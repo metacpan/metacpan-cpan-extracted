@@ -22,10 +22,10 @@ wit:
   This Perl script attempts to mimic the output of example.f using Perl
   classes. The --help option gets you documentation.
 
-* template.pm
+* template.tpl
   This is a file suitable (perhaps!) for generating a complete planetary
   (but not Solar!) class using
-  $ tools/decode -template tools/template.pm >...
+  $ tools/generate -template tools/template.tpl >...
   and its home-grown (yukkk!) templating system.
 
 # ex: set filetype=text textwidth=72 autoindent :

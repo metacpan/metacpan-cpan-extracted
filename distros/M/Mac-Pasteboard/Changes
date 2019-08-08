@@ -1,3 +1,10 @@
+0.010		2019-08-07	T. R. Wyant
+    Tweak t/pasteboard.t do() file names.  This test does things like
+    "do 't/misc.tx';", and some CPAN testers flunk this with the error
+    "... '.' is no longer in @INC ...". So I accepted the error
+    message's recommendation and made it './t/misc.tx'. Thanks to Karen
+    Etheridge for the CPAN Testers report AND the RT ticket.
+
 0.009		2017-03-23	T. R. Wyant
     Move bin/pbtool to script/pbtool
 

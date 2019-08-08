@@ -4,16 +4,16 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 use Moo;
 
 use Carp                  ();
 use Comment::Spell::Check ();
-use File::Find            ();
 use Pod::Wordlist         ();
 use Scalar::Util          ();
 use Test::Builder         ();
+use Test::XTFiles         ();
 
 has _skip => (
     is       => 'ro',
@@ -59,60 +59,16 @@ sub add_stopwords {
 }
 
 sub all_files_ok {
-    my $self = shift;
+    my ($self) = @_;
 
-    my @args = scalar @_ ? @_ : $self->_default_dirs();
-    if ( !@args ) {
+    my @files = Test::XTFiles->new->all_files();
+    if ( !@files ) {
         $TEST->skip_all("No files found\n");
         return 1;
     }
 
-    my @files;
-  ARG:
-    for my $arg (@args) {
-        if ( !-e $arg ) {
-            $TEST->carp("File '$arg' does not exist");
-            next ARG;
-        }
-
-        if ( -l $arg ) {
-            $TEST->carp("Ignoring symlink '$arg'");
-            next ARG;
-        }
-
-        if ( -f $arg ) {
-            push @files, $arg;
-            next ARG;
-        }
-
-        if ( !-d $arg ) {
-            $TEST->carp("File '$arg' is not a file nor a directory. Ignoring it.");
-            next ARG;
-        }
-
-        File::Find::find(
-            {
-                no_chdir   => 1,
-                preprocess => sub {
-                    my @sorted = sort grep { !-l "$File::Find::dir/$_" } @_;
-                    return @sorted;
-                },
-                wanted => sub {
-                    return if !-f $File::Find::name;
-                    push @files, $File::Find::name;
-                },
-            },
-            $arg,
-        );
-    }
-
-    if ( !@files ) {
-        $TEST->skip_all("No files found in (@args)\n");
-        return 1;
-    }
-
     my $rc = 1;
-    for my $file ( grep { $_ !~ m{ [~] $ }xsm } @files ) {
+    for my $file (@files) {
         if ( !$self->file_ok($file) ) {
             $rc = 0;
         }
@@ -200,29 +156,6 @@ sub file_ok {
     return;
 }
 
-sub _default_dirs {
-    my ($self) = @_;
-
-    my @dirs;
-    if ( -d 'blib' ) {
-        push @dirs, 'blib';
-    }
-    elsif ( -d 'lib' ) {
-        push @dirs, 'lib';
-    }
-
-    if ( -d 'bin' ) {
-        push @dirs, 'bin';
-    }
-
-    if ( -d 'script' ) {
-        push @dirs, 'script';
-    }
-
-    my @sorted = sort @dirs;
-    return @sorted;
-}
-
 no Moo;
 
 1;
@@ -239,12 +172,12 @@ Test::Spelling::Comment - check for spelling errors in code comments
 
 =head1 VERSION
 
-Version 0.004
+Version 0.005
 
 =head1 SYNOPSIS
 
     use Test::Spelling::Comment;
-    Test::Spelling::Comment->new->add_stopwords(<DATA>)->all_files_ok();
+    Test::Spelling::Comment->new->add_stopwords(<DATA>)->all_files_ok;
 
 =head1 DESCRIPTION
 
@@ -279,7 +212,7 @@ the input file. This happens before passing the file over to
 L<Comment::Spell::Check|Comment::Spell::Check> for spell checking.
 
 Use this option to remove parts of the file that would otherwise require you
-to add multiple C<stopwords>. En example would be lines like these:
+to add multiple C<stopwords>. An example would be lines like these:
 
     # vim: ts=4 sts=4 sw=4 et: syntax=perl
 
@@ -295,22 +228,22 @@ C<file_ok> will ok the test and return something I<true> if no spelling
 error is found in the code comments. Otherwise it fails the test and returns
 something I<false>.
 
-=head2 all_files_ok( [ @entries ] )
+=head2 all_files_ok
 
-Checks all the spelling of the code comments in all files under C<@entries>
-by calling C<file_ok> on every file. Directories are recursive searched for
-files. Everything not a file and not a directory (e.g. a symlink) is
-ignored. It calls C<done_testing> or C<skip_all> so you can't have already
-called C<plan>.
+Calls the C<all_files> method of L<Test::XTFiles> to get all the files to
+be tested. All files will be checked by calling C<file_ok>.
 
-If C<@entries> is empty default directories are searched for files. The
-default directories are F<blib>, or F<lib> if it doesn't exist, F<bin> and
-F<script>.
+It calls C<done_testing> or C<skip_all> so you can't have already called
+C<plan>.
 
-C<all_files_ok> returns something I<true> if no spelling errors were found
-and I<false> otherwise.
+C<all_files_ok> returns something I<true> if all files test ok and I<false>
+otherwise.
 
-Filenames ending with a C<~> are always ignored.
+Please see L<XT::Files> for how to configure the files to be checked.
+
+WARNING: The API was changed with 0.005. Arguments to C<all_files_ok>
+are now silently discarded and the method is now configured with
+L<XT::Files>.
 
 =head2 add_stopwords( @entries )
 
@@ -344,7 +277,7 @@ directory.
         exit 0;
     }
 
-    Test::Spelling::Comment->new->add_stopwords(<DATA>)->all_files_ok();
+    Test::Spelling::Comment->new->add_stopwords(<DATA>)->all_files_ok;
 
     __DATA__
     your
@@ -354,22 +287,16 @@ directory.
 
 =head2 Example 2 Check non-default directories or files
 
-    use 5.006;
-    use strict;
-    use warnings;
+Use the same test file as in Example 1 and create a F<.xtfilesrc> config
+file in the root directory of your distribution.
 
-    use Test::Spelling::Comment 0.002;
+    [Dirs]
+    module = lib
+    module = tools
+    module = corpus/hello
 
-    if ( exists $ENV{AUTOMATED_TESTING} ) {
-        print "1..0 # SKIP these tests during AUTOMATED_TESTING\n";
-        exit 0;
-    }
-
-    Test::Spelling::Comment->new->all_files_ok(qw(
-        corpus/hello.pl
-        lib
-        tools
-    ));
+    [Files]
+    module = corpus/my.pm
 
 =head2 Example 3 Call C<file_ok> directly
 
@@ -420,7 +347,8 @@ directory and remove the C<vim> comment.
 =head1 SEE ALSO
 
 L<Comment::Spell::Check|Comment::Spell::Check>,
-L<Comment::Spell|Comment::Spell>, L<Test::More|Test::More>
+L<Comment::Spell|Comment::Spell>, L<Test::More|Test::More>,
+L<XT::Files>
 
 =head1 SUPPORT
 
@@ -445,7 +373,7 @@ Sven Kirmess <sven.kirmess@kzone.ch>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Sven Kirmess.
+This software is Copyright (c) 2018-2019 by Sven Kirmess.
 
 This is free software, licensed under:
 

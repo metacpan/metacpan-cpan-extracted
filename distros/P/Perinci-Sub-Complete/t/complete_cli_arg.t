@@ -39,7 +39,8 @@ test_complete(
     comp_line0  => 'CMD -^',
     result      => {words=>
                         [qw(--a1 --a2 --a3 --arg0 --f0 --f1 --h1 --h2 --help
-                            --i0 --i1 --i2 --s1 --s1b --s2 --s3 -? -h)],
+                            --i0 --i1 --i2 --s1 --s1b --s1c --s1d --s2 --s3
+                            -? -h)],
                     esc_mode=>'option'},
 );
 test_complete(
@@ -72,10 +73,22 @@ test_complete(
     result      => {words=>[map {+{word=>$_, summary=>undef}} qw(apple apricot)], static=>0}, # static is 0 here because word is not zero-length
 );
 test_complete(
+    name        => 'arg value (schema) #3 examples',
+    args        => {meta=>$meta},
+    comp_line0  => 'CMD --s1c ^',
+    result      => {words=>[{word=>'bar',summary=>undef},{word=>'baz',summary=>'foo'}], static=>1},
+);
+test_complete(
     name        => 'arg value (spec "completion")',
     args        => {meta=>$meta},
     comp_line0  => 'CMD --s2 a^',
     result      => {words=>["aa".."az"], static=>0},
+);
+test_complete(
+    name        => 'arg value (spec examples)',
+    args        => {meta=>$meta},
+    comp_line0  => 'CMD --s1d ^',
+    result      => {words=>[{word=>'bar',summary=>undef},{word=>'baz',summary=>'foo'}], static=>1},
 );
 test_complete(
     name        => 'arg value, pos',
@@ -84,7 +97,7 @@ test_complete(
     result      => {static=>1, words=>[
         sort(
             qw(--a1 --a2 --a3 --arg0 --f0 --f1 --h1 --h2 --help --i0 --i1
-               --i2 --s1 --s1b --s2 --s3 -? -h),
+               --i2 --s1 --s1b --s1c --s1d --s2 --s3 -? -h),
         ),
         (map {+{word=>$_, summary=>undef}} sort 1..99),
     ]},
@@ -95,7 +108,7 @@ test_complete(
     comp_line0  => 'CMD 2 ^',
     result      => {static=>1, words=>[
         qw(--a1 --a2 --a3 --arg0 --f0 --f1 --h1 --h2 --help --i0 --i1
-           --i2 --s1 --s1b --s2 --s3 -? -h),
+           --i2 --s1 --s1b --s1c --s1d --s2 --s3 -? -h),
         (map {+{word=>$_, summary=>undef}} 'apple', 'apricot', 'banana', 'grape', 'grapefruit', 'green grape', 'red date', 'red grape'),
     ]},
 );

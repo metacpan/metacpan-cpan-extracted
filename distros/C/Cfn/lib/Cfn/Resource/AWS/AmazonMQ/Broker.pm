@@ -1,4 +1,4 @@
-# AWS::AmazonMQ::Broker generated from spec 4.1.0
+# AWS::AmazonMQ::Broker generated from spec 5.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::AmazonMQ::Broker',
@@ -155,6 +155,28 @@ package Cfn::Resource::Properties::AWS::AmazonMQ::Broker::LogListValue {
   has General => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
+subtype 'Cfn::Resource::Properties::AWS::AmazonMQ::Broker::EncryptionOptions',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::AmazonMQ::Broker::EncryptionOptions',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::AWS::AmazonMQ::Broker::EncryptionOptionsValue->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::AWS::AmazonMQ::Broker::EncryptionOptionsValue {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has KmsKeyId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has UseAwsOwnedKey => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
 subtype 'Cfn::Resource::Properties::AWS::AmazonMQ::Broker::ConfigurationId',
      as 'Cfn::Value';
 
@@ -186,6 +208,7 @@ package Cfn::Resource::Properties::AWS::AmazonMQ::Broker {
   has BrokerName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has Configuration => (isa => 'Cfn::Resource::Properties::AWS::AmazonMQ::Broker::ConfigurationId', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has DeploymentMode => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has EncryptionOptions => (isa => 'Cfn::Resource::Properties::AWS::AmazonMQ::Broker::EncryptionOptions', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has EngineType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has EngineVersion => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has HostInstanceType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');

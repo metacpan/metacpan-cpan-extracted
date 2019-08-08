@@ -13,7 +13,7 @@ use Time::HiRes ();
 
 use constant WIN32 => $^O eq 'MSWin32';
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 our $TICK = 0.02;
 
 sub new {
@@ -32,7 +32,7 @@ sub new {
     }, $class;
 }
 
-for my $attr (qw(command redirect timeout keep stdout stderr)) {
+for my $attr (qw(command redirect timeout keep stdout stderr env)) {
     no strict 'refs';
     *$attr = sub {
         my $self = shift;
@@ -49,6 +49,7 @@ sub commandf {
 
 sub run {
     my $self = shift;
+    local %ENV = %{$self->{env}} if $self->{env};
     my $command = $self->{command};
     if (ref $command eq 'CODE') {
         $self->_wrap(sub { $self->_run_code($command) });
@@ -325,6 +326,19 @@ You can disable this behavior by setting keep option false.
 =item stdout / stderr
 
 a code ref that will be called whenever stdout/stderr is available
+
+=item env
+
+set environment variables.
+
+  Command::Runner->new(..., env => \%env)->run
+
+is equivalent to
+
+  {
+    local %ENV = %env;
+    Command::Runner->new(...)->run;
+  }
 
 =back
 

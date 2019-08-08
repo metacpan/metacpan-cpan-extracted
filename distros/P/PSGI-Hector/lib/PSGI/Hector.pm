@@ -34,13 +34,13 @@ everything you need.
 use strict;
 use warnings;
 use File::Basename;
-use Class::Load qw(is_class_loaded);
+use Class::Load qw(is_class_loaded load_class);
 use parent qw(PSGI::Hector::Base PSGI::Hector::Utils);
 use PSGI::Hector::Response;
 use PSGI::Hector::Session;	#for session management
 use PSGI::Hector::Request;
 use PSGI::Hector::Log;
-our $VERSION = "1.9";
+our $VERSION = "1.91";
 #########################################################
 
 =head2 init(\%options)
@@ -68,7 +68,7 @@ sub init{
 	return sub {
 		my $env = shift;
 		my $h = $class->new($options, $env);
-		return $h->run();	#do this thing!
+		$h->run();	#do this thing!
 	};
 }
 #########################################################
@@ -87,29 +87,25 @@ Usually this method is invoked from the init() class method.
 #########################################################
 sub new{
 	my($class, $options, $env) = @_;
-	if($options->{'responsePlugin'}){	#this option is mandatory
-		my $self = $class->SUPER::new();
-		$self->{'_env'} = $env;
-		$self->{'_options'} = $options;
-		my $requestClass = $self->__getFullClassName("Request");
-		if($self->getOption('requestClass')){
-			$requestClass = $self->getOption('requestClass');
-		}
-		if(!defined($self->getOption('debug'))){	#turn off debugging by default
-			$self->_setOption("debug", 0);
-		}
-		$self->{'_request'} = $requestClass->new($env);
-		$self->{'_response'} = PSGI::Hector::Response->new($self, $self->getOption('responsePlugin'));	#this could need access to a request object	
-		$self->{'_log'} = PSGI::Hector::Log->new({
-			'debug' => $self->getOption('debug')
-		});
-		$self->_init();	#perform initial setup
-		return $self;
+	die("No response plugin option provided") unless $options->{'responsePlugin'};	#this option is mandatory
+
+	my $self = $class->SUPER::new();
+	$self->{'_env'} = $env;
+	$self->{'_options'} = $options;
+	my $requestClass = $self->__getFullClassName("Request");
+	if($self->getOption('requestClass')){
+		$requestClass = $self->getOption('requestClass');
 	}
-	else{
-		die("No response plugin option provided");
+	if(!defined($self->getOption('debug'))){	#turn off debugging by default
+		$self->_setOption("debug", 0);
 	}
-	return undef;
+	$self->{'_request'} = $requestClass->new($env);
+	$self->{'_response'} = PSGI::Hector::Response->new($self, $self->getOption('responsePlugin'));	#this could need access to a request object	
+	$self->{'_log'} = PSGI::Hector::Log->new({
+		'debug' => $self->getOption('debug')
+	});
+	$self->_init();	#perform initial setup
+	$self;
 }
 #########################################################
 
@@ -126,8 +122,7 @@ See L<PSGI::Hector::Response> for more details.
 
 ###########################################################
 sub getResponse{
-	my $self = shift;
-	return $self->{'_response'};
+	shift->{'_response'};
 }
 #########################################################
 
@@ -151,7 +146,7 @@ sub getSession{
 		}
 		$self->{'_session'} = $sessionClass->new($self);		
 	}
-	return $self->{'_session'};
+	$self->{'_session'};
 }
 #########################################################
 
@@ -167,12 +162,8 @@ Returns the current instance of the L<PSGI::Hector::Request> object.
 
 ###########################################################
 sub getRequest{
-	my $self = shift;
-	my $request = $self->{'_request'};
-	if(!$request){
-		die("No request object found");
-	}
-	return $request;
+	my $request = shift->{'_request'};
+	$request or die("No request object found");
 }
 #########################################################
 
@@ -188,7 +179,7 @@ returns an current instance of the L<PSGI::Hector::Log> object.
 
 #########################################################
 sub getLog{
-	return shift->{'_log'};
+	shift->{'_log'};
 }
 #########################################################
 
@@ -220,7 +211,7 @@ sub getAction{
 			$action = $sefAction;
 		}
 	}
-	return $action;	
+	$action;
 }
 #########################################################
 
@@ -241,7 +232,7 @@ sub getUrlForAction{
 	if($query){	#add query string
 		$url .= "?" . $query;
 	}
-	return $url;
+	$url;
 }
 #########################################################
 
@@ -304,7 +295,7 @@ sub run{	#run the code for the given action
 			$response->setError("No action found for: $action");
 		}
 	}
-	return $response->display();	#display the output to the browser
+	$response->display();	#display the output to the browser
 }
 ##########################################################
 
@@ -325,33 +316,42 @@ sub getOption{
 	if(defined($self->{'_options'}->{$key})){	#this config option has been set
 		$value = $self->{'_options'}->{$key};
 	}
-	return $value;
+	$value;
 }
 ##########################################################
 sub getEnv{
-    my $self = shift;
-    return $self->{'_env'};
+	shift->{'_env'};
 }
 ###########################################################
 # Private methods
 #########################################################
 sub __getFullClassName{
 	my($self, $name) = @_;
-	no strict 'refs';
 	my $class = ref($self);
-	my $baseClass = @{$class . "::ISA"}[0];	#get base classes
-	my $full = $baseClass . "::" . $name;	#default to base class
-	if(is_class_loaded($class . "::" . $name)){
-		$full = $class . "::" . $name
+	$class->__checkClass($class, $name) or die('Could not find full class name');
+}
+#########################################################
+sub __checkClass{
+	my($class, $current, $name) = @_;
+	my $try = $current . "::" . $name;
+	return $try if is_class_loaded($try);
+	eval{
+		load_class($try);
+	};
+	if($@){
+		no strict 'refs';
+		my @parents = @{$current . "::ISA"};	#get base classes
+		my @results = map { $class->__checkClass($_, $name) } @parents;
+		my @found = grep { defined($_) } @results;
+		shift(@found)
 	}
-	return $full;
 }
 #########################################################
 sub __getActionDigest{
 	my $self = shift;
 	my $sha1 = Digest::SHA1->new();
 	$sha1->add($self->getAction());
-	return $sha1->hexdigest();
+	$sha1->hexdigest();
 }
 ###########################################################
 sub _getSefAction{
@@ -361,7 +361,7 @@ sub _getSefAction{
 	if(defined($env->{'PATH_INFO'}) && $env->{'PATH_INFO'} =~ m/\/(.+)$/){	#get the action from the last part of the url
 		$action = $1;
 	}
-	return $action;
+	$action;
 }
 ###########################################################
 sub _init{	#things to do when this object is created
@@ -369,7 +369,7 @@ sub _init{	#things to do when this object is created
 	if(!defined($self->getOption('checkReferer')) || $self->getOption('checkReferer')){	#check the referer by default
 		$self->_checkReferer();	#check this first
 	}
-	return 1;
+	1;
 }
 ###########################################################
 sub _checkReferer{	#simple referer check for very basic security
@@ -384,31 +384,25 @@ sub _checkReferer{	#simple referer check for very basic security
 		my $response = $self->getResponse();
 		$response->setError("Details where not sent from the correct web page");
 	}
-	return $result;
+	$result;
 }
 ##########################################################
 sub _getActions{
-	my $self = shift;
-	return $self->{'_actions'};
+	shift->{'_actions'};
 }
 ###########################################################
 sub _setOption{
 	my($self, $key, $value) = @_;
 	$self->{'_options'}->{$key} = $value;
-	return 1;
+	1;
 }
 ##########################################################
 sub _getScriptName{ #returns the basename of the running script
 	my $self = shift;
 	my $env = $self->getEnv();
 	my $scriptName = $env->{'REQUEST_URI'};
-	if($scriptName){
-		return basename($scriptName);
-	}
-	else{
-		die("Cant find scriptname, are you running a CGI");
-	}
-	return undef;
+	die("Cant find scriptname, are you running a CGI") unless($scriptName);
+	return basename($scriptName);
 }
 ###########################################################
 

@@ -7,10 +7,11 @@ use Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(spawn receive msg snd quit wt snd_wt listener open_node vpid2pid);
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 use Carp;
 use Event;
+use Socket qw(SOCK_NONBLOCK);
 use IO::Socket;
 use Scalar::Util qw(refaddr);
 use Storable qw(freeze thaw);
@@ -59,7 +60,7 @@ END {
 
 sub spawn(&) {
 	my ($spawn) = @_;
-	socketpair(my $child, my $parent, AF_UNIX, SOCK_STREAM, PF_UNSPEC) or die "socketpair: $!";
+	socketpair(my $child, my $parent, AF_UNIX, SOCK_STREAM|SOCK_NONBLOCK, PF_UNSPEC) or die "socketpair: $!";
 	my $vpid = refaddr $child;
 	push @spawn, [$vpid, $child, $parent, $spawn];
 	return $vpid;

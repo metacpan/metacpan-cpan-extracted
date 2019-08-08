@@ -1,7 +1,7 @@
 use t::lib::Test;
 
-use JSON::XS    qw(encode_json   decode_json);
-use File::Temp  qw(tempdir);
+use JSON::MaybeXS qw(encode_json   decode_json);
+use File::Temp    qw(tempdir);
 
 my $dir;
 BEGIN {

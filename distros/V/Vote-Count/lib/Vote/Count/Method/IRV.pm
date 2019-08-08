@@ -9,13 +9,13 @@ use namespace::autoclean;
 use Moose;
 extends 'Vote::Count';
 
-our $VERSION='0.013';
+our $VERSION='0.017';
 
 =head1 NAME
 
 Vote::Count::IRV
 
-=head1 VERSION 0.013
+=head1 VERSION 0.017
 
 =cut
 
@@ -27,12 +27,34 @@ use List::Util qw( min max );
 # use Vote::Count::RankCount;
 # use Try::Tiny;
 use TextTableTiny 'generate_markdown_table';
-use Data::Printer;
-use Data::Dumper;
+#use Data::Printer;
+#use Data::Dumper;
 
-# use YAML::XS;
+sub _TieBreaker ( $I, $tiebreaker, $active, @choices ) {
+  if ( $tiebreaker eq 'all') { return @choices }
+  my $ranked = undef;
+  if ( $tiebreaker eq 'borda') {
+    $ranked = $I->Borda( $active );
+  } elsif ( $tiebreaker eq 'borda_all') {
+    $ranked = $I->Borda( $I->BallotSet()->{'choices'} );
+  } elsif ( $tiebreaker eq 'approval') {
+    $ranked = $I->Approval();
+  } else { die "undefined tiebreak method $tiebreaker!\n"}
+  my @highchoice = () ;
+  my $highest = 0;
+  my $counted = $ranked->RawCount();
+  for my $c (@choices) {
+    if ( $counted->{$c} > $highest ) {
+      @highchoice = ( $c );
+      $highest = $counted->{$c};
+    } elsif ( $counted->{$c} == $highest ) {
+      push @highchoice, $c;
+    }
+  }
+  return @highchoice;
+}
 
-sub RunIRV ( $self, $active = undef ) {
+sub RunIRV ( $self, $active = undef, $tiebreaker = 'all' ) {
   unless ( defined $active ) { $active = $self->Active() }
   my $roundctr   = 0;
   my $maxround   = scalar( keys %{$active} );
@@ -53,7 +75,10 @@ IRVLOOP:
     if ( defined $majority->{'winner'} ) {
       return $majority;
     } else {
-      my @bottom = sort $round->ArrayBottom()->@*;
+      my @bottom = sort $self->_TieBreaker(
+        $tiebreaker,
+        $active,
+        $round->ArrayBottom()->@* );
       if ( scalar(@bottom) == scalar( keys %{$active} ) ) {
         # if there is a tie at the end, the finalists should
         # be both top and bottom and the active set.
@@ -97,19 +122,27 @@ Instant Runoff Voting is easy to count by hand and meets the Later Harm and Cond
 
 =head2 Tie Handling
 
-If there is a tie for lowest Top Count this implementation removes all of the tied choices, or returns a tie when all choices are tied for lowest.
+There is no standard accepted method for IRV tie resolution, Eliminate All is a common one and the default.
 
-At present there is no interface to set a tie breaker, it is a planned feature enhancement to change this in a future release.
+If there is a tie for lowest Top Count the default is 'all' of the tied choices. Returns a tie when all of the remaining choices are in a tie. An optional value to RunIRV is to specify tiebreaker, see _TieBreaker.
 
-Your Election Rules should specify Eliminate All for ties.
+=head2 _TieBreaker
 
-There is no standard accepted method for IRV tie resolution, Eliminate All is a common one.
+Implements some basic methods for resolving ties. By default RunIRV sets a variable of $tiebreaker = 'all', which is to delete all tied choices. Alternate values that can be set are 'borda' (Borda Count the currently active choices), 'borda_all' (Borda Count all of the Choices on the Ballots), and Approval. The Borda Count methods use the defaults.
+
+Tie Break Methods not provided can be implemented by extending Vote::Count::Method::IRV and over-writing the _TieBreaker Method.
+
+  my @remove = $self->_TieBreaker( $tiebreaker, $active, @choices );
+
+=cut
 
 =head2 RunIRV
 
   $ElectionRunIRV();
 
   $ElectionRunIRV( $active )
+
+  $ElectionRunIRV( $active, 'approval' )
 
 Runs IRV on the provided Ballot Set. Takes an optional parameter of $active which is a hashref for which the keys are the currently active choices.
 

@@ -10,6 +10,7 @@
 # Current limitations :
 # - hardcoded style (underline blue)
 #
+# 2019.08.05 v0.14 jul : added -c (color)
 # 2019.07.09 v0.13 jul : added -s (schemeless), use 5.010, better doc
 # 2019.06.18 v0.12 jul : dropped file extension, added pod
 # 2019.06.15 v0.11 jul : changed shebang
@@ -23,33 +24,35 @@ use Getopt::Std;
 use File::Basename;
 use URI::Find;
 use URI::Find::Schemeless;
-use Term::ANSIColor;
+use Term::ANSIColor qw(colored colorvalid);
 
-our $VERSION    = '0.13';
+our $VERSION    = '0.14';
 my $program     = basename($0);
 my $usage       = <<EOF;
 
-Usage: $program [-hVds] [file ...]
+Usage: $program [-hVds] [-c color] [file ...]
 
     -h, --help      help
     -V, --version   version
     -d              debug
     -s              schemeless
+    -c              color (default : underline blue)
 EOF
 
 # options
 
 my %options = ();
-getopts("hVds", \%options) or die $usage;
+getopts("hVdsc:", \%options) or die $usage;
 
 my $help        = $options{h} // 0;
 my $version     = $options{V} // 0;
 my $debug       = $options{d} // 0;
 my $schemeless  = $options{s} // 0;
+my $color       = $options{c} // 'underline blue';
 
 die $usage if $help;
 die $VERSION . "\n" if $version;
-
+die "color not valid. See `perldoc Term::ANSIColor`\n" if not colorvalid($color);
 
 ########
 # MAIN #
@@ -57,8 +60,8 @@ die $VERSION . "\n" if $version;
 
 my $class = $schemeless ? "URI::Find::Schemeless" : "URI::Find";	# copy-paste from urifind
 my $finder = $class->new( sub {
-	my($uri, $orig_uri) = @_;
-	return colored ($orig_uri, 'underline blue');
+	my ($uri, $orig_uri) = @_;
+	return colored ($orig_uri, $color);
 });
 
 
@@ -87,12 +90,13 @@ uricolor - Colorize URIs with ANSI colors.
 
 =head1 SYNOPSIS
 
-    $ uricolor [-hVds] [file ...]
+    $ uricolor [-hVds] [-c color] [file ...]
 
     -h, --help      help
     -V, --version   version
     -d              debug
     -s              schemeless
+    -c              color (default : underline blue)
 
 =head1 DESCRIPTION
 

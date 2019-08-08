@@ -1,10 +1,10 @@
 {
-   "abstract" : "Parse digital client certificates for Perl's PSGI web servers.",
+   "abstract" : "Parse a client certificate and put details in the env",
    "author" : [
       "Keith Carangelo <mail@kcaran.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
@@ -44,7 +44,8 @@
          "web" : "https://github.com/kcaran/Plack-Middleware-ClientCert"
       }
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "JSON::XS version 3.02"
+   "version" : "0.100",
+   "x_generated_by_perl" : "v5.22.1",
+   "x_serialization_backend" : "JSON::XS version 3.01"
 }
 

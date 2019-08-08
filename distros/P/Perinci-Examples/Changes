@@ -1,6 +1,32 @@
-0.814   2019-06-29 (PERLANCAR)
+0.818   2019-07-19  Released-By: PERLANCAR; Urgency: medium
 
-	- [completion] Replace example with the same theme.
+	- test_completion(): add argument to test schema examples and arg
+	  spec examples.
+
+
+0.817   2019-07-19  Released-By: PERLANCAR; Urgency: medium
+
+	- [incompatible change] Completion: Rename function to be more
+	  consistent.
+
+
+0.816   2019-07-19  Released-By: PERLANCAR; Urgency: medium
+
+	- Completion: Replace Sah attribute 'x.examples' with Sah clause
+	  'examples', also add example for Rinci arg spec's 'examples'
+	  property.
+
+
+0.815   2019-07-06  Released-By: PERLANCAR; Urgency: medium
+
+	- Add function: animal_choice() to demonstrate x.examples &
+	  x.examples.summaries.
+
+
+0.814   2019-06-29  Released-By: PERLANCAR
+
+	- [completion] Replace previous example with another with the same
+          theme as existing example (fruits).
 
 
 0.813   2019-06-29  Released-By: PERLANCAR
@@ -14,7 +40,7 @@
 
 0.812   2019-04-15  Released-By: PERLANCAR
 
-	- Use slurpy instead of greedy for example (Rinci 1.1.88).
+	- Use slurpy instead of greedy for the example (Rinci 1.1.88).
 
 
 0.811   2018-12-07  Released-By: PERLANCAR
@@ -24,7 +50,9 @@
 
 0.810   2018-11-29  Released-By: PERLANCAR
 
-	- Add argument examples.
+	- Add argument examples ('x.examples') which is a source of sample valid
+          values that can be used in completion, among others. Also adds an
+          example for 'x.examples.summaries'.
 
 
 0.80    2017-07-11  Released-By: PERLANCAR

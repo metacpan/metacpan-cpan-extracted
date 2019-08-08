@@ -13,6 +13,7 @@ use Firefox::Marionette::Profile();
 use Firefox::Marionette::Proxy();
 use Firefox::Marionette::Exception();
 use Firefox::Marionette::Exception::Response();
+use Symbol();
 use JSON();
 use IPC::Open3();
 use Socket();
@@ -40,7 +41,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '0.78';
+our $VERSION = '0.80';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -70,6 +71,10 @@ sub _OLD_PROTOCOL_NAME_INDEX        { return 2 }
 sub _OLD_PROTOCOL_PARAMETERS_INDEX  { return 3 }
 sub _OLD_INITIAL_PACKET_SIZE        { return 66 }
 sub _READ_LENGTH_OF_OPEN3_OUTPUT    { return 50 }
+sub _DEFAULT_WINDOW_WIDTH           { return 1024 }
+sub _DEFAULT_WINDOW_HEIGHT          { return 768 }
+sub _DEFAULT_DEPTH                  { return 24 }
+sub _REMOTE_READ_BUFFER_SIZE        { return 8192 }
 
 sub BY_XPATH {
     Carp::carp(
@@ -198,13 +203,57 @@ sub downloads {
     return @entries;
 }
 
+sub _setup_ssh {
+    my ( $self, $host, $user ) = @_;
+    $self->{_ssh_control_directory} = File::Temp->newdir(
+        File::Spec->catdir( File::Spec->tmpdir(), 'perl_ff_m_XXXXXXXXXXX' ) )
+      or Firefox::Marionette::Exception->throw(
+        "Failed to create temporary directory:$EXTENDED_OS_ERROR");
+    if ( !defined $user ) {
+        $user = getpwuid $EFFECTIVE_USER_ID;
+    }
+    $self->{_ssh} = {
+        host         => $host,
+        user         => $user,
+        control_path => File::Spec->catfile(
+            $self->{_ssh_control_directory}->dirname(),
+            'control.sock'
+        ),
+    };
+    return;
+}
+
+sub _control_path {
+    my ($self) = @_;
+    if ( my $ssh = $self->_ssh() ) {
+        return $ssh->{control_path};
+    }
+    return;
+}
+
+sub _ssh {
+    my ($self) = @_;
+    return $self->{_ssh};
+}
+
 sub new {
     my ( $class, %parameters ) = @_;
     my $self = bless {}, $class;
     $self->{last_message_id}  = 0;
     $self->{creation_pid}     = $PROCESS_ID;
     $self->{sleep_time_in_ms} = $parameters{sleep_time_in_ms};
-    $self->{mime_types}       = [
+    $self->{survive}          = $parameters{survive};
+    $self->{debug}            = $parameters{debug};
+    if ( defined $parameters{host} ) {
+        $self->_setup_ssh( $parameters{host}, $parameters{user} );
+    }
+    if ( defined $parameters{width} ) {
+        $self->{window_width} = $parameters{width};
+    }
+    if ( defined $parameters{height} ) {
+        $self->{window_height} = $parameters{height};
+    }
+    $self->{mime_types} = [
         qw(
           application/x-gzip
           application/gzip
@@ -245,7 +294,12 @@ sub new {
         }
     }
     my @arguments = $self->_setup_arguments(%parameters);
-    $self->{_pid} = $self->_launch(@arguments);
+    if ( $self->_ssh() ) {
+        $self->{_pid} = $self->_launch(@arguments);
+    }
+    else {
+        $self->{_pid} = $self->_launch(@arguments);
+    }
     my $socket = $self->_setup_local_connection_to_firefox(@arguments);
     my ( $session_id, $capabilities ) =
       $self->_initial_socket_setup( $socket, $parameters{capabilities} );
@@ -261,7 +315,7 @@ sub new {
         Firefox::Marionette::Exception->throw(
             'Failed to correctly setup the Firefox process');
     }
-    if ( $OSNAME eq 'cygwin' ) {
+    if ( ( $OSNAME eq 'cygwin' ) || ( $self->_ssh() ) ) {
     }
     elsif ( $self->marionette_protocol() <= _MARIONETTE_PROTOCOL_VERSION_3() ) {
     }
@@ -385,9 +439,13 @@ sub _setup_arguments {
     if ( $parameters{firefox_binary} ) {
         $self->{firefox_binary} = $parameters{firefox_binary};
     }
+    if ( defined $self->{window_width} ) {
+        push @arguments, '-width', $self->{window_width};
+    }
+    if ( defined $self->{window_height} ) {
+        push @arguments, '-height', $self->{window_height};
+    }
     push @arguments, $self->_check_addons(%parameters);
-
-    $self->{debug} = $parameters{debug};
     push @arguments, $self->_check_visible(%parameters);
     if ( $parameters{profile_name} ) {
         $self->{profile_name} = $parameters{profile_name};
@@ -400,27 +458,18 @@ sub _setup_arguments {
             $profile_directory =
               $self->execute( 'cygpath', '-s', '-m', $profile_directory );
         }
-        my $path = File::Spec->catfile( $profile_directory, 'mimeTypes.rdf' );
-        my $handle =
-          FileHandle->new( $path,
-            Fcntl::O_WRONLY() | Fcntl::O_CREAT() | Fcntl::O_EXCL() )
-          or Firefox::Marionette::Exception->throw(
-            "Failed to open '$path' for writing:$EXTENDED_OS_ERROR");
-        $handle->print(
-            <<'_RDF_') or Firefox::Marionette::Exception->throw("Failed to write to '$path':$EXTENDED_OS_ERROR");
+        my $mime_types_content = <<'_RDF_';
 <?xml version="1.0"?>
 <RDF:RDF xmlns:NC="http://home.netscape.com/NC-rdf#"
          xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <RDF:Seq RDF:about="urn:mimetypes:root">
 _RDF_
         foreach my $mime_type ( @{ $self->{mime_types} } ) {
-            $handle->print(
-                <<"_RDF_") or Firefox::Marionette::Exception->throw("Failed to write to '$path':$EXTENDED_OS_ERROR");
+            $mime_types_content .= <<'_RDF_';
     <RDF:li RDF:resource="urn:mimetype:$mime_type"/>
 _RDF_
         }
-        $handle->print(
-            <<'_RDF_') or Firefox::Marionette::Exception->throw("Failed to write to '$path':$EXTENDED_OS_ERROR");
+        $mime_types_content .= <<'_RDF_';
   </RDF:Seq>
   <RDF:Description RDF:about="urn:root"
                    NC:en-US_defaultHandlersVersion="4" />
@@ -429,8 +478,7 @@ _RDF_
   </RDF:Description>
 _RDF_
         foreach my $mime_type ( @{ $self->{mime_types} } ) {
-            $handle->print(
-                <<"_RDF_") or Firefox::Marionette::Exception->throw("Failed to write to '$path':$EXTENDED_OS_ERROR");
+            $mime_types_content .= <<'_RDF_';
   <RDF:Description RDF:about="urn:mimetype:handler:$mime_type"
                    NC:saveToDisk="true"
                    NC:alwaysAsk="false" />
@@ -440,17 +488,79 @@ _RDF_
   </RDF:Description>
 _RDF_
         }
-        $handle->print(
-            <<'_RDF_') or Firefox::Marionette::Exception->throw("Failed to write to '$path':$EXTENDED_OS_ERROR");
+        $mime_types_content .= <<'_RDF_';
 </RDF:RDF>
 _RDF_
-        $handle->close
-          or Firefox::Marionette::Exception->throw(
-            "Failed to close '$path':$EXTENDED_OS_ERROR");
+        if ( $self->_ssh() ) {
+            $self->_write_mime_types_via_ssh($mime_types_content);
+        }
+        else {
+            my $path =
+              File::Spec->catfile( $profile_directory, 'mimeTypes.rdf' );
+            my $handle =
+              FileHandle->new( $path,
+                Fcntl::O_WRONLY() | Fcntl::O_CREAT() | Fcntl::O_EXCL() )
+              or Firefox::Marionette::Exception->throw(
+                "Failed to open '$path' for writing:$EXTENDED_OS_ERROR");
+            $handle->print($mime_types_content)
+              or Firefox::Marionette::Exception->throw(
+                "Failed to write to '$path':$EXTENDED_OS_ERROR");
+            $handle->close
+              or Firefox::Marionette::Exception->throw(
+                "Failed to close '$path':$EXTENDED_OS_ERROR");
+        }
         push @arguments,
           ( '-profile', $profile_directory, '--no-remote', '--new-instance' );
     }
     return @arguments;
+}
+
+sub _write_mime_types_via_ssh {
+    my ( $self, $mime_types_content ) = @_;
+    my $read_handle  = Symbol::gensym();
+    my $write_handle = Symbol::gensym();
+    pipe $read_handle, $write_handle
+      or Carp::croak("Failed to create pipe:$EXTENDED_OS_ERROR");
+    $write_handle = IO::Handle->new_from_fd( fileno $write_handle, '>' );
+    $write_handle->autoflush(1);
+    $read_handle = IO::Handle->new_from_fd( fileno $read_handle, '<' );
+    $read_handle->autoflush(1);
+    fcntl $read_handle, Fcntl::F_SETFD(), 0
+      or Firefox::Marionette::Exception->throw(
+"Failed to clear close-on-exec flag on pipe read handle: $EXTENDED_OS_ERROR"
+      );
+    my $destination =
+      $self->_remote_catfile( $self->{profile_directory}, 'mimeTypes.rdf' );
+
+    if ( my $pid = fork ) {
+        print {$write_handle} $mime_types_content
+          or Carp::croak("Failed to write to $destination");
+        close $write_handle
+          or Carp::croak("Failed to close $destination");
+        waitpid $pid, 0;
+        if ( $CHILD_ERROR != 0 ) {
+            Carp::croak("Failed to copy mime type data to $destination");
+        }
+    }
+    elsif ( defined $pid ) {
+        eval {
+            open STDIN, '<&', $read_handle
+              or Carp::croak(
+"Failed to redirect STDIN to pipe read handle:$EXTENDED_OS_ERROR"
+              );
+            $self->_ssh_exec( $self->_ssh_parameters(),
+                $self->_ssh_address(), "cat >$destination" )
+              or Firefox::Marionette::Exception->throw(
+                "Failed to exec 'ssh':$EXTENDED_OS_ERROR");
+        } or do {
+            chomp $EVAL_ERROR;
+            warn "$EVAL_ERROR\n";
+        };
+    }
+    else {
+        Carp::croak("Failed to fork:$EXTENDED_OS_ERROR");
+    }
+    return;
 }
 
 sub _is_xvfb_okay {
@@ -576,13 +686,104 @@ sub execute {
     return;
 }
 
+sub _get_version_via_ssh {
+    my ( $self, $binary, @arguments ) = @_;
+    my $version;
+    my $read_handle  = Symbol::gensym();
+    my $write_handle = Symbol::gensym();
+    pipe $read_handle, $write_handle
+      or Carp::croak("Failed to create pipe:$EXTENDED_OS_ERROR");
+    $write_handle = IO::Handle->new_from_fd( fileno $write_handle, '>' );
+    $write_handle->autoflush(1);
+    $read_handle = IO::Handle->new_from_fd( fileno $read_handle, '<' );
+    $read_handle->autoflush(1);
+    fcntl $write_handle, Fcntl::F_SETFD(), 0
+      or Firefox::Marionette::Exception->throw(
+"Failed to clear close-on-exec flag on pipe write handle: $EXTENDED_OS_ERROR"
+      );
+
+    if ( my $pid = fork ) {
+        close $write_handle
+          or Firefox::Marionette::Exception->throw(
+            "Failed to close write pipe in parent:$EXTENDED_OS_ERROR");
+        my ( $result, $contents );
+        while ( $result = sysread $read_handle, my $buffer,
+            _REMOTE_READ_BUFFER_SIZE() )
+        {
+            $contents .= $buffer;
+        }
+        defined $result
+          or Firefox::Marionette::Exception->throw(
+            'Failed to read firefox version from '
+              . (
+                join q[ ], 'ssh', $self->_ssh_parameters( master => 1 ),
+                $self->_ssh_address(), $binary, @arguments
+              )
+              . ":$EXTENDED_OS_ERROR"
+          );
+        close $read_handle
+          or Firefox::Marionette::Exception->throw(
+            'Failed to close '
+              . (
+                join q[ ], 'ssh', $self->_ssh_parameters( master => 1 ),
+                $self->_ssh_address(), $binary, @arguments
+              )
+              . ":$EXTENDED_OS_ERROR"
+          );
+        waitpid $pid, 0;
+        if ( $CHILD_ERROR != 0 ) {
+            Firefox::Marionette::Exception->throw(
+                'Failed to successfully determine firefox version from '
+                  . (
+                    join q[ ], 'ssh', $self->_ssh_parameters( master => 1 ),
+                    $self->_ssh_address(), $binary, @arguments
+                  )
+                  . q[:]
+                  . $self->_error_message( 'ssh', $CHILD_ERROR )
+            );
+        }
+        $version = $contents;
+    }
+    elsif ( defined $pid ) {
+        eval {
+            close $read_handle
+              or Firefox::Marionette::Exception->throw(
+                "Failed to close read pipe in child:$EXTENDED_OS_ERROR");
+            open STDOUT, '>&', $write_handle
+              or Firefox::Marionette::Exception->throw(
+"Failed to redirect STDOUT to pipe write handle:$EXTENDED_OS_ERROR"
+              );
+            local $OUTPUT_AUTOFLUSH = 1;
+            $self->_ssh_exec( $self->_ssh_parameters( master => 1 ),
+                $self->_ssh_address(), $binary, @arguments )
+              or Firefox::Marionette::Exception->throw(
+                "Failed to exec 'ssh':$EXTENDED_OS_ERROR");
+        } or do {
+            chomp $EVAL_ERROR;
+            warn "$EVAL_ERROR\n";
+        };
+    }
+    else {
+        Firefox::Marionette::Exception->throw(
+            "Failed to fork:$EXTENDED_OS_ERROR");
+    }
+    return $version;
+}
+
 sub _initialise_version {
     my ($self) = @_;
     if ( defined $self->{_initial_version} ) {
     }
     else {
-        my $binary         = $self->_binary();
-        my $version_string = $self->execute( $binary, '--version' );
+        my $binary = $self->_binary();
+        my $version_string;
+        if ( $self->_ssh() ) {
+            $version_string =
+              $self->_get_version_via_ssh( $binary, '--version' );
+        }
+        else {
+            $version_string = $self->execute( $binary, '--version' );
+        }
         if ( $version_string =~
             /Mozilla[ ]Firefox[ ](\d+)[.](\d+(?:\w\d+)?)(?:[.](\d+))?\s*$/smx )
 
@@ -618,8 +819,37 @@ sub _pid {
     return $self->{_pid};
 }
 
+sub _launch_via_ssh {
+    my ( $self, @arguments ) = @_;
+    if ( my $pid = fork ) {
+        $self->{_ssh}->{pid} = $pid;
+        return $pid;
+    }
+    elsif ( defined $pid ) {
+        eval {
+            $self->_ssh_exec( $self->_ssh_parameters(),
+                $self->_ssh_address(), $self->_binary(), @arguments )
+              or Firefox::Marionette::Exception->throw(
+                "Failed to exec 'ssh':$EXTENDED_OS_ERROR");
+        } or do {
+            if ( $self->_debug() ) {
+                chomp $EVAL_ERROR;
+                warn "$EVAL_ERROR\n";
+            }
+        };
+        exit 1;
+    }
+    else {
+        Carp::croak("Failed to fork:$EXTENDED_OS_ERROR");
+    }
+    return;
+}
+
 sub _launch {
     my ( $self, @arguments ) = @_;
+    if ( $self->_ssh() ) {
+        return $self->_launch_via_ssh(@arguments);
+    }
     if ( $OSNAME eq 'MSWin32' ) {
         return $self->_launch_win32(@arguments);
     }
@@ -838,11 +1068,20 @@ sub _launch_xvfb {
       or Firefox::Marionette::Exception->throw(
 "Failed to clear the close-on-exec flag on a temporary file:$EXTENDED_OS_ERROR"
       );
-    my @arguments = (
-        '-displayfd',  fileno $display_no_handle,
-        '-screen',     '0',
-        '1024x768x24', '-nolisten',
-        'tcp',         '-fbdir',
+    my $width =
+      defined $self->{window_width}
+      ? $self->{window_width}
+      : _DEFAULT_WINDOW_WIDTH();
+    my $height =
+      defined $self->{window_height}
+      ? $self->{window_height}
+      : _DEFAULT_WINDOW_HEIGHT();
+    my $width_height_depth = join q[x], $width, $height, _DEFAULT_DEPTH();
+    my @arguments          = (
+        '-displayfd',        fileno $display_no_handle,
+        '-screen',           '0',
+        $width_height_depth, '-nolisten',
+        'tcp',               '-fbdir',
         $self->{_xvfb_fbdir_directory}->dirname(),
     );
     my $binary   = $self->_xvfb_binary();
@@ -985,6 +1224,9 @@ sub _binary {
     if ( $self->{firefox_binary} ) {
         $binary = $self->{firefox_binary};
     }
+    elsif ( $self->_ssh() ) {
+        return $binary;
+    }
     else {
         if ( $OSNAME eq 'MSWin32' ) {
           SEARCH:
@@ -1032,7 +1274,7 @@ sub child_error {
 }
 
 sub _signal_name {
-    my ( $self, $number ) = @_;
+    my ( $proto, $number ) = @_;
     my @sig_names = split q[ ], $Config{sig_name};
     return $sig_names[$number];
 }
@@ -1081,7 +1323,17 @@ sub _error_message {
 
 sub _reap {
     my ($self) = @_;
-    if ( $OSNAME eq 'MSWin32' ) {
+    if ( my $ssh = $self->_ssh() ) {
+        while ( ( my $pid = waitpid _ANYPROCESS(), POSIX::WNOHANG() ) > 0 ) {
+            if ( ( $ssh->{pid} ) && ( $pid == $ssh->{pid} ) ) {
+                $self->{_child_error} = $CHILD_ERROR;
+            }
+            elsif ( ( $self->xvfb() ) && ( $pid == $self->xvfb() ) ) {
+                $self->{_xvfb_child_error} = $CHILD_ERROR;
+            }
+        }
+    }
+    elsif ( $OSNAME eq 'MSWin32' ) {
         if ( $self->{_win32_process} ) {
             $self->{_win32_process}->GetExitCode( my $exit_code );
             if ( $exit_code != Win32::Process::STILL_ACTIVE() ) {
@@ -1104,7 +1356,13 @@ sub _reap {
 
 sub alive {
     my ($self) = @_;
-    if ( $OSNAME eq 'MSWin32' ) {
+    if ( my $ssh = $self->_ssh() ) {
+        $self->_reap();
+        if ( defined $ssh->{pid} ) {
+            return kill 0, $ssh->{pid};
+        }
+    }
+    elsif ( $OSNAME eq 'MSWin32' ) {
         if ( $self->{_win32_process} ) {
             $self->{_win32_process}->GetExitCode( my $exit_code );
             $self->_reap();
@@ -1123,26 +1381,108 @@ sub alive {
     }
 }
 
+sub _forwarding_path {
+    my ($self) = @_;
+    if ( defined $self->{_ssh_control_directory} ) {
+        my $path =
+          File::Spec->catfile( $self->{_ssh_control_directory}->dirname(),
+            'forward.sock' );
+        return $path;
+    }
+    return;
+
+}
+
+sub _setup_local_path_via_ssh {
+    my ( $self, $port ) = @_;
+    my $path;
+    if ( $self->_ssh() ) {
+        $path = $self->_forwarding_path();
+        if ( my $pid = fork ) {
+            waitpid $pid, 0;
+            if ( $CHILD_ERROR != 0 ) {
+                Firefox::Marionette::Exception->throw(
+                        'Failed to forward marionette port from '
+                      . $self->_ssh_address() . q[:]
+                      . $self->_error_message( 'ssh', $CHILD_ERROR ) );
+            }
+            return $path;
+        }
+        elsif ( defined $pid ) {
+            eval {
+                $self->_ssh_exec( $self->_ssh_parameters(),
+                    '-L', "$path:localhost:$port", '-O', 'forward',
+                    $self->_ssh_address() )
+                  or Firefox::Marionette::Exception->throw(
+                    "Failed to exec 'ssh':$EXTENDED_OS_ERROR");
+            } or do {
+                if ( $self->_debug() ) {
+                    chomp $EVAL_ERROR;
+                    warn "$EVAL_ERROR\n";
+                }
+            };
+            exit 1;
+        }
+        else {
+            Firefox::Marionette::Exception->throw(
+                "Failed to fork:$EXTENDED_OS_ERROR");
+        }
+    }
+    return;
+}
+
+sub _get_port_or_undef {
+    my ($self) = @_;
+    my $port;
+    if ( $self->{profile_path} ) {
+        $port = defined $port && $port > 0 ? $port : $self->_get_port();
+        if ( $port == 0 ) {
+            sleep 1;
+            return;
+        }
+    }
+    return $port;
+}
+
+sub _get_sock_addr {
+    my ( $self, $host, $port ) = @_;
+    my $sock_addr;
+    if ( $self->_ssh() ) {
+        if ( -e $self->_control_path() ) {
+            my $path = $self->_setup_local_path_via_ssh($port);
+            $sock_addr = Socket::pack_sockaddr_un($path);
+        }
+        else {
+            sleep 1;
+            return;
+        }
+    }
+    else {
+        $sock_addr =
+          Socket::pack_sockaddr_in( $port, Socket::inet_aton($host) );
+    }
+    return $sock_addr;
+}
+
 sub _setup_local_connection_to_firefox {
     my ( $self, @arguments ) = @_;
     my $host = _DEFAULT_HOST();
     my $port;
     my $socket;
+    my $sock_addr;
     my $connected;
     while ( ( !$connected ) && ( $self->alive() ) ) {
         $socket = undef;
-        socket $socket, Socket::PF_INET(), Socket::SOCK_STREAM(), 0
+        socket $socket, $self->_ssh() ? Socket::PF_UNIX() : Socket::PF_INET(),
+          Socket::SOCK_STREAM(), 0
           or Firefox::Marionette::Exception->throw(
             "Failed to create a socket:$EXTENDED_OS_ERROR");
         binmode $socket;
-        if ( $self->{profile_path} ) {
-            $port = $self->_get_port();
-            next if ( !defined $port );
-            next if ( $port == 0 );
-        }
-        if ( connect $socket,
-            Socket::pack_sockaddr_in( $port, Socket::inet_aton($host) ) )
-        {
+        $port ||= $self->_get_port_or_undef();
+        next if ( !defined $port );
+        $sock_addr ||= $self->_get_sock_addr( $host, $port );
+        next if ( !defined $sock_addr );
+        if ( connect $socket, $sock_addr ) {
             $connected = 1;
         }
         elsif ( $EXTENDED_OS_ERROR == POSIX::ECONNREFUSED() ) {
@@ -1163,23 +1503,119 @@ sub _setup_local_connection_to_firefox {
     }
     else {
         my $error_message =
-          $self->error_message() ? $self->error_message() : q[];
+            $self->error_message()
+          ? $self->error_message()
+          : q[Firefox was not launched];
         Firefox::Marionette::Exception->throw($error_message);
     }
     return $socket;
 }
 
+sub _remote_catfile {
+    my ( $self, @parts ) = @_;
+    return join q[/], @parts;
+}
+
+sub _ssh_address {
+    my ($self) = @_;
+    my $address = join q[], $self->{_ssh}->{user}, q[@], $self->{_ssh}->{host};
+    return $address;
+}
+
+sub _ssh_parameters {
+    my ( $self, %parameters ) = @_;
+    my @parameters = (
+        '-2',
+        '-q',
+        '-o' => 'ExitOnForwardFailure=yes',
+        '-o' => 'BatchMode=yes',
+    );
+    if ( $parameters{master} ) {
+        push @parameters,
+          (
+            '-o' => 'ControlPath=' . $self->_control_path(),
+            '-o' => 'ControlMaster=yes',
+            '-o' => 'ControlPersist=yes',
+          );
+    }
+    else {
+        push @parameters,
+          (
+            '-o' => 'ControlPath=' . $self->_control_path(),
+            '-o' => 'ControlMaster=no',
+          );
+    }
+    return @parameters;
+}
+
+sub _ssh_exec {
+    my ( $self, @parameters ) = @_;
+    if ( $self->_debug() ) {
+        warn q[** ] . ( join q[ ], 'ssh', @parameters ) . "\n";
+    }
+    return exec {'ssh'} 'ssh', @parameters;
+}
+
+sub _make_remote_directory {
+    my ($self) = @_;
+    my $profile_directory =
+      File::Temp::mktemp('.firefox_marionette_profile_XXXXXXXXXXX');
+    if ( my $pid = fork ) {
+        waitpid $pid, 0;
+        if ( $CHILD_ERROR != 0 ) {
+            Firefox::Marionette::Exception->throw(
+                    'Failed to create directory '
+                  . $self->_ssh_address()
+                  . ":$profile_directory:"
+                  . $self->_error_message( 'ssh', $CHILD_ERROR ) );
+        }
+        return $profile_directory;
+    }
+    elsif ( defined $pid ) {
+        eval {
+            $self->_ssh_exec( $self->_ssh_parameters(),
+                $self->_ssh_address(), 'mkdir', '-m', '700',
+                $profile_directory )
+              or Firefox::Marionette::Exception->throw(
+                "Failed to exec 'ssh':$EXTENDED_OS_ERROR");
+        } or do {
+            if ( $self->_debug() ) {
+                chomp $EVAL_ERROR;
+                warn "$EVAL_ERROR\n";
+            }
+        };
+        exit 1;
+    }
+    else {
+        Firefox::Marionette::Exception->throw(
+            "Failed to fork:$EXTENDED_OS_ERROR");
+    }
+    return;
+}
+
 sub _setup_new_profile {
     my ( $self, $profile ) = @_;
-    $self->{profile_directory} = File::Temp->newdir(
-        File::Spec->catdir(
-            File::Spec->tmpdir(), 'firefox_marionette_profile_XXXXXXXXXXX'
-        )
-      )
-      or Firefox::Marionette::Exception->throw(
-        "Failed to create temporary directory:$EXTENDED_OS_ERROR");
-    my $profile_path =
-      File::Spec->catfile( $self->{profile_directory}, 'prefs.js' );
+    if ( $self->_ssh() ) {
+        $self->{profile_directory} = $self->_make_remote_directory();
+    }
+    else {
+        $self->{profile_directory} = File::Temp->newdir(
+            File::Spec->catdir(
+                File::Spec->tmpdir(), 'firefox_marionette_profile_XXXXXXXXXXX'
+            )
+          )
+          or Firefox::Marionette::Exception->throw(
+            "Failed to create temporary directory:$EXTENDED_OS_ERROR");
+    }
+    my $profile_path;
+    if ( $self->_ssh() ) {
+        $profile_path =
+          $self->_remote_catfile( $self->{profile_directory}, 'prefs.js' );
+    }
+    else {
+        $profile_path =
+          File::Spec->catfile( $self->{profile_directory}, 'prefs.js' );
+    }
     $self->{profile_path} = $profile_path;
     if ($profile) {
     }
@@ -1203,30 +1639,191 @@ sub _setup_new_profile {
         $profile->set_value( 'marionette.defaultPrefs.port', $port );
         $profile->set_value( 'marionette.port',              $port );
     }
-    $profile->save($profile_path);
+    if ( $self->_ssh() ) {
+        $self->_save_profile_via_ssh($profile);
+    }
+    else {
+        $profile->save($profile_path);
+    }
     return $self->{profile_directory};
+}
+
+sub _save_profile_via_ssh {
+    my ( $self, $profile ) = @_;
+    my $read_handle  = Symbol::gensym();
+    my $write_handle = Symbol::gensym();
+    pipe $read_handle, $write_handle
+      or Carp::croak("Failed to create pipe:$EXTENDED_OS_ERROR");
+    $write_handle = IO::Handle->new_from_fd( fileno $write_handle, '>' );
+    $write_handle->autoflush(1);
+    $read_handle = IO::Handle->new_from_fd( fileno $read_handle, '<' );
+    $read_handle->autoflush(1);
+    fcntl $read_handle, Fcntl::F_SETFD(), 0
+      or Firefox::Marionette::Exception->throw(
+"Failed to clear close-on-exec flag on pipe read handle: $EXTENDED_OS_ERROR"
+      );
+    my $destination = $self->{profile_path};
+
+    if ( my $pid = fork ) {
+        close $read_handle
+          or Firefox::Marionette::Exception->throw(
+            "Failed to close read handle for pipe:$EXTENDED_OS_ERROR");
+        print {$write_handle} $profile->as_string()
+          or Firefox::Marionette::Exception->throw(
+            "Failed to write to $destination:$EXTENDED_OS_ERROR");
+        close $write_handle or Carp::croak("Failed to close $destination");
+        waitpid $pid, 0;
+        if ( $CHILD_ERROR != 0 ) {
+            Firefox::Marionette::Exception->throw(
+                    'Failed to copy profile data to '
+                  . $self->_ssh_address()
+                  . ":$destination:"
+                  . $self->_error_message( 'ssh', $CHILD_ERROR ) );
+        }
+    }
+    elsif ( defined $pid ) {
+        eval {
+            close $write_handle
+              or Firefox::Marionette::Exception->throw(
+                "Failed to close write handle for pipe:$EXTENDED_OS_ERROR");
+            open STDIN, '<&', $read_handle
+              or Carp::croak(
+"Failed to redirect STDIN to pipe read handle:$EXTENDED_OS_ERROR"
+              );
+            $self->_ssh_exec( $self->_ssh_parameters(),
+                $self->_ssh_address(), "cat >$destination" )
+              or Firefox::Marionette::Exception->throw(
+                "Failed to exec 'ssh':$EXTENDED_OS_ERROR");
+        } or do {
+            chomp $EVAL_ERROR;
+            warn "$EVAL_ERROR\n";
+        };
+    }
+    else {
+        Firefox::Marionette::Exception->throw(
+            "Failed to fork:$EXTENDED_OS_ERROR");
+    }
+    return;
+}
+
+sub _get_port_via_ssh {
+    my ($self) = @_;
+    my $port;
+    my $read_handle  = Symbol::gensym();
+    my $write_handle = Symbol::gensym();
+    pipe $read_handle, $write_handle
+      or Carp::croak("Failed to create pipe:$EXTENDED_OS_ERROR");
+    $write_handle = IO::Handle->new_from_fd( fileno $write_handle, '>' );
+    $write_handle->autoflush(1);
+    $read_handle = IO::Handle->new_from_fd( fileno $read_handle, '<' );
+    $read_handle->autoflush(1);
+    fcntl $write_handle, Fcntl::F_SETFD(), 0
+      or Firefox::Marionette::Exception->throw(
+"Failed to clear close-on-exec flag on pipe write handle: $EXTENDED_OS_ERROR"
+      );
+    my $source = $self->{profile_path};
+
+    if ( my $pid = fork ) {
+        close $write_handle
+          or Firefox::Marionette::Exception->throw(
+            "Failed to close write pipe in parent:$EXTENDED_OS_ERROR");
+        my ( $result, $contents );
+        while ( $result = sysread $read_handle, my $buffer,
+            _REMOTE_READ_BUFFER_SIZE() )
+        {
+            $contents .= $buffer;
+        }
+        defined $result
+          or Firefox::Marionette::Exception->throw(
+                'Failed to read profile data from '
+              . $self->_ssh_address()
+              . ":$source:$EXTENDED_OS_ERROR" );
+        my $sandbox_regex = $self->_sandbox_regex();
+        foreach my $line ( split /\r?\n/smx, $contents ) {
+            if ( $line =~
+                /^user_pref[(]"marionette[.]port",[ ]*(\d+)[)];\s*$/smx )
+            {
+                $port = $1;
+            }
+            elsif ( $line =~
+                /^user_pref[(]"$sandbox_regex",[ ]*"([^"]+)"[)];\s*$/smx )
+            {
+                my ( $sandbox, $uuid ) = ( $1, $2 );
+                $self->{_ssh}->{sandbox}->{$sandbox} = $uuid;
+            }
+        }
+        close $read_handle
+          or Firefox::Marionette::Exception->throw( 'Failed to close '
+              . $self->_ssh_address()
+              . ":$source:$EXTENDED_OS_ERROR" );
+        waitpid $pid, 0;
+        if ( $CHILD_ERROR != 0 ) {
+            Firefox::Marionette::Exception->throw(
+                    'Failed to successfully retrieve profile data from '
+                  . $self->_ssh_address() . q[:]
+                  . $self->_error_message( 'ssh', $CHILD_ERROR ) );
+        }
+    }
+    elsif ( defined $pid ) {
+        eval {
+            close $read_handle
+              or Firefox::Marionette::Exception->throw(
+                "Failed to close read pipe in child:$EXTENDED_OS_ERROR");
+            open STDOUT, '>&', $write_handle
+              or Firefox::Marionette::Exception->throw(
+"Failed to redirect STDOUT to pipe write handle:$EXTENDED_OS_ERROR"
+              );
+            local $OUTPUT_AUTOFLUSH = 1;
+            $self->_ssh_exec( $self->_ssh_parameters(),
+                $self->_ssh_address(), "cat $source" )
+              or Firefox::Marionette::Exception->throw(
+                "Failed to exec 'ssh':$EXTENDED_OS_ERROR");
+        } or do {
+            chomp $EVAL_ERROR;
+            warn "$EVAL_ERROR\n";
+        };
+    }
+    else {
+        Firefox::Marionette::Exception->throw(
+            "Failed to fork:$EXTENDED_OS_ERROR");
+    }
+    return $port;
 }
 
 sub _get_port {
     my ($self) = @_;
     my $port;
-    my $profile_handle =
-      FileHandle->new( $self->{profile_path}, Fcntl::O_RDONLY() )
-      or ( ( $OSNAME eq 'MSWin32' )
-        && ( $EXTENDED_OS_ERROR == _WIN32_ERROR_SHARING_VIOLATION() ) )
-      or Firefox::Marionette::Exception->throw(
-        "Failed to open '$self->{profile_path}' for reading:$EXTENDED_OS_ERROR"
-      );
-    if ($profile_handle) {
-        while ( my $line = <$profile_handle> ) {
-            if ( $line =~ /user_pref[(]"marionette.port",[ ]*(\d+)[)];\s*$/smx )
-            {
-                $port = $1;
-            }
-        }
-        $profile_handle->close()
+    if ( my $ssh = $self->_ssh() ) {
+        $port = $self->_get_port_via_ssh();
+    }
+    else {
+        my $profile_handle =
+          FileHandle->new( $self->{profile_path}, Fcntl::O_RDONLY() )
+          or ( ( $OSNAME eq 'MSWin32' )
+            && ( $EXTENDED_OS_ERROR == _WIN32_ERROR_SHARING_VIOLATION() ) )
           or Firefox::Marionette::Exception->throw(
-            "Failed to close '$self->{profile_path}':$EXTENDED_OS_ERROR");
+"Failed to open '$self->{profile_path}' for reading:$EXTENDED_OS_ERROR"
+          );
+        if ($profile_handle) {
+            my $sandbox_regex = $self->_sandbox_regex();
+            qr/security[.]sandbox[.](\w+)[.]tempDirSuffix/smx;
+            while ( my $line = <$profile_handle> ) {
+                if ( $line =~
+                    /^user_pref[(]"marionette.port",[ ]*(\d+)[)];\s*$/smx )
+                {
+                    $port = $1;
+                }
+                elsif ( $line =~
+                    /^user_pref[(]"$sandbox_regex",[ ]*"([^"]+)"[)];\s*$/smx )
+                {
+                    my ( $sandbox, $uuid ) = ( $1, $2 );
+                    $self->{_sandbox}->{$sandbox} = $uuid;
+                }
+            }
+            $profile_handle->close()
+              or Firefox::Marionette::Exception->throw(
+                "Failed to close '$self->{profile_path}':$EXTENDED_OS_ERROR");
+        }
     }
     return $port;
 }
@@ -1833,6 +2430,7 @@ sub delete_session {
         [ _COMMAND(), $message_id, $self->_command('WebDriver:DeleteSession') ]
     );
     my $response = $self->_get_response($message_id);
+    delete $self->{session_id};
     return $self;
 }
 
@@ -2915,7 +3513,7 @@ sub quit {
             );
             my $response = $self->_get_response($message_id);
             my $socket   = delete $self->{_socket};
-            if ( $OSNAME eq 'MSWin32' ) {
+            if ( ( $OSNAME eq 'MSWin32' ) && ( !$self->_ssh() ) ) {
                 $self->{_win32_process}->Wait( Win32::Process::INFINITE() );
                 $self->_reap();
             }
@@ -2926,6 +3524,12 @@ sub quit {
                         _MIN_VERSION_FOR_MODERN_EXIT() )
                   )
                 {
+                    close $socket
+                      or Firefox::Marionette::Exception->throw(
+                        "Failed to close socket to firefox:$EXTENDED_OS_ERROR");
+                    $socket = undef;
+                }
+                elsif ( $self->_ssh() ) {
                     close $socket
                       or Firefox::Marionette::Exception->throw(
                         "Failed to close socket to firefox:$EXTENDED_OS_ERROR");
@@ -2942,24 +3546,190 @@ sub quit {
                     "Failed to close socket to firefox:$EXTENDED_OS_ERROR");
             }
         }
-    }
-    $self->_terminate_process();
-    if ( my $pid = $self->xvfb() ) {
-        my $int_signal = $self->_signal_number('INT');
-        while ( kill 0, $pid ) {
-            kill $int_signal, $pid;
-            sleep 1;
-            $self->_reap();
-        }
-        delete $self->{_xvfb_display_number};
-        delete $self->{_xvfb_authority_directory};
+        $self->_terminate_process();
     }
     return $self->child_error();
 }
 
+sub _sandbox_regex {
+    my ($self) = @_;
+    return qr/security[.]sandbox[.](\w+)[.]tempDirSuffix/smx;
+}
+
+sub _sandbox_prefix {
+    my ($self) = @_;
+    return 'Temp-';
+}
+
+sub _get_remote_tmp_directory {
+    my ($self) = @_;
+    my $directory;
+    my $read_handle  = Symbol::gensym();
+    my $write_handle = Symbol::gensym();
+    pipe $read_handle, $write_handle
+      or Carp::croak("Failed to create pipe:$EXTENDED_OS_ERROR");
+    $write_handle = IO::Handle->new_from_fd( fileno $write_handle, '>' );
+    $write_handle->autoflush(1);
+    $read_handle = IO::Handle->new_from_fd( fileno $read_handle, '<' );
+    $read_handle->autoflush(1);
+    fcntl $write_handle, Fcntl::F_SETFD(), 0
+      or Firefox::Marionette::Exception->throw(
+"Failed to clear close-on-exec flag on pipe write handle: $EXTENDED_OS_ERROR"
+      );
+
+    if ( my $pid = fork ) {
+        close $write_handle
+          or Firefox::Marionette::Exception->throw(
+            "Failed to close write pipe in parent:$EXTENDED_OS_ERROR");
+        my ( $result, $contents );
+        while ( $result = sysread $read_handle, my $buffer,
+            _REMOTE_READ_BUFFER_SIZE() )
+        {
+            $contents .= $buffer;
+        }
+        defined $result
+          or Firefox::Marionette::Exception->throw( 'Failed to read ' . q[$]
+              . 'TMPDIR from '
+              . $self->_ssh_address()
+              . ":$EXTENDED_OS_ERROR" );
+        foreach my $line ( split /\r?\n/smx, $contents ) {
+            if ( $line =~ /^TMPDIR="([^"]*)"$/smx ) {
+                $directory = $1;
+            }
+        }
+    }
+    elsif ( defined $pid ) {
+        eval {
+            close $read_handle
+              or Firefox::Marionette::Exception->throw(
+                "Failed to close read pipe in child:$EXTENDED_OS_ERROR");
+            open STDOUT, '>&', $write_handle
+              or Firefox::Marionette::Exception->throw(
+"Failed to redirect STDOUT to pipe write handle:$EXTENDED_OS_ERROR"
+              );
+            local $OUTPUT_AUTOFLUSH = 1;
+            $self->_ssh_exec( $self->_ssh_parameters(),
+                $self->_ssh_address(), 'echo "TMPDIR=' . q[$] . 'TMPDIR"' )
+              or Firefox::Marionette::Exception->throw(
+                "Failed to exec 'ssh':$EXTENDED_OS_ERROR");
+        } or do {
+            chomp $EVAL_ERROR;
+            warn "$EVAL_ERROR\n";
+        };
+    }
+    else {
+        Firefox::Marionette::Exception->throw(
+            "Failed to fork:$EXTENDED_OS_ERROR");
+    }
+    return $directory;
+}
+
+sub _cleanup_remote_filesystem {
+    my ($self) = @_;
+    if ( ( my $ssh = $self->_ssh() ) && ( defined $self->{profile_directory} ) )
+    {
+        my @remote_directories = ( $self->{profile_directory} );
+        my $tmp_directory      = $self->_get_remote_tmp_directory() || '/tmp';
+        foreach my $sandbox ( sort { $a cmp $b } keys %{ $ssh->{sandbox} } ) {
+            push @remote_directories,
+                $tmp_directory . q[/]
+              . $self->_sandbox_prefix()
+              . $ssh->{sandbox}->{$sandbox};
+        }
+        if ( my $pid = fork ) {
+            waitpid $pid, 0;
+            if ( $CHILD_ERROR != 0 ) {
+                Firefox::Marionette::Exception->throw(
+                    q[Failed to 'rm -Rf ] . join q[ ],
+                    @remote_directories . q[' for ] . $self->_ssh_address() );
+            }
+        }
+        elsif ( defined $pid ) {
+            eval {
+                $self->_ssh_exec(
+                    $self->_ssh_parameters(), $self->_ssh_address(),
+                    'rm -Rf ' . join q[ ],    @remote_directories
+                  )
+                  or Firefox::Marionette::Exception->throw(
+                    "Failed to exec 'ssh':$EXTENDED_OS_ERROR");
+            } or do {
+                chomp $EVAL_ERROR;
+                warn "$EVAL_ERROR\n";
+            };
+        }
+        else {
+            Firefox::Marionette::Exception->throw(
+                "Failed to fork:$EXTENDED_OS_ERROR");
+        }
+    }
+    return;
+}
+
+sub _terminate_master_control_via_ssh {
+    my ($self) = @_;
+    my $path = $self->_control_path();
+    if ( -e $path ) {
+    }
+    elsif ( $OS_ERROR == POSIX::ENOENT() ) {
+        return;
+    }
+    else {
+        Firefox::Marionette::Exception->throw(
+            "Failed to stat '$path':$EXTENDED_OS_ERROR");
+    }
+    if ( my $pid = fork ) {
+        waitpid $pid, 0;
+        if ( $CHILD_ERROR != 0 ) {
+            Firefox::Marionette::Exception->throw(
+                'Failed to terminate master ssh process:'
+                  . $self->_error_message( 'ssh', $CHILD_ERROR ) );
+        }
+    }
+    elsif ( defined $pid ) {
+        eval {
+            $self->_ssh_exec( $self->_ssh_parameters(),
+                '-O', 'exit', $self->_ssh_address() )
+              or Firefox::Marionette::Exception->throw(
+                "Failed to exec 'ssh':$EXTENDED_OS_ERROR");
+        } or do {
+            chomp $EVAL_ERROR;
+            warn "$EVAL_ERROR\n";
+        };
+    }
+    else {
+        Firefox::Marionette::Exception->throw(
+            "Failed to fork:$EXTENDED_OS_ERROR");
+    }
+    return;
+}
+
 sub _terminate_process {
     my ($self) = @_;
-    if ( $OSNAME eq 'MSWin32' ) {
+    if ( my $ssh = $self->_ssh() ) {
+        my $term_signal = $self->_signal_number('TERM')
+          ;    # https://support.mozilla.org/en-US/questions/752748
+        if ( $term_signal > 0 ) {
+            my $count = 0;
+            while (( $count < _NUMBER_OF_TERM_ATTEMPTS() )
+                && ( defined $self->_pid() )
+                && ( kill $term_signal, $self->_pid() ) )
+            {
+                $count += 1;
+                sleep 1;
+                $self->_reap();
+            }
+        }
+        my $kill_signal = $self->_signal_number('KILL');   # no more mr nice guy
+        if ( ( $kill_signal > 0 ) && ( defined $self->_pid() ) ) {
+            while ( kill $kill_signal, $self->_pid() ) {
+                sleep 1;
+                $self->_reap();
+            }
+        }
+        $self->_cleanup_remote_filesystem();
+        $self->_terminate_master_control_via_ssh();
+    }
+    elsif ( $OSNAME eq 'MSWin32' ) {
         if ( $self->{_win32_process} ) {
             $self->{_win32_process}->Kill(1);
             sleep 1;
@@ -2991,6 +3761,22 @@ sub _terminate_process {
                 $self->_reap();
             }
         }
+    }
+    $self->_terminate_xvfb();
+    return;
+}
+
+sub _terminate_xvfb {
+    my ($self) = @_;
+    if ( my $pid = $self->xvfb() ) {
+        my $int_signal = $self->_signal_number('INT');
+        while ( kill 0, $pid ) {
+            kill $int_signal, $pid;
+            sleep 1;
+            $self->_reap();
+        }
+        delete $self->{_xvfb_display_number};
+        delete $self->{_xvfb_authority_directory};
     }
     return;
 }
@@ -3568,7 +4354,7 @@ sub _get_response {
 }
 
 sub _signal_number {
-    my ( $self, $name ) = @_;
+    my ( $proto, $name ) = @_;
     my @sig_nums  = split q[ ], $Config{sig_num};
     my @sig_names = split q[ ], $Config{sig_name};
     my %signals_by_name;
@@ -3582,8 +4368,34 @@ sub _signal_number {
 
 sub DESTROY {
     my ($self) = @_;
-    if ( $self->{creation_pid} == $PROCESS_ID ) {
+    if ( $self->{survive} ) {
+    }
+    elsif ( $self->{creation_pid} == $PROCESS_ID ) {
         $self->quit();
+        $self->_cleanup_local_filesystem();
+    }
+    return;
+}
+
+sub _cleanup_local_filesystem {
+    my ($self) = @_;
+    foreach my $key ( sort { $a cmp $b } keys %{ $self->{_sandbox} } ) {
+        my $path = File::Spec->catfile( File::Spec->tmpdir(),
+            $self->_sandbox_prefix() . $self->{_sandbox}->{$key} );
+        rmdir $path
+          or ( $OS_ERROR == POSIX::ENOENT() )
+          or Carp::croak("Failed to rmdir $path:$EXTENDED_OS_ERROR");
+    }
+    if ( my $control_path = $self->_control_path() ) {
+        unlink $control_path
+          or ( $OS_ERROR == POSIX::ENOENT() )
+          or Carp::croak("Failed to unlink $control_path:$EXTENDED_OS_ERROR");
+    }
+    if ( my $forwarding_path = $self->_forwarding_path() ) {
+        unlink $forwarding_path
+          or ( $OS_ERROR == POSIX::ENOENT() )
+          or
+          Carp::croak("Failed to unlink $forwarding_path:$EXTENDED_OS_ERROR");
     }
     return;
 }
@@ -3597,7 +4409,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 0.78
+Version 0.80
 
 =head1 SYNOPSIS
 
@@ -3622,53 +4434,212 @@ This is a client module to automate the Mozilla Firefox browser via the L<Marion
 
 =head1 SUBROUTINES/METHODS
 
-=head2 new
- 
-accepts an optional hash as a parameter.  Allowed keys are below;
+=head2 accept_alert
 
-=over 4
+accepts a currently displayed modal message box
 
-=item * firefox_binary - use the specified path to the L<Firefox|https://firefox.org/> binary, rather than the default path.
+=head2 accept_connections
 
-=item * capabilities - use the supplied L<capabilities|Firefox::Marionette::Capabilities> object, for example to set whether the browser should L<accept insecure certs|Firefox::Marionette::Capabilities#accept_insecure_certs> or whether the browser should use a L<proxy|Firefox::Marionette::Proxy>.
+Enables or disables accepting new socket connections.  By calling this method with false the server will not accept any further connections, but existing connections will not be forcible closed. Use true to re-enable accepting connections.
 
-=item * profile_name - pick a specific existing profile to automate, rather than creating a new profile.  Note that L<firefox|https://firefox.com> refuses to allow more than one instance of a profile to run at the same time.  Profile names can be obtained by using the L<Firefox::Marionette::Profile::names()|Firefox::Marionette::Profile#names> method.  NOTE: firefox ignores any changes made to the profile on the disk while it is running.
+Please note that when closing the connection via the client you can end-up in a non-recoverable state if it hasn't been enabled before.
 
-=item * profile - create a new profile based on the supplied profile.  NOTE: firefox ignores any changes made to the profile on the disk while it is running.
+=head2 active_element
 
-=item * debug - should firefox's debug to be available via STDERR. This defaults to "0".
+returns the active element of the current browsing context's document element, if the document element is non-null.
 
-=item * addons - should any firefox extensions and themes be available in this session.  This defaults to "0".
+=head2 active_frame
 
-=item * mime_types - any MIME types that Firefox will encounter during this session.  MIME types that are not specified will result in a hung browser (the File Download popup will appear).
+returns the current active L<frame|Firefox::Marionette::Element> if there is one in the current browsing context.  Otherwise, this method returns undef.
 
-=item * sleep_time_in_ms - the amount of time (in milliseconds) that this module should sleep when unsuccessfully calling the subroutine provided to the L<await|Firefox::Marionette#await> or L<bye|Firefox::Marionette#bye> methods.  This defaults to "1" millisecond.
+=head2 add_cookie
 
-=item * visible - should firefox be visible on the desktop.  This defaults to "0".
+accepts a single L<cookie|Firefox::Marionette::Cookie> object as the first parameter and adds it to the current cookie jar.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
 
-=item * timeouts - a shortcut to allow directly providing a L<timeout|Firefox::Marionette::Timeout> object, instead of needing to use timeouts from the capabilities parameter.  Overrides the timeouts provided (if any) in the capabilities parameter.
+=head2 addons
 
-=item * page_load - a shortcut to allow directly providing the L<page_load|Firefox::Marionette::Timeout#page_load> timeout, instead of needing to use timeouts from the capabilities parameter.  Overrides all longer ways.
+returns if pre-existing addons (extensions/themes) are allowed to run.  This will be true for Firefox versions less than 55, as -safe-mode cannot be automated.
 
-=item * script - a shortcut to allow directly providing the L<script|Firefox::Marionette::Timeout#script> timeout, instead of needing to use timeouts from the capabilities parameter.  Overrides all longer ways.
+=head2 alert_text
 
-=item * implicit - a shortcut to allow directly providing the L<implicit|Firefox::Marionette::Timeout#implicit> timeout, instead of needing to use timeouts from the capabilities parameter.  Overrides all longer ways.
+Returns the message shown in a currently displayed modal message box
 
-=back
+=head2 alive
 
-This method returns a new C<Firefox::Marionette> object, connected to an instance of L<firefox|https://firefox.com>.  In a non MacOS/Win32/Cygwin environment, if necessary (no DISPLAY variable can be found and visible has been set to true) and possible (Xvfb can be executed successfully), this method will also automatically start an L<Xvfb|https://en.wikipedia.org/wiki/Xvfb> instance.
- 
-=head2 go
+This method returns true or false depending on if the Firefox process is still running.
 
-Navigates the current browsing context to the given L<URI|URI> and waits for the document to load or the session's L<page_load|Firefox::Marionette::Timeouts#page_load> duration to elapse before returning, which, by default is 5 minutes.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods
+=head2 application_type
 
-=head2 uri
+returns the application type for the Marionette protocol.  Should be 'gecko'.
 
-returns the current L<URI|URI> of current top level browsing context for Desktop.  It is equivalent to the javascript C<document.location.href>
+=head2 async_script 
 
-=head2 title
+accepts a scalar containing a javascript function that is executed in the browser.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
 
-returns the current title of the window.
+The executing javascript is subject to the L<script|Firefox::Marionette::Timeouts#script> timeout, which, by default is 30 seconds.
+
+=head2 attribute 
+
+accepts an L<element|Firefox::Marionette::Element> as the first parameter and a scalar attribute name as the second parameter.  It returns the initial value of the attribute with the supplied name.  This method will return the initial content, the L<property|Firefox::Marionette#property> method will return the current content.
+
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+    my $element = $firefox->find_id('search_input');
+    !defined $element->attribute('value') or die "attribute is not defined!");
+    $element->type('Test::More');
+    !defined $element->attribute('value') or die "attribute is still not defined!");
+
+=head2 await
+
+accepts a subroutine reference as a parameter and then executes the subroutine.  If a L<not found|Firefox::Marionette::Exception::NotFound> exception is thrown, this method will sleep for L<sleep_time_in_ms|Firefox::Marionette#sleep_time_in_ms> milliseconds and then execute the subroutine again.  When the subroutine executes successfully, it will return what the subroutine returns.
+
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new(sleep_time_in_ms => 5)->go('https://metacpan.org/');
+
+    $firefox->find_id('search-input')->type('Test::More');
+
+    $firefox->find_name('lucky')->click();
+
+    $firefox->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click();
+
+=head2 back
+
+causes the browser to traverse one step backward in the joint history of the current browsing context.  The browser will wait for the one step backward to complete or the session's L<page_load|Firefox::Marionette::Timeouts#page_load> duration to elapse before returning, which, by default is 5 minutes.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
+
+=head2 browser_version
+
+This method returns version of firefox.
+
+=head2 bye
+
+accepts a subroutine reference as a parameter and then executes the subroutine.  If the subroutine executes successfully, this method will sleep for L<sleep_time_in_ms|Firefox::Marionette#sleep_time_in_ms> milliseconds and then execute the subroutine again.  When a L<not found|Firefox::Marionette::Exception::NotFound> exception is thrown, this method will return L<itself|Firefox::Marionette> to aid in chaining methods.
+
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+
+    $firefox->find_id('search-input')->type('Test::More');
+
+    $firefox->find_name('lucky')->click();
+
+    $firefox->bye(sub { $firefox->find_name('lucky') })->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click();
+
+=head2 capabilities
+
+returns the L<capabilities|Firefox::Marionette::Capabilities> of the current firefox binary.  You can retrieve L<timeouts|Firefox::Marionette::Timeouts> or a L<proxy|Firefox::Marionette::Proxy> with this method.
+
+=head2 child_error
+
+This method returns the $? (CHILD_ERROR) for the Firefox process, or undefined if the process has not yet exited.
+
+=head2 chrome_window_handle
+
+returns an server-assigned integer identifiers for the current chrome window that uniquely identifies it within this Marionette instance.  This can be used to switch to this window at a later point. This corresponds to a window that may itself contain tabs.
+
+=head2 chrome_window_handles
+
+returns identifiers for each open chrome window for tests interested in managing a set of chrome windows and tabs separately.
+
+=head2 clear
+
+accepts a L<element|Firefox::Marionette::Element> as the first parameter and clears any user supplied input
+
+=head2 click
+
+accepts a L<element|Firefox::Marionette::Element> as the first parameter and sends a 'click' to it.  The browser will wait for any page load to complete or the session's L<page_load|Firefox::Marionette::Timeouts#page_load> duration to elapse before returning, which, by default is 5 minutes.
+
+=head2 close_current_chrome_window_handle
+
+closes the current chrome window (that is the entire window, not just the tabs).  It returns a list of still available chrome window handles. You will need to L<switch_to_window|Firefox::Marionette#switch_to_window> to use another window.
+
+=head2 close_current_window_handle
+
+closes the current window/tab.  It returns a list of still available window/tab handles.
+
+=head2 context
+
+returns the context type that is Marionette's current target for browsing context scoped commands.
+
+=head2 cookies
+
+returns the contents of the cookie jar in scalar or list context.
+
+=head2 css
+
+accepts an L<element|Firefox::Marionette::Element> as the first parameter and a scalar CSS property name as the second parameter.  It returns the value of the computed style for that property.
+
+=head2 current_chrome_window_handle 
+
+see L<chrome_window_handle|Firefox::Marionette#chrome_window_handle>.
+
+=head2 delete_cookie
+
+deletes a single cookie by name.  Accepts a scalar containing the cookie name as a parameter.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
+
+=head2 delete_cookies
+
+here be cookie monsters! This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
+
+=head2 delete_session
+
+deletes the current WebDriver session.
+
+=head2 dismiss_alert
+
+dismisses a currently displayed modal message box
+
+=head2 downloading
+
+returns true if any files in L<downloads|Firefox::Marionette#downloads> end in C<.part>
+
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+
+    $firefox->find_class('container-fluid')->find_id('search-input')->type('Test::More');
+
+    $firefox->find('//button[@name="lucky"]')->click();
+
+    $firefox->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click();
+
+    while(!$firefox->downloads()) { sleep 1 }
+
+    while($firefox->downloading()) { sleep 1 }
+
+    foreach my $path ($firefox->downloads()) {
+        say $path;
+    }
+
+=head2 downloads
+
+returns a list of file paths (including partial downloads) of downloads during this Firefox session.
+
+    use Firefox::Marionette();
+    use v5.10;
+
+    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+
+    $firefox->find_class('container-fluid')->find_id('search-input')->type('Test::More');
+
+    $firefox->find('//button[@name="lucky"]')->click();
+
+    $firefox->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click();
+
+    while(!$firefox->downloads()) { sleep 1 }
+
+    foreach my $path ($firefox->downloads()) {
+        say $path;
+    }
+
+=head2 error_message
+
+This method returns a human readable error message describing how the Firefox process exited (assuming it started okay).  On Win32 platforms this information is restricted to exit code.
+
+=head2 execute
+
+This utility method executes a command with arguments and returns STDOUT as a chomped string.  It is a simple method only intended for the Firefox::Marionette::* modules.
 
 =head2 find
 
@@ -3824,33 +4795,50 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
 
 If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound> exception will be thrown. 
 
-=head2 css
+=head2 forward
 
-accepts an L<element|Firefox::Marionette::Element> as the first parameter and a scalar CSS property name as the second parameter.  It returns the value of the computed style for that property.
+causes the browser to traverse one step forward in the joint history of the current browsing context. The browser will wait for the one step forward to complete or the session's L<page_load|Firefox::Marionette::Timeouts#page_load> duration to elapse before returning, which, by default is 5 minutes.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
 
-=head2 attribute 
+=head2 full_screen
 
-accepts an L<element|Firefox::Marionette::Element> as the first parameter and a scalar attribute name as the second parameter.  It returns the initial value of the attribute with the supplied name.  This method will return the initial content, the L<property|Firefox::Marionette#property> method will return the current content.
+full screens the firefox window. This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
 
-    use Firefox::Marionette();
+=head2 go
 
-    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
-    my $element = $firefox->find_id('search_input');
-    !defined $element->attribute('value') or die "attribute is not defined!");
-    $element->type('Test::More');
-    !defined $element->attribute('value') or die "attribute is still not defined!");
-
-=head2 property
-
-accepts an L<element|Firefox::Marionette::Element> as the first parameter and a scalar attribute name as the second parameter.  It returns the current value of the property with the supplied name.  This method will return the current content, the L<attribute|Firefox::Marionette#attribute> method will return the initial content.
+Navigates the current browsing context to the given L<URI|URI> and waits for the document to load or the session's L<page_load|Firefox::Marionette::Timeouts#page_load> duration to elapse before returning, which, by default is 5 minutes.
 
     use Firefox::Marionette();
 
-    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
-    my $element = $firefox->find_id('search_input');
-    $element->property('value') eq '' or die "Initial property is the empty string";
-    $element->type('Test::More');
-    $element->property('value') eq 'Test::More' or die "This property should have changed!";
+    my $firefox = Firefox::Marionette->new();
+    $firefox->go('https://metacpan.org/'); # will only return when metacpan.org is FULLY loaded (including all images / js / css)
+
+To make the L<go|Firefox::Marionette#go> method return quicker, you need to set the L<page load strategy|Firefox::Marionette::Capabilities#page_load_strategy> L<capability|Firefox::Marionette::Capabilities> to an appropriate value, such as below;
+
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new( capabilities => Firefox::Marionette::Capabilities->new( page_load_strategy => 'none' ));
+    $firefox->go('https://metacpan.org/'); # will return immediately after requesting the browser to navigate to metacpan.org
+
+This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
+
+=head2 html
+
+returns the page source of the content document.  This page source can be wrapped in html that firefox provides.  See the L<json|Firefox::Marionette#json> method for an alternative when dealing with response content types such as application/json and L<strip|Firefox::Marionette#strip> for an alterative when dealing with other non-html content types such as text/plain.
+
+    use Firefox::Marionette();
+    use v5.10;
+
+    say Firefox::Marionette->new()->go('https://metacpan.org/')->html();
+
+=head2 install
+
+accepts the fully qualified path to an .xpi addon file as the first parameter and an optional true/false second parameter to indicate if the xpi addon file should be a temporary addition (just for the existance of this browser instance).  Unsigned xpi addon files may be loaded temporarily.  It returns the GUID for the addon which may be used as a parameter to the L<uninstall|Firefox::Marionette#uninstall> method.
+
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new();
+
+    my $extension_id = $firefox->install('/full/path/to/gnu_terry_pratchett-0.4-an+fx.xpi');
 
 =head2 interactive
 
@@ -3865,6 +4853,27 @@ returns true if C<document.readyState === "interactive"> or if L<loaded|Firefox:
         # redirecting to Test::More page
     }
 
+=head2 is_displayed
+
+accepts an L<element|Firefox::Marionette::Element> as the first parameter.  This method returns true or false depending on if the element is displayed.
+
+=head2 is_enabled
+
+accepts an L<element|Firefox::Marionette::Element> as the first parameter.  This method returns true or false depending on if the element is enabled.
+
+=head2 is_selected
+
+accepts an L<element|Firefox::Marionette::Element> as the first parameter.  This method returns true or false depending on if the element is selected.
+
+=head2 json
+
+returns a L<JSON|JSON> object that has been parsed from the page source of the content document.  This is a convenience method that wraps the L<strip|Firefox::Marionette#strip> method.
+
+    use Firefox::Marionette();
+    use v5.10;
+
+    say Firefox::Marionette->new()->go('https://fastapi.metacpan.org/v1/download_url/Firefox::Marionette")->json()->{version};
+
 =head2 loaded
 
 returns true if C<document.readyState === "complete">
@@ -3877,6 +4886,14 @@ returns true if C<document.readyState === "complete">
     while(!$firefox->loaded()) {
         # redirecting to Test::More page
     }
+
+=head2 marionette_protocol
+
+returns the version for the Marionette protocol.  Current most recent version is '3'.
+
+=head2 maximise
+
+maximises the firefox window. This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
 
 =head2 mime_types
 
@@ -3891,220 +4908,65 @@ returns a list of MIME types that will be downloaded by firefox and made availab
         say $mime_type;
     }
 
-=head2 downloads
+=head2 minimise
 
-returns a list of file paths (including partial downloads) of downloads during this Firefox session.
+minimises the firefox window. This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
 
-    use Firefox::Marionette();
-    use v5.10;
-
-    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
-
-    $firefox->find_class('container-fluid')->find_id('search-input')->type('Test::More');
-
-    $firefox->find('//button[@name="lucky"]')->click();
-
-    $firefox->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click();
-
-    while(!$firefox->downloads()) { sleep 1 }
-
-    foreach my $path ($firefox->downloads()) {
-        say $path;
-    }
-
-=head2 downloading
-
-returns true if any files in L<downloads|Firefox::Marionette#downloads> end in C<.part>
-
-    use Firefox::Marionette();
-
-    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
-
-    $firefox->find_class('container-fluid')->find_id('search-input')->type('Test::More');
-
-    $firefox->find('//button[@name="lucky"]')->click();
-
-    $firefox->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click();
-
-    while(!$firefox->downloads()) { sleep 1 }
-
-    while($firefox->downloading()) { sleep 1 }
-
-    foreach my $path ($firefox->downloads()) {
-        say $path;
-    }
-
-=head2 script 
-
-accepts a scalar containing a javascript function body that is executed in the browser, and an optional hash as a second parameter.  Allowed keys are below;
+=head2 new
+ 
+accepts an optional hash as a parameter.  Allowed keys are below;
 
 =over 4
 
-=item * args - The reference to a list is the arguments passed to the function body.
+=item * addons - should any firefox extensions and themes be available in this session.  This defaults to "0".
 
-=item * timeout - A timeout to override the default L<script|Firefox::Marionette::Timeouts#script> timeout, which, by default is 30 seconds.
+=item * capabilities - use the supplied L<capabilities|Firefox::Marionette::Capabilities> object, for example to set whether the browser should L<accept insecure certs|Firefox::Marionette::Capabilities#accept_insecure_certs> or whether the browser should use a L<proxy|Firefox::Marionette::Proxy>.
 
-=item * sandbox - Name of the sandbox to evaluate the script in.  The sandbox is cached for later re-use on the same L<window|https://developer.mozilla.org/en-US/docs/Web/API/Window>object if C<new> is false.  If he parameter is undefined, the script is evaluated in a mutable sandbox.  If the parameter is "system", it will be evaluted in a sandbox with elevated system privileges, equivalent to chrome space.
+=item * firefox_binary - use the specified path to the L<Firefox|https://firefox.org/> binary, rather than the default path.
 
-=item * new - Forces the script to be evaluated in a fresh sandbox.  Note that if it is undefined, the script will normally be evaluted in a fresh sandbox.
+=item * debug - should firefox's debug to be available via STDERR. This defaults to "0".
 
-=item * filename - Filename of the client's program where this script is evaluated.
+=item * height - set the L<height|http://kb.mozillazine.org/Command_line_arguments#List_of_command_line_arguments_.28incomplete.29> of the initial firefox window
 
-=item * line - Line in the client's program where this script is evaluated.
+=item * host - use L<ssh|https://man.openbsd.org/ssh.1> to create and automate firefox on the specified host.  The "firefox_binary" and "user" parameters may be useful in this case.  Authentication is expected to be via your local ssh-agent.  This has only been tested on linux and darwin environments.  Feedback welcome.
+
+=item * implicit - a shortcut to allow directly providing the L<implicit|Firefox::Marionette::Timeout#implicit> timeout, instead of needing to use timeouts from the capabilities parameter.  Overrides all longer ways.
+
+=item * mime_types - any MIME types that Firefox will encounter during this session.  MIME types that are not specified will result in a hung browser (the File Download popup will appear).
+
+=item * page_load - a shortcut to allow directly providing the L<page_load|Firefox::Marionette::Timeout#page_load> timeout, instead of needing to use timeouts from the capabilities parameter.  Overrides all longer ways.
+
+=item * profile - create a new profile based on the supplied profile.  NOTE: firefox ignores any changes made to the profile on the disk while it is running.
+
+=item * profile_name - pick a specific existing profile to automate, rather than creating a new profile.  Note that L<firefox|https://firefox.com> refuses to allow more than one instance of a profile to run at the same time.  Profile names can be obtained by using the L<Firefox::Marionette::Profile::names()|Firefox::Marionette::Profile#names> method.  NOTE: firefox ignores any changes made to the profile on the disk while it is running.
+
+=item * script - a shortcut to allow directly providing the L<script|Firefox::Marionette::Timeout#script> timeout, instead of needing to use timeouts from the capabilities parameter.  Overrides all longer ways.
+
+=item * sleep_time_in_ms - the amount of time (in milliseconds) that this module should sleep when unsuccessfully calling the subroutine provided to the L<await|Firefox::Marionette#await> or L<bye|Firefox::Marionette#bye> methods.  This defaults to "1" millisecond.
+
+=item * survive - if this is set to a true value, firefox will not automatically exit when the object goes out of scope.
+
+=item * timeouts - a shortcut to allow directly providing a L<timeout|Firefox::Marionette::Timeout> object, instead of needing to use timeouts from the capabilities parameter.  Overrides the timeouts provided (if any) in the capabilities parameter.
+
+=item * user - if the "host" parameter is also set, the "user" parameter will specify the user that ssh will attempt to login as
+
+=item * visible - should firefox be visible on the desktop.  This defaults to "0".
+
+=item * width - set the L<width|http://kb.mozillazine.org/Command_line_arguments#List_of_command_line_arguments_.28incomplete.29> of the initial firefox window
 
 =back
 
-Returns the result of the javascript function.
-
+This method returns a new C<Firefox::Marionette> object, connected to an instance of L<firefox|https://firefox.com>.  In a non MacOS/Win32/Cygwin environment, if necessary (no DISPLAY variable can be found and visible has been set to true) and possible (Xvfb can be executed successfully), this method will also automatically start an L<Xvfb|https://en.wikipedia.org/wiki/Xvfb> instance.
+ 
     use Firefox::Marionette();
 
-    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+    my $remote_darwin_firefox = Firefox::Marionette->new( debug => 1, host => '10.1.2.3', firefox_binary => '/Applications/Firefox.app/Contents/MacOS/firefox');
+    ...
 
-    if ($firefox->script('return window.find("lucky");')) {
-        # luckily!
+    foreach my $profile_name (Firefox::Marionette::Profile->names()) {
+        my $firefox_with_existing_profile = Firefox::Marionette->new(profile_name => $profile_name);
+        ...
     }
-
-The executing javascript is subject to the L<script|Firefox::Marionette::Timeouts#script> timeout, which, by default is 30 seconds.
-
-=head2 async_script 
-
-accepts a scalar containing a javascript function that is executed in the browser.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
-
-The executing javascript is subject to the L<script|Firefox::Marionette::Timeouts#script> timeout, which, by default is 30 seconds.
-
-=head2 html
-
-returns the page source of the content document.  This page source can be wrapped in html that firefox provides.  See the L<json|Firefox::Marionette#json> method for an alternative when dealing with response content types such as application/json and L<strip|Firefox::Marionette#strip> for an alterative when dealing with other non-html content types such as text/plain.
-
-    use Firefox::Marionette();
-    use v5.10;
-
-    say Firefox::Marionette->new()->go('https://metacpan.org/')->html();
-
-=head2 strip
-
-returns the page source of the content document after an attempt has been made to remove typical firefox html wrappers of non html content types such as text/plain and application/json.  See the L<json|Firefox::Marionette#json> method for an alternative when dealing with response content types such as application/json and L<html|Firefox::Marionette#html> for an alterative when dealing with html content types.  This is a convenience method that wraps the L<html|Firefox::Marionette#html> method.
-
-    use Firefox::Marionette();
-    use JSON();
-    use v5.10;
-
-    say JSON::decode_json(Firefox::Marionette->new()->go('https://fastapi.metacpan.org/v1/download_url/Firefox::Marionette")->strip())->{version};
-
-=head2 json
-
-returns a L<JSON|JSON> object that has been parsed from the page source of the content document.  This is a convenience method that wraps the L<strip|Firefox::Marionette#strip> method.
-
-    use Firefox::Marionette();
-    use v5.10;
-
-    say Firefox::Marionette->new()->go('https://fastapi.metacpan.org/v1/download_url/Firefox::Marionette")->json()->{version};
-
-=head2 context
-
-returns the context type that is Marionette's current target for browsing context scoped commands.
-
-=head2 add_cookie
-
-accepts a single L<cookie|Firefox::Marionette::Cookie> object as the first parameter and adds it to the current cookie jar.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
-
-=head2 delete_cookie
-
-deletes a single cookie by name.  Accepts a scalar containing the cookie name as a parameter.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
-
-=head2 delete_cookies
-
-here be cookie monsters! This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
-
-=head2 cookies
-
-returns the contents of the cookie jar in scalar or list context.
-
-=head2 type
-
-accepts an L<element|Firefox::Marionette::Element> as the first parameter and a string as the second parameter.  It sends the string to the specified L<element|Firefox::Marionette::Element> in the current page, such as filling out a text box. This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
-
-=head2 await
-
-accepts a subroutine reference as a parameter and then executes the subroutine.  If a L<not found|Firefox::Marionette::Exception::NotFound> exception is thrown, this method will sleep for L<sleep_time_in_ms|Firefox::Marionette#sleep_time_in_ms> milliseconds and then execute the subroutine again.  When the subroutine executes successfully, it will return what the subroutine returns.
-
-    use Firefox::Marionette();
-
-    my $firefox = Firefox::Marionette->new(sleep_time_in_ms => 5)->go('https://metacpan.org/');
-
-    $firefox->find_id('search-input')->type('Test::More');
-
-    $firefox->find_name('lucky')->click();
-
-    $firefox->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click();
-
-=head2 bye
-
-accepts a subroutine reference as a parameter and then executes the subroutine.  If the subroutine executes successfully, this method will sleep for L<sleep_time_in_ms|Firefox::Marionette#sleep_time_in_ms> milliseconds and then execute the subroutine again.  When a L<not found|Firefox::Marionette::Exception::NotFound> exception is thrown, this method will return L<itself|Firefox::Marionette> to aid in chaining methods.
-
-    use Firefox::Marionette();
-
-    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
-
-    $firefox->find_id('search-input')->type('Test::More');
-
-    $firefox->find_name('lucky')->click();
-
-    $firefox->bye(sub { $firefox->find_name('lucky') })->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click();
-
-=head2 sleep_time_in_ms
-
-accepts a new time to sleep in L<await|Firefox::Marionette#await> or L<bye|Firefox::Marionette#bye> methods and returns the previous time.  The default time is "1" millisecond.
-
-    use Firefox::Marionette();
-
-    my $firefox = Firefox::Marionette->new(sleep_time_in_ms => 5); # setting default time to 5 milliseconds
-
-    my $old_time_in_ms = $firefox->sleep_time_in_ms(8); # setting default time to 8 milliseconds, returning 5 (milliseconds)
-
-=head2 is_displayed
-
-accepts an L<element|Firefox::Marionette::Element> as the first parameter.  This method returns true or false depending on if the element is displayed.
-
-=head2 is_enabled
-
-accepts an L<element|Firefox::Marionette::Element> as the first parameter.  This method returns true or false depending on if the element is enabled.
-
-=head2 is_selected
-
-accepts an L<element|Firefox::Marionette::Element> as the first parameter.  This method returns true or false depending on if the element is selected.
-
-=head2 active_element
-
-returns the active element of the current browsing context's document element, if the document element is non-null.
-
-=head2 back
-
-causes the browser to traverse one step backward in the joint history of the current browsing context.  The browser will wait for the one step backward to complete or the session's L<page_load|Firefox::Marionette::Timeouts#page_load> duration to elapse before returning, which, by default is 5 minutes.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
-
-=head2 forward
-
-causes the browser to traverse one step forward in the joint history of the current browsing context. The browser will wait for the one step forward to complete or the session's L<page_load|Firefox::Marionette::Timeouts#page_load> duration to elapse before returning, which, by default is 5 minutes.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
-
-=head2 active_frame
-
-returns the current active L<frame|Firefox::Marionette::Element> if there is one in the current browsing context.  Otherwise, this method returns undef.
-
-=head2 switch_to_shadow_root
-
-accepts an L<element|Firefox::Marionette::Element> as a parameter and switches to it's L<shadow root|https://www.w3.org/TR/shadow-dom/>
-
-=head2 switch_to_window
-
-accepts a window handle (either the result of L<window_handles|Firefox::Marionette#window_handles> or a window name as a parameter and switches focus to this window.
-
-=head2 switch_to_frame
-
-accepts a L<frame|Firefox::Marionette::Element> as a parameter and switches to it within the current window.
-
-=head2 switch_to_parent_frame
-
-set the current browsing context for future commands to the parent of the current browsing context
 
 =head2 new_window
 
@@ -4128,53 +4990,69 @@ Returns the window handle for the new window.
 
     $firefox->switch_to_window($window_handle);
 
-=head2 close_current_chrome_window_handle
+=head2 new_session
 
-closes the current chrome window (that is the entire window, not just the tabs).  It returns a list of still available chrome window handles. You will need to L<switch_to_window|Firefox::Marionette#switch_to_window> to use another window.
+creates a new WebDriver session.  It is expected that the caller performs the necessary checks on the requested capabilities to be WebDriver conforming.  The WebDriver service offered by Marionette does not match or negotiate capabilities beyond type and bounds checks.
 
-=head2 close_current_window_handle
+=head2 property
 
-closes the current window/tab.  It returns a list of still available window/tab handles.
+accepts an L<element|Firefox::Marionette::Element> as the first parameter and a scalar attribute name as the second parameter.  It returns the current value of the property with the supplied name.  This method will return the current content, the L<attribute|Firefox::Marionette#attribute> method will return the initial content.
 
-=head2 full_screen
+    use Firefox::Marionette();
 
-full screens the firefox window. This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
+    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+    my $element = $firefox->find_id('search_input');
+    $element->property('value') eq '' or die "Initial property is the empty string";
+    $element->type('Test::More');
+    $element->property('value') eq 'Test::More' or die "This property should have changed!";
 
-=head2 minimise
+=head2 quit
 
-minimises the firefox window. This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
+Marionette will stop accepting new connections before ending the current session, and finally attempting to quit the application.  This method returns the $? (CHILD_ERROR) value for the Firefox process
 
-=head2 maximise
+=head2 rect
 
-maximises the firefox window. This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
+accepts a L<element|Firefox::Marionette::Element> as the first parameter and returns the current L<position and size|Firefox::Marionette::Element::Rect> of the L<element|Firefox::Marionette::Element>
 
 =head2 refresh
 
 refreshes the current page.  The browser will wait for the page to completely refresh or the session's L<page_load|Firefox::Marionette::Timeouts#page_load> duration to elapse before returning, which, by default is 5 minutes.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
 
-=head2 alert_text
-
-Returns the message shown in a currently displayed modal message box
-
-=head2 dismiss_alert
-
-dismisses a currently displayed modal message box
-
-=head2 accept_alert
-
-accepts a currently displayed modal message box
-
-=head2 send_alert_text
-
-sends keys to the input field of a currently displayed modal message box
-
-=head2 capabilities
-
-returns the L<capabilities|Firefox::Marionette::Capabilities> of the current firefox binary.  You can retrieve L<timeouts|Firefox::Marionette::Timeouts> or a L<proxy|Firefox::Marionette::Proxy> with this method.
-
 =head2 screen_orientation
 
 returns the current browser orientation.  This will be one of the valid primary orientation values 'portrait-primary', 'landscape-primary', 'portrait-secondary', or 'landscape-secondary'.  This method is only currently available on Android (Fennec).
+
+=head2 script 
+
+accepts a scalar containing a javascript function body that is executed in the browser, and an optional hash as a second parameter.  Allowed keys are below;
+
+=over 4
+
+=item * args - The reference to a list is the arguments passed to the function body.
+
+=item * filename - Filename of the client's program where this script is evaluated.
+
+=item * line - Line in the client's program where this script is evaluated.
+
+=item * new - Forces the script to be evaluated in a fresh sandbox.  Note that if it is undefined, the script will normally be evaluted in a fresh sandbox.
+
+=item * sandbox - Name of the sandbox to evaluate the script in.  The sandbox is cached for later re-use on the same L<window|https://developer.mozilla.org/en-US/docs/Web/API/Window>object if C<new> is false.  If he parameter is undefined, the script is evaluated in a mutable sandbox.  If the parameter is "system", it will be evaluted in a sandbox with elevated system privileges, equivalent to chrome space.
+
+=item * timeout - A timeout to override the default L<script|Firefox::Marionette::Timeouts#script> timeout, which, by default is 30 seconds.
+
+=back
+
+Returns the result of the javascript function.
+
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+
+    if ($firefox->script('return window.find("lucky");')) {
+        # luckily!
+    }
+
+The executing javascript is subject to the L<script|Firefox::Marionette::Timeouts#script> timeout, which, by default is 30 seconds.
 
 =head2 selfie
 
@@ -4200,81 +5078,65 @@ The parameters after the L<element|Firefox::Marionette::Element> parameter are t
 
 =back
 
+=head2 send_alert_text
+
+sends keys to the input field of a currently displayed modal message box
+
+=head2 sleep_time_in_ms
+
+accepts a new time to sleep in L<await|Firefox::Marionette#await> or L<bye|Firefox::Marionette#bye> methods and returns the previous time.  The default time is "1" millisecond.
+
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new(sleep_time_in_ms => 5); # setting default time to 5 milliseconds
+
+    my $old_time_in_ms = $firefox->sleep_time_in_ms(8); # setting default time to 8 milliseconds, returning 5 (milliseconds)
+
+=head2 strip
+
+returns the page source of the content document after an attempt has been made to remove typical firefox html wrappers of non html content types such as text/plain and application/json.  See the L<json|Firefox::Marionette#json> method for an alternative when dealing with response content types such as application/json and L<html|Firefox::Marionette#html> for an alterative when dealing with html content types.  This is a convenience method that wraps the L<html|Firefox::Marionette#html> method.
+
+    use Firefox::Marionette();
+    use JSON();
+    use v5.10;
+
+    say JSON::decode_json(Firefox::Marionette->new()->go('https://fastapi.metacpan.org/v1/download_url/Firefox::Marionette")->strip())->{version};
+
+=head2 switch_to_frame
+
+accepts a L<frame|Firefox::Marionette::Element> as a parameter and switches to it within the current window.
+
+=head2 switch_to_parent_frame
+
+set the current browsing context for future commands to the parent of the current browsing context
+
+=head2 switch_to_shadow_root
+
+accepts an L<element|Firefox::Marionette::Element> as a parameter and switches to it's L<shadow root|https://www.w3.org/TR/shadow-dom/>
+
+=head2 switch_to_window
+
+accepts a window handle (either the result of L<window_handles|Firefox::Marionette#window_handles> or a window name as a parameter and switches focus to this window.
+
 =head2 tag_name
 
 accepts a L<Firefox::Marionette::Element|Firefox::Marionette::Element> object as the first parameter and returns the relevant tag name.  For example 'a' or 'input'.
-
-=head2 window_rect
-
-accepts an optional L<position and size|Firefox::Marionette::Window::Rect> as a parameter, sets the current browser window to that position and size and returns the previous L<position, size and state|Firefox::Marionette::Window::Rect> of the browser window.  If no parameter is supplied, it returns the current  L<position, size and state|Firefox::Marionette::Window::Rect> of the browser window.
-
-=head2 rect
-
-accepts a L<element|Firefox::Marionette::Element> as the first parameter and returns the current L<position and size|Firefox::Marionette::Element::Rect> of the L<element|Firefox::Marionette::Element>
 
 =head2 text
 
 accepts a L<element|Firefox::Marionette::Element> as the first parameter and returns the text that is contained by that element (if any)
 
-=head2 clear
-
-accepts a L<element|Firefox::Marionette::Element> as the first parameter and clears any user supplied input
-
-=head2 click
-
-accepts a L<element|Firefox::Marionette::Element> as the first parameter and sends a 'click' to it.  The browser will wait for any page load to complete or the session's L<page_load|Firefox::Marionette::Timeouts#page_load> duration to elapse before returning, which, by default is 5 minutes.
-
 =head2 timeouts
 
 returns the current L<timeouts|Firefox::Marionette::Timeouts> for page loading, searching, and scripts.
 
-=head2 new_session
+=head2 title
 
-creates a new WebDriver session.  It is expected that the caller performs the necessary checks on the requested capabilities to be WebDriver conforming.  The WebDriver service offered by Marionette does not match or negotiate capabilities beyond type and bounds checks.
+returns the current title of the window.
 
-=head2 delete_session
+=head2 type
 
-deletes the current WebDriver session.
-
-=head2 window_type
-
-returns the current window's type.  This should be 'navigator:browser'.
-
-=head2 window_handle
-
-returns the current window's handle. On desktop this typically corresponds to the currently selected tab.  returns an opaque server-assigned identifier to this window that uniquely identifies it within this Marionette instance.  This can be used to switch to this window at a later point.
-
-=head2 window_handles
-
-returns a list of top-level browsing contexts. On desktop this typically corresponds to the set of open tabs for browser windows, or the window itself for non-browser chrome windows.  Each window handle is assigned by the server and is guaranteed unique, however the return array does not have a specified ordering.
-
-=head2 accept_connections
-
-Enables or disables accepting new socket connections.  By calling this method with false the server will not accept any further connections, but existing connections will not be forcible closed. Use true to re-enable accepting connections.
-
-Please note that when closing the connection via the client you can end-up in a non-recoverable state if it hasn't been enabled before.
-
-=head2 current_chrome_window_handle 
-
-see L<chrome_window_handle|Firefox::Marionette#chrome_window_handle>.
-
-=head2 chrome_window_handle
-
-returns an server-assigned integer identifiers for the current chrome window that uniquely identifies it within this Marionette instance.  This can be used to switch to this window at a later point. This corresponds to a window that may itself contain tabs.
-
-=head2 chrome_window_handles
-
-returns identifiers for each open chrome window for tests interested in managing a set of chrome windows and tabs separately.
-
-=head2 install
-
-accepts the fully qualified path to an .xpi addon file as the first parameter and an optional true/false second parameter to indicate if the xpi addon file should be a temporary addition (just for the existance of this browser instance).  Unsigned xpi addon files may be loaded temporarily.  It returns the GUID for the addon which may be used as a parameter to the L<uninstall|Firefox::Marionette#uninstall> method.
-
-    use Firefox::Marionette();
-
-    my $firefox = Firefox::Marionette->new();
-
-    my $extension_id = $firefox->install('/full/path/to/gnu_terry_pratchett-0.4-an+fx.xpi');
+accepts an L<element|Firefox::Marionette::Element> as the first parameter and a string as the second parameter.  It sends the string to the specified L<element|Firefox::Marionette::Element> in the current page, such as filling out a text box. This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
 
 =head2 uninstall
 
@@ -4290,45 +5152,29 @@ accepts the GUID for the addon to uninstall.  The GUID is returned when from the
 
     $firefox->uninstall($extension_id); # not recommended to uninstall this extension IRL.
 
-=head2 application_type
+=head2 uri
 
-returns the application type for the Marionette protocol.  Should be 'gecko'.
+returns the current L<URI|URI> of current top level browsing context for Desktop.  It is equivalent to the javascript C<document.location.href>
 
-=head2 marionette_protocol
+=head2 window_handle
 
-returns the version for the Marionette protocol.  Current most recent version is '3'.
+returns the current window's handle. On desktop this typically corresponds to the currently selected tab.  returns an opaque server-assigned identifier to this window that uniquely identifies it within this Marionette instance.  This can be used to switch to this window at a later point.
 
-=head2 addons
+=head2 window_handles
 
-returns if pre-existing addons (extensions/themes) are allowed to run.  This will be true for Firefox versions less than 55, as -safe-mode cannot be automated.
+returns a list of top-level browsing contexts. On desktop this typically corresponds to the set of open tabs for browser windows, or the window itself for non-browser chrome windows.  Each window handle is assigned by the server and is guaranteed unique, however the return array does not have a specified ordering.
+
+=head2 window_rect
+
+accepts an optional L<position and size|Firefox::Marionette::Window::Rect> as a parameter, sets the current browser window to that position and size and returns the previous L<position, size and state|Firefox::Marionette::Window::Rect> of the browser window.  If no parameter is supplied, it returns the current  L<position, size and state|Firefox::Marionette::Window::Rect> of the browser window.
+
+=head2 window_type
+
+returns the current window's type.  This should be 'navigator:browser'.
 
 =head2 xvfb
 
 returns the pid of the xvfb process if it exists.
-
-=head2 quit
-
-Marionette will stop accepting new connections before ending the current session, and finally attempting to quit the application.  This method returns the $? (CHILD_ERROR) value for the Firefox process
-
-=head2 browser_version
-
-This method returns version of firefox.
-
-=head2 execute
-
-This utility method executes a command with arguments and returns STDOUT as a chomped string.  It is a simple method only intended for the Firefox::Marionette::* modules.
-
-=head2 child_error
-
-This method returns the $? (CHILD_ERROR) for the Firefox process, or undefined if the process has not yet exited.
-
-=head2 error_message
-
-This method returns a human readable error message describing how the Firefox process exited (assuming it started okay).  On Win32 platforms this information is restricted to exit code.
-
-=head2 alive
-
-This method returns true or false depending on if the Firefox process is still running.
 
 =head1 DIAGNOSTICS
 

@@ -89,8 +89,15 @@ share {
 
   my $with_local = '';
   my $with_cpp11 = '';
+  
+  #  ensure we are compatible with the installed proj version
+  my $start_url = Alien::proj->atleast_version ('6.0.0')
+    ? 'http://download.osgeo.org/gdal/CURRENT'
+    : 'http://download.osgeo.org/gdal/2.4.2';
 
-  start_url 'http://download.osgeo.org/gdal/CURRENT';
+  say "Proj library version is " . Alien::proj->version;
+
+  start_url $start_url;
   #start_url "file://$base_dir";  #  debug
   plugin Download => (
     filter  => qr/^gdal-([0-9\.]+)\.tar\.gz$/,

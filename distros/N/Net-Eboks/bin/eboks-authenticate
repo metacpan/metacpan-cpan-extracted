@@ -10,11 +10,8 @@ use URI::QueryParam;
 use HTTP::Request;
 use HTTP::Response;
 
-my $e;
 my $port = 9999;
-
-my $ticket;
-my $server;
+my ($server, $error, $e);
 
 sub html($)
 {
@@ -68,18 +65,16 @@ that the device is, indeed yours.<br> On the next page you will be presented
 the standard NemID dialog, that you need to login as you usually do.<br>
 If you are going to authorize the login with your NemID app, make sure that
 the requestor is "E-Boks login".
-<form action="/logon" method="POST">
+<form action="/step2" method="POST">
 <input type="submit" value="Next">
 </form>
 SUCCESS
 	},
 
-	'/logon' => sub {
-		my $req = shift;
-		return IO::Lambda::HTTP::Client->new( HTTP::Request->new(
-			'GET',
-			'https://m.e-boks.dk/app/logon.aspx?logontype=nemid',
-		), keep_alive => 1);
+	'/step2' => sub {
+		IO::Lambda::HTTP::Client->new( HTTP::Request->new(
+			GET => 'https://m.e-boks.dk/app/logon.aspx?logontype=nemid'
+		), keep_alive => 1)
 	},
 
 	'/nemid/Logon/LogonPrivate' => sub {
@@ -97,7 +92,6 @@ SUCCESS
 	},
 );
 
-my $error;
 ($server, $error) = http_server {
 	my $req = shift;
 	if ( my $cb = $routes{$req->uri}) {
@@ -108,7 +102,6 @@ my $error;
 	}
 } "localhost:$port", timeout => 10;
 die $error unless $server;
-die "error: $error\n" if defined $error;
 print "Open a browser and go to this address:\n";
 print "\n   http://localhost:$port/\n\n";
 $server->wait;

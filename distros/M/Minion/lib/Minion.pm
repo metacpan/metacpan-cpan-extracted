@@ -22,7 +22,7 @@ has missing_after => 1800;
 has remove_after  => 172800;
 has tasks         => sub { {} };
 
-our $VERSION = '9.11';
+our $VERSION = '9.12';
 
 sub add_task { ($_[0]->tasks->{$_[1]} = $_[2]) and return $_[0] }
 
@@ -808,7 +808,8 @@ Release a named lock that has been previously acquired with L</"lock">.
 
   my $worker = $minion->worker;
 
-Build L<Minion::Worker> object.
+Build L<Minion::Worker> object. Note that this method should only be used to
+implement custom workers.
 
   # Use the standard worker with all its features
   my $worker = $minion->worker;

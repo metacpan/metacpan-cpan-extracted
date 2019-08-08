@@ -3,7 +3,7 @@ use lib '.';
 use Progressive::Web::Application;
 subtest empty_new => sub {
 	plan tests => 1;
-	ok(Progressive::Web::Application->new());
+	ok(Progressive::Web::Application->new( root => 'confused'));
 };
 
 subtest set_manifest => sub {
@@ -218,5 +218,26 @@ subtest generate => sub {
 	is_deeply($pwa->manifest, $expected, 'generate icons on new');
 	ok(my $remove = $pwa->tools->{remove_directory}->('t/resources/icons'));
 };
+
+subtest clear_manifest => sub {
+	plan tests => 4;
+	ok(my $pwa = Progressive::Web::Application->new(
+		manifest => {
+			name => 'test application',
+			short_name => 'test',
+			start_url => '/',
+			icons => 't/resources',
+			display => 'standalone',
+			background_color => '#dadada',
+			theme_color => '#dadada'
+		}
+	));
+	ok($pwa->manifest(), 'has manifest');
+	ok($pwa->clear_manifest(), 'clear manifest');
+	ok(!$pwa->manifest(), 'does not have a manifest');
+};
+
+
+
 
 done_testing();

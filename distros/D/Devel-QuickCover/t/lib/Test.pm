@@ -5,8 +5,8 @@ use parent 'Test::Builder::Module';
 
 use Data::Dumper;
 use Test::More;
-use JSON::XS    qw( decode_json );
-use Path::Tiny  qw( path );
+use JSON::MaybeXS qw( decode_json );
+use Path::Tiny    qw( path );
 
 our @EXPORT= (
      @Test::More::EXPORT,

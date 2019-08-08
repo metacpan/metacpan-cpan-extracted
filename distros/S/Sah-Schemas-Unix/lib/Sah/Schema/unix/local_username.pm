@@ -1,7 +1,7 @@
 package Sah::Schema::unix::local_username;
 
-our $DATE = '2019-05-07'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-07-12'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 our $schema = ['unix::username' => {
     summary => 'Unix user name that must exist on the system',
@@ -28,7 +28,7 @@ Sah::Schema::unix::local_username - Unix user name that must exist on the system
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::Schema::unix::local_username (from Perl distribution Sah-Schemas-Unix), released on 2019-05-07.
+This document describes version 0.004 of Sah::Schema::unix::local_username (from Perl distribution Sah-Schemas-Unix), released on 2019-07-12.
 
 =head1 DESCRIPTION
 

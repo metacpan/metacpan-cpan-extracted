@@ -1,7 +1,7 @@
 {
    "abstract" : "Mojolicious and Async MySQL/MariaDB",
    "author" : [
-      "Rolf Stöckli <tekki@cpan.org>"
+      "Jan Henning Thorsen <jhthorsen@cpan.org>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
@@ -54,7 +54,7 @@
          "web" : "https://github.com/jhthorsen/mojo-mysql"
       }
    },
-   "version" : "1.16",
+   "version" : "1.17",
    "x_contributors" : [
       "Curt Hochwender <hochwender@centurytel.net>",
       "Dan Book <dbook@cpan.org>",

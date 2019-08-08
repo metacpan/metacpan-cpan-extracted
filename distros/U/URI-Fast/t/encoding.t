@@ -31,6 +31,8 @@ subtest 'basics' => sub{
 subtest 'negative path' => sub {
   is URI::Fast::decode("foo %"), "foo %", "terminal %";
   is URI::Fast::decode("% foo"), "% foo", "leading %";
+  is URI::Fast::encode(''), '', 'encode empty string';
+  is URI::Fast::decode(''), '', 'decode empty string';
 };
 
 subtest 'aliases' => sub{

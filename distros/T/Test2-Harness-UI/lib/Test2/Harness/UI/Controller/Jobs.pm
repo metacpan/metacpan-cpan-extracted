@@ -2,7 +2,7 @@ package Test2::Harness::UI::Controller::Jobs;
 use strict;
 use warnings;
 
-our $VERSION = '0.000004';
+our $VERSION = '0.000005';
 
 use Data::GUID;
 use List::Util qw/max/;
@@ -37,7 +37,7 @@ sub handle {
 
         done  => sub { $run->complete },
         fetch => sub {
-            my @jobs = map {encode_json($_) . "\n"} sort _sort_jobs $run->jobs(undef, {offset => $offset, order_by => {-asc => 'job_ord'}})->all;
+            my @jobs = map {encode_json($_->glance_data) . "\n"} sort _sort_jobs $run->jobs(undef, {offset => $offset, order_by => {-asc => 'job_ord'}})->all;
             $offset += @jobs;
             return @jobs;
         },

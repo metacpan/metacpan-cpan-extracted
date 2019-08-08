@@ -7,18 +7,21 @@ package Comics::Plugin::Nozzman;
 
 use parent qw(Comics::Fetcher::Single);
 
-our $VERSION = "0.01";
+our $VERSION = "1.00";
 
-sub register {
-    shift->SUPER::register
-      ( { name    => "Nozzman",
-	  url     => "http://www.nozzman.nl/cartoons/",
-	  pat    =>
-	    qr{ data-image="(?<url>https://static.*?squarespace.com/static/
-		[0-9a-f]+/t/(?<image>[0-9a-f]+/\d+/))"
-	      }six,
-	} );
-}
+our $name    = "Nozzman";
+our $url     = "http://www.nozzman.nl/cartoons/";
+
+our $pattern =
+  qr{ <noscript>
+      <img \s+
+       src="(?<url>https://images.squarespace-cdn.com/
+	     content/v1/
+		[-_0-9a-z]+/
+		[-_0-9a-z]+/
+		[-_0-9a-z]+/
+		(?<image>[^./]+\.\w+))"
+    }ix;
 
 # Important: Return the package name!
 __PACKAGE__;

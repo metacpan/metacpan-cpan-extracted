@@ -6,7 +6,7 @@ use Perl::PrereqScanner::NotQuiteLite 0.9901;
 use List::Util 1.33 qw/none/;
 use version;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 $VERSION =~ s/_//; ## no critic
 
 # These equivalents should be reasonably well-known and, preferably,
@@ -57,14 +57,15 @@ sub analyse {
     # NOTE: all files in xt/ should be ignored because they are
     # for authors only and their dependencies may not be (and
     # often are not) listed in meta files.
-    my @test_files = grep {m!^t\b.*\.t!} sort keys %$files;
+    my @test_files = grep {m!^t\b.*\.t$!} sort keys %$files;
     $me->d->{test_files} = \@test_files;
 
     my %test_modules = map {
-        my $m = $_;
+        my $m = my $f = $_;
         $m =~ s|\.pm$||;
         $m =~ s|/|::|g;
-        ($m => $_)
+        (my $m0 = $m) =~ s|^t::(?:lib::)?||;
+        ($m => $f, $m0 => $f)
     } grep {m|^t\b.*\.pm$|} keys %$files;
 
     my %skip=map {$_->{module}=>1 } @$modules;
@@ -151,7 +152,10 @@ sub _scan {
 
         # There may be broken files (intentionally, or unintentionally, esp in tests)
         if (@{$ctx->{errors} || []}) {
-            $files_hash->{$file}{scan_error} = 1;
+            my $error = join ',', @{$ctx->{errors}};
+            $error =~ s/ at \S+ line \d+[^\n]*//gs;
+            $error =~ s/Scan Error: //g;
+            $files_hash->{$file}{scan_error} = $error;
         }
 
         if ($ctx->{perl6}) {
@@ -219,7 +223,7 @@ sub kwalitee_indicators {
             error => q{This distribution does not 'use warnings;' (or its equivalents) in all of its modules. Note that this is not about that your modules actually warn when something bad happens. It's bad if nobody can tell if a module warns or not, without reading the source code of your favorite module that actually enforces warnings. In other words, it's bad if someone feels the need to add 'use warnings' to your modules.},
             is_extra => 1,
             ignorable => 1,
-            remedy => q{Add 'use warnings' (or its equivalents) to all modules (this will require perl > 5.6), or convince us that your favorite module is well-known enough and people can easily see the modules warn when something bad happens.},
+            remedy => q{Add 'use warnings' (or its equivalents) to all modules, or convince us that your favorite module is well-known enough and people can easily see the modules warn when something bad happens.},
             code => sub {
                 my $d = shift;
                 my $files = $d->{files_hash} || {};

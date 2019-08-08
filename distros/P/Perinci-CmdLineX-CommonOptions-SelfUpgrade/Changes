@@ -1,8 +1,14 @@
-0.002   2019-06-19 (PERLANCAR)
+0.003   2019-08-07  Released-By: PERLANCAR; Urgency: medium
+
+	- Allow user to supply list of modules to update via
+	  _list_modules() hook.
+
+
+0.002   2019-06-19  Released-By: PERLANCAR
 
 	- Fix accidental use of old namespace notation.
 
 
-0.001    2019-06-06 (PERLANCAR)
+0.001    2019-06-06  Released-By: PERLANCAR
 
          - First release.

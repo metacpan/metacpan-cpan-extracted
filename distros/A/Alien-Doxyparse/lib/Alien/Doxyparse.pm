@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use parent 'Alien::Base';
  
-our $VERSION = '0.10';
+our $VERSION = '0.12';
 
 =head1 NAME
 
@@ -107,7 +107,7 @@ Joenio Costa <joenio@joenio.me>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Joenio Costa.
+This software is copyright (c) 2017-2019 by Joenio Costa.
 
 This is free software; you can redistribute it and/or modify it under the same
 terms as the Perl 5 programming language system itself.

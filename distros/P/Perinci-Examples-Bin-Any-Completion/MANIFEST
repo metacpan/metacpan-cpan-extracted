@@ -8,6 +8,7 @@ Makefile.PL
 README
 dist.ini
 lib/Perinci/Examples/Bin/Any/Completion.pm
+script/peri-eg-complete-animal-choice
 script/peri-eg-complete-comment-fruit-any
 script/peri-eg-complete-fruits-any
 t/00-compile.t

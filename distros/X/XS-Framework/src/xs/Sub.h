@@ -85,7 +85,7 @@ private:
     template <class Enable, class...Ctx> struct CallContext;
 
 public:
-    template <class...Ctx> using call_t = decltype(CallContext<void, Ctx...>::call((CV*)nullptr, CallArgs{}));
+    template <class...Ctx> using call_t = decltype(CallContext<void, Ctx...>::call((CV*)nullptr, CallArgs()));
 
     template <class...Ctx, class...Args>
     call_t<Ctx...> call (Args&&...va) const {

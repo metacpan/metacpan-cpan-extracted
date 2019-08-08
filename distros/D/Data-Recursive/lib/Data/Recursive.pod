@@ -1,0 +1,351 @@
+=head1 NAME
+
+Data::Recursive - array and hash merge, deep clone, recursive data compare, done very fast, with C++ API.
+
+=head1 DESCRIPTION
+
+This module performs merging, cloning and comparing data structures of any kind. It is written in C and performs as fast as possible.
+
+=head1 SYNOPSIS
+
+    use Data::Recursive qw/clone lclone merge hash_merge array_merge compare/;
+                       
+    $cloned = clone($data);
+    $cloned = lclone($data);
+    
+    $result = merge($dest, $source, $flags);
+    $result = hash_merge($dest, $source, $flags);
+    $result = array_merge($dest, $source, $flags);
+    
+    $is_equal = compare($hash1, $hash2);
+    $is_equal = compare($array1, $array2);
+    $is_equal = compare($scalar1, $scalar2);
+
+=head1 C++ SYNOPSIS
+
+    #include <xs/clone.h>
+    #include <xs/merge.h>
+    #include <xs/compare.h>
+    using namespace xs;
+    
+    Sv result = clone(data);
+    Sv result = clone(data, 0);
+
+    Sv    result = merge(dest, source, flags);
+    Hash  result = hash_merge(dest, source, flags);
+    Array result = array_merge(dest, source, flags);
+
+    bool is_equal = compare(sv1, sv2);    
+    
+
+=head1 PERL FUNCTIONS
+
+
+
+=head4 clone ($source, $flags = Data::Recursive::TRACK_REFS)
+
+Makes a deep copy of $source and returns it.
+
+Handles CODEREFs and IOREFs, but doesn't clone it, just copies pointer to the same CODE and IO into new reference. All other
+data types are cloned normally.
+
+If C<clone> encounters a blessed object and it has a C<HOOK_CLONE> method, the return value of this method is used instead of a
+default behaviour. You can call C<clone($self)> again from C<HOOK_CLONE> if you need to, for example to prevent cloning some of
+your properties:
+
+    sub HOOK_CLONE {
+        my $self = shift;
+        my $tmp = delete local $self->{big_obj_backref};
+        my $ret = Data::Recursive::clone($self);
+        $ret->{big_obj_backref} = $tmp;
+        return $ret;
+    }
+
+In this case second C<clone()> call won't call C<HOOK_CLONE> again and will clone $self in a standart manner.
+
+Flags:
+
+=over
+
+=item Data::Recursive::TRACK_REFS is set (the default)
+
+Handles cross-references: references to the same data will be the same references in cloned data.
+If a cycled reference is present in $source, it will remain cycled in cloned data.
+
+Weak references are respected: weakref somewhere in C<$source> becomes weakref to the cloned data in the result. However at least one strong reference to the
+same data must present somewhere in C<$source> (and it will become of course a strong reference in the result). Otherwise (if no strong references pointing to
+such data present, only weak refs) all these weak refs will be C<undef> in cloned result, because they can not exist without at least one strong reference.
+C<clone> won't even try to clone those alone weak references (and will not call hook if those are objects with HOOK_CLONE defined).
+
+In subsequent recursive calls from C<HOOK_CLONE> this flag is always preserved, even if C<HOOK_CLONE> calls C<clone($data, 0)>, i.e. keeping the behavior
+of the top call.
+
+=item Data::Recursive::TRACK_REFS is unset
+
+Does not detect cross-references: references to the same data will be different references.
+If a cycled reference is present in $source, it will throw an exception.
+
+Does not respect weak references: if it discovers a weak reference somewhere in C<$source>, it becomes a strong reference in cloned result.
+It behaves like this because in either case the resulting weak reference would be immediately destroyed after cloning as no one else has a strong reference
+to the resulting cloned data. If you want to handle weak references correctly, do not unset this flag.
+
+Use this parameter (i.e. don't set TRACK_REFS flag) if you definitely know that your structure won't contain any cycled refs or weak refs
+to receive up to 30% performance profit. However if your data contains a lot of references which are references to the same data, unsetting this flag
+may significantly decrease performance (see C<PERFORMANCE> why).
+
+=back
+
+=head4 lclone ($source)
+
+"Light clone", same as C<clone($data, 0)>
+
+
+
+=head4 hash_merge (\%dest, \%source, $flags = 0)
+
+Merges hash C<$source> into C<$dest>. Merge is done very fast. C<$source> and C<$dest> must be HASHREFS or undefs.
+New keys from source are added to dest. Existing keys(values) are replaced. If a key contains HASHREF both in source and dest,
+they are merged recursively. Otherwise it gets replaced by value from source. Returns resulting hashref (it may or may not be the
+the same ref as C<$dest>, depending on C<$flags> provided).
+
+$flags is a bitmask of the following flags listed.
+All constants are exported by default if you say
+
+    use Data::Recursive;
+
+=over
+
+=item ARRAY_CONCAT
+
+By default, if a key contains ARRAYREF both in source and dest, it gets replaced by array from source. If you enable this flag,
+such arrays will be concatenated (like: push @{$dest->{key}}, @{$source->{key}).
+
+=item ARRAY_MERGE
+
+If a key contains ARRAYREF both in source and dest, it gets merged. It means that $dest->{key}[0] is merged with $source->{key}[0],
+and so on. Values are merged using following rules: if both are hashrefs or arrayrefs, they are merged recursively, otherwise
+value in dest gets replaced.
+
+=item LAZY
+
+If you set this flag, merge process won't override any existing and defined values in dest. Keep in mind that if you also set
+ARRAY_MERGE, then the same is in effect while merging array elements.
+
+    my $hash1 = {a => 1, b => undef};
+    my $hash2 = {a => 2, b => 3, c => undef };
+    hash_merge($hash1, $hash2, LAZY);
+    # $hash1 is {a => 1, b => 3, c => undef };
+
+=item SKIP_UNDEF
+
+If enabled, values from source that are undefs won't replace anything in dest. 
+
+    my $hash1 = {a => 1};
+    my $hash2 = {a => undef, b => undef, c => 2};
+    hash_merge($hash1, $hash2, SKIP_UNDEF);
+    # $hash1 is {a => 1, c => 2};
+
+=item DELETE_UNDEF
+
+If enabled, values from source that are undefs acts as a 'deleters', i.e. the corresponding values get deleted from dest.
+
+    my $hash1 = {a => 1, b => 2};
+    my $hash2 = {a => undef};
+    hash_merge($hash1, $hash2, DELETE_UNDEF);
+    # $hash1 is {b => 2};
+
+=item COPY_DEST
+
+Makes deep copy of $dest, merges it with source and returns this new hashref.
+
+=item COPY_SOURCE
+
+By default, if any value from source replaces value from dest, it doesn't get deep copied. For example:
+
+    my $hash1 = {};
+    my $hash2 = {a => [1,2]};
+    hash_merge($hash1, $hash2);
+    shift @{$hash1->{a}};
+    say scalar @{$hash2->{a}}; # prints 1
+
+Moreover, even primitive values are not copied, instead they get aliased for speed. For example:
+
+    my $hash1 = {};
+    my $hash2 = {a => 'mystring'};
+    hash_merge($hash1, $hash2);
+    substr($hash1->{a}, 0, 2);
+    say $hash2->{a}; # prints 'string'
+
+If you enable this flag, replacing values from source will be copied (references - deep copied).
+
+=item COPY_ALL
+
+It is COPY_DEST + COPY_SOURCE
+
+=back
+
+This is how undefined $source or undefined $dest are handled:
+
+=over
+
+=item If $source is undef
+
+Nothing is merged, however if COPY_DEST is set, deep copy of $dest is still returned.
+If $dest is also undef, then regardless of COPY_DEST flag, empty hashref is returned.
+
+=item If $dest is undef
+
+Empty hashref is created, merged with $source and returned.
+
+=back
+
+=head4 merge ($dest, $source, $flags = 0)
+
+Acts much like 'hash_merge', but receives any scalar as $dest and $source, not only hashrefs.
+Returns merged value which may or may not be the same scalar (modified or not) as $dest.
+
+This function does the same work as 'hash_merge' does for its elements. I.e. if both $dest and $source are HASHREFs then they
+are merged via 'hash_merge'. If both are ARRAYREFs, then depending on $flags, $dest are either replaced, concatenated or merged.
+Otherwise $source replaces $dest following the rules described in 'hash_merge' function with respect to flags COPY_DEST, COPY_SOURCE and LAZY.
+
+For example, if $source and $dest are scalars (not refs), and no flags provided, then $dest becomes equal $source.
+If LAZY is provided and $dest is not an undef, $dest is unchanged.
+If COPY_DEST is provided then $dest is unchaged and the result is returned in a new scalar.
+And so on.
+
+However there is one difference: if $dest and $source are primitive scalars, instead of creating an alias, the $source variable
+is copied to $dest (or new result). If COPY_SOURCE is disabled, copying is not deep, like $dest = $source.
+
+=head4 array_merge (\@dest, \@source, $flags = 0)
+
+Recursively merges two arrays, using the same rules for each element as C<hash_merge> with ARRAY_MERGE flag enabled.
+
+It is the same as
+
+    merge($dest, $source, $flags | ARRAY_MERGE);
+    
+but requires both C<$dest> and C<$source> to be an array references (or exception will be thrown).
+
+
+
+=head4 compare ($data1, $data2)
+
+Performs deep comparison and returns true if every element of $data1 is equal to corresponding element of $data2.
+
+The rules of equality for two elements (including the top-level $data1 and $data2 itself):
+
+=over
+
+=item If any of two elements is a reference.
+
+=over
+
+=item If any of elements is a blessed object
+
+If they are not objects of the same class, they're not equal
+
+If class has overloaded '==' operation, it is used for checking equality.
+If not, objects' underlying data structures are compared.
+
+=item If both elements are hash refs.
+
+Equal if all of the key/value pairs are equal.
+
+=item If both elements are array refs.
+
+Equal if corresponding elements are equal (a[0] equal b[0], etc).
+
+=item If both elements are code refs.
+
+Equal if they are references to the same code.
+
+=item If both elements are IOs (IO refs)
+
+Equal if both IOs contain the same fileno.
+
+=item If both elements are typeglobs
+
+Equal if both are references to the same glob.
+
+=item If both elements are refs to anything.
+
+They are dereferenced and checked again from the beginning.
+
+=item Otherwise (one is ref, another is not) they are not equal
+
+=back
+
+=item If both elements are not references
+
+Equal if perl's 'eq' or '==' (depending on data type) returns true.
+
+=back
+
+
+
+=head1 C++ API
+
+    #include <xs/clone.h>
+    #include <xs/merge.h>
+    #include <xs/compare.h>
+    using namespace xs;
+
+All functions above behaves like its perl equivalents. See PERL FUNCTIONS docs.
+
+For C++ SVAPI docs see L<XS::Framework>
+
+=head4 Sv clone (const Sv& data, int flags = CloneFlags::TRACK_REFS)
+
+The only flag is C<xs::CloneFlags::TRACK_REFS> which is set by default.
+
+    auto hash = Hash::create(
+        {"key1", Simple(1)},
+        {"key2", Simple("val2")}
+    });
+    hash["backref"] = Ref::create(hash);
+    
+    Hash copy = clone(hash);
+    assert(copy != hash);
+    Hash backref = copy["backref"];
+    assert(copy == backref);
+
+
+=head4 Hash merge (Hash dest, const Hash& source, int flags = 0)
+
+Flags has the same names as perl flags. Located in xs::MergeFlags::******
+
+=head4 Array merge (Array dest, const Array& source, int flags = 0)
+
+=head4 Sv merge (Sv dest, const Sv& source, int flags = 0)
+
+
+=head4 bool compare (const Sv& lh, const Sv& rh)
+
+        
+=head1 PERFORMANCE
+
+Please note, that although most of the time C<lclone> is faster (about 10-30%) than C<clone> because it doesn't need to track
+cross-references and handle weakrefs, on some certain data it can be much slower. For example
+
+    my $hash = {a => 1, b => 2};
+    my $data = [ ($hash) x 100 ];
+    clone($data);
+    lclone($data);
+    
+In this case C<clone> will be much faster, because it will clone C<$hash> only once and keep the same reference in the cloned data.
+
+C<Data::Recursive> is about 4-10x faster than L<Clone> or L<Storable>::dclone
+
+C<Clone::clone> behaves like C<Data::Recursive::clone> so these two were compared.
+
+C<Storable::dclone> behaves like C<Data::Recursive::lclone> so these two were compared.
+
+=head1 AUTHOR
+
+Pronin Oleg <syber@crazypanda.ru>, Crazy Panda LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

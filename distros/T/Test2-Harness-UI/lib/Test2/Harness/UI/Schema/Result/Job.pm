@@ -336,7 +336,7 @@ __PACKAGE__->belongs_to(
 # Created by DBIx::Class::Schema::Loader v0.07049 @ 2019-07-16 09:19:17
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:8NuQjZoBMCqod6+91SUqKw
 
-our $VERSION = '0.000004';
+our $VERSION = '0.000005';
 
 __PACKAGE__->inflate_column(
     parameters => {
@@ -364,6 +364,19 @@ sub TO_JSON {
     $cols{parameters} = $self->parameters;
 
     return \%cols;
+}
+
+my @GLANCE_FIELDS = qw{ exit fail fail_count job_id name pass_count };
+sub glance_data {
+    my $self = shift;
+    my %cols = $self->get_columns;
+
+    my %data;
+    @data{@GLANCE_FIELDS} = @cols{@GLANCE_FIELDS};
+
+    $data{short_file} = $self->short_file;
+
+    return \%data;
 }
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

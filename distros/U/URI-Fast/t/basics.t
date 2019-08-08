@@ -74,6 +74,12 @@ subtest 'auth' => sub{
   my $uri = uri $uris[3];
   is $uri->auth, 'user:pwd@192.168.0.1:8000', 'get';
 
+  subtest 'empty string' => sub{
+    my $uri = uri;
+    $uri->auth('');
+    is $uri->auth, '', 'empty string';
+  };
+
   subtest 'scalar' => sub{
     my $uri = uri $uris[3];
     is $uri->auth('some:one@www.test.com:1234'), 'some:one@www.test.com:1234', 'set';

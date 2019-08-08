@@ -133,6 +133,6 @@ my $batch_job_handler_error =
     description => "test"
   });
 ok(!$batch_job_handler_error, "BOOLIFY on error false");
-ok($batch_job_handler_error =~ /BatchJobHandlerError\s{[^}]+}/,
+ok($batch_job_handler_error =~ /BatchJobHandlerError\s\{[^}]+\}/,
   "check BatchJobHandlerError STRINGIFY");
 

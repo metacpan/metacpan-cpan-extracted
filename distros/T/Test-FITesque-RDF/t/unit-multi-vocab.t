@@ -45,7 +45,7 @@ my $simple = [[
 					 {
 					  'http://example.org/other-vocab#foo' => '42',
 					  'all' => 'counter-clockwise dahut',
-					  'description' => 'Echo a string',
+					  '-special' => { 'description' => 'Echo a string' },
 					 }
 					]
 				  ]];

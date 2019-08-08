@@ -3,7 +3,7 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = '1.152';
+our $VERSION = '1.153';
 
 =encoding utf8
 
@@ -180,6 +180,10 @@ L<Quiq::DestinationTree> - Verwalte Zielbaum eines Datei-Generators
 
 =item *
 
+L<Quiq::Diff> - Zeige Differenzen zwischen Zeichenketten
+
+=item *
+
 L<Quiq::Digest> - Erzeuge Digest
 
 =item *
@@ -228,11 +232,11 @@ L<Quiq::Formatter> - Formatierung von Werten
 
 =item *
 
-L<Quiq::GD::Font> - GD- oder TrueType-Font
+L<Quiq::Gd::Font> - GD- oder TrueType-Font
 
 =item *
 
-L<Quiq::GD::Image> - Schnittstelle zur GD Graphics Library
+L<Quiq::Gd::Image> - Schnittstelle zur GD Graphics Library
 
 =item *
 
@@ -698,7 +702,7 @@ L<Quiq::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.152
+1.153
 
 =head1 AUTHOR
 

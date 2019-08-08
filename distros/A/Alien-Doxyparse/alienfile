@@ -5,6 +5,10 @@ my $doxyparse_version = $ENV{ALIEN_DOXYPARSE_VERSION} || '1.8.14-7';
 probe [ 'which doxyparse' ];
 
 share {
+  my $cmake_flags = '';
+  if ($^O eq 'freebsd') {
+    $cmake_flags = '-DCMAKE_IGNORE_PATH=/usr/local/include/';
+  }
   requires 'Alien::flex';
   requires 'Alien::bison';
   requires 'Alien::cmake3';
@@ -15,7 +19,7 @@ share {
   download [ "curl %{.meta.start_url} -o doxyparse-$doxyparse_version.tar.gz" ];
   extract [ 'tar zxf %{.install.download}' ];
   build [
-    [ 'cmake -G "Unix Makefiles" -Dbuild_parse=ON -DCMAKE_INSTALL_PREFIX=%{.install.prefix}' ],
+    [ 'cmake -G "Unix Makefiles" -Dbuild_parse=ON -DCMAKE_INSTALL_PREFIX=%{.install.prefix}' . " $cmake_flags" ],
     [ '%{make}' ],
     [ '%{make} install' ],
   ];

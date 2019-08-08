@@ -17,7 +17,7 @@ use overload
 
 # DO NOT OVERLOAD @{} - it's an array - we need this!
 
-$VERSION = '0.16';
+$VERSION = '0.17';
 
 use Net::BGP::Notification qw( :errors );
 

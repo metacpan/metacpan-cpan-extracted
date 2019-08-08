@@ -9,7 +9,7 @@ use Astro::Coord::ECI::Utils qw{ date2epoch };
 use Getopt::Long 2.33 qw{ :config auto_version };
 use Pod::Usage;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 my %opt = (
     body	=> 'Earth',
@@ -76,10 +76,10 @@ reference - Produce output corresponding to VSOP87D reference implementation
 
 This option specifies the body whose state vector is to be computed.
 Possible values are class names in this package, with the leading
-C<Astro::Coord::ECI::VSOP87A::> stripped. C<'Earth'> is special-cased.
+C<Astro::Coord::ECI::VSOP87D::> stripped. C<'Earth'> is special-cased.
 Its model lives in
-L<Astro::Coord::ECI::VSOP87A|Astro::Coord::ECI::VSOP87A> itself, since
-VSOP87A is a Heliocentric model and we need to subtract the position of
+L<Astro::Coord::ECI::VSOP87D|Astro::Coord::ECI::VSOP87D> itself, since
+VSOP87D is a Heliocentric model and we need to subtract the position of
 the Earth to get a geocentric position.
 
 The argument is case-insensitive, but only bodies actually implemented
@@ -122,7 +122,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2018 by Thomas R. Wyant, III
+Copyright (C) 2018-2019 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

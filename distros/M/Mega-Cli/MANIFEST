@@ -1,0 +1,8 @@
+Makefile.PL
+MANIFEST
+t/001_test_mega_cli.t
+t/test_download_file
+t/test_upload
+lib/Mega/Cli.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

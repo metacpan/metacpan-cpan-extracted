@@ -1,5 +1,15 @@
 Revision history for Test-Pod-Links
 
+0.003  2019-08-02 08:21:21 UTC
+  - API change: all_pod_files_ok() no longer takes files or directories
+    as arguments. The files to be tested is now obtained from XT::Files.
+
+  - Import croak from Carp instead of calling Carp::croak
+  - Removed minimal dependency on Test::TempDir::Tiny 0.017
+  - Fixed documentation of new, arguments are not a hash ref
+  - skip needs $how_many with Test::More < 1.302013_009
+  - Removed autodie in tests
+
 0.002  2018-04-21 16:05:12 UTC
 
   - Reduced the non-core dependencies

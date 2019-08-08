@@ -5,7 +5,7 @@ use warnings;
 package Test::FITesque::RDF;
 
 our $AUTHORITY = 'cpan:KJETILK';
-our $VERSION   = '0.010';
+our $VERSION   = '0.011';
 
 use Moo;
 use Attean::RDF;
@@ -21,6 +21,7 @@ use HTTP::Request;
 use HTTP::Response;
 use LWP::UserAgent;
 use Try::Tiny;
+use Attean::SimpleQueryEvaluator;
 
 has source => (
 					is      => 'ro',
@@ -59,6 +60,7 @@ sub transform_rdf {
   $ns->add_mapping(test => 'http://ontologi.es/doap-tests#');
   $ns->add_mapping(http => 'http://www.w3.org/2007/ont/http#');
   $ns->add_mapping(httph => 'http://www.w3.org/2007/ont/httph#');
+  $ns->add_mapping(dqm => 'http://purl.org/dqm-vocabulary/v1/dqm#');
   $ns->add_mapping(nfo => 'http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#');
   my $parser = Attean->get_parser(filename => $self->source)->new( base => $self->base_uri );
   my $model = Attean->temporary_model;
@@ -74,7 +76,7 @@ sub transform_rdf {
   $model->add_iter($file_iter->as_quads($graph_id));
 
   my $tests_uri_iter = $model->objects(undef, iri($ns->test->fixtures->as_string))->materialize; # TODO: Implement coercions in Attean
-  if (scalar $tests_uri_iter->elements == 0) { # TODO: Better to check if there are fixture table entries that has no test
+  if (scalar $tests_uri_iter->elements == 0) {
 	 croak "No tests found in " . $self->source;
   }
 
@@ -100,22 +102,22 @@ sub transform_rdf {
 							  triplepattern($test_uri, iri($ns->test->purpose->as_string), variable('description')),
 							  triplepattern($test_uri, iri($ns->test->params->as_string), variable('paramid')));
 
-	 my $algebra = Attean::Algebra::Query->new(children => [$test_bgp]); # TODO: generalize the next 4 lines in Attean
-	 my $planner = Attean::IDPQueryPlanner->new();
-	 my $plan = $planner->plan_for_algebra($algebra, $model, $graph_id);
-	 my $test_iter = $plan->evaluate($model); # Each row will correspond to one test
+	 my $e = Attean::SimpleQueryEvaluator->new( model => $model, default_graph => $graph_id );
+	 my $test_iter = $e->evaluate( $test_bgp, $graph_id); # Each row will correspond to one test
 
 	 while (my $test = $test_iter->next) {
 		push(@instance, [$test->value('handler')->value]);
 		my $method = $test->value('method')->value;
 		my $params_iter = $model->get_quads($test->value('paramid')); # Get the parameters for each test
-		my $params = {description => $test->value('description')->value}; # Description should always be present
+		my $params;
+		$params->{'-special'} = {description => $test->value('description')->value}; # Description should always be present
 		while (my $param = $params_iter->next) {
 		  # First, see if there are HTTP request-responses that can be constructed
 		  my $req_head = $model->objects($param->subject, iri($ns->test->requests->as_string))->next;
 		  my $res_head = $model->objects($param->subject, iri($ns->test->responses->as_string))->next;
 		  my @requests;
 		  my @responses;
+		  my @regexps;
 
 		  if ($req_head && $res_head) { # TODO: Test role?
 			 # There is a list of HTTP requests and responses
@@ -142,28 +144,35 @@ sub transform_rdf {
 						}
 					 }
 				  } elsif (defined($local_header)) {
-					 $req->push_header(_find_header($local_header, $req_data));
+					 $req->push_header(_find_header($local_header) => $req_data->object->value);
 				  }
 				}
 				push(@requests, $req);
 			 }
-			 $params->{'http-requests'} = \@requests;
+			 $params->{'-special'}->{'http-requests'} = \@requests;
 
 			 my $res_iter = $model->get_list($graph_id, $res_head);
 			 while (my $res_subject = $res_iter->next) {
 				my $res = HTTP::Response->new;
 				my $res_entry_iter = $model->get_quads($res_subject);
+				my $regex_headers = {};
 				while (my $res_data = $res_entry_iter->next) {
 				  my $local_header = $ns->httph->local_part($res_data->predicate);
 				  if ($res_data->predicate->equals($ns->http->status)) {
 					 $res->code($res_data->object->value);
 				  } elsif (defined($local_header)) {
-					 $res->push_header(_find_header($local_header, $res_data));
+					 my $cleaned_header = _find_header($local_header);
+					 $res->push_header($cleaned_header => $res_data->object->value);
+					 if ($res_data->object->is_literal && $res_data->object->datatype->as_string eq $ns->dqm->regex->as_string) { # TODO: don't use string comparison when Attean does the coercion
+						$regex_headers->{$cleaned_header} = 1;
+					 }
 				  }
 				}
+				push(@regexps, $regex_headers);
 				push(@responses, $res);
 			 }
-			 $params->{'http-responses'} = \@responses;
+			 $params->{'-special'}->{'http-responses'} = \@responses;
+			 $params->{'-special'}->{'regex-fields'} = \@regexps;
 		  }
 		  if ($param->object->is_literal || $param->object->is_iri) {
 			 my $key = $param->predicate->as_string;
@@ -183,10 +192,10 @@ sub transform_rdf {
 }
 
 sub _find_header {
-  my ($local_header, $data) = @_;
+  my $local_header = shift;
   $local_header =~ s/_/-/g; # Some heuristics for creating HTTP headers
   $local_header =~ s/\b(\w)/\u$1/g;
-  return ($local_header => $data->object->value)
+  return $local_header;
 }
 
 1;
@@ -270,7 +279,7 @@ test will be run. That is formulated in a separate resource which
 requires two predicates, C<< deps:test-requirement >> predicate, whose
 object contains the class name of the implementation of the tests; and
 C<< nfo:definesFunction >> whose object is a string which matches the
-actual function name withing that class.
+actual function name within that class.
 
 =item C<< test:purpose >>
 
@@ -282,6 +291,25 @@ The object of this predicate links to the parameters, which may have
 many different shapes. See below for examples.
 
 =back
+
+=head2 PARAMETERIZATION
+
+This module seeks to parameterize the tests, and does so using mostly
+the C<test:params> predicate above. This is passed on as a hashref to
+the test scripts.
+
+There are two main ways currently implemented, one creates key-value
+pairs, and uses predicates and objects for that respectively, in
+vocabularies chosen by the test writer. The other main way is create
+lists of HTTP requests and responses.
+
+Additionally, a special parameter C<-special> is passed on for
+internal framework use. The leading dash is not allowed as the start
+character of a local name, and therefore chosen to avoid conflicts
+with other parameters.
+
+The literal given in C<test:purpose> above is passed on as with the
+C<description> key in this hashref.
 
 =head2 RDF EXAMPLE
 
@@ -298,7 +326,8 @@ referenced through C<test:test_script> for both functions.
 The C<test:params> predicate is used to link the parameters that will
 be sent as a hashref into the function. The <test:purpose> predicate
 is required to exist outside of the parameters, but will be included
-as a parameter as well, named C<description>.
+as a parameter as well, named C<description> in the C<-special>
+hashref.
 
 There are two mechanisms for passing parameters to the test scripts,
 one is simply to pass arbitrary key-value pairs, the other is to pass
@@ -313,31 +342,34 @@ the parameters, and the C<param_base> is used to set indicate the
 namespace, so that the local part can be resolved, if wanted. The
 resolution itself happens in L<URI::NamespaceMap>.
 
+
  @prefix test: <http://ontologi.es/doap-tests#> .
  @prefix deps: <http://ontologi.es/doap-deps#>.
+ @prefix dc:   <http://purl.org/dc/terms/> .
  @prefix my:   <http://example.org/my-parameters#> .
  @prefix nfo:  <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#> .
+ @prefix :     <http://example.org/test#> .
 
 
- <#test-list> a test:FixtureTable ;
-    test:fixtures <#test1>, <#test2> . 
+ :test_list a test:FixtureTable ;
+    test:fixtures :test1, :test2 .
 
- <#test1> a test:AutomatedTest ;
+ :test1 a test:AutomatedTest ;
     test:param_base <http://example.org/my-parameters#> ;
-    test:purpose "Echo a string"@en ;    
+    test:purpose "Echo a string"@en ;
     test:test_script <http://example.org/simple#string_found> ;
     test:params [ my:all "counter-clockwise dahut" ] .
-        
- <#test2> a test:AutomatedTest ;
+
+ :test2 a test:AutomatedTest ;
     test:param_base <http://example.org/my-parameters#> ;
     test:purpose "Multiply two numbers"@en ;
     test:test_script <http://example.org/multi#multiplication> ;
     test:params [
         my:factor1 6 ;
         my:factor2 7 ;
-        my:product 42 
+        my:product 42
     ] .
-        
+
  <http://example.org/simple#string_found> a nfo:SoftwareItem ;
     nfo:definesFunction "string_found" ;
     deps:test-requirement "Internal::Fixture::Simple"^^deps:CpanId .
@@ -357,7 +389,9 @@ L<HTTP::Request> and L<HTTP::Response> objects respectively. In tests
 scripts, the request objects will typically be passed to the
 L<LWP::UserAgent> as input, and then the response from the remote
 server will be compared with the expected L<HTTP::Response>s made by
-the test fixture.
+the test fixture. These will then be passed as arrayrefs below the
+C<-special> key with the keys C<http-requests> and C<http-responses>
+respectively.
 
 This gets more complex, please see the test data file
 C<t/data/http-list.ttl> file for example.
@@ -368,6 +402,20 @@ one request may be used to influence the next. Server state can be
 relied on between different tests by using an C<rdf:List> of test
 fixtures if it writes something into the server, there is nothing in
 the framework that changes that.
+
+To use data from one response to influence subsequent requests, the
+framework supports datatyping literals with the C<dqm:regex> datatype,
+for example:
+
+ :check_acl_location_res a http:ResponseMessage ;
+    httph:link '<(.*?)>;\\s+rel="acl"'^^dqm:regex ;
+    http:status 200 .
+
+This makes it possible to use a Perl regular expression, which can be
+executed in a test script if desired. If present, it will supply
+another arrayref to the C<-special> key with the key C<regex-fields>
+containing hashrefs with the header field that had a correspondiing
+object datatyped regex as key and simply C<1> as value.
 
 =head1 TODO
 

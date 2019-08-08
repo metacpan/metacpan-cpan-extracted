@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 
 use strict;
 use warnings;
@@ -9,7 +9,7 @@ use Digest::MD5 qw(md5_hex);
 use File::Path qw(make_path);
 use Path::Tiny qw(path);
 use Getopt::Long;
-use JSON::XS;
+use JSON::MaybeXS;
 use Sereal qw(encode_sereal decode_sereal);
 use Devel::QuickCover::Report;
 
@@ -47,7 +47,7 @@ my $DIGESTS       = "$COVERDB/digests";
 my $STRUCTURE     = "$COVERDB/structure/";
 my $RUNS          = "$COVERDB/runs/";
 
-my $JSON          = JSON::XS->new->utf8->indent;
+my $JSON          = JSON::MaybeXS->new->utf8->indent;
 my $DEVEL_COVER_DB_FORMAT = 'Sereal';
 $ENV{DEVEL_COVER_DB_FORMAT}
     and $DEVEL_COVER_DB_FORMAT = 'JSON';

@@ -1,5 +1,9 @@
 Revision history for Perl extension Redis::Namespace
 
+0.09 2019-08-02T12:45:12Z
+        - fix failing test with Redis 5 #9
+        - shrink cpanfile #11
+
 0.08 2018-01-28T12:15:16Z
 	- support bitfield, georadius, georadiusbymember, swapdb, touch, and unlink command
 

@@ -1,5 +1,28 @@
 Revision history for Perl extension Net::BGP.
 
+0.17    2019-08-03
+
+        Added by Damian Ivereigh <damo@launtel.net.au>:
+
+        - Fixed bug where the wrong aggregator variable was being tested.
+        - Added an "OpaqueData" parameter and equivalent accessor sub "opaque_data()"
+          to allow for the storage of arbitrary data with the peer. The main purpose
+          of this is to allow the user to store extra data (a scalar or ref) with the
+          peer that is then readable by the call back routines. I realise there are
+          other ways to do this, but this seems much cleaner.
+        - Fixes the situation where a socket is still in the list of sockets to be
+          selected on, yet it has been closed. I believe this is caused when we
+          create a new connection to a peer at the same time as we receive one.
+          When we find ourselves with a bad FD, we re-check the list of sockets to
+          select on.
+        - It is possible to receive a notification message (error) in response to an
+          OPEN message (e.g. an unrecognised ASN). We were getting a Finite State
+          Machine error, now we call the notification callback.
+        - _kill_session() will call _close_session() even if the socket is not open.
+          This will finally terminate the session properly (stops some weird loops).
+        - Added extra members of the notification state engine.
+          Now calls _kill_session() rather than _cease() when the peer socket is closed.
+
 0.16    2015-01-03
         Added by Joel Maslak <jmaslak@antelope.net>:
         - Feature: 32 bit ASN support (both as an old and a new speaker)

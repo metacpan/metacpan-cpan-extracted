@@ -1,7 +1,7 @@
 package App::instopt;
 
-our $DATE = '2019-06-06'; # DATE
-our $VERSION = '0.009'; # VERSION
+our $DATE = '2019-08-07'; # DATE
+our $VERSION = '0.010'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -825,7 +825,7 @@ App::instopt - Download and install software
 
 =head1 VERSION
 
-This document describes version 0.009 of App::instopt (from Perl distribution App-instopt), released on 2019-06-06.
+This document describes version 0.010 of App::instopt (from Perl distribution App-instopt), released on 2019-08-07.
 
 =head1 SYNOPSIS
 
@@ -881,6 +881,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 cleanup_install_dir
 
 Usage:
@@ -928,6 +929,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 compare_versions
 
 Usage:
@@ -960,6 +962,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 download
@@ -1000,6 +1003,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 download_all
 
 Usage:
@@ -1036,6 +1040,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 list_downloaded
 
 Usage:
@@ -1070,6 +1075,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 list_downloaded_versions
@@ -1110,6 +1116,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 list_installed
 
 Usage:
@@ -1146,6 +1153,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 list_installed_versions
 
 Usage:
@@ -1180,6 +1188,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 update
@@ -1220,6 +1229,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 update_all

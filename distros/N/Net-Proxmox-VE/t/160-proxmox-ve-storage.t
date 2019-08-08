@@ -3,9 +3,7 @@
 use strict;
 use warnings;
 
-use Data::Dumper;
-
-use Test::More; my $tests = 1; # used later
+use Test::More; my $tests = 2; # used later
 use Test::Trap;
 if ( not $ENV{PROXMOX_TEST_URI} ) {
     my $msg = 'This test sucks.  Set $ENV{PROXMOX_TEST_URI} to a real running proxmox to run.';

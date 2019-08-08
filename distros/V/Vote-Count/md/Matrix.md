@@ -72,7 +72,7 @@ Returns an array of the choice or choices with the fewest wins.
 
 ## CondorcetLoser
 
-Eliminates all Condorcet Losers from the Matrix Object's Active list. Returns a hashref:
+Eliminates all Condorcet Losers from the Matrix Object's Active list. Returns a hashref. Takes an optional true false argument (default is false) to include choices that have tied but not won in the elimination.
 
 ```
   {

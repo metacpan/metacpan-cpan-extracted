@@ -6,19 +6,12 @@ use Test::More;
   package MyRole1;
 
   sub before_role {}
-  use constant before_constant => 1;
-  BEGIN {
-    if ("$]" >= 5.026) {
-      $MyRole1::{'blorf'} = sub { 'blorf' };
-    }
-  }
 
   use Role::Tiny;
   no warnings 'once';
 
   our $GLOBAL1 = 1;
   sub after_role {}
-  use constant after_constant => 1;
 }
 
 {

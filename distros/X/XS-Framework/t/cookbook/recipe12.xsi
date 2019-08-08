@@ -60,7 +60,7 @@ namespace xs {
     };
 }
 
-static xs::Sv::payload_marker_t payload_marker_12{};
+static xs::Sv::payload_marker_t payload_marker_12;
 
 struct StatisticsRecipe12_payload {
     PointRecipe12 interest;

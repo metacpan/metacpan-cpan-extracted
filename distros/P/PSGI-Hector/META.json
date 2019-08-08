@@ -4,7 +4,7 @@
       "MacGyveR <dumb@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4211",
+   "generated_by" : "Module::Build version 0.4222",
    "license" : [
       "perl_5"
    ],
@@ -52,7 +52,7 @@
    "provides" : {
       "PSGI::Hector" : {
          "file" : "lib/PSGI/Hector.pm",
-         "version" : "1.9"
+         "version" : "1.91"
       },
       "PSGI::Hector::Base" : {
          "file" : "lib/PSGI/Hector/Base.pm"
@@ -97,5 +97,5 @@
          "url" : "https://github.com/thedumbterminal/PSGI-Hector"
       }
    },
-   "version" : "1.9"
+   "version" : "1.91"
 }

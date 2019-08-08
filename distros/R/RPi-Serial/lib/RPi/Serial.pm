@@ -4,21 +4,22 @@ use 5.006;
 use strict;
 use warnings;
 
-use parent 'WiringPi::API';
+our $VERSION = '3.00';
 
-our $VERSION = '2.3603';
+require XSLoader;
+XSLoader::load('RPi::Serial', $VERSION);
 
 sub new {
     my ($class, $device, $baud) = @_;
     my $self = bless {}, $class;
-    $self->fd($self->serial_open($device, $baud));
+    $self->fd(tty_open($device, $baud));
     return $self;
 }
 sub close {
-    $_[0]->serial_close($_[0]->fd);
+    tty_close($_[0]->fd);
 }
 sub avail {
-    return $_[0]->serial_data_avail($_[0]->fd);
+    return tty_available($_[0]->fd);
 }
 sub fd {
     my $self = shift;
@@ -26,22 +27,22 @@ sub fd {
     return $self->{fd};
 }
 sub flush {
-    $_[0]->serial_flush($_[0]->fd);
+    tty_flush($_[0]->fd);
 }
 sub putc {
-    $_[0]->serial_put_char($_[0]->fd, $_[1]);
+    tty_putc($_[0]->fd, $_[1]);
 }
 sub puts {
-    $_[0]->serial_puts($_[0]->fd, $_[1]);
+    tty_puts($_[0]->fd, $_[1]);
 }
 sub getc {
-    return $_[0]->serial_get_char($_[0]->fd);
+    return tty_getc($_[0]->fd);
 }
 sub gets {
-    return $_[0]->serial_gets($_[0]->fd, $_[1]);
+    return tty_gets($_[0]->fd, $_[1]);
 }
 sub DESTROY {
-    $_[0]->serial_close($_[0]->fd);
+    tty_close($_[0]->fd);
 }
 sub __placeholder {} # vim folds
 1;
@@ -75,10 +76,11 @@ RPi::Serial - Basic read/write interface to a serial port
 
 =head1 DESCRIPTION
 
-Provides basic read and write functionality on the Raspberry Pi's GPIO serial
-interface (GPIO pins 14 and 15).
+Provides basic read and write functionality of a UART serial interface
 
 =head1 WARNING
+
+If using on a Raspberry Pi platform:
 
 In order to use GPIO pins 14 and 15 as a serial interface on the Raspberry Pi,
 you need to disable the built-in Bluetooth adaptor. This distribution will not

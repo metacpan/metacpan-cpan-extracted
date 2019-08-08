@@ -129,6 +129,7 @@ haversines
 hoc
 http
 Hujsak
+IDL
 IDs
 illum
 illuminator
@@ -267,6 +268,7 @@ solstices
 SPACETRACK
 Spacetrack
 specular
+Starlink
 STDERR
 Steele's
 Steffen

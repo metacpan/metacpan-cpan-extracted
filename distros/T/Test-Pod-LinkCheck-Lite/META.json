@@ -52,7 +52,7 @@
    "provides" : {
       "Test::Pod::LinkCheck::Lite" : {
          "file" : "lib/Test/Pod/LinkCheck/Lite.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -70,6 +70,6 @@
          "web" : "https://github.com/trwyant/perl-Test-Pod-LinkCheck-Lite"
       }
    },
-   "version" : "0.001",
-   "x_serialization_backend" : "JSON::PP version 4.03"
+   "version" : "0.002",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

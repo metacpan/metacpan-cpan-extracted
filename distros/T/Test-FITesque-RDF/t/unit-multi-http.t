@@ -43,15 +43,18 @@ my $put_expect = [
             [
               'http_req_res_list_unauthenticated',
               {
-					'description' => 'More elaborate HTTP vocab for PUT then GET test',
-					'http-requests' => [
-											  methods(method => 'PUT'),
-											  methods(method => 'GET')
-											 ],
-					'http-responses' => [
-												methods(code => '201'),
-												isa('HTTP::Response')
-											  ]
+					'-special' => {
+										'regex-fields' => ignore(),
+										'description' => 'More elaborate HTTP vocab for PUT then GET test',
+										'http-requests' => [
+																  methods(method => 'PUT'),
+																  methods(method => 'GET')
+																 ],
+										'http-responses' => [
+																	methods(code => '201'),
+																	isa('HTTP::Response')
+																  ]
+									  },
               }
             ]
           ];
@@ -62,13 +65,15 @@ my $cors_expect = [
             [
               'http_req_res_list_unauthenticated',
               {
-					'description' => 'Testing CORS header when Origin is supplied by client',
-					'http-requests' => [
-											  methods(method => 'GET')
-											 ],
-					'http-responses' => [
-												isa('HTTP::Response')
-											  ]
+					'-special' => { 'description' => 'Testing CORS header when Origin is supplied by client',
+										 'regex-fields' => ignore(),
+										 'http-requests' => [
+																	methods(method => 'GET')
+																  ],
+										 'http-responses' => [
+																	 isa('HTTP::Response')
+																	]
+									  },
 				  }
 				]
 			  ];
@@ -77,7 +82,7 @@ my $cors_expect = [
 
 cmp_deeply($data, [$put_expect, $cors_expect], 'Check basic structure');
 
-my $cors_actual = $data->[1]->[1]->[1];
+my $cors_actual = $data->[1]->[1]->[1]->{'-special'};
 
 ok(defined($cors_actual->{'http-requests'}->[0]->header('Origin')), 'Origin header found');
 ok(defined($cors_actual->{'http-responses'}->[0]->header('Access-Control-Allow-Origin')), 'ACAO header found');

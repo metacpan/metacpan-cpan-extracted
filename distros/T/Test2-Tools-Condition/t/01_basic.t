@@ -1,10 +1,6 @@
 use Test2::V0;
 use Test2::Tools::Condition;
 
-use Test2::Util::Table ();
-
-sub table { join "\n" => Test2::Util::Table::table(@_) }
-
 is 1, condition { $_ > 0 }, '1 > 0';
 isnt 0, condition { $_ > 0 }, '!(0 > 0)';
 is 0, !condition { $_ > 0 }, 'negatable';
@@ -23,38 +19,34 @@ is 'abc', $check, '/^a/ and length == 3';
 isnt 'cba', $check, 'unsatisfy /^a/';
 isnt 'abcabc', $check, 'unsatisfy length == 3';
 
-is intercept {
+like intercept {
     is 0, condition { $_ > 0 };
-}, array {
-    event Ok => { pass => 0 };
-    event Diag => {
-        message => match qr{^\n?Failed test},
-    };
-    event Diag => {
-        message => table(
-            header => [qw/GOT OP CHECK LNs/],
-            rows   => [
-                ['<FALSE (0)>', '==', '<CONDITION>', '27'],
-            ],
-        ),
-    };
-};
+}, [
+    event Fail => {
+        info => [{
+            table => {
+                header => [qw/PATH LNs GOT OP CHECK LNs/],
+                rows   => [
+                    ['', '', '<FALSE (0)>', '==', '<CONDITION>', '23'],
+                ],
+            },
+        }],
+    },
+];
 
-is intercept {
+like intercept {
     is 1, !condition { $_ > 0 };
-}, array {
-    event Ok => { pass => 0 };
-    event Diag => {
-        message => match qr{^\n?Failed test},
-    };
-    event Diag => {
-        message => table(
-            header => [qw/GOT OP CHECK LNs/],
-            rows   => [
-                ['<TRUE (1)>', '!=', '<CONDITION>', '44'],
-            ],
-        ),
-    };
-};
+}, [
+    event Fail => {
+        info => [{
+            table => {
+                header => [qw/PATH LNs GOT OP CHECK LNs/],
+                rows   => [
+                    ['', '', '<TRUE (1)>', '!=', '<CONDITION>', '38'],
+                ],
+            },
+        }],
+    },
+];
 
 done_testing;

@@ -1,7 +1,7 @@
 package Perinci::Examples::FilePartial;
 
-our $DATE = '2019-06-29'; # DATE
-our $VERSION = '0.814'; # VERSION
+our $DATE = '2019-07-19'; # DATE
+our $VERSION = '0.818'; # VERSION
 
 use 5.010;
 use strict;
@@ -37,7 +37,7 @@ $SPEC{read_file} = {
     result => {schema=>'buf*', partial=>1},
 };
 sub read_file {
-    my %args = @_; no warnings ('void');my $arg_err; if (exists($args{'path'})) { ((defined($args{'path'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((!ref($args{'path'})) ? 1 : (($arg_err //= "Not of type text"),0)); if ($arg_err) { return [400, "Invalid argument value for path: $arg_err"] } }if (!exists($args{'path'})) { return [400, "Missing argument: path"] } # VALIDATE_ARGS
+    my %args = @_; my $arg_err; { no warnings ('void');if (exists($args{'path'})) { ((defined($args{'path'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((!ref($args{'path'})) ? 1 : (($arg_err //= "Not of type text"),0)); if ($arg_err) { return [400, "Invalid argument value for path: $arg_err"] } }if (!exists($args{'path'})) { return [400, "Missing argument: path"] } } # VALIDATE_ARGS
 
     my $path = $args{path};
     (-f $path) or return [404, "No such file '$path'"];
@@ -71,7 +71,7 @@ $SPEC{write_file} = {
     },
 };
 sub write_file {
-    my %args = @_; no warnings ('void');my $arg_err; if (exists($args{'content'})) { ((defined($args{'content'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((!ref($args{'content'})) ? 1 : (($arg_err //= "Not of type buffer"),0)); if ($arg_err) { return [400, "Invalid argument value for content: $arg_err"] } }if (!exists($args{'content'})) { return [400, "Missing argument: content"] } no warnings ('void');if (exists($args{'path'})) { ((defined($args{'path'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((!ref($args{'path'})) ? 1 : (($arg_err //= "Not of type text"),0)); if ($arg_err) { return [400, "Invalid argument value for path: $arg_err"] } }if (!exists($args{'path'})) { return [400, "Missing argument: path"] } # VALIDATE_ARGS
+    my %args = @_; my $arg_err; { no warnings ('void');if (exists($args{'content'})) { ((defined($args{'content'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((!ref($args{'content'})) ? 1 : (($arg_err //= "Not of type buffer"),0)); if ($arg_err) { return [400, "Invalid argument value for content: $arg_err"] } }if (!exists($args{'content'})) { return [400, "Missing argument: content"] } no warnings ('void');if (exists($args{'path'})) { ((defined($args{'path'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((!ref($args{'path'})) ? 1 : (($arg_err //= "Not of type text"),0)); if ($arg_err) { return [400, "Invalid argument value for path: $arg_err"] } }if (!exists($args{'path'})) { return [400, "Missing argument: path"] } } # VALIDATE_ARGS
 
     my $path = $args{path};
     my $start = $args{"-arg_part_start"} // 0;
@@ -102,7 +102,7 @@ _
     },
 };
 sub append_file {
-    my %args = @_; no warnings ('void');my $arg_err; if (exists($args{'content'})) { ((defined($args{'content'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((!ref($args{'content'})) ? 1 : (($arg_err //= "Not of type buffer"),0)); if ($arg_err) { return [400, "Invalid argument value for content: $arg_err"] } }if (!exists($args{'content'})) { return [400, "Missing argument: content"] } no warnings ('void');if (exists($args{'path'})) { ((defined($args{'path'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((!ref($args{'path'})) ? 1 : (($arg_err //= "Not of type text"),0)); if ($arg_err) { return [400, "Invalid argument value for path: $arg_err"] } }if (!exists($args{'path'})) { return [400, "Missing argument: path"] } # VALIDATE_ARGS
+    my %args = @_; my $arg_err; { no warnings ('void');if (exists($args{'content'})) { ((defined($args{'content'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((!ref($args{'content'})) ? 1 : (($arg_err //= "Not of type buffer"),0)); if ($arg_err) { return [400, "Invalid argument value for content: $arg_err"] } }if (!exists($args{'content'})) { return [400, "Missing argument: content"] } no warnings ('void');if (exists($args{'path'})) { ((defined($args{'path'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((!ref($args{'path'})) ? 1 : (($arg_err //= "Not of type text"),0)); if ($arg_err) { return [400, "Invalid argument value for path: $arg_err"] } }if (!exists($args{'path'})) { return [400, "Missing argument: path"] } } # VALIDATE_ARGS
 
     my $path = $args{path};
 
@@ -129,7 +129,7 @@ Perinci::Examples::FilePartial - Examples for reading/writing files (demos parti
 
 =head1 VERSION
 
-This document describes version 0.814 of Perinci::Examples::FilePartial (from Perl distribution Perinci-Examples), released on 2019-06-29.
+This document describes version 0.818 of Perinci::Examples::FilePartial (from Perl distribution Perinci-Examples), released on 2019-07-19.
 
 =head1 DESCRIPTION
 

@@ -11,7 +11,7 @@ use vars qw(
 ## Inheritance and Versioning ##
 
 @ISA     = qw( Exporter );
-$VERSION = '0.16';
+$VERSION = '0.17';
 
 ## Module Imports ##
 

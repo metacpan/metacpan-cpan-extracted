@@ -1,5 +1,13 @@
 Revision history for perl Net::Proxmox::VE
 
+0.35 2019-08-03
+- Adjusting prerequisites only.
+- Rework the dist.ini file.
+
+0.34 2019-08-02
+- Problem now croak rather than print (thanks sauriol via GH)
+- Adjusted tests to forgive ssl certificates
+
 0.33 2018-03-15
 - Fix ticket expiration calculation (thanks p5i via GH)
 - Checking that $data->{data} is an array ref (thanks p5i via GH)

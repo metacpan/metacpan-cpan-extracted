@@ -6,7 +6,7 @@ sub _getstash { \%{"$_[0]::"} }
 use strict;
 use warnings;
 
-our $VERSION = '2.000007';
+our $VERSION = '2.000008';
 $VERSION =~ tr/_//d;
 
 our %INFO;
@@ -52,22 +52,6 @@ sub _load_module {
   require $file;
   pop @$guard if _WORK_AROUND_BROKEN_MODULE_STATE;
   return 1;
-}
-
-sub _is_const {
-  my $sub = shift;
-  my $proto = prototype $sub;
-  if (defined &$sub && defined $proto && $proto eq '') {
-    local *_test_const = $sub;
-    local $@;
-    local $SIG{__DIE__};
-    return !eval {
-      use warnings FATAL => 'all';
-      undef &_test_const;
-      1;
-    };
-  }
-  return !!0;
 }
 
 sub import {
@@ -371,10 +355,8 @@ sub _concrete_methods_of {
     map {;
       no strict 'refs';
       my $code = exists &{"${role}::$_"} ? \&{"${role}::$_"} : undef;
-      ( ! $code or exists $not_methods->{$code} or (!/\A\(/ && _is_const($code)) ) ? () : ($_ => $code)
-    }
-    grep +(!ref($stash->{$_}) || ref($stash->{$_}) eq 'CODE'),
-    keys %$stash
+      ( ! $code or exists $not_methods->{$code} ) ? () : ($_ => $code)
+    } grep +(!ref($stash->{$_}) || ref($stash->{$_}) eq 'CODE'), keys %$stash
   };
 }
 
@@ -397,7 +379,7 @@ sub _install_methods {
   # determine already extant methods of target
   my %has_methods;
   @has_methods{grep
-    +(ref($stash->{$_}) || exists &{"${to}::$_"}),
+    +(ref($stash->{$_}) || *{$stash->{$_}}{CODE}),
     keys %$stash
   } = ();
 

@@ -125,6 +125,7 @@ sub _make_item {
     my ($self, $args) = @_;
     my %item = (
         file_name       => $args->{file_name},
+        report_name     => $args->{report_name} || $args->{file_name},
         display_name    => $args->{display_name} || $args->{file_name},
         line_coverage   => $args->{line_coverage},
         sub_coverage    => $args->{sub_coverage},
@@ -144,7 +145,7 @@ sub _make_item {
     } else {
         $item{sub_percentage} = 'NA';
     }
-    ($item{report_name} = $item{file_name}) =~ s{\W}{-}g;
+    $item{report_name} =~ s{\W}{-}g;
     $item{report_name} .= '.html';
 
     return \%item;
@@ -170,6 +171,7 @@ sub _render_file {
         $item->{report_name},
         $self->{compress},
     );
+    return 1;
 }
 
 sub _fetch_source {

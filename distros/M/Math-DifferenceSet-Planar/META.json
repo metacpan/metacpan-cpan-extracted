@@ -1,0 +1,72 @@
+{
+   "abstract" : "object class for planar difference sets",
+   "author" : [
+      "Martin Becker <becker-cpan-mp (at) cozap.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Math-DifferenceSet-Planar",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.06",
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "DBD::SQLite" : "1.48",
+            "DBIx::Class" : "0",
+            "File::Share" : "0",
+            "File::Spec" : "0",
+            "Math::Prime::Util" : "0.59",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Math::DifferenceSet::Planar" : {
+         "file" : "lib/Math/DifferenceSet/Planar.pm",
+         "version" : "0.005"
+      },
+      "Math::DifferenceSet::Planar::Data" : {
+         "file" : "lib/Math/DifferenceSet/Planar/Data.pm",
+         "version" : "0.005"
+      },
+      "Math::DifferenceSet::Planar::Schema" : {
+         "file" : "lib/Math/DifferenceSet/Planar/Schema.pm",
+         "version" : "0.005"
+      },
+      "Math::DifferenceSet::Planar::Schema::Result::DifferenceSet" : {
+         "file" : "lib/Math/DifferenceSet/Planar/Schema/Result/DifferenceSet.pm",
+         "version" : "0.005"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.005",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

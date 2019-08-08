@@ -1,5 +1,10 @@
 Revision history for Perl extension Curio-Role-GitLab-API-v4.
 
+0.02 2019-08-01T17:31:03Z
+
+ - Moved the api arguments into the api argument.
+ - Removed the connection_key attribute.
+
 0.01 2019-05-11T19:04:03Z
 
  - First release.

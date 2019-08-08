@@ -10,17 +10,19 @@ using test::Allocator;
 
 using String = panda::basic_string<char, std::char_traits<char>, Allocator<char>>;
 
-const string_view key1  = "key1key1key1key1key1key1key1key1key1key1key1key1key1key1key1key1key1key1key1key1";
-const string_view key2  = "key2key2key2key2key2key2key2key2key2key2key2key2key2key2key2key2key2key2key2key2key2key2key2key2key2key2key2key2key2key2";
-const string_view val1  = "1111111111111111111111111111111111111111";
-const string_view val2  = "22222222222222222222222222222222222222222222222222";
-const string_view val3  = "333333333333333333333333333333333333333333333333333333333333";
-const string_view nokey = "nokeynokeynokeynokeynokeynokeynokeynokeynokeynokeynokeynokeynokeynokeynokeynokeynokeynokeynokeynokey";
+static const string_view key1  = "key1key1key1key1key1key1key1key1key1key1key1key1key1key1key1key1key1key1key1key1";
+static const string_view key2  = "key2key2key2key2key2key2key2key2key2key2key2key2key2key2key2key2key2key2key2key2key2key2key2key2key2key2key2key2key2key2";
+static const string val1  = "1111111111111111111111111111111111111111";
+static const string val2  = "22222222222222222222222222222222222222222222222222";
+static const string val3  = "333333333333333333333333333333333333333333333333333333333333";
+static const string_view nokey = "nokeynokeynokeynokeynokeynokeynokeynokeynokeynokeynokeynokeynokeynokeynokeynokeynokeynokeynokeynokey";
+static const string skey1 = string(key1);
+static const string skey2 = string(key2);
 
 TEST_CASE("string_map", "[string_containers]") {
     string_map<String, string> c;
-    c.emplace(key1, val1);
-    c.emplace(key2, val2);
+    c.emplace(skey1, val1);
+    c.emplace(skey2, val2);
     get_allocs();
 
     SECTION("find") {
@@ -81,9 +83,9 @@ TEST_CASE("string_map", "[string_containers]") {
 
 TEST_CASE("string_multimap", "[string_containers]") {
     string_multimap<String, string> c;
-    c.emplace(key1, val1);
-    c.emplace(key2, val2);
-    c.emplace(key1, val3);
+    c.emplace(skey1, val1);
+    c.emplace(skey2, val2);
+    c.emplace(skey1, val3);
     get_allocs();
 
     SECTION("find") {
@@ -139,8 +141,8 @@ TEST_CASE("string_multimap", "[string_containers]") {
 
 TEST_CASE("unordered_string_map", "[string_containers]") {
     unordered_string_map<String, string> c;
-    c.emplace(key1, val1);
-    c.emplace(key2, val2);
+    c.emplace(skey1, val1);
+    c.emplace(skey2, val2);
     get_allocs();
 
     SECTION("find") {
@@ -189,9 +191,9 @@ TEST_CASE("unordered_string_map", "[string_containers]") {
 
 TEST_CASE("unordered_string_multimap", "[string_containers]") {
     unordered_string_multimap<String, string> c;
-    c.emplace(key1, val1);
-    c.emplace(key2, val2);
-    c.emplace(key1, val3);
+    c.emplace(skey1, val1);
+    c.emplace(skey2, val2);
+    c.emplace(skey1, val3);
     get_allocs();
 
     SECTION("find") {
@@ -239,8 +241,8 @@ TEST_CASE("unordered_string_multimap", "[string_containers]") {
 
 TEST_CASE("string_set", "[string_containers]") {
     string_set<String> c;
-    c.emplace(key1);
-    c.emplace(key2);
+    c.emplace(skey1);
+    c.emplace(skey2);
     get_allocs();
 
     SECTION("find") {
@@ -295,9 +297,9 @@ TEST_CASE("string_set", "[string_containers]") {
 
 TEST_CASE("string_multiset", "[string_containers]") {
     string_multiset<String> c;
-    c.emplace(key1);
-    c.emplace(key2);
-    c.emplace(key1);
+    c.emplace(skey1);
+    c.emplace(skey2);
+    c.emplace(skey1);
     get_allocs();
 
     SECTION("find") {
@@ -353,8 +355,8 @@ TEST_CASE("string_multiset", "[string_containers]") {
 
 TEST_CASE("unordered_string_set", "[string_containers]") {
     unordered_string_set<String> c;
-    c.emplace(key1);
-    c.emplace(key2);
+    c.emplace(skey1);
+    c.emplace(skey2);
     get_allocs();
 
     SECTION("find") {
@@ -397,9 +399,9 @@ TEST_CASE("unordered_string_set", "[string_containers]") {
 
 TEST_CASE("unordered_string_multiset", "[string_containers]") {
     unordered_string_multiset<String> c;
-    c.emplace(key1);
-    c.emplace(key2);
-    c.emplace(key1);
+    c.emplace(skey1);
+    c.emplace(skey2);
+    c.emplace(skey1);
     get_allocs();
 
     SECTION("find") {

@@ -3,11 +3,11 @@ abstract: 'Conditional block with Test2'
 author:
   - 'Takumi Akiyama <t.akiym@gmail.com>'
 build_requires:
-  Test2: '0'
+  Test2::V0: '0'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.11, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.1.5, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,14 +28,15 @@ provides:
     file: lib/Test2/Compare/Condition.pm
   Test2::Tools::Condition:
     file: lib/Test2/Tools/Condition.pm
-    version: '0.01'
+    version: '0.03'
 requires:
-  Test2: '0'
-  Test2::Suite: '0.000077'
+  Test2: '1.302160'
+  Test2::Suite: '0.000122'
 resources:
-  bugtracker: https://github.com/akiym/Test2-Tool-Condition/issues
-  homepage: https://github.com/akiym/Test2-Tool-Condition
-  repository: git://github.com/akiym/Test2-Tool-Condition.git
-version: '0.01'
+  bugtracker: https://github.com/akiym/Test2-Tools-Condition/issues
+  homepage: https://github.com/akiym/Test2-Tools-Condition
+  repository: git://github.com/akiym/Test2-Tools-Condition.git
+version: '0.03'
 x_authority: cpan:AKIYM
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

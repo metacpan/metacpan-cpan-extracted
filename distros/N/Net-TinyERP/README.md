@@ -21,7 +21,7 @@ como produtos, vendedores e crm, envie-nos um Pull Request :)
 
 ```perl
     my $api = Net::TinyERP->new(
-        token       => 'abc123', # <-- OBRIGATÓRIO
+        token => 'abc123', # <-- OBRIGATÓRIO
     );
 
     my $res = $api->nota_fiscal->incluir({
@@ -43,7 +43,7 @@ tenha suporte à API.
 
 * Um token de acesso à API
 
-Veja [Como gerar seu token](https://tiny.com.br/info/api.php?p=api2-gerar-token-api).
+Veja [Como gerar seu token](https://www.tiny.com.br/ajuda/api/api2-gerar-token-api).
 
 * Um certificado digital A1
 
@@ -59,6 +59,3 @@ libs de SSL estão instaladas e que a rede permite esse tipo de acesso.
 No momento apenas a API de manipulação de Notas Fiscais está disponível, NF-e e NFS-e.
 
 Para mais informações, [consulte a documentação completa](https://metacpan.org/pod/Net::TinyERP).
-
-
-

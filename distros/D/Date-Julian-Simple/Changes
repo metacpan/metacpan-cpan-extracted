@@ -1,5 +1,8 @@
 Revision history for Date::Julian::Simple
 
+0.09  Thu Aug 01 15:55:00 2019
+      - Moved author test scripts to xt/ subfolder.
+
 0.08  Sun Jun 02 11:20:00 2019
       - Updated dependency on Date::Utils v0.26.
 

@@ -6,6 +6,9 @@ README.md
 cpanfile
 lib/Curio/Role/GitLab/API/v4.pm
 minil.toml
+t/SYNOPSIS.t
 t/basic.t
+t/lib/MyApp/Config.pm
+t/lib/MyApp/Secrets.pm
 META.yml
 MANIFEST

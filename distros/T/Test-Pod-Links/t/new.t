@@ -25,8 +25,8 @@ sub main {
         isa_ok( $obj, $class, "new() returns a $class object" );
 
         ok( exists $obj->{_cache}, '_cache attribute exists' );
-        is( ref $obj->{_cache}, ref {}, '... and is initialized to a hash ref' );
-        is( scalar keys %{ $obj->{_cache} }, 0, '... without any entries' );
+        is( ref $obj->{_cache},              ref {}, '... and is initialized to a hash ref' );
+        is( scalar keys %{ $obj->{_cache} }, 0,      '... without any entries' );
 
         ok( exists $obj->{_ua}, '_ua attribute exists' );
         isa_ok( $obj->{_ua}, 'HTTP::Tiny', '... which isa HTTP::Tiny object' );
@@ -38,7 +38,7 @@ sub main {
     }
 
     {
-        my $ua = bless {}, 'Local::HTTP::NoUA';
+        my $ua  = bless {}, 'Local::HTTP::NoUA';
         my $obj = $class->new( ua => $ua );
 
         isa_ok( $obj, $class, "new( ua => ...)) returns a $class object" );
@@ -54,7 +54,7 @@ sub main {
         $re = "$re";
         is( $obj->_ignore_regex, qr{$re}, '... and _ignore_regex is correct' );
 
-        ok( 'link' =~ $obj->_ignore_regex,  q{... matches 'link'} );
+        ok( 'link'  =~ $obj->_ignore_regex, q{... matches 'link'} );
         ok( 'link2' !~ $obj->_ignore_regex, q{... does not match 'link2'} );
     }
 
@@ -67,7 +67,7 @@ sub main {
         $re = "$re";
         is( $obj->_ignore_regex, qr{$re}, '... and _ignore_regex is correct' );
 
-        ok( 'link' =~ $obj->_ignore_regex,  q{... matches 'link'} );
+        ok( 'link'  =~ $obj->_ignore_regex, q{... matches 'link'} );
         ok( 'link2' !~ $obj->_ignore_regex, q{... does not match 'link2'} );
     }
 
@@ -81,7 +81,7 @@ sub main {
         my $re    = qr{$link|$link2};
         is( $obj->_ignore_regex, $re, '... and _ignore_regex is correct' );
 
-        ok( 'link' =~ $obj->_ignore_regex,  q{... matches 'link'} );
+        ok( 'link'  =~ $obj->_ignore_regex, q{... matches 'link'} );
         ok( 'link2' =~ $obj->_ignore_regex, q{... matches 'link2'} );
         ok( 'link3' !~ $obj->_ignore_regex, q{... does not match 'link3'} );
     }
@@ -93,10 +93,10 @@ sub main {
         isa_ok( $obj, $class, "new( ignore_match => 'l[iI].k') returns a $class object" );
         is( $obj->_ignore_regex, qr{l[iI].k}, '... and _ignore_regex is correct' );
 
-        ok( 'link' =~ $obj->_ignore_regex,  q{... matches 'link'} );
-        ok( 'lInk' =~ $obj->_ignore_regex,  q{... matches 'lInk'} );
+        ok( 'link'  =~ $obj->_ignore_regex, q{... matches 'link'} );
+        ok( 'lInk'  =~ $obj->_ignore_regex, q{... matches 'lInk'} );
         ok( 'link2' =~ $obj->_ignore_regex, q{... matches 'link2'} );
-        ok( 'LINK' !~ $obj->_ignore_regex,  q{... does not match LINK'} );
+        ok( 'LINK'  !~ $obj->_ignore_regex, q{... does not match LINK'} );
     }
 
     # single regex as scalar
@@ -108,10 +108,10 @@ sub main {
         $re = "$re";
         is( $obj->_ignore_regex, qr{$re}, '... and _ignore_regex is correct' );
 
-        ok( 'link' =~ $obj->_ignore_regex,  q{... matches 'link'} );
-        ok( 'lInk' =~ $obj->_ignore_regex,  q{... matches 'lInk'} );
+        ok( 'link'  =~ $obj->_ignore_regex, q{... matches 'link'} );
+        ok( 'lInk'  =~ $obj->_ignore_regex, q{... matches 'lInk'} );
         ok( 'link2' =~ $obj->_ignore_regex, q{... matches 'link2'} );
-        ok( 'LINK' !~ $obj->_ignore_regex,  q{... does not match LINK'} );
+        ok( 'LINK'  !~ $obj->_ignore_regex, q{... does not match LINK'} );
     }
 
     # single regex as array ref
@@ -121,10 +121,10 @@ sub main {
         isa_ok( $obj, $class, "new( ignore_match => [ 'l[iI].k' ]) returns a $class object" );
         is( $obj->_ignore_regex, qr{l[iI].k}, '... and _ignore_regex is correct' );
 
-        ok( 'link' =~ $obj->_ignore_regex,  q{... matches 'link'} );
-        ok( 'lInk' =~ $obj->_ignore_regex,  q{... matches 'lInk'} );
+        ok( 'link'  =~ $obj->_ignore_regex, q{... matches 'link'} );
+        ok( 'lInk'  =~ $obj->_ignore_regex, q{... matches 'lInk'} );
         ok( 'link2' =~ $obj->_ignore_regex, q{... matches 'link2'} );
-        ok( 'LINK' !~ $obj->_ignore_regex,  q{... does not match LINK'} );
+        ok( 'LINK'  !~ $obj->_ignore_regex, q{... does not match LINK'} );
         ok( 'li_nk' !~ $obj->_ignore_regex, q{... does not match li_nk'} );
     }
 
@@ -137,10 +137,10 @@ sub main {
         my $re2 = qr{^li_nk$};
         is( $obj->_ignore_regex, qr{$re1|$re2}, '... and _ignore_regex is correct' );
 
-        ok( 'link' =~ $obj->_ignore_regex,  q{... matches 'link'} );
-        ok( 'lInk' =~ $obj->_ignore_regex,  q{... matches 'lInk'} );
+        ok( 'link'  =~ $obj->_ignore_regex, q{... matches 'link'} );
+        ok( 'lInk'  =~ $obj->_ignore_regex, q{... matches 'lInk'} );
         ok( 'link2' =~ $obj->_ignore_regex, q{... matches 'link2'} );
-        ok( 'LINK' !~ $obj->_ignore_regex,  q{... does not match LINK'} );
+        ok( 'LINK'  !~ $obj->_ignore_regex, q{... does not match LINK'} );
         ok( 'li_nk' =~ $obj->_ignore_regex, q{... matches li_nk'} );
     }
 
@@ -153,10 +153,10 @@ sub main {
         my $link2 = qr{^link$};
         is( $obj->_ignore_regex, qr{$link|$link2}, '... and _ignore_regex is correct' );
 
-        ok( 'link' =~ $obj->_ignore_regex,    q{... matches 'link'} );
-        ok( 'lInk' !~ $obj->_ignore_regex,    q{... does not match 'lInk'} );
-        ok( 'link2' !~ $obj->_ignore_regex,   q{... does not match 'link2'} );
-        ok( 'LINK' =~ $obj->_ignore_regex,    q{... matches LINK'} );
+        ok( 'link'    =~ $obj->_ignore_regex, q{... matches 'link'} );
+        ok( 'lInk'    !~ $obj->_ignore_regex, q{... does not match 'lInk'} );
+        ok( 'link2'   !~ $obj->_ignore_regex, q{... does not match 'link2'} );
+        ok( 'LINK'    =~ $obj->_ignore_regex, q{... matches LINK'} );
         ok( 'abcLINK' =~ $obj->_ignore_regex, q{... matches abcLINK'} );
         ok( 'LINKabc' !~ $obj->_ignore_regex, q{... does not match LINKabc'} );
     }

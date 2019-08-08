@@ -1,5 +1,10 @@
 Revision history for Perl extension Plack::Middleware::Curlizer
 
+0.03    Mon Aug  5 12:12:40 JST 2019
+        - Improve POD (Thanks, Mohammad S Anwar)
+        - Fix .travis.yml
+        - Add specific version for ShellQuote::Any
+
 0.02    Sat Aug 27 14:03:20 JST 2016
         - set default callback
         - switch modules for escaping command-line(String::ShellQuote to ShellQuote::Any)

@@ -5,7 +5,7 @@ author:
 build_requires:
   Test::More: '0.88'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.3702, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,5 +25,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Role-Tiny
   license: http://dev.perl.org/licenses/
   repository: git://github.com/moose/Role-Tiny.git
-version: '2.000007'
+version: '2.000008'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

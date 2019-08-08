@@ -18,6 +18,7 @@ lib/Devel/QuickCover/Report/Html.pm
 bin/qc-aggregate.pl
 bin/qc-html.pl
 bin/qc-html-report.pl
+bin/release.sh
 
 t/000-use.t
 t/001-basic.t

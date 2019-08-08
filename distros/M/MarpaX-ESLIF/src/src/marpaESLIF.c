@@ -563,6 +563,7 @@ static        short                  _marpaESLIF_rule_action___falseb(void *user
 static        short                  _marpaESLIF_rule_action___jsonb(void *userDatavp, marpaESLIFValue_t *marpaESLIFValuep, int arg0i, int argni, int resulti, short nullableb);
 static        short                  _marpaESLIF_rule_action___rowb(void *userDatavp, marpaESLIFValue_t *marpaESLIFValuep, int arg0i, int argni, int resulti, short nullableb);
 static        short                  _marpaESLIF_rule_action___tableb(void *userDatavp, marpaESLIFValue_t *marpaESLIFValuep, int arg0i, int argni, int resulti, short nullableb);
+static        short                  _marpaESLIF_rule_action___astb(void *userDatavp, marpaESLIFValue_t *marpaESLIFValuep, int arg0i, int argni, int resulti, short nullableb);
 static        short                  _marpaESLIF_symbol_action___transferb(void *userDatavp, marpaESLIFValue_t *marpaESLIFValuep, marpaESLIFValueResult_t *marpaESLIFValueResultp, int resulti);
 static        short                  _marpaESLIF_symbol_action___undefb(void *userDatavp, marpaESLIFValue_t *marpaESLIFValuep, marpaESLIFValueResult_t *marpaESLIFValueResultp, int resulti);
 static        short                  _marpaESLIF_symbol_action___asciib(void *userDatavp, marpaESLIFValue_t *marpaESLIFValuep, marpaESLIFValueResult_t *marpaESLIFValueResultp, int resulti);
@@ -6489,12 +6490,21 @@ static inline short _marpaESLIFRecognizer_resume_oneb(marpaESLIFRecognizer_t *ma
         marpaESLIF_streamp->inputl -= marpaESLIFValueResult.u.a.sizel;
         /* We NEVER free because we called for parsing in lexeme mode */
         /* free(marpaESLIFValueResult.u.a.p); */
-        /* If there is an event, get out of this method */
+
+        /* We want to do as if we would have done a lexeme complete before */
+        MARPAESLIFRECOGNIZER_RESET_EVENTS(marpaESLIFRecognizerp);
+        if (! _marpaESLIFRecognizer_push_grammar_eventsb(marpaESLIFRecognizerp)) {
+          goto err;
+        }
         if ((marpaESLIFRecognizerp->discardEvents != NULL) && (marpaESLIFRecognizerp->discardSymbolp != NULL)) {
           /* Push discard event */
           if (! _marpaESLIFRecognizer_push_eventb(marpaESLIFRecognizerp, MARPAESLIF_EVENTTYPE_DISCARD, marpaESLIFRecognizerp->discardSymbolp, marpaESLIFRecognizerp->discardEvents)) {
             goto err;
           }
+        }
+
+        /* If there is an event, get out of this method */
+        if (marpaESLIFRecognizerp->eventArrayl > 0) {
           rcb = 1;
           goto done;
         } else {
@@ -6666,12 +6676,21 @@ static inline short _marpaESLIFRecognizer_resume_oneb(marpaESLIFRecognizer_t *ma
         /* These lines are important so that this specific retry is clean */
         alternativeStackSymboli = 0;
         maxMatchedl = 0;
-        /* If there is an event, get out of this method */
+
+        /* We want to do as if we would have done a lexeme complete before */
+        MARPAESLIFRECOGNIZER_RESET_EVENTS(marpaESLIFRecognizerp);
+        if (! _marpaESLIFRecognizer_push_grammar_eventsb(marpaESLIFRecognizerp)) {
+          goto err;
+        }
         if ((marpaESLIFRecognizerp->discardEvents != NULL) && (marpaESLIFRecognizerp->discardSymbolp != NULL)) {
           /* Push discard event */
           if (! _marpaESLIFRecognizer_push_eventb(marpaESLIFRecognizerp, MARPAESLIF_EVENTTYPE_DISCARD, marpaESLIFRecognizerp->discardSymbolp, marpaESLIFRecognizerp->discardEvents)) {
             goto err;
           }
+        }
+
+        /* If there is an event, get out of this method */
+        if (marpaESLIFRecognizerp->eventArrayl > 0) {
           rcb = 1;
           goto done;
         } else {
@@ -8047,11 +8066,10 @@ short marpaESLIFRecognizer_eventb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp,
   }
 
   eventArrayp[eventArrayl] = eventArray;
-  if (++eventArrayl > 1) {
+  if ((marpaESLIFRecognizerp->eventArrayl = ++eventArrayl) > 1) {
     /* Sort the events if there is more than one */
     _marpaESLIFRecognizer_sort_eventsb(marpaESLIFRecognizerp);
   }
-  marpaESLIFRecognizerp->eventArrayl = eventArrayl;
 
  no_push:
   rcb = 1;
@@ -14406,6 +14424,131 @@ static short _marpaESLIF_rule_action___tableb(void *userDatavp, marpaESLIFValue_
 }
 
 /*****************************************************************************/
+static short _marpaESLIF_rule_action___astb(void *userDatavp, marpaESLIFValue_t *marpaESLIFValuep, int arg0i, int argni, int resulti, short nullableb)
+/*****************************************************************************/
+/* almost like ::row, except that this is a table where single key is rule   */
+/* name and single value is the list of values.                              */
+/*****************************************************************************/
+{
+  short                    rcb;
+  size_t                   i;
+  marpaESLIFValueResult_t  marpaESLIFValueResult;
+  marpaESLIFValueResult_t *marpaESLIFValueResultp;
+  marpaESLIFValueResult_t *keyp;
+  marpaESLIFValueResult_t *valuep;
+  short                   *origshallowbp;
+  marpaESLIF_symbol_t     *symbolp;
+  size_t                   sizel;
+
+  marpaESLIFValueResult.type               = MARPAESLIF_VALUE_TYPE_TABLE;
+  marpaESLIFValueResult.contextp           = NULL;
+  marpaESLIFValueResult.representationp    = NULL;
+  marpaESLIFValueResult.u.t.p              = NULL;
+  marpaESLIFValueResult.u.t.sizel          = 0;
+  marpaESLIFValueResult.u.t.shallowb       = 0;
+  marpaESLIFValueResult.u.t.freeUserDatavp = marpaESLIFValuep->marpaESLIFRecognizerp;
+  marpaESLIFValueResult.u.t.freeCallbackp  = _marpaESLIF_generic_freeCallbackv;
+
+  if ((marpaESLIFValueResult.u.t.p = (marpaESLIFValueResultPair_t *) malloc(sizeof(marpaESLIFValueResultPair_t))) == NULL) {
+    MARPAESLIF_ERRORF(marpaESLIFValuep->marpaESLIFp, "malloc failure, %s", strerror(errno));
+    goto err;
+  }
+
+  keyp   = &(marpaESLIFValueResult.u.t.p[0].key);
+  valuep = &(marpaESLIFValueResult.u.t.p[0].value);
+
+  /* Per definition, current rule is in marpaESLIFValuep->rulep it is a rule action callback, symbolp otherwise (case of a nullable symbol action) */
+  symbolp = marpaESLIFValuep->rulep != NULL ? marpaESLIFValuep->rulep->lhsp : marpaESLIFValuep->symbolp;
+  keyp->type               = MARPAESLIF_VALUE_TYPE_STRING;
+  keyp->contextp           = NULL;
+  keyp->representationp    = NULL;
+  keyp->u.s.p              = (unsigned char *) symbolp->descp->bytep;
+  keyp->u.s.freeUserDatavp = NULL;
+  keyp->u.s.freeCallbackp  = NULL;
+  keyp->u.s.shallowb       = 1;
+  keyp->u.s.sizel          = symbolp->descp->bytel;
+  keyp->u.s.encodingasciis = symbolp->descp->encodingasciis;;
+
+  *valuep = marpaESLIFValueResultUndef;
+
+  marpaESLIFValueResult.u.t.sizel   = 1;
+
+  if (! nullableb) {
+    sizel = argni - arg0i + 1;
+
+    valuep->type               = MARPAESLIF_VALUE_TYPE_ROW;
+    valuep->contextp           = NULL;
+    valuep->representationp    = NULL;
+    valuep->u.r.p              = NULL;
+    valuep->u.r.sizel          = sizel;
+    valuep->u.r.shallowb       = 0;
+    valuep->u.r.freeUserDatavp = marpaESLIFValuep->marpaESLIFRecognizerp;
+    valuep->u.r.freeCallbackp  = _marpaESLIF_generic_freeCallbackv;
+
+    if (sizel > 0) {
+      if ((valuep->u.r.p = (marpaESLIFValueResult_t *) malloc(sizel * sizeof(marpaESLIFValueResult_t))) == NULL) {
+        MARPAESLIF_ERRORF(marpaESLIFValuep->marpaESLIFp, "malloc failure, %s", strerror(errno));
+        goto err;
+      }
+      for (i = 0; i < sizel; i++) {
+        marpaESLIFValueResultp = _marpaESLIFValue_stack_getp(marpaESLIFValuep, (int) (arg0i + i));
+        if (marpaESLIFValueResultp == NULL) {
+          MARPAESLIF_ERRORF(marpaESLIFValuep->marpaESLIFp, "Failed to fetch value result at stack indice %d", resulti);
+          goto err;
+        }
+
+        /* We have to take care of members's shallow status: the array becomes the owner in any case */
+        origshallowbp = NULL;
+        switch (marpaESLIFValueResultp->type) {
+        case MARPAESLIF_VALUE_TYPE_PTR:
+          origshallowbp = &(marpaESLIFValueResultp->u.p.shallowb);
+          break;
+        case MARPAESLIF_VALUE_TYPE_ARRAY:
+          origshallowbp = &(marpaESLIFValueResultp->u.a.shallowb);
+          break;
+        case MARPAESLIF_VALUE_TYPE_STRING:
+          origshallowbp = &(marpaESLIFValueResultp->u.s.shallowb);
+          break;
+        case MARPAESLIF_VALUE_TYPE_ROW:
+          origshallowbp = &(marpaESLIFValueResultp->u.r.shallowb);
+          break;
+        case MARPAESLIF_VALUE_TYPE_TABLE:
+          origshallowbp = &(marpaESLIFValueResultp->u.t.shallowb);
+          break;
+        default:
+          break;
+        }
+
+        valuep->u.r.p[i] = *marpaESLIFValueResultp;
+
+        if (origshallowbp != NULL) {
+          *origshallowbp = 1;
+        }
+      }
+    }
+  }
+
+  /* If this fails, we will leak at most */
+  if (! _marpaESLIFValue_stack_setb(marpaESLIFValuep, resulti, &marpaESLIFValueResult)) {
+    goto err;
+  }
+
+  rcb = 1;
+  goto done;
+
+ err:
+  if (marpaESLIFValueResult.u.t.p != NULL) {
+    if ((valuep->type == MARPAESLIF_VALUE_TYPE_ROW) && (valuep->u.r.p != NULL)) {
+      free(valuep->u.r.p);
+    }
+  }
+  rcb = 0;
+
+ done:
+  return rcb;
+}
+
+/*****************************************************************************/
 static short _marpaESLIF_rule_action___asciib(void *userDatavp, marpaESLIFValue_t *marpaESLIFValuep, int arg0i, int argni, int resulti, short nullableb)
 /*****************************************************************************/
 {
@@ -16028,6 +16171,8 @@ static inline short _marpaESLIFValue_ruleActionCallbackb(marpaESLIFValue_t *marp
           ruleCallbackp = _marpaESLIF_rule_action___rowb;
         } else if (strcmp(names, "::table") == 0) {
           ruleCallbackp = _marpaESLIF_rule_action___tableb;
+        } else if (strcmp(names, "::ast") == 0) {
+          ruleCallbackp = _marpaESLIF_rule_action___astb;
         } else {
           /* Not a built-in: ask to the resolver */
           if (ruleActionResolverp == NULL) {

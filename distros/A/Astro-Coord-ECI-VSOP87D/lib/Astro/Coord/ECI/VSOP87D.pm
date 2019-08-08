@@ -26,7 +26,7 @@ BEGIN {
 	or constant->import( DEBUG => 0 );
 }
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 my @basic_export = qw{
     SUN_CLASS
@@ -1122,7 +1122,7 @@ The C<$cutoff> argument is optional; if specified as a number larger
 than C<0>, terms whose amplitudes are smaller than the nutation cutoff
 (in milli arc seconds) are ignored. The Meeus version of the algorithm
 is specified by a value of C<3>. The default is specified by the
-L<nutation_cutoff|/nutation_cutoff> attribute.
+C<nutation_cutoff> attribute.
 
 The model itself is the IAU 1980 nutation model. Later models exist, but
 this was chosen because of the desire to be compatible with Meeus'
@@ -1365,7 +1365,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2018 by Thomas R. Wyant, III
+Copyright (C) 2018-2019 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

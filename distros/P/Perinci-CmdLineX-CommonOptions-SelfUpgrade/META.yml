@@ -20,6 +20,7 @@ requires:
   File::Which: '0'
   HTTP::Tiny: '0.057'
   JSON::MaybeXS: '0'
+  Log::ger: '0.027'
   perl: '5.010001'
   strict: '0'
   warnings: '0'
@@ -27,7 +28,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLineX-CommonOptions-SelfUpgrade
   homepage: https://metacpan.org/release/Perinci-CmdLineX-CommonOptions-SelfUpgrade
   repository: git://github.com/perlancar/perl-Perinci-CmdLineX-CommonOptions-SelfUpgrade.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.028002'
@@ -103,7 +104,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.596'
+      version: '0.597'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -300,11 +301,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::AddToDb
       name: '@Author::PERLANCAR/Rinci::AddToDb'
-      version: '0.01'
+      version: '0.020'
     -
-      class: Dist::Zilla::Plugin::Rinci::Validate
-      name: '@Author::PERLANCAR/Rinci::Validate'
-      version: '0.24'
+      class: Dist::Zilla::Plugin::Rinci::EmbedValidator
+      name: '@Author::PERLANCAR/Rinci::EmbedValidator'
+      version: '0.250'
     -
       class: Dist::Zilla::Plugin::SetScriptShebang
       name: '@Author::PERLANCAR/SetScriptShebang'

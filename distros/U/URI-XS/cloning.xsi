@@ -1,0 +1,29 @@
+MODULE = URI::XS                PACKAGE = URI::XS
+PROTOTYPES: DISABLE
+
+URI* URI::HOOK_CLONE () {
+    PROTO = Object(ST(0)).stash();
+    if (dynamic_cast<URI::Strict*>(THIS)) RETVAL = URI::create(*THIS);
+    else                                  RETVAL = make_backref<URI>(*THIS);
+}
+
+string URI::STORABLE_freeze (bool) {
+    RETVAL = THIS->to_string();
+    if (dynamic_cast<URI::Strict*>(THIS)) RETVAL += '1';
+    else RETVAL += '0';
+}
+
+URI* STORABLE_attach (SV* CLASS, bool, SV* serialized) {
+    STRLEN len;
+    char* p = SvPV(serialized, len);
+    len--;
+    char ctrl = p[len];
+    p[len] = 0;
+    if (ctrl == '1') RETVAL = URI::create(string(p, len));
+    else             RETVAL = make_backref<URI>(string(p, len));
+    PROTO = CLASS;
+}
+
+string URI::TO_JSON () {
+    RETVAL = THIS->to_string();
+}

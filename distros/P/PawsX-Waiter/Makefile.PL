@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.020;
 
 use ExtUtils::MakeMaker;
 
@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "PawsX-Waiter",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.020",
   "NAME" => "PawsX::Waiter",
   "PREREQ_PM" => {
     "Data::Structure::Util" => 0,
@@ -28,7 +29,7 @@ my %WriteMakefileArgs = (
     "Test::Moose" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test" => {
     "TESTS" => "t/*.t"
   }

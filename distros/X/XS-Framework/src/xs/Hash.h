@@ -1,5 +1,4 @@
 #pragma once
-#include <tuple>
 #include <xs/Sv.h>
 #include <iterator>
 #include <xs/Scalar.h>
@@ -18,7 +17,7 @@ struct Hash : Sv {
         return ret;
     }
 
-    static Hash create (const std::initializer_list<std::tuple<panda::string_view, Scalar>>& l) { return Hash(l); }
+    static Hash create (const std::initializer_list<std::pair<panda::string_view, Scalar>>& l) { return Hash(l); }
 
     static Hash noinc  (SV* val) { return Hash(val, NONE); }
     static Hash noinc  (HV* val) { return Hash(val, NONE); }
@@ -37,7 +36,7 @@ struct Hash : Sv {
     Hash (const Sub&)    = delete;
     Hash (const Glob&)   = delete;
 
-    Hash (const std::initializer_list<std::tuple<panda::string_view, Scalar>>&);
+    Hash (const std::initializer_list<std::pair<panda::string_view, Scalar>>&);
 
     Hash& operator= (SV* val)         { Sv::operator=(val); _validate(); return *this; }
     Hash& operator= (HV* val)         { Sv::operator=(val); return *this; }

@@ -6,8 +6,9 @@
 #include <limits>
 #include <memory>
 #include <iosfwd>
-#include <cstdint>
 #include <utility>   // swap
+#include <stdint.h>
+#include <stdlib.h>
 #include <assert.h>
 #include <iterator>
 #include <stdexcept>
@@ -178,6 +179,13 @@ public:
     template <size_type SIZE> // implicit constructor for literals, literals are expected to be null-terminated
     constexpr basic_string (const CharT (&str)[SIZE]) : _str_literal(str), _length(SIZE-1), _state(State::LITERAL) {}
 
+    template<class _CharT, typename = typename std::enable_if<std::is_same<_CharT, CharT>::value>::type>
+    // GCC < 6 has a bug determining return value type for literals, so this ctor must be implicitly available
+    #if !defined(__GNUC__) || defined(__clang__) || __GNUC__ >= 6
+    explicit
+    #endif
+    basic_string (const _CharT* const& str) : basic_string(str, traits_type::length(str)) {}
+
     explicit
     basic_string (size_type capacity) : _length(0) {
         _new_auto(capacity);
@@ -187,10 +195,6 @@ public:
         _new_auto(len);
         traits_type::copy(_str, str, len);
     }
-
-    template<class _CharT, typename = typename std::enable_if<std::is_same<_CharT, CharT>::value>::type>
-    explicit
-    basic_string (const _CharT* const& str) : basic_string(str, traits_type::length(str)) {}
 
     basic_string (CharT* str, size_type len, size_type capacity, dtor_fn dtor) {
         _new_external(str, len, capacity, dtor, (ExternalShared*)Alloc::allocate(EBUF_CHARS), &Alloc::deallocate);

@@ -97,7 +97,7 @@ BEGIN {
     die "Neither YAML nor Data::Dumper available.\n";
 }
 
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 our $ALPHA_VERSION = $VERSION;
 $VERSION =~ s/_//g;
 
@@ -129,15 +129,25 @@ eod
 	my $rl = Term::ReadLine->new ('Pasteboard Tool');
 	*_read_contin = sub {$rl->readline ($_[0] || '-> ')};
     } else {
-	*_read_contin = sub {print STDERR $_[0] || '-> '; <STDIN>};
+	# I differ with Perl Best Practices here. The premise of the
+	# following code is that the required module is not available,
+	# so I have to do without. Yes, it's core, but Linux packagers
+	# tend to think they know more than the author of a package what
+	# that package should contain.
+	*_read_contin = sub {print STDERR $_[0] || '-> '; <STDIN>}; ## no critic (ProhibitExplicitStdin)
     }
     warn <<'EOD';
-Copyright (C) 2008, 2011-2017 Thomas R. Wyant, III.
+Copyright (C) 2008, 2011-2019 Thomas R. Wyant, III.
 See documentation for license.
 
 EOD
 } else {
-    *_read_contin = sub {<STDIN>};
+    # As of PPI 1.270 the following '<STDIN>' gets parsed as two
+    # operators enclosing a word, so Perl::Critic generates no
+    # criticism. But it will when PPI gets fixed, so I added a
+    # prophylactic annotation. But Perl::Critic is also opposed to
+    # prophylaxis, hence the 'ProhibitUselessNoCritic'.
+    *_read_contin = sub {<STDIN>}; ## no critic (ProhibitUselessNoCritic,ProhibitExplicitStdin)
 }
 sub _readline {return _read_contin ('pbtool> ')}
 
@@ -673,7 +683,7 @@ Thomas R. Wyant, III (F<wyant at cpan dot org>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008, 2011-2017 by Thomas R. Wyant, III
+Copyright (C) 2008, 2011-2019 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

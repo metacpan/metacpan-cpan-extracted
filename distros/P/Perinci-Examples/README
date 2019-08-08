@@ -2,8 +2,8 @@ NAME
     Perinci::Examples - Various examples of Rinci metadata
 
 VERSION
-    This document describes version 0.814 of Perinci::Examples (from Perl
-    distribution Perinci-Examples), released on 2019-06-29.
+    This document describes version 0.818 of Perinci::Examples (from Perl
+    distribution Perinci-Examples), released on 2019-07-19.
 
 DESCRIPTION
     This distribution contains an odd mix of various functions, variables,
@@ -934,6 +934,14 @@ FUNCTIONS
 
         This argument is intended to test how special characters are
         escaped.
+
+    *   s1c => *str*
+
+        String with examples in schema.
+
+    *   s1d => *str*
+
+        String with examples in argument spec.
 
     *   s2 => *str*
 

@@ -5,6 +5,7 @@ Makefile.PL
 README
 eg/README
 eg/athshean
+eg/lingua-method
 eg/shwcnsnntclstrs
 eg/tokiponaish
 eg/weightify

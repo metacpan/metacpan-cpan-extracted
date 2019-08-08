@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package Net::Proxmox::VE;
-$Net::Proxmox::VE::VERSION = '0.33';
+$Net::Proxmox::VE::VERSION = '0.35';
 
 use Carp qw( croak );
 use HTTP::Headers;
@@ -129,8 +129,8 @@ sub action {
 
     }
     else {
-        print "WARNING: request failed: " . $request->as_string . "\n";
-        print "WARNING: response status: " . $response->status_line . "\n";
+        croak "WARNING: request failed: "  . $request->as_string . "\n" .
+              "WARNING: response status: " . $response->status_line . "\n";
     }
     return
 
@@ -148,11 +148,9 @@ sub api_version_check {
 
     my $data = $self->api_version;
 
-    if (   ref $data eq 'HASH'
-        && $data->{version}
-        && $data->{version} >= 2.0 )
-    {
-        return 1;
+    if ( ref $data eq 'HASH' && $data->{version} ) {
+        my ($version) = $data->{version} =~ m/^(\d+)/;
+        return 1 if $version > 2.0;
     }
 
     return;
@@ -326,7 +324,7 @@ Net::Proxmox::VE - Pure perl API for Proxmox virtualisation
 
 =head1 VERSION
 
-version 0.33
+version 0.35
 
 =head1 SYNOPSIS
 
@@ -350,9 +348,8 @@ This Class provides the framework for talking to Proxmox VE 2.0 API instances.
 This just provides a get/delete/put/post abstraction layer as methods on Proxmox VE REST API
 This also handles the ticket headers required for authentication
 
-More details on the API can be found here:
-http://pve.proxmox.com/wiki/Proxmox_VE_API
-http://pve.proxmox.com/pve2-api-doc/
+More details on the API can be found at L<http://pve.proxmox.com/wiki/Proxmox_VE_API> and
+L<http://pve.proxmox.com/pve2-api-doc/>
 
 This class provides the building blocks for someone wanting to use PHP to talk to Proxmox 2.0. Relatively simple piece of code, just provides a get/put/post/delete abstraction layer as methods on top of Proxmox's REST API, while also handling the Login Ticket headers required for authentication.
 
@@ -510,7 +507,7 @@ Brendan Beveridge <brendan@nodeintegration.com.au>, Dean Hamstead <dean@bytefoun
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Dean Hamstad.
+This software is copyright (c) 2019 by Dean Hamstad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

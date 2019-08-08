@@ -140,7 +140,7 @@ our @CARP_NOT = qw{
     Astro::Coord::ECI
 };
 
-our $VERSION = '0.106';
+our $VERSION = '0.107';
 
 use constant ERR_NOCURRENT => <<eod;
 Error - Can not call %s because there is no current member. Be
@@ -358,8 +358,8 @@ of the selected C<Astro::Coord::ECI::TLE> object.
 
 =item $time = $set->max_effective_date(...);
 
-This method extends L<Astro::Coord::ECI::TLE/max_effective_date>
-appropriately for sets of elements.
+This method extends the L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE>
+C<max_effective_date()> method appropriately for sets of elements.
 
 If there are arguments, their maximum is taken, the appropriate member
 element is set, and C<max_effective_date()> is called on that element,
@@ -517,8 +517,9 @@ removing from the set any members that fail to validate. The number of
 members remaining in the set is returned.
 
 The $options argument is itself optional. If passed, it is a reference
-to a hash of option names and values. See
-L<Astro::Coord::ECI::TLE/validate> for the details.
+to a hash of option names and values. See the
+L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE> C<validate()> method for
+the details.
 
 Each member of the set will be validated at the time it would first be
 used for computations (if that is defined) and at the time its successor

@@ -3,39 +3,40 @@
 @prefix httph:<http://www.w3.org/2007/ont/httph#> .
 @prefix http: <http://www.w3.org/2007/ont/http#> .
 @prefix nfo:  <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#> .
+@prefix :     <http://example.org/test#> .
 
 
-<#test-list> a test:FixtureTable ;
-    test:fixtures <#public-writeread-unauthn-alt> .
+:test_list a test:FixtureTable ;
+    test:fixtures :public_writeread_unauthn_alt .
 
 
-<#public-writeread-unauthn-alt> a test:AutomatedTest ;
+:public_writeread_unauthn_alt a test:AutomatedTest ;
     test:purpose "More elaborate HTTP vocab for PUT then GET test"@en ;
     test:test_script <http://example.org/httplist#http_req_res_list_unauthenticated> ;
     test:params [
-        test:requests ( <#public-writeread-unauthn-alt-put-req> <#public-writeread-unauthn-alt-get-req> ) ;
-        test:responses ( <#public-writeread-unauthn-alt-put-res> <#public-writeread-unauthn-alt-get-res> ) 
-                ] .
-                
+        test:requests ( :public_writeread_unauthn_alt_put_req :public_writeread_unauthn_alt_get_req ) ;
+        test:responses ( :public_writeread_unauthn_alt_put_res :public_writeread_unauthn_alt_get_res ) 
+    ] .
 
-<#public-writeread-unauthn-alt-put-req> a http:RequestMessage ;
-            http:method "PUT" ;
-            httph:content_type "text/turtle" ;
-            http:content "</public/foobar.ttl#dahut> a <http://example.org/Cryptid> ." ;
-            http:requestURI </public/foobar.ttl> .
-          
-<#public-writeread-unauthn-alt-put-res> a http:ResponseMessage ;
+
+:public_writeread_unauthn_alt_put_req a http:RequestMessage ;
+    http:method "PUT" ;
+    httph:content_type "text/turtle" ;
+    http:content "</public/foobar.ttl#dahut> a <http://example.org/Cryptid> ." ;
+    http:requestURI </public/foobar.ttl> .
+
+:public_writeread_unauthn_alt_put_res a http:ResponseMessage ;
     http:status 201 .
 
-<#public-writeread-unauthn-alt-get-req> a http:RequestMessage ;
+:public_writeread_unauthn_alt_get_req a http:RequestMessage ;
     http:method "GET" ;
     http:requestURI </public/foobar.ttl> .
-            
-<#public-writeread-unauthn-alt-get-res> a http:ResponseMessage ;
-            httph:accept_post  "text/turtle", "application/ld+json" ;
-            httph:content_type "text/turtle" .
-            
+
+:public_writeread_unauthn_alt_get_res a http:ResponseMessage ;
+    httph:accept_post  "text/turtle", "application/ld+json" ;
+    httph:content_type "text/turtle" .
+
 
 <http://example.org/httplist#http_req_res_list_unauthenticated> a nfo:SoftwareItem ;
-            deps:test-requirement "Internal::Fixture::HTTPList"^^deps:CpanId ;
-            nfo:definesFunction "http_req_res_list_unauthenticated" .
+    deps:test-requirement "Internal::Fixture::HTTPList"^^deps:CpanId ;
+    nfo:definesFunction "http_req_res_list_unauthenticated" .

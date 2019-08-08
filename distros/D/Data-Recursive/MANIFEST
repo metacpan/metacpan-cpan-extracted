@@ -1,0 +1,22 @@
+Changes
+lib/Data/Recursive.pm
+lib/Data/Recursive.pod
+Makefile.PL
+MANIFEST			This list of files
+misc/mytest.plx
+Recursive.xs
+src/xs/clone.cc
+src/xs/clone.h
+src/xs/compare.cc
+src/xs/compare.h
+src/xs/merge.cc
+src/xs/merge.h
+t/clone-cycle.t
+t/clone-hook.t
+t/clone-weakref.t
+t/clone.t
+t/compare.t
+t/hash_merge.t
+t/merge.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

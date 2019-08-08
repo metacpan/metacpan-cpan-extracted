@@ -1,5 +1,14 @@
 Revision history for Perl extension Test2-Tools-Condition
 
+0.03 2019-08-07T21:52:33Z
+
+    - fix broken tests again
+
+0.02 2019-08-07T10:16:04Z
+
+    - fix broken tests in new version of Test2 (fix #1)
+    - add Test2::V0 deps
+
 0.01 2017-09-30T06:58:15Z
 
     - original version

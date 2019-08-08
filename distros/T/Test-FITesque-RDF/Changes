@@ -6,6 +6,14 @@ Home page:    <https://metacpan.org/release/Test-FITesque-RDF>
 Bug tracker:  <https://github.com/kjetilk/p5-test-fitesque-rdf/issues>
 Maintainer:   Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>
 
+0.011	2019-08-03	Implement regular expressions for stateful tests
+
+ - Added: Improve documentation.
+ - Added: Support regular expressions with a new array.
+ - Introduce a -special key to the parameters to group all internal
+   additions.
+ - Some minor fixes.
+
 0.010	2019-07-05	Adapt to existing vocabularies
 
  - Adapt to existing vocabularies.

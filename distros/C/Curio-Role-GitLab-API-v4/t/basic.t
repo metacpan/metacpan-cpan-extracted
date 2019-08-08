@@ -2,7 +2,7 @@
 use strictures 2;
 use Test2::V0;
 
-use Curio::Role::GitLab::API::v4;
+use Curio::Role::GitLab::API::v4 qw();
 
 ok(1);
 

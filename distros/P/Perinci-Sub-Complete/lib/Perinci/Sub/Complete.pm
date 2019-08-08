@@ -1,7 +1,7 @@
 package Perinci::Sub::Complete;
 
-our $DATE = '2019-06-29'; # DATE
-our $VERSION = '0.937'; # VERSION
+our $DATE = '2019-07-19'; # DATE
+our $VERSION = '0.939'; # VERSION
 
 use 5.010001;
 use strict;
@@ -173,6 +173,24 @@ sub complete_from_schema {
                 next if ref $cs->{in}[$i];
                 push @$words    , $cs->{in}[$i];
                 push @$summaries, $cs->{'x.in.summaries'} ? $cs->{'x.in.summaries'}[$i] : undef;
+            }
+            $static++;
+            return; # from eval. there should not be any other value
+        }
+        if ($cs->{'examples'}) {
+            log_trace("[comp][periscomp] adding completion from schema's 'examples' clause");
+            for my $eg (@{ $cs->{'examples'} }) {
+                if (ref $eg eq 'HASH') {
+                    next unless defined $eg->{value};
+                    next if ref $eg->{value};
+                    push @$words, $eg->{value};
+                    push @$summaries, $eg->{summary};
+                } else {
+                    next unless defined $eg;
+                    next if ref $eg;
+                    push @$words, $eg;
+                    push @$summaries, undef;
+                }
             }
             $static++;
             return; # from eval. there should not be any other value
@@ -528,13 +546,29 @@ sub complete_arg_val {
         my $fres_from_arg_examples;
       COMPLETE_FROM_ARG_EXAMPLES:
         {
-            my $eg = $arg_spec->{examples};
-            unless ($eg) {
+            my $egs = $arg_spec->{examples};
+            unless ($egs) {
                 log_trace("[comp][periscomp] arg spec does not specify examples");
                 last COMPLETE_FROM_ARG_EXAMPLES;
             }
+            my @array;
+            my @summaries;
+            for my $eg (@$egs) {
+                if (ref $eg eq 'HASH') {
+                    next unless defined $eg->{value};
+                    next if ref $eg->{value};
+                    push @array, $eg->{value};
+                    push @summaries, $eg->{summary};
+                } else {
+                    next unless defined $eg;
+                    next if ref $eg;
+                    push @array, $eg;
+                    push @summaries, undef;
+                }
+            }
             $fres_from_arg_examples = complete_array_elem(
-                word=>$word, array=>[map {ref $_ eq 'HASH' ? $_->{value} : $_} @$eg]);
+                word=>$word, array=>\@array, summaries=>\@summaries);
+            $static //= 1;
         } # COMPLETE_FROM_ARG_EXAMPLES
 
         my $fres_from_schema;
@@ -547,6 +581,7 @@ sub complete_arg_val {
             }
             # XXX normalize schema if not normalized
             $fres_from_schema = complete_from_schema(arg=>$arg, extras=>$extras, schema=>$sch, word=>$word);
+            $static //= 1;
         } # COMPLETE_FROM_SCHEMA
 
         $fres = combine_answers(grep {defined} (
@@ -1318,7 +1353,7 @@ Perinci::Sub::Complete - Complete command-line argument using Rinci metadata
 
 =head1 VERSION
 
-This document describes version 0.937 of Perinci::Sub::Complete (from Perl distribution Perinci-Sub-Complete), released on 2019-06-29.
+This document describes version 0.939 of Perinci::Sub::Complete (from Perl distribution Perinci-Sub-Complete), released on 2019-07-19.
 
 =head1 SYNOPSIS
 

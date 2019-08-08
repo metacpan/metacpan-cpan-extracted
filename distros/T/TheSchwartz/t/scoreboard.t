@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-require 't/lib/db-common.pl';
+require './t/lib/db-common.pl';
 
 use Test::More tests => 30;
 

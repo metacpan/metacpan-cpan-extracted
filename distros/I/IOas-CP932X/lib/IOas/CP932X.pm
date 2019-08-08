@@ -11,7 +11,7 @@ package IOas::CP932X;
 use 5.00503;    # Galapagos Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.02';
+$VERSION = '0.04';
 $VERSION = $VERSION;
 
 use strict;
@@ -24,9 +24,9 @@ use Symbol ();
 
 (my $__package__ = __PACKAGE__) =~ s/utf81/utf8.1/i;
 my $io_encoding = lc((split /::/, $__package__)[-1]);
-if ($io_encoding =~ /^(?:cp932x|cp00930|keis78|keis83|keis90|jef|jef9p|jipsj|jipse|letsj|utf8|utf8\.1)$/) {
+if ($io_encoding =~ /^(?:cp932x|cp932|cp932ibm|cp932nec|sjis2004|cp00930|keis78|keis83|keis90|jef|jef9p|jipsj|jipse|letsj|utf8|utf8\.1)$/) {
     eval q{
-use Jacode4e::RoundTrip; # pmake.bat makes META.yml and META.json by /^use /
+use Jacode4e::RoundTrip; # pmake.bat makes META.yml, META.json and Makefile.PL by /^use /
 };
     die $@ if $@;
     *_io_input  = sub ($) { my($s)=@_; Jacode4e::RoundTrip::convert(\$s, 'utf8',       $io_encoding); return $s; };
@@ -34,7 +34,7 @@ use Jacode4e::RoundTrip; # pmake.bat makes META.yml and META.json by /^use /
 }
 else {
     eval q{
-use Encode; # pmake.bat makes META.yml and META.json by /^use /
+use Encode; # pmake.bat makes META.yml, META.json and Makefile.PL by /^use /
 };
     die $@ if $@;
     *_io_input  = sub ($) { my($s)=@_; Encode::from_to             ( $s, $io_encoding, 'UTF-8'     ); return $s; };

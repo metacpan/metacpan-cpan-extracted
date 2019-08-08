@@ -1,7 +1,7 @@
 package XTerm::Util;
 
-our $DATE = '2018-09-26'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-07-12'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -16,13 +16,36 @@ our @EXPORT_OK = qw(
 
 our %SPEC;
 
+our %args_get = (
+    query_terminal => {
+        schema => 'bool*',
+        default => 1,
+    },
+    read_colorfgbg => {
+        schema => 'bool*',
+        default => 1,
+    },
+);
+
+our %argopt_quiet = (
+    quiet => {
+        schema => 'bool*',
+        cmdline_aliases => {q=>{}},
+    },
+);
+
 $SPEC{get_term_bgcolor} = {
     v => 1.1,
     summary => 'Get terminal background color',
     description => <<'_',
 
-Get the terminal's current background color, or undef if unavailable. This uses
-the following xterm control sequence:
+Get the terminal's current background color (in 6-hexdigit format e.g. 000000 or
+ffff33), or undef if unavailable. This routine tries the following mechanisms,
+from most useful to least useful, in order. Each mechanism can be turned off via
+argument.
+
+*query_terminal*. Querying the terminal is done via sending the following xterm
+ control sequence:
 
     \e]11;?\a
 
@@ -31,8 +54,8 @@ question mark replaced by the RGB code, e.g.:
 
     \e]11;rgb:0000/0000/0000\a
 
-I have tested this works on the following terminal software (and version) on
-Linux:
+I have tested that this works on the following terminal software (and version)
+on Linux:
 
     MATE Terminal (1.18.2)
     GNOME Terminal (3.18.3)
@@ -43,23 +66,31 @@ And does not work with the following terminal software (and version) on Linux:
     LXTerminal (0.2.0)
     rxvt (2.7.10)
 
-A 6-hexdigit RGB value will be returned, e.g.:
-
-    000000
-    310035
+*read_colorfgbg*. Some terminals like Konsole set the environment variable
+`COLORFGBG` containing 16-color color code for foreground and background, e.g.:
+`15;0`.
 
 _
-    args => {},
+    args => {
+        %args_get,
+    },
     result_naked => 1,
 };
 sub get_term_bgcolor {
-    return undef unless -x "/bin/sh";
+    my %args = @_;
 
-    require File::Temp;
-    my ($fh1 , $fname1) = File::Temp::tempfile();
-    my (undef, $fname2) = File::Temp::tempfile();
+    my $rgb;
 
-    my $script = q{#!/bin/sh
+  QUERY_TERMINAL: {
+        last unless $args{query_terminal} // 1;
+
+        last unless -x "/bin/sh";
+
+        require File::Temp;
+        my ($fh1 , $fname1) = File::Temp::tempfile();
+        my (undef, $fname2) = File::Temp::tempfile();
+
+        my $script = q{#!/bin/sh
 oldstty=$(stty -g)
 stty raw -echo min 0 time 0
 printf "\033]11;?\a"
@@ -69,22 +100,108 @@ result=${answer#*;}
 stty $oldstty
 echo $result >}.$fname2;
 
-    print $fh1 $script;
-    close $fh1;
-    system {"/bin/sh"} "/bin/sh", $fname1;
+        print $fh1 $script;
+        close $fh1;
+        system {"/bin/sh"} "/bin/sh", $fname1;
 
-    my $out = do {
-        local $/;
-        open my $fh2, "<", $fname2;
-        scalar <$fh2>;
-    };
+        my $out = do {
+            local $/;
+            open my $fh2, "<", $fname2;
+            scalar <$fh2>;
+        };
 
-    my $rgb;
-    if ($out =~ m!rgb:([0-9A-Fa-f]{4})/([0-9A-Fa-f]{4})/([0-9A-Fa-f]{4})\a!) {
-        $rgb = substr($1, 0, 2) . substr($2, 0, 2) . substr($3, 0, 2);
-    }
-    unlink $fname1, $fname2;
+        unlink $fname1, $fname2;
+
+        if ($out =~ m!rgb:([0-9A-Fa-f]{4})/([0-9A-Fa-f]{4})/([0-9A-Fa-f]{4})\a!) {
+            $rgb = substr($1, 0, 2) . substr($2, 0, 2) . substr($3, 0, 2);
+            goto DONE;
+        }
+    } # QUERY_TERMINAL
+
+  READ_COLORFGBG: {
+        last unless $ENV{COLORFGBG};
+        last unless $ENV{COLORFGBG} =~ /\A[0-1][0-9]?;([0-1][0-9]?)\z/;
+        require Color::ANSI::Util;
+        $rgb = Color::ANSI::Util::ansi16_to_rgb($1);
+        goto DONE;
+    } # READ_COLORFGBG
+
+  DONE:
     $rgb;
+}
+
+$SPEC{term_bgcolor_is_dark} = {
+    v => 1.1,
+    summary => 'Check if terminal background color is dark',
+    description => <<'_',
+
+This is basically get_term_bgcolor + rgb_is_dark.
+
+_
+    args => {
+        %args_get,
+        %argopt_quiet,
+    },
+};
+sub term_bgcolor_is_dark {
+    require Color::RGB::Util;
+
+    my %args = @_;
+
+    my $rgb = get_term_bgcolor(%args);
+
+    my $res_code = !defined($rgb) ? undef :
+        Color::RGB::Util::rgb_is_dark($rgb) ? 0:1;
+    my $res_text =
+        !defined($res_code) ? "Can't get terminal background color" :
+        $res_code == 1 ? "Terminal background color '$rgb' is NOT dark" :
+        "Terminal background color '$rgb' is dark";
+    [
+        200,
+        "OK",
+        $res_code,
+        {
+            'cmdline.result' => $args{quiet} ? "" : $res_text,
+            'cmdline.exit_code' => $res_code // 2,
+        },
+    ];
+}
+
+$SPEC{term_bgcolor_is_light} = {
+    v => 1.1,
+    summary => 'Check if terminal background color is light',
+    description => <<'_',
+
+This is basically get_term_bgcolor + rgb_is_light.
+
+_
+    args => {
+        %args_get,
+        %argopt_quiet,
+    },
+};
+sub term_bgcolor_is_light {
+    require Color::RGB::Util;
+
+    my %args = @_;
+
+    my $rgb = get_term_bgcolor(%args);
+
+    my $res_code = !defined($rgb) ? undef :
+        Color::RGB::Util::rgb_is_light($rgb) ? 0:1;
+    my $res_text =
+        !defined($res_code) ? "Can't get terminal background color" :
+        $res_code == 1 ? "Terminal background color '$rgb' is NOT light" :
+        "Terminal background color '$rgb' is light";
+    [
+        200,
+        "OK",
+        $res_code,
+        {
+            'cmdline.result' => $args{quiet} ? "" : $res_text,
+            'cmdline.exit_code' => $res_code // 2,
+        },
+    ];
 }
 
 $SPEC{set_term_bgcolor} = {
@@ -145,7 +262,7 @@ XTerm::Util - Utility routines for xterm-compatible terminal (emulator)s
 
 =head1 VERSION
 
-This document describes version 0.003 of XTerm::Util (from Perl distribution XTerm-Util), released on 2018-09-26.
+This document describes version 0.004 of XTerm::Util (from Perl distribution XTerm-Util), released on 2019-07-12.
 
 =head1 SYNOPSIS
 
@@ -174,12 +291,17 @@ Keywords: xterm, xterm-256color, terminal
 
 Usage:
 
- get_term_bgcolor() -> any
+ get_term_bgcolor(%args) -> any
 
 Get terminal background color.
 
-Get the terminal's current background color, or undef if unavailable. This uses
-the following xterm control sequence:
+Get the terminal's current background color (in 6-hexdigit format e.g. 000000 or
+ffff33), or undef if unavailable. This routine tries the following mechanisms,
+from most useful to least useful, in order. Each mechanism can be turned off via
+argument.
+
+I<query_terminal>. Querying the terminal is done via sending the following xterm
+ control sequence:
 
  \e]11;?\a
 
@@ -188,8 +310,8 @@ question mark replaced by the RGB code, e.g.:
 
  \e]11;rgb:0000/0000/0000\a
 
-I have tested this works on the following terminal software (and version) on
-Linux:
+I have tested that this works on the following terminal software (and version)
+on Linux:
 
  MATE Terminal (1.18.2)
  GNOME Terminal (3.18.3)
@@ -200,16 +322,24 @@ And does not work with the following terminal software (and version) on Linux:
  LXTerminal (0.2.0)
  rxvt (2.7.10)
 
-A 6-hexdigit RGB value will be returned, e.g.:
-
- 000000
- 310035
+I<read_colorfgbg>. Some terminals like Konsole set the environment variable
+C<COLORFGBG> containing 16-color color code for foreground and background, e.g.:
+C<15;0>.
 
 This function is not exported by default, but exportable.
 
-No arguments.
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<query_terminal> => I<bool> (default: 1)
+
+=item * B<read_colorfgbg> => I<bool> (default: 1)
+
+=back
 
 Return value:  (any)
+
 
 
 =head2 set_term_bgcolor
@@ -238,6 +368,80 @@ Arguments ('*' denotes required arguments):
 =item * B<$stderr> => I<true>
 
 =back
+
+Return value:  (any)
+
+
+
+=head2 term_bgcolor_is_dark
+
+Usage:
+
+ term_bgcolor_is_dark(%args) -> [status, msg, payload, meta]
+
+Check if terminal background color is dark.
+
+This is basically get_term_bgcolor + rgb_is_dark.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<query_terminal> => I<bool> (default: 1)
+
+=item * B<quiet> => I<bool>
+
+=item * B<read_colorfgbg> => I<bool> (default: 1)
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 term_bgcolor_is_light
+
+Usage:
+
+ term_bgcolor_is_light(%args) -> [status, msg, payload, meta]
+
+Check if terminal background color is light.
+
+This is basically get_term_bgcolor + rgb_is_light.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<query_terminal> => I<bool> (default: 1)
+
+=item * B<quiet> => I<bool>
+
+=item * B<read_colorfgbg> => I<bool> (default: 1)
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
 
 Return value:  (any)
 
@@ -270,7 +474,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

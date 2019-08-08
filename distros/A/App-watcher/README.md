@@ -8,7 +8,7 @@ See [watcher](https://metacpan.org/pod/watcher)
 
 # AUTHOR
 
-Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>
+Tokuhiro Matsuno &lt;tokuhirom AAJKLFJEF@ GMAIL COM>
 
 # LICENSE
 

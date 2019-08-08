@@ -1,3 +1,14 @@
+0.900012    2019-08-06
+            * Replace JSON::XS with JSON::MaybeXS
+            * Patch bin scripts to support the #! Makefile.PL was invoked with
+            * Add DEVEL_QUICKCOVER_{INCLUDE,EXCLUDE} filters
+            * Add release script
+            * Update ppport.h
+            * Update version and dependencies
+
+0.900011    2017-07-03
+            * Minor charges to Html report generation
+
 0.900010    2016-11-09
             * Minor fixes for report generation
 

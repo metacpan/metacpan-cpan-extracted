@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Perinci-Examples-Bin-Any-Completion",
   "EXE_FILES" => [
+    "script/peri-eg-complete-animal-choice",
     "script/peri-eg-complete-comment-fruit-any",
     "script/peri-eg-complete-fruits-any"
   ],
@@ -26,7 +27,7 @@ my %WriteMakefileArgs = (
     "Perinci::CmdLine::Any" => 0,
     "Perinci::CmdLine::Base" => "1.816",
     "Perinci::CmdLine::Classic" => "1.770",
-    "Perinci::Examples" => "0.811",
+    "Perinci::Examples" => "0.815",
     "Perinci::Examples::Completion" => 0
   },
   "TEST_REQUIRES" => {
@@ -35,7 +36,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -51,7 +52,7 @@ my %FallbackPrereqs = (
   "Perinci::CmdLine::Any" => 0,
   "Perinci::CmdLine::Base" => "1.816",
   "Perinci::CmdLine::Classic" => "1.770",
-  "Perinci::Examples" => "0.811",
+  "Perinci::Examples" => "0.815",
   "Perinci::Examples::Completion" => 0,
   "Test::More" => 0
 );

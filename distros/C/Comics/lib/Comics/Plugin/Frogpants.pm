@@ -17,11 +17,11 @@ our $patterns = [
             }xi,
 	    qr{ <img \s+
 		data-load="false" \s+
-		data-src="(?<url>https?://static\d.squarespace.com/static/
-		[0-9a-f]+/
-		[0-9a-f]+/
-		[0-9a-f]+/
-		[0-9]+/
+		data-src="(?<url>https?://images.squarespace-cdn.com/
+		content/v1/
+		[-_0-9a-z]+/
+		[-_0-9a-z]+/
+		[-_0-9a-z]+/
 		(?<image>[^./]+\.\w+))"
 	       }xi,
 	 ];

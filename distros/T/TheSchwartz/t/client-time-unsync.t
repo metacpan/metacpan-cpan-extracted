@@ -17,7 +17,7 @@ BEGIN {
 }
 no warnings 'redefine';
 
-require 't/lib/db-common.pl';
+require './t/lib/db-common.pl';
 
 use TheSchwartz;
 use Test::More tests => 2;

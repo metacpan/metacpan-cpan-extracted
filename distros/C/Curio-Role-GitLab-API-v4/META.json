@@ -1,7 +1,7 @@
 {
    "abstract" : "Build Curio classes around GitLab::API::v4.",
    "author" : [
-      "Aran Clary Deltac <aran@bluefeet.dev>"
+      "Aran Clary Deltac <bluefeet@gmail.com>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Minilla/v3.1.4",
@@ -42,11 +42,11 @@
       },
       "runtime" : {
          "requires" : {
-            "Curio" : "0.02",
-            "Curio::Role" : "0.01",
+            "Curio::Role" : "0.04",
             "GitLab::API::v4" : "0.07",
             "Moo::Role" : "2.003000",
             "MooX::BuildArgs" : "0.08",
+            "Scalar::Util" : "0",
             "Types::Common::String" : "1.002001",
             "Types::Standard" : "1.002001",
             "namespace::clean" : "0.27",
@@ -56,6 +56,7 @@
       },
       "test" : {
          "requires" : {
+            "Curio" : "0.04",
             "Test2::V0" : "0.000094"
          }
       }
@@ -63,7 +64,7 @@
    "provides" : {
       "Curio::Role::GitLab::API::v4" : {
          "file" : "lib/Curio/Role/GitLab/API/v4.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -77,8 +78,8 @@
          "web" : "https://github.com/bluefeet/Curio-Role-GitLab-API-v4"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_authority" : "cpan:BLUEFEET",
-   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_serialization_backend" : "JSON::PP version 4.04",
    "x_static_install" : 1
 }

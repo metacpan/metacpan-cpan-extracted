@@ -115,12 +115,12 @@ subtest prefer_related_applications => sub {
 	plan tests => 4;
 	is_deeply($manifest->{prefer_related_applications}->(\1, 'test okay'), \1, 'prefer_related_applications true');
 	is_deeply($manifest->{prefer_related_applications}->(\0, 'test okay'), \0, 'prefer_related_applications true');
-	is(eval{$manifest->{orientation}->({okay => 'no'}, 'custom')}, undef, 'prefer_related_applications errors');
-	like($@, qr/Value is not a scalar for field custom/, 'Value is not a scalar for field custom');
+	is(eval{$manifest->{prefer_related_applications}->({okay => 'no'}, 'custom')}, undef, 'prefer_related_applications errors');
+	like($@, qr/Not a SCALAR/, 'Value is not a scalar for field custom');
 };
 
 subtest related_applications => sub {
-	plan tests => 5;
+	plan tests => 8;
 	my $app = {
 		platform => "play", 
 		url => "https://play.google.com/store/apps/details?id=com.example.app1", 
@@ -132,6 +132,12 @@ subtest related_applications => sub {
 	delete $app->{platform};
 	is(eval{$manifest->{related_applications}->([$app], 'custom')}, undef, 'related_applications errors');
 	like($@, qr/Missing required param platform/, 'Missing required param platform');
+	is(eval{$manifest->{related_applications}->([sub{$app}], 'custom')}, undef, 'related_applications errors');
+	like($@, qr/related_applicaiton is not a HASH/, 'related_applicaiton is not a HASH');
+	my $original = $Progressive::Web::Application::TOOL{to_json};
+	$Progressive::Web::Application::TOOL{to_json} = sub {die 'dead'};
+	is(eval{$manifest->{related_applications}->([$app], 'custom')}, undef, 'ummmmm');
+	$Progressive::Web::Application::TOOL{to_json} = $original;
 };
 
 subtest iarc_rating_id => sub {

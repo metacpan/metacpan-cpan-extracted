@@ -31,6 +31,9 @@ my $build = Module::Build->new(
 		"Test::Output" => 0,
 		"Mock::Sub" => 0
 	},
+	configure_requires => {
+		'Module::Build' => 0.42
+	},
 	create_makefile_pl => 'traditional',
 	meta_merge => {
 		resources => {

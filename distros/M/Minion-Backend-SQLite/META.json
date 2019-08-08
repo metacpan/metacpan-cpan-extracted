@@ -64,7 +64,7 @@
    "provides" : {
       "Minion::Backend::SQLite" : {
          "file" : "lib/Minion/Backend/SQLite.pm",
-         "version" : "4.004"
+         "version" : "4.005"
       }
    },
    "release_status" : "stable",
@@ -80,7 +80,7 @@
       },
       "x_IRC" : "irc://irc.freenode.net/#mojo"
    },
-   "version" : "4.004",
+   "version" : "4.005",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -274,7 +274,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "4.004",
+                  "tag" : "4.005",
                   "tag_format" : "%v",
                   "tag_message" : "%v"
                },
@@ -602,6 +602,6 @@
       "yrjustice <43676784+yrjustice@users.noreply.github.com>"
    ],
    "x_generated_by_perl" : "v5.30.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
 }
 

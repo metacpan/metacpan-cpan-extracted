@@ -3,7 +3,7 @@ package Promise::ES6;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =encoding utf-8
 
@@ -45,9 +45,10 @@ The interface is the same, except:
 =item * Promise resolutions and rejections accept exactly one argument,
 not a list. (This accords with the standard.)
 
-=item * Unhandled rejections are reported via C<warn()>.
-
 =item * A C<finally()> method is defined.
+
+=item * Unhandled rejections are reported via C<warn()>. (See below
+for details.)
 
 =back
 
@@ -55,6 +56,20 @@ not a list. (This accords with the standard.)
 
 Right now this doesn’t try for interoperability with other promise
 classes. If that’s something you want, make a feature request.
+
+=head1 UNHANDLED REJECTIONS
+
+As of version 0.05, unhandled rejections prompt a warning I<only> if one
+of the following is true:
+
+=over
+
+=item 1) The unhandled rejection happens outside of the constructor.
+
+=item 2) The unhandled rejection happens via an uncaught exception
+(even within the constructor).
+
+=back
 
 =head1 SEE ALSO
 
@@ -64,16 +79,21 @@ L<this one|https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_p
 
 =cut
 
+our $_SUPPRESS_UNHANDLED_REJECTION_WARNING;
+
 sub new {
     my ($class, $cr) = @_;
 
-    my $self = bless {}, $class;
+    my $self = bless { _suppress_uncaught_reject_warn => 0 }, $class;
+
+    local $_SUPPRESS_UNHANDLED_REJECTION_WARNING = 1;
 
     my $resolver = sub { $self->_finish( resolve => $_[0]) };
     my $rejecter = sub { $self->_finish( reject => $_[0]) };
 
     local $@;
     if ( !eval { $cr->( $resolver, $rejecter ); 1 } ) {
+        local $_SUPPRESS_UNHANDLED_REJECTION_WARNING = 0;
         $self->_finish( reject => $@ );
     }
 
@@ -153,10 +173,12 @@ sub _finish {
             $_->_finish($repromise_how, $repromise_value) for @{ $self->{'_dependents'} };
 
             if ($repromise_how eq 'reject' && !@{ $self->{'_dependents'} }) {
-                $self->{'_warned_unhandled_reject'} ||= do {
-                    my $ref = ref $self;
-                    warn "$ref: Unhandled rejection: $repromise_value";
-                };
+                if (!$_SUPPRESS_UNHANDLED_REJECTION_WARNING) {
+                    $self->{'_warned_unhandled_reject'} ||= do {
+                        my $ref = ref $self;
+                        warn "$ref: Unhandled rejection: $repromise_value";
+                    };
+                }
             }
         }
     };

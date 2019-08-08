@@ -10,6 +10,8 @@ use lib qw{ inc };
 
 use My::Module::Test;
 
+use constant REGEXP_REF	=> ref qr{};
+
 sub test_paste (@);	## no critic (ProhibitSubroutinePrototypes)
 
 check_testable;
@@ -61,7 +63,7 @@ sub test_paste (@) {	## no critic (ProhibitSubroutinePrototypes, RequireArgUnpac
     ($got, $ext_got) = groom_paste ($got);
     ($want, $ext_want) = groom_paste ($want);
     my $ref = ref $want;
-    if ($ref eq 'Regexp') {
+    if ( REGEXP_REF eq $ref ) {
 	@_ = ( $got, $want, "@_" );
 	goto &like;
     } elsif (defined $want) {
@@ -96,3 +98,5 @@ sub groom_paste {
 }
 
 1;
+
+# ex: set filetype=perl textwidth=72 autoindent :

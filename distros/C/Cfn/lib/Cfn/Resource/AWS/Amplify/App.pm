@@ -1,4 +1,4 @@
-# AWS::Amplify::App generated from spec 4.1.0
+# AWS::Amplify::App generated from spec 5.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Amplify::App',
@@ -63,6 +63,29 @@ package Cfn::Resource::Properties::AWS::Amplify::App::EnvironmentVariableValue {
   has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Value => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
+
+subtype 'Cfn::Resource::Properties::AWS::Amplify::App::BasicAuthConfig',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Amplify::App::BasicAuthConfig',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::AWS::Amplify::App::BasicAuthConfigValue->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::AWS::Amplify::App::BasicAuthConfigValue {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has EnableBasicAuth => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Password => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Username => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
 subtype 'ArrayOfCfn::Resource::Properties::AWS::Amplify::App::CustomRule',
      as 'Cfn::Value',
   where { $_->isa('Cfn::Value::Array') or $_->isa('Cfn::Value::Function') },
@@ -110,27 +133,31 @@ package Cfn::Resource::Properties::AWS::Amplify::App::CustomRuleValue {
   has Target => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
-subtype 'Cfn::Resource::Properties::AWS::Amplify::App::BasicAuthConfig',
+subtype 'Cfn::Resource::Properties::AWS::Amplify::App::AutoBranchCreationConfig',
      as 'Cfn::Value';
 
-coerce 'Cfn::Resource::Properties::AWS::Amplify::App::BasicAuthConfig',
+coerce 'Cfn::Resource::Properties::AWS::Amplify::App::AutoBranchCreationConfig',
   from 'HashRef',
    via {
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Amplify::App::BasicAuthConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::AWS::Amplify::App::AutoBranchCreationConfigValue->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Amplify::App::BasicAuthConfigValue {
+package Cfn::Resource::Properties::AWS::Amplify::App::AutoBranchCreationConfigValue {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has EnableBasicAuth => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Password => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Username => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has AutoBranchCreationPatterns => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has BasicAuthConfig => (isa => 'Cfn::Resource::Properties::AWS::Amplify::App::BasicAuthConfig', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has BuildSpec => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has EnableAutoBranchCreation => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has EnableAutoBuild => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has EnvironmentVariables => (isa => 'ArrayOfCfn::Resource::Properties::AWS::Amplify::App::EnvironmentVariable', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Stage => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 package Cfn::Resource::Properties::AWS::Amplify::App {
@@ -139,6 +166,7 @@ package Cfn::Resource::Properties::AWS::Amplify::App {
   extends 'Cfn::Resource::Properties';
   
   has AccessToken => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has AutoBranchCreationConfig => (isa => 'Cfn::Resource::Properties::AWS::Amplify::App::AutoBranchCreationConfig', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has BasicAuthConfig => (isa => 'Cfn::Resource::Properties::AWS::Amplify::App::BasicAuthConfig', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has BuildSpec => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has CustomRules => (isa => 'ArrayOfCfn::Resource::Properties::AWS::Amplify::App::CustomRule', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');

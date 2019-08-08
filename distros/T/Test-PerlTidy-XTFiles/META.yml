@@ -1,0 +1,45 @@
+---
+abstract: 'XT::Files interface for Test::PerlTidy'
+author:
+  - 'Sven Kirmess <sven.kirmess@kzone.ch>'
+build_requires:
+  Test::Builder::Tester: '0'
+  Test::MockModule: '0'
+  Test::More: '0.88'
+  constant: '0'
+  lib: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-PerlTidy-XTFiles
+no_index:
+  directory:
+    - corpus
+    - t
+    - xt
+provides:
+  Test::PerlTidy::XTFiles:
+    file: lib/Test/PerlTidy/XTFiles.pm
+    version: '0.001'
+requires:
+  Class::Tiny: '1'
+  Test::Builder: '0'
+  Test::PerlTidy: '0'
+  Test::XTFiles: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/skirmess/Test-PerlTidy-XTFiles/issues
+  homepage: https://github.com/skirmess/Test-PerlTidy-XTFiles
+  repository: https://github.com/skirmess/Test-PerlTidy-XTFiles.git
+version: '0.001'
+x_generated_by_perl: v5.24.0
+x_serialization_backend: 'YAML::Tiny version 1.70'

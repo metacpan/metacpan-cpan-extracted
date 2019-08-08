@@ -1,0 +1,55 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Math::DifferenceSet::Planar;
+
+use constant PDS => Math::DifferenceSet::Planar::;
+
+$| = 1;
+
+foreach my $db (PDS->list_databases) {
+    my $count = eval { PDS->set_database($db) };
+    if (defined $count) {
+        my $min = PDS->iterate_available_sets->()->order;
+        my $max = PDS->available_max_order;
+        print "$db: $count sets, $min <= order <= $max\n";
+    }
+    else {
+        print "$db: bad database\n";
+    }
+}
+
+__END__
+=head1 NAME
+
+pds_canonize - translate planar difference sets into canonical form
+
+=head1 SYNOPSIS
+
+  show_databases
+
+=head1 DESCRIPTION
+
+This example program examines the distribution share directory and
+reports databases found there, with a short summary of their content.
+
+=head1 AUTHOR
+
+Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2019 by Martin Becker, Blaubeuren.  All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=head1 DISCLAIMER OF WARRANTY
+
+This library is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of merchantability
+or fitness for a particular purpose.
+
+=cut

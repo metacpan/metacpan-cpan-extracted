@@ -33,13 +33,23 @@ The interface is the same, except:
 
 - Promise resolutions and rejections accept exactly one argument,
 not a list. (This accords with the standard.)
-- Unhandled rejections are reported via `warn()`.
 - A `finally()` method is defined.
+- Unhandled rejections are reported via `warn()`. (See below
+for details.)
 
 # COMPATIBILITY
 
 Right now this doesn’t try for interoperability with other promise
 classes. If that’s something you want, make a feature request.
+
+# UNHANDLED REJECTIONS
+
+As of version 0.05, unhandled rejections prompt a warning _only_ if one
+of the following is true:
+
+- 1) The unhandled rejection happens outside of the constructor.
+- 2) The unhandled rejection happens via an uncaught exception
+(even within the constructor).
 
 # SEE ALSO
 

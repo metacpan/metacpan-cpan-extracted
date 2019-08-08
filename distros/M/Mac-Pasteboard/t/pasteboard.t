@@ -19,23 +19,23 @@ mess.
 EOD
 
 subtest 'Copy to clipboard' => sub {
-    do 't/copy.tx';
+    do './t/copy.tx';
 };
 
 subtest 'Error handling' => sub {
-    do 't/error.tx';
+    do './t/error.tx';
 };
 
 subtest 'Miscellaneous' => sub {
-    do 't/misc.tx';
+    do './t/misc.tx';
 };
 
 subtest 'Paste from clipboard' => sub {
-    do 't/paste.tx';
+    do './t/paste.tx';
 };
 
 subtest 'Synch with clipboard' => sub {
-    do 't/synch.tx';
+    do './t/synch.tx';
 };
 
 done_testing;

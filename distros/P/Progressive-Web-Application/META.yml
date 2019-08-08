@@ -27,4 +27,4 @@ requires:
   Module::Find: '0'
   Text::Wrap: '0'
   perl: '5.006'
-version: '0.02'
+version: '0.05'

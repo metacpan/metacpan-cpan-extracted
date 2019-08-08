@@ -43,6 +43,11 @@ using vv_fn   = function<void()>;
 using vi_fn   = function<void(int)>;
 using iid_fn  = function<int(int, panda::string_view)>;
 
+struct Data {
+    int i;
+    Data (int i) : i(i) {}
+};
+
 TEST_CASE("function->sub", "[function]") {
     int ecnt = 0;
     int cnt = 0;
@@ -119,10 +124,6 @@ TEST_CASE("function->sub", "[function]") {
         sub.call<void>(Simple(42));
     }
     SECTION("custom when no typemap") {
-        struct Data {
-            int i;
-            Data (int i) : i(i) {}
-        };
         function<Data(const Data&)> fn = [&](const Data& data) { return data.i + 100; };
         auto sub = function2sub(fn,
             [](const Data& data) { return Simple(data.i + 1000); },

@@ -2,8 +2,8 @@ NAME
     App::instopt - Download and install software
 
 VERSION
-    This document describes version 0.009 of App::instopt (from Perl
-    distribution App-instopt), released on 2019-06-06.
+    This document describes version 0.010 of App::instopt (from Perl
+    distribution App-instopt), released on 2019-08-07.
 
 SYNOPSIS
     See instopt script.

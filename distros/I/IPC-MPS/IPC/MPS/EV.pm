@@ -7,7 +7,7 @@ use Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(spawn receive msg snd quit wt snd_wt listener open_node vpid2pid);
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 use Carp;
 use EV;

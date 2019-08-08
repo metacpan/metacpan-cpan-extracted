@@ -9,7 +9,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.152';
+our $VERSION = '1.153';
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -19,9 +19,9 @@ use Quiq::Terminal;
 use Encode::Guess ();
 use Quiq::String;
 use Encode ();
+use Quiq::Unindent;
 use Fcntl qw/:DEFAULT/;
 use Quiq::Perl;
-use Quiq::Unindent;
 use Quiq::DirHandle;
 use Quiq::Parameters;
 use File::Find ();
@@ -899,10 +899,52 @@ Datei nicht, geschieht nichts.
 # -----------------------------------------------------------------------------
 
 sub truncate {
-    my ($this,$file) = @_;
+    my $this = shift;
+    my $file = $this->expandTilde(shift);
 
     if ($this->exists($file)) {
         Quiq::FileHandle->new('>',$file)->truncate;
+    }
+
+    return;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 unindent() - Entferne Einrückung
+
+=head4 Synopsis
+
+    $this->unindent($file);
+
+=head4 Arguments
+
+=over 4
+
+=item $file
+
+Pfad der Datei.
+
+=back
+
+=head4 Description
+
+Lies den Inhalt der Datei $file, entferne dessen Einrückung (per
+Quiq::Unindent->hereDoc) und schreibe den uneingerückten Inhalt auf
+die Datei zurück. Besitzt der Dateiinhalt keine Einrückung, findet keine
+Änderung des Dateiinhalts statt.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub unindent {
+    my ($this,$file) = @_;
+
+    my $data1 = $this->read($file);
+    my $data2 = Quiq::Unindent->hereDoc($data1);
+    if ($data1 ne $data2) {
+        $this->write($file,$data2);
     }
 
     return;
@@ -1318,7 +1360,7 @@ Die Reihenfolge der Dateien ist undefiniert.
 
 sub find {
     my $class = shift;
-    my $dir = shift;
+    my $dir = $class->expandTilde(shift);
     # @_: @opt
 
     # Optionen
@@ -2724,7 +2766,7 @@ sub symlinkRelative {
 
 =head1 VERSION
 
-1.152
+1.153
 
 =head1 AUTHOR
 

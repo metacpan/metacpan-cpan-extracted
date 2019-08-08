@@ -13,6 +13,7 @@ examples/minion_bench.pl
 lib/Minion.pm
 lib/Minion/Backend.pm
 lib/Minion/Backend/Pg.pm
+lib/Minion/Backend/resources/migrations/pg.sql
 lib/Minion/Command/minion.pm
 lib/Minion/Command/minion/job.pm
 lib/Minion/Command/minion/worker.pm

@@ -2,11 +2,11 @@
 
 namespace xs {
 
-Hash::Hash (const std::initializer_list<std::tuple<panda::string_view, Scalar>>& l) {
+Hash::Hash (const std::initializer_list<std::pair<panda::string_view, Scalar>>& l) {
     sv = (SV*)newHV();
     reserve(l.size());
     auto end = l.end();
-    for (auto ptr = l.begin(); ptr != end; ++ptr) store(std::get<0>(*ptr), std::get<1>(*ptr));
+    for (auto ptr = l.begin(); ptr != end; ++ptr) store(ptr->first, ptr->second);
 }
 
 void Hash::store (const panda::string_view& key, const Scalar& v, U32 hash) {

@@ -57,6 +57,16 @@ Number of seconds to delay between polling attempts. Each waiter has a default d
 Maximum number of polling attempts to issue before failing the waiter. Each waiter has a default maxAttempts configuration value, 
 but you may need to modify this setting for specific use cases.
 
+### beforeWait(CodeRef)
+
+    $waiter->beforeWait(sub { 
+         my ($w, $attempts, $response) = @_;
+         say STDERR "Waiter attempts left:" . ( $w->maxAttempts - $attempts );
+    });
+
+
+Register a callback that is invoked after an attempt but before sleeping. provides the number of attempts made and the previous response.
+
 ### wait(HashRef)
 
      $waiter->wait(

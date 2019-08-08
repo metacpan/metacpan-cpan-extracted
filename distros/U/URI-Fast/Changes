@@ -1,3 +1,12 @@
+0.49 2018-08-02
+-make 0.48_01 official
+
+0.48_01 2019-07-31
+-bugfix: calling query_keyset with a zero-length key could result in a
+ malformed query string
+-bugfix: calling set_param with an array containing a zero-length string could
+ result in a malformed query string
+
 0.48 2019-07-09
 -make 0.47_01 official
 

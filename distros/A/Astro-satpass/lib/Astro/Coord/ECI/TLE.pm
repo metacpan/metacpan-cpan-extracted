@@ -176,13 +176,13 @@ given time, you do
 
   my ($lat, $long, $alt) = $body->model ($time)->geodetic;
 
-Or, assuming the L<model|/item_model> attribute is set the way you want
+Or, assuming the C<model> attribute is set the way you want
 it, by
 
   my ($lat, $long, $alt) = $body->geodetic ($time);
 
 It is also possible to run the desired model (as specified by the
-L<model|/item_model> attribute) simply by setting the time represented
+C<model> attribute) simply by setting the time represented
 by the object.
 
 As of release 0.016, the recommended model to use is SGP4R, which was
@@ -231,7 +231,7 @@ package Astro::Coord::ECI::TLE;
 use strict;
 use warnings;
 
-our $VERSION = '0.106';
+our $VERSION = '0.107';
 
 use base qw{ Astro::Coord::ECI Exporter };
 
@@ -2478,7 +2478,7 @@ sub _period_r {
 This method reblesses a TLE object. The class must be either
 L<Astro::Coord::ECI|Astro::Coord::ECI> or a subclass thereof, as must
 the object passed in to be reblessed. If the $tle object has its
-L<reblessable|/reblessable> attribute false, it will not be reblessed,
+C<reblessable> attribute false, it will not be reblessed,
 but will be returned unmodified. Before reblessing, the
 before_reblessing() method is called.  After reblessing, the
 after_reblessing() method is called with the \%possible_attributes hash
@@ -8262,12 +8262,12 @@ sub _next_elevation_screen {
 #
 #   $ eg/visual -merge
 #
-# Last-Modified: Sat, 04 May 2019 01:10:16 GMT
+# Last-Modified: Tue, 30 Jul 2019 22:00:40 GMT
 
 # The following constants are unsupported, and may be modified or
 # revoked at any time. They exist to support
 # xt/author/magnitude_status.t
-use constant _CELESTRAK_VISUAL => 'Sat, 04 May 2019 01:10:16 GMT';
+use constant _CELESTRAK_VISUAL => 'Tue, 30 Jul 2019 22:00:40 GMT';
 use constant _MCCANTS_VSNAMES  => 'Thu, 25 May 2017 00:30:11 GMT';
 use constant _MCCANTS_QUICKSAT => 'Thu, 25 May 2017 00:00:55 GMT';
 
@@ -8590,8 +8590,8 @@ expect to see only the value 'U', for 'Unclassified.'
 
 =item ds50 (numeric, readonly, parse)
 
-This attribute contains the L<epoch|/item_epoch>, in days since 1950.
-Setting the L<epoch|/item_epoch> also modifies this attribute.
+This attribute contains the C<epoch>, in days since 1950.
+Setting the C<epoch> also modifies this attribute.
 
 =item eccentricity (numeric, parse)
 
@@ -8626,8 +8626,7 @@ also modifies the epoch_dynamical and ds50 attributes.
 =item epoch_dynamical (numeric, readonly, parse)
 
 This attribute contains the dynamical time corresponding to the
-L<epoch|/item_epoch>. Setting the L<epoch|/item_epoch> also modifies
-this attribute.
+C<epoch>. Setting the C<epoch> also modifies this attribute.
 
 =item file (numeric)
 

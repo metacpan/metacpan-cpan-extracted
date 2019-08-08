@@ -6,13 +6,14 @@ use warnings;
 
 use Test::More;
 
-plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Perinci/Examples/Bin/Any/Completion.pm'
 );
 
 my @scripts = (
+    'script/peri-eg-complete-animal-choice',
     'script/peri-eg-complete-comment-fruit-any',
     'script/peri-eg-complete-fruits-any'
 );

@@ -1,5 +1,6 @@
-Revision history for Perl extension WebService-ILS
-
+0.18 2019-08-06T08:20:56Z
+    - RecordedBooks: Pass item availability with results
+    
 0.17 2017-10-12T00:43:30Z
     - Overdrive bugfix: no more _item_metadata(), we switched to item_metadata()
 

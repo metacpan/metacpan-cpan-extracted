@@ -1,6 +1,281 @@
 Changelog for MarpaX-ESLIF
 
-3.0.14 2019-07-22T04:51:44
+3.0.17 2019-08-07T19:13:57
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Version 3.0.17 [ci skip]
+ - BNF/README.pod and test/selfTester.c updates
+ - ::ast built-in action
+ - t/thread.t: Still trying to fix pb with Test::More
+ - Version 3.0.15 [ci skip]
+ - perl/dist.ini: Fix potential use of undefined string in
+   _trim_whitespace()
+ - BNF/README.pod: POD fix [ci skip]
+ - .travis.yml: Update JSON::MaybeXS
+ - src/marpaESLIF.c: If discard is successful, recognizer should break if
+   there is at last one grammar event in addition to the eventual discard
+   event
+ - src/marpaESLIF.c: event sort is always missing the last event
+ - Version 3.0.14 [ci skip]
+ - t/json.t: use parse() [ci skip]
+ - t/import_export.t: Fix number of tests
+ - Version 3.0.13 [ci skip]
+ - t/thread.t: use a constant to hopefully bypass a Test::More apparent
+   random(?) bug [ci skip]
+ - src/marpaESLIFLua.c: Fix printf() debug statement [ci skip]
+ - src/marpaESLIF.c: undef default string representation is empty, \"null\"
+   is reserved to json mode
+ - Tutorials update [ci skip]
+ - doc/API/README.pod: update [ci skip]
+ - test/jsonTesterLua.c fix and <if action> BNF
+ - if-action full implementation [ci skip]
+ - if action: external definition [ci skip]
+ - symbol-action support in :lexeme and :terminal rules
+ - src/marpaESLIF.c: Fix typo in a message [ci skip]
+ - src/bootstrap.c: Fix error string associated to adverb list unpack
+   context [ci skip]
+ - Version 3.0.12
+ - Process grammar :discard[] hooks in any case only in the top recognizer
+ - Process grammar :discard[] hooks from
+   _marpaESLIFRecognizer_push_grammar_eventsb() to
+   _marpaESLIFRecognizer_push_eventb() to catch the case when they are
+   associated to lexemes ot terminals (which are not using grammar events
+   -;)
+ - Fix log calls [ci skip]
+ - Explicit terminal event [ci skip]
+ - <restricted ascii graph name> simplification [ci skip]
+ - :discard[switch] new keyword doc fix
+ - :discard[switch] new keyword fixes
+ - :discard[switch] new keyword
+ - Version 3.0.11 [ci skip]
+ - perl/ESLIF.xs: marpaESLIFPerl_is_bool optimization
+ - MarpaX/ESLIF.pm: Tiny optimization
+ - Revert "In valuation, instanciate lua state with lua_newthread instead
+   of lua_newstate" [ci skip]
+ - Avoid unnecessary events
+ - Merge commit '5cab1870f56f83de6799872dbb088c15c45fd571' [ci skip]
+ - Squashed '3rdparty/github/luaunpanic/' changes from 26e8b99d..4c5c4569
+ - In valuation, instanciate lua state with lua_newthread instead of
+   lua_newstate
+ - Merge commit 'd9988f7ce2ecda775f60ce50bf604705a096cc66' [ci skip]
+ - Squashed '3rdparty/github/luaunpanic/' changes from 1d18796c..26e8b99d
+ - Add missing meta actions to the doc [ci skip]
+ - eslif/L0.h: Simplifications [ci skip]
+ - Version 3.0.10 [ci skip]
+ - src/marpaESLIF.c: Fix memory management in case of error recovery
+ - src/marpaESLIF.c: Move management of
+   marpaESLIFRecognizerp->previousMaxMatchedl in
+   _marpaESLIFRecognizer_lexeme_alternativeb instead of
+   _marpaESLIFRecognizer_resume_oneb
+ - src/marpaESLIF.c: Move management of marpaESLIFRecognizerp->lastSizel in
+   _marpaESLIFRecognizer_lexeme_alternativeb instead of
+   _marpaESLIFRecognizer_resume_oneb
+ - src/marpaESLIF.c: Reset pristine flag in
+   _marpaESLIFRecognizer_lexeme_alternativeb instead of
+   _marpaESLIFRecognizer_resume_oneb
+ - dev+ [ci skip]
+ - java: ESLIFSymbolEventBitSet
+ - lua: symbol eventBitSet [ci skip]
+ - perl: MarpaX::ESLIF::Symbol::EventBitSet
+ - _marpaESLIF_flatten_pointers work [ci skip]
+ - Squashed '3rdparty/github/marpaWrapper/' changes from ea926630..d3bc96e4
+ - Merge commit '719c37e0825f54751771b4b939da8395f96e1ba7' [ci skip]
+ - Merge commit '5c3b13c95a5f170c1eaef52f5d5e67742eedcd48' [ci skip]
+ - Squashed '3rdparty/github/genericHash/' changes from 2a5695ab..3fc52b30
+ - Merge commit '2d0928e6eea97a2e4be7ba06c104ae6ebe3ab67c' [ci skip]
+ - Squashed '3rdparty/github/genericStack/' changes from 49e9eeae..2992af68
+ - src/marpaESLIF.c: Avoid unnecessary memcpy's in
+   _marpaESLIFRecognizer_value_validb
+ - CMakeLists.txt: Fix setting of LUA_INT_TYPE and LUA_FLOAT_TYPE
+ - Symbol event introspection
+ - Squashed '3rdparty/github/marpaWrapper/' changes from d88c2d62..ea926630
+ - Merge commit '68b94bad9878bfaf9788eeab2161a7ea585b2953' [ci skip]
+ - CMakeLists.txt: makes sure core and client luaunpanic have the same
+   number types [ci skip]
+ - CMakeLists.txt: makes sure core and client luaunpanic have the same
+   float type [ci skip]
+
+3.0.16 2019-08-04T08:22:50Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - t/thread.t: Still trying to fix pb with Test::More
+ - Version 3.0.15 [ci skip]
+ - perl/dist.ini: Fix potential use of undefined string in
+   _trim_whitespace()
+ - BNF/README.pod: POD fix [ci skip]
+ - .travis.yml: Update JSON::MaybeXS
+ - src/marpaESLIF.c: If discard is successful, recognizer should break if
+   there is at last one grammar event in addition to the eventual discard
+   event
+ - src/marpaESLIF.c: event sort is always missing the last event
+ - Version 3.0.14 [ci skip]
+ - t/json.t: use parse() [ci skip]
+ - t/import_export.t: Fix number of tests
+ - Version 3.0.13 [ci skip]
+ - t/thread.t: use a constant to hopefully bypass a Test::More apparent
+   random(?) bug [ci skip]
+ - src/marpaESLIFLua.c: Fix printf() debug statement [ci skip]
+ - src/marpaESLIF.c: undef default string representation is empty, \"null\"
+   is reserved to json mode
+ - Tutorials update [ci skip]
+ - doc/API/README.pod: update [ci skip]
+ - test/jsonTesterLua.c fix and <if action> BNF
+ - if-action full implementation [ci skip]
+ - if action: external definition [ci skip]
+ - symbol-action support in :lexeme and :terminal rules
+ - src/marpaESLIF.c: Fix typo in a message [ci skip]
+ - src/bootstrap.c: Fix error string associated to adverb list unpack
+   context [ci skip]
+ - Version 3.0.12
+ - Process grammar :discard[] hooks in any case only in the top recognizer
+ - Process grammar :discard[] hooks from
+   _marpaESLIFRecognizer_push_grammar_eventsb() to
+   _marpaESLIFRecognizer_push_eventb() to catch the case when they are
+   associated to lexemes ot terminals (which are not using grammar events
+   -;)
+ - Fix log calls [ci skip]
+ - Explicit terminal event [ci skip]
+ - <restricted ascii graph name> simplification [ci skip]
+ - :discard[switch] new keyword doc fix
+ - :discard[switch] new keyword fixes
+ - :discard[switch] new keyword
+ - Version 3.0.11 [ci skip]
+ - perl/ESLIF.xs: marpaESLIFPerl_is_bool optimization
+ - MarpaX/ESLIF.pm: Tiny optimization
+ - Revert "In valuation, instanciate lua state with lua_newthread instead
+   of lua_newstate" [ci skip]
+ - Avoid unnecessary events
+ - Squashed '3rdparty/github/luaunpanic/' changes from 26e8b99d..4c5c4569
+ - Merge commit '5cab1870f56f83de6799872dbb088c15c45fd571' [ci skip]
+ - In valuation, instanciate lua state with lua_newthread instead of
+   lua_newstate
+ - Squashed '3rdparty/github/luaunpanic/' changes from 1d18796c..26e8b99d
+ - Merge commit 'd9988f7ce2ecda775f60ce50bf604705a096cc66' [ci skip]
+ - Add missing meta actions to the doc [ci skip]
+ - eslif/L0.h: Simplifications [ci skip]
+ - Version 3.0.10 [ci skip]
+ - src/marpaESLIF.c: Fix memory management in case of error recovery
+ - src/marpaESLIF.c: Move management of
+   marpaESLIFRecognizerp->previousMaxMatchedl in
+   _marpaESLIFRecognizer_lexeme_alternativeb instead of
+   _marpaESLIFRecognizer_resume_oneb
+ - src/marpaESLIF.c: Move management of marpaESLIFRecognizerp->lastSizel in
+   _marpaESLIFRecognizer_lexeme_alternativeb instead of
+   _marpaESLIFRecognizer_resume_oneb
+ - src/marpaESLIF.c: Reset pristine flag in
+   _marpaESLIFRecognizer_lexeme_alternativeb instead of
+   _marpaESLIFRecognizer_resume_oneb
+ - dev+ [ci skip]
+ - java: ESLIFSymbolEventBitSet
+ - lua: symbol eventBitSet [ci skip]
+ - perl: MarpaX::ESLIF::Symbol::EventBitSet
+ - _marpaESLIF_flatten_pointers work [ci skip]
+ - Squashed '3rdparty/github/marpaWrapper/' changes from ea926630..d3bc96e4
+ - Merge commit '719c37e0825f54751771b4b939da8395f96e1ba7' [ci skip]
+ - Squashed '3rdparty/github/genericHash/' changes from 2a5695ab..3fc52b30
+ - Merge commit '5c3b13c95a5f170c1eaef52f5d5e67742eedcd48' [ci skip]
+ - Merge commit '2d0928e6eea97a2e4be7ba06c104ae6ebe3ab67c' [ci skip]
+ - Squashed '3rdparty/github/genericStack/' changes from 49e9eeae..2992af68
+ - src/marpaESLIF.c: Avoid unnecessary memcpy's in
+   _marpaESLIFRecognizer_value_validb
+ - CMakeLists.txt: Fix setting of LUA_INT_TYPE and LUA_FLOAT_TYPE
+ - Symbol event introspection
+ - Squashed '3rdparty/github/marpaWrapper/' changes from d88c2d62..ea926630
+ - Merge commit '68b94bad9878bfaf9788eeab2161a7ea585b2953' [ci skip]
+ - CMakeLists.txt: makes sure core and client luaunpanic have the same
+   number types [ci skip]
+ - CMakeLists.txt: makes sure core and client luaunpanic have the same
+   float type [ci skip]
+
+3.0.15 2019-08-03T04:45:56Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Version 3.0.15 [ci skip]
+ - perl/dist.ini: Fix potential use of undefined string in
+   _trim_whitespace()
+ - BNF/README.pod: POD fix [ci skip]
+ - .travis.yml: Update JSON::MaybeXS
+ - src/marpaESLIF.c: If discard is successful, recognizer should break if
+   there is at last one grammar event in addition to the eventual discard
+   event
+ - src/marpaESLIF.c: event sort is always missing the last event
+ - Version 3.0.14 [ci skip]
+ - t/json.t: use parse() [ci skip]
+ - t/import_export.t: Fix number of tests
+ - Version 3.0.13 [ci skip]
+ - t/thread.t: use a constant to hopefully bypass a Test::More apparent
+   random(?) bug [ci skip]
+ - src/marpaESLIFLua.c: Fix printf() debug statement [ci skip]
+ - src/marpaESLIF.c: undef default string representation is empty, \"null\"
+   is reserved to json mode
+ - Tutorials update [ci skip]
+ - doc/API/README.pod: update [ci skip]
+ - test/jsonTesterLua.c fix and <if action> BNF
+ - if-action full implementation [ci skip]
+ - if action: external definition [ci skip]
+ - symbol-action support in :lexeme and :terminal rules
+ - src/marpaESLIF.c: Fix typo in a message [ci skip]
+ - src/bootstrap.c: Fix error string associated to adverb list unpack
+   context [ci skip]
+ - Version 3.0.12
+ - Process grammar :discard[] hooks in any case only in the top recognizer
+ - Process grammar :discard[] hooks from
+   _marpaESLIFRecognizer_push_grammar_eventsb() to
+   _marpaESLIFRecognizer_push_eventb() to catch the case when they are
+   associated to lexemes ot terminals (which are not using grammar events
+   -;)
+ - Fix log calls [ci skip]
+ - Explicit terminal event [ci skip]
+ - <restricted ascii graph name> simplification [ci skip]
+ - :discard[switch] new keyword doc fix
+ - :discard[switch] new keyword fixes
+ - :discard[switch] new keyword
+ - Version 3.0.11 [ci skip]
+ - perl/ESLIF.xs: marpaESLIFPerl_is_bool optimization
+ - MarpaX/ESLIF.pm: Tiny optimization
+ - Revert "In valuation, instanciate lua state with lua_newthread instead
+   of lua_newstate" [ci skip]
+ - Avoid unnecessary events
+ - Squashed '3rdparty/github/luaunpanic/' changes from 26e8b99d..4c5c4569
+ - Merge commit '5cab1870f56f83de6799872dbb088c15c45fd571' [ci skip]
+ - In valuation, instanciate lua state with lua_newthread instead of
+   lua_newstate
+ - Squashed '3rdparty/github/luaunpanic/' changes from 1d18796c..26e8b99d
+ - Merge commit 'd9988f7ce2ecda775f60ce50bf604705a096cc66' [ci skip]
+ - Add missing meta actions to the doc [ci skip]
+ - eslif/L0.h: Simplifications [ci skip]
+ - Version 3.0.10 [ci skip]
+ - src/marpaESLIF.c: Fix memory management in case of error recovery
+ - src/marpaESLIF.c: Move management of
+   marpaESLIFRecognizerp->previousMaxMatchedl in
+   _marpaESLIFRecognizer_lexeme_alternativeb instead of
+   _marpaESLIFRecognizer_resume_oneb
+ - src/marpaESLIF.c: Move management of marpaESLIFRecognizerp->lastSizel in
+   _marpaESLIFRecognizer_lexeme_alternativeb instead of
+   _marpaESLIFRecognizer_resume_oneb
+ - src/marpaESLIF.c: Reset pristine flag in
+   _marpaESLIFRecognizer_lexeme_alternativeb instead of
+   _marpaESLIFRecognizer_resume_oneb
+ - dev+ [ci skip]
+ - java: ESLIFSymbolEventBitSet
+ - lua: symbol eventBitSet [ci skip]
+ - perl: MarpaX::ESLIF::Symbol::EventBitSet
+ - _marpaESLIF_flatten_pointers work [ci skip]
+ - Merge commit '719c37e0825f54751771b4b939da8395f96e1ba7' [ci skip]
+ - Squashed '3rdparty/github/marpaWrapper/' changes from ea926630..d3bc96e4
+ - Squashed '3rdparty/github/genericHash/' changes from 2a5695ab..3fc52b30
+ - Merge commit '5c3b13c95a5f170c1eaef52f5d5e67742eedcd48' [ci skip]
+ - Merge commit '2d0928e6eea97a2e4be7ba06c104ae6ebe3ab67c' [ci skip]
+ - Squashed '3rdparty/github/genericStack/' changes from 49e9eeae..2992af68
+ - src/marpaESLIF.c: Avoid unnecessary memcpy's in
+   _marpaESLIFRecognizer_value_validb
+ - CMakeLists.txt: Fix setting of LUA_INT_TYPE and LUA_FLOAT_TYPE
+ - Symbol event introspection
+ - Squashed '3rdparty/github/marpaWrapper/' changes from d88c2d62..ea926630
+ - Merge commit '68b94bad9878bfaf9788eeab2161a7ea585b2953' [ci skip]
+ - CMakeLists.txt: makes sure core and client luaunpanic have the same
+   number types [ci skip]
+ - CMakeLists.txt: makes sure core and client luaunpanic have the same
+   float type [ci skip]
+
+3.0.14 2019-07-22T04:51:44Z
  [Jean-Damien Durand <jeandamiendurand@free.fr>]
  - Version 3.0.14 [ci skip]
  - t/json.t: use parse() [ci skip]

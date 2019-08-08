@@ -280,6 +280,28 @@ foreach my $check_url ( 0, 1 ) {
     }
 }
 
+foreach my $skip_server_errors ( 0, 1 ) {
+    my $t = Test::Pod::LinkCheck::Lite->new(
+	skip_server_errors	=> $skip_server_errors,
+    );
+
+    note "Test with explicitly-specified skip_server_errors => $skip_server_errors";
+
+    if ( $skip_server_errors ) {
+	$t->pod_file_ok( 't/data/not_ok/server_error.pod' );
+    } else {
+
+	TODO: {
+	    local $TODO = 'Deliberate failure';
+	    my $errors = $t->pod_file_ok(
+		't/data/not_ok/server_error.pod' );
+
+	    cmp_ok $errors, '==', 1,
+		't/data/not_ok/server_error.pod error count with skip_server_erros false';
+	}
+    }
+}
+
 {
     my $code = sub { 0 };
 

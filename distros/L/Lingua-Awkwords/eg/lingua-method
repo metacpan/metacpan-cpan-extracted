@@ -1,0 +1,132 @@
+#!/usr/bin/env perl
+#
+# word parser/code generator experiement for Lingua::Awkwords. okay for
+# things like Toki Pona that use CV or VCV forms, less so for English,
+# probably needs to better deconstruct at the syllable level for better
+# results there?
+#
+#   ... | ./lingua-method > new
+#   perl new
+
+use 5.28.0;
+use warnings;
+
+my (%letters, %pattern, @plist, %ptypes, %tally, %gtally);
+
+while (readline) {
+    chomp;
+    for my $word (split ' ') {
+        parse_word($word);
+    }
+}
+
+patternize(\%pattern);
+
+for my $type (keys %ptypes) {
+    # TWEAK this here weight as necessary
+    $letters{$type} = join '/', letter_weights($type, weight => 20);
+}
+
+print <<"HEADER";
+#!/usr/bin/env perl
+use 5.28.0;
+use warnings;
+use Lingua::Awkwords::Subpattern;
+use Lingua::Awkwords;
+
+Lingua::Awkwords::Subpattern->set_patterns(
+HEADER
+
+while (my ($L, $weights) = each %letters) {
+    say '    ', $L, ' => Lingua::Awkwords->parse_string(q{ ', $weights, ' }),';
+}
+
+local $" = '/';
+print <<"FOOTER";
+);
+
+my \$tree = Lingua::Awkwords->new( pattern => q{ @plist } );
+
+for (1..20) {
+    say \$tree->render;
+}
+
+FOOTER
+
+# my excuse is I'm not a linguist
+sub deconstruct {
+    my ($s, %param) = @_;
+    my @form;
+  LEX: {
+        last LEX if $s =~ m/\G$/cg;    # end of string
+        if ($s =~ m/\G ($param{vowels}) /cgx) {
+            push @form, [ 'V', $1 ];
+            redo LEX;
+        }
+        if ($s =~ m/\G ($param{consonants}) /cgx) {
+            push @form, [ 'C', $1 ];
+            redo LEX;
+        }
+        redo LEX if $s =~ m/\G./cgs;    # dunno, step forward
+    }
+    return @form;
+}
+
+# this allows the formation of new words by allowing "letters" from the
+# global tally though with a weighting to more or less favor the form of
+# the input
+sub letter_weights {
+    my ($type, %param) = @_;
+    my $gt = $type =~ tr/ABYZ/VCVC/r;
+    my @choices;
+    for my $key (keys $tally{$type}->%*) {
+        push @choices,
+          $key . '*' . ($tally{$type}{$key} * $param{weight} + $gtally{$gt}{$key});
+    }
+    for my $key (keys $gtally{$gt}->%*) {
+        next if exists $tally{$type}{$key};
+        push @choices, $key . '*' . $gtally{$gt}{$key};
+    }
+    return @choices;
+}
+
+# TWEAK you may want a different parsage in which case different code
+# will be required
+sub parse_word {
+    my ($s) = @_;
+    my @forms = deconstruct(
+        $s,
+        vowels     => qr/[aeiou]+/,
+        consonants => qr/[bcdfghjklmnpqrstvwxyz]+/
+    );
+    return if !@forms;
+    for my $f (@forms) {
+        $gtally{ $f->[0] }{ $f->[1] }++;
+    }
+    # beginnings and endings are important? well they are here
+    $forms[0][0]  =~ tr/VC/AB/;
+    $forms[-1][0] =~ tr/VC/YZ/;
+    my $p = \%pattern;
+    for my $f (@forms) {
+        $tally{ $f->[0] }{ $f->[1] }++;
+        # build the tree used by patternize to figure out all the
+        # different large scale word forms (e.g. CVC or VC) (which means
+        # this tool only generates words using those same forms, though
+        # with the letters there in randomized)
+        $p = $p->{ $f->[0] } //= {};
+    }
+}
+
+# recurse through built pattern tree and populate pattern list
+sub patternize {
+    my ($p, $s) = @_;
+    $s //= '';
+    if (!$p->%*) {
+        push @plist, $s;
+        return;
+    }
+    for my $key (keys $p->%*) {
+        $ptypes{$key} = 1;
+        patternize($p->{$key}, $s . $key);
+    }
+}

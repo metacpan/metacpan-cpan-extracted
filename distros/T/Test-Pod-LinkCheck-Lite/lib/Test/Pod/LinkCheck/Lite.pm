@@ -21,7 +21,7 @@ use Scalar::Util ();		# Core since 5.7.3
 use Storable ();		# Core since 5.7.3
 use Test::Builder ();		# Core since 5.6.2
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use constant ON_DARWIN		=> 'darwin' eq $^O;
 use constant ON_VMS		=> 'VMS' eq $^O;
@@ -151,6 +151,10 @@ sub _default_require_installed {
     return 0;
 }
 
+sub _default_skip_server_errors {
+    return 1;
+}
+
 sub _init_agent {
     my ( $self, $name, $value ) = @_;
     $self->{$name} = $value;
@@ -254,6 +258,12 @@ sub _init_require_installed {
     return;
 }
 
+sub _init_skip_server_errors {
+    my ( $self, $name, $value ) = @_;
+    $self->{$name} = $value ? 1 : 0;
+    return;
+}
+
 sub agent {
     my ( $self ) = @_;
     return $self->{agent};
@@ -330,6 +340,7 @@ ${leader}'man' is @{[ _Boolean( $self->man() ) ]}
 ${leader}'module_index' is ( @{[ join ', ', map { "'$_'" }
     $self->module_index() ]} )
 ${leader}'require_installed' is @{[ _Boolean( $self->require_installed() ) ]}
+${leader}'skip_server_errors' is @{[ _Boolean( $self->skip_server_errors() ) ]}
 EOD
 }
 
@@ -436,6 +447,11 @@ sub pod_file_ok {
 sub require_installed {
     my ( $self ) = @_;
     return $self->{require_installed};
+}
+
+sub skip_server_errors {
+    my ( $self ) = @_;
+    return $self->{skip_server_errors};
 }
 
 sub _user_agent {
@@ -789,6 +805,11 @@ sub _handle_url {
 
     $resp->{success}
 	and return 0;
+
+    $self->skip_server_errors()
+	and $resp->{status} =~ m/ \A 5 /smx
+	and return $self->_skip( $link,
+	    "not checked: server error $resp->{status} $resp->{reason}" );
 
     return $self->_fail( $link, "broken: $resp->{status} $resp->{reason}" );
 }
@@ -1246,6 +1267,24 @@ if the module exists.
 
 By default this is false.
 
+=item skip_server_errors
+
+Added in version 0.002.
+
+This Boolean argument is true to generate skips rather than failures if
+an attempt to check a URL link fails with a server error (status
+C<5xx>).
+
+By default this is true; it can be made false by passing value C<0> or
+C<''>.
+
+The default represents a change in the default behaviour from version
+C<0.001>, which failed a URL link if the check returned a server error.
+The logic (if any) in changing the default behaviour is that C<5xx>
+errors can represent actual server problems rather than errors in the
+link being checked, so changing the default behaviour eliminates
+possible false positives.
+
 =back
 
 =head2 agent
@@ -1340,6 +1379,15 @@ failures, passes, and skipped tests, in that order.
     and say 'All POD links must be to installed modules';
 
 This method returns the value of the C<'require_installed'> attribute.
+
+=head2 skip_server_errors
+
+ $t->skip_server_errors()
+    and say 'URL links that return status 5xx are skipped';
+
+Added in version 0.002.
+
+This method returns the value of the C<'skip_server_errors'> attribute.
 
 =head1 SEE ALSO
 

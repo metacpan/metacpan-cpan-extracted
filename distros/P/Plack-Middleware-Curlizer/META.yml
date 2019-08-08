@@ -14,7 +14,7 @@ configure_requires:
   Module::Build::Pluggable: '0'
   Module::Build::Pluggable::CPANfile: '0.05'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,12 +23,12 @@ name: Plack-Middleware-Curlizer
 provides:
   Plack::Middleware::Curlizer:
     file: lib/Plack/Middleware/Curlizer.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   Plack::Middleware: '0'
   Plack::Request: '0'
   Plack::Util::Accessor: '0'
-  ShellQuote::Any: '0'
+  ShellQuote::Any: '0.04'
   perl: '5.008005'
   strict: '0'
   warnings: '0'
@@ -39,5 +39,5 @@ resources:
   bugtracker: http://github.com/bayashi/Plack-Middleware-Curlizer/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/bayashi/Plack-Middleware-Curlizer
-version: '0.02'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.016'
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

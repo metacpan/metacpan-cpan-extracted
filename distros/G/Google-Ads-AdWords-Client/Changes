@@ -1,3 +1,6 @@
+5.8.1
+- Updating unit tests to support new version of Perl.
+
 5.8.0
 - Removed examples and support for v201806.
 For future sunset dates, see

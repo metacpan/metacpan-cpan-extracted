@@ -3,9 +3,9 @@ NAME
     common option to upgrade program to the latest version on CPAN
 
 VERSION
-    This document describes version 0.002 of
+    This document describes version 0.003 of
     Perinci::CmdLineX::CommonOptions::SelfUpgrade (from Perl distribution
-    Perinci-CmdLineX-CommonOptions-SelfUpgrade), released on 2019-06-19.
+    Perinci-CmdLineX-CommonOptions-SelfUpgrade), released on 2019-08-07.
 
 SYNOPSIS
      use Perinci::CmdLine::Lite; # or ::Classic, or ::Any

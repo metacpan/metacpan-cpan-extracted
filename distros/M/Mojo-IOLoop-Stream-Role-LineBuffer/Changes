@@ -1,3 +1,6 @@
+0.004     2019-08-07 11:54:05 EDT
+  - Optimization to buffer parsing (#2, kiwiroy)
+
 0.003     2018-03-30 13:40:42 EDT
   - Use IO::Pipely for portable tests
 

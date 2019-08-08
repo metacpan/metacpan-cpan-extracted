@@ -1,7 +1,7 @@
 Build.PL
 Changes
-eg/README
 eg/manpath.PL
+eg/README
 eg/test-pod-links
 inc/Mock/HTTP/Tiny.pm
 inc/My/Module/Build.pm
@@ -22,6 +22,7 @@ t/data/not_ok/external_installed_bad_section.pod
 t/data/not_ok/external_installed_section.pod
 t/data/not_ok/internal_error.pod
 t/data/not_ok/man_bad.pod
+t/data/not_ok/server_error.pod
 t/data/pod_ok/bug_leading_format_code.pod
 t/data/pod_ok/bug_line_break.pod
 t/data/pod_ok/bug_recursion.pod

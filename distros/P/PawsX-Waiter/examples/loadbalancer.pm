@@ -1,5 +1,6 @@
 #!/usr/bin/perl
 
+use feature 'say';
 use Try::Tiny;
 use Paws;
 use Paws::Credential::File;
@@ -35,6 +36,12 @@ PawsX::Waiter->meta->apply($service);
     );
 
     my $waiter = $service->GetWaiter('InstanceInService');  
+
+     $waiter->beforeWait(sub { 
+	 my ($w, $attempts, $response) = @_;
+         say STDERR "Waiter attempts left:" . ( $w->maxAttempts - $attempts );
+     }); 
+
     $waiter->wait(
         {
             LoadBalancerName => $loadbalancer,

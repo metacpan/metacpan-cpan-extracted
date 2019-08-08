@@ -1,5 +1,14 @@
 Revision history for Firefox-Marionette
 
+0.80  Sat Aug  3 16:57:00 2019
+       Added survive, user and host parameters to new method.
+
+0.79  Thu Aug  1 06:32:00 2019
+       Adding remote support for linux/bsd.
+       Adding window width/height parameters for initial firefox window.
+       Improving documentation.
+       Fixing delete_session bug in RT#130236.
+
 0.78  Thu Jun 11 17:18:00 2019
        Adding support for Firefox 68.
        Adding strict_file_interactability, unhandled_prompt_behavior, set_window_rect and moz_shutdown_timeout to capabilities.

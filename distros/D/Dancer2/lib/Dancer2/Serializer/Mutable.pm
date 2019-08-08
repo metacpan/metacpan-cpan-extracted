@@ -1,6 +1,6 @@
 package Dancer2::Serializer::Mutable;
 # ABSTRACT: Serialize and deserialize content based on HTTP header
-$Dancer2::Serializer::Mutable::VERSION = '0.208000';
+$Dancer2::Serializer::Mutable::VERSION = '0.208001';
 use Moo;
 use Carp 'croak';
 use Encode;
@@ -118,7 +118,7 @@ Dancer2::Serializer::Mutable - Serialize and deserialize content based on HTTP h
 
 =head1 VERSION
 
-version 0.208000
+version 0.208001
 
 =head1 SYNOPSIS
 

@@ -4,12 +4,13 @@
 use strict;
 use warnings;
 
+use App::ElasticSearch::Utilities qw(:default);
+use CLI::Helpers qw(:all);
 use DateTime;
-use YAML;
 use Getopt::Long qw(:config no_ignore_case no_ignore_case_always);
 use Pod::Usage;
-use CLI::Helpers qw(:all);
-use App::ElasticSearch::Utilities qw(:default);
+use Ref::Util qw( is_ref );
+use YAML;
 
 #------------------------------------------------------------------------#
 # Argument Collection
@@ -79,7 +80,16 @@ my %PARTS = (
     }
 );
 
+my %IGNORE = ();
+
 foreach my $base (keys %{ $ALIAS }) {
+    # Index Aliases Managed Manually
+    if( ! is_ref($ALIAS->{$base}) ) {
+        $IGNORE{$base} = 1;
+        delete $ALIAS->{$base};
+        next;
+    }
+
     my $re = $ALIAS->{$base}{pattern};
     $re =~ s/[^\w{}*?-]+//g;
 
@@ -120,7 +130,10 @@ debug_var($ALIAS);
 # Loop through the indices and take appropriate actions;
 foreach my $index (sort keys %{ $indices }) {
     debug("$index being evaluated");
-    my %current = %{ $indices->{$index}{aliases}};
+    my %current = map { $_ => 1 }
+                  grep { !/^\./ }
+                  grep { not exists $IGNORE{$_} }
+                  keys %{ $indices->{$index}{aliases} };
     my $managed = 0;
 
     my %desired = ();
@@ -150,7 +163,7 @@ foreach my $index (sort keys %{ $indices }) {
         }
     }
     my @updates = ();
-    my %checks = map { $_ => 1 } keys(%desired),keys(%current);
+    my %checks = map { $_ => 1 } keys(%desired), keys(%current);
     if( $managed ) {
         foreach my $alias (keys %checks) {
             if( exists $desired{$alias} && exists $current{$alias} ) {
@@ -186,7 +199,7 @@ es-alias-manager.pl - Allow easy alias management for daily indexes
 
 =head1 VERSION
 
-version 7.0
+version 7.1
 
 =head1 SYNOPSIS
 
@@ -251,6 +264,7 @@ to a homogenous index that standard LogStash/Kibana interfaces will understand.
 If I create the following in /etc/elasticsearch/aliases.yml
 
     ---
+    pickle: ~
     logstash:
       pattern: \*-logstash-{{DATE}}
       daily: logstash-{{DATE}}
@@ -267,6 +281,9 @@ If I create the following in /etc/elasticsearch/aliases.yml
               days: 14
             to:
               days: 7
+
+The C<pickle> alias is flagged as an alias to ignore in the addition/removal
+process. This script will automatically ignore any alias that begins with a '.'.
 
 Assuming today is the 2013.07.18 and I have 3 datacenters (IAD, NYC, AMS) with the following indices:
 

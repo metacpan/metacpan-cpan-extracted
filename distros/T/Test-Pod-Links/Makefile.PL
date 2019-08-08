@@ -7,7 +7,7 @@ use 5.006;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Test Pod for invalid HTTP/S links",
+  "ABSTRACT" => "test Pod for invalid HTTP/S links",
   "AUTHOR" => "Sven Kirmess <sven.kirmess\@kzone.ch>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -18,28 +18,26 @@ my %WriteMakefileArgs = (
   "NAME" => "Test::Pod::Links",
   "PREREQ_PM" => {
     "Carp" => 0,
-    "File::Find" => 0,
     "HTTP::Tiny" => "0.014",
     "Pod::Simple::Search" => 0,
     "Pod::Simple::SimpleTree" => 0,
     "Scalar::Util" => 0,
     "Test::Builder" => 0,
+    "Test::XTFiles" => 0,
     "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Cwd" => 0,
+    "File::Temp" => 0,
     "FindBin" => 0,
-    "POSIX" => 0,
     "Test::Builder::Tester" => 0,
     "Test::Fatal" => 0,
     "Test::MockModule" => 0,
     "Test::More" => "0.88",
-    "Test::TempDir::Tiny" => 0,
-    "autodie" => 0,
+    "constant" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,11 +46,9 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
-  "Cwd" => 0,
-  "File::Find" => 0,
+  "File::Temp" => 0,
   "FindBin" => 0,
   "HTTP::Tiny" => "0.014",
-  "POSIX" => 0,
   "Pod::Simple::Search" => 0,
   "Pod::Simple::SimpleTree" => 0,
   "Scalar::Util" => 0,
@@ -61,8 +57,8 @@ my %FallbackPrereqs = (
   "Test::Fatal" => 0,
   "Test::MockModule" => 0,
   "Test::More" => "0.88",
-  "Test::TempDir::Tiny" => 0,
-  "autodie" => 0,
+  "Test::XTFiles" => 0,
+  "constant" => 0,
   "lib" => 0,
   "strict" => 0,
   "warnings" => 0

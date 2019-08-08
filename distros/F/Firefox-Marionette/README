@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 0.78
+    Version 0.80
 
 SYNOPSIS
 
@@ -32,85 +32,265 @@ DESCRIPTION
 
 SUBROUTINES/METHODS
 
- new
+ accept_alert
 
-    accepts an optional hash as a parameter. Allowed keys are below;
+    accepts a currently displayed modal message box
 
-      * firefox_binary - use the specified path to the Firefox
-      <https://firefox.org/> binary, rather than the default path.
+ accept_connections
 
-      * capabilities - use the supplied capabilities object, for example to
-      set whether the browser should accept insecure certs or whether the
-      browser should use a proxy.
+    Enables or disables accepting new socket connections. By calling this
+    method with false the server will not accept any further connections,
+    but existing connections will not be forcible closed. Use true to
+    re-enable accepting connections.
 
-      * profile_name - pick a specific existing profile to automate, rather
-      than creating a new profile. Note that firefox <https://firefox.com>
-      refuses to allow more than one instance of a profile to run at the
-      same time. Profile names can be obtained by using the
-      Firefox::Marionette::Profile::names() method. NOTE: firefox ignores
-      any changes made to the profile on the disk while it is running.
+    Please note that when closing the connection via the client you can
+    end-up in a non-recoverable state if it hasn't been enabled before.
 
-      * profile - create a new profile based on the supplied profile. NOTE:
-      firefox ignores any changes made to the profile on the disk while it
-      is running.
+ active_element
 
-      * debug - should firefox's debug to be available via STDERR. This
-      defaults to "0".
+    returns the active element of the current browsing context's document
+    element, if the document element is non-null.
 
-      * addons - should any firefox extensions and themes be available in
-      this session. This defaults to "0".
+ active_frame
 
-      * mime_types - any MIME types that Firefox will encounter during this
-      session. MIME types that are not specified will result in a hung
-      browser (the File Download popup will appear).
+    returns the current active frame if there is one in the current
+    browsing context. Otherwise, this method returns undef.
 
-      * sleep_time_in_ms - the amount of time (in milliseconds) that this
-      module should sleep when unsuccessfully calling the subroutine
-      provided to the await or bye methods. This defaults to "1"
-      millisecond.
+ add_cookie
 
-      * visible - should firefox be visible on the desktop. This defaults
-      to "0".
+    accepts a single cookie object as the first parameter and adds it to
+    the current cookie jar. This method returns itself to aid in chaining
+    methods.
 
-      * timeouts - a shortcut to allow directly providing a timeout object,
-      instead of needing to use timeouts from the capabilities parameter.
-      Overrides the timeouts provided (if any) in the capabilities
-      parameter.
+ addons
 
-      * page_load - a shortcut to allow directly providing the page_load
-      timeout, instead of needing to use timeouts from the capabilities
-      parameter. Overrides all longer ways.
+    returns if pre-existing addons (extensions/themes) are allowed to run.
+    This will be true for Firefox versions less than 55, as -safe-mode
+    cannot be automated.
 
-      * script - a shortcut to allow directly providing the script timeout,
-      instead of needing to use timeouts from the capabilities parameter.
-      Overrides all longer ways.
+ alert_text
 
-      * implicit - a shortcut to allow directly providing the implicit
-      timeout, instead of needing to use timeouts from the capabilities
-      parameter. Overrides all longer ways.
+    Returns the message shown in a currently displayed modal message box
 
-    This method returns a new Firefox::Marionette object, connected to an
-    instance of firefox <https://firefox.com>. In a non MacOS/Win32/Cygwin
-    environment, if necessary (no DISPLAY variable can be found and visible
-    has been set to true) and possible (Xvfb can be executed successfully),
-    this method will also automatically start an Xvfb
-    <https://en.wikipedia.org/wiki/Xvfb> instance.
+ alive
 
- go
+    This method returns true or false depending on if the Firefox process
+    is still running.
 
-    Navigates the current browsing context to the given URI and waits for
-    the document to load or the session's page_load duration to elapse
+ application_type
+
+    returns the application type for the Marionette protocol. Should be
+    'gecko'.
+
+ async_script
+
+    accepts a scalar containing a javascript function that is executed in
+    the browser. This method returns itself to aid in chaining methods.
+
+    The executing javascript is subject to the script timeout, which, by
+    default is 30 seconds.
+
+ attribute
+
+    accepts an element as the first parameter and a scalar attribute name
+    as the second parameter. It returns the initial value of the attribute
+    with the supplied name. This method will return the initial content,
+    the property method will return the current content.
+
+        use Firefox::Marionette();
+    
+        my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+        my $element = $firefox->find_id('search_input');
+        !defined $element->attribute('value') or die "attribute is not defined!");
+        $element->type('Test::More');
+        !defined $element->attribute('value') or die "attribute is still not defined!");
+
+ await
+
+    accepts a subroutine reference as a parameter and then executes the
+    subroutine. If a not found exception is thrown, this method will sleep
+    for sleep_time_in_ms milliseconds and then execute the subroutine
+    again. When the subroutine executes successfully, it will return what
+    the subroutine returns.
+
+        use Firefox::Marionette();
+    
+        my $firefox = Firefox::Marionette->new(sleep_time_in_ms => 5)->go('https://metacpan.org/');
+    
+        $firefox->find_id('search-input')->type('Test::More');
+    
+        $firefox->find_name('lucky')->click();
+    
+        $firefox->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click();
+
+ back
+
+    causes the browser to traverse one step backward in the joint history
+    of the current browsing context. The browser will wait for the one step
+    backward to complete or the session's page_load duration to elapse
     before returning, which, by default is 5 minutes. This method returns
-    itself to aid in chaining methods
+    itself to aid in chaining methods.
 
- uri
+ browser_version
 
-    returns the current URI of current top level browsing context for
-    Desktop. It is equivalent to the javascript document.location.href
+    This method returns version of firefox.
 
- title
+ bye
 
-    returns the current title of the window.
+    accepts a subroutine reference as a parameter and then executes the
+    subroutine. If the subroutine executes successfully, this method will
+    sleep for sleep_time_in_ms milliseconds and then execute the subroutine
+    again. When a not found exception is thrown, this method will return
+    itself to aid in chaining methods.
+
+        use Firefox::Marionette();
+    
+        my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+    
+        $firefox->find_id('search-input')->type('Test::More');
+    
+        $firefox->find_name('lucky')->click();
+    
+        $firefox->bye(sub { $firefox->find_name('lucky') })->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click();
+
+ capabilities
+
+    returns the capabilities of the current firefox binary. You can
+    retrieve timeouts or a proxy with this method.
+
+ child_error
+
+    This method returns the $? (CHILD_ERROR) for the Firefox process, or
+    undefined if the process has not yet exited.
+
+ chrome_window_handle
+
+    returns an server-assigned integer identifiers for the current chrome
+    window that uniquely identifies it within this Marionette instance.
+    This can be used to switch to this window at a later point. This
+    corresponds to a window that may itself contain tabs.
+
+ chrome_window_handles
+
+    returns identifiers for each open chrome window for tests interested in
+    managing a set of chrome windows and tabs separately.
+
+ clear
+
+    accepts a element as the first parameter and clears any user supplied
+    input
+
+ click
+
+    accepts a element as the first parameter and sends a 'click' to it. The
+    browser will wait for any page load to complete or the session's
+    page_load duration to elapse before returning, which, by default is 5
+    minutes.
+
+ close_current_chrome_window_handle
+
+    closes the current chrome window (that is the entire window, not just
+    the tabs). It returns a list of still available chrome window handles.
+    You will need to switch_to_window to use another window.
+
+ close_current_window_handle
+
+    closes the current window/tab. It returns a list of still available
+    window/tab handles.
+
+ context
+
+    returns the context type that is Marionette's current target for
+    browsing context scoped commands.
+
+ cookies
+
+    returns the contents of the cookie jar in scalar or list context.
+
+ css
+
+    accepts an element as the first parameter and a scalar CSS property
+    name as the second parameter. It returns the value of the computed
+    style for that property.
+
+ current_chrome_window_handle
+
+    see chrome_window_handle.
+
+ delete_cookie
+
+    deletes a single cookie by name. Accepts a scalar containing the cookie
+    name as a parameter. This method returns itself to aid in chaining
+    methods.
+
+ delete_cookies
+
+    here be cookie monsters! This method returns itself to aid in chaining
+    methods.
+
+ delete_session
+
+    deletes the current WebDriver session.
+
+ dismiss_alert
+
+    dismisses a currently displayed modal message box
+
+ downloading
+
+    returns true if any files in downloads end in .part
+
+        use Firefox::Marionette();
+    
+        my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+    
+        $firefox->find_class('container-fluid')->find_id('search-input')->type('Test::More');
+    
+        $firefox->find('//button[@name="lucky"]')->click();
+    
+        $firefox->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click();
+    
+        while(!$firefox->downloads()) { sleep 1 }
+    
+        while($firefox->downloading()) { sleep 1 }
+    
+        foreach my $path ($firefox->downloads()) {
+            say $path;
+        }
+
+ downloads
+
+    returns a list of file paths (including partial downloads) of downloads
+    during this Firefox session.
+
+        use Firefox::Marionette();
+        use v5.10;
+    
+        my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+    
+        $firefox->find_class('container-fluid')->find_id('search-input')->type('Test::More');
+    
+        $firefox->find('//button[@name="lucky"]')->click();
+    
+        $firefox->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click();
+    
+        while(!$firefox->downloads()) { sleep 1 }
+    
+        foreach my $path ($firefox->downloads()) {
+            say $path;
+        }
+
+ error_message
+
+    This method returns a human readable error message describing how the
+    Firefox process exited (assuming it started okay). On Win32 platforms
+    this information is restricted to exit code.
+
+ execute
+
+    This utility method executes a command with arguments and returns
+    STDOUT as a chomped string. It is a simple method only intended for the
+    Firefox::Marionette::* modules.
 
  find
 
@@ -289,176 +469,39 @@ SUBROUTINES/METHODS
 
     If no elements are found, a not found exception will be thrown.
 
- css
+ forward
 
-    accepts an element as the first parameter and a scalar CSS property
-    name as the second parameter. It returns the value of the computed
-    style for that property.
+    causes the browser to traverse one step forward in the joint history of
+    the current browsing context. The browser will wait for the one step
+    forward to complete or the session's page_load duration to elapse
+    before returning, which, by default is 5 minutes. This method returns
+    itself to aid in chaining methods.
 
- attribute
+ full_screen
 
-    accepts an element as the first parameter and a scalar attribute name
-    as the second parameter. It returns the initial value of the attribute
-    with the supplied name. This method will return the initial content,
-    the property method will return the current content.
+    full screens the firefox window. This method returns itself to aid in
+    chaining methods.
 
-        use Firefox::Marionette();
-    
-        my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
-        my $element = $firefox->find_id('search_input');
-        !defined $element->attribute('value') or die "attribute is not defined!");
-        $element->type('Test::More');
-        !defined $element->attribute('value') or die "attribute is still not defined!");
+ go
 
- property
-
-    accepts an element as the first parameter and a scalar attribute name
-    as the second parameter. It returns the current value of the property
-    with the supplied name. This method will return the current content,
-    the attribute method will return the initial content.
+    Navigates the current browsing context to the given URI and waits for
+    the document to load or the session's page_load duration to elapse
+    before returning, which, by default is 5 minutes.
 
         use Firefox::Marionette();
     
-        my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
-        my $element = $firefox->find_id('search_input');
-        $element->property('value') eq '' or die "Initial property is the empty string";
-        $element->type('Test::More');
-        $element->property('value') eq 'Test::More' or die "This property should have changed!";
+        my $firefox = Firefox::Marionette->new();
+        $firefox->go('https://metacpan.org/'); # will only return when metacpan.org is FULLY loaded (including all images / js / css)
 
- interactive
-
-    returns true if document.readyState === "interactive" or if loaded is
-    true
+    To make the go method return quicker, you need to set the page load
+    strategy capability to an appropriate value, such as below;
 
         use Firefox::Marionette();
     
-        my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
-        $firefox->find_id('search_input')->type('Type::More');
-        $firefox->find('//button[@name="lucky"]')->click();
-        while(!$firefox->interactive()) {
-            # redirecting to Test::More page
-        }
+        my $firefox = Firefox::Marionette->new( capabilities => Firefox::Marionette::Capabilities->new( page_load_strategy => 'none' ));
+        $firefox->go('https://metacpan.org/'); # will return immediately after requesting the browser to navigate to metacpan.org
 
- loaded
-
-    returns true if document.readyState === "complete"
-
-        use Firefox::Marionette();
-    
-        my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
-        $firefox->find_id('search_input')->type('Type::More');
-        $firefox->find('//button[@name="lucky"]')->click();
-        while(!$firefox->loaded()) {
-            # redirecting to Test::More page
-        }
-
- mime_types
-
-    returns a list of MIME types that will be downloaded by firefox and
-    made available from the downloads method
-
-        use Firefox::Marionette();
-        use v5.10;
-    
-        my $firefox = Firefox::Marionette->new(mime_types => [ 'application/pkcs10' ])
-    
-        foreach my $mime_type ($firefox->mime_types()) {
-            say $mime_type;
-        }
-
- downloads
-
-    returns a list of file paths (including partial downloads) of downloads
-    during this Firefox session.
-
-        use Firefox::Marionette();
-        use v5.10;
-    
-        my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
-    
-        $firefox->find_class('container-fluid')->find_id('search-input')->type('Test::More');
-    
-        $firefox->find('//button[@name="lucky"]')->click();
-    
-        $firefox->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click();
-    
-        while(!$firefox->downloads()) { sleep 1 }
-    
-        foreach my $path ($firefox->downloads()) {
-            say $path;
-        }
-
- downloading
-
-    returns true if any files in downloads end in .part
-
-        use Firefox::Marionette();
-    
-        my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
-    
-        $firefox->find_class('container-fluid')->find_id('search-input')->type('Test::More');
-    
-        $firefox->find('//button[@name="lucky"]')->click();
-    
-        $firefox->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click();
-    
-        while(!$firefox->downloads()) { sleep 1 }
-    
-        while($firefox->downloading()) { sleep 1 }
-    
-        foreach my $path ($firefox->downloads()) {
-            say $path;
-        }
-
- script
-
-    accepts a scalar containing a javascript function body that is executed
-    in the browser, and an optional hash as a second parameter. Allowed
-    keys are below;
-
-      * args - The reference to a list is the arguments passed to the
-      function body.
-
-      * timeout - A timeout to override the default script timeout, which,
-      by default is 30 seconds.
-
-      * sandbox - Name of the sandbox to evaluate the script in. The
-      sandbox is cached for later re-use on the same window
-      <https://developer.mozilla.org/en-US/docs/Web/API/Window>object if
-      new is false. If he parameter is undefined, the script is evaluated
-      in a mutable sandbox. If the parameter is "system", it will be
-      evaluted in a sandbox with elevated system privileges, equivalent to
-      chrome space.
-
-      * new - Forces the script to be evaluated in a fresh sandbox. Note
-      that if it is undefined, the script will normally be evaluted in a
-      fresh sandbox.
-
-      * filename - Filename of the client's program where this script is
-      evaluated.
-
-      * line - Line in the client's program where this script is evaluated.
-
-    Returns the result of the javascript function.
-
-        use Firefox::Marionette();
-    
-        my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
-    
-        if ($firefox->script('return window.find("lucky");')) {
-            # luckily!
-        }
-
-    The executing javascript is subject to the script timeout, which, by
-    default is 30 seconds.
-
- async_script
-
-    accepts a scalar containing a javascript function that is executed in
-    the browser. This method returns itself to aid in chaining methods.
-
-    The executing javascript is subject to the script timeout, which, by
-    default is 30 seconds.
+    This method returns itself to aid in chaining methods.
 
  html
 
@@ -473,111 +516,34 @@ SUBROUTINES/METHODS
     
         say Firefox::Marionette->new()->go('https://metacpan.org/')->html();
 
- strip
+ install
 
-    returns the page source of the content document after an attempt has
-    been made to remove typical firefox html wrappers of non html content
-    types such as text/plain and application/json. See the json method for
-    an alternative when dealing with response content types such as
-    application/json and html for an alterative when dealing with html
-    content types. This is a convenience method that wraps the html method.
-
-        use Firefox::Marionette();
-        use JSON();
-        use v5.10;
-    
-        say JSON::decode_json(Firefox::Marionette->new()->go('https://fastapi.metacpan.org/v1/download_url/Firefox::Marionette")->strip())->{version};
-
- json
-
-    returns a JSON object that has been parsed from the page source of the
-    content document. This is a convenience method that wraps the strip
-    method.
-
-        use Firefox::Marionette();
-        use v5.10;
-    
-        say Firefox::Marionette->new()->go('https://fastapi.metacpan.org/v1/download_url/Firefox::Marionette")->json()->{version};
-
- context
-
-    returns the context type that is Marionette's current target for
-    browsing context scoped commands.
-
- add_cookie
-
-    accepts a single cookie object as the first parameter and adds it to
-    the current cookie jar. This method returns itself to aid in chaining
-    methods.
-
- delete_cookie
-
-    deletes a single cookie by name. Accepts a scalar containing the cookie
-    name as a parameter. This method returns itself to aid in chaining
-    methods.
-
- delete_cookies
-
-    here be cookie monsters! This method returns itself to aid in chaining
-    methods.
-
- cookies
-
-    returns the contents of the cookie jar in scalar or list context.
-
- type
-
-    accepts an element as the first parameter and a string as the second
-    parameter. It sends the string to the specified element in the current
-    page, such as filling out a text box. This method returns itself to aid
-    in chaining methods.
-
- await
-
-    accepts a subroutine reference as a parameter and then executes the
-    subroutine. If a not found exception is thrown, this method will sleep
-    for sleep_time_in_ms milliseconds and then execute the subroutine
-    again. When the subroutine executes successfully, it will return what
-    the subroutine returns.
+    accepts the fully qualified path to an .xpi addon file as the first
+    parameter and an optional true/false second parameter to indicate if
+    the xpi addon file should be a temporary addition (just for the
+    existance of this browser instance). Unsigned xpi addon files may be
+    loaded temporarily. It returns the GUID for the addon which may be used
+    as a parameter to the uninstall method.
 
         use Firefox::Marionette();
     
-        my $firefox = Firefox::Marionette->new(sleep_time_in_ms => 5)->go('https://metacpan.org/');
+        my $firefox = Firefox::Marionette->new();
     
-        $firefox->find_id('search-input')->type('Test::More');
-    
-        $firefox->find_name('lucky')->click();
-    
-        $firefox->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click();
+        my $extension_id = $firefox->install('/full/path/to/gnu_terry_pratchett-0.4-an+fx.xpi');
 
- bye
+ interactive
 
-    accepts a subroutine reference as a parameter and then executes the
-    subroutine. If the subroutine executes successfully, this method will
-    sleep for sleep_time_in_ms milliseconds and then execute the subroutine
-    again. When a not found exception is thrown, this method will return
-    itself to aid in chaining methods.
+    returns true if document.readyState === "interactive" or if loaded is
+    true
 
         use Firefox::Marionette();
     
         my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
-    
-        $firefox->find_id('search-input')->type('Test::More');
-    
-        $firefox->find_name('lucky')->click();
-    
-        $firefox->bye(sub { $firefox->find_name('lucky') })->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click();
-
- sleep_time_in_ms
-
-    accepts a new time to sleep in await or bye methods and returns the
-    previous time. The default time is "1" millisecond.
-
-        use Firefox::Marionette();
-    
-        my $firefox = Firefox::Marionette->new(sleep_time_in_ms => 5); # setting default time to 5 milliseconds
-    
-        my $old_time_in_ms = $firefox->sleep_time_in_ms(8); # setting default time to 8 milliseconds, returning 5 (milliseconds)
+        $firefox->find_id('search_input')->type('Type::More');
+        $firefox->find('//button[@name="lucky"]')->click();
+        while(!$firefox->interactive()) {
+            # redirecting to Test::More page
+        }
 
  is_displayed
 
@@ -594,51 +560,152 @@ SUBROUTINES/METHODS
     accepts an element as the first parameter. This method returns true or
     false depending on if the element is selected.
 
- active_element
+ json
 
-    returns the active element of the current browsing context's document
-    element, if the document element is non-null.
+    returns a JSON object that has been parsed from the page source of the
+    content document. This is a convenience method that wraps the strip
+    method.
 
- back
+        use Firefox::Marionette();
+        use v5.10;
+    
+        say Firefox::Marionette->new()->go('https://fastapi.metacpan.org/v1/download_url/Firefox::Marionette")->json()->{version};
 
-    causes the browser to traverse one step backward in the joint history
-    of the current browsing context. The browser will wait for the one step
-    backward to complete or the session's page_load duration to elapse
-    before returning, which, by default is 5 minutes. This method returns
-    itself to aid in chaining methods.
+ loaded
 
- forward
+    returns true if document.readyState === "complete"
 
-    causes the browser to traverse one step forward in the joint history of
-    the current browsing context. The browser will wait for the one step
-    forward to complete or the session's page_load duration to elapse
-    before returning, which, by default is 5 minutes. This method returns
-    itself to aid in chaining methods.
+        use Firefox::Marionette();
+    
+        my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+        $firefox->find_id('search_input')->type('Type::More');
+        $firefox->find('//button[@name="lucky"]')->click();
+        while(!$firefox->loaded()) {
+            # redirecting to Test::More page
+        }
 
- active_frame
+ marionette_protocol
 
-    returns the current active frame if there is one in the current
-    browsing context. Otherwise, this method returns undef.
+    returns the version for the Marionette protocol. Current most recent
+    version is '3'.
 
- switch_to_shadow_root
+ maximise
 
-    accepts an element as a parameter and switches to it's shadow root
-    <https://www.w3.org/TR/shadow-dom/>
+    maximises the firefox window. This method returns itself to aid in
+    chaining methods.
 
- switch_to_window
+ mime_types
 
-    accepts a window handle (either the result of window_handles or a
-    window name as a parameter and switches focus to this window.
+    returns a list of MIME types that will be downloaded by firefox and
+    made available from the downloads method
 
- switch_to_frame
+        use Firefox::Marionette();
+        use v5.10;
+    
+        my $firefox = Firefox::Marionette->new(mime_types => [ 'application/pkcs10' ])
+    
+        foreach my $mime_type ($firefox->mime_types()) {
+            say $mime_type;
+        }
 
-    accepts a frame as a parameter and switches to it within the current
-    window.
+ minimise
 
- switch_to_parent_frame
+    minimises the firefox window. This method returns itself to aid in
+    chaining methods.
 
-    set the current browsing context for future commands to the parent of
-    the current browsing context
+ new
+
+    accepts an optional hash as a parameter. Allowed keys are below;
+
+      * addons - should any firefox extensions and themes be available in
+      this session. This defaults to "0".
+
+      * capabilities - use the supplied capabilities object, for example to
+      set whether the browser should accept insecure certs or whether the
+      browser should use a proxy.
+
+      * firefox_binary - use the specified path to the Firefox
+      <https://firefox.org/> binary, rather than the default path.
+
+      * debug - should firefox's debug to be available via STDERR. This
+      defaults to "0".
+
+      * height - set the height
+      <http://kb.mozillazine.org/Command_line_arguments#List_of_command_line_arguments_.28incomplete.29>
+      of the initial firefox window
+
+      * host - use ssh <https://man.openbsd.org/ssh.1> to create and
+      automate firefox on the specified host. The "firefox_binary" and
+      "user" parameters may be useful in this case. Authentication is
+      expected to be via your local ssh-agent. This has only been tested on
+      linux and darwin environments. Feedback welcome.
+
+      * implicit - a shortcut to allow directly providing the implicit
+      timeout, instead of needing to use timeouts from the capabilities
+      parameter. Overrides all longer ways.
+
+      * mime_types - any MIME types that Firefox will encounter during this
+      session. MIME types that are not specified will result in a hung
+      browser (the File Download popup will appear).
+
+      * page_load - a shortcut to allow directly providing the page_load
+      timeout, instead of needing to use timeouts from the capabilities
+      parameter. Overrides all longer ways.
+
+      * profile - create a new profile based on the supplied profile. NOTE:
+      firefox ignores any changes made to the profile on the disk while it
+      is running.
+
+      * profile_name - pick a specific existing profile to automate, rather
+      than creating a new profile. Note that firefox <https://firefox.com>
+      refuses to allow more than one instance of a profile to run at the
+      same time. Profile names can be obtained by using the
+      Firefox::Marionette::Profile::names() method. NOTE: firefox ignores
+      any changes made to the profile on the disk while it is running.
+
+      * script - a shortcut to allow directly providing the script timeout,
+      instead of needing to use timeouts from the capabilities parameter.
+      Overrides all longer ways.
+
+      * sleep_time_in_ms - the amount of time (in milliseconds) that this
+      module should sleep when unsuccessfully calling the subroutine
+      provided to the await or bye methods. This defaults to "1"
+      millisecond.
+
+      * survive - if this is set to a true value, firefox will not
+      automatically exit when the object goes out of scope.
+
+      * timeouts - a shortcut to allow directly providing a timeout object,
+      instead of needing to use timeouts from the capabilities parameter.
+      Overrides the timeouts provided (if any) in the capabilities
+      parameter.
+
+      * user - if the "host" parameter is also set, the "user" parameter
+      will specify the user that ssh will attempt to login as
+
+      * visible - should firefox be visible on the desktop. This defaults
+      to "0".
+
+      * width - set the width
+      <http://kb.mozillazine.org/Command_line_arguments#List_of_command_line_arguments_.28incomplete.29>
+      of the initial firefox window
+
+    This method returns a new Firefox::Marionette object, connected to an
+    instance of firefox <https://firefox.com>. In a non MacOS/Win32/Cygwin
+    environment, if necessary (no DISPLAY variable can be found and visible
+    has been set to true) and possible (Xvfb can be executed successfully),
+    this method will also automatically start an Xvfb
+    <https://en.wikipedia.org/wiki/Xvfb> instance.
+
+        use Firefox::Marionette();
+    
+        my $remote_darwin_firefox = Firefox::Marionette->new( debug => 1, host => '10.1.2.3', firefox_binary => '/Applications/Firefox.app/Contents/MacOS/firefox');
+        ...
+    
+        foreach my $profile_name (Firefox::Marionette::Profile->names()) {
+            my $firefox_with_existing_profile = Firefox::Marionette->new(profile_name => $profile_name);
+            ...
+        }
 
  new_window
 
@@ -661,31 +728,38 @@ SUBROUTINES/METHODS
     
         $firefox->switch_to_window($window_handle);
 
- close_current_chrome_window_handle
+ new_session
 
-    closes the current chrome window (that is the entire window, not just
-    the tabs). It returns a list of still available chrome window handles.
-    You will need to switch_to_window to use another window.
+    creates a new WebDriver session. It is expected that the caller
+    performs the necessary checks on the requested capabilities to be
+    WebDriver conforming. The WebDriver service offered by Marionette does
+    not match or negotiate capabilities beyond type and bounds checks.
 
- close_current_window_handle
+ property
 
-    closes the current window/tab. It returns a list of still available
-    window/tab handles.
+    accepts an element as the first parameter and a scalar attribute name
+    as the second parameter. It returns the current value of the property
+    with the supplied name. This method will return the current content,
+    the attribute method will return the initial content.
 
- full_screen
+        use Firefox::Marionette();
+    
+        my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+        my $element = $firefox->find_id('search_input');
+        $element->property('value') eq '' or die "Initial property is the empty string";
+        $element->type('Test::More');
+        $element->property('value') eq 'Test::More' or die "This property should have changed!";
 
-    full screens the firefox window. This method returns itself to aid in
-    chaining methods.
+ quit
 
- minimise
+    Marionette will stop accepting new connections before ending the
+    current session, and finally attempting to quit the application. This
+    method returns the $? (CHILD_ERROR) value for the Firefox process
 
-    minimises the firefox window. This method returns itself to aid in
-    chaining methods.
+ rect
 
- maximise
-
-    maximises the firefox window. This method returns itself to aid in
-    chaining methods.
+    accepts a element as the first parameter and returns the current
+    position and size of the element
 
  refresh
 
@@ -694,34 +768,54 @@ SUBROUTINES/METHODS
     returning, which, by default is 5 minutes. This method returns itself
     to aid in chaining methods.
 
- alert_text
-
-    Returns the message shown in a currently displayed modal message box
-
- dismiss_alert
-
-    dismisses a currently displayed modal message box
-
- accept_alert
-
-    accepts a currently displayed modal message box
-
- send_alert_text
-
-    sends keys to the input field of a currently displayed modal message
-    box
-
- capabilities
-
-    returns the capabilities of the current firefox binary. You can
-    retrieve timeouts or a proxy with this method.
-
  screen_orientation
 
     returns the current browser orientation. This will be one of the valid
     primary orientation values 'portrait-primary', 'landscape-primary',
     'portrait-secondary', or 'landscape-secondary'. This method is only
     currently available on Android (Fennec).
+
+ script
+
+    accepts a scalar containing a javascript function body that is executed
+    in the browser, and an optional hash as a second parameter. Allowed
+    keys are below;
+
+      * args - The reference to a list is the arguments passed to the
+      function body.
+
+      * filename - Filename of the client's program where this script is
+      evaluated.
+
+      * line - Line in the client's program where this script is evaluated.
+
+      * new - Forces the script to be evaluated in a fresh sandbox. Note
+      that if it is undefined, the script will normally be evaluted in a
+      fresh sandbox.
+
+      * sandbox - Name of the sandbox to evaluate the script in. The
+      sandbox is cached for later re-use on the same window
+      <https://developer.mozilla.org/en-US/docs/Web/API/Window>object if
+      new is false. If he parameter is undefined, the script is evaluated
+      in a mutable sandbox. If the parameter is "system", it will be
+      evaluted in a sandbox with elevated system privileges, equivalent to
+      chrome space.
+
+      * timeout - A timeout to override the default script timeout, which,
+      by default is 30 seconds.
+
+    Returns the result of the javascript function.
+
+        use Firefox::Marionette();
+    
+        my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+    
+        if ($firefox->script('return window.find("lucky");')) {
+            # luckily!
+        }
+
+    The executing javascript is subject to the script timeout, which, by
+    default is 30 seconds.
 
  selfie
 
@@ -744,121 +838,89 @@ SUBROUTINES/METHODS
       * full - take a screenshot of the whole document unless the first
       element parameter has been supplied.
 
+      * raw - rather than a file handle containing the screenshot, the
+      binary PNG image will be returned.
+
       * scroll - scroll to the element supplied
 
       * highlights - a reference to a list containing elements to draw a
       highlight around
+
+ send_alert_text
+
+    sends keys to the input field of a currently displayed modal message
+    box
+
+ sleep_time_in_ms
+
+    accepts a new time to sleep in await or bye methods and returns the
+    previous time. The default time is "1" millisecond.
+
+        use Firefox::Marionette();
+    
+        my $firefox = Firefox::Marionette->new(sleep_time_in_ms => 5); # setting default time to 5 milliseconds
+    
+        my $old_time_in_ms = $firefox->sleep_time_in_ms(8); # setting default time to 8 milliseconds, returning 5 (milliseconds)
+
+ strip
+
+    returns the page source of the content document after an attempt has
+    been made to remove typical firefox html wrappers of non html content
+    types such as text/plain and application/json. See the json method for
+    an alternative when dealing with response content types such as
+    application/json and html for an alterative when dealing with html
+    content types. This is a convenience method that wraps the html method.
+
+        use Firefox::Marionette();
+        use JSON();
+        use v5.10;
+    
+        say JSON::decode_json(Firefox::Marionette->new()->go('https://fastapi.metacpan.org/v1/download_url/Firefox::Marionette")->strip())->{version};
+
+ switch_to_frame
+
+    accepts a frame as a parameter and switches to it within the current
+    window.
+
+ switch_to_parent_frame
+
+    set the current browsing context for future commands to the parent of
+    the current browsing context
+
+ switch_to_shadow_root
+
+    accepts an element as a parameter and switches to it's shadow root
+    <https://www.w3.org/TR/shadow-dom/>
+
+ switch_to_window
+
+    accepts a window handle (either the result of window_handles or a
+    window name as a parameter and switches focus to this window.
 
  tag_name
 
     accepts a Firefox::Marionette::Element object as the first parameter
     and returns the relevant tag name. For example 'a' or 'input'.
 
- window_rect
-
-    accepts an optional position and size as a parameter, sets the current
-    browser window to that position and size and returns the previous
-    position, size and state of the browser window. If no parameter is
-    supplied, it returns the current position, size and state of the
-    browser window.
-
- rect
-
-    accepts a element as the first parameter and returns the current
-    position and size of the element
-
  text
 
     accepts a element as the first parameter and returns the text that is
     contained by that element (if any)
 
- clear
-
-    accepts a element as the first parameter and clears any user supplied
-    input
-
- click
-
-    accepts a element as the first parameter and sends a 'click' to it. The
-    browser will wait for any page load to complete or the session's
-    page_load duration to elapse before returning, which, by default is 5
-    minutes.
-
  timeouts
 
     returns the current timeouts for page loading, searching, and scripts.
 
- new_session
+ title
 
-    creates a new WebDriver session. It is expected that the caller
-    performs the necessary checks on the requested capabilities to be
-    WebDriver conforming. The WebDriver service offered by Marionette does
-    not match or negotiate capabilities beyond type and bounds checks.
+    returns the current title of the window.
 
- delete_session
+ type
 
-    deletes the current WebDriver session.
-
- window_type
-
-    returns the current window's type. This should be 'navigator:browser'.
-
- window_handle
-
-    returns the current window's handle. On desktop this typically
-    corresponds to the currently selected tab. returns an opaque
-    server-assigned identifier to this window that uniquely identifies it
-    within this Marionette instance. This can be used to switch to this
-    window at a later point.
-
- window_handles
-
-    returns a list of top-level browsing contexts. On desktop this
-    typically corresponds to the set of open tabs for browser windows, or
-    the window itself for non-browser chrome windows. Each window handle is
-    assigned by the server and is guaranteed unique, however the return
-    array does not have a specified ordering.
-
- accept_connections
-
-    Enables or disables accepting new socket connections. By calling this
-    method with false the server will not accept any further connections,
-    but existing connections will not be forcible closed. Use true to
-    re-enable accepting connections.
-
-    Please note that when closing the connection via the client you can
-    end-up in a non-recoverable state if it hasn't been enabled before.
-
- current_chrome_window_handle
-
-    see chrome_window_handle.
-
- chrome_window_handle
-
-    returns an server-assigned integer identifiers for the current chrome
-    window that uniquely identifies it within this Marionette instance.
-    This can be used to switch to this window at a later point. This
-    corresponds to a window that may itself contain tabs.
-
- chrome_window_handles
-
-    returns identifiers for each open chrome window for tests interested in
-    managing a set of chrome windows and tabs separately.
-
- install
-
-    accepts the fully qualified path to an .xpi addon file as the first
-    parameter and an optional true/false second parameter to indicate if
-    the xpi addon file should be a temporary addition (just for the
-    existance of this browser instance). Unsigned xpi addon files may be
-    loaded temporarily. It returns the GUID for the addon which may be used
-    as a parameter to the uninstall method.
-
-        use Firefox::Marionette();
-    
-        my $firefox = Firefox::Marionette->new();
-    
-        my $extension_id = $firefox->install('/full/path/to/gnu_terry_pratchett-0.4-an+fx.xpi');
+    accepts an element as the first parameter and a string as the second
+    parameter. It sends the string to the specified element in the current
+    page, such as filling out a text box. This method returns itself to aid
+    in chaining methods.
 
  uninstall
 
@@ -876,57 +938,42 @@ SUBROUTINES/METHODS
     
         $firefox->uninstall($extension_id); # not recommended to uninstall this extension IRL.
 
- application_type
+ uri
 
-    returns the application type for the Marionette protocol. Should be
-    'gecko'.
+    returns the current URI of current top level browsing context for
+    Desktop. It is equivalent to the javascript document.location.href
 
- marionette_protocol
+ window_handle
 
-    returns the version for the Marionette protocol. Current most recent
-    version is '3'.
+    returns the current window's handle. On desktop this typically
+    corresponds to the currently selected tab. returns an opaque
+    server-assigned identifier to this window that uniquely identifies it
+    within this Marionette instance. This can be used to switch to this
+    window at a later point.
 
- addons
+ window_handles
 
-    returns if pre-existing addons (extensions/themes) are allowed to run.
-    This will be true for Firefox versions less than 55, as -safe-mode
-    cannot be automated.
+    returns a list of top-level browsing contexts. On desktop this
+    typically corresponds to the set of open tabs for browser windows, or
+    the window itself for non-browser chrome windows. Each window handle is
+    assigned by the server and is guaranteed unique, however the return
+    array does not have a specified ordering.
+
+ window_rect
+
+    accepts an optional position and size as a parameter, sets the current
+    browser window to that position and size and returns the previous
+    position, size and state of the browser window. If no parameter is
+    supplied, it returns the current position, size and state of the
+    browser window.
+
+ window_type
+
+    returns the current window's type. This should be 'navigator:browser'.
 
  xvfb
 
     returns the pid of the xvfb process if it exists.
-
- quit
-
-    Marionette will stop accepting new connections before ending the
-    current session, and finally attempting to quit the application. This
-    method returns the $? (CHILD_ERROR) value for the Firefox process
-
- browser_version
-
-    This method returns version of firefox.
-
- execute
-
-    This utility method executes a command with arguments and returns
-    STDOUT as a chomped string. It is a simple method only intended for the
-    Firefox::Marionette::* modules.
-
- child_error
-
-    This method returns the $? (CHILD_ERROR) for the Firefox process, or
-    undefined if the process has not yet exited.
-
- error_message
-
-    This method returns a human readable error message describing how the
-    Firefox process exited (assuming it started okay). On Win32 platforms
-    this information is restricted to exit code.
-
- alive
-
-    This method returns true or false depending on if the Firefox process
-    is still running.
 
 DIAGNOSTICS
 

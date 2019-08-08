@@ -16,6 +16,9 @@ requires 'Software::License' => '0.103012';
 requires 'Text::Balanced' => 0;
 requires 'version' => '0.73';
 
+suggests 'Module::CPANfile';
+suggests 'Config::INI::Reader';
+
 on configure => sub {
   requires 'ExtUtils::MakeMaker::CPANfile' => '0.08';
   requires 'perl' => '5.008001';

@@ -11,6 +11,7 @@ use Test::Exception;
 use Path::Tiny;
 
 use Vote::Count;
+use Vote::Count::ReadBallots 'read_ballots';
 use Vote::Count::RankCount;
 
 use feature qw/signatures postderef/;
@@ -89,7 +90,8 @@ is( $tieresult1->{'tie'}, 1, 'Leader Method tie is true for set with tie');
 
 # p $counted1;
 my $table = $counted1->RankTable();
-my $xtable = q/| Rank | Choice     | Votes |
+my $xtable = << 'XTABLE1';
+| Rank | Choice     | Votes |
 |------|------------|-------|
 | 1    | VANILLA    | 7     |
 | 2    | MINTCHIP   | 5     |
@@ -98,7 +100,9 @@ my $xtable = q/| Rank | Choice     | Votes |
 | 4    | STRAWBERRY | 1     |
 | 5    | CARAMEL    | 0     |
 | 5    | ROCKYROAD  | 0     |
-| 5    | RUMRAISIN  | 0     |/;
+| 5    | RUMRAISIN  | 0     |
+XTABLE1
+
 is( $table, $xtable, 'Generate a table with ->RankTable()');
 
 is( $counted1->CountVotes(), 16, 'CountVotes method');
@@ -119,5 +123,42 @@ is_deeply( $bto->{2},
   [ qw/ BRASS BRONZE COPPER PEARL RUBY/],
   'Check that the arrayref from HashByRank is sorted.'
 );
+
+
+subtest 'Bigger Than 10' => sub {
+
+    my $longtable = << 'LONGTABLE';
+| Rank | Choice    | Votes |
+|------|-----------|-------|
+| 1    | LV_TORY   | 186   |
+| 2    | LV_LAB    | 183   |
+| 3    | REM_LIB   | 180   |
+| 4    | REM_TORY  | 176   |
+| 5    | REM_LAB   | 173   |
+| 6    | LV_LIB    | 170   |
+| 7    | SOFT_TORY | 155   |
+| 8    | SOFT_LAB  | 154   |
+| 9    | SOFT_LIB  | 153   |
+| 10   | IND_LCL1  | 91    |
+| 11   | IND_LCL2  | 75    |
+LONGTABLE
+
+    my $brexit
+        = Vote::Count->new( BallotSet => read_ballots('t/data/brexit1.txt'),
+        );
+
+    my $bbyrank = $brexit->Approval()->HashByRank();
+    is_deeply( $bbyrank->{10}, ['IND_LCL1'],
+        'check tenth element from hashbyrank' );
+    is_deeply( $bbyrank->{11}, ['IND_LCL2'],
+        'check 11th element from hashbyrank' ); 
+    is_deeply( $bbyrank->{3}, ['REM_LIB'],
+        'check 3rd element from hashbyrank' );
+    # note $brexit->Approval->RankTable();
+    is( $brexit->Approval->RankTable(),
+        $longtable, 
+        'Check a long table (interest in sort over 10)' );
+};
+
 
 done_testing();

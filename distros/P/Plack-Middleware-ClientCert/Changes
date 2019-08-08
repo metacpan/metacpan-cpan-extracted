@@ -2,5 +2,8 @@ Revision history for Perl extension Plack::Middleware::ClientCert
 
 {{$NEXT}}
 
+0.100 Fri. Aug. 02, 2019
+    - Added support for proxy passing (HTTP_SSL_DN_CLIENT_*)
+
 0.01 Thur. Oct. 20, 2016
     - Initial Version

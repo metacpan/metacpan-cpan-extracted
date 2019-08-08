@@ -1,0 +1,15 @@
+Changes
+lib/Export/XS.pm
+lib/Export/XS.pod
+lib/Export/XS/Auto.pm
+Makefile.PL
+MANIFEST			This list of files
+misc/mytest.plx
+src/xs/export.cc
+src/xs/export.h
+t/autoexport.t
+t/create.t
+t/export.t
+XS.xs
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

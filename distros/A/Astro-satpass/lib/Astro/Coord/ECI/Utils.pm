@@ -13,7 +13,7 @@ Astro::Coord::ECI::Utils - Utility routines for astronomical calculations
 As of release 0.101, subroutines C<equation_of_time()>,
 C<nutation_in_longitude()>, C<nutation_in_obliquity()>, and
 C<obliquity()> are deprecated in favor of
-L<Astro::Coord::ECI|Asto::Coord::ECI> methods C<equation_of_time()>,
+L<Astro::Coord::ECI|Astro::Coord::ECI> methods C<equation_of_time()>,
 C<nutation_in_longitude()>, C<nutation_in_obliquity()>, and
 C<obliquity()>.
 
@@ -136,7 +136,7 @@ package Astro::Coord::ECI::Utils;
 use strict;
 use warnings;
 
-our $VERSION = '0.106';
+our $VERSION = '0.107';
 our @ISA = qw{Exporter};
 
 use Carp;
@@ -252,6 +252,7 @@ my @all_external = ( qw{
 	jcent2000 jd2date jd2datetime jday2000 julianday
 	keplers_equation load_module looks_like_number max min mod2pi
 	nutation_in_longitude nutation_in_obliquity obliquity omega
+	position_angle
 	rad2deg rad2dms rad2hms tan theta0 thetag vector_cross_product
 	vector_dot_product vector_magnitude vector_unitize __classisa
 	__default_station __instance __subroutine_deprecation
@@ -350,7 +351,7 @@ The algorithm comes from Daniel W. E. Green's article "Magnitude
 Corrections for Atmospheric Extinction", which was published in
 the July 1992 issue of "International Comet Quarterly", and is
 available online at
-L<http://www.cfa.harvard.edu/icq/ICQExtinct.html>. The text of
+L<http://www.icq.eps.harvard.edu/ICQExtinct.html>. The text of
 this article makes it clear that the actual value of the
 atmospheric extinction can vary greatly from the typical
 values given even in the absence of cloud cover.
@@ -1144,6 +1145,38 @@ sub omega {
 	    1934.136261) * $T + 125.04452));
 }
 
+=item $pa = position_angle( $alpha1, $delta1, $alpha2, $delta2 );
+
+This low-level subroutine calculates the position angle in right
+ascension of the second body with respect to the first, given the first
+body's right ascension and declination and the second body's right
+ascension and declination in that order, B<in radians>.
+
+The return is the position angle B<in radians>, in the range
+C<< -PI <= $pa < PI >>.
+
+The algorithm comes from Jean Meeus' "Astronomical Algorithms", 2nd
+Edition, page 116, but his algorithm is for the position angle of the
+first body with respect to the second (i.e. the roles of the two bodies
+are reversed). The order of arguments for this subroutine is consistent
+with The IDL Astronomy User's Library at
+L<https://idlastro.gsfc.nasa.gov/>, function C<posang()>.
+
+This is exposed because in principal you could calculate the position
+angle in any spherical coordinate system, you would just need to get the
+order of arguments right (e.g. azimuth, elevation or longitude,
+latitude).
+
+=cut
+
+sub position_angle {
+    my ( $alpha1, $delta1, $alpha2, $delta2 ) = @_;
+    my $delta_alpha = $alpha2 - $alpha1;
+    return atan2( sin( $delta_alpha ),
+	cos( $delta1 ) * tan( $delta2 ) -
+	sin( $delta1 ) * cos( $delta_alpha ) );
+}
+
 
 =item $degrees = rad2deg ($radians)
 
@@ -1295,7 +1328,7 @@ This exportable subroutine is a wrapper for either
 C<Time::y2038::timelocal()> (if that module is installed) or
 C<Time::Local::timelocal()> (if not.)
 
-This wrapper is needed for the same reason L<time_gm()|/time_gm> is
+This wrapper is needed for the same reason C<time_gm()> is
 needed.
 
 =item $a = vector_cross_product( $b, $c );

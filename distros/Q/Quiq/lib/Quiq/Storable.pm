@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.152';
+our $VERSION = '1.153';
 
 use Storable ();
 use Quiq::Path;
@@ -90,7 +90,7 @@ sub thaw {
 =head4 Synopsis
 
     $ref = Quiq::Storable->memoize($file,$sub);
-    $ref = Quiq::Storable->memoize($file,$duration,$sub);
+    $ref = Quiq::Storable->memoize($file,$timeout,$sub);
 
 =head4 Arguments
 
@@ -100,7 +100,7 @@ sub thaw {
 
 Pfad der Cachedatei.
 
-=item $duration
+=item $timeout
 
 Dauer in Sekunden, die die Cachdatei gültig ist. Falls nicht angegeben
 oder C<undef>, ist die Cachdatei unbegrenzt lange gültig.
@@ -143,14 +143,14 @@ Cache Hash (hier mit zyklischer Struktur):
 sub memoize {
     my $class = shift;
     my $file = shift;
-    my $duration = ref $_[0]? undef: shift;
+    my $timeout = ref $_[0]? undef: shift;
     my $sub = shift;
 
     my $p = Quiq::Path->new;
 
     my $ref;
-    if ($p->exists($file) && (!defined($duration) ||
-            Quiq::Path->age($file) <= $duration)) {
+    if ($p->exists($file) && (!defined($timeout) ||
+            Quiq::Path->age($file) <= $timeout)) {
         $ref = $class->thaw($p->read($file));
     }
     else {
@@ -165,7 +165,7 @@ sub memoize {
 
 =head1 VERSION
 
-1.152
+1.153
 
 =head1 AUTHOR
 

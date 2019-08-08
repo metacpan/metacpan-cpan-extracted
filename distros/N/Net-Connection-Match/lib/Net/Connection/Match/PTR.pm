@@ -11,11 +11,11 @@ Net::Connection::Match::PTR - Runs a PTR check against a Net::Connection object.
 
 =head1 VERSION
 
-Version 0.0.0
+Version 0.0.1
 
 =cut
 
-our $VERSION = '0.0.0';
+our $VERSION = '0.0.1';
 
 
 =head1 SYNOPSIS
@@ -52,7 +52,7 @@ our $VERSION = '0.0.0';
                        ],
               );
     
-    my $checker=Net::Connection::Match::Ports->new( \%args );
+    my $checker=Net::Connection::Match::PTR->new( \%args );
     
     if ( $checker->match( $conn ) ){
         print "It matches.\n";
@@ -76,23 +76,23 @@ This intiates the object.
                        ],
               );
     
-    my $checker=Net::Connection::Match::Ports->new( \%args );
+    my $checker=Net::Connection::Match::PTR->new( \%args );
 
 
 =head3 args
 
 Atleast one of the following need used.
 
-=keys ptrs
+=head4 ptrs
 
 This is a array of PTRs to match in for either foreign
 or local side.
 
-=keys fptrs
+=head4 fptrs
 
 This is a array of PTRs to match in for the foreign side.
 
-=keys lptrs
+=head4 lptrs
 
 This is a array of PTRs to match in for the local side.
 

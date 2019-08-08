@@ -7,7 +7,7 @@ use strict;
 ## Inheritance and Versioning ##
 
 @Net::BGP::ASPath::AS_SEQUENCE::ISA = qw( Net::BGP::ASPath::AS );
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 sub type {
     return 2;

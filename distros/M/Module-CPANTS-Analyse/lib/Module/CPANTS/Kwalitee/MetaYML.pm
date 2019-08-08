@@ -7,7 +7,7 @@ use CPAN::Meta::Validator;
 use CPAN::Meta::Converter;
 use List::Util qw/first/;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 $VERSION =~ s/_//; ## no critic
 
 sub order { 10 }
@@ -63,7 +63,10 @@ sub analyse {
 
 sub _analyse_yml {
     my ($me, $file) = @_;
+    my @warnings;
     eval {
+        # CPAN::Meta::YAML warns if it finds a duplicate key
+        local $SIG{__WARN__} = sub { push @warnings, @_ };
         my $meta = CPAN::Meta::YAML->read($file) or die CPAN::Meta::YAML->errstr;
         # Broken META.yml may return a "YAML 1.0" string first.
         # eg. M/MH/MHASCH/Date-Gregorian-0.07.tar.gz
@@ -83,6 +86,9 @@ sub _analyse_yml {
         my ($spec, $error) = _validate_meta($me->d->{meta_yml});
         $me->d->{error}{meta_yml_conforms_to_known_spec} = $error if $error;
         $me->d->{meta_yml_spec_version} = $spec->{spec};
+    }
+    if (@warnings) {
+        $me->d->{error}{meta_yml_has_duplicate_keys} = join ',', @warnings;
     }
 }
 
@@ -126,6 +132,7 @@ sub _validate_meta {
     } elsif (!$spec->is_valid) {
         $error = join ';', sort $spec->errors;
     }
+    $error =~ s/(SCALAR|ARRAY|HASH|GLOB|REF)\(0x[0-9a-f]+\)/$1(...)/g;
     return ($spec, $error);
 }
 

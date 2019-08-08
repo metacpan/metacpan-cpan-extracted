@@ -1,5 +1,10 @@
 Revision history for Role-Tiny
 
+2.000008 - 2019-08-05
+  - reverting all changes from 2.000007 due to failures on some perl versions
+    and a number of downstream users.  The changes will be reintroduced in a
+    fixed form in a future version.
+
 2.000007 - 2019-07-31
   - fix composing roles into packages that have stub subs in them
   - exclude all constant subs from method list

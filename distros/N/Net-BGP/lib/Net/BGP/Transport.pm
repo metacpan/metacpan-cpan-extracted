@@ -13,7 +13,7 @@ use vars qw(
 ## Inheritance and Versioning ##
 
 @ISA     = qw( Exporter );
-$VERSION = '0.16';
+$VERSION = '0.17';
 
 ## General Definitions ##
 
@@ -153,7 +153,10 @@ sub BGP_CAPABILITY_REFRESH_OLD { 128 }
         undef,                                 # BGP_EVENT_CONNECT_RETRY_TIMER_EXPIRED
         \&_handle_hold_timer_expired,          # BGP_EVENT_HOLD_TIMER_EXPIRED
         undef,                                 # BGP_EVENT_KEEPALIVE_TIMER_EXPIRED
-        \&_handle_bgp_open_received            # BGP_EVENT_RECEIVE_OPEN_MESSAGE
+        \&_handle_bgp_open_received,           # BGP_EVENT_RECEIVE_OPEN_MESSAGE
+        undef,                                 # BGP_EVENT_RECEIVE_KEEP_ALIVE_MESSAGE
+        undef,                                 # BGP_EVENT_RECEIVE_UPDATE_MESSAGE
+        \&_handle_receive_notification_message,# BGP_EVENT_RECEIVE_NOTIFICATION_MESSAGE
     ],
     [                                          # OpenConfirm
         \&_handle_bgp_fsm_error,               # Default transition
@@ -656,8 +659,9 @@ sub _handle_socket_read_ready
     my $socket = $this->{_peer_socket};
 
     unless (defined $socket) {
-      warn $this->parent->asstring . ": Connection lost - Connection is formaly shutdown now\n";
-      $this->_cease;
+      warn $this->parent->asstring . ": Connection lost - Connection is fully shutdown now\n";
+      $this->_close_session();
+      $this->parent->reset_callback();
       return;
     }
 
@@ -774,8 +778,8 @@ sub _kill_session
       );
 
       $this->_send_msg($buffer,1);
-      $this->_close_session();
     };
+    $this->_close_session();
 
     # invoke user callback function
     $this->parent->error_callback($error);
@@ -1556,8 +1560,8 @@ Net::BGP::Peer, Net::BGP, Net::BGP::Update, Net::BGP::Refresh
 
 =head1 AUTHOR
 
-Stephen J. Scheck <code@neurosphere.com> in original Peer.pm form
-Martin Lorensen <lorensen@cpan.org> seperated into Transort.pm
+Stephen J. Scheck <sscheck@cpan.org> in original Peer.pm form
+Martin Lorensen <lorensen@cpan.org> separated into Transport.pm
 
 =cut
 

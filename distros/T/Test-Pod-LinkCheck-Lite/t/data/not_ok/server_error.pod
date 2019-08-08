@@ -1,0 +1,8 @@
+=pod
+
+This POD contains a URL link that returns a server error, at least when
+running under the test harness. This is L<https://hosed.server/>.
+
+=cut
+
+# ex: set textwidth=72 :

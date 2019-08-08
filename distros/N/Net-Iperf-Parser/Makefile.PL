@@ -16,12 +16,13 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Net::Iperf::Parser",
   "PREREQ_PM" => {
-    "Moose" => 0
+    "Moose" => 0,
+    "namespace::autoclean" => 0
   },
   "TEST_REQUIRES" => {
     "Test::UseAllModules" => "0.15"
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.03",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -30,7 +31,8 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Moose" => 0,
-  "Test::UseAllModules" => "0.15"
+  "Test::UseAllModules" => "0.15",
+  "namespace::autoclean" => 0
 );
 
 

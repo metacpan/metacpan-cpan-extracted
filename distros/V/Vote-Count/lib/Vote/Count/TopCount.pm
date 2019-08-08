@@ -16,13 +16,13 @@ use TextTableTiny 'generate_markdown_table';
 
 # ABSTRACT: TopCount and related methods for Vote::Count. Toolkit for vote counting.
 
-our $VERSION='0.013';
+our $VERSION='0.017';
 
 =head1 NAME
 
 Vote::Count::TopCount
 
-=head1 VERSION 0.013
+=head1 VERSION 0.017
 
 =head1 Synopsis
 

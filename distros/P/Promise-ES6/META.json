@@ -35,6 +35,7 @@
             "FindBin" : "0",
             "Test::Class" : "0",
             "Test::Deep" : "0",
+            "Test::FailWarnings" : "0",
             "Test::Fatal" : "0",
             "Test::More" : "0",
             "autodie" : "0"
@@ -52,6 +53,6 @@
          "web" : "https://github.com/FGasper/p5-Promise-ES6"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

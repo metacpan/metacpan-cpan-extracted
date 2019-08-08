@@ -7,7 +7,7 @@ use 5.022;
 use Test2::V0;
 use Test2::Bundle::More;
 use Test::Exception;
-# use Data::Printer;
+use Data::Printer;
 use JSON::MaybeXS qw/encode_json/;
 # use YAML::XS;
 use feature qw /postderef signatures/;
@@ -41,6 +41,15 @@ my $KnotSet =
   );
 
 isa_ok( $M1, ['Vote::Count::Matrix'], 'The matrix is a Vote::Count::Matrix' );
+
+note 'Testing with Condorcet removal including choices with a tie.' ;
+my $N1 =
+  Vote::Count::Matrix->new( 'BallotSet' => read_ballots('t/data/ties1.txt'),
+  );
+my $mmm = $N1->CondorcetLoser( 1 );
+is( $mmm->{'eliminations'}, 11,
+'11 eliminated Condorcet losers in sampe with ties');
+
 
 subtest '_conduct_pair returns hash with pairing info' => sub {
   my $t1 = Vote::Count::Matrix::_conduct_pair( $M1->BallotSet, 'RUMRAISIN',

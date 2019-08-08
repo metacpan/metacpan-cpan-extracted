@@ -2,10 +2,20 @@ package SPVM::Regex {
   use SPVM::Unicode (uchar);
   use SPVM::List;
   use SPVM::IntList;
+  use SPVM::Hash;
+  use SPVM::StringBuffer;
+  use SPVM::Stringer;
 
   has patterns : SPVM::List;
-  has match_start : int;
-  has match_end : int;
+  has string_start : int;
+  has string_end : int;
+  
+  has captures : string[];
+  
+  has match_start : ro int;
+  has match_end : ro int;
+  
+  has replace_count : ro int;
   
   enum {
     STATUS_START,
@@ -15,12 +25,21 @@ package SPVM::Regex {
     STATUS_CHAR_CLASS,
   }
   
+  sub caps : string ($self : self, $index : int) {
+    unless ($index > 0) {
+      die "Invalid capture index";
+    }
+    return $self->{captures}[$index - 1];
+  }
+  
   sub new : SPVM::Regex ($re_str : string) {
     my $self = new SPVM::Regex;
     
     $self->{patterns} = SPVM::List->new;
     
     $self->compile($re_str);
+    
+    $self->{captures} = new string[255];
     
     return $self;
   }
@@ -49,9 +68,12 @@ package SPVM::Regex {
     my $char_class_uchar_min_maxs_list : SPVM::IntList;
     
     my $before_is_char_class_range = 0;
-
+    
+    my $is_capture = 0;
+    my $is_capture_start = 0;
+    
     while ((my $uchar = uchar($re_str, \$pos)) >= 0) {
-      if ($self->{match_end}) {
+      if ($self->{string_end}) {
         die "\$ must be last of regex";
       }
       
@@ -177,7 +199,7 @@ package SPVM::Regex {
                   die "Regex compile error";
                 }
                 
-                $self->{match_start} = 1;
+                $self->{string_start} = 1;
                 
                 break;
               }
@@ -186,7 +208,7 @@ package SPVM::Regex {
                 break;
               }
               case '$': {
-                $self->{match_end} = 1;
+                $self->{string_end} = 1;
                 break;
               }
               case '|': {
@@ -194,11 +216,24 @@ package SPVM::Regex {
                 break;
               }
               case '(': {
-                die "Not yet implemented (";
+                if ($is_capture) {
+                  die "Invalid capture start";
+                }
+                else {
+                  $is_capture = 1;
+                  $is_capture_start = 1;
+                }
                 break;
               }
               case ')': {
-                die "Not yet implemented )";
+                if ($is_capture) {
+                  $is_capture = 0;
+                  my $before_pattern = (SPVM::Regex::Pattern)$patterns->get($patterns->length - 1);
+                  $before_pattern->{capture_end} = 1;
+                }
+                else {
+                  die "Invalid capture end";
+                }
                 break;
               }
               case '[': {
@@ -296,6 +331,7 @@ package SPVM::Regex {
           }
         }
       }
+
       if ($cur_is_char) {
         my $pattern = new SPVM::Regex::Pattern;
         $pattern->{type} = SPVM::Regex::Pattern->PATTERN;
@@ -303,6 +339,12 @@ package SPVM::Regex {
         $pattern->{uchar_min_maxs} = $cur_uchar_min_maxs;
         $pattern->{max_repeat} = 1;
         $pattern->{min_repeat} = 1;
+
+        if ($is_capture_start) {
+          $pattern->{capture_start} = 1;
+          $is_capture_start = 0;
+        }
+        
         $patterns->push($pattern);
         $before_is_charset = 1;
       }
@@ -352,45 +394,59 @@ package SPVM::Regex {
     }
   }
   
-  sub match : string[] ($self : self, $target : string) {
+  sub match : int ($self : self, $target : string) {
+    return $self->match_repeat($target, 0);
+  }
+  
+  sub match_repeat : int ($self : self, $target : string, $target_base_index : int) {
     
     unless ($target) {
       die "Target string must be defined";
     }
     
-    # Convert to Unicode codepoint
-    my $target_uchars_list = SPVM::IntList->new;
-    {
-      my $target_index = 0;
-      while ((my $target_uchar = uchar($target, \$target_index)) >= 0) {
-        $target_uchars_list->push($target_uchar);
-      }
-    }
-    
-    my $target_uchars = $target_uchars_list->to_array;
-
     my $patterns = $self->{patterns};
     my $patterns_length = $patterns->length;
     
-    my $target_base_index = 0;
     my $match_all = 0;
     my $target_index = 0;
-    while ($target_base_index < @$target_uchars) {
-      $target_index = $target_base_index;
+    my $target_base_index_before : int;
+    while (1) {
+      $target_base_index_before = $target_base_index;
+      my $target_base_uchar = uchar($target, \$target_base_index);
+      unless ($target_base_uchar >= 0) {
+        last;
+      }
+      
+      $target_index =  $target_base_index_before;
+      
       my $pattern_index = 0;
       
-      while ($target_index < @$target_uchars) {
-        my $target_uchar = $target_uchars->[$target_index];
+      my $capture_start_index = -1;
+      my $capture_count = 0;
+      while (1) {
         my $pattern = (SPVM::Regex::Pattern)$patterns->get($pattern_index);
         my $max_repeat = $pattern->{max_repeat};
         my $min_repeat = $pattern->{min_repeat};
         my $uchar_min_maxs = $pattern->{uchar_min_maxs};
         my $negate = $pattern->{negate};
         
+        if ($pattern->{capture_start}) {
+          $capture_start_index = $target_index;
+        }
+        
+        my $target_before_index = $target_index;
+        my $target_uchar = uchar($target, \$target_index);
+        unless ($target_uchar >= 0) {
+          last;
+        }
+        
+        
         my $type = $pattern->{type};
         
         my $match_uchar_repeat = 0;
         my $repeat_count = 0;
+        my $repeat_before_target_index = $target_before_index;
+        
         if ($type == SPVM::Regex::Pattern->PATTERN) {
           # Match uchar repeat
           for (my $repeat_index = 0; $repeat_index < $max_repeat; $repeat_index++) {
@@ -427,10 +483,13 @@ package SPVM::Regex {
             # Increment repeat count
             if ($match_uchar) {
               $repeat_count++;
-              if ($target_index + $repeat_count == @$target_uchars) {
+              $repeat_before_target_index = $target_index;
+              $target_uchar = uchar($target, \$target_index);
+              if ($target_index == length $target) {
                 last;
               }
-              $target_uchar = $target_uchars->[$target_index + $repeat_count];
+              
+              $target_before_index = $target_index;
             }
             else {
               last;
@@ -444,10 +503,16 @@ package SPVM::Regex {
           die "Not implemented";
         }
         
-        $target_index += $repeat_count;
-        
         if ($match_uchar_repeat) {
+          if ($pattern->{capture_end}) {
+            $self->{captures}[$capture_count] = substr($target, $capture_start_index, $repeat_before_target_index - $capture_start_index);
+            $capture_count++;
+            if ($capture_count > 255) {
+              die "Too many captures";
+            }
+          }
           $pattern_index++;
+          $target_index = $repeat_before_target_index;
           if ($pattern_index == $patterns_length) {
             last;
           }
@@ -462,38 +527,146 @@ package SPVM::Regex {
         last;
       }
       else {
-        if ($self->{match_start}) {
+        if ($self->{string_start}) {
           last;
-        }
-        else {
-          $target_base_index++;
         }
       }
     }
     
+    my $really_match = 0;
     if ($match_all) {
-      if ($self->{match_end}) {
-        if ($target_index == @$target_uchars) {
-          return new string[0];
-        }
-        else {
-          return undef;
+      if ($self->{string_end}) {
+        if ($target_index == length $target) {
+          $really_match = 1;
         }
       }
       else {
-        return new string[0];
+        $really_match = 1;
       }
     }
-    else {
-      return undef;
-    }
-  }
-  
-  sub replace : string ($self : self, $target : string, $replace : string) {
     
-    return undef;
+    if ($really_match) {
+      $self->{match_start} = $target_base_index_before;
+      $self->{match_end} = $target_index;
+    }
+    
+    return $really_match;
+  }
+
+  sub replace  : string ($self : self, $target : string, $target_base_index : int, $replace_object : object) {
+    return $self->replace_opt($target, $target_base_index, $replace_object, [(object)replace_all => 0]);
+  }
+
+  sub replace_all  : string ($self : self, $target : string, $target_base_index : int, $replace_object : object) {
+    return $self->replace_opt($target, $target_base_index, $replace_object, [(object)replace_all => 1]);
   }
   
+  private sub replace_opt  : string ($self : self, $target : string, $target_base_index : int, $replace_object : object, $opta : object[]) {
+    
+    my $original_target_base_index = $target_base_index;
+    
+    my $opt = SPVM::Hash->newa($opta);
+    
+    my $replace_all = 0;
+    if (my $replace_all_obj = $opt->get("replace_all")) {
+      $replace_all = (int)$replace_all_obj;
+    }
+    $self->{replace_count} = 0;
+    
+    unless ($target) {
+      return $target;
+    }
+    
+    my $result : byte[];
+    my $replace_count = 0;
+    my $result_buffer = SPVM::StringBuffer->new;
+    my $target_length = length $target;
+    
+    if ($target_base_index > 0) {
+      my $first_string = substr($target, 0, $target_base_index);
+      $result_buffer->push($first_string);
+    }
+    
+    while (my $match = $self->match_repeat($target, $target_base_index)) {
+      
+      my $match_start = $self->match_start;
+      my $match_end = $self->match_end;
+      
+      my $replace : string;
+      if ($replace_object isa string) {
+        $replace = (string)$replace_object;
+      }
+      elsif ($replace_object isa object[]) {
+        my $replace_objects = (object[])$replace_object;
+        
+        my $replace_buffer = SPVM::StringBuffer->new;
+        for (my $i = 0; $i < @$replace_objects; $i++) {
+          my $replace_elem_object = $replace_objects->[$i];
+          
+          if ($replace_elem_object isa string) {
+            $replace_buffer->push((string)$replace_elem_object);
+          }
+          elsif ($replace_elem_object isa SPVM::Int) {
+            my $capture = $self->caps((int)$replace_elem_object);
+            $replace_buffer->push($capture);
+          }
+          else {
+            die "Invalid replace argument element";
+          }
+        }
+        
+        $replace = $replace_buffer->to_str;
+      }
+      elsif ($replace_object isa SPVM::Stringer) {
+        my $replace_buffer = SPVM::StringBuffer->new;
+        my $stringer = (SPVM::Stringer)$replace_object;
+        my $cb_result = $stringer->to_str;
+        $replace_buffer->push($cb_result);
+        $replace = $replace_buffer->to_str;
+      }
+      else {
+        die "Invalid replace argument";
+      }
+      
+      my $match_length = $match_end - $match_start;
+      my $replace_length = length $replace;
+      
+      my $result_length = $target_length + $replace_length - $match_length;
+      
+      $result = new byte[$result_length];
+      
+      my $rest_length = $target_length - $match_end;
+      
+      my $before_result = (string)sliceb((byte[])$target, $target_base_index, $match_start - $target_base_index);
+      $result_buffer->push($before_result);
+      $result_buffer->push($replace);
+      
+      $replace_count++;
+      
+      unless ($replace_all) {
+        last;
+      }
+      $target_base_index = $match_end;
+    }
+    
+    
+    if ($replace_count == 0) {
+      $result = (byte[])copy_str($target);
+    }
+    else {
+      my $match_end = $self->match_end;
+      my $rest_length = $target_length - $match_end;
+      my $rest_string = substr($target, $match_end, $rest_length);
+      $result_buffer->push($rest_string);
+      
+      $result = (byte[])$result_buffer->to_str;
+    }
+    
+    $self->{replace_count} = $replace_count;
+    
+    return (string)$result;
+  }
+
   private sub duplicate : int ($self : self, $pattern1 : SPVM::Regex::Pattern, $pattern2 : SPVM::Regex::Pattern) {
     my $uchar_min_maxs1 = $pattern1->{uchar_min_maxs};
     my $uchar_min_maxs2 = $pattern2->{uchar_min_maxs};
@@ -578,7 +751,8 @@ package SPVM::Regex::Pattern {
     CAPTURE_START,
     CAPTURE_END,
   }
-  
+  has capture_start : byte;
+  has capture_end : byte;
   has negate : byte;
   has type : byte;
   has max_repeat : int;

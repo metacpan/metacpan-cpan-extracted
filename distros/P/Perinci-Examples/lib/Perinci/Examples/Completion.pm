@@ -1,7 +1,7 @@
 package Perinci::Examples::Completion;
 
-our $DATE = '2019-06-29'; # DATE
-our $VERSION = '0.814'; # VERSION
+our $DATE = '2019-07-19'; # DATE
+our $VERSION = '0.818'; # VERSION
 
 use 5.010;
 use strict;
@@ -71,6 +71,50 @@ sub fruits {
     [200, "OK", {@_}];
 }
 
+$SPEC{animals} = {
+    v => 1.1,
+    summary => 'Specify an animal (optional) and a color (optional), '.
+        'with some examples given in argument spec or schema (for completion)',
+    args => {
+        animal => {
+            schema => ['str*', {
+                'examples' => [
+                    {value=>'dog', summary=>'You cannot teach this animal new tricks when it is old'},
+                    {value=>'bird', summary=>'Two of this can be killed with one stone'},
+                    {value=>'elephant', summary=>'It never forgets'},
+                ],
+            }],
+            pos => 0,
+        },
+        color => {
+            schema => ['str*'],
+            examples => [
+                'black',
+                'blue',
+                {value=>'chartreuse', summary=>'half green, half yellow'},
+                {value=>'cyan', summary=>'half green, half blue'},
+                'green',
+                'grey',
+                {value=>'magenta', summary=>'half red, half blue'},
+                'red',
+                'white',
+                'yellow',
+            ],
+            pos => 0,
+        },
+    },
+    description => <<'_',
+
+Demonstrates Rinci argument spec `examples` property as well as Sah schema's
+`examples` clause. This property is a source of valid values for the argument
+and can be used for testing, documentation, or completion.
+
+_
+};
+sub animals {
+    [200, "OK", {@_}];
+}
+
 1;
 # ABSTRACT: More completion examples
 
@@ -86,11 +130,48 @@ Perinci::Examples::Completion - More completion examples
 
 =head1 VERSION
 
-This document describes version 0.814 of Perinci::Examples::Completion (from Perl distribution Perinci-Examples), released on 2019-06-29.
+This document describes version 0.818 of Perinci::Examples::Completion (from Perl distribution Perinci-Examples), released on 2019-07-19.
 
 =for Pod::Coverage .*
 
 =head1 FUNCTIONS
+
+
+=head2 animals
+
+Usage:
+
+ animals(%args) -> [status, msg, payload, meta]
+
+Specify an animal (optional) and a color (optional), with some examples given in argument spec or schema (for completion).
+
+Demonstrates Rinci argument spec C<examples> property as well as Sah schema's
+C<examples> clause. This property is a source of valid values for the argument
+and can be used for testing, documentation, or completion.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<animal> => I<str>
+
+=item * B<color> => I<str>
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
 
 
 =head2 fruits

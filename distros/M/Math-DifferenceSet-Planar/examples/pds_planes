@@ -1,0 +1,59 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use FindBin;
+use Math::DifferenceSet::Planar;
+
+use constant PDS => Math::DifferenceSet::Planar::;
+
+$| = 1;
+
+if (@ARGV < 1 || 2 < @ARGV  || grep {!/^[1-9][0-9]*\z/} @ARGV) {
+    die "usage: pds_planes (p n|q)\n";
+}
+
+my $s0 = PDS->new(@ARGV);
+
+my $it = $s0->iterate_planes;
+while (my $s = $it->()) {
+    my @e = $s->elements;
+    print "@e\n";
+}
+
+__END__
+=head1 NAME
+
+pds_planes - enumerate planar difference sets of a given order
+
+=head1 SYNOPSIS
+
+  pds_planes p n
+  pds_planes order
+
+=head1 DESCRIPTION
+
+This example program writes planar difference sets of a given order
+to standard output.  The order can be specified as a prime number and
+an exponent, or as a prime power.  The output will be lines with one
+representative difference set per line, for all planes of the given order.
+
+=head1 AUTHOR
+
+Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2019 by Martin Becker, Blaubeuren.  All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=head1 DISCLAIMER OF WARRANTY
+
+This library is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of merchantability
+or fitness for a particular purpose.
+
+=cut

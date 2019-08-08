@@ -50,3 +50,5 @@ sub test_synch (@) {	## no critic (ProhibitSubroutinePrototypes, RequireArgUnpac
 }
 
 1;
+
+# ex: set filetype=perl textwidth=72 autoindent :

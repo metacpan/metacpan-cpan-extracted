@@ -1,7 +1,7 @@
 package Data::Sah::Coerce::perl::str::str_check_unix_group_exists;
 
-our $DATE = '2019-05-07'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-07-12'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -46,7 +46,7 @@ Data::Sah::Coerce::perl::str::str_check_unix_group_exists - Check that Unix grou
 
 =head1 VERSION
 
-This document describes version 0.003 of Data::Sah::Coerce::perl::str::str_check_unix_group_exists (from Perl distribution Sah-Schemas-Unix), released on 2019-05-07.
+This document describes version 0.004 of Data::Sah::Coerce::perl::str::str_check_unix_group_exists (from Perl distribution Sah-Schemas-Unix), released on 2019-07-12.
 
 =head1 DESCRIPTION
 

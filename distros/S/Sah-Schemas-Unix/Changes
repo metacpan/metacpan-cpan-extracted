@@ -1,4 +1,10 @@
-0.003   2019-05-07 (PERLANCAR)
+0.004   2019-07-12  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Add aliases for {file,dir,path}name::unix ->
+	  unix::{file,dir,path}name.
+
+
+0.003   2019-05-07  Released-By: PERLANCAR
 
 	- [ux] Add description to some of the schemas.
 
@@ -6,12 +12,12 @@
           unix::uid, not uint.
 
 
-0.002   2019-05-07 (PERLANCAR)
+0.002   2019-05-07  Released-By: PERLANCAR
 
         - [bugfix] [build] Rebuild to fix dependencies to non-existing coercion
           rule modules.
 
 
-0.001   2019-05-07 (PERLANCAR)
+0.001   2019-05-07  Released-By: PERLANCAR
 
         - First release.

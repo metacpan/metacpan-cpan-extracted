@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package Net::Proxmox::VE::Pools;
-$Net::Proxmox::VE::Pools::VERSION = '0.33';
+$Net::Proxmox::VE::Pools::VERSION = '0.35';
 use parent 'Exporter';
 
 
@@ -108,7 +108,7 @@ Net::Proxmox::VE::Pools - Presents a pool object
 
 =head1 VERSION
 
-version 0.33
+version 0.35
 
 =head1 SYNOPSIS
 
@@ -216,7 +216,7 @@ String. List of virtual machines in pve-vmid-list format.
 
 =head1 SEE ALSO
 
-  L<Net::Proxmox::VE>
+L<Net::Proxmox::VE>
 
 =head1 AUTHOR
 
@@ -224,7 +224,7 @@ Brendan Beveridge <brendan@nodeintegration.com.au>, Dean Hamstead <dean@bytefoun
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Dean Hamstad.
+This software is copyright (c) 2019 by Dean Hamstad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

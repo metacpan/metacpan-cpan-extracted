@@ -1,5 +1,10 @@
 Revision history for Perl module App::watcher
 
+0.12 2019-08-06T03:33:02Z
+
+    - adding --filter
+      (yanick)
+
 0.11 2015-07-27T03:00:25Z
 
     - added --execlude option

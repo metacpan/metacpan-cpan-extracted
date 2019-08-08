@@ -26,20 +26,20 @@
       "configure" : {
          "requires" : {
             "CPP::catch" : "v1.0.8",
-            "Test::Catch" : "v1.0.7",
-            "XS::Install" : "v1.2.8"
+            "Test::Catch" : "v1.0.8",
+            "XS::Install" : "v1.2.9"
          }
       },
       "runtime" : {
          "requires" : {
-            "XS::Install" : "v1.2.8",
+            "XS::Install" : "v1.2.9",
             "perl" : "5.012000"
          }
       },
       "test" : {
          "requires" : {
             "CPP::catch" : "v1.0.8",
-            "Test::Catch" : "v1.0.7",
+            "Test::Catch" : "v1.0.8",
             "Test::Deep" : "0",
             "Test::More" : "0",
             "Test::Simple" : "0.96"
@@ -47,6 +47,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v1.2.6",
+   "version" : "v1.2.9",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

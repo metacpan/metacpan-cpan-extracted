@@ -1,0 +1,49 @@
+NAME
+    DateTime::Duration::Patch::StringifyAsISO8601 - Make DateTime::Duration
+    objects stringify to ISO8601 duration
+
+VERSION
+    This document describes version 0.001 of
+    DateTime::Duration::Patch::StringifyAsISO8601 (from Perl distribution
+    DateTime-Duration-Patch-StringifyAsISO8601), released on 2019-06-19.
+
+SYNOPSIS
+     use DateTime::Duration;
+     use DateTime::Duration::Patch::StringifyAsISO8601;
+
+     my $dur = DateTime::Duration->new(years => 1, months => 2);
+     say $dur; # => "P1Y2M"
+
+DESCRIPTION
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/DateTime-Duration-Patch-StringifyAsISO8601
+    >.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-DateTime-Duration-Patch-StringifyAsIS
+    O8601>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=DateTime-Duration-Pat
+    ch-StringifyAsISO8601>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    DateTime::Duration
+
+    DateTime::Format::Duration::ISO8601
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

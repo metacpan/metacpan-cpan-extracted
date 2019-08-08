@@ -1,0 +1,698 @@
+#!perl
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Net::Connection::ncnetstat;
+
+sub version{
+	print "ncnetstat v. 0.0.0\n";
+}
+
+sub help{
+	print '
+-a         Show all connections.
+--drp      Don\'t resolve port names.
+-i         Invert the sort.
+-l         Show the listening ports.
+-n         Don\' resolve the PTRs.
+--nc       Don\'t use colors.
+-S <sort>  The Net::Connection::Sort to use.
+-t         Show only TCP connections.
+-u         Show only UDP connections.
+
+-c <CIDRs>  A comma seperated list of CIDRs to search for.
+--ci        Invert the CIDR search.
+
+-C    Show the command to the first space.
+--Cl  Show the whole command.
+
+-p <ports>  A comma seperated list of ports to search for.
+--pi        Invert the port search.
+
+-P <protocols>  A comma seperated list of protocols to search for.
+--Pi            Invert your protocol search.
+
+--ptrr <rgx>   A comma seperated list of regex to use for a PTR search.
+--ptrri        Invert the RegexPTR search.
+--lptrr <rgx>  A comma seperated list of regex to use for a local PTR search.
+--lptrri       Invert the local RegexPTR search.
+--rptrr <rgx>  A comma seperated list of regex to use for a remote PTR search.
+--rptrri       Invert the remote RegexPTR search.
+
+--ptr <PTRs>   A comma seperated list of PTRs to search for.
+--ptri         Invert the PTR search.
+--lptr <PTRs>  A comma seperated list of local PTRs to search for.
+--lptri        Invert the local PTR search.
+--rptr <PTRs>  A comma seperated list of remote PTRs to search for.
+--rptri        Invert the remote PTR search.
+
+-s <states>  A comma seperated list of states to search for.
+--si         Invert the state search.
+
+-u <users>   A comma seperated list of usernames to search for.
+--ui         Invert the username search.
+
+--uid <uids> A comma separated list of UIDs to search for.
+--uidi       Invert the UID search.
+
+The default available sort methods are as below.
+host_f   foreign host
+host_fl  foreign host, local host
+host_l   local host
+host_lf  local host, foreign host
+pid      process ID
+port_f   foreign port, numerically
+port_fa  foreign port, alphabetically
+port_l   local port, numerically
+port_la  local port, alphabetically
+proto    protocol
+ptr_f    foreign PTR
+ptr_l    local PTR
+state    state
+uid      user ID
+user     username
+';
+}
+
+# command line option holders
+my $tcp=0;
+my $udp=0;
+my $help=0;
+my $version=0;
+my $dont_resolve_ports=0;
+my $sort='host_fl';
+my $cidr_string;
+my $lcidr_string;
+my $rcidr_string;
+my $ports_string;
+my $states_string;
+my $protocols_string;
+my $all=0;
+my $listening;
+my $invert=0;
+my $ptrs_string;
+my $ptrrs_string;
+my $rptrs_string;
+my $lptrs_string;
+my $rptrrs_string;
+my $lptrrs_string;
+my $ports_invert;
+my $rptrs_invert;
+my $lptrs_invert;
+my $rptrrs_invert;
+my $lptrrs_invert;
+my $ptrs_invert;
+my $ptrrs_invert;
+my $cidr_invert;
+my $lcidr_invert;
+my $rcidr_invert;
+my $states_invert;
+my $protocols_invert;
+my $no_color=0;
+my $no_use_ptr=0;
+my $ptr=1;
+my $command=0;
+my $command_long=0;
+my $uid_string;
+my $uid_invert=0;
+my $users_string;
+my $users_invert=0;
+
+# get the commandline options
+Getopt::Long::Configure ('no_ignore_case');
+Getopt::Long::Configure ('bundling');
+GetOptions(
+		   't'=>\$tcp,
+		   'u'=>\$udp,
+		   'version' => \$version,
+		   'v' => \$version,
+		   'help' => \$help,
+		   'h' => \$help,
+		   'a' => \$all,
+		   'l' => \$listening,
+		   'i' => \$invert,
+		   'drp' => \$dont_resolve_ports,
+		   'c=s' => \$cidr_string,
+		   'ci'=> \$cidr_invert,
+		   'lc=s' => \$lcidr_string,
+		   'lci'=> \$lcidr_invert,
+		   'rc=s' => \$rcidr_string,
+		   'rci'=> \$rcidr_invert,
+		   'S=s' => \$sort,
+		   'p=s' => \$ports_string,
+		   'pi' => \$ports_invert,
+		   's=s' => \$states_string,
+		   'si' => \$states_invert,
+		   'P=s' => \$protocols_string,
+		   'Pi' => \$protocols_invert,
+		   'ptrr=s' => \$ptrrs_string,
+		   'ptr=s' => \$ptrs_string,
+		   'ptri' => \$ptrs_invert,
+		   'ptrri' => \$ptrrs_invert,
+		   'rptrr=s' => \$rptrrs_string,
+		   'rptr=s' => \$rptrs_string,
+		   'rptrri' => \$rptrrs_invert,
+		   'rptri' => \$rptrs_invert,
+		   'lptrr=s' => \$lptrrs_string,
+		   'lptr=s' => \$lptrs_string,
+		   'lptri' => \$lptrs_invert,
+		   'lptrri' => \$lptrrs_invert,
+		   'nc' => \$no_color,
+		   'n' => \$no_use_ptr,
+		   'C' => \$command,
+		   'Cl' => \$command_long,
+		   'uid=s' => \$uid_string,
+		   'uidi'=> \$uid_invert,
+		   'u=s' => \$users_string,
+		   'ui' => \$users_invert,
+		   );
+
+my @filters;
+
+# print the version info if requested
+if ( $version ){
+	&version;
+	exit;
+}
+
+if ( $help ){
+	&version;
+	&help;
+	exit;
+}
+
+# add the filters for the -l and -a option
+if (
+	( ! $all ) &&
+	( ! $listening )
+	){
+	# If -a is not given, we don't want the listen ports
+	push( @filters, {
+					 type=>'States',
+					 invert=>1,
+					 args=>{
+							states=>['LISTEN']
+							}
+					 },
+		  {
+		   type=>'Ports',
+		   invert=>1,
+		   args=>{
+				  fports=>[
+						   '*',
+						   ],
+				  }
+		   }
+		 );
+}elsif(
+	   $listening &&
+	   ( ! $all )
+	   ){
+	# if -l we only want the ports in the LISTEN state
+	push( @filters, {
+					 type=>'States',
+					 invert=>0,
+					 args=>{
+							states=>['LISTEN']
+							}
+					 }
+		 );
+}
+
+#
+# Handle stats search
+#
+if ( defined( $states_string ) ){
+	my @states=split(/\,/, $states_string );
+	push( @filters, {
+					 type=>'States',
+					 invert=>$states_invert,
+					 args=>{
+							states=>\@states,
+							},
+					 }
+		 );
+}
+
+#
+# handles the protocol search
+#
+if ( defined( $protocols_string ) ){
+	my @protos=split(/\,/, $protocols_string );
+	push( @filters, {
+					 type=>'Protos',
+					 invert=>$protocols_invert,
+					 args=>{
+							protos=>\@protos,
+							},
+					 }
+		 );
+}
+
+#
+# Handle CIDR searches
+#
+if ( defined( $cidr_string ) ){
+	my @cidrs=split(/\,/, $cidr_string );
+	push( @filters, {
+					 type=>'CIDR',
+					 invert=>$cidr_invert,
+					 args=>{
+							cidrs=>\@cidrs,
+							},
+					 }
+		  );
+}
+
+#
+# Handle UID searches
+#
+if ( defined( $uid_string ) ){
+	my @uids=split(/\,/, $uid_string );
+	push( @filters, {
+					 type=>'UID',
+					 invert=>$uid_invert,
+					 args=>{
+							uids=>\@uids,
+							},
+					 }
+		  );
+}
+
+#
+# Handle username searches
+#
+if ( defined( $users_string ) ){
+	my @users=split(/\,/, $users_string );
+	push( @filters, {
+					 type=>'Username',
+					 invert=>$users_invert,
+					 args=>{
+							usernames=>\@users,
+							},
+					 }
+		  );
+}
+
+#
+# Handle local CIDR searches
+#
+#if ( defined( $lcidr_string ) ){
+#	my @cidrs=split(/\,/, $lcidr_string );
+#	push( @filters, {
+#					 type=>'CIDR',
+#					 invert=>$cidr_invert,
+#					 args=>{
+#							lcidrs=>\@cidrs,
+#							},
+#					 }
+#		  );
+#}
+
+#
+# Handle local CIDR searches
+#
+#if ( defined( $fcidr_string ) ){
+#	my @cidrs=split(/\,/, $fcidr_string );
+#	push( @filters, {
+#					 type=>'CIDR',
+#					 invert=>$cidr_invert,
+#					 args=>{
+#							fcidrs=>\@cidrs,
+#							},
+#					 }
+#		  );
+#}
+
+#
+# Handle the ports search.
+#
+if ( defined( $ports_string ) ){
+	my @ports=split(/\,/, $ports_string);
+	push( @filters, {
+					 type=>'Ports',
+					 invert=>$ports_invert,
+					 args=>{
+							ports=>\@ports,
+							},
+					 }
+		 );
+}
+
+#
+# Handle the regex PTR searches
+#
+if ( defined( $ptrrs_string ) ){
+	my @ptrs=split(/\,/, $ptrrs_string);
+	push( @filters, {
+					 type=>'RegexPTR',
+					 invert=>$ptrrs_invert,
+					 args=>{
+							ptrs=>\@ptrs,
+							},
+					 }
+		 );
+}
+
+#
+# Handle the regex local PTR searches
+#
+if ( defined( $lptrrs_string ) ){
+	my @ptrs=split(/\,/, $lptrrs_string);
+	push( @filters, {
+					 type=>'RegexPTR',
+					 invert=>$lptrrs_invert,
+					 args=>{
+							lptrs=>\@ptrs,
+							},
+					 }
+		 );
+}
+
+#
+# Handle the regex remote PTR searches
+#
+if ( defined( $rptrrs_string ) ){
+	my @ptrs=split(/\,/, $rptrrs_string);
+	push( @filters, {
+					 type=>'RegexPTR',
+					 invert=>$rptrrs_invert,
+					 args=>{
+							fptrs=>\@ptrs,
+							},
+					 }
+		 );
+
+}
+
+#
+# Handle the ptrs searches
+#
+if ( defined( $ptrs_string ) ){
+	my @ptrs=split(/\,/, $ptrs_string);
+	push( @filters, {
+					 type=>'PTR',
+					 invert=>$rptrs_invert,
+					 args=>{
+							ptrs=>\@ptrs,
+							},
+					 }
+		 );
+}
+
+#
+# Handle the remote ptrs searches
+#
+if ( defined( $rptrs_string ) ){
+	my @ptrs=split(/\,/, $rptrs_string);
+	push( @filters, {
+					 type=>'PTR',
+					 invert=>$rptrs_invert,
+					 args=>{
+							fptrs=>\@ptrs,
+							},
+					 }
+		 );
+}
+
+#
+# Handle the local ptrs searches
+#
+if ( defined( $lptrs_string ) ){
+	my @ptrs=split(/\,/, $lptrs_string);
+	push( @filters, {
+					 type=>'PTR',
+					 invert=>$lptrs_invert,
+					 args=>{
+							lptrs=>\@ptrs,
+							},
+					 }
+		 );
+}
+
+# handle the -t -u options
+# only add a filter if one is specified...
+# adding both is just pointless
+if (
+	( ! $tcp ) &&
+	$udp
+	){
+	push( @filters, {
+					 type=>'Protos',
+					 invert=>0,
+					 args=>{
+							protos=>[ 'udp4', 'udp6' ],
+							}
+					 },
+		 );
+}elsif(
+	   $tcp &&
+	   ( ! $udp )
+	   ){
+	push( @filters, {
+					 type=>'Protos',
+					 invert=>0,
+					 args=>{
+							protos=>[ 'tcp4', 'tcp6' ],
+							}
+					 }
+		 );
+}
+
+if ( $no_use_ptr ){
+	$ptr=0;
+}
+
+# XOR the -i if needed
+if ( defined( $ENV{NCNETSTAT_invert} ) ){
+	$invert= $invert ^ $ENV{NCNETSTAT_invert};
+}
+# XOR the -n value if needed
+if ( defined( $ENV{NCNETSTAT_ptr} ) ){
+	$ptr = $ptr ^ $ENV{NCNETSTAT_ptr};
+}
+# same for the no color
+if ( defined( $ENV{NO_COLOR} ) ){
+	$no_color = $no_color ^ 1;
+}
+# disable the color if requested
+if ( $no_color ){
+	$ENV{ANSI_COLORS_DISABLED}=1;
+}
+# set C if Cl is set
+if ( $command_long && ! $command ){
+	$command=1;
+}
+
+my $ncnetstat=Net::Connection::ncnetstat->new(
+											  {
+											   ptr=>$ptr,
+											   command=>$command,
+											   command_long=>$command_long,
+											   sorter=>{
+														invert=>$invert,
+														type=>$sort,
+														},
+											   match=>{
+													   checks=>\@filters,
+													   }
+											   }
+											  );
+print $ncnetstat->run;
+
+=head1 NAME
+
+ncnetstat - a netstat like utility that supports color and searching
+
+=head1 SYNOPSIS
+
+ncnetstat [B<-a>] [B<--drp>] [B<-l>] [B<-n>] [B<--nc>] [B<-S <sort>>] [B<-t>] [B<-u>]
+[B<-c <CIDRs>>] [B<--ci -p <ports>>] [B<--pi>] [B<-P <protocols>>] [B<--Pi>]
+[B<--ptr <PTRs>>] [B<--ptri>] [B<--lptr <PTRs>>] [B<--lptri>] [B<--rptr <PTRs>>] [B<--rptri>]
+[B<-s <states>>] [B<--si>]
+
+=head1 FLAGS
+
+=head2 -a
+
+Show all connections.
+
+=head2 -c <CIDRs>
+
+A comma seperated list of CIDRs to search for.
+
+=head2 --ci
+
+Invert the CIDR search.
+
+=head2 -C
+
+Show the command to the first space.
+
+=head2 --Cl
+
+Show the whole command.
+
+=head2 --drp
+
+Don't resolve port names.
+
+=head2 -i
+
+Invert the sort.
+
+=head2 -l
+
+Show the listening ports.
+
+=head2 -n
+
+Don't resolve the PTRs.
+
+=head2 --nc
+
+Don't use colors.
+
+=head2 -p <ports>
+
+A comma seperated list of ports to search for.
+
+=head2 --pi
+
+Invert the port search.
+
+=head2 -P <protocols>
+
+A comma seperated list of protocols to search for.
+
+=head2 --Pi
+
+Invert your protocol search.
+
+=head2 --ptr <PTRs>
+
+A comma seperated list of PTRs to search for.
+
+=head2 --ptri
+
+Invert the PTR search.
+
+=head2 --lptr <PTRs>
+
+A comma seperated list of local PTRs to search for.
+
+=head2 --lptri
+
+Invert the local PTR search.
+
+=head2 --rptr <PTRs>
+
+A comma seperated list of remote PTRs to search for.
+
+=head2 --rptri
+
+Invert the remote PTR search.
+
+=head2 -s <states>
+
+A comma seperated list of states to search for.
+
+=head2 --si
+
+Invert the state search.
+
+=head2 -S <sort>
+
+The L<Net::Connection::Sort> to use.
+
+The default available sort methods are as below.
+
+    host_f   foreign host
+    host_fl  foreign host, local host *default*
+    host_l   local host
+    host_lf  local host, foreign host
+    pid      process ID
+    port_f   foreign port, numerically
+    port_fa  foreign port, alphabetically
+    port_l   local port, numerically
+    port_la  local port, alphabetically
+    proto    protocol
+    ptr_f    foreign PTR
+    ptr_l    local PTR
+    state    state
+    uid      user ID
+    user     username
+
+=head2 -t
+
+Show only TCP connections.
+
+=head2 -u
+
+Show only UDP connections.
+
+=head1 ENVIRONMENT VARIABLES
+
+=head2 NCNETSTAT_invert
+
+This is either 0 or 1. If defined it will be used for XORing the -i flag.
+
+    export CNETSTAT_invert=1
+    # run ncnetstat inverted
+    ncnetstat
+    # run it non-inverted, the opposite of what the -i flag normally is
+    ncnetstat -i
+
+=head2 NCNETSTAT_sort
+
+Sets the default sort method. -S overrides this.
+
+=head2 NO_COLOR
+
+If this is set, The output will not be colorized. If this is set, the --nc
+flag is also inverted.
+
+=head2 RES_NAMESERVERS
+
+A space-separated list of nameservers to query used by L<Net::DNS::Resolver>.
+
+There are a few more possible ones, but this is the most useful one and that documentation
+really belongs to that module.
+
+=head1 EXAMPLES
+
+    ncnestat -s established,time_wait
+
+Return a list of connection that are in the established or time_wait state.
+
+    ncnestat -c ::/0
+
+Return a list of all IPv6 addresses.
+
+    ncnestat -c ::1/128,127.0.0.1/32
+
+Return all connections to localhost.
+
+    ncnestat -c 192.168.15.2/32 -l
+
+Display all connections listening explicitly on 192.168.15.2.
+
+    ncnetstat -S host_f -i
+
+Sort the connections by the foreign host and invert the results.
+
+    ncnetstat -c 10.0.0.0/24 --ci
+
+Show connections that are either not locally or remotely part of the
+10.0.0.0/24 subnet.
+
+    ncnetstat --ptr foo.bar
+
+Find connections to/from IPs that have a PTR record of foo.bar.
+
+    ncnetstat --ptr foo.bar --ptri
+
+Find connections to/from IPs that do not have a PTR record of foo.bar.
+
+=cut

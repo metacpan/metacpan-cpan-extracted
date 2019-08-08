@@ -254,6 +254,7 @@ sub _search_result_xlate {
         items => [ map {
             my $i = $self->_item_xlate($_->{item});
             $i->{url} ||= "https://$domain/#titles/$i->{isbn}" if $domain;
+            $i->{available} = $_->{interest}{isAvailable};
             $i;
         } @{$res->{items} || []} ],
         page_size => $res->{pageSize},

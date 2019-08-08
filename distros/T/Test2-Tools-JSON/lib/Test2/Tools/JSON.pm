@@ -2,7 +2,7 @@ package Test2::Tools::JSON;
 use strict;
 use warnings;
 
-our $VERSION = "0.03";
+our $VERSION = "0.05";
 
 use Carp ();
 use JSON::MaybeXS qw/JSON/;

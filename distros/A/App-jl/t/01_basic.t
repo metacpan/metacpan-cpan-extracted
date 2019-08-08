@@ -305,4 +305,21 @@ jl_test('UA-LABEL', encode_json({
     ok $output !~ m!"foo"!;
 });
 
+jl_test('MAX_NUMBER', encode_json({
+    created => 4294967295000, # (2**32 -1) * 1000
+}), ['-xxxxx'], sub {
+    my ($output, $src) = @_;
+
+    ok $output !~ m!4294967295000!;
+    ok $output =~ m!\.000!;
+});
+
+jl_test('TOO_LARGE_NUMBER', encode_json({
+    created => 4294967295001, # (2**32 -1) * 1000 + 1
+}), ['-xxxxx'], sub {
+    my ($output, $src) = @_;
+
+    ok $output =~ m!4294967295001!;
+});
+
 done_testing;

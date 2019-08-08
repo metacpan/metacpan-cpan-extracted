@@ -1,13 +1,18 @@
-0.003   2018-09-26 (PERLANCAR)
+0.004   2019-07-12  Released-By: PERLANCAR; Urgency: medium
+
+	- Add functions: term_bgcolor_is_{dark,light}.
+
+
+0.003   2018-09-26  Released-By: PERLANCAR
 
 	- Move Rinci metadata from App::XTermUtils.
 
 
-0.002   2018-09-26 (PERLANCAR)
+0.002   2018-09-26  Released-By: PERLANCAR
 
 	- set_term_bgcolor(): Add option to print to STDERR.
 
 
-0.001   2018-09-25 (PERLANCAR)
+0.001   2018-09-25  Released-By: PERLANCAR
 
         - First release.

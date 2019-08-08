@@ -106,6 +106,20 @@ subtest 'param' => sub{
         };
       };
     };
+
+    # https://github.com/sysread/URI-Fast/issues/23
+    subtest 'set: array with zero-length string' => sub {
+      my $u = uri;
+
+      $u->param(foo => ['', 'bar']);
+      is "$u", '?foo=&foo=bar', 'empty string as first value';
+
+      $u->param(foo => ['bar', '']);
+      is "$u", '?foo=bar&foo=', 'empty string as last value';
+
+      $u->param(foo => ['bar', '', 'baz']);
+      is "$u", '?foo=bar&foo=&foo=baz', 'empty string as middle value';
+    };
   }
 
   subtest 'separator replacement' => sub {

@@ -22,7 +22,7 @@ requires:
   DateTime: '0'
   Digest::SHA: '0'
   Getopt::Long: '0'
-  IO::Lambda: '1.28'
+  IO::Lambda: '1.29'
   IO::Socket::SSL: '0'
   LWP: '0'
   MIME::Base64: '0'
@@ -31,5 +31,5 @@ requires:
   perl: '5.01'
 resources:
   repository: http://github.com/dk/Net-Eboks
-version: '0.07'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

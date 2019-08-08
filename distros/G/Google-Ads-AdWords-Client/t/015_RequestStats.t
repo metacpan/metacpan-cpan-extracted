@@ -65,7 +65,14 @@ is($client->get_requests_count(),        1);
 is($client->get_operations_count(),      2);
 is($client->get_failed_requests_count(), 0);
 
+# When deserializing a fault, there is a warning that is sent to STDERR that
+# we want to not log. This is expected, but makes for noisy output.
+# Copy STDERR to another filehandle and send errors to nowhere.
+open (my $STDOLD, '>&', STDERR);
+open (STDERR, '>>', '/dev/null');
 @results = $deserializer->deserialize($deserializer_fault_input);
+# Restore the file handle.
+open (STDERR, '>&', $STDOLD);
 
 is($client->get_last_request_stats()->get_service_name(),  "CampaignService");
 is($client->get_last_request_stats()->get_method_name(),   "get");

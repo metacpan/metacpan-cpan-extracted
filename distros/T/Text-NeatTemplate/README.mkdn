@@ -4,7 +4,7 @@ Text::NeatTemplate - a fast, middleweight template engine.
 
 # VERSION
 
-version 0.1101
+version 0.1300
 
 # SYNOPSIS
 
@@ -145,6 +145,18 @@ Formatting directives are:
 
     Convert to a string containing alphanumeric characters, dashes
     and underscores; spaces are converted to underscores.
+    (useful for anchors or filenames)
+
+- alphahash
+
+    Convert to a string containing only alphanumeric characters
+    and then prefix with a hash (#) character
+    (useful for anchors or tags)
+
+- alphahyphen
+
+    Convert to a string containing alphanumeric characters, dashes
+    and underscores; spaces are converted to hyphens.
     (useful for anchors or filenames)
 
 - comma\_front
@@ -341,7 +353,7 @@ See ["FORMATTING"](#formatting) for details of all the formatting directives.
 $val = $tobj->simple\_html($val);
 
 Do a simple HTML conversion of the value.
-bold, italic, <br>
+bold, italic, &lt;br>
 
 # Callable Functions
 

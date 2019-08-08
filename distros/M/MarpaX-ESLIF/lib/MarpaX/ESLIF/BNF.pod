@@ -14,7 +14,7 @@ MarpaX::ESLIF::BNF - MarpaX::ESLIF's BNF
 
 =head1 VERSION
 
-version 3.0.14
+version 3.0.17
 
 =head1 DESCRIPTION
 
@@ -284,6 +284,12 @@ Meaningful only for rule actions.
 =item C<::table>
 
 Creates a value of type TABLE, that contains all RHS's values. The number of RHS must be odd.
+
+Meaningful only for rule actions.
+
+=item C<::ast>
+
+Creates a value of type TABLE, where the single key is a string containing the lhs name, and the single value is a row containing all RHS's values, or UNDEF if rule is nullable.
 
 Meaningful only for rule actions.
 
@@ -760,6 +766,10 @@ MarpaX::ESLIF BNF can be expressed in itself:
                                    | <lua action name>
                                    | '::true'
                                    | '::false'
+                                   | '::json'
+                                   | '::row'
+                                   | '::table'
+                                   | '::ast'
   <free name>                    ::= <restricted ascii graph name>
   <symbol action name>           ::= <restricted ascii graph name>
                                    | '::transfer'
@@ -843,8 +853,6 @@ Lua object representing current marpaESLIFRecognizer instance.
 Lua object representing current marpaESLIFValue instance.
 
 =back
-
-=over
 
 Grammar events have a cost, and when possible lexeme or terminal events should be prefered.
 

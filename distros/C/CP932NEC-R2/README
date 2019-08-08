@@ -1,0 +1,39 @@
+NAME
+
+  CP932NEC::R2 - provides minimal CP932NEC I/O subroutines by short name
+
+SYNOPSIS
+
+  use CP932NEC::R2;
+
+DESCRIPTION
+
+  CP932NEC::R2 module provides minimal CP932NEC I/O subroutines by short name that
+  include no I/O encoding name. This module stands on UTF8::R2 module and
+  IOas::CP932NEC module.
+
+SUBROUTINES
+
+  @result = mbeach($utf8str)
+  $result = mbtr($utf8str, 'ABC', 'XYZ', 'cdsr')
+  $result = iolen($utf8str)
+  $result = iomid($utf8expr, $offset_as_cp932x, $length_as_cp932x, $utf8replacement)
+  @result = ioget(FILEHANDLE)
+  $result = ioput(FILEHANDLE, @utf8str)
+  $result = ioputf(FILEHANDLE, $utf8format, @utf8list)
+  @result = iosort(@utf8str)
+
+TIED HASH VARIABLE
+
+  $result = $utf8str =~ $mb{qr/$utf8regex/imsxogc}
+  $result = $utf8str =~ s<$mb{qr/before/imsxo}><after>egr
+
+SUPPORTED PERL VERSIONS
+
+  perl version 5.005_03 to newest perl
+
+SEE ALSO
+
+  http://search.cpan.org/~ina/
+  http://backpan.perl.org/authors/id/I/IN/INA/
+

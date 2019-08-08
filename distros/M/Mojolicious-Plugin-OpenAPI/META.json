@@ -30,7 +30,7 @@
       },
       "runtime" : {
          "requires" : {
-            "JSON::Validator" : "3.09",
+            "JSON::Validator" : "3.11",
             "Mojolicious" : "8.00"
          }
       },
@@ -52,7 +52,7 @@
          "web" : "https://github.com/jhthorsen/mojolicious-plugin-openapi"
       }
    },
-   "version" : "2.14",
+   "version" : "2.16",
    "x_contributors" : [
       "Jan Henning Thorsen"
    ],

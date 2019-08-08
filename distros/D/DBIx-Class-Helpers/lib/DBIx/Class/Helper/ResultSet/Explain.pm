@@ -1,5 +1,5 @@
 package DBIx::Class::Helper::ResultSet::Explain;
-$DBIx::Class::Helper::ResultSet::Explain::VERSION = '2.033004';
+$DBIx::Class::Helper::ResultSet::Explain::VERSION = '2.034000';
 # ABSTRACT: Get query plan for a ResultSet
 
 use strict;
@@ -114,7 +114,7 @@ to your entire schema.
      0,
      "Init",
      0,
-     11,
+     10,
      0,
      "",
      "00",
@@ -202,16 +202,6 @@ to your entire schema.
    ],
    [
      9,
-     "Close",
-     0,
-     0,
-     0,
-     "",
-     "00",
-     undef,
-   ],
-   [
-     10,
      "Halt",
      0,
      0,
@@ -221,7 +211,7 @@ to your entire schema.
      undef,
    ],
    [
-     11,
+     10,
      "Transaction",
      0,
      0,
@@ -231,17 +221,7 @@ to your entire schema.
      undef,
    ],
    [
-     12,
-     "TableLock",
-     0,
-     3,
-     0,
-     "Gnarly",
-     "00",
-     undef,
-   ],
-   [
-     13,
+     11,
      "Goto",
      0,
      1,
@@ -256,13 +236,13 @@ to your entire schema.
 
  [
    [
-     "Seq Scan on \"Gnarly\" me  (cost=0.00..16.20 rows=620 width=100) (actual time=0.001..0.001 rows=0 loops=1)",
+     "Seq Scan on \"Gnarly\" me  (cost=0.00..16.20 rows=620 width=100) (actual time=0.000..0.000 rows=0 loops=1)",
    ],
    [
-     "Planning time: 0.216 ms",
+     "Planning time: 0.261 ms",
    ],
    [
-     "Execution time: 0.014 ms",
+     "Execution time: 0.021 ms",
    ],
  ]
 
@@ -290,7 +270,7 @@ Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Arthur Axel "fREW" Schmidt.
+This software is copyright (c) 2019 by Arthur Axel "fREW" Schmidt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

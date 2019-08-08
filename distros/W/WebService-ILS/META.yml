@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.0, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.1.5, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +27,7 @@ no_index:
 provides:
   WebService::ILS:
     file: lib/WebService/ILS.pm
-    version: '0.17'
+    version: '0.18'
   WebService::ILS::JSON:
     file: lib/WebService/ILS/JSON.pm
   WebService::ILS::OverDrive:
@@ -62,6 +62,9 @@ requires:
   URI: '0'
   perl: '5.008001'
 resources:
-  repository: git+ssh://git.catalyst.net.nz/git/private/webservice-ils.git
-version: '0.17'
+  repository: git://gitlab.com/srdjan-catalyst/webservice-ils.git
+version: '0.18'
+x_contributors:
+  - 'Wm. Nick Clemens <nick@bywatersolutions.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

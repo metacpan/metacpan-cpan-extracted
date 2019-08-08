@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /XTerm/Util/get_term_bgcolor
-# and generated automatically using Perinci::CmdLine::Gen version 0.486
+# and generated automatically using Perinci::CmdLine::Gen version 0.488
 
-our $DATE = '2018-09-26'; # DATE
+our $DATE = '2019-07-12'; # DATE
 our $DIST = 'App-XTermUtils'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ get-term-bgcolor - Get terminal background color
 
 =head1 VERSION
 
-This document describes version 0.003 of get-term-bgcolor (from Perl distribution App-XTermUtils), released on 2018-09-26.
+This document describes version 0.004 of get-term-bgcolor (from Perl distribution App-XTermUtils), released on 2019-07-12.
 
 =head1 SYNOPSIS
 
@@ -47,8 +47,13 @@ Usage:
 
 =head1 DESCRIPTION
 
-Get the terminal's current background color, or undef if unavailable. This uses
-the following xterm control sequence:
+Get the terminal's current background color (in 6-hexdigit format e.g. 000000 or
+ffff33), or undef if unavailable. This routine tries the following mechanisms,
+from most useful to least useful, in order. Each mechanism can be turned off via
+argument.
+
+I<query_terminal>. Querying the terminal is done via sending the following xterm
+ control sequence:
 
  \e]11;?\a
 
@@ -57,8 +62,8 @@ question mark replaced by the RGB code, e.g.:
 
  \e]11;rgb:0000/0000/0000\a
 
-I have tested this works on the following terminal software (and version) on
-Linux:
+I have tested that this works on the following terminal software (and version)
+on Linux:
 
  MATE Terminal (1.18.2)
  GNOME Terminal (3.18.3)
@@ -69,14 +74,23 @@ And does not work with the following terminal software (and version) on Linux:
  LXTerminal (0.2.0)
  rxvt (2.7.10)
 
-A 6-hexdigit RGB value will be returned, e.g.:
-
- 000000
- 310035
+I<read_colorfgbg>. Some terminals like Konsole set the environment variable
+C<COLORFGBG> containing 16-color color code for foreground and background, e.g.:
+C<15;0>.
 
 =head1 OPTIONS
 
 C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--no-query-terminal>
+
+=item B<--no-read-colorfgbg>
+
+=back
 
 =head2 Output options
 
@@ -187,7 +201,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

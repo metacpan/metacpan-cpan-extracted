@@ -1927,6 +1927,27 @@ sub create_snapshot {
     return $snapshot;
 }
 
+=item my @checkpoints = $dom->list_all_checkpoints($flags)
+
+Return a list of all domain checkpoints associated with this domain.
+The elements in the returned list are instances of the
+L<Sys::Virt::DomainCheckpoint> class. The C<$flags> parameter can be
+used to filter the list of return domain checkpoints.
+
+=item my $checkpoint = $dom->get_checkpoint_by_name($name)
+
+Return the domain checkpoint with a name of C<$name>. The returned object is
+an instance of the L<Sys::Virt::DomainCheckpoint> class.
+
+=cut
+
+sub get_checkpoint_by_name {
+    my $self = shift;
+    my $name = shift;
+
+    return Sys::Virt::DomainCheckpoint->_new(domain => $self, name => $name);
+}
+
 1;
 
 =item $dom->fs_trim($mountPoint, $minimum, $flags=0);
@@ -2577,6 +2598,11 @@ domain.
 =item Sys::Virt::Domain::UNDEFINE_KEEP_NVRAM
 
 keep NVRAM state file when undefining the virtual
+domain.
+
+=item Sys::Virt::Domain::UNDEFINE_CHECKPOINTS_METADATA
+
+Also remove any checkpoint metadata when undefining the virtual
 domain.
 
 =back
@@ -4057,6 +4083,14 @@ Only list domains that are currently shutoff
 =item Sys::Virt::Domain::LIST_TRANSIENT
 
 Only list domains that do not have a persistent config
+
+=item Sys::Virt::Domain::LIST_HAS_CHECKPOINT
+
+Only list domains that have a stored checkpoint
+
+=item Sys::Virt::Domain::LIST_NO_CHECKPOINT
+
+Only list domains that do not have a stored checkpoint
 
 =back
 

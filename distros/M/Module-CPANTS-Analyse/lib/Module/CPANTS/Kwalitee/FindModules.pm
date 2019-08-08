@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use File::Spec::Functions qw(catfile);
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 $VERSION =~ s/_//; ## no critic
 
 sub order { 30 }
@@ -19,7 +19,8 @@ sub analyse {
 
     if ($me->d->{meta_yml} && $me->d->{meta_yml}{provides}) {
         my $provides = $me->d->{meta_yml}{provides};
-        while (my ($module, $data) = each %$provides) {
+        for my $module (sort keys %$provides) {
+            my $data = $provides->{$module};
             next unless ref $data eq ref {}; # ignore wrong format
             my $file = $data->{file} || '';
             my $found = {
@@ -38,7 +39,12 @@ sub analyse {
 
             push @{$me->d->{modules}}, $found;
             if (exists $me->d->{files_hash}{$file}) {
-                $me->d->{files_hash}{$file}{module} = $module;
+                (my $path_part = $module) =~ s|::|/|g;
+                if ($file =~ /\b$path_part\.pm$/) {
+                    $me->d->{files_hash}{$file}{module} = $module;
+                } elsif ("$path_part.pm" =~ /\b$file$/) {
+                    $me->d->{files_hash}{$file}{module} ||= $module;
+                }
             } else {
                 $found->{not_exists} = 1;
             }
@@ -69,6 +75,7 @@ sub analyse {
             }
             else {
                 # open file and find first package
+                my ($basename) = $file =~ /(\w+)\.pm/;
                 my $module;
                 my $max_lines_to_look_at = 666;
                 open (my $fh, "<", catfile($me->distdir, $file)) or die "__PACKAGE__: Cannot open $file to find package declaration: $!";
@@ -76,7 +83,7 @@ sub analyse {
                     next if $line =~ /^\s*#/; # ignore comments
                     if ($line =~ /^\s*package\s*(.*?)\s*;/) {
                         $module = $1;
-                        last;
+                        last if $basename and $module =~ /\b$basename$/;
                     }
                     last if $line =~ /^__(DATA|END)__/;
                     $max_lines_to_look_at--;

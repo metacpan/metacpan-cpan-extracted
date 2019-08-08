@@ -1,0 +1,8 @@
+# Not only is this a very popular example, it also has more than 2 choices
+# that would be condorcet winners when their ballots were redacted for 
+# Later Harm!
+:CHOICES:CHATTANOOGA:KNOXVILLE:MEMPHIS:NASHVILLE
+15:CHATTANOOGA:KNOXVILLE:NASHVILLE:MEMPHIS
+17:KNOXVILLE:CHATTANOOGA:NASHVILLE:MEMPHIS
+26:NASHVILLE:CHATTANOOGA:KNOXVILLE:MEMPHIS
+42:MEMPHIS:NASHVILLE:CHATTANOOGA:KNOXVILLE

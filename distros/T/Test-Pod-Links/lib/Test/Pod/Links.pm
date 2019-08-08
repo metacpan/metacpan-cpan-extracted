@@ -4,15 +4,15 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
-use Carp       ();
-use File::Find ();
+use Carp ();
 use HTTP::Tiny 0.014 ();
 use Pod::Simple::Search     ();
 use Pod::Simple::SimpleTree ();
 use Scalar::Util            ();
 use Test::Builder           ();
+use Test::XTFiles           ();
 
 my $TEST = Test::Builder->new();
 
@@ -26,59 +26,15 @@ my $TEST = Test::Builder->new();
 sub all_pod_files_ok {
     my $self = shift;
 
-    my @args = scalar @_ ? @_ : $self->_default_dirs();
-    if ( !@args ) {
-        $TEST->skip_all("No files found\n");
-        return 1;
-    }
-
-    my @files;
-  ARG:
-    for my $arg (@args) {
-        if ( !-e $arg ) {
-            $TEST->carp("File '$arg' does not exist");
-            next ARG;
-        }
-
-        if ( -l $arg ) {
-            $TEST->carp("Ignoring symlink '$arg'");
-            next ARG;
-        }
-
-        if ( -f $arg ) {
-            push @files, $arg;
-            next ARG;
-        }
-
-        if ( !-d $arg ) {
-            $TEST->carp("File '$arg' is not a file nor a directory. Ignoring it.");
-            next ARG;
-        }
-
-        File::Find::find(
-            {
-                no_chdir   => 1,
-                preprocess => sub {
-                    my @sorted = sort grep { !-l "$File::Find::dir/$_" } @_;
-                    return @sorted;
-                },
-                wanted => sub {
-                    return if !-f $File::Find::name;
-                    push @files, $File::Find::name;
-                },
-            },
-            $arg,
-        );
-    }
-
+    my @files = Test::XTFiles->new->all_files();
     if ( !@files ) {
-        $TEST->skip_all("No files found in (@args)\n");
+        $TEST->skip_all("No files found\n");
         return 1;
     }
 
     my @pod_files = grep { Pod::Simple::Search->new->contains_pod($_) } @files;
     if ( !@pod_files ) {
-        $TEST->skip_all("No files with Pod found in (@args)\n");
+        $TEST->skip_all("No files with Pod found\n");
         return 1;
     }
 
@@ -215,29 +171,6 @@ sub pod_file_ok {
     return;
 }
 
-sub _default_dirs {
-    my ($self) = @_;
-
-    my @dirs;
-    if ( -d 'blib' ) {
-        push @dirs, 'blib';
-    }
-    elsif ( -d 'lib' ) {
-        push @dirs, 'lib';
-    }
-
-    if ( -d 'bin' ) {
-        push @dirs, 'bin';
-    }
-
-    if ( -d 'script' ) {
-        push @dirs, 'script';
-    }
-
-    my @sorted = sort @dirs;
-    return @sorted;
-}
-
 sub _extract_links_from_pod {
     my ( $self, $node_ref ) = @_;
 
@@ -293,11 +226,11 @@ __END__
 
 =head1 NAME
 
-Test::Pod::Links - Test Pod for invalid HTTP/S links
+Test::Pod::Links - test Pod for invalid HTTP/S links
 
 =head1 VERSION
 
-Version 0.002
+Version 0.003
 
 =head1 SYNOPSIS
 
@@ -319,14 +252,14 @@ Recommendation is to put it into your F<xt> instead of your F<t> directory.
 
 =head2 new( [ ARGS ] )
 
-Returns a new C<Test::Pod::Link> instance. C<new> takes an optional hash ref
+Returns a new C<Test::Pod::Link> instance. C<new> takes an optional hash
 with its arguments.
 
-    Test::Pod::Links->new({
+    Test::Pod::Links->new(
         ignore       => 'url_to_ignore',
         ignore_match => qr{url to ignore},
         ua           => HTTP::Tiny->new,
-    });
+    );
 
 The following arguments are supported:
 
@@ -361,23 +294,25 @@ you call this test directly instead of a C<plan>.
 C<pod_file_ok> returns something I<true> if all web links are reachable
 and I<false> otherwise.
 
-=head2 all_pod_files_ok( [ @entries ] )
+=head2 all_pod_files_ok
 
-Checks all the web links in all files under C<@entries> by calling
-C<pod_file_ok> on every file. Directories are recursive searched for files
-containing Pod. Everything not a file and not a directory (e.g. a symlink)
-is ignored. It calls C<done_testing> or C<skip_all> so you can't have
-already called plan.
+Calls the C<all_files> method of L<Test::XTFiles> to get all the files to
+be tested. Then, C<contains_pod> from L<Pod::Simple::Search> is used to
+identify files that contain Pod.
 
-If C<@entries> is empty default directories are searched for files
-containing Pod. The default directories are F<blib>, or F<lib> if it doesn't
-exist, F<bin> and F<script>.
+All files that contain Pod will be checked  by calling C<pod_file_ok>.
 
-The method C<contains_pod> from L<Pod::Simple::Search> is used to identify
-files that contain Pod.
+It calls C<done_testing> or C<skip_all> so you can't have already called
+C<plan>.
 
 <all_pod_files_ok> returns something I<true> if all web links are reachable
 and I<false> otherwise.
+
+Please see L<XT::Files> for how to configure the files to be checked.
+
+WARNING: The API was changed with 0.003. Arguments to C<all_pod_files_ok>
+are now silently discarded and the method is now configured with
+L<XT::Files>.
 
 =head1 EXAMPLES
 
@@ -401,23 +336,16 @@ directory.
 
 =head2 Example 2 Check non-default directories or files
 
-    use 5.006;
-    use strict;
-    use warnings;
+Use the same test file as in Example 1 and create a F<.xtfilesrc> config
+file in the root directory of your distribution.
 
-    use Test::Pod::Links;
+    [Dirs]
+    module = lib
+    module = tools
+    module = corpus/hello
 
-    if ( exists $ENV{AUTOMATED_TESTING} ) {
-        print "1..0 # SKIP these tests during AUTOMATED_TESTING\n";
-        exit 0;
-    }
-
-    Test::Pod::Links->new->all_pod_files_ok(qw(
-        corpus/7_links.pod
-        corpus/hello
-        lib
-        tools
-    ));
+    [Files]
+    pod = corpus/7_links.pod
 
 =head2 Example 3 Specify a different user agent for L<HTTP::Tiny>
 
@@ -548,7 +476,8 @@ decide which URLs to skip over.
 
 =head1 SEE ALSO
 
-L<HTTP::Tiny>, L<Test::More>, L<Test::Pod::LinkCheck>, L<Test::Pod::No404s>
+L<HTTP::Tiny>, L<Test::More>, L<Test::Pod::LinkCheck>, L<Test::Pod::No404s>,
+L<XT::Files>
 
 =head1 SUPPORT
 
@@ -573,7 +502,7 @@ Sven Kirmess <sven.kirmess@kzone.ch>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Sven Kirmess.
+This software is Copyright (c) 2018-2019 by Sven Kirmess.
 
 This is free software, licensed under:
 

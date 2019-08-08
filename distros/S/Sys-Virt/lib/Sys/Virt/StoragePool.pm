@@ -478,6 +478,10 @@ Include ZFS storage pools
 
 Include VStorage storage pools
 
+=item Sys::Virt::StoragePool::LIST_ISCSI_DIRECT
+
+Include direct iSCSI pools
+
 =back
 
 =head2 EVENT ID CONSTANTS

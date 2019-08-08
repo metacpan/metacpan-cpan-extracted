@@ -26,6 +26,12 @@ subtest "in clause" => sub {
               {words=>[map { +{word=>$_, summary=>undef} } sort qw/bar baz/], static=>1});
 };
 
+subtest "examples clause" => sub {
+    my $sch = [str => {'examples'=>['bar',{value=>'baz', summary=>'foo'}]}, {}];
+    is_deeply(complete_from_schema(schema=>$sch, word=>''),
+              {words=>[{word=>'bar', summary=>undef},{word=>'baz', summary=>'foo'}], static=>1});
+};
+
 subtest int => sub {
     subtest "min/max below limit" => sub {
         my $sch = [int => {min=>-2, max=>7}, {}];

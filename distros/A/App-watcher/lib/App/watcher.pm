@@ -2,7 +2,7 @@ package App::watcher;
 use strict;
 use warnings;
 use 5.008008;
-our $VERSION='0.11';
+our $VERSION='0.12';
 1;
 __END__
 

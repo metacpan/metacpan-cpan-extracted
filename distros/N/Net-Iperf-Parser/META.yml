@@ -15,9 +15,10 @@ meta-spec:
 name: Net-Iperf-Parser
 requires:
   Moose: '0'
+  namespace::autoclean: '0'
 resources:
   homepage: https://github.com/EmilianoBruni/net-iperf-parser
   repository: https://github.com/EmilianoBruni/net-iperf-parser.git
-version: '0.01'
+version: '0.03'
 x_generated_by_perl: v5.24.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

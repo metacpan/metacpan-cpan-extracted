@@ -13,8 +13,7 @@ is intercept {
         json => json([1,2,3]),
     };
 }, array {
-    event Ok => { pass => 0 };
-    etc;
+    event 'Fail';
 }, 'fail due to invalid JSON with trailing commas';
 
 is {

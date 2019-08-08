@@ -1,25 +1,32 @@
 ---
 abstract: 'reliable job queue'
 author:
-  - 'Six Apart <cpan@sixapart.com>'
+  - ', Six Apart Ltd, cpan@sixapart.com. All'
 build_requires:
-  Data::ObjectDriver: 0.04
-  Digest::MD5: 0
-  Module::Build: 0
-  Storable: 0
-  Test::More: 0
+  Test::More: '0'
 configure_requires:
-  Module::Build: 0
-generated_by: 'Module::Build version 0.3624'
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.5, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: TheSchwartz
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
 provides:
   TheSchwartz:
     file: lib/TheSchwartz.pm
-    version: 1.12
+    version: '1.13'
   TheSchwartz::Error:
     file: lib/TheSchwartz/Error.pm
   TheSchwartz::ExitStatus:
@@ -33,9 +40,22 @@ provides:
   TheSchwartz::Worker:
     file: lib/TheSchwartz/Worker.pm
 requires:
-  Data::ObjectDriver: 0.04
-  Digest::MD5: 0
-  Storable: 0
+  Data::ObjectDriver: '0.04'
+  Digest::MD5: '0'
+  Storable: '0'
+  perl: '5.008001'
 resources:
-  license: http://dev.perl.org/licenses/
-version: 1.12
+  bugtracker: https://github.com/akiym/TheSchwartz/issues
+  homepage: https://github.com/akiym/TheSchwartz
+  repository: git://github.com/akiym/TheSchwartz.git
+version: '1.13'
+x_authority: cpan:AKIYM
+x_contributors:
+  - 'Akira Sawada <akira@peatix.com>'
+  - 'Brad Fitzpatrick <brad@danga.com>'
+  - 'Jeff Fearn <Jeff.Fearn@gmail.com>'
+  - 'Jeff Fearn <jfearn@redhat.com>'
+  - 'Six Apart Ltd. <cpan@sixapart.com>'
+  - 'Takumi Akiyama <t.akiym@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

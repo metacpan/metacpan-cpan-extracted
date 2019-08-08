@@ -1,7 +1,7 @@
 package Sah::SchemaR::unix::local_groupname;
 
-our $DATE = '2019-05-07'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-07-12'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 our $rschema = ["str",[{description=>"\nThe checking follows POSIX rules: does not begin with a hyphen and only contains\n[A-Za-z0-9._-].\n\nThe above rule allows integers like 1234, which can be confused with GID, so\nthis schema disallows pure integers.\n\nThe maximum length is 32 following libc6's limit.\n\n",match=>qr((?=\A[A-Za-z0-9._][A-Za-z0-9._-]{0,31}\z)(?=.*[A-Za-z._-])),max_len=>32,min_len=>1,summary=>"Unix group name"},{description=>"\nSupport coercion from GID.\n\n",summary=>"Unix group name that must exist on the system","x.perl.coerce_rules"=>["int_convert_gid_to_unix_group","str_check_unix_group_exists"]}],["unix::groupname","str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::unix::local_groupname - Unix group name that must exist on the sys
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::SchemaR::unix::local_groupname (from Perl distribution Sah-Schemas-Unix), released on 2019-05-07.
+This document describes version 0.004 of Sah::SchemaR::unix::local_groupname (from Perl distribution Sah-Schemas-Unix), released on 2019-07-12.
 
 =head1 DESCRIPTION
 

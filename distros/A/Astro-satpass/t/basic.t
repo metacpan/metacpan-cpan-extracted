@@ -11,6 +11,7 @@ use Time::Local;
 ##use constant EQUATORIALRADIUS => 6378.14;	# Meeus page 82.
 ##use constant PERL2000 => timegm (0, 0, 12, 1, 0, 100);
 use constant TIMFMT => '%d-%b-%Y %H:%M:%S';
+use constant PI	=> atan2 0, -1;
 
 use constant ARRAY_REF	=> ref [];
 use constant HASH_REF	=> ref {};
@@ -312,6 +313,33 @@ u_cmp_eql find_first_true => [
 u_cmp_eql format_space_track_json_time => timegm( 0, 0, 0, 1, 3, 114 ),
     '2014-04-01 00:00:00', '%s', 'Format Space Tracj JSON time';
 
+note <<EOD;
+The following test is from the example in the IDL Astronomy User's
+Library source for posang().
+EOD
+
+TODO: {
+#    local $TODO = 'position_angle() is a work-in-progress';
+
+    note <<EOD;
+This is one of the few of Meeus' formulae where he does not provide a
+worked example. I am unable to duplicate the IDL Astronomy User's
+Library posang() sample results, but neither is PyAstronomy's
+positionAngle(), which claims to derive from the IDL implementation.
+http://www.backyard-astro.com/deepsky/top100/07.html gives the position
+angle from Mizar to Alcor as 72 degrees. PyAstronomy calculates 71 and a
+bit using their SIMBAD positions as of July 21 2019, so I am testing
+against that number.
+EOD
+
+    u_cmp_eql position_angle => [
+	deg_to_rad( 200.98141867 ),
+	deg_to_rad(  54.92535197 ),
+	deg_to_rad( 201.3064076387 ),
+	deg_to_rad(  54.9879596614 ),
+    ], deg_to_rad( 71.32015 ), '%.6f', 'position angle Alcor wrt Mizar';
+}
+
 done_testing;
 
 sub instantiate ($) {
@@ -321,6 +349,11 @@ sub instantiate ($) {
     };
     @_ = ( $pass, "Instantiate $class" );
     goto &ok;
+}
+
+sub deg_to_rad {
+    my ( $deg ) = @_;
+    return $deg * PI / 180;
 }
 
 sub u_cmp_eql (@) {

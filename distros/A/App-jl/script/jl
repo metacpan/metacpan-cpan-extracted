@@ -43,7 +43,7 @@ This option is useful for below case:
        ]
     }
 
-TAB delimited string has been arraynized. It's easy to treat by c<jq>.
+TAB delimited string has been arraynized. It's easy to treat by C<jq>.
 
 =head3 xx
 

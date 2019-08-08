@@ -48,7 +48,7 @@
    "provides" : {
       "Command::Runner" : {
          "file" : "lib/Command/Runner.pm",
-         "version" : "0.101"
+         "version" : "0.102"
       },
       "Command::Runner::Format" : {
          "file" : "lib/Command/Runner/Format.pm"
@@ -72,12 +72,12 @@
          "web" : "https://github.com/skaji/Command-Runner"
       }
    },
-   "version" : "0.101",
+   "version" : "0.102",
    "x_contributors" : [
       "Shoichi Kaji <skaji@outlook.com>"
    ],
-   "x_generated_by_perl" : "v5.26.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02",
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
    "x_static_install" : 1
 }
 

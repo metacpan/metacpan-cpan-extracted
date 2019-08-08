@@ -1,11 +1,16 @@
-0.009   2019-06-06 (PERLANCAR)
+0.010   2019-08-07  Released-By: PERLANCAR; Urgency: medium
+
+	- Update all Software::Catalog::SW::* when -U.
+
+
+0.009   2019-06-06  Released-By: PERLANCAR
 
 	- Add option: --self-upgrade (-U).
 
 	- [ux] download: Strip URL query string from filename.
 
 
-0.008   2019-04-05 (PERLANCAR)
+0.008   2019-04-05  Released-By: PERLANCAR
 
 	- [bugfix] list_downloaded_versions(): Check VERSION/ARCH/ directory
 	  instead of just VERSION/ directory.
@@ -14,14 +19,14 @@
           arch specified by user.
 
 
-0.007   2019-01-13 (PERLANCAR)
+0.007   2019-01-13  Released-By: PERLANCAR
 
 	- [bugfix] Forgot to init in some functions.
 
 	- Tweak wording of log statements for clarity.
 
 
-0.006   2018-11-21 (PERLANCAR)
+0.006   2018-11-21  Released-By: PERLANCAR
 
 	- [bugfix] update-all: --download option was not provided and
 	  defaulted to off.
@@ -30,7 +35,7 @@
 	  specification.
 
 
-0.005   2018-10-18 (PERLANCAR)
+0.005   2018-10-18  Released-By: PERLANCAR
 
 	- Add subcommand: compare-versions.
 
@@ -39,7 +44,7 @@
 	- [Bugfix] Fix argument passing.
 
 
-0.004   2018-10-05 (PERLANCAR)
+0.004   2018-10-05  Released-By: PERLANCAR
 
 	- Add subcommand: download-all.
 
@@ -48,7 +53,7 @@
 	- download: Check against downloaded version first.
 
 
-0.003   2018-10-04 (PERLANCAR)
+0.003   2018-10-04  Released-By: PERLANCAR
 
 	- [Incompatible change] Rename subcommand cleanup ->
           cleanup-install-dir.
@@ -58,18 +63,18 @@
         - Implement subcommand list-downloaded.
 
 
-0.002   2018-10-04 (PERLANCAR)
+0.002   2018-10-04  Released-By: PERLANCAR
 
 	- Add subcommands: cleanup, list-installed-versions.
 
 	- list-installed: show active & inactive versions.
 
 
-0.001   2018-09-13 (PERLANCAR)
+0.001   2018-09-13  Released-By: PERLANCAR
 
         - First implementation of list-installed, download, update, update-all.
 
 
-0.000   2018-09-13 (PERLANCAR)
+0.000   2018-09-13  Released-By: PERLANCAR
 
         - First early release, most things are not implemented yet.

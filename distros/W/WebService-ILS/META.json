@@ -4,7 +4,7 @@
       "Srdjan Janković <srdjan@catalyst.net.nz>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.0",
+   "generated_by" : "Minilla/v3.1.5",
    "license" : [
       "perl_5"
    ],
@@ -35,7 +35,7 @@
          "requires" : {
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
-            "Test::PAUSE::Permissions" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
             "Test::Pod" : "1.41",
             "Test::Spellunker" : "v0.2.7"
          }
@@ -72,7 +72,7 @@
    "provides" : {
       "WebService::ILS" : {
          "file" : "lib/WebService/ILS.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "WebService::ILS::JSON" : {
          "file" : "lib/WebService/ILS/JSON.pm"
@@ -108,9 +108,13 @@
    "release_status" : "stable",
    "resources" : {
       "repository" : {
-         "url" : "git+ssh://git.catalyst.net.nz/git/private/webservice-ils.git"
+         "url" : "git://gitlab.com/srdjan-catalyst/webservice-ils.git"
       }
    },
-   "version" : "0.17",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "0.18",
+   "x_contributors" : [
+      "Wm. Nick Clemens <nick@bywatersolutions.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_static_install" : 1
 }

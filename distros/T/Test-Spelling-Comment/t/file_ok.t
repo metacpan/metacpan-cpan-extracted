@@ -34,7 +34,7 @@ sub main {
         my $obj = $class->new;
 
         #
-        my $tmp = tempdir();
+        my $tmp               = tempdir();
         my $non_existing_file = File::Spec->catfile( $tmp, 'no_such_file' );
 
         #
@@ -50,7 +50,7 @@ sub main {
 
     note('file exists, without spelling errors');
     {
-        my $tmp = tempdir();
+        my $tmp  = tempdir();
         my $file = File::Spec->catfile( $tmp, 'file.pm' );
 
         my $string_orig = "hello world\nfrom\nfile\n";
@@ -76,7 +76,7 @@ sub main {
 
     note('skip, single regex');
     {
-        my $tmp = tempdir();
+        my $tmp  = tempdir();
         my $file = File::Spec->catfile( $tmp, 'file.pm' );
 
         my $string_base     = "hello world\nfrom\nfile\n";
@@ -105,7 +105,7 @@ sub main {
 
     note('skip, two regex');
     {
-        my $tmp = tempdir();
+        my $tmp  = tempdir();
         my $file = File::Spec->catfile( $tmp, 'file.pm' );
 
         my $string_base     = "hello world\nfrom\nfile\n";
@@ -134,7 +134,7 @@ sub main {
 
     note('skip, two regex as string');
     {
-        my $tmp = tempdir();
+        my $tmp  = tempdir();
         my $file = File::Spec->catfile( $tmp, 'file.pm' );
 
         my $string_base     = "hello world\nfrom\nfile\n";
@@ -163,7 +163,7 @@ sub main {
 
     note('skip, one regex as string');
     {
-        my $tmp = tempdir();
+        my $tmp  = tempdir();
         my $file = File::Spec->catfile( $tmp, 'file.pm' );
 
         my $string_base     = "hello world\nfrom\nfile\n";
@@ -192,7 +192,7 @@ sub main {
 
     note('skip twice on same line');
     {
-        my $tmp = tempdir();
+        my $tmp  = tempdir();
         my $file = File::Spec->catfile( $tmp, 'file.pm' );
 
         my $string_orig     = "hello world\nfrom http://url HTTP://another\nfile\nhttps://third xx";
@@ -220,7 +220,7 @@ sub main {
 
     note('file exists, with spelling errors');
     {
-        my $tmp = tempdir();
+        my $tmp  = tempdir();
         my $file = File::Spec->catfile( $tmp, 'file.pm' );
 
         _touch($file);
@@ -252,7 +252,7 @@ sub main {
 
     note('file exists, Comment::Spell::Check throws an exception, without stopwords');
     {
-        my $tmp = tempdir();
+        my $tmp  = tempdir();
         my $file = File::Spec->catfile( $tmp, 'file.pm' );
 
         _touch($file);
@@ -282,7 +282,7 @@ sub main {
 
     note('file exists, Comment::Spell::Check throws an exception, with stopwords');
     {
-        my $tmp = tempdir();
+        my $tmp  = tempdir();
         my $file = File::Spec->catfile( $tmp, 'file.pm' );
 
         _touch($file);

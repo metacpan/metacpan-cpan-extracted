@@ -1,3 +1,11 @@
+0.107		2019-08-03	T. R. Wyant
+    Fix broken POD links and add a test to ensure they stay fixed.
+
+    Add low-level subroutine position_angle() to
+    Astro::Coord::ECI::Utils.
+
+    Allow station argument to equatorial_apparent() method.
+
 0.106		2019-05-13	T. R. Wyant
     Added some canned satellite magnitudes, mostly in the range of 4.5
     to 5 or so.

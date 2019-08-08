@@ -4,13 +4,13 @@
       "Dai Okabayashi <bayashi@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4218",
+   "generated_by" : "Module::Build version 0.4229",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Plack-Middleware-Curlizer",
    "prereqs" : {
@@ -31,7 +31,7 @@
             "Plack::Middleware" : "0",
             "Plack::Request" : "0",
             "Plack::Util::Accessor" : "0",
-            "ShellQuote::Any" : "0",
+            "ShellQuote::Any" : "0.04",
             "perl" : "5.008005",
             "strict" : "0",
             "warnings" : "0"
@@ -50,7 +50,7 @@
    "provides" : {
       "Plack::Middleware::Curlizer" : {
          "file" : "lib/Plack/Middleware/Curlizer.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -69,6 +69,6 @@
          "web" : "http://webchat.freenode.net/?channels=%23bayadev"
       }
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

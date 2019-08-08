@@ -1,0 +1,29 @@
+--- #YAML:1.0
+meta-spec:
+  version: 1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+name: IOas-CP932IBM
+version: 0.04
+abstract: provides CP932IBM I/O subroutines for UTF-8 script
+author:
+  - ina <ina@cpan.org>
+license: perl
+generated_by: pmake.bat
+requires:
+  Encode: 0
+  ExtUtils::MakeMaker: 5.4302
+  File::Basename: 2.6
+  File::Copy: 2.02
+  File::Path: 1.0401
+  FindBin: 1.42
+  Jacode4e::RoundTrip: 2.13.81.7
+  Socket: 0
+  Symbol: 0
+  lib: 0
+  strict: 1.01
+  vars: 0
+build_requires:
+  Test: 1.122
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ina-cpan/IOas-CP932IBM

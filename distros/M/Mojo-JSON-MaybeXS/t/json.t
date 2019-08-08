@@ -241,7 +241,7 @@ $array = decode_json '["\\ud800\\udf46"]';
 is_deeply $array, ["\x{10346}"], 'decode [\"\\ud800\\udf46\"]';
 
 # Decode object with duplicate keys
-unless (_cpanel_version('3.0235')) {
+if (_cpanel_version('4.09') or !_cpanel_version('3.0235')) {
   $hash = decode_json '{"foo": 1, "foo": 2}';
   is_deeply $hash, {foo => 2}, 'decode {"foo": 1, "foo": 2}';
 }

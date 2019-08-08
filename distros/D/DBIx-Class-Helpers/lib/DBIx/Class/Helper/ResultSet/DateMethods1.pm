@@ -1,5 +1,5 @@
 package DBIx::Class::Helper::ResultSet::DateMethods1;
-$DBIx::Class::Helper::ResultSet::DateMethods1::VERSION = '2.033004';
+$DBIx::Class::Helper::ResultSet::DateMethods1::VERSION = '2.034000';
 # ABSTRACT: Work with dates in your RDBMS nicely
 
 use parent 'DBIx::Class::ResultSet';
@@ -90,6 +90,20 @@ sub _introspector {
             ];
          }
       });
+
+      $d->decorate_driver_unconnected(MSSQL => datesubtract_sql => sub {
+         sub {
+            my ($date_sql, $unit, $amount_sql) = @_;
+
+            my ($d_sql, @d_args) = @{$date_sql};
+            my ($a_sql, @a_args) = @{$amount_sql};
+
+            return [ # no idea if this works..
+               "DATEADD($diff_part_map{$unit}, -1 * CAST($a_sql AS int), $d_sql)",
+               @a_args, @d_args,
+            ];
+         }
+      });
    }
 
    SQLITE: {
@@ -122,7 +136,6 @@ sub _introspector {
          }
       });
 
-
       my %diff_part_map = (
          day                 => 'days',
          hour                => 'hours',
@@ -143,6 +156,22 @@ sub _introspector {
 
             return [
                "DATETIME($d_sql, $a_sql || ?)",
+               @d_args, @a_args, " $diff_part_map{$unit}"
+            ];
+         }
+      });
+
+      $d->decorate_driver_unconnected(SQLite => datesubtract_sql => sub {
+         sub {
+            my ($date_sql, $unit, $amount_sql) = @_;
+
+            my ($d_sql, @d_args) = @{$date_sql};
+            my ($a_sql, @a_args) = @{$amount_sql};
+
+            die "unknown part $unit" unless $diff_part_map{$unit};
+
+            return [
+               "DATETIME($d_sql, '-' || $a_sql || ?)",
                @d_args, @a_args, " $diff_part_map{$unit}"
             ];
          }
@@ -214,6 +243,25 @@ sub _introspector {
             ];
          }
       });
+
+      $d->decorate_driver_unconnected(Pg => datesubtract_sql => sub {
+         sub {
+            my ($date_sql, $unit, $amount_sql) = @_;
+
+            my ($d_sql, @d_args) = @{$date_sql};
+            my ($a_sql, @a_args) = @{$amount_sql};
+
+            @d_args = ([{ dbd_attrs => SQL_TIMESTAMP }, $d_args[0]])
+               if $d_sql eq '?' && @d_args == 1;
+
+            die "unknown part $unit" unless $diff_part_map{$unit};
+
+            return [
+               "($d_sql - $a_sql * interval '1 $diff_part_map{$unit}')",
+               @d_args, @a_args,
+            ];
+         }
+      });
    }
 
    MYSQL: {
@@ -275,6 +323,22 @@ sub _introspector {
             ];
          }
       });
+
+    $d->decorate_driver_unconnected(mysql => datesubtract_sql => sub {
+         sub {
+            my ($date_sql, $unit, $amount_sql) = @_;
+
+            my ($d_sql, @d_args) = @{$date_sql};
+            my ($a_sql, @a_args) = @{$amount_sql};
+
+            die "unknown part $unit" unless $diff_part_map{$unit};
+
+            return [
+               "DATE_SUB($d_sql, INTERVAL $a_sql $diff_part_map{$unit})",
+               @d_args, @a_args,
+            ];
+         }
+      });
    }
 
    ORACLE: {
@@ -313,6 +377,21 @@ sub _introspector {
 
             return [
                "(TO_TIMESTAMP($d_sql) + NUMTODSINTERVAL($a_sql, ?))",
+               @d_args, @a_args, $diff_part_map{$unit}
+            ];
+         }
+      });
+      $d->decorate_driver_unconnected(Oracle => datesubtract_sql => sub {
+         sub {
+            my ($date_sql, $unit, $amount_sql) = @_;
+
+            my ($d_sql, @d_args) = @{$date_sql};
+            my ($a_sql, @a_args) = @{$amount_sql};
+
+            die "unknown unit $unit" unless $diff_part_map{$unit};
+
+            return [ # no idea if this works..
+               "(TO_TIMESTAMP($d_sql) - NUMTODSINTERVAL($a_sql, ?))",
                @d_args, @a_args, $diff_part_map{$unit}
             ];
          }
@@ -421,6 +500,23 @@ sub dt_SQL_add {
 
    return \(
       $d->get($storage->dbh, undef, 'dateadd_sql')->(
+         [ _flatten_thing($self, $thing) ],
+         $unit,
+         [ _flatten_thing($self, $amount) ],
+      )
+   );
+}
+
+sub dt_SQL_subtract {
+   my ($self, $thing, $unit, $amount) = @_;
+
+   my $storage = $self->result_source->storage;
+   $storage->ensure_connected;
+
+   $d ||= _introspector();
+
+   return \(
+      $d->get($storage->dbh, undef, 'datesubtract_sql')->(
          [ _flatten_thing($self, $thing) ],
          $unit,
          [ _flatten_thing($self, $amount) ],
@@ -1005,6 +1101,17 @@ Takes three arguments: a date conforming to L</TYPES>, a unit, and an amount.
 The idea is to add the given unit to the datetime.  See your L</IMPLEMENTATION>
 for what units are accepted.
 
+=head2 dt_SQL_subtract
+
+Same as L<dt_SQL_add>, but subtracts the amount.
+
+Only confirmed to work with Postgres, MySQL and SQLite. It should work with Oracle
+and MSSQL, but due to lack of access to those DB engines the implementation was
+done only based on docs.
+
+This method was implemented by L<Thomas Klausner|https://domm.plix.at> and
+sponsored by L<Ctrl O|https://www.ctrlo.com/>.
+
 =head2 dt_SQL_pluck
 
  # get count per year
@@ -1026,7 +1133,7 @@ Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Arthur Axel "fREW" Schmidt.
+This software is copyright (c) 2019 by Arthur Axel "fREW" Schmidt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

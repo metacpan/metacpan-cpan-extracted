@@ -22,16 +22,28 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Class::Refresh" => 0,
     "Cwd" => 0,
+    "Data::Dumper" => 0,
+    "File::Basename" => 0,
     "File::Find" => 0,
+    "File::Path" => 0,
+    "File::Slurp" => 0,
     "Filesys::Notify::Simple" => 0,
     "Getopt::Long" => 0,
+    "Term::ANSIColor" => 0,
     "Test::More" => 0,
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.004",
+  "TEST_REQUIRES" => {
+    "Devel::Peek" => 0,
+    "File::Spec" => 0,
+    "Test::Differences" => 0,
+    "Test::Spec" => 0,
+    "lib" => 0
+  },
+  "VERSION" => "0.006",
   "test" => {
-    "TESTS" => ""
+    "TESTS" => "t/Test/Tdd/*.t"
   }
 );
 
@@ -39,10 +51,20 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Class::Refresh" => 0,
   "Cwd" => 0,
+  "Data::Dumper" => 0,
+  "Devel::Peek" => 0,
+  "File::Basename" => 0,
   "File::Find" => 0,
+  "File::Path" => 0,
+  "File::Slurp" => 0,
+  "File::Spec" => 0,
   "Filesys::Notify::Simple" => 0,
   "Getopt::Long" => 0,
+  "Term::ANSIColor" => 0,
+  "Test::Differences" => 0,
   "Test::More" => 0,
+  "Test::Spec" => 0,
+  "lib" => 0,
   "strict" => 0,
   "warnings" => 0
 );

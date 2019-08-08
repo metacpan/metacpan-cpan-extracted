@@ -1,0 +1,80 @@
+MODULE = URI::XS                PACKAGE = URI::XS::UserPass
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash(__PACKAGE__, GV_ADD).inherit(__MODULE__);
+}
+
+string URI::UserPass::user (SV* newval = NULL) {
+    if (newval) {
+        THIS->user(xs::in<string>(aTHX_ newval));
+        XSRETURN_UNDEF;
+    }
+    RETVAL = THIS->user();
+}
+
+string URI::UserPass::password (SV* newval = NULL) {
+    if (newval) {
+        THIS->password(xs::in<string>(aTHX_ newval));
+        XSRETURN_UNDEF;
+    }
+    RETVAL = THIS->password();
+}
+
+MODULE = URI::XS                PACKAGE = URI::XS::http
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash s(__PACKAGE__, GV_ADD);
+    s.inherit(__MODULE__);
+    register_perl_scheme(aTHX_ "http", s.name());
+}
+
+URI::http* new (SV* CLASS, string url = string(), ...) {
+    RETVAL = make_backref<URI::http>(url);
+    add_query_args(aTHX_ RETVAL, MARK+3, items-2);
+    PROTO = CLASS;
+}    
+
+MODULE = URI::XS                PACKAGE = URI::XS::https
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash s(__PACKAGE__, GV_ADD);
+    s.inherit("URI::XS::http");
+    register_perl_scheme(aTHX_ "https", s.name());
+}
+
+URI::https* new (SV* CLASS, string url = string(), ...) {
+    RETVAL = make_backref<URI::https>(url);
+    add_query_args(aTHX_ RETVAL, MARK+3, items-2);
+    PROTO = CLASS;
+}    
+
+MODULE = URI::XS                PACKAGE = URI::XS::ftp
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash s(__PACKAGE__, GV_ADD);
+    s.inherit("URI::XS::UserPass");
+    register_perl_scheme(aTHX_ "ftp", s.name());
+}
+
+URI::ftp* new (SV* CLASS, string url = string(), int flags = 0) {
+    RETVAL = new XSURIftp(url, flags);
+    PROTO = CLASS;
+}
+
+MODULE = URI::XS                PACKAGE = URI::XS::socks
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash s(__PACKAGE__, GV_ADD);
+    s.inherit("URI::XS::UserPass");
+    register_perl_scheme(aTHX_ "socks", s.name());
+}
+
+URI::socks* new (SV* CLASS, string url = string(), int flags = 0) {
+    RETVAL = new XSURIsocks(url, flags);
+    PROTO = CLASS;
+}

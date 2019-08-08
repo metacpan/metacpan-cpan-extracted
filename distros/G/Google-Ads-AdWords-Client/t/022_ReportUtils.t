@@ -57,7 +57,7 @@ my $report_as_string = $report_handler->get_as_string();
 ok(!$report_as_string, "report as string");
 ok($report_as_string->isa("Google::Ads::Common::ReportDownloadError"),
   "check report handler->report_as_string return type");
-ok($report_as_string =~ /ReportDownloadError\s{[^}]+}/,
+ok($report_as_string =~ /ReportDownloadError\s\{[^}]+\}/,
   "check ReportDownloadError STRINGIFY");
 
 my ($fh, $filename) = tempfile();

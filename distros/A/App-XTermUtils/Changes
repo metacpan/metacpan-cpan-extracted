@@ -1,13 +1,18 @@
-0.003   2018-09-26 (PERLANCAR)
+0.004   2019-07-12  Released-By: PERLANCAR; Urgency: medium
+
+	- Add CLIs: term-bgcolor-is-{dark,light}.
+
+
+0.003   2018-09-26  Released-By: PERLANCAR
 
 	- Move Rinci metadata to XTerm::Util, use that directly.
 
 
-0.002   2018-09-26 (PERLANCAR)
+0.002   2018-09-26  Released-By: PERLANCAR
 
 	- [ux] Simplify CLI scripts, no need to read env or config.
 
 
-0.001   2018-09-25 (PERLANCAR)
+0.001   2018-09-25  Released-By: PERLANCAR
 
         - First release.

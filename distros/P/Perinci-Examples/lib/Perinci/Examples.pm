@@ -2,8 +2,8 @@
 
 package Perinci::Examples;
 
-our $DATE = '2019-06-29'; # DATE
-our $VERSION = '0.814'; # VERSION
+our $DATE = '2019-07-19'; # DATE
+our $VERSION = '0.818'; # VERSION
 
 use 5.010001;
 use strict;
@@ -455,6 +455,23 @@ _
                 ],
             }],
         },
+        s1c => {
+            summary => 'String with examples in schema',
+            schema  => [str => {
+                examples => [
+                    'bar',
+                    {value=>'baz', summary=>'foo'},
+                ],
+            }],
+        },
+        s1d => {
+            summary => 'String with examples in argument spec',
+            schema  => ['str'],
+            examples => [
+                'bar',
+                {value=>'baz', summary=>'foo'},
+            ],
+        },
         s2 => {
             summary => 'String with completion routine that generate random letter',
             schema  => 'str',
@@ -653,8 +670,8 @@ _
 };
 sub merge_hash {
     my %args = @_;
-    my $h1 = $args{h1}; no warnings ('void');my $arg_err; ((defined($h1)) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((ref($h1) eq 'HASH') ? 1 : (($arg_err //= "Not of type hash"),0)); if ($arg_err) { return [400, "Invalid argument value for h1: $arg_err"] } # VALIDATE_ARG
-    my $h2 = $args{h2}; no warnings ('void');((defined($h2)) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((ref($h2) eq 'HASH') ? 1 : (($arg_err //= "Not of type hash"),0)); if ($arg_err) { return [400, "Invalid argument value for h2: $arg_err"] } # VALIDATE_ARG
+    my $h1 = $args{h1}; my $arg_err; { no warnings ('void');((defined($h1)) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((ref($h1) eq 'HASH') ? 1 : (($arg_err //= "Not of type hash"),0)); if ($arg_err) { return [400, "Invalid argument value for h1: $arg_err"] } } # VALIDATE_ARG
+    my $h2 = $args{h2}; { no warnings ('void');((defined($h2)) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((ref($h2) eq 'HASH') ? 1 : (($arg_err //= "Not of type hash"),0)); if ($arg_err) { return [400, "Invalid argument value for h2: $arg_err"] } } # VALIDATE_ARG
 
     [200, "OK", {%$h1, %$h2}];
 }
@@ -680,7 +697,7 @@ $SPEC{test_validate_args} = {
     "x.perinci.sub.wrapper.disable_validate_args" => 1,
 };
 sub test_validate_args {
-    my %args = @_; no warnings ('void');require Scalar::Util::Numeric;my $arg_err; if (exists($args{'a'})) { (!defined($args{'a'}) ? 1 :  ((Scalar::Util::Numeric::isint($args{'a'})) ? 1 : (($arg_err //= "Not of type integer"),0))); if ($arg_err) { return [400, "Invalid argument value for a: $arg_err"] } }no warnings ('void');if (exists($args{'b'})) { (!defined($args{'b'}) ? 1 :  ((!ref($args{'b'})) ? 1 : (($arg_err //= "Not of type text"),0)) && ((length($args{'b'}) >= 2) ? 1 : (($arg_err //= "Length must be at least 2"),0))); if ($arg_err) { return [400, "Invalid argument value for b: $arg_err"] } }no warnings ('void');if (exists($args{'h1'})) { (!defined($args{'h1'}) ? 1 :  ((ref($args{'h1'}) eq 'HASH') ? 1 : (($arg_err //= "Not of type hash"),0))); if ($arg_err) { return [400, "Invalid argument value for h1: $arg_err"] } }# VALIDATE_ARGS
+    my %args = @_; my $arg_err; { no warnings ('void');require Scalar::Util::Numeric;if (exists($args{'a'})) { (!defined($args{'a'}) ? 1 :  ((Scalar::Util::Numeric::isint($args{'a'})) ? 1 : (($arg_err //= "Not of type integer"),0))); if ($arg_err) { return [400, "Invalid argument value for a: $arg_err"] } }no warnings ('void');if (exists($args{'b'})) { (!defined($args{'b'}) ? 1 :  ((!ref($args{'b'})) ? 1 : (($arg_err //= "Not of type text"),0)) && ((length($args{'b'}) >= 2) ? 1 : (($arg_err //= "Length must be at least 2"),0))); if ($arg_err) { return [400, "Invalid argument value for b: $arg_err"] } }no warnings ('void');if (exists($args{'h1'})) { (!defined($args{'h1'}) ? 1 :  ((ref($args{'h1'}) eq 'HASH') ? 1 : (($arg_err //= "Not of type hash"),0))); if ($arg_err) { return [400, "Invalid argument value for h1: $arg_err"] } }} # VALIDATE_ARGS
     [200];
 }
 
@@ -1053,7 +1070,7 @@ _
     },
 };
 sub gen_random_bytes {
-    my %args = @_; no warnings ('void');require Scalar::Util::Numeric;my $arg_err; if (exists($args{'len'})) { ((defined($args{'len'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((Scalar::Util::Numeric::isint($args{'len'})) ? 1 : (($arg_err //= "Not of type integer"),0)) && (($args{'len'} >= 0) ? 1 : (($arg_err //= "Must be at least 0"),0)); if ($arg_err) { return [400, "Invalid argument value for len: $arg_err"] } }# VALIDATE_ARGS
+    my %args = @_; $args{'len'} //= 1024;my $arg_err; { no warnings ('void');require Scalar::Util::Numeric;if (exists($args{'len'})) { ((defined($args{'len'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((Scalar::Util::Numeric::isint($args{'len'})) ? 1 : (($arg_err //= "Not of type integer"),0)) && (($args{'len'} >= 0) ? 1 : (($arg_err //= "Must be at least 0"),0)); if ($arg_err) { return [400, "Invalid argument value for len: $arg_err"] } }} # VALIDATE_ARGS
     my $len = $args{len} // 1024;
     [200, "OK", join("", map {chr(256*rand())} 1..$len)];
 }
@@ -1133,7 +1150,7 @@ Perinci::Examples - Various examples of Rinci metadata
 
 =head1 VERSION
 
-This document describes version 0.814 of Perinci::Examples (from Perl distribution Perinci-Examples), released on 2019-06-29.
+This document describes version 0.818 of Perinci::Examples (from Perl distribution Perinci-Examples), released on 2019-07-19.
 
 =head1 DESCRIPTION
 
@@ -2225,6 +2242,14 @@ String with possible values in "in" schema clause.
 String with possible values in "in" schema clause, contains special characters.
 
 This argument is intended to test how special characters are escaped.
+
+=item * B<s1c> => I<str>
+
+String with examples in schema.
+
+=item * B<s1d> => I<str>
+
+String with examples in argument spec.
 
 =item * B<s2> => I<str>
 

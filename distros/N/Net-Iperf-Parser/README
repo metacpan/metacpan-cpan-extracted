@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.01
+    version 0.03
 
 SYNOPSIS
 
@@ -12,8 +12,26 @@ SYNOPSIS
     
       my $p = new Net::Iperf::Parser;
     
-      $p->parse($row);
-      print $p->dump;
+      my @rows = `iperf -c iperf.volia.net -P 2`;
+    
+      foreach (@rows) {
+        $p->parse($_);
+        print $p->dump if ($p->is_valid && $p->is_global_avg);
+      }
+
+    and result is something like this
+
+      {
+          is_valid          => 1,
+          start             => 0,
+          end               => 10,
+          duration          => 10,
+          speed             => 129024,
+          speedk            => 126,
+          speedm            => 0.123046875,
+          is_process_avg    => 1,
+          is_global_avg     => 1,
+      }
 
 DESCRIPTION
 
@@ -23,11 +41,11 @@ METHODS
 
  start
 
-    Return the start range
+    Return the start time
 
  end
 
-    Return the end range
+    Return the end time
 
  is_valid
 
@@ -57,13 +75,17 @@ METHODS
 
     Return a to_string version of the object (like a Data::Dumper::dumper)
 
- parsed
+ parse($row)
 
- parsecsv
+    Parse a single iperf line result
+
+ parsecsv($row)
+
+    Parse a single iperf line result in CSV mode (-y C)
 
 SEE ALSO
 
-    Net::OpenSSH
+    iperf <https://iperf.fr/>
 
 AUTHOR
 

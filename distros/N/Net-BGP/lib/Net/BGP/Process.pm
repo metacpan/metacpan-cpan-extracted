@@ -7,7 +7,7 @@ use vars qw( $VERSION );
 
 ## Inheritance and Versioning ##
 
-$VERSION = '0.15';
+$VERSION = '0.17';
 
 ## Module Imports ##
 
@@ -159,6 +159,23 @@ sub event_loop
             foreach my $ready ( @{$ready[2]} ) {
                 my $trans = $this->{_trans_sock_map}->{$ready};
                 $trans->_handle_socket_error_condition();
+            }
+        } else {
+            if ($!{EBADF}) {
+                # One of the sockets is bad
+                foreach my $fh ( $this->{_error_fh}->handles ) {
+                    if (!$fh->opened) {
+                        my $trans = $this->{_trans_sock_map}->{$fh};
+                        # We seem to have a transport with a dud socket
+                        # Update the select statement - not sure if this
+                        # is right though - Damian Ivereigh 29/09/2016
+                        if ($trans) {
+                            $this->_update_select($trans);
+                        } else {
+                            warn "Cannot find trans object\n";
+                        }
+                    }
+                }
             }
         }
     }
@@ -413,7 +430,7 @@ Net::BGP, Net::BGP::Peer, Net::BGP::Update, Net::BGP::Notification
 
 =head1 AUTHOR
 
-Stephen J. Scheck <code@neurosphere.com>
+Stephen J. Scheck <sscheck@cpan.org>
 
 =cut
 

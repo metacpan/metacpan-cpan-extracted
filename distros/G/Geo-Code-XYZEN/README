@@ -1,0 +1,12 @@
+# GeoCode
+An open source Geolocation Code, mapping (latitude,longitude,elevation) to (three {geo}names).
+==================
+
+
+
+## Abstract
+
+This is a system for encoding earth locations defined as latitude,longitude,elevation into an easy to remember and intuitive three name code with a resolution of 1 by 1 by 1 m^3.
+
+
+

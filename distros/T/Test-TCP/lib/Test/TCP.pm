@@ -2,7 +2,7 @@ package Test::TCP;
 use strict;
 use warnings;
 use 5.00800;
-our $VERSION = '2.19';
+our $VERSION = '2.20';
 use base qw/Exporter/;
 use Test::SharedFork 0.12;
 use Test::More ();
@@ -155,7 +155,7 @@ sub DESTROY {
 1;
 __END__
 
-=for stopwords OO
+=for stopwords OO loopback
 
 =encoding utf8
 

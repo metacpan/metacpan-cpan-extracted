@@ -11,20 +11,21 @@ use Vote::Count::RankCount;
 no warnings 'experimental';
 use List::Util qw( min max sum );
 use TextTableTiny  qw/generate_markdown_table/;
+use Sort::Hash;
 
 # use Try::Tiny;
-use Data::Printer;
-use Data::Dumper;
+#use Data::Printer;
+#use Data::Dumper;
 
 use YAML::XS;
 
-our $VERSION='0.013';
+our $VERSION='0.017';
 
 =head1 NAME
 
 Vote::Count::Matrix
 
-=head1 VERSION 0.013
+=head1 VERSION 0.017
 
 =cut
 
@@ -142,10 +143,15 @@ sub LeastWins ( $matrix ) {
   return @lowest;
 }
 
-sub CondorcetLoser( $self ) {
+sub CondorcetLoser( $self, $nowins=0 ) {
   my $unfinished = 1;
   my $wordy      = "Removing Condorcet Losers\n";
   my @eliminated = ();
+  my $loser = sub ( $score ) {
+    if ( $nowins  ) { return 1 if $score < 1 }
+    else { return 1 if $score == 0 }
+    return 0;
+  };
 CONDORCETLOSERLOOP:
   while ($unfinished) {
     $unfinished = 0;
@@ -162,7 +168,7 @@ CONDORCETLOSERLOOP:
     }
     $wordy .= YAML::XS::Dump($scores);
     for my $A (@alist) {
-      if ( $scores->{$A} == 0 ) {
+      if ( $loser->($scores->{$A} ) ) {
         push @eliminated, ($A);
         $wordy .= "Eliminationg Condorcet Loser: *$A*\n";
         delete $self->{'Active'}{$A};
@@ -285,7 +291,9 @@ sub ScoreTable ( $self ) {
   my $scores = $self->ScoreMatrix();
   my @header = ( 'Choice', 'Score' );
   my @rows = ( \@header );
-  for my $c ( sort keys $scores->%* ) {push @rows, [ $c, $scores->{$c} ] }
+  for my $c ( sort_hash( $scores, 'numeric', 'desc') ) {
+  # for my $c ( sort ( keys $scores->%* ) ) {
+      push @rows, [ $c, $scores->{$c} ] }
   return generate_markdown_table( rows => \@rows );
 }
 
@@ -439,7 +447,7 @@ Returns an array of the choice or choices with the fewest wins.
 
 =head2 CondorcetLoser
 
-Eliminates all Condorcet Losers from the Matrix Object's Active list. Returns a hashref:
+Eliminates all Condorcet Losers from the Matrix Object's Active list. Returns a hashref. Takes an optional true false argument (default is false) to include choices that have tied but not won in the elimination.
 
  
    {

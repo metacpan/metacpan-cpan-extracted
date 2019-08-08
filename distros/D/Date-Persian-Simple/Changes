@@ -1,5 +1,8 @@
 Revision history for Date::Persian::Simple
 
+0.23  Fri Jul 02 15:45:00 2019
+      - Moved author test scripts to xt/ subfolder.
+
 0.22  Mon Jun 03 17:40:00 2019
       - Updated dependency on Date::Utils v0.26.
 

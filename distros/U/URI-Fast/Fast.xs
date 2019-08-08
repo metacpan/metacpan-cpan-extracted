@@ -323,7 +323,7 @@ void str_append(pTHX_ uri_str_t *str, const char *value, size_t len) {
     return;
   }
 
-  if (value != NULL) {
+  if (value != NULL && len > 0) {
     size_t allocate = str->chunk * (((str->length + len + 1) / str->chunk) + 1);
 
     if (allocate != str->allocated) {
@@ -1054,7 +1054,7 @@ SV* get_query_keys(pTHX_ SV* sv_uri) {
   while (!query_scanner_done(&scanner)) {
     query_scanner_next(&scanner, &token);
     if (token.type == DONE) continue;
-    char key[token.key_length];
+    char key[token.key_length + 1];
     klen = uri_decode(token.key, token.key_length, key, "");
     hv_store(out, key, -klen, &PL_sv_undef, 0);
   }
@@ -1198,6 +1198,10 @@ void set_auth(pTHX_ SV *sv_uri, SV *sv_value) {
     size_t vlen;
     const char *value = SvPV_const(sv_value, vlen);
 
+    if (vlen > URI_SIZE_auth) {
+      croak("set_auth: size of auth string exceeds max of %lu", URI_SIZE_auth);
+    }
+
     // auth isn't stored as an individual field, so encode to local array and rescan
     char auth[URI_SIZE_auth];
     size_t len = uri_encode(value, vlen, (char*) &auth, URI_CHARS_AUTH, uri->is_iri);
@@ -1251,9 +1255,8 @@ void set_path_array(pTHX_ SV *sv_uri, SV *sv_path) {
         seg = SvPV_const(tmp, seg_len);
       }
 
-      char out[seg_len * 3];
+      char out[seg_len * 3 + 1];
       size_t out_len = uri_encode(seg, seg_len, out, URI_CHARS_PATH_SEGMENT, uri->is_iri);
-
       str_append(aTHX_ path, out, out_len);
     }
   }
@@ -1297,10 +1300,11 @@ void update_query_keyset(pTHX_ SV *sv_uri, SV *sv_key_set, SV *sv_separator) {
 
     SvGETMAGIC(val);
 
-    char enc_key[(3 * klen) + 1];
-    klen = uri_encode(key, klen, enc_key, ":@?/", uri->is_iri);
-
-    hv_store(enc_keys, enc_key, klen * (uri->is_iri ? -1 : 1), val, 0);
+    if (klen > 0) {
+      char enc_key[(3 * klen) + 1];
+      klen = uri_encode(key, klen, enc_key, ":@?/", uri->is_iri);
+      hv_store(enc_keys, enc_key, klen * (uri->is_iri ? -1 : 1), val, 0);
+    }
   }
 
   // Begin building the new query string from the existing one. As each key is
@@ -1455,7 +1459,7 @@ void set_param(pTHX_ SV *sv_uri, SV *sv_key, SV *sv_values, SV *sv_separator) {
     SvGETMAGIC(*refval);
     strval = SvPV_const(*refval, reflen);
 
-    char tmp[reflen * 3];
+    char tmp[reflen * 3 + 1];
     vlen = uri_encode(strval, reflen, tmp, ":@?/", uri->is_iri);
     str_append(aTHX_ dest, tmp, vlen);
     off += vlen;

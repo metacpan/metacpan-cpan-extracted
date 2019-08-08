@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>SPVM言語仕様 1.0 ベータ</title>
+    <title>SPVM言語仕様 1.0</title>
     <meta charset="UTF-8">
     <link rel="shortcut icon" href="/images/spvm-logo.png">
     <link rel="stylesheet" type="text/css" href="/css/common.css">
@@ -28,7 +28,7 @@
     <div class="header">
       <div class="container">
         <h1>
-          <a style="color:#333;text-decoration:none;" href="/language.html"><img src="/images/spvm-logo.png">SPVM 1.0 言語仕様</a>
+          <a style="color:#333;text-decoration:none;" href="/"><img src="/images/spvm-logo.png">SPVMドキュメント 1.0 ベータ</a>
         </h1>
       </div>
     </div>
@@ -42,7 +42,7 @@
         <b>SPVM 1.0の言語仕様</b>がこのドキュメントには記述されています。SPVMは、1.0のリリースに向けて、ベータテスト中です。言語仕様は、警告なく変更されることがあります。
       </p>
       <p>
-        最終更新日 2019年6月5日 (SPVM言語仕様は、現在90%の完成度)
+        最終更新日 2019年7月1日 (SPVM言語仕様は、現在91%の完成度)
       </p>
       <h2 id="language-toc">目次</h2>
       <ul class="toc">
@@ -235,12 +235,12 @@
         SPVMのソースコードは「<a href="#language-parser-space-character">空白文字</a>」「<a href="#language-comment">コメント</a>」「<a href="#language-pod">POD</a>」「<a href="#language-literal">リテラル</a>」「<a href="#language-parser-identifier">識別子</a>」「<a href="#language-parser-keyword">キーワード</a>」「<a href="#language-parser-separator">区切り文字</a>」「<a href="#language-parser-operator">演算子</a>」で構成されます。
       </p>
       
-      <h3 id="language-parser-line-terminater">行終端</h3><!-- 2019/2/27 almost ok -->
+      <h3 id="language-parser-line-terminater">行終端</h3><!-- 2019/7/1 check -->
       <p>
         SPVMのソースコードの行終端は、ASCIIコードの「LF」「CR」「CR LF」です。
       </p>
       <p>
-        行終端が現れたときは、適切に行番号がインクリメントされます。
+        行終端が現れたときは、適切に行番号がインクリメントされます。ソースコード中の行終端は、ASCIIコードの「LF」として扱われます。
       </p>
       
       <h3 id="language-parser-space-character">空白文字</h3><!-- 2019/2/27 almost ok -->
@@ -503,7 +503,7 @@ allow
   : ALLOW basic_type ';'
 
 enumeration
-  : ENUM enumeration_block
+  : opt_descriptors ENUM enumeration_block
 
 enumeration_block 
   : '{' opt_enumeration_values '}'
@@ -2214,6 +2214,53 @@ enum {
       <p>
         enumの定義が不正な場合は、コンパイル時エラーが発生します。
       </p>
+      
+      <p>
+        <b>列挙デスクリプタ</b>
+      </p>
+      <p>
+        列挙には、デスクリプタを指定することができます。
+      </p>
+<pre>
+private enum {
+  FLAG1,
+  FLAG2 = 4,
+  FLAG3,
+}
+</pre>
+      <p>
+        列挙で指定できるデスクリプタの一覧です。
+      </p>
+      <table>
+        <tr>
+          <th>
+            デスクリプタ名
+          </th>
+          <th>
+            役割
+          </th>
+        </tr>
+        <tr>
+          <td>
+            <b>public</b>
+          </td>
+          <td>
+            この列挙は、外部のパッケージからアクセスできます。デフォルトの設定です。
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <b>private</b>
+          </td>
+          <td>
+            この列挙は、外部のパッケージからアクセスできません。
+          </td>
+        </tr>
+      </table>
+      <p>
+        「public」と「private」の両方のデスクリプタが指定された場合は、コンパイル時エラーが発生します。
+      </p>
+      
       <h3 id="language-enum-call">列挙の呼び出し</h3>
       <p>
         列挙は、定数サブルーチンのエイリアスなので、サブルーチン呼び出しとまったく同じ方法で呼び出すことができます。
@@ -3982,6 +4029,7 @@ package Foo::Bar {
         <li><a href="#language-literal-floating-point">浮動小数点リテラル</a></li>
         <li><a href="#language-literal-character">文字リテラル</a></li>
         <li><a href="#language-literal-string">文字列リテラル</a></li>
+        <li><a href="#language-literal-string-variable-expansion">変数展開</a></li>
       </ul>
       <h3 id="language-literal-integer">整数リテラル</h2>
       <p>
@@ -4450,6 +4498,62 @@ package Foo::Bar {
             Unicodeのコードポイントを16進数で指定します。UTF-8に変換されます。16進数は「0～9」「a～f」「A～F」で表現します。
           </td>
         </tr>
+        <tr>
+          <td>
+            <b>\s</b>
+          </td>
+          <td>
+            Asciiコードの92、115の並び「\s」
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <b>\S</b>
+          </td>
+          <td>
+            Asciiコードの92、83の並び「\S」
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <b>\d</b>
+          </td>
+          <td>
+            Asciiコードの92、100の並び「\d」
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <b>\D</b>
+          </td>
+          <td>
+            Asciiコードの92、68の並び「\D」
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <b>\w</b>
+          </td>
+          <td>
+            Asciiコードの92、119の並び「\w」
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <b>\W</b>
+          </td>
+          <td>
+            Asciiコードの92、87の並び「\W」
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <b>\の後ろに「a～z」「A～Z」「0-9」「"」「'」「\」「$」以外のAsciiコードがきた場合</b>
+          </td>
+          <td>
+            Asciiコードの92、アスキーコードで表現される文字の並び。たとえば「\-」の場合は「\-」。
+          </td>
+        </tr>
       </table>
       <p>
         Unicodeのコードポイントを指定するエスケープ文字以外は、<a href="#language-literal-character">文字リテラル</a>のエスケープ文字と共通です。
@@ -4470,7 +4574,64 @@ package Foo::Bar {
 "\x0D\x0A"
 "\N{U+3042}\N{U+3044}\N{U+3046}"
 </pre>
+
+      <h3 id="language-literal-string-variable-expansion">変数展開</h2>
+      <p>
+        文字列リテラル中のレキシカル変数、パッケージ変数、デリファレンス、フィールドアクセス、定数の添え字の配列アクセス、例外変数の場合は、変数展開が行われます。
+      </p>
+<pre>
+"AAA $foo BBB"
+"AAA $FOO BBB"
+"AAA $$foo BBB"
+"AAA $foo->{x} BBB"
+"AAA $foo->[3] BBB"
+"AAA $foo->{x}[3] BBB"
+"AAA $@ BBB"
+</pre>
+      <p>
+        上記は、以下のように展開されます。
+      </p>
+<pre>
+"AAA" . $foo . "BBB"
+"AAA" . $FOO . "BBB"
+"AAA" . $$foo . "BBB"
+"AAA" . $foo->{x} . "BBB"
+"AAA" . $foo->[3] . "BBB"
+"AAA" . $foo->{x}[3] . "BBB"
+"AAA" . $@ . "BBB"
+</pre>
       
+      <p>
+        変数名の終わりを表すために「{」と「}」で変数名を囲むことができます。
+      </p>
+<pre>
+"AAA ${foo}_ccc BBB"
+</pre>
+      <p>
+        上記は、以下のように展開されます。
+      </p>
+<pre>
+"AAA " . ${foo} . "_ccc BBB"
+</pre>
+      <p>
+        「{」と「}」の囲みがない場合は、変数名として正しい文字列までを変数として解釈します。デリファレンスの場合も同じです。
+      </p>
+      <p>
+        変数名の後ろに「->」が続いた場合は、フィールドアクセス、あるいは、配列アクセスと解釈します。
+      </p>
+      <p>
+        1. その後ろに、続く文字が「a-z」「A-Z」「0-9」「_」「{」「[」であった場合は、解釈を進めます。
+      </p>
+      <p>
+        2. 「1.」の後ろに続く文字が「}」「]」であった場合は、その次の文字が「->」「{」「[」であった場合は、解釈を進め、1に戻ります。そうでない場合は、解釈を止めます。
+      </p>
+      <p>
+        末尾の$は変数展開の開始としては扱われず「$」として扱われます。
+      </p>
+<pre>
+"AAA$"
+</pre>
+
       <h2 id="language-string">文字列</h2>
       <p>
         SPVMの文字列のデータ表現は、byte型の配列です。特別な内部表現を持たない、単なるバイト列です。
@@ -6169,7 +6330,7 @@ switch (条件式) {
 }
 </pre>
       <p>
-        caseのブロックが存在する場合は、最後の文はbreak文でなければなりません。そうでない場合は、コンパイルエラーが発生します。
+        caseのブロックが存在する場合は、最後の文はbreak文あるいは、return文でなければなりません。そうでない場合は、コンパイルエラーが発生します。
       </p>
 
       <p>
@@ -7996,7 +8157,6 @@ sub foo : void ($thread_id : int) {
       <p>
         複数数値型のフィールドの個数の最大値は、16個で、少なくともひとつのフィールドが必要です。そうでない場合は、コンパイル時エラーが発生します。
       </p>
-
     </div>
     <div class="footer">
       <div><a href="javascript:void(0)" class="to-top">▲</a></div>

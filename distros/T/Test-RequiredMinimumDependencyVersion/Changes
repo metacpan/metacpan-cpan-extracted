@@ -1,5 +1,12 @@
 Revision history for Test-MinimumPrereqs
 
+0.003  2019-08-02 12:51:14 UTC
+
+  - API change: all_files_ok() no longer takes files or directories as
+    arguments. The files to be tested is now obtained from XT::Files.
+
+  - Removed minimal dependency on Test::TempDir::Tiny 0.017
+
 0.002  2018-06-14 22:08:38 UTC
 
   - Updated documentation

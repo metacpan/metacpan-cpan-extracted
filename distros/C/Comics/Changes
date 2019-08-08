@@ -1,5 +1,11 @@
 Revision history for Comics
 
+1.xx
+
+	Fix patterns for Nozzman, GeekAndPoke, AMultiverse, JHall,
+	Frogpants, LittleGamers, Glasbergen.
+	Disable JHall Bloop (seems defunct).
+
 1.14	2019-07-12
 
 	Add BerkeleyMews, TheOtherEnd, SkeletonClaw.

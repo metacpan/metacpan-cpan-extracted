@@ -8,7 +8,7 @@ use vars qw( $VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS @ERRORS );
 ## Inheritance and Versioning ##
 
 @ISA     = qw( Exporter );
-$VERSION = '0.07';
+$VERSION = '0.17';
 
 ## Module Imports ##
 
@@ -242,7 +242,7 @@ B<Net::BGP::Update>
 
 =head1 AUTHOR
 
-Stephen J. Scheck <code@neurosphere.com>
+Stephen J. Scheck <sscheck@cpan.org>
 
 =cut
 

@@ -1,13 +1,19 @@
 Revision History for Text-NeatTemplate
 ======================================
 
-v0.1101 2016-01-01
+v0.1300 2019-08-05
 ------------------
 
-* 2016-01-01 13:08:11 +1100
-  fixing github meta; version bump
-* 2015-05-05 11:21:59 +1000
-  Dist::Zilla fix.
+* 2019-08-05 10:34:44 +1000
+  added "alphahyphen" formatting directive
+
+v0.1200 2019-08-05
+------------------
+
+* 2019-08-05 10:26:22 +1000
+  tweak
+* 2019-08-05 10:24:47 +1000
+  added alphahash formatting directive
 
 ====================================
 End of changes in the last 1000 days

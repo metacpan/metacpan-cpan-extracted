@@ -1,2 +1,9 @@
+0.002		2019-08-04	T. R. Wyant
+    Skip URL links with server (5xx) errors.  This is controlled by
+    Boolean attribute skip_server_errors, which is true by default.  The
+    default behaviour is a change from version 0.001, which generated a
+    failed test in this case. The logic (if any) is that status 5xx can
+    represent an actual server error rather than an incorrect link.
+
 0.001		2019-07-04	T. R. Wyant
     First production release

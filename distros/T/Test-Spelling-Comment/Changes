@@ -1,7 +1,12 @@
 Revision history for Test-Spelling-Comment
 
+0.005  2019-08-03 23:39:53 UTC
+  - API change: all_files_ok() no longer takes files or directories as
+    arguments. The files to be tested is now obtained from XT::Files.
+
 0.004  2018-06-25 18:13:37 UTC
 
+  - Removed minimal dependency on Test::TempDir::Tiny 0.017
   - Use g flag for the substitution with the skip patterns
 
 0.003  2018-06-24 19:35:33 UTC

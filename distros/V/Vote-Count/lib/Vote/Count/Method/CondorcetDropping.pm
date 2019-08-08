@@ -9,37 +9,42 @@ use namespace::autoclean;
 use Moose;
 extends 'Vote::Count';
 
-our $VERSION='0.013';
+our $VERSION='0.017';
 
 =head1 NAME
 
 Vote::Count::Method::CondorcetDropping
 
-=head1 VERSION 0.013
+=head1 VERSION 0.017
 
 =cut
 
 # ABSTRACT: Methods which use simple dropping rules to resolve a Winnerless Condorcet Matrix.
 
-#buildpod
-
 =pod
+
+=head1 SYNOPSIS
+
+  my $CondorcetElection =
+    Vote::Count::Method::CondorcetDropping->new(
+      'BallotSet' => $ballotset ,
+      'DropStyle' => 'all',
+      'DropRule'  => 'topcount',
+    );
+
+  my $Winner = $CondorcetElection->RunCondorcetDropping( $SmithSet )->{'winner'};
 
 =head1 Condorcet Dropping Methods
 
 This module implements dropping methodologies for resolving a Condorcet Matrix with no Winner. Dropping Methodologies apply a rule to either all remaining choices or to those with the least wins to select a choice for elimination.
-
 
 =head2 Basic Dropping Methods
 
 Common Dropping Methods are: Borda Count (with all the attendant weighting issues), Approval, Plurality Loser (TopCount), and Greatest Loss. Greatest Loss is not currently available, and will likely be implemented in the SSD module if and when that is ever written.
 
 
-=head1 SYNOPSIS
-
 =cut
 
-#buildpod
 
 no warnings 'experimental';
 use List::Util qw( min max );

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.152';
+our $VERSION = '1.153';
 
 use Quiq::String;
 use Quiq::Option;
@@ -332,7 +332,7 @@ sub toFile {
 
 =head1 VERSION
 
-1.152
+1.153
 
 =head1 AUTHOR
 

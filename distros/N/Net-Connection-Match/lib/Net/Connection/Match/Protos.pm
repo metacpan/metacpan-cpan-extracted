@@ -6,7 +6,7 @@ use warnings;
 
 =head1 NAME
 
-Net::Connection::Match::Protos - Runs a basic state check against a Net::Connection object.
+Net::Connection::Match::Protos - Runs a protocol check against a Net::Connection object.
 
 =head1 VERSION
 
@@ -91,7 +91,7 @@ sub new{
 				};
     bless $self;
 
-	# make sure each cidr is valid before returning it
+	# lc everything for easier matching later
 	my $protos_int=0;
 	while( defined( $args{protos}[$protos_int] ) ){
 		$self->{protos}[$protos_int]=lc( $args{protos}[$protos_int] );

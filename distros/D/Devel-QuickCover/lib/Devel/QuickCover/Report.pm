@@ -3,9 +3,9 @@ package Devel::QuickCover::Report;
 use strict;
 use warnings;
 
-use JSON::XS    qw(encode_json   decode_json);
-use Sereal      qw(encode_sereal decode_sereal);
-use Path::Tiny  qw(path);
+use JSON::MaybeXS qw(encode_json   decode_json);
+use Sereal        qw(encode_sereal decode_sereal);
+use Path::Tiny    qw(path);
 
 sub new {
     my ($class) = @_;

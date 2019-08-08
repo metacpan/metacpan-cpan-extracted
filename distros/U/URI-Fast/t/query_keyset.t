@@ -43,4 +43,10 @@ subtest 'separator replacement' => sub {
   unlike $uri->query, qr/&/, 'original separator replaced';
 };
 
+subtest 'empty string' => sub {
+  my $uri = uri 'http://example.com/?foo&bar';
+  $uri->query_keyset({'' => 1, bar => 0});
+  is $uri->query, 'foo', 'empty string does not break query';
+};
+
 done_testing;

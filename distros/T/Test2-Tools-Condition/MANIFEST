@@ -9,6 +9,5 @@ lib/Test2/Tools/Condition.pm
 minil.toml
 t/00_compile.t
 t/01_basic.t
-test.pl
 META.yml
 MANIFEST

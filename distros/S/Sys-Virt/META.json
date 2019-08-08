@@ -41,10 +41,13 @@
    "provides" : {
       "Sys::Virt" : {
          "file" : "lib/Sys/Virt.pm",
-         "version" : "v5.5.0"
+         "version" : "v5.6.0"
       },
       "Sys::Virt::Domain" : {
          "file" : "lib/Sys/Virt/Domain.pm"
+      },
+      "Sys::Virt::DomainCheckpoint" : {
+         "file" : "lib/Sys/Virt/DomainCheckpoint.pm"
       },
       "Sys::Virt::DomainSnapshot" : {
          "file" : "lib/Sys/Virt/DomainSnapshot.pm"
@@ -97,6 +100,6 @@
       },
       "x_MailingList" : "http://www.redhat.com/mailman/listinfo/libvir-list"
    },
-   "version" : "v5.5.0",
+   "version" : "v5.6.0",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

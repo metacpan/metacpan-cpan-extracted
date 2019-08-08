@@ -6,6 +6,9 @@ use Filesys::Notify::Simple;
 use Pod::Usage;
 use File::Spec;
 use App::watcher;
+
+use List::MoreUtils qw/ any /;
+
 use 5.008008;
 
 our $VERSION=$App::watcher::VERSION;
@@ -21,11 +24,18 @@ GetOptions(
     'send_only' => \my $send_only,
     'h|help'   => \my $help,
     'v|version' => \my $version,
+    'filter=s@' => \my @filters,
 ) or pod2usage;
 $version and do { print "watcher: $VERSION\n"; exit 0 };
 pod2usage(1) if $help;
 pod2usage(1) unless @ARGV;
 @dir = ('.') unless @dir;
+
+$_ = qr/$_/ for @filters;
+
+# default filter
+push @filters, m!^\.[^\.]|[/\\][\._][^\.]|\.bak$|~$|_flymake\.(?:p[lm]|t)!
+    unless @filters;
 
 if (@exclude_dir) {
     @exclude_dir = map { File::Spec->abs2rel($_) } @exclude_dir;
@@ -123,14 +133,10 @@ sub valid_file {
     my $rel = File::Spec->abs2rel($file);
 
     # default filter
-    if($rel =~ m!^\.[^\.]|[/\\][\._][^\.]|\.bak$|~$|_flymake\.(?:p[lm]|t)!) {
-        return 0;
-    }
+    return if any { $rel =~ $_ } @filters;
 
     # exclude path filter
-    if (@exclude_dir) {
-        return not grep { index($rel, $_) == 0 } @exclude_dir;
-    }
+    return if any { index($rel, $_) == 0 } @exclude_dir;
 
     return 1;
 }
@@ -147,8 +153,9 @@ watcher - watch the file updates
 
     % watcher --dir . -- osascript -e 'tell application "Google Chrome" to reload active tab of window 1'
 
-        --dir=.      Diretory to watch.
-        --exclude    Diretory to ignore.
+        --dir=.      Directory to watch.
+        --exclude    Directory to ignore.
+        --filter     Regex of files to ignore 
         --signal=HUP Sending signal to restart(Default: TERM)(EXPERIMENTAL)
         --send_only  Sending signal without fork/exec(EXPERIMENTAL)
         -h --help    show this help
@@ -156,6 +163,11 @@ watcher - watch the file updates
 =head1 DESCRIPTION
 
 This command watches the directory updates, and run the commands.
+
+If no filter is provided via the C<--filter> option, a default
+filter will be used. This default filter ignores files and
+directories prefixed with a dot, F<.bak> files, and files
+ending with a F<~>.
 
 =head1 Sending SIGHUP without restart process
 

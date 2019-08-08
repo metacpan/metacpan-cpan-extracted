@@ -6,7 +6,7 @@ use warnings;
 use 5.010;
 
 # ABSTRACT: easier loading of a project's local libs
-our $VERSION = "1.006";
+our $VERSION = "1.007";
 
 use FindBin qw();
 use Carp qw(carp);
@@ -127,7 +127,7 @@ lib::projectroot - easier loading of a project's local libs
 
 =head1 VERSION
 
-version 1.006
+version 1.007
 
 =head1 SYNOPSIS
 
@@ -255,6 +255,8 @@ Some ideas for future releases:
 =item * L<File::FindLib> - find and use a file or dir based on the script location. Again no L<local::lib> support.
 
 =item * and probably more...
+
+=back
 
 =head1 THANKS
 

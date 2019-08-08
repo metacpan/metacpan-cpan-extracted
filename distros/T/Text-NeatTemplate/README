@@ -146,6 +146,17 @@ FORMATTING
       underscores; spaces are converted to underscores. (useful for anchors
       or filenames)
 
+    alphahash
+
+      Convert to a string containing only alphanumeric characters and then
+      prefix with a hash (#) character (useful for anchors or tags)
+
+    alphahyphen
+
+      Convert to a string containing alphanumeric characters, dashes and
+      underscores; spaces are converted to hyphens. (useful for anchors or
+      filenames)
+
     comma_front
 
       Put anything after the last comma at the front (as with an author

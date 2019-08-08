@@ -94,6 +94,7 @@ do { my $x = {
                                       'Test::Builder' => '0',
                                       'Test::More' => '0.92',
                                       'Type::Tiny' => '1.000006',
+                                      'Types::Standard' => '0',
                                       'URI::Escape' => '0',
                                       'YAML' => '0.86',
                                       'parent' => '0'

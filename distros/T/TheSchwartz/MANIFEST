@@ -1,6 +1,9 @@
-bin/schwartzmon
 Build.PL
-CHANGES
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
 doc/http-mappings.txt
 doc/notes.txt
 doc/schema-postgres.sql
@@ -15,11 +18,9 @@ lib/TheSchwartz/FuncMap.pm
 lib/TheSchwartz/Job.pm
 lib/TheSchwartz/JobHandle.pm
 lib/TheSchwartz/Worker.pm
-MANIFEST			This list of files
-MANIFEST.SKIP
-META.yml
+minil.toml
 perltidyrc
-README.md
+script/schwartzmon
 server/bin/schwartzd
 server/doc/deps.txt
 server/doc/protocol.txt
@@ -56,3 +57,5 @@ xt/perlcritic.t
 xt/pod-coverage.t
 xt/pod-spelling.t
 xt/pod.t
+META.yml
+MANIFEST

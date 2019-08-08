@@ -1,5 +1,9 @@
 Revision history for CtrlO-Crypt-XkcdPassword
 
+1.006	2019-08-07T19:19:20
+    - Fixed pod error reported by CPANTS. (Mohammad S Anwar)
+
+
 1.005   2018-04-02T21:36:04
     - improve error-tests
     - Fixed broken link in docs, reported by manwar via

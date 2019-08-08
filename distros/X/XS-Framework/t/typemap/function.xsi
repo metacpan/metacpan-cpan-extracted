@@ -9,6 +9,11 @@ using vv_fn  = function<void()>;
 using vi_fn  = function<void(int)>;
 using iis_fn = function<int(int, string_view)>;
 
+struct Data {
+    Data (int i) : i(i) {}
+    int i;
+};
+
 MODULE = MyTest::Typemap                PACKAGE = MyTest::Function
 PROTOTYPES: DISABLE
 
@@ -44,10 +49,6 @@ vi_fn s2f2s_vi (vi_fn fn) {
 }
 
 int s2f_notm (Sub sub, int i) {
-    struct Data {
-        Data (int i) : i(i) {}
-        int i;
-    };
     auto fn = sub2function<function<Data(const Data&)>>(
         sub,
         [=](const Sv& sv)     { return Data((int)Simple(sv) + 1); },

@@ -23,5 +23,5 @@ requires:
   URI::Find: '0'
   URI::Find::Schemeless: '0'
   perl: '5.010'
-version: '0.13'
+version: '0.14'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

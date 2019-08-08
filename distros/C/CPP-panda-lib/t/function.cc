@@ -221,16 +221,16 @@ TEST_CASE("contravariance of arguments" , "[function]") {
     };
     REQUIRE(cb(3) == 10);
 }
+struct Base {
+    virtual ~Base(){}
+    virtual panda::string name() { return "base";}
+};
+struct Derrived : Base {
+    virtual panda::string name() override { return "override";}
+};
 
 TEST_CASE("contravariance of arguments classes" , "[function]") {
     using panda::string;
-    struct Base {
-        virtual ~Base(){}
-        virtual string name() { return "base";}
-    };
-    struct Derrived : Base {
-        virtual string name() override { return "override";}
-    };
     function<Base& (Derrived&)> cb = [](Base& b) -> Base& {
         return b;
     };

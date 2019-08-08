@@ -7,14 +7,14 @@ package Comics::Plugin::LittleGamers;
 
 use parent qw(Comics::Fetcher::Single);
 
-our $VERSION = "1.01";
+our $VERSION = "1.02";
 
 our $name    = "Little Gamers";
 our $url     = "http://www.little-gamers.com/";
 our $pattern =
 	    qr{ <meta \s+
 		 property="og:image" \s+
-		 content="(?<url>http://little-gamers.com/comics/
+		 content="(?<url>https?://little-gamers.com/comics/
 		           (?<image>.*?\.\w+))" \s* /?>
 	      }six;
 

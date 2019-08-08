@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.152';
+our $VERSION = '1.153';
 
 use Quiq::Css;
 use Quiq::JavaScript;
@@ -50,11 +50,11 @@ wenn das Fragment die Antwort eines Ajax-Requests ist.
 
 =item html => $html (Default: '')
 
-Der HTML-Code der Komponente.
+Der HTML-Code des Fragments.
 
-=item javaScript => $js|\@js (Default: undef)
+=item javaScript => $js | \@js (Default: undef)
 
-Ein oder mehrere Der JavaScript-Code der Komponente. Siehe Methode
+Der JavaScript-Code der Fragmente. Siehe Methode
 Quiq::JavaScript->code(). Das Attribut kann mehrfach
 vorkommen, z.B. für die getrennte Angabe von JavaScript-URLs und
 JavaScript-Code.
@@ -64,9 +64,9 @@ JavaScript-Code.
 Ersetze im generierten Code die angegebenen Platzhalter durch ihre
 Werte.
 
-=item styleSheet => $css|\@css (Default: undef)
+=item styleSheet => $css | \@css (Default: undef)
 
-Der CSS-Code der Komponente. Siehe Methode
+Der CSS-Code der Fragmente. Siehe Methode
 Quiq::Css->style(). Das Attribut kann mehrfach vorkommen,
 z.B. für die getrennte Angabe von CSS-URLs und CSS-Definitionen.
 
@@ -162,7 +162,7 @@ sub html {
 
 =head1 VERSION
 
-1.152
+1.153
 
 =head1 AUTHOR
 

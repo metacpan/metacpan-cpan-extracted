@@ -4,7 +4,7 @@
       "Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v2.4.3",
+   "generated_by" : "Minilla/v3.1.4",
    "license" : [
       "perl_5"
    ],
@@ -58,7 +58,7 @@
    "provides" : {
       "App::watcher" : {
          "file" : "lib/App/watcher.pm",
-         "version" : "0.11"
+         "version" : "0.12"
       }
    },
    "release_status" : "stable",
@@ -72,12 +72,15 @@
          "web" : "https://github.com/tokuhirom/App-watcher"
       }
    },
-   "version" : "0.11",
+   "version" : "0.12",
    "x_contributors" : [
-      "issm <issmxx@gmail.com>",
       "Neil Bowers <neil@bowers.com>",
+      "Tokuhiro Matsuno <tokuhirom@gmail.com>",
+      "Yanick Champoux <yanick@babyl.dyndns.org>",
       "Yuuki Furuyama <addsict@gmail.com>",
-      "wenjun.yan <wenjun.yan@linecorp.com>",
-      "Tokuhiro Matsuno <tokuhirom@gmail.com>"
-   ]
+      "issm <issmxx@gmail.com>",
+      "wenjun.yan <wenjun.yan@linecorp.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400",
+   "x_static_install" : 1
 }

@@ -1,0 +1,45 @@
+NAME
+
+  IOas::SJIS2004 - provides SJIS2004 I/O subroutines for UTF-8 script
+
+SYNOPSIS
+
+  use IOas::SJIS2004;
+
+DESCRIPTION
+
+  IOas::SJIS2004 module provides SJIS2004 I/O subroutines for UTF-8 script for
+  stable scripting environment, using no utf8 pragma, no UTF-8 flag.
+
+SUBROUTINES
+
+  Octet Length as I/O Encoding
+    IOas::SJIS2004::length($utf8str)
+    IOas::SJIS2004::sprintf($utf8format, @utf8list)
+    IOas::SJIS2004::substr($utf8expr, $offset_as_cp932x, $length_as_cp932x, $utf8replacement)
+
+  String Comparison as I/O Encoding
+    IOas::SJIS2004::cmp($utf8str_a, $utf8str_b)
+    IOas::SJIS2004::eq($utf8str_a, $utf8str_b)
+    IOas::SJIS2004::ne($utf8str_a, $utf8str_b)
+    IOas::SJIS2004::ge($utf8str_a, $utf8str_b)
+    IOas::SJIS2004::gt($utf8str_a, $utf8str_b)
+    IOas::SJIS2004::le($utf8str_a, $utf8str_b)
+    IOas::SJIS2004::lt($utf8str_a, $utf8str_b)
+    IOas::SJIS2004::sort(@utf8str)
+
+  Encoding Convert on I/O Operations
+    IOas::SJIS2004::getc(FILEHANDLE)
+    IOas::SJIS2004::readline(FILEHANDLE)
+    IOas::SJIS2004::print(FILEHANDLE, @utf8str)
+    IOas::SJIS2004::printf(FILEHANDLE, $utf8format, @utf8list)
+
+SUPPORTED PERL VERSIONS
+
+  perl version 5.005_03 to newest perl
+
+SEE ALSO
+
+  http://search.cpan.org/~ina/
+  http://backpan.perl.org/authors/id/I/IN/INA/
+

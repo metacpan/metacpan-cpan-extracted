@@ -1,5 +1,12 @@
 Revision history for RPi-Serial
 
+3.00    2019-08-02
+        - added the XS file to the distribution
+
+2.99    2019-08-02
+        - removed requirement of WiringPi::API, all low-level operational code
+          is now incorporated into a local XS file
+
 2.3603  2018-02-09
         - added WARNING section in POD about the requirement of disabling
           the Pi's Bluetooth before the GPIO serial will work (closes #1)

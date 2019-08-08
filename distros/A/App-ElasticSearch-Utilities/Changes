@@ -1,9 +1,41 @@
 ==================================================
-Changes from 2017-06-27 00:00:00 +0000 to present.
+Changes from 2017-08-01 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 7.0 at 2019-06-27 03:42:04 +0000
+version 7.1 at 2019-08-01 19:27:33 +0000
+----------------------------------------
+
+  Change: eaf5f3ca17bfa2abd653715cc69de098283a2ffc
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-08-01 12:25:21 +0000
+
+    Fixes to allow index aliases to inform the maintenance scripts 
+
+  Change: 3c04257f11032df5e0b10694b77da17d4bd02ab0
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-07-31 20:27:52 +0000
+
+    Fixes to allow tagging indexes with special aliases
+
+    These aliases can be used to inform other processes, or simply as ways to
+    indicate they have special value.
+
+    * `es-alias-manager.pl` now ignores any alias applied to an index that
+
+    starts with an '_' or '.' and allows a user to specify an ignored
+
+    alias using a YAML null element: `ignored_alias: ~` *
+    `es-daily-index-maintenance.pl` now allows `--skip-alias pickle` to
+
+    skip any index aliased `pickle` from it's activities. Additionally,
+
+    any indexes tagged with `_hold` or `_do_not_erase` (in honor of every
+
+    whiteboard in the world) will be spared from maintenance. 
+
+----------------------------------------
+version 7.0 at 2019-06-27 03:41:36 +0000
 ----------------------------------------
 
   Change: e5dd9b3aac45bdb0f8caeddb012adbd319f18746
@@ -785,5 +817,5 @@ version 5.4 at 2017-10-13 19:36:20 +0000
     es-alias-manager.pl: relax index name checker to allow _ 
 
 =================================================
-Plus 60 releases after 2017-06-27 00:00:00 +0000.
+Plus 60 releases after 2017-08-01 00:00:00 +0000.
 =================================================

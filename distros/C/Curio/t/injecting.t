@@ -21,10 +21,11 @@ subtest keys => sub{
     package CC::k;
         use Curio;
         add_key 'foo';
+        has bar => (is=>'ro', default=>1);
     package main;
 
     my $regular = CC::k->fetch('foo');
-    my $custom = CC::k->new();
+    my $custom = CC::k->new(bar=>2);
 
     is( CC::k->fetch('foo'), $regular, 'fetch returned regular object' );
     CC::k->inject( 'foo', $custom );

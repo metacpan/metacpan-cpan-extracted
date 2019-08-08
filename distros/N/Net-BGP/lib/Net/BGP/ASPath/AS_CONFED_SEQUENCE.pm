@@ -11,7 +11,7 @@ use strict;
 @Net::BGP::ASPath::AS_CONFED_SEQUENCE::ISA =
   qw( Net::BGP::ASPath::AS_SEQUENCE );
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 sub type {
     return 3;

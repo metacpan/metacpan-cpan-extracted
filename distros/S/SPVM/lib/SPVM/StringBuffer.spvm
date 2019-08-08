@@ -1,16 +1,18 @@
 package SPVM::StringBuffer {
-  has value      : byte[];
-  has length      : ro int;
+  use SPVM::Hash;
+
+  has value : byte[];
+  has length : ro int;
+  
+  private enum {
+    DEFAULT_CAPACITY = 16,
+  }
   
   sub capacity : int ($self : self) {
     return @$self->{value};
   }
   
-  sub _copy_value : byte[] ($self : self) {
-    return copy_barray($self->{value});
-  }
-  
-  sub _reallocate : void ($self : self, $new_capacity : int) {
+  private sub _reallocate : void ($self : self, $new_capacity : int) {
     my $new_string = new byte [$new_capacity];
     for (my $i = 0; $i < $self->{length}; ++$i) {
       $new_string->[$i] = $self->{value}[$i];
@@ -18,129 +20,39 @@ package SPVM::StringBuffer {
     $self->{value} = $new_string;
   }
 
-  sub to_barray : byte[] ($self : self) {
-    return sliceb($self->{value}, 0, $self->{length});
-  }
-
   sub new : SPVM::StringBuffer () {
     my $self = new SPVM::StringBuffer;
-    my $default_capacity = 16;
+    my $default_capacity = DEFAULT_CAPACITY();
     $self->{value} = new byte [$default_capacity];
     $self->{length} = 0;
     return $self;
   }
-
-  sub new_with_capacity : SPVM::StringBuffer ($capacity : int) {
+  
+  sub new_opt : SPVM::StringBuffer ($options : object[]) {
+    my $options_h = SPVM::Hash->newa($options);
+    
     my $self = new SPVM::StringBuffer;
-    unless ($capacity > 0) {
-      die "capacity must be positive";
+
+    my $default_capacity : int;
+    if ($options_h->exists("capacity")) {
+      $default_capacity = (int)$options_h->delete("capacity");
     }
-    $self->{value} = new byte [$capacity];
+    else {
+      $default_capacity = DEFAULT_CAPACITY();
+    }
+    
+    # Minimal capacity is 1
+    if ($default_capacity < 1) {
+      die "Invalid capacity";
+    }
+    
+    $self->{value} = new byte [$default_capacity];
     $self->{length} = 0;
+    
     return $self;
   }
 
-  sub new_with_string : SPVM::StringBuffer ($string : string) {
-    my $self = new SPVM::StringBuffer;
-    $self->{value} = (byte [])$string;
-    $self->{length} = @$self->{value};
-    return $self;
-  }
-
-  sub substr : SPVM::StringBuffer ($self : self, $offset : int, $length : int) {
-    if ($offset >= $self->{length}) {
-      die("substr offset is greater or equal than string length");
-      return SPVM::StringBuffer->new;
-    }
-    
-    my $new_capacity = $length;
-    
-    my $new_text = SPVM::StringBuffer->new_with_capacity($new_capacity);
-    
-    for (my $i = 0; $i < $length; $i++) {
-      $new_text->{value}[$i] = $self->{value}[$offset + $i];
-    }
-    $new_text->{length} = $length;
-    
-    return $new_text;
-  }
-
-  sub copy : SPVM::StringBuffer ($self : self) {
-    my $ret = SPVM::StringBuffer->new;
-    $ret->{value}      = $self->{value};
-    $ret->{length}      = $self->{length};
-    return $ret;
-  }
-
-  # O($self->{length} + $buffer)
-  sub prepend : void ($self : self, $buffer : SPVM::StringBuffer) {
-    
-    # TODO: Think how to deal with capacity.
-    my $capacity = @$self->{value}; # capacity is not shrunk.
-    if ($capacity < $self->{length} + $buffer->{length}) { # don't consider about x2 allocation.
-      $capacity = $self->{length} + $buffer->{length};
-    }
-    my $new_string = new byte [$capacity];
-    for (my $i = 0; $i < $buffer->{length}; ++$i) {
-      $new_string->[$i] = $buffer->{value}->[$i];
-    }
-    for (my $i = 0; $i < $self->{length}; ++$i) {
-      $new_string->[$buffer->{length} + $i] = $self->{value}[$i];
-    }
-    $self->{value} = $new_string;
-    $self->{length} += $buffer->{length};
-  }
-
-  sub append : void ($self : self, $buffer : SPVM::StringBuffer) {
-    my $capacity = @$self->{value};
-    if ($self->{length} + $buffer->{length} > $capacity) {
-      # O($new_capacity)
-      my $new_capacity : int;
-      if ($self->{length} + $buffer->{length} > $capacity * 2) {
-        $new_capacity = $self->{length} + $buffer->{length};
-      } else {
-        $new_capacity = $capacity * 2;
-      }
-      $self->_reallocate($new_capacity);
-      for (my $i = 0; $i < $buffer->{length}; ++$i) {
-        $self->{value}[$self->{length} + $i] = $buffer->{value}->[$i];
-      }
-      $self->{length} += $buffer->{length};
-    }
-    else {
-      for (my $i = 0; $i < $buffer->{length}; ++$i) {
-        $self->{value}[$self->{length} + $i] = $buffer->{value}->[$i];
-      }
-      $self->{length} += $buffer->{length};
-    }
-  }
-
-  sub append_bytes : void ($self : self, $bytes : byte[]) {
-    my $length = @$bytes;
-    my $capacity = @$self->{value};
-    if ($self->{length} + $length > $capacity) {
-      # O($new_capacity)
-      my $new_capacity : int;
-      if ($self->{length} + $length > $capacity * 2) {
-        $new_capacity = $self->{length} + $length;
-      } else {
-        $new_capacity = $capacity * 2;
-      }
-      $self->_reallocate($new_capacity);
-      for (my $i = 0; $i < $length; ++$i) {
-        $self->{value}[$self->{length} + $i] = $bytes->[$i];
-      }
-      $self->{length} += $length;
-    }
-    else {
-      for (my $i = 0; $i < $length; ++$i) {
-        $self->{value}[$self->{length} + $i] = $bytes->[$i];
-      }
-      $self->{length} += $length;
-    }
-  }
-
-  sub append_string : void ($self : self, $string : string) {
+  sub push  : void ($self : self, $string : string) {
     my $length = length($string);
     my $capacity = @$self->{value};
     if ($self->{length} + $length > $capacity) {
@@ -165,58 +77,27 @@ package SPVM::StringBuffer {
     }
   }
 
-  sub replace : void ($self : self, $offset : int, $length : int, $replace : string) {
-    if ($offset > $self->{length}) {
-      warn("replace offset past end of string");
-      $offset = $self->{length};
-      $length = 0;
-    }
-
-    if ($length > $self->{length} - $offset) {
-      $length = $self->{length} - $offset;
-    }
-
-    my $replace_length = 0;
-    if ($replace) {
-      $replace_length = length($replace);
-    }
-
-    my $capacity = @$self->{value};
-    if ($self->{length} - $length + $replace_length > $capacity) {
-      # O($new_string_length)
-      $self->_reallocate($self->{length} - $length + $replace_length);
-    }
-
-    my $last_sequence_length = $self->{length} - $offset - $length;
-    if ($length > $replace_length) {
-      # move last sequence to forward
-      for (my $i = 0; $i < $last_sequence_length; ++$i) {
-        my $origin = $offset + $length + $i;
-        my $target = $offset + $replace_length + $i;
-        $self->{value}[$target] = $self->{value}[$origin];
-      }
-    }
-    else {
-      # move last sequence to backward
-      for (my $i = 0; $i < $last_sequence_length; ++$i) {
-        my $origin = $self->{length} - 1 - $i;
-        my $target = $offset + $replace_length + $last_sequence_length - 1 - $i;
-        $self->{value}[$target] = $self->{value}[$origin];
-      }
-    }
-
-    # replace with new array
-    for (my $i = 0; $i < $replace_length; ++$i) {
-      my $target = $offset + $i;
-      $self->{value}[$target] = $replace->[$i];
-    }
-
-    $self->{length} += $replace_length - $length;
+  sub to_str : string ($self : self) {
+    return (string)(sliceb($self->{value}, 0, $self->{length}));
   }
 
-  sub index : int ($self : self, $search : string, $from_index : int) {
+  sub substr : string ($self : self, $offset : int, $length : int) {
+    if ($offset >= $self->{length}) {
+      die("substr offset is greater or equal than string length");
+    }
+    
+    my $new_text = new byte[$length];
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $new_text->[$i] = $self->{value}[$offset + $i];
+    }
+    
+    return $new_text;
+  }
+
+  sub index : int ($self : self, $search : string, $offset : int) {
     my $slen = length $search;
-    for (my $i = $from_index; $i < $self->{length} - $slen + 1; ++$i) {
+    for (my $i = $offset; $i < $self->{length} - $slen + 1; ++$i) {
       my $found = 1;
       for (my $j = 0; $j < $slen; ++$j) {
         if ($self->{value}[$i + $j] != $search->[$j]) {
@@ -231,19 +112,7 @@ package SPVM::StringBuffer {
     return -1;
   }
 
-  sub equals : int ($self : self, $buffer : SPVM::StringBuffer) {
-    unless ($self->{length} == $buffer->{length}) {
-      return 0;
-    }
-    for (my $i = 0; $i < $self->{length}; ++$i) {
-      unless ($self->{value}[$i] == $buffer->{value}->[$i]) {
-        return 0;
-      }
-    }
-    return 1;
-  }
-
-  sub to_str : string ($self : self) {
-    return (string)(sliceb($self->{value}, 0, $self->{length}));
+  sub clear : void ($self : self) {
+    $self->{length} = 0;
   }
 }

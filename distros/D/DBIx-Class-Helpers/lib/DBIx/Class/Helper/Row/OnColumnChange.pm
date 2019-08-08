@@ -1,5 +1,5 @@
 package DBIx::Class::Helper::Row::OnColumnChange;
-$DBIx::Class::Helper::Row::OnColumnChange::VERSION = '2.033004';
+$DBIx::Class::Helper::Row::OnColumnChange::VERSION = '2.034000';
 # ABSTRACT: Do things when the values of a column change
 
 use strict;
@@ -358,7 +358,7 @@ Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Arthur Axel "fREW" Schmidt.
+This software is copyright (c) 2019 by Arthur Axel "fREW" Schmidt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

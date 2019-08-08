@@ -34,9 +34,9 @@ self.addEventListener('fetch', function (e) {
 		e.respondWith(
 			caches.match(e.request).then(function(response) {
 				return response || fetch(e.request).catch(function () {
-						caches.match(offlineFile).then(function (response) {
-							return response;
-						});
+					caches.match(offlineFile).then(function (response) {
+						return response;
+					});
 				});
 			})
 		);
@@ -46,7 +46,7 @@ self.addEventListener('fetch', function (e) {
 		e.respondWith(
 			caches.open(cacheName).then(function(cache) {
 				return fetch(e.request).then(function(response) {
-					cache.put(e.request, response.clone());
+					if (e.request.method === 'GET') cache.put(e.request, response.clone());
 					return response;
 				});
 			}).catch(function() {

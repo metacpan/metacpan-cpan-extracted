@@ -3,6 +3,7 @@ lib/Progressive/Web/Application.pm
 lib/Progressive/Web/Application/Command.pm
 lib/Progressive/Web/Application/Template/Base.pm
 lib/Progressive/Web/Application/Template/General.pm
+lib/Progressive/Web/Application/Template/GeneralDeferred.pm
 lib/Progressive/Web/Application/Template/OfflineOnly.pm
 lib/Progressive/Web/Application/Template/PreCacheEndpoint.pm
 Makefile.PL
@@ -23,6 +24,7 @@ t/pod-coverage.t
 t/pod.t
 t/resources/320x320-icon.png
 t/resources/36x36-icon.png
+t/resources/kaput.png
 t/resources/pwa.js
 t/resources/service-worker.js
 t/resources/things/one.js

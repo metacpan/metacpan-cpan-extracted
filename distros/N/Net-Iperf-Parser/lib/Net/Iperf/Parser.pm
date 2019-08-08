@@ -1,5 +1,5 @@
 package Net::Iperf::Parser;
-$Net::Iperf::Parser::VERSION = '0.01';
+$Net::Iperf::Parser::VERSION = '0.03';
 use Moose;
 use namespace::autoclean;
 
@@ -107,7 +107,7 @@ Net::Iperf::Parser - Parse a single iperf line result
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -115,8 +115,26 @@ version 0.01
 
   my $p = new Net::Iperf::Parser;
 
-  $p->parse($row);
-  print $p->dump;
+  my @rows = `iperf -c iperf.volia.net -P 2`;
+
+  foreach (@rows) {
+    $p->parse($_);
+    print $p->dump if ($p->is_valid && $p->is_global_avg);
+  }
+
+and result is something like this
+
+  {
+      is_valid          => 1,
+      start             => 0,
+      end               => 10,
+      duration          => 10,
+      speed             => 129024,
+      speedk            => 126,
+      speedm            => 0.123046875,
+      is_process_avg    => 1,
+      is_global_avg     => 1,
+  }
 
 =head1 DESCRIPTION
 
@@ -126,11 +144,11 @@ Parse a single iperf line result in default or CSV mode
 
 =head2 start
 
-Return the start range
+Return the start time
 
 =head2 end
 
-Return the end range
+Return the end time
 
 =head2 is_valid
 
@@ -160,13 +178,17 @@ Return the speed calculated in Mbps
 
 Return a to_string version of the object (like a Data::Dumper::dumper)
 
-=head2 parsed
+=head2 parse($row)
 
-=head2 parsecsv
+Parse a single iperf line result
+
+=head2 parsecsv($row)
+
+Parse a single iperf line result in CSV mode (-y C)
 
 =head1 SEE ALSO
 
-L<Net::OpenSSH>
+L<iperf|https://iperf.fr/>
 
 =head1 AUTHOR
 

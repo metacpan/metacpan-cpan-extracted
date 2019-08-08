@@ -1,5 +1,5 @@
 package Curio::Role;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =encoding utf8
 
@@ -28,6 +28,8 @@ sub import {
     my ($class) = @_;
 
     my $factory = $class->factory();
+    return if !$factory;
+
     my $name = $factory->export_function_name();
     return if !defined $name;
 
@@ -157,9 +159,6 @@ sub initialize {
     my $factory = MyApp::Service::Cache->factory();
 
 Returns the class's L<Curio::Factory> object.
-
-Calling this is equivalent to calling L<Curio::Factory/find_factory>,
-but is much faster.
 
 =cut
 

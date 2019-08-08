@@ -1,0 +1,13 @@
+.releaserc
+blib/
+CVS/
+.git/
+MYMETA.*
+.bak$
+Makefile$
+^parent-versioned.*/
+^parent-versioned.*.tar$
+^parent-versioned.*.tar.gz$
+pm_to_blib
+.travis.yml
+cover_db/

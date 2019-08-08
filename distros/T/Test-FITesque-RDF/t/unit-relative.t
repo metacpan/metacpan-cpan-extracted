@@ -46,7 +46,7 @@ cmp_deeply($data, [
 			  [ [ 'Internal::Fixture::Simple' ],
 				 [ 'relative_uri',
 					{
-					 'description' => 'Check that a relative URI resolves',
+					 '-special' => { 'description' => 'Check that a relative URI resolves' },
 					 'url' => 'http://example.org/foo/'
 					}
 				 ]

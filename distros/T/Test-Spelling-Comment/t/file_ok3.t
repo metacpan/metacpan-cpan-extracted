@@ -26,7 +26,7 @@ sub main {
 
     my $obj = $class->new;
 
-    my $tmp = tempdir();
+    my $tmp  = tempdir();
     my $file = File::Spec->catfile( $tmp, 'file.pm' );
 
     _touch($file);

@@ -1,3 +1,8 @@
+0.132		2019-08-05	T. R. Wyant
+    Update canned status table for decay of
+
+    - Iridium 61
+
 0.131		2019-07-20	T. R. Wyant
     Fix broken POD links, and add test to ensure they stay fixed.
     

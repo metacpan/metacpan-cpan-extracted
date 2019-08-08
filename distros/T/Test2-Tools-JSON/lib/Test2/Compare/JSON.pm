@@ -41,15 +41,13 @@ sub deltas {
 
     my $check = $convert->($self->{+INREF});
 
-    my $delta = $check->run(
+    return $check->run(
         id      => [META => 'JSON'],
+        convert => $convert,
+        seen    => $seen,
         got     => $self->{+JSON}->decode($got),
         exists  => 1,
-        convert => $convert,
-        seen    => {},
     );
-    return unless $delta;
-    return $delta;
 }
 
 1;

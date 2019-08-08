@@ -10,11 +10,11 @@ Astro::SIMBAD::Client - Fetch astronomical data from SIMBAD 4.
 
 =head1 NOTICE
 
-As of release 0.027_01 the SOAP interface is deprecated. The +University
+As of release 0.027_01 the SOAP interface is deprecated. The University
 of Strasbourg has announced at
-+L<http://cds.u-strasbg.fr/resources/doku.php?id=soap> that this
-+interface will not be maintained after April 1 2014, and that +B<this
-interface will be stopped on December 31 2018>.
+L<http://cds.u-strasbg.fr/resources/doku.php?id=soap> that this
+interface will not be maintained after April 1 2014, and that 
+B<this interface will be stopped on December 31 2018>.
 
 Because the SOAP interface is still sort of functional (except for
 VO-format queries) as of June 4 2014, I have revised the transition plan
@@ -116,7 +116,7 @@ BEGIN {
 	|| sub { return $_[0] };
 }
 
-our $VERSION = '0.039';
+our $VERSION = '0.040';
 
 our @CARP_NOT = qw{Astro::SIMBAD::Client::WSQueryInterfaceService};
 
@@ -1475,32 +1475,27 @@ The Astro::SIMBAD::Client class has the following attributes:
 
 =over
 
-=item autoload (boolean)
+=item autoload
 
-=for html <a name="autoload"></a>
-
-This attribute determines whether setting the parser should attempt
-to autoload its package.
+This Boolean attribute determines whether setting the parser should
+attempt to autoload its package.
 
 The default is 1 (i.e. true).
 
-=for html <a name="debug"></a>
+=item debug
 
-=item debug (integer)
-
-This attribute turns on debug output. It is unsupported in the sense
-that the author makes no claim what will happen if it is non-zero.
+This integer attribute turns on debug output. It is unsupported in the
+sense that the author makes no claim what will happen if it is non-zero.
 
 The default value is 0.
 
-=for html <a name="delay"></a>
+=item delay
 
-=item delay (integer)
-
-This attribute sets the minimum delay in seconds between requests, so as
-not to overload the SIMBAD server. If Time::HiRes can be loaded, you can
-set delays in fractions of a second; otherwise the delays will be
-rounded to the nearest second.
+This numeric attribute sets the minimum delay in seconds between
+requests, so as not to overload the SIMBAD server. If
+L<Time::HiRes|Time::HiRes> can be loaded, you can set delays in
+fractions of a second; otherwise the delays will be rounded to the
+nearest second.
 
 Delays are from the time of the last request to the server, no matter
 which object issued the request. The delay can be set to 0, but not to a
@@ -1508,13 +1503,11 @@ negative number.
 
 The default is 3.
 
-=for html <a name="emulate_soap_queries">
+=item emulate_soap_queries
 
-=item emulate_soap_queries (boolean)
-
-If this attribute is true, the methods that would normally use the SOAP
-interface (that is, C<query()> and friends) use the script interface
-instead.
+If this Boolean attribute is true, the methods that would normally use
+the SOAP interface (that is, C<query()> and friends) use the script
+interface instead.
 
 The purpose of this attribute is to give the user a way to manage the
 deprecation and ultimate removal of the SOAP interface from the SIMBAD
@@ -1524,12 +1517,10 @@ put through a deprecation cycle.
 The default is false, but will become true once the University of
 Strasbourg shuts down its SOAP server.
 
-=for html <a name="format"></a>
-
-=item format (hash)
+=item format
 
 This attribute holds the default format for a given query()
-output type. See
+output type. It is specified as a reference to a hash. See
 L<http://simweb.u-strasbg.fr/simbad/sim-help?Page=sim-fscript> for how
 to specify formats for each output type. Output type 'script' is used to
 specify a format for the script() method.
@@ -1571,11 +1562,11 @@ FORMAT_VO_BASIC.
 There is no way to specify a default format for the 'script_file'
 method.
 
-=for html <a name="parser"></a>
+=item parser
 
-=item parser (hash)
-
-This attribute specifies the parser for a given output type.
+This attribute specifies the parser for a given output type. The actual
+value is a hash reference; the keys are valid output types, and the
+values are as described below.
 
 Parsers may be specified by either a code reference, or by the
 text name of a subroutine. If specified as text and the name
@@ -1591,58 +1582,50 @@ The output types are anything legal for the query() method (i.e. 'txt'
 and 'vo' at the moment), plus 'script' for a script parser. All default
 to '', meaning no parser is used.
 
-=item post (boolean)
+=item post
 
-=for html <a name="post"></a>
-
-This attribute specifies that url_query() data should be acquired using
-a POST request. If false, a GET request is used.
+This Boolean attribute specifies that url_query() data should be
+acquired using a POST request. If false, a GET request is used.
 
 The default is 1 (i.e. true).
 
-=for html <a name="scheme"></a>
+=item scheme
 
-=item scheme (string)
-
-This attribute specifies the server's URI scheme to be used. As of
-January 27 2017, either C<'http'> or C<'https'> is valid.
+This string attribute specifies the server's URI scheme to be used. As
+of January 27 2017, either C<'http'> or C<'https'> is valid.
 
 The default is the value of environment variable
 C<ASTRO_SIMBAD_CLIENT_SCHEME>, or C<'http'> if the environment variable
 is not set, or if it contains a value other than C<'http'> or
 C<'https'>, case-insensitive.
 
-=for html <a name="server"></a>
+=item server
 
-=item server (string)
-
-This attribute specifies the server to be used. As of March 10 2010,
-either C<'simbad.u-strasbg.fr'> or C<'simbad.cfa.harvard.edu'> is valid.
+This string attribute specifies the server to be used. As of March 10
+2010, either C<'simbad.u-strasbg.fr'> or C<'simbad.cfa.harvard.edu'> is
+valid.
 
 The default is the value of environment variable
 ASTRO_SIMBAD_CLIENT_SERVER, or C<'simbad.u-strasbg.fr'> if the
 environment variable is not set.
 
-=for html <a name="type"></a>
+=item type
 
-=item type (string)
-
-This attribute specifies the default output type. Note that although
-SIMBAD only defined types 'txt' and 'vo', we do not validate this,
-since the SIMBAD web site hints at more types to come. SIMBAD appears
-to treat an unrecognized type as C<'txt'>.
+This string attribute specifies the default output type. Note that
+although SIMBAD only defined types 'txt' and 'vo', we do not validate
+this, since the SIMBAD web site hints at more types to come. SIMBAD
+appears to treat an unrecognized type as C<'txt'>.
 
 The default is C<'txt'>.
 
-=for html <a name="url_args"></a>
+=item url_args
 
-=item url_args (hash)
+This attribute specifies default arguments for url_query method as a
+reference to a hash of argument name/value pairs. These will be applied
+only if not specified in the method call. Any argument given in the
+SIMBAD documentation may be specified. For example:
 
-This attribute specifies default arguments for url_query method. These
-will be applied only if not specified in the method call. Any argument
-given in the SIMBAD documentation may be specified. For example:
-
- $simbad->set (url_args => {coodisp1 => d});
+ $simbad->set( url_args => { coodisp1 => 'd' } );
 
 causes the query to return coordinates in degrees and decimals rather
 than in sexagesimal (degrees, minutes, and seconds or hours, minutes,
@@ -1652,15 +1635,14 @@ does not seem to be affected by this.
 The initial default for this attribute is an empty hash; that is, no
 arguments are defaulted by this mechanism.
 
-=for html <a name="verbatim"></a>
+=item verbatim
 
-=item verbatim (boolean)
-
-This attribute specifies whether script() and script_file() are to strip
-the front matter from the script output. If false, everything up to and
-including the '::data:::::' line is removed before passing the output to
-the parser or returning it to the user. If true, the script output is
-passed to the parser or returned to the user unmodified.
+This Boolean attribute specifies whether C<script()> and
+C<script_file()> are to strip the front matter from the script output.
+If false, everything up to and including the '::data:::::' line is
+removed before passing the output to the parser or returning it to the
+user. If true, the script output is passed to the parser or returned to
+the user unmodified.
 
 The default is C<0> (i.e. false).
 

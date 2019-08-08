@@ -5,11 +5,17 @@ use 5.008;
 use strict;
 use warnings;
 
+use Config;
 use Astro::Coord::ECI::Utils qw{ date2epoch };
 use Astro::Coord::ECI::VSOP87D qw{ __model };
 use File::Basename qw{ basename };
 use File::Glob qw{ bsd_glob };
 use Test::More 0.88;	# Because of done_testing();
+
+# I believe the expanded limit when using long doubles is because the
+# Fortran program that generated the comparison data only used double.
+# This only shows up when testing Mercury.
+use constant TEST_LIMIT	=> defined $Config{uselongdouble} ? 11e-10 : 5e-10;
 
 my @name = (
     'Longitude, radians',
@@ -19,6 +25,8 @@ my @name = (
     'Latitudinal velocity, radians/day',
     'Radius velocity, AU/day',
 );
+
+note "Test limit is @{[ TEST_LIMIT ]}";
 
 foreach my $fn ( bsd_glob( 't/data/vsop87*.*' ) ) {
     my $body = basename( $fn );
@@ -53,7 +61,7 @@ foreach my $fn ( bsd_glob( 't/data/vsop87*.*' ) ) {
 	    cutoff	=> 'none',
 	);
 	foreach my $inx ( 0 .. $#got ) {
-	    cmp_ok abs( $got[$inx] - $want[$inx] ), '<', 5e-10,
+	    cmp_ok abs( $got[$inx] - $want[$inx] ), '<', TEST_LIMIT,
 	    "$body $dt [$inx] ($name[$inx])";
 	}
     }

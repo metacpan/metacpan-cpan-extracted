@@ -1,0 +1,104 @@
+{
+   "abstract" : "reliable job queue",
+   "author" : [
+      ", Six Apart Ltd, cpan@sixapart.com. All"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.5",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "TheSchwartz",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::ObjectDriver" : "0.04",
+            "Digest::MD5" : "0",
+            "Storable" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "TheSchwartz" : {
+         "file" : "lib/TheSchwartz.pm",
+         "version" : "1.13"
+      },
+      "TheSchwartz::Error" : {
+         "file" : "lib/TheSchwartz/Error.pm"
+      },
+      "TheSchwartz::ExitStatus" : {
+         "file" : "lib/TheSchwartz/ExitStatus.pm"
+      },
+      "TheSchwartz::FuncMap" : {
+         "file" : "lib/TheSchwartz/FuncMap.pm"
+      },
+      "TheSchwartz::Job" : {
+         "file" : "lib/TheSchwartz/Job.pm"
+      },
+      "TheSchwartz::JobHandle" : {
+         "file" : "lib/TheSchwartz/JobHandle.pm"
+      },
+      "TheSchwartz::Worker" : {
+         "file" : "lib/TheSchwartz/Worker.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/akiym/TheSchwartz/issues"
+      },
+      "homepage" : "https://github.com/akiym/TheSchwartz",
+      "repository" : {
+         "url" : "git://github.com/akiym/TheSchwartz.git",
+         "web" : "https://github.com/akiym/TheSchwartz"
+      }
+   },
+   "version" : "1.13",
+   "x_authority" : "cpan:AKIYM",
+   "x_contributors" : [
+      "Akira Sawada <akira@peatix.com>",
+      "Brad Fitzpatrick <brad@danga.com>",
+      "Jeff Fearn <Jeff.Fearn@gmail.com>",
+      "Jeff Fearn <jfearn@redhat.com>",
+      "Six Apart Ltd. <cpan@sixapart.com>",
+      "Takumi Akiyama <t.akiym@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_static_install" : 1
+}

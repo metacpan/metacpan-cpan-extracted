@@ -57,6 +57,7 @@ void Stash::_promote (GV* gv, const panda::string_view& key) const {
                 ((XPVCV*)MUTABLE_PTR(SvANY(val)))->xcv_gv_u.xcv_hek = hek;
                 CvNAMED_on((CV*)val);
                 CvCVGV_RC_off((CV*)val);
+                CvANON_off((CV*)val);
             }
         }
     #endif

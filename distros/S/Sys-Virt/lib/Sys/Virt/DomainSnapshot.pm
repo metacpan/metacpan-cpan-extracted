@@ -194,6 +194,10 @@ Create multiple disk snapshots atomically
 
 Create snapshot while the guest is running
 
+=item Sys::Virt::DomainSnapshot::CREATE_VALIDATE
+
+Validate the XML document against the schema
+
 =back
 
 =head2 SNAPSHOT DELETION

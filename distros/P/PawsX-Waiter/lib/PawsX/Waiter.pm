@@ -8,7 +8,7 @@ use JSON;
 use Path::Tiny;
 use PawsX::Waiter::Client;
 
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 
 sub GetWaiter {
     my ( $self, $waiter ) = @_;
@@ -43,6 +43,7 @@ __END__
 PawsX::Waiter - A Waiter library for Paws
 
 =head1 SYNOPSIS
+
     use PawsX::Waiter;
 
       my $client = Paws->new(
@@ -61,12 +62,10 @@ PawsX::Waiter - A Waiter library for Paws
       );
 
       my $waiter = $service->GetWaiter('InstanceInService');
-      $waiter->wait(
-         {
-            LoadBalancerName => 'test-elb',
-            Instances        => [ { InstanceId => 'i-0xxxxx' } ],
-        }
-      );
+      $waiter->wait({
+          LoadBalancerName => 'test-elb',
+          Instances        => [ { InstanceId => 'i-0xxxxx' } ],
+      });
       
 =head1 DESCRIPTION
 
@@ -92,15 +91,22 @@ Number of seconds to delay between polling attempts. Each waiter has a default d
     
 Maximum number of polling attempts to issue before failing the waiter. Each waiter has a default maxAttempts configuration value, 
 but you may need to modify this setting for specific use cases.
+
+=head4 beforeWait(CodeRef)
+
+    $waiter->beforeWait(sub { 
+        my ($w, $attempts, $response) = @_;
+        say STDERR "Waiter attempts left:" . ( $w->maxAttempts - $attempts );
+    });
+
+Register a callback that is invoked after an attempt but before sleeping. provides the number of attempts made and the previous response.
   
 =head3 wait(HashRef)
     
-     $waiter->wait(
-         {
-            LoadBalancerName => 'test-elb',
-            Instances        => [ { InstanceId => 'i-0xxxxx' } ],
-        }
-      );
+     $waiter->wait({
+         LoadBalancerName => 'test-elb',
+         Instances        => [ { InstanceId => 'i-0xxxxx' } ],
+     });
 
 Block until the waiter completes or fails.Note that this might throw a PawsX::Exception::* if the waiter fails.
 

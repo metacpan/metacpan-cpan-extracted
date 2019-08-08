@@ -1,5 +1,20 @@
 Revision history for the Perl extension Win32.
 
+0.53	[2019-08-05]
+        - improve Win32::GetOSDisplayName
+        - added Win2016/2019 detection and version information by
+          Richard Leach [PR/15]
+        - Include wchar.h to allow building with g++ by Tony Cook [rt#127836]
+
+0.52_02 [2018-11-02] by Reini Urban
+        - added () usage croaks.
+        - Fixed a -Warray-bounds buffer overflow in LONGPATH,
+        - Fix various -Wunused warnings
+          and two -Wmaybe-uninitialized.
+
+0.52_01 [2017-11-30]
+        - add missing const
+
 0.52    [2015-08-19]
         - minimal Windows 10 support (thanks to Joel Maslak) [PR/8]
         - refactor Windows 10 support to include ProductInfo flags

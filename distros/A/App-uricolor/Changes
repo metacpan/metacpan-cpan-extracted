@@ -1,8 +1,11 @@
 Revision history for App-uricolor
 
+0.14    2019.08.05 
+        added -c (color)
+
 0.13    2019.07.09 
         added -s (schemeless), use 5.010, better doc
-		
+
 0.12    2019.06.18 
         dropped file extension, added pod
 

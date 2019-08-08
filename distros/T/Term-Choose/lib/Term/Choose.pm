@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.654';
+our $VERSION = '1.655';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -1143,9 +1143,13 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.654
+Version 1.655
 
 =cut
+
+=head1 ANNOUNCEMENT
+
+With the next release there will only be mouse mode C<off> (0) and mouse mode C<on> (1). See ANNOUNCEMENT in L</mouse>.
 
 =head1 SYNOPSIS
 
@@ -1595,6 +1599,10 @@ marked as C<UTF-8> with C<:encoding(UTF-8)>. This doesn't apply if the OS is MSW
 
 If the OS is MSWin32 there is no difference between the mouse modes 1, 3, and 4 - the all enable the mouse with the help
 of L<Win32::Console>.
+
+ANNOUNCEMENT: With the next release there will only be mouse mode C<off> (0) and mouse mode C<on> (1). During a
+transition period, 2,3 and 4 will also activate the mouse mode. Mouse set to C<on> enables the Any-Event-Mouse-Mode
+(1003) and the Extended-SGR-Mouse-Mode (1006).
 
 =head3 order
 

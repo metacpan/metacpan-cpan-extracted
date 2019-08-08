@@ -1,0 +1,22 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+examples/pds_canonize
+examples/pds_multiply
+examples/pds_planes
+examples/pds_translate
+examples/show_databases
+lib/Math/DifferenceSet/Planar.pm
+lib/Math/DifferenceSet/Planar/Data.pm
+lib/Math/DifferenceSet/Planar/Schema.pm
+lib/Math/DifferenceSet/Planar/Schema/Result/DifferenceSet.pm
+share/pds.db
+t/01_basics.t
+t/90_pod.t
+t/91_pod_cover_cp.t
+t/99_signature.t
+t/lib/Test/MyUtils.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

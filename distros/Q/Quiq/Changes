@@ -1,3 +1,31 @@
+1.153 2019-08-03
+================
+[Quiq::Diff]
+* Klasse hinzugefügt
+
+[Quiq::Gd::Font]
+* Umbenannt: GD -> Gd
+
+[Quiq::Gd::Image]
+* Umbenannt: GD -> Gd
+
+[Quiq::Html::Fragment]
+* Doku bearbeitet
+
+[Quiq::Path]
+* find(): Tilde-Expansion hinzugefügt
+* truncate(): Tilde-Expansion hinzugefügt
+* unindent(): neue Methode
+
+[Quiq::Storable]
+* Kosmetik
+
+[Quiq::TempFile]
+* new(): Speichern von Daten hinzugefügt
+
+[Quiq::Test::Class]
+* in(): Bessere Information im Fehlerfall
+
 1.152 2019-07-25
 ================
 [Quiq::Digest]

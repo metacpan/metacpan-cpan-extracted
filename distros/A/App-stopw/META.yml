@@ -29,7 +29,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-stopw
   homepage: https://metacpan.org/release/App-stopw
   repository: git://github.com/perlancar/perl-App-stopw.git
-version: '0.040'
+version: '0.041'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

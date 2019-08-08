@@ -8,7 +8,7 @@ use Mojo::Util 'steady_time';
 use Sys::Hostname 'hostname';
 use Time::HiRes 'usleep';
 
-our $VERSION = '4.004';
+our $VERSION = '4.005';
 
 has dequeue_interval => 0.5;
 has 'sqlite';
@@ -107,6 +107,9 @@ sub list_jobs {
     my $ids_in = join ',', ('?')x@$ids;
     push @where, @$ids ? "id in ($ids_in)" : 'id is null';
     push @where_params, @$ids;
+  }
+  if (defined(my $notes = $options->{notes})) {
+    croak 'Listing jobs by existence of notes is unimplemented';
   }
   if (defined(my $queues = $options->{queues})) {
     my $queues_in = join ',', ('?')x@$queues;
@@ -219,17 +222,26 @@ sub lock {
 
 sub note {
   my ($self, $id, $merge) = @_;
-  my (@set, @set_params);
+  my (@set, @set_params, @remove, @remove_params);
   foreach my $key (keys %$merge) {
     croak qq{Invalid note key '$key'; must not contain '.', '[', or ']'}
       if $key =~ m/[\[\].]/;
-    push @set, q{'$.' || ?}, 'json(?)';
-    push @set_params, $key, {json => $merge->{$key}};
+    if (defined $merge->{$key}) {
+      push @set, q{'$.' || ?}, 'json(?)';
+      push @set_params, $key, {json => $merge->{$key}};
+    } else {
+      push @remove, q{'$.' || ?};
+      push @remove_params, $key;
+    }
   }
   my $json_set = join ', ', @set;
+  my $json_remove = join ', ', @remove;
+  my $set_to = 'notes';
+  $set_to = "json_set($set_to, $json_set)" if @set;
+  $set_to = "json_remove($set_to, $json_remove)" if @remove;
   return !!$self->sqlite->db->query(
-    qq{update minion_jobs set notes = json_set(notes, $json_set)
-       where id = ?}, @set_params, $id
+    qq{update minion_jobs set notes = $set_to where id = ?},
+    @set_params, @remove_params, $id
   )->rows;
 }
 

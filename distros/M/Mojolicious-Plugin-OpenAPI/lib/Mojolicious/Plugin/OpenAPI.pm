@@ -7,7 +7,7 @@ use Mojo::JSON;
 use Mojo::Util;
 use constant DEBUG => $ENV{MOJO_OPENAPI_DEBUG} || 0;
 
-our $VERSION = '2.14';
+our $VERSION = '2.16';
 my $X_RE = qr{^x-};
 
 has route     => sub {undef};
@@ -66,13 +66,29 @@ sub register {
 }
 
 sub _add_default_response {
-  my ($self, $op_spec, $code) = @_;
-  return if $op_spec->{responses}{$code};
-  my $name   = $self->{default_response_name};
-  my $ref    = $self->validator->schema->data->{definitions}{$name} ||= $self->_default_schema;
-  my %schema = ('$ref' => "#/definitions/$name");
+  my ($self, $op_spec) = @_;
+  my $name        = $self->{default_response_name};
+  my $schema_data = $self->validator->schema->data;
+
+  my $ref
+    = $self->validator->version ge '3'
+    ? ($schema_data->{components}{responses}{$name} ||= $self->_default_schema)
+    : ($schema_data->{definitions}{$name} ||= $self->_default_schema);
+
+  my %schema
+    = $self->validator->version ge '3'
+    ? ('$ref' => "#/components/responses/$name")
+    : ('$ref' => "#/definitions/$name");
+
   tie %schema, 'JSON::Validator::Ref', $ref, $schema{'$ref'}, $schema{'$ref'};
-  $op_spec->{responses}{$code} = {description => 'Default response.', schema => \%schema};
+  for my $code (@{$self->{default_response_codes}}) {
+    if ($self->validator->version ge '3') {
+      $op_spec->{responses}{$code} ||= $self->_default_schema_v3(\%schema);
+    }
+    else {
+      $op_spec->{responses}{$code} ||= $self->_default_schema_v2(\%schema);
+    }
+  }
 }
 
 sub _add_routes {
@@ -90,8 +106,8 @@ sub _add_routes {
     for my $http_method (sort keys %{$self->validator->get([paths => $openapi_path]) || {}}) {
       next if $http_method =~ $X_RE or $http_method eq 'parameters';
       my $op_spec = $self->validator->get([paths => $openapi_path => $http_method]);
-      my $name = $op_spec->{'x-mojo-name'} || $op_spec->{operationId};
-      my $to   = $op_spec->{'x-mojo-to'};
+      my $name    = $op_spec->{'x-mojo-name'} || $op_spec->{operationId};
+      my $to      = $op_spec->{'x-mojo-to'};
       my $r;
 
       $self->{parameters_for}{$openapi_path}{$http_method}
@@ -115,7 +131,7 @@ sub _add_routes {
         $r->name("$self->{route_prefix}$name") if $name;
       }
 
-      $self->_add_default_response($op_spec, $_) for @{$self->{default_response_codes}};
+      $self->_add_default_response($op_spec);
 
       $r->to(ref $to eq 'ARRAY' ? @$to : $to) if $to;
       $r->to({'openapi.method' => $http_method});
@@ -164,8 +180,8 @@ sub _build_route {
     ? Mojo::URL->new($self->validator->get('/servers/0/url') || '/')->path->to_string
     : $self->validator->get('/basePath') || '/';
 
-  $route = $route->any($base_path) if $route and !$route->pattern->unparsed;
-  $route = $app->routes->any($base_path) unless $route;
+  $route     = $route->any($base_path) if $route and !$route->pattern->unparsed;
+  $route     = $app->routes->any($base_path) unless $route;
   $base_path = $self->validator->schema->data->{basePath} = $route->to_string;
   $base_path =~ s!/$!!;
 
@@ -194,6 +210,19 @@ sub _default_schema {
         }
       }
     }
+  };
+}
+
+sub _default_schema_v2 {
+  my ($self, $schema) = @_;
+  +{description => 'Default response.', schema => $schema};
+}
+
+sub _default_schema_v3 {
+  my ($self, $schema) = @_;
+  +{
+    description => 'default Mojolicious::Plugin::OpenAPI response',
+    content     => {'application/json' => {schema => $schema}},
   };
 }
 
@@ -389,8 +418,8 @@ input/output validation to your L<Mojolicious> application based on a OpenAPI
 Have a look at the L</SEE ALSO> for references to more documentation, or jump
 right to the L<tutorial|Mojolicious::Plugin::OpenAPI::Guides::Tutorial>.
 
-Currently v2 is very well supported, while v3 should be considered higly
-EXPERIMENTAL. Note that testing out v3 requires L<YAML::XS> to be installed.
+Currently v2 is very well supported, while v3 should be considered
+EXPERIMENTAL.
 
 Please report in L<issues|https://github.com/jhthorsen/json-validator/issues>
 or open pull requests to enhance the 3.0 support.
@@ -635,8 +664,6 @@ the terms of the Artistic License version 2.0.
 =item * L<Mojolicious::Plugin::OpenAPI::Security>
 
 =item * L<Mojolicious::Plugin::OpenAPI::SpecRenderer>
-
-=item * L<http://thorsen.pm/perl/programming/2015/07/05/mojolicious-swagger2.html>.
 
 =item * L<OpenAPI specification|https://openapis.org/specification>
 

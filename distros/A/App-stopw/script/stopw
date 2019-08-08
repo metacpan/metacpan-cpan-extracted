@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-06-23'; # DATE
-our $VERSION = '0.040'; # VERSION
+our $DATE = '2019-07-06'; # DATE
+our $VERSION = '0.041'; # VERSION
 
 use 5.010001;
 use strict;
@@ -35,6 +35,11 @@ Options:
 
 For more details, see manpage.
 _
+        exit 0;
+    },
+    'version|v' => sub {
+        no warnings 'once';
+        say "stopw version ".(${__PACKAGE__."::VERSION"} // "dev");
         exit 0;
     },
 );
@@ -159,7 +164,7 @@ stopw - A console-based virtual stopwatch and timer
 
 =head1 VERSION
 
-This document describes version 0.040 of stopw (from Perl distribution App-stopw), released on 2019-06-23.
+This document describes version 0.041 of stopw (from Perl distribution App-stopw), released on 2019-07-06.
 
 =head1 SYNOPSIS
 

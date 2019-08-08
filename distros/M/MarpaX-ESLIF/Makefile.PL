@@ -444,7 +444,9 @@ sub guess_compiler {
 
 sub _trim_whitespace {
   my $string = shift;
-  $string =~ s/^\s+|\s+$//g;
+  if (defined($string)) {
+    $string =~ s/^\s+|\s+$//g;
+  }
   return $string;
 }
 
@@ -541,7 +543,7 @@ my %WriteMakefileArgs = (
     "threads" => 0,
     "utf8" => 0
   },
-  "VERSION" => "3.0.14",
+  "VERSION" => "3.0.17",
   "test" => {
     "TESTS" => "t/*.t"
   }

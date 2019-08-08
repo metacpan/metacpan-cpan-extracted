@@ -125,7 +125,7 @@ Net::TinyERP::NotaFiscal - Nota Fiscal Eletrônica (NFe) via TinyERP
 
 
 Para mais informações sobre os parâmetros, consulte a 
-L<< documentação do 'pesquisar' na API|https://tiny.com.br/help?p=api2-notas-fiscais-pesquisar >>.
+L<< documentação do 'pesquisar' na API|https://www.tiny.com.br/ajuda/api/api2-notas-fiscais-pesquisar >>.
 
 =head2 obter( $id )
 
@@ -143,7 +143,7 @@ Obtém dados sobre uma Nota Fiscal incluida no sistema do TinyERP
     }
 
 Para mais informações sobre os parâmetros, consulte a
-L<< documentação do 'obter' na API|https://tiny.com.br/help?p=api2-notas-fiscais-obter >>.
+L<< documentação do 'obter' na API|https://www.tiny.com.br/ajuda/api/api2-notas-fiscais-obter >>.
 
 =head2 obter_xml( $id )
 
@@ -162,7 +162,7 @@ conjunto com a mercadoria.
     }
 
 Para mais informações sobre os parâmetros, consulte a
-L<< documentação do 'obter link' na API|https://tiny.com.br/help?p=api2-notas-fiscais-obter-link >>.
+L<< documentação do 'obter link' na API|https://www.tiny.com.br/ajuda/api/api2-notas-fiscais-obter-link >>.
 
 =head2 emitir( $id )
 
@@ -181,7 +181,7 @@ com valor fiscal.
     }
 
 Para mais informações sobre os parâmetros, consulte a
-L<< documentação do 'emitir' na API|https://tiny.com.br/help?p=api2-notas-fiscais-emitir >>.
+L<< documentação do 'emitir' na API|https://www.tiny.com.br/ajuda/api/api2-notas-fiscais-emitir >>.
 
 =head2 incluir( \%params )
 
@@ -236,12 +236,12 @@ ainda precisa C<emitir()> a nota para que ela tenha valor fiscal.
     });
 
     if ($res->{status} eq 'OK') {
-        say $res->{registros}{registro}{id};
-        say $res->{registros}{registro}{status};
+        say $res->{registros}[0]{registro}{id};
+        say $res->{registros}[0]{registro}{status};
     }
 
 Para mais informações sobre os parâmetros, consulte a
-L<< documentação do 'incluir' na API|https://tiny.com.br/help?p=api2-notas-fiscais-incluir >>.
+L<< documentação do 'incluir' na API|https://www.tiny.com.br/ajuda/api/api2-notas-fiscais-incluir >>.
 
 =head1 VEJA TAMBÉM
 

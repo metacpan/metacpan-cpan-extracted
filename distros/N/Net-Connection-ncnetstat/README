@@ -1,0 +1,73 @@
+Net-Connection-ncnetstat
+
+Provides a enhances colorized netstat like tool that is capable of doing searches.
+
+> ncnetstat -p ldap -n -a -C
+Proto User  PID  Local Host   Port  Foreach Host Port  State       Command
+tcp6  ldap  1377 *            ldap  *            *     LISTEN      slapd
+tcp4  ldap  1377 *            ldap  *            *     LISTEN      slapd
+tcp4  ldap  1377 127.0.0.1    ldap  127.0.0.1    41453 ESTABLISHED slapd
+tcp4  ldap  1377 127.0.0.1    ldap  127.0.0.1    62370 ESTABLISHED slapd
+tcp4  ldap  1377 127.0.0.1    ldap  127.0.0.1    35181 ESTABLISHED slapd
+tcp4  ldap  1377 127.0.0.1    ldap  127.0.0.1    23619 ESTABLISHED slapd
+tcp4  ldap  1377 127.0.0.1    ldap  127.0.0.1    23620 ESTABLISHED slapd
+tcp4  nslcd 1386 127.0.0.1    41453 127.0.0.1    ldap  ESTABLISHED nslcd
+tcp4  nslcd 1386 127.0.0.1    62370 127.0.0.1    ldap  ESTABLISHED nslcd
+tcp4  nslcd 1386 127.0.0.1    35181 127.0.0.1    ldap  ESTABLISHED nslcd
+tcp4  nslcd 1386 127.0.0.1    23619 127.0.0.1    ldap  ESTABLISHED nslcd
+tcp4  nslcd 1386 127.0.0.1    23620 127.0.0.1    ldap  ESTABLISHED nslcd
+tcp4  ldap  1377 192.168.15.2 ldap  192.168.14.2 39821 ESTABLISHED slapd
+
+The search criteria can be any of the following.
+
+CIDR
+port
+host
+PTR
+state
+
+TODO
+
+* Add support for more collection methods than Net::Connection::lsof
+
+* Support color selection and column ordering.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Net::Connection::ncnetstat
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-Connection-ncnetstat
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Net-Connection-ncnetstat
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Net-Connection-ncnetstat
+
+    Search CPAN
+        https://metacpan.org/release/Net-Connection-ncnetstat
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2019 by Zane C. Bowers-Hadley.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

@@ -1,11 +1,12 @@
 package Perinci::CmdLineX::CommonOptions::SelfUpgrade;
 
-our $DATE = '2019-06-19'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-08-07'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
 use warnings;
+use Log::ger;
 
 # currently this is crude, we'll be more proper after Perinci::Script and plugin
 # system is developed.
@@ -32,6 +33,7 @@ sub apply_to_object {
 
 package # hide from PAUSE
     Perinci::CmdLine::Base;
+use Log::ger;
 
 sub action_self_upgrade {
     require File::Which;
@@ -44,54 +46,84 @@ sub action_self_upgrade {
         return [412, "Cannot upgrade: 'cpanm' program not available"];
     }
 
-    my $url = $self->url;
-    unless ($url =~ m!\A(?:pl:|riap://perl)?/(.+)/[^/]*\z!) {
-        return [412, "Cannot upgrade: Unsupported Riap URL $url"];
+    my @modules;
+    if ($Perinci::CmdLineX::CommonOptions::SelfUpgrade::_list_modules) {
+        # get list of modules to download from this hook
+        @modules = $Perinci::CmdLineX::CommonOptions::SelfUpgrade::_list_modules->();
+    } else {
+        my $url = $self->url;
+        unless ($url =~ m!\A(?:pl:|riap://perl)?/(.+)/[^/]*\z!) {
+            return [412, "Cannot upgrade: Unsupported Riap URL $url"];
+        }
+        (my $module = $1) =~ s!/!::!g;
+        @modules = ($module);
     }
 
-    (my $package = $1) =~ s!/!::!g;
-    (my $package_pm = "$package.pm") =~ s!::!/!g;
-    eval { require $package_pm };
-    if ($@) {
-        return [500, "Cannot upgrade: $@"];
-    }
-    my $local_version = ${"$package\::VERSION"};
+    my @failed_modules;
+    log_info "Upgrading these modules: %s ...", \@modules;
+    #print "Upgrading these modules: ", join(", ", @modules), "\n";
+    for my $module (@modules) {
+        (my $module_pm = "$module.pm") =~ s!::!/!g;
+        eval { require $module_pm };
+        if ($@) {
+            warn "Cannot upgrade module '$module': $@, skipped\n";
+            push @failed_modules, $module;
+            next;
+        }
+        my $local_version = ${"$module\::VERSION"};
 
-    my $apiurl = "http://fastapi.metacpan.org/v1/module/$package?fields=version";
-    my $apires = HTTP::Tiny->new->get($apiurl);
-    unless ($apires->{success}) {
-        return [500, "Cannot upgrade: Can't check latest version from $apiurl: $apires->{status} - $apires->{reason}"];
-    }
+        my $apiurl = "http://fastapi.metacpan.org/v1/module/$module?fields=version";
+        my $apires = HTTP::Tiny->new->get($apiurl);
+        unless ($apires->{success}) {
+            warn "Cannot upgrade module '$module': Can't check latest version from $apiurl: $apires->{status} - $apires->{reason}\n";
+            push @failed_modules, $module;
+            next;
+        }
 
-    eval { $apires = JSON::MaybeXS::decode_json($apires->{content}) };
-    if ($@) {
-        return [500, "Cannot upgrade: Invalid API response from $apiurl: not valid JSON: $@"];
-    }
+        eval { $apires = JSON::MaybeXS::decode_json($apires->{content}) };
+        if ($@) {
+            warn "Cannot upgrade module '$module': Invalid API response from $apiurl: not valid JSON: $@\n";
+            push @failed_modules, $module;
+            next;
+        }
 
-    my $version_on_cpan;
-    if ($apires->{message}) {
-        if ($apires->{code} == 404) {
-            return [412, "Cannot upgrade: Module $package is not on CPAN"];
+        my $version_on_cpan;
+        if ($apires->{message}) {
+            if ($apires->{code} == 404) {
+                warn "Cannot upgrade module '$module': module not found on CPAN\n";
+                push @failed_modules, $module;
+                next;
+            }
+        }
+
+        $version_on_cpan = $apires->{version};
+        unless (defined $version_on_cpan) {
+            warn "Cannot upgrade module '$module': Module's latest version on CPAN is undefined\n";
+            push @failed_modules, $module;
+            next;
+        }
+
+        if (defined $local_version &&
+                version->parse($local_version) >= version->parse($version_on_cpan)) {
+            log_info "Local version ($local_version) of module '$module' is already newest".
+                ($local_version ne $version_on_cpan ? " ($version_on_cpan)" : "");
+            next;
+        }
+
+        say "Updating to version $version_on_cpan ...";
+        system "cpanm", "-n", $module;
+
+        my $exit_code = $? < 0 ? $? : $? >> 8;
+
+        if ($exit_code) {
+            warn "Cannot upgrade module '$module': cpanm failed (exit code $exit_code)\n";
+            push @failed_modules, $module;
+            next;
         }
     }
-    $version_on_cpan = $apires->{version};
-    unless (defined $version_on_cpan) {
-        return [412, "Cannot upgrade: Module $package\'s latest version on CPAN is undefined"];
-    }
 
-    if (defined $local_version &&
-            version->parse($local_version) >= version->parse($version_on_cpan)) {
-        return [304, "Local version ($local_version) already newest".
-                    ($local_version ne $version_on_cpan ? " ($version_on_cpan)" : "")];
-    }
-
-    say "Updating to version $version_on_cpan ...";
-    system "cpanm", "-n", $package;
-
-    my $exit_code = $? < 0 ? $? : $? >> 8;
-
-    if ($exit_code) {
-        [500, "Cannot upgrade: cpanm failed (exit code $exit_code)"];
+    if (@failed_modules) {
+        [500, "One or more modules cannot be upgraded: ".join(", ", @failed_modules)];
     } else {
         [200, "OK"];
     }
@@ -112,7 +144,7 @@ Perinci::CmdLineX::CommonOptions::SelfUpgrade - Add --self-upgrade (-U) common o
 
 =head1 VERSION
 
-This document describes version 0.002 of Perinci::CmdLineX::CommonOptions::SelfUpgrade (from Perl distribution Perinci-CmdLineX-CommonOptions-SelfUpgrade), released on 2019-06-19.
+This document describes version 0.003 of Perinci::CmdLineX::CommonOptions::SelfUpgrade (from Perl distribution Perinci-CmdLineX-CommonOptions-SelfUpgrade), released on 2019-08-07.
 
 =head1 SYNOPSIS
 

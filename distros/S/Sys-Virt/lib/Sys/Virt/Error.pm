@@ -414,6 +414,10 @@ The firewalld service
 
 The domain checkpoint
 
+=item Sys::Virt::Error::FROM_TPM
+
+The TPM subsystem
+
 =back
 
 =head2 ERROR CODE CONSTANTS

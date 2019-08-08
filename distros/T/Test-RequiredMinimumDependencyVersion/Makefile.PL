@@ -7,7 +7,7 @@ use 5.006;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Require a minimum version for your dependencies",
+  "ABSTRACT" => "require a minimum version for your dependencies",
   "AUTHOR" => "Sven Kirmess <sven.kirmess\@kzone.ch>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -18,25 +18,24 @@ my %WriteMakefileArgs = (
   "NAME" => "Test::RequiredMinimumDependencyVersion",
   "PREREQ_PM" => {
     "Carp" => 0,
-    "File::Find" => 0,
     "Perl::PrereqScanner" => 0,
     "Test::Builder" => 0,
+    "Test::XTFiles" => 0,
     "strict" => 0,
     "version" => "0.77",
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Cwd" => 0,
     "FindBin" => 0,
-    "POSIX" => 0,
     "Test::Builder::Tester" => 0,
     "Test::Fatal" => 0,
     "Test::MockModule" => 0,
     "Test::More" => "0.88",
-    "Test::TempDir::Tiny" => "0.017",
+    "Test::TempDir::Tiny" => 0,
+    "constant" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,17 +44,16 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
-  "Cwd" => 0,
-  "File::Find" => 0,
   "FindBin" => 0,
-  "POSIX" => 0,
   "Perl::PrereqScanner" => 0,
   "Test::Builder" => 0,
   "Test::Builder::Tester" => 0,
   "Test::Fatal" => 0,
   "Test::MockModule" => 0,
   "Test::More" => "0.88",
-  "Test::TempDir::Tiny" => "0.017",
+  "Test::TempDir::Tiny" => 0,
+  "Test::XTFiles" => 0,
+  "constant" => 0,
   "lib" => 0,
   "strict" => 0,
   "version" => "0.77",

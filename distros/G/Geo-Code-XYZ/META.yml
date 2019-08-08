@@ -20,5 +20,5 @@ no_index:
 requires:
   Math::BigInt: '1'
   perl: '5.006'
-version: '1.2'
+version: '1.5'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

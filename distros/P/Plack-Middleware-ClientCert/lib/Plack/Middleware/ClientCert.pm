@@ -1,10 +1,10 @@
 package Plack::Middleware::ClientCert;
-# ABSTRACT: Parse digital client certificates for Perl's PSGI web servers.
-$Plack::Middleware::ClientCert::VERSION = '0.01';
 use strict;
 use warnings;
 
 use parent qw(Plack::Middleware);
+
+our $VERSION = '0.100';
 
 sub client_cert
  {
@@ -15,6 +15,14 @@ sub client_cert
   my $ssl_env = "SSL_CLIENT_S_DN";
 
   my $dn = $env->{ CERT_SUBJECT } || $env->{ $ssl_env } || '';
+
+  #
+  # If headers are passed in by a proxy, they are prefixed by HTTP_
+  #
+  if (!$dn && $env->{ "HTTP_$ssl_env" }) {
+    $ssl_env = "HTTP_$ssl_env";
+    $dn = $env->{ $ssl_env };
+   }
 
   #
   # Apache on Linux does the parsing for us.  The parts to the DN are
@@ -55,6 +63,12 @@ sub client_cert
      }
    }
 
+  # Add serial number if appropriate
+  my $serial_key = $ssl_env;
+  $serial_key =~ s/S_DN/M_SERIAL/;
+
+  $env->{ "${prefix}serial" } = $env->{ $serial_key } || '';
+
   return;
 
  } # End of client_cert()
@@ -77,31 +91,31 @@ __END__
 
 =head1 NAME
 
-Plack::Middleware::ClientCert - Parse digital client certificates for Perl's PSGI web servers.
+Plack::Middleware::ClientCert
 
 =head1 VERSION
 
-version 0.01
+version 0.100
 
 =head1 SYNOPSIS
 
 Parse a client certificate and put details in the env
 
-    use Plack::Builder;
-
-    my $app = sub {
-        my $env = shift;
-        return [
-            200,
-            [ 'Content-Type' => 'text/plain' ],
-            [ "Hello $env->{ client_cn } from $env->{ client_ou } of $env->{ clent_o }" ],
-        ];
-    };
-
-    builder {
-        enable 'ClientCert';
-        $app;
-    };
+      use Plack::Builder;
+  
+      my $app = sub {
+          my $env = shift;
+          return [
+              200,
+              [ 'Content-Type' => 'text/plain' ],
+              [ "Hello $env->{ client_cn } from $env->{ client_ou } of $env->{ c  lent_o }" ],
+          ];
+      };
+  
+      builder {
+          enable 'ClientCert';
+          $app;
+      };
 
 =head1 DESCRIPTION
 
@@ -109,7 +123,7 @@ Plack::Middleware::ClientCert parses the fields of a digital certificate
 in either Apache or IIS. The certificate distinguished name is either
 slash-delimited or comma delimited in the form:
 
-C=US, O=Agents Virtual Community, OU="My Insurance, Inc.", CN=Troy O'Leary
+'C=US, O=Agents Virtual Community, OU="My Insurance, Inc.", CN=Troy O'Leary
 
 Any fields containing a comma are double-quoted.
 
@@ -121,7 +135,11 @@ client_o
 
 =head1 NAME
 
-Plack::Middleware::ClientCert
+Plack::Middleware::ClientCert - Parse a client certificate and put details in the env
+
+=head1 AUTHOR
+
+Keith Carangelo
 
 =head1 AUTHOR
 
@@ -129,7 +147,7 @@ Keith Carangelo <mail@kcaran.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Keith Carangelo.
+This software is copyright (c) 2019 by Keith Carangelo.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

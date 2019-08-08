@@ -1,0 +1,17 @@
+Revision history for Net-Connection-ncnetstat
+
+0.1.1	 2019-08-06/21:30
+		 - Foreach Host -> Remote Host
+
+0.1.0	 2019-08-06/05:30
+		 - Add RegexPTR support.
+		 - Add UID support.
+		 - Add username support.
+
+0.0.1	 2019-08-05/21:10
+		 - Actually install the script now.
+
+
+0.0.0	 2019-08-04/23:45
+		 - Initial release.
+

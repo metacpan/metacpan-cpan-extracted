@@ -1,9 +1,14 @@
-0.008   2019-06-27 (PERLANCAR)
+0.009   2019-08-07  Released-By: PERLANCAR; Urgency: medium
+
+	- Add some deadlines for Jun 2020 exam.
+
+
+0.008   2019-06-27  Released-By: PERLANCAR
 
         - Fix clash (two 0.006 releases were made).
 
 
-0.006.2 2019-06-20 (PERLANCAR)
+0.006.2 2019-06-20  Released-By: PERLANCAR
 
         - No functional changes.
 
@@ -12,32 +17,32 @@
 	  (renamed role name).
 
 
-0.007   2019-05-25 (PERLANCAR)
+0.007   2019-05-25  Released-By: PERLANCAR
 
 	- Recognize two params: exam_month & exam_level.
 
 
-0.006   2019-05-25 (PERLANCAR)
+0.006   2019-05-25  Released-By: PERLANCAR
 
 	- Updates: dec2019exam test center change request deadline, some
 	  jun2020exam dates.
 
 
-0.005   2019-02-15 (PERLANCAR)
+0.005   2019-02-15  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [refactor] Roles refactoring.
 
 
-0.004   2019-02-14 (PERLANCAR)
+0.004   2019-02-14  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Move data to __DATA__.
 
 
-0.003    2019-02-14 (PERLANCAR)
+0.003    2019-02-14  Released-By: PERLANCAR
 
          - No functional changes.
 
@@ -45,13 +50,13 @@
            Synopsis.
 
 
-0.002    2019-02-14 (PERLANCAR)
+0.002    2019-02-14  Released-By: PERLANCAR
 
          - No functional changes.
 
          - [dist] Rebuild with DZP:Calendar::Dates & PWP:Calendar::Dates.
 
 
-0.001    2019-02-12 (PERLANCAR)
+0.001    2019-02-12  Released-By: PERLANCAR
 
          - First release.

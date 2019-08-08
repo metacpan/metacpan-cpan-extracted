@@ -4,7 +4,7 @@ requires 'warnings';
 requires 'Plack::Request';
 requires 'Plack::Middleware';
 requires 'Plack::Util::Accessor';
-requires 'ShellQuote::Any';
+requires 'ShellQuote::Any', '0.04';
 
 on 'test' => sub {
     requires 'Test::More', '0.88';

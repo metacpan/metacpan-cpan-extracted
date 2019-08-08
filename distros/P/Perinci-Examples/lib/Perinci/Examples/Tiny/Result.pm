@@ -1,7 +1,7 @@
 package Perinci::Examples::Tiny::Result;
 
-our $DATE = '2019-06-29'; # DATE
-our $VERSION = '0.814'; # VERSION
+our $DATE = '2019-07-19'; # DATE
+our $VERSION = '0.818'; # VERSION
 
 our %SPEC;
 
@@ -54,7 +54,7 @@ Perinci::Examples::Tiny::Result - Tests related to function result
 
 =head1 VERSION
 
-This document describes version 0.814 of Perinci::Examples::Tiny::Result (from Perl distribution Perinci-Examples), released on 2019-06-29.
+This document describes version 0.818 of Perinci::Examples::Tiny::Result (from Perl distribution Perinci-Examples), released on 2019-07-19.
 
 =head1 DESCRIPTION
 

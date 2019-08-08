@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 
 # Aggregate a bunch of cover files into a Sereal "database".
 

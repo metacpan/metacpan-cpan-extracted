@@ -6,7 +6,7 @@ use Mojo::Util 'monkey_patch';
 use JSON::MaybeXS 'JSON';
 use Mojo::JSON ();
 
-our $VERSION = '1.001';
+our $VERSION = '1.002';
 
 my $BINARY = JSON::MaybeXS->new(utf8 => 1, canonical => 1, allow_nonref => 1,
 	allow_unknown => 1, allow_blessed => 1, convert_blessed => 1);
@@ -17,6 +17,10 @@ my $FALSE = JSON->false;
 
 if (JSON eq 'Cpanel::JSON::XS') {
 	local $@;
+	if (eval { Cpanel::JSON::XS->VERSION('4.09'); 1 }) {
+		$BINARY->allow_dupkeys;
+		$TEXT->allow_dupkeys;
+	}
 	if (eval { Cpanel::JSON::XS->VERSION('3.0112'); 1 }) {
 		$BINARY->stringify_infnan;
 		$TEXT->stringify_infnan;
@@ -63,6 +67,12 @@ the JSON encoder for a L<Mojolicious> application, or anything else using
 L<Mojo::JSON>. It must be loaded before L<Mojo::JSON> so the new functions will
 be properly exported.
 
+Since L<Mojolicious> version 7.87, L<Mojo::JSON> has delegated to
+L<Cpanel::JSON::XS> by default if installed and recent enough. Installing
+L<Mojolicious> version 7.87+ and L<Cpanel::JSON::XS> version 4.09+ resolves the
+below listed caveats between these modules, and is sufficient to improve the
+performance of L<Mojo::JSON> without the use of this module.
+
 =head1 CAVEATS
 
 L<JSON::MaybeXS> may load different modules behind the scenes depending on what
@@ -78,15 +88,15 @@ does. C<allow_nonref> allows encoding and decoding of bare values outside of
 hash/array references, since L<Mojo::JSON> does not prevent this, in accordance
 with L<RFC 7159|http://tools.ietf.org/html/rfc7159>. The other options prevent
 the encoder from blowing up when encountering values that cannot be represented
-in JSON to better match the behavior of L<Mojo::JSON>; in most cases, where
-L<Mojo::JSON> would stringify a reference, L<JSON::MaybeXS> with these settings
-will encode it to C<null>. See below for more specifics.
+in JSON to better match the behavior of L<Mojo::JSON>. See below for more
+specifics.
 
 To better match the behavior of L<Mojo::JSON>, certain options may be enabled
 depending on the backend that is used. If L<Cpanel::JSON::XS> version 3.0112 or
 greater is loaded, it will be used with the option C<stringify_infnan>. If
 either L<Cpanel::JSON::XS> of at least version 3.0206 or L<JSON::PP> is loaded,
-it will be used with the option C<escape_slash>.
+it will be used with the option C<escape_slash>. If L<Cpanel::JSON::XS> version
+4.09 or greater is loaded, it will be used with the option C<allow_dupkeys>.
 
 As of this writing, the author has found the following incompatibilities:
 
@@ -106,24 +116,29 @@ it to C<null>.
 
 L<JSON::MaybeXS> does not allow unblessed references other than to hashes,
 arrays, or the scalar values C<0> and C<1>, and will encode them to C<null>.
-L<Mojo::JSON> will treat all scalar references the same as references to C<0>
-or C<1> and will encode them to C<true> or C<false> depending on their boolean
-value. Other references (code, filehandle, etc) will be stringified.
+Before L<Mojolicious> version 7.87, L<Mojo::JSON> will treat all scalar
+references the same as references to C<0> or C<1> and will encode them to
+C<true> or C<false> depending on their boolean value, and other references
+(code, filehandle, etc) will be stringified.
+
+Since L<Mojolicious> version 7.87, L<Mojo::JSON>'s behavior with unblessed
+references is the same as L<JSON::MaybeXS>.
 
  print encode_json([\'asdf', sub { 1 }]);
- # Mojo::JSON: [true,"CODE(0x11d1650)"]
+ # Mojo::JSON (Mojolicious >= 7.87): [null,null]
  # JSON::MaybeXS: [null,null]
 
 =head2 Escapes
 
-L<Mojo::JSON> currently escapes the slash character C</> for security reasons,
-as well as the unicode characters C<u2028> and C<u2029>. L<Cpanel::JSON::XS>
-version 3.0206 or greater and L<JSON::PP> will have the option set to escape
-the slash character, and L<JSON::XS> does not escape these characters. This
-does not affect decoding of the resulting JSON.
+L<Mojo::JSON> currently escapes the slash character C</> for security reasons.
+Before L<Mojolicious> version 7.87, it also escaped the unicode characters
+C<u2028> and C<u2029>. L<Cpanel::JSON::XS> version 3.0206 or greater and
+L<JSON::PP> will have the option set to escape the slash character, and
+L<JSON::XS> does not escape these characters. This does not affect decoding of
+the resulting JSON.
 
  print encode_json(["/\x{2028}/\x{2029}"]);
- # Mojo::JSON: ["\/\u2028\/\u2029"]
+ # Mojo::JSON (Mojolicious >= 7.87): ["\/ \/ "]
  # Cpanel::JSON::XS >= 3.0206 or JSON::PP: ["\/ \/ "]
  # JSON::XS: ["/ / "]
  # Both decode to arrayref containing: "/\x{2028}/\x{2029}"
@@ -159,11 +174,12 @@ regardless of whether it has been used as a string.
 L<Mojo::JSON>, L<JSON::XS>, and L<JSON::PP> will silently accept duplicate keys
 in the same JSON object when decoding a JSON string. L<Cpanel::JSON::XS>
 version 3.0235 or greater will throw an exception if duplicate keys are
-encountered.
+encountered. L<Cpanel::JSON::XS> version 4.09 or greater will have the option
+set to once again accept duplicate keys.
 
  print dumper decode_json('{"foo":1, "bar":2, "foo":3}');
  # Mojo::JSON, JSON::XS, or JSON::PP: { bar => 2, foo => 3 }
- # Cpanel::JSON::XS >= 3.0235: "Duplicate keys not allowed" exception
+ # Cpanel::JSON::XS >= 3.0235 and < 4.09: "Duplicate keys not allowed" exception
 
 =head1 BUGS
 

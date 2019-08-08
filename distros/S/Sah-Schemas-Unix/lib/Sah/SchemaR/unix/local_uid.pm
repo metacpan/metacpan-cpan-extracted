@@ -1,7 +1,7 @@
 package Sah::SchemaR::unix::local_uid;
 
-our $DATE = '2019-05-07'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-07-12'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 our $rschema = ["int",[{description=>"\nSee also `posint` for integers that start from 1.\n\n",min=>0,summary=>"Non-negative integer (0, 1, 2, ...)"},{description=>"\n",summary=>"User identifier (UID)"},{description=>"\nExisting means having a user name associated with this UID, i.e. `getpwuid`\nreturns a record.\n\nSupport coercion from an existing user name.\n\n",summary=>"User identifier (UID) that has to exist (has associated username) on the system","x.perl.coerce_rules"=>["str_convert_unix_user_to_uid","int_check_uid_exists"]}],["unix::uid","uint","int"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::unix::local_uid - User identifier (UID) that has to exist (has ass
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::SchemaR::unix::local_uid (from Perl distribution Sah-Schemas-Unix), released on 2019-05-07.
+This document describes version 0.004 of Sah::SchemaR::unix::local_uid (from Perl distribution Sah-Schemas-Unix), released on 2019-07-12.
 
 =head1 DESCRIPTION
 

@@ -278,6 +278,13 @@ These options are currently available:
 
 List only jobs with these ids.
 
+=item notes
+
+  notes => ['foo', 'bar']
+
+List only jobs with one of these notes. Note that this option is EXPERIMENTAL
+and might change without warning!
+
 =item queues
 
   queues => ['important', 'unimportant']
@@ -565,8 +572,8 @@ defaults to C<1>.
 
   my $bool = $backend->note($job_id, {mojo => 'rocks', minion => 'too'});
 
-Change one or more metadata fields for a job. Meant to be overloaded in a
-subclass.
+Change one or more metadata fields for a job. Setting a value to C<undef>
+will remove the field. Meant to be overloaded in a subclass.
 
 =head2 receive
 

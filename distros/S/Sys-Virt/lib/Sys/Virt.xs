@@ -6357,6 +6357,27 @@ list_all_snapshots(dom, flags=0)
       free(domsss);
 
 
+void
+list_all_checkpoints(dom, flags=0)
+      virDomainPtr dom;
+      unsigned int flags;
+ PREINIT:
+      virDomainCheckpointPtr *domcps;
+      int i, ndomcp;
+      SV *domcprv;
+  PPCODE:
+      if ((ndomcp = virDomainListAllCheckpoints(dom, &domcps, flags)) < 0)
+          _croak_error();
+
+      EXTEND(SP, ndomcp);
+      for (i = 0 ; i < ndomcp ; i++) {
+          domcprv = sv_newmortal();
+          sv_setref_pv(domcprv, "Sys::Virt::DomainCheckpoint", domcps[i]);
+          PUSHs(domcprv);
+      }
+      free(domcps);
+
+
 int
 has_current_snapshot(dom, flags=0)
       virDomainPtr dom;
@@ -8375,6 +8396,112 @@ DESTROY(domss_rv)
       }
 
 
+MODULE = Sys::Virt::DomainCheckpoint  PACKAGE = Sys::Virt::DomainCheckpoint
+
+
+virDomainCheckpointPtr
+_create_xml(dom, xml, flags=0)
+      virDomainPtr dom;
+      const char *xml;
+      unsigned int flags;
+    CODE:
+      if (!(RETVAL = virDomainCheckpointCreateXML(dom, xml, flags)))
+          _croak_error();
+  OUTPUT:
+      RETVAL
+
+
+virDomainCheckpointPtr
+_lookup_by_name(dom, name, flags=0)
+      virDomainPtr dom;
+      const char *name;
+      unsigned int flags;
+    CODE:
+      if (!(RETVAL = virDomainCheckpointLookupByName(dom, name, flags)))
+          _croak_error();
+  OUTPUT:
+      RETVAL
+
+
+const char *
+get_name(domcp)
+      virDomainCheckpointPtr domcp;
+    CODE:
+      if (!(RETVAL = virDomainCheckpointGetName(domcp)))
+          _croak_error();
+  OUTPUT:
+      RETVAL
+
+
+SV *
+get_xml_description(domcp, flags=0)
+      virDomainCheckpointPtr domcp;
+      unsigned int flags;
+  PREINIT:
+      char *xml;
+    CODE:
+      if (!(xml = virDomainCheckpointGetXMLDesc(domcp, flags)))
+          _croak_error();
+      RETVAL = newSVpv(xml, 0);
+      free(xml);
+  OUTPUT:
+      RETVAL
+
+
+void
+delete(domcp, flags=0)
+      virDomainCheckpointPtr domcp;
+      unsigned int flags;
+  PPCODE:
+      if (virDomainCheckpointDelete(domcp, flags) < 0)
+          _croak_error();
+
+
+virDomainCheckpointPtr
+get_parent(domcp, flags=0)
+      virDomainCheckpointPtr domcp;
+      unsigned int flags;
+    CODE:
+      if (!(RETVAL = virDomainCheckpointGetParent(domcp, flags)))
+          _croak_error();
+  OUTPUT:
+      RETVAL
+
+
+void
+list_all_children(domcp, flags=0)
+      virDomainCheckpointPtr domcp;
+      unsigned int flags;
+ PREINIT:
+      virDomainCheckpointPtr *domcps;
+      int i, ndomcp;
+      SV *domcprv;
+  PPCODE:
+      if ((ndomcp = virDomainCheckpointListAllChildren(domcp, &domcps, flags)) < 0)
+          _croak_error();
+
+      EXTEND(SP, ndomcp);
+      for (i = 0 ; i < ndomcp ; i++) {
+          domcprv = sv_newmortal();
+          sv_setref_pv(domcprv, "Sys::Virt::DomainCheckpoint", domcps[i]);
+          PUSHs(domcprv);
+      }
+      free(domcps);
+
+
+void
+DESTROY(domcp_rv)
+      SV *domcp_rv;
+ PREINIT:
+      virDomainCheckpointPtr domcp;
+  PPCODE:
+      domcp = (virDomainCheckpointPtr)SvIV((SV*)SvRV(domcp_rv));
+      if (domcp) {
+          virDomainCheckpointFree(domcp);
+          sv_setiv((SV*)SvRV(domcp_rv), 0);
+      }
+
+
 MODULE = Sys::Virt::Event  PACKAGE = Sys::Virt::Event
 
 
@@ -8899,6 +9026,7 @@ BOOT:
       REGISTER_CONSTANT(VIR_DOMAIN_UNDEFINE_SNAPSHOTS_METADATA, UNDEFINE_SNAPSHOTS_METADATA);
       REGISTER_CONSTANT(VIR_DOMAIN_UNDEFINE_NVRAM, UNDEFINE_NVRAM);
       REGISTER_CONSTANT(VIR_DOMAIN_UNDEFINE_KEEP_NVRAM, UNDEFINE_KEEP_NVRAM);
+      REGISTER_CONSTANT(VIR_DOMAIN_UNDEFINE_CHECKPOINTS_METADATA, UNDEFINE_CHECKPOINTS_METADATA);
 
       REGISTER_CONSTANT(VIR_DOMAIN_START_PAUSED, START_PAUSED);
       REGISTER_CONSTANT(VIR_DOMAIN_START_AUTODESTROY, START_AUTODESTROY);
@@ -9531,6 +9659,8 @@ BOOT:
       REGISTER_CONSTANT(VIR_CONNECT_LIST_DOMAINS_RUNNING, LIST_RUNNING);
       REGISTER_CONSTANT(VIR_CONNECT_LIST_DOMAINS_SHUTOFF, LIST_SHUTOFF);
       REGISTER_CONSTANT(VIR_CONNECT_LIST_DOMAINS_TRANSIENT, LIST_TRANSIENT);
+      REGISTER_CONSTANT(VIR_CONNECT_LIST_DOMAINS_HAS_CHECKPOINT, LIST_HAS_CHECKPOINT);
+      REGISTER_CONSTANT(VIR_CONNECT_LIST_DOMAINS_NO_CHECKPOINT, LIST_NO_CHECKPOINT);
 
       REGISTER_CONSTANT(VIR_DOMAIN_SEND_KEY_MAX_KEYS, SEND_KEY_MAX_KEYS);
 
@@ -9623,6 +9753,7 @@ BOOT:
       REGISTER_CONSTANT(VIR_DOMAIN_SNAPSHOT_CREATE_QUIESCE, CREATE_QUIESCE);
       REGISTER_CONSTANT(VIR_DOMAIN_SNAPSHOT_CREATE_ATOMIC, CREATE_ATOMIC);
       REGISTER_CONSTANT(VIR_DOMAIN_SNAPSHOT_CREATE_LIVE, CREATE_LIVE);
+      REGISTER_CONSTANT(VIR_DOMAIN_SNAPSHOT_CREATE_VALIDATE, CREATE_VALIDATE);
 
       REGISTER_CONSTANT(VIR_DOMAIN_SNAPSHOT_LIST_ROOTS, LIST_ROOTS);
       REGISTER_CONSTANT(VIR_DOMAIN_SNAPSHOT_LIST_DESCENDANTS, LIST_DESCENDANTS);
@@ -9643,6 +9774,24 @@ BOOT:
       REGISTER_CONSTANT(VIR_DOMAIN_SNAPSHOT_REVERT_FORCE, REVERT_FORCE);
 
       REGISTER_CONSTANT(VIR_DOMAIN_SNAPSHOT_XML_SECURE, XML_SECURE);
+
+      stash = gv_stashpv( "Sys::Virt::DomainCheckpoint", TRUE );
+      REGISTER_CONSTANT(VIR_DOMAIN_CHECKPOINT_DELETE_CHILDREN, DELETE_CHILDREN);
+      REGISTER_CONSTANT(VIR_DOMAIN_CHECKPOINT_DELETE_METADATA_ONLY, DELETE_METADATA_ONLY);
+      REGISTER_CONSTANT(VIR_DOMAIN_CHECKPOINT_DELETE_CHILDREN_ONLY, DELETE_CHILDREN_ONLY);
+
+      REGISTER_CONSTANT(VIR_DOMAIN_CHECKPOINT_CREATE_REDEFINE, CREATE_REDEFINE);
+      REGISTER_CONSTANT(VIR_DOMAIN_CHECKPOINT_CREATE_QUIESCE, CREATE_QUIESCE);
+
+      REGISTER_CONSTANT(VIR_DOMAIN_CHECKPOINT_LIST_ROOTS, LIST_ROOTS);
+      REGISTER_CONSTANT(VIR_DOMAIN_CHECKPOINT_LIST_DESCENDANTS, LIST_DESCENDANTS);
+      REGISTER_CONSTANT(VIR_DOMAIN_CHECKPOINT_LIST_LEAVES, LIST_LEAVES);
+      REGISTER_CONSTANT(VIR_DOMAIN_CHECKPOINT_LIST_NO_LEAVES, LIST_NO_LEAVES);
+      REGISTER_CONSTANT(VIR_DOMAIN_CHECKPOINT_LIST_TOPOLOGICAL, LIST_TOPOLOGICAL);
+
+      REGISTER_CONSTANT(VIR_DOMAIN_CHECKPOINT_XML_SECURE, XML_SECURE);
+      REGISTER_CONSTANT(VIR_DOMAIN_CHECKPOINT_XML_SIZE, XML_SIZE);
+      REGISTER_CONSTANT(VIR_DOMAIN_CHECKPOINT_XML_NO_DOMAIN, XML_NO_DOMAIN);
 
       stash = gv_stashpv( "Sys::Virt::StoragePool", TRUE );
       REGISTER_CONSTANT(VIR_STORAGE_POOL_INACTIVE, STATE_INACTIVE);
@@ -9688,6 +9837,7 @@ BOOT:
       REGISTER_CONSTANT(VIR_CONNECT_LIST_STORAGE_POOLS_GLUSTER, LIST_GLUSTER);
       REGISTER_CONSTANT(VIR_CONNECT_LIST_STORAGE_POOLS_ZFS, LIST_ZFS);
       REGISTER_CONSTANT(VIR_CONNECT_LIST_STORAGE_POOLS_VSTORAGE, LIST_VSTORAGE);
+      REGISTER_CONSTANT(VIR_CONNECT_LIST_STORAGE_POOLS_ISCSI_DIRECT, LIST_ISCSI_DIRECT);
 
       REGISTER_CONSTANT(VIR_STORAGE_POOL_EVENT_ID_LIFECYCLE, EVENT_ID_LIFECYCLE);
       REGISTER_CONSTANT(VIR_STORAGE_POOL_EVENT_ID_REFRESH, EVENT_ID_REFRESH);
@@ -9830,6 +9980,7 @@ BOOT:
       REGISTER_CONSTANT(VIR_SECRET_USAGE_TYPE_CEPH, USAGE_TYPE_CEPH);
       REGISTER_CONSTANT(VIR_SECRET_USAGE_TYPE_ISCSI, USAGE_TYPE_ISCSI);
       REGISTER_CONSTANT(VIR_SECRET_USAGE_TYPE_TLS, USAGE_TYPE_TLS);
+      REGISTER_CONSTANT(VIR_SECRET_USAGE_TYPE_VTPM, USAGE_TYPE_VTPM);
 
 
       REGISTER_CONSTANT(VIR_CONNECT_LIST_SECRETS_EPHEMERAL, LIST_EPHEMERAL);
@@ -9932,6 +10083,7 @@ BOOT:
       REGISTER_CONSTANT(VIR_FROM_RESCTRL, FROM_RESCTRL);
       REGISTER_CONSTANT(VIR_FROM_FIREWALLD, FROM_FIREWALLD);
       REGISTER_CONSTANT(VIR_FROM_DOMAIN_CHECKPOINT, FROM_DOMAIN_CHECKPOINT);
+      REGISTER_CONSTANT(VIR_FROM_TPM, FROM_TPM);
 
 
       REGISTER_CONSTANT(VIR_ERR_OK, ERR_OK);

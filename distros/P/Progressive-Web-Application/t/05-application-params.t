@@ -139,4 +139,17 @@ subtest cacheName => sub {
 	is($pwa->{params}{cache_name}, 'my-cache-name', 'updated cache name was set');
 };
 
+subtest clear_params => sub {
+	plan tests => 5;
+	ok(my $pwa = Progressive::Web::Application->new(
+		params => {
+			cache_name => 'to be cleared'
+		}
+	), 'new to get default cache_name');
+	ok($pwa->params(), 'has params');
+	ok($pwa->clear_params(), 'clear the params');
+	ok(!$pwa->params(), 'Does not have params');
+	ok(!$pwa->clear_params(), 'No params to clear');
+};
+
 done_testing();

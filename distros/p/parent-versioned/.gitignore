@@ -1,0 +1,12 @@
+CVS
+blib
+pm_to_blib
+MANIFEST.bak
+Makefile
+Makefile.old
+parent-*.tar.gz
+parent-*.tar
+parent/
+parent-*/
+MYMETA.*
+cover_db/

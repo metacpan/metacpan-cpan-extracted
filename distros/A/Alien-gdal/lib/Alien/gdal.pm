@@ -6,7 +6,7 @@ use warnings;
 use parent qw( Alien::Base );
 use FFI::CheckLib;
 
-our $VERSION = '1.16';
+our $VERSION = '1.17';
 
 my ($have_geos, $have_proj);
 my @have_aliens;

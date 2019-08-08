@@ -4,14 +4,14 @@ author:
   - unknown
 build_requires:
   CPP::catch: v1.0.8
-  Test::Catch: v1.0.7
+  Test::Catch: v1.0.8
   Test::Deep: '0'
   Test::More: '0'
   Test::Simple: '0.96'
 configure_requires:
   CPP::catch: v1.0.8
-  Test::Catch: v1.0.7
-  XS::Install: v1.2.8
+  Test::Catch: v1.0.8
+  XS::Install: v1.2.9
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: unknown
@@ -24,7 +24,7 @@ no_index:
     - t
     - inc
 requires:
-  XS::Install: v1.2.8
+  XS::Install: v1.2.9
   perl: '5.012000'
-version: v1.2.6
+version: v1.2.9
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

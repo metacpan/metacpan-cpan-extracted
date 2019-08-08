@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.152';
+our $VERSION = '1.153';
 
 use overload '""' => sub {${$_[0]}}, 'cmp' => sub{${$_[0]} cmp $_[1]};
 use Quiq::Path;
@@ -39,6 +39,17 @@ im String-Kontext automatisch zum Datei-Pfad.
 =head4 Synopsis
 
     $file = $class->new(@opt);
+    $file = $class->new($data,@opt);
+
+=head4 Arguments
+
+=over 4
+
+=item $data
+
+Daten, die in die temporäre Datei geschrieben werden.
+
+=back
 
 =head4 Options
 
@@ -79,35 +90,47 @@ sub new {
     my $class = shift;
     # @_: @opt
 
+    # Optionen und Argumente
+
+    my ($dir,$suffix,$template,$unlink);
+
+    my $argA = $class->parameters(0,1,\@_,
+        -dir => \$dir,
+        -suffix => \$suffix,
+        -template => \$template,
+        -unlink => \$unlink,
+    );
+    my $data = shift @$argA;
+
     # Wir setzen unsere Optionen in die Optionen von File::Temp um
 
     my @args;
-    while (@_) {
-        my $opt = shift;
-        if ($opt eq '-dir') {
-            substr($opt,0,1) = '';
-            push @args,uc($opt),Quiq::Path->expandTilde(shift);
-        }
-        elsif ($opt =~ /^(-suffix|-template|-unlink)$/) {
-            substr($opt,0,1) = '';
-            push @args,uc($opt),shift;
-        }
-        else {
-            $class->throw(
-                'TEMPFILE-00001: Unknown option',
-                Option => $_[0],
-            )
-        }
+    if (defined $dir) {
+        push @args,'DIR',Quiq::Path->expandTilde($dir);
+    }
+    if (defined $suffix) {
+        push @args,'SUFFIX',$suffix;
+    }
+    if (defined $template) {
+        push @args,'TEMPLATE',$template;
+    }
+    if (defined $unlink) {
+        push @args,'UNLINK',$unlink;
     }
 
-    return bless \File::Temp->new(@args),$class;
+    my $self = bless \File::Temp->new(@args),$class;
+    if (defined $data) {
+        Quiq::Path->write($self,$data);
+    }
+
+    return $self;
 }
 
 # -----------------------------------------------------------------------------
 
 =head1 VERSION
 
-1.152
+1.153
 
 =head1 AUTHOR
 

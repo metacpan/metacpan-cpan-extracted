@@ -4,7 +4,7 @@
       "Ichinose Shogo <shogo82148@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.10",
+   "generated_by" : "Minilla/v3.1.4",
    "license" : [
       "perl_5"
    ],
@@ -33,7 +33,11 @@
       },
       "develop" : {
          "requires" : {
+            "Furl" : "0",
+            "JSON" : "0",
             "Test::CPAN::Meta" : "0",
+            "Test::Kwalitee" : "0",
+            "Test::Kwalitee::Extra" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
             "Test::PAUSE::Permissions" : "0.04",
             "Test::Pod" : "1.41",
@@ -49,13 +53,9 @@
       "test" : {
          "requires" : {
             "File::Temp" : "0",
-            "Furl" : "0",
-            "JSON" : "0",
             "Test::Deep" : "0",
             "Test::Exception" : "0",
             "Test::Fatal" : "0",
-            "Test::Kwalitee" : "0",
-            "Test::Kwalitee::Extra" : "0",
             "Test::More" : "0",
             "Test::RedisServer" : "0",
             "Test::TCP" : "0"
@@ -65,7 +65,7 @@
    "provides" : {
       "Redis::Namespace" : {
          "file" : "lib/Redis/Namespace.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
@@ -79,10 +79,11 @@
          "web" : "https://github.com/shogo82148/Redis-Namespace"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_contributors" : [
-      "karupanerura <karupa@cpan.org>",
-      "Mihyaeru <mihyaeru21@gmail.com>"
+      "Mihyaeru <mihyaeru21@gmail.com>",
+      "karupanerura <karupa@cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_static_install" : 1
 }

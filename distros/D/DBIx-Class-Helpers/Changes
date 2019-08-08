@@ -1,5 +1,9 @@
 Revision history for DBIx-Class-Helpers
 
+2.034000  2019-08-02 10:45:04-07:00 America/Los_Angeles
+ - Added dt_SQL_subtract to ::DateMethods1
+   (Thanks Thomas Klausner!) (closes GH#96)
+
 2.033004  2018-01-26 09:33:20-08:00 America/Los_Angeles
  - Fix ::RemoveColumns and ::AutoRemoveColumns to not wreak havoc when select/as
    is used (Thanks Vladimir Melnik for test and ribasushi for hint at fix!)

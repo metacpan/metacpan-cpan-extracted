@@ -7,6 +7,356 @@ package TestCase::Lib::SPVM::Regex {
     return 1;
   }
 
+  sub replace_all_capture : int () {
+    # Replace all capture
+    {
+      my $re = SPVM::Regex->new("a(bc)");
+      my $target = "ppzabczabcz";
+      my $result = $re->replace_all($target, 0, [(object)"ABC", 1, "PQR"]);
+      
+      unless ($re->replace_count == 2) {
+        return 0;
+      }
+      
+      unless ($result eq "ppzABCbcPQRzABCbcPQRz") {
+        return 0;
+      }
+    }
+
+    # Replace all callback
+    {
+      my $re = SPVM::Regex->new("a(bc)");
+      my $target = "ppzabczabcz";
+      my $result = $re->replace_all($target, 0, [$re : SPVM::Regex] sub : string ($self : self) {
+        return "ABC" . $re->caps(1) . "PQRS";
+      });
+      
+      unless ($re->replace_count == 2) {
+        return 0;
+      }
+      
+      unless ($result eq "ppzABCbcPQRSzABCbcPQRSz") {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+
+  sub replace_all : int () {
+    # Replace all
+    {
+      my $re = SPVM::Regex->new("abc");
+      my $target = "ppzabczabcz";
+      my $result = $re->replace_all($target, 0, "ABC");
+      
+      unless ($re->replace_count == 2) {
+        return 0;
+      }
+      
+      unless ($result eq "ppzABCzABCz") {
+        return 0;
+      }
+    }
+
+    # Replace all offset
+    {
+      my $re = SPVM::Regex->new("abc");
+      my $target = "ppzabczabczabcz";
+      my $result = $re->replace_all($target, 6, "ABC");
+      
+      unless ($re->replace_count == 2) {
+        return 0;
+      }
+      
+      unless ($result eq "ppzabczABCzABCz") {
+        return 0;
+      }
+    }
+
+    # Replace all with number
+    {
+      my $re = SPVM::Regex->new("a\d+b");
+      my $target = "za123bz";
+      my $result = $re->replace_all($target, 0, "ABC");
+      
+      unless ($re->replace_count == 1) {
+        return 0;
+      }
+      
+      unless ($result eq "zABCz") {
+        return 0;
+      }
+    }
+
+    # Replace all - Not replace_all
+    {
+      my $re = SPVM::Regex->new("a\d+b");
+      my $target = "pppp";
+      my $result = $re->replace_all($target, 0, "ABC");
+      
+      unless ($re->replace_count == 0) {
+        return 0;
+      }
+      
+      unless ($result eq "pppp") {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  sub replace : int () {
+    # Replace
+    {
+      my $re = SPVM::Regex->new("abc");
+      my $target = "ppzabcz";
+      my $result = $re->replace($target, 0, "ABC");
+      
+      unless ($re->replace_count == 1) {
+        return 0;
+      }
+      
+      unless ($result eq "ppzABCz") {
+        return 0;
+      }
+    }
+
+    # Replace offset
+    {
+      my $re = SPVM::Regex->new("abc");
+      my $target = "ppzabczabczabcz";
+      my $result = $re->replace($target, 6, "ABC");
+      
+      unless ($re->replace_count == 1) {
+        return 0;
+      }
+      
+      unless ($result eq "ppzabczABCzabcz") {
+        return 0;
+      }
+    }
+
+    # Replace with number
+    {
+      my $re = SPVM::Regex->new("a\d+b");
+      my $target = "za123bz";
+      my $result = $re->replace($target, 0, "ABC");
+      
+      unless ($re->replace_count == 1) {
+        return 0;
+      }
+      
+      unless ($result eq "zABCz") {
+        return 0;
+      }
+    }
+
+    # Replace - Not replaced
+    {
+      my $re = SPVM::Regex->new("a\d+b");
+      my $target = "pppp";
+      my $result = $re->replace($target, 0, "ABC");
+      
+      unless ($re->replace_count == 0) {
+        return 0;
+      }
+      
+      unless ($result eq "pppp") {
+        return 0;
+      }
+    }
+
+    return 1;
+  }
+  
+  sub match_start_and_end : int () {
+    # Match start and end
+    {
+      my $re = SPVM::Regex->new("abc");
+      my $target = "ppzabcz";
+      my $match = $re->match($target);
+      
+      unless ($match) {
+        return 0;
+      }
+      
+      unless ($re->match_start == 3) {
+        return 0;
+      }
+      unless ($re->match_end == 6) {
+        return 0;
+      }
+    }
+
+    # Match start UTF-8
+    {
+      my $re = SPVM::Regex->new("あい[かきくけこ]+う");
+      my $target = "んんあいかくこうん";
+      my $match = $re->match($target);
+      
+      unless ($match) {
+        return 0;
+      }
+      
+      unless ($re->match_start == 6) {
+        return 0;
+      }
+      unless ($re->match_end == 24) {
+        return 0;
+      }
+    }
+
+    # Match start zero width
+    {
+      my $re = SPVM::Regex->new("b*c");
+      my $target = "zzcz";
+      my $match = $re->match($target);
+      
+      unless ($match) {
+        return 0;
+      }
+      
+      unless ($re->match_start == 2) {
+        return 0;
+      }
+      unless ($re->match_end == 3) {
+        return 0;
+      }
+    }
+
+
+    # Match start zero width only
+    {
+      my $re = SPVM::Regex->new("b*");
+      my $target = "zzcz";
+      my $match = $re->match($target);
+      
+      unless ($match) {
+        return 0;
+      }
+      
+      unless ($re->match_start == 0) {
+        return 0;
+      }
+      unless ($re->match_end == 0) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  sub match_capture : int ()  {
+    # Capture a char
+    {
+      my $re = SPVM::Regex->new("a(b)c");
+      my $target = "zabcz";
+      my $match = $re->match($target);
+      
+      unless ($match) {
+        return 0;
+      }
+      
+      unless ($re->caps(1) eq "b") {
+        return 0;
+      }
+    }
+
+    # Capture a char UTF-8
+    {
+      my $re = SPVM::Regex->new("あ(い)う");
+      my $target = "んあいうん";
+      my $match = $re->match($target);
+      
+      unless ($match) {
+        return 0;
+      }
+      
+      unless ($re->caps(1) eq "い") {
+        return 0;
+      }
+    }
+
+    # Capture a char zero width
+    {
+      my $re = SPVM::Regex->new("a(b?)c");
+      my $target = "zacz";
+      my $match = $re->match($target);
+      
+      unless ($match) {
+        return 0;
+      }
+      
+      unless ($re->caps(1) eq "") {
+        return 0;
+      }
+    }
+
+    # Capture char class and quantifier
+    {
+      my $re = SPVM::Regex->new("\-(\w+)\-");
+      my $target = "-abc89-";
+      my $match = $re->match($target);
+      
+      unless ($match) {
+        return 0;
+      }
+      
+      unless ($re->caps(1) eq "abc89") {
+        return 0;
+      }
+    }
+
+    # Capture many strings 
+    {
+      my $re = SPVM::Regex->new("\-(\w+) (\w+) (\w+) (\w+) (\w+)");
+      my $target = "-abc1 abc2 abc3 abc4 abc5 abc6-";
+      my $match = $re->match($target);
+      
+      unless ($match) {
+        return 0;
+      }
+      
+      unless ($re->caps(1) eq "abc1") {
+        return 0;
+      }
+
+      unless ($re->caps(2) eq "abc2") {
+        return 0;
+      }
+
+      unless ($re->caps(3) eq "abc3") {
+        return 0;
+      }
+
+      unless ($re->caps(4) eq "abc4") {
+        return 0;
+      }
+
+      unless ($re->caps(5) eq "abc5") {
+        return 0;
+      }
+    }
+
+    # Capture error
+    {
+      eval { SPVM::Regex->new(")abc"); };
+      unless ($@) {
+        return 0;
+      }
+      eval { SPVM::Regex->new("((abc)"); };
+      unless ($@) {
+        return 0;
+      }
+      
+      $@ = undef;
+    }
+    
+    return 1;
+  }
+  
   sub match_char_class_range : int ()  {
     # Match char class range
     {
@@ -371,7 +721,7 @@ package TestCase::Lib::SPVM::Regex {
           return 0;
         }
       }
-      
+
       # Not Match $ - "zabbcz"
       {
         my $re = SPVM::Regex->new("ab+c$");
@@ -676,14 +1026,6 @@ package TestCase::Lib::SPVM::Regex {
       unless ($match) {
         return 0;
       }
-      
-      unless ($match isa string[]) {
-        return 0;
-      }
-      
-      unless (@$match == 0) {
-        return 0;
-      }
     }
     
     # Match same string
@@ -694,14 +1036,6 @@ package TestCase::Lib::SPVM::Regex {
       my $match = $re->match($target);
       
       unless ($match) {
-        return 0;
-      }
-      
-      unless ($match isa string[]) {
-        return 0;
-      }
-      
-      unless (@$match == 0) {
         return 0;
       }
     }

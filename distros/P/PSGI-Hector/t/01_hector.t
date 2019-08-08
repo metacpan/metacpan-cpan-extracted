@@ -1,7 +1,18 @@
+package parent;
+use lib qw(../lib lib);
+use parent qw(PSGI::Hector);
+####################################
+package child;
+use parent qw(parent);
+####################################
+package multiChild;
+use parent qw(Test::More parent);
+####################################
+package main;
 use strict;
 use warnings;
 use Test::More;
-plan(tests => 14);
+plan(tests => 18);
 use lib qw(../lib lib);
 use PSGI::Hector;
 
@@ -44,25 +55,25 @@ my $request = $h->getRequest();
 isa_ok($request, "PSGI::Hector::Request");
 
 #7
-is($h->getSiteUrl(), "http://www.test.com:8080/test.cgi", "PSGI::Hector::Utils::getSiteUrl()");
+is($h->getSiteUrl(), "http://www.test.com:8080/test.cgi", "PSGI::Hector::Utils->getSiteUrl()");
 
 #8
-is($h->getThisUrl(), "http://www.test.com:8080/test.cgi", "PSGI::Hector::Utils::getThisUrl()");
+is($h->getThisUrl(), "http://www.test.com:8080/test.cgi", "PSGI::Hector::Utils->getThisUrl()");
 
 #9
-is($h->getOption('debug'), 1, "PSGI::Hector::getOption()");
+is($h->getOption('debug'), 1, "PSGI::Hector->getOption()");
 
 #10
 {
 	my $env = $h->getEnv();
-	is($env{'REQUEST_METHOD'}, "GET", "PSGI::Hector::getEnv()");
+	is($env{'REQUEST_METHOD'}, "GET", "PSGI::Hector->getEnv()");
 }
 
 #11
-is($h->getUrlForAction("someAction", "a=b&c=d"), "/someAction?a=b&c=d", "PSGI::Hector::getUrlForAction()");
+is($h->getUrlForAction("someAction", "a=b&c=d"), "/someAction?a=b&c=d", "PSGI::Hector->getUrlForAction()");
 
 #12
-is($h->getFullUrlForAction("someAction", "a=b&c=d"), "http://www.test.com:8080/test.cgi/someAction?a=b&c=d", "PSGI::Hector::getFullUrlForAction()");
+is($h->getFullUrlForAction("someAction", "a=b&c=d"), "http://www.test.com:8080/test.cgi/someAction?a=b&c=d", "PSGI::Hector->getFullUrlForAction()");
 
 #13
 {
@@ -74,3 +85,30 @@ is($h->getFullUrlForAction("someAction", "a=b&c=d"), "http://www.test.com:8080/t
 #14
 my $logger = $h->getLog();
 isa_ok($logger, 'PSGI::Hector::Log');
+
+#15
+{
+	my $full = $h->__getFullClassName('Request');
+	is($full, 'PSGI::Hector::Request', 'PSGI::Hector->__getFullClassName() not overidden')
+}
+
+#16
+{
+	my $p = parent->new($options, \%env);
+	my $full = $p->__getFullClassName('Request');
+	is($full, 'PSGI::Hector::Request', 'PSGI::Hector->__getFullClassName() overidden')
+}
+
+#17
+{
+	my $c = child->new($options, \%env);
+	my $full = $c->__getFullClassName('Request');
+	is($full, 'PSGI::Hector::Request', 'PSGI::Hector->__getFullClassName() overidden twice')
+}
+
+#18
+{
+	my $mc = multiChild->new($options, \%env);
+	my $full = $mc->__getFullClassName('Request');
+	is($full, 'PSGI::Hector::Request', 'PSGI::Hector->__getFullClassName() overidden twice with multiple base classes')
+}

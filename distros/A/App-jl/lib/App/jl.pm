@@ -6,7 +6,7 @@ use Sub::Data::Recursive;
 use B;
 use Getopt::Long qw/GetOptionsFromArray/;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 my $MAX_RECURSIVE_CALL = 255;
 
@@ -296,8 +296,8 @@ sub _ts2date {
     my $msec           = shift || '';
 
     # 946684800 = 2000-01-01T00:00:00Z
-    if ($unix_timestamp >= 946684800) {
-        if ($unix_timestamp > 2**31 -1) {
+    if ($unix_timestamp >= 946684800 && $unix_timestamp <= ((2**32 - 1) * 1000)) {
+        if ($unix_timestamp > 2**32 -1) {
             ($msec) = ($unix_timestamp =~ m!(\d\d\d)$!);
             $msec = ".$msec";
             $unix_timestamp = int($unix_timestamp / 1000);
@@ -451,7 +451,7 @@ The main routine
 
 =begin html
 
-<a href="https://github.com/bayashi/App-jl/blob/master/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic-GREEN.png"></a> <a href="http://travis-ci.org/bayashi/App-jl"><img src="https://secure.travis-ci.org/bayashi/App-jl.png?_t=1562446988"/></a> <a href="https://coveralls.io/r/bayashi/App-jl"><img src="https://coveralls.io/repos/bayashi/App-jl/badge.png?_t=1562446988&branch=master"/></a>
+<a href="https://github.com/bayashi/App-jl/blob/master/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic-GREEN.png"></a> <a href="http://travis-ci.org/bayashi/App-jl"><img src="https://secure.travis-ci.org/bayashi/App-jl.png?_t=1564893921"/></a> <a href="https://coveralls.io/r/bayashi/App-jl"><img src="https://coveralls.io/repos/bayashi/App-jl/badge.png?_t=1564893921&branch=master"/></a>
 
 =end html
 

@@ -32,11 +32,6 @@ like $@,
   qr/^Method name conflict for 'foo' between roles 'R1' and 'R2', cannot apply these simultaneously to an object/,
   'apply conflicting roles to object';
 
-eval { Role::Tiny->apply_roles_to_object(X->new); 1 }
-  or $@ ||= "false exception!";
-like $@,
-  qr/^No roles supplied!/,
-  'apply no roles to object';
 
 
 done_testing;

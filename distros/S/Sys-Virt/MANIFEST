@@ -37,6 +37,7 @@ lib/Sys/Virt.pm
 lib/Sys/Virt.xs
 lib/Sys/Virt/Domain.pm
 lib/Sys/Virt/DomainSnapshot.pm
+lib/Sys/Virt/DomainCheckpoint.pm
 lib/Sys/Virt/Error.pm
 lib/Sys/Virt/Event.pm
 lib/Sys/Virt/Interface.pm

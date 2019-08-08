@@ -4,10 +4,11 @@ use warnings;
 
 use parent qw(Test::Class);
 use Test::More;
+use Test::FailWarnings;
 
 use Promise::ES6;
 
-sub reject : Tests {
+sub reject : Tests(1) {
     Promise::ES6->reject('oh my god')->then(sub {
         die;
     }, sub {

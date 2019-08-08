@@ -4,7 +4,7 @@
       "Joenio Costa <joenio@joenio.me>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -22,7 +22,12 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Alien::Build::MM" : "0.25"
+            "Alien::Build::MM" : "0.25",
+            "Alien::bison" : "0",
+            "Alien::cmake3" : "0",
+            "Alien::flex" : "0",
+            "Alien::m4" : "0",
+            "Config" : "0"
          }
       },
       "configure" : {
@@ -43,9 +48,9 @@
          "url" : "http://github.com/joenio/alien-doxyparse"
       }
    },
-   "version" : "0.10",
+   "version" : "0.12",
    "x_alienfile" : {
-      "generated_by" : "Alien::Build::MM version 1.48",
+      "generated_by" : "Alien::Build::MM version 1.79",
       "requires" : {
          "share" : {
             "Alien::bison" : "0",
@@ -57,5 +62,5 @@
          "system" : {}
       }
    },
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

@@ -26,6 +26,6 @@ resources:
   bugtracker: https://github.com/jjn1056/Catalyst-Plugin-InjectionHelpers/issues
   homepage: https://github.com/jjn1056/Catalyst-Plugin-InjectionHelpers
   repository: https://github.com/jjn1056/Catalyst-Plugin-InjectionHelpers.git
-version: '0.014'
+version: '0.015'
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

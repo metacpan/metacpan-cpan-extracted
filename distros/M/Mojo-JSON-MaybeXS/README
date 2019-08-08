@@ -21,6 +21,12 @@ DESCRIPTION
     Mojo::JSON. It must be loaded before Mojo::JSON so the new functions
     will be properly exported.
 
+    Since Mojolicious version 7.87, Mojo::JSON has delegated to
+    Cpanel::JSON::XS by default if installed and recent enough. Installing
+    Mojolicious version 7.87+ and Cpanel::JSON::XS version 4.09+ resolves
+    the below listed caveats between these modules, and is sufficient to
+    improve the performance of Mojo::JSON without the use of this module.
+
 CAVEATS
 
     JSON::MaybeXS may load different modules behind the scenes depending on
@@ -37,15 +43,15 @@ CAVEATS
     accordance with RFC 7159 <http://tools.ietf.org/html/rfc7159>. The
     other options prevent the encoder from blowing up when encountering
     values that cannot be represented in JSON to better match the behavior
-    of Mojo::JSON; in most cases, where Mojo::JSON would stringify a
-    reference, JSON::MaybeXS with these settings will encode it to null.
-    See below for more specifics.
+    of Mojo::JSON. See below for more specifics.
 
     To better match the behavior of Mojo::JSON, certain options may be
     enabled depending on the backend that is used. If Cpanel::JSON::XS
     version 3.0112 or greater is loaded, it will be used with the option
     stringify_infnan. If either Cpanel::JSON::XS of at least version 3.0206
-    or JSON::PP is loaded, it will be used with the option escape_slash.
+    or JSON::PP is loaded, it will be used with the option escape_slash. If
+    Cpanel::JSON::XS version 4.09 or greater is loaded, it will be used
+    with the option allow_dupkeys.
 
     As of this writing, the author has found the following
     incompatibilities:
@@ -66,24 +72,29 @@ CAVEATS
 
     JSON::MaybeXS does not allow unblessed references other than to hashes,
     arrays, or the scalar values 0 and 1, and will encode them to null.
-    Mojo::JSON will treat all scalar references the same as references to 0
-    or 1 and will encode them to true or false depending on their boolean
-    value. Other references (code, filehandle, etc) will be stringified.
+    Before Mojolicious version 7.87, Mojo::JSON will treat all scalar
+    references the same as references to 0 or 1 and will encode them to
+    true or false depending on their boolean value, and other references
+    (code, filehandle, etc) will be stringified.
+
+    Since Mojolicious version 7.87, Mojo::JSON's behavior with unblessed
+    references is the same as JSON::MaybeXS.
 
      print encode_json([\'asdf', sub { 1 }]);
-     # Mojo::JSON: [true,"CODE(0x11d1650)"]
+     # Mojo::JSON (Mojolicious >= 7.87): [null,null]
      # JSON::MaybeXS: [null,null]
 
  Escapes
 
     Mojo::JSON currently escapes the slash character / for security
-    reasons, as well as the unicode characters u2028 and u2029.
-    Cpanel::JSON::XS version 3.0206 or greater and JSON::PP will have the
-    option set to escape the slash character, and JSON::XS does not escape
-    these characters. This does not affect decoding of the resulting JSON.
+    reasons. Before Mojolicious version 7.87, it also escaped the unicode
+    characters u2028 and u2029. Cpanel::JSON::XS version 3.0206 or greater
+    and JSON::PP will have the option set to escape the slash character,
+    and JSON::XS does not escape these characters. This does not affect
+    decoding of the resulting JSON.
 
      print encode_json(["/\x{2028}/\x{2029}"]);
-     # Mojo::JSON: ["\/\u2028\/\u2029"]
+     # Mojo::JSON (Mojolicious >= 7.87): ["\/ \/ "]
      # Cpanel::JSON::XS >= 3.0206 or JSON::PP: ["\/ \/ "]
      # JSON::XS: ["/ / "]
      # Both decode to arrayref containing: "/\x{2028}/\x{2029}"
@@ -121,11 +132,12 @@ CAVEATS
     Mojo::JSON, JSON::XS, and JSON::PP will silently accept duplicate keys
     in the same JSON object when decoding a JSON string. Cpanel::JSON::XS
     version 3.0235 or greater will throw an exception if duplicate keys are
-    encountered.
+    encountered. Cpanel::JSON::XS version 4.09 or greater will have the
+    option set to once again accept duplicate keys.
 
      print dumper decode_json('{"foo":1, "bar":2, "foo":3}');
      # Mojo::JSON, JSON::XS, or JSON::PP: { bar => 2, foo => 3 }
-     # Cpanel::JSON::XS >= 3.0235: "Duplicate keys not allowed" exception
+     # Cpanel::JSON::XS >= 3.0235 and < 4.09: "Duplicate keys not allowed" exception
 
 BUGS
 

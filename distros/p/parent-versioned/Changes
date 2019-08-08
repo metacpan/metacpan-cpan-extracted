@@ -1,0 +1,16 @@
+0.002 2019-08-03
+    . Initial CPAN mainline release.
+    . Added a README.md
+    . Bumped the version number to a non-development number.
+
+0.00102 2019-08-03
+    . CPAN development release.
+    . Incorporate tests for versioning functionality (100% coverage).
+    . Update POD to include a section about test coverage.
+    . Fix some ^M line endings in xt/ tests.
+
+0.00101 2019-08-03
+    . Initial version forked from parent.pm, version 0.237.
+    . Shift to parent::versioned namespace.
+    . Support array ref import list to specify minimum module version.
+

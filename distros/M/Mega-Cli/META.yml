@@ -1,0 +1,29 @@
+---
+abstract: unknown
+author:
+  - 'vrag <vrag867@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mega-Cli
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Basename: '0'
+  File::Spec: '0'
+  Lock::Socket: '0'
+  perl: '5.008008'
+resources:
+  bugtracker: https://github.com/vrag86/perl-mega-cli.git/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/vrag86/perl-mega-cli.git
+version: '0.02'

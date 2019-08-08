@@ -1,0 +1,45 @@
+NAME
+
+  IOas::CP932 - provides CP932 I/O subroutines for UTF-8 script
+
+SYNOPSIS
+
+  use IOas::CP932;
+
+DESCRIPTION
+
+  IOas::CP932 module provides CP932 I/O subroutines for UTF-8 script for
+  stable scripting environment, using no utf8 pragma, no UTF-8 flag.
+
+SUBROUTINES
+
+  Octet Length as I/O Encoding
+    IOas::CP932::length($utf8str)
+    IOas::CP932::sprintf($utf8format, @utf8list)
+    IOas::CP932::substr($utf8expr, $offset_as_cp932x, $length_as_cp932x, $utf8replacement)
+
+  String Comparison as I/O Encoding
+    IOas::CP932::cmp($utf8str_a, $utf8str_b)
+    IOas::CP932::eq($utf8str_a, $utf8str_b)
+    IOas::CP932::ne($utf8str_a, $utf8str_b)
+    IOas::CP932::ge($utf8str_a, $utf8str_b)
+    IOas::CP932::gt($utf8str_a, $utf8str_b)
+    IOas::CP932::le($utf8str_a, $utf8str_b)
+    IOas::CP932::lt($utf8str_a, $utf8str_b)
+    IOas::CP932::sort(@utf8str)
+
+  Encoding Convert on I/O Operations
+    IOas::CP932::getc(FILEHANDLE)
+    IOas::CP932::readline(FILEHANDLE)
+    IOas::CP932::print(FILEHANDLE, @utf8str)
+    IOas::CP932::printf(FILEHANDLE, $utf8format, @utf8list)
+
+SUPPORTED PERL VERSIONS
+
+  perl version 5.005_03 to newest perl
+
+SEE ALSO
+
+  http://search.cpan.org/~ina/
+  http://backpan.perl.org/authors/id/I/IN/INA/
+

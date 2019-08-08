@@ -44,7 +44,7 @@ namespace xs {
 
 }
 
-static xs::Sv::payload_marker_t payload_marker_09{};
+static xs::Sv::payload_marker_t payload_marker_09;
 
 MODULE = MyTest::Cookbook                PACKAGE = MyTest::Cookbook::Point
 PROTOTYPES: DISABLE

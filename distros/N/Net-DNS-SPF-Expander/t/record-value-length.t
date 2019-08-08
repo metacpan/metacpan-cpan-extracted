@@ -3,7 +3,6 @@ use warnings;
 use lib 'lib';
 
 use Net::DNS::SPF::Expander;
-use Data::Printer;
 
 use Test::More;
 use Test::Exception;

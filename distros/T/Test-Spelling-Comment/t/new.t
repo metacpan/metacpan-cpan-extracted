@@ -37,7 +37,7 @@ sub main {
 
     {
         my $stopwords = bless {}, 'Local::Pod::Wordlist';
-        my $obj = $class->new( stopwords => $stopwords );
+        my $obj       = $class->new( stopwords => $stopwords );
         ok( $obj->_has_stopwords, '... and has a _stopwords defined' );
         isa_ok( $obj->_stopwords, 'Local::Pod::Wordlist', q{... _stopwords returns a 'Local::Pod::Wordlist'} );
     }

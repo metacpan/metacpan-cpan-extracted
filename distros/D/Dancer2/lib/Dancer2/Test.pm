@@ -1,6 +1,6 @@
 package Dancer2::Test;
 # ABSTRACT: Useful routines for testing Dancer2 apps
-$Dancer2::Test::VERSION = '0.208000';
+$Dancer2::Test::VERSION = '0.208001';
 use strict;
 use warnings;
 
@@ -629,7 +629,7 @@ Dancer2::Test - Useful routines for testing Dancer2 apps
 
 =head1 VERSION
 
-version 0.208000
+version 0.208001
 
 =head1 SYNOPSIS
 
@@ -654,7 +654,7 @@ B<DEPRECATED. This module and all the functions listed below are deprecated. Do
 not use this module.> The routines provided by this module for testing Dancer2
 apps are buggy and unnecessary. Instead, use the L<Plack::Test> module as shown
 in the SYNOPSIS above and ignore the functions in this documentation. Consult
-the L<Plack::Test> documenation for further details.
+the L<Plack::Test> documentation for further details.
 
 This module will be removed from the Dancer2 distribution in the near future.
 You should migrate all tests that use it over to the L<Plack::Test> module and

@@ -2,7 +2,12 @@
 abstract: 'run tests continuously, detecting changes'
 author:
   - 'Rogerio Chaves <rogeriocfj@gmail.com>'
-build_requires: {}
+build_requires:
+  Devel::Peek: '0'
+  File::Spec: '0'
+  Test::Differences: '0'
+  Test::Spec: '0'
+  lib: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -15,9 +20,14 @@ name: Test-Tdd
 requires:
   Class::Refresh: '0'
   Cwd: '0'
+  Data::Dumper: '0'
+  File::Basename: '0'
   File::Find: '0'
+  File::Path: '0'
+  File::Slurp: '0'
   Filesys::Notify::Simple: '0'
   Getopt::Long: '0'
+  Term::ANSIColor: '0'
   Test::More: '0'
   perl: '5.008'
   strict: '0'
@@ -25,6 +35,6 @@ requires:
 resources:
   homepage: https://github.com/rogeriochaves/perl-tdd-runner
   repository: https://github.com/rogeriochaves/perl-tdd-runner.git
-version: '0.004'
-x_generated_by_perl: v5.18.2
+version: '0.006'
+x_generated_by_perl: v5.18.4
 x_serialization_backend: 'YAML::Tiny version 1.73'

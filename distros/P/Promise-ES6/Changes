@@ -1,5 +1,8 @@
 Revision history for Perl module Promise::ES6
 
+0.05
+- Prevent warn() when creating a pre-rejected promise.
+
 0.04 Mon 4 Mar 2019
 - Fix missing test dependency. (doh!)
 

@@ -9,5 +9,6 @@ MANIFEST.SKIP
 README.md
 t/00-basic.t
 t/01-nota_fiscal.t
+t/02-nota_servicos.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

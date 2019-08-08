@@ -1,5 +1,8 @@
 Revision history for Command-Runner
 
+0.102  2019-08-06 20:29:53 EEST
+    - Add env option (#5)
+
 0.101  2018-05-02 18:12:25 JST
     - Read stdout/stderr pipes after sending signals
 

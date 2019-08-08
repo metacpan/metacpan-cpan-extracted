@@ -1,14 +1,13 @@
 package Net::DNS::SPF::Expander;
-$Net::DNS::SPF::Expander::VERSION = '0.019';
-use Moose;
-use IO::All -utf8;
+$Net::DNS::SPF::Expander::VERSION = '0.021';
+use Moo;
+use MooX::Options;
+use Types::Standard qw/Str HashRef ArrayRef Maybe Int InstanceOf RegexpRef/;
 use Net::DNS::ZoneFile;
 use Net::DNS::Resolver;
-use MooseX::Types::IO::All 'IO_All';
+use Path::Tiny;
 use List::AllUtils qw(sum any part first uniq);
 use Scalar::Util ();
-
-with 'MooseX::Getopt';
 
 # ABSTRACT: Expands DNS SPF records, so you don't have to.
 # The problem is that you only get 10 per SPF records,
@@ -101,10 +100,13 @@ to expand. It must be a valid L<Net::DNS::Zonefile> zonefile.
 
 =cut
 
-has 'input_file' => (
+option 'input_file' => (
     is       => 'ro',
-    isa      => 'Str',
+    isa      => InstanceOf ["Path::Tiny"],
+    coerce   => sub { path($_[0]) },
     required => 1,
+    format   => 's',
+    doc      => 'The file to be SPF-expanded'
 );
 
 =head2 output_file
@@ -114,11 +116,14 @@ onto the end of the original filename.
 
 =cut
 
-has 'output_file' => (
-    is         => 'ro',
-    isa        => 'Str',
-    lazy       => 1,
-    builder    => '_build_output_file',
+option 'output_file' => (
+    is      => 'ro',
+    isa     => InstanceOf ["Path::Tiny"],
+    coerce  => sub { path($_[0]) },
+    lazy    => 1,
+    builder => '_build_output_file',
+    format  => 's',
+    doc     => 'The destination file to write SPF-expanded records'
 );
 
 =head2 backup_file
@@ -130,9 +135,8 @@ onto the end of the original filename.
 
 has 'backup_file' => (
     is         => 'ro',
-    isa        => IO_All,
+    isa      => InstanceOf["Path::Tiny"],
     lazy       => 1,
-    coerce     => 1,
     builder    => '_build_backup_file',
 );
 
@@ -144,7 +148,7 @@ A list of nameservers that will be passed to the resolver.
 
 has 'nameservers' => (
     is  => 'ro',
-    isa => 'Maybe[ArrayRef]',
+    isa => Maybe[ArrayRef],
 );
 
 =head2 parsed_file
@@ -155,7 +159,7 @@ The L<Net::DNS::Zonefile> object created from the input_file.
 
 has 'parsed_file' => (
     is         => 'ro',
-    isa        => 'Net::DNS::ZoneFile',
+    isa        => InstanceOf['Net::DNS::ZoneFile'],
     lazy       => 1,
     builder    => '_build_parsed_file',
 );
@@ -169,7 +173,7 @@ a, mx, include, and redirect records. Configurable.
 
 has 'to_expand' => (
     is      => 'ro',
-    isa     => 'ArrayRef[RegexpRef]',
+    isa     => ArrayRef[RegexpRef],
     default => sub {
         [ qr/^a:/, qr/^mx/, qr/^include/, qr/^redirect/, ];
     },
@@ -184,7 +188,7 @@ we will copy ip4, ip6, ptr, and exists records. Configurable.
 
 has 'to_copy' => (
     is      => 'rw',
-    isa     => 'ArrayRef[RegexpRef]',
+    isa     => ArrayRef[RegexpRef],
     default => sub {
         [ qr/v=spf1/, qr/^ip4/, qr/^ip6/, qr/^ptr/, qr/^exists/, ];
     },
@@ -199,7 +203,7 @@ exp, v=spf1, and ~all.
 
 has 'to_ignore' => (
     is      => 'ro',
-    isa     => 'ArrayRef[RegexpRef]',
+    isa     => ArrayRef[RegexpRef],
     default => sub {
         [ qr/^v=spf1/, qr/^(\??)all/, qr/^exp/, qr/^~all/ ];
     },
@@ -215,7 +219,7 @@ from our length calculation.
 
 has 'maximum_record_length' => (
     is      => 'ro',
-    isa     => 'Int',
+    isa     => Int,
     default => sub {
         255 - length('v=spf1 ') - length(' ~all') - length('"') - length('"');
     },
@@ -229,10 +233,8 @@ Default time to live is 10 minutes. Configurable.
 
 has 'ttl' => (
     is      => 'ro',
-    isa     => 'Str',
-    default => sub {
-        '10M',;
-    },
+    isa     => Str,
+    default => sub { '10M' },
 );
 
 =head2 origin
@@ -244,26 +246,12 @@ or you can set it if you like.
 
 has 'origin' => (
     is         => 'ro',
-    isa        => 'Str',
+    isa        => Str,
     lazy       => 1,
     builder    => '_build_origin',
 );
 
 =head1 PRIVATE ATTRIBUTES
-
-=head2 _input_file
-
-The L<IO::All> object created from the input_file.
-
-=cut
-
-has '_input_file' => (
-    is         => 'ro',
-    isa        => IO_All,
-    coerce     => 1,
-    lazy       => 1,
-    builder    => '_build__input_file',
-);
 
 =head2 _resource_records
 
@@ -274,7 +262,7 @@ found in the entire parsed_file.
 
 has '_resource_records' => (
     is         => 'ro',
-    isa        => 'Maybe[ArrayRef[Net::DNS::RR]]',
+    isa        => Maybe[ArrayRef[InstanceOf["Net::DNS::RR"]]],
     lazy       => 1,
     builder    => '_build__resource_records',
 );
@@ -288,7 +276,7 @@ records found in the entire parsed_file.
 
 has '_spf_records' => (
     is         => 'ro',
-    isa        => 'Maybe[ArrayRef[Net::DNS::RR]]',
+    isa        => Maybe[ArrayRef[InstanceOf["Net::DNS::RR"]]],
     lazy       => 1,
     builder    => '_build__spf_records',
 );
@@ -303,7 +291,7 @@ variables if you want to change the nameserver it uses.
 
 has '_resolver' => (
     is         => 'ro',
-    isa        => 'Net::DNS::Resolver',
+    isa        => InstanceOf["Net::DNS::Resolver"],
     lazy       => 1,
     builder    => '_build__resolver',
 );
@@ -338,7 +326,7 @@ They are alpha sorted in the final results for predictability in tests.
 
 has '_expansions' => (
     is         => 'ro',
-    isa        => 'HashRef',
+    isa        => HashRef,
     lazy       => 1,
     builder    => '_build__expansions',
 );
@@ -354,7 +342,7 @@ pieces.
 
 has '_lengths_of_expansions' => (
     is         => 'ro',
-    isa        => 'HashRef',
+    isa        => HashRef,
     lazy       => 1,
     builder    => '_build__lengths_of_expansions',
 );
@@ -367,7 +355,7 @@ What sort of records are SPF records? IN records.
 
 has '_record_class' => (
     is      => 'ro',
-    isa     => 'Str',
+    isa     => Str,
     default => sub {
         'IN',;
     },
@@ -420,21 +408,9 @@ Tack a ".bak" onto the end of the input_file.
 
 sub _build_backup_file {
     my $self = shift;
-    my $path = $self->_input_file->filepath;
-    my $name = $self->_input_file->filename;
-    return "${path}${name}.bak";
-}
-
-=head2 _build__input_file
-
-Turn the string input_file into a filehandle with
-L<IO::All>.
-
-=cut
-
-sub _build__input_file {
-    my $self = shift;
-    return to_IO_All( $self->input_file );
+    my $path = $self->input_file->parent;
+    my $name = $self->input_file->basename;
+    return path("${path}/${name}.bak");
 }
 
 =head2 _build_output_file
@@ -445,23 +421,23 @@ Tack a ".new" onto the end of the input_file.
 
 sub _build_output_file {
     my $self = shift;
-    my $path = $self->_input_file->filepath;
-    my $name = $self->_input_file->filename;
-    return "${path}${name}.new";
+    my $path = $self->input_file->parent;
+    my $name = $self->input_file->basename;
+    return path("${path}/${name}.new");
 }
 
 =head2 _build_parsed_file
 
-Turn the L<IO::All> filehandle into a L<Net::DNS::Zonefile>
+Turn the L<Path::Tiny> filehandle into a L<Net::DNS::Zonefile>
 object, so that we can extract the SPF records.
 
 =cut
 
 sub _build_parsed_file {
     my $self = shift;
-    my $path = $self->_input_file->filepath;
-    my $name = $self->_input_file->filename;
-    return Net::DNS::ZoneFile->new("${path}${name}");
+    my $path = $self->input_file->parent;
+    my $name = $self->input_file->basename;
+    return Net::DNS::ZoneFile->new("${path}/${name}");
 }
 
 =head2 _build_resource_records
@@ -530,12 +506,11 @@ Returns a scalar string of the data written to the file.
 
 sub write {
     my $self  = shift;
-    my $lines = $self->_new_records_lines;
-    my $path  = $self->_input_file->filepath;
-    my $name  = $self->_input_file->filename;
-    io( $self->backup_file )->print( $self->_input_file->all );
-    io( $self->output_file )->print(@$lines);
-    return join( '', @$lines );
+    my @new_lines = @{$self->_new_records_lines};
+    my @input_lines = $self->input_file->lines;
+    $self->backup_file->spew(@input_lines);
+    $self->output_file->spew(@new_lines);
+    return join( '', @new_lines );
 }
 
 =head2 new_spf_records
@@ -1066,7 +1041,7 @@ sub _new_records_lines {
             push @record_strings, @$record_string;
         }
     }
-    my @original_lines = $self->_input_file->slurp;
+    my @original_lines = $self->input_file->lines;
     my @new_lines      = ();
     my @spf_indices;
     my $i = 0;
@@ -1114,7 +1089,7 @@ Chris Weyl E<lt>cweyl@campusexplorer.comE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2015 Campus Explorer, Inc.
+Copyright (c) 2019 Campus Explorer, Inc.
 
 =head1 LICENSE
 

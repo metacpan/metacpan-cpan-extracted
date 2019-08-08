@@ -1,0 +1,44 @@
+---
+abstract: 'object class for planar difference sets'
+author:
+  - 'Martin Becker <becker-cpan-mp (at) cozap.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '7.06'
+  File::ShareDir::Install: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Math-DifferenceSet-Planar
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Math::DifferenceSet::Planar:
+    file: lib/Math/DifferenceSet/Planar.pm
+    version: '0.005'
+  Math::DifferenceSet::Planar::Data:
+    file: lib/Math/DifferenceSet/Planar/Data.pm
+    version: '0.005'
+  Math::DifferenceSet::Planar::Schema:
+    file: lib/Math/DifferenceSet/Planar/Schema.pm
+    version: '0.005'
+  Math::DifferenceSet::Planar::Schema::Result::DifferenceSet:
+    file: lib/Math/DifferenceSet/Planar/Schema/Result/DifferenceSet.pm
+    version: '0.005'
+requires:
+  Carp: '0'
+  DBD::SQLite: '1.48'
+  DBIx::Class: '0'
+  File::Share: '0'
+  File::Spec: '0'
+  Math::Prime::Util: '0.59'
+  perl: '5.010'
+version: '0.005'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

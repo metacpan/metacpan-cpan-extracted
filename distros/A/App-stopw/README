@@ -2,8 +2,8 @@ NAME
     App::stopw - A console-based virtual stopwatch and timer
 
 VERSION
-    This document describes version 0.040 of App::stopw (from Perl
-    distribution App-stopw), released on 2019-06-23.
+    This document describes version 0.041 of App::stopw (from Perl
+    distribution App-stopw), released on 2019-07-06.
 
 SYNOPSIS
     This distribution provides the stopw command-line utility.

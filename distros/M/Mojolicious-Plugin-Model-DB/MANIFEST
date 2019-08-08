@@ -1,0 +1,10 @@
+Makefile.PL
+Changes
+MANIFEST
+META.json
+META.yml
+README.md
+t/base.t
+t/namespace.t
+lib/Mojolicious/Plugin/Model/DB.pm
+cpanfile

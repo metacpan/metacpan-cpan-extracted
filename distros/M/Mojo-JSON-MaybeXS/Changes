@@ -1,3 +1,7 @@
+1.002     2019-08-07 13:01:24 EDT
+  - Set allow_dupkeys when using Cpanel::JSON::XS >= 4.09
+  - Doc updates for Mojo::JSON using Cpanel::JSON::XS natively in Mojolicious 7.87+
+
 1.001     2018-02-06 14:06:23 EST
   - Doc updates for upgraded numbers logic
 

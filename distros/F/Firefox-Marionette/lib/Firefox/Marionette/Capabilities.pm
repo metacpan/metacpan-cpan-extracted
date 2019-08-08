@@ -3,7 +3,7 @@ package Firefox::Marionette::Capabilities;
 use strict;
 use warnings;
 
-our $VERSION = '0.78';
+our $VERSION = '0.80';
 
 sub new {
     my ( $class, %parameters ) = @_;
@@ -126,7 +126,7 @@ Firefox::Marionette::Capabilities - Represents Firefox Capabilities retrieved us
 
 =head1 VERSION
 
-Version 0.78
+Version 0.80
 
 =head1 SYNOPSIS
 
@@ -134,7 +134,7 @@ Version 0.78
     use v5.10;
 
     my $firefox = Firefox::Marionette->new( capabilities => Firefox::Marionette::Capabilities->new( accept_insecure_certs => 0 ) );
-    if ($firefox->capabilities->accept_insecure_certs() {
+    if ($firefox->capabilities->accept_insecure_certs()) {
         say "Browser will now ignore certificate failures";
     }
 
@@ -144,109 +144,55 @@ This module handles the implementation of Firefox Capabilities using the Marione
 
 =head1 SUBROUTINES/METHODS
 
-=head2 new
- 
-accepts a hash as a parameter.  Allowed keys are below;
+=head2 accept_insecure_certs
 
-=over 4
+indicates whether untrusted and self-signed TLS certificates are implicitly trusted on navigation for the duration of the session.
 
-=item * accept_insecure_certs - Indicates whether untrusted and self-signed TLS certificates are implicitly trusted on navigation for the duration of the session. Allowed values are 1 or 0.  Default is 0.
+=head2 browser_name
 
-=item * page_load_strategy - defines the page load strategy to use for the duration of the session. Setting a page load strategy will cause navigation to be "eager", waiting for the interactive document ready state; "normal" (the default), waiting for the complete ready state; or "none", which will return immediately after starting navigation. 
+returns the browsers name.  For example 'firefox'
 
-=item * proxy - describes the L<proxy|Firefox::Marionette::Proxy> setup for the upcoming browser session.
+=head2 browser_version 
 
-=item * timeouts - describes the L<timeouts|Firefox::Marionette::Timeouts> imposed on certain session operations.
+returns the version of L<firefox|https://firefox.com/>
 
-=item * moz_webdriver_click - a boolean value to indicate which kind of interactability checks to run when performing a L<click|Firefox::Marionette#click> or L<sending keys|Firefox::Marionette#type> to an elements. For Firefoxen prior to version 58.0 some legacy code as imported from an older version of FirefoxDriver was in use.
+=head2 enumerate
 
-With Firefox 58 the interactability checks as required by the WebDriver specification are enabled by default. This means geckodriver will additionally check if an element is obscured by another when clicking, and if an element is focusable for sending keys.
+This method returns a list of strings describing the capabilities that this version of Firefox supports.
 
-Because of this change in behaviour, we are aware that some extra errors could be returned. In most cases the test in question might have to be updated so it's conform with the new checks. But if the problem is located in geckodriver, then please raise an issue in the issue tracker.
+=head2 moz_accessibility_checks 
 
-To temporarily disable the WebDriver conformant checks use 0 as value for this capability.
+returns the current accessibility (a11y) value
 
-Please note that this capability exists only temporarily, and that it will be removed once the interactability checks have been stabilized.
+=head2 moz_build_id
 
-=item * moz_accessibility_checks - run a11y checks when clicking elements. Allowed values are 1 or 0.  Default is 0.
+returns the L<Firefox BuildId|https://developer.mozilla.org/en-US/docs/Web/API/Navigator/buildID>
 
-=item * moz_headless - the browser should be started with the -headless option.  moz_headless is only supported in Firefox 56+
+=head2 moz_headless
 
-=item * moz_use_non_spec_compliant_pointer_origin - a boolean value to indicate how the pointer origin for an action command will be calculated.
+returns whether the browser is running in headless mode
+
+=head2 moz_process_id 
+
+returns the process id belonging to the browser
+
+=head2 moz_profile
+
+returns the directory that contains the browsers profile
+
+=head2 moz_shutdown_timeout
+
+returns the value of L<moz:shutdownTimeout|https://github.com/mozilla/gecko-dev/commit/7aad85995b21bdaf440dc9dad35c5769a35e90eb#diff-48053ba06cc33be0efb2d7256a1affd9> (aka the value of config toolkit.asyncshutdown.crash_timeout)
+
+=head2 moz_use_non_spec_compliant_pointer_origin
+
+returns a boolean value to indicate how the pointer origin for an action command will be calculated.
 
 With Firefox 59 the calculation will be based on the requirements by the WebDriver specification. This means that the pointer origin is no longer computed based on the top and left position of the referenced element, but on the in-view center point.
 
 To temporarily disable the WebDriver conformant behavior use 0 as value for this capability.
 
 Please note that this capability exists only temporarily, and that it will be removed once all Selenium bindings can handle the new behavior.
-
-=item * strict_file_interactability - a boolean value to indicate if interactability checks will be applied to <input type=file>. Allowed values are 1 or 0.  Default is 0.
-
-=item * unhandled_prompt_behavior - defines what firefox should do on encountering a L<user prompt|https://html.spec.whatwg.org/#user-prompts>.  There are a range of L<allowed values|https://w3c.github.io/webdriver/#dfn-user-prompt-handler>, including "dismiss", "accept", "dismiss and notify", "accept and notify" and "ignore".
-
-=back
-
-This method returns a new L<capabilities|Firefox::Marionette::Capabilities> object.
- 
-=head2 enumerate
-
-This method returns a list of strings describing the capabilities that this version of Firefox supports.
-
-=head2 accept_insecure_certs
-
-indicates whether untrusted and self-signed TLS certificates are implicitly trusted on navigation for the duration of the session.
-
-=head2 page_load_strategy 
-
-returns the page load strategy to use for the duration of the session. Setting a page load strategy will cause navigation to be "eager", waiting for the interactive document ready state; "normal" (the default), waiting for the complete ready state; or "none", which will return immediately after starting navigation. 
-
-=head2 timeouts
-
-returns the current L<timeouts|Firefox::Marionette::Timeouts> object
-
-=head2 proxy
-
-returns the current L<proxy|Firefox::Marionette::Proxy> object
-
-=head2 browser_version 
-
-returns the version of L<firefox|https://firefox.com/>
-
-=head2 platform_name 
-
-returns the operating system name. For example 'linux', 'darwin' or 'windows_nt'.
-
-=head2 rotatable
-
-does this version of L<firefox|https://firefox.com> have a rotatable screen such as Android Fennec.
-
-=head2 platform_version
-
-returns the operation system version. For example '4.14.11-300.fc27.x86_64', '17.3.0' or '10.0'
-
-=head2 moz_profile
-
-returns the directory that contains the browsers profile
-
-=head2 moz_build_id
-
-returns the L<Firefox BuildId|https://developer.mozilla.org/en-US/docs/Web/API/Navigator/buildID>
-
-=head2 strict_file_interactability
-
-returns the current value of L<strictFileInteractability|https://w3c.github.io/webdriver/#dfn-strict-file-interactability>
-
-=head2 unhandled_prompt_behavior
-
-returns the current value of L<unhandledPromptBehavior|https://w3c.github.io/webdriver/#dfn-user-prompt-handler>.  
-
-=head2 set_window_rect
-
-returns true if Firefox fully supports L<setWindowRect|https://w3c.github.io/webdriver/#dfn-window-dimensioning-positioning>, otherwise it returns false.
-
-=head2 moz_shutdown_timeout
-
-returns the value of L<moz:shutdownTimeout|https://github.com/mozilla/gecko-dev/commit/7aad85995b21bdaf440dc9dad35c5769a35e90eb#diff-48053ba06cc33be0efb2d7256a1affd9> (aka the value of config toolkit.asyncshutdown.crash_timeout)
 
 =head2 moz_webdriver_click
 
@@ -260,31 +206,85 @@ To temporarily disable the WebDriver conformant checks use 0 as value for this c
 
 Please note that this capability exists only temporarily, and that it will be removed once the interactability checks have been stabilized.
 
-=head2 moz_process_id 
+=head2 new
+ 
+accepts a hash as a parameter.  Allowed keys are below;
 
-returns the process id belonging to the browser
+=over 4
 
-=head2 browser_name
+=item * accept_insecure_certs - Indicates whether untrusted and self-signed TLS certificates are implicitly trusted on navigation for the duration of the session. Allowed values are 1 or 0.  Default is 0.
 
-returns the browsers name.  For example 'firefox'
+=item * moz_accessibility_checks - run a11y checks when clicking elements. Allowed values are 1 or 0.  Default is 0.
 
-=head2 moz_headless
+=item * moz_headless - the browser should be started with the -headless option.  moz_headless is only supported in Firefox 56+
 
-returns whether the browser is running in headless mode
-
-=head2 moz_accessibility_checks 
-
-returns the current accessibility (a11y) value
-
-=head2 moz_use_non_spec_compliant_pointer_origin
-
-returns a boolean value to indicate how the pointer origin for an action command will be calculated.
+=item * moz_use_non_spec_compliant_pointer_origin - a boolean value to indicate how the pointer origin for an action command will be calculated.
 
 With Firefox 59 the calculation will be based on the requirements by the WebDriver specification. This means that the pointer origin is no longer computed based on the top and left position of the referenced element, but on the in-view center point.
 
 To temporarily disable the WebDriver conformant behavior use 0 as value for this capability.
 
 Please note that this capability exists only temporarily, and that it will be removed once all Selenium bindings can handle the new behavior.
+
+=item * moz_webdriver_click - a boolean value to indicate which kind of interactability checks to run when performing a L<click|Firefox::Marionette#click> or L<sending keys|Firefox::Marionette#type> to an elements. For Firefoxen prior to version 58.0 some legacy code as imported from an older version of FirefoxDriver was in use.
+
+With Firefox 58 the interactability checks as required by the WebDriver specification are enabled by default. This means geckodriver will additionally check if an element is obscured by another when clicking, and if an element is focusable for sending keys.
+
+Because of this change in behaviour, we are aware that some extra errors could be returned. In most cases the test in question might have to be updated so it's conform with the new checks. But if the problem is located in geckodriver, then please raise an issue in the issue tracker.
+
+To temporarily disable the WebDriver conformant checks use 0 as value for this capability.
+
+Please note that this capability exists only temporarily, and that it will be removed once the interactability checks have been stabilized.
+
+=item * page_load_strategy - defines the page load strategy to use for the duration of the session. Setting a page load strategy will cause navigation to be "eager", waiting for the interactive document ready state; "normal" (the default), waiting for the complete ready state; or "none", which will return immediately after starting navigation. 
+
+=item * proxy - describes the L<proxy|Firefox::Marionette::Proxy> setup for the upcoming browser session.
+
+=item * strict_file_interactability - a boolean value to indicate if interactability checks will be applied to <input type=file>. Allowed values are 1 or 0.  Default is 0.
+
+=item * timeouts - describes the L<timeouts|Firefox::Marionette::Timeouts> imposed on certain session operations.
+
+=item * unhandled_prompt_behavior - defines what firefox should do on encountering a L<user prompt|https://html.spec.whatwg.org/#user-prompts>.  There are a range of L<allowed values|https://w3c.github.io/webdriver/#dfn-user-prompt-handler>, including "dismiss", "accept", "dismiss and notify", "accept and notify" and "ignore".
+
+=back
+
+This method returns a new L<capabilities|Firefox::Marionette::Capabilities> object.
+ 
+=head2 page_load_strategy 
+
+returns the page load strategy to use for the duration of the session. Setting a page load strategy will cause navigation to be "eager", waiting for the interactive document ready state; "normal" (the default), waiting for the complete ready state; or "none", which will return immediately after starting navigation. 
+
+=head2 platform_name 
+
+returns the operating system name. For example 'linux', 'darwin' or 'windows_nt'.
+
+=head2 proxy
+
+returns the current L<proxy|Firefox::Marionette::Proxy> object
+
+=head2 platform_version
+
+returns the operation system version. For example '4.14.11-300.fc27.x86_64', '17.3.0' or '10.0'
+
+=head2 rotatable
+
+does this version of L<firefox|https://firefox.com> have a rotatable screen such as Android Fennec.
+
+=head2 set_window_rect
+
+returns true if Firefox fully supports L<setWindowRect|https://w3c.github.io/webdriver/#dfn-window-dimensioning-positioning>, otherwise it returns false.
+
+=head2 strict_file_interactability
+
+returns the current value of L<strictFileInteractability|https://w3c.github.io/webdriver/#dfn-strict-file-interactability>
+
+=head2 timeouts
+
+returns the current L<timeouts|Firefox::Marionette::Timeouts> object
+
+=head2 unhandled_prompt_behavior
+
+returns the current value of L<unhandledPromptBehavior|https://w3c.github.io/webdriver/#dfn-user-prompt-handler>.  
 
 =head1 DIAGNOSTICS
 

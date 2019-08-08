@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Digest::SHA();
 use MIME::Base64();
-use Test::More tests => 385;
+use Test::More tests => 387;
 use Cwd();
 use Firefox::Marionette qw(:all);
 use Config;
@@ -24,7 +24,7 @@ sub out_of_time {
 		($package, $file, $line) = caller;
 	}
 	diag("Testing has been running for " . (time - $^T) . " seconds at $file line $line");
-	if ($ENV{FIREFOX_BINARY}) {
+	if ($ENV{RELEASE_TESTING}) {
 		return;
 	} elsif (time - $^T > $test_time_limit) {
 		return 1;
@@ -33,12 +33,22 @@ sub out_of_time {
 	}
 }
 
+my $launches = 0;
+
 my ($major_version, $minor_version, $patch_version); 
 sub start_firefox {
 	my ($require_visible, %parameters) = @_;
 	if ($ENV{FIREFOX_BINARY}) {
 		$parameters{firefox_binary} = $ENV{FIREFOX_BINARY};
 		diag("Overriding firefox binary to $parameters{firefox_binary}");
+	}
+	if ($ENV{FIREFOX_HOST}) {
+		$parameters{host} = $ENV{FIREFOX_HOST};
+		diag("Overriding host to '$parameters{host}'");
+		if ($launches % 2) {
+			diag("Overriding user to 'firefox'");
+			$parameters{user} = 'firefox';
+		}
 	}
 	if (defined $parameters{capabilities}) {
 		if ($major_version < 52) {
@@ -185,6 +195,9 @@ sub start_firefox {
 				diag("Failed to start a hidden firefox in $^O:$exception");
 			}
 		}
+	}
+	if (($firefox) && (!$skip_message)) {
+		$launches += 1;
 	}
 	return ($skip_message, $firefox);
 }
@@ -466,6 +479,13 @@ SKIP: {
 if ($major_version < 40) {
 	$profile->set_value('security.tls.version.max', 3); 
 }
+	$profile->set_value('browser.newtabpage.activity-stream.feeds.favicon', 'true'); 
+	$profile->set_value('browser.shell.shortcutFavicons', 'true'); 
+	$profile->set_value('browser.discovery.enabled', 'true'); 
+	$profile->set_value('browser.newtabpage.enabled', 'true'); 
+	$profile->set_value('browser.pagethumbnails.capturing_disabled', 'false', 0); 
+	$profile->set_value('distribution.fedora.bookmarksProcessed', 'false', 0); 
+	$profile->set_value('startup.homepage_welcome_url', 'false', 0); 
 
 SKIP: {
 	my $daemon = HTTP::Daemon->new(LocalAddr => 'localhost') || die "Failed to create HTTP::Daemon";
@@ -578,60 +598,65 @@ SKIP: {
 		if (!$capabilities->proxy()) {
 			skip("\$capabilities->proxy is not supported for " . $capabilities->browser_version(), 1);
 		} elsif ((exists $Config::Config{'d_fork'}) && (defined $Config::Config{'d_fork'}) && ($Config::Config{'d_fork'} eq 'define')) {
-			my @sig_nums  = split q[ ], $Config{sig_num};
-			my @sig_names = split q[ ], $Config{sig_name};
-			my %signals_by_name;
-			my $idx = 0;
-			foreach my $sig_name (@sig_names) {
-				$signals_by_name{$sig_name} = $sig_nums[$idx];
-				$idx += 1;
-			}
-			if (my $pid = fork) {
-				$firefox->go('http://wtf.example.org');
-				ok($firefox->html() =~ /success/smx, "Correctly accessed the Proxy");
-				diag($firefox->html());
-				while(kill $signals_by_name{TERM}, $pid) {
-					waitpid $pid, POSIX::WNOHANG();
-					sleep 1;
+			if ($ENV{RELEASE_TESTING}) {
+				my @sig_nums  = split q[ ], $Config{sig_num};
+				my @sig_names = split q[ ], $Config{sig_name};
+				my %signals_by_name;
+				my $idx = 0;
+				foreach my $sig_name (@sig_names) {
+					$signals_by_name{$sig_name} = $sig_nums[$idx];
+					$idx += 1;
 				}
-			} elsif (defined $pid) {
-				eval {
-					local $SIG{ALRM} = sub { die "alarm during proxy server\n" };
-					alarm 5;
-					$0 = "[Test HTTP Proxy for " . getppid . "]";
-					while (my $connection = $daemon->accept()) {
-						diag("Accepted connection");
-						if (my $child = fork) {
-						} elsif (defined $child) {
-							eval {
-								local $SIG{ALRM} = sub { die "alarm during proxy server accept\n" };
-								alarm 5;
-								while (my $request = $connection->get_request()) {
-									diag("Got request for " . $request->uri());
-									my $response = HTTP::Response->new(200, "OK", undef, "success");
-									$connection->send_response($response);
-								}
-								$connection->close;
-								$connection = undef;
-								exit 0;
-							} or do {
-								chomp $@;
-								diag("Caught exception in proxy server accept:$@");
-							};
-							exit 1;
-						} else {
-							diag("Failed to fork connection:$!");
-							die "Failed to fork:$!";
-						}
+				if (my $pid = fork) {
+					$firefox->go('http://wtf.example.org');
+					ok($firefox->html() =~ /success/smx, "Correctly accessed the Proxy");
+					diag($firefox->html());
+					while(kill $signals_by_name{TERM}, $pid) {
+						waitpid $pid, POSIX::WNOHANG();
+						sleep 1;
 					}
-				} or do {
-					chomp $@;
-					diag("Caught exception in proxy server:$@");
-				};
-				exit 1;
+				} elsif (defined $pid) {
+					eval {
+						local $SIG{ALRM} = sub { die "alarm during proxy server\n" };
+						alarm 5;
+						$0 = "[Test HTTP Proxy for " . getppid . "]";
+						while (my $connection = $daemon->accept()) {
+							diag("Accepted connection");
+							if (my $child = fork) {
+							} elsif (defined $child) {
+								eval {
+									local $SIG{ALRM} = sub { die "alarm during proxy server accept\n" };
+									alarm 5;
+									while (my $request = $connection->get_request()) {
+										diag("Got request for " . $request->uri());
+										my $response = HTTP::Response->new(200, "OK", undef, "success");
+										$connection->send_response($response);
+									}
+									$connection->close;
+									$connection = undef;
+									exit 0;
+								} or do {
+									chomp $@;
+									diag("Caught exception in proxy server accept:$@");
+								};
+								exit 1;
+							} else {
+								diag("Failed to fork connection:$!");
+								die "Failed to fork:$!";
+							}
+						}
+					} or do {
+						chomp $@;
+						diag("Caught exception in proxy server:$@");
+					};
+					exit 1;
+				} else {
+					diag("Failed to fork http proxy:$!");
+					die "Failed to fork:$!";
+				}
 			} else {
-				diag("Failed to fork http proxy:$!");
-				die "Failed to fork:$!";
+				skip("Skipping proxy forks except for RELEASE_TESTING=1", 1);
+				diag("Skipping proxy forks except for RELEASE_TESTING=1");
 			}
 		} else {
 			skip("No forking available for $^O", 1);
@@ -1777,14 +1802,30 @@ SKIP: {
 	$ENV{http_proxy} = 'https://localhost:' . $localPort;
 	$ENV{https_proxy} = 'https://proxy2.example.org:4343';
 	$ENV{ftp_proxy} = 'ftp://ftp2.example.org:2121';
-	($skip_message, $firefox) = start_firefox(1, visible => 1);
+	($skip_message, $firefox) = start_firefox(1, visible => 1, width => 800, height => 600);
 	if (!$skip_message) {
 		$at_least_one_success = 1;
 	}
 	if ($skip_message) {
-		skip($skip_message, 11);
+		skip($skip_message, 13);
 	}
 	ok($firefox, "Firefox has started in Marionette mode with visible set to 1");
+	my $window_rect;
+	eval {
+		$window_rect = $firefox->window_rect();
+	};
+	SKIP: {
+		if (($major_version < 50) && (!defined $window_rect)) {
+			skip("Firefox $major_version does not appear to support the \$firefox->window_rect() method", 2);
+		}
+		local $TODO = $^O eq 'linux' ? '' : "Initial width/height parameters not entirely stable in $^O";
+		ok($window_rect->width() == 800, "Window has a width of 800 (" . $window_rect->width() . ")");
+		ok($window_rect->height() == 600, "Window has a height of 600 (" . $window_rect->height() . ")");
+		if (($window_rect->width() == 800) && ($window_rect->height() == 600)) {
+		} else {
+			diag("Width/Height for $^O set to 800x600, but returned " . $window_rect->width() . "x" . $window_rect->height());
+		}
+	}
 	my $capabilities = $firefox->capabilities();
 	ok((ref $capabilities) eq 'Firefox::Marionette::Capabilities', "\$firefox->capabilities() returns a Firefox::Marionette::Capabilities object");
 	ok(!$capabilities->moz_headless(), "\$capabilities->moz_headless() is set to false");

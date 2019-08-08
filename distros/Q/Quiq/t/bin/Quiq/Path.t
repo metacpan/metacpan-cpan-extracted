@@ -148,6 +148,41 @@ sub test_read : Test(4) {
 
 # -----------------------------------------------------------------------------
 
+sub test_unindent : Test(3) {
+    my $self = shift;
+
+    my $p = Quiq::Path->new;
+
+    my $original = << '    __EOT__';
+
+          Dies ist der
+        erste Absatz.
+
+          Dies ist ein
+        zweiter Absatz.
+
+    __EOT__
+
+    # Einrückung entfernen
+
+    my $expected = Quiq::Unindent->hereDoc($original);
+    my $file = Quiq::TempFile->new($original);
+    $p->unindent($file);
+    my $data = $p->read($file);
+    $self->is($data,$expected,'Einrückung wurde entfernt');
+
+    # Ein wiederholter Aufruf ändert nichts an der Datei (auch nicht mtime)
+
+    $expected = $p->mtime($file);
+    sleep 1;
+    $self->isnt($expected,time,'Zeit ist vergangen');
+    $p->unindent($file);
+    my $mtime = $p->mtime($file);
+    $self->is($mtime,$expected,'Datei wurde nicht geändert');
+}
+
+# -----------------------------------------------------------------------------
+
 sub test_write : Test(3) {
     my $self = shift;
 

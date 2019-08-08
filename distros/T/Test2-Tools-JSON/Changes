@@ -1,5 +1,15 @@
 Revision history for Perl extension Test2-Tools-JSON
 
+0.05 2019-08-07T21:52:49Z
+
+    - fix broken tests again
+
+0.04 2019-08-07T10:01:59Z
+
+    - fix broken tests in new version of Test2 (fix #1)
+    - pass $seen from params
+    - add Test2::V0 deps
+
 0.03 2018-01-30T09:03:58Z
 
     - same behavior of JSON::decode_json

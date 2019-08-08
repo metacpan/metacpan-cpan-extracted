@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities::Query;
 use strict;
 use warnings;
 
-our $VERSION = '7.0'; # VERSION
+our $VERSION = '7.1'; # VERSION
 
 use CLI::Helpers qw(:output);
 use Clone qw(clone);
@@ -270,7 +270,7 @@ App::ElasticSearch::Utilities::Query - Object representing ES Queries
 
 =head1 VERSION
 
-version 7.0
+version 7.1
 
 =head1 ATTRIBUTES
 

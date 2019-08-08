@@ -72,6 +72,19 @@ METHODS
 
       a code ref that will be called whenever stdout/stderr is available
 
+    env
+
+      set environment variables.
+
+        Command::Runner->new(..., env => \%env)->run
+
+      is equivalent to
+
+        {
+          local %ENV = %env;
+          Command::Runner->new(...)->run;
+        }
+
  run
 
     Run command. It returns a hash reference, which contains:

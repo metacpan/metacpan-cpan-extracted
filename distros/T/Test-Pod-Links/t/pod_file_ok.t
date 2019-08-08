@@ -7,10 +7,10 @@ use warnings;
 use Test::Builder::Tester;
 use Test::Fatal;
 use Test::More 0.88;
-use Test::TempDir::Tiny;
 
 use Test::Pod::Links;
 
+use File::Temp;
 use FindBin qw($RealBin);
 use lib "$RealBin/lib";
 
@@ -27,10 +27,10 @@ sub main {
         #
         like( exception { $obj->pod_file_ok() },      qr{usage: pod_file_ok[(]FILE[)]}, 'pod_file_ok() throws an exception with too few arguments' );
         like( exception { $obj->pod_file_ok(undef) }, qr{usage: pod_file_ok[(]FILE[)]}, '... undef for a file name' );
-        like( exception { $obj->pod_file_ok( 'file', 'name', 'abc' ) }, qr{usage: pod_file_ok[(]FILE[)]}, '... too many arguments' );
+        like( exception { $obj->pod_file_ok( 'file', 'name' ) }, qr{usage: pod_file_ok[(]FILE[)]}, '... too many arguments' );
 
         #
-        my $tmp               = tempdir();
+        my $tmp               = File::Temp->newdir;
         my $non_existing_file = "$tmp/no_such_file";
 
         #
@@ -47,7 +47,7 @@ sub main {
     {
         my $file = 'corpus/malformed.pod';
 
-        my $ua = Local::HTTP::Tiny::Mock->new();
+        my $ua  = Local::HTTP::Tiny::Mock->new();
         my $obj = $class->new( ua => $ua );
 
         test_out("not ok 1 - Parse Pod ($file)");
@@ -62,7 +62,7 @@ sub main {
     {
         my $file = 'corpus/0_links.pod';
 
-        my $ua = Local::HTTP::Tiny::Mock->new();
+        my $ua  = Local::HTTP::Tiny::Mock->new();
         my $obj = $class->new( ua => $ua );
 
         test_out("ok 1 - Parse Pod ($file)");
@@ -76,7 +76,7 @@ sub main {
     {
         my $file = 'corpus/1_link_non_web.pod';
 
-        my $ua = Local::HTTP::Tiny::Mock->new();
+        my $ua  = Local::HTTP::Tiny::Mock->new();
         my $obj = $class->new( ua => $ua );
 
         test_out("ok 1 - Parse Pod ($file)");
@@ -90,7 +90,7 @@ sub main {
     {
         my $file = 'corpus/1_link_web.pod';
 
-        my $ua = Local::HTTP::Tiny::Mock->new();
+        my $ua  = Local::HTTP::Tiny::Mock->new();
         my $obj = $class->new( ua => $ua );
 
         test_out("ok 1 - Parse Pod ($file)");
@@ -105,7 +105,7 @@ sub main {
     {
         my $file = 'corpus/7_links_4_web.pod';
 
-        my $ua = Local::HTTP::Tiny::Mock->new();
+        my $ua  = Local::HTTP::Tiny::Mock->new();
         my $obj = $class->new( ua => $ua );
 
         test_out("ok 1 - Parse Pod ($file)");
@@ -134,7 +134,7 @@ sub main {
     {
         my $file = 'corpus/3_links_1_dead.pod';
 
-        my $ua = Local::HTTP::Tiny::Mock->new();
+        my $ua  = Local::HTTP::Tiny::Mock->new();
         my $obj = $class->new( ua => $ua );
 
         test_out("ok 1 - Parse Pod ($file)");
@@ -155,7 +155,7 @@ sub main {
     {
         my $file = 'corpus/5_links_1_dead.pod';
 
-        my $ua = Local::HTTP::Tiny::Mock->new();
+        my $ua  = Local::HTTP::Tiny::Mock->new();
         my $obj = $class->new( ua => $ua );
 
         test_out("ok 1 - Parse Pod ($file)");
@@ -281,7 +281,7 @@ sub main {
     {
         my $file = 'corpus/hello';
 
-        my $ua = Local::HTTP::Tiny::Mock->new();
+        my $ua  = Local::HTTP::Tiny::Mock->new();
         my $obj = $class->new( ua => $ua );
 
         test_out("ok 1 - Parse Pod ($file)");

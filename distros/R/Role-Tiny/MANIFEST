@@ -23,7 +23,6 @@ t/role-tiny-composition.t
 t/role-tiny-with.t
 t/role-tiny.t
 t/role-with-inheritance.t
-t/stub.t
 t/subclass.t
 xt/around-does.t
 xt/compose-modifiers.t

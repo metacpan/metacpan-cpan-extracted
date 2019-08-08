@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Perinci/Examples/Completion/fruits
-# and generated automatically using Perinci::CmdLine::Gen version 0.487
+# and generated automatically using Perinci::CmdLine::Gen version 0.488
 
-our $DATE = '2018-12-09'; # DATE
+our $DATE = '2019-07-06'; # DATE
 our $DIST = 'Perinci-Examples-Bin-Any-Completion'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -35,13 +35,13 @@ peri-eg-complete-fruits-any - peri-eg-complete-fruits-any
 
 =head1 VERSION
 
-This document describes version 0.003 of peri-eg-complete-fruits-any (from Perl distribution Perinci-Examples-Bin-Any-Completion), released on 2018-12-09.
+This document describes version 0.004 of peri-eg-complete-fruits-any (from Perl distribution Perinci-Examples-Bin-Any-Completion), released on 2019-07-06.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % peri-eg-complete-fruits-any [options] [fruits] ...
+ % peri-eg-complete-fruits-any [options] [fruits]
 
 =head1 DESCRIPTION
 
@@ -54,6 +54,14 @@ C<*> marks required options.
 =head2 Main options
 
 =over
+
+=item B<--category>=I<s>
+
+This argument contains valid values and their summaries in the schema.
+
+Valid values:
+
+ ["citrus","tropical","melon","stone"]
 
 =item B<--fruit>=I<s@>
 
@@ -198,6 +206,7 @@ Finally, you can filter a section by environment variable using the filter C<env
 
 List of available configuration parameters:
 
+ category (see --category)
  format (see --format)
  fruits (see --fruit)
  naked_res (see --naked-res)
@@ -238,7 +247,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

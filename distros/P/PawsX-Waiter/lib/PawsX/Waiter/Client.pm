@@ -3,17 +3,19 @@ package PawsX::Waiter::Client;
 use v5.20;
 use Moose;
 
-use feature qw(postderef);
+use feature qw(postderef say);
 no warnings qw(experimental::postderef);
 
-use PawsX::Waiter::Exception;
 use Jmespath;
 use Data::Structure::Util qw(unbless);
 use Try::Tiny;
 
+use PawsX::Waiter::Exception;
+
 has client => (
     is       => 'ro',
-    required => 1
+    required => 1,
+    weak_ref => 1,
 );
 
 has delay => (
@@ -38,6 +40,16 @@ has acceptors => (
     is       => 'ro',
     isa      => 'ArrayRef[HashRef]',
     required => 1,
+);
+
+has 'beforeWait' => (
+    traits    => ['Code'],
+    is        => 'rw',
+    isa       => 'CodeRef',
+    predicate => 'has_beforeWait',
+    handles   => {
+        _beforeWait => 'execute_method',
+    },
 );
 
 sub operation_request {
@@ -74,16 +86,13 @@ sub wait {
     my ( $self, $options ) = @_;
 
     my $current_state = 'waiting';
-    my $sleep_amount  = $self->delay;
-    my $max_attempts  = $self->maxAttempts;
     my $num_attempts  = 0;
 
     while (1) {
+   
         my $response = $self->operation_request($options);
         $num_attempts++;
-
-        print STDERR "Waiter attempts left:"
-          . ( $max_attempts - $num_attempts );
+      
       ACCEPTOR:
         foreach my $acceptor ( $self->acceptors->@* ) {
             if ( my $status = $self->matcher( $acceptor, $response ) ) {
@@ -95,20 +104,20 @@ sub wait {
         if ( $current_state eq 'success' ) { return; }
         if ( $current_state eq 'failure' ) {
             PawsX::Waiter::Exception->throw(
-                name          => $current_state,
-                reason        => 'Waiter encountered a terminal failure state',
+                message       => 'Waiter encountered a terminal failure state',
                 last_response => $response,
             );
         }
-        if ( $num_attempts >= $max_attempts ) {
+        if ( $num_attempts >= $self->maxAttempts ) {
             PawsX::Waiter::Exception::TimeOut->throw(
-                name          => $current_state,
-                reason        => 'Max attempts exceeded',
+                message       => 'Max attempts exceeded',
                 last_response => $response,
             );
         }
 
-        sleep($sleep_amount);
+        $self->_beforeWait($num_attempts, $response) if $self->has_beforeWait;
+
+        sleep( $self->delay );
     }
 }
 

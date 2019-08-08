@@ -2,7 +2,7 @@ package Web::Request::Role::Response;
 
 # ABSTRACT: Generate various HTTP responses from a Web::Request
 
-our $VERSION = '1.003';
+our $VERSION = '1.005';
 
 use 5.010;
 use Moose::Role;
@@ -80,7 +80,7 @@ Web::Request::Role::Response - Generate various HTTP responses from a Web::Reque
 
 =head1 VERSION
 
-version 1.003
+version 1.005
 
 =head1 SYNOPSIS
 
@@ -154,13 +154,13 @@ the data in the correct encoding and a meaningful filename.
 
   $req->no_content_response
 
-Returns C<2014 No Content>.
+Returns C<204 No Content>.
 
 =head3 transparent_gif_response
 
   $req->transparent_gif_response
 
-Returns a transparent 1x1 pixle GIF. Useful as the response of a
+Returns a transparent 1x1 pixel GIF. Useful as the response of a
 tracking URL.
 
 =head1 THANKS
@@ -181,7 +181,7 @@ Thomas Klausner <domm@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Thomas Klausner.
+This software is copyright (c) 2017 - 2019 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

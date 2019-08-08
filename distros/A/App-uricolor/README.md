@@ -4,12 +4,13 @@ uricolor - Colorize URIs with ANSI colors.
 SYNOPSIS
 --------
 
-    $ uricolor [-hVds] [file ...]
+    $ uricolor [-hVds] [-c color] [file ...]
 
     -h, --help      help
     -V, --version   version
     -d              debug
     -s              schemeless
+    -c              color (default : underline blue)
 
 DESCRIPTION
 -----------

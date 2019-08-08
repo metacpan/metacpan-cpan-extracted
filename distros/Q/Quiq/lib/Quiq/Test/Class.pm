@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.152';
+our $VERSION = '1.153';
 
 use Test::Builder ();
 use Quiq::Option;
@@ -826,13 +826,40 @@ inTest()
 sub in {
     my ($self,$got,$expectedA,$text) = @_;
 
-    my $ok = Quiq::Assert->isEnumValue($got,$expectedA,-sloppy=>1);
+    my $bool = Quiq::Assert->isEnumValue($got,$expectedA,-sloppy=>1);
+
+    # Um Warnungen à la "does not map to ascii" zu verhindern
+    $text = Quiq::Converter->umlautToAscii($text);
+
+    # MEMO: So implementiert man einen speziellen Test
+
+    my $tb = Test::More->builder; # Test::Builder-Objekt besorgen
+    $tb->ok($bool,$text);         # Testergebnis protokollieren
+    if (!$bool) {                 # Im Fehlerfall Diagnose protokollieren
+        my @arr = @$expectedA;
+        my $last = pop @arr;
+        my $expected = join ', ',map {"'$_'"} @arr;
+        if ($expected) {
+            $expected .= ' or ';
+        }
+        $expected .= "'$last'";
+        # Konform zu Test::Builder krautig formatiert
+        $tb->diag("    got: '$got'\n    expected: $expected");
+    }
+
+    return $bool;                 # Testergebnis zurückliefern
+}
+
+sub in_orig {
+    my ($self,$got,$expectedA,$text) = @_;
+
+    my $bool = Quiq::Assert->isEnumValue($got,$expectedA,-sloppy=>1);
 
     # Um Warnungen à la "does not map to ascii" zu verhindern
     $text = Quiq::Converter->umlautToAscii($text);
 
     local $Test::Builder::Level = $Test::Builder::Level + 1;
-    return Test::More::ok($ok,$text);    
+    return Test::More::ok($bool,$text);    
 }
 
 {
@@ -1171,7 +1198,7 @@ sub MODIFY_CODE_ATTRIBUTES {
 
 =head1 VERSION
 
-1.152
+1.153
 
 =head1 AUTHOR
 

@@ -1,0 +1,48 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.83.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA256 0d2ca49a947736c6933058b806b7c519685d532fb920e764adc33324d8ab7162 Changes
+SHA256 c092cb12d050418bd18c1c9d69b56d2ae9c2f7a74adfcd11d6c385dcce625d40 MANIFEST
+SHA256 cfef50943c2887f7c869c0fd73d8f412190fd3828ea253bf4135d12bd18afa76 META.json
+SHA256 9b3ce9e52cd615cdd2dbb87a0dfd8aef4c0dcf2618908d348c559148a29385c4 META.yml
+SHA256 424136b4899e6fa379e85adfee96c5fd8b9d702b23920870757970d6c971ff07 Makefile.PL
+SHA256 335a28179401a95894381c16218199f4503b1dec9d000f06d7dfe81006b1f755 README
+SHA256 35b005f2af82ca94c3931f3ec2839eca9e367ebbfb308c6cdddcbf930dc7512e examples/pds_canonize
+SHA256 9a4c60ae85fa949e190ae56b85b7f95df7e1a4999544f43b2a25cf68bab6c2b9 examples/pds_multiply
+SHA256 4574154380cadf71bfdd9c182611242d0683cd74942aa0f1b36d8fce46ffee8e examples/pds_planes
+SHA256 973533be214ea08fcd0139b69e2a5f215362b3f8c53a726e71ef566327f6a6fc examples/pds_translate
+SHA256 aea1c6c2a2d8dd0eb8ca5c0e3bf1bc98da7eadc52b9fe7e221eae7cd7b8da0c2 examples/show_databases
+SHA256 cbc588832b531956ee41b78b5e28537edc65fb590ea8d058163700db63530b38 lib/Math/DifferenceSet/Planar.pm
+SHA256 e5f91f7c5db9eb6ff30f1938ea67a0be910cd482aeb9346b8576dd10840be377 lib/Math/DifferenceSet/Planar/Data.pm
+SHA256 f4a122bfab5de6d832e9c7bfba2a942571e0bc2cfe090e52eda9bf294731cb2f lib/Math/DifferenceSet/Planar/Schema.pm
+SHA256 0ffeb6878e1d4478b8e0c9a94edbf4164792eac0ba73eb00ad4e7db878e7fbc4 lib/Math/DifferenceSet/Planar/Schema/Result/DifferenceSet.pm
+SHA256 ac1d941162a17e8f73ea4be9c7689865eb4b773b1559045d4b906a6df0bc85ab share/pds.db
+SHA256 32ea60ca7de05e40eafb484f168c7b614de690cfb431b4e00e25ad7323c012cf t/01_basics.t
+SHA256 f8b752cd3c30a9cc9e05ce9760341692c056d519e2a7ae85495b4da7b1df9cd6 t/90_pod.t
+SHA256 9ca444808e7f1ea9471ccb4fe50fc0b225bab52ecedc543fb0f4fcfb9b72e911 t/91_pod_cover_cp.t
+SHA256 1a6793eced606ba260add45bc18c53c7e31d835694ce1298dd3dd3693ed7ac85 t/99_signature.t
+SHA256 906dd91cfeb5c6b405ef9b789dd275b8f6fc25d618b2eb6330634900dc7703db t/lib/Test/MyUtils.pm
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEAvNunIEMc95qZ1IlYfdtm5E/Jw0FAl1JYd0ACgkQYfdtm5E/
+Jw1Zkwf9H0gUu+y38oFufazNf7tKdKY7NQrmIE8XpUXEjdhuUwLMUlH5uMg3Yi2p
+c3v8VeFfONTRBQVjH/r5AOnlsLafRSkeA0k7ddpGEp6ZxSnHoeu4L1ONa/uXPjWG
+eRFQBWhViRuBfDwctAjbKMegCYT+wYZ1mF4hk3cxeTruTXcCPCNYhrSVoDelCfHK
+E0IvhWY/FXY59Dji9XhPrU+vt0gjg9NAdhTF58U99GdASdIwexz+PYVVqDquZ650
+G1y9MnzKotQLRQEcunxiQBGolMxp2NSl7vFDaQt/0uyhnb8N7zxiOMBh0te0sIWK
+vR0ppe9GlfaZwd0c0oxx0eES9xe17w==
+=ewbm
+-----END PGP SIGNATURE-----

@@ -1,0 +1,190 @@
+=head1 NAME
+
+Export::XS - Replacement for Exporter.pm + const.pm in XS, with C++ API.
+
+=head1 SYNOPSIS
+
+=head2 Exporting functions
+
+    package MyModule;
+    use Export::XS::Auto;
+    
+    sub mysub { ... }
+    sub mysub2 { ... }
+    
+    1;
+    
+    package Somewhere;
+    use MyModule qw/mysub mysub2/;
+    
+    mysub();
+    
+=head2 Creating and using constants (without export)
+
+    package MyModule;
+    
+    use Export::XS
+        CONST1 => 1,
+        CONST2 => 'string';
+    
+    say CONST1;
+    say CONST2;
+
+=head2 Creating and using constants with export
+
+    package MyModule;
+    
+    use Export::XS::Auto {
+        CONST1 => 1,
+        CONST2 => 'string',
+    };
+    
+    say CONST1;
+    say CONST2;
+    
+    package Somewhere;
+    
+    use MyModule;
+    
+    say CONST1;
+    say CONST2;
+    
+=head1 C SYNOPSIS
+
+    #include <xs/export.h>
+    using namespace xs::exp;
+    
+    // one-by-one
+    create_constant(stash, "STATUS_OFF",       0);
+    create_constant(stash, "STATUS_ACTIVE",    1);
+    create_constant(stash, "STATUS_SUSPENDED", 2);
+    create_constant(stash, "STATUS_PENDING",   3);
+    create_constant(stash, "DEFAULT_NAME", "john");
+    create_constant(stash, "CONST_NAME", value_sv);
+    autoexport(stash);
+    
+    // bulk 
+    create_constants(stash, {
+        {"STATUS_OFF",       0},
+        {"STATUS_ACTIVE",    1},
+        {"STATUS_SUSPENDED", 2},
+        {"STATUS_PENDING",   3},
+        {"DEFAULT_NAME", "john"}
+    });
+    
+    // exporting subs
+    export_sub(from_stash, to_stash, "myfunc");
+    
+    // export all constants
+    export_constants(from, to);
+
+=head1 DESCRIPTION
+
+It's very fast not only in runtime but at compile time as well. That means you can create and export/import a
+lot of constants/functions without slowing down the startup.
+
+You can create constants by saying
+
+    use Export::XS {CONST_NAME1 => VALUE1, ...};
+    use Export::XS CONST_NAME1 => VALUE1, ... ;
+
+If you want your class to able to export constants or functions, use C<Export::XS::Auto> instead of C<Export::XS>.
+
+Exports specified constants and functions to caller's package.
+
+    use MyModule qw/subs list/;
+
+Exports nothing
+
+    use MyModule();
+    
+
+Exports all constants only (no functions)
+
+    use MyModule;
+
+Exports functions sub1 and sub2 and all constants
+
+    use MyModule qw/sub1 sub2 :const/;
+
+
+If Export::XS discovers name collision while creating or exporting functions or constants it raises an exception.
+If you specify wrong sub or const name in import list an exception will also be raisen.
+
+=head1 C FUNCTIONS
+
+API is thread-safe. C<Sv>, C<Stash>, and so on is SVAPI classes (Perl C++ API), see L<XS::Framework>.
+C<string_view> is a C<panda::string_view> which is implementation of C++17's string_view, see L<CPP::panda::lib>.
+
+    struct Constant {
+        Constant (string_view name, const Sv& val);
+        Constant (string_view name, string_view val);
+        Constant (string_view name, int64_t val);
+    };
+
+=head4 void create_constant (Stash stash, string_view name, const Sv& value)
+
+=head4 void create_constant (Stash stash, string_view name, string_view value)
+
+=head4 void create_constant (Stash stash, string_view name, int64_t value)
+
+Creates constant with name C<name> and value C<value> in package C<stash>.
+Croaks if package already has sub/constant with that name.
+
+=head4 void create_constant (Stash stash, const Constant& constant)
+
+Creates constant with name C<constant.name> and value <constant.value> in C<stash>. 
+
+=head4 void create_constants (Stash stash, const std::initializer_list<Constant>& constants)
+
+Creates a constant for each element in C<constants>.
+
+=head4 void create_constants (Stash stash, const Hash& constants)
+
+Creates a constant for each key/value pair in C<constants>.
+
+=head4 void create_constants (Stash stash, SV*const* list, size_t items)
+
+Creates a constant for each key/value pair in array C<list>.
+It means that list[0] is a key, list[1] is a value, list[2] is a key, etc...
+Array should not contain empty slots and empty keys or it will croak.
+If elements count is odd, last element is ignored. You must pass the size of C<list> in C<items>.
+
+=head4 void autoexport (Stash stash)
+
+Makes C<stash> autoexport its constants when someone says
+
+    use ThatClass; # ThatClass is stash.name()
+
+=head4 void export_sub (const Stash& from, Stash to, string_view name)
+
+Exports sub/constant with name C<name> from package C<from> to package <to>.
+
+=head4 void export_constants (const Stash& from, Stash to)
+
+Exports all constants from package C<from> to package <to>.
+
+=head4 void register_export (const Stash& stash, string_view name)
+
+Forces an export of a function with specified name by default (along with constants), i.e. when user says
+
+    use SomeClass;
+
+=head4 Array constants_list (const Stash& stash)
+
+Returns the list of all constants defined in package C<stash> as a perl array.
+
+=head1 PERFOMANCE
+
+Export::XS is up to 10x faster than const.pm and Exporter.pm at compile-time.
+The runtime perfomance is the same as it doesn't depend on this module.
+
+=head1 AUTHOR
+
+Pronin Oleg <syber@cpan.org>, Crazy Panda LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

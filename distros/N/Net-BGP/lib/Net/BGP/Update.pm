@@ -14,7 +14,7 @@ use vars qw(
 use Net::BGP::NLRI qw( :origin );
 
 @ISA     = qw( Exporter Net::BGP::NLRI );
-$VERSION = '0.16';
+$VERSION = '0.17';
 
 ## Module Imports ##
 
@@ -838,7 +838,7 @@ sub _encode_aggregator
             inet_aton($this->{_aggregator}->[1]);
 
         $ret = $this->_encode_attr(BGP_PATH_ATTR_AGGREGATOR, $aggr);
-    } elsif ($aggr <= 65535) {
+    } elsif ($this->{_aggregator} <= 65535) {
         $aggr = pack('n', $this->{_aggregator}->[0]) .
             inet_aton($this->{_aggregator}->[1]);
 
@@ -1083,7 +1083,7 @@ B<Net::BGP::Notification>, B<Net::BGP::NLRI>
 
 =head1 AUTHOR
 
-Stephen J. Scheck <code@neurosphere.com>
+Stephen J. Scheck <sscheck@cpan.org>
 
 =cut
 

@@ -93,4 +93,4 @@ done_testing;
 
 1;
 
-# ex: set textwidth=72 :
+# ex: set filetype=perl textwidth=72 autoindent :

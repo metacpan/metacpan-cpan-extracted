@@ -8,16 +8,7 @@ use strict; use warnings;
 
 #########################
 
-# change 'tests => 1' to 'tests => last_test_to_print';
-
-#########################
-
-
-# Insert your test code below, the Test::More module is use()ed here so read
-# its man page ( perldoc Test::More ) for help writing this test script.
-
-
-use Test::More tests => 18;
+use Test::More;
 
 use_ok('Types::Core');
 use Types::Core;
@@ -53,21 +44,42 @@ ok(blessed $a, "blessed a test");
 
 my $h={one=>1, two=>2, three=>3};
 
-ok((EhV $h, two), "EhV test existing->true?");
+my $v;
+ok($v=(EhV ($h, two)), "EhV test existing->true?");
+ok($v==2, "EhV test, returns value of two?");
 
 ok(! (EhV $h, four), "EhV test not exist(false)");
 
 ok(! exists $h->{four}, "EhV testing last false didn't autovivify");
 
 #test 15:
-ok( ! (EhV $h, undef), "EhV testing undef keyname(isfalse)");
+ok( ! (EhV($h, undef)), "EhV testing undef keyname(isfalse)");
 
-ok( !defined( EhV $h, undef), "EhV testing undef is !defined");
+ok( !defined( EhV ($h, undef)), "EhV testing undef is !defined");
 
 my $h2;
-ok (!defined (EhV $h2, two), "EhV test w/undef ref is !defined?");
+ok (!defined (EhV ($h2, two)), "EhV test w/undef ref is !defined?");
 
-ok(3 == (EhV $h, three), "Ehv test that true = val of key");
+ok(3 == (EhV ($h, three)), "EhV test that true = val of key");
 
+## same tests with ErV
 
+ok($v=(ErV ($h, two)), "ErV test existing->true?");
+ok($v==2, "ErV test, returns value of two?");
+
+ok(! (ErV ($h, four)), "ErV test not exist(false)");
+
+ok(! exists $h->{four}, "ErV testing last false didn't autovivify");
+
+#test 15:
+ok( ! (ErV ($h, undef)), "ErV testing undef keyname(isfalse)");
+
+ok( !defined( ErV ($h, undef)), "ErV testing undef is !defined");
+
+#my $h2;
+ok (!defined (ErV ($h2, two)), "ErV test w/undef ref is !defined?");
+
+ok(3 == (ErV ($h, three)), "ErV test that true = val of key");
+
+done_testing();
 

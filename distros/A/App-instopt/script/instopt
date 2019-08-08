@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-06-06'; # DATE
-our $VERSION = '0.009'; # VERSION
+our $DATE = '2019-08-07'; # DATE
+our $VERSION = '0.010'; # VERSION
 
 use 5.010;
 use strict;
@@ -12,6 +12,16 @@ use Perinci::CmdLine::Any;
 use Perinci::CmdLineX::CommonOptions::SelfUpgrade;
 
 my $prefix = "/App/instopt/";
+
+$Perinci::CmdLineX::CommonOptions::SelfUpgrade::_list_modules = sub {
+    require PERLANCAR::Module::List;
+    my @modules = ('App::instopt');
+    my $mods = PERLANCAR::Module::List::list_modules(
+        'Software::Catalog::SW::', {list_modules=>1, recurse=>1});
+    push @modules, $_ for sort keys %$mods;
+    #log_debug "Modules to upgrade: %s", \@modules;
+    @modules;
+};
 
 my $cli = Perinci::CmdLine::Any->new(
     url => $prefix,
@@ -48,7 +58,7 @@ instopt - Download and install software
 
 =head1 VERSION
 
-This document describes version 0.009 of instopt (from Perl distribution App-instopt), released on 2019-06-06.
+This document describes version 0.010 of instopt (from Perl distribution App-instopt), released on 2019-08-07.
 
 =head1 SYNOPSIS
 
@@ -255,7 +265,7 @@ C<*> marks required options.
 
 =over
 
-=item B<--config-path>=I<filename>, B<-c>
+=item B<--config-path>=I<s>, B<-c>
 
 Set path to configuration file.
 

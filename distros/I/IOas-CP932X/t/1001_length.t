@@ -24,8 +24,8 @@ use vars qw(@test);
     sub { $_='ABCD';       IOas::CP932X::length($_) == 4  },
     sub { $_='ｱｲｳｴｵ';      IOas::CP932X::length($_) == 5  },
     sub { $_='あいうえお'; IOas::CP932X::length($_) == 10 },
-    sub { $_='彁';         IOas::CP932X::length($_) == 4  },
-    sub { $_='彁彁';       IOas::CP932X::length($_) == 8  },
+    sub {1},
+    sub {1},
     sub {1},
 # 11
     sub { $_='';           IOas::CP932X::length() == 0    },
@@ -35,8 +35,19 @@ use vars qw(@test);
     sub { $_='ABCD';       IOas::CP932X::length() == 4    },
     sub { $_='ｱｲｳｴｵ';      IOas::CP932X::length() == 5    },
     sub { $_='あいうえお'; IOas::CP932X::length() == 10   },
-    sub { $_='彁';         IOas::CP932X::length() == 4    },
-    sub { $_='彁彁';       IOas::CP932X::length() == 8    },
+    sub {1},
+    sub {1},
+    sub {1},
+# 21
+    sub { ('CP932X' eq ('CP'.'932'.'X')) == do { $_='彁';   IOas::CP932X::length($_) == 4} },
+    sub { ('CP932X' eq ('CP'.'932'.'X')) == do { $_='彁彁'; IOas::CP932X::length($_) == 8} },
+    sub { ('CP932X' eq ('CP'.'932'.'X')) == do { $_='彁';   IOas::CP932X::length()   == 4} },
+    sub { ('CP932X' eq ('CP'.'932'.'X')) == do { $_='彁彁'; IOas::CP932X::length()   == 8} },
+    sub {1},
+    sub {1},
+    sub {1},
+    sub {1},
+    sub {1},
     sub {1},
 #
 );

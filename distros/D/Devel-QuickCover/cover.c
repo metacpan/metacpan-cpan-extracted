@@ -143,8 +143,18 @@ void cover_dump(CoverList* cover, FILE* fp) {
   CoverNode* node = 0;
   SubCoverNode* sub_node = 0;
   int ncount = 0, i = 0, scount = 0;
+  const char *env_filter;
+  REGEXP *include = NULL, *exclude = NULL;
 
   assert(cover);
+
+  if ((env_filter = getenv("DEVEL_QUICKCOVER_INCLUDE"))) {
+    include = pregcomp(newSVpvn(env_filter, strlen(env_filter)), 0);
+  }
+
+  if ((env_filter = getenv("DEVEL_QUICKCOVER_EXCLUDE"))) {
+    exclude = pregcomp(newSVpvn(env_filter, strlen(env_filter)), 0);
+  }
 
   /*
    * We output the cover data as elements in a JSON hash
@@ -157,6 +167,21 @@ void cover_dump(CoverList* cover, FILE* fp) {
     node = cover->list[i];
     if (!node || !node->bcnt) {
       continue;
+    }
+
+    if (include || exclude) {
+      STRLEN len = strlen(node->file);
+      SV *sv = newSVpvn(node->file, len);
+
+      /* If we have an include filter and the file DOESN'T match, skip it */
+      if (include && !pregexec(include, node->file, node->file + len, node->file, 0, sv, 0)) {
+        continue;
+      }
+
+      /* If we have an exclude filter and the file DOES match, skip it */
+      if (exclude && pregexec(exclude, node->file, node->file + len, node->file, 0, sv, 0)) {
+        continue;
+      }
     }
 
     if (ncount++) {

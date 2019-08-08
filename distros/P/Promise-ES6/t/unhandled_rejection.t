@@ -33,15 +33,15 @@ my @tests = (
             \@warnings,
             [],
             'don’t warn() if there is a rejection handler',
-        );
+        ) or diag explain \@warnings;
     },
     sub {
         Promise::ES6->new( sub { my ($res, $rej) = @_; $rej->(123) } );
 
         cmp_deeply(
             \@warnings,
-            [ re( qr<123> ) ],
-            'warn() as expected when constructor callback rejects',
+            [],
+            'do NOT warn() when constructor callback rejects “peacefully”',
         );
     },
     sub {
@@ -57,9 +57,7 @@ my @tests = (
     },
 
     sub {
-        my $p = Promise::ES6->new(
-            sub { my ($res, $rej) = @_; $rej->(123) },
-        );
+        my $p = Promise::ES6->new( sub { die 123 } );
 
         $p->catch( sub { 234 } )->then( sub { die 345 } );
 

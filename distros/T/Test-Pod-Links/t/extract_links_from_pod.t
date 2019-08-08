@@ -73,7 +73,7 @@ sub main {
 
         like( exception { $obj->_extract_links_from_pod(); }, qr{usage: _extract_links_from_pod[(]\[ elementname, \\[%]attributes, [.][.][.]subnodes[.][.][.] \][)]}, '_extract_links_from_pod throws an exception if called with to few arguments' );
         like( exception { $obj->_extract_links_from_pod( 1, 2 ); }, qr{usage: _extract_links_from_pod[(]\[ elementname, \\[%]attributes, [.][.][.]subnodes[.][.][.] \][)]}, '_extract_links_from_pod throws an exception if called with to many arguments' );
-        like( exception { $obj->_extract_links_from_pod(1); }, qr{usage: _extract_links_from_pod[(]\[ elementname, \\[%]attributes, [.][.][.]subnodes[.][.][.] \][)]}, '_extract_links_from_pod throws an exception if called with incorrect arguments' );
+        like( exception { $obj->_extract_links_from_pod(1); },     qr{usage: _extract_links_from_pod[(]\[ elementname, \\[%]attributes, [.][.][.]subnodes[.][.][.] \][)]}, '_extract_links_from_pod throws an exception if called with incorrect arguments' );
         like( exception { $obj->_extract_links_from_pod( [1] ); }, qr{usage: _extract_links_from_pod[(]\[ elementname, \\[%]attributes, [.][.][.]subnodes[.][.][.] \][)]}, '_extract_links_from_pod throws an exception if called with incorrect arguments' );
     }
 

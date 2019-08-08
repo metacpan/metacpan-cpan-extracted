@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/akiym/Test2-Tool-Condition.svg?branch=master)](https://travis-ci.org/akiym/Test2-Tool-Condition)
+[![Build Status](https://travis-ci.org/akiym/Test2-Tools-Condition.svg?branch=master)](https://travis-ci.org/akiym/Test2-Tools-Condition)
 # NAME
 
 Test2::Tools::Condition - Conditional block with Test2

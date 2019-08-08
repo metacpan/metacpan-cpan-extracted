@@ -54,7 +54,7 @@ DESCRIPTION
         requires two predicates, `deps:test-requirement` predicate, whose
         object contains the class name of the implementation of the tests; and
         `nfo:definesFunction` whose object is a string which matches the
-        actual function name withing that class.
+        actual function name within that class.
 
     `test:purpose`
         The object of this predicate provides a literal description of the
@@ -63,6 +63,23 @@ DESCRIPTION
     `test:params`
         The object of this predicate links to the parameters, which may have
         many different shapes. See below for examples.
+
+  PARAMETERIZATION
+    This module seeks to parameterize the tests, and does so using mostly the
+    `test:params` predicate above. This is passed on as a hashref to the test
+    scripts.
+
+    There are two main ways currently implemented, one creates key-value
+    pairs, and uses predicates and objects for that respectively, in
+    vocabularies chosen by the test writer. The other main way is create lists
+    of HTTP requests and responses.
+
+    Additionally, a special parameter `-special` is passed on for internal
+    framework use. The leading dash is not allowed as the start character of a
+    local name, and therefore chosen to avoid conflicts with other parameters.
+
+    The literal given in `test:purpose` above is passed on as with the
+    `description` key in this hashref.
 
   RDF EXAMPLE
     The below example starts with prefix declarations. Since this is a
@@ -78,7 +95,7 @@ DESCRIPTION
     The `test:params` predicate is used to link the parameters that will be
     sent as a hashref into the function. The <test:purpose> predicate is
     required to exist outside of the parameters, but will be included as a
-    parameter as well, named `description`.
+    parameter as well, named `description` in the `-special` hashref.
 
     There are two mechanisms for passing parameters to the test scripts, one
     is simply to pass arbitrary key-value pairs, the other is to pass lists of
@@ -94,29 +111,31 @@ DESCRIPTION
 
      @prefix test: <http://ontologi.es/doap-tests#> .
      @prefix deps: <http://ontologi.es/doap-deps#>.
+     @prefix dc:   <http://purl.org/dc/terms/> .
      @prefix my:   <http://example.org/my-parameters#> .
      @prefix nfo:  <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#> .
+     @prefix :     <http://example.org/test#> .
 
 
-     <#test-list> a test:FixtureTable ;
-        test:fixtures <#test1>, <#test2> . 
+     :test_list a test:FixtureTable ;
+        test:fixtures :test1, :test2 .
 
-     <#test1> a test:AutomatedTest ;
+     :test1 a test:AutomatedTest ;
         test:param_base <http://example.org/my-parameters#> ;
-        test:purpose "Echo a string"@en ;    
+        test:purpose "Echo a string"@en ;
         test:test_script <http://example.org/simple#string_found> ;
         test:params [ my:all "counter-clockwise dahut" ] .
-        
-     <#test2> a test:AutomatedTest ;
+
+     :test2 a test:AutomatedTest ;
         test:param_base <http://example.org/my-parameters#> ;
         test:purpose "Multiply two numbers"@en ;
         test:test_script <http://example.org/multi#multiplication> ;
         test:params [
             my:factor1 6 ;
             my:factor2 7 ;
-            my:product 42 
+            my:product 42
         ] .
-        
+
      <http://example.org/simple#string_found> a nfo:SoftwareItem ;
         nfo:definesFunction "string_found" ;
         deps:test-requirement "Internal::Fixture::Simple"^^deps:CpanId .
@@ -132,7 +151,9 @@ DESCRIPTION
     HTTP::Response objects respectively. In tests scripts, the request objects
     will typically be passed to the LWP::UserAgent as input, and then the
     response from the remote server will be compared with the expected
-    HTTP::Responses made by the test fixture.
+    HTTP::Responses made by the test fixture. These will then be passed as
+    arrayrefs below the `-special` key with the keys `http-requests` and
+    `http-responses` respectively.
 
     This gets more complex, please see the test data file
     `t/data/http-list.ttl` file for example.
@@ -143,6 +164,20 @@ DESCRIPTION
     between different tests by using an `rdf:List` of test fixtures if it
     writes something into the server, there is nothing in the framework that
     changes that.
+
+    To use data from one response to influence subsequent requests, the
+    framework supports datatyping literals with the `dqm:regex` datatype, for
+    example:
+
+     :check_acl_location_res a http:ResponseMessage ;
+        httph:link '<(.*?)>;\\s+rel="acl"'^^dqm:regex ;
+        http:status 200 .
+
+    This makes it possible to use a Perl regular expression, which can be
+    executed in a test script if desired. If present, it will supply another
+    arrayref to the `-special` key with the key `regex-fields` containing
+    hashrefs with the header field that had a correspondiing object datatyped
+    regex as key and simply 1 as value.
 
 TODO
     Separate the implementation-specific details (such as

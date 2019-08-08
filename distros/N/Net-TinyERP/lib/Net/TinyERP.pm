@@ -4,7 +4,7 @@ use warnings;
 use Net::TinyERP::NotaFiscal;
 use Net::TinyERP::NotaFiscalServicos;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 sub new {
     my ($class, @params) = @_;
@@ -100,7 +100,7 @@ tenha suporte à API.
 
 =head2 Um token de acesso à API
 
-Veja L<Como gerar seu token|https://tiny.com.br/info/api.php?p=api2-gerar-token-api>.
+Veja L<Como gerar seu token|https://www.tiny.com.br/ajuda/api/api2-gerar-token-api>.
 
 =head2 Um certificado digital A1
 

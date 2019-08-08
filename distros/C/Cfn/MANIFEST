@@ -94,6 +94,7 @@ lib/Cfn/Resource/AWS/CloudFront/Distribution.pm
 lib/Cfn/Resource/AWS/CloudFront/StreamingDistribution.pm
 lib/Cfn/Resource/AWS/CloudTrail/Trail.pm
 lib/Cfn/Resource/AWS/CloudWatch/Alarm.pm
+lib/Cfn/Resource/AWS/CloudWatch/AnomalyDetector.pm
 lib/Cfn/Resource/AWS/CloudWatch/Dashboard.pm
 lib/Cfn/Resource/AWS/CodeBuild/Project.pm
 lib/Cfn/Resource/AWS/CodeCommit/Repository.pm
@@ -103,6 +104,7 @@ lib/Cfn/Resource/AWS/CodeDeploy/DeploymentGroup.pm
 lib/Cfn/Resource/AWS/CodePipeline/CustomActionType.pm
 lib/Cfn/Resource/AWS/CodePipeline/Pipeline.pm
 lib/Cfn/Resource/AWS/CodePipeline/Webhook.pm
+lib/Cfn/Resource/AWS/CodeStar/GitHubRepository.pm
 lib/Cfn/Resource/AWS/Cognito/IdentityPool.pm
 lib/Cfn/Resource/AWS/Cognito/IdentityPoolRoleAttachment.pm
 lib/Cfn/Resource/AWS/Cognito/UserPool.pm
@@ -278,6 +280,8 @@ lib/Cfn/Resource/AWS/IoTAnalytics/Channel.pm
 lib/Cfn/Resource/AWS/IoTAnalytics/Dataset.pm
 lib/Cfn/Resource/AWS/IoTAnalytics/Datastore.pm
 lib/Cfn/Resource/AWS/IoTAnalytics/Pipeline.pm
+lib/Cfn/Resource/AWS/IoTEvents/DetectorModel.pm
+lib/Cfn/Resource/AWS/IoTEvents/Input.pm
 lib/Cfn/Resource/AWS/IoTThingsGraph/FlowTemplate.pm
 lib/Cfn/Resource/AWS/KMS/Alias.pm
 lib/Cfn/Resource/AWS/KMS/Key.pm

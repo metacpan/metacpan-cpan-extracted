@@ -13,7 +13,7 @@ BEGIN {
         require Win32;
     }
 }
-our $VERSION = '0.78';
+our $VERSION = '0.80';
 
 sub _ANY_PORT           { return 0 }
 sub _GETPWUID_DIR_INDEX { return 7 }
@@ -182,7 +182,7 @@ sub save {
         Fcntl::S_IRWXU() )
       or Firefox::Marionette::Exception->throw(
         "Failed to open '$temp_path' for writing:$EXTENDED_OS_ERROR");
-    $handle->write( $self->_as_string() )
+    $handle->write( $self->as_string() )
       or Firefox::Marionette::Exception->throw(
         "Failed to write to '$temp_path':$EXTENDED_OS_ERROR");
     $handle->close()
@@ -194,7 +194,7 @@ sub save {
     return;
 }
 
-sub _as_string {
+sub as_string {
     my ($self) = @_;
     my $string = q[];
     foreach my $key ( sort { $a cmp $b } keys %{ $self->{keys} } ) {
@@ -278,7 +278,7 @@ Firefox::Marionette::Profile - Represents a prefs.js Firefox Profile
 
 =head1 VERSION
 
-Version 0.78
+Version 0.80
 
 =head1 SYNOPSIS
 
@@ -330,6 +330,10 @@ accepts a path as the parameter.  This path should be to a C<prefs.js> file.  Pa
 =head2 save
 
 accepts a path as the parameter.  Saves the current profile to this location.
+
+=head2 as_string
+
+returns the contents of current profile as a string.
 
 =head2 get_value
 

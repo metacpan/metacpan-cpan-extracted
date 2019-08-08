@@ -1,5 +1,9 @@
 Revision history for Bread::Runner
 
+0.902	2019-08-07T19:13:44
+    - Added missing prereqs as reported by CPANTS. (Mohammad S Anwar)
+
+
 0.901  2016-12-09T12:35:01
     - add a default startup logmessage, and an opt to disable it (Thomas Klausner)
     - readme to make github happy (Thomas Klausner

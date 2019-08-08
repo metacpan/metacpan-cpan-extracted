@@ -1,5 +1,11 @@
 Revision history for Perl extension Curio.
 
+0.05 2019-08-06T20:35:51Z
+
+ - Removed the unused Curio::Factory::find_factory() class method.
+ - Fixed injecting so that it actually works!  Also fixed the tests
+   which made it seem like it was working.
+
 0.04 2019-07-15T19:46:01Z
 
  - The exported function may now be overriden with a custom function.

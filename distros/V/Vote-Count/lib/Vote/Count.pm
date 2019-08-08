@@ -16,13 +16,13 @@ use Path::Tiny;
 no warnings 'experimental';
 
 
-our $VERSION='0.013';
+our $VERSION='0.017';
 
 =head1 NAME
 
 Vote::Count
 
-=head1 VERSION 0.013
+=head1 VERSION 0.017
 
 =cut
 
@@ -438,6 +438,11 @@ L<Vote::Count::Floor|https://metacpan.org/pod/Vote::Count::Floor>
 L<Vote::Count::TopCount|https://metacpan.org/pod/Vote::Count::TopCount>
 
 
+=item *
+
+L<Vote::Count::Redact|https://metacpan.org/pod/Vote::Count::Redact>
+
+
 =back
 
 
@@ -453,6 +458,47 @@ L<Vote::Count::Matrix|https://metacpan.org/pod/Vote::Count::Matrix>
 =item *
 
 L<Vote::Count::RankCount|https://metacpan.org/pod/Vote::Count::RankCount>
+
+
+=back
+
+
+=head2 Voting Methods
+
+=over
+
+=item *
+
+L<Vote::Count::Method::CondorcetDropping|https://metacpan.org/pod/Vote::Count::Method::CondorcetDropping>
+
+
+=item *
+
+L<Vote::Count::Method::IRV|https://metacpan.org/pod/Vote::Count::Method::IRV>
+
+
+=back
+
+
+=head2 Non Object Oriented Components
+
+=over
+
+=item *
+
+L<Vote::Count::Redact|https://metacpan.org/pod/Vote::Count::Redact>
+
+
+=back
+
+
+=head2 Utilities
+
+=over
+
+=item *
+
+L<Vote::Count::ReadBallots|https://metacpan.org/pod/Vote::Count::ReadBallots>
 
 
 =back

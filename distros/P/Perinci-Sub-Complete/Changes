@@ -1,3 +1,15 @@
+0.939   2019-07-19  Released-By: PERLANCAR; Urgency: medium
+
+	- Replace adding completion from Sah attribute
+	  'x.examples'/'x.examples.summaries' with from Sah clause
+	  'examples' (Sah 0.9.46).
+
+
+0.938   2019-07-06  Released-By: PERLANCAR; Urgency: medium
+
+	- Add completion from schema's x.examples attribute.
+
+
 0.937   2019-06-29  Released-By: PERLANCAR; Urgency: low
 
 	- Get summaries from schema's x.in.summaries attribute. To try this out,

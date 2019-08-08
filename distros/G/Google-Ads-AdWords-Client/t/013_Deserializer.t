@@ -72,7 +72,14 @@ $deserializer_input =
 $deserializer_input =
   replace_properties($deserializer_input, {version => $client->get_version()});
 
+# When deserializing a fault, there is a warning that is sent to STDERR that
+# we want to not log. This is expected, but makes for noisy output.
+# Copy STDOUT to another filehandle and send errors to nowhere.
+open (my $STDOLD, '>&', STDERR);
+open (STDERR, '>>', '/dev/null');
 @results = $deserializer->deserialize($deserializer_input);
+# Restore the file handle.
+open (STDERR, '>&', $STDOLD);
 
 isa_ok($results[0],               "SOAP::WSDL::SOAP::Typelib::Fault11");
 isa_ok($results[0]->get_detail(), "Google::Ads::AdWords::FaultDetail");

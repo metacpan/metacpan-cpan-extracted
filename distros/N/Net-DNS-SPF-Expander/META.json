@@ -4,7 +4,7 @@
       "Amiri Barksdale <amiri@campusexplorer.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -21,21 +21,21 @@
       },
       "runtime" : {
          "requires" : {
-            "IO::All" : "0",
             "List::AllUtils" : "0",
-            "Moose" : "0",
-            "MooseX::Getopt" : "0",
-            "MooseX::Types::IO::All" : "0",
+            "Moo" : "0",
+            "MooX::Options" : "0",
             "Net::DNS::Resolver" : "0",
             "Net::DNS::ZoneFile" : "0",
+            "Path::Tiny" : "0",
             "Scalar::Util" : "0",
+            "Types::Standard" : "0",
             "strict" : "0",
             "warnings" : "0"
          }
       },
       "test" : {
          "requires" : {
-            "Data::Printer" : "0",
+            "IO::All" : "0",
             "Test::Differences" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0",
@@ -54,7 +54,8 @@
          "web" : "http://github.com/amiri/Net-DNS-SPF-Expander"
       }
    },
-   "version" : "0.019",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+   "version" : "0.021",
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
 }
 

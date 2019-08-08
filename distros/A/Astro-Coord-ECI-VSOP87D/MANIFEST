@@ -47,7 +47,7 @@ tools/generate
 tools/generate.data
 tools/README
 tools/reference
-tools/template.pm
+tools/template.tpl
 xt/author/changes.t
 xt/author/critic.t
 xt/author/executable.t
@@ -57,6 +57,7 @@ xt/author/minimum_perl.t
 xt/author/perlcriticrc
 xt/author/pod.t
 xt/author/pod_coverage.t
+xt/author/pod_links.t
 xt/author/pod_spelling.t
 META.yml
 META.json

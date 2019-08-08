@@ -13,6 +13,7 @@ virStorageVolPtr O_OBJECT_storagevol
 virNodeDevicePtr O_OBJECT_nodedevice
 virSecretPtr O_OBJECT_secret
 virDomainSnapshotPtr O_OBJECT_domainsnapshot
+virDomainCheckpointPtr O_OBJECT_domaincheckpoint
 virStreamPtr O_OBJECT_stream
 
 INPUT
@@ -180,6 +181,20 @@ O_OBJECT_domainsnapshot
 OUTPUT
 O_OBJECT_domainsnapshot
         sv_setref_pv( $arg, "Sys::Virt::DomainSnapshot", (void*)$var );
+
+
+INPUT
+O_OBJECT_domaincheckpoint
+    if (sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG))
+        $var = INT2PTR($type, SvIV((SV*)SvRV( $arg )));
+    else {
+        warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+        XSRETURN_UNDEF;
+    }
+
+OUTPUT
+O_OBJECT_domaincheckpoint
+        sv_setref_pv( $arg, "Sys::Virt::DomainCheckpoint", (void*)$var );
 
 
 INPUT

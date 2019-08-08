@@ -79,3 +79,5 @@ sub groom_error {
 }
 
 1;
+
+# ex: set filetype=perl textwidth=72 autoindent :

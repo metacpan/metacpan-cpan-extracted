@@ -3,10 +3,10 @@
 use strict;
 use warnings;
 
-use Data::Dumper;
-
 use Test::More; my $tests = 5; # used later
 use Test::Trap;
+use IO::Socket::SSL qw(SSL_VERIFY_NONE);
+
 if ( not $ENV{PROXMOX_TEST_URI} ) {
     my $msg = 'This test sucks.  Set $ENV{PROXMOX_TEST_URI} to a real running proxmox to run.';
     plan( skip_all => $msg );
@@ -35,9 +35,20 @@ Try something like...
        $ENV{PROXMOX_TEST_URI} =~ m{^(\w+):(\w+)\@([\w\.]+):(\d+)/(\w+)$}
        or die q|PROXMOX_TEST_URI didnt match form 'user:pass@hostname:port/realm'|."\n";
 
-   trap {
-      $obj = Net::Proxmox::VE->new( host => $host, password => $pass, user => $user, port => $port, realm => $realm )
-   };
+    trap {
+        $obj = Net::Proxmox::VE->new(
+            host     => $host,
+            password => $pass,
+            user     => $user,
+            port     => $port,
+            realm    => $realm,
+            ssl_opts => {
+                SSL_verify_mode => SSL_VERIFY_NONE,
+                verify_hostname => 0
+            },
+
+        )
+    };
    ok (! $trap->die, 'doesnt die with good arguments');
 
 }

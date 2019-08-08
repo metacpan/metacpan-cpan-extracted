@@ -1,0 +1,21 @@
+Changes
+lib/RF/HC12.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00-load.t
+t/05-retrieve_controls.t
+t/06-retrieve_defaults.t
+t/10-set_baud.t
+t/15-set_power.t
+t/20-set_channel.t
+t/25-set_transmit_mode.t
+t/30-reset.t
+t/35-sleep_wake.t
+t/90-set_config.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

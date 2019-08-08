@@ -1,3 +1,8 @@
+1.1.7  02.08.2019
+           - Change Hash ilist from tuple to pair
+           - fix buggy GCC 4.9
+1.1.6  01.08.2019
+           - fix very specific bug with creating globs (only perl 5.24.4 debug+threads)
 1.1.5  31.07.2019
            - fix very specific bug with creating globs (only perl 5.22.0-5.26.0)
 1.1.4  30.07.2019

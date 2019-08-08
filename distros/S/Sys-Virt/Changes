@@ -1,5 +1,13 @@
 Revision history for perl module Sys::Virt
 
+5.6.0 2019-08-06
+
+ - Add VIR_DOMAIN_SNAPSHOT_CREATE_VALIDATE constant
+ - Add VIR_CONNECT_LIST_STORAGE_POOLS_ISCSI_DIRECT constant
+ - Add VIR_FROM_TPM constant
+ - Add VIR_SECRET_USAGE_TYPE_VTPM constant
+ - Add DomainCheckpoint class and associated constants
+
 5.5.0 2019-07-03
 
  - Add support for virNetworkPortPtr object and its APIs

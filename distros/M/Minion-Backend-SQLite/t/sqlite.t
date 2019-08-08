@@ -404,6 +404,13 @@ is $batch->[1]{queue}, 'default', 'right queue';
 is $batch->[2]{queue}, 'default', 'right queue';
 is $batch->[3]{queue}, 'default', 'right queue';
 ok !$batch->[4], 'no more results';
+TODO: { todo_skip 'filtering jobs by notes not yet implemented', 3;
+  $id2   = $minion->enqueue('test' => [] => {notes => {is_test => 1}});
+  $batch = $minion->backend->list_jobs(0, 10, {notes => ['is_test']})->{jobs};
+  is $batch->[0]{task}, 'test', 'right task';
+  ok !$batch->[4], 'no more results';
+  ok $minion->job($id2)->remove, 'job removed';
+}
 $batch
   = $minion->backend->list_jobs(0, 10, {queues => ['does_not_exist']})->{jobs};
 is_deeply $batch, [], 'no results';
@@ -674,7 +681,7 @@ is $job->info->{result}, "Intentional failure!\n", 'right result';
 $worker->unregister;
 } # end SKIP
 
-SKIP: { skip 'Minion workers do not support fork emulation', 5 if HAS_PSEUDOFORK;
+SKIP: { skip 'Minion workers do not support fork emulation', 7 if HAS_PSEUDOFORK;
 # Nested data structures
 $minion->add_task(
   nested => sub {
@@ -702,6 +709,9 @@ my $notes = {
 };
 is_deeply $job->info->{notes}, $notes, 'right metadata';
 is_deeply $job->info->{result}, [{23 => 'testtesttest'}], 'right structure';
+ok $job->note(yada => undef, bar => undef), 'removed metadata';
+$notes = {foo => [4, 5, 6], baz => 'yada'};
+is_deeply $job->info->{notes}, $notes, 'right metadata';
 $worker->unregister;
 } # end SKIP
 

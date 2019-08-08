@@ -1,6 +1,9 @@
 Revision history for Term::Choose
 
 
+1.655   2019-08-03
+    - Announcement changes mouse mode.
+
 1.654   2019-07-07
     - Bugfix backup instance defaults.
 

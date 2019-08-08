@@ -2,11 +2,11 @@ use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.056
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.058
 
 use Test::More;
 
-plan tests => 27 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 33 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Data/Sah/Coerce/perl/int/int_check_gid_exists.pm',
@@ -17,21 +17,27 @@ my @module_files = (
     'Data/Sah/Coerce/perl/str/int_convert_uid_to_unix_user.pm',
     'Data/Sah/Coerce/perl/str/str_check_unix_group_exists.pm',
     'Data/Sah/Coerce/perl/str/str_check_unix_user_exists.pm',
+    'Sah/Schema/unix/dirname.pm',
+    'Sah/Schema/unix/filename.pm',
     'Sah/Schema/unix/gid.pm',
     'Sah/Schema/unix/groupname.pm',
     'Sah/Schema/unix/local_gid.pm',
     'Sah/Schema/unix/local_groupname.pm',
     'Sah/Schema/unix/local_uid.pm',
     'Sah/Schema/unix/local_username.pm',
+    'Sah/Schema/unix/pathname.pm',
     'Sah/Schema/unix/pid.pm',
     'Sah/Schema/unix/uid.pm',
     'Sah/Schema/unix/username.pm',
+    'Sah/SchemaR/unix/dirname.pm',
+    'Sah/SchemaR/unix/filename.pm',
     'Sah/SchemaR/unix/gid.pm',
     'Sah/SchemaR/unix/groupname.pm',
     'Sah/SchemaR/unix/local_gid.pm',
     'Sah/SchemaR/unix/local_groupname.pm',
     'Sah/SchemaR/unix/local_uid.pm',
     'Sah/SchemaR/unix/local_username.pm',
+    'Sah/SchemaR/unix/pathname.pm',
     'Sah/SchemaR/unix/pid.pm',
     'Sah/SchemaR/unix/uid.pm',
     'Sah/SchemaR/unix/username.pm',
@@ -69,7 +75,7 @@ for my $lib (@module_files)
     is($?, 0, "$lib loaded ok");
 
     shift @_warnings if @_warnings and $_warnings[0] =~ /^Using .*\bblib/
-        and not eval { require blib; blib->VERSION('1.01') };
+        and not eval { +require blib; blib->VERSION('1.01') };
 
     if (@_warnings)
     {

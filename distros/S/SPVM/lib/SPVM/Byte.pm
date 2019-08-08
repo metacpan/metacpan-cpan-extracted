@@ -1,32 +1,40 @@
 package SPVM::Byte;
 
+use SPVM 'SPVM::Byte';
+
 1;
+
+# Check document 2019/07/23 almost ok.
 
 =head1 NAME
 
 SPVM::Byte - Byte object
 
 =head1 SYNOPSYS
-
+  
+  use SPVM::Byte;
+  
   my $byte_object = SPVM::Byte->new(5);
   my $byte_value = $byte_object->val;
 
 =head1 DESCRIPTION
 
-Byte object.
+L<SPVM::Byte> object stores a C<byte> value.
 
-=head1 CONSTRUCTOR
+This object is immutable.
+
+=head1 CLASS METHODS
 
 =head2 new
 
   sub new : SPVM::Byte ($value : byte)
 
-Create L<SPVM::Byte> object with specified C<byte> value.
+Create a new L<SPVM::Byte> object with specific C<byte> value.
 
-=head1 METHODS
+=head1 INSTANCE METHODS
 
 =head2 val
 
   sub val : byte ($self : self)
 
-Get C<byte> value.
+Get a C<byte> value.

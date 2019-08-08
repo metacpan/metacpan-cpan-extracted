@@ -14,7 +14,9 @@ use Log::Any::Adapter;
 use Log::Any qw/$log/;
 use threads;
 use constant { NTHREAD => 3 };
-use Test::More tests => 3 + NTHREAD * 5;
+use Test::More;
+
+my $number_of_tests = 3 + NTHREAD * 5;
 
 BEGIN {
     diag("Using " . NTHREAD . " threads");
@@ -119,7 +121,7 @@ while ($remains) {
     }
 }
 
-done_testing();
+done_testing($number_of_tests);
 
 package MyRecognizerInterface;
 use strict;

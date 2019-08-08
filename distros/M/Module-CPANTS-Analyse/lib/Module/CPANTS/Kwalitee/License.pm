@@ -4,7 +4,7 @@ use strict;
 use File::Spec::Functions qw(catfile);
 use Software::LicenseUtils;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 $VERSION =~ s/_//; ## no critic
 
 sub order { 100 }
@@ -23,8 +23,10 @@ sub analyse {
     $me->d->{license} = '';
     if ($yaml) {
         if ($yaml->{license} and $yaml->{license} ne 'unknown') {
-            $me->d->{license_from_yaml} = $yaml->{license};
-            $me->d->{license} = $yaml->{license}.' defined in META.yml';
+            my $license = $yaml->{license};
+            $license = join ',', @$license if ref $license eq 'ARRAY';
+            $me->d->{license_from_yaml} = $license;
+            $me->d->{license} = $license.' defined in META.yml';
         }
     }
     # use "files_array" to exclude files listed in "no_index".
@@ -39,7 +41,8 @@ sub analyse {
 
     # check pod
     my %licenses;
-    foreach my $file (grep { /\.p(m|od|l)$/ } sort @$files ) {
+    foreach my $file (grep { /\.(?:pm|pod|pl|PL)$/ } sort @$files ) {
+        next if $file =~ /(?:Makefile|Build)\.PL$/;
         my $path = catfile($distdir, $file);
         next unless -r $path; # skip if not readable
         open my $fh, '<', $path or next;

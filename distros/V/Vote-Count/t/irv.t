@@ -6,7 +6,7 @@ use 5.022;
 use Test2::V0;
 use Test2::Bundle::More;
 # use Test::Exception;
-# use Data::Printer;
+use Data::Printer;
 # use Data::Dumper;
 
 use Path::Tiny;
@@ -47,7 +47,6 @@ my $ex2 = {
 is_deeply( $r2, $ex2, 'returns set with Mintchip winning 122 of 216 votes');
 # need test of tie at the top.
 
-ok $B3;
 my $r3 = $B3->RunIRV();
 my $ex3 = {
   tie => 1, tied => [ 'CHOCOLATE','VANILLA' ], winner => 0
@@ -81,6 +80,48 @@ my $logcheck2 = q/Eliminating:PISTACHIO---IRVRound4/;
   $tlv =~ tr/ \n//d;
   like( $tlv, qr/$expecttlv/,
     "compare terse log to expected log" );
+};
+
+subtest 'tiebreakers' => sub {
+  my $active = {
+    PISTACHIO => 0,
+    ROCKYROAD => 0,
+    CHOCOLATE => 0,
+    VANILLA => 0,
+  };
+  my $I5 = Vote::Count::Method::IRV->new(
+  BallotSet => read_ballots('t/data/irvtie.txt'));
+  my @resolve1 = sort $I5->_TieBreaker(
+    'all', $active, ( 'VANILLA', 'CHOCOLATE' ) );
+  is_deeply(
+    \@resolve1,
+    [ 'CHOCOLATE', 'VANILLA'],
+    'All returns both tied choices' );
+  my @resolve2 = sort $I5->_TieBreaker(
+    'borda', $active,
+    ( 'VANILLA', 'CHOCOLATE' ) );
+  is_deeply(
+    \@resolve2,
+    [ 'CHOCOLATE'],
+    'Borda returns choice that won' );
+  my @resolve3 = sort
+    $I5->_TieBreaker( 'borda_all', $active, ( 'VANILLA', 'CHOCOLATE' ) );
+  is_deeply(
+    \@resolve3,
+    [ 'VANILLA'],
+    'borda_all returns choice that won (different winner than borda on active!)' );
+  my @resolve4 = sort
+    $I5->_TieBreaker( 'approval', $active, ( 'VANILLA', 'CHOCOLATE' ) );
+  is_deeply(
+    \@resolve4,
+    [ 'CHOCOLATE', 'VANILLA'],
+    'approval returns a tie for the top2' );
+  my @resolve5 = sort
+    $I5->_TieBreaker( 'approval', $active, ( 'VANILLA', 'ROCKYROAD' ) );
+  is_deeply(
+    \@resolve5,
+    [ 'VANILLA'],
+    'approval winner for a non-tied pair' );
 };
 
 done_testing();

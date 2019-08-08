@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.152';
+our $VERSION = '1.153';
 
 use Data::Printer color=>{string=>'black'};
 use Data::Printer ();
@@ -108,7 +108,7 @@ sub modulePaths {
 
 =head1 VERSION
 
-1.152
+1.153
 
 =head1 AUTHOR
 

@@ -1,13 +1,12 @@
 Changes
 LICENSE
+MANIFEST.SKIP
 META.json
 Makefile.PL
 README.md
-cpanfile
 lib/Net/EmptyPort.pm
 lib/Test/TCP.pm
 lib/Test/TCP/CheckPort.pm
-minil.toml
 t/00_compile.t
 t/01_simple.t
 t/02_abrt.t

@@ -53,15 +53,18 @@ cmp_deeply($data,
 				  'http_req_res_list_unauthenticated',
 				  {
 					'user' => 'alice',
-					'http-requests' => ignore(),
-					'http-responses' => ignore(),
-					'description' => 'Mix HTTP and ordinary params.',
+					'-special' => {
+										'regex-fields' => ignore(),
+										'http-requests' => ignore(),
+										'http-responses' => ignore(),
+										'description' => 'Mix HTTP and ordinary params.'
+									  },
               }
             ]
           ]
         ], 'Main structure ok');
 
-my $params = $data->[0]->[1]->[1];
+my $params = $data->[0]->[1]->[1]->{'-special'};
 
 is(scalar @{$params->{'http-requests'}}, 1, 'There is one request');
 

@@ -1,3 +1,6 @@
+0.08 2019-08-06
+  - Implements the resources in CloudFormation spec 5.0.0 (published as of 2019-08-06)
+
 0.07 2019-07-10
   - Implements the resources in CloudFormation spec 4.1.0 (published as of 2019-07-02)
   - Fix CPAN testers failures due to missing test dependency (reported by eserte)
