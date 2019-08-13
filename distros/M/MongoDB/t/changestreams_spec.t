@@ -18,14 +18,32 @@ use utf8;
 use Test::More 0.96;
 use Test::Deep;
 use Safe::Isa;
+use Storable qw( dclone );
 
 use MongoDB;
 
 use lib "t/lib";
-use MongoDBTest qw/skip_unless_mongod build_client get_test_db server_version server_type/;
+use MongoDBTest qw/
+    skip_unless_mongod
+    build_client
+    get_test_db
+    server_version
+    server_type
+    skip_unless_failpoints_available
+    set_failpoint
+    clear_failpoint
+    check_min_server_version
+/;
 use MongoDBSpecTest qw/foreach_spec_test/;
 
 skip_unless_mongod();
+skip_unless_failpoints_available();
+
+my @events;
+
+sub clear_events { @events = () }
+
+sub event_cb { push @events, dclone $_[0] }
 
 my $global_client = build_client();
 my $server_version = server_version($global_client);
@@ -37,7 +55,7 @@ my $server_topology =
 
 my ($db1, $db2);
 
-foreach_spec_test('t/data/change-streams', sub {
+foreach_spec_test('t/data/change-streams', $global_client, sub {
     my ($test, $plan) = @_;
 
     plan skip_all => sprintf(
@@ -49,7 +67,7 @@ foreach_spec_test('t/data/change-streams', sub {
         ? version->parse('v'.$test->{minServerVersion})
         : undef;
     plan skip_all => "Test requires version $min_version"
-        if defined($min_version) and $server_version < $min_version;
+        if defined($min_version) and check_min_server_version($global_client, $min_version);
 
     $db1->drop if defined $db1;
     $db2->drop if defined $db2;
@@ -57,27 +75,31 @@ foreach_spec_test('t/data/change-streams', sub {
     $db1 = get_test_db($global_client);
     $db2 = get_test_db($global_client);
 
-    my @events;
-    my $client = build_client(monitoring_callback => sub {
-        push @events, shift;
-    });
+    my $client = build_client(monitoring_callback => \&event_cb);
+    set_failpoint($client, $test->{'failPoint'});
+    clear_events();
+
     $db1 = $client->get_database($db1->name);
     $db2 = $client->get_database($db2->name);
 
     $db1->run_command([create => $plan->{database_name}]);
     $db2->run_command([create => $plan->{database2_name}]);
 
-    my $coll1 = $db1->get_collection($plan->{collection_name});
-    my $coll2 = $db2->get_collection($plan->{collection2_name});
+    my $coll = $db1->get_collection($plan->{collection_name});
+    $coll->drop;
+    if ($test->{description} =~ /rename|drop/i) {
+        # lets add bogus document in order to avoid 'invalid source ns' error
+        $coll->insert_one({});
+    }
 
     my $stream_target =
-        $test->{target} eq 'collection' ? $coll1 :
+        $test->{target} eq 'collection' ? $coll :
         $test->{target} eq 'database' ? $db1 :
         $test->{target} eq 'client' ? $client :
         die "Unknown target: ".$test->{target};
 
     my $resolve_db = sub {
-        $_[0] eq $plan->{database_name} ? $db1 : 
+        $_[0] eq $plan->{database_name} ? $db1 :
         $_[0] eq $plan->{database2_name} ? $db2 :
         undef
     };
@@ -95,6 +117,9 @@ foreach_spec_test('t/data/change-streams', sub {
             or diag("Stream Error: $stream_error");
         if (defined(my $code = $test->{result}{error}{code})) {
             is $stream_error->code, $code, "error code $code";
+            if (my $err_labels = $test->{result}{error}{'errorLabels'}) {
+                cmp_deeply($stream_error->error_labels, $err_labels, 'errorLabels');
+            }
         }
     }
     else {
@@ -106,6 +131,7 @@ foreach_spec_test('t/data/change-streams', sub {
         my ($op_db, $op_coll, $op_name)
             = @{ $operation }{qw( database collection name )};
         $op_db = $op_db->$resolve_db;
+        my $orig_coll_name = $op_coll;
         $op_coll = $op_db->get_collection($op_coll);
 
         my $op_sub = __PACKAGE__->can("operation_${op_name}");
@@ -136,14 +162,16 @@ foreach_spec_test('t/data/change-streams', sub {
             }
         };
     }
+    clear_failpoint($client, $test->{'failPoint'});
 
-    if (@{ $test->{result}{success} || [] }) {
+    my $test_result = $test->{result};
+    if ($test_result->{success}) {
         subtest 'success' => sub {
             my @changes;
             while (defined(my $change = $stream->next)) {
                 push @changes, $change;
             }
-            my @expected_changes = @{ $test->{result}{success} || [] };
+            my @expected_changes = @{ $test_result->{success} };
             is scalar(@changes), scalar(@expected_changes),
                 'expected number';
             if (@changes == @expected_changes) {
@@ -160,21 +188,37 @@ foreach_spec_test('t/data/change-streams', sub {
                     };
                 }
             }
+            else {
+                fail(
+                    sprintf(
+                        'Expected (%d) changes, but got (%d)',
+                        scalar(@expected_changes),
+                        scalar(@changes)
+                    )
+                );
+            }
         };
+    }
+    elsif (my $test_err = $test_result->{error}) {
+        if ($stream) {
+            my $change = eval { $stream->next };
+            my $err = $@;
+            cmp_deeply($err->error_labels, $test_err->{'errorLabels'}, 'errorLabels');
+        }
     }
 });
 
 sub event_matches {
     my ($event, $expected) = @_;
-    
+
     my $data;
     if ($data = $expected->{command_started_event}) {
         return undef
-            unless $event->{type} eq 'command_started';
+            unless ($event->{type} // '') eq 'command_started';
     }
     elsif ($data = $expected->{command_succeeded_event}) {
         return undef
-            unless $event->{type} eq 'command_succeeded';
+            unless ($event->{type} // '') eq 'command_succeeded';
     }
     else {
         die "Unrecognized event";
@@ -237,7 +281,7 @@ sub check_event {
     is $event->{databaseName}, $expected->{database_name},
         'database name',
         if exists $expected->{database_name};
-    
+
     if (my $command = $expected->{command}) {
         for my $key (sort keys %$command) {
             cmp_deeply(
@@ -271,6 +315,32 @@ sub check_result {
 sub operation_insertOne {
     my ($db, $coll, $args) = @_;
     $coll->insert_one($args->{document});
+}
+
+sub operation_updateOne {
+    my ($db, $coll, $args) = @_;
+    $coll->update_one($args->{filter}, $args->{update});
+}
+
+sub operation_replaceOne {
+    my ($db, $coll, $args) = @_;
+    $coll->replace_one($args->{filter}, $args->{replacement});
+}
+
+sub operation_deleteOne {
+    my ($db, $coll, $args) = @_;
+    $coll->delete_one($args->{filter});
+}
+
+sub operation_rename {
+    my ($db, $coll, $args) = @_;
+    my $new_name = $args->{'to'};
+    $coll->rename($new_name);
+}
+
+sub operation_drop {
+    my ($db, $coll, $args) = @_;
+    $coll->drop;
 }
 
 done_testing;

@@ -21,10 +21,10 @@ sub new {
         o => $options,
         d => $data,
     };
-    if ( $data->{driver} eq 'SQLite' ) {
+    if ( $info->{driver} eq 'SQLite' ) {
         $sf->{join_types} = [ 'INNER JOIN', 'LEFT JOIN', 'CROSS JOIN' ];
     }
-    elsif ( $data->{driver} =~ /^(?:mysql|MariaDB)\z/ ) {
+    elsif ( $info->{driver} =~ /^(?:mysql|MariaDB)\z/ ) {
         $sf->{join_types} = [ 'INNER JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'CROSS JOIN' ];
     }
     else {
@@ -58,7 +58,7 @@ sub join_tables {
         # Choose
         my $master = $tc->choose(
             [ @pre, @choices ],
-            { %{$sf->{i}{lyt_v}}, prompt => 'Choose MASTER table:' }
+            { %{$sf->{i}{lyt_v}}, prompt => 'Choose MAIN table:' }
         );
         if ( ! defined $master ) {
             return;
@@ -176,7 +176,7 @@ sub __add_slave_with_join_condition {
         # Choose
         my $slave = $tc->choose(
             [ @pre, @choices ],
-            { %{$sf->{i}{lyt_v}}, prompt => 'Add a SLAVE table:', undef => $sf->{i}{_reset} }
+            { %{$sf->{i}{lyt_v}}, prompt => 'Add table:', undef => $sf->{i}{_reset} }
         );
         if ( ! defined $slave ) {
             if ( @bu ) {

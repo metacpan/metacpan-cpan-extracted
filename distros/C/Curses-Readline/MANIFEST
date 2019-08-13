@@ -1,0 +1,11 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+contrib/readline
+cpanfile
+lib/Curses/Readline.pm
+t/01basic.t
+META.yml
+MANIFEST

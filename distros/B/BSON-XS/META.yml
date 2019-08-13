@@ -51,7 +51,7 @@ no_index:
 provides:
   BSON::XS:
     file: lib/BSON/XS.pm
-    version: v0.8.0
+    version: v0.8.1
 requires:
   BSON: '1.012000'
   XSLoader: '0'
@@ -64,7 +64,7 @@ resources:
   bugtracker: https://jira.mongodb.org/browse/PERL
   homepage: https://github.com/mongodb/mongo-perl-bson-xs
   repository: https://github.com/mongodb/mongo-perl-bson-xs.git
-version: v0.8.0
+version: v0.8.1
 x_authority: cpan:MONGODB
 x_contributors:
   - 'Paul "LeoNerd" Evans <leonerd@leonerd.org.uk>'

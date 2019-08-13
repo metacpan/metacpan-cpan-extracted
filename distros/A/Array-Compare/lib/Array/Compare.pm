@@ -58,7 +58,7 @@ your array data contains C<^G> characters as it is possible that
 two different arrays can be converted to the same string.
 
 To avoid this, it is possible to override the default separator
-character, either by passing and alternative to the C<new> function
+character, either by passing an alternative to the C<new> function
 
   my $comp = Array::Compare->new(Sep => '|');
 
@@ -73,7 +73,7 @@ You can also control whether or not whitespace within the elements of
 the arrays should be considered significant when making the comparison.
 The default is that all whitespace is significant. The alternative is
 for all consecutive white space characters to be converted to a single
-space for the pruposes of the comparison. Again, this can be turned on
+space for the purposes of the comparison. Again, this can be turned on
 when creating a comparator object:
 
   my $comp = Array::Compare->new(WhiteSpace => 0);
@@ -100,7 +100,7 @@ which differ between the two arrays. If the arrays are the same it returns
 an empty list. In scalar context the full comparison returns the length of
 this list (i.e. the number of elements that differ). You can access the full
 comparison in two ways. Firstly, there is a C<DefFull> attribute. If this
-is C<true> then a full comparison if carried out whenever the C<compare>
+is C<true> then a full comparison is carried out whenever the C<compare>
 method is called.
 
   my $comp = Array::Compare->new(DefFull => 1);
@@ -155,10 +155,9 @@ or:
   my %skip = (1 => 1, 2 => 2);
   $comp->Skip(\%skip);
 
-To reset the comparator so that no longer skips elements, set the skip
-hash to an empty hash.
+To reset the comparator so that no longer skips elements, call NoSkip().
 
-  $comp->Skip({});
+  $comp->NoSkip();
 
 You can also check to see if one array is a permutation of another, i.e.
 they contain the same elements but in a different order.
@@ -187,7 +186,7 @@ use Moo;
 use Types::Standard qw(Str Bool HashRef);
 use Carp;
 
-$VERSION = '3.0.2';
+$VERSION = '3.0.3';
 
 has Sep        => ( is => 'rw', isa => Str,     default => '^G' );
 has WhiteSpace => ( is => 'rw', isa => Bool,    default => 1 );
@@ -227,6 +226,18 @@ in the comparison. Default is 1 (case is significant).
 a reference to a hash which contains the numbers of any columns that should
 be skipped in the comparison. Default is an empty hash (all columns are
 significant).
+
+=item NoSkip
+
+Reset skipped column details. It assigns {} to the attribute C<Skip>.
+
+=cut
+
+sub NoSkip {
+    my $self = shift;
+
+    $self->Skip({});
+}
 
 =item DefFull
 
@@ -374,7 +385,7 @@ Do a full comparison between two arrays.
 
 Checks each individual column. In scalar context returns the number
 of columns that differ (zero if the arrays are the same). In list
-context returns an list containing the indexes of the columns that
+context returns a list containing the indexes of the columns that
 differ (an empty list if the arrays are the same).
 
 Uses the values of 'Sep' and 'WhiteSpace' to influence the comparison.

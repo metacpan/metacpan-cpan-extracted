@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     "Module::Runtime" => 0,
     "Moose" => 0,
     "Template" => 0,
-    "Test::BDD::Cucumber" => "0.57",
+    "Test::BDD::Cucumber" => 0,
     "Weasel" => 0,
     "Weasel::Session" => "0.11",
     "YAML::Syck" => 0
@@ -39,7 +39,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Weasel::Driver::Mock" => 0
   },
-  "VERSION" => "0.09",
+  "VERSION" => "0.11",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,7 +53,7 @@ my %FallbackPrereqs = (
   "Module::Runtime" => 0,
   "Moose" => 0,
   "Template" => 0,
-  "Test::BDD::Cucumber" => "0.57",
+  "Test::BDD::Cucumber" => 0,
   "Test::More" => 0,
   "Weasel" => 0,
   "Weasel::Driver::Mock" => 0,

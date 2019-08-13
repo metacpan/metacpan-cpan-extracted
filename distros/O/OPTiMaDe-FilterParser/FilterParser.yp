@@ -9,7 +9,7 @@ use OPTiMaDe::FilterParser::ListComparison;
 use OPTiMaDe::FilterParser::Property;
 use OPTiMaDe::FilterParser::Zip;
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 our $OPTiMaDe_VERSION = '0.10.0';
 
 our $allow_LIKE_operator = 0;
@@ -52,21 +52,22 @@ value_list: value
 
 value_zip: value value_zip_part
             {
-                return [ @_[1..$#_] ];
+                return [ [ '=', $_[1] ], $_[2] ];
             }
          | operator value value_zip_part
             {
-                return [ @_[1..$#_] ];
+                return [ [ $_[1], $_[2] ], $_[3] ];
             }
          | value_zip value_zip_part
             {
-                return [ @_[1..$#_] ];
+                push @{$_[1]}, $_[2];
+                return $_[1];
             }
          ;
 
 value_zip_part: colon value
                 {
-                    return [ undef, $_[2] ];
+                    return [ '=', $_[2] ];
                 }
               | colon operator value
                 {
@@ -75,9 +76,13 @@ value_zip_part: colon value
               ;
 
 value_zip_list: value_zip
+                {
+                    return [ $_[1] ];
+                }
               | value_zip_list comma value_zip
                 {
-                    return [ $_[1], $_[3] ];
+                    push @{$_[1]}, $_[3];
+                    return $_[1];
                 }
               ;
 
@@ -164,11 +169,11 @@ value_op_rhs: operator value
 
 known_op_rhs: IS KNOWN
                 {
-                    return [ @_[1..$#_] ];
+                    return [ "$_[1] $_[2]" ];
                 }
             | IS UNKNOWN
                 {
-                    return [ @_[1..$#_] ];
+                    return [ "$_[1] $_[2]" ];
                 }
             ;
 
@@ -213,13 +218,13 @@ fuzzy_string_op_rhs: CONTAINS string
 set_op_rhs: HAS value
             {
                 my $lc = OPTiMaDe::FilterParser::ListComparison->new( $_[1] );
-                $lc->set_values( [ '=', $_[2] ] );
+                $lc->set_values( [ [ '=', $_[2] ] ] );
                 return $lc;
             }
           | HAS operator value
             {
                 my $lc = OPTiMaDe::FilterParser::ListComparison->new( $_[1] );
-                $lc->set_values( [ $_[2], $_[3] ] );
+                $lc->set_values( [ [ $_[2], $_[3] ] ] );
                 return $lc;
             }
           | HAS ALL value_list
@@ -245,7 +250,7 @@ set_op_rhs: HAS value
 set_zip_op_rhs: property_zip_addon HAS value_zip
                 {
                     $_[1]->set_operator( $_[2] );
-                    $_[1]->set_values( $_[3] );
+                    $_[1]->set_values( [ $_[3] ] );
                     return $_[1];
                 }
               | property_zip_addon HAS ONLY value_zip_list
@@ -272,7 +277,7 @@ length_comparison: LENGTH property operator value
                     {
                         my $cmp = OPTiMaDe::FilterParser::ListComparison->new( $_[1] );
                         $cmp->set_property( $_[2] );
-                        $cmp->set_values( [ $_[3], $_[4] ] );
+                        $cmp->set_values( [ [ $_[3], $_[4] ] ] );
                         return $cmp;
                     }
                  ;

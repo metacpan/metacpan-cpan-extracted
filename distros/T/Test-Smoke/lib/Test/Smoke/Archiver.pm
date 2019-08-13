@@ -124,7 +124,7 @@ sub archive_rpt {
     }
     my $dst = catfile($self->adir, sprintf("rpt%s.rpt", $self->patchlevel));
     if (-f $dst) {
-        return $self->log_info("%s exits, skip archive rpt", $dst);
+        return $self->log_info("%s exists, skip archive rpt", $dst);
     }
 
     my $success = copy($src, $dst);
@@ -149,7 +149,7 @@ sub archive_out {
     }
     my $dst = catfile($self->adir, sprintf("out%s.out", $self->patchlevel));
     if (-f $dst) {
-        return $self->log_info("%s exits, skip archive out", $dst);
+        return $self->log_info("%s exists, skip archive out", $dst);
     }
 
     my $success = copy($src, $dst);
@@ -174,7 +174,7 @@ sub archive_jsn {
     }
     my $dst = catfile($self->adir, sprintf("jsn%s.jsn", $self->patchlevel));
     if (-f $dst) {
-        return $self->log_info("%s exits, skip archive jsn", $dst);
+        return $self->log_info("%s exists, skip archive jsn", $dst);
     }
 
     my $success = copy($src, $dst);
@@ -199,7 +199,7 @@ sub archive_log {
     }
     my $dst = catfile($self->adir, sprintf("log%s.log", $self->patchlevel));
     if (-f $dst) {
-        return $self->log_info("%s exits, skip archive log", $dst);
+        return $self->log_info("%s exists, skip archive log", $dst);
     }
 
     my $success = copy($src, $dst);

@@ -19,44 +19,44 @@ is_deeply([splice @calls], [
 ]);
 
 do {
-    package Parent;
+    package MyParent;
     use Class::Method::Modifiers;
 
-    sub original { push @calls, 'Parent::original' }
+    sub original { push @calls, 'MyParent::original' }
     around original => sub {
         my $orig = shift;
-        push @calls, 'around/before Parent::original';
+        push @calls, 'around/before MyParent::original';
         $orig->(@_);
-        push @calls, 'around/after Parent::original';
+        push @calls, 'around/after MyParent::original';
     };
 };
 
-Parent->original;
+MyParent->original;
 is_deeply([splice @calls], [
-    'around/before Parent::original',
-    'Parent::original',
-    'around/after Parent::original',
+    'around/before MyParent::original',
+    'MyParent::original',
+    'around/after MyParent::original',
 ]);
 
 do {
-    package Parent;
+    package MyParent;
     use Class::Method::Modifiers;
 
     around original => sub {
         my $orig = shift;
-        push @calls, '2 around/before Parent::original';
+        push @calls, '2 around/before MyParent::original';
         $orig->(@_);
-        push @calls, '2 around/after Parent::original';
+        push @calls, '2 around/after MyParent::original';
     };
 };
 
-Parent->original;
+MyParent->original;
 is_deeply([splice @calls], [
-    '2 around/before Parent::original',
-    'around/before Parent::original',
-    'Parent::original',
-    'around/after Parent::original',
-    '2 around/after Parent::original',
+    '2 around/before MyParent::original',
+    'around/before MyParent::original',
+    'MyParent::original',
+    'around/after MyParent::original',
+    '2 around/after MyParent::original',
 ]);
 
 done_testing;

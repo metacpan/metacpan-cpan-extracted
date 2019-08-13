@@ -15,7 +15,6 @@ use Mojo::Loader;
 use Mojo::URL;
 use Mojo::Util qw(url_unescape sha1_sum);
 use Scalar::Util qw(blessed refaddr);
-use Time::Local ();
 
 use constant CASE_TOLERANT     => File::Spec->case_tolerant;
 use constant COLORS            => eval { require Term::ANSIColor };
@@ -25,7 +24,7 @@ use constant RECURSION_LIMIT   => $ENV{JSON_VALIDATOR_RECURSION_LIMIT} || 100;
 use constant SPECIFICATION_URL => 'http://json-schema.org/draft-04/schema#';
 
 our $DEFINITIONS = 'definitions';
-our $VERSION = '3.11';
+our $VERSION = '3.14';
 our $YAML_LOADER = eval q[use YAML::XS 0.67; YAML::XS->can('Load')];  # internal
 our @EXPORT_OK   = qw(joi validate_json);
 
@@ -596,7 +595,7 @@ sub _validate {
   }
   elsif ($type) {
     my $method = sprintf '_validate_type_%s', $type;
-    $self->_report_schema($path || '/', $type, $schema);
+    $self->_report_schema($path || '/', $type, $schema) if REPORT;
     @errors = $self->$method($to_json ? $$to_json : $_[1], $path, $schema);
     $self->_report_errors($path, $type, \@errors) if REPORT;
     return @errors if @errors;
@@ -1029,9 +1028,9 @@ sub _add_path_to_error_messages {
 }
 
 sub _cmp {
-  return undef if !defined $_[0] or !defined $_[1];
+  return undef    if !defined $_[0] or !defined $_[1];
   return "$_[3]=" if $_[2] and $_[0] >= $_[1];
-  return $_[3] if $_[0] > $_[1];
+  return $_[3]    if $_[0] > $_[1];
   return "";
 }
 
@@ -1045,9 +1044,9 @@ sub _expected {
 sub _guess_data_type {
   my $ref     = ref $_[0];
   my $blessed = blessed $_[0];
-  return 'object' if $ref eq 'HASH';
-  return lc $ref if $ref and !$blessed;
-  return 'null' if !defined $_[0];
+  return 'object'  if $ref eq 'HASH';
+  return lc $ref   if $ref and !$blessed;
+  return 'null'    if !defined $_[0];
   return 'boolean' if $blessed and ("$_[0]" eq "1" or !"$_[0]");
 
   if (_is_number($_[0])) {

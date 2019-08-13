@@ -40,6 +40,7 @@
       },
       "test" : {
          "requires" : {
+            "Test::Deep" : "0",
             "Test::More" : "1.30"
          }
       }
@@ -60,6 +61,6 @@
       },
       "x_IRC" : "irc://irc.freenode.net/#mojo"
    },
-   "version" : "3.11",
+   "version" : "3.14",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

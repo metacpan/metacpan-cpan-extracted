@@ -1,5 +1,12 @@
 Revision history for Net-Connection-ncnetstat
 
+0.3.0	 2019-08-12/06:00
+		 - Add support for wchan, pctmem, and pctcpu.
+
+0.2.0	 2019-08-09/08:30
+		 - Add regexp command searching.
+		 - Update the POD for ncnetstat.
+
 0.1.1	 2019-08-06/21:30
 		 - Foreach Host -> Remote Host
 

@@ -22,7 +22,7 @@ requires:
   Module::Runtime: '0'
   Moose: '0'
   Template: '0'
-  Test::BDD::Cucumber: '0.57'
+  Test::BDD::Cucumber: '0'
   Weasel: '0'
   Weasel::Session: '0.11'
   YAML::Syck: '0'
@@ -30,5 +30,5 @@ requires:
 resources:
   bugtracker: https://github.com/ehuelsmann/pherkin-extension-weasel/issues
   repository: https://github.com/ehuelsmann/pherkin-extension-weasel.git
-version: '0.09'
+version: '0.11'
 x_serialization_backend: 'YAML::Tiny version 1.70'

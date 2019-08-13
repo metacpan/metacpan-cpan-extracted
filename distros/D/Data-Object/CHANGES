@@ -1,6 +1,24 @@
 Changelog for Data-Object
 
-0.96 2019-04-10T13:05:56
+0.97 2019-08-09T18:53:20
+ - Updated documentation
+ - Added release script
+ - Temporarily disable Travis tests for Perl < 5.22
+ - Added CI support for Perl 5.30
+ - Refactored main-module POD
+ - Data-Object Library POD Fix
+ - Added constructor functions
+ - Cleaned-up the .replyrc file
+ - Added configuration for type libraries
+ - Fixed super-do null-argument issue
+ - Updated POD in Data_Object_Hash_new.t
+ - Added missing dotfiles
+ - Updated dist author and software licensing
+ - Added Reply (REPL) configs
+ - Build 0.96 (#173)
+
+0.96 2019-04-10T13:06:17
+ - Built release version 0.96
  - Updated documentation
  - Moved Role::Type functionality into Base
  - Replaced Kind with Base

@@ -1,14 +1,10 @@
-#!/usr/bin/perl
-
 use warnings;
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
+use warnings;
 use lib "t/lib";
 use SQLiteTest;
 use Test::More;
+use if -d ".git", "Test::FailWarnings";
 
 use DBI;
 
@@ -47,8 +43,6 @@ my @tests = qw(
   2147483648
   2147483649
 );
-
-plan tests => 1 + @tests * 6 * 6;
 
 my $dbh = connect_ok();
 $dbh->do('
@@ -113,3 +107,5 @@ for my $val (@tests) {
     }
   }
 }
+
+done_testing;

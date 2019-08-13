@@ -1,5 +1,4 @@
-#define PERL_NO_GET_CONTEXT     /* we want efficiency */
-
+#include <time.h>
 #include "util.h"
 
 void dump_value(pTHX_ SV* val, Buffer* buf)

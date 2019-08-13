@@ -19,10 +19,9 @@ package MongoDB::ChangeStream;
 # ABSTRACT: A stream providing update information for collections.
 
 use version;
-our $VERSION = 'v2.0.3';
+our $VERSION = 'v2.2.0';
 
 use Moo;
-use Try::Tiny;
 use MongoDB::Cursor;
 use MongoDB::Op::_ChangeStream;
 use MongoDB::Error;
@@ -83,6 +82,12 @@ has _resume_after => (
     is => 'ro',
     init_arg => 'resume_after',
     predicate => '_has_resume_after',
+);
+
+has _start_after => (
+    is => 'ro',
+    init_arg => 'start_after',
+    predicate => '_has_start_after',
 );
 
 has _all_changes_for_cluster => (
@@ -150,6 +155,11 @@ sub _execute_query {
     if ($self->_has_last_resume_token) {
         $resume_opt->{resume_after} = $self->_last_resume_token;
     }
+    elsif ( $self->_has_start_after ) {
+        $self->_last_resume_token(
+            $resume_opt->{start_after} = $self->_start_after
+        );
+    }
     # no results yet, but we have operation time from prior query
     elsif ($self->_has_last_operation_time) {
         $resume_opt->{start_at_operation_time} = $self->_last_operation_time;
@@ -158,8 +168,11 @@ sub _execute_query {
     else {
         $resume_opt->{start_at_operation_time} = $self->_start_at_operation_time
             if $self->_has_start_at_operation_time;
-        $resume_opt->{resume_after} = $self->_resume_after
-            if $self->_has_resume_after;
+        if ( $self->_has_resume_after ) {
+            $self->_last_resume_token(
+                $resume_opt->{resume_after} = $self->_resume_after
+            );
+        }
     }
 
     my $op = MongoDB::Op::_ChangeStream->new(
@@ -178,7 +191,7 @@ sub _execute_query {
         %{ $self->_op_args },
     );
 
-    my $res = $self->_client->send_read_op($op);
+    my $res = $self->_client->send_retryable_read_op($op);
     $self->_result($res->{result});
     $self->_last_operation_time($res->{operationTime})
         if exists $res->{operationTime};
@@ -207,12 +220,11 @@ sub next {
     my $change;
     my $retried;
     while (1) {
-        last if try {
+        last if eval {
             $change = $self->_result->next;
-            1 # successfully fetched result
-        }
-        catch {
-            my $error = $_;
+            1; # successfully fetched result
+        } or do {
+            my $error = $@ || "Unknown error";
             if (
                 not($retried)
                 and $error->$_isa('MongoDB::Error')
@@ -224,7 +236,7 @@ sub next {
             else {
                 die $error;
             }
-            0 # failed, cursor was rebuilt
+            0; # failed, cursor was rebuilt
         };
     }
 
@@ -234,8 +246,12 @@ sub next {
         return undef; ## no critic
     }
 
-    if (exists $change->{_id}) {
-        $self->_last_resume_token($change->{_id});
+    if (exists $change->{'postBatchResumeToken'}) {
+        $self->_last_resume_token( $change->{'postBatchResumeToken'} );
+        return $change;
+    }
+    elsif (exists $change->{_id}) {
+        $self->_last_resume_token( $change->{_id} );
         return $change;
     }
     else {
@@ -244,6 +260,47 @@ sub next {
             "resume token is missing");
     }
 }
+
+#pod =head2 get_resume_token
+#pod
+#pod Users can inspect the C<_id> on each C<ChangeDocument> to use as a
+#pod resume token. But since MongoDB 4.2, C<aggregate> and C<getMore> responses
+#pod also include a C<postBatchResumeToken>. Drivers use one or the other
+#pod when automatically resuming.
+#pod
+#pod This method retrieves the same resume token that would be used to
+#pod automatically resume. Users intending to store the resume token
+#pod should use this method to get the most up to date resume token.
+#pod
+#pod For instance:
+#pod
+#pod     if ($local_change) {
+#pod         process_change($local_change);
+#pod     }
+#pod
+#pod     eval {
+#pod         my $change_stream = $coll->watch([], { resumeAfter => $local_resume_token });
+#pod         while ( my $change = $change_stream->next) {
+#pod             $local_resume_token = $change_stream->get_resume_token;
+#pod             $local_change = $change;
+#pod             process_change($local_change);
+#pod         }
+#pod     };
+#pod     if (my $err = $@) {
+#pod         $log->error($err);
+#pod     }
+#pod
+#pod In this case the current change is always persisted locally,
+#pod including the resume token, such that on restart the application
+#pod can still process the change while ensuring that the change stream
+#pod continues from the right logical time in the oplog. It is the
+#pod application's responsibility to ensure that C<process_change> is
+#pod idempotent, this design merely makes a reasonable effort to process
+#pod each change at least once.
+#pod
+#pod =cut
+
+sub get_resume_token { $_[0]->_last_resume_token }
 
 1;
 
@@ -259,7 +316,7 @@ MongoDB::ChangeStream - A stream providing update information for collections.
 
 =head1 VERSION
 
-version v2.0.3
+version v2.2.0
 
 =head1 SYNOPSIS
 
@@ -290,6 +347,43 @@ Waits for the next change in the collection and returns it.
 B<Note>: This method will wait for the amount of milliseconds passed
 as C<maxAwaitTimeMS> to L<MongoDB::Collection/watch> or the server's
 default wait-time. It will not wait indefinitely.
+
+=head2 get_resume_token
+
+Users can inspect the C<_id> on each C<ChangeDocument> to use as a
+resume token. But since MongoDB 4.2, C<aggregate> and C<getMore> responses
+also include a C<postBatchResumeToken>. Drivers use one or the other
+when automatically resuming.
+
+This method retrieves the same resume token that would be used to
+automatically resume. Users intending to store the resume token
+should use this method to get the most up to date resume token.
+
+For instance:
+
+    if ($local_change) {
+        process_change($local_change);
+    }
+
+    eval {
+        my $change_stream = $coll->watch([], { resumeAfter => $local_resume_token });
+        while ( my $change = $change_stream->next) {
+            $local_resume_token = $change_stream->get_resume_token;
+            $local_change = $change;
+            process_change($local_change);
+        }
+    };
+    if (my $err = $@) {
+        $log->error($err);
+    }
+
+In this case the current change is always persisted locally,
+including the resume token, such that on restart the application
+can still process the change while ensuring that the change stream
+continues from the right logical time in the oplog. It is the
+application's responsibility to ensure that C<process_change> is
+idempotent, this design merely makes a reasonable effort to process
+each change at least once.
 
 =head1 SEE ALSO
 

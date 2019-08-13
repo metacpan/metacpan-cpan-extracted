@@ -42,5 +42,5 @@ requires:
   perl: '5.008009'
 resources:
   repository: https://github.com/p5pclub/devel-quickcover
-version: '0.900012'
+version: '0.900014'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

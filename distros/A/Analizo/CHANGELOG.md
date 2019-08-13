@@ -7,6 +7,46 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+- (for new features)
+
+### Changed
+- (for changes in existing functionality)
+
+### Deprecated
+- (for soon-to-be removed features)
+
+### Removed
+- (for now removed features)
+
+### Fixed
+- (for any bug fixes)
+
+### Security
+- (in case of vulnerabilities)
+
+## [1.23.0] - 2019-08-10
+
+### Added
+- Added new tool files-graph to output graph among files in DOT format
+- Add Ubuntu 16 install instructions on documentation
+
+### Changed
+- Depends on doxyparse 1.8.15 provided by Alien::Doxyparse 0.13
+- Stores cache on distinct dirs for each Analizo version
+- Improve ACC metric description on documentation
+
+### Fixed
+- Added test for void arguments on C code
+- Fix tests to run on right place `t/samples/sample_basic/c/`
+- Added missing prereq Graph::Writer::Dot as suggested by CPANTS
+- Added atomated tests for httpd-2.4.38 errors
+- Added samples for bug parsing kdelibs project
+
+### Removed
+- Removed the evolution-matrix visualization tool
+- Removed the dsm visualization tool
+
 ## [1.22.0] - 2018-09-25
 
 ### Removed
@@ -14,7 +54,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Removed dependency for `sloccount` external tool
 
 ### Changed
-- Development setup installs Doxyarse from latest source master branch
+- Development setup installs Doxyparse from latest source master branch
 - Improved the performance for ACC metric calculation
 
 ### Fixed
@@ -151,7 +191,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Script development-setup.sh fixed.
 - Running of a single acceptance Cucumber test fixed.
 
-[Unreleased]: https://github.com/analizo/analizo/compare/1.22.0...HEAD
+[Unreleased]: https://github.com/analizo/analizo/compare/1.23.0...HEAD
+[1.23.0]: https://github.com/analizo/analizo/compare/1.22.0...HEAD
 [1.22.0]: https://github.com/analizo/analizo/compare/1.21.0...1.22.0
 [1.21.0]: https://github.com/analizo/analizo/compare/1.20.8...1.21.0
 [1.20.8]: https://github.com/analizo/analizo/compare/1.20.7...1.20.8

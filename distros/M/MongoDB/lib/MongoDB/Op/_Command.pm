@@ -19,7 +19,7 @@ package MongoDB::Op::_Command;
 # Encapsulate running a command and returning a MongoDB::CommandResult
 
 use version;
-our $VERSION = 'v2.0.3';
+our $VERSION = 'v2.2.0';
 
 use Moo;
 
@@ -27,6 +27,7 @@ use MongoDB::_Constants;
 use MongoDB::_Types qw(
     Document
     ReadPreference
+    to_IxHash
 );
 use List::Util qw/first/;
 use Types::Standard qw(
@@ -84,12 +85,22 @@ sub execute {
 
     $self->_apply_session_and_cluster_time( $link, \$self->{query} );
 
-    # $query is passed as a reference because it *may* be replaced
-    $self->_apply_read_prefs( $link, $topology_type, $self->{query_flags}, \$self->{query});
+    my ( $op_bson, $request_id );
 
-    my ( $op_bson, $request_id ) =
-      MongoDB::_Protocol::write_query( $self->{db_name} . '.$cmd',
-        $self->{bson_codec}->encode_one( $self->{query} ), undef, 0, -1, $self->{query_flags});
+    if ( $link->supports_op_msg ) {
+        # $query is passed as a reference because it *may* be replaced
+        $self->_apply_op_msg_read_prefs( $link, $topology_type, $self->{query_flags}, \$self->{query});
+        $self->{query} = to_IxHash( $self->{query} );
+        $self->{query}->Push( '$db', $self->db_name );
+        ( $op_bson, $request_id ) =
+            MongoDB::_Protocol::write_msg( $self->{bson_codec}, undef, $self->{query} );
+    } else {
+        # $query is passed as a reference because it *may* be replaced
+        $self->_apply_op_query_read_prefs( $link, $topology_type, $self->{query_flags}, \$self->{query});
+        ( $op_bson, $request_id ) =
+          MongoDB::_Protocol::write_query( $self->{db_name} . '.$cmd',
+            $self->{bson_codec}->encode_one( $self->{query} ), undef, 0, -1, $self->{query_flags});
+    }
 
     if ( length($op_bson) > MAX_BSON_WIRE_SIZE ) {
         # XXX should this become public?
@@ -123,6 +134,7 @@ sub execute {
     my $res = MongoDB::CommandResult->_new(
         output => $self->{bson_codec}->decode_one( $result->{docs} ),
         address => $link->address,
+        session => $self->session,
     );
 
     $self->_update_session_pre_assert( $res );

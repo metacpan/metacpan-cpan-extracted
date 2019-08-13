@@ -11,7 +11,13 @@ BEGIN {
 }
 
 my $output_raw=`lsof -i UDP -i TCP -n -l -P`;
-if ( $? eq 0 ){
+if (
+	( $? eq 0 ) ||
+	(
+	 ( $^O =~ /linux/ ) &&
+	 ( $? eq 256 )
+	 )
+	){
 	$extra_tests=2;
 	my $worked=0;
 	my $ncnetstat;

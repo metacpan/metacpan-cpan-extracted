@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.8.1';
+our $VERSION = 'v3.9.0';
 
 
 has to_location => (
@@ -42,7 +42,7 @@ SemanticWeb::Schema::InsertAction - The act of adding at a specific location in 
 
 =head1 VERSION
 
-version v3.8.1
+version v3.9.0
 
 =head1 DESCRIPTION
 

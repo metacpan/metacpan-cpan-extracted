@@ -1,6 +1,6 @@
 package Bio::Palantir::Refiner::GenePlus;
 # ABSTRACT: Refiner internal class for handling GenePlus objects
-$Bio::Palantir::Refiner::GenePlus::VERSION = '0.191800';
+$Bio::Palantir::Refiner::GenePlus::VERSION = '0.192240';
 use Moose;
 use namespace::autoclean;
 
@@ -125,7 +125,7 @@ sub _build_exp_domains {
         return [];
     }
 
-    return [ sort { $a->end <=> $b->end } @domains ];
+    return [ sort { $a->begin <=> $b->begin } @domains ];
 }
 
 ## use critic
@@ -146,7 +146,7 @@ sub BUILD {
             return;
         }
 
-        $self->_set_domains(\@domains);
+        $self->_set_domains( [sort { $a->begin <=> $b->begin } @domains] );
     }
 
     else { 
@@ -177,8 +177,8 @@ sub BUILD {
         }
         
         $self->_set_domains(\@domains_plus);
-        
-        # self explaining
+       
+        # elongate and refine domain coordinates
         $self->_elongate_coordinates([$self->all_domains]);
         $self->_refine_coordinates($self->all_domains);
 
@@ -206,19 +206,23 @@ sub _fill_gaps {         # use gene protein sequence
     
     my $gap_cutoff = shift // 250;
 
-    # point out "holes" in domain architecture
+    # point out gaps in the domain architecture
     my %gap_for;
-    my @domains = $self->all_domains;
+    my $gap_corr = 1;
 
-    for (my $i = 0; $i <= (scalar @domains - 2); $i++ ) {
-            
-        if ( ($domains[$i+1]->begin - $domains[$i]->end) > $gap_cutoff ) {
+    my @domains = sort { $a->begin <=> $b->begin } $self->all_domains; # still no rank at this stage
 
-            $gap_for{$domains[$i]->end . '-' . $domains[$i+1]->end} = { 
-                start => $domains[$i]->end + 1,
-                end   => $domains[$i+1]->begin - 1,
-                size  => ($domains[$i+1]->begin - 1)
-                            - ($domains[$i]->end + 1) + 1,
+    for (my $i = 0; $i <= (scalar @domains - 2); $i++) {
+         
+        my $gap_begin = $domains[$i]->end + $gap_corr;
+        my $gap_end = $domains[$i+1]->begin - $gap_corr;
+
+        if ( ($gap_end - $gap_begin + 1) > $gap_cutoff ) {
+
+            $gap_for{ $gap_begin . '-' . $gap_end } = {
+                start => $gap_begin,
+                end   => $gap_end,
+                size  => ($gap_end - $gap_begin + 1),
             };
         }
 
@@ -227,8 +231,10 @@ sub _fill_gaps {         # use gene protein sequence
 
     for my $gap (keys %gap_for) {
 
+        my $perl_corr = 1;
         my ($seq) = $self->protein_sequence;
-        $seq = substr($seq, $gap_for{$gap}{start} - 1, $gap_for{$gap}{size});                    
+        $seq = substr($seq, $gap_for{$gap}{start} - $perl_corr, 
+            $gap_for{$gap}{size});                    
 
         my @new_domains = $self->detect_domains($seq, $gap_for{$gap}{start}, 
             [ $gap_for{$gap}{start}, $gap_for{$gap}{end} ]) ;
@@ -245,7 +251,9 @@ sub _fill_gaps {         # use gene protein sequence
         @new_domains = grep { defined } @new_domains;
 
         if (@new_domains) {
-            $self->_set_domains( [@domains, @new_domains] );
+            my @ordered_domains 
+                = sort { $a->begin <=> $b->begin } (@domains, @new_domains);
+            $self->_set_domains(\@ordered_domains);
         }
     }
 
@@ -266,7 +274,7 @@ Bio::Palantir::Refiner::GenePlus - Refiner internal class for handling GenePlus 
 
 =head1 VERSION
 
-version 0.191800
+version 0.192240
 
 =head1 SYNOPSIS
 

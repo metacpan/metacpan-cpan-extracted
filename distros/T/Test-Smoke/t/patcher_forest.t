@@ -1,15 +1,14 @@
-#! /usr/bin/perl -w
+#! perl -w
 use strict;
 
-# $Id$
-
-use File::Spec::Functions;
+use File::Spec;
 my $findbin;
 use File::Basename;
 BEGIN { $findbin = dirname $0; }
 use lib $findbin;
 use TestLib;
 use Cwd 'abs_path';
+use File::Temp 'tempdir';
 
 my $win32_fat;
 BEGIN { $win32_fat = $^O eq 'MSWin32' && Win32::FsType() ne 'NTFS' }
@@ -30,12 +29,15 @@ my $untgz = find_untargz();
 $verbose and diag( "found untargz: $untgz" );
 my $unzipper = find_unzip();
 $verbose and diag( "Found unzip: $unzipper" );
+
+my $curdir = abs_path('.');
+my $tmpdir = tempdir(CLEANUP => $ENV{SMOKE_DEBUG} ? 0 : 1);
 my %config = (
-    ddir  => catdir(abs_path(), qw( t perl-current )),
+    ddir     => File::Spec->catdir($tmpdir, 'perl-current'),
     fsync    => 'copy',
-    cdir     => catdir(abs_path(), qw( t perl )),
-    mdir     => catdir(abs_path(), qw( t perl-master )),
-    fdir     => catdir(abs_path(), qw( t perl-inter  )),
+    cdir     => File::Spec->catdir($tmpdir, 'perl'),
+    mdir     => File::Spec->catdir($tmpdir, 'perl-master'),
+    fdir     => File::Spec->catdir($tmpdir, 'perl-inter'),
     patchbin => $patch,
     v        => $verbose,
 );
@@ -47,35 +49,39 @@ SKIP: {
     $untgz    or skip "Cannot un-tar-gz",                       $to_skip;
     $unzipper or skip "No unzip found",                         $to_skip;
 
-    chdir 't';
-    my $untgz_ok = do_untargz( $untgz, File::Spec->catfile(
-       qw( ftppub snap perl@20000.tgz ) ) );
-    my $p_content = do_unzip( $unzipper, catfile(
-        qw( ftppub perl-current-diffs 20005.gz ) ));
-    chdir updir;
+    chdir $tmpdir;
+    my $untgz_ok = do_untargz(
+        $untgz,
+        File::Spec->catfile($curdir, qw( t ftppub snap perl@20000.tgz ))
+    );
+    my $p_content = do_unzip(
+        $unzipper,
+        File::Spec->catfile($curdir, qw( t ftppub perl-current-diffs 20005.gz ) )
+    );
+    chdir $curdir;
     ok( $untgz_ok, "Mockup sourcetree unpacked" );
-    ok -d catdir( 't', 'perl' ), "sourcetree is there";
+    ok -d File::Spec->catdir( $tmpdir, 'perl' ), "sourcetree is there";
     like $p_content, '/^\+/m', "patch content ok";
 
     my $syncer = Test::Smoke::Syncer->new( forest => %config );
     ok my $pl = $syncer->sync, "Forest planted" or
-        skip "No source forest", $to_skip -= 4;
+        skip "No source forest ($tmpdir)", $to_skip -= 4;
     is $pl, '20000', "patchlevel $pl";
     $has_forest = 1;
 
     local *PINFO;
-    my $relpatch = catfile updir, '20005';
-    open PINFO, "> " . catfile(qw( t 20005 )) or
+    my $relpatch = File::Spec->catfile($tmpdir, '20005');
+    open PINFO, "> $relpatch" or
         skip "Cannot write patch: $!", $to_skip -= 1;
     print PINFO $p_content;
     ok close PINFO, "patch written";
 
-    my $pinfo = catfile( 't', 'test.patches' );
+    my $pinfo = File::Spec->catfile($tmpdir, 'test.patches');
     open PINFO, "> $pinfo" or skip "Cannot open '$pinfo': $!", $to_skip -= 2;
     select( (select(PINFO), $|++)[0] );
     print PINFO <<EOPINFO;
 $relpatch;-p1
-# Do some somments 
+# Do some comments 
 # This is to take out #20001, so we can see what happend
 # $relpatch;-R
 # $relpatch
@@ -83,25 +89,23 @@ EOPINFO
     ok close PINFO, "pfile written";
 
     # cheat with .patch
-    unlink catfile qw( t perl-inter .patch );
-    ok my $patcher = Test::Smoke::Patcher->new( multi => {
-        %config,
-        pfile => catfile( updir, 'test.patches' ),
-    }), "Patcher created";
+    unlink File::Spec->catfile($tmpdir, qw(perl-inter .patch));
+    ok(
+        my $patcher = Test::Smoke::Patcher->new(
+            multi => {
+                %config,
+                pfile => File::Spec->catfile($tmpdir, 'test.patches'),
+            }
+        ),
+        "Patcher created"
+    );
     isa_ok $patcher, 'Test::Smoke::Patcher';
 
-    $ENV{SMOKE_DEBUG} and diag Dumper $patcher;
+    ($ENV{SMOKE_DEBUG} || $verbose > 2) and diag(explain($patcher));
     ok eval { $patcher->patch }, "Patch the intermediate tree";
+    diag("patching error: $@") if $@;
 
-    chomp( my $plev = get_file(qw( t perl-current .patch )) );
+    chomp( my $plev = get_file($tmpdir, qw( perl-current .patch )) );
     is $plev, 20006, "Tree successfully patched";
 }
 
-END {
-    unless ( $ENV{SMOKE_DEBUG} ) {
-        rmtree catdir( 't', $_ )
-            for qw( perl perl-master perl-inter perl-current );
-        1 while unlink catfile qw( t test.patches );
-        1 while unlink catfile qw( t 20005 );
-    }
-}

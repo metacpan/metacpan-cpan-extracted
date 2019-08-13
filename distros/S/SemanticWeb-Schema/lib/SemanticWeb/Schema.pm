@@ -13,7 +13,7 @@ use Types::Standard qw/ Str /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.8.1';
+our $VERSION = 'v3.9.0';
 
 # RECOMMEND PREREQ: aliased
 # RECOMMEND PREREQ: Class::XSAccessor 1.18
@@ -46,7 +46,7 @@ SemanticWeb::Schema - Moo classes for http://schema.org/ classes
 
 =head1 VERSION
 
-version v3.8.1
+version v3.9.0
 
 =head1 SYNOPSIS
 
@@ -67,15 +67,17 @@ were generated automatically from the following sources:
 
 =over
 
-=item L<https://schema.org/version/3.8/ext-auto.rdf>
+=item L<https://schema.org/version/3.9/ext-auto.rdf>
 
-=item L<https://schema.org/version/3.8/ext-bib.rdf>
+=item L<https://schema.org/version/3.9/ext-bib.rdf>
 
-=item L<https://schema.org/version/3.8/ext-health-lifesci.rdf>
+=item L<https://schema.org/version/3.9/ext-health-lifesci.rdf>
 
-=item L<https://schema.org/version/3.8/ext-meta.rdf>
+=item L<https://schema.org/version/3.9/ext-meta.rdf>
 
-=item L<https://schema.org/version/3.8/schema.rdf>
+=item L<https://schema.org/version/3.9/ext-pending.rdf>
+
+=item L<https://schema.org/version/3.9/schema.rdf>
 
 =back
 

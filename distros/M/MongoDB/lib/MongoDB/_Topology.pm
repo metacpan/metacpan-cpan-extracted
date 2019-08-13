@@ -17,7 +17,7 @@ use warnings;
 package MongoDB::_Topology;
 
 use version;
-our $VERSION = 'v2.0.3';
+our $VERSION = 'v2.2.0';
 
 use Moo;
 use BSON;
@@ -52,9 +52,12 @@ use Config;
 use List::Util qw/first max min/;
 use Safe::Isa;
 use Time::HiRes qw/time usleep/;
-use Try::Tiny;
 
 use namespace::clean;
+
+with $_ for qw(
+  MongoDB::Role::_TopologyMonitoring
+);
 
 #--------------------------------------------------------------------------#
 # attributes
@@ -181,6 +184,11 @@ has server_selection_try_once => (
     isa => Boolish,
 );
 
+has server_selector => (
+    is => 'ro',
+    isa => Maybe[CodeRef],
+);
+
 has ewma_alpha => (
     is      => 'ro',
     default => 0.2,
@@ -229,6 +237,13 @@ has is_compatible => (
     is => 'ro',
     writer => '_set_is_compatible',
     isa => Boolish,
+);
+
+has compatibility_error => (
+    is      => 'ro',
+    default => '',
+    writer => '_set_compatibility_error',
+    isa     => Str,
 );
 
 has wire_version_floor => (
@@ -339,6 +354,12 @@ sub _build_handshake_document {
 
 sub BUILD {
     my ($self) = @_;
+
+    $self->publish_topology_opening
+      if $self->monitoring_callback;
+
+    $self->publish_old_topology_desc
+      if $self->monitoring_callback;
     my $type = $self->type;
     my @addresses = @{ $self->uri->hostids };
 
@@ -365,7 +386,49 @@ sub BUILD {
 
     $self->_add_address_as_unknown($_) for @addresses;
 
+    $self->publish_new_topology_desc
+      if $self->monitoring_callback;
+
     return;
+}
+
+sub DEMOLISH {
+    my $self = shift;
+
+    $self->publish_topology_closing
+      if $self->monitoring_callback;
+
+    return;
+}
+
+sub _check_for_uri_changes {
+    my ($self) = @_;
+
+    my $type = $self->type;
+    return unless
+        $type eq 'Sharded'
+        or $type eq 'Unknown';
+
+    my @existing = @{ $self->uri->hostids };
+
+    my $options = {
+        fallback_ttl_sec => $self->{heartbeat_frequency_sec},
+    };
+
+    if ($self->uri->check_for_changes($options)) {
+        my %new = map { ($_, 1) } @{ $self->uri->hostids };
+        for my $address (@existing) {
+            if (!$new{$address}) {
+                $self->_remove_address($address);
+            }
+            else {
+                delete $new{$address};
+            }
+        }
+        for my $address (keys %new) {
+            $self->_add_address_as_unknown($address);
+        }
+    }
 }
 
 #--------------------------------------------------------------------------#
@@ -397,8 +460,24 @@ sub close_all_links {
     return;
 }
 
+sub _maybe_get_txn_error_labels_and_unpin_from {
+    my $op = shift;
+    return () unless defined $op
+        && defined $op->session;
+    if ( $op->session->_in_transaction_state( TXN_STARTING, TXN_IN_PROGRESS ) ) {
+        $op->session->_unpin_address;
+        return ( error_labels => [ TXN_TRANSIENT_ERROR_MSG ] );
+    } elsif ( $op->session->_in_transaction_state( TXN_COMMITTED ) ) {
+        return ( error_labels => [ TXN_UNKNOWN_COMMIT_MSG ] );
+    }
+    return ();
+}
+
 sub get_readable_link {
-    my ( $self, $read_pref ) = @_;
+    my ( $self, $op ) = @_;
+    $self->_check_for_uri_changes;
+
+    my $read_pref = defined $op ? $op->read_preference : undef;
 
     my $mode = $read_pref ? lc $read_pref->mode : 'primary';
     my $method =
@@ -424,25 +503,33 @@ sub get_readable_link {
     }
 
     my $rp = $read_pref ? $read_pref->as_string : 'primary';
+
     MongoDB::SelectionError->throw(
-        "No readable server available for matching read preference $rp. MongoDB server status:\n"
-          . $self->_status_string );
+        message => "No readable server available for matching read preference $rp. MongoDB server status:\n"
+          . $self->_status_string,
+        _maybe_get_txn_error_labels_and_unpin_from( $op ),
+    );
 }
 
 sub get_specific_link {
-    my ( $self, $address ) = @_;
+    my ( $self, $address, $op ) = @_;
+    $self->_check_for_uri_changes;
 
     my $server = $self->servers->{$address};
     if ( $server && ( my $link = $self->_get_server_link($server) ) ) {
         return $link;
     }
     else {
-        MongoDB::SelectionError->throw("Server $address is no longer available");
+        MongoDB::SelectionError->throw(
+            message => "Server $address is no longer available",
+            _maybe_get_txn_error_labels_and_unpin_from( $op ),
+        );
     }
 }
 
 sub get_writable_link {
-    my ($self) = @_;
+    my ( $self, $op ) = @_;
+    $self->_check_for_uri_changes;
 
     my $method =
       ( $self->type eq "Single" || $self->type eq "Sharded" )
@@ -466,12 +553,17 @@ sub get_writable_link {
     }
 
     MongoDB::SelectionError->throw(
-        "No writable server available.  MongoDB server status:\n" . $self->_status_string );
+        message => "No writable server available.  MongoDB server status:\n" . $self->_status_string,
+        _maybe_get_txn_error_labels_and_unpin_from( $op ),
+    );
 }
 
+# Marking a server unknown from outside the topology indicates an operational
+# error, so the last scan is set to EPOCH so that the next scan won't wait for
+# the scanning cooldown.
 sub mark_server_unknown {
-    my ( $self, $server, $error ) = @_;
-    $self->_reset_address_to_unknown( $server->address, $error );
+    my ( $self, $server, $error, $no_cooldown ) = @_;
+    $self->_reset_address_to_unknown( $server->address, $error, $no_cooldown // EPOCH );
     return;
 }
 
@@ -553,6 +645,9 @@ sub _add_address_as_unknown {
     my ( $self, $address, $last_update, $error ) = @_;
     $error = $error ? "$error" : "";
     $error =~ s/ at \S+ line \d+.*//ms;
+
+    $self->publish_server_opening($address)
+      if $self->monitoring_callback;
 
     return $self->servers->{$address} = MongoDB::_Server->new(
         address          => $address,
@@ -647,27 +742,23 @@ sub _supports_sessions {
     return defined $self->logical_session_timeout_minutes;
 }
 
-# Used for bulkWrite for shortcutting to original execute command
-sub _supports_retry_writes {
-    my ( $self ) = @_;
-
-    # retryWrites arent supported in standalone servers
-    return if $self->type eq 'Single';
-
-    # retryWrites require a wire version of at least six
-    return if $self->wire_version_ceil < 6;
-
-    # must have lstm present
-    return 1 if defined $self->logical_session_timeout_minutes;
-    return;
-}
-
 sub _supports_transactions {
     my ( $self ) = @_;
 
     return unless $self->_supports_sessions;
+    return $self->_supports_mongos_pinning_transactions if $self->type eq 'Sharded';
     return if $self->wire_version_ceil < 7;
-    return if $self->type eq 'Sharded';
+    return 1;
+}
+
+# Seperated out so can be used in dispatch logic
+sub _supports_mongos_pinning_transactions {
+    my ( $self ) = @_;
+
+    # Separated out so that it doesnt return 1 for wire version 8 non sharded
+    return if $self->wire_version_ceil < 8;
+    # This extra sharded check is required so this test can be standalone
+    return if $self->type ne 'Sharded';
     return 1;
 }
 
@@ -772,8 +863,11 @@ sub _find_available_server {
     my ( $self, $read_pref, @candidates ) = @_;
     $self->_check_staleness_compatibility($read_pref) if $read_pref;
     push @candidates, $self->all_servers unless @candidates;
+    my $selector = $self->server_selector;
     return $self->_get_server_in_latency_window(
-        [ grep { $_->is_available } @candidates ] );
+      [ grep { $_->is_available }
+          $selector ? $selector->(@candidates) : @candidates ]
+    );
 }
 
 # This uses read preference to check for max staleness compatibility in
@@ -782,8 +876,11 @@ sub _find_readable_mongos_server {
     my ( $self, $read_pref, @candidates ) = @_;
     $self->_check_staleness_compatibility($read_pref);
     push @candidates, $self->all_servers unless @candidates;
+    my $selector = $self->server_selector;
     return $self->_get_server_in_latency_window(
-        [ grep { $_->is_available } @candidates ] );
+      [ grep { $_->is_available }
+          $selector ? $selector->(@candidates) : @candidates ]
+    );
 }
 
 sub _find_nearest_server {
@@ -791,7 +888,10 @@ sub _find_nearest_server {
     $self->_check_staleness_compatibility($read_pref);
     push @candidates, ( $self->_primaries, $self->_secondaries ) unless @candidates;
     my @suitable = $self->_eligible( $read_pref, @candidates );
-    return $self->_get_server_in_latency_window( \@suitable );
+    my $selector = $self->server_selector;
+    return $self->_get_server_in_latency_window(
+        [ $selector ? $selector->(@suitable) : @suitable ]
+    );
 }
 
 sub _find_primary_server {
@@ -814,7 +914,10 @@ sub _find_secondary_server {
     $self->_check_staleness_compatibility($read_pref);
     push @candidates, $self->_secondaries unless @candidates;
     my @suitable = $self->_eligible( $read_pref, @candidates );
-    return $self->_get_server_in_latency_window( \@suitable );
+    my $selector = $self->server_selector;
+    return $self->_get_server_in_latency_window(
+        [ $selector ? $selector->(@suitable) : @suitable ]
+    );
 }
 
 sub _find_secondarypreferred_server {
@@ -834,7 +937,6 @@ sub _get_server_in_latency_window {
     my @sorted =
       sort { $a->{rtt} <=> $b->{rtt} }
       map { { server => $_, rtt => $rtt_hash->{ $_->address } } } @$servers;
-
     # lowest RTT is always in the windows
     my @in_window = shift @sorted;
 
@@ -843,6 +945,25 @@ sub _get_server_in_latency_window {
     push @in_window, grep { $_->{rtt} <= $max_rtt } @sorted;
     return $in_window[ int( rand(@in_window) ) ]->{server};
 }
+
+my $PRIMARY = MongoDB::ReadPreference->new;
+my $PRIMARY_PREF = MongoDB::ReadPreference->new( mode => 'primaryPreferred' );
+
+sub _ping_server {
+    my ($self, $link) = @_;
+    return eval {
+        my $op = MongoDB::Op::_Command->_new(
+            db_name             => 'admin',
+            query               => [ping => 1],
+            query_flags         => {},
+            bson_codec          => $self->bson_codec,
+            read_preference     => $PRIMARY_PREF,
+            monitoring_callback => $self->monitoring_callback,
+        );
+        $op->execute( $link )->output;
+    };
+}
+
 
 sub _get_server_link {
     my ( $self, $server, $method, $read_pref ) = @_;
@@ -855,6 +976,10 @@ sub _get_server_link {
 
     # for idle links, refresh the server and verify validity
     if ( time - $link->last_used > $self->socket_check_interval_sec ) {
+        return $link if $self->_ping_server;
+        $self->mark_server_unknown(
+          $server, 'Lost connection with the server'
+        );
         $self->check_address($address);
 
         # topology might have dropped the server
@@ -874,13 +999,12 @@ sub _get_server_link {
 sub _initialize_link {
     my ( $self, $address ) = @_;
 
-    my $link = try {
+    my $link = eval {
         MongoDB::_Link->new( %{$self->link_options}, address => $address )->connect;
-    }
-    catch {
+    } or do {
+        my $error = $@ || "Unknown error";
         # if connection failed, update topology with Unknown description
-        $self->_reset_address_to_unknown( $address, $_ );
-        return;
+        $self->_reset_address_to_unknown( $address, $error );
     };
 
     return unless $link;
@@ -897,11 +1021,11 @@ sub _initialize_link {
     # try to authenticate; if authentication fails, all
     # servers are considered invalid and we throw an error
     if ( $self->type eq 'Single' || first { $_ eq $server->type } qw/Standalone Mongos RSPrimary RSSecondary/ ) {
-        try {
+        eval {
             $self->credential->authenticate($server, $link, $self->bson_codec);
-        }
-        catch {
-            my $err = $_;
+            1;
+        } or do {
+            my $err = $@;
             my $msg = $err->$_isa("MongoDB::Error") ? $err->message : "$err";
             $self->_reset_address_to_unknown( $_->address, $err ) for $self->all_servers;
             MongoDB::AuthError->throw("Authentication to $address failed: $msg");
@@ -921,6 +1045,8 @@ sub _remove_address {
         $self->_clear_current_primary;
     }
     delete $self->$_->{$address} for qw/servers links rtt_ewma_sec/;
+    $self->publish_server_closing( $address )
+      if $self->monitoring_callback;
     return;
 }
 
@@ -932,7 +1058,7 @@ sub _remove_server {
 
 sub _reset_address_to_unknown {
     my ( $self, $address, $error, $update_time ) = @_;
-    $update_time ||= time;
+    $update_time //= time;
 
     $self->_remove_address($address);
     my $desc = $self->_add_address_as_unknown( $address, $update_time, $error );
@@ -1013,6 +1139,7 @@ sub _selection_timeout {
                     );
                 }
             }
+            $self->_set_compatibility_error($error_string);
             MongoDB::ProtocolError->throw( $error_string );
         }
 
@@ -1033,8 +1160,6 @@ sub _selection_timeout {
         }
     }
 }
-
-my $PRIMARY = MongoDB::ReadPreference->new;
 
 sub _generate_ismaster_request {
     my ( $self, $link, $should_perform_handshake ) = @_;
@@ -1059,6 +1184,9 @@ sub _generate_ismaster_request {
 sub _update_topology_from_link {
     my ( $self, $link, %opts ) = @_;
 
+    $self->publish_server_heartbeat_started( $link )
+      if $self->monitoring_callback;
+
     my $start_time = time;
     my $is_master = eval {
         my $op = MongoDB::Op::_Command->_new(
@@ -1076,6 +1204,10 @@ sub _update_topology_from_link {
         $op->execute( $link )->output;
     };
     if ( my $e = $@ ) {
+        my $end_time_fail = time;
+        my $rtt_sec_fail = $end_time_fail - $start_time;
+        $self->publish_server_heartbeat_failed( $link, $rtt_sec_fail, $e )
+          if $self->monitoring_callback;
         if ($e->$_isa("MongoDB::DatabaseError") && $e->code == USER_NOT_FOUND ) {
             MongoDB::AuthError->throw("mechanism negotiation error: $e");
         }
@@ -1103,6 +1235,11 @@ sub _update_topology_from_link {
 
     my $end_time = time;
     my $rtt_sec = $end_time - $start_time;
+    # Protect against clock skew
+    $rtt_sec = 0 if $rtt_sec < 0;
+
+    $self->publish_server_heartbeat_succeeded( $link, $rtt_sec, $is_master )
+      if $self->monitoring_callback;
 
     my $new_server = MongoDB::_Server->new(
         address          => $link->address,
@@ -1148,18 +1285,24 @@ sub _update_topology_from_server_desc {
     # after a server has been removed
     return unless $self->servers->{$address};
 
+    $self->publish_old_topology_desc( $address, $new_server )
+      if $self->monitoring_callback;
+
     $self->_update_ewma( $address, $new_server );
 
     # must come after ewma update
     $self->servers->{$address} = $new_server;
 
     my $method = "_update_" . $self->type;
+
     $self->$method( $address, $new_server );
 
     # if link is still around, tag it with server specifics
     $self->_update_link_metadata( $address, $new_server );
 
     $self->_update_ls_timeout_minutes( $new_server );
+
+    $self->publish_new_topology_desc if $self->monitoring_callback;
 
     return $new_server;
 }

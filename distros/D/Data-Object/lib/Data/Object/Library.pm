@@ -23,7 +23,7 @@ use Data::Object::Type::Space;
 use Data::Object::Type::String;
 use Data::Object::Type::Undef;
 
-our $VERSION = '0.96'; # VERSION
+our $VERSION = '0.97'; # VERSION
 
 # BUILD
 
@@ -77,9 +77,10 @@ Data-Object Library Configuration
 
 =head1 DESCRIPTION
 
-Data::Object::Library is a L<Type::Tiny> type library that extends the
-L<Types::Standard>, L<Types::Common::Numeric>, and L<Types::Common::String>
-libraries and adds type constraints and coercions for L<Data::Object> objects.
+Data::Object::Library is a L<Type::Tiny> type library (L<Type::Library>) which
+extends the L<Types::Standard>, L<Types::Common::Numeric>, and
+L<Types::Common::String> libraries, and adds type constraints and coercions for
+L<Data::Object> objects.
 
 =cut
 

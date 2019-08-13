@@ -1,7 +1,7 @@
 package Data::Sah::Compiler::perl::TH;
 
-our $DATE = '2019-07-25'; # DATE
-our $VERSION = '0.899'; # VERSION
+our $DATE = '2019-08-12'; # DATE
+our $VERSION = '0.900'; # VERSION
 
 use 5.010;
 use strict;
@@ -58,7 +58,7 @@ Data::Sah::Compiler::perl::TH - Base class for perl type handlers
 
 =head1 VERSION
 
-This document describes version 0.899 of Data::Sah::Compiler::perl::TH (from Perl distribution Data-Sah), released on 2019-07-25.
+This document describes version 0.900 of Data::Sah::Compiler::perl::TH (from Perl distribution Data-Sah), released on 2019-08-12.
 
 =for Pod::Coverage ^(compiler|clause_.+|gen_.+)$
 

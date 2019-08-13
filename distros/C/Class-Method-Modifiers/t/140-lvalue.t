@@ -76,4 +76,20 @@ is(After->lvalue_method, 4, 'after maintains lvalue attribute');
     'after array lvalue attribute sets values');
 }
 
+{
+  package LvalueWithProto;
+  use Class::Method::Modifiers;
+
+  my $f;
+  sub lvalue_proto_method ($) :lvalue { $f }
+
+  local $SIG{__WARN__} = sub {};
+  after lvalue_proto_method => sub {};
+}
+
+is exception { LvalueWithProto->lvalue_proto_method = 4 }, undef,
+  'after maintains lvalue attribute with prototype present';
+is(LvalueWithProto->lvalue_proto_method, 4,
+  'after with lvalue and prototype correctly assigns');
+
 done_testing;

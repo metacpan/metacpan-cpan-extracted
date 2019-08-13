@@ -1,15 +1,9 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest;
-use Test::More tests => 12;
-use Test::NoWarnings;
+use Test::More;
+use if -d ".git", "Test::FailWarnings";
 
 my $dbh = DBI->connect('dbi:SQLite:dbname=:memory:',undef,undef,{RaiseError => 1});
 
@@ -81,3 +75,5 @@ SKIP: {
     # 11. Correct info retrieved
     is_deeply( \@info, $expected, 'We got the right info from multiple databases' );
 }
+
+done_testing;

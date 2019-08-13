@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.008005;
+use 5.010000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "PDF-API2",
   "LICENSE" => "lgpl",
-  "MIN_PERL_VERSION" => "5.008005",
+  "MIN_PERL_VERSION" => "5.010000",
   "NAME" => "PDF::API2",
   "PREREQ_PM" => {
     "Compress::Zlib" => "1.0",
@@ -24,7 +24,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::Memory::Cycle" => 0
   },
-  "VERSION" => "2.034",
+  "VERSION" => "2.035",
   "test" => {
     "TESTS" => "t/*.t"
   }

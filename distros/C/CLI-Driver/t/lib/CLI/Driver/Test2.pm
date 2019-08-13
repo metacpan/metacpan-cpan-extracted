@@ -64,6 +64,9 @@ method test9_method {
     return $self->dry_run;
 }
 
+method test10_method (Str :$myarg!) {
+    return "test10: $myarg";    
+}
 
 #############################
 ###### PRIVATE METHODS ######

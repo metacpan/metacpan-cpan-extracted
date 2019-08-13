@@ -12,14 +12,14 @@
          "rdfs:comment" : "The overall rating, based on a collection of reviews or ratings, of the item.",
          "rdfs:label" : "aggregateRating",
          "schema:domainIncludes" : [
-            "schema:Product",
-            "schema:Place",
-            "schema:Offer",
+            "schema:Organization",
             "schema:CreativeWork",
+            "schema:Offer",
+            "schema:Place",
             "schema:Service",
-            "schema:Event",
+            "schema:Product",
             "schema:Brand",
-            "schema:Organization"
+            "schema:Event"
          ],
          "schema:rangeIncludes" : "schema:AggregateRating"
       },
@@ -30,11 +30,11 @@
          "rdfs:label" : "logo",
          "rdfs:subPropertyOf" : "schema:image",
          "schema:domainIncludes" : [
-            "schema:Brand",
-            "schema:Organization",
-            "schema:Place",
             "schema:Service",
-            "schema:Product"
+            "schema:Brand",
+            "schema:Place",
+            "schema:Product",
+            "schema:Organization"
          ],
          "schema:rangeIncludes" : [
             "schema:URL",
@@ -46,14 +46,14 @@
          "rdfs:comment" : "A review of the item.",
          "rdfs:label" : "review",
          "schema:domainIncludes" : [
+            "schema:Organization",
             "schema:Service",
-            "schema:CreativeWork",
             "schema:Offer",
             "schema:Product",
-            "schema:Place",
-            "schema:Event",
+            "schema:CreativeWork",
             "schema:Brand",
-            "schema:Organization"
+            "schema:Event",
+            "schema:Place"
          ],
          "schema:rangeIncludes" : "schema:Review"
       },
@@ -62,10 +62,10 @@
          "rdfs:comment" : "A slogan or motto associated with the item.",
          "rdfs:label" : "slogan",
          "schema:domainIncludes" : [
-            "schema:Organization",
-            "schema:Service",
             "schema:Product",
+            "schema:Organization",
             "schema:Place",
+            "schema:Service",
             "schema:Brand"
          ],
          "schema:rangeIncludes" : "schema:Text"

@@ -17,7 +17,7 @@ use JSON qw/decode_json/;
 use WWW::Mechanize;
 use Path::Tiny;
 
-our $VERSION = version->new('0.7.1');
+our $VERSION = version->new('0.7.2');
 
 extends 'Group::Git';
 
@@ -79,7 +79,13 @@ sub _repos {
 
     while ($more) {
         $mech->get( $url . $start );
-        my $response = decode_json $mech->content;
+        my $response = eval { decode_json $mech->content };
+        if ( !$response ) {
+            die $@ || "Error occured processing stash server response\n";
+        }
+        elsif ( $response->{errors} ) {
+            die join '', map {"$_->{message}\n"} @{ $response->{errors} };
+        }
 
         REPO:
         for my $repo (@{ $response->{values} }) {
@@ -127,7 +133,7 @@ Group::Git::Stash - Adds reading all repositories you have access to on your loc
 
 =head1 VERSION
 
-This documentation refers to Group::Git::Stash version 0.7.1.
+This documentation refers to Group::Git::Stash version 0.7.2.
 
 =head1 SYNOPSIS
 

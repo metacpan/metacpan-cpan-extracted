@@ -1,6 +1,7 @@
 .perltidyrc
 .ship.conf
 .travis.yml
+.vstags
 Changes
 cpanfile
 Dockerfile
@@ -10,6 +11,7 @@ MANIFEST			This list of files
 README.md
 script/mojopaste
 t/00-basic.t
+t/branding.t
 t/charts.t
 t/config.t
 t/Helper.pm

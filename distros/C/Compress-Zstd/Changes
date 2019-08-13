@@ -1,5 +1,8 @@
 Revision history for Perl extension Compress-Zstd
 
+0.19 2019-08-12T08:33:36Z
+    - zstd 1.4.2
+
 0.18 2019-04-29T08:45:05Z
     - zstd 1.4.0
 

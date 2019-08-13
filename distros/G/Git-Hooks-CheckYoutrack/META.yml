@@ -1,0 +1,35 @@
+---
+abstract: unknown
+author:
+  - 'Dinesh Dharmalingam <dd.dinesh.rajakumar@gmail.com>'
+build_requires:
+  Config: '0'
+  Email::Sender::Transport::Mbox: '0'
+  ExtUtils::MakeMaker: '0'
+  Path::Tiny: '0.060'
+  Test::Requires::Git: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Git-Hooks-CheckYoutrack
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Git::Hooks: '0'
+  JSON::XS: '0'
+  LWP::UserAgent: '0'
+  Log::Any: '0'
+  Path::Tiny: '0.060'
+  URI::Builder: '0'
+resources:
+  repository: https://github.com/dinesh-it/Git-Hooks-CheckYoutrack.git
+version: v1.0.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -48,4 +48,13 @@ use_ok 'Data::Object::Export';
 
 can_ok 'Data::Object::Export', 'do';
 
+use Data::Object 'Core';
+
+ok !eval { do() };
+ok !eval { do('') };
+
+ok do {{}};
+ok do (hash => {});
+ok !do '/path/to/file';
+
 ok 1 and done_testing;

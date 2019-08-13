@@ -1,16 +1,9 @@
-#!/usr/bin/perl
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest qw/connect_ok $sqlite_call/;
 use Test::More;
-use Test::NoWarnings;
-
-plan tests => 1 + 19;
+use if -d ".git", "Test::FailWarnings";
 
 my $dbfile = "tmp.sqlite";
 
@@ -57,6 +50,7 @@ my $sth = $dbh->prepare("SELECT * FROM barfoo");
 ok !$DBD::SQLite::VirtualTable::T::CREATE_COUNT,    "no vtab created";
 is $DBD::SQLite::VirtualTable::T::CONNECT_COUNT, 1, "1 vtab connected";
 
+done_testing;
 
 package DBD::SQLite::VirtualTable::T;
 use base 'DBD::SQLite::VirtualTable';
@@ -76,4 +70,3 @@ sub DESTROY         {$DESTROY_COUNT++}
 sub DESTROY_MODULE  {$DESTROY_MODULE_COUNT++}
 
 1;
-

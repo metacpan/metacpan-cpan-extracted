@@ -1,16 +1,10 @@
-#!/usr/bin/perl
-
 use 5.00503;
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest qw/connect_ok @CALL_FUNCS/;
 use Test::More;
-use Test::NoWarnings;
+use if -d ".git", "Test::FailWarnings";
 use DBD::SQLite;
 use DBD::SQLite::Constants;
 
@@ -18,8 +12,6 @@ my @function_flags = (undef, 0);
 if ($DBD::SQLite::sqlite_version_number >= 3008003) {
   push @function_flags, DBD::SQLite::Constants::SQLITE_DETERMINISTIC;
 }
-
-plan tests => 29 * @CALL_FUNCS * @function_flags + 1;
 
 sub now {
     return time();
@@ -136,3 +128,5 @@ foreach my $call_func (@CALL_FUNCS) { for my $flags (@function_flags) {
 
 	$dbh->disconnect;
 }}
+
+done_testing;

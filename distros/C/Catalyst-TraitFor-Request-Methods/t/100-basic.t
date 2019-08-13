@@ -1,0 +1,48 @@
+#!perl
+
+use Test::Most;
+
+use HTTP::Request::Common;
+
+use lib 't/lib';
+
+use Catalyst::Test 'TestApp';
+
+my @Methods =
+  map { "is_" . $_ } qw/ get head post put delete connect options trace patch /;
+
+subtest 'HEAD' => sub {
+
+    my ( $res, $c ) = ctx_request( HEAD '/' );
+    can_ok( $c->req, @Methods );
+
+    ok $res->is_success, 'HEAD /';
+
+    ok $c->req->is_head, 'is_head';
+    ok !$c->req->is_get, '!is_get';
+
+};
+
+subtest 'GET' => sub {
+
+    my ( $res, $c ) = ctx_request( GET '/' );
+
+    ok $res->is_success, 'GET /';
+
+    ok $c->req->is_get, 'is_get';
+    ok !$c->req->is_post, '!is_post';
+
+};
+
+subtest 'POST' => sub {
+
+    my ( $res, $c ) = ctx_request( POST '/' );
+
+    ok $res->is_success, 'POST /';
+
+    ok $c->req->is_post, 'is_post';
+    ok !$c->req->is_get, '!is_get';
+
+};
+
+done_testing;

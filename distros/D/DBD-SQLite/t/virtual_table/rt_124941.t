@@ -1,14 +1,9 @@
-#!/usr/bin/perl
 use strict;
-BEGIN {
-        $|  = 1;
-        $^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest qw/connect_ok $sqlite_call has_sqlite/;
-use Test::More tests => 6;
-use Test::NoWarnings;
+use Test::More;
+use if -d ".git", "Test::FailWarnings";
 
 my $dbh = connect_ok(sqlite_trace => 2);
 # register the module and declare the virtual table
@@ -93,3 +88,5 @@ EOT
 
     is_deeply($got_aref, $expected_aref, $test_desc);
 }
+
+done_testing;

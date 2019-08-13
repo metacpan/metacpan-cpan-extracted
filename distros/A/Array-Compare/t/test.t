@@ -22,6 +22,10 @@ ok(not $comp->compare(\@A, \@B));
 $comp->Skip(\%skip1);
 ok($comp->compare(\@A, \@B));
 
+# Compare two different arrays after reset Skip - should fail
+$comp->NoSkip();
+ok(not $comp->compare(\@A, \@B));
+
 # compare two different arrays but ignore non-differing column - should fail
 $comp->Skip(\%skip2);
 ok(not $comp->compare(\@A, \@B));

@@ -1,0 +1,49 @@
+{
+   "class" : {
+      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1062",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "For a given health insurance plan, the specification for costs and coverage of prescription drugs.",
+      "rdfs:label" : "HealthPlanFormulary",
+      "rdfs:subClassOf" : "schema:Intangible",
+      "schema:category" : "issue-1062",
+      "schema:isPartOf" : "http:pending.schema.org"
+   },
+   "properties" : {
+      "schema:healthPlanCostSharing" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1062",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Whether The costs to the patient for services under this network or formulary.",
+         "rdfs:label" : "healthPlanCostSharing",
+         "schema:category" : "issue-1062",
+         "schema:domainIncludes" : [
+            "schema:HealthPlanNetwork",
+            "schema:HealthPlanFormulary"
+         ],
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Boolean"
+      },
+      "schema:healthPlanDrugTier" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1062",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The tier(s) of drugs offered by this formulary or insurance plan.",
+         "rdfs:label" : "healthPlanDrugTier",
+         "schema:category" : "issue-1062",
+         "schema:domainIncludes" : [
+            "schema:HealthPlanFormulary",
+            "schema:HealthInsurancePlan"
+         ],
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:offersPrescriptionByMail" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1062",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Whether prescriptions can be delivered by mail.",
+         "rdfs:label" : "offersPrescriptionByMail",
+         "schema:category" : "issue-1062",
+         "schema:domainIncludes" : "schema:HealthPlanFormulary",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Boolean"
+      }
+   }
+}

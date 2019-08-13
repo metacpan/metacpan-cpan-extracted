@@ -9,13 +9,15 @@ use Test::More;
 use Test::NoWarnings ();
 
 use File::Path;
+use File::Temp 'tempdir';
 use File::Spec::Functions;
 use Test::Smoke::App::SmokePerl;
 use Test::Smoke::App::Options;
 my $opt = 'Test::Smoke::App::Options';
 $Test::Smoke::LogMixin::USE_TIMESTAMP = 0;
 
-my $ddir = catdir('t', 'perl');
+my $tmpdir = tempdir(CLEANUP => ($ENV{SMOKE_DEBUG} ? 0 : 1));
+my $ddir = catdir($tmpdir, 'perl');
 mkpath($ddir);
 {
     fake_out($ddir);
@@ -23,11 +25,11 @@ mkpath($ddir);
     local *CORE::GLOBAL::localtime = sub {
         return (2, 11, 14, 15, 3, 115, 3, 104, 1);
     };
-    local *Test::Smoke::App::SyncTree::run = \&smarty_pants;
-    local *Test::Smoke::App::RunSmoke::run = \&smarty_pants;
-    local *Test::Smoke::App::Reporter::run = \&smarty_pants;
+    local *Test::Smoke::App::SyncTree::run   = \&smarty_pants;
+    local *Test::Smoke::App::RunSmoke::run   = \&smarty_pants;
+    local *Test::Smoke::App::Reporter::run   = \&smarty_pants;
     local *Test::Smoke::App::SendReport::run = \&smarty_pants;
-    local *Test::Smoke::App::Archiver::run = \&smarty_pants;
+    local *Test::Smoke::App::Archiver::run   = \&smarty_pants;
 
     {
         open my $log, '>', \my $logfile;
@@ -89,11 +91,6 @@ calling ->run() from Test::Smoke::App::RunSmoke
 Test::NoWarnings::had_no_warnings();
 $Test::NoWarnings::do_end_test = 0;
 done_testing();
-
-END {
-    unlink catfile($ddir, Test::Smoke::App::Options->outfile->default);
-    rmtree($ddir);
-}
 
 sub smarty_pants {
     my $self = shift;

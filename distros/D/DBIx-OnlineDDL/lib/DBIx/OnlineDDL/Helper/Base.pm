@@ -1,7 +1,7 @@
 package DBIx::OnlineDDL::Helper::Base;
 
 our $AUTHORITY = 'cpan:GSG';
-our $VERSION   = '0.91';
+our $VERSION   = '0.92';
 
 use v5.10;
 use Moo;
@@ -21,7 +21,7 @@ DBIx::OnlineDDL::Helper::Base - Private OnlineDDL helper for RDBMS-specific code
 
 =head1 VERSION
 
-version 0.91
+version 0.92
 
 =head1 DESCRIPTION
 
@@ -330,7 +330,7 @@ sub swap_tables {
     @stmts = $helper->remove_fks_from_child_tables_stmts if $helper->child_fks_need_adjusting;
 
 Return a list of statements needed to remove FKs from the child tables.  These will be
-ran through L<DBIx::OnlineDDL/dbh_runner_do>.
+run through L<DBIx::OnlineDDL/dbh_runner_do>.
 
 Only used if L</child_fks_need_adjusting> is true.
 
@@ -365,7 +365,7 @@ sub remove_fks_from_child_tables_stmts {
     @stmts = $helper->rename_fks_back_to_original_stmts if $helper->dbms_uses_global_fk_namespace;
 
 Return a list of statements needed to rename the FKs back to their original names.  These will be
-ran through L<DBIx::OnlineDDL/dbh_runner_do>.
+run through L<DBIx::OnlineDDL/dbh_runner_do>.
 
 Only used if L</dbms_uses_global_fk_namespace> is true.
 
@@ -409,7 +409,7 @@ sub rename_fks_back_to_original_stmts {
     @stmts = $helper->add_fks_back_to_child_tables_stmts if $helper->child_fks_need_adjusting;
 
 Return a list of statements needed to add FKs back to the child tables.  These will be
-ran through L<DBIx::OnlineDDL/dbh_runner_do>.
+run through L<DBIx::OnlineDDL/dbh_runner_do>.
 
 Only used if L</child_fks_need_adjusting> is true.
 
@@ -444,7 +444,7 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2018 Grant Street Group
+Copyright 2019 Grant Street Group
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

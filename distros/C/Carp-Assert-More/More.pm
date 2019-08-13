@@ -15,18 +15,19 @@ Carp::Assert::More - convenience wrappers around Carp::Assert
 
 =head1 VERSION
 
-Version 1.18
+Version 1.20
 
 =cut
 
 BEGIN {
-    $VERSION = '1.18';
+    $VERSION = '1.20';
     @ISA = qw(Exporter);
     @EXPORT = qw(
         assert_all_keys_in
         assert_aoh
         assert_arrayref
         assert_coderef
+        assert_datetime
         assert_defined
         assert_empty
         assert_exists
@@ -679,6 +680,25 @@ sub assert_coderef($;$) {
 
     return assert_isa( $ref, 'CODE', $name );
 }
+
+
+=head1 TYPE-SPECIFIC ASSERTIONS
+
+=head2 assert_datetime( $date )
+
+Asserts that C<$date> is a DateTime object.
+
+=cut
+
+sub assert_datetime {
+    my $datetime = shift;
+    my $desc     = shift // 'Must be a DateTime object';
+
+    assert_isa( $datetime, 'DateTime', $desc );
+
+    return;
+}
+
 
 =head1 SET AND HASH MEMBERSHIP
 

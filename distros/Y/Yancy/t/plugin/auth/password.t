@@ -159,6 +159,31 @@ subtest 'protect routes' => sub {
     };
 };
 
+subtest 'errors' => sub {
+    subtest 'user not found' => sub {
+        $t->post_ok( '/yancy/auth/password', form => { username => 'NOT FOUND', password => '123', return_to => '/' } )
+          ->status_is( 400 )
+          ->header_isnt( Location => '/yancy' )
+          ->element_exists(
+              'form[method=POST][action=/yancy/auth/password] input[name=username][value=NOT FOUND]',
+              'username input exists with value pre-filled',
+          )
+          ->element_exists(
+              'form[method=POST][action=/yancy/auth/password] input[name=password]:not([value])',
+              'password input exists without value',
+          )
+          ->element_exists(
+              'form[method=POST][action=/yancy/auth/password] input[name=return_to][value=/]',
+              'return to field exists with correct value',
+          )
+          ->text_like(
+              '.login-error', qr{\s*Login failed: User or password incorrect!\s*},
+              'login error alert box shown',
+          )
+          ;
+    };
+};
+
 subtest 'logout' => sub {
     $t->get_ok( '/yancy/auth/password/logout' )
       ->status_is( 302 )
@@ -242,6 +267,38 @@ subtest 'login and change password digest' => sub {
     my $digest = Digest->new( 'SHA-1' )->add( '456rty' )->b64digest;
     is $new_user->{password}, join( '$', $digest, 'SHA-1' ),
         'user password is updated to new default config';
+};
+
+subtest 'regressions' => sub {
+    subtest 'no known registerable fields (Github #69)' => sub {
+        my $t = Test::Mojo->new( 'Mojolicious' );
+        $t->app->plugin( 'Yancy', {
+            backend => $backend_url,
+            schema => {
+                user => {
+                    'x-id-field' => 'username',
+                    # No required fields here
+                    properties => {
+                        username => { type => 'string' },
+                        password => { type => 'string' },
+                    },
+                },
+            },
+        } );
+        eval {
+            $t->app->yancy->plugin( 'Auth::Password', {
+                schema => 'user',
+                username_field => 'username',
+                password_field => 'password',
+                password_digest => { type => 'SHA-1' },
+                # No register_fields here
+                # No allow_register either
+            } );
+        };
+        ok !$@, 'can load Auth::Password plugin' or diag $@;
+
+    };
+
 };
 
 done_testing;

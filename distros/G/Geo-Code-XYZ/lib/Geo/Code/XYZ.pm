@@ -714,11 +714,11 @@ Geo::Code::XYZ - Encode latitude,longitude,elevation into three names and vice v
 
 =head1 VERSION
 
-Version 1.5
+Version 1.6
 
 =cut
 
-our $VERSION = '1.5';
+our $VERSION = '1.6';
 
 
 =head1 SYNOPSIS
@@ -747,11 +747,11 @@ Geo::Code::XYZ is the 3d version of the perl5 module Geo::Code. It produces loca
 
 A set of 146300 geonames has been selected from geonames.org and other open sources with certain requirements such as: every geoname has phonetic/levenstein distance of at least 2 from every other geoname, major geonames are prioritized over less known ones to make the set more memorable.
 
-The first geoname is the name of the most prominent location name in the vicinity of the point (for eg, L<LONDON-ZERO-MAX|https://3geonames.org/LONDON-ZERO-MAX> will be a location near London, UK.) The other two are random geonames or english words of length les than or equal to 9. If the first name is not a geoname, for eg, L<MAX-ZERO-LONDON|https://3geonames.org/MAX-ZERO-LONDON>, then the location is somewhere in the ocean or the poles, too far from any known geoname. (at least 200 kilometres away from the nearest geoname)
+The first geoname is the name of the most prominent location name in the vicinity of the point (for eg, L<LONDON-ZERO-MAX|https://3geonames.org/LONDON-ZERO-MAX> is a location near London, UK.) The other two are random geonames or english words of length less than or equal to 9. If the first name is not a geoname, for eg, L<MAX-ZERO-LONDON|https://3geonames.org/MAX-ZERO-LONDON>, then the location is somewhere in the ocean or the poles, too far from any known geoname. (at least 200 kilometres away from the nearest geoname)
 
-Geocodes that are close to each other will have similar names, for eg:  L<LONDON-SHURGARD-OINK|https://3geonames.org/LONDON-SHURGARD-OINK> and L<LONDON-SHURGARD-OPEC|https://3geonames.org/LONDON-SHURGARD-OPEC> are about 1 meter from each other, while L<LONDON-SHURGARD-OINK|https://3geonames.org/LONDON-SHURGARD-OINK> and L<LONDON-SHURIKEN-LAOLA|https://3geonames.org/LONDON-SHURIKEN-LAOLA> are about 383 meters away.
+Geocodes that are close to each other will have similar names, for eg:  L<LONDON-SHURGARD-OINK|https://3geonames.org/LONDON-SHURGARD-OINK> and L<LONDON-SHURGARD-OPEC|https://3geonames.org/LONDON-SHURGARD-OPEC> are about 1 meter from each other, while L<LONDON-SHURGARD-OINK|https://3geonames.org/LONDON-SHURGARD-OINK> and L<LONDON-SHURIKEN-OINK|https://3geonames.org/LONDON-SHURIKEN-OINK> are about 383 meters away.
 
-There are several improvements in Geo::Code::XYZ over the original Geo::Code, in addition to the elevation feature, such as, more intuitive name choices for readability and location proximity, more evenly spread phonetic distance for reducing errors in voice transmission of geocodes, picking geoname aliases according to OSM admin boundaries (3geonames.org online version only - this module does not rely on a database and this last feature needs one.)
+There are several improvements in Geo::Code::XYZ over the original Geo::Code, in addition to the elevation feature, such as, more intuitive name choices for readability and location proximity, more evenly spread phonetic distance for reducing errors in voice transmission of geocodes, picking geoname aliases based on OSM admin boundaries (3geonames.org online version only - this module does not rely on a database and this last feature needs one.)
 
 This module is explained in more detailed on GitHub. L<View on GitHub|https://github.com/eruci/geocode>.
 

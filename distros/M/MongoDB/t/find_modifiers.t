@@ -24,8 +24,15 @@ use MongoDB;
 use boolean;
 
 use lib "t/lib";
-use MongoDBTest
-  qw/skip_unless_mongod build_client get_test_db server_version server_type/;
+use MongoDBTest qw/
+    skip_unless_mongod
+    build_client
+    get_test_db
+    server_version
+    server_type
+    check_min_server_version
+    skip_unless_min_version
+/;
 
 skip_unless_mongod();
 
@@ -105,7 +112,7 @@ sub option_is {
 
     # In a legacy query, options show up as dollar modifiers
     my $key_to_check =
-      $server_version < v3.2.0 ? $modifier_for_option{$option_name} : $option_name;
+      check_min_server_version($conn, 'v3.2.0') ? $modifier_for_option{$option_name} : $option_name;
 
     my $got   = $payload->{$key_to_check};
     my $label = "'$key_to_check' correct";
@@ -234,7 +241,7 @@ subtest "Given: a 'max' value for an index" => sub {
     subtest "When: adding a max via option" => sub {
         @intercept = ();
         my $cursor =
-          $coll->find( { x => { '$gt' => $num_docs_to_search } }, { max => $max } );
+          $coll->find( { x => { '$gt' => $num_docs_to_search } }, { max => $max, hint => [x => 1] } );
         is( scalar $cursor->all(), $num_docs_to_search, "Number of documents correct" );
         option_is( $intercept[-1], 'max', $max );
     };
@@ -242,7 +249,7 @@ subtest "Given: a 'max' value for an index" => sub {
     subtest "When: adding a max via modifiers" => sub {
         @intercept = ();
         my $cursor = $coll->find( { x => { '$gt' => $num_docs_to_search } },
-            { modifiers => { '$max' => $max } } );
+            { modifiers => { '$max' => $max }, hint => [x => 1] } );
         is( scalar $cursor->all(), $num_docs_to_search, "Number of documents correct" );
         option_is( $intercept[-1], 'max', $max );
     };
@@ -250,7 +257,7 @@ subtest "Given: a 'max' value for an index" => sub {
     subtest "When: adding a max via option and modifiers" => sub {
         @intercept = ();
         my $cursor = $coll->find( { x => { '$gt' => $num_docs_to_search } },
-            { max => $max, modifiers => { '$max' => $max2 } } );
+            { max => $max, modifiers => { '$max' => $max2 }, hint => [x => 1] } );
         is( scalar $cursor->all(), $num_docs_to_search, "Number of documents correct" );
         option_is( $intercept[-1], 'max', $max );
     };
@@ -290,7 +297,7 @@ subtest "Given: a 'maxScan' value for an index" => sub {
 };
 
 subtest "Given: a 'maxTimeMS' value for an index" => sub {
-    plan skip_all => 'Requires MongoDB 2.6+' unless $server_version >= v2.6.0;
+    skip_unless_min_version($conn, 'v2.6.0');
 
     my $maxTimeMS = 1000;
     my $maxTimeMS2 = 2000;
@@ -335,7 +342,7 @@ subtest "Given: a 'min' value for an index" => sub {
     subtest "When: adding a min via option" => sub {
         @intercept = ();
         my $cursor =
-          $coll->find( { x => { '$gt' => $num_docs_to_search } }, { min => $min } );
+          $coll->find( { x => { '$gt' => $num_docs_to_search } }, { min => $min, hint => [x => 1] } );
         is( scalar $cursor->all(), $num_docs_to_search, "Number of documents correct" );
         option_is( $intercept[-1], 'min', $min );
     };
@@ -343,7 +350,7 @@ subtest "Given: a 'min' value for an index" => sub {
     subtest "When: adding a min via modifiers" => sub {
         @intercept = ();
         my $cursor = $coll->find( { x => { '$gt' => $num_docs_to_search } },
-            { modifiers => { '$min' => $min } } );
+            { modifiers => { '$min' => $min }, hint => [x => 1] } );
         is( scalar $cursor->all(), $num_docs_to_search, "Number of documents correct" );
         option_is( $intercept[-1], 'min', $min );
     };
@@ -351,7 +358,7 @@ subtest "Given: a 'min' value for an index" => sub {
     subtest "When: adding a min via options and modifiers" => sub {
         @intercept = ();
         my $cursor = $coll->find( { x => { '$gt' => $num_docs_to_search } },
-            { min => $min, modifiers => { '$min' => $min2 } } );
+            { min => $min, modifiers => { '$min' => $min2 }, hint => [x => 1] } );
         is( scalar $cursor->all(), $num_docs_to_search, "Number of documents correct" );
         option_is( $intercept[-1], 'min', $min );
     };

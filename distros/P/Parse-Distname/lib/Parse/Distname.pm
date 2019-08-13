@@ -5,7 +5,7 @@ use warnings;
 use Carp;
 use Exporter 5.57 'import';
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 our @EXPORT_OK = qw/parse_distname/;
 
 our $SUFFRE = qr/\.(?:tgz|tbz|tar[\._-]gz|tar\.bz2|tar\.Z|zip)$/;
@@ -135,7 +135,7 @@ sub _parse_distv {
   # If we still don't have a version, and the name doesn't have a hyphen,
   # and it has a tailing number... (and an occasional alpha/beta marker)
   # (and the number is not a part of a few proper names)
-  if (!defined $version and $distv !~ /\-(?:S3|MSWin32|OS2)$/i and $distv =~ s/([_\.]?)([vV]?[0-9_]+[ab]?)$//) {
+  if (!defined $version and $distv !~ /\-(?:S3|MSWin32|OS2|(?:[A-Za-z][A-Za-z0-9_]*)?SSL3)$/i and $distv =~ s/([_\.]?)([vV]?[0-9_]+[ab]?)$//) {
     my $separator = $1;
     $version = $2;
 

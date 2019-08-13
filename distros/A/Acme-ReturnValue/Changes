@@ -1,6 +1,19 @@
 Changes Acme::ReturnValue
 
+1.003   2019-08-12T18:21:15
+    - fix botched cpanfile via dist.ini
+      this should also fix all the test fails and
+      https://github.com/domm/Acme-ReturnValue/issues/1
+
+
+1.002   2019-08-09T21:40:44
+    - generated a fresh set of data and website
+    - add cpanfile, update dist.ini
+    - update urls to use metacpan & plix
+
+
 1.001	2013-03-30T10:39:27+0100
+    - now also figured out how to exclude crap thats lying in my work dir
     - manually removed lots of files (json dumps, website)
       /me hates dist::zilla right now...
 

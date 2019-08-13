@@ -12,9 +12,9 @@
          "rdfs:comment" : "The hours during which this service or contact is available.",
          "rdfs:label" : "hoursAvailable",
          "schema:domainIncludes" : [
-            "schema:Service",
+            "schema:LocationFeatureSpecification",
             "schema:ContactPoint",
-            "schema:LocationFeatureSpecification"
+            "schema:Service"
          ],
          "schema:rangeIncludes" : "schema:OpeningHoursSpecification"
       },
@@ -24,17 +24,17 @@
          "rdfs:comment" : "The date when the item becomes valid.",
          "rdfs:label" : "validFrom",
          "schema:domainIncludes" : [
-            "schema:LocationFeatureSpecification",
-            "schema:OpeningHoursSpecification",
-            "schema:Demand",
-            "schema:MonetaryAmount",
             "schema:PriceSpecification",
+            "schema:Offer",
+            "schema:LocationFeatureSpecification",
             "schema:Permit",
-            "schema:Offer"
+            "schema:Demand",
+            "schema:OpeningHoursSpecification",
+            "schema:MonetaryAmount"
          ],
          "schema:rangeIncludes" : [
-            "schema:DateTime",
-            "schema:Date"
+            "schema:Date",
+            "schema:DateTime"
          ]
       },
       "schema:validThrough" : {
@@ -45,15 +45,15 @@
          "schema:domainIncludes" : [
             "schema:LocationFeatureSpecification",
             "schema:Offer",
-            "schema:OpeningHoursSpecification",
             "schema:JobPosting",
             "schema:PriceSpecification",
             "schema:MonetaryAmount",
+            "schema:OpeningHoursSpecification",
             "schema:Demand"
          ],
          "schema:rangeIncludes" : [
-            "schema:DateTime",
-            "schema:Date"
+            "schema:Date",
+            "schema:DateTime"
          ]
       }
    }

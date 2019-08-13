@@ -10,10 +10,13 @@ subtest no_keys => sub{
     my $regular = CC::nk->fetch();
     my $custom = CC::nk->new();
 
+    is( CC::nk->injection(), undef, 'not injected' );
     is( CC::nk->fetch(), $regular, 'fetch returned regular object' );
     CC::nk->inject( $custom );
+    isnt( CC::nk->injection(), undef, 'is injected' );
     is( CC::nk->fetch(), $custom, 'fetch returned custom object' );
     CC::nk->uninject();
+    is( CC::nk->injection(), undef, 'not injected' );
     is( CC::nk->fetch(), $regular, 'fetch returned regular object' );
 };
 

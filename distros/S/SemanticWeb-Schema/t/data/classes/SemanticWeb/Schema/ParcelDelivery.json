@@ -37,8 +37,8 @@
          "rdfs:label" : "expectedArrivalFrom",
          "schema:domainIncludes" : "schema:ParcelDelivery",
          "schema:rangeIncludes" : [
-            "schema:Date",
-            "schema:DateTime"
+            "schema:DateTime",
+            "schema:Date"
          ]
       },
       "schema:expectedArrivalUntil" : {
@@ -47,8 +47,8 @@
          "rdfs:label" : "expectedArrivalUntil",
          "schema:domainIncludes" : "schema:ParcelDelivery",
          "schema:rangeIncludes" : [
-            "schema:Date",
-            "schema:DateTime"
+            "schema:DateTime",
+            "schema:Date"
          ]
       },
       "schema:hasDeliveryMethod" : {
@@ -83,15 +83,18 @@
          "schema:rangeIncludes" : "schema:Order"
       },
       "schema:provider" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2289",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The service provider, service operator, or service performer; the goods producer. Another party (a seller) may offer those services or goods on behalf of the provider. A provider may also serve as the seller.",
          "rdfs:label" : "provider",
+         "schema:category" : "issue-2289",
          "schema:domainIncludes" : [
+            "schema:EducationalOccupationalProgram",
             "schema:Service",
             "schema:Reservation",
             "schema:ParcelDelivery",
-            "schema:CreativeWork",
             "schema:Trip",
+            "schema:CreativeWork",
             "schema:Invoice"
          ],
          "schema:rangeIncludes" : [

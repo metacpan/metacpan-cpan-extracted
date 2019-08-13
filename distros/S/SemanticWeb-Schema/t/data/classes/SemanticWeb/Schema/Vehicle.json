@@ -95,8 +95,8 @@
          "rdfs:comment" : "The type of fuel suitable for the engine or engines of the vehicle. If the vehicle has only one engine, this property can be attached directly to the vehicle.",
          "rdfs:label" : "fuelType",
          "schema:domainIncludes" : [
-            "schema:EngineSpecification",
-            "schema:Vehicle"
+            "schema:Vehicle",
+            "schema:EngineSpecification"
          ],
          "schema:rangeIncludes" : [
             "schema:QualitativeValue",
@@ -120,9 +120,9 @@
          "schema:domainIncludes" : "schema:Vehicle",
          "schema:isPartOf" : "http:auto.schema.org",
          "schema:rangeIncludes" : [
-            "schema:URL",
             "schema:Text",
-            "schema:QualitativeValue"
+            "schema:QualitativeValue",
+            "schema:URL"
          ]
       },
       "schema:mileageFromOdometer" : {
@@ -160,8 +160,8 @@
          "rdfs:label" : "numberOfAxles",
          "schema:domainIncludes" : "schema:Vehicle",
          "schema:rangeIncludes" : [
-            "schema:QuantitativeValue",
-            "schema:Number"
+            "schema:Number",
+            "schema:QuantitativeValue"
          ]
       },
       "schema:numberOfDoors" : {
@@ -193,8 +193,8 @@
          "rdfs:label" : "numberOfPreviousOwners",
          "schema:domainIncludes" : "schema:Vehicle",
          "schema:rangeIncludes" : [
-            "schema:Number",
-            "schema:QuantitativeValue"
+            "schema:QuantitativeValue",
+            "schema:Number"
          ]
       },
       "schema:payload" : {
@@ -212,8 +212,8 @@
          "rdfs:comment" : "The date of production of the item, e.g. vehicle.",
          "rdfs:label" : "productionDate",
          "schema:domainIncludes" : [
-            "schema:Product",
-            "schema:Vehicle"
+            "schema:Vehicle",
+            "schema:Product"
          ],
          "schema:rangeIncludes" : "schema:Date"
       },
@@ -223,8 +223,8 @@
          "rdfs:comment" : "The date the item e.g. vehicle was purchased by the current owner.",
          "rdfs:label" : "purchaseDate",
          "schema:domainIncludes" : [
-            "schema:Vehicle",
-            "schema:Product"
+            "schema:Product",
+            "schema:Vehicle"
          ],
          "schema:rangeIncludes" : "schema:Date"
       },
@@ -236,8 +236,8 @@
          "schema:domainIncludes" : "schema:Vehicle",
          "schema:isPartOf" : "http:auto.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Number",
-            "schema:QuantitativeValue"
+            "schema:QuantitativeValue",
+            "schema:Number"
          ]
       },
       "schema:speed" : {
@@ -331,8 +331,8 @@
          "rdfs:label" : "vehicleSeatingCapacity",
          "schema:domainIncludes" : "schema:Vehicle",
          "schema:rangeIncludes" : [
-            "schema:QuantitativeValue",
-            "schema:Number"
+            "schema:Number",
+            "schema:QuantitativeValue"
          ]
       },
       "schema:vehicleSpecialUsage" : {
@@ -354,8 +354,8 @@
          "rdfs:label" : "vehicleTransmission",
          "schema:domainIncludes" : "schema:Vehicle",
          "schema:rangeIncludes" : [
-            "schema:URL",
             "schema:QualitativeValue",
+            "schema:URL",
             "schema:Text"
          ]
       },

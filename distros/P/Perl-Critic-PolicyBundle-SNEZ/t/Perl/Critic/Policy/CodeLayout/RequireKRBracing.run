@@ -1,0 +1,115 @@
+## name Opening brace without whitespace
+## failures 1
+## cut
+if (condition()){
+}
+
+## name Opening brace on the following line
+## failures 1
+## cut
+if (condition())
+{ $x = 1 }
+
+## name Complex condition, brace on next line
+## failures 1
+## cut
+while ($x > 12
+   and not $download->finished
+)
+{
+    try_again();
+}
+
+## name foreach
+## failures 1
+## cut
+foreach (@array){}
+
+## name else on same line with closing brace
+## failures 1
+## cut
+if ($x == 1) {
+    print "Good\n";
+} else {
+    print "Bad\n";
+}
+
+## name No whitespace between closing brace and else
+## failures 1
+## cut
+if ($is_fine) {
+    $x = 1;
+}else {
+    $x = 0;
+}
+
+## name continue on same line with closing brace
+## failures 1
+## cut
+foreach (@array) {
+    next unless defined;
+    push @results, $_;
+} continue {
+    print;
+}
+
+## name No whitespace before opening foreach parenthesis
+## failures 1
+## cut
+foreach(@array) {
+}
+
+## name No whitespace before opening foreach parenthesis with iterator
+## failures 1
+## cut
+foreach my $elem(@array) {
+}
+
+## name No whitespace before opening if parenthesis
+## failures 1
+## cut
+if($is_fine) {
+}
+
+
+## Basic pass
+## failures 0
+## cut
+if (condition()) {
+}
+
+## name Complex condition
+## failures 0
+## cut
+while ($x > 12
+   and not $download->finished
+) {
+    try_again();
+}
+
+## name Correct if-elsif-else
+## failures 0
+## cut
+if ($x == 1) {
+    print 'One';
+}
+elsif ($x == 2) {
+    print 'Two';
+}
+else {
+    print 'Three';
+}
+
+## name Correct foreach
+## failures 0
+## cut
+foreach (@array) {
+    do_sth($_);
+}
+continue {
+    print $c++;
+}
+
+foreach my $key (keys %hash) {
+    print "$key: $hash{$key}\n";
+}

@@ -1,17 +1,12 @@
-#!/usr/bin/perl
-
 # This test works, but as far as I can tell this doesn't actually test
 # the thing that the test was originally meant to test.
 
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
-use Test::More tests => 9;
+use warnings;
+use Test::More;
 use lib "t/lib";
 use SQLiteTest;
+use if -d ".git", "Test::FailWarnings";
 
 my $create1 = 'CREATE TABLE table1 (id INTEGER NOT NULL, name CHAR (64) NOT NULL)';
 my $create2 = 'CREATE TABLE table2 (id INTEGER NOT NULL, name CHAR (64) NOT NULL)';
@@ -59,3 +54,5 @@ SCOPE: {
 	ok( $dbh->do($create2), $create2 ) or diag("Error: '$DBI::errstr'");
 	ok( $dbh->disconnect, '->disconnect ok' );
 }
+
+done_testing;

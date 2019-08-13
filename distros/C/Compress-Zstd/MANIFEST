@@ -62,6 +62,7 @@ ext/zstd/build/VS_scripts/build.VS2017Professional.cmd
 ext/zstd/build/VS_scripts/build.generic.cmd
 ext/zstd/build/cmake/CMakeLists.txt
 ext/zstd/build/cmake/CMakeModules/AddZstdCompilationFlags.cmake
+ext/zstd/build/cmake/CMakeModules/FindLibLZ4.cmake
 ext/zstd/build/cmake/CMakeModules/GetZstdLibraryVersion.cmake
 ext/zstd/build/cmake/README.md
 ext/zstd/build/cmake/contrib/CMakeLists.txt
@@ -219,6 +220,7 @@ ext/zstd/contrib/seekable_format/examples/parallel_compression.c
 ext/zstd/contrib/seekable_format/examples/parallel_processing.c
 ext/zstd/contrib/seekable_format/examples/seekable_compression.c
 ext/zstd/contrib/seekable_format/examples/seekable_decompression.c
+ext/zstd/contrib/seekable_format/examples/seekable_decompression_mem.c
 ext/zstd/contrib/seekable_format/zstd_seekable.h
 ext/zstd/contrib/seekable_format/zstd_seekable_compression_format.md
 ext/zstd/contrib/seekable_format/zstdseek_compress.c
@@ -283,6 +285,10 @@ ext/zstd/lib/compress/hist.h
 ext/zstd/lib/compress/huf_compress.c
 ext/zstd/lib/compress/zstd_compress.c
 ext/zstd/lib/compress/zstd_compress_internal.h
+ext/zstd/lib/compress/zstd_compress_literals.c
+ext/zstd/lib/compress/zstd_compress_literals.h
+ext/zstd/lib/compress/zstd_compress_sequences.c
+ext/zstd/lib/compress/zstd_compress_sequences.h
 ext/zstd/lib/compress/zstd_double_fast.c
 ext/zstd/lib/compress/zstd_double_fast.h
 ext/zstd/lib/compress/zstd_fast.c
@@ -369,6 +375,7 @@ ext/zstd/programs/zstdless.1
 ext/zstd/programs/zstdless.1.md
 ext/zstd/tests/Makefile
 ext/zstd/tests/README.md
+ext/zstd/tests/bigdict.c
 ext/zstd/tests/checkTag.c
 ext/zstd/tests/datagencli.c
 ext/zstd/tests/decodecorpus.c
@@ -378,17 +385,18 @@ ext/zstd/tests/fuzz/Makefile
 ext/zstd/tests/fuzz/README.md
 ext/zstd/tests/fuzz/block_decompress.c
 ext/zstd/tests/fuzz/block_round_trip.c
-ext/zstd/tests/fuzz/default.options
 ext/zstd/tests/fuzz/dictionary_decompress.c
 ext/zstd/tests/fuzz/dictionary_round_trip.c
 ext/zstd/tests/fuzz/fuzz.h
 ext/zstd/tests/fuzz/fuzz.py
 ext/zstd/tests/fuzz/fuzz_helpers.h
 ext/zstd/tests/fuzz/regression_driver.c
+ext/zstd/tests/fuzz/simple_compress.c
 ext/zstd/tests/fuzz/simple_decompress.c
 ext/zstd/tests/fuzz/simple_round_trip.c
 ext/zstd/tests/fuzz/stream_decompress.c
 ext/zstd/tests/fuzz/stream_round_trip.c
+ext/zstd/tests/fuzz/zstd_frame_info.c
 ext/zstd/tests/fuzz/zstd_helpers.c
 ext/zstd/tests/fuzz/zstd_helpers.h
 ext/zstd/tests/fuzzer.c

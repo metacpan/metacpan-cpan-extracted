@@ -27,37 +27,78 @@
             "schema:Time"
          ]
       },
+      "schema:itinerary" : {
+         "dc:source" : "schemadotorgsources:Tourism",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Destination(s) ( <a class=\"localLink\" href=\"http://schema.org/Place\">Place</a> ) that make up a trip. For a trip where destination order is important use <a class=\"localLink\" href=\"http://schema.org/ItemList\">ItemList</a> to specify that order (see examples).",
+         "rdfs:label" : "itinerary",
+         "schema:category" : "issue-1810",
+         "schema:domainIncludes" : "schema:Trip",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:Place",
+            "schema:ItemList"
+         ]
+      },
       "schema:offers" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2289",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "An offer to provide this item&#x2014;for example, an offer to sell a product, rent the DVD of a movie, perform a service, or give away tickets to an event.",
          "rdfs:label" : "offers",
+         "schema:category" : "issue-2289",
          "schema:domainIncludes" : [
             "schema:Event",
-            "schema:Trip",
-            "schema:MenuItem",
-            "schema:AggregateOffer",
+            "schema:Service",
             "schema:Product",
+            "schema:MenuItem",
+            "schema:Trip",
             "schema:CreativeWork",
-            "schema:Service"
+            "schema:EducationalOccupationalProgram",
+            "schema:AggregateOffer"
          ],
          "schema:rangeIncludes" : "schema:Offer"
       },
+      "schema:partOfTrip" : {
+         "dc:source" : "schemadotorgsources:Tourism",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Identifies that this <a class=\"localLink\" href=\"http://schema.org/Trip\">Trip</a> is a subTrip of another Trip.  For example Day 1, Day 2, etc. of a multi-day trip.",
+         "rdfs:label" : "partOfTrip",
+         "schema:category" : "issue-1810",
+         "schema:domainIncludes" : "schema:Trip",
+         "schema:inverseOf" : "schema:subTrip",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Trip"
+      },
       "schema:provider" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2289",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The service provider, service operator, or service performer; the goods producer. Another party (a seller) may offer those services or goods on behalf of the provider. A provider may also serve as the seller.",
          "rdfs:label" : "provider",
+         "schema:category" : "issue-2289",
          "schema:domainIncludes" : [
+            "schema:EducationalOccupationalProgram",
             "schema:Service",
             "schema:Reservation",
             "schema:ParcelDelivery",
-            "schema:CreativeWork",
             "schema:Trip",
+            "schema:CreativeWork",
             "schema:Invoice"
          ],
          "schema:rangeIncludes" : [
             "schema:Person",
             "schema:Organization"
          ]
+      },
+      "schema:subTrip" : {
+         "dc:source" : "schemadotorgsources:Tourism",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Identifies a <a class=\"localLink\" href=\"http://schema.org/Trip\">Trip</a> that is a subTrip of this Trip.  For example Day 1, Day 2, etc. of a multi-day trip.",
+         "rdfs:label" : "subTrip",
+         "schema:category" : "issue-1810",
+         "schema:domainIncludes" : "schema:Trip",
+         "schema:inverseOf" : "schema:partOfTrip",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Trip"
       }
    }
 }

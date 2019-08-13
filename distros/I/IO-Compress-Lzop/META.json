@@ -35,8 +35,8 @@
       "runtime" : {
          "requires" : {
             "Compress::LZO" : "0",
-            "IO::Compress::Base" : "2.086",
-            "IO::Uncompress::Base" : "2.086"
+            "IO::Compress::Base" : "2.087",
+            "IO::Uncompress::Base" : "2.087"
          }
       }
    },
@@ -52,6 +52,6 @@
          "web" : "https://github.com/pmqs/IO-Compress-Lzop"
       }
    },
-   "version" : "2.086",
+   "version" : "2.087",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

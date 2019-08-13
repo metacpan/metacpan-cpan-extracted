@@ -1,15 +1,9 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest;
-use Test::More tests => 8;
-use Test::NoWarnings;
+use Test::More;
+use if -d ".git", "Test::FailWarnings";
 
 my $dbh = connect_ok( RaiseError => 1 );
 $dbh->do("CREATE TABLE f (f1, f2, f3)");
@@ -43,3 +37,5 @@ SCOPE: {
 		'f.f3'  => 1,
 	}, 'Shortname row ok' );
 }
+
+done_testing;

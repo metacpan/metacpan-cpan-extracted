@@ -1,11 +1,11 @@
 #!perl
 
-# Note: This script is a CLI  for Riap function /Complete/Util/complete_hash_key
-# and generated automatically using Perinci::CmdLine::Gen version 0.482
+# Note: This script is a CLI for Riap function /Complete/Util/complete_hash_key
+# and generated automatically using Perinci::CmdLine::Gen version 0.488
 
-our $DATE = '2017-08-18'; # DATE
+our $DATE = '2019-07-18'; # DATE
 our $DIST = 'App-CompleteCLIs'; # DIST
-our $VERSION = '0.13'; # VERSION
+our $VERSION = '0.140'; # VERSION
 
 use 5.010001;
 use strict;
@@ -16,10 +16,14 @@ use Perinci::CmdLine::Any;
 # code_before_instantiate_cmdline
 use Complete::Util;
 
-Perinci::CmdLine::Any->new(
+my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Complete/Util/complete_hash_key",
     program_name => "complete-hash-key",
-)->run;
+    read_config => 0,
+    read_env => 0,
+);
+
+$cmdline->run;
 
 # ABSTRACT: Complete from hash keys
 # PODNAME: complete-hash-key
@@ -36,7 +40,7 @@ complete-hash-key - Complete from hash keys
 
 =head1 VERSION
 
-This document describes version 0.13 of complete-hash-key (from Perl distribution App-CompleteCLIs), released on 2017-08-18.
+This document describes version 0.140 of complete-hash-key (from Perl distribution App-CompleteCLIs), released on 2019-07-18.
 
 =head1 SYNOPSIS
 
@@ -58,6 +62,14 @@ See C<--hash>.
 
 =item B<--hash>=I<s>*
 
+=item B<--summaries-from-hash-values>
+
+=item B<--summaries-json>=I<s>
+
+See C<--summaries>.
+
+=item B<--summaries>=I<s>
+
 =item B<--word>=I<s>*
 
 Word to complete.
@@ -65,36 +77,6 @@ Word to complete.
 Default value:
 
  ""
-
-=back
-
-=head2 Configuration options
-
-=over
-
-=item B<--config-path>=I<filename>
-
-Set path to configuration file.
-
-Can be specified multiple times.
-
-=item B<--config-profile>=I<s>
-
-Set configuration profile to use.
-
-=item B<--no-config>
-
-Do not use any configuration file.
-
-=back
-
-=head2 Environment options
-
-=over
-
-=item B<--no-env>
-
-Do not read environment for default options.
 
 =back
 
@@ -185,43 +167,6 @@ It is also recommended to install L<shcompgen> (see above).
 
 For fish and zsh, install L<shcompgen> as described above.
 
-=head1 CONFIGURATION FILE
-
-This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
-
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/complete-hash-key.conf>, F<~/complete-hash-key.conf>, or F</etc/complete-hash-key.conf>.
-
-All found files will be read and merged.
-
-To disable searching for configuration files, pass C<--no-config>.
-
-You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
-
-You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
-
-Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
-
-List of available configuration parameters:
-
- format (see --format)
- hash (see --hash)
- naked_res (see --naked-res)
- word (see --word)
-
-=head1 ENVIRONMENT
-
-=head2 COMPLETE_HASH_KEY_OPT => str
-
-Specify additional command-line options.
-
-=head1 FILES
-
-F<~/.config/complete-hash-key.conf>
-
-F<~/complete-hash-key.conf>
-
-F</etc/complete-hash-key.conf>
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/App-CompleteCLIs>.
@@ -244,7 +189,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

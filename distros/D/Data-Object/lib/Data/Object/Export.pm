@@ -8,7 +8,7 @@ use Scalar::Util;
 
 use parent 'Exporter';
 
-our $VERSION = '0.96'; # VERSION
+our $VERSION = '0.97'; # VERSION
 
 # BUILD
 
@@ -100,8 +100,11 @@ our %EXPORT_TAGS = (
 # PROXY
 
 sub do {
-  # try to be less evil
-  return CORE::do(@_) if @_ < 2;
+  unless (grep length, grep defined, @_) {
+    croak "Null filename used";
+  }
+
+  return CORE::do($_[0]) if @_ < 2;
 
   my $point;
 

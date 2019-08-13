@@ -4,19 +4,21 @@ File::Open::NoCache::ReadOnly - Open a file and clear the cache afterward
 
 # VERSION
 
-Version 0.01
+Version 0.02
 
 # SUBROUTINES/METHODS
 
 ## new
 
-Open a file and flush the cache afterwards.
+Open a file that will be read once sequentially and not again,
+optimising the cache accordingly.
 One use case is building a large database from smaller files that are
-only read in once.
+only read in once,
 Once the file has been used it's a waste of RAM to keep it in cache.
 
     use File::Open::NoCache::ReadOnly;
     my $fh = File::Open::NoCache::ReadOnly->new('/etc/passwd');
+    my $fh2 = File::Open::NoCache::ReadOnly->new(filename => '/etc/group', fatal => 1);
 
 ## fd
 
@@ -24,6 +26,12 @@ Returns the file descriptor of the file
 
     my $fd = $fh->fd();
     my $line = <$fd>;
+
+## close
+
+Shouldn't be needed as close happens automatically when there variable goes out of scope.
+However Perl isn't as good at reaping as it'd have you believe, so this is here to force it when you
+know you're finished with the object.
 
 # AUTHOR
 
@@ -49,10 +57,6 @@ You can also look for information at:
 - RT: CPAN's request tracker
 
     [http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-Open-NoCache-ReadOnly](http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-Open-NoCache-ReadOnly)
-
-- AnnoCPAN: Annotated CPAN documentation
-
-    [http://annocpan.org/dist/File-Open-NoCache-ReadOnly](http://annocpan.org/dist/File-Open-NoCache-ReadOnly)
 
 - CPAN Ratings
 

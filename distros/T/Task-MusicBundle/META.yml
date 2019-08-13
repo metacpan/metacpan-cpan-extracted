@@ -39,6 +39,7 @@ requires:
   MIDI::Tweaks: '0'
   MIDI::Util: '0'
   Music::AtonalUtil: '0'
+  Music::Cadence: '0'
   Music::Canon: '0'
   Music::Chord::Namer: '0'
   Music::Chord::Note: '0'
@@ -68,9 +69,9 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Task-MusicBundle
-  repository: https://github.com/ology/Task-MusicBundle
-version: '0.1700'
+  homepage: https://github.com/ology/Task-MusicBundle
+  repository: https://github.com/ology/Task-MusicBundle.git
+version: '0.1800'
 x_Dist_Zilla:
   perl:
     version: '5.027007'
@@ -235,9 +236,9 @@ x_Dist_Zilla:
       name: MetaJSON
       version: '6.012'
     -
-      class: Dist::Zilla::Plugin::MetaResources
-      name: MetaResources
-      version: '6.012'
+      class: Dist::Zilla::Plugin::GithubMeta
+      name: GithubMeta
+      version: '0.58'
     -
       class: Dist::Zilla::Plugin::Test::PodSpelling
       config:

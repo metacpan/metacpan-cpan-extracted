@@ -86,6 +86,43 @@ subtest 'scan match' => sub {
 };
 
 
+subtest 'special characters' => sub {
+    $redis->flushall;
+    my $ns1 = Redis::Namespace->new(redis => $redis, namespace => 'h?llo');
+    my $ns2 = Redis::Namespace->new(redis => $redis, namespace => 'h*llo');
+    my $ns3 = Redis::Namespace->new(redis => $redis, namespace => 'h[ae]llo');
+    my $ns4 = Redis::Namespace->new(redis => $redis, namespace => 'h[^e]llo');
+    my $ns5 = Redis::Namespace->new(redis => $redis, namespace => 'h[a-b]llo');
+
+    $redis->mset('hello:foo' => 'a', 'hallo:bar' => 'a', 'hxllo:foobar' => 'a', 'hllo:hoge' => 'a', 'heeeello:fuga' => 'a');
+
+    $ns1->mset(foo => 'a', bar => 'b');
+    $ns2->mset(foo => 'a', bar => 'b');
+    $ns3->mset(foo => 'a', bar => 'b');
+    $ns4->mset(foo => 'a', bar => 'b');
+    $ns5->mset(foo => 'a', bar => 'b');
+
+    my $keys = sub {
+        my ($ns) = @_;
+        my @ret = ();
+        iterate sub {
+            $ns->scan($_[0], MATCH => '*');
+        }, sub {
+            push @ret, $_[0];
+        };
+        return [sort @ret];
+    };
+
+    is_deeply $keys->($ns1), ['bar', 'foo'], 'keys h?llo:';
+    is_deeply $keys->($ns2), ['bar', 'foo'], 'keys h*llo:';
+    is_deeply $keys->($ns3), ['bar', 'foo'], 'keys h[ae]llo:';
+    is_deeply $keys->($ns4), ['bar', 'foo'], 'keys h[^e]llo:';
+    is_deeply $keys->($ns5), ['bar', 'foo'], 'keys h[a-b]llo:';
+
+    $redis->flushall;
+};
+
+
 subtest 'scan count' => sub {
     # add keys for test
     $redis->flushall;

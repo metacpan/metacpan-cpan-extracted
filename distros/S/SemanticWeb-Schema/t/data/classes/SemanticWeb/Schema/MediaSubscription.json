@@ -24,8 +24,8 @@
          "rdfs:label" : "expectsAcceptanceOf",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
-            "schema:ActionAccessSpecification",
             "schema:ConsumeAction",
+            "schema:ActionAccessSpecification",
             "schema:MediaSubscription"
          ],
          "schema:rangeIncludes" : "schema:Offer"

@@ -1,5 +1,5 @@
 package Text::Autoformat::NullHang;
-$Text::Autoformat::NullHang::VERSION = '1.74';
+$Text::Autoformat::NullHang::VERSION = '1.75';
 use 5.006;
 use strict;
 use warnings;

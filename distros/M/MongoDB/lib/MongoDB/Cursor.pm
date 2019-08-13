@@ -20,7 +20,7 @@ package MongoDB::Cursor;
 # ABSTRACT: A lazy cursor for Mongo query results
 
 use version;
-our $VERSION = 'v2.0.3';
+our $VERSION = 'v2.2.0';
 
 use Moo;
 use MongoDB::Error;
@@ -35,7 +35,6 @@ use Types::Standard qw(
 );
 use boolean;
 use Tie::IxHash;
-use Try::Tiny;
 use namespace::clean -except => 'meta';
 
 #pod =attr started_iterating
@@ -78,7 +77,7 @@ has result => (
 sub _build_result {
     my ($self) = @_;
 
-    return $self->{client}->send_read_op( $self->_query );
+    return $self->{client}->send_retryable_read_op( $self->_query );
 }
 
 #--------------------------------------------------------------------------#
@@ -443,7 +442,7 @@ sub explain {
         monitoring_callback => $self->client->monitoring_callback,
     );
 
-    return $self->_query->client->send_read_op($explain_op);
+    return $self->_query->client->send_retryable_read_op($explain_op);
 }
 
 #pod =head1 QUERY ITERATION
@@ -612,7 +611,7 @@ MongoDB::Cursor - A lazy cursor for Mongo query results
 
 =head1 VERSION
 
-version v2.0.3
+version v2.2.0
 
 =head1 SYNOPSIS
 
@@ -625,6 +624,10 @@ version v2.0.3
 =head1 USAGE
 
 =head2 Multithreading
+
+B<NOTE>: Per L<threads> documentation, use of Perl threads is discouraged by the
+maintainers of Perl and the MongoDB Perl driver does not test or provide support
+for use with threads.
 
 Cursors are cloned in threads, but not reset.  Iterating the same cursor from
 multiple threads will give unpredictable results.  Only iterate from a single

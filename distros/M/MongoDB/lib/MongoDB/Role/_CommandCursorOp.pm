@@ -19,7 +19,7 @@ package MongoDB::Role::_CommandCursorOp;
 # MongoDB interface for database commands with cursors
 
 use version;
-our $VERSION = 'v2.0.3';
+our $VERSION = 'v2.2.0';
 
 use Moo::Role;
 
@@ -72,6 +72,7 @@ sub _build_result_from_cursor {
         _docs         => $batch,
         _max_time_ms  => $max_time_ms,
         _session       => $self->session,
+	_post_batch_resume_token => $c->{postBatchResumeToken},
     );
 }
 

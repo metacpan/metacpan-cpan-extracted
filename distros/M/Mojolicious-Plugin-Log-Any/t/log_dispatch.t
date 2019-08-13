@@ -15,25 +15,22 @@ my $log = Mojo::Log->with_roles('Mojo::Log::Role::AttachLogger')->new
 
 foreach my $level (@levels) {
   @log = ();
-  
   $log->$level('test', 'message');
-  
   ok +(grep { m/\[\Q$level\E\] test\nmessage$/m } @log), "$level log message"
     or diag dumper \@log;
 }
 
 my $info_log = Log::Dispatch->new(outputs => [['Code', code => sub { my %p = @_; push @log, $p{message} }, min_level => 'info']]);
-$log->unsubscribe('message')->attach_logger($info_log);
+$log->unsubscribe('message')->attach_logger($info_log, {prepend_level => 0});
 
 foreach my $level (@levels) {
   @log = ();
-  
   $log->$level('test', 'message');
   
   if ($level eq 'debug') {
     is_deeply \@log, [], 'no log message' or diag dumper \@log;
   } else {
-    ok +(grep { m/\[\Q$level\E\] test\nmessage$/m } @log), "$level log message"
+    ok +(grep { m/^test\nmessage$/m } @log), "$level log message (no prepend)"
       or diag dumper \@log;
   }
 }

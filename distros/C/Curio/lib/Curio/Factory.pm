@@ -1,5 +1,5 @@
 package Curio::Factory;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =encoding utf8
 
@@ -505,9 +505,9 @@ has default_arguments => (
 
 =head1 ATTRIBUTES
 
-=head2 keys
+=head2 declared_keys
 
-    my $keys = $factory->keys();
+    my $keys = $factory->declared_keys();
     foreach my $key (@$keys) { ... }
 
 Returns an array ref containing all the keys declared with
@@ -515,7 +515,7 @@ L</add_key>.
 
 =cut
 
-sub keys {
+sub declared_keys {
     my ($self) = @_;
     return [ keys %{ $self->_keys() } ];
 }
@@ -551,7 +551,7 @@ sub _fetch_curio {
     $curio = $self->_cache_get( $key ) if $self->does_caching();
     return $curio if $curio;
 
-    $curio = $self->_create( $key );
+    $curio = $self->_create( $key, {} );
 
     $self->_cache_set( $key, $curio ) if $self->does_caching();
 
@@ -586,22 +586,34 @@ sub _fetch_resource {
     return $curio->$method();
 }
 
-# I see no need for a public create() method at this time.
+=head2 create
 
-#sub create {
-#    my $self = shift;
-#    my $key = $self->_process_key_arg( \@_ );
-#    croak 'Too many arguments passed to create()' if @_;
-#
-#    return $self->_create( $key );
-#}
+    my $curio = $factory->create( %extra_args );
+    my $curio = $factory->create( $key, %extra_args );
+
+Creates a new curio object with arguments gotten from L</arguments>.  Extra
+arguments, which will take precedence, may also be passed.
+
+=cut
+
+sub create {
+    my $self = shift;
+    my $key = $self->_process_key_arg( \@_ );
+
+    my $extra_args = $self->class->BUILDARGS( @_ );
+
+    return $self->_create( $key, $extra_args );
+}
 
 sub _create {
-    my ($self, $key) = @_;
+    my ($self, $key, $extra_args) = @_;
 
     my $args = $self->_arguments( $key );
 
-    my $curio = $self->class->new( $args );
+    my $curio = $self->class->new(
+        %$args,
+        %$extra_args,
+    );
 
     my $method = $self->resource_method_name();
     if ($curio->can($method)) {
@@ -610,7 +622,6 @@ sub _create {
 
         my $resource_class = blessed $resource;
         $self->_install_curio_method( $resource_class ) if $resource_class;
-
     }
 
     return $curio;
@@ -788,6 +799,8 @@ Takes a curio object of your making and forces L</fetch_curio> to
 return the injected object (or the injected object's resource).
 This is useful for injecting mock objects in tests.
 
+The L</create> method is a good way to make the mock curio object.
+
 =cut
 
 sub inject {
@@ -858,6 +871,24 @@ sub uninject {
     my $curio = $self->_remove_injection( $key );
 
     return $curio;
+}
+
+=head2 injection
+
+    my $curio_object = $factory->injection();
+    my $curio_object = $factory->injection( $key );
+
+Returns the injected curio object, or C<undef> if none has been injected.
+
+=cut
+
+sub injection {
+    my $self = shift;
+    my $key = $self->_process_key_arg( \@_ );
+
+    $key = $undef_key if !defined $key;
+
+    return $self->_get_injection( $key );
 }
 
 1;

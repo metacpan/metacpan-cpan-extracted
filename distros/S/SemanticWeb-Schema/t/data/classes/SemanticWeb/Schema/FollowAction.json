@@ -13,8 +13,8 @@
          "rdfs:subPropertyOf" : "schema:object",
          "schema:domainIncludes" : "schema:FollowAction",
          "schema:rangeIncludes" : [
-            "schema:Person",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Person"
          ]
       }
    }

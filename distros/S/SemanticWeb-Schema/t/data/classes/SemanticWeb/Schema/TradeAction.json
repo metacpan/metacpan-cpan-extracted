@@ -12,12 +12,12 @@
          "rdfs:label" : "price",
          "schema:domainIncludes" : [
             "schema:PriceSpecification",
-            "schema:TradeAction",
-            "schema:Offer"
+            "schema:Offer",
+            "schema:TradeAction"
          ],
          "schema:rangeIncludes" : [
-            "schema:Number",
-            "schema:Text"
+            "schema:Text",
+            "schema:Number"
          ]
       },
       "schema:priceCurrency" : {
@@ -25,11 +25,11 @@
          "rdfs:comment" : "The currency of the price, or a price component when attached to <a class=\"localLink\" href=\"http://schema.org/PriceSpecification\">PriceSpecification</a> and its subtypes.<br/><br/>\n\nUse standard formats: <a href=\"http://en.wikipedia.org/wiki/ISO_4217\">ISO 4217 currency format</a> e.g. \"USD\"; <a href=\"https://en.wikipedia.org/wiki/List_of_cryptocurrencies\">Ticker symbol</a> for cryptocurrencies e.g. \"BTC\"; well known names for <a href=\"https://en.wikipedia.org/wiki/Local_exchange_trading_system\">Local Exchange Tradings Systems</a> (LETS) and other currency types e.g. \"Ithaca HOUR\".",
          "rdfs:label" : "priceCurrency",
          "schema:domainIncludes" : [
-            "schema:Reservation",
-            "schema:Ticket",
-            "schema:Offer",
             "schema:TradeAction",
-            "schema:PriceSpecification"
+            "schema:Ticket",
+            "schema:Reservation",
+            "schema:PriceSpecification",
+            "schema:Offer"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -39,9 +39,9 @@
          "rdfs:comment" : "One or more detailed price specifications, indicating the unit price and delivery or payment charges.",
          "rdfs:label" : "priceSpecification",
          "schema:domainIncludes" : [
-            "schema:Offer",
+            "schema:TradeAction",
             "schema:Demand",
-            "schema:TradeAction"
+            "schema:Offer"
          ],
          "schema:rangeIncludes" : "schema:PriceSpecification"
       }

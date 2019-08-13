@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Sun Sep 15 18:39:01 1996
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Jun  2 10:40:04 2015
-# Update Count    : 23
+# Last Modified On: Tue Jul 16 10:00:31 2019
+# Update Count    : 25
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -23,7 +23,7 @@ my ($my_name, $my_version) = qw( MyProg 0.01 );
 use Getopt::Long 2.13;
 
 # Command line options.
-my $verbose = 0;		# verbose processing
+my $verbose = 1;		# verbose processing
 
 # Development options (not shown with -help).
 my $debug = 0;			# debugging
@@ -61,7 +61,8 @@ sub app_options {
     # Process options.
     if ( @ARGV > 0 ) {
 	GetOptions('ident'	=> \$ident,
-		   'verbose'	=> \$verbose,
+		   'verbose+'	=> \$verbose,
+		   'quiet'	=> sub { $verbose = 0 },
 		   'trace'	=> \$trace,
 		   'help|?'	=> \$help,
 		   'man'	=> \$man,
@@ -94,6 +95,7 @@ sample [options] [file ...]
    --help		shows a brief help message and exits
    --man                shows full documentation and exits
    --verbose		provides more verbose information
+   --quiet		runs as silently as possible
 
 =head1 OPTIONS
 
@@ -114,6 +116,11 @@ Prints program identification.
 =item B<--verbose>
 
 Provides more verbose information.
+This option may be repeated to increase verbosity.
+
+=item B<--quiet>
+
+Suppresses all non-essential information.
 
 =item I<file>
 

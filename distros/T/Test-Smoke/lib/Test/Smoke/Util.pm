@@ -154,6 +154,7 @@ Returns the name of the outputfile.
 my %win32_makefile_map = (
     nmake => "Makefile",
     dmake => "makefile.mk",
+    gmake => "GNUmakefile",
 );
 
 sub Configure_win32 {
@@ -161,6 +162,7 @@ sub Configure_win32 {
     $win32_maker ||= 'nmake'; $win32_maker = lc $win32_maker;
     my $is_dmake = $win32_maker eq 'dmake';
     my $is_nmake = $win32_maker eq 'nmake';
+    my $is_gmake = $win32_maker eq 'gmake';
 
     local $_;
     my %opt_map = (
@@ -274,18 +276,22 @@ sub Configure_win32 {
     $opts{CCTYPE} = "BORLAND" if $opts{BCCOLD};
 
     local (*ORG, *NEW);
-    my $in =  "win32/$win32_makefile_map{ $win32_maker }";
+    my $maker = $win32_makefile_map{ $win32_maker }
+      or die "no make file for $win32_maker";
+    my $in =  "win32/$maker";
     my $out = "win32/smoke.mk";
 
     open ORG, "< $in"  or die "unable to open '$in': $!";
+    binmode ORG;
     open NEW, "> $out" or die "unable to open '$out': $!";
+    binmode NEW;
     my $donot_change = 0;
     while (<ORG>) {
         if ( $donot_change ) {
             # need to help the Win95 build
             $is_dmake and s/\b$win32_makefile_map{ $win32_maker }\b/smoke.mk/;
             if (m/^\s*CFG_VARS\s*=/) {
-                my( $extra_char, $quote ) = $is_nmake
+                my( $extra_char, $quote ) = ($is_nmake || $is_gmake)
                     ? ( "\t", '"' ) : ("~", "" );
                 $_ .= join "", map "\t\t$quote$_$quote\t${extra_char}\t\\\n",
                                    grep /\w+=/, @args;
@@ -321,10 +327,12 @@ sub Configure_win32 {
         }
         else {
             foreach my $cfg_var ( grep defined $opts{ $_ }, @w32_opts ) {
-                if (  m/^\s*#?\s*($cfg_var\s*\*?=)\s*(.*)$/ ) {
+                if (  m/^\s*#?\s*($cfg_var\s*(\*|:)?=)\s*(.*)$/ ) {
+                    my ($name, $val) = ($1, $2);
+                    next if $_ =~ /^#/ and !$opts{ $cfg_var };
                     $_ =  $opts{ $cfg_var } ?
-                        "$1 $opts{ $cfg_var }\n":
-                        "#$1 $2\n";
+                        "$name $opts{ $cfg_var }\n":
+                        "#$name $val\n";
                     last;
                 }
             }

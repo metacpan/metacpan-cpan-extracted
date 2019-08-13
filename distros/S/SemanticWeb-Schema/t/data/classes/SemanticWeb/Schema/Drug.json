@@ -13,10 +13,10 @@
          "rdfs:comment" : "An active ingredient, typically chemical compounds and/or biologic substances.",
          "rdfs:label" : "activeIngredient",
          "schema:domainIncludes" : [
-            "schema:Substance",
+            "schema:Drug",
             "schema:DrugStrength",
             "schema:DietarySupplement",
-            "schema:Drug"
+            "schema:Substance"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:Text"
@@ -110,8 +110,8 @@
          "rdfs:comment" : "The unit in which the drug is measured, e.g. '5 mg tablet'.",
          "rdfs:label" : "drugUnit",
          "schema:domainIncludes" : [
-            "schema:Drug",
-            "schema:DrugCost"
+            "schema:DrugCost",
+            "schema:Drug"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:Text"
@@ -123,6 +123,16 @@
          "schema:domainIncludes" : "schema:Drug",
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:includedInHealthInsurancePlan" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1062",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The insurance plans that cover this drug.",
+         "rdfs:label" : "includedInHealthInsurancePlan",
+         "schema:category" : "issue-1062",
+         "schema:domainIncludes" : "schema:Drug",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:HealthInsurancePlan"
       },
       "schema:interactingDrug" : {
          "rdf:type" : "rdf:Property",
@@ -171,8 +181,8 @@
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
             "schema:DrugLegalStatus",
-            "schema:MedicalEnumeration",
-            "schema:Text"
+            "schema:Text",
+            "schema:MedicalEnumeration"
          ]
       },
       "schema:manufacturer" : {
@@ -191,10 +201,10 @@
          "rdfs:comment" : "Recommended intake of this supplement for a given population as defined by a specific recommending authority.",
          "rdfs:label" : "maximumIntake",
          "schema:domainIncludes" : [
-            "schema:Drug",
-            "schema:Substance",
+            "schema:DietarySupplement",
             "schema:DrugStrength",
-            "schema:DietarySupplement"
+            "schema:Substance",
+            "schema:Drug"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:MaximumDoseSchedule"
@@ -204,8 +214,8 @@
          "rdfs:comment" : "The specific biochemical interaction through which this drug or supplement produces its pharmacological effect.",
          "rdfs:label" : "mechanismOfAction",
          "schema:domainIncludes" : [
-            "schema:DietarySupplement",
-            "schema:Drug"
+            "schema:Drug",
+            "schema:DietarySupplement"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:Text"
@@ -215,8 +225,8 @@
          "rdfs:comment" : "The generic name of this drug or supplement.",
          "rdfs:label" : "nonProprietaryName",
          "schema:domainIncludes" : [
-            "schema:Drug",
-            "schema:DietarySupplement"
+            "schema:DietarySupplement",
+            "schema:Drug"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:Text"
@@ -260,8 +270,8 @@
          "schema:domainIncludes" : "schema:Drug",
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
-            "schema:DrugPrescriptionStatus",
-            "schema:Text"
+            "schema:Text",
+            "schema:DrugPrescriptionStatus"
          ]
       },
       "schema:proprietaryName" : {
@@ -283,6 +293,16 @@
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:Drug"
       },
+      "schema:rxcui" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1062",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The RxCUI drug identifier from RXNORM.",
+         "rdfs:label" : "rxcui",
+         "schema:category" : "issue-1062",
+         "schema:domainIncludes" : "schema:Drug",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
       "schema:warning" : {
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Any FDA or other warnings about the drug (text or URL).",
@@ -290,8 +310,8 @@
          "schema:domainIncludes" : "schema:Drug",
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:URL"
+            "schema:URL",
+            "schema:Text"
          ]
       }
    }

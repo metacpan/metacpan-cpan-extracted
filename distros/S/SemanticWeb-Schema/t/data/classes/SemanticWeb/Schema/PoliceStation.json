@@ -4,8 +4,8 @@
       "rdfs:comment" : "A police station.",
       "rdfs:label" : "PoliceStation",
       "rdfs:subClassOf" : [
-         "schema:CivicStructure",
-         "schema:EmergencyService"
+         "schema:EmergencyService",
+         "schema:CivicStructure"
       ]
    },
    "properties" : {}

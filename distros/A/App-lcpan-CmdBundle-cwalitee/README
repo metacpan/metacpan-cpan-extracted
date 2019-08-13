@@ -1,0 +1,57 @@
+NAME
+    App::lcpan::CmdBundle::cwalitee - More lcpan subcommands related to
+    cwalitee
+
+VERSION
+    This document describes version 0.002 of App::lcpan::CmdBundle::cwalitee
+    (from Perl distribution App-lcpan-CmdBundle-cwalitee), released on
+    2019-07-11.
+
+SYNOPSIS
+DESCRIPTION
+    This bundle provides the following lcpan subcommands:
+
+    *   lcpan cwalitee-of-module-abstract
+
+    *   lcpan cwalitees-of-modules-abstracts
+
+    *   lcpan cwalitee-of-script-abstract
+
+    *   lcpan cwalitees-of-scripts-abstracts
+
+    *   lcpan cwalitee-of-release-changes
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-lcpan-CmdBundle-cwalitee>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-lcpan-CmdBundle-cwalitee>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-lcpan-CmdBundle-c
+    walitee>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    lcpan
+
+    Cwalitee::Common
+
+    CPAN::Changes::Cwalitee
+
+    Module::Abstract::Cwalitee
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

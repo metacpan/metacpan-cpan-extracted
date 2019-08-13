@@ -53,6 +53,7 @@
             "MIDI::Tweaks" : "0",
             "MIDI::Util" : "0",
             "Music::AtonalUtil" : "0",
+            "Music::Cadence" : "0",
             "Music::Canon" : "0",
             "Music::Chord::Namer" : "0",
             "Music::Chord::Note" : "0",
@@ -95,16 +96,14 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "mailto" : "bug-Task-MusicBundle@rt.cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Task-MusicBundle"
-      },
+      "homepage" : "https://github.com/ology/Task-MusicBundle",
       "repository" : {
          "type" : "git",
+         "url" : "https://github.com/ology/Task-MusicBundle.git",
          "web" : "https://github.com/ology/Task-MusicBundle"
       }
    },
-   "version" : "0.1700",
+   "version" : "0.1800",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.027007"
@@ -315,9 +314,9 @@
             "version" : "6.012"
          },
          {
-            "class" : "Dist::Zilla::Plugin::MetaResources",
-            "name" : "MetaResources",
-            "version" : "6.012"
+            "class" : "Dist::Zilla::Plugin::GithubMeta",
+            "name" : "GithubMeta",
+            "version" : "0.58"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::PodSpelling",

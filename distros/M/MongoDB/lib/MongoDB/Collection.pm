@@ -20,7 +20,7 @@ package MongoDB::Collection;
 # ABSTRACT: A MongoDB Collection
 
 use version;
-our $VERSION = 'v2.0.3';
+our $VERSION = 'v2.2.0';
 
 use MongoDB::ChangeStream;
 use MongoDB::Error;
@@ -61,7 +61,6 @@ use Carp 'carp';
 use boolean;
 use Safe::Isa;
 use Scalar::Util qw/blessed reftype/;
-use Try::Tiny;
 use Moo;
 use namespace::clean -except => 'meta';
 
@@ -420,23 +419,23 @@ sub insert_many {
     MongoDB::UsageError->throw("documents argument must be an array reference")
       unless ref( $_[1] ) eq 'ARRAY';
 
-    # internally ends up performing a retryable write if possible, see OP::_BulkWrite
-    my $res = $_[0]->client->send_write_op(
-        MongoDB::Op::_BulkWrite->_new(
-            # default
-            ordered => 1,
-            # user overrides
-            session => $_[0]->client->_get_session_from_hashref( $_[2] ),
-            ( defined $_[2] ? ( %{ $_[2] } ) : () ),
-            # un-overridable
-            queue => [ map { [ insert => $_ ] } @{ $_[1] } ],
-            # insert_many is specifically retryable (PERL-792)
-            _retryable => 1,
-            %{ $_[0]->_op_args },
-        )
+    my $op = MongoDB::Op::_BulkWrite->_new(
+        # default
+        ordered => 1,
+        # user overrides
+        session => $_[0]->client->_get_session_from_hashref( $_[2] ),
+        ( defined $_[2] ? ( %{ $_[2] } ) : () ),
+        # un-overridable
+        queue => [ map { [ insert => $_ ] } @{ $_[1] } ],
+        # insert_many is specifically retryable (PERL-792)
+        _retryable => 1,
+        %{ $_[0]->_op_args },
     );
 
-    return $_[0]->write_concern->is_acknowledged
+    # internally ends up performing a retryable write if possible, see OP::_BulkWrite
+    my $res = $_[0]->client->send_write_op( $op );
+
+    return $op->_should_use_acknowledged_write
       ? MongoDB::InsertManyResult->_new(
         acknowledged         => 1,
         inserted             => $res->inserted,
@@ -844,7 +843,7 @@ sub find_one {
     $options->{projection} = $projection;
     $options->{limit} = -1;
 
-    return $self->client->send_read_op(
+    return $self->client->send_retryable_read_op(
         MongoDB::Op::_Query->_new(
             filter => $filter || {},
             options => MongoDB::Op::_Query->precondition_options($options),
@@ -931,7 +930,7 @@ sub find_one_and_delete {
         session       => $session,
     );
 
-    return $self->write_concern->is_acknowledged
+    return $op->_should_use_acknowledged_write
       ? $self->client->send_retryable_write_op( $op )
       : $self->client->send_write_op( $op );
 }
@@ -980,7 +979,7 @@ sub find_one_and_replace {
       unless ref( $_[1] ) && ref( $_[2] );
 
     my ( $self, $filter, $replacement, $options ) = @_;
-
+    $options->{is_replace} = 1;
     return $self->_find_one_and_update_or_replace($filter, $replacement, $options);
 }
 
@@ -1031,7 +1030,7 @@ sub find_one_and_update {
       unless ref( $_[1] ) && ref( $_[2] );
 
     my ( $self, $filter, $update, $options ) = @_;
-
+    $options->{is_replace} = 0;
     return $self->_find_one_and_update_or_replace($filter, $update, $options);
 }
 
@@ -1119,6 +1118,9 @@ sub watch {
             : (full_document => 'default'),
         exists($options->{resumeAfter})
             ? (resume_after => delete $options->{resumeAfter})
+            : (),
+        exists($options->{startAfter})
+            ? (start_after => delete $options->{startAfter})
             : (),
         exists($options->{maxAwaitTimeMS})
             ? (max_await_time_ms => delete $options->{maxAwaitTimeMS})
@@ -1213,13 +1215,16 @@ sub aggregate {
     __ixhash( $options, 'hint' ) if ref $options->{hint};
 
     # read preferences are ignored if the last stage is $out
-    my ($last_op) = keys %{ $pipeline->[-1] };
+    my $last_op = '';
+    # If $pipeline is an empty array, this can explode
+    if ( scalar( @$pipeline ) > 0 ) { ($last_op) = keys %{ $pipeline->[-1] } };
+    my $has_out = !!($last_op =~ m/\$out|\$merge/);
 
     my $op = MongoDB::Op::_Aggregate->_new(
         pipeline     => $pipeline,
         options      => $options,
         read_concern => $self->read_concern,
-        has_out      => $last_op eq '$out',
+        has_out      => $has_out,
         exists($options->{maxAwaitTimeMS})
             ? (maxAwaitTimeMS => delete $options->{maxAwaitTimeMS})
             : (),
@@ -1227,7 +1232,9 @@ sub aggregate {
         %{ $self->_op_args },
     );
 
-    return $self->client->send_read_op($op);
+    return $has_out ?
+        $self->client->send_read_op($op)
+        : $self->client->send_retryable_read_op($op);
 }
 
 #pod =method count_documents
@@ -1239,6 +1246,8 @@ sub aggregate {
 #pod To return a count of all documents, use an empty hash reference as the filter.
 #pod
 #pod B<NOTE>: this may result in a scan of all documents in the collection.
+#pod For a fast count of the total documents in a collection see
+#pod L</estimated_document_count> instead.
 #pod
 #pod A hash reference of options may be provided. Valid keys include:
 #pod
@@ -1287,7 +1296,7 @@ sub count_documents {
         push @$pipeline, { '$limit', delete $options->{limit} };
     }
 
-    push @$pipeline, { '$group' => { '_id' => undef, 'n' => { '$sum' => 1 } } };
+    push @$pipeline, { '$group' => { '_id' => 1, 'n' => { '$sum' => 1 } } };
 
     # possibly fallback to default maxTimeMS
     if ( ! exists $options->{maxTimeMS} && $self->max_time_ms ) {
@@ -1337,11 +1346,11 @@ sub estimated_document_count {
     my $op = MongoDB::Op::_Count->_new(
         options         => $filtered,
         filter          => undef,
-        session         => undef,
+        session         => $self->client->_maybe_get_implicit_session,
         %{ $self->_op_args },
     );
 
-    my $res = $self->client->send_read_op($op);
+    my $res = $self->client->send_retryable_read_op($op);
 
     return $res->{n} // 0;
 }
@@ -1400,75 +1409,7 @@ sub distinct {
         %{ $self->_op_args },
     );
 
-    return $self->client->send_read_op($op);
-}
-
-
-#pod =method parallel_scan
-#pod
-#pod     @result_objs = $collection->parallel_scan(10);
-#pod     @result_objs = $collection->parallel_scan(10, $options );
-#pod
-#pod Returns one or more L<MongoDB::QueryResult> objects to scan the collection in
-#pod parallel. The argument is the maximum number of L<MongoDB::QueryResult> objects
-#pod to return and must be a positive integer between 1 and 10,000.
-#pod
-#pod As long as the collection is not modified during scanning, each document will
-#pod appear only once in one of the cursors' result sets.
-#pod
-#pod B<Note>: the server may return fewer cursors than requested, depending on the
-#pod underlying storage engine and resource availability.
-#pod
-#pod A hash reference of options may be provided. Valid keys include:
-#pod
-#pod =for :list
-#pod * C<maxTimeMS> – the maximum amount of time in milliseconds to allow the
-#pod   command to run.  (Note, this will be ignored for servers before version 3.4.)
-#pod
-#pod =cut
-
-sub parallel_scan {
-    my ( $self, $num_cursors, $options ) = @_;
-    unless (defined $num_cursors && $num_cursors == int($num_cursors)
-        && $num_cursors > 0 && $num_cursors <= 10000
-    ) {
-        MongoDB::UsageError->throw( "first argument to parallel_scan must be a positive integer between 1 and 10000" )
-    }
-    $options = ref $options eq 'HASH' ? $options : { };
-
-    my $op = MongoDB::Op::_ParallelScan->_new(
-        %{ $self->_op_args },
-        num_cursors     => $num_cursors,
-        options         => $options,
-    );
-
-    my $result = $self->client->send_read_op( $op );
-    my $response = $result->output;
-
-    MongoDB::UsageError->throw("No cursors returned")
-        unless $response->{cursors} && ref $response->{cursors} eq 'ARRAY';
-
-    my @cursors;
-    for my $c ( map { $_->{cursor} } @{$response->{cursors}} ) {
-        my $batch = $c->{firstBatch};
-        my $qr = MongoDB::QueryResult->_new(
-            _client       => $self->client,
-            _address      => $result->address,
-            _full_name    => $c->{ns},
-            _bson_codec   => $self->bson_codec,
-            _batch_size   => scalar @$batch,
-            _cursor_at    => 0,
-            _limit        => 0,
-            _cursor_id    => $c->{id},
-            _cursor_start => 0,
-            _cursor_flags => {},
-            _cursor_num   => scalar @$batch,
-            _docs         => $batch,
-        );
-        push @cursors, $qr;
-    }
-
-    return @cursors;
+    return $self->client->send_retryable_read_op($op);
 }
 
 #pod =method rename
@@ -1771,6 +1712,7 @@ sub _dynamic_write_concern {
 sub _find_one_and_update_or_replace {
     my ($self, $filter, $modifier, $options) = @_;
     $options ||= {};
+    my $is_replace = delete $options->{is_replace};
 
     # rename projection -> fields
     $options->{fields} = delete $options->{projection} if exists $options->{projection};
@@ -1801,10 +1743,11 @@ sub _find_one_and_update_or_replace {
         options        => $options,
         bypassDocumentValidation => $bypass,
         session        => $session,
+        is_replace     => $is_replace,
         %{ $self->_op_args },
     );
 
-    return $self->write_concern->is_acknowledged
+    return $op->_should_use_acknowledged_write
       ? $self->client->send_retryable_write_op( $op )
       : $self->client->send_write_op( $op );
 }
@@ -1812,6 +1755,52 @@ sub _find_one_and_update_or_replace {
 #--------------------------------------------------------------------------#
 # Deprecated functions
 #--------------------------------------------------------------------------#
+
+sub parallel_scan {
+    my ( $self, $num_cursors, $options ) = @_;
+    $self->_warn_deprecated_method('parallel_scan' => []);
+
+    unless (defined $num_cursors && $num_cursors == int($num_cursors)
+        && $num_cursors > 0 && $num_cursors <= 10000
+    ) {
+        MongoDB::UsageError->throw( "first argument to parallel_scan must be a positive integer between 1 and 10000" )
+    }
+    $options = ref $options eq 'HASH' ? $options : { };
+
+    my $op = MongoDB::Op::_ParallelScan->_new(
+        %{ $self->_op_args },
+        num_cursors     => $num_cursors,
+        options         => $options,
+    );
+
+    my $result = $self->client->send_read_op( $op );
+    my $response = $result->output;
+
+    MongoDB::UsageError->throw("No cursors returned")
+        unless $response->{cursors} && ref $response->{cursors} eq 'ARRAY';
+
+    my @cursors;
+    for my $c ( map { $_->{cursor} } @{$response->{cursors}} ) {
+        my $batch = $c->{firstBatch};
+        my $qr = MongoDB::QueryResult->_new(
+            _client       => $self->client,
+            _address      => $result->address,
+            _full_name    => $c->{ns},
+            _bson_codec   => $self->bson_codec,
+            _batch_size   => scalar @$batch,
+            _cursor_at    => 0,
+            _limit        => 0,
+            _cursor_id    => $c->{id},
+            _cursor_start => 0,
+            _cursor_flags => {},
+            _cursor_num   => scalar @$batch,
+            _docs         => $batch,
+        );
+        push @cursors, $qr;
+    }
+
+    return @cursors;
+}
 
 sub count {
     my ( $self, $filter, $options ) = @_;
@@ -1879,7 +1868,7 @@ sub _run_command {
         monitoring_callback => $self->client->monitoring_callback,
     );
 
-    my $obj = $self->client->send_read_op($op);
+    my $obj = $self->client->send_retryable_read_op($op);
 
     return $obj->output;
 }
@@ -1896,7 +1885,7 @@ MongoDB::Collection - A MongoDB Collection
 
 =head1 VERSION
 
-version v2.0.3
+version v2.2.0
 
 =head1 SYNOPSIS
 
@@ -2793,6 +2782,8 @@ Returns a count of documents matching a L<filter expression|/Filter expression>.
 To return a count of all documents, use an empty hash reference as the filter.
 
 B<NOTE>: this may result in a scan of all documents in the collection.
+For a fast count of the total documents in a collection see
+L</estimated_document_count> instead.
 
 A hash reference of options may be provided. Valid keys include:
 
@@ -2889,31 +2880,6 @@ C<session> - the session to use for these operations. If not supplied, will use 
 See documentation for the L<distinct
 command|http://docs.mongodb.org/manual/reference/command/distinct/> for
 details.
-
-=head2 parallel_scan
-
-    @result_objs = $collection->parallel_scan(10);
-    @result_objs = $collection->parallel_scan(10, $options );
-
-Returns one or more L<MongoDB::QueryResult> objects to scan the collection in
-parallel. The argument is the maximum number of L<MongoDB::QueryResult> objects
-to return and must be a positive integer between 1 and 10,000.
-
-As long as the collection is not modified during scanning, each document will
-appear only once in one of the cursors' result sets.
-
-B<Note>: the server may return fewer cursors than requested, depending on the
-underlying storage engine and resource availability.
-
-A hash reference of options may be provided. Valid keys include:
-
-=over 4
-
-=item *
-
-C<maxTimeMS> – the maximum amount of time in milliseconds to allow the command to run.  (Note, this will be ignored for servers before version 3.4.)
-
-=back
 
 =head2 rename
 

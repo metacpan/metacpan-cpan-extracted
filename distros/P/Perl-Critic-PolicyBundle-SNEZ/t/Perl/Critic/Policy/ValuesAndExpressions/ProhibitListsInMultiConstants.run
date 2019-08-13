@@ -1,0 +1,29 @@
+## name Basic failure
+## failures 2
+## cut
+use constant {
+    one   => 1,
+    two   => ('one', 'two', 'three'),
+    three => qw[ xx yy zz ],
+};
+
+## name Array reference as value
+## failures 0
+## cut
+use constant {
+    stuff => [qw[ foo bar ]],
+};
+
+## name Function call as value 
+## failures 0
+## cut
+use constant {
+    foo => rand(10),
+    bar => join(',', qw( amount ext_ca_count )),
+};
+
+## name Lists in single constant declarations
+## failures 0
+## cut
+use constant NUMBERS => (1, 2, 3);
+use constant WORDS => qw[ one two three ];

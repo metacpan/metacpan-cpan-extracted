@@ -53,6 +53,6 @@
          "url" : "https://github.com/thrig/Data-SSHPubkey"
       }
    },
-   "version" : "0.06",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "1.00",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -6,10 +6,16 @@ object mathes a series of checks.
 Currently can do matching based off of the following.
 
  * CIDR
+ * Command
+ * PctCPU
  * Ports
  * Protocol
  * State
+ * RegexPTR
  * PTR
+ * UID
+ * Username
+ * WChan
 
     use Net::Connection::Match;
     use Net::Connection;

@@ -20,9 +20,8 @@ my $server = Test::TCP->new(
         $redis->exec;
     },
 );
-my $redis_server2 = Test::RedisServer->new;
 my $redis1 = Redis->new( $redis_server1->connect_info );
-my $redis2 = Redis->new( server => 'localhost:' . $server->port);
+my $redis2 = Redis->new( server => 'localhost:' . $server->port, reconnect => 60, every => 1_000_000);
 my $ns1 = Redis::Namespace->new(redis => $redis1, namespace => 'ns');
 my $ns2 = Redis::Namespace->new(redis => $redis2, namespace => 'ns');
 

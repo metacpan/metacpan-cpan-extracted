@@ -1,6 +1,6 @@
 package Bio::Palantir::Parser::Root;
 # ABSTRACT: BiosynML DTD-derived internal class
-$Bio::Palantir::Parser::Root::VERSION = '0.191800';
+$Bio::Palantir::Parser::Root::VERSION = '0.192240';
 use Moose;
 use namespace::autoclean;
 
@@ -183,9 +183,28 @@ sub BUILD {
     $self->_set_genes( \@genes );
 
     my $cluster_rank = 1;
-    my @clusters;
     
-    for my $cluster (@{ forcearray $self->_root->{'model'} }) { 
+    # fix for antismash5: cluster order is not preserved during json2xml conversion
+    my $cluster_list;
+    unless ( 
+        grep { $_->{genecluster}->{sequence}->{value} }
+        @{ forcearray $self->_root->{'model'} })
+    {
+        # filter clusters by coordinates order for antiSMASH 5 (and 3)
+        $cluster_list 
+            = [ sort { $a->{genecluster}->{region}->{begin}->{value} 
+                <=> $b->{genecluster}->{region}->{begin}->{value} }
+                @{ forcearray $self->_root->{'model'} } ]
+        ;
+    }
+
+    else {
+        # do not filter clusters as antismash 4 reboots coordinates per contig
+        $cluster_list = [ @{ forcearray $self->_root->{'model'} } ];
+    }
+                
+    my @clusters;
+    for my $cluster (@$cluster_list) {
         my $begin = $cluster->{'genecluster'}->{'region'}->{'begin'}->{'value'};
         my $end   = $cluster->{'genecluster'}->{'region'}->{'end'  }->{'value'};
 
@@ -199,12 +218,13 @@ sub BUILD {
             $end   = $temp_begin;
         }
 
-        # second fix for antiSMASH4: handle the coordinates reset for each contig
+        # second fix for antiSMASH 4: handle the coordinates reset for each contig (use of the sequence value which is only exploited in antiSMASH 4)
         my @cluster_genes;
         if ($cluster->{'genecluster'}->{'sequence'}->{'value'}) {
             my $cluster_seqlist 
                 = $cluster->{'genecluster'}->{'sequence'}->{'value'};
 
+            # filter on the sequence value and the cluster coordinates
             @cluster_genes = grep { $_->genomic_dna_begin < $end 
                                 && $_->genomic_dna_end > $begin }
                              grep { $_->_root->{'sequence'}{'value'} 
@@ -218,14 +238,18 @@ sub BUILD {
                 &&  $_->genomic_dna_end > $begin } @genes;
         }
         
+        @cluster_genes 
+            = sort { $a->genomic_dna_begin <=> $b->genomic_dna_begin } 
+            @cluster_genes
+        ;
+
         my $gene_rank = 1;
         my $domain_rank = 1;
 
         for my $gene (@cluster_genes) {
 
-            for my $domain ($gene->all_domains) {
-                $domain->_set_rank($domain_rank++);
-            }
+            $_->_set_rank($domain_rank++) 
+                for sort { $a->begin <=> $b->begin } $gene->all_domains;
 
             $gene->_set_rank($gene_rank++);
         }
@@ -262,7 +286,7 @@ Bio::Palantir::Parser::Root - BiosynML DTD-derived internal class
 
 =head1 VERSION
 
-version 0.191800
+version 0.192240
 
 =head1 SYNOPSIS
 

@@ -10,12 +10,13 @@ use Test::More;
 plan skip_all => "Disabled" if $ENV{NO_JIRA_CHECK};
 
 my @commits = split /\n/, <<'EOC';
-20dfb74f (origin/maint-v2.0) PERL-1061 Fix mongodb+srv boolean option parsing
+054f48b3 (PERL-1123-retrywrites-error) PERL-1123 Raise better error for retryable writes with mmapv1
 
 EOC
 
 my %ticket_map;
 for my $commit ( @commits ) {
+    next if $commit =~ /PERL-\d+:?\s+CI:/i;
     for my $ticket ( $commit =~ /PERL-(\d+)/g ) {
         next if $ENV{CHECK_JIRA_SKIP}
             && grep { $ticket eq $_ } split " ", $ENV{CHECK_JIRA_SKIP};

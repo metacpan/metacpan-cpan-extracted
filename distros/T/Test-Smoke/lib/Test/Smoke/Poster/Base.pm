@@ -8,12 +8,10 @@ our $VERSION = '0.001';
 use base 'Test::Smoke::ObjectBase';
 use Test::Smoke::LogMixin;
 
-use fallback 'inc';
-
 require Test::Smoke;
 
 use File::Spec::Functions;
-use JSON;
+use Test::Smoke::Util::LoadAJSON;
 
 =head1 NAME
 

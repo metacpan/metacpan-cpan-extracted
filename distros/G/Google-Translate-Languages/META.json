@@ -24,7 +24,7 @@
             "Carp" : "0",
             "Data::Dump" : "0",
             "Data::Table::Text" : "20171117",
-            "ISO::639" : "20171206",
+            "ISO::639" : "20171214",
             "Test2::API" : "0",
             "Test::More" : "0",
             "utf8" : "0"
@@ -34,7 +34,7 @@
    "provides" : {
       "Google::Translate::Languages" : {
          "file" : "lib/Google/Translate/Languages.pm",
-         "version" : "20171222"
+         "version" : "20190811"
       }
    },
    "release_status" : "stable",
@@ -43,5 +43,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "20171222"
+   "version" : "20190811",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -6,12 +6,12 @@ use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 my @calls;
 
 do {
-    package Parent;
-    sub foo { push @calls, 'Parent::foo' }
+    package MyParent;
+    sub foo { push @calls, 'MyParent::foo' }
 
     package Child;
     use Class::Method::Modifiers;
-    our @ISA = 'Parent';
+    our @ISA = 'MyParent';
 
     around foo => sub {
         push @calls, 'before Child::foo';
@@ -23,17 +23,17 @@ do {
 Child->foo;
 is_deeply([splice @calls], [
     'before Child::foo',
-    'Parent::foo',
+    'MyParent::foo',
     'after Child::foo',
 ]);
 
 do {
-    package Parent;
+    package MyParent;
     use Class::Method::Modifiers;
     around foo => sub {
-        push @calls, 'before Parent::foo';
+        push @calls, 'before MyParent::foo';
         shift->(@_);
-        push @calls, 'after Parent::foo';
+        push @calls, 'after MyParent::foo';
     };
 };
 
@@ -43,9 +43,9 @@ TODO: {
     local $TODO = "pending discussion with stevan";
     is_deeply([splice @calls], [
         'before Child::foo',
-        'before Parent::foo',
-        'Parent::foo',
-        'after Parent::foo',
+        'before MyParent::foo',
+        'MyParent::foo',
+        'after MyParent::foo',
         'after Child::foo',
     ]);
 }

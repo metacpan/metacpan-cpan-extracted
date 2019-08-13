@@ -1,5 +1,14 @@
 Revision history for BSON
 
+v1.12.1   2019-08-13 08:17:13-04:00 America/New_York
+
+  [!!! END OF LIFE NOTICE !!!]
+
+    - Version v1.12.0 is the final feature release of the MongoDB BSON
+      library.  The library is now in a 12-month "sunset" period and will
+      receive security patches and critical bug fixes only.  The BSON
+      library will be end-of-life and unsupported on August 13, 2020.
+
 v1.12.0   2019-07-12 12:06:36-04:00 America/New_York
 
     [Added]

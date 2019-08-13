@@ -1,0 +1,26 @@
+Changes
+lib/Perl/Critic/Policy/CodeLayout/RequireBreakBeforeOperator.pm
+lib/Perl/Critic/Policy/CodeLayout/RequireKRBracing.pm
+lib/Perl/Critic/Policy/CodeLayout/RequireKRParens.pm
+lib/Perl/Critic/Policy/CodeLayout/RequireSpaceAroundBinaryOperators.pm
+lib/Perl/Critic/Policy/ControlStructures/ProhibitMultipleSubscripts.pm
+lib/Perl/Critic/Policy/ValuesAndExpressions/ProhibitListsInMultiConstants.pm
+lib/Perl/Critic/PolicyBundle/SNEZ.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/00-compile.t
+t/Perl/Critic/Policy/CodeLayout/RequireBreakBeforeOperator.run
+t/Perl/Critic/Policy/CodeLayout/RequireKRBracing.run
+t/Perl/Critic/Policy/CodeLayout/RequireKRParens.run
+t/Perl/Critic/Policy/CodeLayout/RequireSpaceAroundBinaryOperators.run
+t/Perl/Critic/Policy/ControlStructures/ProhibitMultipleSubscripts.run
+t/Perl/Critic/Policy/ValuesAndExpressions/ProhibitListsInMultiConstants.run
+t/policies.t
+xt/critic.t
+xt/kwalitee.t
+xt/manifest.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

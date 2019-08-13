@@ -100,6 +100,7 @@ method get_signature {
 		my @keys = keys %sig;
 
 		if ( @keys == 1 ) {
+			# happy path
 			my $key = shift @keys;
 			$return{$key} = $sig{$key};
 		}

@@ -19,7 +19,7 @@ use Config::Any;
 use Term::ANSIColor qw/colored/;
 use File::chdir;
 
-our $VERSION = version->new('0.7.1');
+our $VERSION = version->new('0.7.2');
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 main();
@@ -33,6 +33,7 @@ sub main {
         use_ext => 1,
     });
     $conf = {
+        cache_dir => '/tmp/group-git/',
         map { %$_        }
         map { values %$_ }
         @{$conf}
@@ -338,7 +339,7 @@ group-git - Perform operations over many git repositories at once
 
 =head1 VERSION
 
-This documentation refers to group-git version 0.7.1.
+This documentation refers to group-git version 0.7.2.
 
 =head1 SYNOPSIS
 

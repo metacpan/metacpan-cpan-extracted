@@ -9,7 +9,7 @@ use base 'Exporter';
 our @EXPORT_OK = qw/encode decode/;
 
 use version;
-our $VERSION = 'v1.12.0';
+our $VERSION = 'v1.12.1';
 
 use Carp;
 use Config;
@@ -941,7 +941,14 @@ BSON - BSON serialization and deserialization
 
 =head1 VERSION
 
-version v1.12.0
+version v1.12.1
+
+=head1 END OF LIFE NOTICE
+
+Version v1.12.0 is the final feature release of the MongoDB BSON
+library.  The library is now in a 12-month "sunset" period and will
+receive security patches and critical bug fixes only.  The BSON
+library will be end-of-life and unsupported on August 13, 2020.
 
 =head1 SYNOPSIS
 

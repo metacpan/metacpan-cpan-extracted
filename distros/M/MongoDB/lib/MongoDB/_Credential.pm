@@ -18,7 +18,7 @@ use warnings;
 package MongoDB::_Credential;
 
 use version;
-our $VERSION = 'v2.0.3';
+our $VERSION = 'v2.2.0';
 
 use Moo;
 use MongoDB::Error;
@@ -33,7 +33,6 @@ use Encode qw/encode/;
 use MIME::Base64 qw/encode_base64 decode_base64/;
 use Safe::Isa;
 use Tie::IxHash;
-use Try::Tiny;
 use MongoDB::_Types qw(
     Boolish
 );
@@ -64,7 +63,6 @@ has mechanism => (
 has username => (
     is      => 'ro',
     isa     => Str,
-    default => '',
 );
 
 has source => (
@@ -73,10 +71,14 @@ has source => (
     builder => '_build_source',
 );
 
+has db_name => (
+    is      => 'ro',
+    isa     => Str,
+);
+
 has password => (
     is      => 'ro',
     isa     => Str,
-    default => '',
 );
 
 has pw_is_digest => (
@@ -148,22 +150,23 @@ sub _build__digested_password {
 sub _build_source {
     my ($self) = @_;
     my $mech = $self->mechanism;
-    return
-      $mech eq 'MONGODB-X509' || $mech eq 'PLAIN' || $mech eq 'GSSAPI'
-      ? '$external'
-      : 'admin';
+    if ( $mech eq 'PLAIN' ) {
+        return $self->db_name // '$external';
+    }
+    return $mech eq 'MONGODB-X509'
+      || $mech eq 'GSSAPI' ? '$external' : $self->db_name // 'admin';
 }
 
 #<<< No perltidy
 my %CONSTRAINTS = (
     'MONGODB-CR' => {
         username             => sub { length },
-        password             => sub { length },
+        password             => sub { defined },
         source               => sub { length },
         mechanism_properties => sub { !keys %$_ },
     },
     'MONGODB-X509' => {
-        password             => sub { ! length },
+        password             => sub { ! defined },
         source               => sub { $_ eq '$external' },
         mechanism_properties => sub { !keys %$_ },
     },
@@ -173,25 +176,25 @@ my %CONSTRAINTS = (
     },
     'PLAIN'       => {
         username             => sub { length },
-        password             => sub { length },
-        source               => sub { $_ eq '$external' },
+        password             => sub { defined },
+        source               => sub { length },
         mechanism_properties => sub { !keys %$_ },
     },
     'SCRAM-SHA-1' => {
         username             => sub { length },
-        password             => sub { length },
+        password             => sub { defined },
         source               => sub { length },
         mechanism_properties => sub { !keys %$_ },
     },
     'SCRAM-SHA-256' => {
         username             => sub { length },
-        password             => sub { length },
+        password             => sub { defined },
         source               => sub { length },
         mechanism_properties => sub { !keys %$_ },
     },
     'DEFAULT' => {
         username             => sub { length },
-        password             => sub { length },
+        password             => sub { defined },
         source               => sub { length },
         mechanism_properties => sub { !keys %$_ },
     },
@@ -208,7 +211,8 @@ sub BUILD {
         my $validator = $CONSTRAINTS{$mech}{$key};
         local $_ = $self->$key;
         unless ( $validator->() ) {
-            MongoDB::UsageError->throw("invalid field $key in $mech credential");
+            $_ //= "";
+            MongoDB::UsageError->throw("invalid field $key with value '$_' in $mech credential");
         }
     }
 
@@ -298,7 +302,7 @@ sub _authenticate_GSSAPI {
         "GSSAPI requires Authen::SASL and GSSAPI or Authen::SASL::XS from CPAN");
 
     my ( $sasl, $client );
-    try {
+    eval {
         $sasl = Authen::SASL->new(
             mechanism => 'GSSAPI',
             callback  => {
@@ -308,14 +312,15 @@ sub _authenticate_GSSAPI {
         );
         $client =
           $sasl->client_new( $self->mechanism_properties->{SERVICE_NAME}, $link->host );
-    }
-    catch {
+        1;
+    } or do {
+        my $error = $@ || "Unknown error";
         MongoDB::AuthError->throw(
-            "Failed to initialize a GSSAPI backend (did you install GSSAPI or Authen::SASL::XS?) Error was: $_"
+            "Failed to initialize a GSSAPI backend (did you install GSSAPI or Authen::SASL::XS?) Error was: $error"
         );
     };
 
-    try {
+    eval {
         # start conversation
         my $step = $client->client_start;
         $self->_assert_gssapi( $client,
@@ -331,9 +336,10 @@ sub _authenticate_GSSAPI {
             ( $sasl_resp, $conv_id, $done ) =
               $self->_sasl_continue( $link, $bson_codec, $step, $conv_id );
         }
-    }
-    catch {
-        my $msg = $_->$_isa("MongoDB::Error") ? $_->message : "$_";
+        1;
+    } or do {
+        my $error = $@ || "Unknown error";
+        my $msg = $error->$_isa("MongoDB::Error") ? $error->message : "$error";
         MongoDB::AuthError->throw("GSSAPI error: $msg");
     };
 
@@ -457,7 +463,7 @@ sub _scram_auth {
     my ( $self, $link, $bson_codec, $client, $mech ) = @_;
 
     my ( $msg, $sasl_resp, $conv_id, $done );
-    try {
+    eval {
         $msg = $client->first_msg;
         ( $sasl_resp, $conv_id, $done ) =
           $self->_sasl_start( $link, $bson_codec, $msg, $mech );
@@ -467,9 +473,10 @@ sub _scram_auth {
         $client->validate($sasl_resp);
         # might require an empty payload to complete SASL conversation
         $self->_sasl_continue( $link, $bson_codec, "", $conv_id ) if !$done;
-    }
-    catch {
-        my $msg = $_->$_isa("MongoDB::Error") ? $_->message : "$_";
+		1;
+    } or do {
+        my $error = $@ || "Unknown error";
+        my $msg = $error->$_isa("MongoDB::Error") ? $error->message : "$error";
         MongoDB::AuthError->throw("$mech error: $msg");
     };
 }

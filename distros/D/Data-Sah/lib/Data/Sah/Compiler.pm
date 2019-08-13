@@ -1,7 +1,7 @@
 package Data::Sah::Compiler;
 
-our $DATE = '2019-07-25'; # DATE
-our $VERSION = '0.899'; # VERSION
+our $DATE = '2019-08-12'; # DATE
+our $VERSION = '0.900'; # VERSION
 
 use 5.010;
 use strict;
@@ -218,8 +218,6 @@ sub get_th {
         my $obj = $module->new(compiler=>$self);
         $th_map->{$name} = $obj;
     }
-    use experimental 'smartmatch';
-
     return $th_map->{$name};
 }
 
@@ -245,8 +243,6 @@ sub get_fsh {
         my $obj = $module->new();
         $fsh_table->{$name} = $obj;
     }
-    use experimental 'smartmatch';
-
     return $fsh_table->{$name};
 }
 
@@ -309,8 +305,6 @@ sub check_compile_args {
 }
 
 sub _process_clause {
-    use experimental 'smartmatch';
-
     my ($self, $cd, $clset_num, $clause) = @_;
 
     my $th = $cd->{th};
@@ -328,7 +322,7 @@ sub _process_clause {
     delete $cd->{uclset}{$clause};
     delete $cd->{uclset}{"$clause.prio"};
 
-    if ($clause ~~ @{ $cd->{args}{skip_clause} }) {
+    if (grep { $_ eq $clause } @{ $cd->{args}{skip_clause} }) {
         delete $cd->{uclset}{$_}
             for grep {/^\Q$clause\E(\.|\z)/} keys(%{$cd->{uclset}});
         return;
@@ -779,7 +773,7 @@ Data::Sah::Compiler - Base class for Sah compilers (Data::Sah::Compiler::*)
 
 =head1 VERSION
 
-This document describes version 0.899 of Data::Sah::Compiler (from Perl distribution Data-Sah), released on 2019-07-25.
+This document describes version 0.900 of Data::Sah::Compiler (from Perl distribution Data-Sah), released on 2019-08-12.
 
 =for Pod::Coverage ^(check_compile_args|def|expr|init_cd|literal|name|add_module|add_compile_module|add_runtime_module)$
 

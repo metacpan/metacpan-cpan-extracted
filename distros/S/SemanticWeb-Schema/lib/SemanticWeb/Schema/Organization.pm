@@ -15,7 +15,15 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.8.1';
+our $VERSION = 'v3.9.0';
+
+
+has actionable_feedback_policy => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'actionableFeedbackPolicy',
+);
+
 
 
 has address => (
@@ -90,6 +98,14 @@ has contact_points => (
 
 
 
+has corrections_policy => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'correctionsPolicy',
+);
+
+
+
 has department => (
     is        => 'rw',
     predicate => 1,
@@ -102,6 +118,22 @@ has dissolution_date => (
     is        => 'rw',
     predicate => 1,
     json_ld   => 'dissolutionDate',
+);
+
+
+
+has diversity_policy => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'diversityPolicy',
+);
+
+
+
+has diversity_staffing_report => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'diversityStaffingReport',
 );
 
 
@@ -134,6 +166,14 @@ has employees => (
     is        => 'rw',
     predicate => 1,
     json_ld   => 'employees',
+);
+
+
+
+has ethics_policy => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'ethicsPolicy',
 );
 
 
@@ -210,6 +250,14 @@ has global_location_number => (
 
 
 
+has has_credential => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'hasCredential',
+);
+
+
+
 has has_offer_catalog => (
     is        => 'rw',
     predicate => 1,
@@ -226,10 +274,34 @@ has has_pos => (
 
 
 
+has has_product_return_policy => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'hasProductReturnPolicy',
+);
+
+
+
 has isic_v4 => (
     is        => 'rw',
     predicate => 1,
     json_ld   => 'isicV4',
+);
+
+
+
+has knows_about => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'knowsAbout',
+);
+
+
+
+has knows_language => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'knowsLanguage',
 );
 
 
@@ -310,6 +382,14 @@ has number_of_employees => (
     is        => 'rw',
     predicate => 1,
     json_ld   => 'numberOfEmployees',
+);
+
+
+
+has ownership_funding_info => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'ownershipFundingInfo',
 );
 
 
@@ -410,6 +490,14 @@ has telephone => (
 
 
 
+has unnamed_sources_policy => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'unnamedSourcesPolicy',
+);
+
+
+
 has vat_id => (
     is        => 'rw',
     predicate => 1,
@@ -434,13 +522,35 @@ SemanticWeb::Schema::Organization - An organization such as a school
 
 =head1 VERSION
 
-version v3.8.1
+version v3.9.0
 
 =head1 DESCRIPTION
 
 An organization such as a school, NGO, corporation, club, etc.
 
 =head1 ATTRIBUTES
+
+=head2 C<actionable_feedback_policy>
+
+C<actionableFeedbackPolicy>
+
+=for html For a <a class="localLink"
+href="http://schema.org/NewsMediaOrganization">NewsMediaOrganization</a> or
+other news-related <a class="localLink"
+href="http://schema.org/Organization">Organization</a>, a statement about
+public engagement activities (for news media, the newsroomâs), including
+involving the public - digitally or otherwise -- in coverage decisions,
+reporting and activities after publication.
+
+A actionable_feedback_policy should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
+
+=item C<Str>
+
+=back
 
 =head2 C<address>
 
@@ -570,6 +680,27 @@ A contact_points should be one of the following types:
 
 =back
 
+=head2 C<corrections_policy>
+
+C<correctionsPolicy>
+
+=for html For an <a class="localLink"
+href="http://schema.org/Organization">Organization</a> (e.g. <a
+class="localLink"
+href="http://schema.org/NewsMediaOrganization">NewsMediaOrganization</a>),
+a statement describing (in news media, the newsroomâs) disclosure and
+correction policy for errors.
+
+A corrections_policy should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
+
+=item C<Str>
+
+=back
+
 =head2 C<department>
 
 A relationship between an organization and a department of that
@@ -594,6 +725,50 @@ The date that this organization was dissolved.
 A dissolution_date should be one of the following types:
 
 =over
+
+=item C<Str>
+
+=back
+
+=head2 C<diversity_policy>
+
+C<diversityPolicy>
+
+=for html Statement on diversity policy by an <a class="localLink"
+href="http://schema.org/Organization">Organization</a> e.g. a <a
+class="localLink"
+href="http://schema.org/NewsMediaOrganization">NewsMediaOrganization</a>.
+For a <a class="localLink"
+href="http://schema.org/NewsMediaOrganization">NewsMediaOrganization</a>, a
+statement describing the newsroomâs diversity policy on both staffing and
+sources, typically providing staffing data.
+
+A diversity_policy should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
+
+=item C<Str>
+
+=back
+
+=head2 C<diversity_staffing_report>
+
+C<diversityStaffingReport>
+
+=for html For an <a class="localLink"
+href="http://schema.org/Organization">Organization</a> (often but not
+necessarily a <a class="localLink"
+href="http://schema.org/NewsMediaOrganization">NewsMediaOrganization</a>),
+a report on staffing diversity issues. In a news context this might be for
+example ASNE or RTDNA (US) reports, or self-reported.
+
+A diversity_staffing_report should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::Article']>
 
 =item C<Str>
 
@@ -645,6 +820,30 @@ A employees should be one of the following types:
 =over
 
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
+
+=back
+
+=head2 C<ethics_policy>
+
+C<ethicsPolicy>
+
+=for html Statement about ethics policy, e.g. of a <a class="localLink"
+href="http://schema.org/NewsMediaOrganization">NewsMediaOrganization</a>
+regarding journalistic and publishing practices, or of a <a
+class="localLink" href="http://schema.org/Restaurant">Restaurant</a>, a
+page describing food source policies. In the case of a <a class="localLink"
+href="http://schema.org/NewsMediaOrganization">NewsMediaOrganization</a>,
+an ethicsPolicy is typically a statement describing the personal,
+organizational, and corporate standards of behavior expected by the
+organization.
+
+A ethics_policy should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
+
+=item C<Str>
 
 =back
 
@@ -770,6 +969,20 @@ A global_location_number should be one of the following types:
 
 =back
 
+=head2 C<has_credential>
+
+C<hasCredential>
+
+A credential awarded to the Person or Organization.
+
+A has_credential should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::EducationalOccupationalCredential']>
+
+=back
+
 =head2 C<has_offer_catalog>
 
 C<hasOfferCatalog>
@@ -799,6 +1012,20 @@ A has_pos should be one of the following types:
 
 =back
 
+=head2 C<has_product_return_policy>
+
+C<hasProductReturnPolicy>
+
+Indicates a ProductReturnPolicy that may be applicable.
+
+A has_product_return_policy should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::ProductReturnPolicy']>
+
+=back
+
 =head2 C<isic_v4>
 
 C<isicV4>
@@ -810,6 +1037,49 @@ person, or place.
 A isic_v4 should be one of the following types:
 
 =over
+
+=item C<Str>
+
+=back
+
+=head2 C<knows_about>
+
+C<knowsAbout>
+
+=for html Of a <a class="localLink" href="http://schema.org/Person">Person</a>, and
+less typically of an <a class="localLink"
+href="http://schema.org/Organization">Organization</a>, to indicate a topic
+that is known about - suggesting possible expertise but not implying it. We
+do not distinguish skill levels here, or relate this to educational
+content, events, objectives or <a class="localLink"
+href="http://schema.org/JobPosting">JobPosting</a> descriptions.
+
+A knows_about should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::Thing']>
+
+=item C<Str>
+
+=back
+
+=head2 C<knows_language>
+
+C<knowsLanguage>
+
+=for html Of a <a class="localLink" href="http://schema.org/Person">Person</a>, and
+less typically of an <a class="localLink"
+href="http://schema.org/Organization">Organization</a>, to indicate a known
+language. We do not distinguish skill levels or
+reading/writing/speaking/signing here. Use language codes from the <a
+href="http://tools.ietf.org/html/bcp47">IETF BCP 47 standard</a>.
+
+A knows_language should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::Language']>
 
 =item C<Str>
 
@@ -959,6 +1229,32 @@ A number_of_employees should be one of the following types:
 =over
 
 =item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
+
+=back
+
+=head2 C<ownership_funding_info>
+
+C<ownershipFundingInfo>
+
+=for html For an <a class="localLink"
+href="http://schema.org/Organization">Organization</a> (often but not
+necessarily a <a class="localLink"
+href="http://schema.org/NewsMediaOrganization">NewsMediaOrganization</a>),
+a description of organizational ownership structure; funding and grants. In
+a news/media setting, this is with particular reference to editorial
+independence. Note that the <a class="localLink"
+href="http://schema.org/funder">funder</a> is also available and can be
+used to make basic funder information machine-readable.
+
+A ownership_funding_info should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::AboutPage']>
+
+=item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
+
+=item C<Str>
 
 =back
 
@@ -1143,6 +1439,27 @@ The telephone number.
 A telephone should be one of the following types:
 
 =over
+
+=item C<Str>
+
+=back
+
+=head2 C<unnamed_sources_policy>
+
+C<unnamedSourcesPolicy>
+
+=for html For an <a class="localLink"
+href="http://schema.org/Organization">Organization</a> (typically a <a
+class="localLink"
+href="http://schema.org/NewsMediaOrganization">NewsMediaOrganization</a>),
+a statement about policy on use of unnamed sources and the decision process
+required.
+
+A unnamed_sources_policy should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
 
 =item C<Str>
 

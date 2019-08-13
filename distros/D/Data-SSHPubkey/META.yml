@@ -29,5 +29,5 @@ requires:
   strict: '0'
 resources:
   repository: https://github.com/thrig/Data-SSHPubkey
-version: '0.06'
+version: '1.00'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

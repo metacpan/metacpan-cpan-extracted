@@ -1,0 +1,12 @@
+{
+   "class" : {
+      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1559",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A Consortium is a membership <a class=\"localLink\" href=\"http://schema.org/Organization\">Organization</a> whose members are typically Organizations.",
+      "rdfs:label" : "Consortium",
+      "rdfs:subClassOf" : "schema:Organization",
+      "schema:category" : "issue-1559",
+      "schema:isPartOf" : "http:pending.schema.org"
+   },
+   "properties" : {}
+}

@@ -1,0 +1,12 @@
+{
+   "class" : {
+      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1495",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A <a class=\"localLink\" href=\"http://schema.org/LibrarySystem\">LibrarySystem</a> is a collaborative system amongst several libraries.",
+      "rdfs:label" : "LibrarySystem",
+      "rdfs:subClassOf" : "schema:Organization",
+      "schema:category" : "issue-1495",
+      "schema:isPartOf" : "http:pending.schema.org"
+   },
+   "properties" : {}
+}

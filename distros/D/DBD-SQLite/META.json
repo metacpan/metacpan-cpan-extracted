@@ -24,7 +24,7 @@
       "build" : {
          "requires" : {
             "File::Spec" : "0.82",
-            "Test::More" : "0.42"
+            "Test::More" : "0.88"
          }
       },
       "configure" : {
@@ -55,6 +55,6 @@
       },
       "x_MailingList" : "http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/dbd-sqlite"
    },
-   "version" : "1.62",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "1.64",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

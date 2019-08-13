@@ -1,14 +1,10 @@
 use strict;
 
-BEGIN {
-    $|  = 1;
-    $^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest;
-use Test::More tests => 6;
-use Test::NoWarnings;
+use Test::More;
+use if -d ".git", "Test::FailWarnings";
 
 my $dbh = connect_ok( RaiseError => 1, AutoCommit => 1 );
 
@@ -25,3 +21,5 @@ ok($sth2);
 my $ret = eval { $sth2->execute(); "ok" };
 ok !$@;
 is($ret, 'ok');
+
+done_testing;

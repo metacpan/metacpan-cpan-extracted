@@ -15,7 +15,23 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.8.1';
+our $VERSION = 'v3.9.0';
+
+
+has health_plan_network_id => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'healthPlanNetworkId',
+);
+
+
+
+has is_accepting_new_patients => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'isAcceptingNewPatients',
+);
+
 
 
 has medical_specialty => (
@@ -42,7 +58,7 @@ SemanticWeb::Schema::MedicalOrganization - A medical organization (physical or n
 
 =head1 VERSION
 
-version v3.8.1
+version v3.9.0
 
 =head1 DESCRIPTION
 
@@ -50,6 +66,35 @@ A medical organization (physical or not), such as hospital, institution or
 clinic.
 
 =head1 ATTRIBUTES
+
+=head2 C<health_plan_network_id>
+
+C<healthPlanNetworkId>
+
+Name or unique ID of network. (Networks are often reused across different
+insurance plans).
+
+A health_plan_network_id should be one of the following types:
+
+=over
+
+=item C<Str>
+
+=back
+
+=head2 C<is_accepting_new_patients>
+
+C<isAcceptingNewPatients>
+
+Whether the provider is accepting new patients.
+
+A is_accepting_new_patients should be one of the following types:
+
+=over
+
+=item C<Bool>
+
+=back
 
 =head2 C<medical_specialty>
 

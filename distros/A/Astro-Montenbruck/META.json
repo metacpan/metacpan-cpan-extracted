@@ -4,13 +4,13 @@
       "Sergey Krushinsky <krushi at cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4216",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "artistic_1"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Astro-Montenbruck",
    "prereqs" : {
@@ -44,7 +44,7 @@
    "provides" : {
       "Astro::Montenbruck" : {
          "file" : "lib/Astro/Montenbruck.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "Astro::Montenbruck::CoCo" : {
          "file" : "lib/Astro/Montenbruck/CoCo.pm",
@@ -110,6 +110,22 @@
          "file" : "lib/Astro/Montenbruck/NutEqu.pm",
          "version" : "0.01"
       },
+      "Astro::Montenbruck::RiseSet" : {
+         "file" : "lib/Astro/Montenbruck/RiseSet.pm",
+         "version" : "0.01"
+      },
+      "Astro::Montenbruck::RiseSet::Constants" : {
+         "file" : "lib/Astro/Montenbruck/RiseSet/Constants.pm",
+         "version" : "0.01"
+      },
+      "Astro::Montenbruck::RiseSet::RST" : {
+         "file" : "lib/Astro/Montenbruck/RiseSet/RST.pm",
+         "version" : "0.01"
+      },
+      "Astro::Montenbruck::RiseSet::Sunset" : {
+         "file" : "lib/Astro/Montenbruck/RiseSet/Sunset.pm",
+         "version" : "0.01"
+      },
       "Astro::Montenbruck::Time" : {
          "file" : "lib/Astro/Montenbruck/Time.pm",
          "version" : "0.01"
@@ -124,6 +140,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.05",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

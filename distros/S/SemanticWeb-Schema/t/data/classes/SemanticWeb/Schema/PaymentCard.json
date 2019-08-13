@@ -9,5 +9,48 @@
          "schema:FinancialProduct"
       ]
    },
-   "properties" : {}
+   "properties" : {
+      "schema:cashBack" : {
+         "dc:source" : [
+            "https://github.com/schemaorg/schemaorg/issues/1253",
+            "schemadotorgsources:FIBO"
+         ],
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A cardholder benefit that pays the cardholder a small percentage of their net expenditures.",
+         "rdfs:label" : "cashBack",
+         "schema:category" : "issue-1253",
+         "schema:domainIncludes" : "schema:PaymentCard",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:Number",
+            "schema:Boolean"
+         ]
+      },
+      "schema:contactlessPayment" : {
+         "dc:source" : [
+            "https://github.com/schemaorg/schemaorg/issues/1253",
+            "schemadotorgsources:FIBO"
+         ],
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A secure method for consumers to purchase products or services via debit, credit or smartcards by using RFID or NFC technology.",
+         "rdfs:label" : "contactlessPayment",
+         "schema:category" : "issue-1253",
+         "schema:domainIncludes" : "schema:PaymentCard",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Boolean"
+      },
+      "schema:floorLimit" : {
+         "dc:source" : [
+            "schemadotorgsources:FIBO",
+            "https://github.com/schemaorg/schemaorg/issues/1253"
+         ],
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A floor limit is the amount of money above which credit card transactions must be authorized.",
+         "rdfs:label" : "floorLimit",
+         "schema:category" : "issue-1253",
+         "schema:domainIncludes" : "schema:PaymentCard",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:MonetaryAmount"
+      }
+   }
 }

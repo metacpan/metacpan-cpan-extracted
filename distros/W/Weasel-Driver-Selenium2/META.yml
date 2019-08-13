@@ -14,12 +14,14 @@ meta-spec:
   version: '1.4'
 name: Weasel-Driver-Selenium2
 requires:
+  Carp::Clan: '0'
   Moose: '0'
   Selenium::Remote::Driver: '0'
-  Weasel: '0.01'
+  Weasel::DriverRole: '0.03'
+  namespace::autoclean: '0'
   perl: v5.10.1
 resources:
   bugtracker: https://github.com/perl-weasel/weasel-driver-selenium2/issues
   repository: https://github.com/perl-weasel/weasel-driver-selenium2.git
-version: '0.09'
+version: '0.10'
 x_serialization_backend: 'YAML::Tiny version 1.70'

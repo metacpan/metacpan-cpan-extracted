@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.8.1';
+our $VERSION = 'v3.9.0';
 
 
 has about => (
@@ -186,6 +186,14 @@ has comment_count => (
 
 
 
+has conditions_of_access => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'conditionsOfAccess',
+);
+
+
+
 has content_location => (
     is        => 'rw',
     predicate => 1,
@@ -198,6 +206,14 @@ has content_rating => (
     is        => 'rw',
     predicate => 1,
     json_ld   => 'contentRating',
+);
+
+
+
+has content_reference_time => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'contentReferenceTime',
 );
 
 
@@ -222,6 +238,22 @@ has copyright_year => (
     is        => 'rw',
     predicate => 1,
     json_ld   => 'copyrightYear',
+);
+
+
+
+has correction => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'correction',
+);
+
+
+
+has creative_work_status => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'creativeWorkStatus',
 );
 
 
@@ -482,6 +514,14 @@ has material => (
 
 
 
+has material_extent => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'materialExtent',
+);
+
+
+
 has mentions => (
     is        => 'rw',
     predicate => 1,
@@ -590,6 +630,30 @@ has schema_version => (
     is        => 'rw',
     predicate => 1,
     json_ld   => 'schemaVersion',
+);
+
+
+
+has sd_date_published => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'sdDatePublished',
+);
+
+
+
+has sd_license => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'sdLicense',
+);
+
+
+
+has sd_publisher => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'sdPublisher',
 );
 
 
@@ -738,7 +802,7 @@ SemanticWeb::Schema::CreativeWork - The most generic kind of creative work
 
 =head1 VERSION
 
-version v3.8.1
+version v3.9.0
 
 =head1 DESCRIPTION
 
@@ -1056,6 +1120,28 @@ A comment_count should be one of the following types:
 
 =back
 
+=head2 C<conditions_of_access>
+
+C<conditionsOfAccess>
+
+=for html Conditions that affect the availability of, or method(s) of access to, an
+item. Typically used for real world items such as an <a class="localLink"
+href="http://schema.org/ArchiveComponent">ArchiveComponent</a> held by an
+<a class="localLink"
+href="http://schema.org/ArchiveOrganization">ArchiveOrganization</a>. This
+property is not suitable for use as a general Web access control mechanism.
+It is expressed only in natural language.<br/><br/> For example "Available
+by appointment from the Reading Room" or "Accessible only from logged-in
+accounts ".
+
+A conditions_of_access should be one of the following types:
+
+=over
+
+=item C<Str>
+
+=back
+
 =head2 C<content_location>
 
 C<contentLocation>
@@ -1082,6 +1168,21 @@ A content_rating should be one of the following types:
 =over
 
 =item C<InstanceOf['SemanticWeb::Schema::Rating']>
+
+=item C<Str>
+
+=back
+
+=head2 C<content_reference_time>
+
+C<contentReferenceTime>
+
+The specific time described by a creative work, for works (e.g. articles,
+video objects etc.) that emphasise a particular moment within an Event.
+
+A content_reference_time should be one of the following types:
+
+=over
 
 =item C<Str>
 
@@ -1129,6 +1230,42 @@ A copyright_year should be one of the following types:
 =over
 
 =item C<Num>
+
+=back
+
+=head2 C<correction>
+
+=for html Indicates a correction to a <a class="localLink"
+href="http://schema.org/CreativeWork">CreativeWork</a>, either via a <a
+class="localLink"
+href="http://schema.org/CorrectionComment">CorrectionComment</a>, textually
+or in another document.
+
+A correction should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::CorrectionComment']>
+
+=item C<Str>
+
+=back
+
+=head2 C<creative_work_status>
+
+C<creativeWorkStatus>
+
+The status of a creative work in terms of its stage in a lifecycle. Example
+terms include Incomplete, Draft, Published, Obsolete. Some organizations
+define a set of terms for the stages of their publication lifecycle.
+
+A creative_work_status should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::DefinedTerm']>
+
+=item C<Str>
 
 =back
 
@@ -1627,6 +1764,23 @@ A material should be one of the following types:
 
 =back
 
+=head2 C<material_extent>
+
+C<materialExtent>
+
+The quantity of the materials being described or an expression of the
+physical space they occupy.
+
+A material_extent should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
+
+=item C<Str>
+
+=back
+
 =head2 C<mentions>
 
 Indicates that the CreativeWork contains a reference to, but is not
@@ -1837,6 +1991,62 @@ A schema_version should be one of the following types:
 =over
 
 =item C<Str>
+
+=back
+
+=head2 C<sd_date_published>
+
+C<sdDatePublished>
+
+=for html Indicates the date on which the current structured data was generated /
+published. Typically used alongside <a class="localLink"
+href="http://schema.org/sdPublisher">sdPublisher</a>
+
+A sd_date_published should be one of the following types:
+
+=over
+
+=item C<Str>
+
+=back
+
+=head2 C<sd_license>
+
+C<sdLicense>
+
+A license document that applies to this structured data, typically
+indicated by URL.
+
+A sd_license should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
+
+=item C<Str>
+
+=back
+
+=head2 C<sd_publisher>
+
+C<sdPublisher>
+
+=for html Indicates the party responsible for generating and publishing the current
+structured data markup, typically in cases where the structured data is
+derived automatically from existing published content but published on a
+different site. For example, student projects and open data initiatives
+often re-publish existing content with more explicitly structured metadata.
+The <a class="localLink"
+href="http://schema.org/sdPublisher">sdPublisher</a> property helps make
+such practices more explicit.
+
+A sd_publisher should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::Organization']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
 

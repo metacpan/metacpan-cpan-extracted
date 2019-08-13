@@ -1,15 +1,9 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest;
-use Test::More tests => 21;
-use Test::NoWarnings;
+use Test::More;
+use if -d ".git", "Test::FailWarnings";
 use DBI qw(:sql_types);
 
 my $dbh = connect_ok();
@@ -94,3 +88,5 @@ is( $sth->fetchrow_arrayref->[0], 1, "result of: $tweaked_statement : [2]" );
 $sth = $dbh->prepare($tweaked_statement);
 ok( $sth->execute(2), "execute: $tweaked_statement : [2]" );
 is( $sth->fetchrow_arrayref->[0], 1, "result of: $tweaked_statement : [2]" );
+
+done_testing;

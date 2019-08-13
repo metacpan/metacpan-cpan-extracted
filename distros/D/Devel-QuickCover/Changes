@@ -1,3 +1,9 @@
+0.900014    2019-08-09
+            * Declare internal variables -- threaded perls
+
+0.900013    2019-08-08
+            * Clean up includes -- threaded perls
+
 0.900012    2019-08-06
             * Replace JSON::XS with JSON::MaybeXS
             * Patch bin scripts to support the #! Makefile.PL was invoked with

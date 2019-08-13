@@ -1,7 +1,7 @@
 ---
 abstract: 'multi-language source code analysis toolkit'
 author:
-  - 'Joenio Marques da Costa <joenio@joenio.me>'
+  - 'Joenio Costa <joenio@joenio.me>'
 build_requires:
   Archive::Extract: '0'
   File::LibMagic: '0'
@@ -17,11 +17,11 @@ build_requires:
   Test::MockModule: '0'
   Test::MockObject: '0'
 configure_requires:
-  Alien::Doxyparse: '0.10'
+  Alien::Doxyparse: '0.13'
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -40,10 +40,9 @@ requires:
   File::HomeDir: '0'
   FindBin::libs: '0'
   Graph: '0'
-  Graph::Writer::DSM: '0.005'
+  Graph::Writer::Dot: '0'
   JSON: '0'
   List::Compare: '0'
-  Mojolicious: '0'
   Statistics::Descriptive: '0'
   Term::ProgressBar: '0'
   YAML: '1.20'
@@ -53,6 +52,5 @@ requires:
 resources:
   bugtracker: http://github.com/analizo/Analizo/issues
   repository: git://github.com/analizo/analizo.git
-version: 1.22.0
-x_generated_by_perl: v5.26.2
-x_serialization_backend: 'YAML::Tiny version 1.73'
+version: 1.23.0
+x_serialization_backend: 'YAML::Tiny version 1.70'

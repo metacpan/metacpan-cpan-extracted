@@ -1,25 +1,16 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
-use DBD::SQLite;
+use warnings;
+use lib "t/lib";
+use SQLiteTest;
 use Test::More;
+use if -d ".git", "Test::FailWarnings";
 
 BEGIN {
-	if (!grep /^ENABLE_COLUMN_METADATA/, DBD::SQLite::compile_options()) {
+	if (!has_compile_option('ENABLE_COLUMN_METADATA')) {
 		plan skip_all => "Column metadata is disabled for this DBD::SQLite";
 	}
 }
 
-use lib "t/lib";
-use SQLiteTest qw/connect_ok @CALL_FUNCS/;
-use Test::NoWarnings;
-
-plan tests => 16 * @CALL_FUNCS + 1;
 for my $call_func (@CALL_FUNCS) {
 	my $dbh = connect_ok(RaiseError => 1);
 	$dbh->do('create table foo (id integer primary key autoincrement, "name space", unique_col integer unique)');
@@ -63,3 +54,5 @@ for my $call_func (@CALL_FUNCS) {
 		ok $@, "successfully died when dbh is inactive";
 	}
 }
+
+done_testing;

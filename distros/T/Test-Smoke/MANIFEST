@@ -69,6 +69,7 @@ lib/Test/Smoke/Syncer/Snapshot.pm
 lib/Test/Smoke/Util.pm
 lib/Test/Smoke/Util/Execute.pm
 lib/Test/Smoke/Util/FindHelpers.pm
+lib/Test/Smoke/Util/LoadAJSON.pm
 lib/Test/Smoke/Util/Win32ErrorMode.pm
 lib/Test/Smoke/maint_dfconfig
 lib/Test/Smoke/perl58x.cfg
@@ -78,7 +79,6 @@ lib/Test/Smoke/smoke58x_dfconfig
 lib/Test/Smoke/vmsperl.cfg
 lib/Test/Smoke/w32current.cfg
 lib/fallback.pm
-lib/inc/JSON.pm
 lib/inc/Mail/Sendmail.pm
 t/10-fallback.t
 t/11-no_fallback.t

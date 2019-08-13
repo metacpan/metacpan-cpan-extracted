@@ -2,21 +2,19 @@ Net-Connection-ncnetstat
 
 Provides a enhances colorized netstat like tool that is capable of doing searches.
 
-> ncnetstat -p ldap -n -a -C
-Proto User  PID  Local Host   Port  Foreach Host Port  State       Command
-tcp6  ldap  1377 *            ldap  *            *     LISTEN      slapd
-tcp4  ldap  1377 *            ldap  *            *     LISTEN      slapd
-tcp4  ldap  1377 127.0.0.1    ldap  127.0.0.1    41453 ESTABLISHED slapd
-tcp4  ldap  1377 127.0.0.1    ldap  127.0.0.1    62370 ESTABLISHED slapd
-tcp4  ldap  1377 127.0.0.1    ldap  127.0.0.1    35181 ESTABLISHED slapd
-tcp4  ldap  1377 127.0.0.1    ldap  127.0.0.1    23619 ESTABLISHED slapd
-tcp4  ldap  1377 127.0.0.1    ldap  127.0.0.1    23620 ESTABLISHED slapd
-tcp4  nslcd 1386 127.0.0.1    41453 127.0.0.1    ldap  ESTABLISHED nslcd
-tcp4  nslcd 1386 127.0.0.1    62370 127.0.0.1    ldap  ESTABLISHED nslcd
-tcp4  nslcd 1386 127.0.0.1    35181 127.0.0.1    ldap  ESTABLISHED nslcd
-tcp4  nslcd 1386 127.0.0.1    23619 127.0.0.1    ldap  ESTABLISHED nslcd
-tcp4  nslcd 1386 127.0.0.1    23620 127.0.0.1    ldap  ESTABLISHED nslcd
-tcp4  ldap  1377 192.168.15.2 ldap  192.168.14.2 39821 ESTABLISHED slapd
+> ncnetstat -W --Cl --pct -p ldap -n
+Proto User  PID  Local Host   Port  Remote Host  Port  State       WChan  CPU% Mem% Command
+tcp4  ldap  1377 127.0.0.1    ldap  127.0.0.1    41453 ESTABLISHED uwait  0.00 0.03 /usr/local/libexec/slapd -u ldap -g ldap
+tcp4  ldap  1377 127.0.0.1    ldap  127.0.0.1    62370 ESTABLISHED uwait  0.00 0.03 /usr/local/libexec/slapd -u ldap -g ldap
+tcp4  ldap  1377 127.0.0.1    ldap  127.0.0.1    35181 ESTABLISHED uwait  0.00 0.03 /usr/local/libexec/slapd -u ldap -g ldap
+tcp4  ldap  1377 127.0.0.1    ldap  127.0.0.1    23619 ESTABLISHED uwait  0.00 0.03 /usr/local/libexec/slapd -u ldap -g ldap
+tcp4  ldap  1377 127.0.0.1    ldap  127.0.0.1    23620 ESTABLISHED uwait  0.00 0.03 /usr/local/libexec/slapd -u ldap -g ldap
+tcp4  nslcd 1386 127.0.0.1    41453 127.0.0.1    ldap  ESTABLISHED nanslp 0.00 0.02 /usr/local/sbin/nslcd
+tcp4  nslcd 1386 127.0.0.1    62370 127.0.0.1    ldap  ESTABLISHED nanslp 0.00 0.02 /usr/local/sbin/nslcd
+tcp4  nslcd 1386 127.0.0.1    35181 127.0.0.1    ldap  ESTABLISHED nanslp 0.00 0.02 /usr/local/sbin/nslcd
+tcp4  nslcd 1386 127.0.0.1    23619 127.0.0.1    ldap  ESTABLISHED nanslp 0.00 0.02 /usr/local/sbin/nslcd
+tcp4  nslcd 1386 127.0.0.1    23620 127.0.0.1    ldap  ESTABLISHED nanslp 0.00 0.02 /usr/local/sbin/nslcd
+tcp4  ldap  1377 192.168.15.2 ldap  192.168.14.2 39821 ESTABLISHED uwait  0.00 0.03 /usr/local/libexec/slapd -u ldap -g ldap
 
 The search criteria can be any of the following.
 
@@ -24,7 +22,13 @@ CIDR
 port
 host
 PTR
+pctcpu
+pctmem
+Regex PTR
 state
+UID
+username
+wait channel
 
 TODO
 
@@ -61,6 +65,9 @@ You can also look for information at:
 
     Search CPAN
         https://metacpan.org/release/Net-Connection-ncnetstat
+
+    Repository
+        https://github.com/VVelox/Net-Connection-ncnetstat
 
 
 LICENSE AND COPYRIGHT

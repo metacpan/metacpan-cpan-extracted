@@ -8,16 +8,41 @@ ABSTRACT
 
 SYNOPSIS
 
-      package Person;
+      # Root Namespace and Type Library
+      package App;
     
-      use Data::Object 'Class';
+      use Data::Object 'Library';
     
-      extends 'Identity';
+      # Type Library Aware Application Class
+      package User;
     
-      has fullname => (
-        is => 'ro',
-        isa => 'Str'
+      use Data::Object 'Class', 'App';
+    
+      has name => (
+        is  => 'ro',
+        isa => 'Str',
+        req => 1
       );
+    
+      method greet(User $user) {
+        return 'Hello '. $user->name .', How are you?';
+      }
+    
+      # Type Library Aware Application Package
+      package main;
+    
+      use User;
+    
+      use Data::Object 'Core', 'App';
+    
+      fun greetings(User $u1, User $u2) {
+        return $u1->greet($u2);
+      }
+    
+      my $u1 = User->new(name => 'Jane');
+      my $u2 = User->new(name => 'June');
+    
+      say(greetings($u1, $u2)); # Hey June
     
       1;
 
@@ -25,27 +50,13 @@ DESCRIPTION
 
     Data-Object is a robust development framework for modern Perl
     development, embracing Perl's multi-paradigm programming nature,
-    flexibility and vast ecosystem that millions of engineers already know
-    and love.
+    flexibility and vast ecosystem that many of engineers already know and
+    love.
 
     This framework aims to provide a standardized and cohesive set of
     classes, types, objects, functions, patterns, and tools for
     jump-starting application development with modern conventions and best
     practices.
-
-    The power of this framework comes from the extendable (yet fully
-    optional) type library which is integrated into the object system and
-    type-constrainable subroutine signatures (supporting functions, methods
-    and method modifiers). We also provide classes which wrap Perl 5 native
-    data types and provides methods for operating on the data.
-
-    Contrary to popular opinion, modern Perl programming can be extremely
-    structured and quite beautiful, leveraging many advanced concepts found
-    on other languages, and some which aren't. Abilities like method
-    modification (augmenting), reflection, advanced object-orientation,
-    type-constrainable object attributes, type-constrainable subroutine
-    signatures (with named and positional arguments), as well roles
-    (similar to mixins or interfaces in other languages).
 
 INSTALLATION
 
@@ -60,74 +71,88 @@ INSTALLATION
 
     Add Data::Object to the list of dependencies in cpanfile:
 
-      requires "Data::Object" => "0.90"; # 0.90 or newer
+      requires "Data::Object" => "0.97"; # 0.97 or newer
 
-    If cpanm doesn't have permission to install modules to the current
-    perl, it will automatically set up and install to a local::lib in your
-    home directory. See the local::lib documentation for details on
+    If cpanm doesn't have permission to install modules in the current Perl
+    installation, it will automatically set up and install to a local::lib
+    in your home directory. See the local::lib documentation for details on
     enabling it in your environment. We recommend using a Perlbrew
     <https://github.com/gugod/app-perlbrew> or Plenv
     <https://github.com/tokuhirom/plenv> environment. These tools will help
-    you manage multiple perl installations in your $HOME directory. They
-    are completely isolated perl installations.
+    you manage multiple Perl installations in your $HOME directory. They
+    are completely isolated Perl installations.
 
 OVERVIEW
+
+    The power of this framework comes from the extendable (yet fully
+    optional) type library which is integrated into the object system and
+    type-constrainable subroutine signatures (supporting functions, methods
+    and method modifiers). We also provide classes which wrap Perl 5 native
+    data types and provides methods for operating on the data.
+
+    Contrary to popular opinion, modern Perl programming can be extremely
+    well-structured and beautiful, leveraging many advanced concepts found
+    on other languages, and some which aren't. Abilities like method
+    modification also referred to as augmenting, reflection, advanced
+    object-orientation, type-constrainable object attributes,
+    type-constrainable subroutine signatures (with named and positional
+    arguments), as well roles (similar to mixins or interfaces in other
+    languages).
 
       use Data::Object;
 
     This is what's enabled whenever you import the Data::Object framework.
 
       # basics
-      # use strict;
-      # use warnings;
+      use strict;
+      use warnings;
     
-      # say, state, switch, unicode_strings, array_base
-      # use feature ':5.14';
+      # loads say, state, switch, unicode_strings, array_base
+      use feature ':5.14';
     
-      # types and signatures
-      # use Data::Object::Library;
-      # use Data::Object::Signatures;
+      # loads types and signatures
+      use Data::Object::Library;
+      use Data::Object::Signatures;
     
-      # super "do" function, tools and functions
-      # use Data::Object::Export;
-    
-      # overload core "do" function
-      # use subs 'do';
+      # load super "do" function, etc
+      use Data::Object::Export;
 
-    This creates a class representing a person which greets another person.
+    To explain the example in the synopsis: The following creates a class
+    representing a user which has the ability to greet user person.
 
-      package Person;
+      package User;
     
       use Data::Object 'Class', 'App';
     
       has name => (
-        is => 'ro',
-        isa => 'Str'
+        is  => 'ro',
+        isa => 'Str',
+        req => 1
       );
     
-      method hello(Person $person) {
-        return 'Hello '. $person->name .', How are you?';
+      method hello(User $user) {
+        return 'Hello '. $user->name .'. How are you?';
       }
     
       1;
 
-    This creates a function that returns how one person greet another
-    person.
+    The following is a script that creates a function that returns how one
+    user greets another user.
 
-      #!perl
+      #!/usr/bin/perl
     
-      use Person;
+      use User;
     
       use Data::Object 'Core', 'App';
     
-      fun greetings(Person $p1, Person $p2) {
-        return $p1->hello($p2);
+      fun greetings(User $u1, User $u2) {
+        return $u1->hello($u2);
       }
     
-      my $p1 = Person->new(name => 'Jane');
-      my $p2 = Person->new(name => 'June');
+      my $u1 = User->new(name => 'Jane');
+      my $u2 = User->new(name => 'June');
     
-      say(greetings($p1, $p2)); # Hey June
+      say(greetings($u1, $u2)); # Hey June
 
     This demonstrates much of the power of this framework in one simple
     example. If you're new to Perl, the code above creates a class with a
@@ -136,17 +161,16 @@ OVERVIEW
     called App where all user-defined type constraints will be stored and
     retrieved (and reified).
 
-    The class method takes a single argument which must be an instance of
-    the class being created. The main program (namespace) initializes the
-    framework and specifies the user-defined type library to use in the
-    creation of a single function greetings which takes two arguments which
-    must both be instances of the class we just created. It's important to
-    note that in order for the code above to execute, the App type library
-    must exist. This could be as simple as:
+    The main program (namespace) initializes the framework and specifies
+    the user-defined type library to use in the creation of a single
+    function greetings which takes two arguments which must both be
+    instances of the class we just created. It's important to note that in
+    order for the code above to execute, the App type library must exist.
+    This could be as simple as:
 
       package App;
     
-      use Type::Library -base;
+      use Data::Object 'Library';
     
       1;
 
@@ -164,395 +188,182 @@ OVERVIEW
     Function::Parameters, Try::Tiny and data objects in a cooperative and
     cohesive way that feels like it's native to the language.
 
-OVERVIEW: CONFIGURATION
+FUNCTIONS
 
-      package Authenticatable;
-    
-      use Data::Object 'Rule';
-    
-      package Authentication;
-    
-      use Data::Object 'Role';
-    
-      package User;
-    
-      use Data::Object 'Class';
-    
-      with 'Authentication';
-      with 'Authenticatable';
+    This package implements the following functions.
 
-    It's an important and intentional design decision to make this
-    framework highly configurable. It's really Perlish that way. Using the
-    do and Data::Object modules is the entry point into this framework and
-    is where the configuration of the various features begins. The import
-    process has been designed to be idempotent, and declaring the use of
-    the same module multiple times with different parameters is encouraged.
+ any
 
-OVERVIEW: CONSTRUCTORS
+      any(Any $arg) : Object
 
-      use Data::Object;
-    
-      my $file = do('path', 'dump.json');
-      my $json = do('json' $file->slurp);
-    
-      say(do('dump', $json));
+    The any constructor function returns a Data::Object::Any object for
+    given argument.
 
-    The constructor functions offered through Data::Object::Export, when
-    called, return instances of the classes they're associated with. They
-    are merely a convenience and provide a way to quickly load a class and
-    construct an object at runtime. These functions can be proxied to by
-    the special (albeit slightly evil) do function, which overloads the
-    core “do” function. This super-function is made available to every
-    namespace where the Data-Object framework is configured.
+    any example
 
-OVERVIEW: DATA OBJECTS
+        # given \*main
+      
+        my $object = Data::Object->any(\*main);
 
-      use Data::Object;
-      use Data::Object::Code;
-    
-      # returns a code object
-      my $code = Data::Object::Code->new(fun{ join ' ', @_ });
-    
-      # returns truthy
-      $code->isa('Data::Object::Code');
-    
-      # returns a string object representing 'Hello World'
-      my $string = $code->call('Hello', 'World');
-    
-      # returns a new string object
-      $string = $string->split('')->reverse->join('')->uppercase;
-    
-      # returns a number object (returns truthy) and outputs "DLROW OLLEH"
-      my $result = $string->say;
-    
-      # returns truthy
-      $result->isa('Data::Object::Number');
+ array
 
-    This framework also provides classes which wrap Perl 5 native data
-    types and provides methods for operating on that data, e.g.
-    Data::Object::Array, Data::Object::Code, Data::Object::Hash, and
-    Data::Object::String, to name a few. These are referred to as the data
-    type classes which construct data objects.
+      array(ArrayRef $arg) : Object
 
-OVERVIEW: DISPATCHERS
+    The array constructor function returns a Data::Object::Array object for
+    given argument.
 
-      use Data::Object::Dispatch;
-    
-      my $package = 'Logger';
-    
-      my $dispatch1 = Data::Object::Dispatch->new($package);
-    
-      $dispatch1->call(@args);
-    
-      my $dispatch2 = Data::Object::Dispatch->new($package, 'log', time);
-    
-      $dispatch2->call('Something went wrong');
-    
-      # i.e. Logger::log(time, 'Something went wrong')
+    array example
 
-    Dispatchers are basically closures which when called execute
-    subroutines in a package, and can be curried. This concept is often
-    found in functional programming and is extremely powerful in that it
-    creates an inversion of control by allowing the closure creator to
-    decide how the call will be executed. The Data::Object::Dispatch class
-    can be used directly or subclassed to create sophisticated
-    applications.
+        # given [1..4]
+      
+        my $object = Data::Object->array([1..4]);
 
-OVERVIEW: FUNCTION CLASSES
+ code
 
-      my $data = Data::Object::Array->new([1..4]);
-    
-      my $sets = [];
-    
-      my $func = Data::Object::Func::Array::EachNValues->new(
-        arg1 => $data,
-        arg2 => 2,
-        arg3 => fun ($v1, $v2) { push $@sets, [$v1, $v2]; }
-      );
-    
-      my $result = $func->execute;
+      code(CodeRef $arg) : Object
 
-    Each data type class' methods correspond to a function class which
-    encapsulates the subroutine logic, enforces its signature, provides
-    execution automation, and establishes an architecture that's easy to
-    evolve and maintain. These classes provide the logic that gets executed
-    whenever a method call is made on a data object.
+    The code constructor function returns a Data::Object::Code object for
+    given argument.
 
-OVERVIEW: FUNCTION SIGNATURES
+    code example
 
-      use Data::Object;
-    
-      fun output($string) {
-        say $string;
-      }
-    
-      fun collect(Any @args) {
-        return (map do('dump', $_), @args);
-      }
-    
-      output(collect(@data));
+        # given sub { shift + 1 }
+      
+        my $object = Data::Object->code(sub { $_[0] + 1 });
 
-    Everything offered by this framework is optional and one of its best
-    features is the type-constrainable method and function signatures which
-    leverages the core type library and can easily interoperate with a
-    user-defined type library (or libraries).
+ exception
 
-OVERVIEW: OBJECT SYSTEM
+      exception(HashRef $arg) : Object
 
-      package App::Person;
-    
-      use Data::Object 'Class', 'App';
-    
-      has 'fname';
-      has 'lname';
-    
-      has 'parents' => (
-        is  => 'ro',
-        isa => 'Tuple[AppPerson, AppPerson]',
-        lzy => 1
-      );
+    The exception constructor function returns a Data::Object::Exception
+    object for given argument.
 
-    The underlying object system uses Moo which is a light-weight Moose
-    compatible framework for declaring classes, attributes, and
-    method-modifiers, as well as constructing objects, with clear and
-    concise syntax. Data-Object takes this functionality further by
-    providing an integrated type system and syntactic sugar around the
-    class attribute declaration.
+    exception example
 
-OVERVIEW: PACKAGE CLASS
+        # given { message => 'Oops' }
+      
+        my $object = Data::Object->exception({ message => 'Oops' });
 
-      use Data::Object::Space;
-    
-      my $space = Data::Object::Space->new('data/object');
-    
-      "$space"
-      # Data::Object
-    
-      $space->path;
-      # Data/Object
-    
-      $space->file;
-      # Data/Object.pm
-    
-      $space->children;
-      # ['Data/Object/Array.pm', ...]
+ float
 
-    The package class, Data::Object::Space, provides methods of loading,
-    blessing, inspecting, and otherwise operating on packages.
+      float(Num $arg) : Object
 
-OVERVIEW: PODISH PARSER
+    The float constructor function returns a Data::Object::Float object for
+    given argument.
 
-      package App::Command;
-    
-      use Data::Object 'Data';
-    
-      =help
-    
-      fetches results from the api
-    
-      =cut
-    
-      my $data = Data::Object::Data->new;
-    
-      my $help = $data->content('help');
-    
-      1;
+    float example
 
-    The pod-ish parser, offered in Data::Object::Data, allows you to parse
-    files and packages and extract pod-like sections of information. This
-    is a powerful ability that rethinks what, why and how we use POD (plain
-    old documentation) data, and opens up your application to make use of
-    this data in cool new ways.
+        # given 1.23
+      
+        my $object = Data::Object->float(1.23);
 
-OVERVIEW: ROLES AND RULES
+ hash
 
-      package Persona;
-    
-      use Data::Object 'Rule';
-    
-      requires 'id';
-      requires 'fname';
-      requires 'lname';
-      requires 'created';
-      requires 'updated';
-    
-      around created() {
-        # do something ...
-        return $self->$orig;
-      }
-    
-      around updated() {
-        # do something ...
-        return $self->$orig;
-      }
-    
-      1;
+      hash(HashRef $arg) : Object
 
-    Roles offer us a way to reuse behavior without relying on inheritance.
-    Rules are roles but meant to establish by convention the separation of
-    interface declaration and behavior abstraction, i.e. rules are where we
-    put the “interface” rules, and roles are where we put the behavior.
+    The hash constructor function returns a Data::Object::Hash object for
+    given argument.
 
-OVERVIEW: SINGLETONS
+    hash example
 
-      package App::Config;
-    
-      use Data::Object 'State';
-    
-      extends 'Config';
-    
-      has 'datastore';
-      has 'environment';
-      has 'servers';
-    
-      1;
+        # given {1..4}
+      
+        my $object = Data::Object->hash({1..4});
 
-    Occasionally it makes sense to declare some persistent state and the
-    Data::Object::State class allows you to do that with all of the
-    features and benefits of a Moo or Moose derived object.
+ integer
 
-OVERVIEW: STANDARD LIBRARY
+      integer(Int $arg) : Object
 
-      # Data::Object::Any
-      # Data::Object::Array
-      # Data::Object::Class
-      # Data::Object::Code
-      # Data::Object::Config
-      # Data::Object::Exception
-      # Data::Object::Float
-      # Data::Object::Hash
-      # Data::Object::Integer
-      # Data::Object::Number
-      # Data::Object::Regexp
-      # Data::Object::Replace
-      # Data::Object::Role
-      # Data::Object::Rule
-      # Data::Object::Scalar
-      # Data::Object::Search
-      # Data::Object::Space
-      # Data::Object::State
-      # Data::Object::String
-      # Data::Object::Template
-      # Data::Object::Type
-      # Data::Object::Undef
+    The integer constructor function returns a Data::Object::Integer object
+    for given argument.
 
-    The framework is meant to offer a kind-of standard library of
-    functionality, concepts, and patterns for developing modern Perl
-    applications. Again, everything provided is optional and has been
-    designed to be configurable.
+    integer example
 
-OVERVIEW: TYPE BUILDER
+        # given -123
+      
+        my $object = Data::Object->integer(-123);
 
-      package App::Type::Label;
-    
-      use parent 'Data::Object::Type';
-    
-      sub name {
-        return 'Label';
-      }
-    
-      sub parent {
-        return 'Str';
-      }
-    
-      sub coercions {
-        my $coercions = [];
-    
-        push @$coercions, 'Str', sub { shift =~ s/\W//gr };
-    
-        return $coercions;
-      }
-    
-      sub validation {
-        my ($self, $data) = @_;
-    
-        return if !$data;
-    
-        return $data !~ /\W/;
-      }
-    
-      1;
+ number
 
-    The type system provided is based on the Type::Tiny system and takes
-    advantage of many of the features and functions available, such as
-    coercion and parameterization. The Data::Object::Library library is
-    itself a Type::Library, and extends the Types::Standard,
-    Types::TypeTiny, Types::Common::Numeric and Types::Common::String
-    libraries, and provides additional types based on the classes, roles
-    and rules offered as part of this framework.
+      number(Num $arg) : Object
 
-    Many of the Data-Object type constraints are defined via an abstract
-    base class, Data::Object::Type, which makes the super-class a
-    type-constraint builder, which is then registered with the Data-Object
-    type library. This base class provides a pattern for easily defining
-    type constraints with coercions and which might be parameterized that
-    can be registered in any Type::Library library.
+    The number constructor function returns a Data::Object::Number object
+    for given argument.
 
-OVERVIEW: TYPE SYSTEM
+    number example
 
-      package DSN;
-    
-      use Data::Object 'Class';
-    
-      has scheme => (
-        is  => 'ro',
-        isa => 'Str',
-        req => 1
-      );
-    
-      has driver => (
-        is  => 'ro',
-        isa => 'Str',
-        req => 1
-      );
-    
-      has database => (
-        is  => 'ro',
-        isa => 'Str',
-        req => 1
-      );
-    
-      has options => (
-        is  => 'ro',
-        isa => 'HashRef',
-        req => 1
-      );
-    
-      has host => (
-        is  => 'ro',
-        isa => 'Str',
-        opt => 1
-      );
-    
-      has port => (
-        is  => 'ro',
-        isa => 'Number',
-        opt => 1
-      );
-    
-      has username => (
-        is  => 'ro',
-        isa => 'Str',
-        opt => 1
-      );
-    
-      has password => (
-        is  => 'ro',
-        isa => 'Str',
-        opt => 1
-      );
-    
-      1;
+        # given 123
+      
+        my $object = Data::Object->number(123);
 
-    The type system and core type library offered in Data::Object::Library
-    provide type constraints for the most common types of objects and
-    values. These type constraints can be declared in class attribute
-    declarations as well as in method and function signatures.
+ regexp
 
-    The type-constrainable aspects of the Data-Object framework are
-    context-aware, i.e. the framework provides mechanisms for mapping
-    user-defined type libraries to namespaces so that user-defined types
-    can be used in type validation alongside core types. This prevents any
-    need to extend the core type library and prevents type constraint
-    naming collisions across applications.
+      regexp(Regexp $arg) : Object
+
+    The regexp constructor function returns a Data::Object::Regexp object
+    for given argument.
+
+    regexp example
+
+        # given qr(\w+)
+      
+        my $object = Data::Object->regexp(qr(\w+));
+
+ scalar
+
+      scalar(Any $arg) : Object
+
+    The scalar constructor function returns a Data::Object::Scalar object
+    for given argument.
+
+    scalar example
+
+        # given \*main
+      
+        my $object = Data::Object->scalar(\*main);
+
+ string
+
+      string(Str $arg) : Object
+
+    The string constructor function returns a Data::Object::String object
+    for given argument.
+
+    string example
+
+        # given 'hello'
+      
+        my $object = Data::Object->string('hello');
+
+ undef
+
+      undef(Undef $arg?) : Object
+
+    The undef constructor function returns a Data::Object::Undef object for
+    given argument.
+
+    undef example
+
+        # given undef
+      
+        my $object = Data::Object->undef(undef);
+
+METHODS
+
+    This package implements the following methods.
+
+ new
+
+      new(Str $arg) : Object
+
+    The new method expects a string representing a class name under the
+    Data::Object namespace and returns a Data::Object::Space object.
+
+    new example
+
+        # given 'String'
+      
+        my $space = Data::Object->new('String');
+      
+        my $string = $space->build('hello world');
 

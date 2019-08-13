@@ -2,8 +2,8 @@ NAME
     App::CompleteCLIs - CLI wrappers for complete_*() functions
 
 VERSION
-    This document describes version 0.13 of App::CompleteCLIs (from Perl
-    distribution App-CompleteCLIs), released on 2017-08-18.
+    This document describes version 0.140 of App::CompleteCLIs (from Perl
+    distribution App-CompleteCLIs), released on 2019-07-18.
 
 SYNOPSIS
 DESCRIPTION
@@ -12,6 +12,8 @@ DESCRIPTION
     various "complete_*" functions on the command-line.
 
     *   complete-array-elem
+
+    *   complete-country-code
 
     *   complete-dist
 
@@ -117,7 +119,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016, 2015, 2014 by
+    This software is copyright (c) 2019, 2017, 2016, 2015, 2014 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

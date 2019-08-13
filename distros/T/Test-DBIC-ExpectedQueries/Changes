@@ -2,6 +2,15 @@
 Feature oriented Revision history for Test-DBIC-ExpectedQueries
 ===============================================================
 
+2.001 -- 2019-08-12 17:39:31 UTC
+
+* Support a test description, and report the test correctly.
+
+* Fix the stack trace so it's less spammy (filter out more common
+  infrastructure modules), and more readable.
+
+
+
 2.000 -- 2019-07-17 21:14:39 UTC
 
 * BREAKING CHANGE -- This release includes a bug fix to the

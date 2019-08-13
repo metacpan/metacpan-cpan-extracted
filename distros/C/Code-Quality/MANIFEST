@@ -1,0 +1,15 @@
+Changes
+COPYING
+Makefile.PL
+MANIFEST
+README.md
+t/breakage.t
+t/Code-Quality.t
+t/examples.txt
+t/lib.pm
+t/perlcritic.t
+t/perlcriticrc
+t/regression.t
+lib/Code/Quality.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

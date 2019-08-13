@@ -87,24 +87,32 @@ my $class = 'Bio::Palantir::Refiner::ClusterPlus';
     my @expected_domain_symbols = [
         'AT', 'PCP', 'C', 'A', 'PCP', 
         'C', 'A', 'A', 'PCP', 'C', 
-        'C', 'A', 'PCP', 'A',
+        'A', 'C', 'A', 'PCP',
     ];
+
 
     my @expected_domain_classes = [
         'substrate-selection', 'carrier-protein', 'condensation', 
         'substrate-selection', 'carrier-protein', 'condensation',
         'substrate-selection', 'substrate-selection', 'carrier-protein',
-        'condensation', 'condensation', 'substrate-selection',
-        'carrier-protein', 'substrate-selection',
+        'condensation', 'substrate-selection', 'condensation', 
+         'substrate-selection', 'carrier-protein',
+    ];
+
+    my @expected_domain_coordinates = [
+        [1, 399], [396, 463], [490, 924], [929, 1415], [1427, 1494],
+        [1525, 1957], [1951, 2437], [2355, 2843], [2855, 2922], [2954, 3391],
+        [3399, 3768], [3770, 4201], [4202, 4685], [4697, 4766],
     ];
 
     my $domain_n;
     $domain_n += $_->count_domains for $ClusterPlus2->all_genes;
 
-    my (@domain_symbols, @domain_classes);
+    my (@domain_symbols, @domain_classes, @domain_coordinates);
     for my $gene ($ClusterPlus2->all_genes) {
         push @domain_symbols, $_->symbol for $gene->all_domains;
         push @domain_classes, $_->class  for $gene->all_domains;
+        push @domain_coordinates, $_->coordinates for $gene->all_domains;
     }
 
     cmp_ok $domain_n, '==', 14,
@@ -115,6 +123,9 @@ my $class = 'Bio::Palantir::Refiner::ClusterPlus';
 
     cmp_deeply \@domain_classes, @expected_domain_classes,
         'got expected domain classes for NRPS DomainPlus objects - GenePlus _get_class method test';
+    
+    cmp_deeply \@domain_coordinates, @expected_domain_coordinates,
+        'got expected domain coordinates for NRPS DomainPlus objects - Fillable role method test';
 
 }
 
@@ -144,7 +155,7 @@ my $class = 'Bio::Palantir::Refiner::ClusterPlus';
         push @domain_sizes,     $_->size     for $gene->all_domains;
         push @domain_subtypes,  $_->subtype  for $gene->all_domains;
     }
-
+    
     # elongate coordinates - handle_overlaps - refine_coordinates
     cmp_deeply \@domain_sizes, @expected_domain_sizes,
         'got expected elongated sizes for PKS DomainPlus objects - Coordinates methods test';

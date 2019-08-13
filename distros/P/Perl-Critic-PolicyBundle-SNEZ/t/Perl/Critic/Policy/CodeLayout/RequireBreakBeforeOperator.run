@@ -1,0 +1,23 @@
+## name Expression broken after operators
+## failures 3
+## cut
+push @steps, $steps[-1] +
+    $radial_velocity * $elapsed_time +
+    $orbital_velocity * ($phase + $phase_shift) -
+    $DRAG_COEFF * $altitude;
+
+## name Expression correctly broken before operators
+## failures 0
+## cut
+push @steps, $steps[-1]
+            + $radial_velocity * $elapsed_time
+            + $orbital_velocity * ($phase + $phase_shift)
+            - $DRAG_COEFF * $altitude;
+
+## name Comma-separated list with comma at the end
+## failures 0
+## cut
+my @list = (
+    1,
+    2,
+);

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.153';
+our $VERSION = '1.154';
 
 use Quiq::Css;
 use Quiq::JavaScript;
@@ -48,13 +48,14 @@ werden.
 Füge <DOCTYPE> am Anfang des Fragments hinzu. Dies ist nützlich,
 wenn das Fragment die Antwort eines Ajax-Requests ist.
 
-=item html => $html (Default: '')
+=item html => $html | \@html (Default: '')
 
-Der HTML-Code des Fragments.
+Der HTML-Code des Fragments. Ist ein Array von Code-Abschnitten
+angegeben, werden diese konkateniert.
 
 =item javaScript => $js | \@js (Default: undef)
 
-Der JavaScript-Code der Fragmente. Siehe Methode
+Der JavaScript-Code des Fragments. Siehe Methode
 Quiq::JavaScript->code(). Das Attribut kann mehrfach
 vorkommen, z.B. für die getrennte Angabe von JavaScript-URLs und
 JavaScript-Code.
@@ -66,7 +67,7 @@ Werte.
 
 =item styleSheet => $css | \@css (Default: undef)
 
-Der CSS-Code der Fragmente. Siehe Methode
+Der CSS-Code des Fragments. Siehe Methode
 Quiq::Css->style(). Das Attribut kann mehrfach vorkommen,
 z.B. für die getrennte Angabe von CSS-URLs und CSS-Definitionen.
 
@@ -97,7 +98,7 @@ sub new {
 
     my $self = $class->SUPER::new(
         doctype => 0,
-        html => '',
+        html => [],
         javaScript => [],
         placeholders => undef,
         styleSheet => [],
@@ -106,7 +107,7 @@ sub new {
         my $key = shift;
         my $val = shift;
 
-        if ($key eq 'styleSheet' || $key eq 'javaScript') {
+        if ($key =~ /^(html|javaScript|styleSheet)$/) {
             my $arr = $self->get($key);
             push @$arr,ref $val? @$val: $val;
         }
@@ -153,7 +154,7 @@ sub html {
         '-',
         $doctype? $h->doctype: '',
         Quiq::Css->style($h,$styleSheet),
-        $html,
+        join('',@$html),
         Quiq::JavaScript->script($h,$javaScript),
     );
 }
@@ -162,7 +163,7 @@ sub html {
 
 =head1 VERSION
 
-1.153
+1.154
 
 =head1 AUTHOR
 

@@ -1,9 +1,11 @@
+
 package Net::Connection::lsof;
 
 use 5.006;
 use strict;
 use warnings;
 use Net::Connection;
+use Proc::ProcessTable;
 require Exporter;
 
 our @ISA = qw(Exporter);
@@ -15,11 +17,11 @@ Net::Connection::lsof - This uses lsof to generate a array of Net::Connection ob
 
 =head1 VERSION
 
-Version 0.0.2
+Version 0.1.1
 
 =cut
 
-our $VERSION = '0.0.2';
+our $VERSION = '0.1.1';
 
 
 =head1 SYNOPSIS
@@ -68,6 +70,12 @@ Attempt to resolve the UID to a username.
 
 Defaults to 1.
 
+=head4 proc_info
+
+Add assorted process information to the objects.
+
+Defaults to 1.
+
     my @objects;
     eval{ @objects = &lsof_to_nc_objects( $args ); };
 
@@ -88,14 +96,42 @@ sub lsof_to_nc_objects{
 	if ( !defined( $func_args{uid_resolve} ) ){
 		$func_args{uid_resolve}=1;
 	}
+	if ( !defined( $func_args{proc_info} ) ){
+		$func_args{proc_info}=1;
+	}
 
 	my $output_raw=`lsof -i UDP -i TCP -n -l -P`;
-	if ( $? ne 0 ){
-		die('"lsof -i UDP -i TCP -n -l -P" exited with a non-zero value');
+	if (
+		( $? ne 0 ) &&
+		(
+		 ( $^O =~ /linux/ ) &&
+		 ( $? ne 256 )
+		 )
+		){
+		die('"lsof -i UDP -i TCP -n -l -P" exited with a non-zero value or in the case of some linux distros a non-1 value');
 	}
 	my @output_lines=split(/\n/, $output_raw);
 
 	my @nc_objects;
+
+	# process info caches
+	my %pid_proc;
+	my %pid_pctmem;
+	my %pid_pctcpu;
+	my %pid_wchan;
+	my %pid_start;
+
+	my $proc_table;
+	my $physmem;
+	if ( $func_args{proc_info} ){
+		my $pt=Proc::ProcessTable->new;
+		$proc_table=$pt->table;
+		if ( $^O =~ /bsd/ ){
+			$physmem=`/sbin/sysctl -a hw.physmem`;
+			chomp( $physmem );
+			$physmem=~s/^.*\: //;
+		}
+	}
 
 	my $line_int=1;
 	while ( defined( $output_lines[$line_int] ) ){
@@ -167,6 +203,61 @@ sub lsof_to_nc_objects{
 		if ( defined( $line_split[8] ) ){
 			$args->{state}=$line_split[8];
 			$args->{state}=~s/[\(\)]//g;
+		}
+
+		#
+		# put together process info if requested
+		#
+		if ( $func_args{proc_info} ){
+			if ( defined( $pid_proc{ $args->{pid} } ) ){
+				$args->{proc}=$pid_proc{ $args->{pid} };
+				$args->{wchan}=$pid_wchan{ $args->{pid} };
+				$args->{pctmem}=$pid_pctmem{ $args->{pid} };
+				$args->{pctcpu}=$pid_pctcpu{ $args->{pid} };
+				$args->{pid_start}=$pid_start{ $args->{pid} };
+			}else{
+				my $loop=1;
+				my $proc_int=0;
+				while(
+					  defined( $proc_table->[ $proc_int ] ) &&
+					  $loop
+					  ){
+
+					# matched
+					if ( $proc_table->[ $proc_int ]->{pid} eq $args->{pid} ){
+						# exit the loop
+						$loop = 0;
+
+						# fetch and save the proc info
+						if ( $proc_table->[ $proc_int ]->cmndline =~ /^$/ ){
+							# kernel proc
+							$args->{proc}='['.$proc_table->[ $proc_int ]->{fname}.']';
+						}else{
+							# non-kernel proc
+							$args->{proc}=$proc_table->[ $proc_int ]->{cmndline};
+						}
+						$pid_proc{ $args->{pid} }=$args->{proc};
+
+						$args->{wchan}=$proc_table->[ $proc_int ]->{wchan};
+						$pid_wchan{ $args->{pid} }=$args->{wchan};
+
+						$args->{pid_start}=$proc_table->[ $proc_int ]->{pid_start};
+						$pid_start{ $args->{pid} }=$args->{pid_start};
+
+						$args->{pctcpu}=$proc_table->[ $proc_int ]->{pctcpu};
+						$pid_pctcpu{ $args->{pid} }=$args->{pctcpu};
+
+						if ($^O =~ /bsd/){
+							$args->{pctmem}= (( $proc_table->[ $proc_int ]->{rssize} * 1024 * 4 ) / $physmem) * 100;
+						}else{
+							$args->{pctmem}=$proc_table->[ $proc_int ]->{pctmem};
+						}
+						$pid_pctmem{ $args->{pid} }=$args->{pctmem};
+					}
+
+					$proc_int++;
+				}
+			}
 		}
 
 		push( @nc_objects, Net::Connection->new( $args ) );

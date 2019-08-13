@@ -1,5 +1,18 @@
 Revision history for perl distribution Applify
 
+0.16 2019-08-10T14:39:05+0200
+ - Fix "default" should be overridden when user specifies command line argument
+   (This might be a BREAKING change for some)
+ - Fix missing documentation regarding "alias"
+ - Add public attribute option_parser() #12
+ - Add notes about what "*" means in --help, and added note about "n_of" using "+". #10
+   Contributor: Roy Storey
+ - Add "has_attribute" predicate methods #13
+   Contributor: Roy Storey
+ - Add support for options with "isa" being a Type::Tiny object #15
+ - Add support for option's "default" being a code-ref
+ - Allow --foo_bar as well as --foo-bar
+
 0.15 2018-06-06T22:52:43+0800
  - Improved documentation
 

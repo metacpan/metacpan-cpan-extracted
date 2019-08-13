@@ -4,6 +4,7 @@ author:
   - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::Deep: '0'
   Test::More: '1.30'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -29,5 +30,5 @@ resources:
   homepage: https://mojolicious.org
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/mojolicious/json-validator.git
-version: '3.11'
+version: '3.14'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

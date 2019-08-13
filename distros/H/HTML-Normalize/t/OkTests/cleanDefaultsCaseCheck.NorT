@@ -3,4 +3,4 @@
 -default=font foo2="bob"
 <p><font foo1="bar" foo2="Bob">foo</font></p>
 <!--expected-->
-<p><font foo2="Bob">foo</p>
+<p><font foo2="Bob">foo</font></p>

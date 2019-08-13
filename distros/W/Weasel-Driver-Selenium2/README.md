@@ -5,7 +5,7 @@ Weasel::Driver::Selenium2 - Selenium::Remote::Driver wrapper for Weasel
 
 # VERSION
 
-0.09
+0.10
 
 # SYNOPSIS
 

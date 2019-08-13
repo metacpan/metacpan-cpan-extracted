@@ -1,19 +1,11 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest;
 use Test::More;
+use if -d ".git", "Test::FailWarnings";
 
 BEGIN { requires_sqlite('3.6.8') }
-
-plan tests => 13;
-use Test::NoWarnings;
 
 { # simple case
 	my $dbh = connect_ok(
@@ -160,3 +152,5 @@ use Test::NoWarnings;
 	$dbh->{AutoCommit} = 1;
 	# should not spit the "Issuing rollback()" warning
 }
+
+done_testing;

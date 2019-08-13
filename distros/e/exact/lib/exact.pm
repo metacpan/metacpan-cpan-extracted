@@ -1,13 +1,13 @@
 package exact;
 # ABSTRACT: Perl pseudo pragma to enable strict, warnings, features, mro, filehandle methods
 
-use 5.010;
+use 5.014;
 use strict;
 use warnings;
 use namespace::autoclean;
-use TryCatch;
+use Try::Tiny;
 
-our $VERSION = '1.06'; # VERSION
+our $VERSION = '1.08'; # VERSION
 
 use feature    ();
 use utf8       ();
@@ -88,10 +88,10 @@ sub import {
         feature->import(@experiments) unless ( not @experiments or grep { $_ eq 'noexperiments' } @functions );
     }
     catch {
-        my $err = @$;
+        my $err = $_;
         $err =~ s/\s*at .+? line \d+\.\s+//;
         croak("$err via use of exact");
-    }
+    };
 
     warnings->unimport('experimental')
         unless ( $perl_version < 18 or grep { $_ eq 'noskipexperimentalwarnings' } @functions );
@@ -107,7 +107,7 @@ sub import {
 
     eval qq{
         package $caller {
-            use TryCatch;
+            use Try::Tiny;
         };
     } unless ( grep { $_ eq 'notry' } @functions );
 
@@ -161,12 +161,41 @@ exact - Perl pseudo pragma to enable strict, warnings, features, mro, filehandle
 
 =head1 VERSION
 
-version 1.06
+version 1.08
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/exact.svg)](https://travis-ci.org/gryphonshafer/exact)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/exact/badge.png)](https://coveralls.io/r/gryphonshafer/exact)
 
 =head1 SYNOPSIS
+
+Instead of this:
+
+    use strict;
+    use warnings;
+    use utf8;
+    use open ':std', ':utf8';
+    use feature ':5.23';
+    use feature qw( signatures refaliasing bitwise );
+    use mro 'c3';
+    use IO::File;
+    use IO::Handle;
+    use namespace::autoclean;
+    use Carp qw( croak carp confess cluck );
+    use Try::Tiny;
+
+    no warnings "experimental::signatures";
+    no warnings "experimental::refaliasing";
+    no warnings "experimental::bitwise";
+
+Type this:
+
+    use exact;
+
+Or for finer control, add some trailing modifiers like a line of the following:
+
+    use exact '5.20';
+    use exact 5.16, nostrict, nowarnings, noc3, noutf8, noexperiments, noautoclean;
+    use exact noexperiments, fc, signatures;
 
 =head1 DESCRIPTION
 
@@ -208,40 +237,9 @@ import L<Carp>'s 4 methods
 
 =item *
 
-import (kinda) L<TryCatch> awesomeness
+import (kinda) L<Try::Tiny>
 
 =back
-
-=for test_synopsis no strict 'subs'
-
-Instead of this:
-
-    use strict;
-    use warnings;
-    use utf8;
-    use open ':std', ':utf8';
-    use feature ':5.23';
-    use feature qw( signatures refaliasing bitwise );
-    use mro 'c3';
-    use IO::File;
-    use IO::Handle;
-    use namespace::autoclean;
-    use Carp qw( croak carp confess cluck );
-    use TryCatch;
-
-    no warnings "experimental::signatures";
-    no warnings "experimental::refaliasing";
-    no warnings "experimental::bitwise";
-
-Type this:
-
-    use exact;
-
-Or for finer control, add some trailing modifiers like a line of the following:
-
-    use exact '5.20';
-    use exact 5.16, nostrict, nowarnings, noc3, noutf8, noexperiments, noautoclean;
-    use exact noexperiments, fc, signatures;
 
 =head1 IMPORT FLAGS
 
@@ -290,7 +288,7 @@ C<cluck>.
 
 =head2 C<notry>
 
-This skips importing the functionality of L<TryCatch>.
+This skips importing the functionality of L<Try::Tiny>.
 
 =head1 BUNDLES
 
@@ -422,7 +420,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Gryphon Shafer.
+This software is copyright (c) 2019 by Gryphon Shafer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

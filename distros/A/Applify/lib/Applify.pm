@@ -1,54 +1,62 @@
 package Applify;
 use strict;
 use warnings;
+
 use Carp           ();
 use File::Basename ();
+use Scalar::Util 'blessed';
 
 use constant SUB_NAME_IS_AVAILABLE => $INC{'App/FatPacker/Trace.pm'}
   ? 0    # this will be true when running under "fatpack"
   : eval 'use Sub::Name; 1' ? 1 : 0;
 
-our $VERSION = '0.15';
+our $INSTANTIATING = 0;
 our $PERLDOC       = 'perldoc';
-our $SUBCMD_PREFIX = "command";
-my $ANON = 1;
+our $SUBCMD_PREFIX = 'command';
+our $VERSION = '0.16';
+my $ANON = 0;
 
 sub app {
-  my $self   = shift;
-  my $code   = $self->{app} ||= shift;
-  my $parser = $self->_option_parser;
-  my (%options, @options_spec, $application_class, $app);
+  my $self = shift;
+  $self->{app} = shift if @_;
 
-  # has to be run before calculating option spec.
-  # cannot do ->can() as application_class isn't created yet.
-  if ($self->_subcommand_activate($ARGV[0])) { shift @ARGV; }
-  for my $option (@{$self->{options}}) {
-    my $options_key = $self->_attr_to_option($option->{name});
-    push @options_spec, $self->_calculate_option_spec($option);
-    $options{$options_key} = $option->{default}          if exists $option->{default};
-    $options{$options_key} = [@{$options{$options_key}}] if ref($options{$options_key}) eq 'ARRAY';
-  }
+  # Activate sub command
+  local @ARGV = @ARGV;
+  shift @ARGV if $self->_subcommand_activate($ARGV[0]);
 
-  unless ($parser->getoptions(\%options, @options_spec, $self->_default_options)) {
+  # Parse command line options
+  my $parsed_options
+    = $self->option_parser->getoptions(\my %argv, (map { $self->_calculate_option_spec($_) } @{$self->options}),
+    $self->_default_options);
+
+  # Check if we should abort running the app based on user argv
+  if (!$parsed_options) {
     $self->_exit(1);
   }
-
-  if ($options{help}) {
+  elsif ($argv{help}) {
     $self->print_help;
     $self->_exit('help');
   }
-  elsif ($options{man}) {
+  elsif ($argv{man}) {
     system $PERLDOC => $self->documentation;
     $self->_exit($? >> 8);
   }
-  elsif ($options{version}) {
+  elsif ($argv{version}) {
     $self->print_version;
     $self->_exit('version');
   }
 
-  $application_class = $self->{application_class} ||= $self->_generate_application_class($code);
-  $app = $application_class->new(
-    {map { my $k = $self->_option_to_attr($_); $k => $self->_upgrade($k, $options{$_}) } keys %options});
+  # Create the application and run (or return) it
+  local $INSTANTIATING = 1;
+  my $app = eval {
+    $self->{application_class} ||= $self->_generate_application_class;
+    $self->{application_class}->new(\%argv);
+  } or do {
+    $@ =~ s!\sat\s.*!!s unless $ENV{APPLIFY_VERBOSE};
+    $self->print_help;
+    local $! = 1;    # exit value
+    die "\nInvalid input:\n\n$@\n";
+  };
 
   return $app if defined wantarray;    # $app = do $script_file;
   $self->_exit($app->run(@ARGV));
@@ -99,8 +107,8 @@ sub import {
 }
 
 sub new {
-  my ($class, $args) = @_;
-  my $self = bless $args, $class;
+  my $class = shift;
+  my $self  = bless @_ ? @_ > 1 ? {@_} : {%{$_[0]}} : {}, ref $class || $class;
 
   $self->{options} ||= [];
   $self->{caller} or die 'Usage: $self->new({ caller => [...], ... })';
@@ -113,30 +121,29 @@ sub option {
   my $type          = shift or die 'Usage: option $type => ...';
   my $name          = shift or die 'Usage: option $type => $name => ...';
   my $documentation = shift or die 'Usage: option $type => $name => $documentation, ...';
-  my ($default, %args);
 
-  if (@_ % 2) {
-    $default = shift;
-    %args    = @_;
-  }
-  else {
-    %args = @_;
-  }
-
-  if ($args{alias} and !ref $args{alias}) {
-    $args{alias} = [$args{alias}];
-  }
-
-  push @{$self->{options}}, {default => $default, %args, type => $type, name => $name, documentation => $documentation};
+  my %option = @_ % 2 ? (default => @_) : @_;
+  $option{alias} = [$option{alias}] if $option{alias} and !ref $option{alias};
+  $option{arg}   = do { local $_ = $name; s!_!-!g; $_ } unless $option{arg};
+  push @{$self->options}, {%option, type => $type, name => $name, documentation => $documentation};
 
   return $self;
+}
+
+sub option_parser {
+  my $self = shift;
+  return do { $self->{option_parser} = shift; $self } if @_;
+  return $self->{option_parser} ||= do {
+    require Getopt::Long;
+    Getopt::Long::Parser->new(config => [qw(no_auto_help no_auto_version pass_through)]);
+  };
 }
 
 sub options { $_[0]->{options} }
 
 sub print_help {
   my $self    = shift;
-  my @options = @{$self->{options}};
+  my @options = @{$self->options};
   my $width   = 0;
 
   push @options, {name => ''};
@@ -164,23 +171,28 @@ OPTION:
     print "\noptions:\n";
   }
 
+  $width += 2;
+
 OPTION:
   for my $option (@options) {
-    my $name = $self->_attr_to_option($option->{name}) or do { print "\n"; next OPTION };
+    my $arg = $option->{arg} || $option->{name} or do { print "\n"; next OPTION };
 
     printf(
-      " %s %2s%-${width}s  %s\n",
-      $option->{required} ? '*'  : ' ',
-      length($name) > 1   ? '--' : '-',
-      $name, $option->{documentation},
+      " %s %-${width}s  %s\n",
+      $option->{required} ? '*' : $option->{n_of} ? '+' : ' ',
+      _option_with_dashes($arg),
+      $option->{documentation},
     );
   }
 
+  print "Notes:\n";
+  print " * denotes a required option\n";
+  print " + denotes an option that accepts multiple values\n";
   return $self;
 }
 
 sub print_version {
-  my $self = shift;
+  my $self    = shift;
   my $version = $self->version or die 'Cannot print version without version()';
 
   unless ($version =~ m!^\d!) {
@@ -204,15 +216,32 @@ sub version {
   return $_[0];
 }
 
-sub _attr_to_option {
-  local $_ = $_[1] or return;
-  s!_!-!g;
-  $_;
+sub _app_new {
+  my $self  = bless {}, shift;
+  my $attrs = ref $_[0] eq 'HASH' ? shift : {@_};
+  $self->$_($attrs->{$_}) for grep { $self->can($_) } keys %$attrs;
+  return $self;
+}
+
+sub _app_run {
+  my ($app, @extra) = @_;
+  my $self = $app->_script;
+
+  if (my @missing = grep { $_->{required} && !exists $app->{$_->{name}} } @{$self->options}) {
+    my $missing = join ', ', map { _option_with_dashes($_->{arg}) } @missing;
+    $self->print_help;
+    die "Required attribute missing: $missing\n";
+  }
+
+  # get subcommand code - which should have a registered subroutine
+  # or fallback to app {} block.
+  my $code = $self->_subcommand_code($app) || $self->{app};
+  return $app->$code(@extra);
 }
 
 sub _calculate_option_spec {
   my ($self, $option) = @_;
-  my $spec = $self->_attr_to_option($option->{name});
+  my $spec = join '|', $option->{name}, $option->{arg};
 
   if (ref $option->{alias} eq 'ARRAY') {
     $spec .= join '|', '', @{$option->{alias}};
@@ -227,11 +256,13 @@ sub _calculate_option_spec {
   elsif ($option->{type} =~ /^dir/)            { $spec .= '=s' }    # TODO
   else                                         { die 'Usage: option {bool|flag|inc|str|int|num|file|dir} ...' }
 
+  # Let Types::Type handle the validation
+  if (blessed $option->{isa}) {
+    $spec =~ s!=\w$!=s!;
+  }
+
   if (my $n_of = $option->{n_of}) {
     $spec .= $n_of eq '@' ? $n_of : "{$n_of}";
-    $option->{default}
-      and ref $option->{default} ne 'ARRAY'
-      and die 'Usage option ... default => [Need to be an array ref]';
     $option->{default} ||= [];
   }
 
@@ -267,68 +298,79 @@ sub _exit {
   exit $reason;
 }
 
+sub _generate_attribute_accessor {
+  my ($self, $option) = @_;
+  my $default = ref $option->{default} eq 'CODE' ? $option->{default} : sub { $option->{default} };
+  my $isa     = $option->{isa};
+  my $name    = $option->{name};
+
+  if (blessed $isa and $isa->can('check')) {
+    my $assert_method = $isa->has_coercion ? 'assert_coerce'    : 'assert_return';
+    my $prefix        = $isa->has_coercion ? 'Could not coerce' : 'Failed check for';
+    return sub {
+      @_ == 1 && return exists $_[0]{$name} ? $_[0]{$name} : ($_[0]{$name} = $_[0]->$default);
+      eval { $_[0]{$name} = $isa->$assert_method($_[1]); 1 } or do {
+        my $human = $INSTANTIATING ? _option_with_dashes($option->{arg}) : qq("$name");
+        die qq($prefix $human: $@);
+      };
+    };
+  }
+  elsif (my $class = _load_class($isa)) {
+    return sub {
+      @_ == 1 && exists $_[0]{$name} && return $_[0]{$name};
+      my $val = @_ > 1 ? $_[1] : $_[0]->$default;
+      $_[0]{$name} = ref $val eq 'ARRAY' ? [map { $class->new($_) } @$val] : $class->new($val);
+    };
+  }
+  else {
+    return sub {
+      @_ == 1 && return exists $_[0]{$name} ? $_[0]{$name} : ($_[0]{$name} = $_[0]->$default);
+      $_[0]{$name} = $_[1];
+    };
+  }
+}
+
 sub _generate_application_class {
   my ($self, $code) = @_;
   my $application_class = $self->{caller}[1];
-  my $extends = $self->{extends} || [];
-  my ($meta, @required);
+  my $extends           = $self->{extends} || [];
 
+  $ANON++;
   $application_class =~ s!\W!_!g;
   $application_class = join '::', ref($self), "__ANON__${ANON}__", $application_class;
-  $ANON++;
+  eval qq[package $application_class; use base qw(@$extends); 1] or die "Failed to generate application class: $@";
 
-  eval qq[
-    package $application_class;
-    use base qw(@$extends);
-    1;
-  ] or die "Failed to generate application class: $@";
+  _sub("$application_class\::new"     => \&_app_new) unless grep { $_->can('new') } @$extends;
+  _sub("$application_class\::run"     => \&_app_run);
+  _sub("$application_class\::_script" => sub {$self});
 
-  {
-    no strict 'refs';
-    _sub("$application_class\::new" => sub { my $class = shift; bless shift, $class })
-      unless grep { $_->can('new') } @$extends;
-    _sub("$application_class\::_script" => sub {$self});
-    _sub(
-      "$application_class\::run" => sub {
-        my ($app, @extra) = @_;
+  for ('app', $self->{caller}[0]) {
+    my $ns = do { no strict 'refs'; \%{"$_\::"} };
 
-        if (@required = grep { not defined $app->{$_} } @required) {
-          my $required = join ', ', map { '--' . $self->_attr_to_option($_) } @required;
-          $app->_script->print_help;
-          die "Required attribute missing: $required\n";
-        }
-
-        # get subcommand code - which should have a registered subroutine
-        # or fallback to app {} block.
-        $code = $app->_script->_subcommand_code($app) || $code;
-        return $app->$code(@extra);
-      }
-    );
-
-    for ('app', $self->{caller}[0]) {
-      my $ns = \%{"$_\::"};
-
-      for my $name (keys %$ns) {
-        $self->{skip_subs}{$name} and next;
-        my $code = eval { ref $ns->{$name} eq 'CODE' ? $ns->{$name} : *{$ns->{$name}}{CODE} } or next;
-        my $fqn = join '::', $application_class, $name;
-        _sub($fqn => $code);
-        delete $ns->{$name};    # may be a bit too destructive?
-      }
+    for my $name (keys %$ns) {
+      $self->{skip_subs}{$name} and next;
+      my $code = eval { ref $ns->{$name} eq 'CODE' ? $ns->{$name} : *{$ns->{$name}}{CODE} } or next;
+      my $fqn  = join '::', $application_class, $name;
+      _sub($fqn => $code);
+      delete $ns->{$name};    # may be a bit too destructive?
     }
+  }
 
-    $meta = $application_class->meta if $application_class->isa('Moose::Object') and $application_class->can('meta');
+  my $meta = $application_class->meta if $application_class->isa('Moose::Object') and $application_class->can('meta');
 
-    for my $option (@{$self->{options}}) {
-      my $name = $option->{name};
-      my $fqn = join '::', $application_class, $name;
-      if ($meta) {
-        $meta->add_attribute($name => {is => 'rw', default => $option->{default}});
-      }
-      else {
-        _sub($fqn => sub { @_ == 2 and $_[0]->{$name} = $_[1]; $_[0]->{$name} });
-      }
-      push @required, $name if $option->{required};
+  for my $option (@{$self->options}) {
+    my $name = $option->{name};
+    if ($meta) {
+      my %attr_options = (is => 'rw', predicate => 1, required => $option->{required});
+      $attr_options{default} = $option->{default} if $option->{default};
+      $attr_options{isa}     = $option->{isa}     if $option->{isa};
+      $meta->add_attribute($name => \%attr_options) unless $meta->find_attribute_by_name($name);
+    }
+    else {
+      my $accessor = join '::', $application_class, $name;
+      _sub($accessor => $self->_generate_attribute_accessor($option));
+      my $predicator = join '::', $application_class, join '_', has => $name;
+      _sub($predicator => sub { !!defined $_[0]->{$name} });
     }
   }
 
@@ -341,21 +383,10 @@ sub _load_class {
   return eval "require $class; 1" ? $class : "";
 }
 
-sub _option_parser {
-  $_[0]->{_option_parser} ||= do {
-    require Getopt::Long;
-    Getopt::Long::Parser->new(config => [qw(no_auto_help no_auto_version pass_through)]);
-  };
-}
-
-sub _option_to_attr {
-  local $_ = $_[1] or return;
-  s!-!_!g;
-  $_;
-}
+sub _option_with_dashes { length($_[0]) > 1 ? "--$_[0]" : "-$_[0]" }
 
 sub _print_synopsis {
-  my $self = shift;
+  my $self          = shift;
   my $documentation = $self->documentation or return;
   my ($print, $classpath);
 
@@ -368,7 +399,7 @@ sub _print_synopsis {
   my $FH = $self->_documentation_class_handle($documentation, $classpath);
 
   while (<$FH>) {
-    last if $print and /^=(?:cut|head1)/;
+    last  if $print and /^=(?:cut|head1)/;
     print if $print;
     $print = 1 if /^=head1 SYNOPSIS/;
   }
@@ -402,15 +433,6 @@ sub _subcommand_code {
   return $app->can("${SUBCMD_PREFIX}_${name}");
 }
 
-sub _upgrade {
-  my ($self, $name, $input) = @_;
-  return $input unless defined $input;
-
-  my ($option) = grep { $_->{name} eq $name } @{$self->{options}};
-  return $input unless my $class = _load_class($option->{isa});
-  return ref $input eq 'ARRAY' ? [map { $class->new($_) } @$input] : $class->new($input);
-}
-
 1;
 
 =encoding utf8
@@ -421,7 +443,7 @@ Applify - Write object oriented scripts with ease
 
 =head1 VERSION
 
-0.15
+0.16
 
 =head1 DESCRIPTION
 
@@ -508,7 +530,11 @@ application object.
 
 This function is used to define options which can be given to this
 application. See L</SYNOPSIS> for example code. This function can also be
-called as a method on C<$self>.
+called as a method on C<$self>. Additionally, similar to
+L<Moose attributes|Moose::Manual::Attributes#Predicate-and-clearer-methods>, a
+C<has_$name> method will be generated, which can be called on C<$self> to
+determine if the L</option> has been set, either by a user or from the
+C<$default>.
 
 =over 2
 
@@ -547,9 +573,22 @@ inside the application. Example:
 
 Used as description text when printing the usage text.
 
+=item * C<$default>
+
+Either a plain value or a code ref that can be used to generate a value.
+
+  option str => passwd => "Password file", "/etc/passwd";
+  option str => passwd => "Password file", sub { "/etc/passwd" };
+
 =item * C<@args>
 
 =over 2
+
+=item * C<alias>
+
+Used to define an alias for the option. Example:
+
+  option inc => verbose => "Output debug information", alias => "v";
 
 =item * C<required>
 
@@ -562,12 +601,21 @@ See L<Getopt::Long/Options-with-multiple-values> for details.
 
 =item * C<isa>
 
-Specify the class an option should be instantiated as. Example:
+Can be used to either specify a class that the value should be instantiated
+as, or a L<Type::Tiny> object that will be used for coercion and/or type
+validation.
+
+Example using a class:
 
   option file => output => "output file", isa => "Mojo::File";
 
 The C<output()> attribute will then later return an object of L<Mojo::File>,
 instead of just a plain string.
+
+Example using L<Type::Tiny>:
+
+  use Types::Standard "Int";
+  option num => age => "Your age", isa => Int;
 
 =item * Other
 
@@ -655,6 +703,16 @@ application object in list/scalar context (from L<perlfunc/do>).
 
 =head1 ATTRIBUTES
 
+=head2 option_parser
+
+  $self = $self->option_parser(Getopt::Long::Parser->new);
+  $parser = $self->option_parser;
+
+You can specify your own option parser if you have special needs. The default
+is:
+
+  Getopt::Long::Parser->new(config => [qw(no_auto_help no_auto_version pass_through)]);
+
 =head2 options
 
   $array_ref = $self->options;
@@ -665,7 +723,7 @@ Holds the application options given to L</option>.
 
 =head2 new
 
-  $self = $class->new({ options => $array_ref, ... });
+  $self = $class->new({options => $array_ref, ...});
 
 Object constructor. Creates a new object representing the script meta
 information.

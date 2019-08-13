@@ -40,6 +40,7 @@ my $script = $app->_script;
 $script->option(str => foo_bar => 'Foo can something');
 $script->option(str => foo_2   => 'foo_2 can something else', 42);
 $script->option(str => foo_3   => 'foo_3 can also something', 123, required => 1);
+$script->option(str => foo_4   => 'foo_4 can also something', 123, n_of => '@');
 
 my $application_class = $script->_generate_application_class(sub { });
 like $application_class, qr{^Applify::__ANON__2__::}, 'generated application class';
@@ -51,9 +52,13 @@ Usage:
    --foo-bar  Foo can something
    --foo-2    foo_2 can something else
  * --foo-3    foo_3 can also something
+ + --foo-4    foo_4 can also something
 
    --help     Print this help text
 
+Notes:
+ * denotes a required option
+ + denotes an option that accepts multiple values
 HERE
 
 eval { $script->documentation(undef) };
@@ -71,11 +76,15 @@ Usage:
    --foo-bar  Foo can something
    --foo-2    foo_2 can something else
  * --foo-3    foo_3 can also something
+ + --foo-4    foo_4 can also something
 
    --help     Print this help text
    --man      Display manual for this application
    --version  Print application name and version
 
+Notes:
+ * denotes a required option
+ + denotes an option that accepts multiple values
 HERE
 
 
@@ -89,11 +98,15 @@ Usage:
    --foo-bar  Foo can something
    --foo-2    foo_2 can something else
  * --foo-3    foo_3 can also something
+ + --foo-4    foo_4 can also something
 
    --help     Print this help text
    --man      Display manual for this application
    --version  Print application name and version
 
+Notes:
+ * denotes a required option
+ + denotes an option that accepts multiple values
 HERE
 
 done_testing;

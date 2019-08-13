@@ -1,3 +1,40 @@
+1.154 2019-08-11
+================
+[Quiq::Cascm]
+* deleteAllVersions() hinzugefügt
+* Selektion in findItem() verbessert
+* repoFileToFile() um Option -sloppy erweitert
+
+[Quiq::Database::Connection]
+* Tempdatei-Erzeugung auf Quiq::Path umgestellt
+
+[Quiq::Database::ResultSet]
+* Ausgabe von asTable() geändert
+
+[Quiq::Diff]
+* Tempdatei-Erzeugung auf Quiq::Path umgestellt
+
+[Quiq::Html::Construct]
+* Klasse hinzugefügt
+
+[Quiq::Html::Fragment]
+* Komponente html auf mehrere Abschnitte ausgedehnt
+
+[Quiq::Html::Page]
+* Attribut load hinzugefügt
+
+[Quiq::Html::Producer]
+* Klasse hinzugefügt
+
+[Quiq::Parallel]
+* Tempdatei-Erzeugung auf Quiq::Path umgestellt
+
+[Quiq::Path]
+* tempFile() und tempDir() hinzugefügt
+
+[Quiq::TempFile]
+* Doku bearbeitet
+
 1.153 2019-08-03
 ================
 [Quiq::Diff]

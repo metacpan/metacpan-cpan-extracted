@@ -1,42 +1,47 @@
-0.13    2017-08-18 (PERLANCAR)
+0.140   2019-07-18  Released-By: PERLANCAR; Urgency: medium
+
+	- Add CLI: complete-country-code.
+
+
+0.13    2017-08-18  Released-By: PERLANCAR
 
 	- Add utility: complete-ppr-subpattern.
 
 
-0.12    2017-01-01 (PERLANCAR)
+0.12    2017-01-01  Released-By: PERLANCAR
 
 	- Add CLI script: complete-riap-url-clientless.
 
 
-0.11    2016-12-31 (PERLANCAR)
+0.11    2016-12-31  Released-By: PERLANCAR
 
 	- Add utilities: complete-regexp-pattern-{module,pattern},
           complete-service-{name,port}.
 
 
-0.10    2016-10-19 (PERLANCAR)
+0.10    2016-10-19  Released-By: PERLANCAR
 
 	- Add utilities: complete-perl-builtin-function,
           complete-perl-builtin-symbol, complete-perl-version,
           complete-known-mac, complete-env-elem, complete-path-env-elem.
 
 
-0.09    2016-10-18 (PERLANCAR)
+0.09    2016-10-18  Released-By: PERLANCAR
 
 	- Add utility: complete-known-host.
 
 
-0.08    2016-10-15 (PERLANCAR)
+0.08    2016-10-15  Released-By: PERLANCAR
 
 	- Add utility: complete-manpage-section.
 
 
-0.07    2016-10-15 (PERLANCAR)
+0.07    2016-10-15  Released-By: PERLANCAR
 
         - Add utility: complete-locale.
 
 
-0.06    2015-09-18 (PERLANCAR)
+0.06    2015-09-18  Released-By: PERLANCAR
 
         - Adjust to Complete::Util 0.36 being split to
           Complete::{Env,File,Program}.
@@ -45,21 +50,21 @@
           Complete::TZ/
 
 
-0.05    2015-09-09 (PERLANCAR)
+0.05    2015-09-09  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [dist] Remove prereq: Complete because it is not directly used.
 
 
-0.04    2015-08-19 (PERLANCAR)
+0.04    2015-08-19  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [dist] [Bugfix] Complete is a runtime requires, not just spec.
 
 
-0.03    2015-08-18 (PERLANCAR)
+0.03    2015-08-18  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -68,7 +73,7 @@
 	  requirement.
 
 
-0.02    2014-12-31 (PERLANCAR)
+0.02    2014-12-31  Released-By: PERLANCAR
 
 	- Add workaround for Complete::Util scripts which didn't work
 	  before with error 'ERROR 500: No metadata for ...'.
@@ -76,6 +81,6 @@
 	- Add CLIs from Complete::{Dist,Dist::Zilla,Pod::Weaver}.
 
 
-0.01    2014-12-27 (PERLANCAR)
+0.01    2014-12-27  Released-By: PERLANCAR
 
         - First release.

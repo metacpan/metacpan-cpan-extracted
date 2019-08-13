@@ -1,0 +1,12 @@
+{
+   "class" : {
+      "dc:source" : "schemadotorgsources2:FundInfoCollab",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A Research project.",
+      "rdfs:label" : "ResearchProject",
+      "rdfs:subClassOf" : "schema:Project",
+      "schema:category" : "issue-383",
+      "schema:isPartOf" : "http:pending.schema.org"
+   },
+   "properties" : {}
+}

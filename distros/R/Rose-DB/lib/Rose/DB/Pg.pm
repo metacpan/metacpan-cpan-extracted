@@ -152,6 +152,8 @@ sub format_select_lock
 
   $sql .= ' NOWAIT'  if($lock->{'nowait'});
 
+  $sql .= ' SKIP LOCKED'  if($lock->{'skip_locked'});
+
   return $sql;
 }
 

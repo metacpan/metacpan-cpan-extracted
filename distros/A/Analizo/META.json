@@ -1,10 +1,10 @@
 {
    "abstract" : "multi-language source code analysis toolkit",
    "author" : [
-      "Joenio Marques da Costa <joenio@joenio.me>"
+      "Joenio Costa <joenio@joenio.me>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "gpl_3"
    ],
@@ -25,7 +25,7 @@
       },
       "configure" : {
          "requires" : {
-            "Alien::Doxyparse" : "0.10",
+            "Alien::Doxyparse" : "0.13",
             "ExtUtils::MakeMaker" : "0",
             "File::ShareDir::Install" : "0.06"
          }
@@ -44,10 +44,9 @@
             "File::HomeDir" : "0",
             "FindBin::libs" : "0",
             "Graph" : "0",
-            "Graph::Writer::DSM" : "0.005",
+            "Graph::Writer::Dot" : "0",
             "JSON" : "0",
             "List::Compare" : "0",
-            "Mojolicious" : "0",
             "Statistics::Descriptive" : "0",
             "Term::ProgressBar" : "0",
             "YAML" : "1.20",
@@ -80,8 +79,7 @@
          "web" : "https://github.com/analizo/analizo"
       }
    },
-   "version" : "1.22.0",
-   "x_generated_by_perl" : "v5.26.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
+   "version" : "1.23.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
 }
 

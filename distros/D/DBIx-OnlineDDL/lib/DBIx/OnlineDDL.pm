@@ -1,10 +1,11 @@
 package DBIx::OnlineDDL;
 
 our $AUTHORITY = 'cpan:GSG';
-our $VERSION   = '0.91';
+our $VERSION   = '0.92';
 
 use v5.10;
 use Moo;
+use MooX::StrictConstructor;
 
 use Types::Standard        qw( Str Bool HashRef CodeRef InstanceOf Dict Optional );
 use Types::Common::Numeric qw( PositiveNum PositiveInt );
@@ -17,7 +18,8 @@ use List::Util        1.44 (qw( uniq any all ));  # 1.44 has uniq
 use Sub::Util               qw( subname set_subname );
 use Term::ProgressBar 2.14;   # with silent option
 
-use namespace::clean;  # don't export the above
+# Don't export the above, but don't conflict with StrictConstructor, either
+use namespace::clean -except => [qw< new meta >];
 
 my $DEFAULT_MAX_ATTEMPTS = 20;
 
@@ -29,7 +31,7 @@ DBIx::OnlineDDL - Run DDL on online databases safely
 
 =head1 VERSION
 
-version 0.91
+version 0.92
 
 =head1 SYNOPSIS
 
@@ -1667,7 +1669,7 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2018 Grant Street Group
+Copyright 2019 Grant Street Group
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

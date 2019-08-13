@@ -1,3 +1,15 @@
+Changes in version 2.51
+-----------------------
+
+* Fix bug https://rt.cpan.org/Ticket/Display.html?id=122068.
+
+* Fix bug https://rt.perl.org/Ticket/Display.html?id=134352.
+
+* Fix warnings when getting options after calling Getopt::Long->VERSION.
+  Thanks to Dan Book.
+
+* Fix issue https://rt.cpan.org/Ticket/Display.html?id=124789.
+
 Changes in version 2.50
 -----------------------
 

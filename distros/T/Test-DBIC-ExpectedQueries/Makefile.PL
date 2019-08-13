@@ -22,7 +22,9 @@ my %WriteMakefileArgs = (
     "Exporter::Tiny" => 0,
     "Moo" => 0,
     "Test::More" => 0,
-    "Try::Tiny" => 0
+    "Try::Tiny" => 0,
+    "autobox::Core" => 0,
+    "autobox::Transform" => 0
   },
   "TEST_REQUIRES" => {
     "Test::Deep" => 0,
@@ -31,7 +33,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "2.000",
+  "VERSION" => "2.001",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,6 +50,8 @@ my %FallbackPrereqs = (
   "Test::More" => 0,
   "Test::Warnings" => 0,
   "Try::Tiny" => 0,
+  "autobox::Core" => 0,
+  "autobox::Transform" => 0,
   "lib" => 0,
   "strict" => 0,
   "warnings" => 0

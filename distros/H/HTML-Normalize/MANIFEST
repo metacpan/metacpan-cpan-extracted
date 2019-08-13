@@ -1,14 +1,15 @@
-MANIFEST
-README
-LICENSE
-Todo
 Changes
-Makefile.PL
+HTML-Normalize-1.0004.tar
 lib/HTML/Normalize.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.yml
+MYMETA.json
+MYMETA.yml
+README
 samples/Cleaner.pl
 t/01_Normalize.t
-t/pod.t
-t/pod_cover.t
 t/OkTests/cleanDefaults.NorT
 t/OkTests/cleanDefaultsCaseCheck.NorT
 t/OkTests/cleanDefaultsRegex.NorT
@@ -17,6 +18,8 @@ t/OkTests/comuteInline.NorT
 t/OkTests/divBarrierTest.NorTR
 t/OkTests/dropImplicit.NorT
 t/OkTests/formatted.NorT
+t/OkTests/indented.NorT
+t/OkTests/indentedNested.NorT
 t/OkTests/inlinedBlocks.NorT
 t/OkTests/keepBreaks.NorT
 t/OkTests/keepImplicit.NorT
@@ -28,4 +31,6 @@ t/OkTests/removeEmpty.NorT
 t/OkTests/tagSoup.NorT
 t/OkTests/twoDeepInlinedBlocks.NorT
 t/OkTests/unformatted.NorT
-META.yml                                 Module meta-data (added by MakeMaker)
+t/tmplykm1k.html
+Todo
+META.json                                Module JSON meta-data (added by MakeMaker)

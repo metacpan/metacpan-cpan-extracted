@@ -16,6 +16,14 @@
          box-shadow: 5px 10px 8px lightgrey;
          border: 1px solid lightgrey;
       }
+      tbody.failing {
+         background-color: #fff0ff;
+      }
+      tr.step td.failing {
+         color: white;
+         font-weight: bold;
+         background-color: red;
+      }
     </style>
   </head>
   <body>
@@ -51,18 +59,20 @@
           </td>
         </tr>
 [% ELSIF row.step -%]
-        <tr class="step">
-          <td>[% row.step.text | html %]</td>
-          <td></td>
-          <td class="[% row.step.result.remove('[<>]') # compensate '<missing>'
-                     %]">[% row.step.result | html %]</td>
-        </tr>
+        <tbody class="step [% IF row.step.failing ; 'failing' ; END %]">
+          <tr class="step">
+            <td>[% row.step.text | html %]</td>
+            <td></td>
+            <td class="[% row.step.result.remove('[<>]') # compensate '<missing>'
+                       %]">[% row.step.result | html %]</td>
+          </tr>
 [% FOR log IN row.step.logs -%]
-        <tr class="log">
-          <td></td>
-          <td>[% log.text | html %]</td>
-          <td></td>
-        </tr>
+          <tr class="log">
+            <td></td>
+            <td>[% log.text | html %]</td>
+            <td></td>
+          </tr>
+        <tbody>
 [% END -%]
 [% END -%]
 [% END -%]
@@ -75,8 +85,8 @@ title: [% feature.title | html %]
 filename: [% feature.filename | html %]
 log_filename: [% feature.log_filename | html %]
 stats:
-  success: [% feature.successes | html %]
-  fail: [% feature.failures | html %]
+  success: [% feature.successes.size %]
+  fail: [% feature.failures.size %]
 ---
 -->
   </body>

@@ -1,17 +1,11 @@
-#!/usr/bin/perl
-
 # I've disabled warnings, so theoretically warnings shouldn't be printed
 
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest;
-use Test::More tests => 6;
-use Test::NoWarnings;
+use Test::More;
+use if -d ".git", "Test::FailWarnings";
 
 SCOPE: {
 	my $dbh = connect_ok( RaiseError => 1, PrintWarn => 0, Warn => 0 );
@@ -23,3 +17,5 @@ SCOPE: {
 		'INSERT ok',
 	);
 }
+
+done_testing;

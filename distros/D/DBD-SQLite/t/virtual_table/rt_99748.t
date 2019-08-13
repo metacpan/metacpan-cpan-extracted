@@ -1,14 +1,9 @@
-#!/usr/bin/perl
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest qw/connect_ok $sqlite_call has_sqlite/;
 use Test::More;
-use Test::NoWarnings;
+use if -d ".git", "Test::FailWarnings";
 
 # tests that the MATCH operator does not allow code injection
 my @interpolation_attempts = (
@@ -23,7 +18,6 @@ my @interpolation_attempts = (
   '$self',
  );
 
-
 # sample data
 our $perl_rows = [
   [1, 2, 'three'],
@@ -33,10 +27,6 @@ our $perl_rows = [
   [11, undef,  '\}'],
   [12, undef,  "data\nhas\tspaces"],
 ];
-
-my $tests = 14;
-$tests += 2 if has_sqlite('3.6.19');
-plan tests => 4 + 2 * $tests + @interpolation_attempts + 9;
 
 my $dbh = connect_ok( RaiseError => 1, AutoCommit => 1 );
 
@@ -157,3 +147,5 @@ sub test_match_operator {
   is_deeply $res, [], $sql;
 
 }
+
+done_testing;

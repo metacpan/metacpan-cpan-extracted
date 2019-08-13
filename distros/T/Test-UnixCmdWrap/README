@@ -1,0 +1,20 @@
+Test::UnixCmdWrap - test unix commands with various assumptions
+
+to install this module, use CPAN, for example:
+
+    cpanm Test::UnixCmdWrap
+
+
+run perldoc(1) on Test::UnixCmdWrap for additional documentation
+
+
+for the source code, see
+
+https://github.com/thrig/Test-UnixCmdWrap
+
+this can be built and installed by running
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install

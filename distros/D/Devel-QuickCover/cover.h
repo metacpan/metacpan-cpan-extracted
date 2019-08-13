@@ -8,11 +8,7 @@
 
 /* Needed for FILE declaration. */
 #include <stdio.h>
-
-/* for U32 */
-#include  <EXTERN.h>
-#include  <perl.h>
-#include  "ppport.h"
+#include "util.h"
 
 /*
  * We will have one of these per sub, stored in a singly linked list.

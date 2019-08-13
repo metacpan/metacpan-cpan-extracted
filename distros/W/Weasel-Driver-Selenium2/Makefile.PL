@@ -17,14 +17,16 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Weasel::Driver::Selenium2",
   "PREREQ_PM" => {
+    "Carp::Clan" => 0,
     "Moose" => 0,
     "Selenium::Remote::Driver" => 0,
-    "Weasel" => "0.01"
+    "Weasel::DriverRole" => "0.03",
+    "namespace::autoclean" => 0
   },
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "0.09",
+  "VERSION" => "0.10",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -32,10 +34,12 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Carp::Clan" => 0,
   "Moose" => 0,
   "Selenium::Remote::Driver" => 0,
   "Test::More" => 0,
-  "Weasel" => "0.01"
+  "Weasel::DriverRole" => "0.03",
+  "namespace::autoclean" => 0
 );
 
 

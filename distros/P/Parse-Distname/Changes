@@ -1,5 +1,8 @@
 Revision history for Parse-Distname
 
+0.04 2019/08/09
+  - fixed a case that contains SSL3
+
 0.03 2018/11/20
   - fixed to return early correctly
 

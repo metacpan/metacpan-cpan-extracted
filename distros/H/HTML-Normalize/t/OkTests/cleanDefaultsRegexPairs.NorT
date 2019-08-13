@@ -1,3 +1,4 @@
+-selfrender=1
 -default=font bar1=1
 -default=font bar2='2'
 -default=font bar3="3"

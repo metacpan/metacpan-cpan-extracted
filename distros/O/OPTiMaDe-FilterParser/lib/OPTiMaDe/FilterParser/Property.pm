@@ -13,6 +13,12 @@ sub push_identifier {
     push @{$self->{name}}, $identifier;
 }
 
+sub to_filter
+{
+    my( $self ) = @_;
+    return join '.', @{$self->{name}};
+}
+
 sub to_SQL
 {
     my( $self, $delim ) = @_;

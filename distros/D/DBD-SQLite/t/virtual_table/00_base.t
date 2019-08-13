@@ -1,16 +1,9 @@
-#!/usr/bin/perl
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest qw/connect_ok $sqlite_call/;
 use Test::More;
-use Test::NoWarnings;
-
-plan tests => 1 + 9;
+use if -d ".git", "Test::FailWarnings";
 
 my $dbh = connect_ok( RaiseError => 1, PrintError => 0, AutoCommit => 1 );
 
@@ -25,7 +18,6 @@ is $rows->[0]{rowid}, 5, "rowid column";
 is $rows->[0]{foo}, "auto_vivify:0", "foo column";
 is $rows->[0]{bar}, "auto_vivify:1", "bar column";
 
-
 $sql = "SELECT * FROM foobar ";
 $rows = $dbh->selectall_arrayref($sql, {Slice => {}});
 is scalar(@$rows), 5, "got 5 rows again";
@@ -36,6 +28,7 @@ $sql = "SELECT * FROM foobar WHERE foo > -1 and bar < 33";
 $rows = $dbh->selectall_arrayref($sql, {Slice => {}});
 is scalar(@$rows), 5, "got 5 rows (because of omitted constraints)";
 
+done_testing;
 
 package DBD::SQLite::VirtualTable::T;
 use strict;
@@ -53,7 +46,6 @@ sub NEW {
 
   return $self;
 }
-
 
 sub BEST_INDEX {
   my ($self, $constraints, $order_by) = @_;
@@ -82,8 +74,6 @@ sub BEST_INDEX {
   return $outputs;
 }
 
-
-
 package DBD::SQLite::VirtualTable::T::Cursor;
 use strict;
 use warnings;
@@ -103,8 +93,6 @@ sub FILTER {
 
   return;
 }
-
-
 
 sub EOF {
   my $self = shift;
@@ -130,8 +118,4 @@ sub ROWID {
   return $self->{row_count};
 }
 
-
 1;
-
-
-

@@ -19,7 +19,7 @@ package MongoDB::Role::_SessionSupport;
 # MongoDB role to add support for sessions on Ops
 
 use version;
-our $VERSION = 'v2.0.3';
+our $VERSION = 'v2.2.0';
 
 use Moo::Role;
 use MongoDB::_Types -types, 'to_IxHash';
@@ -55,6 +55,8 @@ sub _apply_session_and_cluster_time {
 
     if ( $self->session->_in_transaction_state( TXN_STARTING ) ) {
         ($$query_ref)->Push( 'startTransaction' => true );
+        # delete first to not merge options
+        ($$query_ref)->Delete( 'readConcern' );
         ($$query_ref)->Push( @{ $self->session->_get_transaction_read_concern->as_args( $self->session ) } );
     } elsif ( ! $self->session->_in_transaction_state( TXN_NONE ) ) {
         # read concern only valid outside a transaction or when starting
@@ -80,6 +82,8 @@ sub _apply_session_and_cluster_time {
     # so happening before the command is sent is still valid
     if ( $self->session->_in_transaction_state( TXN_STARTING ) ) {
         $self->session->_set__transaction_state( TXN_IN_PROGRESS );
+        # Set the session address for operation pinning in transactions against mongos
+        $self->session->_set__address( $link->address );
     }
 
     $self->session->_server_session->update_last_use;
@@ -110,6 +114,12 @@ sub _update_session_and_cluster_time {
     if ( defined $cluster_time ) {
         $self->session->client->_update_cluster_time( $cluster_time );
         $self->session->advance_cluster_time( $cluster_time );
+    }
+
+    my $recovery_token = $self->__extract_from( $response, 'recoveryToken' );
+
+    if ( defined $recovery_token ) {
+        $self->session->_set__recovery_token( $recovery_token );
     }
 
     return;
@@ -144,7 +154,9 @@ sub _update_session_connection_error {
     my ( $self, $err ) = @_;
 
     return unless defined $self->session;
-    return $self->session->_maybe_apply_error_labels( $err );
+    $self->session->_server_session->mark_dirty
+      if $err->$_isa("MongoDB::ConnectionError") || $err->$_isa("MongoDB::NetworkTimeout");
+    return $self->session->_maybe_apply_error_labels_and_unpin( $err );
 }
 
 sub __extract_from {

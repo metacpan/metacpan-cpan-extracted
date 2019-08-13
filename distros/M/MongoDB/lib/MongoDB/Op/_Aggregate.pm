@@ -19,7 +19,7 @@ package MongoDB::Op::_Aggregate;
 # Encapsulate aggregate operation; return MongoDB::QueryResult
 
 use version;
-our $VERSION = 'v2.0.3';
+our $VERSION = 'v2.2.0';
 
 use Moo;
 
@@ -83,8 +83,10 @@ sub execute {
     # will reject it as unrecognized
     delete $options->{maxTimeMS} unless $is_2_6;
 
-    # bypassDocumentValidation isn't available until 3.2 (wire version 4)
-    delete $options->{bypassDocumentValidation} unless $link->supports_document_validation;
+    # bypassDocumentValidation isn't available until 3.2 (wire version 4) & dont send if false
+    unless ($link->supports_document_validation && $options->{bypassDocumentValidation}) {
+        delete $options->{bypassDocumentValidation};
+    }
 
     if ( defined $options->{collation} and !$link->supports_collation ) {
         MongoDB::UsageError->throw(
@@ -134,7 +136,8 @@ sub execute {
         pipeline  => $self->pipeline,
         %$options,
         (
-            !$has_out && $link->supports_read_concern ? @{ $self->read_concern->as_args( $self->session) } : ()
+            $link->supports_aggregate_out_read_concern || (!$has_out && $link->supports_read_concern) ?
+                @{ $self->read_concern->as_args( $self->session) } : ()
         ),
         (
             $has_out && $link->supports_helper_write_concern ? @{ $self->write_concern->as_args } : ()

@@ -19,7 +19,7 @@ package MongoDB::_Types;
 # MongoDB type definitions
 
 use version;
-our $VERSION = 'v2.0.3';
+our $VERSION = 'v2.2.0';
 
 use Type::Library
   -base,
@@ -119,7 +119,7 @@ class_type BSONDoc, { class => 'BSON::Doc' };
 
 class_type ClientSession, { class => 'MongoDB::ClientSession' };
 
-enum CompressionType, [qw/zlib/];
+enum CompressionType, [qw/zlib zstd snappy/];
 
 declare ZlibCompressionLevel, as Int,
   where { $_ >= -1 && $_ <= 9 },

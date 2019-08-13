@@ -72,23 +72,25 @@ sub sync {
         if ( my $gitexit = $gitbin->exitcode ) {
             croak("Cannot make initial clone: $self->{gitbin} exit $gitexit");
         }
-        $self->log_debug($cloneout);
+        $self->log_debug("[git clone from $self->{gitorigin}]: $cloneout");
     }
 
     my $gitbranch = $self->get_git_branch;
     chdir $self->{gitdir} or croak("Cannot chdir($self->{gitdir}): $!");
+    $self->log_debug("chdir($self->{gitdir})");
 
     my $gitout = $gitbin->run(remote => 'update', '--prune', '2>&1');
     $self->log_debug("gitorigin(update --prune): $gitout");
 
     $gitout = $gitbin->run(checkout => $gitbranch, '2>&1');
-    $self->log_debug($gitout);
+    $self->log_debug("gitorigin(checkout): $gitout");
 
     $gitout = $gitbin->run(reset => '--hard', "origin/$gitbranch", '2>&1');
-    $self->log_debug("gitorigin(checkout): $gitout");
+    $self->log_debug("gitorigin(reset --hard): $gitout");
 
     # Now handle the working-clone
     chdir $cwd or croak("Cannot chdir($cwd): $!");
+    $self->log_debug("chdir($cwd)");
     # make the working-clone if it doesn't exist yet
     if ( ! -d $self->{ddir} || ! -d catdir($self->{ddir}, '.git') ) {
         # It needs to be empty ...
@@ -100,22 +102,32 @@ sub sync {
         if ( my $gitexit = $gitbin->exitcode ) {
             croak("Cannot make smoke clone: $self->{gitbin} exit $gitexit");
         }
-        $self->log_debug($cloneout);
+        $cloneout =~ s/%/%%/g;
+        $self->log_debug("[git clone $self->{gitdir}]: $cloneout");
     }
 
     chdir $self->{ddir} or croak("Cannot chdir($self->{ddir}): $!");
+    $self->log_debug("chdir($self->{ddir})");
 
+    # reset the working-dir to HEAD of the last branch smoked
+    $gitout = $gitbin->run(reset => '--hard', 'HEAD', '2>&1');
+    $self->log_debug("working-dir(reset --hard): $gitout");
+
+    # remove all untracked files and dirs
     $gitout = $gitbin->run(clean => '-dfx', '2>&1');
-    $self->log_debug($gitout);
+    $self->log_debug("working-dir(clean -dfx): $gitout");
 
+    # update from origin
     $gitout = $gitbin->run(fetch => 'origin', '2>&1');
-    $self->log_debug($gitout);
+    $self->log_debug("working-dir(fetch origin): $gitout");
 
+    # now checkout the branch we want smoked
     $gitout = $gitbin->run(checkout => $gitbranch, '2>&1');
-    $self->log_debug($gitout);
+    $self->log_debug("working-dir(checkout $gitbranch): $gitout");
 
+    # Make sure HEAD is exactly what the branch is
     $gitout = $gitbin->run(reset => '--hard', "origin/$gitbranch", '2>&1');
-    $self->log_debug($gitout);
+    $self->log_debug("working-dir(reset --hard): $gitout");
 
     $self->make_dot_patch();
 

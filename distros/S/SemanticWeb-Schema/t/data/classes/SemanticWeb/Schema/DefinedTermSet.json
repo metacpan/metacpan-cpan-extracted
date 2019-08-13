@@ -1,0 +1,24 @@
+{
+   "class" : {
+      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/894",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A set of defined terms for example a set of categories or a classification scheme, a glossary, dictionary or enumeration.",
+      "rdfs:label" : "DefinedTermSet",
+      "rdfs:subClassOf" : "schema:CreativeWork",
+      "schema:category" : "issue-894",
+      "schema:isPartOf" : "http:pending.schema.org"
+   },
+   "properties" : {
+      "schema:hasDefinedTerm" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/894",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A Defined Term contained in this term set.",
+         "rdfs:label" : "hasDefinedTerm",
+         "rdfs:subPropertyOf" : "schema:hasPart",
+         "schema:category" : "issue-894",
+         "schema:domainIncludes" : "schema:DefinedTermSet",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:DefinedTerm"
+      }
+   }
+}

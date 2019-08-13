@@ -22,28 +22,32 @@ use MongoDB;
 use BSON;
 use Test::More;
 use Path::Tiny;
+use Scalar::Util qw/isvstring/;
 use boolean;
 use version;
 
 our @EXPORT_OK = qw(
-    build_client
-    get_test_db
-    server_version
-    server_type
-    clear_testdbs
-    get_capped
-    skip_if_mongod
-    skip_unless_mongod
-    skip_unless_failpoints_available
-    skip_unless_sessions
-    skip_unless_transactions
-    to_snake_case
-    remap_hashref_to_snake_case
-    uri_escape
-    get_unique_collection
-    get_features
-    check_min_server_version
-    uuid_to_string
+  build_client
+  get_test_db
+  server_version
+  server_type
+  clear_testdbs
+  get_capped
+  skip_if_mongod
+  skip_unless_mongod
+  skip_unless_failpoints_available
+  set_failpoint
+  clear_failpoint
+  skip_unless_sessions
+  skip_unless_transactions
+  to_snake_case
+  remap_hashref_to_snake_case
+  uri_escape
+  get_unique_collection
+  get_features
+  check_min_server_version
+  uuid_to_string
+  skip_unless_min_version
 );
 
 my @testdbs;
@@ -79,7 +83,7 @@ sub build_client {
     }
 
     # allow whole test suite to be run with compression enabled
-    if (my $comp = $ENV{PERL_MONGO_TEST_COMPRESSION}) {
+    if ( my $comp = $ENV{PERL_MONGO_TEST_COMPRESSION} ) {
         $args{compressors} ||= [$comp];
     }
 
@@ -88,10 +92,10 @@ sub build_client {
         $host,
         {
             ssl                         => $ssl || $ENV{MONGO_SSL},
-            socket_timeout_ms           => 60000,
+            socket_timeout_ms           => 120000,
             server_selection_timeout_ms => $ENV{ATLAS_PROXY} ? 10000 : 2000,
             server_selection_try_once   => 0,
-            wtimeout                    => 5000,
+            wtimeout                    => 15000,
             compressors                 => ['zlib'],
             retry_writes                => 1,
             ( $codec ? ( bson_codec => $codec ) : () ),
@@ -101,33 +105,33 @@ sub build_client {
 }
 
 sub get_test_db {
-    my $conn = shift;
+    my $conn   = shift;
     my $prefix = shift || 'testdb';
-    my $testdb = $prefix . int(rand(2**31));
-    my $db = $conn->get_database($testdb) or die "Can't get database\n";
-    push(@testdbs, $db);
-    return  $db;
+    my $testdb = $prefix . int( rand( 2**31 ) );
+    my $db     = $conn->get_database($testdb) or die "Can't get database\n";
+    push( @testdbs, $db );
+    return $db;
 }
 
 sub get_unique_collection {
     my ( $db, $prefix, $options ) = @_;
     return $db->get_collection(
-        sprintf( '%s_%d_%d', $prefix, time(), int(rand(999999)) ),
-        $options,
-    );
+        sprintf( '%s_%d_%d', $prefix, time(), int( rand(999999) ) ), $options, );
 }
 
 sub get_capped {
-    my ($db, $name, %args) = @_;
-    $name ||= 'capped' . int(rand(2**31));
+    my ( $db, $name, %args ) = @_;
+    $name ||= 'capped' . int( rand( 2**31 ) );
     $args{size} ||= 500_000;
-    $db->run_command([ create => $name, capped => true, %args ]);
+    $db->run_command( [ create => $name, capped => true, %args ] );
     return $db->get_collection($name);
 }
 
 sub skip_unless_mongod {
+    my $min_version = shift;
+    my $conn;
     eval {
-        my $conn = build_client( server_selection_timeout_ms => 1000 );
+        $conn = build_client( server_selection_timeout_ms => 10000 );
         my $topo = $conn->_topology;
         $topo->scan_all_servers;
         my $link;
@@ -155,6 +159,11 @@ sub skip_unless_mongod {
         }
         plan skip_all => "$err";
     }
+
+    if ($min_version) {
+        plan skip_all => "Requires MongoDB $min_version"
+            if check_min_server_version($conn, $min_version);
+    }
 }
 
 sub skip_if_mongod {
@@ -163,9 +172,9 @@ sub skip_if_mongod {
         my $topo = $conn->_topology;
         $topo->scan_all_servers;
         # will throw if no servers available
-        $topo->get_readable_link(MongoDB::ReadPreference->new({mode => 'nearest'}));
+        $topo->get_readable_link( MongoDB::ReadPreference->new( { mode => 'nearest' } ) );
     };
-    if ( ! $@ ) {
+    if ( !$@ ) {
         plan skip_all => "Test can't start with a running mongod";
     }
 }
@@ -204,12 +213,51 @@ sub skip_unless_failpoints_available {
     plan skip_all => "enableTestCommands is off"
       unless $param && $param->{enableTestCommands};
 
+    # For transaction tests under mongos
     plan skip_all => "fail points not supported via mongos"
-      if $server_type eq 'Mongos';
+      if $server_type eq 'Mongos'
+        && ( $conn->_topology->wire_version_ceil < 8
+          || $arg->{skip_mongos} );
+}
+
+sub set_failpoint {
+    my ( $client, $failpoint ) = @_;
+
+    return unless defined $failpoint;
+    _send_failpoint_admin_command( $client, [
+        configureFailPoint => $failpoint->{configureFailPoint},
+        mode => $failpoint->{mode},
+        defined $failpoint->{data}
+          ? ( data => $failpoint->{data} )
+          : (),
+    ]);
+}
+
+sub clear_failpoint {
+    my ( $client, $failpoint ) = @_;
+
+    return unless defined $failpoint;
+    _send_failpoint_admin_command( $client, [
+        configureFailPoint => $failpoint->{configureFailPoint},
+        mode => 'off',
+    ]);
+}
+
+# Failpoint commands must be sent to all servers if sharded
+sub _send_failpoint_admin_command {
+    my ( $client, $command ) = @_;
+
+    if ( $client->_topology->type eq 'Sharded' ) {
+        for my $server ( $client->_topology->all_servers ) {
+            $client->_send_direct_admin_command( $server->address, $command );
+        }
+    } else {
+        $client->send_admin_command( $command );
+    }
 }
 
 sub skip_unless_sessions {
-    my $conn           = build_client;
+    my $conn = build_client;
 
     plan skip_all => "Session support not available"
       unless $conn->_topology->_supports_sessions;
@@ -219,27 +267,34 @@ sub skip_unless_transactions {
     my $conn = build_client;
 
     plan skip_all => "Transaction support not available"
-        unless $conn->_topology->_supports_transactions;
+      unless $conn->_topology->_supports_transactions;
 }
 
 sub server_version {
-
-    my $conn = shift;
-    my $build = $conn->send_admin_command( [ buildInfo => 1 ] )->output;
-    my ($version_str) = $build->{version} =~ m{^([0-9.]+)};
-    return version->parse("v$version_str");
+    my $conn          = shift;
+    return $conn->_primary_server_version;
 }
 
 sub check_min_server_version {
     my ( $conn, $min_version ) = @_;
-    $min_version = "v$min_version" unless $min_version =~ /^v/;
-    $min_version .= ".0" unless $min_version =~ /^v\d+\.\d+.\d+$/;
-    $min_version = version->new($min_version);
-    my $server_version = server_version( $conn );
+    unless ( ref($min_version) eq 'version') {
+        unless ( isvstring($min_version) ) {
+            $min_version = "v$min_version" unless $min_version =~ /^v/;
+            $min_version .= ".0" unless $min_version =~ /^v\d+\.\d+.\d+$/;
+        }
+        $min_version = version->new($min_version);
+    }
+    my $server_version = server_version($conn);
     if ( $min_version > $server_version ) {
         return 1;
     }
     return 0;
+}
+
+sub skip_unless_min_version {
+    my ( $conn, $min_version ) = @_;
+    plan skip_all => "Requires MongoDB $min_version"
+        if check_min_server_version( $conn, $min_version );
 }
 
 sub server_type {
@@ -248,15 +303,15 @@ sub server_type {
     my $server_type;
 
     # check database type
-    my $ismaster = $conn->get_database('admin')->run_command({ismaster => 1});
-    if (exists $ismaster->{msg} && $ismaster->{msg} eq 'isdbgrid') {
+    my $ismaster = $conn->get_database('admin')->run_command( { ismaster => 1 } );
+    if ( exists $ismaster->{msg} && $ismaster->{msg} eq 'isdbgrid' ) {
         $server_type = 'Mongos';
     }
     elsif ( $ismaster->{ismaster} && exists $ismaster->{setName} ) {
-        $server_type = 'RSPrimary'
+        $server_type = 'RSPrimary';
     }
-    elsif ( ! exists $ismaster->{setName} && ! $ismaster->{isreplicaset} ) {
-        $server_type = 'Standalone'
+    elsif ( !exists $ismaster->{setName} && !$ismaster->{isreplicaset} ) {
+        $server_type = 'Standalone';
     }
     else {
         $server_type = 'Unknown';
@@ -274,7 +329,7 @@ sub get_features {
 }
 
 # URI escaping adapted from HTTP::Tiny
-my %escapes = map { chr($_) => sprintf("%%%02X", $_) } 0..255;
+my %escapes = map { chr($_) => sprintf( "%%%02X", $_ ) } 0 .. 255;
 my $unsafe_char = qr/[^A-Za-z0-9\-\._~]/;
 
 sub uri_escape {
@@ -294,10 +349,10 @@ sub remap_hashref_to_snake_case {
     my $hash = shift;
     return {
         map {
-            my $k = to_snake_case( $_ );
-            $k => $hash->{ $_ }
+            my $k = to_snake_case($_);
+            $k => $hash->{$_}
         } keys %$hash
-    }
+    };
 }
 
 sub uuid_to_string {

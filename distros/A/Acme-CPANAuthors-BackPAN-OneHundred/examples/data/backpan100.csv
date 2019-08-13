@@ -1,53 +1,51 @@
-# DATE: 2019-04-15T04:53:47
+# DATE: 2019-08-11T07:18:36
 #Pause,Count,Name
-PERLANCAR,1842,perlancar
+PERLANCAR,1932,perlancar
 PSIXDISTS,550,Perl 6 Modules
-SHARYANTO,510,Steven Haryanto
+SHARYANTO,509,Steven Haryanto
 TOBYINK,329,Toby Inkster
-RJBS,313,Ricardo SIGNES
-ZOFFIX,296,Zoffix Znet
+RJBS,312,Ricardo SIGNES
+ZOFFIX,293,Zoffix Znet
 ADAMK,287,Adam Kennedy
-ETHER,271,Karen Etheridge
+ETHER,279,Karen Etheridge
 TOKUHIROM,252,???
 JGNI,250,John Imrie
-MIYAGAWA,245,Tatsuhiko Miyagawa
+MIYAGAWA,246,Tatsuhiko Miyagawa
 INGY,223,Ingy dot Net
 BINGOS,221,Chris Williams
 FLORA,210,Florian Ragwitz
+PLICEASE,206,Graham Ollis
 DAGOLDEN,204,David Golden
-PLICEASE,202,Graham Ollis
 SMUELLER,192,Steffen Mueller
 KENTNL,189,Kent Fredric
-MARCEL,182,???
-PEVANS,176,Paul Evans
-BOBTFISH,172,Tomas Doran
+MARCEL,182,Marcel Gruenauer
+PEVANS,178,Paul Evans
 DROLSKY,172,Dave Rolsky
-ELIZABETH,166,Elizabeth Mattijsen
+BOBTFISH,172,Tomas Doran
 NUFFIN,161,Yuval Kogman
-SHLOMIF,157,Shlomi Fish
-MANWAR,154,Mohammad S Anwar
-NEILB,148,Neil Bowers
-GUGOD,146,Liu Kang Min
-RSAVAGE,142,Ron Savage
+SHLOMIF,160,Shlomi Fish
+MANWAR,155,Mohammad S Anwar
+NEILB,151,Neil Bowers
+GUGOD,149,Liu Kang Min
 SKIM,142,Michal Josef Spacek
+RSAVAGE,142,Ron Savage
 BDFOY,138,brian d foy
 DMAKI,137,Daisuke Maki
 BARBIE,134,Barbie
 FAYLAND,133,Fayland Lin
 AUTRIJUS,125,Audrey Tang
 SZABGAB,124,Gabor Szabo
+MRAMBERG,121,Marcus Ramberg
 SIMON,121,Simon Cozens
-MRAMBERG,120,Marcus Ramberg
 SALVA,116,Salvador Fandino Garcia
-MLEHMANN,114,???
+MLEHMANN,115,???
+DMUEY,113,Daniel Muey
 YANICK,113,Yanick Champoux
-DMUEY,112,Daniel Muey
-RRWO,112,Robert Rothenberg
+RRWO,113,Robert Rothenberg
 RENEEB,111,Renee Baecker
 LBROCARD,111,Leon Brocard
 GETTY,108,Torsten Raudssus
-JHTHORSEN,103,Jan Henning Thorsen
-LEONT,101,Leon Timmermans
+VVELOX,106,???
+JHTHORSEN,106,Jan Henning Thorsen
+TEAM,102,Tom Molesworth
 LEOCHARRE,101,Leo Charre
-EXODIST,100,Chad Granum
-TEAM,100,Tom Molesworth

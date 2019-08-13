@@ -16,12 +16,13 @@ use strict;
 use warnings;
 use Test::More 0.96;
 use JSON::MaybeXS;
-use Test::Deep;
+use Test::Deep ':v1';
 use Path::Tiny;
-use Try::Tiny;
 use version;
+use Scalar::Util 'blessed';
 
 use MongoDB;
+use boolean;
 
 use lib "t/lib";
 use MongoDBTest qw/
@@ -31,6 +32,8 @@ use MongoDBTest qw/
     server_version
     server_type
     get_features
+    check_min_server_version
+    skip_unless_min_version
 /;
 
 skip_unless_mongod();
@@ -40,13 +43,11 @@ plan skip_all => "Not testing with BSON wrappers"
 
 my $conn           = build_client();
 my $testdb         = get_test_db($conn);
-my $server_version = server_version($conn);
 my $server_type    = server_type($conn);
 my $features       = get_features($conn);
 my $coll           = $testdb->get_collection('test_collection');
 
-
-for my $dir ( map { path("t/data/CRUD/$_") } qw/read write/ ) {
+for my $dir ( map { path("t/data/CRUD/v2/$_") } qw/read write pipelines/ ) {
     my $iterator = $dir->iterator( { recurse => 1 } );
     while ( my $path = $iterator->() ) {
         next unless -f $path && $path =~ /\.json$/;
@@ -63,22 +64,20 @@ for my $dir ( map { path("t/data/CRUD/$_") } qw/read write/ ) {
             }
             if ( exists $plan->{minServerVersion} ) {
                 my $min_version = $plan->{minServerVersion};
-                $min_version = "v$min_version" unless $min_version =~ /^v/;
-                $min_version .= ".0" unless $min_version =~ /^v\d+\.\d+.\d+$/;
-                $min_version = version->new($min_version);
-                plan skip_all => "Requires MongoDB $min_version"
-                    if $min_version > $server_version;
+                skip_unless_min_version( $conn, $min_version );
             }
             for my $test ( @{ $plan->{tests} } ) {
                 $coll->drop;
                 $coll->insert_many( $plan->{data} );
-                my $op   = $test->{operation};
-                my $meth = $op->{name};
-                local $ENV{PERL_MONGO_NO_DEP_WARNINGS} = 1 if $meth eq 'count';
-                $meth =~ s{([A-Z])}{_\L$1}g;
-                my $test_meth = "test_$meth";
-                my $res = main->$test_meth( $test->{description}, $meth, $op->{arguments},
-                    $test->{outcome} );
+                foreach my $op ( @{ $test->{'operations'} || [$test->{'operation'}] } ) {
+                    my $meth   = $op->{name};
+                    my $object = $op->{'object'} || 'collection';
+                    local $ENV{PERL_MONGO_NO_DEP_WARNINGS} = 1 if $meth eq 'count';
+                    $meth =~ s{([A-Z])}{_\L$1}g;
+                    my $test_meth = "test_${meth}_${object}";
+                    my $res = main->$test_meth( $test->{description}, $meth, $op->{arguments},
+                        $test->{outcome} );
+                }
             }
         };
     }
@@ -117,7 +116,7 @@ sub test_modify {
     my ( $class, $label, $method, $args, $outcome ) = @_;
     my $filter = delete $args->{filter};
     # SERVER-5289 -- _id not taken from filter before 2.6
-    if (   $server_version < v2.6.0
+    if (   check_min_server_version($conn, 'v2.6.0')
         && !$coll->find_one($filter)
         && $args->{upsert}
         && exists( $args->{replacement} ) )
@@ -136,7 +135,7 @@ sub test_find_and_modify {
     $args->{returnDocument} = lc( $args->{returnDocument} )
       if exists $args->{returnDocument};
     # SERVER-17650 -- before 3.0, this case returned empty doc
-    if (   $server_version < v3.0.0
+    if (   check_min_server_version($conn, 'v3.0.0')
         && !$coll->find_one($filter)
         && ( !$args->{returnDocument} || $args->{returnDocument} eq 'before' )
         && $args->{upsert}
@@ -145,7 +144,7 @@ sub test_find_and_modify {
         $outcome->{result} = {};
     }
     # SERVER-5289 -- _id not taken from filter before 2.6
-    if ( $server_version < v2.6.0 ) {
+    if ( check_min_server_version($conn, 'v2.6.0') ) {
         if ( $outcome->{result}
             && ( !exists $args->{projection}{_id} || $args->{projection}{_id} ) )
         {
@@ -157,31 +156,36 @@ sub test_find_and_modify {
         }
     }
     my $res = $coll->$method( $filter, $doc, ( scalar %$args ? $args : () ) );
-    check_find_one_outcome( $label, $res, $outcome );
+    if ($method eq 'find_one_and_update') {
+        check_write_outcome( $label, $res, $outcome );
+    }
+    else {
+        check_find_one_outcome( $label, $res, $outcome );
+    }
 }
 
 BEGIN {
-    *test_find                     = \&test_read_w_filter;
-    *test_count                    = \&test_read_w_filter;
-    *test_count_documents          = \&test_read_w_filter;
-    *test_estimated_document_count = \&test_read_w_filter;
-    *test_delete_many              = \&test_write_w_filter;
-    *test_delete_one               = \&test_write_w_filter;
-    *test_insert_many              = \&test_insert;
-    *test_insert_one               = \&test_insert;
-    *test_replace_one              = \&test_modify;
-    *test_update_one               = \&test_modify;
-    *test_update_many              = \&test_modify;
-    *test_find_one_and_delete      = \&test_write_w_filter;
-    *test_find_one_and_replace     = \&test_find_and_modify;
-    *test_find_one_and_update      = \&test_find_and_modify;
+    *test_find_collection                     = \&test_read_w_filter;
+    *test_count_collection                    = \&test_read_w_filter;
+    *test_count_documents_collection          = \&test_read_w_filter;
+    *test_estimated_document_count_collection = \&test_read_w_filter;
+    *test_delete_many_collection              = \&test_write_w_filter;
+    *test_delete_one_collection               = \&test_write_w_filter;
+    *test_insert_many_collection              = \&test_insert;
+    *test_insert_one_collection               = \&test_insert;
+    *test_replace_one_collection              = \&test_modify;
+    *test_update_one_collection               = \&test_modify;
+    *test_update_many_collection              = \&test_modify;
+    *test_find_one_and_delete_collection      = \&test_write_w_filter;
+    *test_find_one_and_replace_collection     = \&test_find_and_modify;
+    *test_find_one_and_update_collection      = \&test_find_and_modify;
 }
 
 #--------------------------------------------------------------------------#
 # method-specific tests
 #--------------------------------------------------------------------------#
 
-sub test_bulk_write {
+sub test_bulk_write_collection {
     my ( $class, $label, $method, $args, $outcome ) = @_;
 
     my $bulk;
@@ -210,26 +214,55 @@ sub test_bulk_write {
     check_write_outcome( $label, $res, $outcome );
 }
 
-sub test_aggregate {
+sub test_aggregate_collection {
     my ( $class, $label, $method, $args, $outcome ) = @_;
 
-    plan skip_all => "aggregate not available until MongoDB v2.2"
-        unless $server_version > v2.2.0;
+    skip_unless_min_version($conn, 'v2.2.0');
 
     my $pipeline = delete $args->{pipeline};
 
     # $out not supported until 2.6
     my $is_out = exists $pipeline->[-1]{'$out'};
-    return if $is_out && $server_version < v2.6.0;
+    return if $is_out && check_min_server_version($conn, 'v2.6.0');
+
+    my $is_merge = exists $pipeline->[-1]{'$merge'};
+    return if $is_merge && server_version($conn) < v4.2.0;
 
     # Perl driver returns empty result if $out
-    $outcome->{result} = [] if $is_out;
+    $outcome->{result} = [] if $is_out || $is_merge;
 
     my $res = $coll->aggregate( grep { defined } $pipeline, $args );
     check_read_outcome( $label, $res, $outcome );
 }
 
-sub test_distinct {
+sub test_aggregate_database {
+    my ( $class, $label, $method, $args, $outcome ) = @_;
+
+    skip_unless_min_version($conn, 'v3.6.0');
+
+    plan skip_all => "mongos mangles commands too much vs test expectations"
+        if $server_type eq 'Mongos';
+
+    my $pipeline = delete $args->{pipeline};
+    my $res = $conn->get_database('admin')->aggregate($pipeline, $args);
+    is($res->{'_full_name'}, 'admin.$cmd.aggregate', 'check DB aggregate full name');
+    my $got = [ $res->all ]->[0]{'command'};
+    my $result = $outcome->{'result'}[0]{'command'};
+    $result->{'cursor'} = ignore();
+    $result->{'pipeline'}[0]{'$currentOp'} = noclass(
+        superhashof($result->{'pipeline'}[0]{'$currentOp'})
+    );
+    $result->{'pipeline'}[2]{'$project'} = ignore();
+    $result->{'pipeline'}[3]{'$project'} = ignore();
+
+    cmp_deeply(
+        $got,
+        noclass( superhashof($result) ),
+        "$label: compare",
+    ) or diag explain $got;
+}
+
+sub test_distinct_collection {
     my ( $class, $label, $method, $args, $outcome ) = @_;
     my $fieldname = delete $args->{fieldName};
     my $filter    = delete $args->{filter};
@@ -247,7 +280,7 @@ sub check_read_outcome {
     if ( ref $outcome->{result} ) {
         my $all = [ $res->all ];
         cmp_deeply( $all, $outcome->{result}, "$label: result documents" )
-          or diag explain $all;
+            or diag explain $all;
     }
     else {
         is( $res, $outcome->{result}, "$label: result scalar" );
@@ -265,11 +298,16 @@ sub check_write_outcome {
         # BulkWriteResults for everything.
         next if $k eq 'upsertedCount' && $res->isa("MongoDB::UpdateResult");
         ( my $attr = $k ) =~ s{([A-Z])}{_\L$1}g;
-        if ( $server_version < v2.6.0 ) {
+        if ( check_min_server_version($conn, 'v2.6.0') ) {
             $outcome->{result}{$k} = undef    if $k eq 'modifiedCount';
             $outcome->{result}{$k} = ignore() if $k eq 'upsertedId';
         }
-        cmp_deeply( $res->$attr, $outcome->{result}{$k}, "$label: $k" );
+        if (blessed $res) {
+            cmp_deeply( $res->$attr, $outcome->{result}{$k}, "$label: $k" );
+        }
+        else {
+            cmp_deeply( $res->{$attr}, $outcome->{result}{$k}, "$label: $k" );
+        }
     }
 
     check_collection( $label, $outcome );

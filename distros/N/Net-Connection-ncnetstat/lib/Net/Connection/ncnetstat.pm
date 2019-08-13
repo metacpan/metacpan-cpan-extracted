@@ -17,11 +17,11 @@ Net::Connection::ncnetstat - The backend for ncnetstat, the colorized and enhanc
 
 =head1 VERSION
 
-Version 0.1.1
+Version 0.3.0
 
 =cut
 
-our $VERSION = '0.1.1';
+our $VERSION = '0.3.0';
 
 
 =head1 SYNOPSIS
@@ -44,6 +44,8 @@ our $VERSION = '0.1.1';
                                                    ptr=>1,
                                                    command=>1,
                                                    command_long=>0,
+                                                   wchan=>0,
+                                                   pct_show=>1,
                                                    sorter=>{
                                                             invert=>0,
                                                             type=>'host_lf',
@@ -114,6 +116,8 @@ sub new{
 				ptr=>1,
 				command=>0,
 				command_long=>0,
+				wchan=>0,
+				pct=>0,
 				};
     bless $self;
 
@@ -129,10 +133,18 @@ sub new{
 		$self->{command}=$args{command};
 	}
 
+	if ( defined( $args{pct} ) ){
+		$self->{pct}=$args{pct};
+	}
+
+	if ( defined( $args{wchan} ) ){
+		$self->{wchan}=$args{wchan};
+	}
+
 	if ( defined( $args{command_long} ) ){
 		$self->{command_long}=$args{command_long};
 	}
-	
+
 	return $self;
 }
 
@@ -173,8 +185,17 @@ sub run{
 				 color('underline white').'State'.color('reset'),
 				 );
 
+	if ( $self->{wchan} ){
+		push( @headers, color('underline white').'WChan'.color('reset') );
+	}
+
+	if ( $self->{pct} ){
+		push( @headers, color('underline white').'CPU%'.color('reset') );
+		push( @headers, color('underline white').'Mem%'.color('reset') );
+	}
+
 	if ( $self->{command} ){
-		push( @headers, color('underline white').'Command'.color('reset') )
+		push( @headers, color('underline white').'Command'.color('reset') );
 	}
 
 	my $tb = Text::Table->new( @headers );
@@ -253,6 +274,30 @@ sub run{
 			 color('magenta').$fport.color('reset'),
 			 color('bright_blue').$conn->state.color('reset'),
 			 );
+
+		# handle the wchan bit if needed
+		if (
+			$self->{wchan} &&
+			defined( $conn->wchan )
+			){
+			push( @new_line, color('bright_yellow').$conn->wchan.color('reset') );
+		}
+
+		# handle the percent stuff if needed
+		if (
+			$self->{pct} &&
+			defined( $conn->pctcpu )
+			){
+			push( @new_line, color('bright_cyan').sprintf('%.2f',$conn->pctcpu).color('reset') );
+		}
+
+		# handle the percent stuff if needed
+		if (
+			$self->{pct} &&
+			defined( $conn->pctmem )
+			){
+			push( @new_line, color('bright_green').sprintf('%.2f', $conn->pctmem).color('reset') );
+		}
 
 		# handle the command portion if needed
 		if (
@@ -354,6 +399,10 @@ L<https://cpanratings.perl.org/d/Net-Connection-ncnetstat>
 =item * Search CPAN
 
 L<https://metacpan.org/release/Net-Connection-ncnetstat>
+
+=item * Repository
+
+L<https://github.com/VVelox/Net-Connection-ncnetstat>
 
 =back
 

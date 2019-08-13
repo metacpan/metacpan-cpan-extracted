@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 89;
+plan tests => 91;
 
 my @module_files = (
     'MongoDB.pm',
@@ -45,6 +45,7 @@ my @module_files = (
     'MongoDB/Op/_DropCollection.pm',
     'MongoDB/Op/_DropDatabase.pm',
     'MongoDB/Op/_DropIndexes.pm',
+    'MongoDB/Op/_EndTxn.pm',
     'MongoDB/Op/_Explain.pm',
     'MongoDB/Op/_FSyncUnlock.pm',
     'MongoDB/Op/_FindAndDelete.pm',
@@ -77,6 +78,7 @@ my @module_files = (
     'MongoDB/Role/_ReadPrefModifier.pm',
     'MongoDB/Role/_SessionSupport.pm',
     'MongoDB/Role/_SingleBatchDocWrite.pm',
+    'MongoDB/Role/_TopologyMonitoring.pm',
     'MongoDB/Role/_UpdatePreEncoder.pm',
     'MongoDB/Role/_WriteOp.pm',
     'MongoDB/Role/_WriteResult.pm',

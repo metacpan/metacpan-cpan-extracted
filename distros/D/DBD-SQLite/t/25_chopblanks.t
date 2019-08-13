@@ -1,17 +1,11 @@
-#!/usr/bin/perl
-
 # Check whether 'ChopBlanks' works.
 
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest;
-use Test::More tests => 14;
-use Test::NoWarnings;
+use Test::More;
+use if -d ".git", "Test::FailWarnings";
 
 # Create a database
 my $dbh = connect_ok( RaiseError => 1 );
@@ -67,3 +61,5 @@ SCOPE: {
 	], 'ChopBlanks = 1' );
 	ok( $sth->finish, '->finish' );
 }
+
+done_testing;

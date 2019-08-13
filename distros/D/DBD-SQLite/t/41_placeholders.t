@@ -1,17 +1,9 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest qw/connect_ok/;
 use Test::More;
-use Test::NoWarnings;
-
-plan tests => 13;
+use if -d ".git", "Test::FailWarnings";
 
 my $dbh = connect_ok( RaiseError => 1 );
 ok $dbh->do('create table foo (id integer, value integer)');
@@ -58,3 +50,5 @@ SKIP: {
 
     ok $count == 2;
 }
+
+done_testing;

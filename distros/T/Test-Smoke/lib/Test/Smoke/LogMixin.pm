@@ -1,6 +1,7 @@
 package Test::Smoke::LogMixin;
 use warnings;
 use strict;
+BEGIN { $|++ }
 
 our $VERSION = '0.001';
 

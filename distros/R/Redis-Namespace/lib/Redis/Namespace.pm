@@ -2,9 +2,10 @@ package Redis::Namespace;
 
 use strict;
 use warnings;
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use Redis;
+use Carp qw(carp croak);
 
 our %BEFORE_FILTERS = (
     # do nothing
@@ -71,6 +72,13 @@ our %BEFORE_FILTERS = (
         return @result;
     },
 
+    keys => sub {
+        my ($self, $pattern) = @_;
+        return unless defined $pattern;
+        my $namespace = $self->{namespace_escaped};
+        return "$namespace:$pattern";
+    },
+
     sort => sub {
         my ($self, @args) = @_;
         my @res;
@@ -117,6 +125,8 @@ our %BEFORE_FILTERS = (
         my ($self, @args) = @_;
         my @res;
 
+        my $namespace = $self->{namespace_escaped};
+
         # first arg is iteration key
         if(@args) {
             my $first = shift @args;
@@ -129,7 +139,7 @@ our %BEFORE_FILTERS = (
             my $option = lc shift @args;
             if($option eq 'match') {
                 my $pattern = shift @args;
-                push @res, $option, $self->add_namespace($pattern);
+                push @res, $option, "$namespace:$pattern";
                 $has_pattern = 1;
             } elsif($option eq 'count') {
                 my $count = shift @args;
@@ -141,7 +151,7 @@ our %BEFORE_FILTERS = (
 
         # add pattern option
         unless($has_pattern) {
-            push @res, 'match', $self->add_namespace('*');
+            push @res, 'match', "$namespace:*";
         }
 
         return @res;
@@ -227,6 +237,54 @@ our %BEFORE_FILTERS = (
         }
         return @res;
     },
+
+    # XREAD [COUNT count] [BLOCK milliseconds] STREAMS key [key ...] ID [ID ...]
+    # => XREAD [COUNT count] [BLOCK milliseconds] STREAMS namespace:key [namespace:key ...] ID [ID ...]
+    xread => sub {
+        my ($self, @args) = @_;
+        my @res;
+        while(@args) {
+            my $option = lc shift @args;
+            if($option eq 'count' || $option eq 'block') {
+                my $count = shift @args;
+                push @res, $option, $count;
+            } elsif ($option eq 'streams') {
+                my $num = scalar(@args) / 2;
+                push @res, $option, $self->add_namespace(@args[0..$num-1]), @args[$num..2*$num-1];
+                @args = ();
+            } else {
+                push @res, $option;
+            }
+        }
+        return @res;
+    },
+
+    # XREADGROUP GROUP group consumer [COUNT count] [BLOCK milliseconds] [NOACK] STREAMS key [key ...] ID [ID ...]
+    # => XREADGROUP GROUP group consumer [COUNT count] [BLOCK milliseconds] [NOACK] STREAMS namespace:key [namespace:key ...] ID [ID ...]
+    xreadgroup => sub {
+        my ($self, @args) = @_;
+        my @res;
+
+        # GROUP group consumer
+        push @res, splice @args, 0, 3;
+
+        while(@args) {
+            my $option = lc shift @args;
+            if($option eq 'count' || $option eq 'block') {
+                my $count = shift @args;
+                push @res, $option, $count;
+            } elsif ($option eq 'noack') {
+                push @res, $option;
+            } elsif ($option eq 'streams') {
+                my $num = scalar(@args) / 2;
+                push @res, $option, $self->add_namespace(@args[0..$num-1]), @args[$num..2*$num-1];
+                @args = ();
+            } else {
+                push @res, $option;
+            }
+        }
+        return @res;
+    },
 );
 
 our %AFTER_FILTERS = (
@@ -252,7 +310,20 @@ our %AFTER_FILTERS = (
         my ($self, $iter, $list) = @_;
         my @keys = map { $self->rem_namespace($_) } @$list;
         return ($iter, \@keys);
-    }
+    },
+
+    # [ [ namespace:key1, [...] ], [ namespace:key2, [...] ] => [ [ key1, [...] ], [ key2, [...] ]
+    xread => sub {
+        my ($self, @args) = @_;
+        return map {
+            if ($_) {
+                my ($key, @rest) = @$_;
+                [$self->rem_namespace($key), @rest];
+            } else {
+                $_;
+            }
+        } @args;
+    },
 );
 
 sub add_namespace {
@@ -314,6 +385,20 @@ sub rem_namespace {
     return @result;
 }
 
+# %UNSAFE_COMMANDS may break other namepace and/or change the state of redis-server.
+# these commands are disable in strict mode.
+our %UNSAFE_COMMANDS = (
+    cluster   => 1,
+    config    => 1,
+    flushall  => 1,
+    flushdb   => 1,
+    readonly  => 1,
+    readwrite => 1,
+    replicaof => 1,
+    slaveof   => 1,
+    shutdown  => 1,
+);
+
 our %COMMANDS = (
     append           => [ 'first' ],
     auth             => [],
@@ -324,8 +409,10 @@ our %COMMANDS = (
     bitpos           => [ 'first' ],
     bitop            => [ 'exclude_first' ],
     blpop            => [ 'exclude_last', 'first' ],
-    brpop            => [ 'exclude_last' ],
+    brpop            => [ 'exclude_last', 'first' ],
     brpoplpush       => [ 'exclude_last' ],
+    bzpopmax         => [ 'exclude_last', 'first' ],
+    bzpopmin         => [ 'exclude_last', 'first' ],
     client           => [],
     cluster          => [],
     command          => [],
@@ -375,7 +462,7 @@ our %COMMANDS = (
     incrby           => [ 'first' ],
     incrbyfloat      => [ 'first' ],
     info             => [],
-    keys             => [ 'first', 'all' ],
+    keys             => [ 'keys', 'all' ],
     lastsave         => [],
     lindex           => [ 'first' ],
     linsert          => [ 'first' ],
@@ -387,11 +474,7 @@ our %COMMANDS = (
     lrem             => [ 'first' ],
     lset             => [ 'first' ],
     ltrim            => [ 'first' ],
-    mapped_hmset     => [ 'first' ],
-    mapped_hmget     => [ 'first' ],
-    mapped_mget      => [ 'all', 'all' ],
-    mapped_mset      => [ 'all' ],
-    mapped_msetnx    => [ 'all' ],
+    memory           => [],
     mget             => [ 'all' ],
     migrate          => [ 'migrate' ],
     monitor          => [],
@@ -418,6 +501,7 @@ our %COMMANDS = (
     readwrite        => [],
     rename           => [ 'all' ],
     renamenx         => [ 'all' ],
+    replicaof        => [],
     restore          => [ 'first' ],
     role             => [],
     rpop             => [ 'first' ],
@@ -465,12 +549,38 @@ our %COMMANDS = (
     unwatch          => [],
     wait             => [],
     watch            => [ 'all' ],
+    xack             => [ 'first' ],
+    xadd             => [ 'first' ],
+    xclaim           => [ 'first' ],
+    xdel             => [ 'first' ],
+    xgroup => {
+        create      => [ 'first' ],
+        setid       => [ 'first' ],
+        destroy     => [ 'first' ],
+        delconsumer => [ 'first' ],
+        help        => [],
+    },
+    xinfo => {
+        consumers => [ 'first' ],
+        groups    => [ 'first' ],
+        stream    => [ 'first' ],
+        help      => [],
+    },
+    xlen             => [ 'all' ],
+    xpending         => [ 'first' ],
+    xrange           => [ 'first' ],
+    xread            => [ 'xread', 'xread' ],
+    xreadgroup       => [ 'xreadgroup', 'xread' ],
+    xrevrange        => [ 'first' ],
+    xtrim            => [ 'first' ],
     zadd             => [ 'first' ],
     zcard            => [ 'first' ],
     zcount           => [ 'first' ],
     zincrby          => [ 'first' ],
     zinterstore      => [ 'exclude_options' ],
     zlexcount        => [ 'first' ],
+    zpopmax          => [ 'first' ],
+    zpopmin          => [ 'first' ],
     zrange           => [ 'first' ],
     zrangebylex      => [ 'first' ],
     zrangebyscore    => [ 'first' ],
@@ -498,16 +608,25 @@ sub new {
     $self->{redis} = $args{redis} || Redis->new(%args);
     $self->{namespace} = $args{namespace};
     $self->{warning} = $args{warning};
+    $self->{strict} = $args{strict};
     $self->{subscribers} = {};
     if ($args{guess}) {
-        my $version = $self->{redis}->info->{redis_version};
-        my ($major, $minor, $rev) = split /\./, $version;
-        if ( $major >= 3 || $major == 2 && $minor >= 8 && $rev >= 13 ) {
+        my $count = eval { $self->{redis}->command_count };
+        if ($count) {
             $self->{guess} = 1;
         } elsif ($self->{warning}) {
-            warn "guess option requires 2.8.13 or later. your redis version is $version";
+            my $version = $self->{redis}->info->{redis_version};
+            carp "guess option requires 2.8.13 or later. your redis version is $version";
         }
     }
+    $self->{guess_cache} = {};
+    $self->{movablekeys} = {};
+
+    # escape for pattern
+    my $escaped = $args{namespace};
+    $escaped =~ s/([[?*\\])/"\\$1"/ge;
+    $self->{namespace_escaped} = $escaped;
+
     return $self;
 }
 
@@ -515,40 +634,58 @@ sub _wrap_method {
     my ($class, $command) = @_;
     my ($cmd, @extra) = split /_/, lc($command);
     my $filters = $COMMANDS{$cmd};
-    my $warn_message;
     my ($before, $after);
+    my @subcommand = ();
 
     if ($filters) {
-        $before = $BEFORE_FILTERS{$filters->[0] // 'none'};
-        $after = $AFTER_FILTERS{$filters->[1] // 'none'};
+        if (ref $filters eq 'HASH') {
+            # the target command has sub-commands
+            if (@extra > 0) {
+                my $subcommand = shift @extra;
+                @subcommand = ($subcommand);
+                $before = $BEFORE_FILTERS{$filters->{$subcommand}[0] // 'none'};
+                $after = $AFTER_FILTERS{$filters->{$subcommand}[1] // 'none'};
+            } else {
+                $before = sub {
+                    my ($self, $subcommand, @arg) = @_;
+                    my $before = $BEFORE_FILTERS{$filters->{$subcommand}[0] // 'none'};
+                    $after = $AFTER_FILTERS{$filters->{$subcommand}[1] // 'none'};
+                    return ($subcommand, $before->($self, @arg));
+                };
+                $after = $AFTER_FILTERS{'none'};
+            }
+        } else {
+            $before = $BEFORE_FILTERS{$filters->[0] // 'none'};
+            $after = $AFTER_FILTERS{$filters->[1] // 'none'};
+        }
     }
 
     return sub {
         my ($self, @args) = @_;
         my $redis = $self->{redis};
         my $wantarray = wantarray;
+        my ($before, $after) = ($before, $after);
 
-        if (!$before || !$after) {
-            if ($self->{guess}) {
-                ($before, $after, $warn_message) = $self->_guess($command);
-            } else {
-                $warn_message = "Passing '$command' to redis as is.";
-                $before = $BEFORE_FILTERS{none};
-                $after = $AFTER_FILTERS{none};
-            }
+        if ($self->{strict} && $UNSAFE_COMMANDS{$command}) {
+            croak "unsafe command '$command'";
         }
 
-        warn $warn_message if $warn_message && $self->{warning};
+        if (!$before || !$after) {
+            if ($self->{strict}) {
+                croak "unknown command '$command'";
+            }
+            ($before, $after) = $self->_guess($command, @subcommand, @extra, @args);
+        }
 
         if(@args && ref $args[-1] eq 'CODE') {
             my $cb = pop @args;
-            @args = $before->($self, @extra, @args);
+            @args = (@subcommand, $before->($self, @extra, @args));
             push @args, sub {
                 my ($result, $error) = @_;
                 $cb->($after->($self, $result), $error);
             };
         } else {
-            @args = $before->($self, @extra, @args);
+            @args = (@subcommand, $before->($self, @extra, @args));
         }
 
         if(!$wantarray) {
@@ -564,17 +701,37 @@ sub _wrap_method {
 }
 
 sub _guess {
-    my ($self, $command) = @_;
-    my $info = $self->{redis}->command('info', $command);
-    my ($name, $num, $flags, $first, $last, $step) = @{$info->[0]};
-    my ($movablekeys) = grep { $_ eq 'movablekeys' } @{$flags || []};
-
-    unless ($name) {
-        return $BEFORE_FILTERS{none}, $AFTER_FILTERS{none}, "Unknown command. Passing '$command' to redis as is.";
+    my ($self, $command, @args) = @_;
+    if (!$self->{guess}) {
+        carp "unknown command '$command'. passing arguments to the redis server as is.";
+        return $BEFORE_FILTERS{none}, $AFTER_FILTERS{none};
     }
 
+    if (my $cache = $self->{guess_cache}{$command}) {
+        return @$cache;
+    }
+
+    my $movablekeys = $self->{movablekeys}{$command};
     if ($movablekeys) {
-        return $BEFORE_FILTERS{none}, $AFTER_FILTERS{none}, "movablekeys command. Passing '$command' to redis as is.";
+        return $self->_guess_movablekeys($command, @args);
+    }
+
+    my $info = $self->{redis}->command_info($command);
+    my ($name, $num, $flags, $first, $last, $step) = @{$info->[0] || []};
+
+    unless ($name) {
+        if ($self->{warning}) {
+            carp "unknown command '$command'. passing arguments to the redis server as is.";
+        }
+        my ($before, $after) = ($BEFORE_FILTERS{none}, $AFTER_FILTERS{none});
+        $self->{guess_cache}{$command} = [$before, $after];
+        return $before, $after;
+    }
+
+    ($movablekeys) = grep { $_ eq 'movablekeys' } @{$flags || []};
+    if ($movablekeys) {
+        $self->{movablekeys}{$command} = 1;
+        return $self->_guess_movablekeys($command, @args);
     }
 
     my $before = sub {
@@ -586,7 +743,80 @@ sub _guess {
         }
         return @args;
     };
-    return $before, $AFTER_FILTERS{none};
+    my $after = $AFTER_FILTERS{none};
+    $self->{guess_cache}{$command} = [$before, $after];
+    return $before, $after;
+}
+
+sub _guess_movablekeys {
+    my ($self, $command, @args) = @_;
+    if(@args && ref $args[-1] eq 'CODE') {
+        pop @args; # ignore callback function
+    }
+
+    my @keys = eval { $self->{redis}->command_getkeys($command, @args) }
+        or return $BEFORE_FILTERS{none}, $AFTER_FILTERS{none};
+    my @positions = ();
+    my @list = ();
+
+    # search the positions of keys.
+    my $search; $search = sub {
+        my ($i, $start) = @_;
+        my $key = $keys[$i];
+        for (my $j = $start; $j < @args; $j++) {
+            next if $args[$j] ne $key;
+            push @positions, $j;
+            if ($i+1 < @keys) {
+                $search->($i+1, $j+1);
+            } else {
+                push @list, [@positions];
+            }
+            pop @positions;
+        }
+    };
+    $search->(0, 0);
+
+    if (@list == 0) {
+        croak "fail to guess key positions of command '$command'";
+    } elsif (@list == 1) {
+        # found keys
+        my $positions = $list[0];
+        return sub {
+            my ($self, @args) = @_;
+            @args[@$positions] = $self->add_namespace(@args[@$positions]);
+            return @args;
+        }, $AFTER_FILTERS{none}
+    }
+
+    # found keys, but their positions are ambiguous
+    my $prefix = "test-key-$^T-$$-";
+    my @want = map { "$prefix$_" } @keys;
+LOOP:
+    for my $positions(@list) {
+        my @args = @args;
+        for my $i(@$positions) {
+            $args[$i] = $prefix . $args[$i];
+        }
+        my @keys = eval { $self->{redis}->command_getkeys($command, @args) };
+
+        if (scalar(@keys) != scalar(@want)) {
+            next;
+        }
+        for my $i(0..scalar(@keys)-1) {
+            if ($keys[$i] ne $want[$i]) {
+                next LOOP
+            }
+        }
+
+        # found!
+        return sub {
+            my ($self, @args) = @_;
+            @args[@$positions] = $self->add_namespace(@args[@$positions]);
+            return @args;
+        }, $AFTER_FILTERS{none}
+    }
+
+    croak "fail to guess key positions of command '$command'";
 }
 
 sub DESTROY { }
@@ -629,12 +859,25 @@ sub __wrap_subcb {
 sub __subscribe {
     my ($self, $command, @args) = @_;
     my $cb = pop @args;
-    confess("Missing required callback in call to $command(), ")
+    confess("missing required callback in call to $command(), ")
         unless ref($cb) eq 'CODE';
 
     my $redis = $self->{redis};
     my $callback = $self->__wrap_subcb($cb);
     @args = $BEFORE_FILTERS{all}->($self, @args);
+    return $redis->$command(@args, $callback);
+}
+
+sub __psubscribe {
+    my ($self, $command, @args) = @_;
+    my $cb = pop @args;
+    confess("missing required callback in call to $command(), ")
+        unless ref($cb) eq 'CODE';
+
+    my $redis = $self->{redis};
+    my $callback = $self->__wrap_subcb($cb);
+    my $namespace = $self->{namespace_escaped};
+    @args = map { "$namespace:$_" } @args;
     return $redis->$command(@args, $callback);
 }
 
@@ -656,7 +899,7 @@ sub subscribe {
 
 sub psubscribe {
     my $self = shift;
-    return $self->__subscribe('psubscribe', @_);
+    return $self->__psubscribe('psubscribe', @_);
 }
 
 sub unsubscribe {
@@ -666,7 +909,7 @@ sub unsubscribe {
 
 sub punsubscribe {
     my $self = shift;
-    return $self->__subscribe('punsubscribe', @_);
+    return $self->__psubscribe('punsubscribe', @_);
 }
 
 1;
@@ -713,9 +956,16 @@ prefix of keys.
 
 =item guess
 
-If Redis::Namespace doesn't known the command,
+If C<Redis::Namespace> doesn't known the command,
 call L<command info|http://redis.io/commands/command-info> and guess positions of keys.
 It is boolean value.
+
+=item strict
+
+It is boolean value.
+If it is true, C<Redis::Namespace> doesn't execute unsafe commands
+which may break another namepace and/or change the state of redis-server, such as C<FLUSHALL> and C<SHUTDOWN>.
+Also, unknown commands are not executed, because there is no guarantee that the command does not break another namepace.
 
 =back
 

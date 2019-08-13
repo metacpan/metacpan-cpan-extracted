@@ -28,7 +28,7 @@ is_deeply(\@seen, \@expected, "multiple modifiers subclassed with multiple modif
 
 BEGIN
 {
-    package Parent;
+    package MyParent;
     sub new { bless {}, shift }
     sub orig
     {
@@ -39,7 +39,7 @@ BEGIN
 BEGIN
 {
     package Child;
-    our @ISA = 'Parent';
+    our @ISA = 'MyParent';
     use Class::Method::Modifiers;
 
     after 'orig' => sub

@@ -19,7 +19,7 @@ package MongoDB::MongoClient;
 # ABSTRACT: A connection to a MongoDB server or multi-server deployment
 
 use version;
-our $VERSION = 'v2.0.3';
+our $VERSION = 'v2.2.0';
 
 use Moo;
 use MongoDB::ClientSession;
@@ -36,7 +36,7 @@ use MongoDB::_Dispatcher;
 use MongoDB::_SessionPool;
 use MongoDB::_Topology;
 use MongoDB::_URI;
-use BSON 1.010001;
+use BSON 1.012000;
 use Digest::MD5;
 use UUID::URandom;
 use Tie::IxHash;
@@ -46,7 +46,6 @@ use Safe::Isa 1.000007;
 use Scalar::Util qw/reftype weaken/;
 use boolean;
 use Encode;
-use Try::Tiny;
 use MongoDB::_Types qw(
     ArrayOfHashRef
     AuthMechanism
@@ -88,6 +87,9 @@ use namespace::clean -except => 'meta';
 #pod The C<host> attribute specifies either a single server to connect to (as
 #pod C<hostname> or C<hostname:port>), or else a L<connection string URI|/CONNECTION
 #pod STRING URI> with a seed list of one or more servers plus connection options.
+#pod
+#pod B<NOTE>: Options specified in the connection string take precedence over options
+#pod provided as constructor arguments.
 #pod
 #pod Defaults to the connection string URI C<mongodb://localhost:27017>.
 #pod
@@ -152,9 +154,9 @@ sub _build_app_name {
 #pod * PLAIN
 #pod * SCRAM-SHA-1
 #pod
-#pod If not specified, then if no username is provided, it defaults to NONE.
-#pod If a username is provided, it is set to DEFAULT, which chooses SCRAM-SHA-1 if
-#pod available or MONGODB-CR otherwise.
+#pod If not specified, then if no username or C<authSource> URI option is provided,
+#pod it defaults to NONE.  Otherwise, it is set to DEFAULT, which chooses
+#pod SCRAM-SHA-1 if available or MONGODB-CR otherwise.
 #pod
 #pod This may be set in a connection string with the C<authMechanism> option.
 #pod
@@ -169,7 +171,8 @@ has auth_mechanism => (
 sub _build_auth_mechanism {
     my ($self) = @_;
 
-    my $default = $self->username ? 'DEFAULT' : 'NONE';
+    my $source = $self->_uri->options->{authsource} // "";
+    my $default = length( $self->username ) || length($source) ? 'DEFAULT' : 'NONE';
 
     return $self->__uri_or_else(
         u => 'authmechanism',
@@ -230,8 +233,8 @@ sub _build_bson_codec {
 
 #pod =attr compressors
 #pod
-#pod An array reference of compression type names. Currently only C<zlib>
-#pod is supported.
+#pod An array reference of compression type names. Currently, C<zlib>, C<zstd> and
+#pod C<snappy> are supported.
 #pod
 #pod =cut
 
@@ -382,7 +385,7 @@ sub _build_j {
     return $self->__uri_or_else(
         u => 'journal',
         e => 'j',
-        d => 0,
+        d => undef,
     );
 }
 
@@ -544,6 +547,40 @@ has port => (
     default => 27017,
 );
 
+#pod =attr read_concern_level
+#pod
+#pod The read concern level determines the consistency level required
+#pod of data being read.
+#pod
+#pod The default level is C<undef>, which means the server will use its configured
+#pod default.
+#pod
+#pod If the level is set to "local", reads will return the latest data a server has
+#pod locally.
+#pod
+#pod Additional levels are storage engine specific.  See L<Read
+#pod Concern|http://docs.mongodb.org/manual/search/?query=readConcern> in the MongoDB
+#pod documentation for more details.
+#pod
+#pod This may be set in a connection string with the the C<readConcernLevel> option.
+#pod
+#pod =cut
+
+has read_concern_level => (
+    is      => 'lazy',
+    isa     => Maybe [Str],
+    builder => '_build_read_concern_level',
+);
+
+sub _build_read_concern_level {
+    my ($self) = @_;
+    return $self->__uri_or_else(
+        u => 'readconcernlevel',
+        e => 'read_concern_level',
+        d => undef,
+    );
+}
+
 #pod =attr read_pref_mode
 #pod
 #pod The read preference mode determines which server types are candidates
@@ -641,6 +678,78 @@ sub _build_replica_set_name {
     );
 }
 
+#pod =attr retry_reads
+#pod
+#pod =cut
+
+has retry_reads => (
+    is      => 'lazy',
+    isa     => Boolish,
+    builder => '_build_retry_reads',
+);
+
+sub _build_retry_reads {
+    my ( $self ) = @_;
+    return $self->__uri_or_else(
+        u => 'retryreads',
+        e => 'retry_reads',
+        d => 1,
+    );
+}
+
+#pod =attr retry_writes
+#pod
+#pod Whether the client should use retryable writes for supported commands. The
+#pod default value is true, which means that commands which support retryable writes
+#pod will be retried on certain errors, such as C<not master> and C<node is
+#pod recovering> errors.
+#pod
+#pod This may be set in a connection string with the C<retryWrites> option.
+#pod
+#pod Note that this is only supported on MongoDB > 3.6 in Replica Set or Shard
+#pod Clusters, and will be ignored on other deployments.
+#pod
+#pod Unacknowledged write operations also do not support retryable writes, even when
+#pod retry_writes has been enabled.
+#pod
+#pod The supported single statement write operations are currently as follows:
+#pod
+#pod =for :list
+#pod * C<insert_one>
+#pod * C<update_one>
+#pod * C<replace_one>
+#pod * C<delete_one>
+#pod * C<find_one_and_delete>
+#pod * C<find_one_and_replace>
+#pod * C<find_one_and_update>
+#pod
+#pod The supported multi statement write operations are as follows:
+#pod
+#pod =for :list
+#pod * C<insert_many>
+#pod * C<bulk_write>
+#pod
+#pod The multi statement operations may be ether ordered or unordered. Note that for
+#pod C<bulk_write> operations, the request may not include update_many or
+#pod delete_many operations.
+#pod
+#pod =cut
+
+has retry_writes => (
+    is      => 'lazy',
+    isa     => Boolish,
+    builder => '_build_retry_writes',
+);
+
+sub _build_retry_writes {
+    my ( $self ) = @_;
+    return $self->__uri_or_else(
+        u => 'retrywrites',
+        e => 'retry_writes',
+        d => 1,
+    );
+}
+
 #pod =attr server_selection_timeout_ms
 #pod
 #pod This attribute specifies the amount of time in milliseconds to wait for a
@@ -706,6 +815,22 @@ sub _build_server_selection_try_once {
     );
 }
 
+#pod =attr server_selector
+#pod
+#pod Optional. This takes a function that augments the server selection rules.
+#pod The function takes as a parameter a list of server descriptions representing
+#pod the suitable servers for the read or write operation, and returns a list of
+#pod server descriptions that should still be considered suitable. Most users
+#pod should rely on the default server selection algorithm and should not need
+#pod to set this attribute.
+#pod
+#pod =cut
+
+has server_selector => (
+    is  => 'ro',
+    isa => Maybe[CodeRef],
+);
+
 #pod =attr socket_check_interval_ms
 #pod
 #pod If a socket to a server has not been used in this many milliseconds, an
@@ -744,6 +869,10 @@ sub _build_socket_check_interval_ms {
 #pod If set to a negative value, socket operations will block indefinitely
 #pod until the server replies or until the operating system TCP/IP stack
 #pod gives up.
+#pod
+#pod The driver automatically sets the TCP keepalive option when initializing the
+#pod socket. For keepalive related issues, check the MongoDB documentation for
+#pod L<Does TCP keepalive time affect MongoDB Deployments?|https://docs.mongodb.com/v3.2/faq/diagnostics/#does-tcp-keepalive-time-affect-mongodb-deployments>.
 #pod
 #pod A zero value polls the socket for available data and is thus likely to fail
 #pod except when talking to a local process (and perhaps even then).
@@ -871,7 +1000,7 @@ sub _build_username {
 #pod the server has received and processed the request. Older documentation may refer
 #pod to this as "fire-and-forget" mode.  This option is not recommended.
 #pod
-#pod =item * C<1> Acknowledged. This is the default. MongoClient will wait until the
+#pod =item * C<1> Acknowledged. MongoClient will wait until the
 #pod primary MongoDB acknowledges the write.
 #pod
 #pod =item * C<2> Replica acknowledged. MongoClient will wait until at least two
@@ -883,6 +1012,8 @@ sub _build_username {
 #pod =item * C<majority> A majority of replicas acknowledged.
 #pod
 #pod =back
+#pod
+#pod If not set, the server default is used, which is typically "1".
 #pod
 #pod In MongoDB v2.0+, you can "tag" replica members. With "tagging" you can
 #pod specify a custom write concern For more information see L<Data Center
@@ -912,7 +1043,8 @@ sub _build_w {
 #pod The number of milliseconds an operation should wait for C<w> secondaries to
 #pod replicate it.
 #pod
-#pod Defaults to 1000 (1 second).
+#pod Defaults to 1000 (1 second). If you set this to undef, it could block indefinitely
+#pod (or until socket timeout is reached).
 #pod
 #pod See C<w> above for more information.
 #pod
@@ -922,7 +1054,7 @@ sub _build_w {
 
 has wtimeout => (
     is      => 'lazy',
-    isa     => Int,
+    isa     => Maybe[Int],
     builder => '_build_wtimeout',
 );
 
@@ -932,95 +1064,6 @@ sub _build_wtimeout {
         u => 'wtimeoutms',
         e => 'wtimeout',
         d => 1000,
-    );
-}
-
-#pod =attr read_concern_level
-#pod
-#pod The read concern level determines the consistency level required
-#pod of data being read.
-#pod
-#pod The default level is C<undef>, which means the server will use its configured
-#pod default.
-#pod
-#pod If the level is set to "local", reads will return the latest data a server has
-#pod locally.
-#pod
-#pod Additional levels are storage engine specific.  See L<Read
-#pod Concern|http://docs.mongodb.org/manual/search/?query=readConcern> in the MongoDB
-#pod documentation for more details.
-#pod
-#pod This may be set in a connection string with the the C<readConcernLevel> option.
-#pod
-#pod =cut
-
-has read_concern_level => (
-    is      => 'lazy',
-    isa     => Maybe [Str],
-    builder => '_build_read_concern_level',
-);
-
-sub _build_read_concern_level {
-    my ($self) = @_;
-    return $self->__uri_or_else(
-        u => 'readconcernlevel',
-        e => 'read_concern_level',
-        d => undef,
-    );
-}
-
-#pod =attr retry_writes
-#pod
-#pod Whether the client should use retryable writes for supported commands. The
-#pod default value is false, which means that no write commands will be retried.
-#pod
-#pod If this is set to a true value, then commands which support retryable writes
-#pod will be retried on certain errors, such as C<not master> and C<node is
-#pod recovering> errors.
-#pod
-#pod This may be set in a connection string with the C<retryWrites> option.
-#pod
-#pod Note that this is only supported on MongoDB > 3.6 in Replica Set or Shard
-#pod Clusters, and will be ignored on other deployments.
-#pod
-#pod Unacknowledged write operations also do not support retryable writes, even when
-#pod retry_writes has been enabled.
-#pod
-#pod The supported single statement write operations are currently as follows:
-#pod
-#pod =for :list
-#pod * C<insert_one>
-#pod * C<update_one>
-#pod * C<replace_one>
-#pod * C<delete_one>
-#pod * C<find_one_and_delete>
-#pod * C<find_one_and_replace>
-#pod * C<find_one_and_update>
-#pod
-#pod The supported multi statement write operations are as follows:
-#pod
-#pod =for :list
-#pod * C<insert_many>
-#pod * C<bulk_write>
-#pod
-#pod The multi statement operations may be ether ordered or unordered. Note that for
-#pod C<bulk_write> operations, the request may not include update_many or
-#pod delete_many operations.
-#pod
-#pod =cut
-
-has retry_writes => (
-    is      => 'lazy',
-    isa     => Boolish,
-    builder => '_build_retry_writes',
-);
-
-sub _build_retry_writes {
-    my ( $self ) = @_;
-    return $self->__uri_or_else(
-        u => 'retrywrites',
-        e => 'retry_writes',
-        d => 0,
     );
 }
 
@@ -1075,13 +1118,22 @@ has _write_concern => (
 
 sub _build__write_concern {
     my ($self) = @_;
-    return MongoDB::WriteConcern->new(
+
+    return MongoDB::WriteConcern->new( $self->_write_concern_options );
+}
+
+# Seperated out for use in transaction option defaults
+sub _write_concern_options {
+    my ($self) = @_;
+
+    return (
+        wtimeout => $self->wtimeout,
         # Must check for defined as w can be 0, and defaults to undef
-        ( defined $self->w ? ( w        => $self->w )        : () ),
-        ( $self->wtimeout ? ( wtimeout => $self->wtimeout ) : () ),
-        ( $self->j        ? ( j        => $self->j )        : () ),
+        ( defined $self->w ? ( w => $self->w ) : () ),
+        ( defined $self->j ? ( j => $self->j ) : () ),
     );
 }
+
 
 #pod =method read_concern
 #pod
@@ -1189,6 +1241,8 @@ sub _build__topology {
         monitoring_callback => $self->monitoring_callback,
         compressors => $self->compressors,
         zlib_compression_level => $self->zlib_compression_level,
+        socket_check_interval_sec => $self->socket_check_interval_ms / 1000,
+        server_selector => $self->server_selector,
     );
 }
 
@@ -1202,13 +1256,16 @@ has _credential => (
 sub _build__credential {
     my ($self) = @_;
     my $mechanism = $self->auth_mechanism;
+    my $uri_options = $self->_uri->options;
+    my $source = $uri_options->{authsource};
     my $cred = MongoDB::_Credential->new(
         monitoring_callback  => $self->monitoring_callback,
         mechanism            => $mechanism,
         mechanism_properties => $self->auth_mechanism_properties,
         ( $self->username ? ( username => $self->username ) : () ),
         ( $self->password ? ( password => $self->password ) : () ),
-        ( $self->db_name  ? ( source   => $self->db_name )  : () ),
+        ( $source ? ( source   => $source )  : () ),
+        ( $self->db_name ? ( db_name => $self->db_name ) : () ),
     );
     return $cred;
 }
@@ -1242,6 +1299,7 @@ has _dispatcher => (
         qw(
           send_direct_op
           send_primary_op
+          send_retryable_read_op
           send_read_op
           send_retryable_write_op
           send_write_op
@@ -1254,6 +1312,7 @@ sub _build__dispatcher {
     return MongoDB::_Dispatcher->new(
         topology     => $self->_topology,
         retry_writes => $self->retry_writes,
+        retry_reads  => $self->retry_reads,
     );
 }
 
@@ -1293,6 +1352,7 @@ my @deferred_options = qw(
   read_pref_tag_sets
   replica_set_name
   retry_writes
+  retry_reads
   server_selection_timeout_ms
   server_selection_try_once
   socket_check_interval_ms
@@ -1506,12 +1566,12 @@ sub start_session {
 }
 
 sub _maybe_get_implicit_session {
-    my ( $self, $opts ) = @_;
+    my ($self) = @_;
 
     # Dont return an error as implicit sessions need to be backwards compatible
     return undef unless $self->_topology->_supports_sessions; ## no critic
 
-    return $self->_start_client_session( 0, $opts );
+    return $self->_start_client_session(0);
 }
 
 sub _start_client_session {
@@ -1557,7 +1617,28 @@ sub send_admin_command {
         monitoring_callback => $self->monitoring_callback,
     );
 
-    return $self->send_read_op( $op );
+    return $self->send_retryable_read_op( $op );
+}
+
+# Ostensibly the same as above, but allows for specific addressing - uses 'send_direct_op'.
+sub _send_direct_admin_command {
+     my ( $self, $address, $command, $read_pref ) = @_;
+
+    $read_pref = MongoDB::ReadPreference->new(
+        ref($read_pref) ? $read_pref : ( mode => $read_pref ) )
+      if $read_pref && ref($read_pref) ne 'MongoDB::ReadPreference';
+
+    my $op = MongoDB::Op::_Command->_new(
+        db_name             => 'admin',
+        query               => $command,
+        query_flags         => {},
+        bson_codec          => $self->bson_codec,
+        read_preference     => $read_pref,
+        session             => $self->_maybe_get_implicit_session,
+        monitoring_callback => $self->monitoring_callback,
+    );
+
+    return $self->send_direct_op( $op, $address );
 }
 
 #--------------------------------------------------------------------------#
@@ -1585,24 +1666,20 @@ sub send_admin_command {
 
 sub list_databases {
     my ( $self, $args ) = @_;
-
     my @databases;
-    my $max_tries = 3;
-    for my $try ( 1 .. $max_tries ) {
-        last if try {
-            my $output = $self->send_admin_command([ listDatabases => 1, ( $args ? %$args : () ) ])->output;
-            if (ref($output) eq 'HASH' && exists $output->{databases}) {
-                @databases = @{ $output->{databases} };
-            }
-            return 1;
-        } catch {
-            if ( $_->$_isa("MongoDB::DatabaseError" ) ) {
-                return if $_->result->output->{code} == CANT_OPEN_DB_IN_READ_LOCK() || $try < $max_tries;
-            }
-            die $_;
-        };
-    }
-
+    eval {
+        my $output = $self->send_admin_command([ listDatabases => 1, ( $args ? %$args : () ) ])->output;
+        if (ref($output) eq 'HASH' && exists $output->{databases}) {
+            @databases = @{ $output->{databases} };
+        }
+        return 1;
+    } or do {
+        my $error = $@ || "Unknown error";
+        if ( $error->$_isa("MongoDB::DatabaseError" ) ) {
+            return if $error->result->output->{code} == CANT_OPEN_DB_IN_READ_LOCK();
+        }
+        die $error;
+    };
     return @databases;
 }
 
@@ -1808,6 +1885,9 @@ sub watch {
         exists($options->{resumeAfter})
             ? (resume_after => delete $options->{resumeAfter})
             : (),
+        exists($options->{startAfter})
+            ? (start_after => delete $options->{startAfter})
+            : (),
         exists($options->{maxAwaitTimeMS})
             ? (max_await_time_ms => delete $options->{maxAwaitTimeMS})
             : (),
@@ -1830,6 +1910,12 @@ sub watch {
     );
 }
 
+sub _primary_server_version {
+    my $self = shift;
+    my $build = $self->send_admin_command( [ buildInfo => 1 ] )->output;
+    my ($version_str) = $build->{version} =~ m{^([0-9.]+)};
+    return version->parse("v$version_str");
+}
 
 1;
 
@@ -1845,7 +1931,7 @@ MongoDB::MongoClient - A connection to a MongoDB server or multi-server deployme
 
 =head1 VERSION
 
-version v2.0.3
+version v2.2.0
 
 =head1 SYNOPSIS
 
@@ -1914,6 +2000,9 @@ The C<host> attribute specifies either a single server to connect to (as
 C<hostname> or C<hostname:port>), or else a L<connection string URI|/CONNECTION
 STRING URI> with a seed list of one or more servers plus connection options.
 
+B<NOTE>: Options specified in the connection string take precedence over options
+provided as constructor arguments.
+
 Defaults to the connection string URI C<mongodb://localhost:27017>.
 
 For IPv6 support, you must have a recent version of L<IO::Socket::IP>
@@ -1971,9 +2060,9 @@ SCRAM-SHA-1
 
 =back
 
-If not specified, then if no username is provided, it defaults to NONE.
-If a username is provided, it is set to DEFAULT, which chooses SCRAM-SHA-1 if
-available or MONGODB-CR otherwise.
+If not specified, then if no username or C<authSource> URI option is provided,
+it defaults to NONE.  Otherwise, it is set to DEFAULT, which chooses
+SCRAM-SHA-1 if available or MONGODB-CR otherwise.
 
 This may be set in a connection string with the C<authMechanism> option.
 
@@ -1997,8 +2086,8 @@ If not provided, a L<BSON> object with default values will be generated.
 
 =head2 compressors
 
-An array reference of compression type names. Currently only C<zlib>
-is supported.
+An array reference of compression type names. Currently, C<zlib>, C<zstd> and
+C<snappy> are supported.
 
 =head2 zlib_compression_level
 
@@ -2131,6 +2220,23 @@ An empty password still requires a ":" character.
 If a network port is not specified as part of the C<host> attribute, this
 attribute provides the port to use.  It defaults to 27107.
 
+=head2 read_concern_level
+
+The read concern level determines the consistency level required
+of data being read.
+
+The default level is C<undef>, which means the server will use its configured
+default.
+
+If the level is set to "local", reads will return the latest data a server has
+locally.
+
+Additional levels are storage engine specific.  See L<Read
+Concern|http://docs.mongodb.org/manual/search/?query=readConcern> in the MongoDB
+documentation for more details.
+
+This may be set in a connection string with the the C<readConcernLevel> option.
+
 =head2 read_pref_mode
 
 The read preference mode determines which server types are candidates
@@ -2192,6 +2298,75 @@ names must match this or they will be removed from the topology.
 
 This may be set in a connection string with the C<replicaSet> option.
 
+=head2 retry_reads
+
+=head2 retry_writes
+
+Whether the client should use retryable writes for supported commands. The
+default value is true, which means that commands which support retryable writes
+will be retried on certain errors, such as C<not master> and C<node is
+recovering> errors.
+
+This may be set in a connection string with the C<retryWrites> option.
+
+Note that this is only supported on MongoDB > 3.6 in Replica Set or Shard
+Clusters, and will be ignored on other deployments.
+
+Unacknowledged write operations also do not support retryable writes, even when
+retry_writes has been enabled.
+
+The supported single statement write operations are currently as follows:
+
+=over 4
+
+=item *
+
+C<insert_one>
+
+=item *
+
+C<update_one>
+
+=item *
+
+C<replace_one>
+
+=item *
+
+C<delete_one>
+
+=item *
+
+C<find_one_and_delete>
+
+=item *
+
+C<find_one_and_replace>
+
+=item *
+
+C<find_one_and_update>
+
+=back
+
+The supported multi statement write operations are as follows:
+
+=over 4
+
+=item *
+
+C<insert_many>
+
+=item *
+
+C<bulk_write>
+
+=back
+
+The multi statement operations may be ether ordered or unordered. Note that for
+C<bulk_write> operations, the request may not include update_many or
+delete_many operations.
+
 =head2 server_selection_timeout_ms
 
 This attribute specifies the amount of time in milliseconds to wait for a
@@ -2223,6 +2398,15 @@ See L</SERVER SELECTION> for more details.
 This may be set in a connection string with the C<serverSelectionTryOnce>
 option.
 
+=head2 server_selector
+
+Optional. This takes a function that augments the server selection rules.
+The function takes as a parameter a list of server descriptions representing
+the suitable servers for the read or write operation, and returns a list of
+server descriptions that should still be considered suitable. Most users
+should rely on the default server selection algorithm and should not need
+to set this attribute.
+
 =head2 socket_check_interval_ms
 
 If a socket to a server has not been used in this many milliseconds, an
@@ -2244,6 +2428,10 @@ The default is 30,000 ms.
 If set to a negative value, socket operations will block indefinitely
 until the server replies or until the operating system TCP/IP stack
 gives up.
+
+The driver automatically sets the TCP keepalive option when initializing the
+socket. For keepalive related issues, check the MongoDB documentation for
+L<Does TCP keepalive time affect MongoDB Deployments?|https://docs.mongodb.com/v3.2/faq/diagnostics/#does-tcp-keepalive-time-affect-mongodb-deployments>.
 
 A zero value polls the socket for available data and is thus likely to fail
 except when talking to a local process (and perhaps even then).
@@ -2315,7 +2503,7 @@ The client I<write concern>.
 the server has received and processed the request. Older documentation may refer
 to this as "fire-and-forget" mode.  This option is not recommended.
 
-=item * C<1> Acknowledged. This is the default. MongoClient will wait until the
+=item * C<1> Acknowledged. MongoClient will wait until the
 primary MongoDB acknowledges the write.
 
 =item * C<2> Replica acknowledged. MongoClient will wait until at least two
@@ -2328,6 +2516,8 @@ number for more replicas.
 
 =back
 
+If not set, the server default is used, which is typically "1".
+
 In MongoDB v2.0+, you can "tag" replica members. With "tagging" you can
 specify a custom write concern For more information see L<Data Center
 Awareness|http://docs.mongodb.org/manual/data-center-awareness/>
@@ -2339,97 +2529,12 @@ This may be set in a connection string with the C<w> option.
 The number of milliseconds an operation should wait for C<w> secondaries to
 replicate it.
 
-Defaults to 1000 (1 second).
+Defaults to 1000 (1 second). If you set this to undef, it could block indefinitely
+(or until socket timeout is reached).
 
 See C<w> above for more information.
 
 This may be set in a connection string with the C<wTimeoutMS> option.
-
-=head2 read_concern_level
-
-The read concern level determines the consistency level required
-of data being read.
-
-The default level is C<undef>, which means the server will use its configured
-default.
-
-If the level is set to "local", reads will return the latest data a server has
-locally.
-
-Additional levels are storage engine specific.  See L<Read
-Concern|http://docs.mongodb.org/manual/search/?query=readConcern> in the MongoDB
-documentation for more details.
-
-This may be set in a connection string with the the C<readConcernLevel> option.
-
-=head2 retry_writes
-
-Whether the client should use retryable writes for supported commands. The
-default value is false, which means that no write commands will be retried.
-
-If this is set to a true value, then commands which support retryable writes
-will be retried on certain errors, such as C<not master> and C<node is
-recovering> errors.
-
-This may be set in a connection string with the C<retryWrites> option.
-
-Note that this is only supported on MongoDB > 3.6 in Replica Set or Shard
-Clusters, and will be ignored on other deployments.
-
-Unacknowledged write operations also do not support retryable writes, even when
-retry_writes has been enabled.
-
-The supported single statement write operations are currently as follows:
-
-=over 4
-
-=item *
-
-C<insert_one>
-
-=item *
-
-C<update_one>
-
-=item *
-
-C<replace_one>
-
-=item *
-
-C<delete_one>
-
-=item *
-
-C<find_one_and_delete>
-
-=item *
-
-C<find_one_and_replace>
-
-=item *
-
-C<find_one_and_update>
-
-=back
-
-The supported multi statement write operations are as follows:
-
-=over 4
-
-=item *
-
-C<insert_many>
-
-=item *
-
-C<bulk_write>
-
-=back
-
-The multi statement operations may be ether ordered or unordered. Note that for
-C<bulk_write> operations, the request may not include update_many or
-delete_many operations.
 
 =head1 METHODS
 
@@ -2760,21 +2865,114 @@ The currently supported connection string options are:
 
 =over 4
 
-*appName
-*authMechanism
-*authMechanism.SERVICE_NAME
-*compressors
-*connectTimeoutMS
-*journal
-*readPreference
-*readPreferenceTags
-*replicaSet
-*ssl
-*w
-*wtimeoutMS
-*zlibCompressionLevel
+=item *
+
+C<appName>
+
+=item *
+
+C<authMechanism>
+
+=item *
+
+C<authMechanismProperties>
+
+=item *
+
+C<authSource>
+
+=item *
+
+C<compressors>
+
+=item *
+
+C<connect>
+
+=item *
+
+C<connectTimeoutMS>
+
+=item *
+
+C<heartbeatFrequencyMS>
+
+=item *
+
+C<journal>
+
+=item *
+
+C<localThresholdMS>
+
+=item *
+
+C<maxStalenessSeconds>
+
+=item *
+
+C<maxTimeMS>
+
+=item *
+
+C<readConcernLevel>
+
+=item *
+
+C<readPreference>
+
+=item *
+
+C<readPreferenceTags>
+
+=item *
+
+C<replicaSet>
+
+=item *
+
+C<retryReads>
+
+=item *
+
+C<retryWrites>
+
+=item *
+
+C<serverSelectionTimeoutMS>
+
+=item *
+
+C<serverSelectionTryOnce>
+
+=item *
+
+C<socketCheckIntervalMS>
+
+=item *
+
+C<socketTimeoutMS>
+
+=item *
+
+C<ssl>
+
+=item *
+
+C<w>
+
+=item *
+
+C<wTimeoutMS>
+
+=item *
+
+C<zlibCompressionLevel>
 
 =back
+
+B<NOTE>: Options specified in the connection string take precedence over options
+provided as constructor arguments.
 
 See the official MongoDB documentation on connection strings for more on the URI
 format and connection string options:
@@ -2783,13 +2981,13 @@ L<http://docs.mongodb.org/manual/reference/connection-string/>.
 =head1 SERVER SELECTION
 
 For a single server deployment or a direct connection to a mongod or
-mongos, all reads and writes and sent to that server.  Any read-preference
+mongos, all reads and writes are sent to that server.  Any read-preference
 is ignored.
 
 When connected to a deployment with multiple servers, such as a replica set
 or sharded cluster, the driver chooses a server for operations based on the
-type of operation (read or write), the types of servers available and a
-read preference.
+type of operation (read or write), application-provided server selector, the
+types of servers available and a read preference.
 
 For a replica set deployment, writes are sent to the primary (if available)
 and reads are sent to a server based on the L</read_preference> attribute,
@@ -2801,11 +2999,11 @@ servers in the seed list.  Any read preference is passed through to the
 mongos and used by it when executing reads against shards.
 
 If multiple servers can service an operation (e.g. multiple mongos servers,
-or multiple replica set members), one is chosen at random from within the
-"latency window".  The server with the shortest average round-trip time
-(RTT) is always in the window.  Any servers with an average round-trip time
-less than or equal to the shortest RTT plus the L</local_threshold_ms> are
-also in the latency window.
+or multiple replica set members), one is chosen by filtering with server
+selector and then at random from within the "latency window".  The server
+with the shortest average round-trip time (RTT) is always in the window.
+Any servers with an average round-trip time less than or equal to the
+shortest RTT plus the L</local_threshold_ms> are also in the latency window.
 
 If a suitable server is not immediately available, what happens next
 depends on the L</server_selection_try_once> option.
@@ -3041,6 +3239,10 @@ C<auth_mechanism_properties> attribute or in the connection string.
 
 You B<MUST> call the L</reconnect> method on any MongoDB::MongoClient objects
 after forking or spawning a thread.
+
+B<NOTE>: Per L<threads> documentation, use of Perl threads is discouraged by the
+maintainers of Perl and the MongoDB Perl driver does not test or provide support
+for use with threads.
 
 =head1 AUTHORS
 

@@ -19,12 +19,13 @@ package MongoDB::IndexView;
 # ABSTRACT: Index management for a collection
 
 use version;
-our $VERSION = 'v2.0.3';
+our $VERSION = 'v2.2.0';
 
 use Moo;
 use MongoDB::Error;
 use MongoDB::Op::_CreateIndexes;
 use MongoDB::Op::_DropIndexes;
+use MongoDB::ReadPreference;
 use MongoDB::_Types qw(
     BSONCodec
     IxHash
@@ -150,9 +151,11 @@ sub list {
         coll_name           => $self->_coll_name,
         bson_codec          => $self->_bson_codec,
         monitoring_callback => $self->_client->monitoring_callback,
+        read_preference     => MongoDB::ReadPreference->new( mode => 'primary' ),
+        session             => $self->_client->_maybe_get_implicit_session,
     );
 
-    return $self->_client->send_primary_op($op);
+    return $self->_client->send_retryable_read_op($op);
 }
 
 #pod =method create_one
@@ -467,7 +470,7 @@ MongoDB::IndexView - Index management for a collection
 
 =head1 VERSION
 
-version v2.0.3
+version v2.2.0
 
 =head1 SYNOPSIS
 

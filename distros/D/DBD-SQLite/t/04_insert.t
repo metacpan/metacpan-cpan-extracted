@@ -1,15 +1,9 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest;
-use Test::More tests => 14;
-use Test::NoWarnings;
+use Test::More;
+use if -d ".git", "Test::FailWarnings";
 
 my $dbh = connect_ok();
 
@@ -40,3 +34,5 @@ SCOPE: {
 }
 
 is( $dbh->do("delete from f where f1='test'"), 3 );
+
+done_testing;

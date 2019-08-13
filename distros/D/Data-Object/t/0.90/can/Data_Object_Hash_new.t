@@ -15,7 +15,6 @@ new
 
   # given 1..4
 
-  my $hash = Data::Object::Hash->new(1..4);
   my $hash = Data::Object::Hash->new({1..4});
 
 =description

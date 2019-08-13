@@ -22,8 +22,8 @@
          "rdfs:label" : "typeOfBed",
          "schema:domainIncludes" : "schema:BedDetails",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:BedType"
+            "schema:BedType",
+            "schema:Text"
          ]
       }
    }

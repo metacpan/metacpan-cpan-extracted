@@ -1,6 +1,6 @@
 use alienfile;
 
-my $doxyparse_version = $ENV{ALIEN_DOXYPARSE_VERSION} || '1.8.14-7';
+my $doxyparse_version = $ENV{ALIEN_DOXYPARSE_VERSION} || '1.8.15';
 
 probe [ 'which doxyparse' ];
 

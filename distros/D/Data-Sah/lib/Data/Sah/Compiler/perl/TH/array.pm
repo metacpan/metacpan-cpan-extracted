@@ -1,12 +1,12 @@
 package Data::Sah::Compiler::perl::TH::array;
 
-our $DATE = '2019-07-25'; # DATE
-our $VERSION = '0.899'; # VERSION
+our $DATE = '2019-08-12'; # DATE
+our $VERSION = '0.900'; # VERSION
 
 use 5.010;
 use strict;
 use warnings;
-#use Log::Any '$log';
+#use Log::ger;
 
 use Mo qw(build default);
 use Role::Tiny::With;
@@ -22,23 +22,20 @@ sub handle_type {
     $cd->{_ccl_check_type} = "ref($dt) eq 'ARRAY'";
 }
 
-my $FRZ = "Storable::freeze";
-
 sub superclause_comparable {
     my ($self, $which, $cd) = @_;
     my $c  = $self->compiler;
     my $ct = $cd->{cl_term};
     my $dt = $cd->{data_term};
 
-    # Storable is chosen because it's core and fast. ~~ is not very
-    # specific.
-    $c->add_runtime_module($cd, 'Storable');
+    $c->add_runtime_module($cd, $cd->{args}{dump_module});
 
     if ($which eq 'is') {
-        $c->add_ccl($cd, "$FRZ($dt) eq $FRZ($ct)");
+        $c->add_ccl($cd, $c->expr_dump($cd, $dt).' eq '.$c->expr_dump($cd, $ct));
     } elsif ($which eq 'in') {
-        $c->add_runtime_smartmatch_pragma($cd);
-        $c->add_ccl($cd, "$FRZ($dt) ~~ [map {$FRZ(\$_)} \@{ $ct }]");
+        $c->add_ccl($cd, "do { my \$s = ".$c->expr_dump($cd, $dt)."; my \$res = 0; " .
+                        "for my \$el (\@{ $ct }) { my \$els = ".$c->expr_dump($cd, "\$el")."; ".
+                        "if (\$s eq \$els) { \$res = 1; last } } \$res }");
     }
 }
 
@@ -65,12 +62,10 @@ sub superclause_has_elems {
                 $cd, "\@{$dt} >= $cv->[0] && \@{$dt} <= $cv->[1]");
         }
     } elsif ($which eq 'has') {
-        $c->add_runtime_smartmatch_pragma($cd);
-        #$c->add_ccl($cd, "$FRZ($ct) ~~ [map {$FRZ(\$_)} \@{ $dt }]");
-
-        # XXX currently we choose below for speed, but only works for array of
-        # scalars
-        $c->add_ccl($cd, "$ct ~~ $dt");
+        $c->add_runtime_module($cd, $cd->{args}{dump_module});
+        $c->add_ccl($cd, "do { my \$s = ".$c->expr_dump($cd, $ct)."; my \$res = 0; " .
+                        "for my \$el (\@{ $dt }) { my \$els = ".$c->expr_dump($cd, "\$el")."; ".
+                        "if (\$s eq \$els) { \$res = 1; last } } \$res }");
     } elsif ($which eq 'each_index') {
         $self_th->set_tmp_data_term($cd) if $cd->{args}{data_term_includes_topic_var};
         $self_th->gen_each($cd, "0..\@{$cd->{data_term}}-1", '_', '$_');
@@ -150,7 +145,7 @@ Data::Sah::Compiler::perl::TH::array - perl's type handler for type "array"
 
 =head1 VERSION
 
-This document describes version 0.899 of Data::Sah::Compiler::perl::TH::array (from Perl distribution Data-Sah), released on 2019-07-25.
+This document describes version 0.900 of Data::Sah::Compiler::perl::TH::array (from Perl distribution Data-Sah), released on 2019-08-12.
 
 =for Pod::Coverage ^(clause_.+|superclause_.+)$
 

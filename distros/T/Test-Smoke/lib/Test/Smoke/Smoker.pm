@@ -7,6 +7,7 @@ our $VERSION = '0.046';
 use Config;
 use Cwd;
 use File::Spec::Functions qw( :DEFAULT abs2rel rel2abs );
+use Capture::Tiny 'capture';
 use Test::Smoke::LogMixin;
 use Test::Smoke::Util qw( get_smoked_Config skip_filter );
 
@@ -469,7 +470,7 @@ sub make_ {
         $self->log( "\nCompiler info: $cinfo{cc} version $version\n" )
             if $cinfo{cc};
 
-        $self->{w32cc} =~ /MSVC|BORLAND/ and $self->tty( "\n$make_output\n" );
+        $self->{w32cc} =~ /MSVC|BORLAND|GCC/ and $self->tty( "\n$make_output\n" );
     }
 
     my $exe_ext  = $Config{_exe} || $Config{exe_ext};
@@ -1108,15 +1109,19 @@ sub set_skip_tests {
                 next;
             }
             my $tsrc = File::Spec->catfile( $self->{ddir}, $raw );
-            my $tdst = $tsrc . "skip";
-            $unset and ( $tsrc, $tdst ) = ( $tdst, $tsrc );
-            -f $tsrc or next;
-            my $perms = (stat $tsrc)[2] & 07777;
-            chmod 0755, $tsrc;
-            my $did_mv = rename $tsrc, $tdst;
-            my $error = $did_mv ? "" : " ($!)";
-            $self->log_info("\t%s: %sok%s\n", $raw, $did_mv ?  '' : 'not ', $error);
-            -f $tdst and chmod $perms, $tdst;
+            next if !-f $tsrc;
+            my $skip = qq[print "1..0 # SKIP Disabled by Test::Smoke\\n";\nexit 0;\n__END__\n];
+            use autodie;
+
+            open my $test_fh_r, "<:raw", $tsrc;
+            my $body = do { local $/; <$test_fh_r> };
+            close $test_fh_r;
+
+            open my $test_fh_w, ">:raw", $tsrc;
+            print $test_fh_w !$unset ? "$skip$body" : do { $body =~ s/^\Q$skip\E//; $body; };
+            close $test_fh_w;
+
+            $self->log_info("\t%s: %sok%s\n", $raw, '', "");
         }
         close SKIPTESTS;
         @libext and $self->change_manifest( \@libext, $unset );
@@ -1156,7 +1161,9 @@ sub change_manifest {
         };
         local( *MANIO, *MANIN );
         if ( open MANIO, "< $mani_new" ) {
+            binmode MANIO;
             if ( open MANIN, "> $mani_org" ) {
+                binmode MANIN;
                 my $mline;
                 while ( $mline = <MANIO> ) {
                     chomp $mline;
@@ -1190,9 +1197,10 @@ sub _run {
     $self->log_debug("[$command]");
     defined $sub and return &$sub( $command, @args );
 
-    my @output = qx( $command );
-    $self->{_run_exit} = $? >> 8;
-    return wantarray ? @output : join " ", @output;
+    my ( $out, $err, $res ) = capture { system $command };
+    print STDERR $err if $err;
+    $self->{_run_exit} = $res >> 8;
+    return wantarray ? split /(\r\n|\r|\n)/, $out : $out;
 }
 
 =head2 $self->_make( $command )
@@ -1208,27 +1216,39 @@ sub _make {
     $self->{makeopt} and $cmd = "$self->{makeopt} $cmd";
     $cmd =~ m/clean/ and $cmd =~ s/-j[0-9]+\s+//;
 
-    $self->{is_win32} || $self->{is_vms} or return $self->_run( "make $cmd" );
+    return
+        $self->{is_vms}   ? $self->_make_vms($cmd)
+      : $self->{is_win32} ? $self->_make_win32($cmd)
+      :                     $self->_run("make $cmd");
+}
+
+sub _make_win32 {
+    my $self = shift;
+    my $cmd = shift;
+
+    $cmd =~ s|2\s*>\s*/dev/null\s*$|2>nul|;
+
+    $cmd = "$self->{w32make} -f smoke.mk $cmd";
+    chdir "win32" or die "unable to chdir () into 'win32'";
+    my @output = $self->_run($cmd);
+    chdir ".." or die "unable to chdir() out of 'win32'";
+    return wantarray ? @output : join "", @output;
+}
+
+sub _make_vms {
+    my $self = shift;
+    my $cmd = shift;
 
     my $kill_err;
     # don't capture STDERR
     # @ But why? and what if we do it DOSish? 2>NUL:
 
-    my $maker = $self->{is_vms} ? $self->{vmsmake} : $self->{w32make};
     $cmd =~ s|2\s*>\s*/dev/null\s*$|| and $kill_err = 1;
 
-    if ( $self->{is_win32} ) {
-        $cmd = "$maker -f smoke.mk $cmd";
-        chdir "win32" or die "unable to chdir () into 'win32'";
-    } else {
-        $cmd = "$maker $cmd";
-    }
+    $cmd = "$self->{vmsmake} $cmd";
     my @output = $self->_run(
         $kill_err ? qq{$^X -e "close STDERR; system '$cmd'"} : $cmd
     );
-    if ( $self->{is_win32} ) {
-        chdir ".." or die "unable to chdir() out of 'win32'";
-    }
     return wantarray ? @output : join "", @output;
 }
 

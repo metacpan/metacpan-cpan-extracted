@@ -112,8 +112,21 @@ subtest 'Errors' => sub {
             );
         },
         qr/Block execution requires/,
-        'execute dies with rs + no coderef',
+        'constructor dies with rs + no coderef',
     );
+
+    like(
+        dies {
+            DBIx::BatchChunker->new(
+                rs          => $track_rs,
+                coderef    => sub {},
+                single_row => 1,
+            );
+        },
+        qr/Found unknown attribute.+single_row/,
+        'constructor dies with misspelled attr',
+    );
+
 };
 
 ############################################################

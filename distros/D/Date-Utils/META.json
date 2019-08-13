@@ -43,7 +43,7 @@
    "provides" : {
       "Date::Utils" : {
          "file" : "lib/Date/Utils.pm",
-         "version" : "0.26"
+         "version" : "0.27"
       }
    },
    "release_status" : "stable",
@@ -54,6 +54,6 @@
          "web" : "https://github.com/manwar/Date-Utils"
       }
    },
-   "version" : "0.26",
+   "version" : "0.27",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

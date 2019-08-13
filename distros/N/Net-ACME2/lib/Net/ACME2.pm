@@ -7,7 +7,7 @@ use warnings;
 
 =head1 NAME
 
-Net::ACME2 - Client logic for the ACME (Let’s Encrypt) protocol
+Net::ACME2 - Client logic for the ACME (Let's Encrypt) protocol
 
 X<Lets Encrypt> X<Let's Encrypt> X<letsencrypt>
 
@@ -104,6 +104,8 @@ a new version of this module.
 
 =item * Comprehensive error handling with typed, L<X::Tiny>-based exceptions.
 
+=item * L<Retry POST (once) on C<badNonce> errors.|https://tools.ietf.org/html/rfc8555#section-6.5>
+
 =item * This is a pure-Perl solution. Most of its dependencies are
 either core modules or pure Perl themselves. XS is necessary to
 communicate with the ACME server via TLS; however, most Perl installations
@@ -154,7 +156,7 @@ use Net::ACME2::HTTP;
 use Net::ACME2::Order;
 use Net::ACME2::Authorization;
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 use constant {
     _HTTP_OK => 200,
@@ -219,10 +221,12 @@ sub _new_without_key_check {
 
     bless $self, $class;
 
-    $self->_set_ua();
+    $self->_set_http();
 
     return $self;
 }
+
+#----------------------------------------------------------------------
 
 =head2 $id = I<OBJ>->key_id()
 
@@ -237,15 +241,27 @@ sub key_id {
     return $self->{'_key_id'};
 }
 
+#----------------------------------------------------------------------
+
+=head2 I<OBJ>->http_timeout( [$NEW] )
+
+A passthrough interface to the underlying L<HTTP::Tiny> object’s
+C<timeout()> method.
+
+=cut
+
+sub http_timeout {
+    my $self = shift;
+
+    return $self->{'_http'}->timeout(@_);
+}
+
+#----------------------------------------------------------------------
+
 =head2 $url = I<CLASS>->get_terms_of_service()
 
 Returns the URL for the terms of service. Callable as either
 a class method or an instance method.
-
-B<NOTE:> For L<Let’s Encrypt|http://letsencrypt.org> you can
-unofficially resolve against
-L<https://acme-v01.api.letsencrypt.org/terms> to see the terms
-of service.
 
 =cut
 
@@ -266,6 +282,8 @@ sub get_terms_of_service {
 
     return $url;
 }
+
+#----------------------------------------------------------------------
 
 =head2 $created_yn = I<OBJ>->create_account( %OPTS )
 
@@ -295,7 +313,7 @@ sub create_account {
 
     $self->{'_key_id'} = $resp->header('location');
 
-    $self->{'_ua'}->set_key_id( $self->{'_key_id'} );
+    $self->{'_http'}->set_key_id( $self->{'_key_id'} );
 
     return 0 if $resp->status() == _HTTP_OK;
 
@@ -312,6 +330,8 @@ sub create_account {
 
     return 1;
 }
+
+#----------------------------------------------------------------------
 
 =head2 $order = I<OBJ>->create_order( %OPTS )
 
@@ -338,6 +358,8 @@ sub create_order {
     );
 }
 
+#----------------------------------------------------------------------
+
 =head2 $authz = I<OBJ>->get_authorization( $URL )
 
 Fetches the authorization’s information based on the given $URL
@@ -357,6 +379,8 @@ sub get_authorization {
         %{ $resp->content_struct() },
     );
 }
+
+#----------------------------------------------------------------------
 
 =head2 $str = I<OBJ>->make_key_authorization( $CHALLENGE )
 
@@ -380,6 +404,8 @@ sub make_key_authorization {
     return $challenge_obj->token() . '.' . $self->_key_thumbprint();
 }
 
+#----------------------------------------------------------------------
+
 =head2 I<OBJ>->accept_challenge( $CHALLENGE )
 
 Signal to the ACME server that the CHALLENGE is ready.
@@ -399,6 +425,8 @@ sub accept_challenge {
     return;
 }
 
+#----------------------------------------------------------------------
+
 =head2 $status = I<OBJ>->poll_authorization( $AUTHORIZATION )
 
 Accepts a L<Net::ACME2::Authorization> instance and polls the
@@ -411,6 +439,8 @@ As a courtesy, this returns the $AUTHORIZATION’s new C<status()>.
 
 #This has to handle updates to the authz and challenge objects
 *poll_authorization = *_poll_order_or_authz;
+
+#----------------------------------------------------------------------
 
 =head2 $status = I<OBJ>->finalize_order( $ORDER, $CSR )
 
@@ -450,6 +480,8 @@ sub finalize_order {
     return $order_obj->status();
 }
 
+#----------------------------------------------------------------------
+
 =head2 $status = I<OBJ>->poll_order( $ORDER )
 
 Like C<poll_authorization()> but handles a
@@ -458,6 +490,8 @@ L<Net::ACME2::Order> object instead.
 =cut
 
 *poll_order = *_poll_order_or_authz;
+
+#----------------------------------------------------------------------
 
 =head2 $cert = I<OBJ>->get_certificate_chain( $ORDER )
 
@@ -487,14 +521,14 @@ sub _get_directory {
 
     $self->{'_directory'} ||= do {
         my $dir_path = $self->DIRECTORY_PATH();
-        $self->{'_ua'}->get("https://$self->{'_host'}$dir_path")->content_struct();
+        $self->{'_http'}->get("https://$self->{'_host'}$dir_path")->content_struct();
     };
 
     my $new_nonce_url = $self->{'_directory'}{'newNonce'} or do {
         _die_generic('Directory is missing “newNonce”.');
     };
 
-    $self->{'_ua'}->set_new_nonce_url( $new_nonce_url );
+    $self->{'_http'}->set_new_nonce_url( $new_nonce_url );
 
     return $self->{'_directory'};
 }
@@ -527,10 +561,10 @@ sub _key_obj {
     return $self->{'_key_obj'} ||= Net::ACME2::AccountKey->new($self->{'_key'});
 }
 
-sub _set_ua {
+sub _set_http {
     my ($self) = @_;
 
-    $self->{'_ua'} = Net::ACME2::HTTP->new(
+    $self->{'_http'} = Net::ACME2::HTTP->new(
         key => $self->{'_key'} && $self->_key_obj(),
         key_id => $self->{'_key_id'},
     );
@@ -568,7 +602,7 @@ sub _post_url {
 
     my $post_method = $opt_post_method || 'post_key_id';
 
-    return $self->{'_ua'}->$post_method( $url, $data );
+    return $self->{'_http'}->$post_method( $url, $data );
 }
 
 sub _die_generic {
@@ -576,8 +610,8 @@ sub _die_generic {
 }
 
 #legacy aliases
-*create_new_account = \*create_account;
-*create_new_order = \*create_order;
+*create_new_account = *create_account;
+*create_new_order = *create_order;
 
 1;
 
@@ -602,6 +636,8 @@ simple as possible.)
 =back
 
 =head1 SEE ALSO
+
+L<Crypt::LE> is another ACME client library.
 
 L<Crypt::Perl> provides this library’s default cryptography backend.
 See this distribution’s F</examples> directory for sample usage

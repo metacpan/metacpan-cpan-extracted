@@ -1,0 +1,5 @@
+Revision history for perl module Git::Hooks::CheckYoutrack
+
+1.0.0 - New module (plugin for Git::Hooks)
+		Git::Hooks::CheckYoutrack - Checks for youtrack ticket on commit message
+

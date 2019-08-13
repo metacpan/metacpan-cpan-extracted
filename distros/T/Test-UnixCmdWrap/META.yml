@@ -1,0 +1,35 @@
+---
+abstract: 'test unix commands with various assumptions'
+author:
+  - 'Jeremy Mates <jeremy.mates@gmail.com>'
+build_requires:
+  Cwd: '0'
+  Test::Most: '0'
+configure_requires:
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-UnixCmdWrap
+provides:
+  Test::UnixCmdWrap:
+    file: lib/Test/UnixCmdWrap.pm
+    version: '0.02'
+requires:
+  Carp: '0'
+  Cwd: '0'
+  File::Spec: '0'
+  Moo: '0'
+  Test::Cmd: '0'
+  Test::Differences: '0'
+  Test::More: '0'
+  Test::UnixExit: '0'
+  perl: v5.24.0
+resources:
+  license: http://opensource.org/licenses/BSD-3-Clause
+  repository: https://github.com/thrig/Test-UnixCmdWrap
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

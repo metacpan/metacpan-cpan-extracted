@@ -2,8 +2,8 @@
 # Author          : Johan Vromans
 # Created On      : Sat Mar 16 11:43:21 1996
 # Last Modified By: Johan Vromans
-# Last Modified On: Sat May 27 12:13:51 2017
-# Update Count    : 118
+# Last Modified On: Mon Aug 12 17:08:17 2019
+# Update Count    : 120
 # Status          : Unknown, Use with caution!
 
 use Config;
@@ -11,7 +11,7 @@ use ExtUtils::MakeMaker 5.0;
 
 use lib "./lib";
 use Getopt::Long;
-my $version = "2.50";
+my $version = "2.51";
 
 my $mm_version = $ExtUtils::MakeMaker::VERSION;
 if ($mm_version =~ /_/) {
@@ -106,11 +106,7 @@ WriteMakefile(
             META_MERGE => {
                 'meta-spec' => { version => 2 },
                 resources => {
-                    repository => {
-                        type => 'git',
-                        web  => 'https://github.com/sciurius/perl-Getopt-Long',
-                        url  => 'https://github.com/sciurius/perl-Getopt-Long.git',
-                    },
+		  repository => "https://github.com/sciurius/perl-Getopt-Long",
                 },
             },
         ),

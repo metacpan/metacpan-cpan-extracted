@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.8.1';
+our $VERSION = 'v3.9.0';
 
 
 has active_ingredient => (
@@ -118,6 +118,14 @@ has food_warning => (
     is        => 'rw',
     predicate => 1,
     json_ld   => 'foodWarning',
+);
+
+
+
+has included_in_health_insurance_plan => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'includedInHealthInsurancePlan',
 );
 
 
@@ -250,6 +258,14 @@ has related_drug => (
 
 
 
+has rxcui => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'rxcui',
+);
+
+
+
 has warning => (
     is        => 'rw',
     predicate => 1,
@@ -274,7 +290,7 @@ SemanticWeb::Schema::Drug - A chemical or biologic substance
 
 =head1 VERSION
 
-version v3.8.1
+version v3.9.0
 
 =head1 DESCRIPTION
 
@@ -472,6 +488,20 @@ A food_warning should be one of the following types:
 =over
 
 =item C<Str>
+
+=back
+
+=head2 C<included_in_health_insurance_plan>
+
+C<includedInHealthInsurancePlan>
+
+The insurance plans that cover this drug.
+
+A included_in_health_insurance_plan should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::HealthInsurancePlan']>
 
 =back
 
@@ -709,6 +739,18 @@ A related_drug should be one of the following types:
 =over
 
 =item C<InstanceOf['SemanticWeb::Schema::Drug']>
+
+=back
+
+=head2 C<rxcui>
+
+The RxCUI drug identifier from RXNORM.
+
+A rxcui should be one of the following types:
+
+=over
+
+=item C<Str>
 
 =back
 

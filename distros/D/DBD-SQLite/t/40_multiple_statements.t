@@ -1,17 +1,9 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest qw/connect_ok/;
 use Test::More;
-use Test::NoWarnings;
-
-plan tests => 21;
+use if -d ".git", "Test::FailWarnings";
 
 {
 	# DBD::SQLite prepares/does the first statement only;
@@ -132,3 +124,5 @@ plan tests => 21;
 	ok $got->[0][0] == 1
 	&& $got->[1][0] == 2, "and got the inserted values";
 }
+
+done_testing;

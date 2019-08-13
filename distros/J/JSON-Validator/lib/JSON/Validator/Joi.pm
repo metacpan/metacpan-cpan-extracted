@@ -3,13 +3,14 @@ use Mojo::Base -base;
 
 use Mojo::JSON qw(false true);
 use Mojo::Util;
+use Storable 'dclone';
 
 # Avoid "Subroutine redefined" warnings
 require JSON::Validator;
 
-has enum => sub { +[] };
+has enum                                   => sub { +[] };
 has [qw(format max min multiple_of regex)] => undef;
-has type => 'object';
+has type                                   => 'object';
 
 for my $attr (qw(required strict unique)) {
   Mojo::Util::monkey_patch(__PACKAGE__,
@@ -40,11 +41,22 @@ sub extend {
   die "Cannot extend joi '@{[$self->type]}' by '@{[$by->type]}'"
     unless $self->type eq $by->type;
 
-  my $clone = shift->new(%$self, %$by);
+  my $clone = shift->new(dclone($self));
 
-  if ($self->type eq 'object') {
-    $clone->{properties}{$_} ||= $self->{properties}{$_}
-      for keys %{$self->{properties} || {}};
+  for my $key (keys %$by) {
+    my $ref = ref $by->{$key};
+    $clone->{$key} = $by->{$key} unless $ref eq 'ARRAY' or $ref eq 'HASH';
+  }
+
+  if ($self->type eq 'array') {
+    $clone->{items} = dclone($by->{items}) if $by->{items};
+  }
+  elsif ($self->type eq 'object') {
+    $clone->{required}
+      = [JSON::Validator::_uniq(@{$clone->{required}}, @{$by->{required}})]
+      if ref $by->{required} eq 'ARRAY';
+    $clone->{properties}{$_} = dclone($by->{properties}{$_})
+      for keys %{$by->{properties} || {}};
   }
 
   return $clone;
@@ -81,7 +93,8 @@ sub uri       { shift->_type('string')->format('uri') }
 
 sub validate {
   my ($self, $data) = @_;
-  state $jv = JSON::Validator->new->coerce(1);
+  state $jv
+    = JSON::Validator->new->coerce({booleans => 1, numbers => 1, strings => 1});
   return $jv->validate($data, $self->compile);
 }
 
@@ -321,9 +334,10 @@ Sets L</format> to L<email|JSON::Validator/email>.
 
 =head2 extend
 
-  my $new_joi = $joi->extend($joi);
+  my $new_joi = $joi->extend($other_joi_object);
 
-Will extend C<$joi> with the definitions in C<$joi> and return a new object.
+Will extend C<$joi> with the definitions in C<$other_joi_object> and return a
+new object.
 
 =head2 iso_date
 

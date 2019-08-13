@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.8.1';
+our $VERSION = 'v3.9.0';
 
 
 has amount => (
@@ -34,10 +34,50 @@ has currency => (
 
 
 
+has grace_period => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'gracePeriod',
+);
+
+
+
+has loan_repayment_form => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'loanRepaymentForm',
+);
+
+
+
 has loan_term => (
     is        => 'rw',
     predicate => 1,
     json_ld   => 'loanTerm',
+);
+
+
+
+has loan_type => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'loanType',
+);
+
+
+
+has recourse_loan => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'recourseLoan',
+);
+
+
+
+has renegotiable_loan => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'renegotiableLoan',
 );
 
 
@@ -66,7 +106,7 @@ SemanticWeb::Schema::LoanOrCredit - A financial product for the loaning of an am
 
 =head1 VERSION
 
-version v3.8.1
+version v3.9.0
 
 =head1 DESCRIPTION
 
@@ -108,6 +148,37 @@ A currency should be one of the following types:
 
 =back
 
+=head2 C<grace_period>
+
+C<gracePeriod>
+
+The period of time after any due date that the borrower has to fulfil its
+obligations before a default (failure to pay) is deemed to have occurred.
+
+A grace_period should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::Duration']>
+
+=back
+
+=head2 C<loan_repayment_form>
+
+C<loanRepaymentForm>
+
+A form of paying back money previously borrowed from a lender. Repayment
+usually takes the form of periodic payments that normally include part
+principal plus interest in each payment.
+
+A loan_repayment_form should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::RepaymentSpecification']>
+
+=back
+
 =head2 C<loan_term>
 
 C<loanTerm>
@@ -119,6 +190,51 @@ A loan_term should be one of the following types:
 =over
 
 =item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
+
+=back
+
+=head2 C<loan_type>
+
+C<loanType>
+
+The type of a loan or credit.
+
+A loan_type should be one of the following types:
+
+=over
+
+=item C<Str>
+
+=back
+
+=head2 C<recourse_loan>
+
+C<recourseLoan>
+
+The only way you get the money back in the event of default is the
+security. Recourse is where you still have the opportunity to go back to
+the borrower for the rest of the money.
+
+A recourse_loan should be one of the following types:
+
+=over
+
+=item C<Bool>
+
+=back
+
+=head2 C<renegotiable_loan>
+
+C<renegotiableLoan>
+
+Whether the terms for payment of interest can be renegotiated during the
+life of the loan.
+
+A renegotiable_loan should be one of the following types:
+
+=over
+
+=item C<Bool>
 
 =back
 

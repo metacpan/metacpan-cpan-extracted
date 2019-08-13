@@ -19,7 +19,7 @@ package MongoDB::Role::_PrivateConstructor;
 # MongoDB interface for a private constructor
 
 use version;
-our $VERSION = 'v2.0.3';
+our $VERSION = 'v2.2.0';
 
 use MongoDB::_Constants;
 use Sub::Defer;
@@ -30,19 +30,19 @@ use Moo::Role;
 # public one, which checks required/isa assertions.  When disabled,
 # the private constructor blesses args directly to the class for speed.
 BEGIN {
-    my $code =
-      WITH_ASSERTS
-      ? 'sub _new { my $class = shift; $class->new(@_) }'
-      : <<'HERE';
-my %done;
-sub _new {
-    my $class = shift;
-    undefer_sub($class->can(q{new})) and $done{$class}++
-      unless $done{$class};
-    return bless {@_}, $class
-}
+  my $NO_ASSERT_CONSTRUCTOR = <<'HERE';
+    my %done;
+    sub _new {
+      my $class = shift;
+      undefer_sub($class->can(q{new})) and $done{$class}++
+        unless $done{$class};
+      return bless {@_}, $class
+    }
 HERE
-    eval $code; ## no critic
+
+  WITH_ASSERTS
+  ? eval 'sub _new { my $class = shift; $class->new(@_) }' ## no critic
+  : eval $NO_ASSERT_CONSTRUCTOR; ## no critic
 }
 
 1;

@@ -20,7 +20,7 @@ package MongoDB::Op::_BulkWrite;
 # MongoDB::BulkWriteResult object
 
 use version;
-our $VERSION = 'v2.0.3';
+our $VERSION = 'v2.2.0';
 
 use Moo;
 
@@ -40,7 +40,6 @@ use Types::Standard qw(
     InstanceOf
 );
 use Safe::Isa;
-use Try::Tiny;
 use boolean;
 
 use namespace::clean;
@@ -80,7 +79,7 @@ with $_ for qw(
 
 sub _is_retryable {
     my $self = shift;
-    return $self->write_concern->is_acknowledged && $self->_retryable;
+    return $self->_should_use_acknowledged_write && $self->_retryable;
 }
 
 sub has_collation {
@@ -103,7 +102,7 @@ sub execute {
 
         MongoDB::UsageError->throw(
             "Unacknowledged bulk writes that specify a collation are not allowed")
-          if !$self->write_concern->is_acknowledged;
+          if !$self->_should_use_acknowledged_write;
     }
 
     my $use_write_cmd = $link->supports_write_commands;
@@ -145,7 +144,7 @@ sub execute {
     return MongoDB::UnacknowledgedResult->_new(
         write_errors         => [],
         write_concern_errors => [],
-    ) if !$self->write_concern->is_acknowledged;
+    ) if ! $self->_should_use_acknowledged_write;
 
     # only reach here with an error for unordered bulk ops
     $result->assert_no_write_error;
@@ -231,8 +230,8 @@ sub _execute_write_command_batch {
             $self->_is_retryable
               ? $self->client->send_retryable_write_op( $op )
               : $self->client->send_write_op( $op );
-        };
-        if ( my $error = $@ ) {
+        } or do {
+            my $error = $@ || "Unknown error";
             # This error never touches the database!.... so is before any retryable writes errors etc.
             if ( $error->$_isa("MongoDB::_CommandSizeError") ) {
                 if ( @$chunk == 1 ) {
@@ -262,7 +261,7 @@ sub _execute_write_command_batch {
             else {
                 die $error;
             }
-        }
+        };
 
         redo unless $cmd_result; # restart after a chunk split
 
@@ -413,16 +412,16 @@ sub _execute_legacy_batch {
             );
         }
 
-        my $op_result = try {
+        my $op_result = eval {
             $op->execute($link);
-        }
-        catch {
-            if (   $_->$_isa("MongoDB::DatabaseError")
-                && $_->result->does("MongoDB::Role::_WriteResult") )
+        } or do {
+            my $error = $@ || "Unknown error";
+            if (   $error->$_isa("MongoDB::DatabaseError")
+                && $error->result->does("MongoDB::Role::_WriteResult") )
             {
-                return $_->result;
+                return $error->result;
             }
-            die $_ unless $w_0 && /exceeds maximum size/;
+            die $error unless $w_0 && /exceeds maximum size/;
             return undef; ## no critic: this makes op_result undef
         };
 

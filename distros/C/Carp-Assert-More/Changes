@@ -1,5 +1,9 @@
 Revision history for Perl extension Carp::Assert::More.
 
+1.20    Fri Aug  9 10:10:06 CDT 2019
+        [ENHANCEMENTS]
+        Add assert_datetime() for asserting DateTime objects.
+
 1.18    Fri Jul 19 17:12:32 CDT 2019
         [ENHANCEMENTS]
         Added assert_aoh() for asserting an array of hashrefs.

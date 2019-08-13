@@ -5,7 +5,7 @@ use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 
 my ($parent_caller, $before_caller, $around_caller, $after_caller);
 
-my $parent = Parent->new();
+my $parent = MyParent->new();
 $parent->orig();
 
 is($parent_caller, 'main', "parent with no modifiers sees 'main' as caller");
@@ -25,7 +25,7 @@ TODO:
 
 BEGIN
 {
-    package Parent;
+    package MyParent;
     sub new { bless {}, shift }
     sub orig
     {
@@ -36,7 +36,7 @@ BEGIN
 BEGIN
 {
     package Child;
-    our @ISA = 'Parent';
+    our @ISA = 'MyParent';
     use Class::Method::Modifiers;
 
     before 'orig' => sub

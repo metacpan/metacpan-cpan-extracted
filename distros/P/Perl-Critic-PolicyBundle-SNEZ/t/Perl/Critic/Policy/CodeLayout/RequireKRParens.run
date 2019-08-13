@@ -1,0 +1,73 @@
+## name Subroutines with whitespace before parentheses
+## failures 2
+## cut
+do_something (12);
+Spil::Info::warnx    ('CKP', 'sub');
+
+## name Subroutine with parenthesis on next line
+## failures 1
+## cut
+Data::Date::convert
+($date, 'YYYY-MM-DD');
+
+## name Method call with space before parentheses
+## failures 1
+## cut
+$obj->method (1, 2, 3);
+
+## name if conditions without proper whitespace
+## failures 4
+## cut
+if ($is_fine){
+}
+if(not $is_fine) {
+}
+if($small or $large){
+}
+
+## name foreach with no whitespace before the list
+## failures 1
+## cut
+foreach my $elem(@array) {
+
+}
+
+## name C-style for loop whith no whitespace
+## failures 2
+## cut
+for(my $i = 0; $i < 10; ++$i){
+
+}
+
+## name Trailing condition with no leading whitespace
+## failures 1
+## cut
+Spil::Info::diex('Bad stuff happened') if($stuff_happened and $bad);
+
+## name Correct calls
+## failures 0
+## cut
+do_something(12);
+Spil::Info::warnx('CKP', 'sub');
+Data::Date::convert($data, 'YYYY-MM-DD');
+$obj->method(1, 2, 3);
+
+## name Function called without parentheses
+## failures 0
+## cut
+sub foo;
+foo 12;
+
+## name Unpacking subroutine arguments
+## failures 0
+## cut
+sub foo {
+    my ($x, $y, $z) = @_;
+
+}
+
+## name Proper trailing condition
+## failures 0
+## cut
+Spil::Info::diex('Bad stuff happened') if ($stuff_happened and $bad);
+Spil::Info::diex('Bad stuff happened') if $stuff_happened and $bad;

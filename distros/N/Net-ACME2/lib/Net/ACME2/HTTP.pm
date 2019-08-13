@@ -27,6 +27,8 @@ use Net::ACME2::X              ();
 
 use constant _CONTENT_TYPE => 'application/jose+json';
 
+my $_MAX_RETRIES = 5;
+
 #accessed from tests
 our $_NONCE_HEADER = 'replay-nonce';
 
@@ -43,9 +45,17 @@ sub new {
         _ua       => $ua,
         _acme_key => $opts{'key'},
         _key_id => $opts{'key_id'},
+
+        _retries_left => $_MAX_RETRIES,
     }, $class;
 
     return bless $self, $class;
+}
+
+sub timeout {
+    my $self = shift;
+
+    return $self->{'_ua'}->timeout(@_);
 }
 
 sub set_key_id {
@@ -103,23 +113,77 @@ sub _post {
 
     local $opts_hr->{'headers'}{'Content-Type'} = 'application/jose+json';
 
-    return $self->_request_and_set_last_nonce(
-        'POST',
-        $url,
-        {
-            content => $jws,
-            headers => {
-                'content-type' => _CONTENT_TYPE,
+    my $pre_err = $@;
+
+    my $resp = eval {
+        $self->_request_and_set_last_nonce(
+            'POST',
+            $url,
+            {
+                content => $jws,
+                headers => {
+                    'content-type' => _CONTENT_TYPE,
+                },
             },
-        },
-        $opts_hr || (),
-    );
+            $opts_hr || (),
+        );
+    };
+
+    my $err;
+
+    if (!defined $resp) {
+        $err = $@;
+
+        if ( eval { $err->get('acme')->type() =~ m<:badNonce\z> } ) {
+            if (!$self->{'_retries_left'}) {
+                warn( "$url: Received “badNonce” error, and no retries left!\n" );
+            }
+            elsif ($self->{'_last_nonce'}) {
+
+                # This scenario seems worth a warn() because even if the
+                # retry succeeds, something probably went awry somewhere.
+
+                warn( "$url: Received “badNonce” error! Retrying ($self->{'_retries_left'} left) …\n" );
+
+                local $self->{'_retries_left'} = $self->{'_retries_left'} - 1;
+
+                # NB: The success of this depends on our having recorded
+                # the Replay-Nonce from the last response.
+                $resp = $self->_post(@_[ 1 .. $#_ ]);
+            }
+            else {
+                warn( "$url: Received “badNonce” without a Replay-Nonce! (Server violates RFC 8555/6.5!) Cannot retry …" );
+            }
+        }
+    }
+
+    if (!defined $resp) {
+        $@ = $err;
+        die;
+    }
+
+    $@ = $pre_err;
+
+    return $resp;
 }
 
 sub _ua_request {
     my ( $self, $type, @args ) = @_;
 
     return $self->{'_ua'}->request( $type, @args );
+}
+
+sub _consume_nonce_in_headers {
+    my ($self, $headers_hr) = @_;
+
+    my $_nonce_header_lc = $_NONCE_HEADER;
+    $_nonce_header_lc =~ tr<A-Z><a-z>;
+
+    my $nonce = $headers_hr->{$_nonce_header_lc};
+
+    $self->{'_last_nonce'} = $nonce if $nonce;
+
+    return;
 }
 
 #overridden in tests
@@ -131,19 +195,12 @@ sub _request {
     #cf. eval_bug.readme
     my $eval_err = $@;
 
-    eval { $resp = $self->_ua_request( $type, @args ); };
-
-    # Check ref() first to avoid potentially running overload.pm’s
-    # stringification.
-    if (ref($@) || $@) {
+    eval { $resp = $self->_ua_request( $type, @args ); 1 } or do {
         my $exc = $@;
 
         if ( eval { $exc->isa('Net::ACME2::X::HTTP::Protocol') } ) {
-            my $_nonce_header_lc = $_NONCE_HEADER;
-            $_nonce_header_lc =~ tr<A-Z><a-z>;
 
-            my $nonce = $exc->get('headers')->{$_nonce_header_lc};
-            $self->{'_last_nonce'} = $nonce if $nonce;
+            $self->_consume_nonce_in_headers( $exc->get('headers') );
 
             #If the exception is able to be made into a Net::ACME2::Error,
             #then do so to get a nicer error message.
@@ -166,7 +223,7 @@ sub _request {
 
         $@ = $exc;
         die;
-    }
+    };
 
     $@ = $eval_err;
 
@@ -211,8 +268,6 @@ sub _get_first_nonce {
 sub _create_jwt {
     my ( $self, $jwt_method, $url, $data ) = @_;
 
-    $self->_get_first_nonce() if !$self->{'_last_nonce'};
-
     $self->{'_jwt_maker'} ||= do {
         my $class;
 
@@ -242,11 +297,23 @@ sub _create_jwt {
         );
     };
 
+    $self->_get_first_nonce() if !$self->{'_last_nonce'};
+
+    # Ideally we’d wait until we’ve confirmed that this JWT reached the
+    # server to delete the local nonce, but at this point a failure to
+    # reach the server seems pretty edge-case-y. Even if that happens,
+    # we’ll just request another nonce next time, so no big deal.
+    my $nonce = delete $self->{'_last_nonce'};
+
+    # For testing badNonce retry:
+    # $nonce = reverse($nonce) if $self->{'_retries_left'};
+    # $nonce = reverse($nonce);
+
     return $self->{'_jwt_maker'}->$jwt_method(
         key_id => $self->{'_key_id'},
         payload => $data,
         extra_headers => {
-            nonce => $self->{'_last_nonce'},
+            nonce => $nonce,
             url => $url,
         },
     );

@@ -1,5 +1,26 @@
 Revision history for Perl extension Minion::Backend::mysql.
 
+0.16      2019-08-10 21:27:33-05:00 America/Chicago
+
+  [Added]
+
+  - Added Travis tests for more MySQL and MariaDB versions. Thanks
+    @paultcochrane for the initial work on this. (Github #1)
+  - You can now pass in a connected Mojo::mysql instance to the backend
+    to make it use that (instead of creating its own instance). This can
+    help make sure that concurrent connections are limited and reused.
+    Thanks @larryl & @GrantStreetGroup for contributing this!
+    (Github #22)
+
+  [Fixed]
+
+  - Fixed SQL errors under MySQL strict mode (Specifically, the SQL
+    GROUP BY columns need to be specified as SELECTed). Thanks @larryl
+    & @GrantStreetGroup! (Github #22)
+  - Fixed backend creating dozens of connections to MySQL. Now basic
+    operations should be far more efficient. Thanks @larryl
+    & @GrantStreetGroup! (Github #22)
+
 0.15      2018-11-10 11:46:56-06:00 America/Chicago
 
   [Fixed]

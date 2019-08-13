@@ -132,6 +132,10 @@ sub reporter_config { # needed for sending out reports
             skip_tests(),
             harnessonly(),
             harness3opts(),
+            hostname(),
+            from(),
+            send_log(),
+            send_out(),
             user_note(),
             un_file(),
             un_position(),
@@ -188,6 +192,7 @@ sub runsmoke_config { # runsmoke.pl
             opt_continue(),
             skip_tests(),
             testmake(),
+            w32args(),
             w32cc(),
             w32make(),
         ],
@@ -464,6 +469,15 @@ sub hdir { # hdir => ddir
     );
 }
 
+sub hostname {
+    return $opt->new(
+        name => 'hostname',
+        option => '=s',
+        deafult => undef,
+        helptext => 'Use the hostname option to override System::Info->hostname',
+    );
+}
+
 sub is56x {
     return $opt->new(
         name => 'is56x',
@@ -697,6 +711,7 @@ sub send_log {
         name => 'send_log',
         option => '=s',
         default => 'on_fail',
+        allow => [qw/ never on_fail always /],
         helptext => "Send logfile to the CoreSmokeDB server.",
     );
 }
@@ -706,6 +721,7 @@ sub send_out {
         name => 'send_out',
         option => '=s',
         default => 'never',
+        allow => [qw/ never on_fail always /],
         helptext => "Send out-file to the CoreSmokeDB server.",
     );
 }
@@ -767,7 +783,7 @@ sub smokedb_url {
     return $opt->new(
         name => 'smokedb_url',
         option => '=s',
-        default => 'http://perl5.test-smoke.org/report',
+        default => 'https://perl5.test-smoke.org/report',
         helptext => "The URL for sending reports to CoreSmokeDB.",
     );
 }

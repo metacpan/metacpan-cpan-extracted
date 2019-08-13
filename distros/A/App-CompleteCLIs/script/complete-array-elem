@@ -1,11 +1,11 @@
 #!perl
 
-# Note: This script is a CLI  for Riap function /Complete/Util/complete_array_elem
-# and generated automatically using Perinci::CmdLine::Gen version 0.482
+# Note: This script is a CLI for Riap function /Complete/Util/complete_array_elem
+# and generated automatically using Perinci::CmdLine::Gen version 0.488
 
-our $DATE = '2017-08-18'; # DATE
+our $DATE = '2019-07-18'; # DATE
 our $DIST = 'App-CompleteCLIs'; # DIST
-our $VERSION = '0.13'; # VERSION
+our $VERSION = '0.140'; # VERSION
 
 use 5.010001;
 use strict;
@@ -16,10 +16,14 @@ use Perinci::CmdLine::Any;
 # code_before_instantiate_cmdline
 use Complete::Util;
 
-Perinci::CmdLine::Any->new(
+my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Complete/Util/complete_array_elem",
     program_name => "complete-array-elem",
-)->run;
+    read_config => 0,
+    read_env => 0,
+);
+
+$cmdline->run;
 
 # ABSTRACT: Complete from array
 # PODNAME: complete-array-elem
@@ -36,22 +40,45 @@ complete-array-elem - Complete from array
 
 =head1 VERSION
 
-This document describes version 0.13 of complete-array-elem (from Perl distribution App-CompleteCLIs), released on 2017-08-18.
+This document describes version 0.140 of complete-array-elem (from Perl distribution App-CompleteCLIs), released on 2019-07-18.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % complete-array-elem [options] <word> <array> ...
+ % complete-array-elem [options] <word> <array>
 
 =head1 DESCRIPTION
 
 Try to find completion from an array of strings. Will attempt several methods,
 from the cheapest and most discriminating to the most expensive and least
-discriminating: normal string prefix matching, word-mode matching (see
-C<Complete::Common::OPT_WORD_MODE> for more details), char-mode matching (see
-C<Complete::Common::OPT_CHAR_MODE> for more details), and fuzzy matching (see
-C<Complete::Common::OPT_FUZZY> for more details).
+discriminating.
+
+First method is normal/exact string prefix matching (either case-sensitive or
+insensitive depending on the C<$Complete::Common::OPT_CI> variable or the
+C<COMPLETE_OPT_CI> environment variable). If at least one match is found, return
+result. Else, proceed to the next method.
+
+Word-mode matching (can be disabled by setting
+C<$Complete::Common::OPT_WORD_MODE> or C<COMPLETE_OPT_WORD_MODE> environment
+varialbe to false). Word-mode matching is described in L<Complete::Common>. If
+at least one match is found, return result. Else, proceed to the next method.
+
+Prefix char-mode matching (can be disabled by settings
+C<$Complete::Common::OPT_CHAR_MODE> or C<COMPLETE_OPT_CHAR_MODE> environment
+variable to false). Prefix char-mode matching is just like char-mode matching
+(see next paragraph) except the first character must match. If at least one
+match is found, return result. Else, proceed to the next method.
+
+Char-mode matching (can be disabled by settings
+C<$Complete::Common::OPT_CHAR_MODE> or C<COMPLETE_OPT_CHAR_MODE> environment
+variable to false). Char-mode matching is described in L<Complete::Common>. If
+at least one match is found, return result. Else, proceed to the next method.
+
+Fuzzy matching (can be disabled by setting C<$Complete::Common::OPT_FUZZY> or
+C<COMPLETE_OPT_FUZZY> to false). Fuzzy matching is described in
+L<Complete::Common>. If at least one match is found, return result. Else,
+return empty string.
 
 Will sort the resulting completion list, so you don't have to presort the array.
 
@@ -77,6 +104,14 @@ See C<--exclude>.
 
 =item B<--exclude>=I<s>
 
+=item B<--summaries-json>=I<s>
+
+See C<--summaries>.
+
+=item B<--summaries>=I<s@>
+
+Can be specified multiple times.
+
 =item B<--word>=I<s>*
 
 Word to complete.
@@ -84,36 +119,6 @@ Word to complete.
 Default value:
 
  ""
-
-=back
-
-=head2 Configuration options
-
-=over
-
-=item B<--config-path>=I<filename>
-
-Set path to configuration file.
-
-Can be specified multiple times.
-
-=item B<--config-profile>=I<s>
-
-Set configuration profile to use.
-
-=item B<--no-config>
-
-Do not use any configuration file.
-
-=back
-
-=head2 Environment options
-
-=over
-
-=item B<--no-env>
-
-Do not read environment for default options.
 
 =back
 
@@ -220,45 +225,6 @@ It is also recommended to install L<shcompgen> (see above).
 
 For fish and zsh, install L<shcompgen> as described above.
 
-=head1 CONFIGURATION FILE
-
-This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
-
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/complete-array-elem.conf>, F<~/complete-array-elem.conf>, or F</etc/complete-array-elem.conf>.
-
-All found files will be read and merged.
-
-To disable searching for configuration files, pass C<--no-config>.
-
-You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
-
-You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
-
-Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
-
-List of available configuration parameters:
-
- array (see --array)
- exclude (see --exclude)
- format (see --format)
- naked_res (see --naked-res)
- replace_map (see --replace-map)
- word (see --word)
-
-=head1 ENVIRONMENT
-
-=head2 COMPLETE_ARRAY_ELEM_OPT => str
-
-Specify additional command-line options.
-
-=head1 FILES
-
-F<~/.config/complete-array-elem.conf>
-
-F<~/complete-array-elem.conf>
-
-F</etc/complete-array-elem.conf>
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/App-CompleteCLIs>.
@@ -281,7 +247,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

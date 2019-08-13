@@ -1,11 +1,11 @@
 requires "Carp" => "0";
 requires "IO::File" => "0";
 requires "IO::Handle" => "0";
-requires "TryCatch" => "0";
+requires "Try::Tiny" => "0";
 requires "feature" => "0";
 requires "mro" => "0";
 requires "namespace::autoclean" => "0";
-requires "perl" => "5.010";
+requires "perl" => "5.014";
 requires "strict" => "0";
 requires "utf8" => "0";
 requires "warnings" => "0";
@@ -16,6 +16,7 @@ on 'test' => sub {
   requires "IPC::Open3" => "0";
   requires "Test::Exception" => "0";
   requires "Test::More" => "0";
+  requires "Test::Most" => "0";
 };
 
 on 'configure' => sub {
@@ -31,5 +32,4 @@ on 'develop' => sub {
   requires "Test::Pod" => "1.41";
   requires "Test::Pod::Coverage" => "1.08";
   requires "Test::Portability::Files" => "0";
-  requires "Test::Synopsis" => "0";
 };

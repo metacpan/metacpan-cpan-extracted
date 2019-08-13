@@ -1,23 +1,16 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use Test::More;
 use lib "t/lib";
 use SQLiteTest;
 use DBD::SQLite;
+use if -d ".git", "Test::FailWarnings";
 
 BEGIN {
-	if (!grep /^ENABLE_COLUMN_METADATA/, DBD::SQLite::compile_options()) {
+	if (!has_compile_option('ENABLE_COLUMN_METADATA')) {
 		plan skip_all => "Column metadata is disabled for this DBD::SQLite";
 	}
 }
-
-plan tests => 6;
 
 my $dbh = connect_ok();
 
@@ -34,3 +27,5 @@ my $expected = {
 for my $m (keys %$expected) {
     is_deeply($sth->{$m}, $expected->{$m});
 }
+
+done_testing;

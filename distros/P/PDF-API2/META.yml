@@ -17,9 +17,9 @@ name: PDF-API2
 requires:
   Compress::Zlib: '1.0'
   Font::TTF: '0'
-  perl: v5.8.5
+  perl: v5.10.0
 resources:
   repository: git://github.com/ssimms/pdfapi2.git
-version: '2.034'
+version: '2.035'
 x_generated_by_perl: v5.22.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

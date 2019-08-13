@@ -3,6 +3,11 @@ use strict;
 
 use Test::More;
 plan skip_all => "This ($^O) is not MSWin32!" if $^O ne 'MSWin32';
+require Win32;
+my (undef, $major) = Win32::GetOSVersion();
+if ($major < 6) {
+    plan skip_all => "GetErrorMode requires Windows Vista";
+}
 
 require Win32::API;
 require Test::Smoke::Util::Win32ErrorMode;

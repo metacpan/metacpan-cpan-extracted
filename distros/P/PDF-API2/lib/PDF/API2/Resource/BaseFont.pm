@@ -5,7 +5,7 @@ use base 'PDF::API2::Resource';
 use strict;
 use warnings;
 
-our $VERSION = '2.034'; # VERSION
+our $VERSION = '2.035'; # VERSION
 
 use Compress::Zlib;
 use Encode qw(:all);
@@ -498,7 +498,7 @@ Return the glyph's width.
 sub wxByGlyph {
     my $self  = shift();
     my $glyph = shift();
-    my $width = undef;
+    my $width;
     if (ref($self->data->{'wx'}) eq 'HASH') {
         $width   = $self->data->{'wx'}->{$glyph};
         $width //= $self->missingwidth();
@@ -506,7 +506,7 @@ sub wxByGlyph {
     }
     else {
         my $cid = $self->cidByUni(uniByName($glyph));
-        $width   = $self->data->{'wx'}->[$cid];
+        $width   = $self->data->{'wx'}->[$cid] if defined $cid;
         $width //= $self->missingwidth();
         $width //= 300;
     }
@@ -523,7 +523,8 @@ sub wxByUni {
     my $self  = shift();
     my $val   = shift();
     my $gid   = $self->glyphByUni($val);
-    my $width = $self->data->{'wx'}->{$gid};
+    my $width;
+    $width   = $self->data->{'wx'}->{$gid} if defined $gid;
     $width //= $self->missingwidth();
     $width //= 300;
     return $width;
@@ -538,7 +539,8 @@ Return the character's width based on the current encoding.
 sub wxByEnc {
     my ($self, $e) = @_;
     my $glyph = $self->glyphByEnc($e);
-    my $width = $self->data->{'wx'}->{$glyph};
+    my $width;
+    $width   = $self->data->{'wx'}->{$glyph} if defined $glyph;
     $width //= $self->missingwidth();
     $width //= 300;
     return $width;
@@ -553,7 +555,8 @@ Return the character's width based on the font's default encoding.
 sub wxByMap {
     my ($self, $map) = @_;
     my $glyph = $self->glyphByMap($map);
-    my $width = $self->data->{'wx'}->{$glyph};
+    my $width;
+    $width = $self->data->{'wx'}->{$glyph} if defined $glyph;
     $width //= $self->missingwidth();
     $width //= 300;
     return $width;
@@ -567,7 +570,7 @@ Return the width of $text as if it were at size 1.
 
 sub width {
     my ($self, $text) = @_;
-    $text = $self->strByUtf($text) if is_utf8($text);
+    $text = $self->strByUtf($text) if utf8::is_utf8($text);
 
     my @cache;
     my $width      = 0;
@@ -593,7 +596,7 @@ Return the widths of the words in $text as if they were at size 1.
 
 sub width_array {
     my ($self, $text) = @_;
-    $text = $self->utfByStr($text) unless is_utf8($text);
+    $text = $self->utfByStr($text) unless utf8::is_utf8($text);
     my @widths = map { $self->width($_) } split(/\s+/, $text);
     return @widths;
 }
@@ -638,7 +641,7 @@ Return a properly formatted representation of $text for use in the PDF.
 
 sub textByStr {
     my ($self, $string) = @_;
-    $string = $self->strByUtf($string) if is_utf8($string);
+    $string = $self->strByUtf($string) if utf8::is_utf8($string);
 
     my $text = $string;
     $text =~ s/\\/\\\\/go;
@@ -651,7 +654,7 @@ sub textByStrKern {
     my ($self, $string) = @_;
     return '(' . $self->textByStr($string) . ')' unless $self->{'-dokern'} and ref($self->data->{'kern'});
 
-    $string = $self->strByUtf($string) if is_utf8($string);
+    $string = $self->strByUtf($string) if utf8::is_utf8($string);
 
     my $text       = ' ';
     my $tBefore    = 0;

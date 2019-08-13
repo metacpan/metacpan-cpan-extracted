@@ -1,6 +1,6 @@
 {
     "name": "Acme-CPANAuthors-BackPAN-OneHundred",
-    "version": "1.11",
+    "version": "1.12",
     "abstract": "The CPAN Authors who have 100+ distributions on BackPAN",
     "author": [
         "Barbie (BARBIE) <barbie@cpan.org>"
@@ -44,7 +44,7 @@
     "provides": {
         "Acme::CPANAuthors::BackPAN::OneHundred": {
             "file": "lib/Acme/CPANAuthors/BackPAN/OneHundred.pm",
-            "version": "1.11"
+            "version": "1.12"
         }
     },
     "no_index": {

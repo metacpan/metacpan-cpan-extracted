@@ -1,17 +1,9 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest;
 use Test::More;
-use Test::NoWarnings;
-
-plan tests => 3 * @CALL_FUNCS * 3 + 1;
+use if -d ".git", "Test::FailWarnings";
 
 # The following snippets are copied from Cookbook.pod by hand.
 # Don't forget to update here when the pod is updated.
@@ -132,3 +124,5 @@ END_SQL
 		is $result->[1] => 1250;
 	}
 }
+
+done_testing;

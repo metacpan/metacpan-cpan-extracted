@@ -4,7 +4,7 @@ SemanticWeb::Schema - Moo classes for http://schema.org/ classes
 
 # VERSION
 
-version v3.8.1
+version v3.9.0
 
 # SYNOPSIS
 
@@ -25,11 +25,12 @@ print $person->json_ld;
 This is a base class for the `SemanticWeb::Schema` classes, which
 were generated automatically from the following sources:
 
-- [https://schema.org/version/3.8/ext-auto.rdf](https://schema.org/version/3.8/ext-auto.rdf)
-- [https://schema.org/version/3.8/ext-bib.rdf](https://schema.org/version/3.8/ext-bib.rdf)
-- [https://schema.org/version/3.8/ext-health-lifesci.rdf](https://schema.org/version/3.8/ext-health-lifesci.rdf)
-- [https://schema.org/version/3.8/ext-meta.rdf](https://schema.org/version/3.8/ext-meta.rdf)
-- [https://schema.org/version/3.8/schema.rdf](https://schema.org/version/3.8/schema.rdf)
+- [https://schema.org/version/3.9/ext-auto.rdf](https://schema.org/version/3.9/ext-auto.rdf)
+- [https://schema.org/version/3.9/ext-bib.rdf](https://schema.org/version/3.9/ext-bib.rdf)
+- [https://schema.org/version/3.9/ext-health-lifesci.rdf](https://schema.org/version/3.9/ext-health-lifesci.rdf)
+- [https://schema.org/version/3.9/ext-meta.rdf](https://schema.org/version/3.9/ext-meta.rdf)
+- [https://schema.org/version/3.9/ext-pending.rdf](https://schema.org/version/3.9/ext-pending.rdf)
+- [https://schema.org/version/3.9/schema.rdf](https://schema.org/version/3.9/schema.rdf)
 
 # ATTRIBUTES
 

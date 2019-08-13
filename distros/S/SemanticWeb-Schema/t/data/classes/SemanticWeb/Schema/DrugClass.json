@@ -12,10 +12,10 @@
          "rdfs:comment" : "Specifying a drug or medicine used in a medication procedure",
          "rdfs:label" : "drug",
          "schema:domainIncludes" : [
-            "schema:DrugClass",
-            "schema:TherapeuticProcedure",
             "schema:Patient",
-            "schema:MedicalCondition"
+            "schema:DrugClass",
+            "schema:MedicalCondition",
+            "schema:TherapeuticProcedure"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:Drug"

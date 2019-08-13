@@ -59,7 +59,7 @@ front-ends.
 
 F<runsmoke.pl> can use the configuration file created by
 F<configsmoke.pl>.  Other options can override the settings 
-from the configuration file. If the config-filename is ommited 
+from the configuration file. If the config-filename is omitted
 B<smokecurrent_config> is assumed.
 
 =item Overridable options

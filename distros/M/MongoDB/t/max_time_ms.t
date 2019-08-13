@@ -22,8 +22,16 @@ use MongoDB;
 
 use lib "t/lib";
 use MongoDBTest qw(
-  skip_unless_mongod build_client get_test_db server_type server_version
+  skip_unless_mongod
+  build_client
+  get_test_db
+  server_type
+  server_version
   skip_unless_failpoints_available
+  set_failpoint
+  clear_failpoint
+  check_min_server_version
+  skip_unless_min_version
 );
 
 skip_unless_mongod();
@@ -73,7 +81,7 @@ subtest "expected behaviors" => sub {
 
     SKIP: {
         skip "aggregate not available until MongoDB v2.2", 1
-            unless $server_version > v2.2.0;
+            if check_min_server_version($conn, 'v2.2.0');
 
         is(
             exception {
@@ -143,28 +151,10 @@ subtest "expected behaviors" => sub {
         "list_collections command with maxTimeMS works"
     );
 
-    subtest "parallel_scan" => sub { 
-        plan skip_all => "Parallel scan not supported before MongoDB 2.6"
-        unless $server_version >= v2.6.0;
-        plan skip_all => "Parallel scan not supported on mongos"
-        if $server_type eq 'Mongos';
-        plan skip_all => "Not supported on Atlas Free Tier"
-          if $ENV{ATLAS_PROXY};
-
-        is(
-            exception {
-                my $cursor = $coll->parallel_scan( 20, { maxTimeMS => 5000 } );
-            },
-            undef,
-            "parallel_scan command with maxTimeMS works"
-        );
-    };
-
 };
 
 subtest "force maxTimeMS failures" => sub {
-    plan skip_all => "maxTimeMS not available before 2.6"
-      unless $server_version >= v2.6.0;
+    skip_unless_min_version($conn, 'v2.6.0');
 
     # low batchSize to force multiple batches to get all docs
     my $cursor = $coll->find( {}, { batchSize => 5, maxTimeMS => 5000 } )->result;
@@ -172,8 +162,9 @@ subtest "force maxTimeMS failures" => sub {
 
     is(
         exception {
-            $admin->run_command(
-                [ configureFailPoint => 'maxTimeAlwaysTimeOut', mode => 'alwaysOn' ] );
+            set_failpoint(
+                $conn,
+                { configureFailPoint => 'maxTimeAlwaysTimeOut', mode => 'alwaysOn' } );
         },
         undef,
         "turned on maxTimeAlwaysTimeOut fail point"
@@ -216,7 +207,7 @@ subtest "force maxTimeMS failures" => sub {
 
     SKIP: {
         skip "aggregate not available until MongoDB v2.2", 1
-            unless $server_version > v2.2.0;
+            if check_min_server_version($conn, 'v2.2.0');
 
         like(
             exception {
@@ -286,21 +277,6 @@ subtest "force maxTimeMS failures" => sub {
         "list_collections command times out"
     );
 
-    subtest "parallel_scan" => sub { 
-        plan skip_all => "Parallel scan not supported before MongoDB 2.6"
-        unless $server_version >= v2.6.0;
-        plan skip_all => "Parallel scan not supported on mongos"
-        if $server_type eq 'Mongos';
-
-        like(
-            exception {
-                my $cursor = $coll->parallel_scan( 20, { maxTimeMS => 10 } );
-            },
-            qr/exceeded time limit/,
-            "parallel_scan command times out"
-        );
-    };
-
     subtest "max_time_ms via constructor" => sub {
         is(
             exception { my $doc = $coll->count_documents( {} ) },
@@ -336,7 +312,7 @@ subtest "force maxTimeMS failures" => sub {
 
         SKIP: {
             skip "aggregate not available until MongoDB v2.2", 1
-                unless $server_version > v2.2.0;
+                if check_min_server_version($conn, 'v2.2.0');
             is(
                 exception {
                     my $doc = $coll->aggregate(
@@ -401,8 +377,9 @@ subtest "force maxTimeMS failures" => sub {
 
     is(
         exception {
-            $admin->run_command(
-                [ configureFailPoint => 'maxTimeAlwaysTimeOut', mode => 'off' ] );
+            clear_failpoint(
+                $conn,
+                { configureFailPoint => 'maxTimeAlwaysTimeOut' } );
         },
         undef,
         "turned off maxTimeAlwaysTimeOut fail point"
@@ -410,17 +387,15 @@ subtest "force maxTimeMS failures" => sub {
 };
 
 subtest "create_many w/ maxTimeMS" => sub {
-    plan skip_all => "maxTimeMS not available before 3.6"
-      unless $server_version >= v3.6.0;
+    skip_unless_min_version($conn, 'v3.6.0');
 
     $coll->drop;
 
     is(
         exception {
-            $admin->run_command([
-                configureFailPoint => 'maxTimeAlwaysTimeOut',
-                mode => 'alwaysOn',
-            ]);
+            set_failpoint(
+                $conn,
+                { configureFailPoint => 'maxTimeAlwaysTimeOut', mode => 'alwaysOn' } );
         },
         undef,
         'max time failpoint on',
@@ -449,10 +424,9 @@ subtest "create_many w/ maxTimeMS" => sub {
 
     is(
         exception {
-            $admin->run_command([
-                configureFailPoint => 'maxTimeAlwaysTimeOut',
-                mode => 'off',
-            ]);
+            clear_failpoint(
+                $conn,
+                { configureFailPoint => 'maxTimeAlwaysTimeOut' } );
         },
         undef,
         'max time failpoint off',
@@ -471,17 +445,15 @@ subtest "create_many w/ maxTimeMS" => sub {
 };
 
 subtest "create_one w/ maxTimeMS" => sub {
-    plan skip_all => "maxTimeMS not available before 3.6"
-      unless $server_version >= v3.6.0;
+    skip_unless_min_version($conn, 'v3.6.0');
 
     $coll->drop;
 
     is(
         exception {
-            $admin->run_command([
-                configureFailPoint => 'maxTimeAlwaysTimeOut',
-                mode => 'alwaysOn',
-            ]);
+            set_failpoint(
+                $conn,
+                { configureFailPoint => 'maxTimeAlwaysTimeOut', mode => 'alwaysOn' } );
         },
         undef,
         'max time failpoint on',
@@ -505,10 +477,9 @@ subtest "create_one w/ maxTimeMS" => sub {
 
     is(
         exception {
-            $admin->run_command([
-                configureFailPoint => 'maxTimeAlwaysTimeOut',
-                mode => 'off',
-            ]);
+            clear_failpoint(
+                $conn,
+                { configureFailPoint => 'maxTimeAlwaysTimeOut' } );
         },
         undef,
         'max time failpoint off',
@@ -524,17 +495,15 @@ subtest "create_one w/ maxTimeMS" => sub {
 };
 
 subtest "drop_one w/ maxTimeMS" => sub {
-    plan skip_all => "maxTimeMS not available before 3.6"
-      unless $server_version >= v3.6.0;
+    skip_unless_min_version($conn, 'v3.6.0');
 
     $coll->drop;
 
     is(
         exception {
-            $admin->run_command([
-                configureFailPoint => 'maxTimeAlwaysTimeOut',
-                mode => 'alwaysOn',
-            ]);
+            set_failpoint(
+                $conn,
+                { configureFailPoint => 'maxTimeAlwaysTimeOut', mode => 'alwaysOn' } );
         },
         undef,
         'max time failpoint on',
@@ -560,10 +529,9 @@ subtest "drop_one w/ maxTimeMS" => sub {
 
     is(
         exception {
-            $admin->run_command([
-                configureFailPoint => 'maxTimeAlwaysTimeOut',
-                mode => 'off',
-            ]);
+          clear_failpoint(
+                $conn,
+                { configureFailPoint => 'maxTimeAlwaysTimeOut' } );
         },
         undef,
         'max time failpoint off',
@@ -580,17 +548,15 @@ subtest "drop_one w/ maxTimeMS" => sub {
 };
 
 subtest "drop_all w/ maxTimeMS" => sub {
-    plan skip_all => "maxTimeMS not available before 3.6"
-      unless $server_version >= v3.6.0;
+    skip_unless_min_version($conn, 'v3.6.0');
 
     $coll->drop;
 
     is(
         exception {
-            $admin->run_command([
-                configureFailPoint => 'maxTimeAlwaysTimeOut',
-                mode => 'alwaysOn',
-            ]);
+            set_failpoint(
+                $conn,
+                { configureFailPoint => 'maxTimeAlwaysTimeOut', mode => 'alwaysOn' } );
         },
         undef,
         'max time failpoint on',
@@ -616,10 +582,9 @@ subtest "drop_all w/ maxTimeMS" => sub {
 
     is(
         exception {
-            $admin->run_command([
-                configureFailPoint => 'maxTimeAlwaysTimeOut',
-                mode => 'off',
-            ]);
+            clear_failpoint(
+                $conn,
+                { configureFailPoint => 'maxTimeAlwaysTimeOut' } );
         },
         undef,
         'max time failpoint off',

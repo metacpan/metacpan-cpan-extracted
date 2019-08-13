@@ -9,6 +9,7 @@ t/assert_all_keys_in.t
 t/assert_aoh.t
 t/assert_arrayref.t
 t/assert_coderef.t
+t/assert_datetime.t
 t/assert_defined.t
 t/assert_empty.t
 t/assert_exists.t

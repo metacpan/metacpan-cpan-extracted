@@ -9,26 +9,26 @@
    "properties" : {
       "schema:amount" : {
          "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/1253",
-            "https://github.com/schemaorg/schemaorg/issues/1698"
+            "https://github.com/schemaorg/schemaorg/issues/1698",
+            "https://github.com/schemaorg/schemaorg/issues/1253"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The amount of money.",
          "rdfs:label" : "amount",
          "schema:category" : [
-            "issue-1253",
-            "issue-1698"
+            "issue-1698",
+            "issue-1253"
          ],
          "schema:domainIncludes" : [
             "schema:InvestmentOrDeposit",
             "schema:MonetaryGrant",
+            "schema:DatedMoneySpecification",
             "schema:LoanOrCredit",
-            "schema:MoneyTransfer",
-            "schema:DatedMoneySpecification"
+            "schema:MoneyTransfer"
          ],
          "schema:rangeIncludes" : [
-            "schema:Number",
-            "schema:MonetaryAmount"
+            "schema:MonetaryAmount",
+            "schema:Number"
          ]
       },
       "schema:currency" : {
@@ -38,11 +38,11 @@
          "rdfs:label" : "currency",
          "schema:category" : "issue-1253",
          "schema:domainIncludes" : [
+            "schema:MonetaryAmountDistribution",
             "schema:ExchangeRateSpecification",
             "schema:DatedMoneySpecification",
             "schema:LoanOrCredit",
-            "schema:MonetaryAmount",
-            "schema:MonetaryAmountDistribution"
+            "schema:MonetaryAmount"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -52,10 +52,10 @@
          "rdfs:label" : "endDate",
          "schema:domainIncludes" : [
             "schema:Role",
-            "schema:Event",
             "schema:DatedMoneySpecification",
-            "schema:CreativeWorkSeason",
-            "schema:CreativeWorkSeries"
+            "schema:CreativeWorkSeries",
+            "schema:Event",
+            "schema:CreativeWorkSeason"
          ],
          "schema:rangeIncludes" : [
             "schema:DateTime",
@@ -67,15 +67,15 @@
          "rdfs:comment" : "The start date and time of the item (in <a href=\"http://en.wikipedia.org/wiki/ISO_8601\">ISO 8601 date format</a>).",
          "rdfs:label" : "startDate",
          "schema:domainIncludes" : [
-            "schema:CreativeWorkSeries",
             "schema:CreativeWorkSeason",
-            "schema:DatedMoneySpecification",
+            "schema:CreativeWorkSeries",
+            "schema:Role",
             "schema:Event",
-            "schema:Role"
+            "schema:DatedMoneySpecification"
          ],
          "schema:rangeIncludes" : [
-            "schema:Date",
-            "schema:DateTime"
+            "schema:DateTime",
+            "schema:Date"
          ]
       }
    }

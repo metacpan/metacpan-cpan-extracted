@@ -2,7 +2,6 @@
 
 use 5.010;
 use strict;
-use experimental 'smartmatch';
 use warnings;
 use FindBin '$Bin';
 
@@ -27,8 +26,8 @@ my @kxlt2 = keys %$xlt2;
 
 say "Translations in $lang1 not found in $lang2:";
 my $found;
-for (@kxlt1) {
-    next if $_ ~~ @kxlt2;
+for my $k (@kxlt1) {
+    next if grep { $k eq $_ } @kxlt2;
     $found++;
     say "q[", backslash($_), "]";
 }

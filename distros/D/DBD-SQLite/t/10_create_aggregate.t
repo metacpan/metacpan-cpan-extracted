@@ -1,15 +1,9 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest qw/connect_ok @CALL_FUNCS/;
 use Test::More;
-use Test::NoWarnings;
+use if -d ".git", "Test::FailWarnings";
 use DBD::SQLite;
 use DBD::SQLite::Constants;
 
@@ -17,8 +11,6 @@ my @function_flags = (undef, 0);
 if ($DBD::SQLite::sqlite_version_number >= 3008003) {
   push @function_flags, DBD::SQLite::Constants::SQLITE_DETERMINISTIC;
 }
-
-plan tests => 21 * @CALL_FUNCS * @function_flags + 1;
 
 # Create the aggregate test packages
 SCOPE: {
@@ -94,7 +86,6 @@ foreach my $call_func (@CALL_FUNCS) { for my $flags (@function_flags) {
 	$result = $dbh->selectall_arrayref( "SELECT newcount() FROM aggr_test GROUP BY field" );
 	ok( @$result == 3 && $result->[0][0] == 1 && $result->[1][0] == 1 );
 
-
 	# Test aggregate on empty table
 	$dbh->do( "DROP TABLE aggr_empty_test;" );
 	$dbh->do( "CREATE TABLE aggr_empty_test ( field )" );
@@ -141,3 +132,5 @@ foreach my $call_func (@CALL_FUNCS) { for my $flags (@function_flags) {
 
 	$dbh->disconnect;
 }}
+
+done_testing;

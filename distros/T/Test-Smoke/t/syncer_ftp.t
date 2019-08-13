@@ -1,7 +1,6 @@
 #! /usr/bin/perl -w
 use strict;
 
-# $Id$
 ##### syncer_ftp.t
 #
 # Here we try to test the actual syncing process from a snapshot
@@ -10,7 +9,7 @@ use strict;
 # For this there is the 't/ftppub' directory with:
 #     't/ftppub/snap' contains two fake snapshots (with files)
 #     't/ftppub/perl-current-diffs' contains a few fake diffs
-# Now that we have controlable FTP (if you have Net::FTP), 
+# Now that we have controlable FTP (if you have Net::FTP),
 # we can concentrate on doing the untargz and patch stuff
 #
 #####
@@ -20,12 +19,13 @@ BEGIN { $findbin = dirname $0; }
 use lib $findbin;
 use TestLib;
 use File::Spec;
+use File::Temp 'tempdir';
 
 use Test::More;
 
 BEGIN {
     eval { require Net::FTP; };
-    $@ and plan( skip_all => "No 'Net::FTP' found!\n" . 
+    $@ and plan( skip_all => "No 'Net::FTP' found!\n" .
                              "!!!You will not be able to smoke from " .
                              "snapshots without it!!!" );
     plan tests => 7;
@@ -41,12 +41,12 @@ sub Net::FTP::new { bless {}, 'Net::FTP' }
 sub Net::FTP::login { return 1 }
 sub Net::FTP::binary { return 1 }
 sub Net::FTP::quit {return 1 }
-sub Net::FTP::cwd { 
+sub Net::FTP::cwd {
     my $self = shift;
     ( my $dir = shift ) =~ s|^.*/||;
     $self->{cwd} = File::Spec->catdir( 't', 'ftppub', $dir );
 }
-sub Net::FTP::ls { 
+sub Net::FTP::ls {
     my $self = shift;
     local *DLDIR;
     opendir DLDIR, $self->{cwd} or return ( );
@@ -87,6 +87,8 @@ require Test::Smoke::Patcher; # for testing only
 use_ok( 'Test::Smoke::Syncer' );
 
 my $patch = find_a_patch();
+my $tmpdir = tempdir(CLEANUP => ($ENV{SMOKE_DEBUG} ? 0 : 1));
+
 SKIP: { # Here we try for 'Archive::Tar'/'Compress::Zlib'
 
     eval { require Archive::Tar; };
@@ -95,15 +97,18 @@ SKIP: { # Here we try for 'Archive::Tar'/'Compress::Zlib'
     eval { require Compress::Zlib; };
     $@ and skip "Can't load 'Compress::Zlib'", 3;
 
-    my $syncer = Test::Smoke::Syncer->new( snapshot => { v => $verbose,
-        ddir     => File::Spec->catdir( 't', 'perl-current' ),
-        sdir     => '/t/snap',
-        tar      => 'Archive::Tar',
-        unzip    => 'Compress::Zlib',
-        snapext  => 'tgz',
-        cleanup  => 3,
-        patchbin => $patch,
-    } );
+    my $syncer = Test::Smoke::Syncer->new(
+        snapshot => {
+            v        => $verbose,
+            ddir     => File::Spec->catdir($tmpdir, 'perl-current'),
+            sdir     => '/t/snap',
+            tar      => 'Archive::Tar',
+            unzip    => 'Compress::Zlib',
+            snapext  => 'tgz',
+            cleanup  => 3,
+            patchbin => $patch,
+        }
+    );
 
     isa_ok( $syncer, 'Test::Smoke::Syncer::Snapshot' );
 
@@ -131,15 +136,18 @@ SKIP: { # Here we try for gzip/tar
     $gzip = whereis( 'gunzip' ) unless $gzip;
     $gzip = whereis( 'zcat' ) unless $gzip;
 
-    my $syncer = Test::Smoke::Syncer->new( snapshot => { v => $verbose,
-        ddir     => File::Spec->catdir( 't', 'perl-current' ),
-        sdir     => '/t/snap',
-        tar      => $unpack,
-        unzip    => $gzip,
-        snapext  => 'tgz',
-        cleanup  => 3,
-        patchbin => $patch,
-    } );
+    my $syncer = Test::Smoke::Syncer->new(
+        snapshot => {
+            v        => $verbose,
+            ddir     => File::Spec->catdir($tmpdir, 'perl-current'),
+            sdir     => '/t/snap',
+            tar      => $unpack,
+            unzip    => $gzip,
+            snapext  => 'tgz',
+            cleanup  => 3,
+            patchbin => $patch,
+        }
+    );
 
     isa_ok( $syncer, 'Test::Smoke::Syncer::Snapshot' );
 
@@ -154,11 +162,4 @@ SKIP: { # Here we try for gzip/tar
 
     is( $plevel2, 20005, "A patched snapshot $plevel2 by $syncer->{unzip}" );
 
-}
-
-END { # Cleanup testfiles!
-    my $snapshot = File::Spec->catfile( 't', "perl\@20000.tgz" );
-    1 while unlink $snapshot;
-
-    rmtree( File::Spec->catdir( 't', 'perl-current' ) );
 }

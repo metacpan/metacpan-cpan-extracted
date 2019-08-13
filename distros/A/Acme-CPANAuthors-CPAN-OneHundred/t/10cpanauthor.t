@@ -8,7 +8,7 @@ plan skip_all => "can't load Acme::CPANAuthors"
 plan tests => 9;
 
 my $authors  = eval { Acme::CPANAuthors->new("CPAN::OneHundred") };
-is( $@, "", "creating a new Acme::CPANAuthors object with InMemoriam authors" );
+is( $@, "", "creating a new Acme::CPANAuthors object with CPAN 100 authors" );
 isa_ok( $authors, "Acme::CPANAuthors" );
 
 my $number = 41;

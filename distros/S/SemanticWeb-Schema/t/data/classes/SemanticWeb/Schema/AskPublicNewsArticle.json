@@ -1,0 +1,15 @@
+{
+   "class" : {
+      "dc:source" : [
+         "https://github.com/schemaorg/schemaorg/issues/1525",
+         "schemadotorgsources2:TP"
+      ],
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A <a class=\"localLink\" href=\"http://schema.org/NewsArticle\">NewsArticle</a> expressing an open call by a <a class=\"localLink\" href=\"http://schema.org/NewsMediaOrganization\">NewsMediaOrganization</a> asking the public for input, insights, clarifications, anecdotes, documentation, etc., on an issue, for reporting purposes.",
+      "rdfs:label" : "AskPublicNewsArticle",
+      "rdfs:subClassOf" : "schema:NewsArticle",
+      "schema:category" : "issue-1525",
+      "schema:isPartOf" : "http:pending.schema.org"
+   },
+   "properties" : {}
+}

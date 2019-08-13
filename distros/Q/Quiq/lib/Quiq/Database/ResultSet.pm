@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.153';
+our $VERSION = '1.154';
 
 use Quiq::Object;
 use Time::HiRes ();
@@ -816,8 +816,9 @@ sub asTable {
     # Statement
 
     if ($info >= 3 && (my $stmt = $self->stmt)) {
-        $str .= sprintf "%s\n\n%s\n\n",$stmt,
-            '-' x Quiq::String->maxLineLength($stmt);
+        #$str .= sprintf "%s\n\n%s\n\n",$stmt,
+        #    '-' x Quiq::String->maxLineLength($stmt);
+        $str .= sprintf "%s\n\n",$stmt;
     }
     my @titles = $self->titles;
     if ($info >= 2) {
@@ -962,7 +963,7 @@ sub diffReport {
 
 =head1 VERSION
 
-1.153
+1.154
 
 =head1 AUTHOR
 

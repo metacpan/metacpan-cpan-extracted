@@ -6,7 +6,7 @@ package BSON::Time;
 # ABSTRACT: BSON type wrapper for date and time
 
 use version;
-our $VERSION = 'v1.12.0';
+our $VERSION = 'v1.12.1';
 
 use Carp qw/croak/;
 use Config;
@@ -266,7 +266,7 @@ BSON::Time - BSON type wrapper for date and time
 
 =head1 VERSION
 
-version v1.12.0
+version v1.12.1
 
 =head1 SYNOPSIS
 

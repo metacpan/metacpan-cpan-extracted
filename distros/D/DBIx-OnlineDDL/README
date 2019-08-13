@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.91
+    version 0.92
 
 SYNOPSIS
 
@@ -492,7 +492,7 @@ AUTHOR
 
 LICENSE AND COPYRIGHT
 
-    Copyright 2018 Grant Street Group
+    Copyright 2019 Grant Street Group
 
     This program is free software; you can redistribute it and/or modify it
     under the terms of the the Artistic License (2.0). You may obtain a

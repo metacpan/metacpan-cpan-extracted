@@ -127,9 +127,9 @@ sub _unlink_if_exists {
 
     local ( $!, $^E );
 
-    eval { unlink $path };
-
-    die if $@ && $@->errno() != Errno::ENOENT();
+    eval { unlink $path; 1 } or do {
+        die if $@->errno() != Errno::ENOENT();
+    };
 
     $@ = $eval_err;
 

@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.8.1';
+our $VERSION = 'v3.9.0';
 
 
 has additional_name => (
@@ -218,6 +218,14 @@ has global_location_number => (
 
 
 
+has has_credential => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'hasCredential',
+);
+
+
+
 has has_occupation => (
     is        => 'rw',
     predicate => 1,
@@ -282,10 +290,34 @@ has isic_v4 => (
 
 
 
+has job_title => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'jobTitle',
+);
+
+
+
 has knows => (
     is        => 'rw',
     predicate => 1,
     json_ld   => 'knows',
+);
+
+
+
+has knows_about => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'knowsAbout',
+);
+
+
+
+has knows_language => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'knowsLanguage',
 );
 
 
@@ -482,7 +514,7 @@ SemanticWeb::Schema::Person - A person (alive
 
 =head1 VERSION
 
-version v3.8.1
+version v3.9.0
 
 =head1 DESCRIPTION
 
@@ -837,6 +869,20 @@ A global_location_number should be one of the following types:
 
 =back
 
+=head2 C<has_credential>
+
+C<hasCredential>
+
+A credential awarded to the Person or Organization.
+
+A has_credential should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::EducationalOccupationalCredential']>
+
+=back
+
 =head2 C<has_occupation>
 
 C<hasOccupation>
@@ -955,6 +1001,22 @@ A isic_v4 should be one of the following types:
 
 =back
 
+=head2 C<job_title>
+
+C<jobTitle>
+
+The job title of the person (for example, Financial Manager).
+
+A job_title should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::DefinedTerm']>
+
+=item C<Str>
+
+=back
+
 =head2 C<knows>
 
 The most generic bi-directional social/work relation.
@@ -964,6 +1026,49 @@ A knows should be one of the following types:
 =over
 
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
+
+=back
+
+=head2 C<knows_about>
+
+C<knowsAbout>
+
+=for html Of a <a class="localLink" href="http://schema.org/Person">Person</a>, and
+less typically of an <a class="localLink"
+href="http://schema.org/Organization">Organization</a>, to indicate a topic
+that is known about - suggesting possible expertise but not implying it. We
+do not distinguish skill levels here, or relate this to educational
+content, events, objectives or <a class="localLink"
+href="http://schema.org/JobPosting">JobPosting</a> descriptions.
+
+A knows_about should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::Thing']>
+
+=item C<Str>
+
+=back
+
+=head2 C<knows_language>
+
+C<knowsLanguage>
+
+=for html Of a <a class="localLink" href="http://schema.org/Person">Person</a>, and
+less typically of an <a class="localLink"
+href="http://schema.org/Organization">Organization</a>, to indicate a known
+language. We do not distinguish skill levels or
+reading/writing/speaking/signing here. Use language codes from the <a
+href="http://tools.ietf.org/html/bcp47">IETF BCP 47 standard</a>.
+
+A knows_language should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::Language']>
+
+=item C<Str>
 
 =back
 

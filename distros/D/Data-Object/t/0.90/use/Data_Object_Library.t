@@ -21,9 +21,10 @@ Data-Object Library Configuration
 
 =description
 
-Data::Object::Library is a L<Type::Tiny> type library that extends the
-L<Types::Standard>, L<Types::Common::Numeric>, and L<Types::Common::String>
-libraries and adds type constraints and coercions for L<Data::Object> objects.
+Data::Object::Library is a L<Type::Tiny> type library (L<Type::Library>) which
+extends the L<Types::Standard>, L<Types::Common::Numeric>, and
+L<Types::Common::String> libraries, and adds type constraints and coercions for
+L<Data::Object> objects.
 
 =cut
 

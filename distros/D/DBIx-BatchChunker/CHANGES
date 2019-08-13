@@ -6,6 +6,11 @@ Home page:       <https://metacpan.org/release/DBIx-BatchChunker>
 Bug tracker:     <https://github.com/GrantStreetGroup/DBIx-BatchChunker/issues>
 Maintainer:      Grant Street Group <developers@grantstreet.com>
 
+0.94        2019-08-06
+
+    - Change boolean $rs calls to "defined $rs"
+    - Use MooX::StrictConstructor to prevent attribute misspellings
+
 0.93        2018-12-27
 
     - Change target_time default from 15 to 5 seconds

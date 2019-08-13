@@ -1,0 +1,65 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Mario Zieschang <mziescha@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Geoffrey",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBD::SQLite" : "1.4",
+            "DBI" : "1.632",
+            "Exception::Class" : "0",
+            "File::Slurp" : "9999.19",
+            "File::Spec" : "0",
+            "Hash::MD5" : "0.08",
+            "Perl::Version" : "0",
+            "Readonly" : "0",
+            "Ref::Util" : "0",
+            "SQL::Abstract" : "0",
+            "Test::Builder" : "0",
+            "Test::Exception" : "0",
+            "Time::Piece" : "1.27",
+            "perl" : "5.010000"
+         }
+      },
+      "test" : {
+         "requires" : {}
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://gitlab.com/GeoffreyDB/Geoffrey.git",
+         "web" : "https://gitlab.com/GeoffreyDB/Geoffrey"
+      }
+   },
+   "version" : "0.000101",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

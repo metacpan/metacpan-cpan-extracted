@@ -401,7 +401,7 @@ sqlite_db_login6(SV *dbh, imp_dbh_t *imp_dbh, char *dbname, char *user, char *pa
 {
     dTHX;
     int rc;
-    HV *hv;
+    HV *hv = NULL;
     SV **val;
     int extended = 0;
     int flag = 0;
@@ -459,11 +459,12 @@ sqlite_db_login6(SV *dbh, imp_dbh_t *imp_dbh, char *dbname, char *user, char *pa
 
     sqlite3_busy_timeout(imp_dbh->db, SQL_TIMEOUT);
 
-    if (hv) {
+    if (SvROK(attr)) {
+        hv = (HV*)SvRV(attr);
         if (hv_exists(hv, "sqlite_defensive", 16)) {
             val = hv_fetch(hv, "sqlite_defensive", 16, 0);
             if (val && SvIOK(*val)) {
-                sqlite3_db_config(imp_dbh->db, SQLITE_DBCONFIG_DEFENSIVE, SvIV(*val), 0);
+                sqlite3_db_config(imp_dbh->db, SQLITE_DBCONFIG_DEFENSIVE, (int)SvIV(*val), 0);
             }
         }
     }
@@ -2787,6 +2788,10 @@ sqlite_db_config(pTHX_ SV *dbh, int id, int new_value)
         case SQLITE_DBCONFIG_TRIGGER_EQP:
         case SQLITE_DBCONFIG_RESET_DATABASE:
         case SQLITE_DBCONFIG_DEFENSIVE:
+        case SQLITE_DBCONFIG_WRITABLE_SCHEMA:
+        case SQLITE_DBCONFIG_LEGACY_ALTER_TABLE:
+        case SQLITE_DBCONFIG_DQS_DML:
+        case SQLITE_DBCONFIG_DQS_DDL:
             rc = sqlite3_db_config(imp_dbh->db, id, new_value, &ret);
             break;
         default:
@@ -2798,6 +2803,13 @@ sqlite_db_config(pTHX_ SV *dbh, int id, int new_value)
         return FALSE;
     }
     return ret;
+}
+
+int
+sqlite_db_get_autocommit(pTHX_ SV *dbh)
+{
+    D_imp_dbh(dbh);
+    return sqlite3_get_autocommit(imp_dbh->db);
 }
 
 #include "dbdimp_tokenizer.inc"

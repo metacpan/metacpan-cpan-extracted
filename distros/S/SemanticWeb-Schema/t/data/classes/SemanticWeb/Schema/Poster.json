@@ -1,0 +1,12 @@
+{
+   "class" : {
+      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1448",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A large, usually printed placard, bill, or announcement, often illustrated, that is posted to advertise or publicize something.",
+      "rdfs:label" : "Poster",
+      "rdfs:subClassOf" : "schema:CreativeWork",
+      "schema:category" : "issue-1448",
+      "schema:isPartOf" : "http:pending.schema.org"
+   },
+   "properties" : {}
+}

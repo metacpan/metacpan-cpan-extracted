@@ -1,14 +1,10 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
+no if $] >= 5.022, "warnings", "locale";
 use lib "t/lib";
 use SQLiteTest;
-use Test::More tests => 2;
+use Test::More;
+use if -d ".git", "Test::FailWarnings";
 use DBI;
 
 my $dbh = connect_ok(RaiseError => 1, PrintError => 0);
@@ -37,3 +33,5 @@ eval {
   $dbh->do('CREATE VIRTUAL TABLE FIXMESSAGE USING FTS3(MESSAGE, tokenize=perl, "main::locale_tokenizer");');
 };
 ok $@, "cause an error but not segfault";
+
+done_testing;

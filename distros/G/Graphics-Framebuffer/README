@@ -105,7 +105,8 @@ Some lower clocked ARM devices may be too slow for practical use of all of the
 methods in this module, but the best way to find out is to run
 'examples/primitives.pl' to see which are fast enough to use.
 
-Here's what I have tested this module on (all 1920x1080x32):
+Here's what I have tested this module on (all 1920x1080x32, unless otherwise
+noted):
 
 Raspberry PI2/3 - Tollerable, I did 16 bit mode testing and coding on this
                 - machine.  Using a Perlbrew custom compiled Perl helps a bit.
@@ -144,11 +145,30 @@ NVidia 970 Ti   - In addition, 3840x2160x32 (4K) is surprisingly fast.  Who'd
 
 Windows 10 PC   - This is how I found out that the Nouveau driver is very poor
 Native with     - when handling a framebuffer.  It's actually disgraceful at
-4GHx 6 core i7  - how bad and how slow it really is.  It doesn't appear to be
+4GHz 6 core i7  - how bad and how slow it really is.  It doesn't appear to be
 CPU and two     - using any DMA for the memory copy of the framebuffer, but
 Nvidia 1080Ti's - CPU itself for transfers.  Running Virtual Box on Windows
                 = is much faster than running Linux natively with the 
                 - Nouveau framebuffer drivers!  Sad, really sad.
+
+If you want specific screen formats supported that are not 16/24/32 bit color,
+then it may be advantageous to consider loaning me the display module you want
+to display on.  I have the following platforms to test it on (whichever is
+compatible with your display):
+
+  *  Raspberry Pi2 & Pi3 (compatible with the first Pi)
+  *  Odroid XU3 and XU4
+  *  NVidia Jetson-Nano (Tegra CPU/GPU)
+  *  Intel i7 CPU Linux PC
+
+I won't need to borrow it long, as I will just need to write a conversion
+routine in C to map output to the display.  That way, once that is working, I
+can get a good idea of how to display it, if that routine works.
+
+If you want vintage computer compatibility, like Atari or something similar,
+then all I can do is emulate it.  YOU will have to supply me with the OS image
+with Perl on it to boot it with.  I do not think MultiTOS has a framebuffer
+device, but if it does, it may work.  Otherwise 68K linux is your only option.
 
 SUPPORT AND DOCUMENTATION
 

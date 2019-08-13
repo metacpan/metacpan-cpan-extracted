@@ -1,29 +1,15 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest;
 use Test::More;
 
 BEGIN {
-	use DBD::SQLite;
-	unless ($DBD::SQLite::sqlite_version_number && $DBD::SQLite::sqlite_version_number >= 3006006) {
-		plan skip_all => "this test requires SQLite 3.6.6 and newer";
-		exit;
-	}
-	if (!grep /^ENABLE_FTS3/, DBD::SQLite::compile_options()) {
-		plan skip_all => "FTS3 is disabled for this DBD::SQLite";
-	}
+	requires_sqlite('3.6.6');
+	plan skip_all => "FTS is disabled for this DBD::SQLite" unless has_fts();
 }
 
-use Test::NoWarnings;
-
-plan tests => 6;
+use if -d ".git", "Test::FailWarnings";
 
 my $dbh = connect_ok( RaiseError => 1, AutoCommit => 0 );
 
@@ -60,3 +46,5 @@ sub insert_data {
 	$sth->execute($inc_num, $text) || die "execute failed\n";
 	$dbh->commit;
 }
+
+done_testing;

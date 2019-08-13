@@ -1,20 +1,12 @@
-#!/usr/bin/perl
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest qw/connect_ok $sqlite_call/;
 use Test::More;
-use Test::NoWarnings;
+use if -d ".git", "Test::FailWarnings";
 use FindBin;
 
 plan skip_all => "\$FindBin::Bin points to a nonexistent path for some reason: $FindBin::Bin" if !-d $FindBin::Bin;
-
-plan tests => 13;
 
 my $dbh = connect_ok( RaiseError => 1, PrintError => 0, AutoCommit => 1 );
 
@@ -28,12 +20,10 @@ $dbh->do(<<"");
 $dbh->do(<<"");
   INSERT INTO base VALUES(2, 'foo2', '10_filecontent.t', 'bar2')
 
-
 # start tests
 
 ok $dbh->$sqlite_call(create_module => fs => "DBD::SQLite::VirtualTable::FileContent"),
    "create_module";
-
 
 ok $dbh->do(<<""), "create vtable";
   CREATE VIRTUAL TABLE vfs USING fs(source = base,
@@ -57,9 +47,9 @@ is_deeply([sort keys %{$rows->[0]}], [qw/bar content foo path/], "col list OK");
 is $rows->[0]{bar},   'bar1', 'got bar1';
 is $rows->[1]{bar},   'bar2', 'got bar2';
 
-
 # expensive  request (reads content from  all files in table) !
 $sql  = "SELECT * FROM vfs WHERE content LIKE '%filesys%'";
 $rows = $dbh->selectall_arrayref($sql, {Slice => {}});
 is scalar(@$rows), 1, "got 1 row";
 
+done_testing;

@@ -15,10 +15,8 @@ my $log = Mojo::Log->with_roles('Mojo::Log::Role::AttachLogger')->new
 
 foreach my $level (@levels) {
   @log = ();
-  
   $log->$level('test', 'message');
-  
-  ok +(grep { m/\[\Q$level\E\] test\nmessage$/m } @log), "$level log message"
+  ok +(grep { m/^\[\Q$level\E\] test\nmessage$/m } @log), "$level log message"
     or diag dumper \@log;
 }
 

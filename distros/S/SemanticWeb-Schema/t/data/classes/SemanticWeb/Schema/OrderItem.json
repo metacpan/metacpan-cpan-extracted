@@ -11,8 +11,8 @@
          "rdfs:comment" : "The delivery of the parcel related to this order or order item.",
          "rdfs:label" : "orderDelivery",
          "schema:domainIncludes" : [
-            "schema:Order",
-            "schema:OrderItem"
+            "schema:OrderItem",
+            "schema:Order"
          ],
          "schema:rangeIncludes" : "schema:ParcelDelivery"
       },
@@ -42,13 +42,13 @@
          "rdfs:comment" : "The item ordered.",
          "rdfs:label" : "orderedItem",
          "schema:domainIncludes" : [
-            "schema:OrderItem",
-            "schema:Order"
+            "schema:Order",
+            "schema:OrderItem"
          ],
          "schema:rangeIncludes" : [
-            "schema:Service",
             "schema:Product",
-            "schema:OrderItem"
+            "schema:OrderItem",
+            "schema:Service"
          ]
       }
    }

@@ -16,15 +16,16 @@ Makefile.PL
 MANIFEST			This list of files
 README
 t/00-load.t
-t/10-test1.t
-t/20-test2.t
-t/30-test3.t
-t/40-test4.t
-t/50-test5.t
-t/60-test6.t
-t/70-test7.t
-t/80-test8.t
-t/90-test9.t
+t/01-test1.t
+t/02-test2.t
+t/03-test3.t
+t/04-test4.t
+t/05-test5.t
+t/06-test6.t
+t/07-test7.t
+t/08-test8.t
+t/09-test9.t
+t/10-test10.t
 t/etc/cli-driver.yml
 t/lib/CLI/Driver/Test.pm
 t/lib/CLI/Driver/Test2.pm

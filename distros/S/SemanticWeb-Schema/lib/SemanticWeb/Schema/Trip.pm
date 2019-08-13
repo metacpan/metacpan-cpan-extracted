@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.8.1';
+our $VERSION = 'v3.9.0';
 
 
 has arrival_time => (
@@ -34,6 +34,14 @@ has departure_time => (
 
 
 
+has itinerary => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'itinerary',
+);
+
+
+
 has offers => (
     is        => 'rw',
     predicate => 1,
@@ -42,10 +50,26 @@ has offers => (
 
 
 
+has part_of_trip => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'partOfTrip',
+);
+
+
+
 has provider => (
     is        => 'rw',
     predicate => 1,
     json_ld   => 'provider',
+);
+
+
+
+has sub_trip => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'subTrip',
 );
 
 
@@ -66,7 +90,7 @@ SemanticWeb::Schema::Trip - A trip or journey
 
 =head1 VERSION
 
-version v3.8.1
+version v3.9.0
 
 =head1 DESCRIPTION
 
@@ -102,6 +126,24 @@ A departure_time should be one of the following types:
 
 =back
 
+=head2 C<itinerary>
+
+=for html Destination(s) ( <a class="localLink"
+href="http://schema.org/Place">Place</a> ) that make up a trip. For a trip
+where destination order is important use <a class="localLink"
+href="http://schema.org/ItemList">ItemList</a> to specify that order (see
+examples).
+
+A itinerary should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::ItemList']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Place']>
+
+=back
+
 =head2 C<offers>
 
 An offer to provide this item&#x2014;for example, an offer to sell a
@@ -113,6 +155,22 @@ A offers should be one of the following types:
 =over
 
 =item C<InstanceOf['SemanticWeb::Schema::Offer']>
+
+=back
+
+=head2 C<part_of_trip>
+
+C<partOfTrip>
+
+=for html Identifies that this <a class="localLink"
+href="http://schema.org/Trip">Trip</a> is a subTrip of another Trip. For
+example Day 1, Day 2, etc. of a multi-day trip.
+
+A part_of_trip should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::Trip']>
 
 =back
 
@@ -129,6 +187,22 @@ A provider should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Organization']>
 
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
+
+=back
+
+=head2 C<sub_trip>
+
+C<subTrip>
+
+=for html Identifies a <a class="localLink" href="http://schema.org/Trip">Trip</a>
+that is a subTrip of this Trip. For example Day 1, Day 2, etc. of a
+multi-day trip.
+
+A sub_trip should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::Trip']>
 
 =back
 

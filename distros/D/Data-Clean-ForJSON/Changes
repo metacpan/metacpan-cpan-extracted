@@ -1,0 +1,297 @@
+0.392   2019-08-08  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename module Data::Clean::JSON -> Data::Clean::ForJSON to be clearer.
+	  Rename dist from Data-Clean-JSON to Data-Clean-ForJSON.
+
+
+0.391   2018-10-09  Released-By: PERLANCAR
+
+	- No functional changes.
+
+	- [doc] Explain more about cloning circular references.
+
+
+0.390   2018-10-09  Released-By: PERLANCAR
+
+        - Bump prereq version Data::Clean to 0.500, which replaces cloning
+          module of choice from Data::Clone to Sereal::Dclone because the former
+          croaks on JSON::PP::Boolean (scalar-ref) objects.
+
+        - [Incompatible change] Data::Clean::JSON: flatten JSON::PP::Boolean
+          objects to 1/0 to prevent problem with some clone modules.
+
+        - [test] Add tests with various clone modules.
+
+
+0.38    2017-01-15  Released-By: PERLANCAR
+
+	- [dist] Force update Data::Clean to 0.48.
+
+
+0.37    2016-09-28  Released-By: PERLANCAR
+
+	- Convert bigints (Math::BigInt objects) into strings.
+
+
+0.36    2016-05-27  Released-By: PERLANCAR
+
+        - Introduce shortcut non-OO functions: clean_json_in_place,
+          clone_and_clean_json.
+
+
+0.35    2016-05-21  Released-By: PERLANCAR
+
+        - [Bugfix] Previous release did not correctly set recurse object option,
+          the correct option is !recurse_obj (wrong Data::Clean documentation).
+
+        - [dist] Bump prereq version Data::Clean to 0.35.
+
+
+0.34    2016-05-21  Released-By: PERLANCAR
+
+	- [Incompatible change] By default now recurses into object (see
+	  !recurse_object option in Data::Clean documentation).
+
+
+0.33    2016-04-14  Released-By: PERLANCAR
+
+	- Split Data::Clean::Base to its own dist as Data::Clean, rebase on
+	  Data::Clean.
+
+
+0.32    2016-03-30  Released-By: PERLANCAR
+
+	- Avoid perl undef warning because Scalar::Util::reftype() might
+	  return undef.
+
+
+0.31    2016-03-30  Released-By: PERLANCAR
+
+	- Introduce option "!recurse_obj" to recurse into hash-/array-based
+	  objects.
+
+
+0.30    2016-03-09  Released-By: PERLANCAR
+
+	- Remove usage of JSON module in test, handle
+	  Cpanel::JSON::XS::Boolean.
+
+
+0.29    2016-01-20  Released-By: PERLANCAR
+
+	- Stringify version objects.
+
+	- [Bugfix] Stringifying Regexp erroneously becomes literal 'Regexp'
+	  instead of its stringified value because we generate a new 'if'
+	  clause when it should be 'elsif'.
+
+	- Bump prereq version Log::Any::IfLOG to 0.07.
+
+
+0.28    2015-06-10  Released-By: PERLANCAR
+
+	- No functional changes.
+
+	- Mention Data::Abridge.
+
+
+0.27    2015-06-08  Released-By: PERLANCAR
+
+        - No functional changes.
+
+        - Re-release to show up in MetaCPAN index.
+
+
+0.26    2015-05-23  Released-By: PERLANCAR
+
+        - No functional changes.
+
+        - [Bugfix] Don't assume Scalar::Util's blessed has been imported.
+
+
+0.25    2015-05-23  Released-By: PERLANCAR
+
+        - Put generated cleanser code in 'src', for other tools that might need
+          it (e.g. Perinci::CmdLine::Inline).
+
+
+0.24    2015-03-26  Released-By: PERLANCAR
+
+        - Change the default clone limit from 50 to 1, as this is now the more
+          sensible default now that the previous release has fixed clone limit
+          counting for converted objects.
+
+
+0.23    2015-03-26  Released-By: PERLANCAR
+
+        - Don't count object converted into non-ref into clone limit. This
+          solves the problem of only a few DateTime/Time::Moment/other objects
+          being converted into timestamps (if they happen to be referenced twice
+          or more in the data structure, triggering the circular check and
+          quickly hitting the clone limit), because even after each object is
+          converted into a non-ref value, the old ref is still counted. The new
+          release now compares the ref() of the new converted value when doing
+          circular check.
+
+
+0.22    2015-03-26  Released-By: PERLANCAR
+
+	- Convert Time::Moment objects like DateTime objects (convert them
+	  to epoch value), BTW the fallback unbless routine in
+	  Function::Fallback::CoreOrPP seems to have a problem in
+	  unblessing Time::Moment objects, but it doesn't have a problem
+	  unblessing other blessed scalar refs.
+
+
+0.21    2015-03-26  Released-By: PERLANCAR
+
+	- No functional changes.
+
+	- Replace Log::Any with Log::Any::IfLOG.
+
+
+0.20    2014-12-10  Released-By: PERLANCAR
+
+	- No functional changes.
+
+	- Use new name of renamed/split module SHARYANTO::String::Util ->
+	  String::LineNumber & String::PerlQuote.
+
+
+0.19    2014-11-13  Released-By: PERLANCAR
+
+	- Avoid perl undef warning & syntax error in generated code [CT].
+
+
+0.18    2014-11-12  Released-By: PERLANCAR
+
+	- No functional changes.
+
+	- Make Acme::Damn and Data::Clone optional prereqs [#98887].
+
+
+0.17    2014-11-07  Released-By: PERLANCAR
+
+	- Remove unneeded dep.
+
+
+0.16     2014-04-10  Released-By: SHARYANTO
+
+         - No functional changes.
+
+         - Replace Acme::Damn and Data::Clone with Function::Fallback::CoreOrPP.
+
+
+0.15     2014-02-13  Released-By: SHARYANTO
+
+         [INCOMPATIBLE CHANGES]
+
+         - Default command for circular is changed from
+           [replace_with_ref=>'CIRCULAR'] to ['clone']. I believe this is more
+           useful for common cases, e.g. when $ref is [1] then {a=>$ref,
+           b=>$ref} will become {a=>[1], b=>[1]} instead of {a=>[1],
+           b=>'CIRCULAR'}.
+
+
+0.14     2014-02-13  Released-By: SHARYANTO
+
+         [ENHANCEMENTS]
+
+         - Add command: clone (for -circular).
+
+
+0.13     2013-10-31  Released-By: SHARYANTO
+
+         [ENHANCEMENTS]
+
+         - Allow opt '' to process non-references (e.g. numbers, strings, other
+           simple scalars).
+
+
+0.12     2013-10-31  Released-By: SHARYANTO
+
+         - No functional changes.
+
+         - Add some more tests.
+
+         [BUG FIXES]
+
+         - Properly quote string in 'replace_with_str' command.
+
+         [SECURITY]
+
+         - Check syntax of function and method name in 'call_func' and
+           'call_method'.
+
+
+0.11     2013-10-15  Released-By: SHARYANTO
+
+         - Introduce get_cleanser() to get singleton instance.
+
+
+0.10     2013-10-14  Released-By: SHARYANTO
+
+         - Split functionality of JSON::{PP,XS}::Boolean handling to
+           Data::Clean::FromJSON.
+
+
+0.09     2013-10-14  Released-By: SHARYANTO
+
+         - No functional changes. Revert back some code.
+
+
+0.08     2013-10-14 (SHARYANTO) - Get well soon, dad!
+
+         - Handle JSON::{XS,PP}::Boolean objects (convert to 1/0).
+
+
+0.07     2013-09-11  Released-By: SHARYANTO
+
+         - No functional changes. Replace Data::Structure::Util's unbless() with
+           Acme::Damn's damn() because the former currently fails to build on
+           Windows (I'm currently trying to make Perinci::CmdLine work on
+           Windows).
+
+
+0.06     2013-08-07  Released-By: SHARYANTO
+
+         [INCOMPATIBLE CHANGES]
+
+         - Now by default clean objects by unblessing them instead of turning
+           them into class-name strings.
+
+         - No longer log cleanser code by default. You need to enable
+           using LOG_CLEANSER_CODE.
+
+         [ENHANCEMENTS]
+
+         - Add command: unbless.
+
+
+0.05     2012-08-05  Released-By: SHARYANTO
+
+         - Fix circular handling.
+
+
+0.04     2012-08-04  Released-By: SHARYANTO
+
+         - More documentation.
+
+         - Handle circular references.
+
+
+0.03     2012-08-03  Released-By: SHARYANTO
+
+         - No functional changes. Fix English (cleaner -> cleanser).
+
+
+0.02     2012-08-03  Released-By: SHARYANTO
+
+         - Tweak default settings.
+
+         - Add basic tests.
+
+
+0.01     2012-08-03  Released-By: SHARYANTO
+
+         - First release. Incomplete and no tests yet.

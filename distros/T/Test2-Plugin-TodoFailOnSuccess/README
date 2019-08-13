@@ -1,0 +1,90 @@
+NAME
+
+    Test2::Plugin::TodoFailOnSuccess - Report failure if a TODO test
+    unexpectedly passes
+
+VERSION
+
+    version 0.0.1
+
+SYNOPSIS
+
+      package My::Tests;
+    
+      use Test2::V0;
+    
+      use Test2::Plugin::TodoFailOnSuccess;  # report unexpected TODO success
+    
+      use Test2::Tools::Basic;    # for "todo" sub
+      use Test2::Todo;            # for "todo" object
+    
+      sub test_something
+      {
+          # Lexical scope TODO:
+          #
+          {
+              my $todo = todo 'Not expected to pass';
+              is $value, $expected_value, "Got expected value";
+          }
+    
+          # Coderef TODO:
+          #
+          todo 'Not expected to pass either' => sub {
+              is $value, $expected_value, "Got expected value";
+          };
+    
+          # Object-oriented TODO:
+          #
+          my $todo = Test2::Todo->new( reason => 'Still not expected to pass' );
+          is $value, $expected_value, "Got expected value";
+          $todo->end;
+      }
+
+DESCRIPTION
+
+    Wrapping a test with TODO is a conventient way to avoid being tripped
+    up by test failures until you have a chance to get the code working. It
+    normally won't hurt to leave the TODO in place after the tests start
+    passing, but if you forget to remove the TODO at that point, a
+    subsequent code change could start causing new test failures which
+    would then go unreported and possibly unnoticed.
+
+    This module provides a mechanism to trigger explicit test failures when
+    TODO tests unexpectedly pass, so that you have an opportunity to remove
+    the TODO.
+
+    If a TODO test passes, a failure will be reported with a message
+    containing the test description, equivalent to doing:
+
+      fail "TODO passed unexpectedly: $test_description";
+
+    which might appear in your TAP output along with the TODO reason as
+    something like:
+
+      not ok 3 - TODO passed unexpectedly: Got expected value # TODO Not expected to pass
+
+    Note that due to the additional fail being reported, you may see
+    messages about your planned number of tests being exceeded, for
+    example:
+
+      # Did not follow plan: expected 5, ran 6.
+
+    There are no options or arguments, just use
+    Test2::Plugin::TodoFailOnSuccess in your test file.
+
+AUTHOR
+
+    Grant Street Group <developers@grantstreet.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2019 by Grant Street Group.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+
+CONTRIBUTOR
+
+    Larry Leszczynski <Larry.Leszczynski@GrantStreet.com>
+

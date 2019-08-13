@@ -1,0 +1,93 @@
+{
+   "abstract" : "Perl client library for the Google CloudTasks API (I<unofficial>).",
+   "author" : [
+      "egawata (egawa dot takashi at gmail.com)"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.4",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Google-CloudTasks",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Request" : "0",
+            "JSON::XS" : "0",
+            "LWP::UserAgent" : "0",
+            "Mouse" : "0",
+            "URI" : "0",
+            "URI::QueryParam" : "0",
+            "WWW::Google::Cloud::Auth::ServiceAccount" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "MIME::Base64" : "0",
+            "Test::Deep" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0.98",
+            "Time::HiRes" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Google::CloudTasks" : {
+         "file" : "lib/Google/CloudTasks.pm",
+         "version" : "0.01"
+      },
+      "Google::CloudTasks::Client" : {
+         "file" : "lib/Google/CloudTasks/Client.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/egawata/Google-CloudTasks/issues"
+      },
+      "homepage" : "https://github.com/egawata/Google-CloudTasks",
+      "repository" : {
+         "url" : "git://github.com/egawata/Google-CloudTasks.git",
+         "web" : "https://github.com/egawata/Google-CloudTasks"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:EGAWATA",
+   "x_contributors" : [
+      "egawata <egawa.takashi@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_static_install" : 1
+}

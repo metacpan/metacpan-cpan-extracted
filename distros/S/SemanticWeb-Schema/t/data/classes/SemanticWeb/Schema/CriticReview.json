@@ -1,0 +1,12 @@
+{
+   "class" : {
+      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1589",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A <a class=\"localLink\" href=\"http://schema.org/CriticReview\">CriticReview</a> is a more specialized form of Review written or published by a source that is recognized for its reviewing activities. These can include online columns, travel and food guides, TV and radio shows, blogs and other independent Web sites. <a class=\"localLink\" href=\"http://schema.org/CriticReview\">CriticReview</a>s are typically more in-depth and professionally written. For simpler, casually written user/visitor/viewer/customer reviews, it is more appropriate to use the <a class=\"localLink\" href=\"http://schema.org/UserReview\">UserReview</a> type. Review aggregator sites such as Metacritic already separate out the site's user reviews from selected critic reviews that originate from third-party sources.",
+      "rdfs:label" : "CriticReview",
+      "rdfs:subClassOf" : "schema:Review",
+      "schema:category" : "issue-1589",
+      "schema:isPartOf" : "http:pending.schema.org"
+   },
+   "properties" : {}
+}

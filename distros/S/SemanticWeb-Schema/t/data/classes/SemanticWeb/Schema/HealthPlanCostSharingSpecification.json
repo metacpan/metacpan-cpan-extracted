@@ -1,0 +1,63 @@
+{
+   "class" : {
+      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1062",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A description of costs to the patient under a given network or formulary.",
+      "rdfs:label" : "HealthPlanCostSharingSpecification",
+      "rdfs:subClassOf" : "schema:Intangible",
+      "schema:category" : "issue-1062",
+      "schema:isPartOf" : "http:pending.schema.org"
+   },
+   "properties" : {
+      "schema:healthPlanCoinsuranceOption" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1062",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Whether the coinsurance applies before or after deductible, etc. TODO: Is this a closed set?",
+         "rdfs:label" : "healthPlanCoinsuranceOption",
+         "schema:category" : "issue-1062",
+         "schema:domainIncludes" : "schema:HealthPlanCostSharingSpecification",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:healthPlanCoinsuranceRate" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1062",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Whether The rate of coinsurance expressed as a number between 0.0 and 1.0.",
+         "rdfs:label" : "healthPlanCoinsuranceRate",
+         "schema:category" : "issue-1062",
+         "schema:domainIncludes" : "schema:HealthPlanCostSharingSpecification",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Number"
+      },
+      "schema:healthPlanCopay" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1062",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Whether The copay amount.",
+         "rdfs:label" : "healthPlanCopay",
+         "schema:category" : "issue-1062",
+         "schema:domainIncludes" : "schema:HealthPlanCostSharingSpecification",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:PriceSpecification"
+      },
+      "schema:healthPlanCopayOption" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1062",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Whether the copay is before or after deductible, etc. TODO: Is this a closed set?",
+         "rdfs:label" : "healthPlanCopayOption",
+         "schema:category" : "issue-1062",
+         "schema:domainIncludes" : "schema:HealthPlanCostSharingSpecification",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:healthPlanPharmacyCategory" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1062",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The category or type of pharmacy associated with this cost sharing.",
+         "rdfs:label" : "healthPlanPharmacyCategory",
+         "schema:category" : "issue-1062",
+         "schema:domainIncludes" : "schema:HealthPlanCostSharingSpecification",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      }
+   }
+}

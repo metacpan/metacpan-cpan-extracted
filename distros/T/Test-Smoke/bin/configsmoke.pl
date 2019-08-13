@@ -22,9 +22,8 @@ use System::Info;
 use Test::Smoke::Util qw(do_pod2usage whereis);
 use Test::Smoke::Util::FindHelpers ':all';
 
-# $Id$
-use vars qw($VERSION $conf);
-$VERSION = '0.090';
+use vars qw($conf);
+our $VERSION = '0.091';
 
 use Getopt::Long;
 my %options = (
@@ -115,9 +114,9 @@ or regenerate from previous _config:
 Current options:
 
   -d dfvalsprefix   Set prefix for a _dfconfig file (<prefix>)
-  -c configprefix   When ommited 'perlcurrent' is used
-  -j jclprefix      When ommited 'perlcurrent' is used
-  -l logprefix      When ommited 'perlcurrent' is used
+  -c configprefix   When omitted 'perlcurrent' is used
+  -j jclprefix      When omitted 'perlcurrent' is used
+  -l logprefix      When omitted 'perlcurrent' is used
   -p prefix         Set -c and -j and -l at once
 
   -des              confirm all answers (needs previous _config)
@@ -137,7 +136,7 @@ my $syncmsg = join "\n", @{ {
     rsync    => "\trsync - Use the rsync(1) program",
     copy     => "\tcopy - Use File::Copy to copy from a local directory",
     hardlink => "\thardlink - Copy from a local directory using link()",
-    snapshot => "\tsnapshot - Get a snapshot using Net::FTP (or LWP::Simple)",
+#    snapshot => "\tsnapshot - Get a snapshot using Net::FTP (or LWP::Simple)",
 } }{ @syncers };
 my @untars = get_avail_tar();
 my $untarmsg = join "", map "\n\t$_" => @untars;
@@ -146,7 +145,7 @@ my %vdirs = map {
     my $vdir = $_;
     is_vms and $vdir =~ tr/.//d;
     ( $_ => $vdir )
-} qw( 5.18.x 5.20.x 5.22.x );
+} qw( 5.18.x 5.20.x 5.22.x 5.24.x 5.26.x );
 
 my %versions = (
     '5.18.x' => {
@@ -212,6 +211,48 @@ my %versions = (
         ),
         is56x   => 0,
     },
+    '5.24.x' => {
+        gbranch => 'maint-5.24',
+        source  => 'perl5.git.perl.org::perl-5.24.x',
+        server  => 'http://perl5.git.perl.org',
+        sdir    => '/perl.git/snapshot/refs/heads/',
+        sfile   => 'maint-5.24.tar.gz',
+        pdir    => '/pub/apc/perl-current-diffs',
+        ddir    => File::Spec->catdir(
+            cwd(),
+            File::Spec->updir,
+            'perl-current'
+        ),
+
+        text    => 'Perl 5.24 maint',
+        cfg     => (
+            is_win32
+                ? 'w32current.cfg'
+                : is_vms ? 'vmsperl.cfg' : 'perlmaint.cfg'
+        ),
+        is56x   => 0,
+    },
+    '5.26.x' => {
+        gbranch => 'maint-5.26',
+        source  => 'perl5.git.perl.org::perl-5.26.x',
+        server  => 'http://perl5.git.perl.org',
+        sdir    => '/perl.git/snapshot/refs/heads/',
+        sfile   => 'maint-5.26.tar.gz',
+        pdir    => '/pub/apc/perl-current-diffs',
+        ddir    => File::Spec->catdir(
+            cwd(),
+            File::Spec->updir,
+            'perl-current'
+        ),
+
+        text    => 'Perl 5.26 maint',
+        cfg     => (
+            is_win32
+                ? 'w32current.cfg'
+                : is_vms ? 'vmsperl.cfg' : 'perlmaint.cfg'
+        ),
+        is56x   => 0,
+    },
     'blead' => {
         gbranch => 'blead',
         source  => 'perl5.git.perl.org::perl-current',
@@ -225,7 +266,7 @@ my %versions = (
             'perl-current'
         ),
 
-        text    => 'Perl 5.22 to-be',
+        text    => 'Perl 5.28 to-be',
         cfg     => (
             is_win32
                 ? 'w32current.cfg'
@@ -511,7 +552,7 @@ Send smoke results to the SmokeDB? (url)
 \t(Leave empty for no.)
 EOT
         alt => [ ],
-        dft => 'http://perl5.test-smoke.org/report',
+        dft => 'https://perl5.test-smoke.org/report',
     },
     send_log => {
         msg => 'Do you want to send the logfile with the report?',
@@ -529,6 +570,11 @@ EOT
         dft => undef,
     },
 
+    hostname => {
+        msg => 'Use the hostname option to override System::Info->hostname',
+        alt => [ ],
+        dft => undef,
+    },
     # user_note
     user_note => {
         msg => "",
@@ -1195,6 +1241,19 @@ SKIP_TESTS: {
     }
 }
 
+=item hostname
+
+In the case C<< System::Info->hostname >> needs to be overridden.
+
+=cut
+
+HOSTNAME: {
+    $arg = 'hostname';
+    my $hostname = System::Info::si_uname('n');
+    $opt{$arg}{msg} .= "\n   Leave empty to use default '$hostname'";
+    $config{$arg} = prompt($arg);
+}
+
 =item user_note
 
 This gives you a way of adding personal information to the report.
@@ -1267,7 +1326,7 @@ C<< $ENV{PERLIO} = "perlio"; >>). This feature should only be used with
 UTF8 locales, that is why this is checked (by regex only).
 
 B<If you know of a way to get the utf8 locales on your system, which is
-not coverd here, please let me know!>
+not covered here, please let me know!>
 
 =cut
 
@@ -1863,7 +1922,7 @@ sub sort_configkeys {
         qw( makeopt testmake harnessonly hasharness3 harness3opts ),
 
         # user_notes
-        qw( user_note un_file un_position ),
+        qw( hostname user_note un_file un_position ),
 
         # ENV stuff
         qw( perl5lib delay_report ),

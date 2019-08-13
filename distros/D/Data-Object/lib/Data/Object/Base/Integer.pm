@@ -8,7 +8,7 @@ use Scalar::Util 'blessed', 'looks_like_number';
 
 use parent 'Data::Object::Base';
 
-our $VERSION = '0.96'; # VERSION
+our $VERSION = '0.97'; # VERSION
 
 # BUILD
 

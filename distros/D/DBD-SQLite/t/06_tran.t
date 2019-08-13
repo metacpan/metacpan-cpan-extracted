@@ -1,15 +1,9 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest;
-use Test::More tests => 6;
-use Test::NoWarnings;
+use Test::More;
+use if -d ".git", "Test::FailWarnings";
 
 my $dbh = connect_ok(
 	AutoCommit => 0,
@@ -54,3 +48,5 @@ $dbh->rollback;
 	);
 	ok !$dbh->{sqlite_use_immediate_transaction}, "sqlite_use_immediate_transaction is false if you set explicitly";
 }
+
+done_testing;

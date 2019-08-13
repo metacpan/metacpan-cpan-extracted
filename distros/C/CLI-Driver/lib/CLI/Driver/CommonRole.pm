@@ -26,7 +26,13 @@ method chdir (Str $dir) {
 	chdir($dir) or confess "failed to chdir to $dir: $!";
 }
 
-method fatal (Str $str, Num $frames? = 1) {
+method die (Str $str) {
+
+	chomp $str;
+	die "[ERROR] $str\n";
+}
+
+method fatal (Str $str, Num $frames? = 0) {
 
 	chomp $str;
 

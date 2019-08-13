@@ -1,19 +1,13 @@
-#!/usr/bin/perl
-
 # Tests that executing the same prepare_cached twice without a
 # finish in between does not prevent it being automatically cleaned
 # up and that it does not generate a warning.
 
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest;
-use Test::More tests => 32;
-use Test::NoWarnings;
+use Test::More;
+use if -d ".git", "Test::FailWarnings";
 
 # Create the table
 SCOPE: {
@@ -42,10 +36,6 @@ sub fetchrow_1 {
 	my $row = $_[0]->fetchrow_arrayref;
 	is_deeply( $row, [ 1 ], 'Got row 1' );
 }
-
-
-
-
 
 ######################################################################
 # A well-behaved non-cached statement
@@ -80,10 +70,6 @@ SCOPE: {
 	is( $c, 0, 'No warnings' );
 }
 
-
-
-
-
 ######################################################################
 # A badly-behaved regular statement
 
@@ -110,10 +96,6 @@ SCOPE: {
 	$dbh->disconnect;
 	is( $c, 1, 'Got a warning' );
 }
-
-
-
-
 
 ######################################################################
 # A well-behaved cached statement
@@ -157,10 +139,6 @@ SCOPE: {
 	is( $c, 1, 'No warnings' );
 }
 
-
-
-
-
 #####################################################################
 # Badly-behaved prepare_cached (but still acceptable)
 
@@ -177,3 +155,5 @@ SCOPE: {
 	$dbh->disconnect;
 	is( $c, 1, 'No warnings' );
 }
+
+done_testing;

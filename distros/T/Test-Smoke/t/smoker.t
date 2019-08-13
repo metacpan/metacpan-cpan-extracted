@@ -896,12 +896,13 @@ SKIP: {
 
     ok -f $skip_tests, "skip_tests file exists";
 
+    my $skip_test = catfile( $dst, 't', 'op', 'skip.t' );
     $smoker->set_skip_tests;
     ok -f catfile( $dst, 'MANIFEST.ORG'), "MANIFEST was copied";
 
-    ok ! -f catfile( $dst, 't', 'op', 'skip.t' ) &&
-       -f catfile( $dst, 't', 'op', 'skip.tskip' ),
-       "t/op/skip.t was renamed";
+    my $skip = qq[print "1..0 # SKIP Disabled by Test::Smoke];
+    ok get_file($skip_test) =~ /^\Q$skip\E/,
+       "t/op/skip.t had skip code added";
 
     my @libext = grep m{^(?:lib|ext|cpan|dist)/} => @notest;
     my $manifest = catfile $dst, 'MANIFEST';
@@ -915,9 +916,8 @@ SKIP: {
 
     ok ! -f catfile( $dst, 'MANIFEST.ORG'), "MANIFEST.ORG was removed";
 
-    ok -f catfile( $dst, 't', 'op', 'skip.t' ) &&
-       ! -f catfile( $dst, 't', 'op', 'skip.tskip' ),
-       "t/op/skip.t was renamed back";
+    ok get_file($skip_test) !~ /^\Q$skip\E/,
+       "t/op/skip.t had skip code removed again";
 
     my $files = get_file( $manifest );
 

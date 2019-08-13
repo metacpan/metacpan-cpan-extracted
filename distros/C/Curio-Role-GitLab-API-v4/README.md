@@ -16,8 +16,10 @@ use Types::Common::String qw( NonEmptySimpleStr );
 use Curio role => '::GitLab::API::v4';
 use strictures 2;
 
-export_function_name 'myapp_gitlab';
 key_argument 'connection_key';
+export_function_name 'myapp_gitlab';
+always_export;
+export_resource;
 
 has connection_key => (
     is       => 'ro',
@@ -50,23 +52,24 @@ sub private_token {
 Then use your new Curio class elsewhere:
 
 ```perl
-use MyApp::Service::GitLab qw( myapp_gitlab );
+use MyApp::Service::GitLab;
 
 my $api = myapp_gitlab('admin');
 ```
 
 # DESCRIPTION
 
-This role provides all the basics for building a Curio class which wraps around
-[GitLab::API::v4](https://metacpan.org/pod/GitLab::API::v4).
+This role provides all the basics for building a Curio class which
+wraps around [GitLab::API::v4](https://metacpan.org/pod/GitLab::API::v4).
 
-# OPTIONAL ARGUMENTS
+# REQUIRED ARGUMENTS
 
 ## api
 
 Holds the [GitLab::API::v4](https://metacpan.org/pod/GitLab::API::v4) object.
 
-May be passed as a hashref of arguments, or a pre-created object.
+May be passed as either a hashref of arguments or a pre-created
+object.
 
 # OPTIONAL METHODS
 
@@ -82,9 +85,10 @@ The ["private\_token" in GitLab::API::v4](https://metacpan.org/pod/GitLab::API::
 
 # TOKENS
 
-In your Curio class you may create two methods, ["access\_token"](#access_token) and ["private\_token"](#private_token).
-If either/both of these methods exist and return a defined value then they will be used
-when constructing the ["api"](#api) object.
+In your Curio class you may create two methods, ["access\_token"](#access_token) and
+["private\_token"](#private_token).  If either/both of these methods exist and return a
+defined value then they will be used when constructing the ["api"](#api)
+object.
 
 In the ["SYNOPSIS"](#synopsis) a sample `private_token` method is shown:
 
@@ -98,24 +102,28 @@ sub private_token {
 }
 ```
 
-The `myapp_secret` call is expected to be the place where you use whatever tool you use
-to hold your GitLab tokens and likely all passwords and other credentials (secrets) that
-your application needs.
+The `myapp_secret` call is expected to be the place where you use
+whatever tool you use to hold your GitLab tokens and likely all
+passwords and other credentials (secrets) that your application needs.
 
-Some common tools that people use to manage their secrets are Kubernetes' secrets objects,
-AWS's Secret Manager, HashiCorp's Vault, or just an inescure configuration file; to name a
-few.
+Some common tools that people use to manage their secrets are
+Kubernetes' secrets objects, AWS's Secret Manager, HashiCorp's Vault,
+or just an inescure configuration file; to name a few.
 
-So, the way you write your token methods is going to be unique to your setup.
+So, the way you write your token methods is going to be unique to your
+setup.
 
 # FEATURES
 
-This role sets the ["does\_caching" in Curio::Factory](https://metacpan.org/pod/Curio::Factory#does_caching) feature.
+This role turns on ["does\_caching" in Curio::Factory](https://metacpan.org/pod/Curio::Factory#does_caching) and sets
+["resource\_method\_name" in Curio::Factory](https://metacpan.org/pod/Curio::Factory#resource_method_name) to `api` (as in
+["api"](#api)).
 
-You can of course disable this.
+You can of course revert these changes:
 
 ```
 does_caching 0;
+resource_method_name undef;
 ```
 
 # SUPPORT
@@ -127,9 +135,10 @@ Curio-Role-GitLab-API-v4 GitHub issue tracker:
 
 # ACKNOWLEDGEMENTS
 
-Thanks to [ZipRecruiter](https://www.ziprecruiter.com/) for encouraging their employees
-to contribute back to the open source ecosystem.  Without their dedication to quality
-software development this distribution would not exist.
+Thanks to [ZipRecruiter](https://www.ziprecruiter.com/) for
+encouraging their employees to contribute back to the open source
+ecosystem.  Without their dedication to quality software development
+this distribution would not exist.
 
 # AUTHORS
 
@@ -141,13 +150,15 @@ Aran Clary Deltac <bluefeet@gmail.com>
 
 Copyright (C) 2019 Aran Clary Deltac
 
-This program is free software: you can redistribute it and/or modify it under the terms of
-the GNU General Public License as published by the Free Software Foundation, either
-version 3 of the License, or (at your option) any later version.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU General Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with this program.
-If not, see [http://www.gnu.org/licenses/](http://www.gnu.org/licenses/).
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see [http://www.gnu.org/licenses/](http://www.gnu.org/licenses/).

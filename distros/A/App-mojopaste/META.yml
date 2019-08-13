@@ -24,5 +24,7 @@ resources:
   bugtracker: https://github.com/jhthorsen/app-mojopaste/issues
   homepage: https://github.com/jhthorsen/app-mojopaste
   repository: https://github.com/jhthorsen/app-mojopaste.git
-version: '1.00'
+version: '1.04'
+x_contributors:
+  - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

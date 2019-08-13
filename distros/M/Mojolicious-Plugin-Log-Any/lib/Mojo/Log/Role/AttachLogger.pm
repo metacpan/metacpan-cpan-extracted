@@ -6,42 +6,52 @@ use Import::Into ();
 use Module::Runtime ();
 use Scalar::Util ();
 
-our $VERSION = '0.005';
+our $VERSION = 'v1.0.0';
 
 our @CARP_NOT = 'Mojolicious::Plugin::Log::Any';
 
 requires 'on';
 
 sub attach_logger {
-  my ($self, $logger, $category) = @_;
+  my ($self, $logger, $opt) = @_;
   Carp::croak 'No logger passed' unless defined $logger;
+  my ($category, $prepend);
+  if (ref $opt) {
+    ($category, $prepend) = @$opt{'category','prepend_level'};
+  } else {
+    $category = $opt;
+  }
   $category //= 'Mojo::Log';
+  $prepend //= 1;
   
   my $do_log;
   if (Scalar::Util::blessed($logger)) {
     if ($logger->isa('Log::Any::Proxy')) {
       $do_log = sub {
         my ($self, $level, @msg) = @_;
-        my $formatted = "[$level] " . join "\n", @msg;
-        $logger->$level($formatted);
+        my $msg = join "\n", @msg;
+        $msg = "[$level] $msg" if $prepend;
+        $logger->$level($msg);
       };
     } elsif ($logger->isa('Log::Dispatch')) {
       $do_log = sub {
         my ($self, $level, @msg) = @_;
-        my $formatted = "[$level] " . join "\n", @msg;
+        my $msg = join "\n", @msg;
+        $msg = "[$level] $msg" if $prepend;
         $level = 'critical' if $level eq 'fatal';
-        $logger->log(level => $level, message => $formatted);
+        $logger->log(level => $level, message => $msg);
       };
     } elsif ($logger->isa('Log::Dispatchouli') or $logger->isa('Log::Dispatchouli::Proxy')) {
       $do_log = sub {
         my ($self, $level, @msg) = @_;
-        my $formatted = "[$level] " . join "\n", @msg;
-        return $logger->log_debug($formatted) if $level eq 'debug';
+        my $msg = join "\n", @msg;
+        $msg = "[$level] $msg" if $prepend;
+        return $logger->log_debug($msg) if $level eq 'debug';
         # hacky but we don't want to use log_fatal because it throws an
         # exception, we want to allow real exceptions to propagate, and we
         # can't localize a call to set_muted
         local $logger->{muted} = 0 if $level eq 'fatal' and $logger->get_muted;
-        $logger->log($formatted);
+        $logger->log($msg);
       };
     } elsif ($logger->isa('Mojo::Log')) {
       $do_log = sub {
@@ -56,16 +66,18 @@ sub attach_logger {
     $logger = Log::Any->get_logger(category => $category);
     $do_log = sub {
       my ($self, $level, @msg) = @_;
-      my $formatted = "[$level] " . join "\n", @msg;
-      $logger->$level($formatted);
+      my $msg = join "\n", @msg;
+      $msg = "[$level] $msg" if $prepend;
+      $logger->$level($msg);
     };
   } elsif ($logger eq 'Log::Log4perl') {
     require Log::Log4perl;
     $logger = Log::Log4perl->get_logger($category);
     $do_log = sub {
       my ($self, $level, @msg) = @_;
-      my $formatted = "[$level] " . join "\n", @msg;
-      $logger->$level($formatted);
+      my $msg = join "\n", @msg;
+      $msg = "[$level] $msg" if $prepend;
+      $logger->$level($msg);
     };
   } elsif ($logger eq 'Log::Contextual' or "$logger"->isa('Log::Contextual')) {
     Module::Runtime::require_module("$logger");
@@ -74,8 +86,9 @@ sub attach_logger {
     "$logger"->import::into(ref($self), values %functions);
     $do_log = sub {
       my ($self, $level, @msg) = @_;
-      my $formatted = "[$level] " . join "\n", @msg;
-      $self->can($functions{$level})->($formatted);
+      my $msg = join "\n", @msg;
+      $msg = "[$level] $msg" if $prepend;
+      $self->can($functions{$level})->($msg);
     };
   } else {
     Carp::croak "Unsupported logger class $logger";
@@ -154,13 +167,15 @@ L<Mojo::Log::Role::AttachLogger> composes the following methods.
 
 =head2 attach_logger
 
-  $log = $log->attach_logger($logger, $category);
+  $log = $log->attach_logger($logger, $options);
 
 Subscribes to L<Mojo::Log/"message"> and passes log messages to the given
-logging framework or object, with an optional category for L<Log::Any> and
-L<Log::Log4perl> (defaults to C<Mojo::Log>). The log level will be prepended to
-the message in square brackets (except when passing to another L<Mojo::Log>
-object). The following loggers are recognized:
+logging framework or object. The second argument is optionally a category
+(default C<Mojo::Log>) or hashref of options. The log level will be prepended
+to the message in square brackets (except when passing to another L<Mojo::Log>
+object, or L</"prepend_level"> is false).
+
+The following loggers are recognized:
 
 =over
 
@@ -200,6 +215,21 @@ specified category (defaults to C<Mojo::Log>).
 =item Mojo::Log
 
 Another L<Mojo::Log> object can be passed to be used for logging.
+
+=back
+
+The following options are supported:
+
+=over
+
+=item category
+
+Category name (defaults to Mojo::Log).
+
+=item prepend_level
+
+Prepend the log level to messages in the form C<[$level]> (default for
+non-L<Mojo::Log> loggers). Set false to disable.
 
 =back
 

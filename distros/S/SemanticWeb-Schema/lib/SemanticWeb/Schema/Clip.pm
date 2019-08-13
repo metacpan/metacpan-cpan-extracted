@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.8.1';
+our $VERSION = 'v3.9.0';
 
 
 has actor => (
@@ -58,6 +58,14 @@ has directors => (
 
 
 
+has end_offset => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'endOffset',
+);
+
+
+
 has music_by => (
     is        => 'rw',
     predicate => 1,
@@ -90,6 +98,14 @@ has part_of_series => (
 
 
 
+has start_offset => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'startOffset',
+);
+
+
+
 
 
 1;
@@ -106,7 +122,7 @@ SemanticWeb::Schema::Clip - A short TV or radio program or a segment/part of a p
 
 =head1 VERSION
 
-version v3.8.1
+version v3.9.0
 
 =head1 DESCRIPTION
 
@@ -184,6 +200,21 @@ A directors should be one of the following types:
 
 =back
 
+=head2 C<end_offset>
+
+C<endOffset>
+
+The end time of the clip expressed as the number of seconds from the
+beginning of the work.
+
+A end_offset should be one of the following types:
+
+=over
+
+=item C<Num>
+
+=back
+
 =head2 C<music_by>
 
 C<musicBy>
@@ -239,6 +270,21 @@ A part_of_series should be one of the following types:
 =over
 
 =item C<InstanceOf['SemanticWeb::Schema::CreativeWorkSeries']>
+
+=back
+
+=head2 C<start_offset>
+
+C<startOffset>
+
+The start time of the clip expressed as the number of seconds from the
+beginning of the work.
+
+A start_offset should be one of the following types:
+
+=over
+
+=item C<Num>
 
 =back
 

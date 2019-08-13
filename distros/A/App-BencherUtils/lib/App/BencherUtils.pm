@@ -1,14 +1,14 @@
 package App::BencherUtils;
 
-our $DATE = '2018-04-03'; # DATE
-our $VERSION = '0.241'; # VERSION
+our $DATE = '2019-08-08'; # DATE
+our $VERSION = '0.242'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
 use warnings;
 use Log::ger;
 
-use Data::Clean::JSON;
+use Data::Clean::ForJSON;
 use Function::Fallback::CoreOrPP qw(clone);
 use Perinci::Object;
 use Perinci::Sub::Util qw(err);
@@ -43,7 +43,7 @@ my %args_common_query = (
 );
 
 sub _clean {
-    state $cleanser = Data::Clean::JSON->get_cleanser;
+    state $cleanser = Data::Clean::ForJSON->get_cleanser;
     $cleanser->clone_and_clean($_[0]);
 }
 
@@ -730,7 +730,7 @@ App::BencherUtils - Utilities related to bencher
 
 =head1 VERSION
 
-This document describes version 0.241 of App::BencherUtils (from Perl distribution App-BencherUtils), released on 2018-04-03.
+This document describes version 0.242 of App::BencherUtils (from Perl distribution App-BencherUtils), released on 2019-08-08.
 
 =head1 SYNOPSIS
 
@@ -765,7 +765,7 @@ This distribution includes several utilities:
 
 Usage:
 
- bencher_code(%args) -> [status, msg, result, meta]
+ bencher_code(%args) -> [status, msg, payload, meta]
 
 Accept a list of codes and perform benchmark.
 
@@ -805,18 +805,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 bencher_for
 
 Usage:
 
- bencher_for(%args) -> [status, msg, result, meta]
+ bencher_for(%args) -> [status, msg, payload, meta]
 
 List distributions that benchmarks specified modules.
 
@@ -839,18 +840,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 bencher_module_startup_overhead
 
 Usage:
 
- bencher_module_startup_overhead(%args) -> [status, msg, result, meta]
+ bencher_module_startup_overhead(%args) -> [status, msg, payload, meta]
 
 Accept a list of module names and perform startup overhead benchmark.
 
@@ -900,18 +902,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 chart_bencher_result
 
 Usage:
 
- chart_bencher_result(%args) -> [status, msg, result, meta]
+ chart_bencher_result(%args) -> [status, msg, payload, meta]
 
 Generate chart of bencher result and display it.
 
@@ -932,18 +935,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 cleanup_old_bencher_results
 
 Usage:
 
- cleanup_old_bencher_results(%args) -> [status, msg, result, meta]
+ cleanup_old_bencher_results(%args) -> [status, msg, payload, meta]
 
 Delete old results.
 
@@ -991,18 +995,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 format_bencher_result
 
 Usage:
 
- format_bencher_result(%args) -> [status, msg, result, meta]
+ format_bencher_result(%args) -> [status, msg, payload, meta]
 
 Format bencher raw/JSON result.
 
@@ -1023,18 +1028,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 list_bencher_results
 
 Usage:
 
- list_bencher_results(%args) -> [status, msg, result, meta]
+ list_bencher_results(%args) -> [status, msg, payload, meta]
 
 List results in results directory.
 
@@ -1071,18 +1077,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 list_bencher_scenario_modules
 
 Usage:
 
- list_bencher_scenario_modules(%args) -> [status, msg, result, meta]
+ list_bencher_scenario_modules(%args) -> [status, msg, payload, meta]
 
 List Bencher scenario modules.
 
@@ -1103,7 +1110,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -1131,7 +1138,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

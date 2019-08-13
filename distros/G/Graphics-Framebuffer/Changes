@@ -1468,3 +1468,12 @@ Revision history for Graphics-Framebuffer
 
       Fixed an error in get_pixel and pixel methods.  "replace_color" was
       having issues and this was the cause.
+
+6.29  July 17, 2019
+
+      Fixed the threaded slideshow example script, as well as enabled the
+      ability to show the filename.
+
+6.30  Aug 11, 2019
+
+      Many changes to the example scripts and documentation.

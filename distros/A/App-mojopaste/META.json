@@ -52,6 +52,9 @@
          "web" : "https://github.com/jhthorsen/app-mojopaste"
       }
    },
-   "version" : "1.00",
+   "version" : "1.04",
+   "x_contributors" : [
+      "Jan Henning Thorsen <jhthorsen@cpan.org>"
+   ],
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

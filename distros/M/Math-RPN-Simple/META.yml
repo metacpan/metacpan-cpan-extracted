@@ -1,0 +1,29 @@
+---
+abstract: 'Simpler implementation of L<Math::RPN>.'
+author:
+  - 'Michał Wróblewski <debos@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Math-RPN-Simple
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Exporter: '0'
+  List::Util: '1.33'
+resources:
+  bugtracker: https://github.com/DeBos99/Math-RPN-Simple/issues
+  homepage: https://github.com/DeBos99/Math-RPN-Simple
+  repository: https://github.com/DeBos99/Math-RPN-Simple.git
+version: v1.1.2
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

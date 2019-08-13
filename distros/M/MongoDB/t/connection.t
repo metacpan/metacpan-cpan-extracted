@@ -20,8 +20,15 @@ use Test::Fatal;
 use MongoDB;
 
 use lib "t/lib";
-use MongoDBTest
-  qw/skip_unless_mongod build_client get_test_db server_version server_type/;
+use MongoDBTest qw/
+    skip_unless_mongod
+    build_client
+    get_test_db
+    server_version
+    server_type
+    check_min_server_version
+    skip_unless_min_version
+/;
 
 skip_unless_mongod();
 
@@ -64,7 +71,7 @@ subtest "get_database and check names" => sub {
 
 subtest "wire protocol versions" => sub {
     is $conn->_topology->{min_wire_version}, 0, 'default min wire version';
-    is $conn->_topology->{max_wire_version}, 5, 'default max wire version';
+    is $conn->_topology->{max_wire_version}, 8, 'default max wire version';
 
     # monkey patch wire versions
     my $conn2 = build_client();
@@ -91,9 +98,10 @@ subtest "topology status" => sub {
     my $res = $conn->topology_status( );
     is( ref($res), 'HASH', "topology_status returns a hash reference" );
     my $last = $res->{last_scan_time};
-    sleep 1;
+    sleep 2;
     $res = $conn->topology_status( refresh => 1 );
-    ok( $res->{last_scan_time} > $last, "scan time refreshed" );
+    ok( $res->{last_scan_time} > $last, "scan time refreshed" )
+      or diag "Before: $res->{last_scan_time}; After: $last";
 };
 
 subtest "cooldown" => sub {
@@ -107,12 +115,11 @@ subtest "cooldown" => sub {
 };
 
 subtest "app name" => sub {
-    plan skip_all => "Needs v3.3.11+ for client metadata feature"
-      unless $server_version >= v3.3.11;
+    skip_unless_min_version($conn, 'v3.3.11');
     plan skip_all => "currentOp not supported on Atlas Free Tier"
         if $ENV{ATLAS_PROXY};
     plan skip_all => "currentOp with appName not supported on mongos before v3.6.0"
-      if $server_type eq 'Mongos' && $server_version < v3.6.0;
+      if $server_type eq 'Mongos' && check_min_server_version($conn, 'v3.6.0');
 
 
     my $app_name = 'test_app_name';

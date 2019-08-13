@@ -41,7 +41,7 @@
          "requires" : {
             "Data::Dmp" : "0.21",
             "Data::Dump" : "0",
-            "Data::Sah::Coerce" : "0.031",
+            "Data::Sah::Coerce" : "0.032",
             "Data::Sah::CoerceCommon" : "0",
             "Data::Sah::Normalize" : "0.03",
             "Data::Sah::Resolve" : "0.003",
@@ -67,7 +67,6 @@
             "Text::sprintfn" : "0",
             "Tie::IxHash" : "0",
             "Time::HiRes" : "0",
-            "experimental" : "0",
             "parent" : "0",
             "perl" : "5.010001",
             "strict" : "0",
@@ -106,7 +105,7 @@
          "web" : "https://github.com/perlancar/perl-Data-Sah"
       }
    },
-   "version" : "0.899",
+   "version" : "0.900",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028002"

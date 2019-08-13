@@ -11,14 +11,14 @@
          "rdfs:comment" : "A goal towards an action is taken. Can be concrete or abstract.",
          "rdfs:label" : "purpose",
          "schema:domainIncludes" : [
-            "schema:PayAction",
             "schema:AllocateAction",
+            "schema:PayAction",
             "schema:MedicalDevice"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Thing",
-            "schema:MedicalDevicePurpose"
+            "schema:MedicalDevicePurpose",
+            "schema:Thing"
          ]
       }
    }

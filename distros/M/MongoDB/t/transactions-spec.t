@@ -42,7 +42,13 @@ use MongoDBTest qw/
     get_unique_collection
     skip_unless_mongod
     skip_unless_failpoints_available
+    set_failpoint
+    clear_failpoint
     skip_unless_transactions
+/;
+use MongoDBSpecTest qw/
+    maybe_skip_multiple_mongos
+    foreach_spec_test
 /;
 
 skip_unless_mongod();
@@ -55,16 +61,10 @@ sub clear_events { @events = () }
 sub event_count { scalar @events }
 # Must use dclone, as was causing action at a distance for binc on txn number
 sub event_cb { push @events, dclone $_[0] }
-
-my $conn           = build_client();
+# disabling wtimeout default of 5000 in MongoDBTest
+my $conn           = build_client( wtimeout => undef );
 my $server_version = server_version($conn);
 my $server_type    = server_type($conn);
-
-plan skip_all => "Requires MongoDB 4.0"
-    if $server_version < v4.0.0;
-
-plan skip_all => "deployment does not support transactions"
-    unless $conn->_topology->_supports_transactions;
 
 # defines which argument hash fields become positional arguments
 my %method_args = (
@@ -77,6 +77,7 @@ my %method_args = (
     update_many => [qw( filter update )],
     find        => [qw( filter )],
     count       => [qw( filter )],
+    count_documents => [qw( filter )],
     bulk_write  => [qw( requests )],
     find_one_and_update => [qw( filter update )],
     find_one_and_replace => [qw( filter replacement )],
@@ -86,81 +87,62 @@ my %method_args = (
     distinct    => [qw( fieldName filter )],
 );
 
-my $dir      = path("t/data/transactions");
-my $iterator = $dir->iterator;
-while ( my $path = $iterator->() ) {
-    next unless $path =~ /\.json$/;
-    my $plan = eval { decode_json( $path->slurp_utf8 ) };
-    if ($@) {
-        die "Error decoding $path: $@";
-    }
+my $dir = path("t/data/transactions");
+foreach_spec_test($dir, $conn, sub {
+    my ($test, $plan) = @_;
     my $test_db_name = $plan->{database_name};
     my $test_coll_name = $plan->{collection_name};
 
-    subtest $path => sub {
+    my $description = $test->{description};
+    local $TODO = 'does a run_command read_preference count as a user configurable read_preference?' if $description =~ /explicit secondary read preference/;
 
-        for my $test ( @{ $plan->{tests} } ) {
-            my $description = $test->{description};
-            local $TODO = 'does a run_command read_preference count as a user configurable read_preference?' if $path =~ /run-command/ && $description =~ /explicit secondary read preference/;
-            subtest $description => sub {
-                my $client = build_client();
+    subtest $description => sub {
+        plan skip_all => $test->{skipReason} if $test->{skipReason};
+        maybe_skip_multiple_mongos( $conn, $test->{useMultipleMongoses} );
 
-                # Kills its own session as well
-                eval { $client->send_admin_command([ killAllSessions => [] ]) };
-                my $test_db = $client->get_database( $test_db_name );
+        #my $client = build_client( wtimeout => undef );
 
-                # We crank wtimeout up to 10 seconds to help reduce
-                # replication timeouts in testing
-                my $test_coll = $test_db->get_collection(
-                    $test_coll_name,
-                    { write_concern => { w => 'majority', wtimeout => 10000 } }
-                );
-                $test_coll->drop;
+        # Kills its own session as well
+        eval { $conn->send_admin_command([ killAllSessions => [] ]) };
+        my $test_db = $conn->get_database( $test_db_name );
 
-                # Drop first to make sure its clear for the next test.
-                # MongoDB::Collection doesnt have a ->create option so done as
-                # a seperate step.
-                $test_db->run_command([ create => $test_coll_name ]);
+        # We crank wtimeout up to 10 seconds to help reduce
+        # replication timeouts in testing
+        my $test_coll = $test_db->get_collection(
+            $test_coll_name,
+            { write_concern => { w => 'majority', wtimeout => 10000 } }
+        );
+        $test_coll->drop;
 
-                if ( scalar @{ $plan->{data} } > 0 ) {
-                    $test_coll->insert_many( $plan->{data} );
-                }
+        # Drop first to make sure its clear for the next test.
+        # MongoDB::Collection doesnt have a ->create option so done as
+        # a seperate step.
+        $test_db->run_command([ create => $test_coll_name ]);
 
-                set_failpoint( $client, $test->{failPoint} );
-                run_test( $test_db_name, $test_coll_name, $test );
-                clear_failpoint( $client, $test->{failPoint} );
+        if ( scalar @{ $plan->{data} } > 0 ) {
+            $test_coll->insert_many( $plan->{data} );
+        }
 
-                if ( defined $test->{outcome}{collection}{data} ) {
-                    my @outcome = $test_coll->find()->all;
-                    cmp_deeply( \@outcome, $test->{outcome}{collection}{data}, 'outcome as expected' )
-                }
-            };
+        # PERL-1083 Work around StaleDbVersion issue. Guarded against possible errors
+        if ( $description eq 'distinct' && $conn->_topology->type eq 'Sharded' ) {
+            eval { $test_coll->distinct( '_id' ) };
+        }
+
+        set_failpoint( $conn, $test->{failPoint} );
+        run_test( $test_db_name, $test_coll_name, $test );
+        clear_failpoint( $conn, $test->{failPoint} );
+
+        if ( defined $test->{outcome}{collection}{data} ) {
+            # Need to use a specific read concern and read preference to check
+            my $outcome_coll = $test_coll->clone(
+                read_preference => 'primary',
+                read_concern => 'local',
+            );
+            my @outcome = $outcome_coll->find()->all;
+            cmp_deeply( \@outcome, $test->{outcome}{collection}{data}, 'outcome as expected' )
         }
     };
-}
-
-sub set_failpoint {
-    my ( $client, $failpoint ) = @_;
-
-    return unless defined $failpoint;
-    my $ret = $client->send_admin_command([
-        configureFailPoint => $failpoint->{configureFailPoint},
-        mode => $failpoint->{mode},
-        defined $failpoint->{data}
-          ? ( data => $failpoint->{data} )
-          : (),
-    ]);
-}
-
-sub clear_failpoint {
-    my ( $client, $failpoint ) = @_;
-
-    return unless defined $failpoint;
-    my $ret = $client->send_admin_command([
-        configureFailPoint => $failpoint->{configureFailPoint},
-        mode => 'off',
-    ]);
-}
+});
 
 sub to_snake_case {
     my $t = shift;
@@ -197,6 +179,7 @@ sub run_test {
       # Explicitly disable retry_writes for the test, as they change the
       # txnNumber counting used in the test specs.
       retry_writes => 0,
+      wtimeout => undef,
       %$client_options
     );
 
@@ -220,15 +203,18 @@ sub run_test {
 
         my $op_result = $operation->{result};
 
+        my $cmd = to_snake_case( $operation->{name} );
         eval {
             $sessions{ database } = $client->get_database( $test_db_name );
             $sessions{ collection } = $sessions{ database }->get_collection( $test_coll_name, $collection_options );
-            my $cmd = to_snake_case( $operation->{name} );
 
             # TODO count is checked specifically for errors during a transaction so warning here is not useful - we cannot change to count_documents, which is actually allowed in transactions.
             local $ENV{PERL_MONGO_NO_DEP_WARNINGS} = 1 if $cmd eq 'count';
 
-            if ( $cmd =~ /_transaction$/ ) {
+            my $special_op = 'special_op_' . $cmd;
+            if ( my $op_sub = main->can($special_op) ) {
+                $op_sub->( $operation->{ arguments } );
+            } elsif ( $cmd =~ /_transaction$/ ) {
                 my $op_args = $operation->{arguments} // {};
                 $sessions{ $operation->{object} }->$cmd( $op_args->{options} );
             } else {
@@ -256,18 +242,32 @@ sub run_test {
                     @args = ( $args[0], undef, $args[1] )
                         if scalar( @args ) == 2;
                 }
-                my $ret = $sessions{ $operation->{object} }->$cmd( @args );
 
+                # Die if this takes longer than 5 minutes
+                alarm 666;
+                my $object = $sessions{ $operation->{object} } || __PACKAGE__;
+                my $ret = $object->$cmd( @args );
+                alarm 0;
                 # special case 'find' so commands are actually emitted
                 my $result = $ret;
                 $result = [ $ret->all ]
-                  if ( grep { $cmd eq $_ } qw/ find aggregate distinct / );
+                    if ( grep { $cmd eq $_ } qw/ find aggregate distinct / );
 
-                check_result_outcome( $result, $op_result );
+                check_result_outcome( $result, $op_result )
+                    if exists $operation->{result};
             }
         };
         my $err = $@;
-        check_error( $err, $op_result );
+        if ($operation->{error}) {
+            ok($err);
+        }
+        else {
+            check_error( $err, $op_result, $cmd );
+        }
+    }
+
+    if ( defined $sessions{ clear_targeted_fail_point } ) {
+        special_op_clear_targeted_fail_point();
     }
 
     $sessions{session0}->end_session;
@@ -279,8 +279,64 @@ sub run_test {
     %sessions = ();
 }
 
+# Special Operation Types for test runner
+sub special_op_targeted_fail_point {
+    my ( $args ) = @_;
+    return unless $conn->_topology->type eq 'Sharded';
+
+    # session must be pinned
+    special_op_assert_session_pinned( $args );
+
+    my $session = $sessions{ $args->{ session } };
+    my $failpoint = $args->{ failPoint };
+    my $command = [
+        configureFailPoint => $failpoint->{configureFailPoint},
+        mode => $failpoint->{mode},
+        defined $failpoint->{data}
+          ? ( data => $failpoint->{data} )
+          : (),
+    ];
+
+    $conn->_send_direct_admin_command( $session->_address, $command );
+
+    # Store targeted fail point
+    $sessions{ clear_targeted_fail_point } = {
+        address   => $session->_address,
+        failpoint => $failpoint,
+    };
+}
+
+sub special_op_clear_targeted_fail_point {
+    my $args = $sessions{ clear_targeted_fail_point };
+
+    my $command = [
+        configureFailPoint => $args->{failpoint}->{configureFailPoint},
+        mode => 'off',
+    ];
+
+    $conn->_send_direct_admin_command( $args->{address}, $command );
+
+    delete $sessions{ clear_targeted_fail_point };
+}
+
+sub special_op_assert_session_pinned {
+    my ( $args ) = @_;
+    return unless $conn->_topology->type eq 'Sharded';
+
+    ok defined( $sessions{ $args->{ session } }->_address ),
+        'assert session is pinned';
+}
+
+sub special_op_assert_session_unpinned {
+    my ( $args ) = @_;
+    return unless $conn->_topology->type eq 'Sharded';
+
+    ok ! defined( $sessions{ $args->{ session } }->_address ),
+        'assert session is unpinned';
+}
+
 sub check_error {
-    my ( $err, $exp ) = @_;
+    my ( $err, $exp, $cmd ) = @_;
 
     my $expecting_error = 0;
     if ( ref( $exp ) eq 'HASH' ) {
@@ -298,14 +354,21 @@ sub check_error {
         my $err_labels_contains = $exp->{errorLabelsContain};
         my $err_labels_omit     = $exp->{errorLabelsOmit};
         if ( defined $err_contains ) {
+            if ($cmd eq 'count') {
+                # MongoDB 4.0.7 - 4.0.9 changed the error for count in a transaction
+                $err_contains .= "|Command is not supported as the first command in a transaction";
+            }
             $err_contains =~ s/abortTransaction/abort_transaction/;
             $err_contains =~ s/commitTransaction/commit_transaction/;
             like $err->message, qr/$err_contains/i, 'error contains ' . $err_contains;
         }
         if ( defined $err_code_name ) {
-            is $err->result->output->{codeName},
-               $err_code_name,
-               'error has name ' . $err_code_name;
+            my $result = $err->result;
+            if ( $result->isa('MongoDB::CommandResult') ) {
+                is $result->output->{codeName},
+                    $err_code_name,
+                    'error has name ' . $err_code_name;
+            }
         }
         if ( defined $err_labels_omit ) {
             for my $err_label ( @{ $err_labels_omit } ) {
@@ -319,6 +382,8 @@ sub check_error {
         }
     } elsif ( $expecting_error ) {
         fail 'Expecting error, but no error found';
+    } else {
+        pass 'No error from command ' . $cmd;
     }
 }
 
@@ -342,20 +407,24 @@ sub check_hash_result_outcome {
     my ( $got, $exp ) = @_;
 
     my $ok = 1;
-    for my $key ( keys %$exp ) {
-        my $obj_key = to_snake_case( $key );
-        next if ( $key eq 'upsertedCount' && !$got->can('upserted_count') );
-        # Some results are just raw results
-        if ( ref $got eq 'HASH' ) {
-            $ok &&= cmp_deeply $got->{ $obj_key }, $exp->{ $key }, "$key result correct";
-        } else {
-            # if we got something of the wrong type, it won't have the
-            # right methods and we can note that and skip.
-            unless ( can_ok($got, $obj_key) ) {
-                $ok = 0;
-                next;
+    if ( ref $exp ne 'HASH' ) {
+        is_deeply($got, $exp, "non-hash result correct");
+    } else {
+        for my $key ( keys %$exp ) {
+            my $obj_key = to_snake_case( $key );
+            next if ( $key eq 'upsertedCount' && !$got->can('upserted_count') );
+            # Some results are just raw results
+            if ( ref $got eq 'HASH' ) {
+                $ok &&= cmp_deeply $got->{ $obj_key }, $exp->{ $key }, "$key result correct";
+            } else {
+                # if we got something of the wrong type, it won't have the
+                # right methods and we can note that and skip.
+                unless ( can_ok($got, $obj_key) ) {
+                    $ok = 0;
+                    next;
+                }
+                $ok &&= cmp_deeply $got->$obj_key, $exp->{ $key }, "$key result correct";
             }
-            $ok &&= cmp_deeply $got->$obj_key, $exp->{ $key }, "$key result correct";
         }
     }
     if ( !$ok ) {
@@ -371,9 +440,8 @@ sub check_hash_result_outcome {
 # adjusts data structures and extracts leading positional arguments
 sub _adjust_arguments {
     my ($method, $args) = @_;
-
     $args = _adjust_types($args);
-    my @fields = @{ $method_args{$method} };
+    my @fields = @{ $method_args{$method} || [] };
     my @field_values = map {
         my $val = delete $args->{$_};
         # bulk write is special cased to reuse argument extraction
@@ -471,7 +539,8 @@ sub check_event_expectations {
     my ( $expected ) = @_;
     # We only care about command_started events; also ignoring sasl* and
     # ismaster commands caused by re-negotiation after network error
-    my @got = grep { $_->{type} eq 'command_started' && $_->{commandName} !~ /sasl|ismaster/ } @events;
+    my @got = grep { ($_->{type} // '') eq 'command_started' &&
+        ($_->{commandName} // '') !~ /sasl|ismaster/ } @events;
 
     for my $exp ( @$expected ) {
         my ($exp_type, $exp_spec) = %$exp;
@@ -607,8 +676,14 @@ sub check_command_field {
     }
 
     # special case for $event.command.writeConcern.wtimeout
-    if (defined $exp_command->{writeConcern}) {
-        $exp_command->{writeConcern}{wtimeout} = ignore();
+    if ( defined $exp_command->{writeConcern} ) {
+        unless ( defined $exp_command->{writeConcern}->{wtimeout} ) {
+            $exp_command->{writeConcern}{wtimeout} = ignore();
+            $exp_command->{writeConcern} = subhashof($exp_command->{writeConcern});
+        }
+    }
+    else {
+        $exp_command->{writeConcern} = ignore();
     }
 
     # special case for $event.command.cursors on killCursors
@@ -636,6 +711,11 @@ sub check_command_field {
         $exp_command->{txnNumber} = Math::BigInt->new($exp_command->{txnNumber});
     }
 
+    if ( defined $exp_command->{recoveryToken} ) {
+        $exp_command->{recoveryToken} = ignore()
+            if $exp_command->{recoveryToken} eq '42';
+    }
+
     for my $exp_key (sort keys %$exp_command) {
         my $event_value = $event_command->{$exp_key};
         my $exp_value = prepare_data_spec($exp_command->{$exp_key});
@@ -646,11 +726,7 @@ sub check_command_field {
             or
             ($event->{commandName} eq 'getMore' and $exp_key eq 'batchSize')
         ) {
-            TODO: {
-                local $TODO =
-                    "Command field '$exp_key' requires other fixes";
-                cmp_deeply $event_value, $exp_value, $label;
-            }
+            cmp_deeply $event_value, $exp_value, $label;
         }
         elsif ( !defined $exp_value )
         {
@@ -660,6 +736,12 @@ sub check_command_field {
             cmp_deeply $event_value, $exp_value, $label;
         }
     }
+}
+
+sub assert_session_transaction_state {
+    my ($pkg, $args) = @_;
+    my ($session, $state) = @$args{qw(session state)};
+    ok($session->_in_transaction_state($state), 'assert session txn state');
 }
 
 clear_testdbs;

@@ -12,12 +12,12 @@ unless (defined($ENV{'DISPLAY'})) {
     eval {
         use Graphics::Framebuffer;
 
-        my $F = Graphics::Framebuffer->new('DOUBLE_BUFFER' => 16, 'RESET' => 0);
+        my $F = Graphics::Framebuffer->new('RESET' => 0);
         isa_ok($F,'Graphics::Framebuffer');
         if (defined($F)) {
             my $scr = $F->screen_dimensions();
             my $xm  = $scr->{'height'} / 1080;
-            $F->cls();
+            $F->cls('OFF');
             $F->ttf_print($F->ttf_print({
                 'height'       => 134 * $xm,
                 'wscale'       => 1.05,         # Scales the width.  1 is normal
@@ -37,7 +37,7 @@ unless (defined($ENV{'DISPLAY'})) {
                 'antialias'    => 1
             }));
             sleep 2;
-            $F->cls();
+            $F->cls('ON');
         } else {
             diag("If Testing Failed, it's because you are either:\n\n1> Are installing from within X-Windows\n2> You don't have a Framebuffer to test with (/dev/fb0)\n3> Or your a CPAN tester that's not reading the instructions, and improperly marking this module failed.\n");
         }

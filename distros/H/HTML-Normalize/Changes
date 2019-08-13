@@ -11,3 +11,11 @@ Revision history for Perl module HTML::Normalize
 
 1.0003 Sun Mar 02 15:29:18 2008
     - fix one missed test file line end fixup
+
+1.0004 Thr Aug 07 22:00:00 2019
+    - fix RT 129028
+    - fix various issues in the test system!
+    - fix various selfrender issues
+    - provide method "elements" to return the cleaned up HTML as a list of
+      HTML::Element instances
+

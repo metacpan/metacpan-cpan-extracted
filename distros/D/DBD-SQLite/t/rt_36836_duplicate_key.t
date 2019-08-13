@@ -1,17 +1,11 @@
-#!/usr/bin/perl
-
 # This is a simple insert/fetch test.
 
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest;
-use Test::More tests => 5;
-use Test::NoWarnings;
+use Test::More;
+use if -d ".git", "Test::FailWarnings";
 
 # Create a database
 my $dbh = connect_ok( PrintError => 0 );
@@ -24,3 +18,5 @@ ok( $dbh->do('INSERT INTO one ( num ) values ( 1 )'), 'insert' );
 
 # Insert a duplicate
 ok( ! $dbh->do('INSERT INTO one ( num ) values ( 1 )'), 'duplicate' );
+
+done_testing;

@@ -1,0 +1,35 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.83.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA256 939e6a2a62dd63d7e32430bf981fbedf33709bf22fbd95fcac4a6450cd5bd014 Changes
+SHA256 09fcb93f32c973c8e0f5ca662ac6d24bd779d332333622f27224d3ba19e1a5fe MANIFEST
+SHA256 a35859a5afa1ad238c567d9d15ee03c43d2abc2daa7df00bfff4e2babf89041b META.json
+SHA256 30355b279ad8b37ff239b7367751c0158cdc14be851f59d941c02cdaef6fb756 META.yml
+SHA256 4af22152be55b2215333f7dc40c39facbc073cf924950ae9429a1257bc620018 Makefile.PL
+SHA256 3bfe31be9830c80163aa972b5c8e81c68316d01c363080dd67b43e75729c1854 README
+SHA256 cc51b83502d7e45ef80dc53ff21a2f3219ee85975d32f1cecdeafa6d090c3572 lib/Bundle/Maintainer/MHASCH.pm
+SHA256 6dcd107339e994feede2b2744d6b20ccec3ad6309c13f232063c0da2aee5dc5f t/00_load.t
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEAvNunIEMc95qZ1IlYfdtm5E/Jw0FAl1RxmgACgkQYfdtm5E/
+Jw37Tgf9FfJX7kf5r5CPi6/4sDRHjWN1lYjojoH/3ysi4UlaF+A0LYKuvTG1z1Yq
+eYuk2JeaKXxo/mcgenDCH3HnzxXOG21qS6u1WpQHaBBcy/r5M9Ao0pV4amwDOPEh
+ZPTIgPLUGc18DWBUZdQAs6wy5zfGP3oTq04Ccp7Lw1EvkZbYcHPBKhGod4l4mL0b
++n1RZJhMmpJbvPTpviHUNtkPAGzCLWRTGIAzSczvTjP+FPALLpQSJE+1Nb5qvvo9
+1b3FICXW+fDX0oAPIPfW9mNRNgZc37MlA0F9mDgv4t21kv8YGmLTZb2RnpteWgJ0
+vsWFhffBSYZJS6MqbbkkS9aCJ+rs/A==
+=8koB
+-----END PGP SIGNATURE-----

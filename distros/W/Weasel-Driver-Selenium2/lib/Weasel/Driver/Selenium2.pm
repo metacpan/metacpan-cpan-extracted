@@ -5,7 +5,7 @@ Weasel::Driver::Selenium2 - Weasel driver wrapping Selenium::Remote::Driver
 
 =head1 VERSION
 
-0.09
+0.10
 
 =head1 SYNOPSIS
 
@@ -58,13 +58,13 @@ use MIME::Base64;
 use Selenium::Remote::Driver;
 use Time::HiRes qw/ time sleep /;
 use Weasel::DriverRole;
-use Carp;
+use Carp::Clan qw(^Weasel::);
 use English qw(-no_match_vars);
 
 use Moose;
 with 'Weasel::DriverRole';
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 
 =head1 ATTRIBUTES
@@ -136,7 +136,7 @@ see L<Weasel::DriverRole>.
 =cut
 
 sub implements {
-    return '0.02';
+    return '0.03';
 }
 
 =item start
@@ -231,7 +231,13 @@ sub wait_for {
         if (time() <= $end) {
             sleep $args{poll_delay};
         }
+        elsif ($args{on_timeout}) {
+            $args{on_timeout}->();
+        }
         else {
+            croak "wait_for deadline expired waiting for: $args{description}"
+                if defined $args{description};
+
             croak 'wait_for deadline expired; consider increasing the deadline';
         }
     }
@@ -291,7 +297,7 @@ sub execute_script {
 sub get_attribute {
     my ($self, $id, $att) = @_;
 
-    return $self->_resolve_id($id)->get_attribute($att);
+    return $self->_resolve_id($id)->get_attribute($att,1);
 }
 
 =item get_page_source($fh)

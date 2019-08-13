@@ -111,7 +111,7 @@
    "provides" : {
       "BSON::XS" : {
          "file" : "lib/BSON/XS.pm",
-         "version" : "v0.8.0"
+         "version" : "v0.8.1"
       }
    },
    "release_status" : "stable",
@@ -126,7 +126,7 @@
          "web" : "https://github.com/mongodb/mongo-perl-bson-xs"
       }
    },
-   "version" : "v0.8.0",
+   "version" : "v0.8.1",
    "x_authority" : "cpan:MONGODB",
    "x_contributors" : [
       "Paul \"LeoNerd\" Evans <leonerd@leonerd.org.uk>"

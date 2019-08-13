@@ -20,7 +20,7 @@ if ($content =~ m{=head1 SYNOPSIS\n\n\S.+?:\n\n(.+?)\n\S.+?:\n\n(.+?)\n=head1}s)
     }
 }
 
-my $api = myapp_gitlab()->api();
+my $api = myapp_gitlab();
 
 isa_ok( $api, ['GitLab::API::v4'], 'got a gitlab api object' );
 

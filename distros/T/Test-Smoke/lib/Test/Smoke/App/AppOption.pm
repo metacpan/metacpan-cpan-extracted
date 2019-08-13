@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use Carp;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use base 'Test::Smoke::ObjectBase';
 
@@ -90,7 +90,7 @@ sub new {
     return bless $struct, $class;
 }
 
-=head2 $otion->allowed($value[, $allow])
+=head2 $option->allowed($value[, $allow])
 
 Checks if a value is in a set of allowed values.
 

@@ -394,7 +394,7 @@ draw_bgc_maps.pl - This script draws NRPS/PKS BGC clusters maps in PNG
 
 =head1 VERSION
 
-version 0.191800
+version 0.192240
 
 =head1 NAME
 

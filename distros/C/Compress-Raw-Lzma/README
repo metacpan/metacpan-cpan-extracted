@@ -1,9 +1,9 @@
 
                             Compress-Raw-Lzma
 
-                               Version 2.086
+                              Version 2.087
 
-                               31 March 2019
+                              10 August 2019
 
        Copyright (c) 2009-2019 Paul Marquess. All rights reserved.
           This program is free software; you can redistribute it
@@ -186,7 +186,7 @@ To help me help you, I need all of the following information:
         If you haven't installed Compress-Raw-Lzma then search Compress::Raw::Lzma.pm
         for a line like this:
 
-          $VERSION = "2.086" ;
+          $VERSION = "2.087" ;
 
      c. The version of lzma you have used.
         If you have successfully installed Compress-Raw-Lzma, this one-liner

@@ -1,5 +1,12 @@
 Revision history for Net-Connection-Match
 
+0.4.0	 2019-08-12/05:50
+		 - Add PctCPU, PctMem, and WChan.
+
+0.3.0	 2019-08-09/07:40
+		 - Add a missing depend for Error::Helper.
+		 - Add support for regexp command searches.
+
 0.2.0	 2019-08-06/05:30
 		 - Misc. POD fixes.
 		 - Add RegexPTR support.

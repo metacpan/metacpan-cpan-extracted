@@ -4,24 +4,29 @@
       "Thomas Klausner <domm@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Acme-ReturnValue",
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Module::Build" : "0.3601"
+            "Module::Build" : "0.28"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.3601"
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0"
          }
       },
       "runtime" : {
@@ -48,20 +53,36 @@
       },
       "test" : {
          "requires" : {
+            "Acme::CPANAuthors::Register" : "0",
+            "Any::Moose" : "0",
+            "Carp" : "0",
+            "Digest::HMAC_SHA1" : "0",
+            "Exporter" : "0",
+            "MIME::Base64" : "0",
             "Test::More" : "0",
-            "Test::Most" : "0"
+            "Test::Most" : "0",
+            "Time::Piece" : "0",
+            "URI::file" : "0",
+            "WWW::Shorten::_dead" : "0",
+            "XML::LibXML" : "0",
+            "utf8" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "http://returnvalues.useperl.at",
+      "bugtracker" : {
+         "web" : "https://github.com/domm/Acme-ReturnValue/issues"
+      },
+      "homepage" : "https://returnvalues.plix.at",
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/domm/Acme-ReturnValue.git",
-         "web" : "http://github.com/domm/Acme-ReturnValue"
+         "web" : "https://github.com/domm/Acme-ReturnValue"
       }
    },
-   "version" : "1.001"
+   "version" : "1.003",
+   "x_generated_by_perl" : "v5.24.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
 }
 

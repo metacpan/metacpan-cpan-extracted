@@ -1,0 +1,40 @@
+severity = 1
+
+[-BuiltinFunctions::ProhibitComplexMappings]
+[-CodeLayout::RequireTidyCode]
+[-ControlStructures::ProhibitPostfixControls]
+[-ControlStructures::ProhibitUnlessBlocks]
+[-Documentation::PodSpelling]
+[-Documentation::RequirePodAtEnd]
+[-Documentation::RequirePodLinksIncludeText]
+[-Documentation::RequirePodSections]
+[-InputOutput::ProhibitBacktickOperators]
+[-InputOutput::RequireBracedFileHandleWithPrint]
+[-Modules::ProhibitAutomaticExportation]
+[-References::ProhibitDoubleSigils]
+[-RegularExpressions::ProhibitEnumeratedClasses]
+[-RegularExpressions::ProhibitUnusualDelimiters]
+[-RegularExpressions::RequireBracesForMultiline]
+[-RegularExpressions::RequireLineBoundaryMatching]
+[-Subroutines::RequireFinalReturn]
+[-ValuesAndExpressions::ProhibitConstantPragma]
+[-ValuesAndExpressions::ProhibitEmptyQuotes]
+[-ValuesAndExpressions::ProhibitLeadingZeros]
+[-ValuesAndExpressions::ProhibitMagicNumbers]
+[-ValuesAndExpressions::ProhibitNoisyQuotes]
+[-Variables::ProhibitLocalVars]
+[-Variables::ProhibitPackageVars]
+[-Variables::ProhibitPunctuationVars]
+
+[BuiltinFunctions::ProhibitStringyEval]
+allow_includes = 1
+
+[RegularExpressions::RequireExtendedFormatting]
+minimum_regex_length_to_complain_about = 30
+
+[Subroutines::RequireArgUnpacking]
+short_subroutine_statements = 5
+allow_subscripts = 1
+
+[TestingAndDebugging::ProhibitNoWarnings]
+allow_with_category_restriction = 1

@@ -19,7 +19,7 @@ package MongoDB::GridFSBucket::DownloadStream;
 # ABSTRACT: File handle abstraction for downloading
 
 use version;
-our $VERSION = 'v2.0.3';
+our $VERSION = 'v2.2.0';
 
 use Moo;
 use Types::Standard qw(
@@ -67,6 +67,7 @@ has file_doc => (
 has _buffer => (
     is  => 'rwp',
     isa => Str,
+    default => "",
 );
 
 has _chunk_n => (
@@ -329,11 +330,9 @@ sub read {
         MongoDB::UsageError->throw(
             'Negative length passed to MongoDB::GridFSBucket::DownloadStream->read');
     }
-    my $bufflen = length $$buffref;
-
     $offset   ||= 0;
-    $bufflen  ||= 0;
     $$buffref ||= '';
+    my $bufflen = length $$buffref;
 
     $offset = max( 0, $bufflen + $offset ) if $offset < 0;
     if ( $offset > $bufflen ) {
@@ -437,7 +436,7 @@ MongoDB::GridFSBucket::DownloadStream - File handle abstraction for downloading
 
 =head1 VERSION
 
-version v2.0.3
+version v2.2.0
 
 =head1 SYNOPSIS
 

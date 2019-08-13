@@ -1,6 +1,13 @@
 CHANGES
 -------
 
+  2.087 10 August 2019
+
+      * clang warning in ppport.h
+        update to latest ppport.h
+        https://github.com/pmqs/Compress-Raw-Zlib/issues/1
+        664a5fbacf778acdd4cfbcc571997f3df5ee43d3
+
   2.086 31 March 2019
 
       * Moved source to github https://github.com/pmqs/Compress-Raw-Zlib

@@ -4,7 +4,7 @@ use warnings;
 
 {
     no strict "vars";
-    $VERSION = "1.13";
+    $VERSION = "1.14";
 }
 
 use Acme::CPANAuthors::Register (
@@ -18,7 +18,6 @@ use Acme::CPANAuthors::Register (
     'DAGOLDEN'      => 'David Golden',
     'DMAKI'         => 'Daisuke Maki',
     'DROLSKY'       => 'Dave Rolsky',
-    'ELIZABETH'     => 'Elizabeth Mattijsen',
     'ETHER'         => 'Karen Etheridge',
     'FAYLAND'       => 'Fayland Lin',
     'FLORA'         => 'Florian Ragwitz',
@@ -28,7 +27,7 @@ use Acme::CPANAuthors::Register (
     'KENTNL'        => 'Kent Fredric',
     'LBROCARD'      => 'Leon Brocard',
     'MANWAR'        => 'Mohammad S Anwar',
-    'MARCEL'        => '???',
+    'MARCEL'        => 'Marcel Gruenauer',
     'MIYAGAWA'      => 'Tatsuhiko Miyagawa',
     'MLEHMANN'      => '???',
     'MRAMBERG'      => 'Marcus Ramberg',
@@ -49,6 +48,7 @@ use Acme::CPANAuthors::Register (
     'TEAM'          => 'Tom Molesworth',
     'TOBYINK'       => 'Toby Inkster',
     'TOKUHIROM'     => '???',
+    'VVELOX'        => '???',
     'YANICK'        => 'Yanick Champoux',
 
 );
@@ -82,14 +82,14 @@ currently maintaining 100 or more distributions on CPAN.
 
 =head1 THE AUTHORS
 
-   1.  1706  PERLANCAR     perlancar
+   1.  1765  PERLANCAR     perlancar
    2.  550  PSIXDISTS     Perl 6 Modules
    3.  296  RJBS          Ricardo SIGNES
    4.  282  TOBYINK       Toby Inkster
-   5.  261  ETHER         Karen Etheridge
+   5.  266  ETHER         Karen Etheridge
    6.  247  ADAMK         Adam Kennedy
    7.  245  JGNI          John Imrie
-   8.  239  MIYAGAWA      Tatsuhiko Miyagawa
+   8.  240  MIYAGAWA      Tatsuhiko Miyagawa
    9.  219  INGY          Ingy dot Net
   10.  215  BINGOS        Chris Williams
   11.  209  FLORA         Florian Ragwitz
@@ -97,34 +97,34 @@ currently maintaining 100 or more distributions on CPAN.
   13.  185  SMUELLER      Steffen Mueller
   14.  182  TOKUHIROM     ???
   15.  180  DAGOLDEN      David Golden
-  16.  167  PLICEASE      Graham Ollis
-  17.  166  PEVANS        Paul Evans
+  16.  169  PLICEASE      Graham Ollis
+  17.  168  PEVANS        Paul Evans
   18.  158  NUFFIN        Yuval Kogman
   19.  156  DROLSKY       Dave Rolsky
   20.  152  BOBTFISH      Tomas Doran
-  21.  149  SHLOMIF       Shlomi Fish
-  22.  147  MARCEL        ???
-  23.  143  ELIZABETH     Elizabeth Mattijsen
-  24.  140  SKIM          Michal Josef Spacek
-  25.  133  NEILB         Neil Bowers
-  26.  130  GUGOD         Liu Kang Min
-  27.  122  DMAKI         Daisuke Maki
+  21.  152  SHLOMIF       Shlomi Fish
+  22.  147  MARCEL        Marcel Gruenauer
+  23.  140  SKIM          Michal Josef Spacek
+  24.  135  NEILB         Neil Bowers
+  25.  133  GUGOD         Liu Kang Min
+  26.  122  DMAKI         Daisuke Maki
+  27.  118  MANWAR        Mohammad S Anwar
   28.  118  SIMON         Simon Cozens
   29.  117  BARBIE        Barbie
-  30.  117  MANWAR        Mohammad S Anwar
-  31.  117  RSAVAGE       Ron Savage
-  32.  112  AUTRIJUS      Audrey Tang
+  30.  117  RSAVAGE       Ron Savage
+  31.  112  AUTRIJUS      Audrey Tang
+  32.  112  MRAMBERG      Marcus Ramberg
   33.  112  SALVA         Salvador Fandino Garcia
-  34.  111  MRAMBERG      Marcus Ramberg
-  35.  109  YANICK        Yanick Champoux
-  36.  108  FAYLAND       Fayland Lin
-  37.  107  MLEHMANN      ???
-  38.  103  BDFOY         brian d foy
-  39.  103  RENEEB        Renee Baecker
-  40.  101  LBROCARD      Leon Brocard
-  41.  100  TEAM          Tom Molesworth
+  34.  109  YANICK        Yanick Champoux
+  35.  108  FAYLAND       Fayland Lin
+  36.  108  MLEHMANN      ???
+  37.  103  BDFOY         brian d foy
+  38.  103  RENEEB        Renee Baecker
+  39.  103  VVELOX        ???
+  40.  102  TEAM          Tom Molesworth
+  41.  101  LBROCARD      Leon Brocard
 
-List last updated: 2019-04-15T04:53:46
+List last updated: 2019-08-11T07:18:35
 
 =head1 MAINTENANCE
 

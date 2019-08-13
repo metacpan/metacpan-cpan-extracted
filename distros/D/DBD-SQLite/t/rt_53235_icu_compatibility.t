@@ -1,24 +1,14 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-    $|  = 1;
-    $^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest;
 use Test::More;
 BEGIN {
-    require DBD::SQLite;
-    if (DBD::SQLite->can('compile_options')
-        && grep /ENABLE_ICU/, DBD::SQLite::compile_options()) {
-        plan( tests => 16 );
-    } else {
+    unless (has_compile_option('ENABLE_ICU')) {
         plan( skip_all => 'requires SQLite ICU plugin to be enabled' );
     }
 }
-# use Test::NoWarnings;
+# use if -d ".git", "Test::FailWarnings";
 
 my @isochars = (ord("K"), 0xf6, ord("n"), ord("i"), ord("g"));
 my $koenig   = pack("U*", @isochars);
@@ -95,3 +85,5 @@ utf8::encode($koenig);
         is $got[$i] => $expected[$i], "got: $got[$i]";
     }
 }
+
+done_testing;

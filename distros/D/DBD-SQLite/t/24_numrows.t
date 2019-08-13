@@ -1,17 +1,11 @@
-#!/usr/bin/perl
-
 # This tests, whether the number of rows can be retrieved.
 
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest;
-use Test::More tests => 18;
-use Test::NoWarnings;
+use Test::More;
+use if -d ".git", "Test::FailWarnings";
 
 sub rows {
     my $sth      = shift;
@@ -78,3 +72,5 @@ SCOPE: {
 	rows( $sth, 2 );
 	ok( $sth->finish, '->finish' );
 }
+
+done_testing;

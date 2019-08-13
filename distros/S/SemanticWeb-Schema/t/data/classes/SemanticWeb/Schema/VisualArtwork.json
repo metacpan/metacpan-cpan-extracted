@@ -13,8 +13,8 @@
          "rdfs:label" : "artEdition",
          "schema:domainIncludes" : "schema:VisualArtwork",
          "schema:rangeIncludes" : [
-            "schema:Integer",
-            "schema:Text"
+            "schema:Text",
+            "schema:Integer"
          ]
       },
       "schema:artMedium" : {
@@ -44,9 +44,9 @@
          "rdfs:label" : "artist",
          "schema:category" : "Comics",
          "schema:domainIncludes" : [
-            "schema:VisualArtwork",
             "schema:ComicIssue",
-            "schema:ComicStory"
+            "schema:ComicStory",
+            "schema:VisualArtwork"
          ],
          "schema:isPartOf" : "http:bib.schema.org",
          "schema:rangeIncludes" : "schema:Person"
@@ -67,9 +67,9 @@
          "rdfs:label" : "colorist",
          "schema:category" : "Comics",
          "schema:domainIncludes" : [
-            "schema:ComicIssue",
+            "schema:VisualArtwork",
             "schema:ComicStory",
-            "schema:VisualArtwork"
+            "schema:ComicIssue"
          ],
          "schema:isPartOf" : "http:bib.schema.org",
          "schema:rangeIncludes" : "schema:Person"
@@ -84,8 +84,8 @@
             "schema:VisualArtwork"
          ],
          "schema:rangeIncludes" : [
-            "schema:QuantitativeValue",
-            "schema:Distance"
+            "schema:Distance",
+            "schema:QuantitativeValue"
          ]
       },
       "schema:height" : {
@@ -93,14 +93,14 @@
          "rdfs:comment" : "The height of the item.",
          "rdfs:label" : "height",
          "schema:domainIncludes" : [
-            "schema:VisualArtwork",
-            "schema:Person",
             "schema:MediaObject",
-            "schema:Product"
+            "schema:Product",
+            "schema:VisualArtwork",
+            "schema:Person"
          ],
          "schema:rangeIncludes" : [
-            "schema:Distance",
-            "schema:QuantitativeValue"
+            "schema:QuantitativeValue",
+            "schema:Distance"
          ]
       },
       "schema:inker" : {
@@ -109,9 +109,9 @@
          "rdfs:label" : "inker",
          "schema:category" : "Comics",
          "schema:domainIncludes" : [
-            "schema:ComicIssue",
+            "schema:ComicStory",
             "schema:VisualArtwork",
-            "schema:ComicStory"
+            "schema:ComicIssue"
          ],
          "schema:isPartOf" : "http:bib.schema.org",
          "schema:rangeIncludes" : "schema:Person"
@@ -122,8 +122,8 @@
          "rdfs:label" : "letterer",
          "schema:category" : "Comics",
          "schema:domainIncludes" : [
-            "schema:ComicIssue",
             "schema:VisualArtwork",
+            "schema:ComicIssue",
             "schema:ComicStory"
          ],
          "schema:isPartOf" : "http:bib.schema.org",
@@ -135,9 +135,9 @@
          "rdfs:label" : "penciler",
          "schema:category" : "Comics",
          "schema:domainIncludes" : [
-            "schema:ComicStory",
+            "schema:ComicIssue",
             "schema:VisualArtwork",
-            "schema:ComicIssue"
+            "schema:ComicStory"
          ],
          "schema:isPartOf" : "http:bib.schema.org",
          "schema:rangeIncludes" : "schema:Person"
@@ -159,13 +159,13 @@
          "rdfs:comment" : "The width of the item.",
          "rdfs:label" : "width",
          "schema:domainIncludes" : [
-            "schema:MediaObject",
             "schema:Product",
-            "schema:VisualArtwork"
+            "schema:VisualArtwork",
+            "schema:MediaObject"
          ],
          "schema:rangeIncludes" : [
-            "schema:Distance",
-            "schema:QuantitativeValue"
+            "schema:QuantitativeValue",
+            "schema:Distance"
          ]
       }
    }

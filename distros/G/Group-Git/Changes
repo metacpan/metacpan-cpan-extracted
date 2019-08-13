@@ -1,5 +1,13 @@
 Revision history for Group-Git
 
+0.7.2   2019-08-11
+        Updating for release of version 0.7.2
+        Updating travis perl version (Ivan Wills)
+        Skipping vtide dir (Ivan Wills)
+        Added more logical processing of errors (Ivan Wills)
+        Better error reporting (Ivan Wills)
+        Adding default cache dir (Ivan Wills)
+
 0.7.1   2019-03-22
         Updating for release of version 0.7.1
         Making it possible to exclude tags (via config) (Ivan Wills)

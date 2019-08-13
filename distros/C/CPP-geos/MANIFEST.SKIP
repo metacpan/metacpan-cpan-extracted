@@ -1,6 +1,6 @@
 ^geos-.*
 
-#!start included /home/syber/perl5/perlbrew/perls/perl-5.28.0dm/lib/5.28.0/ExtUtils/MANIFEST.SKIP
+#!start included /home/b/perl5/perlbrew/perls/perl-debug-5.30.0/lib/5.30.0/ExtUtils/MANIFEST.SKIP
 # Avoid version control files.
 \bRCS\b
 \bCVS\b
@@ -64,5 +64,14 @@
 
 # Avoid MYMETA files
 ^MYMETA\.
-#!end included /home/syber/perl5/perlbrew/perls/perl-5.28.0dm/lib/5.28.0/ExtUtils/MANIFEST.SKIP
+
+# Temp files for new META
+^META_new\.(?:json|yml)
+
+# Avoid travis-ci.org file
+^\.travis\.yml
+
+# Avoid AppVeyor file
+^\.?appveyor.yml
+#!end included /home/b/perl5/perlbrew/perls/perl-debug-5.30.0/lib/5.30.0/ExtUtils/MANIFEST.SKIP
 

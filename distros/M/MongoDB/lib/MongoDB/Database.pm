@@ -20,7 +20,7 @@ package MongoDB::Database;
 # ABSTRACT: A MongoDB Database
 
 use version;
-our $VERSION = 'v2.0.3';
+our $VERSION = 'v2.2.0';
 
 use MongoDB::CommandResult;
 use MongoDB::Error;
@@ -44,7 +44,6 @@ use Types::Standard qw(
 use Carp 'carp';
 use boolean;
 use Moo;
-use Try::Tiny;
 use namespace::clean -except => 'meta';
 
 has _client => (
@@ -223,9 +222,10 @@ sub list_collections {
         options             => $options,
         session             => $session,
         monitoring_callback => $self->_client->monitoring_callback,
+        read_preference     => MongoDB::ReadPreference->new( mode => 'primary' ),
     );
 
-    return $self->_client->send_primary_op($op);
+    return $self->_client->send_retryable_read_op($op);
 }
 
 #pod =method collection_names
@@ -442,12 +442,37 @@ sub run_command {
         monitoring_callback => $self->_client->monitoring_callback,
     );
 
-    my $obj = $self->_client->send_read_op($op);
+    my $obj = $self->_client->send_retryable_read_op($op);
 
     return $obj->output;
 }
 
-sub _aggregate {
+#pod =method aggregate
+#pod
+#pod Runs a query using the MongoDB 3.6+ aggregation framework and returns a
+#pod L<MongoDB::QueryResult> object.
+#pod
+#pod The first argument must be an array-ref of L<aggregation
+#pod pipeline|http://docs.mongodb.org/manual/core/aggregation-pipeline/> documents.
+#pod Each pipeline document must be a hash reference.
+#pod
+#pod The server supports several collection-less aggregation source stages like
+#pod C<$currentOp> and C<$listLocalSessions>.
+#pod
+#pod     $result = $database->aggregate( [
+#pod         {
+#pod             "\$currentOp" => {
+#pod                 allUsers => true,
+#pod             },
+#pod         },
+#pod     ] );
+#pod
+#pod See L<Aggregation|http://docs.mongodb.org/manual/aggregation/> in the MongoDB manual
+#pod for more information on how to construct aggregation queries.
+#pod
+#pod =cut
+
+sub aggregate {
     MongoDB::UsageError->throw("pipeline argument must be an array reference")
       unless ref( $_[1] ) eq 'ARRAY';
 
@@ -466,14 +491,14 @@ sub _aggregate {
         $options->{maxTimeMS} = $self->max_time_ms;
     }
 
-    # read preferences are ignored if the last stage is $out
+    # read preferences are ignored if the last stage is $out or $merge
     my ($last_op) = keys %{ $pipeline->[-1] };
 
     my $op = MongoDB::Op::_Aggregate->_new(
         pipeline        => $pipeline,
         options         => $options,
         read_concern    => $self->read_concern,
-        has_out         => $last_op eq '$out',
+        has_out         => !!($last_op =~ m/\$out|\$merge/),
         client          => $self->_client,
         bson_codec      => $self->bson_codec,
         db_name         => $self->name,
@@ -485,7 +510,7 @@ sub _aggregate {
         monitoring_callback => $self->_client->monitoring_callback,
     );
 
-    return $self->_client->send_read_op($op);
+    return $self->_client->send_retryable_read_op($op);
 }
 
 #pod =method watch
@@ -537,6 +562,9 @@ sub watch {
         exists($options->{resumeAfter})
             ? (resume_after => delete $options->{resumeAfter})
             : (),
+        exists($options->{startAfter})
+            ? (start_after => delete $options->{startAfter})
+            : (),
         exists($options->{maxAwaitTimeMS})
             ? (max_await_time_ms => delete $options->{maxAwaitTimeMS})
             : (),
@@ -571,7 +599,7 @@ MongoDB::Database - A MongoDB Database
 
 =head1 VERSION
 
-version v2.0.3
+version v2.2.0
 
 =head1 SYNOPSIS
 
@@ -847,6 +875,29 @@ For a list of possible database commands, run:
 There are a few examples of database commands in the
 L<MongoDB::Examples/"DATABASE COMMANDS"> section.  See also core documentation
 on database commands: L<http://dochub.mongodb.org/core/commands>.
+
+=head2 aggregate
+
+Runs a query using the MongoDB 3.6+ aggregation framework and returns a
+L<MongoDB::QueryResult> object.
+
+The first argument must be an array-ref of L<aggregation
+pipeline|http://docs.mongodb.org/manual/core/aggregation-pipeline/> documents.
+Each pipeline document must be a hash reference.
+
+The server supports several collection-less aggregation source stages like
+C<$currentOp> and C<$listLocalSessions>.
+
+    $result = $database->aggregate( [
+        {
+            "\$currentOp" => {
+                allUsers => true,
+            },
+        },
+    ] );
+
+See L<Aggregation|http://docs.mongodb.org/manual/aggregation/> in the MongoDB manual
+for more information on how to construct aggregation queries.
 
 =head2 watch
 

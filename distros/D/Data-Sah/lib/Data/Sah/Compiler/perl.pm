@@ -1,7 +1,7 @@
 package Data::Sah::Compiler::perl;
 
-our $DATE = '2019-07-25'; # DATE
-our $VERSION = '0.899'; # VERSION
+our $DATE = '2019-08-12'; # DATE
+our $VERSION = '0.900'; # VERSION
 
 use 5.010;
 use strict;
@@ -70,6 +70,12 @@ sub compile {
     #        $subname . "(" . join(", ", @args) . ")";
     #    }
     #);
+
+    # Data::Dumper is chosen as the default because it's core, but note here the
+    # inconveniences: 1) the incantation to use it the way we want is
+    # cumbersome. Storable is not feasible because of reason explained in
+    # comment in expr_dump(). Data::Dmp is another choice.
+    $args{dump_module} //= "Data::Dumper";
 
     $args{pp} //= $PP // $ENV{DATA_SAH_PP} // 0;
     $args{core} //= $CORE // $ENV{DATA_SAH_CORE} // 0;
@@ -207,11 +213,6 @@ sub add_runtime_no {
     );
 }
 
-sub add_runtime_smartmatch_pragma {
-    my ($self, $cd) = @_;
-    $self->add_runtime_use($cd, 'experimental', ['"smartmatch"']);
-}
-
 # add Scalar::Util::Numeric module
 sub add_sun_module {
     my ($self, $cd) = @_;
@@ -272,7 +273,7 @@ sub expr_push_and_pop_dpath_between_expr {
         "",
         "[",
         $self->expr_push('$_sahv_dpath', $self->literal(undef)), ", ", # 0
-        "~~", $self->enclose_paren($et), ", ", #1 (~~ to avoid list flattening)
+        "scalar", $self->enclose_paren($et), ", ", #1 ('scalar' to avoid list flattening)
         $self->expr_pop('$_sahv_dpath'), # 2
         "]->[1]",
     );
@@ -388,6 +389,23 @@ sub expr_eval {
     "(eval { $stmt }, !\$@)";
 }
 
+# Storable (fast, core) is not chosen because i cannot make it to dump 3 and "3"
+# as "3". some other inconveniences (but not deal breaker): 1) only accepts
+# references so we need to freeze \$foo or [$foo] instead of just $foo; 2) need
+# to set $Storable::canonical to true, otherwise hash keys are not ordered.
+
+sub expr_dump {
+    my ($self, $cd, $t) = @_;
+    my $dump_module = $cd->{args}{dump_module};
+    if ($dump_module eq 'Data::Dumper') {
+        "Data::Dumper->new([$t])->Terse(1)->Indent(0)->Sortkeys(1)->Dump";
+    } elsif ($dump_module eq 'Data::Dmp') {
+        "Data::Dmp::dmp($t)";
+    } else {
+        $self->_die($cd, "Unknown dump module '$dump_module'") if $@;
+    }
+}
+
 sub stmt_require_module {
     my ($self, $mod_record) = @_;
 
@@ -465,7 +483,7 @@ Data::Sah::Compiler::perl - Compile Sah schema to Perl code
 
 =head1 VERSION
 
-This document describes version 0.899 of Data::Sah::Compiler::perl (from Perl distribution Data-Sah), released on 2019-07-25.
+This document describes version 0.900 of Data::Sah::Compiler::perl (from Perl distribution Data-Sah), released on 2019-08-12.
 
 =head1 SYNOPSIS
 
@@ -604,12 +622,6 @@ C<no> statements, e.g. like below, currently you can generate them manually:
 This is the counterpart of C<add_runtime_use()>, to generate C<no foo> statement.
 
 See also: C<add_runtime_use()>.
-
-=head2 $c->add_runtime_smartmatch_pragma($cd)
-
-Equivalent to:
-
- $c->add_runtime_use($cd, 'experimental', ["'smartmatch'"]);
 
 =head2 $c->add_sun_module($cd)
 

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use local::lib;
 
-our $VERSION = '1.22.0';
+our $VERSION = '1.23.0';
 
 =head1 NAME
 
@@ -77,7 +77,7 @@ passing "." or "./src" as input directories).
 The options and output are specific to each tool, so make sure to read the
 corresponding manual for the tool(s) you want.
 
-Run B<analizo> withtout any command line arguments to see the list of available
+Run B<analizo> without any command line arguments to see the list of available
 tools.
 
 =head1 OPTIONS

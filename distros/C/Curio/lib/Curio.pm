@@ -1,5 +1,5 @@
 package Curio;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Curio::Declare qw();
 use Curio::Role qw();
@@ -58,6 +58,9 @@ Create a Curio class:
     does_caching;
     cache_per_process;
     export_function_name 'myapp_cache';
+    always_export;
+    export_resource;
+    resource_method_name 'chi';
     
     add_key geo_ip => (
         chi => {
@@ -80,9 +83,9 @@ Create a Curio class:
 
 Then use your new Curio class elsewhere:
 
-    use MyApp::Service::Cache qw( myapp_cache );
+    use MyApp::Service::Cache;
     
-    my $chi = myapp_cache('geo_ip')->chi();
+    my $chi = myapp_cache('geo_ip');
 
 =head1 DESCRIPTION
 
@@ -178,8 +181,8 @@ Which is exactly the same as:
     use Moo;
     use Curio::Declare;
     use namespace::clean;
-    with 'Curio::Role';
-    __PACKAGE__->initialize();
+    BEGIN { with 'Curio::Role' }
+    BEGIN { __PACKAGE__->initialize() }
 
 If you're not into the declarative interface, or have some other
 reason to switch around this boilerplate, you may copy the above and

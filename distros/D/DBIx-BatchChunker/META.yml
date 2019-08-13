@@ -17,7 +17,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.32, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,6 +34,7 @@ requires:
   Data::Float: '0'
   List::Util: '1.33'
   Moo: '2.000002'
+  MooX::StrictConstructor: '0.008'
   Scalar::Util: '0'
   Term::ProgressBar: '2.14'
   Type::Utils: '0'
@@ -45,6 +46,6 @@ resources:
   bugtracker: https://github.com/GrantStreetGroup/DBIx-BatchChunker/issues
   homepage: https://github.com/GrantStreetGroup/DBIx-BatchChunker
   repository: https://github.com/GrantStreetGroup/DBIx-BatchChunker.git
-version: '0.93'
+version: '0.94'
 x_authority: cpan:GSG
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

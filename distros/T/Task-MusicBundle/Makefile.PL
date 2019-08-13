@@ -37,6 +37,7 @@ my %WriteMakefileArgs = (
     "MIDI::Tweaks" => 0,
     "MIDI::Util" => 0,
     "Music::AtonalUtil" => 0,
+    "Music::Cadence" => 0,
     "Music::Canon" => 0,
     "Music::Chord::Namer" => 0,
     "Music::Chord::Note" => 0,
@@ -71,7 +72,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.1700",
+  "VERSION" => "0.1800",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -102,6 +103,7 @@ my %FallbackPrereqs = (
   "MIDI::Tweaks" => 0,
   "MIDI::Util" => 0,
   "Music::AtonalUtil" => 0,
+  "Music::Cadence" => 0,
   "Music::Canon" => 0,
   "Music::Chord::Namer" => 0,
   "Music::Chord::Note" => 0,

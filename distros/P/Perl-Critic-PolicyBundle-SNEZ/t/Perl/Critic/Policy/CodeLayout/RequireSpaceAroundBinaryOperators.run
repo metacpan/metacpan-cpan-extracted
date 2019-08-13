@@ -1,0 +1,49 @@
+## name Basic violation
+## failures 1
+## cut
+2+2;
+
+## name Operand in parentheses
+## failures 1
+## cut
+$x = (2 + 1)-$y;
+
+## name No whitespace around ,=> secret operator
+## failures 3
+## cut
+my %hash_with_constant_keys = (
+    BASIC_VALUE,=> 1,
+    EXTRA_VALUE,=>2,
+    OTHER_VALUE      ,=>'Something',
+    LAST_VALUE         ,=> 'The End',
+);
+
+## name Basic pass
+## failures 0
+## cut
+2 + 2;
+
+## name Unary operator
+## failures 0
+## cut
+$x = -$y;
+
+## name Unary operator in parentheses
+## failures 0
+## cut
+$x = (-$y);
+
+## name Operand in parentheses
+## failures 0
+## cut
+$x = (2 + 1) - $y;
+
+## name Accept a correctly used ,=> secret operator
+## failures 0
+## cut
+my %hash_with_constant_keys = (
+    BASIC_VALUE ,=> 1,
+    EXTRA_VALUE ,=> 2,
+    OTHER_VALUE ,=> 'Something',
+    LAST_VALUE  ,=> 'The End',
+);

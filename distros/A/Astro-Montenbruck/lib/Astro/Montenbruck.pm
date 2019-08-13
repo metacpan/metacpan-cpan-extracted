@@ -3,7 +3,7 @@ use 5.22.0;
 use strict;
 use warnings;
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 1;
 __END__
@@ -36,12 +36,10 @@ between precision on the one hand and compact, well organized code on the other.
 As authors of the book state, they have tried to obtain an accuracy that is
 approximately the same as that found in astronomical yearbooks.
 
-  "The errors in the fundamental routines for determining the coordinates
-  of the Sun, the Moon, and the planets amount to about 1″-3″."
+"The errors in the fundamental routines for determining the coordinates
+of the Sun, the Moon, and the planets amount to about 1″-3″."
 
-  -- Introduction to the 4-th edition, p.2.
-
-
+-- Introduction to the 4-th edition, p.2.
 
 =head1 MODULES
 
@@ -55,7 +53,9 @@ approximately the same as that found in astronomical yearbooks.
 
 =item * L<Astro::Montenbruck::CoCo> — Coordinates conversions.
 
-=item * L<Astro::Montenbruck::Nutation> — Nutation and obliquity of ecliptic.
+=item * L<Astro::Montenbruck::NutEqu> — Nutation and obliquity of ecliptic.
+
+=item * L<Astro::Montenbruck::RiseSet> — Rise, set, transit and twilight time.
 
 =back
 

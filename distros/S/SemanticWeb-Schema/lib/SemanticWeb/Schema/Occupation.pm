@@ -15,7 +15,15 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.8.1';
+our $VERSION = 'v3.9.0';
+
+
+has education_requirements => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'educationRequirements',
+);
+
 
 
 has estimated_salary => (
@@ -46,6 +54,14 @@ has occupational_category => (
     is        => 'rw',
     predicate => 1,
     json_ld   => 'occupationalCategory',
+);
+
+
+
+has qualifications => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'qualifications',
 );
 
 
@@ -82,13 +98,29 @@ SemanticWeb::Schema::Occupation - A profession
 
 =head1 VERSION
 
-version v3.8.1
+version v3.9.0
 
 =head1 DESCRIPTION
 
 A profession, may involve prolonged training and/or a formal qualification.
 
 =head1 ATTRIBUTES
+
+=head2 C<education_requirements>
+
+C<educationRequirements>
+
+Educational background needed for the position or Occupation.
+
+A education_requirements should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::EducationalOccupationalCredential']>
+
+=item C<Str>
+
+=back
 
 =head2 C<estimated_salary>
 
@@ -159,6 +191,20 @@ A occupational_category should be one of the following types:
 =over
 
 =item C<InstanceOf['SemanticWeb::Schema::CategoryCode']>
+
+=item C<Str>
+
+=back
+
+=head2 C<qualifications>
+
+Specific qualifications required for this role or Occupation.
+
+A qualifications should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::EducationalOccupationalCredential']>
 
 =item C<Str>
 

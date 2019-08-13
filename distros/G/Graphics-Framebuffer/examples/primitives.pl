@@ -338,7 +338,7 @@ sub color_mapping {
             'width'  => $XX,
             'height' => $YY - $F->{'Y_CLIP'},
             'center' => CENTER_XY,
-            'file'   => "$images_path/Test_Pattern.jpg"
+            'file'   => "$images_path/4KTest_Pattern.png"
         }
     );
     $F->blit_write($image);

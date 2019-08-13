@@ -1,10 +1,9 @@
 package Bio::Palantir::Refiner::ClusterPlus;
 # ABSTRACT: Refiner internal class for handling ClusterPlus objects
-$Bio::Palantir::Refiner::ClusterPlus::VERSION = '0.191800';
+$Bio::Palantir::Refiner::ClusterPlus::VERSION = '0.192240';
 use Moose;
 use namespace::autoclean;
 
-use Smart::Comments;
 use Data::UUID;
 
 use aliased 'Bio::Palantir::Refiner::GenePlus';
@@ -88,30 +87,34 @@ sub BUILD {
 
     $self->_set_genes(\@genes_plus);
         
-    $self->_update_ranks;
+    $self->_update_domain_ranks;
 
     return;
 }
 
 # public attributes
 
-sub _update_ranks {
+sub _update_domain_ranks {
     my $self = shift;
 
     my $rank = 1;
     my $exp_rank = 1;
     
     for my $gene ($self->all_genes) {
+
+        next
+            unless $gene->all_domains;
        
         my @sorted_domains 
             = sort { $a->begin <=> $b->begin } $gene->all_domains;
-
         $sorted_domains[$_]->_set_rank($rank++) 
             for (0..(scalar @sorted_domains - 1));
 
+        # assign Domain objets array in the coordinates order
+        $gene->_set_domains(\@sorted_domains);
+
         my @sorted_exp_domains 
             = sort { $a->begin <=> $b->begin } $gene->all_exp_domains;
-
         $sorted_exp_domains[$_]->_set_rank($exp_rank++) 
             for (0..(scalar @sorted_exp_domains - 1));
     }
@@ -133,7 +136,7 @@ Bio::Palantir::Refiner::ClusterPlus - Refiner internal class for handling Cluste
 
 =head1 VERSION
 
-version 0.191800
+version 0.192240
 
 =head1 SYNOPSIS
 

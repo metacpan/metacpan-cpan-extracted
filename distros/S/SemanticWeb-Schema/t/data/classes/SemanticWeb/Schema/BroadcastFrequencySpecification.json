@@ -16,9 +16,32 @@
          "schema:category" : "issue-1004",
          "schema:domainIncludes" : "schema:BroadcastFrequencySpecification",
          "schema:rangeIncludes" : [
-            "schema:QuantitativeValue",
-            "schema:Number"
+            "schema:Number",
+            "schema:QuantitativeValue"
          ]
+      },
+      "schema:broadcastSignalModulation" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2111",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The modulation (e.g. FM, AM, etc) used by a particular broadcast service",
+         "rdfs:label" : "broadcastSignalModulation",
+         "schema:category" : "issue-2111",
+         "schema:domainIncludes" : "schema:BroadcastFrequencySpecification",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:Text",
+            "schema:QualitativeValue"
+         ]
+      },
+      "schema:broadcastSubChannel" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2111",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The subchannel used for the broadcast.",
+         "rdfs:label" : "broadcastSubChannel",
+         "schema:category" : "issue-2111",
+         "schema:domainIncludes" : "schema:BroadcastFrequencySpecification",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
       }
    }
 }

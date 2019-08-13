@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.153';
+our $VERSION = '1.154';
 
 use Quiq::Sql;
 use Quiq::Object;
@@ -20,7 +20,6 @@ use Quiq::Array;
 use Quiq::String;
 use Quiq::Path;
 use Quiq::Digest;
-use Quiq::TempFile;
 use Quiq::Database::Cursor;
 use Time::HiRes ();
 use Quiq::Parameters;
@@ -1374,7 +1373,7 @@ sub sql {
             # richtige Cache-Datei um, siehe $cur->fetch().
 
             $cacheOp = 'w';
-            $cacheFile = Quiq::TempFile->new(-dir=>$cacheDir);
+            $cacheFile = $p->tempFile(-dir=>$cacheDir);
         }
     }
 
@@ -4903,7 +4902,7 @@ Von Perl aus auf die Access-Datenbank zugreifen:
 
 =head1 VERSION
 
-1.153
+1.154
 
 =head1 AUTHOR
 

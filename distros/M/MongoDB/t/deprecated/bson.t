@@ -28,7 +28,13 @@ use MongoDB::BSON::Binary;
 use BSON::Types ':all';
 
 use lib "t/lib";
-use MongoDBTest qw/skip_unless_mongod build_client get_test_db server_version/;
+use MongoDBTest qw/
+    skip_unless_mongod
+    build_client
+    get_test_db
+    server_version
+    skip_unless_min_version
+/;
 
 skip_unless_mongod();
 
@@ -195,18 +201,15 @@ subtest "no . in key names" => sub {
     };
     like($@, qr/documents for storage cannot contain|invalid character/, "insert");
 
-    TODO: {
-        local $TODO = "insert_many doesn't check for nested keys";
-        eval {
-            $c->insert_many([{"x" => "foo"}, {"x.y" => "foo"}, {"y" => "foo"}]);
-        };
-        like($@, qr/documents for storage cannot contain|invalid character/, "batch insert");
+    eval {
+        $c->insert_many([{"x" => "foo"}, {"x.y" => "foo"}, {"y" => "foo"}]);
+    };
+    like($@, qr/documents for storage cannot contain|invalid character/, "batch insert");
 
-        eval {
-            $c->insert_many([{"x" => "foo"}, {"foo" => ["x", {"x.y" => "foo"}]}, {"y" => "foo"}]);
-        };
-        like($@, qr/documents for storage cannot contain|invalid character/, "batch insert");
-    }
+    eval {
+        $c->insert_many([{"x" => "foo"}, {"foo" => ["x", {"x.y" => "foo"}]}, {"y" => "foo"}]);
+    };
+    like($@, qr/documents for storage cannot contain|invalid character/, "batch insert");
 };
 
 # XXX should be legal to have empty keys
@@ -373,7 +376,7 @@ subtest "MongoDB::BSON::Binary type" => sub {
 subtest "Checking hash key unicode support" => sub {
     use utf8;
     $c->drop;
-    
+
     my $testkey = 'юникод';
     my $hash = { $testkey => 1 };
 
@@ -420,8 +423,7 @@ subtest "PERL-575 inflated boolean" => sub {
 };
 
 subtest "PERL-611 Decimal128" => sub {
-    plan skip_all => "Decimal128 needs MongoDB 3.3.8 or later"
-      unless $server_version >= v3.3.8;
+    skip_unless_min_version($conn, 'v3.3.8');
 
     my $string = "1.23456789E+1000";
     my $d128 = BSON::Decimal128->new( value => $string );

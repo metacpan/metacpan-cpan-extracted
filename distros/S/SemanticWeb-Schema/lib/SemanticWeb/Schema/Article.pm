@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.8.1';
+our $VERSION = 'v3.9.0';
 
 
 has article_body => (
@@ -30,6 +30,14 @@ has article_section => (
     is        => 'rw',
     predicate => 1,
     json_ld   => 'articleSection',
+);
+
+
+
+has backstory => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'backstory',
 );
 
 
@@ -90,7 +98,7 @@ SemanticWeb::Schema::Article - An article
 
 =head1 VERSION
 
-version v3.8.1
+version v3.9.0
 
 =head1 DESCRIPTION
 
@@ -126,6 +134,26 @@ such as Sports, Lifestyle, etc.
 A article_section should be one of the following types:
 
 =over
+
+=item C<Str>
+
+=back
+
+=head2 C<backstory>
+
+=for html For an <a class="localLink" href="http://schema.org/Article">Article</a>,
+typically a <a class="localLink"
+href="http://schema.org/NewsArticle">NewsArticle</a>, the backstory
+property provides a textual summary giving a brief explanation of why and
+how an article was created. In a journalistic setting this could include
+information about reporting process, methods, interviews, data sources,
+etc.
+
+A backstory should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
 
 =item C<Str>
 

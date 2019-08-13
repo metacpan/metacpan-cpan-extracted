@@ -1,19 +1,11 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
-use SQLiteTest     qw/connect_ok @CALL_FUNCS/;
+use SQLiteTest;
 use Test::More;
-use Test::NoWarnings qw/had_no_warnings clear_warnings/;
+use if -d ".git", "Test::FailWarnings";
 
 use DBD::SQLite;
-
-plan tests => 24 * @CALL_FUNCS + 1;
 
 # hooks : just count the commits / rollbacks / updates
 my ($n_commits, $n_rollbacks, $n_updates, @update_args);
@@ -71,15 +63,12 @@ foreach my $call_func (@CALL_FUNCS) {
   is($n_commits, 0, "commit hook unregistered");
   is($n_updates, 0, "update hook unregistered");
 
-  # check here explicitly for warnings, before we clear them
-  had_no_warnings();
-
   # remember how many rows we had so far
   my ($n_rows) = $dbh->selectrow_array($sql_count_rows);
 
   # a commit hook that rejects the transaction
   $dbh->$call_func(sub {return 1}, "commit_hook");
-  eval {do_transaction($dbh)}; # in eval() because of RaiseError
+  allow_warnings { eval {do_transaction($dbh)} }; # in eval() because of RaiseError
   ok ($@, "transaction was rejected: $@" );
 
   # no explicit rollback, because SQLite already did it
@@ -96,7 +85,7 @@ foreach my $call_func (@CALL_FUNCS) {
 
   # try transaction again .. rollback hook should not be called
   $n_rollbacks = 0;
-  eval {do_transaction($dbh)};
+  allow_warnings { eval {do_transaction($dbh)} };
   is($n_rollbacks, 0, "rollback hook unregistered");
 
   # check that the rollbacks did really occur
@@ -122,25 +111,17 @@ foreach my $call_func (@CALL_FUNCS) {
             "args to authorizer (INSERT)");
 
   # try a delete (should be unauthorized)
-  eval {$dbh->do("DELETE FROM hook_test WHERE foo = 'auth_test'")};
+  allow_warnings { eval {$dbh->do("DELETE FROM hook_test WHERE foo = 'auth_test'")} };
   ok($@, "delete was rejected with message $@");
   is_deeply(\@authorizer_args, 
             [DBD::SQLite::DELETE, 'hook_test', undef, 'temp', undef],
             "args to authorizer (DELETE)");
 
-
   # unregister the authorizer ... now DELETE should be authorized
   $dbh->$call_func(undef, "set_authorizer");
-  eval {$dbh->do("DELETE FROM hook_test WHERE foo = 'auth_test'")};
+  allow_warnings { eval {$dbh->do("DELETE FROM hook_test WHERE foo = 'auth_test'")} };
   ok(!$@, "delete was accepted");
-
-
-  # sqlite3 did warn in tests above, so avoid complains from Test::Warnings
-  # (would be better to turn off warnings from sqlite3, but I didn't find
-  #  any way to do that)
-  clear_warnings();
 }
-
 
 sub do_transaction {
   my $dbh = shift;
@@ -152,3 +133,5 @@ sub do_transaction {
   }
   $dbh->commit;
 }
+
+done_testing;

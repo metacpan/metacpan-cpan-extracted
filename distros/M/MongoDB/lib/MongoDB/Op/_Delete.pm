@@ -19,7 +19,7 @@ package MongoDB::Op::_Delete;
 # Encapsulate a delete operation; returns a MongoDB::DeleteResult
 
 use version;
-our $VERSION = 'v2.0.3';
+our $VERSION = 'v2.2.0';
 
 use Moo;
 
@@ -67,7 +67,7 @@ sub execute {
           if !$link->supports_collation;
         MongoDB::UsageError->throw(
             "Unacknowledged deletes that specify a collation are not allowed")
-          if !$self->write_concern->is_acknowledged;
+          if ! $self->_should_use_acknowledged_write;
     }
 
     my $filter =
@@ -82,7 +82,7 @@ sub execute {
     };
 
     return (
-        ! $self->write_concern->is_acknowledged
+        ! $self->_should_use_acknowledged_write
         ? (
             $self->_send_legacy_op_noreply(
                 $link,

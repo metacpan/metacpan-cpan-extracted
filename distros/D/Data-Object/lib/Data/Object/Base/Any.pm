@@ -7,7 +7,7 @@ use Scalar::Util 'blessed';
 
 use parent 'Data::Object::Base';
 
-our $VERSION = '0.96'; # VERSION
+our $VERSION = '0.97'; # VERSION
 
 # BUILD
 

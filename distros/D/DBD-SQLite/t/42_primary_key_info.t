@@ -1,17 +1,9 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest qw/connect_ok/;
 use Test::More;
-use Test::NoWarnings;
-
-plan tests => (5 * 5) + (3 * 6 + 1) + (5 * 2) + 1;
+use if -d ".git", "Test::FailWarnings";
 
 for my $quote ('', qw/' " ` []/) {
 	my ($begin_quote, $end_quote) = (substr($quote, 0, 1), substr($quote, -1, 1));
@@ -119,3 +111,5 @@ for my $quote ('', qw/' " ` []/) {
 		is $pk_info[0]{PK_NAME} => 'bar', "pk name is correct";
 	}
 }
+
+done_testing;

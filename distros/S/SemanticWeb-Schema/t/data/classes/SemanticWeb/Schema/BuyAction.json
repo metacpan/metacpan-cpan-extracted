@@ -12,15 +12,15 @@
          "rdfs:label" : "seller",
          "rdfs:subPropertyOf" : "schema:participant",
          "schema:domainIncludes" : [
-            "schema:Order",
-            "schema:Demand",
+            "schema:BuyAction",
             "schema:Offer",
+            "schema:Demand",
             "schema:Flight",
-            "schema:BuyAction"
+            "schema:Order"
          ],
          "schema:rangeIncludes" : [
-            "schema:Person",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Person"
          ]
       },
       "schema:vendor" : {
@@ -30,8 +30,8 @@
          "rdfs:subPropertyOf" : "schema:participant",
          "schema:domainIncludes" : "schema:BuyAction",
          "schema:rangeIncludes" : [
-            "schema:Person",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Person"
          ],
          "schema:supersededBy" : "schema:seller"
       },

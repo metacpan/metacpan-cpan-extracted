@@ -19,14 +19,13 @@ package MongoDB::Op::_DropCollection;
 # Implements a collection drop; returns a MongoDB::CommandResult
 
 use version;
-our $VERSION = 'v2.0.3';
+our $VERSION = 'v2.2.0';
 
 use Moo;
 
 use MongoDB::Error;
 use MongoDB::Op::_Command;
 use Safe::Isa;
-use Try::Tiny;
 use namespace::clean;
 
 with $_ for qw(
@@ -51,15 +50,16 @@ sub execute {
     );
 
     my $res;
-    try {
+    eval {
         $res = $op->execute($link);
         $res->assert_no_write_concern_error;
-    }
-    catch {
-        if ( $_->$_isa("MongoDB::DatabaseError") ) {
-            return undef if $_->code == NAMESPACE_NOT_FOUND() || $_->message =~ /^ns not found/; ## no critic: make $res undef
+        1;
+    } or do {
+        my $error = $@ || "Unknown error";
+        if ( $error->$_isa("MongoDB::DatabaseError") ) {
+            return undef if $error->code == NAMESPACE_NOT_FOUND() || $error->message =~ /^ns not found/; ## no critic: make $res undef
         }
-        die $_;
+        die $error;
     };
 
     return $res;

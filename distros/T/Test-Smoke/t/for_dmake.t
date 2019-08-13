@@ -1,17 +1,29 @@
 #! perl -w
 use strict;
 
+use File::Copy 'copy';
 use File::Spec;
+use File::Temp 'tempdir';
+use Cwd 'abs_path';
 
 use Test::More tests => 101;
 BEGIN { use_ok( 'Test::Smoke::Util' ); }
-END {
-#    1 while unlink 'win32/smoke.mk';
-    chdir File::Spec->updir
-        if -d File::Spec->catdir( File::Spec->updir, 't' );
+
+my $tmpdir = tempdir(CLEANUP => ($ENV{SMOKE_DEBUG} ? 0 : 1));
+mkdir File::Spec->catdir($tmpdir, 'win32');
+{ # cp -r t/win32/ $tmpdir
+    my $source_dir = File::Spec->catdir('t', 'win32');
+    local *SRCDIR;
+    opendir SRCDIR, $source_dir or die "Cannot open '$source_dir': $!";
+    while (my $entry = readdir(SRCDIR)) {
+        my $full_name = File::Spec->catfile($source_dir, $entry);
+        next unless -f $full_name;
+        copy($full_name, File::Spec->catdir($tmpdir, 'win32'));
+    }
+    close SRCDIR;
 }
 
-chdir 't' or die "chdir: $!" if -d 't';
+chdir $tmpdir or die "chdir: $!";
 my $smoke_mk = 'win32/smoke.mk';
 
 # Force the options that have a different default in

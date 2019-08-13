@@ -11,7 +11,7 @@ package UTF8::R2;
 use 5.00503;    # Galapagos Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.03';
+$VERSION = '0.04';
 $VERSION = $VERSION;
 
 use strict;
@@ -65,7 +65,12 @@ sub import {
         shift @_;
     }
     for (@_) {
-        if (defined $utf8_codepoint{$_}) {
+        if ($_ eq '%mb') {
+            no strict qw(refs);
+            tie my %mb, 'UTF8::R2';
+            *{caller().'::mb'} = \%mb;
+        }
+        elsif (defined $utf8_codepoint{$_}) {
             $x = $utf8_codepoint{$_};
         }
     }
@@ -554,9 +559,9 @@ sub UTF8::R2::ucfirst (;$) {
 
 # syntax sugar for UTF-8 codepoint regex
 #
-# tie my %utf8r2, 'UTF8::R2';
-# $result = $_ =~ $utf8r2{qr/$utf8regex/imsxogc}
-# $result = $_ =~ s<$utf8r2{qr/before/imsxo}><after>egr
+# tie my %mb, 'UTF8::R2';
+# $result = $_ =~ $mb{qr/$utf8regex/imsxogc}
+# $result = $_ =~ s<$mb{qr/before/imsxo}><after>egr
 
 sub TIEHASH  { bless { }, $_[0] }
 sub FETCH    { UTF8::R2::qr $_[1] }
@@ -583,9 +588,10 @@ UTF8::R2 - makes UTF-8 scripting easy for enterprise use or LTS
 =head1 SYNOPSIS
 
   use UTF8::R2;
+  use UTF8::R2 ver.sion;      # match or die
   use UTF8::R2 qw( RFC3629 ); # m/./ matches RFC3629 codepoint (default)
   use UTF8::R2 qw( RFC2279 ); # m/./ matches RFC2279 codepoint
-  use UTF8::R2 ver.sion;      # match or die
+  use UTF8::R2 qw( %mb );     # multibyte regex by %mb
 
     $result = UTF8::R2::chop(@_)
     $result = UTF8::R2::chr($_)
@@ -604,9 +610,9 @@ UTF8::R2 - makes UTF-8 scripting easy for enterprise use or LTS
     $result = UTF8::R2::uc($_)
     $result = UTF8::R2::ucfirst($_)
 
-    tie my %utf8r2, 'UTF8::R2';
-    $result = $_ =~ $utf8r2{qr/$utf8regex/imsxogc}
-    $result = $_ =~ s<$utf8r2{qr/before/imsxo}><after>egr
+    use UTF8::R2 qw(%mb);
+    $result = $_ =~ $mb{qr/$utf8regex/imsxogc}
+    $result = $_ =~ s<$mb{qr/before/imsxo}><after>egr
 
 =head1 OCTET SEMANTICS FUNCTIONS VS. CODEPOINT SEMANTICS SUBROUTINES
 
@@ -633,8 +639,8 @@ UTF-8 codepoint semantics is provided by the new subroutine name.
   ------------------------------------------------------------------------------------------------------------------------------------------
   // or m// or qr//       UTF8::R2::qr(qr/$utf8regex/imsxogc)        not supports metasymbol \X that match grapheme
                             or                                       not support range of codepoint(like an "[A-Z]")
-                          tie my %utf8r2, 'UTF8::R2';                not supports POSIX character class (like an [:alpha:])
-                          $utf8r2{qr/$utf8regex/imsxogc}             not supports named character (such as \N{GREEK SMALL LETTER EPSILON}, \N{greek:epsilon}, or \N{epsilon})
+                          use UTF8::R2 qw(%mb);                      not supports POSIX character class (like an [:alpha:])
+                          $mb{qr/$utf8regex/imsxogc}                 not supports named character (such as \N{GREEK SMALL LETTER EPSILON}, \N{greek:epsilon}, or \N{epsilon})
                                                                      not supports character properties (like \p{PROP} and \P{PROP})
   ------------------------------------------------------------------------------------------------------------------------------------------
   ?? or m??                 (nothing)
@@ -649,15 +655,15 @@ UTF-8 codepoint semantics is provided by the new subroutine name.
   ------------------------------------------------------------------------------------------------------------------------------------------
   s/before/after/imsxoegr s<@{[UTF8::R2::qr(qr/before/imsxo)]}><after>egr
                             or
-                          tie my %utf8r2, 'UTF8::R2';
-                          s<$utf8r2{qr/before/imsxo}><after>egr
+                          use UTF8::R2 qw(%mb);
+                          s<$mb{qr/before/imsxo}><after>egr
   ------------------------------------------------------------------------------------------------------------------------------------------
   split//                 UTF8::R2::split(qr/$utf8regex/imsxo, $_, 3)  *CAUTION* UTF8::R2::split(/re/,$_,3) means UTF8::R2::split($_ =~ /re/,$_,3)
   ------------------------------------------------------------------------------------------------------------------------------------------
   sprintf                   (nothing)
   ------------------------------------------------------------------------------------------------------------------------------------------
   substr                  UTF8::R2::substr($_, 0, 5)                 substr() is compatible and usually useful
-                                                                    :lvalue feature needs perl 5.014 or later
+                                                                     :lvalue feature needs perl 5.014 or later
   ------------------------------------------------------------------------------------------------------------------------------------------
   tr/// or y///           UTF8::R2::tr($_, 'ABC', 'XYZ', 'cdsr')     not support range of codepoint(like a "tr/A-Z/a-z/")
   ------------------------------------------------------------------------------------------------------------------------------------------

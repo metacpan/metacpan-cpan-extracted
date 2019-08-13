@@ -1,5 +1,5 @@
 package Yancy::Controller::Yancy::API;
-our $VERSION = '1.038';
+our $VERSION = '1.039';
 # ABSTRACT: An OpenAPI REST controller for the Yancy editor
 
 #pod =head1 DESCRIPTION
@@ -139,7 +139,7 @@ sub _is_type {
 #pod The item's ID field-name is in the stash key C<id_field>. The ID itself
 #pod is extracted from the OpenAPI input, under a parameter of that name.
 #pod
-#pod The return value is filtered like each result is in L</list_items>.
+#pod The return value is filtered like each result is in L</list>.
 #pod
 #pod =cut
 
@@ -274,7 +274,7 @@ Yancy::Controller::Yancy::API - An OpenAPI REST controller for the Yancy editor
 
 =head1 VERSION
 
-version 1.038
+version 1.039
 
 =head1 DESCRIPTION
 
@@ -306,7 +306,7 @@ C<schema>.
 The item's ID field-name is in the stash key C<id_field>. The ID itself
 is extracted from the OpenAPI input, under a parameter of that name.
 
-The return value is filtered like each result is in L</list_items>.
+The return value is filtered like each result is in L</list>.
 
 =head2 set
 

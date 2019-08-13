@@ -1,0 +1,20 @@
+#!/usr/bin/env perl
+#
+# alpo - feed alpo to your own test programs
+
+use strict;
+use warnings;
+use feature qw(say);
+use Cwd qw(getcwd);
+
+if (@ARGV) {
+    if ($ARGV[0] eq 'solleret') {
+        say for reverse @ARGV;
+    } elsif ($ARGV[0] eq 'pwd') {
+        say getcwd();
+        exit 2;
+    } elsif ($ARGV[0] eq 'err') {
+        say STDERR $ENV{ALPO_FOO};
+        exit 4;
+    }
+}

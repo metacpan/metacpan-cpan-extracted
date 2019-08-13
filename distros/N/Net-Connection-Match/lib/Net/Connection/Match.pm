@@ -11,11 +11,11 @@ Net::Connection::Match - Runs a stack of checks to match Net::Connection objects
 
 =head1 VERSION
 
-Version 0.2.0
+Version 0.4.0
 
 =cut
 
-our $VERSION = '0.2.0';
+our $VERSION = '0.4.0';
 
 
 =head1 SYNOPSIS

@@ -53,7 +53,8 @@
             "DBIx::BatchChunker" : "0.92",
             "Eval::Reversible" : "0",
             "List::Util" : "1.44",
-            "Moo" : "2.00",
+            "Moo" : "2.000002",
+            "MooX::StrictConstructor" : "0.008",
             "Term::ProgressBar" : "2.14",
             "Types::Standard" : "1.00",
             "namespace::clean" : "0",
@@ -91,7 +92,7 @@
          "web" : "https://github.com/GrantStreetGroup/DBIx-OnlineDDL"
       }
    },
-   "version" : "0.91",
+   "version" : "0.92",
    "x_authority" : "cpan:GSG",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

@@ -1,0 +1,8 @@
+Revision history for Perl extension Code::Quality.
+
+0.001001 2019-08-13T19:20+03:00
+ - Fix bug: test_clang_tidy should work when code has 2+ errors
+ - Make sure tests do not fail when clang-tidy is not installed
+
+0.001 2019-08-10T13:20+03:00
+ - Initial release

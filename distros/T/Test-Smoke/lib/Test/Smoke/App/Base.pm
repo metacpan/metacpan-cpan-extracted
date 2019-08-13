@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use Carp;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use base 'Test::Smoke::ObjectBase';
 
@@ -200,7 +200,7 @@ sub process_options {
 
 Return the value of an option.
 
-=head3 Argumens
+=head3 Arguments
 
 Positional.
 
@@ -422,16 +422,16 @@ sub _obtain_config_file {
     }
 
     if (-f $cf_name) {
-        $self->cli_options->{'configfile'} = abs_path($cf_name);
+        my $abs_cf = $self->cli_options->{'configfile'} = abs_path($cf_name);
 
         # Read the config-file in a localized environment
         our $conf;
         local $conf;
-        delete $INC{$cf_name};
-        eval { local $^W; require $cf_name };
+        delete $INC{$abs_cf};
+        eval { local $^W; require $abs_cf };
         $self->{_configfile_error} = $@;
         %{$self->from_configfile} = %{ $conf || {} };
-        delete $INC{$cf_name};
+        delete $INC{$abs_cf};
         $self->from_configfile->{verbose} = delete($self->from_configfile->{v})
             if exists $self->from_configfile->{v};
     }

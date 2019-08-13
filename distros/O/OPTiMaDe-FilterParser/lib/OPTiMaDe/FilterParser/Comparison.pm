@@ -28,6 +28,27 @@ sub unshift_operand
     unshift @{$self->{operands}}, $operand;
 }
 
+sub to_filter
+{
+    my( $self ) = @_;
+
+    my $operator = $self->{operator};
+    my @operands;
+    for my $i (0..$#{$self->{operands}}) {
+        my $arg = $self->{operands}[$i];
+        if( blessed $arg && $arg->can( 'to_filter' ) ) {
+            $arg = $arg->to_filter;
+        } else {
+            $arg =~ s/\\/\\\\/g;
+            $arg =~ s/"/\\"/g;
+            $arg = "\"$arg\"";
+        }
+        push @operands, $arg;
+    }
+
+    return "($operands[0] $operator $operands[1])";
+}
+
 sub to_SQL
 {
     my( $self, $delim ) = @_;

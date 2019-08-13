@@ -3,7 +3,7 @@ package App::Maisha::Plugin::Base;
 use strict;
 use warnings;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 #----------------------------------------------------------------------------
 # Public API
@@ -137,7 +137,7 @@ L<App::Maisha>
 
 =head1 COPYRIGHT AND LICENSE
 
-  Copyright (C) 2009-2014 by Barbie
+  Copyright (C) 2009-2019 by Barbie
 
   This distribution is free software; you can redistribute it and/or
   modify it under the Artistic License v2.

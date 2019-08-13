@@ -1,5 +1,5 @@
 ---
-abstract: 'Client logic for the ACME (Let’s Encrypt) protocol'
+abstract: "Client logic for the ACME (Let's Encrypt) protocol"
 author:
   - 'Felipe Gasper'
 build_requires:
@@ -42,5 +42,5 @@ requires:
 resources:
   bugtracker: https://github.com/FGasper/p5-Net-ACME2/issues
   repository: https://github.com/FGasper/p5-Net-ACME2.git
-version: '0.30'
+version: '0.31'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

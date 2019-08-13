@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Exporter ();
 
-our $VERSION = '1.500002';
+our $VERSION = '1.500003';
 $VERSION =~ tr/_//d;
 
 our @EXPORT_OK = qw(
@@ -283,6 +283,7 @@ sub pairfirst (&@) {
 
 sub List::Util::PP::_Pair::key   { $_[0][0] }
 sub List::Util::PP::_Pair::value { $_[0][1] }
+sub List::Util::PP::_Pair::TO_JSON { [ @{$_[0]} ] }
 
 sub uniq (@) {
   my %seen;

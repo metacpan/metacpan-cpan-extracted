@@ -1,18 +1,12 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest;
 use Test::More;
+use if -d ".git", "Test::FailWarnings";
 
 BEGIN { requires_sqlite('3.7.7') }
 
-plan tests => 17;
 use DBI;
 use DBD::SQLite;
 
@@ -34,7 +28,8 @@ sub cleanup {
 
 cleanup();
 
-{
+SKIP: {
+  skip 'URI filename is enabled', 1 if has_compile_option('USE_URI');
   my $dbh = eval {
     DBI->connect("dbi:SQLite:$uri{base}", undef, undef, {
       PrintError => 0,
@@ -225,3 +220,5 @@ cleanup();
   $dbh->disconnect;
   cleanup();
 }
+
+done_testing;

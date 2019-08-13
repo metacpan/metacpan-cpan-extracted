@@ -46,7 +46,7 @@ sub run {
 
     my @domains = $class->_get_domains();
 
-    my $order = $acme->create_new_order(
+    my $order = $acme->create_order(
         identifiers => [ map { { type => 'dns', value => $_ } } @domains ],
     );
 

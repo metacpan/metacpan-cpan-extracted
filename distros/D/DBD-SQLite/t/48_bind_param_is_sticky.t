@@ -1,20 +1,12 @@
-#!/usr/bin/perl
-
 # Check data type assignment in bind_param is sticky
 
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest qw/connect_ok/;
 use DBI qw(:sql_types);
 use Test::More;
-use Test::NoWarnings;
-
-plan tests => 10 + 1;
+use if -d ".git", "Test::FailWarnings";
 
 my $dbh = connect_ok(
     RaiseError => 1,
@@ -47,3 +39,5 @@ $dbh->commit;
 
 $dbh->disconnect;
 undef($dbh);
+
+done_testing;

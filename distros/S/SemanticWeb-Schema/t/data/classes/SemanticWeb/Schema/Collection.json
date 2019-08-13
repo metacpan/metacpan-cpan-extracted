@@ -6,5 +6,16 @@
       "rdfs:subClassOf" : "schema:CreativeWork",
       "schema:isPartOf" : "http:bib.schema.org"
    },
-   "properties" : {}
+   "properties" : {
+      "schema:collectionSize" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1759",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The number of items in the <a class=\"localLink\" href=\"http://schema.org/Collection\">Collection</a>.",
+         "rdfs:label" : "collectionSize",
+         "schema:category" : "issue-1759",
+         "schema:domainIncludes" : "schema:Collection",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Integer"
+      }
+   }
 }

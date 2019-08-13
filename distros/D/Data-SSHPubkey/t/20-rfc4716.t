@@ -35,21 +35,21 @@ EOF
 
 chomp $keys;
 
-my $ret = pubkeys( \$keys );
+my @ret = pubkeys(\$keys);
 
-is( scalar @$ret, 2 );
+is(scalar @ret, 2);
 
-ok( $ret->[0][1] =~ m{^---- BEGIN SSH2 PUBLIC KEY ----${/}AAAAB3NzaC1y} );
-ok( $ret->[1][1] =~ m{^---- BEGIN SSH2 PUBLIC KEY ----${/}AAAAB3NzaC1k} );
+ok($ret[0][1] =~ m{^---- BEGIN SSH2 PUBLIC KEY ----${/}AAAAB3NzaC1y});
+ok($ret[1][1] =~ m{^---- BEGIN SSH2 PUBLIC KEY ----${/}AAAAB3NzaC1k});
 
-dies_ok { pubkeys( \"---- BEGIN SSH2 PUBLIC KEY ----\n" ) };
-dies_ok { pubkeys( \"---- BEGIN SSH2 PUBLIC KEY ----\nx: \\\nbar \\" ) };
+dies_ok { pubkeys(\"---- BEGIN SSH2 PUBLIC KEY ----\n") };
+dies_ok { pubkeys(\"---- BEGIN SSH2 PUBLIC KEY ----\nx: \\\nbar \\") };
 
 # filename parse
-dies_ok { pubkeys( File::Spec->catfile(qw{t toolong.pub}) ) };
+dies_ok { pubkeys(File::Spec->catfile(qw{t toolong.pub})) };
 
 $Data::SSHPubkey::max_lines = 640;
 
-lives_ok { pubkeys( File::Spec->catfile(qw{t toolong.pub}) ) };
+lives_ok { pubkeys(File::Spec->catfile(qw{t toolong.pub})) };
 
 plan tests => 7

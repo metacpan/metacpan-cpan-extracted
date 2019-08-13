@@ -1,5 +1,5 @@
 requires 'namespace::clean' => '0.27';
-requires 'perl' => '5.008001';
+requires 'perl' => '5.016001';
 requires 'strictures' => '2.000001';
 
 requires 'Curio::Role' => '0.04';

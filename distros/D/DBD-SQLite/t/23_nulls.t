@@ -1,16 +1,11 @@
-#!/usr/bin/perl
-
 # This is a test for correctly handling NULL values.
 
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest;
-use Test::More tests => 9;
+use Test::More;
+use if -d ".git", "Test::FailWarnings";
 
 # Create a database
 my $dbh = connect_ok();
@@ -40,3 +35,5 @@ SCOPE: {
 	is( $row->[1], 'NULL-valued id', 'Second column is defined' );
 	ok( $sth->finish, '->finish' );
 }
+
+done_testing;

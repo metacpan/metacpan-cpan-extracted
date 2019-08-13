@@ -1,27 +1,16 @@
-#!/usr/bin/perl
-
 # Tests path containing non-latine-1 characters
 # currently fails on Windows
 
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest;
 use Test::More;
-BEGIN {
-	if ( $] >= 5.008005 ) {
-		plan( tests => 2 + 12 * (($^O eq 'cygwin') ? 2 : 4) );
-	} else {
-		plan( skip_all => 'Unicode is not supported before 5.8.5' );
-	}
-}
-#use Test::NoWarnings;
+use if -d ".git", "Test::FailWarnings";
 use File::Temp ();
 use File::Spec::Functions ':ALL';
+
+BEGIN { requires_unicode_support() }
 
 my $dir = File::Temp::tempdir( CLEANUP => 1 );
 foreach my $subdir ( 'longascii', 'adatbázis', 'name with spaces', '¿¿¿ ¿¿¿¿¿¿') {
@@ -104,7 +93,6 @@ foreach my $subdir ( 'longascii', 'adatbázis', 'name with spaces', '¿¿¿ ¿¿¿¿¿¿')
 	unlink(_path($dbfilex))  if -e _path($dbfilex);
 }
 
-
 # connect to an empty filename - sqlite will create a tempfile
 eval {
 	my $dbh = DBI->connect("dbi:SQLite:dbname=", undef, undef, {
@@ -115,9 +103,6 @@ eval {
 };
 is( $@, '', "Could connect to temp database (empty filename)" );
 diag( $@ ) if $@;
-
-
-
 
 sub _path {  # copied from DBD::SQLite::connect
 	my $path = shift;
@@ -137,3 +122,5 @@ sub _path {  # copied from DBD::SQLite::connect
 	}
 	return $path;
 }
+
+done_testing;

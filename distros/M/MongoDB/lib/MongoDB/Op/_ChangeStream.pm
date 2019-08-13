@@ -20,7 +20,7 @@ package MongoDB::Op::_ChangeStream;
 # and operationTime if supported
 
 use version;
-our $VERSION = 'v2.0.3';
+our $VERSION = 'v2.2.0';
 
 use Moo;
 
@@ -76,6 +76,11 @@ has resume_after => (
     predicate => 'has_resume_after',
 );
 
+has start_after => (
+    is => 'ro',
+    predicate => 'has_start_after',
+);
+
 has all_changes_for_cluster => (
     is => 'ro',
     isa => Boolish,
@@ -106,8 +111,10 @@ sub execute {
     # will reject it as unrecognized
     delete $options->{maxTimeMS} unless $is_2_6;
 
-    # bypassDocumentValidation isn't available until 3.2 (wire version 4)
-    delete $options->{bypassDocumentValidation} unless $link->supports_document_validation;
+    # bypassDocumentValidation isn't available until 3.2 (wire version 4) & dont send if false
+    unless ($link->supports_document_validation && $options->{bypassDocumentValidation}) {
+        delete $options->{bypassDocumentValidation};
+    }
 
     if ( defined $options->{collation} and !$link->supports_collation ) {
         MongoDB::UsageError->throw(
@@ -168,6 +175,10 @@ sub execute {
                 ? (resumeAfter => $self->resume_after)
                 : ()
             ),
+            ($self->has_start_after
+                ? (startAfter => $self->start_after)
+                : ()
+            ),
         }},
         @{ $self->pipeline },
     );
@@ -200,6 +211,7 @@ sub execute {
             ns         => '',
             id         => 0,
             firstBatch => ( delete $res->output->{result} ) || [],
+            postBatchResumeToken => 0,
         };
     }
 

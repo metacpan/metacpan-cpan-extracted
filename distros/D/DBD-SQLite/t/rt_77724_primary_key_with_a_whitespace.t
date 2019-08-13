@@ -1,15 +1,9 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest;
-use Test::More tests => 4;
-use Test::NoWarnings;
+use Test::More;
+use if -d ".git", "Test::FailWarnings";
 
 my $dbh = connect_ok(RaiseError => 1, PrintError => 0);
 
@@ -25,3 +19,5 @@ ok $row, 'Found the primary key column.';
 is $row->{COLUMN_NAME} => "Country Code",
 	'Key column name reported correctly.'
 	or note explain $row;
+
+done_testing;

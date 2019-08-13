@@ -9,24 +9,24 @@ use Test::More 0.88;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 my @tracelog;
 
-package GreatGrandParent;
+package GreatGrandMyParent;
 sub new { bless {}, shift }
 sub method { 4 }
 sub wrapped { push @tracelog => 'primary' }
 
-package GrandParent;
+package GrandMyParent;
 use Class::Method::Modifiers;
-our @ISA = 'GreatGrandParent';
+our @ISA = 'GreatGrandMyParent';
 around method => sub { (3, $_[0]->()) };
 
-package Parent;
+package MyParent;
 use Class::Method::Modifiers;
-our @ISA = 'GrandParent';
+our @ISA = 'GrandMyParent';
 around method => sub { (2, $_[0]->()) };
 
 package Child;
 use Class::Method::Modifiers;
-our @ISA = 'Parent';
+our @ISA = 'MyParent';
 around method => sub { (1, $_[0]->()) };
 
 package GrandChild;

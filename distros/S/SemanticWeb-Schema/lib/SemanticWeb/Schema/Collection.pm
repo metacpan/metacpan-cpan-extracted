@@ -15,7 +15,15 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.8.1';
+our $VERSION = 'v3.9.0';
+
+
+has collection_size => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'collectionSize',
+);
+
 
 
 
@@ -34,11 +42,28 @@ SemanticWeb::Schema::Collection - A created collection of Creative Works or othe
 
 =head1 VERSION
 
-version v3.8.1
+version v3.9.0
 
 =head1 DESCRIPTION
 
 A created collection of Creative Works or other artefacts.
+
+=head1 ATTRIBUTES
+
+=head2 C<collection_size>
+
+C<collectionSize>
+
+=for html The number of items in the <a class="localLink"
+href="http://schema.org/Collection">Collection</a>.
+
+A collection_size should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::Integer']>
+
+=back
 
 =head1 SEE ALSO
 

@@ -30,7 +30,7 @@ MongoDB::Upgrading - Deprecations and behavior changes from v1 to v2
 
 =head1 VERSION
 
-version v2.0.3
+version v2.2.0
 
 =head1 DESCRIPTION
 
@@ -332,7 +332,7 @@ MongoDB::DBRef
 
 =item *
 
-MongodB::OID
+MongoDB::OID
 
 =item *
 

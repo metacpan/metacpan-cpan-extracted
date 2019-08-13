@@ -13,13 +13,13 @@ use warnings;
 use Carp qw(croak);
 use File::Temp ();
 
-our ( $max_keys, $max_lines, %ssh_pubkey_types );
+our ($max_keys, $max_lines, %ssh_pubkey_types);
 
 require Exporter;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(&convert_pubkeys &pubkeys %ssh_pubkey_types);
 
-our $VERSION = '0.06';
+our $VERSION = '1.00';
 
 # rsa or ecdsa or ed25519 with the upper case forms presumably some
 # other encoding of one of these, so set very low by default
@@ -46,7 +46,7 @@ sub convert_pubkeys {
     my ($list) = @_;
     my @pubkeys;
     for my $ref (@$list) {
-        if ( $ref->[0] =~ m/^(?:PEM|PKCS8|RFC4716)$/ ) {
+        if ($ref->[0] =~ m/^(?:PEM|PKCS8|RFC4716)$/) {
             # TODO perl (or CPAN module) conversion of these so don't
             # need to call out to this ssh-keygen which is not portable
             # to olden versions of ssh-keygen
@@ -58,43 +58,43 @@ sub convert_pubkeys {
             binmode $fh;
             push @pubkeys, do { local $/; readline $fh };
             close $fh or die "ssh-keygen failed with exit status $?";
-        } elsif ( $ref->[0] =~ m/^(?:ecdsa|ed25519|rsa)$/ ) {
+        } elsif ($ref->[0] =~ m/^(?:ecdsa|ed25519|rsa)$/) {
             push @pubkeys, $ref->[1];
         } else {
             croak 'unknown public key type ' . $ref->[0];
         }
     }
     chomp @pubkeys;
-    return \@pubkeys;
+    return @pubkeys;
 }
 
 sub pubkeys {
     my ($input) = @_;
     croak "input must be string, GLOB, or scalar ref" if !defined $input;
     my $fh;
-    if ( ref $input eq 'GLOB' ) {
+    if (ref $input eq 'GLOB') {
         $fh = $input;
     } else {
         open $fh, '<', $input or croak "could not open $input: $!";
         binmode $fh;
     }
     my @keys;
-    while ( my $line = readline $fh ) {
+    while (my $line = readline $fh) {
         croak "too many input lines" if $. > $max_lines;
-        if ( $line =~ m{^(-----BEGIN RSA PUBLIC KEY-----)} ) {
+        if ($line =~ m{^(-----BEGIN RSA PUBLIC KEY-----)}) {
             my $key = $1;
-            my ( $ok, $data ) = _until_end( $fh, '-----END RSA PUBLIC KEY-----' );
+            my ($ok, $data) = _until_end($fh, '-----END RSA PUBLIC KEY-----');
             croak "could not parse PEM pubkey: $data" unless defined $ok;
             push @keys, [ 'PEM', $key . $/ . $data ];
-        } elsif ( $line =~ m{^(-----BEGIN PUBLIC KEY-----)} ) {
+        } elsif ($line =~ m{^(-----BEGIN PUBLIC KEY-----)}) {
             my $key = $1;
-            my ( $ok, $data ) = _until_end( $fh, '-----END PUBLIC KEY-----' );
+            my ($ok, $data) = _until_end($fh, '-----END PUBLIC KEY-----');
             croak "could not parse PKCS8 pubkey: $data" unless defined $ok;
             push @keys, [ 'PKCS8', $key . $/ . $data ];
 
-        } elsif ( $line =~ m{^(---- BEGIN SSH2 PUBLIC KEY ----)} ) {
+        } elsif ($line =~ m{^(---- BEGIN SSH2 PUBLIC KEY ----)}) {
             my $key = $1;
-            my ( $ok, $data ) = _until_end( $fh, '---- END SSH2 PUBLIC KEY ----' );
+            my ($ok, $data) = _until_end($fh, '---- END SSH2 PUBLIC KEY ----');
             croak "could not parse RFC4716 pubkey: $data" unless defined $ok;
             push @keys, [ 'RFC4716', $key . $/ . $data ];
         } elsif (
@@ -109,19 +109,19 @@ sub pubkeys {
         }
         croak "too many keys" if @keys > $max_keys;
     }
-    return \@keys;
+    return @keys;
 }
 
 # this (probably incorrectly) enforces RFC 4716 parsing on all of the
 # multiline formats so may not be correct for the other two formats,
 # though attempts are made at supporting them
 sub _until_end {
-    my ( $fh, $fin ) = @_;
+    my ($fh, $fin) = @_;
     my $ok;
     my $ret = '';
-    while ( my $line = readline $fh ) {
+    while (my $line = readline $fh) {
         die "too many input lines" if $. > $max_lines;
-        if ( $line =~ m/^($fin)/ ) {
+        if ($line =~ m/^($fin)/) {
             $ret .= $1;
             $ok = 1;
             last;
@@ -137,8 +137,8 @@ sub _until_end {
 
         # RFC 4716 ignore "key file header" fields as this code pretends
         # that it cannot recognize any
-        if ( $line =~ m/:/ ) {
-            if ( $line =~ m/\\$/ ) {    # backslash continues a line
+        if ($line =~ m/:/) {
+            if ($line =~ m/\\$/) {    # backslash continues a line
                 do {
                     $line = readline $fh;
                     return undef, "continued to EOF" if eof $fh;
@@ -154,7 +154,7 @@ sub _until_end {
         # module as I don't know what that specific encoding looks like.
         # go with a sloppy Base64ish match, meanwhile, as that is what
         # OpenSSH generates as output
-        if ( $line =~ m{^([A-Za-z0-9+/=]{1,72})$} ) {
+        if ($line =~ m{^([A-Za-z0-9+/=]{1,72})$}) {
             $ret .= $1 . $/;
             next;
         }
@@ -187,8 +187,8 @@ Data::SSHPubkey - utility function to parse SSH public keys with
   # a Mojo app might accept public keys from clients, e.g.
   #   cat /etc/ssh/*.pub | curl ... --data-urlencode pk@- http...
   # this case is supported via a scalar reference
-  my $keylist = pubkeys( \$c->param('pk') );
-  for my $ref ( @$keylist ) {
+  my @keylist = pubkeys( \$c->param('pk') );
+  for my $ref ( @keylist ) {
       my ($type, $pubkey) = @$ref;
       ...
   }
@@ -197,54 +197,46 @@ Data::SSHPubkey - utility function to parse SSH public keys with
   # pass in a file handle
   open( my $fh, '-|', qw(ssh-keyscan --), $host ) or die ...
   binmode $fh;
-  my $keylist = pubkeys($fh);
+  @keylist = pubkeys($fh);
 
   # a string will be treated as a file to open and read
-  my $keylist = pubkeys( "/etc/ssh/ssh_host_ed25519_key.pub" );
+  my @keylist = pubkeys( "/etc/ssh/ssh_host_ed25519_key.pub" );
 
   # if you do not care about the key types, extract only the pub
   # keys with something like
-  ... = map { $_->[1] } @$keylist;
+  ... = map { $_->[1] } @keylist;
 
 =head1 DESCRIPTION
 
 C<Data::SSHPubkey> parses SSH public keys, or at least some of those
 supported by L<ssh-keygen(1)>. It may be prudent to check any uploaded
-data against C<ssh-keygen> though this module should help extract said
-data from a web form upload or the like to get to that step.
-
-Currently supported public key types (the possible values that C<$type>
-above may contain):
+data against C<ssh-keygen>. Currently supported public key types (the
+possible values that C<$type> above may contain):
 
   ecdsa ed25519 rsa
   PEM PKCS8 RFC4716
 
 Neither SSH1 keys nor SSH2 DSA keys are supported.
 
-The C<$pubkey> data will not include any tailing comments; those are
-stripped. The C<$pubkey> data will not end with a newline; that must
-be added by your software as necessary when writing out the public
-keys. POSIX mandates an ultimate newline, and the shell C<read>
-command is buggy by default if that ultimate newline is missing:
-
-  $ (echo data; echo -n loss) | while read line; do echo $line; done
-
-Inner newlines for the multiline SSH public key types (C<PEM>, C<PKCS8>,
-and C<RFC4716>) will be standardized to the C<$/> variable. This may
-cause problems if C<ssh-keygen(1)> or equivalent on some platform
-demands a specific newline sequence that is not C<$/>.
+The data will not include any tailing comments; those are stripped. The
+data will not end with a newline; that must be added by your software as
+necessary when writing out the public keys. Inner newlines for the
+multiline SSH public key types (C<PEM>, C<PKCS8>, and C<RFC4716>) will
+be standardized to the C<$/> variable. This may cause problems if
+C<ssh-keygen(1)> or equivalent on some platform demands a specific
+newline sequence that is not C<$/>.
 
 The types C<PEM>, C<PKCS8>, and C<RFC4716> will need conversion for use
 with OpenSSH; use B<convert_pubkeys> or these types could be excluded
 with something like:
 
   my @pubkeys = grep { $_->[0] =~ m/^(?:ecdsa|ed25519|rsa)$/ }
-    @{ Data::SSHPubkey::pubkeys( ... ) };
+    Data::SSHPubkey::pubkeys( ... );
 
 or
 
   ... = map { $_->[0] =~ m/^(?:ecdsa|ed25519|rsa)$/ ? $_->[1] : () }
-    @{ Data::SSHPubkey::pubkeys( ... ) };
+    Data::SSHPubkey::pubkeys( ... );
 
 to obtain only the public key material.
 
@@ -267,10 +259,9 @@ be opened and parsed.
 
 This routine will B<croak> on error as, in theory, all the errors should
 be due to the data passed in by the caller, or possibly the system has
-run out of memory, or something.
+just run out of memory, or something.
 
-The return format is a reference to a list of C<[ $type, $pubkey ]>
-sublists.
+The return format is a list of C<[ $type, $pubkey ]> sublists.
 
 =back
 
@@ -290,12 +281,6 @@ SSH public key types supported by this module.
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-data-sshpubkey at
-rt.cpan.org>, or through the web interface at
-L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Data-SSHPubkey>. I
-will be notified, and then you'll automatically be notified of progress
-on your bug as I make changes.
-
 Patches might best be applied towards:
 
 L<https://github.com/thrig/Data-SSHPubkey>
@@ -308,8 +293,8 @@ Support for the C<PEM> and especially C<PKCS8> formats is a bit sloppy,
 and the base64 matching is done by a regex that may accept data that is
 not valid base64.
 
-Support for various RFC 4253 formats is likely lacking (see below or
-the comments in the code).
+Support for various RFC 4253 formats is likely lacking (see below or the
+comments in the code).
 
 More tests are necessary for more edge cases.
 
@@ -324,6 +309,8 @@ B<convert_pubkeys> calls out to (modern versions of) L<ssh-keygen(1)>;
 ideally this might instead be done via suitable CPAN modules.
 
 =head1 SEE ALSO
+
+https://github.com/thrig/web_irulan
 
 L<ssh-keygen(1)>, L<ssh-keyscan(1)>
 

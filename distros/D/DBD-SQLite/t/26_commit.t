@@ -1,22 +1,13 @@
-#!/usr/bin/perl
-
 # This is testing the transaction support.
 
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest;
-use Test::More tests => 28;
-# use Test::NoWarnings;
+use Test::More;
+# use if -d ".git", "Test::FailWarnings";
 
 my $warning_count = 0;
-
-
-
 
 #####################################################################
 # Support functions
@@ -37,10 +28,6 @@ sub rows {
 		"Found $expected rows",
 	);
 }
-
-
-
-
 
 #####################################################################
 # Main Tests
@@ -120,3 +107,5 @@ SCOPE: {
 	$SIG{__WARN__} = 'DEFAULT';
 	is( $warning_count, 2, 'Got one warning' );
 }
+
+done_testing;

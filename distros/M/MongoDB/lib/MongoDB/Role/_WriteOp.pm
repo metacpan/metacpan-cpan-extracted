@@ -20,7 +20,7 @@ package MongoDB::Role::_WriteOp;
 # or other things that take a write concern)
 
 use version;
-our $VERSION = 'v2.0.3';
+our $VERSION = 'v2.2.0';
 
 use Moo::Role;
 
@@ -35,5 +35,13 @@ has write_concern => (
     required => 1,
     isa => WriteConcern,
 );
+
+sub _should_use_acknowledged_write {
+    my $self = shift;
+
+    # We should never use an unacknowledged write concern in an active transaction
+    return 1 if $self->session && $self->session->_active_transaction;
+    return $self->write_concern->is_acknowledged;
+}
 
 1;

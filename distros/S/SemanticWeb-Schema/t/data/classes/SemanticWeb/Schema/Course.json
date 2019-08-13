@@ -19,19 +19,24 @@
          "rdfs:label" : "coursePrerequisites",
          "schema:domainIncludes" : "schema:Course",
          "schema:rangeIncludes" : [
-            "schema:Course",
             "schema:Text",
+            "schema:Course",
             "schema:AlignmentObject"
          ]
       },
       "schema:educationalCredentialAwarded" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2289",
          "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "A description of the qualification, award, certificate, diploma or other educational credential awarded as a consequence of successful completion of this course.",
+         "rdfs:comment" : "A description of the qualification, award, certificate, diploma or other educational credential awarded as a consequence of successful completion of this course or program.",
          "rdfs:label" : "educationalCredentialAwarded",
-         "schema:domainIncludes" : "schema:Course",
+         "schema:category" : "issue-2289",
+         "schema:domainIncludes" : [
+            "schema:Course",
+            "schema:EducationalOccupationalProgram"
+         ],
          "schema:rangeIncludes" : [
-            "schema:EducationalOccupationalCredential",
             "schema:URL",
+            "schema:EducationalOccupationalCredential",
             "schema:Text"
          ]
       },
@@ -41,6 +46,23 @@
          "rdfs:label" : "hasCourseInstance",
          "schema:domainIncludes" : "schema:Course",
          "schema:rangeIncludes" : "schema:CourseInstance"
+      },
+      "schema:occupationalCredentialAwarded" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2289",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A description of the qualification, award, certificate, diploma or other occupational credential awarded as a consequence of successful completion of this course or program.",
+         "rdfs:label" : "occupationalCredentialAwarded",
+         "schema:category" : "issue-2289",
+         "schema:domainIncludes" : [
+            "schema:Course",
+            "schema:EducationalOccupationalProgram"
+         ],
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:URL",
+            "schema:Text",
+            "schema:EducationalOccupationalCredential"
+         ]
       }
    }
 }

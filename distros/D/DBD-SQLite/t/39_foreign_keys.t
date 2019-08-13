@@ -1,20 +1,12 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest;
 use Test::More;
 
 BEGIN { requires_sqlite('3.6.19') }
 
-use Test::NoWarnings;
-
-plan tests => 17;
+use if -d ".git", "Test::FailWarnings";
 
 # following tests are from http://www.sqlite.org/foreignkeys.html
 
@@ -77,3 +69,5 @@ sub insert_track {  _do("INSERT INTO track (trackid, trackname, trackartist) VAL
 sub update_track {  _do("UPDATE track SET trackartist = ? WHERE trackname = ?", @_); }
 
 sub _do { eval { $dbh->do(shift, undef, @_) }; }
+
+done_testing;

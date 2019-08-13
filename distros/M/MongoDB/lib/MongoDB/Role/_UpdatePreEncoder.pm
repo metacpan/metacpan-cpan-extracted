@@ -19,11 +19,12 @@ package MongoDB::Role::_UpdatePreEncoder;
 # MongoDB interface for pre-encoding and validating update/replace docs
 
 use version;
-our $VERSION = 'v2.0.3';
+our $VERSION = 'v2.2.0';
 
 use Moo::Role;
 
 use BSON::Raw;
+use BSON::Types 'bson_array';
 use MongoDB::Error;
 use MongoDB::_Constants;
 
@@ -34,13 +35,29 @@ requires qw/bson_codec/;
 sub _pre_encode_update {
     my ( $self, $max_bson_object_size, $doc, $is_replace ) = @_;
 
-    my $bson_doc = $self->bson_codec->encode_one(
-        $doc,
-        {
-            invalid_chars => $is_replace ? '.' : '',
-            max_length => $is_replace ? $max_bson_object_size : undef,
+    my $type = ref($doc);
+    my $bson_doc;
+
+    if ( $type eq 'BSON::Raw' ) {
+        $bson_doc = $doc->bson;
+    }
+    elsif ($type eq 'BSON::Array' && !$is_replace) {
+        return $doc;
+    }
+    else {
+        if ($type eq 'ARRAY' && scalar(@$doc) && ref($doc->[0]) && !$is_replace) {
+            return bson_array(@$doc);
         }
-    );
+        else {
+            $bson_doc = $self->bson_codec->encode_one(
+                $doc,
+                {
+                    invalid_chars => $is_replace ? '.' : '',
+                    max_length => $is_replace ? $max_bson_object_size : undef,
+                }
+            );
+        }
+    }
 
     # must check if first character of first key is valid for replace/update;
     # do this from BSON to get key *after* op_char replacment;
@@ -51,11 +68,11 @@ sub _pre_encode_update {
         my $err;
         if ($is_replace) {
             $err = "replacement document must not contain update operators"
-              if $first_char eq '$';
+                if $first_char eq '$';
         }
         else {
             $err = "update document must only contain update operators"
-              if $first_char ne '$';
+                if $first_char ne '$';
         }
 
         MongoDB::DocumentError->throw(
@@ -70,6 +87,7 @@ sub _pre_encode_update {
         );
     }
 
+    return $doc if $type eq 'BSON::Raw';
     # manually bless for speed
     return bless { bson => $bson_doc, metadata => {} }, "BSON::Raw";
 }

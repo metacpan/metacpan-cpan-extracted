@@ -8,10 +8,10 @@ plan skip_all => "can't load Acme::CPANAuthors"
 plan tests => 9;
 
 my $authors  = eval { Acme::CPANAuthors->new("BackPAN::OneHundred") };
-is( $@, "", "creating a new Acme::CPANAuthors object with InMemoriam authors" );
+is( $@, "", "creating a new Acme::CPANAuthors object with BackPAN 100 authors" );
 isa_ok( $authors, "Acme::CPANAuthors" );
 
-my $number = 51;
+my $number = 49;
 is( $authors->count, $number, " .. \$authors->count matches current count" );
 
 my @ids = $authors->id;

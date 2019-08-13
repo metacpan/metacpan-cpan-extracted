@@ -26,21 +26,21 @@ no_index:
 provides:
   Curio:
     file: lib/Curio.pm
-    version: '0.05'
+    version: '0.06'
   Curio::Declare:
     file: lib/Curio/Declare.pm
-    version: '0.05'
+    version: '0.06'
   Curio::Factory:
     file: lib/Curio/Factory.pm
-    version: '0.05'
+    version: '0.06'
   Curio::Guard:
     file: lib/Curio/Guard.pm
   Curio::Role:
     file: lib/Curio/Role.pm
-    version: '0.05'
+    version: '0.06'
   Curio::Util:
     file: lib/Curio/Util.pm
-    version: '0.05'
+    version: '0.06'
 recommends:
   Sub::Name: '0.20'
 requires:
@@ -55,13 +55,13 @@ requires:
   Types::Common::String: '1.002001'
   Types::Standard: '1.002001'
   namespace::clean: '0.27'
-  perl: '5.008001'
+  perl: '5.016001'
   strictures: '2.000001'
 resources:
   bugtracker: https://github.com/bluefeet/Curio/issues
   homepage: https://github.com/bluefeet/Curio
   repository: git://github.com/bluefeet/Curio.git
-version: '0.05'
+version: '0.06'
 x_authority: cpan:BLUEFEET
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

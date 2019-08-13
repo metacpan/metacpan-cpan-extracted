@@ -1,7 +1,7 @@
 package Data::Sah::Compiler::perl::TH::bool;
 
-our $DATE = '2019-07-25'; # DATE
-our $VERSION = '0.899'; # VERSION
+our $DATE = '2019-08-12'; # DATE
+our $VERSION = '0.900'; # VERSION
 
 use 5.010;
 use strict;
@@ -31,8 +31,7 @@ sub superclause_comparable {
     if ($which eq 'is') {
         $c->add_ccl($cd, "($dt ? 1:0) == ($ct ? 1:0)");
     } elsif ($which eq 'in') {
-        $c->add_runtime_smartmatch_pragma($cd);
-        $c->add_ccl($cd, "($dt ? 1:0) ~~ [map {\$_?1:0} \@{$ct}]");
+        $c->add_ccl($cd, "(grep { (\$_ ? 1:0) == ($dt ? 1:0) } \@{ $ct }) ? 1:0");
     }
 }
 
@@ -96,7 +95,7 @@ Data::Sah::Compiler::perl::TH::bool - perl's type handler for type "bool"
 
 =head1 VERSION
 
-This document describes version 0.899 of Data::Sah::Compiler::perl::TH::bool (from Perl distribution Data-Sah), released on 2019-07-25.
+This document describes version 0.900 of Data::Sah::Compiler::perl::TH::bool (from Perl distribution Data-Sah), released on 2019-08-12.
 
 =for Pod::Coverage ^(clause_.+|superclause_.+)$
 

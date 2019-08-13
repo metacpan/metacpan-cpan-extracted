@@ -107,7 +107,6 @@ method is_soft {
 
 method get_val {
 
-    my @argv = @ARGV;
     my $arg  = $self->cli_arg;
     my $val;
 
@@ -115,7 +114,7 @@ method get_val {
         #
         # deprecated in favor of self->is_flag
         #
-        my $success = GetOptionsFromArray( \@argv, "$arg" => \$val, );
+        my $success = GetOptionsFromArray( \@ARGV, "$arg" => \$val, );
 
         if ($success) {
             my $val = $val ? 1 : 0;
@@ -125,10 +124,10 @@ method get_val {
         confess "something went sideways?";
     }
     elsif ($self->is_flag) {
-                # - just a cli switch
+        # - just a cli switch
         # - never required from cmdline
         
-        my $success = GetOptionsFromArray( \@argv, "$arg" => \$val, );
+        my $success = GetOptionsFromArray( \@ARGV, "$arg" => \$val, );
 
         if ($success) {
             my $val = $val ? 1 : 0;
@@ -141,7 +140,7 @@ method get_val {
 
         # get "-arg <val>" from cmdline if exists
 
-        my $success = GetOptionsFromArray( \@argv, "$arg=s" => \$val, );
+        my $success = GetOptionsFromArray( \@ARGV, "$arg=s" => \$val, );
         if ($success) {
             return $val;
         }

@@ -1,11 +1,5 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest qw/connect_ok requires_sqlite/;
 use Test::More;
@@ -13,9 +7,7 @@ use DBD::SQLite::Constants qw/SQLITE_OPEN_READONLY/;
 
 BEGIN { requires_sqlite('3.7.11') }
 
-use Test::NoWarnings;
-
-plan tests => 14;
+use if -d ".git", "Test::FailWarnings";
 
 {
 	my $dbh = connect_ok(
@@ -46,3 +38,5 @@ plan tests => 14;
 	# told so)
 	ok $dbh->do('CREATE TABLE foo (id)');
 }
+
+done_testing;

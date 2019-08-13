@@ -85,6 +85,15 @@ METHODS
       recognized by "attach_logger" in Mojo::Log::Role::AttachLogger.
       Defaults to Log::Any.
 
+    category
+
+      Passed through to "attach_logger" in Mojo::Log::Role::AttachLogger.
+      Defaults to the application name.
+
+    prepend_level
+
+      Passed through to "attach_logger" in Mojo::Log::Role::AttachLogger.
+
 BUGS
 
     Report any issues on the public bugtracker.

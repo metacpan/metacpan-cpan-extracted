@@ -1,5 +1,9 @@
 Revision history for this software.
 
+0.04  2019-08-09 00:00:00
+  - supports multibyte regex by %mb on using "use UTF8::R2 qw(%mb)"
+  - created by INABA Hitoshi
+
 0.03  2019-07-11 00:00:00
   - change default encoding to RFC3629 as documented
   - supports UTF8::R2::qr(qr/ MBCS? MBCS+ MBCS* MBCS{n} MBCS{n,} MBCS{n,m} /)

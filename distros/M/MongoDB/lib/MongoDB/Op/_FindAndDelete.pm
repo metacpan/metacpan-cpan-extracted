@@ -19,7 +19,7 @@ package MongoDB::Op::_FindAndDelete;
 # Encapsulate find_and_delete operation; atomically delete and return doc
 
 use version;
-our $VERSION = 'v2.0.3';
+our $VERSION = 'v2.2.0';
 
 use Moo;
 
@@ -28,7 +28,6 @@ use MongoDB::Op::_Command;
 use Types::Standard qw(
     HashRef
 );
-use Try::Tiny;
 use boolean;
 
 use namespace::clean;
@@ -82,15 +81,16 @@ sub execute {
     # XXX more special error handling that will be a problem for
     # command monitoring
     my $result;
-    try {
+    eval {
         $result = $op->execute( $link, $topology );
         $result = $result->{output};
-    }
-    catch {
-        die $_ unless $_ eq 'No matching object found';
+        1;
+    } or do {
+        my $error = $@ || "Unknown error";
+        die $error unless $error eq 'No matching object found';
     };
 
-    # findAndModify returns ok:1 even for write concern errors, so 
+    # findAndModify returns ok:1 even for write concern errors, so
     # we must check and throw explicitly
     if ( $result->{writeConcernError} ) {
         MongoDB::WriteConcernError->throw(

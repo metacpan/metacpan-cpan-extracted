@@ -1,17 +1,9 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest qw/connect_ok/;
 use Test::More;
-use Test::NoWarnings;
-
-plan tests => 8;
+use if -d ".git", "Test::FailWarnings";
 
 my $dbh = connect_ok( RaiseError => 1 );
 
@@ -38,3 +30,5 @@ diag $@ if $@;
 eval { $dbh->do(undef) };
 ok !$@, "undef statement does not spit a warning, and does not die anyway";
 diag $@ if $@;
+
+done_testing;

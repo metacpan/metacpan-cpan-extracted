@@ -23,7 +23,7 @@ use warnings;
 package MongoDB::_Link;
 
 use version;
-our $VERSION = 'v2.0.3';
+our $VERSION = 'v2.2.0';
 
 use Moo;
 use Errno qw[EINTR EPIPE];
@@ -215,7 +215,27 @@ has supports_retryWrites => (
     isa => Boolish,
 );
 
+has supports_op_msg => (
+    is => 'rwp',
+    init_arg => undef,
+    isa => Boolish,
+);
+
+has supports_retryReads => (
+    is => 'rwp',
+    init_arg => undef,
+    isa => Boolish,
+);
+
+# for wire version >= 7
 has supports_4_0_changestreams => (
+    is => 'rwp',
+    init_arg => undef,
+    isa => Boolish,
+  );
+
+# wire version >= 8
+has supports_aggregate_out_read_concern => (
     is => 'rwp',
     init_arg => undef,
     isa => Boolish,
@@ -264,7 +284,7 @@ sub connect {
     # workaround, we always force 'localhost' to use IPv4.
 
     my $fh = $SOCKET_CLASS->new(
-        PeerHost => $host,
+        PeerHost => $ENV{TEST_MONGO_SOCKET_HOST} || $host,
         PeerPort => $port,
         ( lc($host) eq 'localhost' ? ( Family => AF_INET ) : () ),
         Proto    => 'tcp',
@@ -355,9 +375,14 @@ sub set_metadata {
             ? 1
             : 0
         );
+        $self->_set_supports_op_msg(1);
+        $self->_set_supports_retryReads(1);
     }
     if ( $self->accepts_wire_version(7) ) {
         $self->_set_supports_4_0_changestreams(1);
+    }
+    if ( $self->accepts_wire_version(8) ) {
+        $self->_set_supports_aggregate_out_read_concern(1);
     }
 
     return;
@@ -622,8 +647,12 @@ sub _ssl_args {
 
     # This test reimplements IO::Socket::SSL::can_client_sni(), which wasn't
     # added until IO::Socket::SSL 1.84
-    if ( Net::SSLeay::OPENSSL_VERSION_NUMBER() >= 0x01000000 ) {
+    if ( Net::SSLeay::OPENSSL_VERSION_NUMBER() >= 0x10000000 ) {
         $ssl_args{SSL_hostname} = $host, # Sane SNI support
+    }
+
+    if ( Net::SSLeay::OPENSSL_VERSION_NUMBER() >= 0x10100000 ) {
+        $ssl_args{SSL_OP_NO_RENEGOTIATION} = Net::SSLeay::OP_NO_RENEGOTIATION();
     }
 
     $ssl_args{SSL_verifycn_scheme} = 'http';              # enable CN validation

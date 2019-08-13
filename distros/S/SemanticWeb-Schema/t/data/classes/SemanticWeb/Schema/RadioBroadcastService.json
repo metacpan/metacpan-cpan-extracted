@@ -1,0 +1,23 @@
+{
+   "class" : {
+      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2109",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A delivery service through which radio content is provided via broadcast over the air or online.",
+      "rdfs:label" : "RadioBroadcastService",
+      "rdfs:subClassOf" : "schema:BroadcastService",
+      "schema:category" : "issue-2109",
+      "schema:isPartOf" : "http:pending.schema.org"
+   },
+   "properties" : {
+      "schema:callSign" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2109",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The official callsign for the radio broadcast.",
+         "rdfs:label" : "callSign",
+         "schema:category" : "issue-2109",
+         "schema:domainIncludes" : "schema:RadioBroadcastService",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      }
+   }
+}

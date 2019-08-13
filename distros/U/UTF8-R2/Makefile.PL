@@ -2,11 +2,24 @@ use strict;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
-    'NAME'      => 'UTF8::R2',
-    'VERSION'   => '0.03',
-    'ABSTRACT'  => 'makes UTF-8 scripting easy for enterprise use or LTS',
-    'PREREQ_PM' => { },
-    'AUTHOR'    => 'ina <ina@cpan.org> in a CPAN',
+    'NAME'      => q{UTF8::R2},
+    'VERSION'   => q{0.04},
+    'ABSTRACT'  => q{makes UTF-8 scripting easy for enterprise use or LTS},
+    'PREREQ_PM' => {
+        'Carp' => '0',
+        'ExtUtils::MakeMaker' => '5.4302',
+        'File::Basename' => '2.6',
+        'File::Copy' => '2.02',
+        'File::Path' => '1.0401',
+        'FindBin' => '1.42',
+        'Socket' => '0',
+        'Symbol' => '0',
+        'lib' => '0',
+        'perl' => '5.005_03',
+        'strict' => '1.01',
+        'vars' => '0',
+    },
+    'AUTHOR'    => q{ina <ina@cpan.org> in a CPAN},
 );
 
 __END__

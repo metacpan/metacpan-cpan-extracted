@@ -5,8 +5,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep 15 15:59:04 1992
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Jul  9 14:28:48 2010
-# Update Count    : 43
+# Last Modified On: Tue Jul 16 10:02:16 2019
+# Update Count    : 44
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -28,7 +28,7 @@ my ($my_name, $my_version) = qw( MyProg 0.01 );
 use Getopt::Long 2.13;
 
 # Command line options.
-my $verbose = 0;		# verbose processing
+my $verbose = 1;		# verbose processing
 
 # Development options (not shown with -help).
 my $debug = 0;			# debugging
@@ -61,7 +61,8 @@ sub app_options {
 
     if ( !GetOptions(
 		     'ident'	=> \$ident,
-		     'verbose'	=> \$verbose,
+		     'verbose+'	=> \$verbose,
+		     'quiet'	=> sub { $verbose = 0 },
 		     'trace'	=> \$trace,
 		     'help|?'	=> \$help,
 		     'debug'	=> \$debug,
@@ -81,9 +82,10 @@ sub app_usage {
     app_ident();
     print STDERR <<EndOfUsage;
 Usage: $0 [options] [file ...]
-    -help		this message
-    -ident		show identification
-    -verbose		verbose information
+   --ident		shows identification
+   --help		shows a brief help message and exits
+   --verbose		provides more verbose information
+   --quiet		runs as silently as possible
 EndOfUsage
     exit $exit if defined $exit && $exit != 0;
 }

@@ -1,0 +1,21 @@
+Revision history for Math-RPN-Simple
+
+1.1.2 - 2019-08-13
+
+	Fixed typo in POD.
+
+1.1.1 - 2019-08-13
+
+	Fixed typo in POD.
+
+1.1.0 - 2019-08-13
+
+	Added cos and sin functions.
+
+1.0.1 - 2019-08-13
+
+	Fixed POD.
+
+1.0.0 - 2019-08-13
+
+	Start of project.

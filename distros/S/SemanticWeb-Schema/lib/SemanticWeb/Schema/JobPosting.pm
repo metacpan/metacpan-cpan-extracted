@@ -15,7 +15,15 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.8.1';
+our $VERSION = 'v3.9.0';
+
+
+has applicant_location_requirements => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'applicantLocationRequirements',
+);
+
 
 
 has base_salary => (
@@ -38,6 +46,14 @@ has date_posted => (
     is        => 'rw',
     predicate => 1,
     json_ld   => 'datePosted',
+);
+
+
+
+has education_requirements => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'educationRequirements',
 );
 
 
@@ -106,6 +122,14 @@ has job_benefits => (
 
 
 
+has job_immediate_start => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'jobImmediateStart',
+);
+
+
+
 has job_location => (
     is        => 'rw',
     predicate => 1,
@@ -114,10 +138,34 @@ has job_location => (
 
 
 
+has job_location_type => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'jobLocationType',
+);
+
+
+
+has job_start_date => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'jobStartDate',
+);
+
+
+
 has occupational_category => (
     is        => 'rw',
     predicate => 1,
     json_ld   => 'occupationalCategory',
+);
+
+
+
+has qualifications => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'qualifications',
 );
 
 
@@ -202,13 +250,30 @@ SemanticWeb::Schema::JobPosting - A listing that describes a job opening in a ce
 
 =head1 VERSION
 
-version v3.8.1
+version v3.9.0
 
 =head1 DESCRIPTION
 
 A listing that describes a job opening in a certain organization.
 
 =head1 ATTRIBUTES
+
+=head2 C<applicant_location_requirements>
+
+C<applicantLocationRequirements>
+
+The location(s) applicants can apply from. This is usually used for
+telecommuting jobs where the applicant does not need to be in a physical
+office. Note: This should not be used for citizenship or work visa
+requirements.
+
+A applicant_location_requirements should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::AdministrativeArea']>
+
+=back
 
 =head2 C<base_salary>
 
@@ -249,6 +314,22 @@ Publication date for the job posting.
 A date_posted should be one of the following types:
 
 =over
+
+=item C<Str>
+
+=back
+
+=head2 C<education_requirements>
+
+C<educationRequirements>
+
+Educational background needed for the position or Occupation.
+
+A education_requirements should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::EducationalOccupationalCredential']>
 
 =item C<Str>
 
@@ -370,6 +451,20 @@ A job_benefits should be one of the following types:
 
 =back
 
+=head2 C<job_immediate_start>
+
+C<jobImmediateStart>
+
+An indicator as to whether a position is available for an immediate start.
+
+A job_immediate_start should be one of the following types:
+
+=over
+
+=item C<Bool>
+
+=back
+
 =head2 C<job_location>
 
 C<jobLocation>
@@ -381,6 +476,37 @@ A job_location should be one of the following types:
 =over
 
 =item C<InstanceOf['SemanticWeb::Schema::Place']>
+
+=back
+
+=head2 C<job_location_type>
+
+C<jobLocationType>
+
+A description of the job location (e.g TELECOMMUTE for telecommute jobs).
+
+A job_location_type should be one of the following types:
+
+=over
+
+=item C<Str>
+
+=back
+
+=head2 C<job_start_date>
+
+C<jobStartDate>
+
+The date on which a successful applicant for this job would be expected to
+start work. Choose a specific date in the future or use the
+jobImmediateStart property to indicate the position is to be filled as soon
+as possible.
+
+A job_start_date should be one of the following types:
+
+=over
+
+=item C<Str>
 
 =back
 
@@ -402,6 +528,20 @@ A occupational_category should be one of the following types:
 =over
 
 =item C<InstanceOf['SemanticWeb::Schema::CategoryCode']>
+
+=item C<Str>
+
+=back
+
+=head2 C<qualifications>
+
+Specific qualifications required for this role or Occupation.
+
+A qualifications should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::EducationalOccupationalCredential']>
 
 =item C<Str>
 

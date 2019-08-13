@@ -1,19 +1,11 @@
-#!/usr/bin/perl
-
 # Trigger locking error and test prepared statement is still valid afterwards
 
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest qw/connect_ok dbfile @CALL_FUNCS/;
 use Test::More;
-use Test::NoWarnings;
-
-plan tests => 10 * @CALL_FUNCS + 1;
+use if -d ".git", "Test::FailWarnings";
 
 foreach my $call_func (@CALL_FUNCS) {
 
@@ -83,3 +75,5 @@ foreach my $call_func (@CALL_FUNCS) {
 
 	unlink $dbfile;
 }
+
+done_testing;

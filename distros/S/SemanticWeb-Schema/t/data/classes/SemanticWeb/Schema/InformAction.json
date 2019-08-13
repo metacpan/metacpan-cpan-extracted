@@ -11,13 +11,13 @@
          "rdfs:comment" : "Upcoming or past event associated with this place, organization, or action.",
          "rdfs:label" : "event",
          "schema:domainIncludes" : [
+            "schema:JoinAction",
+            "schema:Organization",
+            "schema:PlayAction",
             "schema:LeaveAction",
             "schema:InformAction",
-            "schema:Organization",
-            "schema:Place",
-            "schema:JoinAction",
-            "schema:PlayAction",
-            "schema:InviteAction"
+            "schema:InviteAction",
+            "schema:Place"
          ],
          "schema:rangeIncludes" : "schema:Event"
       }

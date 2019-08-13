@@ -23,12 +23,12 @@
          "rdfs:comment" : "An intended audience, i.e. a group for whom something was created.",
          "rdfs:label" : "audience",
          "schema:domainIncludes" : [
-            "schema:Product",
-            "schema:CreativeWork",
             "schema:LodgingBusiness",
+            "schema:Service",
+            "schema:CreativeWork",
             "schema:PlayAction",
-            "schema:Event",
-            "schema:Service"
+            "schema:Product",
+            "schema:Event"
          ],
          "schema:rangeIncludes" : "schema:Audience"
       },
@@ -37,14 +37,14 @@
          "rdfs:comment" : "A language someone may use with or at the item, service or place. Please use one of the language codes from the <a href=\"http://tools.ietf.org/html/bcp47\">IETF BCP 47 standard</a>. See also <a class=\"localLink\" href=\"http://schema.org/inLanguage\">inLanguage</a>",
          "rdfs:label" : "availableLanguage",
          "schema:domainIncludes" : [
-            "schema:TouristAttraction",
-            "schema:ContactPoint",
             "schema:LodgingBusiness",
-            "schema:ServiceChannel"
+            "schema:TouristAttraction",
+            "schema:ServiceChannel",
+            "schema:ContactPoint"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:Language"
+            "schema:Language",
+            "schema:Text"
          ]
       },
       "schema:checkinTime" : {
@@ -65,8 +65,8 @@
          "rdfs:comment" : "The latest someone may check out of a lodging establishment.",
          "rdfs:label" : "checkoutTime",
          "schema:domainIncludes" : [
-            "schema:LodgingReservation",
-            "schema:LodgingBusiness"
+            "schema:LodgingBusiness",
+            "schema:LodgingReservation"
          ],
          "schema:rangeIncludes" : [
             "schema:Time",
@@ -79,12 +79,12 @@
          "rdfs:comment" : "The number of rooms (excluding bathrooms and closets) of the accommodation or lodging business.\nTypical unit code(s): ROM for room or C62 for no unit. The type of room can be put in the unitText property of the QuantitativeValue.",
          "rdfs:label" : "numberOfRooms",
          "schema:domainIncludes" : [
-            "schema:Apartment",
-            "schema:Accommodation",
             "schema:Suite",
-            "schema:House",
             "schema:SingleFamilyResidence",
-            "schema:LodgingBusiness"
+            "schema:House",
+            "schema:Accommodation",
+            "schema:LodgingBusiness",
+            "schema:Apartment"
          ],
          "schema:rangeIncludes" : [
             "schema:Number",
@@ -101,8 +101,8 @@
             "schema:LodgingBusiness"
          ],
          "schema:rangeIncludes" : [
-            "schema:Boolean",
-            "schema:Text"
+            "schema:Text",
+            "schema:Boolean"
          ]
       },
       "schema:starRating" : {

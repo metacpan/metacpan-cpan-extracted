@@ -19,16 +19,18 @@ package MongoDB::CommandResult;
 # ABSTRACT: MongoDB generic command result document
 
 use version;
-our $VERSION = 'v2.0.3';
+our $VERSION = 'v2.2.0';
 
 use Moo;
 use MongoDB::Error;
 use MongoDB::_Constants;
 use MongoDB::_Types qw(
     HostAddress
+    ClientSession
 );
 use Types::Standard qw(
     HashRef
+    Maybe
 );
 use namespace::clean;
 
@@ -60,6 +62,18 @@ has address => (
     is       => 'ro',
     required => 1,
     isa => HostAddress,
+);
+
+#pod =attr session
+#pod
+#pod ClientSession which the command was ran with, if any
+#pod
+#pod =cut
+
+has session => (
+    is       => 'ro',
+    required => 0,
+    isa => Maybe[ClientSession],
 );
 
 #pod =method last_code
@@ -136,8 +150,11 @@ sub last_error_labels {
 sub assert {
     my ($self, $default_class) = @_;
 
-    $self->_throw_database_error( $default_class )
-        if ! $self->output->{ok};
+    if ( ! $self->output->{ok} ) {
+        $self->session->_maybe_unpin_address( $self->last_error_labels )
+            if defined $self->session;
+        $self->_throw_database_error( $default_class );
+    }
 
     return 1;
 }
@@ -171,7 +188,7 @@ MongoDB::CommandResult - MongoDB generic command result document
 
 =head1 VERSION
 
-version v2.0.3
+version v2.2.0
 
 =head1 DESCRIPTION
 
@@ -187,6 +204,10 @@ Hash reference with the output document of a database command
 =head2 address
 
 Address ("host:port") of server that ran the command
+
+=head2 session
+
+ClientSession which the command was ran with, if any
 
 =head1 METHODS
 

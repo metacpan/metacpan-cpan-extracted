@@ -1,4 +1,4 @@
-#!perl
+#!/usr/bin/env perl
 
 use strict;
 use warnings;
@@ -6,20 +6,22 @@ use Getopt::Long;
 use Net::Connection::ncnetstat;
 
 sub version{
-	print "ncnetstat v. 0.0.0\n";
+	print "ncnetstat v. 0.2.0\n";
 }
 
 sub help{
 	print '
 -a         Show all connections.
---drp      Don\'t resolve port names.
+--drp      Do not resolve port names.
 -i         Invert the sort.
 -l         Show the listening ports.
--n         Don\' resolve the PTRs.
---nc       Don\'t use colors.
+-n         Do not resolve the PTRs.
+--nc       Do not use colors.
+--pct      Show memory and CPU usage percent.
 -S <sort>  The Net::Connection::Sort to use.
 -t         Show only TCP connections.
 -u         Show only UDP connections.
+-W         Show the wchan.
 
 -c <CIDRs>  A comma seperated list of CIDRs to search for.
 --ci        Invert the CIDR search.
@@ -27,11 +29,23 @@ sub help{
 -C    Show the command to the first space.
 --Cl  Show the whole command.
 
+--cmd <cmds> A comma seperated list of commands to search for.
+--cmdi       Invert the command search.
+
+--cpu <pct> Show connections belonging to procs matching this CPU usage percent.
+--cpui      Invert the CPU search.
+
+--mem <pct> Show connections belonging to procs matching this memory usage percent.
+--memi      Invert the memory usage search.
+
 -p <ports>  A comma seperated list of ports to search for.
 --pi        Invert the port search.
 
--P <protocols>  A comma seperated list of protocols to search for.
---Pi            Invert your protocol search.
+-P <protos> A comma seperated list of protocols to search for.
+--Pi        Invert your protocol search.
+
+--pid <pids> A comma separated list of PIDs to search for.
+--pidi       Invert the pid search.
 
 --ptrr <rgx>   A comma seperated list of regex to use for a PTR search.
 --ptrri        Invert the RegexPTR search.
@@ -50,11 +64,14 @@ sub help{
 -s <states>  A comma seperated list of states to search for.
 --si         Invert the state search.
 
--u <users>   A comma seperated list of usernames to search for.
---ui         Invert the username search.
+-U <users>   A comma seperated list of usernames to search for.
+--Ui         Invert the username search.
 
 --uid <uids> A comma separated list of UIDs to search for.
 --uidi       Invert the UID search.
+
+-w <rgx>     A comma separated list of regexp to use for matching wchan values.
+--wi         Invert the wchan search.
 
 The default available sort methods are as below.
 host_f   foreign host
@@ -72,6 +89,13 @@ ptr_l    local PTR
 state    state
 uid      user ID
 user     username
+
+For CPU, memory, PID, and UID searches, the equalities below can be
+used, by directly prepending them to the number.
+<
+<=
+>
+>=
 ';
 }
 
@@ -118,6 +142,18 @@ my $uid_string;
 my $uid_invert=0;
 my $users_string;
 my $users_invert=0;
+my $pids_string;
+my $pids_invert=0;
+my $commands_string;
+my $commands_invert;
+my $wchan_string;
+my $wchan_invert=0;
+my $wchan_show=0;
+my $pct_show=0;
+my $cpu_string;
+my $cpu_invert=0;
+my $mem_string;
+my $mem_invert=0;
 
 # get the commandline options
 Getopt::Long::Configure ('no_ignore_case');
@@ -146,6 +182,8 @@ GetOptions(
 		   'si' => \$states_invert,
 		   'P=s' => \$protocols_string,
 		   'Pi' => \$protocols_invert,
+		   'pid=s' => \$pids_string,
+		   'pidi' => \$pids_invert,
 		   'ptrr=s' => \$ptrrs_string,
 		   'ptr=s' => \$ptrs_string,
 		   'ptri' => \$ptrs_invert,
@@ -164,8 +202,18 @@ GetOptions(
 		   'Cl' => \$command_long,
 		   'uid=s' => \$uid_string,
 		   'uidi'=> \$uid_invert,
-		   'u=s' => \$users_string,
-		   'ui' => \$users_invert,
+		   'U=s' => \$users_string,
+		   'Ui' => \$users_invert,
+		   'cmd=s' => \$commands_string,
+		   'cmdi' => \$commands_invert,
+		   'w=s' => \$wchan_string,
+		   'wi' => \$wchan_invert,
+		   'W' => \$wchan_show,
+		   'pct' => \$pct_show,
+		   'cpu=s' => \$cpu_string,
+		   'cpui' => \$cpu_invert,
+		   'mem=s' => \$mem_string,
+		   'memi' => \$mem_invert,
 		   );
 
 my @filters;
@@ -431,6 +479,81 @@ if ( defined( $lptrs_string ) ){
 		 );
 }
 
+#
+# Handle the PID searches
+#
+if ( defined( $pids_string ) ){
+	my @pids=split(/\,/, $pids_string);
+	push( @filters, {
+					 type=>'PID',
+					 invert=>$pids_invert,
+					 args=>{
+							pids=>\@pids,
+							},
+					 }
+		 );
+}
+
+#
+# Handle the command searches
+#
+if ( defined( $commands_string ) ){
+	my @commands=split(/\,/, $commands_string);
+	push( @filters, {
+					 type=>'Command',
+					 invert=>$commands_invert,
+					 args=>{
+							commands=>\@commands,
+							},
+					 }
+		 );
+}
+
+#
+# Handle the wait channel searches
+#
+if ( defined( $wchan_string ) ){
+	my @wchans=split(/\,/, $wchan_string);
+	push( @filters, {
+					 type=>'WChan',
+					 invert=>$wchan_invert,
+					 args=>{
+							wchans=>\@wchans,
+							},
+					 }
+		 );
+}
+
+#
+# Handle the pctcpu searches
+#
+if ( defined( $cpu_string ) ){
+	my @cpus=split(/\,/, $cpu_string);
+	push( @filters, {
+					 type=>'PctCPU',
+					 invert=>$cpu_invert,
+					 args=>{
+							pctcpus=>\@cpus,
+							},
+					 }
+		 );
+}
+
+#
+# Handle the pctmem searches
+#
+if ( defined( $mem_string ) ){
+	my @mems=split(/\,/, $mem_string);
+	push( @filters, {
+					 type=>'PctMem',
+					 invert=>$mem_invert,
+					 args=>{
+							pctmems=>\@mems,
+							},
+					 }
+		 );
+}
+
 # handle the -t -u options
 # only add a filter if one is specified...
 # adding both is just pointless
@@ -490,6 +613,8 @@ my $ncnetstat=Net::Connection::ncnetstat->new(
 											   ptr=>$ptr,
 											   command=>$command,
 											   command_long=>$command_long,
+											   wchan=>$wchan_show,
+											   pct=>$pct_show,
 											   sorter=>{
 														invert=>$invert,
 														type=>$sort,
@@ -510,7 +635,7 @@ ncnetstat - a netstat like utility that supports color and searching
 ncnetstat [B<-a>] [B<--drp>] [B<-l>] [B<-n>] [B<--nc>] [B<-S <sort>>] [B<-t>] [B<-u>]
 [B<-c <CIDRs>>] [B<--ci -p <ports>>] [B<--pi>] [B<-P <protocols>>] [B<--Pi>]
 [B<--ptr <PTRs>>] [B<--ptri>] [B<--lptr <PTRs>>] [B<--lptri>] [B<--rptr <PTRs>>] [B<--rptri>]
-[B<-s <states>>] [B<--si>]
+[B<-s <states>>] [B<--si>] ...
 
 =head1 FLAGS
 
@@ -534,6 +659,22 @@ Show the command to the first space.
 
 Show the whole command.
 
+=head2 --cmd <cmds>
+
+A comma seperated list of commands to search for.
+
+=head2 --cmdi
+
+Invert the command search.
+
+=head2 --cpu <pct>
+
+Show connections belonging to procs matching this CPU usage percent.
+
+=head2--cpui
+
+Invert the CPU search.
+
 =head2 --drp
 
 Don't resolve port names.
@@ -545,6 +686,15 @@ Invert the sort.
 =head2 -l
 
 Show the listening ports.
+
+=head2 --mem <pct>
+
+Show connections belonging to procs matching this memory usage percent.
+
+
+=head2 --memi
+
+Invert the memory usage search.
 
 =head2 -n
 
@@ -558,6 +708,10 @@ Don't use colors.
 
 A comma seperated list of ports to search for.
 
+=head2 --pct
+
+Show memory and CPU usage of the process that has the connection.
+
 =head2 --pi
 
 Invert the port search.
@@ -570,6 +724,14 @@ A comma seperated list of protocols to search for.
 
 Invert your protocol search.
 
+=head2 --pid <pids>
+
+A comma separated list of PIDs to search for.
+
+=head2 --pidi
+
+Invert the pid search.
+
 =head2 --ptr <PTRs>
 
 A comma seperated list of PTRs to search for.
@@ -578,6 +740,14 @@ A comma seperated list of PTRs to search for.
 
 Invert the PTR search.
 
+=head2 --ptrr <rgx>
+
+A comma seperated list of regex to use for a PTR search.
+
+=head2 --ptrri
+
+Invert the RegexPTR search.
+
 =head2 --lptr <PTRs>
 
 A comma seperated list of local PTRs to search for.
@@ -585,6 +755,22 @@ A comma seperated list of local PTRs to search for.
 =head2 --lptri
 
 Invert the local PTR search.
+
+=head2 --lptrr <rgx>
+
+A comma seperated list of regex to use for a local PTR search.
+
+=head2 --lptrri
+
+Invert the local RegexPTR search.
+
+=head2 --rptr <PTRs>
+
+A comma seperated list of remote PTRs to search for.
+
+=head2 --rptri
+
+Invert the remote PTR search.
 
 =head2 --rptr <PTRs>
 
@@ -631,6 +817,47 @@ Show only TCP connections.
 =head2 -u
 
 Show only UDP connections.
+
+=head2 -U <users>
+
+A comma seperated list of usernames to search for.
+
+=head2 --Ui
+
+Invert the username search.
+
+=head2 --uid <uids>
+
+A comma separated list of UIDs to search for.
+
+=head2 --uidi
+
+Invert the UID search.
+
+=head2 -W
+
+Show the wait channel.
+
+=head2 -w <rgx>
+
+A comma separated list of regexp to use for matching wchan values.
+
+=head2 --wi
+
+Invert the wchan search
+
+=head1 PID/UID/CPU/Mem EQUALITIES
+
+For some searches, the equalities below can be used, by
+directly prepending them to the number.
+
+    <
+    <=
+    >
+    >=
+
+So if you wanted to find every connection from a UID greater than 1000, would
+do '--uid \>1000'.
 
 =head1 ENVIRONMENT VARIABLES
 
@@ -694,5 +921,19 @@ Find connections to/from IPs that have a PTR record of foo.bar.
     ncnetstat --ptr foo.bar --ptri
 
 Find connections to/from IPs that do not have a PTR record of foo.bar.
+
+    ncnetstat -n --uid '>1000' --Cl
+
+Show every connection by a user with a UID greater than 1000, do not resolve
+PTR info and print the whole command.
+
+    ncnetstat -U www -p 80,443 --pi
+
+Show every connecttion by the user www that is not a HTTP or HTTPS connection.
+
+   ncnetstat --cpu '>5' --Cl --pct -W
+
+Search for connections from procs using more than 5% of the CPU time. Show memory
+and CPU usage as well whole command and wait channel.
 
 =cut

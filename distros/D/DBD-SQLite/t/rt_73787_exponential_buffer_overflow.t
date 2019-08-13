@@ -1,15 +1,9 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest qw/connect_ok/;
-use Test::More tests => 6;
-use Test::NoWarnings;
+use Test::More;
+use if -d ".git", "Test::FailWarnings";
 
 my $dbh = connect_ok(sqlite_see_if_its_a_number => 1);
 $dbh->do('create table foo (id integer primary key, exp)');
@@ -22,3 +16,5 @@ for my $value (qw/2e100 10.04e100/) {
     };
     ok !$@, "and without errors";
 }
+
+done_testing;

@@ -1,0 +1,63 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Dinesh Dharmalingam <dd.dinesh.rajakumar@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Git-Hooks-CheckYoutrack",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Git::Hooks" : "0",
+            "JSON::XS" : "0",
+            "LWP::UserAgent" : "0",
+            "Log::Any" : "0",
+            "Path::Tiny" : "0.060",
+            "URI::Builder" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Config" : "0",
+            "Email::Sender::Transport::Mbox" : "0",
+            "Path::Tiny" : "0.060",
+            "Test::Requires::Git" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dinesh-it/Git-Hooks-CheckYoutrack.git",
+         "web" : "https://github.com/dinesh-it/Git-Hooks-CheckYoutrack"
+      }
+   },
+   "version" : "v1.0.0",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

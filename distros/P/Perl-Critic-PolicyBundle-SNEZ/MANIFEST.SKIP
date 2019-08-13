@@ -1,0 +1,8 @@
+\.gitignore
+\.git/
+blib/
+^MANIFEST\.bak$
+^MYMETA\.(json|yml)$
+^Makefile(\.old)?$
+^Perl-Critic-PolicyBundle-SNEZ
+^pm_to_blib$

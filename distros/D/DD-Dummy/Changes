@@ -1,0 +1,47 @@
+0.007   2019-08-12  Released-By: PERLANCAR; Urgency: medium
+
+        - (Temporarily) rename dist from DD to DD-Dummy.
+
+
+0.006   2019-08-08  Released-By: PERLANCAR; Urgency: medium
+
+	- Make Data::Dumper an optional dependency.
+
+        - Add backend: Data::Dumper::Compact.
+
+
+0.005   2019-08-08  Released-By: PERLANCAR; Urgency: medium
+
+	- Add dd_warn() and dd_die().
+
+	- Add backends: Data::Dump::PHP, PHP::Serialization,
+          Data::Format::Pretty::{Console,SimpleText,Text}, Data::Printer,
+          JSON::Color, JSON::MaybeXS, JSON::PP, YAML, YAML::Tiny::Color.
+
+
+0.004   2019-08-08  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Give instruction on how to install the module.
+
+
+0.003   2019-08-08  Released-By: PERLANCAR; Urgency: medium
+
+	- Add DD::Dummy so we can install DD using 'cpanm DD::Dummy'.
+
+          DD is currently not indexed by PAUSE due to permission: someone else
+          used this package name in the past (although it's not used anymore and
+          no longer on CPAN). While we ask for the original owner/co-maint of
+          the DD module to give us co-maint, we add a dummy package DD::Dummy to
+          be able to install this module from CPAN.
+
+
+0.002   2019-08-01  Released-By: PERLANCAR; Urgency: high
+
+	- [bugfix] dmp() was not available yet.
+
+
+0.001    2017-02-10  Released-By: PERLANCAR
+
+         - First release.

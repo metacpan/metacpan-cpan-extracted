@@ -24,7 +24,7 @@ use OPTiMaDe::FilterParser::ListComparison;
 use OPTiMaDe::FilterParser::Property;
 use OPTiMaDe::FilterParser::Zip;
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 our $OPTiMaDe_VERSION = '0.10.0';
 
 our $allow_LIKE_operator = 0;
@@ -41,669 +41,660 @@ sub new {
 [
 	{#State 0
 		ACTIONS => {
-			'string' => 12,
-			'number' => 8,
-			'LENGTH' => 3,
-			"(" => 16,
-			'identifier' => 9,
-			'NOT' => 10
+			'string' => 9,
+			'LENGTH' => 16,
+			'identifier' => 1,
+			"(" => 6,
+			'NOT' => 3,
+			'number' => 2
 		},
 		GOTOS => {
-			'property_first_comparison' => 17,
-			'expression_clause' => 18,
-			'comparison' => 6,
-			'openingbrace' => 14,
-			'constant' => 15,
-			'predicate_comparison' => 5,
-			'expression' => 13,
-			'expression_phrase' => 4,
-			'filter' => 11,
-			'constant_first_comparison' => 2,
-			'length_comparison' => 1,
-			'property' => 7
+			'comparison' => 5,
+			'constant' => 4,
+			'expression_phrase' => 17,
+			'filter' => 18,
+			'constant_first_comparison' => 7,
+			'openingbrace' => 8,
+			'predicate_comparison' => 11,
+			'length_comparison' => 10,
+			'expression' => 12,
+			'property' => 13,
+			'expression_clause' => 15,
+			'property_first_comparison' => 14
 		}
 	},
 	{#State 1
-		DEFAULT => -36
+		DEFAULT => -58
 	},
 	{#State 2
-		DEFAULT => -28
+		DEFAULT => -3
 	},
 	{#State 3
 		ACTIONS => {
-			'identifier' => 9
+			'number' => 2,
+			'string' => 9,
+			"(" => 6,
+			'identifier' => 1,
+			'LENGTH' => 16
 		},
 		GOTOS => {
-			'property' => 19
+			'predicate_comparison' => 19,
+			'length_comparison' => 10,
+			'property' => 13,
+			'property_first_comparison' => 14,
+			'comparison' => 21,
+			'constant' => 4,
+			'constant_first_comparison' => 7,
+			'openingbrace' => 20
 		}
 	},
 	{#State 4
 		ACTIONS => {
-			'AND' => 20
-		},
-		DEFAULT => -20
-	},
-	{#State 5
-		DEFAULT => -23
-	},
-	{#State 6
-		DEFAULT => -22
-	},
-	{#State 7
-		ACTIONS => {
-			"<" => 35,
-			'STARTS' => 25,
-			'CONTAINS' => 32,
-			'LIKE' => 33,
-			">" => 31,
-			'ENDS' => 30,
-			'IS' => 40,
-			"!" => 29,
-			"." => 39,
-			":" => 28,
-			'HAS' => 27,
-			"=" => 37
+			"!" => 22,
+			">" => 27,
+			"<" => 26,
+			"=" => 23
 		},
 		GOTOS => {
-			'set_op_rhs' => 41,
-			'value_op_rhs' => 38,
-			'set_zip_op_rhs' => 26,
-			'property_zip_addon' => 36,
-			'operator' => 24,
-			'colon' => 34,
-			'dot' => 21,
-			'fuzzy_string_op_rhs' => 23,
-			'known_op_rhs' => 22
-		}
-	},
-	{#State 8
-		DEFAULT => -3
-	},
-	{#State 9
-		DEFAULT => -58
-	},
-	{#State 10
-		ACTIONS => {
-			'identifier' => 9,
-			"(" => 16,
-			'string' => 12,
-			'number' => 8,
-			'LENGTH' => 3
-		},
-		GOTOS => {
-			'property' => 7,
-			'length_comparison' => 1,
-			'openingbrace' => 44,
-			'predicate_comparison' => 42,
-			'constant' => 15,
-			'constant_first_comparison' => 2,
-			'property_first_comparison' => 17,
-			'comparison' => 43
-		}
-	},
-	{#State 11
-		ACTIONS => {
-			'' => 45
-		}
-	},
-	{#State 12
-		DEFAULT => -2
-	},
-	{#State 13
-		DEFAULT => -1
-	},
-	{#State 14
-		ACTIONS => {
-			'string' => 12,
-			'number' => 8,
-			'LENGTH' => 3,
-			'identifier' => 9,
-			'NOT' => 10,
-			"(" => 16
-		},
-		GOTOS => {
-			'comparison' => 6,
-			'expression_clause' => 18,
-			'property_first_comparison' => 17,
-			'expression_phrase' => 4,
-			'constant_first_comparison' => 2,
-			'openingbrace' => 14,
-			'expression' => 46,
-			'constant' => 15,
-			'predicate_comparison' => 5,
-			'length_comparison' => 1,
-			'property' => 7
-		}
-	},
-	{#State 15
-		ACTIONS => {
-			"!" => 29,
-			"<" => 35,
-			"=" => 37,
-			">" => 31
-		},
-		GOTOS => {
-			'value_op_rhs' => 47,
+			'value_op_rhs' => 25,
 			'operator' => 24
 		}
 	},
-	{#State 16
+	{#State 5
+		DEFAULT => -22
+	},
+	{#State 6
 		DEFAULT => -60
 	},
-	{#State 17
+	{#State 7
+		DEFAULT => -28
+	},
+	{#State 8
+		ACTIONS => {
+			'NOT' => 3,
+			'number' => 2,
+			'string' => 9,
+			'LENGTH' => 16,
+			'identifier' => 1,
+			"(" => 6
+		},
+		GOTOS => {
+			'comparison' => 5,
+			'constant' => 4,
+			'expression_phrase' => 17,
+			'constant_first_comparison' => 7,
+			'openingbrace' => 8,
+			'predicate_comparison' => 11,
+			'length_comparison' => 10,
+			'expression' => 28,
+			'property' => 13,
+			'property_first_comparison' => 14,
+			'expression_clause' => 15
+		}
+	},
+	{#State 9
+		DEFAULT => -2
+	},
+	{#State 10
+		DEFAULT => -36
+	},
+	{#State 11
+		DEFAULT => -23
+	},
+	{#State 12
+		DEFAULT => -1
+	},
+	{#State 13
+		ACTIONS => {
+			'HAS' => 40,
+			"!" => 22,
+			":" => 38,
+			'STARTS' => 30,
+			'LIKE' => 37,
+			'CONTAINS' => 42,
+			"=" => 23,
+			'ENDS' => 33,
+			"<" => 26,
+			"." => 32,
+			'IS' => 41,
+			">" => 27
+		},
+		GOTOS => {
+			'property_zip_addon' => 31,
+			'set_zip_op_rhs' => 39,
+			'value_op_rhs' => 29,
+			'set_op_rhs' => 44,
+			'operator' => 24,
+			'dot' => 36,
+			'fuzzy_string_op_rhs' => 35,
+			'colon' => 43,
+			'known_op_rhs' => 34
+		}
+	},
+	{#State 14
 		DEFAULT => -29
 	},
-	{#State 18
+	{#State 15
 		ACTIONS => {
-			'OR' => 48
+			'OR' => 45
 		},
 		DEFAULT => -18
 	},
-	{#State 19
+	{#State 16
 		ACTIONS => {
-			"." => 39,
-			"!" => 29,
-			"<" => 35,
-			">" => 31,
-			"=" => 37
+			'identifier' => 1
 		},
 		GOTOS => {
-			'dot' => 21,
-			'operator' => 49
+			'property' => 46
 		}
+	},
+	{#State 17
+		ACTIONS => {
+			'AND' => 47
+		},
+		DEFAULT => -20
+	},
+	{#State 18
+		ACTIONS => {
+			'' => 48
+		}
+	},
+	{#State 19
+		DEFAULT => -26
 	},
 	{#State 20
 		ACTIONS => {
-			"(" => 16,
-			'NOT' => 10,
-			'identifier' => 9,
-			'string' => 12,
-			'number' => 8,
-			'LENGTH' => 3
+			'number' => 2,
+			'NOT' => 3,
+			'string' => 9,
+			"(" => 6,
+			'identifier' => 1,
+			'LENGTH' => 16
 		},
 		GOTOS => {
-			'length_comparison' => 1,
-			'property' => 7,
-			'expression_clause' => 50,
-			'property_first_comparison' => 17,
-			'comparison' => 6,
-			'constant' => 15,
-			'predicate_comparison' => 5,
-			'openingbrace' => 14,
-			'expression_phrase' => 4,
-			'constant_first_comparison' => 2
+			'property' => 13,
+			'property_first_comparison' => 14,
+			'expression_clause' => 15,
+			'length_comparison' => 10,
+			'predicate_comparison' => 11,
+			'expression' => 49,
+			'constant_first_comparison' => 7,
+			'openingbrace' => 8,
+			'constant' => 4,
+			'comparison' => 5,
+			'expression_phrase' => 17
 		}
 	},
 	{#State 21
-		ACTIONS => {
-			'identifier' => 51
-		}
+		DEFAULT => -25
 	},
 	{#State 22
-		DEFAULT => -31
+		ACTIONS => {
+			"=" => 50
+		}
 	},
 	{#State 23
-		DEFAULT => -32
+		DEFAULT => -69
 	},
 	{#State 24
 		ACTIONS => {
-			'identifier' => 9,
-			'number' => 53,
+			'number' => 54,
+			'identifier' => 1,
 			'string' => 52
 		},
 		GOTOS => {
-			'value' => 55,
-			'property' => 54
+			'property' => 51,
+			'value' => 53
 		}
 	},
 	{#State 25
-		ACTIONS => {
-			'string' => 56,
-			'WITH' => 57
-		}
+		DEFAULT => -35
 	},
 	{#State 26
-		DEFAULT => -34
+		ACTIONS => {
+			"=" => 55
+		},
+		DEFAULT => -65
 	},
 	{#State 27
 		ACTIONS => {
-			">" => 31,
-			'ANY' => 62,
-			'string' => 52,
-			"<" => 35,
-			'identifier' => 9,
-			'ALL' => 58,
-			"=" => 37,
-			'ONLY' => 61,
-			"!" => 29,
-			'number' => 53
+			"=" => 56
 		},
-		GOTOS => {
-			'operator' => 60,
-			'value' => 59,
-			'property' => 54
-		}
+		DEFAULT => -67
 	},
 	{#State 28
-		DEFAULT => -64
+		ACTIONS => {
+			")" => 58
+		},
+		GOTOS => {
+			'closingbrace' => 57
+		}
 	},
 	{#State 29
-		ACTIONS => {
-			"=" => 63
-		}
+		DEFAULT => -30
 	},
 	{#State 30
 		ACTIONS => {
-			'WITH' => 64,
-			'string' => 65
+			'string' => 60,
+			'WITH' => 59
 		}
 	},
 	{#State 31
 		ACTIONS => {
-			"=" => 66
+			'HAS' => 61,
+			":" => 38
 		},
-		DEFAULT => -67
+		GOTOS => {
+			'colon' => 62
+		}
 	},
 	{#State 32
-		ACTIONS => {
-			'string' => 67
-		}
+		DEFAULT => -62
 	},
 	{#State 33
 		ACTIONS => {
-			'string' => 68
+			'WITH' => 63,
+			'string' => 64
 		}
 	},
 	{#State 34
-		ACTIONS => {
-			'identifier' => 9
-		},
-		GOTOS => {
-			'property' => 69
-		}
+		DEFAULT => -31
 	},
 	{#State 35
-		ACTIONS => {
-			"=" => 70
-		},
-		DEFAULT => -65
+		DEFAULT => -32
 	},
 	{#State 36
 		ACTIONS => {
-			":" => 28,
-			'HAS' => 71
-		},
-		GOTOS => {
-			'colon' => 72
+			'identifier' => 65
 		}
 	},
 	{#State 37
-		DEFAULT => -69
+		ACTIONS => {
+			'string' => 66
+		}
 	},
 	{#State 38
-		DEFAULT => -30
+		DEFAULT => -64
 	},
 	{#State 39
-		DEFAULT => -62
+		DEFAULT => -34
 	},
 	{#State 40
 		ACTIONS => {
-			'KNOWN' => 73,
-			'UNKNOWN' => 74
+			'identifier' => 1,
+			'string' => 52,
+			"!" => 22,
+			'number' => 54,
+			'ANY' => 71,
+			"=" => 23,
+			"<" => 26,
+			">" => 27,
+			'ONLY' => 67,
+			'ALL' => 69
+		},
+		GOTOS => {
+			'value' => 68,
+			'property' => 51,
+			'operator' => 70
 		}
 	},
 	{#State 41
-		DEFAULT => -33
-	},
-	{#State 42
-		DEFAULT => -26
-	},
-	{#State 43
-		DEFAULT => -25
-	},
-	{#State 44
 		ACTIONS => {
-			'string' => 12,
-			'number' => 8,
-			'LENGTH' => 3,
-			"(" => 16,
-			'identifier' => 9,
-			'NOT' => 10
-		},
-		GOTOS => {
-			'property' => 7,
-			'length_comparison' => 1,
-			'predicate_comparison' => 5,
-			'expression' => 75,
-			'openingbrace' => 14,
-			'constant' => 15,
-			'expression_phrase' => 4,
-			'constant_first_comparison' => 2,
-			'expression_clause' => 18,
-			'property_first_comparison' => 17,
-			'comparison' => 6
+			'KNOWN' => 73,
+			'UNKNOWN' => 72
 		}
 	},
+	{#State 42
+		ACTIONS => {
+			'string' => 74
+		}
+	},
+	{#State 43
+		ACTIONS => {
+			'identifier' => 1
+		},
+		GOTOS => {
+			'property' => 75
+		}
+	},
+	{#State 44
+		DEFAULT => -33
+	},
 	{#State 45
-		DEFAULT => 0
+		ACTIONS => {
+			'string' => 9,
+			"(" => 6,
+			'LENGTH' => 16,
+			'identifier' => 1,
+			'NOT' => 3,
+			'number' => 2
+		},
+		GOTOS => {
+			'property' => 13,
+			'property_first_comparison' => 14,
+			'expression_clause' => 15,
+			'predicate_comparison' => 11,
+			'length_comparison' => 10,
+			'expression' => 76,
+			'constant_first_comparison' => 7,
+			'openingbrace' => 8,
+			'comparison' => 5,
+			'constant' => 4,
+			'expression_phrase' => 17
+		}
 	},
 	{#State 46
 		ACTIONS => {
-			")" => 76
+			"." => 32,
+			"=" => 23,
+			"<" => 26,
+			">" => 27,
+			"!" => 22
 		},
 		GOTOS => {
-			'closingbrace' => 77
+			'operator' => 77,
+			'dot' => 36
 		}
 	},
 	{#State 47
-		DEFAULT => -35
-	},
-	{#State 48
 		ACTIONS => {
-			'LENGTH' => 3,
-			'number' => 8,
-			'string' => 12,
-			'identifier' => 9,
-			'NOT' => 10,
-			"(" => 16
+			'identifier' => 1,
+			'LENGTH' => 16,
+			"(" => 6,
+			'string' => 9,
+			'number' => 2,
+			'NOT' => 3
 		},
 		GOTOS => {
-			'length_comparison' => 1,
-			'property' => 7,
-			'comparison' => 6,
-			'property_first_comparison' => 17,
-			'expression_clause' => 18,
-			'expression_phrase' => 4,
-			'constant_first_comparison' => 2,
-			'constant' => 15,
-			'expression' => 78,
-			'openingbrace' => 14,
-			'predicate_comparison' => 5
+			'comparison' => 5,
+			'constant' => 4,
+			'expression_phrase' => 17,
+			'constant_first_comparison' => 7,
+			'openingbrace' => 8,
+			'predicate_comparison' => 11,
+			'length_comparison' => 10,
+			'property' => 13,
+			'property_first_comparison' => 14,
+			'expression_clause' => 78
 		}
+	},
+	{#State 48
+		DEFAULT => 0
 	},
 	{#State 49
 		ACTIONS => {
-			'number' => 53,
-			'string' => 52,
-			'identifier' => 9
+			")" => 58
 		},
 		GOTOS => {
-			'value' => 79,
-			'property' => 54
+			'closingbrace' => 79
 		}
 	},
 	{#State 50
-		DEFAULT => -21
+		DEFAULT => -70
 	},
 	{#State 51
-		DEFAULT => -59
+		ACTIONS => {
+			"." => 32
+		},
+		DEFAULT => -6,
+		GOTOS => {
+			'dot' => 36
+		}
 	},
 	{#State 52
 		DEFAULT => -4
 	},
 	{#State 53
-		DEFAULT => -5
-	},
-	{#State 54
-		ACTIONS => {
-			"." => 39
-		},
-		DEFAULT => -6,
-		GOTOS => {
-			'dot' => 21
-		}
-	},
-	{#State 55
 		DEFAULT => -37
 	},
+	{#State 54
+		DEFAULT => -5
+	},
+	{#State 55
+		DEFAULT => -66
+	},
 	{#State 56
-		DEFAULT => -41
+		DEFAULT => -68
 	},
 	{#State 57
+		DEFAULT => -24
+	},
+	{#State 58
+		DEFAULT => -61
+	},
+	{#State 59
 		ACTIONS => {
 			'string' => 80
 		}
 	},
-	{#State 58
-		ACTIONS => {
-			"<" => 35,
-			'string' => 52,
-			"!" => 29,
-			'number' => 53,
-			"=" => 37,
-			">" => 31,
-			'identifier' => 9
-		},
-		GOTOS => {
-			'operator' => 81,
-			'value' => 82,
-			'value_list' => 83,
-			'property' => 54
-		}
-	},
-	{#State 59
-		DEFAULT => -46
-	},
 	{#State 60
-		ACTIONS => {
-			'identifier' => 9,
-			'number' => 53,
-			'string' => 52
-		},
-		GOTOS => {
-			'property' => 54,
-			'value' => 84
-		}
+		DEFAULT => -41
 	},
 	{#State 61
 		ACTIONS => {
-			'number' => 53,
+			'ANY' => 83,
+			"=" => 23,
+			"<" => 26,
+			">" => 27,
+			'ALL' => 82,
+			'ONLY' => 84,
+			'identifier' => 1,
 			'string' => 52,
-			"!" => 29,
-			"<" => 35,
-			"=" => 37,
-			">" => 31,
-			'identifier' => 9
+			"!" => 22,
+			'number' => 54
 		},
 		GOTOS => {
-			'property' => 54,
-			'value_list' => 85,
-			'value' => 82,
-			'operator' => 81
+			'value' => 85,
+			'property' => 51,
+			'operator' => 81,
+			'value_zip' => 86
 		}
 	},
 	{#State 62
 		ACTIONS => {
-			"=" => 37,
-			">" => 31,
-			'identifier' => 9,
-			'string' => 52,
-			"!" => 29,
-			'number' => 53,
-			"<" => 35
+			'identifier' => 1
 		},
 		GOTOS => {
-			'operator' => 81,
-			'value_list' => 86,
-			'property' => 54,
-			'value' => 82
+			'property' => 87
 		}
 	},
 	{#State 63
-		DEFAULT => -70
-	},
-	{#State 64
 		ACTIONS => {
-			'string' => 87
+			'string' => 88
 		}
 	},
-	{#State 65
+	{#State 64
 		DEFAULT => -43
 	},
+	{#State 65
+		DEFAULT => -59
+	},
 	{#State 66
-		DEFAULT => -68
+		DEFAULT => -45
 	},
 	{#State 67
-		DEFAULT => -40
+		ACTIONS => {
+			'identifier' => 1,
+			"<" => 26,
+			"=" => 23,
+			">" => 27,
+			'string' => 52,
+			"!" => 22,
+			'number' => 54
+		},
+		GOTOS => {
+			'property' => 51,
+			'operator' => 89,
+			'value' => 91,
+			'value_list' => 90
+		}
 	},
 	{#State 68
-		DEFAULT => -45
+		DEFAULT => -46
 	},
 	{#State 69
 		ACTIONS => {
-			"." => 39
+			'identifier' => 1,
+			"=" => 23,
+			"<" => 26,
+			">" => 27,
+			'string' => 52,
+			"!" => 22,
+			'number' => 54
 		},
-		DEFAULT => -56,
 		GOTOS => {
-			'dot' => 21
+			'value' => 91,
+			'value_list' => 92,
+			'property' => 51,
+			'operator' => 89
 		}
 	},
 	{#State 70
-		DEFAULT => -66
+		ACTIONS => {
+			'number' => 54,
+			'string' => 52,
+			'identifier' => 1
+		},
+		GOTOS => {
+			'property' => 51,
+			'value' => 93
+		}
 	},
 	{#State 71
 		ACTIONS => {
-			"=" => 37,
-			'ALL' => 92,
-			'identifier' => 9,
-			"!" => 29,
-			'number' => 53,
-			'ONLY' => 89,
-			'ANY' => 88,
-			">" => 31,
-			"<" => 35,
-			'string' => 52
+			"=" => 23,
+			'identifier' => 1,
+			"<" => 26,
+			'string' => 52,
+			">" => 27,
+			"!" => 22,
+			'number' => 54
 		},
 		GOTOS => {
-			'value' => 93,
-			'property' => 54,
-			'operator' => 91,
-			'value_zip' => 90
+			'property' => 51,
+			'operator' => 89,
+			'value' => 91,
+			'value_list' => 94
 		}
 	},
 	{#State 72
-		ACTIONS => {
-			'identifier' => 9
-		},
-		GOTOS => {
-			'property' => 94
-		}
+		DEFAULT => -39
 	},
 	{#State 73
 		DEFAULT => -38
 	},
 	{#State 74
-		DEFAULT => -39
+		DEFAULT => -40
 	},
 	{#State 75
 		ACTIONS => {
-			")" => 76
+			"." => 32
 		},
+		DEFAULT => -56,
 		GOTOS => {
-			'closingbrace' => 95
+			'dot' => 36
 		}
 	},
 	{#State 76
-		DEFAULT => -61
-	},
-	{#State 77
-		DEFAULT => -24
-	},
-	{#State 78
 		DEFAULT => -19
 	},
+	{#State 77
+		ACTIONS => {
+			'identifier' => 1,
+			'string' => 52,
+			'number' => 54
+		},
+		GOTOS => {
+			'value' => 95,
+			'property' => 51
+		}
+	},
+	{#State 78
+		DEFAULT => -21
+	},
 	{#State 79
-		DEFAULT => -55
+		DEFAULT => -27
 	},
 	{#State 80
 		DEFAULT => -42
 	},
 	{#State 81
 		ACTIONS => {
-			'identifier' => 9,
+			'number' => 54,
 			'string' => 52,
-			'number' => 53
+			'identifier' => 1
 		},
 		GOTOS => {
-			'value' => 96,
-			'property' => 54
+			'property' => 51,
+			'value' => 96
 		}
 	},
 	{#State 82
-		DEFAULT => -7
+		ACTIONS => {
+			"<" => 26,
+			"=" => 23,
+			'identifier' => 1,
+			">" => 27,
+			'string' => 52,
+			"!" => 22,
+			'number' => 54
+		},
+		GOTOS => {
+			'value_zip_list' => 98,
+			'value_zip' => 97,
+			'operator' => 81,
+			'property' => 51,
+			'value' => 85
+		}
 	},
 	{#State 83
 		ACTIONS => {
-			"," => 98
+			'number' => 54,
+			"!" => 22,
+			'string' => 52,
+			">" => 27,
+			'identifier' => 1,
+			"=" => 23,
+			"<" => 26
 		},
-		DEFAULT => -48,
 		GOTOS => {
-			'comma' => 97
+			'property' => 51,
+			'value_zip' => 97,
+			'value_zip_list' => 99,
+			'operator' => 81,
+			'value' => 85
 		}
 	},
 	{#State 84
-		DEFAULT => -47
+		ACTIONS => {
+			"!" => 22,
+			'number' => 54,
+			"<" => 26,
+			'identifier' => 1,
+			"=" => 23,
+			">" => 27,
+			'string' => 52
+		},
+		GOTOS => {
+			'property' => 51,
+			'value_zip_list' => 100,
+			'value_zip' => 97,
+			'operator' => 81,
+			'value' => 85
+		}
 	},
 	{#State 85
 		ACTIONS => {
-			"," => 98
+			":" => 38
 		},
-		DEFAULT => -50,
 		GOTOS => {
-			'comma' => 97
+			'colon' => 102,
+			'value_zip_part' => 101
 		}
 	},
 	{#State 86
 		ACTIONS => {
-			"," => 98
-		},
-		DEFAULT => -49,
-		GOTOS => {
-			'comma' => 97
-		}
-	},
-	{#State 87
-		DEFAULT => -44
-	},
-	{#State 88
-		ACTIONS => {
-			'identifier' => 9,
-			">" => 31,
-			"=" => 37,
-			"<" => 35,
-			"!" => 29,
-			'number' => 53,
-			'string' => 52
-		},
-		GOTOS => {
-			'value' => 93,
-			'property' => 54,
-			'operator' => 91,
-			'value_zip_list' => 100,
-			'value_zip' => 99
-		}
-	},
-	{#State 89
-		ACTIONS => {
-			'string' => 52,
-			'number' => 53,
-			"!" => 29,
-			"<" => 35,
-			"=" => 37,
-			">" => 31,
-			'identifier' => 9
-		},
-		GOTOS => {
-			'value_zip_list' => 101,
-			'value_zip' => 99,
-			'operator' => 91,
-			'value' => 93,
-			'property' => 54
-		}
-	},
-	{#State 90
-		ACTIONS => {
-			":" => 28
+			":" => 38
 		},
 		DEFAULT => -51,
 		GOTOS => {
@@ -711,175 +702,184 @@ sub new {
 			'colon' => 102
 		}
 	},
-	{#State 91
+	{#State 87
 		ACTIONS => {
-			'string' => 52,
-			'number' => 53,
-			'identifier' => 9
-		},
-		GOTOS => {
-			'value' => 104,
-			'property' => 54
-		}
-	},
-	{#State 92
-		ACTIONS => {
-			"=" => 37,
-			'identifier' => 9,
-			">" => 31,
-			'string' => 52,
-			"!" => 29,
-			'number' => 53,
-			"<" => 35
-		},
-		GOTOS => {
-			'operator' => 91,
-			'property' => 54,
-			'value' => 93,
-			'value_zip_list' => 105,
-			'value_zip' => 99
-		}
-	},
-	{#State 93
-		ACTIONS => {
-			":" => 28
-		},
-		GOTOS => {
-			'colon' => 102,
-			'value_zip_part' => 106
-		}
-	},
-	{#State 94
-		ACTIONS => {
-			"." => 39
+			"." => 32
 		},
 		DEFAULT => -57,
 		GOTOS => {
-			'dot' => 21
+			'dot' => 36
+		}
+	},
+	{#State 88
+		DEFAULT => -44
+	},
+	{#State 89
+		ACTIONS => {
+			'string' => 52,
+			'identifier' => 1,
+			'number' => 54
+		},
+		GOTOS => {
+			'value' => 104,
+			'property' => 51
+		}
+	},
+	{#State 90
+		ACTIONS => {
+			"," => 105
+		},
+		DEFAULT => -50,
+		GOTOS => {
+			'comma' => 106
+		}
+	},
+	{#State 91
+		DEFAULT => -7
+	},
+	{#State 92
+		ACTIONS => {
+			"," => 105
+		},
+		DEFAULT => -48,
+		GOTOS => {
+			'comma' => 106
+		}
+	},
+	{#State 93
+		DEFAULT => -47
+	},
+	{#State 94
+		ACTIONS => {
+			"," => 105
+		},
+		DEFAULT => -49,
+		GOTOS => {
+			'comma' => 106
 		}
 	},
 	{#State 95
-		DEFAULT => -27
+		DEFAULT => -55
 	},
 	{#State 96
-		DEFAULT => -8
+		ACTIONS => {
+			":" => 38
+		},
+		GOTOS => {
+			'value_zip_part' => 107,
+			'colon' => 102
+		}
 	},
 	{#State 97
 		ACTIONS => {
-			">" => 31,
-			'identifier' => 9,
-			"=" => 37,
-			'string' => 52,
-			"!" => 29,
-			'number' => 53,
-			"<" => 35
-		},
-		GOTOS => {
-			'operator' => 108,
-			'value' => 107,
-			'property' => 54
-		}
-	},
-	{#State 98
-		DEFAULT => -63
-	},
-	{#State 99
-		ACTIONS => {
-			":" => 28
+			":" => 38
 		},
 		DEFAULT => -16,
 		GOTOS => {
-			'colon' => 102,
-			'value_zip_part' => 103
+			'value_zip_part' => 103,
+			'colon' => 102
+		}
+	},
+	{#State 98
+		ACTIONS => {
+			"," => 105
+		},
+		DEFAULT => -53,
+		GOTOS => {
+			'comma' => 108
+		}
+	},
+	{#State 99
+		ACTIONS => {
+			"," => 105
+		},
+		DEFAULT => -54,
+		GOTOS => {
+			'comma' => 108
 		}
 	},
 	{#State 100
 		ACTIONS => {
-			"," => 98
-		},
-		DEFAULT => -54,
-		GOTOS => {
-			'comma' => 109
-		}
-	},
-	{#State 101
-		ACTIONS => {
-			"," => 98
+			"," => 105
 		},
 		DEFAULT => -52,
 		GOTOS => {
-			'comma' => 109
+			'comma' => 108
 		}
+	},
+	{#State 101
+		DEFAULT => -11
 	},
 	{#State 102
 		ACTIONS => {
-			"<" => 35,
-			"!" => 29,
-			'string' => 52,
-			'number' => 53,
-			"=" => 37,
-			'identifier' => 9,
-			">" => 31
+			"!" => 22,
+			'number' => 54,
+			'identifier' => 1,
+			"<" => 26,
+			"=" => 23,
+			">" => 27,
+			'string' => 52
 		},
 		GOTOS => {
-			'value' => 110,
-			'property' => 54,
-			'operator' => 111
+			'property' => 51,
+			'operator' => 109,
+			'value' => 110
 		}
 	},
 	{#State 103
 		DEFAULT => -13
 	},
 	{#State 104
-		ACTIONS => {
-			":" => 28
-		},
-		GOTOS => {
-			'value_zip_part' => 112,
-			'colon' => 102
-		}
+		DEFAULT => -8
 	},
 	{#State 105
-		ACTIONS => {
-			"," => 98
-		},
-		DEFAULT => -53,
-		GOTOS => {
-			'comma' => 109
-		}
+		DEFAULT => -63
 	},
 	{#State 106
-		DEFAULT => -11
+		ACTIONS => {
+			'number' => 54,
+			"!" => 22,
+			'string' => 52,
+			">" => 27,
+			"=" => 23,
+			'identifier' => 1,
+			"<" => 26
+		},
+		GOTOS => {
+			'value' => 112,
+			'operator' => 111,
+			'property' => 51
+		}
 	},
 	{#State 107
-		DEFAULT => -9
+		DEFAULT => -12
 	},
 	{#State 108
 		ACTIONS => {
+			'number' => 54,
+			"!" => 22,
 			'string' => 52,
-			'number' => 53,
-			'identifier' => 9
+			">" => 27,
+			"=" => 23,
+			'identifier' => 1,
+			"<" => 26
 		},
 		GOTOS => {
-			'value' => 113,
-			'property' => 54
+			'property' => 51,
+			'value_zip' => 113,
+			'operator' => 81,
+			'value' => 85
 		}
 	},
 	{#State 109
 		ACTIONS => {
-			'identifier' => 9,
-			">" => 31,
-			"=" => 37,
-			"<" => 35,
-			'number' => 53,
-			"!" => 29,
+			'number' => 54,
+			'identifier' => 1,
 			'string' => 52
 		},
 		GOTOS => {
-			'value_zip' => 114,
-			'operator' => 91,
-			'value' => 93,
-			'property' => 54
+			'property' => 51,
+			'value' => 114
 		}
 	},
 	{#State 110
@@ -887,24 +887,21 @@ sub new {
 	},
 	{#State 111
 		ACTIONS => {
-			'identifier' => 9,
-			'string' => 52,
-			'number' => 53
+			'number' => 54,
+			'identifier' => 1,
+			'string' => 52
 		},
 		GOTOS => {
 			'value' => 115,
-			'property' => 54
+			'property' => 51
 		}
 	},
 	{#State 112
-		DEFAULT => -12
+		DEFAULT => -9
 	},
 	{#State 113
-		DEFAULT => -10
-	},
-	{#State 114
 		ACTIONS => {
-			":" => 28
+			":" => 38
 		},
 		DEFAULT => -17,
 		GOTOS => {
@@ -912,8 +909,11 @@ sub new {
 			'colon' => 102
 		}
 	},
-	{#State 115
+	{#State 114
 		DEFAULT => -15
+	},
+	{#State 115
+		DEFAULT => -10
 	}
 ],
                                   yyrules  =>
@@ -978,7 +978,7 @@ sub
 sub
 #line 54 "FilterParser.yp"
 {
-                return [ @_[1..$#_] ];
+                return [ [ '=', $_[1] ], $_[2] ];
             }
 	],
 	[#Rule 12
@@ -986,7 +986,7 @@ sub
 sub
 #line 58 "FilterParser.yp"
 {
-                return [ @_[1..$#_] ];
+                return [ [ $_[1], $_[2] ], $_[3] ];
             }
 	],
 	[#Rule 13
@@ -994,34 +994,41 @@ sub
 sub
 #line 62 "FilterParser.yp"
 {
-                return [ @_[1..$#_] ];
+                push @{$_[1]}, $_[2];
+                return $_[1];
             }
 	],
 	[#Rule 14
 		 'value_zip_part', 2,
 sub
-#line 68 "FilterParser.yp"
+#line 69 "FilterParser.yp"
 {
-                    return [ undef, $_[2] ];
+                    return [ '=', $_[2] ];
                 }
 	],
 	[#Rule 15
 		 'value_zip_part', 3,
 sub
-#line 72 "FilterParser.yp"
+#line 73 "FilterParser.yp"
 {
                     return [ $_[2], $_[3] ];
                 }
 	],
 	[#Rule 16
-		 'value_zip_list', 1, undef
+		 'value_zip_list', 1,
+sub
+#line 79 "FilterParser.yp"
+{
+                    return [ $_[1] ];
+                }
 	],
 	[#Rule 17
 		 'value_zip_list', 3,
 sub
-#line 79 "FilterParser.yp"
+#line 83 "FilterParser.yp"
 {
-                    return [ $_[1], $_[3] ];
+                    push @{$_[1]}, $_[3];
+                    return $_[1];
                 }
 	],
 	[#Rule 18
@@ -1030,7 +1037,7 @@ sub
 	[#Rule 19
 		 'expression', 3,
 sub
-#line 88 "FilterParser.yp"
+#line 93 "FilterParser.yp"
 {
                 return [ @_[1..$#_] ];
             }
@@ -1041,7 +1048,7 @@ sub
 	[#Rule 21
 		 'expression_clause', 3,
 sub
-#line 95 "FilterParser.yp"
+#line 100 "FilterParser.yp"
 {
                         return [ @_[1..$#_] ];
                     }
@@ -1055,7 +1062,7 @@ sub
 	[#Rule 24
 		 'expression_phrase', 3,
 sub
-#line 103 "FilterParser.yp"
+#line 108 "FilterParser.yp"
 {
                         return $_[2];
                     }
@@ -1063,7 +1070,7 @@ sub
 	[#Rule 25
 		 'expression_phrase', 2,
 sub
-#line 107 "FilterParser.yp"
+#line 112 "FilterParser.yp"
 {
                         return [ @_[1..$#_] ];
                     }
@@ -1071,7 +1078,7 @@ sub
 	[#Rule 26
 		 'expression_phrase', 2,
 sub
-#line 111 "FilterParser.yp"
+#line 116 "FilterParser.yp"
 {
                         return [ @_[1..$#_] ];
                     }
@@ -1079,7 +1086,7 @@ sub
 	[#Rule 27
 		 'expression_phrase', 4,
 sub
-#line 115 "FilterParser.yp"
+#line 120 "FilterParser.yp"
 {
                         return [ $_[1], $_[3] ];
                     }
@@ -1093,7 +1100,7 @@ sub
 	[#Rule 30
 		 'property_first_comparison', 2,
 sub
-#line 123 "FilterParser.yp"
+#line 128 "FilterParser.yp"
 {
                                     $_[2]->unshift_operand( $_[1] );
                                     return $_[2];
@@ -1102,7 +1109,7 @@ sub
 	[#Rule 31
 		 'property_first_comparison', 2,
 sub
-#line 128 "FilterParser.yp"
+#line 133 "FilterParser.yp"
 {
                                     return [ $_[1], @{$_[2]} ];
                                 }
@@ -1110,7 +1117,7 @@ sub
 	[#Rule 32
 		 'property_first_comparison', 2,
 sub
-#line 132 "FilterParser.yp"
+#line 137 "FilterParser.yp"
 {
                                     $_[2]->unshift_operand( $_[1] );
                                     return $_[2];
@@ -1119,7 +1126,7 @@ sub
 	[#Rule 33
 		 'property_first_comparison', 2,
 sub
-#line 137 "FilterParser.yp"
+#line 142 "FilterParser.yp"
 {
                                     $_[2]->set_property( $_[1] );
                                     return $_[2];
@@ -1128,7 +1135,7 @@ sub
 	[#Rule 34
 		 'property_first_comparison', 2,
 sub
-#line 142 "FilterParser.yp"
+#line 147 "FilterParser.yp"
 {
                                     $_[2]->unshift_property( $_[1] );
                                     return $_[2];
@@ -1137,7 +1144,7 @@ sub
 	[#Rule 35
 		 'constant_first_comparison', 2,
 sub
-#line 149 "FilterParser.yp"
+#line 154 "FilterParser.yp"
 {
                                 $_[2]->unshift_operand( $_[1] );
                                 return $_[2];
@@ -1149,7 +1156,7 @@ sub
 	[#Rule 37
 		 'value_op_rhs', 2,
 sub
-#line 158 "FilterParser.yp"
+#line 163 "FilterParser.yp"
 {
                     my $cmp = OPTiMaDe::FilterParser::Comparison->new( $_[1] );
                     $cmp->push_operand( $_[2] );
@@ -1159,23 +1166,23 @@ sub
 	[#Rule 38
 		 'known_op_rhs', 2,
 sub
-#line 166 "FilterParser.yp"
+#line 171 "FilterParser.yp"
 {
-                    return [ @_[1..$#_] ];
+                    return [ "$_[1] $_[2]" ];
                 }
 	],
 	[#Rule 39
 		 'known_op_rhs', 2,
 sub
-#line 170 "FilterParser.yp"
+#line 175 "FilterParser.yp"
 {
-                    return [ @_[1..$#_] ];
+                    return [ "$_[1] $_[2]" ];
                 }
 	],
 	[#Rule 40
 		 'fuzzy_string_op_rhs', 2,
 sub
-#line 176 "FilterParser.yp"
+#line 181 "FilterParser.yp"
 {
                             my $cmp = OPTiMaDe::FilterParser::Comparison->new( $_[1] );
                             $cmp->push_operand( $_[2] );
@@ -1185,7 +1192,7 @@ sub
 	[#Rule 41
 		 'fuzzy_string_op_rhs', 2,
 sub
-#line 182 "FilterParser.yp"
+#line 187 "FilterParser.yp"
 {
                             my $cmp = OPTiMaDe::FilterParser::Comparison->new( $_[1] );
                             $cmp->push_operand( $_[2] );
@@ -1195,7 +1202,7 @@ sub
 	[#Rule 42
 		 'fuzzy_string_op_rhs', 3,
 sub
-#line 188 "FilterParser.yp"
+#line 193 "FilterParser.yp"
 {
                             my $cmp = OPTiMaDe::FilterParser::Comparison->new( "$_[1] $_[2]" );
                             $cmp->push_operand( $_[3] );
@@ -1205,7 +1212,7 @@ sub
 	[#Rule 43
 		 'fuzzy_string_op_rhs', 2,
 sub
-#line 194 "FilterParser.yp"
+#line 199 "FilterParser.yp"
 {
                             my $cmp = OPTiMaDe::FilterParser::Comparison->new( $_[1] );
                             $cmp->push_operand( $_[2] );
@@ -1215,7 +1222,7 @@ sub
 	[#Rule 44
 		 'fuzzy_string_op_rhs', 3,
 sub
-#line 200 "FilterParser.yp"
+#line 205 "FilterParser.yp"
 {
                             my $cmp = OPTiMaDe::FilterParser::Comparison->new( "$_[1] $_[2]" );
                             $cmp->push_operand( $_[3] );
@@ -1225,7 +1232,7 @@ sub
 	[#Rule 45
 		 'fuzzy_string_op_rhs', 2,
 sub
-#line 206 "FilterParser.yp"
+#line 211 "FilterParser.yp"
 {
                             my $cmp = OPTiMaDe::FilterParser::Comparison->new( $_[1] );
                             $cmp->push_operand( $_[2] );
@@ -1235,27 +1242,27 @@ sub
 	[#Rule 46
 		 'set_op_rhs', 2,
 sub
-#line 214 "FilterParser.yp"
+#line 219 "FilterParser.yp"
 {
                 my $lc = OPTiMaDe::FilterParser::ListComparison->new( $_[1] );
-                $lc->set_values( [ '=', $_[2] ] );
+                $lc->set_values( [ [ '=', $_[2] ] ] );
                 return $lc;
             }
 	],
 	[#Rule 47
 		 'set_op_rhs', 3,
 sub
-#line 220 "FilterParser.yp"
+#line 225 "FilterParser.yp"
 {
                 my $lc = OPTiMaDe::FilterParser::ListComparison->new( $_[1] );
-                $lc->set_values( [ $_[2], $_[3] ] );
+                $lc->set_values( [ [ $_[2], $_[3] ] ] );
                 return $lc;
             }
 	],
 	[#Rule 48
 		 'set_op_rhs', 3,
 sub
-#line 226 "FilterParser.yp"
+#line 231 "FilterParser.yp"
 {
                 my $lc = OPTiMaDe::FilterParser::ListComparison->new( "$_[1] $_[2]" );
                 $lc->set_values( $_[3] );
@@ -1265,7 +1272,7 @@ sub
 	[#Rule 49
 		 'set_op_rhs', 3,
 sub
-#line 232 "FilterParser.yp"
+#line 237 "FilterParser.yp"
 {
                 my $lc = OPTiMaDe::FilterParser::ListComparison->new( "$_[1] $_[2]" );
                 $lc->set_values( $_[3] );
@@ -1275,7 +1282,7 @@ sub
 	[#Rule 50
 		 'set_op_rhs', 3,
 sub
-#line 238 "FilterParser.yp"
+#line 243 "FilterParser.yp"
 {
                 my $lc = OPTiMaDe::FilterParser::ListComparison->new( "$_[1] $_[2]" );
                 $lc->set_values( $_[3] );
@@ -1285,17 +1292,17 @@ sub
 	[#Rule 51
 		 'set_zip_op_rhs', 3,
 sub
-#line 246 "FilterParser.yp"
+#line 251 "FilterParser.yp"
 {
                     $_[1]->set_operator( $_[2] );
-                    $_[1]->set_values( $_[3] );
+                    $_[1]->set_values( [ $_[3] ] );
                     return $_[1];
                 }
 	],
 	[#Rule 52
 		 'set_zip_op_rhs', 4,
 sub
-#line 252 "FilterParser.yp"
+#line 257 "FilterParser.yp"
 {
                     $_[1]->set_operator( "$_[2] $_[3]" );
                     $_[1]->set_values( $_[4] );
@@ -1305,7 +1312,7 @@ sub
 	[#Rule 53
 		 'set_zip_op_rhs', 4,
 sub
-#line 258 "FilterParser.yp"
+#line 263 "FilterParser.yp"
 {
                     $_[1]->set_operator( "$_[2] $_[3]" );
                     $_[1]->set_values( $_[4] );
@@ -1315,7 +1322,7 @@ sub
 	[#Rule 54
 		 'set_zip_op_rhs', 4,
 sub
-#line 264 "FilterParser.yp"
+#line 269 "FilterParser.yp"
 {
                     $_[1]->set_operator( "$_[2] $_[3]" );
                     $_[1]->set_values( $_[4] );
@@ -1325,18 +1332,18 @@ sub
 	[#Rule 55
 		 'length_comparison', 4,
 sub
-#line 272 "FilterParser.yp"
+#line 277 "FilterParser.yp"
 {
                         my $cmp = OPTiMaDe::FilterParser::ListComparison->new( $_[1] );
                         $cmp->set_property( $_[2] );
-                        $cmp->set_values( [ $_[3], $_[4] ] );
+                        $cmp->set_values( [ [ $_[3], $_[4] ] ] );
                         return $cmp;
                     }
 	],
 	[#Rule 56
 		 'property_zip_addon', 2,
 sub
-#line 281 "FilterParser.yp"
+#line 286 "FilterParser.yp"
 {
                             my $zip = OPTiMaDe::FilterParser::Zip->new;
                             $zip->push_property( $_[2] );
@@ -1346,7 +1353,7 @@ sub
 	[#Rule 57
 		 'property_zip_addon', 3,
 sub
-#line 287 "FilterParser.yp"
+#line 292 "FilterParser.yp"
 {
                             $_[1]->push_property( $_[3] );
                             return $_[1];
@@ -1355,7 +1362,7 @@ sub
 	[#Rule 58
 		 'property', 1,
 sub
-#line 296 "FilterParser.yp"
+#line 301 "FilterParser.yp"
 {
                 my $id = OPTiMaDe::FilterParser::Property->new;
                 $id->push_identifier( $_[1] );
@@ -1365,7 +1372,7 @@ sub
 	[#Rule 59
 		 'property', 3,
 sub
-#line 302 "FilterParser.yp"
+#line 307 "FilterParser.yp"
 {
                 $_[1]->push_identifier( $_[3] );
                 return $_[1];
@@ -1392,7 +1399,7 @@ sub
 	[#Rule 66
 		 'operator', 2,
 sub
-#line 324 "FilterParser.yp"
+#line 329 "FilterParser.yp"
 {
                 return join( '', @_[1..$#_] );
             }
@@ -1403,7 +1410,7 @@ sub
 	[#Rule 68
 		 'operator', 2,
 sub
-#line 329 "FilterParser.yp"
+#line 334 "FilterParser.yp"
 {
                 return join( '', @_[1..$#_] );
             }
@@ -1414,7 +1421,7 @@ sub
 	[#Rule 70
 		 'operator', 2,
 sub
-#line 334 "FilterParser.yp"
+#line 339 "FilterParser.yp"
 {
                 return join( '', @_[1..$#_] );
             }
@@ -1424,7 +1431,7 @@ sub
     bless($self,$class);
 }
 
-#line 339 "FilterParser.yp"
+#line 344 "FilterParser.yp"
 
 
 # Footer section

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.153';
+our $VERSION = '1.154';
 
 use Time::HiRes ();
 
@@ -60,7 +60,7 @@ sub insertDurationBytes {
 
 =head1 VERSION
 
-1.153
+1.154
 
 =head1 AUTHOR
 

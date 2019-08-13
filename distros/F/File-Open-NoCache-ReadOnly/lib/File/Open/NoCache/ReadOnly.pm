@@ -21,23 +21,25 @@ File::Open::NoCache::ReadOnly - Open a file and clear the cache afterward
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SUBROUTINES/METHODS
 
 =head2 new
 
-Open a file and flush the cache afterwards.
+Open a file that will be read once sequentially and not again,
+optimising the cache accordingly.
 One use case is building a large database from smaller files that are
-only read in once.
+only read in once,
 Once the file has been used it's a waste of RAM to keep it in cache.
 
     use File::Open::NoCache::ReadOnly;
     my $fh = File::Open::NoCache::ReadOnly->new('/etc/passwd');
+    my $fh2 = File::Open::NoCache::ReadOnly->new(filename => '/etc/group', fatal => 1);
 
 =cut
 
@@ -51,7 +53,7 @@ sub new {
 	if(ref($_[0]) eq 'HASH') {
 		%params = %{$_[0]};
 	} elsif(ref($_[0]) || !defined($_[0])) {
-		Carp::croak('Usage: ', __PACKAGE__, '->new(%args)');
+		Carp::carp('Usage: ', __PACKAGE__, '->new(%args)');
 	} elsif(scalar(@_) % 2 == 0) {
 		%params = @_;
 	} else {
@@ -60,7 +62,11 @@ sub new {
 
 	if(my $filename = $params{'filename'}) {
 		if(open(my $fd, '<', $filename)) {
+			IO::AIO::fadvise($fd, 0, 0, IO::AIO::FADV_SEQUENTIAL|IO::AIO::FADV_NOREUSE|IO::AIO::FADV_DONTNEED);
 			return bless { fd => $fd }, $class
+		}
+		if($params{'fatal'}) {
+			Carp::croak("$filename: $!");
 		}
 		Carp::carp("$filename: $!");
 		return;
@@ -84,10 +90,15 @@ sub fd {
 	return $self->{'fd'};
 }
 
-sub DESTROY {
-	if(defined($^V) && ($^V ge 'v5.14.0')) {
-		return if ${^GLOBAL_PHASE} eq 'DESTRUCT';	# >= 5.14.0 only
-	}
+=head2	close
+
+Shouldn't be needed as close happens automatically when there variable goes out of scope.
+However Perl isn't as good at reaping as it'd have you believe, so this is here to force it when you
+know you're finished with the object.
+
+=cut
+
+sub close {
 	my $self = shift;
 
 	if(my $fd = $self->{'fd'}) {
@@ -95,9 +106,23 @@ sub DESTROY {
 		# IO::AIO::fadvise($fd, 0, $statb[7] - 1, IO::AIO::FADV_DONTNEED);
 		IO::AIO::fadvise($fd, 0, 0, IO::AIO::FADV_DONTNEED);
 
-		close $self->{'fd'};
+		close $fd;
 
 		delete $self->{'fd'};
+	# } else {
+		# Seems to get false positives
+		# Carp::carp('Attempt to close object twice');
+	}
+}
+
+sub DESTROY {
+	if(defined($^V) && ($^V ge 'v5.14.0')) {
+		return if ${^GLOBAL_PHASE} eq 'DESTRUCT';	# >= 5.14.0 only
+	}
+	my $self = shift;
+
+	if(defined($self->{'fd'})) {
+		$self->close();
 	}
 }
 
@@ -127,10 +152,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-Open-NoCache-ReadOnly>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/File-Open-NoCache-ReadOnly>
 
 =item * CPAN Ratings
 

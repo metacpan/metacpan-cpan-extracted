@@ -15,7 +15,7 @@ use File::Copy;
 my $verbose = exists $ENV{SMOKE_VERBOSE} ? $ENV{SMOKE_VERBOSE} : 0;
 my $showcfg = 0;
 
-use Test::More tests => 683;
+use Test::More tests => 691;
 
 use_ok 'Test::Smoke::Reporter';
 
@@ -2130,6 +2130,81 @@ EORESULTS
     }
     unlink $config_sh;
 }
+
+{
+    note("rt.cpan.org 125932");
+
+    create_config_sh( $config_sh, version => '5.11.2' );
+
+    my $reporter = Test::Smoke::Reporter->new(
+        ddir       => $findbin,
+        v          => $verbose,
+        outfile    => '',
+        showcfg    => $showcfg,
+        cfg        => \( my $bcfg = <<__EOCFG__ ),
+-Dcc=/opt/perl/ccache/gcc
+__EOCFG__
+    );
+    isa_ok( $reporter, 'Test::Smoke::Reporter' );
+
+    my $p = [
+        'd3bb03e0842cd3214922ab134a48314ee3fe2077',
+        'v5.29.1-31-gd3bb03e084',
+        '',
+    ];
+    my $patch = $p->[0] . ($p->[1] ? " $p->[1]" : "");
+    my $cfgarg = q|-Duseithreads -Doptimize="-O2 -pipe -fstack-protector -fno-strict-aliasing" -Dcc="clang -Qunused-arguments" -Duse64bitint|;
+    $reporter->read_parse( \(my $result = <<EORESULTS) );
+Started smoke at 1532483322
+Smoking patch $p->[0] $p->[1]
+Smoking branch smoke-me/khw-sisyphus
+Stopped smoke at 1532483323
+Started smoke at 1532483323
+
+Configuration: -Dusedevel $cfgarg
+------------------------------------------------------------------------------
+
+Compiler info: clang -Qunused-arguments version 4.2.1 Compatible FreeBSD Clang 6.0.0 (tags/RELEASE_600/final 326565)
+TSTENV = stdio	Files=2662, Tests=1183093, 280 wallclock secs (78.77 usr  9.51 sys + 597.30 cusr 55.12 csys = 740.70 CPU)
+
+../lib/locale.t.............................................FAILED
+    436-437, 441, 444, 458
+
+TSTENV = perlio	Files=2662, Tests=1182934, 265 wallclock secs (81.45 usr 11.89 sys + 547.26 cusr 57.26 csys = 697.85 CPU)
+
+../lib/locale.t.............................................FAILED
+    436-437, 441, 444, 458
+
+Stopped smoke at 1532484119
+Finished smoking $p->[0] $p->[1] smoke-me/khw-sisyphus
+EORESULTS
+
+    is( $reporter->{_rpt}{patch}, $p->[0],
+        "Changenumber $reporter->{_rpt}{patch}" );
+    is( $reporter->{_rpt}{patchdescr}, $p->[1] || $p->[0],
+        "Changedescr $reporter->{_rpt}{patchdescr}" );
+
+    is( $reporter->{_rpt}{$cfgarg}{summary}{N}{stdio}, "F",
+        "'$cfgarg' reports fail" );
+    is( $reporter->{_rpt}{$cfgarg}{summary}{N}{perlio}, "F",
+        "'$cfgarg' reports fail" );
+    ok( (not defined $reporter->{_rpt}{running}),
+        "Smoke not running" );
+    is( $reporter->{_rpt}{finished}, "Finished",
+        "Smoke finished" );
+
+    my @f_lines = split /\n/, $reporter->failures;
+    is_deeply \@f_lines,
+        [split /\n/, <<'__EOFAIL__'], "Multiple unit tests and sequences of unit tests identified as failures";
+[stdio/perlio] -Duseithreads -Duse64bitint
+../lib/locale.t.............................................FAILED
+    436-437, 441, 444, 458
+__EOFAIL__
+
+    unlink $config_sh;
+}
+
+########## SUBROUTINES ##########
 
 sub create_config_sh {
     my ($file, %cfg) = @_;

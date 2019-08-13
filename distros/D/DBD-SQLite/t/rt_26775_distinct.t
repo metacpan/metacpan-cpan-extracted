@@ -1,14 +1,12 @@
-#!/usr/bin/perl
 use strict;
 use warnings;
 use DBI;
 use Test::More;
 use lib "t/lib";
 use SQLiteTest;
+use if -d ".git", "Test::FailWarnings";
 
 BEGIN { requires_sqlite('3.6.3') }
-
-plan tests => 22;
 
 use_ok('DBD::SQLite');
 
@@ -50,7 +48,6 @@ for my $query (split m/ ; /xms, $slurp) {
 # ######
 # Then we test the bug.
 # 
-
 
 # We test with both 'DISTINCT(t.name) [..]' and 'DISTINCT t.name [..]'
 #
@@ -96,6 +93,8 @@ foreach my $query (($query_with_parens, $query_without_parens)) {
 }
 
 $dbh->disconnect;
+
+done_testing;
 
 sub trim {
     my ($string) = @_;

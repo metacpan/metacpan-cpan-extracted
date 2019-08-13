@@ -1,15 +1,9 @@
-#!/usr/bin/perl -w
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest;
-use Test::More tests => 92 * 4 + 2;
-use Test::NoWarnings;
+use Test::More;
+use if -d ".git", "Test::FailWarnings";
 
 my $dbh = connect_ok(
 	AutoCommit => 1,
@@ -213,3 +207,5 @@ foreach my $func (@funcs) {
 }
 eval { $dbh->{AutoCommit} = 1 }; # to end transaction
 $dbh->disconnect;
+
+done_testing;

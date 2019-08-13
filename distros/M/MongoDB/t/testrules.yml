@@ -8,5 +8,9 @@ seq:
     - seq: t/examples/changestream.t
     - seq: t/retryable-writes-spec.t
     - seq: t/retryable-writes-split-batch.t
+    - seq: t/retryable-reads-spec.t
+    - seq: t/sessions-spec.t
     - seq: t/transactions-spec.t
+    - seq: t/transactions-convenient-api-spec.t
+    - seq: t/connections-survive-step-down.t
     - par: **

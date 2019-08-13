@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.8.1';
+our $VERSION = 'v3.9.0';
 
 
 has hosting_organization => (
@@ -50,6 +50,14 @@ has membership_number => (
 
 
 
+has membership_points_earned => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'membershipPointsEarned',
+);
+
+
+
 has program_name => (
     is        => 'rw',
     predicate => 1,
@@ -74,7 +82,7 @@ SemanticWeb::Schema::ProgramMembership - Used to describe membership in a loyalt
 
 =head1 VERSION
 
-version v3.8.1
+version v3.9.0
 
 =head1 DESCRIPTION
 
@@ -138,6 +146,24 @@ A membership_number should be one of the following types:
 =over
 
 =item C<Str>
+
+=back
+
+=head2 C<membership_points_earned>
+
+C<membershipPointsEarned>
+
+The number of membership points earned by the member. If necessary, the
+unitText can be used to express the units the points are issued in. (e.g.
+stars, miles, etc.)
+
+A membership_points_earned should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
+
+=item C<Num>
 
 =back
 

@@ -1,0 +1,155 @@
+## name PBP "Good" examples
+## failures 0
+## cut
+for my $client (@clients) {
+    $client->tally_hours();
+    $client->bill_hours();
+    $client->reset_hours();
+}
+
+for my $agent_num (0 .. $#operatives) {
+    print "Checking agent $agent_num\n";
+    my $agent = $operatives[$agent_num];
+    if ($on_disavowed_list{$agent}) {
+        print "\t...$agent disavowed!\n";
+    }
+}
+
+## name PBP "Bad" example 1
+## failures 2
+## cut
+for my $n (0..$#clients) {
+    $clients[$n]->tally_hours(  );
+    $clients[$n]->bill_hours(  );
+    $clients[$n]->freeze_hours(  );
+    $clients[$n]->reset_hours(  );
+    $clients[$n]->store(  );
+}
+
+## TODO PBP "Bad" example 2
+## failures 1
+## cut
+for my $agent_num (0..$#operatives) {                        # Iterate indices
+    print "Checking agent $agent_num\n";                     # Use index
+    if ($on_disavowed_list{$operatives[$agent_num]}) {       # Extract value
+        print "\t...$operatives[$agent_num] disavowed!\n";   # Extract value again
+    }
+}
+
+## name Multiple uses of a constant hash key
+## failures 2
+## cut
+foreach my $cred_ref (@credentials) {
+    $cred_ref->{port} = 21 if not $cred_ref->{port};
+    if ($cred_ref->{password}) {
+        $cred_ref->{password} = encrypt_password($cred_ref->{password});
+    }
+    else {
+        $cred_ref->{password} = default_password();
+    }
+    if ($cred_ref->{key}) {
+        $cred_ref->{key} = encrypt_private_key($cred_ref->{key});
+    }
+    else {
+        $cred_ref->{key} = default_key();
+    }
+}
+
+## name Block in loop list
+## failures 1
+## cut
+foreach my $cred_ref (@credentials) {
+    if (    $cred_ref->{port} != 21
+        and $cred_ref->{port} != 22
+        and $cred_ref->{port} != 23
+    ) {
+        $cred_ref->{host} = $cred_ref->{host} . ':' . $cred_ref->{port};
+    }
+    $cred_ref->{password} = decrypt_password($cred_ref->{password}) if $cred_ref->{password};
+    $cred_ref->{key} = decrypt_private_key($cred_ref->{key}) if $cred_ref->{key};
+}
+
+## name Nested subscript
+## failures 0
+## cut
+foreach my $map_ref (@mappings) {
+    $map_ref->{ids}[ $map_ref->{id_level} ] = $map_ref->{new_id};
+}
+
+## name Similar-looking subscripts with different values
+## failures 0
+## cut
+for my $val_ref (@values) {
+    $insert->execute(map { $val_ref->{$_} } @some_cols);
+    $insert->execute(map { $val_ref->{$_} } @other_cols);
+}
+
+## name Multiple subscripts with slices
+## failures 4
+## cut
+for my $date_ref (@date_ranges) {
+    Spil::Info::warnx('INF', 'begin - end', [ @$date_ref{qw[ begin end ]} ]);
+    _do_something($date_ref->{begin}, $date_ref->{end});
+    _do_sth_else(@$date_ref{'begin', 'end'});
+    _do_the_rest(@$date_ref{'begin', 'end'});
+    _do_the_boogie(@$date_ref{'begin', 'end'});
+}
+
+## name Two nested iterations with same iterator name
+## failures 0
+## cut
+foreach my $elem_ref (@data) {
+    foreach my $sub_ref (@{ $elem_ref->{some_list} }) {
+        do_some_stuff($sub_ref->{value});
+    }
+    foreach my $sub_ref (@{ $elem_ref->{other_list} }) {
+        do_other_stuff($sub_ref->{value});
+    }
+}
+
+## name Different amount of whitespace in subscripts
+## failures 1
+## cut
+foreach my $elem_ref (@stuff) {
+    Some::Util::foo($elem_ref->{     data });
+    Some::Util::barr($elem_ref->{    data });
+    Some::Util::squeeze($elem_ref->{ data });
+    Some::Util::push(   $elem_ref->{ data });
+}
+
+## name Operation in subscript
+## failures 0
+## cut
+foreach my $elem_ref (@stuff) {
+    print $elem_ref->{$id} + $elem_ref->{ $id . '_new' };
+}
+
+## name delete
+## failures 0
+## cut
+foreach my $foo_ref (@foos) {
+    if ($foo_ref->{in} < 0) {
+        delete $foo_ref->{in};
+    }
+    if ($foo_ref->{out} > 10) {
+        delete($foo_ref->{out});
+    }
+}
+
+## name Subscript unrelated to the loop iterator
+## failures 0
+## cut
+foreach my $attr (@attrs) {
+    no strict 'refs';
+
+    *{"get_$attr"} = sub {
+        my ($self) = @_;
+        return $self->{$attr};
+    };
+
+    *{"set_$attr"} = sub {
+        my ($self, $new) = @_;
+        $self->{$attr} = $new;
+        return $self->{$attr};
+    };
+}

@@ -1,17 +1,11 @@
-#!/usr/bin/perl
-
 # Tests simple table creation
 
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest;
-use Test::More tests => 7;
-use Test::NoWarnings;
+use Test::More;
+use if -d ".git", "Test::FailWarnings";
 
 my $dbh = connect_ok();
 $dbh->do(<<'END_SQL');
@@ -35,3 +29,4 @@ my $names = $sth->{NAME};
 is( scalar(@$names), 4, 'Got 4 columns' );
 is_deeply( $names, [ 'f1', 'f1', 'f2', 'f3' ], 'Table prepending is disabled by default' );
 
+done_testing;

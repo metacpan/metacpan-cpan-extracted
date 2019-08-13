@@ -1,0 +1,22 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+App::mojopaste	lib/App/mojopaste.pm	1;"	p
+App::mojopaste::Backend::File	script/mojopaste	2;"	p
+App::mojopaste::Backend::File::_load_p	script/mojopaste	19;"	s
+App::mojopaste::Backend::File::_save_p	script/mojopaste	31;"	s
+App::mojopaste::Backend::File::register	script/mojopaste	11;"	s
+_chart	script/mojopaste	171;"	s
+_load_p	script/mojopaste	19;"	s
+_save_p	script/mojopaste	31;"	s
+import	t/Helper.pm	13;"	s
+main	script/mojopaste	44;"	p
+main::_chart	script/mojopaste	171;"	s
+register	script/mojopaste	11;"	s
+t	t/Helper.pm	7;"	s
+t::Helper	t/Helper.pm	1;"	p
+t::Helper::import	t/Helper.pm	13;"	s
+t::Helper::t	t/Helper.pm	7;"	s

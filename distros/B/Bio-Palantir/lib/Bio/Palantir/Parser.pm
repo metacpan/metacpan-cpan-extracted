@@ -1,11 +1,10 @@
 package Bio::Palantir::Parser;
 # ABSTRACT: front-end class for Bio::Palantir::Parser module, wich handles the parsing of biosynML.xml and regions.js antiSMASH reports
-$Bio::Palantir::Parser::VERSION = '0.191800';
+$Bio::Palantir::Parser::VERSION = '0.192240';
 use Moose;
 use namespace::autoclean;
 
 use autodie;
-use Smart::Comments;
 
 use Carp;
 use File::Basename 'fileparse';
@@ -302,7 +301,7 @@ Bio::Palantir::Parser - front-end class for Bio::Palantir::Parser module, wich h
 
 =head1 VERSION
 
-version 0.191800
+version 0.192240
 
 =head1 SYNOPSIS
 

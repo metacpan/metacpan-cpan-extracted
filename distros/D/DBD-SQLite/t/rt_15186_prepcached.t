@@ -1,19 +1,13 @@
-#!/usr/bin/perl
-
 # This is a regression test for bug #15186:
 # http://rt.cpan.org/Public/Bug/Display.html?id=15186
 # About re-using statements with prepare_cached().
 
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest;
-use Test::More tests => 13;
-use Test::NoWarnings;
+use Test::More;
+use if -d ".git", "Test::FailWarnings";
 
 # Create a database
 my $dbh = connect_ok( RaiseError => 1 );
@@ -74,3 +68,5 @@ SCOPE: {
 		'Query 2 Row 2',
 	);
 }
+
+done_testing;

@@ -15,13 +15,29 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.8.1';
+our $VERSION = 'v3.9.0';
 
 
 has broadcast_frequency_value => (
     is        => 'rw',
     predicate => 1,
     json_ld   => 'broadcastFrequencyValue',
+);
+
+
+
+has broadcast_signal_modulation => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'broadcastSignalModulation',
+);
+
+
+
+has broadcast_sub_channel => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'broadcastSubChannel',
 );
 
 
@@ -42,7 +58,7 @@ SemanticWeb::Schema::BroadcastFrequencySpecification - The frequency in MHz and 
 
 =head1 VERSION
 
-version v3.8.1
+version v3.9.0
 
 =head1 DESCRIPTION
 
@@ -64,6 +80,36 @@ A broadcast_frequency_value should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
 
 =item C<Num>
+
+=back
+
+=head2 C<broadcast_signal_modulation>
+
+C<broadcastSignalModulation>
+
+The modulation (e.g. FM, AM, etc) used by a particular broadcast service
+
+A broadcast_signal_modulation should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::QualitativeValue']>
+
+=item C<Str>
+
+=back
+
+=head2 C<broadcast_sub_channel>
+
+C<broadcastSubChannel>
+
+The subchannel used for the broadcast.
+
+A broadcast_sub_channel should be one of the following types:
+
+=over
+
+=item C<Str>
 
 =back
 

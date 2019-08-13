@@ -68,6 +68,6 @@
          "web" : "https://github.com/p5pclub/devel-quickcover"
       }
    },
-   "version" : "0.900012",
+   "version" : "0.900014",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

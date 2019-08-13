@@ -15,7 +15,31 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.8.1';
+our $VERSION = 'v3.9.0';
+
+
+has account_minimum_inflow => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'accountMinimumInflow',
+);
+
+
+
+has account_overdraft_limit => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'accountOverdraftLimit',
+);
+
+
+
+has bank_account_type => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'bankAccountType',
+);
+
 
 
 
@@ -34,12 +58,59 @@ SemanticWeb::Schema::BankAccount - A product or service offered by a bank whereb
 
 =head1 VERSION
 
-version v3.8.1
+version v3.9.0
 
 =head1 DESCRIPTION
 
 A product or service offered by a bank whereby one may deposit, withdraw or
 transfer money and in some cases be paid interest.
+
+=head1 ATTRIBUTES
+
+=head2 C<account_minimum_inflow>
+
+C<accountMinimumInflow>
+
+A minimum amount that has to be paid in every month.
+
+A account_minimum_inflow should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::MonetaryAmount']>
+
+=back
+
+=head2 C<account_overdraft_limit>
+
+C<accountOverdraftLimit>
+
+An overdraft is an extension of credit from a lending institution when an
+account reaches zero. An overdraft allows the individual to continue
+withdrawing money even if the account has no funds in it. Basically the
+bank allows people to borrow a set amount of money.
+
+A account_overdraft_limit should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::MonetaryAmount']>
+
+=back
+
+=head2 C<bank_account_type>
+
+C<bankAccountType>
+
+The type of a bank account.
+
+A bank_account_type should be one of the following types:
+
+=over
+
+=item C<Str>
+
+=back
 
 =head1 SEE ALSO
 

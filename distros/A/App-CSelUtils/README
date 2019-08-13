@@ -2,8 +2,8 @@ NAME
     App::CSelUtils - Utilities related to Data::CSel
 
 VERSION
-    This document describes version 0.082 of App::CSelUtils (from Perl
-    distribution App-CSelUtils), released on 2019-07-29.
+    This document describes version 0.084 of App::CSelUtils (from Perl
+    distribution App-CSelUtils), released on 2019-08-08.
 
 DESCRIPTION
     This distribution contains the following utilities:
@@ -62,13 +62,23 @@ FUNCTIONS
 
             dump:tag.id.class
 
-        which will result in a node printed like this:
+            which will result in a node printed like this:
 
-         HTML::Element tag=p id=undef class=undef
+            HTML::Element tag=p id=undef class=undef
 
         By default, if no attributes are specified, "id" is used. If the
         node class does not support the attribute, or if the value of the
         attribute is undef, then "undef" is shown.
+
+        *   "eval" will execute Perl code for each matching node. The Perl
+            code will be called with arguments: "($node)". For convenience,
+            $_ is also locally set to the matching node. Example in htmlsel
+            you can add this action:
+
+            eval:'print $_->tag'
+
+            which will print the tag name for each matching HTML::Element
+            node.
 
     *   select_action => *str* (default: "csel")
 

@@ -1,10 +1,5 @@
-#!/usr/bin/perl
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 # test the example described in 
 # L<DBD::SQLite::VirtualTable::PerlData/"Hashref example : unicode characters">
 
@@ -14,15 +9,12 @@ use Test::More;
 
 BEGIN {
   # check for old Perls which did not have Unicode::UCD in core
-  if (eval "use Unicode::UCD 'charinfo'; 1") {
-    plan tests => 10;
-  }
-  else {
+  unless (eval "use Unicode::UCD 'charinfo'; 1") {
     plan skip_all => "Unicode::UCD does not seem to be installed";
   }
 }
 
-use Test::NoWarnings;
+use if -d ".git", "Test::FailWarnings";
 
 our $chars = [map {charinfo($_)} 0x300..0x400];
 
@@ -54,10 +46,11 @@ is $res->[0]{block}, $sigma_block, "letter in proper block";
 # the following does not work because \b gets escaped as a literal
 #$sql = "SELECT * FROM charinfo WHERE script='Greek' AND name MATCH '\\bSIGMA\\b'";
 
-
 # but the following does work because the REGEXP operator is handled
 # outside of the BEST_INDEX / FILTER methods
 $sql = "SELECT * FROM charinfo WHERE script='Greek' AND name REGEXP '\\bSIGMA\\b'";
 $res = $dbh->selectall_arrayref($sql, {Slice => {}});
 ok scalar(@$res),                        "found sigma letters";
 is $res->[0]{block},  $sigma_block, "letter in proper block";
+
+done_testing;

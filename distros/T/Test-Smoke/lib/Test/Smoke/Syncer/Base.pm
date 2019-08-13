@@ -7,6 +7,7 @@ our $VERSION = '0.001';
 
 use Cwd qw/cwd abs_path/;
 use Test::Smoke::Util qw/whereis/;
+use Test::Smoke::LogMixin;
 
 =head1 NAME
 
@@ -66,11 +67,11 @@ sub _clear_source_tree {
 
     $tree_dir ||= $self->{ddir};
 
-    $self->{v} and print "Clear source-tree from '$tree_dir' ";
+    $self->log_info("Clear source-tree from '$tree_dir' ");
     my $cnt = File::Path::rmtree( $tree_dir, $self->{v} > 1 );
 
     File::Path::mkpath( $tree_dir, $self->{v} > 1 ) unless -d $tree_dir;
-    $self->{v} and print "$cnt items OK\n";
+    $self->log_info("clear-source-tree: $cnt items OK");
 
 }
 
@@ -258,12 +259,17 @@ The contents of @leave_these should be in "MANIFEST-format"
 
 sub clean_from_directory {
     my $self = shift;
-    my $source_dir = File::Spec->rel2abs( shift, abs_path() );
+    my ($clean_dir, @leave_these) = @_;
+    my $this_dir = abs_path(File::Spec->curdir);
+
+    my $source_dir = File::Spec->file_name_is_absolute($clean_dir)
+        ? $clean_dir
+        : File::Spec->rel2abs($clean_dir, $this_dir);
+    $self->log_debug("[clean_from_directory($this_dir)] $clean_dir => $source_dir\n");
 
     require Test::Smoke::SourceTree;
-    my $tree = Test::Smoke::SourceTree->new( $source_dir );
+    my $tree = Test::Smoke::SourceTree->new($source_dir, $self->{v});
 
-    my @leave_these = @_ ? @_ : ();
     my %orig_dir = map { ( $_ => 1) } @leave_these;
     File::Find::find( sub {
         return unless -f;
@@ -271,14 +277,13 @@ sub clean_from_directory {
         $orig_dir{ $file } = 1;
     }, $source_dir );
 
-    $tree = Test::Smoke::SourceTree->new( $self->{ddir} );
+    $tree = Test::Smoke::SourceTree->new( $self->{ddir}, $self->{v} );
     File::Find::find( sub {
         return unless -f;
         my $file = $tree->abs2mani( $File::Find::name );
         return if exists $orig_dir{ $file };
-        $self->{v} > 1 and print "Unlink '$file'";
         1 while unlink $_;
-        $self->{v} > 1 and print -e $_ ? ": $!\n" : "\n";
+        $self->log_debug("Unlink '$file': " . (-e $_ ? "$!" : "ok"));
     }, $self->{ddir} );
 }
 

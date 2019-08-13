@@ -15,7 +15,15 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.8.1';
+our $VERSION = 'v3.9.0';
+
+
+has monthly_minimum_repayment_amount => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'monthlyMinimumRepaymentAmount',
+);
+
 
 
 
@@ -34,7 +42,7 @@ SemanticWeb::Schema::CreditCard - A card payment method of a particular brand or
 
 =head1 VERSION
 
-version v3.8.1
+version v3.9.0
 
 =head1 DESCRIPTION
 
@@ -47,6 +55,25 @@ supplies the card account.<br/><br/> Commonly used values:<br/><br/> <ul>
 <li>http://purl.org/goodrelations/v1#JCB</li>
 <li>http://purl.org/goodrelations/v1#MasterCard</li>
 <li>http://purl.org/goodrelations/v1#VISA</li> </ul> 
+
+=head1 ATTRIBUTES
+
+=head2 C<monthly_minimum_repayment_amount>
+
+C<monthlyMinimumRepaymentAmount>
+
+The minimum payment is the lowest amount of money that one is required to
+pay on a credit card statement each month.
+
+A monthly_minimum_repayment_amount should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::MonetaryAmount']>
+
+=item C<Num>
+
+=back
 
 =head1 SEE ALSO
 

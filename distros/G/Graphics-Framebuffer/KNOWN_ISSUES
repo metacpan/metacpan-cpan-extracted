@@ -52,3 +52,7 @@ Mouse methods are rudimentary and your user must be a member of the "input"
 group for them to work.  Frankly, I recommend using your own routines with
 threads, or better yet, if you really need a mouse, then maybe X-Windows and
 and SDL may be better for you.
+
+I don't really plan on developing mouse capability any further.  It was a test
+to see if it was possible.  Well, it was possible, but not very practical.
+

@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+README
+alpo
+alpo2
+lib/Test/UnixCmdWrap.pm
+t/00-load.t
+t/alpo.t
+t/pod-coverage.t
+t/pod.t
+META.yml
+META.json
+SIGNATURE    Added here by Module::Build

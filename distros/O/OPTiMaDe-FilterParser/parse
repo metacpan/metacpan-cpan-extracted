@@ -2,6 +2,7 @@
 
 use strict;
 use warnings;
+use Data::Compare;
 use Data::Dumper;
 use OPTiMaDe::FilterParser;
 use Scalar::Util qw(blessed);
@@ -21,11 +22,32 @@ for (@ARGV) {
     my $parser = new OPTiMaDe::FilterParser;
     my $tree = $parser->Run( $_ );
     print Dumper $tree;
+    print "== Filter ==\n";
+    print to_filter( $tree ) . "\n";
     print "== SQL ==\n";
-    print traverse( $tree ) . "\n";
+    print to_SQL( $tree ) . "\n";
+
+    my $filter = to_filter( $tree );
+    $parser = new OPTiMaDe::FilterParser;
+    my $tree_now = $parser->parse_string( $filter );
+    Compare( $tree, $tree_now ) || print "Roundtrip NOT passed\n";
 }
 
-sub traverse
+sub to_filter
+{
+    my( $node ) = @_;
+    if( blessed $node && $node->can( 'to_filter' ) ) {
+        return $node->to_filter;
+    } elsif( blessed $node ) {
+        return '<no filter representation>';
+    } elsif( ref $node && ref $node eq 'ARRAY' ) {
+        return '(' . join( ' ', map { to_filter( $_ ) } @{$node} ) . ')';
+    } else {
+        return $node;
+    }
+}
+
+sub to_SQL
 {
     my( $node ) = @_;
     if( blessed $node && $node->can( 'to_SQL' ) ) {
@@ -33,8 +55,11 @@ sub traverse
     } elsif( blessed $node ) {
         return '<no SQL representation>';
     } elsif( ref $node && ref $node eq 'ARRAY' ) {
-        my @parts = map { traverse( $_ ) } @{$node};
-        return '(' . join( ' ', @parts ) . ')';
+        return '(' . join( ' ', map { to_SQL( $_ ) } @{$node} ) . ')';
+    } elsif( $node eq 'IS KNOWN' ) {
+        $node = 'IS NOT NULL';
+    } elsif( $node eq 'IS UNKNOWN' ) {
+        $node = 'IS NULL';
     } else {
         return $node;
     }

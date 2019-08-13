@@ -1,15 +1,9 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest qw/connect_ok/;
-use Test::More tests => 5;
-use Test::NoWarnings;
+use Test::More;
+use if -d ".git", "Test::FailWarnings";
 
 my $dbh = connect_ok();
 
@@ -27,3 +21,5 @@ $dbh->do("\nCOMMIT");
 
 is $dbh->{AutoCommit}, 1,
 	'AutoCommit=1 after "\nCOMMIT"';
+
+done_testing;

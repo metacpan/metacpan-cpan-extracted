@@ -1,6 +1,16 @@
 CHANGES
 -------
 
+  2.087 10 August 2019
+
+      * IO::Uncompress::Unzip
+        nextStream not updating filehandle correctly
+        https://github.com/pmqs/IO-Compress/issues/3
+        25152f04f5b1bd9341502e42a5877c72eac3f291
+      
+      * Added travis & appveyor files for CI in GitHub
+
+
   2.086 31 March 2019
 
       * IO::Compress::Zip & IO::Uncompress::Unzip

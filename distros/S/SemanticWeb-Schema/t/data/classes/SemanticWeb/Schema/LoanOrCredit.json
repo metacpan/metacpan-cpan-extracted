@@ -9,26 +9,26 @@
    "properties" : {
       "schema:amount" : {
          "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/1253",
-            "https://github.com/schemaorg/schemaorg/issues/1698"
+            "https://github.com/schemaorg/schemaorg/issues/1698",
+            "https://github.com/schemaorg/schemaorg/issues/1253"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The amount of money.",
          "rdfs:label" : "amount",
          "schema:category" : [
-            "issue-1253",
-            "issue-1698"
+            "issue-1698",
+            "issue-1253"
          ],
          "schema:domainIncludes" : [
             "schema:InvestmentOrDeposit",
             "schema:MonetaryGrant",
+            "schema:DatedMoneySpecification",
             "schema:LoanOrCredit",
-            "schema:MoneyTransfer",
-            "schema:DatedMoneySpecification"
+            "schema:MoneyTransfer"
          ],
          "schema:rangeIncludes" : [
-            "schema:Number",
-            "schema:MonetaryAmount"
+            "schema:MonetaryAmount",
+            "schema:Number"
          ]
       },
       "schema:currency" : {
@@ -38,13 +38,39 @@
          "rdfs:label" : "currency",
          "schema:category" : "issue-1253",
          "schema:domainIncludes" : [
+            "schema:MonetaryAmountDistribution",
             "schema:ExchangeRateSpecification",
             "schema:DatedMoneySpecification",
             "schema:LoanOrCredit",
-            "schema:MonetaryAmount",
-            "schema:MonetaryAmountDistribution"
+            "schema:MonetaryAmount"
          ],
          "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:gracePeriod" : {
+         "dc:source" : [
+            "https://github.com/schemaorg/schemaorg/issues/1253",
+            "schemadotorgsources:FIBO"
+         ],
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The period of time after any due date that the borrower has to fulfil its obligations before a default (failure to pay) is deemed to have occurred.",
+         "rdfs:label" : "gracePeriod",
+         "schema:category" : "issue-1253",
+         "schema:domainIncludes" : "schema:LoanOrCredit",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Duration"
+      },
+      "schema:loanRepaymentForm" : {
+         "dc:source" : [
+            "https://github.com/schemaorg/schemaorg/issues/1253",
+            "schemadotorgsources:FIBO"
+         ],
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A form of paying back money previously borrowed from a lender. Repayment usually takes the form of periodic payments that normally include part principal plus interest in each payment.",
+         "rdfs:label" : "loanRepaymentForm",
+         "schema:category" : "issue-1253",
+         "schema:domainIncludes" : "schema:LoanOrCredit",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:RepaymentSpecification"
       },
       "schema:loanTerm" : {
          "dc:source" : "schemadotorgsources:FIBO",
@@ -54,6 +80,48 @@
          "rdfs:subPropertyOf" : "schema:duration",
          "schema:domainIncludes" : "schema:LoanOrCredit",
          "schema:rangeIncludes" : "schema:QuantitativeValue"
+      },
+      "schema:loanType" : {
+         "dc:source" : [
+            "https://github.com/schemaorg/schemaorg/issues/1253",
+            "schemadotorgsources:FIBO"
+         ],
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The type of a loan or credit.",
+         "rdfs:label" : "loanType",
+         "schema:category" : "issue-1253",
+         "schema:domainIncludes" : "schema:LoanOrCredit",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:Text",
+            "schema:URL"
+         ]
+      },
+      "schema:recourseLoan" : {
+         "dc:source" : [
+            "https://github.com/schemaorg/schemaorg/issues/1253",
+            "schemadotorgsources:FIBO"
+         ],
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The only way you get the money back in the event of default is the security. Recourse is where you still have the opportunity to go back to the borrower for the rest of the money.",
+         "rdfs:label" : "recourseLoan",
+         "schema:category" : "issue-1253",
+         "schema:domainIncludes" : "schema:LoanOrCredit",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Boolean"
+      },
+      "schema:renegotiableLoan" : {
+         "dc:source" : [
+            "schemadotorgsources:FIBO",
+            "https://github.com/schemaorg/schemaorg/issues/1253"
+         ],
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Whether the terms for payment of interest can be renegotiated during the life of the loan.",
+         "rdfs:label" : "renegotiableLoan",
+         "schema:category" : "issue-1253",
+         "schema:domainIncludes" : "schema:LoanOrCredit",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Boolean"
       },
       "schema:requiredCollateral" : {
          "dc:source" : "schemadotorgsources:FIBO",

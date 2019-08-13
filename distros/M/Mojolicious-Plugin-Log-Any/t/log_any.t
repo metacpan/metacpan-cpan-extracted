@@ -14,9 +14,7 @@ my $log = Mojo::Log->with_roles('Mojo::Log::Role::AttachLogger')->new
 my $log_any = Log::Any->get_logger(category => 'Test::Category');
 foreach my $level (@levels) {
   $log_any->clear;
-  
   $log->$level('test', 'message');
-  
   $log_any->category_contains_ok('Test::Category', qr/\[\Q$level\E\] test\nmessage$/m, "$level log message");
 }
 

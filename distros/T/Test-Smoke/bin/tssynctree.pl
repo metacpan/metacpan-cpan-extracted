@@ -1,5 +1,6 @@
 #! /usr/bin/perl -w
 use strict;
+$|++;
 
 use File::Spec::Functions;
 use FindBin;

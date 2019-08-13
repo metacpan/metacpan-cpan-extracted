@@ -11,7 +11,7 @@ eval { Test::RedisServer->new } or plan skip_all => 'redis-server is required in
 
 my $redis_server = Test::RedisServer->new;
 my $redis = Redis->new( $redis_server->connect_info );
-my $ns = Redis::Namespace->new(redis => $redis, namespace => 'ns');
+my $ns = Redis::Namespace->new(redis => $redis, namespace => 'ns', guess => 1, warning => 1);
 
 sub pipeline_ok {
     my ($desc, @commands) = @_;

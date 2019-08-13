@@ -3,16 +3,14 @@ use warnings;
 use strict;
 
 use vars qw( $VERSION );
-$VERSION = '0.053';
-
-use fallback 'inc';
+$VERSION = '0.054';
 
 require File::Path;
 require Test::Smoke;
 use Cwd;
 use Encode qw( decode encode );
 use File::Spec::Functions;
-use JSON;
+use Test::Smoke::Util::LoadAJSON;
 use POSIX qw( strftime );
 use System::Info;
 use Test::Smoke::Util qw(
@@ -42,6 +40,10 @@ my %CONFIG = (
     df_harness3opts => undef,
 
     df_v            => 0,
+    df_hostname     => undef,
+    df_from         => '',
+    df_send_log     => 'on_fail',
+    df_send_out     => 'never',
     df_user_note    => '',
     df_un_file      => undef,
     df_un_position  => 'bottom', # != USERNOTE_ON_TOP for bottom
@@ -503,10 +505,14 @@ sub _parse {
             next;
         }
 
-        if (/^\s+(\d+(?:[-\s]+\d+)*)/) {
+        my @captures = ();
+        if (@captures = $_ =~ m/
+            (?:^|,)\s+
+            (\d+(?:-\d+)?)
+            /gx) {
             if (ref $rpt{$cfgarg}->{$debug}{$tstenv}{$previous}) {
                 push @{$rpt{$cfgarg}->{$debug}{$tstenv}{$previous}}, $_;
-                push @{$new[-1]{results}[-1]{failures}[-1]{extra}}, $1;
+                push @{$new[-1]{results}[-1]{failures}[-1]{extra}}, @captures;
             }
             next;
         }
@@ -524,7 +530,7 @@ sub _parse {
 
     $rpt{last_cfg} = $statarg;
     exists $rpt{statcfg}{$statarg} or $rpt{running} = $fcnt;
-    $rpt{avg} = $rpt{secs} / $rpt{count};
+    $rpt{avg} = $rpt{count} ? $rpt{secs} / $rpt{count} : 0;
     $self->{_rpt} = \%rpt;
     $self->_post_process;
 }
@@ -767,7 +773,7 @@ sub get_logfile {
 
 =head2 $reporter->write_to_file( [$name] )
 
-Write the C<< $self->report >> to file. If name is ommitted it will
+Write the C<< $self->report >> to file. If name is omitted it will
 use C<< catfile( $self->{ddir}, $self->{rptfile} ) >>.
 
 =cut
@@ -823,13 +829,13 @@ sub smokedb_data {
             git_describe     => $self->{_rpt}{patchdescr},
             git_id           => $self->{_rpt}{patch},
             smoke_branch     => $self->{_rpt}{smokebranch},
-            hostname         => $si->host,
+            hostname         => $self->{hostname} || $si->host,
             lang             => $ENV{LANG},
             lc_all           => $ENV{LC_ALL},
             osname           => $osname,
             osversion        => $osversion,
             perl_id          => $Conf{version},
-            reporter         => $self->{_conf_args}{from},
+            reporter         => $self->{from},
             reporter_version => $VERSION,
             smoke_date       => __posixdate($self->{_rpt}{started}),
             smoke_revision   => $Test::Smoke::VERSION,
@@ -849,7 +855,7 @@ sub smokedb_data {
 
     $rpt{log_file} = undef;
     my $rpt_fail = $rpt{summary} eq "PASS" ? 0 : 1;
-    if (my $send_log = $rpt{_conf_args}{send_log}) {
+    if (my $send_log = $self->{send_log}) {
         if (   ($send_log eq "always")
             or ($send_log eq "on_fail" && $rpt_fail))
         {
@@ -857,7 +863,7 @@ sub smokedb_data {
         }
     }
     $rpt{out_file} = undef;
-    if (my $send_out = $rpt{_conf_args}{send_out}) {
+    if (my $send_out = $self->{send_out}) {
         if (   ($send_out eq "always")
             or ($send_out eq "on_fail" && $rpt_fail))
         {
@@ -869,9 +875,9 @@ sub smokedb_data {
             }
         }
     }
-    delete $rpt{$_} for "user_note", grep m/^_/ => keys %rpt;
+    delete $rpt{$_} for qw/from send_log send_out user_note/, grep m/^_/ => keys %rpt;
 
-    my $json = JSON->new->utf8(1)->pretty(1)->encode(\%rpt);
+    my $json = Test::Smoke::Util::LoadAJSON->new->utf8(1)->pretty(1)->encode(\%rpt);
 
     # write the json to file:
     my $jsn_file = catfile($self->{ddir}, $self->{jsnfile});
@@ -1216,7 +1222,7 @@ sub summary {
     return $rpt_summary;
 }
 
-=head2 $repoarter->has_test_failures( )
+=head2 $reporter->has_test_failures( )
 
 Returns true if C<< @{ $reporter->{_failures} >>.
 
@@ -1238,7 +1244,7 @@ sub failures {
     } @{ $self->{_failures} };
 }
 
-=head2 $repoarter->has_todo_passed( )
+=head2 $reporter->has_todo_passed( )
 
 Returns true if C<< @{ $reporter->{_todo_pasesd} >>.
 
@@ -1260,7 +1266,7 @@ sub todo_passed {
     } @{ $self->{_todo_passed} };
 }
 
-=head2 $repoarter->has_mani_failures( )
+=head2 $reporter->has_mani_failures( )
 
 Returns true if C<< @{ $reporter->{_mani} >>.
 

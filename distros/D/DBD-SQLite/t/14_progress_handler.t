@@ -1,17 +1,9 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest qw/connect_ok @CALL_FUNCS/;
 use Test::More;
-use Test::NoWarnings;
-
-plan tests => 5 * @CALL_FUNCS + 1;
+use if -d ".git", "Test::FailWarnings";
 
 my $N_OPCODES = 50; # how many opcodes before calling the progress handler
 
@@ -44,7 +36,6 @@ foreach my $call_func (@CALL_FUNCS) {
 	# now the progress handler should have been called a number of times
 	ok($n_callback);
 
-
 	# unregister the progress handler, set counter back to zero, do more work
 	ok($dbh->$call_func( $N_OPCODES, undef, "progress_handler" ));
 	$n_callback = 0;
@@ -55,3 +46,5 @@ foreach my $call_func (@CALL_FUNCS) {
 
 	$dbh->disconnect;
 }
+
+done_testing;

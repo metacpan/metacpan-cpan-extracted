@@ -1,15 +1,9 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest;
-use Test::More tests => 37;
-use Test::NoWarnings;
+use Test::More;
+use if -d ".git", "Test::FailWarnings";
 
 # Create a database
 my $dbh = connect_ok( dbfile => 'foo', RaiseError => 1, PrintError => 1, PrintWarn => 1 );
@@ -116,7 +110,6 @@ SCOPE: {
 	ok( $sth->finish, '->finish' );
 }
 
-
 # Delete the test row from the table
 ok( $dbh->do('DELETE FROM ONE WHERE id = 2 AND name IS NULL'), 'DELETE' );
 
@@ -137,3 +130,5 @@ SCOPE: {
 	my $sth = $dbh->prepare("UPDATE one SET id = 3 WHERE name = 'Gary Shea'");
 	isa_ok( $sth, 'DBI::st' );
 }
+
+done_testing;

@@ -1,3 +1,10 @@
+** 0.10 / 2019-08-10
+   - Force compatibility with JSONWIRE for new FF & Chrome
+     get_attribute won't try to separate attribute and properties
+   - Support 'on_timeout' callback for Weasel drivers
+   - Report failure locations of croak/cluck outside Weasel::*
+   - Add missing 'namespace::autoclean' dependency (thanks to MANWAR)
+
 ** 0.09 / 2019-06-25
    - Use high-resolution timings from Time::HiRes by actually
      importing time() and sleep()

@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.206';
+our $VERSION = '2.207';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -27,7 +27,7 @@ use App::DBBrowser::Opt::Get;
 #use App::DBBrowser::Opt::Set;    # required
 #use App::DBBrowser::Opt::DBSet   # required
 #use App::DBBrowser::Subqueries;  # required
-use App::DBBrowser::Table;
+#use App::DBBrowser::Table;       # required
 #use App::DBBrowser::Union;       # required
 
 BEGIN {
@@ -536,6 +536,7 @@ sub run {
 
 sub __browse_the_table {
     my ( $sf, $qt_table, $qt_columns ) = @_;
+    require App::DBBrowser::Table;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $sql = {};
     $ax->reset_sql( $sql );
@@ -711,7 +712,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.206
+Version 2.207
 
 =head1 DESCRIPTION
 

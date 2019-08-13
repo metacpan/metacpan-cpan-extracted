@@ -5,8 +5,10 @@
  * A bunch of helper functions.
  */
 
-#include "EXTERN.h"
-#include "perl.h"
+#define PERL_NO_GET_CONTEXT     /* we want efficiency */
+#include <EXTERN.h>
+#include <perl.h>
+#include "ppport.h"
 
 #include <stdio.h>
 #include "buffer.h"

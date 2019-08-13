@@ -6,18 +6,18 @@ use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 my @calls;
 
 do {
-    package Parent;
+    package MyParent;
 
     sub original {
         $_ = "danger";
-        push @calls, 'Parent::original';
+        push @calls, 'MyParent::original';
     }
 };
 
 do {
     package Child::Before;
     use Class::Method::Modifiers;
-    BEGIN { our @ISA = 'Parent' }
+    BEGIN { our @ISA = 'MyParent' }
 
     before original => sub {
         $_ = "danger";
@@ -28,19 +28,19 @@ do {
 Child::Before->original;
 is_deeply([splice @calls], [
     'Child::Before::original',
-    'Parent::original',
+    'MyParent::original',
 ]);
 
 Child::Before->original;
 is_deeply([splice @calls], [
     'Child::Before::original',
-    'Parent::original',
+    'MyParent::original',
 ]);
 
 do {
     package Child::After;
     use Class::Method::Modifiers;
-    BEGIN { our @ISA = 'Parent' }
+    BEGIN { our @ISA = 'MyParent' }
 
     after original => sub {
         $_ = "danger";
@@ -50,20 +50,20 @@ do {
 
 Child::After->original;
 is_deeply([splice @calls], [
-    'Parent::original',
+    'MyParent::original',
     'Child::After::original',
 ]);
 
 Child::After->original;
 is_deeply([splice @calls], [
-    'Parent::original',
+    'MyParent::original',
     'Child::After::original',
 ]);
 
 do {
     package Child::Around;
     use Class::Method::Modifiers;
-    BEGIN { our @ISA = 'Parent' }
+    BEGIN { our @ISA = 'MyParent' }
 
     around original => sub {
         my $orig = shift;
@@ -78,14 +78,14 @@ do {
 Child::Around->original;
 is_deeply([splice @calls], [
     'Child::Around::original(before)',
-    'Parent::original',
+    'MyParent::original',
     'Child::Around::original(after)',
 ]);
 
 Child::Around->original;
 is_deeply([splice @calls], [
     'Child::Around::original(before)',
-    'Parent::original',
+    'MyParent::original',
     'Child::Around::original(after)',
 ]);
 

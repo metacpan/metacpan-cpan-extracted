@@ -1,7 +1,7 @@
 package App::CSelUtils;
 
-our $DATE = '2019-07-29'; # DATE
-our $VERSION = '0.082'; # VERSION
+our $DATE = '2019-08-08'; # DATE
+our $VERSION = '0.084'; # VERSION
 
 use 5.010001;
 use strict;
@@ -47,7 +47,7 @@ _
         'x.name.is_plural' => 1,
         schema => ['array*', {
             of => ['str*', {
-                match => qr/\A(dump(:\w+(\.\w+)*)?|print_as_string|print_method:\w+(\.\w+)*|count)\z/,
+                match => qr/\A(dump(:\w+(\.\w+)*)?|eval:.+|print_as_string|print_method:\w+(\.\w+)*|count)\z/,
             }],
         }],
         default => ['print_as_string'],
@@ -88,13 +88,20 @@ _
                     }
                 },
             },
+            eval => {
+                summary => '--eval E is shortcut for --action eval:E',
+                code => sub {
+                    my ($args, $val) = @_;
+                    $args->{node_actions} //= [];
+                    push @{ $args->{node_actions} }, "eval:$val";
+                },
+            },
             print_method => {
                 summary => '--print-method M is shortcut for --node-action print_method:M',
                 code => sub {
                     my ($args, $val) = @_;
                     $args->{node_actions} //= [];
-                    my $actions = $args->{node_actions};
-                    push @$actions, "print_method:$val";
+                    push @{ $args->{node_actions} }, "print_method:$val";
                 },
             },
         },
@@ -105,24 +112,32 @@ Each action can be one of the following:
 * `count` will print the number of matching nodes.
 
 * `print_method` will call on or more of the node object's methods and print the
-result. Example:
+  result. Example:
 
     print_method:as_string
 
 * `dump` will show a indented text representation of the node and its
-descendants. Each line will print information about a single node: its class,
-followed by the value of one or more attributes. You can specify which
-attributes to use in a dot-separated syntax, e.g.:
+  descendants. Each line will print information about a single node: its class,
+  followed by the value of one or more attributes. You can specify which
+  attributes to use in a dot-separated syntax, e.g.:
 
     dump:tag.id.class
 
-which will result in a node printed like this:
+  which will result in a node printed like this:
 
     HTML::Element tag=p id=undef class=undef
 
 By default, if no attributes are specified, `id` is used. If the node class does
 not support the attribute, or if the value of the attribute is undef, then
 `undef` is shown.
+
+* `eval` will execute Perl code for each matching node. The Perl code will be
+  called with arguments: `($node)`. For convenience, `$_` is also locally set to
+  the matching node. Example in <prog:htmlsel> you can add this action:
+
+    eval:'print $_->tag'
+
+  which will print the tag name for each matching <pm:HTML::Element> node.
 
 _
     },
@@ -228,6 +243,17 @@ sub foosel {
                         },
                     }, $_)
                   } @matches;
+            } elsif ($action =~ /\Aeval:(.+)/) {
+                my $string_code = $1;
+                my $compiled_code =
+                    eval "package main; no strict; no warnings; sub { $string_code }";
+                if ($@) {
+                    die "Can't compile code in eval: $@\n";
+                }
+                for my $match (@matches) {
+                    local $_ = $match;
+                    $compiled_code->($match);
+                }
             } elsif ($action eq 'count') {
                 if (@$actions == 1) {
                     $res->[2] = ~~@matches;
@@ -373,7 +399,7 @@ App::CSelUtils - Utilities related to Data::CSel
 
 =head1 VERSION
 
-This document describes version 0.082 of App::CSelUtils (from Perl distribution App-CSelUtils), released on 2019-07-29.
+This document describes version 0.084 of App::CSelUtils (from Perl distribution App-CSelUtils), released on 2019-08-08.
 
 =head1 DESCRIPTION
 
@@ -442,15 +468,27 @@ attributes to use in a dot-separated syntax, e.g.:
 
 dump:tag.id.class
 
-=back
-
 which will result in a node printed like this:
 
- HTML::Element tag=p id=undef class=undef
+HTML::Element tag=p id=undef class=undef
+
+=back
 
 By default, if no attributes are specified, C<id> is used. If the node class does
 not support the attribute, or if the value of the attribute is undef, then
 C<undef> is shown.
+
+=over
+
+=item * C<eval> will execute Perl code for each matching node. The Perl code will be
+called with arguments: C<($node)>. For convenience, C<$_> is also locally set to
+the matching node. Example in L<htmlsel> you can add this action:
+
+eval:'print $_->tag'
+
+which will print the tag name for each matching L<HTML::Element> node.
+
+=back
 
 =item * B<select_action> => I<str> (default: "csel")
 

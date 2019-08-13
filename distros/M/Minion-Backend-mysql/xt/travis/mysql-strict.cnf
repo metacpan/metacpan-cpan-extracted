@@ -1,0 +1,2 @@
+[mysqld]
+sql-mode=TRADITIONAL,ONLY_FULL_GROUP_BY

@@ -1,21 +1,9 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest qw/connect_ok @CALL_FUNCS has_sqlite/;
 use Test::More;
-use Test::NoWarnings;
-
-my $tests = 3;
-$tests += 2 if has_sqlite('3.6.4');
-$tests += 1 if has_sqlite('3.7.0');
-
-plan tests => 4 + $tests * @CALL_FUNCS + 1;
+use if -d ".git", "Test::FailWarnings";
 
 my $dbh = connect_ok();
 {
@@ -58,3 +46,5 @@ for my $func (@CALL_FUNCS) {
 		}
 	}
 }
+
+done_testing;

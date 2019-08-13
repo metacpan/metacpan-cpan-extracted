@@ -15,7 +15,7 @@ BEGIN
   }
   else
   {
-    Test::More->import(tests => 287);
+    Test::More->import(tests => 292);
   }
 }
 
@@ -528,4 +528,32 @@ if(have_db('pg') && $version >= 1.24)
 else
 {
   SKIP: { skip("HandleError tests (DBI $DBI::VERSION)", 10) }
+}
+
+SELECT_LOCK: {
+  no warnings 'once';
+  local *Rose::DB_Test::Object::table_sql_from_lock_on_value = sub { 'my_table' };
+
+  Rose::DB->register_db(
+    type     => 'select_lock',
+    driver   => 'pg',
+    database => 'test',
+  );
+
+  $db = Rose::DB->new('select_lock');
+
+  my $sql = $db->format_select_lock('Rose::DB_Test::Object', { type => 'shared', nowait => 1, skip_locked => 1 });
+  is($sql, 'FOR SHARE NOWAIT SKIP LOCKED', 'shared, nowait, skip_locked');
+
+  $sql = $db->format_select_lock('Rose::DB_Test::Object', { type => 'for update', nowait => 1, skip_locked => 1 });
+  is($sql, 'FOR UPDATE NOWAIT SKIP LOCKED', 'for update, nowait, skip_locked');
+
+  $sql = $db->format_select_lock('Rose::DB_Test::Object', { type => 'for update', nowait => 1 });
+  is($sql, 'FOR UPDATE NOWAIT', 'for update, nowait');
+
+  $sql = $db->format_select_lock('Rose::DB_Test::Object', { type => 'for update', skip_locked => 1 });
+  is($sql, 'FOR UPDATE SKIP LOCKED', 'for update, skip_locked');
+
+  $sql = $db->format_select_lock('Rose::DB_Test::Object', { type => 'shared' });
+  is($sql, 'FOR SHARE', 'shared');
 }

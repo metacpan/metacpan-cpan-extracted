@@ -10,7 +10,7 @@ use CLI::Driver::Action;
 
 with 'CLI::Driver::CommonRole';
 
-our $VERSION = 0.2;
+our $VERSION = 0.3;
 
 =head1 NAME
 
@@ -99,6 +99,12 @@ has actions => (
 ##############################################################################
 ### PRIVATE ATTRIBUTES
 ##############################################################################
+
+has _orig_argv => (
+	is => 'rw',
+	isa => 'ArrayRef',
+	default => sub {[ @ARGV ]}
+);
 
 ##############################################################################
 ### PUBLIC METHODS

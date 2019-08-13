@@ -1,0 +1,16 @@
+Version history for Catalyst-TraitFor-Request-Methods:
+
+v0.1.1    2019-08-12 17:05:57+01:00 Europe/London
+  [Bug Fixes]
+  - Specify a minimum Catalyst version.
+
+  [Documentation]
+  - Link to Catalyst::Request from SEE ALSO.
+
+  - Elaborated on use case for this module.
+
+  [Tests]
+  - Remove unnecessary test prereqs.
+
+v0.1.0    2019-08-12 13:20:13+01:00 Europe/London
+  - Initial version released.

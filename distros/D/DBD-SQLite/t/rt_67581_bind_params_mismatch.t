@@ -1,14 +1,9 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest qw/connect_ok/;
-use Test::More tests => 34;
+use Test::More;
+use if -d ".git", "Test::FailWarnings";
 use DBI qw/:sql_types/;
 
 my $id = 0;
@@ -145,3 +140,5 @@ for my $has_pk (0..1) {
 
 	$dbh->disconnect;
 }
+
+done_testing;

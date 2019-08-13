@@ -5,12 +5,11 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.153';
+our $VERSION = '1.154';
 
 use Quiq::Path;
 use Quiq::Parameters;
 use Quiq::System;
-use Quiq::TempDir;
 use Quiq::Progress;
 use Quiq::Hash;
 use Quiq::FileHandle;
@@ -236,7 +235,7 @@ sub runFetch {
         if ($outputDir) {
             $p->mkdir($outputDir,-recursive=>1);
         }
-        $dir = $outputDir || Quiq::TempDir->new;
+        $dir = $outputDir || $p->tempDir;
     }
 
     # Aktionen nach Beendigung eines Child-Prozesses
@@ -345,7 +344,7 @@ sub runFetch {
 
 =head1 VERSION
 
-1.153
+1.154
 
 =head1 AUTHOR
 

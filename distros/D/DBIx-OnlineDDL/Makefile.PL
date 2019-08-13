@@ -51,15 +51,16 @@ my %WriteMakefileArgs = (
     PREREQ_PM     => {
         # Start from "scan-perl-prereqs --pretty lib"
 
-        'Class::Load'          => 0,
-        DBI                    => '1.630',  # sane minimum baseline
-        'DBIx::BatchChunker'   => '0.92',   # stmt changes + dbi_connector
-        'Eval::Reversible'     => 0,
-        'List::Util'           => '1.44',  # has any/all (1.33), Sub::Util (1.40), and uniq (1.44)
-        Moo                    => '2.00',  # sane minimum baseline
-        'Term::ProgressBar'    => '2.14',  # with silent option
-        'Types::Standard'      => '1.00',  # sane minimum baseline
-        'namespace::clean'     => 0,
+        'Class::Load'             => 0,
+        DBI                       => '1.630',  # sane minimum baseline
+        'DBIx::BatchChunker'      => '0.92',   # stmt changes + dbi_connector
+        'Eval::Reversible'        => 0,
+        'List::Util'              => '1.44',      # has any/all (1.33), Sub::Util (1.40), and uniq (1.44)
+        Moo                       => '2.000002',  # bypass the default=>0 + required=>1 bug
+        'MooX::StrictConstructor' => '0.008',     # sane minimum baseline
+        'Term::ProgressBar'       => '2.14',      # with silent option
+        'Types::Standard'         => '1.00',      # sane minimum baseline
+        'namespace::clean'        => 0,
     },
     TEST_REQUIRES => {
         # Start from "scan-perl-prereqs --pretty t"

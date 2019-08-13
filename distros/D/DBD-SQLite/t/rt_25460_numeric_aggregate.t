@@ -1,15 +1,9 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest;
-use Test::More tests => 14;
-use Test::NoWarnings;
+use Test::More;
+use if -d ".git", "Test::FailWarnings";
 
 # Create the table
 my $dbh = connect_ok();
@@ -61,3 +55,5 @@ is_deeply(
 	],
 	'group/sum/sort/limit query ok'
 );
+
+done_testing;

@@ -19,7 +19,7 @@ package MongoDB::BulkWrite;
 # ABSTRACT: MongoDB bulk write interface
 
 use version;
-our $VERSION = 'v2.0.3';
+our $VERSION = 'v2.2.0';
 
 use MongoDB::Error;
 use MongoDB::Op::_BulkWrite;
@@ -267,6 +267,10 @@ sub execute {
 
     my $session = $self->_client->_get_session_from_hashref( $options );
 
+    # Transaction write concern overrides all
+    $write_concern = $session->_get_transaction_write_concern
+      if defined $session && $session->_active_transaction;
+
     my $op = MongoDB::Op::_BulkWrite->_new(
         client                   => $self->_client,
         db_name                  => $self->_database->name,
@@ -300,7 +304,7 @@ MongoDB::BulkWrite - MongoDB bulk write interface
 
 =head1 VERSION
 
-version v2.0.3
+version v2.2.0
 
 =head1 SYNOPSIS
 

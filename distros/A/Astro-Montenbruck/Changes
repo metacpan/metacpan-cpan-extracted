@@ -4,3 +4,6 @@ Revision history for AstroScript
              floating point error in tests fixed.
              Helpers module moved from 'lib' to 'script'
 2019-06-20 - floating point error in test fixed
+
+2019-08-10 - module for calculating rise, set and transit events with example
+             script.

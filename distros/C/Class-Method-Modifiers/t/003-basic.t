@@ -6,59 +6,59 @@ use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 my @calls;
 
 do {
-    package Parent;
+    package MyParent;
     use Class::Method::Modifiers;
 
-    sub original { push @calls, 'Parent::original' }
-    before original => sub { push @calls, 'before Parent::original' };
-    after  original => sub { push @calls, 'after Parent::original' };
+    sub original { push @calls, 'MyParent::original' }
+    before original => sub { push @calls, 'before MyParent::original' };
+    after  original => sub { push @calls, 'after MyParent::original' };
 };
 
-Parent->original;
+MyParent->original;
 is_deeply([splice @calls], [
-    'before Parent::original',
-    'Parent::original',
-    'after Parent::original',
+    'before MyParent::original',
+    'MyParent::original',
+    'after MyParent::original',
 ]);
 
 do {
-    package Parent;
+    package MyParent;
     use Class::Method::Modifiers;
 
-    before original => sub { push @calls, 'before before Parent::original' };
-    after  original => sub { push @calls, 'after after Parent::original' };
+    before original => sub { push @calls, 'before before MyParent::original' };
+    after  original => sub { push @calls, 'after after MyParent::original' };
 };
 
-Parent->original;
+MyParent->original;
 is_deeply([splice @calls], [
-    'before before Parent::original',
-    'before Parent::original',
-    'Parent::original',
-    'after Parent::original',
-    'after after Parent::original',
+    'before before MyParent::original',
+    'before MyParent::original',
+    'MyParent::original',
+    'after MyParent::original',
+    'after after MyParent::original',
 ]);
 
 do {
     package Child;
-    BEGIN { our @ISA = 'Parent' }
+    BEGIN { our @ISA = 'MyParent' }
 };
 
-Parent->original;
+MyParent->original;
 is_deeply([splice @calls], [
-    'before before Parent::original',
-    'before Parent::original',
-    'Parent::original',
-    'after Parent::original',
-    'after after Parent::original',
+    'before before MyParent::original',
+    'before MyParent::original',
+    'MyParent::original',
+    'after MyParent::original',
+    'after after MyParent::original',
 ]);
 
 Child->original;
 is_deeply([splice @calls], [
-    'before before Parent::original',
-    'before Parent::original',
-    'Parent::original',
-    'after Parent::original',
-    'after after Parent::original',
+    'before before MyParent::original',
+    'before MyParent::original',
+    'MyParent::original',
+    'after MyParent::original',
+    'after after MyParent::original',
 ]);
 
 do {
@@ -69,23 +69,23 @@ do {
     after  original => sub { push @calls, 'after Child::original' };
 };
 
-Parent->original;
+MyParent->original;
 is_deeply([splice @calls], [
-    'before before Parent::original',
-    'before Parent::original',
-    'Parent::original',
-    'after Parent::original',
-    'after after Parent::original',
+    'before before MyParent::original',
+    'before MyParent::original',
+    'MyParent::original',
+    'after MyParent::original',
+    'after after MyParent::original',
 ]);
 
 Child->original;
 is_deeply([splice @calls], [
     'before Child::original',
-    'before before Parent::original',
-    'before Parent::original',
-    'Parent::original',
-    'after Parent::original',
-    'after after Parent::original',
+    'before before MyParent::original',
+    'before MyParent::original',
+    'MyParent::original',
+    'after MyParent::original',
+    'after after MyParent::original',
     'after Child::original',
 ]);
 

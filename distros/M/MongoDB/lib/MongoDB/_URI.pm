@@ -17,18 +17,22 @@ use warnings;
 package MongoDB::_URI;
 
 use version;
-our $VERSION = 'v2.0.3';
+our $VERSION = 'v2.2.0';
 
 use Moo;
 use MongoDB::Error;
 use Encode ();
+use Time::HiRes qw(time);
+use MongoDB::_Constants qw( RESCAN_SRV_FREQUENCY_SEC );
 use Types::Standard qw(
     Any
     ArrayRef
     HashRef
     Str
+    Int
 );
 use namespace::clean -except => 'meta';
+use Scalar::Util qw/looks_like_number/;
 
 my $uri_re =
     qr{
@@ -85,12 +89,18 @@ has hostids => (
 );
 
 has valid_options => (
-    is => 'ro',
+    is => 'lazy',
     isa => HashRef,
-    builder => '_build_valid_options',
+);
+
+has expires => (
+    is => 'ro',
+    isa => Int,
+    writer => '_set_expires',
 );
 
 sub _build_valid_options {
+    my $self = shift;
     return {
         map { lc($_) => 1 } qw(
             appName
@@ -98,34 +108,37 @@ sub _build_valid_options {
             authMechanismProperties
             authSource
             compressors
-            connectTimeoutMS
             connect
+            connectTimeoutMS
             heartbeatFrequencyMS
             journal
             localThresholdMS
+            maxIdleTimeMS
             maxStalenessSeconds
             maxTimeMS
+            readConcernLevel
             readPreference
             readPreferenceTags
             replicaSet
-            retryWrites
             serverSelectionTimeoutMS
             serverSelectionTryOnce
             socketCheckIntervalMS
             socketTimeoutMS
             ssl
+            tlsCAFile
+            tlsCertificateKeyFile
+            tlsCertificateKeyFilePassword
+            tlsCertificateKeyPassword
             w
             wTimeoutMS
-            readConcernLevel
             zlibCompressionLevel
-        )
+        ), keys %{ $self->_valid_str_to_bool_options }
     };
 }
 
 has valid_srv_options => (
-    is => 'ro',
+    is => 'lazy',
     isa => HashRef,
-    builder => '_build_valid_srv_options',
 );
 
 sub _build_valid_srv_options {
@@ -135,6 +148,69 @@ sub _build_valid_srv_options {
             replicaSet
         )
     };
+}
+
+has _valid_str_to_bool_options => (
+    is => 'lazy',
+    isa => HashRef,
+    builder => '_build_valid_str_to_bool_options',
+);
+
+sub _build_valid_str_to_bool_options {
+    return {
+        map { lc($_) => 1 } qw(
+            ssl
+            journal
+            serverselectiontryonce
+            tls
+            tlsAllowInvalidCertificates
+            tlsAllowInvalidHostnames
+            tlsInsecure
+            retryWrites
+            retryReads
+            tlsAllowInsecure
+        )
+    };
+}
+
+has _extra_options_validation => (
+    is => 'lazy',
+    isa => HashRef,
+    builder => '_build_extra_options_validation',
+);
+
+sub _build_extra_options_validation {
+  return {
+      _PositiveInt => sub {
+          my $v = shift;
+          Int->($v) && $v >= 0;
+      },
+      wtimeoutms => '_PositiveInt',
+      connecttimeoutms => '_PositiveInt',
+      localthresholdms => '_PositiveInt',
+      serverselectiontimeoutms => '_PositiveInt',
+      sockettimeoutms => '_PositiveInt',
+      maxidletimems => '_PositiveInt',
+      w => sub {
+          my $v = shift;
+          if (looks_like_number($v)) {
+              return $v >= 0;
+          }
+          return 1; # or any string
+      },
+      zlibcompressionlevel => sub {
+          my $v = shift;
+          Int->($v) && $v >= -1 && $v <= 9;
+      },
+      heartbeatfrequencyms => sub {
+          my $v = shift;
+          Int->($v) && $v >= 500;
+      },
+      maxstalenessseconds => sub {
+          my $v = shift;
+          Int->($v) && ( $v == 1 || $v == -1 || $v >= 90 );
+      },
+  };
 }
 
 sub _unescape_all {
@@ -152,8 +228,10 @@ sub _parse_doc {
     for my $tag ( split /,/, $string ) {
         if ( $tag =~ /\S/ ) {
             my @kv = map { my $s = $_; $s =~ s{^\s*}{}; $s =~ s{\s*$}{}; $s } split /:/, $tag, 2;
-            MongoDB::UsageError->throw("in option '$name', '$tag' is not a key:value pair")
-              unless @kv == 2;
+            if ( @kv != 2 ) {
+                warn "in option '$name', '$tag' is not a key:value pair\n";
+                return
+            }
             $set->{$kv[0]} = $kv[1];
         }
     }
@@ -183,28 +261,76 @@ sub _parse_options {
             next;
         }
         if ( $lc_k eq 'authmechanismproperties' ) {
-            $parsed{$lc_k} = _parse_doc( $k, $v );
+            my $temp = _parse_doc( $k, $v );
+            if ( defined $temp ) {
+                $parsed{$lc_k} = $temp;
+                if ( exists $parsed{$lc_k}{CANONICALIZE_HOST_NAME} ) {
+                    my $temp = __str_to_bool( 'CANONICALIZE_HOST_NAME', $parsed{$lc_k}{CANONICALIZE_HOST_NAME} );
+                    if ( defined $temp ) {
+                        $parsed{$lc_k}{CANONICALIZE_HOST_NAME} = $temp;
+                    }
+                }
+            }
         }
         elsif ( $lc_k eq 'compressors' ) {
-            $parsed{$lc_k} = [split m{,}, $v, -1];
+            my @compressors = split /,/, $v, -1;
+            my $valid_compressors = {
+                snappy => 1,
+                zlib => 1,
+                zstd => 1
+            };
+            for my $compressor ( @compressors ) {
+                warn("Unsupported compressor $compressor\n")
+                    unless $valid_compressors->{$compressor};
+            }
+            $parsed{$lc_k} = [ @compressors ];
         }
         elsif ( $lc_k eq 'authsource' ) {
-            $result->{db_name} = $v;
             $parsed{$lc_k} = $v;
         }
         elsif ( $lc_k eq 'readpreferencetags' ) {
             $parsed{$lc_k} ||= [];
-            push @{ $parsed{$lc_k} }, _parse_doc( $k, $v );
+            my $temp = _parse_doc( $k, $v );
+            if ( defined $temp ) {
+                push @{$parsed{$lc_k}}, $temp;
+            }
+        }
+        elsif ( $self->_valid_str_to_bool_options->{ $lc_k } ) {
+            my $temp =  __str_to_bool( $k, $v );
+            if ( defined $temp ) {
+                $parsed{$lc_k} = $temp
+            }
+        }
+        elsif ( my $opt_validation = $self->_extra_options_validation->{ $lc_k } ) {
+            unless (ref $opt_validation eq 'CODE') {
+                $opt_validation = $self->_extra_options_validation->{ $opt_validation };
+            }
+            my $valid = eval { $opt_validation->($v) };
+            my $err = "$@";
+            if ( ! $valid ) {
+                warn("Unsupported URI value '$k' = '$v': $err");
+            }
+            else {
+                $parsed{$lc_k} = $v;
+            }
         }
         else {
             $parsed{$lc_k} = $v;
         }
     }
+    if (exists $parsed{'tlsinsecure'} || exists $parsed{'tlsallowinsecure'}) {
+        if (exists $parsed{'tlsallowinvalidcertificates'} || exists $parsed{'tlsallowinvalidhostnames'}) {
+            MongoDB::Error->throw('tlsInsecure conflicts with other options');
+        }
+    }
+    if ( exists ($parsed{'tls'}) && exists($parsed{'ssl'}) && $parsed{'tls'} != $parsed{'ssl'}) {
+        MongoDB::Error->throw('tls and ssl must have the same value');
+    }
     return \%parsed;
 }
 
 sub _fetch_dns_seedlist {
-    my ( $self, $host_name ) = @_;
+    my ( $self, $host_name, $phase ) = @_;
 
     my @split_name = split( '\.', $host_name );
     MongoDB::Error->throw("URI '$self' must contain domain name and hostname")
@@ -218,21 +344,29 @@ sub _fetch_dns_seedlist {
     my @hosts;
     my $options = {};
     my $domain_name = join( '.', @split_name[1..$#split_name] );
+    my $minimum_ttl;
     if ( $srv_data ) {
-        foreach my $rr ( $srv_data->answer ) {
+        SRV_RECORD: foreach my $rr ( $srv_data->answer ) {
             next unless $rr->type eq 'SRV';
             my $target = $rr->target;
             # search for dot before domain name for a valid hostname - can have sub-subdomain
             unless ( $target =~ /\.\Q$domain_name\E$/ ) {
-                MongoDB::Error->throw(
-                    "URI '$self' SRV record returns FQDN '$target'"
-                    . " which does not match domain name '${$domain_name}'"
-                );
+                my $err_msg = "URI '$self' SRV record returns FQDN '$target'"
+                    . " which does not match domain name '${$domain_name}'";
+                if ($phase && $phase eq 'init') {
+                    MongoDB::Error->throw($err_msg);
+                }
+                else {
+                    warn $err_msg;
+                }
+                next SRV_RECORD;
             }
             push @hosts, {
               target => $target,
               port   => $rr->port,
             };
+            $minimum_ttl = $rr->ttl
+                if not defined $minimum_ttl or $rr->ttl < $minimum_ttl;
         }
         my $txt_data = $res->query( $host_name, 'TXT' );
         if ( defined $txt_data ) {
@@ -252,11 +386,25 @@ sub _fetch_dns_seedlist {
         MongoDB::Error->throw("URI '$self' does not return any SRV results");
     }
 
-    return ( \@hosts, $options );
+    unless (@hosts) {
+        my $err_msg = "URI '$self' does not return any valid SRV results";
+        if ($phase && $phase eq 'init') {
+            MongoDB::Error->throw($err_msg);
+        }
+        else {
+            warn $err_msg;
+        }
+    }
+
+    $minimum_ttl = RESCAN_SRV_FREQUENCY_SEC
+        if $minimum_ttl < RESCAN_SRV_FREQUENCY_SEC
+            && $phase && $phase ne 'init';
+
+    return ( \@hosts, $options, time + $minimum_ttl );
 }
 
 sub _parse_srv_uri {
-    my ( $self, $uri ) = @_;
+    my ( $self, $uri, $phase ) = @_;
 
     my %result;
 
@@ -285,7 +433,7 @@ sub _parse_srv_uri {
         $result{options} = $self->_parse_options( $self->valid_options, \%result );
     }
 
-    my ( $hosts, $options ) = $self->_fetch_dns_seedlist( $result{hostids} );
+    my ( $hosts, $options, $expires ) = $self->_fetch_dns_seedlist( $result{hostids}, $phase );
 
     # Default to SSL on unless specified in conn string options
     $options = {
@@ -309,17 +457,104 @@ sub _parse_srv_uri {
         join( '&', map { sprintf( '%s=%s', $_, __uri_escape( $options->{$_} ) ) } keys %$options ),
     );
 
-    return $new_uri;
+    return( $new_uri, $expires );
 }
 
 sub BUILD {
+    my ($self) = @_;
+
+    $self->_initialize_from_uri;
+}
+
+# Options:
+# - fallback_ttl_sec: Fallback TTL in seconds in case of an error
+sub check_for_changes {
+    my ($self, $options) = @_;
+
+    if (defined $self->{expires} && $self->{expires} <= time) {
+        my @current = sort @{ $self->{hostids} };
+        local $@;
+        my $ok = eval {
+
+            $self->_update_from_uri;
+            1;
+        };
+        if (!$ok) {
+            warn "Error while fetching SRV records: $@";
+            $self->{expires} = $options->{fallback_ttl_sec};
+        };
+        return 0
+            unless $ok;
+        my @new = sort @{ $self->{hostids} };
+        return 1
+            unless @current == @new;
+        for my $index (0 .. $#current) {
+            return 1
+                unless $new[$index] eq $current[$index];
+        }
+        return 0;
+    }
+
+    return 0;
+}
+
+sub _prepare_dns_hosts {
+    my ($self, $hostids) = @_;
+
+    if ( !defined $hostids || !length $hostids ) {
+        MongoDB::Error->throw("URI '$self' could not be parsed (missing host list)");
+    }
+    $hostids = [ map { lc _unescape_all($_) } split ',', $hostids ];
+    for my $hostid (@$hostids) {
+        MongoDB::Error->throw(
+            "URI '$self' could not be parsed (Unix domain sockets are not supported)")
+          if $hostid =~ /\// && $hostid =~ /\.sock/;
+        MongoDB::Error->throw(
+            "URI '$self' could not be parsed (IP literals are not supported)")
+          if substr( $hostid, 0, 1 ) eq '[';
+        my ( $host, $port ) = split ":", $hostid, 2;
+        MongoDB::Error->throw("host list '@{ $hostids }' contains empty host")
+          unless length $host;
+        if ( defined $port ) {
+            MongoDB::Error->throw("URI '$self' could not be parsed (invalid port '$port')")
+              unless $port =~ /^\d+$/;
+            MongoDB::Error->throw(
+                "URI '$self' could not be parsed (invalid port '$port' (must be in range [1,65535])")
+              unless $port >= 1 && $port <= 65535;
+        }
+    }
+    $hostids = [ map { /:/ ? $_ : $_.":27017" } @$hostids ];
+    return $hostids;
+}
+
+sub _update_from_uri {
+    my ($self) = @_;
+
+    my $uri = $self->uri;
+    my %result;
+
+    ($uri, my $expires) = $self->_parse_srv_uri( $uri );
+    $self->{expires} = $expires;
+
+    if ( $uri !~ m{^$uri_re$} ) {
+        MongoDB::Error->throw("URI '$self' could not be parsed");
+    }
+
+    my $hostids = $3;
+    $hostids = $self->_prepare_dns_hosts($hostids);
+
+    $self->{hostids} = $hostids;
+}
+
+sub _initialize_from_uri {
     my ($self) = @_;
 
     my $uri = $self->uri;
     my %result;
 
     if ( $uri =~ m{^mongodb\+srv://} ) {
-        $uri = $self->_parse_srv_uri( $uri );
+        ($uri, my $expires) = $self->_parse_srv_uri( $uri, 'init' );
+        $result{expires} = $expires;
     }
 
     # we throw Error instead of UsageError for errors, to avoid stacktrace revealing credentials
@@ -346,29 +581,7 @@ sub BUILD {
         $result{password} = _unescape_all( $result{password} );
     }
 
-    if ( !defined $result{hostids} || !length $result{hostids} ) {
-        MongoDB::Error->throw("URI '$self' could not be parsed (missing host list)");
-    }
-    $result{hostids} = [ map { lc _unescape_all($_) } split ',', $result{hostids} ];
-    for my $hostid ( @{ $result{hostids} } ) {
-        MongoDB::Error->throw(
-            "URI '$self' could not be parsed (Unix domain sockets are not supported)")
-          if $hostid =~ /\// && $hostid =~ /\.sock/;
-        MongoDB::Error->throw(
-            "URI '$self' could not be parsed (IP literals are not supported)")
-          if substr( $hostid, 0, 1 ) eq '[';
-        my ( $host, $port ) = split ":", $hostid, 2;
-        MongoDB::Error->throw("host list '@{ $result{hostids} }' contains empty host")
-          unless length $host;
-        if ( defined $port ) {
-            MongoDB::Error->throw("URI '$self' could not be parsed (invalid port '$port')")
-              unless $port =~ /^\d+$/;
-            MongoDB::Error->throw(
-                "URI '$self' could not be parsed (invalid port '$port' (must be in range [1,65535])")
-              unless $port >= 1 && $port <= 65535;
-        }
-    }
-    $result{hostids} = [ map { /:/ ? $_ : $_.":27017" } @{ $result{hostids} } ];
+    $result{hostids} = $self->_prepare_dns_hosts($result{hostids});
 
     if ( defined $result{db_name} ) {
         MongoDB::Error->throw(
@@ -379,10 +592,9 @@ sub BUILD {
 
     if ( defined $result{options} ) {
         $result{options} = $self->_parse_options( $self->valid_options, \%result );
-        __normalize_boolean_options($result{options});
     }
 
-    for my $attr (qw/username password db_name options hostids/) {
+    for my $attr (qw/username password db_name options hostids expires/) {
         my $setter = "_set_$attr";
         $self->$setter( $result{$attr} ) if defined $result{$attr};
     }
@@ -390,22 +602,14 @@ sub BUILD {
     return;
 }
 
-sub __normalize_boolean_options {
-    my ($options) = @_;
-    for my $k ( qw/ssl journal serverselectiontryonce/ ) {
-        if (exists $options->{$k}) {
-            $options->{$k} = __str_to_bool( $k, $options->{$k} );
-        }
-    }
-}
-
 sub __str_to_bool {
     my ($k, $str) = @_;
     MongoDB::UsageError->throw("cannot convert undef to bool for key '$k'")
       unless defined $str;
     my $ret = $str eq "true" ? 1 : $str eq "false" ? 0 : undef;
-    return $ret if defined $ret;
-    MongoDB::UsageError->throw("expected boolean string 'true' or 'false' for key '$k' but instead received '$str'");
+    warn("expected boolean string 'true' or 'false' for key '$k' but instead received '$str'. Ignoring '$k'.\n")
+        unless defined $ret;
+    return $ret;
 }
 
 # uri_escape borrowed from HTTP::Tiny 0.070

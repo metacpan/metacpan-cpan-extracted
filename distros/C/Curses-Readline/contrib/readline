@@ -1,0 +1,20 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use lib 'lib';
+use Curses::Readline qw(curses_readline);
+use Curses;
+
+initscr;
+noecho;
+cbreak;
+keypad(1);
+
+my $result = curses_readline;
+
+endwin;
+
+print $result . "\n";
+
+exit 0;

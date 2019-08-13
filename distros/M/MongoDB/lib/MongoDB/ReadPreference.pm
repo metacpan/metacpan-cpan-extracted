@@ -19,7 +19,7 @@ package MongoDB::ReadPreference;
 # ABSTRACT: Encapsulate and validate read preferences
 
 use version;
-our $VERSION = 'v2.0.3';
+our $VERSION = 'v2.2.0';
 
 use Moo;
 use MongoDB::Error;
@@ -115,7 +115,7 @@ sub has_empty_tag_sets {
 
 # Reformat to the document needed by mongos in $readPreference
 
-sub for_mongos {
+sub _as_hashref {
     my ($self) = @_;
     return {
         mode => $self->mode,
@@ -157,7 +157,7 @@ MongoDB::ReadPreference - Encapsulate and validate read preferences
 
 =head1 VERSION
 
-version v2.0.3
+version v2.2.0
 
 =head1 SYNOPSIS
 

@@ -135,6 +135,7 @@ t/annotate.t
 t/author-critic.t
 t/author-pod-syntax.t
 t/barcode.t
+t/bbox.t
 t/circular-references.t
 t/cmap.t
 t/content.t

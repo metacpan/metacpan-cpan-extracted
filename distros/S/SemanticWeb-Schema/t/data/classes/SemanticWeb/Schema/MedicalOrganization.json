@@ -6,15 +6,38 @@
       "rdfs:subClassOf" : "schema:Organization"
    },
    "properties" : {
+      "schema:healthPlanNetworkId" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1062",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Name or unique ID of network. (Networks are often reused across different insurance plans).",
+         "rdfs:label" : "healthPlanNetworkId",
+         "schema:category" : "issue-1062",
+         "schema:domainIncludes" : [
+            "schema:HealthPlanNetwork",
+            "schema:MedicalOrganization"
+         ],
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:isAcceptingNewPatients" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1062",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Whether the provider is accepting new patients.",
+         "rdfs:label" : "isAcceptingNewPatients",
+         "schema:category" : "issue-1062",
+         "schema:domainIncludes" : "schema:MedicalOrganization",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Boolean"
+      },
       "schema:medicalSpecialty" : {
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A medical specialty of the provider.",
          "rdfs:label" : "medicalSpecialty",
          "schema:domainIncludes" : [
+            "schema:MedicalOrganization",
             "schema:Physician",
-            "schema:Hospital",
             "schema:MedicalClinic",
-            "schema:MedicalOrganization"
+            "schema:Hospital"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:MedicalSpecialty"

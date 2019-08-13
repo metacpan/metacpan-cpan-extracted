@@ -688,7 +688,7 @@ export_bgc_sql_tables.pl - Exports SQL tables of BGC data (Palantir and antiSMAS
 
 =head1 VERSION
 
-version 0.191800
+version 0.192240
 
 =head1 NAME
 

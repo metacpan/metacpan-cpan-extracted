@@ -1,0 +1,12 @@
+{
+   "class" : {
+      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1589",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "An <a class=\"localLink\" href=\"http://schema.org/EmployerReview\">EmployerReview</a> is a review of an <a class=\"localLink\" href=\"http://schema.org/Organization\">Organization</a> regarding its role as an employer, written by a current or former employee of that organization.",
+      "rdfs:label" : "EmployerReview",
+      "rdfs:subClassOf" : "schema:Review",
+      "schema:category" : "issue-1576",
+      "schema:isPartOf" : "http:pending.schema.org"
+   },
+   "properties" : {}
+}

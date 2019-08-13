@@ -20,7 +20,7 @@ package MongoDB;
 # ABSTRACT: Official MongoDB Driver for Perl
 
 use version;
-our $VERSION = 'v2.0.3';
+our $VERSION = 'v2.2.0';
 
 # regexp_pattern was unavailable before 5.10, had to be exported to load the
 # function implementation on 5.10, and was automatically available in 5.10.1
@@ -83,7 +83,14 @@ MongoDB - Official MongoDB Driver for Perl
 
 =head1 VERSION
 
-version v2.0.3
+version v2.2.0
+
+=head1 END OF LIFE NOTICE
+
+Version v2.2.0 is the final feature release of the MongoDB Perl driver.
+The driver is now in a 12-month "sunset" period and will receive security
+patches and critical bug fixes only.  The Perl driver will be end-of-life
+and unsupported on August 13, 2020.
 
 =head1 SYNOPSIS
 
@@ -237,7 +244,9 @@ deprecation warning is issued once per call-site for deprecated methods.)
 
 =head1 THREADS
 
-Per L<threads> documentation, use of Perl threads is discouraged.
+Per L<threads> documentation, use of Perl threads is discouraged by the
+maintainers of Perl and the MongoDB Perl driver does not test or provide support
+for use with threads.
 
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
@@ -282,7 +291,7 @@ Florian Ragwitz <rafl@debian.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Andrew Page Andrey Khozov Ashley Willis Ask Bjørn Hansen Bernard Gorman Brendan W. McAdams Brian Moss Casey Rojas Christian Sturm Walde Colin Cyr Danny Raetzsch David Morrison Nadle Steinbrunner Storch diegok D. Ilmari Mannsåker Eric Daniels Gerard Goossen Glenn Fowler Graham Barr Hao Wu Harish Upadhyayula Jason Carey Toffaletti Johann Rolschewski John A. Kunze Joseph Harnish Josh Matthews Joshua Juran J. Stewart Kamil Slowikowski Ken Williams Matthew Shopsin Matt S Trout Michael Langner Rotmanov Mike Dirolf Mohammad Anwar Nickola Trupcheff Nigel Gregoire Niko Tyni Nuno Carvalho Orlando Vazquez Othello Maurer Pan Fan Pavel Denisov Rahul Dhodapkar Robert Sedlacek (Shadowcat Systems Ltd) Robin Lee Roman Yerin Ronald J Kimball Ryan Chipman Slaven Rezic Stephen Oberholtzer Steve Sanbeg Stuart Watt Thomas Bloor Tobias Leich Uwe Voelker Wan Bachtiar Whitney Jackson Xavier Guimard Xtreak Zhihong Zhang
+=for stopwords Andrew Page Andrey Khozov Ashley Willis Ask Bjørn Hansen Bernard Gorman Brendan W. McAdams Brian Moss Casey Rojas Christian Sturm Walde Colin Cyr Danny Raetzsch David Morrison Nadle Steinbrunner Storch diegok D. Ilmari Mannsåker Eric Daniels Finn Kempers (Shadowcat Systems Ltd) Gerard Goossen Glenn Fowler Graham Barr Hao Wu Harish Upadhyayula Jason Carey Toffaletti Johann Rolschewski John A. Kunze Joseph Harnish Josh Matthews Joshua Juran J. Stewart Kamil Slowikowski Ken Williams Matthew Shopsin Matt S Trout Michael Langner Rotmanov Mike Dirolf Mohammad Anwar Nickola Trupcheff Nigel Gregoire Niko Tyni Nuno Carvalho Orlando Vazquez Othello Maurer Pan Fan Pavel Denisov Rahul Dhodapkar Robert Sedlacek Robin Lee Roman Yerin Ronald J Kimball Ryan Chipman Slaven Rezic Stephen Oberholtzer Steve Sanbeg Stuart Watt Thomas Bloor Tobias Leich Uwe Voelker Wallace Reis Wan Bachtiar Whitney Jackson Xavier Guimard Xtreak Zhihong Zhang
 
 =over 4
 
@@ -365,6 +374,10 @@ D. Ilmari Mannsåker <ilmari.mannsaker@net-a-porter.com>
 =item *
 
 Eric Daniels <eric.daniels@mongodb.com>
+
+=item *
+
+Finn Kempers (Shadowcat Systems Ltd) <toyou1995@gmail.com>
 
 =item *
 
@@ -512,6 +525,10 @@ Slaven Rezic <slaven.rezic@idealo.de>
 
 =item *
 
+Slaven Rezic <srezic@cpan.org>
+
+=item *
+
 Stephen Oberholtzer <stevie@qrpff.net>
 
 =item *
@@ -533,6 +550,10 @@ Tobias Leich <email@froggs.de>
 =item *
 
 Uwe Voelker <uwe.voelker@xing.com>
+
+=item *
+
+Wallace Reis <wallace@reis.me>
 
 =item *
 

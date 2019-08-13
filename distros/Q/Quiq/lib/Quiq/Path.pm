@@ -9,7 +9,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.153';
+our $VERSION = '1.154';
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -25,6 +25,7 @@ use Quiq::Perl;
 use Quiq::DirHandle;
 use Quiq::Parameters;
 use File::Find ();
+use Quiq::TempDir;
 use Cwd ();
 use Quiq::Process;
 
@@ -907,6 +908,51 @@ sub truncate {
     }
 
     return;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 tempFile() - Erzeuge temporäre Datei
+
+=head4 Synopsis
+
+    $file = $this->tempFile(@opt);
+    $file = $this->tempFile($data,@opt);
+
+=head4 Arguments
+
+Daten, die in die temporäre Datei geschrieben werden.
+
+=head4 Options
+
+Siehe Quiq::TempFile->new().
+
+=head4 Returns
+
+=over 4
+
+=item $file
+
+Tempdatei-Objekt
+
+=back
+
+=head4 Description
+
+Erzeuge eine temporäre Datei, beschreibe sie mit den Daten $data und
+liefere eine Referenz auf das Objekt zurück.
+
+=head4 See Also
+
+Quiq::TempFile
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub tempFile {
+    my $this = shift;
+    return Quiq::TempFile->new(@_);
 }
 
 # -----------------------------------------------------------------------------
@@ -1821,6 +1867,42 @@ sub rmdir {
     };
 
     return;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 tempDir() - Erzeuge temporäres Verzeichnis
+
+=head4 Synopsis
+
+    $dir = $this->tempDir(@opt);
+
+=head4 Returns
+
+=over 4
+
+=item $dir
+
+Tempdir-Objekt
+
+=back
+
+=head4 Description
+
+Erzeuge ein temporäres Verzeichnis und liefere eine Referenz auf
+das Objekt zurück.
+
+=head4 See Also
+
+Quiq::TempDir
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub tempDir {
+    my $this = shift;
+    return Quiq::TempDir->new;
 }
 
 # -----------------------------------------------------------------------------
@@ -2766,7 +2848,7 @@ sub symlinkRelative {
 
 =head1 VERSION
 
-1.153
+1.154
 
 =head1 AUTHOR
 

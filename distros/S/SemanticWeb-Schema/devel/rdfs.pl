@@ -19,7 +19,7 @@ use Text::Wrap qw/ wrap /;
 use Types::Standard -types;
 use URI;
 
-our $VERSION = 'v3.8.1';
+our $VERSION = 'v3.9.0';
 
 const my $MAX_ABSTRACT_LENGTH => 44;    # See ExtUtils::ModuleMaker
 
@@ -103,14 +103,15 @@ has definition => (
     default => sub {
         [
             ## 'http://dublincore.org/2012/06/14/dcterms.rdf',
-#            'https://schema.org/version/3.8/all-layers.rdf',
-#            'https://schema.org/version/3.8/ext-attic.rdf',
-            'https://schema.org/version/3.8/ext-auto.rdf',
-            'https://schema.org/version/3.8/ext-bib.rdf',
-            'https://schema.org/version/3.8/ext-health-lifesci.rdf',
-            # 'https://schema.org/version/3.8/ext-iot.rdf',
-            'https://schema.org/version/3.8/ext-meta.rdf',
-            'https://schema.org/version/3.8/schema.rdf',
+#            'https://schema.org/version/3.9/all-layers.rdf',
+#            'https://schema.org/version/3.9/ext-attic.rdf',
+            'https://schema.org/version/3.9/ext-auto.rdf',
+            'https://schema.org/version/3.9/ext-bib.rdf',
+            'https://schema.org/version/3.9/ext-health-lifesci.rdf',
+            # 'https://schema.org/version/3.9/ext-iot.rdf',
+            'https://schema.org/version/3.9/ext-meta.rdf',
+            'https://schema.org/version/3.9/ext-pending.rdf',
+            'https://schema.org/version/3.9/schema.rdf',
         ]
     },
 );
@@ -247,6 +248,8 @@ sub generate_class_from_trine {
     return if any { $_ eq 'schema:DataType' } @$types;
 
     return unless any { $_ =~ /^(rdfs|schema):Class$/ } @$types;
+
+    $subj =~ s/2:DModel/:3DModel/; # fix an error in trine data
 
     my $class_name = $self->label_to_package_name($subj);
 

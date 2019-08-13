@@ -1,20 +1,12 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest qw/connect_ok @CALL_FUNCS requires_sqlite/;
 use Test::More;
 
 BEGIN { requires_sqlite('3.6.21') }
 
-use Test::NoWarnings;
-
-plan tests => 12 * @CALL_FUNCS + 1;
+use if -d ".git", "Test::FailWarnings";
 
 my $flag = 0;
 for my $call_func (@CALL_FUNCS) {
@@ -63,3 +55,5 @@ for my $call_func (@CALL_FUNCS) {
 	is $profile[2][0] => "insert into bar values (?)";
 	like $profile[2][1] => qr/^[0-9]+$/;
 }
+
+done_testing;

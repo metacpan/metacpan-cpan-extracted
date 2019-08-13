@@ -45,13 +45,13 @@ To install this module, run the following commands:
 
 NOTE:  _The install step may require sudo (root access)._
 
-       _Build.PL is not supported by Inline::C._
+       _Build.PL is not supported by Inline::C, and thus not by this module as well._
 
 ## FURTHER TEST SCRIPTS
 
 To test the installation properly.  Log into the text console (not X).  Go to the 'examples' directory and run 'primitives.pl'.  It basically calls most of the features of the module.
 
-The script 'threadstest.pl' requires 'Sys::CPU'.  It is not listed as a prerequisite for this module (as it isn't), but if you want to run this one script, then this is a required module.  It demonstrates how to use this module in a threaded environment.
+The scripts beginning with 'thread' requires 'Sys::CPU'.  It is not listed as a prerequisite for this module (as it isn't), but if you want to run the threaded scripts, then this is a required module.  It demonstrates how to use this module in a threaded environment.
 
 ## GETTING STARTED
 

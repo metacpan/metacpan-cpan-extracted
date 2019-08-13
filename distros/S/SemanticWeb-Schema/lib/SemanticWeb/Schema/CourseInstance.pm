@@ -15,13 +15,21 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.8.1';
+our $VERSION = 'v3.9.0';
 
 
 has course_mode => (
     is        => 'rw',
     predicate => 1,
     json_ld   => 'courseMode',
+);
+
+
+
+has course_workload => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'courseWorkload',
 );
 
 
@@ -50,7 +58,7 @@ SemanticWeb::Schema::CourseInstance - An instance of a <a class="localLink" href
 
 =head1 VERSION
 
-version v3.8.1
+version v3.9.0
 
 =head1 DESCRIPTION
 
@@ -72,6 +80,23 @@ reference to a term from a controlled vocabulary (e.g.
 https://ceds.ed.gov/element/001311#Asynchronous ).
 
 A course_mode should be one of the following types:
+
+=over
+
+=item C<Str>
+
+=back
+
+=head2 C<course_workload>
+
+C<courseWorkload>
+
+The amount of work expected of students taking the course, often provided
+as a figure per week or per month, and may be broken down by type. For
+example, "2 hours of lectures, 1 hour of lab work and 3 hours of
+independent study per week".
+
+A course_workload should be one of the following types:
 
 =over
 

@@ -4,7 +4,7 @@ use Test::More 0.88;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 
 my @seen;
-my $class = Parent->new();
+my $class = MyParent->new();
 $class->orig("hi");
 is(@seen, 5);
 is($seen[0], "before-orig:hi");
@@ -41,7 +41,7 @@ is($seen[4], "CCafter-orig:oy");
 
 @seen = ();
 
-$class = Parent2->new();
+$class = MyParent2->new();
 $class->orig("bye");
 is(@seen, 5);
 is($seen[0], "before-orig:bye");
@@ -52,7 +52,7 @@ is($seen[4], "after-orig:bye");
 
 BEGIN
 {
-    package Parent;
+    package MyParent;
     use Class::Method::Modifiers;
 
     sub new { bless {}, shift }
@@ -84,7 +84,7 @@ BEGIN
 BEGIN
 {
     package Child;
-    our @ISA = 'Parent';
+    our @ISA = 'MyParent';
     use Class::Method::Modifiers;
 
     before 'orig' => sub
@@ -137,7 +137,7 @@ BEGIN
 }
 BEGIN
 {
-    package Parent2;
+    package MyParent2;
     use Class::Method::Modifiers;
 
     sub new { bless {}, shift }

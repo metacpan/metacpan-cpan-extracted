@@ -1,15 +1,9 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-    $|  = 1;
-    $^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest;
 use Test::More;
-use Test::NoWarnings;
+use if -d ".git", "Test::FailWarnings";
 
 use DBI::Const::GetInfoType;
 
@@ -41,8 +35,6 @@ my %info = (
     SQL_TABLE_TERM             => 'table',
 );
 
-plan tests => scalar(keys %info) + 2;
-
 my $dbh = connect_ok( RaiseError => 1 );
 
 foreach my $option ( sort keys %info ) {
@@ -53,3 +45,5 @@ foreach my $option ( sort keys %info ) {
 }
 
 $dbh->disconnect;
+
+done_testing;

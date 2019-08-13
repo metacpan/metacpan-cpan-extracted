@@ -6,7 +6,7 @@ package BSON::MaxKey;
 # ABSTRACT: BSON type wrapper for MaxKey
 
 use version;
-our $VERSION = 'v1.12.0';
+our $VERSION = 'v1.12.1';
 
 use Carp;
 
@@ -49,7 +49,7 @@ BSON::MaxKey - BSON type wrapper for MaxKey
 
 =head1 VERSION
 
-version v1.12.0
+version v1.12.1
 
 =head1 SYNOPSIS
 

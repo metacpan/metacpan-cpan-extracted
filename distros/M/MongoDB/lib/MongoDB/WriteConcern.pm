@@ -19,7 +19,7 @@ package MongoDB::WriteConcern;
 # ABSTRACT: Encapsulate and validate a write concern
 
 use version;
-our $VERSION = 'v2.0.3';
+our $VERSION = 'v2.2.0';
 
 use Moo;
 use MongoDB::Error;
@@ -28,7 +28,7 @@ use MongoDB::_Types qw(
 );
 use Types::Standard qw(
     ArrayRef
-    Num
+    Int
     Str
     Maybe
 );
@@ -38,28 +38,28 @@ use namespace::clean -except => 'meta';
 
 #pod =attr w
 #pod
-#pod Specifies the desired acknowledgement level. Defaults to '1'.
+#pod Specifies the desired acknowledgement level. If not set, the
+#pod server default will be used, which is usually "1".
 #pod
 #pod =cut
 
 has w => (
     is        => 'ro',
-    isa       => Maybe [Str],
-    predicate => '_has_w',
+    isa       => Maybe[Str],
 );
 
 #pod =attr wtimeout
 #pod
 #pod Specifies how long to wait for the write concern to be satisfied (in
-#pod milliseconds).  Defaults to 1000.
+#pod milliseconds).  Defaults to 1000. If you set this to undef, it could block
+#pod indefinitely (or until socket timeout is reached).
 #pod
 #pod =cut
 
 has wtimeout => (
-    is        => 'ro',
-    isa       => Num,
-    predicate => '_has_wtimeout',
-    default   => 1000,
+    is      => 'ro',
+    isa     => Maybe[Int],
+    default => 1000,
 );
 
 #pod =attr j
@@ -75,7 +75,6 @@ has wtimeout => (
 has j => (
     is        => 'ro',
     isa       => Boolish,
-    predicate => '_has_j',
 );
 
 has _is_acknowledged => (
@@ -101,27 +100,41 @@ sub _build_as_args {
     my ($self) = @_;
 
     my $wc = {
-        ( $self->_has_w        ? ( w        => $self->w )           : () ),
-        ( $self->_has_wtimeout ? ( wtimeout => 0+ $self->wtimeout ) : () ),
-        ( $self->_has_j        ? ( j        => boolean($self->j) )           : () ),
+        ( defined( $self->w )        ? ( w        => $self->w )            : () ),
+        ( defined( $self->wtimeout ) ? ( wtimeout => 0+ $self->wtimeout )  : () ),
+        ( defined( $self->j )        ? ( j        => boolean( $self->j ) ) : () ),
     };
 
-    return ( (defined $self->w || defined $self->j) ? [writeConcern => $wc] : [] );
+    return ( keys %$wc ? [writeConcern => $wc] : [] );
 }
 
 sub BUILD {
     my ($self) = @_;
+    if ( ! $self->_w_is_valid ) {
+        MongoDB::UsageError->throw("can't use write concern w=" . $self->w );
+    }
+
     if ( ! $self->_w_is_acknowledged && $self->j ) {
         MongoDB::UsageError->throw("can't use write concern w=0 with j=" . $self->j );
+    }
+
+    # cant use nonnegnum earlier in type as errors explode with wrong class
+    if ( defined($self->wtimeout) && $self->wtimeout < 0 ) {
+        MongoDB::UsageError->throw("wtimeout must be non negative");
     }
     return;
 }
 
+sub _w_is_valid {
+  my ($self) = @_;
+  return 1 if !defined $self->w;
+  return looks_like_number( $self->w ) ? $self->w >= 0 : length $self->w;
+}
+
 sub _w_is_acknowledged {
     my ($self) = @_;
-    return ($self->_has_w
-      && ( looks_like_number( $self->w ) ? $self->w > 0 : length $self->w ))
-      || !defined $self->w;
+    return 1 if !defined $self->w;
+    return looks_like_number( $self->w ) ? $self->w > 0 : length $self->w;
 }
 
 
@@ -139,7 +152,7 @@ MongoDB::WriteConcern - Encapsulate and validate a write concern
 
 =head1 VERSION
 
-version v2.0.3
+version v2.2.0
 
 =head1 SYNOPSIS
 
@@ -162,12 +175,14 @@ L<http://docs.mongodb.org/manual/core/read-preference/>.
 
 =head2 w
 
-Specifies the desired acknowledgement level. Defaults to '1'.
+Specifies the desired acknowledgement level. If not set, the
+server default will be used, which is usually "1".
 
 =head2 wtimeout
 
 Specifies how long to wait for the write concern to be satisfied (in
-milliseconds).  Defaults to 1000.
+milliseconds).  Defaults to 1000. If you set this to undef, it could block
+indefinitely (or until socket timeout is reached).
 
 =head2 j
 

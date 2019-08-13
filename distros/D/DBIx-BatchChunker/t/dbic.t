@@ -25,6 +25,18 @@ my $schema       = CDTest->init_schema;
 my $track_rs     = $schema->resultset('Track')->search({ position => 1 });
 my $track1_count = $track_rs->count;
 
+# This tests that $rs calls aren't in boolean context.  CDBICompat has this
+# strange idea that "if ($rs)" means "actively run a $rs->count on the DB".
+{
+    no warnings 'redefine';
+    package DBIx::Class::ResultSet;
+
+    sub _bool () {
+        return 1 if caller =~ /^DBIx::Class::/;
+        die 'Cannot call $rs in boolean context!'
+    }
+}
+
 subtest 'DBIC Processing (+ process_past_max)' => sub {
     my $calls = 0;
 

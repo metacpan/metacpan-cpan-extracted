@@ -9,10 +9,9 @@ Feature: give manpage on --help
     Then the output must match "USAGE\\s+analizo <tool> \\[OPTIONS\\]"
     Examples:
       | tool             |
-      | evolution-matrix |
       | graph            |
       | metrics          |
       | metrics-batch    |
       | metrics-history  |
       | tree-evolution   |
-      | dsm              |
+      | files-graph      |

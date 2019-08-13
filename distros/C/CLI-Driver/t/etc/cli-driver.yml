@@ -1,12 +1,14 @@
 ---
 
 test1:
+  desc: basic happy path test
   class:
     name: CLI::Driver::Test
   method:
     name: test1_method
 
 test2:
+  desc: test method->args->required->hard
   class:
     name: CLI::Driver::Test
   method:
@@ -17,6 +19,7 @@ test2:
           m: myarg
 
 test3:
+  desc: "test method->args->required->soft"
   class:
     name: CLI::Driver::Test
   method:
@@ -29,6 +32,7 @@ test3:
           s: softargX
 
 test4:
+  desc: "test method->args->optional"
   class:
     name: CLI::Driver::Test
   method:
@@ -43,6 +47,7 @@ test4:
         o: optionalargZ
 
 test5:
+  desc: "test method->args->flags"
   class:
     name: CLI::Driver::Test
   method:
@@ -60,6 +65,7 @@ test5:
         
         
 test6:
+  desc: "test class->attr->required->hard"
   class:
     name: CLI::Driver::Test2
     attr:
@@ -79,6 +85,7 @@ test6:
       flags:
 
 test7:
+  desc: "test class->attr->required->soft"
   class:
     name: CLI::Driver::Test2
     attr:
@@ -99,6 +106,7 @@ test7:
       flags:
 
 test8:
+  desc: "test class->attr->optional"
   class:
     name: CLI::Driver::Test2
     attr:
@@ -119,6 +127,7 @@ test8:
       flags:   
       
 test9:
+  desc: "test class->attr->flags"
   class:
     name: CLI::Driver::Test2
     attr:
@@ -136,4 +145,15 @@ test9:
         hard: 
         soft:
       optional:
-      flags:                        
+      flags:       
+      
+test10:
+  desc: test extraneous args
+  class:
+    name: CLI::Driver::Test
+  method:
+    name: test2_method
+    args:
+      required: 
+        hard: 
+          m: myarg                       

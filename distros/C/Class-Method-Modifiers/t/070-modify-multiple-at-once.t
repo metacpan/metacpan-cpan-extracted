@@ -4,13 +4,13 @@ use Test::More 0.88;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 my @seen;
 
-package Parent;
+package MyParent;
 sub new { bless {}, shift }
 sub left { push @seen, "orig-left" }
 sub right { push @seen, "orig-right" }
 
 package Child;
-our @ISA = 'Parent';
+our @ISA = 'MyParent';
 use Class::Method::Modifiers;
 before 'left', 'right' => sub { push @seen, 'before' };
 

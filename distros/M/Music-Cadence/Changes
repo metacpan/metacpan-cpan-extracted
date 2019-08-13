@@ -1,0 +1,29 @@
+Revision history for Music-Cadence
+
+0.0201 2019-08-11 17:27:36
+    - Add eg/cadence to illustrate real life usage.
+
+0.0200 2019-08-11 11:03:00
+    - Remove %notes & just use the @scale indexes.
+    - Replace imperfect with half.
+    - Fix the variation of the deceptive cadence.
+
+0.0105 2019-08-11 08:12:49
+    - Fix the resolution chord of the desceptive cadence.
+
+0.0104 2019-08-11 08:02:59
+    - Add crucial disclaimer.
+
+0.0103 2019-08-11 07:42:42
+    - Fix documentation error.
+    - Change argument name from variation to leading.
+
+0.0102 2019-08-11 02:31:29
+    - Fix variation default.
+
+0.0101 2019-08-11 02:15:45
+    - Fix documentation.
+
+0.0100 2019-08-11 01:55:35
+    - Add working code!
+    - Mint by Dist:Zilla.

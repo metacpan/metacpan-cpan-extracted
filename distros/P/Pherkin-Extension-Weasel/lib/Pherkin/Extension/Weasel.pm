@@ -5,7 +5,7 @@ Pherkin::Extension::Weasel - Pherkin extension for web-testing
 
 =head1 VERSION
 
-0.09
+0.11
 
 =head1 SYNOPSIS
 
@@ -47,12 +47,13 @@ package Pherkin::Extension::Weasel;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.11';
 
 
 use Digest::MD5 qw(md5_hex);
 use File::Find::Rule;
 use File::Share ':all';
+use List::Util qw(any);
 use Module::Runtime qw(use_module);
 use Template;
 use Test::BDD::Cucumber::Extension;
@@ -244,6 +245,7 @@ sub pre_feature {
     if ($log) {
         my $feature_log = {
             scenarios => [],
+            failing_scenarios => [],
             title => $feature->name,
             filename => $feature->document->filename,
             satisfaction => join("\n",
@@ -277,8 +279,17 @@ sub pre_scenario {
     my ($self, $scenario, $feature_stash, $stash) = @_;
 
     if (grep { $_ eq 'weasel'} @{$scenario->tags}) {
-        $stash->{ext_wsl} = $self->_weasel->session;
-        $self->_weasel->session->start;
+        if (any { $_ eq 'weasel-one-session' } @{$scenario->tags}
+            and $feature_stash->{ext_wsl}) {
+            $stash->{ext_wsl} = $feature_stash->{ext_wsl};
+        }
+        else {
+            $stash->{ext_wsl} = $self->_weasel->session;
+            $self->_weasel->session->start;
+        }
+        if (any { $_ eq 'weasel-one-session' } @{$scenario->tags}) {
+            $feature_stash->{ext_wsl} = $stash->{ext_wsl};
+        }
 
         my $log = $self->_log;
         if ($log) {
@@ -304,10 +315,18 @@ sub post_scenario {
     my $log = $self->_log;
     if ($log) {
         $self->_flush_log;
+        if ($log->{scenario}->{failing}) {
+            push @{$log->{feature}->{failures}}, $log->{scenario};
+            $log->{feature}->{failing} = 1;
+        }
+        else {
+            push @{$log->{feature}->{successes}}, $log->{scenario};
+        }
         $log->{scenario} = undef;
     }
 
     $stash->{ext_wsl}->stop
+        unless any { $_ eq 'weasel-one-session' } @{$scenario->tags};
 }
 
 sub pre_step {
@@ -321,7 +340,7 @@ sub pre_step {
     if ($log) {
         my $step = {
             text => $context->step->verb_original
-                . ' ' . $context->step->text,
+                . ' ' . $context->text, # includes filled outline placeholders
             logs => [],
             result => '',
         };
@@ -340,6 +359,8 @@ sub post_step {
     if ($log) {
         if (ref $result) {
             $log->{step}->{result} = $result->result;
+            $log->{scenario}->{failing} = 1
+                if $result->result eq 'failing';
         }
         else {
             $log->{step}->{result} = '<missing>'; # Pherkin <= 0.56

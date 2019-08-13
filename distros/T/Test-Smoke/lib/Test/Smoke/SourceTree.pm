@@ -6,7 +6,7 @@ $VERSION = '0.008';
 
 use File::Spec;
 use File::Find;
-use Cwd;
+use Cwd 'abs_path';
 use Carp;
 use Test::Smoke::LogMixin;
 
@@ -68,15 +68,25 @@ C<< File::Spec->rel2abs( $tree_dir) >>.
 sub new {
     my $proto = shift;
     my $class = ref $proto ? ref $proto : $proto;
+    my ($dir, $verbose) = @_;
 
     croak sprintf "Usage: my \$tree = %s->new( <directory> )", __PACKAGE__
         unless @_;
+
     # it should be a directory!
-    my $dir = File::Spec->canonpath( shift );
-    my $cwd = cwd();
+    my $cwd = abs_path(File::Spec->curdir);
     chdir $dir or croak "Cannot chdir($dir): $!";
-    my $self = {tree_dir => cwd(), verbose => shift || 0};
+    # try not to trip over an absolute-path to something that somehow is a
+    # symlink. abs_path('.') will give you the real-path; that will fail...
+    my $tree_dir = File::Spec->file_name_is_absolute($dir)
+        ? $dir
+        : abs_path(File::Spec->curdir);
+    my $self = {
+        tree_dir => $tree_dir,
+        verbose => $verbose || 0,
+    };
     chdir $cwd;
+
     return bless $self, $class;
 }
 
@@ -179,8 +189,13 @@ C<abs2mani()> returns the MANIFEST style filename.
 
 sub abs2mani {
     my $self = shift;
-    my $relfile = File::Spec->abs2rel( File::Spec->canonpath( shift ),
-                                       $self->tree_dir );
+    my ($source_file) = @_;
+
+    my $relfile = File::Spec->abs2rel(
+        File::Spec->canonpath( $source_file ), $self->tree_dir
+    );
+    $self->log_debug("[abs2mani($source_file)] $relfile");
+
     my( undef, $directories, $file ) = File::Spec->splitpath( $relfile );
     my @dirs = grep $_ && length $_ => File::Spec->splitdir( $directories );
     push @dirs, $file;
@@ -214,7 +229,7 @@ sub check_MANIFEST {
     # Walk the tree, remove all found files from %manifest
     # and add other files to %manifest
     # unless they are in the ignore list
-    my $cwd = cwd();
+    my $cwd = abs_path(File::Spec->curdir);
     chdir $self->tree_dir or die "Cannot chdir($self->tree_dir): $!";
     require File::Find;
     File::Find::find(

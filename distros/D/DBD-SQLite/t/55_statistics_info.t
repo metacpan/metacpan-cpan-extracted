@@ -1,11 +1,5 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest;
 use Test::More;
@@ -18,7 +12,7 @@ BEGIN {
     }
 }
 
-use Test::NoWarnings;
+use if -d ".git", "Test::FailWarnings";
 
 my @sql_statements = split /\n\n/, <<__EOSQL__;
 CREATE TABLE a (
@@ -45,9 +39,6 @@ CREATE TABLE remote.b (
 );
 
 __EOSQL__
-
-
-plan tests => @sql_statements + 2 + 46 * 2;
 
 my $dbh = connect_ok( RaiseError => 1, PrintError => 0, AutoCommit => 1 );
 my $sth;
@@ -123,3 +114,5 @@ for my $table_name ('a', 'A') {
   }
   ok(not(exists $stats_data->{a_ln}->{3}), "only two indexes in a_an index");
 }
+
+done_testing;

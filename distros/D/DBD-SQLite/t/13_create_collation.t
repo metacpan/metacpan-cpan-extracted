@@ -1,28 +1,14 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
+no if $] >= 5.022, "warnings", "locale";
 use lib "t/lib";
-use SQLiteTest     qw/connect_ok dies @CALL_FUNCS/;
+use SQLiteTest;
 use Test::More;
-BEGIN {
-        my $COLLATION_TESTS = 10;
-        my $WRITE_ONCE_TESTS = 4;
-
-	if ( $] >= 5.008005 ) {
-		plan( tests => $COLLATION_TESTS * @CALL_FUNCS + 
-                               $WRITE_ONCE_TESTS + 1);
-	} else {
-		plan( skip_all => 'Unicode is not supported before 5.8.5' );
-	}
-}
-use Test::NoWarnings;
+use if -d ".git", "Test::FailWarnings";
 use Encode qw/decode/;
 use DBD::SQLite;
+
+BEGIN { requires_unicode_support(); }
 
 BEGIN {
 	# Sadly perl for windows (and probably sqlite, too) may hang
@@ -53,16 +39,12 @@ sub by_num_desc ($$) {
 	$_[1] <=> $_[0];
 }
 
-
 # collation 'no_accents' will be automatically loaded on demand
 $DBD::SQLite::COLLATION{no_accents} = \&no_accents;
-
 
 $" = ", "; # to embed arrays into message strings
 
 my $sql = "SELECT txt from collate_test ORDER BY txt";
-
-
 
 # test interaction with the global COLLATION hash ("WriteOnce")
 
@@ -84,8 +66,6 @@ my $tied = tied %DBD::SQLite::COLLATION;
 delete $tied->{foo};
 $DBD::SQLite::COLLATION{foo} = \&by_num_desc; # override, no longer dies
 is($DBD::SQLite::COLLATION{foo}, \&by_num_desc, "overridden collation");
-
-
 
 # now really test the collation functions
 
@@ -132,7 +112,6 @@ foreach my $call_func (@CALL_FUNCS) {
     is_deeply(\@sorted, $db_sorted, 
               "collate no_accents (@sorted // @$db_sorted)");
 
-
     # manual addition of a collation for this dbh
     $dbh->$call_func(by_length => \&by_length, "create_collation");
     @sorted    = sort by_length @words;
@@ -142,6 +121,4 @@ foreach my $call_func (@CALL_FUNCS) {
   }
 }
 
-
-
-
+done_testing;

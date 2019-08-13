@@ -19,7 +19,7 @@ package MongoDB::_TransactionOptions;
 # MongoDB options for transactions
 
 use version;
-our $VERSION = 'v2.0.3';
+our $VERSION = 'v2.2.0';
 
 use MongoDB::Error;
 
@@ -36,6 +36,8 @@ use MongoDB::_Types qw(
 use Types::Standard qw(
     HashRef
     Any
+    Maybe
+    Int
 );
 use namespace::clean -except => 'meta';
 
@@ -73,10 +75,14 @@ sub _build_write_concern {
 
     my $options = $self->options->{writeConcern};
     $options ||= $self->default_options->{writeConcern};
+    $options ||= {};
 
-    my $write_concern;
-    $write_concern = MongoDB::WriteConcern->new( $options ) if defined $options;
-    $write_concern ||= $self->client->write_concern;
+    # Merge in client default to pass through forced undef wtimeout etc.
+    $options = {
+        $self->client->_write_concern_options,
+        %$options,
+    };
+    my $write_concern = MongoDB::WriteConcern->new( $options );
 
     unless ( $write_concern->is_acknowledged ) {
         MongoDB::ConfigurationError->throw(
@@ -129,6 +135,21 @@ sub _build_read_preference {
     }
 
     return $read_pref;
+}
+
+has max_commit_time_ms => (
+    is => 'lazy',
+    isa => Maybe[Int],
+    init_arg => undef,
+    builder => '_build_max_commit_time_ms',
+);
+
+sub _build_max_commit_time_ms {
+    my $self = shift;
+    my ( $opts, $default_opts ) = ( $self->options, $self->default_options );
+    my $max_time_ms = $opts->{'maxCommitTimeMS'};
+    $max_time_ms ||= $default_opts->{'maxCommitTimeMS'};
+    return $max_time_ms;
 }
 
 1;

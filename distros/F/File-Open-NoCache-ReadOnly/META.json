@@ -63,6 +63,6 @@
          "x_repository" : "https://github.com/nigelhorne/File-Open-NoCache-ReadOnly"
       }
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

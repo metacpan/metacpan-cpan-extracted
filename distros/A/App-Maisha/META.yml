@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                   App-Maisha
-version:                0.21
+version:                0.22
 abstract:               A command line social micro-blog networking tool
 author:
   - Barbie <barbie@cpan.org>
@@ -10,7 +10,7 @@ distribution_type:      module
 installdirs:            site
 
 requires:
-  perl:                     5.006
+  perl:                     5.014
   Carp:                     0
   Class::Accessor::Fast:    0
   Config::Any:              0
@@ -39,22 +39,22 @@ build_requires:
 provides:
   App::Maisha:
     file: lib/App/Maisha.pm
-    version: 0.21
+    version: 0.22
   App::Maisha::Shell:
     file: lib/App/Maisha/Shell.pm
-    version: 0.21
+    version: 0.22
   App::Maisha::Plugin::Base:
     file: lib/App/Maisha/Plugin/Base.pm
-    version: 0.21
+    version: 0.22
   App::Maisha::Plugin::Identica:
     file: lib/App/Maisha/Plugin/Identica.pm
-    version: 0.21
+    version: 0.22
   App::Maisha::Plugin::Test:
     file: lib/App/Maisha/Plugin/Test.pm
-    version: 0.21
+    version: 0.22
   App::Maisha::Plugin::Twitter:
     file: lib/App/Maisha/Plugin/Twitter.pm
-    version: 0.21
+    version: 0.22
 
 no_index:
   directory:

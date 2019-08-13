@@ -1,3 +1,13 @@
+0.084   2019-08-08  Released-By: PERLANCAR; Urgency: medium
+
+	- Add node action: eval.
+
+
+0.083   2019-07-30  Released-By: PERLANCAR; Urgency: low
+
+	- [ux] Simplify CLI scripts by disabling read_config & read_env.
+
+
 0.082   2019-07-29  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
 
 	- [refactor][imcompatible change] Extract common subroutine: foosel(),
@@ -7,7 +17,7 @@
 
 0.081   2019-07-27  Released-By: PERLANCAR; Urgency: medium
 
-	- Add action dump.
+	- Add action: dump.
 
 
 0.080   2019-07-26  Released-By: PERLANCAR; Urgency: low

@@ -1,5 +1,8 @@
 Revision history for List-Util-MaybeXS
 
+1.500003 - 2019-08-08
+  - added TO_JSON method to pair object, as added in List::Util 1.51.
+
 1.500002 - 2018-04-19
   - trigger codification overloads only once if used for callback
   - fix error report location if given a non-coderef

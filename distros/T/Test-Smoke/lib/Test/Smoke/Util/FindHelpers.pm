@@ -183,7 +183,7 @@ sub get_avail_w32compilers {
     my %map = (
         MSVC => { ccname => 'cl',    maker => [ 'nmake' ] },
         BCC  => { ccname => 'bcc32', maker => [ 'dmake' ] },
-        GCC  => { ccname => 'gcc',   maker => [ 'dmake' ] },
+        GCC  => { ccname => 'gcc',   maker => [ 'dmake', 'gmake' ] },
     );
 
     my $CC = 'MSVC';

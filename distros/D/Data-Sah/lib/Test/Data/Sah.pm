@@ -2,8 +2,8 @@
 
 package Test::Data::Sah;
 
-our $DATE = '2019-07-25'; # DATE
-our $VERSION = '0.899'; # VERSION
+our $DATE = '2019-08-12'; # DATE
+our $VERSION = '0.900'; # VERSION
 
 use 5.010;
 use strict;
@@ -49,7 +49,7 @@ sub test_sah_cases {
             } elsif ($rt eq 'str') {
                 $testres = is($res, "", $name) or diag explain $res;
             } elsif ($rt eq 'full') {
-                $testres = is(~~keys(%{$res->{errors}}), 0, $name) or diag explain $res;
+                $testres = is(scalar keys(%{$res->{errors}}), 0, $name) or diag explain $res;
             }
         } else {
             if ($rt eq 'bool') {
@@ -57,7 +57,7 @@ sub test_sah_cases {
             } elsif ($rt eq 'str') {
                 $testres = isnt($res, "", $name) or diag explain $res;
             } elsif ($rt eq 'full') {
-                $testres = isnt(~~keys(%{$res->{errors}}), 0, $name) or diag explain $res;
+                $testres = isnt(scalar keys(%{$res->{errors}}), 0, $name) or diag explain $res;
             }
         }
         next if $testres;
@@ -159,17 +159,15 @@ sub run_spectest {
     };
 
     {
-        use experimental 'smartmatch';
-
         last unless $args{test_normalize_schema};
 
         for my $file ("00-normalize_schema.json") {
-            unless (!@files || $file ~~ @files) {
+            unless (!@files || grep { $_ eq $file } @files) {
                 diag "Skipping file $file";
                 next;
             }
             subtest $file => sub {
-                my $tspec = _decode_json(~~read_text("$dir/spectest/$file"));
+                my $tspec = _decode_json(read_text("$dir/spectest/$file"));
                 for my $test (@{ $tspec->{tests} }) {
                     subtest $test->{name} => sub {
                         if (my $reason = $code_test_excluded->($test)) {
@@ -195,18 +193,16 @@ sub run_spectest {
     }
 
     {
-        use experimental 'smartmatch';
-
         last unless $args{test_merge_clause_sets};
 
         for my $file ("01-merge_clause_sets.json") {
             last; # we currently remove _merge_clause_sets() from Data::Sah
-            unless (!@files || $file ~~ @files) {
+            unless (!@files || grep { $_ eq $file } @files) {
                 diag "Skipping file $file";
                 next;
             }
             subtest $file => sub {
-                my $tspec = _decode_json(~~read_text("$dir/spectest/$file"));
+                my $tspec = _decode_json(scalar read_text("$dir/spectest/$file"));
                 for my $test (@{ $tspec->{tests} }) {
                     subtest $test->{name} => sub {
                         if (my $reason = $code_test_excluded->($test)) {
@@ -232,16 +228,14 @@ sub run_spectest {
     }
 
     {
-        use experimental 'smartmatch';
-
         for my $file (grep {/^10-type-/} @specfiles) {
-            unless (!@files || $file ~~ @files) {
+            unless (!@files || grep { $_ eq $file } @files) {
                 diag "Skipping file $file";
                 next;
             }
             subtest $file => sub {
                 diag "Loading $file ...";
-                my $tspec = _decode_json(~~read_text("$dir/spectest/$file"));
+                my $tspec = _decode_json(read_text("$dir/spectest/$file"));
                 note "Test version: ", $tspec->{version};
                 my $tests = $tspec->{tests};
                 if ($args{tests_func}) {
@@ -282,34 +276,28 @@ sub run_spectest {
 }
 
 sub all_match {
-    use experimental 'smartmatch';
-
     my ($list1, $list2) = @_;
 
-    for (@$list1) {
-        return 0 unless $_ ~~ @$list2;
+    for my $el (@$list1) {
+        return 0 unless grep { $_ eq $el } @$list2;
     }
     1;
 }
 
 sub any_match {
-    use experimental 'smartmatch';
-
     my ($list1, $list2) = @_;
 
-    for (@$list1) {
-        return 1 if $_ ~~ @$list2;
+    for my $el (@$list1) {
+        return 1 if grep { $_ eq $el } @$list2;
     }
     0;
 }
 
 sub none_match {
-    use experimental 'smartmatch';
-
     my ($list1, $list2) = @_;
 
-    for (@$list1) {
-        return 0 if $_ ~~ @$list2;
+    for my $el (@$list1) {
+        return 0 if grep { $_ eq $el } @$list2;
     }
     1;
 }
@@ -329,7 +317,7 @@ Test::Data::Sah - Test routines for Data::Sah
 
 =head1 VERSION
 
-This document describes version 0.899 of Test::Data::Sah (from Perl distribution Data-Sah), released on 2019-07-25.
+This document describes version 0.900 of Test::Data::Sah (from Perl distribution Data-Sah), released on 2019-08-12.
 
 =head1 FUNCTIONS
 

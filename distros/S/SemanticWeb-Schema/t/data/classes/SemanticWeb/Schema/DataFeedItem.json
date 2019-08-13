@@ -15,8 +15,8 @@
             "schema:DataFeedItem"
          ],
          "schema:rangeIncludes" : [
-            "schema:Date",
-            "schema:DateTime"
+            "schema:DateTime",
+            "schema:Date"
          ]
       },
       "schema:dateDeleted" : {

@@ -20,7 +20,7 @@ package MongoDB::Op::_Query;
 # Encapsulate a query operation; returns a MongoDB::QueryResult object
 
 use version;
-our $VERSION = 'v2.0.3';
+our $VERSION = 'v2.2.0';
 
 use boolean;
 use Moo;
@@ -154,7 +154,7 @@ sub _legacy_query {
       $opts->{projection} ? $self->bson_codec->encode_one( $opts->{projection} ) : undef;
 
     # $query is passed as a reference because it *may* be replaced
-    $self->_apply_read_prefs( $link, $topology, $query_flags, \$query );
+    $self->_apply_op_query_read_prefs( $link, $topology, $query_flags, \$query );
 
     my $filter = $self->bson_codec->encode_one($query);
 

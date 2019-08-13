@@ -1,0 +1,33 @@
+---
+abstract: 'extra Perl::Critic policies'
+author:
+  - 'Szymon Nieznański'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Path::Tiny: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl-Critic-PolicyBundle-SNEZ
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::Alias: '0'
+  List::MoreUtils: '0'
+  Perl::Critic: '0'
+  parent: '0'
+  perl: '5.010001'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/s-nez/perl-critic-bundle.git
+version: 0.02
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

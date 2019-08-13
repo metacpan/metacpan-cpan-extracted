@@ -5,9 +5,6 @@
 #include <string.h>
 #include <time.h>
 
-#define PERL_NO_GET_CONTEXT     /* we want efficiency */
-#include "EXTERN.h"
-
 #include "glog.h"
 #include "gmem.h"
 #include "cover.h"
@@ -145,6 +142,7 @@ void cover_dump(CoverList* cover, FILE* fp) {
   int ncount = 0, i = 0, scount = 0;
   const char *env_filter;
   REGEXP *include = NULL, *exclude = NULL;
+  dTHX;
 
   assert(cover);
 

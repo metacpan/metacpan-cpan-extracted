@@ -5,7 +5,7 @@
 #-------------------------------------------------------------------------------
 
 package Google::Translate::Languages;
-our $VERSION = '20171222';
+our $VERSION = '20190811';
 use v5.8.0;
 use warnings FATAL => qw(all);
 use Carp qw(confess);
@@ -39,11 +39,11 @@ sub splitListsOfLanguages($)                                                    
 
 sub additional2CharCodes
  {my ($l) = @_;                                                                 # Hash of language name lists to code
-  $l->{Cebuano}        = "ceb";                                                 # None
-  $l->{Filipino}       = "fil";                                                 # None
+  $l->{Cebuano}        = "cb";                                                  # https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes - not present so I made it up
+  $l->{Filipino}       = "tl";                                                  # https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes tagalog
   $l->{Frisian}        = "fy";                                                  # Only 2 char version
-  $l->{Hawaiian}       = "haw";                                                 # None
-  $l->{Hmong}          = "hmn";                                                 # None
+  $l->{Hawaiian}       = "hw";                                                  # https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes - not present so I made it up
+  $l->{Hmong}          = "hm";                                                  # https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes - not present so I made it up
   $l->{Khmer}          = "km";
   $l->{Norwegian}      = "nb";                                                  # Could be nb or nn but Aws::Polly::Select uses nb so we do here too for consistency
   $l->{"Scots Gaelic"} = "gd";
@@ -59,7 +59,8 @@ sub additional3CharCodes
  }
 
 sub generate                                                                    ## Generate the language code tables from the raw data
- {my @l  = map{trim($_)} split /\n/, &raw;                                       # Split the raw data into lines of <td>
+ {my @l  = map{trim($_)} split /\n/, &raw;                                      # Split the raw data into lines of <td>
+
   my %c2 = %{&ISO::639::languageFromCode2};
   my %c3 = %{&ISO::639::languageFromCode3};
 
@@ -74,7 +75,7 @@ sub generate                                                                    
     my $c3 = $c3{$languageName};
     !$c2 and warn "No 2 character code for $languageName";
     !$c3 and warn "No 3 character code for $languageName";
-    push @L, [$languageName, $c2, $c3];
+    push @L, [$languageName =~ s(\s+) ()gsr, $c2, $c3];                         # Remove blanks from language names
    }
 
   my $d = dump(\@L);
@@ -83,14 +84,11 @@ sub generate                                                                    
   my $s = <<END;
 sub languages{$d}
 END
-  if (my $f = do{"zzz.data"})                                                 # File to save the translations hash to
-   {writeFile($f, $s);                                                        # Save the translations hash
-    say STDERR "New version written to:\n$f";
-   }
+  say STDERR "New version written to:\n", owf("zzz.data", $s);                  # Write new table for manual replacement in this file at: sub languages just below as
  }
 
 # Language table goes here
-sub languages{[   ["Afrikaans", "af", "afr"],   ["Albanian", "sq", "alb"],   ["Amharic", "am", "amh"],   ["Arabic", "ar", "ara"],   ["Armenian", "hy", "arm"],   ["Azerbaijani", "az", "aze"],   ["Basque", "eu", "baq"],   ["Belarusian", "be", "bel"],   ["Bengali", "bn", "ben"],   ["Bosnian", "bs", "bos"],   ["Bulgarian", "bg", "bul"],   ["Burmese", "my", "mya"],   ["Catalan", "ca", "cat"],   ["Cebuano", "ceb", "ceb"],   ["Chichewa", "ny", "nya"],   ["Chinese", "zh", "chi"],   ["Corsican", "co", "cos"],   ["Croatian", "hr", "hrv"],   ["Czech", "cs", "ces"],   ["Danish", "da", "dan"],   ["Dutch", "nl", "nld"],   ["English", "en", "enm"],   ["Esperanto", "eo", "epo"],   ["Estonian", "et", "est"],   ["Filipino", "fil", "fil"],   ["Finnish", "fi", "fin"],   ["French", "fr", "fro"],   ["Frisian", "fy", "fry"],   ["Galician", "gl", "glg"],   ["Georgian", "ka", "kat"],   ["German", "de", "goh"],   ["Greek", "el", "ell"],   ["Gujarati", "gu", "guj"],   ["Haitian Creole", "ht", "hat"],   ["Hausa", "ha", "hau"],   ["Hawaiian", "haw", "haw"],   ["Hebrew", "he", "heb"],   ["Hindi", "hi", "hin"],   ["Hmong", "hmn", "hmn"],   ["Hungarian", "hu", "hun"],   ["Icelandic", "is", "isl"],   ["Igbo", "ig", "ibo"],   ["Indonesian", "id", "ind"],   ["Irish", "ga", "sga"],   ["Italian", "it", "ita"],   ["Japanese", "ja", "jpn"],   ["Javanese", "jv", "jav"],   ["Kannada", "kn", "kan"],   ["Kazakh", "kk", "kaz"],   ["Khmer", "km", "khm"],   ["Korean", "ko", "kor"],   ["Kurdish", "ku", "kur"],   ["Kyrgyz", "ky", "kir"],   ["Lao", "lo", "lao"],   ["Latin", "la", "lat"],   ["Latvian", "lv", "lav"],   ["Lithuanian", "lt", "lit"],   ["Luxembourgish", "lb", "ltz"],   ["Macedonian", "mk", "mac"],   ["Malagasy", "mg", "mlg"],   ["Malay", "ms", "may"],   ["Malayalam", "ml", "mal"],   ["Maltese", "mt", "mlt"],   ["Maori", "mi", "mri"],   ["Marathi", "mr", "mar"],   ["Mongolian", "mn", "mon"],   ["Nepali", "ne", "nep"],   ["Norwegian", "nb", "nno"],   ["Pashto", "ps", "pus"],   ["Persian", "fa", "peo"],   ["Polish", "pl", "pol"],   ["Portuguese", "pt", "por"],   ["Punjabi", "pa", "pan"],   ["Romanian", "ro", "ron"],   ["Russian", "ru", "rus"],   ["Samoan", "sm", "smo"],   ["Scots Gaelic", "gd", "gla"],   ["Serbian", "sr", "srp"],   ["Sesotho", "st", "sot"],   ["Shona", "sn", "sna"],   ["Sindhi", "sd", "snd"],   ["Sinhala", "si", "sin"],   ["Slovak", "sk", "slo"],   ["Slovenian", "sl", "slv"],   ["Somali", "so", "som"],   ["Spanish", "es", "spa"],   ["Sundanese", "su", "sun"],   ["Swahili", "sw", "swa"],   ["Swedish", "sv", "swe"],   ["Tajik", "tg", "tgk"],   ["Tamil", "ta", "tam"],   ["Telugu", "te", "tel"],   ["Thai", "th", "tha"],   ["Turkish", "tr", "ota"],   ["Ukrainian", "uk", "ukr"],   ["Urdu", "ur", "urd"],   ["Uzbek", "uz", "uzb"],   ["Vietnamese", "vi", "vie"],   ["Welsh", "cy", "wel"],   ["Xhosa", "xh", "xho"],   ["Yiddish", "yi", "yid"],   ["Yoruba", "yo", "yor"],   ["Zulu", "zu", "zul"], ]}
+sub languages{[   ["Afrikaans", "af", "afr"],   ["Albanian", "sq", "alb"],   ["Amharic", "am", "amh"],   ["Arabic", "ar", "ara"],   ["Armenian", "hy", "arm"],   ["Azerbaijani", "az", "aze"],   ["Basque", "eu", "baq"],   ["Belarusian", "be", "bel"],   ["Bengali", "bn", "ben"],   ["Bosnian", "bs", "bos"],   ["Bulgarian", "bg", "bul"],   ["Burmese", "my", "bur"],   ["Catalan", "ca", "cat"],   ["Cebuano", "cb", "ceb"],   ["Chichewa", "ny", "nya"],   ["Chinese", "zh", "chi"],   ["Corsican", "co", "cos"],   ["Croatian", "hr", "hrv"],   ["Czech", "cs", "ces"],   ["Danish", "da", "dan"],   ["Dutch", "nl", "dum"],   ["English", "en", "enm"],   ["Esperanto", "eo", "epo"],   ["Estonian", "et", "est"],   ["Filipino", "tl", "fil"],   ["Finnish", "fi", "fin"],   ["French", "fr", "fro"],   ["Frisian", "fy", "fry"],   ["Galician", "gl", "glg"],   ["Georgian", "ka", "geo"],   ["German", "de", "goh"],   ["Greek", "el", "ell"],   ["Gujarati", "gu", "guj"],   ["HaitianCreole", "ht", "hat"],   ["Hausa", "ha", "hau"],   ["Hawaiian", "hw", "haw"],   ["Hebrew", "he", "heb"],   ["Hindi", "hi", "hin"],   ["Hmong", "hm", "hmn"],   ["Hungarian", "hu", "hun"],   ["Icelandic", "is", "ice"],   ["Igbo", "ig", "ibo"],   ["Indonesian", "id", "ind"],   ["Irish", "ga", "sga"],   ["Italian", "it", "ita"],   ["Japanese", "ja", "jpn"],   ["Javanese", "jv", "jav"],   ["Kannada", "kn", "kan"],   ["Kazakh", "kk", "kaz"],   ["Khmer", "km", "khm"],   ["Korean", "ko", "kor"],   ["Kurdish", "ku", "kur"],   ["Kyrgyz", "ky", "kir"],   ["Lao", "lo", "lao"],   ["Latin", "la", "lat"],   ["Latvian", "lv", "lav"],   ["Lithuanian", "lt", "lit"],   ["Luxembourgish", "lb", "ltz"],   ["Macedonian", "mk", "mac"],   ["Malagasy", "mg", "mlg"],   ["Malay", "ms", "msa"],   ["Malayalam", "ml", "mal"],   ["Maltese", "mt", "mlt"],   ["Maori", "mi", "mri"],   ["Marathi", "mr", "mar"],   ["Mongolian", "mn", "mon"],   ["Nepali", "ne", "nep"],   ["Norwegian", "nb", "nno"],   ["Pashto", "ps", "pus"],   ["Persian", "fa", "peo"],   ["Polish", "pl", "pol"],   ["Portuguese", "pt", "por"],   ["Punjabi", "pa", "pan"],   ["Romanian", "ro", "ron"],   ["Russian", "ru", "rus"],   ["Samoan", "sm", "smo"],   ["ScotsGaelic", "gd", "gla"],   ["Serbian", "sr", "srp"],   ["Sesotho", "st", "sot"],   ["Shona", "sn", "sna"],   ["Sindhi", "sd", "snd"],   ["Sinhala", "si", "sin"],   ["Slovak", "sk", "slk"],   ["Slovenian", "sl", "slv"],   ["Somali", "so", "som"],   ["Spanish", "es", "spa"],   ["Sundanese", "su", "sun"],   ["Swahili", "sw", "swa"],   ["Swedish", "sv", "swe"],   ["Tajik", "tg", "tgk"],   ["Tamil", "ta", "tam"],   ["Telugu", "te", "tel"],   ["Thai", "th", "tha"],   ["Turkish", "tr", "ota"],   ["Ukrainian", "uk", "ukr"],   ["Urdu", "ur", "urd"],   ["Uzbek", "uz", "uzb"],   ["Vietnamese", "vi", "vie"],   ["Welsh", "cy", "cym"],   ["Xhosa", "xh", "xho"],   ["Yiddish", "yi", "yid"],   ["Yoruba", "yo", "yor"],   ["Zulu", "zu", "zul"], ]}
 
 # Raw data from inside table goes here
 sub raw {<<END}
@@ -238,11 +236,13 @@ module.  For an alphabetic listing of all methods by name see L<Index|/Index>.
 
 =head1 Languages and codes
 
-[Language name, ISO639 2 character code, and ISO639 3 character code] in English for languages supported by Google Translate
+[Language name, ISO639 2 character code, and ISO639 3 character code] in
+English for languages supported by Google Translate
 
 =head2 supportedLanguages()
 
-[Language name, ISO639 2 character code, and ISO639 3 character code] in English for languages supported by Google Translate
+[Language name, ISO639 2 character code, and ISO639 3 character code] in
+English for languages supported by Google Translate
 
 
 This is a static method and so should be invoked as:

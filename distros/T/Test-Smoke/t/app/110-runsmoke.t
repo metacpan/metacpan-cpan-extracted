@@ -10,6 +10,7 @@ use Test::NoWarnings ();
 
 use File::Spec::Functions;
 use File::Path;
+use File::Temp 'tempdir';
 use Cwd 'abs_path';
 
 BEGIN {
@@ -24,9 +25,10 @@ my $win_error_setting = $^O eq 'MSWin32'
     ? "\012Changing ErrorMode settings to prevent popups"
     : '';
 
+my $tmpdir = tempdir(CLEANUP => ($ENV{SMOKE_DEBUG} ? 0 : 1));
 { # Basic test, check we die() if the directory doesn't exist.
 
-    my $ddir = 't/will_not_exist_..._ever_I_hope';
+    my $ddir = catdir($tmpdir, 'will_not_exist_..._ever_I_hope');
     local @ARGV = ('--ddir', $ddir);
     my $app = Test::Smoke::App::RunSmoke->new(
         Test::Smoke::App::Options->runsmoke_config()
@@ -37,11 +39,8 @@ my $win_error_setting = $^O eq 'MSWin32'
     is(0+$!, 2, "->run() fails: $!");
 }
 
-my $ddir = catdir(abs_path(), 't', 'perl');
+my $ddir = catdir($tmpdir, 'perl');
 mkpath($ddir, $ENV{TEST_VERBOSE});
-END {
-    rmtree $ddir;
-}
 { # Basic test, override ->run() with something predictable
     local @ARGV = ('--ddir', $ddir, '--verbose', 1);
     my $app = Test::Smoke::App::RunSmoke->new(

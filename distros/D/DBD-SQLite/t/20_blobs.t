@@ -1,18 +1,12 @@
-#!/usr/bin/perl
-
 # This is a test for correct handling of BLOBS; namely $dbh->quote
 # is expected to work correctly.
 
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest;
-use Test::More tests => 17;
-use Test::NoWarnings;
+use Test::More;
+use if -d ".git", "Test::FailWarnings";
 use DBI ':sql_types';
 
 sub ShowBlob($) {
@@ -72,6 +66,13 @@ SCOPE: {
 	ok( $sth->bind_param(1, 3), '->bind_param' );
 	ok( $sth->bind_param(2, undef, SQL_BLOB), '->bind_param' );
 	ok( $sth->execute, '->execute' );
+
+    ok my $quoted_blob = $dbh->quote($blob, SQL_BLOB);
+	ok( $dbh->do("INSERT INTO one VALUES( 4, $quoted_blob )"), 'insert quoted blob' );
+    ok my $quoted_empty = $dbh->quote('', SQL_BLOB);
+	ok( $dbh->do("INSERT INTO one VALUES( 5, $quoted_empty )"), 'insert quoted empty string' );
+    ok my $quoted_undef = $dbh->quote(undef, SQL_BLOB);
+	ok( $dbh->do("INSERT INTO one VALUES( 6, $quoted_undef )"), 'insert quoted undef' );
 }
 
 # Now, try SELECT'ing the row out.
@@ -84,6 +85,11 @@ SCOPE: {
 		[ 1, $blob ],
 		[ 2, '' ],
 		[ 3, undef ],
+		[ 4, $blob ],
+		[ 5, '' ],
+		[ 6, undef ],
 	], 'Got the blob back ok' );
 	ok( $sth->finish, '->finish' );
 }
+
+done_testing;

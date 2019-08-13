@@ -19,7 +19,7 @@ package MongoDB::Op::_Update;
 # Encapsulate an update operation; returns a MongoDB::UpdateResult
 
 use version;
-our $VERSION = 'v2.0.3';
+our $VERSION = 'v2.2.0';
 
 use Moo;
 
@@ -95,7 +95,7 @@ sub execute {
           if !$link->supports_collation;
         MongoDB::UsageError->throw(
             "Unacknowledged updates that specify a collation are not allowed")
-          if !$self->write_concern->is_acknowledged;
+          if ! $self->_should_use_acknowledged_write;
     }
 
     if ( defined $self->arrayFilters ) {
@@ -104,7 +104,7 @@ sub execute {
           if !$link->supports_arrayFilters;
         MongoDB::UsageError->throw(
             "Unacknowledged updates that specify arrayFilters are not allowed")
-          if !$self->write_concern->is_acknowledged;
+          if ! $self->_should_use_acknowledged_write;
     }
 
     my $orig_op = {
@@ -136,7 +136,7 @@ sub execute {
         $orig_op,
         "MongoDB::UpdateResult",
         "update",
-    ) if !$self->write_concern->is_acknowledged;
+    ) if ! $self->_should_use_acknowledged_write;
 
     return $self->_send_write_command(
         $link,

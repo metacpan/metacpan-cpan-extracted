@@ -31,9 +31,11 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp::Clan" : "0",
             "Moose" : "0",
             "Selenium::Remote::Driver" : "0",
-            "Weasel" : "0.01",
+            "Weasel::DriverRole" : "0.03",
+            "namespace::autoclean" : "0",
             "perl" : "v5.10.1"
          }
       },
@@ -54,7 +56,7 @@
          "web" : "https://github.com/perl-weasel/weasel-driver-selenium2"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::XS version 3.03"
 }
 

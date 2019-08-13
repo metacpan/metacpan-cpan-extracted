@@ -19,7 +19,7 @@ package MongoDB::UpdateResult;
 # ABSTRACT: MongoDB update result object
 
 use version;
-our $VERSION = 'v2.0.3';
+our $VERSION = 'v2.2.0';
 
 use Moo;
 use MongoDB::_Constants;
@@ -95,7 +95,7 @@ MongoDB::UpdateResult - MongoDB update result object
 
 =head1 VERSION
 
-version v2.0.3
+version v2.2.0
 
 =head1 SYNOPSIS
 

@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.8.1';
+our $VERSION = 'v3.9.0';
 
 
 has aggregate_rating => (
@@ -202,6 +202,14 @@ has slogan => (
 
 
 
+has terms_of_service => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'termsOfService',
+);
+
+
+
 
 
 1;
@@ -218,7 +226,7 @@ SemanticWeb::Schema::Service - A service provided by an organization, e
 
 =head1 VERSION
 
-version v3.8.1
+version v3.9.0
 
 =head1 DESCRIPTION
 
@@ -559,6 +567,20 @@ A service_type should be one of the following types:
 A slogan or motto associated with the item.
 
 A slogan should be one of the following types:
+
+=over
+
+=item C<Str>
+
+=back
+
+=head2 C<terms_of_service>
+
+C<termsOfService>
+
+Human-readable terms of service documentation.
+
+A terms_of_service should be one of the following types:
 
 =over
 

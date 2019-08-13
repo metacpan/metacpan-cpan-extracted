@@ -1,8 +1,5 @@
-#! /usr/bin/perl -w
+#! perl -w
 use strict;
-use Data::Dumper;
-
-# $Id$
 
 my $findbin;
 use File::Basename;
@@ -10,38 +7,48 @@ BEGIN { $findbin = dirname $0; }
 use lib $findbin;
 use TestLib;
 use File::Spec;
+use File::Temp 'tempdir';
+use Cwd 'abs_path';
 
 use Test::More;
 
-my $cdir = 'origdir';
-my $ddir = 'perl-current';
 # Set up some sort of source-tree
 require File::Copy;
 
+my $tmpdir = tempdir(CLEANUP => ($ENV{SMOKE_DEBUG} ? 0 : 1));
+my $cdir = File::Spec->catdir($tmpdir, 'origdir');
+my $ddir = File::Spec->catdir($tmpdir, 'perl-current');
+my $curdir = abs_path(File::Spec->curdir);
+
 SETUP: {
-    chdir 't' or plan skip_all => "Cannot chdir 't': $!";
+    chdir $tmpdir or plan skip_all => "Cannot chdir '$tmpdir': $!";
+
     # Make sure they are all gone
     rmtree( $cdir );
+    mkdir $cdir, 0744 or plan skip_all => "Cannot create test-tree: $!";
+    my $subdir = File::Spec->catdir( $cdir, 'win32' );
+    mkdir $subdir, 0744 or plan skip_all => "Cannot create '$subdir': $!";
+
     rmtree( $ddir );
 
-    mkdir $cdir, 0744 or plan skip_all => "Cannot create test-tree: $!";
+    chdir File::Spec->catdir($curdir, 't');
+
     # Copy all *.t files to the new dir
     my $count = 0;
-    foreach my $test ( glob '*.t' ) {
-        $count += File::Copy::copy( $test,
-                                     File::Spec->catfile( $cdir, $test ) );
+    foreach my $test ( glob('*.t') ) {
+        $count += File::Copy::copy($test, File::Spec->catfile($cdir, $test));
     }
     $ENV{SMOKE_VERBOSE} and diag "Copied files ($cdir): $count";
     # Copy the subdir 'win32' also
-    my $subdir = File::Spec->catdir( $cdir, 'win32' );
-    mkdir $subdir, 0744 or plan skip_all => "Cannot create '$subdir': $!";
     local *DIR;
     opendir DIR, 'win32' or plan skip_all => "Cannot opendir 'win32': $!";
     $count = 0;
     while ( my $file = readdir DIR ) {
         -f File::Spec->catfile('win32', $file ) or next;
-        $count += File::Copy::copy( File::Spec->catfile( 'win32', $file ),
-                                    File::Spec->catfile( $subdir, $file ) );
+        $count += File::Copy::copy(
+            File::Spec->catfile('win32', $file),
+            File::Spec->catfile($subdir, $file)
+        );
     }
     closedir DIR;
     $ENV{SMOKE_VERBOSE} and diag "Copied files ($subdir): $count";
@@ -60,14 +67,13 @@ SETUP: {
         plan skip_all => "Cannot create 'MANIFEST': $!";
     print MANIFEST "$_\n" for @MANIFEST;
     close MANIFEST or plan skip_all => "Cannot write 'MANIFEST': $!";
-    chdir File::Spec->updir;
+    chdir $curdir;
 }
 
 plan tests => 8;
 use_ok( 'Test::Smoke::Syncer' );
 require_ok( 'Test::Smoke::SourceTree' );
 
-chdir 't';
 SKIP: {
     my $syncer = Test::Smoke::Syncer->new(
         copy => {
@@ -97,12 +103,4 @@ SKIP: {
     is( $ocnt, 0, "All files seem to be copied" );
     my $dcnt = grep $dest{ $_ } => keys %dest;
     is( $dcnt, 0, "No other files have been added" );
-}
-
-END { 
-    unless ( $ENV{SMOKE_DEBUG} ) {
-      rmtree( $ddir );
-      rmtree( $cdir );
-    }
-    chdir File::Spec->updir;
 }

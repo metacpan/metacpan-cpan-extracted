@@ -5,8 +5,10 @@ NAME
 SYNOPSIS
 
   use UTF8::R2;
-  use UTF8::R2 qw( RFC3629 );
-  use UTF8::R2 qw( RFC2279 );
+  use UTF8::R2 ver.sion;      # match or die
+  use UTF8::R2 qw( RFC3629 ); # m/./ matches RFC3629 codepoint (default)
+  use UTF8::R2 qw( RFC2279 ); # m/./ matches RFC2279 codepoint
+  use UTF8::R2 qw( %mb );     # multibyte regex by %mb
 
 DESCRIPTION
 
@@ -45,9 +47,9 @@ SUBROUTINES
     UTF8::R2::qr(qr/ utf8_regex_here . \D \H \N \R \S \V \W \b \d \h \s \v \w \x{Unicode} [ \D \H \S \V \W \b \d \h \s \v \w \x{Unicode} ] ? + * {n} {n,} {n,m} /imsxogc)
     UTF8::R2::split(qr/$utf8regex/imsxo, $_, 3)
     UTF8::R2::tr($_, 'ABC', 'XYZ', 'cdsr')
-    tie my %utf8r2, 'UTF8::R2';
-      $_ =~ $utf8r2{qr/$utf8regex/imsxogc}
-      $_ =~ s<$utf8r2{qr/before/imsxo}><after>egr
+    use UTF8::R2 qw(%mb);
+      $_ =~ $mb{qr/$utf8regex/imsxogc}
+      $_ =~ s<$mb{qr/before/imsxo}><after>egr
 
   OTHER UTF-8 CODEPOINT FEATURE
     UTF8::R2::chop(@_)

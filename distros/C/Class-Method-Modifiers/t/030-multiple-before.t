@@ -11,7 +11,7 @@ my $child = Child->new; $child->orig;
 is_deeply(\@seen, \@expected, "multiple befores called in the right order");
 
 BEGIN {
-    package Parent;
+    package MyParent;
     sub new { bless {}, shift }
     sub orig
     {
@@ -21,7 +21,7 @@ BEGIN {
 
 BEGIN {
     package Child;
-    our @ISA = 'Parent';
+    our @ISA = 'MyParent';
     use Class::Method::Modifiers;
 
     before orig => sub

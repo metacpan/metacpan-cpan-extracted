@@ -11,7 +11,7 @@ is($words[2], "after");
 
 BEGIN
 {
-    package Parent;
+    package MyParent;
     sub new { bless {}, shift }
     sub orig
     {
@@ -24,7 +24,7 @@ BEGIN
 BEGIN
 {
     package Child;
-    our @ISA = 'Parent';
+    our @ISA = 'MyParent';
     use Class::Method::Modifiers;
 
     around 'orig' => sub

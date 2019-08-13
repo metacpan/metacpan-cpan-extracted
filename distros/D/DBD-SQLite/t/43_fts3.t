@@ -1,13 +1,10 @@
-#!/usr/bin/perl
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
+no if $] >= 5.022, "warnings", "locale";
 use lib "t/lib";
-use SQLiteTest     qw/connect_ok has_sqlite/;
+use SQLiteTest;
 use Test::More;
+use if -d ".git", "Test::FailWarnings";
 use DBD::SQLite;
 
 my @texts = ("il était une bergère",
@@ -28,24 +25,18 @@ my @tests = (
 );
 
 BEGIN {
-	if ($] < 5.008005) {
-		plan skip_all => 'Unicode is not supported before 5.8.5';
+	requires_unicode_support();
+
+	if (!has_fts()) {
+		plan skip_all => 'FTS is disabled for this DBD::SQLite';
 	}
-	if (!grep /ENABLE_FTS3/, DBD::SQLite::compile_options()) {
-		plan skip_all => 'FTS3 is disabled for this DBD::SQLite';
-	}
-	if ($DBD::SQLite::sqlite_version_number >= 3011000 and $DBD::SQLite::sqlite_version_number < 3012000 and !grep /ENABLE_FTS3_TOKENIZER/, DBD::SQLite::compile_options()) {
+	if ($DBD::SQLite::sqlite_version_number >= 3011000 and $DBD::SQLite::sqlite_version_number < 3012000 and !has_compile_option('ENABLE_FTS3_TOKENIZER')) {
 		plan skip_all => 'FTS3 tokenizer is disabled for this DBD::SQLite';
 	}
 }
 
 # Perl may spit a warning on locale
 # use Test::NoWarnings;
-
-my $num = has_sqlite('3.7.4') ? 4 : 2;
-
-plan tests => $num * @tests # each test with unicode y/n and with fts3/fts4
-            + 2;           # connect_ok with unicode y/n
 
 BEGIN {
 	# Sadly perl for windows (and probably sqlite, too) may hang
@@ -56,13 +47,12 @@ BEGIN {
 		setlocale(LC_COLLATE, 'en-us');
 	}
 }
-use locale;
 
+use locale;
 
 sub locale_tokenizer { # see also: Search::Tokenizer
   return sub {
     my $string = shift;
-
     my $regex      = qr/\w+/;
     my $term_index = 0;
 
@@ -75,11 +65,7 @@ sub locale_tokenizer { # see also: Search::Tokenizer
   };
 }
 
-
-
 use DBD::SQLite;
-
-
 
 for my $use_unicode (0, 1) {
 
@@ -88,6 +74,7 @@ for my $use_unicode (0, 1) {
 
   for my $fts (qw/fts3 fts4/) {
     next if $fts eq 'fts4' && !has_sqlite('3.7.4');
+
     # create fts table
     $dbh->do(<<"") or die DBI::errstr;
       CREATE VIRTUAL TABLE try_$fts
@@ -107,9 +94,10 @@ for my $use_unicode (0, 1) {
   SKIP: {
       skip "These tests require SQLite compiled with "
          . "ENABLE_FTS3_PARENTHESIS option", scalar @tests
-        unless DBD::SQLite->can('compile_options') &&
-        grep /ENABLE_FTS3_PARENTHESIS/, DBD::SQLite::compile_options();
+        unless has_compile_option('ENABLE_FTS3_PARENTHESIS');
+
       my $sql = "SELECT docid FROM try_$fts WHERE content MATCH ?";
+
       for my $t (@tests) {
         my ($query, @expected) = @$t;
         @expected = map {$doc_ids[$_]} @expected;
@@ -120,4 +108,4 @@ for my $use_unicode (0, 1) {
   }
 }
 
-
+done_testing;

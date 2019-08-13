@@ -3,7 +3,7 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = '1.153';
+our $VERSION = '1.154';
 
 =encoding utf8
 
@@ -268,6 +268,10 @@ L<Quiq::Html::Base> - Basisklasse für HTML-Komponenten
 
 =item *
 
+L<Quiq::Html::Construct> - Generierung von einfachen Tag-Konstrukten
+
+=item *
+
 L<Quiq::Html::Form::Layout> - HTML-Formular mit freiem Layout
 
 =item *
@@ -289,6 +293,10 @@ L<Quiq::Html::Listing> - Programm-Listing in HTML
 =item *
 
 L<Quiq::Html::Page> - HTML-Seite
+
+=item *
+
+L<Quiq::Html::Producer> - Generierung von HTML-Code
 
 =item *
 
@@ -702,7 +710,7 @@ L<Quiq::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.153
+1.154
 
 =head1 AUTHOR
 

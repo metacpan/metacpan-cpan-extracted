@@ -1,0 +1,27 @@
+---
+abstract: 'use static analysis to compute a "code quality" metric for a program'
+author:
+  - 'Marius Gavrilescu <marius@ieval.ro>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Slurper: '0'
+  String::Escape: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Code-Quality
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Cpanel::JSON::XS: '0'
+  perl: '5.020000'
+resources: {}
+version: '0.001001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

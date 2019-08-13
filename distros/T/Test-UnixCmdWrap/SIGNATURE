@@ -1,0 +1,40 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.83.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA256 bb2bfdf8ed1e959138127dc610cdae11b3a3d879b89fa42cba955ecb2b56925d Build.PL
+SHA256 d18a2623ae2a701abaff6291ee417996d2d01b576fd2ab351e089531d7a1a0eb Changes
+SHA256 db739608563af2d9f1763883315451cc38032cb67bdd42a443bfcc7eef1a49b2 LICENSE
+SHA256 6093b35eea46ddc0d95362915ff4db6c76d391c19dc0faf549aaf4288b97c647 MANIFEST
+SHA256 1130a203219c3e582190fe7f2b4c74b307073bf3610b7ba31e7f520438219c0f META.json
+SHA256 f1bf70f6161daa36e3da4e31563b9adfadf0a86769c20a6f1b0f0a5897d62c24 META.yml
+SHA256 15dfc96ee9acd58639211de0a6b65fc540cbef7a388a3eed3837bd4fc248f3b8 README
+SHA256 65bc0020f8525e7b8fa010fa1e26aaaf73e3551ae77ceb5ae1e80589d5b3df48 alpo
+SHA256 9613ce7843934f97f619483d7f14c224fe7599037f98bd53fc6551bbf379f1d7 alpo2
+SHA256 e0bef67591b53b328681d5de9b9d6c026817b87029f991deeeb14eb2272eb6d9 lib/Test/UnixCmdWrap.pm
+SHA256 2558056b18a007294272477e099793c85da77815961b96d2d3db8a498d048e73 t/00-load.t
+SHA256 295bcedeebd389daf9bb38becd38a12eaddd1de0717129b57e82552be704eca4 t/alpo.t
+SHA256 7c0dee989d98e8145db9e79246557847af6cfd8ad734c2e3a296bdc3ac84349e t/pod-coverage.t
+SHA256 a54f27bd91fd819db4e99b373240cf4c27a753332a9ead32b8ebc7d78ea29d50 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJdUt03AAoJEIGZLuHhLAOFPYUH/iHs7AWLB7HH2g+MDvMHO2iq
+XZe+yZLjY1jI65/WnK7I8Xop8L0f/Z9bn6joGrcduRnyEoL8i6UVjyEwruGghM7o
+aHBzlUlkibsJJCjQnQVj0AA3RQr0cHJ5VPZ9iIZpJvivIILD4chw9gVl+gVv9B8i
+gyEySk3PwCrBnmOghghfIYf3Qh90rNV3onO3biFOyjfEPWzhLeBO2g4UslToQv1O
+zA+74wzo34WyAA4rAp+YGKuwkzM4pBeNI1IVZY/sfNvWKVIs64cdRPI4RabWVD3o
+fUp96/bqBFYywkdE0Y7bbc+EMx+TYY5vUKZqxX+8OSF13BgpPrTIUeLBGtyxRjc=
+=Wv+O
+-----END PGP SIGNATURE-----

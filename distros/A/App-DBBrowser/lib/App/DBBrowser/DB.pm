@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.206';
+our $VERSION = '2.207';
 
 #use bytes; # required
 use Scalar::Util qw( looks_like_number );
@@ -168,7 +168,7 @@ sub tables_data { # not public
     my %duplicates;
     for my $href ( @$info ) {
         next if $href->{TABLE_TYPE} eq 'INDEX';
-        #if ( $href->{TABLE_TYPE} =~ /SYSTEM/ || $href->{TABLE_TYPE} =~ /^(?:TABLE|VIEW|LOCAL TEMPORARY)\z/ ) {
+        next if $href->{TABLE_TYPE} =~ /^SYSTEM/ && ! $sf->{Plugin}{o}{G}{metadata};
         my $table = $href->{$table_name};
         if ( ! defined $schema && $duplicates{$table}++ ) {
             # the $schema is undefined if: SQLite + attached databases
@@ -357,7 +357,7 @@ App::DBBrowser::DB - Database plugin documentation.
 
 =head1 VERSION
 
-Version 2.206
+Version 2.207
 
 =head1 DESCRIPTION
 

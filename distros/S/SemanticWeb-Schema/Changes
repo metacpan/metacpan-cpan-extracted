@@ -1,5 +1,11 @@
 Revision history for SemanticWeb-Schema:
 
+v3.9.0    2019-08-08 16:04:56+01:00 Europe/London
+  [Enhancements]
+  - Updated classes to Version 3.9 of the schema.
+
+  - Include ext-pending in the schema.
+
 v3.8.1    2019-07-14 14:24:23+01:00 Europe/London
   [Other Changes]
   - Classes and POD data is dumped in alphabetical order, to avoid

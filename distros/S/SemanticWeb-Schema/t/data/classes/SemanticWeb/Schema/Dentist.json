@@ -4,9 +4,9 @@
       "rdfs:comment" : "A dentist.",
       "rdfs:label" : "Dentist",
       "rdfs:subClassOf" : [
-         "schema:MedicalBusiness",
          "schema:MedicalOrganization",
-         "schema:LocalBusiness"
+         "schema:LocalBusiness",
+         "schema:MedicalBusiness"
       ]
    },
    "properties" : {}

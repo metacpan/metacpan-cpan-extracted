@@ -1,14 +1,10 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
+no if $] >= 5.022, "warnings", "locale";
 use lib "t/lib";
-use SQLiteTest     qw/connect_ok @CALL_FUNCS/;
+use SQLiteTest;
 use Test::More;
+use if -d ".git", "Test::FailWarnings";
 
 my @words = qw{
 	berger Bergère bergère Bergere
@@ -19,14 +15,7 @@ my @words = qw{
      };
 my @regexes = qw(  ^b\\w+ (?i:^b\\w+) );
 
-BEGIN {
-	if ($] < 5.008005) {
-		plan skip_all => 'Unicode is not supported before 5.8.5';
-	}
-}
-
-plan tests => 2 * (3 + 2 * @regexes) * @CALL_FUNCS;
-
+BEGIN { requires_unicode_support() }
 BEGIN {
 	# Sadly perl for windows (and probably sqlite, too) may hang
 	# if the system locale doesn't support european languages.
@@ -39,8 +28,6 @@ BEGIN {
 use locale;
 
 use DBD::SQLite;
-
-
 
 foreach my $call_func (@CALL_FUNCS) {
 
@@ -92,3 +79,4 @@ foreach my $call_func (@CALL_FUNCS) {
   }
 }
 
+done_testing;

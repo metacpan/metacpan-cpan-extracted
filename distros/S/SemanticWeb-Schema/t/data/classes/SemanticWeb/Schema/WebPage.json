@@ -12,8 +12,8 @@
          "rdfs:label" : "breadcrumb",
          "schema:domainIncludes" : "schema:WebPage",
          "schema:rangeIncludes" : [
-            "schema:BreadcrumbList",
-            "schema:Text"
+            "schema:Text",
+            "schema:BreadcrumbList"
          ]
       },
       "schema:lastReviewed" : {
@@ -80,8 +80,8 @@
             "schema:WebPage"
          ],
          "schema:rangeIncludes" : [
-            "schema:SpeakableSpecification",
-            "schema:URL"
+            "schema:URL",
+            "schema:SpeakableSpecification"
          ]
       },
       "schema:specialty" : {

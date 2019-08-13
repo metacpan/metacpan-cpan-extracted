@@ -6,7 +6,7 @@ package BSON::Array;
 # ABSTRACT: BSON type wrapper for a list of elements
 
 use version;
-our $VERSION = 'v1.12.0';
+our $VERSION = 'v1.12.1';
 
 sub new {
     my ( $class, @args ) = @_;
@@ -25,7 +25,7 @@ BSON::Array - BSON type wrapper for a list of elements
 
 =head1 VERSION
 
-version v1.12.0
+version v1.12.1
 
 =head1 SYNOPSIS
 

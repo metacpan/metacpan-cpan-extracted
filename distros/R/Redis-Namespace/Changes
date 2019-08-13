@@ -1,5 +1,10 @@
 Revision history for Perl extension Redis::Namespace
 
+0.10 2019-08-12T02:32:23Z
+        - support commands of Redis 5.0
+        - add strict option
+        - escape the pattern of KEY, SCAN, PSUBSCRIBE and PUNSUBSCRIBE command
+
 0.09 2019-08-02T12:45:12Z
         - fix failing test with Redis 5 #9
         - shrink cpanfile #11

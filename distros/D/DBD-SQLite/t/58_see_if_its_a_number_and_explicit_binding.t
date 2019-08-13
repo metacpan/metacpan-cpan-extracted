@@ -1,18 +1,10 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest qw/connect_ok/;
 use Test::More;
-use Test::NoWarnings;
+use if -d ".git", "Test::FailWarnings";
 use DBI qw(:sql_types);
-
-plan tests => 9;
 
 # The following is by mje++
 # http://pastebin.com/RkUwwVti
@@ -72,3 +64,5 @@ $sth->bind_param(1, 1, SQL_INTEGER);
 $sth->bind_param(2, $test_value, SQL_VARCHAR);
 $sth->execute;
 my_is($dbh, "prepared insert with provided bound data and type SQL_VARCHAR see_if_its_a_number=0");
+
+done_testing;

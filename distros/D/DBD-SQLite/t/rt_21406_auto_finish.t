@@ -1,15 +1,9 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest;
-use Test::More tests => 11;
-use Test::NoWarnings;
+use Test::More;
+use if -d ".git", "Test::FailWarnings";
 
 SCOPE: {
 	my $dbh = connect_ok( RaiseError => 1 );
@@ -33,3 +27,5 @@ SCOPE: {
 	is_deeply( $sth2->fetchrow_arrayref, [ 'foo', 'bar', 2 ], 'Row 2 ok' );
 	ok( $sth2->finish, '->finish ok' );
 }
+
+done_testing;

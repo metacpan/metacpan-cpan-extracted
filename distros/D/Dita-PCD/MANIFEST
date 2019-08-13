@@ -1,0 +1,9 @@
+Build.PL
+CHANGES
+CONTRIBUTING.md
+lib/Dita/PCD.pm
+MANIFEST			This list of files
+README
+test.pl
+META.yml
+META.json

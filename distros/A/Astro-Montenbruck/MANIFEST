@@ -18,18 +18,25 @@ lib/Astro/Montenbruck/Ephemeris/Planet/Uranus.pm
 lib/Astro/Montenbruck/Ephemeris/Planet/Venus.pm
 lib/Astro/Montenbruck/MathUtils.pm
 lib/Astro/Montenbruck/NutEqu.pm
+lib/Astro/Montenbruck/RiseSet.pm
+lib/Astro/Montenbruck/RiseSet/Constants.pm
+lib/Astro/Montenbruck/RiseSet/RST.pm
+lib/Astro/Montenbruck/RiseSet/Sunset.pm
 lib/Astro/Montenbruck/Time.pm
 lib/Astro/Montenbruck/Time/DeltaT.pm
 lib/Astro/Montenbruck/Time/Sidereal.pm
 LICENSE
+locale.log
 MANIFEST			This list of files
 META.json
 META.yml
 README
 README.md
 script/createdocs.pl
-script/Helpers.pm
+script/lib/Display.pm
+script/lib/Helpers.pm
 script/planpos.pl
+script/riseset.pl
 script/simple_ephem.pl
 script/test_all.pl
 t/00-load.t
@@ -42,5 +49,8 @@ t/15-ephemeris.t
 t/19650201.txt
 t/20-deltat.t
 t/25-nutequ.t
+t/30-sunset.t
+t/35-rst.t
+t/40-riseset.t
 t/pod-coverage.t
 t/pod.t

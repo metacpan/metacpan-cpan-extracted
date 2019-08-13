@@ -1,0 +1,5 @@
+#!/usr/bin/env perl
+#
+# alpo2 - because how do you know that alpo isn't being called?
+
+exit 3;

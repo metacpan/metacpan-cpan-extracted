@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.153';
+our $VERSION = '1.154';
 
 use Quiq::Database::Row::Array;
 use Quiq::Shell;
@@ -731,7 +731,7 @@ sub versionInfo {
 
 # -----------------------------------------------------------------------------
 
-=head3 deleteVersion() - Lösche Repository-Datei
+=head3 deleteVersion() - Lösche höchste Version von Repository-Datei
 
 =head4 Synopsis
 
@@ -782,6 +782,73 @@ sub deleteVersion {
 
 # -----------------------------------------------------------------------------
 
+=head3 deleteAllVersions() - Lösche alle Versionen einer Repository-Datei
+
+=head4 Synopsis
+
+    $output = $scm->deleteAllVersions($repoFile,$backupDir);
+
+=head4 Arguments
+
+=over 4
+
+=item $repoFile
+
+Der Pfad der zu löschenden Repository-Datei.
+
+=item $backupDir
+
+Verzeichnis, in das die Repository-Datei nach dem Löschen der
+letzten Version gesichert wird.
+
+=back
+
+=head4 Returns
+
+Ausgabe des Kommandos (String)
+
+=head4 Description
+
+Lösche alle Versionen der Repository-Datei $repoFile. Dies setzt
+voraus, dass alle Versionen in einem (oder mehreren) Paketen
+auf I<Entwicklung> enthalten sind.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub deleteAllVersions {
+    my ($self,$repoFile,$backupDir) = @_;
+
+    my $p = Quiq::Path->new;
+    
+    if (!$p->exists($backupDir)) {
+        $self->throw(
+            'CASCM-00099: Backup directory does not exist',
+            BackupDir => $backupDir,
+        );
+        
+    }
+
+    my $output;
+    my $tab = $self->findItem($repoFile);
+    for ($tab->rows) {
+        $output .= $self->deleteVersion($repoFile);
+    }
+    my $file = $self->repoFileToFile($repoFile,-sloppy=>1);
+    if ($p->exists($file)) {
+        my ($repoDir) = $p->split($repoFile);
+        $p->copyToDir($file,"$backupDir/$repoDir",
+            -createDir => 1,
+            -move => 1,
+        );
+    }
+
+    return $output;
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 findItem() - Zeige Information über Item an
 
 =head4 Synopsis
@@ -821,39 +888,45 @@ sub findItem {
     my $viewPath = $self->viewPath;
 
     my $tab = $self->runSql("
-        SELECT DISTINCT -- Warum ist hier DISTINCT nötig?
-            itm.itemobjid AS id
-            , SYS_CONNECT_BY_PATH(itm.itemname,'/') AS item_path
-            , itm.itemtype AS item_type
-            , ver.mappedversion AS version
-            , ver.versiondataobjid
-            , pkg.packagename AS package
-            , sta.statename AS state
-        FROM
-            haritems itm
-            JOIN harversions ver
-                ON ver.itemobjid = itm.itemobjid
-            JOIN harpackage pkg
-                ON pkg.packageobjid = ver.packageobjid
-            JOIN harenvironment env
-                ON env.envobjid = pkg.envobjid
-            JOIN harstate sta
-                ON sta.stateobjid = pkg.stateobjid
-            JOIN haritems par
-                ON par.itemobjid = itm.parentobjid
-            JOIN harrepository rep
-                ON rep.repositobjid = itm.repositobjid
-        WHERE
-            env.environmentname = '$projectContext'
-            AND itm.itemname LIKE '%$namePattern%'
-        START WITH
-            itm.itemname = '$viewPath'
-            AND itm.repositobjid = rep.repositobjid
-        CONNECT BY
-            PRIOR itm.itemobjid = itm.parentobjid
-        ORDER BY
-            item_path
-            , TO_NUMBER(ver.mappedversion)
+        SELECT
+            *
+        FROM (
+            SELECT DISTINCT -- Warum ist hier DISTINCT nötig?
+                itm.itemobjid AS id
+                , SYS_CONNECT_BY_PATH(itm.itemname,'/') AS item_path
+                , itm.itemtype AS item_type
+                , ver.mappedversion AS version
+                , ver.versiondataobjid
+                , pkg.packagename AS package
+                , sta.statename AS state
+            FROM
+                haritems itm
+                JOIN harversions ver
+                    ON ver.itemobjid = itm.itemobjid
+                JOIN harpackage pkg
+                    ON pkg.packageobjid = ver.packageobjid
+                JOIN harenvironment env
+                    ON env.envobjid = pkg.envobjid
+                JOIN harstate sta
+                    ON sta.stateobjid = pkg.stateobjid
+                JOIN haritems par
+                    ON par.itemobjid = itm.parentobjid
+                JOIN harrepository rep
+                    ON rep.repositobjid = itm.repositobjid
+            WHERE
+                env.environmentname = '$projectContext'
+                -- AND itm.itemname LIKE '%$namePattern%'
+            START WITH
+                itm.itemname = '$viewPath'
+                AND itm.repositobjid = rep.repositobjid
+            CONNECT BY
+                PRIOR itm.itemobjid = itm.parentobjid
+            ORDER BY
+                item_path
+                , TO_NUMBER(ver.mappedversion)
+         )
+         WHERE
+             item_path LIKE '%$namePattern%'
     ");
 
     # Wir entfernen den Anfang des View-Path,
@@ -963,13 +1036,22 @@ und liefere diesen zurück.
 # -----------------------------------------------------------------------------
 
 sub repoFileToFile {
-    my ($self,$repoFile) = @_;
+    my $self = shift;
 
-    # Vollständigen Pfad der Repository-Datei ermitteln
+    # Optionen und Argumente
+
+    my $sloppy = 0;
+
+    my $argA = $self->parameters(1,1,\@_,
+        -sloppy => \$sloppy,
+    );
+    my $repoFile = shift @$argA;
+
+    # Operation ausführen
 
     my $p = Quiq::Path->new;
     my $file = sprintf '%s/%s',$self->workspace,$repoFile;
-    if (!$p->exists($file)) {
+    if (!$sloppy && !$p->exists($file)) {
         $self->throw(
             'CASCM-00099: Repository file does not exist',
             File => $file,
@@ -1945,7 +2027,7 @@ sub runSql {
 
 =head1 VERSION
 
-1.153
+1.154
 
 =head1 AUTHOR
 

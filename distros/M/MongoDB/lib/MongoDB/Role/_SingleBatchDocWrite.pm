@@ -19,7 +19,7 @@ package MongoDB::Role::_SingleBatchDocWrite;
 # MongoDB interface for database insert/update/delete operations
 
 use version;
-our $VERSION = 'v2.0.3';
+our $VERSION = 'v2.2.0';
 
 use Moo::Role;
 
@@ -30,6 +30,7 @@ use MongoDB::_Constants;
 use MongoDB::_Protocol;
 use MongoDB::_Types qw(
     WriteConcern
+    to_IxHash
 );
 
 use namespace::clean;
@@ -167,12 +168,19 @@ sub _send_write_command {
 
     $self->_apply_session_and_cluster_time( $link, \$cmd );
 
-    # send command and get response document
-    my $command = $self->bson_codec->encode_one( $cmd );
-
-    my ( $op_bson, $request_id ) =
-      MongoDB::_Protocol::write_query( $self->db_name . '.$cmd',
-        $command, undef, 0, -1, undef );
+    my ( $op_bson, $request_id );
+    if ( $link->supports_op_msg ) {
+        $cmd = to_IxHash( $cmd );
+        $cmd->Push( '$db', $self->db_name );
+        ( $op_bson, $request_id ) =
+            MongoDB::_Protocol::write_msg( $self->bson_codec, undef, $cmd );
+    } else {
+        # send command and get response document
+        my $command = $self->bson_codec->encode_one( $cmd );
+        ( $op_bson, $request_id ) =
+          MongoDB::_Protocol::write_query( $self->db_name . '.$cmd',
+            $command, undef, 0, -1, undef );
+    }
 
     if ( length($op_bson) > MAX_BSON_WIRE_SIZE ) {
         # XXX should this become public?
@@ -206,14 +214,13 @@ sub _send_write_command {
     $self->_update_session_and_cluster_time($res);
 
     # Error checking depends on write concern
-    # TODO does this logic get affected by transactions???? Probably?
-
-    if ( $self->write_concern->is_acknowledged ) {
+    if ( $self->_should_use_acknowledged_write ) {
         # errors in the command itself get handled as normal CommandResult
         if ( !$res->{ok} && ( $res->{errmsg} || $res->{'$err'} ) ) {
             return MongoDB::CommandResult->_new(
                 output => $res,
                 address => $link->address,
+                session => $self->session,
             );
         }
 

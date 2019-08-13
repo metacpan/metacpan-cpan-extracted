@@ -1,6 +1,12 @@
 Revision history for App-DBBrowser
 
 
+2.207    2019-08-09
+        - Require App::DBBrowser::Table.
+        - Bugfix in Join: use the right reference to get the driver type.
+        - Update menus in Join.
+        - Join/Union: consider the option 'metadata'.
+
 2.206    2019-07-07
         - Fixed cursor visibility by raising the required Term::Form version.
 

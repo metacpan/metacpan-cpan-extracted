@@ -5,7 +5,7 @@ use strict;
 use DBI   1.57 ();
 use DynaLoader ();
 
-our $VERSION = '1.62';
+our $VERSION = '1.64';
 our @ISA     = 'DynaLoader';
 
 # sqlite_version cache (set in the XS bootstrap)
@@ -61,6 +61,7 @@ sub driver {
         DBD::SQLite::db->install_method('sqlite_create_module');
         DBD::SQLite::db->install_method('sqlite_limit');
         DBD::SQLite::db->install_method('sqlite_db_config');
+        DBD::SQLite::db->install_method('sqlite_get_autocommit');
 
         $methods_are_installed++;
     }
@@ -249,6 +250,16 @@ sub ping {
 
     return 0 if $file && !-f $file;
     return $dbh->FETCH('Active') ? 1 : 0;
+}
+
+sub quote {
+    my ($self, $value, $data_type) = @_;
+    return "NULL" unless defined $value;
+    if ($data_type and $data_type == DBI::SQL_BLOB) {
+        return q(X') . unpack('H*', $value) . q(');
+    }
+    $value =~ s/'/''/g;
+    return "'$value'";
 }
 
 sub get_info {
@@ -1057,7 +1068,7 @@ are limited by the typeless nature of the SQLite database.
 =head1 SQLITE VERSION
 
 DBD::SQLite is usually compiled with a bundled SQLite library
-(SQLite version S<3.26.0> as of this release) for consistency.
+(SQLite version S<3.29.0> as of this release) for consistency.
 However, a different version of SQLite may sometimes be used for
 some reasons like security, or some new experimental features.
 
@@ -1864,7 +1875,8 @@ C<$dbh-E<gt>sqlite_last_insert_rowid()> directly.
 
 =head2 $dbh->sqlite_db_filename()
 
-Retrieve the current (main) database filename. If the database is in-memory or temporary, this returns C<undef>.
+Retrieve the current (main) database filename. If the database is in-memory
+or temporary, this returns an empty string, or C<undef>.
 
 =head2 $dbh->sqlite_busy_timeout()
 
@@ -2344,6 +2356,12 @@ Sets a new run-time limit for the category, and returns the current limit.
 If the new value is a negative number (or omitted), the limit is unchanged
 and just returns the current limit. Category ids (SQLITE_LIMIT_LENGTH,
 SQLITE_LIMIT_VARIABLE_NUMBER, etc) can be imported from DBD::SQLite::Constants. 
+
+=head2 $dbh->sqlite_get_autocommit()
+
+Returns true if the internal SQLite connection is in an autocommit mode.
+This does not always return the same value as C<< $dbh->{AutoCommit} >>.
+This returns false if you explicitly issue a C<<BEGIN>> statement.
 
 =head1 DRIVER FUNCTIONS
 

@@ -1,18 +1,12 @@
-#!/usr/bin/perl
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest qw/connect_ok $sqlite_call requires_sqlite has_sqlite/;
 use Test::More;
 
 BEGIN { requires_sqlite('3.7.4') }
 
-use Test::NoWarnings;
+use if -d ".git", "Test::FailWarnings";
 use FindBin;
 
 our $perl_rows = [
@@ -20,10 +14,6 @@ our $perl_rows = [
   [4, 5, 'six'  ],
   [7, 8, 'nine' ],
 ];
-
-my $tests = 25;
-$tests += 2 * 2 if has_sqlite('3.7.11');
-plan tests => $tests;
 
 my $dbh = connect_ok( RaiseError => 1, AutoCommit => 1 );
 
@@ -45,13 +35,11 @@ is scalar(@$res), 3, "got 3 rows";
 is $res->[0]{a}, 1, 'got 1 in a';
 is $res->[0]{b}, 2, 'got 2 in b';
 
-
 $sql  = "SELECT * FROM vtb WHERE b < 8 ORDER BY a DESC";
 $res = $dbh->selectall_arrayref($sql, {Slice => {}});
 is scalar(@$res), 2, "got 2 rows";
 is $res->[0]{a}, 4, 'got 4 in first a';
 is $res->[1]{a}, 1, 'got 1 in second a';
-
 
 $sql = "SELECT rowid FROM vtb WHERE c = 'six'";
 $res = $dbh->selectall_arrayref($sql, {Slice => {}});
@@ -62,13 +50,11 @@ $sql = "SELECT c FROM vtb WHERE c MATCH 'i' ORDER BY c";
 $res = $dbh->selectcol_arrayref($sql);
 is_deeply $res, [qw/nine six/], $sql;
 
-
 $dbh->do("INSERT INTO vtb(a, b, c) VALUES (11, 22, 33)");
 my $row_id = $dbh->last_insert_id('', '', '', '');
 is $row_id, 3,                            'new rowid is 3';
 is scalar(@$perl_rows), 4,                'perl_rows expanded';
 is_deeply $perl_rows->[-1], [11, 22, 33], 'new row is correct';
-
 
 #======================================================================
 # test the hashref implementation
@@ -84,7 +70,6 @@ $res = $dbh->selectall_arrayref($sql, {Slice => {}});
 is scalar(@$res), 2, "got 2 rows";
 is $res->[0]{a}, 4, 'got 4 in first a';
 is $res->[1]{a}, 1, 'got 1 in second a';
-
 
 #======================================================================
 # test the colref implementation
@@ -110,7 +95,6 @@ $sql = "SELECT a FROM vtb WHERE a IN intarray";
 $res = $dbh->selectcol_arrayref($sql);
 is_deeply $res, [ 1, 7 ], "IN intarray";
 
-
 # same thing with strings
 our $strings = [qw/one two three/];
 ok $dbh->do(<<""), "create vtable strarray";
@@ -129,3 +113,5 @@ is_deeply $res, [ 1 ], "IN strarray";
 $sql = "SELECT a FROM vtb WHERE c IN (SELECT str FROM strarray WHERE str > 'a')";
 $res = $dbh->selectcol_arrayref($sql);
 is_deeply $res, [ 1 ], "IN SELECT FROM strarray";
+
+done_testing;

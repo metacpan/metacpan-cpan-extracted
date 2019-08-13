@@ -10,6 +10,8 @@ eval { Test::RedisServer->new } or plan skip_all => 'redis-server is required in
 
 my $redis_server = Test::RedisServer->new;
 my $redis = Redis->new( $redis_server->connect_info );
+eval { $redis->command_count } or plan skip_all => 'redis-server does not support the COMMAND command';
+
 my $ns = Redis::Namespace->new(redis => $redis, namespace => 'ns');
 
 subtest 'COMMAND COUNT' => sub {

@@ -39,6 +39,7 @@ use File::Spec::Functions qw( :DEFAULT abs2rel rel2abs
                               splitdir splitpath catpath);
 require File::Path;
 use Cwd;
+use Carp;
 
 =item manify_path( $path )
 
@@ -99,7 +100,7 @@ sub get_file {
         @content = <MYFILE>;
         close MYFILE;
     } else {
-        warn "(@{[cwd]})$filename: $!";
+        Carp::carp("(@{[cwd]})$filename: $!");
     }
 
     return wantarray ? @content : join "", @content;

@@ -10,9 +10,4 @@
     </font>
 </p>
 <!--expected-->
-<p>bar 1
-    <font foo="baz">baz 1
-        <font foo="bar">bar 1
-        </font>
-    </font>
-</p>
+<p>bar 1 <font foo="baz">baz 1 <font foo="bar">bar 1 </font> </font> </p>

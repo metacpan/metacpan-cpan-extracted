@@ -109,9 +109,12 @@ perltidy\.(LOG|ERR)
 fatlib/
 cpanfile\.snapshot$
 local/
+lib/SemanticWeb/Schema/CssSelectorType.pm
 lib/SemanticWeb/Schema/DataType.pm
 lib/SemanticWeb/Schema/Float.pm
 lib/SemanticWeb/Schema/Integer.pm
-lib/SemanticWeb/Schema/URL.pm
 lib/SemanticWeb/Schema/MedicalCode.pm
+lib/SemanticWeb/Schema/Text.pm
+lib/SemanticWeb/Schema/URL.pm
+lib/SemanticWeb/Schema/XPathType.pm
 cache/

@@ -18,7 +18,6 @@ use Test::More 0.96;
 use Test::Fatal;
 use JSON::MaybeXS;
 use Path::Tiny 0.054; # basename with suffix
-use Try::Tiny;
 
 use MongoDB;
 use MongoDB::ReadPreference;
@@ -185,7 +184,7 @@ my @uri_tests = (
     [ "mongodb://host/?readPreference=secondary&maxStalenessSeconds=1",   1 ],
     [ "mongodb://host/?maxStalenessSeconds=-1",                           -1 ],
     [ "mongodb://host/?readPreference=primary&maxStalenessSeconds=-1",    -1 ],
-    [ "mongodb://host/?readPreference=secondary&maxStalenessSeconds=0",   undef ],
+    # [ "mongodb://host/?readPreference=secondary&maxStalenessSeconds=0",   undef ],
 );
 
 for my $case (@uri_tests) {
@@ -196,7 +195,8 @@ for my $case (@uri_tests) {
     }
     else {
         eval { MongoDB->connect($uri) };
-        like( $@, qr/max_staleness_seconds/, "$uri is an error" );
+        like( $@, qr/(max_staleness_seconds|maxStalenessSeconds)/,
+            "$uri is an error" );
     }
 }
 

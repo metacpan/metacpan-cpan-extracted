@@ -6,7 +6,7 @@ package BSON::Types;
 # ABSTRACT: Helper functions to wrap BSON type classes
 
 use version;
-our $VERSION = 'v1.12.0';
+our $VERSION = 'v1.12.1';
 
 use base 'Exporter';
 our @EXPORT_OK = qw(
@@ -352,7 +352,7 @@ BSON::Types - Helper functions to wrap BSON type classes
 
 =head1 VERSION
 
-version v1.12.0
+version v1.12.1
 
 =head1 SYNOPSIS
 

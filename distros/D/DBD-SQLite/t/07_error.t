@@ -1,15 +1,9 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest;
-use Test::More tests => 8;
-use Test::NoWarnings;
+use Test::More;
+use if -d ".git", "Test::FailWarnings";
 
 my $dbh = connect_ok( RaiseError => 1, PrintError => 0 );
 eval {
@@ -30,3 +24,5 @@ eval {
 ok($@, 'Statement 2 generated an error');
 is( $DBI::err, 19, '$DBI::err ok' );
 like( $DBI::errstr, qr/column a is not unique|UNIQUE constraint failed/, '$DBI::errstr ok' );
+
+done_testing;

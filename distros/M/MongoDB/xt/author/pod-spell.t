@@ -63,6 +63,7 @@ Examples
 FAILOVER
 Fan
 Filtered
+Finn
 Florian
 Fowler
 Friedman
@@ -95,6 +96,7 @@ Josh
 Joshua
 Juran
 Kamil
+Kempers
 Ken
 Khozov
 Kimball
@@ -150,6 +152,7 @@ Rassi
 ReadConcern
 ReadPreference
 Regexp
+Reis
 ReplicaSetNoPrimary
 ReplicaSetWithPrimary
 Rezic
@@ -178,6 +181,7 @@ Storch
 Stuart
 Sturm
 Systems
+TCP
 TLS
 Tailable
 Thomas
@@ -198,6 +202,7 @@ Uwe
 Vazquez
 Voelker
 Walde
+Wallace
 Wan
 Watt
 Whitney
@@ -233,6 +238,7 @@ _Distinct
 _DropCollection
 _DropDatabase
 _DropIndexes
+_EndTxn
 _Explain
 _FSyncUnlock
 _FindAndDelete
@@ -259,6 +265,7 @@ _SessionPool
 _SessionSupport
 _SingleBatchDocWrite
 _Topology
+_TopologyMonitoring
 _TransactionOptions
 _Types
 _URI
@@ -290,7 +297,6 @@ coffeeshops
 commandName
 connectionId
 contentType
-copydb
 copydbgetnonce
 copydbsaslstart
 createUser
@@ -324,6 +330,7 @@ hupadhyayula
 ilmari
 imsxlu
 intra
+ismaster
 jak
 jason
 jjuran
@@ -332,6 +339,7 @@ journaling
 jstewart
 kallimachos
 kb
+keepalive
 kid
 kind
 kslowikowski
@@ -353,6 +361,7 @@ mongos
 mst
 mulder
 natively
+newDescription
 nigelg
 nightsailer
 nojournal
@@ -365,12 +374,14 @@ ovazquez
 pageview
 pavel
 phaylon
+previousDescription
 primaryPreferred
 proxying
 rafl
 rahul
 rassi
 reconnections
+refaddr
 requestId
 rescan
 retryable
@@ -385,6 +396,7 @@ secondaryPreferred
 sharded
 sindbach
 slaven
+srezic
 ssl
 stevesanbeg
 stevie
@@ -393,6 +405,8 @@ subdocument
 tailable
 tbsliver
 tirkarthi
+topologyId
+toyou1995
 trippable
 trupcheff
 trustno
@@ -403,6 +417,7 @@ upserted
 uwe
 v1
 walde
+wallace
 whjackson
 writeConcern
 wtimeout

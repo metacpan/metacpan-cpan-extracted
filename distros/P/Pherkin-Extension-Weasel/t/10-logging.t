@@ -159,6 +159,7 @@ my $context = Test::BDD::Cucumber::StepContext->new(
     feature => $f,
     scenario => $s,
     step => $step,
+    text => 'step 1',
     verb => 'Given',
     verb_original => 'Given',
     harness => Test::BDD::Cucumber::Harness->new(),

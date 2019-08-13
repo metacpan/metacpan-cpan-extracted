@@ -1,0 +1,55 @@
+---
+abstract: 'Perl client library for the Google CloudTasks API (I<unofficial>).'
+author:
+  - 'egawata (egawa dot takashi at gmail.com)'
+build_requires:
+  MIME::Base64: '0'
+  Test::Deep: '0'
+  Test::Exception: '0'
+  Test::More: '0.98'
+  Time::HiRes: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Google-CloudTasks
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Google::CloudTasks:
+    file: lib/Google/CloudTasks.pm
+    version: '0.01'
+  Google::CloudTasks::Client:
+    file: lib/Google/CloudTasks/Client.pm
+    version: '0.01'
+requires:
+  HTTP::Request: '0'
+  JSON::XS: '0'
+  LWP::UserAgent: '0'
+  Mouse: '0'
+  URI: '0'
+  URI::QueryParam: '0'
+  WWW::Google::Cloud::Auth::ServiceAccount: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/egawata/Google-CloudTasks/issues
+  homepage: https://github.com/egawata/Google-CloudTasks
+  repository: git://github.com/egawata/Google-CloudTasks.git
+version: '0.01'
+x_authority: cpan:EGAWATA
+x_contributors:
+  - 'egawata <egawa.takashi@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -33,7 +33,7 @@ Each YAML file has the following keys:
   - ``description``: The name of the test.
   - ``minServerVersion``: The minimum server version to run this test against. If not present, assume there is no minimum server version.
   - ``maxServerVersion``: Reserved for later use
-  - ``failPoint``: Reserved for later use
+  - ``failPoint``(optional): The configureFailPoint command document to run to configure a fail point on the primary server.
   - ``target``: The entity on which to run the change stream. Valid values are:
   
     - ``collection``: Watch changes on collection ``database_name.collection_name``
@@ -48,7 +48,7 @@ Each YAML file has the following keys:
     - ``database``: Database against which to run the operation
     - ``collection``: Collection against which to run the operation
     - ``name``: Name of the command to run
-    - ``arguments``: Object of arguments for the command (ex: document to insert)
+    - ``arguments`` (optional): Object of arguments for the command (ex: document to insert)
 
   - ``expectations``: Optional list of command-started events in Extended JSON format
   - ``result``: Document with ONE of the following fields:
@@ -104,6 +104,9 @@ For each YAML file, for each element in ``tests``:
   - Drop the database ``database2_name``
   - Create the database ``database_name`` and the collection ``database_name.collection_name``
   - Create the database ``database2_name`` and the collection ``database2_name.collection2_name``
+  - If the the ``failPoint`` field is present, configure the fail point on the primary server. See
+    `Server Fail Point <../../transactions/tests#server-fail-point>`_ in the
+    Transactions spec test documentation for more information.
 
 - Create a new MongoClient ``client``
 - Begin monitoring all APM events for ``client``. (If the driver uses global listeners, filter out all events that do not originate with ``client``). Filter out any "internal" commands (e.g. ``isMaster``)
@@ -118,12 +121,12 @@ For each YAML file, for each element in ``tests``:
 - If there was an error:
 
   - Assert that an error was expected for the test.
-  - Assert that the error MATCHES ``results.error``
+  - Assert that the error MATCHES ``result.error``
 
 - Else:
 
   - Assert that no error was expected for the test
-  - Assert that the changes received from ``changeStream`` MATCH the results in ``results.success``
+  - Assert that the changes received from ``changeStream`` MATCH the results in ``result.success``
 
 - If there are any ``expectations``
 
@@ -146,7 +149,7 @@ Prose Tests
 The following tests have not yet been automated, but MUST still be tested
 
 1. ``ChangeStream`` must continuously track the last seen ``resumeToken``
-2. ``ChangeStream`` will throw an exception if the server response is missing the resume token
+2. ``ChangeStream`` will throw an exception if the server response is missing the resume token (if wire version is < 8, this is a driver-side error; for 8+, this is a server-side error)
 3. ``ChangeStream`` will automatically resume one time on a resumable error (including `not master`) with the initial pipeline and options, except for the addition/update of a ``resumeToken``.
 4. ``ChangeStream`` will not attempt to resume on a server error
 5. ``ChangeStream`` will perform server selection before attempting to resume, using initial ``readPreference``

@@ -1,6 +1,6 @@
 package App::mojopaste;
 
-our $VERSION = '1.00';
+our $VERSION = '1.04';
 
 1;
 
@@ -12,7 +12,7 @@ App::mojopaste - Pastebin application
 
 =head1 VERSION
 
-1.00
+1.04
 
 =head1 DESCRIPTION
 
@@ -110,10 +110,13 @@ L<https://hub.docker.com/r/jhthorsen/mojopaste> for more information.
 Example mojopaste.conf:
 
   {
-    paste_dir     => '/path/to/paste/dir',
+    brand_link    => "index",
+    brand_logo    => "/images/logo.png",
+    brand_text    => "Mojopaste",
+    paste_dir     => "/path/to/paste/dir",
     enable_charts => 1, # default is 0
-    hypnotoad => {
-      listen => ['http://*:8080'],
+    hypnotoad     => {
+      listen => ["http://*:8080"],
     },
   }
 

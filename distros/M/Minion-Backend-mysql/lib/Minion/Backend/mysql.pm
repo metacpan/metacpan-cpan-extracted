@@ -7,12 +7,13 @@ use Mojo::Base 'Minion::Backend';
 use Mojo::IOLoop;
 use Mojo::JSON qw(encode_json decode_json);
 use Mojo::mysql;
+use Scalar::Util qw(blessed);
 use Sys::Hostname 'hostname';
 use Time::Piece ();
 
 has 'mysql';
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 sub dequeue {
   my ($self, $id, $wait, $options) = @_;
@@ -104,14 +105,15 @@ sub enqueue {
 
 sub note {
   my ($self, $id, $merge) = @_;
-  my $job = $self->mysql->db->query(
+  my $db = $self->mysql->db;
+  my $job = $db->query(
     'SELECT notes FROM minion_jobs WHERE id=?', $id,
   )->hash || return 0;
   my $notes = decode_json( $job->{notes} );
   foreach my $key (keys %$merge){
       $notes->{ $key } = $merge->{$key};
   }
-  return !!$self->mysql->db->query(
+  return !!$db->query(
     'UPDATE minion_jobs SET notes = ? WHERE id = ?',
     encode_json( $notes ), $id,
   )->rows;
@@ -142,7 +144,14 @@ sub list_jobs {
   }
 
   my $where = @where ? 'WHERE ' . join( ' AND ', @where ) : '';
-  my $jobs = $self->mysql->db->query(
+
+  my $db = $self->mysql->db;
+
+  # Note: The GROUP BY below only needs minion_jobs.id, child_jobs.parent_id,
+  # and parent_jobs.child_id - the additional redundant columns are just
+  # there to satisfy the ONLY_FULL_GROUP_BY requirement in MySQL strict mode.
+  #
+  my $jobs = $db->query(
     "SELECT
       id, args, attempts,
       UNIX_TIMESTAMP(created) AS created,
@@ -158,6 +167,11 @@ sub list_jobs {
     LEFT JOIN minion_jobs_depends parent_jobs ON minion_jobs.id=parent_jobs.child_id
     $where
     GROUP BY minion_jobs.id, child_jobs.parent_id, parent_jobs.child_id
+           , minion_jobs.args, minion_jobs.attempts, minion_jobs.created,
+             minion_jobs.delayed, minion_jobs.finished, minion_jobs.notes,
+             minion_jobs.priority, minion_jobs.queue, minion_jobs.result,
+             minion_jobs.retried, minion_jobs.retries, minion_jobs.started,
+             minion_jobs.state, minion_jobs.task, minion_jobs.worker
     ORDER BY id DESC
     LIMIT ?
     OFFSET ?", @params, $limit, $offset,
@@ -171,7 +185,7 @@ sub list_jobs {
   #; use Data::Dumper;
   #; say Dumper $jobs;
 
-  my $total = $self->mysql->db->query(
+  my $total = $db->query(
     'SELECT COUNT(*) AS count FROM minion_jobs',
   )->hash->{count};
 
@@ -202,22 +216,24 @@ sub list_workers {
     push @params, @{ $options->{ids} };
   }
 
+  my $db = $self->mysql->db;
+
   my $where = @where ? 'WHERE ' . join ' AND ', @where : '';
   my $sql = "SELECT
     id, UNIX_TIMESTAMP(notified) AS notified, host, pid,
     UNIX_TIMESTAMP(started) AS started, status
   FROM minion_workers $where ORDER BY id DESC LIMIT ? OFFSET ?";
-  my $workers = $self->mysql->db->query($sql, @params, $limit, $offset)
+  my $workers = $db->query($sql, @params, $limit, $offset)
     ->hashes;
 
   # Add jobs to each worker
   my $jobs_sql = q{SELECT id FROM minion_jobs WHERE state='active' AND worker=?};
   $workers->map( sub {
       $_->{status} = decode_json( $_->{status} );
-      $_->{jobs} = $self->mysql->db->query($jobs_sql, $_->{id})->arrays->flatten->to_array
+      $_->{jobs} = $db->query($jobs_sql, $_->{id})->arrays->flatten->to_array
   } );
 
-  my $total = $self->mysql->db->query(
+  my $total = $db->query(
     'SELECT COUNT(*) AS count FROM minion_workers',
   )->hash->{count};
 
@@ -247,9 +263,11 @@ sub list_locks {
       ORDER BY id
       DESC LIMIT ? OFFSET ?";
 
-  my $locks = $self->mysql->db->query($sql, @params, $limit || 0, $offset || 0)->hashes;
+  my $db = $self->mysql->db;
 
-  my $total = $self->mysql->db->query(
+  my $locks = $db->query($sql, @params, $limit || 0, $offset || 0)->hashes;
+
+  my $total = $db->query(
     "SELECT COUNT(name) AS total FROM minion_locks $where", @params
   )->hash->{total};
 
@@ -261,11 +279,17 @@ sub list_locks {
 
 sub new {
   my ( $class, @args ) = @_;
-  if ( ref $args[0] eq 'HASH' ) {
-    @args = %{ $args[0] };
+  my $mysql;
+  if ( @args == 1 && blessed($args[0]) && $args[0]->isa('Mojo::mysql') ) {
+    $mysql = $args[0];
   }
-  my $self = $class->SUPER::new(mysql => Mojo::mysql->new(@args));
-  my $mysql = $self->mysql->max_connections(1);
+  else {
+    if ( ref $args[0] eq 'HASH' ) {
+      @args = %{ $args[0] };
+    }
+    $mysql = Mojo::mysql->new(@args);
+  }
+  my $self = $class->SUPER::new(mysql => $mysql);
   $mysql->migrations->name('minion')->from_data;
   $mysql->once(connection => sub { shift->migrations->migrate });
   return $self;
@@ -330,9 +354,10 @@ sub repair {
 sub reset {
     my $self = shift;
 
-    $self->mysql->db->query("delete from minion_jobs");
-    $self->mysql->db->query("truncate table minion_locks");
-    $self->mysql->db->query("truncate table minion_workers");
+    my $mysql = $self->mysql;
+    $mysql->db->query("delete from minion_jobs");
+    $mysql->db->query("truncate table minion_locks");
+    $mysql->db->query("truncate table minion_workers");
 }
 
 sub lock {
@@ -444,6 +469,11 @@ sub _try {
   my $db = $self->mysql->db;
 
   my $tx = $db->begin;
+
+  # Note: The GROUP BY below only needs job.id - the additional redundant
+  # columns are just there to satisfy the ONLY_FULL_GROUP_BY requirement
+  # in MySQL strict mode.
+  #
   my $job = $tx->db->query(qq{
     SELECT job.id, job.args, job.retries, job.task
     FROM minion_jobs job
@@ -455,6 +485,7 @@ sub _try {
       )
       AND job.queue IN ($qq) AND job.task IN ($qt)
     GROUP BY job.id
+           , job.args, job.created, job.priority, job.retries, job.task
     ORDER BY job.priority DESC, job.created
     LIMIT 1 FOR UPDATE},
    @{ $options->{queues} || ['default']}, @{ $tasks }
@@ -497,14 +528,17 @@ sub _update {
 
 sub broadcast {
   my ($self, $command, $args, $ids) = (shift, shift, shift || [], shift || []);
+
+  my $db = $self->mysql->db;
+
   my $message = encode_json( [ $command, @$args ] );
   if ( !@$ids ) {
     @$ids = map { $_->{id} }
-      @{ $self->mysql->db->query( 'SELECT id FROM minion_workers' )->hashes },
+      @{ $db->query( 'SELECT id FROM minion_workers' )->hashes },
   }
   my $rows = 0;
   for my $id ( @$ids ) {
-    $rows += $self->mysql->db->query(
+    $rows += $db->query(
       'INSERT INTO minion_workers_inbox ( worker_id, message ) VALUES ( ?, ? )',
       $id, $message,
     )->rows;
@@ -515,14 +549,15 @@ sub broadcast {
 sub receive {
   my ($self, $worker_id) = @_;
   #; use Data::Dumper;
-  my $rows = $self->mysql->db->query(
+  my $db = $self->mysql->db;
+  my $rows = $db->query(
     'SELECT id, message FROM minion_workers_inbox WHERE worker_id=?', $worker_id,
   )->hashes;
   return [] unless $rows && @$rows;
   #; say Dumper $rows;
   my @ids = map { $_->{id} } @$rows;
   #; say Dumper \@ids;
-  $self->mysql->db->query(
+  $db->query(
     'DELETE FROM minion_workers_inbox WHERE id IN (' . ( join ", ", ( '?' ) x @ids ) . ')',
     @ids,
   );
@@ -949,7 +984,7 @@ Minion::Backend::mysql
 
 =head1 VERSION
 
-version 0.15
+version 0.16
 
 =head1 SYNOPSIS
 
@@ -1371,7 +1406,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alexander Nalobin Dmitry Krylov Jason A. Crome Olaf Alders Paul Cochrane Zoffix Znet
+=for stopwords Alexander Nalobin Dmitry Krylov Jason A. Crome Larry Leszczynski Olaf Alders Paul Cochrane Zoffix Znet
 
 =over 4
 
@@ -1386,6 +1421,10 @@ Dmitry Krylov <pentabion@gmail.com>
 =item *
 
 Jason A. Crome <jcrome@empoweredbenefits.com>
+
+=item *
+
+Larry Leszczynski <larryl@cpan.org>
 
 =item *
 
@@ -1467,12 +1506,12 @@ ALTER TABLE minion_workers ADD COLUMN status MEDIUMBLOB;
 ALTER TABLE minion_jobs ADD COLUMN notes MEDIUMBLOB;
 CREATE TABLE IF NOT EXISTS minion_locks (
   id      SERIAL NOT NULL PRIMARY KEY,
-  name    VARCHAR(255) NOT NULL,
+  name    VARCHAR(200) NOT NULL,
   expires TIMESTAMP NOT NULL,
   INDEX (name, expires)
 );
 DELIMITER //
-CREATE FUNCTION minion_lock( $1 VARCHAR(255), $2 INTEGER, $3 INTEGER) RETURNS BOOL
+CREATE FUNCTION minion_lock( $1 VARCHAR(200), $2 INTEGER, $3 INTEGER) RETURNS BOOL
 BEGIN
   DECLARE new_expires TIMESTAMP DEFAULT DATE_ADD( NOW(), INTERVAL 1*$2 SECOND );
   DELETE FROM minion_locks WHERE expires < NOW();

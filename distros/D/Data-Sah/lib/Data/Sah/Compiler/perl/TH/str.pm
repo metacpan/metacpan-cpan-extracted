@@ -1,7 +1,7 @@
 package Data::Sah::Compiler::perl::TH::str;
 
-our $DATE = '2019-07-25'; # DATE
-our $VERSION = '0.899'; # VERSION
+our $DATE = '2019-08-12'; # DATE
+our $VERSION = '0.900'; # VERSION
 
 use 5.010;
 use strict;
@@ -31,8 +31,7 @@ sub superclause_comparable {
     if ($which eq 'is') {
         $c->add_ccl($cd, "$dt eq $ct");
     } elsif ($which eq 'in') {
-        $c->add_runtime_smartmatch_pragma($cd);
-        $c->add_ccl($cd, "$dt ~~ $ct");
+        $c->add_ccl($cd, "grep { \$_ eq $dt } \@{ $ct }");
     }
 }
 
@@ -187,7 +186,7 @@ Data::Sah::Compiler::perl::TH::str - perl's type handler for type "str"
 
 =head1 VERSION
 
-This document describes version 0.899 of Data::Sah::Compiler::perl::TH::str (from Perl distribution Data-Sah), released on 2019-07-25.
+This document describes version 0.900 of Data::Sah::Compiler::perl::TH::str (from Perl distribution Data-Sah), released on 2019-08-12.
 
 =for Pod::Coverage ^(clause_.+|superclause_.+)$
 

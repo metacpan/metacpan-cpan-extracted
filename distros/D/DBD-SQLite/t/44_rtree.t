@@ -1,16 +1,15 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest;
 use Test::More;
-use DBD::SQLite;
-use Data::Dumper;
+use if -d ".git", "Test::FailWarnings";
+
+BEGIN {
+	if (!has_compile_option('ENABLE_RTREE')) {
+		plan skip_all => 'RTREE is disabled for this DBD::SQLite';
+	}
+}
 
 # NOTE: It seems to be better to compare rounded values
 # because stored coordinate values may have slight errors
@@ -52,15 +51,6 @@ my @test_results = (
     [1..6],
     [1, 3, 5, 6]
 );
-
-BEGIN {
-	if (!grep /ENABLE_RTREE/, DBD::SQLite::compile_options()) {
-		plan skip_all => 'RTREE is disabled for this DBD::SQLite';
-	}
-}
-use Test::NoWarnings;
-
-plan tests => @coords + (2 * @test_regions)  + 4;
 
 # connect
 my $dbh = connect_ok( RaiseError => 1 );
@@ -112,3 +102,5 @@ for my $region (@test_regions) {
     my $results = $dbh->selectcol_arrayref($overlap_sql, undef, @$region);
     is_deeply_approx($results, shift @test_results);
 }
+
+done_testing;

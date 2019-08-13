@@ -10,7 +10,7 @@ is($child->orig($storage), "before foo", "before affected orig's args a little")
 
 BEGIN
 {
-    package Parent;
+    package MyParent;
     sub new { bless {}, shift }
     sub orig
     {
@@ -22,7 +22,7 @@ BEGIN
 BEGIN
 {
     package Child;
-    our @ISA = 'Parent';
+    our @ISA = 'MyParent';
     use Class::Method::Modifiers;
 
     before 'orig' => sub

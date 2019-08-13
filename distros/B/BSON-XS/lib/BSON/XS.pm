@@ -21,7 +21,7 @@ package BSON::XS;
 # ABSTRACT: XS implementation of MongoDB's BSON serialization
 
 use version;
-our $VERSION = 'v0.8.0';
+our $VERSION = 'v0.8.1';
 
 # cached for efficiency during decoding
 # XXX eventually move this into XS
@@ -51,7 +51,14 @@ BSON::XS - XS implementation of MongoDB's BSON serialization
 
 =head1 VERSION
 
-version v0.8.0
+version v0.8.1
+
+=head1 END OF LIFE NOTICE
+
+Version v0.8.0 is the final feature release of the MongoDB BSON::XS
+library.  The library is now in a 12-month "sunset" period and will
+receive security patches and critical bug fixes only.  The BSON::XS
+library will be end-of-life and unsupported on August 13, 2020.
 
 =head1 DESCRIPTION
 

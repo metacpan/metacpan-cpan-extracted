@@ -51,16 +51,17 @@ my %WriteMakefileArgs = (
     PREREQ_PM     => {
         # Start from "scan-perl-prereqs --pretty lib"
 
-        'Moo'                    => '2.000002',  # bypass the default=>0 + required=>1 bug
-        'CLDR::Number'           => 0,
-        'Types::Standard'        => '1.00',  # sane minimum baseline
-        'Types::Common::Numeric' => 0,
-        'Type::Utils'            => 0,
-        'Data::Float'            => 0,
-        'List::Util'             => '1.33',  # has any/all/etc.
-        'Scalar::Util'           => 0,
-        'Term::ProgressBar'      => '2.14',  # with silent option
-        'namespace::clean'       => 0,
+        'Moo'                     => '2.000002',  # bypass the default=>0 + required=>1 bug
+        'MooX::StrictConstructor' => '0.008',     # sane minimum baseline
+        'CLDR::Number'            => 0,
+        'Types::Standard'         => '1.00',  # sane minimum baseline
+        'Types::Common::Numeric'  => 0,
+        'Type::Utils'             => 0,
+        'Data::Float'             => 0,
+        'List::Util'              => '1.33',  # has any/all/etc.
+        'Scalar::Util'            => 0,
+        'Term::ProgressBar'       => '2.14',  # with silent option
+        'namespace::clean'        => 0,
 
         # not strictly required, but useless without it
         'DBI' => 0,

@@ -1,4 +1,9 @@
 Revision history for File-Open-NoCache-ReadOnly
 
+0.02	Mon 12 Aug 08:39:30 EDT 2019
+	Added the fatal option to new()
+	Aim better for sequential read once
+	Added close() method
+
 0.01	Mon  6 May 10:52:39 EDT 2019
         First release

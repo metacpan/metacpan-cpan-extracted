@@ -1,6 +1,6 @@
 package Bio::Palantir::Roles::Fillable;
 # ABSTRACT: Fillable Moose role for the construction of DomainPlus object arrays and Exploratory methods
-$Bio::Palantir::Roles::Fillable::VERSION = '0.191800';
+$Bio::Palantir::Roles::Fillable::VERSION = '0.192240';
 use Moose::Role;
 
 use autodie;
@@ -167,8 +167,8 @@ sub _elongate_coordinates {
         # gap filling elongation check
         else {
 
-            $start = $gap_coords->[0] if $start <= $gap_coords->[0];
-            $end   = ($gap_coords->[1] - 1) if $end > $gap_coords->[1];            
+            $start = $gap_coords->[0] if $start < $gap_coords->[0];
+            $end   = ($gap_coords->[1] - 1) if $end >= $gap_coords->[1];
         }
 
         my $size = $end - $start + 1;
@@ -474,7 +474,7 @@ sub _parse_generic_domains {
 
     my $tbout = $self->_do_hmmscan($seq, $hmmdb);
 
-    # parsing of  domtblout hmmscan report 
+    # parsing of domtblout hmmscan report 
     my $report = DomTable->new( file => $tbout->filename );
 
     my $ug = Data::UUID->new;
@@ -541,7 +541,7 @@ Bio::Palantir::Roles::Fillable - Fillable Moose role for the construction of Dom
 
 =head1 VERSION
 
-version 0.191800
+version 0.192240
 
 =head1 SYNOPSIS
 

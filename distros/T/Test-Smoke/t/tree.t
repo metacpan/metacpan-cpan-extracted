@@ -1,11 +1,10 @@
 #! /usr/bin/perl -w
 use strict;
 
-# $Id$
-
 use Data::Dumper;
 use File::Spec::Functions qw( :DEFAULT abs2rel rel2abs splitpath splitdir );
 use File::Find;
+use File::Temp 'tempdir';
 use Cwd;
 
 use Test::More tests => 22;
@@ -18,7 +17,7 @@ sub mani_file_from_list($;@) {
     print MANIFEST "$_\n" for grep length $_ => @list;
     close MANIFEST;
 }
-    
+
 sub MANIFEST_from_dir($) {
     my( $path ) = @_;
 
@@ -45,11 +44,11 @@ sub MANIFEST_from_dir($) {
 BEGIN { use_ok( 'Test::Smoke::SourceTree', ':const' ); }
 
 my $cwd = cwd();
-chdir 't' or die "Cannot chdir(t): $!";
-my $path = File::Spec->canonpath( cwd() );
-chdir $cwd;
+my $tmpdir = tempdir(CLEANUP => $ENV{SMOKE_DEBUG} ? 0 : 1);
+my $path = $tmpdir;
+
 {
-    my $tree = Test::Smoke::SourceTree->new( 't' );
+    my $tree = Test::Smoke::SourceTree->new($tmpdir);
     isa_ok( $tree, 'Test::Smoke::SourceTree' );
 
     is( $tree->canonpath, File::Spec->canonpath( $path ) , "canonpath" );
@@ -65,10 +64,10 @@ chdir $cwd;
 }
 
 SKIP: {
-    eval { MANIFEST_from_dir 't' };
+    eval { MANIFEST_from_dir($tmpdir) };
     $@ and skip $@, 3;
 
-    my $tree = Test::Smoke::SourceTree->new( 't' );
+    my $tree = Test::Smoke::SourceTree->new($tmpdir);
     isa_ok( $tree, 'Test::Smoke::SourceTree' );
 
     my $mani_check = $tree->check_MANIFEST;
@@ -83,10 +82,10 @@ SKIP: {
 }
 
 SKIP: { # Check that we can pass extra files to check_MANIFEST()
-    eval { MANIFEST_from_dir 't' };
+    eval { MANIFEST_from_dir($tmpdir) };
     $@ and skip $@, 1;
 
-    my $tree = Test::Smoke::SourceTree->new( 't' );
+    my $tree = Test::Smoke::SourceTree->new($tmpdir);
 
     my $mani_check = $tree->check_MANIFEST( 'does_not_exist' );
 
@@ -98,37 +97,35 @@ SKIP: { # Check that we can pass extra files to check_MANIFEST()
 }
 
 SKIP: { # Check that check_MANIFEST() finds dubious files
-    my $missing = File::Spec->catfile( 't', 'missing' );
+    my $missing = File::Spec->catfile($tmpdir, 'missing');
     $missing = File::Spec->rel2abs( $missing );
     local *FH;
     {
         open FH, "> $missing" or skip "Cannot create '$missing': $!", 3;
         close FH;
     }
-    eval { MANIFEST_from_dir 't' };
+    eval { MANIFEST_from_dir($tmpdir) };
     $@ and skip $@, 3;
     1 while unlink $missing;
-    my $undeclared = File::Spec->catfile( 't', 'undeclared' );
+    my $undeclared = File::Spec->catfile($tmpdir, 'undeclared' );
     $undeclared = File::Spec->rel2abs( $undeclared );
     {
-        open FH, "> $undeclared" or 
-            skip "Cannot create '$undeclared': $!", 3;
+        open FH, "> $undeclared" or skip "Cannot create '$undeclared': $!", 3;
         close FH;
     }
-    my $skipit = File::Spec->catfile( 't', 'skip_it' );
+    my $skipit = File::Spec->catfile($tmpdir, 'skip_it');
     $skipit = File::Spec->rel2abs( $skipit );
     {
-        open FH, "> $skipit" or 
-            skip "Cannot create '$skipit': $!", 3;
+        open FH, "> $skipit" or skip "Cannot create '$skipit': $!", 3;
         close FH;
     }
 
-    my $tree = Test::Smoke::SourceTree->new( 't' );
+    my $tree = Test::Smoke::SourceTree->new($tmpdir);
 
-    my $mani_check = $tree->check_MANIFEST( 'skip_it' );
+    my $mani_check = $tree->check_MANIFEST('skip_it');
 
     is( keys %$mani_check, 2, "Two dubious files" ) or
-        diag Dumper $mani_check;
+        diag(explain($mani_check));
 
     my $check = { undeclared => ST_UNDECLARED, missing => ST_MISSING };
     if ( $Test::Smoke::SourceTree::NOCASE ) {
@@ -152,40 +149,38 @@ SKIP: { # Check that check_MANIFEST() finds dubious files
 }
 
 SKIP: { # Check that check_MANIFEST() finds dubious files with MANIFEST.SKIP
-    my $missing = File::Spec->catfile( 't', 'missing' );
+    my $missing = File::Spec->catfile($tmpdir, 'missing');
     $missing = File::Spec->rel2abs( $missing );
     local *FH;
     {
         open FH, "> $missing" or skip "Cannot create '$missing': $!", 3;
         close FH;
     }
-    eval { MANIFEST_from_dir 't' };
+    eval { MANIFEST_from_dir($tmpdir) };
     $@ and skip $@, 3;
     1 while unlink $missing; # make it missing!
 
-    my $undeclared = File::Spec->catfile( 't', 'undeclared' );
+    my $undeclared = File::Spec->catfile($tmpdir, 'undeclared');
     $undeclared = File::Spec->rel2abs( $undeclared );
     {
-        open FH, "> $undeclared" or 
-            skip "Cannot create '$undeclared': $!", 3;
+        open FH, "> $undeclared" or skip "Cannot create '$undeclared': $!", 3;
         close FH;
     }
-    my $skipit = File::Spec->catfile( 't', 'skip_it' );
+    my $skipit = File::Spec->catfile($tmpdir, 'skip_it' );
     $skipit = File::Spec->rel2abs( $skipit );
     {
-        open FH, "> $skipit" or 
-            skip "Cannot create '$skipit': $!", 3;
+        open FH, "> $skipit" or skip "Cannot create '$skipit': $!", 3;
         close FH;
     }
-    my $mani_skip = File::Spec->catfile( 't', 'MANIFEST.SKIP' );
+    my $mani_skip = File::Spec->catfile($tmpdir, 'MANIFEST.SKIP' );
     mani_file_from_list( $mani_skip, 'skip_it' );
 
-    my $tree = Test::Smoke::SourceTree->new( 't' );
+    my $tree = Test::Smoke::SourceTree->new($tmpdir);
 
     my $mani_check = $tree->check_MANIFEST( );
 
     is( keys %$mani_check, 2, "[MANIFEST.SKIP] Two dubious files" ) or
-        diag Dumper $mani_check;
+        diag(explain($mani_check));
 
     my $check = { undeclared => ST_UNDECLARED, missing => ST_MISSING };
     if ( $Test::Smoke::SourceTree::NOCASE ) {
@@ -210,8 +205,8 @@ SKIP: { # Check that check_MANIFEST() finds dubious files with MANIFEST.SKIP
 }
 
 { #
-    my $tree1 = Test::Smoke::SourceTree->new( 't' );
-    my $tree2 = $tree1->new( 't' );
+    my $tree1 = Test::Smoke::SourceTree->new($tmpdir);
+    my $tree2 = $tree1->new($tmpdir);
     isa_ok $tree2, 'Test::Smoke::SourceTree';
     my $empty = $tree2->_read_mani_file( 'MANIFEST.SKIP', 1 );
     is_deeply $empty, { }, "Return empty hashref [no MANIFEST]";

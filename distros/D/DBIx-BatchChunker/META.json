@@ -4,7 +4,7 @@
       "Grant Street Group <developers@grantstreet.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.32, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -53,6 +53,7 @@
             "Data::Float" : "0",
             "List::Util" : "1.33",
             "Moo" : "2.000002",
+            "MooX::StrictConstructor" : "0.008",
             "Scalar::Util" : "0",
             "Term::ProgressBar" : "2.14",
             "Type::Utils" : "0",
@@ -93,7 +94,7 @@
          "web" : "https://github.com/GrantStreetGroup/DBIx-BatchChunker"
       }
    },
-   "version" : "0.93",
+   "version" : "0.94",
    "x_authority" : "cpan:GSG",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

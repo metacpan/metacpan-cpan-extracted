@@ -18,7 +18,7 @@ our $JD_UNIX_EPOCH = _gmtime2jd(gmtime(0));  # Standard Julian date for the begi
 our %EXPORT_TAGS = (
     all => [
         qw/jd_cent after_gregorian cal2jd jd2cal jd0 unix2jd jd2mjd mjd2jd
-          jd2unix jdnow t1900 jd2lst
+          jd2unix jdnow t1900 jd2gst jd2lst
           $SEC_PER_DAY $SEC_PER_CEN $J2000 $J1900 $GREGORIAN_START $JD_UNIX_EPOCH/
     ],
 );

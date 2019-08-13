@@ -41,8 +41,8 @@
          "rdfs:label" : "confirmationNumber",
          "rdfs:subPropertyOf" : "schema:identifier",
          "schema:domainIncludes" : [
-            "schema:Invoice",
-            "schema:Order"
+            "schema:Order",
+            "schema:Invoice"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -65,8 +65,8 @@
          "rdfs:label" : "discount",
          "schema:domainIncludes" : "schema:Order",
          "schema:rangeIncludes" : [
-            "schema:Number",
-            "schema:Text"
+            "schema:Text",
+            "schema:Number"
          ]
       },
       "schema:discountCode" : {
@@ -116,8 +116,8 @@
          "rdfs:comment" : "The delivery of the parcel related to this order or order item.",
          "rdfs:label" : "orderDelivery",
          "schema:domainIncludes" : [
-            "schema:Order",
-            "schema:OrderItem"
+            "schema:OrderItem",
+            "schema:Order"
          ],
          "schema:rangeIncludes" : "schema:ParcelDelivery"
       },
@@ -141,13 +141,13 @@
          "rdfs:comment" : "The item ordered.",
          "rdfs:label" : "orderedItem",
          "schema:domainIncludes" : [
-            "schema:OrderItem",
-            "schema:Order"
+            "schema:Order",
+            "schema:OrderItem"
          ],
          "schema:rangeIncludes" : [
-            "schema:Service",
             "schema:Product",
-            "schema:OrderItem"
+            "schema:OrderItem",
+            "schema:Service"
          ]
       },
       "schema:partOfInvoice" : {
@@ -173,8 +173,8 @@
          "rdfs:comment" : "The date that payment is due.",
          "rdfs:label" : "paymentDueDate",
          "schema:domainIncludes" : [
-            "schema:Order",
-            "schema:Invoice"
+            "schema:Invoice",
+            "schema:Order"
          ],
          "schema:rangeIncludes" : [
             "schema:Date",
@@ -196,8 +196,8 @@
          "rdfs:comment" : "An identifier for the method of payment used (e.g. the last 4 digits of the credit card).",
          "rdfs:label" : "paymentMethodId",
          "schema:domainIncludes" : [
-            "schema:Invoice",
-            "schema:Order"
+            "schema:Order",
+            "schema:Invoice"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -214,15 +214,15 @@
          "rdfs:label" : "seller",
          "rdfs:subPropertyOf" : "schema:participant",
          "schema:domainIncludes" : [
-            "schema:Order",
-            "schema:Demand",
+            "schema:BuyAction",
             "schema:Offer",
+            "schema:Demand",
             "schema:Flight",
-            "schema:BuyAction"
+            "schema:Order"
          ],
          "schema:rangeIncludes" : [
-            "schema:Person",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Person"
          ]
       }
    }

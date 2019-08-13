@@ -15,8 +15,8 @@
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:AnatomicalStructure",
          "schema:supersededBy" : [
-            "schema:veinBranch",
             "schema:nerveBranch",
+            "schema:veinBranch",
             "schema:arterialBranch"
          ]
       },
@@ -35,8 +35,8 @@
          "schema:domainIncludes" : "schema:Nerve",
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
-            "schema:AnatomicalStructure",
-            "schema:SuperficialAnatomy"
+            "schema:SuperficialAnatomy",
+            "schema:AnatomicalStructure"
          ]
       },
       "schema:sourcedFrom" : {

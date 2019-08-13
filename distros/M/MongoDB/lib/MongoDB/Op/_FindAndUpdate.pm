@@ -19,7 +19,7 @@ package MongoDB::Op::_FindAndUpdate;
 # Encapsulate find_and_update operation; atomically update and return doc
 
 use version;
-our $VERSION = 'v2.0.3';
+our $VERSION = 'v2.2.0';
 
 use Moo;
 
@@ -28,8 +28,9 @@ use MongoDB::Op::_Command;
 use Types::Standard qw(
     HashRef
 );
-use Try::Tiny;
-
+use MongoDB::_Types qw(
+    Boolish
+);
 use namespace::clean;
 
 has filter => (
@@ -41,7 +42,6 @@ has filter => (
 has modifier => (
     is       => 'ro',
     required => 1,
-    isa      => HashRef,
 );
 
 has options => (
@@ -50,11 +50,18 @@ has options => (
     isa      => HashRef,
 );
 
+has is_replace => (
+    is       => 'ro',
+    required => 1,
+    isa      => Boolish,
+);
+
 with $_ for qw(
   MongoDB::Role::_PrivateConstructor
   MongoDB::Role::_CollectionOp
   MongoDB::Role::_WriteOp
   MongoDB::Role::_BypassValidation
+  MongoDB::Role::_UpdatePreEncoder
 );
 
 sub execute {
@@ -70,7 +77,11 @@ sub execute {
         [
             findAndModify => $self->coll_name,
             query         => $self->filter,
-            update        => $self->modifier,
+            update        => $self->_pre_encode_update(
+                $link->max_bson_object_size,
+                $self->modifier,
+                $self->is_replace,
+            ),
             (
                 $link->supports_find_modify_write_concern
                 ? ( @{ $self->write_concern->as_args } )
@@ -93,15 +104,16 @@ sub execute {
     # XXX more special error handling that will be a problem for
     # command monitoring
     my $result;
-    try {
+    eval {
         $result = $op->execute( $link, $topology );
         $result = $result->{output};
-    }
-    catch {
-        die $_ unless $_ eq 'No matching object found';
+        1;
+    } or do {
+        my $error = $@ || "Unknown error";
+        die $error unless $error eq 'No matching object found';
     };
 
-    # findAndModify returns ok:1 even for write concern errors, so 
+    # findAndModify returns ok:1 even for write concern errors, so
     # we must check and throw explicitly
     if ( $result->{writeConcernError} ) {
         MongoDB::WriteConcernError->throw(

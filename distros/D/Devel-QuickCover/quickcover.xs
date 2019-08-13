@@ -1,12 +1,10 @@
-#define PERL_NO_GET_CONTEXT     /* we want efficiency */
-#include "EXTERN.h"
-#include "perl.h"
-#include "XSUB.h"
-#include "ppport.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+
+#define PERL_NO_GET_CONTEXT     /* we want efficiency */
+#include <XSUB.h>
+
 #include "glog.h"
 #include "gmem.h"
 #include "cover.h"

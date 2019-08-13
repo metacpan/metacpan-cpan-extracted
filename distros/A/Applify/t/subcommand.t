@@ -121,6 +121,9 @@ options:
 
    --help        Print this help text
 
+Notes:
+ * denotes a required option
+ + denotes an option that accepts multiple values
 HERE
 
 }
@@ -148,6 +151,9 @@ options:
 
    --help        Print this help text
 
+Notes:
+ * denotes a required option
+ + denotes an option that accepts multiple values
 HERE
 
 }

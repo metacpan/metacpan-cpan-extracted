@@ -2,15 +2,17 @@ package Mojolicious::Plugin::Log::Any;
 
 use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION = '0.005';
+our $VERSION = 'v1.0.0';
 
 sub register {
   my ($self, $app, $conf) = @_;
   
-  my $logger = $conf->{logger} // 'Log::Any';
+  my $logger = delete $conf->{logger} // 'Log::Any';
+  my %opt = %$conf;
+  $opt{category} //= ref $app;
   
   $app->log->with_roles('Mojo::Log::Role::AttachLogger')->level('debug')
-    ->unsubscribe('message')->attach_logger($logger, ref($app));
+    ->unsubscribe('message')->attach_logger($logger, \%opt);
 }
 
 1;
@@ -98,6 +100,15 @@ Register logger in L<Mojolicious> application. Takes the following options:
 
 Logging framework or object to pass log messages to, of a type recognized by
 L<Mojo::Log::Role::AttachLogger/"attach_logger">. Defaults to C<Log::Any>.
+
+=item category
+
+Passed through to L<Mojo::Log::Role::AttachLogger/"attach_logger">. Defaults to
+the application name.
+
+=item prepend_level
+
+Passed through to L<Mojo::Log::Role::AttachLogger/"attach_logger">.
 
 =back
 

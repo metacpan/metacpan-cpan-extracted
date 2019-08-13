@@ -1,0 +1,54 @@
+{
+   "class" : {
+      "dc:source" : "schemadotorgsources2:FundInfoCollab",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A monetary grant.",
+      "rdfs:label" : "MonetaryGrant",
+      "rdfs:subClassOf" : "schema:Grant",
+      "schema:category" : "issue-383",
+      "schema:isPartOf" : "http:pending.schema.org"
+   },
+   "properties" : {
+      "schema:amount" : {
+         "dc:source" : [
+            "https://github.com/schemaorg/schemaorg/issues/1698",
+            "https://github.com/schemaorg/schemaorg/issues/1253"
+         ],
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The amount of money.",
+         "rdfs:label" : "amount",
+         "schema:category" : [
+            "issue-1698",
+            "issue-1253"
+         ],
+         "schema:domainIncludes" : [
+            "schema:InvestmentOrDeposit",
+            "schema:MonetaryGrant",
+            "schema:DatedMoneySpecification",
+            "schema:LoanOrCredit",
+            "schema:MoneyTransfer"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:MonetaryAmount",
+            "schema:Number"
+         ]
+      },
+      "schema:funder" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A person or organization that supports (sponsors) something through some kind of financial contribution.",
+         "rdfs:label" : "funder",
+         "rdfs:subPropertyOf" : "schema:sponsor",
+         "schema:domainIncludes" : [
+            "schema:Organization",
+            "schema:MonetaryGrant",
+            "schema:Person",
+            "schema:Event",
+            "schema:CreativeWork"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Person",
+            "schema:Organization"
+         ]
+      }
+   }
+}

@@ -1,11 +1,5 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest;
 use Test::More;
@@ -17,9 +11,7 @@ BEGIN {
 		unless $ENV{TEST_DBD_SQLITE_WITH_DEBUGGER};
 }
 
-use Test::NoWarnings;
-
-plan tests => 2;
+use if -d ".git", "Test::FailWarnings";
 
 my $file = 't/panic.pl';
 open my $fh, '>', $file;
@@ -37,6 +29,8 @@ END {
 	unlink $file if $file && -f $file;
 	unlink 'test.db' if -f 'test.db';
 }
+
+done_testing;
 
 __DATA__
 use strict;
@@ -60,4 +54,3 @@ $sth->execute;
 
 # XXX: Panic occurs here when running under the debugger
 $dbh->commit or die $dbh->errstr;
-

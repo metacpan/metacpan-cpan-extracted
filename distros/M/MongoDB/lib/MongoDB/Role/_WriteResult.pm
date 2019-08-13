@@ -19,7 +19,7 @@ package MongoDB::Role::_WriteResult;
 # MongoDB interface for common write result attributes and methods
 
 use version;
-our $VERSION = 'v2.0.3';
+our $VERSION = 'v2.2.0';
 
 use Moo::Role;
 
@@ -39,7 +39,7 @@ has [qw/write_errors write_concern_errors/] => (
 
 with 'MongoDB::Role::_DatabaseErrorThrower';
 
-sub acknowledged() { 1 }; # override to 0 for MongoDB::UnacknowledgedResult
+sub acknowledged { 1 }; # override to 0 for MongoDB::UnacknowledgedResult
 
 # inline assert_no_write_error and assert_no_write_concern rather
 # than having to make to additional method calls

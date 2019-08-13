@@ -1,48 +1,47 @@
 Source: analizo
 Section: devel
 Priority: optional
-Maintainer: Joenio Marques da Costa <joenio@joenio.me>
+Maintainer: Joenio Costa <joenio@joenio.me>
 Build-Depends: debhelper (>= 10)
-Build-Depends-Indep: libfile-share-perl,
- libgit-wrapper-perl,
+Build-Depends-Indep: libgit-wrapper-perl,
  libfile-sharedir-perl,
  liblist-moreutils-perl,
  libterm-ui-perl,
+ libfile-share-perl,
+ libtest-mockobject-perl,
  libtest-bdd-cucumber-perl,
  libfile-slurp-perl,
- libarchive-extract-perl,
- libfile-libmagic-perl,
- libtest-mockobject-perl,
  libtest-mockmodule-perl,
+ libfile-libmagic-perl,
+ libtest-class-perl,
  libtest-exception-perl,
- libtest-class-perl
+ libarchive-extract-perl
 Standards-Version: 4.1.2
 Homepage: http://analizo.org
 
 Package: analizo
 Architecture: all
 Depends: ${misc:Depends}, ${perl:Depends}, libapp-cmd-perl,
- libjson-perl,
- libmojolicious-perl,
- libclass-inspector-perl,
- libgraph-perl,
- libzmq-ffi-perl,
- libterm-progressbar-perl,
- libclass-accessor-perl,
- libgraph-writer-dsm-perl,
- libenv-path-perl,
- libdbi-perl,
- libyaml-libyaml-perl,
- libfile-copy-recursive-perl,
- liblocal-lib-perl,
- libyaml-perl,
- libfindbin-libs-perl,
- libdbd-sqlite3-perl,
- libchi-perl,
- libapp-cmd-perl,
- libfile-homedir-perl,
- liblist-compare-perl,
  libstatistics-descriptive-perl,
+ libenv-path-perl,
+ libjson-perl,
+ libgraph-readwrite-perl,
+ libfindbin-libs-perl,
+ libclass-inspector-perl,
+ libyaml-libyaml-perl,
+ liblist-compare-perl,
+ libfile-homedir-perl,
+ libapp-cmd-perl,
+ libfile-copy-recursive-perl,
+ libzmq-ffi-perl,
+ libclass-accessor-perl,
+ libchi-perl,
+ libyaml-perl,
+ libgraph-perl,
+ libterm-progressbar-perl,
+ libdbd-sqlite3-perl,
+ liblocal-lib-perl,
+ libdbi-perl,
  doxyparse
 Recommends: graphviz, man
 Description: multi-language source code analysis toolkit

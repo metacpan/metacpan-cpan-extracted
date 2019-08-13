@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.8.1';
+our $VERSION = 'v3.9.0';
 
 
 has author => (
@@ -30,6 +30,14 @@ has best_rating => (
     is        => 'rw',
     predicate => 1,
     json_ld   => 'bestRating',
+);
+
+
+
+has rating_explanation => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'ratingExplanation',
 );
 
 
@@ -74,7 +82,7 @@ SemanticWeb::Schema::Rating - A rating is an evaluation on a numeric scale
 
 =head1 VERSION
 
-version v3.8.1
+version v3.9.0
 
 =head1 DESCRIPTION
 
@@ -110,6 +118,24 @@ A best_rating should be one of the following types:
 =over
 
 =item C<Num>
+
+=item C<Str>
+
+=back
+
+=head2 C<rating_explanation>
+
+C<ratingExplanation>
+
+=for html A short explanation (e.g. one to two sentences) providing background
+context and other information that led to the conclusion expressed in the
+rating. This is particularly applicable to ratings associated with "fact
+check" markup using <a class="localLink"
+href="http://schema.org/ClaimReview">ClaimReview</a>.
+
+A rating_explanation should be one of the following types:
+
+=over
 
 =item C<Str>
 

@@ -7,11 +7,10 @@ BEGIN {
     $lib = 't/Factory';
     mkpath("$lib/JSON", $ENV{TEST_VERBOSE});
 }
-use lib 'lib/inc';
 use lib $lib;
 
 # Do not import, it will find installed JSON::PP/XS :(
-use JSON ();
+use Test::Smoke::Util::LoadAJSON ();
 
 # Preload modules before we mess with @INC
 require Data::Dumper;  # Test::More::explain()
@@ -36,7 +35,11 @@ sub decode_json { return __PACKAGE__ . "\::decode_json()"; }
 );
 
 {
-    like($INC{'JSON.pm'}, qr{(?:^|/)inc/}, "Loaded the correct JSON.pm");
+    like(
+        $INC{'Test/Smoke/Util/LoadAJSON.pm'},
+        qr{LoadAJSON\.pm},
+        "Loaded the correct JSON-factory"
+    );
 }
 
 {
@@ -53,8 +56,8 @@ sub decode_json { return __PACKAGE__ . "\::decode_json()"; }
 
     delete($INC{'JSON.pm'}); reset 'JSON';
     local @INC = ('inc', $lib);
-    JSON->import();
-    my $obj = JSON->new;
+    Test::Smoke::Util::LoadAJSON->import();
+    my $obj = Test::Smoke::Util::LoadAJSON->new;
     isa_ok($obj, 'JSON::PP');
 
     is(encode_json(), 'JSON::PP::encode_json()', "JSON::PP::encode_json()");
@@ -86,8 +89,8 @@ sub decode_json { return __PACKAGE__ . "\::decode_json()"; }
 
     delete($INC{'JSON.pm'});
     local @INC = ('inc', $lib);
-    JSON->import();
-    my $obj = JSON->new;
+    Test::Smoke::Util::LoadAJSON->import();
+    my $obj = Test::Smoke::Util::LoadAJSON->new;
     isa_ok($obj, 'JSON::XS');
 
     is(encode_json(), 'JSON::XS::encode_json()', "JSON::XS::encode_json()");

@@ -1,14 +1,9 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
-use Test::More tests => 21;
+use warnings;
+use Test::More;
 use lib "t/lib";
 use SQLiteTest;
+use if -d ".git", "Test::FailWarnings";
 
 # 1-4. Connect & create tables
 my $dbh = connect_ok(dbfile => 'foo');
@@ -58,3 +53,4 @@ isnt $types->[1], 'CHAR(1)', '$sth->{TYPE}[1] doesn\'t return a string';
 like $types->[0], qr/^-?\d+$/, '$sth->{TYPE}[0] returns an integer';
 like $types->[1], qr/^-?\d+$/, '$sth->{TYPE}[1] returns an integer';
 
+done_testing;

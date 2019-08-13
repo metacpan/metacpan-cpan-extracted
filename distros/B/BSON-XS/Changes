@@ -1,5 +1,14 @@
 Revision history for BSON-XS
 
+v0.8.1    2019-08-13 08:19:37-04:00 America/New_York
+
+  [!!! END OF LIFE NOTICE !!!]
+
+    - Version v0.8.0 is the final feature release of the MongoDB BSON::XS
+      library.  The library is now in a 12-month "sunset" period and will
+      receive security patches and critical bug fixes only.  The BSON::XS
+      library will be end-of-life and unsupported on August 13, 2020.
+
 v0.8.0    2019-07-12 13:57:20-04:00 America/New_York
 
     [Added]

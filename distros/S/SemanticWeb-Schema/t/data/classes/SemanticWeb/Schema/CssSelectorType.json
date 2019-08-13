@@ -1,0 +1,12 @@
+{
+   "class" : {
+      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1672",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Text representing a CSS selector.",
+      "rdfs:label" : "CssSelectorType",
+      "rdfs:subClassOf" : "schema:Text",
+      "schema:category" : "issue-1672",
+      "schema:isPartOf" : "http:pending.schema.org"
+   },
+   "properties" : {}
+}

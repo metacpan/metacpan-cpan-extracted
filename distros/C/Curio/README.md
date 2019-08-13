@@ -19,6 +19,9 @@ use strictures 2;
 does_caching;
 cache_per_process;
 export_function_name 'myapp_cache';
+always_export;
+export_resource;
+resource_method_name 'chi';
 
 add_key geo_ip => (
     chi => {
@@ -43,9 +46,9 @@ has chi => (
 Then use your new Curio class elsewhere:
 
 ```perl
-use MyApp::Service::Cache qw( myapp_cache );
+use MyApp::Service::Cache;
 
-my $chi = myapp_cache('geo_ip')->chi();
+my $chi = myapp_cache('geo_ip');
 ```
 
 # DESCRIPTION
@@ -135,8 +138,8 @@ Which is exactly the same as:
 use Moo;
 use Curio::Declare;
 use namespace::clean;
-with 'Curio::Role';
-__PACKAGE__->initialize();
+BEGIN { with 'Curio::Role' }
+BEGIN { __PACKAGE__->initialize() }
 ```
 
 If you're not into the declarative interface, or have some other

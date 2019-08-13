@@ -1,0 +1,37 @@
+---
+abstract: 'Report failure if a TODO test unexpectedly passes'
+author:
+  - 'Grant Street Group <developers@grantstreet.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test2::Bundle::Extended: '0'
+  Test2::Tools::Compare: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test2-Plugin-TodoFailOnSuccess
+provides:
+  Test2::Plugin::TodoFailOnSuccess:
+    file: lib/Test2/Plugin/TodoFailOnSuccess.pm
+    version: v0.0.1
+requires:
+  Devel::Cover: '0'
+  Test2::API: '0'
+resources:
+  bugtracker: https://github.com/GrantStreetGroup/Test2-Plugin-TodoFailOnSuccess/issues
+  repository: git://github.com/GrantStreetGroup/Test2-Plugin-TodoFailOnSuccess.git
+version: 0.0.1
+x_contributors:
+  - 'Larry Leszczynski <Larry.Leszczynski@GrantStreet.com>'
+x_generated_by_perl: v5.18.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_static_install: 1

@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/BencherUtils/list_bencher_results
-# and generated automatically using Perinci::CmdLine::Gen version 0.485
+# and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2018-04-03'; # DATE
+our $DATE = '2019-08-08'; # DATE
 our $DIST = 'App-BencherUtils'; # DIST
-our $VERSION = '0.241'; # VERSION
+our $VERSION = '0.242'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ list-bencher-results - List results in results directory
 
 =head1 VERSION
 
-This document describes version 0.241 of list-bencher-results (from Perl distribution App-BencherUtils), released on 2018-04-03.
+This document describes version 0.242 of list-bencher-results (from Perl distribution App-BencherUtils), released on 2019-08-08.
 
 =head1 SYNOPSIS
 
@@ -99,17 +99,15 @@ Directory to store results files in.
 
 =over
 
-=item B<--config-path>=I<filename>
+=item B<--config-path>=I<s>, B<-c>
 
 Set path to configuration file.
 
-Can be specified multiple times.
-
-=item B<--config-profile>=I<s>
+=item B<--config-profile>=I<s>, B<-P>
 
 Set configuration profile to use.
 
-=item B<--no-config>
+=item B<--no-config>, B<-C>
 
 Do not use any configuration file.
 
@@ -321,7 +319,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

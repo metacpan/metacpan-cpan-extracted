@@ -1,0 +1,6 @@
+-selfrender=1
+-indent='   '
+<p>foo</p><p>bar</p>
+<!--expected-->
+<p>foo</p>
+<p>bar</p>

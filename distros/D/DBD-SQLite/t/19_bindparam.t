@@ -1,15 +1,9 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest;
-use Test::More tests => 39;
-use Test::NoWarnings;
+use Test::More;
+use if -d ".git", "Test::FailWarnings";
 use DBI ':sql_types';
 
 # Create a database
@@ -87,3 +81,5 @@ SCOPE: {
 	is( $id,   6,   'id = 6'   );
 	is( $name, 'Larry', 'name = Larry' );
 }
+
+done_testing;

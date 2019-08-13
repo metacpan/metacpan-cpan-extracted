@@ -1,24 +1,31 @@
-0.241   2018-04-03 (PERLANCAR)
+0.242   2019-08-08  Released-By: PERLANCAR; Urgency: high
+
+	- No functional changes.
+
+	- Adjust to renamed dep: Data::Clean::JSON -> Data::Clean::ForJSON.
+
+
+0.241   2018-04-03  Released-By: PERLANCAR
 
 	- bencher-module-startup-overhead: Allow imports.
 
 
-0.240   2018-02-18 (PERLANCAR)
+0.240   2018-02-18  Released-By: PERLANCAR
 
 	- Add utility: bencher-for.
 
 
-0.23    2017-08-02 (PERLANCAR)
+0.23    2017-08-02  Released-By: PERLANCAR
 
 	- bencher-code: Tweak Rinci metadata.
 
 
-0.22    2017-07-13 (PERLANCAR)
+0.22    2017-07-13  Released-By: PERLANCAR
 
 	- bencher-code: Add --precision option.
 
 
-0.21    2017-07-13 (PERLANCAR)
+0.21    2017-07-13  Released-By: PERLANCAR
 
 	- Add --without-process-size option to bencher-code &
 	  bencher-module-startup-overhead.
@@ -27,14 +34,14 @@
           overhead mode.
 
 
-0.20    2017-06-20 (PERLANCAR)
+0.20    2017-06-20  Released-By: PERLANCAR
 
 	- Add utility: bencher-code.
 
         - Switch from Log::Any to Log::ger.
 
 
-0.19    2016-10-27 (PERLANCAR)
+0.19    2016-10-27  Released-By: PERLANCAR
 
 	- Add utility: bencher-module-startup-overhead.
 
@@ -44,29 +51,29 @@
 	  'participant_types'.
 
 
-0.18    2016-10-20 (PERLANCAR)
+0.18    2016-10-20  Released-By: PERLANCAR
 
         - list-bencher-scenario-modules: Accept --detail (-l) to show detail of
           each scenario module.
 
 
-0.17    2016-07-13 (PERLANCAR)
+0.17    2016-07-13  Released-By: PERLANCAR
 
 	- Add utility: chart-bencher-result.
 
 
-0.16    2016-07-13 (PERLANCAR)
+0.16    2016-07-13  Released-By: PERLANCAR
 
 	- Add utility: format-bencher-result.
 
 
-0.15    2016-06-26 (PERLANCAR)
+0.15    2016-06-26  Released-By: PERLANCAR
 
 	- Avoid a couple more of undef warnings when a bench result doesn't
 	  have meta (cpu).
 
 
-0.14    2016-06-23 (PERLANCAR)
+0.14    2016-06-23  Released-By: PERLANCAR
 
 	- cleanup-old-bencher-results: add --num-keep option.
 
@@ -76,12 +83,12 @@
 	- Avoid 'once' warning.
 
 
-0.13    2016-06-23 (PERLANCAR)
+0.13    2016-06-23  Released-By: PERLANCAR
 
 	- Add utility: cleanup-old-bencher-results.
 
 
-0.12    2016-05-24 (PERLANCAR)
+0.12    2016-05-24  Released-By: PERLANCAR
 
 	- [Removed] Remove bencher-all and bencher-all-under-lib, now that
 	  bencher can also save result to JSON file (--save-result),
@@ -94,57 +101,57 @@
 	- [Bugfix] We should clean first, then encode to JSON.
 
 
-0.11    2016-03-15 (PERLANCAR)
+0.11    2016-03-15  Released-By: PERLANCAR
 
 	- Adjust to Bencher 0.38 (backend split to Bencher::Backend).
 
 
-0.10    2016-03-10 (PERLANCAR)
+0.10    2016-03-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace JSON with JSON::MaybeXS.
 
 
-0.09    2016-01-22 (PERLANCAR)
+0.09    2016-01-22  Released-By: PERLANCAR
 
 	- [Bugfix] list-bencher-results: Forgot to adjust to Bencher 0.30+
 	  (format_result() now returns formatted string) causing --fmt to
 	  break.
 
 
-0.08    2016-01-22 (PERLANCAR)
+0.08    2016-01-22  Released-By: PERLANCAR
 
 	- [Bugfix] Forgot to pass note to bencher, derp.
 
 
-0.07    2016-01-22 (PERLANCAR)
+0.07    2016-01-22  Released-By: PERLANCAR
 
 	- bencher-all: Add option --note (passed to bencher).
 
 
-0.06    2016-01-21 (PERLANCAR)
+0.06    2016-01-21  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [build] Rebuild to fix POD (related to multiple config filenames).
 
 
-0.05    2016-01-20 (PERLANCAR)
+0.05    2016-01-20  Released-By: PERLANCAR
 
 	- Clean JSON so it's safe to write to file.
 
 	- list-bencher-reulsts: Add a couple of examples.
 
 
-0.04    2016-01-11 (PERLANCAR)
+0.04    2016-01-11  Released-By: PERLANCAR
 
 	- list-bencher-results: Add option --latest (and --no-latest too).
 
 	- Normalize Module/SubModule into Module::SubModule.
 
 
-0.03    2016-01-08 (PERLANCAR)
+0.03    2016-01-08  Released-By: PERLANCAR
 
 	- Rename module/dist from App-BencherAll to App-BencherUtils.
 
@@ -161,7 +168,7 @@
 	- [ux] bencher-all*: Add completion for --include & --exclude.
 
 
-0.02    2016-01-07 (PERLANCAR)
+0.02    2016-01-07  Released-By: PERLANCAR
 
         - Trap when bencher dies, so we can continue to the next scenario.
 
@@ -171,6 +178,6 @@
         - Other small fixes.
 
 
-0.01    2016-01-07 (PERLANCAR)
+0.01    2016-01-07  Released-By: PERLANCAR
 
         - First release.

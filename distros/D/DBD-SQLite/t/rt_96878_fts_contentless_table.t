@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 # In a contentless FTS table, the columns are hidden from the schema,
 # and therefore SQLite has no information to infer column types, so
 # these are typed as SQLITE_NULL ... and this type conflicts with the
@@ -7,21 +5,15 @@
 # column, using a CAST expression or a call to bind_param().
 
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest;
 use Test::More;
+use if -d ".git", "Test::FailWarnings";
+use DBI qw/SQL_INTEGER/;
 
 BEGIN { requires_sqlite('3.7.9') }
-BEGIN { plan skip_all => 'FTS3 is disabled for this DBD::SQLite' if !grep /ENABLE_FTS3/, DBD::SQLite::compile_options() }
-
-use DBI qw/SQL_INTEGER/;
-plan tests => 8;
-use Test::NoWarnings;
+BEGIN { plan skip_all => 'FTS is disabled for this DBD::SQLite' unless has_fts() }
 
 my $dbh = connect_ok(RaiseError => 1, AutoCommit => 1);
 
@@ -29,7 +21,6 @@ my $dbh = connect_ok(RaiseError => 1, AutoCommit => 1);
 
 my $sql = q{CREATE VIRTUAL TABLE foo USING fts4 (content="", a, b)};
 ok( $dbh->do($sql), 'CREATE TABLE' );
-
 
 ok($dbh->do("INSERT INTO foo(docid, a, b) VALUES(1, 'a', 'b')"),
    "insert without bind");
@@ -55,3 +46,4 @@ ok( $dbh->do("CREATE VIRTUAL TABLE foo_aux USING fts4aux(foo)"), 'FTS4AUX');
 my $data = $dbh->selectcol_arrayref("select term from foo_aux where col='*'");
 is_deeply ([sort @$data], [qw/a aa aaa b bb bbb/], "terms properly indexed");
 
+done_testing;

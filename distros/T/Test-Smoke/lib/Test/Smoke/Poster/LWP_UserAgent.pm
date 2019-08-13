@@ -6,9 +6,7 @@ our $VERSION = '0.001';
 
 use base 'Test::Smoke::Poster::Base';
 
-use fallback 'inc';
-
-use JSON;
+use Test::Smoke::Util::LoadAJSON;
 
 =head1 NAME
 

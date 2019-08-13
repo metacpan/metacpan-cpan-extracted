@@ -1,19 +1,11 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest;
 use Test::More;
+use if -d ".git", "Test::FailWarnings";
 
 BEGIN { requires_sqlite('3.6.8') }
-
-plan tests => 5;
-use Test::NoWarnings;
 
 my $dbh = connect_ok(
 	AutoCommit => 1,
@@ -47,3 +39,5 @@ is $dbh->selectrow_array("SELECT COUNT(*) FROM MST"), 0,
 	"savepoint rolled back";
 
 $dbh->rollback;
+
+done_testing;

@@ -1,14 +1,9 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
-use Test::More tests => 7;
+use warnings;
+use Test::More;
 use lib "t/lib";
 use SQLiteTest;
+use if -d ".git", "Test::FailWarnings";
 
 my $dbh = connect_ok( PrintError => 0, RaiseError => 0 );
 
@@ -48,3 +43,5 @@ like(
 	qr/attempt to fetch on inactive database handle/,
 	'Got the expected warning',
 );
+
+done_testing;

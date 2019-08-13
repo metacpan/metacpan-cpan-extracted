@@ -1,25 +1,14 @@
-#!/usr/bin/perl
-
 # This is a test for correct handling of the "unicode" database
 # handle parameter.
 
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest;
 use Test::More;
-BEGIN {
-	if ( $] >= 5.008005 ) {
-		plan( tests => 26 );
-	} else {
-		plan( skip_all => 'Unicode is not supported before 5.8.5' );
-	}
-}
-use Test::NoWarnings;
+use if -d ".git", "Test::FailWarnings";
+
+BEGIN { requires_unicode_support() }
 
 #
 #   Include std stuff
@@ -137,3 +126,5 @@ sub database_roundtrip {
 	croak "Bad row length ".@row unless (@row == 2);
 	@row;
 }
+
+done_testing;

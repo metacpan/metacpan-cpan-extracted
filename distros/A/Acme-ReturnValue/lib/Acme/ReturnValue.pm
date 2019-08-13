@@ -4,7 +4,7 @@ package Acme::ReturnValue;
 use 5.010;
 use strict;
 use warnings;
-our $VERSION = '1.001';
+our $VERSION = '1.003';
 
 # ABSTRACT: report interesting return values
 
@@ -232,11 +232,13 @@ sub in_file {
     }
 }
 
-"let's return a strange value";
+"let's return a strange value from Riga";
 
 __END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -244,7 +246,7 @@ Acme::ReturnValue - report interesting return values
 
 =head1 VERSION
 
-version 1.001
+version 1.003
 
 =head1 SYNOPSIS
 
@@ -260,7 +262,7 @@ version 1.001
 C<Acme::ReturnValue> will list 'interesting' return values of modules.
 'Interesting' means something other than '1'.
 
-See L<http://returnvalues.useperl.at|http://returnvalues.useperl.at> for the results of running Acme::ReturnValue on the whole CPAN.
+See L<https://returnvalues.plix.at|https://returnvalues.plix.at> for the results of running Acme::ReturnValue on the whole CPAN.
 
 =head2 METHODS
 
@@ -352,7 +354,7 @@ Thomas Klausner <domm@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Thomas Klausner.
+This software is copyright (c) 2013 - 2019 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

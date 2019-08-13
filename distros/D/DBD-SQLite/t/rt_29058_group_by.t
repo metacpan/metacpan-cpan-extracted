@@ -1,14 +1,10 @@
 use strict;
 
-BEGIN {
-    $|  = 1;
-    $^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest;
-use Test::More tests => 9;
-use Test::NoWarnings;
+use Test::More;
+use if -d ".git", "Test::FailWarnings";
 use DBI qw(:sql_types);
 
 my $dbh = connect_ok();
@@ -78,3 +74,5 @@ is( scalar(@$ar), 2, 'Got 2 results' );
 	# print "4: @$_\n" for @$ar;
 	is( scalar(@$ar), 2, "we got ".(@$ar)." items" );
 #}
+
+done_testing;

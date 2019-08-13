@@ -1,22 +1,14 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest qw/connect_ok @CALL_FUNCS/;
 use Test::More;
 use DBD::SQLite;
-#use Test::NoWarnings;
+#use if -d ".git", "Test::FailWarnings";
 
 my @methods = qw(
 	commit rollback
 );
-
-plan tests => 2 * (6 + @methods) + 2 * @CALL_FUNCS * (14 + ($DBD::SQLite::sqlite_version_number >= 3006011) * 2);
 
 local $SIG{__WARN__} = sub {};  # to hide warnings/error messages
 
@@ -181,3 +173,5 @@ for my $call_func (@CALL_FUNCS) {
 		}
 	}
 }
+
+done_testing;

@@ -17,7 +17,7 @@ use warnings;
 package MongoDB::_Server;
 
 use version;
-our $VERSION = 'v2.0.3';
+our $VERSION = 'v2.2.0';
 
 use Moo;
 use MongoDB::_Types qw(

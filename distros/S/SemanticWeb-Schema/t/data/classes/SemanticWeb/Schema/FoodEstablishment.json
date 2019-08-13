@@ -23,9 +23,9 @@
          "rdfs:label" : "hasMenu",
          "schema:domainIncludes" : "schema:FoodEstablishment",
          "schema:rangeIncludes" : [
-            "schema:URL",
+            "schema:Menu",
             "schema:Text",
-            "schema:Menu"
+            "schema:URL"
          ]
       },
       "schema:menu" : {
@@ -34,9 +34,9 @@
          "rdfs:label" : "menu",
          "schema:domainIncludes" : "schema:FoodEstablishment",
          "schema:rangeIncludes" : [
-            "schema:Menu",
+            "schema:Text",
             "schema:URL",
-            "schema:Text"
+            "schema:Menu"
          ],
          "schema:supersededBy" : "schema:hasMenu"
       },

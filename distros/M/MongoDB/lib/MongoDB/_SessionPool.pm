@@ -17,7 +17,7 @@ use warnings;
 package MongoDB::_SessionPool;
 
 use version;
-our $VERSION = 'v2.0.3';
+our $VERSION = 'v2.2.0';
 
 use Moo;
 use MongoDB::_ServerSession;
@@ -92,7 +92,8 @@ sub retire_server_session {
     }
 
     unless ( $server_session->_is_expiring( $session_timeout ) ) {
-        unshift @{ $self->_server_session_pool }, $server_session;
+        unshift @{ $self->_server_session_pool }, $server_session
+            unless $server_session->dirty;
     }
     return;
 }

@@ -11,11 +11,11 @@ Net::Connection - Represents a network connection as a object.
 
 =head1 VERSION
 
-Version 0.1.0
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 
 
 =head1 SYNOPSIS
@@ -129,11 +129,23 @@ This is the PTR address for local_host.
 If ptrs is not true and local_host appears to be
 a hostname, then it is set to the same as local_host.
 
+=head2  pctcpu
+
+Percent of CPU usage by the PID for this connection.
+
+=head2  pctmem
+
+Percent of memory usage by the PID for this connection.
+
 =head4 pid
 
 This is the pid for a connection.
 
 If defined, it needs to be numeric.
+
+=head4 pid_start
+
+The start time in seconds of the PID for the connection.
 
 =head4 ports
 
@@ -146,6 +158,10 @@ This is the protocol type.
 This needs to be defined, but unfortunately no real checking is done
 as of currently as various OSes uses varrying capitalizations and slightly
 different forms of TCP, TCP4, tcp4, tcpv4, and the like.
+
+=head4 proc
+
+Either the command line or fname if that is blank for the PID.
 
 =head4 ptrs
 
@@ -197,6 +213,10 @@ will attempt to be automatically contemplated.
 
 If uid_resolve is true and uid is defined, then this
 will attempt to be automatically contemplated.
+
+=head4 wchan
+
+The current wait channel for the PID of the connection in question.
 
 =cut
 
@@ -264,6 +284,10 @@ sub new{
 			  'proto' => $args{'proto'},
 			  'local_ptr' => undef,
 			  'foreign_ptr' => undef,
+			  'pctcpu' => undef,
+			  'pctmem' => undef,
+			  'proc' => undef,
+			  'wchan' => undef,
 			  };
 	bless $self;
 
@@ -288,6 +312,18 @@ sub new{
 	}
 	if (defined( $args{'username'} )){
 		$self->{'username'}=$args{'username'};
+	}
+	if (defined( $args{'proc'} )){
+		$self->{'proc'}=$args{'proc'};
+	}
+	if (defined( $args{'wchan'} )){
+		$self->{'wchan'}=$args{'wchan'};
+	}
+	if (defined( $args{'pctmem'} )){
+		$self->{'pctmem'}=$args{'pctmem'};
+	}
+	if (defined( $args{'pctcpu'} )){
+		$self->{'pctcpu'}=$args{'pctcpu'};
 	}
 
 	# resolve port names if asked to
@@ -500,7 +536,7 @@ sub local_port_name{
 	return $_[0]->{'local_port_name'};
 }
 
-=head2 foreign_ptr
+=head2 local_ptr
 
 This returns the PTR for the local host.
 
@@ -515,6 +551,38 @@ sub local_ptr{
 	return $_[0]->{'local_ptr'};
 }
 
+=head2 pctcpu
+
+Returns the percent of memory in use by the process
+that has connection.
+
+This may not be if it was not set. Please see new
+for more information.
+
+    my $pctcpu=$conn->pctcpu;
+
+=cut
+
+sub pctcpu{
+	return $_[0]->{'pctcpu'};
+}
+
+=head2 pctmem
+
+Returns the percent of memory in use by the process
+that has connection.
+
+This may not be if it was not set. Please see new
+for more information.
+
+    my $pctmem=$conn->pctmem;
+
+=cut
+
+sub pctmem{
+	return $_[0]->{'pctmem'};
+}
+
 =head2 pid
 
 This returns the pid of a connection.
@@ -527,6 +595,22 @@ This may return undef.
 
 sub pid{
 	return $_[0]->{'pid'};
+}
+
+=head2 proc
+
+Returns the command line or fname for the process
+that has the connection.
+
+This may not be if it was not set. Please see new
+for more information.
+
+    my $proc=$conn->proc;
+
+=cut
+
+sub proc{
+	return $_[0]->{'proc'};
 }
 
 =head2 proto
@@ -614,6 +698,21 @@ for more information.
 
 sub username{
 	return $_[0]->{'username'};
+}
+
+=head2 wchan
+
+Returns the wchan for the process that has the connection.
+
+This may not be if it was not set. Please see new
+for more information.
+
+    my $wchan=$conn->wchan;
+
+=cut
+
+sub wchan{
+	return $_[0]->{'wchan'};
 }
 
 =head1 AUTHOR

@@ -1,5 +1,10 @@
 Revision history for Perl extension Curio.
 
+0.06 2019-08-12T23:35:52Z
+
+ - Added the create() and injection() factory methods.
+ - Renamed the keys() attribute to declared_keys().
+
 0.05 2019-08-06T20:35:51Z
 
  - Removed the unused Curio::Factory::find_factory() class method.

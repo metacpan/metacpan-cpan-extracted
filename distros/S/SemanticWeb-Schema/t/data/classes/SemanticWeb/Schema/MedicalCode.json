@@ -10,6 +10,20 @@
       "schema:isPartOf" : "http:health-lifesci.schema.org"
    },
    "properties" : {
+      "schema:codeValue" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/894",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A short textual code that uniquely identifies the value.",
+         "rdfs:label" : "codeValue",
+         "rdfs:subPropertyOf" : "schema:termCode",
+         "schema:category" : "issue-894",
+         "schema:domainIncludes" : [
+            "schema:MedicalCode",
+            "schema:CategoryCode"
+         ],
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
       "schema:codingSystem" : {
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The coding system, e.g. 'ICD-10'.",

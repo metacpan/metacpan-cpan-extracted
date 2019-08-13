@@ -1,0 +1,53 @@
+==================================================
+Changes from 2018-08-12 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.0.1 at 2019-08-12 19:08:55 +0000
+------------------------------------------
+
+  Change: 2f97f18df56f2cae65b716bb64eeee1c0d881035
+  Author: Larry Leszczynski <Larry.Leszczynski@GrantStreet.com>
+  Date : 2019-08-12 14:39:07 +0000
+
+    Ran "make update" 
+
+  Change: f49d435cd53b2d1faba82d9d56e4f2645eb9208d
+  Author: Larry Leszczynski <Larry.Leszczynski@GrantStreet.com>
+  Date : 2019-08-12 14:26:26 +0000
+
+    Added some examples 
+
+  Change: 681c4b0948b6d0edfe268ba45de646cdef656a26
+  Author: Larry Leszczynski <Larry.Leszczynski@GrantStreet.com>
+  Date : 2019-08-12 14:26:26 +0000
+
+    Added some background/motivation to the DESCRIPTION 
+
+  Change: 36a1ce69781f75d49fe3365944b22fec27c2cd12
+  Author: Larry Leszczynski <Larry.Leszczynski@GrantStreet.com>
+  Date : 2019-08-12 14:26:26 +0000
+
+    Fixed duplicated TODO reason in TAP output 
+
+  Change: 6f417c90131ace4f37012cd2830b80bc5b2e1b89
+  Author: Larry Leszczynski <Larry.Leszczynski@GrantStreet.com>
+  Date : 2019-07-30 21:13:34 +0000
+
+    Added some unit tests 
+
+  Change: 9811e4379c34d56606f4329d3e1673ec5b6963f8
+  Author: Larry Leszczynski <Larry.Leszczynski@GrantStreet.com>
+  Date : 2019-07-30 15:40:05 +0000
+
+    Create distribution files 
+
+  Change: fd1aa6afb80a5543c5caa194388f2f5b02a189c4
+  Author: Larry Leszczynski <Larry.Leszczynski@GrantStreet.com>
+  Date : 2019-07-30 15:36:56 +0000
+
+    Initial Commit 
+
+================
+End of releases.
+================

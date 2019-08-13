@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.8.1';
+our $VERSION = 'v3.9.0';
 
 
 has course_code => (
@@ -50,6 +50,14 @@ has has_course_instance => (
 
 
 
+has occupational_credential_awarded => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'occupationalCredentialAwarded',
+);
+
+
+
 
 
 1;
@@ -66,7 +74,7 @@ SemanticWeb::Schema::Course - A description of an educational course which may b
 
 =head1 VERSION
 
-version v3.8.1
+version v3.9.0
 
 =head1 DESCRIPTION
 
@@ -124,7 +132,7 @@ C<educationalCredentialAwarded>
 
 A description of the qualification, award, certificate, diploma or other
 educational credential awarded as a consequence of successful completion of
-this course.
+this course or program.
 
 A educational_credential_awarded should be one of the following types:
 
@@ -148,6 +156,24 @@ A has_course_instance should be one of the following types:
 =over
 
 =item C<InstanceOf['SemanticWeb::Schema::CourseInstance']>
+
+=back
+
+=head2 C<occupational_credential_awarded>
+
+C<occupationalCredentialAwarded>
+
+A description of the qualification, award, certificate, diploma or other
+occupational credential awarded as a consequence of successful completion
+of this course or program.
+
+A occupational_credential_awarded should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::EducationalOccupationalCredential']>
+
+=item C<Str>
 
 =back
 

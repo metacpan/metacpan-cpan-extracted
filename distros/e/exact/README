@@ -1,9 +1,9 @@
 This archive contains the distribution exact,
-version 1.06:
+version 1.08:
 
   Perl pseudo pragma to enable strict, warnings, features, mro, filehandle methods
 
-This software is copyright (c) 2018 by Gryphon Shafer.
+This software is copyright (c) 2019 by Gryphon Shafer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -6,6 +6,7 @@ META.json
 META.yml
 Makefile.PL
 README.md
+cpanfile
 dist.ini
 lib/Pherkin/Extension/Weasel.pm
 lib/Pherkin/Extension/weasel_steps/nav_steps.pl

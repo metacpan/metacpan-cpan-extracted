@@ -1,11 +1,5 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest;
 use Test::More;
@@ -18,7 +12,7 @@ BEGIN {
     }
 }
 
-use Test::NoWarnings;
+use if -d ".git", "Test::FailWarnings";
 
 # SQL below freely adapted from http://www.sqlite.org/foreignkeys.htm ...
 # not the best datamodel in the world, but good enough for our tests.
@@ -58,9 +52,6 @@ CREATE TABLE song(
 );
 __EOSQL__
 
-
-plan tests => @sql_statements + 22;
-
 my $dbh = connect_ok( RaiseError => 1, PrintError => 0, AutoCommit => 1 );
 my $sth;
 my $fk_data;
@@ -92,30 +83,25 @@ for ($fk_data->{albumeditor}) {
   is($_->{UNIQUE_OR_PRIMARY}, 'PRIMARY', "FK albumeditor, primary");
 }
 
-
 $sth = $dbh->foreign_key_info(undef, undef, 'artist',
                               undef, undef, 'album');
 $fk_data = $sth->fetchall_hashref('FKCOLUMN_NAME');
 is_deeply([keys %$fk_data], ['albumartist'], "FK album with PK, only 1 result");
-
 
 $sth = $dbh->foreign_key_info(undef, undef, 'foobar',
                               undef, undef, 'album');
 $fk_data = $sth->fetchall_hashref('FKCOLUMN_NAME');
 is_deeply([keys %$fk_data], [], "FK album with PK foobar, 0 result");
 
-
 $sth = $dbh->foreign_key_info(undef, undef, undef,
                               undef, 'remote', undef);
 $fk_data = $sth->fetchall_hashref('FKCOLUMN_NAME');
 is_deeply([sort keys %$fk_data], [qw/albumartist albumeditor/], "FK remote.*, 2 results");
 
-
 $sth = $dbh->foreign_key_info(undef, 'remote', undef,
                               undef, undef, undef);
 $fk_data = $sth->fetchall_hashref('FKCOLUMN_NAME');
 is_deeply([sort keys %$fk_data], [qw/songalbum songartist/], "FK with PK remote.*, 2 results");
-
 
 $sth = $dbh->foreign_key_info(undef, undef, undef,
                               undef, undef, 'song');
@@ -126,3 +112,5 @@ for ($fk_data->{songartist}) {
 for ($fk_data->{songalbum}) {
   is($_->{KEY_SEQ}, 2, "FK song, key seq 2");
 }
+
+done_testing;

@@ -1,15 +1,9 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest;
-use Test::More tests => 22;
-use Test::NoWarnings;
+use Test::More;
+use if -d ".git", "Test::FailWarnings";
 
 my @catalog_info = (
     [undef, undef, undef, undef, undef],
@@ -146,3 +140,4 @@ is_deeply $info, [$table2_info, @systable_info, $table4_info, $table3_info, $tab
 #warn 'Table Types', substr Dumper($dbh->table_info('', '', '', '%')->fetchall_arrayref), 5;
 #warn 'table_info', substr Dumper($info), 5;
 
+done_testing;

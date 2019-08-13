@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 use strict;
 use warnings;
 
@@ -9,10 +7,8 @@ use SQLiteTest qw/connect_ok dbfile @CALL_FUNCS requires_sqlite/;
 
 BEGIN { requires_sqlite('3.6.11') }
 
-use Test::NoWarnings;
+use if -d ".git", "Test::FailWarnings";
 use DBI;
-
-plan tests => 11 * @CALL_FUNCS + 1;
 
 foreach my $call_func (@CALL_FUNCS) {
 	# Connect to the test db and add some stuff:
@@ -111,3 +107,5 @@ foreach my $call_func (@CALL_FUNCS) {
 
 	$foo->disconnect;
 }
+
+done_testing;

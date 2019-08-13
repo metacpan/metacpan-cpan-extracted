@@ -1,0 +1,39 @@
+{
+   "class" : {
+      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1758",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "An intangible type to be applied to any archive content, carrying with it a set of properties required to describe archival items and collections.",
+      "rdfs:label" : "ArchiveComponent",
+      "rdfs:subClassOf" : "schema:CreativeWork",
+      "schema:category" : "issue-1758",
+      "schema:isPartOf" : "http:pending.schema.org"
+   },
+   "properties" : {
+      "schema:holdingArchive" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1758",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "<a class=\"localLink\" href=\"http://schema.org/ArchiveOrganization\">ArchiveOrganization</a> that holds, keeps or maintains the <a class=\"localLink\" href=\"http://schema.org/ArchiveComponent\">ArchiveComponent</a>.",
+         "rdfs:label" : "holdingArchive",
+         "schema:category" : "issue-1758",
+         "schema:domainIncludes" : "schema:ArchiveComponent",
+         "schema:inverseOf" : "schema:archiveHeld",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:ArchiveOrganization"
+      },
+      "schema:itemLocation" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1758",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Current location of the item.",
+         "rdfs:label" : "itemLocation",
+         "rdfs:subPropertyOf" : "schema:location",
+         "schema:category" : "issue-1758",
+         "schema:domainIncludes" : "schema:ArchiveComponent",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:Place",
+            "schema:PostalAddress",
+            "schema:Text"
+         ]
+      }
+   }
+}

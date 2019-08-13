@@ -1,6 +1,6 @@
 {
     "name": "Acme-CPANAuthors-CPAN-OneHundred",
-    "version": "1.13",
+    "version": "1.14",
     "abstract": "The CPAN Authors who have 100+ distributions on CPAN",
     "author": [
         "Barbie (BARBIE) <barbie@cpan.org>"
@@ -44,7 +44,7 @@
     "provides": {
         "Acme::CPANAuthors::CPAN::OneHundred": {
             "file": "lib/Acme/CPANAuthors/CPAN/OneHundred.pm",
-            "version": "1.13"
+            "version": "1.14"
         }
     },
     "no_index": {

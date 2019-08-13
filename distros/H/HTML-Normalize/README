@@ -2,7 +2,7 @@ NAME
     HTML::Normalize - HTML light weight cleanup
 
 VERSION
-    Version 1.0003
+    Version 1.0004
 
 SYNOPSIS
         my $norm = HTML::Normalize->new ();
@@ -25,4 +25,3 @@ DESCRIPTION
     color="#FF0000">" element would become and "<font color="#FF0000">" and
     "<font face="Verdana" size="1">" would be removed if Verdana size 1 is
     set as the default font.
-

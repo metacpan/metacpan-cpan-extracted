@@ -1,17 +1,9 @@
-#!/usr/bin/perl
-
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest qw/connect_ok/;
 use Test::More;
-use Test::NoWarnings;
-
-plan tests => 15 + 1;
+use if -d ".git", "Test::FailWarnings";
 
 # single column integer primary key
 {
@@ -45,7 +37,7 @@ plan tests => 15 + 1;
 	my $sth = $dbh->primary_key_info(undef, undef, 'foo');
 	my @pk_info;
 	while(my $row = $sth->fetchrow_hashref) { push @pk_info, $row };
-       is @pk_info => 2, "found 2 pks";
+    is @pk_info => 2, "found 2 pks";
 	is $pk_info[0]{COLUMN_NAME} => 'type', "first pk name is type";
 	is $pk_info[1]{COLUMN_NAME} => 'id', "second pk name is id";
 }
@@ -65,3 +57,5 @@ plan tests => 15 + 1;
 	@pk = map $_->{COLUMN_NAME}, sort {$a->{KEY_SEQ} <=> $b->{KEY_SEQ}} @pk_info;
 	is join(' ', @pk) => 'c"d b a', 'pk KEY_SEQ is correct';
 }
+
+done_testing;

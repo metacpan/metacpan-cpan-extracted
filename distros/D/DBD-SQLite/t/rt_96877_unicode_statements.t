@@ -1,25 +1,15 @@
-#!/usr/bin/perl
 # According to the sqlite doc, the SQL argument to sqlite3_prepare_v2
 # should be in utf8, but DBD::SQLite does not ensure this (even with
 # sqlite_unicode => 1). Only bind values are properly converted.
 
 use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-}
-
+use warnings;
 use lib "t/lib";
 use SQLiteTest;
 use Test::More;
-BEGIN {
-	if ( $] >= 5.008005 ) {
-		plan( tests => 16 );
-	} else {
-		plan( skip_all => 'Unicode is not supported before 5.8.5' );
-	}
-}
-use Test::NoWarnings;
+use if -d ".git", "Test::FailWarnings";
+
+BEGIN { requires_unicode_support() }
 
 my $dbh = connect_ok( sqlite_unicode => 1 );
 is( $dbh->{sqlite_unicode}, 1, 'Unicode is on' );
@@ -39,3 +29,5 @@ foreach ( "A", "\xe9", "\x{20ac}" ) {
 
 	ok( $dbh->do("DELETE FROM foo"), 'DELETE ok' );
 }
+
+done_testing;

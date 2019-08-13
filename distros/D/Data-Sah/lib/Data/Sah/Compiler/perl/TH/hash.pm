@@ -1,7 +1,7 @@
 package Data::Sah::Compiler::perl::TH::hash;
 
-our $DATE = '2019-07-25'; # DATE
-our $VERSION = '0.899'; # VERSION
+our $DATE = '2019-08-12'; # DATE
+our $VERSION = '0.900'; # VERSION
 
 use 5.010;
 use strict;
@@ -24,23 +24,20 @@ sub handle_type {
     $cd->{_ccl_check_type} = "ref($dt) eq 'HASH'";
 }
 
-my $FRZ = "Storable::freeze";
-
 sub superclause_comparable {
     my ($self, $which, $cd) = @_;
     my $c  = $self->compiler;
     my $ct = $cd->{cl_term};
     my $dt = $cd->{data_term};
 
-    # Storable is chosen because it's core and fast. ~~ is not very
-    # specific.
-    $c->add_runtime_module($cd, 'Storable');
+    $c->add_runtime_module($cd, $cd->{args}{dump_module});
 
     if ($which eq 'is') {
-        $c->add_ccl($cd, "$FRZ($dt) eq $FRZ($ct)");
+        $c->add_ccl($cd, $c->expr_dump($cd, $dt).' eq '.$c->expr_dump($cd, $ct));
     } elsif ($which eq 'in') {
-        $c->add_runtime_smartmatch_pragma($cd);
-        $c->add_ccl($cd, "$FRZ($dt) ~~ [map {$FRZ(\$_)} \@{ $ct }]");
+        $c->add_ccl($cd, "do { my \$s = ".$c->expr_dump($cd, $dt)."; my \$res = 0; " .
+                        "for my \$el (\@{ $ct }) { my \$els = ".$c->expr_dump($cd, "\$el")."; ".
+                        "if (\$s eq \$els) { \$res = 1; last } } \$res }");
     }
 }
 
@@ -69,13 +66,10 @@ sub superclause_has_elems {
                     "keys(\%{$dt}) <= $cv->[1]");
         }
     } elsif ($which eq 'has') {
-        $c->add_runtime_smartmatch_pragma($cd);
-        #$c->add_ccl($cd, "$FRZ($ct) ~~ [map {$FRZ(\$_)} values \%{ $dt }]");
-
-        # XXX currently we choose below for speed, but only works for hash of
-        # scalars. stringifying is required because smartmatch will switch to
-        # numeric if we feed something like {a=>1}
-        $c->add_ccl($cd, "$ct ~~ [values \%{ $dt }]");
+        $c->add_runtime_module($cd, $cd->{args}{dump_module});
+        $c->add_ccl($cd, "do { my \$s = ".$c->expr_dump($cd, $ct)."; my \$res = 0; " .
+                        "for my \$el (values \%{ $dt }) { my \$els = ".$c->expr_dump($cd, "\$el")."; ".
+                        "if (\$s eq \$els) { \$res = 1; last } } \$res }");
     } elsif ($which eq 'each_index') {
         $self_th->set_tmp_data_term($cd) if $cd->{args}{data_term_includes_topic_var};
         $self_th->gen_each($cd, "sort keys(\%{$cd->{data_term}})", '', '$_');
@@ -123,15 +117,13 @@ sub _clause_keys_or_re_keys {
 
         if ($cd->{clset}{"$which.restrict"} // 1) {
             local $cd->{_debug_ccl_note} = "$which.restrict";
-            $c->add_runtime_module($cd, "List::Util");
-            $c->add_runtime_smartmatch_pragma($cd);
+            #$c->add_runtime_module($cd, "List::Util");
             $c->add_ccl(
                 $cd,
-                # here we need ~~ because it can match against strs or regexes
-                "!defined(List::Util::first(sub {!(\$_ ~~ $lit_valid_keys)}, ".
-                    "keys %{$cd->{data_term}}))",
+                #"!defined(List::Util::first(sub { my \$ditem=\$_; !defined(List::Util::first(sub {\$ditem ".($which eq 'keys' ? 'eq' : '=~')." \$_ }, \@{ $lit_valid_keys })) }, keys %{ $dt }))",
+                "!(grep { my \$ditem=\$_; !(grep { \$ditem ".($which eq 'keys' ? 'eq' : '=~')." \$_ } \@{ $lit_valid_keys }) } keys %{ $dt })",
                 {
-                    err_msg => 'TMP1',
+                    err_msg => 'TMP',
                     err_expr => join(
                         "",
                         'sprintf(',
@@ -139,8 +131,7 @@ sub _clause_keys_or_re_keys {
                             $cd, "hash contains ".
                                 "unknown field(s) (%s)")),
                         ',',
-                        "join(', ', sort grep {!(\$_ ~~ $lit_valid_keys)} ",
-                        "keys %{$cd->{data_term}})",
+                        "join(', ', sort grep { my \$ditem=\$_; !(grep { \$ditem ".($which eq 'keys' ? 'eq':'=~')." \$_ } \@{ $lit_valid_keys })} keys %{ $dt })",
                         ')',
                     ),
                 },
@@ -166,7 +157,7 @@ sub _clause_keys_or_re_keys {
             my $sch = $c->main->normalize_schema($cv->{$k});
             my $kdn = $k; $kdn =~ s/\W+/_/g;
             my $klit = $which eq 're_keys' ? '$_' : $c->literal($k);
-            my $kdt = "$cd->{data_term}\->{$klit}";
+            my $kdt = "$dt\->{$klit}";
             my %iargs = %{$cd->{args}};
             $iargs{outer_cd}             = $cd;
             $iargs{data_name}            = $kdn;
@@ -182,6 +173,8 @@ sub _clause_keys_or_re_keys {
 
             # stack is used to store (non-bool) subresults
             $c->add_var($cd, '_sahv_stack', []) if $cd->{use_dpath};
+
+            $c->add_runtime_module($cd, "List::Util") if $which eq 're_keys'; # for re_keys
 
             my @code = (
                 ($c->indent_str($cd), "(push(@\$_sahv_dpath, undef), push(\@\$_sahv_stack, undef), \$_sahv_stack->[-1] = \n")
@@ -202,7 +195,7 @@ sub _clause_keys_or_re_keys {
                 $which eq 're_keys' || !$sdef ? ")" : "",
 
                 # close iteration over all data's keys which match regex
-                (")}, sort keys %{ $cd->{data_term} })))")
+                (")}, sort keys %{ $dt })))")
                     x !!($which eq 're_keys'),
 
                 ($c->indent_str($cd), "), pop(\@\$_sahv_dpath), pop(\@\$_sahv_stack)\n")
@@ -259,17 +252,17 @@ sub clause_allowed_keys {
     my $ct = $cd->{cl_term};
     my $dt = $cd->{data_term};
 
-    $c->add_runtime_module($cd, "List::Util");
-    $c->add_runtime_smartmatch_pragma($cd);
+    #$c->add_runtime_module($cd, "List::Util");
     $c->add_ccl(
       $cd,
-      "!defined(List::Util::first(sub {!(\$_ ~~ $ct)}, keys \%{ $dt }))",
+      #"!defined(List::Util::first(sub { my \$ditem=\$_; !defined(List::Util::first!(sub { \$ditem eq \$_ }, \@{ $ct })) }, keys \%{ $dt }))",
+      "!(grep { my \$ditem=\$_; !(grep { \$ditem eq \$_ } \@{ $ct }) } keys \%{ $dt })",
       {
         err_msg => 'TMP',
         err_expr =>
           "sprintf(".
           $c->literal($c->_xlt($cd, "hash contains non-allowed field(s) (%s)")).
-          ",join(', ', sort grep { !(\$_ ~~ $ct) } keys \%{ $dt }))"
+          ",join(', ', sort grep { my \$ditem=\$_; !(grep { \$ditem eq \$_ } \@{ $ct }) } keys \%{ $dt }))"
       }
     );
 }
@@ -287,11 +280,11 @@ sub clause_allowed_keys_re {
     }
 
     my $re = $c->_str2reliteral($cd, $cv);
-    $c->add_runtime_module($cd, "List::Util");
-    $c->add_runtime_smartmatch_pragma($cd);
+    #$c->add_runtime_module($cd, "List::Util");
     $c->add_ccl(
         $cd,
-        "!defined(List::Util::first(sub {\$_ !~ /$re/}, keys \%{ $dt }))",
+        #"!defined(List::Util::first(sub {\$_ !~ /$re/}, keys \%{ $dt }))",
+        "!(grep {\$_ !~ /$re/} keys \%{ $dt })",
         {
           err_msg => 'TMP',
           err_expr =>
@@ -308,17 +301,17 @@ sub clause_forbidden_keys {
     my $ct = $cd->{cl_term};
     my $dt = $cd->{data_term};
 
-    $c->add_runtime_module($cd, "List::Util");
-    $c->add_runtime_smartmatch_pragma($cd);
+    #$c->add_runtime_module($cd, "List::Util");
     $c->add_ccl(
       $cd,
-      "!defined(List::Util::first(sub {\$_ ~~ $ct}, keys \%{ $dt }))",
+      #"!defined(List::Util::first(sub {\$_ ~~ $ct}, keys \%{ $dt }))",
+      "!(grep { my \$ditem=\$_; !!(grep { \$ditem eq \$_ } \@{ $ct }) } keys \%{ $dt })",
       {
         err_msg => 'TMP',
         err_expr =>
           "sprintf(".
           $c->literal($c->_xlt($cd, "hash contains forbidden field(s) (%s)")).
-          ",join(', ', sort grep { \$_ ~~ $ct } keys \%{ $dt }))"
+          ",join(', ', sort grep { my \$ditem=\$_; !(grep { \$ditem eq \$_ } \@{ $ct }) } keys \%{ $dt }))"
       }
     );
 }
@@ -336,11 +329,11 @@ sub clause_forbidden_keys_re {
     }
 
     my $re = $c->_str2reliteral($cd, $cv);
-    $c->add_runtime_module($cd, "List::Util");
-    $c->add_runtime_smartmatch_pragma($cd);
+    #$c->add_runtime_module($cd, "List::Util");
     $c->add_ccl(
         $cd,
-        "!defined(List::Util::first(sub {\$_ =~ /$re/}, keys \%{ $dt }))",
+        #"!defined(List::Util::first(sub {\$_ =~ /$re/}, keys \%{ $dt }))",
+        "!(grep {\$_ =~ /$re/} keys \%{ $dt })",
         {
           err_msg => 'TMP',
           err_expr =>
@@ -506,7 +499,7 @@ Data::Sah::Compiler::perl::TH::hash - perl's type handler for type "hash"
 
 =head1 VERSION
 
-This document describes version 0.899 of Data::Sah::Compiler::perl::TH::hash (from Perl distribution Data-Sah), released on 2019-07-25.
+This document describes version 0.900 of Data::Sah::Compiler::perl::TH::hash (from Perl distribution Data-Sah), released on 2019-08-12.
 
 =for Pod::Coverage ^(clause_.+|superclause_.+)$
 

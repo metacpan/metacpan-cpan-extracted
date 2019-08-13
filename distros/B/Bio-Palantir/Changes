@@ -1,3 +1,9 @@
+0.192240  2019-08-12 23:48:09+02:00 Europe/Brussels
+
+0.192240  2019-08-12 23:38:59+02:00 Europe/Brussels
+	- Fixes
+	  - Ranking of cluster elements for antiSMASH version 5
+
 0.191800  2019-06-29 15:01:31+02:00 Europe/Brussels
 	- Additions
 	  - documentation: added Manual.pod

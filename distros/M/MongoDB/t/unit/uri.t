@@ -16,6 +16,9 @@ use strict;
 use warnings;
 use Test::More;
 use Test::Fatal;
+use Path::Tiny;
+use JSON::MaybeXS;
+use boolean;
 
 my $class = "MongoDB::_URI";
 
@@ -229,10 +232,10 @@ subtest "db_name" => sub {
     );
 
     $uri = new_ok( $class, [ uri => 'mongodb://localhost/?authSource=foo' ] );
-    is( $uri->db_name, 'foo', "parse db_name from authSource option" );
+    is( $uri->db_name, '', "parse db_name from authSource option" );
 
     $uri = new_ok( $class, [ uri => 'mongodb://localhost/example_db?authSource=foo' ] );
-    is( $uri->db_name, 'foo', "parse db_name authSource override URI db_name" );
+    is( $uri->db_name, 'example_db', "db_name+authSource doesn't affect db_name" );
 };
 
 subtest "auth credentials" => sub {
@@ -274,116 +277,6 @@ subtest "auth credentials" => sub {
         qr/password must be URL encoded/,
         "password with unescaped colon"
     );
-};
-
-subtest "options" => sub {
-    my ( $uri, @warnings, %expected_options );
-
-    $uri = new_ok( $class, [ uri => 'mongodb://localhost' ] );
-    %expected_options = ();
-    is_deeply( $uri->options, \%expected_options, "no options" );
-
-    $uri = new_ok( $class, [ uri => 'mongodb://localhost/?' ] );
-    %expected_options = ();
-    is_deeply( $uri->options, \%expected_options, "no options with trailing question mark" );
-
-    $uri = new_ok( $class, [ uri => 'mongodb://localhost/?&' ] );
-    %expected_options = ();
-    is_deeply( $uri->options, \%expected_options, "no options with trailing question mark and ampersand" );
-
-    $uri = new_ok( $class, [ uri => 'mongodb://localhost/?w=1' ] );
-    %expected_options = (w => 1);
-    is_deeply( $uri->options, \%expected_options, "single option" );
-
-    $uri = new_ok( $class, [ uri => 'mongodb://localhost/?w=1&replicaSet=set' ] );
-    %expected_options = (w => 1, replicaset => 'set');
-    is_deeply( $uri->options, \%expected_options, "multiple options" );
-
-    $uri = new_ok( $class,
-        [ uri => 'mongodb://localhost/?ReAdPrEfErEnCe=Primary&wTimeoutMS=1000' ] );
-    %expected_options = (readpreference => 'Primary', wtimeoutms => 1000);
-    is_deeply( $uri->options, \%expected_options, "multiple options with mixed case" );
-
-    $uri = new_ok( $class, [ uri => 'mongodb://localhost/?%77=%74rue' ] );
-    %expected_options = (w => 'true');
-    is_deeply( $uri->options, \%expected_options, "percent encoded option" );
-
-    $uri = new_ok( $class, [ uri => 'mongodb://localhost/?w=' ] );
-    %expected_options = (w => '');
-    is_deeply( $uri->options, \%expected_options, "options with empty option value" );
-
-    like(
-        exception { $class->new( uri => 'mongodb://localhost/?w' ) },
-        qr/expected key value pair/,
-        "no equals sign in option"
-    );
-
-    like(
-        exception { $class->new( uri => 'mongodb://localhost/?w==true' ) },
-        qr/expected key value pair/,
-        "extra equals signs at start of option value"
-    );
-
-    like(
-        exception { $class->new( uri => 'mongodb://localhost/?w=true=' ) },
-        qr/expected key value pair/,
-        "extra equals signs at end of option value"
-    );
-
-    like(
-        exception { $class->new( uri => 'mongodb://localhost/?w==true=' ) },
-        qr/expected key value pair/,
-        "equals signs at beginning and end of option value"
-    );
-
-    like(
-        exception { $class->new( uri => 'mongodb://localhost/?w==' ) },
-        qr/expected key value pair/,
-        "option value of equals sign"
-    );
-
-    @warnings = ();
-    {
-        local $SIG{__WARN__} = sub { push @warnings, $_[0] };
-        $uri = new_ok( $class, [ uri => 'mongodb://localhost/?unknown1=a&w=1&unknown2=b' ] );
-    }
-    is( scalar(@warnings), 2, "warnings for unknown options" );
-    is(
-        1,
-        scalar( grep /Unsupported option 'unknown1'/, @warnings ),
-        "warning for 'unknown1' option"
-    );
-    is(
-        1,
-        scalar( grep /Unsupported option 'unknown2'/, @warnings ),
-        "warning for 'unknown2' option"
-    );
-    %expected_options = (w => 1);
-    is_deeply( $uri->options, \%expected_options, "options with warnings" );
-
-    @warnings = ();
-    {
-        local $SIG{__WARN__} = sub { push @warnings, $_[0] };
-        $uri = new_ok( $class, [ uri => 'mongodb://localhost/?w=1&w=2&replicaSet=set' ] );
-    }
-    is( scalar(@warnings), 1, "warnings for duplicate options" );
-    is(
-        1,
-        scalar( grep /Multiple options were found for the same value 'w'/, @warnings ),
-        "warning for duplicate option 'w'"
-    );
-    %expected_options = (w => 1, replicaset => 'set');
-    is_deeply( $uri->options, \%expected_options, "options with duplicate values" );
-
-    @warnings = ();
-    {
-        local $SIG{__WARN__} = sub { push @warnings, $_[0] };
-        $uri = new_ok( $class,
-            [ uri => 'mongodb://localhost/?readPreferenceTags=a:b&readPreferenceTags=c:d' ] );
-    }
-    is( scalar(@warnings), 0, "no warning for duplicate option of list type" );
-    %expected_options = (readpreferencetags => [{a => 'b'}, {c => 'd'}]);
-    is_deeply( $uri->options, \%expected_options, "option of list type with duplicate values" );
 };
 
 done_testing;

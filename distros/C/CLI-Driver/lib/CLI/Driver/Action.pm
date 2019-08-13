@@ -43,7 +43,6 @@ method parse (HashRef :$href!) {
     if ( $href->{class} ) {
 
         my $class = CLI::Driver::Class->new;
-
         my $success = $class->parse( href => $href->{class} );
         if ( !$success ) {
             return 0;
@@ -58,7 +57,6 @@ method parse (HashRef :$href!) {
     if ( $href->{method} ) {
 
         my $method = CLI::Driver::Method->new;
-
         my $success = $method->parse( href => $href->{method} );
         if ( !$success ) {
             return 0;
@@ -192,6 +190,10 @@ method do {
     my $method_name = $method->name;
     my %sig         = $method->get_signature;
 
+	if (@ARGV) {
+		$self->die( "extra args detected: @ARGV");
+	}
+	
     return $obj->$method_name(%sig);
 }
 
