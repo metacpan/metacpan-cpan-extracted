@@ -3,11 +3,11 @@ package Specio::Constraint::ObjectIsa;
 use strict;
 use warnings;
 
-our $VERSION = '0.43';
+our $VERSION = '0.44';
 
-use B ();
 use Role::Tiny::With;
 use Scalar::Util ();
+use Specio::Helpers qw( perlstring );
 use Specio::Library::Builtins;
 use Specio::OO;
 
@@ -24,7 +24,7 @@ with 'Specio::Constraint::Role::IsaType';
         my $self = shift;
         my $val  = shift;
 
-        return sprintf( <<'EOF', $val, $val, B::perlstring( $self->class ) );
+        return sprintf( <<'EOF', $val, $val, perlstring( $self->class ) );
 ( Scalar::Util::blessed( %s ) && %s->isa(%s) )
 EOF
     };
@@ -54,7 +54,7 @@ Specio::Constraint::ObjectIsa - A class for constraints which require an object 
 
 =head1 VERSION
 
-version 0.43
+version 0.44
 
 =head1 SYNOPSIS
 
@@ -109,7 +109,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2018 by Dave Rolsky.
+This software is Copyright (c) 2012 - 2019 by Dave Rolsky.
 
 This is free software, licensed under:
 

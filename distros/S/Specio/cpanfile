@@ -24,6 +24,7 @@ requires "version" => "0.83";
 requires "warnings" => "0";
 recommends "Ref::Util" => "0.112";
 recommends "Sub::Util" => "1.40";
+recommends "XString" => "0";
 
 on 'test' => sub {
   requires "ExtUtils::MakeMaker" => "0";

@@ -1,0 +1,174 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::Geometry
+PROTOTYPES: DISABLE
+
+int Geometry::getSRID()
+
+void Geometry::setSRID(int newSRID)
+
+bool Geometry::isEmpty()
+
+bool Geometry::isSimple()
+
+bool Geometry::isRectangle()
+
+bool Geometry::isValid()
+
+size_t Geometry::getNumPoints()
+
+int Geometry::getDimension()
+
+int Geometry::getCoordinateDimension()
+
+int Geometry::getBoundaryDimension()
+
+int Geometry::getNumGeometries()
+
+Sv Geometry::reverse() { RETVAL = Helper::uplift(THIS->reverse()); }
+
+Sv Geometry::getGeometryN(size_t n) {
+    auto g = THIS->getGeometryN(n);
+    if (g) RETVAL = Helper::uplift(g->clone());
+    else XSRETURN_UNDEF;
+}
+
+Coordinate* Geometry::getCoordinate() {
+    // avoid mem-leak due to https://trac.osgeo.org/geos/ticket/918
+    if (THIS->isEmpty()) XSRETURN_UNDEF;
+
+    auto c = THIS->getCoordinate();
+    if (c) RETVAL = new Coordinate(*c);
+    else XSRETURN_UNDEF;
+}
+
+std::string Geometry::getGeometryType()
+
+int Geometry::getGeometryTypeId()
+
+std::string Geometry::toString (...)
+
+std::string Geometry::toText()
+
+bool Geometry::equalsExact(Geometry& other, double tolerance = 0) { RETVAL = THIS->equalsExact(&other, tolerance); }
+
+bool Geometry::equals(Geometry& other) { RETVAL = THIS->equals(&other); }
+
+int Geometry::compareTo(Geometry& other) { RETVAL = THIS->compareTo(&other); }
+
+Sv Geometry::getBoundary() { RETVAL = Helper::uplift(THIS->getBoundary()); }
+
+double Geometry::getArea()
+
+double Geometry::getLength()
+
+double Geometry::distance(Geometry& g) { RETVAL = THIS->distance(&g); }
+
+bool Geometry::isWithinDistance(Geometry& g, double distance) { RETVAL = THIS->isWithinDistance(&g, distance); }
+
+Point* Geometry::getCentroid() { RETVAL = THIS->getCentroid(); }
+
+Point* Geometry::getInteriorPoint() { RETVAL = THIS->getInteriorPoint(); }
+
+Sv Geometry::symDifference(Geometry& other) { RETVAL = Helper::uplift(THIS->symDifference(&other)); }
+
+Sv Geometry::difference(Geometry& other) { RETVAL = Helper::uplift(THIS->difference(&other)); }
+
+Sv Geometry::Union(Geometry& other) { RETVAL = Helper::uplift(THIS->Union(&other)); }
+
+Sv Geometry::intersection(Geometry& other) { RETVAL = Helper::uplift(THIS->intersection(&other)); }
+
+Sv Geometry::convexHull() { RETVAL = Helper::uplift(THIS->convexHull()); }
+
+Sv Geometry::buffer(double distance, SV* arg2 = NULL, SV* arg3 = NULL) {
+    Geometry* r;
+    if (!arg2) r = THIS->buffer(distance);
+    else {
+        int quadrantSegments = SvIV(arg2);
+        if (arg3) {
+            int endCapStyle = SvIV(arg3);
+            r = THIS->buffer(distance, quadrantSegments, endCapStyle);
+        } else {
+            r = THIS->buffer(distance, quadrantSegments);
+        }
+    }
+    RETVAL = Helper::uplift(r);
+}
+
+bool Geometry::coveredBy(Geometry& other) { RETVAL = THIS->coveredBy(&other); }
+
+bool Geometry::covers(Geometry& other) { RETVAL = THIS->covers(&other); }
+
+bool Geometry::overlaps(Geometry& other) { RETVAL = THIS->overlaps(&other); }
+
+bool Geometry::contains(Geometry& other) { RETVAL = THIS->contains(&other); }
+
+bool Geometry::within(Geometry& other) { RETVAL = THIS->within(&other); }
+
+bool Geometry::crosses(Geometry& other) { RETVAL = THIS->crosses(&other); }
+
+bool Geometry::intersects(Geometry& other) { RETVAL = THIS->intersects(&other); }
+
+bool Geometry::touches(Geometry& other) { RETVAL = THIS->touches(&other); }
+
+bool Geometry::disjoint(Geometry& other) { RETVAL = THIS->disjoint(&other); }
+
+Sv Geometry::getEnvelope() { RETVAL = Helper::uplift(THIS->getEnvelope()); }
+
+Sv Geometry::clone() { RETVAL = Helper::uplift(THIS->clone()); }
+
+PrecisionModel* Geometry::getPrecisionModel() {
+    auto pm = THIS->getPrecisionModel();
+    RETVAL = new PrecisionModel(*pm);
+}
+
+Array Geometry::getCoordinates() {
+    auto seq = std::unique_ptr<CoordinateSequence>(THIS->getCoordinates());
+    RETVAL = Helper::convert_copy(seq.get());
+}
+
+Sv Geometry::relate(Geometry& other, SV* arg = NULL) {
+    if (!arg) RETVAL = xs::out<IntersectionMatrix*>(THIS->relate(&other));
+    else {
+        std::string intersectionPattern {  SvPV_nolen(arg) };
+        RETVAL = Simple(THIS->relate(&other, intersectionPattern));
+    }
+}
+
+
+void Geometry::normalize()
+
+BOOT {
+    auto this_stash = Stash(__PACKAGE__);
+    xs::exp::create_constants(this_stash, {
+        {"TYPE_GEOS_POINT",              GeometryTypeId::GEOS_POINT},
+        {"TYPE_GEOS_LINESTRING",         GeometryTypeId::GEOS_LINESTRING},
+        {"TYPE_GEOS_LINEARRING",         GeometryTypeId::GEOS_LINEARRING},
+        {"TYPE_GEOS_POLYGON",            GeometryTypeId::GEOS_POLYGON},
+        {"TYPE_GEOS_MULTIPOINT",         GeometryTypeId::GEOS_MULTIPOINT},
+        {"TYPE_GEOS_MULTILINESTRING",    GeometryTypeId::GEOS_MULTILINESTRING},
+        {"TYPE_GEOS_MULTIPOLYGON",       GeometryTypeId::GEOS_MULTIPOLYGON},
+        {"TYPE_GEOS_GEOMETRYCOLLECTION", GeometryTypeId::GEOS_GEOMETRYCOLLECTION},
+
+        {"TYPE_CAP_ROUND",  geos::operation::buffer::BufferParameters::CAP_ROUND},
+        {"TYPE_CAP_FLAT",   geos::operation::buffer::BufferParameters::CAP_FLAT},
+        {"TYPE_CAP_SQUARE", geos::operation::buffer::BufferParameters::CAP_SQUARE}
+    });
+    xs::exp::autoexport(this_stash);
+
+    Stash("Geo::Geos::GeometryCollection").inherit(__PACKAGE__);
+
+    Stash("Geo::Geos::Puntal", GV_ADD).mark_as_loaded("Geo::Geos");
+    Stash("Geo::Geos::Puntal").inherit(__PACKAGE__);
+
+    Stash("Geo::Geos::Lineal", GV_ADD).mark_as_loaded("Geo::Geos");
+    Stash("Geo::Geos::Lineal").inherit(__PACKAGE__);
+
+    Stash("Geo::Geos::Polygonal", GV_ADD).mark_as_loaded("Geo::Geos");
+    Stash("Geo::Geos::Polygonal").inherit(__PACKAGE__);
+}
+
+int CLONE_SKIP (...) { PERL_UNUSED_VAR(items); RETVAL = 1; }
+
+Sv Geometry::HOOK_CLONE () {
+    RETVAL = Helper::uplift(THIS->clone());
+}
+

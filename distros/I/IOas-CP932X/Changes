@@ -1,5 +1,9 @@
 Revision history for this software.
 
+0.05  2019-08-14 00:00:00
+  - fix POD
+  - created by INABA Hitoshi
+
 0.04  2019-08-03 00:00:00
   - requires version 2.13.81.7 or later of Jacode4e::RoundTrip
   - created by INABA Hitoshi

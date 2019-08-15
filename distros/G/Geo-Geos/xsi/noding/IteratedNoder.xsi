@@ -1,0 +1,17 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::Noding::IteratedNoder
+PROTOTYPES: DISABLE
+
+Sv new(SV*, SV* precisionModel) {
+    PrecisionModel& pm = xs::in<PrecisionModel&>(precisionModel);
+    Object wrapped = xs::out<IteratedNoder*>(new IteratedNoder(&pm));
+    wrapped.payload_attach(precisionModel, &payload_marker);
+    RETVAL = wrapped.ref();
+}
+
+void IteratedNoder::setMaximumIterations (int n)
+
+int CLONE_SKIP (...) { PERL_UNUSED_VAR(items); RETVAL = 1; }
+
+BOOT {
+    Stash(__PACKAGE__).inherit("Geo::Geos::Noding::Noder");
+}

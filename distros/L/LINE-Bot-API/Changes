@@ -1,5 +1,14 @@
 Revision history for Perl extension LINE::Bot::API
 
+1.11  2019-08-14 15:04:38 JST
+        - Add support for renewing OAuth tokens. (PR #74)
+
+1.10  2019-08-14 14:58:51 JST
+        - Add an example of using altUri.desktop.
+        - Add APIs for getting group/room member profiles
+        - Add support for renewing OAuth tokens.
+        - Add a Type library to be used in the future.
+
 1.09  2019-06-19 12:55:11 JST
         - Add broadcast APIs (PR #71)
         - Add get_quota APIs (PR #69)

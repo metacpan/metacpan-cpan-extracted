@@ -1,0 +1,17 @@
+{
+   "small_test.fa" : {
+      "min" : 4,
+      "size" : 130,
+      "N50" : 65,
+      "seqs" : 6,
+      "max" : 65
+   },
+   "test.fa" : {
+      "max" : 256,
+      "seqs" : 8,
+      "min" : 4,
+      "size" : 825,
+      "N50" : 189
+   }
+}
+

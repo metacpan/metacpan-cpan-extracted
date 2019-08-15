@@ -2,7 +2,7 @@ NAME
     Generic::ColorTheme::Kuler - Color themes from Adobe Kuler
 
 VERSION
-    This document describes version 0.001 of Generic::ColorTheme::Kuler
+    This document describes version 0.002 of Generic::ColorTheme::Kuler
     (from Perl distribution Generic-ColorTheme-Kuler), released on
     2018-02-25.
 

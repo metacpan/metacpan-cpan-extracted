@@ -1,0 +1,132 @@
+=head1 NAME
+
+Geo::Geos::Operation - Provides methods for implementing operations on geometries.
+
+=head1 SYNOPSIS
+
+    use Geo::Geos::Coordinate;
+    use Geo::Geos::Geometry qw/TYPE_CAP_ROUND/;
+    use Geo::Geos::GeometryFactory;
+    # imports constants:
+    # TYPE_OP_INTERSECTION, TYPE_OP_UNION, TYPE_OP_DIFFERENCE, TYPE_OP_SYMDIFFERENCE,
+    # TYPE_BOUNDARY_NODE_RULE_MOD2, TYPE_BOUNDARY_ENDPOINT, TYPE_BOUNDARY_MULTIVALENT_ENDPOINT
+    # TYPE_BOUNDARY_MONOVALENT_ENDPOINT, TYPE_BOUNDARY_OGCSFS
+
+    use Geo::Geos::Operation;
+    use Geo::Geos::Operation qw/buffer distance nearestPoints closestPoints overlayOp relate
+                           isValid mergeLines isSequenced sequence/;
+
+    my $gf = Geo::Geos::GeometryFactory::create();
+    my $c1 = Geo::Geos::Coordinate->new(1,2);
+    my $c2 = Geo::Geos::Coordinate->new(5,2);
+    my $in = $gf->createMultiPoint([$c1, $c2], 2);
+
+    my $distance = 1.0;
+    my $quadrantSegments = 1;
+    my $capStyle = TYPE_CAP_ROUND;
+
+    # buffer
+    buffer($in, $distance);                                # => isa 'Geo::Geos::Geometry'
+    buffer($in, $distance, $quadrantSegments);             # => isa 'Geo::Geos::Geometry'
+    buffer($in, $distance, $quadrantSegments, $capStyle);  # => isa 'Geo::Geos::Geometry'
+
+    # distance
+    my $c11 = Geo::Geos::Coordinate->new(1,2);
+    my $c12 = Geo::Geos::Coordinate->new(5,2);
+    my $g0 = $gf->createMultiPoint([$c11, $c12], 2);
+
+    my $c21 = Geo::Geos::Coordinate->new(1,3);
+    my $c22 = Geo::Geos::Coordinate->new(5,3);
+    my $g1 = $gf->createMultiPoint([$c21, $c21], 2);
+
+    distance($g0, $g1);        # => 1
+    nearestPoints($g0, $g1);   # => is_deeply [Geo::Geos::Coordinate->new(1,2), Geo::Geos::Coordinate->new(1,3)]
+    closestPoints($g0, $g1);   # => is_deeply [Geo::Geos::Coordinate->new(1,2), Geo::Geos::Coordinate->new(1,3)]
+
+    # overlay
+    overlayOp($g0, $g1, TYPE_OP_INTERSECTION);  # => isa 'Geo::Geos::Geometry'
+
+    # valid
+    isValid($g0);      # => successs
+
+    # relate
+    relate($g0, $g1);                          # => isa 'Geo::Geos::IntersectionMatrix'
+    relate($g0, $g1, TYPE_BOUNDARY_OGCSFS);    # => isa 'Geo::Geos::IntersectionMatrix'
+
+    # merge lines
+    my $c_11 = Geo::Geos::Coordinate->new(1,2);
+    my $c_12 = Geo::Geos::Coordinate->new(5,2);
+    my $c_21 = Geo::Geos::Coordinate->new(5,2);
+    my $c_22 = Geo::Geos::Coordinate->new(7,2);
+
+    my $ls1 = $gf->createLineString([$c_11, $c_12], 2);
+    my $ls2 = $gf->createLineString([$c_21, $c_22], 2);
+    my $geometries = mergeLines([$ls1, $ls2]);
+    my $g = $geometries->[0];   # => isa 'Geo::Geos::Geometry'
+    $g->getGeometryType;        # => 'LineString'
+
+    # sequence lines
+    isSequenced($ls1);     # => success
+    sequence($ls1);        # => isa 'Geo::Geos::Geometry'
+
+=head1 SEE ALSO (C++ classes docs)
+
+L<GEOS C++ Library|https://trac.osgeo.org/geos>
+
+geos::algorithm::BoundaryNodeRule
+
+geos::operation::buffer::BufferOp
+
+geos::operation::distance::DistanceOp
+
+geos::operation::overlay::OverlayOp
+
+geos::operation::valid::IsValidOp
+
+geos::operation::relate::RelateOp
+
+geos::operation::linemerge::LineMerger
+
+geos::operation::linemerge::LineSequencer
+
+=head1 EXPORTS CONSTANTS
+
+=over 2
+
+=item TYPE_OP_INTERSECTION
+
+=item TYPE_OP_UNION
+
+=item TYPE_OP_DIFFERENCE
+
+=item TYPE_OP_SYMDIFFERENCE
+
+=item TYPE_BOUNDARY_NODE_RULE_MOD2
+
+=item TYPE_BOUNDARY_ENDPOINT
+
+=item TYPE_BOUNDARY_MULTIVALENT_ENDPOINT
+
+=item TYPE_BOUNDARY_MONOVALENT_ENDPOINT
+
+=item TYPE_BOUNDARY_OGCSFS
+
+=back
+
+=head1 SEE ALSO
+
+L<Geo::Geos>
+
+L<Geo::Geos::Geometry>
+
+L<Geo::Geos::IntersectionMatrix>
+
+=head1 AUTHOR
+
+Ivan Baidakou <i.baydakov@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

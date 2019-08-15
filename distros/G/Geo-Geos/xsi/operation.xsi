@@ -1,0 +1,110 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::Operation
+PROTOTYPES: DISABLE
+
+Sv buffer(Geometry& g, double distance, SV* quadrantSegments = NULL, SV* endCapStyle = NULL) {
+    int vQuadrantSegments = quadrantSegments ? SvIV(quadrantSegments) : (int)BufferParameters::DEFAULT_QUADRANT_SEGMENTS;
+    int vEndCapStyle = endCapStyle? SvIV(endCapStyle) : (int)BufferParameters::CAP_ROUND;
+    Geometry* r = BufferOp::bufferOp(&g, distance, vQuadrantSegments, vEndCapStyle);
+    RETVAL = Helper::uplift(r);
+}
+
+double distance(Geometry& g0, Geometry& g1) {
+    RETVAL = DistanceOp::distance(&g0, &g1);
+}
+
+Array nearestPoints(Geometry& g0, Geometry& g1) {
+    Array r;
+    auto seq = DistanceOp::nearestPoints(&g0, &g1);
+    if(seq) {
+        auto seq_ptr = std::unique_ptr<CoordinateSequence>(seq);
+        r = Helper::convert_copy(seq);
+    }
+    RETVAL = r;
+}
+
+Array closestPoints(Geometry& g0, Geometry& g1) {
+    Array r;
+    auto seq = DistanceOp::closestPoints(&g0, &g1);
+    if(seq) {
+        auto seq_ptr = std::unique_ptr<CoordinateSequence>(seq);
+        r = Helper::convert_copy(seq);
+    }
+    RETVAL = r;
+}
+
+Sv overlayOp(Geometry& g0, Geometry& g1, int opCode) {
+    if (opCode > 4) throw "wrong opCode";
+    OverlayOp::OpCode code = static_cast<OverlayOp::OpCode>(opCode);
+    Geometry* g = OverlayOp::overlayOp(&g0, &g1, code);
+    RETVAL = Helper::uplift(g);
+}
+
+bool isValid(Object obj) {
+    if (obj.stash().name() == "Geo::Geos::Coordinate") {
+        auto& c = xs::in<Coordinate&>(obj);
+        RETVAL = IsValidOp::isValid(c);
+    }
+    else {
+        auto& g = xs::in<Geometry&>(obj);
+        RETVAL = IsValidOp::isValid(g);
+    }
+}
+
+IntersectionMatrix* relate(Geometry& g0, Geometry& g1, SV* boundaryNodeRule = NULL) {
+    if (!boundaryNodeRule) RETVAL = RelateOp::relate(&g0, &g1);
+    else {
+        const BoundaryNodeRule* rule;
+        auto rule_id = SvIV(boundaryNodeRule);
+        switch(rule_id) {
+            case 0: rule = &BoundaryNodeRule::getBoundaryRuleMod2(); break;
+            case 1: rule = &BoundaryNodeRule::getBoundaryEndPoint(); break;
+            case 2: rule = &BoundaryNodeRule::getBoundaryMultivalentEndPoint(); break;
+            case 3: rule = &BoundaryNodeRule::getBoundaryMonovalentEndPoint(); break;
+            case 4: rule = &BoundaryNodeRule::getBoundaryOGCSFS(); break;
+            default: throw("Wrong boundaryNodeRule");
+        }
+        RETVAL = RelateOp::relate(&g0, &g1, *rule);
+    }
+}
+
+Array mergeLines(Array in) {
+    LineMerger lm;
+
+    for(auto it: in) {
+        lm.add(&xs::in<Geometry&>(it));
+    }
+
+    auto v = lm.getMergedLineStrings();
+    Array out = Array::create(v->size());
+    for(LineString* it: *v) {
+        auto wrapped = xs::out<LineString*>(it);
+        out.push(wrapped);
+    }
+    RETVAL  = out;
+    delete v;
+}
+
+bool isSequenced(Geometry& g) {
+    RETVAL = LineSequencer::isSequenced(&g);
+}
+
+Sv sequence(Geometry& g) {
+    RETVAL = Helper::uplift(LineSequencer::sequence(g));
+}
+
+BOOT {
+    auto this_stash = Stash(__PACKAGE__);
+    xs::exp::create_constants(this_stash, {
+        {"TYPE_OP_INTERSECTION",         OverlayOp::OpCode::opINTERSECTION},
+        {"TYPE_OP_UNION",                OverlayOp::OpCode::opUNION},
+        {"TYPE_OP_DIFFERENCE",           OverlayOp::OpCode::opDIFFERENCE},
+        {"TYPE_OP_SYMDIFFERENCE",        OverlayOp::OpCode::opSYMDIFFERENCE},
+
+        {"TYPE_BOUNDARY_NODE_RULE_MOD2",            0},
+        {"TYPE_BOUNDARY_ENDPOINT",                  1},
+        {"TYPE_BOUNDARY_MULTIVALENT_ENDPOINT",      2},
+        {"TYPE_BOUNDARY_MONOVALENT_ENDPOINT",       3},
+        {"TYPE_BOUNDARY_OGCSFS",                    4}
+    });
+    xs::exp::autoexport(this_stash);
+}

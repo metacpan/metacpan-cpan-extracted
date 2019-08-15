@@ -1,7 +1,7 @@
 package Data::Sah::Compiler::human::TH::all;
 
-our $DATE = '2019-08-12'; # DATE
-our $VERSION = '0.900'; # VERSION
+our $DATE = '2019-08-14'; # DATE
+our $VERSION = '0.901'; # VERSION
 
 use 5.010;
 use strict;
@@ -91,7 +91,7 @@ Data::Sah::Compiler::human::TH::all - perl's type handler for type "all"
 
 =head1 VERSION
 
-This document describes version 0.900 of Data::Sah::Compiler::human::TH::all (from Perl distribution Data-Sah), released on 2019-08-12.
+This document describes version 0.901 of Data::Sah::Compiler::human::TH::all (from Perl distribution Data-Sah), released on 2019-08-14.
 
 =for Pod::Coverage ^(clause_.+|superclause_.+)$
 

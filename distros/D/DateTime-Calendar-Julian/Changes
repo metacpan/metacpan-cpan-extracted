@@ -1,3 +1,6 @@
+0.101		2019-08-14	T. R. Wyant
+    - Fix broken POD links, and add test to ensure they stay fixed.
+
 0.100		2018-12-21	T. R. Wyant
     - Update author and copyright information.
 

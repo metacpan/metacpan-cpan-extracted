@@ -5,7 +5,7 @@ use warnings;
 
 use 5.008;
 
-our $VERSION = '0.43';
+our $VERSION = '0.44';
 
 1;
 
@@ -23,7 +23,7 @@ Specio - Type constraints and coercions for Perl
 
 =head1 VERSION
 
-version 0.43
+version 0.44
 
 =head1 SYNOPSIS
 
@@ -398,6 +398,30 @@ coercions and parameterizable types. This is a misfeature.
 
 =back
 
+=head1 OPTIONAL PREREQS
+
+There are several optional prereqs that if installed will make this
+distribution better in some way.
+
+=over 4
+
+=item * L<Ref::Util>
+
+Installing this will speed up a number of type checks for built-in types.
+
+=item * L<XString>
+
+If this is installed it will be loaded instead of the L<B> module if you have
+Perl 5.10 or greater. This module is much more memory efficient than loading
+all of L<B>.
+
+=item * L<Sub::Util> or L<Sub::Name>
+
+If one of these is installed then stack traces that end up in Specio code will
+have much better subroutine names for any frames.
+
+=back
+
 =head1 WHY THE NAME?
 
 This distro was originally called "Type", but that's an awfully generic top
@@ -443,9 +467,13 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords cpansprout Graham Knop Karen Etheridge
+=for stopwords Chris White cpansprout Graham Knop Karen Etheridge
 
 =over 4
+
+=item *
+
+Chris White <chrisw@leehayes.com>
 
 =item *
 
@@ -463,7 +491,7 @@ Karen Etheridge <ether@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2018 by Dave Rolsky.
+This software is Copyright (c) 2012 - 2019 by Dave Rolsky.
 
 This is free software, licensed under:
 

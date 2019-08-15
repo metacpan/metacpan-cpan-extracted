@@ -1,3 +1,15 @@
+0.003   2018-12-22 (PERLANCAR)
+
+	- Add some more modules.
+
+
+0.002   2018-12-22 (PERLANCAR)
+
+	- Add App::hr.
+
+        - Replace mention of AC:NO_COLOR::NonCompliant to AC:ColorEnv.
+
+
 0.001   2018-12-22 (PERLANCAR)
 
         - First release.

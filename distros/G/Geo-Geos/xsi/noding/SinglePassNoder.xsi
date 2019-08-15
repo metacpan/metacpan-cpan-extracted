@@ -1,0 +1,23 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::Noding::SinglePassNoder
+PROTOTYPES: DISABLE
+
+void SinglePassNoder::setSegmentIntersector(SV *newSegInt = NULL) {
+    Object self{ST(0)};
+
+    SegmentIntersector* si = newSegInt ? xs::in<SegmentIntersector*>(newSegInt) : NULL;
+    if (si) {
+        self.payload_attach(SvRV(newSegInt), &payload_marker);
+    }
+    else if (self.payload_exists(&payload_marker)) {
+        self.payload_detach(&payload_marker);
+    }
+
+    THIS->setSegmentIntersector(si);
+}
+
+
+int CLONE_SKIP (...) { PERL_UNUSED_VAR(items); RETVAL = 1; }
+
+BOOT {
+    Stash(__PACKAGE__).inherit("Geo::Geos::Noding::Noder");
+}

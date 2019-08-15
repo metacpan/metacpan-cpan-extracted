@@ -1,31 +1,43 @@
-0.595   2019-02-13 (PERLANCAR)
+0.597   2019-07-17  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+        - [test] Add tests for rand_rgb_color() and rand_rgb_colors().
+
+
+0.596   2019-07-17  Released-By: PERLANCAR; Urgency: medium
+
+	- Add functions: rand_rgb_golors, rgb2int, int2rgb.
+
+
+0.595   2019-02-13  Released-By: PERLANCAR
 
 	- Add functions: assign_rgb_light_color, assign_rgb_dark_color.
 
 
-0.594   2019-02-13 (PERLANCAR)
+0.594   2019-02-13  Released-By: PERLANCAR
 
 	- Add function: assign_rgb_color.
 
 
-0.593   2018-10-05 (PERLANCAR)
+0.593   2018-10-05  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [build] Rebuild to fix repository URL.
 
 
-0.592   2018-10-05 (PERLANCAR)
+0.592   2018-10-05  Released-By: PERLANCAR
 
         - Add mix_rgb_colors.
 
 
-0.591   2018-10-04 (PERLANCAR)
+0.591   2018-10-04  Released-By: PERLANCAR
 
         - Add rgb_diff().
 
 
-0.590   2018-09-26 (PERLANCAR)
+0.590   2018-09-26  Released-By: PERLANCAR
 
 	- Add functions: rgb_distance, rgb_is_dark, rgb_is_light.
 
@@ -35,19 +47,19 @@
 	- [doc] Format POD headings so they can be easily referred to.
 
 
-0.58    2015-01-03 (PERLANCAR)
+0.58    2015-01-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Rebuild (Generate TODO.md).
 
 
-0.57    2014-12-05 (PERLANCAR)
+0.57    2014-12-05  Released-By: PERLANCAR
 
         - Rename module/dist from SHARYANTO-Color-Util to Color-RGB-Util.
 
 
-0.56    2013-09-10 (SHARYANTO)
+0.56    2013-09-10  Released-By: SHARYANTO
 
         - No functional changes. Split from SHARYANTO-Utils to minimize
           dependencies (I'm trying to make Text::ANSITable work under Windows).

@@ -1,7 +1,7 @@
 package Perinci::Examples::Bin::Any::Completion;
 
-our $DATE = '2019-07-06'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-07-19'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 1;
 # ABSTRACT: Example CLI scripts related to completion
@@ -18,7 +18,7 @@ Perinci::Examples::Bin::Any::Completion - Example CLI scripts related to complet
 
 =head1 VERSION
 
-This document describes version 0.004 of Perinci::Examples::Bin::Any::Completion (from Perl distribution Perinci-Examples-Bin-Any-Completion), released on 2019-07-06.
+This document describes version 0.007 of Perinci::Examples::Bin::Any::Completion (from Perl distribution Perinci-Examples-Bin-Any-Completion), released on 2019-07-19.
 
 =head1 HOMEPAGE
 

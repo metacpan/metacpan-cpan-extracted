@@ -14,10 +14,12 @@ use Unicode::Normalize ();
 use Future::Mojo 0.004;    # ->new_timeout
 use Future::Utils qw(fmap);
 use Scalar::Util qw(blessed);
+use Encode;
+use DataDog::DogStatsd::Helper qw(stats_inc);
 
 use constant TIMEOUT => $ENV{MOJO_WEBSOCKETPROXY_TIMEOUT} || 15;
 
-our $VERSION = '0.11';     ## VERSION
+our $VERSION = '0.12';     ## VERSION
 around 'send' => sub {
     my ($orig, $c, $api_response, $req_storage) = @_;
 
@@ -63,15 +65,43 @@ sub open_connection {
     $c->on(
         text => sub {
             my ($c, $msg) = @_;
+
+            my $original = "$msg";
             # Incoming data will be JSON-formatted text, as a Unicode string.
             # We normalize the entire string before decoding.
-            my $normalized_msg = Unicode::Normalize::NFC($msg);
-            if (my $args = eval { decode_json_utf8($normalized_msg) }) {
-                on_message($c, $args);
-            } else {
-                $c->finish(1007 => 'Malformed JSON');
-                $log->debug(qq{JSON decoding failed for "$normalized_msg": $@});
-            }
+
+            my $decoded = eval { Encode::decode_utf8($msg, Encode::FB_CROAK) } or do {
+                $c->tx->emit(
+                    encoding_error => _get_error_details(
+                        code    => 'INVALID_UTF8',
+                        reason  => 'Malformed UTF-8 data',
+                        message => $msg
+                    ));
+                return;
+            };
+
+            # The Unicode::Normalize::NFC check is added as a safety net. However, the error is not triggered so far.
+            my $normalized_msg = eval { Unicode::Normalize::NFC($decoded) } or do {
+                $c->tx->emit(
+                    encoding_error => _get_error_details(
+                        code    => 'INVALID_UNICODE',
+                        reason  => 'Malformed Unicode data',
+                        message => $msg
+                    ));
+                return;
+            };
+
+            my $args = eval { decode_json_text($normalized_msg); } or do {
+                $c->tx->emit(
+                    encoding_error => _get_error_details(
+                        code    => 'INVALID_JSON',
+                        reason  => 'Malformed JSON data',
+                        message => $msg
+                    ));
+                return;
+            };
+
+            on_message($c, $args);
         });
 
     $c->on(
@@ -137,6 +167,10 @@ sub on_message {
             my ($result) = @_;
             $c->send({json => $result}, $req_storage) if $result;
             return $c->_run_hooks($config->{after_dispatch} || []);
+        }
+        )->on_fail(
+        sub {
+            $c->app->log->error("An error occurred handling on_message. Error @_");
         })->retain;
 }
 
@@ -216,6 +250,19 @@ sub forward {
     return;
 }
 
+sub _get_error_details {
+    my (%args) = @_;
+
+    return {
+        error   => 'Error Processing Request',
+        details => {
+            error_code   => $args{code},
+            reason       => $args{reason},
+            request_body => $args{message},
+        },
+    };
+}
+
 1;
 
 __END__
@@ -263,6 +310,10 @@ Dispatch request using message json key.
 Forward call to RPC server using global and action hooks.
 Don't forward call to RPC if any before_forward hook returns response.
 Or if there is instead_of_forward action.
+
+=head2 _get_error_details
+
+Generates and returns a hash for error reporting
 
 =head2 ok
 

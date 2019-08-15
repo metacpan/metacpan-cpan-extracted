@@ -26,7 +26,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Any
   homepage: https://metacpan.org/release/Perinci-CmdLine-Any
   repository: git://github.com/perlancar/perl-Perinci-CmdLine-Any.git
-version: '0.150'
+version: '0.151'
 x_Dist_Zilla:
   perl:
     version: '5.028002'
@@ -379,9 +379,13 @@ x_Dist_Zilla:
       name: Prereqs
       version: '6.012'
     -
-      class: Dist::Zilla::Plugin::Extras
-      name: 'lint-prereqs / assume-used'
-      version: '0.03'
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: suggests
+      name: RuntimeSuggests
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'

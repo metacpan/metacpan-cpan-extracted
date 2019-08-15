@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use Perl::Version;
 
-$Geoffrey::Role::Converter::VERSION = '0.000101';
+$Geoffrey::Role::Converter::VERSION = '0.000102';
 
 sub new {
     my $class = shift;
@@ -20,14 +20,26 @@ sub changelog_table {
 }
 
 sub changelog_columns {
-    return [
-        {name => 'id', type => 'varchar', lenght => 64, primarykey => 1, notnull => 1, default => '\'\''},
-        {name => 'author',           type => 'varchar', lenght => 128, notnull => 1, default => '\'\'',},
-        {name => 'filename',         type => 'varchar', lenght => 255, notnull => 1, default => '\'\''},
-        {name => 'md5sum',           type => 'varchar', lenght => 64,  notnull => 1, default => '\'\''},
-        {name => 'description',      type => 'varchar', lenght => 255,},
-        {name => 'comment',          type => 'varchar', lenght => 128,},
-        {name => 'geoffrey_version', type => 'varchar', lenght => 16,  notnull => 1, default => '\'\''},
+    return [{
+            name       => 'id',
+            type       => 'varchar',
+            lenght     => 64,
+            primarykey => 1,
+            notnull    => 1,
+            default    => '\'\''
+        },
+        {name => 'created_by', type => 'varchar', lenght => 128, notnull => 1, default => '\'\'',},
+        {name => 'filename',   type => 'varchar', lenght => 255,},
+        {name => 'md5sum',     type => 'varchar', lenght => 64,},
+        {name => 'description', type => 'varchar', lenght => 255,},
+        {name => 'comment',     type => 'varchar', lenght => 128,},
+        {
+            name    => 'geoffrey_version',
+            type    => 'varchar',
+            lenght  => 16,
+            notnull => 1,
+            default => '\'\''
+        },
         {name => 'created', type => 'timestamp', default => 'current_timestamp', notnull => 1,},
     ];
 }
@@ -51,11 +63,11 @@ sub origin_types {
         'oid',     'oidvector',                                                    #O
         'path',    'pg_node_tree', 'point', 'polygon',                             #P
                                                                                    #Q
-        'real', 'refcursor', 'regclass', 'regconfig', 'regdictionary', 'regoper', 'regoperator', 'regproc',
-        'regprocedure', 'regtype', 'reltime',                                      #R
-        'serial', 'smallint', 'smallserial', 'smgr',                               #S
-        'text', 'tid', 'timestamp', 'timestamp_tz', 'time', 'time_tz', 'tinterval', 'tsquery', 'tsrange',
-        'tstzrange', 'tsvector', 'txid_snapshot',                                  #T
+        'real', 'refcursor', 'regclass', 'regconfig', 'regdictionary', 'regoper', 'regoperator',
+        'regproc', 'regprocedure', 'regtype',     'reltime',                       #R
+        'serial',  'smallint',     'smallserial', 'smgr',                          #S
+        'text', 'tid', 'timestamp', 'timestamp_tz', 'time', 'time_tz', 'tinterval', 'tsquery',
+        'tsrange', 'tstzrange', 'tsvector', 'txid_snapshot',                       #T
         'uuid',                                                                    #U
                                                                                    #V
                                                                                    #W
@@ -82,52 +94,60 @@ sub check_version {
         $s_max_version = Perl::Version->new($s_max_version);
         return 1 if ($s_min_version <= $s_version && $s_version <= $s_max_version);
         require Geoffrey::Exception::NotSupportedException;
-        Geoffrey::Exception::NotSupportedException::throw_version($self, $s_min_version, $s_version,
-            $s_max_version);
+        Geoffrey::Exception::NotSupportedException::throw_version($self, $s_min_version,
+            $s_version, $s_max_version);
     }
     elsif ($s_min_version <= $s_version) {
         return 1;
     }
     require Geoffrey::Exception::NotSupportedException;
-    return Geoffrey::Exception::NotSupportedException::throw_version($self, $s_min_version, $s_version);
+    return Geoffrey::Exception::NotSupportedException::throw_version($self, $s_min_version,
+        $s_version);
 }
 
 sub type {
-    my ($self, $hr_column) = @_;
-    if (!$hr_column->{type}) {
+    my ($self, $hr_column_params) = @_;
+    if (!$hr_column_params->{type}) {
         require Geoffrey::Exception::RequiredValue;
         Geoffrey::Exception::RequiredValue::throw_column_type($self);
     }
-
     my $s_column_type
-        = (grep {/^$hr_column->{type}$/sxm} @{$self->origin_types()})
-        ? $self->types()->{$hr_column->{type}}
+        = (grep {/^$hr_column_params->{type}$/sxm} @{$self->origin_types()})
+        ? $self->types()->{$hr_column_params->{type}}
         : undef;
     if (!$s_column_type) {
         require Geoffrey::Exception::NotSupportedException;
-        Geoffrey::Exception::NotSupportedException::throw_column_type($hr_column->{type}, $self);
+        Geoffrey::Exception::NotSupportedException::throw_column_type($hr_column_params->{type},
+            $self);
     }
-    $s_column_type .= $hr_column->{strict} ? '(strict)' : q//;
-    $s_column_type .= defined $hr_column->{lenght} ? qq~($hr_column->{lenght})~ : q//;
+    $s_column_type .= $hr_column_params->{strict} ? '(strict)' : q//;
+    $s_column_type
+        .= defined $hr_column_params->{lenght} ? qq~($hr_column_params->{lenght})~ : q//;
     return $s_column_type;
 }
 
-sub _create_table {
-    my ($self, $dbh, $s_name, $ar_columns, $ar_constraints) = @_;
-    my $sth = $dbh->prepare($self->select_get_table);
-    $sth->execute($s_name) or croak $!;
-    my $table = $sth->fetchrow_hashref();
-    return if defined $table;
-    return {
-        name    => $s_name,
-        columns => $ar_columns,
-        ($ar_constraints ? (constraints => $ar_constraints) : ()),
-    };
+sub _get_table_hashref {
+    my ($self, $dbh, $s_name, $ar_columns, $s_schema) = @_;
+    my $s_select_get_table = $self->select_get_table;
+    my $sth                = $dbh->prepare($s_select_get_table);
+    if ($s_schema) {
+        $sth->execute($s_schema, $s_name) or Carp::confess $!;
+    }
+    else {
+        $sth->execute($s_name) or Carp::confess $!;
+    }
+    my $hr_table = $sth->fetchrow_hashref();
+    return if defined $hr_table;
+    return {name => $s_name, columns => $ar_columns,};
 }
 
-sub create_changelog_table {
-    my ($self, $o_dbh) = @_;
-    return $self->_create_table($o_dbh, $self->changelog_table(), $self->changelog_columns());
+sub get_changelog_table_hashref {
+    my ($self, $o_dbh, $s_schema) = @_;
+    return $self->_get_table_hashref(
+        $o_dbh,
+        $self->changelog_table(),
+        $self->changelog_columns(), $s_schema
+    );
 }
 
 sub constraints {
@@ -182,43 +202,50 @@ sub unique {
 
 sub colums_information {
     require Geoffrey::Exception::NotSupportedException;
-    return Geoffrey::Exception::NotSupportedException::throw_list_information('colums_information', shift);
+    return Geoffrey::Exception::NotSupportedException::throw_list_information('colums_information',
+        shift);
 }
 
 sub index_information {
     require Geoffrey::Exception::NotSupportedException;
-    return Geoffrey::Exception::NotSupportedException::throw_list_information('index_information', shift);
+    return Geoffrey::Exception::NotSupportedException::throw_list_information('index_information',
+        shift);
 }
 
 sub view_information {
     require Geoffrey::Exception::NotSupportedException;
-    return Geoffrey::Exception::NotSupportedException::throw_list_information('view_information', shift);
+    return Geoffrey::Exception::NotSupportedException::throw_list_information('view_information',
+        shift);
 }
 
 sub sequence_information {
     require Geoffrey::Exception::NotSupportedException;
-    return Geoffrey::Exception::NotSupportedException::throw_list_information('sequence_information', shift);
+    return Geoffrey::Exception::NotSupportedException::throw_list_information(
+        'sequence_information', shift);
 }
 
 sub primary_key_information {
     require Geoffrey::Exception::NotSupportedException;
-    return Geoffrey::Exception::NotSupportedException::throw_list_information('primary_key_information',
-        shift);
+    return Geoffrey::Exception::NotSupportedException::throw_list_information(
+        'primary_key_information', shift);
 }
 
 sub function_information {
     require Geoffrey::Exception::NotSupportedException;
-    return Geoffrey::Exception::NotSupportedException::throw_list_information('function_information', shift);
+    return Geoffrey::Exception::NotSupportedException::throw_list_information(
+        'function_information', shift);
 }
 
 sub unique_information {
     require Geoffrey::Exception::NotSupportedException;
-    return Geoffrey::Exception::NotSupportedException::throw_list_information('unique_information', shift);
+    return Geoffrey::Exception::NotSupportedException::throw_list_information('unique_information',
+        shift);
 }
 
 sub trigger_information {
     require Geoffrey::Exception::NotSupportedException;
-    return Geoffrey::Exception::NotSupportedException::throw_list_information('trigger_information', shift);
+    return Geoffrey::Exception::NotSupportedException::throw_list_information(
+        'trigger_information', shift);
 }
 
 1;    # End of Geoffrey::converter
@@ -235,7 +262,7 @@ Geoffrey::Role::Converter - Abstract converter class.
 
 =head1 VERSION
 
-Version 0.000101
+Version 0.000102
 
 =head1 DESCRIPTION
 
@@ -261,7 +288,7 @@ Version 0.000101
 
 =head2 type
 
-=head2 create_changelog_table
+=head2 get_changelog_table_hashref
 
 =head2 changelog_table
 

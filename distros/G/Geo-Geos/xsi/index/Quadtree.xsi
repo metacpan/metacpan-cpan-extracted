@@ -1,0 +1,29 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::Index::Quadtree
+PROTOTYPES: DISABLE
+
+Sv new(SV) {
+    Object wrapped = xs::out<quadtree::Quadtree*>(new quadtree::Quadtree());
+    auto payload = new SVs_map_payload();
+    wrapped.payload_attach(payload, &payload_marker_SVs_map);
+
+    RETVAL = wrapped.ref();
+}
+
+int quadtree::Quadtree::depth ()
+
+int quadtree::Quadtree::size ()
+
+Array quadtree::Quadtree::queryAll() {
+    Object me{ST(0)};
+    auto payload = me.payload(&payload_marker_SVs_map);
+    auto real_payload = static_cast<SVs_map_payload*>(payload.ptr);
+
+    std::unique_ptr<std::vector<void*>> holder {THIS->queryAll()};
+    RETVAL = Helper::wrap_inc_SVs(holder.get(), real_payload->map);
+}
+
+std::string quadtree::Quadtree::toString (...)
+
+BOOT {
+    Stash(__PACKAGE__).inherit("Geo::Geos::Index::SpatialIndex");
+}

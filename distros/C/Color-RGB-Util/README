@@ -2,27 +2,36 @@ NAME
     Color::RGB::Util - Utilities related to RGB colors
 
 VERSION
-    This document describes version 0.595 of Color::RGB::Util (from Perl
-    distribution Color-RGB-Util), released on 2019-02-13.
+    This document describes version 0.597 of Color::RGB::Util (from Perl
+    distribution Color-RGB-Util), released on 2019-07-17.
 
 SYNOPSIS
      use Color::RGB::Util qw(
+         assign_rgb_color
+         assign_rgb_dark_color
+         assign_rgb_light_color
+         int2rgb
          mix_2_rgb_colors
          mix_rgb_colors
          rand_rgb_color
-         assign_rgb_color
-         assign_rgb_light_color
-         assign_rgb_dark_color
-         rgb2grayscale
-         rgb2sepia
+         rand_rgb_colors
          reverse_rgb_color
+         rgb2grayscale
+         rgb2int
+         rgb2sepia
+         rgb_diff
+         rgb_distance
+         rgb_is_dark
+         rgb_is_light
          rgb_luminance
          tint_rgb_color
-         rgb_distance
-         rgb_diff
-         rgb_is_light
-         rgb_is_dark
      );
+
+     say assign_rgb_color("foo");                    # 0b5d33
+     say assign_rgb_dark_color("foo");               # 0b5d33
+     say assign_rgb_light_color("foo");              # 85ae99
+
+     say int2rgb(0xffffff);                          # ffffff
 
      say mix_2_rgb_colors('#ff0000', '#ffffff');     # pink (red + white)
      say mix_2_rgb_colors('ff0000', 'ffffff', 0.75); # pink with a whiter shade
@@ -34,38 +43,65 @@ SYNOPSIS
      say rand_rgb_color();
      say rand_rgb_color('000000', '333333');         # limit range
 
-     say assign_rgb_color("foo");                    # 0b5d33
-
-     say rgb2grayscale('0033CC');                    # => 555555
-
-     say rgb2sepia('0033CC');                        # => 4d4535
+     say rand_rgb_colors(
+           {light_color => 1, avoid_colors=>[qw/ffffff ffcc00 ff00cc/],
+           3);                                       # ("e9f3d7", "e0bbcc", "63f88c")
 
      say reverse_rgb_color('0033CC');                # => ffcc33
 
-     say rgb_luminance('d090aa');                    # => ffcc33
+     say rgb2grayscale('0033CC');                    # => 555555
 
-     say tint_rgb_color('#ff8800', '#0033cc');       # => b36e3c
+     say rgb2int("ffffff");                          # 16777215 (which is 0xffffff)
+
+     say rgb2sepia('0033CC');                        # => 4d4535
 
      say rgb_distance('000000', '000000')            # => 0
      say rgb_distance('01f000', '04f400')            # => 5
      say rgb_distance('ffff00', 'ffffff')            # => 255
+
+     say rgb_diff('000000', '000000');               # => 0
+     say rgb_diff('01f000', '04f400');               # => 5
+     say rgb_diff('ffff00', 'ffffff');               # => 255
+     say rgb_diff('000000', '000000', 'approx1');    # => 0
+     say rgb_diff('01f000', '04f400', 'approx1');    # => 9.06
+     say rgb_diff('ffff00', 'ffffff', 'approx1');    # => 360.98
 
      say rgb_is_dark('404040');                      # => 1
      say rgb_is_dark('a0a0a0');                      # => 0
      say rgb_is_light('404040');                     # => 0
      say rgb_is_light('a0a0a0');                     # => 1
 
-     say rgb_diff('000000', '000000');               # => 0
-     say rgb_diff('01f000', '04f400');               # => 5
-     say rgb_diff('ffff00', 'ffffff');               # => 255
+     say rgb_luminance('d090aa');                    # => ffcc33
 
-     say rgb_diff('000000', '000000', 'approx1');    # => 0
-     say rgb_diff('01f000', '04f400', 'approx1');    # => 9.06
-     say rgb_diff('ffff00', 'ffffff', 'approx1');    # => 360.98
+     say tint_rgb_color('#ff8800', '#0033cc');       # => b36e3c
 
 DESCRIPTION
 FUNCTIONS
     None are exported by default, but they are exportable.
+
+  assign_rgb_color
+    Usage:
+
+     my $rgb = assign_rgb_color($str);
+
+    Map a string to an RGB color. This is done by producing SHA-1 digest
+    (160bit, 20 bytes) of the string, then taking the first, 10th, and last
+    byte to become the RGB color.
+
+  assign_rgb_dark_color
+    Like "assign_rgb_color" except that it will make sure the assigned color
+    is dark.
+
+  assign_rgb_light_color
+    Like "assign_rgb_color" except that it will make sure the assigned color
+    is light.
+
+  int2rgb
+    Usage:
+
+     my $rgb = int2rgb(0xffffff); # => ffffff
+
+    Convert integer to RGB string.
 
   mix_2_rgb_colors
     Usage:
@@ -90,22 +126,42 @@ FUNCTIONS
     Generate a random RGB color. You can specify the limit. Otherwise, they
     default to the full range (000000 to ffffff).
 
-  assign_rgb_color
+  rand_rgb_colors
     Usage:
 
-     my $rgb = assign_rgb_color($str);
+     my @rgbs = rand_rgb_colors([ \%opts ], $num=1);
 
-    Map a string to an RGB color. This is done by producing SHA-1 digest
-    (160bit, 20 bytes) of the string, then taking the first, 10th, and last
-    byte to become the RGB color.
+    Produce $num random RGB colors, with some options. Will make reasonable
+    attempt to make the colors different from one another.
 
-  assign_rgb_light_color
-    Like "assign_rgb_color" except that it will make sure the assigned color
-    is light.
+    Known options:
 
-  assign_rgb_dark_color
-    Like "assign_rgb_color" except that it will make sure the assigned color
-    is dark.
+    *   light_color
+
+        Boolean, default true. By default, this function will create light
+        RGB colors, assuming the background color is dark, which is often
+        the case in terminal. If this option is set to false, will create
+        dark colors instead, If this option is set to undef, will create
+        both dark and light colors.
+
+    *   avoid_colors
+
+        Arrayref or hashref. List of colors to be avoided. You can put, for
+        example, colors that you've already assigned/picked for your palette
+        and don't want to use again.
+
+    *   max_attempts
+
+        Uint, default 1000. Number of attempts to try generating the next
+        random color if the generated color is rejected because it is
+        light/dark, or because it's in "avoid_colors".
+
+  reverse_rgb_color
+    Usage:
+
+     my $reversed = reverse_rgb_color($rgb);
+
+    Reverse $rgb.
 
   rgb2grayscale
     Usage:
@@ -114,6 +170,13 @@ FUNCTIONS
 
     Convert $rgb to grayscale RGB value.
 
+  rgb2int
+    Usage:
+
+     my $int = rgb2int("ffffff"); # => 16777216, which is 0xffffff
+
+    Convert RGB string to integer.
+
   rgb2sepia
     Usage:
 
@@ -121,12 +184,53 @@ FUNCTIONS
 
     Convert $rgb to sepia tone RGB value.
 
-  reverse_rgb_color
+  rgb_diff
     Usage:
 
-     my $reversed = reverse_rgb_color($rgb);
+     my $dist = rgb_diff($rgb1, $rgb2[ , $algo ])
 
-    Reverse $rgb.
+    Calculate difference between two RGB colors, using one of several
+    algorithms. The default ("euclidean") simply calculates the distance as:
+
+     ( (R1-R2)**2 + (G1-G2)**2 + (B1-B2)**2 )**0.5
+
+    which is the same as what "rgb_distance"() would produce. Another
+    algorithm ("approx1") uses the following formula:
+
+     ( 2*(R1-R2)**2 + 4*(G1-G2)**2 + 3*(B1-B2)**2 + Rm*((R1-R2)**2 - (B1-B2)**2)/256 )**0.5
+
+    where, Rm or "R mean" is (R1+R2)/2.
+
+    For more details about color difference, refer to
+    <https://en.wikipedia.org/wiki/Color_difference>.
+
+  rgb_distance
+    Usage:
+
+     my $dist = rgb_distance($rgb1, $rgb2)
+
+    Calculate the euclidean RGB distance, using this formula:
+
+     ( (R1-R2)**2 + (G1-G2)**2 + (B1-B2)**2 )**0.5
+
+    For example, the distance between "000000" and "ffffff" is ~441.67,
+    while the distance between "ffff00" and "ffffff" is 255.
+
+  rgb_is_dark
+    Usage:
+
+     my $is_dark = rgb_is_dark($rgb)
+
+    Return true if $rgb is a "dark" color, which is determined by checking
+    if the RGB distance to "000000" is smaller than to "ffffff".
+
+  rgb_is_light
+    Usage:
+
+     my $is_light = rgb_is_light($rgb)
+
+    Return true if $rgb is a "light" color, which is determined by checking
+    if the RGB distance to "000000" is larger than to "ffffff".
 
   rgb_luminance
     Usage:
@@ -149,54 +253,6 @@ FUNCTIONS
     mixing, but the less luminance the color is the less it is tinted with
     the tint color. This has the effect of black color still being black
     instead of becoming tinted.
-
-  rgb_distance
-    Usage:
-
-     my $dist = rgb_distance($rgb1, $rgb2)
-
-    Calculate the euclidean RGB distance, using this formula:
-
-     ( (R1-R2)**2 + (G1-G2)**2 + (B1-B2)**2 )**0.5
-
-    For example, the distance between "000000" and "ffffff" is ~441.67,
-    while the distance between "ffff00" and "ffffff" is 255.
-
-  rgb_diff
-    Usage:
-
-     my $dist = rgb_diff($rgb1, $rgb2[ , $algo ])
-
-    Calculate difference between two RGB colors, using one of several
-    algorithms. The default ("euclidean") simply calculates the distance as:
-
-     ( (R1-R2)**2 + (G1-G2)**2 + (B1-B2)**2 )**0.5
-
-    which is the same as what "rgb_distance"() would produce. Another
-    algorithm ("approx1") uses the following formula:
-
-     ( 2*(R1-R2)**2 + 4*(G1-G2)**2 + 3*(B1-B2)**2 + Rm*((R1-R2)**2 - (B1-B2)**2)/256 )**0.5
-
-    where, Rm or "R mean" is (R1+R2)/2.
-
-    For more details about color difference, refer to
-    <https://en.wikipedia.org/wiki/Color_difference>.
-
-  rgb_is_dark
-    Usage:
-
-     my $is_dark = rgb_is_dark($rgb)
-
-    Return true if $rgb is a "dark" color, which is determined by checking
-    if the RGB distance to "000000" is smaller than to "ffffff".
-
-  rgb_is_light
-    Usage:
-
-     my $is_light = rgb_is_light($rgb)
-
-    Return true if $rgb is a "light" color, which is determined by checking
-    if the RGB distance to "000000" is larger than to "ffffff".
 
 HOMEPAGE
     Please visit the project's homepage at

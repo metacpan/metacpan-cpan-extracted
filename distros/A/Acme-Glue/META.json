@@ -1,0 +1,59 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Lee Johnson <leejo@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Acme-Glue",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.010000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Pod" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/leejo/acme-glue/issues"
+      },
+      "homepage" : "https://metacpan.org/module/Acme::Glue",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/leejo/acme-glue"
+      }
+   },
+   "version" : "2019.08",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

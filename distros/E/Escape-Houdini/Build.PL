@@ -18,7 +18,7 @@ my %module_build_args = (
     "Yanick Champoux <yanick\@cpan.org>"
   ],
   "dist_name" => "Escape-Houdini",
-  "dist_version" => "0.3.1",
+  "dist_version" => "0.3.2",
   "license" => "perl",
   "module_name" => "Escape::Houdini",
   "recursive_test_files" => 1,
@@ -26,22 +26,26 @@ my %module_build_args = (
     "DynaLoader" => 0,
     "Exporter" => 0,
     "parent" => 0,
+    "perl" => "5.008",
     "strict" => 0,
     "warnings" => 0
   },
   "test_requires" => {
+    "Encode" => 0,
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::Exception" => 0,
     "Test::More" => 0,
-    "perl" => "5.006"
+    "perl" => "5.008",
+    "utf8" => 0
   }
 );
 
 
 my %fallback_build_requires = (
+  "Encode" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
@@ -49,7 +53,8 @@ my %fallback_build_requires = (
   "Module::Build" => "0.28",
   "Test::Exception" => 0,
   "Test::More" => 0,
-  "perl" => "5.006"
+  "perl" => "5.008",
+  "utf8" => 0
 );
 
 

@@ -1,0 +1,214 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::Algorithm
+PROTOTYPES: DISABLE
+
+double toDegrees (double radians) { RETVAL = Angle::toDegrees(radians); }
+
+double toRadians (double angleDegrees) { RETVAL = Angle::toRadians(angleDegrees); }
+
+double angle (Coordinate& p0) { RETVAL = Angle::angle(p0); }
+
+bool isAcute (Coordinate* p0, Coordinate* p1, Coordinate *p2)  {
+    RETVAL = Angle::isAcute(*p0, *p1, *p2);
+}
+
+bool isObtuse (Coordinate& p0, Coordinate& p1, Coordinate& p2) {
+    RETVAL = Angle::isObtuse(p0, p1, p2);
+}
+
+double angleBetween (Coordinate& tip1, Coordinate& tail, Coordinate& tip2)  {
+    RETVAL = Angle::angleBetween(tip1, tail, tip2);
+}
+
+double angleBetweenOriented (Coordinate& tip1, Coordinate& tail, Coordinate& tip2)  {
+    RETVAL = Angle::angleBetweenOriented (tip1, tail, tip2);
+}
+
+double interiorAngle(Coordinate& p0, Coordinate& p1,  Coordinate& p2)  {
+    RETVAL = Angle::interiorAngle(p0, p1, p2);
+}
+
+int getTurn (double ang1, double ang2)  { RETVAL = Angle::getTurn(ang1, ang2); }
+
+double normalize (double angle)  { RETVAL = Angle::normalize(angle); }
+
+double normalizePositive (double angle)  { RETVAL = Angle::normalizePositive(angle); }
+
+double diff (double ang1, double ang2)  { RETVAL = Angle::diff(ang1, ang2); }
+
+Coordinate* centroid (Geometry& g) {
+    Coordinate c;
+    if (Centroid::getCentroid(g, c)) RETVAL = new Coordinate(c);
+    else XSRETURN_UNDEF;
+}
+
+Coordinate* centroidArea (Array geoms) {
+    Coordinate result;
+    CentroidArea acc;
+    for(size_t i = 0; i < geoms.size(); ++i) {
+        auto item = geoms.at(i);
+        if (item.is_array_ref()) {
+            auto seq = Helper::convert_coords(Array(item));
+            acc.add(&seq);
+        }
+        else {
+            acc.add(&xs::in<Geometry&>(item));
+        }
+    }
+    if (acc.getCentroid(result)) RETVAL = new Coordinate(result);
+    else XSRETURN_UNDEF;
+}
+
+
+Coordinate* centroidLine (Array geoms) {
+    Coordinate result;
+    CentroidLine acc;
+    for(size_t i = 0; i < geoms.size(); ++i) {
+        auto item = geoms.at(i);
+        if (item.is_array_ref()) {
+            auto seq = Helper::convert_coords(Array(item));
+            acc.add(&seq);
+        }
+        else {
+            acc.add(&xs::in<Geometry&>(item));
+        }
+    }
+    if (acc.getCentroid(result)) RETVAL = new Coordinate(result);
+    else XSRETURN_UNDEF;
+}
+
+Coordinate* centroidPoint (Array geoms) {
+    Coordinate result;
+    CentroidPoint acc;
+    for(size_t i = 0; i < geoms.size(); ++i) {
+        Object item = Object(geoms.at(i));
+        if (!item) throw ("invalid argument");
+        if (item.stash().name() == "Geo::Geos::Coordinate") {
+            acc.add(&xs::in<Coordinate&>(item));
+        }
+        else acc.add(&xs::in<Geometry&>(item));
+    }
+    if (acc.getCentroid(result)) RETVAL = new Coordinate(result);
+    else XSRETURN_UNDEF;
+}
+
+bool isPointInRing(Coordinate& p, Array ring) {
+    auto seq = Helper::convert_coords(ring);
+    RETVAL = CGAlgorithms::isPointInRing(p, &seq);
+}
+
+int locatePointInRing(Coordinate& p,Array ring) {
+    auto seq = Helper::convert_coords(ring);
+    RETVAL = CGAlgorithms::locatePointInRing(p, seq);
+}
+
+bool isOnLine(Coordinate& p, Array line) {
+    auto seq = Helper::convert_coords(line);
+    RETVAL = CGAlgorithms::isPointInRing(p, &seq);
+}
+
+bool isCCW(Array ring) {
+    auto seq = Helper::convert_coords(ring);
+    RETVAL = CGAlgorithms::isCCW(&seq);
+}
+
+int computeOrientation(Coordinate& p1, Coordinate& p2, Coordinate& q){
+    RETVAL = CGAlgorithms::computeOrientation(p1, p2, q);
+}
+
+double distancePointLine(Coordinate& p, Coordinate& A, Coordinate& B) {
+    RETVAL = CGAlgorithms::distancePointLine(p, A, B);
+}
+
+double distancePointLinePerpendicular(Coordinate& p, Coordinate& A, Coordinate& B) {
+    RETVAL = CGAlgorithms::distancePointLinePerpendicular(p, A, B);
+}
+
+double distanceLineLine (Coordinate& A, Coordinate& B, Coordinate& C, Coordinate& D) {
+    RETVAL = CGAlgorithms::distanceLineLine(A, B, C, D);
+}
+
+double signedArea (Array ring) {
+    auto seq = Helper::convert_coords(ring);
+    RETVAL = CGAlgorithms::signedArea(&seq);
+}
+
+double length(Array pts) {
+    auto seq = Helper::convert_coords(pts);
+    RETVAL = CGAlgorithms::signedArea(&seq);
+}
+
+int orientationIndex(Coordinate& p1, Coordinate& p2, Coordinate& q) {
+    RETVAL = CGAlgorithms::computeOrientation(p1, p2, q);
+}
+
+Coordinate* getIntersection(Coordinate& p00, Coordinate& p01, Coordinate& p10, Coordinate& p11) {
+    //auto& c = CentralEndpointIntersector::getIntersection(p00, p01, p10, p11);
+    // ^ buggy implementation in 3.6.3, as it returns dangling reference;
+    CentralEndpointIntersector intor(p00, p01, p10, p11);
+    auto& c = intor.getIntersection();
+    RETVAL = new Coordinate(c);
+}
+
+Sv convexHull(Geometry& newGeometry) {
+    auto ch = ConvexHull(&newGeometry);
+    RETVAL = Helper::uplift(ch.getConvexHull());
+}
+
+Coordinate* interiorPointArea(Geometry& g) {
+    InteriorPointArea ip(&g);
+    Coordinate c;
+    if (ip.getInteriorPoint(c)) RETVAL = new Coordinate(c);
+    else XSRETURN_UNDEF;
+}
+
+Coordinate* interiorPointLine(Geometry& g) {
+    InteriorPointLine ip(&g);
+    Coordinate c;
+    if (ip.getInteriorPoint(c)) RETVAL = new Coordinate(c);
+    else XSRETURN_UNDEF;
+}
+
+Coordinate* interiorPointPoint(Geometry& g) {
+    InteriorPointPoint ip(&g);
+    Coordinate c;
+    if (ip.getInteriorPoint(c)) RETVAL = new Coordinate(c);
+    else XSRETURN_UNDEF;
+}
+
+int locate(Coordinate& p, Geometry& geom) {
+    PointLocator pl;
+    RETVAL = pl.locate(p, &geom);
+}
+
+bool intersects(Coordinate& p, Geometry& geom) {
+    PointLocator pl;
+    RETVAL = pl.intersects(p, &geom);
+}
+
+int signOfDet2x2(double x1, double y1, double x2, double y2) {
+    RETVAL = RobustDeterminant::signOfDet2x2(x1, y1, x2, y2);
+}
+
+int locateIndexedPointInArea(Coordinate& p, Geometry& geom) {
+    locate::IndexedPointInAreaLocator locator(geom);
+    RETVAL = locator.locate(&p);
+}
+
+int locateSimplePointInArea(Coordinate& p, Geometry& geom) {
+    locate::SimplePointInAreaLocator locator(&geom);
+    RETVAL = locator.locate(&p);
+}
+
+BOOT {
+    auto this_stash = Stash(__PACKAGE__);
+    xs::exp::create_constants(this_stash, {
+        {"TYPE_TURN_CLOCKWISE",        CGAlgorithms::CLOCKWISE},
+        {"TYPE_TURN_COLLINEAR",        CGAlgorithms::COLLINEAR},
+        {"TYPE_TURN_COUNTERCLOCKWISE", CGAlgorithms::COUNTERCLOCKWISE},
+
+        {"TYPE_ORIENT_RIGHT",    CGAlgorithms::RIGHT},
+        {"TYPE_ORIENT_LEFT" ,    CGAlgorithms::LEFT},
+        {"TYPE_ORIENT_STRAIGHT", CGAlgorithms::STRAIGHT}
+    });
+    xs::exp::autoexport(this_stash);
+}

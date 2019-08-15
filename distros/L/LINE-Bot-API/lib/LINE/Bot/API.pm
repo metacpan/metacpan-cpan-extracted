@@ -1,9 +1,7 @@
 package LINE::Bot::API;
 use strict;
 use warnings;
-our $VERSION = '1.09';
-
-use URI;
+our $VERSION = '1.11';
 
 use LINE::Bot::API::Builder::SendMessage;
 use LINE::Bot::API::Client;
@@ -12,11 +10,14 @@ use LINE::Bot::API::Response::Common;
 use LINE::Bot::API::Response::Content;
 use LINE::Bot::API::Response::NumberOfSentMessages;
 use LINE::Bot::API::Response::Profile;
+use LINE::Bot::API::Response::GroupMemberProfile;
+use LINE::Bot::API::Response::RoomMemberProfile;
 use LINE::Bot::API::Response::IssueLinkToken;
 use LINE::Bot::API::Response::RichMenu;
 use LINE::Bot::API::Response::RichMenuList;
 use LINE::Bot::API::Response::TargetLimit;
 use LINE::Bot::API::Response::TotalUsage;
+use LINE::Bot::API::Response::Token;
 
 sub new {
     my($class, %args) = @_;
@@ -27,7 +28,7 @@ sub new {
         client               => $client,
         channel_secret       => $args{channel_secret},
         channel_access_token => $args{channel_access_token},
-        messaging_api_endpoint     => $args{messaging_api_endpoint}   // 'https://api.line.me/v2/bot/',
+        messaging_api_endpoint     => $args{messaging_api_endpoint} // 'https://api.line.me/v2/bot/',
     }, $class;
 }
 
@@ -105,6 +106,18 @@ sub get_profile {
     my($self, $user_id) = @_;
     my $res = $self->request(get => "profile/$user_id");
     LINE::Bot::API::Response::Profile->new(%{ $res });
+}
+
+sub get_group_member_profile {
+    my($self, $group_id, $user_id) = @_;
+    my $res = $self->request(get => "group/$group_id/member/$user_id");
+    LINE::Bot::API::Response::GroupMemberProfile->new(%{ $res });
+}
+
+sub get_room_member_profile {
+    my($self, $room_id, $user_id) = @_;
+    my $res = $self->request(get => "room/$room_id/member/$user_id");
+    LINE::Bot::API::Response::RoomMemberProfile->new(%{ $res });
 }
 
 sub leave_room {
@@ -248,6 +261,44 @@ sub unlink_rich_menu_from_multiple_users {
     LINE::Bot::API::Response::RichMenu->new(%{ $res });
 }
 
+sub issue_channel_access_token {
+    my ($self, $opts) = @_;
+
+    my $res = $self->{client}->post_form(
+        'https://api.line.me/v2/oauth/accessToken',
+        undef,
+        [
+            grant_type    => 'client_credentials',
+            client_id     => $opts->{client_id},
+            client_secret => $opts->{client_secret},
+        ]
+    );
+
+    if ($res->{http_status} eq '200') {
+        return LINE::Bot::API::Response::Token->new(%{ $res });
+    } else {
+        return LINE::Bot::API::Response::Error->new(%{ $res });
+    }
+}
+
+sub revoke_channel_access_token {
+    my ($self, $opts) = @_;
+    my $res = $self->{client}->post_form(
+        'https://api.line.me/v2/oauth/revoke',
+        undef,
+        [
+            access_token => $opts->{access_token},
+        ]
+    );
+
+    if ($res->{http_status} eq '200') {
+        return LINE::Bot::API::Response::Common->new(%{ $res });
+    } else {
+        return LINE::Bot::API::Response::Error->new(%{ $res });
+    }
+}
+
+
 1;
 __END__
 
@@ -370,7 +421,7 @@ Sends push messages to multiple users at any time.
     $messages->add_text( text => 'Example push text' );
     $bot->broadcast($messages->build);
 
-See also the LINE Developers API reference of this method: L<https://developers.line.biz/en/reference/messaging-api/#send-broadcast-message>
+See also the LINE Developers API reference of thi smethod: L<https://developers.line.biz/en/reference/messaging-api/#send-broadcast-message>
 
 =head2 validate_signature($json, $signature)
 
@@ -470,6 +521,27 @@ Get user profile information.
     }
 
 See also the LINE Developers API reference of this method:  L<https://developers.line.biz/en/reference/messaging-api/#get-profile>
+
+=head2 get_group_member_profile($group_id, $user_id)
+
+Get group user profile information.
+
+    my $ret = $bot->get_group_member_profile($group_id, $user_id);
+    if ($ret->is_success) {
+        say $ret->display_name;
+        say $ret->user_id;
+        say $ret->picture_url;
+    }
+
+See also the LINE Developers API reference of this method:  L<https://developers.line.biz/en/reference/messaging-api/#get-group-member-profile>
+
+=head2 get_room_member_profile($room_id, $user_id)
+
+Get room user profile information.
+A room is like a group without a group name.
+The response is similar to get_group_member_profile.
+
+See also the LINE Developers API reference of this method:  L<https://developers.line.biz/en/reference/messaging-api/#get-room-member-profile>
 
 =head2 C<< get_number_of_sent_reply_messages($date) >>
 
@@ -612,6 +684,33 @@ The argument C<$user_id> is mandatory. The return value is an empty object.
 This method corresponds to the API of L<Unlink rich menu from multiple users|https://developers.line.biz/en/reference/messaging-api/#unlink-rich-menu-from-users>
 
 The mandatory argument C<$user_ids> is an ArrayRef of user ids. The return value is an empty object.
+
+=head2 C<< issue_channel_access_token({ client_id => '...', client_secret => '...' }) >>
+
+This method corresponds to the API of: L<Issue Channel access token|https://developers.line.biz/en/reference/messaging-api/#issue-channel-access-token>
+
+The argument is a HashRef with two pairs of mandatary key-values:
+
+    {
+        client_id => "...",
+        client_secret => "...",
+    }
+
+Both pieces of information can be accquired from the L<channel console|client_id>.
+
+When a 200 OK HTTP response is returned, a new token is issued. In this case, you may want to store the values in "access_token", "expires_in", and "token_type" attributes of the response object for future use.
+
+Otherwise, you my examine the "error" attribute and "error_description" attribute for more information about the error.
+
+=head2 C<< revoke_channel_access_token({ access_token => "..." }) >>
+
+This method corresponds to the API of: L<Revoke channel access token|https://developers.line.biz/en/reference/messaging-api/#revoke-channel-access-token>
+
+The argument is a HashRef with one pair of mandatary key-values;
+
+    { access_token => "..." }
+
+Upon successful revocation, a 200 OK HTTP response is returned. Otherwise, you my examine the "error" attribute and "error_description" attribute for more information about the error.
 
 =head2 How to build a send message object
 

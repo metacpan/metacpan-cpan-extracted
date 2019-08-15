@@ -33,7 +33,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Examples
   homepage: https://metacpan.org/release/Perinci-Examples
   repository: git://github.com/perlancar/perl-Perinci-Examples.git
-version: '0.818'
+version: '0.819'
 x_Dist_Zilla:
   perl:
     version: '5.028002'

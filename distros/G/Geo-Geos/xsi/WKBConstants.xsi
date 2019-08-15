@@ -1,0 +1,23 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::WKBConstants
+PROTOTYPES: DISABLE
+
+int CLONE_SKIP (...) { PERL_UNUSED_VAR(items); RETVAL = 1; }
+
+BOOT {
+    auto this_stash = Stash(__PACKAGE__);
+    xs::exp::create_constants(this_stash, {
+        //{"TYPE_BYTEORDER_BE", WKBConstants::wkbXDR},
+        //{"TYPE_BYTEORDER_LE", WKBConstants::wkbNDR},
+        {"TYPE_BYTEORDER_BE", 0},
+        {"TYPE_BYTEORDER_LE", 1},
+
+        {"TYPE_WKB_POINT",              WKBConstants::wkbPoint},
+        {"TYPE_WKB_LINESTRING",         WKBConstants::wkbLineString},
+        {"TYPE_WKB_POLYGON",            WKBConstants::wkbPolygon},
+        {"TYPE_WKB_MULTIPOINT",         WKBConstants::wkbMultiPoint},
+        {"TYPE_WKB_MULTILINESTRING",    WKBConstants::wkbMultiLineString},
+        {"TYPE_WKB_MULTIPOLYGON",       WKBConstants::wkbMultiPolygon},
+        {"TYPE_WKB_GEOMETRYCOLLECTION", WKBConstants::wkbGeometryCollection}
+    });
+    xs::exp::autoexport(this_stash);
+}

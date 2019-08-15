@@ -5,7 +5,7 @@ use warnings;
 
 use Mojo::Base -base;
 
-our $VERSION = '0.11';    ## VERSION
+our $VERSION = '0.12';    ## VERSION
 
 =head1 METHODS
 

@@ -8,7 +8,7 @@ SYNOPSIS
 
 DESCRIPTION
 
-  IOas::SJIS2004 module provides SJIS2004 I/O subroutines for UTF-8 script for
+  IOas::SJIS2004 module provides SJIS2004 I/O subroutines in UTF-8 script for
   stable scripting environment, using no utf8 pragma, no UTF-8 flag.
 
 SUBROUTINES
@@ -16,7 +16,7 @@ SUBROUTINES
   Octet Length as I/O Encoding
     IOas::SJIS2004::length($utf8str)
     IOas::SJIS2004::sprintf($utf8format, @utf8list)
-    IOas::SJIS2004::substr($utf8expr, $offset_as_cp932x, $length_as_cp932x, $utf8replacement)
+    IOas::SJIS2004::substr($utf8expr, $offset_as_sjis2004, $length_as_sjis2004, $utf8replacement)
 
   String Comparison as I/O Encoding
     IOas::SJIS2004::cmp($utf8str_a, $utf8str_b)

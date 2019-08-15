@@ -40,9 +40,13 @@
       },
       "x_mentions" : {
          "x_mentions" : {
+            "App::hr" : "0",
             "Color::ANSI::Util" : "0",
             "Data::Dump::Color" : "0",
             "Debug::Print" : "0",
+            "Log::Any::Adapter::Screen" : "0",
+            "Log::ger::Output::Screen" : "0",
+            "Progress::Any::Output::TermProgressBar" : "0",
             "Term::ANSIColor::Conditional" : "0",
             "Term::ANSIColor::Patch::Conditional" : "0",
             "Term::App::Roles" : "0",
@@ -62,7 +66,7 @@
          "web" : "https://github.com/perlancar/perl-Acme-CPANModules-NO_COLOR"
       }
    },
-   "version" : "0.001",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

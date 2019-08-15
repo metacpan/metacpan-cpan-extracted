@@ -2,8 +2,8 @@ NAME
     App::rimetadb - Manage a Rinci metadata database
 
 VERSION
-    This document describes version 0.220 of App::rimetadb (from Perl
-    distribution App-rimetadb), released on 2019-01-06.
+    This document describes version 0.222 of App::rimetadb (from Perl
+    distribution App-rimetadb), released on 2019-08-14.
 
 SYNOPSIS
     See the included CLI script rimetadb.
@@ -14,7 +14,7 @@ FUNCTIONS
 
      argument_stats(%args) -> [status, msg, payload, meta]
 
-    Show statistics on function arguments.
+    Show statistics on function arguments from the database.
 
     This function is not exported.
 
@@ -53,7 +53,7 @@ FUNCTIONS
 
      arguments(%args) -> [status, msg, payload, meta]
 
-    List function arguments.
+    List function arguments in the database.
 
     This function is not exported.
 
@@ -108,7 +108,7 @@ FUNCTIONS
 
      delete(%args) -> [status, msg, payload, meta]
 
-    Delete a package or function metadata.
+    Delete a package or function metadata from the database.
 
     This function is not exported.
 
@@ -151,7 +151,7 @@ FUNCTIONS
 
      function_stats(%args) -> [status, msg, payload, meta]
 
-    Show some statistics on functions.
+    Show some statistics on functions from the database.
 
     This function is not exported.
 
@@ -190,7 +190,7 @@ FUNCTIONS
 
      functions(%args) -> [status, msg, payload, meta]
 
-    List functions.
+    List functions in the database.
 
     This function is not exported.
 
@@ -237,7 +237,7 @@ FUNCTIONS
 
      meta(%args) -> [status, msg, payload, meta]
 
-    Get package/function metadata.
+    Get package/function metadata from the database.
 
     This function is not exported.
 
@@ -280,7 +280,7 @@ FUNCTIONS
 
      packages(%args) -> [status, msg, payload, meta]
 
-    List packages.
+    List packages in the database.
 
     This function is not exported.
 
@@ -323,7 +323,7 @@ FUNCTIONS
 
      stats() -> [status, msg, payload, meta]
 
-    Show some statistics.
+    Show some statistics from the database.
 
     This function is not exported.
 
@@ -345,7 +345,10 @@ FUNCTIONS
 
      update(%args) -> [status, msg, payload, meta]
 
-    Add/update a package or function metadata.
+    Add/update a package or function metadata in the database.
+
+    This routine lets you add/update a package or function metadata in the
+    database with the specified metadata.
 
     This function is not exported.
 
@@ -399,6 +402,15 @@ FUNCTIONS
     This routine scans Perl modules, load them, and update the database
     using Rinci metadata from each modules into the database.
 
+    For each package, function, or function argument metadata, you can put
+    this attribute:
+
+     'x.app.rimetadb.exclude' => 1,
+
+    to exclude the entity from being imported into the database. When you
+    exclude a package, all its contents (currently functions) are also
+    excluded.
+
     This function is not exported.
 
     This function supports dry-run operation.
@@ -419,9 +431,16 @@ FUNCTIONS
 
         Note: has been tested with MySQL and SQLite only.
 
-    *   exclude => *array[perl::modname]*
+    *   exclude => *array[perl::modname_or_prefix]*
 
         Perl package names or prefixes to exclude.
+
+        You can also use this attribute in your package metadata:
+
+         'x.app.rimetadb.exclude' => 1,
+
+        to exclude the package (as well as its contents: all functions) from
+        being imported into the database.
 
     *   force_update => *bool*
 
@@ -436,7 +455,7 @@ FUNCTIONS
         effect. To make sure you use the right library, you can use
         "PERL5OPT" or explicitly use "perl" and use its "-I" option.
 
-    *   module_or_package* => *array[perl::modname]*
+    *   module_or_package* => *array[perl::modname_or_prefix]*
 
         Perl module or prefixes or package to add/update.
 
@@ -445,7 +464,7 @@ FUNCTIONS
         *   a Perl module name e.g. "Foo::Bar". An attempt will be made to
             load that module.
 
-        *   a module prefix ending with "::" or "::*" e.g. "Foo::Bar::*".
+        *   a module prefix ending with "::" e.g. "Foo::Bar::".
             "Module::List" will be used to list all modules under
             "Foo::Bar::" recursively and load all those modules.
 
@@ -453,7 +472,7 @@ FUNCTIONS
             module with that name will *not* be made. This can be used to
             add an already-loaded package e.g. by another module).
 
-        *   a package prefix using "+Foo::Bar::" or "+Foo::Bar::*" syntax.
+        *   a package prefix using "+Foo::Bar::" or "+Foo::Bar::" syntax.
             Subpackages will be listed recursively (using
             Package::Util::Lite's "list_subpackages").
 

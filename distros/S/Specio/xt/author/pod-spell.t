@@ -16,6 +16,7 @@ AnyDoes
 AnyIsa
 Builtins
 CanType
+Chris
 ClassName
 Coercion
 Coercions
@@ -92,9 +93,11 @@ Throwable
 Tuple
 TypeChecks
 Union
+White
 Yuval
 autarch
 boolification
+chrisw
 coercions
 cpansprout
 de

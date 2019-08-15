@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-01-06'; # DATE
-our $VERSION = '0.220'; # VERSION
+our $DATE = '2019-08-14'; # DATE
+our $VERSION = '0.222'; # VERSION
 
 use 5.010001;
 use strict;
@@ -45,7 +45,7 @@ rimetadb - Manage a Rinci metadata database
 
 =head1 VERSION
 
-This document describes version 0.220 of rimetadb (from Perl distribution App-rimetadb), released on 2019-01-06.
+This document describes version 0.222 of rimetadb (from Perl distribution App-rimetadb), released on 2019-08-14.
 
 =head1 SYNOPSIS
 
@@ -112,39 +112,43 @@ Get metadata of function/package:
 
 =head2 B<argument-stats>
 
-Show statistics on function arguments.
+Show statistics on function arguments from the database.
 
 =head2 B<arguments>
 
-List function arguments.
+List function arguments in the database.
 
 =head2 B<delete>
 
-Delete a package or function metadata.
+Delete a package or function metadata from the database.
 
 =head2 B<function-stats>
 
-Show some statistics on functions.
+Show some statistics on functions from the database.
 
 =head2 B<functions>
 
-List functions.
+List functions in the database.
 
 =head2 B<meta>
 
-Get package/function metadata.
+Get package/function metadata from the database.
 
 =head2 B<packages>
 
-List packages.
+List packages in the database.
 
 =head2 B<stats>
 
-Show some statistics.
+Show some statistics from the database.
 
 =head2 B<update>
 
-Add/update a package or function metadata.
+Add/update a package or function metadata in the database.
+
+This routine lets you add/update a package or function metadata in the database
+with the specified metadata.
+
 
 =head2 B<update-from-modules>
 
@@ -152,6 +156,14 @@ Update Rinci metadata database from local Perl modules.
 
 This routine scans Perl modules, load them, and update the database using Rinci
 metadata from each modules into the database.
+
+For each package, function, or function argument metadata, you can put this
+attribute:
+
+ 'x.app.rimetadb.exclude' => 1,
+
+to exclude the entity from being imported into the database. When you exclude a
+package, all its contents (currently functions) are also excluded.
 
 =head1 OPTIONS
 
@@ -161,7 +173,7 @@ C<*> marks required options.
 
 =over
 
-=item B<--config-path>=I<filename>, B<-c>
+=item B<--config-path>=I<s>, B<-c>
 
 Set path to configuration file.
 
@@ -362,6 +374,14 @@ See C<--exclude>.
 
 Perl package names or prefixes to exclude.
 
+You can also use this attribute in your package metadata:
+
+    'x.app.rimetadb.exclude' => 1,
+
+to exclude the package (as well as its contents: all functions) from being
+imported into the database.
+
+
 Can be specified multiple times.
 
 =item B<--force-update>, B<--force>
@@ -392,17 +412,16 @@ For each entry, you can specify:
 * a Perl module name e.g. `Foo::Bar`. An attempt will be made to load that
   module.
 
-* a module prefix ending with `::` or `::*` e.g. `Foo::Bar::*`. `Module::List`
-  will be used to list all modules under `Foo::Bar::` recursively and load all
-  those modules.
+* a module prefix ending with `::` e.g. `Foo::Bar::`. `Module::List` will be
+  used to list all modules under `Foo::Bar::` recursively and load all those
+  modules.
 
 * a package name using `+Foo::Bar` syntax. An attempt to load module with that
   name will *not* be made. This can be used to add an already-loaded package
   e.g. by another module).
 
-* a package prefix using `+Foo::Bar::` or `+Foo::Bar::*` syntax. Subpackages
-  will be listed recursively (using <pm:Package::Util::Lite>'s
-  `list_subpackages`).
+* a package prefix using `+Foo::Bar::` or `+Foo::Bar::` syntax. Subpackages will
+  be listed recursively (using <pm:Package::Util::Lite>'s `list_subpackages`).
 
 
 Can be specified multiple times.

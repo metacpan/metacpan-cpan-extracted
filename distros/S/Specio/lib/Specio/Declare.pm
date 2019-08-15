@@ -5,7 +5,7 @@ use warnings;
 
 use parent 'Exporter';
 
-our $VERSION = '0.43';
+our $VERSION = '0.44';
 
 use Carp qw( croak );
 use Specio::Coercion;
@@ -151,7 +151,7 @@ sub object_does_type {
 
     my $tc = _make_tc(
         ( defined $name ? ( name => $name ) : () ),
-        role => ( defined $p{role} ? $p{role} : $name ),
+        role       => ( defined $p{role} ? $p{role} : $name ),
         type_class => 'Specio::Constraint::ObjectDoes',
     );
 
@@ -177,7 +177,7 @@ sub object_isa_type {
 
     my $tc = _make_tc(
         ( defined $name ? ( name => $name ) : () ),
-        class => ( defined $p{class} ? $p{class} : $name ),
+        class      => ( defined $p{class} ? $p{class} : $name ),
         type_class => 'Specio::Constraint::ObjectIsa',
     );
 
@@ -224,7 +224,7 @@ sub any_does_type {
 
     my $tc = _make_tc(
         ( defined $name ? ( name => $name ) : () ),
-        role => ( defined $p{role} ? $p{role} : $name ),
+        role       => ( defined $p{role} ? $p{role} : $name ),
         type_class => 'Specio::Constraint::AnyDoes',
     );
 
@@ -250,7 +250,7 @@ sub any_isa_type {
 
     my $tc = _make_tc(
         ( defined $name ? ( name => $name ) : () ),
-        class => ( defined $p{class} ? $p{class} : $name ),
+        class      => ( defined $p{class} ? $p{class} : $name ),
         type_class => 'Specio::Constraint::AnyIsa',
     );
 
@@ -345,7 +345,7 @@ Specio::Declare - Specio declaration subroutines
 
 =head1 VERSION
 
-version 0.43
+version 0.44
 
 =head1 SYNOPSIS
 
@@ -482,11 +482,15 @@ subroutine something like this:
       my $self = shift;
       my $var  = shift;
 
-      return $_[0]->parent->inline_check( $_[1] )
+      return $self->parent->inline_check($var)
           . ' and more checking code goes here';
   }
 
-This parameter is mutually exclusive with the C<where> parameter.
+Or, more concisely:
+
+  sub { $_[0]->parent->inline_check( $_[1] ) . 'more code that checks $_[1]' }
+
+The C<inline> parameter is mutually exclusive with the C<where> parameter.
 
 =item * message_generator => sub { ... }
 
@@ -680,7 +684,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2018 by Dave Rolsky.
+This software is Copyright (c) 2012 - 2019 by Dave Rolsky.
 
 This is free software, licensed under:
 

@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.73.
+signed via the Module::Signature module, version 0.83.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,67 +12,70 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA256
 
-SHA1 235bb5b73789953b46e47f314e8ad5151acce1f9 .shipit
-SHA1 4c9e53558a6dbc3a40ecb52bbc526a6d937a477b Changes
-SHA1 f7c8ae3700309058e19618cf3286b824ba20e159 MANIFEST
-SHA1 fa12086c9dd047fd1d090dd2b726a01cc04ed6bd META.yml
-SHA1 47e31537a23d060ed70e3b3c4d014c00f0f33d4b Makefile.PL
-SHA1 ec8bde7d78141c610ceeb9f8f74d48dfca294406 README
-SHA1 53368d91c157d1932b76db94854288903ae7ec59 doc/rfc2445.txt
-SHA1 1ca8755782cececa8cb19deddbcbe03be8e73cfc examples/ical2html.pl
-SHA1 10f1ba97180b54e94ab30d9efe4aaa0a70aa1e26 inc/Module/AutoInstall.pm
-SHA1 d2664c57b65686abbfbbe1e71229761625be4922 inc/Module/Install.pm
-SHA1 b084961275ae4b66a9a0766372b0a08803aa63d1 inc/Module/Install/AutoInstall.pm
-SHA1 da41a8d9904f7b409b49a5f6c338d3eb305a2b4b inc/Module/Install/Base.pm
-SHA1 0db0afe19cd298abba248fa089e5525bd5ab3ab6 inc/Module/Install/Can.pm
-SHA1 e7152bfd5ca67d0e33f96d09c59d600bca5c1f15 inc/Module/Install/Fetch.pm
-SHA1 bd2183c72617105d0b65f3ef81d013bf4af337d6 inc/Module/Install/Include.pm
-SHA1 29ee1cb0dc262b00983e3a2f5cf00b538dff5069 inc/Module/Install/Makefile.pm
-SHA1 e963f80cfe255f16e55067d1feb6841cff3ed2fe inc/Module/Install/Metadata.pm
-SHA1 65a1f09af1f4f9e47a98b6b45667c328b1b2f9c0 inc/Module/Install/Win32.pm
-SHA1 f191c49475b3f51775180cd4f7e41e3bdab7f85a inc/Module/Install/WriteAll.pm
-SHA1 81c4f06af61b620f2923c2243901f628a6675f50 lib/Data/ICal.pm
-SHA1 feb8209da2105652a8e4d4b8fb3bc9581a8d7b74 lib/Data/ICal/Entry.pm
-SHA1 2803481758009f66e096afa3d91626673970922f lib/Data/ICal/Entry/Alarm.pm
-SHA1 e84b1c79549b3f9279277cc4a9f44448d1cefd7f lib/Data/ICal/Entry/Alarm/Audio.pm
-SHA1 5f51e155a9f450c902e366cee93015a2ae0d900b lib/Data/ICal/Entry/Alarm/Display.pm
-SHA1 d1d2e1f3f3a346d0b617a548b517bf63fcdb3331 lib/Data/ICal/Entry/Alarm/Email.pm
-SHA1 0c0e4a91f7db859a2db9c8b60c67decf6904b1dd lib/Data/ICal/Entry/Alarm/None.pm
-SHA1 dd21809687792ac7e69f042eda03b0a72b54d0e1 lib/Data/ICal/Entry/Alarm/Procedure.pm
-SHA1 dcb93443ab59b9f40430750aecb77212f9e75682 lib/Data/ICal/Entry/Alarm/URI.pm
-SHA1 916bb3345aebfc323695ba88eb084c785c4b35a2 lib/Data/ICal/Entry/Event.pm
-SHA1 8064bcb0682d328a6416d87cb22c0b8002a4c88a lib/Data/ICal/Entry/FreeBusy.pm
-SHA1 cf397568e16ae4587e2dda22e627f0550543e609 lib/Data/ICal/Entry/Journal.pm
-SHA1 49e67d4a297668372912178128ba57e4e1746443 lib/Data/ICal/Entry/TimeZone.pm
-SHA1 a96e10f861fcb12cccadd209c0f38da9ba059320 lib/Data/ICal/Entry/TimeZone/Daylight.pm
-SHA1 dd46f62ef99d926d3e0ef33cf417ef230e66707e lib/Data/ICal/Entry/TimeZone/Standard.pm
-SHA1 15a6d5aded4edac787ed42c14553c8a588ac23d8 lib/Data/ICal/Entry/Todo.pm
-SHA1 6e4030477e12b751b9cf0c29ba6bd3d596189321 lib/Data/ICal/Property.pm
-SHA1 371dc48be4670c99ffa5f732e7d7584465e39edc t/00.load.t
-SHA1 33d5621be343fcf0a596391bafba78f4b59b04ba t/01.simplegen.t
-SHA1 0ef26a49106e23a1a99e77f48b18e94a002ca350 t/02.linewrap.t
-SHA1 7aec87bcc3d62d762a2ec4adfaf120016fa1e3e0 t/03.unknown-props.t
-SHA1 1b8e8dde570944000c11b1ac7bdfe44bcdda96ab t/04.mandatory-props.t
-SHA1 e96acd335c8651c924bb2132fd53140fa0423d9c t/05.prop-params.t
-SHA1 e19a41be80213d3a306738f074992457623aa200 t/06.prop-bad-quote.t
-SHA1 6a3f262179361be328ae6ba4a6c9b0f63b4fa2b9 t/07.roundtrip.t
-SHA1 1d27dd46b94878b7494701eb143393f0438675c0 t/08.parse.t
-SHA1 69fce006e3f65f2dfc3c028126d7052cdc676dbb t/09.mime.t
-SHA1 e82bdabfb8322259de9c583fc5c161c4a1d0dcd1 t/10.mime-vcal10.t
-SHA1 b21127ca78036efd5296828b7f9d76c9c2d8f4da t/11.crlf.t
-SHA1 4296bf4950cffca77098c8c85562c444e9c0f897 t/12.verson1.t
-SHA1 21854f472cd60fd9ce6f88872691f2a744e0af5e t/ics/badlyformed.ics
-SHA1 3157614223f00a48699992314b1d48946fc45af7 t/ics/noversion.ics
-SHA1 7ad07fa3318aec73b0fe97ccbb8caa1d35b63927 t/ics/test.ics
-SHA1 4ff82f77563bdd06b4aec84830238b4535cfd07a t/ics/version1.ics
-SHA1 6da39b48ce64b584e4c3274bff96fc76ff484820 t/pod-coverage.t
-SHA1 0190346d7072d458c8a10a45c19f86db641dcc48 t/pod.t
+SHA256 b0485c9218812094dae564b288c89dbe6de55205e288c7db644dc5609e14a6a4 .shipit
+SHA256 974d5f52b02b66dac498320b019b50433232e2ecec4b25902deed02e6d9d9bcf Changes
+SHA256 4fbcacaee9cf71a832b6833aa891d0115a4f890c5ba9e336faf762a0e7edc4b6 MANIFEST
+SHA256 5b862234e01d674ac3affe3d2a239e4c9904d7ce341e659e659d2cf1e352e63d META.yml
+SHA256 b695f5b5764fb9f7b6bc0fc213217cc78062093170f052e7578e941fad2a6045 Makefile.PL
+SHA256 bcb30c0c5a4c6a9d1a2c73d7d0a1cdc9e3657d977b433d5f63526223fc05d805 README
+SHA256 21bfccbb1f8d658d355b8e530feb2bf15d74e0bd3d988f1733569bce9eeaa828 doc/rfc2445.txt
+SHA256 163343c6cedc7ed79dc4e22209999a6dd2f3aa1dd3ed71ebaa23b664355cb103 examples/ical2html.pl
+SHA256 7fe8013fad8ecb0b9ef8bad3fd7287486c1c61c776f76beb7d9d24e06ee3ab44 inc/Module/AutoInstall.pm
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 1e48ae2cb24e1d16193d476e735579dfcd0eefb3685921ad4736390df75d939b inc/Module/Install/AutoInstall.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a97bf661b739643c3adee064addf7a85f22e25e1bbffc137974cd8754ffa5c66 inc/Module/Install/Include.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 685952ef5e10a5a19f9c940a21a76f89f76b7077061916570401fda406e0da5c lib/Data/ICal.pm
+SHA256 765b84762b3bc33fd44c473c62b51ae76acaa252db3ceed815203ae5fc6f99bb lib/Data/ICal/Entry.pm
+SHA256 3d133ea6161058d96b1d63307e10ea44464d3154ce5c7e6545eae59f8c791608 lib/Data/ICal/Entry/Alarm.pm
+SHA256 0a278acea8541a9e429da9f17b0f6dee995bdda3b60df69250602adfe213f4d1 lib/Data/ICal/Entry/Alarm/Audio.pm
+SHA256 6c2a85ac56f3b65d89896e9157125123bfdde65af6b5c45e88d09eaaa9e1f95d lib/Data/ICal/Entry/Alarm/Display.pm
+SHA256 e3e956cbf81051adff18f5814bc0a586bcbea1b440534eb64d9ee1e9fa07f69f lib/Data/ICal/Entry/Alarm/Email.pm
+SHA256 6f64695a164b827b28b2724898ed69b7f03f5d4d6f40d9b08bf372e184a54562 lib/Data/ICal/Entry/Alarm/None.pm
+SHA256 306562323dca76076bb7b9904e1b4aca261c4a834b08004116b05c9f533500d1 lib/Data/ICal/Entry/Alarm/Procedure.pm
+SHA256 c8627059faea985ff0a5ad1ff06570b957d4f3b9f5c89bbed85fce49525b54cb lib/Data/ICal/Entry/Alarm/URI.pm
+SHA256 5b62d38a6f9803e0fbd5b405de31639666ea26cfc97af75fbdd180ed4e0325de lib/Data/ICal/Entry/Event.pm
+SHA256 ef52956ffb5defb0ed7fb4303cdd327e66f3ee41919f21ada2e5005fe729287b lib/Data/ICal/Entry/FreeBusy.pm
+SHA256 1830fa1a9a29414661ee3a0832152ed0fef4a1792fe78067031f8d34b31a7ca6 lib/Data/ICal/Entry/Journal.pm
+SHA256 f23e1c1a1877ed7349efaf40e76d2ccfbc18772ada0590c77d130628ff29a006 lib/Data/ICal/Entry/TimeZone.pm
+SHA256 dca65ec58df939cc1a5b02f10330ec3e1fed535883f3535da178b9a0c8694c05 lib/Data/ICal/Entry/TimeZone/Daylight.pm
+SHA256 2238016402e58f10e0a3c911c02c58b63b15cb6319e66b36c1ff31e6106cc864 lib/Data/ICal/Entry/TimeZone/Standard.pm
+SHA256 0ea8891d15d871850203bee5c455ea96ed0f3ade037dc45003fc732e329a7e58 lib/Data/ICal/Entry/Todo.pm
+SHA256 fb93f480e9a761ecddbce3fa9521ca812028b5e955ec7d21c40b523f31efca74 lib/Data/ICal/Property.pm
+SHA256 98c36e66067a4543c38b631a796edf15fd4e55956a7138043e45d43dbda60939 t/00.load.t
+SHA256 b1ec7e8668f8e4fa5730ec890d8b8af0816ea561ab4319052f2aa50e9ba34c41 t/01.simplegen.t
+SHA256 62e20268df1d1850ad5c1f3b79c79e7b148bf14673da407d8f827e62d88bc02f t/02.linewrap.t
+SHA256 7e8a6ec4a43dc344df49c724c422862f85ef5c53489d2abeb74f564ec7916044 t/03.unknown-props.t
+SHA256 2411ce797b9edf4fa03000912659a1083d339d7b01d6842f1fe0794ebeb692e0 t/04.mandatory-props.t
+SHA256 57a633fc3ec8ff025e5095c0f64f2e57b58b327a71837ee8b540769c9924516d t/05.prop-params.t
+SHA256 044c1571bc0a56192d82cae1d546ba9f9a78034f1e39f29052ca79b08da78b45 t/06.prop-bad-quote.t
+SHA256 2a4d68b9d3d6ddf523a8bdeb1907d0f103e70d1dc86f781edbce604377ab0142 t/07.roundtrip.t
+SHA256 01eecc4663702374bfef9f33bbf08a15418d5993392dcf013b04a7832cdda8ce t/08.parse.t
+SHA256 8323789fd8cddd7233491a82054ce0dc5f3f71c6f8c312a4ad346955b840a49f t/09.mime.t
+SHA256 e5e8554248c8189b0f505a9ca42c39bec0a261bebc1f8cd1e0e8e22feb2af580 t/10.mime-vcal10.t
+SHA256 d2e82f3f431317b26ac231e0fea8eafe09796b4bedd7d9e9f808a32757aae09b t/11.crlf.t
+SHA256 f2db4bf6fe97f31016d7100a873a52a0a23f6eae87394a0e8c647085492012f1 t/12.verson1.t
+SHA256 d2b9e56f612e4c5266f1a82f3b8ec9a2c599475143b6139a64435ba7299208aa t/ics/badlyformed.ics
+SHA256 a43aca8b93e6ed58dd537c64874392d92de0160ab5f05f84ae2341d6c17f7f78 t/ics/noversion.ics
+SHA256 e3e12629f8a7bfd497dd105b99eb72a3afe89f2f3ad592b9fb68d36a4390192a t/ics/test.ics
+SHA256 bcd9e8c630ab1f4022d213820eeee918025962c72d780177f585a8fb397c4c19 t/ics/version1.ics
+SHA256 4bd4f0f77fc3a6672ff6540bb1f9aec720546c421a1e800799e889c850825dd6 t/pod-coverage.t
+SHA256 505f0d5c68824b3d02df44fa02031c9a379939327af4ef3565166d713cd24f70 t/pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
 
-iEYEARECAAYFAlTi7KoACgkQMflWJZZAbqAP1ACgoLpNT7lOyQzlTx/McDJInVOl
-VbAAn2jrGQ2NmyfRnBXEYRbCW0rDUP3r
-=flwi
+iQEcBAEBCAAGBQJdVDhNAAoJEA3wooP+rICy280IAKnvWlPuvcw5iHUL4QpDxM96
+R0VT2bcIzAFEygbtisMA81PaAo7oJWLZHMf6KEWujPC6JW8cmMMMOpkHNW71LaM+
+CAqJnVPoA3Br2MuIu/19FOufJ3XSKBSixPJ8KUUNsPBAbJDjuf5qTPFQfwnpG0oz
+WyjkgSZzkYABE5RjC0dvJIVEsEWWNZknLxm4mHzDtd9pS8u2BJqydmOtjp4luRiL
+bx38USjPe2h5MeQjTAak9QE4P7nLJJg+Vhack/nhsHkBtRgyDnYGwevyqo3GIvCX
+GP17jZA8Jf0zaW28OTmNIBcH+qgNRpq0F+bRmZ+HAQD/vQQ9rA8RVNNYurppvfk=
+=fodn
 -----END PGP SIGNATURE-----

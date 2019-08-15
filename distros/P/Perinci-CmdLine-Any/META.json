@@ -32,6 +32,9 @@
             "Perinci::CmdLine::Lite" : "1.820",
             "strict" : "0",
             "warnings" : "0"
+         },
+         "suggests" : {
+            "Perinci::CmdLine::Classic" : "1.770"
          }
       },
       "test" : {
@@ -57,7 +60,7 @@
          "web" : "https://github.com/perlancar/perl-Perinci-CmdLine-Any"
       }
    },
-   "version" : "0.150",
+   "version" : "0.151",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028002"
@@ -507,9 +510,15 @@
             "version" : "6.012"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Extras",
-            "name" : "lint-prereqs / assume-used",
-            "version" : "0.03"
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "runtime",
+                  "type" : "suggests"
+               }
+            },
+            "name" : "RuntimeSuggests",
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",

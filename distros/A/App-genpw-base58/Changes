@@ -1,0 +1,12 @@
+0.002   2018-01-16 (PERLANCAR)
+
+        - No functional changes.
+
+        - [doc] Mention genpw-base56.
+
+        - Tweak generated CLI (no need to read config & env).
+
+
+0.001   2018-01-16 (PERLANCAR)
+
+        - First release.

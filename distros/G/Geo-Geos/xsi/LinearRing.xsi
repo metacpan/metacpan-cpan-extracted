@@ -1,0 +1,8 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::LinearRing
+PROTOTYPES: DISABLE
+
+Sv LinearRing::reverse() { RETVAL = Helper::uplift(THIS->reverse()); }
+
+BOOT {
+    Stash(__PACKAGE__).inherit("Geo::Geos::LineString");
+}

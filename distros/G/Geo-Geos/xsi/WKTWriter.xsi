@@ -1,0 +1,16 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::WKTWriter
+PROTOTYPES: DISABLE
+
+WKTWriter* new(SV*, SV* roundingPrecision = NULL, SV* trim = NULL) {
+    RETVAL = new WKTWriter();
+    if (roundingPrecision) RETVAL->setRoundingPrecision(SvIV(roundingPrecision));
+    if (trim) RETVAL->setTrim(SvTRUE(trim));
+}
+
+void WKTWriter::setTrim(bool value)
+
+void WKTWriter::setRoundingPrecision(int value)
+
+std::string WKTWriter::write(Geometry& g) { RETVAL = THIS->write(&g); }
+
+int CLONE_SKIP (...) { PERL_UNUSED_VAR(items); RETVAL = 1; }

@@ -1,7 +1,7 @@
 package Data::Sah::Compiler::perl::TH::hash;
 
-our $DATE = '2019-08-12'; # DATE
-our $VERSION = '0.900'; # VERSION
+our $DATE = '2019-08-14'; # DATE
+our $VERSION = '0.901'; # VERSION
 
 use 5.010;
 use strict;
@@ -35,9 +35,9 @@ sub superclause_comparable {
     if ($which eq 'is') {
         $c->add_ccl($cd, $c->expr_dump($cd, $dt).' eq '.$c->expr_dump($cd, $ct));
     } elsif ($which eq 'in') {
-        $c->add_ccl($cd, "do { my \$s = ".$c->expr_dump($cd, $dt)."; my \$res = 0; " .
-                        "for my \$el (\@{ $ct }) { my \$els = ".$c->expr_dump($cd, "\$el")."; ".
-                        "if (\$s eq \$els) { \$res = 1; last } } \$res }");
+        $c->add_ccl($cd, "do { my \$_sahv_dt_str = ".$c->expr_dump($cd, $dt)."; my \$_sahv_res = 0; " .
+                        "for my \$_sahv_el (\@{ $ct }) { my \$_sahv_el_str = ".$c->expr_dump($cd, "\$_sahv_el")."; ".
+                        "if (\$_sahv_dt_str eq \$_sahv_el_str) { \$_sahv_res = 1; last } } \$_sahv_res }");
     }
 }
 
@@ -67,9 +67,9 @@ sub superclause_has_elems {
         }
     } elsif ($which eq 'has') {
         $c->add_runtime_module($cd, $cd->{args}{dump_module});
-        $c->add_ccl($cd, "do { my \$s = ".$c->expr_dump($cd, $ct)."; my \$res = 0; " .
-                        "for my \$el (values \%{ $dt }) { my \$els = ".$c->expr_dump($cd, "\$el")."; ".
-                        "if (\$s eq \$els) { \$res = 1; last } } \$res }");
+        $c->add_ccl($cd, "do { my \$_sahv_ct_str = ".$c->expr_dump($cd, $ct)."; my \$_sahv_res = 0; " .
+                        "for my \$_sahv_el (values \%{ $dt }) { my \$_sahv_el_str = ".$c->expr_dump($cd, "\$_sahv_el")."; ".
+                        "if (\$_sahv_ct_str eq \$_sahv_el_str) { \$_sahv_res = 1; last } } \$_sahv_res }");
     } elsif ($which eq 'each_index') {
         $self_th->set_tmp_data_term($cd) if $cd->{args}{data_term_includes_topic_var};
         $self_th->gen_each($cd, "sort keys(\%{$cd->{data_term}})", '', '$_');
@@ -121,7 +121,7 @@ sub _clause_keys_or_re_keys {
             $c->add_ccl(
                 $cd,
                 #"!defined(List::Util::first(sub { my \$ditem=\$_; !defined(List::Util::first(sub {\$ditem ".($which eq 'keys' ? 'eq' : '=~')." \$_ }, \@{ $lit_valid_keys })) }, keys %{ $dt }))",
-                "!(grep { my \$ditem=\$_; !(grep { \$ditem ".($which eq 'keys' ? 'eq' : '=~')." \$_ } \@{ $lit_valid_keys }) } keys %{ $dt })",
+                "!(grep { my \$_sahv_dt_item=\$_; !(grep { \$_sahv_dt_item ".($which eq 'keys' ? 'eq' : '=~')." \$_ } \@{ $lit_valid_keys }) } keys %{ $dt })",
                 {
                     err_msg => 'TMP',
                     err_expr => join(
@@ -131,7 +131,7 @@ sub _clause_keys_or_re_keys {
                             $cd, "hash contains ".
                                 "unknown field(s) (%s)")),
                         ',',
-                        "join(', ', sort grep { my \$ditem=\$_; !(grep { \$ditem ".($which eq 'keys' ? 'eq':'=~')." \$_ } \@{ $lit_valid_keys })} keys %{ $dt })",
+                        "join(', ', sort grep { my \$_sahv_dt_item=\$_; !(grep { \$_sahv_dt_item ".($which eq 'keys' ? 'eq':'=~')." \$_ } \@{ $lit_valid_keys })} keys %{ $dt })",
                         ')',
                     ),
                 },
@@ -255,14 +255,14 @@ sub clause_allowed_keys {
     #$c->add_runtime_module($cd, "List::Util");
     $c->add_ccl(
       $cd,
-      #"!defined(List::Util::first(sub { my \$ditem=\$_; !defined(List::Util::first!(sub { \$ditem eq \$_ }, \@{ $ct })) }, keys \%{ $dt }))",
-      "!(grep { my \$ditem=\$_; !(grep { \$ditem eq \$_ } \@{ $ct }) } keys \%{ $dt })",
+      #"!defined(List::Util::first(sub { my \$_sahv_dt_item=\$_; !defined(List::Util::first!(sub { \$_sahv_dt_item eq \$_ }, \@{ $ct })) }, keys \%{ $dt }))",
+      "!(grep { my \$_sahv_dt_item=\$_; !(grep { \$_sahv_dt_item eq \$_ } \@{ $ct }) } keys \%{ $dt })",
       {
         err_msg => 'TMP',
         err_expr =>
           "sprintf(".
           $c->literal($c->_xlt($cd, "hash contains non-allowed field(s) (%s)")).
-          ",join(', ', sort grep { my \$ditem=\$_; !(grep { \$ditem eq \$_ } \@{ $ct }) } keys \%{ $dt }))"
+          ",join(', ', sort grep { my \$_sahv_dt_item=\$_; !(grep { \$_sahv_dt_item eq \$_ } \@{ $ct }) } keys \%{ $dt }))"
       }
     );
 }
@@ -305,13 +305,13 @@ sub clause_forbidden_keys {
     $c->add_ccl(
       $cd,
       #"!defined(List::Util::first(sub {\$_ ~~ $ct}, keys \%{ $dt }))",
-      "!(grep { my \$ditem=\$_; !!(grep { \$ditem eq \$_ } \@{ $ct }) } keys \%{ $dt })",
+      "!(grep { my \$_sahv_dt_item=\$_; !!(grep { \$_sahv_dt_item eq \$_ } \@{ $ct }) } keys \%{ $dt })",
       {
         err_msg => 'TMP',
         err_expr =>
           "sprintf(".
           $c->literal($c->_xlt($cd, "hash contains forbidden field(s) (%s)")).
-          ",join(', ', sort grep { my \$ditem=\$_; !(grep { \$ditem eq \$_ } \@{ $ct }) } keys \%{ $dt }))"
+          ",join(', ', sort grep { my \$_sahv_dt_item=\$_; !(grep { \$_sahv_dt_item eq \$_ } \@{ $ct }) } keys \%{ $dt }))"
       }
     );
 }
@@ -499,7 +499,7 @@ Data::Sah::Compiler::perl::TH::hash - perl's type handler for type "hash"
 
 =head1 VERSION
 
-This document describes version 0.900 of Data::Sah::Compiler::perl::TH::hash (from Perl distribution Data-Sah), released on 2019-08-12.
+This document describes version 0.901 of Data::Sah::Compiler::perl::TH::hash (from Perl distribution Data-Sah), released on 2019-08-14.
 
 =for Pod::Coverage ^(clause_.+|superclause_.+)$
 

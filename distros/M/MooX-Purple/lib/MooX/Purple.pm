@@ -3,36 +3,36 @@ package MooX::Purple;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 use Keyword::Declare;
 
 sub import {
 	keytype GATTRS is m{
-			(?:
-				allow (?&PerlNWS)
-					(?:(?!qw)(?&PerlQualifiedIdentifier)|
-					(?&PerlList))
-				|
-				with (?&PerlNWS)
-					(?:(?!qw)(?&PerlQualifiedIdentifier)|
-					(?&PerlList))
-				|
-				is (?&PerlNWS)
-					(?:(?!qw)(?&PerlQualifiedIdentifier)|
-					(?&PerlList))
-				|
-				use (?&PerlNWS)
-					(?:(?&PerlQualifiedIdentifier)\s*(?&PerlList)|(?:(?!qw)(?&PerlQualifiedIdentifier)|
-					(?&PerlList)))
-			)?+
+		(?:
+			allow (?&PerlNWS)
+				(?:(?!qw)(?&PerlQualifiedIdentifier)|
+				(?&PerlList))
+			|
+			with (?&PerlNWS)
+				(?:(?!qw)(?&PerlQualifiedIdentifier)|
+				(?&PerlList))
+			|
+			is (?&PerlNWS)
+				(?:(?!qw)(?&PerlQualifiedIdentifier)|
+				(?&PerlList))
+			|
+			use (?&PerlNWS)
+				(?:(?&PerlQualifiedIdentifier)\s*(?&PerlList)|(?:(?!qw)(?&PerlQualifiedIdentifier)|
+				(?&PerlList)))
+		)?+
 	}xms;
 	keytype SATTRS is m{
-			(?:
-				allow (?&PerlNWS)
-					(?:(?!qw)(?&PerlQualifiedIdentifier)|
-					(?&PerlList))
-				|
-			)?+
+		(?:
+			allow (?&PerlNWS)
+				(?:(?!qw)(?&PerlQualifiedIdentifier)|
+				(?&PerlList))
+			|
+		)?+
 	}xms;
 	keyword role (Ident $class, GATTRS @roles, Block $block) {
 		my ($body, %attrs) = _set_class_role_attrs($block, _parse_role_attrs(@roles));
@@ -42,8 +42,8 @@ sub import {
 			$attrs{with}
 			$attrs{use}
 			$body
+			1;
 		}|;
-		return '';
 	}
 	keyword class (Ident $class, GATTRS @roles, Block $block) {
 		my ($body, %attrs) = _set_class_role_attrs($block, _parse_role_attrs(@roles));
@@ -114,7 +114,7 @@ MooX::Purple - MooX::Purple
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 

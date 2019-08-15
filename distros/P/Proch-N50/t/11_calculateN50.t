@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Proch::N50;
-use Test::More tests => 2;
+use Test::More;
 use FindBin qw($Bin);
 
 my $file = "$Bin/../data/small_test.fa";
@@ -12,3 +12,5 @@ SKIP: {
 	ok($N50 > 0, 'got an N50');
 	ok($N50 == 65, 'N50==65 as expected');
 }
+
+done_testing();

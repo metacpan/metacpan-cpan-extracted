@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Any;
 
 our $DATE = '2019-06-20'; # DATE
-our $VERSION = '0.150'; # VERSION
+our $VERSION = '0.151'; # VERSION
 
 # IFUNBUILT
 # use strict;
@@ -71,7 +71,7 @@ Perinci::CmdLine::Any - Choose Perinci::CmdLine implementation (::Lite or ::Clas
 
 =head1 VERSION
 
-This document describes version 0.150 of Perinci::CmdLine::Any (from Perl distribution Perinci-CmdLine-Any), released on 2019-06-20.
+This document describes version 0.151 of Perinci::CmdLine::Any (from Perl distribution Perinci-CmdLine-Any), released on 2019-06-20.
 
 =head1 SYNOPSIS
 

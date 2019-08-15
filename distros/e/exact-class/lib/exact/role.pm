@@ -5,7 +5,7 @@ use 5.014;
 use exact;
 use Role::Tiny ();
 
-our $VERSION = '1.01'; # VERSION
+our $VERSION = '1.02'; # VERSION
 
 sub import {
     my ( $self, $caller ) = @_;
@@ -17,15 +17,10 @@ sub import {
             use exact 'class', 'noautoclean';
         };
     };
+}
 
-    {
-        no strict 'refs';
-
-        for ('does_role') {
-            my $method = "Role::Tiny::$_";
-            *{ 'exact::role::' . $_ } = \&$method unless ( defined &{ $caller . '::' . $_ } );
-        }
-    }
+sub does_role {
+    Role::Tiny::does_role(@_);
 }
 
 sub apply_roles_to_package {
@@ -62,7 +57,7 @@ exact::role - Simple role interface extension for exact
 
 =head1 VERSION
 
-version 1.01
+version 1.02
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,48 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::Algorithm::MinimumDiameter
+PROTOTYPES: DISABLE
+
+MinimumDiameter* new(SV*, Geometry& g, SV* hint = NULL) {
+    if (!hint) {
+        bool convex = SvTRUE(hint);
+        RETVAL = new MinimumDiameter(&g, convex);
+    }
+    else RETVAL = new MinimumDiameter(&g);
+}
+
+Sv getMinimumRectangle(Object obj) {
+    Geometry* r;
+    if (obj.stash().name() == "Geo::Geos::Algorithm::MinimumDiameter") {
+        auto& self = xs::in<MinimumDiameter&>(obj);
+        r = self.getMinimumRectangle();
+    }
+    else {
+        auto& g = xs::in<Geometry&>(obj);
+        r = MinimumDiameter::getMinimumRectangle(&g);
+    }
+    RETVAL = Helper::uplift(r);
+}
+
+Sv getMinimumDiameter(Geometry& g) {
+    RETVAL = Helper::uplift(MinimumDiameter::getMinimumDiameter(&g));
+}
+
+double MinimumDiameter::getLength()
+
+Coordinate* MinimumDiameter::getWidthCoordinate() {
+    RETVAL = new Coordinate(* (THIS->getWidthCoordinate()));
+}
+
+LineString* MinimumDiameter::getSupportingSegment () {
+    RETVAL = dyn_cast<LineString*>(THIS->getSupportingSegment());
+}
+
+LineString* MinimumDiameter::getDiameter () {
+    RETVAL = dyn_cast<LineString*>(THIS->getDiameter());
+}
+
+
+int CLONE_SKIP (...) { PERL_UNUSED_VAR(items); RETVAL = 1; }
+
+BOOT {
+    xs::exp::autoexport(Stash(__PACKAGE__));
+}

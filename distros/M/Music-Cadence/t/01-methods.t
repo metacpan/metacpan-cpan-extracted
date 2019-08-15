@@ -40,9 +40,31 @@ is_deeply $chords, [ [qw/ D F A /], [qw/ G B D /] ], 'C half';
 $chords = $mc->cadence(
     key     => 'C#',
     type    => 'half',
+    leading => 2,
+);
+is_deeply $chords, [ [qw/ D# F# A# /], [qw/ G# C D# /] ], 'C# half';
+
+$chords = $mc->cadence(
+    type    => 'half',
+    leading => 7,
+);
+is_deeply $chords, [ [qw/ B D F /], [qw/ G B D /] ], 'C half';
+
+$chords = $mc->cadence(
+    key     => 'D',
+    scale   => 'dorian',
+    type    => 'half',
     leading => 6,
 );
-is_deeply $chords, [ [qw/ A# C# F /], [qw/ G# C D# /] ], 'C# half';
+is_deeply $chords, [ [qw/ B D F /], [qw/ A C E /] ], 'D dorian half';
+
+$chords = $mc->cadence(
+    key     => 'E',
+    scale   => 'phrygian',
+    type    => 'half',
+    leading => 5,
+);
+is_deeply $chords, [ [qw/ B D F /], [qw/ B D F /] ], 'E phrygian half';
 
 $chords = $mc->cadence( type => 'deceptive' );
 is_deeply $chords, [ [qw/ G B D /], [qw/ A C E /] ], 'C deceptive';

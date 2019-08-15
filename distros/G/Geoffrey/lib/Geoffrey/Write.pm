@@ -5,7 +5,7 @@ use 5.016;
 use strict;
 use warnings;
 
-$Geoffrey::Write::VERSION = '0.000101';
+$Geoffrey::Write::VERSION = '0.000102';
 
 use parent 'Geoffrey::Role::Core';
 
@@ -40,12 +40,9 @@ sub changeset {
 sub run {
     my ($self, $s_dir, $s_schema, $b_dump) = @_;
     my $o_changelog_io = $self->changelog_io;
-    $o_changelog_io->converter($self->converter) if $o_changelog_io->needs_converter;
-
     # if changelog_io needs a dbh it  must store the changelogs into a database
     # and not in a filepath
     if ($o_changelog_io->needs_dbh) {
-        $o_changelog_io->dbh($self->dbh);
         $s_dir = q~changelog-~;
     }
     else {
@@ -178,7 +175,7 @@ Geoffrey::Write - Write scheme from existing db.
 
 =head1 VERSION
 
-Version 0.000101
+Version 0.000102
 
 =head1 DESCRIPTION
 

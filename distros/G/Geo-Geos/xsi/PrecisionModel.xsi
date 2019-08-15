@@ -1,0 +1,50 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::PrecisionModel
+PROTOTYPES: DISABLE
+
+PrecisionModel* new(SV*, SV* arg1 = NULL, SV* arg2 = NULL, SV* arg3 = NULL) {
+    if (!arg1) RETVAL = new PrecisionModel();
+    else {
+        if(SvIOK(arg1)) {
+            PrecisionModel::Type model = static_cast<PrecisionModel::Type>(SvIV(arg1));
+            RETVAL = new PrecisionModel(model);
+        }
+        else {
+            double scale = SvNV(arg1);
+            if (arg2) {
+                if(!arg3) throw("undef not allowed");
+                double offsetX = SvNV(arg2);
+                double offsetY = SvNV(arg3);
+                RETVAL = new PrecisionModel(scale, offsetX, offsetY);
+            }
+            else RETVAL = new PrecisionModel(scale);
+        }
+    }
+}
+
+double PrecisionModel::getScale()
+
+double PrecisionModel::getOffsetX()
+
+double PrecisionModel::getOffsetY()
+
+bool PrecisionModel::isFloating()
+
+int PrecisionModel::getMaximumSignificantDigits()
+
+int PrecisionModel::getType()
+
+double PrecisionModel::makePrecise(double val)
+
+std::string PrecisionModel::toString(...)
+
+int PrecisionModel::compareTo(PrecisionModel& other) { RETVAL = THIS->compareTo(&other); }
+
+BOOT {
+    auto this_stash = Stash(__PACKAGE__);
+    xs::exp::create_constants(this_stash, {
+        {"TYPE_FIXED",              PrecisionModel::Type::FIXED},
+        {"TYPE_FLOATING",           PrecisionModel::Type::FLOATING},
+        {"TYPE_FLOATING_SINGLE",    PrecisionModel::Type::FLOATING_SINGLE}
+    });
+    xs::exp::autoexport(this_stash);
+}

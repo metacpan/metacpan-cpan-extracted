@@ -3,7 +3,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     'NAME'      => q{IOas::CP932NEC},
-    'VERSION'   => q{0.04},
+    'VERSION'   => q{0.05},
     'ABSTRACT'  => q{provides CP932NEC I/O subroutines for UTF-8 script},
     'PREREQ_PM' => {
         'Encode' => '0',
@@ -16,6 +16,7 @@ WriteMakefile(
         'Socket' => '0',
         'Symbol' => '0',
         'lib' => '0',
+        'perl' => '5.005_03',
         'strict' => '1.01',
         'vars' => '0',
     },

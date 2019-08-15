@@ -1,0 +1,58 @@
+=head1 NAME
+
+Geo::Geos::PrecisionModel - Specifies the precision model of the Coordinate in a Geometry.
+
+=head1 SYNOPSIS
+
+    use Geo::Geos::PrecisionModel;
+
+    Geo::Geos::PrecisionModel->new;                          # => isa 'Geo::Geos::PrecisionModel'
+    Geo::Geos::PrecisionModel->new(TYPE_FLOATING);           # => isa 'Geo::Geos::PrecisionModel'
+    Geo::Geos::PrecisionModel->new(TYPE_FLOATING_SINGLE);    # => isa 'Geo::Geos::PrecisionModel'
+    Geo::Geos::PrecisionModel->new(TYPE_FIXED);              # => isa 'Geo::Geos::PrecisionModel'
+    Geo::Geos::PrecisionModel->new(2.0);                     # => isa 'Geo::Geos::PrecisionModel'
+
+    my $pm_fixed = Geo::Geos::PrecisionModel->new(2.0);
+    $pm_fixed->getScale;    # => 2.0
+    $pm_fixed->isFloating;  # => ''
+    $pm_fixed->getType;     # => TYPE_FIXED
+
+    my $pm = Geo::Geos::PrecisionModel->new;
+    $pm->getMaximumSignificantDigits();     # => 16
+    $pm->makePrecise(1.000001);             # => 1.000001
+
+    $pm->compareTo($pm_fixed);  # => 1
+
+=head1 SEE ALSO (C++ classes docs)
+
+L<GEOS C++ Library|https://trac.osgeo.org/geos>
+
+geos::geom::PrecisionModel
+
+=head1 EXPORTS CONSTANTS
+
+=over 2
+
+=item TYPE_FIXED
+
+=item TYPE_FLOATING
+
+=item TYPE_FLOATING_SINGLE
+
+=back
+
+=head1 SEE ALSO
+
+L<Geo::Geos>
+
+L<Geo::Geos::Precision>
+
+=head1 AUTHOR
+
+Ivan Baidakou <i.baydakov@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

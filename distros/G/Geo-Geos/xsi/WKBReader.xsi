@@ -1,0 +1,31 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::WKBReader
+PROTOTYPES: DISABLE
+
+Sv read(std::string in, SV* geometry_factory = NULL) {
+    std::istringstream in_stream(in);
+    Geometry* g;
+    if (geometry_factory) {
+        WKBReader r(xs::in<GeometryFactory&>(geometry_factory));
+        g = r.read(in_stream);
+    }
+    else {
+        WKBReader r;
+        g = r.read(in_stream);
+    }
+    RETVAL = Helper::uplift(g);
+}
+
+Sv readHEX(std::string in, SV* geometry_factory = NULL) {
+    std::istringstream in_stream(in);
+    Geometry* g;
+    if (geometry_factory) {
+        WKBReader r(xs::in<GeometryFactory&>(geometry_factory));
+        g = r.readHEX(in_stream);
+    }
+    else {
+        WKBReader r;
+        g = r.readHEX(in_stream);
+    }
+    RETVAL = Helper::uplift(g);
+}
+

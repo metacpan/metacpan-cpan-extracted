@@ -1,3 +1,9 @@
+0.819   2019-08-14  Released-By: PERLANCAR; Urgency: medium
+
+	- Add modules:
+	  Perinci::Examples::rimeta::{IncludedPackage,ExcludedPackage}.
+
+
 0.818   2019-07-19  Released-By: PERLANCAR; Urgency: medium
 
 	- test_completion(): add argument to test schema examples and arg

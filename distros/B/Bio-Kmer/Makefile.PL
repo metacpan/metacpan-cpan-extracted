@@ -17,12 +17,14 @@ WriteMakefile1(
   PREREQ_PM    => {
     'File::Basename' => 0,
     'File::Temp'     => 0,
+    'File::Which'    => '1.23',
     'Data::Dumper'   => 0,
     'IO::Uncompress::Gunzip' => 0,
     'threads'        => 0,
     'threads::shared'=> 0,
     'Thread::Queue'  => 0,
     'Exporter'       => 0,
+    'Bio::Perl'      => 0,
   },
   TEST_REQUIRES => {
     'Test::More'     => 0.47,

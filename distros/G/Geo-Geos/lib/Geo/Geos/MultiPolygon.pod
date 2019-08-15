@@ -1,0 +1,59 @@
+=head1 NAME
+
+Geo::Geos::MultiPolygon - Models a collection of Polygons.
+
+=head1 SYNOPSIS (class-specific methods)
+
+    use Geo::Geos::Coordinate;
+    use Geo::Geos::GeometryFactory;
+
+    my $gf = Geo::Geos::GeometryFactory::create();
+
+    my $c1 = Geo::Geos::Coordinate->new(1,2);
+    my $c2 = Geo::Geos::Coordinate->new(5,2);
+    my $c3 = Geo::Geos::Coordinate->new(5,0);
+    my $c4 = Geo::Geos::Coordinate->new(1,0);
+
+    my $lr1 = $gf->createLinearRing([$c1, $c2, $c3, $c4, $c1], 2);
+    my $p1 = $gf->createPolygon($lr1);
+
+    my $cx1 = Geo::Geos::Coordinate->new(15, 15);
+    my $cx2 = Geo::Geos::Coordinate->new(4, 15);
+    my $cx3 = Geo::Geos::Coordinate->new(4, 5);
+    my $cx4 = Geo::Geos::Coordinate->new(15, 5);
+    my $lr2 = $gf->createLinearRing([$cx1, $cx2, $cx3, $cx4, $cx1], 2);
+    my $p2 = $gf->createPolygon($lr2);
+
+    $gf->createMultiPolygon([$p1, $p2]);    # => isa 'Geo::Geos::MultiPolygon'
+    $gf->createMultiPolygon([$p1, $p2]);    # => isa 'Geo::Geos::Polygonal'
+    $gf->createMultiPolygon([$p1, $p2]);    # => isa 'Geo::Geos::GeometryCollection'
+
+=head1 DESCRIPTION
+
+See methods in the base class L<Geo::Geos::Geometry>.
+
+=head1 SEE ALSO (C++ classes docs)
+
+L<GEOS C++ Library|https://trac.osgeo.org/geos>
+
+geos::geom::MultiPolygon
+
+=head1 SEE ALSO
+
+L<Geo::Geos>
+
+L<Geo::Geos::Geometry>
+
+L<Geo::Geos::GeometryCollection>
+
+L<Geo::Geos::GeometryFactory>
+
+=head1 AUTHOR
+
+Ivan Baidakou <i.baydakov@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

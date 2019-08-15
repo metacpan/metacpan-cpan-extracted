@@ -1,5 +1,13 @@
 Revision history for Devel-MAT-Dumper
 
+0.41    2019-08-14 23:25:22
+        [CHANGES]
+         * Define another thirdparty XS extension for setting dumper helpers
+           per blessed package
+         * Attach SIGABRT using an unsafe signal handler so it can see the
+           inner workings of C or XS code
+         * Ignore some unimportant savestack entry types
+
 0.40    2019-02-02 17:14:49
         [CHANGES]
          * Define an SV extension to notate extra SV information when perl is

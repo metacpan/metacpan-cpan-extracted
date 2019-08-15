@@ -1,0 +1,28 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::Prep::Geometry
+PROTOTYPES: DISABLE
+
+Geometry* BasicPreparedGeometry::getGeometry () { RETVAL = THIS->getGeometry().clone(); }
+
+bool BasicPreparedGeometry::contains (Geometry& geom) { RETVAL = THIS->contains(&geom); }
+
+bool BasicPreparedGeometry::containsProperly (Geometry& geom) { RETVAL = THIS->containsProperly(&geom); }
+
+bool BasicPreparedGeometry::coveredBy (Geometry& geom) { RETVAL = THIS->coveredBy(&geom); }
+
+bool BasicPreparedGeometry::covers (Geometry& geom) { RETVAL = THIS->covers(&geom); }
+
+bool BasicPreparedGeometry::crosses (Geometry& geom) { RETVAL = THIS->crosses(&geom); }
+
+bool BasicPreparedGeometry::disjoint (Geometry& geom) { RETVAL = THIS->disjoint(&geom); }
+
+bool BasicPreparedGeometry::intersects (Geometry& geom) { RETVAL = THIS->intersects(&geom); }
+
+bool BasicPreparedGeometry::overlaps (Geometry& geom) { RETVAL = THIS->overlaps(&geom); }
+
+bool BasicPreparedGeometry::touches (Geometry& geom) { RETVAL = THIS->touches(&geom); }
+
+bool BasicPreparedGeometry::within (Geometry& geom) { RETVAL = THIS->within(&geom); }
+
+std::string BasicPreparedGeometry::toString (...)
+
+int CLONE_SKIP (...) { PERL_UNUSED_VAR(items); RETVAL = 1; }

@@ -1,0 +1,21 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::Noding::BasicSegmentString
+
+PROTOTYPES: DISABLE
+
+BasicSegmentString* new(SV*, Array coords) {
+    auto seq = Helper::convert_coords(coords);
+    auto deep_clone = seq.clone();
+    RETVAL = new BasicSegmentString(deep_clone, NULL);
+}
+
+void BasicSegmentString::DESTROY() {
+    delete THIS->getCoordinates();
+}
+
+int BasicSegmentString::getSegmentOctant (unsigned int index)
+
+int CLONE_SKIP (...) { PERL_UNUSED_VAR(items); RETVAL = 1; }
+
+BOOT {
+    Stash(__PACKAGE__).inherit("Geo::Geos::Noding::SegmentString");
+}

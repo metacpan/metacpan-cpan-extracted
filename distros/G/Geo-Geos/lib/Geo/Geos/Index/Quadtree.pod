@@ -1,0 +1,52 @@
+=head1 NAME
+
+Geo::Geos::Index::Quadtree - A spatial index structure for efficient querying of 2D rectangles.
+
+=head1 SYNOPSIS
+
+    use Geo::Geos::Index::Quadtree;
+
+    my $t = Geo::Geos::Index::Quadtree->new;     # => isa 'Geo::Geos::Index::Quadtree'
+
+    my $payload = 'any-scalar';
+    my $e1 = Geo::Geos::Envelope->new(1, 2, 3, 4);
+    $t->insert($e1, $payload);
+
+    $t->queryAll;       # => is_deeply ['any-scalar']
+
+    $t->query($e1);     # => is_deeply ['any-scalar']
+
+    my $item;
+    $t->query($e1, sub { $item = $_[0] });
+    my $ok = $item eq 'any-scalar';   # => success
+
+    $t->remove($e1, $payload);
+    $t->queryAll;       # => is_deeply []
+
+    $t->depth;      # => 1
+    $t->size;       # => 0
+    $t->toString;   # => like qr/ITEMS:/
+
+=head1 SEE ALSO (C++ classes docs)
+
+L<GEOS C++ Library|https://trac.osgeo.org/geos>
+
+geos::index::quadtree::Quadtree
+
+=head1 SEE ALSO
+
+L<Geo::Geos>
+
+L<Geo::Geos::Envelope>
+
+L<Geo::Geos::Index::SpatialIndex>
+
+=head1 AUTHOR
+
+Ivan Baidakou <i.baydakov@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

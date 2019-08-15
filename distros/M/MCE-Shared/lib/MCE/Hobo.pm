@@ -13,7 +13,7 @@ no warnings qw( threads recursion uninitialized once redefine );
 
 package MCE::Hobo;
 
-our $VERSION = '1.843';
+our $VERSION = '1.844';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
@@ -32,7 +32,7 @@ use overload (
 
 sub import {
    no strict 'refs'; no warnings 'redefine';
-   *{ caller().'::mce_async' } = \&async;
+   *{ caller().'::mce_async' } = \&mce_async;
    return;
 }
 
@@ -100,11 +100,10 @@ sub init {
    if ( !exists $mngd->{posix_exit} ) {
       $mngd->{posix_exit} = 1 if (
          ( $_has_threads && $_tid ) || $INC{'Mojo/IOLoop.pm'} ||
+         $INC{'Coro.pm'} || $INC{'LWP/UserAgent.pm'} || $INC{'stfl.pm'} ||
          $INC{'Curses.pm'} || $INC{'CGI.pm'} || $INC{'FCGI.pm'} ||
-         $INC{'Prima.pm'} || $INC{'Tk.pm'} || $INC{'Wx.pm'} ||
-         $INC{'Gearman/Util.pm'} || $INC{'Gearman/XS.pm'} ||
-         $INC{'Coro.pm'} || $INC{'LWP/UserAgent.pm'} ||
-         $INC{'Win32/GUI.pm'} || $INC{'stfl.pm'}
+         $INC{'Tk.pm'} || $INC{'Wx.pm'} || $INC{'Win32/GUI.pm'} ||
+         $INC{'Gearman/Util.pm'} || $INC{'Gearman/XS.pm'}
       );
    }
 
@@ -127,7 +126,7 @@ sub init {
 
 ###############################################################################
 ## ----------------------------------------------------------------------------
-## 'new', 'async (mce_async)', and 'create' for threads-like similarity.
+## 'new', 'mce_async', and 'create' for threads-like similarity.
 ##
 ###############################################################################
 
@@ -138,7 +137,7 @@ sub init {
 ## Use "goto" trick to avoid pad problems from 5.8.1 (fixed in 5.8.2)
 ## Tip found in threads::async.
 
-sub async (&;@) {
+sub mce_async (&;@) {
    goto &create;
 }
 
@@ -209,10 +208,6 @@ sub create {
    }
 
    %{ $_LIST } = (), $_SELF = $self;                     # child
-
-   if ( UNIVERSAL::can('Prima', 'cleanup') ) {
-      no warnings 'redefine'; local $@; eval '*Prima::cleanup = sub {}';
-   }
 
    MCE::Shared::init($id);
 
@@ -565,7 +560,7 @@ sub _dispatch {
    $mngd->{WRK_ID} = $_SELF->{WRK_ID} = $$;
 
    $ENV{PERL_MCE_IPC} = 'win32' if $_is_MSWin32;
-   $SIG{TERM} = $SIG{INT} = $SIG{HUP} = \&_trap;
+   $SIG{TERM} = $SIG{SEGV} = $SIG{INT} = $SIG{HUP} = \&_trap;
    $SIG{QUIT} = \&_quit;
 
    {
@@ -699,6 +694,7 @@ sub _reap_hobo {
       if ( ( $code > 100 || $sig == 9 ) && !$err ) {
          $code = 2, $sig = 1,  $err = 'received SIGHUP'  if $code == 101;
          $code = 2, $sig = 2,  $err = 'received SIGINT'  if $code == 102;
+         $code = 2, $sig = 11, $err = 'received SIGSEGV' if $code == 111;
          $code = 2, $sig = 15, $err = 'received SIGTERM' if $code == 115;
          $code = 2, $sig = 9,  $err = 'received SIGKILL' if $sig  == 9;
       }
@@ -721,6 +717,7 @@ sub _trap {
 
    if    ( $name eq 'HUP'  ) { $exit_status = 101 }
    elsif ( $name eq 'INT'  ) { $exit_status = 102 }
+   elsif ( $name eq 'SEGV' ) { $exit_status = 111 }
    elsif ( $name eq 'TERM' ) { $exit_status = 115 }
 
    _exit($exit_status);
@@ -731,28 +728,13 @@ sub _wait_one {
    my ( $list ) = ( $_LIST->{$pkg} );
    my ( $self, $wrk_id ); local $!;
 
-   if ( $INC{'MCE/Child.pm'} ) {
-      while () {
-         for my $hobo ( $list->vals ) {
-            $wrk_id = $hobo->{WRK_ID};
-            $self   = $list->del($wrk_id), last if waitpid($wrk_id, _WNOHANG);
-         }
-         last if $self;
-         sleep 0.015;
+   while () {
+      for my $hobo ( $list->vals ) {
+         $wrk_id = $hobo->{WRK_ID};
+         $self   = $list->del($wrk_id), last if waitpid($wrk_id, _WNOHANG);
       }
-   }
-   else {
-      while () {
-         $wrk_id = CORE::wait();
-
-         return undef if ( $wrk_id == -1 );        # no child processes
-         last if ( $self = $list->del($wrk_id) );  # our child process
-
-         for my $key ( keys %{ $_LIST } ) {        # other child process
-            _reap_hobo($_LIST->{$key}->del($wrk_id)), last
-               if ( $key ne $pkg && $_LIST->{$key}->exists($wrk_id) );
-         }
-      }
+      last if $self;
+      sleep 0.030;
    }
 
    _reap_hobo($self);
@@ -872,7 +854,7 @@ MCE::Hobo - A threads-like parallelization module
 
 =head1 VERSION
 
-This document describes MCE::Hobo version 1.843
+This document describes MCE::Hobo version 1.844
 
 =head1 SYNOPSIS
 
@@ -1187,8 +1169,8 @@ to terminate after some time. The default is C<0> for no timeout.
 
 Set C<posix_exit> to avoid all END and destructor processing. Constructing
 MCE::Hobo inside a thread implies 1 or if present CGI, FCGI, Coro, Curses,
-Gearman::Util, Gearman::XS, LWP::UserAgent, Mojo::IOLoop, Prima, STFL,
-Tk, Wx, or Win32::GUI.
+Gearman::Util, Gearman::XS, LWP::UserAgent, Mojo::IOLoop, STFL, Tk, Wx,
+or Win32::GUI.
 
 Set C<void_context> to create the hobo process in void context for the
 return value. Otherwise, the return context is wantarray-aware for
@@ -1399,7 +1381,11 @@ Class methods that allows a hobo to obtain its own ID.
 
 =item MCE::Hobo->wait_one()
 
+=item MCE::Hobo->waitone()
+
 =item MCE::Hobo->wait_all()
+
+=item MCE::Hobo->waitall()
 
 Meaningful for the manager process only, waits for one or all hobo processes
 to complete execution. Afterwards, returns the corresponding hobo objects.
@@ -1562,8 +1548,8 @@ at the top of the script.
 
 =item Set posix_exit to avoid all END and destructor processing.
 
-This is helpful in reducing overhead when workers exit. Ditto if using a Perl
-module not parallel safe. The option is ignored on C<$^O eq 'MSWin32'>.
+This is helpful for reducing overhead when workers exit. Ditto if using a Perl
+module not parallel safe. The option is ignored on Windows C<$^O eq 'MSWin32'>.
 
  MCE::Child->init( posix_exit => 1, ... );
   MCE::Hobo->init( posix_exit => 1, ... );

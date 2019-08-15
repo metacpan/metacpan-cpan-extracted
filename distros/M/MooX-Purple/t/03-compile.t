@@ -1,6 +1,6 @@
 use Test::More;
 use MooX::Purple;
-use MooX::Purple::G;
+use MooX::Purple::G 't/lib';
 
 role Before {
 	public seven { return '7' }
@@ -34,6 +34,26 @@ class Night is qw/Hello/ {
 	public nine { return 'nine' }
 };
 
+test_file('Before.pmc');
+test_file('World.pmc');
+test_file('Hello.pmc');
+test_file('Night.pmc');
+
+sub test_file {
+	my $file = shift;
+	my $expected = read_file(sprintf('t/lib/out/%s', $file));
+	my $got = read_file(sprintf('t/lib/%s', $file));
+	is($got, $expected, $gut);
+}
+
+sub read_file {
+	open my $fh, '<', $_[0];
+	my $source = do { local $/; <$fh> };
+	close $fh;
+	return $source;
+}
+
 ok(1);
 done_testing();
+
 

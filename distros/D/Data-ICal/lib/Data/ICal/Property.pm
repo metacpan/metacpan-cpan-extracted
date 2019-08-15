@@ -326,15 +326,18 @@ sub _fold {
      # But some interop tests suggest it's wiser just to not fold for vcal 1.0
      # at all (in quoted-printable).
     } else {
-        my $pos = 0;
+        return $string unless length $string > 75;
 
-        # Walk through the value, looking to replace 75 characters at
-        # a time.  We assign to pos() to update where to pick up for
-        # the next match.
-        while ( $string =~ s/\G(.{75})(?=.)/$1$crlf / ) {
-            $pos += 75 + length($crlf);
-            pos($string) = $pos;
+        $string =~ s{$crlf\z}{};
+
+        my $out = substr($string, 0, 75, "") . $crlf;
+
+        while (length $string) {
+            my $substr = substr $string, 0, 74, "";
+            $out .= " $substr$crlf";
         }
+
+        return $out;
     }
 
     return $string;
@@ -346,7 +349,7 @@ Best Practical Solutions, LLC E<lt>modules@bestpractical.comE<gt>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2005 - 2015, Best Practical Solutions, LLC.  All rights reserved.
+Copyright (c) 2005 - 2019, Best Practical Solutions, LLC.  All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic>.

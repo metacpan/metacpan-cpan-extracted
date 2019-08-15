@@ -1,0 +1,20 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::Noding::SegmentNode
+PROTOTYPES: DISABLE
+
+bool SegmentNode::isInterior()
+
+bool SegmentNode::isEndPoint(unsigned int maxSegmentIndex)
+
+int SegmentNode::compareTo(SegmentNode& other)
+
+std::string SegmentNode::toString(...) {
+    std::ostringstream out;
+    out << *THIS;
+    RETVAL = out.str();
+}
+
+Coordinate* SegmentNode::coord() {
+    RETVAL = new Coordinate(THIS->coord);
+}
+
+unsigned int SegmentNode::segmentIndex() { RETVAL = THIS->segmentIndex; }

@@ -1,0 +1,7 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::Prep::GeometryFactory
+PROTOTYPES: DISABLE
+
+BasicPreparedGeometry* prepare(Geometry& g) {
+    auto pg = const_cast<PreparedGeometry*>(PreparedGeometryFactory::prepare(&g));
+    RETVAL = static_cast<BasicPreparedGeometry*>(pg);
+}

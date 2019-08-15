@@ -1,13 +1,30 @@
-0.003   2019-03-01 (PERLANCAR)
+0.006   2019-08-15  Released-By: PERLANCAR; Urgency: medium
+
+	- Update module name App::CreateSelfSignedSSL ->
+	  App::CreateSelfSignedSSLCert.
+
+
+0.005   2019-08-15  Released-By: PERLANCAR; Urgency: medium
+
+        - Add modules: Perinci::CmdLine::Any, alias::module.
+
+
+0.004   2019-08-14  Released-By: PERLANCAR; Urgency: medium
+
+	- Add modules: App::rimetadb, File::Flock::Retry,
+	  Tie::Handle::FileWriteRotate.
+
+
+0.003   2019-03-01  Released-By: PERLANCAR
 
 	- Updates.
 
 
-0.002   2019-02-26 (PERLANCAR)
+0.002   2019-02-26  Released-By: PERLANCAR
 
 	- Updates.
 
 
-0.001   2019-02-26 (PERLANCAR) (unreleased)
+0.001   2019-02-26 (PERLANCAR)  Released-By: unreleased
 
         - First release.

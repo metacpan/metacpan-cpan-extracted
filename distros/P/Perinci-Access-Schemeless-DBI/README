@@ -1,43 +1,51 @@
-SYNOPSIS
+NAME
+    Perinci::Access::Schemeless::DBI - Subclass of
+    Perinci::Access::Schemeless which gets lists of entities (and metadata)
+    from DBI database
 
+VERSION
+    This document describes version 0.090 of
+    Perinci::Access::Schemeless::DBI (from Perl distribution
+    Perinci-Access-Schemeless-DBI), released on 2019-08-14.
+
+SYNOPSIS
      use DBI;
      use Perinci::Access::Schemeless::DBI;
-    
+
      my $dbh = DBI->connect(...);
      my $pa = Perinci::Access::Schemeless::DBI->new(dbh => $dbh);
-    
+
      my $res;
-    
+
      # will retrieve list of code entities from database
      $res = $pa->request(list => "/Foo/");
-    
+
      # will also get metadata from database
      $res = $pa->request(meta => "/Foo/Bar/func1");
-    
+
      # the rest are the same like Perinci::Access::Schemeless
      $res = $pa->request(actions => "/Foo/");
 
 DESCRIPTION
-
-    This subclass of Perinci::Access::Schemeless gets lists of code
-    entities (currently only packages and functions) from a DBI database
-    (instead of from listing Perl packages on the filesystem). It can also
-    retrieve Rinci metadata from said database (instead of from %SPEC
-    package variables).
+    This subclass of Perinci::Access::Schemeless gets lists of code entities
+    (currently only packages and functions) from a DBI database (instead of
+    from listing Perl packages on the filesystem). It can also retrieve
+    Rinci metadata from said database (instead of from %SPEC package
+    variables).
 
     Currently, you must have a table containing list of packages named
-    package with columns name (package name), metadata (Rinci metadata,
-    encoded in JSON); and a table containing list of functions named
-    function with columns package (package name), name (function name), and
-    metadata (normalized Rinci metadata, encoded in JSON). Table and column
-    names will be configurable in the future. An example of the table's
-    contents:
+    "package" with columns "name" (package name), "metadata" (Rinci
+    metadata, encoded in JSON); and a table containing list of functions
+    named "function" with columns "package" (package name), "name" (function
+    name), and "metadata" (normalized Rinci metadata, encoded in JSON).
+    Table and column names will be configurable in the future. An example of
+    the table's contents:
 
      name      metadata
      ----      ---------
      Foo::Bar  (null)
      Foo::Baz  {"v":"1.1"}
-    
+
      package   name         metadata
      ------    ----         --------
      Foo::Bar  func1        {"v":"1.1","summary":"function 1","args":{}}
@@ -45,37 +53,31 @@ DESCRIPTION
      Foo::Baz  func3        {"v":"1.1","summary":"function 3","args":{"a":{"schema":["int",{},{}]}}}
 
 HOW IT WORKS
-
-    The subclass overrides get_meta() and action_list(). Thus, this
-    modifies behaviors of the following Riap actions: list, meta,
-    child_metas.
-
-METHODS
+    The subclass overrides "get_meta()" and "action_list()". Thus, this
+    modifies behaviors of the following Riap actions: "list", "meta",
+    "child_metas".
 
 new(%args) => OBJ
-
     Aside from its parent class, this class recognizes these attributes:
 
-      * dbh => OBJ (required)
+    *   dbh => OBJ (required)
 
-      DBI database handle.
+        DBI database handle.
 
-      * fallback_on_completion => BOOL (default: 0)
+    *   fallback_on_completion => BOOL (default: 0)
 
-      If set to true, then for complete_arg_val and complete_arg_elem, if
-      metadata has a non-coderef completion or element_completion in its
-      argument spec, then will fallback to parent class
-      Perinci::Access::Schemeless for metadata.
+        If set to true, then for "complete_arg_val" and "complete_arg_elem",
+        if metadata has a non-coderef "completion" or "element_completion"
+        in its argument spec, then will fallback to parent class
+        Perinci::Access::Schemeless for metadata.
 
+METHODS
 FAQ
-
- Rationale for this module?
-
+  Rationale for this module?
     If you have a large number of packages and functions, you might want to
     avoid reading Perl modules on the filesystem.
 
- I have completion routine for my argument, completion no longer works?
-
+  I have completion routine for my argument, completion no longer works?
     For example, suppose your function metadata is something like this:
 
      {
@@ -94,9 +96,9 @@ FAQ
      }
 
     When this is stored in the database, most serialization format (JSON
-    included) doesn't save the code in completion. If you use
+    included) doesn't save the code in "completion". If you use
     Data::Clean::JSON, by default the coderef will be replaced with plain
-    string CODE. This prevents completion to work e.g. if you request with
+    string "CODE". This prevents completion to work e.g. if you request with
     this Riap request:
 
      {action=>'complete_arg_val', uri=>..., arg=>'name'}
@@ -104,11 +106,35 @@ FAQ
     One solution is to fallback to its parent class
     Perinci::Access::Schemeless (which reads metadata from Perl source
     files) for meta request when doing completion. To do this, you can set
-    the attribute fallback_on_completion.
+    the attribute "fallback_on_completion".
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Perinci-Access-Schemeless-DBI>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Perinci-Access-Schemeless-DBI>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Access-Scheme
+    less-DBI>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Riap, Rinci
 
     App::UpdateRinciMetadataDb
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2015, 2014 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

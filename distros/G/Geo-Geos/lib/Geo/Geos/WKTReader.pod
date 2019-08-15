@@ -1,0 +1,40 @@
+=head1 NAME
+
+Geo::Geos::WKTReader - Reads a Geometry from Well-Known Text format.
+
+=head1 SYNOPSIS
+
+    use Geo::Geos::GeometryFactory;
+    use Geo::Geos::WKTReader;
+
+    my $gf = Geo::Geos::GeometryFactory::create();
+    my $s = "POINT (1.0000000000000000 2.0000000000000000)";
+
+    Geo::Geos::WKTReader::read($s, $gf);    # => isa 'Geo::Geos::Geometry'
+    Geo::Geos::WKTReader::read($s);         # => isa 'Geo::Geos::Geometry'
+
+    my $g = Geo::Geos::WKTReader::read($s);
+    $g->toString eq $s;                  # => success
+
+
+=head1 SEE ALSO (C++ classes docs)
+
+L<GEOS C++ Library|https://trac.osgeo.org/geos>
+
+geos::io::WKTReader
+
+L<Geo::Geos>
+
+L<Geo::Geos::Geometry>
+
+L<Geo::Geos::WKTWriter>
+
+=head1 AUTHOR
+
+Ivan Baidakou <i.baydakov@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

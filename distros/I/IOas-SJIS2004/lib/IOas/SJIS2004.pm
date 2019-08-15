@@ -11,7 +11,7 @@ package IOas::SJIS2004;
 use 5.00503;    # Galapagos Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.04';
+$VERSION = '0.05';
 $VERSION = $VERSION;
 
 use strict;
@@ -24,7 +24,7 @@ use Symbol ();
 
 (my $__package__ = __PACKAGE__) =~ s/utf81/utf8.1/i;
 my $io_encoding = lc((split /::/, $__package__)[-1]);
-if ($io_encoding =~ /^(?:cp932x|cp932|cp932ibm|cp932nec|sjis2004|cp00930|keis78|keis83|keis90|jef|jef9p|jipsj|jipse|letsj|utf8|utf8\.1)$/) {
+if ($io_encoding =~ /^(?:sjis2004|cp932|cp932ibm|cp932nec|sjis2004|cp00930|keis78|keis83|keis90|jef|jef9p|jipsj|jipse|letsj|utf8|utf8\.1)$/) {
     eval q{
 use Jacode4e::RoundTrip; # pmake.bat makes META.yml, META.json and Makefile.PL by /^use /
 };
@@ -144,7 +144,7 @@ IOas::SJIS2004 - provides SJIS2004 I/O subroutines for UTF-8 script
     # Octet Length as I/O Encoding
     $result = IOas::SJIS2004::length($utf8str);
     $result = IOas::SJIS2004::sprintf($utf8format, @utf8list);
-    $result = IOas::SJIS2004::substr($utf8expr, $offset_as_cp932x, $length_as_cp932x, $utf8replacement);
+    $result = IOas::SJIS2004::substr($utf8expr, $offset_as_sjis2004, $length_as_sjis2004, $utf8replacement);
 
     # String Comparison as I/O Encoding
     $result = IOas::SJIS2004::cmp($utf8str_a, $utf8str_b);
@@ -167,6 +167,7 @@ IOas::SJIS2004 - provides SJIS2004 I/O subroutines for UTF-8 script
   --------------------------------------------------------
   count by    count by              count by octet
   octet       UTF-8 codepoint       in I/O encoding
+  (useful)    (not so useful)       (useful)
   --------------------------------------------------------
   length      UTF8::R2::length      IOas::SJIS2004::length
   sprintf                           IOas::SJIS2004::sprintf
@@ -192,11 +193,11 @@ IOas::SJIS2004 - provides SJIS2004 I/O subroutines for UTF-8 script
 =head1 I/O Operations
 
   --------------------------------------------------------
-  raw I/O     I/O operations        I/O operations
-  operations  in UTF-8 encoding     with encoding convert
+  raw I/O       I/O operations      I/O operations
+  operations    in UTF-8 encoding   with encoding convert
   --------------------------------------------------------
-  getc        UTF8::R2::getc        IOas::SJIS2004::getc
-  <FILE>                            IOas::SJIS2004::readline
+  getc          UTF8::R2::getc      IOas::SJIS2004::getc
+  <FILEHANDLE>                      IOas::SJIS2004::readline
   print                             IOas::SJIS2004::print
   printf                            IOas::SJIS2004::printf
   --------------------------------------------------------

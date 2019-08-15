@@ -126,7 +126,7 @@ METHODS
         $messages->add_text( text => 'Example push text' );
         $bot->broadcast($messages->build);
 
-    See also the LINE Developers API reference of this method:
+    See also the LINE Developers API reference of thi smethod:
     https://developers.line.biz/en/reference/messaging-api/#send-broadcast-message
 
  validate_signature($json, $signature)
@@ -234,6 +234,28 @@ METHODS
 
     See also the LINE Developers API reference of this method:
     https://developers.line.biz/en/reference/messaging-api/#get-profile
+
+ get_group_member_profile($group_id, $user_id)
+
+    Get group user profile information.
+
+        my $ret = $bot->get_group_member_profile($group_id, $user_id);
+        if ($ret->is_success) {
+            say $ret->display_name;
+            say $ret->user_id;
+            say $ret->picture_url;
+        }
+
+    See also the LINE Developers API reference of this method:
+    https://developers.line.biz/en/reference/messaging-api/#get-group-member-profile
+
+ get_room_member_profile($room_id, $user_id)
+
+    Get room user profile information. A room is like a group without a
+    group name. The response is similar to get_group_member_profile.
+
+    See also the LINE Developers API reference of this method:
+    https://developers.line.biz/en/reference/messaging-api/#get-room-member-profile
 
  get_number_of_sent_reply_messages($date)
 
@@ -383,6 +405,40 @@ METHODS
 
     The mandatory argument $user_ids is an ArrayRef of user ids. The return
     value is an empty object.
+
+ issue_channel_access_token({ client_id => '...', client_secret => '...' })
+
+    This method corresponds to the API of: Issue Channel access token
+    <https://developers.line.biz/en/reference/messaging-api/#issue-channel-access-token>
+
+    The argument is a HashRef with two pairs of mandatary key-values:
+
+        {
+            client_id => "...",
+            client_secret => "...",
+        }
+
+    Both pieces of information can be accquired from the channel console.
+
+    When a 200 OK HTTP response is returned, a new token is issued. In this
+    case, you may want to store the values in "access_token", "expires_in",
+    and "token_type" attributes of the response object for future use.
+
+    Otherwise, you my examine the "error" attribute and "error_description"
+    attribute for more information about the error.
+
+ revoke_channel_access_token({ access_token => "..." })
+
+    This method corresponds to the API of: Revoke channel access token
+    <https://developers.line.biz/en/reference/messaging-api/#revoke-channel-access-token>
+
+    The argument is a HashRef with one pair of mandatary key-values;
+
+        { access_token => "..." }
+
+    Upon successful revocation, a 200 OK HTTP response is returned.
+    Otherwise, you my examine the "error" attribute and "error_description"
+    attribute for more information about the error.
 
  How to build a send message object
 

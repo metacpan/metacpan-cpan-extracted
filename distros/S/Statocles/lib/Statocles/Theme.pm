@@ -1,5 +1,5 @@
 package Statocles::Theme;
-our $VERSION = '0.093';
+our $VERSION = '0.094';
 # ABSTRACT: Templates, headers, footers, and navigation
 
 use Statocles::Base 'Class';
@@ -43,6 +43,59 @@ has include_stores => (
         }
         return [ StoreType->coercion->( $thing ) ];
     },
+);
+
+#pod =attr tag_start
+#pod
+#pod String that indicates the start of a template tag. Defaults to
+#pod C<< <% >>.
+#pod
+#pod =attr tag_end
+#pod
+#pod String that indicates the end of a template tag. Defaults to C<< %> >>.
+#pod
+#pod =attr line_start
+#pod
+#pod String that indicates the start of a line of template code.
+#pod Defaults to C<%>.
+#pod
+#pod =attr expression_mark
+#pod
+#pod String that indicates an expression to be evaluated and inserted into
+#pod the template. Defaults to C<=>.
+#pod
+#pod =attr escape_mark
+#pod
+#pod String that escapes the template directives. Defaults to C<%>.
+#pod
+#pod =attr comment_mark
+#pod
+#pod String that indicates a comment. Defaults to C<#>.
+#pod
+#pod =attr capture_start
+#pod
+#pod Keyword that starts capturing string. Defaults to C<begin>.
+#pod
+#pod =attr capture_end
+#pod
+#pod Keyword that ends capturing string. Defaults to C<end>.
+#pod
+#pod =attr trim_mark
+#pod
+#pod String that indicates that whitespace should be trimmed. Defaults to
+#pod C<=>.
+#pod
+#pod =cut
+
+has [qw(
+    tag_start tag_end
+    line_start trim_mark
+    replace_mark expression_mark
+    escape_mark comment_mark
+    capture_start capture_end
+)] => (
+    is => 'ro',
+    isa => Maybe[Str],
 );
 
 #pod =attr _templates
@@ -264,7 +317,7 @@ Statocles::Theme - Templates, headers, footers, and navigation
 
 =head1 VERSION
 
-version 0.093
+version 0.094
 
 =head1 SYNOPSIS
 
@@ -308,6 +361,46 @@ themes from the Statocles share directory.
 
 An array of L<stores|Statocles::Store> to look for includes. The L</store> is
 added at the end of this list.
+
+=head2 tag_start
+
+String that indicates the start of a template tag. Defaults to
+C<< <% >>.
+
+=head2 tag_end
+
+String that indicates the end of a template tag. Defaults to C<< %> >>.
+
+=head2 line_start
+
+String that indicates the start of a line of template code.
+Defaults to C<%>.
+
+=head2 expression_mark
+
+String that indicates an expression to be evaluated and inserted into
+the template. Defaults to C<=>.
+
+=head2 escape_mark
+
+String that escapes the template directives. Defaults to C<%>.
+
+=head2 comment_mark
+
+String that indicates a comment. Defaults to C<#>.
+
+=head2 capture_start
+
+Keyword that starts capturing string. Defaults to C<begin>.
+
+=head2 capture_end
+
+Keyword that ends capturing string. Defaults to C<end>.
+
+=head2 trim_mark
+
+String that indicates that whitespace should be trimmed. Defaults to
+C<=>.
 
 =head2 _templates
 

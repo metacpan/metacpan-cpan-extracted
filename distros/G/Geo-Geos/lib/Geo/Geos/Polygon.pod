@@ -1,0 +1,55 @@
+=head1 NAME
+
+Geo::Geos::Polygon - Represents a linear polygon, which may include holes.
+
+=head1 SYNOPSIS (class-specific methods)
+
+    use Geo::Geos::Coordinate;
+    use Geo::Geos::GeometryFactory;
+
+    my $gf = Geo::Geos::GeometryFactory::create();
+    my $c1 = Geo::Geos::Coordinate->new(1,2);
+    my $c2 = Geo::Geos::Coordinate->new(5,2);
+    my $c3 = Geo::Geos::Coordinate->new(5,0);
+    my $c4 = Geo::Geos::Coordinate->new(1,0);
+
+    my $lr = $gf->createLinearRing([$c1, $c2, $c3, $c4, $c1], 2);
+    ok $lr;
+
+    my $p = $gf->createPolygon($lr);    # => isa 'Geo::Geos::Polygon'
+    $gf->createPolygon($lr);            # => isa 'Geo::Geos::Polygonal'
+
+    $p->getNumInteriorRing;     # => 1;
+    $p->getInteriorRingN(0);    # => isa 'Geo::Geos::LinearRing'
+    $p->getExteriorRing;        # => isa 'Geo::Geos::LinearRing'
+
+
+=head1 DESCRIPTION
+
+See methods in the base class L<Geo::Geos::Geometry>.
+
+=head1 SEE ALSO (C++ classes docs)
+
+L<GEOS C++ Library|https://trac.osgeo.org/geos>
+
+geos::geom::Polygon
+
+=head1 SEE ALSO
+
+L<Geo::Geos>
+
+L<Geo::Geos::Geometry>
+
+L<Geo::Geos::GeometryFactory>
+
+L<Geo::Geos::LinearRing>
+
+=head1 AUTHOR
+
+Ivan Baidakou <i.baydakov@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

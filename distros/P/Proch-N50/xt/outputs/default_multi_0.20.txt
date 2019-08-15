@@ -1,0 +1,2 @@
+small_test.fa	65
+test.fa	189

@@ -1,5 +1,11 @@
 Revision history for Music-Cadence
 
+0.0300 2019-08-14 21:38:00
+    - Correct diminished chord handling given the scale.
+    - Add tests for scale variations.
+    - Improve documentation.
+    - Enhance eg/cadence functionality.
+
 0.0201 2019-08-11 17:27:36
     - Add eg/cadence to illustrate real life usage.
 

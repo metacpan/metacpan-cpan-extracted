@@ -7,11 +7,11 @@ use Carp qw( croak );
 use Exporter 'import';
 use overload ();
 
-our $VERSION = '0.43';
+our $VERSION = '0.44';
 
 use Scalar::Util qw( blessed );
 
-our @EXPORT_OK = qw( install_t_sub is_class_loaded _STRINGLIKE );
+our @EXPORT_OK = qw( install_t_sub is_class_loaded perlstring _STRINGLIKE  );
 
 sub install_t_sub {
 
@@ -77,6 +77,16 @@ sub _STRING ($) {
     return defined $_[0] && !ref $_[0] && length( $_[0] ) ? $_[0] : undef;
 }
 
+BEGIN {
+    if ( $] >= 5.010 && eval { require XString; 1 } ) {
+        *perlstring = \&XString::perlstring;
+    }
+    else {
+        require B;
+        *perlstring = \&B::perlstring;
+    }
+}
+
 # Borrowed from Types::Standard
 sub is_class_loaded {
     my $stash = do {
@@ -114,7 +124,7 @@ Specio::Helpers - Helper subs for the Specio distro
 
 =head1 VERSION
 
-version 0.43
+version 0.44
 
 =head1 DESCRIPTION
 
@@ -138,7 +148,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2018 by Dave Rolsky.
+This software is Copyright (c) 2012 - 2019 by Dave Rolsky.
 
 This is free software, licensed under:
 

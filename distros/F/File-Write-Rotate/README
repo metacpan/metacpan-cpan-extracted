@@ -2,7 +2,7 @@ NAME
     File::Write::Rotate - Write to files that archive/rotate themselves
 
 VERSION
-    This document describes version 0.320 of File::Write::Rotate (from Perl
+    This document describes version 0.321 of File::Write::Rotate (from Perl
     distribution File-Write-Rotate), released on 2019-06-27.
 
 SYNOPSIS
@@ -240,9 +240,6 @@ METHODS
 
     Does not append newline so you'll have to do it yourself.
 
-  $fwr->flush
-    A no-op, just so the object behaves more like a filehandle object.
-
   $fwr->compress
     Compress old rotated files and remove the uncompressed originals.
     Currently uses IO::Compress::Gzip to do the compression. Extension given
@@ -285,6 +282,9 @@ FAQ
     writes "overflow" a bit, e.g. file sizes will exceed for a bit if you do
     size-based rotation. More suitable if you only do size-based rotation
     since it is usually okay to exceed sizes for a bit.
+
+  I want a filehandle instead of a File::Write::Rotate object!
+    Use Tie::Handle::FileWriteRotate.
 
 HOMEPAGE
     Please visit the project's homepage at

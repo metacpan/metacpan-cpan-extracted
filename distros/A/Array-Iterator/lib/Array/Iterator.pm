@@ -3,7 +3,7 @@ package Array::Iterator;
 use strict;
 use warnings;
 
-our $VERSION = '0.11'; # VERSION
+our $VERSION = '0.12'; # VERSION
 
 ### constructor
 
@@ -167,11 +167,13 @@ sub get_length {
 sub getLength { my $self = shift; $self->get_length(@_) }
 
 1;
-#ABSTRACT: A simple class for iterating over Perl arrays
+# ABSTRACT: A simple class for iterating over Perl arrays
 
 __END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -179,7 +181,7 @@ Array::Iterator - A simple class for iterating over Perl arrays
 
 =head1 VERSION
 
-version 0.11
+This document describes version 0.12 of Array::Iterator (from Perl distribution Array-Iterator), released on 2017-07-04.
 
 =head1 SYNOPSIS
 
@@ -230,6 +232,96 @@ means of doing so). This class only intends to provide a clear and simple
 means of generic iteration, nothing more (yet).
 
 =for Pod::Coverage .+
+
+=head1 TO DO
+
+=over 4
+
+=item Improve BiDirectional Test suite
+
+I want to test the back and forth a little more, make sure they work well with
+one another.
+
+=item Other Iterators
+
+Array::Iterator::BiDirectional::Circular, Array::Iterator::Skipable and
+Array::Iterator::BiDirectional::Skipable are just a few ideas I have had. I am going
+to hold off for now until I am sure they are actually useful.
+
+=back
+
+=head1 OTHER ITERATOR MODULES
+
+There are a number of modules on CPAN with the word Iterator in them. Most of them are
+actually iterators included inside other modules, and only really useful within that
+parent modules context. There are however some other modules out there that are just
+for pure iteration. I have provided a list below of the ones I have found, if perhaps
+you don't happen to like the way I do it.
+
+=over 4
+
+=item B<Tie::Array::Iterable>
+
+This module ties the array, something we do not do. But it also makes an attempt to
+account for, and allow the array to be changed during iteration. It accomplishes this
+control because the underlying array is tied. As we all know, tie-ing things can be a
+performance issue, but if you need what this module provides, then it will likely be
+an acceptable compromise. Array::Iterator makes no attempt to deal with this mid-iteration
+manipulation problem. In fact it is recommened to not alter your array with Array::Iterator,
+and if possible we will enforce this in later versions.
+
+=item B<Data::Iter>
+
+This module allows for simple iteratation over both hashes and arrays. It does it by
+importing several functions which can be used to loop over either type (hash or array)
+in the same way. It is an interesting module, it differs from Array::Iterator in
+paradigm (Array::Iterator is more OO) as well as in intent.
+
+=item B<Class::Iterator>
+
+This is essentially a wrapper around a closure based iterator. This method can be very
+flexible, but at times is difficult to manage due to the inherent complextity of using
+closures. I actually was a closure-as-iterator fan for a while, but eventually moved
+away from it in favor of the more plain vanilla means of iteration, like that found
+Array::Iterator.
+
+=item B<Class::Iter>
+
+This is part of the Class::Visitor module, and is a Visitor and Iterator extensions to
+Class::Template. Array::Iterator is a standalone module not associated with others.
+
+=item B<Data::Iterator::EasyObj>
+
+Data::Iterator::EasyObj makes your array of arrays into iterator objects. It also has
+the ability to further nest additional data structures including Data::Iterator::EasyObj
+objects. Array::Iterator is one dimensional only, and does not attempt to do many of
+the more advanced features of this module.
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+=over 4
+
+=item Thanks to Hugo Cornelis for pointing out a bug in C<peek()>
+
+=item Thanks to Phillip Moore for providing the patch to allow single element iteration
+through the hash-ref constructor parameter.
+
+=back
+
+=head1 ORIGINAL AUTHOR
+
+stevan little, E<lt>stevan@iinteractive.comE<gt>
+
+=head1 ORIGINAL COPYRIGHT AND LICENSE
+
+Copyright 2004, 2005 by Infinity Interactive, Inc.
+
+L<http://www.iinteractive.com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =head1 METHODS
 
@@ -358,45 +450,21 @@ of C<$index>.
 
 =back
 
-=head1 TO DO
+=head1 HOMEPAGE
 
-=over 4
+Please visit the project's homepage at L<https://metacpan.org/release/Array-Iterator>.
 
-=item Improve BiDirectional Test suite
+=head1 SOURCE
 
-I want to test the back and forth a little more, make sure they work well with
-one another.
-
-=item Other Iterators
-
-Array::Iterator::BiDirectional::Circular, Array::Iterator::Skipable and
-Array::Iterator::BiDirectional::Skipable are just a few ideas I have had. I am going
-to hold off for now until I am sure they are actually useful.
-
-=back
+Source repository is at L<https://github.com/sharyanto/perl-Array-Iterator>.
 
 =head1 BUGS
 
-None that I am aware of. The code is pretty thoroughly tested (see L<CODE COVERAGE> below)
-and is based on an (non-publicly released) module which I had used in production systems
-for about 2 years without incident. Of course, if you find a bug, let me know, and I will
-be sure to fix it.
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Array-Iterator>
 
-=head1 CODE COVERAGE
-
-I use B<Devel::Cover> to test the code coverage of my tests, below is the B<Devel::Cover>
-report on this module's test suite.
-
- ------------------------------- ------ ------ ------ ------ ------ ------ ------
- File                              stmt   bran   cond    sub    pod   time  total
- ------------------------------- ------ ------ ------ ------ ------ ------ ------
- Array/Iterator.pm                100.0  100.0   66.7  100.0  100.0   67.6   98.2
- Array/Iterator/BiDirectional.pm  100.0  100.0    n/a  100.0  100.0   20.2  100.0
- Array/Iterator/Circular.pm       100.0  100.0    n/a  100.0  100.0    7.1  100.0
- Array/Iterator/Reusable.pm       100.0    n/a    n/a  100.0  100.0    5.0  100.0
- ------------------------------- ------ ------ ------ ------ ------ ------ ------
- Total                            100.0  100.0   66.7  100.0  100.0  100.0   99.0
- ------------------------------- ------ ------ ------ ------ ------ ------ ------
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =head1 SEE ALSO
 
@@ -423,86 +491,13 @@ The Design Patterns book by the Gang of Four, specifically the Iterator pattern.
 
 Some of the interface for this class is based upon the Java Iterator interface.
 
-=head1 OTHER ITERATOR MODULES
-
-There are a number of modules on CPAN with the word Iterator in them. Most of them are
-actually iterators included inside other modules, and only really useful within that
-parent modules context. There are however some other modules out there that are just
-for pure iteration. I have provided a list below of the ones I have found, if perhaps
-you don't happen to like the way I do it.
-
-=over 4
-
-=item B<Tie::Array::Iterable>
-
-This module ties the array, something we do not do. But it also makes an attempt to
-account for, and allow the array to be changed during iteration. It accomplishes this
-control because the underlying array is tied. As we all know, tie-ing things can be a
-performance issue, but if you need what this module provides, then it will likely be
-an acceptable compromise. Array::Iterator makes no attempt to deal with this mid-iteration
-manipulation problem. In fact it is recommened to not alter your array with Array::Iterator,
-and if possible we will enforce this in later versions.
-
-=item B<Data::Iter>
-
-This module allows for simple iteratation over both hashes and arrays. It does it by
-importing several functions which can be used to loop over either type (hash or array)
-in the same way. It is an interesting module, it differs from Array::Iterator in
-paradigm (Array::Iterator is more OO) as well as in intent.
-
-=item B<Class::Iterator>
-
-This is essentially a wrapper around a closure based iterator. This method can be very
-flexible, but at times is difficult to manage due to the inherent complextity of using
-closures. I actually was a closure-as-iterator fan for a while, but eventually moved
-away from it in favor of the more plain vanilla means of iteration, like that found
-Array::Iterator.
-
-=item B<Class::Iter>
-
-This is part of the Class::Visitor module, and is a Visitor and Iterator extensions to
-Class::Template. Array::Iterator is a standalone module not associated with others.
-
-=item B<Data::Iterator::EasyObj>
-
-Data::Iterator::EasyObj makes your array of arrays into iterator objects. It also has
-the ability to further nest additional data structures including Data::Iterator::EasyObj
-objects. Array::Iterator is one dimensional only, and does not attempt to do many of
-the more advanced features of this module.
-
-=back
-
-=head1 ACKNOWLEDGEMENTS
-
-=over 4
-
-=item Thanks to Hugo Cornelis for pointing out a bug in C<peek()>
-
-=item Thanks to Phillip Moore for providing the patch to allow single element iteration
-through the hash-ref constructor parameter.
-
-=back
-
-=head1 ORIGINAL AUTHOR
-
-stevan little, E<lt>stevan@iinteractive.comE<gt>
-
-=head1 ORIGINAL COPYRIGHT AND LICENSE
-
-Copyright 2004, 2005 by Infinity Interactive, Inc.
-
-L<http://www.iinteractive.com>
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
-
 =head1 AUTHOR
 
-Steven Haryanto <stevenharyanto@gmail.com>
+perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Steven Haryanto.
+This software is copyright (c) 2017, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -3,11 +3,10 @@ package Specio::Library::Structured;
 use strict;
 use warnings;
 
-our $VERSION = '0.43';
+our $VERSION = '0.44';
 
 use parent 'Specio::Exporter';
 
-use B ();
 use Carp qw( confess );
 use List::Util ();
 use Scalar::Util qw( blessed );
@@ -85,7 +84,7 @@ Specio::Library::Structured - Structured types for Specio (Dict, Map, Tuple)
 
 =head1 VERSION
 
-version 0.43
+version 0.44
 
 =head1 SYNOPSIS
 
@@ -239,7 +238,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2018 by Dave Rolsky.
+This software is Copyright (c) 2012 - 2019 by Dave Rolsky.
 
 This is free software, licensed under:
 

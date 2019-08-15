@@ -1,0 +1,14 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::Index::STRtree
+PROTOTYPES: DISABLE
+
+Sv new(SV, std::size_t nodeCapacity = 10) {
+    Object wrapped = xs::out<strtree::STRtree*>(new strtree::STRtree(nodeCapacity));
+    auto payload = new SVs_map_payload();
+    wrapped.payload_attach(payload, &payload_marker_SVs_map);
+
+    RETVAL = wrapped.ref();
+}
+
+BOOT {
+    Stash(__PACKAGE__).inherit("Geo::Geos::Index::SpatialIndex");
+}

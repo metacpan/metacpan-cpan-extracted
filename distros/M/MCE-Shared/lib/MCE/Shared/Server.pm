@@ -13,7 +13,7 @@ no warnings qw( threads recursion uninitialized numeric once );
 
 package MCE::Shared::Server;
 
-our $VERSION = '1.843';
+our $VERSION = '1.844';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
@@ -519,9 +519,9 @@ sub _exit {
    }
 
    # Wait for the main thread to exit.
-   if ( !$_spawn_child && (
-      $_is_MSWin32 || $INC{'Prima.pm'} || $INC{'Tk.pm'} || $INC{'Wx.pm'}
-   )) { sleep 1.0; }
+   if ( !$_spawn_child && ($_is_MSWin32 || $INC{'Tk.pm'} || $INC{'Wx.pm'}) ) {
+      sleep 1.0;
+   }
 
    if ( !$_spawn_child || ($_has_threads && $_is_MSWin32) ) {
       threads->exit(0);
@@ -537,9 +537,11 @@ sub _loop {
    local $\ = undef; local $/ = $LF; $| = 1;
    my $_running_inside_eval = $^S;
 
-   $SIG{TERM} = $SIG{QUIT} = $SIG{INT} = $SIG{HUP} = sub {};
-   $SIG{KILL} = \&_exit if !$_spawn_child;
-   $SIG{USR2} = \&_exit if !$_is_MSWin32;
+   if ($_init_pid eq $_oid) {
+      $SIG{TERM} = $SIG{QUIT} = $SIG{INT} = $SIG{HUP} = sub {};
+      $SIG{KILL} = \&_exit if !$_spawn_child;
+      $SIG{USR2} = \&_exit if !$_is_MSWin32;
+   }
 
    if ($_spawn_child && !$_is_MSWin32) {
       $SIG{PIPE} = sub {
@@ -570,13 +572,10 @@ sub _loop {
       print {*STDERR} defined $_[0] ? $_[0] : '';
       CORE::kill('INT', $_is_MSWin32 ? -$$ : -getpgrp);
 
-      ($_spawn_child && !$_is_MSWin32)
-         ? CORE::kill('KILL', $$) : CORE::exit($?);
+      ( $_spawn_child && !$_is_MSWin32 )
+         ? CORE::kill('KILL', $$)
+         : CORE::exit($?);
    };
-
-   if ($_spawn_child && UNIVERSAL::can('Prima', 'cleanup')) {
-      no warnings 'redefine'; local $@; eval '*Prima::cleanup = sub {}';
-   }
 
    my ($_id, $_fcn, $_wa, $_len, $_le2, $_func, $_var);
    my ($_client_id, $_done) = (0, 0);
@@ -1157,7 +1156,7 @@ sub _loop {
                 # delay after a while to not consume a CPU core
                 $_count = 0 if ++$_count % 50 == 0 && time - $_start > 0.030;
             } else {
-                sleep 0.030;
+                sleep 0.015;
             }
             goto IOCTL;
          }
@@ -1900,7 +1899,7 @@ MCE::Shared::Server - Server/Object packages for MCE::Shared
 
 =head1 VERSION
 
-This document describes MCE::Shared::Server version 1.843
+This document describes MCE::Shared::Server version 1.844
 
 =head1 DESCRIPTION
 

@@ -2,14 +2,15 @@ NAME
     Task::Tmp::spanel - Perl modules for Spanel
 
 VERSION
-    version 0.003
+    version 0.006
 
 TASK CONTENTS
   Included modules
    Algorithm::Dependency::Ordered
    Algorithm::Dependency::Source::HoA
    Any::Moose
-   App::CreateSelfSignedSSL
+   App::CreateSelfSignedSSLCert
+   App::rimetadb
    CDB_File
    CHI
    Capture::Tiny
@@ -35,6 +36,7 @@ TASK CONTENTS
    File::Copy::Recursive
    File::Find
    File::Flock
+   File::Flock::Retry
    File::Path
    File::Slurp
    File::Slurp::Shortcuts
@@ -78,6 +80,7 @@ TASK CONTENTS
    Perinci::Access::HTTP::Client
    Perinci::Access::Schemeless::DBI
    Perinci::CmdLine
+   Perinci::CmdLine::Any
    Perinci::CmdLine::Lite
    Perinci::CmdLine::Server
    Perinci::Exporter
@@ -92,6 +95,7 @@ TASK CONTENTS
    Storable
    String::ShellQuote
    Sub::Curry
+   Tie::Handle::FileWriteRotate
    Time::Local
    URI
    URI::Escape
@@ -100,6 +104,7 @@ TASK CONTENTS
    WWW::Mechanize
    YAML::Syck
    YAML::XS
+   alias::module
    autodie
    base
    bytes

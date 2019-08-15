@@ -17,7 +17,7 @@ SUBROUTINES
   @result = mbeach($utf8str)
   $result = mbtr($utf8str, 'ABC', 'XYZ', 'cdsr')
   $result = iolen($utf8str)
-  $result = iomid($utf8expr, $offset_as_cp932x, $length_as_cp932x, $utf8replacement)
+  $result = iomid($utf8expr, $offset_as_cp932ibm, $length_as_cp932ibm, $utf8replacement)
   @result = ioget(FILEHANDLE)
   $result = ioput(FILEHANDLE, @utf8str)
   $result = ioputf(FILEHANDLE, $utf8format, @utf8list)

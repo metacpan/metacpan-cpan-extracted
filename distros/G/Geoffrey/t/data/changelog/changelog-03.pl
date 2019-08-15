@@ -103,5 +103,5 @@
                     ['Swiss fran', 'Rappen', 2, 'CHF', 'CHF']
                 ],
                 columns => ['name', 'currency_key', 'decimal_places', 'cent_name', 'symbol'],
-                type    => 'inser',
+                action    => 'entry.add',
             }]}]

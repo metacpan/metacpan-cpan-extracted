@@ -68,6 +68,10 @@ IMPORT OPTIONS
 
        $ perl -MDevel::MAT::Dumper=-dump_at_SIGABRT ...
 
+    Note that SIGABRT uses an "unsafe" signal handler (i.e. not deferred
+    until the next perl op), so it can capture the full context of any
+    ongoing XS or C library operations.
+
  -file $PATH
 
     Sets the name of the file which is automatically dumped; defaults to

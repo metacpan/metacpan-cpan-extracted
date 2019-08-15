@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::FFI::Build 1.03 {
+package Dist::Zilla::Plugin::FFI::Build 1.04 {
 
   use 5.014;
   use Moose;
@@ -10,6 +10,7 @@ package Dist::Zilla::Plugin::FFI::Build 1.03 {
   with 'Dist::Zilla::Role::FileMunger',
        'Dist::Zilla::Role::MetaProvider',
        'Dist::Zilla::Role::PrereqSource',
+       'Dist::Zilla::Role::FilePruner',
   ;
 
 my $mm_code_prereqs = <<'EOF1';
@@ -72,6 +73,18 @@ EOF2
     my %meta = ( dynamic_config => 1 );
     \%meta;
   }
+
+  sub prune_files
+  {
+    my($self) = @_;
+
+    foreach my $file (@{ $self->zilla->files })
+    {
+      next unless $file->name =~ m!^ffi/_build/!;
+      $self->log_debug([ 'pruning %s', $file->name ]);
+      $self->zilla->prune_file($file);
+    }
+  }
   
   __PACKAGE__->meta->make_immutable;
 }
@@ -90,13 +103,39 @@ Dist::Zilla::Plugin::FFI::Build
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =head1 SYNOPSIS
 
  [FFI::Build]
 
 =head1 DESCRIPTION
+
+This plugin makes the appropriate modifications to your dist to allow
+you to bundle code with L<FFI::Platypus::Bundle>.  It works with
+L<FFI::Build::MM>, and only works with L<ExtUtils::MakeMaker>, so
+don't try to use it with L<Module::Build>.
+
+It specifically:
+
+=over
+
+=item Updates C<Makefile.PL>
+
+To call L<FFI::Build::MM> to add the necessary hooks to build and install
+your bundled code.
+
+=item Sets configure-time prereqs
+
+For L<FFI::Build::MM>.  It also makes the prereqs for your distribution
+dynamic, which is required for L<FFI::Build::MM>.
+
+=item Prunes any build files
+
+Removes any files in C<ffi/_build> which may be created when developing
+an FFI module using the bundle interface.
+
+=back
 
 This plugin adds the appropriate hooks for L<FFI::Build::MM> into your
 C<Makefile.PL>.  It does not work with L<Module::Build>.

@@ -3,17 +3,17 @@ package Specio::OO;
 use strict;
 use warnings;
 
-use B qw( perlstring );
 use Carp qw( confess );
 use List::Util qw( all );
 use MRO::Compat;
 use Role::Tiny;
 use Scalar::Util qw( weaken );
+use Specio::Helpers qw( perlstring );
 use Specio::PartialDump qw( partial_dump );
 use Specio::TypeChecks;
 use Storable qw( dclone );
 
-our $VERSION = '0.43';
+our $VERSION = '0.44';
 
 use Exporter qw( import );
 
@@ -168,7 +168,7 @@ EOF
 
     my $attrs = $class->_attrs;
     for my $name ( sort keys %{$attrs} ) {
-        my $attr = $attrs->{$name};
+        my $attr     = $attrs->{$name};
         my $key_name = defined $attr->{init_arg} ? $attr->{init_arg} : $name;
 
         if ( $attr->{required} ) {
@@ -314,7 +314,7 @@ sub clone {
     # to clone the coercions contained by a type in a way that doesn't lead to
     # circular clone (type clones coercions which in turn need to clone their
     # to/from types which in turn ...).
-    my $attrs = $self->_attrs;
+    my $attrs   = $self->_attrs;
     my %special = map { $_ => $attrs->{$_}{clone} }
         grep { $attrs->{$_}{clone} } keys %{$attrs};
 
@@ -375,7 +375,7 @@ Specio::OO - A painfully poor reimplementation of Moo(se)
 
 =head1 VERSION
 
-version 0.43
+version 0.44
 
 =head1 DESCRIPTION
 
@@ -400,7 +400,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2018 by Dave Rolsky.
+This software is Copyright (c) 2012 - 2019 by Dave Rolsky.
 
 This is free software, licensed under:
 

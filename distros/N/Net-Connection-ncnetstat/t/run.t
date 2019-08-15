@@ -18,7 +18,7 @@ if (
 	 ( $? eq 256 )
 	 )
 	){
-	$extra_tests=2;
+	$extra_tests=1;
 	my $worked=0;
 	my $ncnetstat;
 	my $tb;
@@ -28,7 +28,6 @@ if (
 		$worked=1;
 	};
 	ok( $worked eq '1', 'run test') or diag("run died with ".$@);
-	ok( ref($tb) eq 'Text::Table', 'run ref test') or diag("run did not return a Text::Table object");
 }else{
 	diag('No lsof installed on this system or "lsof -i UDP -i TCP -n -l -P" does not work');
 }

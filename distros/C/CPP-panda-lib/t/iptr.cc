@@ -386,6 +386,14 @@ TEST_CASE("iptr", "[iptr]") {
         REQUIRE((bool)p == true);
     }
 
+    SECTION("ops") {
+        auto ptr = new Test(123);
+        auto sp1 = TestSP(ptr);
+        auto sp2 = TestSP(ptr);
+        CHECK(sp1 == sp2);
+        CHECK(sp1 == ptr);
+    }
+
     SECTION("weak") {
         SECTION("ctor") {
             SECTION("empty") {

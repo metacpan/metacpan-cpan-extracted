@@ -1,0 +1,39 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::Noding::Noder
+PROTOTYPES: DISABLE
+
+void Noder::computeNodes(Array segStrings) {
+    auto segments = Noder_payload::vector_t();
+    segments.reserve(segStrings.size());
+
+    for(auto it: segStrings) {
+        SegmentString& ss = xs::in<SegmentString&>(it);
+        segments.push_back(&ss);
+    }
+
+    auto payload = new Noder_payload();
+    payload->array_ref = xs::Ref::create(segStrings);
+    payload->segments = std::move(segments);
+
+
+    Object self{ST(0)};
+    self.payload_attach(payload, &payload_marker_Noder);
+
+    THIS->computeNodes(&payload->segments);
+}
+
+Sv Noder::getNodedSubstrings() {
+    auto items = THIS->getNodedSubstrings();
+    if (!items) XSRETURN_UNDEF;
+    else {
+        xs::Array result = xs::Array::create(items->size());
+        for(auto it: *items) {
+            result.push(xs::out<SegmentString*>(it));
+        }
+        delete items;
+        RETVAL = xs::Ref::create(result);
+    }
+}
+
+BOOT {
+    payload_marker_Noder.svt_free = payload_marker_Noder_free;
+}

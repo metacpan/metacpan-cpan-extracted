@@ -5,7 +5,7 @@ use 5.008004;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use DateTime 0.1402;
 use DateTime::Calendar::Julian 0.04;
@@ -842,17 +842,9 @@ specification, and the year must not be signed.
 
 =over
 
-=item * There are problems with calendars switch to Gregorian before 200
-AD or after about 4000 AD. Before 200 AD, this switch leads to
-duplication of dates. After about 4000 AD, there could be entire missing
-months. (The module can handle dates before 200 AD or after 4000 AD just
-fine; it's just the calendar reform dates that should be inside these
-limits.)
+=item * There are problems with calendars switch to Gregorian before 200 AD or after about 4000 AD. Before 200 AD, this switch leads to duplication of dates. After about 4000 AD, there could be entire missing months. (The module can handle dates before 200 AD or after 4000 AD just fine; it's just the calendar reform dates that should be inside these limits.)
 
-=item * There may be functions that give the wrong results for the year
-of the calendar reform. The function L<truncate> is a known problem, and
-L<today> may be a problem. If you find any more problems, please let me
-know.
+=item * There may be functions that give the wrong results for the year of the calendar reform. The function C<truncate()> is a known problem, and C<today()> may be a problem. If you find any more problems, please let me know.
 
 =back
 
@@ -871,7 +863,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 Copyright (c) 2003 Eugene van der Pijll. All rights reserved.
 
-Copyright (C) 2016-2018 Thomas R. Wyant, III
+Copyright (C) 2016-2019 Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself; either the GNU General Public

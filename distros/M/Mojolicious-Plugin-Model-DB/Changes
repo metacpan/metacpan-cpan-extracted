@@ -1,3 +1,6 @@
+0.10 2019-08-14T02:00:00Z
+    - Added prerequisite minimum version 0.10 of module Mojolicious::Plugin::Model.
+
 0.09 2019-08-07T09:40:00Z
     - Removed duplication of method _load_class_for_name.
     - Added module Storable to deep cloning variable $conf.

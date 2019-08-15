@@ -1,24 +1,28 @@
 use 5.010;
 use strict;
 use warnings;
-use lib qw/lib/;
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
 use Git::Hooks::Test ':all';
-use Test::More tests => 4;
+use Test::More tests => 5;
+
+use_ok 'Git::Hooks::CheckYoutrack';
 
 my ($repo, $file, $clone, $T);
 
 sub setup_repos_for {
-    my ($reporef) = @_;
+	my ($reporef) = @_;
 
-    ($repo, $file, $clone, $T) = new_repos();
+	($repo, $file, $clone, $T) = new_repos();
 
 	foreach my $git ($repo, $clone) {
 		install_hooks($git, undef, qw/commit-msg update/);
 	}
 
-    $$reporef->run(qw/config githooks.plugin CheckYoutrack/);
-    $$reporef->run(qw/config githooks.checkyoutrack.youtrack-host/, 'fake://url/');
-    $$reporef->run(qw/config githooks.checkyoutrack.youtrack-token token/);
+	$$reporef->run(qw/config githooks.plugin CheckYoutrack/);
+	$$reporef->run(qw/config githooks.plugins/, "$Bin/../lib/Git/Hooks/");
+	$$reporef->run(qw/config githooks.checkyoutrack.youtrack-host/, 'fake://url/');
+	$$reporef->run(qw/config githooks.checkyoutrack.youtrack-token token/);
 }
 
 sub check_can_commit {

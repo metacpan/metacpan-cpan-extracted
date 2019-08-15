@@ -1,7 +1,7 @@
 package Bencher::Scenario::PackageMoreUtil::package_exists;
 
 our $DATE = '2018-10-07'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use strict;
 use warnings;
@@ -31,7 +31,7 @@ Bencher::Scenario::PackageMoreUtil::package_exists - Benchmark package_exists()
 
 =head1 VERSION
 
-This document describes version 0.001 of Bencher::Scenario::PackageMoreUtil::package_exists (from Perl distribution Bencher-Scenarios-PackageMoreUtil), released on 2018-10-07.
+This document describes version 0.002 of Bencher::Scenario::PackageMoreUtil::package_exists (from Perl distribution Bencher-Scenarios-PackageMoreUtil), released on 2018-10-07.
 
 =head1 SYNOPSIS
 
@@ -53,7 +53,7 @@ Packaging a benchmark script as a Bencher scenario makes it convenient to includ
 
 Version numbers shown below are the versions used when running the sample benchmark.
 
-L<Package::MoreUtil> 0.58
+L<Package::MoreUtil> 0.590
 
 =head1 BENCHMARK PARTICIPANTS
 
@@ -103,10 +103,10 @@ Benchmark with default options (C<< bencher -m PackageMoreUtil::package_exists >
  +----------------------------------------------------+-----------+-----------+------------+---------+---------+
  | participant                                        | rate (/s) | time (μs) | vs_slowest |  errors | samples |
  +----------------------------------------------------+-----------+-----------+------------+---------+---------+
- | Bencher::Scenario::PackageMoreUtil::package_exists |    446000 |     2.24  |       1    | 8.3e-10 |      20 |
- | Bencher::Scenario::PackageMoreUtil                 |    590000 |     1.7   |       1.3  | 3.3e-09 |      20 |
- | Bencher::Scenario                                  |    800000 |     1.2   |       1.8  | 3.7e-09 |      20 |
- | Bencher                                            |   1730000 |     0.579 |       3.87 |   2e-10 |      22 |
+ | Bencher::Scenario::PackageMoreUtil::package_exists |    600000 |  1.7      |    1       | 2.3e-09 |      23 |
+ | Bencher::Scenario::PackageMoreUtil                 |    810000 |  1.2      |    1.3     | 1.7e-09 |      20 |
+ | Bencher::Scenario                                  |   1250000 |  0.802    |    2.07    | 4.1e-10 |      21 |
+ | Bencher                                            |   3200420 |  0.312459 |    5.30824 |   0     |      20 |
  +----------------------------------------------------+-----------+-----------+------------+---------+---------+
 
 
@@ -116,8 +116,8 @@ Benchmark module startup overhead (C<< bencher -m PackageMoreUtil::package_exist
  +---------------------+-----------+------------------------+------------+---------+---------+
  | participant         | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
  +---------------------+-----------+------------------------+------------+---------+---------+
- | Package::MoreUtil   |       7.6 |                    2.8 |        1   |   2e-05 |      20 |
- | perl -e1 (baseline) |       4.8 |                    0   |        1.6 | 3.4e-05 |      20 |
+ | Package::MoreUtil   |       7.8 |                      3 |        1   | 4.5e-05 |      20 |
+ | perl -e1 (baseline) |       4.8 |                      0 |        1.6 | 2.9e-05 |      20 |
  +---------------------+-----------+------------------------+------------+---------+---------+
 
 

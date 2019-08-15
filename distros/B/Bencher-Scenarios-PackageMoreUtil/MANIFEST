@@ -8,8 +8,10 @@ Makefile.PL
 README
 dist.ini
 lib/Bencher/Scenario/PackageMoreUtil/list_package_contents.pm
+lib/Bencher/Scenario/PackageMoreUtil/list_package_subs.pm
 lib/Bencher/Scenario/PackageMoreUtil/package_exists.pm
 lib/Bencher/ScenarioR/PackageMoreUtil/list_package_contents.pm
+lib/Bencher/ScenarioR/PackageMoreUtil/list_package_subs.pm
 lib/Bencher/ScenarioR/PackageMoreUtil/package_exists.pm
 lib/Bencher/Scenarios/PackageMoreUtil.pm
 t/00-compile.t

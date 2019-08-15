@@ -1,6 +1,10 @@
 Revision history for Perl extension POSIX::Run::Capture.
 
-0.02  Fri Dec  1 08:54:18
+1.00  Wed Aug 14 08:11:53 2019
+	- line monitor is called for every line, whether or not terminated
+	with a newline
+
+0.02  Fri Dec  1 08:54:18 2017
         - first release
 
 0.01  Thu Jul 20 18:17:18 2017

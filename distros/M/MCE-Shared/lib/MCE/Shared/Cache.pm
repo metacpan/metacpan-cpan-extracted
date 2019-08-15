@@ -16,7 +16,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.843';
+our $VERSION = '1.844';
 
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
@@ -900,7 +900,7 @@ MCE::Shared::Cache - A hybrid LRU-plain cache helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Cache version 1.843
+This document describes MCE::Shared::Cache version 1.844
 
 =head1 DESCRIPTION
 
@@ -1606,6 +1606,28 @@ Increments the value of a key by the given number and returns its new value.
  $num = $ca->incrby( $key, 2 );
 
 Reorder: Yes
+
+=head1 INTERNAL METHODS
+
+Internal C<Sereal> freeze-thaw hooks for exporting shared-cache object.
+
+=over 3
+
+=item FREEZE
+
+=item THAW
+
+=back
+
+Internal C<Storable> freeze-thaw hooks for exporting shared-cache object.
+
+=over 3
+
+=item STORABLE_freeze
+
+=item STORABLE_thaw
+
+=back
 
 =head1 PERFORMANCE TESTING
 

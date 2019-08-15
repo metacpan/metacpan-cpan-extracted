@@ -1,5 +1,12 @@
 Revision history for Escape-Houdini
 
+0.3.2 2019-08-14
+  [ BUG FIXES ]
+    - Set utf8 flag on all returned values (Askar Timirgazin, GH#6)
+
+  [ STATISTICS ]
+    - code churn: 10 files changed, 182 insertions(+), 8 deletions(-)
+
 0.3.1 2019-06-22
   [ DOCUMENTATION ]
     - Small improvements.

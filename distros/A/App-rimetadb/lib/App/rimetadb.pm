@@ -1,7 +1,7 @@
 package App::rimetadb;
 
-our $DATE = '2019-01-06'; # DATE
-our $VERSION = '0.220'; # VERSION
+our $DATE = '2019-08-14'; # DATE
+our $VERSION = '0.222'; # VERSION
 
 use 5.010001;
 use strict;
@@ -175,6 +175,21 @@ sub _is_excluded {
     0;
 }
 
+sub _package_in_list_of_modnames_or_prefixes {
+    my ($pkg, $list) = @_;
+    #log_debug "Checking if package %s is in list %s", $pkg, $list;
+    my $res = 0;
+    for (@$list) {
+        if (/::\z/) {
+            do { $res++; last } if $pkg =~ /\A\Q$_\E/;
+        } else {
+            do { $res++; last } if $pkg eq $_;
+        }
+    }
+    #log_debug "  result: $res";
+    $res;
+}
+
 sub _complete_package {
     require Complete::Util;
 
@@ -304,6 +319,14 @@ $SPEC{update_from_modules} = {
 This routine scans Perl modules, load them, and update the database using Rinci
 metadata from each modules into the database.
 
+For each package, function, or function argument metadata, you can put this
+attribute:
+
+    'x.app.rimetadb.exclude' => 1,
+
+to exclude the entity from being imported into the database. When you exclude a
+package, all its contents (currently functions) are also excluded.
+
 _
     args => {
         %args_common,
@@ -316,20 +339,19 @@ For each entry, you can specify:
 * a Perl module name e.g. `Foo::Bar`. An attempt will be made to load that
   module.
 
-* a module prefix ending with `::` or `::*` e.g. `Foo::Bar::*`. `Module::List`
-  will be used to list all modules under `Foo::Bar::` recursively and load all
-  those modules.
+* a module prefix ending with `::` e.g. `Foo::Bar::`. `Module::List` will be
+  used to list all modules under `Foo::Bar::` recursively and load all those
+  modules.
 
 * a package name using `+Foo::Bar` syntax. An attempt to load module with that
   name will *not* be made. This can be used to add an already-loaded package
   e.g. by another module).
 
-* a package prefix using `+Foo::Bar::` or `+Foo::Bar::*` syntax. Subpackages
-  will be listed recursively (using <pm:Package::Util::Lite>'s
-  `list_subpackages`).
+* a package prefix using `+Foo::Bar::` or `+Foo::Bar::` syntax. Subpackages will
+  be listed recursively (using <pm:Package::Util::Lite>'s `list_subpackages`).
 
 _
-            schema => ['array*' => of => 'perl::modname*'],
+            schema => ['array*' => of => 'perl::modname_or_prefix*'],
             req => 1,
             pos => 0,
             greedy => 1,
@@ -337,7 +359,17 @@ _
         },
         exclude => {
             summary => 'Perl package names or prefixes to exclude',
-            schema => ['array*' => of => 'perl::modname*'],
+            schema => ['array*' => of => 'perl::modname_or_prefix*'],
+            description => <<'_',
+
+You can also use this attribute in your package metadata:
+
+    'x.app.rimetadb.exclude' => 1,
+
+to exclude the package (as well as its contents: all functions) from being
+imported into the database.
+
+_
         },
         library => {
             summary => "Include library path, like Perl's -I",
@@ -416,7 +448,7 @@ sub update_from_modules {
 
     my @pkgs;
     for my $entry (@{ $args{module_or_package} }) {
-        if ($entry =~ /\A\+(.+)::\*?\z/) {
+        if ($entry =~ /\A\+(.+)::\z/) {
             # package prefix
             log_debug("Listing all packages under $1 ...");
             for (Package::Util::Lite::list_subpackages($1, 1)) {
@@ -428,7 +460,7 @@ sub update_from_modules {
             my $pkg = $1;
             next if $pkg ~~ @pkgs || _is_excluded($pkg, $exc);
             push @pkgs, $pkg;
-        } elsif ($entry =~ /(.+::)\*?\z/) {
+        } elsif ($entry =~ /(.+::)\z/) {
             # module prefix
             log_debug("Listing all modules under $1 ...");
             my $res = Module::List::list_modules(
@@ -448,10 +480,12 @@ sub update_from_modules {
         }
     }
 
+    my @excluded_pkgs;
     my $progress = $args{-progress};
     $progress->pos(0) if $progress;
     $progress->target(~~@pkgs) if $progress;
     my $i = 0;
+  PKG:
     for my $pkg (@pkgs) {
         $i++;
         $progress->update(pos=>$i, message => "Processing package $pkg ...") if $progress;
@@ -475,6 +509,17 @@ sub update_from_modules {
         die "Can't meta $uri: $res->[0] - $res->[1]" unless $res->[0] == 200;
         _cleanser->clean_in_place(my $pkgmeta = $res->[2]);
 
+        if ($pkgmeta->{'x.app.rimetadb.exclude'}) {
+            log_debug("Package $pkg has x.app.rimetadb.exclude set to true, excluding ...");
+            push @excluded_pkgs, $pkg;
+            if ($rec) {
+                log_debug("Deleting package $pkg from the database ...");
+                $dbh->do("DELETE FROM package  WHERE name=?"   , {}, $pkg);
+                $dbh->do("DELETE FROM function WHERE package=?", {}, $pkg);
+            }
+            next PKG;
+        }
+
         $res = _pa->request(list => $uri, {type=>'function'});
         die "Can't list $uri: $res->[0] - $res->[1]" unless $res->[0] == 200;
         my $numf = @{ $res->[2] };
@@ -483,24 +528,42 @@ sub update_from_modules {
         $dbh->do("UPDATE package set mtime=? WHERE name=?", {}, $st[9], $pkg);
         $dbh->do("DELETE FROM function WHERE package=?", {}, $pkg);
         my $j = 0;
+      FUNC:
         for my $e (@{ $res->[2] }) {
-            my $f = $e; $f =~ s!.+/!!;
+            my $func = $e; $func =~ s!.+/!!;
             $j++;
-            log_debug("Processing function $pkg\::$f ...");
-            $progress->update(pos => $i + $j/$numf, message => "Processing function $pkg\::$f ...") if $progress;
+            log_debug("Processing function $pkg\::$func ...");
+            $progress->update(pos => $i + $j/$numf, message => "Processing function $pkg\::$func ...") if $progress;
             $res = _pa->request(meta => "$uri$e");
             die "Can't meta $e: $res->[0] - $res->[1]" unless $res->[0] == 200;
-            _cleanser->clean_in_place(my $meta = $res->[2]);
-            $dbh->do("INSERT INTO function (package, name, summary, metadata) VALUES (?,?,?,?)", {}, $pkg, $f, $meta->{summary}, _json->encode($meta));
+            _cleanser->clean_in_place(my $funcmeta = $res->[2]);
+
+            if ($funcmeta->{'x.app.rimetadb.exclude'}) {
+                log_debug("Function $pkg\::$func has x.app.rimetadb.exclude set to true, excluding ...");
+                next FUNC;
+            }
+
+            for my $argname (sort keys %{ $funcmeta->{args} // {} }) {
+                my $argspec = $funcmeta->{args}{$argname};
+                if ($argspec->{'x.app.rimetadb.exclude'}) {
+                    log_debug("Function argument $argname (of function $pkg\::$func) has x.app.rimetadb.exclude set to true, excluding ...");
+                    delete $funcmeta->{args}{$argname};
+                }
+            }
+
+            $dbh->do("INSERT INTO function (package, name, summary, metadata) VALUES (?,?,?,?)", {}, $pkg, $func, $funcmeta->{summary}, _json->encode($funcmeta));
         }
     }
     $progress->finish if $progress;
+
+    @pkgs = grep { !($_ ~~ @excluded_pkgs) } @pkgs;
 
     if ($args{delete} // 1) {
         my @deleted_pkgs;
         my $sth = $dbh->prepare("SELECT name FROM package");
         $sth->execute;
         while (my $row = $sth->fetchrow_hashref) {
+            next unless _package_in_list_of_modnames_or_prefixes($row->{name}, $args{module_or_package});
             next if $row->{name} ~~ @pkgs;
             log_info("Package $row->{name} no longer exists, deleting from database ...");
             push @deleted_pkgs, $row->{name};
@@ -517,7 +580,13 @@ sub update_from_modules {
 
 $SPEC{update} = {
     v => 1.1,
-    summary => 'Add/update a package or function metadata',
+    summary => 'Add/update a package or function metadata in the database',
+    description => <<'_',
+
+This routine lets you add/update a package or function metadata in the database
+with the specified metadata.
+
+_
     args => {
         %args_common,
         package => {
@@ -585,7 +654,7 @@ sub update {
 
 $SPEC{delete} = {
     v => 1.1,
-    summary => 'Delete a package or function metadata',
+    summary => 'Delete a package or function metadata from the database',
     args => {
         %args_common,
         package => {
@@ -619,7 +688,7 @@ sub delete {
 
 $SPEC{packages} = {
     v => 1.1,
-    summary => 'List packages',
+    summary => 'List packages in the database',
     args => {
         %args_common,
         %args_query,
@@ -663,7 +732,7 @@ sub packages {
 
 $SPEC{functions} = {
     v => 1.1,
-    summary => 'List functions',
+    summary => 'List functions in the database',
     args => {
         %args_common,
         %args_query,
@@ -713,7 +782,7 @@ sub functions {
 
 $SPEC{arguments} = {
     v => 1.1,
-    summary => 'List function arguments',
+    summary => 'List function arguments in the database',
     args => {
         %args_common,
         %args_query,
@@ -795,7 +864,10 @@ sub arguments {
 
 $SPEC{stats} = {
     v => 1.1,
-    summary => 'Show some statistics',
+    summary => 'Show some statistics from the database',
+    args => {
+        %args_common,
+    },
 };
 sub stats {
     my %args = @_;
@@ -819,7 +891,7 @@ sub stats {
 
 $SPEC{function_stats} = {
     v => 1.1,
-    summary => 'Show some statistics on functions',
+    summary => 'Show some statistics on functions from the database',
     args => {
         %args_common,
     },
@@ -853,7 +925,7 @@ sub function_stats {
 
 $SPEC{argument_stats} = {
     v => 1.1,
-    summary => 'Show statistics on function arguments',
+    summary => 'Show statistics on function arguments from the database',
     args => {
         %args_common,
     },
@@ -905,7 +977,7 @@ sub argument_stats {
 
 $SPEC{meta} = {
     v => 1.1,
-    summary => 'Get package/function metadata',
+    summary => 'Get package/function metadata from the database',
     args => {
         %args_common,
         name => {
@@ -961,7 +1033,7 @@ App::rimetadb - Manage a Rinci metadata database
 
 =head1 VERSION
 
-This document describes version 0.220 of App::rimetadb (from Perl distribution App-rimetadb), released on 2019-01-06.
+This document describes version 0.222 of App::rimetadb (from Perl distribution App-rimetadb), released on 2019-08-14.
 
 =head1 SYNOPSIS
 
@@ -976,7 +1048,7 @@ Usage:
 
  argument_stats(%args) -> [status, msg, payload, meta]
 
-Show statistics on function arguments.
+Show statistics on function arguments from the database.
 
 This function is not exported.
 
@@ -1015,13 +1087,14 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 arguments
 
 Usage:
 
  arguments(%args) -> [status, msg, payload, meta]
 
-List function arguments.
+List function arguments in the database.
 
 This function is not exported.
 
@@ -1076,13 +1149,14 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 delete
 
 Usage:
 
  delete(%args) -> [status, msg, payload, meta]
 
-Delete a package or function metadata.
+Delete a package or function metadata from the database.
 
 This function is not exported.
 
@@ -1125,13 +1199,14 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 function_stats
 
 Usage:
 
  function_stats(%args) -> [status, msg, payload, meta]
 
-Show some statistics on functions.
+Show some statistics on functions from the database.
 
 This function is not exported.
 
@@ -1170,13 +1245,14 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 functions
 
 Usage:
 
  functions(%args) -> [status, msg, payload, meta]
 
-List functions.
+List functions in the database.
 
 This function is not exported.
 
@@ -1223,13 +1299,14 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 meta
 
 Usage:
 
  meta(%args) -> [status, msg, payload, meta]
 
-Get package/function metadata.
+Get package/function metadata from the database.
 
 This function is not exported.
 
@@ -1272,13 +1349,14 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 packages
 
 Usage:
 
  packages(%args) -> [status, msg, payload, meta]
 
-List packages.
+List packages in the database.
 
 This function is not exported.
 
@@ -1321,13 +1399,14 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 stats
 
 Usage:
 
  stats() -> [status, msg, payload, meta]
 
-Show some statistics.
+Show some statistics from the database.
 
 This function is not exported.
 
@@ -1345,13 +1424,17 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 update
 
 Usage:
 
  update(%args) -> [status, msg, payload, meta]
 
-Add/update a package or function metadata.
+Add/update a package or function metadata in the database.
+
+This routine lets you add/update a package or function metadata in the database
+with the specified metadata.
 
 This function is not exported.
 
@@ -1400,6 +1483,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 update_from_modules
 
 Usage:
@@ -1410,6 +1494,14 @@ Update Rinci metadata database from local Perl modules.
 
 This routine scans Perl modules, load them, and update the database using Rinci
 metadata from each modules into the database.
+
+For each package, function, or function argument metadata, you can put this
+attribute:
+
+ 'x.app.rimetadb.exclude' => 1,
+
+to exclude the entity from being imported into the database. When you exclude a
+package, all its contents (currently functions) are also excluded.
 
 This function is not exported.
 
@@ -1433,9 +1525,16 @@ user's home directory.
 
 Note: has been tested with MySQL and SQLite only.
 
-=item * B<exclude> => I<array[perl::modname]>
+=item * B<exclude> => I<array[perl::modname_or_prefix]>
 
 Perl package names or prefixes to exclude.
+
+You can also use this attribute in your package metadata:
+
+ 'x.app.rimetadb.exclude' => 1,
+
+to exclude the package (as well as its contents: all functions) from being
+imported into the database.
 
 =item * B<force_update> => I<bool>
 
@@ -1449,7 +1548,7 @@ Note that some modules are already loaded before this option takes effect. To
 make sure you use the right library, you can use C<PERL5OPT> or explicitly use
 C<perl> and use its C<-I> option.
 
-=item * B<module_or_package>* => I<array[perl::modname]>
+=item * B<module_or_package>* => I<array[perl::modname_or_prefix]>
 
 Perl module or prefixes or package to add/update.
 
@@ -1460,17 +1559,16 @@ For each entry, you can specify:
 =item * a Perl module name e.g. C<Foo::Bar>. An attempt will be made to load that
 module.
 
-=item * a module prefix ending with C<::> or C<::*> e.g. C<Foo::Bar::*>. C<Module::List>
-will be used to list all modules under C<Foo::Bar::> recursively and load all
-those modules.
+=item * a module prefix ending with C<::> e.g. C<Foo::Bar::>. C<Module::List> will be
+used to list all modules under C<Foo::Bar::> recursively and load all those
+modules.
 
 =item * a package name using C<+Foo::Bar> syntax. An attempt to load module with that
 name will I<not> be made. This can be used to add an already-loaded package
 e.g. by another module).
 
-=item * a package prefix using C<+Foo::Bar::> or C<+Foo::Bar::*> syntax. Subpackages
-will be listed recursively (using L<Package::Util::Lite>'s
-C<list_subpackages>).
+=item * a package prefix using C<+Foo::Bar::> or C<+Foo::Bar::> syntax. Subpackages will
+be listed recursively (using L<Package::Util::Lite>'s C<list_subpackages>).
 
 =back
 

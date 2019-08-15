@@ -1,5 +1,9 @@
 Revision history for this software.
 
+0.05  2019-08-14 00:00:00
+  - fix POD
+  - created by INABA Hitoshi
+
 0.04  2019-08-09 00:00:00
   - supports multibyte regex by %mb on using "use UTF8::R2 qw(%mb)"
   - created by INABA Hitoshi

@@ -70,7 +70,7 @@
          "web" : "https://github.com/perlancar/perl-Perinci-Examples"
       }
    },
-   "version" : "0.818",
+   "version" : "0.819",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028002"

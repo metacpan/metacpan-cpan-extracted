@@ -82,7 +82,7 @@ struct expected {
         else             construct_err(std::move(ex._err));
     }
 
-    template <class T2>
+    template <class T2, typename = typename std::enable_if<std::is_constructible<T, T2>::value>::type>
     expected (T2&& v) {
         construct_val(std::forward<T2>(v));
     }

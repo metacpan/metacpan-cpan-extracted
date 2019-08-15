@@ -16,7 +16,7 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Bencher::Scenarios::PackageMoreUtil",
   "PREREQ_PM" => {
-    "Package::MoreUtil" => 0,
+    "Package::MoreUtil" => "0.590",
     "strict" => 0,
     "warnings" => 0
   },
@@ -27,7 +27,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,7 +39,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Package::MoreUtil" => 0,
+  "Package::MoreUtil" => "0.590",
   "Test::More" => 0,
   "strict" => 0,
   "warnings" => 0

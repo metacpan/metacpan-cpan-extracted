@@ -13,7 +13,7 @@ my @module_files = (
 );
 
 my @scripts = (
-    'script/peri-eg-complete-animal-choice',
+    'script/peri-eg-complete-animals-any',
     'script/peri-eg-complete-comment-fruit-any',
     'script/peri-eg-complete-fruits-any'
 );

@@ -1,0 +1,57 @@
+=head1 NAME
+
+Geo::Geos::Algorithm::MinimumDiameter - Computes the minimum diameter of a Geometry
+
+=head1 SYNOPSIS
+
+    use Geo::Geos::Coordinate;
+    use Geo::Geos::GeometryFactory;
+    use Geo::Geos::Algorithm::MinimumDiameter qw/getMinimumRectangle/;
+
+    my $c1 = Geo::Geos::Coordinate->new(1,2);
+    my $c2 = Geo::Geos::Coordinate->new(5,2);
+    my $c3 = Geo::Geos::Coordinate->new(5,0);
+    my $c4 = Geo::Geos::Coordinate->new(1,0);
+    my $gf = Geo::Geos::GeometryFactory::create();
+
+    my $lr = $gf->createLinearRing([$c1, $c2, $c3, $c4, $c1], 2);
+    my $md1 = Geo::Geos::Algorithm::MinimumDiameter->new($lr);
+
+    my $md2 = Geo::Geos::Algorithm::MinimumDiameter->new($lr, 1);
+
+    $md2->getLength;                # => is 2
+    $md2->getWidthCoordinate;       # => is Geo::Geos::Coordinate->new(1,0)
+
+    my $ls = $gf->createLineString([$c1, $c2], 2);
+    my $ss = $md2->getSupportingSegment;    # => isa 'Geo::Geos::Geometry'
+    $ls->equalsExact($ss);                  # => success
+
+    my $d = $md2->getDiameter;      # => isa 'Geo::Geos::Geometry'
+    $d->toString;                   # => is 'LINESTRING (1.0000000000000000 2.0000000000000000, 1.0000000000000000 0.0000000000000000)'
+
+    my $r = $md2->getMinimumRectangle;      # => isa 'Geo::Geos::Geometry'
+    $r->toString;                           # like qr/POLYGON/;
+
+    getMinimumRectangle($ls);               # => isa 'Geo::Geos::Geometry'
+
+=head1 SEE ALSO (C++ classes docs)
+
+L<GEOS C++ Library|https://trac.osgeo.org/geos>
+
+geos::algorithm::MinimumDiameter
+
+=head1 SEE ALSO
+
+L<Geo::Geos>
+
+L<Geo::Geos::Algorithm>
+
+=head1 AUTHOR
+
+Ivan Baidakou <i.baydakov@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

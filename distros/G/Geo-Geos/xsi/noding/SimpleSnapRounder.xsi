@@ -1,0 +1,27 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::Noding::SimpleSnapRounder
+PROTOTYPES: DISABLE
+
+Sv new(SV*, SV* precisionModel) {
+    auto& pm = xs::in<PrecisionModel&>(precisionModel);
+    Object wrapped = xs::out<SimpleSnapRounder*>(new SimpleSnapRounder(pm));
+    wrapped.payload_attach(precisionModel, &payload_marker);
+    RETVAL = wrapped.ref();
+}
+
+void SimpleSnapRounder::computeVertexSnaps (Array edges) {
+    std::vector<SegmentString *> v;
+    v.reserve(edges.size());
+
+    for(auto it: edges) {
+        auto& ss = xs::in<SegmentString&>(it);
+        v.push_back(&ss);
+    }
+    THIS->computeVertexSnaps(v);
+}
+
+
+int CLONE_SKIP (...) { PERL_UNUSED_VAR(items); RETVAL = 1; }
+
+BOOT {
+    Stash(__PACKAGE__).inherit("Geo::Geos::Noding::Noder");
+}

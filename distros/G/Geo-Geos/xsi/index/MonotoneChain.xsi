@@ -1,0 +1,58 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::Index::MonotoneChain
+PROTOTYPES: DISABLE
+
+Sv new(SV*, Array pts, std::size_t start, std::size_t end) {
+    auto seq = Helper::convert_coords(pts);
+    auto seq_ptr = seq.clone();
+    auto payload = new MonotoneChain_payload();
+    payload->seq.reset(seq_ptr);
+
+    Object wrapped = xs::out<>(new MonotoneChain(*seq_ptr, start, end, NULL));
+    wrapped.payload_attach(payload, &payload_marker_MonotoneChain);
+
+    RETVAL = wrapped.ref();
+}
+
+Array getChains(Array pts) {
+    auto seq = Helper::convert_coords(pts);
+    std::vector<MonotoneChain*> v;
+    MonotoneChainBuilder::getChains(&seq, NULL, v);
+
+    Array result = Array::create(v.size());
+    for(auto mc: v) {
+        result.push(xs::out<MonotoneChain*>(mc));
+    }
+    RETVAL = result;
+}
+
+Envelope* MonotoneChain::getEnvelope () {
+    RETVAL = new Envelope(THIS->getEnvelope());
+}
+
+size_t MonotoneChain::getStartIndex()
+
+size_t MonotoneChain::getEndIndex()
+
+LineSegment* MonotoneChain::getLineSegment(std::size_t index){
+    LineSegment ls;
+    THIS->getLineSegment(index, ls);
+    RETVAL = new LineSegment(ls);
+}
+
+Array MonotoneChain::getCoordinates () {
+    auto smart_ptr = THIS->getCoordinates();
+    RETVAL = Helper::convert_copy(smart_ptr.get());
+}
+
+void MonotoneChain::computeOverlaps(MonotoneChain &mc, MonotoneChainOverlapAction &mco) {
+    THIS->computeOverlaps(&mc, &mco);
+}
+
+void MonotoneChain::setId(int nId)
+
+int MonotoneChain::getId()
+
+BOOT {
+    xs::exp::autoexport(Stash(__PACKAGE__));
+    payload_marker_MonotoneChain.svt_free = payload_marker_MonotoneChain_free;
+}

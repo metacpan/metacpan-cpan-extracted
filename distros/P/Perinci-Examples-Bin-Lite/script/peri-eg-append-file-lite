@@ -5,7 +5,7 @@
 
 our $DATE = '2018-07-16'; # DATE
 our $DIST = 'Perinci-Examples-Bin-Lite'; # DIST
-our $VERSION = '0.060'; # VERSION
+our $VERSION = '0.061'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ peri-eg-append-file-lite - peri-eg-append-file-lite
 
 =head1 VERSION
 
-This document describes version 0.060 of peri-eg-append-file-lite (from Perl distribution Perinci-Examples-Bin-Lite), released on 2018-07-16.
+This document describes version 0.061 of peri-eg-append-file-lite (from Perl distribution Perinci-Examples-Bin-Lite), released on 2018-07-16.
 
 =head1 SYNOPSIS
 
@@ -72,17 +72,15 @@ See C<--content>.
 
 =over
 
-=item B<--config-path>=I<filename>
+=item B<--config-path>=I<filename>, B<-c>
 
 Set path to configuration file.
 
-Can be specified multiple times.
-
-=item B<--config-profile>=I<s>
+=item B<--config-profile>=I<s>, B<-P>
 
 Set configuration profile to use.
 
-=item B<--no-config>
+=item B<--no-config>, B<-C>
 
 Do not use any configuration file.
 

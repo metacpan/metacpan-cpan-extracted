@@ -1,0 +1,267 @@
+=head1 NAME
+
+Geo::Geos - Perl interface for GEOS C++ library
+
+=head1 SYNOPSIS
+
+    use Geo::Geos::Coordinate;
+    use Geo::Geos::PrecisionModel qw/TYPE_FLOATING/;
+    use Geo::Geos::GeometryFactory;
+
+    my $srid = 3857; # coordinate system
+    my $pm   = Geo::Geos::PrecisionModel->new(TYPE_FLOATING);
+    my $gf   = Geo::Geos::GeometryFactory::create($pm, 3857);
+    my $lr   = $gf->createLinearRing([
+        Geo::Geos::Coordinate->new(1,2),
+        Geo::Geos::Coordinate->new(5,2),
+        Geo::Geos::Coordinate->new(5,0),
+        Geo::Geos::Coordinate->new(1,0),
+        Geo::Geos::Coordinate->new(1,2),
+    ], 2);
+
+    my $polygon = $gf->createPolygon($lr);
+    my $point   = $gf->createPoint(Geo::Geos::Coordinate->new(5,4));
+
+    # query
+    $polygon->getArea;              # => is 8
+    $polygon->getLength;            # => is 12
+    $polygon->distance($point);     # => is 2
+    $polygon->getCentroid;          # => is 'POINT (3.0000000000000000 1.0000000000000000)'
+
+    # operations
+    $polygon->symDifference($polygon);    # => is 'GEOMETRYCOLLECTION EMPTY'
+    $polygon->intersection($point);       # => is 'GEOMETRYCOLLECTION EMPTY'
+
+    # relations
+    $polygon->within($point);      # => ''
+    $polygon->contains($point);    # => ''
+    $polygon->covers($point);      # => ''
+    $polygon->touches($point);     # => ''
+    $polygon->intersects($point);  # => ''
+
+    $polygon->isValid;             # => success
+
+    # Well-Known Text (WKT) I/O
+    use Geo::Geos::WKTWriter;
+    use Geo::Geos::WKTReader;
+    my $string0 = Geo::Geos::WKTWriter->new->write($point);  # => 'POINT (5.0000000000000000 4.0000000000000000)'
+    my $g0  = Geo::Geos::WKTReader::read($string0);          # => isa 'Geo::Geos::Geometry'
+
+    # Well-Known Binary (WKB) I/O
+    use Geo::Geos::WKBReader;
+    use Geo::Geos::WKBWriter;
+    my $writer = Geo::Geos::WKBWriter->new;
+    my $string1 = $writer->write($point);
+    my $string2 = $writer->writeHEX($point);
+    my $g1 = Geo::Geos::WKBReader::read($string1);       # => isa 'Geo::Geos::Geometry'
+    my $g2 = Geo::Geos::WKBReader::readHEX($string2);    # => isa 'Geo::Geos::Geometry'
+
+=head1 DESCRIPTION
+
+This is Perl interface for GEOS C++ L<library|https://trac.osgeo.org/geos>.
+It is build around C++ API, which is a bit more convenient, but without stability guarantees.
+
+Capabilities include:
+
+=over 2
+
+=item Geometries: Point, LineString, Polygon, MultiPoint, MultiLineString, MultiPolygon, GeometryCollection
+
+=item Predicates: Intersects, Touches, Disjoint, Crosses, Within, Contains, Overlaps, Equals, Covers
+
+=item Operations: Union, Distance, Intersection, Symmetric Difference, Convex Hull, Envelope, Buffer, Simplify, Polygon Assembly, Valid, Area, Length
+
+=item Prepared geometries (pre-spatially indexed)
+
+=item STR spatial index
+
+=item OGC Well Known Text (WKT) and Well Known Binary (WKB) encoders and decoders.
+
+=back
+
+The GEOS C++ is used by L<PostGIS|http://postgis.net> project.
+
+=head1 EXCLUDED C++ CLASSES
+
+It is not possible or there is no need to have perl interface for all C++ classes of the library,
+partly because it is not possible to have perlish interface (safe, without memory leaks,
+without explicit C<dispose> calls), partly because classes are not documented and/or buggy
+and some classes are seems internal to the library and no need to export them.
+
+Here is a list of C++ classes, without Perl interface:
+
+geos::geom::CoordinateFilter
+
+geos::geom::CoordinateLessThen
+
+geos::geom::CoordinateSequence (use Array of Coordinate*)
+
+geos::geom::CoordinateSequenceFactory
+
+geos::geom::CoordinateSequenceFilter
+
+geos::geom::CoordinateArraySequence (use Array of Coordinate*)
+
+geos::geom::GeometryFilter
+
+geos::geom::GeometryComponentFilter
+
+geos::geom::Location
+
+geos::algorithm::RayCrossingCounter (duplicates methods in CGAlgorithms)
+
+geos::noding::SegmentNodeList
+
+geos::noding::snapround::HotPixel
+
+geos::noding::MCIndexNoder
+
+geos::noding::MCIndexSegmentSetMutualIntersector
+
+geos::noding::SegmentSetMutualIntersector
+
+geos::index::chain::MonotoneChainSelectAction
+
+geos::index::bintree::* (Buggy interface)
+
+geos::index::quadtree::* (See high-level wrapper Geo::Geos::Index::Quadtree)
+
+geos::index::strtree::* (See high-level wrapper Geo::Geos::Index::STRtree)
+
+geos::index::ItemVisitor (use CODEREF instead)
+
+geos::index::sweepline::SweepLineIndex
+
+geos::index::intervalrtree::SortedPackedIntervalRTree
+
+geos::planargraph::* (Safe interface is not possible)
+
+geos::geomgraph::* (Safe interface is not possible)
+
+geos::operation::* (All main operations are wrapped as methods of Geo::Geos::Operation)
+
+=head1 AUTHOR
+
+Ivan Baidakou <i.baydakov@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 SEE ALSO
+
+L<GEOS C++ Library|https://trac.osgeo.org/geos>
+
+L<PostGIS|http://postgis.net/>
+
+L<Geo::Geos::Algorithm>
+
+L<Geo::Geos::Algorithm::HCoordinate>
+
+L<Geo::Geos::Algorithm::LineIntersector>
+
+L<Geo::Geos::Algorithm::MinimumDiameter>
+
+L<Geo::Geos::Coordinate>
+
+L<Geo::Geos::Dimension>
+
+L<Geo::Geos::Envelope>
+
+L<Geo::Geos::Geometry>
+
+L<Geo::Geos::GeometryCollection>
+
+L<Geo::Geos::GeometryFactory>
+
+L<Geo::Geos::Index::MonotoneChain>
+
+L<Geo::Geos::Index::MonotoneChainOverlapAction>
+
+L<Geo::Geos::Index::Quadtree>
+
+L<Geo::Geos::Index::SpatialIndex>
+
+L<Geo::Geos::Index::STRtree>
+
+L<Geo::Geos::IntersectionMatrix>
+
+L<Geo::Geos::LinearRing>
+
+L<Geo::Geos::LineSegment>
+
+L<Geo::Geos::LineString>
+
+L<Geo::Geos::MultiLineString>
+
+L<Geo::Geos::MultiPoint>
+
+L<Geo::Geos::MultiPolygon>
+
+L<Geo::Geos::Noding>
+
+L<Geo::Geos::Noding::BasicSegmentString>
+
+L<Geo::Geos::Noding::IntersectionAdder>
+
+L<Geo::Geos::Noding::IntersectionFinderAdder>
+
+L<Geo::Geos::Noding::IteratedNoder>
+
+L<Geo::Geos::Noding::NodedSegmentString>
+
+L<Geo::Geos::Noding::Noder>
+
+L<Geo::Geos::Noding::ScaledNoder>
+
+L<Geo::Geos::Noding::SegmentIntersectionDetector>
+
+L<Geo::Geos::Noding::SegmentIntersector>
+
+L<Geo::Geos::Noding::SegmentNode>
+
+L<Geo::Geos::Noding::SegmentString>
+
+L<Geo::Geos::Noding::SimpleNoder>
+
+L<Geo::Geos::Noding::SimpleSnapRounder>
+
+L<Geo::Geos::Noding::SingleInteriorIntersectionFinder>
+
+L<Geo::Geos::Noding::SinglePassNoder>
+
+L<Geo::Geos::Operation>
+
+L<Geo::Geos::Point>
+
+L<Geo::Geos::Polygon>
+
+L<Geo::Geos::Precision>
+
+L<Geo::Geos::Precision::GeometryPrecisionReducer>
+
+L<Geo::Geos::Precision::SimpleGeometryPrecisionReducer>
+
+L<Geo::Geos::PrecisionModel>
+
+L<Geo::Geos::Prep::Geometry>
+
+L<Geo::Geos::Prep::GeometryFactory>
+
+L<Geo::Geos::Triangle>
+
+L<Geo::Geos::Triangulate::DelaunayTriangulationBuilder>
+
+L<Geo::Geos::Triangulate::VoronoiDiagramBuilder>
+
+L<Geo::Geos::WKBConstants>
+
+L<Geo::Geos::WKBReader>
+
+L<Geo::Geos::WKBWriter>
+
+L<Geo::Geos::WKTReader>
+
+L<Geo::Geos::WKTWriter>
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

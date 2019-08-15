@@ -13,7 +13,7 @@ Statocles::Help::Upgrading - A guide to pitfalls when upgrading Statocles
 
 =head1 VERSION
 
-version 0.093
+version 0.094
 
 =head1 DESCRIPTION
 

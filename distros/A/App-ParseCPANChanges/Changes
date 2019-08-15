@@ -1,3 +1,8 @@
+0.071   2019-08-02  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Read from STDIN when file is '-'.
+
+
 0.070   2019-07-03  Released-By: PERLANCAR; Urgency: medium
 
 	- Add option --class to customize parser class.

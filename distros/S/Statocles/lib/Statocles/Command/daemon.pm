@@ -1,5 +1,5 @@
 package Statocles::Command::daemon;
-our $VERSION = '0.093';
+our $VERSION = '0.094';
 # ABSTRACT: Run a daemon to navigate the site
 
 use Statocles::Base 'Command';
@@ -222,7 +222,7 @@ Statocles::Command::daemon - Run a daemon to navigate the site
 
 =head1 VERSION
 
-version 0.093
+version 0.094
 
 =head1 AUTHOR
 

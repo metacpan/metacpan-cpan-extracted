@@ -5,15 +5,13 @@ use 5.016;
 use strict;
 use warnings;
 
-$Geoffrey::Action::Table::VERSION = '0.000101';
+$Geoffrey::Action::Table::VERSION = '0.000102';
 
 use parent 'Geoffrey::Role::Action';
 
 sub _hr_merge_templates {
-    my ( $self, $s_template, $s_table_name ) = @_;
-    if ( ( $self->{template} && !$self->{template}->template($s_template) )
-        || !$self->{template} )
-    {
+    my ($self, $s_template, $s_table_name) = @_;
+    if (($self->{template} && !$self->{template}->template($s_template)) || !$self->{template}) {
         require Geoffrey::Exception::Template;
         Geoffrey::Exception::Template::throw_template_not_found($s_template);
     }
@@ -21,15 +19,15 @@ sub _hr_merge_templates {
     my $ar_template_constraints = [];
     $self->column_action->for_table(1);
     $self->constraint_action->for_table(1);
-    for ( @{ $self->{template}->template($s_template) } ) {
+    for (@{$self->{template}->template($s_template)}) {
         $_->{table} = $s_table_name;
-        push
-          @{$ar_template_columns},
-          $self->column_action->add( $_, $self->constraint_action->add( $s_table_name, $_, $ar_template_constraints ) );
+        push @{$ar_template_columns},
+            $self->column_action->add($_,
+            $self->constraint_action->add($s_table_name, $_, $ar_template_constraints));
     }
     $self->column_action->for_table(0);
     $self->constraint_action->for_table(0);
-    return { columns => $ar_template_columns, constraints => $ar_template_constraints };
+    return {columns => $ar_template_columns, constraints => $ar_template_constraints};
 }
 
 sub postfix {
@@ -46,23 +44,25 @@ sub prefix {
 
 sub constraint_action {
     my $self = shift;
-    return $self->{constraint_action} if ( $self->{constraint_action} );
+    return $self->{constraint_action} if ($self->{constraint_action});
     require Geoffrey::Action::Constraint;
-    $self->{constraint_action} = Geoffrey::Action::Constraint->new( converter => $self->converter, dbh => $self->dbh, );
+    $self->{constraint_action}
+        = Geoffrey::Action::Constraint->new(converter => $self->converter, dbh => $self->dbh,);
     return $self->{constraint_action};
 }
 
 sub column_action {
     my $self = shift;
-    return $self->{column_action} if ( $self->{column_action} );
+    return $self->{column_action} if ($self->{column_action});
     require Geoffrey::Action::Column;
-    $self->{column_action} = Geoffrey::Action::Column->new( converter => $self->converter, dbh => $self->dbh, );
+    $self->{column_action}
+        = Geoffrey::Action::Column->new(converter => $self->converter, dbh => $self->dbh,);
     return $self->{column_action};
 }
 
 sub action {
-    my ( $self, $s_action ) = @_;
-    $s_action = join q//, map { ucfirst } split /_/, $s_action;
+    my ($self, $s_action) = @_;
+    $s_action = join q//, map {ucfirst} split /_/, $s_action;
     require Geoffrey::Utils;
     return Geoffrey::Utils::action_obj_from_name(
         $s_action,
@@ -73,8 +73,8 @@ sub action {
 }
 
 sub add {
-    my ( $self, $hr_params ) = @_;
-    if ( !$hr_params || !$hr_params->{name} ) {
+    my ($self, $hr_params) = @_;
+    if (!$hr_params || !$hr_params->{name}) {
         require Geoffrey::Exception::RequiredValue;
         Geoffrey::Exception::RequiredValue::throw_table_name(__PACKAGE__);
     }
@@ -82,24 +82,28 @@ sub add {
     my $ar_constraints    = [];
     my $constraint_action = $self->constraint_action;
     my $column_action     = $self->column_action;
-    if ( $hr_params->{template} ) {
-        my $templates =
-          $self->_hr_merge_templates( $hr_params->{template}, $hr_params->{name} );
-        push @columns, @{ $templates->{columns} };
-        push @{$ar_constraints}, @{ $templates->{constraints} };
+    if ($hr_params->{template}) {
+        my $templates = $self->_hr_merge_templates($hr_params->{template}, $hr_params->{name});
+        push @columns, @{$templates->{columns}};
+        push @{$ar_constraints}, @{$templates->{constraints}};
     }
     $constraint_action->for_table(1);
     $column_action->for_table(1);
-    for my $col ( @{ $hr_params->{columns} } ) {
-        $col->{table} = $hr_params->{name};
-        my $const = $constraint_action->add( $hr_params->{name}, $col, $ar_constraints );
-        push @columns, $column_action->add( $col, $const );
+    for my $hr_column (@{$hr_params->{columns}}) {
+        $hr_column->{schema} = $hr_params->{schema} if exists $hr_params->{schema};
+        $hr_column->{table} = $hr_params->{name};
+        my $const = $constraint_action->add($hr_params->{name}, $hr_column, $ar_constraints);
+        push @columns, $column_action->add($hr_column, $const);
     }
-    $constraint_action->add( $hr_params->{name}, $_, $ar_constraints ) for @{ $hr_params->{constraints} };
+    for (@{$hr_params->{constraints}}) {
+        $_->{schema} = $hr_params->{schema} if exists $hr_params->{schema};
+        $constraint_action->add($hr_params->{name}, $_, $ar_constraints);
+    }
     push @columns, @{$ar_constraints};
-    if ( scalar @columns == 0 && !$self->converter->can_create_empty_table ) {
+    if (scalar @columns == 0 && !$self->converter->can_create_empty_table) {
         require Geoffrey::Exception::NotSupportedException;
-        Geoffrey::Exception::NotSupportedException::throw_empty_table( $self->converter, $hr_params );
+        Geoffrey::Exception::NotSupportedException::throw_empty_table($self->converter,
+            $hr_params);
     }
     $constraint_action->for_table(0);
     $column_action->for_table(0);
@@ -109,31 +113,32 @@ sub add {
     my $sql = Geoffrey::Utils::replace_spare(
         $self->converter->table->add,
         [
-            $self->prefix . $hr_params->{name} . $self->postfix,
-            join( q/,/, @columns ),
-            $hr_params->{engine}, $hr_params->{charset}
-        ]
-    );
+              (exists $hr_params->{schema} ? $hr_params->{schema} . q/./ : q//)
+            . $self->prefix
+                . $hr_params->{name}
+                . $self->postfix,
+            join(q/,/, @columns),
+            $hr_params->{engine}, $hr_params->{charset}]);
     return $self->do($sql);
 }
 
 sub alter {
-    my ( $self, $hr_params ) = @_;
+    my ($self, $hr_params) = @_;
     require Ref::Util;
-    if ( !Ref::Util::is_hashref($hr_params) ) {
+    if (!Ref::Util::is_hashref($hr_params)) {
         require Geoffrey::Exception::General;
-        Geoffrey::Exception::General::throw_wrong_ref( __PACKAGE__ . '::alter', 'hash' );
+        Geoffrey::Exception::General::throw_wrong_ref(__PACKAGE__ . '::alter', 'hash');
     }
-    if ( !$hr_params->{name} ) {
+    if (!$hr_params->{name}) {
         require Geoffrey::Exception::General;
         Geoffrey::Exception::General::throw_no_table_name('to alter');
     }
     my @ar_result = ();
     require Geoffrey::Utils;
-    for ( @{ $hr_params->{alter} } ) {
-        my ( $s_sub, $s_action ) = Geoffrey::Utils::parse_package_sub( $_->{action} );
+    for (@{$hr_params->{alter}}) {
+        my ($s_sub, $s_action) = Geoffrey::Utils::parse_package_sub($_->{action});
         my $obj_action = $self->action($s_action);
-        if ( !$s_sub || !$obj_action->can($s_sub) ) {
+        if (!$s_sub || !$obj_action->can($s_sub)) {
             require Geoffrey::Exception::RequiredValue;
             Geoffrey::Exception::RequiredValue::throw_action_sub($s_action);
         }
@@ -144,20 +149,20 @@ sub alter {
 }
 
 sub drop {
-    my ( $self, $hr_params ) = @_;
+    my ($self, $hr_params) = @_;
     require Ref::Util;
     my $s_name = Ref::Util::is_hashref($hr_params) ? $hr_params->{name} : undef;
-    if ( !$s_name ) {
+    if (!$s_name) {
         require Geoffrey::Exception::General;
         Geoffrey::Exception::General::throw_no_table_name('to drop');
     }
     require Geoffrey::Utils;
-    return $self->do( Geoffrey::Utils::replace_spare( $self->converter->table->drop, [$s_name] ) );
+    return $self->do(Geoffrey::Utils::replace_spare($self->converter->table->drop, [$s_name]));
 }
 
 sub list_from_schema {
-    my ( $self, $schema ) = @_;
-    return [ map { $_->{name} } @{ $self->do_arrayref( $self->converter->table->list($schema), [] ) } ];
+    my ($self, $schema) = @_;
+    return [map { $_->{name} } @{$self->do_arrayref($self->converter->table->list($schema), [])}];
 }
 
 1;
@@ -174,7 +179,7 @@ Geoffrey::Action::Table - Action handler for tables
 
 =head1 VERSION
 
-Version 0.000101
+Version 0.000102
 
 =head1 DESCRIPTION
 
@@ -187,8 +192,6 @@ Version 0.000101
 =head2 prefix
 
 =head2 constraint_action
-
-=head2 foreignkey_action
 
 =head2 column_action
 

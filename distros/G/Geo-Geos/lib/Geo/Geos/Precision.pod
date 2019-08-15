@@ -1,0 +1,101 @@
+=head1 NAME
+
+Geo::Geos::Precision - Provides methods for manipulating the precision model of Geometries.
+
+=head1 SYNOPSIS
+
+    use Geo::Geos::Precision qw/signExpBits numCommonMostSigMantissaBits zeroLowerBits getBit
+                           commonIntersection commonUnion commonDifference commonSymDifference
+                           commonBuffer enhancedIntersection enhancedUnion enhancedDifference
+                           enhancedSymDifference enhancedBuffer removeCommonBits addCommonBits/;
+    use Geo::Geos::GeometryFactory;
+
+    # common bits
+    signExpBits(1234512222226);                            # => 0
+    numCommonMostSigMantissaBits(1234512222226, 78774);    # => 12
+    zeroLowerBits(1234512222226, 4);                       # => 1234512222224
+    getBit(1234512222226, 4);                              # => 1
+
+    # common bit ops
+    my $gf = Geo::Geos::GeometryFactory::create();
+    my $c1_1 = Geo::Geos::Coordinate->new(0,0);
+    my $c1_2 = Geo::Geos::Coordinate->new(0,2);
+    my $c1_3 = Geo::Geos::Coordinate->new(2,2);
+    my $c1_4 = Geo::Geos::Coordinate->new(2,0);
+    my $lr1 = $gf->createLinearRing([$c1_1, $c1_2, $c1_3, $c1_4, $c1_1], 2);
+    my $p1 = $gf->createPolygon($lr1);
+
+    my $c2_1 = Geo::Geos::Coordinate->new(1,0);
+    my $c2_2 = Geo::Geos::Coordinate->new(1,2);
+    my $c2_3 = Geo::Geos::Coordinate->new(3,2);
+    my $c2_4 = Geo::Geos::Coordinate->new(3,0);
+    my $lr2 = $gf->createLinearRing([$c2_1, $c2_2, $c2_3, $c2_4, $c2_1], 2);
+    my $p2 = $gf->createPolygon($lr2);
+
+    commonIntersection($p1, $p2);      # => isa 'Geo::Geos::Geometry'
+    commonUnion($p1, $p2);             # => isa 'Geo::Geos::Geometry'
+    commonDifference($p1, $p2);        # => isa 'Geo::Geos::Geometry'
+    commonSymDifference($p1, $p2);     # => isa 'Geo::Geos::Geometry'
+    commonBuffer($p1, 0.5);            # => isa 'Geo::Geos::Geometry'
+
+    my $revert = 1; # revert to original precision
+    commonIntersection($p1, $p2, $revert);      # => isa 'Geo::Geos::Geometry'
+    commonUnion($p1, $p2, $revert);             # => isa 'Geo::Geos::Geometry'
+    commonDifference($p1, $p2, $revert);        # => isa 'Geo::Geos::Geometry'
+    commonSymDifference($p1, $p2, $revert);     # => isa 'Geo::Geos::Geometry'
+    commonBuffer($p1, 0.5, $revert);            # => isa 'Geo::Geos::Geometry'
+
+    # enhanced bit ops
+    enhancedIntersection($p1, $p2);    # => isa 'Geo::Geos::Geometry'
+    enhancedUnion($p1, $p2);           # => isa 'Geo::Geos::Geometry'
+    enhancedDifference($p1, $p2);      # => isa 'Geo::Geos::Geometry'
+    enhancedSymDifference($p1, $p2);   # => isa 'Geo::Geos::Geometry'
+    enhancedBuffer($p1, 0.5);          # => isa 'Geo::Geos::Geometry'
+
+    # add & remove common bits
+    my $c_1_1 = Geo::Geos::Coordinate->new(0,1);
+    my $c_1_2 = Geo::Geos::Coordinate->new(1,1);
+    my $c_2_1 = Geo::Geos::Coordinate->new(0,2);
+    my $c_2_2 = Geo::Geos::Coordinate->new(1,2);
+    my $c_3_1 = Geo::Geos::Coordinate->new(0,3);
+    my $c_3_2 = Geo::Geos::Coordinate->new(1,3);
+
+    my $ls1 = $gf->createLineString([$c_1_1, $c_1_2], 2);
+    my $ls2 = $gf->createLineString([$c_2_1, $c_2_2], 2);
+    my $ls3 = $gf->createLineString([$c_3_1, $c_3_2], 2);
+    my $ls4 = $gf->createLineString([$c_3_1, $c_3_2], 2);
+
+    removeCommonBits($ls3, [$ls1, $ls2]);  # => isa 'Geo::Geos::Coordinate'
+    addCommonBits($ls4, [$ls1, $ls2]);     # => isa 'Geo::Geos::Coordinate'
+
+=head1 SEE ALSO (C++ classes docs)
+
+L<GEOS C++ Library|https://trac.osgeo.org/geos>
+
+geos::precision::CommonBits
+
+geos::precision::CommonBitsOp
+
+geos::precision::EnhancedPrecisionOp
+
+geos::precision::CommonBitsRemover
+
+=head1 SEE ALSO
+
+L<Geo::Geos>
+
+L<Geo::Geos::PrecisionModel>
+
+L<Geo::Geos::Precision::GeometryPrecisionReducer>
+
+L<Geo::Geos::Precision::SimpleGeometryPrecisionReducer>
+
+=head1 AUTHOR
+
+Ivan Baidakou <i.baydakov@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

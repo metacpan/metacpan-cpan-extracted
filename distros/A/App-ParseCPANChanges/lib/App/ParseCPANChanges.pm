@@ -1,7 +1,7 @@
 package App::ParseCPANChanges;
 
-our $DATE = '2019-07-03'; # DATE
-our $VERSION = '0.070'; # VERSION
+our $DATE = '2019-08-02'; # DATE
+our $VERSION = '0.071'; # VERSION
 
 use 5.010001;
 use strict;
@@ -18,6 +18,11 @@ $SPEC{parse_cpan_changes} = {
 	    summary => 'If not specified, will look for file called '.
 		'Changes/ChangeLog in current directory',
 	    pos => 0,
+            description => <<'_',
+
+To read from standard input, use `-`.
+
+_
 	},
         class => {
             schema => 'perl::modname*',
@@ -35,16 +40,21 @@ sub parse_cpan_changes {
     require $class_pm;
 
     my $file = $args{file};
+    my $ch;
     if (!$file) {
 	for (qw/Changes ChangeLog/) {
 	    do { $file = $_; last } if -f $_;
 	}
+    } elsif ($file eq '-') {
+        local $/;
+        $ch = $class->load_string(scalar <STDIN>);
+    } else {
+        $ch = $class->load($file);
     }
     return [400, "Please specify file ".
                 "(or run in directory where Changes file exists)"]
         unless $file;
 
-    my $ch = $class->load($file);
     [200, "OK", Data::Structure::Util::unbless($ch)];
 }
 
@@ -63,7 +73,7 @@ App::ParseCPANChanges - Parse CPAN Changes file
 
 =head1 VERSION
 
-This document describes version 0.070 of App::ParseCPANChanges (from Perl distribution App-ParseCPANChanges), released on 2019-07-03.
+This document describes version 0.071 of App::ParseCPANChanges (from Perl distribution App-ParseCPANChanges), released on 2019-08-02.
 
 =head1 DESCRIPTION
 
@@ -92,6 +102,8 @@ Arguments ('*' denotes required arguments):
 =item * B<file> => I<filename>
 
 If not specified, will look for file called Changes/ChangeLog in current directory.
+
+To read from standard input, use C<->.
 
 =back
 

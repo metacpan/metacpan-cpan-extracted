@@ -2,7 +2,7 @@ package Test2::Harness;
 use strict;
 use warnings;
 
-our $VERSION = '0.001080';
+our $VERSION = '0.001081';
 
 use Carp qw/croak/;
 use List::Util qw/sum/;
@@ -172,6 +172,8 @@ sub iteration {
 
                     my $plan = $watcher->plan;
                     $f->{harness_job_end}->{skip} = $plan->{details} || "No reason given" if $plan && !$plan->{count};
+
+                    $f->{harness_job_end}->{times} = $watcher->times;
 
                     push @{$f->{errors}} => $watcher->fail_error_facet_list;
 

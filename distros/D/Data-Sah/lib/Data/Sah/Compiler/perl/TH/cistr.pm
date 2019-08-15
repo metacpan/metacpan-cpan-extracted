@@ -1,7 +1,7 @@
 package Data::Sah::Compiler::perl::TH::cistr;
 
-our $DATE = '2019-08-12'; # DATE
-our $VERSION = '0.900'; # VERSION
+our $DATE = '2019-08-14'; # DATE
+our $VERSION = '0.901'; # VERSION
 
 use 5.010;
 use strict;
@@ -42,7 +42,11 @@ sub superclause_comparable {
     if ($which eq 'is') {
         $c->add_ccl($cd, "$dt eq lc($ct)");
     } elsif ($which eq 'in') {
-        $c->add_ccl($cd, "grep { lc(\$_) eq $dt } \@{ $ct }");
+        if ($dt =~ /\$_\b/) {
+            $c->add_ccl($cd, "do { my \$_sahv_dt = $dt; grep { lc(\$_) eq \$_sahv_dt } \@{ $ct } }");
+        } else {
+            $c->add_ccl($cd, "grep { lc(\$_) eq $dt } \@{ $ct }");
+        }
     }
 }
 
@@ -122,8 +126,8 @@ sub clause_match {
         $c->add_ccl($cd, join(
             "",
             "ref($ct) eq 'Regexp' ? $dt =~ qr/$ct/i : ",
-            "do { my \$re = $ct; eval { \$re = /\$re/i; 1 } && ",
-            "$dt =~ \$re }",
+            "do { my \$_sahv_re = $ct; eval { \$_sahv_re = /\$_sahv_re/i; 1 } && ",
+            "$dt =~ \$_sahv_re }",
         ));
     } else {
         # simplify code and we can check regex at compile time
@@ -148,7 +152,7 @@ Data::Sah::Compiler::perl::TH::cistr - perl's type handler for type "cistr"
 
 =head1 VERSION
 
-This document describes version 0.900 of Data::Sah::Compiler::perl::TH::cistr (from Perl distribution Data-Sah), released on 2019-08-12.
+This document describes version 0.901 of Data::Sah::Compiler::perl::TH::cistr (from Perl distribution Data-Sah), released on 2019-08-14.
 
 =for Pod::Coverage ^(clause_.+|superclause_.+|handle_.+|before_.+|after_.+)$
 

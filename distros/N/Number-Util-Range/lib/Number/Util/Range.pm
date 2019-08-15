@@ -1,7 +1,7 @@
 package Number::Util::Range;
 
 our $DATE = '2019-01-25'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -34,10 +34,34 @@ $SPEC{'convert_number_sequence_to_range'} = {
     result_naked => 1,
     examples => [
         {
+            summary => 'basic, non-numbers ignored',
             args => {
                 array => [100, 2, 3, 4, 5, 101, 'foo'],
             },
             result => [100, "2..5", 101, 'foo'],
+        },
+        {
+            summary => 'option: separator',
+            args => {
+                array => [100, 2, 3, 4, 5, 101],
+                separator => '-',
+            },
+            result => [100, "2-5", 101],
+        },
+        {
+            summary => 'multiple ranges, negative number',
+            args => {
+                array => [100, 2, 3, 4, 5, 6, 101, 102, -5, -4, -3, -2, 103],
+            },
+            result => [100, "2..6", 101, 102, "-5..-2", 103],
+        },
+        {
+            summary => 'option: threshold',
+            args => {
+                array => [100, 2, 3, 4, 5, 101],
+                threshold => 5,
+            },
+            result => [100, 2, 3, 4, 5, 101],
         },
     ],
 };
@@ -92,7 +116,7 @@ Number::Util::Range - Find sequences in number arrays & convert to range (e.g. 1
 
 =head1 VERSION
 
-This document describes version 0.001 of Number::Util::Range (from Perl distribution Number-Util-Range), released on 2019-01-25.
+This document describes version 0.002 of Number::Util::Range (from Perl distribution Number-Util-Range), released on 2019-01-25.
 
 =head1 FUNCTIONS
 
@@ -109,9 +133,25 @@ Examples:
 
 =over
 
-=item * Example #1:
+=item * basic, non-numbers ignored:
 
  convert_number_sequence_to_range(array => [100, 2 .. 5, 101, "foo"]); # -> [100, "2..5", 101, "foo"]
+
+=item * option: separator:
+
+ convert_number_sequence_to_range(array => [100, 2 .. 5, 101], separator => "-"); # -> [100, "2-5", 101]
+
+=item * multiple ranges, negative number:
+
+ convert_number_sequence_to_range(array => [100, 2 .. 6, 101, 102, -5 .. -2, 103]);
+
+Result:
+
+ [100, "2..6", 101, 102, "-5..-2", 103]
+
+=item * option: threshold:
+
+ convert_number_sequence_to_range(array => [100, 2 .. 5, 101], threshold => 5); # -> [100, 2 .. 5, 101]
 
 =back
 

@@ -4,7 +4,7 @@ use XS::Framework;
 use XS::Install::Payload;
 use Export::XS::Auto;
 
-our $VERSION = '3.1.6';
+our $VERSION = '3.1.7';
 
 XS::Loader::bootstrap();
 

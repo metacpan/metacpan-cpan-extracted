@@ -1,6 +1,26 @@
 
 Revision history for Perl module MCE::Shared.
 
+1.844 Wed Aug 14 21:30:00 EST 2019
+
+  * Completed validation running Kelp and Raisin apps with MCE::Shared.
+    For example, constructing shared objects at the top of the script
+    (i.e. MCE::Shared->scalar, MCE::Shared->cache, et cetera).
+    Shared objects are accessible by Plack workers (i.e. Starman).
+
+  * Disable internal signal handling for the shared-manager process
+    if spawned from inside a thread or process.
+
+  * MCE::Hobo workers exit immediately upon receiving a SIGSEGV signal.
+    This safegaurds IPC from stalling inside the manager process.
+
+  * Enhanced the _wait_one private function in MCE::Hobo.
+
+  * Removed Prima from the list for auto-enabling the posix_exit option.
+    Prima (since 1.52) is parallel safe during global cleanup.
+
+  * Reached 100% Pod coverage.
+
 1.843 Tue Jul 23 22:30:00 EST 2019
 
   * Updated results in MCE::Hobo (Parallel::ForkManager-like demonstration).

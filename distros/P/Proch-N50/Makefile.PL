@@ -7,24 +7,39 @@ use 5.018;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Calculate N50 from a FASTA or FASTQ file without dependencies",
-  "AUTHOR" => "Andrea Telatin <andrea.telatin\@quadram.ac.uk>",
+  "ABSTRACT" => "a small module to calculate N50 (total size, and total number of sequences) for a FASTA or FASTQ file. It's easy to install, with minimal dependencies.",
+  "AUTHOR" => "Andrea Telatin <andrea\@telatin.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Proch-N50",
+  "EXE_FILES" => [
+    "bin/n50"
+  ],
   "LICENSE" => "mit",
   "MIN_PERL_VERSION" => "5.018",
   "NAME" => "Proch::N50",
-  "PREREQ_PM" => {},
-  "VERSION" => "0.040",
+  "PREREQ_PM" => {
+    "FASTX::Reader" => "0.32",
+    "Getopt::Long" => "2.45",
+    "JSON::PP" => "2.27",
+    "Pod::Usage" => "1.64",
+    "Text::ASCIITable" => 0
+  },
+  "VERSION" => "0.70",
   "test" => {
     "TESTS" => "t/*.t"
   }
 );
 
 
-my %FallbackPrereqs = ();
+my %FallbackPrereqs = (
+  "FASTX::Reader" => "0.32",
+  "Getopt::Long" => "2.45",
+  "JSON::PP" => "2.27",
+  "Pod::Usage" => "1.64",
+  "Text::ASCIITable" => 0
+);
 
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

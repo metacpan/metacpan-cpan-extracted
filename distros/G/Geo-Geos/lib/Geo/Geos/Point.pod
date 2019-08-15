@@ -1,0 +1,47 @@
+=head1 NAME
+
+Geo::Geos::Point - Implementation of Point
+
+=head1 SYNOPSIS (class-specific methods)
+
+    use Geo::Geos::Coordinate;
+    use Geo::Geos::GeometryFactory;
+
+    my $gf = Geo::Geos::GeometryFactory::create();
+    my $c = Geo::Geos::Coordinate->new(1,2);
+
+    my $p = $gf->createPoint($c);   # => isa 'Geo::Geos::Point'
+    $gf->createPoint($c);           # => isa 'Geo::Geos::Puntal'
+
+    $p->getX;   # => 1
+    $p->getY;   # => 2
+
+    $p->reverse;    # => isa 'Geo::Geos::Geometry'
+
+=head1 DESCRIPTION
+
+See methods in the base class L<Geo::Geos::Geometry>.
+
+=head1 SEE ALSO (C++ classes docs)
+
+L<GEOS C++ Library|https://trac.osgeo.org/geos>
+
+geos::geom::Point
+
+=head1 SEE ALSO
+
+L<Geo::Geos>
+
+L<Geo::Geos::Geometry>
+
+L<Geo::Geos::GeometryFactory>
+
+=head1 AUTHOR
+
+Ivan Baidakou <i.baydakov@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

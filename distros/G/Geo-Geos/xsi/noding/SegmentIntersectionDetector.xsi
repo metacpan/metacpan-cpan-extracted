@@ -1,0 +1,37 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::Noding::SegmentIntersectionDetector
+PROTOTYPES: DISABLE
+
+Sv new(SV*,SV* liObj) {
+    LineIntersector& li = xs::in<LineIntersector&>(liObj);
+    Sv wrapped = xs::out<>(new SegmentIntersectionDetector(&li));
+    wrapped.payload_attach(SvRV(liObj), &payload_marker);
+    RETVAL = wrapped;
+}
+
+
+bool SegmentIntersectionDetector::hasIntersection ()
+
+bool SegmentIntersectionDetector::hasProperIntersection ()
+
+bool SegmentIntersectionDetector::hasNonProperIntersection ()
+
+void SegmentIntersectionDetector::setFindProper(bool findProper)
+
+void SegmentIntersectionDetector::setFindAllIntersectionTypes (bool findAllTypes)
+
+xs::Array SegmentIntersectionDetector::getIntersectionSegments (){
+    RETVAL = Helper::convert_copy(THIS->getIntersectionSegments());
+}
+
+Coordinate* SegmentIntersectionDetector::getIntersection() {
+    auto c = THIS->getIntersection();
+    if (c) RETVAL = new Coordinate(*c);
+    else XSRETURN_UNDEF;
+}
+
+
+int CLONE_SKIP (...) { PERL_UNUSED_VAR(items); RETVAL = 1; }
+
+BOOT {
+    Stash(__PACKAGE__).inherit("Geo::Geos::Noding::SegmentIntersector");
+}

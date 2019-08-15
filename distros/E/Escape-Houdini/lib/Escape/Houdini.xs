@@ -22,6 +22,8 @@
 	                                                           \
 	    result = newSVpvn( buffer.ptr, buffer.size );          \
 	    gh_buf_free(&buffer);                                  \
+	    SvUTF8_on(result);                                     \
+                                                             \
 	    return result;                                         \
 	}
 

@@ -1,7 +1,13 @@
 #!/usr/bin/env perl
 # ABSTRACT: Run Statocles commands
 package statocles;
-our $VERSION = '0.093';
+our $VERSION = '0.094';
+
+use Statocles::Base;
+use Encode qw( decode );
+use Encode::Locale;
+use open qw( :std :locale );
+use POSIX qw( setlocale LC_ALL );
 
 # Mojolicious::Commands currently calls GetOptions and clobbers a few of
 # our command-line options. Since I don't want to rely on the envvars
@@ -11,7 +17,11 @@ our $VERSION = '0.093';
 # module, which loads Mojolicious, which loads Mojolicious::Commands, which
 # calls GetOptions on @ARGV
 my @argv;
-BEGIN { @argv = @ARGV };
+BEGIN { @argv = map { decode( locale => $_ ) } @ARGV };
+
+binmode STDIN, ":encoding(locale)";
+binmode STDOUT, ":encoding(locale)";
+binmode STDERR, ":encoding(locale)";
 
 use Statocles;
 exit Statocles->run( @argv );
@@ -28,7 +38,7 @@ statocles - Run Statocles commands
 
 =head1 VERSION
 
-version 0.093
+version 0.094
 
 =head1 SYNOPSIS
 

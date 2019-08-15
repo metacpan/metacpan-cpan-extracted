@@ -4,7 +4,7 @@ Specio - Type constraints and coercions for Perl
 
 # VERSION
 
-version 0.43
+version 0.44
 
 # SYNOPSIS
 
@@ -374,6 +374,26 @@ Here are some of the salient differences:
     Moose has some bizarre (and mostly) undocumented features relating to
     coercions and parameterizable types. This is a misfeature.
 
+# OPTIONAL PREREQS
+
+There are several optional prereqs that if installed will make this
+distribution better in some way.
+
+- [Ref::Util](https://metacpan.org/pod/Ref::Util)
+
+    Installing this will speed up a number of type checks for built-in types.
+
+- [XString](https://metacpan.org/pod/XString)
+
+    If this is installed it will be loaded instead of the [B](https://metacpan.org/pod/B) module if you have
+    Perl 5.10 or greater. This module is much more memory efficient than loading
+    all of [B](https://metacpan.org/pod/B).
+
+- [Sub::Util](https://metacpan.org/pod/Sub::Util) or [Sub::Name](https://metacpan.org/pod/Sub::Name)
+
+    If one of these is installed then stack traces that end up in Specio code will
+    have much better subroutine names for any frames.
+
 # WHY THE NAME?
 
 This distro was originally called "Type", but that's an awfully generic top
@@ -419,13 +439,14 @@ Dave Rolsky <autarch@urth.org>
 
 # CONTRIBUTORS
 
+- Chris White <chrisw@leehayes.com>
 - cpansprout <cpansprout@gmail.com>
 - Graham Knop <haarg@haarg.org>
 - Karen Etheridge <ether@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2018 by Dave Rolsky.
+This software is Copyright (c) 2012 - 2019 by Dave Rolsky.
 
 This is free software, licensed under:
 

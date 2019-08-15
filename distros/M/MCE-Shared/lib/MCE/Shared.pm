@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized once );
 
-our $VERSION = '1.843';
+our $VERSION = '1.844';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitSubroutinePrototypes)
@@ -448,7 +448,7 @@ MCE::Shared - MCE extension for sharing data supporting threads and processes
 
 =head1 VERSION
 
-This document describes MCE::Shared version 1.843
+This document describes MCE::Shared version 1.844
 
 =head1 SYNOPSIS
 
@@ -714,11 +714,11 @@ is that the object must not have file-handles nor code-blocks.
 
 =over 3
 
-=item mce_open ( filehandle, expr )
+=item open ( filehandle, expr )
 
-=item mce_open ( filehandle, mode, expr )
+=item open ( filehandle, mode, expr )
 
-=item mce_open ( filehandle, mode, reference )
+=item open ( filehandle, mode, reference )
 
 =back
 
@@ -751,7 +751,17 @@ See L<MCE::Shared::Handle> for chunk IO demonstrations.
    mce_open my $fh, "<", "file.log" or die "$!";
  }
 
-Simple examples to open a file for reading:
+=over 3
+
+=item mce_open ( filehandle, expr )
+
+=item mce_open ( filehandle, mode, expr )
+
+=item mce_open ( filehandle, mode, reference )
+
+=back
+
+Native Perl-like syntax to open a shared-file for reading:
 
  use MCE::Shared;
 

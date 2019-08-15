@@ -6,7 +6,6 @@ use lib 't/lib';
 use Test::More 0.96;
 use Test::Specio qw( test_constraint :vars );
 
-use B ();
 use Specio::Library::String;
 
 my %tests = (

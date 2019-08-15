@@ -1,0 +1,47 @@
+=head1 NAME
+
+Geo::Geos::Noding::BasicSegmentString - Represents a list of contiguous line segments, and supports noding the segments.
+
+=head1 SYNOPSIS
+
+    use Geo::Geos::Coordinate;
+    use Geo::Geos::Noding::BasicSegmentString;
+
+    my $c1 = Geo::Geos::Coordinate->new(1,2);
+    my $c2 = Geo::Geos::Coordinate->new(5,2);
+    my $c3 = Geo::Geos::Coordinate->new(7,1);
+
+    my $seq = [$c1, $c2, $c3];
+    my $ss = Geo::Geos::Noding::BasicSegmentString->new($seq);   # => isa 'Geo::Geos::Noding::BasicSegmentString'
+    Geo::Geos::Noding::BasicSegmentString->new($seq);            # => isa 'Geo::Geos::Noding::SegmentString'
+
+    $ss->isClosed;          # => ''
+    $ss->size;              # => 3
+
+    $ss->getCoordinate(0);              # => Geo::Geos::Coordinate->new(1,2)
+    my $c = $ss->getCoordinates->[0];   # => Geo::Geos::Coordinate->new(1,2)
+
+    $ss->toString;              # => like qr/\QLINESTRING(1 2, 5 2, 7 1)\E/
+    $ss->getSegmentOctant(0);   # => 0
+
+=head1 SEE ALSO (C++ classes docs)
+
+L<GEOS C++ Library|https://trac.osgeo.org/geos>
+
+geos::noding::BasicSegmentString
+
+=head1 SEE ALSO
+
+L<Geo::Geos>
+
+L<Geo::Geos::Noding::SegmentString>
+
+=head1 AUTHOR
+
+Ivan Baidakou <i.baydakov@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

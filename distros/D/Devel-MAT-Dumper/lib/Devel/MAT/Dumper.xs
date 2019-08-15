@@ -28,6 +28,10 @@
 #  define OpSIBLING(o) ((o)->op_sibling)
 #endif
 
+#ifndef HvNAMELEN
+#  define HvNAMELEN(hv) (strlen(HvNAME(hv)))
+#endif
+
 /* This technically applies all the way back to 5.6 if we need it... */
 #if (PERL_REVISION == 5) && (PERL_VERSION == 10) && (PERL_SUBVERSION == 0)
 #  define CxOLD_OP_TYPE(cx) ((cx)->blk_eval.old_op_type)
@@ -149,8 +153,11 @@ enum PMAT_CTXt {
   PMAT_CTXtEVAL,
 };
 
-static HV *helper_per_magic;
+typedef int DMD_Helper(pTHX_ SV const *sv);
+static HV *helper_per_package;
+
 typedef int DMD_MagicHelper(pTHX_ SV const *sv, MAGIC *mg);
+static HV *helper_per_magic;
 
 static void write_u8(FILE *fh, uint8_t v)
 {
@@ -792,6 +799,25 @@ static void write_sv(FILE *fh, const SV *sv)
     }
   }
 
+  if(SvOBJECT(sv)) {
+    HV *stash = SvSTASH(sv);
+    SV **helpersv = hv_fetch(helper_per_package, HvNAME(stash), HvNAMELEN(stash), 0);
+
+    if(helpersv) {
+      DMD_Helper *helperfunc = (DMD_Helper *)SvUV(*helpersv);
+
+      ENTER;
+      SAVETMPS;
+
+      int ret = (*helperfunc)(aTHX_ sv);
+      if(ret > 0)
+        write_annotations_from_stack(fh, ret);
+
+      FREETMPS;
+      LEAVE;
+    }
+  }
+
 #ifdef DEBUG_LEAKING_SCALARS
   {
     write_u8(fh, PMAT_SVxDEBUGREPORT);
@@ -1126,9 +1152,13 @@ static void dumpfh(FILE *fh)
       case SAVEt_SHARED_PVREF:
       case SAVEt_SPTR:
 
+      case SAVEt_DESTRUCTOR:
+      case SAVEt_DESTRUCTOR_X:
       case SAVEt_GP:
       case SAVEt_I32:
       case SAVEt_INT:
+      case SAVEt_IV:
+      case SAVEt_LONG:
 #if (PERL_REVISION == 5) && (PERL_VERSION >= 20)
       case SAVEt_STRLEN:
 #endif
@@ -1292,4 +1322,5 @@ void
 dumpfh(FILE *fh)
 
 BOOT:
-  helper_per_magic = get_hv("Devel::MAT::Dumper::HELPER_PER_MAGIC", GV_ADD);
+  helper_per_package = get_hv("Devel::MAT::Dumper::HELPER_PER_PACKAGE", GV_ADD);
+  helper_per_magic   = get_hv("Devel::MAT::Dumper::HELPER_PER_MAGIC", GV_ADD);

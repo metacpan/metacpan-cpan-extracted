@@ -1,0 +1,44 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::Triangle
+PROTOTYPES: DISABLE
+
+Triangle* new(SV*, Coordinate& p0, Coordinate& p1, Coordinate& p2)
+
+Coordinate* Triangle::p0(Coordinate* newval = NULL) : ALIAS(p1=1,p2=2) {
+    Coordinate* val;
+    switch (ix) {
+        case 0:  val = &THIS->p0; break;
+        case 1:  val = &THIS->p1; break;
+        default: val = &THIS->p2; break;
+    }
+    if (newval) {
+        *val = *newval;
+    }
+    RETVAL = new Coordinate(*val);
+}
+
+Coordinate* Triangle::inCentre() {
+    Coordinate c;
+    THIS->inCentre(c);
+    RETVAL = new Coordinate(c);
+}
+
+Coordinate* Triangle::circumcentre() {
+    Coordinate c;
+    THIS->circumcentre(c);
+    RETVAL = new Coordinate(c);
+}
+
+bool isInCircleNonRobust(Coordinate& a, Coordinate& b, Coordinate& c, Coordinate& p): ALIAS(isInCircleNormalized=1, isInCircleRobust=2) {
+    switch(ix) {
+        case 0: RETVAL = TrianglePredicate::isInCircleNonRobust(a, b, c, p); break;
+        case 1: RETVAL = TrianglePredicate::isInCircleNormalized(a, b, c, p); break;
+        default: RETVAL = TrianglePredicate::isInCircleRobust(a, b, c, p); break;
+    }
+}
+
+
+int CLONE_SKIP (...) { PERL_UNUSED_VAR(items); RETVAL = 1; }
+
+BOOT {
+    xs::exp::autoexport(Stash(__PACKAGE__));
+}

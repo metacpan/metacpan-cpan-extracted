@@ -3,7 +3,7 @@ NAME
     or ::Classic)
 
 VERSION
-    This document describes version 0.150 of Perinci::CmdLine::Any (from
+    This document describes version 0.151 of Perinci::CmdLine::Any (from
     Perl distribution Perinci-CmdLine-Any), released on 2019-06-20.
 
 SYNOPSIS

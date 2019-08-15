@@ -7,7 +7,7 @@ use JSON::PP;
 use Text::Trim qw(trim rtrim);
 use XSLoader;
 
-our $VERSION = '0.000013';
+our $VERSION = '0.000014';
 XSLoader::load( __PACKAGE__, $VERSION );
 
 our @EXPORT_OK = qw[];
@@ -49,7 +49,7 @@ JavaScript::V8::XS - Perl XS binding for the V8 Javascript embeddable engine
 
 =head1 VERSION
 
-Version 0.000013
+Version 0.000014
 
 =head1 SYNOPSIS
 
@@ -93,6 +93,8 @@ Version 0.000013
     my $context = $vm->parse_js_stacktrace($stacktrace_lines, 2);
 
     my $rounds = $vm->run_gc();
+
+    my $info = $vm->get_version_info();
 
 =head1 DESCRIPTION
 
@@ -247,6 +249,10 @@ will appear first in the returned stacktrace information.
 
 Run at least one round of the JavaScript garbage collector, and return the
 number of rounds that were effectively run.
+
+=head2 get_version_info
+
+Return a hashref with version information.
 
 =head1 SEE ALSO
 

@@ -1,0 +1,65 @@
+=head1 NAME
+
+Geo::Geos::Algorithm::LineIntersector - test whether two line segments intersect and compute the intersection point if they do.
+
+=head1 SYNOPSIS
+
+    use Geo::Geos::Algorithm::LineIntersector qw/interpolateZ computeEdgeDistance isSameSignAndNonZero hasIntersection/;
+    use Geo::Geos::Coordinate;
+    use Geo::Geos::PrecisionModel;
+
+    my $c1 = Geo::Geos::Coordinate->new(0,1);
+    my $c2 = Geo::Geos::Coordinate->new(2,1);
+    my $c3 = Geo::Geos::Coordinate->new(1,0);
+    my $c4 = Geo::Geos::Coordinate->new(1,2);
+
+    my $pm = Geo::Geos::PrecisionModel->new;
+    my $li1 = Geo::Geos::Algorithm::LineIntersector->new($pm);
+
+    $li1->hasIntersection; # => is ''
+
+    my $li2 = Geo::Geos::Algorithm::LineIntersector->new;
+    $li2->setPrecisionModel($pm);
+
+    $li2->computeIntersection($c1, $c2, $c3, $c4);
+    $li2->hasIntersection;                                  # => success
+    $li2->toString;                                         # => '0 1_2 1 1 0_1 2 :  proper';
+    $li2->getIntersectionNum;                               # => is 1
+    $li2->isProper;                                         # => success
+    $li2->getIndexAlongSegment(0, 0);                       # => is 1
+    $li2->getEdgeDistance(0, 0);                            # => is 1
+
+
+    $li2->getIntersectionAlongSegment(1, 0);    # => isa 'Geo::Geos::Coordinate'
+
+    my $c01 = Geo::Geos::Coordinate->new(0,1,1);
+    my $c02 = Geo::Geos::Coordinate->new(2,1,2);
+    my $c03 = Geo::Geos::Coordinate->new(1,0,3);
+
+    interpolateZ($c01, $c02, $c03);           # => like qr/3.4142135/
+    computeEdgeDistance($c01, $c02, $c03);    # => is 2
+    isSameSignAndNonZero(-1, -2);             # => success
+    hasIntersection($c01, $c02, $c03);        # => ''
+
+
+=head1 SEE ALSO (C++ classes docs)
+
+L<GEOS C++ Library|https://trac.osgeo.org/geos>
+
+geos::algorithm::LineIntersector
+
+=head1 SEE ALSO
+
+L<Geo::Geos>
+
+L<Geo::Geos::Algorithm>
+
+=head1 AUTHOR
+
+Ivan Baidakou <i.baydakov@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

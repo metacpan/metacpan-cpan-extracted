@@ -1,0 +1,61 @@
+=head1 NAME
+
+Geo::Geos::WKBWriter - Writes a Geometry into Well-Known Binary format.
+
+=head1 SYNOPSIS
+
+    use Geo::Geos::GeometryFactory;
+    use Geo::Geos::PrecisionModel qw/TYPE_FLOATING/;
+    use Geo::Geos::WKBWriter;
+    use Geo::Geos::WKBConstants qw/TYPE_BYTEORDER_BE/;
+
+    my $pm = Geo::Geos::PrecisionModel->new(TYPE_FLOATING);
+    my $gf = Geo::Geos::GeometryFactory::create($pm, 3857);
+    my $c  = Geo::Geos::Coordinate->new(1,2);
+    my $p  = $gf->createPoint($c);
+
+    my $dimensions   = 2;
+    my $include_SRID = 1;
+
+    Geo::Geos::WKBWriter->new($dimensions, TYPE_BYTEORDER_BE, $include_SRID);    # => isa 'Geo::Geos::WKBWriter'
+    Geo::Geos::WKBWriter->new($dimensions, TYPE_BYTEORDER_BE);                   # => isa 'Geo::Geos::WKBWriter'
+    Geo::Geos::WKBWriter->new($dimensions);                                      # => isa 'Geo::Geos::WKBWriter'
+    Geo::Geos::WKBWriter->new();                                                 # => isa 'Geo::Geos::WKBWriter'
+
+    my $w = Geo::Geos::WKBWriter->new($dimensions, TYPE_BYTEORDER_BE, $include_SRID);
+
+    $w->setOutputDimension(2);
+    $w->getOutputDimension;     # => 2
+
+    $w->setByteOrder(TYPE_BYTEORDER_BE);
+    $w->getByteOrder;                       # => TYPE_BYTEORDER_BE
+
+    $w->setIncludeSRID(1);
+    $w->getIncludeSRID;     # => success
+
+    $w->write($p);
+    $w->writeHEX($p);
+
+=head1 SEE ALSO (C++ classes docs)
+
+L<GEOS C++ Library|https://trac.osgeo.org/geos>
+
+geos::io::WKBWriter
+
+L<Geo::Geos>
+
+L<Geo::Geos::Geometry>
+
+L<Geo::Geos::WKBConstants>
+
+L<Geo::Geos::WKBReader>
+
+=head1 AUTHOR
+
+Ivan Baidakou <i.baydakov@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

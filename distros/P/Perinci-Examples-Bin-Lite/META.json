@@ -65,7 +65,7 @@
          "web" : "https://github.com/perlancar/perl-Perinci-Examples-Bin-Lite"
       }
    },
-   "version" : "0.060",
+   "version" : "0.061",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

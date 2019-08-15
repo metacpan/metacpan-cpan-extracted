@@ -1,0 +1,17 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::Noding::ScaledNoder
+PROTOTYPES: DISABLE
+
+Sv new(SV*, SV* noder, double nScaleFactor, double nOffsetX=0.0, double nOffsetY=0.0) {
+    Noder& n = xs::in<Noder&>(noder);
+    Object wrapped = xs::out<>(new ScaledNoder(n, nScaleFactor, nOffsetX, nOffsetY));
+    wrapped.payload_attach(SvRV(noder), &payload_marker);
+    RETVAL = wrapped.ref();
+}
+
+bool ScaledNoder::isIntegerPrecision ()
+
+int CLONE_SKIP (...) { PERL_UNUSED_VAR(items); RETVAL = 1; }
+
+BOOT {
+    Stash(__PACKAGE__).inherit("Geo::Geos::Noding::Noder");
+}

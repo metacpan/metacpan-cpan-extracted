@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::FFI 1.03 {
+package Dist::Zilla::Plugin::FFI 1.04 {
 
   use strict;
   use warnings;
@@ -23,7 +23,7 @@ Dist::Zilla::Plugin::FFI - FFI related Dist::Zilla plugins
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =head1 SYNOPSIS
 
@@ -31,7 +31,7 @@ version 1.03
 
 =head1 DESCRIPTION
 
-This distribution contains some useful plugins for working with FFI::Platypus and friends.
+This distribution contains some useful plugins for working with L<FFI::Platypus> and friends.
 
 =head1 SEE ALSO
 

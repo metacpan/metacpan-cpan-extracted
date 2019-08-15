@@ -1,7 +1,7 @@
 package Task::Tmp::spanel;
 
-our $DATE = '2019-03-01'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-08-15'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 1;
 # ABSTRACT: Perl modules for Spanel
@@ -18,7 +18,7 @@ Task::Tmp::spanel - Perl modules for Spanel
 
 =head1 VERSION
 
-version 0.003
+version 0.006
 
 =head1 TASK CONTENTS
 
@@ -30,7 +30,9 @@ version 0.003
 
 =head3 L<Any::Moose>
 
-=head3 L<App::CreateSelfSignedSSL>
+=head3 L<App::CreateSelfSignedSSLCert>
+
+=head3 L<App::rimetadb>
 
 =head3 L<CDB_File>
 
@@ -81,6 +83,8 @@ version 0.003
 =head3 L<File::Find>
 
 =head3 L<File::Flock>
+
+=head3 L<File::Flock::Retry>
 
 =head3 L<File::Path>
 
@@ -168,6 +172,8 @@ version 0.003
 
 =head3 L<Perinci::CmdLine>
 
+=head3 L<Perinci::CmdLine::Any>
+
 =head3 L<Perinci::CmdLine::Lite>
 
 =head3 L<Perinci::CmdLine::Server>
@@ -196,6 +202,8 @@ version 0.003
 
 =head3 L<Sub::Curry>
 
+=head3 L<Tie::Handle::FileWriteRotate>
+
 =head3 L<Time::Local>
 
 =head3 L<URI>
@@ -211,6 +219,8 @@ version 0.003
 =head3 L<YAML::Syck>
 
 =head3 L<YAML::XS>
+
+=head3 L<alias::module>
 
 =head3 L<autodie>
 

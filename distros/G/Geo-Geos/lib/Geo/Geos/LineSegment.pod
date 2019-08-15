@@ -1,0 +1,53 @@
+=head1 NAME
+
+Geo::Geos::LineSegment - Represents a line segment defined by two Coordinates.
+
+=head1 SYNOPSIS
+
+    use Geo::Geos::Coordinate;
+    use Geo::Geos::LineSegment;
+    use Geo::Geos::Algorithm qw/TYPE_ORIENT_RIGHT TYPE_ORIENT_LEFT TYPE_ORIENT_STRAIGHT/;
+
+
+    Geo::Geos::LineSegment->new;     # => isa 'Geo::Geos::LineSegment'
+
+    my $c1 = Geo::Geos::Coordinate->new(1, 1);
+    my $c2 = Geo::Geos::Coordinate->new(5, 1);
+    my $ls = Geo::Geos::LineSegment->new($c1, $c2);  # => isa 'Geo::Geos::LineSegment'
+
+    $ls->getLength;     # => 4
+    $ls->isHorizontal;  # => success
+    $ls->isVertical;    # => ''
+
+    my $c3 = Geo::Geos::Coordinate->new(1, 0);
+    my $c4 = Geo::Geos::Coordinate->new(5, 0);
+    $ls->setCoordinates($c3, $c4);
+    $ls->p0;    # => Geo::Geos::Coordinate->new(1, 0);
+    $ls->p1;    # => Geo::Geos::Coordinate->new(5, 0);
+
+    $ls->orientationIndex($c2); # => TYPE_ORIENT_STRAIGHT
+    $ls->orientationIndex($ls); # => TYPE_ORIENT_LEFT
+
+=head1 SEE ALSO (C++ classes docs)
+
+L<GEOS C++ Library|https://trac.osgeo.org/geos>
+
+geos::geom::LineSegment
+
+=head1 SEE ALSO
+
+L<Geo::Geos>
+
+L<Geo::Geos::Algorithm>
+
+L<Geo::Geos::Index::MonotoneChain>
+
+=head1 AUTHOR
+
+Ivan Baidakou <i.baydakov@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

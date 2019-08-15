@@ -39,9 +39,13 @@ my $infile = dirname($0)."/../data/rand.fastq.gz";
 my $kmer=Bio::Kmer->new(dirname($0)."/../data/rand.fastq.gz",{kmerlength=>8,kmercounter=>"perl"});
 my $hist=$kmer->histogram() || die Dumper $kmer;
 for(my $i=0;$i<@correctCounts;$i++){
+  #diag "Expecting $correctCounts[$i]. Found $$hist[$i]";
+  note "Expecting $correctCounts[$i]. Found $$hist[$i]";
   is $$hist[$i], $correctCounts[$i], "Freq of $i checks out";
 }
 for my $query(keys(%query)){
+  #diag "Expecting $query{$query}. Found ".$kmer->query($query);
+  note "Expecting $query{$query}. Found ".$kmer->query($query);
   is $query{$query}, $kmer->query($query), "Queried for $query{$query}";
 }
 $kmer->close();

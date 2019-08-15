@@ -1,0 +1,16 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::LineString
+PROTOTYPES: DISABLE
+
+Point* LineString::getPointN(std::size_t n) { RETVAL = THIS->getPointN(n); }
+
+Point* LineString::getStartPoint() { RETVAL = THIS->getStartPoint(); }
+
+Point* LineString::getEndPoint() { RETVAL = THIS->getEndPoint(); }
+
+bool LineString::isClosed()
+
+bool LineString::isRing()
+
+BOOT {
+    Stash(__PACKAGE__).inherit("Geo::Geos::Lineal");
+}

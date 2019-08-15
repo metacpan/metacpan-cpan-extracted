@@ -5,7 +5,7 @@ use warnings;
 
 use vars qw($VERSION @ISA);
 
-$VERSION = '0.100';
+$VERSION = '0.101';
 
 use DateTime 0.08;
 @ISA = 'DateTime';
@@ -187,7 +187,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 Copyright (c) 2003 Eugene van der Pijll.  All rights reserved.
 
-Copyright (C) 2018 Thomas R. Wyant, III
+Copyright (C) 2018-2019 Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
@@ -198,7 +198,7 @@ merchantability or fitness for a particular purpose.
 
 =head1 SEE ALSO
 
-L<DateTime|/DateTime>
+L<DateTime|DateTime>
 
 L<DateTime::Calendar::Christian|DateTime::Calendar::Christian>
 

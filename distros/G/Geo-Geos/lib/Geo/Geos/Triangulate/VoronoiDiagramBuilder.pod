@@ -1,0 +1,56 @@
+=head1 NAME
+
+Geo::Geos::Triangulate::VoronoiDiagramBuilder - Creates Voronoi Diagrams.
+
+=head1 SYNOPSIS
+
+    use Geo::Geos::Coordinate;
+    use Geo::Geos::Triangulate::VoronoiDiagramBuilder;
+
+    my $gf = Geo::Geos::GeometryFactory::create();
+    my $c1 = Geo::Geos::Coordinate->new(1,2);
+    my $c2 = Geo::Geos::Coordinate->new(5,2);
+    my $c3 = Geo::Geos::Coordinate->new(5,0);
+    my $c4 = Geo::Geos::Coordinate->new(1,0);
+
+    my $coords = [$c1, $c2, $c3, $c4];
+
+    my $env = Geo::Geos::Envelope->new(
+        Geo::Geos::Coordinate->new(0,0),
+        Geo::Geos::Coordinate->new(6,6),
+    );
+    my $tolerance = 0;
+
+    my $builder = Geo::Geos::Triangulate::VoronoiDiagramBuilder->new($gf, $coords, $tolerance, $env);
+
+    my $diagram = $builder->getDiagram;         # => isa 'Geo::Geos::GeometryCollection'
+    my $edges   = $builder->getDiagramEdges;    # => isa 'Geo::Geos::MultiLineString'
+
+    my $lr = $gf->createLinearRing([$c1, $c2, $c3, $c4, $c1], 2);
+    my $p  = $gf->createPolygon($lr);
+
+    my $builder1 = Geo::Geos::Triangulate::VoronoiDiagramBuilder->new($gf, $coords, $tolerance);
+    my $builder2 = Geo::Geos::Triangulate::VoronoiDiagramBuilder->new($gf, $coords);
+    my $builder3 = Geo::Geos::Triangulate::VoronoiDiagramBuilder->new($gf, $p);
+    my $builder4 = Geo::Geos::Triangulate::VoronoiDiagramBuilder->new($gf, $p, $tolerance);
+    my $builder5 = Geo::Geos::Triangulate::VoronoiDiagramBuilder->new($gf, $p, $tolerance, $env);
+
+=head1 SEE ALSO (C++ classes docs)
+
+L<GEOS C++ Library|https://trac.osgeo.org/geos>
+
+geos::triangulate::DelaunayTriangulationBuilder
+
+=head1 SEE ALSO
+
+L<Geo::Geos>
+
+=head1 AUTHOR
+
+Ivan Baidakou <i.baydakov@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

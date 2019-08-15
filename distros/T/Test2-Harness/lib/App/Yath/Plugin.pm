@@ -2,7 +2,7 @@ package App::Yath::Plugin;
 use strict;
 use warnings;
 
-our $VERSION = '0.001080';
+our $VERSION = '0.001081';
 
 sub options {}
 
@@ -19,5 +19,7 @@ sub munge_files {}
 sub block_default_search {}
 
 sub claim_file {}
+
+sub inject_run_data {}
 
 1;

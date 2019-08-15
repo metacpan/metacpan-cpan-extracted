@@ -1,7 +1,7 @@
 package Data::Sah::Compiler::perl::TH::array;
 
-our $DATE = '2019-08-12'; # DATE
-our $VERSION = '0.900'; # VERSION
+our $DATE = '2019-08-14'; # DATE
+our $VERSION = '0.901'; # VERSION
 
 use 5.010;
 use strict;
@@ -33,9 +33,9 @@ sub superclause_comparable {
     if ($which eq 'is') {
         $c->add_ccl($cd, $c->expr_dump($cd, $dt).' eq '.$c->expr_dump($cd, $ct));
     } elsif ($which eq 'in') {
-        $c->add_ccl($cd, "do { my \$s = ".$c->expr_dump($cd, $dt)."; my \$res = 0; " .
-                        "for my \$el (\@{ $ct }) { my \$els = ".$c->expr_dump($cd, "\$el")."; ".
-                        "if (\$s eq \$els) { \$res = 1; last } } \$res }");
+        $c->add_ccl($cd, "do { my \$_sahv_dt_str = ".$c->expr_dump($cd, $dt)."; my \$_sahv_res = 0; " .
+                        "for my \$_sahv_el (\@{ $ct }) { my \$_sahv_el_str = ".$c->expr_dump($cd, "\$_sahv_el")."; ".
+                        "if (\$_sahv_dt_str eq \$_sahv_el_str) { \$_sahv_res = 1; last } } \$_sahv_res }");
     }
 }
 
@@ -63,9 +63,9 @@ sub superclause_has_elems {
         }
     } elsif ($which eq 'has') {
         $c->add_runtime_module($cd, $cd->{args}{dump_module});
-        $c->add_ccl($cd, "do { my \$s = ".$c->expr_dump($cd, $ct)."; my \$res = 0; " .
-                        "for my \$el (\@{ $dt }) { my \$els = ".$c->expr_dump($cd, "\$el")."; ".
-                        "if (\$s eq \$els) { \$res = 1; last } } \$res }");
+        $c->add_ccl($cd, "do { my \$_sahv_ct_str = ".$c->expr_dump($cd, $ct)."; my \$_sahv_res = 0; " .
+                        "for my \$_sahv_el (\@{ $dt }) { my \$_sahv_el_str = ".$c->expr_dump($cd, "\$_sahv_el")."; ".
+                        "if (\$_sahv_ct_str eq \$_sahv_el_str) { \$_sahv_res = 1; last } } \$_sahv_res }");
     } elsif ($which eq 'each_index') {
         $self_th->set_tmp_data_term($cd) if $cd->{args}{data_term_includes_topic_var};
         $self_th->gen_each($cd, "0..\@{$cd->{data_term}}-1", '_', '$_');
@@ -145,7 +145,7 @@ Data::Sah::Compiler::perl::TH::array - perl's type handler for type "array"
 
 =head1 VERSION
 
-This document describes version 0.900 of Data::Sah::Compiler::perl::TH::array (from Perl distribution Data-Sah), released on 2019-08-12.
+This document describes version 0.901 of Data::Sah::Compiler::perl::TH::array (from Perl distribution Data-Sah), released on 2019-08-14.
 
 =for Pod::Coverage ^(clause_.+|superclause_.+)$
 

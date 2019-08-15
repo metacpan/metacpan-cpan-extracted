@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::cpantesters_author;
 
 our $DATE = '2018-09-12'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -20,7 +20,7 @@ $SPEC{handle_cmd} = {
     description => <<'_',
 
 Given author with CPAN ID `CPANID`, this will open
-`https://matrix.cpantesters.org/?author=CPANID`. `CPANID` will first be checked for
+`http://matrix.cpantesters.org/?author=CPANID`. `CPANID` will first be checked for
 existence in local index database.
 
 _
@@ -45,7 +45,7 @@ sub handle_cmd {
         };
 
         require Browser::Open;
-        my $url = "https://matrix.cpantesters.org/?author=$cpanid";
+        my $url = "http://matrix.cpantesters.org/?author=$cpanid";
         my $err = Browser::Open::open_browser($url);
         if ($err) {
             $envres->add_result(500, "Can't open browser for URL $url");
@@ -71,7 +71,7 @@ App::lcpan::Cmd::cpantesters_author - Open author page on CPAN Testers matrix
 
 =head1 VERSION
 
-This document describes version 0.001 of App::lcpan::Cmd::cpantesters_author (from Perl distribution App-lcpan-CmdBundle-cpantesters), released on 2018-09-12.
+This document describes version 0.002 of App::lcpan::Cmd::cpantesters_author (from Perl distribution App-lcpan-CmdBundle-cpantesters), released on 2018-09-12.
 
 =head1 DESCRIPTION
 
@@ -89,7 +89,7 @@ Usage:
 Open author page on CPAN Testers matrix.
 
 Given author with CPAN ID C<CPANID>, this will open
-CL<https://matrix.cpantesters.org/?author=CPANID>. C<CPANID> will first be checked for
+CL<http://matrix.cpantesters.org/?author=CPANID>. C<CPANID> will first be checked for
 existence in local index database.
 
 This function is not exported.

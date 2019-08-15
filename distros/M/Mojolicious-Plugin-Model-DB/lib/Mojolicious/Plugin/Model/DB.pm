@@ -4,7 +4,7 @@ use Mojo::Util 'camelize';
 use Storable qw/dclone/;
 use Class::Method::Modifiers qw/after/;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 after register => sub {
     my ($plugin, $app, $conf) = @_;

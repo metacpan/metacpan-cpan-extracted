@@ -44,7 +44,9 @@
          "requires" : {
             "Config" : "0",
             "Email::Sender::Transport::Mbox" : "0",
+            "FindBin" : "0",
             "Path::Tiny" : "0.060",
+            "Test::More" : "0",
             "Test::Requires::Git" : "0",
             "lib" : "0"
          }
@@ -58,6 +60,6 @@
          "web" : "https://github.com/dinesh-it/Git-Hooks-CheckYoutrack"
       }
    },
-   "version" : "v1.0.0",
+   "version" : "v1.0.1",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

@@ -1,0 +1,170 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::Envelope
+PROTOTYPES: DISABLE
+
+Envelope* new(SV*, Sv arg1 = Sv(), SV* arg2 = NULL, SV* arg3 = NULL, SV* arg4 = NULL) {
+    if (items == 1) RETVAL = new Envelope();
+    else if (items == 2) {
+        if (!arg1.is_simple()) {
+            auto& c = xs::in<Coordinate&>(arg1);
+            RETVAL = new Envelope(c);
+        }
+        else {
+            if(!arg1) throw("undef not allowed");
+            panda::string_view sw = Simple(arg1);
+            std::string str { sw.begin(), sw.end() };
+            RETVAL = new Envelope(str);
+        }
+    }
+    else if (items == 3) {
+        auto& c1 = xs::in<Coordinate&>(arg1);
+        auto& c2 = xs::in<Coordinate&>(arg2);
+        RETVAL = new Envelope(c1, c2);
+    }
+    else if (items == 5)  RETVAL = new Envelope(Simple(arg1), Simple(arg2), Simple(arg3), Simple(arg4));
+    else throw ("unsupported constructor");
+}
+
+void Envelope::init(SV* arg1 = NULL, SV* arg2 = NULL, SV* arg3 = NULL, SV* arg4 = NULL) {
+    if (items == 1) THIS->init();
+    else if (items == 2) {
+        auto& c = xs::in<Coordinate&>(arg1);
+        THIS->init(c);
+    }
+    else if (items == 3) {
+        auto c1 = xs::in<Coordinate&>(arg1);
+        auto c2 = xs::in<Coordinate&>(arg2);
+        THIS->init(c1, c2);
+    }
+    else if (items == 5)  THIS->init(Simple(arg1), Simple(arg2), Simple(arg3), Simple(arg4));
+    else throw ("unsupported arguments");
+}
+
+void Envelope::setToNull()
+
+double Envelope::getArea()
+
+double Envelope::getMaxY()
+
+double Envelope::getMaxX()
+
+double Envelope::getMinY()
+
+double Envelope::getMinX()
+
+double Envelope::getWidth()
+
+double Envelope::getHeight()
+
+bool Envelope::isNull()
+
+int Envelope::hashCode ()
+
+std::string Envelope::toString (...)
+
+bool Envelope::eq (Sv other_arg, SV*) {
+    auto other = xs::in<Envelope*>(other_arg);
+    RETVAL = other ? THIS->equals(other) : false;
+}
+
+Coordinate* Envelope::centre() {
+    Coordinate c;
+    if (!THIS->centre(c)) XSRETURN_UNDEF;
+    RETVAL = new Coordinate(c);
+}
+
+bool Envelope::contains(SV* arg1, SV* arg2 = NULL) {
+    if (!arg2) {
+        Object obj {arg1};
+        if(!obj) throw("wrong argument");
+        if (obj.stash().name() == "Geo::Geos::Envelope") {
+            auto e = xs::in<Envelope*>(obj);
+            RETVAL = THIS->contains(e);
+        }
+        else {
+            auto& c = xs::in<Coordinate&>(obj);
+            RETVAL = THIS->contains(c);
+        }
+    }
+    else RETVAL = THIS->contains(Simple(arg1), Simple(arg2));
+}
+
+bool Envelope::covers(SV* arg1, SV* arg2 = NULL) {
+    if (!arg2) {
+        Object obj {arg1};
+        if(!obj) throw("wrong argument");
+        if (obj.stash().name() == "Geo::Geos::Envelope") {
+            auto e = xs::in<Envelope*>(obj);
+            RETVAL = THIS->covers(e);
+        }
+        else {
+            auto& c = xs::in<Coordinate&>(obj);
+            RETVAL = THIS->covers(c);
+        }
+    }
+    else RETVAL = THIS->covers(Simple(arg1), Simple(arg2));
+}
+
+bool intersects(Object maybe_self, SV* arg1, SV* arg2 = NULL, SV* arg3 = NULL) {
+    if (!maybe_self) throw("wrong argument");
+    auto arg0_stash = maybe_self.stash().name();
+    if (arg0_stash != "Geo::Geos::Envelope") {
+        // static method
+        auto& p1 = xs::in<Coordinate&>(maybe_self);
+        auto& p2 = xs::in<Coordinate&>(arg1);
+        if (!arg3) {
+            auto& q = xs::in<Coordinate&>(arg2);
+            RETVAL = Envelope::intersects(p1, p2, q);
+        }
+        else {
+            auto& q1 = xs::in<Coordinate&>(arg2);
+            auto& q2 = xs::in<Coordinate&>(arg3);
+            RETVAL = Envelope::intersects(p1, p2, q1, q2);
+        }
+    } else  {
+        // object method
+        Envelope& self = xs::in<Envelope&>(maybe_self);
+        if (!arg2) {
+            Object obj {arg1};
+            if(!obj) throw("wrong argument");
+            if (obj.stash().name() == "Geo::Geos::Envelope") {
+                auto& e = xs::in<Envelope&>(obj);
+                RETVAL = self.intersects(&e);
+            }
+            else {
+                auto& c = xs::in<Coordinate&>(obj);
+                RETVAL = self.intersects(c);
+            }
+        }
+        else RETVAL = self.intersects(Simple(arg1), Simple(arg2));
+    }
+}
+
+void Envelope::expandToInclude(SV* arg1, SV* arg2 = NULL) {
+    if (!arg2) {
+        Object obj {arg1};
+        if(!obj) throw("wrong argument");
+        if (obj.stash().name() == "Geo::Geos::Envelope") {
+            auto& e = xs::in<Envelope&>(obj);
+            THIS->expandToInclude(&e);
+        }
+        else {
+            auto& c = xs::in<Coordinate&>(obj);
+            THIS->expandToInclude(c);
+        }
+    }
+    else THIS->expandToInclude(Simple(arg1), Simple(arg2));
+}
+
+double Envelope::distance(Envelope& other) { RETVAL = THIS->distance(&other); }
+
+void Envelope::translate(double tX, double tY)
+
+void Envelope::expandBy(double dX, double dY)
+
+Envelope* Envelope::intersection(Envelope& other) {
+    Envelope e;
+    if (!THIS->intersection(other, e)) XSRETURN_UNDEF;
+    RETVAL = new Envelope(e);
+}
+
+int CLONE_SKIP (...) { PERL_UNUSED_VAR(items); RETVAL = 1; }

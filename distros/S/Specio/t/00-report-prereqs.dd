@@ -42,7 +42,8 @@ do { my $x = {
        'runtime' => {
                       'recommends' => {
                                         'Ref::Util' => '0.112',
-                                        'Sub::Util' => '1.40'
+                                        'Sub::Util' => '1.40',
+                                        'XString' => '0'
                                       },
                       'requires' => {
                                       'B' => '0',

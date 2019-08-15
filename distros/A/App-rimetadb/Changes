@@ -1,18 +1,36 @@
-0.220   2019-01-06 (PERLANCAR)
+0.222   2019-08-14  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] stats: did not include common options like --dsn.
+
+
+0.221   2019-08-14  Released-By: PERLANCAR; Urgency: medium
+
+	- [new] Observe x.app.rimetadb.exclude property.
+
+	- [incompatible change] Only use Foo:: as prefix notation, no longer
+          accept Foo::*.
+
+	- [bugfix] update-from-modules: When deleting packages from
+	  database, only delete those specified in module_or_package.
+
+	- [ux] Tweak summaries to make them clearer.
+
+
+0.220   2019-01-06  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace the use of Package::MoreUtil with Package::Util::Lite.
 
 
-0.21    2017-07-10 (PERLANCAR)
+0.21    2017-07-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace Log::Any with Log::ger.
 
 
-0.20    2016-12-10 (PERLANCAR)
+0.20    2016-12-10  Released-By: PERLANCAR
 
 	- Add subcommand: function-stats.
 
@@ -23,24 +41,24 @@
 	  %str%).
 
 
-0.19    2016-12-10 (PERLANCAR)
+0.19    2016-12-10  Released-By: PERLANCAR
 
         - Make subcommand 'arguments' show more details about each function
           argument. Add subcommand 'argument-stats' that just shows the number
           of occurrences for each argument.
 
 
-0.18    2016-09-27 (PERLANCAR)
+0.18    2016-09-27  Released-By: PERLANCAR
 
 	- Add tab completion.
 
 
-0.17    2016-09-27 (PERLANCAR)
+0.17    2016-09-27  Released-By: PERLANCAR
 
 	- Add subcommand: meta.
 
 
-0.16    2016-03-10 (PERLANCAR)
+0.16    2016-03-10  Released-By: PERLANCAR
 
 	- Test schema migration during release, not author testing (I
 	  practically never run tests with AUTHOR_TESTING=1).
@@ -48,12 +66,12 @@
 	- Replace JSON with JSON::MaybeXS.
 
 
-0.15    2016-01-03 (PERLANCAR)
+0.15    2016-01-03  Released-By: PERLANCAR
 
 	- Add subcommand: arguments.
 
 
-0.14    2015-12-01 (PERLANCAR)
+0.14    2015-12-01  Released-By: PERLANCAR
 
 	- [Bugfix] More SQL fixes, derp.
 
@@ -63,20 +81,20 @@
 	- functions: [ux] Show full function name when not in detail mode.
 
 
-0.13    2015-12-01 (PERLANCAR)
+0.13    2015-12-01  Released-By: PERLANCAR
 
 	- Bump database schema version 3->4 (also add 'dist' column to
 	  function).
 
 
-0.12    2015-12-01 (PERLANCAR)
+0.12    2015-12-01  Released-By: PERLANCAR
 
         - Rename dist from App-UpdateRinciMetadataDb to App-rimetadb. Will make
           the app a bit more general, e.g. to be used by
           Dist-Zilla-Plugin-Rinci-AddToDb.
 
 
-0.11    2015-09-03 (PERLANCAR)
+0.11    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -85,7 +103,7 @@
 	  requirement.
 
 
-0.10    2015-08-17 (PERLANCAR)
+0.10    2015-08-17  Released-By: PERLANCAR
 
         - Switch from Log::Any to Log::Any::IfLOG.
 
@@ -94,14 +112,14 @@
         - Add xt/author/sql_schema_versioned.t.
 
 
-0.09    2014-12-27 (PERLANCAR)
+0.09    2014-12-27  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace Module::Path with Module::Path::More.
 
 
-0.08    2014-12-05 (PERLANCAR)
+0.08    2014-12-05  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -109,7 +127,7 @@
 	  Package::MoreUtil.
 
 
-0.07    2014-09-12 (PERLANCAR)
+0.07    2014-09-12  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -123,14 +141,14 @@
            generated script is not as polished as it should be. Stay tuned.
 
 
-0.05    2014-07-04 (SHARYANTO)
+0.05    2014-07-04  Released-By: SHARYANTO
 
         - [Bugfix] Avoid the use of $_ for loose loops because something else
           might overwrite it (e.g. during module load(), for modules that don't
           quite behave).
 
 
-0.04    2014-07-04 (SHARYANTO)
+0.04    2014-07-04  Released-By: SHARYANTO
 
         [INCOMPATIBLE CHANGES]
 
@@ -153,18 +171,18 @@
           'Foo::Bar::' to exclude Foo::Bar as well as all packages under it).
 
 
-0.03    2014-06-20 (SHARYANTO)
+0.03    2014-06-20  Released-By: SHARYANTO
 
         - Test with MySQL (in addition to SQLite).
 
 
-0.02    2014-06-20 (SHARYANTO)
+0.02    2014-06-20  Released-By: SHARYANTO
 
         - Add option: --exclude.
 
         - Make use of progress indicator optional.
 
 
-0.01    2014-06-19 (SHARYANTO)
+0.01    2014-06-19  Released-By: SHARYANTO
 
         - First release.

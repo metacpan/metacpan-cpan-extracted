@@ -33,6 +33,7 @@ typedef struct Duk {
     duk_context* ctx;
     int pagesize_bytes;
     unsigned long flags;
+    HV* version;
     HV* stats;
     HV* msgs;
     size_t total_allocated_bytes;
@@ -80,5 +81,7 @@ SV* pl_eval(pTHX_ Duk* duk, const char* js, const char* file);
 int pl_run_gc(Duk* duk);
 
 SV* pl_global_objects(pTHX_ duk_context* ctx);
+
+HV* pl_get_version_info(pTHX);
 
 #endif

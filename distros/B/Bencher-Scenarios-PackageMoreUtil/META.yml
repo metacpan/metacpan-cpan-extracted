@@ -18,14 +18,14 @@ meta-spec:
   version: '1.4'
 name: Bencher-Scenarios-PackageMoreUtil
 requires:
-  Package::MoreUtil: '0'
+  Package::MoreUtil: '0.590'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Scenarios-PackageMoreUtil
   homepage: https://metacpan.org/release/Bencher-Scenarios-PackageMoreUtil
   repository: git://github.com/perlancar/perl-Bencher-Scenarios-PackageMoreUtil.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

@@ -56,5 +56,6 @@ t/20_references.t
 t/21_this_bug.t
 t/22_overflow.t
 t/23_dualvar.t
+t/24_version.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

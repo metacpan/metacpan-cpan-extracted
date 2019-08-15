@@ -4,11 +4,21 @@ Revision history for Geoffrey
 # Version: 0.000100  Date: 2019/08/05 (Mario Zieschang)
 #========================================================================
 
-* Ported from DBIx::Schema::Changelog.
+* Ported from DBIx::Schema::Changelog
 
 
 #========================================================================
 # Version: 0.000101  Date: 2019/08/06 (Mario Zieschang)
 #========================================================================
 
-* fixt test plans.
+* fix test plans
+
+#========================================================================
+# Version: 0.000102  Date: 2019/08/14 (Mario Zieschang)
+#========================================================================
+
+* transport schema throught environment
+* run not executed changessets
+* work to execute already stored but without md5hash
+
+

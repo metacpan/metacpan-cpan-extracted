@@ -1,4 +1,4 @@
-use Test::More tests => 17;
+use Test::More tests => 16;
 
 use DBI;
 use strict;
@@ -27,22 +27,18 @@ isa_ok( $object, 'Geoffrey::Action::Entry' );
 
 throws_ok { $object->add(); } 'Geoffrey::Exception::RequiredValue::TableName', 'Not supportet thrown';
 
-throws_ok { $object->add({table => "user"}); } 'Geoffrey::Exception::RequiredValue::TableColumn', 'Not supportet thrown';
+throws_ok { $object->add( { table => "user" } ); } 'Geoffrey::Exception::RequiredValue::Values', 'Not supportet thrown';
 
-throws_ok { $object->add( { table => "user", columns => [ 'name', 'client' ] } ); }
-'Geoffrey::Exception::RequiredValue::Values', 'Not supportet thrown';
-
-ok( $object->add( { table => "user", columns => [ 'name', 'client' ], values => [ [ 'test', 1 ] ] } ),
-    'Add entry test' );
+ok( $object->add( { table => "user", values => [ { name => 'test', client => 1 } ] } ), 'Add entry test' );
 
 is(
     $object->alter(
         '"user"',
-        [ 'client', 'name' ],
-        [ { column => 'name', operator => '=', value => q~'test'~, }, ],
-        [ [ '1', 'test_name', ], ],
+        { name => 'test', },
+        [ { client => 1, name => 'test_name' } ],
+
     ),
-    q~UPDATE "user" SET client = ?, name = ? WHERE ( name = 'test' )~,
+    q~UPDATE "user" SET client = ?, name = ? WHERE ( name = ? )~,
     'Alter entry test'
 );
 
@@ -54,7 +50,7 @@ is(
 
 $dbh->disconnect();
 
-throws_ok { $object->alter( '"user"', [ 'client', 'name' ], ); }
+throws_ok { $object->alter('"user"'); }
 'Geoffrey::Exception::RequiredValue::WhereClause', 'Not supportet thrown';
 
 throws_ok { $object->alter(); } 'Geoffrey::Exception::RequiredValue::TableName', 'Not supportet thrown';

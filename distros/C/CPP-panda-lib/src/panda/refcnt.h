@@ -8,6 +8,8 @@
 
 namespace panda {
 
+using std::nullptr_t;
+
 template <typename T>
 struct iptr {
     template <class U> friend struct iptr;
@@ -92,6 +94,26 @@ struct iptr {
 private:
     T* ptr;
 };
+
+template <class T1, class T2> inline bool operator== (const iptr<T1>& x, const iptr<T2>& y) { return x.get() == y.get(); }
+template <class T1, class T2> inline bool operator!= (const iptr<T1>& x, const iptr<T2>& y) { return x.get() != y.get(); }
+template <class T1, class T2> inline bool operator<  (const iptr<T1>& x, const iptr<T2>& y) { return x.get() < y.get(); }
+template <class T1, class T2> inline bool operator<= (const iptr<T1>& x, const iptr<T2>& y) { return x.get() <= y.get(); }
+template <class T1, class T2> inline bool operator>  (const iptr<T1>& x, const iptr<T2>& y) { return x.get() > y.get(); }
+template <class T1, class T2> inline bool operator>= (const iptr<T1>& x, const iptr<T2>& y) { return x.get() >= y.get(); }
+
+template <class T> inline bool operator== (const iptr<T>& x, nullptr_t) noexcept { return !x.get(); }
+template <class T> inline bool operator== (nullptr_t, const iptr<T>& x) noexcept { return !x.get(); }
+template <class T> inline bool operator!= (const iptr<T>& x, nullptr_t) noexcept { return x.get(); }
+template <class T> inline bool operator!= (nullptr_t, const iptr<T>& x) noexcept { return x.get(); }
+template <class T> inline bool operator<  (const iptr<T>& x, nullptr_t) noexcept { return x.get() < nullptr; }
+template <class T> inline bool operator<  (nullptr_t, const iptr<T>& x) noexcept { return nullptr < x.get(); }
+template <class T> inline bool operator<= (const iptr<T>& x, nullptr_t) noexcept { return x.get() <= nullptr; }
+template <class T> inline bool operator<= (nullptr_t, const iptr<T>& x) noexcept { return nullptr <= x.get(); }
+template <class T> inline bool operator>  (const iptr<T>& x, nullptr_t) noexcept { return x.get() > nullptr; }
+template <class T> inline bool operator>  (nullptr_t, const iptr<T>& x) noexcept { return nullptr > x.get(); }
+template <class T> inline bool operator>= (const iptr<T>& x, nullptr_t) noexcept { return x.get() >= nullptr; }
+template <class T> inline bool operator>= (nullptr_t, const iptr<T>& x) noexcept { return nullptr >= x.get(); }
 
 template <typename T, typename... Args>
 iptr<T> make_iptr (Args&&... args) {
@@ -234,7 +256,7 @@ void swap(weak_iptr<T>& a, weak_iptr<T>& b) noexcept { a.swap(b); }
 
 template <class T> struct _weak_t;
 template <class T> struct _weak_t<iptr<T>> {
-    using type = weak_iptr<T>;;
+    using type = weak_iptr<T>;
 };
 
 template <typename T>

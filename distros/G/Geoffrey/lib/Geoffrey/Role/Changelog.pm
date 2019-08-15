@@ -5,7 +5,7 @@ use 5.016;
 use strict;
 use warnings;
 
-$Geoffrey::Role::Changelog::VERSION = '0.000101';
+$Geoffrey::Role::Changelog::VERSION = '0.000102';
 
 sub new {
     my $class = shift;
@@ -55,7 +55,7 @@ Geoffrey::Role::Changelog - Abstract file class.
 
 =head1 VERSION
 
-Version 0.000101
+Version 0.000102
 
 =head1 DESCRIPTION
 

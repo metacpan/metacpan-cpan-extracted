@@ -1,0 +1,60 @@
+=head1 NAME
+
+Geo::Geos::Noding::SingleInteriorIntersectionFinder - inds an interior intersection in a set of SegmentString, if one exists.
+
+=head1 SYNOPSIS
+
+    use Geo::Geos::Coordinate;
+    use Geo::Geos::PrecisionModel;
+    use Geo::Geos::Noding::BasicSegmentString;
+    use Geo::Geos::Noding::IntersectionAdder;
+
+    my $c1 = Geo::Geos::Coordinate->new(0,1);
+    my $c2 = Geo::Geos::Coordinate->new(1,1);
+
+    my $c2_2 = Geo::Geos::Coordinate->new(1,0);
+    my $c2_1 = Geo::Geos::Coordinate->new(1,2);
+    my $pm = Geo::Geos::PrecisionModel->new;
+
+    my $ss1 = Geo::Geos::Noding::BasicSegmentString->new([$c1, $c2]);
+    my $ss2 = Geo::Geos::Noding::BasicSegmentString->new([$c2_1, $c2_2]);
+
+    my $li = Geo::Geos::Algorithm::LineIntersector->new($pm);
+
+    my $sid = Geo::Geos::Noding::SingleInteriorIntersectionFinder->new($li); # => isa 'Geo::Geos::Noding::SingleInteriorIntersectionFinder'
+    Geo::Geos::Noding::SingleInteriorIntersectionFinder->new($li);           # => isa 'Geo::Geos::Noding::SegmentIntersector'
+
+    $sid->isDone;   # => ''
+
+    $sid->processIntersections($ss1, 0, $ss2, 0);
+    my $r1 = $sid->isDone;              # => success
+    my $r2 = $sid->hasIntersection;     # => success
+
+    my $c = $sid->getInteriorIntersection;  # => is Geo::Geos::Coordinate->new(1, 1)
+    $sid->getIntersectionSegments->[0];     # => isa 'Geo::Geos::Coordinate'
+
+=head1 SEE ALSO (C++ classes docs)
+
+L<GEOS C++ Library|https://trac.osgeo.org/geos>
+
+geos::noding::IntersectionAdder
+
+=head1 SEE ALSO
+
+L<Geo::Geos>
+
+L<Geo::Geos::Algorithm::LineIntersector>
+
+L<Geo::Geos::Noding::NodedSegmentString>
+
+L<Geo::Geos::Noding::SegmentIntersector>
+
+=head1 AUTHOR
+
+Ivan Baidakou <i.baydakov@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

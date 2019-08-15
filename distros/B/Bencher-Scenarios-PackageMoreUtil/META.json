@@ -29,7 +29,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Package::MoreUtil" : "0",
+            "Package::MoreUtil" : "0.590",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -64,7 +64,7 @@
          "web" : "https://github.com/perlancar/perl-Bencher-Scenarios-PackageMoreUtil"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

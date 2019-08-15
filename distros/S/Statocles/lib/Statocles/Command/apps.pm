@@ -1,5 +1,5 @@
 package Statocles::Command::apps;
-our $VERSION = '0.093';
+our $VERSION = '0.094';
 # ABSTRACT: List the apps in the site
 
 use Statocles::Base 'Command';
@@ -30,7 +30,7 @@ Statocles::Command::apps - List the apps in the site
 
 =head1 VERSION
 
-version 0.093
+version 0.094
 
 =head1 AUTHOR
 

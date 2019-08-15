@@ -41,6 +41,8 @@ t/dispatcher.cc
 t/dispatcher.t
 t/endian.cc
 t/endian.t
+t/excepted.cc
+t/excepted.t
 t/from_chars.cc
 t/from_chars.t
 t/function.cc

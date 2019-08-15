@@ -1,0 +1,164 @@
+=head1 NAME
+
+Geo::Geos::Geometry - Basic implementation of Geometry
+
+=head1 SYNOPSIS
+
+    use Geo::Geos::Coordinate;
+    use Geo::Geos::Dimension;
+    use Geo::Geos::Geometry;
+    use Geo::Geos::GeometryFactory;
+
+    my $gf = Geo::Geos::GeometryFactory::create();
+
+    my $c1 = Geo::Geos::Coordinate->new(1,2);
+    my $c2 = Geo::Geos::Coordinate->new(5,2);
+    my $c3 = Geo::Geos::Coordinate->new(5,0);
+    my $c4 = Geo::Geos::Coordinate->new(1,0);
+
+    my $g0 = $gf->createLinearRing([$c1, $c2, $c3, $c4, $c1], 2);   # => isa 'Geo::Geos::Geometry'
+    my $g1 = $gf->createPolygon($g0);                               # => isa 'Geo::Geos::Geometry'
+
+    $g1->isSimple;                  # => success
+    $g1->getNumPoints;              # => 5;
+    $g1->getDimension;              # => TYPE_A
+    $g1->getCoordinateDimension;    # => 2
+    $g1->getCoordinate;             # => isa 'Geo::Geos::Coordinate'
+
+    $g1->setSRID(5);
+    $g1->getSRID;       # => 5
+
+    $g1->getArea;    # => 8;
+    $g1->getLength;  # => 12;
+    $g1->clone;      # => isa 'Geo::Geos::Geometry'
+
+    $g1->distance($g0);                 # => 0
+    $g1->isWithinDistance($g1, 0.1);    # => success
+
+    $g1->getGeometryType;   # => is 'Polygon'
+    $g1->getGeometryTypeId; # => is TYPE_GEOS_POLYGON
+
+    $g1->getBoundary;           # => isa 'Geo::Geos::Geometry'
+    $g1->getBoundaryDimension;  # => 1
+
+    $g1->equalsExact($g1);      # => success
+    $g1->equalsExact($g1, 1.2); # => success
+    $g1->compareTo($g1);        # => 0
+
+    $g1->getNumGeometries;              # => 1;
+    $g1->getGeometryN(0);               # => isa 'Geo::Geos::Geometry'
+    my $r = ref($g1->getCoordinates);   # => 'ARRAY'
+    $g1->getCoordinate;                 # => isa 'Geo::Geos::Coordinate'
+
+    $g1->getPrecisionModel->isFloating;     # => success
+
+    $g1->getCentroid->getGeometryType;      # => 'Point'
+    $g1->getInteriorPoint->getGeometryType; # => 'Point'
+
+    # operations
+    $g1->symDifference($g1);    # => isa 'Geo::Geos::Geometry'
+    $g1->difference($g1);       # => isa 'Geo::Geos::Geometry'
+    $g1->Union($g1);            # => isa 'Geo::Geos::Geometry'
+    $g1->intersection($g1);     # => isa 'Geo::Geos::Geometry'
+
+    $g1->convexHull;    # => isa 'Geo::Geos::Geometry'
+
+    $g1->buffer(1);                     # => isa 'Geo::Geos::Geometry'
+    $g1->buffer(1, 2);                  # => isa 'Geo::Geos::Geometry'
+    $g1->buffer(1, 3, TYPE_CAP_FLAT);   # => isa 'Geo::Geos::Geometry'
+
+    $g1->toText;    # => like qr/POLYGON/
+    $g1->toString;  # => like qr/POLYGON/
+
+    # relations
+    $g1->covers($g1);       # => success
+    $g1->coveredBy($g1);    # => success
+    $g1->equals($g1);       # => success
+    $g1->overlaps($g1);     # => ''
+    $g1->contains($g1);     # => success
+    $g1->within($g1);       # => success
+    $g1->crosses($g1);      # => ''
+    $g1->intersects($g1);   # => success
+    $g1->touches($g1);      # => ''
+    $g1->disjoint($g1);     # => ''
+
+    $g1->getEnvelope;       # => isa 'Geo::Geos::Geometry'
+    $g1->isRectangle;       # => success
+    $g1->isValid;           # => success
+    $g1->isEmpty;           # => ''
+    $g1->isSimple;          # => success
+
+    $g1->relate($g1);       # => isa 'Geo::Geos::IntersectionMatrix'
+    $g1->normalize;
+
+=head1 SEE ALSO (C++ classes docs)
+
+L<GEOS C++ Library|https://trac.osgeo.org/geos>
+
+geos::geom::Geometry
+
+=head1 EXPORTS CONSTANTS
+
+=over 2
+
+=item TYPE_GEOS_POINT
+
+=item TYPE_GEOS_LINESTRING
+
+=item TYPE_GEOS_LINEARRING
+
+=item TYPE_GEOS_POLYGON
+
+=item TYPE_GEOS_MULTIPOINT
+
+=item TYPE_GEOS_MULTILINESTRING
+
+=item TYPE_GEOS_MULTIPOLYGON
+
+=item TYPE_GEOS_GEOMETRYCOLLECTION
+
+=item TYPE_CAP_ROUND
+
+=item TYPE_CAP_FLAT
+
+=item TYPE_CAP_SQUARE
+
+=back
+
+=head1 SEE ALSO
+
+L<Geo::Geos::Coordinate>
+
+L<Geo::Geos::Dimension>
+
+L<Geo::Geos::Envelope>
+
+L<Geo::Geos::GeometryFactory>
+
+L<Geo::Geos::GeometryCollection>
+
+L<Geo::Geos::LinearRing>
+
+L<Geo::Geos::LineString>
+
+L<Geo::Geos::MultiLineString>
+
+L<Geo::Geos::MultiPoint>
+
+L<Geo::Geos::MultiPolygon>
+
+L<Geo::Geos::Point>
+
+L<Geo::Geos::Polygon>
+
+L<Geo::Geos::Prep::Geometry>
+
+=head1 AUTHOR
+
+Ivan Baidakou <i.baydakov@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

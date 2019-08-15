@@ -23,7 +23,7 @@ exit
 # Copyright (c) 2008, 2009, 2010, 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-$VERSIONE = '0.17';
+$VERSIONE = '0.18';
 $VERSIONE = $VERSIONE;
 use strict;
 use FindBin;
@@ -199,11 +199,18 @@ for my $target (@ARGV) {
             File::Copy           2.02
             File::Path           1.0401
             FindBin              1.42
+            IOas::CP932          0.04
+            IOas::CP932IBM       0.04
+            IOas::CP932NEC       0.04
+            IOas::CP932NEC         0.04
+            IOas::SJIS2004       0.04
             Jacode4e::RoundTrip  2.13.81.7
-            perl                 5.005_03
+            UTF8::R2             0.03
             strict               1.01
         ));
-        my %requires = ();
+        my %requires = (qw(
+            perl                 5.005_03
+        ));
         my %provides = ();
         for my $file (grep /\.(pl|pm|t|bat)\z/i, @file) {
             if (open FILE, $file) {

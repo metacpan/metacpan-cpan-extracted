@@ -40,6 +40,8 @@ class V8Context {
 
         int run_gc();
 
+        HV* get_version_info();
+
         HV* get_stats();
         void reset_stats();
 
@@ -51,6 +53,7 @@ class V8Context {
         Persistent<ObjectTemplate>* persistent_template;
 
         uint64_t flags;
+        HV* version;
         HV* stats;
         HV* msgs;
         long pagesize_bytes;
@@ -69,6 +72,7 @@ class V8Context {
 
         void set_up();
         void tear_down();
+        void GetVersionInfo();
 };
 
 #endif

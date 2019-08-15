@@ -3,7 +3,7 @@ package Specio::Constraint::Role::DoesType;
 use strict;
 use warnings;
 
-our $VERSION = '0.43';
+our $VERSION = '0.44';
 
 use Role::Tiny;
 use Scalar::Util qw( blessed );
@@ -109,7 +109,7 @@ Specio::Constraint::Role::DoesType - Provides a common implementation for Specio
 
 =head1 VERSION
 
-version 0.43
+version 0.44
 
 =head1 DESCRIPTION
 
@@ -132,7 +132,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2018 by Dave Rolsky.
+This software is Copyright (c) 2012 - 2019 by Dave Rolsky.
 
 This is free software, licensed under:
 

@@ -27,6 +27,7 @@ lib/App/Yath/Command/times.pm
 lib/App/Yath/Command/watch.pm
 lib/App/Yath/Command/which.pm
 lib/App/Yath/Plugin.pm
+lib/App/Yath/Plugin/Git.pm
 lib/App/Yath/Util.pm
 lib/Test2/Formatter/QVF.pm
 lib/Test2/Formatter/Stream.pm
@@ -72,9 +73,11 @@ lib/Test2/Harness/Util/Term.pm
 lib/Test2/Harness/Util/TestFile.pm
 lib/Test2/Harness/Util/UUID.pm
 lib/Test2/Harness/Watcher.pm
+lib/Test2/Plugin/DBIProfile.pm
 lib/Test2/Plugin/MemUsage.pm
 lib/Test2/Plugin/UUID.pm
 lib/Test2/Tools/HarnessTester.pm
+log.jsonl
 scripts/yath
 t/App/Yath.t
 t/App/Yath/Command.t

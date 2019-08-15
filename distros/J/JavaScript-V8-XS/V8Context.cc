@@ -1,4 +1,5 @@
 #include <unistd.h>
+#include <v8-version.h>
 #include "libplatform/libplatform.h"
 #include "pl_util.h"
 #include "pl_v8.h"
@@ -33,6 +34,7 @@ V8Context::V8Context(HV* opt)
       persistent_context(0),
       persistent_template(0),
       flags(0),
+      version(0),
       stats(0),
       msgs(0),
       pagesize_bytes(0),
@@ -221,6 +223,14 @@ int V8Context::run_gc()
     int ret = pl_run_gc(this);
     pl_stats_stop(aTHX_ this, &perf, "run_gc");
     return ret;
+}
+
+HV* V8Context::get_version_info()
+{
+    if (!version) {
+        GetVersionInfo();
+    }
+    return version;
 }
 
 HV* V8Context::get_stats()
@@ -444,4 +454,59 @@ uint64_t V8Context::GetTypeFlags(const Local<Value>& v)
     if (v->IsWeakMap()          ) result |= 0x0000080000000000;
     if (v->IsWeakSet()          ) result |= 0x0000100000000000;
     return result;
+}
+
+static void add_hash_key(HV* hash, const char* key, int val)
+{
+    STRLEN klen = strlen(key);
+    SV* pval = sv_2mortal(newSVnv(val));
+    if (hv_store(hash, key, klen, pval, 0)) {
+        SvREFCNT_inc(pval);
+    }
+    else {
+        croak("Could not create numeric entry %s=%d in hash\n", key, val);
+    }
+}
+
+static void add_hash_key(HV* hash, const char* key, const char* val)
+{
+    STRLEN klen = strlen(key);
+    STRLEN vlen = strlen(val);
+    SV* pval = sv_2mortal(newSVpv(val, vlen));
+    if (hv_store(hash, key, klen, pval, 0)) {
+        SvREFCNT_inc(pval);
+    }
+    else {
+        croak("Could not create string entry %s=[%s] in hash\n", key, val);
+    }
+}
+
+void V8Context::GetVersionInfo()
+{
+    static struct version_info {
+        const char* field;
+        int value;
+        int skip_zero;
+    } VersionInfo[] = {
+        { "major", V8_MAJOR_VERSION, 0 },
+        { "minor", V8_MINOR_VERSION, 0 },
+        { "build", V8_BUILD_NUMBER , 0 },
+        { "patch", V8_PATCH_LEVEL  , 1 },
+    };
+
+    version = newHV();
+    char buf[100];
+    int pos = 0;
+    for (unsigned int j = 0; j < sizeof(VersionInfo) / sizeof(VersionInfo[0]); ++j) {
+        int value = VersionInfo[j].value;
+        add_hash_key(version, VersionInfo[j].field, value);
+        if (!value && VersionInfo[j].skip_zero) {
+            continue;
+        }
+        if (pos > 0) {
+            buf[pos++] = '.';
+        }
+        pos += sprintf(buf + pos, "%d", value);
+    }
+    add_hash_key(version, "version", buf);
 }

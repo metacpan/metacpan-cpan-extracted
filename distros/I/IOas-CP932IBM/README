@@ -8,7 +8,7 @@ SYNOPSIS
 
 DESCRIPTION
 
-  IOas::CP932IBM module provides CP932IBM I/O subroutines for UTF-8 script for
+  IOas::CP932IBM module provides CP932IBM I/O subroutines in UTF-8 script for
   stable scripting environment, using no utf8 pragma, no UTF-8 flag.
 
 SUBROUTINES
@@ -16,7 +16,7 @@ SUBROUTINES
   Octet Length as I/O Encoding
     IOas::CP932IBM::length($utf8str)
     IOas::CP932IBM::sprintf($utf8format, @utf8list)
-    IOas::CP932IBM::substr($utf8expr, $offset_as_cp932x, $length_as_cp932x, $utf8replacement)
+    IOas::CP932IBM::substr($utf8expr, $offset_as_cp932ibm, $length_as_cp932ibm, $utf8replacement)
 
   String Comparison as I/O Encoding
     IOas::CP932IBM::cmp($utf8str_a, $utf8str_b)

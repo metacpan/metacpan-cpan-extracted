@@ -1,5 +1,5 @@
 package Statocles::Document;
-our $VERSION = '0.093';
+our $VERSION = '0.094';
 # ABSTRACT: Base class for all Statocles documents
 
 use Statocles::Base 'Class';
@@ -7,7 +7,7 @@ with 'Statocles::Role::PageAttrs';
 use Statocles::Image;
 use Statocles::Util qw( derp );
 use YAML ();
-use JSON::PP qw( decode_json );
+use JSON::PP;
 
 #pod =attr path
 #pod
@@ -402,7 +402,7 @@ sub parse_content {
             $json = join "\n", splice( @lines, 0, $i+1 );
         }
         eval {
-            %doc = %{ decode_json( $json ) };
+            %doc = %{ JSON::PP->new()->utf8(0)->decode( $json ) };
         };
         if ( $@ ) {
             die qq{Error parsing JSON: $@\n};
@@ -469,7 +469,7 @@ Statocles::Document - Base class for all Statocles documents
 
 =head1 VERSION
 
-version 0.093
+version 0.094
 
 =head1 DESCRIPTION
 

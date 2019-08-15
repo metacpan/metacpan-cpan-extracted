@@ -29,11 +29,13 @@ WriteMakefile(
 		'JSON::XS' => 0,
 	},
 	"TEST_REQUIRES" => {
-		"Config" => 0,
-		"Email::Sender::Transport::Mbox" => 0,
-		"Path::Tiny" => "0.060",
-		"Test::Requires::Git" => 0,
-		"lib" => 0
+		'Config' => 0,
+		'Email::Sender::Transport::Mbox' => 0,
+		'Path::Tiny' => "0.060",
+		'Test::More' => 0,
+		'Test::Requires::Git' => 0,
+		'FindBin' => 0,
+		'lib' => 0
 	},
 	EXE_FILES                => [],
 	"test" => {

@@ -3,7 +3,7 @@ meta-spec:
   version: 1.4
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
 name: IOas-CP932IBM
-version: 0.04
+version: 0.05
 abstract: provides CP932IBM I/O subroutines for UTF-8 script
 author:
   - ina <ina@cpan.org>
@@ -20,6 +20,7 @@ requires:
   Socket: 0
   Symbol: 0
   lib: 0
+  perl: 5.005_03
   strict: 1.01
   vars: 0
 build_requires:

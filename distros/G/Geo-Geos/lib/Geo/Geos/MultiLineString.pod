@@ -1,0 +1,53 @@
+=head1 NAME
+
+Geo::Geos::MultiLineString - Models a collection of LineStrings.
+
+=head1 SYNOPSIS (class-specific methods)
+
+    use Geo::Geos::Coordinate;
+    use Geo::Geos::GeometryFactory;
+
+    my $c11 = Geo::Geos::Coordinate->new(1,2);
+    my $c12 = Geo::Geos::Coordinate->new(5,2);
+    my $c21 = Geo::Geos::Coordinate->new(10,2);
+    my $c22 = Geo::Geos::Coordinate->new(15,2);
+    my $gf = Geo::Geos::GeometryFactory::create();
+
+    my $l1 = $gf->createLineString([$c11, $c21], 2);
+    my $l2 = $gf->createLineString([$c21, $c22], 2);
+    my $mls = $gf->createMultiLineString([$l1, $l2]);   # => isa 'Geo::Geos::MultiLineString'
+    $gf->createMultiLineString([$l1, $l2]);             # => isa 'Geo::Geos::GeometryCollection'
+    $gf->createMultiLineString([$l1, $l2]);             # => isa 'Geo::Geos::Lineal'
+
+    $mls->isClosed;     # => success
+    $mls->reverse;      # => isa 'Geo::Geos::Geometry'
+
+=head1 DESCRIPTION
+
+See methods in the base class L<Geo::Geos::Geometry>.
+
+=head1 SEE ALSO (C++ classes docs)
+
+L<GEOS C++ Library|https://trac.osgeo.org/geos>
+
+geos::geom::MultiLineString
+
+=head1 SEE ALSO
+
+L<Geo::Geos>
+
+L<Geo::Geos::Geometry>
+
+L<Geo::Geos::GeometryCollection>
+
+L<Geo::Geos::GeometryFactory>
+
+=head1 AUTHOR
+
+Ivan Baidakou <i.baydakov@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

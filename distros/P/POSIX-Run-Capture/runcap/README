@@ -1,0 +1,68 @@
+#+TITLE: runcap
+
+* Overview
+
+The function *runcap* runs an external command, and waits for its
+termination, optionally capturing its standard output and standard
+error streams, and piping data to its standard input.
+
+* Building as a standalone library
+
+The following steps will build the project as a standalone installable
+library:
+
+1. Configure the package
+  #+BEGIN_SRC shell-script
+    ./configure
+  #+END_SRC
+2. Build the project.
+  #+BEGIN_SRC shell-script
+    make
+  #+END_SRC
+3. Install the files (normally run as root).
+  #+BEGIN_SRC shell-script
+    make install
+  #+END_SRC
+  
+  This will install the files *libruncap.so* and *libruncap.a* to the
+  system library directory, and the header file *runcap.h* to the
+  system include directory.
+
+* Incorporating as a submodule
+
+To incorporate *runcap* as a submodule to your project, follow these
+steps:
+
+1. Change to your project's toplevel directory.
+2. Clone the project.
+  #+BEGIN_SRC shell-script
+    git submodule add git://git.gnu.org.ua/runcap.git
+    git submodule init
+  #+END_SRC
+3. Add it to *git* index:
+  #+BEGIN_SRC shell-script
+    git add runcap
+  #+END_SRC
+4. Add it to your toplevel *Makefile.am*. 
+  #+BEGIN_SRC make
+    ACLOCAL_AMFLAGS = -I runcap
+
+    SUBDIRS = runcap
+  #+END_SRC
+5. Edit your *configure.ac*
+  #+BEGIN_SRC automake
+    RUNCAP_SETUP
+  #+END_SRC
+6. 
+  #+BEGIN_SRC make
+    AM_CPPFLAGS = @RUNCAP_INC@
+    AM_LDADD = @RUNCAP_LDADD@
+  #+END_SRC
+
+
+# Local Variables:
+# mode: org
+# paragraph-separate: "[ 	^L]*$"
+# version-control: never
+# End:
+

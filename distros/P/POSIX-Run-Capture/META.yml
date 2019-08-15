@@ -20,10 +20,10 @@ no_index:
 provides:
   POSIX::Run::Capture:
     file: lib/POSIX/Run/Capture.pm
-    version: '0.02'
+    version: '1.00'
 requires:
   perl: '5.006'
 resources:
   repository: git://git.gnu.org.ua/posixruncapture.git
-version: '0.02'
+version: '1.00'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

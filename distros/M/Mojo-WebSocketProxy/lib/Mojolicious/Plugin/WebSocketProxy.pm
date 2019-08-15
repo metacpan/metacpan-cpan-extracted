@@ -8,10 +8,12 @@ use Mojo::WebSocketProxy::Backend;
 use Mojo::WebSocketProxy::Config;
 use Mojo::WebSocketProxy::Dispatcher;
 
+use Log::Any qw($log);
+
 # Other backend types may be available; we default to 'jsonrpc' in the code below
 use Mojo::WebSocketProxy::Backend::JSONRPC;
 
-our $VERSION = '0.11';    ## VERSION
+our $VERSION = '0.12';    ## VERSION
 
 sub register {
     my ($self, $app, $config) = @_;
@@ -36,6 +38,10 @@ sub register {
                 message => $message
             };
             $error->{details} = $details if ref($details) eq 'HASH' && keys %$details;
+
+            if ($details && ref($details) ne 'HASH') {
+                $log->debugf("Details in a websocket error must be a hash reference instead of a %s", ref($details));
+            }
 
             return {
                 msg_type => $msg_type,

@@ -11,7 +11,7 @@ package IOas::CP932X;
 use 5.00503;    # Galapagos Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.04';
+$VERSION = '0.05';
 $VERSION = $VERSION;
 
 use strict;
@@ -167,6 +167,7 @@ IOas::CP932X - provides CP932X I/O subroutines for UTF-8 script
   --------------------------------------------------------
   count by    count by              count by octet
   octet       UTF-8 codepoint       in I/O encoding
+  (useful)    (not so useful)       (useful)
   --------------------------------------------------------
   length      UTF8::R2::length      IOas::CP932X::length
   sprintf                           IOas::CP932X::sprintf
@@ -192,11 +193,11 @@ IOas::CP932X - provides CP932X I/O subroutines for UTF-8 script
 =head1 I/O Operations
 
   --------------------------------------------------------
-  raw I/O     I/O operations        I/O operations
-  operations  in UTF-8 encoding     with encoding convert
+  raw I/O       I/O operations      I/O operations
+  operations    in UTF-8 encoding   with encoding convert
   --------------------------------------------------------
-  getc        UTF8::R2::getc        IOas::CP932X::getc
-  <FILE>                            IOas::CP932X::readline
+  getc          UTF8::R2::getc      IOas::CP932X::getc
+  <FILEHANDLE>                      IOas::CP932X::readline
   print                             IOas::CP932X::print
   printf                            IOas::CP932X::printf
   --------------------------------------------------------

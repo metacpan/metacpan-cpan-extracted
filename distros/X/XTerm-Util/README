@@ -2,7 +2,7 @@ NAME
     XTerm::Util - Utility routines for xterm-compatible terminal (emulator)s
 
 VERSION
-    This document describes version 0.004 of XTerm::Util (from Perl
+    This document describes version 0.005 of XTerm::Util (from Perl
     distribution XTerm-Util), released on 2019-07-12.
 
 SYNOPSIS
@@ -157,6 +157,8 @@ FUNCTIONS
 
     Return value: (any)
 
+ENVIRONMENT
+  COLORFGBG
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/XTerm-Util>.

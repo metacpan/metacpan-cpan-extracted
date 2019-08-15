@@ -1,5 +1,5 @@
 package Statocles::Template;
-our $VERSION = '0.093';
+our $VERSION = '0.094';
 # ABSTRACT: A template object to pass around
 
 use Statocles::Base 'Class';
@@ -78,8 +78,21 @@ has _template => (
     lazy => 1,
     default => sub {
         my ( $self ) = @_;
+        my %config;
+        if ( $self->theme ) {
+            %config = map { $_ => $self->theme->$_ }
+                grep { $self->theme->$_ }
+                qw(
+                    tag_start tag_end
+                    line_start trim_mark
+                    replace_mark expression_mark
+                    escape_mark comment_mark
+                    capture_start capture_end
+                );
+        }
         my $t = Mojo::Template->new(
             name => $self->path,
+            %config,
         );
         $t->parse( $self->content );
         return $t;
@@ -156,7 +169,7 @@ sub render {
             my ( $text, %extra_args ) = @_;
             die "Cannot use markdown helper: No site object given to template"
                 unless exists $args{site};
-            return $args{site}->markdown->markdown( $text );
+            return $args{site}->markdown->markdown( ref $text eq 'CODE' ? $text->() : $text );
         };
 
         local *{"@{[$t->namespace]}::content"} = sub {
@@ -301,7 +314,7 @@ Statocles::Template - A template object to pass around
 
 =head1 VERSION
 
-version 0.093
+version 0.094
 
 =head1 DESCRIPTION
 

@@ -1,0 +1,46 @@
+=head1 NAME
+
+Geo::Geos::MultiPoint - Models a collection of Point objects.
+
+=head1 SYNOPSIS (class-specific methods)
+
+    use Geo::Geos::Coordinate;
+    use Geo::Geos::GeometryFactory;
+
+    my $c1 = Geo::Geos::Coordinate->new(1,2);
+    my $c2 = Geo::Geos::Coordinate->new(5,2);
+    my $gf = Geo::Geos::GeometryFactory::create();
+
+    $gf->createMultiPoint([$c1, $c2], 2);   # => isa 'Geo::Geos::MultiLineString'
+    $gf->createMultiPoint([$c1, $c2], 2);   # => isa 'Geo::Geos::Puntal'
+    $gf->createMultiPoint([$c1, $c2], 2);   # => isa 'Geo::Geos::GeometryCollection'
+
+=head1 DESCRIPTION
+
+See methods in the base class L<Geo::Geos::Geometry>.
+
+=head1 SEE ALSO (C++ classes docs)
+
+L<GEOS C++ Library|https://trac.osgeo.org/geos>
+
+geos::geom::MultiPoint
+
+=head1 SEE ALSO
+
+L<Geo::Geos>
+
+L<Geo::Geos::Geometry>
+
+L<Geo::Geos::GeometryCollection>
+
+L<Geo::Geos::GeometryFactory>
+
+=head1 AUTHOR
+
+Ivan Baidakou <i.baydakov@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

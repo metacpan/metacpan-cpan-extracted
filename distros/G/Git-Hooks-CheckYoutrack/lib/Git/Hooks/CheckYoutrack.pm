@@ -14,7 +14,7 @@ use LWP::UserAgent;
 use URI::Builder;
 use JSON::XS;
 
-$Git::Hooks::CheckYoutrack::VERSION = '1.0.0';
+$Git::Hooks::CheckYoutrack::VERSION = '1.0.1';
 
 =head1 NAME
 
@@ -142,6 +142,15 @@ sub _show_error {
 }
 
 # =========================================================================== #
+
+=head2 B<update>
+
+This hook is for remote repository and should be installed and configured at the remote git server.
+Checks for youtrack ticket on each commit message pushed to the remote repository and deny push
+if its not found and its required = true in the config, shows a warning message on client side 
+if config required = false but accepts the push.
+
+=cut
 
 sub check_affected_refs {
     my ($git) = @_;
@@ -381,6 +390,39 @@ sub _get_youtrack_id {
 
 # =========================================================================== #
 
+=head1 USAGE INSTRUCTION
+
+Create a generic script that will be invoked by Git for every hook. Go to hooks directory of your repository,
+for local repository it is .git/hooks/ and for remote server it is ./hooks/ and create a simple executable perl script
+
+    $ cd /path/to/repo/.git/hooks
+ 
+    $ cat >git-hooks.pl <<'EOT'
+    #!/usr/bin/env perl
+    use Git::Hooks;
+    run_hook($0, @ARGV);
+    EOT
+ 
+    $ chmod +x git-hooks.pl
+
+Now you should create symbolic links pointing to this perl script for each hook you are interested in
+
+For local repository
+
+    $ cd /path/to/repo/.git/hooks
+
+    $ ln -s git-hooks.pl commit-msg
+    $ ln -s git-hooks.pl applypatch-msg
+    $ ln -s git-hooks.pl prepare-commit-msg
+
+For remote repository
+
+    $ cd /path/to/repo/hooks
+
+    $ ln -s git-hooks.pl update
+
+=cut
+
 # Install hooks via Git::Hooks
 APPLYPATCH_MSG \&check_message_file;
 COMMIT_MSG \&check_message_file;
@@ -397,11 +439,9 @@ __END__
 
 Git::Hooks
 
-Git::Hooks::CheckJira
-
 =head1 AUTHORS
 
-Dinesh Dharmalingam, <dinesh@exceleron.com>
+Dinesh Dharmalingam, <dd.dinesh.rajakumar@gmail.com>
 
 =head1 LICENSE
 

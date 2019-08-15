@@ -1,0 +1,15 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::WKTReader
+PROTOTYPES: DISABLE
+
+Sv read(std::string in, SV* geometry_factory = NULL) {
+    Geometry* g;
+    if (geometry_factory) {
+        WKTReader r(xs::in<GeometryFactory&>(geometry_factory));
+        g = r.read(in);
+    }
+    else {
+        WKTReader r;
+        g = r.read(in);
+    }
+    RETVAL = Helper::uplift(g);
+}

@@ -5,7 +5,7 @@
       "Thomas R. Wyant, III <wyant at cpan dot org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -43,7 +43,7 @@
    "provides" : {
       "DateTime::Calendar::Julian" : {
          "file" : "lib/DateTime/Calendar/Julian.pm",
-         "version" : "0.100"
+         "version" : "0.101"
       }
    },
    "release_status" : "stable",
@@ -61,6 +61,6 @@
          "web" : "https://github.com/trwyant/perl-DateTime-Calendar-Julian"
       }
    },
-   "version" : "0.100",
-   "x_serialization_backend" : "JSON::PP version 4.00"
+   "version" : "0.101",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

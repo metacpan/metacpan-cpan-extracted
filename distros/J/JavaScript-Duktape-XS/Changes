@@ -1,3 +1,6 @@
+0.000078    2019-08-14
+            * Add possibility to retrieve Duktape version information.
+
 0.000077    2019-06-28
             * Prefer string value for dualvars.
             * Fix error: "Don't know how to deal with an undetermined Perl

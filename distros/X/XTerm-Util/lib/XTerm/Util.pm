@@ -1,7 +1,7 @@
 package XTerm::Util;
 
 our $DATE = '2019-07-12'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -262,7 +262,7 @@ XTerm::Util - Utility routines for xterm-compatible terminal (emulator)s
 
 =head1 VERSION
 
-This document describes version 0.004 of XTerm::Util (from Perl distribution XTerm-Util), released on 2019-07-12.
+This document describes version 0.005 of XTerm::Util (from Perl distribution XTerm-Util), released on 2019-07-12.
 
 =head1 SYNOPSIS
 
@@ -444,6 +444,10 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
+=head1 ENVIRONMENT
+
+=head2 COLORFGBG
 
 =head1 HOMEPAGE
 

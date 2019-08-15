@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -47,6 +47,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v1.2.9",
+   "version" : "v1.2.10",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

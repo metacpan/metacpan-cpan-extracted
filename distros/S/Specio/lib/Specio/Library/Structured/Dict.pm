@@ -3,11 +3,12 @@ package Specio::Library::Structured::Dict;
 use strict;
 use warnings;
 
-our $VERSION = '0.43';
+our $VERSION = '0.44';
 
 use Carp qw( confess );
 use List::Util ();
 use Scalar::Util qw( blessed );
+use Specio::Helpers qw( perlstring );
 use Specio::Library::Builtins;
 use Specio::TypeChecks qw( does_role );
 
@@ -83,8 +84,8 @@ sub _structured_inline_generator {
     my @code = sprintf( '( %s )', $hashref->_inline_check($val) );
 
     for my $k ( sort keys %{ $args{kv} } ) {
-        my $p = $args{kv}{$k};
-        my $access = sprintf( '%s->{%s}', $val, B::perlstring($k) );
+        my $p      = $args{kv}{$k};
+        my $access = sprintf( '%s->{%s}', $val, perlstring($k) );
 
         if ( !blessed($p) ) {
             my $type = $p->{optional};
@@ -106,7 +107,7 @@ sub _structured_inline_generator {
         push @code,
             sprintf(
             $check,
-            ( join ', ', map { B::perlstring($_) } keys %{ $args{kv} } ),
+            ( join ', ', map { perlstring($_) } keys %{ $args{kv} } ),
             $args{slurpy}->_inline_check( sprintf( '%s->{$_}', $val ) ),
             $val,
             );
@@ -131,7 +132,7 @@ Specio::Library::Structured::Dict - Guts of Dict structured type
 
 =head1 VERSION
 
-version 0.43
+version 0.44
 
 =head1 DESCRIPTION
 
@@ -155,7 +156,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2018 by Dave Rolsky.
+This software is Copyright (c) 2012 - 2019 by Dave Rolsky.
 
 This is free software, licensed under:
 

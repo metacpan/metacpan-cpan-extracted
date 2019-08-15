@@ -1,0 +1,47 @@
+=head1 NAME
+
+Geo::Geos::Triangulate::DelaunayTriangulationBuilder - Extracts triangulation edges or triangles.
+
+=head1 SYNOPSIS
+
+    use Geo::Geos::Coordinate;
+    use Geo::Geos::Triangulate::DelaunayTriangulationBuilder;
+
+    my $gf = Geo::Geos::GeometryFactory::create();
+    my $c1 = Geo::Geos::Coordinate->new(1,2);
+    my $c2 = Geo::Geos::Coordinate->new(5,2);
+    my $c3 = Geo::Geos::Coordinate->new(5,0);
+    my $c4 = Geo::Geos::Coordinate->new(1,0);
+
+    my $lr = $gf->createLinearRing([$c1, $c2, $c3, $c4, $c1], 2);
+    my $p  = $gf->createPolygon($lr);
+
+    my $tolerance = 0;
+    my $builder = Geo::Geos::Triangulate::DelaunayTriangulationBuilder->new($gf, $p, $tolerance);
+
+    my $edges     = $builder->getEdges;        # => isa 'Geo::Geos::MultiLineString'
+    my $triangles = $builder->getTriangles;    # => isa 'Geo::Geos::GeometryCollection'
+
+    my $builder2 = Geo::Geos::Triangulate::DelaunayTriangulationBuilder->new($gf, $p);
+    my $builder3 = Geo::Geos::Triangulate::DelaunayTriangulationBuilder->new($gf, [$c1, $c2, $c3, $c4]);
+    my $builder4 = Geo::Geos::Triangulate::DelaunayTriangulationBuilder->new($gf, [$c1, $c2, $c3, $c4], 0.1);
+
+=head1 SEE ALSO (C++ classes docs)
+
+L<GEOS C++ Library|https://trac.osgeo.org/geos>
+
+geos::triangulate::DelaunayTriangulationBuilder
+
+=head1 SEE ALSO
+
+L<Geo::Geos>
+
+=head1 AUTHOR
+
+Ivan Baidakou <i.baydakov@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

@@ -1,0 +1,75 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::IntersectionMatrix
+PROTOTYPES: DISABLE
+
+IntersectionMatrix* new(SV*, SV* arg1 = NULL) {
+    if (!arg1) RETVAL = new IntersectionMatrix();
+    else {
+        std::string elements { SvPV_nolen(arg1) };
+        RETVAL = new IntersectionMatrix(elements);
+    }
+}
+
+bool IntersectionMatrix::matches (std::string requiredDimensionSymbols)
+
+void IntersectionMatrix::add(IntersectionMatrix& other) { THIS->add(&other); }
+
+void IntersectionMatrix::set(SV* arg1, SV* arg2 = NULL, SV* arg3 = NULL) {
+    if(!arg1) throw("undef not allowed");
+    if (!arg2) {
+        std::string dimensionSymbols { SvPV_nolen(arg1) };
+        THIS->set(dimensionSymbols);
+    } else {
+        if(!arg3) throw("undef not allowed");
+        int row = SvIV(arg1);
+        int col = SvIV(arg2);
+        int val = SvIV(arg3);
+        THIS->set(row, col, val);
+    }
+}
+
+void IntersectionMatrix::setAtLeast(SV* arg1, SV* arg2 = NULL, SV* arg3 = NULL) {
+    if(!arg1) throw("undef not allowed");
+    if (!arg2) {
+        std::string dimensionSymbols { SvPV_nolen(arg1) };
+        THIS->setAtLeast(dimensionSymbols);
+    } else {
+        if(!arg3) throw("undef not allowed");
+        int row = SvIV(arg1);
+        int col = SvIV(arg2);
+        int val = SvIV(arg3);
+        THIS->setAtLeast(row, col, val);
+    }
+}
+
+void IntersectionMatrix::setAll(int dimensionValue)
+
+void IntersectionMatrix::setAtLeastIfValid(int row, int column, int minimumDimensionValue)
+
+int IntersectionMatrix::get(int row, int col)
+
+bool IntersectionMatrix::isDisjoint()
+
+bool IntersectionMatrix::isIntersects()
+
+bool IntersectionMatrix::isWithin()
+
+bool IntersectionMatrix::isContains()
+
+bool IntersectionMatrix::isCovers()
+
+bool IntersectionMatrix::isCoveredBy()
+
+bool IntersectionMatrix::isTouches (int dimensionOfGeometryA, int dimensionOfGeometryB)
+
+bool IntersectionMatrix::isCrosses (int dimensionOfGeometryA, int dimensionOfGeometryB)
+
+bool IntersectionMatrix::isEquals (int dimensionOfGeometryA, int dimensionOfGeometryB)
+
+bool IntersectionMatrix::isOverlaps (int dimensionOfGeometryA, int dimensionOfGeometryB)
+
+# returns self
+void IntersectionMatrix::transpose() { THIS->transpose(); XSRETURN(1); }
+
+std::string IntersectionMatrix::toString (...)
+
+int CLONE_SKIP (...) { PERL_UNUSED_VAR(items); RETVAL = 1; }

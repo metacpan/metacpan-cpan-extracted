@@ -23,6 +23,8 @@
 
     int run_gc();
 
+    HV* get_version_info();
+
     HV* get_stats();
     void reset_stats();
 

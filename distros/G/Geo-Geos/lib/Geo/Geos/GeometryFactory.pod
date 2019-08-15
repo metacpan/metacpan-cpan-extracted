@@ -1,0 +1,112 @@
+=head1 NAME
+
+Geo::Geos::GeometryFactory - Supplies a set of utility methods for building Geometry objects.
+
+=head1 SYNOPSIS
+
+    use Geo::Geos::GeometryFactory qw/create/;
+
+    # constructors
+    my $gf1 = create();                             # => isa 'Geo::Geos::GeometryFactory'
+
+    use Geo::Geos::PrecisionModel;
+    my $pm = Geo::Geos::PrecisionModel->new(TYPE_FLOATING_SINGLE);
+    my $gf2 = Geo::Geos::GeometryFactory::create($pm);   # => isa 'Geo::Geos::GeometryFactory'
+    $gf2->getPrecisionModel;                             # => isa 'Geo::Geos::PrecisionModel'
+
+    my $srid = 3857;
+    my $gf3 = Geo::Geos::GeometryFactory::create($pm, 3857);     # => isa 'Geo::Geos::GeometryFactory'
+    $gf3->getSRID;                                          # => 3857
+
+    use Geo::Geos::Envelope;
+    my $gf = Geo::Geos::GeometryFactory::create;
+    $gf->toGeometry(Geo::Geos::Envelope->new(1, 2, 3, 4));       # => isa 'Geo::Geos::Geometry'
+
+    # geometry constructors
+    $gf->createEmptyGeometry;       # => isa 'Geo::Geos::Geometry'
+    $gf->createGeometryCollection;  # => isa 'Geo::Geos::GeometryCollection'
+
+    my $c = Geo::Geos::Coordinate->new(1,2);
+    $gf->createPoint;               # => isa 'Geo::Geos::Point'
+    $gf->createPoint($c);           # => isa 'Geo::Geos::Point'
+    $gf->createPoint([$c], 2);      # => isa 'Geo::Geos::Point'
+
+    my $c1 = Geo::Geos::Coordinate->new(1,2);
+    my $c2 = Geo::Geos::Coordinate->new(5,2);
+    $gf->createMultiPoint;                  # => isa 'Geo::Geos::MultiPoint'
+    $gf->createMultiPoint([$c1, $c2], 2);   # => isa 'Geo::Geos::MultiPoint'
+
+    $gf->createLineString;                  # => isa 'Geo::Geos::LineString'
+    $gf->createLineString([$c1, $c2], 2);   # => isa 'Geo::Geos::LineString'
+
+    my $c11 = Geo::Geos::Coordinate->new(1,2);
+    my $c12 = Geo::Geos::Coordinate->new(5,2);
+    my $c21 = Geo::Geos::Coordinate->new(10,2);
+    my $c22 = Geo::Geos::Coordinate->new(15,2);
+    my $l1 = $gf->createLineString([$c11, $c21], 2);
+    my $l2 = $gf->createLineString([$c21, $c22], 2);
+    $gf->createMultiLineString;                 # => isa 'Geo::Geos::MultiLineString'
+    $gf->createMultiLineString([$l1, $l2]);     # => isa 'Geo::Geos::MultiLineString'
+
+    my $cr1 = Geo::Geos::Coordinate->new(1,2);
+    my $cr2 = Geo::Geos::Coordinate->new(5,2);
+    my $cr3 = Geo::Geos::Coordinate->new(5,0);
+    my $cr4 = Geo::Geos::Coordinate->new(1,0);
+    $gf->createLinearRing;                                      # => isa 'Geo::Geos::LinearRing'
+    $gf->createLinearRing([$cr1, $cr2, $cr3, $cr4, $cr1], 2);   # => isa 'Geo::Geos::LinearRing'
+
+    my $lr = $gf->createLinearRing([$cr1, $cr2, $cr3, $cr4, $cr1], 2);
+    $gf->createPolygon;         # => isa 'Geo::Geos::Polygon'
+    $gf->createPolygon($lr);    # => isa 'Geo::Geos::Polygon'
+
+    my $cr2_1 = Geo::Geos::Coordinate->new(10,2);
+    my $cr2_2 = Geo::Geos::Coordinate->new(15,2);
+    my $cr2_3 = Geo::Geos::Coordinate->new(15,0);
+    my $cr2_4 = Geo::Geos::Coordinate->new(10,0);
+    my $lr2 = $gf->createLinearRing([$cr2_1, $cr2_2, $cr2_3, $cr2_4, $cr2_1], 2);
+    my $p1 = $gf->createPolygon($lr);
+    my $p2 = $gf->createPolygon($lr2);
+    $gf->createMultiPolygon;                # => isa 'Geo::Geos::MultiPolygon'
+    $gf->createMultiPolygon([$p1, $p2]);    # => isa 'Geo::Geos::MultiPolygon'
+
+=head1 SEE ALSO (C++ classes docs)
+
+L<GEOS C++ Library|https://trac.osgeo.org/geos>
+
+geos::geom::GeometryFactory
+
+=head1 SEE ALSO
+
+L<Geo::Geos>
+
+
+L<Geo::Geos::Geometry>
+
+L<Geo::Geos::GeometryCollection>
+
+L<Geo::Geos::LinearRing>
+
+L<Geo::Geos::LineString>
+
+L<Geo::Geos::MultiLineString>
+
+L<Geo::Geos::MultiPoint>
+
+L<Geo::Geos::MultiPolygon>
+
+L<Geo::Geos::Point>
+
+L<Geo::Geos::Polygon>
+
+L<Geo::Geos::Prep::GeometryFactory>
+
+
+=head1 AUTHOR
+
+Ivan Baidakou <i.baydakov@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

@@ -1,0 +1,41 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::Noding::IntersectionFinderAdder
+PROTOTYPES: DISABLE
+
+Sv new(SV*,SV* liObj, Array coords) {
+    LineIntersector& li = xs::in<LineIntersector&>(liObj);
+    auto* payload = new IntersectionFinderAdder_payload{SvRV(liObj), {}};
+
+    auto* v = &payload->coords;
+    v->reserve(coords.size());
+    for(auto it: coords) {
+        Coordinate& c = xs::in<Coordinate&>(it);
+        v->emplace_back(c);
+    }
+
+    Object wrapped = xs::out<>(new IntersectionFinderAdder(li, *v));
+    wrapped.payload_attach(payload, &payload_marker_IntersectionFinderAdder);
+
+    RETVAL = wrapped.ref();
+}
+
+xs::Array IntersectionFinderAdder::getInteriorIntersections() {
+    Object me{ST(0)};
+    auto payload = me.payload(&payload_marker_IntersectionFinderAdder);
+    auto* real_payload = static_cast<IntersectionFinderAdder_payload*>(payload.ptr);
+    auto* v = &real_payload->coords;
+
+    auto result = xs::Array::create(v->size());
+    for(auto& c: *v) {
+        result.push(xs::out<Coordinate*>(new Coordinate(c)));
+    }
+    RETVAL = result;
+}
+
+int CLONE_SKIP (...) { PERL_UNUSED_VAR(items); RETVAL = 1; }
+
+BOOT {
+    payload_marker_IntersectionFinderAdder.svt_free = payload_marker_IntersectionFinderAdder_free;
+    Stash(__PACKAGE__).inherit("Geo::Geos::Noding::SegmentIntersector");
+}
+
+

@@ -61,7 +61,7 @@ struct excepted {
         }
     }
 
-    template <class T2>
+    template <class T2, typename = typename std::enable_if<std::is_constructible<T, T2>::value>::type>
     excepted (T2&& v) {
         construct_val(std::forward<T2>(v));
     }

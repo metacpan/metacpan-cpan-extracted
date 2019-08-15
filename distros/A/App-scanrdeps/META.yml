@@ -1,0 +1,37 @@
+---
+abstract: 'just main_module for scanrdeps.pl'
+author:
+  - 'Pavel Serikov <pavelsr@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150001'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-scanrdeps
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::scanrdeps:
+    file: lib/App/scanrdeps.pm
+    version: '0.01'
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/pavelsr/perl_scanrdeps/issues
+  homepage: https://github.com/pavelsr/perl_scanrdeps
+  repository: git://github.com/pavelsr/perl_scanrdeps.git
+version: '0.01'
+x_static_install: 1

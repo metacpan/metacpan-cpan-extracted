@@ -50,6 +50,50 @@ namespace panda {
  * c_str() is not supported, because strings are not null-terminated
  */
 
+namespace string_detail {
+    template <typename S>
+    struct mutable_charref {
+        using value_type = typename S::value_type;
+        using size_type  = typename S::size_type;
+
+        mutable_charref (S& string, size_type pos): _string(string), _pos(pos) {}
+
+        template <typename Arg, typename = std::enable_if_t<std::is_convertible<Arg, value_type>::value>>
+        mutable_charref& operator= (Arg&& value) {
+            _string._detach();
+            _string._str[_pos] = std::forward<Arg>(value);
+            return *this;
+        }
+
+        operator value_type() const { return _string._str[_pos]; }
+
+    private:
+        S& _string;
+        size_type _pos;
+    };
+
+    enum class State : uint8_t {
+        INTERNAL, // has InternalBuffer, may have _storage.dtor in case of basic_string<A,B,X> <-> basic_string<A,B,Y> convertations
+        EXTERNAL, // has ExternalShared, shares external data, _storage.dtor present, _storage.external->dtor present
+        LITERAL,  // shares external data, no Buffer, no _storage.dtor (literal data is immortal)
+        SSO       // owns small string, no Buffer, no _storage.dtor
+    };
+
+    template <class CharT>
+    struct Buffer {
+        size_t   capacity;
+        uint32_t refcnt;
+        CharT    start[(sizeof(void*)-4)/sizeof(CharT)]; // align to word size
+    };
+
+    template <class CharT>
+    struct ExternalShared : Buffer<CharT> {
+        using dtor_fn = void (*)(CharT*, size_t);
+        dtor_fn dtor; // deallocator for ExternalShared, may differ from Alloc::deallocate !
+        CharT*  ptr;  // pointer to external data originally passed to string's constructor
+    };
+}
+
 template <class T>
 struct DefaultStaticAllocator {
     typedef T value_type;
@@ -71,58 +115,9 @@ struct DefaultStaticAllocator {
     }
 };
 
-namespace {
-template <typename S>
-class _mutable_charref {
-public:
-    using value_type = typename S::value_type;
-    using size_type = typename S::size_type;
-
-    _mutable_charref(S& string, size_type pos): _string(string), _pos(pos) {}
-
-    template <typename Arg, typename = typename std::enable_if<std::is_convertible<Arg, value_type>::value> >
-    _mutable_charref& operator= (Arg&& value) {
-        _string._detach();
-        _string._str[_pos] = std::forward<Arg>(value);
-        return *this;
-    }
-    operator value_type() const { return _string._str[_pos]; }
-private:
-    S& _string;
-    size_type _pos;
-};
-
-} // end of anonymous namespace
-
-
-template <class CharT>
-class _basic_string_base {
-protected:
-    typedef void (*dtor_fn) (CharT*, size_t);
-
-    enum class State : uint8_t {
-        INTERNAL, // has InternalBuffer, may have _dtor in case of basic_string<A,B,X> <-> basic_string<A,B,Y> convertations
-        EXTERNAL, // has ExternalShared, shares external data, _dtor present, _ebuf->dtor present
-        LITERAL,  // shares external data, no Buffer, no _dtor (literal data is immortal)
-        SSO       // owns small string, no Buffer, no _dtor
-    };
-
-    struct Buffer {
-        size_t   capacity;
-        uint32_t refcnt;
-        CharT    start[(sizeof(void*)-4)/sizeof(CharT)]; // align to word size
-    };
-
-    struct ExternalShared : Buffer {
-        dtor_fn dtor; // deallocator for ExternalShared, may differ from Alloc::deallocate !
-        CharT*  ptr;  // pointer to external data originally passed to string's constructor
-    };
-};
-
 template <class CharT, class Traits = std::char_traits<CharT>, class Alloc = DefaultStaticAllocator<CharT>>
-class basic_string : private _basic_string_base<CharT> {
-public:
-    class iterator;
+struct basic_string {
+    struct iterator;
     typedef Traits                                     traits_type;
     typedef Alloc                                      allocator_type;
     typedef std::allocator_traits<allocator_type>      allocator_traits;
@@ -137,15 +132,21 @@ public:
     typedef typename allocator_traits::difference_type difference_type;
     typedef typename allocator_traits::size_type       size_type;
 
-    using typename _basic_string_base<CharT>::ExternalShared;
+    using ExternalShared = string_detail::ExternalShared<CharT>;
 
 private:
-    using typename _basic_string_base<CharT>::State;
-    using typename _basic_string_base<CharT>::dtor_fn;
-    using typename _basic_string_base<CharT>::Buffer;
+    using dtor_fn         = typename ExternalShared::dtor_fn;
+    using State           = string_detail::State;
+    using Buffer          = string_detail::Buffer<CharT>;
+    using mutable_charref = string_detail::mutable_charref<basic_string>;
 
-    template <class C, class T, class A> friend class basic_string;
-    friend class _mutable_charref<basic_string>;
+    template <class C, class T, class A> friend struct basic_string;
+    friend mutable_charref;
+
+    static constexpr const size_type BUF_CHARS     = (sizeof(Buffer) - sizeof(Buffer().start)) / sizeof(CharT);
+    static constexpr const size_type EBUF_CHARS    = sizeof(ExternalShared) / sizeof(CharT);
+    static constexpr const size_type MAX_SSO_BYTES = 3 * sizeof(void*) - 1; // last byte for _state
+    static const CharT TERMINAL;
 
     union {
         CharT*       _str;
@@ -154,20 +155,21 @@ private:
 
     size_type _length;
 
-    union {
-        Buffer*         _buf;
-        ExternalShared* _ebuf;
-        CharT           _sso_start[sizeof(void*)/sizeof(CharT)]; // SSO start (aligned)
+    #pragma pack(push, 1)
+    union { // the size of this union is MAX_SSO_BYTES. Last byte is kept for _state which is following this union (and thus packing is needed)
+        char  __fill[MAX_SSO_BYTES];
+        CharT _sso[MAX_SSO_BYTES/sizeof(CharT)];
+        struct {
+            union {
+                Buffer*         any; // when code doesn't matter if we in internal or external state
+                Buffer*         internal;
+                ExternalShared* external;
+            };
+            dtor_fn dtor;
+        } _storage;
     };
-
-    dtor_fn _dtor;
-    int8_t  _align[sizeof(void*)-1]; // align to word size (_state is 1 byte), SSO end
-    State   _state;
-
-    static const size_type BUF_CHARS     = (sizeof(*_buf) - sizeof(_buf->start)) / sizeof(CharT);
-    static const size_type EBUF_CHARS    = sizeof(ExternalShared) / sizeof(CharT);
-    static const size_type MAX_SSO_BYTES = sizeof(_buf) + sizeof(_dtor) + sizeof(_align);
-    static const CharT     TERMINAL;
+    State _state;
+    #pragma pack(pop)
 
 public:
     static const size_type npos          = std::numeric_limits<size_type>::max();
@@ -251,43 +253,42 @@ public:
         return *this;
     }
 
-    class iterator {
-    public:
+    struct iterator {
         using size_type         = typename basic_string::size_type;
         using value_type        = typename basic_string::value_type;
-        using reference         = _mutable_charref<basic_string>;
-        using pointer           = _mutable_charref<basic_string>;
+        using reference         = mutable_charref;
+        using pointer           = mutable_charref;
         using difference_type   = std::ptrdiff_t;
         using iterator_category = std::random_access_iterator_tag;
         using const_iterator    = typename basic_string::const_iterator;
 
-        iterator(basic_string& string, size_type pos): _string(string), _pos(pos) {}
+        iterator (basic_string& string, size_type pos): _string(string), _pos(pos) {}
 
-        iterator& operator++()                      { ++_pos; return *this; }
-        iterator operator++(int)                    { iterator copy{_string, _pos }; ++_pos; return copy; }
-        iterator& operator--()                      { --_pos; return *this; }
-        iterator operator--(int)                    { iterator copy{_string, _pos }; --_pos; return copy; }
-        iterator& operator+=(int delta)             { _pos += delta; return *this; }
-        iterator& operator-=(int delta)             { _pos -= delta; return *this; }
-        reference operator*()                       { return reference{_string, _pos}; }
-        reference operator->()                      { return reference{_string, _pos}; }
-        reference operator[](size_type i)           { return reference{_string, i + _pos}; }
+        iterator& operator++ ()            { ++_pos; return *this; }
+        iterator  operator++ (int)         { iterator copy{_string, _pos }; ++_pos; return copy; }
+        iterator& operator-- ()            { --_pos; return *this; }
+        iterator  operator-- (int)         { iterator copy{_string, _pos }; --_pos; return copy; }
+        iterator& operator+= (int delta)   { _pos += delta; return *this; }
+        iterator& operator-= (int delta)   { _pos -= delta; return *this; }
+        reference operator*  ()            { return reference{_string, _pos}; }
+        reference operator-> ()            { return reference{_string, _pos}; }
+        reference operator[] (size_type i) { return reference{_string, i + _pos}; }
 
-        difference_type operator-(const iterator& rhs) const { return static_cast<difference_type>(_pos - rhs._pos); }
+        difference_type operator- (const iterator& rhs) const { return static_cast<difference_type>(_pos - rhs._pos); }
 
-        bool operator==(const iterator& rhs) const { return _pos == rhs._pos; }
-        bool operator!=(const iterator& rhs) const { return _pos != rhs._pos; }
-        bool operator< (const iterator& rhs) const { return rhs._pos - _pos > 0; }
-        bool operator> (const iterator& rhs) const { return _pos - rhs._pos > 0; }
-        bool operator<=(const iterator& rhs) const { return rhs._pos - _pos >= 0; }
-        bool operator>=(const iterator& rhs) const { return _pos - rhs._pos >= 0; }
+        bool operator== (const iterator& rhs) const { return _pos == rhs._pos; }
+        bool operator!= (const iterator& rhs) const { return _pos != rhs._pos; }
+        bool operator<  (const iterator& rhs) const { return rhs._pos - _pos > 0; }
+        bool operator>  (const iterator& rhs) const { return _pos - rhs._pos > 0; }
+        bool operator<= (const iterator& rhs) const { return rhs._pos - _pos >= 0; }
+        bool operator>= (const iterator& rhs) const { return _pos - rhs._pos >= 0; }
 
-        operator const_iterator() { return _string.data() + _pos; }
+        operator const_iterator () { return _string.data() + _pos; }
 
-        friend inline iterator operator+(int delta, const iterator& it) { return iterator{it._string, it._pos + delta}; }
-        friend inline iterator operator+(const iterator& it, int delta) { return iterator{it._string, it._pos + delta}; }
-        friend inline iterator operator-(int delta, const iterator& it) { return iterator{it._string, it._pos - delta}; }
-        friend inline iterator operator-(const iterator& it, int delta) { return iterator{it._string, it._pos - delta}; }
+        friend inline iterator operator+ (int delta, const iterator& it) { return iterator{it._string, it._pos + delta}; }
+        friend inline iterator operator+ (const iterator& it, int delta) { return iterator{it._string, it._pos + delta}; }
+        friend inline iterator operator- (int delta, const iterator& it) { return iterator{it._string, it._pos - delta}; }
+        friend inline iterator operator- (const iterator& it, int delta) { return iterator{it._string, it._pos - delta}; }
 
     private:
         basic_string& _string;
@@ -308,7 +309,7 @@ public:
     }
 
     basic_string& assign (CharT* str, size_type len, size_type capacity, dtor_fn dtor) {
-        if (_state != State::EXTERNAL || _buf->refcnt != 1) {
+        if (_state != State::EXTERNAL || _storage.external->refcnt != 1) {
             _release();
             _new_external(str, len, capacity, dtor, (ExternalShared*)Alloc::allocate(EBUF_CHARS), &Alloc::deallocate);
         }
@@ -418,23 +419,23 @@ public:
         return _str[pos];
     }
 
-    _mutable_charref<basic_string> at (size_type pos) {
+    mutable_charref at (size_type pos) {
         if (pos >= _length) throw std::out_of_range("basic_string::at");
-        return _mutable_charref<basic_string>{ *this, pos };
+        return mutable_charref{ *this, pos };
     }
 
     constexpr const CharT& operator[] (size_type pos) const { return _str[pos]; }
-    _mutable_charref<basic_string> operator[] (size_type pos) { return _mutable_charref<basic_string>{ *this, pos }; }
+    mutable_charref        operator[] (size_type pos)       { return mutable_charref{ *this, pos }; }
 
     constexpr const CharT& front () const { return _str[0]; }
     constexpr const CharT& back  () const { return _str[_length-1]; }
-    _mutable_charref<basic_string> front () { return _mutable_charref<basic_string>{ *this, 0 }; }
-    _mutable_charref<basic_string> back  () { return _mutable_charref<basic_string>{ *this, _length-1 }; }
+    mutable_charref        front ()       { return mutable_charref{ *this, 0 }; }
+    mutable_charref        back  ()       { return mutable_charref{ *this, _length-1 }; }
 
     size_type capacity () const {
         switch (_state) {
-            case State::INTERNAL: return _buf->refcnt == 1 ? _capacity_internal() : 0;
-            case State::EXTERNAL: return _buf->refcnt == 1 ? _capacity_external() : 0;
+            case State::INTERNAL: return _storage.internal->refcnt == 1 ? _capacity_internal() : 0;
+            case State::EXTERNAL: return _storage.external->refcnt == 1 ? _capacity_external() : 0;
             case State::LITERAL:  return 0;
             case State::SSO:      return _capacity_sso();
         }
@@ -455,7 +456,7 @@ public:
         switch (_state) {
             case State::INTERNAL:
             case State::EXTERNAL:
-                return _buf->refcnt;
+                return _storage.any->refcnt;
             default: return 1;
         }
     }
@@ -490,25 +491,25 @@ public:
         switch (_state) {
             case State::INTERNAL:
                 if (_length <= MAX_SSO_CHARS) {
-                    auto old_buf  = _buf;
-                    auto old_dtor = _dtor;
+                    auto old_buf  = _storage.internal;
+                    auto old_dtor = _storage.dtor;
                     _detach_str(_length);
                     _release_internal(old_buf, old_dtor);
                 }
-                else if (_buf->capacity > _length) {
-                    if (_buf->refcnt == 1) _internal_realloc(_length);
+                else if (_storage.internal->capacity > _length) {
+                    if (_storage.internal->refcnt == 1) _internal_realloc(_length);
                     // else _detach_cow(_length); // NOTE: it's a very hard question should or should not we do it, NOT FOR NOW
                 }
                 break;
             case State::EXTERNAL:
                 if (_length <= MAX_SSO_CHARS) {
-                    auto old_buf  = _ebuf;
-                    auto old_dtor = _dtor;
+                    auto old_buf  = _storage.external;
+                    auto old_dtor = _storage.dtor;
                     _detach_str(_length);
                     _release_external(old_buf, old_dtor);
                 }
-                else if (_buf->capacity > _length) {
-                    if (_buf->refcnt == 1) _external_realloc(_length);
+                else if (_storage.external->capacity > _length) {
+                    if (_storage.external->refcnt == 1) _external_realloc(_length);
                     // else _detach_cow(_length); // NOTE: it's a very hard question should or should not we do it, NOT FOR NOW
                 }
                 break;
@@ -522,11 +523,12 @@ public:
     void swap (basic_string<CharT, Traits, Alloc2>& oth) {
         std::swap(_str, oth._str);
         std::swap(_length, oth._length);
-        std::swap(_buf, oth._buf);
-        std::swap(_dtor, oth._dtor);
-        std::swap(*((void**)_align), *((void**)oth._align)); // swaps _state also
-        if (_state == State::SSO) _str = _sso_start + (_str - oth._sso_start); //  "oth" was SSO
-        if (oth._state == State::SSO) oth._str = oth._sso_start + (oth._str - _sso_start); // "this" was SSO
+        if (_state == State::SSO) oth._str = oth._sso + (oth._str - _sso);
+        if (oth._state == State::SSO) _str = _sso + (_str - oth._sso);
+        // swap union & state after it
+        std::swap(((void**)__fill)[0], ((void**)oth.__fill)[0]);
+        std::swap(((void**)__fill)[1], ((void**)oth.__fill)[1]);
+        std::swap(((void**)__fill)[2], ((void**)oth.__fill)[2]);
     }
 
     size_type copy (CharT* dest, size_type count, size_type pos = 0) const {
@@ -554,7 +556,7 @@ public:
         switch (_state) {
             case State::INTERNAL:
             case State::EXTERNAL:
-                if (_buf->refcnt == 1) {
+                if (_storage.any->refcnt == 1) {
             case State::SSO:
                     // move tail or head depending on what is shorter
                     if (pos >= _length - pos) traits_type::move(_str + pos, _str + pos + count, _length - pos); // tail is shorter
@@ -564,7 +566,7 @@ public:
                     }
                     break;
                 }
-                else --_buf->refcnt; // fallthrough
+                else --_storage.any->refcnt; // fallthrough
             case State::LITERAL:
                 auto old_str = _str;
                 _new_auto(_length);
@@ -1139,22 +1141,22 @@ public:
 
 private:
 
-    constexpr size_type _capacity_internal () const { return _buf->capacity - (_str - _buf->start); }
-    constexpr size_type _capacity_external () const { return _buf->capacity - (_str - _ebuf->ptr); }
-    constexpr size_type _capacity_sso      () const { return MAX_SSO_CHARS - (_str - _sso_start); }
+    constexpr size_type _capacity_internal () const { return _storage.internal->capacity - (_str - _storage.internal->start); }
+    constexpr size_type _capacity_external () const { return _storage.external->capacity - (_str - _storage.external->ptr); }
+    constexpr size_type _capacity_sso      () const { return MAX_SSO_CHARS - (_str - _sso); }
 
     void _new_auto (size_type capacity) {
         if (capacity <= MAX_SSO_CHARS) {
             _state = State::SSO;
-            _str   = _sso_start;
+            _str   = _sso;
         } else {
             if (capacity > MAX_SIZE) throw std::length_error("basic_string::_new_auto");
-            _state = State::INTERNAL;
-            _buf           = (Buffer*)Alloc::allocate(capacity + BUF_CHARS);
-            _buf->capacity = capacity;
-            _buf->refcnt   = 1;
-            _str           = _buf->start;
-            _dtor          = &Alloc::deallocate;
+            _state                      = State::INTERNAL;
+            _storage.internal           = (Buffer*)Alloc::allocate(capacity + BUF_CHARS);
+            _storage.internal->capacity = capacity;
+            _storage.internal->refcnt   = 1;
+            _str                        = _storage.internal->start;
+            _storage.dtor               = &Alloc::deallocate;
         }
     }
 
@@ -1162,46 +1164,46 @@ private:
     void _new_internal_from_sso (size_type capacity) {
         auto ibuf = (Buffer*)Alloc::allocate(capacity + BUF_CHARS);
         traits_type::copy(ibuf->start, _str, _length);
-        ibuf->capacity = capacity;
-        ibuf->refcnt   = 1;
-        _state = State::INTERNAL;
-        _buf   = ibuf;
-        _str   = ibuf->start;
-        _dtor  = &Alloc::deallocate;
+        ibuf->capacity    = capacity;
+        ibuf->refcnt      = 1;
+        _state            = State::INTERNAL;
+        _str              = ibuf->start;
+        _storage.internal = ibuf;
+        _storage.dtor     = &Alloc::deallocate;
     }
 
     void _new_internal_from_sso (size_type capacity, size_type pos, size_type remove_count, size_type insert_count) {
         auto ibuf = (Buffer*)Alloc::allocate(capacity + BUF_CHARS);
         if (pos) traits_type::copy(ibuf->start, _str, pos);
         traits_type::copy((CharT*)ibuf->start + pos + insert_count, _str + pos + remove_count, _length - pos - remove_count);
-        ibuf->capacity = capacity;
-        ibuf->refcnt   = 1;
-        _state = State::INTERNAL;
-        _buf   = ibuf;
-        _str   = ibuf->start;
-        _dtor  = &Alloc::deallocate;
+        ibuf->capacity    = capacity;
+        ibuf->refcnt      = 1;
+        _state            = State::INTERNAL;
+        _str              = ibuf->start;
+        _storage.internal = ibuf;
+        _storage.dtor     = &Alloc::deallocate;
     }
 
     void _new_external (CharT* str, size_type len, size_type capacity, dtor_fn dtor, ExternalShared* ebuf, dtor_fn ebuf_dtor) {
-        _state = State::EXTERNAL;
-        _str    = str;
-        _length = len;
-        _dtor   = dtor;
-        _ebuf   = ebuf;
-        _ebuf->capacity = capacity;
-        _ebuf->refcnt   = 1;
-        _ebuf->dtor     = ebuf_dtor;
-        _ebuf->ptr      = str;
+        _state            = State::EXTERNAL;
+        _str              = str;
+        _length           = len;
+        ebuf->capacity    = capacity;
+        ebuf->refcnt      = 1;
+        ebuf->dtor        = ebuf_dtor;
+        ebuf->ptr         = str;
+        _storage.dtor     = dtor;
+        _storage.external = ebuf;
     }
 
     // releases currently held external string and reuses current ExternalShared for the new external string
     void _replace_external (CharT* str, size_type len, size_type capacity, dtor_fn dtor) {
         _free_external_str();
-        _str    = str;
-        _length = len;
-        _dtor   = dtor;
-        _ebuf->capacity = capacity;
-        _ebuf->ptr      = str;
+        _str                        = str;
+        _length                     = len;
+        _storage.dtor               = dtor;
+        _storage.external->capacity = capacity;
+        _storage.external->ptr      = str;
     }
 
     template <class Alloc2>
@@ -1210,21 +1212,21 @@ private:
         switch (oth._state) {
             case State::INTERNAL:
             case State::EXTERNAL:
-                _state = oth._state;
-                _str   = oth._str + offset;
-                _buf   = oth._buf;
-                _dtor  = oth._dtor;
-                ++_buf->refcnt;
+                _state        = oth._state;
+                _str          = oth._str + offset;
+                _storage.any  = oth._storage.any;
+                _storage.dtor = oth._storage.dtor;
+                ++_storage.any->refcnt;
                 break;
             case State::LITERAL:
                 _state = State::LITERAL;
                 _str_literal = oth._str_literal + offset;
                 break;
             case State::SSO:
-                _buf = oth._buf;
-                _dtor = oth._dtor;
-                *((void**)_align) = *((void**)oth._align); // also sets _state to SSO
-                _str = _sso_start + (oth._str - oth._sso_start) + offset;
+                ((void**)__fill)[0] = ((void**)oth.__fill)[0];
+                ((void**)__fill)[1] = ((void**)oth.__fill)[1];
+                ((void**)__fill)[2] = ((void**)oth.__fill)[2]; // also sets _state to SSO
+                _str = _sso + (oth._str - oth._sso) + offset;
                 break;
         }
     }
@@ -1239,12 +1241,15 @@ private:
     template <class Alloc2>
     void _move_from (basic_string<CharT, Traits, Alloc2>&& oth) {
         _length = oth._length;
-        _buf    = oth._buf;
-        _dtor   = oth._dtor;
-        *((void**)_align) = *((void**)oth._align);
-        if (oth._state == State::SSO) _str = _sso_start + (oth._str - oth._sso_start);
+        #pragma GCC diagnostic push
+        #pragma GCC diagnostic ignored "-Wuninitialized"
+        #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+        ((void**)__fill)[0] = ((void**)oth.__fill)[0];
+        ((void**)__fill)[1] = ((void**)oth.__fill)[1];
+        ((void**)__fill)[2] = ((void**)oth.__fill)[2]; // also sets _state to SSO
+        #pragma GCC diagnostic pop
+        if (oth._state == State::SSO) _str = _sso + (oth._str - oth._sso);
         else _str = oth._str;
-
         oth._state       = State::LITERAL;
         oth._str_literal = &TERMINAL;
         oth._length      = 0;
@@ -1261,34 +1266,34 @@ private:
     }
 
     void _reserve_drop_internal (size_type capacity) {
-        if (_buf->refcnt > 1) {
-            --_buf->refcnt;
+        if (_storage.internal->refcnt > 1) {
+            --_storage.internal->refcnt;
             _new_auto(capacity);
         }
-        else if (_buf->capacity < capacity) { // could realloc save anything?
+        else if (_storage.internal->capacity < capacity) { // could realloc save anything?
             _free_internal();
             _new_auto(capacity);
         }
-        else _str = _buf->start;
+        else _str = _storage.internal->start;
     }
 
     void _reserve_drop_external (size_type capacity) {
-        if (_buf->refcnt > 1) {
-            --_buf->refcnt;
+        if (_storage.external->refcnt > 1) {
+            --_storage.external->refcnt;
             _new_auto(capacity);
         }
-        else if (_buf->capacity < capacity) {
+        else if (_storage.external->capacity < capacity) {
             _free_external();
             _new_auto(capacity);
         }
-        else _str = _ebuf->ptr;
+        else _str = _storage.external->ptr;
     }
 
     void _detach () {
         switch (_state) {
             case State::INTERNAL:
             case State::EXTERNAL:
-                if (_buf->refcnt > 1) _detach_cow(_length);
+                if (_storage.any->refcnt > 1) _detach_cow(_length);
                 break;
             case State::LITERAL:
                 _detach_str(_length);
@@ -1298,7 +1303,7 @@ private:
     }
 
     void _detach_cow (size_type capacity) {
-        --_buf->refcnt;
+        --_storage.any->refcnt;
         _detach_str(capacity);
     }
 
@@ -1324,26 +1329,26 @@ private:
     }
 
     void _reserve_save_internal (size_type capacity) {
-        if (_buf->refcnt > 1) _detach_cow(capacity);
-        else if (_buf->capacity < capacity) _internal_realloc(capacity); // need to grow storage
+        if (_storage.internal->refcnt > 1) _detach_cow(capacity);
+        else if (_storage.internal->capacity < capacity) _internal_realloc(capacity); // need to grow storage
         else if (_capacity_internal() < capacity) { // may not to grow storage if str is moved to the beginning
-            traits_type::move(_buf->start, _str, _length);
-            _str = _buf->start;
+            traits_type::move(_storage.internal->start, _str, _length);
+            _str = _storage.internal->start;
         }
     }
 
     void _internal_realloc (size_type capacity) {
-        // see if we can reallocate. if _str != _buf->start we should not reallocate because we would need
+        // see if we can reallocate. if _str != start we should not reallocate because we would need
         // either allocate more space than needed or move everything to the beginning before reallocation
-        if (_dtor == &Alloc::deallocate && _str == _buf->start) {
+        if (_storage.dtor == &Alloc::deallocate && _str == _storage.internal->start) {
             if (capacity > MAX_SIZE) throw std::length_error("basic_string::_internal_realloc");
-            _buf = (Buffer*)Alloc::reallocate((CharT*)_buf, capacity + BUF_CHARS, _buf->capacity + BUF_CHARS);
-            _str = _buf->start;
-            _buf->capacity = capacity;
+            _storage.internal = (Buffer*)Alloc::reallocate((CharT*)_storage.internal, capacity + BUF_CHARS, _storage.internal->capacity + BUF_CHARS);
+            _str = _storage.internal->start;
+            _storage.internal->capacity = capacity;
         } else { // need to allocate/deallocate
-            auto old_buf  = _buf;
+            auto old_buf  = _storage.internal;
             auto old_str  = _str;
-            auto old_dtor = _dtor;
+            auto old_dtor = _storage.dtor;
             _new_auto(capacity);
             traits_type::copy(_str, old_str, _length);
             _free_internal(old_buf, old_dtor);
@@ -1351,18 +1356,18 @@ private:
     }
 
     void _reserve_save_external (size_type capacity) {
-        if (_buf->refcnt > 1) _detach_cow(capacity);
-        else if (_buf->capacity < capacity) _external_realloc(capacity); // need to grow storage, switch to INTERNAL/SSO
+        if (_storage.external->refcnt > 1) _detach_cow(capacity);
+        else if (_storage.external->capacity < capacity) _external_realloc(capacity); // need to grow storage, switch to INTERNAL/SSO
         else if (_capacity_external() < capacity) { // may not to grow storage if str is moved to the beginning
-            traits_type::move(_ebuf->ptr, _str, _length);
-            _str = _ebuf->ptr;
+            traits_type::move(_storage.external->ptr, _str, _length);
+            _str = _storage.external->ptr;
         }
     }
 
     void _external_realloc (size_type capacity) {
-        auto old_buf  = _ebuf;
+        auto old_buf  = _storage.external;
         auto old_str  = _str;
-        auto old_dtor = _dtor;
+        auto old_dtor = _storage.dtor;
         _new_auto(capacity);
         traits_type::copy(_str, old_str, _length);
         _free_external(old_buf, old_dtor);
@@ -1374,8 +1379,8 @@ private:
             return;
         }
         else if (_capacity_sso() < capacity) {
-            traits_type::move(_sso_start, _str, _length);
-            _str = _sso_start;
+            traits_type::move(_sso, _str, _length);
+            _str = _sso;
         }
     }
 
@@ -1387,37 +1392,37 @@ private:
 
         switch (_state) {
             case State::INTERNAL:
-                if (_buf->refcnt > 1) {
-                    --_buf->refcnt;
+                if (_storage.internal->refcnt > 1) {
+                    --_storage.internal->refcnt;
                     _reserve_middle_new(pos, remove_count, insert_count);
                 }
-                else if (newlen > _buf->capacity) {
-                    auto old_buf  = _buf;
-                    auto old_dtor = _dtor;
+                else if (newlen > _storage.internal->capacity) {
+                    auto old_buf  = _storage.internal;
+                    auto old_dtor = _storage.dtor;
                     _reserve_middle_new(pos, remove_count, insert_count);
                     _release_internal(old_buf, old_dtor);
                 }
-                else _reserve_middle_move(pos, remove_count, insert_count, _buf->start, _capacity_internal());
+                else _reserve_middle_move(pos, remove_count, insert_count, _storage.internal->start, _capacity_internal());
                 break;
             case State::EXTERNAL:
-                if (_buf->refcnt > 1) {
-                    --_buf->refcnt;
+                if (_storage.external->refcnt > 1) {
+                    --_storage.external->refcnt;
                     _reserve_middle_new(pos, remove_count, insert_count);
                 }
-                else if (newlen > _buf->capacity) {
-                    auto old_buf  = _ebuf;
-                    auto old_dtor = _dtor;
+                else if (newlen > _storage.external->capacity) {
+                    auto old_buf  = _storage.external;
+                    auto old_dtor = _storage.dtor;
                     _reserve_middle_new(pos, remove_count, insert_count);
                     _release_external(old_buf, old_dtor);
                 }
-                else _reserve_middle_move(pos, remove_count, insert_count, _ebuf->ptr, _capacity_external());
+                else _reserve_middle_move(pos, remove_count, insert_count, _storage.external->ptr, _capacity_external());
                 break;
             case State::LITERAL:
                 _reserve_middle_new(pos, remove_count, insert_count);
                 break;
             case State::SSO:
                 if (newlen > MAX_SSO_CHARS) _new_internal_from_sso(newlen, pos, remove_count, insert_count);
-                else _reserve_middle_move(pos, remove_count, insert_count, _sso_start, _capacity_sso());
+                else _reserve_middle_move(pos, remove_count, insert_count, _sso, _capacity_sso());
                 break;
         }
 
@@ -1472,13 +1477,13 @@ private:
         }
     }
 
-    void _release_internal () { _release_internal(_buf, _dtor); }
-    void _release_external () { _release_external(_ebuf, _dtor); }
+    void _release_internal () { _release_internal(_storage.internal, _storage.dtor); }
+    void _release_external () { _release_external(_storage.external, _storage.dtor); }
 
-    void _free_internal     () { _free_internal(_buf, _dtor); }
+    void _free_internal     () { _free_internal(_storage.internal, _storage.dtor); }
     void _free_external     () { _free_external_str(); _free_external_buf(); }
-    void _free_external_str () { _free_external_str(_ebuf, _dtor); }
-    void _free_external_buf () { _free_external_buf(_ebuf); }
+    void _free_external_str () { _free_external_str(_storage.external, _storage.dtor); }
+    void _free_external_buf () { _free_external_buf(_storage.external); }
 
     static void _release_internal (Buffer* buf, dtor_fn dtor)          { if (!--buf->refcnt) _free_internal(buf, dtor); }
     static void _release_external (ExternalShared* ebuf, dtor_fn dtor) { if (!--ebuf->refcnt) _free_external(ebuf, dtor); }

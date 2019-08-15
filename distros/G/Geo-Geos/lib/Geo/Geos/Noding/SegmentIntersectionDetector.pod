@@ -1,0 +1,63 @@
+=head1 NAME
+
+Geo::Geos::Noding::SegmentIntersectionDetector - Detects and records an intersection between two SegmentStrings, if one exists.
+
+=head1 SYNOPSIS
+
+    use Geo::Geos::Algorithm::LineIntersector;
+    use Geo::Geos::Coordinate;
+    use Geo::Geos::PrecisionModel;
+    use Geo::Geos::Noding::NodedSegmentString;
+    use Geo::Geos::Noding::SegmentIntersectionDetector;
+
+    my $c1 = Geo::Geos::Coordinate->new(0,1);
+    my $c2 = Geo::Geos::Coordinate->new(2,1);
+    my $c3 = Geo::Geos::Coordinate->new(1,0);
+    my $c4 = Geo::Geos::Coordinate->new(1,2);
+    my $pm = Geo::Geos::PrecisionModel->new;
+
+    my $ss1 = Geo::Geos::Noding::NodedSegmentString->new([$c1, $c2]);
+    my $ss2 = Geo::Geos::Noding::NodedSegmentString->new([$c3, $c4]);
+
+    my $li = Geo::Geos::Algorithm::LineIntersector->new($pm);
+
+    my $sid = Geo::Geos::Noding::SegmentIntersectionDetector->new($li);  # => isa 'Geo::Geos::Noding::SegmentIntersectionDetector'
+    Geo::Geos::Noding::SegmentIntersectionDetector->new($li);            # => isa 'Geo::Geos::Noding::SegmentIntersector'
+
+    my $r1 = $sid->isDone;       # => ''
+
+    $sid->processIntersections($ss1, 0, $ss2, 0);
+    my $r2 = $sid->isDone;       # => success
+
+    my $c_1 = $sid->getIntersection;                  # => Geo::Geos::Coordinate->new(1,1)
+    my $c_2 = $sid->getIntersectionSegments->[0];     # => isa 'Geo::Geos::Coordinate'
+
+    my $r3 = $sid->hasProperIntersection;        # => success
+    my $r4 = $sid->hasNonProperIntersection;     # => ''
+
+
+=head1 SEE ALSO (C++ classes docs)
+
+L<GEOS C++ Library|https://trac.osgeo.org/geos>
+
+geos::noding::SegmentIntersectionDetector
+
+=head1 SEE ALSO
+
+L<Geo::Geos>
+
+L<Geo::Geos::Algorithm::LineIntersector>
+
+L<Geo::Geos::Noding::NodedSegmentString>
+
+L<Geo::Geos::Noding::SegmentIntersector>
+
+=head1 AUTHOR
+
+Ivan Baidakou <i.baydakov@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

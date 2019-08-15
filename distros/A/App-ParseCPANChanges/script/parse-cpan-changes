@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/ParseCPANChanges/parse_cpan_changes
 # and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-07-03'; # DATE
+our $DATE = '2019-08-02'; # DATE
 our $DIST = 'App-ParseCPANChanges'; # DIST
-our $VERSION = '0.070'; # VERSION
+our $VERSION = '0.071'; # VERSION
 
 use 5.010001;
 use strict;
@@ -35,7 +35,7 @@ parse-cpan-changes - Parse CPAN Changes file
 
 =head1 VERSION
 
-This document describes version 0.070 of parse-cpan-changes (from Perl distribution App-ParseCPANChanges), released on 2019-07-03.
+This document describes version 0.071 of parse-cpan-changes (from Perl distribution App-ParseCPANChanges), released on 2019-08-02.
 
 =head1 SYNOPSIS
 
@@ -61,13 +61,16 @@ Default value:
 
 If not specified, will look for file called Changes/ChangeLog in current directory.
 
+To read from standard input, use `-`.
+
+
 =back
 
 =head2 Configuration options
 
 =over
 
-=item B<--config-path>=I<filename>, B<-c>
+=item B<--config-path>=I<s>, B<-c>
 
 Set path to configuration file.
 

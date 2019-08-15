@@ -1,0 +1,37 @@
+=head1 NAME
+
+Geo::Geos::Noding::SegmentNode - Represents an intersection point between two NodedSegmentString.
+
+=head1 SYNOPSIS
+
+    use Geo::Geos::Noding::NodedSegmentString;
+
+    my $c1 = Geo::Geos::Coordinate->new(1,2);
+    my $c2 = Geo::Geos::Coordinate->new(5,2);
+    my $c3 = Geo::Geos::Coordinate->new(7,1);
+
+    my $ss = Geo::Geos::Noding::NodedSegmentString->new([$c1, $c2]);
+
+
+
+=head1 SEE ALSO (C++ classes docs)
+
+L<GEOS C++ Library|https://trac.osgeo.org/geos>
+
+geos::noding::SegmentNode
+
+=head1 SEE ALSO
+
+L<Geo::Geos>
+
+L<Geo::Geos::Noding::NodedSegmentString>
+
+=head1 AUTHOR
+
+Ivan Baidakou <i.baydakov@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

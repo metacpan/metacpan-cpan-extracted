@@ -8,10 +8,11 @@ package Devel::MAT::Dumper;
 use strict;
 use warnings;
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 use File::Basename qw( basename );
 use File::Spec;
+use POSIX;
 
 require XSLoader;
 XSLoader::load( __PACKAGE__, $VERSION );
@@ -85,6 +86,10 @@ a dump file if the signal is received. After dumping the file, the signal
 handler is removed and the signal re-raised.
 
    $ perl -MDevel::MAT::Dumper=-dump_at_SIGABRT ...
+
+Note that C<SIGABRT> uses an "unsafe" signal handler (i.e. not deferred until
+the next perl op), so it can capture the full context of any ongoing XS or C
+library operations.
 
 =head2 -file $PATH
 
@@ -181,13 +186,25 @@ sub import
          my $signal = $1;
          exists $SIG{$signal} or die "Unrecognised signal name SIG$signal\n";
 
-         $SIG{$signal} = sub {
+         my $handler = sub {
             ( my $file = $dumpfile_name ) =~ s/NNN/$next_serial++/e;
             print STDERR "Dumping to $file because of SIG$signal\n";
             Devel::MAT::Dumper::dump( $file );
             undef $SIG{$signal};
             kill $signal => $$;
          };
+
+         if( $signal eq "ABRT" ) {
+            # Install SIGABRT handler using unsafe signal so it can see
+            # inner workings of C code properly
+            my $sigaction = POSIX::SigAction->new( $handler );
+            $sigaction->safe(0);
+
+            POSIX::sigaction( POSIX::SIGABRT, $sigaction );
+         }
+         else {
+            $SIG{$signal} = $handler;
+         }
       }
       elsif( $sym eq "-file" ) {
          $dumpfile_name = File::Spec->rel2abs( shift );

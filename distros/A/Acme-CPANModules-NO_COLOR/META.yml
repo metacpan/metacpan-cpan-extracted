@@ -20,7 +20,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-NO_COLOR
   homepage: https://metacpan.org/release/Acme-CPANModules-NO_COLOR
   repository: git://github.com/perlancar/perl-Acme-CPANModules-NO_COLOR.git
-version: '0.001'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

@@ -11,25 +11,37 @@ my $max = shift || 16;
 
 my @notes = qw/ C4 D4 E4 F4 G4 A4 B4 C5 /;
 
+my @leaders = qw/ 1 2 4 7 /;
+
 my $score = MIDI::Util::setup_score( bpm => 100 );
+ 
+my $mc = Music::Cadence->new;
 
 for my $i ( 1 .. $max ) {
     my $note1 = $notes[ int rand @notes ];
     my $note2 = $notes[ int rand @notes ];
 
-    $score->n( 'hn', $note1, $note2 );
-}
- 
-my $mc = Music::Cadence->new;
+    $score->n( 'qn', $note1, $note2 );
 
-my $notes = $mc->cadence(
-  key    => 'C',
-  scale  => 'major',
+    if ( $i % 4 == 0 ) {
+        my $leading = $leaders[ int rand @leaders ];
+        my $chords = $mc->cadence(
+            type    => 'half',
+            octave  => 4,
+            leading => $leading,
+        );
+
+        $score->n( 'hn', @{ $chords->[0] } );
+        $score->n( 'hn', @{ $chords->[1] } );
+    }
+}
+
+my $chords = $mc->cadence(
   type   => 'plagal',
   octave => 4,
 );
 
-$score->n( 'wn', @{ $notes->[0] } );
-$score->n( 'wn', @{ $notes->[1] } );
+$score->n( 'hn', @{ $chords->[0] } );
+$score->n( 'hn', @{ $chords->[1] } );
 
 $score->write_score("$0.mid");

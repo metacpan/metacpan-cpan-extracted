@@ -4,58 +4,53 @@ use utf8;
 use strict;
 use warnings;
 
-$Geoffrey::Action::Entry::VERSION = '0.000101';
+$Geoffrey::Action::Entry::VERSION = '0.000102';
 
 use parent 'Geoffrey::Role::Action';
 
+sub _get_sql_abstract {
+    my ($self) = @_;
+    require SQL::Abstract;
+    $self->{sql_abstract} //= SQL::Abstract->new;
+    return $self->{sql_abstract};
+}
+
 sub add {
     my ( $self, $hr_params ) = @_;
-    my $s_table_name = $hr_params->{table};
-    my $ar_columns   = $hr_params->{columns};
-    my $ar_values    = $hr_params->{values};
 
-    if ( !$s_table_name ) {
+    if ( !$hr_params->{table} ) {
         require Geoffrey::Exception::RequiredValue;
         Geoffrey::Exception::RequiredValue::throw_table_name( __PACKAGE__ . '::add' );
     }
-    if ( !$ar_columns ) {
-        require Geoffrey::Exception::RequiredValue;
-        Geoffrey::Exception::RequiredValue::throw_table_column( __PACKAGE__ . '::add' );
-    }
-    if ( !$ar_values ) {
+    if ( !$hr_params->{values} ) {
         require Geoffrey::Exception::RequiredValue;
         Geoffrey::Exception::RequiredValue::throw_values( __PACKAGE__ . '::add' );
     }
-    return $self->do_prepared(
-        qq~INSERT INTO $s_table_name ( ~
-          . ( join q/,/, @{$ar_columns} )
-          . ' ) VALUES ('
-          . ( join q/,/, map { q~?~ } @{$ar_columns} ) . ')',
-        $ar_values
+
+    my ( $s_stmt, @a_bindings ) = $self->_get_sql_abstract->insert(
+        ( exists $hr_params->{schema} ? $hr_params->{schema} . q/./ : q// ) . $hr_params->{table},
+        $hr_params->{values}->[0],
     );
+
+    return $self->do_prepared( $s_stmt, \@a_bindings );
 }
 
 sub alter {
-    my ( $self, $s_table_name, $ar_columns, $ar_where_and, $ar_values ) = @_;
+    my ( $self, $s_table_name, $hr_where, $ar_values ) = @_;
+
     if ( !$s_table_name ) {
         require Geoffrey::Exception::RequiredValue;
         Geoffrey::Exception::RequiredValue::throw_table_name( __PACKAGE__ . '::alter' );
     }
-    if ( !$ar_columns ) {
-        require Geoffrey::Exception::RequiredValue;
-        Geoffrey::Exception::RequiredValue::throw_table_column( __PACKAGE__ . '::alter' );
-    }
-    if ( !$ar_where_and ) {
+
+    if ( !$hr_where ) {
         require Geoffrey::Exception::RequiredValue;
         Geoffrey::Exception::RequiredValue::throw_where_clause( __PACKAGE__ . '::alter' );
     }
-    return $self->do_prepared(
-        qq~UPDATE $s_table_name SET ~
-          . ( join ', ', map { $_ . ' = ?' } @{$ar_columns} )
-          . ' WHERE ( '
-          . _s_where_clause($ar_where_and) . ' )',
-        $ar_values
-    );
+
+    my ( $s_stmt, @a_bindings ) = $self->_get_sql_abstract->update( $s_table_name, $ar_values->[0], $hr_where );
+
+    return $self->do_prepared( $s_stmt, \@a_bindings );
 }
 
 sub drop {
@@ -86,7 +81,7 @@ Geoffrey::Action::Entry - Action to insert change or delete entries from tables
 
 =head1 VERSION
 
-Version 0.000101
+Version 0.000102
 
 =head1 DESCRIPTION
 

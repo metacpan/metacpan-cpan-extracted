@@ -49,20 +49,56 @@ commit message if the current working branch name is starting with the valid tic
 These hooks are invoked during the commit, to check if the commit message
 starts with a valid Youtrack ticket Id.
 
+## **update**
+
+This hook is for remote repository and should be installed and configured at the remote git server.
+Checks for youtrack ticket on each commit message pushed to the remote repository and deny push
+if its not found and its required = true in the config, shows a warning message on client side 
+if config required = false but accepts the push.
+
 ## **prepare-commit-msg**
 
 This hook is invoked before a commit, to check if the current branch name start with 
 a valid youtrack ticket id and pre-populates the commit message with youtrack ticket: summary
 
+# USAGE INSTRUCTION
+
+Create a generic script that will be invoked by Git for every hook. Go to hooks directory of your repository,
+for local repository it is .git/hooks/ and for remote server it is ./hooks/ and create a simple executable perl script
+
+       $ cd /path/to/repo/.git/hooks
+    
+       $ cat >git-hooks.pl <<'EOT'
+       #!/usr/bin/env perl
+       use Git::Hooks;
+       run_hook($0, @ARGV);
+       EOT
+    
+       $ chmod +x git-hooks.pl
+
+Now you should create symbolic links pointing to this perl script for each hook you are interested in
+
+For local repository
+
+    $ cd /path/to/repo/.git/hooks
+
+    $ ln -s git-hooks.pl commit-msg
+    $ ln -s git-hooks.pl applypatch-msg
+    $ ln -s git-hooks.pl prepare-commit-msg
+
+For remote repository
+
+    $ cd /path/to/repo/hooks
+
+    $ ln -s git-hooks.pl update
+
 # SEE ALSO
 
 Git::Hooks
 
-Git::Hooks::CheckJira
-
 # AUTHORS
 
-Dinesh Dharmalingam, &lt;dinesh@exceleron.com>
+Dinesh Dharmalingam, &lt;dd.dinesh.rajakumar@gmail.com>
 
 # LICENSE
 

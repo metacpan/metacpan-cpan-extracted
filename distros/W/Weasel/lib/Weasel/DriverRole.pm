@@ -5,7 +5,7 @@ Weasel::DriverRole - API definition for driver wrappers
 
 =head1 VERSION
 
-0.02
+0.03
 
 =head1 SYNOPSIS
 
@@ -40,7 +40,7 @@ use Carp;
 use Moose::Role;
 use namespace::autoclean;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 ATTRIBUTES
 
@@ -176,13 +176,16 @@ sub is_displayed {
     croak q{Abstract interface method 'is_displayed' called};
 }
 
-=item wait_for( $callback, retry_timeout => $num, poll_delay => $num )
+=item wait_for( $callback, retry_timeout => $num, poll_delay => $num, on_timeout => \&cb )
 
 The driver may interpret the 'poll_delay' in one of two ways:
  1. The 'poll_delay' equals the number of seconds between the start of
     successive poll requests
  2. The 'poll_delay' equals the number of seconds to wait between the end
     of one poll request and the start of the next
+
+I<Since 0.03:> Unless an C<on_timeout> callback is provided, will C<die>
+when the timeout has exceeded. Otherwise, call the provided callback.
 
 Note: The user should catch inside the callback any exceptions that are
   thrown inside the callback, unless such exceptions are allowed to

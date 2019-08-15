@@ -11,7 +11,7 @@ package CP932X::R2;
 use 5.00503;    # Galapagos Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.03';
+$VERSION = '0.04';
 $VERSION = $VERSION;
 
 use strict;
@@ -88,7 +88,7 @@ Following subroutines and tied hash variable provide UTF-8 semantics for us.
   ------------------------------------------------------------------------------------------------------------------------------------------
   s/before/after/imsxoegr  s<$mb{qr/before/imsxo}><after>egr
   ------------------------------------------------------------------------------------------------------------------------------------------
-  split(//,$_)             mbeach($utf8str)                            split $utf8str as CP932X encoding into each characters
+  split(//,$_)             mbeach($utf8str)                            split $utf8str into each characters
   ------------------------------------------------------------------------------------------------------------------------------------------
   tr/// or y///            mbtr($utf8str, 'ABC', 'XYZ', 'cdsr')        not support range of codepoint(like a "tr/A-Z/a-z/")
   ------------------------------------------------------------------------------------------------------------------------------------------
@@ -111,6 +111,9 @@ These subroutines provide CP932X octets semantics for you.
   printf                   ioputf(FILEHANDLE, $utf8format, @utf8list)  printf @utf8str as CP932X encoding
   ------------------------------------------------------------------------------------------------------------------------------------------
   sort                     iosort(@utf8str)                            sort @utf8str as CP932X encoding
+  ------------------------------------------------------------------------------------------------------------------------------------------
+  sprintf                  (nothing)                                   "iosputf" is bad interface because it makes confuse by bringing
+                                                                       both internal code and external code into your script
   ------------------------------------------------------------------------------------------------------------------------------------------
   substr                   iomid($utf8expr, $offset_as_cp932x, $length_as_cp932x, $utf8replacement)
                                                                        substr $utf8expr as CP932X octets

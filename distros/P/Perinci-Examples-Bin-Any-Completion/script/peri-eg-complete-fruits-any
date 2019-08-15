@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Perinci/Examples/Completion/fruits
-# and generated automatically using Perinci::CmdLine::Gen version 0.488
+# and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-07-06'; # DATE
+our $DATE = '2019-07-19'; # DATE
 our $DIST = 'Perinci-Examples-Bin-Any-Completion'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -35,13 +35,13 @@ peri-eg-complete-fruits-any - peri-eg-complete-fruits-any
 
 =head1 VERSION
 
-This document describes version 0.004 of peri-eg-complete-fruits-any (from Perl distribution Perinci-Examples-Bin-Any-Completion), released on 2019-07-06.
+This document describes version 0.007 of peri-eg-complete-fruits-any (from Perl distribution Perinci-Examples-Bin-Any-Completion), released on 2019-07-19.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % peri-eg-complete-fruits-any [options] [fruits]
+ % peri-eg-complete-fruits-any [options] [fruits] ...
 
 =head1 DESCRIPTION
 
@@ -77,7 +77,7 @@ See C<--fruit>.
 
 =over
 
-=item B<--config-path>=I<filename>, B<-c>
+=item B<--config-path>=I<s>, B<-c>
 
 Set path to configuration file.
 

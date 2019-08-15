@@ -1,7 +1,7 @@
 package Data::Sah::Type::datetime;
 
-our $DATE = '2019-08-12'; # DATE
-our $VERSION = '0.900'; # VERSION
+our $DATE = '2019-08-14'; # DATE
+our $VERSION = '0.901'; # VERSION
 
 use Role::Tiny;
 use Role::Tiny::With;
@@ -23,7 +23,7 @@ Data::Sah::Type::datetime - datetime type
 
 =head1 VERSION
 
-This document describes version 0.900 of Data::Sah::Type::datetime (from Perl distribution Data-Sah), released on 2019-08-12.
+This document describes version 0.901 of Data::Sah::Type::datetime (from Perl distribution Data-Sah), released on 2019-08-14.
 
 =for Pod::Coverage ^(clause_.+|clausemeta_.+)$
 

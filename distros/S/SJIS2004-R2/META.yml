@@ -3,7 +3,7 @@ meta-spec:
   version: 1.4
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
 name: SJIS2004-R2
-version: 0.03
+version: 0.04
 abstract: provides minimal SJIS2004 I/O subroutines by short name
 author:
   - ina <ina@cpan.org>

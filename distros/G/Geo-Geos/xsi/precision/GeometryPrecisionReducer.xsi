@@ -1,0 +1,29 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::Precision::GeometryPrecisionReducer
+PROTOTYPES: DISABLE
+
+Sv new(SV*, SV* arg0) {
+    GeometryPrecisionReducer* self;
+    Object arg{arg0};
+    if (arg.stash().name() == "Geo::Geos::PrecisionModel") {
+        PrecisionModel& pm = xs::in<PrecisionModel&>(arg);
+        self = new GeometryPrecisionReducer(pm);
+    }
+    else {
+        GeometryFactory& gf = xs::in<GeometryFactory&>(arg);
+        self = new GeometryPrecisionReducer(gf);
+    }
+    Object wrapped = xs::out<GeometryPrecisionReducer*>(self);
+    wrapped.payload_attach(SvRV(arg0), &payload_marker);
+    RETVAL = wrapped.ref();
+}
+
+void GeometryPrecisionReducer::setRemoveCollapsedComponents(bool remove)
+
+void GeometryPrecisionReducer::setPointwise (bool pointwise)
+
+Sv GeometryPrecisionReducer::reduce(Geometry& g) {
+    auto ptr = THIS->reduce(g);
+    RETVAL = Helper::uplift(ptr.release());
+}
+
+int CLONE_SKIP (...) { PERL_UNUSED_VAR(items); RETVAL = 1; }

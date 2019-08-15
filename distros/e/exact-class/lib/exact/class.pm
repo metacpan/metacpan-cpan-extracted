@@ -6,7 +6,7 @@ use exact;
 use Role::Tiny ();
 use Scalar::Util;
 
-our $VERSION = '1.01'; # VERSION
+our $VERSION = '1.02'; # VERSION
 
 my $store = '::____exact_class';
 
@@ -85,9 +85,9 @@ sub class_has {
     try {
         ____attrs($set);
     }
-    catch ($e) {
-        croak($$e);
-    }
+    catch {
+        croak($$_);
+    };
 
     return;
 }
@@ -106,9 +106,9 @@ sub has {
     try {
         ____attrs($set);
     }
-    catch ($e) {
-        croak($$e);
-    }
+    catch {
+        croak($$_);
+    };
 
     return;
 }
@@ -202,7 +202,7 @@ exact::class - Simple class interface extension for exact
 
 =head1 VERSION
 
-version 1.01
+version 1.02
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/exact-class.svg)](https://travis-ci.org/gryphonshafer/exact-class)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/exact-class/badge.png)](https://coveralls.io/r/gryphonshafer/exact-class)

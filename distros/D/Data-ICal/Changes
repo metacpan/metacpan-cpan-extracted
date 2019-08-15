@@ -1,5 +1,15 @@
 Revision history for Data-ICal
 
+0.23 2019-08-14
+
+ - Rewrite property folding to be faster (and clearer)(thanks to Calvin Morrison)
+ - Linewrap tests: add a stronger assertion about expectation(thanks to Ricardo Signes)
+
+Note that as the folding code is rewritten, there is a tiny behavior change:
+Long folded strings will always contain CRLF at the end no matter if
+original strings have that or not(they should have according to RFC).
+Please report if this is an issue to you.
+
 0.22 2015-02-17
  - Add URI and NONE alarm types, for compatibility with Apple iCal
  - Add support for the common X-WR-CalName property

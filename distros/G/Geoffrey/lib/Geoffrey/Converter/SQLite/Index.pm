@@ -5,7 +5,7 @@ use 5.016;
 use strict;
 use warnings;
 
-$Geoffrey::Converter::SQLite::Index::VERSION = '0.000101';
+$Geoffrey::Converter::SQLite::Index::VERSION = '0.000102';
 
 use parent 'Geoffrey::Role::ConverterType';
 
@@ -73,7 +73,7 @@ Geoffrey::Converter::SQLite::Index - SQLite converter type for indexes!
 
 =head1 VERSION
 
-Version 0.000101
+Version 0.000102
 
 =head1 DESCRIPTION
 

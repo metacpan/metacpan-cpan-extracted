@@ -8,7 +8,7 @@ SYNOPSIS
 
 DESCRIPTION
 
-  IOas::CP932X module provides CP932X I/O subroutines for UTF-8 script for
+  IOas::CP932X module provides CP932X I/O subroutines in UTF-8 script for
   stable scripting environment, using no utf8 pragma, no UTF-8 flag.
 
 SUBROUTINES

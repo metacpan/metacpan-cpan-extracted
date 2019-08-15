@@ -2,7 +2,7 @@ package App::Yath::Command::run;
 use strict;
 use warnings;
 
-our $VERSION = '0.001080';
+our $VERSION = '0.001081';
 
 use Test2::Harness::Feeder::Run;
 use Test2::Harness::Util::File::JSON;
@@ -394,6 +394,12 @@ Use TAP
 
 The TAP format is lossy and clunky. Test2::Harness normally uses a newer streaming format to receive test results. There are old/legacy tests where this causes problems, in which case setting --TAP or --no-stream can help.
 
+=item --times
+
+Monitor timing data for each test file
+
+This tells perl to load Test2::Plugin::Times before starting each test. Use -T to show the timing data
+
 =item --unsafe-inc
 
 =item --no-unsafe-inc
@@ -431,14 +437,6 @@ This is useful if you want to inspect the work directory after the harness is do
 Pass the specified switch to perl for each test
 
 This is not compatible with preload.
-
-=item -T
-
-=item --times
-
-Monitor timing data for each test file
-
-This tells perl to load Test2::Plugin::Times before starting each test.
 
 =back
 

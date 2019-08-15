@@ -3,7 +3,7 @@ NAME
     (e.g. 100,2,3,4,5,101 -> 100,"2..5",101)
 
 VERSION
-    This document describes version 0.001 of Number::Util::Range (from Perl
+    This document describes version 0.002 of Number::Util::Range (from Perl
     distribution Number-Util-Range), released on 2019-01-25.
 
 FUNCTIONS
@@ -17,9 +17,25 @@ FUNCTIONS
 
     Examples:
 
-    *   Example #1:
+    *   basic, non-numbers ignored:
 
          convert_number_sequence_to_range(array => [100, 2 .. 5, 101, "foo"]); # -> [100, "2..5", 101, "foo"]
+
+    *   option: separator:
+
+         convert_number_sequence_to_range(array => [100, 2 .. 5, 101], separator => "-"); # -> [100, "2-5", 101]
+
+    *   multiple ranges, negative number:
+
+         convert_number_sequence_to_range(array => [100, 2 .. 6, 101, 102, -5 .. -2, 103]);
+
+        Result:
+
+         [100, "2..6", 101, 102, "-5..-2", 103]
+
+    *   option: threshold:
+
+         convert_number_sequence_to_range(array => [100, 2 .. 5, 101], threshold => 5); # -> [100, 2 .. 5, 101]
 
     This function is not exported by default, but exportable.
 

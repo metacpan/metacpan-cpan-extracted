@@ -6,7 +6,9 @@ build_requires:
   Config: '0'
   Email::Sender::Transport::Mbox: '0'
   ExtUtils::MakeMaker: '0'
+  FindBin: '0'
   Path::Tiny: '0.060'
+  Test::More: '0'
   Test::Requires::Git: '0'
   lib: '0'
 configure_requires:
@@ -31,5 +33,5 @@ requires:
   URI::Builder: '0'
 resources:
   repository: https://github.com/dinesh-it/Git-Hooks-CheckYoutrack.git
-version: v1.0.0
+version: v1.0.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

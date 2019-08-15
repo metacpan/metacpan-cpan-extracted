@@ -1,8 +1,9 @@
 package MooX::Purple::G;
 
 use 5.006;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 use PPR;
+use Cwd qw/abs_path/;
 use strict;
 use warnings;
 
@@ -34,60 +35,96 @@ my $SATTRS = '(
 	(?:(?&PerlNWS)*)
 )';
 
-sub import {
-	open FH, "<$0";
-	my $source = join '', <FH>;
-	close FH;
-	while ($source =~ m/(?<match> role\s*
-		(?<class> (?&PerlIdentifier)) 
-		(?<attrs> (?: $GATTRS*))
-		(?<block> (?&PerlBlock)))
+sub g {
+	my ($source, $keyword, $callback, $lib) = @_;
+	while ($$source =~ m/
+		$keyword 
 		$PPR::GRAMMAR
 	/xms) {
 		my %hack = %+;
-		$source =~ s/$hack{match}/roles(%hack)/e;
+		my ($make, %makes) = $callback->(%hack);
+		$hack{match} = quotemeta($hack{match});
+		if ($lib) {
+			$make =~ s/(^\{\s*)|(\}\s*$)//g;
+			$make =~ s/^\t//gm;
+			write_file(sprintf("%s/%s.pmc", $lib, $makes{class}), $make)
+				if $makes{class};		
+			$$source =~ s/$hack{match}//;
+		} else {
+			$$source =~ s/$hack{match}/$make/e;
+		}
 	}
-	
-	while ($source =~ m/(?<match> class\s*
+	$source;
+}
+
+sub import {
+	my $lib = $_[1];
+	open FH, "<$0";
+	my $source = \join '', <FH>;
+	close FH;
+	g(
+		g(
+			$source,
+			qq/(?<match> role\\s*
+			(?<class> (?&PerlIdentifier)) 
+			(?<attrs> (?: $GATTRS*))
+			(?<block> (?&PerlBlock)))/,
+			\&roles, 
+			$lib
+		),
+		qq/(?<match> class\\s*
 		(?<class> (?&PerlIdentifier))
 		(?<attrs> (?: $GATTRS*))
-		(?<block> (?&PerlBlock)))
-		$PPR::GRAMMAR
-	/xms) {
-		my %hack = %+;
-		$hack{match} = quotemeta($hack{match});
-		$source =~ s/$hack{match}/classes(%hack)/e;
+		(?<block> (?&PerlBlock)))/,
+		\&classes,
+		$lib
+	);
+	unless ($lib) {
+		$source =~ s/use MooX\:\:Purple;\n*//;
+		$source =~ s/use MooX\:\:Purple\:\:G;\n*//;
+		my $current = [caller()]->[1];
+		$current =~ s/\.(.*)/\.pmc/;
+		write_file($current, $$source);
 	}
+}
 
-	while ($source =~ m/(?<match> private\s*
-		(?<method> (?&PerlIdentifier))
-		(?<attrs> (?: $SATTRS*))
-		(?<block> (?&PerlBlock)))
-		$PPR::GRAMMAR
-	/xms) {
-		my %hack = %+;
-		$hack{match} = quotemeta($hack{match});
-		$source =~ s/$hack{match}/private(%hack)/e;
+sub make_path {
+	my $path = abs_path();;
+	for (split '/', $_[0]) {
+		$path .= "/$_";
+		if (! -d $path) {
+			mkdir $path  or Carp::croak(qq/
+				Cannot open file for writing $!
+			/);
+		}
 	}
+}
 
-	while ($source =~ m/(?<match> public\s*
+sub write_file {
+	my $f = $_[0];
+	$f =~ s/\:\:/\//g;
+	make_path(substr($f, 0, rindex($f, '/')));
+	open FH, '>', $f or die "$f cannot open file to write $!";
+	print FH $_[1];
+	close FH;
+}
+
+sub p {
+	g(
+		g(
+			$_[0],
+			qq|(?<match> private\\s*
+			(?<method> (?&PerlIdentifier))
+			(?<attrs> (?: $SATTRS*))
+			(?<block> (?&PerlBlock)))|,
+			\&private,
+		),
+		qq|(?<match> public\\s*
 		(?<method> (?&PerlIdentifier))
 		(?:(?&PerlNWS))*
-		(?<block> (?&PerlBlock)))
-		$PPR::GRAMMAR
-	/xms) {
-		my %hack = %+;
-		$hack{match} = quotemeta($hack{match});
-		$source =~ s/$hack{match}/public(%hack)/e;
-	}
-	
-	$source =~ s/use MooX\:\:Purple;\n*//;
-	$source =~ s/use MooX\:\:Purple\:\:G;\n*//;
-	my $current = [caller()]->[1];
-	$current =~ s/\.(.*)/\.pmc/;
-	open FH, '>', $current or die "cannot open file to write $!";
-	print FH $source;
-	close FH;
+		(?<block> (?&PerlBlock)))|,
+		\&public,
+	);
 }
 
 sub roles {
@@ -95,12 +132,14 @@ sub roles {
 	my @hack = grep {$_ && $_ !~ m/^\s*$/} $args{attrs} =~ m/(?:$GATTRS) $PPR::GRAMMAR/gx;
 	my ($body, %attrs) = _set_class_role_attrs($args{block}, _parse_role_attrs(@hack));
 	$body =~ s/\s*$//;
-	my $r = qq|{
+	my $r = \qq|{
 	package $args{class};
 	use Moo::Role;
 	$attrs{with}$attrs{use}$body
+	1;
 }|;
-	return $r;
+	p($r);
+	return ($$r, %args);
 }
 
 sub classes {
@@ -108,7 +147,7 @@ sub classes {
 	my @hack = grep {$_ && $_ !~ m/^\s*$/} $args{attrs} =~ m/(?:$GATTRS) $PPR::GRAMMAR/gx;
 	my ($body, %attrs) = _set_class_role_attrs($args{block}, _parse_role_attrs(@hack));
 	$body =~ s/\s*$//;
-	return qq|{
+	my $r = \qq|{
 	package $args{class};
 	use Moo;
 	use MooX::LazierAttributes;
@@ -116,6 +155,8 @@ sub classes {
 	$attrs{is}$attrs{with}$attrs{use}$body
 	1;
 }|;
+	p($r);
+	return ($$r, %args);
 }
 
 sub private {
@@ -160,7 +201,6 @@ sub _set_class_role_attrs {
 		my $allow = join ' ', @{$attrs{allow}};
 		$body =~ s{private\s*(\p{XIDS}\p{XIDC}*)}{private $1 allow qw/$allow/}g;
 	}
-
 	$attrs{is} = $attrs{is} ? sprintf "extends qw/%s/;\n", join ' ', @{$attrs{is}} : '';
 	$attrs{with} = $attrs{with} ? sprintf "with qw/%s/;\n", join ' ', @{$attrs{with}} : '';
 	$attrs{use} = $attrs{use} ? join('', map { sprintf("\tuse %s;\n", $_) } @{$attrs{use}}) : '';
@@ -178,7 +218,7 @@ MooX::Purple - MooX::Purple::G
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 

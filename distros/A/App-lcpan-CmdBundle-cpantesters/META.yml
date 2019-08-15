@@ -28,7 +28,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-lcpan-CmdBundle-cpantesters
   homepage: https://metacpan.org/release/App-lcpan-CmdBundle-cpantesters
   repository: git://github.com/perlancar/perl-App-lcpan-CmdBundle-cpantesters.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

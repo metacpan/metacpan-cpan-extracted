@@ -1,0 +1,48 @@
+=head1 NAME
+
+Geo::Geos::Dimension - Represents dimensions of a point, a curve and a surface.
+
+=head1 SYNOPSIS
+
+    use Geo::Geos::Dimension;
+
+    Geo::Geos::Dimension::toDimensionSymbol(TYPE_DONTCARE);  # => '*'
+    Geo::Geos::Dimension::toDimensionValue('1');             # => TYPE_L
+
+=head1 SEE ALSO (C++ classes docs)
+
+L<GEOS C++ Library|https://trac.osgeo.org/geos>
+
+geos::geom::Dimension
+
+=head1 EXPORTS CONSTANTS
+
+=over 2
+
+=item TYPE_DONTCARE
+
+=item TYPE_True
+
+=item TYPE_False
+
+=item TYPE_P
+
+=item TYPE_L
+
+=item TYPE_A
+
+=back
+
+=head1 SEE ALSO
+
+L<Geo::Geos>
+
+=head1 AUTHOR
+
+Ivan Baidakou <i.baydakov@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

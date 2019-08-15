@@ -1,7 +1,7 @@
 This archive contains the distribution Proch-N50,
-version 0.040:
+version 0.70:
 
-  Calculate N50 from a FASTA or FASTQ file without dependencies
+  a small module to calculate N50 (total size, and total number of sequences) for a FASTA or FASTQ file. It's easy to install, with minimal dependencies.
 
 This software is Copyright (c) 2019 by Andrea Telatin.
 

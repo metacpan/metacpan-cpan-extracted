@@ -11,7 +11,7 @@ package UTF8::R2;
 use 5.00503;    # Galapagos Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.04';
+$VERSION = '0.05';
 $VERSION = $VERSION;
 
 use strict;
@@ -595,7 +595,7 @@ UTF8::R2 - makes UTF-8 scripting easy for enterprise use or LTS
 
     $result = UTF8::R2::chop(@_)
     $result = UTF8::R2::chr($_)
-    $result = UTF8::R2::getc(FILE)
+    $result = UTF8::R2::getc(FILEHANDLE)
     $result = UTF8::R2::index($_, 'ABC', 5)
     $result = UTF8::R2::lc($_)
     $result = UTF8::R2::lcfirst($_)
@@ -627,7 +627,7 @@ UTF-8 codepoint semantics is provided by the new subroutine name.
   ------------------------------------------------------------------------------------------------------------------------------------------
   chr                     UTF8::R2::chr($_)                          returns UTF-8 codepoint octets by UTF-8 number (not by Unicode number)
   ------------------------------------------------------------------------------------------------------------------------------------------
-  getc                    UTF8::R2::getc(FILE)                       get UTF-8 codepoint octets
+  getc                    UTF8::R2::getc(FILEHANDLE)                 get UTF-8 codepoint octets
   ------------------------------------------------------------------------------------------------------------------------------------------
   index                   UTF8::R2::index($_, 'ABC', 5)              index() is compatible and usually useful
   ------------------------------------------------------------------------------------------------------------------------------------------
@@ -642,6 +642,18 @@ UTF-8 codepoint semantics is provided by the new subroutine name.
                           use UTF8::R2 qw(%mb);                      not supports POSIX character class (like an [:alpha:])
                           $mb{qr/$utf8regex/imsxogc}                 not supports named character (such as \N{GREEK SMALL LETTER EPSILON}, \N{greek:epsilon}, or \N{epsilon})
                                                                      not supports character properties (like \p{PROP} and \P{PROP})
+
+                          Special Escapes in Regex                   Support Perl Version
+                          --------------------------------------------------------------------------------------------------
+                          $mb{qr/ \x{Unicode} /}                     since perl 5.006
+                          $mb{qr/ [^ ... ] /}                        since perl 5.008  ** CAUTION ** perl 5.006 cannot this
+                          $mb{qr/ \h /}                              since perl 5.010
+                          $mb{qr/ \v /}                              since perl 5.010
+                          $mb{qr/ \H /}                              since perl 5.010
+                          $mb{qr/ \V /}                              since perl 5.010
+                          $mb{qr/ \R /}                              since perl 5.010
+                          $mb{qr/ \N /}                              since perl 5.012
+
   ------------------------------------------------------------------------------------------------------------------------------------------
   ?? or m??                 (nothing)
   ------------------------------------------------------------------------------------------------------------------------------------------
@@ -673,21 +685,6 @@ UTF-8 codepoint semantics is provided by the new subroutine name.
   ------------------------------------------------------------------------------------------------------------------------------------------
   write                     (nothing)
   ------------------------------------------------------------------------------------------------------------------------------------------
-
-=head1 REGEX FEATURES
-
-  -------------------------------------------------------------------------------------------------------
-  Special Escapes in Regex                  Support Perl Version
-  -------------------------------------------------------------------------------------------------------
-  UTF8::R2::qr(qr/ \x{Unicode} /)           since perl 5.006
-  UTF8::R2::qr(qr/ [^ ... ] /)              since perl 5.008  ** CAUTION ** perl 5.006 cannot this
-  UTF8::R2::qr(qr/ \h /)                    since perl 5.010
-  UTF8::R2::qr(qr/ \v /)                    since perl 5.010
-  UTF8::R2::qr(qr/ \H /)                    since perl 5.010
-  UTF8::R2::qr(qr/ \V /)                    since perl 5.010
-  UTF8::R2::qr(qr/ \R /)                    since perl 5.010
-  UTF8::R2::qr(qr/ \N /)                    since perl 5.012
-  -------------------------------------------------------------------------------------------------------
 
 =head1 OUR GOAL
 

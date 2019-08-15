@@ -1,0 +1,69 @@
+=head1 NAME
+
+Geo::Geos::Algorithm::HCoordinate - Homogeneous coordinate in a 2-D coordinate space.
+
+=head1 SYNOPSIS
+
+    use Geo::Geos::Coordinate;
+    use Geo::Geos::Algorithm::HCoordinate qw/intersection/;
+
+    my $hc1 = Geo::Geos::Algorithm::HCoordinate->new(1,2,3);
+
+    $hc1->x;     # => is 1
+    $hc1->y;     # => is 2
+    $hc1->w;     # => is 3
+
+    my $hc2 = Geo::Geos::Algorithm::HCoordinate->new(
+        Geo::Geos::Coordinate->new(1,2),
+        Geo::Geos::Coordinate->new(-5,3)
+    );
+
+    $hc2->x;     # => is 0
+    $hc2->y;     # => is 0
+    $hc2->w;     # => is 0
+
+    my $hc3 = Geo::Geos::Algorithm::HCoordinate->new(Geo::Geos::Coordinate->new(1,2));
+    $hc3->x;    # => is 1
+    $hc3->y;    # => is 2
+
+    my $hc4 = Geo::Geos::Algorithm::HCoordinate->new($hc1, $hc2);
+
+    my $hc5 = Geo::Geos::Algorithm::HCoordinate->new(
+        Geo::Geos::Coordinate->new(1,2),
+        Geo::Geos::Coordinate->new(5,3),
+        Geo::Geos::Coordinate->new(0,0),
+        Geo::Geos::Coordinate->new(0,7),
+    );
+    $hc5->toString;     # => '(0, 49) [w: 28]'
+
+    my $ci = intersection(
+        Geo::Geos::Coordinate->new(1,2),
+        Geo::Geos::Coordinate->new(5,3),
+        Geo::Geos::Coordinate->new(0,0),
+        Geo::Geos::Coordinate->new(0,7),
+    );
+    $ci;    # => isa 'Geo::Geos::Coordinate'
+
+=head1 SEE ALSO (C++ classes docs)
+
+L<GEOS C++ Library|https://trac.osgeo.org/geos>
+
+geos::algorithm::HCoordinate
+
+=head1 SEE ALSO
+
+L<Geo::Geos>
+
+L<Geo::Geos::Algorithm>
+
+L<Geo::Geos::Coordinate>
+
+=head1 AUTHOR
+
+Ivan Baidakou <i.baydakov@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

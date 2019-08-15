@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.843';
+our $VERSION = '1.844';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (InputOutput::ProhibitTwoArgOpen)
@@ -686,7 +686,7 @@ MCE::Shared::Handle - Handle helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Handle version 1.843
+This document describes MCE::Shared::Handle version 1.844
 
 =head1 DESCRIPTION
 
@@ -760,11 +760,15 @@ A handle helper class for use as a standalone or managed by L<MCE::Shared>.
 
 =head1 API DOCUMENTATION
 
-=head2 mce_open ( filehandle, expr )
+=head2 MCE::Shared::Handle->new ( )
 
-=head2 mce_open ( filehandle, mode, expr )
+Called by MCE::Shared for constructing a shared-handle object.
 
-=head2 mce_open ( filehandle, mode, reference )
+=head2 open ( filehandle, expr )
+
+=head2 open ( filehandle, mode, expr )
+
+=head2 open ( filehandle, mode, reference )
 
 In version 1.007 and later, constructs a new object by opening the file
 whose filename is given by C<expr>, and associates it with C<filehandle>.
@@ -789,7 +793,13 @@ a message and stop if open fails.
 
  mce_open my $fh, "<", "file.log" or die "$!"; # ditto
 
-Simple examples to open a file for reading:
+=head2 mce_open ( filehandle, expr )
+
+=head2 mce_open ( filehandle, mode, expr )
+
+=head2 mce_open ( filehandle, mode, reference )
+
+Native Perl-like syntax to open a file for reading:
 
  # mce_open is exported by MCE::Shared or MCE::Shared::Handle.
  # It creates a shared file handle with MCE::Shared present

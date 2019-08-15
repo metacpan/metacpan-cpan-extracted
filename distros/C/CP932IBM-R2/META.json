@@ -1,6 +1,6 @@
 {
     "name" : "CP932IBM-R2",
-    "version" : "0.03",
+    "version" : "0.04",
     "abstract" : "provides minimal CP932IBM I/O subroutines by short name",
     "author" : [
         "ina <ina@cpan.org>"

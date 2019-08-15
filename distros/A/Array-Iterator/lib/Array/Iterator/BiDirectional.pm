@@ -4,7 +4,7 @@ package Array::Iterator::BiDirectional;
 use strict;
 use warnings;
 
-our $VERSION = '0.11'; # VERSION
+our $VERSION = '0.12'; # VERSION
 
 use Array::Iterator;
 our @ISA = qw(Array::Iterator);
@@ -57,11 +57,13 @@ sub look_back {
 sub lookBack { my $self = shift; $self->look_back(@_) }
 
 1;
-#ABSTRACT: A subclass of Array::Iterator to allow forwards and backwards iteration
+# ABSTRACT: A subclass of Array::Iterator to allow forwards and backwards iteration
 
 __END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -69,7 +71,7 @@ Array::Iterator::BiDirectional - A subclass of Array::Iterator to allow forwards
 
 =head1 VERSION
 
-version 0.11
+This document describes version 0.12 of Array::Iterator::BiDirectional (from Perl distribution Array-Iterator), released on 2017-07-04.
 
 =head1 SYNOPSIS
 
@@ -94,6 +96,19 @@ version 0.11
 Occasionally it is useful for an iterator to go in both directions, forward and backward. One example would be token processing. When looping though tokens it is sometimes necessary to advance forward looking for a match to a rule. If the match fails, a bi-directional iterator can be moved back so that the next rule can be tried.
 
 =for Pod::Coverage .+
+
+=head1 ORIGINAL AUTHOR
+
+stevan little, E<lt>stevan@iinteractive.comE<gt>
+
+=head1 ORIGINAL COPYRIGHT AND LICENSE
+
+Copyright 2004 by Infinity Interactive, Inc.
+
+L<http://www.iinteractive.com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =head1 METHODS
 
@@ -123,38 +138,33 @@ Optional argument has the same meaning except that it specifies C<$n>th previous
 
 =back
 
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Array-Iterator>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/sharyanto/perl-Array-Iterator>.
+
 =head1 BUGS
 
-None that I am aware of, if you find a bug, let me know, and I will be sure to fix it.
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Array-Iterator>
 
-=head1 CODE COVERAGE
-
-See the B<CODE COVERAGE> section of the B<Array::Iterator> documentation for information about the code coverage of this module's test suite.
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =head1 SEE ALSO
 
 This is a subclass of B<Array::Iterator>, please refer to it for more documenation.
 
-=head1 ORIGINAL AUTHOR
-
-stevan little, E<lt>stevan@iinteractive.comE<gt>
-
-=head1 ORIGINAL COPYRIGHT AND LICENSE
-
-Copyright 2004 by Infinity Interactive, Inc.
-
-L<http://www.iinteractive.com>
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
-
 =head1 AUTHOR
 
-Steven Haryanto <stevenharyanto@gmail.com>
+perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Steven Haryanto.
+This software is copyright (c) 2017, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

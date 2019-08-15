@@ -1,8 +1,32 @@
 
+Version 3.9.0, released August 13, 2019
+
+  - ShowErrorStatement works for "quickexec" do() calls
+    [Dmitry Karasik]
+    [RT #120268]
+    [Github issue #44]
+
+  - Add :pg_limits to add constants such as PG_MAX_SMALLINT
+    [Greg Sabino Mullane]
+    [Github issue #51]
+
+  - Add $dbh->pg_error_field() function
+    [Greg Sabino Mullane]
+
+  - Fix failing tests due to incorrect 'initdb' check
+    [Greg Sabino Mullane]
+    [Github issue #54]
+    [RT #130279]
+
+
 Version 3.8.1, released July 6, 2019
 
   - Fix encoding of SQL_VARBINARY type in $dbh->quote() function
     [Pali]
+
+  - Fix encoding in $dbh->do() function
+    [Pali]
+    [CPAN ticket #122991]
 
   - Fix E'' string escape handling on architectures with unsigned chars
     [Github issue #46]

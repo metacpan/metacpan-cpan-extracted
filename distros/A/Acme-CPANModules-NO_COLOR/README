@@ -3,7 +3,7 @@ NAME
     convention
 
 VERSION
-    This document describes version 0.001 of Acme::CPANModules::NO_COLOR
+    This document describes version 0.003 of Acme::CPANModules::NO_COLOR
     (from Perl distribution Acme-CPANModules-NO_COLOR), released on
     2018-12-22.
 
@@ -15,12 +15,23 @@ DESCRIPTION
     called NO_COLOR. The existence of said environment variable, regardless
     of its value, signals that programs should not use colored output.
 
+    If you know of other modules that should be listed here, please contact
+    me.
+
 INCLUDED MODULES
+    *   App::hr
+
     *   Color::ANSI::Util
 
     *   Data::Dump::Color
 
     *   Debug::Print
+
+    *   Log::Any::Adapter::Screen
+
+    *   Log::ger::Output::Screen
+
+    *   Progress::Any::Output::TermProgressBar
 
     *   Term::ANSIColor::Conditional
 

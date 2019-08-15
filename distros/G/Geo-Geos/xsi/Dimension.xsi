@@ -1,0 +1,25 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::Dimension
+PROTOTYPES: DISABLE
+
+string toDimensionSymbol(int value) {
+    char c = Dimension::toDimensionSymbol(value);
+    RETVAL = c;
+}
+
+int toDimensionValue(string value) {
+    if (value.size() != 1) throw "string of one char is expected";
+    RETVAL =  Dimension::toDimensionValue(value[0]);
+}
+
+BOOT {
+    auto this_stash = Stash(__PACKAGE__);
+    xs::exp::create_constants(this_stash, {
+        {"TYPE_DONTCARE", Dimension::DimensionType::DONTCARE},
+        {"TYPE_True", Dimension::DimensionType::True},
+        {"TYPE_False", Dimension::DimensionType::False},
+        {"TYPE_P", Dimension::DimensionType::P},
+        {"TYPE_L", Dimension::DimensionType::L},
+        {"TYPE_A", Dimension::DimensionType::A}
+    });
+    xs::exp::autoexport(this_stash);
+}

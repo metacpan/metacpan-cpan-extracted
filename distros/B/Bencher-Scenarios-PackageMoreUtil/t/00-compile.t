@@ -6,12 +6,14 @@ use warnings;
 
 use Test::More;
 
-plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Bencher/Scenario/PackageMoreUtil/list_package_contents.pm',
+    'Bencher/Scenario/PackageMoreUtil/list_package_subs.pm',
     'Bencher/Scenario/PackageMoreUtil/package_exists.pm',
     'Bencher/ScenarioR/PackageMoreUtil/list_package_contents.pm',
+    'Bencher/ScenarioR/PackageMoreUtil/list_package_subs.pm',
     'Bencher/ScenarioR/PackageMoreUtil/package_exists.pm',
     'Bencher/Scenarios/PackageMoreUtil.pm'
 );

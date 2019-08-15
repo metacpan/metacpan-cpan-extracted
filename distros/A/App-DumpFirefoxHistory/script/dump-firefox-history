@@ -1,11 +1,11 @@
 #!perl
 
-# Note: This script is a CLI  for Riap function /App/DumpFirefoxHistory/dump_firefox_history
-# and generated automatically using Perinci::CmdLine::Gen version 0.482
+# Note: This script is a CLI for Riap function /App/DumpFirefoxHistory/dump_firefox_history
+# and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2017-11-01'; # DATE
+our $DATE = '2019-08-14'; # DATE
 our $DIST = 'App-DumpFirefoxHistory'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -13,10 +13,12 @@ use warnings;
 
 use Perinci::CmdLine::Any;
 
-Perinci::CmdLine::Any->new(
+my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/DumpFirefoxHistory/dump_firefox_history",
     program_name => "dump-firefox-history",
-)->run;
+);
+
+$cmdline->run;
 
 # ABSTRACT: Dump Firefox history
 # PODNAME: dump-firefox-history
@@ -33,7 +35,7 @@ dump-firefox-history - Dump Firefox history
 
 =head1 VERSION
 
-This document describes version 0.002 of dump-firefox-history (from Perl distribution App-DumpFirefoxHistory), released on 2017-11-01.
+This document describes version 0.003 of dump-firefox-history (from Perl distribution App-DumpFirefoxHistory), released on 2019-08-14.
 
 =head1 SYNOPSIS
 
@@ -49,6 +51,18 @@ C<*> marks required options.
 
 =over
 
+=item B<--copy-size-limit>=I<s>
+
+Default value:
+
+ 104857600
+
+Chrome often locks the History database for a long time. If the size of the
+database is not too large (determine by checking against this limit), then the
+script will copy the file to a temporary file and extract the data from the
+copied database.
+
+
 =item B<--detail>, B<-l>
 
 =item B<--profile>=I<s>
@@ -57,10 +71,10 @@ Select profile to use.
 
 Default value:
 
- "default"
+ "default-release"
 
-You can either provide a name, e.g. `default`, the profile directory of which
-will be then be searched in `~/.mozilla/firefox/*.<name>`. Or you can also
+You can either provide a name, e.g. `default-release`, the profile directory of
+which will be then be searched in `~/.mozilla/firefox/*.<name>`. Or you can also
 provide a directory name.
 
 
@@ -70,17 +84,15 @@ provide a directory name.
 
 =over
 
-=item B<--config-path>=I<filename>
+=item B<--config-path>=I<s>, B<-c>
 
 Set path to configuration file.
 
-Can be specified multiple times.
-
-=item B<--config-profile>=I<s>
+=item B<--config-profile>=I<s>, B<-P>
 
 Set configuration profile to use.
 
-=item B<--no-config>
+=item B<--no-config>, B<-C>
 
 Do not use any configuration file.
 
@@ -201,6 +213,7 @@ Finally, you can filter a section by environment variable using the filter C<env
 
 List of available configuration parameters:
 
+ copy_size_limit (see --copy-size-limit)
  detail (see --detail)
  format (see --format)
  naked_res (see --naked-res)
@@ -242,7 +255,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,83 @@
+=head1 NAME
+
+Geo::Geos::Envelope - Defines a rectangulare region of the 2D coordinate plane
+
+=head1 SYNOPSIS
+
+    use Geo::Geos::Coordinate;
+    use Geo::Geos::Envelope;
+
+    Geo::Geos::Envelope->new->isNull;    # => success
+
+    my $e1 = Geo::Geos::Envelope->new(1, 2, 3, 4);
+    $e1->toString;  # => "Env[1:2,3:4]"
+
+    my $c1 = Geo::Geos::Coordinate->new(1,3);
+    my $c2 = Geo::Geos::Coordinate->new(2,4);
+    my $e2 = Geo::Geos::Envelope->new(1, 2, 3, 4);
+
+    my $e3 = Geo::Geos::Envelope->new($c1);
+    $e3->centre;    # => is Geo::Geos::Coordinate->new(1,3)
+
+    my $e4 = Geo::Geos::Envelope->new;
+    $e4->init(1, 2, 3, 4);
+    $e4->init($c1, $c2);
+    $e4->init($c1);
+    $e4->setToNull;
+    $e4->isNull;    # => success
+
+    $e2->getArea;   # => 1
+    $e2->getMinX;   # => 1
+    $e2->getMinY;   # => 3
+    $e2->getMaxX;   # => 2
+    $e2->getMaxY;   # => 4
+    $e2->getWidth;  # => 1
+    $e2->getHeight; # => 1
+
+    $e2->contains($e3);     # => success
+    $e2->covers($e3);       # => success
+    $e2->intersects($e3);   # => success
+
+    my $c01 = Geo::Geos::Coordinate->new(0,0);
+    my $c02 = Geo::Geos::Coordinate->new(3,3);
+    my $q01 = Geo::Geos::Coordinate->new(1,1);
+    my $q02 = Geo::Geos::Coordinate->new(5,5);
+
+    Geo::Geos::Envelope::intersects($c01, $c02, $q01);           # => success
+    Geo::Geos::Envelope::intersects($c01, $c02, $q01, $q02);     # => success
+
+    my $e6 = Geo::Geos::Envelope->new(0, 1, 0, 1);
+    $e6->translate(1,1);
+    $e6->toString;       # => is 'Env[1:2,1:2]'
+
+    $e6->expandBy(1,1);
+    $e6->toString;       # => is 'Env[0:3,0:3]'
+
+    $e6->expandToInclude(Geo::Geos::Envelope->new(0, 4, 0, 4));
+    $e6->toString;       # => is 'Env[0:4,0:4]'
+
+    $e2->intersection($e6);     # => isa 'Geo::Geos::Envelope'
+
+    $e6->distance($e6); # => 0;
+
+=head1 SEE ALSO (C++ classes docs)
+
+L<GEOS C++ Library|https://trac.osgeo.org/geos>
+
+geos::geom::Envelope
+
+=head1 SEE ALSO
+
+L<Geo::Geos>
+
+L<Geo::Geos::Coordinate>
+
+=head1 AUTHOR
+
+Ivan Baidakou <i.baydakov@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

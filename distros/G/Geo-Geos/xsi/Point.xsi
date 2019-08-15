@@ -1,0 +1,12 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::Point
+PROTOTYPES: DISABLE
+
+double Point::getX();
+
+double Point::getY();
+
+Sv Point::reverse() { RETVAL = Helper::uplift(THIS->reverse()); }
+
+BOOT {
+    Stash(__PACKAGE__).inherit("Geo::Geos::Puntal");
+}

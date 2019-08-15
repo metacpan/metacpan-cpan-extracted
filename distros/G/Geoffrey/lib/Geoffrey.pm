@@ -7,7 +7,7 @@ use warnings;
 use Readonly;
 use Geoffrey::Action::Table;
 
-$Geoffrey::VERSION = '0.000101';
+$Geoffrey::VERSION = '0.000102';
 
 use parent 'Geoffrey::Role::Core';
 
@@ -17,38 +17,40 @@ sub new {
     my $class = shift;
     my $self  = $class->SUPER::new(@_);
     bless $self, $class;
-    $self->converter->check_version( $self->dbh->get_info($IDX_DATABASE_DRIVER) );
+    $self->converter->check_version($self->dbh->get_info($IDX_DATABASE_DRIVER));
     return $self;
 }
 
 sub _prepare_tables {
     my ($self) = @_;
 
-    my $o_action_table = Geoffrey::Action::Table->new( dbh => $self->dbh, converter => $self->converter );
+    my $o_action_table = Geoffrey::Action::Table->new(dbh => $self->dbh, converter => $self->converter);
 
-    my $hr_changelog_table = $self->converter->create_changelog_table( $self->dbh );
+    my $hr_changelog_table = $self->converter->get_changelog_table_hashref($self->dbh, $self->schema);
     $o_action_table->add($hr_changelog_table) if $hr_changelog_table;
     return $hr_changelog_table;
 }
 
 sub add_environment {
-    my ( $self, $s_system, $s_created_by, $i_staging_order ) = @_;
+    my ($self, $s_system, $s_created_by, $i_staging_order) = @_;
     require Geoffrey::Action::Entry;
-    my $o_action_entry = Geoffrey::Action::Entry->new( dbh => $self->dbh, converter => $self->converter );
-    return $o_action_entry->add(
-        {
-            table   => $self->converter->environment_table,
-            columns => [ 'system', 'created_by', 'staging_order', ],
-            values  => [ [ $s_system, $s_created_by, $i_staging_order ], ],
-        }
-    );
+    my $o_action_entry = Geoffrey::Action::Entry->new(dbh => $self->dbh, converter => $self->converter);
+    return $o_action_entry->add({
+        table   => $self->converter->environment_table,
+        columns => ['system', 'created_by', 'staging_order',],
+        values  => [[$s_system, $s_created_by, $i_staging_order],],
+    });
 }
 
 sub reader {
     my $self = shift;
     require Geoffrey::Read;
-    $self->{reader} //=
-      Geoffrey::Read->new( converter => $self->converter, dbh => $self->dbh, io_name => $self->io_name );
+    $self->{reader} //= Geoffrey::Read->new(
+        converter => $self->converter,
+        dbh       => $self->dbh,
+        io_name   => $self->io_name,
+        schema    => $self->schema,
+    );
     return $self->{reader};
 }
 
@@ -59,19 +61,20 @@ sub writer {
         converter => $self->converter,
         dbh       => $self->dbh,
         io_name   => $self->io_name,
+        schema    => $self->schema,
     );
     return $self->{writer};
 }
 
 sub read {
-    my ( $self, $s_dir_name ) = @_;
+    my ($self, $s_changelog_root) = @_;
     $self->_prepare_tables;
-    return $self->reader->run($s_dir_name);
+    return $self->reader->run($s_changelog_root);
 }
 
 sub write {
-    my ( $self, $s_dir_name, $schema, $dump ) = @_;
-    return $self->writer->run( $s_dir_name, $schema, $dump );
+    my ($self, $s_changelog_root, $s_schema, $dump) = @_;
+    return $self->writer->run($s_changelog_root, $s_schema, $dump);
 }
 
 1;
@@ -88,7 +91,7 @@ Geoffrey - Continuous Database Migration
 
 =head1 VERSION
 
-Version 0.000101
+Version 0.000102
 
 =head1 DESCRIPTION
 

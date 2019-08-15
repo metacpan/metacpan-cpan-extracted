@@ -5,7 +5,7 @@ use 5.016;
 use strict;
 use warnings;
 
-$Test::Mock::Geoffrey::Converter::SQLite::VERSION = '0.000101';
+$Test::Mock::Geoffrey::Converter::SQLite::VERSION = '0.000102';
 
 use Test::Mock::Geoffrey::Converter::SQLite::Trigger;
 use Test::Mock::Geoffrey::Converter::SQLite::Functions;
@@ -26,7 +26,7 @@ Test::Mock::Geoffrey::Converter::SQLite - Mocking class for the SQLite converter
 
 =head1 VERSION
 
-Version 0.000101
+Version 0.000102
 
 =head1 DESCRIPTION
 

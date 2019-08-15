@@ -1,0 +1,9 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::MultiLineString
+PROTOTYPES: DISABLE
+
+bool MultiLineString::isClosed()
+
+BOOT {
+    Stash(__PACKAGE__).inherit("Geo::Geos::Lineal");
+    Stash(__PACKAGE__).inherit("Geo::Geos::GeometryCollection");
+}

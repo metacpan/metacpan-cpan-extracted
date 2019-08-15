@@ -60,6 +60,6 @@
          "web" : "https://github.com/gonzus/JavaScript-V8-XS"
       }
    },
-   "version" : "0.000013",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.000014",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

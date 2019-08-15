@@ -1,0 +1,41 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::Noding::NodedSegmentString
+PROTOTYPES: DISABLE
+
+NodedSegmentString* new(SV*, Array coords) {
+    auto seq = Helper::convert_coords(coords);
+    auto v = new NodedSegmentString(seq.clone(), NULL);
+    RETVAL = v;
+}
+
+Sv NodedSegmentString::addIntersectionNode (Coordinate& c, std::size_t segmentIndex) {
+    auto* node = THIS->addIntersectionNode(&c, segmentIndex);
+    Sv wrapped = xs::out<SegmentNode*>(node);
+    Object obj{ST(0)};
+    wrapped.payload_attach(obj.detach(), &payload_marker);
+    RETVAL = wrapped;
+}
+
+int NodedSegmentString::getSegmentOctant (unsigned int index)
+
+void NodedSegmentString::addIntersections (LineIntersector& li, unsigned int segmentIndex, int geomIndex) {
+    THIS->addIntersections(&li, segmentIndex, geomIndex);
+}
+
+void NodedSegmentString::addIntersection (Object arg1, unsigned int segmentIndex, SV* arg3 = NULL, SV* arg4 = NULL) {
+    if (!arg3) {
+        auto& c = xs::in<Coordinate&>(arg1);
+        THIS->addIntersection(c, segmentIndex);
+    }
+    else {
+        auto& li = xs::in<LineIntersector&>(arg1);
+        if (!arg3) throw("missing mandatory argument");
+        if (!arg4) throw("missing mandatory argument");
+        THIS->addIntersection(&li, segmentIndex, SvIV(arg3), SvIV(arg4));
+    }
+}
+
+int CLONE_SKIP (...) { PERL_UNUSED_VAR(items); RETVAL = 1; }
+
+BOOT {
+    Stash(__PACKAGE__).inherit("Geo::Geos::Noding::SegmentString");
+}

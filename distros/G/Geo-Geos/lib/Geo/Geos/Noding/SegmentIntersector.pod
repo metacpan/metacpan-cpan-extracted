@@ -1,0 +1,54 @@
+=head1 NAME
+
+Geo::Geos::Noding::SegmentIntersector - Processes possible intersections detected by a Noder.
+
+=head1 SYNOPSIS
+
+    use Geo::Geos::Coordinate;
+    use Geo::Geos::PrecisionModel;
+    use Geo::Geos::Noding::IntersectionAdder;
+    use Geo::Geos::Noding::SegmentIntersectionDetector;
+
+    my $c4 = Geo::Geos::Coordinate->new(1,2);
+
+    my $pm = Geo::Geos::PrecisionModel->new;
+    my $li = Geo::Geos::Algorithm::LineIntersector->new($pm);
+
+    my $iaf = Geo::Geos::Noding::IntersectionFinderAdder->new($li, [$c4]);   # => isa 'Geo::Geos::Noding::SegmentIntersector'
+    Geo::Geos::Noding::IntersectionAdder->new($li);                          # => isa 'Geo::Geos::Noding::SegmentIntersector'
+    Geo::Geos::Noding::SegmentIntersectionDetector->new($li);                # => isa 'Geo::Geos::Noding::SegmentIntersector'
+    Geo::Geos::Noding::SingleInteriorIntersectionFinder->new($li);           # => isa 'Geo::Geos::Noding::SegmentIntersector'
+
+    $iaf->isDone;                       # => ''
+    $iaf->getInteriorIntersections;     # => is_deeply [Geo::Geos::Coordinate->new(1,2)];
+
+
+=head1 SEE ALSO (C++ classes docs)
+
+L<GEOS C++ Library|https://trac.osgeo.org/geos>
+
+geos::noding::SegmentIntersector
+
+=head1 SEE ALSO
+
+L<Geo::Geos>
+
+L<Geo::Geos::Algorithm::LineIntersector>
+
+L<Geo::Geos::Noding::IntersectionAdder>
+
+L<Geo::Geos::Noding::IntersectionFinderAdder>
+
+L<Geo::Geos::Noding::SegmentIntersectionDetector>
+
+L<Geo::Geos::Noding::SingleInteriorIntersectionFinder>
+
+=head1 AUTHOR
+
+Ivan Baidakou <i.baydakov@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

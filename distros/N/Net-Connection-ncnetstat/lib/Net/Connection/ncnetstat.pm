@@ -7,9 +7,10 @@ use Net::Connection;
 use Net::Connection::Match;
 use Net::Connection::Sort;
 use Net::Connection::lsof;
-use Text::Table;
 use Term::ANSIColor;
 use Proc::ProcessTable;
+use Text::ANSITable;
+
 
 =head1 NAME
 
@@ -17,11 +18,11 @@ Net::Connection::ncnetstat - The backend for ncnetstat, the colorized and enhanc
 
 =head1 VERSION
 
-Version 0.3.0
+Version 0.4.1
 
 =cut
 
-our $VERSION = '0.3.0';
+our $VERSION = '0.4.1';
 
 
 =head1 SYNOPSIS
@@ -175,31 +176,52 @@ sub run{
 	@found=$self->{sorter}->sorter( \@found );
 
 	my @headers=(
-				 color('underline white').'Proto'.color('reset'),
-				 color('underline white').'User'.color('reset'),
-				 color('underline white').'PID'.color('reset'),
-				 color('underline white').'Local Host'.color('reset'),
-				 color('underline white').'Port'.color('reset'),
-				 color('underline white').'Remote Host'.color('reset'),
-				 color('underline white').'Port'.color('reset'),
-				 color('underline white').'State'.color('reset'),
+				 'Proto',
+				 'User',
+				 'PID',
+				 'Local Host',
+				 'Port',
+				 'Remote Host',
+				 'Prt',
+				 'State'
 				 );
 
-	if ( $self->{wchan} ){
-		push( @headers, color('underline white').'WChan'.color('reset') );
-	}
+	 if ( $self->{wchan} ){
+	 	push( @headers, 'WChan' );
+	 }
 
-	if ( $self->{pct} ){
-		push( @headers, color('underline white').'CPU%'.color('reset') );
-		push( @headers, color('underline white').'Mem%'.color('reset') );
-	}
+	 if ( $self->{pct} ){
+	 	push( @headers, 'CPU%' );
+	 	push( @headers, 'Mem%' );
+	 }
 
-	if ( $self->{command} ){
-		push( @headers, color('underline white').'Command'.color('reset') );
-	}
+	 if ( $self->{command} ){
+	 	push( @headers, 'Command' );
+	 }
 
-	my $tb = Text::Table->new( @headers );
+	#my $tb = Text::Table->new( @headers );
+	my $tb = Text::ANSITable->new;
 
+	$tb->border_style('Default::none_ascii');  # if not, a nice default is picked
+	$tb->color_theme('Default::no_color');  # if not, a nice default is picked
+
+	 $tb->set_column_style(0, pad => 0);
+	 $tb->set_column_style(1, pad => 1);
+	 $tb->set_column_style(2, pad => 0);
+	 $tb->set_column_style(3, pad => 1, formats=>[[wrap => {ansi=>1, mb=>1}]]);
+	 $tb->set_column_style(4, pad => 0);
+	 $tb->set_column_style(5, pad => 1, formats=>[[wrap => {ansi=>1, mb=>1}]]);
+	 $tb->set_column_style(6, pad => 0);
+	 $tb->set_column_style(7, pad => 1);
+	 $tb->set_column_style(9, pad => 0);
+	 $tb->set_column_style(10, pad => 1);
+	 $tb->set_column_style(11, pad => 0, formats=>[[wrap => {ansi=>1, mb=>1}]]);
+	 $tb->set_column_style(12, pad => 1);
+	 $tb->set_column_style(13, pad => 0 );
+
+	$tb->columns( \@headers );
+
+	
 	# process table stuff if needed
 	my $ppt;
 	my $proctable;
@@ -315,6 +337,16 @@ sub run{
 				if (defined( $cmd_cache{$conn->pid} ) ){
 					push( @new_line, color('bright_red').$cmd_cache{$conn->pid}.color('reset') );
 					$loop=0;
+				}elsif(
+					   defined( $conn->proc )
+					   ){
+					my $command=$conn->proc;
+					if ( ! $self->{command_long} ){
+						$command=~s/\ .*//;
+					}
+					$cmd_cache{$conn->pid}=$command;
+					push( @new_line, color('bright_red').$cmd_cache{$conn->pid}.color('reset') );
+					$loop=0,
 				}elsif( $proctable->[ $proc ]->pid eq $conn->pid ){
 					if ( $proctable->[ $proc ]->{'cmndline'} =~ /^$/ ){
 						#kernel process
@@ -346,12 +378,10 @@ sub run{
 			push( @new_line, '');
 		}
 
-		push( @td, \@new_line );
+		$tb->add_row( \@new_line );
 	}
 
-	$tb->load( @td );
-
-	return $tb;
+	return $tb->draw;
 }
 
 =head1 TODO

@@ -1,7 +1,7 @@
 package Data::Sah::Compiler::perl::TH::re;
 
-our $DATE = '2019-08-12'; # DATE
-our $VERSION = '0.900'; # VERSION
+our $DATE = '2019-08-14'; # DATE
+our $VERSION = '0.901'; # VERSION
 
 use 5.010;
 use strict;
@@ -22,7 +22,7 @@ sub handle_type {
 
     my $dt = $cd->{data_term};
     $cd->{_ccl_check_type} = "ref($dt) eq 'Regexp' || !ref($dt) && ".
-        "eval { my \$tmp = $dt; qr/\$tmp/; 1 }";
+        "eval { my \$_sahv_re = $dt; qr/\$_sahv_re/; 1 }";
 }
 
 1;
@@ -40,7 +40,7 @@ Data::Sah::Compiler::perl::TH::re - perl's type handler for type "re"
 
 =head1 VERSION
 
-This document describes version 0.900 of Data::Sah::Compiler::perl::TH::re (from Perl distribution Data-Sah), released on 2019-08-12.
+This document describes version 0.901 of Data::Sah::Compiler::perl::TH::re (from Perl distribution Data-Sah), released on 2019-08-14.
 
 =for Pod::Coverage ^(clause_.+|superclause_.+)$
 

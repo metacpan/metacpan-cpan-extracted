@@ -49,6 +49,7 @@ TESTSUITE_AT = \
   pipe.at\
   linemon00.at\
   linemon01.at\
+  linemon02.at\
   seek00.at\
   seek01.at
 # Add more files here

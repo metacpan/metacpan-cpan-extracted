@@ -1,0 +1,78 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::Algorithm::LineIntersector
+PROTOTYPES: DISABLE
+
+Sv new(SV*, SV* precisionModel = NULL) {
+    PrecisionModel* pm = precisionModel ? xs::in<PrecisionModel*>(precisionModel) : NULL;
+    Object wrapped = xs::out<LineIntersector*>(new LineIntersector(pm));
+    if (pm) wrapped.payload_attach(precisionModel, &payload_marker);
+    RETVAL = wrapped.ref();
+}
+
+double interpolateZ(Coordinate *p, Coordinate *p0, Coordinate *p1) { RETVAL = LineIntersector::interpolateZ(*p, *p0, *p1); }
+
+double computeEdgeDistance(Coordinate *p, Coordinate *p0, Coordinate *p1) { RETVAL = LineIntersector::computeEdgeDistance(*p, *p0, *p1); }
+
+bool isSameSignAndNonZero(double a, double b) { RETVAL = LineIntersector::isSameSignAndNonZero(a, b); }
+
+bool hasIntersection(Object arg0, Coordinate *p1 = NULL, Coordinate *p2 = NULL) {
+    if (p1 == NULL) RETVAL = xs::in<LineIntersector&>(arg0).hasIntersection();
+    else {
+        auto& p0 = xs::in<Coordinate&>(arg0);
+        if(!p1) throw("undef not allowed");
+        if(!p2) throw("undef not allowed");
+        RETVAL = LineIntersector::hasIntersection(p0, *p1, *p2);
+    }
+}
+
+
+bool LineIntersector::isInteriorIntersection (SV* arg = NULL) {
+    if(!arg) RETVAL = THIS->isInteriorIntersection();
+    else {
+        int inputLineIndex = SvIV(arg);
+        RETVAL = THIS->isInteriorIntersection(inputLineIndex);
+    }
+}
+
+void LineIntersector::setPrecisionModel (SV* pm) {
+    PrecisionModel& newPM = xs::in<PrecisionModel&>(pm);
+    THIS->setPrecisionModel(&newPM);
+    Object me {ST(0)};
+    if (me.payload_exists(&payload_marker)) {
+        me.payload_detach(&payload_marker);
+    }
+    me.payload_attach(SvRV(pm), &payload_marker);
+}
+
+void LineIntersector::computeIntersection (Coordinate& p1, Coordinate& p2, Coordinate& p3, SV* p4arg = NULL) {
+    if (!p4arg) THIS->computeIntersection(p1, p2, p3);
+    else {
+        auto& p4 = xs::in<Coordinate&>(p4arg);
+        THIS->computeIntersection(p1, p2, p3, p4);
+    }
+}
+
+std::string LineIntersector::toString(...)
+
+int LineIntersector::getIntersectionNum ()
+
+bool LineIntersector::isProper ()
+
+int LineIntersector::getIndexAlongSegment (int segmentIndex, int intIndex)
+
+double LineIntersector::getEdgeDistance (int geomIndex, int intIndex)
+
+Coordinate* LineIntersector::getIntersectionAlongSegment (int segmentIndex, int intIndex) {
+    RETVAL = new Coordinate(THIS->getIntersectionAlongSegment(segmentIndex, intIndex));
+}
+
+int CLONE_SKIP (...) { PERL_UNUSED_VAR(items); RETVAL = 1; }
+
+BOOT {
+    auto this_stash = Stash(__PACKAGE__);
+    xs::exp::create_constants(this_stash, {
+        {"TYPE_NO_INTERSECTION",        LineIntersector::NO_INTERSECTION},
+        {"TYPE_POINT_INTERSECTION",     LineIntersector::POINT_INTERSECTION},
+        {"TYPE_COLLINEAR_INTERSECTION", LineIntersector::COLLINEAR_INTERSECTION}
+    });
+    xs::exp::autoexport(this_stash);
+}

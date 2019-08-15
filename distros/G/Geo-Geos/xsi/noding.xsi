@@ -1,0 +1,90 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::Noding
+PROTOTYPES: DISABLE
+
+int compareOrientedCoordinateArray(Array pts1, Array pts2) {
+    auto seq1 = Helper::convert_coords(pts1);
+    auto seq2 = Helper::convert_coords(pts2);
+    geos::noding::OrientedCoordinateArray oca{seq1};
+    RETVAL = oca.compareTo(seq2);
+}
+
+int octant(Sv arg1, SV* arg2) {
+    if (arg1.is_object_ref() && Object(arg1).stash().name() == "Geo::Geos::Coordinate") {
+        auto& c1 = xs::in<Coordinate&>(arg1);
+        auto& c2 = xs::in<Coordinate&>(arg2);
+        RETVAL = Octant::octant(&c1, &c2);
+    } else {
+        if(!arg1) throw("undef not allowed");
+        if(!arg2) throw("undef not allowed");
+        double dx = SvNV(arg1);
+        double dy = SvNV(arg2);
+        RETVAL = Octant::octant(dx, dy);
+    }
+}
+
+void checkNodingValid(Array segmentStrigns) {
+    std::vector<SegmentString*> v;
+    v.reserve(segmentStrigns.size());
+
+    for (auto it: segmentStrigns) {
+        SegmentString& ss = xs::in<SegmentString&>(it);
+        v.push_back(&ss);
+    }
+    NodingValidator nv(v);
+    nv.checkValid();
+}
+
+std::string fastCheckNodingValid(Array segmentStrigns) {
+    std::vector<SegmentString*> v;
+    v.reserve(segmentStrigns.size());
+
+    for (auto it: segmentStrigns) {
+        SegmentString& ss = xs::in<SegmentString&>(it);
+        v.push_back(&ss);
+    }
+    FastNodingValidator fnv{v};
+
+    if (GIMME_V == G_VOID) {
+        fnv.checkValid();
+        XSRETURN_UNDEF;
+    }
+    else {
+        if (fnv.isValid()) XSRETURN_UNDEF;
+        else RETVAL = fnv.getErrorMessage();
+    }
+}
+
+int compareSegmentPoints(int octant, Coordinate& p1, Coordinate& p2) {
+    RETVAL = SegmentPointComparator::compare(octant, p1, p2);
+}
+
+Array extractSegmentStrings(Geometry& g) {
+    SegmentString::ConstVect v;
+    geos::noding::SegmentStringUtil::extractSegmentStrings(&g, v);
+
+    Array result = xs::Array::create(v.size());
+    for(auto ss: v) {
+        auto it = xs::out<SegmentString*>(const_cast<SegmentString*>(ss));
+        result.push(it);
+    };
+    RETVAL = result;
+}
+
+bool intersects(Array baseSegmentStrings, Array segmentStrings, SV* intDetector = NULL) {
+    SegmentString::ConstVect vb;
+    for(auto it: baseSegmentStrings) vb.push_back(&xs::in<SegmentString&>(it));
+
+    SegmentString::ConstVect v;
+    for(auto it: segmentStrings) v.push_back(&xs::in<SegmentString&>(it));
+
+    FastSegmentSetIntersectionFinder finder{&vb};
+    if (!intDetector) RETVAL = finder.intersects(&v);
+    else {
+        auto& id = xs::in<SegmentIntersectionDetector&>(intDetector);
+        RETVAL = finder.intersects(&v, &id);
+    }
+}
+
+BOOT {
+    xs::exp::autoexport(Stash(__PACKAGE__));
+}

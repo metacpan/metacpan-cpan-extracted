@@ -4,7 +4,9 @@ use My::Test;
 use Capture::Tiny qw( capture );
 use FindBin ();
 use Statocles;
+use POSIX qw( setlocale LC_ALL LC_CTYPE );
 my $SHARE_DIR = path( __DIR__, '..', 'share' );
+my $FORCE_LOCALE = "en_US.UTF-8";
 
 subtest 'get help' => sub {
     local $0 = path( $FindBin::Bin, '..', '..', 'bin', 'statocles' )->stringify;
@@ -26,16 +28,24 @@ subtest 'get help' => sub {
 
 subtest 'get version' => sub {
     local $Statocles::VERSION = '1.00';
+    setlocale( LC_ALL, $FORCE_LOCALE );
+    local $ENV{LANG} = $FORCE_LOCALE;
+    local $ENV{LC_ALL} = $FORCE_LOCALE;
+    local $ENV{LC_CTYPE} = $FORCE_LOCALE;
     my ( $output, $stderr, $exit ) = capture { Statocles->run( '--version' ) };
     is $exit, 0;
     ok !$stderr, 'stderr is empty' or diag "STDERR: $stderr";
-    is $output, "Statocles version 1.00 (Perl $^V)\n";
+    my $expected = <<EOF;
+Statocles version 1.00 (Perl $^V)
+Locale: en_US.UTF-8
+EOF
+    is $output, $expected;
 
     subtest '-v (verbose) and no args shows version' => sub {
         my ( $output, $stderr, $exit ) = capture { Statocles->run( '-v' ) };
         is $exit, 0;
         ok !$stderr, 'stderr is empty' or diag "STDERR: $stderr";
-        is $output, "Statocles version 1.00 (Perl $^V)\n";
+        is $output, $expected;
     };
 };
 

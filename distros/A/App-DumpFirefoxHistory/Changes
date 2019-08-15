@@ -1,9 +1,18 @@
-0.002   2017-11-01 (PERLANCAR)
+0.003   2019-08-14  Released-By: PERLANCAR; Urgency: medium
+
+	- Like dump-chrome-history, now also copy places.sqlite to a
+	  temporary file, when locked.
+
+	- [incompatible change] Change default profile from default to
+          default-release.
+
+
+0.002   2017-11-01  Released-By: PERLANCAR
 
 	- Update to new Firefox profile directory name (/\w+\.NAME-\d+/
 	  instead of just /\w+\.NAME/).
 
 
-0.001   2017-03-20 (PERLANCAR)
+0.001   2017-03-20  Released-By: PERLANCAR
 
         - First release.

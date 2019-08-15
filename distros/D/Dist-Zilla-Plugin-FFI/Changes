@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-Plugin-FFI
 
+1.04      2019-08-13 13:58:33 -0400
+  - [FFI::Build] will prune ffi/_build files which you
+    probably do not want bundled with your FFI dist.
+
 1.03      2019-02-12 16:06:51 -0500
   - [FFI::Build] sets configure_requires properly for 
     FFI::Build::MM

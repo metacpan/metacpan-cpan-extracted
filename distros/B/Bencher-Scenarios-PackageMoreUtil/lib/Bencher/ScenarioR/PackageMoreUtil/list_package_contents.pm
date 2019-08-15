@@ -1,6 +1,6 @@
 package Bencher::ScenarioR::PackageMoreUtil::list_package_contents;
 
-our $VERSION = 0.001; # VERSION
+our $VERSION = 0.002; # VERSION
 
 our $results = [
   [
@@ -9,11 +9,11 @@ our $results = [
     [
       {
         ds_tags     => "",
-        errors      => 2.7e-07,
+        errors      => 1.6e-07,
         p_tags      => "",
         participant => "Package::MoreUtil",
         perl        => "perl",
-        rate        => 6600,
+        rate        => 6800,
         samples     => 20,
         time        => 150,
         vs_slowest  => 1,
@@ -141,7 +141,7 @@ our $results = [
                                               number_of_cores              => 2,
                                               number_of_logical_processors => 4,
                                               processor_id                 => 0,
-                                              speed                        => 2643.627,
+                                              speed                        => 2869.982,
                                               stepping                     => 4,
                                             },
                                             {
@@ -257,7 +257,7 @@ our $results = [
                                               number_of_cores              => 2,
                                               number_of_logical_processors => 4,
                                               processor_id                 => 1,
-                                              speed                        => 2465.551,
+                                              speed                        => 2781.201,
                                               stepping                     => 4,
                                             },
                                             {
@@ -373,7 +373,7 @@ our $results = [
                                               number_of_cores              => 2,
                                               number_of_logical_processors => 4,
                                               processor_id                 => 2,
-                                              speed                        => 2417.358,
+                                              speed                        => 2886.474,
                                               stepping                     => 4,
                                             },
                                             {
@@ -489,18 +489,18 @@ our $results = [
                                               number_of_cores              => 2,
                                               number_of_logical_processors => 4,
                                               processor_id                 => 3,
-                                              speed                        => 2503.405,
+                                              speed                        => 2789.916,
                                               stepping                     => 4,
                                             },
                                           ],
-      "func.elapsed_time"              => 0.0207319259643555,
+      "func.elapsed_time"              => 0.028609037399292,
       "func.module_startup"            => undef,
       "func.module_versions"           => {
                                             "__PACKAGE__" => 1.041,
                                             "Bencher::Scenario::PackageMoreUtil::list_package_contents" => undef,
                                             "Benchmark::Dumb" => 0.111,
                                             "Devel::Platform::Info" => 0.16,
-                                            "Package::MoreUtil" => 0.58,
+                                            "Package::MoreUtil" => "0.590",
                                             "perl" => "v5.26.1",
                                             "Sys::Info" => 0.78,
                                           },
@@ -531,13 +531,13 @@ our $results = [
                                           },
       "func.precision"                 => 0,
       "func.scenario_module"           => "Bencher::Scenario::PackageMoreUtil::list_package_contents",
-      "func.scenario_module_md5sum"    => "5073c31dc8a0e8fb7b6e84e73c86f4ad",
-      "func.scenario_module_mtime"     => 1538917060,
-      "func.scenario_module_sha1sum"   => "1291418c8ff4084045e1a4e125c246446652e7c9",
-      "func.scenario_module_sha256sum" => "655b26b506c8260c032d9308e29f6ab53675c5c3b75720e7565970850d065591",
-      "func.time_end"                  => 1538917634.58755,
+      "func.scenario_module_md5sum"    => "8e615c484ca76c4a22a6c3458bc2dcb1",
+      "func.scenario_module_mtime"     => 1538919541,
+      "func.scenario_module_sha1sum"   => "c69ccc0d939cfe1395dfe22656a4f99761a99f17",
+      "func.scenario_module_sha256sum" => "4d9c1456f19f1afa6779a58ddc3bebd3ffb526d5111a3f8f6de60ce58a5e84b2",
+      "func.time_end"                  => 1538919608.86287,
       "func.time_factor"               => 1000000,
-      "func.time_start"                => 1538917634.56682,
+      "func.time_start"                => 1538919608.83426,
       "table.field_aligns"             => [
                                             "left",
                                             "left",

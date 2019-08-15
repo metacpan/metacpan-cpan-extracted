@@ -1,0 +1,66 @@
+=head1 NAME
+
+Geo::Geos::IntersectionMatrix - Dimensionally Extended Nine-Intersection Model (DE-9IM) matrix.
+
+=head1 SYNOPSIS
+
+    use Geo::Geos::Dimension qw/TYPE_DONTCARE TYPE_True TYPE_False TYPE_P TYPE_L TYPE_A/;
+    use Geo::Geos::IntersectionMatrix;
+
+    Geo::Geos::IntersectionMatrix->new;                           # => isa 'Geo::Geos::IntersectionMatrix'
+    my $im = Geo::Geos::IntersectionMatrix->new('T*T******');     # => isa 'Geo::Geos::IntersectionMatrix'
+
+    $im->toString;              # => 'T*T******'
+    $im->set('TTT******');
+    $im->toString;              # => 'TTT******'
+
+    $im->set(2,2,TYPE_False);
+    $im->toString;              # => 'TTT*****F'
+    $im->get(2,2);              # => is TYPE_False
+
+    $im->setAll(TYPE_DONTCARE);
+    $im->toString;              # => '*********'
+    $im->matches('*********');  # => successs
+
+    $im->setAtLeast(2,2,TYPE_True);
+    $im->toString;                          # => '********T';
+    $im->setAtLeast('FFFFFFFFF');
+    $im->toString;                          # => 'FFFFFFFFF';
+    $im->setAtLeastIfValid(2,2,TYPE_L);
+    $im->toString;                          # => 'FFFFFFFF1';
+
+    $im->isDisjoint;    # => success
+    $im->isIntersects;  # => ''
+    $im->isWithin;      # => ''
+    $im->isContains;    # => ''
+    $im->isCovers;      # => ''
+    $im->isCoveredBy;   # => ''
+
+    $im->isTouches(TYPE_A, TYPE_A);     # => ''
+    $im->isCrosses(TYPE_A, TYPE_A);     # => ''
+    $im->isEquals(TYPE_A, TYPE_A);      # => ''
+    $im->isOverlaps(TYPE_A, TYPE_A);    # => ''
+
+    Geo::Geos::IntersectionMatrix->new('*T*******')->transpose->toString;    # => '***T*****'
+
+=head1 SEE ALSO (C++ classes docs)
+
+L<GEOS C++ Library|https://trac.osgeo.org/geos>
+
+geos::geom::IntersectionMatrix
+
+=head1 SEE ALSO
+
+L<Geo::Geos>
+
+L<Geo::Geos::Dimension>
+
+=head1 AUTHOR
+
+Ivan Baidakou <i.baydakov@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

@@ -1,0 +1,25 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::Polygon
+PROTOTYPES: DISABLE
+
+
+LinearRing* geos::geom::Polygon::getExteriorRing() {
+    RETVAL = dyn_cast<LinearRing*>(THIS->getExteriorRing()->clone());
+}
+
+LinearRing* geos::geom::Polygon::getInteriorRingN(std::size_t index) {
+    auto r = THIS->getInteriorRingN(index);
+    if (r) RETVAL = dyn_cast<LinearRing*>(r->clone());
+    else XSRETURN_UNDEF;
+}
+
+std::size_t geos::geom::Polygon::getNumInteriorRing() { RETVAL = THIS->getNumInteriorRing(); }
+
+GeometryCollection* geos::geom::Polygon::tesselate() {
+    RETVAL = panda::Geos::tesselate(*THIS);
+}
+
+int CLONE_SKIP (...) { PERL_UNUSED_VAR(items); RETVAL = 1; }
+
+BOOT {
+    Stash(__PACKAGE__).inherit("Geo::Geos::Polygonal");
+}

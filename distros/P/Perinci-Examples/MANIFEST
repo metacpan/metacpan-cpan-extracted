@@ -27,6 +27,8 @@ lib/Perinci/Examples/Tiny/Args.pm
 lib/Perinci/Examples/Tiny/Result.pm
 lib/Perinci/Examples/Tx.pm
 lib/Perinci/Examples/Version.pm
+lib/Perinci/Examples/rimetadb/ExcludedPackage.pm
+lib/Perinci/Examples/rimetadb/IncludedPackage.pm
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t

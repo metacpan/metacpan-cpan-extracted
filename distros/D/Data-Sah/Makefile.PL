@@ -58,12 +58,13 @@ my %WriteMakefileArgs = (
     "Sah::SpecTest" => "0.9.42",
     "Test::Exception" => 0,
     "Test::More" => "0.98",
+    "Test::NoWarnings" => 0,
     "Test::Warn" => 0,
     "Time::Duration::Parse::AsHash" => 0,
     "lib::filter" => "0.03",
     "overload" => 0
   },
-  "VERSION" => "0.900",
+  "VERSION" => "0.901",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -102,6 +103,7 @@ my %FallbackPrereqs = (
   "Scalar::Util::Numeric::PP" => 0,
   "Test::Exception" => 0,
   "Test::More" => "0.98",
+  "Test::NoWarnings" => 0,
   "Test::Warn" => 0,
   "Text::sprintfn" => 0,
   "Tie::IxHash" => 0,

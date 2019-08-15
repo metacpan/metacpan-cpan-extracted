@@ -9,7 +9,7 @@ use XS::Install::Deps;
 use XS::Install::Util;
 use XS::Install::Payload;
 
-our $VERSION = '1.2.9';
+our $VERSION = '1.2.10';
 my $THIS_MODULE = 'XS::Install';
 
 our @EXPORT_OK = qw/write_makefile not_available/;
@@ -110,7 +110,10 @@ sub pre_process {
         BIN_DEPENDENT => $module_info->{BIN_DEPENDENT},
         STATIC_LIBS   => [],
         SHARED_LIBS   => [],
-        SELF_INC      => $params->{INC} || '',
+        ORIG          => {
+            INC     => $params->{INC} || '',
+            CCFLAGS => $params->{CCFLAGS},
+        },  
     };
 }
 
@@ -325,7 +328,7 @@ sub process_binary {
     my $cdeps = XS::Install::Deps::find_header_deps({
         files   => \@cdeps_list,
         headers => ['./'],
-        inc     => [map { s/^-I//; $_ } split(' ', $params->{MODULE_INFO}{SELF_INC})],
+        inc     => [map { s/^-I//; $_ } split(' ', $params->{MODULE_INFO}{ORIG}{INC})],
     });
 
     # push C to OBJECT and process C files header deps
@@ -544,8 +547,8 @@ sub process_test {
         CC        => $tp->{CC} || $params->{CC},
         LD        => $tp->{LD} || $params->{LD},
         LDFROM    => $ldfrom,
-        INC       => string_merge($params->{MODULE_INFO}{SELF_INC}, $tp->{INC}),
-        CCFLAGS   => string_merge($params->{CCFLAGS}, $tp->{CCFLAGS}),
+        INC       => string_merge($params->{MODULE_INFO}{ORIG}{INC}, $tp->{INC}),
+        CCFLAGS   => string_merge($params->{MODULE_INFO}{ORIG}{CCFLAGS}, $tp->{CCFLAGS}),
         DEFINE    => string_merge($params->{DEFINE}, $tp->{DEFINE}),
         XSOPT     => string_merge($params->{XSOPT}, $tp->{XSOPT}),
         LIBS      => $params->{LIBS},

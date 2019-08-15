@@ -1,7 +1,7 @@
 package Finance::GDAX::Lite;
 
-our $DATE = '2018-06-11'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2018-06-14'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -41,23 +41,6 @@ sub new {
     $self->{_urienc} = URI::Encode->new;
 
     bless $self, $class;
-}
-
-sub _get_json {
-    my ($self, $url) = @_;
-
-    log_trace("JSON API request: %s", $url);
-
-    my $res = $self->{_http}->get($url);
-    die "Can't retrieve $url: $res->{status} - $res->{reason}"
-        unless $res->{success};
-    my $decoded;
-    eval { $decoded = $self->{_json}->decode($res->{content}) };
-    die "Can't decode response from $url: $@" if $@;
-
-    log_trace("JSON API response: %s", $decoded);
-
-    $decoded;
 }
 
 sub _request {
@@ -115,12 +98,20 @@ sub _request {
     };
 
     my $res = $self->{_http}->request($method, $url, $options);
+    # HTTP::Tiny puts error message in content
+    if (!$res->{success} && $res->{status} == 599 &&
+            $res->{reason} eq 'Internal Exception') {
+        $res->{content} =~ s/\R/ /g;
+        $res->{reason} .= ": $res->{content}";
+        undef $res->{content};
+    }
 
     if ($res->{headers}{'content-type'} =~ m!application/json!) {
         $res->{content} = $self->{_json}->decode($res->{content});
+        log_trace("API response [%s]: JSON: %s", $time, $res->{content});
+    } else {
+        log_trace("API response [%s]: non-JSON: %s", $time, $res->{content});
     }
-
-    log_trace("API response [%s]: %s", $time, $res->{content});
 
     my $reason = $res->{reason};
     if ($res->{status} != 200 &&
@@ -155,7 +146,7 @@ Finance::GDAX::Lite - Client API library for GDAX (lite edition)
 
 =head1 VERSION
 
-This document describes version 0.002 of Finance::GDAX::Lite (from Perl distribution Finance-GDAX-Lite), released on 2018-06-11.
+This document describes version 0.003 of Finance::GDAX::Lite (from Perl distribution Finance-GDAX-Lite), released on 2018-06-14.
 
 =head1 SYNOPSIS
 

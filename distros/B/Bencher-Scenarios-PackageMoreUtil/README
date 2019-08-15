@@ -2,7 +2,7 @@ NAME
     Bencher::Scenarios::PackageMoreUtil - Benchmark Package::MoreUtil
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     Bencher::Scenarios::PackageMoreUtil (from Perl distribution
     Bencher-Scenarios-PackageMoreUtil), released on 2018-10-07.
 
@@ -12,6 +12,8 @@ DESCRIPTION
     *   Bencher::Scenario::PackageMoreUtil::package_exists
 
     *   Bencher::Scenario::PackageMoreUtil::list_package_contents
+
+    *   Bencher::Scenario::PackageMoreUtil::list_package_subs
 
 HOMEPAGE
     Please visit the project's homepage at

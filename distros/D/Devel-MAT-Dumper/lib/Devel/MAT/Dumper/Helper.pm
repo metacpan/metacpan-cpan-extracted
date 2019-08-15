@@ -8,7 +8,7 @@ package Devel::MAT::Dumper::Helper;
 use strict;
 use warnings;
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 =head1 NAME
 
@@ -31,6 +31,17 @@ In your module's XS source:
    ...
 
    #ifdef HAVE_DMD_HELPER
+   static int dumpstruct(pTHX_ const SV *sv)
+   {
+     int ret = 0;
+
+     ret += DMD_ANNOTATE_SV(sv, another_sv,
+       "the description of this field");
+     ...
+
+     return ret;
+   }
+
    static int dumpmagic(pTHX_ const SV *sv, MAGIC *mg)
    {
      int ret = 0;
@@ -47,6 +58,7 @@ In your module's XS source:
 
    BOOT:
    #ifdef HAVE_DMD_HELPER
+     DMD_SET_PACKAGE_HELPER("My::Package", dumpstruct);
      DMD_SET_MAGIC_HELPER(&vtbl, dumpmagic);
    #endif
 
@@ -56,12 +68,14 @@ This module provides a build-time helper to assist in writing XS modules that
 can provide extra information to a L<Devel::MAT> heap dump file when dumping
 data structures relating to that module.
 
-Following the example in the L</SYNOPSIS> section above, the C<dumpmagic>
-function is called whenever L<Devel::MAT::Dumper> finds an SV with extension
-magic matching the given magic virtual table pointer. This function may then
-inspect its own state from the SV or MAGIC pointers, and invoke the
-C<DMD_ANNOTATE_SV> macro to provide extra annotations into the heap dump file
-about how this magical SV is related to another one.
+Following the example in the L</SYNOPSIS> section above, the C<dumpstruct>
+function is called whenever L<Devel::MAT::Dumper> finds an SV blessed into the
+given package, and the C<dumpmagic> function is called whenever
+L<Devel::MAT::Dumper> finds an SV with extension magic matching the given
+magic virtual table pointer. These functions may then inspect the module's
+state from the SV or MAGIC pointers, and invoke the C<DMD_ANNOTATE_SV> macro
+to provide extra annotations into the heap dump file about how this SV is
+related to another one.
 
 Under this code structure, a module will cleanly build, install and run just
 fine if L<Devel::MAT::Dumper::Helper> is not available at build time, so it is
@@ -180,6 +194,16 @@ static int S_DMD_AnnotateSv(pTHX_ const SV *targ, const SV *val, const char *nam
   return 4;
 }
 
+typedef int DMD_Helper(pTHX_ const SV *sv);
+
+#define DMD_SET_PACKAGE_HELPER(package, helper) S_DMD_SetPackageHelper(aTHX_ package, helper)
+static void S_DMD_SetPackageHelper(pTHX_ char *package, DMD_Helper *helper)
+{
+  HV *helper_per_package = get_hv("Devel::MAT::Dumper::HELPER_PER_PACKAGE", GV_ADD);
+
+  hv_store(helper_per_package, package, strlen(package), newSVuv(PTR2UV(helper)), 0);
+}
+
 typedef int DMD_MagicHelper(pTHX_ const SV *sv, MAGIC *mg);
 
 #define DMD_SET_MAGIC_HELPER(vtbl, helper) S_DMD_SetMagicHelper(aTHX_ vtbl, helper)
@@ -191,6 +215,22 @@ static void S_DMD_SetMagicHelper(pTHX_ MGVTBL *vtbl, DMD_MagicHelper *helper)
   hv_store_ent(helper_per_magic, keysv, newSVuv(PTR2UV(helper)), 0);
 
   SvREFCNT_dec(keysv);
+}
+
+#define DMD_IS_ACTIVE()  S_DMD_is_active(aTHX)
+static bool S_DMD_is_active(pTHX)
+{
+#ifdef MULTIPLICITY
+  return !!get_cv("Devel::MAT::Dumper::dump", 0);
+#else
+  static bool active;
+  static bool cached = FALSE;
+  if(!cached) {
+    active = !!get_cv("Devel::MAT::Dumper::dump", 0);
+    cached = TRUE;
+  }
+  return active;
+#endif
 }
 
 #endif

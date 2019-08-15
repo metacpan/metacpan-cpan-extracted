@@ -4,11 +4,12 @@ use utf8;
 use strict;
 use warnings FATAL => 'all';
 
-$Geoffrey::Role::Action::VERSION = '0.000101';
+$Geoffrey::Role::Action::VERSION = '0.000102';
 
 sub new {
     my $class = shift;
     my $self  = {@_};
+
     # make converter required
     if ( !$self->{converter} ) {
         require Geoffrey::Exception::RequiredValue;
@@ -38,8 +39,7 @@ sub drop {
 
 sub list_from_schema {
     require Geoffrey::Exception::NotSupportedException;
-    return Geoffrey::Exception::NotSupportedException::throw_action( 'list_from_schema',
-        shift );
+    return Geoffrey::Exception::NotSupportedException::throw_action( 'list_from_schema', shift );
 }
 
 sub dryrun {
@@ -79,12 +79,12 @@ sub do_prepared {
     my ( $self, $s_sql, $ar_values ) = @_;
     return $s_sql if $self->dryrun;
     require Carp;
-    my $obj_prepared_statement = $self->dbh->prepare($s_sql) or Carp::croak $!;
-    $obj_prepared_statement->execute( @{$_} ) or Carp::croak $! for @{$ar_values};
+    my $obj_prepared_statement = $self->dbh->prepare($s_sql) or Carp::longmess( $!, $s_sql );
+    $obj_prepared_statement->execute( @{$ar_values} ) or Carp::longmess( $!, $s_sql );
     return $s_sql;
 }
 
-1;# End of Geoffrey::Role::Action
+1;    # End of Geoffrey::Role::Action
 
 __END__
 
@@ -98,7 +98,7 @@ Geoffrey::Role::Action - Abstract action class.
 
 =head1 VERSION
 
-Version 0.000101
+Version 0.000102
 
 =head1 DESCRIPTION
 

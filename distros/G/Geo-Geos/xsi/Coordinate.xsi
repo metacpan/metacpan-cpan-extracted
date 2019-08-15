@@ -1,0 +1,51 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::Coordinate
+PROTOTYPES: DISABLE
+
+Sv getNull () { RETVAL = coordinate_get_null(); }
+
+Coordinate* new(SV*, double x = 0, double y = 0, SV* z = NULL) {
+    RETVAL = new Coordinate(x, y, z ? SvNV(z) : DoubleNotANumber);
+}
+
+double Coordinate::x(SV* newval = NULL) : ALIAS(y=1,z=2) {
+    double* val;
+    switch (ix) {
+        case 0:  val = &THIS->x; break;
+        case 1:  val = &THIS->y; break;
+        default: val = &THIS->z; break;
+    }
+    if (newval) {
+        if (SvREADONLY(ST(0))) throw "cannot modify readonly object";
+        *val = SvNV(newval);
+    }
+    RETVAL = *val;
+}
+
+void Coordinate::setNull() {
+    if (SvREADONLY(ST(0))) throw "cannot modify readonly object";
+    THIS->setNull();
+}
+
+bool Coordinate::isNull()
+
+bool Coordinate::equals   (Coordinate& other)
+
+bool Coordinate::equals2D (Coordinate& other)
+
+bool Coordinate::equals3D (Coordinate& other)
+
+int Coordinate::compareTo (Coordinate& other)
+
+bool Coordinate::eq (Sv other_arg, SV*) {
+    auto* other = xs::in<Coordinate*>(other_arg);
+    RETVAL = other ? THIS->equals(*other) : false;
+}
+
+
+std::string Coordinate::toString (...)
+
+double Coordinate::distance (Coordinate& other)
+
+int Coordinate::hashCode ()
+
+int CLONE_SKIP (...) { PERL_UNUSED_VAR(items); RETVAL = 1; }

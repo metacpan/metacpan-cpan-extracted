@@ -1,7 +1,7 @@
 package Perinci::Access::Schemeless::DBI;
 
-our $DATE = '2016-03-16'; # DATE
-our $VERSION = '0.08'; # VERSION
+our $DATE = '2019-08-14'; # DATE
+our $VERSION = '0.090'; # VERSION
 
 use 5.010001;
 use strict;
@@ -29,8 +29,9 @@ sub new {
 
         my ($sch_ver) = $dbh->selectrow_array(
             "SELECT value FROM meta WHERE name='schema_version'");
-        if (!$sch_ver || $sch_ver ne '2') {
-            die "Database schema not supported, only version 2 is supported";
+        $sch_ver //= 0;
+        if (!$sch_ver || $sch_ver !~ /^(2|3|4|5)$/) {
+            die "Database schema version ($sch_ver) not supported, only version 2-5 is supported";
         }
     }
 
@@ -204,7 +205,7 @@ Perinci::Access::Schemeless::DBI - Subclass of Perinci::Access::Schemeless which
 
 =head1 VERSION
 
-This document describes version 0.08 of Perinci::Access::Schemeless::DBI (from Perl distribution Perinci-Access-Schemeless-DBI), released on 2016-03-16.
+This document describes version 0.090 of Perinci::Access::Schemeless::DBI (from Perl distribution Perinci-Access-Schemeless-DBI), released on 2019-08-14.
 
 =head1 SYNOPSIS
 
@@ -321,7 +322,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Ac
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Perinci-Access-Schemeless-DBI>.
+Source repository is at L<https://github.com/perlancar/perl-Perinci-Access-Schemeless-DBI>.
 
 =head1 BUGS
 
@@ -343,7 +344,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,7 +1,7 @@
 package Perinci::Examples::CLI;
 
-our $DATE = '2019-07-19'; # DATE
-our $VERSION = '0.818'; # VERSION
+our $DATE = '2019-08-14'; # DATE
+our $VERSION = '0.819'; # VERSION
 
 use 5.010001;
 use strict;
@@ -323,7 +323,7 @@ Perinci::Examples::CLI - Example for CLI help/usage generation
 
 =head1 VERSION
 
-This document describes version 0.818 of Perinci::Examples::CLI (from Perl distribution Perinci-Examples), released on 2019-07-19.
+This document describes version 0.819 of Perinci::Examples::CLI (from Perl distribution Perinci-Examples), released on 2019-08-14.
 
 =head1 DESCRIPTION
 

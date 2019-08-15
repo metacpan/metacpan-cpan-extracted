@@ -3,9 +3,8 @@ package Test::Specio;
 use strict;
 use warnings;
 
-our $VERSION = '0.43';
+our $VERSION = '0.44';
 
-use B ();
 use IO::File;
 use Scalar::Util qw( blessed looks_like_number openhandle );
 use Specio::Library::Builtins;
@@ -224,7 +223,7 @@ BEGIN {
     }
 }
 
-our @EXPORT_OK = ( @vars, qw( builtins_tests describe test_constraint ) );
+our @EXPORT_OK   = ( @vars, qw( builtins_tests describe test_constraint ) );
 our %EXPORT_TAGS = ( vars => \@vars );
 
 sub builtins_tests {
@@ -1258,7 +1257,7 @@ sub describe {
         return q{''} if $val eq q{};
 
         return looks_like_number($val)
-            && $val !~ /\n/ ? $val : B::perlstring($val);
+            && $val !~ /\n/ ? $val : Specio::Helpers::perlstring($val);
     }
 
     return 'open filehandle'
@@ -1299,7 +1298,7 @@ Test::Specio - Test helpers for Specio
 
 =head1 VERSION
 
-version 0.43
+version 0.44
 
 =head1 SYNOPSIS
 
@@ -1549,7 +1548,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2018 by Dave Rolsky.
+This software is Copyright (c) 2012 - 2019 by Dave Rolsky.
 
 This is free software, licensed under:
 

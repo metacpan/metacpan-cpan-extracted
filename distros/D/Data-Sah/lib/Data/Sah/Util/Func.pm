@@ -1,7 +1,7 @@
 package Data::Sah::Util::Func;
 
-our $DATE = '2019-08-12'; # DATE
-our $VERSION = '0.900'; # VERSION
+our $DATE = '2019-08-14'; # DATE
+our $VERSION = '0.901'; # VERSION
 
 use 5.010;
 use strict;
@@ -34,7 +34,7 @@ Data::Sah::Util::Func - Sah utility routines for adding function
 
 =head1 VERSION
 
-This document describes version 0.900 of Data::Sah::Util::Func (from Perl distribution Data-Sah), released on 2019-08-12.
+This document describes version 0.901 of Data::Sah::Util::Func (from Perl distribution Data-Sah), released on 2019-08-14.
 
 =head1 DESCRIPTION
 

@@ -1,0 +1,33 @@
+=head1 NAME
+
+Geo::Geos::GeometryCollection - Represents a collection of heterogeneous Geometry objects.
+
+=head1 DESCRIPTION
+
+See methods in the base class L<Geo::Geos::Geometry>.
+
+=head1 SEE ALSO (C++ classes docs)
+
+L<GEOS C++ Library|https://trac.osgeo.org/geos>
+
+geos::geom::GeometryCollection
+
+=head1 SEE ALSO
+
+L<Geo::Geos::Geometry>
+
+L<Geo::Geos::MultiLineString>
+
+L<Geo::Geos::MultiPoint>
+
+L<Geo::Geos::MultiPolygon>
+
+=head1 AUTHOR
+
+Ivan Baidakou <i.baydakov@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

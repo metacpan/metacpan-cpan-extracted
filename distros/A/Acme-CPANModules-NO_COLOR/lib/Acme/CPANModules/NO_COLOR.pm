@@ -1,7 +1,7 @@
 package Acme::CPANModules::NO_COLOR;
 
 our $DATE = '2018-12-22'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our $LIST = {
     summary => "Modules that follow the NO_COLOR convention",
@@ -12,19 +12,25 @@ output of console programs by defining an environment variable called NO_COLOR.
 The existence of said environment variable, regardless of its value, signals
 that programs should not use colored output.
 
+If you know of other modules that should be listed here, please contact me.
+
 _
     entries => [
+        {module=>'App::hr'},
         {module=>'Color::ANSI::Util'},
         {module=>'Data::Dump::Color'},
         {module=>'Debug::Print'},
+        {module=>'Log::Any::Adapter::Screen'},
+        {module=>'Log::ger::Output::Screen'},
+        {module=>'Progress::Any::Output::TermProgressBar'},
         {module=>'Term::ANSIColor::Conditional'},
         {module=>'Term::ANSIColor::Patch::Conditional'},
         {module=>'Term::App::Roles'},
         {module=>'Text::ANSITable'},
     ],
     links => [
-        {url=>'pm:Acme::CPANModules::NO_COLOR::NonCompliant'},
         {url=>'pm:Acme::CPANModules::COLOR'},
+        {url=>'pm:Acme::CPANModules::ColorEnv'},
     ],
 };
 
@@ -43,7 +49,7 @@ Acme::CPANModules::NO_COLOR - Modules that follow the NO_COLOR convention
 
 =head1 VERSION
 
-This document describes version 0.001 of Acme::CPANModules::NO_COLOR (from Perl distribution Acme-CPANModules-NO_COLOR), released on 2018-12-22.
+This document describes version 0.003 of Acme::CPANModules::NO_COLOR (from Perl distribution Acme-CPANModules-NO_COLOR), released on 2018-12-22.
 
 =head1 DESCRIPTION
 
@@ -54,15 +60,25 @@ output of console programs by defining an environment variable called NO_COLOR.
 The existence of said environment variable, regardless of its value, signals
 that programs should not use colored output.
 
+If you know of other modules that should be listed here, please contact me.
+
 =head1 INCLUDED MODULES
 
 =over
+
+=item * L<App::hr>
 
 =item * L<Color::ANSI::Util>
 
 =item * L<Data::Dump::Color>
 
 =item * L<Debug::Print>
+
+=item * L<Log::Any::Adapter::Screen>
+
+=item * L<Log::ger::Output::Screen>
+
+=item * L<Progress::Any::Output::TermProgressBar>
 
 =item * L<Term::ANSIColor::Conditional>
 

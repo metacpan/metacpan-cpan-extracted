@@ -3,12 +3,12 @@ package Specio::Constraint::AnyCan;
 use strict;
 use warnings;
 
-our $VERSION = '0.43';
+our $VERSION = '0.44';
 
-use B ();
 use List::Util 1.33 ();
 use Role::Tiny::With;
 use Scalar::Util ();
+use Specio::Helpers qw( perlstring );
 use Specio::Library::Builtins;
 use Specio::OO;
 
@@ -25,8 +25,7 @@ with 'Specio::Constraint::Role::CanType';
         my $self = shift;
         my $val  = shift;
 
-        my $methods = join ', ',
-            map { B::perlstring($_) } @{ $self->methods };
+        my $methods = join ', ', map { perlstring($_) } @{ $self->methods };
         return sprintf( <<'EOF', $val, $methods );
 (
     do {
@@ -82,7 +81,7 @@ Specio::Constraint::AnyCan - A class for constraints which require a class name 
 
 =head1 VERSION
 
-version 0.43
+version 0.44
 
 =head1 SYNOPSIS
 
@@ -139,7 +138,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2018 by Dave Rolsky.
+This software is Copyright (c) 2012 - 2019 by Dave Rolsky.
 
 This is free software, licensed under:
 

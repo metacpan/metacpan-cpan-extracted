@@ -1,0 +1,93 @@
+=head1 NAME
+
+Geo::Geos::Noding - Noding support functions.
+
+=head1 SYNOPSIS
+
+    use Geo::Geos::Algorithm::LineIntersector;
+    use Geo::Geos::Coordinate;
+    use Geo::Geos::Noding qw/compareOrientedCoordinateArray octant checkNodingValid fastCheckNodingValid
+                        compareSegmentPoints extractSegmentStrings intersects/;
+    use Geo::Geos::Noding::NodedSegmentString;
+    use Geo::Geos::Noding::SegmentIntersectionDetector;
+    use Geo::Geos::PrecisionModel;
+
+    my $c1 = Geo::Geos::Coordinate->new(0,1);
+    my $c2 = Geo::Geos::Coordinate->new(2,1);
+    my $c3 = Geo::Geos::Coordinate->new(1,0);
+    my $c4 = Geo::Geos::Coordinate->new(1,2);
+    my $gf = Geo::Geos::GeometryFactory::create();
+    my $pm = Geo::Geos::PrecisionModel->new;
+    my $li = Geo::Geos::Algorithm::LineIntersector->new($pm);
+
+    compareOrientedCoordinateArray([$c1], [$c2]);     # => -1
+
+    octant($c1, $c2); # => 0
+    octant(1, 4);     # => 1
+
+    my $ss1 = Geo::Geos::Noding::NodedSegmentString->new([$c1, $c2]);
+    my $ss2 = Geo::Geos::Noding::NodedSegmentString->new([$c3, $c4]);
+
+    fastCheckNodingValid([$ss1]);                 # OK => undef
+    my $err = fastCheckNodingValid([$ss1, $ss2]); # FAIL => like qr/found non-noded intersection/
+    # fastCheckNodingValid([$ss1, $ss2]) - throws exception in void context, if invalid
+    # checkNodingValid([$ss1, $ss2])     - throws exception if invalid
+
+    compareSegmentPoints(4, $c1, $c2);    # => 1
+
+    my $ls = $gf->createLineString([$c1, $c2], 2);
+    my $ss = extractSegmentStrings($ls);
+    my $ss0 = $ss->[0];   # => isa 'Geo::Geos::Noding::SegmentString'
+
+    my $c21 = Geo::Geos::Coordinate->new(0,1);
+    my $c22 = Geo::Geos::Coordinate->new(2,1);
+    my $c23 = Geo::Geos::Coordinate->new(1,0);
+    my $c24 = Geo::Geos::Coordinate->new(1,2);
+
+    my $ss21 = Geo::Geos::Noding::NodedSegmentString->new([$c21, $c22]);
+    my $ss22 = Geo::Geos::Noding::NodedSegmentString->new([$c23, $c24]);
+
+    my $sid = Geo::Geos::Noding::SegmentIntersectionDetector->new($li);
+
+    intersects([$ss21], [$ss22]);           # => success
+    intersects([$ss21], [$ss22], $sid);     # => success
+
+=head1 SEE ALSO (C++ classes docs)
+
+L<GEOS C++ Library|https://trac.osgeo.org/geos>
+
+geos::noding::FastNodingValidator
+
+geos::noding::FastSegmentSetIntersectionFinder
+
+geos::noding::NodingValidator
+
+geos::noding::OrientedCoordinateArray
+
+geos::noding::Octant
+
+geos::noding::SegmentPointComparator
+
+geos::noding::SegmentStringUtil
+
+=head1 SEE ALSO
+
+L<Geo::Geos>
+
+L<Geo::Geos::Algorithm::LineIntersector>
+
+L<Geo::Geos::Noding::SegmentString>
+
+L<Geo::Geos::Noding::NodedSegmentString>
+
+L<Geo::Geos::Noding::SegmentIntersectionDetector>
+
+=head1 AUTHOR
+
+Ivan Baidakou <i.baydakov@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

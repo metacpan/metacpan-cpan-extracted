@@ -1,0 +1,53 @@
+=head1 NAME
+
+Geo::Geos::Coordinate - The lightweight class used to store coordinates.
+
+=head1 SYNOPSIS
+
+    use Geo::Geos::Coordinate;
+
+    my $c_3d = Geo::Geos::Coordinate->new(1,2,3);
+    $c_3d->x;   # => 1;
+    $c_3d->y;   # => 2;
+    $c_3d->z;   # => 3;
+
+    my $c2 = Geo::Geos::Coordinate->new(1,2,3);
+    $c2->equals($c_3d);     # => success
+    $c2->equals2D($c_3d);   # => success
+    $c2->equals3D($c_3d);   # => success
+
+    $c2->compareTo($c_3d);  # => 0
+    $c2->distance($c_3d);   # => 0
+    $c2->isNull;            # ''
+
+    my $c_2d = Geo::Geos::Coordinate->new(1,2);
+    $c_2d->x;   # => 1;
+    $c_2d->y;   # => 2;
+    $c_2d->z;   # => 'NaN';
+
+    $c_2d->toString;    # => '1 2'
+
+    $c_2d->x(8);
+    $c_2d->x;   # => 8;
+
+=head1 SEE ALSO (C++ classes docs)
+
+L<GEOS C++ Library|https://trac.osgeo.org/geos>
+
+geos::geom::Coordinate
+
+=head1 SEE ALSO
+
+L<Geo::Geos>
+
+L<Geo::Geos::Algorithm>
+
+=head1 AUTHOR
+
+Ivan Baidakou <i.baydakov@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

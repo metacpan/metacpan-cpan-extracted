@@ -54,7 +54,7 @@ SUBROUTINES
   OTHER UTF-8 CODEPOINT FEATURE
     UTF8::R2::chop(@_)
     UTF8::R2::chr($_)
-    UTF8::R2::getc(FILE)
+    UTF8::R2::getc(FILEHANDLE)
     UTF8::R2::index($_, 'ABC', 5)
     UTF8::R2::lc($_)
     UTF8::R2::lcfirst($_)

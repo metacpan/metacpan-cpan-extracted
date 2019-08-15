@@ -1,0 +1,49 @@
+=head1 NAME
+
+Geo::Geos::Index::SpatialIndex - Abstract class for spatial index algorithms.
+
+=head1 SYNOPSIS
+
+    use Geo::Geos::Index::Quadtree;
+
+    my $t  = Geo::Geos::Index::Quadtree->new;     # => isa 'Geo::Geos::Index::SpatialIndex'
+    my $t2 = Geo::Geos::Index::STRtree->new;      # => isa 'Geo::Geos::Index::SpatialIndex'
+
+    my $payload = 'any-scalar';
+    my $e1 = Geo::Geos::Envelope->new(1, 2, 3, 4);
+    $t->insert($e1, $payload);
+
+    $t->query($e1);     # => is_deeply ['any-scalar']
+
+    my $item;
+    $t->query($e1, sub { $item = $_[0] });
+    my $ok = $item eq 'any-scalar';   # => success
+
+    $t->remove($e1, $payload);
+    $t->query($e1);     # => is_deeply []
+
+=head1 SEE ALSO (C++ classes docs)
+
+L<GEOS C++ Library|https://trac.osgeo.org/geos>
+
+geos::index::SpatialIndex
+
+=head1 SEE ALSO
+
+L<Geo::Geos>
+
+L<Geo::Geos::Envelope>
+
+L<Geo::Geos::Index::Quadtree>
+
+L<Geo::Geos::Index::STRtree>
+
+=head1 AUTHOR
+
+Ivan Baidakou <i.baydakov@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

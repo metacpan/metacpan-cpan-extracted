@@ -1,5 +1,4 @@
 Changes
-ignore.txt
 lib/MooX/Purple.pm
 lib/MooX/Purple/G.pm
 Makefile.PL
@@ -10,8 +9,11 @@ README
 t/00-load.t
 t/01-test.t
 t/02-test.t
-t/03-compile.pmc
 t/03-compile.t
+t/lib/out/Before.pmc
+t/lib/out/Hello.pmc
+t/lib/out/Night.pmc
+t/lib/out/World.pmc
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

@@ -1,5 +1,5 @@
 package Statocles::Page::Document;
-our $VERSION = '0.093';
+our $VERSION = '0.094';
 # ABSTRACT: Render document objects into HTML
 
 use Statocles::Base 'Class';
@@ -210,7 +210,7 @@ sub sections {
         @sections =
             map { $self->markdown->markdown( $_ ) }
             map { $self->_render_content_template( $_, {} ) }
-            split /\n---\n/,
+            split /\R---\R/,
             $self->document->content;
 
         $self->_rendered_sections( \@sections );
@@ -338,7 +338,7 @@ Statocles::Page::Document - Render document objects into HTML
 
 =head1 VERSION
 
-version 0.093
+version 0.094
 
 =head1 DESCRIPTION
 

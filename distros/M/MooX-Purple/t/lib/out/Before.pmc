@@ -1,0 +1,5 @@
+package Before;
+use Moo::Role;
+
+sub seven { return '7' }
+1;

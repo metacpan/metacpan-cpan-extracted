@@ -70,7 +70,7 @@
          "web" : "https://github.com/perlancar/perl-File-Write-Rotate"
       }
    },
-   "version" : "0.320",
+   "version" : "0.321",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028002"

@@ -1,3 +1,11 @@
+0.151   2019-06-20 (PERLANCAR)
+
+	- No functional changes.
+
+	- Add Perinci::CmdLine::Classic as runtime suggests dependency
+	  (previously deliberately excluded).
+
+
 0.150   2019-06-20 (PERLANCAR)
 
 	- No functional changes.

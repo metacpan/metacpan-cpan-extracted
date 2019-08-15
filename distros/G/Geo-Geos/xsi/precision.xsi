@@ -1,0 +1,75 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::Precision
+PROTOTYPES: DISABLE
+
+int64 signExpBits(int64 num) {
+    RETVAL = CommonBits::signExpBits(num);
+}
+
+int numCommonMostSigMantissaBits (int64 num1, int64 num2) {
+    RETVAL = CommonBits::numCommonMostSigMantissaBits(num1, num2);
+}
+
+int64 zeroLowerBits (int64 bits, int nBits) {
+    RETVAL = CommonBits::zeroLowerBits(bits, nBits);
+}
+
+int getBit (int64 bits, int i) {
+    RETVAL = CommonBits::getBit (bits, i);
+}
+
+Sv commonIntersection (Geometry& g0, Geometry& g1, bool nReturnToOriginalPrecision = false) {
+    RETVAL = Helper::uplift(CommonBitsOp(nReturnToOriginalPrecision).intersection(&g0, &g1));
+}
+
+Sv commonUnion (Geometry& g0, Geometry& g1, bool nReturnToOriginalPrecision = false) {
+    RETVAL = Helper::uplift(CommonBitsOp(nReturnToOriginalPrecision).Union(&g0, &g1));
+}
+
+Sv commonDifference (Geometry& g0, Geometry& g1, bool nReturnToOriginalPrecision = false) {
+    RETVAL = Helper::uplift(CommonBitsOp(nReturnToOriginalPrecision).difference(&g0, &g1));
+}
+
+Sv commonSymDifference (Geometry& g0, Geometry& g1, bool nReturnToOriginalPrecision = false) {
+    RETVAL = Helper::uplift(CommonBitsOp(nReturnToOriginalPrecision).symDifference(&g0, &g1));
+}
+
+Sv commonBuffer (Geometry& g0, double distance, bool nReturnToOriginalPrecision = false) {
+    RETVAL = Helper::uplift(CommonBitsOp(nReturnToOriginalPrecision).buffer(&g0, distance));
+}
+
+Sv enhancedIntersection (Geometry& g0, Geometry& g1) {
+    RETVAL = Helper::uplift(EnhancedPrecisionOp().intersection(&g0, &g1));
+}
+
+Sv enhancedUnion (Geometry& g0, Geometry& g1){
+    RETVAL = Helper::uplift(EnhancedPrecisionOp().Union(&g0, &g1));
+}
+
+Sv enhancedDifference (Geometry& g0, Geometry& g1){
+    RETVAL = Helper::uplift(EnhancedPrecisionOp().difference(&g0, &g1));
+}
+
+Sv enhancedSymDifference (Geometry& g0, Geometry& g1){
+    RETVAL = Helper::uplift(EnhancedPrecisionOp().symDifference(&g0, &g1));
+}
+
+Sv enhancedBuffer (Geometry& g, double distance){
+    RETVAL = Helper::uplift(EnhancedPrecisionOp().buffer(&g, distance));
+}
+
+Coordinate* removeCommonBits(Geometry& target, Array sources): ALIAS(addCommonBits=1) {
+    CommonBitsRemover cbr;
+    for(const auto& it: sources) {
+        cbr.add(&xs::in<Geometry&>(it));
+    }
+
+    switch (ix) {
+        case 0:  cbr.removeCommonBits(&target); break;
+        default: cbr.addCommonBits(&target); break;
+    }
+    RETVAL = new Coordinate(cbr.getCommonCoordinate());
+}
+
+BOOT {
+    xs::exp::autoexport(Stash(__PACKAGE__));
+}

@@ -1,0 +1,8 @@
+package Night;
+use Moo;
+use MooX::LazierAttributes;
+use MooX::ValidateSubs;
+extends qw/Hello/;
+
+sub nine { return 'nine' }
+1;

@@ -5,7 +5,7 @@ use 5.016;
 use strict;
 use warnings;
 
-$Geoffrey::Role::Core::VERSION = '0.000101';
+$Geoffrey::Role::Core::VERSION = '0.000102';
 
 sub new {
     my $class = shift;
@@ -33,7 +33,7 @@ sub converter_name {
 sub db_changelog_columns {
     $_[0]->{db_changelog_columns} //= [
         qw/
-            author
+            created_by
             geoffrey_version
             comment
             id
@@ -49,6 +49,7 @@ sub io_name {
     return $_[0]->{io_name};
 }
 sub dbh                { return $_[0]->{dbh} }
+sub schema             { return $_[0]->{schema} }
 sub environment_system { return $_[0]->{system} // 'main'; }
 sub disconnect         { return $_[0]->{dbh}->disconnect; }
 
@@ -63,6 +64,9 @@ sub changelog_io {
     my ($self) = @_;
     require Geoffrey::Utils;
     $self->{changelog_io} //= Geoffrey::Utils::changelog_io_from_name($self->io_name);
+    $self->{changelog_io}->converter($self->converter) if $self->{changelog_io}->needs_converter;
+    $self->{changelog_io}->dbh($self->dbh)             if $self->{changelog_io}->needs_dbh;
+    $self->{changelog_io}->schema($self->schema)       if $self->schema;
     return $self->{changelog_io};
 }
 
@@ -80,7 +84,7 @@ Geoffrey::Role::Core - Abstract core class.
 
 =head1 VERSION
 
-Version 0.000101
+Version 0.000102
 
 =head1 DESCRIPTION
 
@@ -140,6 +144,8 @@ and returns it
 =head2 converter_name
 
 =head2 environment_system
+
+=head2 schema
 
 =head1 DIAGNOSTICS
 

@@ -5,7 +5,7 @@ Weasel::Session - Connection to an encapsulated test driver
 
 =head1 VERSION
 
-0.11
+0.12
 
 =head1 SYNOPSIS
 
@@ -50,7 +50,7 @@ use Module::Runtime qw/ use_module /;;
 use Weasel::FindExpanders qw/ expand_finder_pattern /;
 use Weasel::WidgetHandlers qw| best_match_handler_class |;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 
 =head1 ATTRIBUTES
@@ -531,7 +531,7 @@ sub tag_name {
          'getting tag name');
 }
 
-=item wait_for($callback, [ retry_timeout => $number,] [poll_delay => $number])
+=item wait_for($callback, [ retry_timeout => $number,] [poll_delay => $number,] [ on_timeout => \&cb ])
 
 Polls $callback->() until it returns true, or C<wait_timeout> expires
 -- whichever comes first.

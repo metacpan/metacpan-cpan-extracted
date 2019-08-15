@@ -1,0 +1,125 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::GeometryFactory
+PROTOTYPES: DISABLE
+
+GeometryFactory* create(SV* arg1 = NULL, SV* arg2 = NULL) {
+    GeometryFactory::Ptr ptr;
+    if (!arg1) {
+        ptr = GeometryFactory::create();
+    }
+    else {
+        auto& pm = xs::in<PrecisionModel&>(arg1);
+        if (arg2) {
+            int srid = SvIV(arg2);
+            ptr = GeometryFactory::create(&pm, srid);
+        }
+        else ptr = GeometryFactory::create(&pm);
+    }
+
+    if (ptr.get()) {
+        /* steal pointer without destroying the factory */
+        RETVAL = ptr.release();
+    }
+    else throw ("unsupported arguments");
+}
+
+PrecisionModel* GeometryFactory::getPrecisionModel() {
+    auto pm = THIS->getPrecisionModel();
+    RETVAL = new PrecisionModel(*pm);
+}
+
+int GeometryFactory::getSRID ()
+
+GeometryCollection* GeometryFactory::createGeometryCollection() {
+    RETVAL = THIS->createGeometryCollection();
+}
+
+Point* GeometryFactory::createPoint(Sv arg1 = Sv{}, SV* arg2 = NULL) {
+    if (!arg1) RETVAL = THIS->createPoint();
+    else {
+        if (!arg1.is_array_ref()) {
+            Object obj {arg1};
+            if (obj && obj.stash().name() == "Geo::Geos::Coordinate") {
+                auto coord = xs::in<Coordinate*>(obj);
+                RETVAL = THIS->createPoint(*coord);
+            }
+            else throw ("Object must be blessed into Geo::Geos::Coordinate");
+        }
+        else {
+            if (!arg2) throw ("missing mandatory argument");
+            size_t dims = SvIV(arg2);
+            auto seq = Helper::convert_copy(*THIS, Array(arg1), dims);
+            RETVAL = THIS->createPoint(seq);
+        }
+    }
+}
+
+MultiPoint* GeometryFactory::createMultiPoint(SV* arg1 = NULL, SV* arg2 = NULL) {
+    if (!arg1) RETVAL = THIS->createMultiPoint();
+    else {
+        if (!arg2) throw ("missing mandatory argument");
+        size_t dims = SvIV(arg2);
+        auto seq = std::unique_ptr<CoordinateSequence>(Helper::convert_copy(*THIS, Array(arg1), dims));
+        RETVAL = THIS->createMultiPoint(*seq);
+    }
+}
+
+LineString* GeometryFactory::createLineString(SV* arg1 = NULL, SV* arg2 = NULL) {
+    if (!arg1) RETVAL = THIS->createLineString();
+    else {
+        if (!arg2) throw ("missing argument");
+        size_t dims = SvIV(arg2);
+        auto seq = std::unique_ptr<CoordinateSequence>(Helper::convert_copy(*THIS, Array(arg1), dims));
+        RETVAL = THIS->createLineString(*seq);
+    }
+}
+
+MultiLineString* GeometryFactory::createMultiLineString(SV* arg1 = NULL) {
+    if (!arg1) RETVAL = THIS->createMultiLineString();
+    else {
+        Array geometries(arg1);
+        if (!geometries) throw ("unsupported argument");
+        auto lines = Helper::convert_geometries(geometries);
+        RETVAL = THIS->createMultiLineString(lines);
+    }
+}
+
+LinearRing* GeometryFactory::createLinearRing(SV* arg1 = NULL, SV* arg2 = NULL) {
+    if (!arg1) RETVAL = THIS->createLinearRing();
+    else {
+        if (!arg2) throw ("missing argument");
+        size_t dims = SvIV(arg2);
+        auto seq = std::unique_ptr<CoordinateSequence>(Helper::convert_copy(*THIS, Array(arg1), dims));
+        RETVAL = THIS->createLinearRing(*seq);
+    }
+}
+
+geos::geom::Polygon* GeometryFactory::createPolygon(SV* arg1 = NULL, SV* arg2 = NULL) {
+    if (!arg1) RETVAL = THIS->createPolygon();
+    else {
+        auto ring = xs::in<LinearRing*>(arg1);
+        auto holes = Helper::convert_geometries(Array(arg2));
+        RETVAL = THIS->createPolygon(*ring, holes);
+    }
+}
+
+MultiPolygon* GeometryFactory::createMultiPolygon(SV* arg1 = NULL) {
+    if (!arg1) RETVAL = THIS->createMultiPolygon();
+    else {
+        auto polygons = Helper::convert_geometries(Array(arg1));
+        RETVAL = THIS->createMultiPolygon(polygons);
+    }
+}
+
+Sv GeometryFactory::toGeometry(Envelope* env) {
+    RETVAL = Helper::uplift(THIS->toGeometry(env));
+}
+
+Sv GeometryFactory::createEmptyGeometry() {
+    RETVAL = Helper::uplift(THIS->createEmptyGeometry());
+}
+
+int CLONE_SKIP (...) { PERL_UNUSED_VAR(items); RETVAL = 1; }
+
+BOOT {
+    xs::exp::autoexport(Stash(__PACKAGE__));
+}

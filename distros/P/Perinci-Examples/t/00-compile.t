@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 20 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 22 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Perinci/Examples.pm',
@@ -28,7 +28,9 @@ my @module_files = (
     'Perinci/Examples/Tiny/Args.pm',
     'Perinci/Examples/Tiny/Result.pm',
     'Perinci/Examples/Tx.pm',
-    'Perinci/Examples/Version.pm'
+    'Perinci/Examples/Version.pm',
+    'Perinci/Examples/rimetadb/ExcludedPackage.pm',
+    'Perinci/Examples/rimetadb/IncludedPackage.pm'
 );
 
 

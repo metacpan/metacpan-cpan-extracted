@@ -1,0 +1,22 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::Noding::SegmentString
+PROTOTYPES: DISABLE
+
+unsigned int SegmentString::size ()
+
+Coordinate* SegmentString::getCoordinate (unsigned int i){
+    RETVAL = new Coordinate(THIS->getCoordinate(i));
+}
+
+Array SegmentString::getCoordinates () {
+    auto seq = THIS->getCoordinates();
+    RETVAL = Helper::convert_copy(seq);
+}
+
+bool SegmentString::isClosed()
+
+std::string SegmentString::toString(...) {
+    std::ostringstream out;
+    out << *THIS;
+    RETVAL = out.str();
+}
+

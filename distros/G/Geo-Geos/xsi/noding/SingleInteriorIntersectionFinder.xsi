@@ -1,0 +1,33 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::Noding::SingleInteriorIntersectionFinder
+PROTOTYPES: DISABLE
+
+Sv new(SV*,SV* liObj) {
+    auto& li = xs::in<LineIntersector&>(liObj);
+    Sv wrapped = xs::out<>(new SingleInteriorIntersectionFinder(li));
+    wrapped.payload_attach(SvRV(liObj), &payload_marker);
+    RETVAL = wrapped;
+}
+
+
+bool SingleInteriorIntersectionFinder::hasIntersection ()
+
+Coordinate* SingleInteriorIntersectionFinder::getInteriorIntersection() {
+    RETVAL = new Coordinate(THIS->getInteriorIntersection());
+}
+
+xs::Array SingleInteriorIntersectionFinder::getIntersectionSegments() {
+    auto& vector = THIS->getIntersectionSegments();
+    auto r = xs::Array::create(vector.size());
+    for(auto& c: vector) {
+        auto copy = xs::out<Coordinate*>(new Coordinate(c));
+        r.push(copy);
+    }
+    RETVAL = r;
+}
+
+
+int CLONE_SKIP (...) { PERL_UNUSED_VAR(items); RETVAL = 1; }
+
+BOOT {
+    Stash(__PACKAGE__).inherit("Geo::Geos::Noding::SegmentIntersector");
+}

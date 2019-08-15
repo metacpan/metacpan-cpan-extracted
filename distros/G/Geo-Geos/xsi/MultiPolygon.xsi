@@ -1,0 +1,9 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::MultiPolygon
+PROTOTYPES: DISABLE
+
+int CLONE_SKIP (...) { PERL_UNUSED_VAR(items); RETVAL = 1; }
+
+BOOT {
+    Stash(__PACKAGE__).inherit("Geo::Geos::Polygonal");
+    Stash(__PACKAGE__).inherit("Geo::Geos::GeometryCollection");
+}

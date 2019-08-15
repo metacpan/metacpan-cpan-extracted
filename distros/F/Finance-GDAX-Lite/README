@@ -2,8 +2,8 @@ NAME
     Finance::GDAX::Lite - Client API library for GDAX (lite edition)
 
 VERSION
-    This document describes version 0.002 of Finance::GDAX::Lite (from Perl
-    distribution Finance-GDAX-Lite), released on 2018-06-11.
+    This document describes version 0.003 of Finance::GDAX::Lite (from Perl
+    distribution Finance-GDAX-Lite), released on 2018-06-14.
 
 SYNOPSIS
      use Finance::GDAX::Lite;

@@ -1,0 +1,46 @@
+=head1 NAME
+
+Geo::Geos::WKTWriter - Writes a Geometry into Well-Known Text format.
+
+=head1 SYNOPSIS
+
+    use Geo::Geos::GeometryFactory;
+    use Geo::Geos::WKTReader;
+
+    my $gf = Geo::Geos::GeometryFactory::create();
+    my $c  = Geo::Geos::Coordinate->new(1,2);
+    my $p  = $gf->createPoint($c);
+
+    my $roundingPrecision = 5;
+    my $trim = 0;
+    Geo::Geos::WKTWriter->new($roundingPrecision, $trim);    # => isa 'Geo::Geos::WKTWriter'
+    Geo::Geos::WKTWriter->new($roundingPrecision);           # => isa 'Geo::Geos::WKTWriter'
+    Geo::Geos::WKTWriter->new;                               # => isa 'Geo::Geos::WKTWriter'
+
+    my $writer = Geo::Geos::WKTWriter->new;
+    $writer->setTrim(1);
+    $writer->setRoundingPrecision(16);
+
+    $writer->write($p);     # => 'POINT (1 2)'
+
+=head1 SEE ALSO (C++ classes docs)
+
+L<GEOS C++ Library|https://trac.osgeo.org/geos>
+
+geos::io::WKTWriter
+
+L<Geo::Geos>
+
+L<Geo::Geos::Geometry>
+
+L<Geo::Geos::WKTReader>
+
+=head1 AUTHOR
+
+Ivan Baidakou <i.baydakov@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

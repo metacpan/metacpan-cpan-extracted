@@ -62,7 +62,7 @@
          "web" : "https://github.com/perlancar/perl-Finance-GDAX-Lite"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -387,7 +387,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AddPrereqs",
             "name" : "@Author::PERLANCAR/Rinci::AddPrereqs",
-            "version" : "0.140"
+            "version" : "0.142"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AddToDb",

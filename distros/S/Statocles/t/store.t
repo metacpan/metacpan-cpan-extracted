@@ -14,18 +14,6 @@ test_constructor(
     },
 );
 
-subtest 'warn if path does not exist' => sub {
-    my $path = $SHARE_DIR->child( qw( DOES_NOT_EXIST ) );
-    lives_ok {
-        Statocles::Store->new(
-            path => $path,
-        )->iterator;
-    } 'store created with nonexistent path';
-
-    cmp_deeply $site->log->history->[-1], [ ignore(), 'warn', qq{Store path "$path" does not exist} ]
-        or diag explain $site->log->history->[-1];
-};
-
 my %tests = (
     'required.markdown' => {
         title => 'Required Document',
@@ -106,6 +94,14 @@ my %tests = (
     },
     'image.png' => { },
     'text.txt' => { },
+    'utf8-yml.md' => {
+        title => "Zero \x{00BB} One Hundred",
+        content => "\nThis is a test post for UTF-8 with YAML front matter.\n",
+    },
+    'utf8-json.md' => {
+        title => "Zero \x{00BB} One Hundred",
+        content => "\nThis is a test post for UTF-8 titles with a JSON front matter.\n",
+    },
 );
 
 sub test_store {

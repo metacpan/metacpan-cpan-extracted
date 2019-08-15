@@ -45,10 +45,8 @@ static void save_msg(pTHX_ V8Context* ctx, const char* target, SV* message)
     }
 }
 
-static int console_output_line(V8Context* ctx, SV* message, unsigned int flags)
+static int console_output_line(pTHX_ V8Context* ctx, SV* message, unsigned int flags)
 {
-    dTHX;
-
     STRLEN mlen = 0;
     char* mstr = SvPV(message, mlen);
     if (ctx->flags & V8_OPT_FLAG_SAVE_MESSAGES) {
@@ -79,8 +77,8 @@ static int console_output(const FunctionCallbackInfo<Value>& args, unsigned int 
     SV* message = newSVpvs("");
     bool separate = false;
     if (preamble) {
-        sv_catpv(aTHX_ message, preamble);
-        sv_catpvf(aTHX_ message, ":");
+        Perl_sv_catpv(aTHX_ message, preamble);
+        Perl_sv_catpvf(aTHX_ message, ":");
         separate = true;
     }
 
@@ -93,14 +91,14 @@ static int console_output(const FunctionCallbackInfo<Value>& args, unsigned int 
         for (int j = start; j < args.Length(); j++) {
             /* add separator if necessary */
             if (separate) {
-                sv_catpvf(aTHX_ message, " ");
+                Perl_sv_catpvf(aTHX_ message, " ");
             }
             separate = true;
 
             /* for non-objects, just get their value as string */
             if (!args[j]->IsObject()) {
                 String::Utf8Value str(isolate, args[j]);
-                sv_catpvf(aTHX_ message, "%s", *str);
+                Perl_sv_catpvf(aTHX_ message, "%s", *str);
                 continue;
             }
 
@@ -112,7 +110,7 @@ static int console_output(const FunctionCallbackInfo<Value>& args, unsigned int 
             }
             Local<String> json = Local<String>::Cast(ret);
             String::Utf8Value str(isolate, json);
-            sv_catpvf(aTHX_ message, "%s", *str);
+            Perl_sv_catpvf(aTHX_ message, "%s", *str);
         }
     }
     if (stack) {
@@ -123,7 +121,7 @@ static int console_output(const FunctionCallbackInfo<Value>& args, unsigned int 
 #endif
     }
 
-    return console_output_line(ctx, message, flags);
+    return console_output_line(aTHX_ ctx, message, flags);
 }
 
 static void console_assert(const FunctionCallbackInfo<Value>& args)
@@ -217,10 +215,12 @@ int pl_register_console_functions(V8Context* ctx)
 
 int pl_show_error(V8Context* ctx, const char* fmt, ...)
 {
+    dTHX;
+
     SV* message = newSVpvs("");
     va_list ap;
     va_start(ap, fmt);
-    sv_vcatpvf(aTHX_ message, fmt, &ap);
+    Perl_sv_vcatpvf(aTHX_ message, fmt, &ap);
     va_end(ap);
-    return console_output_line(ctx, message, CONSOLE_TARGET_STDERR | CONSOLE_FLUSH);
+    return console_output_line(aTHX_ ctx, message, CONSOLE_TARGET_STDERR | CONSOLE_FLUSH);
 }

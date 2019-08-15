@@ -11,8 +11,6 @@ ppport.h
 README
 runcap/aclocal.m4
 runcap/compile
-runcap/config.guess
-runcap/config.sub
 runcap/configure
 runcap/configure.ac
 runcap/depcomp
@@ -20,13 +18,9 @@ runcap/getc.c
 runcap/getl.c
 runcap/install-sh
 runcap/install.am
-runcap/install.in
-runcap/libtool
-runcap/ltmain.sh
 runcap/Make.am
-runcap/Makefile.am
-runcap/Makefile.in
 runcap/missing
+runcap/README
 runcap/runcap.3
 runcap/runcap.c
 runcap/runcap.h
@@ -40,18 +34,17 @@ runcap/t/genout.c
 runcap/t/INPUT
 runcap/t/linemon00.at
 runcap/t/linemon01.at
+runcap/t/linemon02.at
 runcap/t/lines.at
 runcap/t/longout.at
 runcap/t/Makefile.am
 runcap/t/Makefile.in
-runcap/t/package.m4
 runcap/t/pipe.at
 runcap/t/rt.c
 runcap/t/seek00.at
 runcap/t/seek01.at
 runcap/t/simple.at
 runcap/t/stdin.at
-runcap/t/testsuite
 runcap/t/two.at
 runcap/tell.c
 t/00use.t
@@ -63,6 +56,7 @@ t/05simple.t
 t/06lines.t
 t/07two.t
 t/08input.t
+t/09linemon.t
 t/TestCapture.pm
 typemap
 META.yml                                 Module YAML meta-data (added by MakeMaker)

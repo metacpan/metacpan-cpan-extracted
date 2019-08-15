@@ -1,7 +1,7 @@
 package Data::Sah::Compiler::perl::TH::str;
 
-our $DATE = '2019-08-12'; # DATE
-our $VERSION = '0.900'; # VERSION
+our $DATE = '2019-08-14'; # DATE
+our $VERSION = '0.901'; # VERSION
 
 use 5.010;
 use strict;
@@ -31,7 +31,11 @@ sub superclause_comparable {
     if ($which eq 'is') {
         $c->add_ccl($cd, "$dt eq $ct");
     } elsif ($which eq 'in') {
-        $c->add_ccl($cd, "grep { \$_ eq $dt } \@{ $ct }");
+        if ($dt =~ /\$_\b/) {
+            $c->add_ccl($cd, "do { my \$_sahv_dt = $dt; grep { \$_ eq \$_sahv_dt } \@{ $ct } }");
+        } else {
+            $c->add_ccl($cd, "grep { \$_ eq $dt } \@{ $ct }");
+        }
     }
 }
 
@@ -137,8 +141,8 @@ sub clause_match {
         $c->add_ccl($cd, join(
             "",
             "ref($ct) eq 'Regexp' ? $dt =~ $ct : ",
-            "do { my \$re = $ct; eval { \$re = /\$re/; 1 } && ",
-            "$dt =~ \$re }",
+            "do { my \$_sahv_re = $ct; eval { \$_sahv_re = /\$_sahv_re/; 1 } && ",
+            "$dt =~ \$_sahv_re }",
         ));
     } else {
         # simplify code and we can check regex at compile time
@@ -157,15 +161,15 @@ sub clause_is_re {
     if ($cd->{cl_is_expr}) {
         $c->add_ccl($cd, join(
             "",
-            "do { my \$re = $dt; ",
-            "(eval { \$re = qr/\$re/; 1 } ? 1:0) == ($ct ? 1:0) }",
+            "do { my \$_sahv_re = $dt; ",
+            "(eval { \$_sahv_re = qr/\$_sahv_re/; 1 } ? 1:0) == ($ct ? 1:0) }",
         ));
     } else {
         # simplify code
         $c->add_ccl($cd, join(
             "",
-            "do { my \$re = $dt; ",
-            ($cv ? "" : "!"), "(eval { \$re = qr/\$re/; 1 })",
+            "do { my \$_sahv_re = $dt; ",
+            ($cv ? "" : "!"), "(eval { \$_sahv_re = qr/\$_sahv_re/; 1 })",
             "}",
         ));
     }
@@ -186,7 +190,7 @@ Data::Sah::Compiler::perl::TH::str - perl's type handler for type "str"
 
 =head1 VERSION
 
-This document describes version 0.900 of Data::Sah::Compiler::perl::TH::str (from Perl distribution Data-Sah), released on 2019-08-12.
+This document describes version 0.901 of Data::Sah::Compiler::perl::TH::str (from Perl distribution Data-Sah), released on 2019-08-14.
 
 =for Pod::Coverage ^(clause_.+|superclause_.+)$
 

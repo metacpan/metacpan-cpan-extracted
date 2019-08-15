@@ -60,6 +60,6 @@
          "web" : "https://gitlab.com/GeoffreyDB/Geoffrey"
       }
    },
-   "version" : "0.000101",
+   "version" : "0.000102",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

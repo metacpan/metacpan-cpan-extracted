@@ -33,7 +33,7 @@ WriteMakefile(
         'Mojo::Base' => 0,
         'Mojo::Util' => 0,
         'Class::Method::Modifiers' => 0,
-        'Mojolicious::Plugin::Model' => 0
+        'Mojolicious::Plugin::Model' => '0.10'
     },
     
     test => {

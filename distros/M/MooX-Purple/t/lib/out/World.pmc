@@ -1,0 +1,13 @@
+package World;
+use Moo::Role;
+with qw/Before/;
+
+sub six {
+	my $caller = caller();
+	my @allowed = qw(Hello);
+	unless ($caller eq __PACKAGE__ || grep { $_ eq $caller } @allowed) {
+		die "cannot call private method six from $caller";
+	}
+	'six' 
+}
+1;

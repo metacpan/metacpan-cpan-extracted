@@ -6,7 +6,7 @@ use strict;
 use Readonly;
 use warnings;
 
-$Geoffrey::Utils::VERSION = '0.000101';
+$Geoffrey::Utils::VERSION = '0.000102';
 
 Readonly::Scalar our $INT_64BIT_SIGNED => 9_223_372_036_854_775_807;
 
@@ -14,8 +14,7 @@ sub replace_spare {
     my ( $string, $options ) = @_;
     if ( !$string ) {
         require Geoffrey::Exception::RequiredValue;
-        Geoffrey::Exception::RequiredValue::throw_common( 'String to replace',
-            __PACKAGE__ . '::replace_spare' );
+        Geoffrey::Exception::RequiredValue::throw_common( 'String to replace', __PACKAGE__ . '::replace_spare' );
     }
     eval { $string =~ s/\{(\d+)\}/$options->[$1]/g; } or do { };
     return $string;
@@ -69,11 +68,23 @@ sub parse_package_sub {
     my ($s_action) = @_;
     my @a_action = split /\./, lc $s_action;
     my $s_sub = pop @a_action;
-    return (
-        $s_sub, join q//,
-        map { ucfirst } split /_/,
-        ( join q/::/, map { ucfirst } @a_action )
-    );
+    return ( $s_sub, join q//, map { ucfirst } split /_/, ( join q/::/, map { ucfirst } @a_action ) );
+}
+
+sub to_lowercase {
+    my ($ur_entry) = @_;
+    return unless $ur_entry;
+    if ( ref($ur_entry) eq 'ARRAY' ) {
+        $_ = to_lowercase($_) for @{$ur_entry};
+        return $ur_entry;
+    }
+    for my $s_key ( sort keys %{$ur_entry} ) {
+        my $ur_value = delete $ur_entry->{$s_key};
+        next unless $ur_value;
+        $ur_entry->{ lc $s_key eq 'plain_sql' ? 'as' : lc $s_key } =
+          ref($ur_value) =~ /(HASH|ARRAY)/ ? to_lowercase($ur_value) : $ur_value;
+    }
+    return $ur_entry;
 }
 
 1;    # End of Geoffrey::Utils
@@ -86,7 +97,7 @@ Geoffrey::Utils - Helper snippets
 
 =head1 VERSION
 
-Version 0.000101
+Version 0.000102
 
 =head1 DESCRIPTION
 
@@ -113,6 +124,8 @@ Generates a name by given context and currente unixtimestamp
 =head2 action_obj_from_name
 
 =head2 parse_package_sub
+
+=head2 to_lowercase
 
 =head1 DIAGNOSTICS
 

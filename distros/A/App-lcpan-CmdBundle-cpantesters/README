@@ -3,7 +3,7 @@ NAME
     CPAN Testers
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     App::lcpan::CmdBundle::cpantesters (from Perl distribution
     App-lcpan-CmdBundle-cpantesters), released on 2018-09-12.
 

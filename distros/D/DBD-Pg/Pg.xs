@@ -356,6 +356,7 @@ void do(dbh, statement_sv, attr=Nullsv, ...)
 			if (!dbdxst_bind_params(sth, imp_sth, items-2, ax+2))
 				XSRETURN_UNDEF;
 			imp_sth->async_flag = asyncflag;
+			imp_dbh->do_tmp_sth = imp_sth;
 			retval = dbd_st_execute(sth, imp_sth);
 		}
 
@@ -390,6 +391,14 @@ pg_endcopy(dbh)
 	SV * dbh
 	CODE:
 		ST(0) = (pg_db_endcopy(dbh)!=0) ? &PL_sv_no : &PL_sv_yes;
+
+  
+void
+pg_error_field(dbh, fieldname)
+	SV * dbh
+	char * fieldname;
+	CODE:
+		ST(0) = pg_db_error_field(dbh, fieldname);
 
 
 void

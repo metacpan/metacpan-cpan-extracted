@@ -1,7 +1,7 @@
 package Bencher::Scenario::PackageMoreUtil::list_package_contents;
 
 our $DATE = '2018-10-07'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use strict;
 use warnings;
@@ -28,7 +28,7 @@ Bencher::Scenario::PackageMoreUtil::list_package_contents - Benchmark list_packa
 
 =head1 VERSION
 
-This document describes version 0.001 of Bencher::Scenario::PackageMoreUtil::list_package_contents (from Perl distribution Bencher-Scenarios-PackageMoreUtil), released on 2018-10-07.
+This document describes version 0.002 of Bencher::Scenario::PackageMoreUtil::list_package_contents (from Perl distribution Bencher-Scenarios-PackageMoreUtil), released on 2018-10-07.
 
 =head1 SYNOPSIS
 
@@ -50,7 +50,7 @@ Packaging a benchmark script as a Bencher scenario makes it convenient to includ
 
 Version numbers shown below are the versions used when running the sample benchmark.
 
-L<Package::MoreUtil> 0.58
+L<Package::MoreUtil> 0.590
 
 =head1 BENCHMARK PARTICIPANTS
 
@@ -76,7 +76,7 @@ Benchmark with default options (C<< bencher -m PackageMoreUtil::list_package_con
  +-------------------+---------+--------+------+-----------+-----------+------------+---------+---------+
  | participant       | ds_tags | p_tags | perl | rate (/s) | time (μs) | vs_slowest |  errors | samples |
  +-------------------+---------+--------+------+-----------+-----------+------------+---------+---------+
- | Package::MoreUtil |         |        | perl |      6600 |       150 |          1 | 2.7e-07 |      20 |
+ | Package::MoreUtil |         |        | perl |      6800 |       150 |          1 | 1.6e-07 |      20 |
  +-------------------+---------+--------+------+-----------+-----------+------------+---------+---------+
 
 
@@ -86,12 +86,16 @@ Benchmark module startup overhead (C<< bencher -m PackageMoreUtil::list_package_
  +---------------------+-----------+------------------------+------------+---------+---------+
  | participant         | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
  +---------------------+-----------+------------------------+------------+---------+---------+
- | Package::MoreUtil   |       7.6 |                    2.8 |        1   | 2.6e-05 |      20 |
- | perl -e1 (baseline) |       4.8 |                    0   |        1.6 | 2.9e-05 |      20 |
+ | Package::MoreUtil   |       7.6 |                    2.9 |        1   | 3.7e-05 |      22 |
+ | perl -e1 (baseline) |       4.7 |                    0   |        1.6 | 2.4e-05 |      20 |
  +---------------------+-----------+------------------------+------------+---------+---------+
 
 
 To display as an interactive HTML table on a browser, you can add option C<--format html+datatables>.
+
+=head1 BENCHMARK NOTES
+
+C<list_package_contents()> is quite slow. Avoid if unnecessary.
 
 =head1 HOMEPAGE
 

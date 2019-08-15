@@ -143,6 +143,13 @@ stream_capture_get(struct stream_capture *cap, int *feof)
 		return -1;
 	}
 	if (rc == 0) {
+		if (cap->sc_linemon && cap->sc_level > cap->sc_cur) {
+			cap->sc_linemon(cap->sc_base + cap->sc_cur,
+					cap->sc_level - cap->sc_cur,
+					cap->sc_monarg);
+			cap->sc_cur = cap->sc_level;
+			cap->sc_nlines++;
+		}
 		*feof = 1;
 		return 0;
 	} else

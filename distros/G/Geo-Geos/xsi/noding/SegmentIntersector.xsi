@@ -1,0 +1,9 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::Noding::SegmentIntersector
+
+PROTOTYPES: DISABLE
+
+void SegmentIntersector::processIntersections(SegmentString& e0, int segIndex0, SegmentString& e1, int segIndex1) {
+    THIS->processIntersections(&e0, segIndex0, &e1, segIndex1);
+}
+
+bool SegmentIntersector::isDone ()

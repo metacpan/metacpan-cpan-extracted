@@ -1,0 +1,69 @@
+=head1 NAME
+
+Geo::Geos::Prep::Geometry - Geometry with optimized performance for specific geometric operations
+
+=head1 SYNOPSIS
+
+    use Geo::Geos::Coordinate;
+    use Geo::Geos::GeometryFactory;
+    use Geo::Geos::Prep::GeometryFactory;
+
+    my $gf = Geo::Geos::GeometryFactory::create();
+    my $c1 = Geo::Geos::Coordinate->new(1,2);
+    my $c2 = Geo::Geos::Coordinate->new(5,2);
+    my $c3 = Geo::Geos::Coordinate->new(5,0);
+    my $c4 = Geo::Geos::Coordinate->new(1,0);
+
+    my $lr1 = $gf->createLinearRing([$c1, $c2, $c3, $c4, $c1], 2);
+    my $p1 = $gf->createPolygon($lr1);
+
+    my $cx1 = Geo::Geos::Coordinate->new(1.5,1.5);
+    my $cx2 = Geo::Geos::Coordinate->new(4,1.5);
+    my $cx3 = Geo::Geos::Coordinate->new(4,0.5);
+    my $cx4 = Geo::Geos::Coordinate->new(1.5,0.5);
+    my $lr2 = $gf->createLinearRing([$cx1, $cx2, $cx3, $cx4, $cx1], 2);
+
+    my $p2 = $gf->createPolygon($lr2);
+
+    my $pp1 = Geo::Geos::Prep::GeometryFactory::prepare($p1);
+    my $pp2 = Geo::Geos::Prep::GeometryFactory::prepare($p2);
+
+    my $r1 = $pp1->contains($p2);                # => success
+    my $r2 = $pp1->containsProperly($p2);        # => success
+    my $r3 = !$pp1->coveredBy($p2);              # => success
+    my $r4 = $pp1->covers($p2);                  # => success
+    my $r5 = !$pp1->crosses($p2);                # => success
+    my $r6 = !$pp1->disjoint($p2);               # => success
+    my $r7 = $pp1->intersects($p2);              # => success
+    my $r8 = !$pp1->overlaps($p2);               # => success
+    my $r9 = !$pp1->touches($p2);                # => success
+    my $r0 = !$pp1->within($p2);                 # => success
+
+    $pp1->toString;     # => like qr/POLYGON/
+
+
+=head1 SEE ALSO (C++ classes docs)
+
+L<GEOS C++ Library|https://trac.osgeo.org/geos>
+
+geos::geom::prep::PreparedGeometry
+
+geos::geom::prep::BasicPreparedGeometry
+
+=head1 SEE ALSO
+
+L<Geo::Geos>
+
+L<Geo::Geos::Geometry>
+
+L<Geo::Geos::Prep::GeometryFactory>
+
+=head1 AUTHOR
+
+Ivan Baidakou <i.baydakov@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

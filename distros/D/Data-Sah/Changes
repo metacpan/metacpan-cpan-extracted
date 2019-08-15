@@ -1,3 +1,10 @@
+0.901   2019-08-14  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Handle cases where we generate code "grep { ... } ..."
+	  and data_term contains $_ which clashes with topic variable
+	  inside the grep block.
+
+
 0.900   2019-08-12  Released-By: PERLANCAR; Urgency: medium
 
         - Avoid generating code that uses smartmatch.

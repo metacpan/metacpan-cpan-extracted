@@ -5,7 +5,7 @@ use 5.016;
 use strict;
 use warnings;
 
-$Geoffrey::Action::Constraint::VERSION = '0.000101';
+$Geoffrey::Action::Constraint::VERSION = '0.000102';
 
 use parent 'Geoffrey::Role::Action';
 
@@ -14,12 +14,12 @@ sub new {
     my $self  = $class->SUPER::new(@_);
     $self->{constraints} = [
         qw/
-          foreignkey
-          primarykey
-          check
-          index
-          unique
-          /
+            foreignkey
+            primarykey
+            check
+            index
+            unique
+            /
     ];
     return bless $self, $class;
 }
@@ -29,7 +29,7 @@ sub _obj_check {
     require Geoffrey::Action::Constraint::Check;
     $self->{check} //= Geoffrey::Action::Constraint::Check->new(
         converter => $self->converter,
-        dbh    => $self->dbh,
+        dbh       => $self->dbh,
     );
     return $self->{check};
 }
@@ -39,19 +39,9 @@ sub _obj_index {
     require Geoffrey::Action::Constraint::Index;
     $self->{index} //= Geoffrey::Action::Constraint::Index->new(
         converter => $self->converter,
-        dbh    => $self->dbh,
+        dbh       => $self->dbh,
     );
     return $self->{index};
-}
-
-sub _obj_foreignkey {
-    my ($self) = @_;
-    require Geoffrey::Action::Constraint::ForeignKey;
-    $self->{foreignkey} //= Geoffrey::Action::Constraint::ForeignKey->new(
-        converter => $self->converter,
-        dbh    => $self->dbh,
-    );
-    return $self->{foreignkey};
 }
 
 sub _obj_unique {
@@ -59,7 +49,7 @@ sub _obj_unique {
     require Geoffrey::Action::Constraint::Unique;
     $self->{unique} //= Geoffrey::Action::Constraint::Unique->new(
         converter => $self->converter,
-        dbh    => $self->dbh,
+        dbh       => $self->dbh,
     );
     return $self->{unique};
 }
@@ -69,14 +59,25 @@ sub _obj_primarykey {
     require Geoffrey::Action::Constraint::PrimaryKey;
     $self->{primarykey} //= Geoffrey::Action::Constraint::PrimaryKey->new(
         converter => $self->converter,
-        dbh    => $self->dbh,
+        dbh       => $self->dbh,
     );
     return $self->{primarykey};
 }
 
+sub _obj_foreignkey {
+    my ($self) = @_;
+    require Geoffrey::Action::Constraint::ForeignKey;
+    $self->{foreignkey} //= Geoffrey::Action::Constraint::ForeignKey->new(
+        converter => $self->converter,
+        dbh       => $self->dbh,
+    );
+    return $self->{foreignkey};
+}
+
+
 sub _set_collective_params {
-    my ( $self, $s_sub_call, $b_param ) = @_;
-    for ( @{ $self->{constraints} } ) {
+    my ($self, $s_sub_call, $b_param) = @_;
+    for (@{$self->{constraints}}) {
         my $s_obj_sub = '_obj_' . $_;
         $self->$s_obj_sub($self)->$s_sub_call($b_param);
     }
@@ -84,16 +85,16 @@ sub _set_collective_params {
 }
 
 sub _collective_do {
-    my ( $self, $s_sub_call, $s_table_name, $constraints_to_alter ) = @_;
+    my ($self, $s_sub_call, $s_table_name, $constraints_to_alter) = @_;
     my @a_result = ();
-    for ( @{$constraints_to_alter} ) {
+    for (@{$constraints_to_alter}) {
         my $s_obj_sub = '_obj_' . delete $_->{constraint};
-        if ( !$self->can($s_obj_sub) ) {
+        if (!$self->can($s_obj_sub)) {
             require Geoffrey::Exception::General;
             return Geoffrey::Exception::General::throw_unknown_action($s_obj_sub);
         }
         $_->{table} = $s_table_name;
-        push @a_result, $self->do( $self->$s_obj_sub()->$s_sub_call($_) );
+        push @a_result, $self->do($self->$s_obj_sub()->$s_sub_call($_));
     }
     return if scalar @a_result == 0;
     return shift @a_result if scalar @a_result == 1;
@@ -101,87 +102,87 @@ sub _collective_do {
 }
 
 sub for_table {
-    my ( $self, $b_for_table ) = @_;
-    return $self->{for_table} if ( !defined $b_for_table );
+    my ($self, $b_for_table) = @_;
+    return $self->{for_table} if (!defined $b_for_table);
     $self->{for_table} = $b_for_table;
-    $self->_set_collective_params( 'for_table', $b_for_table );
+    $self->_set_collective_params('for_table', $b_for_table);
     return $self;
 }
 
 sub dryrun {
-    my ( $self, $b_dryrun ) = @_;
-    return $self->{dryrun} if ( !defined $b_dryrun );
+    my ($self, $b_dryrun) = @_;
+    return $self->{dryrun} if (!defined $b_dryrun);
     $self->{dryrun} = $b_dryrun;
-    $self->_set_collective_params( 'dryrun', $b_dryrun );
+    $self->_set_collective_params('dryrun', $b_dryrun);
     return $self;
 }
 
 sub add {
-    my ( $self, $s_table_name, $hr_params, $constr_ref ) = @_;
-    return $self->s_table_column( $s_table_name, $hr_params, $constr_ref ) if $self->for_table;
+    my ($self, $s_table_name, $hr_params, $ar_constraint_params) = @_;
+    return $self->create_table_column($s_table_name, $hr_params, $ar_constraint_params)
+        if $self->for_table;
     require Geoffrey::Exception::General;
     return Geoffrey::Exception::General::throw_unknown_action('add constraint');
 }
 
 sub alter {
-    my ( $self, $hr_params ) = @_;
+    my ($self, $hr_params) = @_;
     require Ref::Util;
-    if ( !Ref::Util::is_hashref($hr_params) ) {
+    if (!Ref::Util::is_hashref($hr_params)) {
         require Geoffrey::Exception::General;
-        Geoffrey::Exception::General::throw_wrong_ref( __PACKAGE__ . '::alter', 'hash' );
+        Geoffrey::Exception::General::throw_wrong_ref(__PACKAGE__ . '::alter', 'hash');
     }
-    return $self->_collective_do( 'alter', delete $hr_params->{table},
-        $hr_params->{constraints} );
+    return $self->_collective_do('alter', delete $hr_params->{table}, $hr_params->{constraints});
 }
 
 sub drop {
-    my ( $self, $s_table_name, $hr_params ) = @_;
-    if ( !$s_table_name ) {
+    my ($self, $s_table_name, $hr_params) = @_;
+    if (!$s_table_name) {
         require Geoffrey::Exception::RequiredValue;
         Geoffrey::Exception::RequiredValue::throw_reftable_missing();
     }
-    return $self->_collective_do( 'drop', $s_table_name, $hr_params->{constraints} );
+    return $self->_collective_do('drop', $s_table_name, $hr_params->{constraints});
 }
 
-sub s_table_column {
-    my ( $self, $s_table_name, $hr_column_params, $constr_ref ) = @_;
-    if ( $hr_column_params->{primarykey} && $hr_column_params->{primarykey} != 1 ) {
-        return push @{$constr_ref},
-          $self->_obj_primarykey->add( $s_table_name, $hr_column_params->{primarykey} );
+sub create_table_column {
+    my ($self, $s_table_name, $hr_column_params, $ar_constraint_params) = @_;
+    if ($hr_column_params->{primarykey} && $hr_column_params->{primarykey} != 1) {
+        return push @{$ar_constraint_params},
+            $self->_obj_primarykey->add($s_table_name, $hr_column_params->{primarykey});
     }
-    push @{$constr_ref},
-      $self->_uniques_to_add(
-        {
+    push @{$ar_constraint_params},
+        $self->_uniques_to_add({
             unique => $hr_column_params->{unique},
             table  => $s_table_name,
             column => $hr_column_params->{name},
-        }
-      );
+        });
 
-    my $obj_fkey = $self->_obj_foreignkey;
-    if ( $hr_column_params->{foreignkey} ) {
+    my $o_foreign_key = $self->_obj_foreignkey;
+    if ($hr_column_params->{foreignkey}) {
         $hr_column_params->{foreignkey}->{column} = $hr_column_params->{name};
         $hr_column_params->{foreignkey}->{table}  = $s_table_name;
-        push @{$constr_ref}, $obj_fkey->for_table(1)->add( $hr_column_params->{foreignkey} );
+        $hr_column_params->{foreignkey}->{schema} = $hr_column_params->{schema}
+            if $hr_column_params->{schema};
+        push @{$ar_constraint_params},
+            $o_foreign_key->for_table(1)->add($hr_column_params->{foreignkey});
     }
 
-    my $consts = $self->converter->constraints;
-    my $not_null = ( $hr_column_params->{notnull} ) ? $consts->{not_null} : q~~;
-    my $primarykey =
-      ( defined $hr_column_params->{primarykey} ) ? $consts->{primary_key} : q~~;
-    $obj_fkey->for_table(0);
+    my $consts     = $self->converter->constraints;
+    my $not_null   = ($hr_column_params->{notnull}) ? $consts->{not_null} : q~~;
+    my $primarykey = (defined $hr_column_params->{primarykey}) ? $consts->{primary_key} : q~~;
+    $o_foreign_key->for_table(0);
     return qq~$not_null $primarykey~;
 }
 
 sub _uniques_to_add {
-    my ( $self, $hr_unique_params ) = @_;
+    my ($self, $hr_unique_params) = @_;
     return () if !$hr_unique_params->{unique};
     require Ref::Util;
-    my $hr_to_add =
-      Ref::Util::is_hashref( $hr_unique_params->{unique} )
-      ? $hr_unique_params->{unique}
-      : { columns => [ $hr_unique_params->{column} ] };
-    return $self->_obj_unique->add( $hr_unique_params->{table}, $hr_to_add );
+    my $hr_to_add
+        = Ref::Util::is_hashref($hr_unique_params->{unique})
+        ? $hr_unique_params->{unique}
+        : {columns => [$hr_unique_params->{column}]};
+    return $self->_obj_unique->add($hr_unique_params->{table}, $hr_to_add);
 }
 
 1;
@@ -206,7 +207,7 @@ Geoffrey::Action::Constraint - Action handler for constraint
 
 =head1 VERSION
 
-Version 0.000101
+Version 0.000102
 
 =head1 DESCRIPTION
 
@@ -226,7 +227,7 @@ Version 0.000101
 
 =head2 drop
 
-=head2 s_table_column
+=head2 create_table_column
 
 Prepare column string for create table.
 Or add new column into table

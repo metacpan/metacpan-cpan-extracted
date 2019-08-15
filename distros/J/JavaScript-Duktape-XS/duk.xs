@@ -281,6 +281,15 @@ dispatch_function_in_event_loop(Duk* duk, const char* func)
     pl_stats_stop(aTHX_ duk, &stats, "dispatch");
   OUTPUT: RETVAL
 
+HV*
+get_version_info(Duk* duk)
+  CODE:
+    if (!duk->version) {
+        duk->version = pl_get_version_info(aTHX);
+    }
+    RETVAL = duk->version;
+  OUTPUT: RETVAL
+
 SV*
 run_gc(Duk* duk)
   PREINIT:

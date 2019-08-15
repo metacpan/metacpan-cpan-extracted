@@ -16,7 +16,7 @@ use 5.008001;
 {
     package DBD::Pg;
 
-    use version; our $VERSION = qv('3.8.1');
+    use version; our $VERSION = qv('3.9.0');
 
     use DBI ();
     use DynaLoader ();
@@ -24,11 +24,28 @@ use 5.008001;
     use vars qw(@ISA %EXPORT_TAGS $err $errstr $sqlstate $drh $dbh $DBDPG_DEFAULT @EXPORT);
     @ISA = qw(DynaLoader Exporter);
 
+    use constant {
+        PG_MIN_SMALLINT => -32768,
+        PG_MAX_SMALLINT => 32767,
+        PG_MIN_INTEGER  => -2147483648,
+        PG_MAX_INTEGER  => 2147483647,
+        PG_MIN_BIGINT => "-9223372036854775808",
+        PG_MAX_BIGINT => "9223372036854775807",
+        PG_MIN_SMALLSERIAL => 1,
+        PG_MAX_SMALLSERIAL => 32767,
+        PG_MIN_SERIAL => 1,
+        PG_MAX_SERIAL => 2147483647,
+        PG_MIN_BIGSERIAL => 1,
+        PG_MAX_BIGSERIAL => "9223372036854775807",
+    };
 
     %EXPORT_TAGS =
         (
-         async => [qw(PG_ASYNC PG_OLDQUERY_CANCEL PG_OLDQUERY_WAIT)],
-         pg_types => [qw(
+         async => [qw($DBDPG_DEFAULT PG_ASYNC PG_OLDQUERY_CANCEL PG_OLDQUERY_WAIT)],
+         pg_limits => [qw($DBDPG_DEFAULT
+                       PG_MIN_SMALLINT PG_MAX_SMALLINT PG_MIN_INTEGER PG_MAX_INTEGER PG_MAX_BIGINT PG_MIN_BIGINT
+                       PG_MIN_SMALLSERIAL PG_MAX_SMALLSERIAL PG_MIN_SERIAL PG_MAX_SERIAL PG_MIN_BIGSERIAL PG_MAX_BIGSERIAL)],
+         pg_types => [qw($DBDPG_DEFAULT PG_ASYNC PG_OLDQUERY_CANCEL PG_OLDQUERY_WAIT
 			PG_ACLITEM PG_ACLITEMARRAY PG_ANY PG_ANYARRAY PG_ANYELEMENT
 			PG_ANYENUM PG_ANYNONARRAY PG_ANYRANGE PG_BIT PG_BITARRAY
 			PG_BOOL PG_BOOLARRAY PG_BOX PG_BOXARRAY PG_BPCHAR
@@ -70,7 +87,7 @@ use 5.008001;
         sub new { my $self = {}; return bless $self, shift; }
     }
     $DBDPG_DEFAULT = DBD::Pg::DefaultValue->new();
-    Exporter::export_ok_tags('pg_types', 'async');
+    Exporter::export_ok_tags('pg_types', 'async', 'pg_limits');
     @EXPORT = qw($DBDPG_DEFAULT PG_ASYNC PG_OLDQUERY_CANCEL PG_OLDQUERY_WAIT PG_BYTEA);
 
     require_version DBI 1.614;
@@ -128,6 +145,7 @@ use 5.008001;
         if (!$methods_are_installed) {
             DBD::Pg::db->install_method('pg_cancel');
             DBD::Pg::db->install_method('pg_endcopy');
+            DBD::Pg::db->install_method('pg_error_field');
             DBD::Pg::db->install_method('pg_getline');
             DBD::Pg::db->install_method('pg_getcopydata');
             DBD::Pg::db->install_method('pg_getcopydata_async');
@@ -1535,7 +1553,6 @@ use 5.008001;
 
         my ($dbh,$type) = @_;
 
-        return undef unless defined $type;
         return undef unless exists $get_info_type{$type};
 
         my $ans = $get_info_type{$type}->[1];
@@ -1562,9 +1579,8 @@ use 5.008001;
         }
          elsif ($ans eq 'KEYWORDS') {
             ## http://www.postgresql.org/docs/current/static/sql-keywords-appendix.html
-            ## Basically, we want ones that are 'reserved' for PostgreSQL but not 'reserved' in SQL:2003
-            ## 
-            return join ',' => (qw(ANALYSE ANALYZE ASC DEFERRABLE DESC DO FREEZE ILIKE INITIALLY ISNULL LIMIT NOTNULL OFF OFFSET PLACING RETURNING VERBOSE));
+            ## Basically, we want ones that are 'reserved' for PostgreSQL but not 'reserved' in SQL:2011
+            return join ',' => (qw(ANALYSE ANALYZE ASC CONCURRENTLY DEFERRABLE DESC DO FREEZE ILIKE INITIALLY ISNULL LIMIT NOTNULL PLACING RETURNING VARIADIC VERBOSE));
          }
          elsif ($ans eq 'READONLY') {
              my $SQL = q{SELECT CASE WHEN setting = 'on' THEN 'Y' ELSE 'N' END FROM pg_settings WHERE name = 'transaction_read_only'};
@@ -1688,9 +1704,6 @@ DBD::Pg - PostgreSQL database driver for the DBI module
   # For some advanced uses you may need PostgreSQL type values:
   use DBD::Pg qw(:pg_types);
 
-  # For asynchronous calls, import the async constants:
-  use DBD::Pg qw(:async);
-
   $dbh->do('INSERT INTO mytable(a) VALUES (1)');
 
   $sth = $dbh->prepare('INSERT INTO mytable(a) VALUES (?)');
@@ -1698,7 +1711,7 @@ DBD::Pg - PostgreSQL database driver for the DBI module
 
 =head1 VERSION
 
-This documents version 3.8.1 of the DBD::Pg module
+This documents version 3.9.0 of the DBD::Pg module
 
 =head1 DESCRIPTION
 
@@ -2192,9 +2205,7 @@ by default.
 =head3 B<ShowErrorStatement> (boolean, inherited)
 
 Appends information about the current statement to error messages. If placeholder information 
-is available, adds that as well. (Note that calls to $dbh->do() create a very short-lived 
-statement handle internally and this will not be able to provide placeholder information).
-Defaults to false.
+is available, adds that as well. Defaults to false.
 
 =head3 B<Warn> (boolean, inherited)
 
@@ -2770,7 +2781,7 @@ server version 9.0 or higher.
 
 The C<ping> method determines if there is a working connection to an active 
 database server. It does this by sending a small query to the server, currently 
-B<'DBD::Pg ping test v3.8.1'>. It returns 0 (false) if the connection is not valid, 
+B<'DBD::Pg ping test v3.9.0'>. It returns 0 (false) if the connection is not valid, 
 otherwise it returns a positive number (true). The value returned indicates the 
 current state:
 
@@ -2801,12 +2812,84 @@ return the following:
    -3      The test query failed (PQexec returned null)
    -4      PQstatus returned a CONNECTION_BAD
 
+=head3 B<pg_error_field>
+
+  $value = $dbh->pg_error_field('context');
+
+The B<pg_error_field> returns specific information about the last error that occurred. 
+It needs to be called as soon as possible after an error occurs, as any other query 
+sent to Postgres (via $dbh or $sth) will reset all the error information. Note that 
+this is called at the database handle ($dbh) level, but can return errors that occurred 
+via both database handles (e.g. $dbh->do) and statement handles (e.g. $sth->execute). 
+It takes a single argument, indicating which field to return. The value returned will be 
+undef if the previous command was not an error, or if the field is not applicable to the current error.
+
+The canonical list of field types can be found at:
+
+L<https://www.postgresql.org/docs/current/libpq-exec.html#LIBPQ-PQRESULTERRORFIELD>
+
+The literal names on that page can be used (e.g. B<PG_DIAG_STATEMENT_HINT>), but lowercase 
+is accepted too, as well as the following abbreviated forms:
+
+=over 4
+
+=item severity
+
+=item severity_nonlocal
+
+=item state
+
+=item primary
+
+=item detail
+
+=item hint
+
+=item statement_position
+
+=item internal_position
+
+=item internal_query
+
+=item context
+
+=item schema
+
+=item table
+
+=item column
+
+=item type
+
+=item constraint
+
+=item source_file
+
+=item source_line
+
+=item source_function
+
+=back
+
 =head3 B<get_info>
 
   $value = $dbh->get_info($info_type);
 
 Supports a very large set (> 250) of the information types, including the minimum 
 recommended by DBI.
+
+Items of note:
+
+=over 4
+
+=item SQL_KEYWORDS
+
+This returns all items reserved by Postgres but NOT reserved by SQL:2011 standard. See:
+
+http://www.postgresql.org/docs/current/static/sql-keywords-appendix.htm
+
+=back
+
 
 =head3 B<table_info>
 
@@ -3110,6 +3193,15 @@ immediately permanent. The default of AutoCommit is on, but this may change
 in the future, so it is highly recommended that you explicitly set it when
 calling L</connect>. For details see the notes about L</Transactions>
 elsewhere in this document.
+
+=head3 B<ParamValues> (hash ref, read-only)
+
+Ignored unless inside a C<do> method call. There it is temporarily aliased to
+the C<ParamValues> hash from the temporary statement handle inside an internal
+C<prepare / execute / fetch> routine, invisible from outside, and is treated
+correspondingly (see C<ParamValues> in L</Statement Handle Attributes>). This
+allows for correct reporting of values bound to placeholders to the caller,
+should the query fail (see C<ShowErrorStatement>).
 
 =head3 B<pg_bool_tf> (boolean)
 
@@ -3948,8 +4040,6 @@ It is possible to send a query to the backend and have your script do other work
 running on the backend. Both queries sent by the L</do> method, and by the L</execute> method can be 
 sent asynchronously. The basic usage is as follows:
 
-  use DBD::Pg ':async';
-
   print "Async do() example:\n";
   $dbh->do("SELECT long_running_query()", {pg_async => PG_ASYNC});
   do_something_else();
@@ -3985,15 +4075,7 @@ sent asynchronously. The basic usage is as follows:
 
 =head3 Asynchronous Constants
 
-There are currently three asynchronous constants exported by DBD::Pg. You can import all of them by putting 
-either of these at the top of your script:
-
-  use DBD::Pg;
-
-  use DBD::Pg ':async';
-
-You may also use the numbers instead of the constants, but using the constants is recommended as it 
-makes your script more readable.
+There are currently three asynchronous constants automatically exported by DBD::Pg.
 
 =over 4
 
@@ -4230,6 +4312,33 @@ the COPY statement. Returns a 1 on successful input. Examples:
 When you are finished with pg_putcopydata, call pg_putcopyend to let the server know 
 that you are done, and it will return to a normal, non-COPY state. Returns a 1 on 
 success. This method will fail if called when not in COPY IN mode.
+
+=head2 Postgres limits
+
+For convienence, DBD::Pg can export certain constants representing the limits of 
+Postgres data types. To use them, just add C<:pg_limits> when DBD::Pg is used:
+
+  use DBD::Pg qw/:pg_limits/;
+
+The constants and their values are:
+
+=pod
+
+  PG_MIN_SMALLINT    -32768
+  PG_MAX_SMALLINT     32767
+  PG_MIN_INTEGER     -2147483648
+  PG_MAX_INTEGER      2147483647
+  PG_MIN_BIGINT      -9223372036854775808
+  PG_MAX_BIGINT       9223372036854775807
+  PG_MIN_SMALLSERIAL  1
+  PG_MAX_SMALLSERIAL  32767
+  PG_MIN_SERIAL       1
+  PG_MAX_SERIAL       2147483647
+  PG_MIN_BIGSERIAL    1
+  PG_MAX_BIGSERIAL    9223372036854775807
+
+=cut
+
 
 =head2 Large Objects
 

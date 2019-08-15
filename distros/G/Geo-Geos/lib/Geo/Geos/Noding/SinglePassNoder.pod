@@ -1,0 +1,53 @@
+=head1 NAME
+
+Geo::Geos::Noding::SinglePassNoder - Base class for Noders which make a single pass to find intersections.
+
+=head1 SYNOPSIS
+
+    use Geo::Geos::Coordinate;
+    use Geo::Geos::PrecisionModel;
+    use Geo::Geos::Noding::IntersectionAdder;
+    use Geo::Geos::Noding::NodedSegmentString;
+    use Geo::Geos::Noding::SimpleNoder;
+
+    my $c1 = Geo::Geos::Coordinate->new(0,1);
+    my $c2 = Geo::Geos::Coordinate->new(2,1);
+    my $c3 = Geo::Geos::Coordinate->new(1,0);
+    my $c4 = Geo::Geos::Coordinate->new(1,2);
+    my $pm = Geo::Geos::PrecisionModel->new;
+
+    my $li = Geo::Geos::Algorithm::LineIntersector->new($pm);
+    my $ia = Geo::Geos::Noding::IntersectionAdder->new($li);
+
+    my $sn = Geo::Geos::Noding::SimpleNoder->new($ia);           # => isa 'Geo::Geos::Noding::SinglePassNoder'
+
+    my $ss1 = Geo::Geos::Noding::NodedSegmentString->new([$c1, $c2, $c3, $c4]);
+    $sn->computeNodes([$ss1]);
+
+    $sn->getNodedSubstrings->[0];   # => isa 'Geo::Geos::Noding::SegmentString';
+
+=head1 SEE ALSO (C++ classes docs)
+
+L<GEOS C++ Library|https://trac.osgeo.org/geos>
+
+geos::noding::SinglePassNoder
+
+=head1 SEE ALSO
+
+L<Geo::Geos>
+
+L<Geo::Geos::Noding::Noder>
+
+L<Geo::Geos::Noding::SegmentString>
+
+L<Geo::Geos::Noding::SimpleNoder>
+
+=head1 AUTHOR
+
+Ivan Baidakou <i.baydakov@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

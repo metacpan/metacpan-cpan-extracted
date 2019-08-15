@@ -1,5 +1,5 @@
 package Statocles;
-our $VERSION = '0.093';
+our $VERSION = '0.094';
 # ABSTRACT: A static site generator
 
 use Statocles::Base 'Class';
@@ -20,20 +20,6 @@ my @VERBOSE = ( "warn", "info", "debug", "trace" );
 has site => (
     is => 'ro',
     isa => InstanceOf['Statocles::Site'],
-);
-
-#pod =attr log
-#pod
-#pod A L<Mojo::Log> object for logging. Defaults to the current site's C<log> attribute.
-#pod
-#pod =cut
-
-has log => (
-    is => 'rw',
-    lazy => 1,
-    default => sub {
-        $_[0]->site->log;
-    },
 );
 
 #pod =method run
@@ -64,6 +50,8 @@ sub run {
 
     if ( $opt{version} || ( $opt{verbose} && !@argv ) ) {
         say "Statocles version $Statocles::VERSION (Perl $^V)";
+        require POSIX;
+        say "Locale: " . POSIX::setlocale( POSIX::LC_CTYPE );
         return 0;
     }
 
@@ -159,16 +147,14 @@ sub _load_site {
     return ( 0, $site );
 }
 
-# The currently-running site.
-# I hate this, but I know of no better way to ensure that we always have access
-# to a Mojo::Log object, while still being relatively useful, without having to
-# wire up every single object with a log object.
-our $SITE;
-
-BEGIN {
-    package # Hide from PAUSE
-        site;
-    sub log { return $SITE->log }
+sub log {
+    my ( $invocant, $level, @args ) = @_;
+    use Mojo::Log;
+    state $log = Mojo::Log->new( level => $ENV{MOJO_LOG_LEVEL} // 'info' );
+    if ( $level && @args ) {
+        return $log->$level( @args );
+    }
+    return $log;
 }
 
 1;
@@ -185,7 +171,7 @@ Statocles - A static site generator
 
 =head1 VERSION
 
-version 0.093
+version 0.094
 
 =head1 SYNOPSIS
 
@@ -287,10 +273,6 @@ applications|Statocles::App>.
 
 The L<site|Statocles::Site> we're working with.
 
-=head2 log
-
-A L<Mojo::Log> object for logging. Defaults to the current site's C<log> attribute.
-
 =head1 METHODS
 
 =head2 run
@@ -315,9 +297,13 @@ Doug Bell <preaction@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords djerius Ed J Ferenc Erki Joel Berger Kent Fredric Konrad Bucheli Mohammad S Anwar perlancar (@netbook-zenbook-ux305) Roy Storey tadegenban Vladimir Lettiev William Lindley
+=for stopwords David Farrell djerius Ed J Ferenc Erki Joel Berger Kent Fredric Konrad Bucheli Mohammad S Anwar perlancar (@netbook-zenbook-ux305) Roy Storey tadegenban Vladimir Lettiev William Lindley Wojtek Bażant
 
 =over 4
+
+=item *
+
+David Farrell <davidnmfarrell@gmail.com>
 
 =item *
 
@@ -366,6 +352,10 @@ Vladimir Lettiev <thecrux@gmail.com>
 =item *
 
 William Lindley <wlindley@wlindley.com>
+
+=item *
+
+Wojtek Bażant <wojtek.bazant@sanger.ac.uk>
 
 =back
 

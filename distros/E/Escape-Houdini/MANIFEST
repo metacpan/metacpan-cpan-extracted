@@ -42,4 +42,5 @@ t/basic.t
 t/gc.t
 t/growth.t
 t/samples.t
+t/utf8.t
 xt/release/unused-vars.t

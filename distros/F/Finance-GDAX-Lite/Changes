@@ -1,3 +1,9 @@
+0.003   2018-06-14 (PERLANCAR)
+
+	- [ux] In case of HTTP error 599 (HTTP::Tiny), put the error
+	  message (from content) in response reason.
+
+
 0.002   2018-06-11 (PERLANCAR)
 
 	- [ux] Include message in response reason, so it's immediately seen

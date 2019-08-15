@@ -1,25 +1,32 @@
-0.050   2017-09-08 (PERLANCAR)
+20190815.0  2019-08-15  Released-By: PERLANCAR; Urgency: medium
+
+            - Change versioning scheme.
+
+            - [build] Rebuild to update data (new: Debian 10).
+
+
+0.050   2017-09-08  Released-By: PERLANCAR
 
 	- [Incompatible change] Switch data source from gudangdata
 	  repository to gudangdata-distrowatch (some fields are changed).
 
 
-0.04    2017-01-17 (PERLANCAR)
+0.04    2017-01-17  Released-By: PERLANCAR
 
 	- Update data (fix typos in a couple of dates).
 
 
-0.03    2015-10-01 (PERLANCAR)
+0.03    2015-10-01  Released-By: PERLANCAR
 
 	- Update data (kernel/perl version for older releases).
 
 
-0.02    2015-09-22 (PERLANCAR)
+0.02    2015-09-22  Released-By: PERLANCAR
 
 	- Update data (add column perlver).
 
 
-0.01    2015-09-22 (PERLANCAR)
+0.01    2015-09-22  Released-By: PERLANCAR
 
         - First version, released while waiting for new Debian::Releases which
           is supposed to contain additional data too.

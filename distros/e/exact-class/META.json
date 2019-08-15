@@ -63,7 +63,7 @@
          "web" : "https://github.com/gryphonshafer/exact-class"
       }
    },
-   "version" : "1.01",
+   "version" : "1.02",
    "x_generated_by_perl" : "v5.30.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
 }

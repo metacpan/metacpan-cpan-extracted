@@ -1,3 +1,6 @@
+0.000014    2019-08-14
+            * Add possibility to retrieve V8 version information.
+
 0.000013    2019-06-28
             * Prefer string value for dualvars.
 

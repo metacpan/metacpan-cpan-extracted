@@ -1,7 +1,7 @@
 package App::lcpan::CmdBundle::cpantesters;
 
 our $DATE = '2018-09-12'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: More lcpan subcommands related to CPAN Testers
@@ -18,7 +18,7 @@ App::lcpan::CmdBundle::cpantesters - More lcpan subcommands related to CPAN Test
 
 =head1 VERSION
 
-This document describes version 0.001 of App::lcpan::CmdBundle::cpantesters (from Perl distribution App-lcpan-CmdBundle-cpantesters), released on 2018-09-12.
+This document describes version 0.002 of App::lcpan::CmdBundle::cpantesters (from Perl distribution App-lcpan-CmdBundle-cpantesters), released on 2018-09-12.
 
 =head1 SYNOPSIS
 

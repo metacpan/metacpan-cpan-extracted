@@ -3,7 +3,7 @@
 package File::Write::Rotate;
 
 our $DATE = '2019-06-27'; # DATE
-our $VERSION = '0.320'; # VERSION
+our $VERSION = '0.321'; # VERSION
 
 use 5.010001;
 use strict;
@@ -403,9 +403,6 @@ sub write {
     }
 }
 
-sub flush {
-}
-
 sub compress {
     my ($self) = shift;
 
@@ -475,7 +472,7 @@ File::Write::Rotate - Write to files that archive/rotate themselves
 
 =head1 VERSION
 
-This document describes version 0.320 of File::Write::Rotate (from Perl distribution File-Write-Rotate), released on 2019-06-27.
+This document describes version 0.321 of File::Write::Rotate (from Perl distribution File-Write-Rotate), released on 2019-06-27.
 
 =head1 SYNOPSIS
 
@@ -726,10 +723,6 @@ histories and delete the older ones.
 
 Does not append newline so you'll have to do it yourself.
 
-=head2 $fwr->flush
-
-A no-op, just so the object behaves more like a filehandle object.
-
 =head2 $fwr->compress
 
 Compress old rotated files and remove the uncompressed originals. Currently uses
@@ -774,6 +767,10 @@ significantly reduce the overhead and increase write speed several times (e.g.
 file sizes will exceed for a bit if you do size-based rotation. More suitable if
 you only do size-based rotation since it is usually okay to exceed sizes for a
 bit.
+
+=head2 I want a filehandle instead of a File::Write::Rotate object!
+
+Use L<Tie::Handle::FileWriteRotate>.
 
 =head1 HOMEPAGE
 

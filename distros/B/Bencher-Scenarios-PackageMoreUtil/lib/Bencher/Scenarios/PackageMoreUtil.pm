@@ -1,7 +1,7 @@
 package Bencher::Scenarios::PackageMoreUtil;
 
 our $DATE = '2018-10-07'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: Benchmark Package::MoreUtil
@@ -18,7 +18,7 @@ Bencher::Scenarios::PackageMoreUtil - Benchmark Package::MoreUtil
 
 =head1 VERSION
 
-This document describes version 0.001 of Bencher::Scenarios::PackageMoreUtil (from Perl distribution Bencher-Scenarios-PackageMoreUtil), released on 2018-10-07.
+This document describes version 0.002 of Bencher::Scenarios::PackageMoreUtil (from Perl distribution Bencher-Scenarios-PackageMoreUtil), released on 2018-10-07.
 
 =head1 DESCRIPTION
 
@@ -29,6 +29,8 @@ This distribution contains the following L<Bencher> scenario modules:
 =item * L<Bencher::Scenario::PackageMoreUtil::package_exists>
 
 =item * L<Bencher::Scenario::PackageMoreUtil::list_package_contents>
+
+=item * L<Bencher::Scenario::PackageMoreUtil::list_package_subs>
 
 =back
 

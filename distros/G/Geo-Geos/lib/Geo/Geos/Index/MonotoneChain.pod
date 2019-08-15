@@ -1,0 +1,66 @@
+=head1 NAME
+
+Geo::Geos::Index::MonotoneChain -  Partition the segments of a linestring to allow for fast searching of intersections.
+
+=head1 SYNOPSIS
+
+    use Geo::Geos::Coordinate;
+    use Geo::Geos::Index::MonotoneChain qw/getChains/;
+    use Geo::Geos::Index::MonotoneChainOverlapAction;
+
+    my $c1 = Geo::Geos::Coordinate->new(0,2);
+    my $c2 = Geo::Geos::Coordinate->new(1,2);
+    my $c3 = Geo::Geos::Coordinate->new(2,2);
+    my $c4 = Geo::Geos::Coordinate->new(3,1);
+    my $c5 = Geo::Geos::Coordinate->new(4,1);
+    my $c6 = Geo::Geos::Coordinate->new(5,1);
+    my $c7 = Geo::Geos::Coordinate->new(6,0);
+    my $c8 = Geo::Geos::Coordinate->new(7,0);
+
+    my $list = [$c1, $c2, $c3, $c4, $c5, $c6, $c7, $c8];
+    my $mc = Geo::Geos::Index::MonotoneChain->new($list, 0, 7);  # => isa 'Geo::Geos::Index::MonotoneChain'
+
+    $mc->getStartIndex;     # => 0
+    $mc->getEndIndex;       # => 7
+
+    $mc->setId(1234);
+    $mc->getId;             # => 1234
+
+    my $c = $mc->getCoordinates->[0];   # => Geo::Geos::Coordinate->new(0,2)
+    my $ls = $mc->getLineSegment(0);    # => isa 'Geo::Geos::LineSegment'
+    my $e = $mc->getEnvelope;           # => isa 'Geo::Geos::Envelope'
+
+    my $mc2 = Geo::Geos::Index::MonotoneChain->new([$c5, $c6], 0, 1);
+    my $mcoa = Geo::Geos::Index::MonotoneChainOverlapAction->new;
+    $mc->computeOverlaps($mc2, $mcoa);
+
+    my $mc3 = getChains($list)->[0];    # => isa 'Geo::Geos::Index::MonotoneChain'
+
+=head1 SEE ALSO (C++ classes docs)
+
+L<GEOS C++ Library|https://trac.osgeo.org/geos>
+
+geos::index::chain::MonotoneChain
+
+geos::index::chain::MonotoneChainBuilder
+
+
+=head1 SEE ALSO
+
+L<Geo::Geos>
+
+L<Geo::Geos::Envelope>
+
+L<Geo::Geos::LineSegment>
+
+L<Geo::Geos::Index::MonotoneChainOverlapAction>
+
+=head1 AUTHOR
+
+Ivan Baidakou <i.baydakov@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

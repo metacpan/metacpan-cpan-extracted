@@ -1,7 +1,7 @@
 package App::htmlsel;
 
-our $DATE = '2019-07-29'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2019-08-09'; # DATE
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use strict;
@@ -26,14 +26,15 @@ sub htmlsel {
             my $args = shift;
 
             require HTML::TreeBuilder;
-            my $tree;
+            my $content;
             if ($args->{file} eq '-') {
                 binmode STDIN, ":encoding(utf8)";
-                $tree = HTML::TreeBuilder->new->parse_content(join "", <>);
+                $content = join "", <STDIN>;
             } else {
-                #require File::Slurper;
-                $tree = HTML::TreeBuilder->new->parse_file($args->{file});
+                require File::Slurper;
+                $content = File::Slurper::read_text($args->{file});
             }
+            my $tree = HTML::TreeBuilder->new->parse_content($content);
 
           PATCH: {
                 last if $App::htmlsel::patch_handle;
@@ -96,7 +97,7 @@ App::htmlsel - Select HTML::Element nodes using CSel syntax
 
 =head1 VERSION
 
-This document describes version 0.006 of App::htmlsel (from Perl distribution App-htmlsel), released on 2019-07-29.
+This document describes version 0.009 of App::htmlsel (from Perl distribution App-htmlsel), released on 2019-08-09.
 
 =head1 SYNOPSIS
 
@@ -143,15 +144,27 @@ attributes to use in a dot-separated syntax, e.g.:
 
 dump:tag.id.class
 
-=back
-
 which will result in a node printed like this:
 
- HTML::Element tag=p id=undef class=undef
+HTML::Element tag=p id=undef class=undef
+
+=back
 
 By default, if no attributes are specified, C<id> is used. If the node class does
 not support the attribute, or if the value of the attribute is undef, then
 C<undef> is shown.
+
+=over
+
+=item * C<eval> will execute Perl code for each matching node. The Perl code will be
+called with arguments: C<($node)>. For convenience, C<$_> is also locally set to
+the matching node. Example in L<htmlsel> you can add this action:
+
+eval:'print $_->tag'
+
+which will print the tag name for each matching L<HTML::Element> node.
+
+=back
 
 =item * B<select_action> => I<str> (default: "csel")
 

@@ -1,0 +1,75 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::Algorithm::HCoordinate
+PROTOTYPES: DISABLE
+
+HCoordinate* new(SV*, SV* arg1, SV* arg2 = NULL, SV* arg3 = NULL, SV* arg4 = NULL) {
+    if (!arg2) {
+        auto c = xs::in<Coordinate*>(arg1);
+        RETVAL = new HCoordinate(*c);
+    }
+    else if(!arg3) {
+        Object obj1 {arg1}, obj2{arg2};
+        if(!obj1) throw("wrong argument");
+        if(!obj2) throw("wrong argument");
+        if (obj1.stash().name() == "Geo::Geos::Algorithm::HCoordinate") {
+            auto& c1 = xs::in<HCoordinate&>(obj1);
+            auto& c2 = xs::in<HCoordinate&>(obj1);
+            RETVAL = new HCoordinate(c1, c2);
+        }
+        else {
+            auto& c1 = xs::in<Coordinate&>(obj1);
+            auto& c2 = xs::in<Coordinate&>(obj1);
+            RETVAL = new HCoordinate(c1, c2);
+        }
+    }
+    else if(!arg4) {
+        if(!arg1) throw("undef not allowed");
+        if(!arg2) throw("undef not allowed");
+        if(!arg3) throw("undef not allowed");
+        RETVAL = new HCoordinate(Simple(arg1), Simple(arg2), Simple(arg3));
+    }
+    else {
+        auto& c1 = xs::in<Coordinate&>(arg1);
+        auto& c2 = xs::in<Coordinate&>(arg2);
+        auto& c3 = xs::in<Coordinate&>(arg3);
+        auto& c4 = xs::in<Coordinate&>(arg4);
+        RETVAL = new HCoordinate(c1, c2, c3, c4);
+    }
+}
+
+double HCoordinate::x(SV* newval = NULL) : ALIAS(y=1,w=2) {
+    double* val;
+    switch (ix) {
+        case 0:  val = &THIS->x; break;
+        case 1:  val = &THIS->y; break;
+        default: val = &THIS->w; break;
+    }
+    if (newval) {
+        *val = SvNV(newval);
+    }
+    RETVAL = *val;
+}
+
+Coordinate* HCoordinate::getCoordinate() {
+    Coordinate c;
+    THIS->getCoordinate(c);
+    RETVAL = new Coordinate(c);
+}
+
+
+Coordinate* intersection( Coordinate& p1,  Coordinate& p2, Coordinate& q1,  Coordinate& q2) {
+    Coordinate c;
+    HCoordinate::intersection(p1, p2, q1, q2, c);
+    RETVAL = new Coordinate(c);
+}
+
+std::string HCoordinate::toString(...) {
+    std::ostringstream out;
+    out << *THIS;
+    RETVAL = out.str();
+}
+
+int CLONE_SKIP (...) { PERL_UNUSED_VAR(items); RETVAL = 1; }
+
+BOOT {
+    xs::exp::autoexport(Stash(__PACKAGE__));
+}

@@ -1,0 +1,32 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::WKBWriter
+PROTOTYPES: DISABLE
+
+WKBWriter* new(SV*, int dims=2, int bo = getMachineByteOrder(), bool includeSRID=false) {
+    RETVAL = new WKBWriter(dims, bo, includeSRID);
+}
+
+int WKBWriter::getOutputDimension()
+
+void WKBWriter::setOutputDimension(int newOutputDimension)
+
+int WKBWriter::getByteOrder()
+
+void WKBWriter::setByteOrder(int newByteOrder)
+
+int WKBWriter::getIncludeSRID()
+
+void WKBWriter::setIncludeSRID(int newIncludeSRID)
+
+std::string WKBWriter::write(Geometry& g) {
+    std::ostringstream out;
+    THIS->write(g, out);
+    RETVAL = out.str();
+}
+
+std::string WKBWriter::writeHEX(Geometry& g) {
+    std::ostringstream out;
+    THIS->writeHEX(g, out);
+    RETVAL = out.str();
+}
+
+int CLONE_SKIP (...) { PERL_UNUSED_VAR(items); RETVAL = 1; }

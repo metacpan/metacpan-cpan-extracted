@@ -35,7 +35,7 @@
             "Class::Method::Modifiers" : "0",
             "Mojo::Base" : "0",
             "Mojo::Util" : "0",
-            "Mojolicious::Plugin::Model" : "0",
+            "Mojolicious::Plugin::Model" : "0.10",
             "Storable" : "0",
             "perl" : "5.010001"
          }
@@ -52,6 +52,6 @@
          "web" : "https://github.com/lucas1/Mojolicious-Plugin-Model-DB"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

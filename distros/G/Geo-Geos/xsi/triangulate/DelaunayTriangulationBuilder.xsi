@@ -1,0 +1,41 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::Triangulate::DelaunayTriangulationBuilder
+PROTOTYPES: DISABLE
+
+Sv new(SV*, SV* geometry_factory, Sv sites, SV* tolerance = NULL) {
+    auto builder = std::unique_ptr<DelaunayTriangulationBuilder>(new DelaunayTriangulationBuilder());
+    GeometryFactory* factory = xs::in<GeometryFactory*>(geometry_factory);
+
+    if (sites.is_array_ref()) {
+        auto seq = std::unique_ptr<CoordinateSequence>(Helper::convert_copy(*factory, sites, 2));
+        builder->setSites(*seq);
+    }
+    else {
+        auto& g = xs::in<Geometry&>(sites);
+        builder->setSites(g);
+    }
+
+    if (tolerance) {
+        builder->setTolerance(Simple(tolerance));
+    }
+
+    Object wrapped = xs::out<DelaunayTriangulationBuilder*>(builder.release());
+    wrapped.payload_attach(SvRV(geometry_factory), &payload_marker);
+    RETVAL = wrapped.ref();
+}
+
+Sv DelaunayTriangulationBuilder::getEdges() {
+    Object me{ST(0)};
+    auto payload = me.payload(&payload_marker);
+    GeometryFactory* factory = xs::in<GeometryFactory*>(payload.obj);
+    auto edges = THIS->getEdges(*factory);
+    RETVAL = Helper::uplift(edges.release());
+}
+
+Sv DelaunayTriangulationBuilder::getTriangles() {
+    Object me{ST(0)};
+    auto payload = me.payload(&payload_marker);
+    GeometryFactory* factory = xs::in<GeometryFactory*>(payload.obj);
+    auto edges = THIS->getTriangles(*factory);
+    RETVAL = Helper::uplift(edges.release());
+}
+

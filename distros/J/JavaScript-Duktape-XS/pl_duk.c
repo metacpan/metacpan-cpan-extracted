@@ -672,3 +672,51 @@ static duk_ret_t perl_caller(duk_context* ctx)
 
     return pl_call_perl_sv(ctx, func);
 }
+
+static void add_hash_key_int(pTHX_ HV* hash, const char* key, int val)
+{
+    STRLEN klen = strlen(key);
+    SV* pval = sv_2mortal(newSVnv(val));
+    if (hv_store(hash, key, klen, pval, 0)) {
+        SvREFCNT_inc(pval);
+    }
+    else {
+        croak("Could not create numeric entry %s=%d in hash\n", key, val);
+    }
+}
+
+static void add_hash_key_str(pTHX_ HV* hash, const char* key, const char* val)
+{
+    STRLEN klen = strlen(key);
+    STRLEN vlen = strlen(val);
+    SV* pval = sv_2mortal(newSVpv(val, vlen));
+    if (hv_store(hash, key, klen, pval, 0)) {
+        SvREFCNT_inc(pval);
+    }
+    else {
+        croak("Could not create string entry %s=[%s] in hash\n", key, val);
+    }
+}
+
+HV* pl_get_version_info(pTHX)
+{
+    HV* version = newHV();
+
+    long duk_version = DUK_VERSION;
+    int patch = duk_version % 100;
+    duk_version /= 100;
+    int minor = duk_version % 100;
+    duk_version /= 100;
+    int major = duk_version;
+
+    add_hash_key_int(aTHX_ version, "major"  , major);
+    add_hash_key_int(aTHX_ version, "minor"  , minor);
+    add_hash_key_int(aTHX_ version, "patch"  , patch);
+
+    char buf[100];
+    sprintf(buf, "%d.%d.%d", major, minor, patch);
+
+    add_hash_key_str(aTHX_ version, "version", buf);
+
+    return version;
+}

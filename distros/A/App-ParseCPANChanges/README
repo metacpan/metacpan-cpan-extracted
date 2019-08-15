@@ -2,8 +2,8 @@ NAME
     App::ParseCPANChanges - Parse CPAN Changes file
 
 VERSION
-    This document describes version 0.070 of App::ParseCPANChanges (from
-    Perl distribution App-ParseCPANChanges), released on 2019-07-03.
+    This document describes version 0.071 of App::ParseCPANChanges (from
+    Perl distribution App-ParseCPANChanges), released on 2019-08-02.
 
 DESCRIPTION
     This distribution provides a simple command-line wrapper for
@@ -27,6 +27,8 @@ FUNCTIONS
 
         If not specified, will look for file called Changes/ChangeLog in
         current directory.
+
+        To read from standard input, use "-".
 
     Returns an enveloped result (an array).
 

@@ -1,0 +1,8 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::GeometryCollection
+PROTOTYPES: DISABLE
+
+int CLONE_SKIP (...) { PERL_UNUSED_VAR(items); RETVAL = 1; }
+
+BOOT {
+    Stash(__PACKAGE__).inherit("Geo::Geos::Geometry");
+}

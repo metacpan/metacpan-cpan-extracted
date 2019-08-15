@@ -1,0 +1,35 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::Index::MonotoneChainOverlapAction
+PROTOTYPES: DISABLE
+
+MonotoneChainOverlapAction* new(SV*)
+
+void MonotoneChainOverlapAction::overlap(Object arg1, SV* arg2, SV* arg3 = NULL, SV* arg4 = NULL) {
+    if (arg1.stash().name() == "Geo::Geos::LineSegment") {
+        auto& ls1 = xs::in<LineSegment&>(arg1);
+        auto& ls2 = xs::in<LineSegment&>(arg2);
+        THIS->overlap(ls1, ls2);
+    }
+    else {
+        if(!arg2) throw("undef not allowed");
+        if(!arg4) throw("undef not allowed");
+        auto& mc1 = xs::in<MonotoneChain&>(arg1);
+        auto& mc2 = xs::in<MonotoneChain&>(arg3);
+        std::size_t start1 = SvUV(arg2);
+        std::size_t start2 = SvUV(arg4);
+        THIS->overlap(mc1, start1, mc2, start2);
+    }
+}
+
+Envelope* MonotoneChainOverlapAction::tempEnv1(SV* newval = NULL) : ALIAS(tempEnv2=1) {
+    Envelope* val;
+    switch (ix) {
+        case 0:  val = &THIS->tempEnv1; break;
+        default: val = &THIS->tempEnv2; break;
+    }
+    if (newval) {
+        auto e = xs::in<Envelope*>(newval);
+        *val = *e;
+    }
+    RETVAL = new Envelope(*val);
+}
+

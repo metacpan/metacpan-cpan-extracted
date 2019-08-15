@@ -6,6 +6,8 @@ use Test::Exception;
 
 use Escape::Houdini qw/ :all /;
 
+use utf8;
+
 subtest 'escape_html' => sub {
     is escape_html( "<body>" ) => '&lt;body&gt;';
     throws_ok { escape_html( [ 1..4]  ) } qr/\Qescape_html() argument not a string/;

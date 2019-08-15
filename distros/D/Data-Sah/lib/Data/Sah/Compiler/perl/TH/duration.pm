@@ -1,7 +1,7 @@
 package Data::Sah::Compiler::perl::TH::duration;
 
-our $DATE = '2019-08-12'; # DATE
-our $VERSION = '0.900'; # VERSION
+our $DATE = '2019-08-14'; # DATE
+our $VERSION = '0.901'; # VERSION
 
 use 5.010;
 use strict;
@@ -182,7 +182,7 @@ Data::Sah::Compiler::perl::TH::duration - perl's type handler for type "duration
 
 =head1 VERSION
 
-This document describes version 0.900 of Data::Sah::Compiler::perl::TH::duration (from Perl distribution Data-Sah), released on 2019-08-12.
+This document describes version 0.901 of Data::Sah::Compiler::perl::TH::duration (from Perl distribution Data-Sah), released on 2019-08-14.
 
 =head1 DESCRIPTION
 

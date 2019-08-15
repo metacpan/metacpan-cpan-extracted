@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-07-29'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2019-08-09'; # DATE
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use strict;
@@ -11,6 +11,8 @@ use Perinci::CmdLine::Any;
 
 Perinci::CmdLine::Any->new(
     url => '/App/htmlsel/htmlsel',
+    read_config => 0,
+    read_env => 0,
 )->run;
 
 # ABSTRACT: Select HTML::Element nodes using CSel syntax
@@ -28,7 +30,7 @@ htmlsel - Select HTML::Element nodes using CSel syntax
 
 =head1 VERSION
 
-This document describes version 0.006 of htmlsel (from Perl distribution App-htmlsel), released on 2019-07-29.
+This document describes version 0.009 of htmlsel (from Perl distribution App-htmlsel), released on 2019-08-09.
 
 =head1 SYNOPSIS
 
@@ -70,6 +72,14 @@ Shortcut for --node-action dump.
 
 See C<--node-action>.
 
+=item B<--eval>=I<s@>
+
+--eval E is shortcut for --action eval:E.
+
+See C<--node-action>.
+
+Can be specified multiple times.
+
 =item B<--expr>=I<s>
 
 =item B<--file>=I<filename>
@@ -91,24 +101,32 @@ Each action can be one of the following:
 * `count` will print the number of matching nodes.
 
 * `print_method` will call on or more of the node object's methods and print the
-result. Example:
+  result. Example:
 
     print_method:as_string
 
 * `dump` will show a indented text representation of the node and its
-descendants. Each line will print information about a single node: its class,
-followed by the value of one or more attributes. You can specify which
-attributes to use in a dot-separated syntax, e.g.:
+  descendants. Each line will print information about a single node: its class,
+  followed by the value of one or more attributes. You can specify which
+  attributes to use in a dot-separated syntax, e.g.:
 
     dump:tag.id.class
 
-which will result in a node printed like this:
+  which will result in a node printed like this:
 
     HTML::Element tag=p id=undef class=undef
 
 By default, if no attributes are specified, `id` is used. If the node class does
 not support the attribute, or if the value of the attribute is undef, then
 `undef` is shown.
+
+* `eval` will execute Perl code for each matching node. The Perl code will be
+  called with arguments: `($node)`. For convenience, `$_` is also locally set to
+  the matching node. Example in <prog:htmlsel> you can add this action:
+
+    eval:'print $_->tag'
+
+  which will print the tag name for each matching <pm:HTML::Element> node.
 
 
 Can be specified multiple times.
@@ -157,34 +175,6 @@ CSel expression, refer to <pm:Data::CSel>.
 
 `root` will return a single node which is the root node.
 
-
-=back
-
-=head2 Configuration options
-
-=over
-
-=item B<--config-path>=I<s>, B<-c>
-
-Set path to configuration file.
-
-=item B<--config-profile>=I<s>, B<-P>
-
-Set configuration profile to use.
-
-=item B<--no-config>, B<-C>
-
-Do not use any configuration file.
-
-=back
-
-=head2 Environment options
-
-=over
-
-=item B<--no-env>
-
-Do not read environment for default options.
 
 =back
 
@@ -274,45 +264,6 @@ It is also recommended to install L<shcompgen> (see above).
 =head2 other shells
 
 For fish and zsh, install L<shcompgen> as described above.
-
-=head1 CONFIGURATION FILE
-
-This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
-
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/htmlsel.conf>, F<~/htmlsel.conf>, or F</etc/htmlsel.conf>.
-
-All found files will be read and merged.
-
-To disable searching for configuration files, pass C<--no-config>.
-
-You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
-
-You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
-
-Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
-
-List of available configuration parameters:
-
- expr (see --expr)
- file (see --file)
- format (see --format)
- naked_res (see --naked-res)
- node_actions (see --node-action)
- select_action (see --select-action)
-
-=head1 ENVIRONMENT
-
-=head2 HTMLSEL_OPT => str
-
-Specify additional command-line options.
-
-=head1 FILES
-
-F<~/.config/htmlsel.conf>
-
-F<~/htmlsel.conf>
-
-F</etc/htmlsel.conf>
 
 =head1 HOMEPAGE
 

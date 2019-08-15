@@ -1,0 +1,88 @@
+{
+   "event_id" : "9F6C0572-BE0A-11E9-8A20-DCF29A753E2B",
+   "facet_data" : {
+      "about" : {
+         "no_display" : 1
+      },
+      "harness" : {
+         "event_id" : "9F6C0572-BE0A-11E9-8A20-DCF29A753E2B",
+         "job_id" : 0,
+         "run_id" : "9F644B84-BE0A-11E9-8A20-DCF29A753E2B"
+      },
+      "harness_run" : {
+         "args" : [],
+         "blib" : 1,
+         "cover" : null,
+         "default_search" : [
+            "./t",
+            "./t2",
+            "test.pl"
+         ],
+         "dummy" : 0,
+         "env_vars" : {
+            "HARNESS_ACTIVE" : 1,
+            "HARNESS_IS_VERBOSE" : 1,
+            "HARNESS_JOBS" : 1,
+            "HARNESS_VERSION" : "Test2-Harness-0.001081",
+            "PERL_USE_UNSAFE_INC" : 1,
+            "T2_HARNESS_ACTIVE" : 1,
+            "T2_HARNESS_IS_VERBOSE" : 1,
+            "T2_HARNESS_JOBS" : 1,
+            "T2_HARNESS_RUN_ID" : "9F644B84-BE0A-11E9-8A20-DCF29A753E2B",
+            "T2_HARNESS_VERSION" : "0.001081"
+         },
+         "event_uuids" : 1,
+         "exclude_files" : {},
+         "exclude_patterns" : [],
+         "finite" : 1,
+         "input" : null,
+         "job_count" : 1,
+         "lib" : 1,
+         "libs" : [
+            "/home/exodist/projects/Test2/Test2-Harness/lib",
+            "/home/exodist/projects/Test2/Test2-Harness/lib",
+            "/home/exodist/projects/Test2/Test2-Harness/blib/lib",
+            "/home/exodist/projects/Test2/Test2-Harness/blib/arch"
+         ],
+         "load" : null,
+         "load_import" : null,
+         "mem_usage" : 1,
+         "meta" : {
+            "git" : {
+               "sha" : "b5e4781a3a2448833021de2bf94493670a42d77e",
+               "sha_short" : "b5e4781",
+               "status" : " M ../../../.config/awesome/rc.lua\n M ../../../.config/dconf/user\n M ../../../.ssh/config\n M ../../../.vim/.netrwhist\n M ../../../bin/awesome_load.pl\n M ../../../bin/ec2r\n M ../../../bin/s"
+            }
+         },
+         "no_long" : null,
+         "plugins" : [
+            "App::Yath::Plugin::Git"
+         ],
+         "preload" : null,
+         "run_id" : "9F644B84-BE0A-11E9-8A20-DCF29A753E2B",
+         "search" : [
+            "t/fail.t"
+         ],
+         "show_times" : null,
+         "switches" : [],
+         "times" : 1,
+         "tlib" : 0,
+         "unsafe_inc" : 1,
+         "use_fork" : 1,
+         "use_stream" : 1,
+         "verbose" : 1
+      }
+   },
+   "job_id" : 0,
+   "run_id" : "9F644B84-BE0A-11E9-8A20-DCF29A753E2B",
+   "stamp" : 1565728844.51179
+}
+{"event_id":"9F7F71C0-BE0A-11E9-8A20-DCF29A753E2B","stamp":1565728844.63908,"run_id":"9F644B84-BE0A-11E9-8A20-DCF29A753E2B","facet_data":{"harness_job_launch":{"stamp":1565728844.63906,"retry":null},"harness":{"event_id":"9F7F71C0-BE0A-11E9-8A20-DCF29A753E2B","run_id":"9F644B84-BE0A-11E9-8A20-DCF29A753E2B","job_id":"9F663DD6-BE0A-11E9-8A20-DCF29A753E2B"},"harness_job":{"use_stream":1,"postexit_timeout":null,"pid":23384,"use_preload":1,"env_vars":{"TEST2_JOB_DIR":"/tmp/yath-test-23376-CnpivaRt/9F663DD6-BE0A-11E9-8A20-DCF29A753E2B","HARNESS_IS_VERBOSE":1,"PERL5LIB":"/home/exodist/projects/Test2/Test2-Harness/lib:/home/exodist/projects/Test2/Test2-Harness/lib:/home/exodist/projects/Test2/Test2-Harness/blib/lib:/home/exodist/projects/Test2/Test2-Harness/blib/arch","T2_HARNESS_IS_VERBOSE":1,"T2_HARNESS_VERSION":"0.001081","HARNESS_VERSION":"Test2-Harness-0.001081","HARNESS_JOBS":1,"TMPDIR":"/tmp/yath-test-23376-CnpivaRt/9F663DD6-BE0A-11E9-8A20-DCF29A753E2B/tmp","HARNESS_ACTIVE":1,"T2_HARNESS_ACTIVE":1,"TEMPDIR":"/tmp/yath-test-23376-CnpivaRt/9F663DD6-BE0A-11E9-8A20-DCF29A753E2B/tmp","T2_HARNESS_JOBS":1,"PERL_USE_UNSAFE_INC":null,"T2_HARNESS_RUN_ID":"9F644B84-BE0A-11E9-8A20-DCF29A753E2B"},"input":"","mem_usage":1,"shbang":{"line":"#!perl","switches":[]},"times":1,"show_times":null,"use_timeout":1,"load_import":[],"args":[],"job_id":"9F663DD6-BE0A-11E9-8A20-DCF29A753E2B","load":[],"switches":[],"event_uuids":1,"category":"general","file":"/home/exodist/projects/Test2/Test2-Harness/t/fail.t","headers":{},"preload":[],"conflicts":[],"job_name":1,"event_timeout":null,"stamp":1565728844.47391,"use_fork":1,"stage":"default","libs":["/home/exodist/projects/Test2/Test2-Harness/lib","/home/exodist/projects/Test2/Test2-Harness/lib","/home/exodist/projects/Test2/Test2-Harness/blib/lib","/home/exodist/projects/Test2/Test2-Harness/blib/arch"]}},"job_id":"9F663DD6-BE0A-11E9-8A20-DCF29A753E2B"}
+{"facet_data":{"harness_job_start":{"stamp":"1565728844.6253","details":"Job 9F663DD6-BE0A-11E9-8A20-DCF29A753E2B started at 1565728844.6253","job_id":"9F663DD6-BE0A-11E9-8A20-DCF29A753E2B","file":"/home/exodist/projects/Test2/Test2-Harness/t/fail.t"},"about":{"uuid":"9F7F79CC-BE0A-11E9-8A20-DCF29A753E2B"},"harness":{"event_id":"9F7F79CC-BE0A-11E9-8A20-DCF29A753E2B","run_id":"9F644B84-BE0A-11E9-8A20-DCF29A753E2B","job_id":"9F663DD6-BE0A-11E9-8A20-DCF29A753E2B"}},"run_id":"9F644B84-BE0A-11E9-8A20-DCF29A753E2B","job_id":"9F663DD6-BE0A-11E9-8A20-DCF29A753E2B","event_id":"9F7F79CC-BE0A-11E9-8A20-DCF29A753E2B","stamp":"1565728844.6253"}
+{"run_id":"9F644B84-BE0A-11E9-8A20-DCF29A753E2B","facet_data":{"meta":{"Test::Builder":{"ok":1,"reason":"","type":"","name":"t/fail_once is there.","actual_ok":1}},"hubs":[{"nested":0,"details":"Test2::Hub","hid":"23384~0~1565728844~2","ipc":0,"tid":0,"pid":23384,"uuid":"9F82BC90-BE0A-11E9-A519-E0F29A753E2B","buffered":0}],"about":{"uuid":"9F831BFE-BE0A-11E9-A519-E0F29A753E2B","eid":"23384~0~1565728844~6","package":"Test2::Event::Ok"},"trace":{"hid":"23384~0~1565728844~2","nested":0,"huuid":"9F82BC90-BE0A-11E9-A519-E0F29A753E2B","uuid":"9F831AAA-BE0A-11E9-A519-E0F29A753E2B","pid":23384,"tid":0,"cid":"23384~0~1565728844~5","buffered":0,"frame":["main","t/fail.t",20,"Test::More::ok"]},"control":{},"harness":{"event_id":"9F831BFE-BE0A-11E9-A519-E0F29A753E2B","run_id":"9F644B84-BE0A-11E9-8A20-DCF29A753E2B","job_id":"9F663DD6-BE0A-11E9-8A20-DCF29A753E2B"},"assert":{"no_debug":1,"details":"t/fail_once is there.","pass":1}},"job_id":"9F663DD6-BE0A-11E9-8A20-DCF29A753E2B","pid":23384,"tid":0,"stream_id":1,"event_id":"9F831BFE-BE0A-11E9-A519-E0F29A753E2B","assert_count":1,"times":[0.03,0.0,0.0,0.0],"stamp":1565728844.66316}
+{"assert_count":2,"stamp":1565728844.66331,"times":[0.03,0.0,0.0,0.0],"job_id":"9F663DD6-BE0A-11E9-8A20-DCF29A753E2B","run_id":"9F644B84-BE0A-11E9-8A20-DCF29A753E2B","facet_data":{"meta":{"Test::Builder":{"actual_ok":1,"name":"t/fail_repeatedly is there.","type":"","reason":"","ok":1}},"hubs":[{"buffered":0,"tid":0,"pid":23384,"uuid":"9F82BC90-BE0A-11E9-A519-E0F29A753E2B","ipc":0,"nested":0,"hid":"23384~0~1565728844~2","details":"Test2::Hub"}],"about":{"eid":"23384~0~1565728844~8","package":"Test2::Event::Ok","uuid":"9F8323D8-BE0A-11E9-A519-E0F29A753E2B"},"trace":{"cid":"23384~0~1565728844~7","frame":["main","t/fail.t",24,"Test::More::ok"],"buffered":0,"pid":23384,"tid":0,"uuid":"9F8322F2-BE0A-11E9-A519-E0F29A753E2B","huuid":"9F82BC90-BE0A-11E9-A519-E0F29A753E2B","nested":0,"hid":"23384~0~1565728844~2"},"control":{},"assert":{"no_debug":1,"pass":1,"details":"t/fail_repeatedly is there."},"harness":{"job_id":"9F663DD6-BE0A-11E9-8A20-DCF29A753E2B","run_id":"9F644B84-BE0A-11E9-8A20-DCF29A753E2B","event_id":"9F8323D8-BE0A-11E9-A519-E0F29A753E2B"}},"tid":0,"stream_id":2,"event_id":"9F8323D8-BE0A-11E9-A519-E0F29A753E2B","pid":23384}
+{"times":[0.03,0.0,0.0,0.0],"stamp":1565728844.66346,"assert_count":2,"tid":0,"event_id":"9F832946-BE0A-11E9-A519-E0F29A753E2B","stream_id":3,"pid":23384,"facet_data":{"hubs":[{"buffered":0,"tid":0,"pid":23384,"uuid":"9F82BC90-BE0A-11E9-A519-E0F29A753E2B","ipc":0,"nested":0,"details":"Test2::Hub","hid":"23384~0~1565728844~2"}],"trace":{"buffered":0,"frame":["main","t/fail.t",26,"Test::More::done_testing"],"cid":"23384~0~1565728844~9","uuid":"9F83268A-BE0A-11E9-A519-E0F29A753E2B","tid":0,"pid":23384,"hid":"23384~0~1565728844~2","nested":0,"huuid":"9F82BC90-BE0A-11E9-A519-E0F29A753E2B"},"about":{"uuid":"9F832946-BE0A-11E9-A519-E0F29A753E2B","eid":"23384~0~1565728844~10","package":"Test2::Event::Plan"},"plan":{"count":2},"harness":{"event_id":"9F832946-BE0A-11E9-A519-E0F29A753E2B","job_id":"9F663DD6-BE0A-11E9-8A20-DCF29A753E2B","run_id":"9F644B84-BE0A-11E9-8A20-DCF29A753E2B"},"control":{"terminate":null}},"run_id":"9F644B84-BE0A-11E9-8A20-DCF29A753E2B","job_id":"9F663DD6-BE0A-11E9-8A20-DCF29A753E2B"}
+{"assert_count":2,"stamp":1565728844.66367,"times":[0.03,0.0,0.0,0.0],"job_id":"9F663DD6-BE0A-11E9-8A20-DCF29A753E2B","facet_data":{"control":{},"memory":{"peak":["35488","kB"],"size":["35488","kB"],"details":"rss:  23100kB\nsize: 35488kB\npeak: 35488kB","rss":["23100","kB"]},"harness":{"run_id":"9F644B84-BE0A-11E9-8A20-DCF29A753E2B","job_id":"9F663DD6-BE0A-11E9-8A20-DCF29A753E2B","event_id":"9F83315C-BE0A-11E9-A519-E0F29A753E2B"},"about":{"uuid":"9F83315C-BE0A-11E9-A519-E0F29A753E2B","details":"rss:  23100kB\nsize: 35488kB\npeak: 35488kB"},"trace":{"details":"Test2::API::Instance END Block finalization","pid":23384,"tid":0,"frame":["Test2::API::Instance","/home/exodist/perl5/perlbrew/perls/main/lib/site_perl/5.28.1/Test2/API/Instance.pm",0,"Test2::API::Instance::END"]},"hubs":[{"ipc":0,"details":"Test2::Hub","hid":"23384~0~1565728844~2","nested":0,"buffered":0,"uuid":"9F82BC90-BE0A-11E9-A519-E0F29A753E2B","pid":23384,"tid":0}]},"run_id":"9F644B84-BE0A-11E9-8A20-DCF29A753E2B","event_id":"9F83315C-BE0A-11E9-A519-E0F29A753E2B","tid":0,"stream_id":4,"pid":23384}
+{"job_id":"9F663DD6-BE0A-11E9-8A20-DCF29A753E2B","run_id":"9F644B84-BE0A-11E9-8A20-DCF29A753E2B","facet_data":{"times":{"start":1565728844.64356,"csys":0.0,"user":0.03,"sys":0.0,"cuser":0.0,"stop":1565728844.6637},"hubs":[{"details":"Test2::Hub","hid":"23384~0~1565728844~2","nested":0,"ipc":0,"uuid":"9F82BC90-BE0A-11E9-A519-E0F29A753E2B","pid":23384,"tid":0,"buffered":0}],"control":{"global":0,"terminate":null,"has_callback":0},"harness":{"event_id":"9F833D96-BE0A-11E9-A519-E0F29A753E2B","run_id":"9F644B84-BE0A-11E9-8A20-DCF29A753E2B","job_id":"9F663DD6-BE0A-11E9-8A20-DCF29A753E2B"},"about":{"uuid":"9F833D96-BE0A-11E9-A519-E0F29A753E2B","no_display":null,"details":"0.02014s on wallclock (0.03 usr 0.00 sys + 0.00 cusr 0.00 csys = 0.03 CPU)","package":"Test2::Event::Times","eid":"23384~0~1565728844~12"},"trace":{"details":"Test2::API::Instance END Block finalization","pid":23384,"tid":0,"frame":["Test2::API::Instance","/home/exodist/perl5/perlbrew/perls/main/lib/site_perl/5.28.1/Test2/API/Instance.pm",0,"Test2::API::Instance::END"]}},"pid":23384,"event_id":"9F833D96-BE0A-11E9-A519-E0F29A753E2B","stream_id":5,"tid":0,"assert_count":2,"stamp":1565728844.66401,"times":[0.03,0.0,0.0,0.0]}
+{"stamp":1565728844.68238,"event_id":"9F860CCE-BE0A-11E9-8A20-DCF29A753E2B","job_id":"9F663DD6-BE0A-11E9-8A20-DCF29A753E2B","run_id":"9F644B84-BE0A-11E9-8A20-DCF29A753E2B","facet_data":{"harness":{"run_id":"9F644B84-BE0A-11E9-8A20-DCF29A753E2B","job_id":"9F663DD6-BE0A-11E9-8A20-DCF29A753E2B","event_id":"9F860CCE-BE0A-11E9-8A20-DCF29A753E2B"},"about":{"uuid":"9F860CCE-BE0A-11E9-8A20-DCF29A753E2B"},"harness_job_exit":{"file":"/home/exodist/projects/Test2/Test2-Harness/t/fail.t","job_id":"9F663DD6-BE0A-11E9-8A20-DCF29A753E2B","exit":"0","stderr":"T2-HARNESS-ESYNC: 23384~0~1\nT2-HARNESS-ESYNC: 23384~0~2\nT2-HARNESS-ESYNC: 23384~0~3\nT2-HARNESS-ESYNC: 23384~0~4\nT2-HARNESS-ESYNC: 23384~0~5\n","details":"Test script exited 0","stdout":"T2-HARNESS-ESYNC: 23384~0~1\nT2-HARNESS-ESYNC: 23384~0~2\nT2-HARNESS-ESYNC: 23384~0~3\nT2-HARNESS-ESYNC: 23384~0~4\nT2-HARNESS-ESYNC: 23384~0~5\n"}}}
+{"facet_data":{"harness":{"event_id":"9F861D72-BE0A-11E9-8A20-DCF29A753E2B","job_id":"9F663DD6-BE0A-11E9-8A20-DCF29A753E2B","run_id":"9F644B84-BE0A-11E9-8A20-DCF29A753E2B"},"harness_job_end":{"file":"/home/exodist/projects/Test2/Test2-Harness/t/fail.t","fail":0,"stamp":1565728844.68279,"times":{"cleanup":0.0193319320678711,"total":0.0574920177459717,"startup":0.0378601551055908,"events":0.000299930572509766}},"errors":[]},"run_id":"9F644B84-BE0A-11E9-8A20-DCF29A753E2B","job_id":"9F663DD6-BE0A-11E9-8A20-DCF29A753E2B","event_id":"9F861D72-BE0A-11E9-8A20-DCF29A753E2B","stamp":1565728844.68279}

@@ -2793,7 +2793,7 @@ struct test_string {
     }
 };
 
-template <class T> const T                            test_string<T>::LITERAL[38] = {'h','e','l','l','o',' ','w','o','r','l','d',',',' ','t','h','i','s',' ','i','s',' ','a',' ','l','i','t','e','r','a','l',' ','s','t','r','i','n','g',0};
-template <class T> const T                            test_string<T>::EMPTY[1]    = {0};
+template <class T> const T test_string<T>::LITERAL[38] = {'h','e','l','l','o',' ','w','o','r','l','d',',',' ','t','h','i','s',' ','i','s',' ','a',' ','l','i','t','e','r','a','l',' ','s','t','r','i','n','g',0};
+template <class T> const T test_string<T>::EMPTY[1]    = {0};
 
 }

@@ -1,0 +1,54 @@
+=head1 NAME
+
+Geo::Geos::LineString - Models an OGC-style LineString.
+
+=head1 SYNOPSIS (class-specific methods)
+
+    use Geo::Geos::Coordinate;
+    use Geo::Geos::GeometryFactory;
+
+    my $c1 = Geo::Geos::Coordinate->new(1,2);
+    my $c2 = Geo::Geos::Coordinate->new(5,2);
+    my $gf = Geo::Geos::GeometryFactory::create();
+
+    my $ls = $gf->createLineString([$c1, $c2], 2);  # => isa 'Geo::Geos::LineString'
+    $gf->createLineString([$c1, $c2], 2);           # => isa 'Geo::Geos::Lineal'
+
+    $ls->getPointN(0);       # => isa 'Geo::Geos::Point'
+    $ls->getStartPoint;      # => isa 'Geo::Geos::Point'
+    $ls->getEndPoint;        # => isa 'Geo::Geos::Point'
+
+    $ls->isClosed;  # => ''
+    $ls->isRing;    # => ''
+
+    $lr->reverse;    # => isa 'Geo::Geos::Geometry'
+
+=head1 DESCRIPTION
+
+See methods in the base class L<Geo::Geos::Geometry>.
+
+=head1 SEE ALSO (C++ classes docs)
+
+L<GEOS C++ Library|https://trac.osgeo.org/geos>
+
+geos::geom::LineString
+
+=head1 SEE ALSO
+
+L<Geo::Geos>
+
+L<Geo::Geos::Geometry>
+
+L<Geo::Geos::GeometryFactory>
+
+L<Geo::Geos::Point>
+
+=head1 AUTHOR
+
+Ivan Baidakou <i.baydakov@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

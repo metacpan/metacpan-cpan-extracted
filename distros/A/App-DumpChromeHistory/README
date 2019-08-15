@@ -1,10 +1,81 @@
-SYNOPSIS
+NAME
+    App::DumpChromeHistory - Dump Chrome history
 
+VERSION
+    This document describes version 0.002 of App::DumpChromeHistory (from
+    Perl distribution App-DumpChromeHistory), released on 2019-08-14.
+
+SYNOPSIS
     See the included script dump-chrome-history.
 
-SEE ALSO
+FUNCTIONS
+  dump_chrome_history
+    Usage:
 
+     dump_chrome_history(%args) -> [status, msg, payload, meta]
+
+    Dump Chrome history.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   copy_size_limit => *posint* (default: 104857600)
+
+        Chrome often locks the History database for a long time. If the size
+        of the database is not too large (determine by checking against this
+        limit), then the script will copy the file to a temporary file and
+        extract the data from the copied database.
+
+    *   detail => *bool*
+
+    *   profile => *str* (default: "Default")
+
+        Select profile to use.
+
+        You can either provide a name, e.g. "Default", the profile directory
+        of which will be then be searched in
+        "~/.config/google-chrome/<name>". Or you can also provide a
+        directory name.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-DumpChromeHistory>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-DumpChromeHistory>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-DumpChromeHistory
+    >
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     App::DumpFirefoxHistory
 
     App::DumpOperaHistory
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

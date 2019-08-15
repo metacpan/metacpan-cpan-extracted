@@ -1,0 +1,46 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::Triangulate::VoronoiDiagramBuilder
+PROTOTYPES: DISABLE
+
+Sv new(SV*, SV* geometry_factory, Sv sites, SV* tolerance = NULL, SV* env = NULL) {
+    auto builder = std::unique_ptr<VoronoiDiagramBuilder>(new VoronoiDiagramBuilder());
+    GeometryFactory* factory = xs::in<GeometryFactory*>(geometry_factory);
+
+    if (sites.is_array_ref()) {
+        auto seq = std::unique_ptr<CoordinateSequence>(Helper::convert_copy(*factory, sites, 2));
+        builder->setSites(*seq);
+    }
+    else {
+        auto& g = xs::in<Geometry&>(sites);
+        builder->setSites(g);
+    }
+
+    if (tolerance) {
+        builder->setTolerance(Simple(tolerance));
+    }
+
+    if (env) {
+        auto envelope = xs::in<Envelope*>(env);
+        builder->setClipEnvelope(envelope);
+    }
+
+    Object wrapped = xs::out<VoronoiDiagramBuilder*>(builder.release());
+    wrapped.payload_attach(SvRV(geometry_factory), &payload_marker);
+    RETVAL = wrapped.ref();
+}
+
+Sv VoronoiDiagramBuilder::getDiagramEdges() {
+    Object me{ST(0)};
+    auto payload = me.payload(&payload_marker);
+    GeometryFactory* factory = xs::in<GeometryFactory*>(payload.obj);
+    auto edges = THIS->getDiagramEdges(*factory);
+    RETVAL = Helper::uplift(edges.release());
+}
+
+Sv VoronoiDiagramBuilder::getDiagram() {
+    Object me{ST(0)};
+    auto payload = me.payload(&payload_marker);
+    GeometryFactory* factory = xs::in<GeometryFactory*>(payload.obj);
+    auto edges = THIS->getDiagram(*factory);
+    RETVAL = Helper::uplift(edges.release());
+}
+

@@ -1,0 +1,162 @@
+MODULE = Geo::Geos                PACKAGE = Geo::Geos::LineSegment
+PROTOTYPES: DISABLE
+
+LineSegment* new(SV*, SV* arg1 = NULL, SV* arg2 = NULL, SV* arg3 = NULL, SV* arg4 = NULL) {
+    if (!arg1) RETVAL = new LineSegment();
+    else if (!arg3) {
+        auto& c1 = xs::in<Coordinate&>(arg1);
+        auto& c2 = xs::in<Coordinate&>(arg2);
+        RETVAL = new LineSegment(c1, c2);
+    }
+    else {
+        if(!arg2) throw("undef not allowed");
+        if(!arg3) throw("undef not allowed");
+        if(!arg4) throw("undef not allowed");
+        double x0 = SvNV(arg1);
+        double y0 = SvNV(arg2);
+        double x1 = SvNV(arg3);
+        double y1 = SvNV(arg4);
+        RETVAL = new LineSegment(x0, y0, x1, y1);
+    }
+}
+
+double LineSegment::getLength()
+
+bool LineSegment::isHorizontal()
+
+bool LineSegment::isVertical()
+
+void LineSegment::setCoordinates(SV* arg1, SV* arg2 = NULL) {
+    if (!arg2) {
+        auto& ls = xs::in<LineSegment&>(arg1);
+        THIS->setCoordinates(ls);
+    }
+    else {
+        auto& c1 = xs::in<Coordinate&>(arg1);
+        auto& c2 = xs::in<Coordinate&>(arg2);
+        THIS->setCoordinates(c1, c2);
+    }
+}
+
+int LineSegment::orientationIndex(Object arg) {
+    if (arg.stash().name() == "Geo::Geos::Coordinate") {
+        auto c = xs::in<Coordinate*>(arg);
+        RETVAL = THIS->orientationIndex(*c);
+    }
+    else {
+        auto& ls = xs::in<LineSegment&>(arg);
+        RETVAL = THIS->orientationIndex(ls);
+    }
+}
+
+void LineSegment::reverse ()
+
+void LineSegment::normalize ()
+
+double LineSegment::angle ()
+
+Coordinate* LineSegment::midPoint() {
+    Coordinate c;
+    THIS->midPoint(c);
+    RETVAL = new Coordinate(c);
+}
+
+double LineSegment::distance(Object arg){
+    if (arg.stash().name() == "Geo::Geos::Coordinate") {
+        auto c = xs::in<Coordinate*>(arg);
+        RETVAL = THIS->distance(*c);
+    }
+    else {
+        auto& ls = xs::in<LineSegment&>(arg);
+        RETVAL = THIS->distance(ls);
+    }
+}
+
+double LineSegment::distancePerpendicular(Coordinate& p)
+
+Coordinate* LineSegment::pointAlong(double segmentLengthFraction) {
+    Coordinate c;
+    THIS->pointAlong(segmentLengthFraction, c);
+    RETVAL = new Coordinate(c);
+}
+
+Coordinate* LineSegment::pointAlongOffset (double segmentLengthFraction, double offsetDistance){
+    Coordinate c;
+    THIS->pointAlongOffset(segmentLengthFraction, offsetDistance, c);
+    RETVAL = new Coordinate(c);
+}
+
+double LineSegment::projectionFactor(Coordinate& p)
+
+double LineSegment::segmentFraction (Coordinate& p)
+
+void LineSegment::project(Object arg) {
+    if (arg.stash().name() == "Geo::Geos::Coordinate") {
+        auto& c = xs::in<Coordinate&>(arg);
+        Coordinate c_out;
+        THIS->project(c, c_out);
+        auto wrapped = xs::out<>(new Coordinate(c_out));
+        mXPUSHs(wrapped.detach());
+    }
+    else {
+        auto& ls = xs::in<LineSegment&>(arg);
+        LineSegment ls_out;
+        bool overlap = THIS->project(ls, ls_out);
+        auto wrapped = xs::out<>(new LineSegment(ls_out));
+        mXPUSHs(wrapped.detach());
+        if (GIMME_V == G_ARRAY) mXPUSHi(overlap);
+    }
+}
+
+Coordinate* LineSegment::closestPoint (Coordinate& p) {
+    Coordinate c;
+    THIS->closestPoint(p, c);
+    RETVAL = new Coordinate(c);
+}
+
+int LineSegment::compareTo(LineSegment& other)
+
+bool LineSegment::equalsTopo(LineSegment& other)
+
+Array LineSegment::closestPoints(LineSegment& line) {
+    auto seq = std::unique_ptr<CoordinateSequence>(THIS->closestPoints(line));
+    RETVAL = Helper::convert_copy(seq.get());
+}
+
+Coordinate* LineSegment::intersection(LineSegment& line){
+    Coordinate c;
+    if(THIS->intersection(line, c)) RETVAL = new Coordinate(c);
+    else XSRETURN_UNDEF;
+}
+
+Coordinate* LineSegment::lineIntersection(LineSegment& line){
+    Coordinate c;
+    if(THIS->lineIntersection(line, c)) RETVAL = new Coordinate(c);
+    else XSRETURN_UNDEF;
+}
+
+LineString* LineSegment::toGeometry(GeometryFactory& gf) {
+    auto ptr = THIS->toGeometry(gf);
+    RETVAL = ptr.release();
+}
+
+std::string LineSegment::toString(...) {
+    std::ostringstream out;
+    out << *THIS;
+    RETVAL = out.str();
+}
+
+Coordinate* LineSegment::p0(SV* newval = NULL) : ALIAS(p1=1) {
+    Coordinate* val;
+    switch (ix) {
+        case 0:  val = &THIS->p0; break;
+        default: val = &THIS->p1; break;
+    }
+    if (newval) {
+        auto& c = xs::in<Coordinate&>(newval);
+        *val = c;
+    }
+    RETVAL = new Coordinate(*val);
+}
+
+int CLONE_SKIP (...) { PERL_UNUSED_VAR(items); RETVAL = 1; }

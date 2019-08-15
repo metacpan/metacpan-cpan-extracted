@@ -25,7 +25,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Number-Util-Range
   homepage: https://metacpan.org/release/Number-Util-Range
   repository: git://github.com/perlancar/perl-Number-Util-Range.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.026000'

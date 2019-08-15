@@ -1,6 +1,6 @@
 
 package Geoffrey::Tutorial;
-$Geoffrey::Tutorial::VERSION = '0.000101';
+$Geoffrey::Tutorial::VERSION = '0.000102';
 __END__
 
 =pod
@@ -11,7 +11,7 @@ Geoffrey::Tutorial - A gentle introduction to Geoffrey
 
 =head1 VERSION
 
-Version 0.000101
+Version 0.000102
 
 =head1 What is Geoffrey?
 

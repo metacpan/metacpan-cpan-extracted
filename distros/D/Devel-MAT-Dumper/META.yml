@@ -17,14 +17,14 @@ name: Devel-MAT-Dumper
 provides:
   Devel::MAT::Dumper:
     file: lib/Devel/MAT/Dumper.pm
-    version: '0.40'
+    version: '0.41'
   Devel::MAT::Dumper::Helper:
     file: lib/Devel/MAT/Dumper/Helper.pm
-    version: '0.40'
+    version: '0.41'
 requires:
   File::Spec: '0'
   perl: '5.010'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.40'
+version: '0.41'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

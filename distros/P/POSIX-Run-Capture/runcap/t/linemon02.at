@@ -1,0 +1,23 @@
+AT_SETUP([line monitor, no trailing newline])
+AT_KEYWORDS([linemon linemon02.at])
+AT_CHECK([rt -m -- genout -l 31 $INPUT
+],
+[0],
+[stdout: CHAPTER I. Down the Rabbit-Holeres=0
+exit code: 0
+stdout: 1 lines, 31 bytes
+stderr: 0 lines, 0 bytes
+])
+
+AT_CHECK([rt -m -- genout -l 102 $INPUT
+],
+[0],
+[stdout: CHAPTER I. Down the Rabbit-Hole
+stdout:
+stdout: Alice was beginning to get very tired of sitting by her sister on theres=0
+exit code: 0
+stdout: 3 lines, 102 bytes
+stderr: 0 lines, 0 bytes
+])
+AT_CLEANUP
+

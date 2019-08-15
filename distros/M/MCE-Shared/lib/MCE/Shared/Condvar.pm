@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.843';
+our $VERSION = '1.844';
 
 use MCE::Shared::Base ();
 use MCE::Util ();
@@ -352,7 +352,7 @@ MCE::Shared::Condvar - Condvar helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Condvar version 1.843
+This document describes MCE::Shared::Condvar version 1.844
 
 =head1 DESCRIPTION
 
@@ -451,6 +451,10 @@ The following example demonstrates barrier synchronization.
  #        MCE Sync:   0.062s  child processes
 
 =head1 API DOCUMENTATION
+
+=head2 MCE::Shared::Condvar->new ( )
+
+Called by MCE::Shared for constructing a shared-condvar object.
 
 =head2 MCE::Shared->condvar ( [ value ] )
 
