@@ -44,7 +44,9 @@ or other reference).
 The L<XS::Framework::Manual::SVAPI::Simple> object is intendent to present
 Perl primitive values, i.e. string or numbers.
 
-L<XS::Framework::Manual::SVAPI::Glob> object holds a pointer to a scalar, an array, a hash etc. and usually can be found in C<Stash>'es.
+L<XS::Framework::Manual::SVAPI::Glob> object holds a GLOB containing a scalar, an array, a hash etc. and usually can be found in C<Stash>'es.
+
+L<XS::Framework::Manual::SVAPI::Io> object holds IO.
 
 The rule of thumb for wrappers creation (i.e. constructor, assignment): if
 the incorrect underlying C<SV*> is supplied (e.g. C<SV*> holding a number
@@ -80,6 +82,8 @@ L<XS::Framework::Manual::SVAPI::Scalar>
 L<XS::Framework::Manual::SVAPI::Simple>
 
 L<XS::Framework::Manual::SVAPI::Stash>
+
+L<XS::Framework::Manual::SVAPI::Io>
 
 
 =head2 MISCELLANEOUS

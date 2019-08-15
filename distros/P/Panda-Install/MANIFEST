@@ -9,6 +9,8 @@ lib/Panda/XSLoader.pm
 lib/Panda/XSLoader.pod
 Makefile.PL
 MANIFEST			This list of files
+META.json
+META.yml
 t/00-Panda-Install.t
 t/01-all_from.t
 t/02-configure_requires.t
@@ -51,5 +53,3 @@ t/testmod/test.xs
 t/testmod/typemap.map
 t/testmod_noxs/lib/TestMod.pm
 t/testmod_noxs/lib/TestMod/Pack.pm
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

@@ -7,33 +7,33 @@ use warnings FATAL => 'all';
 use Geoffrey::Template;
 use Geoffrey::Changeset;
 
-$Geoffrey::Read::VERSION = '0.000102';
+$Geoffrey::Read::VERSION = '0.000103';
 
 use parent 'Geoffrey::Role::Core';
 
 sub _obj_entries {
     my ($self) = @_;
     require Geoffrey::Action::Entry;
-    $self->{entries} //= Geoffrey::Action::Entry->new( dbh => $self->dbh, converter => $self->converter, );
+    $self->{entries} //= Geoffrey::Action::Entry->new(dbh => $self->dbh, converter => $self->converter,);
     return $self->{entries};
 }
 
 sub _parse_changelogs {
-    my ( $self, $ar_changelogs, $s_changelog_root ) = @_;
-    for my $i_changelog ( @{$ar_changelogs} ) {
-        my $s_changelog =
-          $s_changelog_root
-          ? File::Spec->catfile( $s_changelog_root, "changelog-$i_changelog" )
-          : "changelog-$i_changelog";
+    my ($self, $ar_changelogs, $s_changelog_root) = @_;
+    for my $i_changelog (@{$ar_changelogs}) {
+        my $s_changelog
+            = $s_changelog_root
+            ? File::Spec->catfile($s_changelog_root, "changelog-$i_changelog")
+            : "changelog-$i_changelog";
         return 0 if !$self->_parse_log($s_changelog);
     }
     return 1;
 }
 
 sub _parse_log {
-    my ( $self, $s_changelog ) = @_;
-    for ( @{ $self->changelog_io->load($s_changelog) } ) {
-        my $changeset_result = $self->run_changeset( $_, $s_changelog );
+    my ($self, $s_changelog) = @_;
+    for (@{$self->changelog_io->load($s_changelog)}) {
+        my $changeset_result = $self->run_changeset($_, $s_changelog);
         return 0 if $changeset_result->{exit};
     }
     return 1;
@@ -47,92 +47,84 @@ sub _get_sql_abstract {
 }
 
 sub _get_changset_by_id {
-    my ( $self, $s_changeset_id ) = @_;
-    my $s_changelog_name = ( $self->schema ? $self->schema . q/./ : q// ) . $self->converter->changelog_table;
-    my $s_changeset_sql = $self->_get_sql_abstract->select( $s_changelog_name, qw/*/, { id => $s_changeset_id } );
-    my $hr_result = $self->dbh->selectrow_hashref( $s_changeset_sql, { Slice => {} }, ($s_changeset_id) );
+    my ($self, $s_changeset_id) = @_;
+    my $s_changelog_name = ($self->schema ? $self->schema . q/./ : q//) . $self->converter->changelog_table;
+    my $s_changeset_sql = $self->_get_sql_abstract->select($s_changelog_name, qw/*/, {id => $s_changeset_id});
+    my $hr_result = $self->dbh->selectrow_hashref($s_changeset_sql, {Slice => {}}, ($s_changeset_id));
     return unless $hr_result;
     require Geoffrey::Utils;
     return Geoffrey::Utils::to_lowercase($hr_result);
 }
 
 sub _check_key {
-    my ( $self, $s_changeset_id, $s_md5sum ) = @_;
+    my ($self, $s_changeset_id, $s_md5sum) = @_;
     my $hr_db_changeset = $self->_get_changset_by_id($s_changeset_id);
     return 0 unless scalar keys %{$hr_db_changeset};
     return 0 unless $hr_db_changeset->{md5sum};
 
-    if ( $hr_db_changeset->{md5sum} ne $s_md5sum ) {
+    if ($hr_db_changeset->{md5sum} ne $s_md5sum) {
         require Geoffrey::Exception::Database;
-        Geoffrey::Exception::Database::throw_changeset_corrupt( $s_changeset_id, $s_md5sum,
-            $hr_db_changeset->{md5sum} );
+        Geoffrey::Exception::Database::throw_changeset_corrupt($s_changeset_id, $s_md5sum, $hr_db_changeset->{md5sum});
     }
     return 1;
 }
 
 sub run_changeset {
-    my ( $self, $hr_changeset, $s_file ) = @_;
-    return { exit => 1 } if $hr_changeset->{stop};
-    if ( !$hr_changeset->{id} ) {
+    my ($self, $hr_changeset, $s_file) = @_;
+    return {exit => 1} if $hr_changeset->{stop};
+    if (!$hr_changeset->{id}) {
         require Geoffrey::Exception::RequiredValue;
         Geoffrey::Exception::RequiredValue::throw_id($s_file);
     }
     require Hash::MD5;
     my $s_changeset_checksum = Hash::MD5::sum($hr_changeset);
-    return { key => 1 } if $self->_check_key( $hr_changeset->{id}, $s_changeset_checksum );
-    $self->changeset->handle_entries( $hr_changeset->{entries} );
-    my $s_table_name = ( $self->schema ? $self->schema . q/./ : q// ) . $self->converter->changelog_table;
+    return {key => 1} if $self->_check_key($hr_changeset->{id}, $s_changeset_checksum);
+    $self->changeset->handle_entries($hr_changeset->{entries});
+    my $s_table_name = ($self->schema ? $self->schema . q/./ : q//) . $self->converter->changelog_table;
     require Geoffrey::Utils;
-    my $hr_db_changeset = Geoffrey::Utils::to_lowercase( $self->_get_changset_by_id( $hr_changeset->{id} ) );
+    my $hr_db_changeset = Geoffrey::Utils::to_lowercase($self->_get_changset_by_id($hr_changeset->{id}));
 
     if ($hr_db_changeset) {
         return {
             changeset => $self->_obj_entries->alter(
                 $s_table_name,
-                [ { md5sum => $s_changeset_checksum } ],
-                { id => $hr_changeset->{id} }
-            )
-        };
+                {id => $hr_changeset->{id}},
+                [{md5sum => $s_changeset_checksum}],
+            )};
     }
 
     return {
-        changeset => $self->_obj_entries->add(
-            {
+        changeset => $self->_obj_entries->add({
                 table  => $s_table_name,
-                values => [
-                    {
+                values => [{
                         created_by       => $hr_changeset->{author},
                         geoffrey_version => $Geoffrey::Read::VERSION,
                         comment          => 'Imported by current db.',
                         id               => $hr_changeset->{id},
                         filename         => $s_file,
                         md5sum           => $s_changeset_checksum,
-                    }
-                ]
-            }
-        )
-    };
+                    }]})};
 }
 
 sub schema { return shift->{schema}; }
 
 sub changeset {
-    my ( $self, $obj_changeset ) = @_;
+    my ($self, $obj_changeset) = @_;
     $self->{changeset} = $obj_changeset if $obj_changeset;
-    $self->{changeset} //=
-      Geoffrey::Changeset->new( converter => $self->converter, dbh => $self->dbh, schema => $self->schema, );
+    $self->{changeset}
+        //= Geoffrey::Changeset->new(converter => $self->converter, dbh => $self->dbh, schema => $self->schema,);
     return $self->{changeset};
 }
 
 sub run {
-    my ( $self, $s_changelog_root ) = @_;
-    $self->changelog_io->converter( $self->converter ) if $self->changelog_io->needs_converter;
-    $self->changelog_io->dbh( $self->dbh )             if $self->changelog_io->needs_dbh;
-    my $main = $self->changelog_io->load( File::Spec->catfile( $s_changelog_root, 'changelog' ) );
-    $self->changeset->template( Geoffrey::Template->new->load_templates( $main->{templates} ) );
-    $self->changeset->prefix( $main->{prefix}   ? $main->{prefix} . '_'  : q~~ );
-    $self->changeset->postfix( $main->{postfix} ? '_' . $main->{postfix} : q~~ );
-    return $self->_parse_changelogs( $main->{changelogs}, $s_changelog_root );
+    my ($self, $s_changelog_root) = @_;
+    $self->changelog_io->converter($self->converter) if $self->changelog_io->needs_converter;
+    $self->changelog_io->dbh($self->dbh)             if $self->changelog_io->needs_dbh;
+    my $main = $self->changelog_io->load(File::Spec->catfile($s_changelog_root, 'changelog'));
+    $self->changeset->template(Geoffrey::Template->new->load_templates($main->{templates}));
+    $self->changeset->prefix($main->{prefix}   ? $main->{prefix} . '_'  : q~~);
+    $self->changeset->postfix($main->{postfix} ? '_' . $main->{postfix} : q~~);
+    return $self->_parse_changelogs($main->{changelogs}, $s_changelog_root);
 }
 
 1;    # End of Geoffrey::Read
@@ -149,7 +141,7 @@ Geoffrey::Read - Read existing db scheme.
 
 =head1 VERSION
 
-Version 0.000102
+Version 0.000103
 
 =head1 DESCRIPTION
 

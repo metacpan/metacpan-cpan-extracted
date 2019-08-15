@@ -29,8 +29,9 @@ ok( $o_writer->changeset->isa('Geoffrey::Changeset'),          'changeset sub te
 is(
     $o_geoffrey->write( q~.~, 'main', 1 ), q~{
   'changelogs' => [
-                    '1-indexes',
-                    '2-views'
+                    '1-tables',
+                    '2-indexes',
+                    '3-views'
                   ]
 }
 ~, 'changeset sub test'

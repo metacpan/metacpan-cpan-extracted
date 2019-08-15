@@ -7,7 +7,7 @@ use warnings;
 use Readonly;
 use Geoffrey::Action::Table;
 
-$Geoffrey::VERSION = '0.000102';
+$Geoffrey::VERSION = '0.000103';
 
 use parent 'Geoffrey::Role::Core';
 
@@ -18,6 +18,7 @@ sub new {
     my $self  = $class->SUPER::new(@_);
     bless $self, $class;
     $self->converter->check_version($self->dbh->get_info($IDX_DATABASE_DRIVER));
+    $self->_prepare_tables;
     return $self;
 }
 
@@ -29,17 +30,6 @@ sub _prepare_tables {
     my $hr_changelog_table = $self->converter->get_changelog_table_hashref($self->dbh, $self->schema);
     $o_action_table->add($hr_changelog_table) if $hr_changelog_table;
     return $hr_changelog_table;
-}
-
-sub add_environment {
-    my ($self, $s_system, $s_created_by, $i_staging_order) = @_;
-    require Geoffrey::Action::Entry;
-    my $o_action_entry = Geoffrey::Action::Entry->new(dbh => $self->dbh, converter => $self->converter);
-    return $o_action_entry->add({
-        table   => $self->converter->environment_table,
-        columns => ['system', 'created_by', 'staging_order',],
-        values  => [[$s_system, $s_created_by, $i_staging_order],],
-    });
 }
 
 sub reader {
@@ -68,7 +58,6 @@ sub writer {
 
 sub read {
     my ($self, $s_changelog_root) = @_;
-    $self->_prepare_tables;
     return $self->reader->run($s_changelog_root);
 }
 
@@ -91,7 +80,7 @@ Geoffrey - Continuous Database Migration
 
 =head1 VERSION
 
-Version 0.000102
+Version 0.000103
 
 =head1 DESCRIPTION
 
@@ -187,8 +176,6 @@ There is no default.
 =item path to changelog folder
 
 =back
-
-=head2 add_environment
 
 =head1 DIAGNOSTICS
 

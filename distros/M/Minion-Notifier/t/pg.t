@@ -7,7 +7,7 @@ plan skip_all => 'set TEST_ONLINE_PG to a postgresql url to run test'
   unless my $url = $ENV{TEST_ONLINE_PG};
 
 use Test::Mojo;
-my $t = Test::Mojo->new;
+use Mojo::IOLoop;
 
 require Mojo::Pg;
 
@@ -45,6 +45,7 @@ any '/live' => sub {
   $id = $minion->enqueue('live');
 };
 
+my $t = Test::Mojo->new;
 $t->get_ok('/live')
   ->status_is(200)
   ->json_is('/id' => $id);

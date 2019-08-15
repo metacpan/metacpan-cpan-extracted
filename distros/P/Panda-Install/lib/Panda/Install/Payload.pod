@@ -1,16 +1,10 @@
 =head1 NAME
 
-Panda::Install::Payload - Manager for module's payload.
-
-=head1 FUNCTIONS
-
-=head4 payload_dir($module)
-
-Returns directory where the payload of module $module is located or undef if $module didn't install any payload.
+Panda::Install::Payload - [DEPRECATED] Manager for module's payload.
 
 =head1 AUTHOR
 
-Pronin Oleg <syber@crazypanda.ru>, Crazy Panda, CP Decision LTD
+Pronin Oleg <syber@crazypanda.ru>, Crazy Panda LTD
 
 =head1 LICENSE
 

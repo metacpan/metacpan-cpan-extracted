@@ -6,7 +6,7 @@ use strict;
 use Readonly;
 use warnings;
 
-$Geoffrey::Converter::SQLite::VERSION = '0.000102';
+$Geoffrey::Converter::SQLite::VERSION = '0.000103';
 
 use parent 'Geoffrey::Role::Converter';
 
@@ -240,7 +240,8 @@ sub foreign_key {
 }
 
 sub trigger {
-    my ($self) = @_;
+    my ( $self, $o_trigger ) = @_;
+    $self->{trigger} = $o_trigger if defined $o_trigger;
     $self->{trigger} //= Geoffrey::Converter::SQLite::Trigger->new;
     return $self->{trigger};
 }
@@ -269,7 +270,7 @@ Geoffrey::Converter::SQLite - The great new Geoffrey::Converter::SQLite!
 
 =head1 VERSION
 
-Version 0.000102
+Version 0.000103
 
 =head1 DESCRIPTION
 

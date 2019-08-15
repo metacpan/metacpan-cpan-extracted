@@ -8,102 +8,75 @@ use Geoffrey::Utils;
 use Geoffrey::Exception::RequiredValue;
 use Geoffrey::Exception::NotSupportedException;
 
-$Geoffrey::Action::Trigger::VERSION = '0.000102';
+$Geoffrey::Action::Trigger::VERSION = '0.000103';
 
 use parent 'Geoffrey::Role::Action';
 
 sub add {
-    my ( $self, $params, $options ) = @_;
+    my ($self, $params, $options) = @_;
     my $trigger = $self->converter->trigger;
 
-    Geoffrey::Exception::NotSupportedException::throw_action()
-      if !$trigger || !$trigger->add;
-    Geoffrey::Exception::RequiredValue::throw_trigger_name('for add trigger')
-      if !$params->{name};
-    Geoffrey::Exception::RequiredValue::throw_table_name('for add trigger')
-      if !$params->{event_object_table};
-    Geoffrey::Exception::RequiredValue::throw_common('event_manipulation')
-      if !$params->{event_manipulation};
-    Geoffrey::Exception::RequiredValue::throw_common('action_timing')
-      if !$params->{action_timing};
-    Geoffrey::Exception::RequiredValue::throw_common('action_orientation')
-      if !$params->{action_orientation};
-    Geoffrey::Exception::RequiredValue::throw_common('action_statement')
-      if !$params->{action_statement};
+    Geoffrey::Exception::NotSupportedException::throw_action() if !$trigger || !$trigger->add;
+    Geoffrey::Exception::RequiredValue::throw_trigger_name('for add trigger') if !$params->{name};
+    Geoffrey::Exception::RequiredValue::throw_table_name('for add trigger')   if !$params->{event_object_table};
+    Geoffrey::Exception::RequiredValue::throw_common('event_manipulation')    if !$params->{event_manipulation};
+    Geoffrey::Exception::RequiredValue::throw_common('action_timing')         if !$params->{action_timing};
+    Geoffrey::Exception::RequiredValue::throw_common('action_orientation')    if !$params->{action_orientation};
+    Geoffrey::Exception::RequiredValue::throw_common('action_statement')      if !$params->{action_statement};
 
-    my $result = $self->_find_same_trigger( $params->{event_object_table},
-        $params->{name}, $params->{schema} );
+    my $result = $self->_find_same_trigger($params->{event_object_table}, $params->{name}, $params->{schema});
 
-    if ( @{$result} > 0 ) {
-        $self->drop( $params->{name}, $params->{event_object_table} );
-        $params->{event_manipulation} .=
-          ' OR ' . $result->[0]->{event_manipulation};
+    if (@{$result} > 0) {
+        $self->drop($params->{name}, $params->{event_object_table});
+        $params->{event_manipulation} .= ' OR ' . $result->[0]->{event_manipulation};
     }
 
     my $sql = Geoffrey::Utils::replace_spare(
         $trigger->add($options),
         [
-            $params->{name},               $params->{action_timing},
-            $params->{event_manipulation}, $params->{event_object_table},
-            $params->{action_orientation}, $params->{action_statement},
-        ]
-    );
+            $params->{name},               $params->{action_timing},      $params->{event_manipulation},
+            $params->{event_object_table}, $params->{action_orientation}, $params->{action_statement},
+        ]);
     return $self->do($sql);
 }
 
 sub alter {
-    my ( $self, $params, $options ) = @_;
+    my ($self, $params, $options) = @_;
     my $trigger = $self->converter->trigger;
-    Geoffrey::Exception::NotSupportedException::throw_action()
-      if !$trigger || !$trigger->alter;
-    Geoffrey::Exception::RequiredValue::throw_trigger_name('for drop trigger')
-      if !$params->{name};
-    Geoffrey::Exception::RequiredValue::throw_table_name('for drop trigger')
-      if !$params->{event_object_table};
-    Geoffrey::Exception::RequiredValue::throw_common('event_manipulation')
-      if !$params->{event_manipulation};
-    Geoffrey::Exception::RequiredValue::throw_common('action_timing')
-      if !$params->{action_timing};
-    Geoffrey::Exception::RequiredValue::throw_common('action_orientation')
-      if !$params->{action_orientation};
-    Geoffrey::Exception::RequiredValue::throw_common('action_statement')
-      if !$params->{action_statement};
+    Geoffrey::Exception::NotSupportedException::throw_action() if !$trigger || !$trigger->alter;
+    Geoffrey::Exception::RequiredValue::throw_trigger_name('for drop trigger') if !$params->{name};
+    Geoffrey::Exception::RequiredValue::throw_table_name('for drop trigger')   if !$params->{event_object_table};
+    Geoffrey::Exception::RequiredValue::throw_common('event_manipulation')     if !$params->{event_manipulation};
+    Geoffrey::Exception::RequiredValue::throw_common('action_timing')          if !$params->{action_timing};
+    Geoffrey::Exception::RequiredValue::throw_common('action_orientation')     if !$params->{action_orientation};
+    Geoffrey::Exception::RequiredValue::throw_common('action_statement')       if !$params->{action_statement};
 
-    return [
-        $self->drop( $params, $options ),
-        $self->add( $params, $options ),
-    ];
+    return [$self->drop($params, $options), $self->add($params, $options),];
 }
 
 sub drop {
-    my ( $self, $name, $table ) = @_;
+    my ($self, $name, $table) = @_;
     my $trigger = $self->converter->trigger;
-    Geoffrey::Exception::NotSupportedException::throw_action()
-      if !$trigger || !$trigger->drop;
-    Geoffrey::Exception::RequiredValue::throw_trigger_name('for drop trigger')
-      if !$name;
-    Geoffrey::Exception::RequiredValue::throw_table_name('for drop trigger')
-      if !$table;
-    return $self->do(
-        Geoffrey::Utils::replace_spare( $trigger->drop, [ $name, $table ] ) );
+    Geoffrey::Exception::NotSupportedException::throw_action() if !$trigger || !$trigger->drop;
+    Geoffrey::Exception::RequiredValue::throw_trigger_name('for drop trigger') if !$name;
+    Geoffrey::Exception::RequiredValue::throw_table_name('for drop trigger')   if !$table;
+    return $self->do(Geoffrey::Utils::replace_spare($trigger->drop, [$name, $table]));
 }
 
 sub list {
-    my ( $self, $schema ) = @_;
+    my ($self, $schema) = @_;
     my $trigger = $self->converter->trigger;
-    if ( !$trigger || !$trigger->list ) {
+    if (!$trigger || !$trigger->list) {
         Geoffrey::Exception::NotSupportedException::throw_action();
     }
-    return $trigger->information(
-        $self->do_arrayref( $trigger->list($schema) ) );
+    return $trigger->information($self->do_arrayref($trigger->list($schema)));
 }
 
 sub _find_same_trigger {
-    my ( $self, $table, $name, $schema ) = @_;
+    my ($self, $table, $name, $schema) = @_;
     my $trigger = $self->converter->trigger;
     return [] if !$trigger->can('find_by_name_and_table');
-    return $self->do_arrayref( $trigger->find_by_name_and_table,
-        [ $table, $name, $schema ] );
+    return $self->do_arrayref($trigger->find_by_name_and_table, [$table, $name, $schema]);
 }
 
 1;
@@ -120,7 +93,7 @@ Geoffrey::Action::Trigger - Action for triggers
 
 =head1 VERSION
 
-Version 0.000102
+Version 0.000103
 
 =head1 DESCRIPTION
 

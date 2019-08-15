@@ -9,12 +9,12 @@ build_requires:
   Test::More: '0'
   Test::Simple: '0.96'
 configure_requires:
-  CPP::panda::lib: v1.0.5
+  CPP::panda::lib: '0'
   ExtUtils::MakeMaker: '6.76'
-  Panda::Install: v1.2.9
-  Panda::XS: v2.1.7
+  Panda::Install: v1.2.16
+  Panda::XS: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,10 +25,10 @@ no_index:
     - t
     - inc
 requires:
-  CPP::panda::lib: v1.0.5
+  CPP::panda::lib: '0'
   Panda::Export: '0'
-  Panda::Install: v1.2.9
-  Panda::XS: v2.1.7
+  Panda::Install: v1.2.16
+  Panda::XS: '0'
   perl: '5.010000'
-version: v3.1.5
+version: v3.1.6
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

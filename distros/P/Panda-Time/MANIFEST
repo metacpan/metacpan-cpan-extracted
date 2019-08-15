@@ -3,6 +3,8 @@ lib/Panda/Time.pm
 lib/Panda/Time.pod
 Makefile.PL
 MANIFEST			This list of files
+META.json
+META.yml
 misc/test_dates_gen.plx
 misc/win32_translist_gen.plx
 src/panda/time.cc
@@ -1285,5 +1287,3 @@ zoneinfo/WET
 zoneinfo/zone.tab
 zoneinfo/zone1970.tab
 zoneinfo/Zulu
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

@@ -14,7 +14,7 @@ struct Object : Sv {
 
     Object (std::nullptr_t = nullptr) {}
 
-    template <class T, typename = panda::enable_if_one_of_t<T,SV,AV,HV,CV,GV>>
+    template <class T, typename = enable_if_rawsv_t<T>>
     Object (T* sv, bool policy = INCREMENT) : Sv(sv, policy) { _validate(); }
 
     Object (const Object& oth) : Sv(oth), _ref(oth._ref)                       {}
@@ -22,14 +22,14 @@ struct Object : Sv {
     Object (const Sv&     oth) : Sv(oth)                                       { _validate(); }
     Object (Sv&&          oth) : Sv(std::move(oth))                            { _validate(); }
 
-    template <class T, typename = panda::enable_if_one_of_t<T,SV,AV,HV,CV,GV>>
+    template <class T, typename = enable_if_rawsv_t<T>>
     Object& operator= (T* val)            { _ref.reset(); Sv::operator=(val); _validate(); return *this; }
     Object& operator= (const Object& oth) { Sv::operator=(oth); _ref = oth._ref; return *this; }
     Object& operator= (Object&& oth)      { Sv::operator=(std::move(oth)); _ref = std::move(oth._ref); return *this; }
     Object& operator= (const Sv& oth)     { _ref.reset(); Sv::operator=(oth); _validate(); return *this; }
     Object& operator= (Sv&& oth)          { _ref.reset(); Sv::operator=(std::move(oth)); _validate(); return *this; }
 
-    template <class T, typename = panda::enable_if_one_of_t<T,SV,AV,HV,CV,GV>>
+    template <class T, typename = enable_if_rawsv_t<T>>
     void set (T* val) { _ref.reset(); Sv::operator=(val); }
 
     Stash stash () const { return SvSTASH(sv); }
@@ -97,7 +97,7 @@ private:
         }
         if (is_undef()) return reset();
         reset();
-        throw std::invalid_argument("wrong SV* type for Object");
+        throw std::invalid_argument("SV is not an Object (blessed value or reference to blessed value)");
     }
 
     void _check_ref () const { if (!_ref || SvRV(_ref) != sv) _ref = Ref::create(sv); }

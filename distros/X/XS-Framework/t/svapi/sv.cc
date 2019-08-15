@@ -52,6 +52,7 @@ TEST_CASE("Sv", "[Sv]") {
         SECTION("HV") { Test::ctor(vars.hv, behaviour_t::VALID); }
         SECTION("CV") { Test::ctor(vars.cv, behaviour_t::VALID); }
         SECTION("GV") { Test::ctor(vars.gv, behaviour_t::VALID); }
+        SECTION("IO") { Test::ctor(vars.io, behaviour_t::VALID); }
         SECTION("Sv") { Test::ctor(my, behaviour_t::VALID); }
     }
 
@@ -62,6 +63,7 @@ TEST_CASE("Sv", "[Sv]") {
         SECTION("HV") { Test::assign(o, vars.hv, behaviour_t::VALID); }
         SECTION("CV") { Test::assign(o, vars.cv, behaviour_t::VALID); }
         SECTION("GV") { Test::assign(o, vars.gv, behaviour_t::VALID); }
+        SECTION("IO") { Test::assign(o, vars.io, behaviour_t::VALID); }
         SECTION("Sv") { Test::assign(o, my, behaviour_t::VALID); }
     }
 
@@ -85,6 +87,7 @@ TEST_CASE("Sv", "[Sv]") {
         SECTION("to HV") { test_cast<HV>((SV*)vars.hv, vars.pv); }
         SECTION("to CV") { test_cast<CV>((SV*)vars.cv, vars.iv); }
         SECTION("to GV") { test_cast<GV>((SV*)vars.gv, vars.iv); }
+        SECTION("to IO") { test_cast<IO>((SV*)vars.io, vars.iv); }
     }
 
     SECTION("get") {
@@ -92,7 +95,8 @@ TEST_CASE("Sv", "[Sv]") {
         SECTION("AV") { test_get<AV>((SV*)vars.av, vars.iv); }
         SECTION("HV") { test_get<HV>((SV*)vars.hv, vars.pv); }
         SECTION("CV") { test_get<CV>((SV*)vars.cv, vars.iv); }
-        SECTION("GV") { test_get<CV>((SV*)vars.gv, vars.iv); }
+        SECTION("GV") { test_get<GV>((SV*)vars.gv, vars.iv); }
+        SECTION("IO") { test_get<IO>((SV*)vars.io, vars.iv); }
     }
 
     SECTION("noinc") { Test::noinc(vars.iv, behaviour_t::VALID); }
@@ -137,6 +141,11 @@ TEST_CASE("Sv", "[Sv]") {
         REQUIRE(sv);
         REQUIRE(sv.defined());
         REQUIRE(sv.is_true());
+
+        sv = vars.io;
+        REQUIRE(sv);
+        REQUIRE(!sv.defined());
+        REQUIRE(!sv.is_true());
     }
 
     SECTION("type") {
@@ -156,6 +165,8 @@ TEST_CASE("Sv", "[Sv]") {
         REQUIRE(sv.type() == SVt_PVMG);
         sv = vars.gv;
         REQUIRE(sv.type() == SVt_PVGV);
+        sv = vars.io;
+        REQUIRE(sv.type() == SVt_PVIO);
     }
 
     SECTION("readonly") {
@@ -245,6 +256,8 @@ TEST_CASE("Sv", "[Sv]") {
         REQUIRE(!o.is_scalar());
         o = vars.gv;
         REQUIRE(o.is_scalar());
+        o = vars.io;
+        REQUIRE(!o.is_scalar());
     }
 
     SECTION("is_ref") {
@@ -267,6 +280,8 @@ TEST_CASE("Sv", "[Sv]") {
         o = vars.stash;
         REQUIRE(!o.is_ref());
         o = vars.gv;
+        REQUIRE(!o.is_ref());
+        o = vars.io;
         REQUIRE(!o.is_ref());
     }
 
@@ -292,6 +307,8 @@ TEST_CASE("Sv", "[Sv]") {
         REQUIRE(!o.is_simple());
         o = vars.gv;
         REQUIRE(!o.is_simple());
+        o = vars.io;
+        REQUIRE(!o.is_simple());
     }
 
     SECTION("is_array") {
@@ -315,6 +332,8 @@ TEST_CASE("Sv", "[Sv]") {
         o = vars.stash;
         REQUIRE(!o.is_array());
         o = vars.gv;
+        REQUIRE(!o.is_array());
+        o = vars.io;
         REQUIRE(!o.is_array());
     }
 
@@ -340,6 +359,8 @@ TEST_CASE("Sv", "[Sv]") {
         REQUIRE(o.is_hash());
         o = vars.gv;
         REQUIRE(!o.is_hash());
+        o = vars.io;
+        REQUIRE(!o.is_hash());
     }
 
     SECTION("is_sub") {
@@ -363,6 +384,8 @@ TEST_CASE("Sv", "[Sv]") {
         o = vars.stash;
         REQUIRE(!o.is_sub());
         o = vars.gv;
+        REQUIRE(!o.is_sub());
+        o = vars.io;
         REQUIRE(!o.is_sub());
     }
 
@@ -388,6 +411,8 @@ TEST_CASE("Sv", "[Sv]") {
         REQUIRE(!o.is_object());
         o = vars.gv;
         REQUIRE(!o.is_object());
+        o = vars.io;
+        REQUIRE(o.is_object());
     }
 
     SECTION("is_stash") {
@@ -411,6 +436,8 @@ TEST_CASE("Sv", "[Sv]") {
         o = vars.stash;
         REQUIRE(o.is_stash());
         o = vars.gv;
+        REQUIRE(!o.is_stash());
+        o = vars.io;
         REQUIRE(!o.is_stash());
     }
 
@@ -436,6 +463,8 @@ TEST_CASE("Sv", "[Sv]") {
         REQUIRE(!o.is_glob());
         o = vars.gv;
         REQUIRE(o.is_glob());
+        o = vars.io;
+        REQUIRE(!o.is_glob());
     }
 
     SECTION("operator==") {
@@ -455,6 +484,9 @@ TEST_CASE("Sv", "[Sv]") {
         o = vars.gv;
         REQUIRE(o == vars.gv);
         REQUIRE(vars.gv == o);
+        o = vars.io;
+        REQUIRE(o == vars.io);
+        REQUIRE(vars.io == o);
     }
 
     SECTION("detach") {

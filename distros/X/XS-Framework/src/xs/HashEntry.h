@@ -31,6 +31,7 @@ struct HashEntry {
     void value (const Array&) = delete;
     void value (const Hash&)  = delete;
     void value (const Sub&)   = delete;
+    void value (const Io&)    = delete;
 
     bool operator== (const HashEntry& oth) const { return he == oth.he; }
 

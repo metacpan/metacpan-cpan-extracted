@@ -1,5 +1,5 @@
 package App::CSV2Chart::Command::xlsx;
-$App::CSV2Chart::Command::xlsx::VERSION = '0.4.0';
+$App::CSV2Chart::Command::xlsx::VERSION = '0.6.0';
 use strict;
 use warnings;
 
@@ -75,13 +75,16 @@ sub execute
     # Create a new chart object. In this case an embedded chart.
     my $chart1 = $workbook->add_chart( type => 'scatter', embedded => 1 );
 
-    # Configure second series. Note alternative use of array ref to define
-    # ranges: [ $sheetname, $row_start, $row_end, $col_start, $col_end ].
-    $chart1->add_series(
-        name       => '=Sheet1!$B$1',
-        categories => [ 'Sheet1', 1, 1 + $h, 0, 0 ],
-        values     => [ 'Sheet1', 1, 1 + $h, 1, 1 ],
-    );
+    foreach my $series_idx ( 0 .. $#$data - 1 )
+    {
+        # Configure second series. Note alternative use of array ref to define
+        # ranges: [ $sheetname, $row_start, $row_end, $col_start, $col_end ].
+        $chart1->add_series(
+            name       => '=Sheet1!$' . chr( ord('B') + $series_idx ) . '$1',
+            categories => [ 'Sheet1', 1, 1 + $h, 0, 0 ],
+            values => [ 'Sheet1', 1, 1 + $h, 1 + $series_idx, 1 + $series_idx ],
+        );
+    }
 
     # Add a chart title and some axis labels.
     $chart1->set_title(
@@ -252,21 +255,13 @@ __END__
 
 =encoding UTF-8
 
-=head1 NAME
-
-App::CSV2Chart::Command::xlsx
-
 =head1 VERSION
 
-version 0.4.0
+version 0.6.0
 
 =head1 NAME
 
 csv2chart xlsx - generate an .xlsx file with an embedded chart from CSV data
-
-=head1 VERSION
-
-version 0.4.0
 
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

@@ -67,6 +67,7 @@ TEST_CASE("Ref", "[Sv]") {
             SECTION("HV")     { Test::ctor((SV*)vars.hv, behaviour_t::THROWS); }
             SECTION("CV")     { Test::ctor((SV*)vars.cv, behaviour_t::THROWS); }
             SECTION("GV")     { Test::ctor((SV*)vars.gv, behaviour_t::THROWS); }
+            SECTION("IO")     { Test::ctor((SV*)vars.io, behaviour_t::THROWS); }
         }
 
         SECTION("Ref")        { Test::ctor(my, behaviour_t::VALID); }
@@ -94,6 +95,7 @@ TEST_CASE("Ref", "[Sv]") {
         SECTION("HV")     { test_create(vars.hv); }
         SECTION("CV")     { test_create(vars.cv); }
         SECTION("GV")     { test_create(vars.gv); }
+        SECTION("IO")     { test_create(vars.io); }
         SECTION("Sv")     { test_create(Sv(vars.pv)); }
         SECTION("Scalar") { test_create(Scalar(vars.iv)); }
         SECTION("Array")  { test_create(Array(vars.av)); }
@@ -103,6 +105,7 @@ TEST_CASE("Ref", "[Sv]") {
         SECTION("Stash")  { test_create(Stash(vars.stash)); }
         SECTION("Glob")   { test_create(Glob(vars.gv)); }
         SECTION("Ref")    { test_create(Ref(vars.rv)); }
+        SECTION("Io")     { test_create(Io(vars.io)); }
     }
 
     SECTION("operator=") {
@@ -116,6 +119,7 @@ TEST_CASE("Ref", "[Sv]") {
             SECTION("HV")        { Test::assign(o, (SV*)vars.hv, behaviour_t::THROWS); }
             SECTION("CV")        { Test::assign(o, (SV*)vars.cv, behaviour_t::THROWS); }
             SECTION("GV")        { Test::assign(o, (SV*)vars.gv, behaviour_t::THROWS); }
+            SECTION("IO")        { Test::assign(o, (SV*)vars.io, behaviour_t::THROWS); }
         }
         SECTION("Ref")        { Test::assign(o, my, behaviour_t::VALID); }
         SECTION("valid Sv")   { Test::assign(o, oth_valid, behaviour_t::VALID); }
@@ -161,6 +165,7 @@ TEST_CASE("Ref", "[Sv]") {
         REQUIRE_THROWS_AS(r.value<Stash>().get(), std::invalid_argument);
         REQUIRE_THROWS_AS(r.value<Glob>().get(), std::invalid_argument);
         REQUIRE_THROWS_AS(r.value<Ref>().get(), std::invalid_argument);
+        REQUIRE_THROWS_AS(r.value<Io>().get(), std::invalid_argument);
 
         SvRV_set(rv, (SV*)vars.av);
         REQUIRE(r.value().get<AV>() == vars.av);
@@ -173,6 +178,7 @@ TEST_CASE("Ref", "[Sv]") {
         REQUIRE_THROWS_AS(r.value<Stash>().get(), std::invalid_argument);
         REQUIRE_THROWS_AS(r.value<Glob>().get(), std::invalid_argument);
         REQUIRE_THROWS_AS(r.value<Ref>().get(), std::invalid_argument);
+        REQUIRE_THROWS_AS(r.value<Io>().get(), std::invalid_argument);
 
         SvRV_set(rv, (SV*)vars.hv);
         REQUIRE(r.value().get<HV>() == vars.hv);
@@ -185,6 +191,7 @@ TEST_CASE("Ref", "[Sv]") {
         REQUIRE_THROWS_AS(r.value<Stash>().get(), std::invalid_argument);
         REQUIRE_THROWS_AS(r.value<Glob>().get(), std::invalid_argument);
         REQUIRE_THROWS_AS(r.value<Ref>().get(), std::invalid_argument);
+        REQUIRE_THROWS_AS(r.value<Io>().get(), std::invalid_argument);
 
         SvRV_set(rv, (SV*)vars.cv);
         REQUIRE(r.value().get<CV>() == vars.cv);
@@ -197,6 +204,7 @@ TEST_CASE("Ref", "[Sv]") {
         REQUIRE_THROWS_AS(r.value<Stash>().get(), std::invalid_argument);
         REQUIRE_THROWS_AS(r.value<Glob>().get(), std::invalid_argument);
         REQUIRE_THROWS_AS(r.value<Ref>().get(), std::invalid_argument);
+        REQUIRE_THROWS_AS(r.value<Io>().get(), std::invalid_argument);
 
         SvRV_set(rv, (SV*)vars.ov);
         REQUIRE(r.value().get<SV>() == vars.ov);
@@ -209,6 +217,7 @@ TEST_CASE("Ref", "[Sv]") {
         REQUIRE_THROWS_AS(r.value<Stash>().get(), std::invalid_argument);
         REQUIRE_THROWS_AS(r.value<Glob>().get(), std::invalid_argument);
         REQUIRE_THROWS_AS(r.value<Ref>().get(), std::invalid_argument);
+        REQUIRE_THROWS_AS(r.value<Io>().get(), std::invalid_argument);
 
         SvRV_set(rv, (SV*)vars.stash);
         REQUIRE(r.value().get<HV>() == vars.stash);
@@ -221,6 +230,7 @@ TEST_CASE("Ref", "[Sv]") {
         REQUIRE(r.value<Stash>().get<HV>() == vars.stash);
         REQUIRE_THROWS_AS(r.value<Glob>().get(), std::invalid_argument);
         REQUIRE_THROWS_AS(r.value<Ref>().get(), std::invalid_argument);
+        REQUIRE_THROWS_AS(r.value<Io>().get(), std::invalid_argument);
 
         SvRV_set(rv, (SV*)vars.gv);
         REQUIRE(r.value().get<GV>() == vars.gv);
@@ -233,6 +243,7 @@ TEST_CASE("Ref", "[Sv]") {
         REQUIRE_THROWS_AS(r.value<Stash>().get(), std::invalid_argument);
         REQUIRE(r.value<Glob>().get<GV>() == vars.gv);
         REQUIRE_THROWS_AS(r.value<Ref>().get(), std::invalid_argument);
+        REQUIRE_THROWS_AS(r.value<Io>().get(), std::invalid_argument);
 
         SvRV_set(rv, vars.rv);
         REQUIRE(r.value().get() == vars.rv);
@@ -245,6 +256,20 @@ TEST_CASE("Ref", "[Sv]") {
         REQUIRE_THROWS_AS(r.value<Stash>().get(), std::invalid_argument);
         REQUIRE_THROWS_AS(r.value<Glob>().get(), std::invalid_argument);
         REQUIRE(r.value<Ref>().get() == vars.rv);
+        REQUIRE_THROWS_AS(r.value<Io>().get(), std::invalid_argument);
+
+        SvRV_set(rv, (SV*)vars.io);
+        REQUIRE(r.value().get<IO>() == vars.io);
+        REQUIRE_THROWS_AS(r.value<Scalar>().get(), std::invalid_argument);
+        REQUIRE_THROWS_AS(r.value<Simple>().get(), std::invalid_argument);
+        REQUIRE_THROWS_AS(r.value<Array>().get(), std::invalid_argument);
+        REQUIRE_THROWS_AS(r.value<Hash>().get(), std::invalid_argument);
+        REQUIRE_THROWS_AS(r.value<Sub>().get(), std::invalid_argument);
+        REQUIRE(r.value<Object>().get() == (SV*)vars.io);
+        REQUIRE_THROWS_AS(r.value<Stash>().get(), std::invalid_argument);
+        REQUIRE_THROWS_AS(r.value<Glob>().get(), std::invalid_argument);
+        REQUIRE_THROWS_AS(r.value<Ref>().get(), std::invalid_argument);
+        REQUIRE(r.value<Io>().get<IO>() == vars.io);
 
         SvRV_set(rv, vars.iv); // do not remove, or double free will occur
     }

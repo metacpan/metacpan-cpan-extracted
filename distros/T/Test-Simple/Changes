@@ -1,4 +1,15 @@
+1.302166  2019-08-15 10:37:01-07:00 America/Los_Angeles
+
+    - Fix context test on older perls
+
+1.302165  2019-08-15 10:21:09-07:00 America/Los_Angeles
+
+    - Better diagnostics when a context is destroyed unexpectedly
+    - Add an event to notify when END phase starts
+
 1.302164  2019-04-27 01:43:44-07:00 America/Los_Angeles
+
+    - No changes since trial
 
 1.302163  2019-04-25 05:45:47-07:00 America/Los_Angeles (TRIAL RELEASE)
 

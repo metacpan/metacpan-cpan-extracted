@@ -5,7 +5,7 @@ use 5.016;
 use strict;
 use warnings;
 
-$Geoffrey::Write::VERSION = '0.000102';
+$Geoffrey::Write::VERSION = '0.000103';
 
 use parent 'Geoffrey::Role::Core';
 
@@ -175,7 +175,7 @@ Geoffrey::Write - Write scheme from existing db.
 
 =head1 VERSION
 
-Version 0.000102
+Version 0.000103
 
 =head1 DESCRIPTION
 

@@ -6,6 +6,8 @@ lib/Panda/Lib.pod
 Logger.xsi
 Makefile.PL
 MANIFEST			This list of files
+META.json
+META.yml
 NativeCallbackDispatcher.xsi
 src/xs/lib/clone.cc
 src/xs/lib/clone.h
@@ -27,5 +29,3 @@ t/08-merge.t
 t/09-CallbackDispatcher.t
 t/99-leaks.t
 typemap
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

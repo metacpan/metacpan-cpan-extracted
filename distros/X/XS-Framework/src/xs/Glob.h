@@ -1,4 +1,5 @@
 #pragma once
+#include <xs/Io.h>
 #include <xs/Sub.h>
 #include <xs/Hash.h>
 #include <xs/Array.h>
@@ -27,6 +28,7 @@ struct Glob : Scalar {
     Glob (const Array&)  = delete;
     Glob (const Hash&)   = delete;
     Glob (const Sub&)    = delete;
+    Glob (const Io&)     = delete;
 
     Glob& operator= (SV* val)           { Scalar::operator=(val); _validate(); return *this; }
     Glob& operator= (GV* val)           { Scalar::operator=(val); return *this; }
@@ -41,35 +43,39 @@ struct Glob : Scalar {
     Glob& operator= (const Array&)      = delete;
     Glob& operator= (const Hash&)       = delete;
     Glob& operator= (const Sub&)        = delete;
+    Glob& operator= (const Io&)         = delete;
 
     void set (SV* val) { Sv::operator=(val); }
-    void set (GV* val) { Sv::operator=(val); }
 
     operator AV* () const = delete;
     operator HV* () const = delete;
     operator CV* () const = delete;
+    operator IO* () const = delete;
     operator GV* () const { return (GV*)sv; }
 
     GV* operator->() const { return (GV*)sv; }
 
     template <typename T = SV> panda::enable_if_one_of_t<T,SV,GV>* get () const { return (T*)sv; }
 
-    template <typename T> panda::enable_if_one_of_t<T,Scalar,Array,Hash,Sub> slot () const;
+    template <typename T> panda::enable_if_one_of_t<T,Scalar,Array,Hash,Sub,Io> slot () const;
 
-    Scalar scalar () const { return sv ? GvSV((GV*)sv) : NULL; }
-    Array  array  () const { return sv ? GvAV((GV*)sv) : NULL; }
-    Hash   hash   () const { return sv ? GvHV((GV*)sv) : NULL; }
-    Sub    sub    () const { return sv ? GvCV((GV*)sv) : NULL; }
+    Scalar scalar () const { return sv ? GvSV((GV*)sv) : nullptr; }
+    Array  array  () const { return sv ? GvAV((GV*)sv) : nullptr; }
+    Hash   hash   () const { return sv ? GvHV((GV*)sv) : nullptr; }
+    Sub    sub    () const { return sv ? GvCV((GV*)sv) : nullptr; }
+    Io     io     () const { return sv ? GvIO((GV*)sv) : nullptr; }
 
     void slot (SV*);
     void slot (AV*);
     void slot (HV*);
     void slot (CV*);
+    void slot (IO*);
     void slot (const Scalar&);
     void slot (const Sv&     v) { slot(v.get()); }
     void slot (const Array&  v) { slot(v.get<AV>()); }
     void slot (const Hash&   v) { slot(v.get<HV>()); }
     void slot (const Sub&    v) { slot(v.get<CV>()); }
+    void slot (const Io&     v) { slot(v.get<IO>()); }
     void slot (GV*)             = delete;
     void slot (const Glob&)     = delete;
 
@@ -77,6 +83,7 @@ struct Glob : Scalar {
     void array  (const Array&  val) { slot(val); }
     void hash   (const Hash&   val) { slot(val); }
     void sub    (const Sub&    val) { slot(val); }
+    void io     (const Io&     val) { slot(val); }
 
     Sv get_const () const { return gv_const_sv((GV*)sv); }
 
@@ -90,9 +97,16 @@ private:
     void _validate () {
         if (!sv) return;
         if (type() == SVt_PVGV) return;
+        if (SvROK(sv)) {
+            SV* val = SvRV(sv);
+            if (SvTYPE(val) == SVt_PVGV) {
+                Sv::operator=(val);
+                return;
+            }
+        }
         if (is_undef()) return reset();
         reset();
-        throw std::invalid_argument("wrong SV* type for Glob");
+        throw std::invalid_argument("SV is not a Glob or Glob reference");
     }
 };
 
@@ -100,5 +114,6 @@ template <> inline Scalar Glob::slot<Scalar> () const { return scalar(); }
 template <> inline Array  Glob::slot<Array>  () const { return array(); }
 template <> inline Hash   Glob::slot<Hash>   () const { return hash(); }
 template <> inline Sub    Glob::slot<Sub>    () const { return sub(); }
+template <> inline Io     Glob::slot<Io>     () const { return io(); }
 
 }

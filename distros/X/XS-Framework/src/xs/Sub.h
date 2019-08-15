@@ -29,6 +29,7 @@ struct Sub : Sv {
     Sub (const Array&)  = delete;
     Sub (const Hash&)   = delete;
     Sub (const Glob&)   = delete;
+    Sub (const Io&)     = delete;
 
     Sub& operator= (SV* val)        { Sv::operator=(val); _validate(); return *this; }
     Sub& operator= (CV* val)        { Sv::operator=(val); return *this; }
@@ -40,6 +41,7 @@ struct Sub : Sv {
     Sub& operator= (const Array&)   = delete;
     Sub& operator= (const Hash&)    = delete;
     Sub& operator= (const Glob&)    = delete;
+    Sub& operator= (const Io&)      = delete;
 
     void set (SV* val) { Sv::operator=(val); }
 
@@ -47,6 +49,7 @@ struct Sub : Sv {
     operator HV* () const = delete;
     operator CV* () const { return (CV*)sv; }
     operator GV* () const = delete;
+    operator IO* () const = delete;
 
     CV* operator-> () const { return (CV*)sv; }
 
@@ -109,7 +112,7 @@ private:
         }
         if (is_undef()) return reset();
         reset();
-        throw std::invalid_argument("wrong SV* type for Sub");
+        throw std::invalid_argument("SV is not a Sub or Sub reference");
     }
 
     void _throw_super () const;

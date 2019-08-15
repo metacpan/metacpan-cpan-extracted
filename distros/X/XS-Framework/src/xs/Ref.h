@@ -18,9 +18,10 @@ struct Ref : Scalar {
 
     Ref (const Simple&) = delete;
     Ref (const Glob&)   = delete;
-    Ref (const Array&) = delete;
-    Ref (const Hash&)  = delete;
-    Ref (const Sub&)   = delete;
+    Ref (const Array&)  = delete;
+    Ref (const Hash&)   = delete;
+    Ref (const Sub&)    = delete;
+    Ref (const Io&)     = delete;
 
     static Ref create (SV* sv = nullptr, bool policy = INCREMENT) {
         SV* rv;
@@ -32,6 +33,7 @@ struct Ref : Scalar {
     static Ref create (HV* sv, bool policy = INCREMENT) { return create((SV*)sv, policy); }
     static Ref create (CV* sv, bool policy = INCREMENT) { return create((SV*)sv, policy); }
     static Ref create (GV* sv, bool policy = INCREMENT) { return create((SV*)sv, policy); }
+    static Ref create (IO* sv, bool policy = INCREMENT) { return create((SV*)sv, policy); }
 
     static Ref create (const Sv& o) { return create(o.get()); }
 
@@ -76,10 +78,11 @@ struct Ref : Scalar {
     Ref& operator= (const Array&)  = delete;
     Ref& operator= (const Hash&)   = delete;
     Ref& operator= (const Sub&)    = delete;
+    Ref& operator= (const Io&)     = delete;
 
     void set (SV* val) { Scalar::set(val); }
 
-    template <class T = Sv> enable_if_sv_t<T,T> value () const { return T(sv ? SvRV(sv) : NULL); }
+    template <class T = Sv> enable_if_sv_t<T,T> value () const { return T(sv ? SvRV(sv) : nullptr); }
 
     void value (SV* val, bool policy = INCREMENT) {
         if (!val) val = &PL_sv_undef;
@@ -94,6 +97,7 @@ struct Ref : Scalar {
     void value (HV* val, bool policy = INCREMENT) { value((SV*)val, policy); }
     void value (CV* val, bool policy = INCREMENT) { value((SV*)val, policy); }
     void value (GV* val, bool policy = INCREMENT) { value((SV*)val, policy); }
+    void value (IO* val, bool policy = INCREMENT) { value((SV*)val, policy); }
     void value (const Sv& val)                    { value(val.get()); }
     void value (std::nullptr_t)                   { value((SV*)nullptr); }
 
@@ -103,7 +107,7 @@ private:
         if (SvROK(sv)) return;
         if (is_undef()) return reset();
         reset();
-        throw std::invalid_argument("wrong SV* type for Ref");
+        throw std::invalid_argument("SV is not a reference");
     }
 };
 

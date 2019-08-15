@@ -5,7 +5,7 @@ use 5.016;
 use strict;
 use warnings;
 
-$Geoffrey::Exception::Template::VERSION = '0.000102';
+$Geoffrey::Exception::Template::VERSION = '0.000103';
 
 use Exception::Class 1.23 (
     'Geoffrey::Exception::Template' => { description => 'Unidentified exception', },

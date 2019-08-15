@@ -1,10 +1,10 @@
 =head1 NAME
 
-Panda::Install::ParseXS - Adds new features for TYPEMAPS and XS code
+Panda::Install::ParseXS - [DEPRECATED] Adds new features for TYPEMAPS and XS code
 
 =head1 AUTHOR
 
-Pronin Oleg <syber@crazypanda.ru>, Crazy Panda, CP Decision LTD
+Pronin Oleg <syber@crazypanda.ru>, Crazy Panda LTD
 
 =head1 LICENSE
 

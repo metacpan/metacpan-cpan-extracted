@@ -8,6 +8,13 @@ template <> SV* _get_xv<Scalar> (const char* name) { return get_sv(name, 0); }
 template <> SV* _get_xv<Array>  (const char* name) { return (SV*)get_av(name, 0); }
 template <> SV* _get_xv<Hash>   (const char* name) { return (SV*)get_hv(name, 0); }
 template <> SV* _get_xv<Sub>    (const char* name) { return (SV*)get_cv(name, 0); }
+template <> SV* _get_xv<Io>     (const char* name) {
+    panda::string code = "*";
+    code += name;
+    code += "{IO}";
+    auto ret = eval_pv(code.c_str(), 1);
+    return ret;
+}
 
 template <class SlotClass, class T>
 void test_set_slot (Glob& o, T* sv) {
@@ -66,6 +73,7 @@ TEST_CASE("Glob", "[Sv]") {
             SECTION("SHV")    { Test::ctor((SV*)vars.stash, behaviour_t::THROWS); }
             SECTION("CV")     { Test::ctor((SV*)vars.cv, behaviour_t::THROWS); }
             SECTION("GV")     { Test::ctor((SV*)vars.gv, behaviour_t::VALID); }
+            SECTION("IO")     { Test::ctor((SV*)vars.io, behaviour_t::THROWS); }
         }
         SECTION("GV") { Test::ctor(vars.gv, behaviour_t::VALID); }
 
@@ -87,6 +95,7 @@ TEST_CASE("Glob", "[Sv]") {
             SECTION("SHV")       { Test::assign(o, (SV*)vars.stash, behaviour_t::THROWS); }
             SECTION("CV")        { Test::assign(o, (SV*)vars.cv, behaviour_t::THROWS); }
             SECTION("GV")        { Test::assign(o, (SV*)vars.gv, behaviour_t::VALID); }
+            SECTION("IO")        { Test::assign(o, (SV*)vars.io, behaviour_t::THROWS); }
         }
         SECTION("GV")         { Test::assign(o, vars.gv, behaviour_t::VALID); }
         SECTION("Glob")       { Test::assign(o, my, behaviour_t::VALID); }
@@ -96,20 +105,11 @@ TEST_CASE("Glob", "[Sv]") {
 
     SECTION("set") {
         Glob o;
-        SECTION("SV") {
-            auto cnt = SvREFCNT(vars.iv);
-            o.set(vars.iv); // no checks
-            REQUIRE(o);
-            REQUIRE(SvREFCNT(vars.iv) == cnt+1);
-            REQUIRE(o.get() == vars.iv);
-        }
-        SECTION("GV") {
-            auto cnt = SvREFCNT(vars.pv);
-            o.set((GV*)vars.pv); // no checks
-            REQUIRE(o);
-            REQUIRE(SvREFCNT(vars.hv) == cnt+1);
-            REQUIRE(o.get<GV>() == (GV*)vars.pv);
-        }
+        auto cnt = SvREFCNT(vars.iv);
+        o.set(vars.iv); // no checks
+        REQUIRE(o);
+        REQUIRE(SvREFCNT(vars.iv) == cnt+1);
+        REQUIRE(o.get() == vars.iv);
     }
 
     SECTION("cast") {

@@ -1,0 +1,102 @@
+- id: 003.03-maz
+  author: "Mario Zieschang"
+  entries:
+    - action: view.add
+      name: 'view_client'
+      as:  'SELECT "user".guest, "user".pass, "user".salt, "user".locale, "user".last_login, "user".mail, "user".client, "user".flag, "user".active, "user".name, company.name AS company, client.id FROM client, company, "user" WHERE client.id = company.id AND company.id = "user".id AND "user".id = client.id'
+
+- id: 003.04-maz
+  author: "Mario Zieschang"
+  entries:
+    - action: sql.add
+      as:  'SELECT * FROM "user"'
+
+- id: 003.05-maz
+  author: "Mario Zieschang"
+  entries:
+    - action: table.alter
+      name: '"user"'
+      alter:
+        - {action: 'column.add', name: 'drop_test', type: integer }
+        - {action: 'column.drop', name: 'drop_test', type: integer }
+
+- id: 003.06-maz
+  author: "Mario Zieschang"
+  entries:
+    - action: table.add
+      name: 'drop_table_test'
+      template: 'tpl_std_client_ref'
+    - action: table.drop
+      name: 'drop_table_test'
+
+- id: 003.07-maz
+  author: "Mario Zieschang"
+  entries:
+    - action: table.add
+      name: 'add_foreign_test'
+      template: 'tpl_std_client_ref'
+      columns:
+        - name: player1
+          type: integer
+
+- id: 003.08-maz
+  author: "Mario Zieschang"
+  entries:
+    - action: constraint.alter
+      name: 'add_foreign_test'
+      alter:
+        - action: 'foreign_key.add'
+          name: player1
+          reftable: 'team'
+          refcolumn: 'id'
+
+- id: 003.09-maz
+  author: "Mario Zieschang"
+  entries:
+    - action: table.drop
+      name: 'add_foreign_test'
+
+- id: 003.10-maz
+  author: "Mario Zieschang"
+  entries:
+    - action: table.add
+      name: 'add_unique_test'
+      template: 'tpl_std_client_ref'
+      columns:
+          - name: player1
+            type: integer
+
+- id: 003.11-maz
+  author: "Mario Zieschang"
+  entries:
+    - action: table.alter
+      name: 'add_unique_test'
+      alter:
+        - action: 'constraint.unique.add'
+          name: add_unique_test_id_player1
+          columns: [ id, player1 ]
+
+- id: 003.12-maz
+  author: "Mario Zieschang"
+  entries:
+    - action: table.drop
+      name: 'add_unique_test'
+
+- id: 003.13-maz
+  author: Mario Zieschang
+  entries:
+    - columns:
+        - { lenght: 50, name: cent_name, type: varchar }
+        - { name: decimal_places, notnull: 1, type: integer }
+        - { lenght: 10, name: currency_key, type: varchar }
+        - { lenght: 10, name: symbol, type: varchar }
+      template: 'tpl_std'
+      name: currencies
+      type: createtable
+    - columns: [ name, currency_key, decimal_places, cent_name, symbol ]
+      table: currencies
+      type: insert
+      values:
+          - [ Euro, cent, 3, EUR, "€" ]
+          - [ Dollar, Cent, 3, USD, $ ]
+          - [ Swiss fran, Rappen, 2, CHF, CHF ]

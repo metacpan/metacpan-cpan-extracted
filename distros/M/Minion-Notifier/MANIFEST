@@ -5,6 +5,7 @@ MANIFEST
 MANIFEST.SKIP
 META.json
 META.yml
+README
 cpanfile
 lib/Minion/Notifier.pm
 lib/Minion/Notifier/Transport.pm

@@ -25,6 +25,7 @@ struct KeyProxy : Scalar {
     KeyProxy& operator= (const Array&) = delete;
     KeyProxy& operator= (const Hash&)  = delete;
     KeyProxy& operator= (const Sub&)   = delete;
+    KeyProxy& operator= (const Io&)    = delete;
 
     KeyProxy operator[] (size_t key);
     KeyProxy operator[] (const panda::string_view& key);

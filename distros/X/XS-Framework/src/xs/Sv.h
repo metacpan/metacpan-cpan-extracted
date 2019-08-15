@@ -7,11 +7,11 @@
 
 namespace xs {
 
-struct Sv; struct Scalar; struct Simple; struct Ref; struct Array; struct Hash; struct List; struct Sub; struct Stash; struct Glob; struct Object;
+struct Sv; struct Scalar; struct Simple; struct Ref; struct Array; struct Hash; struct List; struct Sub; struct Stash; struct Glob; struct Object; struct Io;
 using xs::my_perl;
 
-template <class T, class R = T> using enable_if_sv_t    = std::enable_if_t<panda::is_one_of<T,Sv,Scalar,Ref,Simple,Object,Sub,Hash,Array,Glob,Stash,List>::value, R>;
-template <class T, class R = T> using enable_if_rawsv_t = std::enable_if_t<panda::is_one_of<T,SV,AV,HV,CV,GV>::value, R>;
+template <class T, class R = T> using enable_if_sv_t    = std::enable_if_t<panda::is_one_of<T,Sv,Scalar,Ref,Simple,Object,Sub,Hash,Array,Glob,Stash,List,Io>::value, R>;
+template <class T, class R = T> using enable_if_rawsv_t = std::enable_if_t<panda::is_one_of<T,SV,AV,HV,CV,GV,IO>::value, R>;
 
 struct Sv {
     static const bool INCREMENT = true;
@@ -72,6 +72,7 @@ struct Sv {
     operator HV*   () const { return is_hash()  ? (HV*)sv : nullptr; }
     operator CV*   () const { return is_sub()   ? (CV*)sv : nullptr; }
     operator GV*   () const { return is_glob()  ? (GV*)sv : nullptr; }
+    operator IO*   () const { return is_io()    ? (IO*)sv : nullptr; }
     operator void* () const { return sv; } // resolves ambiguity for passing to perl-macros-api
 
     // unsafe getters (faster)
@@ -93,15 +94,19 @@ struct Sv {
     bool   is_string      () const { return sv && SvPOK(sv); }
     bool   is_like_number () const { return sv && looks_like_number(sv); }
     bool   is_array       () const { return sv && type() == SVt_PVAV; }
-    bool   is_array_ref   () const { return sv && SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVAV; }
+    bool   is_array_ref   () const { return is_ref_of_type(SVt_PVAV); }
     bool   is_hash        () const { return sv && type() == SVt_PVHV; }
-    bool   is_hash_ref    () const { return sv && SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVHV; }
+    bool   is_hash_ref    () const { return is_ref_of_type(SVt_PVHV); }
     bool   is_sub         () const { return sv && type() == SVt_PVCV; }
-    bool   is_sub_ref     () const { return sv && SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVCV; }
+    bool   is_sub_ref     () const { return is_ref_of_type(SVt_PVCV); }
     bool   is_glob        () const { return sv && type() == SVt_PVGV; }
     bool   is_object      () const { return sv && SvOBJECT(sv); }
-    bool   is_object_ref  () const { return sv && SvROK(sv) && SvOBJECT(SvRV(sv)); }
+    bool   is_object_ref  () const { return is_ref() && SvOBJECT(SvRV(sv)); }
     bool   is_stash       () const { return is_hash() && HvNAME(sv); }
+    bool   is_io          () const { return sv && type() == SVt_PVIO; }
+    bool   is_io_ref      () const { return is_ref_of_type(SVt_PVIO); }
+
+    bool is_ref_of_type (svtype type) const { return sv && SvROK(sv) && SvTYPE(SvRV(sv)) == type; }
 
     void readonly (bool val) {
         if (val) SvREADONLY_on(sv);

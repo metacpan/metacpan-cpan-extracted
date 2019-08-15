@@ -23,6 +23,7 @@ TEST_CASE("Array", "[Sv]") {
             SECTION("from OAV")       { Test::ctor((SV*)vars.oav, behaviour_t::VALID); }
             SECTION("from HV")        { Test::ctor((SV*)vars.hv, behaviour_t::THROWS); }
             SECTION("from CV")        { Test::ctor((SV*)vars.cv, behaviour_t::THROWS); }
+            SECTION("from IO")        { Test::ctor((SV*)vars.io, behaviour_t::THROWS); }
         }
         SECTION("from AV") { Test::ctor(vars.av, behaviour_t::VALID); }
 
@@ -57,6 +58,7 @@ TEST_CASE("Array", "[Sv]") {
             SECTION("OAV")       { Test::assign(o, (SV*)vars.oav, behaviour_t::VALID); }
             SECTION("HV")        { Test::assign(o, (SV*)vars.hv, behaviour_t::THROWS); }
             SECTION("CV")        { Test::assign(o, (SV*)vars.cv, behaviour_t::THROWS); }
+            SECTION("IO")        { Test::assign(o, (SV*)vars.io, behaviour_t::THROWS); }
         }
         SECTION("AV")         { Test::assign(o, vars.av, behaviour_t::VALID); }
         SECTION("Array")      { Test::assign(o, my, behaviour_t::VALID); }

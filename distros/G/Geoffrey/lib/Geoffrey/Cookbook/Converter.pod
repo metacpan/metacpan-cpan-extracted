@@ -1,5 +1,5 @@
 package Geoffrey::Cookbook::converter;
-$Geoffrey::Cookbook::converter::VERSION = '0.000102';
+$Geoffrey::Cookbook::converter::VERSION = '0.000103';
 __END__
 
 =pod
@@ -10,7 +10,7 @@ Geoffrey::Cookbook::converter - A gentle introduction to Geoffrey
 
 =head1 VERSION
 
-Version 0.000102
+Version 0.000103
 
 
 =head1 DESCRIPTION

@@ -1,0 +1,60 @@
+=head1 NAME
+
+XS::Framework::Manual::SVAPI::Io - XS::Framework IO C++ class reference
+
+=head1 Io
+
+=head2 Overview
+
+The C<Io> class is the wrapper around Perls C<IO*> type. As with other type, it might hold an underlying Perl C<SV*> or might not.
+
+The C<Io> object does not holds C<undef>; if C<undef> is assigned or supplied
+in constructor, the object is considered I<empty>. In other words the
+C<undef> and C<NULL> have the same meaning for the class.
+
+An C<IO> is a structure which corresponds to a Perl file handles, sockets, pipes, etc, for example C<*STDOUT{IO}>.
+
+=head2 Construction
+
+To create an wrapper around existing C<IO*> the following constructors can be used:
+
+    Io (std::nullptr_t = nullptr)
+    Io (SV* sv, bool policy = INCREMENT)
+    Io (GV* sv, bool policy = INCREMENT)
+    Io (IO* sv, bool policy = INCREMENT)
+    Io (const Io& oth)
+    Io (Io&&      oth)
+    Io (const Sv& oth)
+    Io (Sv&&      oth)
+
+If arguments is C<undef> or C<NULL>, the returned C<Io> object will be
+empty.
+
+Supported values are
+
+=over
+
+=item IO
+
+=item Reference to IO
+
+=item Glob containing non-null IO slot
+
+=item Reference to glob containing non-null IO slot
+
+=back
+
+Otherwise, if unappropriate value is supplied, then exception will be
+thrown.
+
+As with all other SVAPI classes, assigment operators, C<get>, C<set> and dereferencing are supported.
+
+=head2 int fileno() const
+
+Returns file descriptor of underlying PerlIO. This method is NULL-unsafe.
+
+=head2 char iotype() const
+
+Returns the type of underlying PerlIO as per C<IoTYPE()>. This method is NULL-unsafe.
+
+=cut

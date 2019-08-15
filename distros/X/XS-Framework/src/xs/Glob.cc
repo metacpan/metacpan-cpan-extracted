@@ -33,9 +33,10 @@ void Glob::slot (SV* val) {
     GV* gv = (GV*)sv;
     if (!val || SvTYPE(val) <= SVt_PVMG) _set_slot(&GvSV(gv), val);
     else switch (SvTYPE(val)) {
-        case SVt_PVCV: _set_slot(gv, (CV*)val); break;
-        case SVt_PVHV: _set_slot((SV**)&GvHV(gv), val); break;
-        case SVt_PVAV: _set_slot((SV**)&GvAV(gv), val); break;
+        case SVt_PVCV: _set_slot(gv, (CV*)val);          break;
+        case SVt_PVHV: _set_slot((SV**)&GvHV(gv),  val); break;
+        case SVt_PVAV: _set_slot((SV**)&GvAV(gv),  val); break;
+        case SVt_PVIO: _set_slot((SV**)&GvIOp(gv), val); break;
         default: throw std::invalid_argument("can set unsupported type to a typeglob");
     }
 }
@@ -43,6 +44,7 @@ void Glob::slot (SV* val) {
 void Glob::slot (AV* val)           { _set_slot((SV**)&GvAV((GV*)sv), (SV*)val); }
 void Glob::slot (HV* val)           { _set_slot((SV**)&GvHV((GV*)sv), (SV*)val); }
 void Glob::slot (CV* val)           { _set_slot((GV*)sv, val); }
+void Glob::slot (IO* val)           { _set_slot((SV**)&GvIOp((GV*)sv), (SV*)val); }
 void Glob::slot (const Scalar& val) { _set_slot(&GvSV((GV*)sv), val); }
 
 }

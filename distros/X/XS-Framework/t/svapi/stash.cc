@@ -26,6 +26,7 @@ TEST_CASE("Stash", "[Sv]") {
             SECTION("SHV")       { Test::ctor((SV*)vars.stash, behaviour_t::VALID); }
             SECTION("CV")        { Test::ctor((SV*)vars.cv, behaviour_t::THROWS); }
             SECTION("GV")        { Test::ctor((SV*)vars.gv, behaviour_t::THROWS); }
+            SECTION("IO")        { Test::ctor((SV*)vars.io, behaviour_t::THROWS); }
         }
         SECTION("HV")  { Test::ctor(vars.hv, behaviour_t::THROWS); }
         SECTION("OHV") { Test::ctor(vars.ohv, behaviour_t::THROWS); }
@@ -56,6 +57,7 @@ TEST_CASE("Stash", "[Sv]") {
             SECTION("SHV")       { Test::assign(o, (SV*)vars.stash, behaviour_t::VALID); }
             SECTION("CV")        { Test::assign(o, (SV*)vars.cv, behaviour_t::THROWS); }
             SECTION("GV")        { Test::assign(o, (SV*)vars.gv, behaviour_t::THROWS); }
+            SECTION("IO")        { Test::assign(o, (SV*)vars.io, behaviour_t::THROWS); }
         }
         SECTION("HV")           { Test::assign(o, vars.hv, behaviour_t::THROWS); }
         SECTION("OHV")          { Test::assign(o, vars.ohv, behaviour_t::THROWS); }
@@ -172,6 +174,11 @@ TEST_CASE("Stash", "[Sv]") {
                 my["test"] = v.get();
                 REQUIRE(my["test"] == v);
             }
+            SECTION("IO") {
+                Io v(vars.io);
+                my["test"] = v.get();
+                REQUIRE(my["test"].io() == v);
+            }
         }
         SECTION("AV") {
             auto v = Array::create();
@@ -204,6 +211,11 @@ TEST_CASE("Stash", "[Sv]") {
             REQUIRE(!my["test"].array());
             REQUIRE(!my["test"].hash());
             REQUIRE(!my["test"].sub());
+        }
+        SECTION("IO") {
+            Io v(vars.io);
+            my["test"] = v.get<IO>();
+            REQUIRE(my["test"].io() == v);
         }
         SECTION("Sv") {
             Sv v = Simple(100);
@@ -273,6 +285,11 @@ TEST_CASE("Stash", "[Sv]") {
             REQUIRE(!my["test"].hash());
             REQUIRE(!my["test"].sub());
         }
+        SECTION("Io") {
+            Io v(vars.io);
+            my["test"] = v;
+            REQUIRE(my["test"].io() == v);
+        }
     }
 
     SECTION("store") {
@@ -329,6 +346,14 @@ TEST_CASE("Stash", "[Sv]") {
         my.sub("test", v);
         REQUIRE(my["test"].sub() == v);
         REQUIRE(my.sub("test") == v);
+    }
+
+    SECTION("io") {
+        REQUIRE(!my.io("jopa"));
+        auto v = Io(vars.io);
+        my.io("test", v);
+        REQUIRE(my["test"].io() == v);
+        REQUIRE(my.io("test") == v);
     }
 
     SECTION("path") {

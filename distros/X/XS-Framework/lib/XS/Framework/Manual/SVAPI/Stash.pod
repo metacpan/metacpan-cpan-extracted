@@ -93,12 +93,14 @@ to thrown exception.
     void store (const panda::string_view& key, HV* v)
     void store (const panda::string_view& key, CV* v)
     void store (const panda::string_view& key, GV* v)
+    void store (const panda::string_view& key, IO* v)
     void store (const panda::string_view& key, const Sv&     v)
     void store (const panda::string_view& key, const Scalar& v)
     void store (const panda::string_view& key, const Array&  v)
     void store (const panda::string_view& key, const Hash&   v)
     void store (const panda::string_view& key, const Sub&    v)
     void store (const panda::string_view& key, const Glob&   v)
+    void store (const panda::string_view& key, const Io&     v)
 
 The NULL-safe C<store> method allows to inject the new value into the stash.
 The exception will be thrown if the stash object is empty.
@@ -110,11 +112,13 @@ values, when the type is known:
     Array  array  (const panda::string_view& name) const
     Hash   hash   (const panda::string_view& name) const
     Sub    sub    (const panda::string_view& name) const
+    Io     io     (const panda::string_view& name) const
 
     void scalar (const panda::string_view& name, const Scalar& v)
     void array  (const panda::string_view& name, const Array&  v)
     void hash   (const panda::string_view& name, const Hash&   v)
     void sub    (const panda::string_view& name, const Sub&    v)
+    void io     (const panda::string_view& name, const Io&     v)
 
 The read-access is NULL-safe; the write-access (i.e assignment) on empty C<Stash>
 throws exception. Usage example:

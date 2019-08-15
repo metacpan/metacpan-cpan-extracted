@@ -35,6 +35,7 @@ struct Hash : Sv {
     Hash (const Array&)  = delete;
     Hash (const Sub&)    = delete;
     Hash (const Glob&)   = delete;
+    Hash (const Io&)     = delete;
 
     Hash (const std::initializer_list<std::pair<panda::string_view, Scalar>>&);
 
@@ -48,6 +49,7 @@ struct Hash : Sv {
     Hash& operator= (const Array&)    = delete;
     Hash& operator= (const Sub&)      = delete;
     Hash& operator= (const Glob&)     = delete;
+    Hash& operator= (const Io&)       = delete;
 
     void set (SV* val) { Sv::operator=(val); }
 
@@ -55,6 +57,7 @@ struct Hash : Sv {
     operator HV* () const { return (HV*)sv; }
     operator CV* () const = delete;
     operator GV* () const = delete;
+    operator IO* () const = delete;
 
     HV* operator-> () const { return (HV*)sv; }
 
@@ -83,6 +86,7 @@ struct Hash : Sv {
     void store (const panda::string_view& key, const Array&,      U32 hash = 0) = delete;
     void store (const panda::string_view& key, const Hash&,       U32 hash = 0) = delete;
     void store (const panda::string_view& key, const Sub&,        U32 hash = 0) = delete;
+    void store (const panda::string_view& key, const Io&,         U32 hash = 0) = delete;
 
     KeyProxy operator[] (const panda::string_view& key) { return KeyProxy(hv_fetch((HV*)sv, key.data(), key.length(), 1), false); }
 
@@ -106,8 +110,7 @@ struct Hash : Sv {
     void undef () { if (sv) hv_undef((HV*)sv); }
     void clear () { if (sv) hv_clear((HV*)sv); }
 
-    class const_iterator : std::iterator<std::forward_iterator_tag, const HashEntry> {
-    public:
+    struct const_iterator : private std::iterator<std::forward_iterator_tag, const HashEntry> {
         const_iterator () : arr(NULL), end(NULL), cur(HashEntry()) {}
 
         const_iterator (HV* hv) : arr(HvARRAY(hv)), end(arr + HvMAX(hv) + 1), cur(HashEntry()) {
@@ -150,8 +153,7 @@ struct Hash : Sv {
         HashEntry cur;
     };
 
-    class iterator : std::iterator<std::forward_iterator_tag, HashEntry>, public const_iterator {
-    public:
+    struct iterator : private std::iterator<std::forward_iterator_tag, HashEntry>, const_iterator {
         using const_iterator::const_iterator;
         HashEntry* operator-> () { return &cur; }
         HashEntry& operator*  () { return cur; }
@@ -179,7 +181,7 @@ private:
         }
         if (is_undef()) return reset();
         reset();
-        throw std::invalid_argument("wrong SV* type for Hash");
+        throw std::invalid_argument("SV is not a Hash or Hash reference");
     }
 };
 

@@ -64,6 +64,7 @@ struct Simple : Scalar {
     Simple (const Array&) = delete;
     Simple (const Hash&)  = delete;
     Simple (const Sub&)   = delete;
+    Simple (const Io&)    = delete;
 
     template <class T, typename = panda::enable_if_arithmetic_t<T>>
     explicit
@@ -115,6 +116,7 @@ struct Simple : Scalar {
     Simple& operator= (const Array&) = delete;
     Simple& operator= (const Hash&)  = delete;
     Simple& operator= (const Sub&)   = delete;
+    Simple& operator= (const Io&)    = delete;
 
     // safe setters (slower)
     template <typename T, typename = panda::enable_if_arithmetic_t<T>>
@@ -188,7 +190,7 @@ private:
         if (!sv) return;
         if (SvTYPE(sv) > SVt_PVMG || SvROK(sv)) {
             reset();
-            throw std::invalid_argument("wrong SV* type for Simple");
+            throw std::invalid_argument("SV is not a number or string");
         }
     }
 };

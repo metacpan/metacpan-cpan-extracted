@@ -7,7 +7,7 @@ use warnings;
 
 use parent 'Geoffrey::Role::Action';
 
-$Geoffrey::Action::View::VERSION = '0.000102';
+$Geoffrey::Action::View::VERSION = '0.000103';
 
 sub add {
     my ( $self, $params ) = @_;
@@ -54,7 +54,7 @@ Geoffrey::Action::View - Handles view actions
 
 =head1 VERSION
 
-Version 0.000102
+Version 0.000103
 
 =head1 DESCRIPTION
 

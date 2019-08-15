@@ -1,5 +1,5 @@
 ---
-abstract: 'useful features and typemaps for XS modules.'
+abstract: '[DEPRECATED] useful features and typemaps for XS modules.'
 author:
   - unknown
 build_requires:
@@ -9,12 +9,11 @@ build_requires:
   Test::More: '0'
   Test::Simple: '0.96'
 configure_requires:
-  CPP::catch::test: v1.0.0
-  CPP::panda::lib: v1.1.1
+  CPP::panda::lib: '0'
   ExtUtils::MakeMaker: '6.76'
-  Panda::Install: v1.2.15
+  Panda::Install: v1.2.16
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,9 +24,8 @@ no_index:
     - t
     - inc
 requires:
-  CPP::catch::test: v1.0.0
-  CPP::panda::lib: v1.1.1
-  Panda::Install: v1.2.15
+  CPP::panda::lib: '0'
+  Panda::Install: v1.2.16
   perl: '5.018000'
-version: v2.1.10
+version: v2.1.11
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

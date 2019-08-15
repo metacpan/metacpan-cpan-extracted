@@ -1,0 +1,170 @@
+NAME
+
+    Minion::Notifier - Notify listeners when a Minion task has completed
+
+SYNOPSIS
+
+      use Mojolicious::Lite;
+    
+      plugin Minion => { Pg => 'posgressql://...'};
+    
+      plugin 'Minion::Notifier';
+    
+      app->minion->add_task( doit => sub { ... } );
+    
+      any '/doit' => sub {
+        my $c = shift;
+        my $id = $c->minion->enqueue(doit => [...]);
+        $c->minion_notifier->on(job => sub {
+          my ($notifier, $job_id, $message) = @_;
+          return unless $job_id eq $id;
+          $c->render( text => "job $id: $message" );
+        });
+      };
+
+DESCRIPTION
+
+    Although Minion is a highly capable job queue, it does not natively
+    have a mechanism to notify listeners when a job has finished or failed.
+    Minion::Notifier provides this feature using pluggable Transport
+    backends. Currently supported are Postgres, Redis, and WebSocket.
+    Postgres support requires Mojo::Pg and Redis requires Mojo::Redis2.
+    WebSockets are native to Mojolicious but you need a broker to manage
+    the connections; Mercury is the author's suggested WebSocket message
+    broker.
+
+    Note that this is an early release and the mechansim for loading
+    plugins, especially third-party plugins is likely to change. Also note
+    that due to the use of messaging buses, the order of events is not
+    guaranteed especially on very fast jobs.
+
+EVENTS
+
+    Minion::Notifier inherits all events from Mojo::EventEmitter and emits
+    the following new ones.
+
+ enqueue
+
+      $notifier->on(enqueue => sub { my ($notifier, $job_id) = @_; ... });
+
+    Emitted whenever any job is enqueued (typically having a state of
+    "inactive"). Note that the event is not repeated as an argument, though
+    this is subject to change.
+
+ dequeue
+
+      $notifier->on(dequeue => sub { my ($notifier, $job_id) = @_; ... });
+
+    Emitted whenever any job is dequeued for processing (typically having a
+    state of "active"). Note that the event is not repeated as an argument,
+    though this is subject to change.
+
+ job
+
+      $notifier->on(job => sub { my ($notifier, $job_id, $event) = @_; ... });
+
+    Emitted on any event from the backend for all jobs. The events are
+    currently "enqueue", "dequeue", "finished", and "failed".
+
+ job:$id
+
+      $notifier->on("job:1234" => sub { my ($notifier, $job_id, $event) = @_; ... });
+
+    Emitted on any message from the backend for specific jobs. Note that
+    the id is still passed so that you may reuse callbacks if desired. The
+    events are currently "enqueue", "dequeue", "finished", and "failed".
+
+    Users of this event are encouraged to carefully consider what race
+    conditions may exist in the act of subscribing to it. For example,
+    Minion::enqueue will emit the "enqueue" event before it even returns
+    the job's id. For this reason, this event is discouraged and may be
+    deprecated/removed in a future release.
+
+ finished
+
+      $notifier->on(finished => sub { my ($notifier, $job_id) = @_; ... });
+
+    Emitted whenever any job reaches a state of "finished". Note that the
+    event is not repeated as an argument, though this is subject to change.
+
+ failed
+
+      $notifier->on(failed => sub { my ($notifier, $job_id) = @_; ... });
+
+    Emitted whenever any job reaches a state of "failed". Note that the
+    event is not repeated as an argument, though this is subject to change.
+
+ATTRIBUTES
+
+    Minion::Notifier inherits all of the attributes from Mojo::EventEmitter
+    and implements the following new ones.
+
+ minion
+
+    The Minion instance to listen to. Note that this attribute is used to
+    gain access to the "application instance".
+
+ transport
+
+    An instance of Minion::Notifier::Transport or more likely a subclass
+    thereof. This is used to moderate the communication between processes
+    and even hosts.
+
+METHODS
+
+    Minion::Notifier inherits all of the methods from Mojo::EventEmitter
+    and implements the following new ones.
+
+ app
+
+    A shortcut for $notifier->minion->app.
+
+ emit_event
+
+    A low level method used to emit the batch of events related to received
+    minion events.
+
+ setup_listener
+
+    Setup the linkages that allow for notifications to be received. This is
+    called automatically by Mojolicious::Plugin::Minion::Notifier once the
+    ioloop has started.
+
+ setup_worker
+
+    Setup the linkages that cause the jobs to send notifications when
+    reaching "finished" or "failed" states. This is called automatically by
+    Mojolicious::Plugin::Minion::Notifier.
+
+FUTURE WORK
+
+      * Document all included classes (hey this is a preview release!)
+
+      * Improve backend loader mechanism
+
+      * Investigate timeout behavior for the various transport backends
+
+SEE ALSO
+
+      * Mojolicious - Real-time web framework
+
+      * Minion - The Mojolicious job queue
+
+      * Mercury - A lightweight message broker using Mojolicious'
+      WebSockets for transport
+
+SOURCE REPOSITORY
+
+    http://github.com/jberger/Minion-Notifier
+
+AUTHOR
+
+    Joel Berger, <joel.a.berger@gmail.com>
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2015 by Joel Berger
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

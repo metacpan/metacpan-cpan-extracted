@@ -3,17 +3,18 @@ digraph G {
                 shape = "record"
         ]
 
-        Sv [label = "{Sv|- sv : SV*}" ]
+        Sv [label = "{Sv}" ]
         Sub [label = "{Sub}" ];
         Array [label = "{Array}" ];
         List [label = "{List}" ];
         Hash [label = "{Hash}" ];
-        Stash [label = "{Stash|- name_sv : Simple}" ]
-        Object [label = "{Object|- ref : Ref}" ];
+        Stash [label = "{Stash}" ]
+        Object [label = "{Object}" ];
         Scalar [label = "{Scalar}" ];
         Simple [label = "{Simple}" ];
         Ref [label = "{Ref}" ];
         Glob [label = "{Glob}" ];
+		Io [label = "{Io}" ];
 
         Sub     -> Sv;
         Array   -> Sv;
@@ -25,4 +26,5 @@ digraph G {
         Simple  -> Scalar;
         Ref     -> Scalar;
         Glob    -> Scalar;
+		Io      -> Sv;
 }

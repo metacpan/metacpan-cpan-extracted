@@ -21,10 +21,10 @@ name: App-CSV2Chart
 provides:
   App::CSV2Chart:
     file: lib/App/CSV2Chart.pm
-    version: v0.4.0
+    version: v0.6.0
   App::CSV2Chart::Command::xlsx:
     file: lib/App/CSV2Chart/Command/xlsx.pm
-    version: v0.4.0
+    version: v0.6.0
 requires:
   App::Cmd::Setup: '0'
   Excel::Writer::XLSX: '0'
@@ -35,7 +35,7 @@ resources:
   bugtracker: https://github.com/shlomif/app-csv2chart/issues
   homepage: http://metacpan.org/release/App-CSV2Chart
   repository: https://github.com/shlomif/CSV2Chart.git
-version: 0.4.0
+version: 0.6.0
 x_Dist_Zilla:
   perl:
     version: '5.028002'
@@ -164,10 +164,6 @@ x_Dist_Zilla:
       name: '@Filter/PodSyntaxTests'
       version: '6.012'
     -
-      class: Dist::Zilla::Plugin::PodVersion
-      name: '@Filter/PodVersion'
-      version: '6.012'
-    -
       class: Dist::Zilla::Plugin::Test::Compile
       config:
         Dist::Zilla::Plugin::Test::Compile:
@@ -246,10 +242,6 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::H1Nester
               name: '@CorePrep/H1Nester'
-              version: '4.015'
-            -
-              class: Pod::Weaver::Section::Name
-              name: '@SHLOMIF/Name'
               version: '4.015'
             -
               class: Pod::Weaver::Section::Version

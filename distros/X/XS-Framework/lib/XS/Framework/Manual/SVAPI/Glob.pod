@@ -14,7 +14,7 @@ The C<Glob> object does not holds C<undef>; if C<undef> is assigned or supplied
 in constructor, the object is considered I<empty>. In other words the
 C<undef> and C<NULL> have the same meaning for the class.
 
-A C<GV >is a structure which corresponds to to a Perl typeglob, ie C<*foo>. It
+A C<GV> is a structure which corresponds to a Perl typeglob, ie C<*foo>. It
 is a structure that holds a pointer to a scalar, an array, a hash etc,
 corresponding to C<$foo>, C<@foo>, C<%foo>.
 
@@ -91,11 +91,13 @@ This are NULL-safe methods. The returned value, however, might be C<NULL>.
     void slot (AV*)
     void slot (HV*)
     void slot (CV*)
+    void slot (IO*)
     void slot (const Scalar&)
     void slot (const Sv&     v)
     void slot (const Array&  v)
     void slot (const Hash&   v)
     void slot (const Sub&    v)
+    void slot (const Io&     v)
 
 This are read/write accessors for appropriate slot type in the C<Glob> instance.
 For example:
@@ -114,17 +116,21 @@ The C<slot> methods are NULL-unsafe.
 
 =head2 sub()
 
+=head2 io()
+
     Scalar scalar () const
     Array  array  () const
     Hash   hash   () const
     Sub    sub    () const
+    Io     io     () const
 
     void scalar (const Scalar& val)
     void array  (const Array&  val)
     void hash   (const Hash&   val)
     void sub    (const Sub&    val)
+    void io     (const Io&     val)
 
-This group of methods provide convenient access to scalar/array/hash/sub slot
+This group of methods provide convenient access to scalar/array/hash/sub/io slot
 of the C<Glob>. The read accessors are NULL-safe, while write-accessors are
 NULL-unsafe.
 

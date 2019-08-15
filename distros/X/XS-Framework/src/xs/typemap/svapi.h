@@ -11,18 +11,6 @@
 
 namespace xs {
 
-namespace typemap { namespace svapi {
-    static inline void _throw (const Scalar&) { throw "arg is not a scalar value"; }
-    static inline void _throw (const Simple&) { throw "arg is not a simple value"; }
-    static inline void _throw (const Ref&)    { throw "arg is not a reference"; }
-    static inline void _throw (const Glob&)   { throw "arg is not a glob value"; }
-    static inline void _throw (const Sub&)    { throw "arg is not a code reference"; }
-    static inline void _throw (const Array&)  { throw "arg is not an array reference"; }
-    static inline void _throw (const Hash&)   { throw "arg is not a hash reference"; }
-    static inline void _throw (const Stash&)  { throw "arg is not a stash reference"; }
-    static inline void _throw (const Object&) { throw "arg is not a blessed reference"; }
-}}
-
 template <> struct Typemap<AV*> : TypemapBase<AV*> {
     static inline AV* in (pTHX_ SV* arg) {
         if (SvROK(arg) && SvTYPE(SvRV(arg)) == SVt_PVAV) return (AV*)SvRV(arg);
@@ -61,13 +49,14 @@ template <> struct Typemap<CV*> : TypemapBase<CV*> {
 
 template <> struct Typemap<IO*> : TypemapBase<IO*> {
     static inline IO* in (pTHX_ SV* arg) {
-        if (SvROK(arg) && SvTYPE(SvRV(arg)) == SVt_PVIO) return (IO*)SvRV(arg);
-        if (SvROK(arg) && SvTYPE(SvRV(arg)) == SVt_PVGV) {
-            IO* var = GvIO(SvRV(arg));
-            if (var) return var;
+        if (SvROK(arg)) {
+            SV* val = SvRV(arg);
+            if (SvTYPE(val) == SVt_PVIO) return (IO*)val;
+            if (SvTYPE(val) == SVt_PVGV && GvIOp(val)) return GvIOp(val);
         }
+        else if (SvTYPE(arg) == SVt_PVGV && GvIOp(arg)) return GvIOp(arg);
         if (!SvOK(arg)) return nullptr;
-        throw "argument is not an IO reference";
+        throw "argument is neither IO reference, nor glob or reference to glob containing IO slot)";
     }
 
     static inline Sv out (pTHX_ IO* var, const Sv& = Sv()) {
@@ -89,49 +78,32 @@ template <> struct Typemap<GV*> : TypemapBase<GV*> {
 };
 
 
-template <> struct Typemap<Sv> : TypemapBase<Sv> {
-    static inline Sv in  (pTHX_ SV* arg) { return arg; }
-    static inline Sv out (pTHX_ const Sv& var, const Sv& = Sv()) {
+template <class TYPE> struct Typemap<Sv, TYPE> : TypemapBase<Sv, TYPE> {
+    static inline TYPE in  (pTHX_ SV* arg) { return arg; }
+    static inline Sv out (pTHX_ const TYPE& var, const Sv& = Sv()) {
         if (!var) return &PL_sv_undef;
         return var;
     }
 };
-
-template <class TYPE> struct Typemap<Scalar, TYPE> : TypemapBase<Scalar, TYPE> {
-    static inline TYPE in (pTHX_ SV* arg) {
-        TYPE ret = arg;
-        if (!ret && SvOK(arg)) typemap::svapi::_throw(TYPE());
-        return ret;
-    }
-    static inline Sv out (pTHX_ const TYPE& var, const Sv& = Sv()) { return var; }
-};
-
-template <> struct Typemap<Simple> : Typemap<Scalar, Simple> {};
-template <> struct Typemap<Ref>    : Typemap<Scalar, Ref>    {};
-template <> struct Typemap<Glob>   : Typemap<Scalar, Glob>   {};
+template <> struct Typemap<Scalar> : Typemap<Sv, Scalar> {};
+template <> struct Typemap<Simple> : Typemap<Sv, Simple> {};
+template <> struct Typemap<Ref>    : Typemap<Sv, Ref>    {};
+template <> struct Typemap<Glob>   : Typemap<Sv, Glob>   {};
 
 template <class TYPE> struct Typemap<Sub, TYPE> : TypemapBase<Sub, TYPE> {
-    static inline TYPE in (pTHX_ SV* arg) {
-        TYPE ret = arg;
-        if (!ret && SvOK(arg)) typemap::svapi::_throw(TYPE());
-        return ret;
-    }
+    static inline TYPE in (pTHX_ SV* arg) { return arg; }
     static inline Sv out (pTHX_ const TYPE& var, const Sv& = Sv()) {
         if (!var) return &PL_sv_undef;
         return Ref::create(var);
     }
 };
-
 template <> struct Typemap<Array> : Typemap<Sub, Array> {};
 template <> struct Typemap<Hash>  : Typemap<Sub, Hash>  {};
 template <> struct Typemap<Stash> : Typemap<Sub, Stash> {};
+template <> struct Typemap<Io>    : Typemap<Sub, Io>    {};
 
 template <> struct Typemap<Object> : TypemapBase<Object> {
-    static inline Object in (pTHX_ SV* arg) {
-        Object ret = arg;
-        if (!ret && SvOK(arg)) typemap::svapi::_throw(Object());
-        return ret;
-    }
+    static inline Object in (pTHX_ SV* arg) { return arg; }
     static inline Sv out (pTHX_ const Object& var, const Sv& = Sv()) {
         if (!var) return &PL_sv_undef;
         return var.ref();

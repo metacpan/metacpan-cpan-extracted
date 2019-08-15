@@ -5,7 +5,7 @@ use 5.016;
 use strict;
 use warnings;
 
-$Geoffrey::Action::Constraint::VERSION = '0.000102';
+$Geoffrey::Action::Constraint::VERSION = '0.000103';
 
 use parent 'Geoffrey::Role::Action';
 
@@ -207,7 +207,7 @@ Geoffrey::Action::Constraint - Action handler for constraint
 
 =head1 VERSION
 
-Version 0.000102
+Version 0.000103
 
 =head1 DESCRIPTION
 

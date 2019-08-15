@@ -38,6 +38,7 @@ struct Array : Sv {
     Array (const Hash&)      = delete;
     Array (const Sub&)       = delete;
     Array (const Glob&)      = delete;
+    Array (const Io&)        = delete;
 
     Array (const std::initializer_list<Scalar>& l, create_type_t type = ALIAS);
 
@@ -51,6 +52,7 @@ struct Array : Sv {
     Array& operator= (const Hash&)      = delete;
     Array& operator= (const Sub&)       = delete;
     Array& operator= (const Glob&)      = delete;
+    Array& operator= (const Io&)        = delete;
 
     void set (SV* val) { Sv::operator=(val); }
 
@@ -58,6 +60,7 @@ struct Array : Sv {
     operator HV* () const = delete;
     operator CV* () const = delete;
     operator GV* () const = delete;
+    operator IO* () const = delete;
 
     AV* operator-> () const { return (AV*)sv; }
 
@@ -93,6 +96,7 @@ struct Array : Sv {
     void store (size_t key, const Array&)   = delete;
     void store (size_t key, const Hash&)    = delete;
     void store (size_t key, const Sub&)     = delete;
+    void store (size_t key, const Io&)      = delete;
 
     KeyProxy operator[] (size_t key) { return KeyProxy(_svlist() + key, true); }
 
@@ -140,6 +144,7 @@ struct Array : Sv {
     void push (const Array&) = delete;
     void push (const Hash&)  = delete;
     void push (const Sub&)   = delete;
+    void push (const Io&)    = delete;
     void push (SV* v)        { push(Scalar(v)); }
     void push (const Sv& v)  { push(Scalar(v)); }
 
@@ -149,14 +154,14 @@ struct Array : Sv {
     void unshift (const Array&) = delete;
     void unshift (const Hash&)  = delete;
     void unshift (const Sub&)   = delete;
+    void unshift (const Io&)    = delete;
     void unshift (SV* v)        { unshift(Scalar(v)); }
     void unshift (const Sv& v)  { unshift(Scalar(v)); }
 
     void undef () { if (sv) av_undef((AV*)sv); }
     void clear () { if (sv) av_clear((AV*)sv); }
 
-    class const_iterator : std::iterator<std::random_access_iterator_tag, const Scalar> {
-    public:
+    struct const_iterator : private std::iterator<std::random_access_iterator_tag, const Scalar> {
         const_iterator ()                          : cur(nullptr) {}
         const_iterator (SV** avfirst)              : cur(avfirst) {}
 
@@ -188,8 +193,7 @@ struct Array : Sv {
         SV** cur;
     };
 
-    class iterator : std::iterator<std::random_access_iterator_tag, Scalar>, public const_iterator {
-    public:
+    struct iterator : private std::iterator<std::random_access_iterator_tag, Scalar>, const_iterator {
         using const_iterator::const_iterator;
 
         iterator& operator++ () { const_iterator::operator++(); return *this; }
@@ -234,7 +238,7 @@ private:
         }
         if (is_undef()) return reset();
         reset();
-        throw std::invalid_argument("wrong SV* type for Array");
+        throw std::invalid_argument("SV is not an Array or Array reference");
     }
 };
 
@@ -259,6 +263,7 @@ struct List : public Array {
     List (const Hash&)   = delete;
     List (const Sub&)    = delete;
     List (const Glob&)   = delete;
+    List (const Io&)     = delete;
 
     List& operator= (SV* val)          { Array::operator=(val); return *this; }
     List& operator= (AV* val)          { Array::operator=(val); return *this; }
@@ -271,6 +276,7 @@ struct List : public Array {
     List& operator= (const Hash&)   = delete;
     List& operator= (const Sub&)    = delete;
     List& operator= (const Glob&)   = delete;
+    List& operator= (const Io&)     = delete;
 };
 
 }

@@ -24,6 +24,10 @@ struct perlvars {
     SV* oavr;
     HV* ohv;
     SV* ohvr;
+    IO* io;
+    SV* ior;
+    GV* iog;
+    SV* iogr;
 
     perlvars () {
         undef = newSV(0);
@@ -48,31 +52,39 @@ struct perlvars {
         if (!gvref) throw std::logic_error("should not happen");
         gv = (GV*)(*gvref);
         gvr = newRV((SV*)gv);
+
+        ior  = SvREFCNT_inc(eval_pv("*STDOUT{IO}", 1));
+        io   = (IO*)SvRV(ior);
+        iog  = (GV*)eval_pv("*STDOUT", 1);
+        iogr = newRV((SV*)iog);
     }
 
     ~perlvars () {
-        SvREFCNT_dec_NN(undef);
-        SvREFCNT_dec_NN(iv);
-        SvREFCNT_dec_NN(pv);
-        SvREFCNT_dec_NN(av);
-        SvREFCNT_dec_NN(hv);
-        SvREFCNT_dec_NN(rv);
-        SvREFCNT_dec_NN(cvr);
-        SvREFCNT_dec_NN(gvr);
-        SvREFCNT_dec_NN(ovr);
-        SvREFCNT_dec_NN(oavr);
-        SvREFCNT_dec_NN(ohvr);
+        SvREFCNT_dec(undef);
+        SvREFCNT_dec(iv);
+        SvREFCNT_dec(pv);
+        SvREFCNT_dec(av);
+        SvREFCNT_dec(hv);
+        SvREFCNT_dec(rv);
+        SvREFCNT_dec(cvr);
+        SvREFCNT_dec(gvr);
+        SvREFCNT_dec(ovr);
+        SvREFCNT_dec(oavr);
+        SvREFCNT_dec(ohvr);
+        SvREFCNT_dec(ior);
+        SvREFCNT_dec(iogr);
     }
 };
 
 template <class TestClass>
 struct TestSv {
 
-    template <class T>
-    static void ctor (T* sv, behaviour_t behaviour, T* check = NULL) {
+    template <class T, class TC = T>
+    static void ctor (T* sv, behaviour_t behaviour, TC* check = nullptr) {
         SECTION("default") { _ctor(sv, behaviour, Sv::INCREMENT, check); }
         SECTION("noinc")   { _ctor(sv, behaviour, Sv::NONE, check); }
     }
+
     template <class T>
     static void ctor (T& src, behaviour_t behaviour) {
         SECTION("copy") { _ctor(src, behaviour, false); }
@@ -107,8 +119,8 @@ struct TestSv {
         REQUIRE(SvREFCNT(sv) == rcnt-1);
     }
 
-    template <class T>
-    static void assign (const TestClass& o, T* sv, behaviour_t behaviour, T* check = NULL) {
+    template <class T, class TC = T>
+    static void assign (const TestClass& o, T* sv, behaviour_t behaviour, TC* check = nullptr) {
         REQUIRE(o);
         SECTION("default")  { _assign(o, sv, behaviour, check); }
         SECTION("to empty") { _assign(TestClass(), sv, behaviour, check); }
@@ -128,9 +140,9 @@ struct TestSv {
     }
 
 private:
-    template <class T>
-    static void _ctor (T* sv, behaviour_t behaviour, bool policy, T* check) {
-        if (!check) check = sv;
+    template <class T, class TC>
+    static void _ctor (T* sv, behaviour_t behaviour, bool policy, TC* check) {
+        if (!check) check = (TC*)sv;
         auto cnt = SvREFCNT(check);
         if (policy == Sv::NONE) SvREFCNT_inc(sv);
         {
@@ -140,7 +152,7 @@ private:
                         TestClass o(sv, policy);
                         REQUIRE(o);
                         REQUIRE(SvREFCNT(check) == cnt+1);
-                        REQUIRE(o.template get<T>() == check);
+                        REQUIRE(o.template get<TC>() == check);
                     }
                     break;
                 case behaviour_t::EMPTY:
@@ -188,9 +200,9 @@ private:
         REQUIRE(SvREFCNT(sv) == cnt-move);
     }
 
-    template <class T>
-    static void _assign (const TestClass& co, T* sv, behaviour_t behaviour, T* check) {
-        if (!check) check = sv;
+    template <class T, class TC>
+    static void _assign (const TestClass& co, T* sv, behaviour_t behaviour, TC* check) {
+        if (!check) check = (TC*)sv;
         SV* src = co;
         auto src_cnt = src ? SvREFCNT(src) : 0;
         auto cnt = SvREFCNT(check);
@@ -200,13 +212,13 @@ private:
                 case behaviour_t::VALID:
                     o = sv;
                     REQUIRE(o);
-                    REQUIRE(o.template get<T>() == check);
+                    REQUIRE(o.template get<TC>() == check);
                     REQUIRE(SvREFCNT(check) == cnt + 1);
                     break;
                 case behaviour_t::EMPTY:
                     o = sv;
                     REQUIRE(!o);
-                    REQUIRE(o.template get<T>() == nullptr);
+                    REQUIRE(o.template get<TC>() == nullptr);
                     REQUIRE(SvREFCNT(check) == cnt);
                     break;
                 case behaviour_t::THROWS:

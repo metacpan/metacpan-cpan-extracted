@@ -103,6 +103,7 @@ TEST_CASE("Simple", "[Sv]") {
             SECTION("HV")     { Test::ctor((SV*)vars.hv, behaviour_t::THROWS); }
             SECTION("CV")     { Test::ctor((SV*)vars.cv, behaviour_t::THROWS); }
             SECTION("GV")     { Test::ctor((SV*)vars.gv, behaviour_t::THROWS); }
+            SECTION("IO")     { Test::ctor((SV*)vars.io, behaviour_t::THROWS); }
         }
 
         SECTION("Simple")     { Test::ctor(my, behaviour_t::VALID); }
@@ -139,6 +140,7 @@ TEST_CASE("Simple", "[Sv]") {
         SECTION("HV")     { Test::noinc((SV*)vars.hv, behaviour_t::THROWS); }
         SECTION("CV")     { Test::noinc((SV*)vars.cv, behaviour_t::THROWS); }
         SECTION("GV")     { Test::noinc((SV*)vars.gv, behaviour_t::THROWS); }
+        SECTION("IO")     { Test::noinc((SV*)vars.io, behaviour_t::THROWS); }
     }
 
     SECTION("format") {
@@ -158,6 +160,7 @@ TEST_CASE("Simple", "[Sv]") {
             SECTION("HV")     { Test::assign(o, (SV*)vars.hv, behaviour_t::THROWS); }
             SECTION("CV")     { Test::assign(o, (SV*)vars.cv, behaviour_t::THROWS); }
             SECTION("GV")     { Test::assign(o, (SV*)vars.gv, behaviour_t::THROWS); }
+            SECTION("IO")     { Test::assign(o, (SV*)vars.io, behaviour_t::THROWS); }
         }
         SECTION("Simple")     { Test::assign(o, my, behaviour_t::VALID); }
         SECTION("valid Sv")   { Test::assign(o, oth_valid, behaviour_t::VALID); }

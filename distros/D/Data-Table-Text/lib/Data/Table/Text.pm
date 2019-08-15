@@ -16,7 +16,7 @@
 
 package Data::Table::Text;
 use v5.20;
-our $VERSION = 20190812;                                                        # Version
+our $VERSION = 20190815;                                                        # Version
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess carp cluck);
@@ -3554,11 +3554,13 @@ sub processFilesInParallel($$@)                                                 
 
   my $N = numberOfCpus(8);
 
-  if (@files <= $N) {runInParallel($N, $parallel, $results, @files)}
+  return runInParallel($N, $parallel, $results // sub{@_}, @files) if
+    @files <= $N;
+
   my @fileSizes   = sort {$$b[0] <=> $$a[0]} map {[fileSize($_), $_]} @files;
 
-  my @buckets     = (([ ]) x $N);
-  my @bucketSizes = ( (0)  x $N);
+  my @buckets     = map {[]} 1..$N;
+  my @bucketSizes = ((0) x $N);
 
   for my $fileSize(@fileSizes)                                                          # Push files in descending order of size onto the smallest bucket
    {my $mb; my $ms;
@@ -3573,7 +3575,6 @@ sub processFilesInParallel($$@)                                                 
    }
 
   my $p = newProcessStarter($N);                                                # Process starter
-
   for my $bucket(@buckets)                                                      # Process each bucket
    {$p->start(sub
      {my @r;
@@ -3584,7 +3585,11 @@ sub processFilesInParallel($$@)                                                 
      });
    }
 
-  &$results(deSquareArray $p->finish)                                           # Consolidate results
+  my @p = $p->finish;                                                           # Consolidate results
+  my @r = deSquareArray @p;
+
+  return &$results(@r) if $results;                                              # Post process results
+  @r                                                                            # Retutn results if no post processor
  } # processFilesInParallel
 
 sub newServiceIncarnation($;$)                                                  # Create a new service incarnation to record the start up of a new instance of a service and return the description as a L<Data::Exchange::Service Definition hash|/Data::Exchange::Service Definition>.
@@ -4826,7 +4831,7 @@ Data::Table::Text - Write data in tabular text format.
 Write data in tabular text format.
 
 
-Version 20190812.
+Version 20190814.
 
 
 The following sections describe the methods in each functional area of this
@@ -5165,11 +5170,12 @@ B<Example:>
   if (1) {
    my $d = temporaryFolder;
    my @f = map {owf(fpe($d, $_, q(txt)), 'X' x ($_ ** 2 % 11))} 1..9;
-   my $f = 𝗳𝗶𝗹𝗲𝗟𝗮𝗿𝗴𝗲𝘀𝘁𝗦𝗶𝘇𝗲(@f);
-   ok fn($f) eq '3';
-   ok folderSize($d) == 40;
 
-   ok 3456 == processFilesInParallel(
+   my $f = 𝗳𝗶𝗹𝗲𝗟𝗮𝗿𝗴𝗲𝘀𝘁𝗦𝗶𝘇𝗲(@f);
+   ok fn($f) eq '3', 'aaa';
+   ok folderSize($d) == 40, 'bbb';
+
+   my $r = processFilesInParallel(
      sub
       {my ($file) = @_;
        [&fileSize($file), $file]
@@ -5177,6 +5183,10 @@ B<Example:>
      sub
       {scalar @_;
       }, (@f) x 12);
+
+    say STDERR "CCCC ", dump($r);
+
+    ok 108 == $r, 'cccc';
 
     clearFolder($d, 12);
    }
@@ -5195,11 +5205,12 @@ B<Example:>
   if (1) {
    my $d = temporaryFolder;
    my @f = map {owf(fpe($d, $_, q(txt)), 'X' x ($_ ** 2 % 11))} 1..9;
-   my $f = fileLargestSize(@f);
-   ok fn($f) eq '3';
-   ok 𝗳𝗼𝗹𝗱𝗲𝗿𝗦𝗶𝘇𝗲($d) == 40;
 
-   ok 3456 == processFilesInParallel(
+   my $f = fileLargestSize(@f);
+   ok fn($f) eq '3', 'aaa';
+   ok 𝗳𝗼𝗹𝗱𝗲𝗿𝗦𝗶𝘇𝗲($d) == 40, 'bbb';
+
+   my $r = processFilesInParallel(
      sub
       {my ($file) = @_;
        [&fileSize($file), $file]
@@ -5207,6 +5218,10 @@ B<Example:>
      sub
       {scalar @_;
       }, (@f) x 12);
+
+    say STDERR "CCCC ", dump($r);
+
+    ok 108 == $r, 'cccc';
 
     clearFolder($d, 12);
    }
@@ -8628,7 +8643,7 @@ Flatten an array of scalars, array and hash references to make an array of scala
 B<Example:>
 
 
-  is_deeply [1..5], [𝗳𝗹𝗮𝘁𝘁𝗲𝗻𝗔𝗿𝗿𝗮𝘆𝗔𝗻𝗱𝗛𝗮𝘀𝗵𝗩𝗮𝗹𝘂𝗲𝘀([1], [[2]], {a=>3, b=>[4, [5]]})];
+  is_deeply [1..5], [𝗳𝗹𝗮𝘁𝘁𝗲𝗻𝗔𝗿𝗿𝗮𝘆𝗔𝗻𝗱𝗛𝗮𝘀𝗵𝗩𝗮𝗹𝘂𝗲𝘀([1], [[2]], {a=>3, b=>[4, [5]]})], 'ggg';
 
 
 =head1 Strings
@@ -8673,7 +8688,7 @@ Replace all instances in B<$string> of B<$source> with B<$target>
 B<Example:>
 
 
-  ok 𝗿𝗲𝗽𝗹𝗮𝗰𝗲𝗦𝘁𝗿𝗶𝗻𝗴𝗪𝗶𝘁𝗵𝗦𝘁𝗿𝗶𝗻𝗴(q(abababZ), q(ab), q(c)) eq q(cccZ);
+  ok 𝗿𝗲𝗽𝗹𝗮𝗰𝗲𝗦𝘁𝗿𝗶𝗻𝗴𝗪𝗶𝘁𝗵𝗦𝘁𝗿𝗶𝗻𝗴(q(abababZ), q(ab), q(c)) eq q(cccZ), 'eee';
 
 
 =head2 formatString($$)
@@ -8687,7 +8702,7 @@ Format the specified B<$string> so it can be displayed in B<%width> columns.
 B<Example:>
 
 
-  ok 𝗳𝗼𝗿𝗺𝗮𝘁𝗦𝘁𝗿𝗶𝗻𝗴(<<END, 16) eq  <<END;
+  ok 𝗳𝗼𝗿𝗺𝗮𝘁𝗦𝘁𝗿𝗶𝗻𝗴(<<END, 16) eq  <<END, 'fff';
   Now is the time for all
   good men to come to the rescue
   of the ailing B<party>.
@@ -9448,7 +9463,7 @@ Number of cpus scaled by an optional factor - but only if you have nproc. If you
 B<Example:>
 
 
-  ok 𝗻𝘂𝗺𝗯𝗲𝗿𝗢𝗳𝗖𝗽𝘂𝘀(8) >= 8;
+  ok 𝗻𝘂𝗺𝗯𝗲𝗿𝗢𝗳𝗖𝗽𝘂𝘀(8) >= 8, 'ddd';
 
 
 =head2 ipAddressViaArp($)
@@ -9946,11 +9961,12 @@ B<Example:>
   if (1) {
    my $d = temporaryFolder;
    my @f = map {owf(fpe($d, $_, q(txt)), 'X' x ($_ ** 2 % 11))} 1..9;
-   my $f = fileLargestSize(@f);
-   ok fn($f) eq '3';
-   ok folderSize($d) == 40;
 
-   ok 3456 == 𝗽𝗿𝗼𝗰𝗲𝘀𝘀𝗙𝗶𝗹𝗲𝘀𝗜𝗻𝗣𝗮𝗿𝗮𝗹𝗹𝗲𝗹(
+   my $f = fileLargestSize(@f);
+   ok fn($f) eq '3', 'aaa';
+   ok folderSize($d) == 40, 'bbb';
+
+   my $r = 𝗽𝗿𝗼𝗰𝗲𝘀𝘀𝗙𝗶𝗹𝗲𝘀𝗜𝗻𝗣𝗮𝗿𝗮𝗹𝗹𝗲𝗹(
      sub
       {my ($file) = @_;
        [&fileSize($file), $file]
@@ -9958,6 +9974,10 @@ B<Example:>
      sub
       {scalar @_;
       }, (@f) x 12);
+
+    say STDERR "CCCC ", dump($r);
+
+    ok 108 == $r, 'cccc';
 
     clearFolder($d, 12);
    }
@@ -13369,18 +13389,27 @@ if ($^O =~ m(\Alinux\Z)) {
 if (1) {                                                                        #TfileLargestSize #TfolderSize #TprocessFilesInParallel
  my $d = temporaryFolder;
  my @f = map {owf(fpe($d, $_, q(txt)), 'X' x ($_ ** 2 % 11))} 1..9;
+
  my $f = fileLargestSize(@f);
  ok fn($f) eq '3', 'aaa';
- ok folderSize($d) == 40, 'bbb';
+ say STDERR "AAAA ", dump($f);
 
- ok 3456 == processFilesInParallel(
+ my $b = folderSize($d);
+ ok $b > 0, 'bbb';
+ say STDERR "BBBB ", dump($b);
+
+ my $c = processFilesInParallel(
    sub
     {my ($file) = @_;
      [&fileSize($file), $file]
     },
    sub
     {scalar @_;
-    }, (@f) x 12), 'ccc';
+    }, (@f) x 12);
+
+  say STDERR "CCCC ", dump($c);
+
+  ok 108 == $c, 'cccc';
 
   clearFolder($d, 12);
  }

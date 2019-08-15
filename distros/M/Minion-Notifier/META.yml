@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'App::ModuleBuildTiny version 0.018, CPAN::Meta::Converter version 2.150010'
+generated_by: 'App::ModuleBuildTiny version 0.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,7 +18,7 @@ name: Minion-Notifier
 provides:
   Minion::Notifier:
     file: lib/Minion/Notifier.pm
-    version: '0.06'
+    version: '0.07'
   Minion::Notifier::Transport:
     file: lib/Minion/Notifier/Transport.pm
   Minion::Notifier::Transport::Pg:
@@ -36,5 +36,5 @@ resources:
   bugtracker: http://github.com/jberger/Minion-Notifier/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/jberger/Minion-Notifier
-version: '0.06'
+version: '0.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

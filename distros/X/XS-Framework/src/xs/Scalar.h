@@ -29,6 +29,7 @@ struct Scalar : Sv {
     Scalar (const Array&) = delete;
     Scalar (const Hash&)  = delete;
     Scalar (const Sub&)   = delete;
+    Scalar (const Io&)    = delete;
 
     Scalar& operator= (SV* val) {
         Sv::operator=(val);
@@ -62,6 +63,7 @@ struct Scalar : Sv {
     Scalar& operator= (const Array&) = delete;
     Scalar& operator= (const Hash&)  = delete;
     Scalar& operator= (const Sub&)   = delete;
+    Scalar& operator= (const Io&)    = delete;
 
     void set (SV* val) { Sv::operator=(val); }
     void set (GV* val) { Sv::operator=(val); }
@@ -69,6 +71,7 @@ struct Scalar : Sv {
     operator AV* () const = delete;
     operator HV* () const = delete;
     operator CV* () const = delete;
+    operator IO* () const = delete;
 
     template <class T = SV> panda::enable_if_one_of_t<T,SV,GV>* get () const { return (T*)sv; }
 
@@ -88,7 +91,7 @@ private:
         if (!sv) return;
         if (is_scalar_unsafe()) return;
         reset();
-        throw std::invalid_argument("wrong SV* type for Scalar");
+        throw std::invalid_argument("SV is not a scalar value");
     }
 };
 

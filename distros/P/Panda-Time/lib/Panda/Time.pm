@@ -4,7 +4,7 @@ use 5.012;
 use CPP::panda::lib;
 use Panda::Install::Payload;
 
-our $VERSION = '3.1.5';
+our $VERSION = '3.1.6';
 
 require Panda::XSLoader;
 Panda::XSLoader::bootstrap('Panda::Time', $VERSION);

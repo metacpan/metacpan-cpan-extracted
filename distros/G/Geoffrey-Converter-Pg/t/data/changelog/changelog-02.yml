@@ -1,0 +1,125 @@
+- id: 002.01-maz
+  author: "Mario Zieschang"
+  entries:
+    - action: table.add
+      name: '"user"'
+      template: 'tpl_std_client_ref'
+      columns:
+          - name: mail
+            type: varchar
+            lenght: 255
+            notnull: 1
+            default: current
+          - name: last_login
+            type: timestamp
+            default: current
+          - name: locale
+            type: char
+          - name: salt
+            type: varchar
+            lenght: 255
+            notnull: 1
+            default: current
+          - name: pass
+            type: varchar
+            lenght: 255
+            notnull: 1
+            default: current
+    - action: table.add
+      name: 'player'
+      template: 'tpl_std_company_ref'
+      columns:
+          - name: surname
+            type: varchar
+            lenght: 255
+            notnull: 1
+            default: current
+
+- id: 002.02-maz
+  author: "Mario Zieschang"
+  entries:
+    - action: table.add
+      name: 'team'
+      template: 'tpl_std_company_ref'
+      columns:
+        - name: player1
+          type: integer
+          notnull: 1
+          foreignkey:
+            reftable: 'player'
+            refcolumn: 'id'
+        - name: player2
+          type: integer
+          notnull: 1
+          foreignkey:
+            reftable: 'player'
+            refcolumn: 'id'
+    - action: table.add
+      name: 'match_player'
+      template: 'tpl_std_company_ref'
+      columns:
+          - name: player1
+            type: integer
+            notnull: 1
+            foreignkey:
+                reftable: 'player'
+                refcolumn: 'id'
+          - name: player2
+            type: integer
+            notnull: 1
+            foreignkey:
+                reftable: 'player'
+                refcolumn: 'id'
+          - name: player1_ht1
+            type: integer
+          - name: player1_ht2
+            type: integer
+            notnull: 1
+            default: 0
+          - name: player2_ht1
+            type: integer
+          - name: player2_ht2
+            type: integer
+            notnull: 1
+            default: 0
+          - name: duration
+            type: integer
+    - action: table.add
+      name: 'match_team'
+      template: 'tpl_std_company_ref'
+      columns:
+          - name: team1
+            type: integer
+            notnull: 1
+            foreignkey:
+                reftable: 'team'
+                refcolumn: 'id'
+          - name: team2
+            type: integer
+            notnull: 1
+            foreignkey:
+                reftable: 'team'
+                refcolumn: 'id'
+          - name: team1_ht1
+            type: integer
+          - name: team1_ht2
+            type: integer
+            notnull: 1
+            default: 0
+          - name: team2_ht1
+            type: integer
+          - name: team2_ht2
+            type: integer
+            notnull: 1
+            default: 0
+          - name: duration
+            type: integer
+    - action: constraint.index.add
+      name: 'index_test'
+      table: 'match_team'
+      using: btree
+      column: id
+    - action: table.alter
+      name: '"user"'
+      alter:
+          - {action: 'column.add', name: 'guest', type: integer }

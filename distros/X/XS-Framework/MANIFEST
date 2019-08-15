@@ -21,10 +21,10 @@ lib/XS/Framework/Manual/recipe12.pod
 lib/XS/Framework/Manual/recipe13.pod
 lib/XS/Framework/Manual/SVAPI.pod
 lib/XS/Framework/Manual/SVAPI/Array.pod
-lib/XS/Framework/Manual/SVAPI/CallProxy.pod
 lib/XS/Framework/Manual/SVAPI/exceptions.pod
 lib/XS/Framework/Manual/SVAPI/Glob.pod
 lib/XS/Framework/Manual/SVAPI/Hash.pod
+lib/XS/Framework/Manual/SVAPI/Io.pod
 lib/XS/Framework/Manual/SVAPI/List.pod
 lib/XS/Framework/Manual/SVAPI/Object.pod
 lib/XS/Framework/Manual/SVAPI/perl_destroy.pod
@@ -59,6 +59,8 @@ src/xs/Glob.h
 src/xs/Hash.cc
 src/xs/Hash.h
 src/xs/HashEntry.h
+src/xs/Io.cc
+src/xs/Io.h
 src/xs/KeyProxy.cc
 src/xs/KeyProxy.h
 src/xs/Object.cc
@@ -122,6 +124,8 @@ t/svapi/glob.cc
 t/svapi/glob.t
 t/svapi/hash.cc
 t/svapi/hash.t
+t/svapi/io.cc
+t/svapi/io.t
 t/svapi/object.cc
 t/svapi/object.t
 t/svapi/ref.cc

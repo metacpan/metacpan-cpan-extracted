@@ -3,6 +3,8 @@ lib/Panda/next.pm
 lib/Panda/next.pod
 Makefile.PL
 MANIFEST			This list of files
+META.json
+META.yml
 next.xs
 perf.plx
 src/xs/next.cc
@@ -29,5 +31,3 @@ t/perl/next_NEXT_utf8.t
 t/perl/next_skip.t
 t/perl/next_skip_utf8.t
 t/test.pl
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

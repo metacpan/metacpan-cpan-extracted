@@ -1,0 +1,56 @@
+{
+   "abstract" : "module for Geoffrey::Changelog to load changeset from database tables.",
+   "author" : [
+      "Mario Zieschang <mziescha@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Geoffrey-Changelog-Database",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Geoffrey" : "0.000103",
+            "SQL::Abstract" : "0",
+            "perl" : "5.024000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://gitlab.com/GeoffreyDB/Geoffrey-Changelog-Database.git",
+         "web" : "https://gitlab.com/GeoffreyDB/Geoffrey-Changelog-Database"
+      }
+   },
+   "version" : "0.000100",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

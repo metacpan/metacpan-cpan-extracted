@@ -5,7 +5,7 @@ use 5.016;
 use strict;
 use warnings;
 
-$Geoffrey::Role::Core::VERSION = '0.000102';
+$Geoffrey::Role::Core::VERSION = '0.000103';
 
 sub new {
     my $class = shift;
@@ -28,20 +28,6 @@ sub new {
 sub converter_name {
     $_[0]->{converter_name} //= 'SQLite';
     return $_[0]->{converter_name};
-}
-
-sub db_changelog_columns {
-    $_[0]->{db_changelog_columns} //= [
-        qw/
-            created_by
-            geoffrey_version
-            comment
-            id
-            filename
-            md5sum
-            /
-    ];
-    return $_[0]->{db_changelog_columns};
 }
 
 sub io_name {
@@ -84,7 +70,7 @@ Geoffrey::Role::Core - Abstract core class.
 
 =head1 VERSION
 
-Version 0.000102
+Version 0.000103
 
 =head1 DESCRIPTION
 
@@ -114,8 +100,6 @@ Returns the dbchangelog table name if none is set then
 
 Returns the table name for the possible environments if none is set then
 'geoffrey_environments' is used for it
-
-=head2 db_changelog_columns
 
 Returns the dbchangelog table column names for insert db logs
 

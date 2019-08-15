@@ -22,6 +22,7 @@ struct Stash : Hash {
         op_proxy& operator= (AV* v) { _throw(); slot(v); return *this; }
         op_proxy& operator= (HV* v) { _throw(); slot(v); return *this; }
         op_proxy& operator= (CV* v) { _throw(); slot(v); return *this; }
+        op_proxy& operator= (IO* v) { _throw(); slot(v); return *this; }
         op_proxy& operator= (GV*);
         op_proxy& operator= (std::nullptr_t)    { return operator=((SV*)NULL); }
         op_proxy& operator= (const Sv& v)       { return operator=(v.get()); }
@@ -29,6 +30,7 @@ struct Stash : Hash {
         op_proxy& operator= (const Array& v)    { _throw(); slot(v); return *this; }
         op_proxy& operator= (const Hash& v)     { _throw(); slot(v); return *this; }
         op_proxy& operator= (const Sub& v)      { _throw(); slot(v); return *this; }
+        op_proxy& operator= (const Io& v)       { _throw(); slot(v); return *this; }
         op_proxy& operator= (const Glob& v)     { return operator=(v.get<GV>()); }
         op_proxy& operator= (const op_proxy& v) { return operator=(v.get<GV>()); }
 
@@ -61,6 +63,7 @@ struct Stash : Hash {
     Stash (const Array&)  = delete;
     Stash (const Sub&)    = delete;
     Stash (const Glob&)   = delete;
+    Stash (const Io&)     = delete;
 
     Stash& operator= (SV* val)          { Hash::operator=(val); _validate(); return *this; }
     Stash& operator= (HV* val)          { Hash::operator=(val); _validate(); return *this; }
@@ -74,6 +77,7 @@ struct Stash : Hash {
     Stash& operator= (const Array&)     = delete;
     Stash& operator= (const Sub&)       = delete;
     Stash& operator= (const Glob&)      = delete;
+    Stash& operator= (const Io&)        = delete;
 
     using Hash::set;
     void set (HV* val) { Hash::operator=(val); }
@@ -102,6 +106,7 @@ struct Stash : Hash {
     void store (const string_view& key, const Array&  v) { operator[](key) = v; }
     void store (const string_view& key, const Hash&   v) { operator[](key) = v; }
     void store (const string_view& key, const Sub&    v) { operator[](key) = v; }
+    void store (const string_view& key, const Io&     v) { operator[](key) = v; }
     void store (const string_view& key, const Glob&   v) { operator[](key) = v; }
 
     op_proxy operator[] (const string_view& key) {
@@ -121,11 +126,13 @@ struct Stash : Hash {
     Array  array  (const string_view& name) const { return fetch(name).array(); }
     Hash   hash   (const string_view& name) const { return fetch(name).hash(); }
     Sub    sub    (const string_view& name) const { return fetch(name).sub(); }
+    Io     io     (const string_view& name) const { return fetch(name).io(); }
 
     void scalar (const string_view& name, const Scalar& v) { operator[](name) = v; }
     void array  (const string_view& name, const Array&  v) { operator[](name) = v; }
     void hash   (const string_view& name, const Hash&   v) { operator[](name) = v; }
     void sub    (const string_view& name, const Sub&    v) { operator[](name) = v; }
+    void io     (const string_view& name, const Io&     v) { operator[](name) = v; }
 
     Sub method (const Sv& name) const {
         GV* gv = gv_fetchmeth_sv((HV*)sv, name, 0, 0);
@@ -198,7 +205,7 @@ private:
         if (HvNAME(sv)) return;
         if (is_undef()) return reset();
         reset();
-        throw std::invalid_argument("wrong SV* type for Stash");
+        throw std::invalid_argument("SV is not a Stash or Stash reference");
     }
 
     void _promote (GV* gv, const panda::string_view& key) const;

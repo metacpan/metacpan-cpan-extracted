@@ -6,7 +6,7 @@ use Cwd 'abs_path';
 use Exporter 'import';
 use Panda::Install::Payload;
 
-our $VERSION = '1.2.16';
+our $VERSION = '1.2.17';
 
 our @EXPORT_OK = qw/write_makefile makemaker_args/;
 our @EXPORT;

@@ -1,17 +1,11 @@
 Revision history for Geoffrey
 
 #========================================================================
-# Version: 0.000100  Date: 2019/08/05 (Mario Zieschang)
+# Version: 0.000103  Date: 2019/08/15 (Mario Zieschang)
 #========================================================================
 
-* Ported from DBIx::Schema::Changelog
-
-
-#========================================================================
-# Version: 0.000101  Date: 2019/08/06 (Mario Zieschang)
-#========================================================================
-
-* fix test plans
+* cleanup changes
+* removed unused sub
 
 #========================================================================
 # Version: 0.000102  Date: 2019/08/14 (Mario Zieschang)
@@ -21,4 +15,14 @@ Revision history for Geoffrey
 * run not executed changessets
 * work to execute already stored but without md5hash
 
+#========================================================================
+# Version: 0.000101  Date: 2019/08/06 (Mario Zieschang)
+#========================================================================
 
+* fix test plans
+
+#========================================================================
+# Version: 0.000100  Date: 2019/08/05 (Mario Zieschang)
+#========================================================================
+
+* Ported from DBIx::Schema::Changelog

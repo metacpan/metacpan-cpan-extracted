@@ -2,7 +2,7 @@ package Test2::Plugin::DBIProfile;
 use strict;
 use warnings;
 
-our $VERSION = '0.001081';
+our $VERSION = '0.001082';
 
 use DBI::Profile;
 use Test2::API qw/test2_add_callback_exit/;
@@ -24,7 +24,7 @@ sub send_profile_event {
     my $data = $p->{Data};
     my ($summary) = $p->format;
 
-    $ctx->send_ev2('DBIProfile' => $data, info => [{tag => 'NOTE', details => $summary}]);
+    $ctx->send_ev2('DBIProfile' => $data, about => {details => $summary});
 }
 
 1;

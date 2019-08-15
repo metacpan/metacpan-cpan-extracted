@@ -20,12 +20,14 @@ TEST_CASE("Object", "[Sv]") {
             SECTION("RV-OSV") { Test::ctor(vars.ovr, behaviour_t::VALID, vars.ov);  }
             SECTION("RV-OAV") { Test::ctor(vars.oavr, behaviour_t::VALID, (SV*)vars.oav); }
             SECTION("RV-OHV") { Test::ctor(vars.ohvr, behaviour_t::VALID, (SV*)vars.ohv); }
+            SECTION("RV-OIO") { Test::ctor(vars.ior, behaviour_t::VALID, (SV*)vars.io); }
             SECTION("AV")     { Test::ctor((SV*)vars.av, behaviour_t::THROWS); }
             SECTION("OAV")    { Test::ctor((SV*)vars.oav, behaviour_t::VALID); }
             SECTION("HV")     { Test::ctor((SV*)vars.hv, behaviour_t::THROWS); }
             SECTION("OHV")    { Test::ctor((SV*)vars.ohv, behaviour_t::VALID); }
             SECTION("CV")     { Test::ctor((SV*)vars.cv, behaviour_t::THROWS); }
             SECTION("GV")     { Test::ctor((SV*)vars.gv, behaviour_t::THROWS); }
+            SECTION("OIO")    { Test::ctor((SV*)vars.io, behaviour_t::VALID); }
         }
         SECTION("AV") {
             SECTION("AV")     { Test::ctor(vars.av, behaviour_t::THROWS); }
@@ -37,6 +39,7 @@ TEST_CASE("Object", "[Sv]") {
         }
         SECTION("CV")         { Test::ctor(vars.cv, behaviour_t::THROWS); }
         SECTION("GV")         { Test::ctor(vars.gv, behaviour_t::THROWS); }
+        SECTION("OIO")        { Test::ctor(vars.io, behaviour_t::VALID); }
 
         SECTION("Object")     { Test::ctor(my, behaviour_t::VALID); }
         SECTION("valid Sv")   { Test::ctor(oth_valid, behaviour_t::VALID); }
@@ -66,12 +69,14 @@ TEST_CASE("Object", "[Sv]") {
             SECTION("RV-OSV") { Test::assign(o, vars.ovr, behaviour_t::VALID, vars.ov); }
             SECTION("RV-OAV") { Test::assign(o, vars.oavr, behaviour_t::VALID, (SV*)vars.oav); }
             SECTION("RV-OHV") { Test::assign(o, vars.ohvr, behaviour_t::VALID, (SV*)vars.ohv); }
+            SECTION("RV-OIO") { Test::assign(o, vars.ior, behaviour_t::VALID, (SV*)vars.io); }
             SECTION("AV")     { Test::assign(o, (SV*)vars.av, behaviour_t::THROWS); }
             SECTION("OAV")    { Test::assign(o, (SV*)vars.oav, behaviour_t::VALID); }
             SECTION("HV")     { Test::assign(o, (SV*)vars.hv, behaviour_t::THROWS); }
             SECTION("OHV")    { Test::assign(o, (SV*)vars.ohv, behaviour_t::VALID); }
             SECTION("CV")     { Test::assign(o, (SV*)vars.cv, behaviour_t::THROWS); }
             SECTION("GV")     { Test::assign(o, (SV*)vars.gv, behaviour_t::THROWS); }
+            SECTION("OIO")    { Test::assign(o, (SV*)vars.io, behaviour_t::VALID); }
         }
         SECTION("AV") {
             SECTION("AV")     { Test::assign(o, vars.av, behaviour_t::THROWS); }
@@ -83,6 +88,7 @@ TEST_CASE("Object", "[Sv]") {
         }
         SECTION("CV")         { Test::assign(o, vars.cv, behaviour_t::THROWS); }
         SECTION("GV")         { Test::assign(o, vars.gv, behaviour_t::THROWS); }
+        SECTION("OIO")        { Test::assign(o, vars.io, behaviour_t::VALID); }
 
         SECTION("Object")     { Test::assign(o, my, behaviour_t::VALID); }
         SECTION("valid Sv")   { Test::assign(o, oth_valid, behaviour_t::VALID); }

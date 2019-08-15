@@ -4,13 +4,13 @@
       "Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "App::ModuleBuildTiny version 0.018",
+   "generated_by" : "App::ModuleBuildTiny version 0.024",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Minion-Notifier",
    "prereqs" : {
@@ -21,7 +21,7 @@
       },
       "develop" : {
          "requires" : {
-            "App::ModuleBuildTiny" : "0.018"
+            "App::ModuleBuildTiny" : "0.024"
          }
       },
       "runtime" : {
@@ -41,7 +41,7 @@
    "provides" : {
       "Minion::Notifier" : {
          "file" : "lib/Minion/Notifier.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "Minion::Notifier::Transport" : {
          "file" : "lib/Minion/Notifier/Transport.pm"
@@ -71,6 +71,6 @@
          "url" : "http://github.com/jberger/Minion-Notifier"
       }
    },
-   "version" : "0.06",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.07",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

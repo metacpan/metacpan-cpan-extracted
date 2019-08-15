@@ -28,9 +28,9 @@ sub send {
 
 sub _start {
   my $self = shift;
-  # The pubsub object needs to be refreshed.
-  # Currently this is the best way to do that.
-  $self->pg->pubsub->unlisten($self->channel . '_dummy');
+  # The pubsub object needs to be refreshed or else we'll get
+  # zombies pretty quickly
+  $self->pg->pubsub->reset;
 }
 
 1;

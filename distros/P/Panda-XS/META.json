@@ -1,16 +1,16 @@
 {
-   "abstract" : "useful features and typemaps for XS modules.",
+   "abstract" : "[DEPRECATED] useful features and typemaps for XS modules.",
    "author" : [
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Panda-XS",
    "no_index" : {
@@ -28,17 +28,15 @@
       },
       "configure" : {
          "requires" : {
-            "CPP::catch::test" : "v1.0.0",
-            "CPP::panda::lib" : "v1.1.1",
+            "CPP::panda::lib" : "0",
             "ExtUtils::MakeMaker" : "6.76",
-            "Panda::Install" : "v1.2.15"
+            "Panda::Install" : "v1.2.16"
          }
       },
       "runtime" : {
          "requires" : {
-            "CPP::catch::test" : "v1.0.0",
-            "CPP::panda::lib" : "v1.1.1",
-            "Panda::Install" : "v1.2.15",
+            "CPP::panda::lib" : "0",
+            "Panda::Install" : "v1.2.16",
             "perl" : "5.018000"
          }
       },
@@ -51,6 +49,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v2.1.10",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "v2.1.11",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

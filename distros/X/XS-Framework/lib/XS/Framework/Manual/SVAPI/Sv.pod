@@ -94,10 +94,6 @@ The copy and move constructors are provided; the refcounter is not touched:
     Sv (const Sv& oth)
     Sv (Sv&&      oth)
 
-To extract the scalar result of call, it is possible to consturct C<Sv> as:
-
-    Sv (const CallProxy& p)
-
 =head2 undef, yes, no
 
 There are a few Sv-constants, which represent common values, e.g. :
@@ -113,8 +109,6 @@ There are a few Sv-constants, which represent common values, e.g. :
     Sv& operator= (HV* val)
     Sv& operator= (CV* val)
     Sv& operator= (GV* val)
-    Sv& operator= (const CallProxy& p)
-
     Sv& operator= (const Sv& oth)
 
 The assignment operators are complementaty to the constructors above. As the

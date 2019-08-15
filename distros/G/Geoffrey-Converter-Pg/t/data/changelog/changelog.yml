@@ -1,0 +1,55 @@
+---
+templates:
+    - name: tpl_minimal
+      columns:
+        - name: id
+          type: integer
+          notnull: 1
+          primarykey: 1
+          default: autoincrement
+        - name: active
+          type: bool
+          default: 1
+    - name: tpl_std
+      template: 'tpl_minimal'
+      columns:
+      - name: name
+        type: varchar
+        notnull: 1
+        default: current
+      - name: flag
+        type: timestamp
+        default: current
+        notnull: 1
+    - name: tpl_std_client_ref
+      template: 'tpl_std'
+      columns:
+      - name: client
+        type: integer
+        notnull: 1
+        foreignkey:
+          reftable: 'client'
+          refcolumn: 'id'
+    - name: tpl_minimal_client_ref
+      template: 'tpl_minimal'
+      columns:
+       - name: client
+         type: integer
+         notnull: 1
+         foreignkey:
+            reftable: 'client'
+            refcolumn: 'id'
+    - name: tpl_std_company_ref
+      template: 'tpl_std_client_ref'
+      columns:
+        - name: company
+          type: integer
+          notnull: 1
+          foreignkey:
+            reftable: 'company'
+            refcolumn: 'id'
+
+changelogs: 
+  - "01"
+  - "02"
+  - "03"

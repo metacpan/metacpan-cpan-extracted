@@ -59,11 +59,11 @@
    "provides" : {
       "App::CSV2Chart" : {
          "file" : "lib/App/CSV2Chart.pm",
-         "version" : "v0.4.0"
+         "version" : "v0.6.0"
       },
       "App::CSV2Chart::Command::xlsx" : {
          "file" : "lib/App/CSV2Chart/Command/xlsx.pm",
-         "version" : "v0.4.0"
+         "version" : "v0.6.0"
       }
    },
    "release_status" : "stable",
@@ -78,7 +78,7 @@
          "web" : "https://github.com/shlomif/CSV2Chart"
       }
    },
-   "version" : "0.4.0",
+   "version" : "0.6.0",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028002"
@@ -244,11 +244,6 @@
             "version" : "6.012"
          },
          {
-            "class" : "Dist::Zilla::Plugin::PodVersion",
-            "name" : "@Filter/PodVersion",
-            "version" : "6.012"
-         },
-         {
             "class" : "Dist::Zilla::Plugin::Test::Compile",
             "config" : {
                "Dist::Zilla::Plugin::Test::Compile" : {
@@ -349,11 +344,6 @@
                      {
                         "class" : "Pod::Weaver::Plugin::H1Nester",
                         "name" : "@CorePrep/H1Nester",
-                        "version" : "4.015"
-                     },
-                     {
-                        "class" : "Pod::Weaver::Section::Name",
-                        "name" : "@SHLOMIF/Name",
                         "version" : "4.015"
                      },
                      {
@@ -547,6 +537,6 @@
       }
    },
    "x_generated_by_perl" : "v5.28.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
 }
 

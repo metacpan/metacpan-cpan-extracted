@@ -22,7 +22,7 @@ requires:
 resources:
   bugtracker: http://github.com/Test-More/test-more/issues
   repository: http://github.com/Test-More/test-more/
-version: '1.302164'
+version: '1.302166'
 x_breaks:
   Log::Dispatch::Config::TestLog: '<= 0.02'
   Net::BitTorrent: '<= 0.052'
@@ -45,5 +45,5 @@ x_breaks:
   Test::SharedFork: '<= 0.34'
   Test::UseAllModules: '>= 0.12, <= 0.14'
   Test::Wrapper: '<= v0.3.0'
-x_generated_by_perl: v5.28.1
+x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -39,6 +39,7 @@ TEST_CASE("Sub", "[Sv]") {
             SECTION("HV")        { Test::ctor((SV*)vars.hv, behaviour_t::THROWS); }
             SECTION("CV")        { Test::ctor((SV*)vars.cv, behaviour_t::VALID); }
             SECTION("GV")        { Test::ctor((SV*)vars.gv, behaviour_t::THROWS); }
+            SECTION("IO")        { Test::ctor((SV*)vars.io, behaviour_t::THROWS); }
         }
         SECTION("CV") { Test::ctor(vars.cv, behaviour_t::VALID); }
 
@@ -72,6 +73,7 @@ TEST_CASE("Sub", "[Sv]") {
             SECTION("HV")        { Test::assign(o, (SV*)vars.hv, behaviour_t::THROWS); }
             SECTION("CV")        { Test::assign(o, (SV*)vars.cv, behaviour_t::VALID); }
             SECTION("GV")        { Test::assign(o, (SV*)vars.gv, behaviour_t::THROWS); }
+            SECTION("IO")        { Test::assign(o, (SV*)vars.io, behaviour_t::THROWS); }
         }
         SECTION("CV")         { Test::assign(o, vars.cv, behaviour_t::VALID); }
         SECTION("Sub")        { Test::assign(o, my, behaviour_t::VALID); }

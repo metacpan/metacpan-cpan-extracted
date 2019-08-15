@@ -25,6 +25,7 @@ TEST_CASE("Scalar", "[Sv]") {
             SECTION("HV")     { Test::ctor((SV*)vars.hv, behaviour_t::THROWS); }
             SECTION("CV")     { Test::ctor((SV*)vars.cv, behaviour_t::THROWS); }
             SECTION("GV")     { Test::ctor((SV*)vars.gv, behaviour_t::VALID); }
+            SECTION("IO")     { Test::ctor((SV*)vars.io, behaviour_t::THROWS); }
         }
         SECTION("GV")         { Test::ctor(vars.gv, behaviour_t::VALID); }
 
@@ -44,6 +45,7 @@ TEST_CASE("Scalar", "[Sv]") {
             SECTION("HV")     { Test::noinc((SV*)vars.hv, behaviour_t::THROWS); }
             SECTION("CV")     { Test::noinc((SV*)vars.cv, behaviour_t::THROWS); }
             SECTION("GV")     { Test::noinc((SV*)vars.gv, behaviour_t::VALID); }
+            SECTION("IO")     { Test::noinc((SV*)vars.io, behaviour_t::THROWS); }
         }
         SECTION("GV")         { Test::noinc(vars.gv, behaviour_t::VALID); }
     }
@@ -60,6 +62,7 @@ TEST_CASE("Scalar", "[Sv]") {
             SECTION("HV")     { Test::assign(o, (SV*)vars.hv, behaviour_t::THROWS); }
             SECTION("CV")     { Test::assign(o, (SV*)vars.cv, behaviour_t::THROWS); }
             SECTION("GV")     { Test::assign(o, (SV*)vars.gv, behaviour_t::VALID); }
+            SECTION("IO")     { Test::assign(o, (SV*)vars.io, behaviour_t::THROWS); }
         }
         SECTION("GV")         { Test::assign(o, vars.gv, behaviour_t::VALID); }
         SECTION("Scalar")     { Test::assign(o, my, behaviour_t::VALID); }

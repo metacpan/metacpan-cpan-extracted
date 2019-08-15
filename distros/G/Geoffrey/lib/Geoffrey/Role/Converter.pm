@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use Perl::Version;
 
-$Geoffrey::Role::Converter::VERSION = '0.000102';
+$Geoffrey::Role::Converter::VERSION = '0.000103';
 
 sub new {
     my $class = shift;
@@ -262,7 +262,7 @@ Geoffrey::Role::Converter - Abstract converter class.
 
 =head1 VERSION
 
-Version 0.000102
+Version 0.000103
 
 =head1 DESCRIPTION
 

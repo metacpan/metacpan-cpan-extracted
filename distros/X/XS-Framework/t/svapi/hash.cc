@@ -24,6 +24,7 @@ TEST_CASE("Hash", "[Sv]") {
             SECTION("from SHV")       { Test::ctor((SV*)vars.stash, behaviour_t::VALID); }
             SECTION("from OHV")       { Test::ctor((SV*)vars.ohv, behaviour_t::VALID); }
             SECTION("from CV")        { Test::ctor((SV*)vars.cv, behaviour_t::THROWS); }
+            SECTION("from IO")        { Test::ctor((SV*)vars.io, behaviour_t::THROWS); }
         }
         SECTION("from HV") { Test::ctor(vars.hv, behaviour_t::VALID); }
 
@@ -76,6 +77,7 @@ TEST_CASE("Hash", "[Sv]") {
             SECTION("SHV")       { Test::assign(o, (SV*)vars.stash, behaviour_t::VALID); }
             SECTION("OHV")       { Test::assign(o, (SV*)vars.ohv, behaviour_t::VALID); }
             SECTION("CV")        { Test::assign(o, (SV*)vars.cv, behaviour_t::THROWS); }
+            SECTION("IO")        { Test::assign(o, (SV*)vars.io, behaviour_t::THROWS); }
         }
         SECTION("HV")         { Test::assign(o, vars.hv, behaviour_t::VALID); }
         SECTION("Hash")       { Test::assign(o, my, behaviour_t::VALID); }
