@@ -44,11 +44,11 @@ Asm::X86 - List of instructions and registers of x86-compatible processors, vali
 
 =head1 VERSION
 
-Version 0.27
+Version 0.28
 
 =cut
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 =head1 DESCRIPTION
 
@@ -439,7 +439,7 @@ our @instr_intel = (
 	'punpckhdq', 'punpckhqdq', 'punpckhwd', 'punpcklbw', 'punpckldq', 'punpcklqdq', 'punpcklwd',
 	'push', 'pusha', 'pushad', 'pushaw', 'pushd', 'pushf', 'pushfd', 'pushfq', 'pushfw', 'pushq',
 	'pushw', 'pxor', 'rcl',	'rcpps', 'rcpss', 'rcr', 'rdfsbase', 'rdgsbase', 'rdm', 'rdmsr',
-	'rdmsrq', 'rdpid', 'rdpkru', 'rdpmc', 'rdrand', 'rdseed', 'rdshr',
+	'rdmsrq', 'rdpid', 'rdpkru', 'rdpmc', 'rdpru', 'rdrand', 'rdseed', 'rdshr',
 	'rdtsc', 'rdtscp', 'rep', 'repe', 'repne', 'repnz',
 	'repz', 'ret', 'retd', 'retf', 'retfd', 'retfq', 'retfw', 'retn', 'retnd', 'retnq', 'retnw', 'retq', 'retw',
 	'rol', 'ror', 'rorx', 'roundpd', 'roundps', 'roundsd', 'roundss', 'rsdc', 'rsldt', 'rsm',

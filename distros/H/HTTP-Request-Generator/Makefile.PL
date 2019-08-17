@@ -55,6 +55,7 @@ my %module = (
     },
     TEST_REQUIRES => {
         'Test::More'   => 0,
+        'File::Spec'   => 0,
         'Data::Dumper' => 0,
     },
 

@@ -17,8 +17,8 @@ use base 'PDF::Builder::Basic::PDF::Objind';
 use strict;
 use warnings;
 
-our $VERSION = '3.015'; # VERSION
-my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
+our $VERSION = '3.016'; # VERSION
+my $LAST_UPDATE = '3.016'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -27,7 +27,7 @@ Inherits from L<PDF::Builder::Basic::PDF::Objind>
 
 =head1 METHODS
 
-=head2 PDF::Array->new($parent, @vals)
+=head2 PDF::Array->new($parent, @values)
 
 Creates an array with the given storage parent and an optional list of values to
 initialise the array with.
@@ -35,11 +35,10 @@ initialise the array with.
 =cut
 
 sub new {
-    my ($class, @vals) = @_;
-
+    my ($class, @values) = @_;
     my $self = {};
 
-    $self->{' val'} = [@vals];
+    $self->{' val'} = [@values];
     $self->{' realised'} = 1;
     bless $self, $class;
     return $self;
@@ -52,7 +51,7 @@ Outputs an array as a PDF array to the given filehandle.
 =cut
 
 sub outobjdeep {
-    my ($self, $fh, $pdf, %opts) = @_;
+    my ($self, $fh, $pdf) = @_;
 
     $fh->print('[ ');
     foreach my $obj (@{$self->{' val'}}) {
@@ -63,39 +62,22 @@ sub outobjdeep {
     return;
 }
 
-=head2 $a->removeobj($elem)
+=head2 $a->elements()
 
-Removes all occurrences of an element from an array.
+Returns the contents of the array.
 
-=cut
-
-sub removeobj {
-    my ($self, $elem) = @_;
-
-    $self->{' val'} = [grep($_ ne $elem, @{$self->{' val'}})];  ## no critic
-    return $self;
-}
-
-=head2 $a->elementsof()
-
-Returns a list of all the elements in the array. Notice that this is
-not the array itself but the elements in the array.
-
-Also available as C<elements>.
+Formerly called C<elementsof>, which is now B<deprecated>.
 
 =cut
 
-sub elementsof {
-    return wantarray? @{$_[0]->{' val'}}: scalar @{$_[0]->{' val'}};
-}
+sub elementsof { return elements(@_); }
 
 sub elements {
-    my $self = shift;
-
+    my $self = shift();
     return @{$self->{' val'}};
 }
 
-=head2 $a->add_elements()
+=head2 $a->add_elements(@elements)
 
 Appends the given elements to the array. An element is only added if it
 is defined.
@@ -103,18 +85,37 @@ is defined.
 =cut
 
 sub add_elements {
-    my $self = shift;
+    my $self = shift();
 
-    foreach my $e (@_) {
-        push(@{$self->{' val'}}, $e) if defined $e;
+    foreach my $element (@_) {
+	    next unless defined $element;
+        push @{$self->{' val'}}, $element;
     }
+    return $self;
+}
+
+=head2 $a->remove_element($element)
+
+Removes all occurrences of an element from an array.
+
+Formerly called C<removeobj>, which is now B<deprecated> and will be removed.
+
+=cut
+
+# not listed as deprecated, not used internally, should not have been
+# used in external code. remove after July 2021.
+sub removeobj { return remove_element(@_); }
+
+sub remove_element {
+    my ($self, $element) = @_;
+
+    $self->{' val'} = [ grep { $_ ne $element } @{$self->{' val'}} ];
     return $self;
 }
 
 =head2 $a->val()
 
-Returns the value of the array. This is a reference to the actual array
-containing the elements.
+Returns a reference to the contents of the array.
 
 =cut
 
@@ -137,9 +138,9 @@ sub copy {
     $res->{' val'} = [];
     foreach my $e (@{$self->{' val'}}) {
         if (ref($e) and $e->can('is_obj') and not $e->is_obj($pdf)) {
-            push(@{$res->{' val'}}, $e->copy($pdf));
+            push @{$res->{' val'}}, $e->copy($pdf);
         } else {
-            push(@{$res->{' val'}}, $e);
+            push @{$res->{' val'}}, $e;
         }
     }
     return $res;

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -66,6 +66,7 @@ WriteMakefile
           'Math::BigInt::Lite' => 0,
           'Math::BigFloat'     => '1.993',
           'Math::BigRat'       => 0,
+          'Number::Fraction'   => 0,
          },
        },
      },

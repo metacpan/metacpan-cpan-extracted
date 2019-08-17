@@ -49,6 +49,14 @@ HTTP::Request::Generator - generate HTTP requests
         $ua->request( $req );
     };
 
+## `expand_curl_pattern`
+
+    my %res = expand_curl_pattern( 'https://' );
+    #
+
+Expands a curl-style pattern to a pattern using positional placeholders.
+See the `curl` documentation on the patterns.
+
 ## `generate_requests( %options )`
 
     my $g = generate_requests(
@@ -73,7 +81,23 @@ two requests:
       url => '/profiles/John',
 
 `generate_requests` returns an iterator in scalar context. In list context, it
-returns the complete list of requests.
+returns the complete list of requests:
+
+    my @requests = generate_requests(
+        url => '/profiles/:name',
+        url_params => ['Mark','John'],
+        wrap => sub {
+            my( $req ) = @_;
+            # Fix up some values
+            $req->{headers}->{'Content-Length'} = 666;
+        },
+    );
+    for my $r (@requests) {
+        send_request( $r );
+    };
+
+Note that returning a list instead of the iterator will use up quite some memory
+quickly, as the list will be the cartesian product of the input parameters.
 
 There are helper functions
 that will turn that data into a data structure suitable for your HTTP framework
@@ -97,6 +121,8 @@ lists will be expanded in memory.
 ### Options
 
 - **pattern**
+
+        pattern => 'https://example.{com,org,net}/page_[00..99].html',
 
     Generate URLs from this pattern instead of `query_params`, `url_params`
     and `url`.
@@ -154,6 +180,15 @@ Converts the request data to a [HTTP::Request](https://metacpan.org/pod/HTTP::Re
 
 Converts the request data to a [Dancer::Request](https://metacpan.org/pod/Dancer::Request) object.
 
+During the creation of Dancer::Request objects, `%ENV` will be empty except
+for `$ENV{TMP}` and `$ENV{TEMP}`.
+
+This function needs and dynamically loads the following modules:
+
+[Dancer::Request](https://metacpan.org/pod/Dancer::Request)
+
+[HTTP::Request](https://metacpan.org/pod/HTTP::Request)
+
 ## `as_plack`
 
     generate_requests(
@@ -163,6 +198,17 @@ Converts the request data to a [Dancer::Request](https://metacpan.org/pod/Dancer
     )
 
 Converts the request data to a [Plack::Request](https://metacpan.org/pod/Plack::Request) object.
+
+During the creation of Plack::Request objects, `%ENV` will be empty except
+for `$ENV{TMP}` and `$ENV{TEMP}`.
+
+This function needs and dynamically loads the following modules:
+
+[Plack::Request](https://metacpan.org/pod/Plack::Request)
+
+[HTTP::Headers](https://metacpan.org/pod/HTTP::Headers)
+
+[Hash::MultiValue](https://metacpan.org/pod/Hash::MultiValue)
 
 # SEE ALSO
 
@@ -189,7 +235,7 @@ Max Maischein `corion@cpan.org`
 
 # COPYRIGHT (c)
 
-Copyright 2017-2018 by Max Maischein `corion@cpan.org`.
+Copyright 2017-2019 by Max Maischein `corion@cpan.org`.
 
 # LICENSE
 

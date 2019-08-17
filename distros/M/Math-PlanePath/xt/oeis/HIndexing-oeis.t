@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2013, 2018 Kevin Ryde
+# Copyright 2013, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -19,21 +19,20 @@
 
 use 5.004;
 use strict;
-use Math::PlanePath::HIndexing;
+use Math::BigInt;
 use Test;
-plan tests => 11;
+plan tests => 1;
 
 use lib 't','xt';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings(); }
 use MyOEIS;
 
+use Math::PlanePath::HIndexing;
+
 
 #------------------------------------------------------------------------------
 # A097110 -- Y at N=2^k
-
-require Math::NumSeq::PlanePathN;
-my $bigclass = Math::NumSeq::PlanePathN::_bigint();
 
 MyOEIS::compare_values
   (anum => 'A097110',
@@ -41,7 +40,7 @@ MyOEIS::compare_values
      my ($count) = @_;
      my $path = Math::PlanePath::HIndexing->new;
      my @got;
-     for (my $n = $bigclass->new(1); @got < $count; $n *= 2) {
+     for (my $n = Math::BigInt->new(1); @got < $count; $n *= 2) {
        my ($x,$y) = $path->n_to_xy($n);
        push @got, $y;
      }

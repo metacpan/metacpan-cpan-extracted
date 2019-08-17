@@ -70,7 +70,7 @@
          "web" : "https://github.com/perlancar/perl-CPAN-Changes-Cwalitee"
       }
    },
-   "version" : "0.007",
+   "version" : "0.009",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

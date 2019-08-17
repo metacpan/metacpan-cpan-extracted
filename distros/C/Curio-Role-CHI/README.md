@@ -10,18 +10,18 @@ Create a Curio class:
 package MyApp::Service::Cache;
 
 use Curio role => '::CHI';
+use strictures 2;
 
-use Exporter qw( import );
-our @EXPORT = qw( myapp_cache );
+export_function_name 'myapp_cache';
+always_export;
+export_resource;
 
 add_key geo_ip => (
-    driver => 'Memory',
-    global => 0,
+    chi => {
+        driver => 'Memory',
+        global => 0,
+    },
 );
-
-sub myapp_cache {
-    return __PACKAGE__->fetch( @_ )->chi();
-}
 
 1;
 ```
@@ -36,73 +36,30 @@ my $chi = myapp_cache('geo_ip');
 
 # DESCRIPTION
 
-This role provides all the basics for building a Curio class
-which wraps around [CHI](https://metacpan.org/pod/CHI).
+This role provides all the basics for building a Curio class which
+wraps around [CHI](https://metacpan.org/pod/CHI).
 
-Fun fact, this ["SYNOPSIS"](#synopsis) is functionally identical to
-["SYNOPSIS" in Curio](https://metacpan.org/pod/Curio#SYNOPSIS).
-
-# ATTRIBUTES
+# REQUIRED ARGUMENTS
 
 ## chi
 
-```perl
-my $chi = MyApp::Service::Cache->fetch('geo_ip)->chi();
-```
-
 Holds the [CHI](https://metacpan.org/pod/CHI) object.
 
-# CACHING
+May be passed as either a hashref of arguments or a pre-created
+object.
 
-This role sets the ["does\_caching" in Curio::Factory](https://metacpan.org/pod/Curio::Factory#does_caching) and
-["cache\_per\_process" in Curio::Factory](https://metacpan.org/pod/Curio::Factory#cache_per_process) features.
+# FEATURES
 
-`cache_per_process` is important to set since there are
-quite a few CHI drivers which do not like to be re-used
-across processes.
+This role turns on ["does\_caching" in Curio::Factory](https://metacpan.org/pod/Curio::Factory#does_caching) and
+["cache\_per\_process" in Curio::Factory](https://metacpan.org/pod/Curio::Factory#cache_per_process), and sets
+["resource\_method\_name" in Curio::Factory](https://metacpan.org/pod/Curio::Factory#resource_method_name) to `chi` (as in ["chi"](#chi)).
 
-You can of course disable these features.
+You can of course revert these changes:
 
 ```
 does_caching 0;
 cache_per_process 0;
-```
-
-# NO KEYS
-
-If you'd like to create a CHI Curio class which exposes a
-single CHI object and does not support keys then here's a
-slightly altered version of the ["SYNOPSIS"](#synopsis) to get you
-started.
-
-Create a Curio class:
-
-```perl
-package MyApp::Service::GeoIPCache;
-
-use Curio role => '::CHI';
-
-use Exporter qw( import );
-our @EXPORT = qw( myapp_geo_ip_cache );
-
-default_arguments (
-    driver => 'Memory',
-    global => 0,
-);
-
-sub myapp_geo_ip_cache {
-    return __PACKAGE__->fetch( @_ )->chi();
-}
-
-1;
-```
-
-Then use your new Curio class elsewhere:
-
-```perl
-use MyApp::Service::GeoIPCache;
-
-my $chi = myapp_geo_ip_cache();
+resource_method_name undef;
 ```
 
 # SUPPORT
@@ -114,15 +71,15 @@ Curio-Role-CHI GitHub issue tracker:
 
 # ACKNOWLEDGEMENTS
 
-Thanks to [ZipRecruiter](https://www.ziprecruiter.com/)
-for encouraging their employees to contribute back to the open
-source ecosystem.  Without their dedication to quality software
-development this distribution would not exist.
+Thanks to [ZipRecruiter](https://www.ziprecruiter.com/) for
+encouraging their employees to contribute back to the open source
+ecosystem.  Without their dedication to quality software development
+this distribution would not exist.
 
 # AUTHORS
 
 ```
-Aran Clary Deltac <aran@bluefeet.dev>
+Aran Clary Deltac <bluefeet@gmail.com>
 ```
 
 # COPYRIGHT AND LICENSE

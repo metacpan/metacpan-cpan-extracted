@@ -1,7 +1,7 @@
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl new_blz.t'
 
-use Test::More tests => 1170;
+use Test::More tests => 1168;
 
 BEGIN { use_ok('Business::KontoCheck') };
 
@@ -49,7 +49,6 @@ __DATA__
 1 20030133 1384736042
 1 51420200 6091086146
 1 74350000 5359927135
-1 10010111 711793036
 1 10040000 62364982
 1 10040005 35824073
 1 10030700 5943915468
@@ -187,7 +186,6 @@ __DATA__
 1 50324000 7643374554
 1 50324040 1210397447
 1 13061008 9039837809
-1 13061028 6145269245
 1 20069125 5115446513
 1 36060488 2919904160
 1 40060265 78548515

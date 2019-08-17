@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013, 2014 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -29,6 +29,7 @@ use 5.004;
 use strict;
 use Carp 'croak';
 use List::Util 'max';
+use Math::BigInt try => 'GMP';
 use Test;
 plan tests => 46;
 
@@ -45,11 +46,6 @@ use Math::PlanePath::CoprimeColumns;
 # uncomment this to run the ### lines
 # use Smart::Comments '###';
 
-
-sub BIGINT {
-  require Math::NumSeq::PlanePathN;
-  return Math::NumSeq::PlanePathN::_bigint();
-}
 
 # P+A=B P=B-A
 sub pair_left_justify {
@@ -396,7 +392,7 @@ MyOEIS::compare_values
      my $path = Math::PlanePath::WythoffArray->new;
      my @got;
      for (my $n = $path->n_start; @got < $count; $n++) {
-       my ($x, $y) = $path->n_to_xy (BIGINT()->new($n));
+       my ($x, $y) = $path->n_to_xy (Math::BigInt->new($n));
        my $t = $path->xy_to_n ($y, $x);
        push @got, $t;
      }
@@ -589,7 +585,7 @@ MyOEIS::compare_values
   my $fw = Math::NumSeq::FibonacciWord->new;
   my $bad = 0;
   foreach my $y (1 .. 1000) {
-    my $n = $path->xy_to_n(0, BIGINT()->new($y));
+    my $n = $path->xy_to_n(0, Math::BigInt->new($y));
     my $seq_value = $seq->ith($n);
     my $fw_value = $fw->ith($y);
     if ($fw_value != $seq_value) {
@@ -706,7 +702,7 @@ foreach my $elem ([ 'A003622', 0 ], # N on Y axis,    OFFSET=1
          my ($count) = @_;
          my $path = Math::PlanePath::WythoffArray->new;
          my @got = @{$options{'extra_initial'}||[]};
-         for (my $y = BIGINT()->new(0); @got < $count; $y++) {
+         for (my $y = Math::BigInt->new(0); @got < $count; $y++) {
            push @got, $path->xy_to_n ($x, $y);
          }
          return \@got;
@@ -743,7 +739,7 @@ MyOEIS::compare_values
      my ($count) = @_;
      my $path = Math::PlanePath::WythoffArray->new;
      my @got = (2,3); # initial skipped
-     for (my $x = BIGINT()->new(1); @got < $count; $x+=2) {
+     for (my $x = Math::BigInt->new(1); @got < $count; $x+=2) {
        push @got, $path->xy_to_n ($x, 1);
      }
      return \@got;
@@ -793,7 +789,7 @@ foreach my $elem ([ 'A000045',  0, extra_initial=>[0,1] ], # X axis Fibonaccis
          my ($count) = @_;
          my $path = Math::PlanePath::WythoffArray->new;
          my @got = @{$options{'extra_initial'}||[]};
-         for (my $x = BIGINT()->new(0); @got < $count; $x++) {
+         for (my $x = Math::BigInt->new(0); @got < $count; $x++) {
            push @got, $path->xy_to_n ($x, $y);
          }
          return \@got;
@@ -813,8 +809,8 @@ MyOEIS::compare_values
      my @got = (0);  # extra 0
      for (my $n = $diagonals->n_start; @got < $count; $n++) {
        my ($x, $y) = $wythoff->n_to_xy ($n);
-       $x = BIGINT()->new($x);
-       $y = BIGINT()->new($y);
+       $x = Math::BigInt->new($x);
+       $y = Math::BigInt->new($y);
        push @got, $diagonals->xy_to_n($x,$y);
      }
      return \@got;
@@ -919,8 +915,8 @@ MyOEIS::compare_values
      my @got;
      for (my $n = $diagonals->n_start; @got < $count; $n++) {
        my ($x, $y) = $diagonals->n_to_xy ($n);
-       $x = BIGINT()->new($x);
-       $y = BIGINT()->new($y);
+       $x = Math::BigInt->new($x);
+       $y = Math::BigInt->new($y);
        push @got, $wythoff->xy_to_n($x,$y);
      }
      return \@got;

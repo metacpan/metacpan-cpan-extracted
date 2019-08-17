@@ -19,19 +19,17 @@ use Sort::Hash;
 
 use YAML::XS;
 
-our $VERSION='0.017';
+our $VERSION='0.021';
 
 =head1 NAME
 
 Vote::Count::Matrix
 
-=head1 VERSION 0.017
+=head1 VERSION 0.021
 
 =cut
 
 # ABSTRACT: Condorcet Win Loss Matrix
-
-
 
 has BallotSet => (
   is       => 'ro',

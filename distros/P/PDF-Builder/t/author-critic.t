@@ -4,19 +4,11 @@ use warnings;
 
 
 BEGIN {
-  unless ($ENV{AUTHOR_TESTING}) {
-    print "1..0 # SKIP these tests are for testing by the author\n";
+  unless ($ENV{'AUTHOR_TESTING'}) {
+    print qq{1..0 # SKIP these tests are for testing by the author\n};
     exit
   }
 }
 
-
-use Test::More;
-use English qw(-no_match_vars);
-
-eval "use Test::Perl::Critic";  ## no critic
-plan skip_all => 'Test::Perl::Critic required to criticise code' if $@;
-Test::Perl::Critic->import( -profile => "perlcritic.rc" ) if -e "perlcritic.rc";
+use Test::Perl::Critic (-profile => "perlcritic.rc") x!! -e "perlcritic.rc";
 all_critic_ok();
-
-1;

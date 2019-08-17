@@ -23,7 +23,7 @@ is(
   'rcv',
   'BallotSetType option is set to rcv' );
 
-is( $VC1->CountBallots(),
+is( $VC1->VotesCast(),
   10, 'Count the number of ballots in the set' );
 
 $VC1->logt('A Terse Entry');
@@ -43,5 +43,24 @@ $VC2->logv('A Verbose Entry');
 $VC2->logd('A Debug Entry');
 $VC2->WriteLog();
 ok( stat( "$tmp/vc2\.brief"), "created brief log to specified path $tmp/vc2\.brief");
+
+isa_ok(
+  $VC2->PairMatrix(),
+  ['Vote::Count::Matrix'],
+  'Confirm Matrix');
+
+$VC2->SetActive(
+  { 'CHOCOLATE' => 1, 'CARAMEL' => 1, 'VANILLA' =>  1 }
+  );
+
+$VC2->UpdatePairMatrix();
+is_deeply(
+  $VC2->PairMatrix()->ScoreMatrix(),
+  { 'CARAMEL' => 0, 'CHOCOLATE' => 1, 'VANILLA' => 2 },
+  'Updated Matrix only scores current choices'
+);
+
+
+
 
 done_testing();

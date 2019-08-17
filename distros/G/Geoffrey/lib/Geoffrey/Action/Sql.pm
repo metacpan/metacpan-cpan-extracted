@@ -5,7 +5,7 @@ use 5.016;
 use strict;
 use warnings;
 
-$Geoffrey::Action::Sql::VERSION = '0.000103';
+$Geoffrey::Action::Sql::VERSION = '0.000201';
 
 use parent 'Geoffrey::Role::Action';
 
@@ -30,7 +30,7 @@ Geoffrey::Action::Sql - Action for manually called sql
 
 =head1 VERSION
 
-Version 0.000103
+Version 0.000201
 
 =head1 DESCRIPTION
 

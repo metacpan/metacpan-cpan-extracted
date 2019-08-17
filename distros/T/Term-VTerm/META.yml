@@ -19,14 +19,14 @@ name: Term-VTerm
 provides:
   Term::VTerm:
     file: lib/Term/VTerm.pm
-    version: '0.04'
+    version: '0.05'
   Term::VTerm::Screen:
     file: lib/Term/VTerm/Screen.pm
-    version: '0.04'
+    version: '0.05'
   Term::VTerm::State:
     file: lib/Term/VTerm/State.pm
-    version: '0.04'
+    version: '0.05'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

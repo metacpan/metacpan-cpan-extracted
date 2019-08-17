@@ -1,7 +1,7 @@
 package Lingua::Identify::Any;
 
-our $DATE = '2019-07-08'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-07-12'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010_001;
 use strict;
@@ -39,6 +39,7 @@ _
             schema => 'str*',
             req => 1,
             pos => 0,
+            cmdline_src => 'stdin_or_file',
         },
         backends => {
             schema => ['array*', of=>['str*', in=>\@BACKENDS]],
@@ -195,7 +196,7 @@ Lingua::Identify::Any - Detect language of text using one of several available b
 
 =head1 VERSION
 
-This document describes version 0.001 of Lingua::Identify::Any (from Perl distribution Lingua-Identify-Any), released on 2019-07-08.
+This document describes version 0.002 of Lingua::Identify::Any (from Perl distribution Lingua-Identify-Any), released on 2019-07-12.
 
 =head1 SYNOPSIS
 

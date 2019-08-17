@@ -1,5 +1,17 @@
 Revision history for Perl extension Curio.
 
+0.08 2019-08-16T21:56:23Z
+
+ - Always use keys.  It is easy enough to make a single-key Curio
+   class.  Supporting no-key classes is just unneeded complexity.
+
+0.07 2019-08-16T18:38:35Z
+
+ - Rather than throw an exception, clear_injection() now returns undef
+   if there was not an injection to clear.
+ - Added the has_injection() method.
+ - Renamed uninject() to clear_injection().
+
 0.06 2019-08-12T23:35:52Z
 
  - Added the create() and injection() factory methods.

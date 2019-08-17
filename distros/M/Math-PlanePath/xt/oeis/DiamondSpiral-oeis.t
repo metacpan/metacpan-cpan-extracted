@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2018 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -21,13 +21,12 @@
 use 5.004;
 use strict;
 use Test;
-plan tests => 1;
+plan tests => 6;
 
 use lib 't','xt';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings(); }
 use MyOEIS;
-
 
 use Math::PlanePath::DiamondSpiral;
 my $path = Math::PlanePath::DiamondSpiral->new;

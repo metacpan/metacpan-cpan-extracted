@@ -7,4 +7,11 @@ Revision history for StreamFinder
         - Removed Tunein as a valid site (can no longer extract streams).
 1.02    2019/01/31
         - Make StreamFinder::Youtube the default and handle pretty much 
-        anything youtube-dl handles.
+        anything youtube-dl handles, ie. brighteon, vimeo, etc.
+1.03    2019/08/15
+        - Fix StreamFinder::Reciva now failing to connect to server 
+        (added wget as fallthrough as LWP::UserAgent and curl fail with 
+        unsupported SSL protocol errors).
+        - Fix StreamFinder.IHeartRadio now failing to grab images / icons.
+        - Strip off "?autoplay=true" from StreamFinder::Youtube urls.
+        - Minor doc fixes.

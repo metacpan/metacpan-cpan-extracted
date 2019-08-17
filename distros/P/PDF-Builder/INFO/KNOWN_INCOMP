@@ -7,7 +7,39 @@ Bug fixes to PDF::API2 (in PDF::Builder) are not mentioned if they correct
 an error (that produces an error message and/or incorrect output) and do not 
 affect the operation or results of otherwise correct code.
 
-3.008     2017-11-19
+3.016     2019-08-03
+
+   RT #130039 PDF::API2 returns $self on 'set' operation, while PDF::Builder
+     always returns the current (possibly just-set) corners of the box. This
+     permits your using a named page size, while getting back the actual 
+     page bounds without having to make a separate query (get) call.
+
+   RT #33497 and RT #117031 fixed differently in PDF::API2 2.034 (June 2019)
+     than in PDF::Builder 3.013 (December 2018). In some cases with UTF-8 
+     character data, PDF::API2 will now display as (text display) rather than
+     in <16 bit hex Unicode values> still shown by PDF::Builder. This may lead 
+     to differences in PDFs produced by the two products, but should be 
+     invisible to the end user.
+
+   lib/PDF/Builder/Basic/PDF/Pages.pm old code for the add_font() method
+     documented the call as $p->add_font($pdf, $font), but implemented the code
+     as $p->add_font($font, $pdf). Older user code may have swapped the order
+     of arguments on an ad-hoc basis, to get it to work. The new code uses
+     the same order as the documentation ($pdf, $font), which might require
+     code to be swapped back. In PDF::API2 2.034, a note in the code mentions 
+     the order difference, but the code was not changed.
+
+3.013     2018-12-27
+
+   lib/PDF/Builder/Basic/PDF/Utils.pm Instead of constantly explicitly 
+     checking for UTF-8 strings, and calling PDFUtf() instead of PDFStr() as
+     appropriate in many routines, PDFString() has been added to Utils to 
+     accept a string and call PDFUtf() or PDFStr() internally, according to 
+     the passed "usage" code. This may result in slightly different behavior 
+     of PDF::Builder, compared to PDF::API2, as the code was implemented in 
+     different ways in different routines.
+
+3.008     2017-11-26
 
    lib/PDF/Builder.pm [ref RT #118047] now uses the Graphics::TIFF package
      by default for TIFF functionality. See the POD for image_tiff() for

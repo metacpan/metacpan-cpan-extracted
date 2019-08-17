@@ -11,13 +11,13 @@ use Moose::Role;
 
 no warnings 'experimental';
 
-our $VERSION='0.017';
+our $VERSION='0.021';
 
 =head1 NAME
 
 Vote::Count::Floor
 
-=head1 VERSION 0.017
+=head1 VERSION 0.021
 
 =cut
 
@@ -30,7 +30,7 @@ with  'Vote::Count::Approval',
 
 sub _FloorMin( $self, $floorpct ) {
   my $pct = $floorpct >= 1 ? $floorpct / 100 : $floorpct;
-  return int( $self->CountBallots() * $pct );
+  return int( $self->VotesCast() * $pct );
 }
 
 
@@ -59,7 +59,7 @@ sub _DoFloor( $self, $ranked, $cutoff ) {
 # votes cast -- not total of approval votes.
 # so floor is the same as for topcount floor.
 sub ApprovalFloor( $self, $floorpct=5 ) {
-  my $votescast = $self->CountBallots();
+  my $votescast = $self->VotesCast();
   $self->logt(
     "Applying Floor Rule of $floorpct\% " .
     "Approval Count. vs Ballots Cast of $votescast.");
@@ -157,4 +157,3 @@ LICENSE
 This module is released under the GNU Public License Version 3. See license file for details. For more information on this license visit L<http://fsf.org>.
 
 =cut
-

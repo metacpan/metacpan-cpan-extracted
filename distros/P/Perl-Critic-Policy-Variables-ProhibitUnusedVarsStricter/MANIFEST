@@ -8,7 +8,7 @@ lib/Perl/Critic/Policy/Variables/ProhibitUnusedVarsStricter.pm
 LICENSES/Artistic
 LICENSES/Copying
 Makefile.PL
-MANIFEST			This list of files
+MANIFEST
 META.json
 META.yml
 README
@@ -32,3 +32,4 @@ xt/author/95_kwalitee.t
 xt/author/98_pod_syntax.t
 xt/author/99_pod_coverage.t
 xt/author/minimum_perl.t
+xt/author/pod_links.t

@@ -1,6 +1,6 @@
 # VERSION
 
-version 0.6.0
+version 0.6.1
 
 # SYNOPSIS
 
@@ -19,7 +19,7 @@ csv2chart - command line utility to convert CSV data to a graphical chart
 
     But see [https://github.com/watson/chart-csv/issues/4](https://github.com/watson/chart-csv/issues/4) .
 
-[Text::CSV](https://metacpan.org/pod/Text::CSV) .
+- [Text::CSV](https://metacpan.org/pod/Text::CSV)
 
 # COPYRIGHT & LICENSE
 

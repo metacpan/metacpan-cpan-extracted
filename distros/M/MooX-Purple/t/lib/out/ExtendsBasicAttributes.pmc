@@ -1,0 +1,62 @@
+package ExtendsBasicAttributes;
+use Moo;
+use MooX::LazierAttributes;
+use MooX::ValidateSubs;
+extends qw/BasicAttributes/;
+
+has '+one' => (
+	is => "ro",
+	default => sub {  20 }
+);
+
+has '+two' => (
+	is => "ro",
+	default => sub {  [qw/four five six/] }
+);
+
+has '+three' => (
+	is => "ro",
+	default => sub {  { three => 'four' } }
+);
+
+has '+four' => (
+	is => "ro",
+	default => sub {  'a different value' }
+);
+
+has '+five' => (
+	is => "ro",
+	default => sub {  bless {}, 'Okays' }
+);
+
+has six => (
+	is => "ro",
+	default => sub {  1 }
+);
+
+has '+seven' => (
+	is => "ro",
+	lazy => 1
+);
+
+has +eleven => (
+	is => "ro",
+	default => sub { 'ahhhhhhhhhhhhh' }
+);
+
+has +twelve => (
+	is => "ro",
+	default => sub { 'ahhhhhhhhhhhhh' }
+);
+
+has +thirteen => (
+	is => "ro",
+	default => sub { 'ahhhhhhhhhhhhh' }
+);
+
+sub _build_fourteen {
+	return 40000;
+}
+
+1;
+1;

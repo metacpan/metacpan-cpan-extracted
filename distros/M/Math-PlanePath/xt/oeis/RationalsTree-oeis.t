@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014, 2017 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2017, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -24,6 +24,7 @@
 
 use 5.004;
 use strict;
+use Math::BigInt;
 use Test;
 plan tests => 58;
 
@@ -279,7 +280,6 @@ MyOEIS::compare_values
      my ($count) = @_;
      my $path  = Math::PlanePath::RationalsTree->new;
      my @got;
-     require Math::BigInt;
      for (my $depth = 0; @got < $count; $depth++) {
        my ($n_lo, $n_hi) = $path->tree_depth_to_n_range($depth);
        my $total = 0;
@@ -304,7 +304,6 @@ MyOEIS::compare_values
      my ($count) = @_;
      my $path  = Math::PlanePath::RationalsTree->new (tree_type => 'Bird');
      my @got = (0);  # extra initial 0 in A000975
-     require Math::BigInt;
      for (my $y = Math::BigInt->new(1); @got < $count; $y++) {
        push @got, $path->xy_to_n (1, $y);
      }
@@ -341,7 +340,6 @@ MyOEIS::compare_values
      my ($count) = @_;
      my $path  = Math::PlanePath::RationalsTree->new (tree_type => 'Drib');
      my @got;
-     require Math::BigInt;
      for (my $x = Math::BigInt->new(1); @got < $count; $x++) {
        push @got, $path->xy_to_n ($x, 1);
      }
@@ -1016,7 +1014,6 @@ MyOEIS::compare_values
      my ($count) = @_;
      my $path  = Math::PlanePath::RationalsTree->new (tree_type => 'CW');
      my @got = (0);  # extra initial 0 in seq A061547
-     require Math::BigInt;
      my $f1 = Math::BigInt->new(1);
      my $f0 = Math::BigInt->new(1);
      while (@got < $count) {

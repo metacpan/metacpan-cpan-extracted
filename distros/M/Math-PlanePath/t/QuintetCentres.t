@@ -33,7 +33,7 @@ use Math::PlanePath::QuintetCentres;
 # VERSION
 
 {
-  my $want_version = 126;
+  my $want_version = 127;
   ok ($Math::PlanePath::QuintetCentres::VERSION, $want_version,
       'VERSION variable');
   ok (Math::PlanePath::QuintetCentres->VERSION,  $want_version,

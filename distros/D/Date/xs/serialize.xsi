@@ -1,0 +1,116 @@
+MODE: INLINE
+
+static inline size_t date_freeze_len (const Date& date) {
+    if (date.timezone()->is_local) return sizeof(ptime_t);
+    return sizeof(ptime_t) + date.timezone()->name.length();
+}
+
+static inline void date_freeze (const Date& date, char* buf) {
+    if (sizeof(ptime_t) == 8) *((ptime_t*)buf) = panda::h2be64(date.epoch());
+    else                      *((ptime_t*)buf) = panda::h2be32(date.epoch());
+    buf += sizeof(ptime_t);
+
+    if (date.timezone()->is_local) *buf = 0;
+    else {
+        auto len = date.timezone()->name.length();
+        std::memcpy(buf, date.timezone()->name.data(), len);
+        buf[len] = 0;
+    }
+}
+
+static inline const char* date_thaw (ptime_t* epoch, const Timezone** zone, const char* ptr, size_t len) {
+    if (len < sizeof(ptime_t)) throw "Date: cannot 'thaw' - corrupted data";
+    if (sizeof(ptime_t) == 8) *epoch = panda::be2h64(*((ptime_t*)ptr));
+    else                      *epoch = panda::be2h32(*((ptime_t*)ptr));
+    ptr += sizeof(ptime_t);
+    if (*ptr == 0) {
+        *zone = NULL;
+        return ptr;
+    }
+    size_t znlen = strlen(ptr);
+    *zone = tzget(ptr);
+    return ptr + znlen;
+}
+
+MODULE = Date                PACKAGE = Date
+PROTOTYPES: DISABLE
+
+Date* Date::HOOK_CLONE () {
+    RETVAL = new Date(*THIS);
+    PROTO = Object(ST(0)).stash();
+}
+
+SV* Date::STORABLE_freeze (bool) {
+    size_t len = date_freeze_len(*THIS);
+    RETVAL = newSV(len);
+    SvPOK_on(RETVAL);
+    char* buf = SvPVX(RETVAL);
+    date_freeze(*THIS, buf);
+    SvCUR_set(RETVAL, len);
+}
+
+Date* STORABLE_attach (SV* CLASS, bool, SV* serialized) {
+    STRLEN len;
+    const char* str = SvPV(serialized, len);
+    ptime_t epoch;
+    const Timezone* zone;
+    date_thaw(&epoch, &zone, str, len);
+    RETVAL = new Date(epoch, zone);
+    PROTO = CLASS;
+}
+
+ptime_t Date::TO_JSON () {
+    RETVAL = THIS->epoch();
+}
+
+MODULE = Date                PACKAGE = Date::Rel
+PROTOTYPES: DISABLE
+
+DateRel* DateRel::HOOK_CLONE () {
+    RETVAL = new DateRel(*THIS);
+    PROTO = Object(ST(0)).stash();
+}
+
+string DateRel::STORABLE_freeze (bool) {
+    RETVAL = THIS->to_string();
+}
+
+DateRel* STORABLE_attach (SV* CLASS, bool, string_view serialized) {
+    RETVAL = new DateRel(serialized);
+    PROTO = CLASS;
+}
+
+MODULE = Date                PACKAGE = Date::Int
+PROTOTYPES: DISABLE
+
+DateInt* DateInt::HOOK_CLONE () {
+    RETVAL = new DateInt(*THIS);
+    PROTO = Object(ST(0)).stash();    
+}
+
+SV* DateInt::STORABLE_freeze (bool) {
+    size_t from_len  = date_freeze_len(THIS->from());
+    size_t total_len = from_len + date_freeze_len(THIS->till()) + 1; // +1 for extra \0 between dates
+    RETVAL = newSV(total_len);
+    SvPOK_on(RETVAL);
+    char* buf = SvPVX(RETVAL);
+    date_freeze(THIS->from(), buf);
+    date_freeze(THIS->till(), buf + from_len + 1);
+    SvCUR_set(RETVAL, total_len);
+}
+
+DateInt* STORABLE_attach (SV* CLASS, bool, SV* serialized) {
+    STRLEN len;
+    const char* str = SvPV(serialized, len);
+    const char* strend = str + len;
+    ptime_t epoch_from, epoch_till;
+    const Timezone* zone_from;
+    const Timezone* zone_till;
+    str = date_thaw(&epoch_from, &zone_from, str, len) + 1;
+    if ((str-1) == strend || str == strend) throw "Date: cannot 'thaw' - corrupted data";
+    date_thaw(&epoch_till, &zone_till, str, strend - str);
+    RETVAL = new DateInt();
+    RETVAL->from().set(epoch_from, zone_from);
+    RETVAL->till().set(epoch_till, zone_till);
+    PROTO = CLASS;
+}

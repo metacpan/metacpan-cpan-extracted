@@ -2,7 +2,6 @@
 
 # test that the basic 'use Perinci::Exporter' works
 
-use 5.010;
 use strict;
 use warnings;
 use lib "t/lib";
@@ -28,4 +27,3 @@ use Test::More 0.96;
 }
 
 done_testing();
-

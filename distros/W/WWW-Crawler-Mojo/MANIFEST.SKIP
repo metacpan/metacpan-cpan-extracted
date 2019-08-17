@@ -5,4 +5,4 @@
 ^MYMETA\.
 ^blib
 ^pm_to_blib
-\.komodoproject
+\B\.DS_Store

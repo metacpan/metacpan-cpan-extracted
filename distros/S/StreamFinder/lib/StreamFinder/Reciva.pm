@@ -4,7 +4,7 @@ StreamFinder::Reciva - Fetch actual raw streamable URLs from radio-station websi
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2017 by
+This module is Copyright (C) 2017-2019 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -275,18 +275,19 @@ sub new
 	$ua->timeout(10);
 	$ua->cookie_jar({});
 	$ua->env_proxy;
-	my $response = $ua->get($url2fetch);
+	my $response = $ua->get($url);
 	if ($response->is_success) {
 		$html = $response->decoded_content;
 	} else {
 		print STDERR $response->status_line  if ($DEBUG);
+		print STDERR "\n..trying wget...\n"  if ($DEBUG);
+		$html = `wget -t 2 -T 20 -O- -o /dev/null \"$url\" 2>/dev/null `;
 	}
 	print STDERR "-1: html=$html=\n"  if ($DEBUG > 1);
 	return undef  unless ($html);  #STEP 1 FAILED, INVALID STATION URL, PUNT!
 	$self->{'iconurl'} = ($html =~ m#stationid\=\"\d+\"\s+href\=\"\/station\/\d+\"\>\s*\<img\s+src\=\"([^\"]*)#) ? $1 : '';
 	$self->{'imageurl'} = $self->{'iconurl'};
 
-	my @streams;
 	$html = '';
 	print STDERR "-3: url2=$url2fetch=\n"  if ($DEBUG);
 	return undef  unless ($url2fetch);
@@ -295,10 +296,13 @@ sub new
 		$html = $response->decoded_content;
 	} else {
 		print STDERR $response->status_line  if ($DEBUG);
+		print STDERR "\n..trying wget...\n"  if ($DEBUG);
+		$html = `wget -t 2 -T 20 -O- -o /dev/null \"$url2fetch\" 2>/dev/null `;
 	}
 	print STDERR "-4: html2=$html=\n"  if ($DEBUG > 1);
 	return undef  unless ($html);  #STEP 1 FAILED, INVALID STATION URL, PUNT!
 
+	my @streams;
 	$self->{'cnt'} = 0;
 	$self->{'title'} = ($html =~ m#Playing:\s*([^\<]+)#) ? $1 : '';
 	my $stream = '';
@@ -310,8 +314,10 @@ sub new
 			if ($response->is_success) {
 				$plshtml = $response->decoded_content;
 			} else {
-				$html = '';
+				$plshtml = '';
 				print STDERR $response->status_line  if ($DEBUG);
+				print STDERR "\n..trying wget...\n"  if ($DEBUG);
+				$plshtml = `wget -t 2 -T 20 -O- -o /dev/null \"$stream\" 2>/dev/null `;
 			}
 			while ($plshtml =~ s#File\d+\=(\S+)##) {
 				print STDERR "-----5: Adding PLS stream ($1)!\n"  if ($DEBUG);
@@ -331,8 +337,10 @@ sub new
 			if ($response->is_success) {
 				$plshtml = $response->decoded_content;
 			} else {
-				$html = '';
+				$plshtml = '';
 				print STDERR $response->status_line  if ($DEBUG);
+				print STDERR "\n..trying wget...\n"  if ($DEBUG);
+				$plshtml = `wget -t 2 -T 20 -O- -o /dev/null \"$stream\" 2>/dev/null `;
 			}
 			while ($plshtml =~ s#File\d+\=(\S+)##) {
 				print STDERR "-----6: Adding PLS stream ($1)!\n"  if ($DEBUG);
@@ -416,7 +424,10 @@ sub getIconData
 	if ($response->is_success) {
 		$art_image = $response->decoded_content;
 	} else {
+		my $iconurl = $self->{'iconurl'};
 		print STDERR $response->status_line  if ($DEBUG);
+		print STDERR "\n..trying wget...\n"  if ($DEBUG);
+		$art_image = `wget -t 2 -T 20 -O- -o /dev/null \"$iconurl\" 2>/dev/null `;
 	}
 	return ()  unless ($art_image);
 	(my $image_ext = $self->{'iconurl'}) =~ s/^.+\.//;
@@ -443,7 +454,10 @@ sub getImageData
 	if ($response->is_success) {
 		$art_image = $response->decoded_content;
 	} else {
+		my $imgurl = $self->{'imageurl'};
 		print STDERR $response->status_line  if ($DEBUG);
+		print STDERR "\n..trying wget...\n"  if ($DEBUG);
+		$art_image = `wget -t 2 -T 20 -O- -o /dev/null \"$imgurl\" 2>/dev/null `;
 	}
 	return ()  unless ($art_image);
 	my $image_ext = $self->{'imageurl'};

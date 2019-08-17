@@ -874,6 +874,7 @@ DLL_EXPORT int lut_info_id(char *lut_name,int *info1,int *info2,int *valid1,int 
 DLL_EXPORT const char *current_lutfile_name(int *set,int *level,int *retval);
 DLL_EXPORT int current_lutfile_name_id(int *set,int *level,int *retval);
 DLL_EXPORT int lut_valid(void);
+DLL_EXPORT int lut_valid_date(char *lut_name,int *v11,int *v12,int *v21,int *v22);
 DLL_EXPORT int get_lut_info2(char *lut_name,int *version_p,char **prolog_p,char **info_p,char **user_info_p);
 DLL_EXPORT int get_lut_info_b(char **info,char *lutname);
 DLL_EXPORT int get_lut_info2_b(char *lutname,int *version,char **prolog_p,char **info_p,char **user_info_p);

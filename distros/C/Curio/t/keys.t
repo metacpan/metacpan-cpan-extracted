@@ -7,15 +7,13 @@ subtest 'does_keys' => sub{
         use Curio;
     package main;
 
-    is( CC::dks->factory->does_keys(), 0, 'does_keys is false' );
-    is( dies{ CC::dks->fetch() }, undef, 'no key worked' );
+    isnt( dies{ CC::dks->fetch() }, undef, 'no key failed' );
     isnt( dies{ CC::dks->fetch('key') }, undef, 'key failed' );
 
     package CC::dks;
         add_key 'key';
     package main;
 
-    is( CC::dks->factory->does_keys(), 1, 'does_keys is true' );
     isnt( dies{ CC::dks->fetch() }, undef, 'no key failed' );
     is( dies{ CC::dks->fetch('key') }, undef, 'key worked' );
 };

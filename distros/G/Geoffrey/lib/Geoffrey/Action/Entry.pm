@@ -4,7 +4,7 @@ use utf8;
 use strict;
 use warnings;
 
-$Geoffrey::Action::Entry::VERSION = '0.000103';
+$Geoffrey::Action::Entry::VERSION = '0.000201';
 
 use parent 'Geoffrey::Role::Action';
 
@@ -28,7 +28,7 @@ sub add {
     }
 
     my ( $s_stmt, @a_bindings ) = $self->_get_sql_abstract->insert(
-        ( exists $hr_params->{schema} ? $hr_params->{schema} . q/./ : q// ) . $hr_params->{table},
+        ( $hr_params->{schema} ? $hr_params->{schema} . q/./ : q// ) . $hr_params->{table},
         $hr_params->{values}->[0],
     );
 
@@ -81,7 +81,7 @@ Geoffrey::Action::Entry - Action to insert change or delete entries from tables
 
 =head1 VERSION
 
-Version 0.000103
+Version 0.000201
 
 =head1 DESCRIPTION
 

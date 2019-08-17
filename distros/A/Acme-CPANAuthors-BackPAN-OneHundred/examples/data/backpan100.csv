@@ -1,6 +1,6 @@
-# DATE: 2019-08-11T07:18:36
+# DATE: 2019-08-17T08:38:55
 #Pause,Count,Name
-PERLANCAR,1932,perlancar
+PERLANCAR,1934,perlancar
 PSIXDISTS,550,Perl 6 Modules
 SHARYANTO,509,Steven Haryanto
 TOBYINK,329,Toby Inkster
@@ -27,8 +27,8 @@ SHLOMIF,160,Shlomi Fish
 MANWAR,155,Mohammad S Anwar
 NEILB,151,Neil Bowers
 GUGOD,149,Liu Kang Min
-SKIM,142,Michal Josef Spacek
 RSAVAGE,142,Ron Savage
+SKIM,142,Michal Josef Spacek
 BDFOY,138,brian d foy
 DMAKI,137,Daisuke Maki
 BARBIE,134,Barbie
@@ -39,13 +39,14 @@ MRAMBERG,121,Marcus Ramberg
 SIMON,121,Simon Cozens
 SALVA,116,Salvador Fandino Garcia
 MLEHMANN,115,???
+RRWO,114,Robert Rothenberg
 DMUEY,113,Daniel Muey
 YANICK,113,Yanick Champoux
-RRWO,113,Robert Rothenberg
 RENEEB,111,Renee Baecker
 LBROCARD,111,Leon Brocard
 GETTY,108,Torsten Raudssus
 VVELOX,106,???
 JHTHORSEN,106,Jan Henning Thorsen
+EXODIST,102,Chad Granum
 TEAM,102,Tom Molesworth
 LEOCHARRE,101,Leo Charre

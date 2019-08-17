@@ -3,7 +3,7 @@ package MooX::Purple;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 use Keyword::Declare;
 
 sub import {
@@ -39,6 +39,7 @@ sub import {
 		return qq|{
 			package $class;
 			use Moo::Role;
+			use MooX::LazierAttributes;
 			$attrs{with}
 			$attrs{use}
 			$body
@@ -114,7 +115,7 @@ MooX::Purple - MooX::Purple
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 

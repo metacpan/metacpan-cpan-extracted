@@ -1,3 +1,7 @@
+2019-08-16  Dave Cross <dave@dave.org.uk>
+
+  * Various test and documentation fixes
+
 2016-12-08  Dave Cross <dave@dave.org.uk>
 
   * lib/AudioFile/Info.pm: Bump version for another upload attempt

@@ -20,24 +20,23 @@ requires:
   CPAN::Changes::Cwalitee: '0'
   Cwalitee::Common: '0.002'
   Data::Sah::Coerce::perl::str::str_normalize_perl_modname: '0'
-  Data::Sah::Coerce::perl::str::str_strip_trailing_slash: '0'
   Data::Sah::Compiler::perl::TH::array: '0'
   Data::Sah::Compiler::perl::TH::bool: '0'
   Data::Sah::Compiler::perl::TH::int: '0'
   Data::Sah::Compiler::perl::TH::str: '0'
   Perinci::CmdLine::Any: '0'
-  Perinci::CmdLine::Base: '1.816'
-  Perinci::CmdLine::Classic: '1.770'
+  Perinci::CmdLine::Lite: '1.820'
   Sah::Schema::pathname: '0'
   Sah::Schema::perl::modname: '0'
   Sah::Schema::uint: '0'
+  perl: '5.010001'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-CPANChangesCwaliteeUtils
   homepage: https://metacpan.org/release/App-CPANChangesCwaliteeUtils
   repository: git://github.com/perlancar/perl-App-CPANChangesCwaliteeUtils.git
-version: '0.003'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -45,6 +44,10 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript calc-cpanges-changes-cwalitee'
+      version: '0.421'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript cc-cwa'
       version: '0.421'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
@@ -125,7 +128,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.596'
+      version: '0.597'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -288,7 +291,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.77'
+              version: '0.780'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'
@@ -322,11 +325,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::AddToDb
       name: '@Author::PERLANCAR/Rinci::AddToDb'
-      version: '0.01'
+      version: '0.020'
     -
-      class: Dist::Zilla::Plugin::Rinci::Validate
-      name: '@Author::PERLANCAR/Rinci::Validate'
-      version: '0.24'
+      class: Dist::Zilla::Plugin::Rinci::EmbedValidator
+      name: '@Author::PERLANCAR/Rinci::EmbedValidator'
+      version: '0.250'
     -
       class: Dist::Zilla::Plugin::SetScriptShebang
       name: '@Author::PERLANCAR/SetScriptShebang'

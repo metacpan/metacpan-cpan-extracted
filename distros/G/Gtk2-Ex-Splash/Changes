@@ -1,4 +1,4 @@
-Copyright 2011 Kevin Ryde
+Copyright 2011, 2019 Kevin Ryde
 
 This file is part of Gtk2-Ex-Splash.
 
@@ -16,6 +16,9 @@ You should have received a copy of the GNU General Public License along
 with Gtk2-Ex-Splash.  If not, see <http://www.gnu.org/licenses/>.
 
 
+
+Version 53, August 2019
+    - new email address
 
 Version 52, April 2011
     - gtk2-ex-splash program fix "--time" option

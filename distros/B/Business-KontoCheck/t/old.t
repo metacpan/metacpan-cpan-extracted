@@ -1,7 +1,7 @@
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl old.t'
 
-use Test::More tests => 2499;
+use Test::More tests => 2497;
 
 BEGIN { use_ok('Business::KontoCheck') };
 
@@ -851,7 +851,6 @@ __DATA__
 1 20030133 7009109478
 1 51420200 4591157792
 1 74350000 4379111449
-1 10010111 468046883
 1 10040000 790666201
 1 10040005 43165842
 1 10040048 60058263
@@ -992,7 +991,6 @@ __DATA__
 1 50324000 9367166737
 1 50324040 8645442353
 1 13061008 8283881636
-1 13061028 2894920171
 1 20069125 5177553999
 1 20069144 9368125849
 1 36060488 9962831524

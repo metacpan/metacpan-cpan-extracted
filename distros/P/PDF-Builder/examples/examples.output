@@ -160,11 +160,11 @@ to see when the resulting PDFs are displayed.
   023_cjkfonts.KozGo*.pdf
    103 pages 15x10 char grid + 1 page Latin text
 
-024_bdffonts  codec.bdf  (sample input)   BUGGY!
+024_bdffonts  codec.bdf  (sample input, not included) 
   024_pdffonts.codec.pdf
-   190 pages 1 bitmapped char each, 1 page 16x16 char grid
-   appears to be Latin-1 character set, characters 32 (space) through 255 (y-umlaut)
-   eventually will get around to putting in a proper one-page grid (currently filled blocks)
+   optional 190 pages 1 bitmapped char each, 
+      1 page 16x16 char grid and 1 page ipsum lorem Latin text
+   Latin-1 character set, characters 32 (space) through 255 (y-umlaut)
 
 025_unifonts
   025_unifonts.pdf 

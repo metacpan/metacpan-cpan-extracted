@@ -1,4 +1,4 @@
-# Copyright 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -23,7 +23,7 @@ use strict;
 *min = \&Math::PlanePath::_min;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 126;
+$VERSION = 127;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 

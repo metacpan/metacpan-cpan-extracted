@@ -1,6 +1,9 @@
 Revision history for CPAN-Testers-Common-Article
 ================================================
 
+0.47    2019-08-16
+        - fixed repo web link.
+
 0.46    2014-09-07
         - fixed license fields in META.json to be lists.
         - added homepage to META files.

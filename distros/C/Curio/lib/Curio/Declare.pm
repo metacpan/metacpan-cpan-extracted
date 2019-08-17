@@ -1,5 +1,5 @@
 package Curio::Declare;
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 use Package::Stash;
 use Curio::Util;
@@ -16,7 +16,6 @@ my %EXPORTS = (
     export_function_name   => 'string',
     always_export          => 'bool',
     export_resource        => 'bool',
-    does_keys              => 'bool',
     allow_undeclared_keys  => 'bool',
     default_key            => 'string',
     key_argument           => 'string',
@@ -100,7 +99,6 @@ Curio::Declare - Provider of Curio's declarative interface.
     does_caching;
     cache_per_process;
     
-    does_keys;
     allow_undeclared_keys;
     default_key 'some_key';
     key_argument 'name_of_argument';
@@ -178,12 +176,6 @@ See L<Curio::Factory/always_export> for details.
     export_resource;
 
 See L<Curio::Factory/export_resource> for details.
-
-=head2 does_keys
-
-    does_keys;
-
-See L<Curio::Factory/does_keys> for details.
 
 =head2 allow_undeclared_keys
 

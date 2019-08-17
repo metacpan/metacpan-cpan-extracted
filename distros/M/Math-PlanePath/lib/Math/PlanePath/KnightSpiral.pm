@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -23,7 +23,7 @@ use strict;
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 126;
+$VERSION = 127;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 *_sqrtint = \&Math::PlanePath::_sqrtint;
@@ -491,16 +491,34 @@ outwards to do the same again to a now bigger square.  The above sample
 shows the first 4-cycle around the central 1, then stepping out at 26 and
 beginning to go around the outside of the 5x5 square.
 
-An attractive traced out picture of the path can be seen at the following
-page (quarter way down under "Open Knight's Tour"),
+An attractive traced out picture of the path appeared in the past at
+C<www.borderschess.org>,
 
 =over
 
-L<http://www.borderschess.org/KTart.htm>
-L<http://www.borderschess.org/KTinfinity.gif>
-L<http://www.borderschess.org/Infinite.gif>
+L<http://web.archive.org/web/1id_/http://www.borderschess.org/Infinite.gif>
+
+L<http://web.archive.org/web/1id_/http://www.borderschess.org/KTinfinity.gif>
+
+L<http://web.archive.org/web/20161028114643id_/http://www.borderschess.org/KTart.htm>
 
 =back
+
+(HTML colours might might make the text invisible.  Try deleting, or browser
+option to ignore page colours, or a text browser.)
+
+=cut
+
+# www.borderschess.org is their book shop site, umm, maybe.
+# Some time in 2016 it changed to wordpress and lost past goodness.
+#
+# KTart.htm about 86 captures:
+#   http://web.archive.org/cdx/search/cdx?limit=200&fl=length,timestamp,original&filter=statuscode:200&url=www.borderschess.org/KTart.htm*
+#
+# Last 20170608194423 is a domain expired something.
+# Second last 20161028114643 is the page at its final revision.
+
+=pod
 
 See L<math-image> to draw the path lines too.
 
@@ -534,7 +552,7 @@ covered.
 
 This Knight's tour is in Sloane's OEIS following the Knight spiral and
 giving the resulting X,Y location by the C<SquareSpiral> numbering.  There's
-eight forms for 4 rotations and spiralling the same or opposite directions.
+eight forms for 4 rotations and the two spirals same or opposite directions.
 
 =over
 
@@ -566,7 +584,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011 Kevin Ryde
+# Copyright 2010, 2011, 2012 Kevin Ryde
 
 # This file is part of Gtk2-Ex-Splash.
 #
@@ -46,8 +46,6 @@ require Gtk2::Ex::Splash;
 #-----------------------------------------------------------------------------
 # Test::Weaken
 
-require Test::Weaken::ExtraBits;
-
 {
   my $leaks = Test::Weaken::leaks
     ({ constructor => sub {
@@ -68,7 +66,6 @@ require Test::Weaken::ExtraBits;
        },
        destructor => \&Test::Weaken::Gtk2::destructor_destroy,
        contents => \&Test::Weaken::Gtk2::contents_container,
-       # ignore => \&my_ignore,
      });
   is ($leaks, undef, 'gc while show()');
   MyTestHelpers::test_weaken_show_leaks($leaks);

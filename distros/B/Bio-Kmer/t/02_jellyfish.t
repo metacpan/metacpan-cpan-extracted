@@ -39,14 +39,14 @@ my %query=(
 SKIP:{
   my $jellyfish = which("jellyfish");
   if(! -e $jellyfish){
-    diag "Jellyfish not found in PATH. Skipping.";
-    skip("Jellyfish test", 14);
+    #diag "Jellyfish not found in PATH. Skipping.";
+    skip("Jellyfish not found in PATH.", 14);
   }
     
   my $jfVersion=`$jellyfish --version 2>/dev/null`; chomp($jfVersion);
   if($?){
-    diag "Jellyfish error and/or jellyfish version < 2. Skipping Jellyfish tests.";
-    skip("Jellyfish test", 14);
+    #diag "Jellyfish error and/or jellyfish version < 2. Skipping Jellyfish tests.";
+    skip("Jellyfish error and/or jellyfish version < 2.", 14);
   }
 
   # e.g., jellyfish 2.2.6

@@ -4,6 +4,7 @@ MANIFEST
 META.yml
 README
 lib/AudioFile/Info.pm
+lib/AudioFile/Info/Dummy.pm
 t/1.t
 t/2_pod.t
 t/3_pod_coverage.t

@@ -5,7 +5,7 @@ use base 'PDF::Builder::Resource::XObject::Image';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.015'; # VERSION
+our $VERSION = '3.016'; # VERSION
 my $LAST_UPDATE = '3.004'; # manually update whenever code is changed
 
 use PDF::Builder::Util;

@@ -32,18 +32,20 @@ my $root = GetDesktopWindow();
 my @desks = grep { $_ == $root } @wins;
 ok(! @desks, "The desktop is not on the window list");
 
+my $class_re = qr/^Notepad$/;
+
 # Make sure there are no existing Notepad windows to interfere with testing
 {
-    my @notepad_windows = FindWindowLike(0, "", "Notepad");
+    my @notepad_windows = FindWindowLike(0, "", $class_re);
     BAIL_OUT('Please close existing Notepad windows before proceeding')
         if @notepad_windows;
 }
 
 # Create a notepad window and check we can find it
 system("cmd /c start notepad.exe \"README\"");
-my @waitwin = WaitWindowLike(0, "readme|README", "Notepad");
+my @waitwin = WaitWindowLike(0, "readme|README", $class_re);
 is(@waitwin, 1, "There is one notepad open with README in it");
-my @windows = FindWindowLike(0, "readme|README", "Notepad");
+my @windows = FindWindowLike(0, "readme|README", $class_re);
 is(@windows, 1, "The same from FindWindowLike");
 is($waitwin[0], $windows[0], "The two windows are the same");
 
@@ -69,9 +71,9 @@ is($content eq $file_content, 1, "file is identical to what is in notepad");
 
 # Open a notepad and type some text into it
 system("cmd /c start notepad.exe");
-@waitwin = WaitWindowLike(0, "", "Notepad");
+@waitwin = WaitWindowLike(0, "", $class_re);
 is(@waitwin, 1, "New notepad opened");
-@windows = FindWindowLike(0, "", "Notepad");
+@windows = FindWindowLike(0, "", $class_re);
 is(@windows, 1, "same here");
 is($waitwin[0], $windows[0], "WindowIDs are identical");
 
@@ -83,11 +85,11 @@ SendKeys(<<EOM, 10);
     3, 2, 1, 0...
     Closing Notepad...
 EOM
-    
+
 SendKeys("{PAU 1000}%{F4}{TAB}{ENTER}");
 
 # We closed it so there should be no notepad open
-@windows = FindWindowLike(0, "", "Notepad");
+@windows = FindWindowLike(0, "", $class_re);
 is(@windows,0, "No notepad open now");
 
 # Since we are looking for child windows, all of them should have

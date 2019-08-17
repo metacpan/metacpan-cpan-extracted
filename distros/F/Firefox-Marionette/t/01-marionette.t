@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Digest::SHA();
 use MIME::Base64();
-use Test::More tests => 387;
+use Test::More tests => 391;
 use Cwd();
 use Firefox::Marionette qw(:all);
 use Config;
@@ -15,8 +15,12 @@ use IO::Socket::SSL();
 
 my $segv_detected;
 my $at_least_one_success;
+my $terminated;
 
 my $test_time_limit = 90;
+
+$SIG{INT} = sub { $terminated = 1; die "Caught an INT signal"; };
+$SIG{TERM} = sub { $terminated = 1; die "Caught a TERM signal"; };
 
 sub out_of_time {
 	my ($package, $file, $line) = caller 1;
@@ -38,20 +42,69 @@ my $launches = 0;
 my ($major_version, $minor_version, $patch_version); 
 sub start_firefox {
 	my ($require_visible, %parameters) = @_;
+	if ($terminated) {
+		die "Caught a signal";
+	}
 	if ($ENV{FIREFOX_BINARY}) {
-		$parameters{firefox_binary} = $ENV{FIREFOX_BINARY};
-		diag("Overriding firefox binary to $parameters{firefox_binary}");
+		$parameters{firefox} = $ENV{FIREFOX_BINARY};
+		diag("Overriding firefox binary to $parameters{firefox}");
+	}
+	if ((defined $major_version) && ($major_version >= 61)) {
+	} elsif ($parameters{har}) {
+		diag("HAR support is not available for Firefox versions less than 61");
+		delete $parameters{har};
 	}
 	if ($ENV{FIREFOX_HOST}) {
 		$parameters{host} = $ENV{FIREFOX_HOST};
 		diag("Overriding host to '$parameters{host}'");
-		if ($launches % 2) {
-			diag("Overriding user to 'firefox'");
-			$parameters{user} = 'firefox';
+		if (($ENV{FIREFOX_HOST} eq 'localhost') && (!$ENV{FIREFOX_PORT})) {
+			if ($launches != 0) {
+				diag("Overriding user to 'firefox'");
+				$parameters{user} = 'firefox';
+			}
+		}
+		if ((defined $parameters{capabilities}) && (!$parameters{capabilities}->moz_headless())) {
+			my $old = $parameters{capabilities};
+			my %new = ( moz_headless => 1 );
+			if (defined $old->proxy()) {
+				$new{proxy} = $old->proxy();
+			}
+			if (defined $old->moz_use_non_spec_compliant_pointer_origin()) {
+				$new{moz_use_non_spec_compliant_pointer_origin} = $old->moz_use_non_spec_compliant_pointer_origin();
+			}
+			if (defined $old->accept_insecure_certs()) {
+				$new{accept_insecure_certs} = $old->accept_insecure_certs();
+			}
+			if (defined $old->strict_file_interactability()) {
+				$new{strict_file_interactability} = $old->strict_file_interactability();
+			}
+			if (defined $old->unhandled_prompt_behavior()) {
+				$new{unhandled_prompt_behavior} = $old->unhandled_prompt_behavior();
+			}
+			if (defined $old->set_window_rect()) {
+				$new{set_window_rect} = $old->set_window_rect();
+			}
+			if (defined $old->page_load_strategy()) {
+				$new{page_load_strategy} = $old->page_load_strategy();
+			}
+			if (defined $old->moz_webdriver_click()) {
+				$new{moz_webdriver_click} = $old->moz_webdriver_click();
+			}
+			if (defined $old->moz_accessibility_checks()) {
+				$new{moz_accessibility_checks} = $old->moz_accessibility_checks();
+			}
+			if (defined $old->timeouts()) {
+				$new{timeouts} = $old->timeouts();
+			}
+			$parameters{capabilities} = Firefox::Marionette::Capabilities->new(%new);
 		}
 	}
+	if ($ENV{FIREFOX_PORT}) {
+		$parameters{port} = $ENV{FIREFOX_PORT};
+	}
 	if (defined $parameters{capabilities}) {
-		if ($major_version < 52) {
+		if ((defined $major_version) && ($major_version >= 52)) {
+		} else {
 			delete $parameters{capabilities}->{page_load_strategy};
 			delete $parameters{capabilities}->{moz_webdriver_click};
 			delete $parameters{capabilities}->{moz_accessibility_checks};
@@ -321,7 +374,7 @@ eval {
 chomp $@;
 ok((($@) and (not($firefox))), "Firefox::Marionette->new() threw an exception when launched with an incorrect path to a binary:$@");
 eval {
-	$firefox = Firefox::Marionette->new(firefox_binary => $^X);
+	$firefox = Firefox::Marionette->new(firefox => $^X);
 };
 chomp $@;
 ok((($@) and (not($firefox))), "Firefox::Marionette->new() threw an exception when launched with a path to a non firefox binary:$@");
@@ -595,7 +648,13 @@ SKIP: {
 		}
 	}
 	SKIP: {
-		if (!$capabilities->proxy()) {
+		if (($ENV{FIREFOX_HOST}) && ($ENV{FIREFOX_HOST} ne 'localhost')) {
+			diag("\$capabilities->proxy is not supported for remote hosts");
+			skip("\$capabilities->proxy is not supported for remote hosts", 1);
+		} elsif (($ENV{FIREFOX_HOST}) && ($ENV{FIREFOX_HOST} eq 'localhost') && ($ENV{FIREFOX_PORT})) {
+			diag("\$capabilities->proxy is not supported for remote hosts");
+			skip("\$capabilities->proxy is not supported for remote hosts", 3);
+		} elsif (!$capabilities->proxy()) {
 			skip("\$capabilities->proxy is not supported for " . $capabilities->browser_version(), 1);
 		} elsif ((exists $Config::Config{'d_fork'}) && (defined $Config::Config{'d_fork'}) && ($Config::Config{'d_fork'} eq 'define')) {
 			if ($ENV{RELEASE_TESTING}) {
@@ -731,19 +790,21 @@ SKIP: {
 	}
 	ok(!$capabilities->accept_insecure_certs(), "\$capabilities->accept_insecure_certs() is false");
 	eval { $firefox->go(URI->new("https://untrusted-root.badssl.com/")) };
-	ok(ref $@ eq 'Firefox::Marionette::Exception::InsecureCertificate', "https://untrusted-root.badssl.com/ threw an exception:$@");
+	my $exception = "$@";
+	chomp $exception;
+	ok(ref $@ eq 'Firefox::Marionette::Exception::InsecureCertificate', "https://untrusted-root.badssl.com/ threw an exception:$exception");
 }
 
 SKIP: {
-	($skip_message, $firefox) = start_firefox(0, debug => 1, capabilities => Firefox::Marionette::Capabilities->new(moz_headless => 1));
+	($skip_message, $firefox) = start_firefox(0, har => 1, debug => 0, capabilities => Firefox::Marionette::Capabilities->new(moz_headless => 1));
 	if (!$skip_message) {
 		$at_least_one_success = 1;
 	}
 	if ($skip_message) {
-		skip($skip_message, 4);
+		skip($skip_message, 5);
 	}
 	if (!$tls_tests_ok) {
-		skip("TLS test infrastructure seems compromised", 4);
+		skip("TLS test infrastructure seems compromised", 5);
 	}
 	ok($firefox, "Firefox has started in Marionette mode with definable capabilities set to known values");
 	my $capabilities = $firefox->capabilities();
@@ -754,14 +815,22 @@ SKIP: {
 	}
 	ok(!$capabilities->accept_insecure_certs(), "\$capabilities->accept_insecure_certs() is false");
 	ok($firefox->go(URI->new("https://metacpan.org/")), "https://metacpan.org/ has been loaded");
+	SKIP: {
+		if ($major_version < 61) {
+			skip("HAR support not available in Firefox before version 61", 1);
+		}
+		my $har = $firefox->har();
+		ok($har->{log}->{creator}->{name} eq 'Firefox', "\$firefox->har() gives a data structure with the correct creator name");
+	}
 }
+
 SKIP: {
 	($skip_message, $firefox) = start_firefox(0, debug => 0, script => 5432, profile => $profile, capabilities => Firefox::Marionette::Capabilities->new(accept_insecure_certs => 1));
 	if (!$skip_message) {
 		$at_least_one_success = 1;
 	}
 	if ($skip_message) {
-		skip($skip_message, 244);
+		skip($skip_message, 247);
 	}
 	ok($firefox, "Firefox has started in Marionette mode without defined capabilities, but with a defined profile and debug turned off");
 	ok($firefox->go(URI->new("https://www.w3.org/WAI/UA/TS/html401/cp0101/0101-FRAME-TEST.html")), "https://www.w3.org/WAI/UA/TS/html401/cp0101/0101-FRAME-TEST.html has been loaded");
@@ -1429,7 +1498,7 @@ SKIP: {
 	diag("Going to Test::More page with a page load strategy of " . ($capabilities->page_load_strategy() || ''));
 	SKIP: {
 		if ($major_version < 45) {
-			skip("Firefox below 45 (at least 24) does not support the getContext method", 2);
+			skip("Firefox below 45 (at least 24) does not support the getContext method", 5);
 		}
 		ok($firefox->bye(sub { $firefox->find_id('search-input') })->await(sub { $firefox->interactive() && $firefox->find_partial('Download'); })->click(), "Clicked on the download link");
 		diag("Clicked download link");
@@ -1440,11 +1509,18 @@ SKIP: {
 			sleep 1;
 		}
 		$count = 0;
+		my $download_path;
 		foreach my $path ($firefox->downloads()) {
 			diag("Downloaded $path");
+			$download_path = $path;
 			$count += 1;
 		}
 		ok($count == 1, "Downloaded 1 files:$count");
+		my $handle = $firefox->download($download_path);
+		ok($handle->isa('GLOB'), "Obtained GLOB from \$firefox->download(\$path)");
+		my $result = sysread $handle, my $buffer, 2;
+		ok($result == 2, "Read data from GLOB:$!");
+		ok($buffer eq "\x1f\x8b", "Downloaded file is gzipped");
 	}
 
 	my $alert_text = 'testing alert';
@@ -1611,7 +1687,13 @@ SKIP: {
         ok($capabilities->timeouts()->implicit() == 987654, "\$firefox->capabilities()->timeouts()->implicit() correctly reflects the implicit shortcut timeout");
 	my $daemon = HTTP::Daemon->new(LocalAddr => 'localhost') || die "Failed to create HTTP::Daemon";
 	SKIP: {
-		if ((exists $Config::Config{'d_fork'}) && (defined $Config::Config{'d_fork'}) && ($Config::Config{'d_fork'} eq 'define')) {
+		if (($ENV{FIREFOX_HOST}) && ($ENV{FIREFOX_HOST} ne 'localhost')) {
+			diag("\$capabilities->proxy is not supported for remote hosts");
+			skip("\$capabilities->proxy is not supported for remote hosts", 3);
+		} elsif (($ENV{FIREFOX_HOST}) && ($ENV{FIREFOX_HOST} eq 'localhost') && ($ENV{FIREFOX_PORT})) {
+			diag("\$capabilities->proxy is not supported for remote hosts");
+			skip("\$capabilities->proxy is not supported for remote hosts", 3);
+		} elsif ((exists $Config::Config{'d_fork'}) && (defined $Config::Config{'d_fork'}) && ($Config::Config{'d_fork'} eq 'define')) {
 			my @sig_nums  = split q[ ], $Config{sig_num};
 			my @sig_names = split q[ ], $Config{sig_name};
 			my %signals_by_name;
@@ -1877,7 +1959,11 @@ SKIP: {
 		alarm 0;
 		ok($maximise, "\$firefox->maximise()");
 	}
-	if (($^O eq 'MSWin32') || (!grep /^moz_process_id$/, $capabilities->enumerate())) {
+	if (($ENV{FIREFOX_HOST}) && ($ENV{FIREFOX_HOST} ne 'localhost')) {
+		ok($firefox->quit() == $correct_exit_status, "Firefox has closed with an exit status of $correct_exit_status:" . $firefox->child_error());
+	} elsif (($ENV{FIREFOX_HOST}) && ($ENV{FIREFOX_HOST} eq 'localhost') && ($ENV{FIREFOX_PORT})) {
+		ok($firefox->quit() == $correct_exit_status, "Firefox has closed with an exit status of $correct_exit_status:" . $firefox->child_error());
+	} elsif (($^O eq 'MSWin32') || (!grep /^moz_process_id$/, $capabilities->enumerate())) {
 		ok($firefox->quit() == $correct_exit_status, "Firefox has closed with an exit status of $correct_exit_status:" . $firefox->child_error());
 	} else {
 		my @sig_nums  = split q[ ], $Config{sig_num};

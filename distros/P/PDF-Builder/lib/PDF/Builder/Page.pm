@@ -5,8 +5,8 @@ use base 'PDF::Builder::Basic::PDF::Pages';
 use strict;
 use warnings;
 
-our $VERSION = '3.015'; # VERSION
-my $LAST_UPDATE = '3.015'; # manually update whenever code is changed
+our $VERSION = '3.016'; # VERSION
+my $LAST_UPDATE = '3.016'; # manually update whenever code is changed
 
 use POSIX qw(floor);
 use Scalar::Util qw(weaken);
@@ -32,9 +32,9 @@ Returns a page object (called from $pdf->page()).
 
 sub new {
     my ($class, $pdf, $parent, $index) = @_;
-    my ($self) = {};
+    my $self = {};
 
-    $class = ref $class if ref $class;
+    $class = ref($class) if ref($class);
     $self = $class->SUPER::new($pdf, $parent);
     $self->{'Type'} = PDFName('Page');
     $self->proc_set(qw( PDF Text ImageB ImageC ImageI ));
@@ -72,7 +72,7 @@ sub new {
 sub coerce {
     my ($class, $pdf, $page) = @_;
     my $self = $page;
-    bless ($self, $class);
+    bless $self, $class;
     $self->{' apipdf'} = $pdf;
     weaken $self->{' apipdf'};
     return $self;
@@ -96,7 +96,7 @@ sub update {
 =item $page->userunit($value)
 
 Sets the User Unit for this one page.  
-See L<PDF::Builder::Docs> "BOX" METHODS/User Units for more information.
+See L<PDF::Builder::Docs/User Units> for more information.
 
 =cut
 
@@ -117,14 +117,44 @@ sub userunit {
     return $self;
 }
 
-sub _set_bbox {
+sub _bbox {
     my ($box, $self, @corners) = @_;
+    # $box is the box name (e.g., MediaBox)
+    # $self points to the page object
+    # at least one element in @corners if setting. get if no elements.
 
     # if 1 or 3 elements in @corners, and [0] contains a letter, it's a name
     my $isName = 0;
     if (scalar @corners && $corners[0] =~ m/[a-z]/i) { $isName = 1; }
 
-    if (scalar @corners == 3) {
+    if (scalar @corners == 0) {
+	# is a query ('get')
+	#   if previously set for this page, just return array
+	#   if not set, check parent (PDF), then up chain as far as MediaBox
+	if (defined $self->{$box}) {
+	    return map { $_->val() } $self->{$box}->elements();
+	} else {
+            my $pdf = $self->{' api'};
+            if (defined $pdf->{'pages'}->{$box}) {
+                # parent (global) box is defined
+                return map { $_->val() } $pdf->{'pages'}->{$box}->elements();
+            } else {
+                # go up the chain until find defined global
+                if ($box eq 'ArtBox' || $box eq 'TrimBox' || $box eq 'BleedBox') {
+            	    $box = 'CropBox';
+                }
+                if ($box eq 'CropBox' && !defined $pdf->{'pages'}->{'CropBox'}) {
+            	    $box = 'MediaBox';
+                }
+                if ($box ne 'CropBox' && $box ne 'MediaBox') {
+            	    # invalid box name. silent error: just return Media Box
+            	    $box = 'MediaBox';
+                }
+                return map { $_->val() } $pdf->{'pages'}->{$box}->elements();
+            }
+	}
+	
+    } elsif (scalar @corners == 3) {
 	# have a name and one option (-orient)
 	my ($name, %opts) = @corners;
         @corners = page_size(($name)); # now 4 numeric values
@@ -152,24 +182,8 @@ sub _set_bbox {
     }
 
     $self->{$box} = PDFArray( map { PDFNum(float($_)) } @corners );
-    return $self;
-}
-
-sub _get_bbox {
-    my ($self, $box_order) = @_;
-
-    # Default to US letter
-    my @media = (0, 0, 612, 792);
-
-    foreach my $mediatype (@{$box_order}) {
-        my $mediaobj = $self->find_prop($mediatype);
-        if ($mediaobj) {
-            @media = map { $_->val() } $mediaobj->elementsof();
-            last;
-        }
-    }
-
-    return @media;
+    # return 4 element array of box corners
+    return @corners;
 }
 
 =item $page->mediabox($alias)
@@ -180,13 +194,16 @@ sub _get_bbox {
 
 =item $page->mediabox($llx,$lly, $urx,$ury)
 
-Sets the Media Box for this one page.  
-See L<PDF::Builder::Docs> "BOX" METHODS/Media Box for more information.
+=item ($llx,$lly, $urx,$ury) = $page->mediabox()
+
+Sets or gets the Media Box for this one page.  
+See L<PDF::Builder::Docs/Media Box> for more information.
+The method always returns the current bounds (after any set operation).
 
 =cut
 
 sub mediabox {
-    return _set_bbox('MediaBox', @_);
+    return _bbox('MediaBox', @_);
 }
 
 =item ($llx,$lly, $urx,$ury) = $page->get_mediabox()
@@ -194,12 +211,15 @@ sub mediabox {
 Gets the Media Box corner coordinates based on best estimates or the default.
 These are in the order given in a mediabox call (4 coordinates).
 
+This method is B<Deprecated>, and will likely be removed in the future. Use
+the global (C<$pdf>) or page (C<$page>) mediabox() call with no parameters
+instead.
+
 =cut
 
 sub get_mediabox {
-    my $self = shift;
-
-    return _get_bbox($self, [qw(MediaBox CropBox BleedBox TrimBox ArtBox)]);
+    my $self = shift();
+    return $self->mediabox();
 }
 
 =item $page->cropbox($alias)
@@ -210,25 +230,31 @@ sub get_mediabox {
 
 =item $page->cropbox($llx,$lly, $urx,$ury)
 
-Sets the Crop Box for this one page.  
-See L<PDF::Builder::Docs> "BOX" METHODS/Crop Box for more information.
+=item ($llx,$lly, $urx,$ury) = $page->cropbox()
+
+Sets or gets the Crop Box for this one page.  
+See L<PDF::Builder::Docs/Crop Box> for more information.
+The method always returns the current bounds (after any set operation).
 
 =cut
 
 sub cropbox {
-    return _set_bbox('CropBox', @_);
+    return _bbox('CropBox', @_);
 }
 
 =item ($llx,$lly, $urx,$ury) = $page->get_cropbox()
 
 Gets the Crop Box based on best estimates or the default.
 
+This method is B<Deprecated>, and will likely be removed in the future. Use
+the global (C<$pdf>) or page (C<$page>) cropbox() call with no parameters
+instead.
+
 =cut
 
 sub get_cropbox {
-    my $self = shift;
-
-    return _get_bbox($self, [qw(CropBox MediaBox BleedBox TrimBox ArtBox)]);
+    my $self = shift();
+    return $self->cropbox();
 }
 
 =item $page->bleedbox($alias)
@@ -239,25 +265,31 @@ sub get_cropbox {
 
 =item $page->bleedbox($llx,$lly, $urx,$ury)
 
-Sets the Bleed Box for this one page.  
-See L<PDF::Builder::Docs> "BOX" METHODS/Bleed Box for more information.
+=item ($llx,$lly, $urx,$ury) = $page->bleedbox()
+
+Sets or gets or gets the Bleed Box for this one page.  
+See L<PDF::Builder::Docs/Bleed Box> for more information.
+The method always returns the current bounds (after any set operation).
 
 =cut
 
 sub bleedbox {
-    return _set_bbox('BleedBox', @_);
+    return _bbox('BleedBox', @_);
 }
 
 =item ($llx,$lly, $urx,$ury) = $page->get_bleedbox()
 
 Gets the Bleed Box based on best estimates or the default.
 
+This method is B<Deprecated>, and will likely be removed in the future. Use
+the global (C<$pdf>) or page (C<$page>) bleedbox() call with no parameters
+instead.
+
 =cut
 
 sub get_bleedbox {
-    my $self = shift;
-
-    return _get_bbox($self, [qw(BleedBox CropBox MediaBox TrimBox ArtBox)]);
+    my $self = shift();
+    return $self->bleedbox();
 }
 
 =item $page->trimbox($alias)
@@ -268,25 +300,31 @@ sub get_bleedbox {
 
 =item $page->trimbox($llx,$lly, $urx,$ury)
 
-Sets the Trim Box for this one page.  
-See L<PDF::Builder::Docs> "BOX" METHODS/Trim Box for more information.
+=item ($llx,$lly, $urx,$ury) = $page->trimbox()
+
+Sets or gets the Trim Box for this one page.  
+See L<PDF::Builder::Docs/Trim Box> for more information.
+The method always returns the current bounds (after any set operation).
 
 =cut
 
 sub trimbox {
-    return _set_bbox('TrimBox', @_);
+    return _bbox('TrimBox', @_);
 }
 
 =item ($llx,$lly, $urx,$ury) = $page->get_trimbox()
 
 Gets the Trim Box based on best estimates or the default.
 
+This method is B<Deprecated>, and will likely be removed in the future. Use
+the global (C<$pdf>) or page (C<$page>) trimbox() call with no parameters
+instead.
+
 =cut
 
 sub get_trimbox {
-    my $self = shift;
-
-    return _get_bbox($self, [qw(TrimBox CropBox MediaBox ArtBox BleedBox)]);
+    my $self = shift();
+    return $self->trimbox();
 }
 
 =item $page->artbox($alias)
@@ -297,25 +335,31 @@ sub get_trimbox {
 
 =item $page->artbox($llx,$lly, $urx,$ury)
 
-Sets the Art Box for this one page.  
-See L<PDF::Builder::Docs> "BOX" METHODS/Art Box for more information.
+=item ($llx,$lly, $urx,$ury) = $page->artbox()
+
+Sets or gets the Art Box for this one page.  
+See L<PDF::Builder::Docs/Art Box> for more information.
+The method always returns the current bounds (after any set operation).
 
 =cut
 
 sub artbox {
-    return _set_bbox('ArtBox', @_);
+    return _bbox('ArtBox', @_);
 }
 
 =item ($llx,$lly, $urx,$ury) = $page->get_artbox()
 
 Gets the Art Box based on best estimates or the default.
 
+This method is B<Deprecated>, and will likely be removed in the future. Use
+the global (C<$pdf>) or page (C<$page>) artbox() call with no parameters
+instead.
+
 =cut
 
 sub get_artbox {
-    my $self = shift;
-
-    return _get_bbox($self, [qw(ArtBox CropBox MediaBox TrimBox BleedBox)]);
+    my $self = shift();
+    return $self->artbox();
 }
 
 =item $page->rotate($deg)
@@ -353,7 +397,7 @@ sub fixcontents {
 sub content {
     my ($self, $obj, $dir) = @_;
 
-    if (defined($dir) && $dir) {
+    if (defined($dir) && $dir > 0) {
         $self->precontent($obj);
     } else {
         $self->addcontent($obj);
@@ -489,7 +533,7 @@ Returns a new annotation object.
 sub annotation {
     my $self = shift;
 
-    unless  (exists $self->{'Annots'}) {
+    unless (exists $self->{'Annots'}) {
         $self->{'Annots'} = PDFArray();
         $self->update();
     } elsif (ref($self->{'Annots'}) =~ /Objind/) {
@@ -523,7 +567,7 @@ B<Example:>
     $co->resource('Shading', $shadekey, $shadeobj);
     $co->resource('ColorSpace', $spacekey, $speceobj);
 
-B<Note:> You only have to add the required resources, if
+B<Note:> You only have to add the required resources if
 they are NOT handled by the *font*, *image*, *shade* or *space*
 methods.
 
@@ -532,7 +576,7 @@ methods.
 sub resource {
     my ($self, $type, $key, $obj, $force) = @_;
 
-    my ($dict) = $self->find_prop('Resources');
+    my $dict = $self->find_prop('Resources');
 
     $dict = $dict || $self->{'Resources'} || PDFDict();
 
@@ -564,20 +608,20 @@ sub ship_out {
 
     $pdf->ship_out($self);
     if (defined $self->{'Contents'}) {
-        $pdf->ship_out($self->{'Contents'}->elementsof());
+        $pdf->ship_out($self->{'Contents'}->elements());
     }
     return $self;
 }
 
-sub outobjdeep {
-    my ($self, @opts) = @_;
-
-    foreach my $k (qw/ api apipdf /) {
-        $self->{" $k"} = undef;
-        delete($self->{" $k"});
-    }
-    return $self->SUPER::outobjdeep(@opts);
-}
+#sub outobjdeep {
+#    my ($self, @opts) = @_;
+#
+#    foreach my $k (qw/ api apipdf /) {
+#        $self->{" $k"} = undef;
+#        delete($self->{" $k"});
+#    }
+#    return $self->SUPER::outobjdeep(@opts);
+#}
 
 =back
 

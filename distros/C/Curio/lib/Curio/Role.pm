@@ -1,5 +1,5 @@
 package Curio::Role;
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 =encoding utf8
 
@@ -125,18 +125,18 @@ sub inject_with_guard {
     return $class->factory->inject_with_guard( @_ );
 }
 
-=head2 uninject
+=head2 clear_injection
 
-    my $curio_object = MyApp::Service::Cache->uninject();
-    my $curio_object = MyApp::Service::Cache->uninject( $key );
+    my $curio_object = MyApp::Service::Cache->clear_injection();
+    my $curio_object = MyApp::Service::Cache->clear_injection( $key );
 
-This proxies to L<Curio::Factory/uninject>.
+This proxies to L<Curio::Factory/clear_injection>.
 
 =cut
 
-sub uninject {
+sub clear_injection {
     my $class = shift;
-    return $class->factory->uninject( @_ );
+    return $class->factory->clear_injection( @_ );
 }
 
 =head2 injection
@@ -151,6 +151,20 @@ This proxies to L<Curio::Factory/injection>.
 sub injection {
     my $class = shift;
     return $class->factory->injection( @_ );
+}
+
+=head2 has_injection
+
+    if (MyApp::Service::Cache->has_injection()) { ... }
+    if (MyApp::Service::Cache->has_injection( $key )) { ... }
+
+This proxies to L<Curio::Factory/has_injection>.
+
+=cut
+
+sub has_injection {
+    my $class = shift;
+    return $class->factory->has_injection( @_ );
 }
 
 =head2 initialize

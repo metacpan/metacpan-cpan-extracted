@@ -5,7 +5,7 @@
 
 package Bio::Kmer;
 require 5.10.0;
-our $VERSION=0.24;
+our $VERSION=0.25;
 
 use strict;
 use warnings;
@@ -21,7 +21,6 @@ use Carp qw/croak carp confess/;
 
 use threads;
 use threads::shared;
-use Thread::Queue;
 
 use Exporter qw/import/;
 our @EXPORT_OK = qw(
@@ -102,7 +101,7 @@ Create a new instance of the kmer counter.  One object per file.
   Argument     Default    Description
   kmercounter  perl       What kmer counter software to use.
                           Choices: Perl, Jellyfish.
-  kmerlength   21         Kmer length
+  kmerlength|k 21         Kmer length
   numcpus      1          This module uses perl 
                           multithreading with pure perl or 
                           can supply this option to other 
@@ -129,13 +128,13 @@ sub new{
   die "ERROR: need a sequence file or a Bio::SeqIO object" if(!$seqfile);
 
   # Set optional parameter defaults
-  $$settings{kmerlength}  ||=21;
-  $$settings{numcpus}     ||=1;
-  $$settings{gt}          ||=1;
-  $$settings{kmercounter} ||="perl";
-  $$settings{tempdir}     ||=tempdir("Kmer.pm.XXXXXX",TMPDIR=>1,CLEANUP=>1);
-  $$settings{sample}        =1 if(!defined($$settings{sample}));
-  $$settings{verbose}     ||=0;
+  $$settings{kmerlength}    = $$settings{kmerlength} || $$settings{k} || 21;
+  $$settings{numcpus}     ||= 1;
+  $$settings{gt}          ||= 1;
+  $$settings{kmercounter} ||= "perl";
+  $$settings{tempdir}     ||= tempdir("Kmer.pm.XXXXXX",TMPDIR=>1,CLEANUP=>1);
+  $$settings{sample}        = 1 if(!defined($$settings{sample}));
+  $$settings{verbose}     ||= 0;
 
   # If the first parameter $seqfile is a Bio::SeqIO object,
   # then send it to a file to dovetail with the rest of
@@ -190,7 +189,8 @@ sub new{
     jellyfish  =>scalar(which("jellyfish")),
 
     # Values that will be filled in after analysis
-    _kmers     =>{},
+    _kmers     =>{},  # hash of kmer=>count
+    _hist      =>[],  # histogram. 0th element is counts of kmers occuring no times, 1st is elements occuring exactly once, etc
   };
   # Add in some other temporary files
   #($$self{kmerfileFh},$$self{kmerfile})      = tempfile("KMER.XXXXXX", DIR=>$$self{tempdir}, SUFFIX=>".tsv");
@@ -214,9 +214,23 @@ sub new{
   return $self;
 }
 
-# Count kmers with faster programs in this order of
-# priority: jellyfish (TODO: KAnalyze)
-# and lastly, pure perl.
+=pod
+
+=over
+
+=item $kmer->count()
+
+Count kmers. This method is called as soon as new() is called
+and so you should never have to run this method.
+Internally caches the kmer counts to ram.
+
+  Arguments: None
+  Returns:   None
+
+=back
+
+=cut
+
 sub count{
   my($self)=@_;
 
@@ -234,6 +248,48 @@ sub count{
   } else {
     die "ERROR: I do not understand the kmer counter $self->{kmercounter}";
   }
+
+  if($$self{sample} < 1){
+
+    my $sample = $$self{sample};
+    my $kmers = $self->kmers();
+    
+    my %subsampledKmers;
+    for my $kmer(keys(%$kmers)){
+      my $count = $$kmers{$kmer};
+      for(my $i=0;$i<$count;$i++){
+        if($sample >= rand(1)){
+          $subsampledKmers{$kmer}++;
+        }
+      }
+    }
+    
+    $self->clearCache();
+    $$self{_kmers} = \%subsampledKmers;
+  }
+}
+
+=pod
+
+=over
+
+=item $kmer->clearCache
+
+Clears kmer counts and histogram counts.  You should probably never use
+this method.
+
+  Arguments: None
+  Returns:   None
+
+=back
+
+=cut
+
+sub clearCache{
+  my($self) = @_;
+
+  $$self{_kmers} = {};
+  $$self{_hist}  = [];
 }
 
 =pod
@@ -282,7 +338,7 @@ sub query{
 
 =item $kmer->histogram()
 
-Count the frequency of kmers.
+Count the frequency of kmers. Internally caches the histogram to ram.
 
   Arguments: none
   Returns:   Reference to an array of counts. The index of 
@@ -294,6 +350,10 @@ Count the frequency of kmers.
 
 sub histogram{
   my($self)=@_;
+
+  if(@{ $$self{_hist} } > 0){
+    return $$self{_hist};
+  }
 
   if($self->{kmercounter} eq "jellyfish"){
     return $self->histogramJellyfish();
@@ -327,6 +387,7 @@ sub histogramJellyfish{
     $_||=0;
   }
 
+  $self->{_hist} = \@hist;
   return \@hist;
 }
 
@@ -347,7 +408,7 @@ sub histogramPerl{
     #$hist[0]=$hist[0] - $hist[$_]; # subtract off from the total space of possible kmers
   }
 
-  $self->{hist}=\@hist;
+  $self->{_hist}=\@hist;
   return \@hist;
 }
 
@@ -436,6 +497,7 @@ Return actual kmers
 sub kmers{
   my($self)=@_;
 
+  # Look for the cached results before trying to read the file.
   return $self->{_kmers} if(keys(%{ $self->{_kmers} }) > 0);
 
   # Dump the kmers to a tab delimited file if we are using
@@ -580,7 +642,7 @@ sub _countKmersPurePerlWorker{
     # Count kmers in a sliding window.
     # We must keep this loop optimized for speed.
     for(my $j=0;$j<$numKmersInRead;$j++){
-      next if($sample < rand(1)); # subsample
+      #next if($sample < rand(1)); # subsample
       #$kmer{substr($seq,$j,$kmerlength)}++;
       push(@$outKmerArray, substr($seq,$j,$kmerlength));
     }

@@ -1,7 +1,7 @@
 {
    "abstract" : "Build Curio classes around CHI.",
    "author" : [
-      "Aran Clary Deltac <aran@bluefeet.dev>"
+      "Aran Clary Deltac <bluefeet@gmail.com>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Minilla/v3.1.4",
@@ -43,18 +43,18 @@
       "runtime" : {
          "requires" : {
             "CHI" : "0.60",
-            "Curio" : "0.02",
-            "Curio::Role" : "0.01",
+            "Curio::Role" : "0.04",
             "Moo::Role" : "2.003000",
-            "MooX::BuildArgs" : "0.08",
+            "Scalar::Util" : "0",
             "Types::Standard" : "1.002001",
             "namespace::clean" : "0.27",
-            "perl" : "5.008001",
+            "perl" : "5.016001",
             "strictures" : "2.000001"
          }
       },
       "test" : {
          "requires" : {
+            "Curio" : "0.04",
             "Test2::V0" : "0.000094"
          }
       }
@@ -62,7 +62,7 @@
    "provides" : {
       "Curio::Role::CHI" : {
          "file" : "lib/Curio/Role/CHI.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -76,8 +76,8 @@
          "web" : "https://github.com/bluefeet/Curio-Role-CHI"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_authority" : "cpan:BLUEFEET",
-   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_serialization_backend" : "JSON::PP version 4.04",
    "x_static_install" : 1
 }

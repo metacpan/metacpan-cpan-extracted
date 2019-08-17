@@ -1,14 +1,16 @@
 requires 'namespace::clean' => '0.27';
-requires 'perl' => '5.008001';
+requires 'perl' => '5.016001';
 requires 'strictures' => '2.000001';
 
 requires 'CHI' => '0.60';
-requires 'Curio' => '0.02';
-requires 'Curio::Role' => '0.01';
+requires 'Curio::Role' => '0.04';
 requires 'Moo::Role' => '2.003000';
-requires 'MooX::BuildArgs' => '0.08';
 requires 'Types::Standard' => '1.002001';
+
+requires 'Scalar::Util';
 
 on test => sub {
     requires 'Test2::V0' => '0.000094';
+
+    requires 'Curio' => '0.04';
 };

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -19,6 +19,7 @@
 
 use 5.004;
 use strict;
+use Math::BigInt try => 'GMP';
 use Test;
 plan tests => 51;
 
@@ -47,7 +48,7 @@ foreach my $elem ([ 'A038503', 0, [1] ],
   my ($anum, $want_dir4, $initial) = @$elem;
   MyOEIS::compare_values
       (anum => $anum,
-       max_count => 5,
+       max_count => 8,
        name => "dir=$want_dir4",
        func => sub {
          my ($count) = @_;
@@ -832,7 +833,6 @@ MyOEIS::compare_values
    func => sub {
      my ($count) = @_;
      my @got;
-     require Math::BigInt;
      my $bits = Math::BigInt->new(0);
      my $target_n_level = 2;
      require Math::NumSeq::PlanePathTurn;

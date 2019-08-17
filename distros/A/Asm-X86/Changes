@@ -1,5 +1,10 @@
 Revision history for Asm-X86
 
+2019-08-16	Bogdan Drozdowski <bogdandr@op.pl>
+
+	* Version 0.28
+	* X86.pm: Updated the instruction list from FASM version 1.73.16.
+
 2019-01-03	Bogdan Drozdowski <bogdandr@op.pl>
 
 	* Version 0.27

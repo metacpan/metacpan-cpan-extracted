@@ -59,11 +59,11 @@
    "provides" : {
       "App::CSV2Chart" : {
          "file" : "lib/App/CSV2Chart.pm",
-         "version" : "v0.6.0"
+         "version" : "v0.6.1"
       },
       "App::CSV2Chart::Command::xlsx" : {
          "file" : "lib/App/CSV2Chart/Command/xlsx.pm",
-         "version" : "v0.6.0"
+         "version" : "v0.6.1"
       }
    },
    "release_status" : "stable",
@@ -78,7 +78,7 @@
          "web" : "https://github.com/shlomif/CSV2Chart"
       }
    },
-   "version" : "0.6.0",
+   "version" : "0.6.1",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028002"

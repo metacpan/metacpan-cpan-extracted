@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2013, 2015, 2018 Kevin Ryde
+# Copyright 2013, 2015, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -19,9 +19,10 @@
 
 use 5.004;
 use strict;
+use Math::BigInt try => 'GMP';
 use Math::PlanePath::AlternatePaperMidpoint;
 use Test;
-plan tests => 11;
+plan tests => 1;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -32,17 +33,14 @@ use MyOEIS;
 #------------------------------------------------------------------------------
 # A016116 -- X/2 at N=2^k, starting k=1, being 2^floor(k/2)
 
-require Math::NumSeq::PlanePathN;
-my $bigclass = Math::NumSeq::PlanePathN::_bigint();
-
 MyOEIS::compare_values
   (anum => 'A016116',
-   max_count => 1000,
+   max_count => 200,
    func => sub {
      my ($count) = @_;
      my $path = Math::PlanePath::AlternatePaperMidpoint->new;
      my @got;
-     for (my $n = $bigclass->new(2); @got < $count; $n *= 2) {
+     for (my $n = Math::BigInt->new(2); @got < $count; $n *= 2) {
        my ($x,$y) = $path->n_to_xy($n);
        push @got, $x/2;
      }

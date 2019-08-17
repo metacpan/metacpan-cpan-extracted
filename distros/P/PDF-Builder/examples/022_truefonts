@@ -15,8 +15,9 @@ use PDF::Builder::Util;
 use Unicode::UCD 'charinfo';
 use Getopt::Long;
 
-#my $compress = 'none'; # uncompressed streams
-my $compress = 'flate'; # compressed streams
+my $compress = 'none'; # uncompressed streams
+#my $compress = 'flate'; # compressed streams
+my $noembed = 0;  # 0 = allow embedding, 1 = don't allow
 
 my $sx = 33;
 my $sy = 45;
@@ -54,7 +55,7 @@ foreach my $fn (@ARGV) {
 
     print STDERR "\n$myName\n";
 
-    my $font = $pdf->ttfont($fn, -encode => $encoding);
+    my $font = $pdf->ttfont($fn, -encode => $encoding, -noembed => $noembed);
     $font->data()->{'nosubset'} = 1;
     # produce a page with dump of font
     # single byte encoding (16 rows x 16 columns)

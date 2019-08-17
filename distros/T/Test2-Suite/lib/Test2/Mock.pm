@@ -2,7 +2,7 @@ package Test2::Mock;
 use strict;
 use warnings;
 
-our $VERSION = '0.000122';
+our $VERSION = '0.000124';
 
 use Carp qw/croak confess/;
 our @CARP_NOT = (__PACKAGE__);
@@ -807,7 +807,7 @@ This gives you the chance to wrap the original sub:
         my (@args) = @_;
 
         ...
-        $orig->(@args);
+        $self->$orig(@args);
         ...
 
         return ...;

@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-06-20'; # DATE
-our $VERSION = '0.463'; # VERSION
+our $DATE = '2019-07-16'; # DATE
+our $VERSION = '0.464'; # VERSION
 
 use 5.010;
 use strict;
@@ -317,7 +317,7 @@ coerce-with-sah - Coerce data
 
 =head1 VERSION
 
-This document describes version 0.463 of coerce-with-sah (from Perl distribution App-SahUtils), released on 2019-06-20.
+This document describes version 0.464 of coerce-with-sah (from Perl distribution App-SahUtils), released on 2019-07-16.
 
 =head1 SYNOPSIS
 
@@ -364,14 +364,14 @@ Examples:
                                                                "GyMMM"             => "MMM y G",
                                                                "GyMMMd"            => "MMM d, y G",
                                                                "GyMMMEd"           => "E, MMM d, y G",
-                                                               "h"                 => "h a",
                                                                "H"                 => "HH",
-                                                               "hm"                => "h:mm a",
+                                                               "h"                 => "h a",
                                                                "Hm"                => "HH:mm",
+                                                               "hm"                => "h:mm a",
                                                                "hms"               => "h:mm:ss a",
                                                                "Hms"               => "HH:mm:ss",
-                                                               "Hmsv"              => "HH:mm:ss v",
                                                                "hmsv"              => "h:mm:ss a v",
+                                                               "Hmsv"              => "HH:mm:ss v",
                                                                "Hmv"               => "HH:mm v",
                                                                "hmv"               => "h:mm a v",
                                                                "M"                 => "L",
@@ -787,7 +787,7 @@ Valid values:
 
 =over
 
-=item B<--config-path>=I<filename>
+=item B<--config-path>=I<s>
 
 Set path to configuration file.
 

@@ -3,8 +3,8 @@ NAME
     file
 
 VERSION
-    This document describes version 0.007 of CPAN::Changes::Cwalitee (from
-    Perl distribution CPAN-Changes-Cwalitee), released on 2019-07-26.
+    This document describes version 0.009 of CPAN::Changes::Cwalitee (from
+    Perl distribution CPAN-Changes-Cwalitee), released on 2019-08-02.
 
 SYNOPSIS
      use CPAN::Changes::Cwalitee qw(
@@ -71,6 +71,8 @@ FUNCTIONS
 
     *   path* => *pathname*
 
+        Use "-" to read from STDIN.
+
     Returns an enveloped result (an array).
 
     First element (status) is an integer containing HTTP status code (200
@@ -114,7 +116,7 @@ FUNCTIONS
     *   List only certain names, show details:
 
          list_cpan_changes_cwalitee_indicators(
-         detail  => 1,
+           detail  => 1,
            include => ["parsable", "date_parsable", "date_correct_format"]
          );
 

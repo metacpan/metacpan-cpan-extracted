@@ -3,15 +3,12 @@ package PDF::Builder::Annotation;
 use base 'PDF::Builder::Basic::PDF::Dict';
 
 use strict;
-no warnings qw[ deprecated recursion uninitialized ];
+use warnings;
 
-our $VERSION = '3.015'; # VERSION
-my $LAST_UPDATE = '3.013'; # manually update whenever code is changed
-
-use Encode qw(:all);
+our $VERSION = '3.016'; # VERSION
+my $LAST_UPDATE = '3.016'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Utils;
-use PDF::Builder::Util;
 
 =head1 NAME
 
@@ -26,34 +23,36 @@ click. Not all features provided here may be available on all PDF Readers.
 
 =over
 
-=item $ant = PDF::Builder::Annotation->new()
+=item $annotation = PDF::Builder::Annotation->new()
 
 Returns an annotation object (called from $page->annotation()).
 
 =cut
 
+# %options removed, as there are currently none
 sub new {
-    my ($class,%opts) = @_;
+    my ($class) = @_;
 
     my $self = $class->SUPER::new();
-    $self->{'Type'} = PDFName('Annot');
+    $self->{'Type'}   = PDFName('Annot');
     $self->{'Border'} = PDFArray(PDFNum(0), PDFNum(0), PDFNum(1));
+
     return $self;
 }
 
-sub outobjdeep {
-    my ($self, @opts) = @_;
-
-    foreach my $k (qw[ api apipdf apipage ]) {
-        $self->{" $k"} = undef;
-        delete($self->{" $k"});
-    }
-    return $self->SUPER::outobjdeep(@opts);
-}
+#sub outobjdeep {
+#    my ($self, @options) = @_;
+#
+#    foreach my $k (qw[ api apipdf apipage ]) {
+#        $self->{" $k"} = undef;
+#        delete($self->{" $k"});
+#    }
+#    return $self->SUPER::outobjdeep(@options);
+#}
 
 # ============== start of annotation types =======================
 
-# note that %opts is given as the only format in most cases, as -rect
+# note that %options is given as the only format in most cases, as -rect
 # is a mandatory "option"
 
 =back
@@ -62,38 +61,40 @@ sub outobjdeep {
 
 =over
 
-=item $ant->link($page, %opts)
+=item $annotation->link($page, %options)
+
+=item $annotation->link($page)
 
 Defines the annotation as a launch-page with page C<$page> (within I<this>
-document) and options %opts (-rect, -border, -color, I<fit>: see descriptions
-below).
+document) and options %options (-rect, -border, -color, I<fit>: see 
+descriptions below).
 
 =cut
 
-sub link {
-    my ($self, $page, %opts) = @_;
+sub link {  ## no critic
+    my ($self, $page, %options) = @_;
 
     $self->{'Subtype'} = PDFName('Link');
-    if (ref $page) {
-        $self->{'A'} = PDFDict();
+    if (ref($page)) {
+        $self->{'A'}        = PDFDict();
         $self->{'A'}->{'S'} = PDFName('GoTo');
     }
-    $self->dest($page, %opts);
-    $self->rect(@{$opts{'-rect'}}) if defined $opts{'-rect'};
-    $self->border(@{$opts{'-border'}}) if defined $opts{'-border'};
-    $self->Color(@{ $opts{'-color'} }) if defined $opts{'-color'};
+    $self->dest($page, %options);
+    $self->rect(@{$options{'-rect'}}) if defined $options{'-rect'};
+    $self->border(@{$options{'-border'}}) if defined $options{'-border'};
+    $self->Color(@{$options{'-color'}}) if defined $options{'-color'};
 
     return $self;
 }
 
-=item $ant->pdf_file($pdffile, $pagenum, %opts)
+=item $annotation->pdf_file($pdffile, $page_number, %options)
 
 Defines the annotation as a PDF-file with filepath C<$pdffile>, on page 
-C<$pagenum>, and options %opts (-rect, -border, -color, I<fit>: see descriptions
-below). This differs from the C<link> call in that the target is found in a
-different PDF file, not the current document.
+C<$page_number>, and options %options (-rect, -border, -color, I<fit>: see 
+descriptions below). This differs from the C<link> call in that the target 
+is found in a different PDF file, not the current document.
 
-C<$pagenum> is the physical page number, starting at 1: 1, 2,...
+C<$page_number> is the physical page number, starting at 1: 1, 2,...
 
 The old name, I<pdfile>, is still available but is B<deprecated> and will be
 removed at some time in the future.
@@ -102,80 +103,81 @@ removed at some time in the future.
 
 # to be removed no earlier than November 16, 2019
 sub pdfile {
-    my ($self, $url, $pnum, %opts) = @_;
+    my ($self, $url, $page_number, %options) = @_;
     warn "use pdf_file() method instead of pdfile()";
-    return $self->pdf_file($url, $pnum, %opts);
+    return $self->pdf_file($url, $page_number, %options);
 }
 
 sub pdf_file {
-    my ($self, $url, $pnum, %opts) = @_;
+    my ($self, $url, $page_number, %options) = @_;
     # note that although "url" is used, it may be a local file
 
-    $self->{'Subtype'} = PDFName('Link');
-    $self->{'A'} = PDFDict();
+    $self->{'Subtype'}  = PDFName('Link');
+    $self->{'A'}        = PDFDict();
     $self->{'A'}->{'S'} = PDFName('GoToR');
     $self->{'A'}->{'F'} = PDFString($url, 'u');
 
-    $pnum--;  # wants it numbered starting at 0
-    $self->dest(PDFNum($pnum), %opts);
-    $self->rect(@{$opts{'-rect'}}) if defined $opts{'-rect'};
-    $self->border(@{$opts{'-border'}}) if defined $opts{'-border'};
-    $self->Color(@{ $opts{'-color'} }) if defined $opts{'-color'};
+    $page_number--;  # wants it numbered starting at 0
+    $self->dest(PDFNum($page_number), %options);
+    $self->rect(@{$options{'-rect'}}) if defined $options{'-rect'};
+    $self->border(@{$options{'-border'}}) if defined $options{'-border'};
+    $self->Color(@{$options{'-color'}}) if defined $options{'-color'};
 
     return $self;
 }
 
-=item $ant->file($file, %opts)
+=item $annotation->file($file, %options)
 
 Defines the annotation as a launch-file with filepath C<$file> (a local file)
-and options %opts (-rect, -border, -color: see descriptions below). I<How> the
-file is displayed depends on the operating system, type of file, and local
-configuration or mapping.
+and options %options (-rect, -border, -color: see descriptions below). 
+I<How> the file is displayed depends on the operating system, type of file, 
+and local configuration or mapping.
 
 =cut
 
 sub file {
-    my ($self, $file, %opts) = @_;
+    my ($self, $file, %options) = @_;
 
-    $self->{'Subtype'} = PDFName('Link');
-    $self->{'A'} = PDFDict();
+    $self->{'Subtype'}  = PDFName('Link');
+    $self->{'A'}        = PDFDict();
     $self->{'A'}->{'S'} = PDFName('Launch');
     $self->{'A'}->{'F'} = PDFString($file, 'f');
-    $self->rect(@{$opts{'-rect'}}) if defined $opts{'-rect'};
-    $self->border(@{$opts{'-border'}}) if defined $opts{'-border'};
-    $self->Color(@{ $opts{'-color'} }) if defined $opts{'-color'};
+    $self->rect(@{$options{'-rect'}}) if defined $options{'-rect'};
+    $self->border(@{$options{'-border'}}) if defined $options{'-border'};
+    $self->Color(@{$options{'-color'}}) if defined $options{'-color'};
 
     return $self;
 }
 
-=item $ant->url($url, %opts)
+=item $annotation->url($url, %options)
 
 Defines the annotation as a launch-url with url C<$url> and
-options %opts (-rect, -border, -color: see descriptions below). This page is
-usually brought up in a browser, and may be remote.
+options %options (-rect, -border, -color: see descriptions below). 
+This page is usually brought up in a browser, and may be remote.
 
 =cut
 
 sub url {
-    my ($self, $url, %opts) = @_;
+    my ($self, $url, %options) = @_;
 
-    $self->{'Subtype'} = PDFName('Link');
-    $self->{'A'} = PDFDict();
-    $self->{'A'}->{'S'} = PDFName('URI');
+    $self->{'Subtype'}    = PDFName('Link');
+    $self->{'A'}          = PDFDict();
+    $self->{'A'}->{'S'}   = PDFName('URI');
     $self->{'A'}->{'URI'} = PDFString($url, 'u');
-    $self->rect(@{$opts{'-rect'}}) if defined $opts{'-rect'};
-    $self->border(@{$opts{'-border'}}) if defined $opts{'-border'};
-    $self->Color(@{ $opts{'-color'} }) if defined $opts{'-color'};
+    $self->rect(@{$options{'-rect'}}) if defined $options{'-rect'};
+    $self->border(@{$options{'-border'}}) if defined $options{'-border'};
+    $self->Color(@{$options{'-color'}}) if defined $options{'-color'};
 
     return $self;
 }
 
-=item $ant->text($text, %opts)
+=item $annotation->text($text, %options)
 
 Defines the annotation as a text note with content string C<$text> and
-options %opts (-rect, -color, -text, -open: see descriptions below). 
+options %options (-rect, -color, -text, -open: see descriptions below). 
+The C<$text> may include newlines \n for multiple lines.
 
-C<-text> is the popup's label string.
+C<-text> is the popup's label string, not to be confused with the main C<$text>.
 
 The icon appears in the upper left corner of the C<-rect> selection rectangle,
 and its active clickable area is fixed by the icon (it is I<not> equal to the 
@@ -207,31 +209,32 @@ A I<reference> to an icon may be passed instead of a name.
 # and enabling icon_appearance() for it doesn't seem to do anything
 
 sub text {
-    my ($self, $text, %opts) = @_;
+    my ($self, $text, %options) = @_;
 
     $self->{'Subtype'} = PDFName('Text');
     $self->content($text);
 
-    $self->rect(@{$opts{'-rect'}}) if defined $opts{'-rect'};
-    $self->Color(@{ $opts{'-color'} }) if defined $opts{'-color'};
-    $self->open($opts{'-open'}) if defined $opts{'-open'};
+    $self->rect(@{$options{'-rect'}}) if defined $options{'-rect'};
+    $self->open($options{'-open'}) if defined $options{'-open'};
+    $self->Color(@{$options{'-color'}}) if defined $options{'-color'};
     # popup label (title)
-    $self->{'T'} = PDFString($opts{'-text'}, 'p') if exists $opts{'-text'};
+    $self->{'T'} = PDFString($options{'-text'}, 'p') if exists $options{'-text'};
 
     # Icon Name will be ignored if there is an AP.
     my $icon;  # perlcritic doesn't want 2 lines combined
-    $icon = $opts{'-icon'} if exists $opts{'-icon'};
+    $icon = $options{'-icon'} if exists $options{'-icon'};
     $self->{'Name'} = PDFName($icon) if $icon && !ref($icon); # icon name
     # Set the icon appearance
-    $self->icon_appearance($icon, %opts) if $icon;
+    $self->icon_appearance($icon, %options) if $icon;
 
     return $self;
 }
 
-=item $ant->movie($file, $contentType, %opts)
+=item $annotation->movie($file, $contentType, %options)
 
-Defines the annotation as a movie from C<$file> with C<$contentType> and
-options %opts (-rect, -border, -color: see descriptions below).
+Defines the annotation as a movie from C<$file> with 
+content (MIME) type C<$contentType> and
+options %options (-rect, -border, -color: see descriptions below).
 
 The C<-rect> rectangle also serves as the area where the movie is played, so it
 should be of usable size and aspect ratio. It does not use a separate popup
@@ -241,31 +244,37 @@ is probably needed on this annotation method.
 
 =cut
 
-# TBD: allow embedding of movie file, per original API2 code. might be useful
-#      for very short clips.
-
 sub movie {
-    my ($self, $file, $contentType, %opts) = @_;
+    my ($self, $file, $contentType, %options) = @_;
 
-    $self->{'Subtype'} = PDFName('Movie'); # subtype = movie (req)
-    $self->{'A'} = PDFBool(1);  # play using default activation parameters
-    $self->{'Movie'} = PDFDict();
+    $self->{'Subtype'}      = PDFName('Movie'); # subtype = movie (req)
+    $self->{'A'}            = PDFBool(1); # play using default activation parms
+    $self->{'Movie'}        = PDFDict();
    #$self->{'Movie'}->{'S'} = PDFName($contentType);
     $self->{'Movie'}->{'F'} = PDFString($file, 'f');
 
-    $self->rect(@{$opts{'-rect'}}) if defined $opts{'-rect'};
-    $self->border(@{$opts{'-border'}}) if defined $opts{'-border'};
-    $self->Color(@{ $opts{'-color'} }) if defined $opts{'-color'};
+# PDF::API2 2.034 changes don't seem to work
+#    $self->{'Movie'}->{'F'} = PDFString($file, 'f'); line above removed
+#$self->{'Movie'}->{'F'} = PDFDict();
+#$self->{' apipdf'}->new_obj($self->{'Movie'}->{'F'});
+#my $f = $self->{'Movie'}->{'F'};
+#$f->{'Type'}    = PDFName('EmbeddedFile');
+#$f->{'Subtype'} = PDFName($contentType);
+#$f->{' streamfile'} = $file;
+
+    $self->rect(@{$options{'-rect'}}) if defined $options{'-rect'};
+    $self->border(@{$options{'-border'}}) if defined $options{'-border'};
+    $self->Color(@{$options{'-color'}}) if defined $options{'-color'};
     # popup label (title)  DOESN'T SEEM TO SHOW UP ANYWHERE
     #  self->A->T and self->T also fail to display
-    $self->{'Movie'}->{'T'} = PDFString($opts{'-text'}, 'p') if exists $opts{'-text'};
+    $self->{'Movie'}->{'T'} = PDFString($options{'-text'}, 'p') if exists $options{'-text'};
 
     return $self;
 }
 
-=item $ant->file_attachment($file, %opts)
+=item $annotation->file_attachment($file, %options)
 
-Defines the annotation as a file attachment with file $file and options %opts
+Defines the annotation as a file attachment with file $file and options %options
 (-rect, -color: see descriptions below). Note that C<-color> applies to
 the icon fill color, not to a selectable area outline. The icon is resized
 (including aspect ratio changes) based on the selectable rectangle given by
@@ -325,14 +334,14 @@ A text label for the popup (on mouseover) that contains the file name.
 #     ends, at the cost of 3 copies of each file.
 
 sub file_attachment {
-    my ($self, $file, %opts) = @_;
+    my ($self, $file, %options) = @_;
 
     my $icon;  # defaults to Reader's default (usually PushPin)
-    $icon = $opts{'-icon'} if exists $opts{'-icon'};
+    $icon = $options{'-icon'} if exists $options{'-icon'};
 
-    $self->rect(@{$opts{'-rect'}}) if defined $opts{'-rect'};
+    $self->rect(@{$options{'-rect'}}) if defined $options{'-rect'};
     # descriptive text on mouse rollover
-    $self->{'T'} = PDFString($opts{'-text'}, 'p') if exists $opts{'-text'};
+    $self->{'T'} = PDFString($options{'-text'}, 'p') if exists $options{'-text'};
 
     $self->{'Subtype'} = PDFName('FileAttachment');
 
@@ -361,7 +370,7 @@ sub file_attachment {
     # text label on pop-up for mouse rollover
     my $cName = $file;
     # trim off any path, leaving just the file name. less confusing that way
-    if (!defined $opts{'-notrimpath'}) {
+    if (!defined $options{'-notrimpath'}) {
         if ($cName =~ m#([^/\\]+)$#) { $cName = $1; }
     }
     $self->{'Contents'} = PDFString($cName, 's');
@@ -369,7 +378,7 @@ sub file_attachment {
     # Icon Name will be ignored if there is an AP.
     $self->{'Name'} = PDFName($icon) if $icon && !ref($icon); # icon name
    #$self->{'F'} = PDFNum(0b0);  # flags default to 0
-    $self->Color(@{ $opts{'-color'} }) if defined $opts{'-color'};
+    $self->Color(@{ $options{'-color'} }) if defined $options{'-color'};
 
     # The File Specification.
     $self->{'FS'} = PDFDict();
@@ -382,7 +391,7 @@ sub file_attachment {
     $self->{'FS'}->{'EF'}->{'F'}->{' streamfile'} = $file;
 
     # Set the icon appearance
-    $self->icon_appearance($icon, %opts) if $icon;
+    $self->icon_appearance($icon, %options) if $icon;
 
     return $self;
 }
@@ -408,7 +417,7 @@ sub file_attachment {
 
 =over
 
-=item $ant->rect($llx,$lly, $urx,$ury)
+=item $annotation->rect($llx,$lly, $urx,$ury)
 
 Sets the rectangle (active click area) of the annotation, given by -rect option.
 This is any pair of diagonally opposite corners of the rectangle.
@@ -436,7 +445,7 @@ sub rect {
     return $self;
 }
 
-=item $ant->border(@b)
+=item $annotation->border(@b)
 
 Sets the border-style of the annotation, if applicable, as given by the
 -border option. There are three entries in the array:
@@ -485,32 +494,29 @@ sub border {
     return $self;
 }
 
-=item $ant->content($text)
+=item $annotation->content(@lines)
 
 Sets the text-content of the C<text()> annotation.
-This is a text string.
+This is a text string or array of strings.
 
 =cut
 
-# TBD allow array of text strings. glue together with x0D or \n
 sub content {
-    my ($self, $t) = @_;
+    my ($self, @lines) = @_;
+    my $text = join("\n", @lines);
     
-   # originally @t, but caller only passed a single text string (scalar) anyway
-   #my $t = join("\n", @t);
-    $self->{'Contents'} = PDFString($t, 's');
+    $self->{'Contents'} = PDFString($text, 's');
     return $self;
 }
 
 # unused internal routine? TBD
 sub name {
-    my ($self, $n) = @_;
-
-    $self->{'Name'} = PDFName($n);
+    my ($self, $name) = @_;
+    $self->{'Name'} = PDFName($name);
     return $self;
 }
 
-=item $ant->open($bool)
+=item $annotation->open($bool)
 
 Display the C<text()> annotation either open or closed, if applicable.
 
@@ -530,19 +536,18 @@ If false (0), or the option is not given, the annotation is initially "closed".
 
 =cut
 
-sub open {
-    my ($self, $n) = @_;
-
-    $self->{'Open'} = PDFBool($n? 1: 0);
+sub open {  ## no critic
+    my ($self, $bool) = @_;
+    $self->{'Open'} = PDFBool($bool? 1: 0);
     return $self;
 }
 
-=item $ant->dest($page, I<fit_setting>)
+=item $annotation->dest($page, I<fit_setting>)
 
 For certain annotation types (C<link> or C<pdf_file>), the I<fit_setting> 
 specifies how the content of the page C<$page> is to be fit to the window,
 while preserving its aspect ratio. 
-These options are:
+These fit settings are:
 
 =over
 
@@ -606,44 +611,45 @@ C<$left>, C<$top>, or C<$zoom> specifies that the current value of that
 parameter is to be retained unchanged.
 
 This is the B<default> fit setting, with position (left and top) and zoom
-the same as the calling page's.
+the same as the calling page's ([undef, undef, undef]).
 
 =back
 
-=item $ant->dest($name)
+=item $annotation->dest($name)
 
-Connect the Annotation to a "Named Destination" defined elsewhere.
+Connect the Annotation to a "Named Destination" defined elsewhere, including
+the optional desired I<fit> (default: -xyz undef*3).
 
 =cut
 
 sub dest {
-    my ($self, $page, %opts) = @_;
+    my ($self, $page, %position) = @_;
 
     if (ref $page) {
         $self->{'A'} ||= PDFDict();
 
-        if      (defined $opts{'-fit'}) {
+        if      (defined $position{'-fit'}) {
             $self->{'A'}->{'D'} = PDFArray($page, PDFName('Fit'));
-        } elsif (defined $opts{'-fith'}) {
-            $self->{'A'}->{'D'} = PDFArray($page, PDFName('FitH'), PDFNum($opts{'-fith'}));
-        } elsif (defined $opts{'-fitb'}) {
+        } elsif (defined $position{'-fith'}) {
+            $self->{'A'}->{'D'} = PDFArray($page, PDFName('FitH'), PDFNum($position{'-fith'}));
+        } elsif (defined $position{'-fitb'}) {
             $self->{'A'}->{'D'} = PDFArray($page, PDFName('FitB'));
-        } elsif (defined $opts{'-fitbh'}) {
-            $self->{'A'}->{'D'} = PDFArray($page, PDFName('FitBH'), PDFNum($opts{'-fitbh'}));
-        } elsif (defined $opts{'-fitv'}) {
-            $self->{'A'}->{'D'} = PDFArray($page, PDFName('FitV'), PDFNum($opts{'-fitv'}));
-        } elsif (defined $opts{'-fitbv'}) {
-            $self->{'A'}->{'D'} = PDFArray($page, PDFName('FitBV'), PDFNum($opts{'-fitbv'}));
-        } elsif (defined $opts{'-fitr'}) {
-            die "Insufficient parameters to ->dest(page, -fitr => []) " unless scalar @{$opts{'-fitr'}} == 4;
-            $self->{'A'}->{'D'} = PDFArray($page, PDFName('FitR'), map {PDFNum($_)} @{$opts{'-fitr'}});
-        } elsif (defined $opts{'-xyz'}) {
-            die "Insufficient parameters to ->dest(page, -xyz => []) " unless scalar @{$opts{'-xyz'}} == 3;
-            $self->{'A'}->{'D'} = PDFArray($page, PDFName('XYZ'), map {defined $_ ? PDFNum($_) : PDFNull()} @{$opts{'-xyz'}});
+        } elsif (defined $position{'-fitbh'}) {
+            $self->{'A'}->{'D'} = PDFArray($page, PDFName('FitBH'), PDFNum($position{'-fitbh'}));
+        } elsif (defined $position{'-fitv'}) {
+            $self->{'A'}->{'D'} = PDFArray($page, PDFName('FitV'), PDFNum($position{'-fitv'}));
+        } elsif (defined $position{'-fitbv'}) {
+            $self->{'A'}->{'D'} = PDFArray($page, PDFName('FitBV'), PDFNum($position{'-fitbv'}));
+        } elsif (defined $position{'-fitr'}) {
+            die "Insufficient parameters to -fitr => []) " unless scalar @{$position{'-fitr'}} == 4;
+            $self->{'A'}->{'D'} = PDFArray($page, PDFName('FitR'), map {PDFNum($_)} @{$position{'-fitr'}});
+        } elsif (defined $position{'-xyz'}) {
+            die "Insufficient parameters to -xyz => []) " unless scalar @{$position{'-xyz'}} == 3;
+            $self->{'A'}->{'D'} = PDFArray($page, PDFName('XYZ'), map {defined $_ ? PDFNum($_) : PDFNull()} @{$position{'-xyz'}});
         } else {
-	        # no "fit" option found. use default.
-            $opts{'-xyz'} = [undef,undef,undef];
-            $self->{'A'}->{'D'} = PDFArray($page, PDFName('XYZ'), map {defined $_ ? PDFNum($_) : PDFNull()} @{$opts{'-xyz'}});
+	    # no "fit" option found. use default.
+            $position{'-xyz'} = [undef,undef,undef];
+            $self->{'A'}->{'D'} = PDFArray($page, PDFName('XYZ'), map {defined $_ ? PDFNum($_) : PDFNull()} @{$position{'-xyz'}});
         }
     } else {
         $self->{'Dest'} = PDFString($page, 'n');
@@ -652,7 +658,7 @@ sub dest {
     return $self;
 }
 
-=item $ant->Color(@color)
+=item $annotation->Color(@color)
 
 Set the icon's fill color. The color is an array of 1, 3, or 4 numbers, each
 in the range 0.0 to 1.0. If 1 number is given, it is the grayscale value (0 = 
@@ -671,7 +677,7 @@ Defining option:
 
 =over
 
-=item -color => [ ] or more than 4 numbers
+=item -color => [ ] or not 1, 3, or 4 numbers 0.0-1.0
 
 A medium gray (0.5 value) will be used if an invalid color is given.
 
@@ -728,7 +734,7 @@ shows up I<as a title> in the pop-up containing the file or text.
 =cut
 
 sub icon_appearance {
-    my ($self, $icon, %opts) = @_;
+    my ($self, $icon, %options) = @_;
     # $icon is a string with name of icon (confirmed not empty) or a reference.
     # if a string (text), has already defined /Name. "None" and ref handle here.
     # options of interest: -rect (to define size of icon)
@@ -737,7 +743,7 @@ sub icon_appearance {
    #return unless $self->{'Subtype'}->val() eq 'FileAttachment';
 
     my @r;  # perlcritic doesn't want 2 lines combined
-    @r = @{$opts{'-rect'}} if defined $opts{'-rect'};
+    @r = @{$options{'-rect'}} if defined $options{'-rect'};
     # number of parameters should be 4, checked above (rect method)
 
     # Handle custom icon type 'None' and icon reference.

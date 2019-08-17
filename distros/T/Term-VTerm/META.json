@@ -35,15 +35,15 @@
    "provides" : {
       "Term::VTerm" : {
          "file" : "lib/Term/VTerm.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "Term::VTerm::Screen" : {
          "file" : "lib/Term/VTerm/Screen.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "Term::VTerm::State" : {
          "file" : "lib/Term/VTerm/State.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -52,6 +52,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.04",
-   "x_serialization_backend" : "JSON::PP version 4.00"
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

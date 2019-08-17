@@ -1,5 +1,6 @@
 package World;
 use Moo::Role;
+use MooX::LazierAttributes;
 with qw/Before/;
 
 sub six {

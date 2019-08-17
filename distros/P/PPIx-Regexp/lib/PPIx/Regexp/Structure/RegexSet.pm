@@ -10,7 +10,7 @@ use PPIx::Regexp::Constant qw{
     @CARP_NOT
 };
 
-our $VERSION = '0.065';
+our $VERSION = '0.066';
 
 sub __following_literal_left_curly_disallowed_in {
     return LITERAL_LEFT_CURLY_REMOVED_PHASE_2;

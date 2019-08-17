@@ -5,7 +5,7 @@ use base 'PDF::Builder::Basic::PDF::Filter::FlateDecode';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.015'; # VERSION
+our $VERSION = '3.016'; # VERSION
 my $LAST_UPDATE = '2.029'; # manually update whenever code is changed
 
 =head1 NAME

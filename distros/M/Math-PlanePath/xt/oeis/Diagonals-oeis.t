@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2017, 2018 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2017, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -21,7 +21,8 @@
 use 5.004;
 use strict;
 use Test;
-plan tests => 15;
+use Math::BigInt try => 'GMP';
+plan tests => 16;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -30,6 +31,27 @@ use MyOEIS;
 
 use Math::PlanePath::Diagonals;
 
+
+#------------------------------------------------------------------------------
+# A097806 - Riordan 1,1,x-1 zeros
+
+foreach my $direction ('down','up') {
+  MyOEIS::compare_values
+      (anum => 'A097806',
+       func => sub {
+         my ($count) = @_;
+         require Math::NumSeq::PlanePathTurn;
+         my $path = Math::PlanePath::Diagonals->new(direction => $direction);
+         my $seq = Math::NumSeq::PlanePathTurn->new(planepath_object => $path,
+                                                    turn_type => 'NotStraight');
+         my @got;
+         while (@got < $count) {
+           my ($i,$value) = $seq->next;
+           push @got, $value;
+         }
+         return \@got;
+       });
+}
 
 #------------------------------------------------------------------------------
 
@@ -59,19 +81,16 @@ MyOEIS::compare_values
      my @got;
      for (my $n = $path->n_start; @got < $count; $n++) {
        my ($x,$y) = $path->n_to_xy($n);
-       push @got, $x;
-       if (@got < $count) {
-         push @got, $y;
-       }
-     }
-     return \@got;
+                                                 push @got, $x;
+                                                 if (@got < $count) {
+                                                   push @got, $y;
+                                                 }
+                                               }
+       return \@got;
    });
 
 #------------------------------------------------------------------------------
 # A057046 -- X at N=2^k
-
-require Math::NumSeq::PlanePathN;
-my $bigclass = Math::NumSeq::PlanePathN::_bigint();
 
 {
   my $path = Math::PlanePath::Diagonals->new (x_start=>1, y_start=>1);
@@ -80,13 +99,13 @@ my $bigclass = Math::NumSeq::PlanePathN::_bigint();
     (anum => 'A057046',
      func => sub {
        my ($count) = @_;
-       my @got;
-       for (my $n = $bigclass->new(1); @got < $count; $n *= 2) {
-         my ($x,$y) = $path->n_to_xy($n);
-         push @got, $x;
-       }
-       return \@got;
-     });
+                                              my @got;
+                                              for (my $n = Math::BigInt->new(1); @got < $count; $n *= 2) {
+                                                my ($x,$y) = $path->n_to_xy($n);
+                                                push @got, $x;
+                                              }
+                                              return \@got;
+                                            });
 
 # A057047 -- Y at N=2^k
 MyOEIS::compare_values
@@ -94,7 +113,7 @@ MyOEIS::compare_values
    func => sub {
      my ($count) = @_;
      my @got;
-     for (my $n = $bigclass->new(1); @got < $count; $n *= 2) {
+     for (my $n = Math::BigInt->new(1); @got < $count; $n *= 2) {
        my ($x,$y) = $path->n_to_xy($n);
        push @got, $y;
      }

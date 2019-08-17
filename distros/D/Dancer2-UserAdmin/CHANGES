@@ -1,0 +1,9 @@
+Changes file for Dancer2::Logger::LogAny
+
+0.9902    2019-08-17 01:16:51-04:00 America/New_York
+
+  - Initial release upon an unsuspecting world
+ 
+0.9901    2019-08-17 01:11:01-04:00 America/New_York
+
+  - Distro setup.

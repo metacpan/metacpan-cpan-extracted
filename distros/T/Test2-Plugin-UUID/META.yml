@@ -1,0 +1,25 @@
+---
+abstract: 'Use REAL UUIDs in Test2'
+author:
+  - 'Chad Granum <exodist@cpan.org>'
+build_requires:
+  Test2::V0: '0.000124'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test2-Plugin-UUID
+requires:
+  Data::UUID: '1.148'
+  Test2::API: '1.302165'
+  perl: '5.008009'
+resources:
+  bugtracker: http://github.com/Test-More/Test2-Plugin-UUID/issues
+  repository: http://github.com/Test-More/Test2-Plugin-UUID/
+version: '0.002001'
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

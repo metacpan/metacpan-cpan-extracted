@@ -1,6 +1,27 @@
-Revision history for Perinci-Exporter
+0.080   2019-08-15  Released-By: PERLANCAR; Urgency: medium
 
-0.07    2015-09-29 (PERLANCAR)
+	[INCOMPATIBLE CHANGES]
+
+        - To be less invasive and more generally usable, wrapping now defaults
+	  to off unless required, e.g. user specifies other options that require
+	  wrapping e.g. 'retry', 'args_as', 'convert', etc.
+
+        [ENHANCEMENTS]
+
+	- Make Perinci::Exporter's startup lighter: no strict, warnings, use
+          5.010. It is now more closer to Exporter.pm and Exporter::Rinci in
+          startup overhead.
+
+        - Reduce the number of dependencies. Make Perinci::Sub::Wrapper and
+          Perinci::Sub::Property::* optional dependencies, since we now change
+          default wrap=0. Inline routines from Package::MoreUtil.
+
+        [DOCUMENTATION]
+
+        - Mention Exporter::Rinci.
+
+
+0.07    2015-09-29  Released-By: PERLANCAR
 
 	- Add Perinci::Examples::Export.
 
@@ -12,8 +33,10 @@ Revision history for Perinci-Exporter
         - When user imports with tag 'foo', will match function tag 'foo' as
           well as 'export:foo'.
 
+        - Remove the use of smartmatch/experimental.pm to reduce deps.
 
-0.06    2015-09-03 (PERLANCAR)
+
+0.06    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -29,7 +52,7 @@ Revision history for Perinci-Exporter
 	  subroutines.
 
 
-0.05    2014-12-05 (PERLANCAR)
+0.05    2014-12-05  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -37,22 +60,22 @@ Revision history for Perinci-Exporter
 	  Package::MoreUtil.
 
 
-0.04     2014-03-07 (SHARYANTO)
+0.04     2014-03-07  Released-By: SHARYANTO
 
          - No functional changes. Update to Perinci::Sub::Wrapper 0.51.
 
 
-0.03     2013-08-12 (SHARYANTO)
+0.03     2013-08-12  Released-By: SHARYANTO
 
          - No functional changes. Update to no longer using
            Perinci::Util::get_package_meta_accessor (removed).
 
 
-0.02     2012-08-10 (SHARYANTO)
+0.02     2012-08-10  Released-By: SHARYANTO
 
          - No functional changes. Update dependencies.
 
 
-0.01     2012-08-02 (SHARYANTO)
+0.01     2012-08-02  Released-By: SHARYANTO
 
          - First release.

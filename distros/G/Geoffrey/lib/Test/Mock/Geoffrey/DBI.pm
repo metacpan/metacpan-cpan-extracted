@@ -5,7 +5,7 @@ use 5.016;
 use strict;
 use warnings;
 
-$Test::Mock::Geoffrey::DBI::VERSION = '0.000103';
+$Test::Mock::Geoffrey::DBI::VERSION = '0.000201';
 
 sub new { return bless {}, shift; }
 
@@ -25,7 +25,7 @@ Test::Mock::Geoffrey::DBI - Mocking class for DBI results.
 
 =head1 VERSION
 
-Version 0.000103
+Version 0.000201
 
 =head1 DESCRIPTION
 

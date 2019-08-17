@@ -1,4 +1,4 @@
-# Copyright 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2014, 2015, 2016, 2017, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -37,7 +37,7 @@ use Math::PlanePath::Base::Digits
   'digit_split_lowtohigh';
 
 use vars '$VERSION', '@ISA';
-$VERSION = 126;
+$VERSION = 127;
 @ISA = ('Math::PlanePath');
 
 # uncomment this to run the ### lines

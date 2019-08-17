@@ -5,8 +5,8 @@ use base 'PDF::Builder::Basic::PDF::Dict';
 use strict;
 no warnings qw( deprecated recursion uninitialized );
 
-our $VERSION = '3.015'; # VERSION
-my $LAST_UPDATE = '3.014'; # manually update whenever code is changed
+our $VERSION = '3.016'; # VERSION
+my $LAST_UPDATE = '3.016'; # manually update whenever code is changed
 
 use Carp;
 use Compress::Zlib qw();
@@ -91,16 +91,16 @@ sub new {
 
 # internal helper method
 sub outobjdeep {
-    my $self = shift;
+    my $self = shift();
 
     $self->textend();
-    foreach my $k (qw[ api apipdf apiistext apipage font fontset fontsize
-                       charspace hscale wordspace lead rise render matrix
-                       textmatrix textlinematrix fillcolor strokecolor
-                       translate scale skew rotate ]) {
-        $self->{" $k"} = undef;
-        delete($self->{" $k"});
-    }
+#   foreach my $k (qw[ api apipdf apiistext apipage font fontset fontsize
+#                      charspace hscale wordspace lead rise render matrix
+#                      textmatrix textlinematrix fillcolor strokecolor
+#                      translate scale skew rotate ]) {
+#       $self->{" $k"} = undef;
+#       delete($self->{" $k"});
+#   }
     if ($self->{'-docompress'} && $self->{'Filter'}) {
         $self->{' stream'} = Compress::Zlib::compress($self->{' stream'});
         $self->{' nofilt'} = 1;
@@ -2296,7 +2296,7 @@ C<endpath()> call (B<n>) after the C<clip()> call, to clear the path (unless
 you want to reuse that path, such as to fill and/or stroke it to show the clip 
 path). If you want to clip text glyphs, it gets rather complicated, as a clip
 port cannot be created within a text object (that will have an effect on text). 
-See the object discussion in L<PDF::Builder::Docs> B<Rendering Order>.
+See the object discussion in L<PDF::Builder::Docs/Rendering Order>.
 
  my $grfxC1 = $page->gfx();
  my $textC  = $page->text();

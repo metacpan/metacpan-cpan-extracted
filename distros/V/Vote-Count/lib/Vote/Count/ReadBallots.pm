@@ -10,18 +10,18 @@ use Carp;
 
 # ABSTRACT: Read Ballots for Vote::Count. Toolkit for vote counting.
 
-our $VERSION='0.017';
+our $VERSION='0.021';
 
 =head1 NAME
 
 Vote::Count::ReadBallots
 
-=head1 VERSION 0.017
+=head1 VERSION 0.021
 
 =head1 SYNOPSIS
 
   Vote::Count::ReadBallots 'read_ballots';
-  
+
   my $data1 = read_ballots('t/data/data1.txt');
 
 =head1 Description
@@ -45,19 +45,20 @@ Reads a file containing vote data. Retruns a HashRef of a Vote::Count BallotSet.
         MINTCHIP     1,
         VANILLA      1
     },
+    votescast        1,
     comment   "# Optional Comment",
-    options   { 
+    options   {
       rcv   1
     }
 
- =head1 Data File Format
- 
+=head1 Data File Format
+
   # This is a comment, optional.
   :CHOICES:VANILLA:CHOCOLATE:STRAWBERRY:MINTCHIP:CARAMEL:RUMRAISIN
   5:VANILLA:CHOCOLATE:STRAWBERRY
   RUMRAISIN
 
-CHOICES must be defined before any vote lines. or an error will be thrown. CHOICES must only be defined once. These rules are to protect against errors in manually prepared files.   
+CHOICES must be defined before any vote lines. or an error will be thrown. CHOICES must only be defined once. These two rules are to protect against errors in manually prepared files.
 
 A data line may begin with a number or a choice. When there is no number the line is counted as being a single ballot. The number represents the number of ballots identical to that one; this notation will both dramatically shrink the data files and improve performance.
 
@@ -91,13 +92,18 @@ sub _choices ( $choices ) {
   return \%C;
 }
 
+## Add ballotscount !
+
 sub read_ballots( $filename ) {
   my %data = (
-    'choices' => undef, 'ballots' => {}, 'options' => { 'rcv' => 1 },
+    'choices' => undef,
+    'ballots' => {},
+    'options' => { 'rcv' => 1 },
+    'votescast' => 0 ,
     'comment' => '' );
-BALLOTREADLINES:  
+BALLOTREADLINES:
   for my $line_raw ( path($filename)->lines ) {
-    if ( $line_raw =~ m/^\#/ ) { 
+    if ( $line_raw =~ m/^\#/ ) {
       $data{'comment'} .= $line_raw;
       next BALLOTREADLINES;
     }
@@ -111,8 +117,9 @@ BALLOTREADLINES:
     }
     my $line = $line_raw;
     next unless ( $line =~ /\w/ );
-    $line =~ s/(\d+)\://;
+    $line =~ s/^(\d+)\://;
     my $numbals = $1 ? $1 : 1;
+    $data{'votescast'} += $numbals;
     if ( $data{'ballots'}{$line} ) {
       $data{'ballots'}{$line}{'count'} =
         $data{'ballots'}{$line}{'count'} + $numbals;
@@ -122,7 +129,7 @@ BALLOTREADLINES:
       for my $choice ( split( /:/, $line ) ) {
         unless ( $data{'choices'}{$choice} ) {
           die "Choice: $choice is not in defined choice list: "
-            . join( ", ", keys( $data{'choices'}->%* ) ) . 
+            . join( ", ", keys( $data{'choices'}->%* ) ) .
             "\n -- $line\n";
         }
         push @votes, $choice;

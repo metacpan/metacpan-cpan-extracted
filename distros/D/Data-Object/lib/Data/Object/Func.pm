@@ -6,7 +6,7 @@ extends 'Data::Object::Base';
 
 with 'Data::Object::Role::Throwable';
 
-our $VERSION = '0.97'; # VERSION
+our $VERSION = '0.98'; # VERSION
 
 # BUILD
 

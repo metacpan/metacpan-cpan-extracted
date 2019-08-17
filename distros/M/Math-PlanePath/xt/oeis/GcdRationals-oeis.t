@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2018 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -21,7 +21,7 @@
 use 5.004;
 use strict;
 use Test;
-plan tests => 6;
+plan tests => 7;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -32,22 +32,40 @@ use Math::PlanePath::GcdRationals;
 
 
 #------------------------------------------------------------------------------
-# A050873 = ceil(X/Y)
+# A178340 Bernoulli denominator = int(X/Y) + 1
+# Not quite since A178340 is reduced rational.  First different at n=49.
+#
+# MyOEIS::compare_values
+#   (anum => q{A178340},
+#    func => sub {
+#      my ($count) = @_;
+#      my $path = Math::PlanePath::GcdRationals->new;
+#      my @got = (1);
+#      for (my $n = $path->n_start; @got < $count; $n++) {
+#        my ($x,$y) = $path->n_to_xy($n);
+#        push @got, int($x/$y) + 1;
+#      }
+#      return \@got;
+#    });
 
-MyOEIS::compare_values
-  (anum => 'A050873',
-   func => sub {
-     my ($count) = @_;
-     my $path = Math::PlanePath::GcdRationals->new
-       (pairs_order => 'rows_reverse');
-     my @got;
-     my $n_start = $path->n_start;
-     for (my $n = $n_start; @got < $count; $n++) {
-       my ($x,$y) = $path->n_to_xy($n);
-       push @got, div_ceil($x,$y);
-     }
-     return \@got;
-   });
+# ceil(X/Y)
+# not in OEIS: 1,2,1,3,1,1,4,1,2,1,5,1,1,1,1,6,1,2,3,2,1,7,1,1,1,1,1,1,8,1,2,1,4,1,2,1,9,1,1,3,1,1,3,1,1,10,1,2,1,2,5,2,1,2,1,11,1,1,1,1,1,1,1,1,1,1,12,1,2,3,4,1,6,1,4,3,2,1,13
+# not A178340 denominator of coeffs in Bernoulli triangle
+#
+# MyOEIS::compare_values
+#   (anum => 'A178340',
+#    func => sub {
+#      my ($count) = @_;
+#      my $path = Math::PlanePath::GcdRationals->new
+#        (pairs_order => 'rows_reverse');
+#      my @got;
+#      my $n_start = $path->n_start;
+#      for (my $n = $n_start; @got < $count; $n++) {
+#        my ($x,$y) = $path->n_to_xy($n);
+#        push @got, div_ceil($x,$y);
+#      }
+#      return \@got;
+#    });
 
 sub div_ceil {
   my ($n,$d) = @_;
@@ -76,23 +94,6 @@ sub div_ceil {
          return \@got;
        });
 }
-
-#------------------------------------------------------------------------------
-# A178340 Bernoulli denominator = int(X/Y) + 1
-# Not quite since A178340 reduced rational.  First different at n=49.
-#
-# MyOEIS::compare_values
-#   (anum => q{A178340},
-#    func => sub {
-#      my ($count) = @_;
-#      my $path = Math::PlanePath::GcdRationals->new;
-#      my @got = (1);
-#      for (my $n = $path->n_start; @got < $count; $n++) {
-#        my ($x,$y) = $path->n_to_xy($n);
-#        push @got, int($x/$y) + 1;
-#      }
-#      return \@got;
-#    });
 
 #------------------------------------------------------------------------------
 # A033638 - diagonals_down X=1 column, quarter squares + 1, squares+pronic + 1

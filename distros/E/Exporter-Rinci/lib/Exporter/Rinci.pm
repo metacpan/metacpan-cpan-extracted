@@ -1,7 +1,7 @@
 package Exporter::Rinci;
 
-our $DATE = '2016-01-19'; # DATE
-our $VERSION = '0.02'; # VERSION
+our $DATE = '2019-08-15'; # DATE
+our $VERSION = '0.030'; # VERSION
 
 use Exporter ();
 
@@ -56,7 +56,7 @@ Exporter::Rinci - A simple wrapper for Exporter for modules with Rinci metadata
 
 =head1 VERSION
 
-This document describes version 0.02 of Exporter::Rinci (from Perl distribution Exporter-Rinci), released on 2016-01-19.
+This document describes version 0.030 of Exporter::Rinci (from Perl distribution Exporter-Rinci), released on 2019-08-15.
 
 =head1 SYNOPSIS
 
@@ -86,7 +86,7 @@ This document describes version 0.02 of Exporter::Rinci (from Perl distribution 
 Exporter::Rinci is a simple wrapper for L<Exporter>. Before handing out control
 to Exporter's import(), it will look at the exporting module's C<@EXPORT>,
 C<@EXPORT_OK>, and C<%EXPORT_TAGS> and if they are empty will fill them out with
-data from Rinci metadata (C<%SPEC>). The rules are similar to
+data from L<Rinci> metadata (C<%SPEC>). The rules are similar to
 L<Perinci::Exporter>: all functions will be put in C<@EXPORT_OK>, except
 functions with C<export:never> tag will not be exported and functions with
 C<export:default> tag will be put in C<@EXPORT>. C<%EXPORT_TAGS> will also be
@@ -110,7 +110,10 @@ feature.
 
 =head1 SEE ALSO
 
-L<Perinci::Exporter>
+If you want something more full-featured, there's L<Perinci::Exporter>. If
+Exporter::Rinci is like Exporter.pm + Rinci, then Perinci::Exporter is like
+L<Sub::Exporter> + Rinci. It features subroutine renaming, wrapping (adding
+retries, timeouts, etc).
 
 =head1 AUTHOR
 
@@ -118,7 +121,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

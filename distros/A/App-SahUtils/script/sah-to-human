@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-06-20'; # DATE
-our $VERSION = '0.463'; # VERSION
+our $DATE = '2019-07-16'; # DATE
+our $VERSION = '0.464'; # VERSION
 
 use 5.010;
 use strict;
@@ -172,7 +172,7 @@ sah-to-human - Convert Sah to human text
 
 =head1 VERSION
 
-This document describes version 0.463 of sah-to-human (from Perl distribution App-SahUtils), released on 2019-06-20.
+This document describes version 0.464 of sah-to-human (from Perl distribution App-SahUtils), released on 2019-07-16.
 
 =head1 SYNOPSIS
 
@@ -185,7 +185,7 @@ Examples:
  % sah-to-human int
  integer
 
- % sah-to-human '["int","min",1,"max",10]'
+ % sah-to-human '["int","min","1","max","10"]'
  integer, must be at least 1, must be at most 10
 
 =head1 OPTIONS
@@ -236,7 +236,7 @@ To be passed during compilation.
 
 =over
 
-=item B<--config-path>=I<filename>, B<-c>
+=item B<--config-path>=I<s>, B<-c>
 
 Set path to configuration file.
 

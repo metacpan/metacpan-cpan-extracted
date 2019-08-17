@@ -5,6 +5,9 @@ use MyApp::FakeCHI;
 use Curio;
 use strictures 2;
 
+add_key 'default';
+default_key 'default';
+
 does_caching;
 
 has chi => (

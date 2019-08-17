@@ -4,7 +4,7 @@ use utf8;
 use strict;
 use warnings FATAL => 'all';
 
-$Geoffrey::Role::Action::VERSION = '0.000103';
+$Geoffrey::Role::Action::VERSION = '0.000201';
 
 sub new {
     my $class = shift;
@@ -98,7 +98,7 @@ Geoffrey::Role::Action - Abstract action class.
 
 =head1 VERSION
 
-Version 0.000103
+Version 0.000201
 
 =head1 DESCRIPTION
 

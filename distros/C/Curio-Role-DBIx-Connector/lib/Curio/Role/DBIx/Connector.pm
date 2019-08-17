@@ -1,8 +1,9 @@
 package Curio::Role::DBIx::Connector;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use DBIx::Connector;
-use Types::Standard qw( InstanceOf );
+use Scalar::Util qw( blessed );
+use Types::Standard qw( InstanceOf ArrayRef );
 
 use Moo::Role;
 use strictures 2;
@@ -16,17 +17,31 @@ after initialize => sub{
     my $factory = $class->factory();
 
     $factory->does_caching( 1 );
+    $factory->resource_method_name( 'connector' );
 
     return;
 };
 
+has _custom_connector => (
+    is       => 'ro',
+    isa      => InstanceOf[ 'DBIx::Connector' ] | ArrayRef,
+    init_arg => 'connector',
+    clearer  => '_clear_custom_connector',
+);
+
 has connector => (
-    is  => 'lazy',
-    isa => InstanceOf[ 'DBIx::Connector' ],
+    is       => 'lazy',
+    init_arg => undef,
 );
 
 sub _build_connector {
     my ($self) = @_;
+
+    my $connector = $self->_custom_connector();
+    $self->_clear_custom_connector();
+    return $connector if blessed $connector;
+
+    return DBIx::Connector->new( @$connector ) if $connector;
 
     my $dsn        = $self->dsn();
     my $username   = $self->can('username') ? $self->username() : '';
@@ -59,103 +74,119 @@ Create a Curio class:
 
     package MyApp::Service::DB;
     
+    use MyApp::Config;
+    use MyApp::Secrets;
+    
     use Curio role => '::DBIx::Connector';
     use strictures 2;
     
-    key_argument 'key';
+    key_argument 'connection_key';
     export_function_name 'myapp_db';
+    always_export;
+    export_resource;
     
     add_key 'writer';
     add_key 'reader';
     
-    has key => (
+    has connection_key => (
         is       => 'ro',
         required => 1,
     );
     
     sub dsn {
         my ($self) = @_;
-        return myapp_config()->{db}->{ $self->key() }->{dsn};
+        return myapp_config()->{db}->{ $self->connection_key() }->{dsn};
     }
     
     sub username {
         my ($self) = @_;
-        return myapp_config()->{db}->{ $self->key() }->{username};
+        return myapp_config()->{db}->{ $self->connection_key() }->{username};
     }
     
     sub password {
         my ($self) = @_;
-        return myapp_secret( $self->key() . '_' . $self->username() );
-    }
-    
-    sub attributes {
-        return { PrintError=>1 };
+        return myapp_secret( $self->connection_key() . '_' . $self->username() );
     }
     
     1;
 
 Then use your new Curio class elsewhere:
 
-    use MyApp::Service::DB qw( myapp_db );
+    use MyApp::Service::DB;
     
-    my $db = myapp_db('writer')->connector();
+    my $db = myapp_db('writer');
     
     $db->run(sub{
-        $_->do( 'CREATE TABLE foo ( bar )' );
+        my ($one) = $_->selectrow_array( 'SELECT 1' );
     });
 
 =head1 DESCRIPTION
 
-This role provides all the basics for building a Curio class
-which wraps around L<DBIx::Connector>.
+This role provides all the basics for building a Curio class which
+wraps around L<DBIx::Connector>.
 
 =head1 OPTIONAL ARGUMENTS
 
 =head2 connector
 
-    my $connector = MyApp::Service::DB->fetch('writer')->connector();
-
 Holds the L<DBIx::Connector> object.
 
-If not specified as an argument, a new connector will be automatically
-built based on L</dsn>, L</username>, L</password>, and L</attributes>.
+May be passed as either ain arrayref of arguments or a pre-created
+object.  If this argument is not set then it will be built from L</dsn>,
+L</username>, L</password>, and L</attributes>.
 
 =head1 REQUIRED METHODS
 
-These methods must be implemented by the consuming curio class.
+These methods must be implemented in your Curio class.
 
 =head2 dsn
 
-    sub dsn { 'dbi:...' }
+This method must return a L<DBI> C<$dsn>/C<$data_source>, such as
+C<dbi:SQLite:dbname=:memory:>.
 
 =head1 OPTIONAL METHODS
 
-These methods may be implemented by the consuming curio class.
+These methods may be implemented in your Curio class.
 
 =head2 username
 
-    sub username { '' }
+If this method is not present then an empty string will be used for
+the username when the L</connector> is built.
 
 =head2 password
 
-    sub password { '' }
+If this method is not present then an empty string will be used for
+the passord when the L</connector> is built.
 
 =head2 attributes
 
-    sub attributes { {} }
+If this method is not present then an empty hashref will be used for
+the attributes when the L</connector> is built.
 
-C<AutoCommit> will be set to C<1> unless you directly override it
-in this hashref.
+    sub attributes {
+        return { SomeAttribute => 3 };
+    }
 
-See L<DBI/ATTRIBUTES-COMMON-TO-ALL-HANDLES>.
+Note what L</AUTOCOMMIT> says.
 
-=head1 CACHING
+=head1 AUTOCOMMIT
 
-This role sets the L<Curio::Factory/does_caching> feature.
+The C<AutoCommit> L<DBI> attribute is defaulted to C<1>.  You can
+override this in L</attributes>.
 
-You can of course disable this feature.
+If the L</connector> argument is set then this defaulting of
+C<AutoCommit> is skipped.
+
+=head1 FEATURES
+
+This role turns on L<Curio::Factory/does_caching> and sets
+L<Curio::Factory/resource_method_name> to C<connector> (as in
+L</connector>).
+
+You can of course revert these changes:
 
     does_caching 0;
+    resource_method_name undef;
 
 =head1 SUPPORT
 
@@ -166,10 +197,10 @@ L<https://github.com/bluefeet/Curio-Role-DBIx-Connector/issues>
 
 =head1 ACKNOWLEDGEMENTS
 
-Thanks to L<ZipRecruiter|https://www.ziprecruiter.com/>
-for encouraging their employees to contribute back to the open
-source ecosystem.  Without their dedication to quality software
-development this distribution would not exist.
+Thanks to L<ZipRecruiter|https://www.ziprecruiter.com/> for
+encouraging their employees to contribute back to the open source
+ecosystem.  Without their dedication to quality software development
+this distribution would not exist.
 
 =head1 AUTHORS
 

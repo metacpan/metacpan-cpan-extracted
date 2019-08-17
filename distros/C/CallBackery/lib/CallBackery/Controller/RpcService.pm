@@ -73,9 +73,29 @@ has passMatch => sub {
     qr{(?i)(?:password|_pass)};
 };
 
+sub perMethodCleaner {
+    my $self = shift;
+    my $method = shift or return;
+    return {
+        login => sub {
+            my $data = shift;
+            if (ref $data eq 'ARRAY'){
+               $data->[1] = 'xxx';
+            }
+            return;
+        }
+    }->{$method};
+};
+
 sub dataCleaner {
     my $self = shift;
     my $data = shift;
+    my $method = shift;
+
+    if (my $perMethodCleaner = $self->perMethodCleaner($method)){
+        return $perMethodCleaner->($data);
+    }
+    
     my $match = $self->passMatch;
     my $type = ref $data;
     for ($type) {
@@ -108,7 +128,7 @@ sub logRpcCall {
     if ($ENV{CALLBACKERY_RPC_LOG}){
         my $method = shift;
         my $data = shift;
-        $self->dataCleaner($data);
+        $self->dataCleaner($data,$method);
         my $userId = eval { $self->user->loginName } // '*UNKNOWN*';
         my $remoteAddr = $self->tx->remote_address;
         $self->log->debug("[$userId|$remoteAddr] CALL $method(".encode_json($data).")");

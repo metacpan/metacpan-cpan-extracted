@@ -1,5 +1,15 @@
 Revision history for Music-Cadence
 
+0.0401 2019-08-16 13:35:00
+    - Simplify the eg/cadence code.
+    - Remove the accidentally shipped MIDI file.
+
+0.0400 2019-08-16 13:10:47
+    - Make key, scale, and octave object attributes.
+    - Add attribute test cases.
+    - Improve documentation.
+    - Cleanup code.
+
 0.0300 2019-08-14 21:38:00
     - Correct diminished chord handling given the scale.
     - Add tests for scale variations.

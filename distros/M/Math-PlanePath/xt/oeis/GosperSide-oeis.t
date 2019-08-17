@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013, 2014, 2015, 2018 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2015, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -19,8 +19,9 @@
 
 use 5.004;
 use strict;
+use Math::BigInt try => 'GMP';
 use Test;
-plan tests => 11;
+plan tests => 13;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -114,7 +115,6 @@ MyOEIS::compare_values
    func => sub {
      my ($count) = @_;
      my @got;
-     require Math::BigInt;
      for (my $k = Math::BigInt->new(1); @got < $count; $k++) {
        my ($x,$y) = $path->n_to_xy(3**$k);
        push @got, $y;

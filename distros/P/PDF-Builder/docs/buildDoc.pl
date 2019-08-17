@@ -16,7 +16,7 @@ use strict;
 use warnings;
 use Getopt::Long;
 
-our $VERSION = '3.015'; # VERSION
+our $VERSION = '3.016'; # VERSION
 my $LAST_UPDATE = '3.011'; # manually update whenever code is changed
 
 # =============
@@ -277,6 +277,7 @@ do {
 			if (-e "pod2html.stderr") {
 				unlink "pod2html.stderr";
 			}
+			print STDERR "processing $source\n";
 			system("pod2html --podpath=$libtop $source --outfile=$target 2>pod2html.stderr");
 			# always produces pod2html.stderr, hopefully empty
 
@@ -341,7 +342,7 @@ do {
 			while ($htmlfile =~ m#<a href="([^"]+)">([^<]+)</a>#g) {
 				my $href = $1;
 				my $linkname = $2;
-				# discard if href is #name 
+				# discard if href is just #name 
 				# (an internal link to a heading) or an
 				# external link (http[s]:// ftp:// etc.)
 				if ($href =~ m/^#/) { next; }
@@ -350,7 +351,9 @@ do {
 				$href =~ s#^/$libtop/##;
 
 				# make list of dirs in target ($href)
-				my @target_dirs = split /[\\\/]/, $href;
+				my ($path, $target) = split /#/, $href;
+				if (!defined $target) { $target = ''; }
+				my @target_dirs = split /[\\\/]/, $path;
 				# last one is filename, save
 				my $newhref = pop @target_dirs;
 				# if first one is empty (was absolute path), discard
@@ -388,13 +391,21 @@ do {
 					}
 				}
 				# update $htmlfile
-				$htmlfile =~ s#/$libtop/$href#$newhref#;
+				if ($target eq '') {
+					$htmlfile =~ s#/$libtop/$href#$newhref#;
+				} else {
+					$htmlfile =~ s%/$libtop/$href%$newhref#$target%;
+				}
 
 				# mark link target ($linkname) as status -1
 				# (ready) if currently -2 (& set $any_minus1)
 				my $found = 0;
+				my $linkPM = $linkname;
+				if ($linkPM =~ m#^.* ([^ ]+)$#) {
+					$linkPM = $1;
+				}
 				for (my $j=0; $j<scalar @file_list; $j++) {
-					if ($file_list[$j]{'pmname'} eq $linkname) {
+					if ($file_list[$j]{'pmname'} eq $linkPM) {
 						if ($file_list[$j]{'status'} == -2) {
 							$file_list[$j]{'status'} = -1;
 							$any_minus1 = 1;

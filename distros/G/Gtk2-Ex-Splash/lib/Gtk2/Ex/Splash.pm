@@ -1,4 +1,4 @@
-# Copyright 2011 Kevin Ryde
+# Copyright 2011, 2019 Kevin Ryde
 
 # This file is part of Gtk2-Ex-Splash.
 #
@@ -24,7 +24,7 @@ use Gtk2;
 use List::Util 'max';
 use Scalar::Util;
 
-our $VERSION = 52;
+our $VERSION = 53;
 
 # uncomment this to run the ### lines
 #use Smart::Comments;
@@ -315,15 +315,26 @@ This is a toplevel splash window centred on the screen.  It can be used as a
 splash at program startup if some initializations might be slow, or a
 general purpose flash or splash.
 
+    +-------------------------------------+
+    |                                     |
+    |                                     |
+    |           +----------+              |
+    |           | Foo Prog |              |
+    |           |  1.x **  |              |
+    |           +----------+              |
+    |                                     |
+    |                                     |
+    +-------------------------------------+
+
 A splash at program startup can be annoying.  It's often better to get the
 main window up and displayed early, and finish populating or opening an
-initial document while the user has something to look at, though that's not
+initial document while the user has something to look at.  Though that's not
 always easy.
 
 A splash can also show something briefly without being too intrusive.  For
 example a slide-show or cron job to flash a fun image every few minutes for
-just a 1/2 second or so to relieve the monotony of work.  The supplied
-C<gtk2-ex-splash> for example displays an image file that way.
+perhaps 1/2 second or so to relieve the monotony of work.  The supplied and
+installed C<gtk2-ex-splash> program displays an image file that way.
 
 The splash window is not interactive and doesn't take the keyboard focus
 away from whatever the user is doing.  (Is that true of "focus follows
@@ -331,16 +342,16 @@ mouse" window manager style though?)  It does consume mouse button clicks
 though.
 
 The splash contents are shown as the window background, so it doesn't
-require any redraws etc from the application and so displays even if the
-application is busy doing other things.
+require any redraws etc from the application and so continues to display
+even if the application is busy doing other things.
 
-=head2 Flushing
+=head2 X Request Flushing
 
 The Splash code tries to flush the outgoing X request queue at suitable
-times to ensure that a C<< $splash->show >> etc immediately shows the
-splash, or a C<< $splash->destroy >> etc immediately removes it.  This seems
-to work reasonably well, and hopefully there won't be any need for special
-specific methods to show and hide.
+times to ensure that a C<< $splash->show() >> etc immediately shows the
+splash, or a C<< $splash->destroy() >> etc immediately removes it.  This
+seems to work reasonably well, and hopefully there won't be any need for
+special specific methods to show and hide.
 
 =head1 FUNCTIONS
 
@@ -372,8 +383,8 @@ supported by GdkPixbuf.  PNG and JPEG are supported in all Gtk2 versions.
 
 In the current code C<filename> is a scalar type, so it can hold a byte
 string which is usual for a filename in Perl and is what's required by the
-C<< Gtk2::Gdk::Pixbuf->new_from_file >> used to read the file.  Is that the
-right property type and the right way to do it?
+C<< Gtk2::Gdk::Pixbuf->new_from_file() >> used to read the file.  Is that
+the right property type and the right way to do it?
 
 =back
 
@@ -384,17 +395,19 @@ splash window displays on (see L<Gtk2::Window/PROPERTIES>).
 
 The splash is only a C<Gtk2::Gdk::Window> with a background, but it's done
 as a widget since C<Gtk2::Gdk::Window> doesn't subclass properly, as of Gtk
-circa 2.22 (notes in C<Gtk2::Gdk::Window>).
+circa 2.22 (see notes in L<Gtk2::Gdk::Window>).
 
-Something fishy happens when another window in the program is on top of the
-splash and is unmapped.  The revealed area of the splash should
+Something fishy happens when another window in the same program is on top of
+the splash and is unmapped.  The revealed area of the splash should
 automatically clear to its background, but doesn't.  Maybe something to do
-with double buffering.  Windows from other client connections don't cause
-the problem.  It only normally arises if the program shows a second splash
-on top of the first and is handled in the code by listening for any widget
-unmaps and clearing splashes.  Unfortunately this doesn't pick up direct
-C<Gtk2::Gdk::Window> hides (ie. not from a widget), though that's hopefully
-unlikely.
+with double buffering.
+
+Windows from other client connections, ie. other programs, don't cause the
+problem.  It only normally arises if a program shows a second splash on top
+of the first.  The current code tries to handle most cases by listening for
+any widget unmaps and any splashes closing.  It doesn't pick up direct
+C<Gtk2::Gdk::Window> hides (ie. not from a widget), though hopefully that's
+rare.
 
 =head1 SEE ALSO
 
@@ -406,7 +419,7 @@ L<http://user42.tuxfamily.org/gtk2-ex-splash/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011 Kevin Ryde
+Copyright 2010, 2011, 2019 Kevin Ryde
 
 Gtk2-Ex-Splash is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

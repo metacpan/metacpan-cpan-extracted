@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::Core 2.37 {
+package Dist::Zilla::Plugin::Author::Plicease::Core 2.38 {
 
   use 5.014;
   use Moose;
@@ -118,7 +118,7 @@ Dist::Zilla::Plugin::Author::Plicease::Core - Handle core prereqs
 
 =head1 VERSION
 
-version 2.37
+version 2.38
 
 =head1 AUTHOR
 

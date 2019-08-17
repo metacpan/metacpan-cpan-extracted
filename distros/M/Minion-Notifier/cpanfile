@@ -7,5 +7,5 @@ feature 'postgres' => sub {
 
 test_requires 'Mojo::SQLite';
 test_requires 'Minion::Backend::SQLite';
-test_requires 'Mercury', '0.003'; # message broker application for websocket test
+test_requires 'Mercury', '0.016'; # Mojo base class fix
 

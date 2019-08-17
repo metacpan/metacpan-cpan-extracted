@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-06-20'; # DATE
-our $VERSION = '0.463'; # VERSION
+our $DATE = '2019-07-16'; # DATE
+our $VERSION = '0.464'; # VERSION
 
 use 5.010;
 use strict;
@@ -482,7 +482,7 @@ validate-with-sah - Validate data with Sah schema
 
 =head1 VERSION
 
-This document describes version 0.463 of validate-with-sah (from Perl distribution App-SahUtils), released on 2019-06-20.
+This document describes version 0.464 of validate-with-sah (from Perl distribution App-SahUtils), released on 2019-07-16.
 
 =head1 SYNOPSIS
 
@@ -667,7 +667,7 @@ Don't validate data, show normalized schema only.
 
 =over
 
-=item B<--config-path>=I<filename>
+=item B<--config-path>=I<s>
 
 Set path to configuration file.
 

@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease 2.37 {
+package Dist::Zilla::Plugin::Author::Plicease 2.38 {
 
   use strict;
   use warnings;
@@ -30,7 +30,7 @@ Dist::Zilla::Plugin::Author::Plicease - Dist::Zilla plugins used by Plicease
 
 =head1 VERSION
 
-version 2.37
+version 2.38
 
 =head1 DESCRIPTION
 

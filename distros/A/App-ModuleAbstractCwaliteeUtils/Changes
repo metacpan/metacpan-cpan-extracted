@@ -1,3 +1,15 @@
+0.003   2019-08-02  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Add shortcut alias ma-cwa for list-module-abstract-cwalitee.
+
+
+0.002   2019-07-26  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Add a few examples.
+
+
 0.001   2019-07-03  Released-By: PERLANCAR
 
         - First release.

@@ -57,6 +57,6 @@
          "web" : "https://github.com/PhilterPaper/Perl-PDF-Builder"
       }
    },
-   "version" : "3.015",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "3.016",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

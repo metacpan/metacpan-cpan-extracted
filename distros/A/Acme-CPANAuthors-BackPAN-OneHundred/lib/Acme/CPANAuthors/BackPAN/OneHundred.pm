@@ -4,7 +4,7 @@ use warnings;
 
 {
     no strict "vars";
-    $VERSION = "1.12";
+    $VERSION = "1.13";
 }
 
 use Acme::CPANAuthors::Register (
@@ -20,6 +20,7 @@ use Acme::CPANAuthors::Register (
     'DMUEY'         => 'Daniel Muey',
     'DROLSKY'       => 'Dave Rolsky',
     'ETHER'         => 'Karen Etheridge',
+    'EXODIST'       => 'Chad Granum',
     'FAYLAND'       => 'Fayland Lin',
     'FLORA'         => 'Florian Ragwitz',
     'GETTY'         => 'Torsten Raudssus',
@@ -98,7 +99,7 @@ See L<http://backpan.cpantesters.org>.
 
 =head1 THE AUTHORS
 
-   1.  1932  PERLANCAR     perlancar
+   1.  1934  PERLANCAR     perlancar
    2.  550  PSIXDISTS     Perl 6 Modules
    3.  509  SHARYANTO     Steven Haryanto
    4.  329  TOBYINK       Toby Inkster
@@ -137,18 +138,19 @@ See L<http://backpan.cpantesters.org>.
   37.  121  SIMON         Simon Cozens
   38.  116  SALVA         Salvador Fandino Garcia
   39.  115  MLEHMANN      ???
-  40.  113  DMUEY         Daniel Muey
-  41.  113  RRWO          Robert Rothenberg
+  40.  114  RRWO          Robert Rothenberg
+  41.  113  DMUEY         Daniel Muey
   42.  113  YANICK        Yanick Champoux
   43.  111  LBROCARD      Leon Brocard
   44.  111  RENEEB        Renee Baecker
   45.  108  GETTY         Torsten Raudssus
   46.  106  JHTHORSEN     Jan Henning Thorsen
   47.  106  VVELOX        ???
-  48.  102  TEAM          Tom Molesworth
-  49.  101  LEOCHARRE     Leo Charre
+  48.  102  EXODIST       Chad Granum
+  49.  102  TEAM          Tom Molesworth
+  50.  101  LEOCHARRE     Leo Charre
 
-List last updated: 2019-08-11T07:18:36
+List last updated: 2019-08-17T08:38:55
 
 =head1 MAINTENANCE
 

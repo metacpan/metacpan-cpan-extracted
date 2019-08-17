@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Provide musical cadence chords
 
-our $VERSION = '0.0300';
+our $VERSION = '0.0401';
 
 use Moo;
 use Music::Chord::Note;
@@ -14,15 +14,33 @@ use strictures 2;
 use namespace::clean;
 
 
+has key => (
+    is      => 'ro',
+    default => sub { 'C' },
+);
+
+
+has scale => (
+    is      => 'ro',
+    default => sub { 'major' },
+);
+
+
+has octave => (
+    is      => 'ro',
+    default => sub { 0 },
+);
+
+
 sub cadence {
     my ( $self, %args ) = @_;
 
     my $cadence = [];
 
-    $args{key}       ||= 'C';
-    $args{scale}     ||= 'major';
+    $args{key}       ||= $self->key;
+    $args{scale}     ||= $self->scale;
+    $args{octave}    //= $self->octave;
     $args{type}      ||= 'perfect';
-    $args{octave}    //= 0;
     $args{leading}   ||= 1;
     $args{variation} ||= 1;
 
@@ -37,29 +55,42 @@ sub cadence {
     );
 
     if ( $args{type} eq 'perfect' ) {
-        $cadence = _generate_chord( $args{scale}, $scale[4], $args{octave}, $mtr, $mcn, $cadence );
-        $cadence = _generate_chord( $args{scale}, $scale[0], $args{octave}, $mtr, $mcn, $cadence );
+        my $chord = _generate_chord( $args{scale}, $scale[4], $args{octave}, $mtr, $mcn );
+        push @$cadence, $chord;
+
+        $chord = _generate_chord( $args{scale}, $scale[0], $args{octave}, $mtr, $mcn );
+        push @$cadence, $chord;
     }
     elsif ( $args{type} eq 'plagal' ) {
-        $cadence = _generate_chord( $args{scale}, $scale[3], $args{octave}, $mtr, $mcn, $cadence );
-        $cadence = _generate_chord( $args{scale}, $scale[0], $args{octave}, $mtr, $mcn, $cadence );
+        my $chord = _generate_chord( $args{scale}, $scale[3], $args{octave}, $mtr, $mcn );
+        push @$cadence, $chord;
+
+        $chord = _generate_chord( $args{scale}, $scale[0], $args{octave}, $mtr, $mcn );
+        push @$cadence, $chord;
     }
     elsif ( $args{type} eq 'half' ) {
-        $cadence = _generate_chord( $args{scale}, $scale[ $args{leading} - 1 ], $args{octave}, $mtr, $mcn, $cadence );
-        $cadence = _generate_chord( $args{scale}, $scale[4], $args{octave}, $mtr, $mcn, $cadence );
+        my $chord = _generate_chord( $args{scale}, $scale[ $args{leading} - 1 ], $args{octave}, $mtr, $mcn );
+        push @$cadence, $chord;
+
+        $chord = _generate_chord( $args{scale}, $scale[4], $args{octave}, $mtr, $mcn );
+        push @$cadence, $chord;
     }
     elsif ( $args{type} eq 'deceptive' ) {
-        $cadence = _generate_chord( $args{scale}, $scale[4], $args{octave}, $mtr, $mcn, $cadence );
+        my $chord = _generate_chord( $args{scale}, $scale[4], $args{octave}, $mtr, $mcn );
+        push @$cadence, $chord;
+
         my $note = $args{variation} == 1 ? $scale[5] : $scale[3];
-        $cadence = _generate_chord( $args{scale}, $note, $args{octave}, $mtr, $mcn, $cadence );
+        $chord = _generate_chord( $args{scale}, $note, $args{octave}, $mtr, $mcn );
+        push @$cadence, $chord;
     }
 
     return $cadence;
 }
 
 sub _generate_chord {
-    my ( $scale, $note, $octave, $mtr, $mcn, $cadence ) = @_;
+    my ( $scale, $note, $octave, $mtr, $mcn ) = @_;
 
+    # Know what chords should be diminished
     my %diminished = (
         ionian     => 'vii',
         major      => 'vii',
@@ -72,17 +103,18 @@ sub _generate_chord {
         locrian    => 'i',
     );
 
+    # Figure out if the chord is diminished, minor, or major
     my $roman = $mtr->parse($note);
     my $type  = $roman =~ /^$diminished{$scale}$/ ? 'dim' : $roman =~ /^[a-z]/ ? 'm' : '';
 
+    # Generate the chord notes
     my @notes = $mcn->chord( $note . $type );
 
+    # Append the octave if requested
     @notes = map { $_ . $octave } @notes
         if $octave;
 
-    push @$cadence, \@notes;
-
-    return $cadence;
+    return \@notes;
 }
 
 1;
@@ -99,24 +131,22 @@ Music::Cadence - Provide musical cadence chords
 
 =head1 VERSION
 
-version 0.0300
+version 0.0401
 
 =head1 SYNOPSIS
 
   use Music::Cadence;
 
-  my $mc = Music::Cadence->new;
-
-  my $chords = $mc->cadence(
+  my $mc = Music::Cadence->new(
     key    => 'C',
     scale  => 'major',
-    type   => 'perfect',
     octave => 4,
-  ); # [['G4','B4','D4'], ['C4','E4','G4']]
+  );
+
+  my $chords = $mc->cadence( type => 'perfect' );
+  # [['G4','B4','D4'], ['C4','E4','G4']]
 
   $chords = $mc->cadence(
-    key     => 'C',
-    scale   => 'major',
     type    => 'half',
     leading => 2,
     octave  => 0,
@@ -126,12 +156,33 @@ version 0.0300
 
 C<Music::Cadence> provides musical cadence chords.
 
-* This module is a very naive implementation of the actual theory.
-YMMV.
+* This module is a naive implementation of the actual theory.  YMMV.
+Patches welcome.
 
 =head1 ATTRIBUTES
 
-None.
+=head2 key
+
+The key or tonal center to use.  Default: C<C>
+
+=head2 scale
+
+The scale to use.  Default: C<major>
+
+Supported scales are:
+
+  ionian / major
+  dorian
+  phrygian
+  lydian
+  mixolydian
+  aeolian / minor
+  locrian
+
+=head2 octave
+
+The octave to append to chord notes.  Default: C<0> meaning "do not
+append."
 
 =head1 METHODS
 
@@ -148,9 +199,9 @@ Create a new C<Music::Cadence> object.
   $chords = $mc->cadence(
     key       => $key,        # Default: C
     scale     => $scale,      # Default: major
+    octave    => $octave,     # Default: 0
     type      => $type,       # Default: perfect
     leading   => $leading,    # Default: 1
-    octave    => $octave,     # Default: 0
     variation => $variation,  # Default: 1
   );
 
@@ -171,16 +222,6 @@ Supported cadences are:
   half
   plagal
   deceptive
-
-Supported scales are:
-
-  ionian / major
-  dorian
-  phrygian
-  lydian
-  mixolydian
-  aeolian / minor
-  locrian
 
 The B<leading> chord is a number for each diatonic scale chord to use
 for the first C<half> cadence chord.  So for the key of C<C major>

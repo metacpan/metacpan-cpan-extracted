@@ -1,5 +1,8 @@
 Revision history for Date::Hijri::Simple
 
+0.24  Sat Aug 17 05:55:00 2019
+      - Updated dependency on Date::Utils v0.27.
+
 0.23  Wed Jul 31 15:40:00 2019
       - Moved author test scripts to xt/ subfolder.
 

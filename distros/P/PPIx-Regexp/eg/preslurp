@@ -14,7 +14,7 @@ use PPIx::Regexp;
 use PPIx::Regexp::Dumper;
 use PPIx::Regexp::Tokenizer;
 
-our $VERSION = '0.065';
+our $VERSION = '0.066';
 
 my %opt = (
     verbose	=> 0,
@@ -217,7 +217,7 @@ For full details on usage, use
 This script makes L<PPI::Document|PPI::Document> objects out of files it
 deems are Perl, then does a L<PPIx::Regexp::Dumper|PPIx::Regexp::Dumper>
 dump on all
-L<PPI::Token::StringLike::Regexp|PPI::Token::StringLike::Regexp>,
+L<PPI::Token::QuoteLike::Regexp|PPI::Token::QuoteLike::Regexp>,
 L<PPI::Token::Regexp::Match|PPI::Token::Regexp::Match> and
 L<PPI::Token::Regexp::Substitute|PPI::Token::Regexp::Substitute>
 objects it finds.

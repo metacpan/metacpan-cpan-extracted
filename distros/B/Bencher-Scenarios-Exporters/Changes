@@ -1,4 +1,15 @@
-0.08    2017-01-25 (PERLANCAR)
+0.091   2019-08-16  Released-By: PERLANCAR; Urgency: medium
+
+	- Exporters::Exporting: add participant: Exporter::Rinci,
+	  Perinci::Exporter.
+
+
+0.090   2019-08-15  Released-By: PERLANCAR; Urgency: medium
+
+	- Add participant: Perinci::Exporter.
+
+
+0.08    2017-01-25  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -7,14 +18,14 @@
           type=x_benchmarks.
 
 
-0.07    2016-03-13 (PERLANCAR)
+0.07    2016-03-13  Released-By: PERLANCAR
 
 	- Add scenario: Exporters::Exporting.
 
 	- Add participant: Xporter.
 
 
-0.06    2016-03-13 (PERLANCAR)
+0.06    2016-03-13  Released-By: PERLANCAR
 
 	- Specify minimum version for PERLANCAR::Exporter::Lite.
 
@@ -22,7 +33,7 @@
 	  DZP:Bencher::Scenario can be added.
 
 
-0.05    2016-03-12 (PERLANCAR)
+0.05    2016-03-12  Released-By: PERLANCAR
 
         - Add participants: Exporter::Lite, PERLANCAR::Exporter::Lite.
 
@@ -30,7 +41,7 @@
           Bencher-Scenarios-Exporters.
 
 
-0.04    2016-01-05 (PERLANCAR)
+0.04    2016-01-05  Released-By: PERLANCAR
 
         - No functional changes.
 
@@ -38,18 +49,18 @@
           (0.02) which shows sample benchmark results in POD.
 
 
-0.03    2015-12-23 (PERLANCAR)
+0.03    2015-12-23  Released-By: PERLANCAR
 
 	- Rename dist from BS-StartupExporters to BS-Exporters.
 
 
-0.02    2015-12-21 (PERLANCAR)
+0.02    2015-12-21  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [dist] Update summary.
 
 
-0.01    2015-12-20 (PERLANCAR)
+0.01    2015-12-20  Released-By: PERLANCAR
 
         - First release.

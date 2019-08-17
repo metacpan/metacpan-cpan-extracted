@@ -1,4 +1,8 @@
 Revision history for Map-Tube-Bielefeld
 
+2019.0816  2019-08-16 07:53:12 CEST
+    - add dependency to cpanfile
+    - correct typo in POD
+
 2019.0718  2019-07-18 16:19:54 CEST
-        - Initial release of Map::Tube::Bielefeld
+    - Initial release of Map::Tube::Bielefeld

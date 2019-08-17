@@ -25,7 +25,7 @@ use Carp 'croak';
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 126;
+$VERSION = 127;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 

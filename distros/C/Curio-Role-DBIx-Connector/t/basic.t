@@ -5,7 +5,6 @@ use Test2::V0;
 subtest initialize => sub{
     package CC::i;
         use Curio role => '::DBIx::Connector';
-        sub dsn { 'dbi:SQLite:dbname=:memory:' }
     package main;
 
     my $factory = CC::i->factory();
@@ -16,6 +15,8 @@ subtest initialize => sub{
 subtest no_keys => sub{
     package CC::nk;
         use Curio role => '::DBIx::Connector';
+        add_key 'default';
+        default_key 'default';
         sub dsn { 'dbi:SQLite:dbname=:memory:' }
     package main;
 

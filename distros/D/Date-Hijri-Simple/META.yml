@@ -20,10 +20,10 @@ no_index:
 provides:
   Date::Hijri::Simple:
     file: lib/Date/Hijri/Simple.pm
-    version: '0.23'
+    version: '0.24'
 requires:
   Date::Exception: '0.03'
-  Date::Utils: '0.26'
+  Date::Utils: '0.27'
   List::Util: '1.41'
   Moo: '2.000000'
   Time::localtime: '1.02'
@@ -31,5 +31,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Date-Hijri-Simple.git
-version: '0.23'
+version: '0.24'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

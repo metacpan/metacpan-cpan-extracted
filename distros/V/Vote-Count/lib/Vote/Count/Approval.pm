@@ -10,13 +10,13 @@ use Moose::Role;
 no warnings 'experimental';
 # use Data::Printer;
 
-our $VERSION='0.017';
+our $VERSION='0.021';
 
 =head1 NAME
 
-Vote::Count::RankCount
+Vote::Count::Approval
 
-=head1 VERSION 0.017
+=head1 VERSION 0.021
 
 =cut
 

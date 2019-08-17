@@ -16,4 +16,9 @@ my $build = Module::Build::Using::PkgConfig->new(
 
 $build->use_pkgconfig( "vterm" );
 
+if( eval { require Devel::MAT::Dumper::Helper and
+            Devel::MAT::Dumper::Helper->VERSION( '0.41' ) } ) {
+   Devel::MAT::Dumper::Helper->extend_module_build( $build );
+}
+
 $build->create_build_script;

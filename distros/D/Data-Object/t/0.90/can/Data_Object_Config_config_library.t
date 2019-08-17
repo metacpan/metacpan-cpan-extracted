@@ -43,6 +43,6 @@ my $config = Data::Object::Config::config_library();
 
 is_deeply $config->[0], ['use', 'Type::Library', '-base'];
 is_deeply $config->[1], ['use', 'Type::Utils', '-all'];
-is_deeply $config->[2], ['call', 'extends', 'Data::Object::Library'];
+is_deeply $config->[2], ['let', 'BEGIN { extends("Data::Object::Library"); }'];
 
 ok 1 and done_testing;

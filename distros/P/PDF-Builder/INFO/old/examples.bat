@@ -23,7 +23,7 @@ perl examples\023_cjkfonts
 echo off
 echo === 024 needs a sample BDF font (not included with distribution)
 echo on
-perl examples\024_bdffonts "..\old PDF-APIx\work-PDF-Builder\codec\codec.bdf"
+perl examples\024_bdffonts \Users\Phil\BDFfonts\codec\codec.bdf
 perl examples\025_unifonts
 perl examples\026_unifont2
 REM perl examples\027_winfont

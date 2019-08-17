@@ -1,5 +1,8 @@
 Revision history for Net-Connection-lsof
 
+0.2.0	 2019-08-16/16:40
+		 - WChan support added to Linux.
+
 0.1.1	 2019-08-13/06:00
 		 - Only call sysctl on BSD.
 

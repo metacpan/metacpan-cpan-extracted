@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013, 2018 Kevin Ryde
+# Copyright 2012, 2013, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -20,7 +20,6 @@
 use 5.004;
 use strict;
 use List::Util 'min', 'max';
-use Math::PlanePath::DragonCurve;
 
 use Test;
 plan tests => 28;
@@ -30,6 +29,7 @@ use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings(); }
 use MyOEIS;
 
+use Math::PlanePath::DragonCurve;
 
 #------------------------------------------------------------------------------
 # Lmin,Lmax Wmin,Wmax claimed in the pod

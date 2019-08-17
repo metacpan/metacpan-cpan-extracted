@@ -37,6 +37,18 @@ Oid lo_import_with_oid (PGconn *conn, char *filename, unsigned int lobjId) {
 
 #endif
 
+#ifndef PG_DIAG_SCHEMA_NAME
+#define PG_DIAG_SCHEMA_NAME     's'
+#define PG_DIAG_TABLE_NAME      't'
+#define PG_DIAG_COLUMN_NAME     'c'
+#define PG_DIAG_DATATYPE_NAME   'd'
+#define PG_DIAG_CONSTRAINT_NAME 'n'
+#endif
+
+#ifndef PG_DIAG_SEVERITY_NONLOCALIZED
+#define PG_DIAG_SEVERITY_NONLOCALIZED 'V'
+#endif
+
 #ifndef PGErrorVerbosity
 typedef enum
 	{
@@ -355,15 +367,15 @@ static ExecStatusType _result(pTHX_ imp_dbh_t * imp_dbh, const char * sql)
 
 	if (TSQL) TRC(DBILOGFP, "%s;\n\n", sql);
 
-    /* If we are clear to free the last result, do so now in anticipation of replacement below */
-    if (0 == imp_dbh->sth_result_owner && NULL != imp_dbh->last_result) {
+	/* If we are clear to free the last result, do so now in anticipation of replacement below */
+	if (0 == imp_dbh->sth_result_owner && NULL != imp_dbh->last_result) {
 		TRACE_PQCLEAR;
-        PQclear(imp_dbh->last_result);
-    }
+		PQclear(imp_dbh->last_result);
+	}
 
 	TRACE_PQEXEC;
 	imp_dbh->last_result = PQexec(imp_dbh->conn, sql);
-    imp_dbh->sth_result_owner = 0;
+	imp_dbh->sth_result_owner = 0;
 	status = _sqlstate(aTHX_ imp_dbh, imp_dbh->last_result);
 
 	if (TEND_slow) TRC(DBILOGFP, "%sEnd _result\n", THEADER_slow);
@@ -481,7 +493,7 @@ int dbd_db_ping (SV * dbh)
 	}
 
 	/* No matter what state we are in, send an empty query to the backend */
-	result = PQexec(imp_dbh->conn, "/* DBD::Pg ping test v3.9.0 */");
+	result = PQexec(imp_dbh->conn, "/* DBD::Pg ping test v3.9.1 */");
 	status = PQresultStatus(result);
 	PQclear(result);
 	if (PGRES_FATAL_ERROR == status) {
@@ -3363,19 +3375,19 @@ long dbd_st_execute (SV * sth, imp_sth_t * imp_sth)
 			ret = PQsendQuery(imp_dbh->conn, statement);
 		}
 		else {
-            /* Clear our old result */
-            if (NULL != imp_sth->result) {
-                TRACE_PQCLEAR;
-                PQclear(imp_sth->result);
-            }
-            /* If the last_result is unowned, clear that too */
-            if (0 == imp_dbh->sth_result_owner && NULL != imp_dbh->last_result) {
-                TRACE_PQCLEAR;
-                PQclear(imp_dbh->last_result);
-            }
+			/* Clear our old result */
+			if (NULL != imp_sth->result) {
+				TRACE_PQCLEAR;
+				PQclear(imp_sth->result);
+			}
+			/* If the last_result is unowned, clear that too */
+			if (0 == imp_dbh->sth_result_owner && NULL != imp_dbh->last_result) {
+				TRACE_PQCLEAR;
+				PQclear(imp_dbh->last_result);
+			}
 			TRACE_PQEXEC;
-            imp_dbh->last_result = imp_sth->result = PQexec(imp_dbh->conn, statement);
-            imp_dbh->sth_result_owner = (long int)imp_sth;
+			imp_dbh->last_result = imp_sth->result = PQexec(imp_dbh->conn, statement);
+			imp_dbh->sth_result_owner = (long int)imp_sth;
 		}
 
 		Safefree(statement);
@@ -3443,20 +3455,20 @@ long dbd_st_execute (SV * sth, imp_sth_t * imp_sth)
 				(imp_dbh->conn, statement, imp_sth->numphs, imp_sth->PQoids, imp_sth->PQvals, imp_sth->PQlens, imp_sth->PQfmts, 0);
 		}
 		else {
-            /* Clear our old result */
-            if (NULL != imp_sth->result) {
-                TRACE_PQCLEAR;
-                PQclear(imp_sth->result);
-            }
-            /* If the last_result is unowned, clear that too */
-            if (0 == imp_dbh->sth_result_owner && NULL != imp_dbh->last_result) {
-                TRACE_PQCLEAR;
-                PQclear(imp_dbh->last_result);
-            }
+			/* Clear our old result */
+			if (NULL != imp_sth->result) {
+				TRACE_PQCLEAR;
+				PQclear(imp_sth->result);
+			}
+			/* If the last_result is unowned, clear that too */
+			if (0 == imp_dbh->sth_result_owner && NULL != imp_dbh->last_result) {
+				TRACE_PQCLEAR;
+				PQclear(imp_dbh->last_result);
+			}
 			TRACE_PQEXECPARAMS;
-            imp_dbh->last_result = imp_sth->result = PQexecParams
+			imp_dbh->last_result = imp_sth->result = PQexecParams
 				(imp_dbh->conn, statement, imp_sth->numphs, imp_sth->PQoids, imp_sth->PQvals, imp_sth->PQlens, imp_sth->PQfmts, 0);
-            imp_dbh->sth_result_owner = (long int)imp_sth;
+			imp_dbh->sth_result_owner = (long int)imp_sth;
 		}
 
 		Safefree(statement);
@@ -3508,20 +3520,20 @@ long dbd_st_execute (SV * sth, imp_sth_t * imp_sth)
 				(imp_dbh->conn, imp_sth->prepare_name, imp_sth->numphs, imp_sth->PQvals, imp_sth->PQlens, imp_sth->PQfmts, 0);
 		}
 		else {
-            /* Clear our old result */
-            if (NULL != imp_sth->result) {
-                TRACE_PQCLEAR;
-                PQclear(imp_sth->result);
-            }
-            /* If the last_result is unowned, clear that too */
-            if (0 == imp_dbh->sth_result_owner && NULL != imp_dbh->last_result) {
-                TRACE_PQCLEAR;
-                PQclear(imp_dbh->last_result);
-            }
+			/* Clear our old result */
+			if (NULL != imp_sth->result) {
+				TRACE_PQCLEAR;
+				PQclear(imp_sth->result);
+			}
+			/* If the last_result is unowned, clear that too */
+			if (0 == imp_dbh->sth_result_owner && NULL != imp_dbh->last_result) {
+				TRACE_PQCLEAR;
+				PQclear(imp_dbh->last_result);
+			}
 			TRACE_PQEXECPREPARED;
 			imp_dbh->last_result = imp_sth->result = PQexecPrepared
 				(imp_dbh->conn, imp_sth->prepare_name, imp_sth->numphs, imp_sth->PQvals, imp_sth->PQlens, imp_sth->PQfmts, 0);
-            imp_dbh->sth_result_owner = (long int)imp_sth;
+			imp_dbh->sth_result_owner = (long int)imp_sth;
 		}
 	} /* end new-style prepare */
 		
@@ -4318,7 +4330,7 @@ SV * pg_db_error_field (SV *dbh, char * fieldname)
         fieldname++;
     }
     fieldname = startstring;
-    
+
     /* These allow partial matches, which is why 'severity_nonlocalized'  needs to go first */
     if ( 0 == strncmp(fieldname, "PG_DIAG_SEVERITY_NONLOCALIZED", 25) ||
          0 == strncmp(fieldname, "SEVERITY_NONLOCAL", 17)) {
@@ -4402,7 +4414,8 @@ SV * pg_db_error_field (SV *dbh, char * fieldname)
 		return &PL_sv_undef;
     }
 
-    return sv_2mortal(newSVpv(PQresultErrorField(imp_dbh->last_result, fieldcode), 0));
+    return NULL == PQresultErrorField(imp_dbh->last_result, fieldcode) ? Nullsv : 
+        sv_2mortal(newSVpv(PQresultErrorField(imp_dbh->last_result, fieldcode), 0));
 
 } /* end of pg_db_error_field */
 

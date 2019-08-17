@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -35,6 +35,86 @@ use Math::PlanePath::SquareSpiral;
 my $knight = Math::PlanePath::KnightSpiral->new;
 my $square = Math::PlanePath::SquareSpiral->new;
 
+
+#------------------------------------------------------------------------------
+# KnightSpiral
+# LSR
+# 1,0,1,-1,1,-1,1,-1,0,1,-1,1,1,1,-1,1,1,-1,1,1,-1,1,1,1,-1,1,1,-1,1,1,-1,1,1,1,-1,1,1,-1,1,1,-1,1,1,1,-1,1,1,-1,1,0,1,-1,1,-1
+
+# 18,25,66
+
+# MyOEIS::compare_values
+#   (anum => 'A227741',
+#    func => sub {
+#      my ($count) = @_;
+#      $count = 5000;
+#      my @got;
+#      require Math::NumSeq::PlanePathTurn;
+#      my $seq = Math::NumSeq::PlanePathTurn->new(planepath => 'KnightSpiral',
+#                                                 turn_type => 'LSR');
+#      while (@got < $count) {
+#        my ($i, $value) = $seq->next;
+#        push @got, $value;
+#        if ($value == 0) {
+#          print "$i,";
+#        }
+#      }
+#      return \@got;
+#    });
+
+# Straight ahead at step to next outer ring is squares.
+# South-East continuing around is others.
+
+# vector_modulo(v,i) = v[(i% #v)+1];
+# S(k) = 4 * k^2 + vector_modulo([16, 12],k) * k + vector_modulo([18, 9],k)
+# vector(10,k,k--; S(k))
+# vector(10,k,k--; S(2*k))       \\ A010006
+# vector(10,k,k--; S(2*k+1))     \\ A016814
+# poldisc(4 * k^2 + 16 * k + 18)
+# poldisc(4 * k^2 + 12 * k + 9)
+# factor(4 * k^2 + 12 * k + 9)
+# 4 * k^2 + 12 * k + 9  == (2*k+3)^2
+# factor(4 * k^2 + 16 * k + 18)
+# factor(I*(4 * k^2 + 16 * k + 18))
+# polroots(4 * k^2 + 16 * k + 18)
+
+#------------------------------------------------------------------------------
+# # A306659 - X coordinate
+# MyOEIS::compare_values
+#   (anum => 'A306659',
+#    func => sub {
+#      my ($count) = @_;
+#      my @got;
+#      for (my $n = 1; @got < $count; $n++) {
+#        my ($x, $y) = $knight->n_to_xy ($n);
+#        push @got, $x;
+#      }
+#      return \@got;
+#    });
+# 
+# # A306660 - Y coordinate
+# MyOEIS::compare_values
+#   (anum => 'A306660',
+#    func => sub {
+#      my ($count) = @_;
+#      my @got;
+#      for (my $n = 1; @got < $count; $n++) {
+#        my ($x, $y) = $knight->n_to_xy ($n);
+#        push @got, $y;
+#      }
+#      return \@got;
+#    });
+
+# Not yet, slightly different innermost ring.
+#
+# A306659   0, 2, 0, -2, -1, 1, 2, 1, -1, -2, 0, 2, 1, -1, -2, -1, 1, 0, -2, -1,
+# A306660   0, 1, 2, 1, -1, -2, 0, 2, 1, -1, -2, -1, 1, 2, 0, -2, -1, 1, 2, 0, -2,
+#
+#     1 . .
+#         2
+#
+# Line plot of X=A306659, Y=A306660
+# http://oeis.org/plot2a?name1=A306659&name2=A306660&tform1=untransformed&tform2=untransformed&shift=0&radiop1=xy&drawpoints=true&drawlines=true
 
 #------------------------------------------------------------------------------
 # A068608 - N values in square spiral order, same first step

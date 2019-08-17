@@ -48,7 +48,7 @@ sub binary_to_decimal {
 # VERSION
 
 {
-  my $want_version = 126;
+  my $want_version = 127;
   ok ($Math::PlanePath::GrayCode::VERSION, $want_version,
       'VERSION variable');
   ok (Math::PlanePath::GrayCode->VERSION,  $want_version,

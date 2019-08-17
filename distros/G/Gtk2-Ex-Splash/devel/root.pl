@@ -23,6 +23,9 @@ use Glib 1.220; # for SOURCE_REMOVE
 use Gtk2 '-init';
 use Gtk2::Ex::Splash;
 
+# uncomment this to run the ### lines
+use Smart::Comments;
+
 
 # my $option_root;
 # 'root'   => \$option_root,
@@ -34,12 +37,23 @@ my $rootwin = Gtk2::Gdk->get_default_root_window;
 require X11::Protocol;
 my $X = X11::Protocol->new (':0');
 if ($X->init_extension('Composite')) {
-  $X->CompositeRedirectWindow ($rootwin->XID, 'Automatic');
+
+  my $window = $rootwin->XID;
+  ### root xid: $window
+  my $window_pixmap = $X->new_rsrc;
+  $X->CompositeNameWindowPixmap ($window, $window_pixmap);
+  $X->QueryPointer($window);
+
+  $X->CompositeRedirectWindow ($window, 'Automatic');
   $X->QueryPointer($rootwin->XID);
-  $X->ClearArea ($rootwin->XID, 0,0, 0,0);
+
+  $X->ClearArea ($rootwin->XID, 0,0, 1000,500);
   $X->QueryPointer($rootwin->XID);
   sleep 3;
+  system ('xwd -root >/tmp/x.xwd && xzgv /tmp/x.xwd');
+  exit 0;
 }
+
 # $rootwin->set_composited (1);  # no good, ends up "Manual"
 my $pixmap = Gtk2::Gdk::Pixmap->new ($rootwin, $rootwin->get_size, -1);
 my $gc = Gtk2::Gdk::GC->new ($rootwin, { graphics_exposures => 0 });

@@ -13,8 +13,6 @@ devel/run-splash-gdk.pl
 devel/run-splash.pl
 devel/SplashGdk.pm
 gtk2-ex-splash
-inc/my_pod2html
-inc/MyMakeMakerExtras.pm
 lib/Gtk2/Ex/Splash.pm
 Makefile.PL
 MANIFEST			This list of files
@@ -24,12 +22,14 @@ t/MyTestHelpers.pm
 t/Splash-load.t
 t/Splash-weaken.t
 t/Splash.t
-t/Test/Weaken/ExtraBits.pm
 xt/0-exe-shebang.t
+xt/0-file-is-part-of.t
 xt/0-META-read.t
+xt/0-no-debug-left-on.t
 xt/0-Test-ConsistentVersion.t
 xt/0-Test-DistManifest.t
 xt/0-Test-Pod.t
 xt/0-Test-Synopsis.t
 xt/0-Test-YAML-Meta.t
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

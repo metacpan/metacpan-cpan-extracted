@@ -1,4 +1,4 @@
-# Copyright 2016, 2017, 2018 Kevin Ryde
+# Copyright 2016, 2017, 2018, 2019 Kevin Ryde
 #
 # This file is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the Free
@@ -23,6 +23,7 @@ use strict;
 use warnings;
 use Carp 'croak';
 use List::Util 'max','sum';
+use Regexp::Common 'balanced';
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
@@ -39,6 +40,7 @@ our @EXPORT_OK
      # 'separate_sinks','add_sink',
      # 'rename_accepting_last',
      # 'is_accepting_sink',
+     # 'blocks',
 
      # generic functions
      'fraction_digits',
@@ -122,6 +124,31 @@ sub num_symbols {
 }
 
 #------------------------------------------------------------------------------
+
+sub descendants {
+  my ($self, $state, $symb) = @_;
+
+  my %try;
+  @try{ref $state eq 'ARRAY' ? @$state : $state} = ();  # hash slice
+  my %seen;
+  my %ret;
+  while (%try) {
+    foreach my $from (keys %try) {
+      delete $try{$from};
+      $seen{$from} = 1;
+      foreach my $to ($self->successors($from,$symb)) {
+        $ret{$to} = 1;
+        unless ($seen{$to}++) {
+          $try{$to} = undef;
+        }
+      }
+    }
+  }
+  return keys %ret;
+}
+
+
+#------------------------------------------------------------------------------
 # Prefixes
 
 =pod
@@ -163,6 +190,15 @@ sub prefix {
 
 sub ancestors {
   my ($self, $state, $symb) = @_;
+
+  # "targets" are the states sought as successors.  Initially given $state,
+  # then the immediate successors of those, successors of successors,
+  # etc.
+  # "ret" is those successors.  It does not include the initial $state,
+  # unless a cycle comes back around to some of $state.
+  # "try" are states to look at for a successor target.  Initially
+  # everything, then when a state is put in "ret" don't try it again.
+
   my %targets;
   @targets{ref $state eq 'ARRAY' ? @$state : $state} = ();  # hash slice
   my %try;
@@ -185,6 +221,8 @@ sub ancestors {
   return keys %ret;
 }
 
+# UNTESTED
+# like successors, but the one-step preceding
 sub predecessors {
   my ($self, $state, $symb) = @_;
   my %targets;
@@ -876,7 +914,7 @@ sub separate_sinks {
 
       ### common sink: "$from_state to $to_state, new $new_state, labels ".join(' ',@labels)
 
-      # when $fa is an NFA and add_transition() accumulates, so for it must
+      # when $fa is an NFA add_transition() accumulates, so for it must
       # remove old transitions
       $fa->remove_transition($from_state,$to_state);
 
@@ -1055,7 +1093,16 @@ sub bits_of_length_flat {
   require FLAT::Regex;
   return FLAT::Regex->new('(0|1)' x $len)
     ->as_dfa
+    ->MyFLAT::minimize
     ->MyFLAT::set_name("$len bits");
+}
+sub bits_of_length_or_more_flat {
+  my ($len) = @_;
+  require FLAT::Regex;
+  return FLAT::Regex->new(('(0|1)' x $len) . '(0|1)*')
+    ->as_dfa
+    ->MyFLAT::minimize
+    ->MyFLAT::set_name(">=$len bits");
 }
 
 #------------------------------------------------------------------------------
@@ -1136,39 +1183,41 @@ sub FLAT_print_perl_accepting {
 sub FLAT_print_gp_inline_table {
   my ($fa, $name) = @_;
   require MyPrintwrap;
-  print "% GP-DEFINE  $name = {[\n";
-  MyPrintwrap::printwrap_indent("% GP-DEFINE    ");
+  MyPrintwrap::printwrap_indent("% GP-DEFINE  ");
+  $MyPrintwrap::Printwrap = 0;
+  MyPrintwrap::printwrap("$name = {[");
+  $MyPrintwrap::Printwrap += 2;
   my @alphabet = sort {$a<=>$b} $fa->alphabet;
   my @states = $fa->get_states;
   foreach my $state (@states) {
-    my @row = map { scalar($fa->successors($state,$_)) + 1 } @alphabet;
+    my @row = map { my @to = $fa->successors($state,$_);
+                    @to==1 or die "oops, not a DFA";
+                    $to[0]+1 } @alphabet;
     MyPrintwrap::printwrap(join(',',@row)
-                           . ($state == $#states ? "\n" : ';'));
+                           . ($state == $#states ? '' : ';'));
   }
-  print "% GP-DEFINE  ]};\n";
+  MyPrintwrap::printwrap("]};\n");
 }
 sub FLAT_print_gp_inline_accepting {
   my ($fa, $name) = @_;
-  my @accepting = $fa->get_accepting;
   require MyPrintwrap;
-  my $start = "% GP-DEFINE  $name = {[";
-  my $end = "]};\n";
-  my $line = $start . join(',',@accepting) . $end;
-  if (length $line < 79) {
-    print "$line\n";
-    return;
-  }
-  print $start,"\n";
+  MyPrintwrap::printwrap_indent("% GP-DEFINE  ");
+  $MyPrintwrap::Printwrap = 0;
+  MyPrintwrap::printwrap("$name = {[");
+  $MyPrintwrap::Printwrap += 2;
+  my $join = '';
+  my @accepting = $fa->get_accepting;
   foreach my $i (0 .. $#accepting) {
-    printwrap("$accepting[$i]" . ($i == $#accepting ? "\n" : ','));
+    MyPrintwrap::printwrap(($accepting[$i]+1) . ($i == $#accepting ? '' : ','));
   }
-  print "% GP-DEFINE  $end";
+  MyPrintwrap::printwrap("]};\n");
 }
 
 sub FLAT_print_tikz {
   my ($fa, %options) = @_;
   my $node_prefix = $options{'node_prefix'} // 's';
   my $flow = $options{'flow'} // $fa->{'flow'} // 'east';
+  my $state_labels = $options{'state_labels'};
 
   my @column_to_states;
   my @state_to_column;
@@ -1207,7 +1256,8 @@ sub FLAT_print_tikz {
       if ($flow eq 'north') { ($x,$y) = ($y,$x); }
       if ($flow eq 'south') { ($x,$y) = ($y,-$x); }
       my $state_name = "$node_prefix$state";
-      print "  \\node ($state_name) at ($x,$y) [my box] {$state};\n";
+      my $state_str = ($state_labels ? $state_labels->[$state] : $state);
+      print "  \\node ($state_name) at ($x,$y) [my box] {$state_str};\n";
     }
   }
   print "\n";
@@ -1287,7 +1337,7 @@ sub aref_to_FLAT_DFA {
     }
     foreach my $digit (0 .. $#$row) {
       my $to_state = $row->[$digit]
-        // croak "state $state digit $digit destination undef";
+        // next; # croak "state $state digit $digit destination undef";
       ($to_state >= 0 && $to_state <= $#$aref)
         or croak "state $state digit $digit destination $to_state out of range";
       ### transition: "$state(=$fstates[$state]) digit=$digit -> $to_state($fstates[$to_state])"
@@ -1351,6 +1401,29 @@ sub FLAT_count_contains {
   }
   return @ret;
 }
+
+# FIXME: Not right for non-accepting cycles.
+sub finite_max_length {
+  my ($fa) = @_;
+  ### finite_max_length() ...
+  my @pending = $fa->get_starting;
+  my %seen = map {$_=>1} @pending;
+  my $ret = -1;
+  my $len = 0;
+  while (@pending) {
+    if (grep {$fa->is_accepting($_)} @pending) {
+      ### accepting ...
+      $ret = $len;
+    }
+    $len++;
+    @pending = $fa->epsilon_closure($fa->successors(\@pending));
+    ### to: @pending
+    @pending = grep {! $seen{$_}++} @pending;
+  }
+  ### $ret
+  return $ret;
+}
+
 
 #------------------------------------------------------------------------------
 # FLAT temporary
@@ -1625,11 +1698,12 @@ sub set_name {
 =item C<$new_fa = $fa-E<gt>digits_increment (key =E<gt> value, ...)>
 
 C<$fa> is a C<FLAT::NFA> or C<FLAT::DFA> accepting digit strings.  Return a
-new FLAT (same DFA or NFA) which accepts numbers +1.  Key/value options are
+new FLAT (same DFA or NFA) which accepts numbers +1, or +/- a given
+increment.  Key/value options are
 
-    add       => integer
-    radix     => integer>=2
-    direction => "lowtohigh" or "hightolow"
+    add       => integer, default 1
+    radix     => integer>=2, default from alphabet
+    direction => "hightolow" (default) or "lowtohigh"
 
 Option C<add =E<gt> $add> is the increment to apply (default 1).  This can
 be negative too.
@@ -1650,6 +1724,14 @@ not change the length, so 00999 -E<gt> 01000.
 
 Negative increments do not decrease string length, so 1000 -> 0999.  If
 C<$add> reduces a number below 0 then that string is quietly dropped.
+
+If the strings matched by C<$fa> represent a predicate, numbers with some
+property, then the returned C<$new_fa> is those N for which N-add has the
+property.  This is since C<$new_fa> is +add from the originals.  So to get a
+predicate testing whether N+1 has the property, apply an C<add =E<gt> -1>.
+An C<intersect()> of that and the original becomes a predicate for a pair N
+and N+1 both with the property and longer runs can be made by further
+intersects.
 
 ENHANCE-ME: Maybe a width option to stay in given number of digits, discard
 anything which would increment to bigger.  Or a wraparound option to ignore
@@ -2162,6 +2244,7 @@ sub blocks {
   return $new_fa;
 }
 
+
 #------------------------------------------------------------------------------
 sub as_perl {
   my ($fa, %options) = @_;
@@ -2185,6 +2268,54 @@ sub print_perl {
   print $fa->MyFLAT::as_perl(@_);
 }
 
+# $re is a Perl regexp, usually a qr/.../ form.
+# Return a string which is a FLAT style regexp.
+# Each char matched by $re is matched by the flat.
+# There's no scope for multi-char symbols in the flat.
+# Whitespace chars should not be matched by $re.
+# Regexp::Common::balanced used here probably needs new enough Perl.
+#
+sub perl_regexp_to_flat_regex {
+  my ($re) = @_;
+  my $str = "$re";
+
+  # (?opts:...)
+  # x = ignore whitespace and comments
+  # Assume for now that if present then it's whitespace everywhere,
+  # which is not quite right.
+  if ($str =~ s/\(\?\^([a-z]*):/(/) {
+    my $opts = $1;
+    if ($opts =~ /x/) {
+      $str =~ tr/ \t\r\n//d;
+    }
+  }
+
+  # ^ $ assumed always for now
+  # would need a good idea of the alphabet
+  $str =~ s/[\^\$]//g;
+
+  # [123] char classes
+  $str =~ s{\[([^\]]*)\]}{ '(' . join('|',split //, $1) . ')' }eg;
+  
+  # (| or |) empty alternative
+  $str =~ s/\(\|/([]|/g;
+  $str =~ s/\|\)/|[])/g;
+  
+  # X+ repeats, possibly nested
+  while ($str =~ s{($RE{'balanced'}{-parens=>'()'}|[^)])\+}{$1$1*}o) {}
+  
+  # X? optional, possibly nested
+  while ($str =~ s{($RE{'balanced'}{-parens=>'()'}|[^)])\?}{($1|[])}o) {}
+  
+  ### $str
+  return $str;
+}
+
+sub flat_regex_to_perl_regexp {
+  my ($str) = @_;
+  $str =~ s/\[\]//g;
+  return qr/^$str$/x;
+}
 
 #------------------------------------------------------------------------------
 1;

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -52,6 +52,19 @@ diagonal, are
 
 =cut
 
+{
+  # Sum, would be an i_to_n_offset
+  require Math::NumSeq::PlanePathCoord;
+  my $seq = Math::NumSeq::PlanePathCoord->new (planepath => 'AlternatePaper',
+                                               coordinate_type => 'Sum',
+                                               i_start => 0,
+                                               n_start => 1);
+  foreach (1..6) {
+    my ($i,$value) = $seq->next;
+    print "$i $value\n";
+  }
+  exit 0;
+}
 
 {
   # resistance

@@ -33,7 +33,7 @@ use Math::PlanePath::QuadricIslands;
 # VERSION
 
 {
-  my $want_version = 126;
+  my $want_version = 127;
   ok ($Math::PlanePath::QuadricIslands::VERSION, $want_version,
       'VERSION variable');
   ok (Math::PlanePath::QuadricIslands->VERSION,  $want_version,

@@ -26,6 +26,7 @@ This can be built and installed (with dependencies) by running:
 
     git clone https://github.com/thrig/Game-PlatformsOfPeril
     cd Game-PlatformsOfPeril
+    cpanm File::ShareDir::Install
     cpanm .
 
 or without dependencies the manual old fashioned way:

@@ -28,20 +28,21 @@ no_index:
 provides:
   Curio::Role::DBIx::Connector:
     file: lib/Curio/Role/DBIx/Connector.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   Curio::Role: '0.04'
   DBIx::Connector: '0.53'
   Moo::Role: '2.003000'
+  Scalar::Util: '0'
   Types::Standard: '1.002001'
   namespace::clean: '0.27'
-  perl: '5.008001'
+  perl: '5.016001'
   strictures: '2.000001'
 resources:
   bugtracker: https://github.com/bluefeet/Curio-Role-DBIx-Connector/issues
   homepage: https://github.com/bluefeet/Curio-Role-DBIx-Connector
   repository: git://github.com/bluefeet/Curio-Role-DBIx-Connector.git
-version: '0.01'
+version: '0.02'
 x_authority: cpan:BLUEFEET
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

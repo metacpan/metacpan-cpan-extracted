@@ -18,7 +18,7 @@ lm-solve - A Computerized Solver for Logic Mazes
 
 =head1 VERSION
 
-version 0.12.0
+version 0.14.0
 
 =head1 SYNOPSIS
 
@@ -39,10 +39,6 @@ input.
 One can find an archive containing some written-down layouts for some of the
 puzzles on the web on the LM-Solve homepage. The format of the
 layouts for the various puzzle types is described below.
-
-=head1 VERSION
-
-version 0.12.0
 
 =head1 OPTIONS
 

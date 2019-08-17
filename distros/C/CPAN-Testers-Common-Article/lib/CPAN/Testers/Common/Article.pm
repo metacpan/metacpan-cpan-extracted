@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '0.46';
+$VERSION = '0.47';
 
 #----------------------------------------------------------------------------
 # Library Modules
@@ -464,7 +464,7 @@ F<http://wiki.cpantesters.org/>
 =head1 AUTHOR
 
   Original author:    Leon Brocard <acme@astray.com>   (C) 2002-2008
-  Current maintainer: Barbie       <barbie@cpan.org>   (C) 2008-2014
+  Current maintainer: Barbie       <barbie@cpan.org>   (C) 2008-2019
 
 =head1 LICENSE
 

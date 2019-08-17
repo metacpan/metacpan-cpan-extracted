@@ -1,5 +1,5 @@
 package Games::LMSolve::Plank::Hex;
-$Games::LMSolve::Plank::Hex::VERSION = '0.12.0';
+$Games::LMSolve::Plank::Hex::VERSION = '0.14.0';
 use strict;
 use warnings;
 
@@ -7,7 +7,7 @@ use vars qw(@ISA);
 
 use Games::LMSolve::Plank::Base;
 
-@ISA=qw(Games::LMSolve::Plank::Base);
+@ISA = qw(Games::LMSolve::Plank::Base);
 
 sub initialize
 {
@@ -30,15 +30,11 @@ Games::LMSolve::Plank::Hex - driver for solving the hex plank puzzles
 
 =head1 VERSION
 
-version 0.12.0
+version 0.14.0
 
 =head1 SYNOPSIS
 
 NA - should not be used directly.
-
-=head1 VERSION
-
-version 0.12.0
 
 =head1 METHODS
 

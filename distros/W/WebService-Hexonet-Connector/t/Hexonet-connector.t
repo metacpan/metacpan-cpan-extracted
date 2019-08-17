@@ -5,9 +5,9 @@ use warnings;
 
 use Test::More;
 use Test::Exception;
-use Test::RequiresInternet ( 'coreapi.1api.net' => 80 );
+use Test::RequiresInternet ( 'api.ispapi.net' => 80 );
 
-use version 0.9917; our $VERSION = version->declare('v2.2.0');
+use version 0.9917; our $VERSION = version->declare('v2.2.2');
 
 # T1-4: test import modules
 use_ok('Config');
@@ -18,6 +18,7 @@ use_ok('Readonly');
 use Readonly;
 use Config;
 use POSIX;
+Readonly my $UNAME_IDX_4        => 4;
 Readonly my $CMD_LIMIT          => 1000;
 Readonly my $INDEX_NOT_FOUND    => -1;
 Readonly my $TMP_ERR_423        => 423;
@@ -367,12 +368,12 @@ $cl->setSession(q{});
 
 # T69 ~> getURL method test
 my $url = $cl->getURL();
-is( $url, 'https://coreapi.1api.net/api/call.cgi', 'AC: Check getURL result.' );
+is( $url, 'https://api.ispapi.net/api/call.cgi', 'AC: Check getURL result.' );
 
 # T70 ~> setURL method test
-$url = $cl->setURL('http://coreapi.1api.net/api/call.cgi')->getURL();
-is( $url, 'http://coreapi.1api.net/api/call.cgi', 'AC: Check if setURL working.' );
-$cl->setURL('https://coreapi.1api.net/api/call.cgi');
+$url = $cl->setURL('http://api.ispapi.net/api/call.cgi')->getURL();
+is( $url, 'http://api.ispapi.net/api/call.cgi', 'AC: Check if setURL working.' );
+$cl->setURL('https://api.ispapi.net/api/call.cgi');
 
 # - T72 ~> setOTP method test
 $cl->setOTP('12345678');
@@ -591,19 +592,19 @@ is( $cls, 'WebService::Hexonet::Connector::Response', 'AC: Check if resetUserVie
 is( $r->isSuccess(), 1, 'AC: Check if resetUserView method is working. #2' );
 
 # ~> getUserAgent method test
-my $arch       = ( uname() )[ 4 ];
+my $arch       = ( uname() )[ $UNAME_IDX_4 ];
 my $os         = ( uname() )[ 0 ];
 my $rv         = $cl->getVersion();
 my $uaexpected = "PERL-SDK ($os; $arch; rv:$rv) perl/$Config{version}";
 my $ua         = $cl->getUserAgent();
-is( $ua, $uaexpected, "AC: Check if getUserAgent method is working." );
+is( $ua, $uaexpected, 'AC: Check if getUserAgent method is working.' );
 
 # ~> setUserAgent method test
 $uaexpected = "WHMCS ($os; $arch; rv:7.7.0) perl-sdk/$rv perl/$Config{version}";
-$cls        = blessed( $cl->setUserAgent( "WHMCS", "7.7.0" ) );
+$cls        = blessed( $cl->setUserAgent( 'WHMCS', '7.7.0' ) );
 $ua         = $cl->getUserAgent();
 is( $cls, 'WebService::Hexonet::Connector::APIClient', 'AC: Check if setUserAgent method is working. #1' );
-is( $ua, $uaexpected, "AC: Check if setUserAgent method is working. #2" );
+is( $ua, $uaexpected, 'AC: Check if setUserAgent method is working. #2' );
 
 done_testing();
 

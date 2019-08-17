@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2018 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -21,7 +21,8 @@
 # Crib notes:
 #
 # In perl 5.8.4 "BigInt != BigRat" doesn't work, must have it other way
-# around as "BigRat != BigInt".  Symptom is "uninitialized" warnings.
+# around as "BigRat != BigInt" so get the BigRat equality testing code.
+# Symptom is "uninitialized" warnings.
 #
 
 

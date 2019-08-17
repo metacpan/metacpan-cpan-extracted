@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2018 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -40,7 +40,7 @@ MyOEIS::compare_values
      require Math::NumSeq::PlanePathTurn;
      my $seq = Math::NumSeq::PlanePathTurn->new
        (planepath => 'FibonacciWordFractal',
-        turn_type => 'LSR');   # turn_type=Straight
+        turn_type => 'LSR');   # PENDING turn_type=Straight
      my @got;
      while (@got < $count) {
        my ($i,$value) = $seq->next;

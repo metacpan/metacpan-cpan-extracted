@@ -1,5 +1,8 @@
 Revision history for Game::PlatformsOfPeril
 
+0.04    2019-08-17
+        Altscreen support, more portable GetTerminalSize call.
+
 0.03    2019-06-06
         Add 'x' command to examine level. Change bomb and make bomb keys
         to make them harder to press. More level maps.

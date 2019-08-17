@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-06-20'; # DATE
-our $VERSION = '0.463'; # VERSION
+our $DATE = '2019-07-16'; # DATE
+our $VERSION = '0.464'; # VERSION
 
 use Data::Dump::Color;
 
@@ -32,7 +32,7 @@ normalize-sah-schema - Normalize Sah schema
 
 =head1 VERSION
 
-This document describes version 0.463 of normalize-sah-schema (from Perl distribution App-SahUtils), released on 2019-06-20.
+This document describes version 0.464 of normalize-sah-schema (from Perl distribution App-SahUtils), released on 2019-07-16.
 
 =head1 SYNOPSIS
 

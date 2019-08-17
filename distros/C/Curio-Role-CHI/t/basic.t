@@ -17,9 +17,14 @@ subtest no_keys => sub{
     package CC::nk;
         use Curio role => '::CHI';
 
+        add_key 'default';
+        default_key 'default';
+
         default_arguments (
-            driver => 'Memory',
-            global => 0,
+            chi => {
+                driver => 'Memory',
+                global => 0,
+            },
         );
     package main;
 
@@ -32,8 +37,10 @@ subtest does_keys => sub{
         use Curio role => '::CHI';
 
         add_key geo_ip => (
-            driver => 'Memory',
-            global => 0,
+            chi => {
+                driver => 'Memory',
+                global => 0,
+            },
         );
     package main;
 

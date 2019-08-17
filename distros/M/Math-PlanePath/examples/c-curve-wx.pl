@@ -63,7 +63,7 @@ use Wx::Event;
 # use Smart::Comments;
 
 
-our $VERSION = 126;
+our $VERSION = 127;
 
 my $level = 5;
 my $scale = 1;

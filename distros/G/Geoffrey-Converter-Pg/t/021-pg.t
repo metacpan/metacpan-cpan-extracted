@@ -21,6 +21,7 @@ SKIP: {
     if ($@) {
         skip "Test::PostgreSQL not installed: $@", 2;
     }
+    $ENV{POSTGRES_HOME} = '/tmp/test/pgsql/geoffrey';
     my $pg = Test::PostgreSQL->new();
 
     my $dbh = DBI->connect( $pg->dsn( dbname => 'test' ), q~~, q~~, { AutoCommit => 1, RaiseError => 1, }, );

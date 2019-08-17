@@ -15,8 +15,8 @@ package PDF::Builder::Basic::PDF::Filter;
 use strict;
 use warnings;
 
-our $VERSION = '3.015'; # VERSION
-my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
+our $VERSION = '3.016'; # VERSION
+my $LAST_UPDATE = '3.016'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Filter::ASCII85Decode;
 use PDF::Builder::Basic::PDF::Filter::ASCIIHexDecode;
@@ -76,8 +76,7 @@ Filter stored data ready for output. Parallels C<infilt>.
 =cut
 
 sub new {
-    my $class = shift;
-
+    my $class = shift();
     my $self = {};
 
     bless $self, $class;
@@ -86,7 +85,7 @@ sub new {
 }
 
 sub release {
-    my $self = shift;
+    my $self = shift();
     return $self unless ref($self);
 
     # delete stuff that we know we can, here
@@ -97,7 +96,7 @@ sub release {
         if      (blessed($item) and $item->can('release')) {
             $item->release();
         } elsif ($ref eq 'ARRAY') {
-            push(@tofree, @$item);
+            push @tofree, @$item ;
         } elsif (defined(reftype($ref)) and reftype($ref) eq 'HASH') {
             release($item);
         }

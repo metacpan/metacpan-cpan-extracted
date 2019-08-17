@@ -1,5 +1,5 @@
 package Catalyst::Model::Curio;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =encoding utf8
 
@@ -41,35 +41,6 @@ which makes it somewhat simpler to create your Catalyst model class.
 You may want to check out L<Curio/Use Curio Directly> for an
 alternative viewpoint on using Catalyst models when you are
 already using Curio.
-
-=head1 KEYS
-
-There are several ways to handle keys in your Curio models because
-Curio classes can optionally support keys.
-
-=head2 No Keys
-
-A Curio class which does not support keys just means you don't
-set the L</key> configuration.
-
-=head2 Single Key
-
-If your Curio class does support keys you can choose to create a model
-for each key you want exposed in catalyst by specifying the L</key>
-configuration in each model for each key you want available in Catalyst.
-Each model would have the same L</class>.
-
-=head2 Multiple Keys
-
-If your Curio class supports keys and you do not set the L</key>
-configuration then the model will automatically create pseudo
-models for each key.
-
-This is done by appending each declared key to your model name.
-You can see this in the L</SYNOPSIS> where the model name is
-C<Cache> but since L</key> is not set, and the Curio class does
-have declared keys then the way you get the model is by appending
-C<::geo_ip> to the model name, or whatever key you want to access.
 
 =cut
 
@@ -115,7 +86,6 @@ sub _install_key_models {
     my ($self) = @_;
 
     return if $self->key();
-    return if !$self->class->factory->does_keys();
 
     my $model_class = ref( $self );
     return if $installed_key_model_classes{ $model_class };
@@ -123,7 +93,7 @@ sub _install_key_models {
     my $model_name = $model_class;
     $model_name =~ s{^.*::(?:Model|M)::}{};
 
-    foreach my $key (@{ $self->class->keys() }) {
+    foreach my $key (@{ $self->class->declared_keys() }) {
         no strict 'refs';
 
         *{"$model_class\::$key\::ACCEPT_CONTEXT"} = sub{
@@ -138,9 +108,11 @@ sub _install_key_models {
     return;
 }
 
-=head1 CONFIGURATION
+=head1 CONFIG ARGUMENTS
 
 =head2 class
+
+    class => 'MyApp::Service::Cache',
 
 The Curio class that this model wraps around.
 
@@ -157,6 +129,8 @@ has class => (
 
 =head2 key
 
+    key => 'geo_ip',
+
 If your Curio class supports keys then, if set, this forces
 your model to interact with one key only.
 
@@ -169,13 +143,23 @@ has key => (
 
 =head2 method
 
-By default when you (per the L</SYNOPSIS>):
+    method => 'connect',
 
-    $c->model('Cache::geo_ip')
+By default Catalyst's C<model()> will call the C<fetch()>
+method on your L</class> which will return a Curio object.
+If you'd like, you can change this to call a different
+method, returning something else of your choice.
 
-It will call the C<fetch> method on your L</class> which will
-return a Curio object.  If you'd like, you can change this to
-call a different method, returning something else of your choice.
+You could, for example, have a method in your Curio class
+which returns the the resource that your Curio object makes:
+
+    sub connect {
+        my $class = shift;
+        return $class->fetch( @_ )->chi();
+    }
+
+Then set the C<method> to C<connect> causing C<model()> to
+return the CHI object instead of the Curio object.
 
 =cut
 
@@ -187,6 +171,32 @@ has method => (
 
 1;
 __END__
+
+=head1 HANDLING KEYS
+
+=head2 No Keys
+
+A Curio class which does not support keys just means you don't
+set the L</key> config argument.
+
+=head2 Single Key
+
+If your Curio class does support keys you can choose to create a model
+for each key you want exposed in catalyst by specifying the L</key>
+config argument in each model for each key you want available in Catalyst.
+Each model would have the same L</class>.
+
+=head2 Multiple Keys
+
+If your Curio class supports keys and you do not set the L</key>
+config argument then the model will automatically create pseudo
+models for each key.
+
+This is done by appending each declared key to your model name.
+You can see this in the L</SYNOPSIS> where the model name is
+C<Cache> but since L</key> is not set, and the Curio class does
+have declared keys then the way you get the model is by appending
+C<::geo_ip> to the model name, or whatever key you want to access.
 
 =head1 SUPPORT
 
@@ -204,7 +214,7 @@ development this distribution would not exist.
 
 =head1 AUTHORS
 
-    Aran Clary Deltac <aran@bluefeet.dev>
+    Aran Clary Deltac <bluefeet@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

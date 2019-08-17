@@ -242,7 +242,7 @@ require DynaLoader;
 }
 $EXPORT_TAGS{ALL}= \@EXPORT_OK;
                              
-$VERSION = '1.63';
+$VERSION = '1.64';
 
 $debug = 0;
 

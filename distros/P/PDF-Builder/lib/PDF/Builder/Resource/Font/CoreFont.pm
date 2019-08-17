@@ -5,7 +5,7 @@ use base 'PDF::Builder::Resource::Font';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.015'; # VERSION
+our $VERSION = '3.016'; # VERSION
 my $LAST_UPDATE = '3.013'; # manually update whenever code is changed
 
 use File::Basename;

@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker 6.5503;
 my $PERL_version = '5.018000';  # can't use in "use" statement above! eval?
                                 # could read from .perl-version file otherwise
 my $MakeMaker_version = '6.5503';
-my $version = '3.015';          # PDFbuild.pl updates from 'version' file
+my $version = '3.016';          # PDFbuild.pl updates from 'version' file
 
 # EVERY RELEASE: check https://www.cpan.org/src/ "First release in each branch
 #   of Perl" (NOT "Latest releases in each branch of Perl"!) and subtract 

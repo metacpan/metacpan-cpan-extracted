@@ -1,11 +1,16 @@
-0.123   2019-06-09 (PERLANCAR)
+0.124   2019-08-15  Released-By: PERLANCAR; Urgency: medium
+
+	- Use Perinci::Exporter.
+
+
+0.123   2019-06-09  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Tweak module Summary again.
 
 
-0.122   2019-06-09 (PERLANCAR)
+0.122   2019-06-09  Released-By: PERLANCAR
 
 	- Add examples for media-is-{landscape,portrait}.
 
@@ -15,24 +20,24 @@
 	- Fix module Summary.
 
 
-0.121   2019-06-09 (PERLANCAR)
+0.121   2019-06-09  Released-By: PERLANCAR
 
 	- [ux] media-is-{portrait,landscape}: Show human-friendly message
 	  when run interactively.
 
 
-0.120   2019-01-28 (PERLANCAR)
+0.120   2019-01-28  Released-By: PERLANCAR
 
 	- Add utilities: media-is-landscape, media-is-portrait,
 	  media-orientation.
 
 
-0.11    2016-04-06 (PERLANCAR)
+0.11    2016-04-06  Released-By: PERLANCAR
 
 	- [Bugfix] Fix broken CLI (Riap URL was not updated).
 
 
-0.10    2016-04-06 (PERLANCAR)
+0.10    2016-04-06  Released-By: PERLANCAR
 
 	- First release, split from Media-Info to reduce dependencies of
           Media-Info.

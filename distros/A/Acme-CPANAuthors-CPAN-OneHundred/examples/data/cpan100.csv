@@ -1,6 +1,6 @@
-# DATE: 2019-08-11T07:18:35
+# DATE: 2019-08-17T08:38:54
 #Pause,Count,Name
-PERLANCAR,1765,perlancar
+PERLANCAR,1768,perlancar
 PSIXDISTS,550,Perl 6 Modules
 RJBS,296,Ricardo SIGNES
 TOBYINK,282,Toby Inkster
@@ -19,8 +19,8 @@ PLICEASE,169,Graham Ollis
 PEVANS,168,Paul Evans
 NUFFIN,158,Yuval Kogman
 DROLSKY,156,Dave Rolsky
-SHLOMIF,152,Shlomi Fish
 BOBTFISH,152,Tomas Doran
+SHLOMIF,152,Shlomi Fish
 MARCEL,147,Marcel Gruenauer
 SKIM,140,Michal Josef Spacek
 NEILB,135,Neil Bowers
@@ -28,16 +28,16 @@ GUGOD,133,Liu Kang Min
 DMAKI,122,Daisuke Maki
 SIMON,118,Simon Cozens
 MANWAR,118,Mohammad S Anwar
-BARBIE,117,Barbie
 RSAVAGE,117,Ron Savage
-AUTRIJUS,112,Audrey Tang
+BARBIE,117,Barbie
 MRAMBERG,112,Marcus Ramberg
+AUTRIJUS,112,Audrey Tang
 SALVA,112,Salvador Fandino Garcia
 YANICK,109,Yanick Champoux
 FAYLAND,108,Fayland Lin
 MLEHMANN,108,???
-RENEEB,103,Renee Baecker
 BDFOY,103,brian d foy
+RENEEB,103,Renee Baecker
 VVELOX,103,???
 TEAM,102,Tom Molesworth
 LBROCARD,101,Leon Brocard

@@ -1,12 +1,13 @@
 package App::MediaInfo;
 
-our $DATE = '2019-06-09'; # DATE
-our $VERSION = '0.123'; # VERSION
+our $DATE = '2019-08-15'; # DATE
+our $VERSION = '0.124'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-#use Log::Any '$log';
+
+use Perinci::Exporter;
 
 our %SPEC;
 
@@ -232,7 +233,7 @@ App::MediaInfo - Utilities related to getting (metadata) information from media 
 
 =head1 VERSION
 
-This document describes version 0.123 of App::MediaInfo (from Perl distribution App-MediaInfo), released on 2019-06-09.
+This document describes version 0.124 of App::MediaInfo (from Perl distribution App-MediaInfo), released on 2019-08-15.
 
 =head1 FUNCTIONS
 

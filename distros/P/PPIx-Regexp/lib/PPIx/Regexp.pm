@@ -120,9 +120,10 @@ These are being removed in positions where quantifiers are legal, so
 that they can be used for new functionality. Some of them are gone in
 5.25.1, others will be removed in a future version of Perl. In
 situations where they have been removed,
-L<perl_version_removed()|/perl_version_removed> will return the version
-in which they were removed. When the new functionality appears, the
-parse produced by this software will reflect the new functionality.
+L<perl_version_removed()|PPIx::Regexp::Element/perl_version_removed>
+will return the version in which they were removed. When the new
+functionality appears, the parse produced by this software will reflect
+the new functionality.
 
 B<NOTE> that the situation with a literal left curly after a literal
 character is complicated. It was made an error in Perl 5.25.1, and
@@ -170,7 +171,7 @@ use PPIx::Regexp::Tokenizer;
 use PPIx::Regexp::Util qw{ __choose_tokenizer_class __instance };
 use Scalar::Util qw{ refaddr };
 
-our $VERSION = '0.065';
+our $VERSION = '0.066';
 
 =head2 new
 
@@ -535,8 +536,8 @@ objects corresponding to all regular expressions found in it, in the
 order in which they occur in the document. You will need to keep a
 reference to the original L<PPI::Document|PPI::Document> object if you
 wish to be able to recover the original L<PPI::Element|PPI::Element>
-objects via the L<PPIx::Regexp::Element|PPIx::Regexp::Element>
-L<source()|PPIx::Regexp::Element/source> method.
+objects via the L<PPIx::Regexp|PPIx::Regexp>
+L<source()|PPIx::Regexp/source> method.
 
 =cut
 
@@ -797,11 +798,12 @@ generally assumes the more modern parse in cases like this.
 
 Very occasionally, a construction will be removed and then added back --
 and then, conceivably, removed again. In this case, the plan is for
-L<perl_version_introduced()|PPIx::Regexp/perl_version_introduced> to
-return the earliest version in which the construction appeared, and
-L<perl_version_removed()> to return the version after the last version
-in which it appeared (whether production or development), or C<undef> if
-it is in the highest-numbered Perl.
+L<perl_version_introduced()|PPIx::Regexp::Element/perl_version_introduced>
+to return the earliest version in which the construction appeared, and
+L<perl_version_removed()|PPIx::Regexp::Element/perl_version_removed> to
+return the version after the last version in which it appeared (whether
+production or development), or C<undef> if it is in the highest-numbered
+Perl.
 
 The constructions involved in this are:
 
@@ -815,15 +817,15 @@ was re-instated because the changes broke GNU Autoconf, and the warning
 message says it will be removed in Perl C<5.30>.
 
 Accordingly,
-L<perl_version_introduced()|PPIx::Regexp/perl_version_introduced>
+L<perl_version_introduced()|PPIx::Regexp::Element/perl_version_introduced>
 returns C<5.0>. At the moment
-L<perl_version_removed()|PPIx::Regexp/perl_version_removed> returns
+L<perl_version_removed()|PPIx::Regexp::Element/perl_version_removed> returns
 C<'5.025001'>. But if it is present with or without warning in C<5.28>,
-L<perl_version_removed()|PPIx::Regexp/perl_version_removed> will become
+L<perl_version_removed()|PPIx::Regexp::Element/perl_version_removed> will become
 C<undef>. If you need finer resolution than this, see
 L<PPIx::Regexp::Element|PPIx::Regexp::Element> methods
-l<accepts_perl()|ppix::regexp::element/accepts_perl> and
-l<requirements_for_perl()|ppix::regexp::element/requirements_for_perl>
+l<accepts_perl()|PPIx::Regexp::Element/accepts_perl> and
+l<requirements_for_perl()|PPIx::Regexp::Element/requirements_for_perl>
 
 =head2 Static Parsing
 
@@ -875,8 +877,9 @@ following modules are known to cause problems:
 
 L<Acme::PerlML|Acme::PerlML>, which renders Perl as XML.
 
-L<Data::PostfixDeref|Data::PostfixDeref>, which causes Perl to interpret
-suffixed empty brackets as dereferencing the thing they suffix.
+C<Data::PostfixDeref>, which causes Perl to interpret suffixed empty
+brackets as dereferencing the thing they suffix. This module by Ben
+Morrow (C<BMORROW>) appears to have been retracted.
 
 L<Filter::Trigraph|Filter::Trigraph>, which recognizes ANSI C trigraphs,
 allowing Perl to be written in the ISO 646 character set.

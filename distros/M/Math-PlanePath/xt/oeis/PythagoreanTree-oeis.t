@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2016, 2018 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2016, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -20,6 +20,7 @@
 
 use 5.004;
 use strict;
+use Math::BigInt try => 'GMP';
 use Test;
 plan tests => 2;
 
@@ -28,7 +29,6 @@ use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings(); }
 use MyOEIS;
 
-use Math::BigInt try => 'GMP';
 use Math::PlanePath::PythagoreanTree;
 
 
@@ -124,7 +124,6 @@ MyOEIS::compare_values
   (anum => 'A000244',
    func => sub {
      my ($count) = @_;
-     require Math::BigInt;
      my @got;
      my $path = Math::PlanePath::PythagoreanTree->new;
      for (my $depth = Math::BigInt->new(0); @got < $count; $depth++) {
@@ -140,7 +139,6 @@ MyOEIS::compare_values
   (anum => 'A052940',
    func => sub {
      my ($count) = @_;
-     require Math::BigInt;
      my @got = (1);
      my $path = Math::PlanePath::PythagoreanTree->new (tree_type => 'UMT',
                                                        coordinates => 'PQ');
@@ -155,7 +153,6 @@ MyOEIS::compare_values
   (anum => 'A055010',
    func => sub {
      my ($count) = @_;
-     require Math::BigInt;
      my @got = (0);
      my $path = Math::PlanePath::PythagoreanTree->new (tree_type => 'UMT',
                                                        coordinates => 'PQ');
@@ -171,7 +168,6 @@ MyOEIS::compare_values
    # max_count => 100,
    func => sub {
      my ($count) = @_;
-     require Math::BigInt;
      my @got = (1);
      my $path = Math::PlanePath::PythagoreanTree->new (tree_type => 'UMT',
                                                        coordinates => 'PQ');
@@ -187,7 +183,6 @@ MyOEIS::compare_values
    # max_count => 100,
    func => sub {
      my ($count) = @_;
-     require Math::BigInt;
      my @got;
      my $path = Math::PlanePath::PythagoreanTree->new (tree_type => 'UMT',
                                                        coordinates => 'PQ');
@@ -203,7 +198,6 @@ MyOEIS::compare_values
   (anum => 'A093357',
    func => sub {
      my ($count) = @_;
-     require Math::BigInt;
      my @got = (0);
      my $path = Math::PlanePath::PythagoreanTree->new (tree_type => 'UMT',
                                                        coordinates => 'AB');
@@ -220,7 +214,6 @@ MyOEIS::compare_values
   (anum => 'A134057',
    func => sub {
      my ($count) = @_;
-     require Math::BigInt;
      my @got = (0,0);
      my $path = Math::PlanePath::PythagoreanTree->new (tree_type => 'UMT',
                                                        coordinates => 'AB');
@@ -238,7 +231,6 @@ MyOEIS::compare_values
    # max_count => 100,
    func => sub {
      my ($count) = @_;
-     require Math::BigInt;
      my @got = (1,0);
      my $path = Math::PlanePath::PythagoreanTree->new (tree_type => 'FB',
                                                        coordinates => 'PQ');
@@ -256,7 +248,6 @@ MyOEIS::compare_values
    # max_count => 100,
    func => sub {
      my ($count) = @_;
-     require Math::BigInt;
      my @got = (1,0);
      my $path = Math::PlanePath::PythagoreanTree->new (tree_type => 'FB',
                                                        coordinates => 'AB');
@@ -273,7 +264,6 @@ MyOEIS::compare_values
    # max_count => 100,
    func => sub {
      my ($count) = @_;
-     require Math::BigInt;
      my @got = (1);
      my $path = Math::PlanePath::PythagoreanTree->new (tree_type => 'FB',
                                                        coordinates => 'AB');
@@ -289,7 +279,6 @@ MyOEIS::compare_values
    # max_count => 100,
    func => sub {
      my ($count) = @_;
-     require Math::BigInt;
      my @got = (0,0,1);
      my $path = Math::PlanePath::PythagoreanTree->new (tree_type => 'FB',
                                                        coordinates => 'AB');
@@ -305,7 +294,6 @@ MyOEIS::compare_values
    # max_count => 100,
    func => sub {
      my ($count) = @_;
-     require Math::BigInt;
      my @got = (0,1);
      my $path = Math::PlanePath::PythagoreanTree->new (tree_type => 'FB',
                                                        coordinates => 'AB');
@@ -322,7 +310,6 @@ MyOEIS::compare_values
   (anum => 'A085601',
    func => sub {
      my ($count) = @_;
-     require Math::BigInt;
      my @got;
      my $path = Math::PlanePath::PythagoreanTree->new (tree_type => 'FB',
                                                        coordinates => 'AC');
@@ -338,7 +325,6 @@ MyOEIS::compare_values
   (anum => 'A028403',
    func => sub {
      my ($count) = @_;
-     require Math::BigInt;
      my @got;
      my $path = Math::PlanePath::PythagoreanTree->new (tree_type => 'FB',
                                                        coordinates => 'AB');
@@ -353,7 +339,6 @@ MyOEIS::compare_values
   (anum => 'A007582',
    func => sub {
      my ($count) = @_;
-     require Math::BigInt;
      my @got;
      my $path = Math::PlanePath::PythagoreanTree->new (tree_type => 'FB',
                                                        coordinates => 'AB');
@@ -371,7 +356,6 @@ MyOEIS::compare_values
    # max_count => 100,
    func => sub {
      my ($count) = @_;
-     require Math::BigInt;
      my @got = (1);
      my $path = Math::PlanePath::PythagoreanTree->new (coordinates => 'AB');
      for (my $depth = Math::BigInt->new(0); @got < $count; $depth++) {
@@ -386,7 +370,6 @@ MyOEIS::compare_values
    # max_count => 100,
    func => sub {
      my ($count) = @_;
-     require Math::BigInt;
      my @got = (0);
      my $path = Math::PlanePath::PythagoreanTree->new (coordinates => 'AB');
      for (my $depth = Math::BigInt->new(0); @got < $count; $depth++) {
@@ -401,7 +384,6 @@ MyOEIS::compare_values
   (anum => 'A046729',
    func => sub {
      my ($count) = @_;
-     require Math::BigInt;
      my @got = (0);
      my $path = Math::PlanePath::PythagoreanTree->new (coordinates => 'AB');
      for (my $depth = Math::BigInt->new(0); @got < $count; $depth++) {
@@ -416,7 +398,6 @@ MyOEIS::compare_values
   (anum => 'A001653',
    func => sub {
      my ($count) = @_;
-     require Math::BigInt;
      my @got = (1);
      my $path = Math::PlanePath::PythagoreanTree->new (coordinates => 'AC');
      for (my $depth = Math::BigInt->new(0); @got < $count; $depth++) {
@@ -432,7 +413,6 @@ MyOEIS::compare_values
    # max_count => 50,
    func => sub {
      my ($count) = @_;
-     require Math::BigInt;
      my @got = (0);
      my $path = Math::PlanePath::PythagoreanTree->new (coordinates => 'SM');
      for (my $depth = Math::BigInt->new(0); @got < $count; $depth++) {
@@ -448,7 +428,6 @@ MyOEIS::compare_values
    # max_count => 100,
    func => sub {
      my ($count) = @_;
-     require Math::BigInt;
      my @got = (1);
      my $path = Math::PlanePath::PythagoreanTree->new (coordinates => 'SM');
      for (my $depth = Math::BigInt->new(0); @got < $count; $depth++) {
@@ -464,7 +443,6 @@ MyOEIS::compare_values
    # max_count => 100,
    func => sub {
      my ($count) = @_;
-     require Math::BigInt;
      my @got = (0,1);
      my $path = Math::PlanePath::PythagoreanTree->new (coordinates => 'PQ');
      for (my $depth = Math::BigInt->new(0); @got < $count; $depth++) {
@@ -480,7 +458,6 @@ MyOEIS::compare_values
   (anum => 'A099776',
    func => sub {
      my ($count) = @_;
-     require Math::BigInt;
      my @got;
      my $path = Math::PlanePath::PythagoreanTree->new (coordinates => 'AC');
      for (my $depth = Math::BigInt->new(0); @got < $count; $depth++) {
@@ -495,7 +472,6 @@ MyOEIS::compare_values
    # max_count => 100,
    func => sub {
      my ($count) = @_;
-     require Math::BigInt;
      my @got = (1);
      my $path = Math::PlanePath::PythagoreanTree->new (coordinates => 'AC');
      for (my $depth = Math::BigInt->new(0); @got < $count; $depth++) {
@@ -511,7 +487,6 @@ MyOEIS::compare_values
    # max_count => 500,
    func => sub {
      my ($count) = @_;
-     require Math::BigInt;
      my @got = (0);
      my $path = Math::PlanePath::PythagoreanTree->new (coordinates => 'AB');
      for (my $depth = Math::BigInt->new(0); @got < $count; $depth++) {
@@ -528,7 +503,6 @@ MyOEIS::compare_values
   (anum => 'A000466',
    func => sub {
      my ($count) = @_;
-     require Math::BigInt;
      my @got = (-1);
      my $path = Math::PlanePath::PythagoreanTree->new;
      for (my $depth = Math::BigInt->new(0); @got < $count; $depth++) {
@@ -547,7 +521,6 @@ MyOEIS::compare_values
    max_count => 35,
    func => sub {
      my ($count) = @_;
-     require Math::BigInt;
      my $path = Math::PlanePath::PythagoreanTree->new (coordinates => 'SM');
      my %seen;
      for (my $n = $path->n_start; $n < 100000; $n++) {
@@ -567,7 +540,6 @@ MyOEIS::compare_values
   (anum => 'A003462',
    func => sub {
      my ($count) = @_;
-     require Math::BigInt;
      my @got = (0);
      my $path = Math::PlanePath::PythagoreanTree->new;
      for (my $depth = Math::BigInt->new(0); @got < $count; $depth++) {

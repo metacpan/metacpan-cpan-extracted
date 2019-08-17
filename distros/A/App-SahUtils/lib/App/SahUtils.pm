@@ -1,7 +1,7 @@
 package App::SahUtils;
 
-our $DATE = '2019-06-20'; # DATE
-our $VERSION = '0.463'; # VERSION
+our $DATE = '2019-07-16'; # DATE
+our $VERSION = '0.464'; # VERSION
 
 use 5.010001;
 use strict;
@@ -346,7 +346,7 @@ App::SahUtils - Collection of CLI utilities for Sah and Data::Sah
 
 =head1 VERSION
 
-This document describes version 0.463 of App::SahUtils (from Perl distribution App-SahUtils), released on 2019-06-20.
+This document describes version 0.464 of App::SahUtils (from Perl distribution App-SahUtils), released on 2019-07-16.
 
 =head1 SYNOPSIS
 
@@ -397,7 +397,7 @@ L<Sah> and L<Data::Sah>:
 
 =item * L<sah-to-human>
 
-=item * L<show-sah-coerce-module>
+=item * L<show-sah-coerce-rule-module>
 
 =item * L<show-sah-schema-module>
 

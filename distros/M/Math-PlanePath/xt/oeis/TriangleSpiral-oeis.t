@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2015 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2015, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -20,6 +20,7 @@
 
 use 5.004;
 use strict;
+use Math::BigInt;
 use Test;
 plan tests => 1;
 
@@ -118,7 +119,6 @@ MyOEIS::compare_values
    func => sub {
      my ($count) = @_;
      my @got;
-     require Math::BigInt;
      my %plotted;
      $plotted{0,0} = Math::BigInt->new(1);
      my $xmin = 0;

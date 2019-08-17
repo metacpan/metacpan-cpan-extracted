@@ -1,6 +1,6 @@
-0.17.5 2019-07-18 09:16:37 +0200 Tobias Oetiker <tobi@oetiker.ch>
+0.18.0 2019-08-16 11:34:38 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
- - upgrade to latest config grammar to make utf8 work
+ - add support for per-call log cleaners to prevent login call from spilling the password while loging
 
 0.17.4 2019-07-16 15:48:07 +0200 Tobias Oetiker <tobi@oetiker.ch>
 

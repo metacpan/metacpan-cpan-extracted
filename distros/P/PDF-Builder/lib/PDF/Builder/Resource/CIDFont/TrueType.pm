@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::CIDFont';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.015'; # VERSION
-my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
+our $VERSION = '3.016'; # VERSION
+my $LAST_UPDATE = '3.016'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Utils;
 use PDF::Builder::Resource::CIDFont::TrueType::FontFile;
@@ -30,7 +30,8 @@ Defined Options:
 
     -encode ... specify fonts encoding for non-UTF-8 text.
 
-    -nosubset ... disables subsetting.
+    -nosubset ... disables subsetting. Any value causes the full font to be
+                  embedded, rather than only the glyphs needed.
 
 =cut
 
@@ -137,7 +138,7 @@ sub glyphNum {
 }
 
 sub outobjdeep {
-    my ($self, $fh, $pdf, %opts) = @_;
+    my ($self, $fh, $pdf) = @_;
 
     my $notdefbefore = 1;
 
@@ -173,7 +174,7 @@ sub outobjdeep {
         #}
     }
 
-    return $self->SUPER::outobjdeep($fh, $pdf, %opts);
+    return $self->SUPER::outobjdeep($fh, $pdf);
 }
 
 =back

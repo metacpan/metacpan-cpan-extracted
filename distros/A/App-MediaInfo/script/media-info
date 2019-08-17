@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/MediaInfo/media_info
-# and generated automatically using Perinci::CmdLine::Gen version 0.488
+# and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-06-09'; # DATE
+our $DATE = '2019-08-15'; # DATE
 our $DIST = 'App-MediaInfo'; # DIST
-our $VERSION = '0.123'; # VERSION
+our $VERSION = '0.124'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,7 +39,7 @@ media-info - Get information about media files/URLs
 
 =head1 VERSION
 
-This document describes version 0.123 of media-info (from Perl distribution App-MediaInfo), released on 2019-06-09.
+This document describes version 0.124 of media-info (from Perl distribution App-MediaInfo), released on 2019-08-15.
 
 =head1 SYNOPSIS
 

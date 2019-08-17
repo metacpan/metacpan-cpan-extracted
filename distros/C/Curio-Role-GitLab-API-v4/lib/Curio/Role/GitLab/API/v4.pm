@@ -1,5 +1,5 @@
 package Curio::Role::GitLab::API::v4;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use GitLab::API::v4;
 use Scalar::Util qw( blessed );

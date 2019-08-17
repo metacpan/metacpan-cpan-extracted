@@ -1,5 +1,5 @@
 package Curio;
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 use Curio::Declare qw();
 use Curio::Role qw();
@@ -89,15 +89,15 @@ Then use your new Curio class elsewhere:
 
 =head1 DESCRIPTION
 
-Curio is a toolbox for building a class which holds a resource (or
+Curio is a toolbox for building classes which holds a resource (or
 many resources) of your making.  Then, in your applications, you can
 access the resource(s) from anywhere.
 
 =head1 INTRODUCTION
 
-Curio is a library for creating L<Moo> classes which encapsulate the
-construction and retrieval of arbitrary resources.  As a user of this
-library you've got two jobs.
+Curio classes are L<Moo> classes which encapsulate the construction
+and retrieval of arbitrary resources.  As a user of this library
+you've got two jobs.
 
 First, you create classes in your application which use Curio.  You'll
 have one class for each type of resource you want available to your
@@ -265,21 +265,14 @@ process/thread changes gracefully.
 
 =head2 Keys
 
-Curio supports fetching curio objects by key.  This is an optional
-feature and by default is turned off.  To turn it on you set
-L<Curio::Factory/does_keys> or just start adding keys with
-L<Curio::Factory/add_key> which will automatically turn on
-C<does_keys>.
-
-When keys are enabled a curio class is able to produce different
-objects based on the key.  For example, lets say you have two
-databases, you could create two curio classes, or you could just
-enable keys.
+Keys allow a curio class to produce different objects based on the
+key.  For example, lets say you have two databases, you'd create two
+keys in your database Curio class.
 
     add_key db1 => ( host => 'db1.example.com' );
     add_key db2 => ( host => 'db2.example.com' );
 
-When keys are enabled calling fetch requires that you pass a key.
+Calling fetch requires that you pass a key.
 
     my $dbh1 = MyApp::Service::DB->fetch(
         'db1', # <-- key
@@ -350,17 +343,17 @@ object.
     
     my $chi = myapp_cache( 'geo_ip' );
     
-    MyApp::Service::Cache->uninject( 'geo_ip' );
+    MyApp::Service::Cache->clear_injection( 'geo_ip' );
 
-Instead of having to call L<Curio::Role/uninject> directly you may
-instead use L<Curio::Role/inject_with_guard>.
+Instead of having to call L<Curio::Role/clear_injection> directly you
+may instead use L<Curio::Role/inject_with_guard>.
 
     my $guard = MyApp::Service::Cache->inject_with_guard(
         'geo_ip', $mock,
     );
 
-When the guard object goes out of scope C<uninject> will be called
-automatically.
+When the guard object goes out of scope C<clear_injection> will be
+called automatically.
 
 =head2 Singletons
 

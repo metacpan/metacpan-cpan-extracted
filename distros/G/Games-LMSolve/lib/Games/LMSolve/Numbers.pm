@@ -1,5 +1,5 @@
 package Games::LMSolve::Numbers;
-$Games::LMSolve::Numbers::VERSION = '0.12.0';
+$Games::LMSolve::Numbers::VERSION = '0.14.0';
 use strict;
 use warnings;
 
@@ -7,15 +7,14 @@ use Games::LMSolve::Base;
 
 use vars qw(@ISA);
 
-@ISA=qw(Games::LMSolve::Base);
+@ISA = qw(Games::LMSolve::Base);
 
-my %cell_dirs =
-    (
-        'N' => [0,-1],
-        'S' => [0,1],
-        'E' => [1,0],
-        'W' => [-1,0],
-    );
+my %cell_dirs = (
+    'N' => [ 0,  -1 ],
+    'S' => [ 0,  1 ],
+    'E' => [ 1,  0 ],
+    'W' => [ -1, 0 ],
+);
 
 sub input_board
 {
@@ -23,25 +22,26 @@ sub input_board
 
     my $filename = shift;
 
-    my $spec =
-    {
-        'dims' => {'type' => "xy(integer)", 'required' => 1},
-        'start' => {'type' => "xy(integer)", 'required' => 1},
-        'layout' => {'type' => "layout", 'required' => 1},
+    my $spec = {
+        'dims'   => { 'type' => "xy(integer)", 'required' => 1 },
+        'start'  => { 'type' => "xy(integer)", 'required' => 1 },
+        'layout' => { 'type' => "layout",      'required' => 1 },
     };
 
-    my $input_obj = Games::LMSolve::Input->new();
-    my $input_fields = $input_obj->input_board($filename, $spec);
-    my ($width, $height) = @{$input_fields->{'dims'}->{'value'}}{'x','y'};
-    my ($start_x, $start_y) = @{$input_fields->{'start'}->{'value'}}{'x','y'};
+    my $input_obj    = Games::LMSolve::Input->new();
+    my $input_fields = $input_obj->input_board( $filename, $spec );
+    my ( $width, $height ) =
+        @{ $input_fields->{'dims'}->{'value'} }{ 'x', 'y' };
+    my ( $start_x, $start_y ) =
+        @{ $input_fields->{'start'}->{'value'} }{ 'x', 'y' };
     my (@board);
 
     my $line;
-    my $line_number=0;
-    my $lines_ref = $input_fields->{'layout'}->{'value'};
+    my $line_number = 0;
+    my $lines_ref   = $input_fields->{'layout'}->{'value'};
 
     my $read_line = sub {
-        if (scalar(@$lines_ref) == $line_number)
+        if ( scalar(@$lines_ref) == $line_number )
         {
             return 0;
         }
@@ -52,74 +52,74 @@ sub input_board
 
     my $gen_exception = sub {
         my $text = shift;
-        die "$text on $filename at line " .
-            ($input_fields->{'layout'}->{'line_num'} + $line_number + 1) .
-            "!\n";
+        die "$text on $filename at line "
+            . ( $input_fields->{'layout'}->{'line_num'} + $line_number + 1 )
+            . "!\n";
     };
 
     my $y = 0;
 
-    INPUT_LOOP: while ($read_line->())
+INPUT_LOOP: while ( $read_line->() )
     {
-        if (length($line) != $width)
+        if ( length($line) != $width )
         {
             $gen_exception->("Incorrect number of cells");
         }
-        if ($line =~ /([^\d\*])/)
+        if ( $line =~ /([^\d\*])/ )
         {
             $gen_exception->("Unknown cell type $1");
         }
-        push @board, [ split(//, $line) ];
+        push @board, [ split( //, $line ) ];
         $y++;
-        if ($y == $height)
+        if ( $y == $height )
         {
             last;
         }
     }
 
-    if ($y != $height)
+    if ( $y != $height )
     {
         $gen_exception->("Input terminated prematurely after reading $y lines");
     }
 
-    if (! defined($start_x))
+    if ( !defined($start_x) )
     {
         $gen_exception->("The starting position was not defined anywhere");
     }
 
     $self->{'height'} = $height;
-    $self->{'width'} = $width;
-    $self->{'board'} = \@board;
+    $self->{'width'}  = $width;
+    $self->{'board'}  = \@board;
 
-    return [ $start_x, $start_y];
+    return [ $start_x, $start_y ];
 }
 
 # A function that accepts the expanded state (as an array ref)
 # and returns an atom that represents it.
 sub pack_state
 {
-    my $self = shift;
+    my $self         = shift;
     my $state_vector = shift;
-    return pack("cc", @{$state_vector});
+    return pack( "cc", @{$state_vector} );
 }
 
 # A function that accepts an atom that represents a state
 # and returns an array ref that represents it.
 sub unpack_state
 {
-    my $self = shift;
+    my $self  = shift;
     my $state = shift;
-    return [ unpack("cc", $state) ];
+    return [ unpack( "cc", $state ) ];
 }
 
 # Accept an atom that represents a state and output a
 # user-readable string that describes it.
 sub display_state
 {
-    my $self = shift;
+    my $self  = shift;
     my $state = shift;
-    my ($x, $y) = @{ $self->unpack_state($state) };
-    return sprintf("X = %i ; Y = %i", $x+1, $y+1);
+    my ( $x, $y ) = @{ $self->unpack_state($state) };
+    return sprintf( "X = %i ; Y = %i", $x + 1, $y + 1 );
 }
 
 sub check_if_final_state
@@ -127,7 +127,7 @@ sub check_if_final_state
     my $self = shift;
 
     my $coords = shift;
-    return $self->{'board'}->[$coords->[1]][$coords->[0]] eq "*";
+    return $self->{'board'}->[ $coords->[1] ][ $coords->[0] ] eq "*";
 }
 
 # This function enumerates the moves accessible to the state.
@@ -146,23 +146,23 @@ sub enumerate_moves
 
     my @moves;
 
-    if ($x + $step < $self->{'width'})
+    if ( $x + $step < $self->{'width'} )
     {
         push @moves, "E";
     }
 
     # The ranges are [0 .. ($width-1)] and [0 .. ($height-1)]
-    if ($x - $step >= 0)
+    if ( $x - $step >= 0 )
     {
         push @moves, "W";
     }
 
-    if ($y + $step < $self->{'height'})
+    if ( $y + $step < $self->{'height'} )
     {
         push @moves, "S";
     }
 
-    if ($y - $step >= 0)
+    if ( $y - $step >= 0 )
     {
         push @moves, "N";
     }
@@ -179,16 +179,16 @@ sub perform_move
     my $self = shift;
 
     my $coords = shift;
-    my $m = shift;
+    my $m      = shift;
 
-    my $step = $self->{'board'}->[$coords->[1]][$coords->[0]];
+    my $step = $self->{'board'}->[ $coords->[1] ][ $coords->[0] ];
 
-    my $offsets = [ map { $_  * $step } @{$cell_dirs{$m}} ];
+    my $offsets    = [ map { $_ * $step } @{ $cell_dirs{$m} } ];
     my @new_coords = @$coords;
     $new_coords[0] += $offsets->[0];
     $new_coords[1] += $offsets->[1];
 
-    return [ @new_coords ];
+    return [@new_coords];
 }
 
 1;
@@ -204,15 +204,11 @@ mazes.
 
 =head1 VERSION
 
-version 0.12.0
+version 0.14.0
 
 =head1 SYNOPSIS
 
 NA - should not be used directly.
-
-=head1 VERSION
-
-version 0.12.0
 
 =head1 METHODS
 

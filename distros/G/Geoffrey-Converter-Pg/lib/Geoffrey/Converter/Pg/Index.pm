@@ -5,7 +5,7 @@ use 5.016;
 use strict;
 use warnings;
 
-$Geoffrey::Converter::Pg::Index::VERSION = '0.000100';
+$Geoffrey::Converter::Pg::Index::VERSION = '0.000200';
 
 use parent 'Geoffrey::Role::ConverterType';
 
@@ -97,7 +97,7 @@ Geoffrey::Converter::Pg::Index - SQLite converter type for indexes!
 
 =head1 VERSION
 
-Version 0.000100
+Version 0.000200
 
 =head1 DESCRIPTION
 

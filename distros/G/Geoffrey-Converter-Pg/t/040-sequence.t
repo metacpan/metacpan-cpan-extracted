@@ -5,7 +5,6 @@ use warnings;
 use Test::More tests => 7;
 use Test::Exception;
 
-
 require_ok('Geoffrey::Converter::Pg');
 use_ok 'Geoffrey::Converter::Pg';
 
@@ -15,12 +14,12 @@ use_ok 'Geoffrey::Action::Constraint::Default';
 my $converter = Geoffrey::Converter::Pg->new();
 my $object = new_ok( 'Geoffrey::Action::Constraint::Default', [ 'converter', $converter ] );
 
-
 SKIP: {
     eval { require Test::PostgreSQL };
     if ($@) {
         skip "Test::PostgreSQL not installed: $@", 2;
     }
+    $ENV{POSTGRES_HOME} = '/tmp/test/pgsql/geoffrey';
     my $pg = Test::PostgreSQL->new();
 
     my $dbh = DBI->connect( $pg->dsn( dbname => 'test' ), q~~, q~~, { AutoCommit => 1, RaiseError => 1, }, );

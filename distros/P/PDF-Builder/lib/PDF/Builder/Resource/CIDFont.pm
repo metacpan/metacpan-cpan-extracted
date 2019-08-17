@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::BaseFont';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.015'; # VERSION
-my $LAST_UPDATE = '3.013'; # manually update whenever code is changed
+our $VERSION = '3.016'; # VERSION
+my $LAST_UPDATE = '3.016'; # manually update whenever code is changed
 
 use Encode qw(:all);
 
@@ -62,7 +62,11 @@ sub glyphByCId {
 }
 
 sub uniByCId { 
-    return $_[0]->data()->{'g2u'}->[$_[1]]; 
+    my ($self, $gid) = @_;
+    my $uni = $self->data()->{'g2u'}->[$gid];
+    # fallback to U+0000 if no match
+    $gid = 0 unless defined $uni;
+    return $gid;
 }
 
 sub cidByUni { 
@@ -140,17 +144,17 @@ sub _cidsByStr {
 sub cidsByStr {
     my ($self, $text) = @_;
 
-    if      (is_utf8($text) && 
+    if      (utf8::is_utf8($text) && 
 	    defined $self->data()->{'decode'} && 
 	    $self->data()->{'decode'} ne 'ident') {
         $text = encode($self->data()->{'decode'}, $text);
-    } elsif (is_utf8($text) && $self->data()->{'decode'} eq 'ident') {
+    } elsif (utf8::is_utf8($text) && $self->data()->{'decode'} eq 'ident') {
         $text = $self->cidsByUtf($text);
-    } elsif (!is_utf8($text) && 
+    } elsif (!utf8::is_utf8($text) && 
 	    defined $self->data()->{'encode'} && 
 	    $self->data()->{'decode'} eq 'ident') {
         $text = $self->cidsByUtf(decode($self->data()->{'encode'}, $text));
-    } elsif (!is_utf8($text) && 
+    } elsif (!utf8::is_utf8($text) && 
 	    $self->can('issymbol') && 
 	    $self->issymbol() && 
 	    $self->data()->{'decode'} eq 'ident') {
@@ -308,11 +312,11 @@ sub glyphNum {
     return scalar @{$self->data()->{'wx'}};
 }
 
-sub outobjdeep {
-    my ($self, $fh, $pdf, %opts) = @_;
-
-    return $self->SUPER::outobjdeep($fh, $pdf, %opts);
-}
+#sub outobjdeep {
+#    my ($self, $fh, $pdf, %opts) = @_;
+#
+#    return $self->SUPER::outobjdeep($fh, $pdf, %opts);
+#}
 
 =back
 

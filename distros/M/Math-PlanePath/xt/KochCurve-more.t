@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013 Kevin Ryde
+# Copyright 2012, 2013, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -20,7 +20,6 @@
 use 5.004;
 use strict;
 use List::Util 'min', 'max';
-use Math::PlanePath::DragonCurve;
 
 use Test;
 plan tests => 1;
@@ -29,6 +28,7 @@ use lib 't','xt';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings(); }
 
+use Math::PlanePath::KochCurve;
 
 # uncomment this to run the ### lines
 #use Smart::Comments '###';
@@ -38,7 +38,6 @@ BEGIN { MyTestHelpers::nowarnings(); }
 # rect_to_n_range() on various boxes
 
 {
-  require Math::PlanePath::KochCurve;
   my $path = Math::PlanePath::KochCurve->new;
   my $n_start = $path->n_start;
 
@@ -61,8 +60,8 @@ BEGIN { MyTestHelpers::nowarnings(); }
 
           my @col = map {$path->xy_to_n($x2,$_)} $y1 .. $y2;
           @col = grep {defined} @col;
-          $min = List::Util::min (grep {defined} $min, @col);
-          $max = List::Util::max (grep {defined} $max, @col);
+          $min = min(grep {defined} $min, @col);
+          $max = max(grep {defined} $max, @col);
           my $want_min = (defined $min ? $min : 1);
           my $want_max = (defined $max ? $max : 0);
           ### @col

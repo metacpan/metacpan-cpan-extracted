@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/ModuleAbstractCwaliteeUtils.pm'
@@ -14,7 +14,8 @@ my @module_files = (
 
 my @scripts = (
     'script/calc-module-abstract-cwalitee',
-    'script/list-module-abstract-cwalitee-indicators'
+    'script/list-module-abstract-cwalitee-indicators',
+    'script/ma-cwa'
 );
 
 # no fake home requested

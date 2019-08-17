@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Module/Abstract/Cwalitee/list_module_abstract_cwalitee_indicators
-# and generated automatically using Perinci::CmdLine::Gen version 0.488
+# and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-07-03'; # DATE
+our $DATE = '2019-08-02'; # DATE
 our $DIST = 'App-ModuleAbstractCwaliteeUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,13 +37,41 @@ list-module-abstract-cwalitee-indicators - list-module-abstract-cwalitee-indicat
 
 =head1 VERSION
 
-This document describes version 0.001 of list-module-abstract-cwalitee-indicators (from Perl distribution App-ModuleAbstractCwaliteeUtils), released on 2019-07-03.
+This document describes version 0.003 of list-module-abstract-cwalitee-indicators (from Perl distribution App-ModuleAbstractCwaliteeUtils), released on 2019-08-02.
 
 =head1 SYNOPSIS
 
 Usage:
 
  % list-module-abstract-cwalitee-indicators [options]
+
+Examples:
+
+List all installed indicators from all modules:
+
+ % list-module-abstract-cwalitee-indicators
+ language_english
+ no_shouting
+ not_empty
+ not_end_with_dot
+ not_module_name
+ not_multiline
+ not_redundant
+ not_start_with_lowercase_letter
+ not_template
+ not_too_long
+ not_too_short
+
+List only certain names, show details:
+
+ % list-module-abstract-cwalitee-indicators --detail --include not_too_short --include not_too_long --include not_template
+ +----------------------------------+---------------+----------+----------+--------+---------+
+ | module                           | name          | priority | severity | status | summary |
+ +----------------------------------+---------------+----------+----------+--------+---------+
+ | Module::Abstract::Cwalitee::Core | not_template  | 50       | 3        | stable |         |
+ | Module::Abstract::Cwalitee::Core | not_too_long  | 50       | 3        | stable |         |
+ | Module::Abstract::Cwalitee::Core | not_too_short | 50       | 3        | stable |         |
+ +----------------------------------+---------------+----------+----------+--------+---------+
 
 =head1 OPTIONS
 
@@ -54,6 +82,104 @@ C<*> marks required options.
 =over
 
 =item B<--detail>, B<-l>
+
+=back
+
+=head2 Filtering options
+
+=over
+
+=item B<--exclude-json>=I<s>, B<-X>
+
+Exclude by name (JSON-encoded).
+
+See C<--exclude>.
+
+=item B<--exclude-module-json>=I<s>
+
+Exclude by module (JSON-encoded).
+
+See C<--exclude-module>.
+
+=item B<--exclude-module>=I<s@>
+
+Exclude by module.
+
+Can be specified multiple times.
+
+=item B<--exclude-status-json>=I<s>
+
+Exclude by status (JSON-encoded).
+
+See C<--exclude-status>.
+
+=item B<--exclude-status>=I<s@>
+
+Exclude by status.
+
+Can be specified multiple times.
+
+=item B<--exclude>=I<s@>
+
+Exclude by name.
+
+Can be specified multiple times.
+
+=item B<--include-json>=I<s>, B<-I>
+
+Include by name (JSON-encoded).
+
+See C<--include>.
+
+=item B<--include-module-json>=I<s>
+
+Include by module (JSON-encoded).
+
+See C<--include-module>.
+
+=item B<--include-module>=I<s@>
+
+Include by module.
+
+Can be specified multiple times.
+
+=item B<--include-status-json>=I<s>
+
+Include by status (JSON-encoded).
+
+See C<--include-status>.
+
+=item B<--include-status>=I<s@>
+
+Include by status.
+
+Default value:
+
+ ["stable"]
+
+Can be specified multiple times.
+
+=item B<--include>=I<s@>
+
+Include by name.
+
+Can be specified multiple times.
+
+=item B<--max-severity>=I<s>
+
+Maximum severity.
+
+Default value:
+
+ 5
+
+=item B<--min-severity>=I<s>
+
+Minimum severity.
+
+Default value:
+
+ 1
 
 =back
 

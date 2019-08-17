@@ -1,5 +1,7 @@
 Revision history for Dist-Zilla-PluginBundle-Author-Plicease
 
+2.38      2019-08-15 19:08:36 -0400
+
 2.37      2019-07-18 11:59:10 -0400
   - Require plicease plugin 2.37
   - [OurPkgVersion] uses no_critic option

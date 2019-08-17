@@ -1,7 +1,7 @@
 package App::CPANChangesCwaliteeUtils;
 
-our $DATE = '2019-07-10'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-08-02'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -23,6 +23,13 @@ $SPEC{calc_cpan_changes_cwalitee} = {
             # Changes, ChangeLog, etc and use that.
         },
     },
+    examples => [
+        {
+            summary => 'Run against the the Changes of App-CPANChangesCwaliteeUtils distribution',
+            args => {},
+            test => 0,
+        },
+    ],
 };
 sub calc_cpan_changes_cwalitee {
     require CPAN::Changes::Cwalitee;
@@ -71,7 +78,7 @@ App::CPANChangesCwaliteeUtils - CLI Utilities related to CPAN Changes cwalitee
 
 =head1 VERSION
 
-This document describes version 0.003 of App::CPANChangesCwaliteeUtils (from Perl distribution App-CPANChangesCwaliteeUtils), released on 2019-07-10.
+This document describes version 0.005 of App::CPANChangesCwaliteeUtils (from Perl distribution App-CPANChangesCwaliteeUtils), released on 2019-08-02.
 
 =head1 DESCRIPTION
 
@@ -80,6 +87,8 @@ This distribution includes the following utilities:
 =over
 
 =item * L<calc-cpan-changes-cwalitee>
+
+=item * L<cc-cwa>
 
 =item * L<list-cpan-changes-cwalitee-indicators>
 
@@ -95,6 +104,117 @@ Usage:
  calc_cpan_changes_cwalitee(%args) -> [status, msg, payload, meta]
 
 Calculate CPAN Changes cwalitee.
+
+Examples:
+
+=over
+
+=item * Run against the the Changes of App-CPANChangesCwaliteeUtils distribution:
+
+ calc_cpan_changes_cwalitee();
+
+Result:
+
+ [
+   {
+     indicator => "not_too_wide",
+     num => 1,
+     result => 1,
+     result_summary => "",
+     severity => 3,
+   },
+   {
+     indicator => "parsable",
+     num => 2,
+     result => 1,
+     result_summary => "",
+     severity => 3,
+   },
+   {
+     indicator => "date_correct_format",
+     num => 3,
+     result => 1,
+     result_summary => "",
+     severity => 3,
+   },
+   {
+     indicator => "date_parsable",
+     num => 4,
+     result => 1,
+     result_summary => "",
+     severity => 3,
+   },
+   {
+     indicator => "english",
+     num => 5,
+     result => 1,
+     result_summary => "",
+     severity => 3,
+   },
+   {
+     indicator => "has_releases",
+     num => 6,
+     result => 1,
+     result_summary => "",
+     severity => 3,
+   },
+   {
+     indicator => "no_duplicate_version",
+     num => 7,
+     result => 1,
+     result_summary => "",
+     severity => 3,
+   },
+   {
+     indicator => "no_empty_group",
+     num => 8,
+     result => 1,
+     result_summary => "",
+     severity => 3,
+   },
+   {
+     indicator => "no_shouting",
+     num => 9,
+     result => 1,
+     result_summary => "",
+     severity => 3,
+   },
+   {
+     indicator => "no_useless_text",
+     num => 10,
+     result => 1,
+     result_summary => "",
+     severity => 3,
+   },
+   {
+     indicator => "preamble_has_no_releases",
+     num => 11,
+     result => 1,
+     result_summary => "",
+     severity => 3,
+   },
+   {
+     indicator => "release_dates_not_future",
+     num => 12,
+     result => 1,
+     result_summary => "",
+     severity => 3,
+   },
+   {
+     indicator => "releases_in_descending_date_order",
+     num => 13,
+     result => 1,
+     result_summary => "",
+     severity => 3,
+   },
+   {
+     indicator => "Score",
+     result => "100.00",
+     result_summary => "13 out of 13",
+   },
+ ]
+
+=back
 
 This function is not exported.
 

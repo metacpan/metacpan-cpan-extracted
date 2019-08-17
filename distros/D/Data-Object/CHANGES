@@ -1,6 +1,13 @@
 Changelog for Data-Object
 
-0.97 2019-08-09T18:53:20
+0.98 2019-08-16T18:46:04
+ - Updated documentation
+ - Fixed issue configuring Libraries
+ - Updated main module documentation
+ - Build 0.97 (#176)
+
+0.97 2019-08-09T18:53:56
+ - Built release version 0.97
  - Updated documentation
  - Added release script
  - Temporarily disable Travis tests for Perl < 5.22

@@ -5,8 +5,8 @@ no warnings qw[ deprecated recursion uninitialized ];
 
 # $VERSION defined here so developers can run PDF::Builder from git.
 # it should be automatically updated as part of the CPAN build.
-our $VERSION = '3.015'; # VERSION
-my $LAST_UPDATE = '3.015'; # manually update whenever code is changed
+our $VERSION = '3.016'; # VERSION
+my $LAST_UPDATE = '3.016'; # manually update whenever code is changed
 
 use Carp;
 use Encode qw(:all);
@@ -83,29 +83,28 @@ PDF::Builder - Facilitates the creation and modification of PDF files
 
 There are four levels of involvement with PDF::Builder. Depending on what you
 want to do, different kinds of installs are recommended.
-See L<PDF::Builder::Docs> section B<Software Development Kit> for suggestions.
+See L<PDF::Builder::Docs/Software Development Kit> for suggestions.
 
 =head2 OPTIONAL LIBRARIES
 
 PDF::Builder can make use of some optional libraries, which are not I<required>
 for a successful installation, but improve speed and capabilities. See 
-L<PDF::Builder::Docs> section B<Optional Libraries> for more information.
+L<PDF::Builder::Docs/Optional Libraries> for more information.
 
 =head2 STRINGS (CHARACTER TEXT)
 
 There are some things you should know about character encoding (for text),
-before you dive in to coding. Please go to L<PDF::Builder::Docs> B<Strings> and have a read.
+before you dive in to coding. Please go to L<PDF::Builder::Docs/Strings (Character Text)> and have a read.
 
 =head2 RENDERING ORDER
 
 Invoking "text" and "graphics" methods can lead to unexpected results (a 
-different ordering of output than intended). See L<PDF::Builder::Docs> 
-B<Rendering Order> for more information.
+different ordering of output than intended). See L<PDF::Builder::Docs/Rendering Order> for more information.
 
 =head2 PDF VERSIONS SUPPORTED
 
 PDF::Builder is mostly PDF 1.4-compliant, but there I<are> complications you
-should be aware of. Please read L<PDF::Builder::Docs> section B<PDF Versions Supported>
+should be aware of. Please read L<PDF::Builder::Docs/PDF Versions Supported>
 for details.
 
 =head2 SUPPORTED PERL VERSIONS
@@ -140,7 +139,7 @@ point.
 =head2 HISTORY
 
 The history of PDF::Builder is a complex and exciting saga... OK, it may be
-mildly interesting. Have a look at L<PDF::Builder::Docs> B<History> section.
+mildly interesting. Have a look at L<PDF::Builder::Docs/History> section.
 
 =head1 AUTHOR
 
@@ -294,8 +293,8 @@ sub new {
 	    }
     }
     if ($options{'-file'}) {
-        $self->{' filed'} = $options{'-file'};
         $self->{'pdf'}->create_file($options{'-file'});
+        $self->{'partial_save'} = 1;
     }
     $self->{'infoMeta'} = [qw(Author CreationDate ModDate Creator Producer Title Subject Keywords)];
 
@@ -324,7 +323,7 @@ B<Example:>
 
 =cut
 
-sub open {
+sub open {  ## no critic
     my ($class, $file, %options) = @_;
     croak "File '$file' does not exist" unless -f $file;
     croak "File '$file' is not readable" unless -r $file;
@@ -421,7 +420,16 @@ sub verCheckInput {
 
 =item $pdf = PDF::Builder->open_scalar($pdf_string)
 
-Opens a PDF contained in a string. See C<new()> for options.
+Opens a PDF contained in a string. See C<new()> for other options.
+
+=over
+
+=item -diags => 1
+
+Display warnings when non-conforming PDF structure is found, and fix up
+where possible. See L<PDF::Builder::Basic::PDF::File> for more information.
+
+=back
 
 B<Example:>
 
@@ -459,7 +467,7 @@ sub open_scalar {
     CORE::open($fh, '+<', \$content) or die "Can't begin scalar IO";
 
     # this would replace any existing self->pdf with a new one
-    $self->{'pdf'} = PDF::Builder::Basic::PDF::File->open($fh, 1);
+    $self->{'pdf'} = PDF::Builder::Basic::PDF::File->open($fh, 1, %options);
     $self->{'pdf'}->{'Root'}->realise();
     $self->{'pages'} = $self->{'pdf'}->{'Root'}->{'Pages'}->realise();
     weaken $self->{'pages'};
@@ -474,7 +482,7 @@ sub open_scalar {
     weaken $self->{'pagestack'}->[$_] for (0 .. scalar @{$self->{'pagestack'}});
     $self->{'catalog'} = $self->{'pdf'}->{'Root'};
     weaken $self->{'catalog'};
-    $self->{'reopened'} = 1;
+    $self->{'opened_scalar'} = 1;
     if (exists $options{'-compress'}) {
       $self->{'forcecompress'} = $options{'-compress'};
       # at this point, no validation of given value! none/flate (0/1).
@@ -494,7 +502,7 @@ sub open_scalar {
 
 Controls viewing preferences for the PDF, including the B<Page Mode>, 
 B<Page Layout>, B<Viewer>, and B<Initial Page> Options. See 
-L<PDF::Builder::Docs> section B<Preferences> for details on all these 
+L<PDF::Builder::Docs/Preferences - set user display preferences> for details on all these 
 option groups.
 
 =cut
@@ -623,7 +631,7 @@ default pdf-context.
 
 =item pageencaps
 
-enables that Builder will add save/restore commands upon importing/opening
+enables Builder's adding save/restore commands upon importing/opening
 pages to preserve graphics-state for modification.
 
 =item copyannots
@@ -685,16 +693,15 @@ Checks if the previously opened PDF is encrypted.
 =cut
 
 sub isEncrypted {
-	my $self = shift;
-
-	return defined($self->{'pdf'}->{'Encrypt'}) ? 1 : 0;
+    my $self = shift();
+    return defined($self->{'pdf'}->{'Encrypt'}) ? 1 : 0;
 }
 
 =item %infohash = $pdf->info(%infohash)
 
 Gets/sets the info structure of the document.
 
-See L<PDF::Builder::Docs> B<info Example> section for an example of the use
+See L<PDF::Builder::Docs/info Example> section for an example of the use
 of this method.
 
 =cut
@@ -702,11 +709,11 @@ of this method.
 sub info {
     my ($self, %opt) = @_;
 
-    if(not defined($self->{'pdf'}->{'Info'})) {
-       $self->{'pdf'}->{'Info'} = PDFDict();
-       $self->{'pdf'}->new_obj($self->{'pdf'}->{'Info'});
+    if (not defined($self->{'pdf'}->{'Info'})) {
+        $self->{'pdf'}->{'Info'} = PDFDict();
+        $self->{'pdf'}->new_obj($self->{'pdf'}->{'Info'});
     } else {
-       $self->{'pdf'}->{'Info'}->realise();
+        $self->{'pdf'}->{'Info'}->realise();
     }
 
     # Maintenance Note: Since we're not shifting at the beginning of
@@ -718,7 +725,7 @@ sub info {
         }
         $self->{'pdf'}->out_obj($self->{'pdf'}->{'Info'});
     }
-    
+
     if (defined $self->{'pdf'}->{'Info'}) {
         %opt = ();
         foreach my $k (@{$self->{'infoMeta'}}) {
@@ -762,7 +769,7 @@ sub infoMetaAttributes {
 
 Gets/sets the XMP XML data stream.
 
-See L<PDF::Builder::Docs> B<XMP XML example> section for an example of the use
+See L<PDF::Builder::Docs/XMP XML example> section for an example of the use
 of this method.
 
 =cut
@@ -770,11 +777,11 @@ of this method.
 sub xmpMetadata {
     my ($self, $value) = @_;
 
-    if(not defined($self->{'catalog'}->{'Metadata'})) {
-            $self->{'catalog'}->{'Metadata'} = PDFDict();
-            $self->{'catalog'}->{'Metadata'}->{'Type'} = PDFName('Metadata');
-            $self->{'catalog'}->{'Metadata'}->{'Subtype'} = PDFName('XML');
-            $self->{'pdf'}->new_obj($self->{'catalog'}->{'Metadata'});
+    if (not defined($self->{'catalog'}->{'Metadata'})) {
+        $self->{'catalog'}->{'Metadata'} = PDFDict();
+        $self->{'catalog'}->{'Metadata'}->{'Type'} = PDFName('Metadata');
+        $self->{'catalog'}->{'Metadata'}->{'Subtype'} = PDFName('XML');
+        $self->{'pdf'}->new_obj($self->{'catalog'}->{'Metadata'});
     } else {
         $self->{'catalog'}->{'Metadata'}->realise();
         $self->{'catalog'}->{'Metadata'}->{' stream'} = unfilter($self->{'catalog'}->{'Metadata'}->{'Filter'}, $self->{'catalog'}->{'Metadata'}->{' stream'});
@@ -782,7 +789,7 @@ sub xmpMetadata {
         delete $self->{'catalog'}->{'Metadata'}->{'Filter'};
     }
 
-    my $md=$self->{'catalog'}->{'Metadata'};
+    my $md = $self->{'catalog'}->{'Metadata'};
 
     if (defined $value) {
         $md->{' stream'} = $value;
@@ -864,14 +871,14 @@ sub pageLabel {
         $nums->add_elements(PDFNum($index));
 
         my $d = PDFDict();
-	if (defined $opts->{'-style'}) {
+        if (defined $opts->{'-style'}) {
             $d->{'S'} = PDFName($opts->{'-style'} eq 'Roman' ? 'R' :
                                 $opts->{'-style'} eq 'roman' ? 'r' :
                                 $opts->{'-style'} eq 'Alpha' ? 'A' :
                                 $opts->{'-style'} eq 'alpha' ? 'a' : 'D');
-	} else {
-	    $d->{'S'} = PDFName('D');
-	}
+        } else {
+            $d->{'S'} = PDFName('D');
+        }
 
         if (defined $opts->{'-prefix'}) {
             $d->{'P'} = PDFString($opts->{'-prefix'}, 's');
@@ -883,6 +890,8 @@ sub pageLabel {
 
         $nums->add_elements($d);
     }
+
+    return;
 } # end of pageLabel()
 
 =item $pdf->finishobjects(@objects)
@@ -902,13 +911,15 @@ B<Example:>
 sub finishobjects {
     my ($self, @objs) = @_;
 
-    if ($self->{'reopened'}) {
+    if ($self->{'opened_scalar'}) {
         die "invalid method invocation: no file, use 'saveas' instead.";
-    } elsif ($self->{' filed'}) {
+    } elsif ($self->{'partial_save'}) {
         $self->{'pdf'}->ship_out(@objs);
     } else {
         die "invalid method invocation: no file, use 'saveas' instead.";
     }
+
+    return;
 }
 
 sub _proc_pages {
@@ -922,7 +933,7 @@ sub _proc_pages {
 
     my @pages;
     $pdf->{' apipagecount'} ||= 0;
-    foreach my $page ($object->{'Kids'}->elementsof()) {
+    foreach my $page ($object->{'Kids'}->elements()) {
         $page->realise();
         if ($page->{'Type'}->val() eq 'Pages') {
             push @pages, _proc_pages($pdf, $page);
@@ -955,9 +966,9 @@ B<Example:>
 =cut
 
 sub update {
-    my $self = shift;
-
+    my $self = shift();
     $self->saveas($self->{'pdf'}->{' fname'});
+    return;
 }
 
 =item $pdf->saveas($file)
@@ -979,20 +990,21 @@ B<Example:>
 sub saveas {
     my ($self, $file) = @_;
 
-    if ($self->{'reopened'}) {
+    if ($self->{'opened_scalar'}) {
         $self->{'pdf'}->append_file();
-	my $fh;
+        my $fh;
         CORE::open($fh, '>', $file) or die "Can't open $file for writing: $!";
         binmode($fh, ':raw');
         print $fh ${$self->{'content_ref'}};
         CORE::close($fh);
-    } elsif ($self->{' filed'}) {
+    } elsif ($self->{'partial_save'}) {
         $self->{'pdf'}->close_file();
     } else {
         $self->{'pdf'}->out_file($file);
     }
 
     $self->end();
+    return;
 }
 
 =item $pdf->save()
@@ -1015,15 +1027,16 @@ B<Example:>
 sub save {
     my ($self) = @_;
 
-    if      ($self->{'reopened'}) {
+    if      ($self->{'opened_scalar'}) {
         die "Invalid method invocation: use 'saveas' instead of 'save'.";
-    } elsif ($self->{' filed'}) {
+    } elsif ($self->{'partial_save'}) {
         $self->{'pdf'}->close_file();
     } else {
         die "Invalid method invocation: use 'saveas' instead of 'save'.";
     }
 
     $self->end();
+    return;
 }
 
 =item $string = $pdf->stringify()
@@ -1054,14 +1067,16 @@ B<Example:>
 # - Steve S. (see bug RT 81530)
 
 sub stringify {
-    my $self = shift;
+    my $self = shift();
 
     my $str = '';
-    if ((defined $self->{'reopened'}) and ($self->{'reopened'} == 1)) {
+    # is only set to 1 (within open_scalar()), otherwise is undef
+    if ($self->{'opened_scalar'}) { 
         $self->{'pdf'}->append_file();
         $str = ${$self->{'content_ref'}};
     } else {
         my $fh = FileHandle->new();
+        # we should be writing to the STRING $str
         CORE::open($fh, '>', \$str) || die "Can't begin scalar IO";
         $self->{'pdf'}->out_file($fh);
         $fh->close();
@@ -1074,15 +1089,14 @@ sub stringify {
 # there IS a release() method defined and documented in Basic/PDF/File.pm
 # it's not clear whether this release is just an internal (rename to _release)
 sub release {
-    my $self = shift;
+    my $self = shift();
     $self->end();
-
     return;
 }
 
 =item $pdf->end()
 
-Remove the object structure from memory.  PDF::Builder contains circular
+Remove the object structure from memory. PDF::Builder contains circular
 references, so this call is necessary in long-running processes to
 keep from running out of memory.
 
@@ -1093,7 +1107,7 @@ files and not writing them.
 =cut
 
 sub end {
-    my $self = shift;
+    my $self = shift();
     $self->{'pdf'}->release() if defined $self->{'pdf'};
 
     foreach my $key (keys %$self) {
@@ -1134,7 +1148,7 @@ B<Example:>
 =cut
 
 sub page {
-    my $self = shift;
+    my $self = shift();
     my $index = shift() || 0;  # default to new "last" page
     my $page;
 
@@ -1151,16 +1165,16 @@ sub page {
     $self->{'pdf'}->out_obj($self->{'pages'});
     if ($index == 0) {
         push @{$self->{'pagestack'}}, $page;
-	weaken $self->{'pagestack'}->[-1];
+        weaken $self->{'pagestack'}->[-1];
     } elsif ($index < 0) {
         splice @{$self->{'pagestack'}}, $index, 0, $page;
-	weaken $self->{'pagestack'}->[$index];
+        weaken $self->{'pagestack'}->[$index];
     } else {
         splice @{$self->{'pagestack'}}, $index-1, 0, $page;
-	weaken $self->{'pagestack'}->[$index - 1];
+        weaken $self->{'pagestack'}->[$index - 1];
     }
 
- #   $page->{'Resources'}=$self->{'pages'}->{'Resources'};
+    #   $page->{'Resources'}=$self->{'pages'}->{'Resources'};
     return $page;
 } # end of page()
 
@@ -1173,7 +1187,7 @@ document.
 
 B<Example:>
 
-    $pdf = PDF::Builder->open('our/99page.pdf');
+    $pdf  = PDF::Builder->open('our/99page.pdf');
     $page = $pdf->openpage(1);   # returns the first page
     $page = $pdf->openpage(99);  # returns the last page
     $page = $pdf->openpage(-1);  # returns the last page
@@ -1199,8 +1213,8 @@ sub openpage {
         bless $page, 'PDF::Builder::Page';
         $page->{' apipdf'} = $self->{'pdf'};
         $page->{' api'} = $self;
-	weaken $page->{' apipdf'};
-	weaken $page->{' api'};
+        weaken $page->{' apipdf'};
+        weaken $page->{' api'};
         $self->{'pdf'}->out_obj($page);
         if (($rotate = $page->find_prop('Rotate')) and (not defined($page->{' fixed'}) or $page->{' fixed'} < 1)) {
             $rotate = ($rotate->val() + 360) % 360;
@@ -1209,7 +1223,7 @@ sub openpage {
                 $page->{'Rotate'} = PDFNum(0);
                 foreach my $mediatype (qw(MediaBox CropBox BleedBox TrimBox ArtBox)) {
                     if ($media = $page->find_prop($mediatype)) {
-                        $media = [ map { $_->val() } $media->elementsof() ];
+                        $media = [ map { $_->val() } $media->elements() ];
                     } else {
                         $media = [0, 0, 612, 792]; # US Letter default
                         next if $mediatype ne 'MediaBox';
@@ -1241,7 +1255,7 @@ sub openpage {
             if ($self->default('pageencaps')) {
                 $content->{' stream'} .= ' q ';
             }
-            foreach my $k ($uncontent->elementsof()) {
+            foreach my $k ($uncontent->elements()) {
                 $k->realise();
                 $content->{' stream'} .= ' ' . unfilter($k->{'Filter'}, $k->{' stream'}) . ' ';
             }
@@ -1254,7 +1268,7 @@ sub openpage {
 
             ## if we like compress we will do it now to do quicker saves
             if ($self->{'forcecompress'} eq 'flate' || 
-		$self->{'forcecompress'} =~ m/^[1-9]\d*$/) {
+                $self->{'forcecompress'} =~ m/^[1-9]\d*$/) {
                 # $content->compressFlate();
                 $content->{' stream'} = dofilter($content->{'Filter'}, $content->{' stream'});
                 $content->{' nofilt'} = 1;
@@ -1271,7 +1285,6 @@ sub openpage {
     $page->{' api'} = $self;
     weaken $page->{' apipdf'};
     weaken $page->{' api'};
-    $page->{' reopened'} = 1;
 
     return $page;
 } # end of openpage()
@@ -1295,7 +1308,7 @@ sub _walk_obj {
 
     if (ref($source_object) =~ /Array$/) {
         $target_object->{' val'} = [];
-        foreach my $k ($source_object->elementsof()) {
+        foreach my $k ($source_object->elements()) {
             $k->realise() if ref($k) =~ /Objind$/;
             $target_object->add_elements(_walk_obj($object_cache, $source_pdf, $target_pdf, $k));
         }
@@ -1378,10 +1391,10 @@ sub importPageIntoForm {
        #my $box = _walk_obj($self->{'apiimportcache'}->{$s_pdf}, $s_pdf->{'pdf'}, $self->{'pdf'}, $s_page->{$k});
         next unless defined $s_page->find_prop($k);
         my $box = _walk_obj($self->{'apiimportcache'}->{$s_pdf}, $s_pdf->{'pdf'}, $self->{'pdf'}, $s_page->find_prop($k));
-        $xo->bbox(map { $_->val() } $box->elementsof());
+        $xo->bbox(map { $_->val() } $box->elements());
         last;
     }
-    $xo->bbox(0, 0, 612, 792) unless defined $xo->{'BBox'}; # US Letter default
+    $xo->bbox(0,0, 612,792) unless defined $xo->{'BBox'}; # US Letter default
 
     foreach my $k (qw(Resources)) {
         $s_page->{$k} = $s_page->find_prop($k);
@@ -1412,15 +1425,15 @@ sub importPageIntoForm {
 
         $xo->{' stream'} = '';
         # openpage pages only contain one stream
-        my ($k) = $s_page->{'Contents'}->elementsof();
+        my ($k) = $s_page->{'Contents'}->elements();
         $k->realise();
         if ($k->{' nofilt'}) {
-          # we have a finished stream here
-          # so we unfilter
-          $xo->add('q', unfilter($k->{'Filter'}, $k->{' stream'}), 'Q');
+            # we have a finished stream here
+            # so we unfilter
+            $xo->add('q', unfilter($k->{'Filter'}, $k->{' stream'}), 'Q');
         } else {
-          # stream is an unfinished/unfiltered content
-          # so we just copy it and add the required "qQ"
+            # stream is an unfinished/unfiltered content
+            # so we just copy it and add the required "qQ"
             $xo->add('q', $k->{' stream'}, 'Q');
         }
         $xo->compressFlate() if $self->{'forcecompress'} eq 'flate' ||
@@ -1508,7 +1521,7 @@ sub import_page {
         my $box = _walk_obj({}, $s_pdf->{'pdf'}, $self->{'pdf'}, $prop);
         my $method = lc $k;
 
-        $t_page->$method(map { $_->val() } $box->elementsof());
+        $t_page->$method(map { $_->val() } $box->elements());
     }
 
     $t_page->gfx()->formimage($xo, 0, 0, 1);
@@ -1524,7 +1537,7 @@ sub import_page {
         }
         my @Fields = ();
         my @Annots = ();
-        foreach my $a ($s_page->{'Annots'}->elementsof()) {
+        foreach my $a ($s_page->{'Annots'}->elements()) {
             $a->realise();
             my $t_a = PDFDict();
             $self->{'pdf'}->new_obj($t_a);
@@ -1532,31 +1545,31 @@ sub import_page {
             # key names are copied from PDF Reference 1.4 (Tables)
             my @k = (
                 qw( Type Subtype Contents P Rect NM M F BS Border AP AS C CA T Popup A AA StructParent Rotate
-                ),                                    # Annotations - Common (8.10)
-                qw(Subtype Contents Open Name),       # Text Annotations (8.15)
-                qw(Subtype Contents Dest H PA),       # Link Annotations (8.16)
-                qw(Subtype Contents DA Q),            # Free Text Annotations (8.17)
-                qw(Subtype Contents L BS LE IC),      # Line Annotations (8.18)
-                qw(Subtype Contents BS IC),           # Square and Circle Annotations (8.20)
-                qw(Subtype Contents QuadPoints),      # Markup Annotations (8.21)
-                qw(Subtype Contents Name),            # Rubber Stamp Annotations (8.22)
-                qw(Subtype Contents InkList BS),      # Ink Annotations (8.23)
-                qw(Subtype Contents Parent Open),     # Popup Annotations (8.24)
-                qw(Subtype FS Contents Name),         # File Attachment Annotations (8.25)
-                qw(Subtype Sound Contents Name),      # Sound Annotations (8.26)
-                qw(Subtype Movie Contents A),         # Movie Annotations (8.27)
-                qw(Subtype Contents H MK),            # Widget Annotations (8.28)
-                                                      # Printers Mark Annotations (none)
-                                                      # Trap Network Annotations (none)
+                ),                                  # Annotations - Common (8.10)
+                qw( Subtype Contents Open Name ),   # Text Annotations (8.15)
+                qw( Subtype Contents Dest H PA ),   # Link Annotations (8.16)
+                qw( Subtype Contents DA Q ),        # Free Text Annotations (8.17)
+                qw( Subtype Contents L BS LE IC ),  # Line Annotations (8.18)
+                qw( Subtype Contents BS IC ),       # Square and Circle Annotations (8.20)
+                qw( Subtype Contents QuadPoints ),  # Markup Annotations (8.21)
+                qw( Subtype Contents Name ),        # Rubber Stamp Annotations (8.22)
+                qw( Subtype Contents InkList BS ),  # Ink Annotations (8.23)
+                qw( Subtype Contents Parent Open ), # Popup Annotations (8.24)
+                qw( Subtype FS Contents Name ),     # File Attachment Annotations (8.25)
+                qw( Subtype Sound Contents Name ),  # Sound Annotations (8.26)
+                qw( Subtype Movie Contents A ),     # Movie Annotations (8.27)
+                qw( Subtype Contents H MK ),        # Widget Annotations (8.28)
+                                                    # Printers Mark Annotations (none)
+                                                    # Trap Network Annotations (none)
             );
             push @k, (
                 qw( Subtype FT Parent Kids T TU TM Ff V DV AA
-                ),                                    # Fields - Common (8.49)
-                qw(DR DA Q),                          # Fields containing variable text (8.51)
-                qw(Opt),                              # Checkbox field (8.54)
-                qw(Opt),                              # Radio field (8.55)
-                qw(MaxLen),                           # Text field (8.57)
-                qw(Opt TI I),                         # Choice field (8.59)
+                ),                                  # Fields - Common (8.49)
+                qw( DR DA Q ),                      # Fields containing variable text (8.51)
+                qw( Opt ),                          # Checkbox field (8.54)
+                qw( Opt ),                          # Radio field (8.55)
+                qw( MaxLen ),                       # Text field (8.57)
+                qw( Opt TI I ),                     # Choice field (8.59)
             ) if $AcroForm;
 
             # sorting out dupes
@@ -1592,8 +1605,7 @@ Returns the number of pages in the document.
 =cut
 
 sub pages {
-    my $self = shift;
-
+    my $self = shift();
     return scalar @{$self->{'pagestack'}};
 }
 
@@ -1605,7 +1617,7 @@ Sets the global UserUnit, defining the scale factor to multiply any size or
 coordinate by. For example, C<userunit(72)> results in a User Unit of 72 points,
 or 1 inch.
 
-See L<PDF::Builder::Docs> "BOX" METHODS/User Units for more information.
+See L<PDF::Builder::Docs/User Units> for more information.
 
 =cut
 
@@ -1613,18 +1625,18 @@ sub userunit {
     my ($self, $value) = @_;
 
     if (float($value) <= 0.0) {
-	warn "Invalid User Unit value '$value', set to 1.0";
-	$value = 1.0;
+        warn "Invalid User Unit value '$value', set to 1.0";
+        $value = 1.0;
     }
 
     PDF::Builder->verCheckOutput(1.6, "set User Unit");
     $self->{'pdf'}->{' userUnit'} = float($value);
     $self->{'pages'}->{'UserUnit'} = PDFNum(float($value));
     if (defined $self->{'pages'}->{'MediaBox'}) { # should be default letter
-	if ($value != 1.0) { # divide points by User Unit
+        if ($value != 1.0) { # divide points by User Unit
             my @corners = ( 0, 0, 612/$value, 792/$value );
             $self->{'pages'}->{'MediaBox'} = PDFArray( map { PDFNum(float($_)) } @corners );
-	}
+        }
     }
 
     return $self;
@@ -1650,20 +1662,48 @@ sub _bbox {
 	        }
 	    }
     } else {
-	# name without [-orient] option, or numeric coordinates given
-	@corners = page_size(@corners);
+        # name without [-orient] option, or numeric coordinates given
+        @corners = page_size(@corners);
     }
 
     my $UU = $self->{'pdf'}->{' userUnit'};
     # scale down size if User Unit given (e.g., Letter => 0 0 8.5 11)
     if ($isName && $UU != 1.0) {
-	for (my $i=0; $i<4; $i++) {
-	    $corners[$i] /= $UU;
-	}
+        for (my $i=0; $i<4; $i++) {
+            $corners[$i] /= $UU;
+        }
     }
 
     return (@corners);
-}
+} # end of _bbox()
+
+# utility to get a bounding box by name
+sub _get_bbox {
+    my ($self, $boxname) = @_;
+
+    # if requested box not set, return next higher box's corners
+    # MediaBox should always at least have a default value
+    if (not defined $self->{'pages'}->{$boxname}) {
+        if      ($boxname eq 'CropBox') {
+	    $boxname = 'MediaBox';
+        } elsif ($boxname eq 'BleedBox' ||
+	         $boxname eq 'TrimBox' ||
+	         $boxname eq 'ArtBox' ) {
+	    if (defined $self->{'pages'}->{'CropBox'}) {
+	        $boxname = 'CropBox';
+	    } else {
+	        $boxname = 'MediaBox';
+	    }
+	} else { 
+            # invalid box name (silent error). just use MediaBox
+	    $boxname = 'MediaBox';
+	}
+    }
+
+    # now $boxname is known to exist
+    return map { $_->val() } $self->{'pages'}->{$boxname}->elements();
+
+} # end of _get_bbox()
 
 =item $pdf->mediabox($name)
 
@@ -1673,21 +1713,25 @@ sub _bbox {
 
 =item $pdf->mediabox($llx,$lly, $urx,$ury)
 
-Sets the global MediaBox, defining the width and height (or by corner
-coordinates, or by standard name) of the output page itself, such as the
-physical paper size. 
+=item ($llx,$lly, $urx,$ury) = $pdf->mediabox()
 
-See L<PDF::Builder::Docs> "BOX" METHODS/Media Box for more information.
+Sets (or gets) the global MediaBox, defining the width and height (or by 
+corner coordinates, or by standard name) of the output page itself, such as 
+the physical paper size. 
+
+See L<PDF::Builder::Docs/Media Box> for more information.
+The method always returns the current bounds (after any set operation).
 
 =cut
 
 sub mediabox {
     my ($self, @corners) = @_;
-    @corners = $self->_bbox(@corners);
+    if (defined $corners[0]) {
+        @corners = $self->_bbox(@corners);
+        $self->{'pages'}->{'MediaBox'} = PDFArray( map { PDFNum(float($_)) } @corners );
+    }
 
-    $self->{'pages'}->{'MediaBox'} = PDFArray( map { PDFNum(float($_)) } @corners );
-
-    return $self;
+    return $self->_get_bbox('MediaBox');
 }
 
 =item $pdf->cropbox($name)
@@ -1698,20 +1742,24 @@ sub mediabox {
 
 =item $pdf->cropbox($llx,$lly, $urx,$ury)
 
-Sets the global CropBox. This will define the media size to which the output
-will later be clipped. 
+=item ($llx,$lly, $urx,$ury) = $pdf->cropbox()
 
-See L<PDF::Builder::Docs> "Box" Methods/Crop Box for more information.
+Sets (or gets) the global CropBox. This will define the media size to which 
+the output will later be clipped. 
+
+See L<PDF::Builder::Docs/Crop Box> for more information.
+The method always returns the current bounds (after any set operation).
 
 =cut
 
 sub cropbox {
     my ($self, @corners) = @_;
-    @corners = $self->_bbox(@corners);
+    if (defined $corners[0]) {
+        @corners = $self->_bbox(@corners);
+        $self->{'pages'}->{'CropBox'} = PDFArray( map { PDFNum(float($_)) } @corners );
+    }
 
-    $self->{'pages'}->{'CropBox'} = PDFArray( map { PDFNum(float($_)) } @corners );
-
-    return $self;
+    return $self->_get_bbox('CropBox');
 }
 
 =item $pdf->bleedbox($name)
@@ -1722,20 +1770,24 @@ sub cropbox {
 
 =item $pdf->bleedbox($llx,$lly, $urx,$ury)
 
-Sets the global BleedBox. This is typically used for hard copy printing where
-you want ink to go to the edge of the cut paper.
+=item ($llx,$lly, $urx,$ury) = $pdf->bleedbox()
 
-See L<PDF::Builder::Docs> "Box" Methods/Bleed Box for more information.
+Sets (or gets) the global BleedBox. This is typically used for hard copy 
+printing where you want ink to go to the edge of the cut paper.
+
+See L<PDF::Builder::Docs/Bleed Box> for more information.
+The method always returns the current bounds (after any set operation).
 
 =cut
 
 sub bleedbox {
     my ($self, @corners) = @_;
-    @corners = $self->_bbox(@corners);
+    if (defined $corners[0]) {
+        @corners = $self->_bbox(@corners);
+        $self->{'pages'}->{'BleedBox'} = PDFArray( map { PDFNum(float($_)) } @corners );
+    }
 
-    $self->{'pages'}->{'BleedBox'} = PDFArray( map { PDFNum(float($_)) } @corners );
-
-    return $self;
+    return $self->_get_bbox('BleedBox');
 }
 
 =item $pdf->trimbox($name)
@@ -1746,20 +1798,24 @@ sub bleedbox {
 
 =item $pdf->trimbox($llx,$lly, $urx,$ury)
 
-Sets the global TrimBox. This is supposed to be the actual dimensions of the 
-finished page (after trimming of the paper). 
+=item ($llx,$lly, $urx,$ury) = $pdf->trimbox()
 
-See L<PDF::Builder::Docs> "Box" Methods/Trim Box for more information.
+Sets (or gets) the global TrimBox. This is supposed to be the actual 
+dimensions of the finished page (after trimming of the paper). 
+
+See L<PDF::Builder::Docs/Trim Box> for more information.
+The method always returns the current bounds (after any set operation).
 
 =cut
 
 sub trimbox {
     my ($self, @corners) = @_;
-    @corners = $self->_bbox(@corners);
+    if (defined $corners[0]) {
+        @corners = $self->_bbox(@corners);
+        $self->{'pages'}->{'TrimBox'} = PDFArray( map { PDFNum(float($_)) } @corners );
+    }
 
-    $self->{'pages'}->{'TrimBox'} = PDFArray( map { PDFNum(float($_)) } @corners );
-
-    return $self;
+    return $self->_get_bbox('TrimBox');
 }
 
 =item $pdf->artbox($name)
@@ -1770,20 +1826,24 @@ sub trimbox {
 
 =item $pdf->artbox($llx,$lly, $urx,$ury)
 
-Sets the global ArtBox. This is supposed to define "the extent of the page's 
-I<meaningful> content". 
+=item ($llx,$lly, $urx,$ury) = $pdf->artbox()
 
-See L<PDF::Builder::Docs> "Box" Methods/Art Box for more information.
+Sets (or gets) the global ArtBox. This is supposed to define "the extent of 
+the page's I<meaningful> content". 
+
+See L<PDF::Builder::Docs/Art Box> for more information.
+The method always returns the current bounds (after any set operation).
 
 =cut
 
 sub artbox {
     my ($self, @corners) = @_;
-    @corners = $self->_bbox(@corners);
+    if (defined $corners[0]) {
+        @corners = $self->_bbox(@corners);
+        $self->{'pages'}->{'ArtBox'} = PDFArray( map { PDFNum(float($_)) } @corners );
+    }
 
-    $self->{'pages'}->{'ArtBox'} = PDFArray( map { PDFNum(float($_)) } @corners );
-
-    return $self;
+    return $self->_get_bbox('ArtBox');
 }
 
 =back
@@ -1803,14 +1863,12 @@ Returns the list of searched directories.
 
 sub addFontDirs {
     my @dirs = @_;
-
     push @FontDirs, @dirs;
-
     return @FontDirs;
 }
 
 sub _findFont {
-    my $font = shift;
+    my $font = shift();
 
     my @fonts = ($font, map { "$_/$font" } @FontDirs);
     shift @fonts while scalar(@fonts) and not -f $fonts[0];
@@ -1822,8 +1880,7 @@ sub _findFont {
 
 =item $font = $pdf->corefont($fontname)
 
-Returns a new Adobe core font object. For details, see L<PDF::Builder::Docs>
-section B<Core Fonts>.
+Returns a new Adobe core font object. For details, see L<PDF::Builder::Docs/Core Fonts>.
 
 See also L<PDF::Builder::Resource::Font::CoreFont>.
 
@@ -1845,7 +1902,7 @@ sub corefont {
 =item $font = $pdf->psfont($ps_file)
 
 Returns a new Adobe Type1 ("PostScript") font object.
-For details, see L<PDF::Builder::Docs> section B<PS Fonts>.
+For details, see L<PDF::Builder::Docs/PS Fonts>.
 
 See also L<PDF::Builder::Resource::Font::Postscript>.
 
@@ -1873,7 +1930,7 @@ sub psfont {
 =item $font = $pdf->ttfont($ttf_file)
 
 Returns a new TrueType (or OpenType) font object.
-For details, see L<PDF::Builder::Docs> section B<TrueType Fonts>.
+For details, see L<PDF::Builder::Docs/TrueType Fonts>.
 
 =cut
 
@@ -1902,7 +1959,7 @@ sub ttfont {
 
 Returns a new CJK font object. These are TrueType-like fonts for East Asian
 languages (Chinese, Japanese, Korean).
-For details, see L<PDF::Builder::Docs> section B<CJK Fonts>.
+For details, see L<PDF::Builder::Docs/CJK Fonts>.
 
 See also L<PDF::Builder::Resource::CIDFont::CJKFont>
 
@@ -1925,8 +1982,10 @@ sub cjkfont {
 =item $font = $pdf->synfont($basefont)
 
 Returns a new synthetic font object. These are modifications to a core (or 
-other) font, where the font may be replaced by a Type1 or Type3 PostScript font.
-For details, see L<PDF::Builder::Docs> section B<Synthetic Fonts>.
+PS/T1 or TTF/OTF) font, where the font may be replaced by a Type1 or Type3 
+PostScript font.
+This does not appear to work with CJK fonts (created with C<cjkfont> method).
+For details, see L<PDF::Builder::Docs/Synthetic Fonts>.
 
 See also L<PDF::Builder::Resource::Font::SynFont>
 
@@ -1962,10 +2021,10 @@ See also L<PDF::Builder::Resource::Font::BdFont>
 =cut
 
 sub bdfont {
-    my ($self, @opts) = @_;
+    my ($self, $bdf_file, @opts) = @_;
 
     require PDF::Builder::Resource::Font::BdFont;
-    my $obj = PDF::Builder::Resource::Font::BdFont->new($self->{'pdf'}, @opts);
+    my $obj = PDF::Builder::Resource::Font::BdFont->new($self->{'pdf'}, $bdf_file, @opts);
 
     $self->{'pdf'}->out_obj($self->{'pages'});
     # $obj->tounicodemap(); # does not support Unicode!
@@ -2015,6 +2074,9 @@ sub unifont {
 Imports and returns a new JPEG image object. C<$file> may be either a filename 
 or a filehandle.
 
+See L<PDF::Builder::Resource::XObject::Image::JPEG> for additional information
+and C<examples/Content.pl> for some examples of placing an image on a page.
+
 =cut
 
 # =item $jpeg = $pdf->image_jpeg($file, %options)   no current options
@@ -2036,7 +2098,14 @@ sub image_jpeg {
 
 Imports and returns a new TIFF image object. C<$file> may be either a filename 
 or a filehandle.
-For details, see L<PDF::Builder::Docs> section B<TIFF Images>.
+For details, see L<PDF::Builder::Docs/TIFF Images>.
+
+See L<PDF::Builder::Resource::XObject::Image::TIFF> and
+L<PDF::Builder::Resource::XObject::Image::TIFF_GT> for additional information
+and C<examples/Content.pl>
+for some examples of placing an image on a page (JPEG, but the principle is
+the same). There is an optional TIFF library described, that gives more
+capability than the default one.
 
 =cut
 
@@ -2077,8 +2146,8 @@ sub image_tiff {
     }
     $obj->{'usesGT'} = PDFNum($rc);  # -1 available but unused
                                      #  0 not available
-			             #  1 available and used
-				     # $tiff->usesLib() to get number
+                                     #  1 available and used
+                                     # $tiff->usesLib() to get number
 
     return $obj;
 }
@@ -2105,7 +2174,7 @@ sub LA_GT {
     my ($rc);
     $rc = eval {
         require Graphics::TIFF;
-	1;
+        1;
     };
     if (!defined $rc) { $rc = 0; }  # else is 1
 
@@ -2116,6 +2185,10 @@ sub LA_GT {
 
 Imports and returns a new PNM image object. C<$file> may be either a filename 
 or a filehandle.
+
+See C<examples/Content.pl>
+for some examples of placing an image on a page (JPEG, but the principle is
+the same).
 
 =cut
 
@@ -2137,7 +2210,14 @@ sub image_pnm {
 
 Imports and returns a new PNG image object. C<$file> may be either 
 a filename or a filehandle.
-For details, see L<PDF::Builder::Docs> section B<PNG Images>.
+For details, see L<PDF::Builder::Docs/PNG Images>.
+
+See L<PDF::Builder::Resource::XObject::Image::PNG> and
+L<PDF::Builder::Resource::XObject::Image::PNG_IPL> for additional information
+and C<examples/Content.pl>
+for some examples of placing an image on a page (JPEG, but the principle is
+the same). There is an optional PNG library (PNG_IPL) described, that gives more
+capability than the default one.
 
 =cut
 
@@ -2147,39 +2227,39 @@ sub image_png {
     my ($rc, $obj);
     $rc = eval {
         require Image::PNG::Libpng;
-	1;
+        1;
     };
     if (!defined $rc) { $rc = 0; }  # else is 1
     if ($rc) {
-	# Image::PNG::Libpng available
-	if (defined $opts{'-nouseIPL'} && $opts{'-nouseIPL'} == 1) {
-	   $rc = -1;  # don't use it
-	}
+        # Image::PNG::Libpng available
+        if (defined $opts{'-nouseIPL'} && $opts{'-nouseIPL'} == 1) {
+            $rc = -1;  # don't use it
+        }
     }
     if ($rc == 1) {
-	# Image::PNG::Libpng (_IPL suffix) available and to be used
+        # Image::PNG::Libpng (_IPL suffix) available and to be used
         require PDF::Builder::Resource::XObject::Image::PNG_IPL;
         $obj = PDF::Builder::Resource::XObject::Image::PNG_IPL->new($self->{'pdf'}, $file, 'Px'.pdfkey(), %opts);
         $self->{'pdf'}->out_obj($self->{'pages'});
     } else {
-	# Image::PNG::Libpng not available, or is but is not to be used
+        # Image::PNG::Libpng not available, or is but is not to be used
         require PDF::Builder::Resource::XObject::Image::PNG;
         $obj = PDF::Builder::Resource::XObject::Image::PNG->new($self->{'pdf'}, $file, 'Px'.pdfkey(), %opts);
         $self->{'pdf'}->out_obj($self->{'pages'});
 
-	if ($rc == 0 && $MSG_COUNT[1]++ == 0) {
-	    # TBD give warning message once, unless silenced (-silent) or
-	    # deliberately not using Image::PNG::Libpng (rc == -1)
-	    if (!defined $opts{'-silent'} || $opts{'-silent'} == 0) {
-	        print STDERR "Your system does not have Image::PNG::Libpng installed, so some\nPNG functions may not run correctly.\n";
-		# even if -silent only once, COUNT still incremented
-	    }
-	}
+        if ($rc == 0 && $MSG_COUNT[1]++ == 0) {
+            # TBD give warning message once, unless silenced (-silent) or
+            # deliberately not using Image::PNG::Libpng (rc == -1)
+            if (!defined $opts{'-silent'} || $opts{'-silent'} == 0) {
+                print STDERR "Your system does not have Image::PNG::Libpng installed, so some\nPNG functions may not run correctly.\n";
+                # even if -silent only once, COUNT still incremented
+            }
+        }
     }
     $obj->{'usesIPL'} = PDFNum($rc);  # -1 available but unused
                                       #  0 not available
-		 	              #  1 available and used
-		        	      # $png->usesLib() to get number
+                                      #  1 available and used
+                                      # $png->usesLib() to get number
     return $obj;
 }
 
@@ -2205,7 +2285,7 @@ sub LA_IPL {
     my ($rc);
     $rc = eval {
         require Image::PNG::Libpng;
-	1;
+        1;
     };
     if (!defined $rc) { $rc = 0; }  # else is 1
 
@@ -2216,6 +2296,10 @@ sub LA_IPL {
 
 Imports and returns a new GIF image object. C<$file> may be either a filename 
 or a filehandle.
+
+See L<PDF::Builder::Resource::XObject::Image::GIF> for additional information
+and C<examples/Content.pl> for some examples of placing an image on a page 
+(JPEG, but the principle is the same).
 
 =cut
 
@@ -2246,6 +2330,10 @@ Valid %options are:
 Use lossless compression.
 
 =back
+
+See L<PDF::Builder::Resource::XObject::Image::GD> for additional information
+and C<examples/Content.pl> for some examples of placing an image on a page 
+(JPEG, but the principle is the same).
 
 =cut
 
@@ -2300,6 +2388,7 @@ sub colorspace_web {
 
     require PDF::Builder::Resource::ColorSpace::Indexed::WebColor;
     my $obj = PDF::Builder::Resource::ColorSpace::Indexed::WebColor->new($self->{'pdf'});
+
     $self->{'pdf'}->out_obj($self->{'pages'});
 
     return $obj;
@@ -2474,7 +2563,7 @@ Returns a new form XObject.
 =cut
 
 sub xo_form {
-    my $self = shift;
+    my $self = shift();
 
     my $obj = PDF::Builder::Resource::XObject::Form::Hybrid->new($self->{'pdf'});
     $self->{'pdf'}->out_obj($self->{'pages'});
@@ -2489,7 +2578,7 @@ Returns a new extended graphics state object.
 =cut
 
 sub egstate {
-    my $self = shift;
+    my $self = shift();
 
     my $obj = PDF::Builder::Resource::ExtGState->new($self->{'pdf'}, pdfkey());
     $self->{'pdf'}->out_obj($self->{'pages'});
@@ -2538,17 +2627,17 @@ Returns a new or existing outlines object.
 =cut
 
 sub outlines {
-    my $self = shift;
+    my $self = shift();
 
     require PDF::Builder::Outlines;
     $self->{'pdf'}->{'Root'}->{'Outlines'} ||= PDF::Builder::Outlines->new($self);
 
     my $obj = $self->{'pdf'}->{'Root'}->{'Outlines'};
-    bless $obj, 'PDF::Builder::Outlines';
-    $obj->{' apipdf'} = $self->{'pdf'};
-    $obj->{' api'}    = $self;
-    weaken $obj->{' apipdf'};
-    weaken $obj->{' api'};
+#    bless $obj, 'PDF::Builder::Outlines';
+#    $obj->{' apipdf'} = $self->{'pdf'};
+#    $obj->{' api'}    = $self;
+#    weaken $obj->{' apipdf'};
+#    weaken $obj->{' api'};
 
     $self->{'pdf'}->new_obj($obj) unless $obj->is_obj($self->{'pdf'});
     $self->{'pdf'}->out_obj($obj);
@@ -2569,9 +2658,9 @@ sub named_destination {
 
     $root->{'Names'} ||= PDFDict();
     $root->{'Names'}->{$cat} ||= PDFDict();
-    $root->{'Names'}->{$cat}->{'-vals'} ||= {};
+    $root->{'Names'}->{$cat}->{'-vals'}  ||= {};
     $root->{'Names'}->{$cat}->{'Limits'} ||= PDFArray();
-    $root->{'Names'}->{$cat}->{'Names'} ||= PDFArray();
+    $root->{'Names'}->{$cat}->{'Names'}  ||= PDFArray();
 
     unless (defined $obj) {
         $obj = PDF::Builder::NamedDestination->new($self->{'pdf'});

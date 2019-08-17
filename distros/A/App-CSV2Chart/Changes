@@ -1,5 +1,10 @@
 Revision history for App-CSV2Chart
 
+0.6.1   2019-08-16
+    - POD fixes
+        - https://github.com/shlomif/CSV2Chart/pull/1 .
+        - By @manwar - thanks!
+
 0.6.0   2019-08-15
     - Support charting several data series.
 

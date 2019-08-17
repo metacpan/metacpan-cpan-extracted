@@ -5,22 +5,19 @@ use warnings;
 
 use autodie;
 
-my @modules =
+my @modules = (
     (
-        (map
-            {
-                "Games::LMSolve::$_"
-            }
+        map { "Games::LMSolve::$_" }
             qw(Numbers Base Plank::Base Plank::Hex Alice),
-            qw(Tilt::Base Tilt::Single Tilt::Multi Tilt::RedBlue),
-            qw(Input Registry)
-        ),
-        "Games::LMSolve"
-    );
+        qw(Tilt::Base Tilt::Single Tilt::Multi Tilt::RedBlue),
+        qw(Input Registry)
+    ),
+    "Games::LMSolve"
+);
 
 my $num_modules = scalar(@modules);
 
-open my $out_fh, ">t/00use.t";
+open my $out_fh, ">", 't/00use.t';
 print {$out_fh} <<"EOF" ;
 #!/usr/bin/perl -w
 
@@ -39,4 +36,4 @@ foreach (@modules)
 
 print {$out_fh} "}\n";
 
-close ($out_fh);
+close($out_fh);

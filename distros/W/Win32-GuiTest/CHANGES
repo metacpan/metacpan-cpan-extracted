@@ -314,3 +314,6 @@
 
 1.63 Jan 29 2016
      - Minor accumulated fixes
+
+1.64 Aug 16 2019
+     - Allow 64-bit SendMessage

@@ -1,6 +1,5 @@
 name = PDF-Builder
-version = 3.015   # have stopped updating, until used again
-author  = Phil Perry <phil4597@catskilltech.com>
+author = Phil Perry <phil4597@catskilltech.com>
 license = LGPL_2_1
 copyright_holder = Phil Perry
 
@@ -15,7 +14,7 @@ format = %-9v %{yyyy-MM-dd}d
 [Prereqs]
 perl = v5.18.0
 Compress::Zlib = 1.0
-Font::TTF = 1.04
+Font::TTF = 1.06
 
 [Prereqs / TestRequires]
 Test::Exception = 0
@@ -25,7 +24,16 @@ Test::Memory::Cycle = 1.0
 #Win32::TieRegistry = 0
 #MacPerl = 0
 
-[GatherDir]
+[Git::Check]
+[Git::Commit]
+
+[Git::NextVersion]
+version_regexp = ^([0-9]+\.[0-9]{3})$
+
+[Git::Tag]
+tag_format = %v
+
+[Git::GatherDir]
 include_dotfiles = 1
 exclude_match = ^\.(?!perlcriticrc$)
 
@@ -42,3 +50,7 @@ except = \.perlcriticrc
 [OurPkgVersion]
 [PodSyntaxTests]
 [Test::Perl::Critic]
+[TestRelease]
+[ConfirmRelease]
+[UploadToCPAN]
+[Git::Push]

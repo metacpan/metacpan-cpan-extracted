@@ -10,27 +10,35 @@ use Test2::API qw{
 
 use Time::HiRes qw/time/;
 
-our $VERSION = '0.000122';
+our $VERSION = '0.000124';
 
+my $ADDED_HOOK = 0;
+my $START;
 sub import {
-    my $start = time;
+    return if $ADDED_HOOK++;
 
-    test2_add_callback_exit(
-        sub {
-            my ($ctx, $real, $new) = @_;
-            my $stop  = time;
-            my @times = times();
+    $START = time;
+    test2_add_callback_exit(\&send_time_event);
+}
 
-            $ctx->send_event(
-                'Times',
-                start => $start,
-                stop  => $stop,
-                user  => $times[0],
-                sys   => $times[1],
-                cuser => $times[2],
-                csys  => $times[3],
-            );
-        }
+sub send_time_event {
+    my ($ctx, $real, $new) = @_;
+    my $stop  = time;
+    my @times = times();
+
+    my $summary = render_bench($START, $stop, @times);
+
+    $ctx->send_ev2(
+        about => {package => __PACKAGE__, details => $summary},
+        info  => [{tag => 'TIME', details => $summary}],
+        times => {
+            start => $START,
+            stop  => $stop,
+            user  => $times[0],
+            sys   => $times[1],
+            cuser => $times[2],
+            csys  => $times[3],
+        },
     );
 }
 

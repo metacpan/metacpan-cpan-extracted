@@ -72,9 +72,11 @@ do
     | t/empty.dat | t/*.xpm | t/*.xbm | t/*.jpg | t/*.gif \
     | t/*.g${MY_HIDE}d \
     | tools/*-oeis-samples.gp \
+    | test-oeis-samples.gp \
     | tools/configurations-gfs-generated.gp \
     | devel/configurations-t-generated.gp \
     | test-symbols.txt | test-funcs.txt \
+    | devel/minimal-domsets-max-even2.c \
     | */_whizzy*)
       continue ;;
     *.gz)

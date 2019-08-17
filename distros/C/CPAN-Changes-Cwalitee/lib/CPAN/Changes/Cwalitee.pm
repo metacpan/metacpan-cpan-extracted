@@ -1,7 +1,7 @@
 package CPAN::Changes::Cwalitee;
 
-our $DATE = '2019-07-26'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $DATE = '2019-08-02'; # DATE
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -52,6 +52,11 @@ $SPEC{calc_cpan_changes_cwalitee} = {
         path => {
             schema => 'pathname*',
             req => 1,
+            description => <<'_',
+
+Use `-` to read from STDIN.
+
+_
         },
     },
 };
@@ -66,9 +71,17 @@ sub calc_cpan_changes_cwalitee {
         prefix => 'CPAN::Changes::',
         %fargs,
         code_init_r => sub {
+            my $file_content;
+            if ($path eq '-') {
+                local $/;
+                binmode(STDIN, ":encoding(utf8)");
+                $file_content = <STDIN>;
+            } else {
+                $file_content = File::Slurper::read_text($path);
+            }
             return {
                 path => $path,
-                file_content => File::Slurper::read_text($path),
+                file_content => $file_content,
             };
         },
         code_fixup_r => sub {
@@ -102,7 +115,7 @@ CPAN::Changes::Cwalitee - Calculate the cwalitee of your CPAN Changes file
 
 =head1 VERSION
 
-This document describes version 0.007 of CPAN::Changes::Cwalitee (from Perl distribution CPAN-Changes-Cwalitee), released on 2019-07-26.
+This document describes version 0.009 of CPAN::Changes::Cwalitee (from Perl distribution CPAN-Changes-Cwalitee), released on 2019-08-02.
 
 =head1 SYNOPSIS
 
@@ -176,6 +189,8 @@ Minimum indicator severity.
 
 =item * B<path>* => I<pathname>
 
+Use C<-> to read from STDIN.
+
 =back
 
 Returns an enveloped result (an array).
@@ -226,7 +241,7 @@ Result:
 =item * List only certain names, show details:
 
  list_cpan_changes_cwalitee_indicators(
- detail  => 1,
+   detail  => 1,
    include => ["parsable", "date_parsable", "date_correct_format"]
  );
 

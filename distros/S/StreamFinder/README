@@ -14,7 +14,7 @@ INSTALLATION
             make install
 
 AUTHOR
-    This module is Copyright (C) 2017 by
+    This module is Copyright (C) 2017-2019 by
 
     Jim Turner, "<turnerjw784 at yahoo.com>"
 
@@ -93,9 +93,11 @@ DESCRIPTION
     hacked version of the open-source "audacious" media player).
     "fauxdacious" incorporates this module to decode and play streams. The
     currently-supported websites are: radionomy.com, iheartradio.com,
-    reciva.com, facebook, and youtube / vimeo. We used to support
-    tunein.com, but they have now borked up their pages to make it nearly
-    impossible to obtain their hidden streams programatically.
+    reciva.com, facebook, and youtube / vimeo / brighteon, et. al. We used
+    to support tunein.com, but they have since apparently wasted a ton of
+    money on web-developers and script kiddies to so fsck up their stations'
+    pages to make it impossible to obtain their hidden streams
+    programatically.
 
     It amazes me the effort to which marketing-run operations will go to and
     web-development money they'll spend to prevent people from accessing
@@ -186,7 +188,7 @@ SUPPORT
         <http://search.cpan.org/dist/StreamFinder/>
 
 LICENSE AND COPYRIGHT
-    Copyright 2017 Jim Turner.
+    Copyright 2017-2019 Jim Turner.
 
     This program is free software; you can redistribute it and/or modify it
     under the terms of the the Artistic License (2.0). You may obtain a copy
@@ -223,4 +225,5 @@ LICENSE AND COPYRIGHT
     CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
     CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
     EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 

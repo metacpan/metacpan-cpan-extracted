@@ -73,9 +73,6 @@ lib/Test2/Harness/Util/Term.pm
 lib/Test2/Harness/Util/TestFile.pm
 lib/Test2/Harness/Util/UUID.pm
 lib/Test2/Harness/Watcher.pm
-lib/Test2/Plugin/DBIProfile.pm
-lib/Test2/Plugin/MemUsage.pm
-lib/Test2/Plugin/UUID.pm
 lib/Test2/Tools/HarnessTester.pm
 log.jsonl
 scripts/yath

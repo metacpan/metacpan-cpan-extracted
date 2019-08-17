@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014, 2015 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -20,7 +20,8 @@
 use 5.004;
 use strict;
 use Test;
-plan tests => 26;
+use Math::BigInt try => 'GMP';
+plan tests => 27;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -34,7 +35,7 @@ use Math::PlanePath::DragonMidpoint;
 
 
 #------------------------------------------------------------------------------
-# A090678   turn=1 straight=0, except A090678 has extra initial 1,1
+# A090678   0=straight, 1=not straight, except A090678 has extra initial 1,1
 
 MyOEIS::compare_values
   (anum => 'A090678',
@@ -43,10 +44,10 @@ MyOEIS::compare_values
      my @got = (1,1);
      require Math::NumSeq::PlanePathTurn;
      my $seq = Math::NumSeq::PlanePathTurn->new(planepath=>'DragonMidpoint',
-                                                turn_type => 'LSR');
+                                                turn_type => 'NotStraight');
      while (@got < $count) {
        my ($i, $value) = $seq->next;
-       push @got, abs($value);
+       push @got, $value;
      }
      return \@got;
    });
@@ -71,9 +72,6 @@ MyOEIS::compare_values
 
 #------------------------------------------------------------------------------
 # A077860 -- Y at N=2^k, starting k=1 N=2
-
-require Math::NumSeq::PlanePathN;
-my $bigclass = Math::NumSeq::PlanePathN::_bigint();
 
 # Re -(i+1)^k + i-1
 {
@@ -100,7 +98,7 @@ MyOEIS::compare_values
      my ($count) = @_;
      my $path = Math::PlanePath::DragonMidpoint->new;
      my @got;
-     for (my $n = $bigclass->new(2); @got < $count; $n *= 2) {
+     for (my $n = Math::BigInt->new(2); @got < $count; $n *= 2) {
        my ($x,$y) = $path->n_to_xy($n);
        push @got, $y;
      }

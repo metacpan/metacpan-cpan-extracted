@@ -17,8 +17,8 @@ use base 'PDF::Builder::Basic::PDF::Objind';
 use strict;
 use warnings;
 
-our $VERSION = '3.015'; # VERSION
-my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
+our $VERSION = '3.016'; # VERSION
+my $LAST_UPDATE = '3.016'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -61,7 +61,6 @@ escaping working.
 
 sub from_pdf {
     my ($class, $str) = @_;
-
     my $self = {};
 
     bless $self, $class;
@@ -80,7 +79,6 @@ escaping working.
 
 sub new {
     my ($class, $str) = @_;
-
     my $self = {};
 
     bless $self, $class;
@@ -97,7 +95,6 @@ Returns $str converted as per criteria for input from PDF file
 
 sub convert {
     my ($self, $input) = @_;
-
     my $output = '';
 
     # Hexadecimal Strings (PDF 1.7 section 7.3.4.3)
@@ -187,15 +184,16 @@ Returns the string formatted for output as PDF for PDF File object $pdf.
 
 sub as_pdf {
     my ($self) = @_;
-
     my $str = $self->{'val'};
 
-    if      ($self->{' isutf'}) {
-        $str = join('', map { sprintf('%04X' , $_) } unpack('U*', $str) );
-        return "<FEFF$str>";
-    } elsif ($self->{' ishex'}) { # imported as hex ?
+    if      ($self->{' ishex'}) { # imported as hex ?
         $str = unpack('H*', $str);
         return "<$str>";
+    } elsif ($self->{' isutf'} or 
+             (utf8::is_utf8($str) and 
+              $str =~ /[^[:ascii:]]/)) {
+        $str = join('', map { sprintf('%04X' , $_) } unpack('U*', $str) );
+        return "<FEFF$str>";
     } else {
         if ($str =~ m/[^\n\r\t\b\f\040-\176\200-\377]/oi) {
             $str =~ s/(.)/sprintf('%02X', ord($1))/oge;
@@ -207,14 +205,14 @@ sub as_pdf {
     }
 }
 
-=head2 $s->outobjdeep()
+=head2 $s->outobjdeep($fh, $pdf)
 
-Outputs the string in PDF format, complete with necessary conversions
+Outputs the string in PDF format, complete with necessary conversions.
 
 =cut
 
 sub outobjdeep {
-    my ($self, $fh, $pdf, %opts) = @_;
+    my ($self, $fh, $pdf) = @_;
 
     $fh->print($self->as_pdf($pdf));
     return;

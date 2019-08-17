@@ -34,7 +34,7 @@ my @scripts = (
     'script/normalize-sah-schema',
     'script/resolve-sah-schema',
     'script/sah-to-human',
-    'script/show-sah-coerce-module',
+    'script/show-sah-coerce-rule-module',
     'script/show-sah-schema-module',
     'script/validate-with-sah'
 );

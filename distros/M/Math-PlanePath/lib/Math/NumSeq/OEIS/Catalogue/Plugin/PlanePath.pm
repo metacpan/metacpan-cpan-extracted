@@ -22,13 +22,13 @@ use 5.004;
 use strict;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 126;
+$VERSION = 127;
 use Math::NumSeq::OEIS::Catalogue::Plugin;
 @ISA = ('Math::NumSeq::OEIS::Catalogue::Plugin');
 
 ## no critic (CodeLayout::RequireTrailingCommaAtNewline)
 
-# total 249 A-numbers in 4 modules
+# total 253 A-numbers in 4 modules
 
 use constant info_arrayref =>
 [
@@ -372,6 +372,36 @@ use constant info_arrayref =>
       'AbsDiff',
       'i_start',
       10
+    ]
+  },
+  {
+    'anum' => 'A318438',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'ComplexMinus',
+      'coordinate_type',
+      'X'
+    ]
+  },
+  {
+    'anum' => 'A318439',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'ComplexMinus',
+      'coordinate_type',
+      'Y'
+    ]
+  },
+  {
+    'anum' => 'A318479',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'ComplexMinus',
+      'coordinate_type',
+      'RSquared'
     ]
   },
   {
@@ -2422,6 +2452,16 @@ use constant info_arrayref =>
       'Diagonals,n_start=0',
       'turn_type',
       'SRL'
+    ]
+  },
+  {
+    'anum' => 'A097806',
+    'class' => 'Math::NumSeq::PlanePathTurn',
+    'parameters' => [
+      'planepath',
+      'Diagonals,n_start=-1',
+      'turn_type',
+      'NotStraight'
     ]
   },
   {

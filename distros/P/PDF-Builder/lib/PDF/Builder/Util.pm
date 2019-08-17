@@ -3,8 +3,8 @@ package PDF::Builder::Util;
 use strict;
 no warnings qw[ recursion uninitialized ];
 
-our $VERSION = '3.015'; # VERSION
-my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
+our $VERSION = '3.016'; # VERSION
+my $LAST_UPDATE = '3.016'; # manually update whenever code is changed
 
 # note: $a and $b are "Magic variables" according to perlcritic, and so it
 # has conniptions over using them as variable names (even with "my"). so, I
@@ -604,7 +604,7 @@ sub unfilter {
         my ($hasflate) = -1;
         my ($temp, $i, $temp1);
 
-        @filts = map { ("PDF::Builder::Basic::PDF::Filter::" . $_->val())->new() } $filter->elementsof();
+        @filts = map { ("PDF::Builder::Basic::PDF::Filter::" . $_->val())->new() } $filter->elements();
 
         foreach my $f (@filts) {
             $stream = $f->infilt($stream, 1);
@@ -627,7 +627,7 @@ sub dofilter {
         my $hasflate = -1;
         my ($temp, $i, $temp1);
 
-        @filts = map { ("PDF::Builder::Basic::PDF::Filter::" . $_->val())->new() } $filter->elementsof();
+        @filts = map { ("PDF::Builder::Basic::PDF::Filter::" . $_->val())->new() } $filter->elements();
 
         foreach my $f (@filts) {
             $stream = $f->outfilt($stream, 1);

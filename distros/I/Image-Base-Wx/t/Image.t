@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012 Kevin Ryde
+# Copyright 2012, 2019 Kevin Ryde
 
 # This file is part of Image-Base-Wx.
 #
@@ -28,19 +28,21 @@ BEGIN { MyTestHelpers::nowarnings() }
 eval { require Wx }
   or plan skip_all => "due to Wx display not available -- $@";
 
-plan tests => 2519;
+plan tests => 2524;
 
 use_ok ('Image::Base::Wx::Image');
 diag "Image::Base version ", Image::Base->VERSION;
 
 # uncomment this to run the ### lines
-#use Smart::Comments;
+# use Smart::Comments;
+
+# Wx::EnableDefaultAssertHandler();
 
 
 #------------------------------------------------------------------------------
 # VERSION
 
-my $want_version = 4;
+my $want_version = 5;
 is ($Image::Base::Wx::Image::VERSION,
     $want_version, 'VERSION variable');
 is (Image::Base::Wx::Image->VERSION,
@@ -96,8 +98,8 @@ ok (! eval { Image::Base::Wx::Image->VERSION($check_version); 1 },
   my $i2 = $image->new;
   $image->xy(0,0, '#000000');
   $i2->xy(0,0, '#FFFFFF');
-  is ($image->xy(0,0), '#000000');
-  is ($i2->xy(0,0), '#FFFFFF');
+  is ($image->xy(0,0), '#000000', 'xy() get');
+  is ($i2->xy(0,0), '#FFFFFF', 'xy() get i2');
 }
 
 
@@ -108,7 +110,6 @@ ok (! eval { Image::Base::Wx::Image->VERSION($check_version); 1 },
 # foreach my $handler (Wx::GetHandlers()) {
 #   diag "  $handler";
 # }
-Wx::InitAllImageHandlers();
 
 {
   my $image = Image::Base::Wx::Image->new;
@@ -122,17 +123,22 @@ Wx::InitAllImageHandlers();
 #------------------------------------------------------------------------------
 # save()
 
-# Wx::InitAllImageHandlers();
+my $temp_bmp_filename = 'tempfile.bmp';
+
 {
-  my $filename = 'tempfile.bmp';
-  my $image = Image::Base::Wx::Image->new
-    (-width => 20, -height => 10,
-     -file_format => 'bmp');
   {
-    $image->save($filename);
-    unlink $filename;
+    # successful save of BMP
+    my $image = Image::Base::Wx::Image->new
+      (-width => 20, -height => 10,
+       -file_format => 'bmp');
+    is ($image->get('-width'),  20);
+    is ($image->get('-height'), 10);
+    $image->save($temp_bmp_filename);
+    diag "$temp_bmp_filename size ", -s $temp_bmp_filename;
+    unlink $temp_bmp_filename;
   }
   {
+    # expect fail to save to no such directory
     my $image = Image::Base::Wx::Image->new
       (-width => 10, -height => 10, -file_format => 'bmp');
     eval { $image->save('/no/such/direct/ory/test.bmp') };
@@ -140,104 +146,6 @@ Wx::InitAllImageHandlers();
     diag "save error as expected: ",$err;
     like ($err, qr/Error|Cannot/i,
           'save(no/such/dir)');
-  }
-}
-
-#------------------------------------------------------------------------------
-# XPM -hotx, -hoty
-
-# Don't seem to get hotspot from xpm ...
-# {
-#   Wx::InitAllImageHandlers();
-#   my $str = <<'HERE';
-# /* XPM */
-# static char *x[] = {
-# "2 3 1 1 1 2",
-# "  c white",
-# "  ",
-# "  ",
-# "  "
-# };
-# HERE
-#   require File::Temp;
-#   my $fh = File::Temp->new;
-#   my $filename = $fh->filename;
-#   binmode $fh or die;
-#   print $fh $str or die;
-#   close $fh or die;
-# 
-#   my $image = Image::Base::Wx::Image->new;
-#   $image->load ($filename);
-#   is ($image->get('-width'),  2, 'get() xpm -width');
-#   is ($image->get('-height'), 3, 'get() xpm -height');
-#   is ($image->get('-hotx'), 1, 'get() xpm -hotx');
-#   is ($image->get('-hoty'), 2, 'get() xpm -hoty');
-# 
-#   $image->set('-hotx', 4);
-#   $image->set('-hoty', 5);
-#   is ($image->get('-hotx'), 4, 'set() -hotx');
-#   is ($image->get('-hoty'), 5, 'set() -hoty');
-# }
-
-#------------------------------------------------------------------------------
-# CUR load -hotx, -hoty
-
-{
-  Wx::InitAllImageHandlers();
-  my $str =
-    ("\x{00}\x{00}\x{02}\x{00}\x{01}\x{00}\x{02}\x{03}"
-     . "\x{00}\x{00}\x{00}\x{00}\x{01}\x{00}\x{4C}\x{00}"
-     . "\x{00}\x{00}\x{16}\x{00}\x{00}\x{00}\x{28}\x{00}"
-     . "\x{00}\x{00}\x{02}\x{00}\x{00}\x{00}\x{06}\x{00}"
-     . "\x{00}\x{00}\x{01}\x{00}\x{18}\x{00}\x{00}\x{00}"
-     . "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}"
-     . "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}"
-     . "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{AA}"
-     . "\x{FF}\x{00}\x{AA}\x{FF}\x{00}\x{00}\x{00}\x{AA}"
-     . "\x{FF}\x{00}\x{AA}\x{FF}\x{00}\x{00}\x{00}\x{AA}"
-     . "\x{FF}\x{00}\x{AA}\x{FF}\x{00}\x{00}\x{00}\x{00}"
-     . "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}"
-     . "\x{00}\x{00}");
-  require File::Temp;
-  my $fh = File::Temp->new;
-  my $filename = $fh->filename;
-  binmode $fh or die;
-  print $fh $str or die;
-  close $fh or die;
-
-  my $image = Image::Base::Wx::Image->new
-    (-file => $filename);
-  is ($image->get('-width'),  2, 'get() cur -width');
-  is ($image->get('-height'), 3, 'get() cur -height');
-  is ($image->get('-hotx'), 0, 'get() cur -hotx');
-  is ($image->get('-hoty'), 1, 'get() cur -hoty');
-}
-
-#------------------------------------------------------------------------------
-# CUR save then load -hotx, -hoty
-
-{
-  Wx::InitAllImageHandlers();
-  require File::Temp;
-  my $fh = File::Temp->new;
-  my $filename = $fh->filename;
-  {
-    my $image = Image::Base::Wx::Image->new
-      (-width => 2,
-       -height => 3,
-       -hotx => 1,
-       -hoty => 2,
-       -file_format => 'CUR');
-    $image->save ($filename);
-  }
-  ok (-f $filename);
-  {
-    my $image = Image::Base::Wx::Image->new
-      (-file => $filename);
-    is ($image->get('-width'),  2, 'get() cur -width');
-    is ($image->get('-height'), 3, 'get() cur -height');
-    is ($image->get('-hotx'), 1, 'get() cur -hotx');
-    is ($image->get('-hoty'), 2, 'get() cur -hoty');
   }
 }
 
@@ -355,6 +263,104 @@ Wx::InitAllImageHandlers();
 }
 
 #------------------------------------------------------------------------------
+# XPM -hotx, -hoty
+
+# Don't seem to get hotspot from xpm ...
+# {
+#   my $str = <<'HERE';
+# /* XPM */
+# static char *x[] = {
+# "2 3 1 1 1 2",
+# "  c white",
+# "  ",
+# "  ",
+# "  "
+# };
+# HERE
+#   require File::Temp;
+#   my $fh = File::Temp->new;
+#   my $filename = $fh->filename;
+#   binmode $fh or die;
+#   print $fh $str or die;
+#   close $fh or die;
+# 
+#   my $image = Image::Base::Wx::Image->new;
+#   $image->load ($filename);
+#   is ($image->get('-width'),  2, 'get() xpm -width');
+#   is ($image->get('-height'), 3, 'get() xpm -height');
+#   is ($image->get('-hotx'), 1, 'get() xpm -hotx');
+#   is ($image->get('-hoty'), 2, 'get() xpm -hoty');
+# 
+#   $image->set('-hotx', 4);
+#   $image->set('-hoty', 5);
+#   is ($image->get('-hotx'), 4, 'set() -hotx');
+#   is ($image->get('-hoty'), 5, 'set() -hoty');
+# }
+
+#------------------------------------------------------------------------------
+# CUR load -hotx, -hoty
+
+{
+  Wx::InitAllImageHandlers();
+
+  my $str =
+    ("\x{00}\x{00}\x{02}\x{00}\x{01}\x{00}\x{02}\x{03}"
+     . "\x{00}\x{00}\x{00}\x{00}\x{01}\x{00}\x{4C}\x{00}"
+     . "\x{00}\x{00}\x{16}\x{00}\x{00}\x{00}\x{28}\x{00}"
+     . "\x{00}\x{00}\x{02}\x{00}\x{00}\x{00}\x{06}\x{00}"
+     . "\x{00}\x{00}\x{01}\x{00}\x{18}\x{00}\x{00}\x{00}"
+     . "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}"
+     . "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}"
+     . "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{AA}"
+     . "\x{FF}\x{00}\x{AA}\x{FF}\x{00}\x{00}\x{00}\x{AA}"
+     . "\x{FF}\x{00}\x{AA}\x{FF}\x{00}\x{00}\x{00}\x{AA}"
+     . "\x{FF}\x{00}\x{AA}\x{FF}\x{00}\x{00}\x{00}\x{00}"
+     . "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}"
+     . "\x{00}\x{00}");
+  open my $fh, '>', $temp_bmp_filename or die $!;
+  binmode $fh or die $!;
+  print $fh $str or die $!;
+  close $fh or die $!;
+
+  my $image = Image::Base::Wx::Image->new
+    (-file => $temp_bmp_filename);
+  unlink $temp_bmp_filename;
+  is ($image->get('-width'),  2, 'BMP sample get() cur -width');
+  is ($image->get('-height'), 3, 'BMP sample get() cur -height');
+  is ($image->get('-hotx'),   0, 'BMP sample get() cur -hotx');
+  is ($image->get('-hoty'),   1, 'BMP sample get() cur -hoty');
+}
+
+#------------------------------------------------------------------------------
+# CUR save then load -hotx, -hoty
+
+{
+  ok (! -f $temp_bmp_filename, "not -f $temp_bmp_filename");
+  {
+    my $image = Image::Base::Wx::Image->new
+      (-width  => 2,
+       -height => 3,
+       -hotx   => 1,
+       -hoty   => 2,
+       -file_format => 'CUR');
+    is ($image->get('-width'),  2, 'created CUR width');
+    is ($image->get('-height'), 3, 'created CUR height');
+    $image->save ($temp_bmp_filename);
+  }
+  diag "$temp_bmp_filename size ", -s $temp_bmp_filename;
+  ok (-f $temp_bmp_filename, "-f $temp_bmp_filename");
+  {
+    my $image = Image::Base::Wx::Image->new
+      (-file => $temp_bmp_filename);
+    unlink $temp_bmp_filename;
+    is ($image->get('-width'),  2, 'save and load cur -width');
+    is ($image->get('-height'), 3, 'save and load cur -height');
+    is ($image->get('-hotx'),   1, 'save and load cur -hotx');
+    is ($image->get('-hoty'),   2, 'save and load cur -hoty');
+  }
+}
+
+#------------------------------------------------------------------------------
 
 {
   require MyTestImageBase;
@@ -373,4 +379,5 @@ Wx::InitAllImageHandlers();
   MyTestImageBase::check_diamond ($image);
 }
 
+#------------------------------------------------------------------------------
 exit 0;

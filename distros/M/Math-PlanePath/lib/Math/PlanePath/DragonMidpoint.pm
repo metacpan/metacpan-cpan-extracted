@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -60,7 +60,7 @@ use List::Util 'min'; # 'max'
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 126;
+$VERSION = 127;
 use Math::PlanePath;
 use Math::PlanePath::Base::NSEW;
 @ISA = ('Math::PlanePath::Base::NSEW',
@@ -981,7 +981,7 @@ L<http://oeis.org/A073089> (etc)
     A073089   abs(dY) of n-1 to n, so 0=horizontal,1=vertical
                 (extra initial 0)
     A077860   Y at N=2^k, being Re(-(i+1)^k + i-1)
-    A090678   turn=1, straight=0  (extra initial 1,1)
+    A090678   0=straight, 1=not straight  (extra initial 1,1)
     A203175   boundary of unit squares N=0 to N=2^k-1, value 4 onwards
 
 =head2 A073089
@@ -1028,7 +1028,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 Math-PlanePath is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

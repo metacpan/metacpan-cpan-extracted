@@ -41,7 +41,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '0.80';
+our $VERSION = '0.81';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -150,7 +150,7 @@ sub _download_directory {
         );
         my $profile =
           Firefox::Marionette::Profile->parse(
-            File::Spec->catfile( $self->{profile_directory}, 'prefs.js' ) );
+            File::Spec->catfile( $self->{_profile_directory}, 'prefs.js' ) );
         $directory = $profile->get_value('browser.download.downloadDir');
     };
     if ( $OSNAME eq 'cygwin' ) {
@@ -164,62 +164,147 @@ sub mime_types {
     return @{ $self->{mime_types} };
 }
 
-sub downloading {
-    my ($self)    = @_;
-    my $directory = $self->_download_directory();
-    my $handle    = DirHandle->new($directory)
+sub download {
+    my ( $self, $path ) = @_;
+    my $handle;
+    if ( my $ssh = $self->_ssh() ) {
+        $handle = $self->_get_file_via_ssh($path);
+    }
+    else {
+        $handle = FileHandle->new( $path, Fcntl::O_RDONLY() )
+          or Firefox::Marionette::Exception->throw(
+            "Failed to open '$path' for reading:$EXTENDED_OS_ERROR");
+    }
+    return $handle;
+}
+
+sub _directory_listing_via_ssh {
+    my ( $self, $directory ) = @_;
+    my $read_handle  = Symbol::gensym();
+    my $write_handle = Symbol::gensym();
+    pipe $read_handle, $write_handle
       or Firefox::Marionette::Exception->throw(
-        "Failed to open directory '$directory':$EXTENDED_OS_ERROR");
+        "Failed to create pipe:$EXTENDED_OS_ERROR");
+    $write_handle = IO::Handle->new_from_fd( fileno $write_handle, '>' );
+    $write_handle->autoflush(1);
+    $read_handle = IO::Handle->new_from_fd( fileno $read_handle, '<' );
+    $read_handle->autoflush(1);
+    fcntl $write_handle, Fcntl::F_SETFD(), 0
+      or Firefox::Marionette::Exception->throw(
+"Failed to clear close-on-exec flag on pipe write handle: $EXTENDED_OS_ERROR"
+      );
+    my $binary    = 'ls';
+    my @arguments = ( '-1', $directory );
+    my @entries;
+
+    if ( my $pid = fork ) {
+        close $write_handle
+          or Firefox::Marionette::Exception->throw(
+            "Failed to close write handle for pipe:$EXTENDED_OS_ERROR");
+        while ( my $entry = <$read_handle> ) {
+            push @entries, $self->_remote_catfile( $directory, $entry );
+        }
+        close $read_handle
+          or Firefox::Marionette::Exception->throw( 'Failed to read from "'
+              . ( join q[ ], $binary, @arguments )
+              . q[" at ]
+              . $self->_ssh_address()
+              . ":$EXTENDED_OS_ERROR" );
+        waitpid $pid, 0;
+        if ( $CHILD_ERROR != 0 ) {
+            Firefox::Marionette::Exception->throw( 'Failed to execute "'
+                  . ( join q[ ], $binary, @arguments )
+                  . q[" at ]
+                  . $self->_ssh_address() . q[:]
+                  . $self->_error_message( 'ssh', $CHILD_ERROR ) );
+        }
+    }
+    elsif ( defined $pid ) {
+        eval {
+            close $read_handle
+              or Firefox::Marionette::Exception->throw(
+                "Failed to close read pipe in child:$EXTENDED_OS_ERROR");
+            open STDOUT, '>&', $write_handle
+              or Firefox::Marionette::Exception->throw(
+"Failed to redirect STDOUT to pipe write handle:$EXTENDED_OS_ERROR"
+              );
+            local $OUTPUT_AUTOFLUSH = 1;
+            $self->_ssh_exec( $self->_ssh_parameters(),
+                $self->_ssh_address(), $binary, @arguments )
+              or Firefox::Marionette::Exception->throw(
+                "Failed to exec 'ssh':$EXTENDED_OS_ERROR");
+        } or do {
+            chomp $EVAL_ERROR;
+            warn "$EVAL_ERROR\n";
+        };
+    }
+    else {
+        Firefox::Marionette::Exception->throw(
+            "Failed to fork:$EXTENDED_OS_ERROR");
+    }
+    return @entries;
+}
+
+sub _directory_listing {
+    my ( $self, $directory ) = @_;
+    my @entries;
+    if ( my $ssh = $self->_ssh() ) {
+        @entries = $self->_directory_listing_via_ssh($directory);
+    }
+    else {
+        my $handle = DirHandle->new($directory)
+          or Firefox::Marionette::Exception->throw(
+            "Failed to open directory '$directory':$EXTENDED_OS_ERROR");
+        while ( my $entry = $handle->read() ) {
+            next if ( $entry eq File::Spec->updir() );
+            next if ( $entry eq File::Spec->curdir() );
+            push @entries, File::Spec->catfile( $directory, $entry );
+        }
+        $handle->close()
+          or Firefox::Marionette::Exception->throw(
+            "Failed to close directory '$directory':$EXTENDED_OS_ERROR");
+    }
+    return @entries;
+}
+
+sub downloading {
+    my ($self) = @_;
     my $downloading = 0;
-    while ( my $entry = $handle->read() ) {
-        next if ( $entry eq File::Spec->updir() );
-        next if ( $entry eq File::Spec->curdir() );
+    foreach
+      my $entry ( $self->_directory_listing( $self->_download_directory() ) )
+    {
         if ( $entry =~ /[.]part$/smx ) {
             $downloading = 1;
             Carp::carp("Waiting for $entry to download");
         }
     }
-    $handle->close()
-      or Firefox::Marionette::Exception->throw(
-        "Failed to close directory '$directory':$EXTENDED_OS_ERROR");
     return $downloading;
 }
 
 sub downloads {
-    my ($self)    = @_;
-    my $directory = $self->_download_directory();
-    my $handle    = DirHandle->new($directory)
-      or Firefox::Marionette::Exception->throw(
-        "Failed to open directory '$directory':$EXTENDED_OS_ERROR");
-    my @entries;
-    while ( my $entry = $handle->read() ) {
-        next if ( $entry eq File::Spec->updir() );
-        next if ( $entry eq File::Spec->curdir() );
-        push @entries, File::Spec->catfile( $directory, $entry );
-    }
-    $handle->close()
-      or Firefox::Marionette::Exception->throw(
-        "Failed to close directory '$directory':$EXTENDED_OS_ERROR");
-    return @entries;
+    my ($self) = @_;
+    return $self->_directory_listing( $self->_download_directory() );
 }
 
 sub _setup_ssh {
-    my ( $self, $host, $user ) = @_;
+    my ( $self, $host, $port, $user ) = @_;
     $self->{_ssh_control_directory} = File::Temp->newdir(
         File::Spec->catdir( File::Spec->tmpdir(), 'perl_ff_m_XXXXXXXXXXX' ) )
       or Firefox::Marionette::Exception->throw(
         "Failed to create temporary directory:$EXTENDED_OS_ERROR");
-    if ( !defined $user ) {
-        $user = getpwuid $EFFECTIVE_USER_ID;
-    }
     $self->{_ssh} = {
         host         => $host,
-        user         => $user,
         control_path => File::Spec->catfile(
             $self->{_ssh_control_directory}->dirname(),
             'control.sock'
         ),
     };
+    if ( defined $user ) {
+        $self->{_ssh}->{user} = $user;
+    }
+    if ( defined $port ) {
+        $self->{_ssh}->{port} = $port;
+    }
     return;
 }
 
@@ -236,7 +321,7 @@ sub _ssh {
     return $self->{_ssh};
 }
 
-sub new {
+sub _init {
     my ( $class, %parameters ) = @_;
     my $self = bless {}, $class;
     $self->{last_message_id}  = 0;
@@ -245,13 +330,18 @@ sub new {
     $self->{survive}          = $parameters{survive};
     $self->{debug}            = $parameters{debug};
     if ( defined $parameters{host} ) {
-        $self->_setup_ssh( $parameters{host}, $parameters{user} );
+        $self->_setup_ssh( $parameters{host}, $parameters{port},
+            $parameters{user} );
     }
     if ( defined $parameters{width} ) {
         $self->{window_width} = $parameters{width};
     }
     if ( defined $parameters{height} ) {
         $self->{window_height} = $parameters{height};
+    }
+    if ( defined $parameters{har} ) {
+        $self->{_har} = $parameters{har};
+        require Firefox::Marionette::HarExportTrigger;
     }
     $self->{mime_types} = [
         qw(
@@ -293,13 +383,14 @@ sub new {
             $known_mime_types{$mime_type} = 1;
         }
     }
+    return $self;
+}
+
+sub new {
+    my ( $class, %parameters ) = @_;
+    my $self      = $class->_init(%parameters);
     my @arguments = $self->_setup_arguments(%parameters);
-    if ( $self->_ssh() ) {
-        $self->{_pid} = $self->_launch(@arguments);
-    }
-    else {
-        $self->{_pid} = $self->_launch(@arguments);
-    }
+    $self->{_pid} = $self->_launch(@arguments);
     my $socket = $self->_setup_local_connection_to_firefox(@arguments);
     my ( $session_id, $capabilities ) =
       $self->_initial_socket_setup( $socket, $parameters{capabilities} );
@@ -325,7 +416,53 @@ sub new {
         );
     }
     $self->_check_timeout_parameters(%parameters);
+    if ( $self->{_har} ) {
+        $self->{_har_addon_directory} = File::Temp->newdir(
+            File::Spec->catdir(
+                File::Spec->tmpdir(),
+                'firefox_marionette_har_addon_directory_XXXXXXXXXXX'
+            )
+          )
+          or Firefox::Marionette::Exception->throw(
+            "Failed to create temporary directory:$EXTENDED_OS_ERROR");
+        my $path = File::Spec->catfile(
+            $self->{_har_addon_directory},
+            'har_export_trigger-0.6.1-an+fx.xpi'
+        );
+        my $handle = FileHandle->new(
+            $path,
+            Fcntl::O_WRONLY() | Fcntl::O_CREAT() | Fcntl::O_EXCL(),
+            Fcntl::S_IRUSR() | Fcntl::S_IWUSR()
+          )
+          or Firefox::Marionette::Exception->throw(
+            "Failed to open '$path' for writing:$EXTENDED_OS_ERROR");
+        binmode $handle;
+        $handle->print(
+            MIME::Base64::decode_base64(
+                Firefox::Marionette::HarExportTrigger->as_string()
+            )
+          )
+          or Firefox::Marionette::Exception->throw(
+            "Failed to write to '$path':$EXTENDED_OS_ERROR");
+        $handle->close()
+          or Firefox::Marionette::Exception->throw(
+            "Failed to close '$path':$EXTENDED_OS_ERROR");
+        $self->install( $path, 0 );
+        unlink $path
+          or Firefox::Marionette::Exception->throw(
+            "Failed to unlink '$path':$EXTENDED_OS_ERROR");
+        delete $self->{_har_addon_directory};
+    }
     return $self;
+}
+
+sub har {
+    my ($self)  = @_;
+    my $context = $self->context('content');
+    my $log     = $self->script(
+        'return (async function() { return await HAR.triggerExport() })();');
+    $self->context($context);
+    return { log => $log };
 }
 
 sub _check_timeout_parameters {
@@ -364,7 +501,9 @@ sub _check_addons {
     my ( $self, %parameters ) = @_;
     $self->{addons} = 1;
     my @arguments = ();
-    if ( !$parameters{addons} ) {
+    if ( $self->{_har} ) {
+    }
+    elsif ( !$parameters{addons} ) {
         if ( $self->_is_safe_mode_okay() ) {
             push @arguments, '-safe-mode';
             $self->{addons} = 0;
@@ -394,7 +533,8 @@ sub _check_visible {
         }
         elsif (( $OSNAME eq 'MSWin32' )
             || ( $OSNAME eq 'darwin' )
-            || ( $OSNAME eq 'cygwin' ) )
+            || ( $OSNAME eq 'cygwin' )
+            || ( $self->_ssh() ) )
         {
         }
         else {
@@ -421,6 +561,7 @@ sub _launch_xvfb_if_required {
         if (   ( $OSNAME eq 'MSWin32' )
             || ( $OSNAME eq 'darwin' )
             || ( $OSNAME eq 'cygwin' )
+            || ( $self->_ssh() )
             || ( $ENV{DISPLAY} )
             || ( $self->{_launched_xvfb_anyway} ) )
         {
@@ -437,7 +578,13 @@ sub _setup_arguments {
     my @arguments = qw(-marionette);
 
     if ( $parameters{firefox_binary} ) {
+        Carp::carp(
+            '**** DEPRECATED - firefox_binary HAS BEEN REPLACED BY firefox ****'
+        );
         $self->{firefox_binary} = $parameters{firefox_binary};
+    }
+    elsif ( $parameters{firefox} ) {
+        $self->{firefox_binary} = $parameters{firefox};
     }
     if ( defined $self->{window_width} ) {
         push @arguments, '-width', $self->{window_width};
@@ -497,9 +644,11 @@ _RDF_
         else {
             my $path =
               File::Spec->catfile( $profile_directory, 'mimeTypes.rdf' );
-            my $handle =
-              FileHandle->new( $path,
-                Fcntl::O_WRONLY() | Fcntl::O_CREAT() | Fcntl::O_EXCL() )
+            my $handle = FileHandle->new(
+                $path,
+                Fcntl::O_WRONLY() | Fcntl::O_CREAT() | Fcntl::O_EXCL(),
+                Fcntl::S_IRUSR() | Fcntl::S_IWUSR()
+              )
               or Firefox::Marionette::Exception->throw(
                 "Failed to open '$path' for writing:$EXTENDED_OS_ERROR");
             $handle->print($mime_types_content)
@@ -511,55 +660,34 @@ _RDF_
         }
         push @arguments,
           ( '-profile', $profile_directory, '--no-remote', '--new-instance' );
+        if ( $self->{_har} ) {
+            push @arguments, '--devtools';
+        }
     }
     return @arguments;
 }
 
 sub _write_mime_types_via_ssh {
     my ( $self, $mime_types_content ) = @_;
-    my $read_handle  = Symbol::gensym();
-    my $write_handle = Symbol::gensym();
-    pipe $read_handle, $write_handle
-      or Carp::croak("Failed to create pipe:$EXTENDED_OS_ERROR");
-    $write_handle = IO::Handle->new_from_fd( fileno $write_handle, '>' );
-    $write_handle->autoflush(1);
-    $read_handle = IO::Handle->new_from_fd( fileno $read_handle, '<' );
-    $read_handle->autoflush(1);
-    fcntl $read_handle, Fcntl::F_SETFD(), 0
+    my $handle = File::Temp::tempfile(
+        File::Spec->catfile(
+            File::Spec->tmpdir(),
+            'firefox_marionette_mime_type_data_XXXXXXXXXXX'
+        )
+      )
       or Firefox::Marionette::Exception->throw(
-"Failed to clear close-on-exec flag on pipe read handle: $EXTENDED_OS_ERROR"
-      );
-    my $destination =
-      $self->_remote_catfile( $self->{profile_directory}, 'mimeTypes.rdf' );
-
-    if ( my $pid = fork ) {
-        print {$write_handle} $mime_types_content
-          or Carp::croak("Failed to write to $destination");
-        close $write_handle
-          or Carp::croak("Failed to close $destination");
-        waitpid $pid, 0;
-        if ( $CHILD_ERROR != 0 ) {
-            Carp::croak("Failed to copy mime type data to $destination");
-        }
-    }
-    elsif ( defined $pid ) {
-        eval {
-            open STDIN, '<&', $read_handle
-              or Carp::croak(
-"Failed to redirect STDIN to pipe read handle:$EXTENDED_OS_ERROR"
-              );
-            $self->_ssh_exec( $self->_ssh_parameters(),
-                $self->_ssh_address(), "cat >$destination" )
-              or Firefox::Marionette::Exception->throw(
-                "Failed to exec 'ssh':$EXTENDED_OS_ERROR");
-        } or do {
-            chomp $EVAL_ERROR;
-            warn "$EVAL_ERROR\n";
-        };
-    }
-    else {
-        Carp::croak("Failed to fork:$EXTENDED_OS_ERROR");
-    }
+        "Failed to open temporary file for writing:$EXTENDED_OS_ERROR");
+    print {$handle} $mime_types_content
+      or Firefox::Marionette::Exception->throw(
+        "Failed to write to temporary file:$EXTENDED_OS_ERROR");
+    seek $handle, 0, Fcntl::SEEK_SET()
+      or Firefox::Marionette::Exception->throw(
+        "Failed to seek to start of temporary file:$EXTENDED_OS_ERROR");
+    $self->_put_file_via_ssh(
+        $handle,
+        $self->_remote_catfile( $self->{_profile_directory}, 'mimeTypes.rdf' ),
+        'mime type data'
+    );
     return;
 }
 
@@ -661,7 +789,8 @@ sub execute {
         $pid =
           IPC::Open3::open3( $writer, $reader, $error, $binary, @arguments );
     } or do {
-        Carp::croak("Failed to execute '$binary':$EXTENDED_OS_ERROR");
+        Firefox::Marionette::Exception->throw(
+            "Failed to execute '$binary':$EXTENDED_OS_ERROR");
     };
     waitpid $pid, 0;
     if ( $CHILD_ERROR == 0 ) {
@@ -672,14 +801,15 @@ sub execute {
             $output .= $buffer;
         }
         defined $result
-          or Carp::croak( q[Failed to read STDOUT from ']
+          or
+          Firefox::Marionette::Exception->throw( q[Failed to read STDOUT from ']
               . ( join q[ ], $binary, @arguments )
               . "':$EXTENDED_OS_ERROR" );
         chomp $output;
         return $output;
     }
     else {
-        Carp::croak( q[Failed to execute ']
+        Firefox::Marionette::Exception->throw( q[Failed to execute ']
               . ( join q[ ], $binary, @arguments ) . q[':]
               . $proto->_error_message( $binary, $CHILD_ERROR ) );
     }
@@ -692,7 +822,8 @@ sub _get_version_via_ssh {
     my $read_handle  = Symbol::gensym();
     my $write_handle = Symbol::gensym();
     pipe $read_handle, $write_handle
-      or Carp::croak("Failed to create pipe:$EXTENDED_OS_ERROR");
+      or Firefox::Marionette::Exception->throw(
+        "Failed to create pipe:$EXTENDED_OS_ERROR");
     $write_handle = IO::Handle->new_from_fd( fileno $write_handle, '>' );
     $write_handle->autoflush(1);
     $read_handle = IO::Handle->new_from_fd( fileno $read_handle, '<' );
@@ -840,7 +971,8 @@ sub _launch_via_ssh {
         exit 1;
     }
     else {
-        Carp::croak("Failed to fork:$EXTENDED_OS_ERROR");
+        Firefox::Marionette::Exception->throw(
+            "Failed to fork:$EXTENDED_OS_ERROR");
     }
     return;
 }
@@ -971,10 +1103,11 @@ sub xvfb {
 
 sub _launch_xauth {
     my ( $self, $display_number ) = @_;
-    my $auth_handle =
-      FileHandle->new( $ENV{XAUTHORITY},
+    my $auth_handle = FileHandle->new(
+        $ENV{XAUTHORITY},
         Fcntl::O_CREAT() | Fcntl::O_WRONLY() | Fcntl::O_EXCL(),
-        Fcntl::S_IRWXU() )
+        Fcntl::S_IRUSR() | Fcntl::S_IWUSR()
+      )
       or Firefox::Marionette::Exception->throw(
         "Failed to open '$ENV{XAUTHORITY}' for writing:$EXTENDED_OS_ERROR");
     $auth_handle->close()
@@ -1518,7 +1651,13 @@ sub _remote_catfile {
 
 sub _ssh_address {
     my ($self) = @_;
-    my $address = join q[], $self->{_ssh}->{user}, q[@], $self->{_ssh}->{host};
+    my $address;
+    if ( defined $self->{_ssh}->{user} ) {
+        $address = join q[], $self->{_ssh}->{user}, q[@], $self->{_ssh}->{host};
+    }
+    else {
+        $address = $self->{_ssh}->{host};
+    }
     return $address;
 }
 
@@ -1530,12 +1669,17 @@ sub _ssh_parameters {
         '-o' => 'ExitOnForwardFailure=yes',
         '-o' => 'BatchMode=yes',
     );
+    if ( my $ssh = $self->_ssh() ) {
+        if ( my $port = $ssh->{port} ) {
+            push @parameters, ( '-p' => $port, );
+        }
+    }
     if ( $parameters{master} ) {
         push @parameters,
           (
             '-o' => 'ControlPath=' . $self->_control_path(),
             '-o' => 'ControlMaster=yes',
-            '-o' => 'ControlPersist=yes',
+            '-o' => 'ControlPersist=30',
           );
     }
     else {
@@ -1557,25 +1701,22 @@ sub _ssh_exec {
 }
 
 sub _make_remote_directory {
-    my ($self) = @_;
-    my $profile_directory =
-      File::Temp::mktemp('.firefox_marionette_profile_XXXXXXXXXXX');
+    my ( $self, $path ) = @_;
     if ( my $pid = fork ) {
         waitpid $pid, 0;
         if ( $CHILD_ERROR != 0 ) {
             Firefox::Marionette::Exception->throw(
                     'Failed to create directory '
                   . $self->_ssh_address()
-                  . ":$profile_directory:"
+                  . ":$path:"
                   . $self->_error_message( 'ssh', $CHILD_ERROR ) );
         }
-        return $profile_directory;
+        return $path;
     }
     elsif ( defined $pid ) {
         eval {
             $self->_ssh_exec( $self->_ssh_parameters(),
-                $self->_ssh_address(), 'mkdir', '-m', '700',
-                $profile_directory )
+                $self->_ssh_address(), 'mkdir', '-m', '700', $path )
               or Firefox::Marionette::Exception->throw(
                 "Failed to exec 'ssh':$EXTENDED_OS_ERROR");
         } or do {
@@ -1596,31 +1737,52 @@ sub _make_remote_directory {
 sub _setup_new_profile {
     my ( $self, $profile ) = @_;
     if ( $self->_ssh() ) {
-        $self->{profile_directory} = $self->_make_remote_directory();
+        $self->{_remote_tmp_directory} = $self->_get_remote_tmp_directory();
+        my $name = File::Temp::mktemp('firefox_marionette_remote_XXXXXXXXXXX');
+        $self->{_root_directory} = $self->_make_remote_directory(
+            $self->_remote_catfile( $self->{_remote_tmp_directory}, $name ) );
+        $self->{_profile_directory} = $self->_make_remote_directory(
+            $self->_remote_catfile( $self->{_root_directory}, 'profile' ) );
+        $self->{_download_directory} = $self->_make_remote_directory(
+            $self->_remote_catfile( $self->{_root_directory}, 'downloads' ) );
     }
     else {
-        $self->{profile_directory} = File::Temp->newdir(
+        $self->{_root_directory} = File::Temp->newdir(
             File::Spec->catdir(
-                File::Spec->tmpdir(), 'firefox_marionette_profile_XXXXXXXXXXX'
+                File::Spec->tmpdir(), 'firefox_marionette_local_XXXXXXXXXXX'
             )
           )
           or Firefox::Marionette::Exception->throw(
             "Failed to create temporary directory:$EXTENDED_OS_ERROR");
+        my $profile_directory =
+          File::Spec->catdir( $self->{_root_directory}, 'profile' );
+        mkdir $profile_directory, Fcntl::S_IRWXU()
+          or Firefox::Marionette::Exception->throw(
+            "Failed to create directory $profile_directory:$EXTENDED_OS_ERROR");
+        $self->{_profile_directory} = $profile_directory;
+        my $download_directory =
+          File::Spec->catdir( $self->{_root_directory}, 'downloads' );
+        mkdir $download_directory, Fcntl::S_IRWXU()
+          or Firefox::Marionette::Exception->throw(
+            "Failed to create directory $download_directory:$EXTENDED_OS_ERROR"
+          );
+        $self->{_download_directory} = $download_directory;
     }
     my $profile_path;
     if ( $self->_ssh() ) {
         $profile_path =
-          $self->_remote_catfile( $self->{profile_directory}, 'prefs.js' );
+          $self->_remote_catfile( $self->{_profile_directory}, 'prefs.js' );
     }
     else {
         $profile_path =
-          File::Spec->catfile( $self->{profile_directory}, 'prefs.js' );
+          File::Spec->catfile( $self->{_profile_directory}, 'prefs.js' );
     }
     $self->{profile_path} = $profile_path;
     if ($profile) {
     }
     else {
-        $profile = Firefox::Marionette::Profile->new();
+        my %parameters = ( download_directory => $self->{_download_directory} );
+        $profile = Firefox::Marionette::Profile->new(%parameters);
     }
     my $mime_types = join q[,], $self->mime_types();
     $profile->set_value( 'browser.helperApps.neverAsk.saveToDisk',
@@ -1645,15 +1807,36 @@ sub _setup_new_profile {
     else {
         $profile->save($profile_path);
     }
-    return $self->{profile_directory};
+    return $self->{_profile_directory};
 }
 
 sub _save_profile_via_ssh {
     my ( $self, $profile ) = @_;
+    my $handle = File::Temp::tempfile(
+        File::Spec->catfile(
+            File::Spec->tmpdir(),
+            'firefox_marionette_saved_profile_XXXXXXXXXXX'
+        )
+      )
+      or Firefox::Marionette::Exception->throw(
+        "Failed to open temporary file for writing:$EXTENDED_OS_ERROR");
+    print {$handle} $profile->as_string()
+      or Firefox::Marionette::Exception->throw(
+        "Failed to write to temporary file:$EXTENDED_OS_ERROR");
+    seek $handle, 0, Fcntl::SEEK_SET()
+      or Firefox::Marionette::Exception->throw(
+        "Failed to seek to start of temporary file:$EXTENDED_OS_ERROR");
+    $self->_put_file_via_ssh( $handle, $self->{profile_path}, 'profile data' );
+    return;
+}
+
+sub _put_file_via_ssh {
+    my ( $self, $original_handle, $path, $description ) = @_;
     my $read_handle  = Symbol::gensym();
     my $write_handle = Symbol::gensym();
     pipe $read_handle, $write_handle
-      or Carp::croak("Failed to create pipe:$EXTENDED_OS_ERROR");
+      or Firefox::Marionette::Exception->throw(
+        "Failed to create pipe:$EXTENDED_OS_ERROR");
     $write_handle = IO::Handle->new_from_fd( fileno $write_handle, '>' );
     $write_handle->autoflush(1);
     $read_handle = IO::Handle->new_from_fd( fileno $read_handle, '<' );
@@ -1662,22 +1845,29 @@ sub _save_profile_via_ssh {
       or Firefox::Marionette::Exception->throw(
 "Failed to clear close-on-exec flag on pipe read handle: $EXTENDED_OS_ERROR"
       );
-    my $destination = $self->{profile_path};
 
     if ( my $pid = fork ) {
         close $read_handle
           or Firefox::Marionette::Exception->throw(
             "Failed to close read handle for pipe:$EXTENDED_OS_ERROR");
-        print {$write_handle} $profile->as_string()
-          or Firefox::Marionette::Exception->throw(
-            "Failed to write to $destination:$EXTENDED_OS_ERROR");
-        close $write_handle or Carp::croak("Failed to close $destination");
+        my $result;
+        while ( $result = sysread $original_handle, my $buffer,
+            _REMOTE_READ_BUFFER_SIZE() )
+        {
+            print {$write_handle} $buffer
+              or Firefox::Marionette::Exception->throw(
+                "Failed to write to $path:$EXTENDED_OS_ERROR");
+        }
+        close $write_handle
+          or Firefox::Marionette::Exception->throw( 'Failed to close '
+              . $self->_ssh_address()
+              . ":$path:$EXTENDED_OS_ERROR" );
         waitpid $pid, 0;
         if ( $CHILD_ERROR != 0 ) {
             Firefox::Marionette::Exception->throw(
-                    'Failed to copy profile data to '
+                    "Failed to copy $description to "
                   . $self->_ssh_address()
-                  . ":$destination:"
+                  . ":$path:"
                   . $self->_error_message( 'ssh', $CHILD_ERROR ) );
         }
     }
@@ -1687,11 +1877,11 @@ sub _save_profile_via_ssh {
               or Firefox::Marionette::Exception->throw(
                 "Failed to close write handle for pipe:$EXTENDED_OS_ERROR");
             open STDIN, '<&', $read_handle
-              or Carp::croak(
+              or Firefox::Marionette::Exception->throw(
 "Failed to redirect STDIN to pipe read handle:$EXTENDED_OS_ERROR"
               );
             $self->_ssh_exec( $self->_ssh_parameters(),
-                $self->_ssh_address(), "cat >$destination" )
+                $self->_ssh_address(), "cat >$path" )
               or Firefox::Marionette::Exception->throw(
                 "Failed to exec 'ssh':$EXTENDED_OS_ERROR");
         } or do {
@@ -1707,12 +1897,33 @@ sub _save_profile_via_ssh {
 }
 
 sub _get_port_via_ssh {
-    my ($self) = @_;
+    my ($self)        = @_;
+    my $handle        = $self->_get_file_via_ssh( $self->{profile_path} );
+    my $sandbox_regex = $self->_sandbox_regex();
+    my $port;
+    while ( my $line = <$handle> ) {
+        if ( $line =~ /^user_pref[(]"marionette[.]port",[ ]*(\d+)[)];\s*$/smx )
+        {
+            $port = $1;
+        }
+        elsif (
+            $line =~ /^user_pref[(]"$sandbox_regex",[ ]*"([^"]+)"[)];\s*$/smx )
+        {
+            my ( $sandbox, $uuid ) = ( $1, $2 );
+            $self->{_ssh}->{sandbox}->{$sandbox} = $uuid;
+        }
+    }
+    return $port;
+}
+
+sub _get_file_via_ssh {
+    my ( $self, $path, $description ) = @_;
     my $port;
     my $read_handle  = Symbol::gensym();
     my $write_handle = Symbol::gensym();
     pipe $read_handle, $write_handle
-      or Carp::croak("Failed to create pipe:$EXTENDED_OS_ERROR");
+      or Firefox::Marionette::Exception->throw(
+        "Failed to create pipe:$EXTENDED_OS_ERROR");
     $write_handle = IO::Handle->new_from_fd( fileno $write_handle, '>' );
     $write_handle->autoflush(1);
     $read_handle = IO::Handle->new_from_fd( fileno $read_handle, '<' );
@@ -1721,7 +1932,13 @@ sub _get_port_via_ssh {
       or Firefox::Marionette::Exception->throw(
 "Failed to clear close-on-exec flag on pipe write handle: $EXTENDED_OS_ERROR"
       );
-    my $source = $self->{profile_path};
+    my $handle = File::Temp::tempfile(
+        File::Spec->catfile(
+            File::Spec->tmpdir(), 'firefox_marionette_get_file_ssh_XXXXXXXXXXX'
+        )
+      )
+      or Firefox::Marionette::Exception->throw(
+        "Failed to open temporary file for writing:$EXTENDED_OS_ERROR");
 
     if ( my $pid = fork ) {
         close $write_handle
@@ -1731,38 +1948,31 @@ sub _get_port_via_ssh {
         while ( $result = sysread $read_handle, my $buffer,
             _REMOTE_READ_BUFFER_SIZE() )
         {
-            $contents .= $buffer;
+            print {$handle} $buffer
+              or Firefox::Marionette::Exception->throw(
+                "Failed to write to temporary file:$EXTENDED_OS_ERROR");
         }
         defined $result
           or Firefox::Marionette::Exception->throw(
-                'Failed to read profile data from '
+                "Failed to read $description from "
               . $self->_ssh_address()
-              . ":$source:$EXTENDED_OS_ERROR" );
-        my $sandbox_regex = $self->_sandbox_regex();
-        foreach my $line ( split /\r?\n/smx, $contents ) {
-            if ( $line =~
-                /^user_pref[(]"marionette[.]port",[ ]*(\d+)[)];\s*$/smx )
-            {
-                $port = $1;
-            }
-            elsif ( $line =~
-                /^user_pref[(]"$sandbox_regex",[ ]*"([^"]+)"[)];\s*$/smx )
-            {
-                my ( $sandbox, $uuid ) = ( $1, $2 );
-                $self->{_ssh}->{sandbox}->{$sandbox} = $uuid;
-            }
-        }
+              . ":$path:$EXTENDED_OS_ERROR" );
         close $read_handle
           or Firefox::Marionette::Exception->throw( 'Failed to close '
               . $self->_ssh_address()
-              . ":$source:$EXTENDED_OS_ERROR" );
+              . ":$path:$EXTENDED_OS_ERROR" );
         waitpid $pid, 0;
         if ( $CHILD_ERROR != 0 ) {
             Firefox::Marionette::Exception->throw(
-                    'Failed to successfully retrieve profile data from '
-                  . $self->_ssh_address() . q[:]
+                    "Failed to successfully retrieve $description from "
+                  . $self->_ssh_address()
+                  . ":$path:"
                   . $self->_error_message( 'ssh', $CHILD_ERROR ) );
         }
+        seek $handle, 0, Fcntl::SEEK_SET()
+          or Firefox::Marionette::Exception->throw(
+            "Failed to seek to start of temporary file:$EXTENDED_OS_ERROR");
+        return $handle;
     }
     elsif ( defined $pid ) {
         eval {
@@ -1775,7 +1985,7 @@ sub _get_port_via_ssh {
               );
             local $OUTPUT_AUTOFLUSH = 1;
             $self->_ssh_exec( $self->_ssh_parameters(),
-                $self->_ssh_address(), "cat $source" )
+                $self->_ssh_address(), "cat $path" )
               or Firefox::Marionette::Exception->throw(
                 "Failed to exec 'ssh':$EXTENDED_OS_ERROR");
         } or do {
@@ -1787,7 +1997,7 @@ sub _get_port_via_ssh {
         Firefox::Marionette::Exception->throw(
             "Failed to fork:$EXTENDED_OS_ERROR");
     }
-    return $port;
+    return;
 }
 
 sub _get_port {
@@ -2104,7 +2314,7 @@ sub _create_capabilities {
         rotatable        => $parameters->{rotatable} ? 1 : 0,
         platform_version => $parameters->{platformVersion},
         moz_profile      => $parameters->{'moz:profile'}
-          || $self->{profile_directory},
+          || $self->{_profile_directory},
         moz_process_id => $pid,
         moz_build_id   => $parameters->{'moz:buildID'}
           || $parameters->{appBuildId},
@@ -3563,11 +3773,20 @@ sub _sandbox_prefix {
 
 sub _get_remote_tmp_directory {
     my ($self) = @_;
-    my $directory;
+    my $tmp_dir =
+      $self->_get_remote_environment_variable_via_ssh('TMPDIR') || '/tmp';
+    $tmp_dir =~ s/\/$//smx;    # remove trailing / for darwin
+    return $tmp_dir;
+}
+
+sub _get_remote_environment_variable_via_ssh {
+    my ( $self, $name ) = @_;
+    my $value;
     my $read_handle  = Symbol::gensym();
     my $write_handle = Symbol::gensym();
     pipe $read_handle, $write_handle
-      or Carp::croak("Failed to create pipe:$EXTENDED_OS_ERROR");
+      or Firefox::Marionette::Exception->throw(
+        "Failed to create pipe:$EXTENDED_OS_ERROR");
     $write_handle = IO::Handle->new_from_fd( fileno $write_handle, '>' );
     $write_handle->autoflush(1);
     $read_handle = IO::Handle->new_from_fd( fileno $read_handle, '<' );
@@ -3589,12 +3808,25 @@ sub _get_remote_tmp_directory {
         }
         defined $result
           or Firefox::Marionette::Exception->throw( 'Failed to read ' . q[$]
-              . 'TMPDIR from '
+              . $name
+              . ' from '
               . $self->_ssh_address()
               . ":$EXTENDED_OS_ERROR" );
-        foreach my $line ( split /\r?\n/smx, $contents ) {
-            if ( $line =~ /^TMPDIR="([^"]*)"$/smx ) {
-                $directory = $1;
+        close $read_handle
+          or Firefox::Marionette::Exception->throw(
+            "Failed to close read pipe in parent:$EXTENDED_OS_ERROR");
+        my $waitedpid = waitpid $pid, 0;
+        if ( $CHILD_ERROR != 0 ) {
+            Firefox::Marionette::Exception->throw( q[Failed to 'echo "]
+                  . $name . q[=] . q[\\] . q["] . q[$]
+                  . $name . q[\\] . q["":]
+                  . $self->_error_message( 'ssh', $CHILD_ERROR ) );
+        }
+        if ( defined $contents ) {
+            foreach my $line ( split /\r?\n/smx, $contents ) {
+                if ( $line =~ /^$name="([^"]*)"$/smx ) {
+                    $value = $1;
+                }
             }
         }
     }
@@ -3608,8 +3840,11 @@ sub _get_remote_tmp_directory {
 "Failed to redirect STDOUT to pipe write handle:$EXTENDED_OS_ERROR"
               );
             local $OUTPUT_AUTOFLUSH = 1;
-            $self->_ssh_exec( $self->_ssh_parameters(),
-                $self->_ssh_address(), 'echo "TMPDIR=' . q[$] . 'TMPDIR"' )
+            $self->_ssh_exec( $self->_ssh_parameters(), $self->_ssh_address(),
+                    'echo "'
+                  . $name . q[=] . q[\\] . q["] . q[$]
+                  . $name . q[\\]
+                  . q[""] )
               or Firefox::Marionette::Exception->throw(
                 "Failed to exec 'ssh':$EXTENDED_OS_ERROR");
         } or do {
@@ -3621,18 +3856,18 @@ sub _get_remote_tmp_directory {
         Firefox::Marionette::Exception->throw(
             "Failed to fork:$EXTENDED_OS_ERROR");
     }
-    return $directory;
+    return $value;
 }
 
 sub _cleanup_remote_filesystem {
     my ($self) = @_;
-    if ( ( my $ssh = $self->_ssh() ) && ( defined $self->{profile_directory} ) )
+    if (   ( my $ssh = $self->_ssh() )
+        && ( defined $self->{_root_directory} ) )
     {
-        my @remote_directories = ( $self->{profile_directory} );
-        my $tmp_directory      = $self->_get_remote_tmp_directory() || '/tmp';
+        my @remote_directories = ( $self->{_root_directory} );
         foreach my $sandbox ( sort { $a cmp $b } keys %{ $ssh->{sandbox} } ) {
             push @remote_directories,
-                $tmp_directory . q[/]
+                $self->{_remote_tmp_directory} . q[/]
               . $self->_sandbox_prefix()
               . $ssh->{sandbox}->{$sandbox};
         }
@@ -3641,7 +3876,11 @@ sub _cleanup_remote_filesystem {
             if ( $CHILD_ERROR != 0 ) {
                 Firefox::Marionette::Exception->throw(
                     q[Failed to 'rm -Rf ] . join q[ ],
-                    @remote_directories . q[' for ] . $self->_ssh_address() );
+                    @remote_directories
+                      . q[' for ]
+                      . $self->_ssh_address()
+                      . $self->_error_message( 'ssh', $CHILD_ERROR )
+                );
             }
         }
         elsif ( defined $pid ) {
@@ -3726,8 +3965,6 @@ sub _terminate_process {
                 $self->_reap();
             }
         }
-        $self->_cleanup_remote_filesystem();
-        $self->_terminate_master_control_via_ssh();
     }
     elsif ( $OSNAME eq 'MSWin32' ) {
         if ( $self->{_win32_process} ) {
@@ -3842,6 +4079,9 @@ sub async_script {
             { script => $script, %parameters }
         ]
     );
+
+    #    my $response = $self->_get_response($message_id);
+    #    return $self->_response_result_value($response);
     return $self;
 }
 
@@ -3915,10 +4155,12 @@ sub json {
 }
 
 sub strip {
-    my ($self)  = @_;
-    my $content = $self->html();
-    my $header  = qr/<html[^>]*><head><link[^>]+><\/head><body><pre>/smx;
-    my $footer  = qr/<\/pre><\/body><\/html>/smx;
+    my ($self)       = @_;
+    my $content      = $self->html();
+    my $head_regex   = qr/<head><link[^>]+><\/head>/smx;
+    my $script_regex = qr/(?:<script[^>]+><\/script>)?/smx;
+    my $header       = qr/<html[^>]*>$script_regex$head_regex<body><pre>/smx;
+    my $footer       = qr/<\/pre><\/body><\/html>/smx;
     $content =~ s/^$header(.*)$footer$/$1/smx;
     return $content;
 }
@@ -4102,7 +4344,7 @@ sub bye {
                 $found = 0;
             }
             else {
-                Carp::croak($EVAL_ERROR);
+                Firefox::Marionette::Exception->throw($EVAL_ERROR);
             }
           };
     }
@@ -4132,7 +4374,7 @@ sub await {
             {
             }
             elsif ( ref $EVAL_ERROR ) {
-                Carp::croak($EVAL_ERROR);
+                Firefox::Marionette::Exception->throw($EVAL_ERROR);
             }
         };
         if ( !$result ) {
@@ -4145,6 +4387,22 @@ sub await {
 
 sub install {
     my ( $self, $path, $temporary ) = @_;
+    my $actual_path;
+    if ( $self->_ssh() ) {
+        $self->{_addons_directory} =
+          $self->_make_remote_directory("$self->{_root_directory}/addons");
+        my ( $volume, $directories, $name ) = File::Spec->splitpath("$path");
+        my $handle = FileHandle->new( $path, Fcntl::O_RDONLY() )
+          or Firefox::Marionette::Exception->throw(
+            "Failed to open $path for reading:$EXTENDED_OS_ERROR");
+        my $remote_name = File::Temp::mktemp( $name . '.XXXXXXXXXXX' );
+        $actual_path =
+          $self->_remote_catfile( $self->{_addons_directory}, $remote_name );
+        $self->_put_file_via_ssh( $handle, $actual_path, 'addon ' . $name );
+    }
+    else {
+        $actual_path = "$path";
+    }
     my $message_id = $self->_new_message_id();
     $self->_send_request(
         [
@@ -4152,7 +4410,7 @@ sub install {
             $message_id,
             $self->_command('Addon:Install'),
             {
-                path      => "$path",
+                path      => $actual_path,
                 temporary => $temporary ? JSON::true() : JSON::false()
             }
         ]
@@ -4308,7 +4566,7 @@ sub _read_from_socket {
             }
         }
     }
-    if ( $self->_debug() ) {
+    if ( ( $self->_debug() ) && ( defined $number_of_bytes_in_response ) ) {
         warn "<< $number_of_bytes_in_response:$json\n";
     }
     return $self->_decode_json($json);
@@ -4372,7 +4630,13 @@ sub DESTROY {
     }
     elsif ( $self->{creation_pid} == $PROCESS_ID ) {
         $self->quit();
-        $self->_cleanup_local_filesystem();
+        if ( $self->_ssh() ) {
+            $self->_cleanup_remote_filesystem();
+            $self->_terminate_master_control_via_ssh();
+        }
+        else {
+            $self->_cleanup_local_filesystem();
+        }
     }
     return;
 }
@@ -4384,18 +4648,20 @@ sub _cleanup_local_filesystem {
             $self->_sandbox_prefix() . $self->{_sandbox}->{$key} );
         rmdir $path
           or ( $OS_ERROR == POSIX::ENOENT() )
-          or Carp::croak("Failed to rmdir $path:$EXTENDED_OS_ERROR");
+          or Firefox::Marionette::Exception->throw(
+            "Failed to rmdir $path:$EXTENDED_OS_ERROR");
     }
     if ( my $control_path = $self->_control_path() ) {
         unlink $control_path
           or ( $OS_ERROR == POSIX::ENOENT() )
-          or Carp::croak("Failed to unlink $control_path:$EXTENDED_OS_ERROR");
+          or Firefox::Marionette::Exception->throw(
+            "Failed to unlink $control_path:$EXTENDED_OS_ERROR");
     }
     if ( my $forwarding_path = $self->_forwarding_path() ) {
         unlink $forwarding_path
           or ( $OS_ERROR == POSIX::ENOENT() )
-          or
-          Carp::croak("Failed to unlink $forwarding_path:$EXTENDED_OS_ERROR");
+          or Firefox::Marionette::Exception->throw(
+            "Failed to unlink $forwarding_path:$EXTENDED_OS_ERROR");
     }
     return;
 }
@@ -4409,7 +4675,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 0.80
+Version 0.81
 
 =head1 SYNOPSIS
 
@@ -4589,6 +4855,31 @@ deletes the current WebDriver session.
 =head2 dismiss_alert
 
 dismisses a currently displayed modal message box
+
+=head2 download
+
+accepts a filesystem path and returns a matching filehandle.  This is trivial for locally running firefox, but sufficiently complex to justify the method for a remote firefox running over ssh.
+
+    use Firefox::Marionette();
+    use v5.10;
+
+    my $firefox = Firefox::Marionette->new( host => 10.1.2.3, firefox => '/Applications/Firefox.app/Contents/MacOS/firefox' )->go('https://metacpan.org/');
+
+    $firefox->find_class('container-fluid')->find_id('search-input')->type('Test::More');
+
+    $firefox->find('//button[@name="lucky"]')->click();
+
+    $firefox->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click();
+
+    while(!$firefox->downloads()) { sleep 1 }
+
+    foreach my $path ($firefox->downloads()) {
+
+        my $handle = $firefox->download($path);
+
+        # do something with downloaded file handle
+
+    }
 
 =head2 downloading
 
@@ -4816,10 +5107,32 @@ To make the L<go|Firefox::Marionette#go> method return quicker, you need to set 
 
     use Firefox::Marionette();
 
-    my $firefox = Firefox::Marionette->new( capabilities => Firefox::Marionette::Capabilities->new( page_load_strategy => 'none' ));
-    $firefox->go('https://metacpan.org/'); # will return immediately after requesting the browser to navigate to metacpan.org
+    my $firefox = Firefox::Marionette->new( capabilities => Firefox::Marionette::Capabilities->new( page_load_strategy => 'eager' ));
+    $firefox->go('https://metacpan.org/'); # will return once the main document has been loaded and parsed, but BEFORE sub-resources (images/stylesheets/frames) have been loaded.
 
 This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
+
+=head2 har
+
+returns a hashref representing the L<http archive|https://en.wikipedia.org/wiki/HAR_(file_format)> of the session.  This function is subject to the L<script|Firefox::Marionette::Timeouts#script> timeout, which, by default is 30 seconds.  It is also possible for the function to hang (until the L<script|Firefox::Marionette::Timeouts#script> timeout) if the original L<devtools|https://developer.mozilla.org/en-US/docs/Tools> window is closed.  The hashref has been designed to be accepted by the L<Archive::Har|Archive::Har> module.  This function should be considered experimental.  Feedback welcome.
+
+    use Firefox::Marionette();
+    use Archive::Har();
+    use v5.10;
+
+    my $firefox = Firefox::Marionette->new(visible => 1, debug => 1, har => 1);
+
+    $firefox->go("http://metacpan.org/");
+
+    $firefox->find('//input[@id="search-input"]')->type('Test::More');
+    $firefox->find_name('lucky')->click($element);
+
+    my $har = Archive::Har->new();
+    $har->hashref($firefox->har());
+
+    foreach my $entry ($har->entries()) {
+        say $entry->request()->url() . " spent " . $entry->timings()->connect() . " ms establishing a TCP connection";
+    }
 
 =head2 html
 
@@ -4922,17 +5235,21 @@ accepts an optional hash as a parameter.  Allowed keys are below;
 
 =item * capabilities - use the supplied L<capabilities|Firefox::Marionette::Capabilities> object, for example to set whether the browser should L<accept insecure certs|Firefox::Marionette::Capabilities#accept_insecure_certs> or whether the browser should use a L<proxy|Firefox::Marionette::Proxy>.
 
-=item * firefox_binary - use the specified path to the L<Firefox|https://firefox.org/> binary, rather than the default path.
+=item * firefox - use the specified path to the L<Firefox|https://firefox.org/> binary, rather than the default path.
 
-=item * debug - should firefox's debug to be available via STDERR. This defaults to "0".
+=item * debug - should firefox's debug to be available via STDERR. This defaults to "0". Any ssh connections will also be printed to STDERR.
 
 =item * height - set the L<height|http://kb.mozillazine.org/Command_line_arguments#List_of_command_line_arguments_.28incomplete.29> of the initial firefox window
 
-=item * host - use L<ssh|https://man.openbsd.org/ssh.1> to create and automate firefox on the specified host.  The "firefox_binary" and "user" parameters may be useful in this case.  Authentication is expected to be via your local ssh-agent.  This has only been tested on linux and darwin environments.  Feedback welcome.
+=item * har - begin the session with the L<devtools|https://developer.mozilla.org/en-US/docs/Tools> window opened in a separate window.  The L<HAR Export Trigger|https://addons.mozilla.org/en-US/firefox/addon/har-export-trigger/> addon will be loaded into the new session automatically, which means that -safe-mode will not be activated for this session AND this functionality will only be available for Firefox 61+.
+
+=item * host - use L<ssh|https://man.openbsd.org/ssh.1> to create and automate firefox on the specified host.  The "firefox", "user" and "port" parameters may be useful in this case.  Authentication is expected to be via your local ssh-agent.  This has only been tested on linux and darwin environments.  This functionality should be considered experimental.  Feedback welcome.
 
 =item * implicit - a shortcut to allow directly providing the L<implicit|Firefox::Marionette::Timeout#implicit> timeout, instead of needing to use timeouts from the capabilities parameter.  Overrides all longer ways.
 
 =item * mime_types - any MIME types that Firefox will encounter during this session.  MIME types that are not specified will result in a hung browser (the File Download popup will appear).
+
+=item * port - if the "host" parameter is also set, the "port" parameter will specify which TCP port the initial ssh connection will be made to.
 
 =item * page_load - a shortcut to allow directly providing the L<page_load|Firefox::Marionette::Timeout#page_load> timeout, instead of needing to use timeouts from the capabilities parameter.  Overrides all longer ways.
 
@@ -4960,7 +5277,7 @@ This method returns a new C<Firefox::Marionette> object, connected to an instanc
  
     use Firefox::Marionette();
 
-    my $remote_darwin_firefox = Firefox::Marionette->new( debug => 1, host => '10.1.2.3', firefox_binary => '/Applications/Firefox.app/Contents/MacOS/firefox');
+    my $remote_darwin_firefox = Firefox::Marionette->new( debug => 1, host => '10.1.2.3', firefox => '/Applications/Firefox.app/Contents/MacOS/firefox');
     ...
 
     foreach my $profile_name (Firefox::Marionette::Profile->names()) {
@@ -5371,6 +5688,8 @@ David Dick  C<< <ddick@cpan.org> >>
  
 Thanks to the entire Mozilla organisation for a great browser and to the team behind Marionette for providing an interface for automation.
  
+Thanks to L<Jan Odvarko|http://www.softwareishard.com/blog/about/> for creating the L<HAR Export Trigger|https://github.com/firefox-devtools/har-export-trigger> extension for Firefox.
+
 Thanks also to the authors of the documentation in the following sources;
 
 =over 4
@@ -5394,6 +5713,8 @@ Copyright (c) 2019, David Dick C<< <ddick@cpan.org> >>. All rights reserved.
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic/perlartistic>.
 
+Includes the L<HAR Export Trigger|https://github.com/firefox-devtools/har-export-trigger>
+extension which is licensed under the Mozilla Public License 2.0.
 
 =head1 DISCLAIMER OF WARRANTY
 

@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.010001;
 
 use ExtUtils::MakeMaker;
 
@@ -15,22 +15,22 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "App-CPANChangesCwaliteeUtils",
   "EXE_FILES" => [
     "script/calc-cpan-changes-cwalitee",
+    "script/cc-cwa",
     "script/list-cpan-changes-cwalitee-indicators"
   ],
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::CPANChangesCwaliteeUtils",
   "PREREQ_PM" => {
     "CPAN::Changes::Cwalitee" => 0,
     "Cwalitee::Common" => "0.002",
     "Data::Sah::Coerce::perl::str::str_normalize_perl_modname" => 0,
-    "Data::Sah::Coerce::perl::str::str_strip_trailing_slash" => 0,
     "Data::Sah::Compiler::perl::TH::array" => 0,
     "Data::Sah::Compiler::perl::TH::bool" => 0,
     "Data::Sah::Compiler::perl::TH::int" => 0,
     "Data::Sah::Compiler::perl::TH::str" => 0,
     "Perinci::CmdLine::Any" => 0,
-    "Perinci::CmdLine::Base" => "1.816",
-    "Perinci::CmdLine::Classic" => "1.770",
+    "Perinci::CmdLine::Lite" => "1.820",
     "Sah::Schema::pathname" => 0,
     "Sah::Schema::perl::modname" => 0,
     "Sah::Schema::uint" => 0,
@@ -43,7 +43,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,7 +54,6 @@ my %FallbackPrereqs = (
   "CPAN::Changes::Cwalitee" => 0,
   "Cwalitee::Common" => "0.002",
   "Data::Sah::Coerce::perl::str::str_normalize_perl_modname" => 0,
-  "Data::Sah::Coerce::perl::str::str_strip_trailing_slash" => 0,
   "Data::Sah::Compiler::perl::TH::array" => 0,
   "Data::Sah::Compiler::perl::TH::bool" => 0,
   "Data::Sah::Compiler::perl::TH::int" => 0,
@@ -63,8 +62,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Perinci::CmdLine::Any" => 0,
-  "Perinci::CmdLine::Base" => "1.816",
-  "Perinci::CmdLine::Classic" => "1.770",
+  "Perinci::CmdLine::Lite" => "1.820",
   "Sah::Schema::pathname" => 0,
   "Sah::Schema::perl::modname" => 0,
   "Sah::Schema::uint" => 0,

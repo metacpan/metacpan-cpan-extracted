@@ -15,17 +15,22 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "App-ModuleAbstractCwaliteeUtils",
   "EXE_FILES" => [
     "script/calc-module-abstract-cwalitee",
-    "script/list-module-abstract-cwalitee-indicators"
+    "script/list-module-abstract-cwalitee-indicators",
+    "script/ma-cwa"
   ],
   "LICENSE" => "perl",
   "NAME" => "App::ModuleAbstractCwaliteeUtils",
   "PREREQ_PM" => {
+    "Data::Sah::Coerce::perl::str::str_normalize_perl_modname" => 0,
+    "Data::Sah::Compiler::perl::TH::array" => 0,
     "Data::Sah::Compiler::perl::TH::bool" => 0,
+    "Data::Sah::Compiler::perl::TH::int" => 0,
     "Data::Sah::Compiler::perl::TH::str" => 0,
     "Module::Abstract::Cwalitee" => 0,
     "Perinci::CmdLine::Any" => 0,
-    "Perinci::CmdLine::Base" => "1.816",
-    "Perinci::CmdLine::Classic" => "1.770"
+    "Perinci::CmdLine::Lite" => "1.820",
+    "Sah::Schema::perl::modname" => 0,
+    "Sah::Schema::uint" => 0
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
@@ -33,7 +38,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,15 +46,19 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Data::Sah::Coerce::perl::str::str_normalize_perl_modname" => 0,
+  "Data::Sah::Compiler::perl::TH::array" => 0,
   "Data::Sah::Compiler::perl::TH::bool" => 0,
+  "Data::Sah::Compiler::perl::TH::int" => 0,
   "Data::Sah::Compiler::perl::TH::str" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Module::Abstract::Cwalitee" => 0,
   "Perinci::CmdLine::Any" => 0,
-  "Perinci::CmdLine::Base" => "1.816",
-  "Perinci::CmdLine::Classic" => "1.770",
+  "Perinci::CmdLine::Lite" => "1.820",
+  "Sah::Schema::perl::modname" => 0,
+  "Sah::Schema::uint" => 0,
   "Test::More" => 0
 );
 

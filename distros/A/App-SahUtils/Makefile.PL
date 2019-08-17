@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
     "script/normalize-sah-schema",
     "script/resolve-sah-schema",
     "script/sah-to-human",
-    "script/show-sah-coerce-module",
+    "script/show-sah-coerce-rule-module",
     "script/show-sah-schema-module",
     "script/validate-with-sah"
   ],
@@ -44,10 +44,10 @@ my %WriteMakefileArgs = (
   "NAME" => "App::SahUtils",
   "PREREQ_PM" => {
     "Complete::Module" => 0,
-    "Complete::Util" => "0.57",
+    "Complete::Util" => "0.601",
     "Data::Dump" => 0,
     "Data::Dump::Color" => 0,
-    "Data::Sah" => "0.895",
+    "Data::Sah" => "0.896",
     "Data::Sah::Coerce" => "0.031",
     "Data::Sah::CoerceCommon" => "0.011",
     "Data::Sah::CoerceJS" => "0.011",
@@ -77,7 +77,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.463",
+  "VERSION" => "0.464",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -86,10 +86,10 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Complete::Module" => 0,
-  "Complete::Util" => "0.57",
+  "Complete::Util" => "0.601",
   "Data::Dump" => 0,
   "Data::Dump::Color" => 0,
-  "Data::Sah" => "0.895",
+  "Data::Sah" => "0.896",
   "Data::Sah::Coerce" => "0.031",
   "Data::Sah::CoerceCommon" => "0.011",
   "Data::Sah::CoerceJS" => "0.011",

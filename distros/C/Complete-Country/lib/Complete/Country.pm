@@ -1,7 +1,7 @@
 package Complete::Country;
 
 our $DATE = '2019-07-18'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -78,7 +78,7 @@ Complete::Country - Complete from list of ISO-3166 country codes
 
 =head1 VERSION
 
-This document describes version 0.001 of Complete::Country (from Perl distribution Complete-Country), released on 2019-07-18.
+This document describes version 0.002 of Complete::Country (from Perl distribution Complete-Country), released on 2019-07-18.
 
 =head1 SYNOPSIS
 
@@ -126,6 +126,10 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
+
+=head1 SEE ALSO
+
+L<Complete::Language>
 
 =head1 AUTHOR
 

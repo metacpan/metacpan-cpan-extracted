@@ -1,0 +1,11 @@
+Dancer2::UserAdmin Sample App
+
+This directory contains a simple Dancer2 app that demonstrates
+use of Dancer2::UserAdmin.
+
+Run the app with:
+
+  $ perl example/app.pl
+
+Then in a browser load http://localhost:3000
+

@@ -1,5 +1,5 @@
 package Curio::Factory;
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 =encoding utf8
 
@@ -100,23 +100,21 @@ sub _process_key_arg {
 
     my $key;
 
-    if ($self->does_keys()) {
-        if (@$args) {
-            $key = shift @$args;
-            croak "Invalid key passed to $caller_sub_name()"
-                if !NonEmptySimpleStr->check( $key );
-        }
-        elsif (defined $self->default_key()) {
-            $key = $self->default_key();
-        }
-        else {
-            croak "No key was passed to $caller_sub_name()";
-        }
+    if (@$args) {
+        $key = shift @$args;
+        croak "Invalid key passed to $caller_sub_name()"
+            if !NonEmptySimpleStr->check( $key );
+    }
+    elsif (defined $self->default_key()) {
+        $key = $self->default_key();
+    }
+    else {
+        croak "No key was passed to $caller_sub_name()";
+    }
 
-        if (!$self->allow_undeclared_keys()) {
-            croak "Undeclared key passed to $caller_sub_name()"
-                if !$self->_keys->{$key};
-        }
+    if (!$self->allow_undeclared_keys()) {
+        croak "Undeclared key passed to $caller_sub_name()"
+            if !$self->_keys->{$key};
     }
 
     $key = $self->_aliases->{$key}
@@ -392,31 +390,6 @@ L</resource_method_name> be set.
 =cut
 
 has export_resource => (
-    is      => 'rw',
-    isa     => Bool,
-    default => 0,
-);
-
-=head2 does_keys
-
-    does_keys => 1,
-
-Turning this on allows a key argument to be passed to L</fetch_curio>
-and many other methods.  Typically, though,  you don't have to
-set this as you'll be using L</add_key> which automatically
-turns this on.
-
-By enabling keys this allows L</fetch_curio>, caching, resource
-registration, injecting, and anything else dealing with
-a Curio object to deal with multiple Curio objects based on
-the passed key argument.
-
-Defaults to off (C<0>), meaning the factory will only ever
-manage a single Curio object.
-
-=cut
-
-has does_keys => (
     is      => 'rw',
     isa     => Bool,
     default => 0,
@@ -698,8 +671,7 @@ sub _arguments {
 
     $factory->add_key( $key, %arguments );
 
-Declares a new key and turns L</does_keys> on if it is not already
-turned on.
+Declares a new key.
 
 Arguments are optional, but if present they will be saved and used
 by L</fetch_curio> when calling C<new()> on L</class>.
@@ -721,8 +693,6 @@ sub add_key {
         if @args % 2 != 0;
 
     $self->_keys->{$key} = { @args };
-
-    $self->does_keys( 1 );
 
     return;
 }
@@ -832,7 +802,8 @@ sub inject {
     );
 
 This is just like L</inject> except it returns an guard object which,
-when it leaves scope and is destroyed, will automatically L</uninject>.
+when it leaves scope and is destroyed, will automatically
+L</clear_injection>.
 
 =cut
 
@@ -843,30 +814,28 @@ sub inject_with_guard {
     my $key = (@_==1) ? undef : shift( @_ );
 
     return Curio::Guard->new(sub{
-        $class->factory->uninject( $key ? $key : () );
+        $class->factory->clear_injection( $key ? $key : () );
     });
 }
 
-=head2 uninject
+=head2 clear_injection
 
-    my $curio_object = $factory->uninject();
-    my $curio_object = $factory->uninject( $key );
+    my $curio_object = $factory->clear_injection();
+    my $curio_object = $factory->clear_injection( $key );
 
-Removes the previously injected curio object, restoring the
-original behavior of L</fetch_curio>.
+Removes the previously injected curio object, restoring the original
+behavior of L</fetch_curio>.
 
-Returns the previously injected curio object.
+Returns the previously injected curio object, or C<undef> if there was
+not one.
 
 =cut
 
-sub uninject {
+sub clear_injection {
     my $self = shift;
     my $key = $self->_process_key_arg( \@_ );
 
     $key = $undef_key if !defined $key;
-
-    croak 'Cannot uninject a Curio object where one has not already been injected'
-        if !$self->_get_injection( $key );
 
     my $curio = $self->_remove_injection( $key );
 
@@ -878,7 +847,8 @@ sub uninject {
     my $curio_object = $factory->injection();
     my $curio_object = $factory->injection( $key );
 
-Returns the injected curio object, or C<undef> if none has been injected.
+Returns the injected curio object, or C<undef> if none has been
+injected.
 
 =cut
 
@@ -889,6 +859,24 @@ sub injection {
     $key = $undef_key if !defined $key;
 
     return $self->_get_injection( $key );
+}
+
+=head2 has_injection
+
+    if ($factory->has_injection()) { ... }
+    if ($factory->has_injection( $key )) { ... }
+
+Returns true (C<1>) if an injection is in place.
+
+=cut
+
+sub has_injection {
+    my $self = shift;
+    my $key = $self->_process_key_arg( \@_ );
+
+    $key = $undef_key if !defined $key;
+
+    return $self->_get_injection( $key ) ? 1 : 0;
 }
 
 1;

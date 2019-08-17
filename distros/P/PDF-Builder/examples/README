@@ -22,25 +22,6 @@ tested against 3.004 July 2017
 
 =========== broken:
 
- 024_bdffonts    Formerly named 024_bmpfonts.
-
-                 This wants one Bitmap Distribution Format (.bdf) for input.
-                 So far, not great results... one character per page (a good 
-                 bitmap), then the full chart only shows bounding boxes for 
-                 characters, and other problems. No idea what the "width of 
-                 character" signifies. I have used .bdf files from Chris 
-                 Cannan's 1998 "codec" distribution -- they might not be 
-                 totally good. 
-
-                 Much work remains to be done, including fixes to bdffonts 
-                 handling. Does anyone still use BDF fonts? If not, perhaps we 
-                 should just get rid of support for them. Considering how many 
-                 "good" fonts there are out there (just TrueType alone, not to 
-                 mention Type 1/PS), the only use I can think of for BDF fonts 
-                 is for novelty or decorative effect, where you want a blocky, 
-                 crude letter or symbol. You certainly wouldn't want to read a 
-                 page of this stuff!
-
 BarCode.pl       Demonstrate the bar code library, 1 page (11 one-dimensional
                  barcodes). It appears to mostly be there, but some heavy bars 
                  seem to be merging into their neighbors, and there may be 
@@ -110,6 +91,9 @@ BarCode.pl       Demonstrate the bar code library, 1 page (11 one-dimensional
                  The Lorem Ipsum text on the last page of some fonts (KozGo, 
                  KozMin, MyungJo) appears to be using the fixed pitch variants
                  of Latin alphabet, rather than proportional.
+
+ 024_bdffonts    produces a grid and sample text for a customer-supplied
+                 BDF (bitmapped) font.
 
  025_unifonts    produces a PDF with a segment of an attached PDF-J file
                  (SJIS encoding) rendered in four different Western+CJK font 

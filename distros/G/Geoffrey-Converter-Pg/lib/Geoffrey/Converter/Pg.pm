@@ -6,7 +6,7 @@ use strict;
 use Readonly;
 use warnings;
 
-$Geoffrey::Converter::Pg::VERSION = '0.000100';
+$Geoffrey::Converter::Pg::VERSION = '0.000200';
 
 use parent 'Geoffrey::Role::Converter';
 
@@ -45,7 +45,6 @@ Readonly::Scalar my $I_CONST_DEFAULT_VALUE     => 5;
 
     sub list {
         my ($self, $schema) = @_;
-        require Geoffrey::Utils;
         return q~SELECT * FROM pg_views WHERE schemaname NOT IN('information_schema', 'pg_catalog')~;
     }
 }
@@ -443,11 +442,11 @@ __END__
 
 =head1 NAME
 
-Geoffrey::Converter::Pg - The great new Geoffrey::Converter::Pg!
+Geoffrey::Converter::Pg - PostgreSQL converter for Geoffrey
 
 =head1 VERSION
 
-Version 0.000100
+Version 0.000200
 
 =head1 DESCRIPTION
 
@@ -461,19 +460,39 @@ Version 0.000100
 
 =head2 constraints
 
+Create an instance of Geoffrey::Converter::Pg::Constraints and returns the object.
+
 =head2 foreign_key
+
+Create an instance of Geoffrey::Converter::Pg::ForeignKey and returns the object.
 
 =head2 index
 
+Create an instance of Geoffrey::Converter::Pg::Index and returns the object.
+
 =head2 primary_key
+
+Create an instance of Geoffrey::Converter::Pg::PrimaryKey and returns the object.
 
 =head2 table
 
+Create an instance of Geoffrey::Converter::Pg::Tables and returns the object.
+
 =head2 trigger
+
+Create an instance of Geoffrey::Converter::Pg::Trigger and returns the object.
 
 =head2 unique
 
+Create an instance of Geoffrey::Converter::Pg::UniqueIndex and returns the object.
+
 =head2 view
+
+Create an instance of Geoffrey::Converter::Pg::View and returns the object.
+
+=head2 sequence
+
+Create an instance of Geoffrey::Converter::Pg::Sequence and returns the object.
 
 =head2 view_information
 
@@ -489,8 +508,6 @@ Version 0.000100
 
 =head2 types
 
-=head2 sequence
-
 =head2 parse_default
 
 =head2 type
@@ -500,6 +517,18 @@ Version 0.000100
 =head1 CONFIGURATION AND ENVIRONMENT
 
 =head1 DEPENDENCIES
+
+=over 4
+
+=item * Inherits
+
+L<Geoffrey::Role::Converter|Geoffrey::Role::Converter>
+
+=item * Internal usage
+
+L<Readonly|Readonly>, L<Geoffrey::Role::ConverterType|Geoffrey::Role::ConverterType>
+
+=back
 
 =head1 INCOMPATIBILITIES
 

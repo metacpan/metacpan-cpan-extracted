@@ -26,11 +26,13 @@ my $M3 =
     'BallotSet' => read_ballots('t/data/biggerset1.txt'),
     'DropStyle' => 'all',
     'DropRule'  => 'topcount',
+    'SkipLoserDrop' => 1,
   );
 isa_ok( $M3, ['Vote::Count::Method::CondorcetDropping'],
   'ISA Vote::Count::Method::CondorcetDropping' );
 my $rM3 = $M3->RunCondorcetDropping();
-is ( $rM3->{'winner'}, 'MINTCHIP', 'winner for biggerset1 topcount/all');
+is ( $rM3->{'winner'}, 'MINTCHIP',
+  'winner for biggerset1 topcount/all');
 note $M3->logv();
 
 my $LoopSet =
@@ -47,8 +49,7 @@ my $LoopSetA =
     'DropRule'  => 'topcount',
   );
 my $rLoopSetA = $LoopSetA->RunCondorcetDropping();
-is( $rLoopSetA->{'winner'}, 'MINTCHIP', 'loopset plurality leastwins winner is the same');
-note $LoopSetA->logd();
+is( $rLoopSetA->{'winner'}, 'MINTCHIP', 'loopset plurality all');note $LoopSetA->logd();
 
 my $KnotSet =
   Vote::Count::Method::CondorcetDropping->new(
@@ -100,6 +101,34 @@ is( $rKnotSet->{'winner'}, 'MINTCHIP', 'knotset winner with defaults');
 note $KnotSet->logd();
 };
 
-
+my $BB = read_ballots('t/data/benham.txt');
+subtest 'Benham' => sub {
+  note( q/Compare Benham to Dropping with Condorcet loser dropping
+  with dataset that will produce different results with the method variation./);
+  my $B1 =   Vote::Count::Method::CondorcetDropping->new(
+    'BallotSet' => $BB,
+    'DropStyle' => 'all',
+    'DropRule'  => 'topcount',
+    'SkipLoserDrop' => 1,
+  );
+  my $rB1 = $B1->RunCondorcetDropping();
+  is( $rB1->{ 'winner' },
+  'RINGDING',
+  'Benham Winner' );
+  like( $B1->logv(), qr/Eliminating DEVILDOG/,
+    'In the Log Benham run eliminated TopCount Loser');
+  # note $B1->logv();
+  my $B2 =   Vote::Count::Method::CondorcetDropping->new(
+    'BallotSet' => $BB,
+    'DropStyle' => 'all',
+    'DropRule'  => 'topcount',
+    'SkipLoserDrop' => 0,
+  );
+  my $rB2 = $B2->RunCondorcetDropping();
+  is( $rB2->{ 'winner' },
+  'DEVILDOG',
+  'Different winner when normal Condorcet Loser dropping in effect' );
+   note $B2->logv();
+};
 
 done_testing();

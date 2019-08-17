@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -20,8 +20,11 @@
 
 use 5.004;
 use strict;
+use Math::BigInt try => 'GMP';
+use Math::BigRat;
+use Math::Trig 'pi';
 use Test;
-plan tests => 1;
+plan tests => 6;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -241,7 +244,6 @@ MyOEIS::compare_values
   (anum => q{A093837},
    func => sub {
      my ($count) = @_;
-     require Math::BigRat;
      my @got;
      for (my $r = 1; @got < $count; $r++) {
        my $Nr = Nr($r);
@@ -255,18 +257,16 @@ MyOEIS::compare_values
 #------------------------------------------------------------------------------
 # A093832 - N(r) / r^2 > pi
 
-use Math::Trig 'pi';
-
 MyOEIS::compare_values
   (anum => q{A093832},
+   max_count => 15,
    func => sub {
      my ($count) = @_;
-     require Math::BigRat;
      my @got;
      for (my $r = 1; @got < $count; $r++) {
        my $Nr = Nr($r);
        my $rsquared = $r*$r;
-       if ($Nr / $rsquared > pi) {
+       if ($Nr / $rsquared > pi()) {
          push @got, $r;
        }
      }

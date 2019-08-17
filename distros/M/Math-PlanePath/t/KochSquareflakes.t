@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -37,7 +37,7 @@ use Math::PlanePath::KochSquareflakes;
 # VERSION
 
 {
-  my $want_version = 126;
+  my $want_version = 127;
   ok ($Math::PlanePath::KochSquareflakes::VERSION, $want_version,
       'VERSION variable');
   ok (Math::PlanePath::KochSquareflakes->VERSION,  $want_version,
@@ -87,14 +87,15 @@ use Math::PlanePath::KochSquareflakes;
     ok ($n_lo, 21);
     ok ($n_hi, 84); }
 
+  # 4^6 == 4096
   foreach my $level (0 .. 6) {
     my ($n_lo,$n_hi) = $path->level_to_n_range($level);
     my ($x_lo,$y_lo) =  $path->n_to_xy($n_lo);
     my ($x_hi,$y_hi) =  $path->n_to_xy($n_hi);
     my $dx = $x_hi - $x_lo;
     my $dy = $y_hi - $y_lo;
-    ok($dx,0);
-    ok($dy,1);
+    ok($dx, 0, "level=$level last to first cycle dx, n_hi=$n_hi");
+    ok($dy, 1, "level=$level last to first cycle dy, n_hi=$n_hi");
   }
 }
 
@@ -145,4 +146,5 @@ sub calc_xstart {
   return $x2;
 }
 
+#------------------------------------------------------------------------------
 exit 0;

@@ -18,7 +18,7 @@ if( !$ok) {
     exit;
 };
 
-plan tests => 6;
+plan tests => 8;
 
 my @requests = generate_requests(
     method => 'POST',
@@ -60,3 +60,17 @@ is_deeply \@urls, [
     'https://www.example.com:8443/',
 ], "Protocols, hostnames and ports get iterated correctly"
     or diag Dumper \@urls;
+
+@requests = generate_requests(
+    method => 'POST',
+    url    => '/feedback',
+    body_params => {
+        comment => ['Some comment', 'Another comment, A++'],
+    },
+    headers => [
+    { "Content-Type" => 'text/plain; encoding=UTF-8', },
+    ],
+    wrap => sub { File::Spec->tmpdir },
+);
+is 0+@requests, 2, 'We generate parametrized POST requests';
+is $requests[0], File::Spec->tmpdir, 'File::Temp->tempdir is the same';

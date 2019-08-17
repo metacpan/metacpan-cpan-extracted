@@ -10,19 +10,29 @@ use Data::Printer;
 # use Data::Dumper;
 
 use Path::Tiny;
+use Storable 'dclone';
 
-use Vote::Count::Method::IRV;
+use Vote::Count 0.020;
 use Vote::Count::ReadBallots 'read_ballots';
 
 use feature qw /postderef signatures/;
 no warnings 'experimental';
 
-my $B1 = Vote::Count::Method::IRV->new(
+my $B1 = Vote::Count->new(
   BallotSet => read_ballots('t/data/data2.txt'), );
-my $B2 = Vote::Count::Method::IRV->new(
+my $B2 = Vote::Count->new(
   BallotSet => read_ballots('t/data/biggerset1.txt'), );
-my $B3 = Vote::Count::Method::IRV->new(
+my $B3 = Vote::Count->new(
   BallotSet => read_ballots('t/data/irvtie.txt'), );
+
+# Active is passed by reference the GetActive/SetActive
+# methods break the reference for safety
+# prove that this protects copies of the ActiveSet from
+# changes IRV makes to it.
+my $activebeforeB1 = $B1->GetActive();
+my $save_activebeforeB1 = { $activebeforeB1->%* };
+$B1->SetActive( $activebeforeB1 );
+
 
 my $r1 = $B1->RunIRV();
 my $ex1 = {
@@ -33,8 +43,10 @@ my $ex1 = {
 };
 is_deeply( $r1, $ex1, 'returns set with Mintchip winning 8 of 15 votes');
 
-
-  # { thresshold => 6, votes => 11, winner => 'VANILLA', winvotes => 7 },
+is_deeply(
+  $activebeforeB1,
+  $save_activebeforeB1,
+  'confirm that GetActive/SetActive broke reference links for safety' );
 
 my $r2 = $B2->RunIRV();
 # note $B2->logd();
@@ -89,15 +101,15 @@ subtest 'tiebreakers' => sub {
     CHOCOLATE => 0,
     VANILLA => 0,
   };
-  my $I5 = Vote::Count::Method::IRV->new(
+  my $I5 = Vote::Count->new(
   BallotSet => read_ballots('t/data/irvtie.txt'));
-  my @resolve1 = sort $I5->_TieBreaker(
+  my @resolve1 = sort $I5->_IRVTieBreaker(
     'all', $active, ( 'VANILLA', 'CHOCOLATE' ) );
   is_deeply(
     \@resolve1,
     [ 'CHOCOLATE', 'VANILLA'],
     'All returns both tied choices' );
-  my @resolve2 = sort $I5->_TieBreaker(
+  my @resolve2 = sort $I5->_IRVTieBreaker(
     'borda', $active,
     ( 'VANILLA', 'CHOCOLATE' ) );
   is_deeply(
@@ -105,23 +117,30 @@ subtest 'tiebreakers' => sub {
     [ 'CHOCOLATE'],
     'Borda returns choice that won' );
   my @resolve3 = sort
-    $I5->_TieBreaker( 'borda_all', $active, ( 'VANILLA', 'CHOCOLATE' ) );
+    $I5->_IRVTieBreaker( 'borda_all', $active, ( 'VANILLA', 'CHOCOLATE' ) );
   is_deeply(
     \@resolve3,
     [ 'VANILLA'],
     'borda_all returns choice that won (different winner than borda on active!)' );
   my @resolve4 = sort
-    $I5->_TieBreaker( 'approval', $active, ( 'VANILLA', 'CHOCOLATE' ) );
+    $I5->_IRVTieBreaker( 'approval', $active, ( 'VANILLA', 'CHOCOLATE' ) );
   is_deeply(
     \@resolve4,
     [ 'CHOCOLATE', 'VANILLA'],
     'approval returns a tie for the top2' );
   my @resolve5 = sort
-    $I5->_TieBreaker( 'approval', $active, ( 'VANILLA', 'ROCKYROAD' ) );
+    $I5->_IRVTieBreaker( 'approval', $active, ( 'VANILLA', 'ROCKYROAD' ) );
   is_deeply(
     \@resolve5,
     [ 'VANILLA'],
     'approval winner for a non-tied pair' );
+
+  my @resolve6 = sort
+    $I5->_IRVTieBreaker( 'grandjunction', $active, ( 'VANILLA', 'ROCKYROAD' ) );
+  is_deeply(
+    \@resolve6,
+    [ 'VANILLA'],
+    'modified grand junction' );
 };
 
 done_testing();

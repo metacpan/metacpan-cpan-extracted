@@ -1,0 +1,4 @@
+appname: ExampleApp
+charset: UTF-8
+log:     debug
+logger:  console

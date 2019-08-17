@@ -324,7 +324,9 @@ print STDERR "--OUTTER: type=$streamtype=\n"  if ($DEBUG);
 		$self->{'title'} = ($html =~ m#\"description\"\s*\:\s*\"([^\"]+)\"#) ? $1 : $url;
 		$self->{'title'} =~ s#http[s]?\:\/\/www\.iheart\.com\/live\/##;
 		$self->{'imageurl'} = ($html =~ m#\"image_src\"\s+href=\"([^\"]+)\"#) ? $1 : '';
-		$self->{'iconurl'} = $self->{'imageurl'} ? $self->{'imageurl'} . '?ops=fit(100%2C100)' : '';
+#		$self->{'iconurl'} = $self->{'imageurl'} ? $self->{'imageurl'} . '?ops=fit(100%2C100)' : '';
+		$self->{'iconurl'} = ($html =~ m#\,\"logo\"\:\"([^\"]+)\"\,\"freq\"\:#) ? $1 : '';
+		$self->{'imageurl'} ||= $self->{'iconurl'};
 		# INNER LOOP: MATCH STREAM URLS BY TYPE PATTEREN REGEX UNTIL WE FIND ONE THAT'S ACCEPTABLE (NOT EXCLUDED TYPE):
 		print STDERR "-3: PATTERN=${streampattern}_stream=\n"  if ($DEBUG);
 INNER:  while ($streamhtml =~ s#(${streampattern}_stream)\"\s*\:\s*\"([^\"]+)\"##)
@@ -436,6 +438,7 @@ sub getIconData
 {
 	my $self = shift;
 	return ()  unless ($self->{'iconurl'});
+
 	my $ua = LWP::UserAgent->new;		
 	$ua->timeout(10);
 	$ua->cookie_jar({});
@@ -448,8 +451,10 @@ sub getIconData
 		print STDERR $response->status_line  if ($DEBUG);
 	}
 	return ()  unless ($art_image);
+
 	(my $image_ext = $self->{'iconurl'}) =~ s/^.+\.//;
 	$image_ext =~ s/[^A-Za-z].*$//;
+
 	return ($image_ext, $art_image);
 }
 

@@ -32,7 +32,7 @@
       },
       "test" : {
          "requires" : {
-            "Mercury" : "0.003",
+            "Mercury" : "0.016",
             "Minion::Backend::SQLite" : "0",
             "Mojo::SQLite" : "0"
          }
@@ -41,7 +41,7 @@
    "provides" : {
       "Minion::Notifier" : {
          "file" : "lib/Minion/Notifier.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "Minion::Notifier::Transport" : {
          "file" : "lib/Minion/Notifier/Transport.pm"
@@ -71,6 +71,6 @@
          "url" : "http://github.com/jberger/Minion-Notifier"
       }
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

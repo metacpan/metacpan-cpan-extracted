@@ -2,7 +2,7 @@ package Test2::Workflow::Build;
 use strict;
 use warnings;
 
-our $VERSION = '0.000122';
+our $VERSION = '0.000124';
 
 use Test2::Workflow::Task::Group;
 

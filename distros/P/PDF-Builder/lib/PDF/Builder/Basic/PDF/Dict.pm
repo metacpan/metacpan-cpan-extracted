@@ -17,8 +17,8 @@ use base 'PDF::Builder::Basic::PDF::Objind';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.015'; # VERSION
-my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
+our $VERSION = '3.016'; # VERSION
+my $LAST_UPDATE = '3.016'; # manually update whenever code is changed
 
 our $mincache = 16 * 1024 * 1024;
 
@@ -76,9 +76,9 @@ Get/Set the standard Type key. It can be passed, and will return, a text value r
 =cut
 
 sub type {
-    my $self = shift;
+    my $self = shift();
     if (scalar @_) {
-        my $type = shift;
+        my $type = shift();
         $self->{'Type'} = ref($type)? $type: PDF::Builder::Basic::PDF::Name->new($type);
     }
     return unless exists $self->{'Type'};
@@ -96,7 +96,7 @@ sub filter {
 
     # Developer's Note: the PDF specification allows Filter to be
     # either a name or an array, but other parts of this codebase
-    # expect an array.  If these are updated, uncomment the
+    # expect an array. If these are updated, uncomment the
     # commented-out lines in order to accept both types.
 
     # if (scalar @filters == 1) {
@@ -111,7 +111,7 @@ sub filter {
 # Undocumented alias, which may be removed in a future release
 sub filters { return filter(@_); }
 
-=head2 $d->outobjdeep($fh)
+=head2 $d->outobjdeep($fh, $pdf)
 
 Outputs the contents of the dictionary to a PDF file. This is a recursive call.
 
@@ -122,7 +122,7 @@ stream's dictionary.
 =cut
 
 sub outobjdeep {
-    my ($self, $fh, $pdf, %opts) = @_;
+    my ($self, $fh, $pdf) = @_;
 
     if (defined $self->{' stream'} or defined $self->{' streamfile'} or defined $self->{' streamloc'}) {
         if      ($self->{'Filter'} and $self->{' nofilt'}) {
@@ -132,8 +132,6 @@ sub outobjdeep {
             $pdf->new_obj($self->{'Length'}) unless $self->{'Length'}->is_obj($pdf);
         } else {
             $self->{'Length'} = PDF::Builder::Basic::PDF::Number->new(length($self->{' stream'}));
-            ## $self->{'Length'} = PDF::Builder::Basic::PDF::Number->new(length($self->{' stream'}) + 1);
-            ## this old code seams to burp acro6, lets see what breaks next -- fredo
         }
     }
 
@@ -145,7 +143,7 @@ sub outobjdeep {
         next if $key =~ m/^[\s\-]/o;
         next unless $self->{$key};
         $fh->print('/' . PDF::Builder::Basic::PDF::Name::string_to_name($key, $pdf) . ' ');
-        $self->{$key}->outobj($fh, $pdf, %opts);
+        $self->{$key}->outobj($fh, $pdf);
         $fh->print(' ');
     }
     $fh->print('>>');
@@ -253,7 +251,7 @@ sub read_stream {
     my @filters;
     if (defined $self->{'Filter'}) {
         my $i = 0;
-        foreach my $filter ($self->{'Filter'}->elementsof()) {
+        foreach my $filter ($self->{'Filter'}->elements()) {
             my $filter_class = "PDF::Builder::Basic::PDF::Filter::" . $filter->val();
             unless  ($self->{'DecodeParms'}) {
                 push(@filters, $filter_class->new());
@@ -279,7 +277,7 @@ sub read_stream {
     my $dictfh;
     my $readlen = 4096;
     for (my $i = 0; $i < $len; $i += $readlen) {
-	my $data;
+	    my $data;
         unless ($i + $readlen > $len) {
             read($fh, $data, $readlen);
         } else {
@@ -293,8 +291,8 @@ sub read_stream {
 
         # Start using a temporary file if the stream gets too big
         if (not $force_memory and 
-	    not defined $self->{' streamfile'} and 
-	    (length($self->{' stream'}) + length($data)) > $mincache) {
+	        not defined $self->{' streamfile'} and 
+	        (length($self->{' stream'}) + length($data)) > $mincache) {
             $dictfh = File::Temp->new(TEMPLATE => 'pdfXXXXX', SUFFIX => 'dat', TMPDIR => 1);
             $self->{' streamfile'} = $dictfh->filename();
             print $dictfh $self->{' stream'};

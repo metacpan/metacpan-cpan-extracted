@@ -1,5 +1,5 @@
 package Games::LMSolve::Registry;
-$Games::LMSolve::Registry::VERSION = '0.12.0';
+$Games::LMSolve::Registry::VERSION = '0.14.0';
 use strict;
 use warnings;
 
@@ -8,7 +8,7 @@ use Games::LMSolve;
 
 use vars qw(@ISA);
 
-@ISA=qw(Games::LMSolve);
+@ISA = qw(Games::LMSolve);
 
 use Games::LMSolve::Alice;
 use Games::LMSolve::Minotaur;
@@ -25,14 +25,14 @@ sub register_all_solvers
     my $self = shift;
     $self->register_solvers(
         {
-            'alice' => "Games::LMSolve::Alice",
-            'minotaur' => "Games::LMSolve::Minotaur",
-            'numbers' => "Games::LMSolve::Numbers",
-            'plank' => "Games::LMSolve::Plank::Base",
-            'hex_plank' => "Games::LMSolve::Plank::Hex",
+            'alice'       => "Games::LMSolve::Alice",
+            'minotaur'    => "Games::LMSolve::Minotaur",
+            'numbers'     => "Games::LMSolve::Numbers",
+            'plank'       => "Games::LMSolve::Plank::Base",
+            'hex_plank'   => "Games::LMSolve::Plank::Hex",
             'tilt_single' => "Games::LMSolve::Tilt::Single",
-            'tilt_multi' => "Games::LMSolve::Tilt::Multi",
-            'tilt_rb' => "Games::LMSolve::Tilt::RedBlue",
+            'tilt_multi'  => "Games::LMSolve::Tilt::Multi",
+            'tilt_rb'     => "Games::LMSolve::Tilt::RedBlue",
             'tilt_puzzle' => "Games::LMSolve::Tilt::RedBlue",
         }
     );
@@ -54,15 +54,11 @@ Games::LMSolve::Registry - the registry of all LM-Solve drivers.
 
 =head1 VERSION
 
-version 0.12.0
+version 0.14.0
 
 =head1 DESCRIPTION
 
 This is a registry of all LM-Solve drivers.
-
-=head1 VERSION
-
-version 0.12.0
 
 =head1 METHODS
 

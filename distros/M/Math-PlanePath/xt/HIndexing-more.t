@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2014, 2018 Kevin Ryde
+# Copyright 2014, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -19,9 +19,6 @@
 
 use 5.004;
 use strict;
-use List::Util 'min', 'max';
-use Math::PlanePath::HIndexing;
-
 use Test;
 plan tests => 35;
 
@@ -29,6 +26,8 @@ use lib 't','xt';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings(); }
 use MyOEIS;
+
+use Math::PlanePath::HIndexing;
 
 
 #------------------------------------------------------------------------------

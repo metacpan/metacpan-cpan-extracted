@@ -23,6 +23,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "Data::Printer" : "0",
             "Exporter" : "0",
             "Exporter::Easy" : "0",
             "List::Util" : "0",
@@ -32,6 +33,7 @@
             "Sort::Hash" : "0",
             "Storable" : "3.15",
             "Time::Piece" : "0",
+            "Try::Tiny" : "0",
             "YAML::XS" : "0",
             "feature" : "0",
             "namespace::autoclean" : "0",
@@ -43,7 +45,6 @@
       },
       "test" : {
          "requires" : {
-            "Data::Printer" : "0",
             "File::Temp" : "0",
             "JSON::MaybeXS" : "0",
             "Test2::Bundle::More" : "0",
@@ -67,7 +68,7 @@
          "web" : "https://github.com/brainbuz/Vote-Count"
       }
    },
-   "version" : "0.017",
+   "version" : "0.021",
    "x_generated_by_perl" : "v5.28.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
 }

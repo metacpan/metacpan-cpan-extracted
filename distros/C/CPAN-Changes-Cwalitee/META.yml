@@ -35,7 +35,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Changes-Cwalitee
   homepage: https://metacpan.org/release/CPAN-Changes-Cwalitee
   repository: git://github.com/perlancar/perl-CPAN-Changes-Cwalitee.git
-version: '0.007'
+version: '0.009'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

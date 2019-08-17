@@ -1,4 +1,4 @@
-# Copyright 2011, 2012 Kevin Ryde
+# Copyright 2011, 2012, 2019 Kevin Ryde
 
 # This file is part of Image-Base-Wx.
 #
@@ -20,13 +20,13 @@ use 5.008;
 use strict;
 use Carp;
 use Wx;
-our $VERSION = 4;
+our $VERSION = 5;
 
 use Image::Base;
 our @ISA = ('Image::Base');
 
 # uncomment this to run the ### lines
-#use Smart::Comments;
+# use Smart::Comments;
 
 
 sub new {
@@ -92,8 +92,12 @@ sub xy {
   } else {
     ### Image-DC xy() fetch: "$x, $y"
     my $c = $self->{'-dc'}->GetPixel ($x,$y);
-    ### $c
+    ### pixel: $c
     ### c str: $c->GetAsString(4)
+    ### c Red  : $c->Red
+    ### c Green: $c->Green
+    ### c Blue : $c->Blue
+    ### c Alpha: $c->Alpha
     return ($c && $c->GetAsString(Wx::wxC2S_HTML_SYNTAX()));
   }
 }
@@ -293,6 +297,11 @@ sub _dc_pen {
     $pen->SetColour($colour_obj);
     $dc->SetPen($pen);
 
+    ### $colour_obj
+    ### colour_obj Red  : $colour_obj->Red
+    ### colour_obj Green: $colour_obj->Green
+    ### colour_obj Blue : $colour_obj->Blue
+
     $self->{'_pen_colour'} = $colour;
   }
   return $dc;
@@ -345,7 +354,7 @@ per its C<Set()> method means
     "#RRGGBB"         2 digit hex
     "RGB(r,g,b)"      decimal 0 to 255
 
-1,3 or 4 digit hex are platform dependent.  They work under Gtk, but not
+1, 3 or 4 digit hex are platform dependent.  They work under Gtk, but not
 under MS-Windows.
 
 The colour is applied to the "pen" in the C<-dc>, and for filling to the
@@ -397,6 +406,15 @@ The size of the DC's target, as per C<$dc-E<gt>GetSize()>.
 
 =back
 
+=head1 BUGS
+
+Wx circa 3.0.4, with Gtk at least, may have line and point fuzzing turned on
+by default.  The effect is that individual pixels, and corners of
+rectangles, do not get the colour you say, but are blurred into the existing
+background.  That sort of thing can be desirable for circles or sloping
+lines, but not for rectangles and pixels.  C<Wx::Image> drawing is precise
+so you can draw that way for full control.
+
 =head1 SEE ALSO
 
 L<Wx>,
@@ -409,7 +427,7 @@ http://user42.tuxfamily.org/image-base-wx/index.html
 
 =head1 LICENSE
 
-Copyright 2012 Kevin Ryde
+Copyright 2012, 2019 Kevin Ryde
 
 Image-Base-Wx is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

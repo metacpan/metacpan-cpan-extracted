@@ -1,5 +1,5 @@
 package Catalyst::Helper::Model::Curio;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use strictures 2;
 
@@ -34,7 +34,7 @@ This would create MyApp::Model::Cache:
 
     script/myapp_create.pl model Cache Curio MyApp::Service::Cache
 
-=head1 DESCRIPTIOM
+=head1 DESCRIPTION
 
 This L<Catalyst::Helper> makes it so you can run a CLI command to
 create a new L<Catalyst::Model::Curio> model which ties into one of
@@ -47,6 +47,8 @@ helpers.
 
 =head2 curio-class
 
+    <curio-class>
+
 This is used as the C<class> configuration option in the model class.
 
 This option is required, if you don't specify it then your model will
@@ -55,6 +57,8 @@ throw an exception when loaded by Catalyst.
 See L<Catalyst::Model::Curio/class> for more details.
 
 =head2 curio-key
+
+    [<curio-key>]
 
 If your Curio class supports keys you may specify a particular key here
 that the model should only interact with.  If you don't specify a key

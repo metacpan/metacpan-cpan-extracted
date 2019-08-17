@@ -13,6 +13,10 @@
 
 #include <string.h>
 
+#ifdef HAVE_DMD_HELPER
+#  include "DMD_helper.h"
+#endif
+
 #define streq(a,b)  (!strcmp(a,b))
 
 #define FREE_CB(v)  if(self->v) SvREFCNT_dec(self->v)
@@ -71,6 +75,89 @@ typedef struct Term__VTerm__Screen {
     CV *resize;
   } cb;
 } *Term__VTerm__Screen;
+
+#ifdef HAVE_DMD_HELPER
+static int dmd_helper_vterm(pTHX_ const SV *sv)
+{
+  Term__VTerm self = INT2PTR(Term__VTerm, SvIV((SV *)sv));
+  int ret = 0;
+
+  if(self->parser_cb.text)
+    ret += DMD_ANNOTATE_SV(sv, (const SV *)self->parser_cb.text, "the 'text' parser callback");
+  if(self->parser_cb.control)
+    ret += DMD_ANNOTATE_SV(sv, (const SV *)self->parser_cb.control, "the 'control' parser callback");
+  if(self->parser_cb.escape)
+    ret += DMD_ANNOTATE_SV(sv, (const SV *)self->parser_cb.escape, "the 'escape' parser callback");
+  if(self->parser_cb.csi)
+    ret += DMD_ANNOTATE_SV(sv, (const SV *)self->parser_cb.csi, "the 'csi' parser callback");
+  if(self->parser_cb.osc)
+    ret += DMD_ANNOTATE_SV(sv, (const SV *)self->parser_cb.osc, "the 'osc' parser callback");
+  if(self->parser_cb.dcs)
+    ret += DMD_ANNOTATE_SV(sv, (const SV *)self->parser_cb.dcs, "the 'dcs' parser callback");
+  if(self->parser_cb.resize)
+    ret += DMD_ANNOTATE_SV(sv, (const SV *)self->parser_cb.resize, "the 'resize' parser callback");
+
+  return ret;
+}
+
+static int dmd_helper_vterm_state(pTHX_ const SV *sv)
+{
+  Term__VTerm__State self = INT2PTR(Term__VTerm__State, SvIV((SV *)sv));
+  int ret = 0;
+
+  if(self->vterm)
+    ret += DMD_ANNOTATE_SV(sv, (const SV *)self->vterm, "the vterm SV");
+
+  if(self->cb.putglyph)
+    ret += DMD_ANNOTATE_SV(sv, (const SV *)self->cb.putglyph, "the 'putglyph' callback");
+  if(self->cb.movecursor)
+    ret += DMD_ANNOTATE_SV(sv, (const SV *)self->cb.movecursor, "the 'movecursor' callback");
+  if(self->cb.scrollrect)
+    ret += DMD_ANNOTATE_SV(sv, (const SV *)self->cb.scrollrect, "the 'scrollrect' callback");
+  if(self->cb.moverect)
+    ret += DMD_ANNOTATE_SV(sv, (const SV *)self->cb.moverect, "the 'moverect' callback");
+  if(self->cb.erase)
+    ret += DMD_ANNOTATE_SV(sv, (const SV *)self->cb.erase, "the 'erase' callback");
+  if(self->cb.initpen)
+    ret += DMD_ANNOTATE_SV(sv, (const SV *)self->cb.initpen, "the 'initpen' callback");
+  if(self->cb.setpenattr)
+    ret += DMD_ANNOTATE_SV(sv, (const SV *)self->cb.setpenattr, "the 'setpenattr' callback");
+  if(self->cb.settermprop)
+    ret += DMD_ANNOTATE_SV(sv, (const SV *)self->cb.settermprop, "the 'settermprop' callback");
+  if(self->cb.bell)
+    ret += DMD_ANNOTATE_SV(sv, (const SV *)self->cb.bell, "the 'bell' callback");
+  if(self->cb.resize)
+    ret += DMD_ANNOTATE_SV(sv, (const SV *)self->cb.resize, "the 'resize' callback");
+  if(self->cb.setlineinfo)
+    ret += DMD_ANNOTATE_SV(sv, (const SV *)self->cb.setlineinfo, "the 'setlineinfo' callback");
+
+  return ret;
+}
+
+static int dmd_helper_vterm_screen(pTHX_ const SV *sv)
+{
+  Term__VTerm__Screen self = INT2PTR(Term__VTerm__Screen, SvIV((SV *)sv));
+  int ret = 0;
+
+  if(self->vterm)
+    ret += DMD_ANNOTATE_SV(sv, (const SV *)self->vterm, "the vterm SV");
+
+  if(self->cb.damage)
+    ret += DMD_ANNOTATE_SV(sv, (const SV *)self->cb.damage, "the 'damage' callback");
+  if(self->cb.moverect)
+    ret += DMD_ANNOTATE_SV(sv, (const SV *)self->cb.moverect, "the 'moverect' callback");
+  if(self->cb.movecursor)
+    ret += DMD_ANNOTATE_SV(sv, (const SV *)self->cb.movecursor, "the 'movecursor' callback");
+  if(self->cb.settermprop)
+    ret += DMD_ANNOTATE_SV(sv, (const SV *)self->cb.settermprop, "the 'settermprop' callback");
+  if(self->cb.bell)
+    ret += DMD_ANNOTATE_SV(sv, (const SV *)self->cb.bell, "the 'bell' callback");
+  if(self->cb.resize)
+    ret += DMD_ANNOTATE_SV(sv, (const SV *)self->cb.resize, "the 'resize' callback");
+
+  return ret;
+}
+#endif
 
 static SV *newSVcolor(VTermColor *col)
 {
@@ -1730,3 +1817,8 @@ convert_color_to_rgb(self,col)
 
 BOOT:
   setup_constants();
+#ifdef HAVE_DMD_HELPER
+  DMD_SET_PACKAGE_HELPER("Term::VTerm",         dmd_helper_vterm);
+  DMD_SET_PACKAGE_HELPER("Term::VTerm::State",  dmd_helper_vterm_state);
+  DMD_SET_PACKAGE_HELPER("Term::VTerm::Screen", dmd_helper_vterm_screen);
+#endif

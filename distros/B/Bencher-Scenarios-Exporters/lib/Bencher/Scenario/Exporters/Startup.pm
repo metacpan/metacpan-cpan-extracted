@@ -1,7 +1,7 @@
 package Bencher::Scenario::Exporters::Startup;
 
-our $DATE = '2017-01-25'; # DATE
-our $VERSION = '0.08'; # VERSION
+our $DATE = '2019-08-16'; # DATE
+our $VERSION = '0.091'; # VERSION
 
 use 5.010001;
 use strict;
@@ -22,6 +22,7 @@ our $scenario = {
         {module=>'Exporter::Tiny'},
         {module=>'Exporter::Tidy'},
         {module=>'Exporter::Rinci'},
+        {module=>'Perinci::Exporter'},
         {module=>'PERLANCAR::Exporter::Lite'},
         {module=>'Sub::Exporter'},
         {module=>'Xporter'},
@@ -43,7 +44,7 @@ Bencher::Scenario::Exporters::Startup - Benchmark the startup overhead of some e
 
 =head1 VERSION
 
-This document describes version 0.08 of Bencher::Scenario::Exporters::Startup (from Perl distribution Bencher-Scenarios-Exporters), released on 2017-01-25.
+This document describes version 0.091 of Bencher::Scenario::Exporters::Startup (from Perl distribution Bencher-Scenarios-Exporters), released on 2019-08-16.
 
 =head1 SYNOPSIS
 
@@ -79,13 +80,15 @@ L<Exporter> 5.72
 
 L<Exporter::Lite> 0.08
 
-L<Exporter::Rinci> 0.02
+L<Exporter::Rinci> 0.030
 
 L<Exporter::Tidy> 0.08
 
-L<Exporter::Tiny> 0.042
+L<Exporter::Tiny> 1.000000
 
 L<PERLANCAR::Exporter::Lite> 0.02
+
+L<Perinci::Exporter> 0.081
 
 L<Sub::Exporter> 0.987
 
@@ -125,6 +128,12 @@ L<Exporter::Rinci>
 
 
 
+=item * Perinci::Exporter (perl_code)
+
+L<Perinci::Exporter>
+
+
+
 =item * PERLANCAR::Exporter::Lite (perl_code)
 
 L<PERLANCAR::Exporter::Lite>
@@ -147,24 +156,25 @@ L<Xporter>
 
 =head1 SAMPLE BENCHMARK RESULTS
 
-Run on: perl: I<< v5.24.0 >>, CPU: I<< Intel(R) Core(TM) M-5Y71 CPU @ 1.20GHz (2 cores) >>, OS: I<< GNU/Linux LinuxMint version 17.3 >>, OS kernel: I<< Linux version 3.19.0-32-generic >>.
+Run on: perl: I<< v5.26.1 >>, CPU: I<< Intel(R) Core(TM) M-5Y71 CPU @ 1.20GHz (2 cores) >>, OS: I<< GNU/Linux LinuxMint version 18.3 >>, OS kernel: I<< Linux version 4.10.0-38-generic >>.
 
 Benchmark with default options (C<< bencher -m Exporters::Startup >>):
 
  #table1#
- +---------------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+----------+---------+
- | participant               | proc_private_dirty_size (MB) | proc_rss_size (MB) | proc_size (MB) | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors  | samples |
- +---------------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+----------+---------+
- | Sub::Exporter             | 0.96                         | 4.3                | 16             |      21   |     15.2               |        1   |   0.0001 |      20 |
- | Exporter::Tiny            | 0.87                         | 4.1                | 16             |       9.7 |      3.9               |        2.1 | 2.7e-05  |      20 |
- | Xporter                   | 0.82                         | 4.1                | 16             |       9.3 |      3.5               |        2.2 | 2.8e-05  |      20 |
- | Exporter::Lite            | 1.1                          | 4.4                | 16             |       8.7 |      2.9               |        2.4 | 3.4e-05  |      20 |
- | Exporter::Rinci           | 0.89                         | 4.2                | 16             |       7   |      1.2               |        2.9 |   2e-05  |      20 |
- | Exporter                  | 0.88                         | 4.2                | 16             |       6.8 |      1                 |        3   | 2.9e-05  |      20 |
- | Exporter::Tidy            | 0.94                         | 4.3                | 16             |       6.5 |      0.7               |        3.2 | 2.3e-05  |      20 |
- | PERLANCAR::Exporter::Lite | 2.3                          | 5.9                | 21             |       6.4 |      0.600000000000001 |        3.2 | 1.1e-05  |      20 |
- | perl -e1 (baseline)       | 0.9                          | 4.3                | 16             |       5.8 |      0                 |        3.5 | 1.7e-05  |      20 |
- +---------------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+----------+---------+
+ +---------------------------+-----------+------------------------+------------+---------+---------+
+ | participant               | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
+ +---------------------------+-----------+------------------------+------------+---------+---------+
+ | Sub::Exporter             |      18   |     12.1               |        1   | 3.5e-05 |      20 |
+ | Exporter::Tiny            |       9.2 |      3.3               |        2   | 1.5e-05 |      21 |
+ | Xporter                   |       8.7 |      2.8               |        2   |   2e-05 |      20 |
+ | Exporter::Lite            |       8.2 |      2.3               |        2.2 | 3.9e-05 |      20 |
+ | Perinci::Exporter         |       7.2 |      1.3               |        2.5 | 2.1e-05 |      20 |
+ | Exporter::Rinci           |       6.6 |      0.699999999999999 |        2.7 | 1.8e-05 |      20 |
+ | Exporter                  |       6.3 |      0.399999999999999 |        2.8 | 2.5e-05 |      20 |
+ | Exporter::Tidy            |       6.2 |      0.3               |        2.9 | 2.4e-05 |      23 |
+ | PERLANCAR::Exporter::Lite |       6.1 |      0.199999999999999 |        2.9 | 1.1e-05 |      20 |
+ | perl -e1 (baseline)       |       5.9 |      0                 |        3   | 3.7e-05 |      20 |
+ +---------------------------+-----------+------------------------+------------+---------+---------+
 
 
 To display as an interactive HTML table on a browser, you can add option C<--format html+datatables>.
@@ -191,7 +201,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

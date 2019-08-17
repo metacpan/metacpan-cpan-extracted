@@ -49,11 +49,11 @@
 
 /* Definitionen und Includes  */
 #ifndef VERSION
-#define VERSION "6.09 (final)"
+#define VERSION "6.10 (final)"
 #define VERSION_MAJOR 6
-#define VERSION_MINOR 09
+#define VERSION_MINOR 10
 #endif
-#define VERSION_DATE "2019-05-13"
+#define VERSION_DATE "2019-08-15"
 
 #ifndef INCLUDE_KONTO_CHECK_DE
 #define INCLUDE_KONTO_CHECK_DE 1
@@ -2742,6 +2742,38 @@ DLL_EXPORT int lut_valid(void)
       RETURN(LUT2_NO_LONGER_VALID);
 }
 
+DLL_EXPORT int lut_valid_date(char *lut_name,int *v11,int *v12,int *v21,int *v22)
+{
+   char *ptr,*info1,*info2;
+   int retval,v1,v2;
+
+   *v11=*v12=*v21=*v22=0;
+   if((retval=lut_info(lut_name,&info1,&info2,&v1,&v2))!=OK)return retval;
+   if(info1){
+      for(ptr=info1;*ptr && *ptr!='\n' && !isdigit(*ptr);ptr++);
+      if(*ptr && *ptr!='\n'){
+         *v11=strtoul(ptr,NULL,10);             /* Anfangsdatum der Gültigkeit */
+         if(*ptr && *ptr!='\n'){
+            while(*ptr && *ptr!='\n' && *ptr++!='-'); /* Endedatum suchen */
+            if(*ptr)*v12=strtoul(ptr,NULL,10);  /* Endedatum der Gültigkeit */
+         }
+      }
+      free(info1);
+   }
+   if(info2){
+      for(ptr=info2;*ptr && *ptr!='\n' && !isdigit(*ptr);ptr++);
+      if(*ptr && *ptr!='\n'){
+         *v21=strtoul(ptr,NULL,10);             /* Anfangsdatum der Gültigkeit */
+         if(*ptr && *ptr!='\n'){
+            while(*ptr && *ptr!='\n' && *ptr++!='-'); /* Endedatum suchen */
+            if(*ptr)*v22=strtoul(ptr,NULL,10);  /* Endedatum der Gültigkeit */
+         }
+      }
+      free(info2);
+   }
+   return OK;
+}
+
 
 /* Funktion lut_info_b() +§§§1 */
 /* ###########################################################################
@@ -2856,7 +2888,7 @@ DLL_EXPORT int lut_info_id(char *lut_name,int *info1,int *info2,int *valid1,int 
  * ###########################################################################
  */
 
-#line 3411 "perl/Business-KontoCheck/konto_check.lxx"
+#line 3443 "perl/Business-KontoCheck/konto_check.lxx"
 DLL_EXPORT int lut_info(char *lut_name,char **info1,char **info2,int *valid1,int *valid2)
 {
    char *ptr,*ptr1,buffer[128];
@@ -2944,7 +2976,7 @@ DLL_EXPORT int lut_info(char *lut_name,char **info1,char **info2,int *valid1,int
 
       /* Infoblocks lesen: 1. Infoblock */
    if((ret=read_lut_block_int(in,0,LUT2_INFO,&cnt,&ptr))==OK){
-#line 3500 "perl/Business-KontoCheck/konto_check.lxx"
+#line 3532 "perl/Business-KontoCheck/konto_check.lxx"
       *(ptr+cnt)=0;
       if(valid1){
          for(ptr1=ptr,v1=v2=0;*ptr1 && *ptr1!='\n' && !isdigit(*ptr1);ptr1++);
@@ -2992,7 +3024,7 @@ DLL_EXPORT int lut_info(char *lut_name,char **info1,char **info2,int *valid1,int
 
       /* Infoblocks lesen: 2. Infoblock */
    if((ret=read_lut_block_int(in,0,LUT2_2_INFO,&cnt,&ptr))==OK){
-#line 3549 "perl/Business-KontoCheck/konto_check.lxx"
+#line 3581 "perl/Business-KontoCheck/konto_check.lxx"
       *(ptr+cnt)=0;
       if(valid2){
          for(ptr1=ptr,v1=v2=0;*ptr1 && *ptr1!='\n' && !isdigit(*ptr1);ptr1++);
@@ -3211,7 +3243,7 @@ DLL_EXPORT int copy_lutfile(char *old_name,char *new_name,int new_slots)
    qsort(slotdir,slot_cnt,sizeof(int),cmp_int);
    for(last_slot=-1,i=0;i<(int)slot_cnt;i++)if((typ=slotdir[i]) && typ!=(UINT4)last_slot){
       read_lut_block_int(lut1,0,typ,&len,&data);
-#line 3769 "perl/Business-KontoCheck/konto_check.lxx"
+#line 3801 "perl/Business-KontoCheck/konto_check.lxx"
       write_lut_block_int(lut2,typ,len,data);
       FREE(data);
       last_slot=typ;
@@ -3441,7 +3473,7 @@ DLL_EXPORT int lut_init(char *lut_name,int required,int set)
  * # Copyright (C) 2008 Michael Plugge <m.plugge@hs-mannheim.de>             #
  * ###########################################################################
  */
-#line 3999 "perl/Business-KontoCheck/konto_check.lxx"
+#line 4031 "perl/Business-KontoCheck/konto_check.lxx"
 DLL_EXPORT int kto_check_init(char *lut_name,int *required,int **status,int set,int incremental)
 {
    char *ptr,*dptr,*data,*eptr,*prolog,*info,*user_info,*hs=NULL,*info1,*info2,*ci=NULL,name_buffer[LUT_PATH_LEN];
@@ -3669,7 +3701,7 @@ DLL_EXPORT int kto_check_init(char *lut_name,int *required,int **status,int set,
          typ1=typ;
       if(lut2_block_status[typ]==OK)continue;   /* jeden Block nur einmal einlesen */
       retval=read_lut_block_int(lut,0,typ,&len,&data);
-#line 4228 "perl/Business-KontoCheck/konto_check.lxx"
+#line 4260 "perl/Business-KontoCheck/konto_check.lxx"
 
       switch(retval){
          case LUT_CRC_ERROR:
@@ -3757,7 +3789,7 @@ DLL_EXPORT int kto_check_init(char *lut_name,int *required,int **status,int set,
             if(typ==LUT2_2_NAME || typ==LUT2_2_NAME_KURZ){
                FREE(data);
                i=read_lut_block_int(lut,0,LUT2_2_NAME_NAME_KURZ,&len,&data);
-#line 4320 "perl/Business-KontoCheck/konto_check.lxx"
+#line 4352 "perl/Business-KontoCheck/konto_check.lxx"
                if(i==OK){  /* was gefunden; Typ ändern, dann weiter wie bei OK */
                   typ=LUT2_2_NAME_NAME_KURZ;
                   typ1=LUT2_NAME_NAME_KURZ;
@@ -4363,7 +4395,7 @@ DLL_EXPORT int lut_blocks_id(int mode,int *lut_filename,int *lut_blocks_ok,int *
  * ###########################################################################
  */
 
-#line 4926 "perl/Business-KontoCheck/konto_check.lxx"
+#line 4958 "perl/Business-KontoCheck/konto_check.lxx"
 DLL_EXPORT const char *current_lutfile_name(int *set,int *level,int *retval)
 {
    if(init_status<7 || !current_lutfile){
@@ -5118,7 +5150,7 @@ static int iban_init(void)
  * ###########################################################################
  */
 
-#line 5681 "perl/Business-KontoCheck/konto_check.lxx"
+#line 5713 "perl/Business-KontoCheck/konto_check.lxx"
 static int iban_regel_cvt(char *blz,char *kto,const char **bicp,int regel_version,RETVAL *retvals)
 {
    char tmp_buffer[16];
@@ -8279,7 +8311,7 @@ static int iban_regel_cvt(char *blz,char *kto,const char **bicp,int regel_versio
    }
 }
 
-#line 8842 "perl/Business-KontoCheck/konto_check.lxx"
+#line 8874 "perl/Business-KontoCheck/konto_check.lxx"
 /* Funktion lut_multiple() +§§§2 */
 /* ###########################################################################
  * # lut_multiple(): Universalfunktion, um zu einer gegebenen Bankleitzahl   #
@@ -8547,7 +8579,7 @@ DLL_EXPORT int lut_cleanup(void)
    FREE(sort_pz_f);
    FREE(sort_plz);
    FREE(sort_iban_regel);
-#line 9104 "perl/Business-KontoCheck/konto_check.lxx"
+#line 9136 "perl/Business-KontoCheck/konto_check.lxx"
    if(name_raw && name_data!=name_raw)
       FREE(name_raw);
    else
@@ -8624,7 +8656,7 @@ DLL_EXPORT int lut_cleanup(void)
       lut_cleanup(); /* neuer Versuch, aufzuräumen */
       RETURN(INIT_FATAL_ERROR);
    }
-#line 9186 "perl/Business-KontoCheck/konto_check.lxx"
+#line 9218 "perl/Business-KontoCheck/konto_check.lxx"
    init_status&=1;
    init_in_progress=0;
    return OK;
@@ -8797,8 +8829,8 @@ static void init_atoi_table(void)
    int i,ziffer;
    unsigned long l;
 
-      /* Änderungen zum 03.06.2019 aktivieren */
-   if(time(NULL)>1559512800 ||0)pz_aenderungen_aktivieren_2019_06=1;
+      /* Änderungen zum 09.09.2019 aktivieren */
+   if(time(NULL)>1567980000 ||0)pz_aenderungen_aktivieren_2019_06=1;
 
    /* ungültige Ziffern; Blanks und Tabs werden ebenfalls als ungültig
     * angesehen(!), da die Stellenzuordnung sonst nicht mehr stimmt. Ausnahme:
@@ -9091,7 +9123,7 @@ static void init_atoi_table(void)
    lut_block_name2[130]="2. SCL Banknamen";
    lut_block_name2[131]="2. SCL Flags";
    lut_blocklen_max=521;
-#line 9426 "perl/Business-KontoCheck/konto_check.lxx"
+#line 9458 "perl/Business-KontoCheck/konto_check.lxx"
    init_status|=1;
 }
 
@@ -9151,7 +9183,7 @@ static int kto_check_int(char *x_blz,int pz_methode,char *kto)
 
    switch(pz_methode){
 
-#line 9489 "perl/Business-KontoCheck/konto_check.lxx"
+#line 9521 "perl/Business-KontoCheck/konto_check.lxx"
 /* Berechnungsmethoden 00 bis 09 +§§§3
    Berechnung nach der Methode 00 +§§§4 */
 /*
@@ -11486,7 +11518,7 @@ static int kto_check_int(char *x_blz,int pz_methode,char *kto)
  * ######################################################################
  */
 
-#line 11500 "perl/Business-KontoCheck/konto_check.lxx"
+#line 11532 "perl/Business-KontoCheck/konto_check.lxx"
       case 51:
          if(*(kto+2)=='9'){   /* Ausnahme */
 
@@ -11748,8 +11780,8 @@ static int kto_check_int(char *x_blz,int pz_methode,char *kto)
          else
             return FALSE;
 
-#line 11714 "perl/Business-KontoCheck/konto_check.lxx"
-#line 11716 "perl/Business-KontoCheck/konto_check.lxx"
+#line 11746 "perl/Business-KontoCheck/konto_check.lxx"
+#line 11748 "perl/Business-KontoCheck/konto_check.lxx"
 /*  Berechnung nach der Methode 53 +§§§4 */
 /*
  * ######################################################################
@@ -12048,7 +12080,7 @@ static int kto_check_int(char *x_blz,int pz_methode,char *kto)
  * # bewerten.                                                          #
  * ######################################################################
  */
-#line 11985 "perl/Business-KontoCheck/konto_check.lxx"
+#line 12017 "perl/Business-KontoCheck/konto_check.lxx"
       case 57:
 #if DEBUG>0
          if(retvals){
@@ -12694,7 +12726,7 @@ static int kto_check_int(char *x_blz,int pz_methode,char *kto)
  * # Prüfzifferberechnung)                                              #
  * ######################################################################
  */
-#line 12565 "perl/Business-KontoCheck/konto_check.lxx"
+#line 12597 "perl/Business-KontoCheck/konto_check.lxx"
       case 66:
 #if DEBUG>0
       case 2066:
@@ -20103,7 +20135,7 @@ static int kto_check_int(char *x_blz,int pz_methode,char *kto)
          return NOT_IMPLEMENTED;
    }
 }
-#line 18777 "perl/Business-KontoCheck/konto_check.lxx"
+#line 18809 "perl/Business-KontoCheck/konto_check.lxx"
 
 /*
  * ######################################################################
@@ -20201,7 +20233,7 @@ DLL_EXPORT int kto_check_blz(char *blz,char *kto)
 #if DEBUG>0    /* es werden einige Funktionen benutzt, die nur in der Debug-Variante enthalten sind */
 DLL_EXPORT int kto_check_regel_dbg(char *blz,char *kto,char *blz2,char *kto2,const char **bic,int *regel,RETVAL *retvals)
 {
-#line 18875 "perl/Business-KontoCheck/konto_check.lxx"
+#line 18907 "perl/Business-KontoCheck/konto_check.lxx"
    char *blz_o,buffer[32],kto_o[16],*blz_n,*kto_n,*ptr,*dptr;
    const char *bicp;
    int ret,ret_regel,r,i;
@@ -20250,7 +20282,7 @@ DLL_EXPORT int kto_check_regel_dbg(char *blz,char *kto,char *blz2,char *kto2,con
    }
    else  /* BLZ und Kto gleich */
       return ret;
-#line 18924 "perl/Business-KontoCheck/konto_check.lxx"
+#line 18956 "perl/Business-KontoCheck/konto_check.lxx"
 }
 
 #else   /* !DEBUG */
@@ -20401,7 +20433,7 @@ DLL_EXPORT int kto_check_blz_dbg(char *blz,char *kto,RETVAL *retvals)
  * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
  * ###########################################################################
  */
-#line 19075 "perl/Business-KontoCheck/konto_check.lxx"
+#line 19107 "perl/Business-KontoCheck/konto_check.lxx"
 DLL_EXPORT int kto_check_pz_dbg(char *pz,char *kto,char *blz,RETVAL *retvals)
 {
    int untermethode,pz_methode;
@@ -20637,7 +20669,7 @@ DLL_EXPORT int get_lut_info2_b(char *lutname,int *version,char **prolog_p,char *
    }
    else
       **user_info_p=0;
-#line 19296 "perl/Business-KontoCheck/konto_check.lxx"
+#line 19328 "perl/Business-KontoCheck/konto_check.lxx"
    FREE(prolog);
    return OK;
 }
@@ -20773,19 +20805,19 @@ DLL_EXPORT const char *get_kto_check_version_x(int mode)
          return __DATE__ ", " __TIME__;    /* Compilierdatum und -zeit */
       case 4:                              /* Datum der Prüfziffermethode */
          if(pz_aenderungen_aktivieren_2019_06)
-            return "03.06.2019";
+            return "09.09.2019";
          else
-            return "04.03.2019 (Aenderungen vom 03.06.2019 enthalten aber noch nicht aktiviert)";
+            return "03.06.2019 (Aenderungen vom 09.09.2019 enthalten aber noch nicht aktiviert)";
       case 5:
-        return "03.06.2019";
+        return "09.09.2019";
       case 6:
-        return "13. Mai 2019";            /* Klartext-Datum der Bibliotheksversion */
+        return "15. August 2019";            /* Klartext-Datum der Bibliotheksversion */
       case 7:
         return "final";              /* Versions-Typ der Bibliotheksversion (development, beta, final) */
       case 8:
         return "6";             /* Hauptversionszahl */
       case 9:
-        return "09";             /* Unterversionszahl */
+        return "10";             /* Unterversionszahl */
    }
 }
 
@@ -20931,7 +20963,7 @@ DLL_EXPORT int dump_lutfile(char *outputname,UINT4 *required)
       default:
          break;
    }
-#line 19529 "perl/Business-KontoCheck/konto_check.lxx"
+#line 19561 "perl/Business-KontoCheck/konto_check.lxx"
    fputc('\n',out);
    while(--i)fputc('=',out);
    fputc('\n',out);
@@ -21256,7 +21288,7 @@ DLL_EXPORT const char *iban2bic_id(char *iban,int *retval,int *blz,int *kto)
    return iban2bic(iban,retval,b,k);
 }
 
-#line 19854 "perl/Business-KontoCheck/konto_check.lxx"
+#line 19886 "perl/Business-KontoCheck/konto_check.lxx"
 /* Funktion iban_gen(), iban_bic_gen() und iban_bic_gen1 +§§§1 */
 /* ###########################################################################
  * # Die Funktion iban_gen generiert aus Bankleitzahl und Kontonummer eine   #
@@ -22089,7 +22121,7 @@ DLL_EXPORT int ipi_check(char *zweck)
  * # Copyright (C) 2009,2011 Michael Plugge <m.plugge@hs-mannheim.de>        #
  * ###########################################################################
  */
-#line 20687 "perl/Business-KontoCheck/konto_check.lxx"
+#line 20719 "perl/Business-KontoCheck/konto_check.lxx"
 
 /* Funktion volltext_zeichen() +§§§2 */
 /* Diese Funktion gibt für Zeichen die bei der Volltextsuche gültig sind
@@ -22936,7 +22968,7 @@ static int qcmp_bic_h(const void *ap,const void *bp)
       return a-b;
 }
 
-#line 21534 "perl/Business-KontoCheck/konto_check.lxx"
+#line 21566 "perl/Business-KontoCheck/konto_check.lxx"
 
 /* Funktion qcmp_bic() +§§§3 */
 static int qcmp_bic(const void *ap,const void *bp)
@@ -23041,7 +23073,7 @@ static int qcmp_iban_regel(const void *ap,const void *bp)
    else 
       return a-b;
 }
-#line 21549 "perl/Business-KontoCheck/konto_check.lxx"
+#line 21581 "perl/Business-KontoCheck/konto_check.lxx"
 
 /* Funktion init_blzf() +§§§2
  * Diese Funktion initialisiert das Array mit den Bankleitzahlen für alle
@@ -23109,7 +23141,7 @@ DLL_EXPORT int konto_check_idx2blz(int idx,int *zweigstelle,int *retval)
 }
 
 /* Funktion suche_int1() +§§§2 */
-#line 21617 "perl/Business-KontoCheck/konto_check.lxx"
+#line 21649 "perl/Business-KontoCheck/konto_check.lxx"
 static int suche_int1(int a1,int a2,int *anzahl,int **start_idx,int **zweigstellen_base,int **blz_base,
       int **base_name,int **base_sort,int(*cmp)(const void *, const void *),int cnt,int such_idx)
 {
@@ -23160,7 +23192,7 @@ static int suche_int1(int a1,int a2,int *anzahl,int **start_idx,int **zweigstell
 }
 
 /* Funktion suche_int2() +§§§2 */
-#line 21668 "perl/Business-KontoCheck/konto_check.lxx"
+#line 21700 "perl/Business-KontoCheck/konto_check.lxx"
 static int suche_int2(int a1,int a2,int *anzahl,int **start_idx,int **zweigstellen_base,int **blz_base,
       int **base_name,int **base_sort,int(*cmp)(const void *, const void *),int such_idx,int pz_suche)
 {
@@ -23775,7 +23807,7 @@ static int cmp_suche_sort(const void *ap,const void *bp)
 DLL_EXPORT int lut_suche_sort1(int anzahl,int *blz_base,int *zweigstellen_base,int *idx,int *anzahl_o,int **idx_op,int **cnt_op,int uniq)
 {
    int i,j,last_idx,*idx_a,*cnt_o;
-#line 22284 "perl/Business-KontoCheck/konto_check.lxx"
+#line 22316 "perl/Business-KontoCheck/konto_check.lxx"
 
    if(idx_op)*idx_op=NULL;
    if(cnt_op)*cnt_op=NULL;
@@ -23857,7 +23889,7 @@ DLL_EXPORT int lut_suche_sort2(int anzahl,int *blz,int *zweigstellen,int *anzahl
    return OK;
 }
 
-#line 22367 "perl/Business-KontoCheck/konto_check.lxx"
+#line 22399 "perl/Business-KontoCheck/konto_check.lxx"
 /* Funktion lut_suche_volltext() +§§§2 */
 DLL_EXPORT int lut_suche_volltext(char *such_wort,int *anzahl,int *base_name_idx,char ***base_name,
       int *zweigstellen_anzahl,int **start_idx,int **zweigstellen_base,int **blz_base)
@@ -23987,7 +24019,7 @@ DLL_EXPORT int lut_suche_blz(int such1,int such2,int *anzahl,int **start_idx,int
    return suche_int1(such1,such2,anzahl,start_idx,zweigstellen_base,blz_base,&blz_f,&sort_blz,qcmp_blz,cnt,0);
 }
 
-#line 22517 "perl/Business-KontoCheck/konto_check.lxx"
+#line 22549 "perl/Business-KontoCheck/konto_check.lxx"
 /* Funktion lut_suche_bic() +§§§2 */
 DLL_EXPORT int lut_suche_bic(char *such_name,int *anzahl,int **start_idx,int **zweigstellen_base,
       char ***base_name,int **blz_base)
@@ -24078,7 +24110,7 @@ DLL_EXPORT int lut_suche_regel(int such1,int such2,int *anzahl,int **start_idx,i
    return suche_int2(such1*100,such2*100+99,anzahl,start_idx,zweigstellen_base,blz_base,&iban_regel,&sort_iban_regel,qcmp_iban_regel,LUT2_IBAN_REGEL_SORT,0);
 }
 
-#line 22550 "perl/Business-KontoCheck/konto_check.lxx"
+#line 22582 "perl/Business-KontoCheck/konto_check.lxx"
 
 /* Funktion lut_suche_bic_h() +§§§2 */
 DLL_EXPORT int lut_suche_bic_h(char *such_name,int *anzahl,int **start_idx,int **zweigstellen_base,
@@ -24464,7 +24496,7 @@ DLL_EXPORT const char *iban_ort(char *iban,int filiale,int*retval)
 {
    return iban_fkt_s(iban,filiale,retval,lut_ort);
 }
-#line 22639 "perl/Business-KontoCheck/konto_check.lxx"
+#line 22671 "perl/Business-KontoCheck/konto_check.lxx"
 
 static int bic_fkt_c(char *bic1,int mode,int filiale,int *retval,char *base,int error)
 {
@@ -25753,7 +25785,7 @@ DLL_EXPORT const char *pz2str(int pz,int *ret)
       default:   return "???";
    }
 }
-#line 23594 "perl/Business-KontoCheck/konto_check.lxx"
+#line 23626 "perl/Business-KontoCheck/konto_check.lxx"
 
 /* Funktion lut_keine_iban_berechnung() +§§§1 */
 /*
@@ -25917,7 +25949,7 @@ DLL_EXPORT char *kto_check_test_vars(char *txt,UINT4 i)
 #endif
 
 
-#line 23758 "perl/Business-KontoCheck/konto_check.lxx"
+#line 23790 "perl/Business-KontoCheck/konto_check.lxx"
 /* Funktionen *_id() +§§§1 */
 /* ###########################################################################
  * # Die folgenden Funktionen sind die id-Varianten von Funktionen, die      #
@@ -26426,7 +26458,7 @@ DLL_EXPORT int lut_write_scl_blocks(char *inputfile,char *lutfile)
    RETURN(OK);
 }
 
-#line 24267 "perl/Business-KontoCheck/konto_check.lxx"
+#line 24299 "perl/Business-KontoCheck/konto_check.lxx"
 /* Funktion lut_scl_init() +§§§3 */
 /* ###########################################################################
  * # Die Funktion lut_scl_init() liest die SCL-Blocks aus einer LUT-Datei    #
@@ -26960,6 +26992,7 @@ XI lut_info(char *lut_name,char **info1,char **info2,int *valid1,int *valid2)EXC
 XI lut_info_b(char *lut_name,char **info1,char **info2,int *valid1,int *valid2)EXCLUDED
 XI lut_info_id(char *lut_name,int *info1,int *info2,int *valid1,int *valid2)EXCLUDED
 XI lut_valid(void)EXCLUDED
+XI lut_valid_date(char *lut_name,int *v11,int *v12,int *v21,int *v22)EXCLUDED
 XI lut_multiple(char *b,int *cnt,int **p_blz,char  ***p_name,char ***p_name_kurz,int **p_plz,char ***p_ort,
       int **p_pan,char ***p_bic,int *p_pz,int **p_nr,char **p_aenderung,char **p_loeschung,int **p_nachfolge_blz,
       int *id,int *cnt_all,int **start_idx)EXCLUDED

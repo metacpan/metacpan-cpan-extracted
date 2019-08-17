@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -32,7 +32,7 @@ use strict;
 use Carp 'croak';
 
 use vars '$VERSION','@ISA';
-$VERSION = 126;
+$VERSION = 127;
 use Math::NumSeq;
 @ISA = ('Math::NumSeq');
 
@@ -66,11 +66,9 @@ use constant::defer parameter_info_array =>
              display => 'Turn Type',
              type    => 'enum',
              default => 'Left',
-             choices => ['Left','Right','Straight',
+             choices => ['Left','Right','Straight','NotStraight',
                          'LSR','SLR','SRL',
                           
-                         # 'NotStraight',
-                         # 'Straight',
                          # 'RSL',
                          # 'Turn4',  # Turn4 is 0<=value<4.
                          # 'Turn4n',
@@ -326,7 +324,8 @@ sub pred {
   }
 
   my $turn_type = $self->{'turn_type'};
-  if ($turn_type eq 'Left' || $turn_type eq 'Right' || $turn_type eq 'Straight') {
+  if ($turn_type eq 'Left' || $turn_type eq 'Right'
+      || $turn_type eq 'Straight' || $turn_type eq 'NotStraight') {
     unless ($value == 0 || $value == 1) {
       return 0;
     }
@@ -439,6 +438,16 @@ sub characteristic_non_decreasing {
     return ($self->turn_any_straight ? 1 : 0);
   }
   use constant _NumSeq_Turn_Straight_integer => 1;
+
+  sub _NumSeq_Turn_NotStraight_min {
+    my ($self) = @_;
+    return 1 - $self->_NumSeq_Turn_Straight_max;  # NotStraight opposite
+  }
+  sub _NumSeq_Turn_NotStraight_max {
+    my ($self) = @_;
+    return 1 - $self->_NumSeq_Turn_Straight_min;  # NotStraight opposite
+  }
+  use constant _NumSeq_Turn_NotStraight_integer => 1;
 
   sub _NumSeq_Turn_LSR_min {
     my ($self) = @_;
@@ -865,6 +874,7 @@ sub characteristic_non_decreasing {
   use constant _NumSeq_Turn_oeis_anum =>
     { '' =>
       { NotStraight => 'A035263',  # morphism
+        # main A035263 is KochCurve turn
         # OEIS-Other: A035263 planepath=HilbertSides turn_type=NotStraight
 
         # Not quite, OFFSET=0 but first turn here N=1.
@@ -1118,13 +1128,28 @@ sub characteristic_non_decreasing {
 # { package Math::PlanePath::R5DragonMidpoint;
 # }
 { package Math::PlanePath::CCurve;
-  # Not quite, A096268 OFFSET=1 vs first turn N=1 here
-  # Straight => 'A096268'
+  use constant _NumSeq_Turn_oeis_anum =>
+    { '' =>
+      { NotStraight => 'A035263',
+        # main A035263 is KochCurve turn
+        # OEIS-Other: A035263 planepath=CCurve turn_type=NotStraight
+      },
+      # Not quite, A096268 OFFSET=1 vs first turn N=1 here
+      # Straight => 'A096268'
+    };
 }
 # { package Math::PlanePath::ComplexPlus;
 # }
-# { package Math::PlanePath::ComplexMinus;
-# }
+{ package Math::PlanePath::ComplexMinus;
+  # use constant _NumSeq_Turn_oeis_anum =>
+  #   { 'realpart=1' =>
+  #     { 
+  #       # Not quite, A011658 OFFSET=0 vs first turn N=1 here
+  #       # NotStraight => 'A011658',  # repeat 0,0,0,1,1
+  #       # # OEIS-Other: A011658 planepath=ComplexMinus turn_type=NotStraight
+  #     },
+  #   };
+}
 # { package Math::PlanePath::ComplexRevolving;
 # }
 { package Math::PlanePath::Rows;
@@ -1237,9 +1262,17 @@ sub characteristic_non_decreasing {
         # OEIS-Other: A129184 planepath=Diagonals,direction=up,n_start=0 turn_type=Right
         # OEIS-Other: A156319 planepath=Diagonals,direction=up,n_start=0 turn_type=SLR
       },
+
+      'direction=down,n_start=-1,x_start=0,y_start=0' =>
+      { NotStraight => 'A097806',
+        # OEIS-Catalogue: A097806 planepath=Diagonals,n_start=-1 turn_type=NotStraight
+      },
       'direction=up,n_start=-1,x_start=0,y_start=0' =>
       { Left => 'A023531', # 1 at m(m+3)/2
         # OEIS-Other: A023531 planepath=Diagonals,direction=up,n_start=-1
+        
+        NotStraight => 'A097806',  # OFFSET=0 
+        # OEIS-Other: A097806 planepath=Diagonals,direction=up,n_start=-1 turn_type=NotStraight
       },
     };
 }
@@ -1724,12 +1757,13 @@ form of a NumSeq sequence.
 
 The C<turn_type> choices are
 
-    "Left"      1=left  0=right or straight
-    "Right"     1=right 0=left or straight
-    "Straight"  1=straight, 0=left or right
-    "LSR"       1=left  0=straight -1=right
-    "SLR"       0=straight 1=left  2=right
-    "SRL"       0=straight 1=right 2=left
+    "Left"         1=left,  0=right or straight
+    "Right"        1=right, 0=left or straight
+    "Straight"     1=straight, 0=left or right
+    "NotStraight"  0=straight, 1=left or right
+    "LSR"          1=left,  0=straight, -1=right
+    "SLR"          0=straight, 1=left,  2=right
+    "SRL"          0=straight, 1=right, 2=left
 
 In each case the value at sequence index i is the turn at N=i,
 
@@ -1740,14 +1774,14 @@ In each case the value at sequence index i is the turn at N=i,
     i-1 ---> i     turn at i
                    first turn at i = n_start + 1
 
-For multiple "arms" the turn follows that particular arm so it's i-arms, i,
+For multiple "arms", the turn follows that particular arm so it's i-arms, i,
 i+arms.  i values start C<n_start()+arms_count()> so that i-arms is
 C<n_start()>, the first N on the path.  A single arm path beginning N=0 has
 its first turn at i=1.
 
-For "Straight", "LSR", "SLR" and "SRL", straight means either straight ahead
-or 180-degree reversal, ie. the direction N to N+1 is along the same line as
-N-1 to N was.
+For "Straight", "LSR", "SLR", and "SRL", straight means either straight
+ahead or 180-degree reversal, ie. the direction N to N+1 is along the same
+line as N-1 to N was.
 
 "Left" means to the left side of the N-1 to N line, so not straight or
 right.  Similarly "Right" means to the right side of the N-1 to N line, so
@@ -1809,18 +1843,18 @@ A turn left or right is identified by considering the dX,dY at N-1 and at N.
     N-1  *
 
 With the two vectors dx1,dy1 and dx2,dy2 at a common origin, if the dx2,dy2
-is above the dx1,dy1 line then it's a turn to the left, or below is a turn
+is "above" the dx1,dy1 line then it's a turn to the left, or below is a turn
 to the right
 
     dx2,dy2
        *
-       |   * dx1,dy1
-       |  /
+       ^   * dx1,dy1
+       |  ^
        | /
        |/
        o
 
-At dx2 the Y value of the dx1,dy1 vector is
+At dx2, the Y value of the dx1,dy1 vector is
 
     cmpY = dx2 * dy1/dx1           if dx1 != 0
 
@@ -1856,7 +1890,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

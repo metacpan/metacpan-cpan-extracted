@@ -12,7 +12,7 @@ use Pod::Usage;
 use PPI::Document;
 use PPIx::Regexp;
 
-our $VERSION = '0.065';
+our $VERSION = '0.066';
 
 my %opt;
 
@@ -139,7 +139,7 @@ Asserting this Boolean option causes a blank line to be inserted before
 the file name in the output.
 
 The default is the inverse of the value of
-L<--files-with-matches|--files-with-matches>.
+L<--files-with-matches|/--files-with-matches>.
 
 =head2 --dump
 
@@ -173,7 +173,7 @@ C<ack>.
 =head2 -l
 
 This Boolean option is a synonym for
-L<--files-with-matches|--files-with-matches>.
+L<--files-with-matches|/--files-with-matches>.
 
 =head2 --no-ignore-directory
 

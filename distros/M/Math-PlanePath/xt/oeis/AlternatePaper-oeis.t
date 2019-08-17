@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -19,10 +19,11 @@
 
 use 5.004;
 use strict;
+use Math::BigInt try => 'GMP';
 use Math::PlanePath::AlternatePaper 124;  # v.124 for n_to_n_list()
 use List::Util 'min';
 use Test;
-plan tests => 16;
+plan tests => 36;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -31,12 +32,35 @@ use MyOEIS;
 
 my $paper = Math::PlanePath::AlternatePaper->new;
 
-require Math::NumSeq::PlanePathN;
-my $bigclass = Math::NumSeq::PlanePathN::_bigint();
-
 
 #------------------------------------------------------------------------------
+# A052955 single-visited points  to N=2^k
+MyOEIS::compare_values
+  (anum => 'A052955',
+   max_value => 1000,
+   func => sub {
+     my ($count) = @_;
+     my @got = (1);  # extra initial 1
+     for (my $k = 0; @got < $count; $k++) {
+       push @got, MyOEIS::path_n_to_singles ($paper, 2**$k);
+     }
+     return \@got;
+   });
 
+# A052940 single-visited points  to N=4^k
+MyOEIS::compare_values
+  (anum => 'A052940',
+   max_value => 1000,
+   func => sub {
+     my ($count) = @_;
+     my @got = (1);    # initial 1 instead of 2
+     for (my $k = 1; @got < $count; $k++) {
+       push @got, MyOEIS::path_n_to_singles ($paper, 4**$k);
+     }
+     return \@got;
+   });
+
+#------------------------------------------------------------------------------
 # A068915   Y when N even, X when N odd
 MyOEIS::compare_values
   (anum => 'A068915',
@@ -309,7 +333,7 @@ MyOEIS::compare_values
      my ($count) = @_;
      my $path = Math::PlanePath::AlternatePaper->new (arms => 3);
      my @got;
-     for (my $x = $bigclass->new(0); @got < $count; $x++) {
+     for (my $x = Math::BigInt->new(0); @got < $count; $x++) {
        my $n = $path->xy_to_n($x,0);
        push @got, $n;
      }
@@ -325,36 +349,9 @@ MyOEIS::compare_values
    func => sub {
      my ($count) = @_;
      my @got;
-     for (my $n = $bigclass->new(2); @got < $count; $n *= 2) {
+     for (my $n = Math::BigInt->new(2); @got < $count; $n *= 2) {
        my ($x,$y) = $paper->n_to_xy($n);
        push @got, $y;
-     }
-     return \@got;
-   });
-
-#------------------------------------------------------------------------------
-# A052955 single-visited points  to N=2^k
-MyOEIS::compare_values
-  (anum => 'A052955',
-   max_value => 10_000,
-   func => sub {
-     my ($count) = @_;
-     my @got = (1);  # extra initial 1
-     for (my $k = 0; @got < $count; $k++) {
-       push @got, MyOEIS::path_n_to_singles ($paper, 2**$k);
-     }
-     return \@got;
-   });
-
-# A052940 single-visited points  to N=4^k
-MyOEIS::compare_values
-  (anum => 'A052940',
-   max_value => 10_000,
-   func => sub {
-     my ($count) = @_;
-     my @got = (1);    # initial 1 instead of 2
-     for (my $k = 1; @got < $count; $k++) {
-       push @got, MyOEIS::path_n_to_singles ($paper, 4**$k);
      }
      return \@got;
    });

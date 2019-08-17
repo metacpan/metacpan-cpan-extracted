@@ -15,11 +15,11 @@ Proc::ProcessTable::Colorizer - Like ps, but with colored columns and enhnaced f
 
 =head1 VERSION
 
-Version 0.3.1
+Version 0.4.0
 
 =cut
 
-our $VERSION = '0.3.1';
+our $VERSION = '0.4.0';
 
 
 =head1 SYNOPSIS
@@ -774,7 +774,13 @@ sub colorize{
 						}
 
 						if ( $^O =~ 'linux' ){
-							$item=color($self->nextColor).$left.' '.color($self->nextColor);
+							my $wchan='';
+							if ( -e '/proc/'.$proc->{pid}.'/wchan'){
+								open( my $wchan_fh, '<', '/proc/'.$proc->{pid}.'/wchan' );
+								$wchan=readline( $wchan_fh );
+								close( $wchan_fh );
+							}
+							$item=color($self->nextColor).$left.' '.color($self->nextColor).$wchan;
 						}else{
 							$item=color($self->nextColor).$left.' '.color($self->nextColor).$proc->{wchan};
 						}

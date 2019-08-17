@@ -1,4 +1,4 @@
-# Copyright 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -36,7 +36,7 @@ use strict;
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 126;
+$VERSION = 127;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 
@@ -910,7 +910,7 @@ For various points the power m is equal to the count of 1-digits.
 
 =head2 k Parameter
 
-The C<k =E<gt> $integer> parameter controls the number of children and top
+Parameter C<k =E<gt> $integer> controls the number of children and top
 nodes.  There are k-1 top nodes and each node has k children.  The top nodes
 are
 
@@ -1001,7 +1001,7 @@ Chan shows that this combination of top nodes and children visits
     if k even:   all rationals X/Y
                   possible GCD(X,Y) a divisor of (k/2)^m
 
-When k odd GCD(X,Y) is a power of k, so for example as described above k=3
+When k odd, GCD(X,Y) is a power of k, so for example as described above k=3
 gives GCD=3^m.  When k even GCD(X,Y) is a divisor of (k/2)^m but not
 necessarily a full such power.  For example with k=12 the first such
 non-power GCD is at N=17 where X=16,Y=18 has GCD(16,18)=2 which is only a
@@ -1255,7 +1255,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

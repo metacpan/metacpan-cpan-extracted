@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2017, 2018 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2017, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -28,16 +28,15 @@ use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings(); }
 use MyOEIS;
 
-use Math::PlanePath::Base::Digits
-  'bit_split_lowtohigh';
-
 use Math::PlanePath::HilbertCurve;
-my $hilbert  = Math::PlanePath::HilbertCurve->new;
-
-use Math::PlanePath::ZOrderCurve;
-my $zorder   = Math::PlanePath::ZOrderCurve->new;
 
 use Math::PlanePath::Diagonals;
+use Math::PlanePath::ZOrderCurve;
+use Math::PlanePath::Base::Digits 'bit_split_lowtohigh';
+use Math::NumSeq::PlanePathDelta;
+
+my $hilbert  = Math::PlanePath::HilbertCurve->new;
+my $zorder   = Math::PlanePath::ZOrderCurve->new;
 
 #------------------------------------------------------------------------------
 
@@ -54,8 +53,7 @@ sub zorder_perm_inverse {
 sub zorder_perm_rep {
   my ($n, $reps) = @_;
   foreach (1 .. $reps) {
-    my ($x, $y) = $zorder->n_to_xy ($n);
-    $n = $hilbert->xy_to_n ($x, $y);
+    $n = zorder_perm($n);
   }
   return $n;
 }
@@ -90,11 +88,75 @@ sub zorder_is_3cycle {
 }
 
 #------------------------------------------------------------------------------
+# A163541 -- absolute direction transpose 0=east, 1=south, 2=west, 3=north
+
+#        1  /
+#        | /         transpose 0<->1
+#    2---+---0                 2<->3
+#      / |
+#    /   3
+
+my @dir4_transpose = (1,0, 3,2);
+MyOEIS::compare_values
+  (anum => 'A163541',
+   name => 'absolute direction transpose',
+   func => sub {
+     my ($count) = @_;
+     my $seq = Math::NumSeq::PlanePathDelta->new(planepath_object=>$hilbert,
+                                                 delta_type => 'Dir4');
+     my @got;
+     while (@got < $count) {
+       my ($n, $value) = $seq->next;
+       push @got, $dir4_transpose[$value];
+     }
+     return \@got;
+   });
+
+#------------------------------------------------------------------------------
+# A083885 etc counts of segments in direction
+
+# dir=1
+# not in OEIS: 2,4,20,64,272,1024,4160
+# dir=2
+# not in OEIS: 1,2,16,56,256,992,4096
+# dir=3
+# not in OEIS: 4,12,64,240,1024,4032
+
+foreach my $elem ([0, 'A083885', 0],
+                  # [1, 'A000001', 0],
+                  # [2, 'A000001', 0],
+                  # [3, 'A000001', 0],
+                 ) {
+  my ($want_dir4, $anum, $initial_k) = @$elem;
+  MyOEIS::compare_values
+      (anum => $anum,
+       max_count => 8,
+       name => "dir=$want_dir4",
+       func => sub {
+         my ($count) = @_;
+         my @got;
+         my $seq = Math::NumSeq::PlanePathDelta->new(planepath_object=>$hilbert,
+                                                     delta_type => 'Dir4');
+         my $n_target = 1;
+         my $total = 0;
+         while (@got < $count) {
+           my ($n, $value) = $seq->next;
+           if ($n == $n_target) {
+             push @got, $total;
+             $n_target *= 4;
+           }
+           $total += ($value == $want_dir4);
+         }
+         return \@got;
+       });
+}
+
+#------------------------------------------------------------------------------
 # A147600 - num fixed points in 4^k blocks
 
 MyOEIS::compare_values
   (anum => 'A147600',
-   max_count => 9,
+   max_count => 8,
    func => sub {
      my ($bvalues_count) = @_;
      my @got;
@@ -118,7 +180,7 @@ MyOEIS::compare_values
 
 MyOEIS::compare_values
   (anum => 'A163894',
-   max_count => 200,
+   max_count => 100,
    func => sub {
      my ($count) = @_;
      my @got;
@@ -140,62 +202,6 @@ sub A163894_perm_n_not {
     }
   }
 }
-
-#------------------------------------------------------------------------------
-# A083885 etc counts of segments in direction
-
-foreach my $elem ([0, 'A083885', 0],
-                  # [1, '', 0],
-                  # [2, '', 1],
-                  # [3, '', 0]
-                 ) {
-  my ($dir, $anum, $initial_k) = @$elem;
-  MyOEIS::compare_values
-      (anum => $anum,
-       max_value => 10_000,
-       func => sub {
-         my ($count) = @_;
-         my @got;
-         my $n = $hilbert->n_start;
-         my $total = 0;
-         my $k = $initial_k;
-         while (@got < $count) {
-           my $n_end = 4**$k;
-           for ( ; $n < $n_end; $n++) {
-             $total += (dxdy_to_dir4($hilbert->n_to_dxdy($n)) == $dir);
-           }
-           push @got, $total;
-           $k++;
-         }
-         return \@got;
-       });
-}
-
-# return 0,1,2,3, with Y reckoned increasing upwards
-sub dxdy_to_dir4 {
-  my ($dx, $dy) = @_;
-  if ($dx > 0) { return 0; }  # east
-  if ($dx < 0) { return 2; }  # west
-  if ($dy > 0) { return 1; }  # north
-  if ($dy < 0) { return 3; }  # south
-}
-
-#------------------------------------------------------------------------------
-# A163541 -- absolute direction transpose 0=east, 1=south, 2=west, 3=north
-
-MyOEIS::compare_values
-  (anum => 'A163541',
-   name => 'absolute direction transpose',
-   func => sub {
-     my ($count) = @_;
-     my @got;
-     for (my $n = $hilbert->n_start; @got < $count; $n++) {
-       my ($dx, $dy) = $hilbert->n_to_dxdy ($n);
-       ($dx,$dy) = ($dy,$dx);   # transpose
-       push @got, MyOEIS::dxdy_to_direction ($dx, $dy);
-     }
-     return \@got;
-   });
 
 #------------------------------------------------------------------------------
 # A163895 - position where A163894 is a new high

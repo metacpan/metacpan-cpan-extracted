@@ -9,37 +9,38 @@ Create a Curio class:
 ```perl
 package MyApp::Service::DB;
 
+use MyApp::Config;
+use MyApp::Secrets;
+
 use Curio role => '::DBIx::Connector';
 use strictures 2;
 
-key_argument 'key';
+key_argument 'connection_key';
 export_function_name 'myapp_db';
+always_export;
+export_resource;
 
 add_key 'writer';
 add_key 'reader';
 
-has key => (
+has connection_key => (
     is       => 'ro',
     required => 1,
 );
 
 sub dsn {
     my ($self) = @_;
-    return myapp_config()->{db}->{ $self->key() }->{dsn};
+    return myapp_config()->{db}->{ $self->connection_key() }->{dsn};
 }
 
 sub username {
     my ($self) = @_;
-    return myapp_config()->{db}->{ $self->key() }->{username};
+    return myapp_config()->{db}->{ $self->connection_key() }->{username};
 }
 
 sub password {
     my ($self) = @_;
-    return myapp_secret( $self->key() . '_' . $self->username() );
-}
-
-sub attributes {
-    return { PrintError=>1 };
+    return myapp_secret( $self->connection_key() . '_' . $self->username() );
 }
 
 1;
@@ -48,78 +49,85 @@ sub attributes {
 Then use your new Curio class elsewhere:
 
 ```perl
-use MyApp::Service::DB qw( myapp_db );
+use MyApp::Service::DB;
 
-my $db = myapp_db('writer')->connector();
+my $db = myapp_db('writer');
 
 $db->run(sub{
-    $_->do( 'CREATE TABLE foo ( bar )' );
+    my ($one) = $_->selectrow_array( 'SELECT 1' );
 });
 ```
 
 # DESCRIPTION
 
-This role provides all the basics for building a Curio class
-which wraps around [DBIx::Connector](https://metacpan.org/pod/DBIx::Connector).
+This role provides all the basics for building a Curio class which
+wraps around [DBIx::Connector](https://metacpan.org/pod/DBIx::Connector).
 
 # OPTIONAL ARGUMENTS
 
 ## connector
 
-```perl
-my $connector = MyApp::Service::DB->fetch('writer')->connector();
-```
-
 Holds the [DBIx::Connector](https://metacpan.org/pod/DBIx::Connector) object.
 
-If not specified as an argument, a new connector will be automatically
-built based on ["dsn"](#dsn), ["username"](#username), ["password"](#password), and ["attributes"](#attributes).
+May be passed as either ain arrayref of arguments or a pre-created
+object.  If this argument is not set then it will be built from ["dsn"](#dsn),
+["username"](#username), ["password"](#password), and ["attributes"](#attributes).
 
 # REQUIRED METHODS
 
-These methods must be implemented by the consuming curio class.
+These methods must be implemented in your Curio class.
 
 ## dsn
 
-```perl
-sub dsn { 'dbi:...' }
-```
+This method must return a [DBI](https://metacpan.org/pod/DBI) `$dsn`/`$data_source`, such as
+`dbi:SQLite:dbname=:memory:`.
 
 # OPTIONAL METHODS
 
-These methods may be implemented by the consuming curio class.
+These methods may be implemented in your Curio class.
 
 ## username
 
-```perl
-sub username { '' }
-```
+If this method is not present then an empty string will be used for
+the username when the ["connector"](#connector) is built.
 
 ## password
 
-```perl
-sub password { '' }
-```
+If this method is not present then an empty string will be used for
+the passord when the ["connector"](#connector) is built.
 
 ## attributes
 
+If this method is not present then an empty hashref will be used for
+the attributes when the ["connector"](#connector) is built.
+
 ```perl
-sub attributes { {} }
+sub attributes {
+    return { SomeAttribute => 3 };
+}
 ```
 
-`AutoCommit` will be set to `1` unless you directly override it
-in this hashref.
+Note what ["AUTOCOMMIT"](#autocommit) says.
 
-See ["ATTRIBUTES-COMMON-TO-ALL-HANDLES" in DBI](https://metacpan.org/pod/DBI#ATTRIBUTES-COMMON-TO-ALL-HANDLES).
+# AUTOCOMMIT
 
-# CACHING
+The `AutoCommit` [DBI](https://metacpan.org/pod/DBI) attribute is defaulted to `1`.  You can
+override this in ["attributes"](#attributes).
 
-This role sets the ["does\_caching" in Curio::Factory](https://metacpan.org/pod/Curio::Factory#does_caching) feature.
+If the ["connector"](#connector) argument is set then this defaulting of
+`AutoCommit` is skipped.
 
-You can of course disable this feature.
+# FEATURES
+
+This role turns on ["does\_caching" in Curio::Factory](https://metacpan.org/pod/Curio::Factory#does_caching) and sets
+["resource\_method\_name" in Curio::Factory](https://metacpan.org/pod/Curio::Factory#resource_method_name) to `connector` (as in
+["connector"](#connector)).
+
+You can of course revert these changes:
 
 ```
 does_caching 0;
+resource_method_name undef;
 ```
 
 # SUPPORT
@@ -131,10 +139,10 @@ Curio-Role-DBIx-Connector GitHub issue tracker:
 
 # ACKNOWLEDGEMENTS
 
-Thanks to [ZipRecruiter](https://www.ziprecruiter.com/)
-for encouraging their employees to contribute back to the open
-source ecosystem.  Without their dedication to quality software
-development this distribution would not exist.
+Thanks to [ZipRecruiter](https://www.ziprecruiter.com/) for
+encouraging their employees to contribute back to the open source
+ecosystem.  Without their dedication to quality software development
+this distribution would not exist.
 
 # AUTHORS
 

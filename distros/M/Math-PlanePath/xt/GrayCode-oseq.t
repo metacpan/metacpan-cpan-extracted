@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013, 2018 Kevin Ryde
+# Copyright 2012, 2013, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -29,10 +29,11 @@ use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings(); }
 use MyOEIS;
 
+use Math::PlanePath::GrayCode;
+
 use Math::PlanePath::Base::Digits
   'digit_split_lowtohigh',
   'digit_join_lowtohigh';
-use Math::PlanePath::GrayCode;
 use Math::PlanePath::Diagonals;
 
 sub numeq_array {

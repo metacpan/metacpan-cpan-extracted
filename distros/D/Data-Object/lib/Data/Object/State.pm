@@ -5,7 +5,7 @@ use warnings;
 
 use parent 'Data::Object::Class';
 
-our $VERSION = '0.97'; # VERSION
+our $VERSION = '0.98'; # VERSION
 
 # BUILD
 

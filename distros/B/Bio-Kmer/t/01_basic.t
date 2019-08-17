@@ -6,24 +6,24 @@ use FindBin qw/$RealBin/;
 use IO::Uncompress::Gunzip qw/gunzip $GunzipError/;
 use Data::Dumper qw/Dumper/;
 
-use Test::More tests => 17;
+use Test::More tests => 19;
 
 use lib "$RealBin/../lib";
 use_ok 'Bio::Kmer';
 
 # expected histogram
 my @correctCounts=(
-  0,
-  16087,
-  17621,
-  12868,
-  6857,
-  3070,
-  1096,
-  380,
-  105,
-  17,
-# 6,
+  0,      # histogram count of 0 instances
+  16087,  # histogram count of 1 instance
+  17621,  # histogram count of 2 instances
+  12868,  # histogram count of 3 instances
+  6857,   # histogram count of 4 instances
+  3070,   # histogram count of 5 instances
+  1096,   # histogram count of 6 instances
+  380,    # histogram count of 7 instances
+  105,    # histogram count of 8 instances
+  17,     # histogram count of 9 instances
+  6,      # histogram count of 10 instances
 );
 
 # expected query results
@@ -49,6 +49,8 @@ for my $query(keys(%query)){
   is $query{$query}, $kmer->query($query), "Queried for $query{$query}";
 }
 $kmer->close();
+my $numKmers = scalar(keys(%{ $kmer->kmers() }));
+is $numKmers, 58107, "Expected 58107 kmers. Found $numKmers kmers.";
 
 # Test subsampling: a subsample should have fewer kmers than
 # the full set but more than 0.
@@ -56,10 +58,11 @@ my $subsampleKmer=Bio::Kmer->new(dirname($0)."/../data/rand.fastq.gz",{kmerlengt
 my $subsampleHist=$kmer->histogram();
 my $subsampleKmerHash=$subsampleKmer->kmers();
 my $numSubsampledKmers = scalar(keys(%$subsampleKmerHash));
-my $numKmers = scalar(keys(%{ $kmer->kmers() }));
 
-ok(($numSubsampledKmers > 0), "Subsample kmers, and there are a nonzero count of results.");
+note "Found $numSubsampledKmers subsampled kmers vs full count of kmers: $numKmers, of a requested frequency of 0.1";
 
-ok(($numSubsampledKmers < $numKmers), "Subsample kmers fewer than full count of kmers");
+cmp_ok($numSubsampledKmers, '>', 0, "Subsampled kmers are a nonzero count.");
+
+cmp_ok($numSubsampledKmers, '<', $numKmers, "Subsample kmers are than the full count.");
 
 

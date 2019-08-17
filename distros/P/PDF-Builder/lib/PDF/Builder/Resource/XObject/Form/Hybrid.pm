@@ -5,8 +5,8 @@ use base qw(PDF::Builder::Content PDF::Builder::Content::Text PDF::Builder::Reso
 use strict;
 use warnings;
 
-our $VERSION = '3.015'; # VERSION
-my $LAST_UPDATE = '3.003'; # manually update whenever code is changed
+our $VERSION = '3.016'; # VERSION
+my $LAST_UPDATE = '3.016'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Dict;
 use PDF::Builder::Basic::PDF::Utils;
@@ -48,20 +48,20 @@ sub new {
 }
 
 sub outobjdeep {
-    my ($self, @options) = @_;
+    my ($self) = shift();
 
     $self->textend() unless $self->{' nofilt'};
 
-    # Maintainer's Note: This list of keys isn't the same as the list
-    # in new().  Should it be?
-    # missing: stream, poststream, apiistext
-    # added:   api, apipdf, apipage
-    foreach my $key (qw(api apipdf apipage font fontsize charspace hscale
-                        wordspace lead rise render matrix fillcolor
-                        strokecolor translate scale skew rotate)) {
-        delete $self->{" $key"};
-    }
-    return PDF::Builder::Basic::PDF::Dict::outobjdeep($self, @options);
+#   # Maintainer's Note: This list of keys isn't the same as the list
+#   # in new().  Should it be?
+#   # missing: stream, poststream, apiistext
+#   # added:   api, apipdf, apipage
+#   foreach my $key (qw(api apipdf apipage font fontsize charspace hscale
+#                       wordspace lead rise render matrix fillcolor
+#                       strokecolor translate scale skew rotate)) {
+#       delete $self->{" $key"};
+#   }
+    return PDF::Builder::Basic::PDF::Dict::outobjdeep($self, @_);
 }
 
 1;

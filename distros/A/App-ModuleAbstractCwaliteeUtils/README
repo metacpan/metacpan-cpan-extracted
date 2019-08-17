@@ -3,9 +3,9 @@ NAME
     Abstract cwalitee
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.003 of
     App::ModuleAbstractCwaliteeUtils (from Perl distribution
-    App-ModuleAbstractCwaliteeUtils), released on 2019-07-03.
+    App-ModuleAbstractCwaliteeUtils), released on 2019-08-02.
 
 DESCRIPTION
     This distribution includes the following utilities:
@@ -13,6 +13,8 @@ DESCRIPTION
     *   calc-module-abstract-cwalitee
 
     *   list-module-abstract-cwalitee-indicators
+
+    *   ma-cwa
 
 HOMEPAGE
     Please visit the project's homepage at

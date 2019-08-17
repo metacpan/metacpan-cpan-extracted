@@ -1,6 +1,6 @@
 package Map::Tube::Bielefeld;
 
-$VERSION = '2019.0718';
+$VERSION = '2019.0816';
 
 =head1 NAME
 
@@ -25,12 +25,12 @@ with 'Map::Tube';
 =head1 DESCRIPTION
 
 It currently provides functionality to find the shortest route between
-the two given stations. The map contains both U-Bahn and S-Bahn stations.
+the two given stations.
 
 =head1 CONSTRUCTOR
 
-    use Map::Tube::Berlin;
-    my $tube = Map::Tube::Berlin->new;
+    use Map::Tube::Bielefeld;
+    my $tube = Map::Tube::Bielefeld->new;
 
 =head1 METHODS
 

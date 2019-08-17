@@ -43,7 +43,6 @@ lib/Test2/Compare/Set.pm
 lib/Test2/Compare/String.pm
 lib/Test2/Compare/Undef.pm
 lib/Test2/Compare/Wildcard.pm
-lib/Test2/Event/Times.pm
 lib/Test2/Manual.pm
 lib/Test2/Manual/Anatomy.pm
 lib/Test2/Manual/Anatomy/API.pm

@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -28,7 +28,7 @@ use List::Util;
 *min = \&Math::PlanePath::_min;
 
 use vars '$VERSION','@ISA';
-$VERSION = 126;
+$VERSION = 127;
 use Math::NumSeq;
 @ISA = ('Math::NumSeq');
 
@@ -3346,7 +3346,7 @@ sub characteristic_smaller {
       { DiffXY  => 'A020990', # GRS*(-1)^n cumulative
         AbsDiff => 'A020990',
 
-        # Not quite, OFFSET=0 value=1 which corresponds to N=1 Sum=1, so
+        # Not quite Sum, OFFSET=0 value=1 corresponds to N=1 Sum=1, so
         # A020986 doesn't have N=0 Sum=0.
         # Sum     => 'A020986', # GRS cumulative
         # # OEIS-Catalogue: A020986 planepath=AlternatePaper coordinate_type=Sum i_start=1
@@ -3399,17 +3399,26 @@ sub characteristic_smaller {
   #  { 'realpart=1,arms=1' =>
   #    {
   #     # not quite, OFFSET=1 but start N=0 here
+  #     # NegX     => 'A290885',
   #     # Y        => 'A290884',
   #     # RSquared => 'A290886',
   #     # OEIS-Catalogue: A290884 planepath=ComplexPlus coordinate_type=Y
   #     # OEIS-Catalogue: A290886 planepath=ComplexPlus coordinate_type=RSquared
-  #     # also -X, also OFFSET=1
-  #     # NegX => 'A290885',
   #    },
   #  };
 # }
 { package Math::PlanePath::ComplexMinus;
   use constant _NumSeq_Coord_filling_type => 'plane';
+  use constant _NumSeq_Coord_oeis_anum =>
+   { 'realpart=1' =>
+     {X        => 'A318438',
+      Y        => 'A318439',
+      RSquared => 'A318479',
+      # OEIS-Catalogue: A318438 planepath=ComplexMinus coordinate_type=X
+      # OEIS-Catalogue: A318439 planepath=ComplexMinus coordinate_type=Y
+      # OEIS-Catalogue: A318479 planepath=ComplexMinus coordinate_type=RSquared
+     },
+   };
 }
 { package Math::PlanePath::ComplexRevolving;
   use constant _NumSeq_Coord_filling_type => 'plane';

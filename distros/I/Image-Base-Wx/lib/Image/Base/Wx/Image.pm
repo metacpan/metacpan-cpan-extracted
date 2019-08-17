@@ -1,4 +1,4 @@
-# Copyright 2012 Kevin Ryde
+# Copyright 2012, 2019 Kevin Ryde
 
 # This file is part of Image-Base-Wx.
 #
@@ -21,13 +21,13 @@ use 5.008;
 use strict;
 use Carp;
 use Wx;
-our $VERSION = 4;
+our $VERSION = 5;
 
 use Image::Base;
 our @ISA = ('Image::Base');
 
 # uncomment this to run the ### lines
-#use Smart::Comments;
+# use Smart::Comments;
 
 
 sub new {
@@ -187,6 +187,24 @@ sub load {
 #       (defined $filename ? (' ',$filename) : ());
 # }
 
+sub _format_to_type {
+  my ($file_format) = @_;
+  my $name = uc($file_format);
+  my $method = "wxBITMAP_TYPE_\U$name";
+  my $type = eval { Wx->$method };
+  unless (defined $type) {
+    croak "Unknown -file_format ", $file_format;
+  }
+  unless (Wx::Image::FindHandlerType($type)) {
+    my $class = "Wx::${name}Handler";
+    unless ($class->isa('Wx::ImageHandler')) {
+      croak "No handler class for -file_format ", $file_format;
+    }
+    Wx::Image::AddHandler($class->new);
+  }
+  return $type;
+}
+
 sub save {
   my ($self, $filename) = @_;
   ### Image-Base-Pixbuf save(): @_
@@ -203,20 +221,31 @@ sub save {
   if ($file_format eq 'jpg') {
     $file_format = 'jpeg';
   }
-  my $handler = Wx::Image::FindHandlerMime("image/$file_format")
-    || Wx::Image::FindHandlerMime("image/x-$file_format")
-      || do {
-        my $class = "Wx::\U$file_format\EHandler";
-        $class->isa('Wx::ImageHandler') && $class->new
-      }
-        || croak "Unrecognised -file_format ",$file_format;
 
-  open my $fh, '>', $filename
-    or croak "Cannot save $filename: $!";
-  $handler->SaveFile($self->{'-wximage'}, $fh)
-    or croak "Error saving $filename (handler ",$handler->GetName,")";
-  close $fh
-    or croak "Error saving $filename: $!";
+  my $type = _format_to_type($file_format);
+  unless ($self->{'-wximage'}->SaveFile($filename, $type)) {
+    croak "Error saving";
+  }
+
+  # Circa WxPerl 0.9932 and Wx 3.0.4, Wx::BMPHandler and Wx::CURHandler
+  # called directly to a Perl fh like below results in bad file contents.
+  # It looks like a lot of extra 00 bytes in between the intended, so maybe
+  # some char coding or something.  Going through Wx::Image::SaveFile is ok.
+  #
+  # my $handler = Wx::Image::FindHandlerMime("image/$file_format")
+  #   || Wx::Image::FindHandlerMime("image/x-$file_format")
+  #     || do {
+  #       my $class = "Wx::\U$file_format\EHandler";
+  #       $class->isa('Wx::ImageHandler') && $class->new
+  #     }
+  #       || croak "Unrecognised -file_format ",$file_format;
+  #
+  # open my $fh, '>', $filename
+  #   or croak "Cannot save $filename: $!";
+  # $handler->SaveFile(, $fh)
+  #   or croak "Error saving $filename (handler ",$handler->GetName,")";
+  # close $fh
+  #   or croak "Error saving $filename: $!";
 }
 
 sub save_fh {
@@ -233,15 +262,26 @@ sub save_fh {
 
   $self->{'-wximage'}->SaveFile($fh, "image/$file_format")
     or croak "Cannot save file",
-      (defined $filename ? (' ',$filename) : ());
+    (defined $filename ? (' ',$filename) : ());
 }
 
 #------------------------------------------------------------------------------
 # drawing
 
+# Attempting to SetRGB an X or Y coordinate out of range provokes assert
+# failures from Wx, which WxPerl will display under
+# "ENABLE_DEFAULT_ASSERT_HANDLER" runtime, or an application can see through
+# OnAssertFailure.
+#
+# Not sure if would prefer to quietly truncate drawing to the valid
+# width/height.  Or maybe an application would like to see that it's going
+# out of bounds ...
+
+
 sub xy {
   my ($self, $x, $y, $colour) = @_;
   my $wximage = $self->{'-wximage'};
+
   if (@_ >= 4) {
     if (lc($colour) eq 'none') {
       # wx 2.8.12 docs say InitAlpha is an error if already have alpha data.
@@ -558,7 +598,7 @@ http://user42.tuxfamily.org/image-base-wx/index.html
 
 =head1 LICENSE
 
-Copyright 2012 Kevin Ryde
+Copyright 2012, 2019 Kevin Ryde
 
 Image-Base-Wx is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

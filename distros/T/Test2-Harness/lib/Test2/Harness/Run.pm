@@ -2,7 +2,7 @@ package Test2::Harness::Run;
 use strict;
 use warnings;
 
-our $VERSION = '0.001082';
+our $VERSION = '0.001084';
 
 use Carp qw/croak/;
 
@@ -109,7 +109,9 @@ sub TO_JSON {
     my $plugins = $self->{+PLUGINS} or return $out;
 
     my $meta = $out->{meta} //= {};
-    $_->inject_run_data($meta) for @$plugins;
+    for my $p (@$plugins) {
+        $p->inject_run_data(meta => $meta, run => $self);
+    }
 
     return $out;
 }

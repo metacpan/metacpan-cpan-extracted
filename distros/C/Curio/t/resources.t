@@ -5,6 +5,8 @@ use Test2::V0;
 subtest resource_method_name => sub{
     package CC::rmn;
         use Curio;
+        add_key 'default';
+        default_key 'default';
         sub foo { {5=>7} }
     package main;
 
@@ -28,6 +30,8 @@ subtest resource_method_name => sub{
 subtest does_registry => sub{
     package CC::rr;
         use Curio;
+        add_key 'default';
+        default_key 'default';
         resource_method_name 'foo';
         our $RESOURCE = [2,5];
         sub foo { $RESOURCE }

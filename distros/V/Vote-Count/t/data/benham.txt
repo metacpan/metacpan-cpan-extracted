@@ -1,0 +1,14 @@
+# Test Case for Benham, where Condorcet Loser Dropping
+# will change outcome.
+# Demonstrates a failing of IRV in general. In this Case
+# there is a loop, with an additional choice which is the
+# plurality winner but not in the loop. With Condorcet Loser
+# Dropping the Irrelevant Choice (Condorcet Loser) is removed,
+# but with IRV dropping one of the loop members is dropped instead.
+:CHOICES:SUZIEQ:YODEL:DEVILDOG:RINGDING
+10:SUZIEQ:YODEL
+13:SUZIEQ:DEVILDOG
+10:SUZIEQ:RINGDING
+16:YODEL:DEVILDOG:RINGDING
+17:RINGDING:YODEL:DEVILDOG
+16:DEVILDOG:RINGDING:YODEL

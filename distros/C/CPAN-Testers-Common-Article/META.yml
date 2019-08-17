@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                     CPAN-Testers-Common-Article
-version:                  0.46
+version:                  0.47
 abstract:                 Parse a CPAN Testers NNTP article
 author:
   - Barbie <barbie@cpan.org>
@@ -30,7 +30,7 @@ build_requires:
 provides:
   CPAN::Testers::Common::Article:
     file:     lib/CPAN/Testers/Common/Article.pm
-    version:  0.46
+    version:  0.47
 
 no_index:
   directory:

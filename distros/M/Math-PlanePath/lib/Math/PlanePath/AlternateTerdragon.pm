@@ -36,7 +36,7 @@ use Math::PlanePath::Base::Digits
   'round_up_pow';
 
 use vars '$VERSION', '@ISA';
-$VERSION = 126;
+$VERSION = 127;
 @ISA = ('Math::PlanePath');
 
 use Math::PlanePath::TerdragonMidpoint;

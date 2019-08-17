@@ -24,8 +24,8 @@ requires:
   Log::ger: '0.027'
   Media::Info: '0'
   Perinci::CmdLine::Any: '0'
-  Perinci::CmdLine::Base: '1.816'
-  Perinci::CmdLine::Classic: '1.770'
+  Perinci::CmdLine::Lite: '1.820'
+  Perinci::Exporter: '0.080'
   Perinci::Sub::ArgEntity::filename: '0'
   Sah::Schema::true: '0'
   perl: '5.010001'
@@ -35,7 +35,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-MediaInfo
   homepage: https://metacpan.org/release/App-MediaInfo
   repository: git://github.com/perlancar/perl-App-MediaInfo.git
-version: '0.123'
+version: '0.124'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -127,7 +127,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.596'
+      version: '0.597'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -290,7 +290,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.77'
+              version: '0.780'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'
@@ -324,11 +324,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::AddToDb
       name: '@Author::PERLANCAR/Rinci::AddToDb'
-      version: '0.01'
+      version: '0.020'
     -
-      class: Dist::Zilla::Plugin::Rinci::Validate
-      name: '@Author::PERLANCAR/Rinci::Validate'
-      version: '0.24'
+      class: Dist::Zilla::Plugin::Rinci::EmbedValidator
+      name: '@Author::PERLANCAR/Rinci::EmbedValidator'
+      version: '0.250'
     -
       class: Dist::Zilla::Plugin::SetScriptShebang
       name: '@Author::PERLANCAR/SetScriptShebang'

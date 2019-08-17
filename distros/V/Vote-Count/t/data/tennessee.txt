@@ -1,6 +1,7 @@
 # Not only is this a very popular example, it also has more than 2 choices
 # that would be condorcet winners when their ballots were redacted for 
-# Later Harm!
+# Later Harm! Manually constructing a set that does this is hard!
+# Knoxville wins IRV, but Nashville is Condorcet Winner!
 :CHOICES:CHATTANOOGA:KNOXVILLE:MEMPHIS:NASHVILLE
 15:CHATTANOOGA:KNOXVILLE:NASHVILLE:MEMPHIS
 17:KNOXVILLE:CHATTANOOGA:NASHVILLE:MEMPHIS

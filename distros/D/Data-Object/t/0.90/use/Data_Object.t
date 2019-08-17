@@ -15,41 +15,14 @@ Modern Perl Development Framework and Standard Library
 
 =synopsis
 
-  # Root Namespace and Type Library
-  package App;
-
-  use Data::Object 'Library';
-
-  # Type Library Aware Application Class
   package User;
 
-  use Data::Object 'Class', 'App';
+  use Data::Object 'Class';
 
-  has name => (
-    is  => 'ro',
-    isa => 'Str',
-    req => 1
-  );
+  extends 'Identity';
 
-  method greet(User $user) {
-    return 'Hello '. $user->name .', How are you?';
-  }
-
-  # Type Library Aware Application Package
-  package main;
-
-  use User;
-
-  use Data::Object 'Core', 'App';
-
-  fun greetings(User $u1, User $u2) {
-    return $u1->greet($u2);
-  }
-
-  my $u1 = User->new(name => 'Jane');
-  my $u2 = User->new(name => 'June');
-
-  say(greetings($u1, $u2)); # Hey June
+  has 'fname';
+  has 'lname';
 
   1;
 
@@ -62,31 +35,6 @@ ecosystem that many of engineers already know and love.
 This framework aims to provide a standardized and cohesive set of classes,
 types, objects, functions, patterns, and tools for jump-starting application
 development with modern conventions and best practices.
-
-=installation
-
-If you have cpanm, you only need one line:
-
-  $ cpanm -qn Data::Object
-
-If you don't have cpanm, get it! It takes less than a minute, otherwise:
-
-  $ curl -L https://cpanmin.us | perl - -qn Data::Object
-
-Add C<Data::Object> to the list of dependencies in C<cpanfile>:
-
-  requires "Data::Object" => "0.97"; # 0.97 or newer
-
-If cpanm doesn't have permission to install modules in the current Perl
-installation, it will automatically set up and install to a local::lib in your
-home directory.  See the L<local::lib|local::lib> documentation for details on
-enabling it in your environment. We recommend using a
-L<Perlbrew|https://github.com/gugod/app-perlbrew> or
-L<Plenv|https://github.com/tokuhirom/plenv> environment. These tools will help
-you manage multiple Perl installations in your C<$HOME> directory. They are
-completely isolated Perl installations.
-
-=overview
 
 The power of this framework comes from the extendable (yet fully optional) type
 library which is integrated into the object system and type-constrainable
@@ -104,7 +52,7 @@ interfaces in other languages).
 
   use Data::Object;
 
-This is what's enabled whenever you import the L<Data::Object> framework.
+This is what's enabled whenever you import the L<Data::Object> application development framework.
 
   # basics
   use strict;
@@ -120,8 +68,8 @@ This is what's enabled whenever you import the L<Data::Object> framework.
   # load super "do" function, etc
   use Data::Object::Export;
 
-To explain the example in the synopsis: The following creates a class
-representing a user which has the ability to greet user person.
+To explain by way of example: The following creates a class representing a user
+which has the ability to greet user person.
 
   package User;
 
@@ -187,6 +135,29 @@ things we love most. The wiring-up of things! If you're familiar with Perl,
 this framework is in-part the wiring up of L<Moo> (with L<Moose> support),
 L<Type::Tiny>, L<Function::Parameters>, L<Try::Tiny> and data objects in a
 cooperative and cohesive way that feels like it's native to the language.
+
+=installation
+
+If you have cpanm, you only need one line:
+
+  $ cpanm -qn Data::Object
+
+If you don't have cpanm, get it! It takes less than a minute, otherwise:
+
+  $ curl -L https://cpanmin.us | perl - -qn Data::Object
+
+Add C<Data::Object> to the list of dependencies in C<cpanfile>:
+
+  requires "Data::Object" => "0.97"; # 0.97 or newer
+
+If cpanm doesn't have permission to install modules in the current Perl
+installation, it will automatically set up and install to a local::lib in your
+home directory.  See the L<local::lib|local::lib> documentation for details on
+enabling it in your environment. We recommend using a
+L<Perlbrew|https://github.com/gugod/app-perlbrew> or
+L<Plenv|https://github.com/tokuhirom/plenv> environment. These tools will help
+you manage multiple Perl installations in your C<$HOME> directory. They are
+completely isolated Perl installations.
 
 =cut
 

@@ -10,6 +10,7 @@ dist.ini
 lib/App/ModuleAbstractCwaliteeUtils.pm
 script/calc-module-abstract-cwalitee
 script/list-module-abstract-cwalitee-indicators
+script/ma-cwa
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t

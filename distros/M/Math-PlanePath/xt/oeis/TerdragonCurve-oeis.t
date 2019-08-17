@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -19,6 +19,7 @@
 
 use 5.004;
 use strict;
+use Math::BigInt;
 use Test;
 plan tests => 12;
 
@@ -144,7 +145,6 @@ foreach my $elem (['A057682', 1, 0, 0, [0,1]],  # X
        name => "$anum arms=$arms",
        func => sub {
          my ($count) = @_;
-         require Math::BigInt;
          my @got = @$initial_got;
          for (my $k = $initial_level; @got < $count; $k++) {
            my ($n_lo,$n_hi) = $path->level_to_n_range(Math::BigInt->new($k));
@@ -396,7 +396,6 @@ MyOEIS::compare_values
                                                  turn_type => 'LSR');
      my @got;
      for (my $level = 0; @got < $count; $level++) {
-       require Math::BigInt;
        my $big = Math::BigInt->new(0);
        foreach my $n (1 .. 3**$level) {
          my $value = $seq->ith($n);
@@ -484,7 +483,7 @@ MyOEIS::compare_values
    });
 
 #------------------------------------------------------------------------------
-# A038502 - taken mod 3 is 1=left, 2=right
+# A038502 - taken mod 3 is turn 1=left, 2=right
 
 MyOEIS::compare_values
   (anum => 'A038502',

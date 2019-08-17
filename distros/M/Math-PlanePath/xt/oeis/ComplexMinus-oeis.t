@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013, 2016 Kevin Ryde
+# Copyright 2012, 2013, 2016, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -19,9 +19,9 @@
 
 use 5.004;
 use strict;
+use Math::BigInt try => 'GMP';   # for bignums in reverse-add steps
 use Test;
-plan tests => 7;
-use Math::BigInt try => 'GMP';
+plan tests => 24;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -30,7 +30,6 @@ use MyOEIS;
 
 # uncomment this to run the ### lines
 # use Smart::Comments '###';
-
 
 use Math::PlanePath::ComplexMinus;
 my $path = Math::PlanePath::ComplexMinus->new;
@@ -110,12 +109,43 @@ sub reverse_subtract_palindrome_steps {
 }
 
 #------------------------------------------------------------------------------
-# A193306 reverse-subtract steps to 0 (plain-rev)
-# A193307 reverse-subtract steps to 0 (rev-plain)
+# A011658 - repeat 0,0,0,1,1 is turn NotStraight
+#               N= 1 2 3 4 5 ...
+
+MyOEIS::compare_values
+  (anum => 'A011658',
+   func => sub {
+     my ($count) = @_;
+     require Math::NumSeq::PlanePathTurn;
+     my $seq = Math::NumSeq::PlanePathTurn->new
+       (planepath => 'ComplexMinus,realpart=2',
+        turn_type => 'NotStraight');
+     my @got;
+     while (@got < $count) {
+       my ($i,$value) = $seq->next;
+       push @got, $value;
+     }
+     return \@got;
+   });
+{
+  my @want = (1,0,0,0,1);
+  my $seq = Math::NumSeq::PlanePathTurn->new
+    (planepath => 'ComplexMinus,realpart=2',
+     turn_type => 'NotStraight');
+  for (1 .. 10_000) {
+    my ($i,$value) = $seq->next;
+    $value == $want[$i%5] or die "oops $i";
+  }
+  ok(1,1, 'Turn repeating');
+}
+
+#------------------------------------------------------------------------------
+# A193306 reverse-subtract steps to 0 (plain-rev) in base i-1
+# A193307 reverse-subtract steps to 0 (rev-plain) in base i-1
 
 MyOEIS::compare_values
   (anum => 'A193306',
-   max_count => 100,
+   max_count => 30,   # touch slow
    func => sub {
      my ($count) = @_;
      my @got;
@@ -127,12 +157,54 @@ MyOEIS::compare_values
 
 MyOEIS::compare_values
   (anum => 'A193307',
-   max_count => 100,
+   max_count => 30,   # touch slow
    func => sub {
      my ($count) = @_;
      my @got;
      for (my $n = Math::BigInt->new(0); @got < $count; $n++) {
        push @got, reverse_subtract_palindrome_steps($n, 1);
+     }
+     return \@got;
+   });
+
+#------------------------------------------------------------------------------
+# A318438 X coordinate
+# A318439 Y coordinate
+
+MyOEIS::compare_values
+  (anum => 'A318438',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $n = 0; @got < $count; $n++) {
+       my ($x,$y) = $path->n_to_xy ($n);
+       push @got, $x;
+     }
+     return \@got;
+   });
+MyOEIS::compare_values
+  (anum => 'A318439',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $n = 0; @got < $count; $n++) {
+       my ($x,$y) = $path->n_to_xy ($n);
+       push @got, $y;
+     }
+     return \@got;
+   });
+
+#------------------------------------------------------------------------------
+# A318479 norm
+
+MyOEIS::compare_values
+  (anum => 'A318479',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $n = 0; @got < $count; $n++) {
+       my ($x,$y) = $path->n_to_xy ($n);
+       push @got, $x**2 + $y**2;
      }
      return \@got;
    });
@@ -200,6 +272,17 @@ MyOEIS::compare_values
      my @got;
      for (my $x = 0; @got < $count; $x++) {
        push @got, $path->xy_to_n ($x,0);
+     }
+     return \@got;
+   });
+# and 2*A066321 on North-West diagonal by one expansion
+MyOEIS::compare_values
+  (anum => q{A066321},
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $i = 0; @got < $count; $i++) {
+       push @got, $path->xy_to_n(-$i,$i) / 2;
      }
      return \@got;
    });

@@ -15,7 +15,7 @@ my @leaders = qw/ 1 2 4 7 /;
 
 my $score = MIDI::Util::setup_score( bpm => 100 );
  
-my $mc = Music::Cadence->new;
+my $mc = Music::Cadence->new( octave => 4 );
 
 for my $i ( 1 .. $max ) {
     my $note1 = $notes[ int rand @notes ];
@@ -24,24 +24,18 @@ for my $i ( 1 .. $max ) {
     $score->n( 'qn', $note1, $note2 );
 
     if ( $i % 4 == 0 ) {
-        my $leading = $leaders[ int rand @leaders ];
         my $chords = $mc->cadence(
             type    => 'half',
-            octave  => 4,
-            leading => $leading,
+            leading => $leaders[ int rand @leaders ],
         );
-
-        $score->n( 'hn', @{ $chords->[0] } );
-        $score->n( 'hn', @{ $chords->[1] } );
+        $score->n( 'hn', @$_ ) for @$chords;
     }
 }
 
-my $chords = $mc->cadence(
-  type   => 'plagal',
-  octave => 4,
-);
+my $chords = $mc->cadence( type => 'deceptive' );
+$score->n( 'hn', @$_ ) for @$chords;
 
-$score->n( 'hn', @{ $chords->[0] } );
-$score->n( 'hn', @{ $chords->[1] } );
+$chords = $mc->cadence( type => 'plagal' );
+$score->n( 'hn', @$_ ) for @$chords;
 
 $score->write_score("$0.mid");

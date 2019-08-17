@@ -37,6 +37,7 @@
       },
       "runtime" : {
          "requires" : {
+            "File::Share" : "0.25",
             "Map::Tube" : "3.63",
             "perl" : "5.008005"
          }
@@ -49,7 +50,18 @@
       }
    },
    "release_status" : "stable",
-   "version" : "2019.0718",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/vpeil/perl-map-tube-bielefeld/issues"
+      },
+      "homepage" : "https://github.com/vpeil/perl-map-tube-bielefeld",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/vpeil/perl-map-tube-bielefeld.git",
+         "web" : "https://github.com/vpeil/perl-map-tube-bielefeld"
+      }
+   },
+   "version" : "2019.0816",
    "x_generated_by_perl" : "v5.30.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.11",
    "x_static_install" : 1

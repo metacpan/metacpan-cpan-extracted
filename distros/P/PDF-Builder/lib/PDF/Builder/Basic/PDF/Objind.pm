@@ -15,8 +15,8 @@ package PDF::Builder::Basic::PDF::Objind;
 use strict;
 use warnings;
 
-our $VERSION = '3.015'; # VERSION
-my $LAST_UPDATE = '3.014'; # manually update whenever code is changed
+our $VERSION = '3.016'; # VERSION
+my $LAST_UPDATE = '3.016'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -145,11 +145,17 @@ subroutine otherwise we could be in for a very deep loop!
 sub val {
     my ($self) = @_;
 
-   #$self->{' parent'}->read_obj(@_)->val() unless $self->{' realised'};
+   # this original code is very confusing. is this a
+   # recursive call to this val(), or another? what is
+   # supposed to be returned when self->realised is True?
+   # perlcritic doesn't like this...
+   #$self->{' parent'}->read_obj(@_)->val() 
+   #   unless $self->{' realised'}; ## no critic
+
     if ($self->{' realised'}) {
-	    return $self->{' realised'};
+        return $self->{' realised'}; # return undef in any cases?
     } else {
-	    return $self->{' parent'}->read_obj(@_)->val();
+        return $self->{' parent'}->read_obj(@_)->val();
     }
 }
 
@@ -160,16 +166,12 @@ Makes sure that the object is fully read in, etc.
 =cut
 
 sub realise {
-    my $self = shift;
+    my $self = shift();
 
-    return $self if $self->{' realised'} || 
-	            !$self->{' objnum'};
-
-    $self->{' realised'} = 1;
-    return $self->{' parent'}->read_obj($self, @_);
+    return $self if $self->{' realised'}; 
+    return $self->{' parent'}->read_obj($self, @_) if $self->{' objnum'};
+    return $self;
 }
-
-=head2 $v = $r->outobjdeep($fh, $pdf, %opts)
 
 =head2 $v = $r->outobjdeep($fh, $pdf)
 
@@ -180,17 +182,23 @@ will loop forever!
 =cut
 
 sub outobjdeep {
-    my ($self, $fh, $pdf, %opts) = @_;
+    my ($self, $fh, $pdf) = @_;
 
-   #$self->{' parent'}->read_obj($self)->outobjdeep($fh, $pdf, %opts) unless $self->{' realised'};
+   # this original code is very confusing. is this a
+   # recursive call to this outobjdeep(), or another? what is
+   # supposed to be returned when self->realised is True?
+   # perlcritic doesn't like the lack of explicit return...
+   #$self->{' parent'}->read_obj($self)->outobjdeep($fh, $pdf) 
+   #    unless $self->{' realised'}; ## no critic
+
     if ($self->{' realised'}) {
-	    return $self->{' realised'};
+        return $self->{' realised'};  # return undef in any cases?
     } else {
-	    return $self->{' parent'}->read_obj($self)->outobjdeep($fh, $pdf, %opts);
+        return $self->{' parent'}->read_obj($self)->outobjdeep($fh, $pdf);
     }
 }
 
-=head2 $r->outobj($fh)
+=head2 $r->outobj($fh, $pdf)
 
 If this is a full object then outputs a reference to the object, otherwise calls
 outobjdeep to output the contents of the object at this point.
@@ -198,30 +206,35 @@ outobjdeep to output the contents of the object at this point.
 =cut
 
 sub outobj {
-    my ($self, $fh, $pdf, %opts) = @_;
+    my ($self, $fh, $pdf) = @_;
 
     if (defined $pdf->{' objects'}{$self->uid()}) {
         $fh->printf("%d %d R", @{$pdf->{' objects'}{$self->uid()}}[0..1]);
     } else {
-        $self->outobjdeep($fh, $pdf, %opts);
+        $self->outobjdeep($fh, $pdf);
     }
     return;
 }
 
-=head2 $s = $r->elementsof()
+=head2 $s = $r->elements()
 
 Abstract superclass function filler. Returns self here but should return
 something more useful if an array.
 
+The old name of this method, C<elementsof>, has been B<deprecated> and will
+be removed in the future.
+
 =cut
 
-sub elementsof {
+sub elementsof { return elements(@_); }
+
+sub elements {
     my ($self) = @_;
 
     if ($self->{' realised'}) {
         return $self;
     } else {
-        return $self->{' parent'}->read_obj($self)->elementsof();
+        return $self->{' parent'}->read_obj($self)->elements();
     }
 }
 
@@ -261,7 +274,7 @@ sub merge {
 
         # This doesn't seem like the right place to do this, but I haven't
         # yet found all of the places where Parent is being set
-        weaken $self->{$k} if $k eq 'Parent';	
+        weaken $self->{$k} if $k eq 'Parent';
     }
     $self->{' realised'} = 1;
     return bless $self, ref($other);

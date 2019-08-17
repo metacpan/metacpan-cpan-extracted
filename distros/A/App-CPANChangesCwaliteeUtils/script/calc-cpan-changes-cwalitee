@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/CPANChangesCwaliteeUtils/calc_cpan_changes_cwalitee
-# and generated automatically using Perinci::CmdLine::Gen version 0.488
+# and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-07-10'; # DATE
+our $DATE = '2019-08-02'; # DATE
 our $DIST = 'App-CPANChangesCwaliteeUtils'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,13 +37,37 @@ calc-cpan-changes-cwalitee - Calculate CPAN Changes cwalitee
 
 =head1 VERSION
 
-This document describes version 0.003 of calc-cpan-changes-cwalitee (from Perl distribution App-CPANChangesCwaliteeUtils), released on 2019-07-10.
+This document describes version 0.005 of calc-cpan-changes-cwalitee (from Perl distribution App-CPANChangesCwaliteeUtils), released on 2019-08-02.
 
 =head1 SYNOPSIS
 
 Usage:
 
  % calc-cpan-changes-cwalitee [options] [path]
+
+Examples:
+
+Run against the the Changes of App-CPANChangesCwaliteeUtils distribution:
+
+ % calc-cpan-changes-cwalitee
+ +-----------------------------------+-----+--------+----------------+----------+
+ | indicator                         | num | result | result_summary | severity |
+ +-----------------------------------+-----+--------+----------------+----------+
+ | not_too_wide                      | 1   | 1      |                | 3        |
+ | parsable                          | 2   | 1      |                | 3        |
+ | date_correct_format               | 3   | 1      |                | 3        |
+ | date_parsable                     | 4   | 1      |                | 3        |
+ | english                           | 5   | 1      |                | 3        |
+ | has_releases                      | 6   | 1      |                | 3        |
+ | no_duplicate_version              | 7   | 1      |                | 3        |
+ | no_empty_group                    | 8   | 1      |                | 3        |
+ | no_shouting                       | 9   | 1      |                | 3        |
+ | no_useless_text                   | 10  | 1      |                | 3        |
+ | preamble_has_no_releases          | 11  | 1      |                | 3        |
+ | release_dates_not_future          | 12  | 1      |                | 3        |
+ | releases_in_descending_date_order | 13  | 1      |                | 3        |
+ | Score                             |     | 100.00 | 13 out of 13   |          |
+ +-----------------------------------+-----+--------+----------------+----------+
 
 =head1 OPTIONS
 

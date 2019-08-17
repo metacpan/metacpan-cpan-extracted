@@ -9,13 +9,13 @@ use namespace::autoclean;
 use Moose;
 extends 'Vote::Count';
 
-our $VERSION='0.017';
+our $VERSION='0.021';
 
 =head1 NAME
 
 Vote::Count::Method::CondorcetDropping
 
-=head1 VERSION 0.017
+=head1 VERSION 0.021
 
 =cut
 
@@ -42,6 +42,9 @@ This module implements dropping methodologies for resolving a Condorcet Matrix w
 
 Common Dropping Methods are: Borda Count (with all the attendant weighting issues), Approval, Plurality Loser (TopCount), and Greatest Loss. Greatest Loss is not currently available, and will likely be implemented in the SSD module if and when that is ever written.
 
+=head2 Option SkipLoserDrop
+
+Normally RunCondorcetDropping eliminates Condorcet Losers whenever they are discovered. However, the Benham method, which is probably the most widely used method that uses simple dropping, only considers Condorcet Winners.
 
 =cut
 
@@ -76,6 +79,12 @@ has 'DropRule' => (
   isa => 'Str',
   is => 'ro',
   default => 'plurality',
+);
+
+has 'SkipLoserDrop' => (
+  isa => 'Int',
+  is => 'ro',
+  default => 0,
 );
 
 sub GetRound ( $self, $active, $roundnum='' ) {
@@ -179,12 +188,14 @@ DROPLOOP:
       $result->{'winner'} = $cw ;
       last DROPLOOP;
     }
-    my $eliminated = $matrix->CondorcetLoser();
+    my $eliminated =
+      $self->SkipLoserDrop()
+      ? { 'eliminations' => 0 }
+      : $matrix->CondorcetLoser();
     if( $eliminated->{'eliminations'}) {
       # tracking active between iterations of matrix.
       $active = $matrix->Active();
-      $self->logv( "Eliminated Condorcet Losers:",
-        join( ', ', $eliminated->{'eliminated'}->@* ));
+      $self->logv( $eliminated->{'verbose'} );
       # active changed, restart loop
       next DROPLOOP;
     }
@@ -194,7 +205,7 @@ DROPLOOP:
     } else { @jeapardy = keys %{$active} }
     for my $goodbye ( $self->DropChoice( $round, @jeapardy )) {
       delete $active->{ $goodbye };
-      $self->logv( "Elimminating $goodbye");
+      $self->logv( "Eliminating $goodbye");
     }
     my @remaining = keys $active->%* ;
     if ( @remaining == 0) {

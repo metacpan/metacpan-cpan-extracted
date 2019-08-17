@@ -1,3 +1,15 @@
+0.005   2019-08-02  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Add shortcut alias cc-cwa for list-cpan-changes-cwalitee.
+
+
+0.004   2019-07-26  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	- Add a couple of examples.
+
+
 0.003   2019-07-10  Released-By: PERLANCAR; Urgency: medium
 
 	- Use args_calc() from Cwalitee::Common for better completion.

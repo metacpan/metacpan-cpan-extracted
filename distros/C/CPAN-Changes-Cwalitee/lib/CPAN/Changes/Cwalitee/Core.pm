@@ -1,7 +1,7 @@
 package CPAN::Changes::Cwalitee::Core;
 
-our $DATE = '2019-07-26'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $DATE = '2019-08-02'; # DATE
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use strict;
@@ -521,7 +521,7 @@ CPAN::Changes::Cwalitee::Core - A collection of core indicators for CPAN Changes
 
 =head1 VERSION
 
-This document describes version 0.007 of CPAN::Changes::Cwalitee::Core (from Perl distribution CPAN-Changes-Cwalitee), released on 2019-07-26.
+This document describes version 0.009 of CPAN::Changes::Cwalitee::Core (from Perl distribution CPAN-Changes-Cwalitee), released on 2019-08-02.
 
 =head1 FUNCTIONS
 

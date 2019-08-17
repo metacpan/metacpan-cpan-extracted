@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -37,11 +37,11 @@
 # A114254 Sum of all terms on the two principal diagonals of a 2n+1 X 2n+1 square spiral.
 
 
-
 use 5.004;
 use strict;
+use Math::BigInt;
 use Test;
-plan tests => 64;
+plan tests => 65;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -73,6 +73,92 @@ sub dxdy_to_dir4_1 {
   if ($dy > 0) { return 2; }  # north
   if ($dy < 0) { return 4; }  # south
 }
+
+
+#------------------------------------------------------------------------------
+# A174344 X coordinate
+MyOEIS::compare_values
+  (anum => 'A174344',
+   func => sub {
+     my ($count) = @_;
+     my $path = Math::PlanePath::SquareSpiral->new;
+     my @got;
+     my $y = 0;
+     for (my $n=1; @got < $count; $n++) {
+       my ($x,$y) = $path->n_to_xy($n);
+       push @got, $x;
+     }
+     return \@got;
+   });
+
+# A274923 Y coordinate
+MyOEIS::compare_values
+  (anum => 'A274923',
+   func => sub {
+     my ($count) = @_;
+     my $path = Math::PlanePath::SquareSpiral->new;
+     my @got;
+     my $y = 0;
+     for (my $n=1; @got < $count; $n++) {
+       my ($x,$y) = $path->n_to_xy($n);
+       push @got, $y;
+     }
+     return \@got;
+   });
+
+#------------------------------------------------------------------------------
+# A267682 Y axis positive and negative, n_start=1, origin twice
+MyOEIS::compare_values
+  (anum => 'A267682',
+   func => sub {
+     my ($count) = @_;
+     my $path = Math::PlanePath::SquareSpiral->new;
+     my @got;
+     my $y = 0;
+     for (;;) {
+       push @got, $path->xy_to_n(0, $y);
+       last unless @got < $count;
+       push @got, $path->xy_to_n(0, -$y);
+       last unless @got < $count;
+       $y++;
+     }
+     return \@got;
+   });
+
+# A156859 Y axis positive and negative, n_start=0
+MyOEIS::compare_values
+  (anum => 'A156859',
+   func => sub {
+     my ($count) = @_;
+     my $path = Math::PlanePath::SquareSpiral->new (n_start => 0);
+     my @got = (0);
+     for (my $y = 1; @got < $count; $y++) {
+       push @got, $path->xy_to_n(0, $y);
+       last unless @got < $count;
+       push @got, $path->xy_to_n(0, -$y);
+     }
+     return \@got;
+   });
+
+# A317186 X axis positive and negative, n_start=0
+MyOEIS::compare_values
+  (anum => 'A317186',
+   func => sub {
+     my ($count) = @_;
+     my $path = Math::PlanePath::SquareSpiral->new;
+     my @got;
+     my $x = 0;
+     for (;;) {
+       last unless @got < $count;
+       push @got, $path->xy_to_n(-$x, 0);
+       $x++;
+       last unless @got < $count;
+       push @got, $path->xy_to_n($x, 0);
+     }
+     return \@got;
+   });
+
+
 
 
 #------------------------------------------------------------------------------
@@ -190,7 +276,6 @@ MyOEIS::compare_values
        func => sub {
          my ($count) = @_;
          my $path = Math::PlanePath::SquareSpiral->new (n_start => 0);
-         require Math::BigInt;
          my $total = Math::BigInt->new(1);
          my @got = ($total);
          for (my $n = $path->n_start + 1; @got < $count; $n++) {
@@ -218,7 +303,6 @@ MyOEIS::compare_values
    func => sub {
      my ($count) = @_;
      my $path = Math::PlanePath::SquareSpiral->new (n_start => 0);
-     require Math::BigInt;
      my $total = Math::BigInt->new(1);
      my @got = ($total);
      for (my $n = $path->n_start + 1; @got < $count; $n++) {
@@ -242,7 +326,6 @@ MyOEIS::compare_values
    func => sub {
      my ($count) = @_;
      my $path = Math::PlanePath::SquareSpiral->new (n_start => 0);
-     require Math::BigInt;
      my $total = Math::BigInt->new(1);
      my @got = (0, $total);
      for (my $n = $path->n_start + 2; @got < $count; $n++) {
@@ -743,7 +826,6 @@ MyOEIS::compare_values
   (anum => q{A141481},
    func => sub {
      my ($count) = @_;
-     require Math::BigInt;
      my $path = Math::PlanePath::SquareSpiral->new (n_start => 0);
      my @got = (1);
      for (my $n = $path->n_start + 1; @got < $count; $n++) {
@@ -762,23 +844,6 @@ MyOEIS::compare_values
          }
        }
        push @got, $sum;
-     }
-     return \@got;
-   });
-
-#------------------------------------------------------------------------------
-# A156859 Y axis positive and negative
-
-MyOEIS::compare_values
-  (anum => 'A156859',
-   func => sub {
-     my ($count) = @_;
-     my $path = Math::PlanePath::SquareSpiral->new (n_start => 0);
-     my @got = (0);
-     for (my $y = 1; @got < $count; $y++) {
-       push @got, $path->xy_to_n(0, $y);
-       last unless @got < $count;
-       push @got, $path->xy_to_n(0, -$y);
      }
      return \@got;
    });
@@ -988,7 +1053,6 @@ MyOEIS::compare_values
    func => sub {
      my ($count) = @_;
      my @got;
-     require Math::BigInt;
      my %plotted;
      $plotted{0,0} = Math::BigInt->new(1);
      my $xmin = 0;
@@ -1032,7 +1096,6 @@ MyOEIS::compare_values
    func => sub {
      my ($count) = @_;
      my @got;
-     require Math::BigInt;
      my %plotted;
      $plotted{0,0} = Math::BigInt->new(1);
      push @got, 1;

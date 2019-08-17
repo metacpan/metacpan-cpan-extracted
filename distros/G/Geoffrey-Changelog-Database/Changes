@@ -1,5 +1,15 @@
 Revision history for Geoffrey-Changelog-Database
 
-0.0.1  Sat Jul 27 08:14:46 2019
-       Initial release.
+#========================================================================
+# Version: 0.000200  Date: 2019/08/16 (Mario Zieschang)
+#========================================================================
 
+* author/created_by compatibility
+* documentations
+* test fixes
+
+#========================================================================
+# Version: 0.000100  Date: 2019/08/15 (Mario Zieschang)
+#========================================================================
+
+* First version, released on an unsuspecting world.

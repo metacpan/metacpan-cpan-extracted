@@ -33,7 +33,7 @@ use Math::PlanePath::HypotOctant;
 # VERSION
 
 {
-  my $want_version = 126;
+  my $want_version = 127;
   ok ($Math::PlanePath::HypotOctant::VERSION, $want_version,
       'VERSION variable');
   ok (Math::PlanePath::HypotOctant->VERSION,  $want_version,

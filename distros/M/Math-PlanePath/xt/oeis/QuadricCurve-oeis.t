@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2013, 2018 Kevin Ryde
+# Copyright 2013, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -19,21 +19,20 @@
 
 use 5.004;
 use strict;
-use Math::PlanePath::QuadricCurve;
+use Math::BigInt try => 'GMP';
 use Test;
-plan tests => 11;
+plan tests => 1;
 
 use lib 't','xt';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings(); }
 use MyOEIS;
 
+use Math::PlanePath::QuadricCurve;
+
 
 #------------------------------------------------------------------------------
 # A133851 -- Y at N=2^k is 2^(k/4) when k=0mod4, starting 
-
-require Math::NumSeq::PlanePathN;
-my $bigclass = Math::NumSeq::PlanePathN::_bigint();
 
 MyOEIS::compare_values
   (anum => 'A133851',
@@ -42,7 +41,7 @@ MyOEIS::compare_values
      my ($count) = @_;
      my $path = Math::PlanePath::QuadricCurve->new;
      my @got;
-     for (my $n = $bigclass->new(2); @got < $count; $n *= 2) {
+     for (my $n = Math::BigInt->new(2); @got < $count; $n *= 2) {
        my ($x,$y) = $path->n_to_xy($n);
        push @got, $y;
      }
@@ -50,7 +49,5 @@ MyOEIS::compare_values
    });
 
 
-
 #------------------------------------------------------------------------------
-
 exit 0;

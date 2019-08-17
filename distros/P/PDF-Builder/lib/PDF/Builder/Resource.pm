@@ -5,8 +5,8 @@ use base 'PDF::Builder::Basic::PDF::Dict';
 use strict;
 use warnings;
 
-our $VERSION = '3.015'; # VERSION
-my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
+our $VERSION = '3.016'; # VERSION
+my $LAST_UPDATE = '3.016'; # manually update whenever code is changed
 
 use PDF::Builder::Util qw(pdfkey);
 use PDF::Builder::Basic::PDF::Utils; # PDFName
@@ -30,7 +30,7 @@ Returns a resource object.
 sub new {
     my ($class, $pdf, $name) = @_;
 
-    $class = ref($class) if ref $class;
+    $class = ref($class) if ref($class);
 
     my $self = $class->SUPER::new();
 
@@ -52,7 +52,7 @@ sub new_api {
     my $resource = $class->new($api2->{'pdf'}, @options);
     return $resource;
 }
-	
+
 =item $name = $resource->name()
 
 =item $resource->name($name)
@@ -69,13 +69,13 @@ sub name {
     return $self->{'Name'}->val();
 }
 
-sub outobjdeep {
-    my ($self, $fh, $pdf, %options) = @_;
-
-    delete $self->{' api'};
-    delete $self->{' apipdf'};
-    return $self->SUPER::outobjdeep($fh, $pdf, %options);
-}
+#sub outobjdeep {
+#    my ($self, $fh, $pdf, %options) = @_;
+#
+#    delete $self->{' api'};
+#    delete $self->{' apipdf'};
+#    return $self->SUPER::outobjdeep($fh, $pdf, %options);
+#}
 
 =back
 

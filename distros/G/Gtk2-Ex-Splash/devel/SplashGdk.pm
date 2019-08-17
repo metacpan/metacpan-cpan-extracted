@@ -1,4 +1,4 @@
-# Copyright 2011 Kevin Ryde
+# Copyright 2011, 2019 Kevin Ryde
 
 # This file is part of Gtk2-Ex-Splash.
 #
@@ -23,7 +23,7 @@ use warnings;
 use Glib 1.220;
 use List::Util 'max';
 
-our $VERSION = 52;
+our $VERSION = 53;
 
 # uncomment this to run the ### lines
 #use Smart::Comments;
@@ -255,7 +255,7 @@ L<http://user42.tuxfamily.org/gtk2-ex-splash/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011 Kevin Ryde
+Copyright 2010, 2011, 2019 Kevin Ryde
 
 Gtk2-Ex-Splash is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

@@ -7,7 +7,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '3.015'; # VERSION
+our $VERSION = '3.016'; # VERSION
 my $LAST_UPDATE = '3.014'; # manually update whenever code is changed
 
 # command line:
@@ -33,25 +33,25 @@ my (@example_list, @example_results);
 
   # require provision of a Type 1 font in %args
   push @example_list, "021_psfonts";
-  push @example_results, "create examples/021_psfonts.<font name>.<encoding>.pdf,\n showing one or more pages of characters.\n";
+  push @example_results, "create examples/021_psfonts.<font name>.<encoding>.pdf,\n showing one or more pages of characters and Lorem Ipsum text.\n";
 
   push @example_list, "021_synfonts";
-  push @example_results, "create examples/021_synfonts.<core font name>.pdf, showing one or more pages\n of characters, for each of 4 variants.\n";
+  push @example_results, "create examples/021_synfonts.<core font name>.pdf, showing one or more pages\n of characters, for each of 4 variants, and Lorem Ipsum text.\n";
 
   # require provision of a TTF font in %args
   push @example_list, "022_truefonts";
-  push @example_results, "create examples/022_truefonts.<font name>.pdf, showing one or more pages\n of characters.\n";
+  push @example_results, "create examples/022_truefonts.<font name>.pdf, showing one or more pages\n of characters and Lorem Ipsum text.\n";
 
   # require provision of a TTF font in %args
   push @example_list, "022_truefonts_diacrits_utf8";
   push @example_results, "create examples/022_truefonts_diacrits_utf8.<font name>.pdf, showing one\n page of characters and a page with a combining diacritic.\n";
 
   push @example_list, "023_cjkfonts";
-  push @example_results, "create examples/023_cjkfonts.<font name>.pdf, showing many pages of characters\n (plus a page of Latin text) for each of 4 variants (regular, bold, italic,\n and bold-italic. Note that Latin text may be proportional or fixed pitch.\n";
+  push @example_results, "create examples/023_cjkfonts.<font name>.pdf, showing many pages of characters\n and a page of Lorem Ipsum text for each of 4 variants (regular, bold, italic,\n and bold-italic. Note that Latin text may be proportional or fixed pitch.\n";
 
   # require provision of a BDF font in %args
   push @example_list, "024_bdffonts";
-  push @example_results, "create examples/024_bdffonts.<font name>.pdf, showing one page per character\n and a consolidated glyphs page.\n";
+  push @example_results, "create examples/024_bdffonts.<font name>.pdf, showing one page of 256 glyphs\n and a page of Lorem Ipsum text.\n";
 
   push @example_list, "025_unifonts";
   push @example_results, "create examples/025_unifonts.pdf, with the first 45 lines of an attached PDF-J\n file in four different Western+CJK fonts.\n";
@@ -118,7 +118,7 @@ my %args;
   $args{'022_truefonts_diacrits_utf8'} = "/WINDOWS/fonts/tahoma.ttf";
 # 024_bdffonts needs a sample BDF (bitmapped font), which is not
 # included with the distribution
-  $args{'024_bdffonts'} = '"../old PDF-APIx/work-PDF-Builder/codec/codec.bdf"';
+  $args{'024_bdffonts'} = "/Users/Phil/BDFfonts/codec/codec.bdf";
 # ShowFont.pl needs a corefont (by default) font name
   $args{'ShowFont.pl'} = "Helvetica";
 

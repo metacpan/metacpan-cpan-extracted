@@ -34,7 +34,7 @@ my $path = Math::PlanePath::CincoCurve->new;
 # VERSION
 
 {
-  my $want_version = 126;
+  my $want_version = 127;
   ok ($Math::PlanePath::CincoCurve::VERSION, $want_version,
       'VERSION variable');
   ok (Math::PlanePath::CincoCurve->VERSION,  $want_version,

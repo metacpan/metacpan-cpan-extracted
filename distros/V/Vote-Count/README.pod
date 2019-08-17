@@ -12,53 +12,56 @@ This is also extremely useful to researchers who may want to study multiple meth
 
 =head1 Synopsis
 
-    use 5.022; # Minimum Perl, or any later Perl.
-    use feature qw /postderef signatures/;
-    use Vote::Count;
-    use Vote::Count::Method::CondorcetDropping;
-    use Vote::Count::Method::IRV;
-    use Vote::Count::ReadBallots 'read_ballots';
-    # example uses biggerset1 from the distribution test data.
-    my $ballotset = read_ballots 't/data/biggerset1.txt' ;
-    my $CondorcetElection =
-      Vote::Count::Method::CondorcetDropping->new(
-        'BallotSet' => $ballotset ,
-        'DropStyle' => 'all',
-        'DropRule'  => 'topcount',
-      );
-    # ChoicesAfterFloor a hashref of choices meeting the
-    # ApprovalFloor which defaulted to 5%.
-    my $ChoicesAfterFloor = $CondorcetElection->ApprovalFloor();
-    # Apply the ChoicesAfterFloor to the Election.
-    $CondorcetElection->Active( $ChoicesAfterFloor );
-    # Get Smith Set and the Election with it as the Active List.
-    my $SmithSet = $CondorcetElection->Matrix()->SmithSet() ;
-    $CondorcetElection->logt(
-      "Dominant Set Is: " . join( ', ', keys( $SmithSet->%* )));
-    my $Winner = $CondorcetElection->RunCondorcetDropping( $SmithSet )->{'winner'};
-    # Create an object for IRV, use the same Floor as Condorcet
-    my $IRVElection = Vote::Count::Method::IRV->new(
-      'BallotSet' => $ballotset,
-      'Active' => $ChoicesAfterFloor );
-    # Get a RankCount Object for the
-    my $Plurality = $IRVElection->TopCount();
-    # In case of ties RankCount objects return top as an array, log the result.
-    my $PluralityWinner = $Plurality->Leader();
-    $IRVElection->logv( "Plurality Results", $Plurality->RankTable);
-    if ( $PluralityWinner->{'winner'}) {
-      $IRVElection->logt( "Plurality Winner: ", $PluralityWinner->{'winner'} )
-    } else {
-      $IRVElection->logt(
-        "Plurality Tie: " . join( ', ', $PluralityWinner->{'tied'}->@*) )
-    }
-    my $IRVResult = $IRVElection->RunIRV();
-    # Now print the logs and winning information.
-    say $CondorcetElection->logv();
-    say $IRVElection->logv();
-    say '******************';
-    say "Plurality Winner: $PluralityWinner->{'winner'}";
-    say "IRV Winner: $IRVResult->{'winner'}";
-    say "Winner: $Winner";
+  use 5.022; # Minimum Perl, or any later Perl.
+  use feature qw /postderef signatures/;
+
+  use Vote::Count;
+  use Vote::Count::ReadBallots 'read_ballots';
+  use Vote::Count::Method::CondorcetDropping;
+
+  # example uses biggerset1 from the distribution test data.
+  my $ballotset = read_ballots 't/data/biggerset1.txt' ;
+  my $CondorcetElection =
+    Vote::Count::Method::CondorcetDropping->new(
+      'BallotSet' => $ballotset ,
+      'DropStyle' => 'all',
+      'DropRule'  => 'topcount',
+    );
+  # ChoicesAfterFloor a hashref of choices meeting the
+  # ApprovalFloor which defaulted to 5%.
+  my $ChoicesAfterFloor = $CondorcetElection->ApprovalFloor();
+  # Apply the ChoicesAfterFloor to the Election.
+  $CondorcetElection->Active( $ChoicesAfterFloor );
+  # Get Smith Set and the Election with it as the Active List.
+  my $SmithSet = $CondorcetElection->Matrix()->SmithSet() ;
+  $CondorcetElection->logt(
+    "Dominant Set Is: " . join( ', ', keys( $SmithSet->%* )));
+  my $Winner = $CondorcetElection->RunCondorcetDropping( $SmithSet )->{'winner'};
+
+  # Create an object for IRV, use the same Floor as Condorcet
+  my $IRVElection = Vote::Count->new(
+    'BallotSet' => $ballotset,
+    'Active' => $ChoicesAfterFloor );
+  # Get a RankCount Object for the
+  my $Plurality = $IRVElection->TopCount();
+  # In case of ties RankCount objects return top as an array, log the result.
+  my $PluralityWinner = $Plurality->Leader();
+  $IRVElection->logv( "Plurality Results", $Plurality->RankTable);
+  if ( $PluralityWinner->{'winner'}) {
+    $IRVElection->logt( "Plurality Winner: ", $PluralityWinner->{'winner'} )
+  } else {
+    $IRVElection->logt(
+      "Plurality Tie: " . join( ', ', $PluralityWinner->{'tied'}->@*) )
+  }
+  my $IRVResult = $IRVElection->RunIRV();
+
+  # Now print the logs and winning information.
+  say $CondorcetElection->logv();
+  say $IRVElection->logv();
+  say 'B<>B<>B<>B<>**';
+  say "Plurality Winner: $PluralityWinner->{'winner'}";
+  say "IRV Winner: $IRVResult->{'winner'}";
+  say "Winner: $Winner";
 
 
 =head1 Preview Release
@@ -113,12 +116,12 @@ Is it feasible to count 100 ballots by hand? How difficult is it to understand t
 
 =head4 Resolvability
 
-I<Majority> meets all of the above criteria, however, unless votes are restricted to two choices, it will frequently fail to provide a winner, or even a tie. No method can be completely impervious to ties. Methods that are not Resolveable are frequently combined with other methods, I<Instant Runoff Voting> is a compound method with I<Majority>, and all usable I<Condorcet> Methods combine seeking a Condorcet Winner with some other process for when there isn't one.
+I<Majority> meets all of the above criteria, however, unless votes are restricted to two choices, it will frequently fail to provide a winner, or even a tie. No method can be completely impervious to ties. Methods that are not Resolvable are frequently combined with other methods, I<Instant Runoff Voting> is a compound method with I<Majority>, and all usable I<Condorcet> Methods combine seeking a Condorcet Winner with some other process for when there isn't one.
 
 
 =head4 Incentive for Strategic Voting
 
-Voting systems have weaknesses which can incentivize voter to vote in an insencere manner. Later Harm Violation is a strong driver for tactical voting. Inconsistency may create circumstances by which a block of voters by voting in certain ways can boost or harm a choice, this vulnerability type is often referred to as an attack, because successful exploitation violates the expectation that all voters have an equal impact on the outcome.
+Voting systems have weaknesses which can incentivize voter to vote in an insincere manner. Later Harm Violation is a strong driver for tactical voting. Inconsistency may create circumstances by which a block of voters by voting in certain ways can boost or harm a choice, this vulnerability type is often referred to as an attack, because successful exploitation violates the expectation that all voters have an equal impact on the outcome.
 
 
 =head3 Arrow's Theorem
@@ -196,7 +199,7 @@ Vulnerable to a Cloning Attack.
 
 Technically this family of methods should be called Condorcet Pairwise, because any method that meets both Condorcet Criteria is technically a Condorcet Method. However, in discussion and throughout this software collection the term Condorcet will refer to  methods which uses a Matrix of Wins and Losses derived from direct pairing of choices and seeks to identify a Condorcet Winner.
 
-The basic Condorcet Method will frequently fail to identify a winner. One possibility is a Loop (Condorcet's Paradox) Where A > B, B > C, and C > A. Another possibility is a knot (not an accepted term, but one which will be used in this documentation). A Loop can be considered a tie, and a Knot can be considered something less than a tie. To make Condorcet resolveable a second method is typically used to resolve Loops and Knots.
+The basic Condorcet Method will frequently fail to identify a winner. One possibility is a Loop (Condorcet's Paradox) Where A > B, B > C, and C > A. Another possibility is a knot (not an accepted term, but one which will be used in this documentation). A Loop can be considered a tie, and a Knot can be considered something less than a tie. To make Condorcet resolvable a second method is typically used to resolve Loops and Knots.
 
 =over
 
@@ -217,7 +220,7 @@ Meets both Condorcet Criteria.
 
 =item *
 
-When a Condorcet Winner is present Consistency is met. When there is no Condorcet Winner this Consistency also applies between a Dominant (Smith) Set and the rest of the choices, but not within the Smith Set. Submethods vary in consistency when there is no Condorcet Winner.
+When a Condorcet Winner is present Consistency is met. When there is no Condorcet Winner this Consistency also applies between a Dominant (Smith) Set and the rest of the choices, but not within the Smith Set. Sub-methods vary in consistency when there is no Condorcet Winner.
 
 
 =back
@@ -232,8 +235,7 @@ Advocates of Score Voting claim that this Ballot Style it is a better expression
 
 =head1 Objective and Motivation
 
-I wanted to be able to evaluate alternative methods for resolving elections and couldn'
-t find a flexible enough existing libary in any of the popular general purpose and web development languages: Perl, PHP, Python, Ruby, JavaScript, nor in the newer language Julia (created as an alternative to R and other math languages). More recently I was writing a bylaws proposal to use RCV and found that the existing libraries and services were not only constrained in what options they can provide, but also didn't document them clearly, making it a challenge to have a method described in bylaws where it could be guaranteed hand and machine counts would agree.
+I wanted to be able to evaluate alternative methods for resolving elections and couldn't find a flexible enough existing libary in any of the popular general purpose and web development languages: Perl, PHP, Python, Ruby, JavaScript, nor in the newer language Julia (created as an alternative to R and other math languages). More recently I was writing a bylaws proposal to use RCV and found that the existing libraries and services were not only constrained in what options they can provide, but also didn't document them clearly, making it a challenge to have a method described in bylaws where it could be guaranteed hand and machine counts would agree.
 
 The objective is to have a library that can handle any of the myriad variants that one might consider either from a study perspective or what is called for by the elections rules of our entity.
 
@@ -279,7 +281,7 @@ Sets a path and Naming pattern for writing logs with the WriteLogs method.
 
   'LogTo' => '/loggingI<path/election>name'
 
-The WriteLogs method will write the logs appending '.brief', '.full', and '.debug' for the three logs where brief is a summary written with the logt (log terse) method, the full transcript log wirtten with logv, and finally the debug log written with logd. Each higher log level captures all events of the lower log levels.
+The WriteLogs method will write the logs appending '.brief', '.full', and '.debug' for the three logs where brief is a summary written with the logt (log terse) method, the full transcript log written with logv, and finally the debug log written with logd. Each higher log level captures all events of the lower log levels.
 
 The default log location is '/tmp/votecount'.
 
@@ -288,7 +290,58 @@ When logging from your methods, use logt for events that produce a summary, use 
 
 =head3 Active Sets
 
-Active sets are typically represnted as a Hash Reference where the keys represent the active choices, the values are ignored. The VoteCount Object contains an Active Set which can be Accessed or set via the ->Active() method. Most Components will take an argument for $activeset or default to the current Active set of the Vote::Count object, which will default to the Choices defined in the BallotSet.
+Active sets are typically represented as a Hash Reference where the keys represent the active choices, the values are ignored. The VoteCount Object contains an Active Set which can be Accessed or set via the ->Active() method. The ->GetActive and ->SetActive methods are preferred because they break the reference link between the object's copy and the external copy of the Active set.
+
+Most Components will take an argument for $activeset or default to the current Active set of the Vote::Count object, which will default to the Choices defined in the BallotSet.
+
+
+=head1 Vote::Count Methods
+
+=over
+
+=item *
+
+new
+
+
+
+=item *
+
+Active: Set or Get Active Set as HashRef
+
+
+
+=item *
+
+BallotSet: Get BallotSet
+
+
+
+=item *
+
+BallotSetType: Get the BallotSet Type (not implemented)
+
+
+
+=item *
+
+PairMatrix: Get a Matrix Object for the Active Set. Generated and cached on the first request.
+
+
+
+=item *
+
+UpdatePairMatrix: Regenerate and cache Matrix with current Active Set.
+
+
+
+=item *
+
+VotesCast: Returns the number of votes cast.
+
+
+
+=back
 
 
 =head2 Components
@@ -321,6 +374,11 @@ L<Vote::Count::TopCount|https://metacpan.org/pod/Vote::Count::TopCount>
 =item *
 
 L<Vote::Count::Redact|https://metacpan.org/pod/Vote::Count::Redact>
+
+
+=item *
+
+L<Vote::Count::TieBreaker|https://metacpan.org/pod/Vote::Count::TieBreaker>
 
 
 =back
@@ -382,5 +440,32 @@ L<Vote::Count::ReadBallots|https://metacpan.org/pod/Vote::Count::ReadBallots>
 
 
 =back
+
+
+=head1 Call for Contributions
+
+This project needs contributions from Programmers and Mathematicians. Review and citations from Mathematicians are urgently requested, because in addition to being a Tool-set for implementing vote counting this documentation will for many also be the manual. From coders there is a lot of help that could be given: any well known method could use a write up if it is easy to implement with the toolkit (see Benham) or a code submission if it is not. Currently Tiedeman, SSD, and Kemmeny-Young are unimplemented. In addition support for Range Ballots will require significant effort.
+
+
+=head1 Advice, Recommendations, Opinion
+
+This section is highly opinionated by the Author of Vote::Count.
+
+If you're looking at all of this wondering "which method I should recommend to my organization to implement Ranked Choice Voting internally?" this is the advice offered by the author of Vote::Count.
+
+I<Instant Runoff Voting> is simple, easy to count by hand, Later Harm protected, and is the most widely used method. It has serious consistency issues, especially how poorly it handles common cloning situations.
+
+I<Benham Condorcet IRV>, meets the two main Condorcet Criteria, and is countable by hand, but it loses Later Harm.
+
+If you like I<Borda> or prefer a I<Range Ballot>, my pick is for I<STAR>. STAR specifies a Range Ballot. Range Ballots are not presently implemented, and will require a lot of work, so it may be some time before it's available here. In the meantime you can implement the RCV variant of STAR with Vote::Count.
+
+I<SmithSet IRV>, is the B<best simple method>. It meets all three key criteria for Condorcet Methods and has less Later Harm effect than any other (non-redacting) Condorcet Method.
+
+I<Redacting Condorcet Methods> are the B<best>. If a Condorcet Winner does not create a Later Harm violation they will always be chosen. They can create a gauge of the later harm effect that then allows for the establishment of a Later Harm tolerance. If there is a Later Harm violation, then ballots are redacted, and the resulting final ballots will meet the Condorcet Criteria.
+
+
+=head2 Always Pick a Floor Rule
+
+Unless your voting rules require voters to rank all choices, a good floor rule will quickly eliminate the low support choices.
 
 =cut

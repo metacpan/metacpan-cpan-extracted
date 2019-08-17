@@ -17,11 +17,11 @@ Net::Connection::lsof - This uses lsof to generate a array of Net::Connection ob
 
 =head1 VERSION
 
-Version 0.1.1
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.1.1';
+our $VERSION = '0.2.0';
 
 
 =head1 SYNOPSIS
@@ -238,8 +238,19 @@ sub lsof_to_nc_objects{
 						}
 						$pid_proc{ $args->{pid} }=$args->{proc};
 
-						$args->{wchan}=$proc_table->[ $proc_int ]->{wchan};
-						$pid_wchan{ $args->{pid} }=$args->{wchan};
+						# linux has shit wchan reporting and apparently if you want more than
+						# the address you need to use the ass backwards /proc
+						if ( $^O =~ /linux/ ){
+							if ( -e '/proc/'.$args->{pid}.'/wchan'){
+								open( my $wchan_fh, '<', '/proc/'.$args->{pid}.'/wchan' );
+								$args->{wchan}=readline( $wchan_fh );
+								close( $wchan_fh );
+								$pid_wchan{ $args->{pid} }=$args->{wchan};
+							}
+						}else{
+							$args->{wchan}=$proc_table->[ $proc_int ]->{wchan};
+							$pid_wchan{ $args->{pid} }=$args->{wchan};
+						}
 
 						$args->{pid_start}=$proc_table->[ $proc_int ]->{pid_start};
 						$pid_start{ $args->{pid} }=$args->{pid_start};

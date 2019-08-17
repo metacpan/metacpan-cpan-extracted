@@ -5,7 +5,7 @@ use 5.016;
 use strict;
 use warnings;
 
-$Geoffrey::Action::Table::VERSION = '0.000103';
+$Geoffrey::Action::Table::VERSION = '0.000201';
 
 use parent 'Geoffrey::Role::Action';
 
@@ -110,15 +110,11 @@ sub add {
 
     #prepare finaly created table to SQL
     require Geoffrey::Utils;
-    my $sql = Geoffrey::Utils::replace_spare(
-        $self->converter->table->add,
-        [
-              (exists $hr_params->{schema} ? $hr_params->{schema} . q/./ : q//)
-            . $self->prefix
-                . $hr_params->{name}
-                . $self->postfix,
-            join(q/,/, @columns),
-            $hr_params->{engine}, $hr_params->{charset}]);
+    my $sql = Geoffrey::Utils::replace_spare( $self->converter->table->add, [
+        ($hr_params->{schema} ? $hr_params->{schema} . q/./ : q//) . $self->prefix . $hr_params->{name} . $self->postfix,
+        join(q/,/, @columns),
+        $hr_params->{engine}, $hr_params->{charset}
+    ]);
     return $self->do($sql);
 }
 
@@ -179,7 +175,7 @@ Geoffrey::Action::Table - Action handler for tables
 
 =head1 VERSION
 
-Version 0.000103
+Version 0.000201
 
 =head1 DESCRIPTION
 

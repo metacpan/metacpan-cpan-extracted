@@ -1,3 +1,4 @@
+#!/usr/bin/perl
 use 5.026_000;
 use strict;
 use warnings;

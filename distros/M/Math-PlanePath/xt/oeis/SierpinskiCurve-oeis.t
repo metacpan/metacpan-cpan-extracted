@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2018 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -19,14 +19,15 @@
 
 use 5.004;
 use strict;
+use Math::BigInt;
 use Test;
-plan tests => 14;
+plan tests => 4;
 
 use lib 't','xt';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings(); }
-
 use MyOEIS;
+
 use Math::PlanePath::SierpinskiCurve;
 use Math::NumSeq::PlanePathDelta;
 use Math::NumSeq::PlanePathTurn;
@@ -35,16 +36,13 @@ use Math::NumSeq::PlanePathTurn;
 #------------------------------------------------------------------------------
 # A081026 -- X at N=2^k
 
-require Math::NumSeq::PlanePathN;
-my $bigclass = Math::NumSeq::PlanePathN::_bigint();
-
 MyOEIS::compare_values
   (anum => 'A081026',
    func => sub {
      my ($count) = @_;
      my $path = Math::PlanePath::SierpinskiCurve->new;
      my @got = (1);
-     for (my $n = $bigclass->new(1); @got < $count; $n *= 2) {
+     for (my $n = Math::BigInt->new(1); @got < $count; $n *= 2) {
        my ($x,$y) = $path->n_to_xy($n);
        push @got, $x;
      }
@@ -108,5 +106,4 @@ MyOEIS::compare_values
    });
 
 #------------------------------------------------------------------------------
-
 exit 0;

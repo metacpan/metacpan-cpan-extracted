@@ -1,4 +1,4 @@
-# Copyright 2012 Kevin Ryde
+# Copyright 2012, 2019 Kevin Ryde
 
 # This file is part of Image-Base-Wx.
 #
@@ -21,13 +21,13 @@ use 5.008;
 use strict;
 use Carp;
 use Wx;
-our $VERSION = 4;
+our $VERSION = 5;
 
 use Image::Base::Wx::DC;
 our @ISA = ('Image::Base::Wx::DC');
 
 # uncomment this to run the ### lines
-#use Smart::Comments;
+# use Smart::Comments;
 
 
 sub new {
@@ -186,9 +186,10 @@ sub load {
     ### $file_format
     ### $type
 
-    # my $handler = Wx::Bitmap::FindHandlerType($type) || next;
+    # my $handler = Wx::Bitmap::FindHandlerType("\U$file_format\EHandler")
+    #   || next;
     # ### $handler
-    # if ($handler->LoadFile ($wxbitmap, $fh)) {
+    # if ($handler->LoadFile ($wxbitmap, $filename)) {
     #   ### loaded ...
     #   ### wxbitmap isok: $wxbitmap->IsOk
     #   $self->{'-file_format'} = $file_format;
@@ -198,7 +199,13 @@ sub load {
     if ($wxbitmap->LoadFile ($filename, $type)) {
       ### loaded ...
       ### wxbitmap isok: $wxbitmap->IsOk
-      $self->{'-file_format'} = $file_format;
+
+      # As of Wx circa 3.0.4, LoadFile() doesn't seem to restrict itself to
+      # the specified $type, but will load anything it recognises.  This
+      # means cannot set -file_format based on what $type works.
+      #
+      # $self->{'-file_format'} = $file_format;
+
       return;
     }
   }
@@ -317,14 +324,9 @@ depending which supporting libraries it was built with.
     CUR
     ANI      load-only
 
-C<load()> detects the format, but a handler for the format must have been
-registered globally.  All formats can be registered with
-
-    Wx::InitAllImageHandlers();
-
-This is suggested since otherwise load XPM seems to behave as an "ANY" which
-might trick the detection attempts.  The C<Wx::Image> handlers are used by
-C<Wx::Bitmap> so registering desired formats there might be enough.
+C<load()> detects the format, but a wxBitmapHandler for the format must have
+been registered globally.  Wx normally has all available handlers pre-loaded
+and believe WxPerl consequently omits a C<Wx::InitStandardHandlers()>.
 
 =head2 Colour Names
 
@@ -377,8 +379,8 @@ the bitmap automatically, but it can be set explicitly if desired.
 
 =item C<-file_format> (string, default undef)
 
-The file format from the last C<load()> and the format to use in C<save()>.
-This is one of the C<wxBITMAP_TYPE_XXX> names such as "PNG" or "JPEG".
+The file format to C<save()>.  This is one of the C<wxBITMAP_TYPE_XXX> names
+such as "PNG" or "JPEG".
 
 =item C<-width> (integer, read-only)
 
@@ -402,6 +404,14 @@ Wx circa 2.8.12 on Gtk prints C<g_log()> warnings on attempting to load an
 unknown file format, including an empty file or garbage.  This is apparently
 from attempting it as an XPM.  Is that a Wx bug?
 
+In the past, C<load()> set C<-file_format> to the format of the file just
+loaded.  Alas Wx circa 3.0.4 seems to load any file format it can, without
+indicating which it was.  Applications using C<load()> will have seen
+C<-file_format> wrongly set always "BMP".  Would like C<load()> to set what
+it read, but there doesn't seem to be a convenient way (short of reading
+with C<Wx::Image> and discarding).  For now, C<load()> doesn't set
+C<-file_format> at all.
+
 =head1 SEE ALSO
 
 L<Wx>,
@@ -415,7 +425,7 @@ http://user42.tuxfamily.org/image-base-wx/index.html
 
 =head1 LICENSE
 
-Copyright 2012 Kevin Ryde
+Copyright 2012, 2019 Kevin Ryde
 
 Image-Base-Wx is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

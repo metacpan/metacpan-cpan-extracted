@@ -45,8 +45,13 @@ $c->dataCleaner($data);
 
 is ($data->{k}{lalala},'xxx','pass clean check');
 
+my $login = ['tobi','secret'];
+$c->dataCleaner($login,'login');
+is ($login->[1],'xxx','pass special login check');
+
 done_testing();
 1;
+
 
 package p1;
 use Mojo::Base qw(CallBackery::Controller::RpcService);

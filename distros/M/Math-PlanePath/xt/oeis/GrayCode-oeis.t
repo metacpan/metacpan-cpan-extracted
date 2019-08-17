@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013, 2014, 2015, 2018 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2015, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -21,19 +21,143 @@ use 5.004;
 use strict;
 
 use Test;
-plan tests => 33;
+plan tests => 37;
 
 use lib 't','xt';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings(); }
 use MyOEIS;
 
-use Math::PlanePath::Base::Digits 'digit_split_lowtohigh';
 use Math::PlanePath::GrayCode;
-use Math::PlanePath::Diagonals;
-use Math::PlanePath::Base::Digits
-  'digit_join_lowtohigh';
 
+use Math::PlanePath::Base::Digits
+  'digit_split_lowtohigh', 'digit_join_lowtohigh';
+use Math::PlanePath::Diagonals;
+use Math::NumSeq::PlanePathTurn;
+
+
+#------------------------------------------------------------------------------
+# A007913 -- square free part of N
+# mod 2 skip N even is Left turns
+
+MyOEIS::compare_values
+  (anum => q{A007913},  # not xreffed in GrayCode.pm
+   fixup => sub {
+     my ($bvalues) = @_;
+     foreach (@$bvalues) { $_ %= 2; }
+   },
+   func => sub {
+     my ($count) = @_;
+     my $seq = Math::NumSeq::PlanePathTurn->new (planepath => 'GrayCode',
+                                                 turn_type => 'NotStraight');
+     my @got;
+     while (@got < $count) {
+       my ($n,$value) = $seq->next;
+       my ($n2,$value2) = $seq->next;  # undouble
+
+       push @got, $value;
+       $value==$value2 || die "oops";
+     }
+     return \@got;
+   });
+
+
+#------------------------------------------------------------------------------
+# A065882 -- low base4 non-zero digit
+# mod 2 is NotStraight
+
+MyOEIS::compare_values
+  (anum => 'A065882',
+   fixup => sub {
+     my ($bvalues) = @_;
+     foreach (@$bvalues) { $_ %= 2; }
+   },
+   func => sub {
+     my ($count) = @_;
+     my $seq = Math::NumSeq::PlanePathTurn->new (planepath => 'GrayCode',
+                                                 turn_type => 'NotStraight');
+     my @got;
+     while (@got < $count) {
+       my ($n,$value) = $seq->next;
+       my ($n2,$value2) = $seq->next;  # undouble
+
+       push @got, $value;
+       $value==$value2 || die "oops";
+     }
+     return \@got;
+   });
+
+#------------------------------------------------------------------------------
+# A003159 -- (N+1)/2 of positions of Left turns
+
+MyOEIS::compare_values
+  (anum => 'A003159',
+   func => sub {
+     my ($count) = @_;
+     my $seq = Math::NumSeq::PlanePathTurn->new (planepath => 'GrayCode',
+                                                 turn_type => 'NotStraight');
+     my @got;
+     while (@got < $count) {
+       my ($n,$value) = $seq->next;
+       my ($n2,$value2) = $seq->next;  # undouble
+
+       if ($value) { push @got, ($n+1)/2; }
+       $value==$value2 || die "oops";
+     }
+     return \@got;
+   });
+
+# A036554 -- (N+1)/2 of positions of Straight turns
+MyOEIS::compare_values
+  (anum => 'A036554',
+   func => sub {
+     my ($count) = @_;
+     my $seq = Math::NumSeq::PlanePathTurn->new (planepath => 'GrayCode',
+                                                 turn_type => 'Straight');
+     my @got;
+     while (@got < $count) {
+       my ($n,$value) = $seq->next;  # undouble
+       my ($n2,$value2) = $seq->next;
+       $value==$value2 || die "oops";
+
+       if ($value) { push @got, ($n+1)/2; }
+     }
+     return \@got;
+   });
+
+#------------------------------------------------------------------------------
+# A039963 -- Left turns
+MyOEIS::compare_values
+  (anum => 'A039963',
+   func => sub {
+     my ($count) = @_;
+     my $seq = Math::NumSeq::PlanePathTurn->new (planepath => 'GrayCode',
+                                                 turn_type => 'Left');
+     my @got;
+     while (@got < $count) {
+       my ($i,$value) = $seq->next;
+       push @got, $value;
+     }
+     return \@got;
+   });
+
+# A035263 -- Left turns undoubled, skip N even
+MyOEIS::compare_values
+  (anum => 'A035263',
+   func => sub {
+     my ($count) = @_;
+     my $seq = Math::NumSeq::PlanePathTurn->new (planepath => 'GrayCode',
+                                                 turn_type => 'Left');
+     my @got;
+     while (@got < $count) {
+       my ($i,$value) = $seq->next;
+       push @got, $value;
+
+       my ($i2,$value2) = $seq->next;  # undouble
+       $value==$value2 || die "oops";
+     }
+     return \@got;
+   });
 
 #------------------------------------------------------------------------------
 # A003188 -- Gray code radix=2 is ZOrder X,Y -> Gray TsF
@@ -239,135 +363,6 @@ MyOEIS::compare_values
      }
      return \@got;
    });
-
-#------------------------------------------------------------------------------
-# A003159 -- (N+1)/2 of positions of Left turns
-
-MyOEIS::compare_values
-  (anum => 'A003159',
-   func => sub {
-     my ($count) = @_;
-     my @got;
-     my $path = Math::PlanePath::GrayCode->new;
-
-     for (my $n = 2; @got < $count; $n += 2) {
-       if (path_n_turn($path,$n) == 1) {
-         push @got, $n/2;
-       }
-     }
-     return \@got;
-   });
-
-#------------------------------------------------------------------------------
-# A036554 -- (N+1)/2 of positions of Left turns
-
-MyOEIS::compare_values
-  (anum => 'A036554',
-   func => sub {
-     my ($count) = @_;
-     my $path = Math::PlanePath::GrayCode->new;
-     my @got;
-     for (my $n = 2; @got < $count; $n += 2) {
-       if (path_n_turn($path,$n) == 0) {
-         push @got, $n/2;
-       }
-     }
-     return \@got;
-   });
-
-#------------------------------------------------------------------------------
-# A039963 -- Left turns
-
-MyOEIS::compare_values
-  (anum => 'A039963',
-   func => sub {
-     my ($count) = @_;
-     my $path = Math::PlanePath::GrayCode->new;
-     my @got;
-     for (my $n = $path->n_start + 1; @got < $count; $n++) {
-       push @got, path_n_turn($path,$n);
-     }
-     return \@got;
-   });
-
-#------------------------------------------------------------------------------
-# A035263 -- Left turns undoubled, skip N even
-
-MyOEIS::compare_values
-  (anum => 'A035263',
-   func => sub {
-     my ($count) = @_;
-     my $path = Math::PlanePath::GrayCode->new;
-     my @got;
-     for (my $n = $path->n_start + 1; @got < $count; $n += 2) {
-       push @got, path_n_turn($path,$n);
-     }
-     return \@got;
-   });
-
-#------------------------------------------------------------------------------
-# A065882 -- low base4 non-zero digit
-
-MyOEIS::compare_values
-  (anum => 'A065882',
-   fixup => sub {
-     my ($bvalues) = @_;
-     foreach (@$bvalues) { $_ %= 2; }
-   },
-   func => sub {
-     my ($count) = @_;
-     my $path = Math::PlanePath::GrayCode->new;
-     my @got;
-     for (my $n = $path->n_start + 1; @got < $count; $n += 2) {
-       push @got, path_n_turn($path,$n);
-     }
-     return \@got;
-   });
-
-#------------------------------------------------------------------------------
-# A007913 -- Left turns from square free part of N, skip N even
-
-MyOEIS::compare_values
-  (anum => q{A007913},  # not xreffed in GrayCode.pm
-   fixup => sub {
-     my ($bvalues) = @_;
-     foreach (@$bvalues) { $_ %= 2; }
-   },
-   func => sub {
-     my ($count) = @_;
-     my $path = Math::PlanePath::GrayCode->new;
-     my @got;
-     for (my $n = $path->n_start + 1; @got < $count; $n += 2) {
-       push @got, path_n_turn($path,$n);
-     }
-     return \@got;
-   });
-
-# return 1 for left, 0 for right
-sub path_n_turn {
-  my ($path, $n) = @_;
-  my $prev_dir = path_n_dir ($path, $n-1);
-  my $dir = path_n_dir ($path, $n);
-  my $turn = ($dir - $prev_dir) % 4;
-  if ($turn == 1) { return 1; }
-  if ($turn == 2) { return 0; }
-  die "Oops, unrecognised turn";
-}
-# return 0,1,2,3
-sub path_n_dir {
-  my ($path, $n) = @_;
-  my ($dx,$dy) = $path->n_to_dxdy($n) or die "Oops, no point at ",$n;
-  return dxdy_to_dir4 ($dx, $dy);
-}
-# return 0,1,2,3, with Y reckoned increasing upwards
-sub dxdy_to_dir4 {
-  my ($dx, $dy) = @_;
-  if ($dx > 0) { return 0; }  # east
-  if ($dx < 0) { return 2; }  # west
-  if ($dy > 0) { return 1; }  # north
-  if ($dy < 0) { return 3; }  # south
-}
-
 
 #------------------------------------------------------------------------------
 # A163233 -- permutation diagonals sF

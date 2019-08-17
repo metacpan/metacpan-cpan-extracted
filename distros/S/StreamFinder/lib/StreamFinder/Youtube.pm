@@ -74,18 +74,21 @@ file.
 
 =head1 DESCRIPTION
 
-StreamFinder::Youtube accepts a valid Youtube video URL on youtube.com, et. al. 
+StreamFinder::Youtube accepts a valid Youtube video URL on youtube, 
+brighteon, vimeo, et. al. that the "youtube-dl" program can handle, 
 and returns the actual stream URL, title and cover art icon for that video.  
-The purpose is that one needs this URL in order to have the option to stream 
-the video in one's own choice of media player software rather than using their 
-web browser and accepting any / all flash, ads, javascript, cookies, trackers, 
-web-bugs, and other crapware that can come with that method of playing.  
-The author uses his own custom all-purpose audio player called "fauxdacious" 
-(his custom hacked version of the open-source "audacious" media player).  
-"fauxdacious" incorporates this module to decode and play youtube.com streams.
-This is a submodule of the general StreamFinder module.
+The purpose is that one needs this URL in order to have the option to 
+stream the video in one's own choice of media player software rather 
+than using their web browser and accepting any / all flash, ads, 
+javascript, cookies, trackers, web-bugs, and other crapware that can 
+come with that method of playing.  The author uses his own custom all-purpose 
+audio player called "fauxdacious" (his custom hacked version of the 
+open-source "audacious" media player).  "fauxdacious" incorporates this 
+module to decode and play youtube.com streams.  This is a submodule of the 
+general StreamFinder module.
 
-Depends:  WWW::YouTube::Download, LWP::UserAgent, URI::Escape.
+Depends:  WWW::YouTube::Download, LWP::UserAgent, URI::Escape, 
+and the separate program:  youtube-dl.
 
 =head1 SUBROUTINES/METHODS
 
@@ -254,6 +257,7 @@ sub new
 	}
 	my $self = {};
 	return undef  unless ($url);
+	$url =~ s/\?autoplay\=true$//;  #STRIP THIS OFF SO WE DON'T HAVE TO.
 	print STDERR "-0(Youtube): URL=$url=\n"  if ($DEBUG);
 
     $self->{'client'} = WWW::YouTube::Download->new;

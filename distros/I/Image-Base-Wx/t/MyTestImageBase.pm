@@ -1,6 +1,6 @@
 # MyTestImageBase.pm -- some tests for Image::Base subclasses
 
-# Copyright 2010, 2011, 2012 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2015, 2019 Kevin Ryde
 
 # MyTestImageBase.pm is shared by several distributions.
 #
@@ -37,7 +37,7 @@ use vars '@CARP_NOT';
 @CARP_NOT = ('Test');
 
 # uncomment this to run the ### lines
-#use Smart::Comments;
+# use Smart::Comments;
 
 
 sub min {
@@ -318,6 +318,7 @@ sub check_xy {
   my ($image, %options) = @_;
   ### check_xy() ...
   my $big_fetch_expect = $options{'big_fetch_expect'};
+  my $big_fetch_is_undefined = $options{'big_fetch_is_undefined'};
 
   {
     my $big_negative = -2**16 + 2;
@@ -326,12 +327,14 @@ sub check_xy {
     $image->xy ($big_negative,0, $white);
     $image->xy (0,$big_negative, $white);
     $image->xy ($big_negative,$big_negative, $white);
-    is (scalar($image->xy($big_negative,$big_negative)), $big_fetch_expect,
-        'xy() negative fetch');
-    is (scalar($image->xy(0,$big_negative)), $big_fetch_expect,
-        'xy() negative fetch');
-    is (scalar($image->xy($big_negative,0)), $big_fetch_expect,
-        'xy() negative fetch');
+    unless ($big_fetch_is_undefined) {
+      is (scalar($image->xy($big_negative,$big_negative)), $big_fetch_expect,
+          'xy() negative fetch');
+      is (scalar($image->xy(0,$big_negative)), $big_fetch_expect,
+          'xy() negative fetch');
+      is (scalar($image->xy($big_negative,0)), $big_fetch_expect,
+          'xy() negative fetch');
+    }
   }
   {
     my $big_positive = 2**16 + 2;
@@ -339,12 +342,14 @@ sub check_xy {
     $image->xy ($big_positive,$big_positive, $white);
     $image->xy (0,$big_positive, $white);
     $image->xy ($big_positive,0, $white);
-    is (scalar($image->xy(0,$big_positive)), $big_fetch_expect,
-        'xy() big positive fetch');
-    is (scalar($image->xy($big_positive,0)), $big_fetch_expect,
-        'xy() big positive fetch');
-    is (scalar($image->xy($big_positive,$big_positive)), $big_fetch_expect,
-        'xy() big positive fetch');
+    unless ($big_fetch_is_undefined) {
+      is (scalar($image->xy(0,$big_positive)), $big_fetch_expect,
+          'xy() big positive fetch');
+      is (scalar($image->xy($big_positive,0)), $big_fetch_expect,
+          'xy() big positive fetch');
+      is (scalar($image->xy($big_positive,$big_positive)), $big_fetch_expect,
+          'xy() big positive fetch');
+    }
   }
 }
 
@@ -477,7 +482,7 @@ sub check_ellipse {
       # MyTestHelpers::diag($name);
 
       # if ($options{'base_ellipse'}
-      #     || $basefunc->($x1,$y1, $x2,$y2)) {
+      #     || &$basefunc($x1,$y1, $x2,$y2)) {
       #   next if $name eq 'ellipse 3,2, 4,2';   # dodgy
       #   next if $name eq 'ellipse 3,2, 13,2';  # dodgy
       #   next if $name eq 'ellipse 1,1, 18,8';  # dodgy

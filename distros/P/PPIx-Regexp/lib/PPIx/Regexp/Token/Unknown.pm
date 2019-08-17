@@ -40,7 +40,7 @@ use base qw{ PPIx::Regexp::Token };
 use Carp qw{ confess };
 use PPIx::Regexp::Constant qw{ @CARP_NOT };
 
-our $VERSION = '0.065';
+our $VERSION = '0.066';
 
 sub __new {
     my ( $class, $content, %arg ) = @_;

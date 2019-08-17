@@ -19,6 +19,8 @@ eod
     };
 }
 
-all_pod_files_ok ();
+all_pod_files_ok(
+    all_pod_files( qw{ blib eg } )
+);
 
 1;

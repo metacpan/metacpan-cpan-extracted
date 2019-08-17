@@ -20,6 +20,8 @@ This is free software, licensed under:
 
   The GNU Lesser General Public License, Version 2.1, February 1999
 
+See INFO/RoadMap file for the PDF::Builder road map.
+See CONTRIBUTING file for how to contribute to the project.
 See INFO/SUPPORT file for information on reporting bugs, etc. via GitHub Issues.
 See INFO/DEPRECATED file for information on deprecated features.
 See INFO/KNOWN_INCOMP file for known incompatibilities with PDF::API2.

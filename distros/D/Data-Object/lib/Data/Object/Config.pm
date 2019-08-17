@@ -12,7 +12,7 @@ use Data::Object::Export qw(
 use Import::Into;
 use Type::Tiny;
 
-our $VERSION = '0.97'; # VERSION
+our $VERSION = '0.98'; # VERSION
 
 # BUILD
 
@@ -185,6 +185,9 @@ sub process {
     if ($plan->[0] eq 'call') {
       process_call($target, $plan);
     }
+    if ($plan->[0] eq 'let') {
+      process_let($target, $plan);
+    }
     if ($plan->[0] eq 'use') {
       process_use($target, $plan);
     }
@@ -226,6 +229,22 @@ sub process_call {
   my ($action, $name, @args) = @$plan;
 
   $target->can($name)->(@args);
+
+  return;
+}
+
+sub prepare_let {
+  my (@args) = @_;
+
+  return ['let', @args];
+}
+
+sub process_let {
+  my ($target, $plan) = @_;
+
+  my ($action, @args) = @$plan;
+
+  eval join ' ', "package $target;", @args;
 
   return;
 }
@@ -432,7 +451,7 @@ sub config_library {
   [
     prepare_use('Type::Library', '-base'),
     prepare_use('Type::Utils', '-all'),
-    prepare_call('extends', 'Data::Object::Library')
+    prepare_let('BEGIN { extends("Data::Object::Library"); }')
   ]
 }
 
@@ -1019,6 +1038,22 @@ The prepare_call function returns a call-plan for the arguments passed.
 
 =cut
 
+=head2 prepare_let
+
+  prepare_let(Str $arg1, Any @args) : ArrayRef
+
+The prepare_let function returns a let-plan for the arguments passed.
+
+=over 4
+
+=item prepare_let example
+
+  prepare_let($package, @args);
+
+=back
+
+=cut
+
 =head2 prepare_use
 
   prepare_use(Str $arg1, Any @args) : ArrayRef
@@ -1078,6 +1113,22 @@ The process_call function executes the call-plan on behalf of the caller.
 =item process_call example
 
   process_call($caller, $plan);
+
+=back
+
+=cut
+
+=head2 process_let
+
+  process_let(Str $arg1, ArrayRef $arg2) : Any
+
+The process_let function executes the let-plan on behalf of the caller.
+
+=over 4
+
+=item process_let example
+
+  process_let($caller, $plan);
 
 =back
 

@@ -4,7 +4,7 @@ StreamFinder::Facebook - Fetch actual raw streamable URLs from videos on faceboo
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2017 by
+This module is Copyright (C) 2017-2019 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -74,7 +74,7 @@ file.
 
 =head1 DESCRIPTION
 
-StreamFinder::Facebook accepts a valid Facebook video URL on Radionomy.com and
+StreamFinder::Facebook accepts a valid Facebook video URL and
 returns the actual stream URL for that video.  The purpose is that one needs 
 this URL in order to have the option to stream the video in one's own choice 
 of audio player software rather than using their web browser and accepting 

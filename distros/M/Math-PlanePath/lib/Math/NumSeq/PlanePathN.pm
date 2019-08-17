@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -28,7 +28,7 @@ use Carp 'croak';
 use constant 1.02;
 
 use vars '$VERSION','@ISA';
-$VERSION = 126;
+$VERSION = 127;
 use Math::NumSeq;
 @ISA = ('Math::NumSeq');
 
@@ -203,11 +203,8 @@ sub _to_bigint {
 }
 # or maybe check for new enough for uv->mpz fix
 use constant::defer _bigint => sub {
-  # Crib note: don't change the back-end if already loaded
-  unless (Math::BigInt->can('new')) {
-    require Math::BigInt;
-    eval { Math::BigInt->import (try => 'GMP') };
-  }
+  # no choice of back-end here, leave that to the mainline
+  require Math::BigInt;
   return 'Math::BigInt';
 };
 
@@ -3215,7 +3212,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

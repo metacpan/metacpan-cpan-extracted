@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012 Kevin Ryde
+# Copyright 2012, 2014, 2015 Kevin Ryde
 
 # This file is part of Image-Base-Wx.
 #
@@ -23,11 +23,11 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 WriteMakefile
-  (NAME         => 'Image-Base-Wx',
+  (NAME         => 'Image::Base::Wx',
    ABSTRACT     => 'Image::Base drawing to Wx things.',
    VERSION_FROM => 'lib/Image/Base/Wx/DC.pm',
-   AUTHOR       => 'Kevin Ryde <user42@zip.com.au>',
-   LICENSE      => 'gpl',
+   AUTHOR       => 'Kevin Ryde <user42_kevin@yahoo.com.au>',
+   LICENSE      => 'gpl_3',
    SIGN         => 1,
    PREREQ_PM    => {
                     # actually only Wx::Image bits Image::Base ellipse(),
@@ -43,13 +43,13 @@ WriteMakefile
      { homepage => 'http://user42.tuxfamily.org/image-base-wx/index.html',
        license  => 'http://www.gnu.org/licenses/gpl.html',
      },
-     no_index => { directory=>['devel'] },
+     no_index => { directory=>['devel','xt'] },
 
-     optional_features =>
-     { maximum_tests =>
-       { description => 'Have "make test" do as much as possible.',
-         requires => { 'Test::Weaken' => '2.000',
-                     },
+     prereqs =>
+     { test =>
+       { suggests =>
+         { 'Test::Weaken' => '2.000',
+         },
        },
      },
    },

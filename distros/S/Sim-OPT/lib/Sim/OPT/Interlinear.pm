@@ -1,4 +1,4 @@
-#package Sim::OPT::Interlinear;
+package Sim::OPT::Interlinear;
 # NOTE: TO USE THE PROGRAM AS A SCRIPT, THE LINE ABOVE SHOULD BE DELETED.
 
 # INTERLINEAR
@@ -22,14 +22,14 @@ use feature 'say';
 no strict;
 no warnings;
 
-#use Sim::OPT;
-#use Sim::OPT::Morph;
-#use Sim::OPT::Sim;
-#use Sim::OPT::Report;
-#use Sim::OPT::Descend;
-#use Sim::OPT::Takechance;
-#use Sim::OPT::Parcoord3d;
-# NOTE: TO USE THE PROGRAM AS A SCRIPT, THE ABOVE "use Sim::OPT..." lines should be deleted.
+use Sim::OPT;
+use Sim::OPT::Morph;
+use Sim::OPT::Sim;
+use Sim::OPT::Report;
+use Sim::OPT::Descend;
+use Sim::OPT::Takechance;
+use Sim::OPT::Parcoord3d;
+# NOTE: TO USE THE PROGRAM AS A SCRIPT, THE ABOVE "use Sim::OPT..." lines should be deleted or commented.
 
 our @ISA = qw( Exporter );
 our @EXPORT = qw( interlinear, interstart prepfactlev tellstepsize );

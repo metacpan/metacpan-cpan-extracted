@@ -32,7 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Geoffrey" : "0.000103",
+            "Geoffrey" : "0.0002",
             "SQL::Abstract" : "0",
             "perl" : "5.024000"
          }
@@ -51,6 +51,6 @@
          "web" : "https://gitlab.com/GeoffreyDB/Geoffrey-Changelog-Database"
       }
    },
-   "version" : "0.000100",
+   "version" : "0.000200",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

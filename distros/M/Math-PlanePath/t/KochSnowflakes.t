@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -20,20 +20,24 @@
 use 5.004;
 use strict;
 use Test;
-plan tests => 160;
+plan tests => 158;
 
 use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings(); }
 
+# uncomment this to run the ### lines
+# use Smart::Comments;
+
 require Math::PlanePath::KochSnowflakes;
 my $path = Math::PlanePath::KochSnowflakes->new;
+
 
 #------------------------------------------------------------------------------
 # VERSION
 
 {
-  my $want_version = 126;
+  my $want_version = 127;
   ok ($Math::PlanePath::KochSnowflakes::VERSION, $want_version,
       'VERSION variable');
   ok (Math::PlanePath::KochSnowflakes->VERSION,  $want_version,
@@ -83,14 +87,15 @@ my $path = Math::PlanePath::KochSnowflakes->new;
     ok ($n_lo, 16);
     ok ($n_hi, 63); }
 
-  foreach my $level (0 .. 6) {
+  foreach my $level (1 .. 6) {
     my ($n_lo,$n_hi) = $path->level_to_n_range($level);
     my ($x_lo,$y_lo) =  $path->n_to_xy($n_lo);
     my ($x_hi,$y_hi) =  $path->n_to_xy($n_hi);
+    ### ends: "$x_lo,$y_lo to $x_hi,$y_hi"
     my $dx = $x_hi - $x_lo;
     my $dy = $y_hi - $y_lo;
-    ok($dx,1);
-    ok($dy,1);
+    ok($dx,1, "snowflake first to last dx $x_lo to $x_hi level=$level");
+    ok($dy,1, "snowflake first to last dy $y_lo to $y_hi level=$level");
   }
 }
 

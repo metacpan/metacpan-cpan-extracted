@@ -8,41 +8,14 @@ ABSTRACT
 
 SYNOPSIS
 
-      # Root Namespace and Type Library
-      package App;
-    
-      use Data::Object 'Library';
-    
-      # Type Library Aware Application Class
       package User;
     
-      use Data::Object 'Class', 'App';
+      use Data::Object 'Class';
     
-      has name => (
-        is  => 'ro',
-        isa => 'Str',
-        req => 1
-      );
+      extends 'Identity';
     
-      method greet(User $user) {
-        return 'Hello '. $user->name .', How are you?';
-      }
-    
-      # Type Library Aware Application Package
-      package main;
-    
-      use User;
-    
-      use Data::Object 'Core', 'App';
-    
-      fun greetings(User $u1, User $u2) {
-        return $u1->greet($u2);
-      }
-    
-      my $u1 = User->new(name => 'Jane');
-      my $u2 = User->new(name => 'June');
-    
-      say(greetings($u1, $u2)); # Hey June
+      has 'fname';
+      has 'lname';
     
       1;
 
@@ -57,32 +30,6 @@ DESCRIPTION
     classes, types, objects, functions, patterns, and tools for
     jump-starting application development with modern conventions and best
     practices.
-
-INSTALLATION
-
-    If you have cpanm, you only need one line:
-
-      $ cpanm -qn Data::Object
-
-    If you don't have cpanm, get it! It takes less than a minute,
-    otherwise:
-
-      $ curl -L https://cpanmin.us | perl - -qn Data::Object
-
-    Add Data::Object to the list of dependencies in cpanfile:
-
-      requires "Data::Object" => "0.97"; # 0.97 or newer
-
-    If cpanm doesn't have permission to install modules in the current Perl
-    installation, it will automatically set up and install to a local::lib
-    in your home directory. See the local::lib documentation for details on
-    enabling it in your environment. We recommend using a Perlbrew
-    <https://github.com/gugod/app-perlbrew> or Plenv
-    <https://github.com/tokuhirom/plenv> environment. These tools will help
-    you manage multiple Perl installations in your $HOME directory. They
-    are completely isolated Perl installations.
-
-OVERVIEW
 
     The power of this framework comes from the extendable (yet fully
     optional) type library which is integrated into the object system and
@@ -101,7 +48,8 @@ OVERVIEW
 
       use Data::Object;
 
-    This is what's enabled whenever you import the Data::Object framework.
+    This is what's enabled whenever you import the Data::Object application
+    development framework.
 
       # basics
       use strict;
@@ -117,7 +65,7 @@ OVERVIEW
       # load super "do" function, etc
       use Data::Object::Export;
 
-    To explain the example in the synopsis: The following creates a class
+    To explain by way of example: The following creates a class
     representing a user which has the ability to greet user person.
 
       package User;
@@ -187,6 +135,30 @@ OVERVIEW
     in-part the wiring up of Moo (with Moose support), Type::Tiny,
     Function::Parameters, Try::Tiny and data objects in a cooperative and
     cohesive way that feels like it's native to the language.
+
+INSTALLATION
+
+    If you have cpanm, you only need one line:
+
+      $ cpanm -qn Data::Object
+
+    If you don't have cpanm, get it! It takes less than a minute,
+    otherwise:
+
+      $ curl -L https://cpanmin.us | perl - -qn Data::Object
+
+    Add Data::Object to the list of dependencies in cpanfile:
+
+      requires "Data::Object" => "0.97"; # 0.97 or newer
+
+    If cpanm doesn't have permission to install modules in the current Perl
+    installation, it will automatically set up and install to a local::lib
+    in your home directory. See the local::lib documentation for details on
+    enabling it in your environment. We recommend using a Perlbrew
+    <https://github.com/gugod/app-perlbrew> or Plenv
+    <https://github.com/tokuhirom/plenv> environment. These tools will help
+    you manage multiple Perl installations in your $HOME directory. They
+    are completely isolated Perl installations.
 
 FUNCTIONS
 

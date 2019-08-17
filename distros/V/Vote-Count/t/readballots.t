@@ -30,7 +30,9 @@ subtest 'test read of small good file' => sub {
   );
   is_deeply( $data1->{'options'},
   { 'rcv' => 1 },
-  'parsed ballot set rcv in options')
+  'parsed ballot set rcv in options');
+  is( $data1->{'votescast'}, 10, 'confirm count of votescast');
+   note 'votescast ' . $data1->{'votescast'};
 };
 
 subtest 'test some bad files' => sub {
@@ -54,11 +56,13 @@ subtest 'comments' => sub {
   my $uncommented = read_ballots('t/data/data1.txt');
   is ($uncommented->{'comment'}, '', 'file with no comment has no comment');
   my $commented = read_ballots('t/data/data2.txt');
-  like( $commented->{'comment'}, qr/Comment 1/, 
+  like( $commented->{'comment'}, qr/Comment 1/,
       'commented file has first comment');
-  like( $commented->{'comment'}, qr/Comment 2/, 
-      'commented file has second comment');  
+  like( $commented->{'comment'}, qr/Comment 2/,
+      'commented file has second comment');
 };
+
+
 
 subtest 'write_ballots' => sub {
   my $rewrite =<<'REWRIT';

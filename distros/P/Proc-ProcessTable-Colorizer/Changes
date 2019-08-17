@@ -1,5 +1,8 @@
 Revision history for Proc-ProcessTable-Colorizer
 
+0.4.0	 2019-08-15/17:20
+		 - WChan support now works on Linux.
+
 0.3.1	 2019-04-14/22:55
 		 -Proc::ProcessTable does support nice on Linux.
 		 -wchan on linux is garbage as it just returns a address,

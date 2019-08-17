@@ -54,7 +54,7 @@
          "web" : "https://github.com/iamalnewkirk/data-object"
       }
    },
-   "version" : "0.97",
+   "version" : "0.98",
    "x_authority" : "cpan:AWNCORP",
    "x_contributors" : [
       "Al Newkirk <al@iamalnewkirk.com>",

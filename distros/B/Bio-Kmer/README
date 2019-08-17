@@ -42,7 +42,7 @@ METHODS
           Argument     Default    Description
           kmercounter  perl       What kmer counter software to use.
                                   Choices: Perl, Jellyfish.
-          kmerlength   21         Kmer length
+          kmerlength|k 21         Kmer length
           numcpus      1          This module uses perl 
                                   multithreading with pure perl or 
                                   can supply this option to other 
@@ -59,6 +59,21 @@ METHODS
           Examples:
           my $kmer=Bio::Kmer->new("file.fastq.gz",{kmercounter=>"jellyfish",numcpus=>4});
 
+    $kmer->count()
+        Count kmers. This method is called as soon as new() is called and so
+        you should never have to run this method. Internally caches the kmer
+        counts to ram.
+
+          Arguments: None
+          Returns:   None
+
+    $kmer->clearCache
+        Clears kmer counts and histogram counts. You should probably never
+        use this method.
+
+          Arguments: None
+          Returns:   None
+
     $kmer->query($queryString)
         Query the set of kmers with your own query
 
@@ -68,7 +83,8 @@ METHODS
                      -1 indicates an invalid kmer (e.g., invalid length)
 
     $kmer->histogram()
-        Count the frequency of kmers.
+        Count the frequency of kmers. Internally caches the histogram to
+        ram.
 
           Arguments: none
           Returns:   Reference to an array of counts. The index of 

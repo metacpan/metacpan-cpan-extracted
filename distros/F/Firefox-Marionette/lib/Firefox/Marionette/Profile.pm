@@ -13,7 +13,7 @@ BEGIN {
         require Win32;
     }
 }
-our $VERSION = '0.80';
+our $VERSION = '0.81';
 
 sub _ANY_PORT           { return 0 }
 sub _GETPWUID_DIR_INDEX { return 7 }
@@ -131,17 +131,19 @@ sub existing {
 }
 
 sub new {
-    my ($class) = @_;
+    my ( $class, %parameters ) = @_;
     my $profile = bless { comments => q[], keys => {} }, $class;
-    $profile->{_download_directory} = File::Temp->newdir(
-        File::Spec->catdir(
-            File::Spec->tmpdir(),
-            'firefox_marionette_download_directory_XXXXXXXXXXX'
-        )
-      )
-      or Firefox::Marionette::Exception->throw(
-        "Failed to create temporary directory:$EXTENDED_OS_ERROR");
-    my $dirname = $profile->{_download_directory}->dirname();
+    my $dirname = $parameters{download_directory};
+    if ( !defined $dirname ) {
+        $profile->{_download_directory} = File::Temp->newdir(
+            File::Spec->catdir(
+                File::Spec->tmpdir(), 'firefox_marionette_profile_XXXXXXXXXXX'
+            )
+          )
+          or Firefox::Marionette::Exception->throw(
+            "Failed to create temporary directory:$EXTENDED_OS_ERROR");
+        $dirname = $profile->{_download_directory}->dirname();
+    }
     if ( $OSNAME eq 'cygwin' ) {
         $dirname =
           Firefox::Marionette->execute( 'cygpath', '-s', '-w', $dirname );
@@ -149,6 +151,7 @@ sub new {
     $profile->set_value( 'browser.shell.checkDefaultBrowser',     'false', 0 );
     $profile->set_value( 'browser.reader.detectedFirstArticle',   'true',  0 );
     $profile->set_value( 'dom.disable_open_click_delay',          0,       0 );
+    $profile->set_value( 'media.gmp-gmpopenh264.autoupdate',      'false', 0 );
     $profile->set_value( 'app.update.auto',                       'false', 0 );
     $profile->set_value( 'app.update.enabled',                    'false', 0 );
     $profile->set_value( 'devtools.jsonview.enabled',             'false', 0 );
@@ -169,7 +172,10 @@ sub new {
     $profile->set_value( 'browser.download.defaultFolder',  $dirname, 1 );
     $profile->set_value( 'browser.download.folderList',     2,        0 )
       ;    # the last folder specified for a download
-    $profile->set_value( 'marionette.port', _ANY_PORT() );
+    $profile->set_value( 'marionette.port',                _ANY_PORT() );
+    $profile->set_value( 'devtools.toolbox.host',          'window', 1 );
+    $profile->set_value( 'devtools.netmonitor.persistlog', 'true', 0 );
+
     return $profile;
 }
 
@@ -278,7 +284,7 @@ Firefox::Marionette::Profile - Represents a prefs.js Firefox Profile
 
 =head1 VERSION
 
-Version 0.80
+Version 0.81
 
 =head1 SYNOPSIS
 

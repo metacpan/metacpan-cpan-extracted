@@ -3,7 +3,7 @@ package Firefox::Marionette::Capabilities;
 use strict;
 use warnings;
 
-our $VERSION = '0.80';
+our $VERSION = '0.81';
 
 sub new {
     my ( $class, %parameters ) = @_;
@@ -126,7 +126,7 @@ Firefox::Marionette::Capabilities - Represents Firefox Capabilities retrieved us
 
 =head1 VERSION
 
-Version 0.80
+Version 0.81
 
 =head1 SYNOPSIS
 
@@ -236,7 +236,7 @@ To temporarily disable the WebDriver conformant checks use 0 as value for this c
 
 Please note that this capability exists only temporarily, and that it will be removed once the interactability checks have been stabilized.
 
-=item * page_load_strategy - defines the page load strategy to use for the duration of the session. Setting a page load strategy will cause navigation to be "eager", waiting for the interactive document ready state; "normal" (the default), waiting for the complete ready state; or "none", which will return immediately after starting navigation. 
+=item * page_load_strategy - defines the L<page load strategy|Firefox::Marionette::Capabilities#page_load_strategy> for the upcoming browser session.
 
 =item * proxy - describes the L<proxy|Firefox::Marionette::Proxy> setup for the upcoming browser session.
 
@@ -252,7 +252,17 @@ This method returns a new L<capabilities|Firefox::Marionette::Capabilities> obje
  
 =head2 page_load_strategy 
 
-returns the page load strategy to use for the duration of the session. Setting a page load strategy will cause navigation to be "eager", waiting for the interactive document ready state; "normal" (the default), waiting for the complete ready state; or "none", which will return immediately after starting navigation. 
+returns the L<page load strategy|https://w3c.github.io/webdriver/#dfn-table-of-page-load-strategies> to use for the duration of the session. The page load strategy corresponds to the L<readyState|https://developer.mozilla.org/en-US/docs/Web/API/Document/readyState#Values> and may be one of the following values;
+
+=over 4
+
+=item * normal - Wait for the document and all sub-resources have finished loading.  The corresponding L<readyState|https://developer.mozilla.org/en-US/docs/Web/API/Document/readyState#Values> is "complete".  The L<load|https://developer.mozilla.org/en-US/docs/Web/Events/load> event is about to fire.  This strategy is the default value.
+
+=item * eager - Wait for the document to have finished loading and have been parsed.  Sub-resources such as images, stylesheets and frames are still loading.  The corresponding L<readyState|https://developer.mozilla.org/en-US/docs/Web/API/Document/readyState#Values> is "interactive".
+
+=item * none - return immediately after starting navigation.  The corresponding L<readyState|https://developer.mozilla.org/en-US/docs/Web/API/Document/readyState#Values> is "loading".
+
+=back
 
 =head2 platform_name 
 

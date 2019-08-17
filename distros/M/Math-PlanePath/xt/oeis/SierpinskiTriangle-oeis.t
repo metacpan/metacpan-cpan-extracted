@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2015 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2015, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -19,15 +19,15 @@
 
 use 5.004;
 use strict;
+use Math::BigInt try => 'GMP';
 use Test;
 plan tests => 16;
 
 use lib 't','xt';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings(); }
-
 use MyOEIS;
-use Math::BigInt try => 'GMP';
+
 use Math::NumSeq::BalancedBinary;
 use Math::PlanePath::SierpinskiTriangle;
 

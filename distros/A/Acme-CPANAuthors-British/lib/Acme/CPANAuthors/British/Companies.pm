@@ -4,7 +4,7 @@ use warnings;
 
 {
     no strict "vars";
-    $VERSION = "1.03";
+    $VERSION = "1.04";
 }
 
 use Acme::CPANAuthors::Register (
@@ -135,7 +135,7 @@ this release.
 
 =head1 COPYRIGHT & LICENSE
 
-  Copyright 2009-2015 Barbie for Miss Barbell Productions.
+  Copyright 2009-2019 Barbie for Miss Barbell Productions.
 
   This distribution is free software; you can redistribute it and/or
   modify it under the Artistic License 2.0.

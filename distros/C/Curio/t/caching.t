@@ -6,6 +6,8 @@ subtest no_cache => sub{
     my $class = 'CC::no_cache';
     package CC::no_cache;
         use Curio;
+        add_key 'default';
+        default_key 'default';
     package main;
 
     my $object1 = $class->fetch();
@@ -18,6 +20,8 @@ subtest cache => sub{
     my $class = 'CC::cache';
     package CC::cache;
         use Curio;
+        add_key 'default';
+        default_key 'default';
         does_caching;
     package main;
 

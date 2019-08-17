@@ -1,21 +1,28 @@
-0.463   2019-06-20 (PERLANCAR)
+0.464   2019-07-16  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename script to be more consistent with others:
+	  script/show-sah-coerce-module ->
+	  script/show-sah-coerce-rule-module.
+
+
+0.463   2019-06-20  Released-By: PERLANCAR
 
 	- [ux] coerce-with-sah: Add example for --coerce-rule.
 
 	- Use Package::Stash's list_all_symbols instead of get_all_symbols.
 
 
-0.462   2019-01-06 (PERLANCAR)
+0.462   2019-01-06  Released-By: PERLANCAR
 
 	- Replace use of Package::MoreUtil with Package::Stash.
 
 
-0.461   2018-06-03 (PERLANCAR)
+0.461   2018-06-03  Released-By: PERLANCAR
 
 	- Adjust to Data::Sah::Coerce 0.025.
 
 
-0.460   2018-01-14 (PERLANCAR)
+0.460   2018-01-14  Released-By: PERLANCAR
 
         - No functional changes.
 
@@ -23,7 +30,7 @@
           perl/modname" didn't work).
 
 
-0.45    2017-03-11 (PERLANCAR)
+0.45    2017-03-11  Released-By: PERLANCAR
 
 	- list-sah-schemas-modules, list-sah-type-modules: Allow filtering etc
 	  by using Perinci::Sub::Gen::AccessTable.
@@ -31,52 +38,52 @@
 	- [doc] Add some cross references.
 
 
-0.44    2017-03-10 (PERLANCAR)
+0.44    2017-03-10  Released-By: PERLANCAR
 
 	- list-sah-schema-modules: Add detail result & more filtering
 	  options by using Perinci::Sub::Gen::AccessTable.
 
 
-0.43    2017-03-09 (PERLANCAR)
+0.43    2017-03-09  Released-By: PERLANCAR
 
         - Add utility: show-sah-coerce-module.
 
 
-0.42    2017-03-09 (PERLANCAR)
+0.42    2017-03-09  Released-By: PERLANCAR
 
 	- list-sah-coerce-rule-modules: Add detail result & more filtering
 	  options by using Perinci::Sub::Gen::AccessTable.
 
 
-0.41    2016-12-09 (PERLANCAR)
+0.41    2016-12-09  Released-By: PERLANCAR
 
 	- Add utilities: get-sah-type,
 	  is-sah{,-simple,-collection,-ref,-numeric}{,-builtin}-ytpe.
 
 
-0.40    2016-12-09 (PERLANCAR)
+0.40    2016-12-09  Released-By: PERLANCAR
 
 	- resolve-sah-schema: Add missing newline in output.
 
 
-0.39    2016-07-22 (PERLANCAR)
+0.39    2016-07-22  Released-By: PERLANCAR
 
 	- Add utility: list-sah-schemas-modules.
 
 
-0.38    2016-07-21 (PERLANCAR)
+0.38    2016-07-21  Released-By: PERLANCAR
 
 	- [ux] normalize-sah-schema, resolve-sah-schema: Allow unquoted
 	  schema names.
 
 
-0.37    2016-07-20 (PERLANCAR)
+0.37    2016-07-20  Released-By: PERLANCAR
 
 	- resolve-sah-schema: Add --return-intermediates &
 	  --merge-clause-sets options.
 
 
-0.36    2016-07-19 (PERLANCAR)
+0.36    2016-07-19  Released-By: PERLANCAR
 
 	- Add utility: resolve-sah-schema.
 
@@ -84,45 +91,45 @@
 	  --str-val, --full.
 
 
-0.35    2016-07-01 (PERLANCAR)
+0.35    2016-07-01  Released-By: PERLANCAR
 
 	- validate-with-sah: Add option --schema-module (-m) to use schema
 	  from a Sah::Schema::* module.
 
 
-0.34    2016-06-16 (PERLANCAR)
+0.34    2016-06-16  Released-By: PERLANCAR
 
 	- Add completion for --coerce-rule, --type, & --format.
 
 	- Add utility: format-with-sah.
 
 
-0.33    2016-06-12 (PERLANCAR)
+0.33    2016-06-12  Released-By: PERLANCAR
 
 	- [Bugfix] list-sah-clauses: Don't use
 	  Data::Sah::Compiler::perl::TH::<type>, load
 	  Data::Sah::Type::<type> directly.
 
 
-0.32    2016-06-12 (PERLANCAR)
+0.32    2016-06-12  Released-By: PERLANCAR
 
 	- list-sah-clauses: Add completion for 'type'.
 
 
-0.31    2016-06-12 (PERLANCAR)
+0.31    2016-06-12  Released-By: PERLANCAR
 
 	- Add utility: list-sah-clauses.
 
 	- sah-to-human: Add examples.
 
 
-0.30    2016-05-30 (PERLANCAR)
+0.30    2016-05-30  Released-By: PERLANCAR
 
 	- [Bugfix] validate-with-sah: setting --compiler/-C to js still set
 	  compiler to perl.
 
 
-0.29    2016-05-30 (PERLANCAR)
+0.29    2016-05-30  Released-By: PERLANCAR
 
         - Add scripts: list-sah-type-modules, list-sah-coerce-rule-modules.
 
@@ -130,57 +137,57 @@
           validate-with-sah.
 
 
-0.28    2016-05-25 (PERLANCAR)
+0.28    2016-05-25  Released-By: PERLANCAR
 
         - Add scripts: list-sah-schema-modules, show-sah-schema-module.
 
 
-0.27    2016-05-24 (PERLANCAR)
+0.27    2016-05-24  Released-By: PERLANCAR
 
 	- Adjust to Data::Sah::Coerce 0.011 (coerce_from and
 	  dont_coerce_from replaced by coerce_rules).
 
 
-0.26    2016-05-23 (PERLANCAR)
+0.26    2016-05-23  Released-By: PERLANCAR
 
 	- coerce-with-sah: Add --show-rules option.
 
 
-0.25    2016-05-22 (PERLANCAR)
+0.25    2016-05-22  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Fix/add examples.
 
 
-0.24    2016-05-22 (PERLANCAR)
+0.24    2016-05-22  Released-By: PERLANCAR
 
 	- Adjust to Data::Sah::Coerce 0.009 (return type 'bool+val'
 	  replaced with 'str+val').
 
 
-0.23    2016-05-20 (PERLANCAR)
+0.23    2016-05-20  Released-By: PERLANCAR
 
 	- coerce-with-sah: Add option --return-type (Data::Sah::Coerce
 	  0.007).
 
 
-0.22    2016-05-19 (PERLANCAR)
+0.22    2016-05-19  Released-By: PERLANCAR
 
 	- Fix typo when passing --coerce-from to gen_coercer().
 
 
-0.21    2016-05-17 (PERLANCAR)
+0.21    2016-05-17  Released-By: PERLANCAR
 
 	- coerce-with-sah: Support using JS coercer.
 
 
-0.20    2016-05-15 (PERLANCAR)
+0.20    2016-05-15  Released-By: PERLANCAR
 
 	- Add script: coerce-with-sah.
 
 
-0.19    2016-05-15 (PERLANCAR)
+0.19    2016-05-15  Released-By: PERLANCAR
 
 	- By default, show result using Data::Dump instead of JSON to
 	  preserve more data.
@@ -188,26 +195,26 @@
 	- Fix example in Synopsis.
 
 
-0.18    2016-05-14 (PERLANCAR)
+0.18    2016-05-14  Released-By: PERLANCAR
 
 	- Add script: normalize-sah-schema.
 
 	- Allow return_type bool+val & str+val (Data::Sah 0.76).
 
 
-0.17    2016-03-10 (PERLANCAR)
+0.17    2016-03-10  Released-By: PERLANCAR
 
 	- Replace JSON with JSON::MaybeXS.
 
 
-0.16    2016-01-18 (PERLANCAR)
+0.16    2016-01-18  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [build] Rebuild to fix POD section ordering.
 
 
-0.15    2015-09-03 (PERLANCAR)
+0.15    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -216,24 +223,24 @@
 	  requirement.
 
 
-0.14    2015-05-26 (PERLANCAR)
+0.14    2015-05-26  Released-By: PERLANCAR
 
 	- Add option: --no-modules.
 
 
-0.13    2015-05-22 (PERLANCAR)
+0.13    2015-05-22  Released-By: PERLANCAR
 
         - validate-with-sah: Add options --core, --core-or-pp.
 
 
-0.12    2015-05-22 (PERLANCAR)
+0.12    2015-05-22  Released-By: PERLANCAR
 
         - [Bugfix] validate-with-sah: Fix Rinci metadata,
           data/multiple_data/data_file/multiple_data_file is only required when
           action=validate.
 
 
-0.11    2015-05-06 (PERLANCAR)
+0.11    2015-05-06  Released-By: PERLANCAR
 
         - No functional changes.
 
@@ -241,31 +248,31 @@
           dep_any).
 
 
-0.10    2015-05-06 (PERLANCAR)
+0.10    2015-05-06  Released-By: PERLANCAR
 
 	- Add option --hash-values to pass to compile() (Data::Sah 0.55).
 
 
-0.09    2015-05-04 (PERLANCAR)
+0.09    2015-05-04  Released-By: PERLANCAR
 
 	- Remove --show-human & --show-raw-human options from
 	  validate-with-sah, instead a new utility is added
 	  bin/sah-to-human for this (with more options).
 
 
-0.08    2015-05-02 (PERLANCAR)
+0.08    2015-05-02  Released-By: PERLANCAR
 
 	- Add options --show-human, --show-raw-human.
 
 
-0.07    2015-05-01 (PERLANCAR)
+0.07    2015-05-01  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Update to Rinci 1.1.77 (args_groups -> args_rels).
 
 
-0.06    2015-04-14 (PERLANCAR)
+0.06    2015-04-14  Released-By: PERLANCAR
 
         - [Incompatible change] Rename --show-linenum to --linenum,
           --show-data-with-result to --data-with-result to be more consistent
@@ -274,7 +281,7 @@
         - Add option: --pp.
 
 
-0.05    2015-04-04 (PERLANCAR)
+0.05    2015-04-04  Released-By: PERLANCAR
 
 	- validate-with-sah: Add options --data-file, --multiple-data-file,
           --data-file-type.
@@ -282,21 +289,21 @@
         - A couple of bug fixes.
 
 
-0.04    2015-04-04 (PERLANCAR)
+0.04    2015-04-04  Released-By: PERLANCAR
 
 	- [Bugfix] Typo.
 
 
-0.03    2015-04-04 (PERLANCAR)
+0.03    2015-04-04  Released-By: PERLANCAR
 
 	- validate-with-sah: Add options --show-raw-compile, --with-debug.
 
 
-0.02    2015-04-03 (PERLANCAR)
+0.02    2015-04-03  Released-By: PERLANCAR
 
 	- validate-with-sah: Add alias -r for --return-type.
 
 
-0.01    2015-04-03 (PERLANCAR)
+0.01    2015-04-03  Released-By: PERLANCAR
 
         - First release.

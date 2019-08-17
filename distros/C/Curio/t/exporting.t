@@ -5,6 +5,8 @@ use Test2::V0;
 subtest export_function_name => sub{
     package CC::efn;
         use Curio;
+        add_key 'foo';
+        default_key 'foo';
         export_function_name 'get_efn';
     package main;
 
@@ -21,6 +23,8 @@ subtest export_function_name => sub{
 subtest always_export => sub{
     package CC::ae;
         use Curio;
+        add_key 'foo';
+        default_key 'foo';
         export_function_name 'get_ae';
         always_export;
     package main;
@@ -33,6 +37,8 @@ subtest always_export => sub{
 subtest export_resource => sub{
     package CC::er;
         use Curio;
+        add_key 'foo';
+        default_key 'foo';
         export_function_name 'get_er';
         export_resource;
         sub res { 'boo' }

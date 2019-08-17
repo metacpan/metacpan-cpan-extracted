@@ -1,2 +1,2 @@
-requires 'Geoffrey',           '>= 0.000103';
+requires 'Geoffrey',           '>= 0.000200';
 requires 'SQL::Abstract',      '>= 0';

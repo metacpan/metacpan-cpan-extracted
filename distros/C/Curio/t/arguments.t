@@ -2,20 +2,22 @@
 use strictures 2;
 use Test2::V0;
 
-subtest no_keys => sub{
+subtest default_key => sub{
     my $class = 'CC::no_keys';
     package CC::no_keys;
         use Curio;
+        add_key default => (foo=>2);
+        default_key 'default';
     package main;
 
     is(
         $class->factory->arguments(),
-        {},
+        { foo=>2 },
         'empty arguments',
     );
 };
 
-subtest does_keys => sub{
+subtest undeclared_key => sub{
     package CC::dk;
         use Curio;
         allow_undeclared_keys;

@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -62,7 +62,7 @@ use strict;
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 126;
+$VERSION = 127;
 use Math::PlanePath;
 *_sqrtint = \&Math::PlanePath::_sqrtint;
 use Math::PlanePath::Base::NSEW;
@@ -875,6 +875,7 @@ L<https://oeis.org/wiki/Ulam's_spiral>
 
     wider=0 (the default)
       A174344    X coordinate
+      A274923    Y coordinate
       A214526    abs(X)+abs(Y) "Manhattan" distance
 
       A079813    abs(dY), being k 0s followed by k 1s
@@ -895,6 +896,8 @@ L<https://oeis.org/wiki/Ulam's_spiral>
       A053755    N values on X=-Y opp diagonal X<=0 (NW)
       A016754    N values on X=-Y opp diagonal X>=0 (SE)
       A200975    N values on all four diagonals
+      A317186    N on Y axis positive and negative
+      A267682    N on Y axis positive and negative (origin twice)
 
       A137928    N values on X=-Y+1 opposite diagonal
       A002061    N values on X=Y diagonal pos and neg
@@ -981,7 +984,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

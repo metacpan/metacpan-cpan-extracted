@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2015, 2018 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2015, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -38,15 +38,13 @@ MyOEIS::compare_values
    func => sub {
      my ($count) = @_;
      my @got;
-     my $x = 0;
-     my $y = 0;
-     foreach my $n (1 .. $count) {
-       push @got, ($path->xy_is_visited($x,$y) ? 1 : 0);
-       $x++;
-       if ($x > $y) {
-         $y++;
-         $x = -$y;
+     for (my $y = 0; @got < $count; $y++) {
+       my $str = '';
+       my $x = 0;
+       foreach my $x (-$y .. $y) {
+         $str .= ($path->xy_is_visited($x,$y) ? 1 : 0);
        }
+       push @got, $str;
      }
      return \@got;
    });

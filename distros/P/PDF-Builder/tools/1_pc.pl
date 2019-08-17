@@ -7,14 +7,14 @@
 use strict;
 use warnings;
 
-our $VERSION = '3.015'; # VERSION
-my $LAST_UPDATE = '3.013'; # manually update whenever code is changed
+our $VERSION = '3.016'; # VERSION
+my $LAST_UPDATE = '3.016'; # manually update whenever code is changed
 
 # command line:
-# -5  run perlcritic -5 .  (should pass)
-# -5x                      exclude certain common errors
+# -5  run perlcritic -5 .  (should be clean)
+# -5x                      exclude certain common errors (none at this time)
 # -4  run perlcritic -4 .  should get a number of common errors
-# -4x                      exclude certain common errors
+# -4x                      exclude certain common errors  DEFAULT
 # -3  run perlcritic -3 .  should get a number of errors
 # -3x                      exclude certain common errors
 # -2  run perlcritic -2 .  should get more errors
@@ -22,10 +22,13 @@ my $LAST_UPDATE = '3.013'; # manually update whenever code is changed
 # -1  run perlcritic -1 .  should get even more errors
 # -1x                      exclude certain common errors
 # 
-# levels 1,2,3 are only for the morbidly curious!
+# levels 1,2,3 are only for the morbidly curious! 
+#   (although some warnings look like they should be addressed)
 
 # output <source name> OK is always ignored
 my @ignore_list = (
+  # should not ignore any level 5 warnings
+  # common level 4 warnings to ignore
      "Code before warnings",  # due to use of "no warnings" pragma 
      "Warnings disabled at",  # due to use of "no warnings" pragma
      "Close filehandles as soon as possible", 
@@ -42,12 +45,18 @@ my @ignore_list = (
      "Symbols are exported by default", 
                               # it doesn't like something about our use of 
 			      # @EXPORT and @EXPORT_OK
+  # common level 3 warnings to ignore for now
+     '"die" used instead of "croak"',  # 
+     '"warn" used instead of "carp"',  # 
+     'Regular expression without "/x" flag',  # 
+     "Backtick operator used",  # 
 	          );
 
 # Note that level 4 includes any level 5 errors, etc.
 # 
 my $level;
 my @exclude;  # leave empty unless "x" suffix
+
 # one command line arg allowed (-4x is default)
 if      (scalar @ARGV == 0) {
     $level = '-4';
@@ -86,6 +95,10 @@ if      (scalar @ARGV == 0) {
     die "0 or 1 argument permitted. -4 is default.\n";
 }
 
+print STDERR "Calling perlcritic $level";
+if (scalar @exclude > 0) { print STDERR ", with excluded warning list"; }
+print STDERR ". This can take several minutes to run!\n";
+
 my @results = `perlcritic $level .`;
 # always remove " source OK"
 my @results2 = ();
@@ -95,13 +108,13 @@ foreach my $line (@results) {
     }
 }
 
-if (@ignore_list) {
+if (scalar @exclude > 0 && scalar @results2 > 0) {
     @results = @results2;
     @results2 = ();
     # remove common errors
     foreach my $line (@results) {
 	my $keep = 1;
-	foreach (@ignore_list) {
+	foreach (@exclude) {
 	    if ($line =~ m/$_/) {
 		$keep = 0;
 		last;

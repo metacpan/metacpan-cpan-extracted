@@ -4,7 +4,7 @@
       "Dennis K. Paulsen (ctrondlp@cpan.org), Ernesto Guisado (erngui@acm.org)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.94, CPAN::Meta::Converter version 2.140640",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -35,9 +35,6 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
          }
-      },
-      "runtime" : {
-         "requires" : {}
       }
    },
    "release_status" : "stable",
@@ -46,5 +43,6 @@
          "url" : "http://github.com/dk/Win32-GuiTest"
       }
    },
-   "version" : "1.63"
+   "version" : "1.64",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

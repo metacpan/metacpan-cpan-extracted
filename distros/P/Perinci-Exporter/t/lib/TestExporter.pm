@@ -1,6 +1,5 @@
 package TestExporter;
 
-use 5.010;
 use strict;
 use warnings;
 use Perinci::Exporter;

@@ -1,7 +1,7 @@
 package App::ModuleAbstractCwaliteeUtils;
 
-our $DATE = '2019-07-03'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-08-02'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: CLI Utilities related to module Abstract cwalitee
@@ -18,7 +18,7 @@ App::ModuleAbstractCwaliteeUtils - CLI Utilities related to module Abstract cwal
 
 =head1 VERSION
 
-This document describes version 0.001 of App::ModuleAbstractCwaliteeUtils (from Perl distribution App-ModuleAbstractCwaliteeUtils), released on 2019-07-03.
+This document describes version 0.003 of App::ModuleAbstractCwaliteeUtils (from Perl distribution App-ModuleAbstractCwaliteeUtils), released on 2019-08-02.
 
 =head1 DESCRIPTION
 
@@ -29,6 +29,8 @@ This distribution includes the following utilities:
 =item * L<calc-module-abstract-cwalitee>
 
 =item * L<list-module-abstract-cwalitee-indicators>
+
+=item * L<ma-cwa>
 
 =back
 

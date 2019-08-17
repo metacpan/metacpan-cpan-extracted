@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2017 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2017, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -20,6 +20,7 @@
 
 use 5.004;
 use strict;
+use Math::BigInt try => 'GMP';
 use Test;
 plan tests => 17;
 
@@ -29,34 +30,13 @@ BEGIN { MyTestHelpers::nowarnings(); }
 use MyOEIS;
 
 use Math::PlanePath::CCurve;
+use Math::NumSeq::PlanePathTurn;
 
 # uncomment this to run the ### lines
 # use Smart::Comments '###';
 
 
 my $path = Math::PlanePath::CCurve->new;
-
-# return 0,1,2,3 turn
-sub path_n_turn {
-  my ($path, $n) = @_;
-  my $prev_dir = path_n_dir ($path, $n-1);
-  my $dir = path_n_dir ($path, $n);
-  return ($dir - $prev_dir) % 4;
-}
-# return 0,1,2,3
-sub path_n_dir {
-  my ($path, $n) = @_;
-  my ($dx,$dy) = $path->n_to_dxdy($n) or die "Oops, no point at ",$n;
-  return dxdy_to_dir4 ($dx, $dy);
-}
-# return 0,1,2,3, with Y reckoned increasing upwards
-sub dxdy_to_dir4 {
-  my ($dx, $dy) = @_;
-  if ($dx > 0) { return 0; }  # east
-  if ($dx < 0) { return 2; }  # west
-  if ($dy > 0) { return 1; }  # north
-  if ($dy < 0) { return 3; }  # south
-}
 
 sub right_boundary {
   my ($n_end) = @_;
@@ -65,90 +45,35 @@ sub right_boundary {
 use Memoize;
 Memoize::memoize('right_boundary');
 
-#------------------------------------------------------------------------------
-# A038503 etc counts of segments in direction
-
-foreach my $elem ([0, 'A038503', 0],
-                  [1, 'A038504', 0],
-                  [2, 'A038505', 1],
-                  [3, 'A000749', 0]) {
-  my ($dir, $anum, $initial_k) = @$elem;
-  MyOEIS::compare_values
-      (anum => $anum,
-       max_value => 100_000,
-       func => sub {
-         my ($count) = @_;
-         my @got;
-         my $n = $path->n_start;
-         my $total = 0;
-         my $k = $initial_k;
-         while (@got < $count) {
-           my $n_end = 2**$k;
-           for ( ; $n < $n_end; $n++) {
-             $total += (dxdy_to_dir4($path->n_to_dxdy($n)) == $dir);
-           }
-           push @got, $total;
-           $k++;
-         }
-         return \@got;
-       });
-}
 
 #------------------------------------------------------------------------------
-# A035263 - morphism turn 0=straight, 1=not-straight
-
-MyOEIS::compare_values
-  (anum => 'A035263',
-   func => sub {
-     my ($count) = @_;
-     my @got;
-     for (my $n = 1; @got < $count; $n++) {
-       my $lsr = $path->_UNDOCUMENTED__n_to_turn_LSR($n);
-       push @got, ($lsr ? 1 : 0);
-     }
-     return \@got;
-   });
-
-MyOEIS::compare_values
-  (anum => q{A035263}, # second check
-   func => sub {
-     my ($count) = @_;
-     my @got;
-     for (my $n = 1; @got < $count; $n++) {
-       push @got, (count_low_0_bits($n) + 1) % 2;
-     }
-     return \@got;
-   });
-
-
-#------------------------------------------------------------------------------
-# A003159 - positions ending even 0 bits is where turn either left or right
-
-MyOEIS::compare_values
-  (anum => 'A003159',
-   func => sub {
-     my ($count) = @_;
-     my @got;
-     for (my $n = 0; @got < $count; $n++) {
-       my $lsr = $path->_UNDOCUMENTED__n_to_turn_LSR($n);
-       if ($lsr) { # left or right
-         push @got, $n;
-       }
-     }
-     return \@got;
-   });
-
 # A036554 - positions ending odd 0 bits is where turn straight or reverse
 MyOEIS::compare_values
   (anum => 'A036554',
    func => sub {
      my ($count) = @_;
+     my $seq = Math::NumSeq::PlanePathTurn->new (planepath => 'CCurve',
+                                                 turn_type => 'Straight');
      my @got;
-     for (my $n = 1; @got < $count; $n++) {
-       my $lsr = $path->_UNDOCUMENTED__n_to_turn_LSR($n);
-       if ($lsr == 0) { # straight
-         push @got, $n;
-       }
+     while (@got < $count) {
+       my ($i,$value) = $seq->next;
+       if ($value) { push @got, $i; }   # N where straight
+     }
+     return \@got;
+   });
+
+# A003159 - positions ending even 0 bits is where turn either left or right,
+# ie. not straight or reverse
+MyOEIS::compare_values
+  (anum => 'A003159',
+   func => sub {
+     my ($count) = @_;
+     my $seq = Math::NumSeq::PlanePathTurn->new (planepath => 'CCurve',
+                                                 turn_type => 'NotStraight');
+     my @got;
+     while (@got < $count) {
+       my ($i,$value) = $seq->next;
+       if ($value) { push @got, $i; }   # N where not straight
      }
      return \@got;
    });
@@ -162,10 +87,12 @@ MyOEIS::compare_values
   (anum => 'A096268',
    func => sub {
      my ($count) = @_;
+     my $seq = Math::NumSeq::PlanePathTurn->new (planepath => 'CCurve',
+                                                 turn_type => 'Straight');
      my @got;
-     for (my $n = 1; @got < $count; $n++) {
-       my $lsr = $path->_UNDOCUMENTED__n_to_turn_LSR($n);
-       push @got, ($lsr ? 0 : 1);  # 1=straight,0=not
+     while (@got < $count) {
+       my ($i,$value) = $seq->next;
+       push @got, $value;
      }
      return \@got;
    });
@@ -200,7 +127,6 @@ sub count_low_1_bits {
   }
   return $count;
 }
-
 sub count_low_0_bits {
   my ($n) = @_;
   if ($n == 0) { die; }
@@ -213,20 +139,29 @@ sub count_low_0_bits {
 }
 
 #------------------------------------------------------------------------------
-# A007814 - count low 0s, is turn right - 1
+# A035263 - morphism turn 0=straight, 1=not-straight
 
 MyOEIS::compare_values
-  (anum => 'A007814',
-   fixup => sub {
-     my ($bvalues) = @_;
-     @$bvalues = map {$_ % 4} @$bvalues;
-   },
+  (anum => 'A035263',
+   func => sub {
+     my ($count) = @_;
+     my $seq = Math::NumSeq::PlanePathTurn->new (planepath => 'CCurve',
+                                                 turn_type => 'NotStraight');
+     my @got;
+     while (@got < $count) {
+       my ($i,$value) = $seq->next;
+       push @got, $value;
+     }
+     return \@got;
+   });
+
+MyOEIS::compare_values
+  (anum => q{A035263}, # second check
    func => sub {
      my ($count) = @_;
      my @got;
-     my $total_turn = 0;
-     for (my $n = $path->n_start + 1; @got < $count; $n++) {
-       push @got, (1 - path_n_turn($path,$n)) % 4;  # negate to right
+     for (my $n = 1; @got < $count; $n++) {
+       push @got, (count_low_0_bits($n) + 1) % 2;
      }
      return \@got;
    });
@@ -243,7 +178,7 @@ MyOEIS::compare_values
 
 MyOEIS::compare_values
   (anum => 'A027383',
-   max_value => 10_000,
+   max_value => 5000,
    func => sub {
      my ($count) = @_;
      my @got = (1);
@@ -258,7 +193,7 @@ MyOEIS::compare_values
 # A131064 right boundary odd powers, extra initial 1
 MyOEIS::compare_values
   (anum => 'A131064',
-   max_value => 50_000,
+   max_value => 5000,
    func => sub {
      my ($count) = @_;
      my @got = (1);
@@ -269,6 +204,86 @@ MyOEIS::compare_values
      }
      return \@got;
    });
+
+#------------------------------------------------------------------------------
+# A038503 etc counts of segments in direction
+
+foreach my $elem ([0, 'A038503', 0],
+                  [1, 'A038504', 0],
+                  [2, 'A038505', 1],
+                  [3, 'A000749', 0]) {
+  my ($dir, $anum, $initial_k) = @$elem;
+  MyOEIS::compare_values
+      (anum => $anum,
+       name => "segments in direction dir=$dir",
+       max_value => 10_000,
+       func => sub {
+         my ($count) = @_;
+         require Math::NumSeq::PlanePathDelta;
+         my $seq = Math::NumSeq::PlanePathDelta->new (planepath => 'CCurve',
+                                                      delta_type => 'Dir4');
+         my $total = 0;
+         my $k = $initial_k;
+         my $n_end = 2**$k;
+         my @got;
+         for (;;) {
+           my ($i,$value) = $seq->next;
+           if ($i >= $n_end) {   # $i now in next level
+             push @got, $total;
+             last if @got >= $count;
+             $k++;
+             $n_end = 2**$k;
+           }
+           $total += ($value==$dir);
+         }
+         return \@got;
+       });
+}
+
+#------------------------------------------------------------------------------
+# A000120 - count 1 bits total turn is direction
+
+MyOEIS::compare_values
+  (anum => 'A000120',
+   fixup => sub {
+     my ($bvalues) = @_;
+     @$bvalues = map {$_ % 4} @$bvalues;
+   },
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     require Math::NumSeq::PlanePathDelta;
+     my $seq = Math::NumSeq::PlanePathDelta->new (planepath => 'CCurve',
+                                                  delta_type => 'Dir4');
+     while (@got < $count) {
+       my ($i,$value) = $seq->next;
+       push @got, $value;
+     }
+     return \@got;
+   });
+
+#------------------------------------------------------------------------------
+# A007814 - count low 0s, is turn right - 1
+
+MyOEIS::compare_values
+  (anum => 'A007814',
+   fixup => sub {
+     my ($bvalues) = @_;
+     @$bvalues = map {$_ % 4} @$bvalues;
+   },
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     my $seq = Math::NumSeq::PlanePathTurn->new
+       (planepath => 'CCurve',
+        turn_type => 'Turn4');   # 0,1,2,3 leftward
+     while (@got < $count) {
+       my ($i,$value) = $seq->next;
+       push @got, (1-$value) % 4;  # negate to right
+     }
+     return \@got;
+   });
+
 
 #------------------------------------------------------------------------------
 # A104488 -- num Hamiltonian groups
@@ -296,15 +311,12 @@ MyOEIS::compare_values
 # A146559   X at N=2^k, being Re((i+1)^k)
 # A009545   Y at N=2^k, being Im((i+1)^k)
 
-require Math::NumSeq::PlanePathN;
-my $bigclass = Math::NumSeq::PlanePathN::_bigint();
-
 MyOEIS::compare_values
   (anum => 'A146559',
    func => sub {
      my ($count) = @_;
      my @got;
-     for (my $n = $bigclass->new(1); @got < $count; $n *= 2) {
+     for (my $n = Math::BigInt->new(1); @got < $count; $n *= 2) {
        my ($x,$y) = $path->n_to_xy($n);
        push @got, $x;
      }
@@ -315,29 +327,9 @@ MyOEIS::compare_values
    func => sub {
      my ($count) = @_;
      my @got;
-     for (my $n = $bigclass->new(1); @got < $count; $n *= 2) {
+     for (my $n = Math::BigInt->new(1); @got < $count; $n *= 2) {
        my ($x,$y) = $path->n_to_xy($n);
        push @got, $y;
-     }
-     return \@got;
-   });
-
-#------------------------------------------------------------------------------
-# A000120 - count 1 bits total turn
-
-MyOEIS::compare_values
-  (anum => 'A000120',
-   fixup => sub {
-     my ($bvalues) = @_;
-     @$bvalues = map {$_ % 4} @$bvalues;
-   },
-   func => sub {
-     my ($count) = @_;
-     my @got = (0);
-     my $total_turn = 0;
-     for (my $n = $path->n_start + 1; @got < $count; $n++) {
-       $total_turn += path_n_turn($path,$n);
-       push @got, $total_turn % 4;
      }
      return \@got;
    });

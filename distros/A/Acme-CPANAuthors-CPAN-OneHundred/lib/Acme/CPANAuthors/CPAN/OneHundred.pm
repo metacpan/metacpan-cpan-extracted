@@ -4,7 +4,7 @@ use warnings;
 
 {
     no strict "vars";
-    $VERSION = "1.14";
+    $VERSION = "1.15";
 }
 
 use Acme::CPANAuthors::Register (
@@ -82,7 +82,7 @@ currently maintaining 100 or more distributions on CPAN.
 
 =head1 THE AUTHORS
 
-   1.  1765  PERLANCAR     perlancar
+   1.  1768  PERLANCAR     perlancar
    2.  550  PSIXDISTS     Perl 6 Modules
    3.  296  RJBS          Ricardo SIGNES
    4.  282  TOBYINK       Toby Inkster
@@ -124,7 +124,7 @@ currently maintaining 100 or more distributions on CPAN.
   40.  102  TEAM          Tom Molesworth
   41.  101  LBROCARD      Leon Brocard
 
-List last updated: 2019-08-11T07:18:35
+List last updated: 2019-08-17T08:38:54
 
 =head1 MAINTENANCE
 

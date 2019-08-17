@@ -15,10 +15,10 @@ package PDF::Builder::Basic::PDF::Page;
 use base 'PDF::Builder::Basic::PDF::Pages';
 
 use strict;
-no warnings qw[ deprecated recursion uninitialized ];
+use warnings;
 
-our $VERSION = '3.015'; # VERSION
-my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
+our $VERSION = '3.016'; # VERSION
+my $LAST_UPDATE = '3.016'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Dict;
 use PDF::Builder::Basic::PDF::Utils;
@@ -65,52 +65,55 @@ should be inserted (so that new pages need not be appended)
 
 =cut
 
-sub new
-{
+sub new {
     my ($class, $pdf, $parent, $index) = @_;
+    my $self = {};
 
-    my ($self) = {};
-
-    $class = ref $class if ref $class;
+    $class = ref($class) if ref($class);
     $self = $class->SUPER::new($pdf, $parent);
     $self->{'Type'} = PDFName('Page');
     delete $self->{'Count'};
     delete $self->{'Kids'};
     $parent->add_page($self, $index);
+    
     return $self;
 }
 
-=head2 $p->add($str)
+# the add() method was deleted from PDF::API2 2.034, but it looks like it
+# still may be used in Builder.pm! apparently calls Content.pm's add().
 
-Adds the string to the currently active stream for this page. If no stream
-exists, then one is created and added to the list of streams for this page.
-
-The slightly cryptic name is an aim to keep it short given the number of times
-people are likely to have to type it.
-
-=cut
-
-sub add {
-    my ($self, $str) = @_;
-
-    my ($strm) = $self->{' curstrm'};
-
-    if (!defined $strm) {
-        $strm = PDF::Builder::Basic::PDF::Dict->new();
-        foreach (@{$self->{' outto'}}) { 
-	    $_->new_obj($strm); 
-        }
-        $self->{'Contents'} = PDFArray() unless defined $self->{'Contents'};
-        unless (ref $self->{'Contents'} eq "PDF::Builder::Basic::PDF::Array") { 
-	    $self->{'Contents'} = PDFArray($self->{'Contents'}); 
-        }
-        $self->{'Contents'}->add_elements($strm);
-        $self->{' curstrm'} = $strm;
-    }
-
-    $strm->{' stream'} .= $str;
-    return $self;
-}
+#=head2 $p->add($str)
+#
+#Adds the string to the currently active stream for this page. If no stream
+#exists, then one is created and added to the list of streams for this page.
+#
+#The slightly cryptic name is an aim to keep it short given the number of times
+#people are likely to have to type it.
+#
+#=cut
+#
+#sub add {
+#    my ($self, $string) = @_;
+#
+#    my $dict = $self->{' curstrm'};
+#
+#    unless (defined $dict) {
+#        $dict = PDF::Builder::Basic::PDF::Dict->new();
+#        foreach my $pdf (@{$self->{' destination_pdfs'}}) { 
+#	    $pdf->new_obj($dict); 
+#        }
+#        $self->{'Contents'} = PDFArray() unless defined $self->{'Contents'};
+#        unless (ref($self->{'Contents'}) eq 'PDF::Builder::Basic::PDF::Array') {
+#	    $self->{'Contents'} = PDFArray($self->{'Contents'}); 
+#        }
+#        $self->{'Contents'}->add_elements($dict);
+#        $self->{' curstrm'} = $dict;
+#    }
+#
+#    $dict->{' stream'} .= $string;
+#
+#    return $self;
+#}
 
 =head2 $p->ship_out($pdf)
 
@@ -122,9 +125,10 @@ sub ship_out {
     my ($self, $pdf) = @_;
 
     $pdf->ship_out($self);
-    if (defined $self->{'Contents'}) { 
-	$pdf->ship_out($self->{'Contents'}->elementsof()); 
+    if (defined $self->{'Contents'}) {
+        $pdf->ship_out($self->{'Contents'}->elements());
     }
+
     return $self;
 }
 

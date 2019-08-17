@@ -3,8 +3,8 @@ package PDF::Builder::Lite;
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.015'; # VERSION
-my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
+our $VERSION = '3.016'; # VERSION
+my $LAST_UPDATE = '3.016'; # manually update whenever code is changed
 
 BEGIN {
 
@@ -42,12 +42,12 @@ PDF::Builder::Lite - Lightweight PDF creation methods
 =cut
 
 sub new {
-    my $class = shift;
-   #my %opts = @_;
+    my ($class, %opts) = @_;
 
     my $self = {};
     bless($self, $class);
-    $self->{'api'} = PDF::Builder->new(@_);
+    $self->{'api'} = PDF::Builder->new(%opts);
+
     return $self;
 }
 
@@ -62,7 +62,7 @@ Opens a new page.
 =cut
 
 sub page {
-    my $self = shift;
+    my $self = shift();
     $self->{'page'} = $self->{'api'}->page();
     $self->{'page'}->mediabox(@_) if $_[0];
     $self->{'gfx'} = $self->{'page'}->gfx();
@@ -90,7 +90,7 @@ sub mediabox {
 
 =item $pdf->saveas($file)
 
-Saves the document (may not be modified later) and
+Saves the document (may B<not> be modified later) and
 deallocates the PDF structures.
 
 If C<$file> is just a hyphen '-', the stringified copy is returned, otherwise
@@ -138,7 +138,7 @@ B<Examples:>
 sub corefont {
     my ($self, $name, @opts) = @_;
 
-    my $obj = $self->{'api'}->corefont($name,@opts);
+    my $obj = $self->{'api'}->corefont($name, @opts);
     return $obj;
 }
 
@@ -164,7 +164,7 @@ sub ttfont {
 
 =item $font = $pdf->psfont($ps_file)
 
-Returns a new Type1 font object.
+Returns a new Type1 (PS) font object.
 
 B<Examples:>
 
@@ -197,7 +197,7 @@ sub psfont {
 #=cut
 #
 #sub color {
-#    my $self = shift;
+#    my $self = shift();
 #
 #    return $self->{'api'}->businesscolor(@_);
 #}
@@ -275,7 +275,7 @@ Saves the state of the page.
 =cut
 
 sub savestate {
-    my $self = shift;
+    my $self = shift();
 
     return $self->{'gfx'}->save();
 }
@@ -287,7 +287,7 @@ Restores the state of the page.
 =cut
 
 sub restorestate {
-    my $self = shift;
+    my $self = shift();
 
     return $self->{'gfx'}->restore();
 }
@@ -299,7 +299,7 @@ Sets extended-graphics state.
 =cut
 
 sub egstate {
-    my $self = shift;
+    my $self = shift();
 
     $self->{'gfx'}->egstate(@_);
     return $self;
@@ -312,7 +312,7 @@ Sets the fill color. See C<strokecolor> for color names and specifications.
 =cut
 
 sub fillcolor {
-    my $self = shift;
+    my $self = shift();
 
     $self->{'gfx'}->fillcolor(@_);
     return $self;
@@ -362,7 +362,7 @@ or the hsv-hex-notation:
 =cut
 
 sub strokecolor {
-    my $self = shift;
+    my $self = shift();
 
     $self->{'gfx'}->strokecolor(@_);
     return $self;
@@ -422,7 +422,7 @@ Move to a new drawing location at C[$x,$y].
 =cut
 
 sub move { # x,y ...
-    my $self = shift;
+    my $self = shift();
 
     $self->{'gfx'}->move(@_);
     return $self;
@@ -435,7 +435,7 @@ Draw a line to C[$x,$y].
 =cut
 
 sub line { # x,y ...
-    my $self = shift;
+    my $self = shift();
 
     $self->{'gfx'}->line(@_);
     return $self;
@@ -448,8 +448,7 @@ Draw a Bezier curve with three control points.
 =cut
 
 sub curve { # x1,y1,x2,y2,x3,y3 ...
-    my $self = shift;
-
+    my $self = shift();
     $self->{'gfx'}->curve(@_);
     return $self;
 }
@@ -466,7 +465,7 @@ sweep, and may be set to 1 for a clockwise sweep.
 =cut
 
 sub arc { # xc,yc, rx,ry, alpha,beta ,move [,dir]
-    my $self = shift;
+    my $self = shift();
 
     $self->{'gfx'}->arc(@_);
     return $self;
@@ -479,7 +478,7 @@ Draw an ellipse centered at C[$xc,$yc], with x radius C[$rx] and y radius C[$ry]
 =cut
 
 sub ellipse {
-    my $self = shift;
+    my $self = shift();
 
     $self->{'gfx'}->ellipse(@_);
     return $self;
@@ -492,7 +491,7 @@ Draw a circle centered at C[$xc,$yc], of radius C[$r].
 =cut
 
 sub circle {
-    my $self = shift;
+    my $self = shift();
 
     $self->{'gfx'}->circle(@_);
     return $self;
@@ -506,7 +505,7 @@ height (+y) C[$h].
 =cut
 
 sub rect { # x,y, w,h ...
-    my $self = shift;
+    my $self = shift();
 
     $self->{'gfx'}->rect(@_);
     return $self;
@@ -519,7 +518,7 @@ Draw a rectangle with opposite corners C[$x1,$y1] and C[$x2,$y2].
 =cut
 
 sub rectxy {
-    my $self = shift;
+    my $self = shift();
 
     $self->{'gfx'}->rectxy(@_);
     return $self;
@@ -533,7 +532,7 @@ continuing on to C[$x2,$y2], ..., C[$xn,$yn].
 =cut
 
 sub poly {
-    my $self = shift;
+    my $self = shift();
 
     $self->{'gfx'}->poly(@_);
     return $self;
@@ -546,7 +545,7 @@ Close a shape (draw a line back to the beginning).
 =cut
 
 sub close {
-    my $self = shift;
+    my $self = shift();
 
     $self->{'gfx'}->close();
     return $self;
@@ -560,7 +559,7 @@ the requested C<strokecolor>.
 =cut
 
 sub stroke {
-    my $self = shift;
+    my $self = shift();
 
     $self->{'gfx'}->stroke();
     return $self;
@@ -574,7 +573,7 @@ The I<non-zero winding rule> is used if the path crosses itself.
 =cut
 
 sub fill { # nonzero winding rule
-    my $self = shift;
+    my $self = shift();
 
     $self->{'gfx'}->fill();
     return $self;
@@ -588,7 +587,7 @@ The I<non-zero winding rule> is used if the path crosses itself.
 =cut
 
 sub fillstroke { # nonzero winding rule
-    my $self = shift;
+    my $self = shift();
 
     $self->{'gfx'}->fillstroke();
     return $self;
@@ -611,7 +610,7 @@ a scale of 72/150 (or 72/300) or adjust width/height accordingly.
 =cut
 
 sub image {
-    my $self = shift;
+    my $self = shift();
 
     $self->{'gfx'}->image(@_);
     return $self;
@@ -624,7 +623,7 @@ Forces the start of text mode while in graphics.
 =cut
 
 sub textstart {
-    my $self = shift;
+    my $self = shift();
 
     $self->{'gfx'}->textstart();
     return $self;
@@ -637,7 +636,7 @@ Define the current font to be an (already defined) font object at the given size
 =cut
 
 sub textfont {
-    my $self = shift;
+    my $self = shift();
 
     $self->{'gfx'}->font(@_);
     return $self;
@@ -650,7 +649,7 @@ Set the baseline-to-baseline "leading" to be used for text lines.
 =cut
 
 sub textlead {
-    my $self = shift;
+    my $self = shift();
 
     $self->{'gfx'}->lead(@_);
     return $self;
@@ -664,7 +663,7 @@ already-specified font.
 =cut
 
 sub text {
-    my $self = shift;
+    my $self = shift();
 
     return $self->{'gfx'}->text(@_) || $self;
 }
@@ -676,7 +675,7 @@ Write a newline (drop down to the next line).
 =cut
 
 sub nl {
-    my $self = shift;
+    my $self = shift();
 
     $self->{'gfx'}->nl();
     return $self;
@@ -689,7 +688,7 @@ Force an end to text output and return to graphics.
 =cut
 
 sub textend {
-    my $self = shift;
+    my $self = shift();
 
     $self->{'gfx'}->textend();
     return $self;
@@ -706,7 +705,7 @@ Justification is 0 for left, 1 for center, and 2 for right.
 =cut
 
 sub print {
-    my $self = shift;
+    my $self = shift();
     my ($font, $size, $x,$y, $rot, $just, @text) = @_;
 
     my $text = join(' ', @text);

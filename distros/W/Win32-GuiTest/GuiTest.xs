@@ -1177,7 +1177,7 @@ GetChildDepth(hAncestor, hChild)
     OUTPUT:
         RETVAL
 
-int
+IV
 SendMessage(hwnd, msg, wParam, lParam)
   HWND hwnd
   UINT msg

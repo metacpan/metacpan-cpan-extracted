@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013, 2015 Kevin Ryde
+# Copyright 2012, 2013, 2015, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -166,12 +166,14 @@ foreach my $elem ([ 1, 1,0 ],
 {
   my $bad = 0;
   foreach my $i (2 .. 200) {
-    my $p = pow3_if_exact($i);
-    if (! $p) {
+    # Not sure if need a bit of head-room on the base-3 calculations.
+    # Had a cpantesters amd64 perl 5.20.1 fail at i=33 for some reason.
+    if (! pow3_if_exact($i+1)) {
       MyTestHelpers::diag ("round_up_pow(3) tests stop for round-off at i=$i");
       last;
     }
 
+    my $p = pow3_if_exact($i);
     {
       my $n = $p-1;
       my $want_pow = $p;

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -26,9 +26,10 @@
 
 use 5.004;
 use strict;
-use Test;
+use Math::BigInt try => 'GMP';   # for bignums in reverse-add steps
 use List::Util 'min';
-plan tests => 199;
+use Test;
+plan tests => 516;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -127,7 +128,7 @@ MyOEIS::compare_values
 # A267872 Number of ON (black) cells in the n-th iteration of the "Rule 237" elementary cellular automaton starting with a single ON (black) cell.
 # A267873 Number of ON (black) cells in the n-th iteration of the "Rule 235" elementary cellular automaton starting with a single ON (black) cell.
 # A267874 Total number of ON (black) cells after n iterations of the "Rule 235" elementary cellular automaton starting with a single ON (black) cell.
-# A267682 Total number of ON (black) cells after n iterations of the "Rule 201" elementary cellular automaton starting with a single ON (black) cell.
+
 # A267610 Total number of OFF (white) cells after n iterations of the "Rule 182" elementary cellular automaton starting with a single ON (black) cell.
    # A267590 Number of ON (black) cells in the n-th iteration of the "Rule 169" elementary cellular automaton starting with a single ON (black) cell.
    # A267591 Total number of ON (black) cells after n iterations of the "Rule 169" elementary cellular automaton starting with a single ON (black) cell.
@@ -668,6 +669,7 @@ my @data =
    [ 'A267679',  201, 'bits' ],
    [ 'A267680',  201, 'bignum', base=>2 ],
    [ 'A267681',  201, 'bignum' ],
+   [ 'A267682',  201, 'number_of', cumulative=>1 ],
 
    [ 'A267683',  203, 'bits' ],
    [ 'A267684',  203, 'bignum', base=>2 ],
@@ -864,7 +866,7 @@ my @data =
    [ 'A117998', 102, 'bignum' ],
    [ 'A117999', 110, 'bignum' ],
    [ 'A037576', 190, 'bignum' ],
-   [ 'A002450', 250, 'bignum', initial=>[0] ], # (4^n-1)/3 10101 extra 0 at start
+   [ 'A002450', 250, 'bignum', initial=>[0] ], # (4^n-1)/3 10101 extra 0 start
 
    [ 'A006977', 230, 'bignum', part=>'left' ],
    [ 'A078176', 225, 'bignum', part=>'whole', ystart=>1, inverse=>1 ],
@@ -876,7 +878,7 @@ my @data =
    [ 'A151929',  30, 'number_of_1s_first_diff', max_count=>200,
      initial=>[0], # without diffs yet applied ...
    ],
-   [ 'A092539',  30, 'bignum_central_column' ],
+   [ 'A092539',  30, 'bignum_central_column', base=>2 ],
    [ 'A094603',  30, 'trailing_number_of', value=>1 ],
    [ 'A094604',  30, 'new_maximum_trailing_number_of', 1 ],
 
@@ -1115,8 +1117,9 @@ sub number_of_make_values {
   my $path = Math::PlanePath::CellularRule->new (rule => $rule);
 
   my @got = @$initial;
+  my $number_of;
   for (my $y = 0; @got < $count; $y++) {
-    my $number_of = 0;
+    unless ($params{'cumulative'}) { $number_of = 0 }
     foreach my $x (($part eq 'right' || $part eq 'centre' ? 0 : -$y)
                    .. ($part eq 'left' || $part eq 'centre' ? 0 : $y)) {
       my $n = $path->xy_to_n ($x, $y);
@@ -1231,7 +1234,6 @@ sub bignum {
          my $path = Math::PlanePath::CellularRule->new (rule => $rule);
 
          my @got = @$initial;
-         require Math::BigInt;
          for (my $y = $ystart; @got < $count; $y++) {
            my $b = Math::BigInt->new(0);
            foreach my $x (($part eq 'right' ? 0 : -$y)
@@ -1295,7 +1297,6 @@ sub bignum_central_column {
          my $path = Math::PlanePath::CellularRule->new (rule => $rule);
 
          my @got;
-         require Math::BigInt;
          my $b = Math::BigInt->new(0);
          for (my $y = 0; @got < $count; $y++) {
            my $bit = ($path->xy_to_n (0, $y) ? 1 : 0);
@@ -1723,4 +1724,16 @@ sub central_column_N {
 # A071054
 # A071055
 #
+
+# A267682 cumulative number of ON cells, by rows
+# A267682_samples = [1, 1, 4, 8, 15, 23, 34, 46, 61, 77, 96, 116, 139, 163, 190, 218, 249, 281, 316, 352, 391, 431, 474, 518, 565, 613, 664, 716, 771, 827, 886, 946, 1009, 1073, 1140, 1208, 1279, 1351, 1426, 1502, 1581, 1661, 1744, 1828, 1915, 2003, 2094, 2186, 2281, 2377, 2476];
+# A267682(n) = n*(2*n-1)/2 + if(n%2==0,1,1/2);
+# A267682(n) = if(n%2==0, n^2 - (n-2)/2, n^2 - (n-1)/2);
+# vector(#A267682_samples,n,n--; A267682(n)) - \
+# A267682_samples
+# recurrence_guess(A267682_samples)
+# vector(10,n,n--;n=2*n+1; A267682(n))
+# even A054556
+# odd A033951
+# recurrence_guess(vector(10,n,n--; sum(i=0,n, 2*2*i+1 + 2*(2*i+1)+3)))
 exit 0;

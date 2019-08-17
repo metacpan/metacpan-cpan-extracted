@@ -17,6 +17,7 @@ INFO/DEPRECATED
 INFO/KNOWN_INCOMP
 INFO/LICENSE
 INFO/PATENTS
+INFO/RoadMap
 INFO/SUPPORT
 INFO/old/.travis.yml.HOLD
 INFO/old/contrib.bat
@@ -199,6 +200,7 @@ t/annotate.t
 t/author-critic.t
 t/author-pod-syntax.t
 t/barcode.t
+t/bbox.t
 t/circular-references.t
 t/cmap.t
 t/content.t
@@ -226,6 +228,7 @@ t/rt67767.t
 t/rt69503.t
 t/rt120397.t
 t/rt120450.t
+t/rt126274.t
 t/string.t
 t/text.t
 t/tiff.t

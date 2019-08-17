@@ -1,5 +1,9 @@
 Revision history for Firefox-Marionette
 
+0.81  Sun Aug 11 20:22:00 2019
+       Improved ssh support for remote firefox, including addons and downloads.
+       Added experimental support for HAR (HTTP Archive) files.
+
 0.80  Sat Aug  3 16:57:00 2019
        Added survive, user and host parameters to new method.
 

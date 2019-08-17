@@ -7,7 +7,7 @@ use warnings;
 use SQL::Abstract;
 use Geoffrey::Exception::Database;
 
-$Geoffrey::Changelog::Database::VERSION = '0.000100';
+$Geoffrey::Changelog::Database::VERSION = '0.000200';
 
 use parent 'Geoffrey::Role::Changelog';
 
@@ -124,7 +124,9 @@ sub write {
                     values => [{
                             id               => $hr_changeset->{id},
                             filename         => __PACKAGE__ . '::' . __LINE__,
-                            created_by       => $hr_changeset->{author},
+                            created_by       => $hr_changeset->{created_by}
+                                                    ? $hr_changeset->{created_by} : $hr_changeset->{author}
+                                                    ? $hr_changeset->{author} : undef,
                             geoffrey_version => $Geoffrey::Changelog::Database::VERSION,
                             ($hr_changeset->{comment} ? (comment => $hr_changeset->{comment}) : ()),
                         }]}));
@@ -171,7 +173,6 @@ sub geoffrey_changelogs {
     return $self->{geoffrey_changelogs};
 }
 
-
 1;    # End of Geoffrey::Changelog
 
 __END__
@@ -186,21 +187,44 @@ Geoffrey::Changelog::Database - module for Geoffrey::Changelog to load changeset
 
 =head1 VERSION
 
-Version 0.000100
+Version 0.000200
 
 =head1 DESCRIPTION
 
 =head1 SYNOPSIS
 
+    my $o_geoffrey = Geoffrey->new(
+        dbh            => $o_handle,
+        converter_name => 'Pg',
+        io_name        => 'Database'
+    );
+
+    # the dot is to fake the root directory, which is not needed becaues of database
+    my $s_user = 'Mario Zieschang';
+    my $s_sql = 'SELECT 1;';
+    my $s_changeset_id = time . '-' . $s_user
+    $o_geoffrey->changelog_io->write( q~.~, [{
+        author  => $s_user,
+        id      => $s_changeset_id,
+        name    => 'Some createative name',
+        entries => [{action => 'sql.add', as => $s_sql}],
+    }]);
+
+    my $hr_changeset = $o_geoffrey->changelog_io->load($s_changeset_id);
+    
+    $o_geoffrey->reader->run_changeset($hr_get_changeset, delete $hr_get_changeset->{filename});
+
 =head1 SUBROUTINES/METHODS
 
 =head2 new
 
-=head2 converter
-
 =head2 tpl_main
 
+Not supported yet.
+
 =head2 tpl_sub
+
+Not supported yet.
 
 =head2 file_extension
 
@@ -212,11 +236,18 @@ Called to load changesets from database
 
 Called to write changesets to database
 
-=head2 dbh
-
 =head2 converter
 
+Instantiates Geoffrey::Converter::... object if none is the in the internal key 'converter'
+and returns it. converter SQLite is default if no changeset_converter is given in the constructor.
+
+=head2 dbh
+
+Contains the given dbi session
+
 =head2 geoffrey_changelogs
+
+Returns the geoffrey_changelogs table name because it's needed for feference
 
 =head2 schema
 
@@ -225,6 +256,18 @@ Called to write changesets to database
 =head1 CONFIGURATION AND ENVIRONMENT
 
 =head1 DEPENDENCIES
+
+=over 4
+
+=item * Inherits
+
+L<Geoffrey::Role::Changelog|Geoffrey::Role::Changelog>
+
+=item * Internal usage
+
+L<SQL::Abstract|SQL::Abstract>, L<Geoffrey::Exception::Database|Geoffrey::Exception::Database>
+
+=back
 
 =head1 INCOMPATIBILITIES
 

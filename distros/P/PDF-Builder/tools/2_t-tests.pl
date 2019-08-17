@@ -1,17 +1,18 @@
 #!/usr/bin/perl
 # run all "t" tests
 # roughly equivalent to t-tests.bat
+# must be run from parent of t/
 # author: Phil M Perry
 
 use strict;
 use warnings;
 
-our $VERSION = '3.015'; # VERSION
-my $LAST_UPDATE = '3.013'; # manually update whenever code is changed
+our $VERSION = '3.016'; # VERSION
+my $LAST_UPDATE = '3.016'; # manually update whenever code is changed
 
-# command line:
+# command line flags, mutually exclusive:
 # -raw   show full output of each t-test run
-# -noOK  exclude "ok" lines so can easily spot error lines
+# -noOK  exclude "ok" lines so can easily spot error lines  DEFAULT
 
 my @test_list = qw(
  00-all-usable
@@ -22,6 +23,7 @@ my @test_list = qw(
  author-critic
  author-pod-syntax
  barcode
+ bbox
  circular-references
  cmap
  content
@@ -49,11 +51,15 @@ my @test_list = qw(
  rt69503
  rt120397
  rt120450
+ rt126274
  string
  text
  tiff
  viewer-preferences
                   );
+# override full list above, and run just one or two tests
+#@test_list = qw( barcode );
+
 # perl t/<name>.t will run it
 
 my $type;
@@ -75,6 +81,7 @@ if      (scalar @ARGV == 0) {
 
 foreach my $file (@test_list) {
     my @results = `perl t/$file.t`;
+    # TBD: detect if a FAILED test, and remark at end if any failures
     print "\nt/$file.t\n";
     if ($type eq '-raw') {
 	print "@results";

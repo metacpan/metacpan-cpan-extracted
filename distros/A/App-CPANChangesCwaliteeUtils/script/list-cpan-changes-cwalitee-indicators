@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /CPAN/Changes/Cwalitee/list_cpan_changes_cwalitee_indicators
-# and generated automatically using Perinci::CmdLine::Gen version 0.488
+# and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-07-10'; # DATE
+our $DATE = '2019-08-02'; # DATE
 our $DIST = 'App-CPANChangesCwaliteeUtils'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,13 +37,43 @@ list-cpan-changes-cwalitee-indicators - list-cpan-changes-cwalitee-indicators
 
 =head1 VERSION
 
-This document describes version 0.003 of list-cpan-changes-cwalitee-indicators (from Perl distribution App-CPANChangesCwaliteeUtils), released on 2019-07-10.
+This document describes version 0.005 of list-cpan-changes-cwalitee-indicators (from Perl distribution App-CPANChangesCwaliteeUtils), released on 2019-08-02.
 
 =head1 SYNOPSIS
 
 Usage:
 
  % list-cpan-changes-cwalitee-indicators [options]
+
+Examples:
+
+List all installed indicators from all modules:
+
+ % list-cpan-changes-cwalitee-indicators
+ date_correct_format
+ date_parsable
+ english
+ has_releases
+ no_duplicate_version
+ no_empty_group
+ no_shouting
+ no_useless_text
+ not_too_wide
+ parsable
+ preamble_has_no_releases
+ release_dates_not_future
+ releases_in_descending_date_order
+
+List only certain names, show details:
+
+ % list-cpan-changes-cwalitee-indicators --detail --include parsable --include date_parsable --include date_correct_format
+ +-------------------------------+---------------------+----------+----------+--------+----------------------------------------------------------------------+
+ | module                        | name                | priority | severity | status | summary                                                              |
+ +-------------------------------+---------------------+----------+----------+--------+----------------------------------------------------------------------+
+ | CPAN::Changes::Cwalitee::Core | date_correct_format | 50       | 3        | stable | Dates are specified in the correct specified format, e.g. YYYY-MM-DD |
+ | CPAN::Changes::Cwalitee::Core | date_parsable       | 50       | 3        | stable | Dates are parsable by CPAN::Changes                                  |
+ | CPAN::Changes::Cwalitee::Core | parsable            | 10       | 3        | stable | Parseable by CPAN::Changes                                           |
+ +-------------------------------+---------------------+----------+----------+--------+----------------------------------------------------------------------+
 
 =head1 OPTIONS
 

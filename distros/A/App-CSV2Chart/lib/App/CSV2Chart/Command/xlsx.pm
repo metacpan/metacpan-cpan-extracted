@@ -1,5 +1,5 @@
 package App::CSV2Chart::Command::xlsx;
-$App::CSV2Chart::Command::xlsx::VERSION = '0.6.0';
+$App::CSV2Chart::Command::xlsx::VERSION = '0.6.1';
 use strict;
 use warnings;
 
@@ -257,7 +257,7 @@ __END__
 
 =head1 VERSION
 
-version 0.6.0
+version 0.6.1
 
 =head1 NAME
 

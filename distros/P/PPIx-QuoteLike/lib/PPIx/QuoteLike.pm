@@ -18,7 +18,7 @@ use PPIx::QuoteLike::Token::Unknown;
 use PPIx::QuoteLike::Token::Whitespace;
 use Scalar::Util ();
 
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 
 use constant CODE_REF	=> ref sub {};
 
@@ -1059,10 +1059,9 @@ following modules are known to cause problems:
 
 L<Acme::PerlML|Acme::PerlML>, which renders Perl as XML.
 
-L<Data::PostfixDeref|Data::PostfixDeref>, which causes Perl to interpret
-suffixed empty brackets as dereferencing the thing they suffix, and
-which is inconsistent with the postfix dereference syntax introduced in
-5.19.5 and mainstreamed with 5.24.0.
+C<Data::PostfixDeref>, which causes Perl to interpret suffixed empty
+brackets as dereferencing the thing they suffix. This module by Ben
+Morrow (C<BMORROW>) appears to have been retracted.
 
 L<Filter::Trigraph|Filter::Trigraph>, which recognizes ANSI C trigraphs,
 allowing Perl to be written in the ISO 646 character set.

@@ -35,10 +35,10 @@
       "runtime" : {
          "requires" : {
             "Complete::Module" : "0",
-            "Complete::Util" : "0.57",
+            "Complete::Util" : "0.601",
             "Data::Dump" : "0",
             "Data::Dump::Color" : "0",
-            "Data::Sah" : "0.895",
+            "Data::Sah" : "0.896",
             "Data::Sah::Coerce" : "0.031",
             "Data::Sah::CoerceCommon" : "0.011",
             "Data::Sah::CoerceJS" : "0.011",
@@ -85,7 +85,7 @@
          "web" : "https://github.com/perlancar/perl-App-SahUtils"
       }
    },
-   "version" : "0.463",
+   "version" : "0.464",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028002"
@@ -491,7 +491,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AddToDb",
             "name" : "@Author::PERLANCAR/Rinci::AddToDb",
-            "version" : "0.01"
+            "version" : "0.020"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::Validate",

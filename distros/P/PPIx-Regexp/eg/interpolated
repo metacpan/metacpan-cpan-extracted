@@ -93,6 +93,8 @@ interpolated - Find all interpolated regular expressions
 If this option is asserted, only interpolated regular expressions
 B<without> the C</o> qualifier are found.
 
+=back
+
 =head1 DETAILS
 
 This script searches files or directories for interpolated regular

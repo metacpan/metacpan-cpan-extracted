@@ -8,13 +8,13 @@ package Vote::Count::Borda;
 use Moose::Role;
 
 
-our $VERSION='0.017';
+our $VERSION='0.021';
 
 =head1 NAME
 
 Vote::Count::Borda
 
-=head1 VERSION 0.017
+=head1 VERSION 0.021
 
 =cut
 

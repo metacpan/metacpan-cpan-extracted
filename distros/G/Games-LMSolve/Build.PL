@@ -19,7 +19,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "Games-LMSolve",
-  "dist_version" => "0.12.0",
+  "dist_version" => "0.14.0",
   "license" => "mit",
   "module_name" => "Games::LMSolve",
   "recursive_test_files" => 1,

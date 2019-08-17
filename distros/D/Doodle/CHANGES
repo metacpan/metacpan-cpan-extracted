@@ -1,0 +1,15 @@
+Changelog for Doodle
+
+0.01 2019-08-16T20:39:08
+ - Disabled Travis targets < Perl 5.22
+ - Updated documentation
+ - Bumped Data::Object version requirement
+ - Updated main module synopsis
+ - Updated Travis config based on CI failures
+ - Cleaned-up signatures in POD
+ - Update main module abstract and description
+ - Fixed Travis sudo install issue
+ - Added Perl 5.30 test target for Travis
+ - Added POD and Boilerplate
+ - Initial implementation
+ - Initial commit

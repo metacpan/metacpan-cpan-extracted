@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011 Kevin Ryde
+# Copyright 2011, 2019 Kevin Ryde
 
 # This file is part of Gtk2-Ex-Splash.
 #
@@ -55,7 +55,7 @@ diag "properties:";
 #------------------------------------------------------------------------------
 # VERSION
 
-my $want_version = 52;
+my $want_version = 53;
 {
   is ($Gtk2::Ex::Splash::VERSION,
       $want_version,

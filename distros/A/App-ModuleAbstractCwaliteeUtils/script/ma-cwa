@@ -1,0 +1,306 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /Module/Abstract/Cwalitee/calc_module_abstract_cwalitee
+# and generated automatically using Perinci::CmdLine::Gen version 0.491
+
+our $DATE = '2019-08-02'; # DATE
+our $DIST = 'App-ModuleAbstractCwaliteeUtils'; # DIST
+our $VERSION = '0.003'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/Module/Abstract/Cwalitee/calc_module_abstract_cwalitee",
+    program_name => "ma-cwa",
+    read_config => 0,
+    read_env => 0,
+);
+
+$cmdline->run;
+
+# ABSTRACT: ma-cwa
+# PODNAME: ma-cwa
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+ma-cwa - ma-cwa
+
+=head1 VERSION
+
+This document describes version 0.003 of ma-cwa (from Perl distribution App-ModuleAbstractCwaliteeUtils), released on 2019-08-02.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % ma-cwa [options] <abstract>
+
+Examples:
+
+Example of a good Abstract:
+
+ % ma-cwa 'Calculate the frobnitz of thromblemeisters'
+ +---------------------------------+-----+--------+----------------+----------+
+ | indicator                       | num | result | result_summary | severity |
+ +---------------------------------+-----+--------+----------------+----------+
+ | not_empty                       | 1   | 1      |                | 3        |
+ | language_english                | 2   | 1      |                | 3        |
+ | no_shouting                     | 3   | 1      |                | 3        |
+ | not_end_with_dot                | 4   | 1      |                | 3        |
+ | not_module_name                 | 5   | 1      |                | 3        |
+ | not_multiline                   | 6   | 1      |                | 3        |
+ | not_redundant                   | 7   | 1      |                | 3        |
+ | not_start_with_lowercase_letter | 8   | 1      |                | 3        |
+ | not_template                    | 9   | 1      |                | 3        |
+ | not_too_long                    | 10  | 1      |                | 3        |
+ | not_too_short                   | 11  | 1      |                | 3        |
+ | Score                           |     | 100.00 | 11 out of 11   |          |
+ +---------------------------------+-----+--------+----------------+----------+
+
+Example of a not-so-good Abstract:
+
+ % ma-cwa 'PERL MODULE TO DO SOMETHING'
+ +---------------------------------+-----+--------+-----------------------------------------------+----------+
+ | indicator                       | num | result | result_summary                                | severity |
+ +---------------------------------+-----+--------+-----------------------------------------------+----------+
+ | not_empty                       | 1   | 1      |                                               | 3        |
+ | language_english                | 2   | 1      |                                               | 3        |
+ | no_shouting                     | 3   | 0      | All-caps                                      | 3        |
+ | not_end_with_dot                | 4   | 1      |                                               | 3        |
+ | not_module_name                 | 5   | 1      |                                               | 3        |
+ | not_multiline                   | 6   | 1      |                                               | 3        |
+ | not_redundant                   | 7   | 0      | Saying 'PERL MODULE TO' is redundant, omit it | 3        |
+ | not_start_with_lowercase_letter | 8   | 1      |                                               | 3        |
+ | not_template                    | 9   | 1      |                                               | 3        |
+ | not_too_long                    | 10  | 1      |                                               | 3        |
+ | not_too_short                   | 11  | 1      |                                               | 3        |
+ | Score                           |     | 81.82  | 9 out of 11                                   |          |
+ +---------------------------------+-----+--------+-----------------------------------------------+----------+
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--abstract>=I<s>*
+
+=back
+
+=head2 Indicator selection options
+
+=over
+
+=item B<--exclude-indicator-json>=I<s>, B<-X>
+
+Do not use these indicators (JSON-encoded).
+
+See C<--exclude-indicator>.
+
+=item B<--exclude-indicator-module-json>=I<s>
+
+Do not use indicators from these modules (JSON-encoded).
+
+See C<--exclude-indicator-module>.
+
+=item B<--exclude-indicator-module>=I<s@>
+
+Do not use indicators from these modules.
+
+Can be specified multiple times.
+
+=item B<--exclude-indicator-status-json>=I<s>
+
+Do not use indicators having these statuses (JSON-encoded).
+
+See C<--exclude-indicator-status>.
+
+=item B<--exclude-indicator-status>=I<s@>
+
+Do not use indicators having these statuses.
+
+Can be specified multiple times.
+
+=item B<--exclude-indicator>=I<s@>
+
+Do not use these indicators.
+
+Can be specified multiple times.
+
+=item B<--include-indicator-json>=I<s>, B<-I>
+
+Only use these indicators (JSON-encoded).
+
+See C<--include-indicator>.
+
+=item B<--include-indicator-module-json>=I<s>
+
+Only use indicators from these modules (JSON-encoded).
+
+See C<--include-indicator-module>.
+
+=item B<--include-indicator-module>=I<s@>
+
+Only use indicators from these modules.
+
+Can be specified multiple times.
+
+=item B<--include-indicator-status-json>=I<s>
+
+Only use indicators having these statuses (JSON-encoded).
+
+See C<--include-indicator-status>.
+
+=item B<--include-indicator-status>=I<s@>
+
+Only use indicators having these statuses.
+
+Default value:
+
+ ["stable"]
+
+Can be specified multiple times.
+
+=item B<--include-indicator>=I<s@>
+
+Only use these indicators.
+
+Can be specified multiple times.
+
+=item B<--min-indicator-severity>=I<s>
+
+Minimum indicator severity.
+
+Default value:
+
+ 1
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C ma-cwa ma-cwa
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete ma-cwa 'p/*/`ma-cwa`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-ModuleAbstractCwaliteeUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-ModuleAbstractCwaliteeUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ModuleAbstractCwaliteeUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -7,7 +7,7 @@ use Data::Object::Export;
 
 use parent 'Data::Object::Type';
 
-our $VERSION = '0.97'; # VERSION
+our $VERSION = '0.98'; # VERSION
 
 # BUILD
 # METHODS

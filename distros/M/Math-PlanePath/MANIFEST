@@ -54,7 +54,7 @@ devel/gosper-replicate.pl
 devel/gosper-side.pl
 devel/gray.pl
 devel/greek-key.pl
-devel/grep-values.pl
+devel/grep-various-values.pl
 devel/grid.pl
 devel/hex-arms.pl
 devel/hexhypot.pl

@@ -1,11 +1,13 @@
+## no critic: Modules::ProhibitAutomaticExportation
+
 package Perinci::Examples::Export;
 
-our $DATE = '2015-09-29'; # DATE
-our $VERSION = '0.07'; # VERSION
+our $DATE = '2019-08-15'; # DATE
+our $VERSION = '0.080'; # VERSION
 
-use 5.010;
-use strict;
-use warnings;
+# be lean
+#use strict;
+#use warnings;
 
 use Perinci::Exporter;
 
@@ -56,14 +58,20 @@ Perinci::Examples::Export - Examples for exporting
 
 =head1 VERSION
 
-This document describes version 0.07 of Perinci::Examples::Export (from Perl distribution Perinci-Exporter), released on 2015-09-29.
+This document describes version 0.080 of Perinci::Examples::Export (from Perl distribution Perinci-Exporter), released on 2019-08-15.
 
 =head1 DESCRIPTION
 
 =head1 FUNCTIONS
 
 
-=head2 f1() -> [status, msg, result, meta]
+=head2 f1
+
+Usage:
+
+ f1() -> [status, msg, payload, meta]
+
+This function is exported by default.
 
 No arguments.
 
@@ -72,14 +80,21 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
-=head2 f2() -> [status, msg, result, meta]
+
+=head2 f2
+
+Usage:
+
+ f2() -> [status, msg, payload, meta]
+
+This function is exported by default.
 
 No arguments.
 
@@ -88,14 +103,21 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
-=head2 f3() -> [status, msg, result, meta]
+
+=head2 f3
+
+Usage:
+
+ f3() -> [status, msg, payload, meta]
+
+This function is not exported.
 
 No arguments.
 
@@ -104,14 +126,21 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
-=head2 f4() -> [status, msg, result, meta]
+
+=head2 f4
+
+Usage:
+
+ f4() -> [status, msg, payload, meta]
+
+This function is not exported.
 
 No arguments.
 
@@ -120,14 +149,21 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
-=head2 f5() -> [status, msg, result, meta]
+
+=head2 f5
+
+Usage:
+
+ f5() -> [status, msg, payload, meta]
+
+This function is not exported.
 
 No arguments.
 
@@ -136,14 +172,21 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
-=head2 f6() -> [status, msg, result, meta]
+
+=head2 f6
+
+Usage:
+
+ f6() -> [status, msg, payload, meta]
+
+This function is not exported.
 
 No arguments.
 
@@ -152,14 +195,21 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
-=head2 f7() -> [status, msg, result, meta]
+
+=head2 f7
+
+Usage:
+
+ f7() -> [status, msg, payload, meta]
+
+This function is not exported by default, but exportable.
 
 No arguments.
 
@@ -168,14 +218,21 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
-=head2 f8() -> [status, msg, result, meta]
+
+=head2 f8
+
+Usage:
+
+ f8() -> [status, msg, payload, meta]
+
+This function is not exported.
 
 No arguments.
 
@@ -184,14 +241,21 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
-=head2 f9() -> [status, msg, result, meta]
+
+=head2 f9
+
+Usage:
+
+ f9() -> [status, msg, payload, meta]
+
+This function is not exported.
 
 No arguments.
 
@@ -200,7 +264,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -228,7 +292,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -47,7 +47,7 @@ use List::Util 'min';
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 126;
+$VERSION = 127;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 
@@ -344,8 +344,8 @@ volume 12, number 2, April 1965, pages 247-248.
 
 =back
 
-X<Twindragon>When continued to a power-of-2 extent this is sometimes called
-the "twindragon" since the shape (and fractal limit) limit correspond to two
+X<Twindragon>When continued to a power-of-2 extent, this is sometimes called
+the "twindragon" since the shape (and fractal limit) corresponds to two
 DragonCurve back-to-back.  But the numbering of points in the twindragon is
 not the same as here.
 
@@ -430,7 +430,7 @@ The offset back for each run like N=5 shown is the r in i-r, then the next
 level is (i-r)^2 = (-2r*i + r^2-1) so N=25 begins at Y=-2*2=-4, X=2*2-1=3.
 
 The successive replications tile the plane for any r, though the N values
-needed to rotate around and do so become large if norm=r*r+1 is large.
+needed to rotate all the way around become big if norm=r*r+1 is big.
 
 =head2 Fractal
 
@@ -759,17 +759,20 @@ this path include
 
 =over
 
-L<http://oeis.org/A066321> (etc)
+L<http://oeis.org/A318438> (etc)
 
 =back
 
     realpart=1 (base i-1, the default)
-      A066321    N on X axis, X>=0
+      A318438    X coordinate
+      A318439    Y coordinate
+      A318479    norm X^2 + Y^2
+      A066321    N on X>=0 axis, or N/2 of North-West diagonal
       A271472      and in binary
       A066322    diffs (N at X=16k+4) - (N at X=16k+3)
       A066323    N on X axis, number of 1 bits
       A137426    dX/2 at N=2^(k+2)-1
-                 dY at N=2^k-1   (step to next replication level)
+                   dY at N=2^k-1   (step to next replication level)
       A256441    N on negative X axis, X<=0
 
       A003476    boundary length / 2
@@ -784,6 +787,9 @@ L<http://oeis.org/A066321> (etc)
       A193306    reverse-subtract steps to 0 (plain-rev)
       A193307    reverse-subtract steps to 0 (rev-plain)
 
+    realpart=1 (base i-2)
+      A011658    turn 0=straight, 1=not straight, repeating 0,0,0,1,1
+
 =head1 SEE ALSO
 
 L<Math::PlanePath>,
@@ -796,7 +802,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 Math-PlanePath is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

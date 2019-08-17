@@ -1,39 +1,64 @@
 package MooX::Purple::G;
-
-use 5.006;
-our $VERSION = '0.08';
-use PPR;
-use Cwd qw/abs_path/;
 use strict;
 use warnings;
+use 5.006;
+our $VERSION = '0.09';
+use PPR;
+use Cwd qw/abs_path/;
 
-my $GATTRS = '(
-	allow (?&PerlNWS)
-		(?:(?!qw)(?&PerlQualifiedIdentifier)|
-		(?&PerlList))
-	|
-	with (?&PerlNWS)
-		(?:(?!qw)(?&PerlQualifiedIdentifier)|
-		(?&PerlList))
-	|
-	is (?&PerlNWS)
-		(?:(?!qw)(?&PerlQualifiedIdentifier)|
-		(?&PerlList))
-	|
-	use (?&PerlNWS)
-		(?:(?&PerlQualifiedIdentifier)\s*(?&PerlList)|(?:(?!qw)(?&PerlQualifiedIdentifier)|
-		(?&PerlList)))
-	| 
-	(?:(?&PerlNWS)*)
-)'; 
-
-my $SATTRS = '(
-	allow (?&PerlNWS)
-		(?:(?!qw)(?&PerlQualifiedIdentifier)|
-		(?&PerlList))
-	|
-	(?:(?&PerlNWS)*)
-)';
+our (%HAS, $GATTRS, $SATTRS);
+BEGIN {
+	$GATTRS = '(
+		allow (?&PerlNWS)
+			(?:(?!qw)(?&PerlQualifiedIdentifier)|
+			(?&PerlList))
+		|
+		with (?&PerlNWS)
+			(?:(?!qw)(?&PerlQualifiedIdentifier)|
+			(?&PerlList))
+		|
+		is (?&PerlNWS)
+			(?:(?!qw)(?&PerlQualifiedIdentifier)|
+			(?&PerlList))
+		|
+		use (?&PerlNWS)
+			(?:(?&PerlQualifiedIdentifier)\s*(?&PerlList)|(?:(?!qw)(?&PerlQualifiedIdentifier)|
+			(?&PerlList)))
+		| 
+		(?:(?&PerlNWS)*)
+	)'; 
+	$SATTRS = '(
+		allow (?&PerlNWS)
+			(?:(?!qw)(?&PerlQualifiedIdentifier)|
+			(?&PerlList))
+		|
+		(?:(?&PerlNWS)*)
+	)';
+	%HAS = (
+		ro => '"ro"',
+		ro => '"ro"',
+		is_ro => 'is => "ro"',
+		rw => '"rw"',
+		is_rw => 'is => "rw"',
+		nan => 'undef',
+		lzy => 'lazy => 1',
+		bld => 'builder => 1',
+		lzy_bld => 'lazy_build => 1',
+		trg => 'trigger => 1',
+		clr => 'clearer => 1',
+		req => 'required => 1',
+		coe => 'coerce => 1',
+		lzy_hash => 'lazy => 1, default => sub { {} }',
+		lzy_array => 'lazy => 1, default => sub { [] }',
+		lzy_str => 'lazy => 1, default => sub { "" }',
+		dhash => 'default => sub { {} }',
+		darray => 'default => sub { [] }',
+		dstr => 'default => sub { "" }',	
+	);
+	$HAS{compile_regex} = sprintf q|[\[\s]+(%s)[\s,]+|, join '|', keys %HAS;
+	$HAS{compile_value_regex} =  sprintf q|[\[\s]+(%s)[\s,]+|, join '|', map { quotemeta($_) } 
+		qw/default lazy required trigger clearer coerce handles builder predicate reader writer weak_ref init_arg moosify/;
+};
 
 sub g {
 	my ($source, $keyword, $callback, $lib) = @_;
@@ -55,6 +80,74 @@ sub g {
 		}
 	}
 	$source;
+}
+
+sub p {
+	g(
+		g(
+			g(
+				$_[0],
+				qq|(?<match> private\\s*
+				(?<method> (?&PerlIdentifier))
+				(?<attrs> (?: $SATTRS*))
+				(?<block> (?&PerlBlock)))|,
+				\&private,
+			),
+			qq|(?<match> public\\s*
+			(?<method> (?&PerlIdentifier))
+			(?:(?&PerlNWS))*
+			(?<block> (?&PerlBlock)))|,
+			\&public,
+		),
+		qq|(?<match> attributes\\s* (?<list> (?&PerlList))\\s*\;)|,
+		\&attributes
+	);
+}
+
+sub i {
+	my $i = shift;
+	my @s;
+	while ( $i =~ s/
+		(?<match>\s*(?:
+			(?<hash>\s*(?&PerlAnonymousHash))|
+			(?<array>\s*(?&PerlAnonymousArray))|
+			(?<sub>\s*(?&PerlAnonymousSubroutine))|
+			(?<bless>\s*(bless\s*(?&PerlExpression)))|
+			(?<ident>\s*(?&PerlIdentifier))|
+			(?<string>\s*(?&PerlString))|
+			(?<num>\s*(?&PerlNumber))
+		)+)\s*(?&PerlComma)*
+		$PPR::GRAMMAR
+	//xms ) {
+		push @s, {%+}
+	}
+	return @s;
+}
+
+sub r {
+	my $i = shift;
+	while ($i =~ m/$_[0]/xms) {
+		my $m = $1;
+		$i =~ s/$m/$_[1]->{$m}/;
+	}
+	$i;
+}
+
+sub kv {
+	my ($i, %a) = @_;
+	while (
+		$i =~ s/
+			\s*(?<key> (?&PerlTerm))\s*
+				(?&PerlComma)
+			\s*(?<value> (?&PerlTerm))\s*
+			$PPR::GRAMMAR
+		//xms
+	) {
+		my %h = %+;
+		$h{key} =~ s/(^\s*)|(\s*$)//g;
+		$a{$h{key}} = $h{value};
+	}
+	return %a;
 }
 
 sub import {
@@ -109,22 +202,61 @@ sub write_file {
 	close FH;
 }
 
-sub p {
+sub attributes {
+	my %args = @_;
+	my @attr;
 	g(
-		g(
-			$_[0],
-			qq|(?<match> private\\s*
-			(?<method> (?&PerlIdentifier))
-			(?<attrs> (?: $SATTRS*))
-			(?<block> (?&PerlBlock)))|,
-			\&private,
-		),
-		qq|(?<match> public\\s*
-		(?<method> (?&PerlIdentifier))
-		(?:(?&PerlNWS))*
-		(?<block> (?&PerlBlock)))|,
-		\&public,
+		\$args{list}, 
+		qq/(?<match> 
+			\\s*(?<key> (?&PerlTerm))\\s*
+				(?&PerlComma)
+			\\s*(?<value> (?&PerlTerm))\\s*
+		)/,
+		sub {
+			my %hack = _construct_attribute(@_);
+			$hack{key} =~ m/\s*(?<array> (?&PerlAnonymousArray)) $PPR::GRAMMAR/xms;
+			for my $key ( ($+{array} ? @{ eval $+{array} } : $hack{key}) ) {
+				$key =~ s/(^\s*)|(\s*$)//g;
+				push @attr, sprintf( 
+q/has %s => (
+	%s
+);/, 
+				$key, join( ",\n\t", (map { 
+					$hack{$_} =~ s/(["']+)/"/g;
+					qq/\t$_ => $hack{$_}/ 
+				} grep { defined $hack{$_} } qw/is isa trigger builder lazy clearer/), (map {
+					my $hak = [i($hack{$_})]->[0];
+					$hack{$_} = defined $hak->{sub} ? $hak->{sub} : qq/sub { $hack{$_} }/;
+					qq/\t$_ => $hack{$_}/; 
+				} grep { $hack{$_} } qw/default/)));
+			} 
+		}
 	);
+	return join "\n\n", @attr;	
+}
+
+sub _construct_attribute {
+	my (%attr) = @_;
+	$attr{value} = r($attr{value}, $HAS{compile_regex}, \%HAS);
+	$attr{value} =~ s/(^\s*\[)|(\s*\]$)//g;
+	my @spec = i($attr{value});
+	my $oc = scalar @spec;
+	unshift @spec, { string => '"ro"' } if (!$spec[0]->{string});
+	$attr{is} = $spec[0]->{string} =~ m/[\'\"\s]+(ro|rw)[\'\"\s]+/ 
+		? shift(@spec)->{string}
+		: '"ro"';
+	($spec[0]->{ident} eq 'undef') 
+		? shift(@spec)
+		: do {
+		$attr{isa} = shift(@spec)->{ident};
+	} if $spec[0]->{ident};
+	my $attrHash = $spec[0]->{hash} ? $spec[0]->{match} =~ m/$HAS{compile_value_regex}/g : 0;
+	if ($spec[0] && keys %{$spec[0]}) {
+		$attr{default} = !$attrHash && $oc <= 3 ? $spec[0]->{sub} ? shift(@spec)->{sub} : qq/sub { / . shift(@spec)->{match} . qq/ }/ : '';
+		%attr = kv($spec[0]->{match}, %attr) if ($spec[0]);
+	}
+	delete $attr{value};
+	return %attr;
 }
 
 sub roles {
@@ -135,6 +267,7 @@ sub roles {
 	my $r = \qq|{
 	package $args{class};
 	use Moo::Role;
+	use MooX::LazierAttributes;
 	$attrs{with}$attrs{use}$body
 	1;
 }|;
@@ -218,7 +351,7 @@ MooX::Purple - MooX::Purple::G
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 

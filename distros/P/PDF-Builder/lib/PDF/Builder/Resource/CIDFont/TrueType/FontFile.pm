@@ -5,8 +5,8 @@ use base 'PDF::Builder::Basic::PDF::Dict';
 use strict;
 no warnings qw[ recursion uninitialized ];
 
-our $VERSION = '3.015'; # VERSION
-my $LAST_UPDATE = '3.014'; # manually update whenever code is changed
+our $VERSION = '3.016'; # VERSION
+my $LAST_UPDATE = '3.016'; # manually update whenever code is changed
 
 use Carp;
 use Encode qw(:all);
@@ -717,13 +717,16 @@ sub glyphNum {
 }
 
 sub outobjdeep {
-    my ($self, $fh, $pdf, %opts) = @_;
+    my ($self, $fh, $pdf) = @_;
 
     my $f = $self->font();
 
     if ($self->iscff()) {
         $f->{'CFF '}->read_dat();
-        $self->{' stream'} = $f->{'CFF '}->{' dat'};
+	# OTF files were always being written into PDF, even if -noembed = 1
+	if ($self->data()->{'noembed'} != 1) {
+            $self->{' stream'} = $f->{'CFF '}->{' dat'};
+	}
     } else {
         if ($self->data()->{'subset'} && !$self->data()->{'nosubset'}) {
             $f->{'glyf'}->read();
@@ -745,7 +748,7 @@ sub outobjdeep {
 	}
     }
 
-    return $self->SUPER::outobjdeep($fh, $pdf, %opts);
+    return $self->SUPER::outobjdeep($fh, $pdf);
 }
 
 1;

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2016, 2017 Kevin Ryde
+# Copyright 2016, 2017, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -19,9 +19,9 @@
 
 use 5.004;
 use strict;
+use Math::BigInt try => 'GMP';
 use Test;
 plan tests => 16;
-use Math::BigInt try => 'GMP';
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -38,7 +38,6 @@ my $path = Math::PlanePath::ComplexPlus->new;
 
 #------------------------------------------------------------------------------
 # A290885 = -X
-
 MyOEIS::compare_values
   (anum => 'A290885',
    func => sub {
@@ -146,5 +145,4 @@ MyOEIS::compare_values
    });
 
 #------------------------------------------------------------------------------
-
 exit 0;

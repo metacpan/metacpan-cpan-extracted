@@ -48,7 +48,7 @@ use PPIx::Regexp::Constant qw{
 use PPIx::Regexp::Tokenizer;
 use PPIx::Regexp::Util qw{ __choose_tokenizer_class __instance };
 
-our $VERSION = '0.065';
+our $VERSION = '0.066';
 
 =head2 new
 

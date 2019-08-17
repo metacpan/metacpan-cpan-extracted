@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -28,7 +28,7 @@ use Carp 'croak';
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 126;
+$VERSION = 127;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 
@@ -527,6 +527,9 @@ L<http://oeis.org/A002262> (etc)
       A101165    total N in column to Y=X-1
       A185506    total N in rectangle 0,0 to X,Y
 
+    either direction=up,down
+      A097806    turn 0=straight, 1=not straight
+
     direction=down, x_start=1, y_start=1
       A057555    X,Y pairs
       A057046    X at N=2^k
@@ -550,7 +553,7 @@ L<http://oeis.org/A002262> (etc)
 
     in direction=up the X,Y coordinate forms are the same but swap X,Y
 
-    either direction
+    either direction=up,down
       A038722    permutation N at transpose Y,X
                    which is direction=down <-> direction=up
 
@@ -590,7 +593,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

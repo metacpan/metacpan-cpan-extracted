@@ -1,3 +1,6 @@
+0.066		2019-08-16	T. R. Wyant
+    Fix broken POD, and add tests to ensure it remains fixed.
+
 0.065		2019-05-25	T. R. Wyant
     Quash undef error in __is_ppi_regexp_element() when passed a
     PPI::Token::Regexp::Transliterate

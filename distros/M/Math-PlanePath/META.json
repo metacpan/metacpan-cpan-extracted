@@ -4,13 +4,13 @@
       "Kevin Ryde <user42_kevin@yahoo.com.au>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Math-PlanePath",
    "no_index" : {
@@ -58,7 +58,8 @@
             "Math::BigFloat" : "1.993",
             "Math::BigInt" : "0",
             "Math::BigInt::Lite" : "0",
-            "Math::BigRat" : "0"
+            "Math::BigRat" : "0",
+            "Number::Fraction" : "0"
          }
       }
    },
@@ -69,6 +70,6 @@
          "http://www.gnu.org/licenses/gpl.html"
       ]
    },
-   "version" : "126",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : 127,
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -1,5 +1,9 @@
 Revision history for Term-VTerm
 
+0.05    2019-08-16 21:28:11
+        [CHANGES]
+         * Add helpers for Devel::MAT::Dumper
+
 0.04    2019-02-20 22:11:54
         [CHANGES]
          * Switch build system to Module::Build::Using::PkgConfig

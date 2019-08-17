@@ -28,7 +28,7 @@
 
 package Game::PlatformsOfPeril;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use 5.24.0;
 use warnings;
@@ -41,14 +41,16 @@ use Term::ReadKey qw(GetTerminalSize ReadKey ReadMode);
 use Time::HiRes qw(gettimeofday sleep tv_interval);
 use POSIX qw(STDIN_FILENO TCIFLUSH tcflush);
 
-# XTerm control sequences
+# ANSI or XTerm control sequences
 sub at              { "\e[" . $_[1] . ';' . $_[0] . 'H' }
+sub alt_screen ()   { "\e[?1049h" }
 sub clear_screen () { "\e[1;1H\e[2J" }
 sub clear_right ()  { "\e[K" }
 sub hide_cursor ()  { "\e[?25l" }
 sub hide_pointer () { "\e[>3p" }
 sub show_cursor ()  { "\e[?25h" }
 sub term_norm ()    { "\e[m" }
+sub unalt_screen () { "\e[?1049l" }
 
 # WHAT Animates and such can be
 sub HERO ()   { 0 }
@@ -90,8 +92,8 @@ sub MSG_MAX ()      { 24 }
 sub MSG_COLS_MAX () { 70 }
 
 # for Animates (and also some Things for the first few slots)
-sub WHAT ()       { 0 }
-sub DISP ()       { 1 }
+sub WHAT () { 0 }
+sub DISP () { 1 }
 # NOTE that GROUND use TYPE to distinguish between different types of
 # those (FLOOR, STAIR, STATUE) which makes the graph code simpler as
 # that only needs to look at WHAT for whether motion is possible in that
@@ -253,6 +255,7 @@ our %Key_Commands = (
     'l' => move_player( +1, +0 ),    # right
     '.' => \&move_nop,               # rest
     ' ' => \&move_nop,               # also rest
+    'v' => sub { post_message( 'Version ' . $VERSION ); return MOVE_FAILED },
     'x' => \&move_examine,
     '<' => sub {
         post_message( $Scientist . q{'s magic wonder left boot, activate!} );
@@ -372,12 +375,12 @@ sub apply_gravity {
 }
 
 sub bad_terminal {
-    ( $TCols, $TRows ) = (GetTerminalSize)[ 0, 1 ];
+    ( $TCols, $TRows ) = (GetTerminalSize *STDOUT)[ 0, 1 ];
     return ( not defined $TCols or $TCols < MSG_COLS_MAX or $TRows < MSG_MAX );
 }
 
 sub bail_out {
-    ReadMode 'restore';
+    restore_term();
     warn $_[0] if @_;
     game_over("Suddenly, the platforms collapse about you.");
 }
@@ -476,7 +479,8 @@ sub game_loop {
     STDOUT->autoflush(1);
     load_level();
     ReadMode 'raw';
-    print term_norm, hide_cursor, hide_pointer, clear_screen, draw_level;
+    print term_norm, alt_screen, hide_cursor, hide_pointer, clear_screen,
+      draw_level;
     post_message('The Platforms of Peril');
     post_message('');
     post_message( 'Your constant foes, the ' . $Monst_Name . 's' );
@@ -508,10 +512,9 @@ sub game_loop {
 sub game_over {
     my ( $msg, $code ) = @_;
     $code //= 1;
-    ReadMode 'restore';
-    print at( 1, ROWS + 1 ), term_norm, "\n", clear_right, show_cursor, $msg, ' (',
-      $Animates{ HERO, }[STASH][GEM_STASH], " gems)\n",
-      clear_right;
+    restore_term();
+    print clear_right, $msg, ' (', $Animates{ HERO, }[STASH][GEM_STASH],
+      " gems)\n", clear_right;
     exit $code;
 }
 
@@ -891,6 +894,11 @@ sub relocate {
     undef $LMap->[ $src->[PROW] ][ $src->[PCOL] ][ $ent->[TYPE] ];
     $ent->[LMC] = $lmc;
     weaken( $ent->[LMC] );
+}
+
+sub restore_term {
+    ReadMode 'restore';
+    print term_norm, show_cursor, unalt_screen;
 }
 
 sub rotate_left {

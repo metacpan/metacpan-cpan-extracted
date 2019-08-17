@@ -4,7 +4,7 @@ use warnings;
 
 {
     no strict "vars";
-    $VERSION = "1.03";
+    $VERSION = "1.04";
 }
 
 use Acme::CPANAuthors::Register (
@@ -30,6 +30,7 @@ use Acme::CPANAuthors::Register (
     ALEXMC      => 'Alex McLintock',
     ALPOW       => 'Alan Pownall',
     AMIAS       => 'Amias Channer',
+    ANDREWISH   => 'Andrew Isherwood',
     ANDREWS     => 'Andrew Stringer',
     ANDYA       => 'Andy Armstrong',
     ANDYW       => 'Andy Walker',
@@ -88,6 +89,7 @@ use Acme::CPANAuthors::Register (
     DJK         => 'Dirk-Jan Koopman',
     DOM         => 'Dominic Hargreaves',
     DORWARD     => 'David Dorward',
+    DPOINTON    => 'Dave Pointon',
     DRAXIL      => 'Joe Higton',
     DREWF       => 'Andy Ferguson',
     DUFFEE      => 'Boyd Duffee',
@@ -116,6 +118,7 @@ use Acme::CPANAuthors::Register (
     IAINT       => 'Iain Tatch',
     ICLARK      => 'Ian Clark',
     IDORU       => 'Russell Matbouli',
+    INFRACANI   => 'Matthew Seaman',
     IOANR       => 'Ioan Rogers',
     ISTEEL      => 'Ian Steel',
     ITDEV       => 'Bruce Mitchell',
@@ -147,6 +150,7 @@ use Acme::CPANAuthors::Register (
     KONOBI      => 'Scott McWhirter',
     KPWATSON    => 'Keith Watson',
     KUNGFUFTR   => 'Scott McWhirter',
+    KYZ         => 'Stuart Caie',
     LGODDARD    => 'Lee Goddard',
     LILSTEVEY   => 'Steven Pitchford',
     LLAP        => 'Leo Lapworth',
@@ -167,8 +171,10 @@ use Acme::CPANAuthors::Register (
     MEH         => 'Andy Smith',
     MFENTON     => 'Mathew Fenton',
     MGLEE       => 'Martin Lee',
+    MGOULD      => 'Miles Gould',
     MICB        => 'Malcolm Beattie',
     MIKEJ       => 'Mike Jones',
+    MIKEJONES   => 'Mike Jones',
     MIRK        => 'Mike Taylor',
     MJBRIGHT    => 'Martin Bright',
     MJEMMESON   => 'Michael Jemmeson',
@@ -274,6 +280,7 @@ use Acme::CPANAuthors::Register (
     SWILCOX     => 'Simon Wilcox',
     TBURGESS    => 'Trevor Burgess',
     TCOX        => 'Tony Cox',
+    TEAM        => 'Tom Molesworth',
     TGROSE      => 'Tony G. Rose',
     THINCH      => 'Timothy Hinchcliffe',
     TIMB        => 'Tim Bunce',
@@ -439,7 +446,7 @@ I always wanted to release an Acme module :)
 
 =head1 COPYRIGHT & LICENSE
 
-  Copyright 2009-2015 Barbie for Miss Barbell Productions.
+  Copyright 2009-2019 Barbie for Miss Barbell Productions.
 
   This distribution is free software; you can redistribute it and/or
   modify it under the Artistic License 2.0.

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012 Kevin Ryde
+# Copyright 2011, 2012, 2019 Kevin Ryde
 
 # This file is part of Image-Base-Wx.
 #
@@ -25,6 +25,49 @@ use Wx;
 use Smart::Comments;
 
 {
+  # monochrome
+  Wx::InitAllImageHandlers();
+  my $wxbitmap = Wx::Bitmap->new(1,1,1);
+  Wx::Colour::MakeGrey();
+  Wx::Colour::MakeMono();
+  exit 0;
+}
+{
+  # failed load of each format
+  my $filename = '/dev/null';
+  $filename = '/usr/share/doc/ghostscript/images/ghostscript_logo.png';
+  my $wxbitmap = Wx::Bitmap->new (20, 10);
+  my $wximage = Wx::Image->new (1,1);
+  foreach my $file_format (qw(BMP
+                              GIF
+                              JPEG
+                              PCX
+                              PNG
+                              PNM
+                              TIF
+                              CUR
+                              ICO
+                              XPM
+                              ANI
+                            )) {
+    ### $file_format
+    {
+      my $type = eval "Wx::wxBITMAP_TYPE_${file_format}()";
+      my $ret = $wxbitmap->LoadFile($filename,$type);
+      ### wxbitmap: $ret
+      ### $type
+    }
+    {
+      require Image::Base::Wx::Image;
+      my $type = Image::Base::Wx::Image::_format_to_type($file_format);
+      my $ret = $wximage->LoadFile($filename,$type);
+      ### wximage: $ret
+      ### $type
+    }
+  }
+  exit 0;
+}
+{
   # bitmap free before DC
   my $wxbitmap = Wx::Bitmap->new (20, 10);
   my $dc = Wx::MemoryDC->new;
@@ -40,28 +83,7 @@ use Smart::Comments;
   
   exit 0;
 }
-{
-  # failed load of each format
-  my $filename = '/dev/null';
-  my $wxbitmap = Wx::Bitmap->new (20, 10);
-  foreach my $file_format (qw(BMP
-                              GIF
-                              JPEG
-                              PCX
-                              PNG
-                              PNM
-                              TIF
-                              CUR
-                              ICO
-                              XPM
-                              ANI
-                            )) {
-    ### $file_format
-    my $type = eval "Wx::wxBITMAP_TYPE_${file_format}()";
-    my $ret = $wxbitmap->LoadFile($filename,$type);
-  }
-  exit 0;
-}
+
 
 {
   # read

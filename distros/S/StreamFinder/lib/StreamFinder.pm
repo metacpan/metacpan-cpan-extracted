@@ -96,9 +96,11 @@ that can come with that method of playing.  The author uses his own custom
 all-purpose audio player called "fauxdacious" (his custom hacked version of 
 the open-source "audacious" media player).  "fauxdacious" incorporates this 
 module to decode and play streams.  The currently-supported websites are:
-radionomy.com, iheartradio.com, reciva.com, facebook, and youtube / vimeo. 
-We used to support tunein.com, but they have now borked up their pages to 
-make it nearly impossible to obtain their hidden streams programatically.
+radionomy.com, iheartradio.com, reciva.com, facebook, and youtube / vimeo / 
+brighteon, et. al.  We used to support tunein.com, but they have since 
+apparently wasted a ton of money on web-developers and script kiddies to so 
+fsck up their stations' pages to make it impossible to obtain their hidden 
+streams programatically.
 
 It amazes me the effort to which marketing-run operations will go to and 
 web-development money they'll spend to prevent people from accessing their 
@@ -255,7 +257,7 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 require Exporter;
 

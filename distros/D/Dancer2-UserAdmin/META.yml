@@ -1,0 +1,40 @@
+---
+abstract: 'Administration for registered users and site memberships'
+author:
+  - 'Nick Tonkin <tonkin@cpan.org>'
+build_requires:
+  HTTP::Request::Common: '0'
+  Plack::Test: '0'
+  Test::More: '0'
+  Test::Pod::Coverage: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-UserAdmin
+provides:
+  Dancer2::Plugin::Memberships:
+    file: lib/Dancer2/Plugin/Memberships.pm
+    version: '0.9902'
+  Dancer2::Plugin::Users:
+    file: lib/Dancer2/Plugin/Users.pm
+    version: '0.9902'
+  Dancer2::UserAdmin:
+    file: lib/Dancer2/UserAdmin.pm
+    version: '0.9902'
+requires:
+  Dancer2: '0.157'
+  Moo: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/1nickt/Dancer2-UserAdmin/issues
+  repository: git://github.com/1nickt/Dancer2-UserAdmin.git
+version: '0.9902'
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

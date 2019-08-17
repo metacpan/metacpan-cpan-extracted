@@ -2,6 +2,118 @@ See also INFO/Changes-ver_2 for changes released for PDF::API2, and
 incorporated into PDF::Builder.
 See also INFO/Changes_2018 for earlier version 3 release logs.
 
+3.016     2019-08-16
+
+    INFO/RoadMap, CONTRIBUTING, MANIFEST, README
+     Add a road map describing where we'd like to take PDF::Builder.
+
+    examples/024_bdffonts-README-examples.output, lib/PDF/Builder.pm, 
+      lib/PDF/Builder/Resource/BaseFont.pm, 
+      lib/PDF/Builder/Resource/Font/BdFont.pm, tools/3_examples.pl, 
+      INFO/old/examples.bat
+     BDF (bitmapped fonts) now working properly, provided you have a good
+      .bdf file as your starting point. They're ugly enough not to be all
+      that useful, but might be used to decorative effect in chapter titles
+      and major headings (not suitable for body text!).
+
+    lib/PDF/Builder/Docs.pm, lib/PDF/Builder/Resource/CIDFont/TrueType.pm
+     Improve documentation of ttfont's -nosubset and -noembed flags.
+     
+    lib/PDF/Builder.pm, lib/PDF/Builder/Docs.pm, 
+      lib/PDF/Builder/Resource/Font/Postscript.pm
+     [RT 130038] Improve documentation for putting an image on the page, 
+      pointing to other sources of information. There are undoubtedly many
+      other "how to do" tasks that need upgraded documentation, and we will
+      attend to them over time. In the meantime, be sure to check out the
+      examples/ Perl programs for numerous examples of how to use calls, and
+      even the t-tests in t/ might prove useful as examples.
+
+    examples/021_psfonts, lib/PDF/Builder/Docs.com, lib/PDF/Builder.com,
+      lib/PDF/Builder/Resource/Font/SynFont.pm
+     [RT 130040] Confirm that the "synfont" method to modify a font does not
+      seem to work with "CJK" fonts (created by the "cjkfont" method), due to
+      internal font file format differences. Also add "Ipsum Lorem" sample 
+      text to 021_psfonts output.
+
+    docs/buildDoc.pl, lib/PDF/Builder.pm, lib/PDF/Builder/Content.pm-
+      Docs.pm-Page.pm
+     Improvement to documentation generation utility to handle pod2html
+      upgrade to specify URLs with targets (#name), and update some POD that
+      refers to specific targets on a page. It's possible that if you have an
+      earlier Perl level, this might not work properly.
+
+    lib/PDF/Builder/Resource/CIDFont/TrueType/FontFile.pm, 
+      lib/PDF/Builder/Docs.pm, examples/022_truefonts
+     [RT 130041] OTF and TTF "CFF" files were getting the font file embedded
+      in them (by ttfont method), even though there was no link to use that
+      large stream, when -noembed=>1. This has been fixed. Also, the 
+      documentation (Docs.pm) has been upgraded to clarify when and how font
+      file embedding is done (especially that it's NOT done for cjkfont). The 
+      TrueType example has had a flag added to specify embedding control.
+
+    lib/PDF/Builder/Resource/BaseFont.pm-CIDFont.pm-UniFont.pm [RT 130074] 
+      clarify remaining uses of is_utf8() call that it's utf8::is_utf8().
+
+    lib/PDF/Builder.pm, lib/PDF/Builder/Page.pm, lib/PDF/Builder/Docs.pm, 
+      INFO/DEPRECATED, INFO/KNOWN_INCOMP, MANIFEST, t/bbox.t, 
+      tools/2_t-tests.pl, INFO/old/t-tests.bat
+     [RT 130039] add "get" capability to both global and page bounding box 
+      calls, obsoleting the get_* calls for the page. $pdf->mediabox() will
+      return the global media box, $page->mediabox() will return the current
+      page's media box, and so on for bleed, crop, trim, and art boxes.
+
+    lib/PDF/Builder.pm, lib/PDF/Builder/Basic/PDF/File.pm 
+     [GH 101] permit out-of-spec PDF structures that were formerly fatal 
+      errors. -diags flag to enable reporting of suspicious structures, 
+      otherwise silent. There are many PDFs "in the wild" that do not conform 
+      to Adobe PDF standards, yet many Readers are happy to accept them.
+
+    docs/buildDoc.pl output module (.pm or .pod) being processed, so user won't 
+      be worried about how long it's taking.
+
+    lib/PDF/Builder.pm, lib/PDF/Builder/Resource/UniFont.pm-BaseFont.pm, 
+      lib/PDF/Builder/Basic/PDF/Array.pm-Dict.pm-File.pm-Filter.pm-Literal.pm-
+      Objind.pm-Page.pm-Pages.pm-String.pm-Utils.pm,
+      lib/PDF/Builder/Basic/PDF/Filter/FlateDecode.pm,
+      lib/PDF/Builder/Resource/CIDFont/CJKFont.pm-TrueType.pm, 
+      lib/PDF/Builder/Resource/CIDFont/TrueType/FontFile.pm,
+      lib/PDF/Builder/Lite.pm-Page.pm-Resource.pm, 
+      t/author-critic.t--author-pod-syntax.t--rt126274.t (new), MANIFEST
+     per PDF::API2 changes, code style cleanup (including some minor changes
+      to outobjdeep(), such as removing %options), and some bug fixes not 
+      already in PDF::Builder. Also some Perl Critic cleanup and removal of
+      unused routines.
+
+    contrib/pdf-deoptimize.pl--pdf-optimize.pl, lib/PDF/Builder.pm,
+      lib/PDF/Builder/Basic/PDF/Array.pm-Dict.pm-Objind.pm-Page.pm-Pages.pm, 
+      lib/PDF/Builder/Util.pm, INFO/DEPRECATED
+     per PDF::API2 changes, elementsof() changed to elements().
+
+    lib/PDF/Builder/Annotation.pm-Content.pm-Outline.pm-Page.pm-Resource.pm,
+      lib/PDF/Builder/Resource/CIDFont.pm-ColorSpace.pm-ExtGState.pm, 
+      lib/PDF/Builder/Resource/XObject/Form/Hybrid.pm
+     per PDF::API2 changes, outobjdeep() is no longer destructive (content is
+      no longer removed). Some outobjdeep() calls removed, others simplified.
+
+    lib/PDF/Builder/Resource/CIDFonts/CMap/*.cmap finish work on [RT 128674]
+      by updating .cmap files to latest. This is difficult because Adobe 
+      provides poor documentation, moved to GitHub a couple years back and
+      did not provide good snapshots of previous releases (to see exactly what
+      changed over time), and provides differing levels of up-to-dateness
+      depending on when someone last updated on GitHub (including older
+      supplements!). It's not clear exactly what Adobe version the existing 
+      (older) PDF::Builder .cmap files correspond to. In some cases, it appears
+      that they were incomplete at the claimed supplement level. It's not 
+      possible to map the cid2code.txt files to PDF::Builder .cmap files in an 
+      automated manner because it's not clear which Unicode is to be used in 
+      the g2u array when multiple Unicode codepoints map to a given CID. There 
+      are some inconsistencies of what CIDs are defined, between the Adobe 
+      documentation, what's in the cid2code.txt files, and what's available in 
+      Unicode. Suggestions on how to automate cid2code.txt usage would be 
+      appreciated. Anyway, this is my best attempt, and corrections accepted!
+
+    tools/1_pc.pl, 2_t-tests.pl clean up minor bugs, improve diagnostics.
+
 3.015     2019-05-19 
 
     The keepers of CPAN declined to re-index PDF::Builder 3.014, which had many

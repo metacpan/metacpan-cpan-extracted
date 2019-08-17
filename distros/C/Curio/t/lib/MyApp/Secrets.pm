@@ -5,9 +5,13 @@ use Types::Standard qw( HashRef );
 use Curio;
 use strictures 2;
 
+add_key 'default';
+default_key 'default';
+
 export_function_name 'myapp_secret';
 always_export;
 resource_method_name 'secrets';
+
 does_caching;
 
 sub myapp_secret {

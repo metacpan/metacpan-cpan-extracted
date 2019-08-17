@@ -1,8 +1,9 @@
 ---
 abstract: 'Build Curio classes around CHI.'
 author:
-  - 'Aran Clary Deltac <aran@bluefeet.dev>'
+  - 'Aran Clary Deltac <bluefeet@gmail.com>'
 build_requires:
+  Curio: '0.04'
   Test2::V0: '0.000094'
 configure_requires:
   Module::Build::Tiny: '0.035'
@@ -26,22 +27,21 @@ no_index:
 provides:
   Curio::Role::CHI:
     file: lib/Curio/Role/CHI.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   CHI: '0.60'
-  Curio: '0.02'
-  Curio::Role: '0.01'
+  Curio::Role: '0.04'
   Moo::Role: '2.003000'
-  MooX::BuildArgs: '0.08'
+  Scalar::Util: '0'
   Types::Standard: '1.002001'
   namespace::clean: '0.27'
-  perl: '5.008001'
+  perl: '5.016001'
   strictures: '2.000001'
 resources:
   bugtracker: https://github.com/bluefeet/Curio-Role-CHI/issues
   homepage: https://github.com/bluefeet/Curio-Role-CHI
   repository: git://github.com/bluefeet/Curio-Role-CHI.git
-version: '0.01'
+version: '0.02'
 x_authority: cpan:BLUEFEET
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

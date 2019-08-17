@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013, 2018 Kevin Ryde
+# Copyright 2012, 2013, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -19,6 +19,7 @@
 
 use 5.004;
 use strict;
+use Math::BigInt try => 'GMP';
 use Test;
 plan tests => 18;
 
@@ -28,9 +29,6 @@ BEGIN { MyTestHelpers::nowarnings(); }
 use MyOEIS;
 
 use Math::PlanePath::PowerArray;
-
-require Math::NumSeq::PlanePathN;
-my $bigclass = Math::NumSeq::PlanePathN::_bigint();
 
 
 #------------------------------------------------------------------------------
@@ -59,7 +57,7 @@ MyOEIS::compare_values
      my ($count) = @_;
      my $path = Math::PlanePath::PowerArray->new (radix => 10);
      my @got;
-     for (my $n = $bigclass->new(2); @got < $count; $n *= 2) {
+     for (my $n = Math::BigInt->new(2); @got < $count; $n *= 2) {
        my ($x,$y) = $path->n_to_xy($n);
        $x == 0 or die;
        push @got, $y;
@@ -77,7 +75,7 @@ MyOEIS::compare_values
      my ($count) = @_;
      my $path = Math::PlanePath::PowerArray->new (radix => 3);
      my @got;
-     for (my $n = $bigclass->new(1); @got < $count; $n *= 2) {
+     for (my $n = Math::BigInt->new(1); @got < $count; $n *= 2) {
        my ($x,$y) = $path->n_to_xy($n);
        push @got, $y;
      }

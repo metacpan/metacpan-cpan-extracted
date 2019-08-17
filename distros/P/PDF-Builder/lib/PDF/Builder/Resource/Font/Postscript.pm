@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::Font';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.015'; # VERSION
-my $LAST_UPDATE = '3.003'; # manually update whenever code is changed
+our $VERSION = '3.016'; # VERSION
+my $LAST_UPDATE = '3.016'; # manually update whenever code is changed
 
 use Encode qw(:all);
 use IO::File qw();
@@ -38,7 +38,7 @@ sub new {
 
     $class = ref $class if ref $class;
 #   $self = $class->SUPER::new($pdf, $data->{'apiname'}.pdfkey().'~'.time());
-    $self = $class->SUPER::new($pdf, $data->{'apiname'}.pdfkey());
+    $self = $class->SUPER::new($pdf, $data->{'apiname'}.'PST1f'.pdfkey());
     $pdf->new_obj($self) unless $self->is_obj($pdf);
     $self->{' data'} = $data;
 

@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::Tests 2.37 {
+package Dist::Zilla::Plugin::Author::Plicease::Tests 2.38 {
 
   use 5.014;
   use Moose;
@@ -164,6 +164,7 @@ package Dist::Zilla::Plugin::Author::Plicease::Tests 2.37 {
   sub test
   {
     my($self, $target) = @_;
+    return if defined $ENV{CI} && $ENV{CI} =~ /^true$/i;
     system 'prove', '-br', 'xt';
     $self->log_fatal('release test failure') unless $? == 0;
   }
@@ -187,7 +188,7 @@ Dist::Zilla::Plugin::Author::Plicease::Tests - add author only release tests to 
 
 =head1 VERSION
 
-version 2.37
+version 2.38
 
 =head1 SYNOPSIS
 
@@ -360,6 +361,8 @@ BEGIN {
     unless eval q{ use Test::Pod::Coverage; 1 };
   plan skip_all => 'test requires YAML'
     unless eval q{ use YAML; 1; };
+  plan skip_all => 'test does not always work in cip check'
+    if defined $ENV{CIPSTATIC} && $ENV{CIPSTATIC} eq 'true';
 };
 use Test::Pod::Coverage;
 use YAML qw( LoadFile );

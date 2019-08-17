@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012 Kevin Ryde
+# Copyright 2011, 2012, 2019 Kevin Ryde
 
 # This file is part of Image-Base-Wx.
 #
@@ -23,6 +23,92 @@ use Wx;
 
 # uncomment this to run the ### lines
 use Smart::Comments;
+
+{
+  my $aa = $Wx::wxAntialiasMode;
+  ### $aa
+
+  my $bitmap = Wx::Bitmap->new (10,10);
+  ### depth: $bitmap->GetDepth
+
+  my $dc = Wx::MemoryDC->new;
+  $dc->SelectObject($bitmap);
+  $dc->IsOk or die;
+
+  my $pen = $dc->GetPen;
+  ### $pen
+  my $colour = '#FFFFFF';
+  $colour = 'white';
+  $colour = '#808080';
+  my $c = Wx::Colour->new($colour);
+  $c->IsOk or die "Unrecognised colour ",$colour;
+  $pen->SetColour($c);
+  # $pen = Wx::wxGREEN_PEN();
+  $dc->SetPen($pen);
+
+  my $brush = $dc->GetBrush;
+  ### $brush
+  $brush->SetColour($c);
+  $brush->SetStyle (Wx::wxSOLID());
+  $dc->SetBrush($brush);
+
+  $c = $pen->GetColour;
+  ### $c
+  ### c Red  : $c->Red
+  ### c Green: $c->Green
+  ### c Blue : $c->Blue
+  ### c Alpha: $c->Alpha
+
+  $dc->DrawPoint(4,4);
+  $dc->DrawPoint(4,4);
+  $dc->DrawPoint(4,4);
+  # $dc->DrawRectangle(0,0,9,9);
+  # $dc->DrawRectangle(0,0,9,9);
+
+  {
+    my $c = $dc->GetPixel(4,4);
+    ### pixel: $c
+    ### c str: $c->GetAsString(4)
+    ### c Red  : $c->Red
+    ### c Green: $c->Green
+    ### c Blue : $c->Blue
+    ### c Alpha: $c->Alpha
+  }
+
+  $bitmap->SaveFile('/tmp/x.png',Wx::wxBITMAP_TYPE_PNG())
+    or die "cannot save";
+  system 'convert /tmp/x.png /tmp/x.xpm';
+  system 'cat /tmp/x.xpm';
+  exit 0;
+}
+{
+  my $c = Wx::wxBLUE();
+  $c = Wx::wxWHITE();
+  ### $c
+  ### c Red  : $c->Red
+  ### c Green: $c->Green
+  ### c Blue : $c->Blue
+  ### c Alpha: $c->Alpha
+  exit 0;
+}
+{
+  require Image::Base::Wx::DC;
+  my $bitmap = Wx::Bitmap->new (20,10,1);
+  ### depth: $bitmap->GetDepth
+
+  my $dc = Wx::MemoryDC->new;
+  $dc->SelectObject($bitmap);
+  $dc->IsOk or die;
+  my $image = Image::Base::Wx::DC->new
+    (-dc => $dc,
+    );
+
+  $image->xy(1,1, '#000000');
+  ### get: $image->xy(1,1)
+  $image->xy(1,1, '#FFFFFF');
+  ### get: $image->xy(1,1)
+  exit 0;
+}
 
 {
   my $colour_obj = Wx::Colour->new('RGB(9991,2,3)');

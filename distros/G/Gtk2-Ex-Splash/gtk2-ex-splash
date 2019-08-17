@@ -1,6 +1,6 @@
 #!perl -w
 
-# Copyright 2011 Kevin Ryde
+# Copyright 2011, 2017, 2019 Kevin Ryde
 
 # This file is part of Gtk2-Ex-Splash.
 #
@@ -26,7 +26,7 @@ use Glib 1.220; # for SOURCE_REMOVE
 use Gtk2;
 use Gtk2::Ex::Splash;
 
-our $VERSION = 52;
+our $VERSION = 53;
 
 # uncomment this to run the ### lines
 #use Smart::Comments;
@@ -108,7 +108,7 @@ Print the program version number and exit.
 
 =back
 
-=head1 ENVIRONMENT
+=head1 ENVIRONMENT VARIABLES
 
 =over
 
@@ -128,7 +128,7 @@ L<http://user42.tuxfamily.org/gtk2-ex-splash/index.html>
 
 =head1 LICENSE
 
-Copyright 2011 Kevin Ryde
+Copyright 2011, 2017, 2019 Kevin Ryde
 
 Gtk2-Ex-Splash is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

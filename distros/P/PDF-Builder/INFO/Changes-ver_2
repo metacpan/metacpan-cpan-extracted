@@ -1,9 +1,39 @@
 Change log for PDF::API2 version 2.xxx (predecessor to PDF::Builder)
 
-2.034     2018-06-02 (unreleased)
+2.035     2019-08-09
+
+    - The bounding box methods (mediabox, cropbox, bleedbox, trimbox, and
+      artbox) now return their values when called without arguments.
+      The get_[media|crop|bleed|trim|art]box page methods have been deprecated
+      since they're now redundant, but they continue to work.
+
+    - [RT #130074] Remove unneeded (and newly-broken) calls to is_utf8 in
+      Annotation.pm and NamedDestination.pm (reported by Mathieu Arnold).
+
+    - Eliminate some uninitialized value warnings in BaseFont.pm
+
+2.034     2019-06-29 
 
     - support last 6 years of Perl initial (.0) releases, plus one major 
-      release, which is currently 5.16 as the minimum.
+      release, which is currently 5.18 as the minimum.
+
+    - Add support for cross-reference streams using 64-bit field widths.
+
+    - When the utf8 flag is set for a PDF string, automatically encode it as
+      UCS-16BE instead of requiring a separate flag to be set in the PDF object.
+      This resolves [RT #33497] and [RT #117031] in addition to making the code
+      easier to maintain.
+
+    - [RT #126274] Fix alignment when using UniFont with text_center or
+      text_right when all characters are in the same block.
+
+    - [RT #121911] Fix adding pages to a document structure with nested Pages
+      elements.  This included a fairly substantial rewrite of the relevant
+      code, so please report any new bugs related to adding pages (report and
+      troubleshooting by Vadim Repin).
+
+    - Renamed pdfile() to pdf_file() in PDF::API2::Annotation and
+      PDF::API2::Outline.  The old name continues to work, but is deprecated.
 
     - Use confess instead of die (Carp.pm) in FontFile.pm
 
@@ -17,8 +47,6 @@ Change log for PDF::API2 version 2.xxx (predecessor to PDF::Builder)
     - (perlcritic) Content.pm outobjdeep() check -docompress is true, not 1. 
       bogen() clarify move, larger, reverse parameter defaults. isvirtual(), 
       ' apiistext' check for true, not 1.
-
-    - Add support for cross-reference streams using 64-bit field widths.
 
     - Add additional author and license information to lib/PDF/API2.pm
 

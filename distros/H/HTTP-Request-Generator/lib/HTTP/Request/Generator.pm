@@ -59,8 +59,10 @@ HTTP::Request::Generator - generate HTTP requests
 
 =cut
 
-our $VERSION = '0.07';
-our @EXPORT_OK = qw( generate_requests as_dancer as_plack as_http_request);
+our $VERSION = '0.08';
+our @EXPORT_OK = qw( generate_requests as_dancer as_plack as_http_request
+    expand_curl_pattern
+);
 
 sub unwrap($item,$default) {
     defined $item
@@ -173,9 +175,18 @@ sub _extract_enum_query( $query ) {
     \%parameters
 }
 
-# Convert a curl-style https://{www.,}example.com/foo-[00..99].html to
-#                      https://:1example.com/foo-:2.html
-sub expand_pattern( $pattern ) {
+
+=head2 C<< expand_curl_pattern >>
+
+    my %res = expand_curl_pattern( 'https://' );
+    #
+
+Expands a curl-style pattern to a pattern using positional placeholders.
+See the C<curl> documentation on the patterns.
+
+=cut
+
+sub expand_curl_pattern( $pattern ) {
     my %ranges;
 
     # Split up the URL pattern into a scheme, host(pattern), port number and
@@ -224,7 +235,7 @@ sub _generate_requests_iter(%options) {
     my @keys = sort keys %defaults;
 
     if( my $pattern = delete $options{ pattern }) {
-        %options = (%options, expand_pattern( $pattern ));
+        %options = (%options, expand_curl_pattern( $pattern ));
     };
 
     my $query_params = $options{ query_params } || {};
@@ -343,7 +354,23 @@ two requests:
       url => '/profiles/John',
 
 C<generate_requests> returns an iterator in scalar context. In list context, it
-returns the complete list of requests.
+returns the complete list of requests:
+
+  my @requests = generate_requests(
+      url => '/profiles/:name',
+      url_params => ['Mark','John'],
+      wrap => sub {
+          my( $req ) = @_;
+          # Fix up some values
+          $req->{headers}->{'Content-Length'} = 666;
+      },
+  );
+  for my $r (@requests) {
+      send_request( $r );
+  };
+
+Note that returning a list instead of the iterator will use up quite some memory
+quickly, as the list will be the cartesian product of the input parameters.
 
 There are helper functions
 that will turn that data into a data structure suitable for your HTTP framework
@@ -369,6 +396,8 @@ lists will be expanded in memory.
 =over 4
 
 =item B<pattern>
+
+    pattern => 'https://example.{com,org,net}/page_[00..99].html',
 
 Generate URLs from this pattern instead of C<query_params>, C<url_params>
 and C<url>.
@@ -476,6 +505,16 @@ sub as_http_request($req) {
 
 Converts the request data to a L<Dancer::Request> object.
 
+During the creation of Dancer::Request objects, C<< %ENV >> will be empty except
+for C<< $ENV{TMP} >> and C<< $ENV{TEMP} >>.
+
+
+This function needs and dynamically loads the following modules:
+
+L<Dancer::Request>
+
+L<HTTP::Request>
+
 =cut
 
 sub as_dancer($req) {
@@ -501,7 +540,10 @@ sub as_dancer($req) {
     my $uri = _build_uri( $req );
 
     # Store metadata / generate "signature" for later inspection/isolation?
+    my %old_ENV = %ENV;
     local %ENV; # wipe out non-overridable default variables of Dancer::Request
+    my @keep = (qw(TMP TEMP));
+    @ENV{ @keep } = @old_ENV{ @keep };
     my $res = Dancer::Request->new_for_request(
         $req->{method} =>  $uri->path,
         $req->{query_params},
@@ -533,6 +575,17 @@ sub as_dancer($req) {
 
 Converts the request data to a L<Plack::Request> object.
 
+During the creation of Plack::Request objects, C<< %ENV >> will be empty except
+for C<< $ENV{TMP} >> and C<< $ENV{TEMP} >>.
+
+This function needs and dynamically loads the following modules:
+
+L<Plack::Request>
+
+L<HTTP::Headers>
+
+L<Hash::MultiValue>
+
 =cut
 
 sub as_plack($req) {
@@ -558,7 +611,10 @@ sub as_plack($req) {
     $env{ CONTENT_TYPE } = undef;
 
     # Store metadata / generate "signature" for later inspection/isolation?
+    my %old_ENV = %ENV;
     local %ENV; # wipe out non-overridable default variables of Dancer::Request
+    my @keep = (qw(TMP TEMP));
+    @ENV{ @keep } = @old_ENV{ @keep };
     my $res = Plack::Request->new(\%env);
     $res
 }
@@ -590,7 +646,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2017-2018 by Max Maischein C<corion@cpan.org>.
+Copyright 2017-2019 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

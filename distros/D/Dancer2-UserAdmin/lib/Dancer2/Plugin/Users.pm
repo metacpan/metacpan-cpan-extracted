@@ -1,0 +1,40 @@
+package Dancer2::Plugin::Users;
+
+our $VERSION = '0.9902';
+
+use Dancer2::Plugin::Memberships;
+
+use Moo;
+
+1; # return true
+
+__END__
+
+=pod
+
+=head1 VERSION
+
+version 0.9902
+
+=head1 NAME
+
+Dancer2::Plugin::Users - Administration of registered users
+
+=head1 DESCRIPTION
+
+This Dancer2 plugin provides registered user management tools.
+
+=head1 CONFIGURATION
+
+=head1 AUTHOR
+
+Nick Tonkin <tonkin@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by Nick Tonkin.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

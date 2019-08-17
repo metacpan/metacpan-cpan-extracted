@@ -1,5 +1,9 @@
 Revision history for Perl extension Curio-Role-GitLab-API-v4.
 
+0.04 2019-08-16T22:02:50Z
+
+ - Fix tests to work against the latest Curio, 0.08.
+
 0.03 2019-08-12T23:53:44Z
 
  - Doc edits and code cleanups.

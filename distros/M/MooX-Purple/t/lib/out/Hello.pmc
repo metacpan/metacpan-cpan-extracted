@@ -8,9 +8,22 @@ use JSON;
 
 use Types::Standard qw/Str HashRef ArrayRef Object/;
 
-attributes
-	one => [{ okay => 'one'}],
-	[qw/two three/] => [rw, Str, { default => 'the world is flat' }];
+has one => (
+	is => "ro",
+	default => sub { { okay => 'one'} }
+);
+
+has two => (
+	is => "rw",
+	isa => Str,
+	default => sub { 'the world is flat' }
+);
+
+has three => (
+	is => "rw",
+	isa => Str,
+	default => sub { 'the world is flat' }
+);
 
 validate_subs
 	four => {

@@ -12,8 +12,8 @@ package main;
 use File::Temp qw/ tempdir /;
 use File::Spec;
 
-my $dir = tempdir( CLEANUP => 1 );
-my $board_fn = File::Spec->catfile($dir, 'board.txt');
+my $dir      = tempdir( CLEANUP => 1 );
+my $board_fn = File::Spec->catfile( $dir, 'board.txt' );
 
 open my $fh, '>', $board_fn
     or die "Cannot open - $!";
@@ -31,15 +31,15 @@ Planks = [ ( (0,3) -> (2,3) ),((2,3) -> (5,3)),((4,0) -> (5,0)),((1,1) -> (1,2))
 
 EOBOARD
 
-close ($fh);
+close($fh);
 
 my $self = Games::LMSolve::Plank::Base->new();
-my @ret = $self->solve_board($board_fn);
+my @ret  = $self->solve_board($board_fn);
 
 sub my_display_solution
 {
     my $buffer = '';
-    my $self = shift;
+    my $self   = shift;
 
     open my $fh, '>>', \$buffer
         or die "cannot open!";
@@ -49,68 +49,68 @@ sub my_display_solution
     my $state_collection = $self->{'state_collection'};
 
     my $output_states = $self->{'cmd_line'}->{'output_states'};
-    my $to_rle = $self->{'cmd_line'}->{'to_rle'};
+    my $to_rle        = $self->{'cmd_line'}->{'to_rle'};
 
-    my $echo_state =
-        sub {
-            my $state = shift;
-            return $output_states ?
-                ($self->display_state($state) . ": Move = ") :
-                "";
-        };
+    my $echo_state = sub {
+        my $state = shift;
+        return $output_states
+            ? ( $self->display_state($state) . ": Move = " )
+            : "";
+    };
 
     print {$fh} $ret[0], "\n";
 
-    if ($ret[0] eq "solved")
+    if ( $ret[0] eq "solved" )
     {
-        my $key = $ret[1];
-        my $s = $state_collection->{$key};
-        my @moves = ();
+        my $key    = $ret[1];
+        my $s      = $state_collection->{$key};
+        my @moves  = ();
         my @states = ($key);
 
-        while ($s->{'p'})
+        while ( $s->{'p'} )
         {
             push @moves, $s->{'m'};
             $key = $s->{'p'};
-            $s = $state_collection->{$key};
+            $s   = $state_collection->{$key};
             push @states, $key;
         }
-        @moves = reverse(@moves);
+        @moves  = reverse(@moves);
         @states = reverse(@states);
         my $num_state;
         if ($to_rle)
         {
             my @moves_rle = _run_length_encoding(@moves);
-            my ($m);
-
             $num_state = 0;
-            foreach $m (@moves_rle)
+            foreach my $m (@moves_rle)
             {
-                print {$fh} $echo_state->($states[$num_state]) . $self->render_move($m->[0]) . " * " . $m->[1] . "\n";
+                print {$fh} $echo_state->( $states[$num_state] )
+                    . $self->render_move( $m->[0] ) . " * "
+                    . $m->[1] . "\n";
                 $num_state += $m->[1];
             }
         }
         else
         {
-            for($num_state=0;$num_state<scalar(@moves);$num_state++)
+            for ( $num_state = 0 ; $num_state < scalar(@moves) ; ++$num_state )
             {
-                print {$fh} $echo_state->($states[$num_state]) . $self->render_move($moves[$num_state]) . "\n";
+                print {$fh} $echo_state->( $states[$num_state] )
+                    . $self->render_move( $moves[$num_state] ) . "\n";
             }
         }
         if ($output_states)
         {
-            print {$fh} $self->display_state($states[$num_state]), "\n";
+            print {$fh} $self->display_state( $states[$num_state] ), "\n";
         }
     }
 
-    close ($fh);
+    close($fh);
 
     return $buffer;
 }
 
 # TEST
 is_deeply(
-    [my_display_solution($self, @ret)],
+    [ my_display_solution( $self, @ret ) ],
     [<<'EOF'],
 solved
 Move the Plank of Length 2 to (2,3) N

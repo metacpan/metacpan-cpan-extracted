@@ -1,38 +1,70 @@
-SYNOPSIS
+NAME
+    Exporter::Rinci - A simple wrapper for Exporter for modules with Rinci
+    metadata
 
+VERSION
+    This document describes version 0.030 of Exporter::Rinci (from Perl
+    distribution Exporter-Rinci), released on 2019-08-15.
+
+SYNOPSIS
      package YourModule;
-    
+
      # most of the time, you only need to do this
      use Exporter::Rinci qw(import);
-    
+
      our %SPEC;
-    
+
      # f1 will not be exported by default, but user can import them explicitly using
      # 'use YourModule qw(f1)'
      $SPEC{f1} = { v=>1.1 };
      sub f1 { ... }
-    
+
      # f2 will be exported by default because it has the export:default tag
      $SPEC{f2} = { v=>1.1, tags=>[qw/a export:default/] };
      sub f2 { ... }
-    
+
      # f3 will never be exported, and user cannot import them via 'use YourModule
      # qw(f1)' nor via 'use YourModule qw(:a)'
      $SPEC{f3} = { v=>1.1, tags=>[qw/a export:never/] };
      sub f3 { ... }
 
 DESCRIPTION
-
     Exporter::Rinci is a simple wrapper for Exporter. Before handing out
     control to Exporter's import(), it will look at the exporting module's
     @EXPORT, @EXPORT_OK, and %EXPORT_TAGS and if they are empty will fill
-    them out with data from Rinci metadata (%SPEC). The rules are similar
-    to Perinci::Exporter: all functions will be put in @EXPORT_OK, except
-    functions with export:never tag will not be exported and functions with
-    export:default tag will be put in @EXPORT. %EXPORT_TAGS will also be
-    filled from functions' tags.
+    them out with data from Rinci metadata (%SPEC). The rules are similar to
+    Perinci::Exporter: all functions will be put in @EXPORT_OK, except
+    functions with "export:never" tag will not be exported and functions
+    with "export:default" tag will be put in @EXPORT. %EXPORT_TAGS will also
+    be filled from functions' tags.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Exporter-Rinci>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Exporter-Rinci>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Exporter-Rinci>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+    If you want something more full-featured, there's Perinci::Exporter. If
+    Exporter::Rinci is like Exporter.pm + Rinci, then Perinci::Exporter is
+    like Sub::Exporter + Rinci. It features subroutine renaming, wrapping
+    (adding retries, timeouts, etc).
 
-    Perinci::Exporter
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2016, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

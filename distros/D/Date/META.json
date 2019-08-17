@@ -1,0 +1,57 @@
+{
+   "abstract" : "fast Date framework with timezone and microseconds support, with Perl and C++ interface.",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Date",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "CPP::panda::lib" : "v1.2.10",
+            "Time::XS" : "v3.1.7",
+            "XS::Framework" : "v1.1.8",
+            "XS::Install" : "v1.2.10",
+            "next::XS" : "v1.0.6"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPP::panda::lib" : "v1.2.10",
+            "Export::XS" : "0",
+            "Time::XS" : "v3.1.7",
+            "XS::Framework" : "v1.1.8",
+            "XS::Install" : "v1.2.10",
+            "next::XS" : "v1.0.6"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Deep" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Test::Simple" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v4.0.0",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

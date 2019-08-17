@@ -1,15 +1,15 @@
 package Curio::Role::CHI;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use CHI;
-use Types::Standard qw( InstanceOf );
+use Scalar::Util qw( blessed );
+use Types::Standard qw( InstanceOf HashRef );
 
 use Moo::Role;
 use strictures 2;
 use namespace::clean;
 
 with 'Curio::Role';
-with 'MooX::BuildArgs';
 
 after initialize => sub{
     my ($class) = @_;
@@ -18,25 +18,32 @@ after initialize => sub{
 
     $factory->does_caching( 1 );
     $factory->cache_per_process( 1 );
+    $factory->resource_method_name( 'chi' );
 
     return;
 };
 
+has _custom_chi => (
+    is       => 'ro',
+    isa      => InstanceOf[ 'CHI::Driver' ] | HashRef,
+    required => 1,
+    init_arg => 'chi',
+    clearer  => '_clear_custom_chi',
+);
+
 has chi => (
-    is  => 'lazy',
-    isa => InstanceOf[ 'CHI::Driver' ],
+    is       => 'lazy',
+    init_arg => undef,
 );
 
 sub _build_chi {
     my ($self) = @_;
 
-    my $chi = CHI->new(
-        %{ $self->build_args() },
-    );
+    my $chi = $self->_custom_chi();
+    $self->_clear_custom_chi();
+    return $chi if blessed $chi;
 
-    $self->clear_build_args();
-
-    return $chi;
+    return CHI->new( %$chi );
 }
 
 1;
@@ -55,18 +62,18 @@ Create a Curio class:
     package MyApp::Service::Cache;
     
     use Curio role => '::CHI';
+    use strictures 2;
     
-    use Exporter qw( import );
-    our @EXPORT = qw( myapp_cache );
+    export_function_name 'myapp_cache';
+    always_export;
+    export_resource;
     
     add_key geo_ip => (
-        driver => 'Memory',
-        global => 0,
+        chi => {
+            driver => 'Memory',
+            global => 0,
+        },
     );
-    
-    sub myapp_cache {
-        return __PACKAGE__->fetch( @_ )->chi();
-    }
     
     1;
 
@@ -78,66 +85,29 @@ Then use your new Curio class elsewhere:
 
 =head1 DESCRIPTION
 
-This role provides all the basics for building a Curio class
-which wraps around L<CHI>.
+This role provides all the basics for building a Curio class which
+wraps around L<CHI>.
 
-Fun fact, this L</SYNOPSIS> is functionally identical to
-L<Curio/SYNOPSIS>.
-
-=head1 ATTRIBUTES
+=head1 REQUIRED ARGUMENTS
 
 =head2 chi
 
-    my $chi = MyApp::Service::Cache->fetch('geo_ip)->chi();
-
 Holds the L<CHI> object.
 
-=head1 CACHING
+May be passed as either a hashref of arguments or a pre-created
+object.
 
-This role sets the L<Curio::Factory/does_caching> and
-L<Curio::Factory/cache_per_process> features.
+=head1 FEATURES
 
-C<cache_per_process> is important to set since there are
-quite a few CHI drivers which do not like to be re-used
-across processes.
+This role turns on L<Curio::Factory/does_caching> and
+L<Curio::Factory/cache_per_process>, and sets
+L<Curio::Factory/resource_method_name> to C<chi> (as in L</chi>).
 
-You can of course disable these features.
+You can of course revert these changes:
 
     does_caching 0;
     cache_per_process 0;
-
-=head1 NO KEYS
-
-If you'd like to create a CHI Curio class which exposes a
-single CHI object and does not support keys then here's a
-slightly altered version of the L</SYNOPSIS> to get you
-started.
-
-Create a Curio class:
-
-    package MyApp::Service::GeoIPCache;
-    
-    use Curio role => '::CHI';
-    
-    use Exporter qw( import );
-    our @EXPORT = qw( myapp_geo_ip_cache );
-    
-    default_arguments (
-        driver => 'Memory',
-        global => 0,
-    );
-    
-    sub myapp_geo_ip_cache {
-        return __PACKAGE__->fetch( @_ )->chi();
-    }
-    
-    1;
-
-Then use your new Curio class elsewhere:
-
-    use MyApp::Service::GeoIPCache;
-    
-    my $chi = myapp_geo_ip_cache();
+    resource_method_name undef;
 
 =head1 SUPPORT
 
@@ -148,14 +118,14 @@ L<https://github.com/bluefeet/Curio-Role-CHI/issues>
 
 =head1 ACKNOWLEDGEMENTS
 
-Thanks to L<ZipRecruiter|https://www.ziprecruiter.com/>
-for encouraging their employees to contribute back to the open
-source ecosystem.  Without their dedication to quality software
-development this distribution would not exist.
+Thanks to L<ZipRecruiter|https://www.ziprecruiter.com/> for
+encouraging their employees to contribute back to the open source
+ecosystem.  Without their dedication to quality software development
+this distribution would not exist.
 
 =head1 AUTHORS
 
-    Aran Clary Deltac <aran@bluefeet.dev>
+    Aran Clary Deltac <bluefeet@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

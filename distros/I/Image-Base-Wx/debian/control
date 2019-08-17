@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2017, 2018, 2019 Kevin Ryde
 #
 # This file is part of Image-Base-Wx.
 #
@@ -19,14 +19,14 @@ Source: libimage-base-wx-perl
 Section: perl
 Priority: optional
 Build-Depends: cdbs, debhelper (>= 5)
-Maintainer: Kevin Ryde <user42@zip.com.au>
-Standards-Version: 3.9.3
+Maintainer: Kevin Ryde <user42_kevin@yahoo.com.au>
+Standards-Version: 4.2.1
 Homepage: http://user42.tuxfamily.org/image-base-wx/index.html
-Bugs: mailto:user42@zip.com.au
+Bugs: mailto:user42_kevin@yahoo.com.au
 
 Package: libimage-base-wx-perl
 Architecture: all
 Depends: libimage-base-perl (>= 1.12), libwx-perl, ${perl:Depends}, ${misc:Depends}
-Description: Draw into wxPerl DC, image, etc.
- An Image::Base extension to draw into wxPerl things, including Wx::DC
- and Wx::Image.
+Description: Draw into WxPerl DC, image, etc
+ An Image::Base extension to draw into WxPerl things, including
+ Wx::Bitmap, Wx::DC and Wx::Image.

@@ -3,8 +3,8 @@ NAME
     active at a time
 
 VERSION
-    This document describes version 0.002 of Sys::RunAlone::Flexible (from
-    Perl distribution Sys-RunAlone-Flexible), released on 2019-05-24.
+    This document describes version 0.003 of Sys::RunAlone::Flexible (from
+    Perl distribution Sys-RunAlone-Flexible), released on 2019-08-17.
 
 SYNOPSIS
     Use like you would use Sys::RunAlone:
@@ -49,9 +49,13 @@ DESCRIPTION
     retrying execution until the other instance of the script has finished.
 
 THEORY OF OPERATION
-    The functionality of this module depends on the availability of the DATA
-    handle in the script from which this module is called (more
+    The functionality of this module depends on the availability of the
+    "DATA" handle in the script from which this module is called (more
     specifically: in the "main" namespace).
+
+    NOTE: the "__END__" tag is always found in the "main" package namespace.
+    However, the "__DATA__" tag is always found in the namespace declared by
+    the script. This might very well be different when writing a modulino.
 
     At compile/INIT time (or when you run "lock"), it is checked when there
     is a DATA handle: if not, it exits with an error message on STDERR and
@@ -138,9 +142,10 @@ SYS::RUNALONE AUTHOR
 
 SYS::RUNALONE COPYRIGHT
     Copyright (c) 2005, 2006, 2008, 2009, 2011, 2012 Elizabeth Mattijsen
-    <liz@dijkmat.nl>. Copyright (c) 2017 Ben Tilly <btilly@gmail.com>. All
-    rights reserved. This program is free software; you can redistribute it
-    and/or modify it under the same terms as Perl itself.
+    <liz@dijkmat.nl>. Copyright (c) 2017 Ben Tilly <btilly@gmail.com>.
+    Copyright (c) 2019 Jim Bacon <boftx@cpan.org>. All rights reserved. This
+    program is free software; you can redistribute it and/or modify it under
+    the same terms as Perl itself.
 
 FUNCTIONS
   lock

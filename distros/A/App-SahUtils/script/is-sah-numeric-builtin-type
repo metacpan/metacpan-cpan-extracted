@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/SahUtils/is_sah_numeric_builtin_type
 # and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-06-20'; # DATE
+our $DATE = '2019-07-16'; # DATE
 our $DIST = 'App-SahUtils'; # DIST
-our $VERSION = '0.463'; # VERSION
+our $VERSION = '0.464'; # VERSION
 
 use 5.010001;
 use strict;
@@ -35,7 +35,7 @@ is-sah-numeric-builtin-type - Check that a string or array schema is a Sah numer
 
 =head1 VERSION
 
-This document describes version 0.463 of is-sah-numeric-builtin-type (from Perl distribution App-SahUtils), released on 2019-06-20.
+This document describes version 0.464 of is-sah-numeric-builtin-type (from Perl distribution App-SahUtils), released on 2019-07-16.
 
 =head1 SYNOPSIS
 
@@ -68,7 +68,7 @@ See C<--schema>.
 
 =over
 
-=item B<--config-path>=I<filename>, B<-c>
+=item B<--config-path>=I<s>, B<-c>
 
 Set path to configuration file.
 

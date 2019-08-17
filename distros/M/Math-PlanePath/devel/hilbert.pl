@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2014, 2015 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2014, 2015, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -223,7 +223,8 @@ use Smart::Comments;
   #     |       |         |    |         |    |
   # Y=0 |  0----1        15---16        20---21
   
-  # Straight
+  # A096268
+  # Straight 
   # 0,1,0, 0,0,1,0, 1,0,1,0,0,0,1,0, 0,0,1,0,0,0,1,0,1,0,1,0,0,0,1,0,1,0,1,0,
   # vector(25,n,valuation(n,2)%2)  /* even,odd trailing 0 bits */
 

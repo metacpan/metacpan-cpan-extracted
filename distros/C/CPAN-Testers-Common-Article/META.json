@@ -1,6 +1,6 @@
 {
     "name": "CPAN-Testers-Common-Article",
-    "version": "0.46",
+    "version": "0.47",
     "abstract": "Parse a CPAN Testers NNTP article",
     "author": [
         "Barbie (BARBIE) <barbie@cpan.org>",
@@ -50,7 +50,7 @@
     "provides": {
         "CPAN::Testers::Common::Article": {
             "file": "lib/CPAN/Testers/Common/Article.pm",
-            "version": "0.46"
+            "version": "0.47"
         }
     },
     "no_index": {
@@ -63,7 +63,7 @@
         "homepage": "http://devel.cpantesters.org",
         "repository": {
             "url": "git://github.com/barbie/cpan-testers-common-article.git",
-            "web": "https://github.com/barbie/cpan-testers-common-article.git",
+            "web": "https://github.com/barbie/cpan-testers-common-article",
             "type": "git"
         }
     }

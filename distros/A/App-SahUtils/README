@@ -2,8 +2,8 @@ NAME
     App::SahUtils - Collection of CLI utilities for Sah and Data::Sah
 
 VERSION
-    This document describes version 0.463 of App::SahUtils (from Perl
-    distribution App-SahUtils), released on 2019-06-20.
+    This document describes version 0.464 of App::SahUtils (from Perl
+    distribution App-SahUtils), released on 2019-07-16.
 
 SYNOPSIS
     This distribution provides the following command-line utilities related
@@ -51,7 +51,7 @@ SYNOPSIS
 
     *   sah-to-human
 
-    *   show-sah-coerce-module
+    *   show-sah-coerce-rule-module
 
     *   show-sah-schema-module
 

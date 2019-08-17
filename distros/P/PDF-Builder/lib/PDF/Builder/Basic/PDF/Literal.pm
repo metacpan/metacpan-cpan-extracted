@@ -5,8 +5,8 @@ use base 'PDF::Builder::Basic::PDF::Objind';
 
 use strict;
 
-our $VERSION = '3.015'; # VERSION
-my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
+our $VERSION = '3.016'; # VERSION
+my $LAST_UPDATE = '3.016'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Filter;
 use PDF::Builder::Basic::PDF::Name;
@@ -22,10 +22,9 @@ PDF::Builder::Basic::PDF::Literal - Literal PDF Object. Inherits from L<PDF::Bui
 
 sub new {
     my ($class, @opts) = @_;
-
     my ($self);
 
-    $class = ref $class if ref $class;
+    $class = ref($class) if ref($class);
     $self = $class->SUPER::new(@_);
     $self->{' realised'} = 1;
     if      (scalar @opts > 1) {
@@ -41,7 +40,7 @@ sub new {
 }
 
 sub outobjdeep {
-    my ($self, $fh, $pdf, %opts) = @_;
+    my ($self, $fh, $pdf) = @_;
     if ($self->{'-isdict'}) {
         if (defined $self->{' stream'}) {
             $self->{'Length'} = length($self->{' stream'}) + 1;
@@ -53,11 +52,14 @@ sub outobjdeep {
             next if $k=~m|^[ \-]|o;
             $fh->print('/'.PDF::Builder::Basic::PDF::Name::string_to_name($k).' ');
             if      (ref($self->{$k}) eq 'ARRAY') {
-                $fh->print('['.join(' ',@{$self->{$k}})."]\n");
+                $fh->print('[' . join(' ',@{$self->{$k}}) . "]\n");
             } elsif (ref($self->{$k}) eq 'HASH') {
-                $fh->print('<<'.join(' ', map { '/'.PDF::Builder::Basic::PDF::Name::string_to_name($_).' '.$self->{$k}->{$_} } sort keys %{$self->{$k}})." >>\n");
+                $fh->print('<<' . 
+                           join(' ', map { '/'.PDF::Builder::Basic::PDF::Name::string_to_name($_) . 
+                           ' ' . $self->{$k}->{$_} } sort keys %{$self->{$k}}) . 
+                           " >>\n");
             } elsif (blessed($self->{$k}) and $self->{$k}->can('outobj')) {
-                $self->{$k}->outobj($fh, $pdf, %opts);
+                $self->{$k}->outobj($fh, $pdf);
                 $fh->print("\n");
             } else {
                 $fh->print("$self->{$k}\n");

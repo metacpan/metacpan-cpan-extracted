@@ -4,7 +4,7 @@ StreamFinder::Radionomy - Fetch actual raw streamable URLs from radio-station we
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2017 by
+This module is Copyright (C) 2017-2019 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		

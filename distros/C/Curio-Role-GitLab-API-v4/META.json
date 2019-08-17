@@ -45,7 +45,6 @@
             "Curio::Role" : "0.04",
             "GitLab::API::v4" : "0.07",
             "Moo::Role" : "2.003000",
-            "MooX::BuildArgs" : "0.08",
             "Scalar::Util" : "0",
             "Types::Common::String" : "1.002001",
             "Types::Standard" : "1.002001",
@@ -64,7 +63,7 @@
    "provides" : {
       "Curio::Role::GitLab::API::v4" : {
          "file" : "lib/Curio/Role/GitLab/API/v4.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -78,7 +77,7 @@
          "web" : "https://github.com/bluefeet/Curio-Role-GitLab-API-v4"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_authority" : "cpan:BLUEFEET",
    "x_serialization_backend" : "JSON::PP version 4.04",
    "x_static_install" : 1
