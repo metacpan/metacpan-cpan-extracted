@@ -4,29 +4,16 @@ use 5.014;
 
 use Data::Object 'Class', 'Doodle::Library';
 
+with 'Doodle::Schema::Helpers';
+
 use Doodle::Table;
 
-our $VERSION = '0.01'; # VERSION
-
-has charset => (
-  is => 'ro',
-  isa => 'Str',
-);
-
-has collation => (
-  is => 'ro',
-  isa => 'Str',
-);
+our $VERSION = '0.03'; # VERSION
 
 has doodle => (
   is => 'ro',
   isa => 'Doodle',
   req => 1
-);
-
-has engine => (
-  is => 'ro',
-  isa => 'Str',
 );
 
 has name => (
@@ -39,6 +26,19 @@ has temporary => (
   is => 'ro',
   isa => 'Bool',
 );
+
+has data => (
+  is => 'ro',
+  isa => 'Data',
+  bld => 'new_data',
+  lzy => 1
+);
+
+# BUILD
+
+fun new_data($self) {
+  return do('hash', {});
+}
 
 # METHODS
 
@@ -61,7 +61,7 @@ method create(Any %args) {
 method delete(Any %args) {
   $args{schema} = $self;
 
-  my $command = $self->doodle->schema_create(%args);
+  my $command = $self->doodle->schema_delete(%args);
 
   return $command;
 }

@@ -9,7 +9,7 @@ Types::Core - Core types defined as tests and literals (ease of use)
 
 =head1 VERSION
 
-Version "0.2.2";
+Version "0.2.4";
 
 =cut
 
@@ -19,9 +19,13 @@ Version "0.2.2";
   use strict;
   use warnings;
   use mem;
-  our $VERSION='0.2.2';
+  our $VERSION='0.2.4';
   use constant Self => __PACKAGE__;
 
+# 0.2.4   -	fixed current tests in 5.{12,10,8}.x; added some tests for
+#						Cmp function to allow comparing objects and sorting them
+#						though still leaving it undocumented, as not sure how
+#						useful it is
 # 0.2.2   - fixed prototype of isnum, tighted up interface and documented it
 #         - fix some test suit failures under older (<5.12) perls
 # 0.2.1   - re-add 'type' as OK synonym for 'typ' (both in EXPORT_OK)
@@ -87,6 +91,8 @@ Version "0.2.2";
                         isnum       Cmp
                         _getClass   _InClass
                         _Obj
+												mk_array		mkARRAY
+											 	mk_hash			mkHASH
                         )  );
   }
 
@@ -367,10 +373,10 @@ Multiple levels of hashes or arrays may be tested in one usage. Example:
 
     sub EhV ($*;******************************) { 
       my ($arg, $field) = (shift, shift);
-      while (HASH $arg && defined $field && exists $arg->{$field}) {
-        $arg = $arg->{$field};
-        $field = shift, next if @_;
-        return $arg;
+      while (ref $arg eq 'HASH' and defined($field) and exists $arg->{$field}) {
+				return $arg->{$field} unless @_ > 0;
+				$arg		= $arg->{$field};
+				$field	= shift;
       }
       return undef;
     }
@@ -390,9 +396,8 @@ Multiple levels of hashes or arrays may be tested in one usage. Example:
     sub mkARRAY($) { goto &mk_array }
     sub mk_hash($) { $_[0] = {} unless q(HASH) eq ref $_[0] ; $_[0] }
     sub mkHASH($) { goto &mk_hash }
-    push @EXPORT_OK, qw(mk_array mk_hash mkHASH mkARRAY);
 
-    # for testing only:
+    # for testing only (EXPERIMENTAL):
     # _Obj - 1 or 2 parms (on top of "objref" ($p))
     ##1st param - name to verify against; verify against objptr by default
     #2nd optional parm = verify against this ref instead of objptr
@@ -484,6 +489,7 @@ be compared.
 
 =cut
 
+use Carp::Always;
 use constant numRE => qr{^ ( 
 														[-+]? (?: (?: \d* \.? \d+ ) | 
 																			(?: \d+ \.? \d* ) ) 
@@ -491,30 +497,33 @@ use constant numRE => qr{^ (
 
 sub isnum(;$) { 
 	local $_ = @_ ? $_[0] : $_;
-	m"@{[numRE]}" && return $1;
+	return undef unless defined $_;
+	m"&numRE" && return $1;
 	undef;
 }
 
 
 sub Cmp (;$$$);
-sub Cmp (;$$$) { my $r=0; my $d;
-  require P;
-  unless (@_) {
-    $d = @_==1 ? $_[0] : @_==3 ? $_[2] : undef;
+sub Cmp (;$$$) { my $r=0; my $dbg;
+  if (@_) {
+    $dbg = @_==1 ? $_[0] : @_==3 ? $_[2] : undef;
    ($a, $b) = @_ if @_>1;
   }
-  my ($ra, $rb)   = (ref $a, ref $b);
-  my ($ta, $tb)   = (type $a, type $b);
+	$a="" unless defined $a;
+	$b="" unless defined $b;
+  require P if $dbg;
+  my ($ra, $rb)   = (defined(ref $a)||"", defined(ref $b)||"");
+  my ($ta, $tb)   = (defined(type $a) || "", defined(type $b)||"");
   do {  P::Pe("ta=%s, tb=%s", $ta, $tb);
-        P::Pe("ra=%s, rb=%s", $ra, $rb) } if $d;
+        P::Pe("ra=%s, rb=%s", $ra, $rb) } if $dbg;
   my ($dta, $dtb) = (defined $ta, defined $tb);
 
   # first handle "values" (neither are a type reference)
-  unless($dta || $dtb) {
+  if ($dta && $dtb) {
     $r = isnum($a) && isnum($b)
                     ? $a <=> $b
                     : $a cmp $b;
-    P::Pe("isnum, a=%s, b=%s, r=%s", isnum($a), isnum($b), $r) if $d;
+    P::Pe("isnum, a=%s, b=%s, r=%s", isnum($a), isnum($b), $r) if $dbg;
     return $r } 
   # then handle unequal type references
   elsif ($dta ^ $dtb) { return (undef, 1) } 
@@ -531,14 +540,14 @@ sub Cmp (;$$$) { my $r=0; my $d;
     return Cmp($$a, $$b) }
   elsif ($ta eq ARRAY) {
 
-    P::Pe("len of array a vs. b: (%s <=> %s)", @$a, @$b) if $d;
+    P::Pe("len of array a vs. b: (%s <=> %s)", @$a, @$b) if $dbg;
     return $r if $r = @$a <=> @$b;
 
     # for each member, compare them using Cmp
     for (my $i=0; $i<@$a; ++$i) {
-      P::Pe("a->[i] Cmp b->[i]...\0x83", $a->[$i], $b->[$i]) if $d;
+      P::Pe("a->[i] Cmp b->[i]...\0x83", $a->[$i], $b->[$i]) if $dbg;
       $r = Cmp($a->[$i], $b->[$i]);
-      P::Pe("a->[i] Cmp b->[i], r=%s", $a->[$i], $b->[$i], $r) if $d;
+      P::Pe("a->[i] Cmp b->[i], r=%s", $a->[$i], $b->[$i], $r) if $dbg;
       return $r if $r;
     }
     return 0;   # arrays are equal
@@ -546,20 +555,20 @@ sub Cmp (;$$$) { my $r=0; my $d;
     my @ka = sort keys %$a;
     my @kb = sort keys %$b;
     $r = Cmp(0+@ka, 0+@kb);
-    P::Pe("Cmp #keys a(%s) b(%s), in hashes: r=%s", 0+@ka, 0+@kb, $r) if $d;
+    P::Pe("Cmp #keys a(%s) b(%s), in hashes: r=%s", 0+@ka, 0+@kb, $r) if $dbg;
     return $r if $r;
 
     $r = Cmp(\@ka, \@kb);
-    P::Pe("Cmp keys of hash: r=%s", $r) if $d;
+    P::Pe("Cmp keys of hash: r=%s", $r) if $dbg;
     return $r if $r;
 
     my @va = map {$a->{$_}} @ka;
     my @vb = map {$b->{$_}} @kb;
     $r = Cmp(\@va, \@vb);
-    P::Pe("Cmp values for each key, r=%s", $r) if $d;
+    P::Pe("Cmp values for each key, r=%s", $r) if $dbg;
     return $r;
   } else {
-    P::Pe("no comparison for type %s, ref %s", $ta, $ra) if $d;
+    P::Pe("no comparison for type %s, ref %s", $ta, $ra) if $dbg;
     return (undef,5); ## unimplemented comparison
   }
 }

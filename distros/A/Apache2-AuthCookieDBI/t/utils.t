@@ -226,21 +226,21 @@ sub test_check_password_digest_none {
 
 sub test_check_password_digest_crypt {
     my $plaintext_password = 'plaintext password';
-    my $crypt_encrypted
-        = CLASS_UNDER_TEST->_crypt_digest( $plaintext_password,
-        $plaintext_password );
+    my $salt = join('',
+        (('.', '/', 0..9, 'A'..'Z', 'a'..'z')[rand 64, rand 64]));
+    my $crypted_password = crypt( $plaintext_password, $salt );
     Test::More::ok(
         CLASS_UNDER_TEST->_check_password(
-            $plaintext_password, $crypt_encrypted, 'crypt'
+            $plaintext_password, $crypted_password, 'crypt'
         ),
-        '_check_password() success case with crypt digest'
+        '_check_password() success case with crypt'
     );
 
     Test::More::ok(
         !CLASS_UNDER_TEST->_check_password(
             $plaintext_password, 'no match', 'crypt'
         ),
-        '_check_password() failure case with crypt digest'
+        '_check_password() failure case with crypt'
     );
 
     return TRUE;

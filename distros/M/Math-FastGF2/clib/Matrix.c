@@ -1,6 +1,6 @@
 /* Fast GF(2^m) library routines */
 /*
-  Copyright (c) by Declan Malone 2009.
+  Copyright (c) by Declan Malone 2009-2019.
   Licensed under the terms of the GNU General Public License and
   the GNU Lesser (Library) General Public License.
 */

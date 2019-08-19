@@ -23,7 +23,8 @@ Doodle Table Class
 
 =description
 
-Database table representation.
+Database table representation. This class consumes the
+L<Doodle::Table::Helpers> role.
 
 =cut
 

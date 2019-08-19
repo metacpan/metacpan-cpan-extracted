@@ -31,7 +31,6 @@
       },
       "test" : {
          "recommends" : {
-            "JSON" : "2.0",
             "Text::ASCIITable" : "0.2"
          }
       }
@@ -39,7 +38,7 @@
    "provides" : {
       "Proch::N50" : {
          "file" : "lib/Proch/N50.pm",
-         "version" : "0.70"
+         "version" : "0.80"
       }
    },
    "release_status" : "stable",
@@ -49,7 +48,7 @@
          "url" : "https://github.com/telatin/bioinfo.git"
       }
    },
-   "version" : "0.70",
+   "version" : "0.80",
    "x_generated_by_perl" : "v5.22.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.10"
 }

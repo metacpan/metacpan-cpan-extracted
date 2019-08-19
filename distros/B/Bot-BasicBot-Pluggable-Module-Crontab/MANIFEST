@@ -1,4 +1,6 @@
 Changes
+examples/robobarbie.cron
+examples/robobarbie.pl
 lib/Bot/BasicBot/Pluggable/Module/Crontab.pm
 LICENSE
 Makefile.PL
@@ -7,7 +9,11 @@ META.json
 META.yml
 README
 t/01load.t
+t/02tick.t
 t/90podtest.t
 t/94metatest.t
 t/95changedate.t
 t/96metatest.t
+t/data/01test.cron
+t/data/02test.cron
+t/data/03test.cron

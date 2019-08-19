@@ -180,10 +180,10 @@ mat_multiply_submatrix_c (SV *Self, SV *Transform, SV *Result,
 	   ++c, u8_tcp += tright, u8_ocp += oright) {
 	for (v=0, 
 	       u8_vip=u8_irp, u8_vtp=u8_tcp,
-	       u8=gf2_mul(8,*u8_vip,*u8_vtp);
+	       u8=gf2_mul8(*u8_vip,*u8_vtp);
 	     u8_vip += iright, u8_vtp += tdown,
 	       ++v < self->cols; ) {
-	  u8^=gf2_mul(8,*u8_vip,*u8_vtp);
+	  u8^=gf2_mul8(*u8_vip,*u8_vtp);
 	}
 	*(u8_ocp + r * odown) = u8;
       }
@@ -363,3 +363,4 @@ void mat_set_raw_values_c (SV *Self, int row, int col,
   return;
 }
 
+/* new code to implement previous offset_to_rowcol */

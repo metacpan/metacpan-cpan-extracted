@@ -6,7 +6,7 @@ use Data::Object::Search;
 
 extends 'Data::Object::Func::Regexp';
 
-our $VERSION = '0.98'; # VERSION
+our $VERSION = '0.99'; # VERSION
 
 # BUILD
 

@@ -1,5 +1,5 @@
 ---
-abstract: 'Database DDL Builder'
+abstract: 'Database DDL Statement Builder'
 author:
   - 'Al Newkirk <awncorp@cpan.org>'
 build_requires:
@@ -19,8 +19,9 @@ requires:
   perl: '5.014'
 resources:
   bugtracker: https://github.com/iamalnewkirk/doodle/issues
+  homepage: https://metacpan.org/pod/Doodle
   repository: git://github.com/iamalnewkirk/doodle.git
-version: '0.01'
+version: '0.03'
 x_authority: cpan:AWNCORP
 x_contributors:
   - 'Al Newkirk <al@iamalnewkirk.com>'

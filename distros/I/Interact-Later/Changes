@@ -1,0 +1,19 @@
+0.04 2019-08-18T20:52:14Z
+
+  - write_data_to_disk() now returns the UUID of the stored file 
+  - Adding a "Dofile"
+  - Better synopsis and description after posting it on PrePan http://prepan.org/module/nYmTLYacoXJ
+  - Documentation about the attributes
+
+0.03 2019-08-18T16:48:48Z
+
+  - Removing some log and adding license metadata
+
+0.02 2019-08-18T16:37:35Z
+
+  - Using a trigger on the cache path so it is absolute 
+
+0.01 2019-08-18T16:23:26Z
+
+  - Configuring Minilla
+  - Sketching the project

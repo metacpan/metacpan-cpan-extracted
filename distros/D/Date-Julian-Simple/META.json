@@ -33,7 +33,7 @@
       "runtime" : {
          "requires" : {
             "Date::Calc" : "6.0",
-            "Date::Utils" : "0.26",
+            "Date::Utils" : "0.27",
             "Moo" : "2.000000",
             "Time::localtime" : "1.02",
             "namespace::autoclean" : "0.28",
@@ -44,7 +44,7 @@
    "provides" : {
       "Date::Julian::Simple" : {
          "file" : "lib/Date/Julian/Simple.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -55,6 +55,6 @@
          "web" : "https://github.com/manwar/Date-Julian-Simple"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

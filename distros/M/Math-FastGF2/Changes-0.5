@@ -1,0 +1,133 @@
+# Changes for version 0.05 of Math::FastGF2
+
+## General Changes
+
+See the main Changes file for full history.
+
+## Performance Changes
+
+I've decided to revisit this module primarily to see if I can get
+better throughput when doing IDA split/combine operations (see
+Crypt::IDA for details; it uses this module for the maths).
+
+Performance has generally been good enough for me when running it on
+my desktop, but recently I've become more interested in running it on
+less powerful machines (Raspberry Pi and old ODROID boards) to build a
+cheap distributed NAS cluster.
+
+After doing some tests, I found that the throughput on these boards
+wasn't good enough to saturate a 100Mbit network, meaning that my IDA
+code, rather than network bandwidth, would be the bottleneck in my
+cluster.
+
+There may be a limit to how fast I can get the combined Perl/XS code
+running, but after doing some profiling and general inspection of the
+code, I've come up with some ideas...
+
+### Result
+
+I've basically done what I can in this module, so I'll move on to
+reworking some stuff in Crypt::IDA next.
+
+It may be that I won't be able to get good enough performance on a
+Raspberry Pi without a total rewrite. However, as I also have an
+ODROID machine in the cluster, I can do all the split/combine tasks
+there and leave Pi machines to just do disk storage.
+
+## Move handling of Matrix->{ROWS,COLS,ORG,WIDTH} back to Perl
+
+Profiling seems to indicate a fair bit of time being taken up by these
+calls. They're not the biggest culprits, but I suspect that there is a
+non-trivial amount of overhead by doing an XS call for these.
+
+I wasn't able to do this because it's just not possible with
+XS. However, I was able to cut down on the number of calls.
+
+## Remove condition checks from deep in critical C inner loops
+
+I made a design decision early on to have all the gf2_* operations
+take "bytes" as their first parameter, rather than implementing
+different routine names for working on fields of sizes 1, 2 or 4
+bytes. I followed the same convention even down into the C routines,
+with a result that most inner loops will have a check for field size
+on each of the variables they're operating on.
+
+I will keep the Perl/XS interface the same, but move the check on
+field size outside critical loops.
+
+(multiply_submatrix is the biggest bottleneck in the code)
+
+### Result
+
+I implemented a quick fix to change:
+
+    gf2_mul(8, ...
+
+to a new
+
+    gf2_mul8( ...
+
+The code is still overly-generic, though I don't fancy exploding it
+out into 24 (or whatever) different versions depending on:
+
+* field size
+* input matrix organisation
+* output matrix organisation
+* transform matrix organisation
+
+I might optimise for the two most common layouts used for an IDA split
+operation on 8-bit fields and use the existing code as a fallback.
+Some other time, though.
+
+## Keep profiling offset_to_rowcol
+
+This may be simply a victim of XS overheads in calling $self->ORG and
+$self->COLS, so when I transfer handling of those methods back into
+Perl, this function may stop being an issue.
+
+### Result
+
+I made a few tweaks to this routine, but the real issue is that it's
+being called indiscriminately (from Crypt::IDA). I can eliminate most
+(if not all) of the calls by keeping a few extra bookkeeping
+variables there.
+
+## Remove/migrate some error-checking or checking for "variants"
+
+The code allows for a lot of different variables that can all work
+together:
+
+* big-endian vs little-endian of data
+* whether perl's endianness is different from data being processed
+* whether matrices are stored in "rowwise" or "columnwise" (or some combination being multiplied together)
+* GF(2) field size (1, 2 or 4 bytes)
+
+All the checks required for such flexibility is possibly slowing us
+down a lot.
+
+Other places might have a bit too much error checking, too.
+
+One solution for handling this stuff in Perl is to have a set of
+method names that begin with an underscore, which are meant for
+internal use only. Where it's warranted, I can move checking of:
+
+* error conditions
+* handling different "flavours" of routines
+
+into the main public method interface and then call one of the
+underscored methods (which can avoid checking the same things
+repeatedly). Also, it might be possible to just move some checks out
+of main loops.
+
+### Result
+
+I didn't follow up on this.
+
+## Future Direction
+
+I might come back soon and rewrite or clean up some code here, but
+it's not a huge priority. I'll go on to rework Crypt::IDA, which uses
+these libraries. That's much more in need of attention. In the
+process, I might come back and make a few more tweaks, but for now I'm
+happy enough with the code here.
+

@@ -4,13 +4,16 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.517';
+our $VERSION = '0.519';
+use Exporter 'import';
+our @EXPORT_OK = qw( fill_form read_line );
 
 use Carp       qw( croak carp );
 use List::Util qw( any );
 
 use Term::Choose::LineFold        qw( line_fold print_columns cut_to_printwidth );
 use Term::Choose::Constants       qw( :form :screen );
+use Term::Choose::Util            qw( unicode_sprintf );
 use Term::Choose::ValidateOptions qw( validate_options );
 
 my $Plugin;
@@ -306,6 +309,11 @@ sub __init_readline {
     my $list = [ [ $prompt, $self->{default} ] ];
     my $m = $self->__string_and_pos( $list );
     return $m;
+}
+
+
+sub read_line {
+    return Term::Form::readline( bless( { %{ _defaults() }, plugin => $Plugin->new() }, 'Term::Form' ), @_ );
 }
 
 
@@ -820,16 +828,7 @@ sub __get_row {
     }
     if ( ! defined $self->{i}{keys}[$idx] ) {
         my $key = $list->[$idx][0];
-        my $key_w = $self->{i}{key_w}[$idx];
-        if ( $key_w > $self->{i}{max_key_w} ) {
-            $self->{i}{keys}[$idx] = $self->__unicode_trim( $key, $self->{i}{max_key_w} );
-        }
-        elsif ( $key_w < $self->{i}{max_key_w} ) {
-            $self->{i}{keys}[$idx] = " " x ( $self->{i}{max_key_w} - $key_w ) . $key;
-        }
-        else {
-            $self->{i}{keys}[$idx] = $key;
-        }
+        $self->{i}{keys}[$idx] = unicode_sprintf( $key, $self->{i}{max_key_w}, 0 );
     }
     if ( ! defined $self->{i}{seps}[$idx] ) {
         my $sep;
@@ -896,7 +895,7 @@ sub __write_first_screen {
     if ( $self->{hide_cursor} ) {
         print HIDE_CURSOR;
     }
-    if ( defined $self->{i}{pre_text} ) {  # empty info add newline ?
+    if ( length $self->{i}{pre_text} ) {
         print $self->{i}{pre_text} . "\n";
     }
     $self->__write_screen( $list );
@@ -904,6 +903,9 @@ sub __write_first_screen {
 
 
 sub fill_form {
+    if ( ref $_[0] ne 'Term::Form' ) {
+        return fill_form( bless( { %{ _defaults() }, plugin => $Plugin->new() }, 'Term::Form' ), @_ );
+    }
     my ( $self, $orig_list, $opt ) = @_;
     croak "'fill_form' called with no argument." if ! defined $orig_list;
     croak "'fill_form' requires an ARRAY reference as its argument." if ref $orig_list ne 'ARRAY';
@@ -1113,6 +1115,23 @@ sub fill_form {
                 $self->__print_next_page( $list );
             }
         }
+        elsif ( $char == CONTROL_X ) {
+            my $up = $self->{i}{curr_row} - $self->{i}{begin_row};
+            if ( @{$m->{str}} ) {
+                $list->[$self->{i}{curr_row}][1] = '';
+                $m = $self->__string_and_pos( $list );
+            }
+            elsif ( $list->[$self->{i}{curr_row}][0] eq $self->{back} ) {
+                    $self->__reset_term( $up );
+                    return;
+            }
+            else {
+                print UP x $up;
+                print "\r" . CLEAR_TO_END_OF_SCREEN;
+                $self->__write_first_screen( $list, 0, 2 );
+                $m = $self->__string_and_pos( $list );
+            }
+        }
         elsif ( $char == VK_INSERT ) {
             $self->{i}{beep} = 1;
         }
@@ -1156,8 +1175,8 @@ sub fill_form {
                     next CHAR;
                 }
                 $self->{i}{curr_row}++;
-                $m = $self->__string_and_pos( $list );                                                              # or go to the next row if not on the last row
-                if ( $self->{i}{curr_row} <= $self->{i}{end_row} ) {
+                $m = $self->__string_and_pos( $list );
+                if ( $self->{i}{curr_row} <= $self->{i}{end_row} ) {                                                # or go to the next row if not on the last row
                     $self->__reset_previous_row( $list, $self->{i}{curr_row} - 1 );
                     print DOWN x 1;
                 }
@@ -1226,17 +1245,11 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.517
+Version 0.519
 
 =cut
 
 =head1 SYNOPSIS
-
-    use Term::Form;
-
-    my $new = Term::Form->new();
-    my $line = $new->readline( 'Prompt: ', { default => 'abc' } );
-
 
     my $aoa = [
         [ 'name'           ],
@@ -1244,7 +1257,24 @@ Version 0.517
         [ 'color', 'green' ],
         [ 'city'           ]
     ];
+
+    # Object-oriented interface:
+
+    use Term::Form;
+
+    my $new = Term::Form->new();
+
+    my $line = $new->readline( 'Prompt: ', { default => 'abc' } );
+
     my $modified_list = $new->fill_form( $aoa );
+
+    # Functional interface:
+
+    use Term::Form qw( read_line fill_form );
+
+    my $line = read_line( 'Prompt: ', { default => 'abc' } );
+
+    my $modified_list = fill_form( $aoa );
 
 =head1 DESCRIPTION
 
@@ -1279,9 +1309,7 @@ C<Up-Arrow>: in C<fill_form> move up one row, in C<readline> move back 10 charac
 
 C<Down-Arrow>: in C<fill_form> move down one row, in C<readline> move forward 10 characters.
 
-Only in C<readline>:
-
-C<Ctrl-X>: clears the input. With the input puffer empty "readline" returns nothing if C<Ctrl-X> is pressed.
+C<Ctrl-X>: If the input puffer is not empty, the input puffer is cleared, else C<Ctrl-X> returns nothing (undef).
 
 Only in C<fill_form>:
 

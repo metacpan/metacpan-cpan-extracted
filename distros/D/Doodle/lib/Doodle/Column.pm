@@ -6,7 +6,7 @@ use Data::Object 'Class', 'Doodle::Library';
 
 with 'Doodle::Column::Helpers';
 
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 has name => (
   is => 'ro',
@@ -120,13 +120,16 @@ Doodle Column Class
 
   use Doodle::Column;
 
-  my $self = Doodle::Column->new(%args);
+  my $self = Doodle::Column->new(
+    name => 'id'
+  );
 
 =cut
 
 =head1 DESCRIPTION
 
-Table column representation.
+Table column representation. This class consumes the L<Doodle::Column::Helpers>
+role.
 
 =cut
 

@@ -1,10 +1,8 @@
 package Data::Object::Library;
 
-use strict;
-use warnings;
+use base 'Type::Library';
 
-use Type::Library -base;
-use Type::Utils -all;
+use Type::Utils ();
 
 use Data::Object::Type::Any;
 use Data::Object::Type::Array;
@@ -23,16 +21,14 @@ use Data::Object::Type::Space;
 use Data::Object::Type::String;
 use Data::Object::Type::Undef;
 
-our $VERSION = '0.98'; # VERSION
+our $VERSION = '0.99'; # VERSION
 
-# BUILD
+Type::Utils::extends('Types::Standard');
+Type::Utils::extends('Types::TypeTiny');
+Type::Utils::extends('Types::Common::Numeric');
+Type::Utils::extends('Types::Common::String');
 
-extends 'Types::Standard';
-extends 'Types::TypeTiny';
-extends 'Types::Common::Numeric';
-extends 'Types::Common::String';
-
-# custom type constraint builders
+# CUSTOM TYPE CONSTRAINT BUILDERS
 
 register Data::Object::Type::Any;
 register Data::Object::Type::Array;

@@ -11,7 +11,7 @@ Doodle::Table::Helpers
 
 =abstract
 
-Nam suscipit iaculis magna vitae faucibus.
+Doodle Table Helpers
 
 =synopsis
 
@@ -23,7 +23,7 @@ Nam suscipit iaculis magna vitae faucibus.
 
 =description
 
-Doodle Table Helpers
+Helpers for configuring Table classes.
 
 =cut
 

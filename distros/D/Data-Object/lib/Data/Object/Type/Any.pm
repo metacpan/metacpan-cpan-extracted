@@ -3,11 +3,9 @@ package Data::Object::Type::Any;
 use strict;
 use warnings;
 
-use Data::Object::Export;
-
 use parent 'Data::Object::Type';
 
-our $VERSION = '0.98'; # VERSION
+our $VERSION = '0.99'; # VERSION
 
 # BUILD
 # METHODS
@@ -21,7 +19,10 @@ sub aliases {
 }
 
 sub coercions {
-  return ['Any', sub { do('any', $_[0]) }];
+  return ['Any', sub {
+    require Data::Object::Any;
+    Data::Object::Any->new($_[0]);
+  }];
 }
 
 sub validation {

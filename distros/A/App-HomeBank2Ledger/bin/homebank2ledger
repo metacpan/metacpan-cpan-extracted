@@ -8,7 +8,7 @@ use strict;
 
 use App::HomeBank2Ledger;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 App::HomeBank2Ledger->main(@ARGV);
 
@@ -24,7 +24,7 @@ homebank2ledger - A tool to convert HomeBank files to Ledger format
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -160,6 +160,15 @@ Enables commodity declarations.
 
 Defaults to enabled; use C<--no-commodities> to disable.
 
+=head2 --budget
+
+Enables budget transactions.
+
+Budget transactions are only supported by the Ledger format (for now). This option is silently
+ignored otherwise.
+
+Defaults to enabled; use C<--no-budget> to disable.
+
 =head2 --opening-date DATE
 
 Specify the opening date for the "opening balances" transaction. This transaction is created (if
@@ -265,7 +274,7 @@ I didn't intend to make this a releasable robust product, so it's lacking tests.
 
 =item *
 
-Budgets and scheduled transactions are not (yet) converted.
+Scheduled transactions are not (yet) converted.
 
 =item *
 

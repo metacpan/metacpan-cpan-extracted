@@ -3,7 +3,7 @@ package Bot::BasicBot::Pluggable::Module::Crontab;
 use warnings;
 use strict;
 
-our $VERSION = '0.01';
+our $VERSION = '1.01';
  
 #----------------------------------------------------------------------------
 
@@ -50,14 +50,15 @@ sub tick {
     my $self = shift;
 
     $self->_load_cron();
+    my $wkno = DateTime->now->week_number;
 
     for my $cron (@crontab) {
         next unless($cron->{tab}->match(time));
         next unless(
                 $cron->{weekno} eq '*' 
-            || ($cron->{modulus} && $cron->{result} == (DateTime->now->week_number % $cron->{modulus})
-            || ($cron->{weekno} =~ /^\d+$/ && DateTime->now->week_number == $cron->{weekno})
-            ));
+            || ( $cron->{modulus} && $cron->{result} == ($wkno % $cron->{modulus}) )
+            || ( $cron->{weekno} =~ /^\d+$/ && $wkno == $cron->{weekno} )
+        );
 
         $self->say(
             channel => $cron->{channel},
@@ -92,14 +93,14 @@ sub _load_cron {
         next if($line =~ /^#/); # ignore comment lines
         next if($line =~ /^$/); # ignore blank lines
 
-        my @fields = split(' ',$line,8);
+        my @fields = split(/ /,$line,8);
         my $crontab = join(' ',(@fields)[0..4]);
         my $tab;
         eval { $tab = Time::Crontab->new($crontab) };
         next if($@);
 
         my ($modulus,$result);
-        ($modulus,$result) = split('/',$fields[5],2)    if($fields[5] =~ m!^\d+/\d+!);
+        ($modulus,$result) = split(/\//,$fields[5],2)    if($fields[5] =~ m!^\d+/\d+!);
 
         push @crontab, {
             tab     => $tab,
@@ -223,7 +224,7 @@ when the bot is initiated. For example:
 
 =head1 COPYRIGHT AND LICENSE
 
-  Copyright (C) 2015 Barbie for Miss Barbell Productions
+  Copyright (C) 2015-2019 Barbie for Miss Barbell Productions
 
   This distribution is free software; you can redistribute it and/or
   modify it under the Artistic License v2.

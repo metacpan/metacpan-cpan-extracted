@@ -5,25 +5,20 @@ use 5.014;
 use strict;
 use warnings;
 
-use Carp 'croak';
-
 use parent 'Data::Object::Config';
 
-our $VERSION = '0.98'; # VERSION
+our $VERSION = '0.99'; # VERSION
 
-# BUILD
 # METHODS
 
 sub new {
-  my ($class, $data) = @_;
+  my ($class, $name) = @_;
 
-  unless (($data || '') =~ /[a-zA-Z]\w*/) {
-    croak('Class name required');
-  }
+  die "Invalid argument" unless ($name || '') =~ /^[a-zA-Z]\w*/;
 
   require Data::Object::Space;
 
-  return Data::Object::Space->new(join '::', __PACKAGE__, $data);
+  return Data::Object::Space->new(join '::', __PACKAGE__, $name);
 }
 
 sub any {

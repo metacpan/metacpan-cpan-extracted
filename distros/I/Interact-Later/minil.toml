@@ -1,0 +1,11 @@
+authority = "cpan:SMONFF"
+badges = ['metacpan']
+homepage = 'https://gitlab.com/smonff/interact-later'
+# See https://github.com/tokuhirom/Minilla/pull/249
+#bugtracker = 'https://gitlab.com/smonff/interact-later/issues'
+license = "artistic_2"
+name = "Interact-Later"
+# badges = ["travis-ci.com"]
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+

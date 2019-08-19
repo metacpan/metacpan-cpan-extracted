@@ -1,6 +1,6 @@
 /* Fast GF(2^m) library routines */
 /*
-  Copyright (c) by Declan Malone 2009.
+  Copyright (c) by Declan Malone 2009-2019.
   Licensed under the terms of the GNU General Public License and
   the GNU Lesser (Library) General Public License.
 */
@@ -92,6 +92,17 @@ gf2_u32 gf2_mul (int width, gf2_u32 a, gf2_u32 b);
 gf2_u32 gf2_inv (int width, gf2_u32 a);
 gf2_u32 gf2_div (int width, gf2_u32 a, gf2_u32 b);
 gf2_u32 gf2_info(int bits);
+
+/* the same, but bringing out "width" */
+gf2_u32 gf2_mul8  (gf2_u32 a, gf2_u32 b);
+gf2_u32 gf2_inv8  (gf2_u32 a);
+gf2_u32 gf2_div8  (gf2_u32 a, gf2_u32 b);
+gf2_u32 gf2_mul16 (gf2_u32 a, gf2_u32 b);
+gf2_u32 gf2_inv16 (gf2_u32 a);
+gf2_u32 gf2_div16 (gf2_u32 a, gf2_u32 b);
+gf2_u32 gf2_mul32 (gf2_u32 a, gf2_u32 b);
+gf2_u32 gf2_inv32 (gf2_u32 a);
+gf2_u32 gf2_div32 (gf2_u32 a, gf2_u32 b);
 
 /* matrix */
 typedef struct {

@@ -33,7 +33,7 @@ for ($i=0; $i<@refs;++$i) {
 }
 
 use Types::Core qw(blessed);
-
+use P;
 my $a={};
 
 ok(! blessed $a, "not bless test");
@@ -45,10 +45,10 @@ ok(blessed $a, "blessed a test");
 my $h={one=>1, two=>2, three=>3};
 
 my $v;
-ok($v=(EhV ($h, two)), "EhV test existing->true?");
+ok($v=EhV($h, two), "EhV test h->{two}, existing?: true");
 ok($v==2, "EhV test, returns value of two?");
 
-ok(! (EhV $h, four), "EhV test not exist(false)");
+ok(! EhV($h, four), "EhV test not exist(false)");
 
 ok(! exists $h->{four}, "EhV testing last false didn't autovivify");
 

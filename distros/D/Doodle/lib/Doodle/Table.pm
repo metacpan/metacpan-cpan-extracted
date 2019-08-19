@@ -10,7 +10,7 @@ use Doodle::Column;
 use Doodle::Index;
 use Doodle::Relation;
 
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 has name => (
   is => 'ro',
@@ -58,6 +58,21 @@ has data => (
   lzy => 1
 );
 
+has engine => (
+  is => 'rw',
+  isa => 'Str'
+);
+
+has charset => (
+  is => 'rw',
+  isa => 'Str'
+);
+
+has collation => (
+  is => 'rw',
+  isa => 'Str'
+);
+
 # BUILD
 
 fun new_data($self) {
@@ -98,7 +113,7 @@ method index(ArrayRef :$columns, Any %args) {
   return $index;
 }
 
-method relation(Str $column, Str $ftable, Str $fcolumn, Any %args) {
+method relation(Str $column, Str $ftable, Str $fcolumn = 'id', Any %args) {
   $args{table} = $self;
 
   $args{column} = $column;
@@ -112,31 +127,18 @@ method relation(Str $column, Str $ftable, Str $fcolumn, Any %args) {
   return $relation;
 }
 
-method create(Maybe[CodeRef] $callback) {
-  $callback->($self) if $callback;
-
-  my $schema = $self->schema;
+method create(Any %args) {
+  $args{schema} = $self->schema if $self->schema;
 
   my $command = $self->doodle->table_create(
+    %args,
     table => $self,
-    schema => $schema,
     columns => $self->columns,
     indices => $self->indices,
     relations => $self->relations
   );
 
   return $command;
-}
-
-method update(Maybe[CodeRef] $callback) {
-  my $commands = $self->doodle->commands;
-  my $position = $commands->count;
-
-  $callback->($self);
-
-  return $commands if !$commands->count;
-
-  return $commands->slice($position..$commands->count->decr);
 }
 
 method delete(Any %args) {
@@ -191,7 +193,8 @@ Doodle Table Class
 
 =head1 DESCRIPTION
 
-Database table representation.
+Database table representation. This class consumes the
+L<Doodle::Table::Helpers> role.
 
 =cut
 
@@ -292,22 +295,6 @@ Registers a table rename and returns the Command object.
 =item rename example
 
   my $rename = $self->rename;
-
-=back
-
-=cut
-
-=head2 update
-
-  update(Any %args) : Command
-
-Registers a table update and returns the Command object.
-
-=over 4
-
-=item update example
-
-  my $update = $self->update;
 
 =back
 

@@ -3,11 +3,9 @@ package Data::Object::Type::Array;
 use strict;
 use warnings;
 
-use Data::Object::Export;
-
 use parent 'Data::Object::Type';
 
-our $VERSION = '0.98'; # VERSION
+our $VERSION = '0.99'; # VERSION
 
 # BUILD
 # METHODS
@@ -21,7 +19,10 @@ sub aliases {
 }
 
 sub coercions {
-  return ['ArrayRef', sub { do('array', $_[0]) }];
+  return ['ArrayRef', sub {
+      require Data::Object::Array;
+      Data::Object::Array->new($_[0]);
+  }];
 }
 
 sub validation {

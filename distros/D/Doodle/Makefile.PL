@@ -7,7 +7,7 @@ use 5.014;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Database DDL Builder",
+  "ABSTRACT" => "Database DDL Statement Builder",
   "AUTHOR" => "Al Newkirk <awncorp\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -22,7 +22,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Data::Object" => "0.98"
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.03",
   "test" => {
     "TESTS" => "t/*.t t/can/*.t t/use/*.t"
   }

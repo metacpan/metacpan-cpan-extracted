@@ -5,7 +5,7 @@
 #-------------------------------------------------------------------------------
 # podDocumentation
 package Dita::GB::Standard;
-our $VERSION = 20190722;
+our $VERSION = 20190819;
 require v5.16;
 use warnings FATAL => qw(all);
 use strict;
@@ -60,12 +60,16 @@ sub hexAsWords($)                                                               
 sub gbStandardFileName($$%)                                                     #E Return the L<GBStandard> file name given the content and extension of a proposed file.
  {my ($content, $extension, %options) = @_;                                     # Content, extension, various ingenious options designed by Micaela
   defined($content) or confess "Content must be defined";
-  $content   =~ s(\s*xtr[cf]="[^"]*") ()gs;                                     # Suppress xtrc|f attributes as we use them to hold file names and line numbers during a conversion but they are not germane to the final result and thus prevent files from being collapsed.
+  $content     =~ s(\s*xtr[cf]="[^"]*") ()gs;                                   # Suppress xtrc|f attributes as we use them to hold file names and line numbers during a conversion but they are not germane to the final result and thus prevent files from being collapsed.
+
   $extension && ($extension =~ m(\A\S{2,}\Z)s) or
     confess "Extension must be non blank and at least two characters long";
-  my $name   = nameFromStringRestrictedToTitle($content, %options);             # Human readable component ideally taken from the title tag
-  my $md5    = $options{md5} // fileMd5Sum($content);                           # Md5 sum either as supplied or computed
-  fpe($name.q(_).(&useWords ? hexAsWords($md5) : $md5), $extension)             # Add extension
+
+  my $name = $options{g} || nameFromStringRestrictedToTitle($content, %options);# Human readable component either as supplied in exceptional cases, or ideally, as taken from the title tag according to the prescription of the Monroe Title Method.
+  my $md5  = $options{md5} // fileMd5Sum($content);                             # Md5 sum either as supplied or computed
+
+  fpe($name.q(_).(&useWords ? hexAsWords($md5) : $md5),                         # Add extension
+      fe($extension)||$extension);                                              # fe returns blank given an extension name without a .
  }
 
 sub gbStandardCompanionFileName($)                                              #E Return the name of the L<Companion File> given a file whose name complies with the L<GBStandard>.
@@ -112,11 +116,12 @@ sub gbStandardCopyFile($%)                                                      
  {my ($source, %options) = @_;                                                  # Source file, options
   -e $source && !-d $source or                                                  # Check that the source file exists and is a file
     confess "Source file to normalize does not exist:\n$source";
+
   my $target = $options{target};                                                # The target folder (or a file in it) to which to copy this file
   my $correctName = gbStandardRename($source, %options);                        # Get the correct name for the file
 
   if ($target and $target ne fp($source))                                       # New target folder specified
-   {my $t = fpf($target, $correctName//$source);                                # Target of copy
+   {my $t = fpf($target, fne($correctName//$source));                           # Target of copy
     copyFile($source, $t);                                                      # Copy file
     my $cs = gbStandardCompanionFileName($source);                              # Companion file source
     my $ct = gbStandardCompanionFileName($t);                                   # Companion file target
@@ -129,7 +134,7 @@ sub gbStandardCopyFile($%)                                                      
     return $t;
    }
   elsif ($correctName)                                                          # Rename file to match L<GBStandard>
-   {my $t = fpf(fp($source), $correctName);                                     # Full file name
+   {my $t = fpf(fp($source), fne $correctName);                                     # Full file name
     rename $source, $t;                                                         # Rename file so it matches L<GBStandard>
     return $t;
    }
@@ -147,11 +152,14 @@ sub gbStandardDelete($)                                                         
 sub gbBinaryStandardFileName($$)                                                #E Return the L<GBStandard> file name given the content and extension of a proposed file.
  {my ($content, $extension) = @_;                                               # Content, extension
   defined($content) or confess "Content must be defined";
-  $extension && ($extension =~ m(\A\S{2,}\Z)s) or
-    confess "Extension must be non blank and at least two characters long";
-  my $name   = lc $extension;                                                   # Human readable component was taken from the file content but this produced long garbled names as there was no useful ascii content at the start of most image files.  Substituted the extension lower case instead to separate the images out in directory listings.
+
+  my $e = fe($extension) || $extension;                                         # File extension - if given an extension without a leading . fe will return blank
+  $e =~ m(\A\S{2,}\Z)s or
+    confess "Extension must be non blank and at least two characters long: ".
+    dump([$e, $extension]);
+  my $name   = lc $e;                                                           # Human readable component was taken from the file content but this produced long garbled names as there was no useful ascii content at the start of most image files.  Substituted the extension lower case instead to separate the images out in directory listings.
   my $md5    = fileMd5Sum($content);                                            # Md5 sum
-  fpe($name.q(_).(&useWords ? hexAsWords($md5) : $md5), $extension)             # Add extension
+  fpe($name.q(_).(&useWords ? hexAsWords($md5) : $md5), $e)                     # Add extension
  }
 
 sub gbBinaryStandardCompanionFileName($)                                        #E Return the name of the companion file given a file whose name complies with the L<GBStandard>.
@@ -187,8 +195,7 @@ sub gbBinaryStandardCreateFile($$$;$)                                           
 sub gbBinaryStandardRename($)                                                   #E Check whether a file needs to be renamed to match the L<GBStandard>. Return the correct name for the file or  B<undef> if the name is already correct.
  {my ($file)   = @_;                                                            # File to check
   my $content  = readBinaryFile($file);                                         # Content of proposed file
-  my $ext      = fe($file);                                                     # Extension of proposed file
-  my $proposed = gbBinaryStandardFileName($content, $ext);                      # Proposed name according to the L<GBStandard>
+  my $proposed = gbBinaryStandardFileName($content, $file);                     # Proposed name according to the L<GBStandard>
   my $base     = fne($file);                                                    # The name of the current file minus the path
   return undef if $base eq $proposed;                                           # Success - the names match
   $proposed                                                                     # Fail - the name should be this
@@ -199,9 +206,8 @@ sub gbBinaryStandardCopyFile($;$)                                               
   -e $source && !-d $source or                                                  # Check that the source file exists and is a file
     confess "Source file to normalize does not exist:\n$source";
   my $correctName = gbBinaryStandardRename($source);                            # Get the correct name for the file
-
   if ($target and $target ne fp($source))                                       # New target folder specified
-   {my $t = fpf($target, $correctName//$source);                                # Target of copy
+   {my $t = fpf($target, fne($correctName // $source));                         # Target of copy
     copyBinaryFile($source, $t);                                                # Copy file
     my $cs = gbBinaryStandardCompanionFileName($source);                        # Companion file source
     my $ct = gbBinaryStandardCompanionFileName($t);                             # Companion file target
@@ -215,7 +221,7 @@ sub gbBinaryStandardCopyFile($;$)                                               
     return $t;
    }
   elsif ($correctName)                                                          # Rename file to match L<GBStandard>
-   {my $t = fpf(fp($source), $correctName);                                     # Full file name
+   {my $t = fpf(fp($source), fne $correctName);                                 # Full file name
     rename $source, $t;                                                         # Rename file so it matches L<GBStandard>
     return $t;
    }
@@ -669,6 +675,15 @@ Files are automatically flattened by the L<GB Standard|http://metacpan.org/pod/D
 content have the same name and so can safely share one global folder without
 fear of name collisions or having multiple names for identical content.
 
+=head3 Mixed Multiple Conversions
+
+When converting documents to L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> it is a standard practice to perform the
+conversion in batches by source document type, perhaps B<html> files first, then
+B<docbook> files, then <AuthorIT> files. Thus leaves the problem of merging the
+results into one corpus after each individual conversion.  The L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard>
+resolves this problem by guaranteeing the uniqueness of the converted
+files allowing them to be merged into one results folder without collisions.
+
 =head3 No Relative Paths in References
 
 If all the topic files share one global folder there is no need for complicated
@@ -858,7 +873,7 @@ as a universal standard.
 The Gearhart-Brenan Dita Topic Naming Standard.
 
 
-Version 20190708.
+Version 20190722.
 
 
 The following sections describe the methods in each functional area of this
@@ -1582,8 +1597,6 @@ under the same terms as Perl itself.
 
 =cut
 
-
-
 # Tests and documentation
 
 sub test
@@ -1601,7 +1614,7 @@ test unless caller;
 
 1;
 # podDocumentation
-__DATA__
+#__DATA__
 use Test::More;
 use warnings FATAL=>qw(all);
 use strict;
@@ -1650,7 +1663,7 @@ if (1) {                                                                        
 END
    }
   else
-   {ok gbStandardFileName(<<END, q(dita)) eq q(c_abc_8551cffdb92932637d952e04447783c8.dita);
+   {ok gbStandardFileName(<<END, q(c_abc.dita)) eq q(c_abc_8551cffdb92932637d952e04447783c8.dita);
 <concept xtrf="A">
   <title>abc 𝝰𝝱𝝲</title>
   <conbody/>
@@ -1664,8 +1677,8 @@ ok gbStandardCompanionFileName(q(a/b.c)) eq q(a/b);                             
 if (1) {                                                                        #TgbStandardCreateFile #TgbStandardCopyFile #TgbStandardDelete #TgbStandardRename
   my $s = q(abc 𝝰𝝱𝝲);
   my $S = q(Hello World);
-  my $d = q(out/);
-  my $D = q(out2/);
+  my $d = temporaryFolder;
+  my $D = temporaryFolder;
   clearFolder($_, 10) for $d, $D;
 
   my $f = gbStandardCreateFile($d, $s, q(xml), companionContent=>$S);           # Create file
@@ -1707,8 +1720,8 @@ ok gbBinaryStandardCompanionFileName(q(a/b.c)) eq q(a/b);                       
 if (1) {                                                                        #TgbBinaryStandardCreateFile #TgbBinaryStandardCopyFile #TgbBinaryStandardDelete #TgbBinaryStandardRename #TgbStandardCompanionFileContent  #TgbBinaryStandardCompanionFileContent
   my $s = qq(\0abc\1);
   my $S = q(Hello World);
-  my $d = q(out/);
-  my $D = q(out2/);
+  my $d = temporaryFolder;
+  my $D = temporaryFolder;
   clearFolder($_, 10) for $d, $D;
 
   my $f = gbBinaryStandardCreateFile($d, $s, q(xml), $S);                       # Create file
@@ -1739,5 +1752,8 @@ if (1) {                                                                        
 
   clearFolder($_, 10) for $d, $D;
  }
+
+ok &gbStandardFileName(qw(aaa dita g bbb)) eq                                   # Override the G component in an awkward manner designed to discourage such usage
+   q(bbb_47bce5c74f589f4867dbd57e9ca9f808.dita);
 
 done_testing;

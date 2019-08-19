@@ -42,6 +42,11 @@
       },
       "runtime" : {
          "requires" : {
+            "File::Basename" : "0",
+            "Getopt::Long::Descriptive" : "0",
+            "List::Util" : "0",
+            "Module::Metadata" : "0",
+            "Term::ANSIColor" : "0",
             "perl" : "5.008001"
          }
       },
@@ -54,7 +59,7 @@
    "provides" : {
       "App::scanrdeps" : {
          "file" : "lib/App/scanrdeps.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -68,6 +73,6 @@
          "web" : "https://github.com/pavelsr/perl_scanrdeps"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_static_install" : 1
 }

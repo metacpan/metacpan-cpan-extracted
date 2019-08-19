@@ -14,7 +14,8 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Proch-N50",
   "EXE_FILES" => [
-    "bin/n50"
+    "bin/n50",
+    "bin/n50.bak"
   ],
   "LICENSE" => "mit",
   "MIN_PERL_VERSION" => "5.018",
@@ -26,7 +27,7 @@ my %WriteMakefileArgs = (
     "Pod::Usage" => "1.64",
     "Text::ASCIITable" => 0
   },
-  "VERSION" => "0.70",
+  "VERSION" => "0.80",
   "test" => {
     "TESTS" => "t/*.t"
   }

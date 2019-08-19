@@ -63,6 +63,7 @@
             "XML::Entities" : "0",
             "XML::Parser::Lite" : "0",
             "parent" : "0",
+            "perl" : "v5.10.1",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -76,39 +77,38 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Test::More" : "0",
-            "perl" : "5.006"
+            "Test::More" : "0"
          }
       }
    },
    "provides" : {
       "App::HomeBank2Ledger" : {
          "file" : "lib/App/HomeBank2Ledger.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "App::HomeBank2Ledger::Formatter" : {
          "file" : "lib/App/HomeBank2Ledger/Formatter.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "App::HomeBank2Ledger::Formatter::Beancount" : {
          "file" : "lib/App/HomeBank2Ledger/Formatter/Beancount.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "App::HomeBank2Ledger::Formatter::Ledger" : {
          "file" : "lib/App/HomeBank2Ledger/Formatter/Ledger.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "App::HomeBank2Ledger::Ledger" : {
          "file" : "lib/App/HomeBank2Ledger/Ledger.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "App::HomeBank2Ledger::Util" : {
          "file" : "lib/App/HomeBank2Ledger/Util.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "File::HomeBank" : {
          "file" : "lib/File/HomeBank.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -123,7 +123,7 @@
          "web" : "https://github.com/chazmcgarvey/homebank2ledger"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_authority" : "cpan:CCM",
    "x_generated_by_perl" : "v5.28.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"

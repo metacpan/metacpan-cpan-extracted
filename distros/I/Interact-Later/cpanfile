@@ -1,0 +1,7 @@
+requires 'Cpanel::JSON::XS', '4.12';
+requires 'Data::Printer', '';
+requires 'Data::UUID', '1.224';
+requires 'File::Find::Rule', '';
+requires 'Mojolicious', '8.23';
+requires 'Moose', '2.2011';
+requires 'Path::Class', '0.37';

@@ -7,7 +7,7 @@ use Data::Object::Role;
 
 use Carp ();
 
-our $VERSION = '0.98'; # VERSION
+our $VERSION = '0.99'; # VERSION
 
 # BUILD
 

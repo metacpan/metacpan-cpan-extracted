@@ -6,7 +6,7 @@ use Data::Object 'Class', 'Doodle::Library';
 
 extends 'Doodle::Grammar';
 
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 has name => (
   def => 'mssql',
@@ -216,7 +216,7 @@ method type_uuid(Column $col) {
 }
 
 method create_table(Command $cmd) {
-  my $s = 'create {temporary} table {if_exists} {table} ({columns}{, constraints})';
+  my $s = 'create {temporary} table {if_not_exists} {table} ({columns}{, constraints})';
 
   return $self->render($s, $cmd);
 }
@@ -271,6 +271,18 @@ method create_relation(Command $cmd) {
 
 method delete_relation(Command $cmd) {
   my $s ='alter table {table} drop constraint {relation_name}';
+
+  return $self->render($s, $cmd);
+}
+
+method create_schema(Command $cmd) {
+  my $s ='create database {schema_name}';
+
+  return $self->render($s, $cmd);
+}
+
+method delete_schema(Command $cmd) {
+  my $s ='drop database {schema_name}';
 
   return $self->render($s, $cmd);
 }
@@ -392,8 +404,33 @@ Returns the SQL statement for the create relation command.
 
   $self->create_relation($command);
 
-  # alter table [users] add constraint fkey_users_profile_id_profiles_id
-  # foreign key (profile_id) references profiles (id)
+  # alter table [users] add constraint [fkey_users_profile_id_profiles_id]
+  # foreign key ([profile_id]) references profiles ([id])
+
+=back
+
+=cut
+
+=head2 create_schema
+
+  create_schema(Command $command) : Str
+
+Returns the SQL statement for the create schema command.
+
+=over 4
+
+=item create_schema example
+
+  use Doodle;
+
+  my $d = Doodle->new;
+  my $s = $d->schema('app');
+
+  my $command = $s->create;
+
+  $self->create_schema($command);
+
+  # create database [app]
 
 =back
 
@@ -498,6 +535,31 @@ Returns the SQL statement for the delete relation command.
   $self->delete_relation($command);
 
   # alter table [users] drop constraint [fkey_users_profile_id_profiles_id]
+
+=back
+
+=cut
+
+=head2 delete_schema
+
+  delete_schema(Command $command) : Str
+
+Returns the SQL statement for the create schema command.
+
+=over 4
+
+=item delete_schema example
+
+  use Doodle;
+
+  my $d = Doodle->new;
+  my $s = $d->schema('app');
+
+  my $command = $s->create;
+
+  $self->delete_schema($command);
+
+  # drop database [app]
 
 =back
 

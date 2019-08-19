@@ -4,7 +4,7 @@ package Proch::N50;
 use 5.014;
 use warnings;
 
-$Proch::N50::VERSION = '0.70';
+$Proch::N50::VERSION = '0.80';
 
 use JSON::PP;
 use FASTX::Reader;
@@ -206,7 +206,7 @@ Proch::N50 - a small module to calculate N50 (total size, and total number of se
 
 =head1 VERSION
 
-version 0.70
+version 0.80
 
 =head1 SYNOPSIS
 
@@ -347,7 +347,7 @@ Returns N50, min and max lengths.
 
 =back
 
-=head2 Implementation (n50)
+=head2 Implementation (n50.pl)
 
 =over 4
 

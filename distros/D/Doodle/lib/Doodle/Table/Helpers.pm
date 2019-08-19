@@ -4,9 +4,8 @@ use 5.014;
 
 use Data::Object 'Role', 'Doodle::Library';
 
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
-# BUILD
 # METHODS
 
 method binary(Str $name, Any %args) {
@@ -233,6 +232,18 @@ method temporary() {
   return $self;
 }
 
+method if_exists() {
+  $self->data->{if_exists} = 1;
+
+  return $self;
+}
+
+method if_not_exists() {
+  $self->data->{if_not_exists} = 1;
+
+  return $self;
+}
+
 method text(Str $name, Any %args) {
   my $column = $self->column($name);
 
@@ -305,6 +316,16 @@ method timestamps_tz() {
   return [$created_at, $updated_at, $deleted_at];
 }
 
+method no_morphs(Str $name) {
+  my $type = "${name}_type";
+  my $fkey = "${name}_fkey";
+
+  my $type_column = $self->string($type)->delete;
+  my $fkey_column = $self->integer($fkey)->delete;
+
+  return [$type_column, $fkey_column];
+}
+
 method no_timestamps() {
   my $created_at = $self->column('created_at')->delete;
   my $updated_at = $self->column('updated_at')->delete;
@@ -333,7 +354,7 @@ Doodle::Table::Helpers
 
 =head1 ABSTRACT
 
-Nam suscipit iaculis magna vitae faucibus.
+Doodle Table Helpers
 
 =cut
 
@@ -349,7 +370,7 @@ Nam suscipit iaculis magna vitae faucibus.
 
 =head1 DESCRIPTION
 
-Doodle Table Helpers
+Helpers for configuring Table classes.
 
 =cut
 
@@ -516,6 +537,40 @@ Registers a float column and returns the Command object set.
 =item float example
 
   my $float = $self->float('amount');
+
+=back
+
+=cut
+
+=head2 if_exists
+
+  if_exists() : Table
+
+Used with the C<delete> method to denote that the table should be deleted only
+if it already exists.
+
+=over 4
+
+=item if_exists example
+
+  $self->if_exists;
+
+=back
+
+=cut
+
+=head2 if_not_exists
+
+  if_not_exists() : Table
+
+Used with the C<create> method to denote that the table should be created only
+if it doesn't already exist.
+
+=over 4
+
+=item if_not_exists example
+
+  $self->if_not_exists;
 
 =back
 
@@ -756,6 +811,23 @@ Registers columns neccessary for polymorphism and returns the Column object set.
 =item morphs example
 
   my $morphs = $self->morphs('parent');
+
+=back
+
+=cut
+
+=head2 no_morphs
+
+  no_morphs(Str $name) : [Command]
+
+Registers a drop for C<{name}_fkey> and C<{name}_type> polymorphic columns and
+returns the Command object set.
+
+=over 4
+
+=item no_morphs example
+
+  my $no_morphs = $self->no_morphs('profile');
 
 =back
 

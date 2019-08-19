@@ -17,7 +17,7 @@ use constant {
               LONG_MIN  => Math::GMPq::_long_min(),
              };
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 our ($ROUND, $PREC);
 
 BEGIN {
@@ -327,8 +327,9 @@ use overload
         denominator => \&denominator,
         nude        => \&nude,
 
-        digits    => \&digits,
-        sumdigits => \&sumdigits,
+        digits     => \&digits,
+        digits2num => \&digits2num,
+        sumdigits  => \&sumdigits,
 
         bsearch    => \&bsearch,
         bsearch_le => \&bsearch_le,
@@ -4718,39 +4719,36 @@ sub __ilog__ {
     my ($x, $y) = @_;
 
     # ilog(x, y <= 1) = NaN
-    Math::GMPz::Rmpz_cmp_ui($y, 1) <= 0 and goto &_nan;
+    $y <= 1 and return;
 
     # ilog(x <= 0, y) = NaN
-    Math::GMPz::Rmpz_sgn($x) <= 0 and goto &_nan;
+    Math::GMPz::Rmpz_sgn($x) <= 0 and return;
 
     # Return faster for y <= 62
-    if (Math::GMPz::Rmpz_cmp_ui($y, 62) <= 0) {
+    if ($y <= 62) {
 
-        $y = Math::GMPz::Rmpz_get_ui($y);
+        $y = Math::GMPz::Rmpz_get_ui($y) if ref($y);
 
-        my $t = Math::GMPz::Rmpz_init();
-        my $e = (Math::GMPz::Rmpz_sizeinbase($x, $y) || goto &_nan) - 1;
+        my $e = (Math::GMPz::Rmpz_sizeinbase($x, $y) || return) - 1;
 
         if ($e > 0) {
-
-            $y == 2
-              ? Math::GMPz::Rmpz_setbit($t, $e)
-              : Math::GMPz::Rmpz_ui_pow_ui($t, $y, $e);
-
+            state $t = Math::GMPz::Rmpz_init_nobless();
+            Math::GMPz::Rmpz_ui_pow_ui($t, $y, $e);
             Math::GMPz::Rmpz_cmp($t, $x) > 0 and --$e;
         }
 
-        Math::GMPz::Rmpz_set_ui($t, $e);
-        return $t;
+        return $e;
     }
 
+    # Make sure `y` is a Math::GMPz object
+    $y = Math::GMPz::Rmpz_init_set_ui($y) if !ref($y);
+
     my $e = 0;
-    my $t = Math::GMPz::Rmpz_init();
 
+    state $t       = Math::GMPz::Rmpz_init_nobless();
     state $round_z = Math::MPFR::MPFR_RNDZ();
-
-    state $logx = Math::MPFR::Rmpfr_init2_nobless(64);
-    state $logy = Math::MPFR::Rmpfr_init2_nobless(64);
+    state $logx    = Math::MPFR::Rmpfr_init2_nobless(64);
+    state $logy    = Math::MPFR::Rmpfr_init2_nobless(64);
 
     Math::MPFR::Rmpfr_set_z($logx, $x, $round_z);
     Math::MPFR::Rmpfr_set_z($logy, $y, $round_z);
@@ -4772,36 +4770,31 @@ sub __ilog__ {
         ++$e;
     }
 
-    Math::GMPz::Rmpz_set_ui($t, $e);
-    $t;
+    return $e;
 }
 
 sub ilog2 ($) {
     my ($x) = @_;
 
-    state $two = Math::GMPz::Rmpz_init_set_ui(2);
-
     $x = $$x if (ref($x) eq __PACKAGE__);
 
     if (ref($x) ne 'Math::GMPz') {
         $x = _star2mpz($x) // goto &nan;
     }
 
-    bless \__ilog__($x, $two);
+    bless \Math::GMPz::Rmpz_init_set_ui(__ilog__($x, 2) // goto &nan);
 }
 
 sub ilog10 ($) {
     my ($x) = @_;
 
-    state $ten = Math::GMPz::Rmpz_init_set_ui(10);
-
     $x = $$x if (ref($x) eq __PACKAGE__);
 
     if (ref($x) ne 'Math::GMPz') {
         $x = _star2mpz($x) // goto &nan;
     }
 
-    bless \__ilog__($x, $ten);
+    bless \Math::GMPz::Rmpz_init_set_ui(__ilog__($x, 10) // goto &nan);
 }
 
 sub ilog ($;$) {
@@ -4817,17 +4810,21 @@ sub ilog ($;$) {
         $x = _star2mpz($x) // goto &nan;
     }
 
-    $y = $$y if (ref($y) eq __PACKAGE__);
-
-    if (ref($y) ne 'Math::GMPz') {
-        $y = _star2mpz($y) // goto &nan;
+    if (!ref($y) and CORE::int($y) eq $y and $y > 1 and $y < ULONG_MAX) {
+        ## y is a native integer -- OK
+    }
+    else {
+        $y = $$y if (ref($y) eq __PACKAGE__);
+        if (ref($y) ne 'Math::GMPz') {
+            $y = _star2mpz($y) // goto &nan;
+        }
     }
 
-    bless \__ilog__($x, $y);
+    bless \Math::GMPz::Rmpz_init_set_ui(__ilog__($x, $y) // goto &nan);
 }
 
-sub length ($) {
-    my ($x) = @_;
+sub length ($;$) {
+    my ($x, $y) = @_;
 
     $x = $$x if (ref($x) eq __PACKAGE__);
 
@@ -4835,7 +4832,29 @@ sub length ($) {
         $x = _star2mpz($x) // return undef;
     }
 
-    CORE::length(Math::GMPz::Rmpz_get_str($x, 10) =~ s/^-//r);
+    my $neg = ((Math::GMPz::Rmpz_sgn($x) || return 1) < 0) ? 1 : 0;
+
+    if (defined($y)) {
+        if (!ref($y) and CORE::int($y) eq $y and $y > 1 and $y < ULONG_MAX) {
+            ## y is a native integer -- OK
+        }
+        else {
+            $y = $$y if (ref($y) eq __PACKAGE__);
+            if (ref($y) ne 'Math::GMPz') {
+                $y = _star2mpz($y) // return undef;
+            }
+        }
+    }
+    else {
+        $y = 10;
+    }
+
+    if ($neg) {
+        $x = Math::GMPz::Rmpz_init_set($x);
+        Math::GMPz::Rmpz_abs($x, $x);
+    }
+
+    1 + (__ilog__($x, $y) // return 0);
 }
 
 #
@@ -7688,7 +7707,7 @@ sub bernoulli_polynomial ($$) {
         push @terms, __mul__(__pow__($x, $k), $q);
     }
 
-    bless \_binsplit(\@terms, \&__add__);
+    bless \_binsplit([reverse @terms], \&__add__);
 }
 
 #
@@ -10476,65 +10495,80 @@ sub digits ($;$) {
 
     $k //= 10;
 
-    if (!ref($k) and CORE::int($k) eq $k and $k > 1 and $k < ULONG_MAX) {
-
-        # Return faster for k=2..62
-        if ($k <= 62) {
-            return map { $k <= 36 ? $DIGITS_36{$_} : $DIGITS_62{$_} }
-              split(//, scalar reverse scalar(Math::GMPz::Rmpz_get_str($n, $k) =~ s/^-//r));
-        }
-
-        $n = Math::GMPz::Rmpz_init_set($n);
-
-        my $sgn = Math::GMPz::Rmpz_sgn($n);
-
-        if ($sgn == 0) {
-            goto &zero;
-        }
-        elsif ($sgn < 0) {
-            Math::GMPz::Rmpz_abs($n, $n);
-        }
-
-        my @digits;
-        while (Math::GMPz::Rmpz_sgn($n) > 0) {
-            my $m = Math::GMPz::Rmpz_init();
-            Math::GMPz::Rmpz_divmod_ui($n, $m, $n, $k);
-            push @digits, bless \$m;
-        }
-
-        return @digits;
-    }
-
-    $k = $$k if (ref($k) eq __PACKAGE__);
-
-    if (ref($k) ne 'Math::GMPz') {
-        $k = _star2mpz($k) // return;
-    }
-
-    # Not defined for k <= 1
-    if (Math::GMPz::Rmpz_cmp_ui($k, 1) <= 0) {
-        return;
-    }
-
-    # Return faster for k=2..62
-    if (Math::GMPz::Rmpz_cmp_ui($k, 62) <= 0) {
-        $k = Math::GMPz::Rmpz_get_ui($k);
-        return map { $k <= 36 ? $DIGITS_36{$_} : $DIGITS_62{$_} }
-          split(//, scalar reverse scalar(Math::GMPz::Rmpz_get_str($n, $k) =~ s/^-//r));
-    }
-
-    $n = Math::GMPz::Rmpz_init_set($n);
-
     my $sgn = Math::GMPz::Rmpz_sgn($n);
 
-    if ($sgn == 0) {
-        goto &zero;
+    if ($sgn == 0) {    # n = 0
+        return (0);
     }
-    elsif ($sgn < 0) {
+    elsif ($sgn < 0) {    # n < 0; make it absolute
+        $n = Math::GMPz::Rmpz_init_set($n);
         Math::GMPz::Rmpz_abs($n, $n);
     }
 
+    if (!ref($k) and CORE::int($k) eq $k and $k > 1 and $k < ULONG_MAX) {
+        return if ($k <= 1);    # not defined for k <= 1
+    }
+    else {
+        $k = $$k if (ref($k) eq __PACKAGE__);
+
+        if (ref($k) ne 'Math::GMPz') {
+            $k = _star2mpz($k) // return;
+        }
+
+        return if (Math::GMPz::Rmpz_cmp_ui($k, 1) <= 0);    # not defined for k <= 1
+    }
+
+    # Return faster for k=2..62
+    if (ref($k) ? (Math::GMPz::Rmpz_cmp_ui($k, 62) <= 0) : ($k <= 62)) {
+        $k = Math::GMPz::Rmpz_get_ui($k) if ref($k);
+        return map { $k <= 36 ? $DIGITS_36{$_} : $DIGITS_62{$_} }
+          split(//, scalar reverse scalar(Math::GMPz::Rmpz_get_str($n, $k)));
+    }
+
+    # Subquadratic algorithm from "Modern Computer Arithmetic" by Richard P. Brent and Paul Zimmermann
+    if (!ref($k) || Math::GMPz::Rmpz_fits_ulong_p($k)) {
+
+        # Find r such that B^(2r - 2) <= A < B^(2r)
+        my $r = (__ilog__($n, $k) >> 1) + 1;
+
+        my $A = $n;
+        my $B = ref($k) ? Math::GMPz::Rmpz_get_ui($k) : $k;
+
+        state $Q = Math::GMPz::Rmpz_init_nobless();
+        state $R = Math::GMPz::Rmpz_init_nobless();
+
+        return sub {
+            my ($A, $r) = @_;
+
+            if (Math::GMPz::Rmpz_cmp_ui($A, $B) < 0) {
+                return Math::GMPz::Rmpz_get_ui($A);
+            }
+
+            my $t = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_ui_pow_ui($t, $B, 2 * ($r - 1));    # can this be optimized away?
+
+            if (Math::GMPz::Rmpz_cmp($t, $A) > 0) {
+                --$r;
+            }
+
+            Math::GMPz::Rmpz_ui_pow_ui($t, $B, $r);
+            Math::GMPz::Rmpz_divmod($Q, $R, $A, $t);
+
+            my $w = ($r + 1) >> 1;
+            Math::GMPz::Rmpz_set($t, $Q);
+
+            my @right = __SUB__->($R, $w);
+            my @left  = __SUB__->($t, $w);
+
+            (@right, (0) x ($r - scalar(@right)), @left);
+          }
+          ->($A, $r);
+    }
+
+    # This algorithm will be used only when base > ULONG_MAX
     my @digits;
+
+    $n = Math::GMPz::Rmpz_init_set($n);    # copy
 
     while (Math::GMPz::Rmpz_sgn($n) > 0) {
         my $m = Math::GMPz::Rmpz_init();
@@ -10556,81 +10590,76 @@ sub sumdigits ($;$) {
 
     $k //= 10;
 
-    if (!ref($k) and CORE::int($k) eq $k and $k > 1 and $k < ULONG_MAX) {
-
-        # Return faster for k=2
-        if ($k == 2) {
-
-            if (Math::GMPz::Rmpz_sgn($n) < 0) {
-                $n = Math::GMPz::Rmpz_init_set($n);
-                Math::GMPz::Rmpz_abs($n, $n);
-            }
-
-            return bless \Math::GMPz::Rmpz_init_set_ui(Math::GMPz::Rmpz_popcount($n));
-        }
-
-        # Return faster for k=3..62
-#<<<
-        if ($k <= 62) {
-            return bless \Math::GMPz::Rmpz_init_set_ui(
-                List::Util::sum(
-                    map { $k <= 36 ? $DIGITS_36{$_} : $DIGITS_62{$_} } split(//, Math::GMPz::Rmpz_get_str($n, $k) =~ s/^-//r)
-                )
-            );
-        }
-#>>>
-
-        $n = Math::GMPz::Rmpz_init_set($n);
-
-        my $sgn = Math::GMPz::Rmpz_sgn($n);
-
-        if ($sgn == 0) {
-            goto &zero;
-        }
-        elsif ($sgn < 0) {
-            Math::GMPz::Rmpz_abs($n, $n);
-        }
-
-        my $m   = Math::GMPz::Rmpz_init();
-        my $sum = Math::GMPz::Rmpz_init_set_ui(0);
-
-        while (Math::GMPz::Rmpz_sgn($n) > 0) {
-            Math::GMPz::Rmpz_add_ui($sum, $sum, Math::GMPz::Rmpz_divmod_ui($n, $m, $n, $k));
-        }
-
-        return bless \$sum;
-    }
-
-    $k = $$k if (ref($k) eq __PACKAGE__);
-
-    if (ref($k) ne 'Math::GMPz') {
-        $k = _star2mpz($k) // goto &nan;
-    }
-
-    $n = Math::GMPz::Rmpz_init_set($n);
-
-    # Not defined for k <= 1
-    if (Math::GMPz::Rmpz_cmp_ui($k, 1) <= 0) {
-        goto &nan;
-    }
-
     my $sgn = Math::GMPz::Rmpz_sgn($n);
 
-    if ($sgn == 0) {
+    if ($sgn == 0) {    # n = 0
         goto &zero;
     }
-    elsif ($sgn < 0) {
+    elsif ($sgn < 0) {    # n < 0; make it absolute
+        $n = Math::GMPz::Rmpz_init_set($n);
         Math::GMPz::Rmpz_abs($n, $n);
+    }
+
+    if (!ref($k) and CORE::int($k) eq $k and $k > 1 and $k < ULONG_MAX) {
+        goto &nan if ($k <= 1);    # not defined for k <= 1
+    }
+    else {
+        $k = $$k if (ref($k) eq __PACKAGE__);
+
+        if (ref($k) ne 'Math::GMPz') {
+            $k = _star2mpz($k) // goto &nan;
+        }
+
+        goto &nan if (Math::GMPz::Rmpz_cmp_ui($k, 1) <= 0);    # not defined for k <= 1
     }
 
     # Return faster for k=2..62
 #<<<
-    if (Math::GMPz::Rmpz_cmp_ui($k, 62) <= 0) {
-        $k = Math::GMPz::Rmpz_get_ui($k);
+    if (ref($k) ? (Math::GMPz::Rmpz_cmp_ui($k, 62) <= 0) : ($k <= 62)) {
+        $k = Math::GMPz::Rmpz_get_ui($k) if ref($k);
         return bless \Math::GMPz::Rmpz_init_set_ui(Math::GMPz::Rmpz_popcount($n)) if $k == 2;
         return bless \Math::GMPz::Rmpz_init_set_ui(List::Util::sum(map { $k <= 36 ? $DIGITS_36{$_} : $DIGITS_62{$_} } split(//, Math::GMPz::Rmpz_get_str($n, $k))));
     }
 #>>>
+
+    # Subquadratic algorithm from "Modern Computer Arithmetic" by Richard P. Brent and Paul Zimmermann
+    if (!ref($k) || Math::GMPz::Rmpz_fits_ulong_p($k)) {
+
+        # Find r such that B^(2r - 2) <= A < B^(2r)
+        my $r = (__ilog__($n, $k) >> 1) + 1;
+
+        my $A = $n;
+        my $B = ref($k) ? Math::GMPz::Rmpz_get_ui($k) : $k;
+
+        state $Q = Math::GMPz::Rmpz_init_nobless();
+        state $R = Math::GMPz::Rmpz_init_nobless();
+
+        my $total = sub {
+            my ($A, $r) = @_;
+
+            if (Math::GMPz::Rmpz_cmp_ui($A, $B) < 0) {
+                return Math::GMPz::Rmpz_get_ui($A);
+            }
+
+            my $w = ($r + 1) >> 1;
+            my $t = Math::GMPz::Rmpz_init();
+
+            Math::GMPz::Rmpz_ui_pow_ui($t, $B, $r);
+            Math::GMPz::Rmpz_divmod($Q, $R, $A, $t);
+            Math::GMPz::Rmpz_set($t, $Q);
+
+            __SUB__->($R, $w) + __SUB__->($t, $w);
+          }
+          ->($A, $r);
+
+        ($total < ULONG_MAX)
+          && return bless \Math::GMPz::Rmpz_init_set_ui($total);
+    }
+
+    # This algorithm will be used only for very large bases,
+    # base > ULONG_MAX, or when the sum of digits exceeds ULONG_MAX.
+    $k = Math::GMPz::Rmpz_init_set_ui($k) if !ref($k);
+    $n = Math::GMPz::Rmpz_init_set($n);                  # copy
 
     my $m   = Math::GMPz::Rmpz_init();
     my $sum = Math::GMPz::Rmpz_init_set_ui(0);
@@ -10641,6 +10670,63 @@ sub sumdigits ($;$) {
     }
 
     bless \$sum;
+}
+
+my %FROM_DIGITS_36;
+@FROM_DIGITS_36{0 .. 35} = (0 .. 9, 'a' .. 'z');
+
+my %FROM_DIGITS_62;
+@FROM_DIGITS_62{0 .. 61} = (0 .. 9, 'A' .. 'Z', 'a' .. 'z');
+
+sub digits2num {
+    my ($digits, $base) = @_;
+
+    ref($digits) eq 'ARRAY' or goto &nan;
+
+    $base //= 10;
+
+    if ($base <= 1) {
+        goto &nan;
+    }
+
+#<<<
+    if ($base <= 62) {
+        $base = ref($base) ? Math::GMPz::Rmpz_get_ui(_star2mpz($base) // goto &nan) : CORE::int($base);
+        return bless \Math::GMPz::Rmpz_init_set_str(scalar reverse(join('', map { ($base <= 36 ? $FROM_DIGITS_36{$_} : $FROM_DIGITS_62{$_}) // goto &nan } @$digits)), $base);
+    }
+#>>>
+
+    if (!ref($base) and CORE::int($base) eq $base and $base > 1 and $base < ULONG_MAX) {
+        $base = Math::GMPz::Rmpz_init_set_ui($base);
+    }
+    else {
+        $base = Math::GMPz::Rmpz_init_set(_star2mpz($base) // goto &nan);
+    }
+
+    my @L = map {
+        (!ref($_) and CORE::int($_) eq $_ and $_ >= 0 and $_ < ULONG_MAX)
+          ? Math::GMPz::Rmpz_init_set_ui($_)
+          : Math::GMPz::Rmpz_init_set(_star2mpz($_) // goto &nan);
+    } @$digits;
+
+    my $k = scalar(@L);
+
+    while ($k > 1) {    # Algorithm from "Modern Computer Arithmetic" by Richard P. Brent and Paul Zimmermann
+
+        my @T;
+        for (0 .. ($k >> 1) - 1) {
+            Math::GMPz::Rmpz_addmul($L[$_ << 1], $L[($_ << 1) + 1], $base);
+            push @T, $L[$_ << 1];
+        }
+
+        push(@T, $L[-1]) if ($k & 1);
+        @L = @T;
+        Math::GMPz::Rmpz_mul($base, $base, $base);
+        $k = ($k >> 1) + ($k & 1);
+    }
+
+    my $t = $L[0] // goto &zero;
+    bless \$t;
 }
 
 sub bsearch ($$;$) {

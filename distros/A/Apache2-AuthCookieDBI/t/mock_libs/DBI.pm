@@ -35,6 +35,10 @@ sub prepare_cached {
     my ($self, @args) = @_;
     return bless {}, 'DBI::Mock::sth';
 }
+sub quote_identifier {
+    my ($self, $arg) = @_;
+    return $arg;
+}
 
 package DBI::Mock::sth;
 

@@ -1,20 +1,25 @@
 Revision history for Perl extension XML::LibXML::Iterator.
 
-1.04 Fri Sep 28 2007
+1.05    2019-08-17
+    - Fix spelling errors - thanks to Debian.
+        - https://rt.cpan.org/Ticket/Display.html?id=125837 .
+    - Convert to http://dzil.org/ .
+
+1.04    2007-09-28
     - fixed RT#29262
     - minor documentation fixes
 
-1.03 Mon Aug 06 2007
+1.03    2007-08-06
     - fixed RT#28688 by using the provided patch
 
-1.02  Sat Jun 23 2007
+1.02    2007-06-23
     - fixed RT#6873
     - cleaned up the tests
     - more compliance with the traversal specification
 
-1.01  Sat Jun 23 2007
+1.01    2007-06-23
     - fixed RT related bugs (though with a huge delay, sorry)
 
-1.00  Fri Nov  8 2002
+1.00    2002-11-08
     - extracted the modules from the main XML::LibXML bundle.
 

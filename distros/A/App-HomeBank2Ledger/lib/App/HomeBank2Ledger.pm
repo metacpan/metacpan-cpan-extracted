@@ -2,7 +2,7 @@ package App::HomeBank2Ledger;
 # ABSTRACT: A tool to convert HomeBank files to Ledger format
 
 
-use warnings FATAL => 'all';    # temp fatal all
+use warnings;
 use strict;
 
 use App::HomeBank2Ledger::Formatter;
@@ -11,7 +11,7 @@ use File::HomeBank;
 use Getopt::Long 2.38 qw(GetOptionsFromArray);
 use Pod::Usage;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 my %ACCOUNT_TYPES = (   # map HomeBank account types to Ledger accounts
     bank        => 'Assets:Bank',
@@ -101,6 +101,7 @@ sub convert_homebank_to_ledger {
     my $transactions    = $homebank->sorted_transactions;
     my $accounts        = $homebank->accounts;
     my $categories      = $homebank->categories;
+    my @budget;
 
     # determine full Ledger account names
     for my $account (@$accounts) {
@@ -111,6 +112,15 @@ sub convert_homebank_to_ledger {
         my $type = $category->{flags}{income} ? 'Income' : 'Expenses';
         my $full_name = $homebank->full_category_name($category->{key});
         $category->{ledger_name} = "${type}:${full_name}";
+
+        if ($opts->{budget} && $category->{flags}{budget}) {
+            for my $month_num ($category->{flags}{custom} ? (1 .. 12) : 0) {
+                my $amount = $category->{budget_amounts}[$month_num] || 0;
+                next if !$amount && !$category->{flags}{forced};
+
+                $budget[$month_num]{$category->{ledger_name}} = $amount;
+            }
+        }
     }
 
     # handle renaming and marking excluded accounts
@@ -132,7 +142,8 @@ sub convert_homebank_to_ledger {
     if ($opts->{accounts}) {
         my @accounts = map { $_->{ledger_name} } grep { !$_->{excluded} } @$accounts, @$categories;
 
-        push @accounts, $default_account_income, $default_account_expenses;
+        push @accounts, $default_account_income   if !grep { $_ eq $default_account_income   } @accounts;
+        push @accounts, $default_account_expenses if !grep { $_ eq $default_account_expenses } @accounts;
         push @accounts, $OPENING_BALANCES_ACCOUNT if $has_initial_balance;
 
         $ledger->add_accounts(@accounts);
@@ -171,9 +182,10 @@ sub convert_homebank_to_ledger {
         $ledger->add_commodities($commodity) if $opts->{commodities};
     }
 
+    my $first_date;
     if ($has_initial_balance) {
         # transactions are sorted, so the first transaction is the oldest
-        my $first_date = $opts->{opening_date} || $transactions->[0]{date};
+        $first_date = $opts->{opening_date} || $transactions->[0]{date};
         if ($first_date !~ /^\d{4}-\d{2}-\d{2}$/) {
             die "Opening date must be in the form YYYY-MM-DD.\n";
         }
@@ -202,6 +214,44 @@ sub convert_homebank_to_ledger {
         });
     }
 
+    if ($opts->{budget}) {
+        my ($first_year) = $first_date =~ /^(\d{4})/;
+
+        for my $month_num (0 .. 12) {
+            next if !$budget[$month_num];
+
+            my $payee = 'Monthly';
+            if (0 < $month_num) {
+                my $year = $first_year;
+                $year += 1 if sprintf('%04d-%02d-99', $first_year, $month_num) lt $first_date;
+                my $date = sprintf('%04d-%02d', $year, $month_num);
+                $payee = "Every 12 months from ${date}";
+            }
+            # my @MONTHS = qw(ALL Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
+            # $payee = "Monthly this $MONTHS[$month_num]" if 0 < $month_num;
+
+            my @postings;
+
+            for my $account (sort keys %{$budget[$month_num]}) {
+                my $amount = $budget[$month_num]{$account};
+                push @postings, {
+                    account     => $account,
+                    amount      => -$amount,
+                    commodity   => $commodities{$homebank->base_currency},
+                }
+            }
+            push @postings, {
+                account => 'Assets',
+            };
+
+            $ledger->add_transactions({
+                date        => '~',
+                payee       => $payee,
+                postings    => \@postings,
+            });
+        }
+    }
+
     my %seen;
 
     TRANSACTION:
@@ -223,7 +273,7 @@ sub convert_homebank_to_ledger {
             amount      => $amount,
             commodity   => $commodities{$account->{currency}},
             payee       => $payee->{name},
-            memo        => $memo,
+            note        => $memo,
             status      => $status,
             tags        => $tags,
         };
@@ -252,7 +302,7 @@ sub convert_homebank_to_ledger {
                 amount      => $paired_transaction->{amount} || -$transaction->{amount},
                 commodity   => $commodities{$dst_account->{currency}},
                 payee       => $paired_payee->{name},
-                memo        => $paired_transaction->{wording} || '',
+                note        => $paired_transaction->{wording} || '',
                 status      => $STATUS_SYMBOLS{$paired_transaction->{status} || ''} || $status,
                 tags        => _split_tags($paired_transaction->{tags}),
             };
@@ -275,7 +325,7 @@ sub convert_homebank_to_ledger {
                     commodity   => $commodities{$account->{currency}},
                     amount      => $amount,
                     payee       => $payee->{name},
-                    memo        => $memo,
+                    note        => $memo,
                     status      => $status,
                     tags        => $tags,
                 };
@@ -293,7 +343,7 @@ sub convert_homebank_to_ledger {
                 commodity   => $commodities{$account->{currency}},
                 amount      => $amount,
                 payee       => $payee->{name},
-                memo        => $memo,
+                note        => $memo,
                 status      => $status,
                 tags        => $tags,
             };
@@ -347,6 +397,7 @@ sub parse_args {
         payees              => 1,
         tags                => 1,
         commodities         => 1,
+        budget              => 1,
         opening_date        => '',
         rename_accounts     => {},
         exclude_accounts    => [],
@@ -364,12 +415,14 @@ sub parse_args {
         'payees!'               => \$opts{payees},
         'tags!'                 => \$opts{tags},
         'commodities!'          => \$opts{commodities},
+        'budget!'               => \$opts{budget},
         'opening-date=s'        => \$opts{opening_date},
         'rename-account|r=s'    => \%{$opts{rename_accounts}},
         'exclude-account|x=s'   => \@{$opts{exclude_accounts}},
     ) or pod2usage(-exitval => 1, -verbose => 99, -sections => [qw(SYNOPSIS OPTIONS)]);
 
-    $opts{input} = shift @args if !$opts{input};
+    $opts{input}  = shift @args if !$opts{input};
+    $opts{budget} = 0 if lc($opts{format}) ne 'ledger';
 
     return \%opts;
 }
@@ -393,7 +446,7 @@ App::HomeBank2Ledger - A tool to convert HomeBank files to Ledger format
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

@@ -82,7 +82,7 @@ package Sidef::Deparse::Sidef {
             grep { $_ ne '' }
               map {
                     ref($_) eq 'HASH' ? $self->deparse_script($_)
-                  : ref($_) ? $self->deparse_expr({self => $_})
+                  : ref($_)           ? $self->deparse_expr({self => $_})
                   : $self->_dump_string($_)
               } @args
           )
@@ -182,7 +182,10 @@ package Sidef::Deparse::Sidef {
         }
 
         $table->{lc($str)} // do {
-            if ($type eq 'float') {
+            if ($str eq 'Inf' or $str eq 'Inf.neg' or $str eq 'NaN') {
+                $str;
+            }
+            elsif ($type eq 'float') {
                 "$str.float";
             }
             elsif (index($str, '/') != -1) {

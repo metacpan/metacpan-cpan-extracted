@@ -9,7 +9,7 @@ use Types::TypeTiny;
 
 use parent 'Data::Object::Base';
 
-our $VERSION = '0.98'; # VERSION
+our $VERSION = '0.99'; # VERSION
 
 # BUILD
 
@@ -36,7 +36,7 @@ sub parent {
 }
 
 sub library {
-  return shift->namespace->meta;
+  return 'Data::Object::Library'->meta;
 }
 
 sub namespace {

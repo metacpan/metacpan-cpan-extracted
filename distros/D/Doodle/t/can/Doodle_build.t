@@ -25,7 +25,7 @@ Execute a given callback for each generated SQL statement.
 
 =signature
 
-build(Grammar $g, CodeRef $callback) : ()
+build(Grammar $grammar, CodeRef $callback) : ()
 
 =type
 

@@ -1,0 +1,30 @@
+#!/usr/bin/env perl
+use Mojolicious::Lite -signatures;
+use Data::Printer;
+
+my $config = plugin 'Config';
+
+post '/' => sub($c) {
+
+  my $delayer
+    = Interact::Later->new( cache_path => app->config->{ cache_path } );
+  $delayer->write_data_to_disk( $c->req->json );
+
+  $c->stash( json => { toto => $c->req->json } );
+  $c->render( format => 'json' );
+};
+
+app->start;
+__DATA__
+
+@@ index.html.ep
+% layout 'default';
+% title 'Welcome';
+<h1>Welcome to the Mojolicious real-time web framework!</h1>
+
+@@ layouts/default.html.ep
+<!DOCTYPE html>
+<html>
+  <head><title><%= title %></title></head>
+  <body><%= content %></body>
+</html>

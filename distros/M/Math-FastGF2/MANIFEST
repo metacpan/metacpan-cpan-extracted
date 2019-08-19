@@ -1,15 +1,18 @@
 MANIFEST
+MANIFEST.SKIP
 README
 Changes
+Changes-0.5
 GNU_GPL.txt
 GNU_LGPL.txt
 FastGF2.xs
 Makefile.PL
 ppport.h
 perlsubs.c
-bin/benchmark-Math-FastGF2.pl
 bin/shamir-split.pl
 bin/shamir-combine.pl
+t/Cauchy.t
+t/Vandermonde.t
 t/Math-FastGF2.t
 t/Matrix.t
 t/multest.pl
@@ -20,4 +23,7 @@ clib/FastGF2.h
 clib/Makefile.PL
 clib/Matrix.c
 typemap
-META.yml                                 Module meta-data (added by MakeMaker)
+tool/benchmark-Math-FastGF2-Matrix-invert.pl
+tool/benchmark-Math-FastGF2.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

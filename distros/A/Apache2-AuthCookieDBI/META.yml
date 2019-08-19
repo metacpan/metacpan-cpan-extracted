@@ -3,36 +3,37 @@ abstract: 'An AuthCookie module backed by a DBI database.'
 author:
   - unknown
 build_requires:
-  Digest::SHA: 5.47
-  Test::More: 0.4
+  Digest::SHA: '5.47'
+  Test::More: '0.4'
 configure_requires:
-  Module::Build: 0.40
+  Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.112150'
-license: open_source
+generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
+license: lgpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Apache2-AuthCookieDBI
 provides:
   Apache2::AuthCookieDBI:
     file: lib/Apache2/AuthCookieDBI.pm
-    version: 2.17
+    version: '2.18'
 recommends:
-  Digest::SHA: 5.47
+  Digest::SHA: '5.47'
 requires:
-  Apache2::AuthCookie: 3.08
-  Apache2::Const: 0
-  Apache2::RequestRec: 0
-  Apache2::ServerUtil: 0
-  Carp: 0
-  Crypt::CBC: 2.13
-  DBI: 1.4
-  Date::Calc: 0
-  Digest::MD5: 0
-  FindBin: 0
-  mod_perl2: 1.999022
+  Apache2::AuthCookie: '3.08'
+  Apache2::Const: '0'
+  Apache2::RequestRec: '0'
+  Apache2::ServerUtil: '0'
+  Carp: '0'
+  Crypt::CBC: '2.13'
+  DBI: '1.4'
+  Date::Calc: '0'
+  Digest::MD5: '0'
+  FindBin: '0'
+  mod_perl2: '1.999022'
 resources:
   license: http://opensource.org/licenses/lgpl-license.php
   repository: https://github.com/matisse/Apache-AuthCookieDBI
-version: 2.17
+version: '2.18'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

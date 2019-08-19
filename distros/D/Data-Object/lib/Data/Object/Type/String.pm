@@ -3,11 +3,9 @@ package Data::Object::Type::String;
 use strict;
 use warnings;
 
-use Data::Object::Export;
-
 use parent 'Data::Object::Type';
 
-our $VERSION = '0.98'; # VERSION
+our $VERSION = '0.99'; # VERSION
 
 # BUILD
 # METHODS
@@ -21,7 +19,10 @@ sub aliases {
 }
 
 sub coercions {
-  return ['Str', sub { do('string', $_[0]) }];
+  return ['Str', sub {
+      require Data::Object::String;
+      Data::Object::String->new($_[0]);
+  }];
 }
 
 sub validation {

@@ -4,6 +4,8 @@ package Math::FastGF2::Matrix;
 use 5.006000;
 use strict;
 use warnings;
+no warnings qw(redefine);
+
 use Carp;
 
 use Math::FastGF2 ":ops";
@@ -17,10 +19,15 @@ require Exporter;
 	       );
 @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 @EXPORT = (  );
-$VERSION = '0.04';
+$VERSION = '0.06';
 
 require XSLoader;
 XSLoader::load('Math::FastGF2', $VERSION);
+
+use constant {
+    ROWWISE => 1,
+    COLWISE => 2,
+};
 
 our @orgs=("undefined", "rowwise", "colwise");
 
@@ -69,11 +76,9 @@ sub new {
 
   return undef if $errors;
 
-  #carp "Calling C Matrix allocator with rows=$o{rows}, ".
-  #  "cols=$o{cols}, width=$o{width}, org=$org";
   return alloc_c($class,$o{rows},$o{cols},$o{width},$org);
-
 }
+
 
 sub new_identity {
   my $proto  = shift;
@@ -209,21 +214,26 @@ sub offset_to_rowcol {
   my $self=shift;
   my $offset=shift;
 
-  if ($offset % $self->WIDTH) {
+  # XS calls are expensive, so do them only once
+  my ($WIDTH, $ROWS, $COLS) = 
+      map { $self->$_ } qw{WIDTH ROWS COLS};
+
+  $offset /= $WIDTH;
+  if (int($offset) != $offset) {
     carp "offset must be a multiple of WIDTH in offset_to_rowcol";
     return undef;
   }
-  $offset /= $self->WIDTH;
-  if ($offset < 0 or $offset >= $self->ROWS * $self->COLS) {
+  if ($offset < 0 or $offset >= $ROWS * $COLS) {
     carp "Offset out of range in offset_to_rowcol";
     return undef;
   }
-  if ($self->ORG eq "rowwise") {
-    return ((int ($offset / $self->COLS)),
-	    ($offset % $self->COLS) );
+  if (ROWWISE == $self->ORGNUM) {
+      my $row = int ($offset / $COLS);
+      return ( ($row), 
+	       ($offset - $row * $COLS) ); # = $offset % $cols
   } else {
-    return (($offset % $self->ROWS),
-	    (int ($offset / $self->ROWS)));
+    return (($offset % $ROWS),
+	    (int ($offset / $ROWS)));
   }
 }
 
@@ -256,7 +266,9 @@ sub getvals {
   my $order = shift || 0;
   my $want_list = wantarray;
 
-  #carp "Asked to read ROW=$row, COL=$col, len=$bytes (words)";
+  # XS calls are expensive, so do them only once
+  my ($WIDTH, $ROWS, $COLS) = 
+      map { $self->$_ } qw{WIDTH ROWS COLS};
 
   unless ($class) {
     carp "getvals only operates on an object instance";
@@ -274,13 +286,13 @@ sub getvals {
     carp "order ($order) != 0 (native), 1 (little-endian) or 2 (big-endian)";
     return undef;
   }
-  my $width=$self->WIDTH;
-  my $msize=$self->ROWS * $self->COLS;
-  if ($row < 0 or $row >= $self->ROWS) {
+  my $width=$WIDTH;
+  my $msize=$ROWS * $COLS;
+  if ($row < 0 or $row >= $ROWS) {
     carp "starting row out of range";
     return undef;
   }
-  if ($col < 0 or $row >= $self->ROWS) {
+  if ($col < 0 or $row >= $ROWS) {
     carp "starting row out of range";
     return undef;
   }
@@ -290,9 +302,9 @@ sub getvals {
   return $s unless $want_list;
 
   # Since the get_raw_values_c call swaps byte order, we don't do it here
-  if ($self->WIDTH == 1) {
+  if ($WIDTH == 1) {
     return unpack "C*", $s;
-  } elsif ($self->WIDTH == 2) {
+  } elsif ($WIDTH == 2) {
     return unpack "S*", $s
   } else {
     return unpack "L*", $s;
@@ -309,7 +321,9 @@ sub setvals {
   my ($str,$words);
   $order=0 unless defined($order);
 
-  #carp "Asked to write ROW=$row, COL=$col";
+  # XS calls are expensive, so do them only once
+  my ($WIDTH, $ROWS, $COLS) = 
+      map { $self->$_ } qw{WIDTH ROWS COLS};
 
   unless ($class) {
     carp "setvals only operates on an object instance";
@@ -323,11 +337,11 @@ sub setvals {
     carp "order != 0 (native), 1 (little-endian) or 2 (big-endian)";
     return undef;
   }
-  if ($row < 0 or $row >= $self->ROWS) {
+  if ($row < 0 or $row >= $ROWS) {
     carp "starting row out of range";
     return undef;
   }
-  if ($col < 0 or $row >= $self->ROWS) {
+  if ($col < 0 or $row >= $ROWS) {
     carp "starting row out of range";
     return undef;
   }
@@ -338,9 +352,9 @@ sub setvals {
       carp "setvals: values must be either a string or reference to a list";
       return undef;
     }
-    if ($self->WIDTH == 1) {
+    if ($WIDTH == 1) {
       $str=pack "C*", @$vals;
-    } elsif ($self->WIDTH == 2) {
+    } elsif ($WIDTH == 2) {
       $str=pack "S*", @$vals;
     } else {
       $str=pack "L*", @$vals;
@@ -348,13 +362,13 @@ sub setvals {
   } else {
     # treat vals as a string
     $str="$vals";
-    $words=(length $str) / $self->WIDTH;
+    $words=(length $str) / $WIDTH;
   }
 
-  my $msize=$self->ROWS * $self->COLS;
-  if ( (($self->ORG eq "rowwise") and
-	($words + $self->COLS * $row + $col > $msize)) or
-       ($words + $self->ROWS * $col + $row > $msize)) {
+  my $msize=$ROWS * $COLS;
+  if ( ((ROWWISE == $self->ORGNUM) and
+	($words + $COLS * $row + $col > $msize)) or
+       ($words + $ROWS * $col + $row > $msize)) {
     carp "string length exceeds matrix size";
     return undef;
   }
@@ -566,6 +580,279 @@ sub zero {
   $self->setvals(0,0,"\0" x ($self->ROWS * $self->COLS * $self->WIDTH));
 
 }
+
+
+# Create a new Cauchy matrix
+# (was being done in Crypt::IDA before, but it's more relevant here)
+sub new_cauchy {
+    my $proto  = shift;
+    my $class  = ref($proto) || $proto;
+    my $parent = ref($proto) && $proto;
+    my %o = (
+	org       => "rowwise",
+	width     => undef,
+	xvals     => undef,	# was "sharelist"
+	yvals     => undef,
+	xyvals    => undef,	# was "key"
+	rows      => undef,
+	cols      => undef,
+	@_
+    );
+
+    my $w   = $o{width}    || die "width parameter required\n";
+
+    # any of these could be undefined
+    my ($rows, $cols, $xvals, $yvals);
+    $rows  = $o{rows};
+    $cols  = $o{cols};
+    $xvals = $o{xvals};
+    $yvals = $o{yvals};
+
+    if (defined $o{xyvals}) {
+	my $xyvals =  $o{xyvals};
+	die "Can't pass both xyvals and xvals\n" if defined $xvals;
+	die "Can't pass both xyvals and yvals\n" if defined $yvals;
+
+	if (defined $rows and !defined $cols) {
+	    $cols = @$xyvals - $rows;
+	    # warn "Rows was $rows. Set 'cols' to $cols\n";
+	} elsif (defined $cols and !defined $rows) {
+	    $rows = @$xyvals - $cols;
+	    # warn "Cols was $cols. Set 'rows' to $rows\n";
+	} else {
+	    die "Passing xyvals requires rows and/or cols\n";
+	}
+
+	# case where both are defined is handled later
+
+	# break up into two lists
+	$xvals = [@$xyvals[0.. $rows - 1]];
+	$yvals = [@$xyvals[$rows .. $rows + $cols - 1]];
+	# warn "Set up xvals with " . (@$xvals+0) . " elements\n";
+	# warn "Set up yvals with " . (@$yvals+0) . " elements\n";
+    } else {
+	# if user sets cols/rows explicitly, don't overwrite
+	$rows = scalar(@$xvals) if defined $xvals and !defined $rows;
+	$cols = scalar(@$yvals) if defined $yvals and !defined $cols;
+    }
+
+    die "Must have either xyvals + rows/cols or xvals + yvals\n"
+	unless defined $xvals and defined $yvals;
+    die "Rows/xvals are inconsistent\n" unless @$xvals == $rows;
+    die "Cols/yvals are inconsistent\n" unless @$yvals == $cols;
+    die "Must have rows >= cols\n" unless $rows >= $cols;
+
+    # Note: no check done to ensure that x,y values are unique
+    my @x   = @$xvals;
+    my @y   = @$yvals;
+
+    my $self = $class->new(rows => $rows, cols => $cols, width => $w,
+			   org => $o{org});
+    die unless ref $self;
+
+    # ported from IDA::ida_key_to_matrix
+    $w <<= 3; 			# bits <- bytes
+    for my $row (0..$rows - 1 ) {
+	for my $col (0 .. $cols - 1) {
+	    my $xi  = $x[$row];
+	    my $yj  = $y[$col];
+	    $self->setval($row, $col, gf2_inv($w, $xi ^ $yj));
+	}
+    }
+    return $self;
+}
+
+
+#
+# New method to calculate inverse Cauchy matrix given list:
+#
+# xyvals = [ x_1, ... x_n, y_1, ... y_k ]
+#
+# See Wikipedia page on Cauchy matrices:
+#
+# https://en.wikipedia.org/wiki/Cauchy_matrix
+#
+# A better page:
+#
+# https://proofwiki.org/wiki/Inverse_of_Cauchy_Matrix
+
+sub new_inverse_cauchy {
+
+    # parameter names were based on Crypt::IDA::ida_key_to_matrix
+    my $proto  = shift;
+    my $class  = ref($proto) || $proto;
+    my $parent = ref($proto) && $proto;
+    my %o = (
+	org       => "rowwise",
+	size      => undef,	# was "quorum"
+	width     => undef,
+	#shares    => undef,	# was "shares"
+	xvals     => undef,	# was "sharelist"
+	width     => undef,
+	xylist    => undef,	# was "key"
+	
+	@_
+    );
+
+    # Our "key" is in x's, y's format. The last "quorum" values are y's
+    # To create a square matrix, we only take the x values specified
+    # in the xvals listref
+    my $k   = $o{size}     || die "size parameter required\n";
+    my $w   = $o{width}    || die "width parameter required\n";
+    my $key = $o{xylist}   || die "xylist parameter required\n";
+    die "xvals parameter required\n" unless defined $o{xvals};
+
+    # Note: no check done below to ensure that xvals are unique
+    my @x   = map {$key->[$_]} @{$o{xvals}};
+    my @y   = splice @$key, -$k;
+    push @$key, @y; 	# splice is destructive; undo damage
+
+    #    warn "xlist: [" . (join ", ", @x) . "]\n";
+    #    warn "ylist: [" . (join ", ", @y) . "]\n";
+    die if @x - @y;		# is it square?
+    die if @$key < 2 * $k;	# is n >= k?
+    die if @x != $k;		# did user supply k xvals?
+
+    my $self = $class->new(rows => $k, cols => $k, width => $w,
+			   org => $o{org});
+    die unless ref $self;
+
+    # Using the proof wiki page as a guide...
+    #
+    # rename k to n so we can use it as a loop counter (and go -1
+    # because we're using zero-based indexes)
+    my ($i, $j, $n, $bits) = (0,0, $k-1, $w * 8);
+
+    if ($n < 3) {
+	# unoptimised version
+	for $i (0 .. $n) {
+	    for $j (0 .. $n) {
+		
+		my $top = 1;	# multiplicative identity
+		map {
+		    $top = gf2_mul($bits, $top, $x[$j] ^ $y[$_]);
+		    $top = gf2_mul($bits, $top, $x[$_] ^ $y[$i]);
+		} (0 .. $n);
+		
+		my $bot = $x[$j] ^ $y[$i];
+		
+		map { $bot = gf2_mul($bits, $bot, $x[$j] ^ $x[$_]) }
+		grep { $_ != $j } (0 .. $n); # $_ is our $k
+		
+		map { $bot = gf2_mul($bits, $bot, $y[$i] ^ $y[$_]) }
+		grep { $_ != $i } (0 .. $n); # $_ is our $k
+		
+		$top = gf2_mul($bits, $top, gf2_inv($bits, $bot));
+		
+		$self->setval($i,$j,$top);
+	    }
+	}
+    } else {
+	# The above two big product loops are ripe for optimisation
+	# Instead of calculating:
+	# * product of row except for ... (n-1 multiplications)
+	# * product of col except for ... (n-1 multiplications)
+	# You can memoise full row/col products 
+	# 
+	# This should be hugely noticeable for large n, but should
+	# probably also even have a positive effect for n>3 assuming
+	# a word size of 1 byte and gf2_inv that is as cheap (or cheaper)
+	# than a multiplication.
+
+	my @jmemo = ();
+	for $j (0..$n) {
+	    my ($sum,$xj) = (1, $x[$j]);
+	    map { $sum = gf2_mul($bits, $sum, $xj ^ $x[$_]) } 
+	    grep { $_ != $j} (0..$n);
+	    push @jmemo, $sum;
+	}
+	my @imemo = ();
+	for $i (0..$n) {
+	    my ($sum,$yi) = (1, $y[$i]);
+	    map { $sum = gf2_mul($bits, $sum, $yi ^ $y[$_]) }
+	    grep {$_ != $i} (0..$n);
+	    push @imemo, $sum;
+	}
+	for $i (0 .. $n) {
+	    for $j (0 .. $n) {
+
+		# We can save one multiplication by 1 below:
+		my $top = gf2_mul($bits, $x[$j] ^ $y[0], $x[0] ^ $y[$i]);
+		map {
+		    $top = gf2_mul($bits, $top, $x[$j] ^ $y[$_]);
+		    $top = gf2_mul($bits, $top, $x[$_] ^ $y[$i]);
+		} (1 .. $n);
+	
+		my $bot = $x[$j] ^ $y[$i];
+		$bot = gf2_mul($bits, $bot, $jmemo[$j]);
+		$bot = gf2_mul($bits, $bot, $imemo[$i]);
+		
+		$top = gf2_mul($bits, $top, gf2_inv($bits, $bot));
+		
+		$self->setval($i,$j,$top);
+	    }
+	}
+    }
+    return $self;
+}
+
+sub new_vandermonde {
+    my $proto  = shift;
+    my $class  = ref($proto) || $proto;
+    my $parent = ref($proto) && $proto;
+    my %o = (
+	org        => "rowwise",
+	cols       => undef,
+	width      => undef,
+	xvals     => undef,  
+	@_
+    );
+
+    # pull out variables
+    my ($org,$cols,$width,$xvals) = 
+	@o{qw(org cols width xvals)}; # hash slice
+
+    die "xvals must be a listref\n" unless ref($xvals) eq "ARRAY";
+    die "need cols > 0" unless defined $cols and $cols >0;
+
+    my $rows = @$xvals;
+
+    my $self = $class->new(
+	org => $org, width => $width, rows => $rows, cols => $cols);
+    die unless ref($self);
+
+    # populate all the rows
+    my $w = $width << 3;
+    for my $row (0 .. $rows -1) {
+	$self->setval($row,0,1);
+	my $x = 1;
+	for my $col (1 .. $cols -1) {
+	    $x = gf2_mul($w,$x,$xvals->[$row]);
+	    $self->setval($row,$col,$x);
+	}
+    }
+    
+    $self;    
+}    
+
+sub print {
+    my $self = shift;
+    #die ref $self;
+    my $rows  = $self->ROWS;
+    my $cols  = $self->COLS;
+    my $w     = $self->WIDTH;
+    $w <<= 1;
+
+    for my $row (0.. $rows -1) {
+	print "| ";
+	for my $col (0.. $cols -1) {
+	    my $f =" {%0${w}x} ";
+	    printf $f, $self->getval($row,$col);
+	}
+	print "|\n";
+    }
+}
+
 
 # Generic routine for copying some matrix elements into a new matrix
 #
@@ -886,6 +1173,81 @@ C<$w> and organisation C<$org>:
 As with the C<new> constructor, the C<org> parameter is optional and
 default to "rowwise".
 
+=head2 new_cauchy
+
+Create a Cauchy matrix from a set of x and y values:
+
+ my @xvals = (1..7);        # all values must be distinct across
+ my @yvals = (8..10);       # the combined list
+ 
+ # Passing separate x and y lists (rows/cols inferred)
+ $i=Math::FastGF2::Matrix->
+          new_cauchy(width => 1, org => "rowwise",
+                     xvals => \@xvals, yvals => \@yvals
+          );
+
+ # Passing combined list and at least one of rows/cols
+ $i=Math::FastGF2::Matrix->
+          new_cauchy(width => 1, org => "rowwise",
+                     xyvals => [@xvals, @yvals],
+                     rows => scalar(@xvals),
+                     cols => scalar(@yvals),
+          );
+
+Cauchy matrices have the useful property that for a matrix of n rows
+and k columns, all subsets of k rows are linearly independent with
+respect to each other. Thus this submatrix is invertible. This has
+applications in constructing error-correcting codes. See the
+L<Crypt::IDA> manual page for details.
+
+=head2 new_inverse_cauchy
+
+Creates an inverse Cauchy matrix from a set of y values and an subset
+of x values:
+
+ my @xvals = (20..27);        # all values must be distinct across
+ my @yvals = (28..30);        # the combined list
+ 
+ $i=Math::FastGF2::Matrix->
+      new_inverse_cauchy(width => 1, org => "rowwise",
+                         xylist => [ @xvals, @yvals ],
+                         size => 3,       # size of y list
+                         xvals => [0..3], # indexes into x list
+ );
+
+Note that the xvals parameter in this case is a set of indices into
+the C<@xvals> array. Effectively, it selects 'size' rows from the
+Cauchy matrix described by C<[ @xvals, @yvals ]> and inverts that
+matrix.
+
+This uses an algorithm described in volume 1 of Knuth's I<"The Art of
+Computer Programming">, which should run faster than the regular
+Gaussian elimination method implemented by the C<invert> method.
+
+=head2 new_vandermonde
+
+Create a Vandermonde matrix from a list of x values
+
+ $i=Math::FastGF2::Matrix->
+      new_vandermonde(width => 1, org => "rowwise",
+                      xvals => [ 0..6 ],  # 7 rows
+                      cols   => 3,
+ );
+
+For each x_i value, creates a row of the form:
+
+        |     0    1    2          cols-1  |
+        |   x    x    x   ...    x         |
+        |    i    i    i          i        |
+
+If all the x_i values in the list are distinct, then, like the Cauchy
+matrix above, taking any 'cols' subset of rows from the matrix gives
+you an invertible matrix. This is the form of matrix generally used
+for Reed-Solomon error-correcting codes.
+
+To create the inverse of some cols x cols submatrix, just use the
+standard C<invert> method on it.
+
 =head2 copy
 
 The copy method copy of some or all elements of an existing
@@ -1109,7 +1471,7 @@ new matrix or undef in the case of an error.
 =head2 Solve
 
 Treat matrix as a set of simultaneous equations and attempt to solve
-it:
+it using Gaussian elimination:
 
  $solution=$m->solve;
 
@@ -1150,7 +1512,7 @@ Declan Malone, E<lt>idablack@users.sourceforge.netE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009 by Declan Malone
+Copyright (C) 2009-2019 by Declan Malone
 
 This package is free software; you can redistribute it and/or modify
 it under the terms of the "GNU General Public License" ("GPL").

@@ -591,6 +591,7 @@ package Sidef::Parser {
                               );
         }
 
+        my $orig_pos   = pos($_);
         my $beg_delim  = quotemeta $delim;
         my $pair_delim = exists($self->{delim_pairs}{$delim}) ? $self->{delim_pairs}{$delim} : ();
 
@@ -618,7 +619,7 @@ package Sidef::Parser {
           || $self->fatal_error(
                                 error => sprintf(qq{can't find the quoted string terminator <<%s>>}, $pair_delim // $delim),
                                 code  => $_,
-                                pos   => pos($_)
+                                pos   => $orig_pos,
                                );
 
         $self->{line} += $string =~ s/\R\K//g if not $opt{no_count_line};
@@ -1746,7 +1747,7 @@ package Sidef::Parser {
                     local $self->{$type eq 'func' ? 'current_function' : 'current_method'} = $has_kids ? $parent : $obj;
                     my $args = '|' . join(',', $type eq 'method' ? 'self' : (), @{$var_names}) . ' |';
 
-                    my $code = '{' . $args . substr($_, pos);
+                    my $code  = '{' . $args . substr($_, pos);
                     my $block = $self->parse_block(code => \$code, with_vars => 1);
                     pos($_) += pos($code) - length($args) - 1;
 
@@ -1872,7 +1873,7 @@ package Sidef::Parser {
             # "try/catch" construct
             if (/\Gtry\h*(?=\{)/gc) {
                 my $try_block = $self->parse_block(code => $opt{code});
-                my $obj = bless({try => $try_block}, 'Sidef::Types::Block::Try');
+                my $obj       = bless({try => $try_block}, 'Sidef::Types::Block::Try');
 
                 $self->parse_whitespace(code => $opt{code});
 
@@ -1949,6 +1950,8 @@ package Sidef::Parser {
                 my $var_names =
                   $self->get_init_vars(code      => $opt{code},
                                        with_vals => 0);
+
+                $self->backtrack_whitespace();
 
                 @{$var_names}
                   || $self->fatal_error(
@@ -2225,29 +2228,34 @@ package Sidef::Parser {
                 my $strings = $self->get_quoted_words(code => $opt{code});
 
                 if ($type eq 'w' or $type eq '<') {
-                    return Sidef::Types::Array::Array->new(
-                                                [map { Sidef::Types::String::String->new(s{\\(?=[\\#\s])}{}gr) } @{$strings}]);
+                    my @list = map { Sidef::Types::String::String->new(s{\\(?=[\\#\s])}{}gr) } @{$strings};
+                    return Sidef::Types::Array::Array->new(\@list);
                 }
-                elsif ($type eq 'i') {
-                    return Sidef::Types::Array::Array->new(
-                                           [map { Sidef::Types::Number::Number->new(s{\\(?=[\\#\s])}{}gr)->int } @{$strings}]);
+
+                if ($type eq 'i') {
+                    my @list = map { Sidef::Types::Number::Number->new(s{\\(?=[\\#\s])}{}gr)->int }
+                      split(/[\s,]+/, join(' ', @$strings));
+                    return Sidef::Types::Array::Array->new(\@list);
                 }
-                elsif ($type eq 'n') {
-                    return Sidef::Types::Array::Array->new(
-                                                [map { Sidef::Types::Number::Number->new(s{\\(?=[\\#\s])}{}gr) } @{$strings}]);
+
+                if ($type eq 'n') {
+                    my @list =
+                      map { Sidef::Types::Number::Number->new(s{\\(?=[\\#\s])}{}gr) } split(/[\s,]+/, join(' ', @$strings));
+                    return Sidef::Types::Array::Array->new(\@list);
                 }
-                elsif ($type eq 'v') {
-                    return
-                      Sidef::Types::Array::Vector->new(map { Sidef::Types::Number::Number->new(s{\\(?=[\\#\s])}{}gr) }
-                                                         split(/[\s,]+/, join(' ', @$strings)));
+
+                if ($type eq 'v') {
+                    my @list =
+                      map { Sidef::Types::Number::Number->new(s{\\(?=[\\#\s])}{}gr) } split(/[\s,]+/, join(' ', @$strings));
+                    return Sidef::Types::Array::Vector->new(@list);    # this must be passed as a list
                 }
-                elsif ($type eq 'm') {
+
+                if ($type eq 'm') {
                     my @matrix;
                     my $data = join(' ', @$strings);
                     foreach my $line (split(/\s*;\s*/, $data)) {
-                        push @matrix,
-                          Sidef::Types::Array::Array->new(
-                                     [map { Sidef::Types::Number::Number->new(s{\\(?=[\\#\s])}{}gr) } split(/[\s,]+/, $line)]);
+                        my @row = map { Sidef::Types::Number::Number->new(s{\\(?=[\\#\s])}{}gr) } split(/[\s,]+/, $line);
+                        push @matrix, Sidef::Types::Array::Array->new(\@row);
                     }
                     return Sidef::Types::Array::Matrix->new(@matrix);
                 }
@@ -2842,6 +2850,7 @@ package Sidef::Parser {
 
         my @methods;
         local *_ = $opt{code};
+        my $orig_pos = pos($_);
 
         {
             if ((/\G(?![-=]>)/ && /\G(?=$self->{operators_re})/o) || /\G\./gc) {
@@ -2870,7 +2879,7 @@ package Sidef::Parser {
                         else {
                             $self->fatal_error(
                                                code  => $_,
-                                               pos   => pos($_) - 1,
+                                               pos   => $orig_pos,
                                                error => "operator `$method` requires a right-side operand",
                                               );
                         }
@@ -3350,6 +3359,7 @@ package Sidef::Parser {
                        )
                   ) {
 
+                    my $orig_pos = pos($_);
                     my ($method, $req_arg, $op_type) = $self->get_method_name(code => $opt{code});
 
                     if (defined($method)) {
@@ -3379,7 +3389,7 @@ package Sidef::Parser {
                             else {
                                 $self->fatal_error(
                                                    code  => $_,
-                                                   pos   => pos($_) - 1,
+                                                   pos   => $orig_pos,
                                                    error => "operator `$method` requires a right-side operand",
                                                   );
                             }

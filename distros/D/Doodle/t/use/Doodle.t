@@ -43,7 +43,8 @@ Database DDL Statement Builder
 =description
 
 Doodle is a database DDL statement builder and provides an object-oriented
-abstraction for performing schema changes in various datastores.
+abstraction for performing schema changes in various datastores. This class
+consumes the L<Doodle::Helpers> roles.
 
 =cut
 
@@ -62,6 +63,8 @@ sub context {
   return $s;
 }
 
+# TEST SCHEMA CREATE
+
 my $schema_create = sub {
   my $t = shift;
   my $d = $t->doodle;
@@ -70,17 +73,41 @@ my $schema_create = sub {
   return $s->create;
 };
 
-# my $mysql_schema_create = context('mysql', 'users', $schema_create);
-# is $mysql_schema_create->sql,
-#   qq{create database `app`};
+my $mysql_schema_create = context('mysql', 'users', $schema_create);
+is $mysql_schema_create->sql,
+  qq{create database `app`};
 
-# my $postgres_schema_create = context('postgres', 'users', $schema_create);
-# is $postgres_schema_create->sql,
-#   qq{create database "app"};
+my $postgres_schema_create = context('postgres', 'users', $schema_create);
+is $postgres_schema_create->sql,
+  qq{create database "app"};
 
-# my $mssql_schema_create = context('mssql', 'users', $schema_create);
-# is $mssql_schema_create->sql,
-#   qq{create database [app]};
+my $mssql_schema_create = context('mssql', 'users', $schema_create);
+is $mssql_schema_create->sql,
+  qq{create database [app]};
+
+# TEST SCHEMA DELETE
+
+my $schema_delete = sub {
+  my $t = shift;
+  my $d = $t->doodle;
+  my $s = $d->schema('app');
+
+  return $s->delete;
+};
+
+my $mysql_schema_delete = context('mysql', 'users', $schema_delete);
+is $mysql_schema_delete->sql,
+  qq{drop database `app`};
+
+my $postgres_schema_delete = context('postgres', 'users', $schema_delete);
+is $postgres_schema_delete->sql,
+  qq{drop database "app"};
+
+my $mssql_schema_delete = context('mssql', 'users', $schema_delete);
+is $mssql_schema_delete->sql,
+  qq{drop database [app]};
+
+# TEST TABLE CREATE
 
 my $create = sub {
   my $t = shift;
@@ -107,6 +134,58 @@ my $mssql_create = context('mssql', 'users', $create);
 is $mssql_create->sql,
   qq{create table [users] ([id] int identity(1,1) primary key, [arid] uniqueidentifier)};
 
+# TEST TABLE CREATE: RELATIONS
+
+my $relations = sub {
+  my $t = shift;
+
+  $t->integer('profile_id')->not_null;
+  $t->relation('profile_id', 'profiles', 'id');
+
+  return $t->create;
+};
+
+my $sqlite_relations = context('sqlite', 'users', $relations);
+is $sqlite_relations->sql,
+  qq{create table "users" ("profile_id" integer not null, foreign key ("profile_id") references "profiles" ("id"))};
+
+my $mysql_relations = context('mysql', 'users', $relations);
+is $mysql_relations->sql,
+  qq{create table `users` (`profile_id` int not null, foreign key (`profile_id`) references `profiles` (`id`))};
+
+my $postgres_relations = context('postgres', 'users', $relations);
+is $postgres_relations->sql,
+  qq{create table "users" ("profile_id" integer not null, foreign key ("profile_id") references "profiles" ("id"))};
+
+my $mssql_relations = context('mssql', 'users', $relations);
+is $mssql_relations->sql,
+  qq{create table [users] ([profile_id] int not null, foreign key ([profile_id]) references [profiles] ([id]))};
+
+# TEST TABLE DELETE
+
+my $delete = sub {
+  my $t = shift;
+
+  return $t->delete;
+};
+
+my $sqlite_delete = context('sqlite', 'users', $delete);
+is $sqlite_delete->sql,
+  qq{drop table "users"};
+
+my $mysql_delete = context('mysql', 'users', $delete);
+is $mysql_delete->sql,
+  qq{drop table `users`};
+
+my $postgres_delete = context('postgres', 'users', $delete);
+is $postgres_delete->sql,
+  qq{drop table "users"};
+
+my $mssql_delete = context('mssql', 'users', $delete);
+is $mssql_delete->sql,
+  qq{drop table [users]};
+
+# TEST COLUMN NULLABILITY
 
 my $null = sub {
   my $t = shift;
@@ -156,6 +235,8 @@ my $mssql_notnull = context('mssql', 'users', $notnull);
 is $mssql_notnull->sql,
   qq{create table [users] ([data] nvarchar(255) not null)};
 
+# TEST COLUMN UPDATE: TYPE ONLY
+
 my $update = sub {
   my $t = shift;
 
@@ -177,6 +258,8 @@ is $postgres_update->sql,
 my $mssql_update = context('mssql', 'users', $update);
 is $mssql_update->sql,
   qq{alter table [users] alter column [data] type text};
+
+# TEST COLUMN UPDATE: SET NULL
 
 my $update_null = sub {
   my $t = shift;
@@ -200,6 +283,8 @@ my $mssql_update_null = context('mssql', 'users', $update_null);
 is $mssql_update_null->sql,
   qq{alter table [users] alter column [data] set null};
 
+# TEST COLUMN UPDATE: SET NOT NULL
+
 my $update_notnull = sub {
   my $t = shift;
 
@@ -222,6 +307,8 @@ my $mssql_update_notnull = context('mssql', 'users', $update_notnull);
 is $mssql_update_notnull->sql,
   qq{alter table [users] alter column [data] set not null};
 
+# TEST COLUMN UPDATE: DROP NULL
+
 my $update_dropnull = sub {
   my $t = shift;
 
@@ -243,27 +330,5 @@ is $postgres_update_dropnull->sql,
 my $mssql_update_dropnull = context('mssql', 'users', $update_dropnull);
 is $mssql_update_dropnull->sql,
   qq{alter table [users] alter column [data] drop null};
-
-my $delete = sub {
-  my $t = shift;
-
-  return $t->delete;
-};
-
-my $sqlite_delete = context('sqlite', 'users', $delete);
-is $sqlite_delete->sql,
-  qq{drop table "users"};
-
-my $mysql_delete = context('mysql', 'users', $delete);
-is $mysql_delete->sql,
-  qq{drop table `users`};
-
-my $postgres_delete = context('postgres', 'users', $delete);
-is $postgres_delete->sql,
-  qq{drop table "users"};
-
-my $mssql_delete = context('mssql', 'users', $delete);
-is $mssql_delete->sql,
-  qq{drop table [users]};
 
 ok 1 and done_testing;

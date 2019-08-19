@@ -3,11 +3,9 @@ package Data::Object::Type::Float;
 use strict;
 use warnings;
 
-use Data::Object::Export;
-
 use parent 'Data::Object::Type';
 
-our $VERSION = '0.98'; # VERSION
+our $VERSION = '0.99'; # VERSION
 
 # BUILD
 # METHODS
@@ -23,9 +21,18 @@ sub aliases {
 sub coercions {
   my $coercions = [];
 
-  push @$coercions, 'Str', sub { do('float', $_[0]) };
-  push @$coercions, 'Num', sub { do('float', $_[0]) };
-  push @$coercions, 'LaxNum', sub { do('float', $_[0]) };
+  push @$coercions, 'Str', sub {
+    require Data::Object::Float;
+    Data::Oject::Float->new($_[0]);
+  };
+  push @$coercions, 'Num', sub {
+    require Data::Object::Float;
+    Data::Oject::Float->new($_[0]);
+  };
+  push @$coercions, 'LaxNum', sub {
+    require Data::Object::Float;
+    Data::Oject::Float->new($_[0]);
+  };
 
   return $coercions;
 }

@@ -1000,6 +1000,16 @@ package Sidef::Types::Array::Array {
                             sub { $block->run(Sidef::Types::Number::Number->_set_uint($_[0]), $_[1]) });
     }
 
+    sub sum_2d {
+        my ($self, $block) = @_;
+        $self->map_2d($block)->sum;
+    }
+
+    sub prod_2d {
+        my ($self, $block) = @_;
+        $self->map_2d($block)->prod;
+    }
+
     sub sum {
         my ($self, $arg) = @_;
 
@@ -1094,22 +1104,42 @@ package Sidef::Types::Array::Array {
         Sidef::Types::Number::Number::lcm(@$self);
     }
 
-    sub digits2num {
+    sub digits2num {    # Algorithm from "Modern Computer Arithmetic" by Richard P. Brent and Paul Zimmermann
         my ($self, $base) = @_;
 
         state $ten = Sidef::Types::Number::Number->_set_uint(10);
-
         $base //= $ten;
 
-        my $sum       = Sidef::Types::Number::Number::ZERO;
-        my $base_prod = Sidef::Types::Number::Number::ONE;
+        my @L = @$self;
+        my ($B, $k) = ($base, scalar(@L));
 
-        foreach my $v (@$self) {
-            $sum       = $sum->add($base_prod->mul($v));
-            $base_prod = $base_prod->mul($base);
+        while ($k > 1) {
+
+            my @T;
+            for (0 .. ($k >> 1) - 1) {
+                CORE::push(@T, $L[2 * $_]->add($B->mul($L[2 * $_ + 1])));
+            }
+
+            CORE::push(@T, $L[-1]) if ($k & 1);
+            @L = @T;
+            $B = $B->mul($B);
+            $k = ($k >> 1) + ($k & 1);
         }
 
-        $sum;
+        $L[0] // Sidef::Types::Number::Number::ZERO;
+    }
+
+    sub cfrac2num {
+        my ($self) = @_;
+
+        my $res = $self->[-1];
+        my $end = $#{$self};
+
+        for my $k (1 .. $end) {
+            $res = $res->inv->add($self->[$end - $k]);
+        }
+
+        $res;
     }
 
     sub _min_max_by {
@@ -1157,33 +1187,35 @@ package Sidef::Types::Array::Array {
         $self;
     }
 
-    sub _flatten {    # this exists for performance reasons
-        my ($self, $class) = @_;
+    sub _flatten {
+        my %addr;    # keeps track of seen objects
 
-        my @array;
-        foreach my $item (@{$self}) {
-            CORE::push(@array,
-                       (ref($item) eq $class or ref($item) =~ /^Sidef::Types::Array::/)
-                       ? _flatten($item, $class)
-                       : $item);
-        }
+        my $sub = sub {
+            my ($obj) = @_;
 
-        @array;
+            my $class   = ref($obj);
+            my $refaddr = Scalar::Util::refaddr($obj);
+
+            exists($addr{$refaddr})
+              and return @{$addr{$refaddr}};
+
+            my @flat;
+            $addr{$refaddr} = \@flat;
+
+            foreach my $item (@$obj) {
+                CORE::push(@flat, ((ref($item) eq $class or UNIVERSAL::isa($item, __PACKAGE__)) ? $item->flatten : $item));
+            }
+
+            @flat;
+        };
+
+        local *Sidef::Types::Array::Array::flatten = $sub;
+        $sub->($_[0]);
     }
 
     sub flatten {
         my ($self) = @_;
-
-        my @flat;
-        my $class = ref($self);
-        foreach my $item (@{$self}) {
-            CORE::push(@flat,
-                       (ref($item) eq $class or ref($item) =~ /^Sidef::Types::Array::/)
-                       ? _flatten($item, $class)
-                       : $item);
-        }
-
-        bless \@flat;
+        bless [$self->_flatten];
     }
 
     *flat = \&flatten;
@@ -1287,8 +1319,6 @@ package Sidef::Types::Array::Array {
 
         $self;
     }
-
-    *each_2D = \&each_2d;
 
     sub each_slice {
         my ($self, $n, $block) = @_;
@@ -1398,6 +1428,25 @@ package Sidef::Types::Array::Array {
         bless \@array;
     }
 
+    sub map_slice {
+        my ($self, $n, $block) = @_;
+
+        $n = CORE::int($n);
+
+        my @array;
+        my $end = @$self;
+        for (my $i = $n - 1 ; $i < $end ; $i += $n) {
+            CORE::push(@array, $block->run(@$self[$i - ($n - 1) .. $i]));
+        }
+
+        my $mod = $end % $n;
+        if ($mod != 0) {
+            CORE::push(@array, $block->run(@$self[$end - $mod .. $end - 1]));
+        }
+
+        bless \@array;
+    }
+
     sub each_index {
         my ($self, $block) = @_;
 
@@ -1481,7 +1530,7 @@ package Sidef::Types::Array::Array {
     sub map_2d {
         my ($self, $block) = @_;
 
-        $block //= Sidef::Types::Block::Block::IDENTITY;
+        $block //= Sidef::Types::Block::Block::ARRAY_IDENTITY;
 
         my @array;
         foreach my $item (@$self) {
@@ -1490,8 +1539,6 @@ package Sidef::Types::Array::Array {
 
         bless \@array, ref($self);
     }
-
-    *map_2D = \&map_2d;
 
     sub map_kv {
         my ($self, $block) = @_;
@@ -1539,8 +1586,6 @@ package Sidef::Types::Array::Array {
     sub grep_2d {
         my ($self, $block) = @_;
 
-        $block //= Sidef::Types::Block::Block::IDENTITY;
-
         my @array;
         foreach my $item (@$self) {
             CORE::push(@array, $item) if $block->run(@$item);
@@ -1548,8 +1593,6 @@ package Sidef::Types::Array::Array {
 
         bless \@array, ref($self);
     }
-
-    *grep_2D = \&grep_2d;
 
     sub grep_kv {
         my ($self, $block) = @_;
@@ -1566,6 +1609,8 @@ package Sidef::Types::Array::Array {
 
     sub group {
         my ($self, $block) = @_;
+
+        $block //= Sidef::Types::Block::Block::IDENTITY;
 
         my %hash;
         foreach my $item (@$self) {
@@ -2223,6 +2268,8 @@ package Sidef::Types::Array::Array {
         bless \@list, ref($self);
     }
 
+    *reduce_map = \&map_reduce;
+
     sub length {
         my ($self) = @_;
         Sidef::Types::Number::Number->_set_uint(scalar @$self);
@@ -2284,7 +2331,7 @@ package Sidef::Types::Array::Array {
             return (
                     $len > 0
                     ? bless([map { $self->[CORE::rand($len)] } 1 .. $amount], ref($self))
-                    : bless([], ref($self))
+                    : bless([],                                               ref($self))
                    );
         }
 

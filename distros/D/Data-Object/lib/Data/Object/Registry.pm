@@ -4,18 +4,13 @@ use strict;
 use warnings;
 
 use Data::Object::State;
-use Type::Registry;
+use Memoize;
 
 use parent 'Data::Object::Base';
 
-our $VERSION = '0.98'; # VERSION
+our $VERSION = '0.99'; # VERSION
 
-# BUILD
 # METHODS
-
-sub def {
-  'Data::Object::Library';
-}
 
 sub get {
   my ($self, $key) = @_;
@@ -42,7 +37,9 @@ sub obj {
 
   my $lut = $self->lut($key);
 
-  unshift @$lut, $self->def;
+  unshift @$lut, 'Data::Object::Library';
+
+  require Type::Registry;
 
   my $obj = "Type::Registry"->for_class($key);
 
@@ -50,6 +47,8 @@ sub obj {
 
   return $obj;
 }
+
+memoize 'obj';
 
 sub rem {
   my ($self, $key, $val) = @_;
@@ -115,22 +114,6 @@ type libraries.
 =head1 METHODS
 
 This package implements the following methods.
-
-=cut
-
-=head2 def
-
-  def() : Str
-
-Returns the default type library.
-
-=over 4
-
-=item def example
-
-  my $def = $registry->def();
-
-=back
 
 =cut
 

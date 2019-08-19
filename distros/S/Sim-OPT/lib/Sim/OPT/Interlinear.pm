@@ -33,8 +33,7 @@ use Sim::OPT::Parcoord3d;
 
 our @ISA = qw( Exporter );
 our @EXPORT = qw( interlinear, interstart prepfactlev tellstepsize );
-
-$VERSION = '0.147';
+$VERSION = '0.149';
 $ABSTRACT = 'Interlinear is a program for building metamodels from incomplete, multivariate, discrete dataseries on the basis of nearest-neighbouring gradients weighted by distance.';
 
 #######################################################################
@@ -728,7 +727,9 @@ sub wei
   }
 
   my ( @arra, @arrah );
-  if ( ( $limit_checkdistgrades ne "" ) and ( $limit_checkdistgrades > $checkstop ) )
+  if ( ( $limit_checkdistgrades ne "" )
+  #and ( $limit_checkdistgrades > $checkstop )
+  )
   {
     @arrah = @arr__;
     @arra = @arrah[0..$limit_checkdistgrades];
@@ -739,11 +740,15 @@ sub wei
   }
 
   my @arrb;
-  if ( ( $limit_checkdistgrades ne "" ) and ( $limit_checkdistgrades > $checkstop ) )
+  if ( ( $limit_checkdistgrades ne "" )
+  #and ( $limit_checkdistgrades > $checkstop )
+  )
   {
     @arrb = @arrah[0..$limit_checkdistpoints];
   }
-  elsif ( ( $limit_checkdistpoints ne "" ) and ( $limit_checkdistpoints > $checkstop ) )
+  elsif ( ( $limit_checkdistpoints ne "" )
+  #and ( $limit_checkdistpoints > $checkstop ) 
+  )
   {
     my @arrb_ = @arr__;
     @arrb = @arrb_[0..$limit_checkdistpoints];
@@ -1934,14 +1939,61 @@ sub interlinear
     $confile = $configf;
   }; #say $tee "CHECK5 \$confile: " . dump( $confile );
 
+
+
+
+
+    $maxloops= 1000;
+$sourcefile = "./sourcefile.csv";
+$newfile = $sourcefile . "_meta.csv";
+$report = $newfile . "_report.txt";
+@mode = ( "wei" ); # #"wei" is weighted gradient linear interpolation of the nearest neighbours.
+#my @mode = ( "near" ); # "nea" means "nearest neighbour"
+#@mode = ( ""mix" ); # "mix" means sequentially mixed in each loop.
+#my @mode = ( "wei", "near", "near", "purelin" ); # a sequence
+@weights = (  ); #my @weights = ( 0.7, 0.3 ); # THE FIRST IS THE WEIGHT FOR linear interpolation, THE SECOND FOR nearest neighbour.
+# THEY ARE FRACTIONS OF 1 AND MUST GIVE 1 IN TOTAL. IF THE VALUES ARE UNSPECIFIED (IE. IF THE ARRAY IS EMPTY), THE VALUES ARE UNWEIGHTED.
+$linearprecedence = "no"; # PRECEDENCE TO LINEAR INTERPOLATES. IF "yes", THE VALUES DERIVED FROM LINEAR INTERPOLATION, WHERE PRESENT, WILL SUPERSEDE THE VALUES DERIVED FROM THE NEAREST NEIGHBUR STRATEGY. IF "no", THE OPPOSITE. IT CAN BE ACTIVE ONLY IF LOGARITHMIC IS OFF. IT WORKS WITH "LINEAR" AND "EXPONENTIAL"
+$relaxmethod = "logarithmic"; #It is relative to the "linnear" method. Options: "logarithmic", "linear" or "exponential". THE FARTHER NEIGHBOURS ARE WEIGHT LESS THAN THE NEAREST ONES: INDEED, LOGARITHMICALLY, LINEARLY OR EXPONENTIALLY. THE LOGARITHM BASE IS $relaxlimit OR $nearrelaxlimit, DEPENDING FROM THE CONTEXT. THE LINEAR MULTIPLICATOR OR THE EXPONENT IS DEFINED BY $overwerightnearest.
+$relaxlimit = 1; #THIS IS THE CEILING FOR THE RELAXATION OF THE RELATIONS OF PURE LINEAR INTERPOLATION. For greatest precision: 0, or a negative number near 0. IF > = 0, THE PROGRAM INTERPOLATES ALSO NEAREST NEIGHBOURS. THE HIGHER THE NUMBER, THE FARTHER THE NEIGHBOURS.
+$overweightnearest = 1; #A NUMBER. IT IS MADE NULL BY THE $logarithmicrelax "yes". THE HIGHER THE NUMBER, THE GREATER THE OVERWEIGHT GIVEN TO THE NEAREST. IN THIS MANNER, THE OVERWEIGHT IS NOT LOGARITHMIC, LIKE IT WHERE OTHERWISE, BUT LINEAR. THIS SLOWS DOWN THE COMPUTATIONS. UNLESS THE OVERWEIGHT IS 1, WHICH MAKES THE OVERWEIGHTING NULL.
+$nearrelaxlimit = 0; #THIS IS THE CEILING FOR THE RELAXATION OF THE RELATIONS OF THE NEAREST NEIGHBOUR STRATEGY. For greatest precision: 0, or a negative number near 0. IF > = 0, THE PROGRAM INCREASES THE DISTANCE OF THE NEAREST NEIGHBOURS INCLUDED. THE HIGHER THE NUMBER, THE FARTHER THE NEIGHBOURS. ONE IS NOT LIKELY TO WANT TO USE THIS OPTION.
+$nearconcurrencies = 1; #Requested minimum number of concurrencies for the nearest neighbour method. Minimum value: 1. The more the requested concurrencies, the greatest the precision, the slowest the convergence.
+$parconcurrencies = 1; #Requested minimum number of concurrencies for the linear interpolations for each parameter of each instance. Minimum value: 1. The more the requested concurrencies, the greatest the precision, the slowest the convergence.
+$instconcurrencies = 1; #Requested minimum number of concurrencies for the linear interpolations for each instance. Minimum value: 1. The more the requested concurrencies, the greatest the precision, the slowest the convergence.
+# my %factlevels = ( pairs => { 1=>3, 2=>3, 3=>3, 4=>3, 5=>3 } ); #The keys are the factor numbers and the values are the number of levels in the data series. OBSOLETE.
+$minreq_forgrad = [1, 1, 1 ]; #THIS VALUES SPECIFY THE NUMBER OF PARAMETER DIFFERENCES (INTEGER NUMBERS) TELLING HOW WELL-ROOTED IN SIMULATED REALITY (I.E, NEAR FROM IT) A POINT MUST BE TO SELECT IT FOR CALCULATING THE GRADIENTS FOR THE METAMODEL. THEY ARE INTEGERS STARTING FROM 1 OR GREATER.
+# THE FIRST VALUE IS RELATIVE TO THE FACTORS AND TELLS HOW RELAXED A SEARCH IS.
+# THE SECOND VALUE IS RELATIVE TO THE LEVELS. ONE MAY WANT TO KEEP IT TO 1: THE GRADIENTS ARE CALCULATED USING ONLY ADJACENT INSTANCES.
+# ONE MAY WANT TO KEEP IT TO 1: THE GRADIENTS ARE CALCULATED USING ONLY ADJACENT INSTANCES.
+# THE THIRD VALUE HOW DIFFERENT (FAR, IN TERMS OF PARAMETER DIFFERENCES) MAY AN INSTANCE BE TO BE CALCULATED THROUGH THE GRADIENT IN QUESTION.
+# ONE MAY WANT TO SET TO THE NUMBER OF PARAMETERS.
+# A LARGE NUMBER, WEAK ENTRY BARRIER. NEVER LESS THAN 1.
+$minreq_forinclusion = 0; # THIS VALUE SPECIFIES A STRENGTH VALUE (LEVEL OF RELIABILITY) TELLING HOW WELL-ROOTED IN SIMULATED REALITY A DERIVED POINT (META-POINT) MUST BE FOR INCLUDING IT IN THE SET OF POINTS USED FOR THE METAMODEL.If 0, no entry barrier.
+$minreq_forcalc = 0; # THIS VALUE SPECIFIES A STRENGTH VALUE (LEVEL OF RELIABILITY) TELLING HOW WELL-ROOTED IN SIMULATED REALITY A DERIVED POINT MUST BE FOR INCLUDING IT IN THE CALCULATIONS FOR CREATING NEW META-POINTS.  A VALUE BETWEEN 1 (JUST SIMULATED POINT) AND 0. If 0, no entry barrier.
+$minreq_formerge = 0; # THIS VALUE SPECIFIES A STRENGTH VALUE (LEVEL OF RELIABILITY) TELLING HOW WELL-ROOTED IN SIMULATED REALITY A DERIVED POINT MUST BE FOR MERGING IT IN THE CALCULATIONS FOR MERGING IT IN THE METAMODEL. A VALUE BETWEEN 1 (JUST SIMULATED POINT) AND 0 (SIMULATED POINTS AND "META"POINTS WITH THE SAME RIGHT ) MUST BE SPECIFIED. If 0, no entry barrier.
+$minimumcertain = 0; # WHAT IS THE MINIMUM LEVEL OF STRENGTH (LEVEL OF RELIABILITY) REQUIRED TO USE A DATUM TO BUILD UPON IT. IT DEPENDS ON THE DISTANCE FROM THE ORIGINS OF THE DATUM. THE LONGER THE DISTANCE, THE SMALLER THE STRENGTH (WHICH IS INDEED INVERSELY PROPORTIONAL). A STENGTH VALUE OF 1 IS OF A SIMULATED DATUM, NOT OF A DERIVED DATUM. If 0, no entry barrier.
+$minimumhold = 1; # WHAT IS THE MINIMUM LEVEL OF STRENGTH (LEVEL OF RELIABILITY) REQUIRED FOR NOT AVERAGING A DATUM WITH ANOTHER, DERIVED DATUM. USUALLY IT HAS TO BE KEPT EQUAL TO $minimimcertain.  If 1, ONLY THE MODEL DATA ARE NOT SUBSTITUTABLE IN THE METAMODEL.
+$condweight = "yes"; # THIS CONDITIONS TELLS IF THE STRENGTH (LEVEL OF RELIABILITY) OF THE GRADIENTS HAS TO BE CUMULATIVELY TAKEN INTO ACCOUNT IN THE WEIGHTING CALCULATIONS.
+$nfilter = "10000"; # do not take into account the gradients which in the ranking of strengths are below a certain position. If unspecified: inactive.
+$limit_checkdistgrades = ""; # LIMIT OF RELATIONS TAKEN INTO ACCOUNT IN CALCULATING THE NET OF GRADIENTS. IF NULL, NO BARRIER. 10000 IS A GOOD COMPROMISE BETWEEN SPEED AND RELIABILITY.
+$limit_checkdistpoints = ""; # LIMIT OF RELATIONS TAKEN INTO ACCOUNT IN CALCULATING THE NET OF POINTS. IF NULL, NO BARRIER. 10000 IS A GOOD COMPROMISE BETWEEN SPEED AND RELIABILITY.
+$fulldo = "no"; # TO SEARCH FOR MAXIMUM PRECISION AT THE EXPENSES OF SPEED. "yes" MAKES THE GRADIENTS BE RECALCULATED AT EACH COMPUTATION CYCLE.
+$lvconversion = "";
+
+
+
+
+
+  print "CONFIG FILE: " . $confile;
   if ( -e $confile )
   {
-    require $confile; ############## TRULY FIX THIS!!!!!
+
+    #eval $confile; ############## TRULY FIX THIS!!!!!
+    #if ( $newfile eq "" ) { die };
   }
   else
   {
-
-
 
   }
 
@@ -2241,7 +2293,7 @@ Sim::OPT::Interlinear
   # As a Perl function:
   re.#!/usr/bin/env perl
   use Sim::OPT::Interlinear
-  Sim::OPT::Interlinear::interlinear( "./sourcefile.csv", "./configfile.pl", "./obtainedmetamodel.csv" );
+  Sim::OPT::Interlinear::interlinear( "./sourcefile.csv", "./confiinterlinear.pl", "./obtainedmetamodel.csv" );
 
   # or as a script, from the command line:
   perl ./Interlinear.pm  .  ./sourcefile.csv
@@ -2326,14 +2378,14 @@ The number of computations required for the creation of a metamodel in OPT incre
 To call Interlinear as a Perl function (best strategy):
 re.pl # open Perl shell
 use Sim::OPT::Interlinear; # load Interlinear
-Sim::OPT::Interlinear::interlinear( "./sourcefile.csv", "./configfile.pl", "./obtainedmetamodel.csv" );
-"configfile.pl" is the configuration file. If that file is an empty file, Interlinear will assume its defaults.
+Sim::OPT::Interlinear::interlinear( "./sourcefile.csv", "./confinterlinear.pl", "./obtainedmetamodel.csv" );
+"confinterlinear.pl" is the configuration file. If that file is an empty file, Interlinear will assume the default file names above.
 "./sourcefile.csv" is the only information which is truly mandatory: the path to the csv dataseries to be completed.
+If is not specified,
 
 To use Interlinear as a script from the command line:
-./Interlinear.pm . "./sourcefile.csv" "./configfile.pl ";
-(Note the dot within the line.) If "./sourcefile.csv" is not specified, the default file "./sourcefile.csv" will be sought.
-If "./configfile.pl" is not specified, the program goes with the defaults.
+perl ./Interlinear.pm . "./sourcefile.csv" "./confinterlinear.pl ";
+(Note the dot within the line.) Again, if "./sourcefile.csv" is not specified, the default file "./sourcefile.csv" will be sought.
 
 Or to begin with a dialogue question:
 ./Interlinear.pm interstart;

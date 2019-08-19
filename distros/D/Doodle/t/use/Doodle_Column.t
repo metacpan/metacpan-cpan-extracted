@@ -17,11 +17,14 @@ Doodle Column Class
 
   use Doodle::Column;
 
-  my $self = Doodle::Column->new(%args);
+  my $self = Doodle::Column->new(
+    name => 'id'
+  );
 
 =description
 
-Table column representation.
+Table column representation. This class consumes the L<Doodle::Column::Helpers>
+role.
 
 =cut
 

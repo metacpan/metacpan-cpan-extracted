@@ -23,8 +23,8 @@ create_relation
 
   $self->create_relation($command);
 
-  # alter table [users] add constraint fkey_users_profile_id_profiles_id
-  # foreign key (profile_id) references profiles (id)
+  # alter table [users] add constraint [fkey_users_profile_id_profiles_id]
+  # foreign key ([profile_id]) references profiles ([id])
 
 =description
 
@@ -59,6 +59,6 @@ my $sql = $g->create_relation($command);
 isa_ok $g, 'Doodle::Grammar::Mssql';
 isa_ok $command, 'Doodle::Command';
 
-is $sql, qq{alter table [users] add constraint fkey_users_profile_id_profiles_id foreign key (profile_id) references profiles (id)};
+is $sql, qq{alter table [users] add constraint [fkey_users_profile_id_profiles_id] foreign key ([profile_id]) references [profiles] ([id])};
 
 ok 1 and done_testing;

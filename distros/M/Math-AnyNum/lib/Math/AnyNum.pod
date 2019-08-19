@@ -6,7 +6,7 @@ Math::AnyNum - Arbitrary size precision for integers, rationals, floating-points
 
 =head1 VERSION
 
-Version 0.32
+Version 0.33
 
 =head1 SYNOPSIS
 
@@ -237,6 +237,7 @@ Additionally, each Math::AnyNum object is B<immutable>.
     inv(x)              multiplicative inverse of x: 1/x
     conj(x)             complex conjugate of x
     digits(n,b)         digits of n in base b
+    digits2num(\@d,b)   conversion of digits in base b to an integer
     sumdigits(n,b)      sum of digits of n in base b
     popcount(n)         number of 1's in binary representation of n
     hamdist(n,k)        number of bit-positions where the bits differ
@@ -1306,7 +1307,7 @@ Returns the n-th Euler polynomial: C<E_n(x)>.
 
 Returns the n-th Bernoulli number C<B_n> as an exact fraction, with C<bernoulli(1) = 1/2>.
 
-When an additional argument is provided, it returns the the n-th Bernoulli polynomial: C<B_n(x)>.
+When an additional argument is provided, it returns the n-th Bernoulli polynomial: C<B_n(x)>.
 
 =head2 euler
 
@@ -1315,7 +1316,7 @@ When an additional argument is provided, it returns the the n-th Bernoulli polyn
 
 Returns the n-th Euler number C<E_n>, starting with C<euler(0) = 1>.
 
-When an additional argument is provided, it returns the the n-th Euler polynomial: C<E_n(x)>.
+When an additional argument is provided, it returns the n-th Euler polynomial: C<E_n(x)>.
 
 =head2 lucas
 
@@ -1872,12 +1873,16 @@ When C<x> is a complex number, it computes the sign using the identity:
 =head2 length
 
     $n->length                                    #=> Scalar
+    $n->length($base)                             #=> Scalar
 
-Returns the number of digits of the integer part of C<n>.
+Returns the number of digits of the integer part of C<n> in a given base (default 10).
+
+Example:
+
+    5040->length        # size in base 10
+    5040->length(2)     # size in base 2
 
 Returns C<undef> when C<n> cannot be truncated to an integer.
-
-For C<-1234.56>, it returns C<4>, which is the length of C<1234>.
 
 =head2 inc
 
@@ -2400,6 +2405,19 @@ Example:
 
     digits(12345)      = (5, 4, 3, 2, 1)
     digits(12345, 100) = (45, 23, 1)
+
+=head2 digits2num
+
+    digits2num([...], b=10)                       #=> Int | NaN
+
+Takes an array-ref of digits (in reverse order) and an optional base (default 10), converting the digits to an integer in the given base.
+
+The value of C<b> must be greater than C<1>. Returns NaN otherwise.
+
+Example:
+
+    digits2num([5, 4, 3, 2, 1])  = 12345
+    digits2num([45, 23, 1], 100) = 12345
 
 =head2 sumdigits
 

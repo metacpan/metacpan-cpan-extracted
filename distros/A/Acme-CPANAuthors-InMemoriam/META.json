@@ -1,6 +1,6 @@
 {
     "name": "Acme-CPANAuthors-InMemoriam",
-    "version": "1.07",
+    "version": "1.08",
     "abstract": "In honour of our deceased CPAN Authors.",
     "author": [
         "Barbie (BARBIE) <barbie@cpan.org>"
@@ -44,7 +44,7 @@
     "provides": {
         "Acme::CPANAuthors::InMemoriam": {
             "file": "lib/Acme/CPANAuthors/InMemoriam.pm",
-            "version": "1.07"
+            "version": "1.08"
         }
     },
     "no_index": {

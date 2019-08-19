@@ -1,6 +1,12 @@
 Changelog for Data-Object
 
-0.98 2019-08-16T18:46:04
+0.99 2019-08-17T23:13:51
+ - Updated documentation
+ - Performance optimizations
+ - Build 0.98 (#177)
+
+0.98 2019-08-16T18:46:44
+ - Built release version 0.98
  - Updated documentation
  - Fixed issue configuring Libraries
  - Updated main module documentation

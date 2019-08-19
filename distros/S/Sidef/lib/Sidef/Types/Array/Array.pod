@@ -308,6 +308,14 @@ Return the
 
 =cut
 
+=head2 cfrac2num
+
+Array.cfrac2num() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 change_to
 
 Array.change_to() -> I<Obj>
@@ -566,8 +574,6 @@ Array.each_2d() -> I<Obj>
 
 Return the
 
-Aliases: I<each_2D>
-
 =cut
 
 =head2 each_cons
@@ -795,8 +801,6 @@ Aliases: I<select>
 Array.grep_2d() -> I<Obj>
 
 Return the
-
-Aliases: I<grep_2D>
 
 =cut
 
@@ -1072,8 +1076,6 @@ Array.map_2d() -> I<Obj>
 
 Return the
 
-Aliases: I<map_2D>
-
 =cut
 
 =head2 map_cons
@@ -1107,6 +1109,16 @@ Aliases: I<map_operator>
 =head2 map_reduce
 
 Array.map_reduce() -> I<Obj>
+
+Return the
+
+Aliases: I<reduce_map>
+
+=cut
+
+=head2 map_slice
+
+Array.map_slice() -> I<Obj>
 
 Return the
 
@@ -1337,6 +1349,14 @@ Aliases: I<unshift>
 =head2 prod
 
 Array.prod() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 prod_2d
+
+Array.prod_2d() -> I<Obj>
 
 Return the
 
@@ -1595,6 +1615,14 @@ Return the
 =head2 sum
 
 Array.sum() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sum_2d
+
+Array.sum_2d() -> I<Obj>
 
 Return the
 

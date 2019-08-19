@@ -11,6 +11,9 @@ use File::Basename;
 use FindBin qw($Bin);
 # The following placeholder is to be programmatically replaced with 'use lib "$Bin/../lib"' if needed
 #~loclib~
+if (-e "$Bin/../lib/Proch/N50.pm" and -e "$Bin/../Changes" ) {
+	use lib "$Bin/../lib";
+}
 use Proch::N50;
 use Data::Dumper;
 our %program = (
@@ -48,6 +51,7 @@ my (
     $opt_basename,
     $opt_template,
     $opt_fullpath,
+    $opt_thousand_separator,
     $opt_format_screen,    # x: same as -f screen
     $opt_format_json,      # j: same as -f json
     $opt_sort_by,          # o
@@ -66,23 +70,24 @@ my %valid_sort_keys = (
 );
 my $tab    = "\t";
 my $new    = "\n";
-my $result = GetOptions(
-    'a|abspath'     => \$opt_fullpath,
-    'b|basename'    => \$opt_basename,
-    'c|color'       => \$opt_color,
-    'd|debug'       => \$opt_debug,
-    'f|format=s'    => \$opt_format,
-    'h|help'        => \$opt_help,
-    'j|json'        => \$opt_format_json,
-    'n|nonewline'   => \$opt_nonewline,
-    'o|sortby=s'    => \$opt_sort_by,
-    'p|pretty'      => \$opt_pretty,
-    'r|reverse'     => \$opt_reverse_sort,
-    's|separator=s' => \$opt_separator,
-    't|template=s'  => \$opt_template,
-    'u|noheader'    => \$opt_noheader,
-    'v|version'     => \$opt_version,
-    'x|screen'      => \$opt_format_screen,
+my $_opt = GetOptions(
+    'a|abspath'       => \$opt_fullpath,
+    'b|basename'      => \$opt_basename,
+    'c|color'         => \$opt_color,
+    'd|debug'         => \$opt_debug,
+    'f|format=s'      => \$opt_format,
+    'h|help'          => \$opt_help,
+    'j|json'          => \$opt_format_json,
+    'n|nonewline'     => \$opt_nonewline,
+    'o|sortby=s'      => \$opt_sort_by,
+    'p|pretty'        => \$opt_pretty,
+    'r|reverse'       => \$opt_reverse_sort,
+    's|separator=s'   => \$opt_separator,
+    'q|thousands-sep' => \$opt_thousand_separator,
+    't|template=s'    => \$opt_template,
+    'u|noheader'      => \$opt_noheader,
+    'v|version'       => \$opt_version,
+    'x|screen'        => \$opt_format_screen,
 );
 
 $opt_sort_by = 'N50' if ( $opt_sort_by eq 'n50' );
@@ -90,7 +95,7 @@ pod2usage( { -exitval => 0, -verbose => 2 } ) if $opt_help;
 version() if defined $opt_version;
 
 our %output_object;
-
+our %output_print;
 # Added in v1.5: list accepted output formats programmatically
 # [-f list] or [--format list] will print a list of accepted formats
 
@@ -118,6 +123,10 @@ if ( $opt_format eq 'list' ) {
     exit;
 }
 
+unless (defined $ARGV[0] or      $opt_version) {
+    say STDERR "\n Usage: n50 file.fa ... \n Type n50 --help for full manual";
+    
+}
 # Shot output formats
 die "Error: Please specify either -x (--screen) or -j (--json)\n"
   if ( $opt_format_screen and $opt_format_json );
@@ -166,8 +175,7 @@ if ( defined $opt_format ) {
     if ( !$formats{$opt_format} ) {
         my @list = sort keys(%formats);
 
-        die
-" FATAL ERROR:\n Output format not valid (--format '$opt_format').\n Use one of the following: "
+        die " FATAL ERROR:\n Output format not valid (--format '$opt_format').\n Use one of the following: "
           . join( ', ', @list ) . ".\n";
     }
 
@@ -175,12 +183,11 @@ if ( defined $opt_format ) {
     if ( $opt_format eq 'json' ) {
 
         $hasJSON = eval {
-            require JSON;
-            JSON->import();
+            require JSON::PP;
+            JSON::PP->import();
             1;
         };
-        die
-"FATAL ERROR: Please install perl module JSON first [e.g. cpanm JSON]\n"
+        die "FATAL ERROR: Please install perl module JSON::PP first [e.g. cpanm JSON::PP]\n"
           unless ($hasJSON);
     }
 
@@ -199,6 +206,11 @@ if ( defined $opt_format ) {
         }
     }
 
+    if ( $opt_format eq 'custom' and ! defined $opt_template ) {
+       print STDERR " [WARNING] There is no default template at the moment!\n";
+       print STDERR "           Specify a --template STRING with --format custom or no output will be printed\n";
+    }
+
     if ( $formats{$opt_format} eq 'Not implemented' ) {
         print STDERR
 " WARNING: Format '$opt_format' not implemented yet. Switching to 'tsv'.\n";
@@ -206,6 +218,7 @@ if ( defined $opt_format ) {
     }
 
 }
+
 foreach my $file (@ARGV) {
 
     # Check if file exists / check if '-' supplied read STDIN
@@ -259,11 +272,16 @@ foreach my $file (@ARGV) {
         'min'  => $min,
         'max'  => $max,
     );
+
     if (defined $output_object{$file}) {
        print STDERR " WARNING: Overwriting '$file': multiple items with the same filename. Try not using -b/--basename.\n";
     }
     $output_object{$file} = \%metrics;
 
+    for my $key (keys %metrics) {
+        $metrics{$key} = thousands($metrics{$key});
+    }  
+    $output_print{$file} = \%metrics;
 }
 
 my $file_num = scalar keys %output_object;
@@ -279,28 +297,28 @@ if ( not $opt_format or $opt_format eq 'default' ) {
 # If only one file is supplied, just return N50 (to allow easy pipeline parsing)
         my @keys = keys %output_object;
         if ($opt_nonewline) {
-            print $output_object{ $keys[0] }{'N50'};
+            print $output_print{ $keys[0] }{'N50'};
         }
         else {
-            say $output_object{ $keys[0] }{'N50'};
+            say $output_print{ $keys[0] }{'N50'};
         }
 
     }
     else {
         # Print table
         foreach my $r ( keys %output_object ) {
-            say $r, $opt_separator, $output_object{$r}{'N50'};
+            say $r, $opt_separator, $output_print{$r}{'N50'};
         }
     }
 }
 elsif ( $opt_format eq 'json' ) {
 
     # Print JSON object
-    my $json           = JSON->new->allow_nonref;
-    my $json_printed   = $json->encode( \%output_object );
+    my $json           = JSON::PP->new->ascii->allow_nonref;;
+    my $json_printed   = $json->encode( \%output_print );
 
     if ( $opt_pretty ) {
-       $json_printed = $json->pretty->encode( \%output_object ); 
+       $json_printed = $json->pretty->encode( \%output_print ); 
     }
     say $json_printed;
 
@@ -317,9 +335,13 @@ elsif ( $opt_format eq 'tsv' or $opt_format eq 'csv' ) {
         print $r, $opt_separator;
 
         for ( my $i = 1 ; $i <= $#fields ; $i++ ) {
-            print $output_object{$r}{ $fields[$i] }
-              if ( defined $output_object{$r}{ $fields[$i] } );
-
+            if ( defined $output_print{$r}{ $fields[$i] } ) {
+		if ($i == 0 or ($opt_separator eq ',' and defined $opt_thousand_separator)) {
+		    print '"' , $output_print{$r}{ $fields[$i] } , '"';
+		} else {
+		    print $output_print{$r}{ $fields[$i] } ;
+		}
+	     }
             if ( ( $i == $#fields ) and ( not $opt_nonewline ) ) {
                 print "\n";
             }
@@ -338,11 +360,11 @@ elsif ( $opt_format eq 'custom' ) {
         my $output_string = '';
         $output_string .= $opt_template if ( defined $opt_template );
 
-        $output_string =~ s/{new}/$new/g if ( $output_string =~ /{new}/ );
-        $output_string =~ s/{tab}/$tab/g if ( $output_string =~ /{tab}/ );
+        $output_string =~ s/({new}|{n}|\\n)/$new/g if ( $output_string =~ /({new}|{n}|\\n)/ );
+        $output_string =~ s/({tab}|{n}|\\t)/$tab/g if ( $output_string =~ /({tab}|{t}|\\t)/ );
         $output_string =~ s/{path}/$r/g  if ( $output_string =~ /{path}/ );
         foreach my $f (@fields) {
-            $output_string =~ s/{$f}/$output_object{$r}{$f}/g;
+            $output_string =~ s/{$f}/$output_print{$r}{$f}/g;
         }
         print $output_string;
     }
@@ -357,8 +379,8 @@ elsif ( $opt_format eq 'screen' ) {
         my @array;
         push( @array, $r );
         for ( my $i = 1 ; $i <= $#fields ; $i++ ) {
-            push( @array, $output_object{$r}{ $fields[$i] } )
-              if ( defined $output_object{$r}{ $fields[$i] } );
+            push( @array, $output_print{$r}{ $fields[$i] } )
+              if ( defined $output_print{$r}{ $fields[$i] } );
         }
         $t->addRow(@array);
     }
@@ -394,11 +416,11 @@ sub printMessage {
 }
 
 sub version {
-   print STDERR '-' x 65, "\n";
+
     printMessage( "$program{NAME}, ver. $program{VERSION}",
         '', 'reset', 'bold green' );
 
-   print STDERR '-' x 65, "\n";
+   print STDERR  '  ','-' x 65, "\n";
 
     printMessage(
         qq(
@@ -407,11 +429,10 @@ sub version {
   Program to calculate N50 from multiple FASTA/FASTQ files, 
   based on Proch::N50 $Proch::N50::VERSION
   https://metacpan.org/pod/distribution/Proch-N50/bin/n50
-
-  Type --help (or -h) to see the full documentation.), '', 'blue', 'green'
+), '', 'blue', 'green'
     );
 
-   print STDERR '-' x 65, "\n";
+   print STDERR '  ','-' x 65, "\n";
 
     return $program{VERSION};
 }
@@ -428,6 +449,12 @@ sub n50fromHash {
     }
     return 0;
 
+}
+
+sub thousands {
+    my ($number) =  @_;
+    $number =~ s/(\d{1,3}?)(?=(\d{3})+$)/$1,/g;
+    return $number;
 }
 
 # Heng Li's subroutine (edited)
@@ -491,11 +518,11 @@ n50 - A script to calculate N50 from one or multiple FASTA/FASTQ files.
 
 =head1 VERSION
 
-version 0.70
+version 0.80
 
 =head1 SYNOPSIS
 
-  n50 [options] [FILE1 FILE2 FILE3...]
+  n50.pl [options] [FILE1 FILE2 FILE3...]
 
 =head1 DESCRIPTION
 
@@ -553,7 +580,7 @@ line.
 If used with 'default' (or 'csv' output format), will NOT print the
 newline character after the N50 for a single file. Useful in bash scripting:
 
-  n50=$(n50 filename);
+  n50=$(n50.pl filename);
 
 =item I<-t, --template>
 
@@ -562,6 +589,11 @@ string for each sample, replacing {new} with newlines, {tab} with
 tab and {N50}, {seqs}, {size}, {path} with sample's N50, number of sequences,
 total size in bp and file path respectively (the latter will
 respect --basename if used).
+
+=item I<-q, --thousands-sep>
+
+Add the thousands separator in all the printed numbers. Enabled by default
+with --format screen (-x).
 
 =item I<-p, --pretty>
 
@@ -612,15 +644,15 @@ Same as C<--format tsv> and C<--separator ,>:
 
 =item I<screen> (screen friendly)
 
-Use C<-x> as shortcut for C<--format screen>.
+Use C<-x> as shortcut for C<--format screen>. Enables --thousands-sep (-q) by default.
 
-  .-----------------------------------------------------------.
-  | File               | Seqs  | Total bp | N50  | min | max  |
-  +--------------------+-------+----------+------+-----+------+
-  | test_fasta_grep.fa |     1 |       80 |   80 |  80 |   80 |
-  | small_test.fa      |     6 |      130 |   65 |   4 |   65 |
-  | rdp_16s_v16.fa     | 13212 | 19098167 | 1467 | 320 | 2210 |
-  '--------------------+-------+----------+------+-----+------'
+  .----------------------------------------------------------------.
+  | File               | Seqs   | Total bp   | N50   | min | max   |
+  +--------------------+--------+------------+-------+-----+-------+
+  | test_fasta_grep.fa |      1 |         80 |    80 |  80 |    80 |
+  | small_test.fa      |      6 |        130 |    65 |   4 |    65 |
+  | rdp_16s_v16.fa     | 13,212 | 19,098,167 | 1,467 | 320 | 2,210 |
+  '--------------------+--------+------------+-------+-----+--------'
 
 =item I<json> (JSON)
 
@@ -643,25 +675,31 @@ Use C<-j> as shortcut for C<--format json>.
     }
   }
 
+=item I<custom>
+
+Will print the output using the template string provided with -t TEMPLATE.
+Fields are in the C<{field_name}> format. C<{new}>/C<{n}>/C<\n> is the newline, C<{tab}>/C<{t}>/C<\t> is a tab.
+All the keys of the JSON object are valid fields: C<{seqs}>, C<{N50}>, C<{min}>, C<{max}>, C<{size}>.
+
 =back
 
 =head1 EXAMPLE USAGES
 
 Screen friendly table (C<-x> is a shortcut for C<--format screen>), sorted by N50 descending (default):
 
-  n50 -x files/*.fa
+  n50.pl -x files/*.fa
 
 Screen friendly table, sorted by total contig length (C<--sortby max>) ascending (C<--reverse>):
 
-  n50 -x -o max -r files/*.fa
+  n50.pl -x -o max -r files/*.fa
 
 Tabular (tsv) output is default:
 
-  n50 -o max -r files/*.fa
+  n50.pl -o max -r files/*.fa
 
 A custom output format:
 
-  n50 data/*.fa -f custom -t '{path}{tab}N50={N50};Sum={size}{new}'
+  n50.pl data/*.fa -f custom -t '{path}{tab}N50={N50};Sum={size}{new}'
 
 =head1 COPYRIGHT
 

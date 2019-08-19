@@ -1,5 +1,13 @@
 Revision history for App-HomeBank2Ledger.
 
+0.005     2019-08-17 16:26:33-06:00 MST7MDT
+  * Add --budget option for converting HomeBank budget to Ledger.
+  * Support quoting commodities when needed.
+  * The formatter now adds posting notes when they differ from the transaction
+    memo and avoids printing posting payees if not different from the
+    transaction payee.
+  * Fix bug which could add duplicate ":Unknown" accounts.
+
 0.004     2019-06-17 23:28:10-06:00 MST7MDT
   * Remove --default-account option. Instead the default account(s) can be
     customized using the --rename-account option, like this:

@@ -6,7 +6,7 @@ use Data::Object 'Class', 'Doodle::Library';
 
 extends 'Doodle::Grammar';
 
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 has name => (
   def => 'sqlite',
@@ -209,7 +209,7 @@ method type_uuid(Column $col) {
 }
 
 method create_table(Command $cmd) {
-  my $s = 'create {temporary} table {if_exists} {table} ({columns}{, constraints})';
+  my $s = 'create {temporary} table {if_not_exists} {table} ({columns}{, constraints})';
 
   return $self->render($s, $cmd);
 }

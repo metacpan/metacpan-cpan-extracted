@@ -1,0 +1,17 @@
+clib/FastGF2.o
+clib/libfastgf2.a
+clib/Matrix.o
+clib/Makefile(.old)?
+clib/MYMETA.json
+clib/MYMETA.yml
+FastGF2.c
+FastGF2.o
+FastGF2.bs
+^blib/
+.gitignore
+MYMETA.json
+MYMETA.yml
+^pm_to_blib
+~$
+^Makefile(.old)?
+^Math-FastGF2.*.tar.gz

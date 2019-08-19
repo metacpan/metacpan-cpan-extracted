@@ -1,5 +1,9 @@
 Revision history for Perl extension Apache2::AuthCookieDBI.
 
+2.18 - Sat Aug 17 12:35:38 PDT 2019
+     - Fix https://github.com/matisse/Apache-AuthCookieDBI/issues/3
+       "DBI_CryptType crypt does not appear to work"
+       Changes by Ed Sabol https://github.com/esabol
 2.17
      - Added support for Digest::SHA::sha256/384/512_hex digests for passwords.
        This is a response to https://rt.cpan.org/Ticket/Display.html?id=79333

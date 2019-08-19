@@ -3,11 +3,9 @@ package Data::Object::Type::Hash;
 use strict;
 use warnings;
 
-use Data::Object::Export;
-
 use parent 'Data::Object::Type';
 
-our $VERSION = '0.98'; # VERSION
+our $VERSION = '0.99'; # VERSION
 
 # BUILD
 # METHODS
@@ -21,7 +19,10 @@ sub aliases {
 }
 
 sub coercions {
-  return ['HashRef', sub { do('hash', $_[0]) }];
+  return ['HashRef', sub {
+      require Data::Object::Hash;
+      Data::Object::Hash->new($_[0]);
+  }];
 }
 
 sub validation {

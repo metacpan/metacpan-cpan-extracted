@@ -82,6 +82,7 @@ sub subroutines {
     render_constraint
     render_constraints
     render_if_exists
+    render_if_not_exists
     render_increments
     render_index_columns
     render_index_name
@@ -92,9 +93,14 @@ sub subroutines {
     render_primary
     render_relation
     render_relation_name
+    render_charset
+    render_collation
+    render_engine
+    render_schema_name
     render_table
     render_temporary
     render_type
+    render_unique
   );
 
   my @files = map { /^(?:$re)\s+([a-zA-Z]\w+).*\{$/ } source("lib/$path.pm");

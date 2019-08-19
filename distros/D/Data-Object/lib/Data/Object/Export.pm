@@ -3,12 +3,13 @@ package Data::Object::Export;
 use strict;
 use warnings;
 
-use Carp;
+use Carp ();
 use Scalar::Util;
+use Memoize;
 
 use parent 'Exporter';
 
-our $VERSION = '0.98'; # VERSION
+our $VERSION = '0.99'; # VERSION
 
 # BUILD
 
@@ -101,7 +102,7 @@ our %EXPORT_TAGS = (
 
 sub do {
   unless (grep length, grep defined, @_) {
-    croak "Null filename used";
+    Carp::croak("Null filename used");
   }
 
   return CORE::do($_[0]) if @_ < 2;
@@ -113,11 +114,11 @@ sub do {
 
   # it's fun to do bad things {0_0}
   unless ($package && $routine) {
-    croak "Can't make call without a package and function";
+    Carp::croak("Can't make call without a package and function");
   }
 
   unless ($point = $package->can($routine)) {
-    croak "Function ($routine) not callable on package ($package)";
+    Carp::croak("Function ($routine) not callable on package ($package)");
   }
 
   goto $point;
@@ -267,6 +268,8 @@ sub reify {
   @_ = ($class, $expr) and goto $point;
 }
 
+memoize 'reify';
+
 sub throw {
   my $class = 'Data::Object::Exception';
   my $point = load($class)->can('throw');
@@ -357,7 +360,7 @@ sub load {
   my $failed = !$class || $class !~ /^[\D](?:[\w:']*\w)?$/;
   my $loaded;
 
-  croak "Invalid package name ($class)" if $failed;
+  Carp::croak("Invalid package name ($class)") if $failed;
 
   my $error = do {
     local $@;
@@ -365,13 +368,15 @@ sub load {
     $@;
   };
 
-  croak "Error attempting to load $class: $error"
+  Carp::croak("Error attempting to load $class: $error")
     if $error
     or $failed
     or not $loaded;
 
   return $class;
 }
+
+memoize 'load';
 
 sub namespace {
   my ($package, $libname) = @_;
@@ -384,6 +389,8 @@ sub namespace {
 
   return $namespace;
 }
+
+memoize 'namespace';
 
 # DEDUCERS
 

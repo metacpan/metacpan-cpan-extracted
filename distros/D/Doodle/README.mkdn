@@ -36,7 +36,8 @@ Database DDL Statement Builder
 # DESCRIPTION
 
 Doodle is a database DDL statement builder and provides an object-oriented
-abstraction for performing schema changes in various datastores.
+abstraction for performing schema changes in various datastores. This class
+consumes the [Doodle::Helpers](https://metacpan.org/pod/Doodle::Helpers) roles.
 
 # METHODS
 
@@ -44,7 +45,7 @@ This package implements the following methods.
 
 ## build
 
-    build(Grammar $g, CodeRef $callback) : ()
+    build(Grammar $grammar, CodeRef $callback) : ()
 
 Execute a given callback for each generated SQL statement.
 
@@ -56,46 +57,6 @@ Execute a given callback for each generated SQL statement.
           # e.g. $db->do($statement->sql);
         });
 
-## column\_create
-
-    column_create(Any %args) : Command
-
-Registers a column create and returns the Command object.
-
-- column\_create example
-
-        my $command = $self->column_create(%args);
-
-## column\_delete
-
-    column_delete(Any %args) : Command
-
-Registers a column delete and returns the Command object.
-
-- column\_delete example
-
-        my $command = $self->column_delete(%args);
-
-## column\_rename
-
-    column_rename(Any %args) : Command
-
-Registers a column rename and returns the Command object.
-
-- column\_rename example
-
-        my $command = $self->column_rename(%args);
-
-## column\_update
-
-    column_update(Any %args) : Command
-
-Registers a column update and returns the Command object.
-
-- column\_update example
-
-        my $command = $self->column_update(%args);
-
 ## grammar
 
     grammar(Str $name) : Grammar
@@ -106,46 +67,6 @@ Returns a new Grammar object.
 
         my $grammar = $self->grammar('sqlite');
 
-## index\_create
-
-    index_create(Any %args) : Command
-
-Registers a index create and returns the Command object.
-
-- index\_create example
-
-        my $command = $self->index_create(%args);
-
-## index\_delete
-
-    index_delete(Any %args) : Command
-
-Register and return an index\_delete command.
-
-- index\_delete example
-
-        my $command = $self->index_delete(%args);
-
-## relation\_create
-
-    relation_create(Any %args) : Command
-
-Registers a relation create and returns the Command object.
-
-- relation\_create example
-
-        my $command = $self->relation_create(%args);
-
-## relation\_delete
-
-    relation_delete(Any %args) : Command
-
-Registers a relation delete and returns the Command object.
-
-- relation\_delete example
-
-        my $command = $self->relation_delete(%args);
-
 ## schema
 
     schema(Str $name, Any %args) : Schema
@@ -155,26 +76,6 @@ Returns a new Schema object.
 - schema example
 
         my $schema = $self->schema($name);
-
-## schema\_create
-
-    schema_create(Any %args) : Command
-
-Registers a schema create and returns the Command object.
-
-- schema\_create example
-
-        my $command = $self->schema_create(%args);
-
-## schema\_delete
-
-    schema_delete(Any %args) : Command
-
-Registers a schema delete and returns the Command object.
-
-- schema\_delete example
-
-        my $command = $self->schema_delete(%args);
 
 ## statements
 
@@ -195,33 +96,3 @@ Return a new Table object.
 - table example
 
         my $table = $self->table('users');
-
-## table\_create
-
-    table_create(Any %args) : Command
-
-Registers a table create and returns the Command object.
-
-- table\_create example
-
-        my $command = $self->table_create(%args);
-
-## table\_delete
-
-    table_delete(Any %args) : Command
-
-Registers a table delete and returns the Command object.
-
-- table\_delete example
-
-        my $command = $self->table_delete(%args);
-
-## table\_rename
-
-    table_rename(Any %args) : Command
-
-Registers a table rename and returns the Command object.
-
-- table\_rename example
-
-        my $command = $self->table_rename(%args);

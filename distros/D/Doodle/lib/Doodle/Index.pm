@@ -4,7 +4,7 @@ use 5.014;
 
 use Data::Object 'Class', 'Doodle::Library';
 
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 has name => (
   is => 'ro',
@@ -79,6 +79,12 @@ method delete(Any %args) {
   my $command = $self->doodle->index_delete(%args);
 
   return $command;
+}
+
+method unique() {
+  $self->data->{unique} = 1;
+
+  return $self;
 }
 
 1;
@@ -160,6 +166,23 @@ Returns the associated Doodle object.
 =item doodle example
 
   my $doodle = $self->doodle;
+
+=back
+
+=cut
+
+=head2 unique
+
+  unique() : Index
+
+Denotes that the index should be created and enforced as unique and returns
+itself.
+
+=over 4
+
+=item unique example
+
+  my $unique = $self->unique;
 
 =back
 

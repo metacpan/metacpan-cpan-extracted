@@ -1,5 +1,23 @@
 Revision history for Perl extension Math::FastGF2.
 
+0.06  Sun 18 Aug 2019
+
+        - Fix Cauchy.t to pass tests if Crypt::IDA is not available
+          (problem discovered via CPAN testers)
+
+0.05  Sat 17 Aug 2019
+        - 10th anniversary special release!!!
+        - New constructor for Cauchy Matrix generated from a list
+	  of x1,x2,...xn,y1,..yk values (moved from Crypt::IDA)
+	- New, slightly more efficient Matrix inversion method for
+	  Cauchy matrices (called as constructor given above x1..yk)
+	- New constructor for Vandermonde matrix (x1..xn)
+	- New $matrix->print method (pretty!)
+	- Don't warn if modules "use"d twice
+	- Profiling-driven speed improvements and some code cleanup
+	  * One of my main reasons to revisit the code.
+	  * See Changes-0.5 for more details.
+
 0.04  Mon Aug 17 21:00:00 2009
 	- Add copy/flip-related Matrix code
         - More tests on getvals/setvals
@@ -14,8 +32,8 @@ Revision history for Perl extension Math::FastGF2.
 0.03  Fri Aug 14 22:50:00 2009
         - New release. Attempt to automatically determine the correct
           C data types for 16 and 32-bit values. This should simplify
-          the task of setting up the software on different
-          platforms. If the determination of types doesn't succeed the
+          the task of setting up the software on different platforms.
+          If the determination of types doesn't succeed the
           Makefile.PL script exits with a useful error message and
           error code 0 before writing a Makefile, so this should at
           least handle the problem gracefully and not raise a FAIL

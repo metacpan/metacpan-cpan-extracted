@@ -1,6 +1,6 @@
 /* Fast GF(2^m) library routines */
 /*
-  Copyright (c) by Declan Malone 2009.
+  Copyright (c) by Declan Malone 2009-2019.
   Licensed under the terms of the GNU General Public License and
   the GNU Lesser (Library) General Public License.
 */
@@ -1321,6 +1321,7 @@ static gf2_u32 gf2_long_mod_inverse_u32 (gf2_u32 x);
 static gf2_u16 gf2_long_mod_power_u16 (gf2_u16 x, gf2_u16 y);
 static gf2_u32 gf2_long_mod_power_u32 (gf2_u32 x, gf2_u32 y);
 
+/* generic interface where 'width' is passed as a parameter */
 gf2_u32 gf2_mul (int width, gf2_u32 a, gf2_u32 b) {
   /* keep 8-bit log/exp tables handy */
   static const gf2_s16 *log_table=fast_gf2_log;
@@ -1338,6 +1339,14 @@ gf2_u32 gf2_mul (int width, gf2_u32 a, gf2_u32 b) {
     return 0;
   }
 }
+
+gf2_u32 gf2_mul8 (gf2_u32 a, gf2_u32 b) {
+  /* keep 8-bit log/exp tables handy */
+  static const gf2_s16 *log_table=fast_gf2_log;
+  static const gf2_u8  *exp_table=fast_gf2_exp+512;
+  return exp_table[log_table[a] + log_table[b]];
+}
+
 
 gf2_u32 gf2_inv (int width, gf2_u32 a) {
   /* keep 8-bit log/exp tables handy */

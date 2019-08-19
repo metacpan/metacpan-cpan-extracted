@@ -1,0 +1,8 @@
+test:
+	minil test
+
+build:
+	minil build
+
+dist:
+	minil release

@@ -33,7 +33,7 @@ package Apache2::AuthCookieDBI;
 use strict;
 use warnings;
 use 5.010_000;
-our $VERSION = '2.17';
+our $VERSION = '2.18';
 
 use Apache2::AuthCookie;
 use base qw( Apache2::AuthCookie );
@@ -337,7 +337,7 @@ sub _dbi_config_vars {
     }
 
     # Compile module for password encryption, if needed.
-    if ( $c{'DBI_CryptType'} =~ '^sha') {
+    if ( $c{'DBI_CryptType'} =~ /^sha/ ) {
         require Digest::SHA;
     }
 
@@ -372,13 +372,12 @@ random string.  This should be secret; either make the httpd.conf file
 only readable by root, or put the PerlSetVar in a file only readable by
 root and include it.
 
-This is required and has no default value.
-(NOTE: In AuthCookieDBI versions 1.22 and earlier the secret key either could be
-set in the configuration file itself
-or it could be place in a seperate file with the path configured with
+This is required and has no default value.  (NOTE: In AuthCookieDBI versions
+1.22 and earlier the secret key either could be set in the configuration file
+itself or it could be placed in a separate file with the path configured with
 C<PerlSetVar WhateverDBI_SecretKeyFile>.
 
-As of version 2.0 you must use  C<WhateverDBI_SecretKey> and not
+As of version 2.0, you must use C<WhateverDBI_SecretKey> and not
 C<PerlSetVar WhateverDBI_SecretKeyFile>.
 
 If you want to put the secret key in a separate file then you can create a
@@ -516,8 +515,7 @@ sub _check_password {
     my %password_checker = (
         'none' => sub { return $password eq $crypted_password; },
         'crypt' => sub {
-            $class->_crypt_digest( $password, $crypted_password ) eq
-                $crypted_password;
+            return crypt( $password, $crypted_password ) eq $crypted_password;
         },
         'md5' => sub { return md5_hex($password) eq $crypted_password; },
         'sha256' => sub {
@@ -531,12 +529,6 @@ sub _check_password {
         },
     );
     return $password_checker{$crypt_type}->();
-}
-
-sub _crypt_digest {
-    my ( $class, $plaintext, $encrypted ) = @_;
-    my $salt = substr $encrypted, 0, 2;
-    return crypt $plaintext, $salt;
 }
 
 #-------------------------------------------------------------------------------
@@ -615,12 +607,16 @@ sub _get_crypted_password {
 
     my $crypted_password = EMPTY_STRING;
 
+    my $PasswordField = $dbh->quote_identifier($c{'DBI_PasswordField'});
+    my $UsersTable = $dbh->quote_identifier($c{'DBI_UsersTable'});
+    my $UserField = $dbh->quote_identifier($c{'DBI_UserField'});
+
     my $sql_query = <<"SQL";
-      SELECT `$c{'DBI_PasswordField'}`
-      FROM `$c{'DBI_UsersTable'}`
-      WHERE `$c{'DBI_UserField'}` = ?
-      AND (`$c{'DBI_PasswordField'}` != ''
-      AND `$c{'DBI_PasswordField'}` IS NOT NULL)
+      SELECT $PasswordField
+      FROM $UsersTable
+      WHERE $UserField = ?
+      AND ($PasswordField != ''
+      AND $PasswordField IS NOT NULL)
 SQL
     my $sth = $dbh->prepare_cached($sql_query);
     $sth->execute($user);
@@ -964,11 +960,15 @@ sub group {
     my $dbh = $class->_dbi_connect($r) || return Apache2::Const::SERVER_ERROR;
 
     # Now loop through all the groups to see if we're a member of any:
+    my $DBI_GroupUserField = $dbh->quote_identifier($c{'DBI_GroupUserField'});
+    my $DBI_GroupsTable = $dbh->quote_identifier($c{'DBI_GroupsTable'});
+    my $DBI_GroupField = $dbh->quote_identifier($c{'DBI_GroupField'});
+
     my $sth = $dbh->prepare_cached( <<"EOS" );
-SELECT `$c{'DBI_GroupUserField'}`
-FROM `$c{'DBI_GroupsTable'}`
-WHERE `$c{'DBI_GroupField'}` = ?
-AND `$c{'DBI_GroupUserField'}` = ?
+SELECT $DBI_GroupUserField
+FROM $DBI_GroupsTable
+WHERE $DBI_GroupField = ?
+AND $DBI_GroupUserField = ?
 EOS
     foreach my $group (@groups) {
         $sth->execute( $group, $user );
@@ -999,10 +999,14 @@ sub user_is_active {
     }
 
     my $dbh = $class->_dbi_connect($r) || return;
+    my $ActiveFieldName = $dbh->quote_identifier($active_field_name);
+    my $DBI_UsersTable = $dbh->quote_identifier($c{'DBI_UsersTable'});
+    my $DBI_UserField  = $dbh->quote_identifier($c{'DBI_UserField'});
+
     my $sql_query = <<"SQL";
-      SELECT `$active_field_name`
-      FROM `$c{'DBI_UsersTable'}`
-      WHERE `$c{'DBI_UserField'}` = ?
+      SELECT $ActiveFieldName
+      FROM $DBI_UsersTable
+      WHERE $DBI_UserField = ?
 SQL
 
     my $sth = $dbh->prepare_cached($sql_query);

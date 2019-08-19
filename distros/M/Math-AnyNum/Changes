@@ -1,5 +1,17 @@
 Revision history for Math-AnyNum
 
+0.33    2019-08-18
+
+        [ADDITIONS]
+
+        - Added the `digits2num(\@digits, $base)` function.
+        - Extended the method `length()` to accept an optional argument specifying the base.
+
+        [IMPROVEMENTS]
+
+        - Faster (subquadratic-time) algorithms in `digits(n,b)` and `sumdigits(n,b)` for bases b > 62.
+        - Minor optimizations in the `ilog(n,k)`, `ilog2(n)` and `ilog10(n)` functions.
+
 0.32    2019-06-07
 
         - Minor documentation improvements.

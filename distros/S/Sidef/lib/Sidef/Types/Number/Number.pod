@@ -2088,6 +2088,14 @@ Return the
 
 =cut
 
+=head2 is_power_of
+
+Number.is_power_of() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_prime
 
 Number.is_prime() -> I<Obj>
@@ -2852,6 +2860,14 @@ Return the
 
 =cut
 
+=head2 pn_primes
+
+Number.pn_primes() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 pn_primorial
 
 Number.pn_primorial() -> I<Obj>
@@ -2921,6 +2937,14 @@ Return the
 =head2 prho_factor
 
 Number.prho_factor() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 primality_pretest
+
+Number.primality_pretest() -> I<Obj>
 
 Return the
 
@@ -3087,6 +3111,22 @@ Return the
 =head2 primorial
 
 Number.primorial() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 primorial_deflation
+
+Number.primorial_deflation() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 primorial_inflation
+
+Number.primorial_inflation() -> I<Obj>
 
 Return the
 

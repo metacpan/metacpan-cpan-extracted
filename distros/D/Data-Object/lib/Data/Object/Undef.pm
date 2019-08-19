@@ -31,7 +31,7 @@ use overload (
 
 use parent 'Data::Object::Base::Undef';
 
-our $VERSION = '0.98'; # VERSION
+our $VERSION = '0.99'; # VERSION
 
 # BUILD
 # METHODS

@@ -207,7 +207,7 @@ package Sidef::Types::Range::RangeNumber {
     sub bsearch {
         my ($self, $block) = @_;
 
-        if ($self->{step}->abs->is_one) {
+        if ($self->{step}->is_one) {
             my $left  = Sidef::Types::Number::Number->new($self->{from});
             my $right = Sidef::Types::Number::Number->new($self->{to});
             return Sidef::Types::Number::Number::bsearch($left, $right, $block);
@@ -219,7 +219,7 @@ package Sidef::Types::Range::RangeNumber {
     sub bsearch_le {
         my ($self, $block) = @_;
 
-        if ($self->{step}->abs->is_one) {
+        if ($self->{step}->is_one) {
             my $left  = Sidef::Types::Number::Number->new($self->{from});
             my $right = Sidef::Types::Number::Number->new($self->{to});
             return Sidef::Types::Number::Number::bsearch_le($left, $right, $block);
@@ -231,13 +231,31 @@ package Sidef::Types::Range::RangeNumber {
     sub bsearch_ge {
         my ($self, $block) = @_;
 
-        if ($self->{step}->abs->is_one) {
+        if ($self->{step}->is_one) {
             my $left  = Sidef::Types::Number::Number->new($self->{from});
             my $right = Sidef::Types::Number::Number->new($self->{to});
             return Sidef::Types::Number::Number::bsearch_ge($left, $right, $block);
         }
 
         $self->to_a->bsearch_ge($block);
+    }
+
+    sub primes {
+        my ($self) = @_;
+
+        if ($self->{step}->abs->is_one) {
+
+            my $left  = Sidef::Types::Number::Number->new($self->{from});
+            my $right = Sidef::Types::Number::Number->new($self->{to});
+
+            if ($self->{step}->is_neg) {
+                return Sidef::Types::Number::Number::primes($right, $left)->flip;
+            }
+
+            return Sidef::Types::Number::Number::primes($left, $right);
+        }
+
+        $self->grep(Sidef::Types::Block::Block->new(code => sub { $_[0]->is_prime }));
     }
 
     sub dump {

@@ -1,7 +1,7 @@
-# 
+#
 #
 package XML::LibXML::Iterator;
-
+$XML::LibXML::Iterator::VERSION = '1.05';
 use strict;
 
 use XML::NodeFilter qw(:results);
@@ -11,13 +11,13 @@ use vars qw($VERSION);
 $VERSION = '1.04';
 
 use overload
-  '++' => sub { $_[0]->nextNode(); $_[0]; },
-  '--' => sub { $_[0]->previousNode(); $_[0]; },
-  '<>' => sub { return wantarray ? $_[0]->_get_all() : $_[0]->nextNode(); },
-;
+    '++' => sub { $_[0]->nextNode();     $_[0]; },
+    '--' => sub { $_[0]->previousNode(); $_[0]; },
+    '<>' => sub { return wantarray ? $_[0]->_get_all() : $_[0]->nextNode(); },
+    ;
 
-
-sub new {
+sub new
+{
     my $class = shift;
     my $node  = shift;
 
@@ -26,10 +26,11 @@ sub new {
     my $self = bless {}, $class;
 
     $self->{FIRST} = $node;
+
     # $self->first;
 
     $self->{CURRENT} = undef;
-    $self->{INDEX} = -1;
+    $self->{INDEX}   = -1;
 
     $self->{ITERATOR} = \&default_iterator;
 
@@ -38,69 +39,82 @@ sub new {
     return $self;
 }
 
-
-sub iterator_function {
+sub iterator_function
+{
     my $self = shift;
     my $func = shift;
 
-    return if defined $func and ref( $func ) ne "CODE";
+    return if defined $func and ref($func) ne "CODE";
 
     $self->first;
-    if ( defined $func ) {
+    if ( defined $func )
+    {
         $self->{ITERATOR} = $func;
     }
-    else {
+    else
+    {
         $self->{ITERATOR} = \&default_iterator;
     }
 }
 
-sub set_filter {
+sub set_filter
+{
     my $self = shift;
-    $self->{FILTERS} = [ @_ ];
+    $self->{FILTERS} = [@_];
 }
 
-sub add_filter {
+sub add_filter
+{
     my $self = shift;
-    push @{$self->{FILTERS}}, @_;
+    push @{ $self->{FILTERS} }, @_;
 }
 
-sub current  { return $_[0]->{CURRENT}; }
-sub index    { return $_[0]->{INDEX}; }
+sub current { return $_[0]->{CURRENT}; }
+sub index   { return $_[0]->{INDEX}; }
 
-sub next { return $_[0]->nextNode(); }
+sub next     { return $_[0]->nextNode(); }
 sub previous { return $_[0]->previousNode(); }
 
-sub nextNode     {
-    my $self = shift;
-    my @filters = @{$self->{FILTERS}};
-    my $node = undef;
-    
-    if ( $self->{INDEX} != -1 ) {
+sub nextNode
+{
+    my $self    = shift;
+    my @filters = @{ $self->{FILTERS} };
+    my $node    = undef;
+
+    if ( $self->{INDEX} != -1 )
+    {
         my $fv = FILTER_SKIP;
-        unless ( scalar @filters > 0 ) {
+        unless ( scalar @filters > 0 )
+        {
             $fv = FILTER_DECLINED;
         }
 
-        while ( 1 ) {
+        while (1)
+        {
             $node = $self->{ITERATOR}->( $self, 1 );
             last unless defined $node;
-            foreach my $f ( @filters ) {
-                $fv = $f->accept_node( $node );
+            foreach my $f (@filters)
+            {
+                $fv = $f->accept_node($node);
                 last if $fv;
             }
             last if $fv == FILTER_ACCEPT or $fv == FILTER_DECLINED;
         }
     }
-    else {
+    else
+    {
         $node = $self->first();
     }
-        
-    if ( defined $node ) {
+
+    if ( defined $node )
+    {
         $self->{CURRENT} = $node;
-        if ( $node->isSameNode( $self->{FIRST} ) ) {
+        if ( $node->isSameNode( $self->{FIRST} ) )
+        {
             $self->{INDEX} = 0;
         }
-        else {
+        else
+        {
             $self->{INDEX}++;
         }
     }
@@ -108,25 +122,30 @@ sub nextNode     {
     return $node;
 }
 
-sub previousNode {
-    my $self = shift;
-    my @filters = @{$self->{FILTERS}};
-    my $node = undef;
-    my $fv = FILTER_SKIP;
-    unless ( scalar @filters > 0 ) {
+sub previousNode
+{
+    my $self    = shift;
+    my @filters = @{ $self->{FILTERS} };
+    my $node    = undef;
+    my $fv      = FILTER_SKIP;
+    unless ( scalar @filters > 0 )
+    {
         $fv = FILTER_DECLINED;
     }
-    while ( 1 ) {
+    while (1)
+    {
         $node = $self->{ITERATOR}->( $self, -1 );
         last unless defined $node;
-        foreach my $f ( @filters ) {
-            $fv = $f->accept_node( $node );
+        foreach my $f (@filters)
+        {
+            $fv = $f->accept_node($node);
             last if $fv;
         }
         last if $fv == FILTER_ACCEPT or $fv == FILTER_DECLINED;
     }
 
-    if ( defined $node ) {
+    if ( defined $node )
+    {
         $self->{CURRENT} = $node;
         $self->{INDEX}--;
     }
@@ -134,88 +153,105 @@ sub previousNode {
     return $node;
 }
 
-sub first {
+sub first
+{
     my $self = shift;
-    if ( scalar @_ ) {
+    if ( scalar @_ )
+    {
         $self->{FIRST} = shift;
     }
 
     $self->{CURRENT} = $self->{FIRST};
 
     # this logic is required if the node is not allowed to be shown
-    my @filters = @{$self->{FILTERS}||[]};
-    my $fv = FILTER_DECLINED;
+    my @filters = @{ $self->{FILTERS} || [] };
+    my $fv      = FILTER_DECLINED;
 
-    foreach my $f ( @filters ) {
+    foreach my $f (@filters)
+    {
         $fv = $f->accept_node( $self->{CURRENT} );
         last if $fv;
     }
 
     $fv ||= FILTER_ACCEPT;
 
-    unless ( $fv == FILTER_ACCEPT ) {
+    unless ( $fv == FILTER_ACCEPT )
+    {
         return undef;
     }
 
-    $self->{INDEX}   = 0;
+    $self->{INDEX} = 0;
     return $self->current;
 }
 
-sub last  {
+sub last
+{
     my $self = shift;
-    while ($self->next) {}
+    while ( $self->next ) { }
     return $self->current;
 }
 
-sub iterate {
-    my $self = shift;
+sub iterate
+{
+    my $self     = shift;
     my $function = shift;
-    return unless defined $function and ref( $function ) eq 'CODE' ;
+    return unless defined $function and ref($function) eq 'CODE';
     my $rv;
     my $node = $self->first;
-    while ( $node ) {
-        $rv = $function->($self,$node);
+    while ($node)
+    {
+        $rv   = $function->( $self, $node );
         $node = $self->next;
     }
     return $rv;
 }
 
-sub default_iterator {
+sub default_iterator
+{
     my $self = shift;
     my $dir  = shift;
     my $node = undef;
 
-
-    if ( $dir < 0 ) {
-        return undef if $self->{CURRENT}->isSameNode( $self->{FIRST} )
-          and $self->{INDEX} <= 0;
+    if ( $dir < 0 )
+    {
+        return undef
+            if $self->{CURRENT}->isSameNode( $self->{FIRST} )
+            and $self->{INDEX} <= 0;
 
         $node = $self->{CURRENT}->previousSibling;
         return $self->{CURRENT}->parentNode unless defined $node;
 
-        while ( $node->hasChildNodes ) {
+        while ( $node->hasChildNodes )
+        {
             $node = $node->lastChild;
         }
     }
-    else {
-        if ( defined $self->{CURRENT} ) {
-            return undef if $self->{CURRENT}->isSameNode( $self->{FIRST} )
+    else
+    {
+        if ( defined $self->{CURRENT} )
+        {
+            return undef
+                if $self->{CURRENT}->isSameNode( $self->{FIRST} )
                 and $self->{INDEX} > 0;
 
-            if ( $self->{CURRENT}->hasChildNodes ) {
+            if ( $self->{CURRENT}->hasChildNodes )
+            {
                 $node = $self->{CURRENT}->firstChild;
             }
-            else {
+            else
+            {
                 $node = $self->{CURRENT}->nextSibling;
                 my $pnode = $self->{CURRENT}->parentNode;
-                while ( not defined $node ) {
+                while ( not defined $node )
+                {
                     last unless defined $pnode;
-                    $node = $pnode->nextSibling;
+                    $node  = $pnode->nextSibling;
                     $pnode = $pnode->parentNode unless defined $node;
                 }
             }
         }
-        else {
+        else
+        {
             $self->{CURRENT} = $self->{FIRST};
             $node = $self->{CURRENT};
         }
@@ -225,26 +261,34 @@ sub default_iterator {
 }
 
 # helper function for the <> operator
-# returns all nodes that have not yet been accessed 
-sub _get_all {
-    my $self = shift;
+# returns all nodes that have not yet been accessed
+sub _get_all
+{
+    my $self   = shift;
     my @retval = ();
     my $node;
-    while ( $node = $self->next() ) {
-        push @retval, $node; 
+    while ( $node = $self->next() )
+    {
+        push @retval, $node;
     }
     return @retval;
 }
 
 1;
+
 __END__
 
 =pod
 
+=encoding UTF-8
 
 =head1 NAME
 
 XML::LibXML::Iterator - XML::LibXML's Tree Iteration Class
+
+=head1 VERSION
+
+version 1.05
 
 =head1 SYNOPSIS
 
@@ -267,7 +311,7 @@ XML::LibXML::Iterator - XML::LibXML's Tree Iteration Class
 =head1 DESCRIPTION
 
 XML::LibXML::Iterator is an iterator class for XML::LibXML parsed
-documents. This class allows to iterate the document tree as it were a
+documents. This class allows one to iterate the document tree as it were a
 linear data structure. It is possible to step back and forth between
 the nodes of the tree and do certain operations on that
 nodes. Different to XPath the nodes are not prefetched but will be
@@ -310,7 +354,7 @@ In short: An iterator will answer the question about what to do next.
 
 XML::LibXML::Iterator requires a parsed document or at least a node to
 operate on. This node is passed to the iterator class and will be used
-as the B<first> node of the iteration. One can allways reset the
+as the B<first> node of the iteration. One can always reset the
 iterator to the first node by using the first()-function.
 
 Once XML::LibXML::Iterator is initialized the tree can be traversed by
@@ -320,7 +364,7 @@ XML::LibXML::Node object if there is such object available.
 Since the current object hold by the iterator class is always
 available via the current() function.
 
-The following example may clearify this:
+The following example may clarify this:
 
   # get the document from wherever you like
   my $doc = XML::LibXML->new->parse_stream( *SOMEINPUT );
@@ -376,14 +420,14 @@ accessed is given by the following order:
 
 In combination with XML::Nodefilter this is best for a wide range of
 scripts and applications. Nevertheless this is still to restrictive
-for some applications. XML::LibXML::Iterator allows to change that
+for some applications. XML::LibXML::Iterator allows one to change that
 behaviour. This is done by resetting XML::LibXML::Iterator's iterator
 function. By using the method iterator_function() to override the
 default iterator function, it is possible to implement iterations
 based on any iteration rule imaginable.
 
 A valid iterator function has to take two parameters: As the first
-parameter it will recieve the iterator object itself, as second the
+parameter it will receive the iterator object itself, as second the
 direction of the iteration will be passed. The direction is either 1
 (for next()) or -1 (for previous()). As the iterator-function is
 called by next() and previous() the interator-function has to be aware
@@ -420,7 +464,7 @@ function therefore will look like this:
 
 Another feature of XML::LibXML::Iterator is the ability to repeat a
 single operation on all nodes in scope. Instead of writing a loop one
-can specify the opeation as a function, that it applied on each node
+can specify the operation as a function, that it applied on each node
 found. The function that does the trick, is named iterate().
 
 iterate() takes again two parameter: First the iterator object, second
@@ -435,31 +479,37 @@ The following example will show how this works:
 This extra long line lowercases all tagnames and the names of the
 attributes in a given subtree.
 
-=head2 Functions
+=head1 METHODS
 
 =over 4
 
-=item new($first_node)
+=item * new($first_node)
 
-=item first()
+=item * default_iterator
 
-=item nextNode()
+=item * first()
 
-=item previousNode()
+=item * next()
 
-=item last()
+=item * nextNode()
 
-=item current()
+=item * previous()
 
-=item index()
+=item * previousNode()
 
-=item iterator_function($funcion_ref)
+=item * last()
 
-=item set_filter(@filter_list)
+=item * current()
 
-=item add_filter(@filter_list)
+=item * index()
 
-=item iterate($function_ref)
+=item * iterator_function($funcion_ref)
+
+=item * set_filter(@filter_list)
+
+=item * add_filter(@filter_list)
+
+=item * iterate($function_ref)
 
 =back
 
@@ -478,5 +528,131 @@ Christian Glahn, E<lt>phish@cpan.orgE<gt>
 This package is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
-=cut
+=head1 AUTHOR
 
+unknown
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by unknown.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/xml-libxml-iterator/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+
+=head1 SUPPORT
+
+=head2 Perldoc
+
+You can find documentation for this module with the perldoc command.
+
+  perldoc XML::LibXML::Iterator
+
+=head2 Websites
+
+The following websites have more information about this module, and may be of help to you. As always,
+in addition to those websites please use your favorite search engine to discover more resources.
+
+=over 4
+
+=item *
+
+MetaCPAN
+
+A modern, open-source CPAN search engine, useful to view POD in HTML format.
+
+L<https://metacpan.org/release/XML-LibXML-Iterator>
+
+=item *
+
+Search CPAN
+
+The default CPAN search engine, useful to view POD in HTML format.
+
+L<http://search.cpan.org/dist/XML-LibXML-Iterator>
+
+=item *
+
+RT: CPAN's Bug Tracker
+
+The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
+
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=XML-LibXML-Iterator>
+
+=item *
+
+AnnoCPAN
+
+The AnnoCPAN is a website that allows community annotations of Perl module documentation.
+
+L<http://annocpan.org/dist/XML-LibXML-Iterator>
+
+=item *
+
+CPAN Ratings
+
+The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
+
+L<http://cpanratings.perl.org/d/XML-LibXML-Iterator>
+
+=item *
+
+CPANTS
+
+The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
+
+L<http://cpants.cpanauthors.org/dist/XML-LibXML-Iterator>
+
+=item *
+
+CPAN Testers
+
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
+
+L<http://www.cpantesters.org/distro/X/XML-LibXML-Iterator>
+
+=item *
+
+CPAN Testers Matrix
+
+The CPAN Testers Matrix is a website that provides a visual overview of the test results for a distribution on various Perls/platforms.
+
+L<http://matrix.cpantesters.org/?dist=XML-LibXML-Iterator>
+
+=item *
+
+CPAN Testers Dependencies
+
+The CPAN Testers Dependencies is a website that shows a chart of the test results of all dependencies for a distribution.
+
+L<http://deps.cpantesters.org/?module=XML::LibXML::Iterator>
+
+=back
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests by email to C<bug-xml-libxml-iterator at rt.cpan.org>, or through
+the web interface at L<https://rt.cpan.org/Public/Bug/Report.html?Queue=XML-LibXML-Iterator>. You will be automatically notified of any
+progress on the request by the system.
+
+=head2 Source Code
+
+The code is open to the world, and available for you to hack on. Please feel free to browse it and play
+with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
+from your repository :)
+
+L<https://github.com/shlomif/xml-libxml-iterator>
+
+  git clone git://github.com/shlomif/xml-libxml-iterator.git
+
+=cut

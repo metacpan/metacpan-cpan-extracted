@@ -2,6 +2,7 @@ package App::HomeBank2Ledger::Formatter::Beancount;
 # ABSTRACT: Beancount formatter
 
 
+use v5.10.1;    # defined-or
 use warnings;
 use strict;
 
@@ -9,7 +10,7 @@ use App::HomeBank2Ledger::Util qw(commify rtrim);
 
 use parent 'App::HomeBank2Ledger::Formatter';
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 my %STATUS_SYMBOLS = (
     cleared => '*',
@@ -24,18 +25,19 @@ sub format {
     my $ledger = shift;
 
     my @out = (
-        $self->_format_header,
-        $self->_format_accounts($ledger),
-        $self->_format_commodities($ledger),
-        # $self->_format_payees,
-        # $self->_format_tags,
-        $self->_format_transactions($ledger),
+        $self->format_header,
+        $self->format_accounts($ledger),
+        $self->format_commodities($ledger),
+        # $self->format_payees,
+        # $self->format_tags,
+        $self->format_transactions($ledger),
     );
 
     return join($/, map { rtrim($_) } @out);
 }
 
-sub _format_header {
+
+sub format_header {
     my $self = shift;
 
     my @out;
@@ -43,16 +45,17 @@ sub _format_header {
     if (my $name = $self->name) {
         push @out, "; Name: $name";
     }
-
-    my $file = $self->file;
-    push @out, "; Converted from ${file} using homebank2ledger ${VERSION}";
+    if (my $file = $self->file) {
+        push @out, "; File: $file";
+    }
 
     push @out, '';
 
     return @out;
 }
 
-sub _format_accounts {
+
+sub format_accounts {
     my $self   = shift;
     my $ledger = shift;
 
@@ -70,7 +73,8 @@ sub _format_accounts {
     return @out;
 }
 
-sub _format_commodities {
+
+sub format_commodities {
     my $self   = shift;
     my $ledger = shift;
 
@@ -89,7 +93,8 @@ sub _format_commodities {
     return @out;
 }
 
-sub _format_transactions {
+
+sub format_transactions {
     my $self   = shift;
     my $ledger = shift;
 
@@ -150,7 +155,27 @@ sub _format_transaction {
         push @line, ($posting_status_symbol ? "  $posting_status_symbol " : '    ');
         push @line, sprintf("\%-${account_width}s", $account);
         push @line, '  ';
-        push @line, $self->_format_amount($posting->{amount}, $posting->{commodity}) if defined $posting->{amount};
+        if (defined $posting->{amount}) {
+            push @line, $self->_format_amount($posting->{amount}, $posting->{commodity});
+            my $lot_price = $posting->{lot_price};
+            my $lot_date  = $posting->{lot_date};
+            my $lot_ref   = $posting->{lot_ref};
+            if ($lot_price || $lot_date || $lot_ref) {
+                push @line, ' {',
+                            join(', ',
+                                $lot_price ? $self->_format_amount($lot_price->{amount}, $lot_price->{commodity}) : (),
+                                $lot_date  ? $lot_date : (),
+                                $lot_ref   ? $self->_format_string($lot_ref) : (),
+                            ),
+                            '}';
+            }
+            if (my $cost = $posting->{total_cost} // $posting->{cost}) {
+                my $is_total = defined $posting->{total_cost};
+                my $cost_symbol = $is_total ? '@@' : '@';
+                push @line, ' ', $cost_symbol, ' ',
+                            $self->_format_amount($cost->{amount}, $cost->{commodity});
+            }
+        }
 
         push @out, join('', @line);
     }
@@ -257,11 +282,55 @@ App::HomeBank2Ledger::Formatter::Beancount - Beancount formatter
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 DESCRIPTION
 
 This is a formatter for L<Beancount|http://furius.ca/beancount/>.
+
+=head1 METHODS
+
+=head2 format_header
+
+    @lines = $formatter->format_header;
+
+Get formatted header. For example,
+
+    ; Name: My Finances
+    ; File: path/to/finances.xhb
+
+=head2 format_accounts
+
+    @lines = $formatter->format_accounts($ledger);
+
+Get formatted accounts. For example,
+
+    2003-02-14 open Assets:Bank:Credit-Union:Savings
+    2003-02-14 open Assets:Bank:Credit-Union:Checking
+    ...
+
+=head2 format_commodities
+
+    @lines = $formatter->format_commodities($ledger);
+
+Get formattted commodities. For example,
+
+    2003-02-14 commodity USD
+        name: "US Dollar"
+    ...
+
+=head2 format_transactions
+
+    @lines = $formatter->format_transactions($ledger);
+
+Get formatted transactions. For example,
+
+    2003-02-14 * "Opening Balance"
+        Assets:Bank:Credit-Union:Savings           458.21 USD
+        Assets:Bank:Credit-Union:Checking          194.17 USD
+        Equity:Opening-Balances
+
+    ...
 
 =head1 SEE ALSO
 

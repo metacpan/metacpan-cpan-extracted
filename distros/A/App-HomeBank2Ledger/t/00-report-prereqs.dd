@@ -39,6 +39,7 @@ do { my $x = {
                                       'XML::Entities' => '0',
                                       'XML::Parser::Lite' => '0',
                                       'parent' => '0',
+                                      'perl' => 'v5.10.1',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }
@@ -52,8 +53,7 @@ do { my $x = {
                                    'File::Spec' => '0',
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
-                                   'Test::More' => '0',
-                                   'perl' => '5.006'
+                                   'Test::More' => '0'
                                  }
                  }
      };

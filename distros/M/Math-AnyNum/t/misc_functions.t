@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 577;
+plan tests => 583;
 
 use Math::AnyNum qw(:misc lngamma ipow10 log);
 use List::Util qw();
@@ -242,6 +242,13 @@ is(denominator(complex('0.75')), '4');          # '3/4'
 is(denominator('0.75'),          '4');          # '3/4'
 is(denominator(complex('3+4i')), 'NaN');
 is(denominator("-42"),           "1");
+
+is($o->new('87524175757784805286500803841234030417952156390545')->length, 50);
+is($o->new('534303892')->length(2),                                       29);
+is($o->new('7583819')->length(3),                                         15);
+is($o->new('4258784685')->length(4),                                      16);
+is($o->new('5040')->length(5),                                            6);
+is($o->new('5040')->length,                                               4);
 
 is(join(' ', digits('1234')),      '4 3 2 1');
 is(join(' ', digits('1234.5678')), '4 3 2 1');    # only the integer part is considered

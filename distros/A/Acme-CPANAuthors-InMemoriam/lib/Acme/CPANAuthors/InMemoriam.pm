@@ -4,7 +4,7 @@ use warnings;
 
 {
     no strict "vars";
-    $VERSION = "1.07";
+    $VERSION = "1.08";
 }
 
 use Acme::CPANAuthors::Register (
@@ -16,10 +16,12 @@ use Acme::CPANAuthors::Register (
     'AVENJ'     => 'Jon Portnoy',
     'CKARG'     => 'Christian Karg',
     'ENCRYPTIO' => 'Chris Kastorff',
+    'GARY'      => 'Gary Howland',
     'GARYAJ'    => 'Gary Ashton-Jones',
     'GMCCAR'    => 'Greg McCarroll',
     'IVORW'     => 'Ivor Williams',
     'JAITKEN'   => 'James Aitken',
+    'KHAMPTON'  => 'Kip Hampton',
     'NI-S'      => 'Nick Ing-Simmons',
     'NOBULL'    => 'Brian McCauley',
     'RKOBES'    => 'Randy Kobes',
@@ -67,10 +69,12 @@ celebrate their time with us.
   AVENJ         Jon Portnoy         d.2016
   CKARG         Christian Karg      d.2013
   ENCRYPTIO     Chris Kastorff      d.2017
+  GARY          Gary Howland        d.2002
   GARYAJ        Gary Ashton-Jones   d.2016
   GMCCAR        Greg McCarroll      d.2013
   IVORW         Ivor Williams       d.2009
   JAITKEN       James Aitken        d.2014
+  KHAMPTON      Kip Hampton         d.2017
   NI-S          Nick Ing-Simmons    d.2006
   NOBULL        Brian McCauley      d.2015
   RKOBES        Randy Kobes         d.2010
@@ -127,7 +131,7 @@ Thanks to Kenichi Ishigaki for writing C<Acme::CPANAuthors>.
 
 =head1 COPYRIGHT & LICENSE
 
-  Copyright 2013-2017 Barbie for Miss Barbell Productions.
+  Copyright 2013-2019 Barbie for Miss Barbell Productions.
 
   This distribution is free software; you can redistribute it and/or
   modify it under the Artistic License 2.0.

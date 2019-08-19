@@ -1,0 +1,34 @@
+55 9  * * 1 *   #green DAILY SCRUM NOW!
+55 9  * * 2 *   #green DAILY SCRUM NOW!
+55 9  * * 3 3/0 #green DAILY SCRUM NOW!
+55 9  * * 3 3/1 #green DAILY SCRUM NOW!
+55 9  * * 4 *   #green DAILY SCRUM NOW!
+55 9  * * 5 *   #green DAILY SCRUM NOW!
+55 11 * * 3 3/2 #green REFINEMENT & PLANNING MEETING
+55 10 * * 2 3/2 #green RETROSPECTIVE MEETING
+
+55 14 * * 1 *   #blue DAILY SCRUM NOW!
+55 14 * * 2 *   #blue DAILY SCRUM NOW!
+55 14 * * 3 2/0 #blue DAILY SCRUM NOW!
+55 14 * * 4 *   #blue DAILY SCRUM NOW!
+55 14 * * 5 *   #blue DAILY SCRUM NOW!
+55 14 * * 3 2/1 #blue REFINEMENT & PLANNING MEETING
+55 14 * * 2 2/1 #blue RETROSPECTIVE MEETING
+
+40 9  * * 1 2/1 #red DAILY SCRUM NOW!
+40 9  * * 2 *   #red DAILY SCRUM NOW!
+40 9  * * 3 *   #red DAILY SCRUM NOW!
+40 9  * * 4 *   #red DAILY SCRUM NOW!
+40 9  * * 5 *   #red DAILY SCRUM NOW!
+55 10 * * 1 2/0 #red REFINEMENT & PLANNING MEETING
+55 10 * * 2 2/1 #red RETROSPECTIVE MEETING
+
+25 9  * * 1 *   #purple DAILY SCRUM NOW!
+25 9  * * 2 *   #purple DAILY SCRUM NOW!
+25 9  * * 3 *   #purple DAILY SCRUM NOW!
+25 9  * * 4 2/0 #purple DAILY SCRUM NOW!
+25 9  * * 5 *   #purple DAILY SCRUM NOW!
+55 9  * * 4 2/1 #purple REFINEMENT & PLANNING MEETING
+55 9  * * 2 2/1 #purple RETROSPECTIVE MEETING
+
+55 9  * * 2 *   #yellow TBC Meeting

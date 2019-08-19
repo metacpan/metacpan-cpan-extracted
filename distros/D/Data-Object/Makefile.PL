@@ -32,7 +32,7 @@ my %WriteMakefileArgs = (
     "Try::Tiny" => "0.30",
     "Type::Tiny" => "1.000005"
   },
-  "VERSION" => "0.98",
+  "VERSION" => "0.99",
   "test" => {
     "TESTS" => "t/0.01/data/*.t t/0.01/data/object/*.t t/0.01/data/object/any/*.t t/0.01/data/object/array/*.t t/0.01/data/object/code/*.t t/0.01/data/object/float/*.t t/0.01/data/object/hash/*.t t/0.01/data/object/integer/*.t t/0.01/data/object/library/*.t t/0.01/data/object/number/*.t t/0.01/data/object/regexp/*.t t/0.01/data/object/scalar/*.t t/0.01/data/object/signatures/*.t t/0.01/data/object/string/*.t t/0.01/data/object/undef/*.t t/0.50/data/*.t t/0.50/data/object/*.t t/0.50/data/object/class/*.t t/0.50/data/object/func/*.t t/0.50/data/object/regexp/*.t t/0.90/*.t t/0.90/can/*.t t/0.90/use/*.t"
   }

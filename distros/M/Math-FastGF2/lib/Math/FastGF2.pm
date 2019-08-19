@@ -3,6 +3,7 @@ package Math::FastGF2;
 use 5.006000;
 use strict;
 use warnings;
+no warnings qw(redefine);
 
 use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION);
 
@@ -15,7 +16,7 @@ require Exporter;
 	       );
 @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 @EXPORT = (  );
-$VERSION = '0.04';
+$VERSION = '0.06';
 
 require XSLoader;
 XSLoader::load('Math::FastGF2', $VERSION);
@@ -428,7 +429,7 @@ Declan Malone, E<lt>idablack@users.sourceforge.netE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009 by Declan Malone
+Copyright (C) 2009-2019 by Declan Malone
 
 This package is free software; you can redistribute it and/or modify
 it under the terms of the "GNU General Public License" ("GPL").

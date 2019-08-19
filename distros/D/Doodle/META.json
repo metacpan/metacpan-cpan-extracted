@@ -1,5 +1,5 @@
 {
-   "abstract" : "Database DDL Builder",
+   "abstract" : "Database DDL Statement Builder",
    "author" : [
       "Al Newkirk <awncorp@cpan.org>"
    ],
@@ -37,13 +37,14 @@
       "bugtracker" : {
          "web" : "https://github.com/iamalnewkirk/doodle/issues"
       },
+      "homepage" : "https://metacpan.org/pod/Doodle",
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/iamalnewkirk/doodle.git",
          "web" : "https://github.com/iamalnewkirk/doodle"
       }
    },
-   "version" : "0.01",
+   "version" : "0.03",
    "x_authority" : "cpan:AWNCORP",
    "x_contributors" : [
       "Al Newkirk <al@iamalnewkirk.com>"

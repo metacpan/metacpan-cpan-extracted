@@ -12,7 +12,7 @@ use Time::Piece;
 use XML::Entities;
 use XML::Parser::Lite;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 our @EXPORT_OK = qw(parse_string parse_file);
 
@@ -411,6 +411,10 @@ sub parse_string {
                         $attr{flags}{$name} = $flags & (1 << $shift) ? 1 : 0;
                     }
 
+                    for my $bnum (0 .. 12) {
+                        $attr{budget_amounts}[$bnum] = delete $attr{"b$bnum"} if $attr{"b$bnum"};
+                    }
+
                     push @categories, \%attr;
                 }
                 elsif ($node eq 'ope') {    # transaction
@@ -487,7 +491,7 @@ File::HomeBank - Parse HomeBank files
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

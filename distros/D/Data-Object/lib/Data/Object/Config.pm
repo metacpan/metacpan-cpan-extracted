@@ -3,23 +3,23 @@ package Data::Object::Config;
 use strict;
 use warnings;
 
-use Data::Object::Export qw(
-  croak
-  namespace
-  registry
-);
-
 use Import::Into;
-use Type::Tiny;
 
-our $VERSION = '0.98'; # VERSION
+our $VERSION = '0.99'; # VERSION
 
 # BUILD
+
+our %cache;
 
 sub import {
   my ($class, $type, $meta) = @_;
 
-  process(scalar(caller), prepare($class, $type), $type, $meta);
+  my $target = caller;
+
+  # only configure once
+  return if $cache{$target}++;
+
+  process($target, prepare($class, $type), $type, $meta);
 
   return;
 }
@@ -489,10 +489,12 @@ sub _process_meta {
   eval "require $namespace";
 
   # ensure that the type library is valid and operable
-  croak "$namespace is not a valid type library" unless $namespace->isa('Type::Library');
+  Data::Object::Export::croak("$namespace is not a valid type library")
+    unless $namespace->isa('Type::Library');
 
   # build type-tiny constraint for target, then add constraint to typelib
-  _process_typereg($namespace, _process_typetiny(registry(), $target, $parent));
+  _process_typereg($namespace, _process_typetiny(Data::Object::Export::registry(),
+      $target, $parent));
 
   return;
 }
@@ -502,7 +504,8 @@ sub _process_typelib {
   my ($target, $meta) = @_;
 
   # register target <-> typelib so target can use typelib
-  return namespace($target, ref($meta) ? join('-', @$meta) : $meta);
+  return Data::Object::Export::namespace($target, ref($meta)
+    ? join('-', @$meta) : $meta);
 }
 
 # experimental
@@ -510,7 +513,8 @@ sub _process_typereg {
   my ($namespace, $constraint) = @_;
 
   # add type constraint to the user-defined type-library
-  return $namespace->get_type($constraint->name) || $namespace->add_type($constraint);
+  return $namespace->get_type($constraint->name)
+    || $namespace->add_type($constraint);
 }
 
 # experimental
@@ -518,7 +522,7 @@ sub _process_typetiny {
   my ($registry, $target, $reference) = @_;
 
   # core typelib has InstanceOf and ConsumerOf type objects
-  my $library = $registry->def;
+  my $library = 'Data::Object::Library';
 
   # type constraint name from target package name
   my $name = ucfirst $target =~ s/\W//gr;

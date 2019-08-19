@@ -10,6 +10,7 @@ README
 README.md
 README.template
 bin/n50
+bin/n50.bak
 data/sim1.fa
 data/sim2.fa
 data/small_test.fa
