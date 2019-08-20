@@ -1,5 +1,8 @@
 Revision history for Date::Saka::Simple
 
+0.25  Tue Aug 20 15:45:00 2019
+      - Updated dependency on Date::Utils v0.27.
+
 0.24  Sat Aug 03 23:45:00 2019
       - Moved author test scripts to xt/ subfolder.
 

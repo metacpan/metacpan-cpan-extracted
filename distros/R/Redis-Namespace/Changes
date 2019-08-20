@@ -1,5 +1,12 @@
 Revision history for Perl extension Redis::Namespace
 
+0.12 2019-08-19T23:12:00Z
+        - support older Perls again
+
+0.11 2019-08-19T22:26:18Z
+        - drop support of perl 5.20
+        - fix some tests
+
 0.10 2019-08-12T02:32:23Z
         - support commands of Redis 5.0
         - add strict option

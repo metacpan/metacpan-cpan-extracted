@@ -10,3 +10,4 @@ t/pod.t
 t/pod-coverage.t
 t/test.ogg
 t/test.mp3
+META.json

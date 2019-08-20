@@ -8,10 +8,10 @@ our @EXPORT = qw( scalar_to_buffer buffer_to_scalar );
 our @EXPORT_OK = qw ( scalar_to_pointer );
 
 # ABSTRACT: Convert scalars to C buffers
-our $VERSION = '0.94'; # VERSION
+our $VERSION = '0.96'; # VERSION
 
 
-use constant _incantation => 
+use constant _incantation =>
   $^O eq 'MSWin32' && $Config::Config{archname} =~ /MSWin32-x64/
   ? 'Q'
   : 'L!';
@@ -28,12 +28,12 @@ sub scalar_to_pointer ($)
   unpack(_incantation, pack 'P', $_[0]);
 }
 
-      
+
 sub buffer_to_scalar ($$)
 {
   unpack 'P'.$_[1], pack _incantation, defined $_[0] ? $_[0] : 0;
 }
-  
+
 1;
 
 __END__
@@ -48,7 +48,7 @@ FFI::Platypus::Buffer - Convert scalars to C buffers
 
 =head1 VERSION
 
-version 0.94
+version 0.96
 
 =head1 SYNOPSIS
 
@@ -58,21 +58,21 @@ version 0.94
 
 =head1 DESCRIPTION
 
-A common pattern in C is to pass a "buffer" or region of memory into a 
-function with a pair of arguments, an opaque pointer and the size of the 
-memory region.  In Perl the equivalent structure is a scalar containing 
-a string of bytes.  This module provides portable functions for 
+A common pattern in C is to pass a "buffer" or region of memory into a
+function with a pair of arguments, an opaque pointer and the size of the
+memory region.  In Perl the equivalent structure is a scalar containing
+a string of bytes.  This module provides portable functions for
 converting a Perl string or scalar into a buffer and back.
 
-These functions are implemented using L<pack and unpack|perlpacktut> and 
+These functions are implemented using L<pack and unpack|perlpacktut> and
 so they should be relatively fast.
 
-Both functions are exported by default, but you can explicitly export 
+Both functions are exported by default, but you can explicitly export
 one or neither if you so choose.
 
-A better way to do this might be with custom types see 
-L<FFI::Platypus::API> and L<FFI::Platypus::Type>.  These functions were 
-taken from the now obsolete L<FFI::Util> module, as they may be useful 
+A better way to do this might be with custom types see
+L<FFI::Platypus::API> and L<FFI::Platypus::Type>.  These functions were
+taken from the now obsolete L<FFI::Util> module, as they may be useful
 in some cases.
 
 B<Caution>: This module provides great power in the way that you
@@ -86,8 +86,8 @@ understand the underlying ownership model of these pointers.
 
  my($pointer, $size) = scalar_to_buffer $scalar;
 
-Convert a string scalar into a buffer.  Returned in order are a pointer 
-to the start of the string scalar's memory region and the size of the 
+Convert a string scalar into a buffer.  Returned in order are a pointer
+to the start of the string scalar's memory region and the size of the
 region.
 
 You should NEVER try to free C<$pointer>.
@@ -130,7 +130,7 @@ Not exported by default, but may be exported on request.
 
  my $scalar = buffer_to_scalar $pointer, $size;
 
-Convert the buffer region defined by the pointer and size into a string 
+Convert the buffer region defined by the pointer and size into a string
 scalar.
 
 Because of the way memory management works in Perl, the buffer is copied
@@ -176,6 +176,8 @@ Ilya Pavlov (Ilya33)
 Petr Pisar (ppisar)
 
 Mohammad S Anwar (MANWAR)
+
+Håkon Hægland (hakonhagland, HAKONH)
 
 =head1 COPYRIGHT AND LICENSE
 

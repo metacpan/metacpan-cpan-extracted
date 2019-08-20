@@ -1,5 +1,5 @@
 package Git::Raw;
-$Git::Raw::VERSION = '0.83';
+$Git::Raw::VERSION = '0.84';
 use strict;
 use warnings;
 
@@ -23,6 +23,7 @@ use Git::Raw::Reference;
 use Git::Raw::Repository;
 use Git::Raw::Stash;
 use Git::Raw::Stash::Progress;
+use Git::Raw::Submodule;
 use Git::Raw::Tree;
 use Git::Raw::TransferProgress;
 use Git::Raw::Worktree;
@@ -32,14 +33,11 @@ use Git::Raw::Worktree;
 __END__
 
 =for HTML
-<a href="https://travis-ci.org/jacquesg/p5-Git-Raw">
-	<img src="https://travis-ci.org/jacquesg/p5-Git-Raw.svg?branch=master" alt="Build Status: Travis" align="right" />
+<a href="https://dev.azure.com/jacquesgermishuys/p5-Git-Raw/_build">
+	<img src="https://dev.azure.com/jacquesgermishuys/p5-Git-Raw/_apis/build/status/jacquesg.p5-Git-Raw?branchName=master" alt="Build Status: Azure Pipeline" align="right" />
 </a>
 <a href="https://ci.appveyor.com/project/jacquesg/p5-git-raw">
 	<img src="https://ci.appveyor.com/api/projects/status/il9rm9fsf9dj1dcu/branch/master?svg=true" alt="Build Status: AppVeyor" align="right" />
-</a>
-<a href="https://codecov.io/gh/jacquesg/p5-Git-Raw">
-	<img src="https://codecov.io/gh/jacquesg/p5-Git-Raw/branch/master/graph/badge.svg" alt="codecov" align="right"/>
 </a>
 <a href="https://coveralls.io/r/jacquesg/p5-Git-Raw">
 	<img src="https://coveralls.io/repos/jacquesg/p5-Git-Raw/badge.png?branch=master" alt="coveralls" align="right" />
@@ -52,7 +50,7 @@ Git::Raw - Perl bindings to the Git linkable library (libgit2)
 
 =head1 VERSION
 
-version 0.83
+version 0.84
 
 =head1 DESCRIPTION
 
@@ -176,6 +174,8 @@ otherwise specified.
 =head2 L<Git::Raw::Repository>
 
 =head2 L<Git::Raw::Signature>
+
+=head2 L<Git::Raw::Submodule>
 
 =head2 L<Git::Raw::Stash>
 

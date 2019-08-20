@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Documentation and tools for using Platypus with the C programming language
-our $VERSION = '0.94'; # VERSION
+our $VERSION = '0.96'; # VERSION
 
 
 sub native_type_map
@@ -27,7 +27,7 @@ FFI::Platypus::Lang::C - Documentation and tools for using Platypus with the C p
 
 =head1 VERSION
 
-version 0.94
+version 0.96
 
 =head1 SYNOPSIS
 
@@ -37,9 +37,9 @@ version 0.94
 
 =head1 DESCRIPTION
 
-This module provides some hooks for Platypus to interact with the C 
-programming language.  It is generally used by default if you do not 
-specify another foreign programming language with the 
+This module provides some hooks for Platypus to interact with the C
+programming language.  It is generally used by default if you do not
+specify another foreign programming language with the
 L<FFI::Platypus#lang> attribute.
 
 =head1 METHODS
@@ -91,6 +91,8 @@ Ilya Pavlov (Ilya33)
 Petr Pisar (ppisar)
 
 Mohammad S Anwar (MANWAR)
+
+Håkon Hægland (hakonhagland, HAKONH)
 
 =head1 COPYRIGHT AND LICENSE
 

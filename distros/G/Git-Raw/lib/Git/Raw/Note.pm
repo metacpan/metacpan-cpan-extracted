@@ -1,5 +1,5 @@
 package Git::Raw::Note;
-$Git::Raw::Note::VERSION = '0.83';
+$Git::Raw::Note::VERSION = '0.84';
 use strict;
 use warnings;
 
@@ -11,7 +11,7 @@ Git::Raw::Note - Git note class
 
 =head1 VERSION
 
-version 0.83
+version 0.84
 
 =head1 DESCRIPTION
 

@@ -1,0 +1,58 @@
+{
+   "abstract" : "Simple Perl script for scraping proxies from multiple websites.",
+   "author" : [
+      "Michał Wróblewski <debos@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Proxy-Scraper",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "LWP::UserAgent" : "0",
+            "List::Util" : "1.33",
+            "Term::ANSIColor" : "0",
+            "WWW::UserAgent::Random" : "0",
+            "Win32::Console::ANSI" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/DeBos99/Proxy-Scraper/issues"
+      },
+      "homepage" : "https://github.com/DeBos99/Proxy-Scraper",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/DeBos99/Proxy-Scraper.git",
+         "web" : "https://github.com/DeBos99/Proxy-Scraper"
+      }
+   },
+   "version" : "v2.0.1",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

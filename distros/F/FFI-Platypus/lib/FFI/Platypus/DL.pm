@@ -10,7 +10,7 @@ our @EXPORT = qw( dlopen dlerror dlsym dlclose );
 push @EXPORT, grep /RTLD_/, keys %FFI::Platypus::DL::;
 
 # ABSTRACT: Slightly non-portable interface to libdl
-our $VERSION = '0.94'; # VERSION
+our $VERSION = '0.96'; # VERSION
 
 
 1;
@@ -27,7 +27,7 @@ FFI::Platypus::DL - Slightly non-portable interface to libdl
 
 =head1 VERSION
 
-version 0.94
+version 0.96
 
 =head1 SYNOPSIS
 
@@ -142,7 +142,7 @@ glibc 2.3.4 extension.
 
 This looks up the given C<$symbol> in the library pointed to by C<$handle>.  If the symbol is found,
 the address for that symbol is returned as an opaque pointer.  This pointer can be passed into
-the L<FFI::Platypus> C<function> and C<attach> methods instead of a function name.  
+the L<FFI::Platypus> C<function> and C<attach> methods instead of a function name.
 
 If the symbol cannot be found then C<undef> will be returned and the diagnostic for the failure can
 be retrieved with C<dlerror> as described below.
@@ -151,7 +151,7 @@ be retrieved with C<dlerror> as described below.
 
  my $status = dlclose($handle);
 
-On success, C<dlclose> returns 0; on error, it returns a nonzero value, and the diagnostic for the 
+On success, C<dlclose> returns 0; on error, it returns a nonzero value, and the diagnostic for the
 failure can be retrieved with C<dlerror> as described below.
 
 =head2 dlerror
@@ -204,6 +204,8 @@ Ilya Pavlov (Ilya33)
 Petr Pisar (ppisar)
 
 Mohammad S Anwar (MANWAR)
+
+Håkon Hægland (hakonhagland, HAKONH)
 
 =head1 COPYRIGHT AND LICENSE
 

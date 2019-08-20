@@ -1,0 +1,35 @@
+---
+abstract: 'abstract syntax tree for configuration files'
+author:
+  - 'Sergey Poznyakoff <gray@gnu.org>'
+build_requires: {}
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Config-AST
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Config::AST:
+    file: lib/Config/AST.pm
+    version: 1.01
+  Config::AST::Node:
+    file: lib/Config/AST/Node.pm
+    version: 0
+  Config::AST::Node::Null:
+    file: lib/Config/AST/Node/Null.pm
+    version: 0
+  Config::AST::Node::Section:
+    file: lib/Config/AST/Node/Section.pm
+    version: 0
+  Config::AST::Node::Value:
+    file: lib/Config/AST/Node/Value.pm
+    version: 0
+resources:
+  repository: git://git.gnu.org.ua/config-ast.git
+version: 1.01

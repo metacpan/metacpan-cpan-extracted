@@ -4,6 +4,11 @@ use Test::More;
 use Test::Deep;
 use lib 't/lib'; use MyTest;
 
+sub is_approx ($$;$) {
+    my ($testv, $v, $name) = @_;
+    cmp_ok abs($testv - $v), '<', 0.000001;
+}
+
 subtest "zero ctor" => sub {
     my $date = Date->new(0);
     is($date->epoch, 0);
@@ -20,7 +25,7 @@ subtest "billion ctor" => sub {
 
 subtest "double & string ctors" => sub {
     my $date = Date->new(1_000_000_000.000001);
-    is $date->epoch, 1_000_000_000.000001;
+    is_approx $date->epoch, 1_000_000_000.000001;
     is($date->to_string, "2001-09-09 05:46:40.000001");
     isnt($date, "2001-09-09 05:46:40");
     is($date, Date->new("2001-09-09 05:46:40.000001"));
@@ -30,18 +35,18 @@ subtest "double & string ctors" => sub {
     is($date->mksec, 1);
     is($date->to_number, 1000000000);
     $date = Date->new($date);
-    is($date->epoch, 1_000_000_000.000001);
+    is_approx($date->epoch, 1_000_000_000.000001);
 };
 
 subtest "hash ctor" => sub {
 	my $date = Date::date({year => 2018, month => 6, day => 27, hour => 22, min => 12, sec => 20, mksec => 340230});
-	is($date->epoch, 1530126740.34023);
+	is_approx($date->epoch, 1530126740.34023);
     is($date->mksec, 340230);
 };
 
 subtest "array ctor" => sub {
     my $date = Date::date([2018, 6, 27, 22, 12, 20, 340230]);
-    is($date->epoch, 1530126740.34023);
+    is_approx($date->epoch, 1530126740.34023);
     is($date->mksec, 340230);
 };
 
@@ -57,9 +62,9 @@ subtest "relations" => sub {
 subtest "assignment" => sub {
     my $date = Date->new(1);
     $date->epoch(1_000_000_000.000001);
-    is $date->epoch, 1_000_000_000.000001;
+    is_approx $date->epoch, 1_000_000_000.000001;
     $date->set("2001-09-09 05:46:40.000002");
-    is $date->epoch, 1_000_000_000.000002;
+    is_approx $date->epoch, 1_000_000_000.000002;
     my $d1 = Date->new("2001-09-09 05:46:40");
     $date->set($d1);
     is($date, $d1);
@@ -77,5 +82,7 @@ subtest "now_hires" => sub {
 	ok $date2 > $date1;
 	ok $date1->mksec || $date2->mksec;
 };
+
+
 
 done_testing;

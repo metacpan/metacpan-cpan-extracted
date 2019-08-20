@@ -1,0 +1,6 @@
+if [ -d TESTDIR/bin ]; then
+   echo "bin found"
+elif [ -d TESTDIR/nope ]; then
+   echo "nope found"
+else
+   echo "bin not found"

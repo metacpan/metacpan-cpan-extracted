@@ -5,7 +5,7 @@ use warnings;
 use Test2::API qw( context );
 
 # ABSTRACT: Run object
-our $VERSION = '1.79'; # VERSION
+our $VERSION = '1.83'; # VERSION
 
 
 sub out    { shift->{out} }
@@ -37,10 +37,10 @@ sub success
 sub exit_is
 {
   my($self, $exit, $message) = @_;
-  
+
   $message ||= "command exited with value $exit";
   my $ok = $self->exit == $exit;
-  
+
   my $ctx = context();
   $ctx->ok($ok, $message);
   $ctx->diag("  actual exit value was: @{[ $self->exit ]}") unless $ok;
@@ -52,10 +52,10 @@ sub exit_is
 sub exit_isnt
 {
   my($self, $exit, $message) = @_;
-  
+
   $message ||= "command exited with value not $exit";
   my $ok = $self->exit != $exit;
-  
+
   my $ctx = context();
   $ctx->ok($ok, $message);
   $ctx->diag("  actual exit value was: @{[ $self->exit ]}") unless $ok;
@@ -67,11 +67,11 @@ sub exit_isnt
 sub _like
 {
   my($self, $regex, $source, $not, $message) = @_;
-  
+
   my $ok = $self->{$source} =~ $regex;
   $ok = !$ok if $not;
-  
-  my $ctx = context();  
+
+  my $ctx = context();
   $ctx->ok($ok, $message);
   unless($ok)
   {
@@ -81,7 +81,7 @@ sub _like
     $ctx->diag("    $regex");
   }
   $ctx->release;
-  
+
   $self;
 }
 
@@ -120,7 +120,7 @@ sub err_unlike
 sub note
 {
   my($self) = @_;
-  my $ctx = context();  
+  my $ctx = context();
   $ctx->note("[cmd]");
   $ctx->note("  @{$self->{cmd}}");
   if($self->out ne '')
@@ -172,7 +172,7 @@ Test::Alien::Run - Run object
 
 =head1 VERSION
 
-version 1.79
+version 1.83
 
 =head1 SYNOPSIS
 

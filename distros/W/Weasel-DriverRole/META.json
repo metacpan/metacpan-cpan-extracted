@@ -1,0 +1,50 @@
+{
+   "abstract" : "API definition for Weasel's driver wrappers",
+   "author" : [
+      "Erik Huelsmann <ehuels@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Weasel-DriverRole",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "v5.10.1"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/perl-weasel/weasel/issues"
+      },
+      "homepage" : "https://weasel.pm/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/perl-weasel/weasel.git",
+         "web" : "https://github.com/perl-weasel/weasel"
+      }
+   },
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::XS version 3.03"
+}
+

@@ -5,7 +5,7 @@ use warnings;
 use Test2::API qw( context );
 
 # ABSTRACT: A mock alien object for testing
-our $VERSION = '1.79'; # VERSION
+our $VERSION = '1.83'; # VERSION
 
 
 sub _def ($) { my($val) = @_; defined $val ? $val : '' }
@@ -58,7 +58,7 @@ Test::Alien::Synthetic - A mock alien object for testing
 
 =head1 VERSION
 
-version 1.79
+version 1.83
 
 =head1 SYNOPSIS
 
@@ -71,7 +71,7 @@ version 1.79
  };
  
  alien_ok $alien;
-
+ 
  done_testing;
 
 =head1 DESCRIPTION
@@ -153,7 +153,7 @@ based L<Alien> distribution.
    like $ptr, qr{^[0-9]+$};
    $free->($ptr);
  };
-
+ 
  done_testing;
  
  __DATA__

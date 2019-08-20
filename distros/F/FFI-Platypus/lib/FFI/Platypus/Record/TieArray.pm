@@ -5,12 +5,12 @@ use warnings;
 use Carp qw( croak );
 
 # ABSTRACT: Tied array interface for record array members
-our $VERSION = '0.94'; # VERSION
+our $VERSION = '0.96'; # VERSION
 
 
 sub TIEARRAY
 {
-  my $class = shift;  
+  my $class = shift;
   bless [ @_ ], $class;
 }
 
@@ -38,7 +38,7 @@ sub CLEAR
 {
   my($self) = @_;
   my($obj, $member) = @$self;
-  
+
   $obj->$member([]);
 }
 
@@ -62,7 +62,7 @@ FFI::Platypus::Record::TieArray - Tied array interface for record array members
 
 =head1 VERSION
 
-version 0.94
+version 0.96
 
 =head1 SYNOPSIS
 
@@ -79,7 +79,7 @@ version 0.94
  {
    my($self, $arg) = @_;
    $self->_bar($arg) if ref($arg) eq ' ARRAY';
-   tie my @list, 'FFI::Platypus::Record::TieArray', 
+   tie my @list, 'FFI::Platypus::Record::TieArray',
      $self, '_bar', 20;
  }
  
@@ -94,13 +94,13 @@ version 0.94
 
 =head1 DESCRIPTION
 
-B<WARNING>: This module is considered EXPERIMENTAL.  It may go away or 
-be changed in incompatible ways, possibly without notice, but not 
+B<WARNING>: This module is considered EXPERIMENTAL.  It may go away or
+be changed in incompatible ways, possibly without notice, but not
 without a good reason.
 
 This class provides a tie interface for record array members.
 
-In the future a short cut for using this with L<FFI::Platypus::Record> 
+In the future a short cut for using this with L<FFI::Platypus::Record>
 directly may be provided.
 
 =head1 SEE ALSO
@@ -146,6 +146,8 @@ Ilya Pavlov (Ilya33)
 Petr Pisar (ppisar)
 
 Mohammad S Anwar (MANWAR)
+
+Håkon Hægland (hakonhagland, HAKONH)
 
 =head1 COPYRIGHT AND LICENSE
 

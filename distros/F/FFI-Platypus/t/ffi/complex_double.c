@@ -53,4 +53,28 @@ complex_double_ptr_ret(double r, double i)
   return &f;
 }
 
+EXTERN double complex
+complex_double_array_get(double complex *f, int index)
+{
+  return f[index];
+}
+
+EXTERN void
+complex_double_array_set(double complex *f, int index, double r, double i)
+{
+  f[index] = r + i*I;
+}
+
+EXTERN double complex *
+complex_double_array_ret(void)
+{
+  static double complex ret[3];
+
+  ret[0] = 0.0 + 0.0*I;
+  ret[1] = 1.0 + 2.0*I;
+  ret[2] = 3.0 + 4.0*I;
+
+  return ret;
+}
+
 #endif

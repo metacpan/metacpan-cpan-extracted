@@ -11,12 +11,12 @@ require Exporter;
 
 our @ISA = qw(Exporter AudioFile::Info Template::Plugin);
 
-our $VERSION = sprintf "%d", '$Revision: 17 $ ' =~ /(\d+)/;
+our $VERSION = '2.0.0';
 
 sub new {
-  my ($class, $context, $file) = @_;
+  my ($class, $context, $file, $params) = @_;
 
-  my $self = $class->SUPER::new($file);
+  my $self = $class->SUPER::new($file, $params);
 
   return $self;
 }

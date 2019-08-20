@@ -1,0 +1,87 @@
+NAME
+    DNS::Zone::PowerDNS::To::BIND - Generate BIND zone configuration from
+    information in PowerDNS database
+
+VERSION
+    This document describes version 0.001 of DNS::Zone::PowerDNS::To::BIND
+    (from Perl distribution DNS-Zone-PowerDNS-To-BIND), released on
+    2019-08-19.
+
+SYNOPSIS
+     use DNS::Zone::PowerDNS::To::BIND qw(gen_bind_zone_from_powerdns_db);
+
+     say gen_bind_zone_from_powerdns_db(
+         db_dsn => 'dbi:mysql:database=pdns',
+         domain => 'example.com',
+         master_host => 'dns1.example.com',
+     );
+
+    will output something like:
+
+     $TTL 300
+     @ IN 300 SOA ns1.example.com. hostmaster.example.org. (
+       2019072401 ;serial
+       7200 ;refresh
+       1800 ;retry
+       12009600 ;expire
+       300 ;ttl
+       )
+      IN NS ns1.example.com.
+      IN NS ns2.example.com.
+      IN A 1.2.3.4
+     www IN CNAME @
+
+FUNCTIONS
+  gen_bind_zone_from_powerdns_db
+    Usage:
+
+     gen_bind_zone_from_powerdns_db(%args) -> any
+
+    Generate BIND zone configuration from information in PowerDNS database.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   db_dsn => *str* (default: "DBI:mysql:database=pdns")
+
+    *   db_password => *str*
+
+    *   db_user => *str*
+
+    *   domain* => *net::hostname*
+
+    *   master_host* => *net::hostname*
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/DNS-Zone-PowerDNS-To-BIND>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-DNS-Zone-PowerDNS-To-BIND>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=DNS-Zone-PowerDNS-To-
+    BIND>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Sah::Schemas::DNS
+
+    DNS::Zone::Struct::To::BIND
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

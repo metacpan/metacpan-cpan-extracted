@@ -6,7 +6,7 @@ use Carp qw( croak );
 use base qw( FFI::Platypus::TypeParser );
 
 # ABSTRACT: FFI Type Parser Version Zero
-our $VERSION = '0.94'; # VERSION
+our $VERSION = '0.96'; # VERSION
 
 
 our @CARP_NOT = qw( FFI::Platypus FFI::Platypus::TypeParser );
@@ -62,7 +62,7 @@ sub parse
 
   if($name =~ m/^ \( (.*) \) \s* -\> \s* (.*) \s* $/x)
   {
-    my @argument_types = map { $self->parse($_) } map { s/^\s+//; s/\s+$//; $_ } split /,/, $1;
+    my @argument_types = map { $self->parse($_) } map { my $t = $_; $t =~ s/^\s+//; $t =~ s/\s+$//; $t } split /,/, $1;
     my $return_type = $self->parse($2);
     return $self->types->{$name} = $self->create_type_closure($return_type, @argument_types);
   }
@@ -163,7 +163,7 @@ FFI::Platypus::TypeParser::Version0 - FFI Type Parser Version Zero
 
 =head1 VERSION
 
-version 0.94
+version 0.96
 
 =head1 SYNOPSIS
 
@@ -206,6 +206,10 @@ Instead you need to use the basic type in the second type definition:
 
  $ffi->type('opaque' => 'foo_t');    # ok!
  $ffi->type('opaque*' => 'foo_ptr'); # ok!
+
+=item object types are not allowed
+
+ $ffi->type('object(Foo::Bar)');   # not ok! in version 0, ok! in version 1
 
 =back
 
@@ -252,6 +256,8 @@ Ilya Pavlov (Ilya33)
 Petr Pisar (ppisar)
 
 Mohammad S Anwar (MANWAR)
+
+Håkon Hægland (hakonhagland, HAKONH)
 
 =head1 COPYRIGHT AND LICENSE
 

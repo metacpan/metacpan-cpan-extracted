@@ -1623,6 +1623,7 @@ typedef struct _ObjectOptions_ {
 	unsigned optActive              : 1;   /* Timer */
 	unsigned optOwnerIcon           : 1;   /* Window */
 	unsigned optMainWindow          : 1;
+	unsigned optDirtyRegion         : 1;   /* Region */
 } ObjectOptions;
 
 #define opt_set( option)           (PObject(self)-> options. option = 1)
@@ -1859,6 +1860,8 @@ SV(CompositeDisplay)
 SV(LayeredWidgets)
 #define   svDWM             34
 SV(DWM)
+#define   svFixedPointerSize 35
+SV(FixedPointerSize)
 END_TABLE(sv,UV)
 #undef SV
 
@@ -2726,6 +2729,18 @@ LP(DashDotDot)
 END_TABLE_CHAR(lp,unsigned char*)
 #undef LP
 
+/* fill modes */
+#define FM(const_name) CONSTANT(fm,const_name)
+START_TABLE(fm,UV)
+#define    fmAlternate       0
+FM(Alternate)
+#define    fmWinding         1
+FM(Winding)
+#define    fmOverlay         2
+FM(Overlay)
+END_TABLE(fm,UV)
+#undef FM
+
 /* font styles */
 #define FS(const_name) CONSTANT(fs,const_name)
 START_TABLE(fs,UV)
@@ -3249,14 +3264,19 @@ typedef struct _TextWrapRec {
 
 typedef struct {
 	int n_points;
-	Bool winding;
+	int fill_mode;
 	Point* points;
 } PolygonRegionRec;
 
 typedef struct {
+	int n_boxes;
+	Box* boxes;
+} BoxRegionRec, *PBoxRegionRec;
+
+typedef struct {
 	int type;
 	union {
-		Box box;
+		BoxRegionRec box;
 		PolygonRegionRec polygon;
 		Handle image;
 	} data;
@@ -3318,6 +3338,9 @@ apc_region_is_empty( Handle self);
 extern ApiHandle
 apc_region_get_handle( Handle self);
 
+extern PRegionRec
+apc_region_copy_rects( Handle self);
+
 /* gp functions */
 extern Bool
 apc_gp_init( Handle self);
@@ -3366,6 +3389,26 @@ apc_gp_fill_sector( Handle self, int x, int y, int dX, int dY, double angleStart
 
 extern Bool
 apc_gp_flood_fill( Handle self, int x, int y, Color borderColor, Bool singleBorder);
+
+#define GGO(const_name) CONSTANT(ggo,const_name)
+START_TABLE(ggo,UV)
+#define ggoGlyphIndex   0x01
+#define ggoUseHints     0x02 
+#define ggoUnicode      0x03
+
+#define ggoMove         0
+GGO(Move)
+#define ggoLine         1
+GGO(Line)
+#define ggoConic        2
+GGO(Conic)
+#define ggoCubic        3
+GGO(Cubic)
+END_TABLE(ggo,UV)
+#undef GGO
+
+extern int
+apc_gp_get_glyph_outline( Handle self, int index, int flags, int ** buffer);
 
 extern Color
 apc_gp_get_pixel( Handle self, int x, int y);
@@ -3417,8 +3460,8 @@ apc_gp_get_font_def( Handle self, int firstChar, int lastChar, Bool unicode);
 extern unsigned long *
 apc_gp_get_font_ranges( Handle self, int * count);
 
-extern Bool
-apc_gp_get_fill_winding( Handle self);
+extern int
+apc_gp_get_fill_mode( Handle self);
 
 extern FillPattern *
 apc_gp_get_fill_pattern( Handle self);
@@ -3440,6 +3483,9 @@ apc_gp_get_line_width( Handle self);
 
 extern int
 apc_gp_get_line_pattern( Handle self, unsigned char * buffer);
+
+extern float
+apc_gp_get_miter_limit( Handle self);
 
 extern Color
 apc_gp_get_nearest_color( Handle self, Color color);
@@ -3484,7 +3530,7 @@ extern Bool
 apc_gp_set_color( Handle self, Color color);
 
 extern Bool
-apc_gp_set_fill_winding( Handle self, Bool fillWinding);
+apc_gp_set_fill_mode( Handle self, int fillMode);
 
 extern Bool
 apc_gp_set_fill_pattern( Handle self, FillPattern pattern);
@@ -3506,6 +3552,9 @@ apc_gp_set_line_width( Handle self, int lineWidth);
 
 extern Bool
 apc_gp_set_line_pattern( Handle self, unsigned char * pattern, int len);
+
+extern Bool
+apc_gp_set_miter_limit( Handle self, float limit);
 
 extern Bool
 apc_gp_set_palette( Handle self);

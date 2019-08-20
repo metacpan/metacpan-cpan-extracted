@@ -10,13 +10,13 @@ on 'test', sub {
 
 };
 
-requires 'JSON';
-requires 'Moo';
+requires 'JSON', 0;
+requires 'Moo', 0;
 requires 'Scalar::Util';
-requires 'Catmandu', '>=0.94';
+requires 'Catmandu', '>=1.2002';
 requires 'Business::ISSN', '0.91';
 requires 'Business::ISBN', '2.010';
-requires 'Data::UUID',0;
-requires 'LWP::Simple',0;
+requires 'Data::UUID::MT', '>=1.001';
+requires 'LWP::Simple', 0;
 requires 'WWW::ORCID', '>=0.0401';
 requires 'Data::Validate::URI',0;

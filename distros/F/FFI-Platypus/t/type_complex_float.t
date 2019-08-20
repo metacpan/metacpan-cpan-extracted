@@ -4,6 +4,7 @@ use Test::More;
 use FFI::Platypus;
 use FFI::Platypus::TypeParser;
 use FFI::CheckLib;
+use Data::Dumper qw( Dumper );
 
 BEGIN {
   plan skip_all => 'Test requires support for float complex'
@@ -108,6 +109,45 @@ foreach my $api (0, 1)
       is_deeply(complex_ret(1.0,2.0),       [1.0,2.0], 'standard');
       is_deeply(complex_ptr_ret(1.0,2.0),  \[1.0,2.0], 'pointer');
       is_deeply([complex_null()],             [],     'null');
+
+    };
+
+    subtest 'complex array arg' => sub {
+
+      my $f = $ffi->function(complex_float_array_get => ['complex_float[]','int'] => 'complex_float' );
+
+      my @a = ([0.0,0.0], [1.0,2.0], [3.0,4.0]);
+      my $ret;
+      is_deeply( $ret = $f->call(\@a, 0), [0.0,0.0] )
+        or diag Dumper($ret);
+      is_deeply( $ret = $f->call(\@a, 1), [1.0,2.0] )
+        or diag Dumper($ret);
+      is_deeply( $ret = $f->call(\@a, 2), [3.0,4.0] )
+        or diag Dumper($ret);
+
+    };
+
+    subtest 'complex array arg set' => sub {
+
+      my $f = $ffi->function(complex_float_array_set => ['complex_float[]','int','float','float'] => 'void' );
+
+      my @a = ([0.0,0.0], [1.0,2.0], [3.0,4.0]);
+      $f->call(\@a, 1, 5.0, 6.0);
+      is_deeply(\@a, [[0.0,0.0], [5.0,6.0], [3.0,4.0]]);
+
+    };
+
+    subtest 'complex array ret' => sub {
+
+      my $f = $ffi->function(complex_float_array_ret => [] => 'complex_float[3]' );
+
+      my @a = ([0.0,0.0], [1.0,2.0], [3.0,4.0]);
+      my $ret;
+
+      is_deeply(
+        $ret = $f->call( \@a ),
+        \@a,
+      ) or diag Dumper($ret);
 
     };
   };

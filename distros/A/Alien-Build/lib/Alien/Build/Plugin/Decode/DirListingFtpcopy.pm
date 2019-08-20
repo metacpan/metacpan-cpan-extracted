@@ -6,7 +6,7 @@ use Alien::Build::Plugin;
 use File::Basename ();
 
 # ABSTRACT: Plugin to extract links from a directory listing using ftpcopy
-our $VERSION = '1.79'; # VERSION
+our $VERSION = '1.83'; # VERSION
 
 
 sub init
@@ -15,7 +15,7 @@ sub init
 
   $meta->add_requires('share' => 'File::Listing::Ftpcopy' => 0);
   $meta->add_requires('share' => 'URI' => 0);
-  
+
   $meta->register_hook( decode => sub {
     my(undef, $res) = @_;
 
@@ -23,7 +23,7 @@ sub init
       unless $res->{type} eq 'dir_listing';
 
     my $base = URI->new($res->{base});
-    
+
     return {
       type => 'list',
       list => [
@@ -58,7 +58,7 @@ Alien::Build::Plugin::Decode::DirListingFtpcopy - Plugin to extract links from a
 
 =head1 VERSION
 
-version 1.79
+version 1.83
 
 =head1 SYNOPSIS
 

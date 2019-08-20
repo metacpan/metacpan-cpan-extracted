@@ -1,6 +1,6 @@
 package Catmandu::Fix::Condition::is_valid_orcid;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use Catmandu::Sane;
 use Moo;

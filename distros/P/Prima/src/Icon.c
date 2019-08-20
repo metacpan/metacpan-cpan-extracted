@@ -728,14 +728,24 @@ Icon_premultiply_alpha( Handle self, SV * alpha)
 Bool
 Icon_alpha( Handle self, int alpha, int x1, int y1, int x2, int y2)
 {
+	Point t;
 	Image dummy;
-	Byte alpha_a8;
+	ImgPaintContext ctx;
 	if (opt_InPaint)
 		return apc_gp_alpha( self, alpha, x1, y1, x2, y2);
 
-	alpha_a8 = alpha;
 	img_fill_dummy( &dummy, var-> w, var-> h, var-> maskType | imGrayScale, var-> mask, std256gray_palette);
-	img_bar((Handle) &dummy, x1, y1, x2 - x1 + 1, y2 - y1 + 1, ropCopyPut, (void*)&alpha_a8);
+
+	t = my->get_translate(self);
+	x1 += t.x;
+	y1 += t.y;
+	ctx. color[0] = alpha & 0xff;
+	ctx. rop = ropCopyPut;
+	ctx. region = var->regionData ? &var->regionData-> data. box : NULL;
+	memset( ctx.pattern, 0xff, sizeof(ctx.pattern));
+	ctx.patternOffset.x = ctx.patternOffset.y = 0;
+	ctx.transparent = false;
+	img_bar((Handle) &dummy, x1, y1, x2 - x1 + 1, y2 - y1 + 1, &ctx);
 
 	return true;
 }

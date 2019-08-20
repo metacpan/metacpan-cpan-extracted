@@ -9,6 +9,9 @@ require_ok 'Alien::Build';
 require_ok 'Alien::Build::CommandSequence';
 require_ok 'Alien::Build::Interpolate';
 require_ok 'Alien::Build::Interpolate::Default';
+require_ok 'Alien::Build::Log';
+require_ok 'Alien::Build::Log::Abbreviate';
+require_ok 'Alien::Build::Log::Default';
 require_ok 'Alien::Build::MM';
 require_ok 'Alien::Build::Plugin';
 require_ok 'Alien::Build::Plugin::Build::Autoconf';
@@ -27,6 +30,7 @@ require_ok 'Alien::Build::Plugin::Core::Tail';
 require_ok 'Alien::Build::Plugin::Decode::DirListing';
 require_ok 'Alien::Build::Plugin::Decode::DirListingFtpcopy';
 require_ok 'Alien::Build::Plugin::Decode::HTML';
+require_ok 'Alien::Build::Plugin::Decode::Mojo';
 require_ok 'Alien::Build::Plugin::Download::Negotiate';
 require_ok 'Alien::Build::Plugin::Extract::ArchiveTar';
 require_ok 'Alien::Build::Plugin::Extract::ArchiveZip';
@@ -54,6 +58,7 @@ require_ok 'Alien::Build::Plugin::Probe::CommandLine';
 require_ok 'Alien::Build::Plugin::Test::Mock';
 require_ok 'Alien::Build::Util';
 require_ok 'Alien::Build::Version::Basic';
+require_ok 'Alien::Build::rc';
 require_ok 'Alien::Role';
 require_ok 'Test::Alien';
 require_ok 'Test::Alien::Build';
@@ -69,6 +74,9 @@ ok -f 't/alien_build.t',                                      'test for Alien::B
 ok -f 't/alien_build_commandsequence.t',                      'test for Alien::Build::CommandSequence';
 ok -f 't/alien_build_interpolate.t',                          'test for Alien::Build::Interpolate';
 ok -f 't/alien_build_interpolate_default.t',                  'test for Alien::Build::Interpolate::Default';
+ok -f 't/alien_build_log.t',                                  'test for Alien::Build::Log';
+ok -f 't/alien_build_log_abbreviate.t',                       'test for Alien::Build::Log::Abbreviate';
+ok -f 't/alien_build_log_default.t',                          'test for Alien::Build::Log::Default';
 ok -f 't/alien_build_mm.t',                                   'test for Alien::Build::MM';
 ok -f 't/alien_build_plugin.t',                               'test for Alien::Build::Plugin';
 ok -f 't/alien_build_plugin_build_autoconf.t',                'test for Alien::Build::Plugin::Build::Autoconf';
@@ -87,6 +95,7 @@ ok -f 't/alien_build_plugin_core_tail.t',                     'test for Alien::B
 ok -f 't/alien_build_plugin_decode_dirlisting.t',             'test for Alien::Build::Plugin::Decode::DirListing';
 ok -f 't/alien_build_plugin_decode_dirlistingftpcopy.t',      'test for Alien::Build::Plugin::Decode::DirListingFtpcopy';
 ok -f 't/alien_build_plugin_decode_html.t',                   'test for Alien::Build::Plugin::Decode::HTML';
+ok -f 't/alien_build_plugin_decode_mojo.t',                   'test for Alien::Build::Plugin::Decode::Mojo';
 ok -f 't/alien_build_plugin_download_negotiate.t',            'test for Alien::Build::Plugin::Download::Negotiate';
 ok -f 't/alien_build_plugin_extract_archivetar.t',            'test for Alien::Build::Plugin::Extract::ArchiveTar';
 ok -f 't/alien_build_plugin_extract_archivezip.t',            'test for Alien::Build::Plugin::Extract::ArchiveZip';
@@ -114,6 +123,7 @@ ok -f 't/alien_build_plugin_probe_commandline.t',             'test for Alien::B
 ok -f 't/alien_build_plugin_test_mock.t',                     'test for Alien::Build::Plugin::Test::Mock';
 ok -f 't/alien_build_util.t',                                 'test for Alien::Build::Util';
 ok -f 't/alien_build_version_basic.t',                        'test for Alien::Build::Version::Basic';
+ok -f 't/alien_build_rc.t',                                   'test for Alien::Build::rc';
 ok -f 't/alien_role.t',                                       'test for Alien::Role';
 ok -f 't/test_alien.t',                                       'test for Test::Alien';
 ok -f 't/test_alien_build.t',                                 'test for Test::Alien::Build';
@@ -131,7 +141,11 @@ sub require_ok ($)
   # will compile okay.  I won't be trying to use them.
   my($mod) = @_;
   my $ctx = context();
-  eval qq{ require $mod };
+  {
+    my $pm = "$mod.pm";
+    $pm =~ s/::/\//g;
+    eval { require $pm };
+  }
   my $error = $@;
   my $ok = !$error;
   $ctx->ok($ok, "require $mod");

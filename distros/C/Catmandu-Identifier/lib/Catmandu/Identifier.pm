@@ -1,7 +1,7 @@
 package Catmandu::Identifier;
 
 use strict;
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 1;
 __END__

@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/resolvetable/resolvetable
-# and generated automatically using Perinci::CmdLine::Gen version 0.488
+# and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-05-30'; # DATE
+our $DATE = '2019-08-20'; # DATE
 our $DIST = 'App-resolvetable'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,17 +39,17 @@ resolvetable - Produce a colored table containing DNS resolve results of several
 
 =head1 VERSION
 
-This document describes version 0.004 of resolvetable (from Perl distribution App-resolvetable), released on 2019-05-30.
+This document describes version 0.005 of resolvetable (from Perl distribution App-resolvetable), released on 2019-08-20.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % resolvetable [options] <names>
+ % resolvetable [options] <name> ...
 
 Examples:
 
- % cat names.txt | resolvetable --colorize -s 8.8.8.8 -s my.dns.server -s my2.dns.server
+ % cat names.txt | resolvetable -s 8.8.8.8 -s my.dns.server -s my2.dns.server
 
 =head1 OPTIONS
 
@@ -74,8 +74,6 @@ The default action is to show resolve result (`show-addresses`). If set to
 servers/resolvers.
 
 
-=item B<--colorize>
-
 =item B<--name>=I<s@>*
 
 Can be specified multiple times.
@@ -83,6 +81,8 @@ Can be specified multiple times.
 =item B<--names-json>=I<s>
 
 See C<--name>.
+
+=item B<--no-colorize>
 
 =item B<--server>=I<s@>*, B<-s>
 

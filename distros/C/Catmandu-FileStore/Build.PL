@@ -8,7 +8,7 @@ use Module::Build 0.28;
 
 my %module_build_args = (
   "build_requires" => {
-    "Module::Build" => "0.28"
+    "Module::Build" => "0.4229"
   },
   "configure_requires" => {
     "Module::Build" => "0.28"
@@ -18,7 +18,7 @@ my %module_build_args = (
     "Patrick Hochstenbach, C<< <patrick.hochstenbach at ugent.be> >>"
   ],
   "dist_name" => "Catmandu-FileStore",
-  "dist_version" => "1.13",
+  "dist_version" => "1.14",
   "license" => "perl",
   "module_name" => "Catmandu::FileStore",
   "recommends" => {
@@ -28,6 +28,7 @@ my %module_build_args = (
   "recursive_test_files" => 1,
   "requires" => {
     "Catmandu" => "1.06",
+    "Module::Build" => "0.4229",
     "perl" => "v5.10.1"
   },
   "test_requires" => {
@@ -47,7 +48,7 @@ my %fallback_build_requires = (
   "Log::Any::Adapter::Log4perl" => 0,
   "Log::Any::Test" => "1.03",
   "Log::Log4perl" => 0,
-  "Module::Build" => "0.28",
+  "Module::Build" => "0.4229",
   "Test::Deep" => "0.112",
   "Test::Exception" => "0.43",
   "Test::LWP::UserAgent" => 0,

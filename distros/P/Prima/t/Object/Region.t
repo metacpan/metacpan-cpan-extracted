@@ -71,11 +71,11 @@ my $r2 = Prima::Region->new( rect => [1, 1, 4, 4]);
 ok( $r->equals($r2), 'equals');
 
 my @star = (0, 0, 2, 5, 5, 0, 0, 3, 5, 3);
-$r = Prima::Region->new(polygon => \@star, winding => 0);
+$r = Prima::Region->new(polygon => \@star, fillMode => fm::Alternate);
 my @box = $r->box;
 ok($box[0] < $box[2] && $box[1] < $box[3], 'star 1');
 
-$r2 = Prima::Region->new(polygon => \@star, winding => 1);
+$r2 = Prima::Region->new(polygon => \@star, fillMode => fm::Winding);
 @box = $r->box;
 ok($box[0] < $box[2] && $box[1] < $box[3], 'star 2');
 ok( !$r-> equals($r2), 'poly winding');
@@ -193,5 +193,159 @@ try('region re-reuse',
 	" **  ".
 	"     "
 );
+
+sub bits  { join ':', map { sprintf "%08b", ord } split '', shift }
+sub bytes { unpack('H*', shift ) }
+
+sub is_bytes
+{
+	my ( $bytes_actual, $bytes_expected, $name ) = @_;
+	my $ok = $bytes_actual eq $bytes_expected;
+	ok( $ok, $name );
+	warn "#   " . bytes($bytes_actual) . " (actual)\n#   " . bytes($bytes_expected) . " (expected)\n" unless $ok;
+}
+
+sub sort_boxes($)
+{
+	my @b = @{$_[0]};
+	my (@x,@r);
+	push @r, [@x] while @x = splice(@b, 0, 4);
+	@r = sort { "@$a" cmp "@$b" } @r;
+	return [ map { @$_ } @r];
+}
+
+sub is_rects
+{
+	my ($r, $rects, $name) = @_;
+	my $boxes = sort_boxes $r->get_boxes;
+	$rects = sort_boxes $rects;
+	my $ok = is_deeply( $boxes, $rects, $name);
+	warn "# (@$boxes) vs (@$rects)\n" unless $ok;
+	return $ok;
+}
+
+$r = Prima::Region->new;
+$r = Prima::Region->new( rect => [0,1,2,3,4,5,6,7]);
+is_rects($r, [0,1,2,2,4,5,2,2], "two simple rects");
+ok( $r->equals( Prima::Region->new(box => $r->get_boxes)), "is equal (1)");
+$r = Prima::Region->new( box => [0,1,2,3,4,5,6,7]);
+is_rects($r, [0,1,2,3,4,5,6,7], "two simple boxes");
+ok( $r->equals( Prima::Region->new(box => $r->get_boxes)), "is equal (2)");
+$r = Prima::Region->new( polygon => [0,0,0,5,5,5,5,0], fillMode => fm::Overlay | fm::Winding);
+is_rects($r, [0,0,6,6], "simple polygon");
+ok( $r->equals( Prima::Region->new(box => $r->get_boxes)), "is equal (3)");
+
+my $b = Prima::Image->new(
+	size => [5,5],
+	type => im::Byte,
+);
+
+sub render
+{
+	my $rx = shift;
+	$b->region(undef);
+	$b->color(cl::Black);
+	$b->bar(0,0,$b->size);
+	$b->color(cl::White);
+	$b->region($rx);
+	$b->bar(0,0,$b->size);
+}
+
+$r = Prima::Region->new( polygon => [0,0,0,5,5,5,5,0, 0,0,0,2,2,2,2,0], fillMode => fm::Winding|fm::Overlay);
+render($r);
+is( $b->sum, 25 * 255, "polygon with winding");
+ok( $r->equals( Prima::Region->new(box => $r->get_boxes)), "is equal (4)");
+
+$r = Prima::Region->new( polygon => [0,0,0,5,5,5,5,0, 0,0,0,2,2,2,2,0], fillMode => fm::Alternate|fm::Overlay);
+render($r);
+is( $b->sum, 24 * 255, "polygon without winding");
+ok( $r->equals( Prima::Region->new(box => $r->get_boxes)), "is equal (5)");
+
+ok( 
+	$b->pixel(0,0) != 0 &&
+	$b->pixel(1,0) != 0 &&
+	$b->pixel(0,1) != 0 &&
+	$b->pixel(1,1) == 0,
+	"pixels are in correct position"
+);
+my $d = $b->data;
+render($b->to_region);
+is_bytes($d, $b->data, "region to image and back is okay");
+
+$b->size(4,4);
+$r = Prima::Region->new( box => [-1,-1,3,3, 2,2,3,3]);
+render($r);
+is_bytes($b->data, ("\xff\xff\x00\x00" x 2).("\x00\x00\xff\xff" x 2), "region outside the box");
+$b->color(0x808080);
+$b->bar(1,1,2,2);
+is_bytes($b->data, 
+	"\xff\xff\x00\x00".
+	"\xff\x80\x00\x00".
+	"\x00\x00\x80\xff".
+	"\x00\x00\xff\xff",
+	"bar inside region"
+);
+$b->translate(0,0);
+render(undef);
+$b->color(cl::Black);
+$b->region($r);
+$b->translate(1,1);
+$b->bar(0,0,$b->size);
+is_bytes($b->data, 
+	"\xff\xff\xff\xff".
+	"\xff\x00\xff\xff".
+	"\xff\xff\x00\x00".
+	"\xff\xff\x00\x00",
+	"region plot with offset 1"
+);
+
+$b->translate(0,0);
+render(undef);
+$b->translate(2,2);
+$b->color(cl::Black);
+$b->region($r);
+$b->bar(0,0,$b->size);
+is_bytes($b->data, 
+	"\xff\xff\xff\xff".
+	"\xff\xff\xff\xff".
+	"\xff\xff\x00\x00".
+	"\xff\xff\x00\x00",
+	"region plot with offset 2"
+);
+
+$b->translate(0,0);
+render(undef);
+$b->translate(5,5);
+$b->color(cl::Black);
+$b->region($r);
+$b->bar(0,0,$b->size);
+is( $b->sum, 16 * 255, "region outside left");
+$b->translate(-5,-5);
+is( $b->sum, 16 * 255, "region outside right");
+
+my $i = Prima::Image->new( size => [32, 32], type => im::Byte);
+$i->color(0);
+$i->bar(0,0,$i->size);
+my $j = $i->dup;
+$j->color(cl::White);
+$j->bar(0,0,$j->size);
+$r = Prima::Region->new( polygon => [0, 0, 10, 25, 25, 0, 0, 15, 25, 15]);
+$i->region($r);
+$i->put_image(0,0,$j);
+
+my $xr = $r->image(type => im::Byte, size => [32, 32], backColor => 0, color => cl::White);
+is( $i->data, $xr->data, 'put_image(region) == region.image');
+
+$i = Prima::Icon->new( size => [32, 32], type => im::Byte, maskType => im::bpp8, autoMasking => am::None);
+$i->color(0);
+$i->bar(0,0,$i->size);
+$j = Prima::Icon->new( size => [32, 32], type => im::Byte, maskType => im::bpp8, autoMasking => am::None);
+$j->color(cl::White);
+$j->bar(0,0,$j->size);
+$j->mask( "\xff" x length($i->mask));
+$i->region($r);
+$i->put_image(0,0,$j,rop::SrcOver);
+is( $i->data, $xr->data, 'put_image(region).rgb == region.image');
+is( $i->mask, $xr->data, 'put_image(region).a8  == region.image');
 
 done_testing;

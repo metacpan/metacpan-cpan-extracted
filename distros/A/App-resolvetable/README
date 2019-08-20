@@ -3,11 +3,11 @@ NAME
     results of several names from several servers/resolvers
 
 VERSION
-    This document describes version 0.004 of App::resolvetable (from Perl
-    distribution App-resolvetable), released on 2019-05-30.
+    This document describes version 0.005 of App::resolvetable (from Perl
+    distribution App-resolvetable), released on 2019-08-20.
 
 DESCRIPTION
-    Sample screenshot 1 (with "--colorize"):
+    Sample screenshot 1:
 
 FUNCTIONS
   resolvetable
@@ -28,7 +28,7 @@ FUNCTIONS
         set to "show-timings", will show resolve times instead to compare
         speed among DNS servers/resolvers.
 
-    *   colorize => *bool*
+    *   colorize => *bool* (default: 1)
 
     *   names* => *array[str]*
 
@@ -49,7 +49,7 @@ FUNCTIONS
 
     Return value: (any)
 
-    Sample screenshot 2 (with "--colorize --timings"):
+    Sample screenshot 2 (with "--timings"):
 
 HOMEPAGE
     Please visit the project's homepage at

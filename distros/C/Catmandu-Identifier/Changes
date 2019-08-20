@@ -1,5 +1,8 @@
 Revision history for Catmandu-Identifier
 
+0.11  2019-08-19 12:15:33 CEST
+    - remove Data::UUID dependency (GH #13)
+
 0.10  2018-05-27 16:28:18 CEST
     - introduce new fix uri_status_code (@phochste)
 

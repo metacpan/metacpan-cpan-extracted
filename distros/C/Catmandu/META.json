@@ -26,7 +26,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Module::Build" : "0.28"
+            "Module::Build" : "0.4229"
          }
       },
       "configure" : {
@@ -57,7 +57,7 @@
             "Config::Onion" : "1.004",
             "Cpanel::JSON::XS" : "3.0213",
             "Data::Compare" : "1.22",
-            "Data::UUID" : "1.217",
+            "Data::UUID::MT" : "1.001",
             "Data::Util" : "0.66",
             "Hash::Merge::Simple" : "0",
             "IO::Handle::Util" : "0.01",
@@ -66,6 +66,7 @@
             "Log::Any" : "0",
             "Log::Any::Adapter" : "0",
             "MIME::Types" : "0",
+            "Module::Build" : "0.4229",
             "Module::Info" : "0",
             "Moo" : "1.004006",
             "MooX::Aliases" : "0.001006",
@@ -114,7 +115,7 @@
          "web" : "https://github.com/LibreCat/Catmandu"
       }
    },
-   "version" : "1.2002",
+   "version" : "1.2003",
    "x_contributors" : [
       "Christian Pietsch <chr.pietsch+github@googlemail.com>",
       "Dave Sherohman <dsheroh@cpan.org>",
@@ -139,7 +140,7 @@
       "Vitali Peil <vpeil@cpan.org>"
    ],
    "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
    "x_static_install" : 0
 }
 

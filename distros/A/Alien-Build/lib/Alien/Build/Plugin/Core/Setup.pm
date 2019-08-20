@@ -7,12 +7,12 @@ use Config;
 use File::Which qw( which );
 
 # ABSTRACT: Core setup plugin
-our $VERSION = '1.79'; # VERSION
+our $VERSION = '1.83'; # VERSION
 
 
 sub init
 {
-  my($self, $meta) = @_;  
+  my($self, $meta) = @_;
   $meta->prop->{platform} ||= {};
   $self->_platform($meta->prop->{platform});
 }
@@ -20,7 +20,7 @@ sub init
 sub _platform
 {
   my(undef, $hash) = @_;
-  
+
   if($^O eq 'MSWin32' && $Config{ccname} eq 'cl')
   {
     $hash->{compiler_type} = 'microsoft';
@@ -29,7 +29,7 @@ sub _platform
   {
     $hash->{compiler_type} = 'unix';
   }
-  
+
   if($^O eq 'MSWin32')
   {
     $hash->{system_type} = 'windows-unknown';
@@ -84,7 +84,7 @@ Alien::Build::Plugin::Core::Setup - Core setup plugin
 
 =head1 VERSION
 
-version 1.79
+version 1.83
 
 =head1 SYNOPSIS
 

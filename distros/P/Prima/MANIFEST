@@ -81,6 +81,7 @@ examples/keyselector.pl
 examples/label.pl
 examples/launch.pl
 examples/layered.pl
+examples/lineplot.pl
 examples/listbox.pl
 examples/macro.pl
 examples/markup.pl
@@ -176,6 +177,7 @@ pod/Prima/linepats.gif
 pod/Prima/markup.gif
 pod/Prima/Menu.pod
 pod/Prima/mdi.gif
+pod/Prima/miterlimit.gif
 pod/Prima/msgbox.gif
 pod/Prima/notebook.gif
 pod/Prima/Object.pod
@@ -363,6 +365,7 @@ t/Image/Colormap.t
 t/Image/Conversion.t
 t/Image/Extract.t
 t/Image/Import.t
+t/Image/Path.t
 t/Image/ROP.t
 t/Image/Stream.t
 t/Image/Stretch.t

@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 59 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 60 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Git/Raw.pm',
@@ -61,6 +61,7 @@ my @module_files = (
     'Git/Raw/Signature.pm',
     'Git/Raw/Stash.pm',
     'Git/Raw/Stash/Progress.pm',
+    'Git/Raw/Submodule.pm',
     'Git/Raw/Tag.pm',
     'Git/Raw/TransferProgress.pm',
     'Git/Raw/Tree.pm',

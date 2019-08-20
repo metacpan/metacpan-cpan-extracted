@@ -32,7 +32,7 @@
    "provides" : {
       "Dita::GB::Standard" : {
          "file" : "lib/Dita/GB/Standard.pm",
-         "version" : "20190819"
+         "version" : "20190820"
       }
    },
    "release_status" : "stable",
@@ -41,6 +41,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "20190819",
+   "version" : "20190820",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

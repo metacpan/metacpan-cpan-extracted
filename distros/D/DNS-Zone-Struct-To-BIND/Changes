@@ -1,0 +1,8 @@
+0.002   2019-08-19  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename module/dist from DNS-Zone{,-}Struct-To-BIND.
+
+
+0.001   2019-07-26  Released-By: PERLANCAR
+
+        - First, early release.

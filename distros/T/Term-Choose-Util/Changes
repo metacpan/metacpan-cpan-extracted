@@ -1,6 +1,9 @@
 Revision history for Term::Choose::Util
 
 
+0.075   2019-08-19
+        - 'settings_menu': looping through values only once.
+
 0.074   2019-06-30
         - Removed functions 'print_hash', 'length_longest' and 'unicode_trim'.
 

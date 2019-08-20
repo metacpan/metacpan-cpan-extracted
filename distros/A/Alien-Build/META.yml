@@ -37,6 +37,7 @@ requires:
   File::Which: '1.10'
   File::chdir: '0'
   JSON::PP: '0'
+  List::Util: '1.33'
   Module::Load: '0'
   Path::Tiny: '0.077'
   Test2::API: '1.302015'
@@ -47,7 +48,7 @@ resources:
   bugtracker: https://github.com/Perl5-Alien/Alien-Build/issues
   homepage: https://metacpan.org/pod/Alien::Build
   repository: git://github.com/Perl5-Alien/Alien-Build.git
-version: '1.79'
+version: '1.83'
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Diab Jerius (DJERIUS)'

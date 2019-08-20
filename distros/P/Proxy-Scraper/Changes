@@ -1,0 +1,27 @@
+Revision history for Proxy-Scraper
+
+All notable changes to this project will be documented in this file.
+
+2.0.1 - 2019-08-20
+
+	Added missing requirement.
+
+2.0.0 - 2019-08-20
+
+	Converted project to module.
+
+1.0.3 - 2019-08-12
+
+	Added .gitignore file.
+
+1.0.2 - 2019-07-28
+
+	Added Reddit to contact section.
+
+1.0.1 - 2019-07-28
+
+	Changed descriptions of arguments.
+
+1.0.0 - 2019-07-28
+
+	Start of project

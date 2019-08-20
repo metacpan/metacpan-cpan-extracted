@@ -1,5 +1,5 @@
 package Git::Raw::Diff::Delta;
-$Git::Raw::Diff::Delta::VERSION = '0.83';
+$Git::Raw::Diff::Delta::VERSION = '0.84';
 use strict;
 use warnings;
 
@@ -11,7 +11,7 @@ Git::Raw::Diff::Delta - Git diff delta class
 
 =head1 VERSION
 
-version 0.83
+version 0.84
 
 =head1 DESCRIPTION
 

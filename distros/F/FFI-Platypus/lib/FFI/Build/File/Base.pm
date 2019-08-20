@@ -4,13 +4,13 @@ use strict;
 use warnings;
 use 5.008001;
 use Carp ();
-use File::Temp     ();
+use FFI::Temp;
 use File::Basename ();
 use FFI::Build::Platform;
-use overload '""' => sub { $_[0]->path };
+use overload '""' => sub { $_[0]->path }, bool => sub { 1 }, fallback => 1;
 
 # ABSTRACT: Base class for File::Build files
-our $VERSION = '0.94'; # VERSION
+our $VERSION = '0.96'; # VERSION
 
 
 sub new
@@ -26,7 +26,7 @@ sub new
     platform => $platform,
     build    => $build,
   }, $class;
-  
+
   if(!defined $content)
   {
     Carp::croak("content is required");
@@ -37,31 +37,32 @@ sub new
   }
   elsif(ref($content) eq 'SCALAR')
   {
-    my @args;
-    push @args, "${base}XXXXXX";
-    push @args, DIR => $dir if $dir;
-    push @args, SUFFIX => $self->default_suffix;
-    
-    my($fh, $filename) = File::Temp::tempfile(@args);
-    
+    my %args;
+    $args{TEMPLATE} = "${base}XXXXXX";
+    $args{DIR}      = $dir if $dir;
+    $args{SUFFIX}   = $self->default_suffix;
+    $args{UNLINK}   = 0;
+
+    my $fh = $self->{fh} = FFI::Temp->new(%args);
+
     binmode( $fh, $self->default_encoding );
     print $fh $$content;
     close $fh;
-    
-    $self->{path} = $filename;
+
+    $self->{path} = $fh->filename;
     $self->{temp} = 1;
   }
   elsif(ref($content) eq '')
   {
     $self->{path} = $content;
   }
-  
+
   if($self->platform->osname eq 'MSWin32')
   {
     $self->{native} = File::Spec->catfile($self->{path});
     $self->{path} =~ s{\\}{/}g;
   }
-  
+
   $self;
 }
 
@@ -136,7 +137,7 @@ sub ld
 sub DESTROY
 {
   my($self) = @_;
-  
+
   if($self->{temp})
   {
     unlink($self->path);
@@ -157,7 +158,7 @@ FFI::Build::File::Base - Base class for File::Build files
 
 =head1 VERSION
 
-version 0.94
+version 0.96
 
 =head1 SYNOPSIS
 
@@ -331,6 +332,8 @@ Ilya Pavlov (Ilya33)
 Petr Pisar (ppisar)
 
 Mohammad S Anwar (MANWAR)
+
+Håkon Hægland (hakonhagland, HAKONH)
 
 =head1 COPYRIGHT AND LICENSE
 

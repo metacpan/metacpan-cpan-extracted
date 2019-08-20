@@ -1,0 +1,43 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Proxy::Scraper qw(scrape_proxies);
+use Term::ANSIColor qw(color colored);
+if($^O eq 'MSWin32'){
+	require Win32::Console::ANSI;
+	Win32::Console::ANSI->import();
+}
+
+my $type;
+my $level;
+my $output_file_path;
+
+GetOptions(
+	'type=s'   => \$type,
+	'level=s'  => \$level,
+	'output=s' => \$output_file_path,
+	'version'  => sub{print "Proxy-Scraper v$Proxy::Scraper::VERSION\n";exit},
+	'help'     => sub{
+		print colored qq{
+			  -h, --help
+			              show help message and exit
+			  -v, --version
+			              show version and exit
+			  -t, --type {http,https,socks4,socks5}
+			              set type of proxy
+			  -l, --level {transparent,anonymous,elite}
+			              set level of proxy anonymity
+			  -o, --output PATH
+			              set path to output file
+		}=~s/^\n//r =~s/^\t+//mgr,'blue';
+		exit;
+	}
+) or exit 1;
+
+scrape_proxies(
+	TYPE        => $type,
+	LEVEL       => $level,
+	OUTPUT_FILE => $output_file_path
+);

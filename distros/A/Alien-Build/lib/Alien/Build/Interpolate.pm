@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Advanced interpolation engine for Alien builds
-our $VERSION = '1.79'; # VERSION
+our $VERSION = '1.83'; # VERSION
 
 
 sub new
@@ -29,7 +29,7 @@ sub add_helper
     require Carp;
     Carp::croak("duplicate implementation for interpolated key $name");
   }
-  
+
   while(@_)
   {
     my $module = shift;
@@ -37,7 +37,7 @@ sub add_helper
     $version ||= 0;
     $self->{helper}->{$name}->{require}->{$module} = $version;
   }
-  
+
   $self->{helper}->{$name}->{code} = $code;
 }
 
@@ -59,27 +59,29 @@ sub has_helper
   {
     my $version = $self->{helper}->{$name}->{require}->{$module};
 
-    # yeah we do have to eval every time in case $version is different
-    # from the last load.
-    eval qq{ use $module @{[ $version ? $version : '' ]} (); 1 };
-    die $@ if $@;
+    {
+      my $pm = "$module.pm";
+      $pm =~ s/::/\//g;
+      require $pm;
+      $module->VERSION($version) if $version;
+    }
 
     unless($self->{classes}->{$module})
     {
       if($module->can('alien_helper'))
       {
         my $helpers = $module->alien_helper;
-        while(my($k,$v) = each %$helpers)
+        foreach my $k (keys %$helpers)
         {
-          $self->{helper}->{$k}->{code} = $v;
+          $self->{helper}->{$k}->{code} = $helpers->{$k};
         }
       }
       $self->{classes}->{$module} = 1;
     }
   }
-  
+
   my $code = $self->{helper}->{$name}->{code};
-  
+
   return unless defined $code;
 
   if(ref($code) ne 'CODE')
@@ -87,12 +89,14 @@ sub has_helper
     my $perl = $code;
     package Alien::Build::Interpolate::Helper;
     $code = sub {
+      ##  no critic
       my $value = eval $perl;
+      ## use critic
       die $@ if $@;
       $value;
     };
   }
-  
+
   $code;
 }
 
@@ -100,10 +104,10 @@ sub has_helper
 sub execute_helper
 {
   my($self, $name) = @_;
-  
+
   my $code = $self->has_helper($name);
   die "no helper defined for $name" unless defined $code;
-  
+
   $code->();
 }
 
@@ -111,9 +115,9 @@ sub execute_helper
 sub _get_prop
 {
   my($name, $prop, $orig) = @_;
-  
+
   $name =~ s/^\./alien./;
-  
+
   if($name =~ /^(.*?)\.(.*)$/)
   {
     my($key,$rest) = ($1,$2);
@@ -134,7 +138,7 @@ sub interpolate
 {
   my($self, $string, $prop) = @_;
   $prop ||= {};
-  
+
   $string =~ s{(?<!\%)\%\{([a-zA-Z_][a-zA-Z_0-9]+)\}}{$self->execute_helper($1)}eg;
   $string =~ s{(?<!\%)\%\{([a-zA-Z_\.][a-zA-Z_0-9\.]+)\}}{_get_prop($1,$prop,$1)}eg;
   $string =~ s/\%(?=\%)//g;
@@ -155,9 +159,9 @@ sub requires
 sub clone
 {
   my($self) = @_;
-  
+
   require Storable;
-  
+
   my %help;
   foreach my $helper (keys %{ $self->{helper} })
   {
@@ -185,7 +189,7 @@ Alien::Build::Interpolate - Advanced interpolation engine for Alien builds
 
 =head1 VERSION
 
-version 1.79
+version 1.83
 
 =head1 CONSTRUCTOR
 

@@ -10,6 +10,11 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xatom.h>
+#define Box _prima_Box
+#include <X11/Xregion.h>
+#undef Box
+#define Box BoxRec
+#undef Box
 #include <X11/Xresource.h>
 #include <X11/cursorfont.h>
 #ifdef HAVE_X11_EXTENSIONS_XRENDER_H
@@ -27,6 +32,7 @@
 #if defined(HAVE_X11_XFT_XFT_H) && defined(HAVE_FONTCONFIG_FONTCONFIG_H) && defined(HAVE_X11_EXTENSIONS_XRENDER_H) && defined(HAVE_FREETYPE_FREETYPE_H)
 #include <X11/Xft/Xft.h>
 #include <fontconfig/fontconfig.h>
+#include FT_OUTLINE_H
 #  if XFT_MAJOR > 1 && FC_MAJOR > 1
 #     define USE_XFT
 #  endif
@@ -300,7 +306,7 @@ typedef struct _timer_sys_data
 typedef struct
 {
 	Region region;
-	int height;
+	int aperture;
 } RegionSysData, *PRegionSysData;
 
 struct  _drawable_sys_data;
@@ -734,6 +740,7 @@ typedef struct _drawable_sys_data
 	XRectangle clip_rect;
 	FillPattern fill_pattern, saved_fill_pattern;
 	Point fill_pattern_offset, saved_fill_pattern_offset;
+	int fill_mode, saved_fill_mode;
 	Pixmap fp_pixmap;
 #if defined(sgi) && !defined(__GNUC__)
 /* multiple compilation and runtime errors otherwise. must be some alignment tricks */
@@ -742,6 +749,7 @@ typedef struct _drawable_sys_data
 	int rop, paint_rop;
 	int rop2, paint_rop2;
 	int line_style, line_width;
+	float miter_limit;
 	unsigned char *dashes, *paint_dashes;
 	int ndashes, paint_ndashes;
 	Point clip_mask_extent, shape_extent, shape_offset;
@@ -1301,6 +1309,9 @@ prima_xft_get_font_abc( Handle self, int firstChar, int lastChar, Bool unicode);
 extern PFontABC
 prima_xft_get_font_def( Handle self, int firstChar, int lastChar, Bool unicode);
 
+extern int
+prima_xft_get_glyph_outline( Handle self, int index, int flags, int ** buffer);
+
 extern PCachedFont
 prima_xft_get_cache( PFont font);
 
@@ -1375,3 +1386,6 @@ prima_find_toplevel_window(Handle self);
 
 extern Byte*
 prima_mirror_bits( void);
+
+extern int
+prima_copy_region_data(void * region);

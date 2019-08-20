@@ -8,7 +8,7 @@ use File::Temp ();
 use Path::Tiny qw( path );
 
 # ABSTRACT: Plugin for fetching files using Net::FTP
-our $VERSION = '1.79'; # VERSION
+our $VERSION = '1.83'; # VERSION
 
 
 has '+url' => '';
@@ -35,12 +35,12 @@ sub init
   $meta->register_hook( fetch => sub {
     my($build, $url) = @_;
     $url ||= $self->url;
-    
+
     $url = URI->new($url);
 
     die "Fetch::NetFTP does not support @{[ $url->scheme ]}"
       unless $url->scheme eq 'ftp';
-    
+
     $build->log("trying passive mode FTP first") if $self->passive;
     my $ftp = _ftp_connect($url, $self->passive);
 
@@ -48,30 +48,30 @@ sub init
 
     unless($path =~ m!/$!)
     {
-      my(@parts) = split '/', $path;
+      my(@parts) = split /\//, $path;
       my $filename = pop @parts;
       my $dir      = join '/', @parts;
-      
+
       my $path = eval {
         $ftp->cwd($dir) or die;
         my $tdir = File::Temp::tempdir( CLEANUP => 1);
         my $path = path("$tdir/$filename")->stringify;
-        
+
         unless(eval { $ftp->get($filename, $path) }) # NAT problem? try to use passive mode
         {
           $ftp->quit;
-          
+
           $build->log("switching to @{[ $self->passive ? 'active' : 'passive' ]} mode");
           $ftp = _ftp_connect($url, !$self->passive);
-          
+
           $ftp->cwd($dir) or die;
-          
+
           $ftp->get($filename, $path) or die;
         }
-        
+
         $path;
       };
-      
+
       if(defined $path)
       {
         return {
@@ -80,33 +80,33 @@ sub init
           path     => $path,
         };
       }
-      
+
       $path .= "/";
     }
-    
+
     $ftp->quit;
     $ftp = _ftp_connect($url, $self->passive);
     $ftp->cwd($path) or die "unable to fetch $url as either a directory or file";
-    
+
     my $list = eval { $ftp->ls };
     unless(defined $list) # NAT problem? try to use passive mode
     {
       $ftp->quit;
-      
+
       $build->log("switching to @{[ $self->passive ? 'active' : 'passive' ]} mode");
       $ftp = _ftp_connect($url, !$self->passive);
-      
+
       $ftp->cwd($path) or die "unable to fetch $url as either a directory or file";
-      
+
       $list = $ftp->ls;
-      
+
       die "cannot list directory $path on $url" unless defined $list;
     }
-    
+
     die "no files found at $url" unless @$list;
 
     $path .= '/' unless $path =~ /\/$/;
-    
+
     return {
       type => 'list',
       list => [
@@ -122,7 +122,7 @@ sub init
         } sort @$list,
       ],
     };
-    
+
   });
 
   $self;
@@ -135,12 +135,12 @@ sub _ftp_connect {
   my $ftp = Net::FTP->new(
     $url->host, Port =>$url->port, Passive =>$is_passive,
   ) or die "error fetching $url: $@";
-  
+
   $ftp->login($url->user, $url->password)
     or die "error on login $url: @{[ $ftp->message ]}";
-  
+
   $ftp->binary;
-  
+
   $ftp;
 }
 
@@ -158,7 +158,7 @@ Alien::Build::Plugin::Fetch::NetFTP - Plugin for fetching files using Net::FTP
 
 =head1 VERSION
 
-version 1.79
+version 1.83
 
 =head1 SYNOPSIS
 

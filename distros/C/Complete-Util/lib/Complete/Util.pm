@@ -1,7 +1,7 @@
 package Complete::Util;
 
-our $DATE = '2019-07-18'; # DATE
-our $VERSION = '0.602'; # VERSION
+our $DATE = '2019-07-23'; # DATE
+our $VERSION = '0.603'; # VERSION
 
 use 5.010001;
 use strict;
@@ -763,16 +763,6 @@ sub combine_answers {
         }
     }
 
-    # re-sort final words
-    if ($final->{words}) {
-        $final->{words} = [
-            sort {
-                (ref($a) ? $a->{word} : $a) cmp
-                    (ref($b) ? $b->{word} : $b);
-            }
-                @{ $final->{words} }];
-    }
-
     $encounter_hash ? $final : $final->{words};
 }
 
@@ -860,7 +850,7 @@ Complete::Util - General completion routine
 
 =head1 VERSION
 
-This document describes version 0.602 of Complete::Util (from Perl distribution Complete-Util), released on 2019-07-18.
+This document describes version 0.603 of Complete::Util (from Perl distribution Complete-Util), released on 2019-07-23.
 
 =head1 DESCRIPTION
 

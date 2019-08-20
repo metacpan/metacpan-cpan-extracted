@@ -1,9 +1,9 @@
 
 
 This archive contains the distribution Weasel-Driver-Mock,
-version 0.01:
+version 0.02:
 
-  Weasel driver to mock a real driver for testing purposes
+  Weasel driver to mock a real driver for testing purposes (Weasel::DriverRole level 0.03)
 
 This software is copyright (c) 2019 by Erik Huelsmann.
 

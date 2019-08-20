@@ -8,7 +8,7 @@ use Capture::Tiny qw( capture );
 use File::Which ();
 
 # ABSTRACT: Probe for tools or commands already available
-our $VERSION = '1.79'; # VERSION
+our $VERSION = '1.83'; # VERSION
 
 
 has '+command' => sub { Carp::croak "@{[ __PACKAGE__ ]} requires command property" };
@@ -34,7 +34,7 @@ has 'version_stderr' => undef;
 sub init
 {
   my($self, $meta) = @_;
-  
+
   my $check = sub {
     my($build) = @_;
 
@@ -71,7 +71,7 @@ sub init
     $build->runtime_prop->{command} = $self->command;
     'system';
   };
-  
+
   if($self->secondary)
   {
     $meta->around_hook(
@@ -106,7 +106,7 @@ Alien::Build::Plugin::Probe::CommandLine - Probe for tools or commands already a
 
 =head1 VERSION
 
-version 1.79
+version 1.83
 
 =head1 SYNOPSIS
 
@@ -134,7 +134,7 @@ The arguments to pass to the command.
 
 =head2 secondary
 
-If you are using another probe plugin (such as L<Alien::Build::Plugin::Probe::CBuilder> or 
+If you are using another probe plugin (such as L<Alien::Build::Plugin::Probe::CBuilder> or
 L<Alien::Build::Plugin::PkgConfig::Negotiate>) to detect the existence of a library, but
 also need a program to exist, then you should set secondary to a true value.  For example
 when you need both:

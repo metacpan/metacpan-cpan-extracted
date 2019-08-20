@@ -8,10 +8,11 @@ use File::Which qw( which );
 use Path::Tiny qw( path );
 use Capture::Tiny qw( capture );
 use File::Temp qw( tempdir );
+use List::Util 1.33 qw( any );
 use File::chdir;
 
 # ABSTRACT: Plugin for fetching files using curl
-our $VERSION = '1.79'; # VERSION
+our $VERSION = '1.83'; # VERSION
 
 
 sub curl_command
@@ -33,7 +34,7 @@ sub protocol_ok
 {
   my($class, $protocol) = @_;
   my $curl = $class->curl_command;
-  return unless defined $curl;
+  return 0 unless defined $curl;
   my($out, $err, $exit) = capture {
     system $curl, '--version';
   };
@@ -45,7 +46,7 @@ sub protocol_ok
       return $proto{$protocol} if $proto{$protocol};
     }
   }
-  return;
+  return 0;
 }
 
 sub init
@@ -99,7 +100,7 @@ sub init
           $build->log(" header: $_") for path('headers')->lines;
         }
 
-        my($type) = split ';', $h{content_type};
+        my($type) = split /;/, $h{content_type};
 
         if($type eq 'text/html')
         {
@@ -192,7 +193,7 @@ sub _execute
   {
     chomp $stderr;
     $build->log($_) for split /\n/, $stderr;
-    if($stderr =~ /Remote filename has no length/ && !!(grep /^-O$/, @command))
+    if($stderr =~ /Remote filename has no length/ && !!(any { /^-O$/ } @command))
     {
       my @new_command = map {
         /^-O$/ ? ( -o => 'index.html' ) : /^-J$/ ? () : ($_)
@@ -218,7 +219,7 @@ Alien::Build::Plugin::Fetch::CurlCommand - Plugin for fetching files using curl
 
 =head1 VERSION
 
-version 1.79
+version 1.83
 
 =head1 SYNOPSIS
 

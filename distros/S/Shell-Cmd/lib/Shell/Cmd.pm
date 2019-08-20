@@ -25,7 +25,7 @@ use IO::File;
 use Cwd;
 
 our($VERSION);
-$VERSION = "3.02";
+$VERSION = "3.03";
 
 $| = 1;
 $Data::Dumper::Sortkeys = 1;
@@ -35,7 +35,10 @@ $Data::Dumper::Sortkeys = 1;
 ###############################################################################
 
 sub version {
+   # uncoverable subroutine
+   # uncoverable statement
    my($self) = @_;
+   # uncoverable statement
    return $VERSION;
 }
 
@@ -160,7 +163,7 @@ sub flush {
       # cmd => { CMD_NUM => { 'meta'      => VAL,   (0 or a string)
       #                       'label'     => LABEL,
       #                       'cmd'       => [ CMD ],
-      #                       'dir'       => DIRE,
+      #                       'dire'      => DIRE,
       #                       'noredir'   => 0/1,
       #                       'retry'     => NUM,
       #                       'sleep'     => NUM,
@@ -312,11 +315,11 @@ sub options {
          next OPT;
 
       } else {
-         $self->_print(1,"Invalid option: $opt");
+         $self->_err("Invalid option: $opt");
          return 1;
       }
 
-      $self->_print(1,"Invalid value: $opt [ $val ]");
+      $self->_err("Invalid value: $opt [ $val ]");
       return 1;
    }
 
@@ -337,7 +340,7 @@ sub cmd {
       if (ref($cmd) ne ''  &&
           ref($cmd) ne 'ARRAY') {
          $$self{'err'} = "cmd must be a string or listref";
-         $self->_print(1,$$self{'err'});
+         $self->_err($$self{'err'});
          return 1;
       }
 
@@ -349,7 +352,7 @@ sub cmd {
       foreach my $opt (keys %options) {
          if ($opt !~ /^(dire|noredir|retry|sleep|check|label)$/) {
             $$self{'err'} = "Invalid cmd option: $opt";
-            $self->_print(1,$$self{'err'});
+            $self->_err($$self{'err'});
             return 1;
          }
          if ($opt eq 'dire') {
@@ -438,10 +441,10 @@ sub _cmd_flow {
 
    #
    # Flow commands may not have the following options:
-   #    dir, noredir, retry, check
+   #    dire, noredir, retry, check
    #
 
-   foreach my $opt ('dir','noredir','retry','check') {
+   foreach my $opt ('dire','noredir','retry','check') {
       if (exists $$self{'cmd'}{$cmd_num}{$opt}) {
          $$self{'err'} = "$opt option not allowed with flow command: $cmd_num";
          return 1;
@@ -449,6 +452,7 @@ sub _cmd_flow {
    }
 
    return 1  if ($err);
+   return 0;
 }
 
 sub _cmd_curr_flow {
@@ -506,7 +510,7 @@ sub _cmd_valid_script {
 sub run {
    my($self)   = @_;
    if ($self->_cmd_valid_script()) {
-      $self->_print(1,"script flow commands not closed correctly");
+      $self->_err($$self{'err'});
       return 252;
    }
    $self->_script();
@@ -524,7 +528,7 @@ sub run {
 
    my $tmp_script = $$self{'g'}{'tmp_script'};
    if (! $tmp_script) {
-      $self->_print(1,"tmp_script option must be set");
+      $self->_err("tmp_script option must be set");
       return 254;
    }
 
@@ -534,6 +538,7 @@ sub run {
       print $out $script;
       $out->close();
    } else {
+      $self->_err("tmp_script not writable");
       return 254;
    }
 
@@ -556,16 +561,17 @@ sub run {
 
    my($stdout,$stderr,$exit);
 
+   # We will always keep at least one of STDOUT/STDERR because they contain the
+   # information necessary to see what commands run.  In 'quiet' mode, the
+   # individual commands will discard all output, but the overall script will
+   # still use STDOUT.
    if      ($$self{'g'}{'out'}  &&
             $$self{'g'}{'err'}) {
-      ($stdout,$stderr,$exit) = capture        { system( ". $tmp_script" ) };
-   } elsif ($$self{'g'}{'out'}) {
-      ($stdout,$exit)          = capture_stdout { system( ". $tmp_script" ) };
+      ($stdout,$stderr,$exit) = capture         { system( ". $tmp_script" ) };
    } elsif ($$self{'g'}{'err'}) {
       ($stderr,$exit)          = capture_stderr { system( ". $tmp_script" ) };
    } else {
-      system(". $tmp_script");
-      $exit = $?;
+      ($stdout,$exit)          = capture_stdout { system( ". $tmp_script" ) };
    }
    $exit = $exit >> 8;
 
@@ -758,7 +764,7 @@ sub _script_options {
    #
 
    if ($$self{'g'}{'mode'} eq 'dry-run') {
-      $$self{'g'}{'s_type'} = $$self{'g'}{'script'}  ||  'run';
+      $$self{'g'}{'s_type'} = ($$self{'g'}{'script'} ? $$self{'g'}{'script'} : 'run');
       if ($$self{'g'}{'script'} eq 'simple') {
          $$self{'g'}{'simple'} = 'simple';
       } elsif ($$self{'g'}{'s_type'} eq 'run'  &&
@@ -820,30 +826,35 @@ sub _script_options {
          $$self{'g'}{'redir'} = '';
          $$self{'g'}{'out'}   = 1;
          $$self{'g'}{'err'}   = 1;
+         $$self{'g'}{'quiet'} = 0;
 
       } elsif ($$self{'g'}{'output'} eq 'merged') {
          # Merged output
          $$self{'g'}{'redir'} = '2>&1';
          $$self{'g'}{'out'}   = 1;
          $$self{'g'}{'err'}   = 0;
+         $$self{'g'}{'quiet'} = 0;
 
       } elsif ($$self{'g'}{'output'} eq 'stdout') {
          # Keep STDOUT, discard STDERR
          $$self{'g'}{'redir'} = '2>/dev/null';
          $$self{'g'}{'out'}   = 1;
          $$self{'g'}{'err'}   = 0;
+         $$self{'g'}{'quiet'} = 0;
 
       } elsif ($$self{'g'}{'output'} eq 'stderr') {
          # Discard STDOUT, keep STDERR
          $$self{'g'}{'redir'} = '>/dev/null';
          $$self{'g'}{'out'}   = 0;
          $$self{'g'}{'err'}   = 1;
+         $$self{'g'}{'quiet'} = 0;
 
-      } elsif ($$self{'g'}{'output'} eq 'quiet') {
+      } else {
          # Discard everthing
          $$self{'g'}{'redir'} = '>/dev/null 2>&1';
          $$self{'g'}{'out'}   = 0;
          $$self{'g'}{'err'}   = 0;
+         $$self{'g'}{'quiet'} = 1;
       }
 
    } else {
@@ -1004,6 +1015,7 @@ sub _script_cmd_cmd {
 <s_type=script>                       : if [ $SC_CURR_SUCC -eq 0 ]; then
 <s_type=script><out>                  :    echo "#SC CMD <?c_num?>.<?a_num?>";
 <s_type=script><err>                  :    echo "#SC CMD <?c_num?>.<?a_num?>" >&2;
+<s_type=script><quiet>                :    echo "#SC CMD <?c_num?>.<?a_num?>";
 <s_type=script><c_retries><out>       :    echo "#SC TRY $SC_TRY";
 <s_type=script><c_retries><err>       :    echo "#SC TRY $SC_TRY" >&2;
 <s_type=script>                       : fi
@@ -1077,6 +1089,7 @@ EOT
 <s_type=script>         :    if [ $CMD_EXIT -ne 0 ]; then
 <s_type=script><out>    :       echo "#SC EXIT <?c_num?>.<?a_num?> $CMD_EXIT";
 <s_type=script><err>    :       echo "#SC EXIT <?c_num?>.<?a_num?> $CMD_EXIT" >&2;
+<s_type=script><quiet>  :       echo "#SC EXIT <?c_num?>.<?a_num?> $CMD_EXIT";
 <s_type=script>         :    fi
                         : fi
 EOT
@@ -1127,8 +1140,8 @@ sub _cmd_options {
                                ? $$self{'cmd'}{$cmd_num}{'check'}
                                : '');
    $$self{'c'}{'c_check_q'} = $self->_quote($$self{'c'}{'c_check'});
-   $$self{'c'}{'c_dir'}     = ($$self{'cmd'}{$cmd_num}{'dir'}
-                               ? $self->_quote($$self{'cmd'}{$cmd_num}{'dir'})
+   $$self{'c'}{'c_dir'}     = ($$self{'cmd'}{$cmd_num}{'dire'}
+                               ? $self->_quote($$self{'cmd'}{$cmd_num}{'dire'})
                                : '');
 
    $$self{'c'}{'c_retries'} = 0  if ($$self{'c'}{'c_retries'} == 1);
@@ -1142,19 +1155,7 @@ sub _cmd_options {
 
    my $n = @{ $$self{'cmd'}{$cmd_num}{'cmd'} };
 
-   if (! $cmd_num) {
-      #
-      # This should never be called if $cmd_num = 0
-      #
-
-      $$self{'c'}{'cmd_str'}   = '';
-      $$self{'c'}{'cmd_str_q'} = '';
-      $$self{'c'}{'cmd_label'} = '';
-      $$self{'c'}{'alt_label'} = '';
-      $$self{'c'}{'alts'}      = 0;
-      $$self{'c'}{'a_num'}     = 0;
-
-   } elsif ($n == 1) {
+   if ($n == 1) {
       #
       # A command with no alternates.
       #
@@ -1299,23 +1300,20 @@ sub _ind_plus {
 sub _ind_minus {
    my($self) = @_;
    $$self{'g'}{'ind_cur_lev'}--;
-   $$self{'g'}{'ind_cur_lev'} = 0  if ($$self{'g'}{'ind_cur_lev'} < 0);
    $self->_ind();
 }
 
 ###############################################################################
 
-sub _print {
-   my($self,$err,$text) = @_;
+sub _err {
+   my($self,$text) = @_;
 
    # uncoverable branch false
    if ($ENV{'SHELL_CMD_TESTING'}) {
       return;
    }
 
-   my $c = ($err ? "# ERROR: " : "# INFO: ");
-   print {$err ? *STDERR : *STDOUT} "${c}${text}\n";
-
+   print STDERR "# ERROR: ${text}\n";
    return;
 }
 
@@ -1377,9 +1375,12 @@ sub _script_output {
       # The output MUST start with a header:
       #    #SC CMD X.Y
       #
+      # uncoverable branch true
       if ($out_hdr !~ /^\#SC CMD (\d+)\.(\d+)$/) {
          # Invalid output... should never happen
-         $self->_print(1,"Missing command header in STDOUT: $out_hdr");
+         # uncoverable statement
+         $self->_err("Missing command header in STDOUT: $out_hdr");
+         # uncoverable statement
          return ();
       }
 
@@ -1465,47 +1466,70 @@ sub _script_output {
 
       ($cmd_next,$alt_next,$try_next,$exit_next,$alt) = @{ shift(@cmd_raw) };
 
-      # ALT_NEXT = 0/1    and
-      # TRY_NEXT = 0
-      #    new command
+      VALID_CONDITIONS: {
 
-      if ($alt_next <= 1  &&
-          $try_next == 0) {
+         ## ALT_NEXT = 0/1    and
+         ## TRY_NEXT = 0
+         ##    next command
+         ##
+         ## All valid CMD_NEXT != CMD_CURR entries will be covered here.
 
-         push(@cmd,[@try]);
-         push(@cmds,[$cmd_curr,$exit_curr,@cmd]);
-         @cmd      = ();
-         @try      = ($alt);
-         $cmd_curr = $cmd_next;
-         $alt_curr = $alt_next;
-         $try_curr = $try_next;
-         $exit_curr= $exit_next;
-         next COMMAND_LOOP;
-      }
+         if ($alt_next <= 1  &&
+             $try_next == 0) {
 
-      # CMD_NEXT = CMD_CURR     and
-      # ALT_NEXT = ALT_CURR+1   and
-      # TRY_NEXT = TRY_CURR
-      #    next alternate
+            push(@cmd,[@try]);
+            push(@cmds,[$cmd_curr,$exit_curr,@cmd]);
+            @cmd      = ();
+            @try      = ($alt);
+            $cmd_curr = $cmd_next;
+            $alt_curr = $alt_next;
+            $try_curr = $try_next;
+            $exit_curr= $exit_next;
+            next COMMAND_LOOP;
+         }
 
-      if ($cmd_next == $cmd_curr    &&
-          $alt_next == $alt_curr+1  &&
-          $try_next == $try_curr) {
+         # uncoverable branch true
+         if ($cmd_next != $cmd_curr) {
+            # uncoverable statement
+            last VALID_CONDITIONS;
+         }
 
-         push(@try,$alt);
-         $alt_curr = $alt_next;
-         $exit_curr= $exit_next;
-         next COMMAND_LOOP;
-      }
+         ## ALT_NEXT = ALT_CURR+1
+         ##    next alternate
+         ##
+         ## All valid entries will have TRY_NEXT = TRY_CURR
 
-      # CMD_NEXT = CMD_CURR  and
-      # ALT_NEXT = 0/1       and
-      # TRY_NEXT = TRY_CURR+1
-      #    next try
+         if ($alt_next == $alt_curr+1) {
 
-      if ($cmd_next == $cmd_curr    &&
-          $alt_next <= 1            &&
-          $try_next == $try_curr+1) {
+            # uncoverable branch true
+            if ($try_next != $try_curr) {
+               # uncoverable statement
+               last VALID_CONDITIONS;
+            }
+
+            push(@try,$alt);
+            $alt_curr = $alt_next;
+            $exit_curr= $exit_next;
+            next COMMAND_LOOP;
+         }
+
+         ## ALT_NEXT = 0/1       and
+         ## TRY_NEXT = TRY_CURR+1
+         ##    next try
+         ##
+         ## Everything left must have both of these conditions.
+
+         # uncoverable branch true
+         if ($alt_next > 1) {
+            # uncoverable statement
+            last VALID_CONDITIONS;
+         }
+
+         # uncoverable branch true
+         if ($try_next != $try_curr+1) {
+            # uncoverable statement
+            last VALID_CONDITIONS;
+         }
 
          push(@cmd,[@try]);
          @try      = ($alt);
@@ -1519,9 +1543,11 @@ sub _script_output {
       # Everything else is an error in the output (should never happen)
       #
 
-      $self->_print(1,"Unexpected error in output: $i " .
-                    "[$cmd_curr,$alt_curr,$try_curr] " .
-                    "[$cmd_next,$alt_next,$try_next]");
+      # uncoverable statement
+      $self->_err("Unexpected error in output: $i " .
+                  "[$cmd_curr,$alt_curr,$try_curr] " .
+                  "[$cmd_next,$alt_next,$try_next]");
+      # uncoverable statement
       return ();
    }
 
@@ -1541,12 +1567,12 @@ sub ssh {
    my($self,@hosts) = @_;
 
    if (! @hosts) {
-      $self->_print(1,"A host or hosts must be supplied with the ssh method");
+      $self->_err("A host or hosts must be supplied with the ssh method");
       return;
    }
 
    if ($self->_cmd_valid_script()) {
-      $self->_print(1,"script flow commands not closed correctly");
+      $self->_err("script flow commands not closed correctly");
       return;
    }
    $self->_script();
@@ -1564,7 +1590,7 @@ sub ssh {
 
    my $tmp_script = $$self{'g'}{'tmp_script'};
    if (! $tmp_script) {
-      $self->_print(1,"tmp_script option must be set");
+      $self->_err("tmp_script option must be set");
       return 254;
    }
 
@@ -1574,6 +1600,7 @@ sub ssh {
       print $out $script;
       $out->close();
    } else {
+      $self->_err("tmp_script not writable");
       return 254;
    }
 
@@ -1619,8 +1646,10 @@ sub _ssh_parallel {
          my($pid,$exit_code,$id,$signal,$core_dump,$data) = @_;
          my($host,$exit,$stdout,$stderr) = @$data;
          $ret{$host} = $exit;
-         $$self{'s'}{$host}{'out'} = $self->_script_output($stdout)  if ($stdout);
-         $$self{'s'}{$host}{'err'} = $self->_script_output($stderr)  if ($stderr);
+         $$self{'s'}{$host}{'out'} = $self->_script_output($stdout)
+           if (defined $stdout);
+         $$self{'s'}{$host}{'err'} = $self->_script_output($stderr)
+           if (defined $stderr);
          $$self{'s'}{$host}{'exit'} = $exit;
       }
      );
@@ -1707,7 +1736,7 @@ sub output {
    my $cmd  = (exists $options{'command'} ? $options{'command'} : 'curr');
 
    if ($type !~ /^(stdout|stderr|command|num|label|exit)$/) {
-      $self->_print(1,"Invalid output option: output=$type");
+      $self->_err("Invalid output option: output=$type");
       return;
    }
 
@@ -1718,8 +1747,8 @@ sub output {
    if ($host) {
       my @all = keys %{ $$self{'s'} };
       if (! @all) {
-         $self->_print(1,"Invalid option in output: " .
-                       "host not allowed unless run with ssh method");
+         $self->_err("Invalid option in output: " .
+                     "host not allowed unless run with ssh method");
          return;
       }
 
@@ -1734,7 +1763,7 @@ sub output {
 
          foreach my $host (@host) {
             if (! exists $$self{'s'}{$host}) {
-               $self->_print(1,"Host has no output: $host");
+               $self->_err("Host has no output: $host");
                next;
             }
 
@@ -1746,7 +1775,7 @@ sub output {
       # host = HOST
 
       if (! exists $$self{'s'}{$host}) {
-         $self->_print(1,"Host has no output: $host");
+         $self->_err("Host has no output: $host");
          return;
       }
       return $self->_output($type,$cmd,$$self{'s'}{$host});

@@ -362,7 +362,7 @@ subtest 'record class' => sub {
     package Foo::Bar5;
     use FFI::Platypus::Record;
     record_layout(qw(
-      int foo
+      string(67) foo
     ));
   }
 
@@ -379,6 +379,24 @@ subtest 'record class' => sub {
     }
 
   };
+
+  subtest 'alias' => sub {
+
+    local $@ = '';
+    my $check = eval { $tp->check_alias('foo_bar5_t') };
+    is "$@", "";
+    is $check, 1;
+
+    eval { $tp->set_alias('foo_bar5_t', $tp->parse('record(Foo::Bar5)') ) };
+    is "$@", "";
+
+    is $tp->parse('foo_bar5_t')->type_code, FFI_PL_TYPE_RECORD_VALUE;
+
+    is $tp->parse('foo_bar5_t*')->type_code, FFI_PL_TYPE_RECORD;
+    is $tp->parse('foo_bar5_t*')->sizeof, 67;
+
+  };
+
 
 };
 
@@ -469,6 +487,26 @@ subtest 'use alias' => sub {
 
   eval { $tp->parse('bar_t[200]') };
   like "$@", qr/^cannot make an array of bar_t/;
+
+};
+
+subtest 'object' => sub {
+
+  { package Roger; }
+
+  is(
+    $tp->parse('object(Roger)')->type_code,
+    FFI_PL_SHAPE_OBJECT | FFI_PL_TYPE_OPAQUE,
+  );
+
+  is(
+    $tp->parse('object(Roger,sint32)')->type_code,
+    FFI_PL_SHAPE_OBJECT | FFI_PL_TYPE_SINT32,
+  );
+
+  local $@ = '';
+  eval { $tp->parse('object(Roger,float)') };
+  like "$@", qr/^cannot make an object of float/;
 
 };
 

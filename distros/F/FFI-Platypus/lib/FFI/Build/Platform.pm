@@ -6,11 +6,13 @@ use 5.008001;
 use Carp ();
 use Text::ParseWords ();
 use List::Util 1.45 ();
-use File::Temp ();
+use FFI::Temp;
 use Capture::Tiny ();
+use File::Spec;
+use FFI::Platypus::ShareConfig;
 
 # ABSTRACT: Platform specific configuration.
-our $VERSION = '0.94'; # VERSION
+our $VERSION = '0.96'; # VERSION
 
 
 sub new
@@ -69,14 +71,14 @@ sub library_suffix
   {
     push @suffix, '.' . $self->{config}->{dlext};
   }
-  wantarray ? @suffix : $suffix[0];
+  wantarray ? @suffix : $suffix[0];  ## no critic (Freenode::Wantarray)
 }
 
 
 sub library_prefix
 {
   my $self = _self(shift);
-  
+
   # this almost certainly requires refinement.
   if($self->osname eq 'cygwin')
   {
@@ -118,7 +120,7 @@ sub cxx
   my $self = _self(shift);
 
   my @cc = @{ $self->cc };
-  
+
   if($self->{config}->{ccname} eq 'gcc')
   {
     if($cc[0] =~ /gcc$/)
@@ -158,7 +160,7 @@ sub for
   my $self = _self(shift);
 
   my @cc = @{ $self->cc };
-  
+
   if($self->{config}->{ccname} eq 'gcc')
   {
     if($cc[0] =~ /gcc$/)
@@ -217,6 +219,8 @@ sub ccflags
   push @ccflags, $self->shellwords($self->{config}->{cccdlflags});
   push @ccflags, $self->shellwords($self->{config}->{ccflags});
   push @ccflags, $self->shellwords($self->{config}->{optimize});
+  my $dist_include = eval { File::Spec->catdir(FFI::Platypus::ShareConfig::dist_dir('FFI-Platypus'), 'include') };
+  push @ccflags, "-I$dist_include" unless $@;
   \@ccflags;
 }
 
@@ -255,12 +259,12 @@ sub cc_mm_works
   my $self = _self(shift);
   my $verbose = shift;
   $verbose ||= 0;
-  
+
   unless(defined $self->{cc_mm_works})
   {
     require FFI::Build::File::C;
     my $c = FFI::Build::File::C->new(\"#include \"foo.h\"\n");
-    my $dir = File::Temp::tempdir( CLEANUP => 1 );
+    my $dir = FFI::Temp->newdir;
     {
       open my $fh, '>', "$dir/foo.h";
       print $fh "\n";
@@ -274,7 +278,7 @@ sub cc_mm_works
       '-MM',
       $c->path,
     );
-    
+
     my($out, $exit) = Capture::Tiny::capture_merged(sub {
       $self->run(@cmd);
     });
@@ -287,8 +291,8 @@ sub cc_mm_works
     {
       print "CC (checkfor -MM)\n";
     }
-    
-    
+
+
     if(!$exit && $out =~ /foo\.h/)
     {
       $self->{cc_mm_works} = '-MM';
@@ -298,7 +302,7 @@ sub cc_mm_works
       $self->{cc_mm_works} = 0;
     }
   }
-  
+
   $self->{cc_mm_works};
 }
 
@@ -363,7 +367,7 @@ sub diag
 {
   my $self = _self(shift);
   my @diag;
-  
+
   push @diag, "osname            : ". _c($self->osname);
   push @diag, "cc                : ". _l($self->cc);
   push @diag, "cxx               : ". (eval { _l($self->cxx) } || '---' );
@@ -393,7 +397,7 @@ FFI::Build::Platform - Platform specific configuration.
 
 =head1 VERSION
 
-version 0.94
+version 0.96
 
 =head1 SYNOPSIS
 
@@ -566,6 +570,8 @@ Ilya Pavlov (Ilya33)
 Petr Pisar (ppisar)
 
 Mohammad S Anwar (MANWAR)
+
+Håkon Hægland (hakonhagland, HAKONH)
 
 =head1 COPYRIGHT AND LICENSE
 

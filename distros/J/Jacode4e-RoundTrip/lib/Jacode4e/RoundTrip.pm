@@ -1,5 +1,5 @@
 package Jacode4e::RoundTrip;
-$VERSION = '2.13.81.7';
+$VERSION = '2.13.81.8';
 ######################################################################
 #
 # Jacode4e::RoundTrip - Jacode4e for round-trip conversion in JIS X 0213

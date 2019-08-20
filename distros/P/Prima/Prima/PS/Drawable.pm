@@ -116,8 +116,8 @@ sub save_state
 		$self-> set_font( $f );
 	}
 	$self-> {saveState}-> {$_} = $self-> $_() for qw(
-		color backColor fillPattern lineEnd linePattern lineWidth
-		rop rop2 textOpaque textOutBaseline font lineJoin fillWinding
+		color backColor fillPattern lineEnd linePattern lineWidth miterLimit
+		rop rop2 textOpaque textOutBaseline font lineJoin fillMode
 	);
 	delete $self->{saveState}->{font}->{size};
 	$self-> {saveState}-> {$_} = [$self-> $_()] for qw(
@@ -130,8 +130,8 @@ sub save_state
 sub restore_state
 {
 	my $self = $_[0];
-	for ( qw( color backColor fillPattern lineEnd linePattern lineWidth
-			rop rop2 textOpaque textOutBaseline font lineJoin fillWinding)) {
+	for ( qw( color backColor fillPattern lineEnd linePattern lineWidth miterLimit
+			rop rop2 textOpaque textOutBaseline font lineJoin fillMode)) {
 		$self-> $_( $self-> {saveState}-> {$_});
 	}
 	for ( qw( translate clipRect)) {
@@ -199,7 +199,7 @@ CLIP
 	$self-> emit("@tp T") if $doTR;
 	$self-> emit("@sc Z") if $doSC;
 	$self-> emit("$ro R") if $ro != 0;
-	$self-> {changed}-> {$_} = 1 for qw(fill linePattern lineWidth lineJoin lineEnd font);
+	$self-> {changed}-> {$_} = 1 for qw(fill linePattern lineWidth lineJoin lineEnd miterLimit font);
 }
 
 sub fill
@@ -278,6 +278,12 @@ sub stroke
 		my $id = ( $lj == lj::Round) ? 1 : (( $lj == lj::Bevel) ? 2 : 0);
 		$self-> emit( "$id SJ");
 		$self-> {changed}-> {lineJoin} = 0;
+	}
+	
+	if ( $self-> {changed}-> {miterLimit}) {
+		my $ml = $self-> miterLimit;
+		$self-> emit( "$ml ML");
+		$self-> {changed}-> {miterLimit} = 0;
 	}
 
 	if ( $r2 != rop::NoOper && $lp ne lp::Solid ) {
@@ -384,7 +390,7 @@ d/T/translate , d/R/rotate , d/P/showpage , d/Z/scale , d/I/imagemask ,
 d/@/dup , d/G/setgray , d/A/setrgbcolor , d/l/lineto , d/F/fill ,
 d/FF/findfont , d/XF/scalefont , d/SF/setfont ,
 d/O/stroke , d/SD/setdash , d/SL/setlinecap , d/SW/setlinewidth ,
-d/SJ/setlinejoin , d/E/eofill ,
+d/SJ/setlinejoin , d/E/eofill , d/ML/setmiterlimit ,
 d/SS/setcolorspace , d/SC/setcolor , d/SM/setmatrix , d/SPD/setpagedevice ,
 d/SP/setpattern , d/CP/currentpoint , d/MX/matrix , d/MP/makepattern ,
 d/b/begin , d/e/end , d/t/true , d/f/false , d/?/ifelse , d/a/arc ,
@@ -405,7 +411,7 @@ PREFIX
 	$self-> {pagePrefix} .= "0 0 M 90 R 0 -$x T\n" if $self-> {reversed};
 
 	$self-> {changed} = { map { $_ => 0 } qw(
-		fill lineEnd linePattern lineWidth lineJoin font)};
+		fill lineEnd linePattern lineWidth lineJoin miterLimit font)};
 	$self-> {docFontMap} = {};
 
 	$self-> SUPER::begin_paint;
@@ -589,10 +595,10 @@ sub lineJoin
 	$_[0]-> {changed}-> {lineJoin} = 1;
 }
 
-sub fillWinding
+sub fillMode
 {
-	return $_[0]-> SUPER::fillWinding unless $#_;
-	$_[0]-> SUPER::fillWinding($_[1]);
+	return $_[0]-> SUPER::fillMode unless $#_;
+	$_[0]-> SUPER::fillMode($_[1]);
 }
 
 sub linePattern
@@ -609,6 +615,16 @@ sub lineWidth
 	$_[0]-> SUPER::lineWidth($_[1]);
 	return unless $_[0]-> {canDraw};
 	$_[0]-> {changed}-> {lineWidth} = 1;
+}
+
+sub miterLimit
+{
+	return $_[0]-> SUPER::miterLimit unless $#_;
+	my ( $self, $ml ) = @_;
+	$ml = 1.0 if $ml < 0;
+	$self-> SUPER::miterLimit($ml);
+	return unless $self-> {canDraw};
+	$self-> {changed}-> {miterLimit} = 1;
 }
 
 sub rop
@@ -850,7 +866,7 @@ sub fill_chord
 	( $x, $y, $dx, $dy) = $self-> pixel2point( $x, $y, $dx, $dy);
 	my $rx = $dx / 2;
 	$end -= $start;
-	my $F = $self-> fillWinding ? 'F' : 'E';
+	my $F = (($self-> fillMode & fm::Winding) == fm::Alternate) ? 'E' : 'F';
 	$self-> fill( <<CHORD );
 $x $y M : $x $y T 1 $try Z
 N $rx 0 M 0 0 $rx 0 $end a X $F ;
@@ -889,7 +905,7 @@ sub fill_sector
 	( $x, $y, $dx, $dy) = $self-> pixel2point( $x, $y, $dx, $dy);
 	my $rx = $dx / 2;
 	$end -= $start;
-	my $F = $self-> fillWinding ? 'F' : 'E';
+	my $F = (($self-> fillMode & fm::Winding) == fm::Alternate) ? 'E' : 'F';
 	$self-> fill(<<SECTOR);
 $x $y M : $x $y T 1 $try Z $start R
 N 0 0 M 0 0 $rx 0 $end a 0 0 l $F ;
@@ -1131,7 +1147,7 @@ sub fillpoly
 	for ( $i = 2; $i < $c; $i += 2) {
 		$x .= "@a[$i,$i+1] l ";
 	}
-	$x .= 'X ' . ($self-> fillWinding ? 'F' : 'E');
+	$x .= 'X ' . ((($self-> fillMode & fm::Winding) == fm::Alternate) ? 'E' : 'F');
 	$self-> fill( $x);
 }
 

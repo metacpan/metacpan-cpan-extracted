@@ -8,10 +8,10 @@ use Carp qw( croak );
 use overload '&{}' => sub {
   my $self = shift;
   sub { $self->{code}->(@_) };
-};
+}, bool => sub { 1 }, fallback => 1;
 
 # ABSTRACT: Platypus closure object
-our $VERSION = '0.94'; # VERSION
+our $VERSION = '0.96'; # VERSION
 
 
 sub new
@@ -66,7 +66,7 @@ sub unstick
 
 package FFI::Platypus::ClosureData;
 
-our $VERSION = '0.94'; # VERSION
+our $VERSION = '0.96'; # VERSION
 
 1;
 
@@ -82,7 +82,7 @@ FFI::Platypus::Closure - Platypus closure object
 
 =head1 VERSION
 
-version 0.94
+version 0.96
 
 =head1 SYNOPSIS
 
@@ -171,6 +171,8 @@ Ilya Pavlov (Ilya33)
 Petr Pisar (ppisar)
 
 Mohammad S Anwar (MANWAR)
+
+Håkon Hægland (hakonhagland, HAKONH)
 
 =head1 COPYRIGHT AND LICENSE
 

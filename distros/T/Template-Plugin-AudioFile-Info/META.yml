@@ -1,23 +1,26 @@
 ---
-name: Template-Plugin-AudioFile-Info
-version: 1.05
+abstract: 'Template Toolkit plugin for'
 author:
   - 'Dave Cross, E<lt>dave@dave.org.ukE<gt>'
-abstract: |-
-  Template Toolkit plugin for
-  AudioFile::Info
+build_requires: {}
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
-resources:
-  license: http://dev.perl.org/licenses/
-requires:
-  AudioFile::Info: 0
-  Template: 0
-  perl: 5.6.0
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Template-Plugin-AudioFile-Info
 provides:
   Template::Plugin::AudioFile::Info:
     file: lib/Template/Plugin/AudioFile/Info.pm
-    version: 17
-generated_by: Module::Build version 0.2808
-meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.2.html
-  version: 1.2
+    version: v2.0.0
+requires:
+  AudioFile::Info: '2.000001'
+  Template: '0'
+  perl: v5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: v2.0.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

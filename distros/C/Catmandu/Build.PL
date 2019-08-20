@@ -8,7 +8,7 @@ use Module::Build 0.28;
 
 my %module_build_args = (
   "build_requires" => {
-    "Module::Build" => "0.28"
+    "Module::Build" => "0.4229"
   },
   "configure_requires" => {
     "Module::Build" => "0.28"
@@ -18,7 +18,7 @@ my %module_build_args = (
     "Nicolas Steenlant, C<< <nicolas.steenlant at ugent.be> >>"
   ],
   "dist_name" => "Catmandu",
-  "dist_version" => "1.2002",
+  "dist_version" => "1.2003",
   "license" => "perl",
   "module_name" => "Catmandu",
   "recommends" => {
@@ -34,7 +34,7 @@ my %module_build_args = (
     "Config::Onion" => "1.004",
     "Cpanel::JSON::XS" => "3.0213",
     "Data::Compare" => "1.22",
-    "Data::UUID" => "1.217",
+    "Data::UUID::MT" => "1.001",
     "Data::Util" => "0.66",
     "Hash::Merge::Simple" => 0,
     "IO::Handle::Util" => "0.01",
@@ -43,6 +43,7 @@ my %module_build_args = (
     "Log::Any" => 0,
     "Log::Any::Adapter" => 0,
     "MIME::Types" => 0,
+    "Module::Build" => "0.4229",
     "Module::Info" => 0,
     "Moo" => "1.004006",
     "MooX::Aliases" => "0.001006",
@@ -85,7 +86,7 @@ my %fallback_build_requires = (
   "Log::Any::Adapter::Log4perl" => 0,
   "Log::Any::Test" => "1.03",
   "Log::Log4perl" => 0,
-  "Module::Build" => "0.28",
+  "Module::Build" => "0.4229",
   "Test::Deep" => "0.112",
   "Test::Exception" => "0.43",
   "Test::LWP::UserAgent" => 0,

@@ -1,0 +1,53 @@
+{
+   "abstract" : "abstract syntax tree for configuration files",
+   "author" : [
+      "Sergey Poznyakoff <gray@gnu.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Config-AST",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "provides" : {
+      "Config::AST" : {
+         "file" : "lib/Config/AST.pm",
+         "version" : "1.01"
+      },
+      "Config::AST::Node" : {
+         "file" : "lib/Config/AST/Node.pm",
+         "version" : 0
+      },
+      "Config::AST::Node::Null" : {
+         "file" : "lib/Config/AST/Node/Null.pm",
+         "version" : 0
+      },
+      "Config::AST::Node::Section" : {
+         "file" : "lib/Config/AST/Node/Section.pm",
+         "version" : 0
+      },
+      "Config::AST::Node::Value" : {
+         "file" : "lib/Config/AST/Node/Value.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git.gnu.org.ua/config-ast.git",
+         "web" : "http://git.gnu.org.ua/cgit/config-ast.git/"
+      }
+   },
+   "version" : "1.01"
+}

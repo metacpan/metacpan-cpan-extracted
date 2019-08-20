@@ -7,7 +7,7 @@ use File::chdir;
 use Path::Tiny ();
 
 # ABSTRACT: Plugin for fetching a local directory
-our $VERSION = '1.79'; # VERSION
+our $VERSION = '1.83'; # VERSION
 
 
 has root => undef;
@@ -18,9 +18,9 @@ has ssl => 0;
 sub init
 {
   my($self, $meta) = @_;
-  
+
   my $url = $meta->prop->{start_url} || 'patch';
-  
+
   $meta->add_requires('configure' => 'Alien::Build::Plugin::Fetch::LocalDir' => '0.72' );
 
   if($url =~ /^file:/)
@@ -41,13 +41,13 @@ sub init
     }
     $self->root($root);
   }
-  
+
   $meta->register_hook(
     fetch => sub {
       my($build, $path) = @_;
-      
+
       $path ||= $url;
-      
+
       if($path =~ /^file:/)
       {
         my $root = URI::file->new($self->root);
@@ -55,9 +55,9 @@ sub init
         $path = $url->path;
         $path =~ s{^/([a-z]:)}{$1}i if $^O eq 'MSWin32';
       }
-      
+
       $path = Path::Tiny->new($path)->absolute($self->root);
-      
+
       if(-d $path)
       {
         return {
@@ -91,7 +91,7 @@ Alien::Build::Plugin::Fetch::LocalDir - Plugin for fetching a local directory
 
 =head1 VERSION
 
-version 1.79
+version 1.83
 
 =head1 SYNOPSIS
 

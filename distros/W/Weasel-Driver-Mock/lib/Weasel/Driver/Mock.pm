@@ -5,7 +5,7 @@ Weasel::Driver::Mock - Weasel driver for testing purposes
 
 =head1 VERSION
 
-0.01
+0.02
 
 =head1 SYNOPSIS
 
@@ -89,7 +89,11 @@ in case of C<ret_array>, the values to be returned.
 When a state specifies an C<err> key, the called function (if it is
 the correct one) die with the value as the argument to C<die>.
 
-=item content (or content_base64 or content_from_file) (optional)
+=item content (optional)
+
+=item content_base64 (optional)
+
+=item content_from_file (optional)
 
 Provides the content to be written to the file handle when the called
 function accepts a file handle argument.
@@ -129,7 +133,7 @@ use Weasel::DriverRole;
 use Moose;
 with 'Weasel::DriverRole';
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 
 =head1 ATTRIBUTES
@@ -158,7 +162,7 @@ see L<Weasel::DriverRole>.
 =cut
 
 sub implements {
-    return '0.02';
+    return '0.03';
 }
 
 
@@ -222,12 +226,23 @@ sub wait_for {
     # Do NOT use Selenium::Waiter, it eats all exceptions!
     my $end = time() + $args{retry_timeout};
     my $rv;
-    do {
+    while (1) {
         $rv = $callback->();
         return $rv if $rv;
 
-        sleep $args{poll_delay};
-    } while (time() <= $end);
+        if (time() <= $end) {
+            sleep $args{poll_delay};
+        }
+        elsif ($args{on_timeout}) {
+            $args{on_timeout}->();
+        }
+        else {
+            croak "wait_for deadline expired waiting for: $args{description}"
+                if defined $args{description};
+
+            croak 'wait_for deadline expired; consider increasing the deadline';
+        }
+    }
 
     return;
 }

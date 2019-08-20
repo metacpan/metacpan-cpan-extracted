@@ -12,7 +12,7 @@ use Doodle::Command;
 use Doodle::Schema;
 use Doodle::Table;
 
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 has commands => (
   is => 'ro',

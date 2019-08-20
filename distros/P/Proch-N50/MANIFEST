@@ -10,7 +10,6 @@ README
 README.md
 README.template
 bin/n50
-bin/n50.bak
 data/sim1.fa
 data/sim2.fa
 data/small_test.fa
@@ -32,6 +31,9 @@ t/release-03-minimum-standards.t
 t/release-04-check-cpan-version.t
 t/release-05-changes-ver.t
 t/release-05-changes.t
+t/release-20_stdin.t
+t/release-21_bin.t
+t/release-22_csv.t
 xt/n50.pl
 xt/n50_loc_lib.sh
 xt/output_test.pl

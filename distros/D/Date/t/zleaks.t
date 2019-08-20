@@ -5,7 +5,7 @@ use lib 't/lib'; use MyTest;
 use Storable qw/freeze thaw nfreeze dclone/;
 
 plan skip_all => 'set TEST_FULL=1 to enable leaks test' unless $ENV{TEST_FULL};
-plan skip_all => 'FreeBSD System and installed BSD::Resource required to test for leaks' unless eval { require BSD::Resource; 1 };
+plan skip_all => 'BSD::Resource required to test for leaks' unless eval { require BSD::Resource; 1 };
 
 my $measure = 200;
 my $leak = 0;

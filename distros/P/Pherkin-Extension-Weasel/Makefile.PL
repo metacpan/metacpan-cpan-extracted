@@ -37,9 +37,9 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Carp::Always" => 0,
     "Test::More" => 0,
-    "Weasel::Driver::Mock" => 0
+    "Weasel::Driver::Mock" => "0.02"
   },
-  "VERSION" => "0.11",
+  "VERSION" => "0.12",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -56,7 +56,7 @@ my %FallbackPrereqs = (
   "Test::BDD::Cucumber" => 0,
   "Test::More" => 0,
   "Weasel" => 0,
-  "Weasel::Driver::Mock" => 0,
+  "Weasel::Driver::Mock" => "0.02",
   "Weasel::Session" => "0.11",
   "YAML::Syck" => 0
 );

@@ -10,6 +10,7 @@ use File::Temp qw( tempdir );
 use Test2::API qw( context run_subtest );
 use Capture::Tiny qw( capture_merged );
 use Alien::Build::Util qw( _mirror );
+use List::Util 1.33 qw( any );
 use File::chdir;
 
 our @EXPORT = qw(
@@ -29,7 +30,7 @@ our @EXPORT = qw(
 );
 
 # ABSTRACT: Tools for testing Alien::Build + alienfile
-our $VERSION = '1.79'; # VERSION
+our $VERSION = '1.83'; # VERSION
 
 
 my $build;
@@ -50,7 +51,7 @@ sub alienfile
   my %args = @_ == 0 ? (filename => 'alienfile') : @_ % 2 ? ( source => do { '# line '. $line . ' "' . path($filename)->absolute . qq("\n) . $_[0] }) : @_;
 
   require alienfile;
-  push @alienfile::EXPORT, 'targ' unless grep /^targ$/, @alienfile::EXPORT;
+  push @alienfile::EXPORT, 'targ' unless any { /^targ$/ } @alienfile::EXPORT;
 
   my $get_temp_root = do{
     my $root; # may be undef;
@@ -600,7 +601,7 @@ sub alien_subtest
   $pass;
 }
 
-delete $ENV{$_} for qw( ALIEN_BUILD_PRELOAD ALIEN_BUILD_POSTLOAD ALIEN_INSTALL_TYPE PKG_CONFIG_PATH );
+delete $ENV{$_} for qw( ALIEN_BUILD_LOG ALIEN_BUILD_PRELOAD ALIEN_BUILD_POSTLOAD ALIEN_INSTALL_TYPE PKG_CONFIG_PATH );
 $ENV{ALIEN_BUILD_RC} = '-';
 
 1;
@@ -617,7 +618,7 @@ Test::Alien::Build - Tools for testing Alien::Build + alienfile
 
 =head1 VERSION
 
-version 1.79
+version 1.83
 
 =head1 SYNOPSIS
 
@@ -627,7 +628,7 @@ version 1.79
  # returns an instance of Alien::Build.
  my $build = alienfile_ok q{
    use alienfile;
-   
+ 
    plugin 'My::Plugin' => (
      foo => 1,
      bar => 'string',

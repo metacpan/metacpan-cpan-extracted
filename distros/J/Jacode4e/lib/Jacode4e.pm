@@ -1,5 +1,5 @@
 package Jacode4e;
-$VERSION = '2.13.6.13';
+$VERSION = '2.13.6.14';
 ######################################################################
 #
 # Jacode4e - jacode.pl-like program for enterprise

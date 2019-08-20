@@ -645,6 +645,7 @@ font_font2logfont( Font * f, LOGFONT * lf)
 	lf-> lfQuality          = PROOF_QUALITY;
 	lf-> lfPitchAndFamily   = FF_DONTCARE;
 	strncpy( lf-> lfFaceName, f-> name, LF_FACESIZE);
+	lf->lfFaceName[LF_FACESIZE - 1] = 0;
 	lf-> lfCharSet          = font_encoding2charset( f-> encoding);
 }
 
@@ -693,7 +694,7 @@ font_pp2font( char * presParam, Font * f)
 	} else
 		f-> size = 10;
 
-	strncpy( f-> name, p, 256);
+	strncpy( f-> name, p, 255);
 	p = f-> name;
 	f-> style = 0;
 	f-> pitch = fpDefault;
@@ -1322,7 +1323,7 @@ apc_lookup_color( const char * colorName)
 
 #define xcmp( name, stlen, retval)  if (( len == stlen) && ( strcmp( name, buf) == 0)) return retval
 
-	strncpy( buf, colorName, 256);
+	strncpy( buf, colorName, 255);
 	len = strlen( buf);
 	for ( b = buf; *b; b++) *b = tolower(*b);
 
@@ -1508,7 +1509,7 @@ hwnd_enter_paint( Handle self)
 
 	apc_gp_set_text_opaque( self, is_apt( aptTextOpaque));
 	apc_gp_set_text_out_baseline( self, is_apt( aptTextOutBaseline));
-	apc_gp_set_fill_winding( self, sys fillWinding);
+	apc_gp_set_fill_mode( self, sys fillMode);
 	apc_gp_set_fill_pattern_offset( self, sys fillPatternOffset);
 	apc_gp_set_line_width( self, sys lineWidth);
 	apc_gp_set_line_end( self, sys lineEnd);
@@ -1516,12 +1517,13 @@ hwnd_enter_paint( Handle self)
 	apc_gp_set_line_pattern( self,
 		( Byte*)(( sys linePatternLen > 3) ? sys linePattern : ( Byte*)&sys linePattern),
 		sys linePatternLen);
+	apc_gp_set_miter_limit( self, sys miterLimit);
 	apc_gp_set_rop( self, sys rop);
 	apc_gp_set_rop2( self, sys rop2);
 	apc_gp_set_transform( self, sys transform. x, sys transform. y);
 	apc_gp_set_fill_pattern( self, sys fillPattern2);
 	sys psd-> font           = var font;
-	sys psd-> fillWinding    = sys fillWinding;
+	sys psd-> fillMode       = sys fillMode;
 	sys psd-> fillPatternOffset = sys fillPatternOffset;
 	sys psd-> lineWidth      = sys lineWidth;
 	sys psd-> lineEnd        = sys lineEnd;
@@ -1560,7 +1562,7 @@ hwnd_leave_paint( Handle self)
 	}
 	if ( sys psd != nil) {
 		var font           = sys psd-> font;
-		sys fillWinding    = sys psd-> fillWinding;
+		sys fillMode       = sys psd-> fillMode;
 		sys fillPatternOffset  = sys psd-> fillPatternOffset;
 		sys lineWidth      = sys psd-> lineWidth;
 		sys lineEnd        = sys psd-> lineEnd;

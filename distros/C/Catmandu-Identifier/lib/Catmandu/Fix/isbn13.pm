@@ -1,6 +1,6 @@
 package Catmandu::Fix::isbn13;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use Catmandu::Sane;
 use Business::ISBN;

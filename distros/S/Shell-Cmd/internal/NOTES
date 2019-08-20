@@ -7,3 +7,8 @@ Before every release, spellcheck the documents:
       rm -f $i.txt $i.txt.bak
    done
 
+#########################################################################
+Test coverage with:
+
+   cover -delete; RELEASE_TESTING=1 SSH_TESTING="elf imp" cover -test
+

@@ -31,7 +31,8 @@ run the shell command(s) for me with added functionality.
 
 This module is designed to take a list of shell commands and
 automatically turn them into a shell script (using only basic shell
-commands) which adds some common desirable functionality including:
+commands which are available in any bourne shell variation) which adds
+some common desirable functionality including:
 
 =over 4
 
@@ -166,9 +167,9 @@ in the L</"PER-COMMAND OPTIONS"> section below.
 
 All of the commands stored in C<$obj> will be run in a single shell,
 so it is fine to gather information in one command and store it in a
-shell variable for use in a later command.  Commands should not
-include a trailing semi-colon as these will be added automatically as
-needed.
+shell variable for use in a later command.  Commands must not include
+a trailing semi-colon as these will interfere with I/O redirection,
+and will be added automatically as needed.
 
 An error is returned if any of the arguments are invalid.
 
@@ -338,7 +339,9 @@ in the following table:
    201     If more than 200 commands are entered,
            and any of them beyond the 200th fail,
            the error code will be 201.
-   252     Flow commands not correctly nested/closed
+   252     An error in the script.  Usually this
+           indicates that flow commands not correctly
+           nested/closed.
    253     If the temporary script cannot
            be copied to a remote host (for use in
            the B<ssh> method), this is returned.

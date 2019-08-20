@@ -33,7 +33,6 @@ for ($i=0; $i<@refs;++$i) {
 }
 
 use Types::Core qw(blessed);
-use P;
 my $a={};
 
 ok(! blessed $a, "not bless test");

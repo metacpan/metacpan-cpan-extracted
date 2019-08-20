@@ -3,7 +3,6 @@
 use 5.010;
 use strict;
 use warnings;
-
 use Test::More 0.98;
 
 use Complete::Util qw(combine_answers);
@@ -17,13 +16,13 @@ test_combine(
 test_combine(
     name   => 'arrays of scalars',
     input  => [[1, 2], [4, 2, 3]],
-    result => [1, 2, 3, 4],
+    result => [1, 2, 4, 3],
 );
 
 test_combine(
     name   => 'arrays of scalars+hashes',
     input  => [[1, 2], [4, 2, 3], [{word=>5, description=>"five"}], [5, 7]],
-    result => [1, 2, 3, 4, {word=>5, description=>"five"}, 7],
+    result => [1, 2, 4, 3, {word=>5, description=>"five"}, 7],
 );
 
 test_combine(
@@ -35,7 +34,7 @@ test_combine(
         {words=>[5, 7], path_sep=>'/'},
     ],
     result => {
-        words => [1, 2, 3, 4, {word=>5, description=>"five"}, 7],
+        words => [1, 2, 4, 3, {word=>5, description=>"five"}, 7],
         path_sep => '/',
         esc_mode => 'none',
     },
@@ -55,14 +54,6 @@ subtest "hashes" => sub {
                    {static=>1, words=>[3]},
                    {static=>0, words=>[4,5]}],
         result => {static=>0, words=>[1,2,3,4,5]},
-    );
-};
-
-subtest "sort" => sub {
-    test_combine(
-        name   => 'words from different answers are re-sorted',
-        input  => [{words=>[1,3]}, {words=>[4,2]}],
-        result => {words=>[1,2,3,4]},
     );
 };
 

@@ -8,7 +8,7 @@ use FFI::Platypus::Function;
 use FFI::Platypus::Type;
 
 # ABSTRACT: Write Perl bindings to non-Perl libraries with FFI. No XS required.
-our $VERSION = '0.94'; # VERSION
+our $VERSION = '0.96'; # VERSION
 
 # Platypus Man,
 # Platypus Man,
@@ -70,6 +70,7 @@ sub new
     abi              => -1,
     api              => $api,
     tp               => $tp->new,
+    fini             => [],
     ignore_not_found => defined $args{ignore_not_found} ? $args{ignore_not_found} : 0,
   }, $class;
 
@@ -84,8 +85,9 @@ sub _lang_class ($)
   my $class = $lang =~ m/^=(.*)$/ ? $1 : "FFI::Platypus::Lang::$lang";
   unless($class->can('native_type_map'))
   {
-    eval qq{ use $class };
-    croak "unable to load $class: $@" if $@;
+    my $pm = "$class.pm";
+    $pm =~ s/::/\//g;
+    require $pm;
   }
   croak "$class does not provide native_type_map method"
     unless $class->can("native_type_map");
@@ -132,9 +134,14 @@ sub lang
 
     {
       my %type_map;
-      foreach my $key (keys %{ $class->native_type_map })
+      my $map = $class->native_type_map(
+        $self->{api} > 0
+          ? (api => $self->{api})
+          : ()
+      );
+      foreach my $key (keys %$map)
       {
-        my $value = $class->native_type_map->{$key};
+        my $value = $map->{$key};
         next unless $self->{tp}->have_type($value);
         $type_map{$key} = $value;
       }
@@ -206,7 +213,9 @@ sub load_custom_type
 
   unless($name->can("ffi_custom_type_api_1"))
   {
-    eval qq{ use $name () };
+    my $pm = "$name.pm";
+    $pm =~ s/::/\//g;
+    eval { require $pm };
     warn $@ if $@;
   }
 
@@ -296,8 +305,6 @@ sub _function_meta
 }
 
 
-#my $inner_counter=0;
-
 sub attach
 {
   my $wrapper;
@@ -306,7 +313,8 @@ sub attach
   my $self = shift;
   my $name = shift;
   my $args = shift;
-  my $varargs = shift if defined $_[0] && ref($_[0]) eq 'ARRAY';
+  my $varargs;
+  $varargs = shift if defined $_[0] && ref($_[0]) eq 'ARRAY';
   my $ret = shift;
   my $proto = shift;
 
@@ -402,8 +410,8 @@ sub find_symbol
     my $handle = do { no warnings; $self->{handles}->{$path||0} } || FFI::Platypus::DL::dlopen($path, FFI::Platypus::DL::RTLD_PLATYPUS_DEFAULT());
     unless($handle)
     {
-      warn "error loading $path: ", FFI::Platypus::DL::dlerror()
-        if $ENV{FFI_PLATYPUS_DLERROR};
+      warn "warning: error loading $path: ", FFI::Platypus::DL::dlerror()
+        if $self->{api} > 0 || $ENV{FFI_PLATYPUS_DLERROR};
       next;
     }
     my $address = FFI::Platypus::DL::dlsym($handle, $self->{mangler}->($name));
@@ -423,56 +431,17 @@ sub find_symbol
 
 sub package
 {
-  my($self, $module, $modlibname) = @_;
+  croak "package method only available with api => 0" if $_[0]->{api} > 0;
+  require FFI::Platypus::Legacy;
+  goto &_package;
+}
 
-  ($module, $modlibname) = caller() unless defined $modlibname;
-  my @modparts = split /::/, $module;
-  my $modfname = $modparts[-1];
-  my $modpname = join('/',@modparts);
-  my $c = @modparts;
-  $modlibname =~ s,[\\/][^\\/]+$,, while $c--;    # Q&D basename
 
-  {
-    my @maybe = (
-      "$modlibname/auto/$modpname/$modfname.txt",
-      "$modlibname/../arch/auto/$modpname/$modfname.txt",
-    );
-    foreach my $file (@maybe)
-    {
-      if(-f $file)
-      {
-        open my $fh, '<', $file;
-        my $line = <$fh>;
-        close $fh;
-        if($line =~ /^FFI::Build\@(.*)$/)
-        {
-          $self->lib("$modlibname/$1");
-          return $self;
-        }
-      }
-    }
-  }
-
-  require FFI::Platypus::ShareConfig;
-  my @dlext = @{ FFI::Platypus::ShareConfig->get("config_dlext") };
-
-  foreach my $dlext (@dlext)
-  {
-    my $file = "$modlibname/auto/$modpname/$modfname.$dlext";
-    unless(-e $file)
-    {
-      $modlibname =~ s,[\\/][^\\/]+$,,;
-      $file = "$modlibname/arch/auto/$modpname/$modfname.$dlext";
-    }
-
-    if(-e $file)
-    {
-      $self->lib($file);
-      return $self;
-    }
-  }
-
-  $self;
+sub bundle
+{
+  croak "bundle method only available with api => 1 or better" if $_[0]->{api} < 1;
+  require FFI::Platypus::Bundle;
+  goto &_bundle;
 }
 
 
@@ -508,6 +477,10 @@ sub abi
 sub DESTROY
 {
   my($self) = @_;
+  foreach my $fini (@{ $self->{fini} })
+  {
+    $fini->($self);
+  }
   foreach my $handle (values %{ $self->{handles} })
   {
     next unless $handle;
@@ -530,7 +503,7 @@ FFI::Platypus - Write Perl bindings to non-Perl libraries with FFI. No XS requir
 
 =head1 VERSION
 
-version 0.94
+version 0.96
 
 =head1 SYNOPSIS
 
@@ -848,9 +821,9 @@ same prefix.  Example:
    my($symbol) = @_;
    return "foo_$symbol";
  });
-
+ 
  $ffi->function( get_bar => [] => 'int' );  # attaches foo_get_bar
-
+ 
  my $f = $ffi->function( set_baz => ['int'] => 'void' );
  $f->call(22); # calls foo_set_baz
 
@@ -1062,7 +1035,7 @@ Return the address of the given symbol (usually function).
 
 =head2 package
 
-[version 0.15]
+[version 0.15 api = 0]
 
  $ffi->package($package, $file); # usually __PACKAGE__ and __FILE__ can be used
  $ffi->package;                  # autodetect
@@ -1071,6 +1044,19 @@ If you use L<FFI::Build> (or the older deprecated L<Module::Build::FFI>
 to bundle C code with your distribution, you can use this method to tell
 the L<FFI::Platypus> instance to look for symbols that came with the
 dynamic library that was built when your distribution was installed.
+
+=head2 bundle
+
+[version 0.96 api = 1+]
+
+ $ffi->bundle($package, \@args);
+ $ffi->bundle(\@args);
+ $ffi->bundle($package);
+ $ffi->bundle;
+
+This is a new experimental interface for bundling compiled code with your
+distribution intended to eventually replace the C<package> method documented
+above.  See L<FFI::Platypus::Bundle> for details on how this works.
 
 =head2 abis
 
@@ -1263,7 +1249,7 @@ structured data records).
  my $uuid = "\0" x 16;  # uuid_t
  uuid_generate($uuid);
  
- my $string = "\0" x 37; # 36 bytes to store a UUID string 
+ my $string = "\0" x 37; # 36 bytes to store a UUID string
                          # + NUL termination
  uuid_unparse($uuid, $string);
  
@@ -2093,6 +2079,8 @@ Ilya Pavlov (Ilya33)
 Petr Pisar (ppisar)
 
 Mohammad S Anwar (MANWAR)
+
+Håkon Hægland (hakonhagland, HAKONH)
 
 =head1 COPYRIGHT AND LICENSE
 

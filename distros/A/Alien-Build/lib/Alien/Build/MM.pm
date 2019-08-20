@@ -8,7 +8,7 @@ use Capture::Tiny qw( capture );
 use Carp ();
 
 # ABSTRACT: Alien::Build installer code for ExtUtils::MakeMaker
-our $VERSION = '1.79'; # VERSION
+our $VERSION = '1.83'; # VERSION
 
 
 sub new
@@ -406,7 +406,7 @@ Alien::Build::MM - Alien::Build installer code for ExtUtils::MakeMaker
 
 =head1 VERSION
 
-version 1.79
+version 1.83
 
 =head1 SYNOPSIS
 
@@ -428,7 +428,7 @@ In your C<Makefile.PL>:
  sub MY::postamble {
    $abmm->mm_postamble(@_);
  }
-
+ 
  sub MY::install {
    $abmm->mm_install(@_);
  }
@@ -442,9 +442,9 @@ In your C<lib/Alien/Libfoo.pm>:
 In your alienfile (needs to be named C<alienfile> and should be in the root of your dist):
 
  use alienfile;
-
+ 
  plugin 'PkgConfig' => 'libfoo';
-
+ 
  share {
    start_url 'http://libfoo.org';
    ...

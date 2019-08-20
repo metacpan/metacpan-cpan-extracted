@@ -8,7 +8,7 @@ use Path::Tiny ();
 use File::chdir;
 
 # ABSTRACT: Mock plugin for testing
-our $VERSION = '1.79'; # VERSION
+our $VERSION = '1.83'; # VERSION
 
 
 has 'probe';
@@ -28,7 +28,7 @@ has 'gather';
 sub init
 {
   my($self, $meta) = @_;
-  
+
   if(my $probe = $self->probe)
   {
     if($probe =~ /^(share|system)$/)
@@ -52,7 +52,7 @@ sub init
       Carp::croak("usage: plugin 'Test::Mock' => ( probe => $probe ); where $probe is one of share, system or die");
     }
   }
-  
+
   if(my $download = $self->download)
   {
     $download = { 'foo-1.00.tar.gz' => _tarball() } unless ref $download eq 'HASH';
@@ -66,7 +66,7 @@ sub init
 
   if(my $extract = $self->extract)
   {
-    $extract = { 
+    $extract = {
       'foo-1.00' => {
         'configure' => _tarball_configure(),
         'foo.c'     => _tarball_foo_c(),
@@ -79,7 +79,7 @@ sub init
       },
     );
   }
-  
+
   if(my $build = $self->build)
   {
     $build = [
@@ -108,9 +108,9 @@ sub init
         },
       },
     ] unless ref $build eq 'ARRAY';
-    
+
     my($build_dir, $install_dir) = @$build;
-    
+
     $meta->register_hook(
       build => sub {
         my($build) = @_;
@@ -120,7 +120,7 @@ sub init
       },
     );
   }
-  
+
   if(my $gather = $self->gather)
   {
     $meta->register_hook(
@@ -147,7 +147,7 @@ sub init
 sub _fs
 {
   my($build, $hash) = @_;
-  
+
   foreach my $key (sort keys %$hash)
   {
     my $val = $hash->{$key};
@@ -258,7 +258,7 @@ Alien::Build::Plugin::Test::Mock - Mock plugin for testing
 
 =head1 VERSION
 
-version 1.79
+version 1.83
 
 =head1 SYNOPSIS
 
@@ -314,7 +314,7 @@ to try the next probe hook, if available, or to assume a C<share> install.
  );
  
  plugin 'Test::Mock' => (
-   download => 1, 
+   download => 1,
  );
 
 Mock out a download.  The C<%fs_spec> is a hash where the hash values are directories
@@ -322,7 +322,7 @@ and the string values are files.  This a spec like this:
 
  plugin 'Test::Mock' => (
    download => {
-     'foo-1.00' => { 
+     'foo-1.00' => {
        'README.txt' => "something to read",
        'foo.c' => "#include <stdio.h>\n",
                   "int main() {\n",
@@ -343,7 +343,7 @@ C<foo-1.00.tar.gz>.
  );
  
  plugin 'Test::Mock' => (
-   extract => 1, 
+   extract => 1,
  );
 
 Similar to C<download> above, but for the C<extract> phase.
@@ -355,7 +355,7 @@ Similar to C<download> above, but for the C<extract> phase.
  );
  
  plugin 'Test::Mock' => (
-   build => 1, 
+   build => 1,
  );
 
 =head2 gather

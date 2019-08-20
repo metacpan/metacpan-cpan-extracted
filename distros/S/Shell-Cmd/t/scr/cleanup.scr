@@ -1,4 +1,5 @@
 rm -f TESTDIR/*.flag
 rm -f TESTDIR/[0-9]*.exp0
+rm -f TESTDIR/[0-9]*.exp0s
 rm -f TESTDIR/[0-9]*.sh
 rm -f TESTDIR/[0-9]*.out

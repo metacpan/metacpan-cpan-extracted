@@ -6,6 +6,7 @@ use Config;
 use File::Spec;
 use FindBin;
 use Text::ParseWords qw( shellwords );
+use My::BuildConfig;
 use My::ShareConfig;
 use My::ConfigH;
 use My::ShareConfig;
@@ -123,31 +124,23 @@ sub share_config
   $self->{share_config} ||= My::ShareConfig->new;
 }
 
+sub build_config
+{
+  my($self) = @_;
+  $self->{build_config} ||= My::BuildConfig->new;
+}
+
 sub probe
 {
   my($self) = @_;
 
-  my $probe = $self->{probe} ||= FFI::Probe->new(
+  $self->{probe} ||= FFI::Probe->new(
     runner => $self->probe_runner,
     log => "config.log",
     data_filename => "./blib/lib/auto/share/dist/FFI-Platypus/probe/probe.pl",
-    alien => [$self->share_config->get('alien')->{class}],
+    alien => [$self->build_config->get('alien')->{class}],
     cflags => ['-Iinclude'],
   );
-
-  unless(exists $probe->data->{alien})
-  {
-    my $class = $self->share_config->get('alien')->{class};
-    my $pm = $class . ".pm";
-    $pm =~ s{::}{/}g;
-    require $pm;
-    $probe->set( 'alien', 'ffi', 'class'    => $class                    );
-    $probe->set( 'alien', 'ffi', 'version', => $class->config('version') );
-    $probe->set( 'alien', 'ffi', 'cflags'   => $class->cflags            );
-    $probe->set( 'alien', 'ffi', 'libs'     => $class->libs              );
-  }
-
-  $probe;
 }
 
 sub probe_runner
@@ -171,8 +164,8 @@ sub probe_runner_build
   my $probe = $self->probe;
   my $builder = FFI::Probe::Runner::Builder->new;
   foreach my $key (qw( cc ccflags optimize ld ldflags ))
-  { @{ $builder->$key } = @{ $probe->data->{eumm}->{$key} } }
-  $builder->build unless -e $builder->exe;  
+  { @{ $builder->$key } = @{ $self->build_config->get('eumm')->{$key} } }
+  $builder->build unless -e $builder->exe;
 }
 
 sub configure
@@ -195,6 +188,20 @@ sub configure
 
   $ch->define_var( PERL_OS_WINDOWS => 1 ) if $^O =~ /^(MSWin32|cygwin|msys)$/;
 
+  {
+    my($major, $minor, $patch) = $] =~ /^(5)\.([0-9]{3})([0-9]{3})/;
+    $ch->define_var( FFI_PL_PERL_VERSION_MAJOR => int $major );
+    $ch->define_var( FFI_PL_PERL_VERSION_MINOR => int $minor );
+    $ch->define_var( FFI_PL_PERL_VERSION_PATCH => int $patch );
+  }
+
+  {
+    my($major, $minor, $patch) = (@{ $self->build_config->get('version') }, 0);
+    $ch->define_var( FFI_PL_VERSION_MAJOR => int $major );
+    $ch->define_var( FFI_PL_VERSION_MINOR => int $minor );
+    $ch->define_var( FFI_PL_VERSION_PATCH => int $patch );
+  }
+
   foreach my $header (qw( stdlib stdint sys/types sys/stat unistd alloca dlfcn limits stddef wchar signal inttypes windows sys/cygwin string psapi stdio stdbool complex ))
   {
     if($probe->check_header("$header.h"))
@@ -206,7 +213,7 @@ sub configure
     }
   }
 
-  if(!$self->share_config->get('config_debug_fake32') && $Config{ivsize} >= 8)
+  if(!$self->build_config->get('config_debug_fake32') && $Config{ivsize} >= 8)
   {
     $ch->define_var( HAVE_IV_IS_64 => 1 );
   }
@@ -294,6 +301,11 @@ sub configure
     $probe{bigendian64} = 0;
   }
 
+  if($self->build_config->get('config_no_alloca'))
+  {
+    $probe{alloca} = 0;
+  }
+
   foreach my $cfile (bsd_glob 'inc/probe/*.c')
   {
     my $name = basename $cfile;
@@ -374,9 +386,10 @@ sub platform
 {
   my($self) = @_;
   my %Config = %Config;
-  foreach my $key (keys %{ $self->probe->data->{eumm} })
+  my $eumm = $self->build_config->get('eumm');
+  foreach my $key (keys %$eumm)
   {
-    $Config{$key} = $self->probe->data->{eumm}->{$key};
+    $Config{$key} = $eumm->{$key};
   }
   require FFI::Build::Platform;
   FFI::Build::Platform->new(\%Config);
@@ -386,15 +399,12 @@ sub alien
 {
   my($self) = @_;
 
-  my $class = $self->share_config->get('alien')->{class};
+  my $class = $self->build_config->get('alien')->{class};
   my $pm = "$class.pm";
   $pm =~ s/::/\//g;
   require $pm;
-  $self->share_config->set(extra_compiler_flags => [ shellwords($class->cflags) ]);
-  $self->share_config->set(extra_linker_flags   => [ shellwords($class->libs) ]);
-  $self->share_config->set(ccflags => $class->cflags);
 
-  $self->share_config->get('alien')->{class};
+  $self->build_config->get('alien')->{class};
 }
 
 1;

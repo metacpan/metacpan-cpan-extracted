@@ -1,9 +1,9 @@
 package Catmandu::Fix::uuid;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use Catmandu::Sane;
-use Data::UUID;
+use Data::UUID::MT;
 use Moo;
 use Catmandu::Fix::Has;
 
@@ -17,7 +17,7 @@ sub emit {
 
     $fixer->emit_create_path($fixer->var, $path, sub {
         my $var = shift;
-        "${var} = Data::UUID->new->create_str();";
+        "${var} = Data::UUID::MT->new(version => 4)->create_string;";
     });
 }
 

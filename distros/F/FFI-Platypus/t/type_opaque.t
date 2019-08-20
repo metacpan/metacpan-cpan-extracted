@@ -161,6 +161,40 @@ foreach my $api (0, 1)
   };
 }
 
+subtest 'object' => sub {
+
+  { package Roger }
+
+  my $ffi = FFI::Platypus->new( api => 1, experimental => 1 );
+  $ffi->type('object(Roger)', 'roger_t');
+  $ffi->type('object(Roger,opaque)', 'roger2_t');
+
+  my $ptr = malloc 200;
+
+  subtest 'argument' => sub {
+
+    is $ffi->cast('roger_t' => 'opaque', bless(\$ptr, 'Roger')), $ptr;
+    is $ffi->cast('roger2_t' => 'opaque', bless(\$ptr, 'Roger')), $ptr;
+
+  };
+
+  subtest 'return value' => sub {
+
+    is $ffi->cast('opaque' => 'roger_t', undef), undef;
+
+    my $obj1 = $ffi->cast('opaque' => 'roger_t', $ptr);
+    isa_ok $obj1, 'Roger';
+    is $$obj1, $ptr;
+
+    my $obj2 = $ffi->cast('opaque' => 'roger2_t', $ptr);
+    isa_ok $obj2, 'Roger';
+    is $$obj2, $ptr;
+
+  };
+
+  free $ptr;
+};
+
 done_testing;
 
 package

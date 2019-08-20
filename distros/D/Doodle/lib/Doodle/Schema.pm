@@ -8,7 +8,7 @@ with 'Doodle::Schema::Helpers';
 
 use Doodle::Table;
 
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 has doodle => (
   is => 'ro',

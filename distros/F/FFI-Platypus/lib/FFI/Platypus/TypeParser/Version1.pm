@@ -6,7 +6,7 @@ use Carp qw( croak );
 use base qw( FFI::Platypus::TypeParser );
 
 # ABSTRACT: FFI Type Parser Version One
-our $VERSION = '0.94'; # VERSION
+our $VERSION = '0.96'; # VERSION
 
 
 our @CARP_NOT = qw( FFI::Platypus FFI::Platypus::TypeParser );
@@ -59,7 +59,10 @@ use constant type_regex =>
       ( (?: [A-Za-z_] [A-Za-z_0-9]* \s+ )* [A-Za-z_] [A-Za-z_0-9]* )         \s*                                                                                  # unit type name $7
                                                                                                                                                                   #
               (?:  (\*)  |   \[ ([0-9]*) \]  |  )                                                                                                                 # pointer $8,       array $9
-                                                                                                                                                                  #
+      |                                                                                                                                                           #
+      object                \s* \( \s* ( (?: [A-Za-z_] [A-Za-z_0-9]* :: )* [A-Za-z_] [A-Za-z_0-9]* )                                                              # object class $10
+                                   (?: \s*,\s* ( (?: [A-Za-z_] [A-Za-z_0-9]* \s+ )* [A-Za-z_] [A-Za-z_0-9]* ) )?                                                  #        type $11
+                                   \s*                                                                            \)                                              #
     )                                                                                                                                                             #
                                                                                                                                                                   #
     \s*                                                                                                                                                           # trailing white space
@@ -81,7 +84,7 @@ sub parse
     my $rt = $2;
     return $self->types->{$name} = $self->create_type_closure(
       $self->parse($rt, $opt),
-      map { $self->parse($_, $opt) } map { s/^\s+//; s/\s+$//; $_ } split /,/, $at,
+      map { $self->parse($_, $opt) } map { my $t = $_; $t =~ s/^\s+//; $t =~ s/\s+$//; $t } split /,/, $at,
     );
   }
 
@@ -189,6 +192,16 @@ sub parse
     if(my $pointer = $8)
     {
       my $unit_type = $self->parse($unit_name, $opt);
+
+      if($unit_type->is_record_value)
+      {
+        my $meta = $unit_type->meta;
+        return $self->types->{$name} = $self->create_type_record(
+          $meta->{size},
+          $meta->{class},
+        );
+      }
+
       my $basic_name = $self->global_types->{rev}->{$unit_type->type_code};
       if($basic_name)
       {
@@ -234,6 +247,23 @@ sub parse
     return $self->types->{$name} || croak "unknown type: $unit_name";
   }
 
+  if(defined (my $class = $10)) # object type
+  {
+    my $basic_name = $11 || 'opaque';
+    my $basic_type = $self->parse($basic_name);
+    if($basic_type->is_object_ok)
+    {
+      return $self->types->{$name} = $self->create_type_object(
+        $basic_type->type_code,
+        $class,
+      );
+    }
+    else
+    {
+      croak "cannot make an object of $basic_name";
+    }
+  }
+
   croak "internal error parsing: $name";
 }
 
@@ -251,7 +281,7 @@ FFI::Platypus::TypeParser::Version1 - FFI Type Parser Version One
 
 =head1 VERSION
 
-version 0.94
+version 0.96
 
 =head1 SYNOPSIS
 
@@ -314,6 +344,8 @@ Ilya Pavlov (Ilya33)
 Petr Pisar (ppisar)
 
 Mohammad S Anwar (MANWAR)
+
+Håkon Hægland (hakonhagland, HAKONH)
 
 =head1 COPYRIGHT AND LICENSE
 

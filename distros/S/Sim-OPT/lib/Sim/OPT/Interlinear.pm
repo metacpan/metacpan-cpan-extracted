@@ -33,16 +33,14 @@ use Sim::OPT::Parcoord3d;
 
 our @ISA = qw( Exporter );
 our @EXPORT = qw( interlinear, interstart prepfactlev tellstepsize );
-$VERSION = '0.149';
+$VERSION = '0.157';
 $ABSTRACT = 'Interlinear is a program for building metamodels from incomplete, multivariate, discrete dataseries on the basis of nearest-neighbouring gradients weighted by distance.';
 
 #######################################################################
 # Interlinear
 #######################################################################
 
-########## AN EXAMPLE OF SETTINGS TO BE PUT IN A CONFIGURATION FILE FOLLOWS.
 
-############# END OF THE EXAMPLE SETTINGS TO BE PUT IN A CONFIGURATION FILE.
 
 
 sub odd
@@ -127,8 +125,8 @@ sub diff
 {
   my $aref = shift;
   my $bref = shift;
-  my @aa = @$aref; #say $tee "\@aa: " . dump( @aa );
-  my @bb = @$bref; #say $tee "\@bb: " . dump( @bb );
+  my @aa = @$aref;
+  my @bb = @$bref;
   my @diff;
   my %bb_hash;
   undef @bb_hash{ @bb };
@@ -141,8 +139,8 @@ sub diff_THIS
 {
   my $aref = shift;
   my $bref = shift;
-  my @aa = @$aref; #say $tee "\@aa: " . dump( @aa );
-  my @bb = @$bref; #say $tee "\@bb: " . dump( @bb );
+  my @aa = @$aref;
+  my @bb = @$bref;
   my %diff3;
   @diff3{@aa} = @aa;
   delete @diff3{@bb};
@@ -178,8 +176,8 @@ sub preparearr
     foreach my $line ( @lines )
     {
       chomp( $line );
-      my @row = split( /,/ , $line ); #say $tee "IN PREPAREARR \@row " . dump( @row );
-      @pars = split( /_/ , $row[0] ); #say $tee "IN PREPAREARR \@pars " . dump( @pars );
+      my @row = split( /,/ , $line );
+      @pars = split( /_/ , $row[0] );
 
       if ( $row[1] eq undef )
       {
@@ -236,19 +234,19 @@ sub preparearr
 sub pythagoras
 {
   my ( $factbag_ref, $levbag_ref, $stepbag_ref ) = @_;
-  my @factbag = @{ $factbag_ref }; #say $tee "\@factbag: " . dump( @factbag );
-  my @levbag = @{ $levbag_ref }; #say $tee "\@levbag: " . dump( @levbag );
-  my @stepbag = @{ $stepbag_ref }; #say $tee "\@stepbag: " . dump( @stepbag );
+  my @factbag = @{ $factbag_ref };
+  my @levbag = @{ $levbag_ref };
+  my @stepbag = @{ $stepbag_ref };
   my $powdist;
   my $inc = 0;
   foreach ( @factbag )
   {
-    my $step = $stepbag[$inc]; #say "\$step: $step" ;
-    my $difflevel = $levbag[$inc]; #say "\$difflevel: $difflevel" ;
+    my $step = $stepbag[$inc];
+    my $difflevel = $levbag[$inc];
     $powdist = $powdist + ( ( $difflevel * $step ) ** 2 );
     $inc++;
   }
-  my $dist = $powdist ** ( 1/2 ); #say "DIST: $dist" ;
+  my $dist = $powdist ** ( 1/2 );
   return ( $dist );
 }
 
@@ -256,51 +254,36 @@ sub pythagoras
 sub weightvals1
 {
   my ( $elt1, $boxgrads_ref, $boxdists_ref, $boxors_ref, $minreq_forcalc, $factbag_ref, $levbag_ref, $stepbag_ref, $elt2, $factlevels_ref, $maxdist, $elt3, $condweight ) = @_;
-  my @boxgrads = @{ $boxgrads_ref }; #say $tee "weightvals1 \@boxgrads: " . dump( @boxgrads );
-  my @boxdists = @{ $boxdists_ref }; #say $tee "weightvals1 \@boxdists: " . dump( @boxdists );
-  my @boxors = @{ $boxors_ref }; #say $tee "weightvals1 \@boxors: " . dump( boxors );
-  my @factbag = @{ $factbag_ref }; #say $tee "weightvals12 \@factbag: " . dump( @factbag );
-  my @levbag = @{ $levbag_ref }; #say $tee "weightvals12 \@levbag: " . dump( @levbag );
-  my @stepbag = @{ $stepbag_ref }; #say $tee "weightvals12 \@stepbag: " . dump( @stepbag );
-  my %factlevels = %{ $factlevels_ref }; #say $tee "weightvals12 \%factlevels: " . dump( %factlevels );
-  #say $tee "weightvals1 \$maxdist: " . dump( $maxdist );
-  #say $tee "weightvals12 \$elt3: " . dump( $elt3 ); say $tee "weightvals12 \$condweight: " . dump( $condweight );
-  #if ( ref( $minreq_forcalc ) )
-  #{
-  #  my $num = $minreq_forcalc->[0];
-  #  my @sorteddists = sort( @boxdists );
-  #  my @box;
-  #  my $ci = 0;
-  #  while ( $c1 < $num )
-  #  {
-  #    push ( @box, $sorteddists[$ci] );
-  #    $ci++;
-  #  }
-  #  @boxdists = @box;
-  #} #say $tee "weightvals1 \@boxdists: " . dump( @boxdists );
+  my @boxgrads = @{ $boxgrads_ref };
+  my @boxdists = @{ $boxdists_ref };
+  my @boxors = @{ $boxors_ref };
+  my @factbag = @{ $factbag_ref };
+  my @levbag = @{ $levbag_ref };
+  my @stepbag = @{ $stepbag_ref };
+  my %factlevels = %{ $factlevels_ref };
 
   my @newboxdists;
   foreach my $or ( @boxors )
   {
-    my $hsh_ref = calcdist( $elt1, $or, \%factlevels, $maxdist, $elt3, $condweight ); #say $tee "555 \$hsh_ref: " . dump( $hsh_ref );
-    my %hsh = %{ $hsh_ref }; #say $tee "556 \%hsh: " . dump( %hsh ); #say $tee "555 \$or: " . dump( $or );
-    my $dist = $hsh{dist}; #say $tee "556 \$dist: " . dump( $dist );
+    my $hsh_ref = calcdist( $elt1, $or, \%factlevels, $maxdist, $elt3, $condweight );
+    my %hsh = %{ $hsh_ref };
+    my $dist = $hsh{dist};
     push ( @newboxdists, $dist );
-  } #say $tee "556 \@newboxdists: " . dump( @newboxdists );
+  }
 
   my @boxstrengths;
   foreach my $dist ( @newboxdists )
   {
     if ( ( $dist ne "" ) and ( $dist != 0 ) )
-    { #say $tee "IN \@boxstrengths: " . dump( @boxstrengths );
+    {
       my $strength = ( 1 - $dist );
       push ( @boxstrengths, $strength );
     }
-  } #say $tee "556 \@boxstrengths: " . dump( @boxstrengths );
+  }
 
   my $sum_strengths;
 
-  $sum_strengths = sum( @boxstrengths ); #say $tee "557 \$sum_strengths: " . dump( $sum_strengths );
+  $sum_strengths = sum( @boxstrengths );
 
   my $totdist;
   my $soughtgrad = 0;
@@ -309,49 +292,46 @@ sub weightvals1
     my $in = 0;
     foreach my $grad ( @boxgrads )
     {
-      #say $tee "577 taken \$grad: " . dump( $grad );
-      my $strength = $boxstrengths[$in]; #say $tee "577 taken \$strength: " . dump( $strength );
+
+      my $strength = $boxstrengths[$in];
 
       if ( ( $strength ne "" ) and ( $sum_strengths ne "" ) and ( $sum_strengths != 0 ))
       {
-        $soughtgrad = ( $soughtgrad + ( $grad * ( $strength / $sum_strengths ) ) ); #say $tee "887 SAYY \$soughtgrad: " . dump( $soughtgrad );
-        #say $tee "577 produced \$soughtgrad: " . dump( $soughtgrad );
+        $soughtgrad = ( $soughtgrad + ( $grad * ( $strength / $sum_strengths ) ) );
       }
       $in++;
     }
   }
-  #my $soughtgrad = $boxgrads[0]; ###HERE. REMOVE.
 
   my ( $totdist, $totstrength );
   unless ( ( scalar( @levbag ) == 0 ) or ( scalar( @factbag ) == 0 ) or ( scalar( @stepbag ) == 0 ) )
   {
-    my $rawtotdist = pythagoras( \@factbag, \@levbag, \@stepbag ); #say $tee "877 \$rawtotdist: " . dump( $rawtotdist );
-    $totdist = ( $rawtotdist / $maxdist ); #say $tee "877 \$totdist: " . dump( $totdist );
-  } #say $tee "weightvals15out \$totdist: " . dump( $totdist );
+    my $rawtotdist = pythagoras( \@factbag, \@levbag, \@stepbag );
+    $totdist = ( $rawtotdist / $maxdist );
+  }
 
   if ( ( $totdist ne "" ) and ( $totdist != 0 ) )
   {
-    $totstrength = ( 1 - $totdist ); #say $tee "877 \$totstrength: " . dump( $totstrength );
-  } #say $tee "weightvals15out \$totstrength: " . dump( $totstrength );
+    $totstrength = ( 1 - $totdist );
+  }
 
   my $soughtinc = $soughtgrad;
-  ###my $soughtinc = ( $elt2 + $soughtgrad ); say $tee "887 \$soughtinc: " . dump( $soughtinc );###ATTENTION HERE
 
   if ( ( $soughtinc ne "" ) and ( $totdist ne "" ) and ( $totstrength ne "" ) and ( $totstrength >= $minreq_forcalc ) )
-  { #say $tee "DONE.";
+  {
     return ( $soughtinc, $totdist, $totstrength );
   }
-} #END SUB weightvals1
+}
 
 
 sub weightvals_merge
 {
   my ( $vals_ref, $strengths_ref, $minreq_formerge, $maxdist ) = @_;
-  my @vals = @{ $vals_ref };  #say $tee "INEND \@vals: " . dump( @vals );
-  my @strengths = @{ $strengths_ref }; #say $tee "INEND \@dists: " . dump( @dists );
+  my @vals = @{ $vals_ref };
+  my @strengths = @{ $strengths_ref };
 
   my ( $soughtval, $totstrength, $sum_strengths );
-  my $strengthsnum = scalar( @strengths ); #say $tee "INEND \$strengthsnum: " . dump( $strengthsnum );
+  my $strengthsnum = scalar( @strengths );
   if ( $strengthsnum > 0 )
   {
     $sum_strengths = sum( @strengths );
@@ -362,15 +342,13 @@ sub weightvals_merge
   my $soughtval = 0;
   if ( ( $sum_strengths ne "" ) and ( $sum_strengths > 0 ) )
   {
-    #say $tee "INEND \$sum_strengths: " . dump( $sum_strengths );
     my $in = 0;
     foreach my $val ( @vals )
     {
-      #say $tee "IN FOREACH VAL \$val: " . dump( $val );
-      my $strength = $strengths[$in]; #say $tee "IN FOREACH VAL \$strength: " . dump( $strength );
-      $soughtval = ( $soughtval + ( $val * ( $strength / $sum_strengths ) ) ); #say $tee "IN FOREACH VAL \$soughtval: " . dump( $soughtval );
+      my $strength = $strengths[$in];
+      $soughtval = ( $soughtval + ( $val * ( $strength / $sum_strengths ) ) );
       $in++;
-    } #say $tee "INEND \$soughtval: " . dump( $soughtval );
+    }
     my $seedstrength = 1;
 
     my $inc = 0;
@@ -378,8 +356,7 @@ sub weightvals_merge
     {
       if ( not ( $strength == 1 ) )
       {
-        #say $tee "IN FOREACH STRENGTH \$strength: " . dump( $strength );
-        $seedstrength = ( $seedstrength * $strength ); #say $tee "IN FOREACH STRENGTH \$seedstrength: " . dump( $seedstrength );
+        $seedstrength = ( $seedstrength * $strength );
       }
       else
       {
@@ -389,8 +366,6 @@ sub weightvals_merge
       }
       $inc++;
     }
-    #say $tee "INEND0 \$seedstrength: " . dump( $seedstrength );
-    #say $tee "INEND0 \$strengthsnum: " . dump( $strengthsnum );
     unless ( $seedstrength == 1 )
     {
       $totstrength = ( $seedstrength ** ( 1 / $strengthsnum ) );
@@ -401,15 +376,12 @@ sub weightvals_merge
       $soughtval = $value;
     }
   }
-  #say $tee "INEND \$totstrength: " . dump( $totstrength );
 
   if ( ( $soughtval ne "" ) and ( $totstrength ne "" ) and ( $totstrength >= $minreq_formerge ) )
   {
-    #say $tee "ENDEND \$soughtval: " . dump( $soughtval );
-    #say $tee "ENDEND \$totstrength: " . dump( $totstrength );
     return ( $soughtval, $totstrength );
   }
-}# END SUB weightvals_merge
+}
 
 
 sub calcdist
@@ -420,10 +392,9 @@ sub calcdist
   my $dist;
   my ( @factbag, @levbag, @stepbag, @da1, @da1par, @da2, @da2par, @diff2 );
 
-  #say $tee "777\scalar( \@diff1 ): " . dump( scalar( @diff1 ) );
   if ( scalar( @diff1 ) > 0 )
   {
-    @diff2 = diff( \@{ $elt1 } , \@{ $el1 } ); #say $tee "777b \@diff2: " . dump( @diff2 );
+    @diff2 = diff( \@{ $elt1 } , \@{ $el1 } );
 
     foreach my $el ( @diff1 )
     {
@@ -438,34 +409,27 @@ sub calcdist
       push( @da2par, $elts[1] );
     } # say $tee "YES, I AIM.";
 
-    #my %h1 = map { split( /-/ , $_ ) } @diff1; #say $tee "THEN \%h1: " . dump( %h1 );
-    #@da1 = keys %h1; #say $tee "THEN \@da1: " . dump( @da1 );
-    #@da1par = values %h1; #say $tee "\@da1par: " . dump( @da1par );
-    #my %h2 = map { split( /-/ , $_ ) } @diff2; #say $tee "THEN \%h2: " . dump( %h2 );
-    #@da2 = keys %h2; #say $tee "THEN \@da2: " . dump( @da2 );
-    #@da2par = values %h2; #say $tee "\@da2par: " . dump( @da2par );
-
     my $c = 0;
     foreach my $e ( @da1par )
-    { #say $tee "\$e: " . dump( $e );
+    {
       my $e = $da1par[$c];
-      my $ei = $da2par[$c]; #say $tee "22 \$ei: " . dump( $ei );
-      my $fact = $da1[$c]; #say $tee "22 \$fact: " . dump( $fact );
-      my $diffpar = abs( $e - $ei ); #say $tee "22 \$diffpar: " . dump( $diffpar ); say $tee "22 \$factlevels{stepsizes}{\$fact}: " . dump( $factlevels{stepsizes}{$fact} );
+      my $ei = $da2par[$c];
+      my $fact = $da1[$c];
+      my $diffpar = abs( $e - $ei );
+
       if ( ( $fact ne "" ) and ( $diffpar ne "" ) and ( $factlevels{stepsizes}{$fact} ne "" ) )
       {
         push ( @factbag, $fact );
         push ( @levbag, $diffpar );
         push ( @stepbag, $factlevels{stepsizes}{$fact} );
       }
-      #say $tee "777b \@factbag : " . dump( @factbag ); say $tee "777b \@levbag : " . dump( @levbag ); say $tee "777b \@stepbag : " . dump( @stepbag );
       $c++;
     }
   }
   unless ( ( scalar( @levbag ) == 0 ) or ( scalar( @factbag ) == 0 ) or ( scalar( @stepbag ) == 0 ) )
   {
-    my $ordist = scalar( @levbag ); #say $tee "\$ordist: " . dump( $ordist );
-    my $rawdist = pythagoras( \@factbag, \@levbag, \@stepbag ); #say $tee "776b\$rawdist: " . dump( $rawdist );
+    my $ordist = scalar( @levbag );
+    my $rawdist = pythagoras( \@factbag, \@levbag, \@stepbag );
     my ( $dist, $strength );
 
     if ( $maxdist ne "" )
@@ -491,18 +455,14 @@ sub calcdist
 
 sub calcdistgrad
 {
-  my ( $el1, $elt1, $factlevels_ref, $minreq, $maxdist, $el3, $elt3, $condweight, $el, $elt ) = @_; #say $tee "777c\$el1: " . dump( $el1 ); say $tee "777c\$elt1: " . dump( $elt1 ); say $tee "777c\$minreq: " . dump( $minreq );
+  my ( $el1, $elt1, $factlevels_ref, $minreq, $maxdist, $el3, $elt3, $condweight, $el, $elt ) = @_;
   my %factlevels = %{ $factlevels_ref };
-  #say $tee "IN CALCDISTGRAD \$el1: " . dump( $el1 );
-  #say $tee "IN CALCDISTGRAD \$elt1: " . dump( $elt1 );
-  my @diff1 = diff( \@{ $el1 }, \@{ $elt1 } ); #say $tee "IN CALCDISTGRAD \@diff1: " . dump( @diff1 );
+  my @diff1 = diff( \@{ $el1 }, \@{ $elt1 } );
   my $dist;
   my ( @factbag, @levbag, @stepbag, @da1, @da1par, @da2, @da2par, @diff2 );
-  #say $tee "777\scalar( \@diff1 ): " . dump( scalar( @diff1 ) ); say $tee "777\$minreq: " . dump( $minreq );
-  #say $tee "\$minreq->[0]: " . dump( $minreq->[0] );
   if ( ( scalar( @diff1 ) > 0 ) and ( scalar( @diff1 ) <= $minreq->[0] ) )
   {
-    @diff2 = diff( \@{ $elt1 } , \@{ $el1 } ); #say $tee "IN CALCDISTGRAD \@diff2: " . dump( @diff2 );
+    @diff2 = diff( \@{ $elt1 } , \@{ $el1 } );
 
     foreach my $el ( @diff1 )
     {
@@ -517,13 +477,6 @@ sub calcdistgrad
       push( @da2par, $elts[1] );
     }
 
-    #my %h1 = map { split( /-/ , $_ ) } @diff1; #say $tee "IN CALCDISTGRAD \%h1: " . dump( \%h1 );
-    #@da1 = keys %h1; # $tee "IN CALCDISTGRAD \@da1: " . dump( @da1 );
-    #@da1par = values %h1; #say $tee "IN CALCDISTGRAD \@da1par: " . dump( @da1par );
-    #my %h2 = map { split( /-/ , $_ ) } @diff2; #say $tee "IN CALCDISTGRAD \%h2: " . dump( \%h2 );
-    #@da2 = keys %h2; #say $tee "IN CALCDISTGRAD \@da2: " . dump( @da2 );
-    #@da2par = values %h2; #say $tee "IN CALCDISTGRAD \@da2par: " . dump( @da2par );
-
     my $c = 0;
     foreach my $lev1 ( @da1par )
     {
@@ -535,7 +488,7 @@ sub calcdistgrad
         if ( $da1 == $da2 )
         {
           my $fact = $da1;
-          my $diffpar = abs( $lev1 - $lev2 ); #say $tee "22 \$diffpar: " . dump( $diffpar );
+          my $diffpar = abs( $lev1 - $lev2 );
           if ( ( $diffpar <= $minreq->[1] ) and ( $fact ne "" ) and ( $diffpar ne "" ) and ( $factlevels{stepsizes}{$fact} ne "" ) )
           {
             push ( @factbag, $fact );
@@ -555,8 +508,8 @@ sub calcdistgrad
 
   unless ( ( scalar( @levbag ) == 0 ) or ( scalar( @factbag ) == 0 ) or ( scalar( @stepbag ) == 0 ) )
   {
-    my $ordist = scalar( @levbag ); #say $tee "IN CALCDISTGRAD \$ordist: " . dump( $ordist );
-    my $rawdist = pythagoras( \@factbag, \@levbag, \@stepbag ); #say $tee "IN CALCDISTGRAD \$rawdist: " . dump( $rawdist );
+    my $ordist = scalar( @levbag );
+    my $rawdist = pythagoras( \@factbag, \@levbag, \@stepbag );
     my ( $dist, $strength );
 
     if ( $maxdist ne "" )
@@ -578,21 +531,11 @@ sub calcmaxdist
 {
   my ( $arr_ref, $factlevels_ref ) = @_;
   my @arr = @{ $arr_ref };
-  #my @sortarr = sort { $a->[0] <=> $b->[0] } @arr;
   my $first = $arr[0];
   my $last = $arr[-1];
   my %hash = %{ calcdist( $first->[1], $last->[1], $factlevels_ref ) };
-  #say $tee "\$first->[0]: " . dump( $first->[0] );
-  #say $tee "\$last->[0]: " . dump( $last->[0] );
-  say $tee "raw max distance: " . dump( $hash{rawdist} ); #say $tee "00\%hash: " . dump( %hash );
 
-  #my %nears;
-  #foreach my $ar ( @arr )
-  #{
-  #  my @nrs = @{ isnear( $ar->[0], $first, $last ) };
-  #  $nears{$ar->[0]} = [ @nrs ];
-  #}
-  #say $tee "NEARS: " . dump( %nears );
+  say $tee "raw max distance: " . dump( $hash{rawdist} );
   return( $hash{rawdist}, $first->[0], $last->[0] );
 }
 
@@ -604,25 +547,23 @@ sub calcmaxdist_old
   my @arr = @{ $arr_ref };
 
   my @arrc;
-  #if ( $limit ne "" )
-  #{
-    if ( ( scalar( @arr ) > 3000 ) and ( scalar( @arr ) <= 20000 ) )
-    {
-      $thislimit = int( scalar( @arr ) ** ( 3 / 4 ) );
-      #$thislimit = int( scalar( @arr ) ** ( 2 / 3 ) );
-    }
-    elsif ( scalar( @arr ) > 20000 )
-    {
-      $thislimit = int( scalar( @arr ) ** ( 2 / 3 ) );
-    }
-    else
-    {
-      $thislimit = scalar( @arr );
-    }
 
-    @arrc = shuffle( @arr );
-    @arrc = @arrc[0..$thislimit];
-  #}
+  if ( ( scalar( @arr ) > 3000 ) and ( scalar( @arr ) <= 20000 ) )
+  {
+    $thislimit = int( scalar( @arr ) ** ( 3 / 4 ) );
+    #$thislimit = int( scalar( @arr ) ** ( 2 / 3 ) );
+  }
+  elsif ( scalar( @arr ) > 20000 )
+  {
+    $thislimit = int( scalar( @arr ) ** ( 2 / 3 ) );
+  }
+  else
+  {
+    $thislimit = scalar( @arr );
+  }
+
+  @arrc = shuffle( @arr );
+  @arrc = @arrc[0..$thislimit];
 
   my @rawdists;
   foreach my $el ( @arrc )
@@ -630,11 +571,11 @@ sub calcmaxdist_old
     foreach my $elt ( @arrc )
     {
       my $hash_ref = calcdist( $el->[1], $elt->[1], $factlevels_ref );
-      my %hash = %{ $hash_ref }; #say $tee "00\%hash: " . dump( %hash );
+      my %hash = %{ $hash_ref };
       push ( @rawdists, $hash{rawdist} );
     }
-  } #say $tee "00\@rawdists: " . dump( @rawdists );
-  my $maxdist = max( @rawdists ); #say $tee "00\$maxdist: " . dump( $maxdist );
+  }
+  my $maxdist = max( @rawdists );
   return( $maxdist );
 }
 
@@ -642,37 +583,37 @@ sub calcmaxdist_old
 sub isnear
 {
   my ( $this, $first, $last ) = @_;
-  my @bits = split( "_", $this ); #say "\@bits" . dump( @bits );
-  my @firstbits = split( "_", $first ); #say "\@firstbits" . dump( @firstbits );
-  my @lastbits = split( "_", $last ); #say "\@lastbits" . dump( @lastbits );
+  my @bits = split( "_", $this );
+  my @firstbits = split( "_", $first );
+  my @lastbits = split( "_", $last );
 
   my $c = 0;
   foreach my $bit ( @bits)
   {
-    my @els = split( "-", $bit); #say "\@els" . dump( @els );
-    my @firstels = split( "-", $firstbits[$c] ); #say "\@firstels" . dump( @firstels );
-    my @lastels = split( "-", $lastbits[$c] ); #say "\@lastels" . dump( @lastels );
+    my @els = split( "-", $bit);
+    my @firstels = split( "-", $firstbits[$c] );
+    my @lastels = split( "-", $lastbits[$c] );
 
     if ( not( $firstels[1] > ( $els[1] - 1 ) ) )
     {
-      my @newels1 = ( $els[0], ( $els[1] - 1 ) ); #say "\@newels1" . dump( @newels1 );
-      my $newl = join( "-", @newels1 ); #say "\$newl" . dump( $newl );
-      push( @newels, $newl ); #say "DYNADEC \@newels" . dump( @newels );
+      my @newels1 = ( $els[0], ( $els[1] - 1 ) );
+      my $newl = join( "-", @newels1 );
+      push( @newels, $newl );
     }
     else
     {
-      push( @newels, $bit ); #say "FLATDEC \@newels" . dump( @newels );
+      push( @newels, $bit );
     }
 
     if ( not( $lastels[1] < ( $els[1] + 1 ) ) )
     {
-      my @newels2 = ( $els[0], ( $els[1] + 1 ) ); #say "\@newels2" . dump( @newels2 );
-      my $newl = join( "-", @newels2 ); #say "\$newl" . dump( $newl );
-      push( @newels, $newl ); #say "DYNATINC \@newels" . dump( @newels );
+      my @newels2 = ( $els[0], ( $els[1] + 1 ) );
+      my $newl = join( "-", @newels2 );
+      push( @newels, $newl );
     }
     else
     {
-      push( @newels, $bit ); #say "FLATINC \@newels" . dump( @newels );
+      push( @newels, $bit );
     }
     $c++;
   }
@@ -680,14 +621,14 @@ sub isnear
   my ( @neighs, @neighbours );
   foreach my $newel ( @newels )
   {
-    my @ns = split( "-", $newel ); #say "\@ns" . dump( @ns );
-    my $n = $ns[0] . "-"; #say "\$n" . dump( $n );
+    my @ns = split( "-", $newel );
+    my $n = $ns[0] . "-";
     my $word = $this;
-    $word =~ s/$n(\d+)/$newel/ ; #say "\$word" . dump( $word );
-    push( @neighs, $word ); #say "\@neighs" . dump( @neighs );
+    $word =~ s/$n(\d+)/$newel/ ;
+    push( @neighs, $word );
   }
   @neighs = uniq( @neighs );
-  my @neighbours = sort { $a <=> $b } @neighs; #say "\@neighbours" . dump( @neighbours );
+  my @neighbours = sort { $a <=> $b } @neighs;
   return( \@neighbours );
 }
 
@@ -695,29 +636,27 @@ sub isnear
 sub wei
 {
   my ( $arr_ref, $relaxmethod, $overweightnearest, $parconcurrencies, $instconcurrencies, $count,
-    $factlevels_ref, $minreq_forgrad, $minreq_forinclusion, $minreq_forcalc, $minreq_formerge, $maxdist, $nfilter, $limit_checkdistgrades, $limit_checkdistpoints, $bank_ref, $fulldo, $first0, $last0, $nears_ref, $checkstop,
-    $weldsprepared_ref, $weldaarrs_ref, $parswelds_ref, $recedes_ref ) = @_;
+    $factlevels_ref, $minreq_forgrad, $minreq_forinclusion, $minreq_forcalc, $minreq_formerge, $maxdist, $nfiltergrads, $limit_checkdistgrads, $limit_checkdistpoints, $bank_ref, $fulldo, $first0, $last0, $nears_ref, $checkstop,
+    $weldsprepared_ref, $weldaarrs_ref, $parswelds_ref, $recedes_ref, $nfilterpoints, $limitgrads, $limitpoints ) = @_;
   my @arr = @{ $arr_ref };
-  #say $tee "ARR VERY_BEFORE: " . dump(@arr);
-  my %factlevels = %{ $factlevels_ref };  #say $tee "AND \%factlevels: " . dump( %factlevels );
-  # my ( %magic, %wand, %spell, %bank );
+
+  my %factlevels = %{ $factlevels_ref };
   my %bank = %{ $bank_ref };
-  my %nears = %{ $nears_ref }; #say $tee " \%nearsIN1: " . dump( \%nears );
+  my %nears = %{ $nears_ref };
 
   my %weldnears;
 
 ###--###
-  my @weldsprepared = @{ $weldsprepared_ref }; #say $tee "NOW \@weldsprepared: " . dump( @weldsprepared );
-  my @weldaarrs = @{ $weldaarrs_ref }; #say $tee "NOW \@weldaarrs: " . dump( @weldaarrs );
-  my @parswelds = @{ $parswelds_ref }; #say $tee "NOW \@parswelds: " . dump( @parswelds );
-  my @recedes = @{ $recedes_ref }; #say $tee "NOW \@recedes: " . dump( @recedes );
+  my @weldsprepared = @{ $weldsprepared_ref };
+  my @weldaarrs = @{ $weldaarrs_ref };
+  my @parswelds = @{ $parswelds_ref };
+  my @recedes = @{ $recedes_ref };
 ###--###
 
-  #say "nfilter: $nfilter.";
-  $nfilter = ( $nfilter - 1 );
+
 
   my @arr__;
-  if ( ( $limit_checkdistgrades ne "" ) or ( $limit_checkdistpoints ne "" ) )
+  if ( ( $limit_checkdistgrads ne "" ) or ( $limit_checkdistpoints ne "" ) )
   {
     @arr__ = shuffle( @arr );
   }
@@ -727,12 +666,9 @@ sub wei
   }
 
   my ( @arra, @arrah );
-  if ( ( $limit_checkdistgrades ne "" )
-  #and ( $limit_checkdistgrades > $checkstop )
-  )
+  if ( ( $limit_checkdistgrads ne "" ) and ( $limit_checkdistgrads > $checkstop ) )
   {
-    @arrah = @arr__;
-    @arra = @arrah[0..$limit_checkdistgrades];
+    @arra = @arr__[0..$limit_checkdistgrads];
   }
   else
   {
@@ -740,15 +676,7 @@ sub wei
   }
 
   my @arrb;
-  if ( ( $limit_checkdistgrades ne "" )
-  #and ( $limit_checkdistgrades > $checkstop )
-  )
-  {
-    @arrb = @arrah[0..$limit_checkdistpoints];
-  }
-  elsif ( ( $limit_checkdistpoints ne "" )
-  #and ( $limit_checkdistpoints > $checkstop ) 
-  )
+  if ( ( $limit_checkdistpoints ne "" ) and ( $limit_checkdistpoints > $checkstop ) )
   {
     my @arrb_ = @arr__;
     @arrb = @arrb_[0..$limit_checkdistpoints];
@@ -760,28 +688,20 @@ sub wei
 
 
   sub fillbank
-  { #say $tee "NOW IN FILLBANK.";
-    #say $tee " \%nearsIN2: " . dump( \%nears );
-    my ( $arr_r, $minimumcertain, $minreq_forgrad, $maxdist, $condweight, $factlevels_r, $nfilter, $arra_r, $first0, $last0, $nears_ref ) = @_;
+  {
+    my ( $arr_r, $minimumcertain, $minreq_forgrad, $maxdist, $condweight, $factlevels_r, $nfiltergrads, $arra_r, $first0, $last0, $nears_ref, $limitgrads, $limitpoints ) = @_;
     my @arr = @{ $arr_r };
     my @arra = @{ $arra_r };
     my %factlevels = %{ $factlevels_r };
-    my %nears = %{ $nears_ref }; #say $tee " \%nearsIN3: " . dump( \%nears );
-    #my $nstop;
-    #if ( $nfilter ne "" )
-    #{
-    #  $nstop = ( $nfilter * 2 );
-    #}
+    my %nears = %{ $nears_ref };
+
 
     my %bank;
     foreach my $el ( @arr )
-    { #say $tee "SO IN FIRST ARR CHECK" ;  say $tee "\$el->[1]: " . dump( $el->[1] ); #say $tee "EL: " . dump( $el );
-      #my $key =  $el->[0] ; #say $tee "\$key: " . dump( $key );
+    {
       if ( ( $el->[2] ne "" ) and ( $el->[3] >= $minimumcertain ) )
-      { #say $tee "SO IN SECOND ARR CHECK" ; say $tee "\nTRYING \$el->[1]: " . dump( $el->[1] );
-
+      {
         my @neighbours;
-        #if ( $el->[2] ne "" )
         {
           if ( scalar( @{ $nears{$el->[0]}{neighbours} } ) == 0 )
           {
@@ -792,22 +712,16 @@ sub wei
           {
             @neighbours = @{ $nears{$el->[0]}{neighbours} };
           }
-          #say $tee "\IT DO NOT EXIST.";
         }
 
         #foreach my $elt ( @arra )
         foreach my $it ( @neighbours )
-        { #say $tee "SO, ELT: " . dump( $elt ); say $tee "IN WHICH, ELT0: " . dump( @{ $elt->[0] } );
-          #if ( ( $elt->[0] ~~ @neighbours ) and ( $elt->[2] ne "" ) and ( $elt->[0] ne $el->[0] ) and ( $el->[3] >= $minimumcertain ) )
-          #if ( ( $elt->[0] ~~ @neighbours ) and ( $elt->[2] ne "" ) and ( $elt->[0] ne $el->[0] ) and ( $el->[3] >= $minimumcertain ) )
-          #if ( ( $elt->[2] ne "" ) and ( $elt->[0] ne $el->[0] ) and ( $el->[3] >= $minimumcertain ) )
-          #if ( ( any { $_ eq $elt->[0] } @neighbours ) and ( $elt->[2] ne "" ) and ( $elt->[0] ne $el->[0] ) and ( $el->[3] >= $minimumcertain ) )
+        {
           my $elt = $nears{$it}{all};
           if ( ( $elt->[2] ne "" ) and ( $elt->[0] ne $el->[0] ) and ( $el->[3] >= $minimumcertain ) )
-          { #say $tee "NOW CHECKING .";
+          {
 
             my ( $res_ref ) = calcdistgrad( $el->[1], $elt->[1], \%factlevels, $minreq_forgrad, $maxdist, $el->[3], $elt->[3], $condweight, $el, $elt );
-            #say $tee "\OBTAINED DIST \$res_ref: " . dump( $res_ref );
 
             my %d;
             my ( @diff1, @diff2, @da1, @da2, @da1par, @da2par );
@@ -815,66 +729,32 @@ sub wei
 
             unless ( !keys %{ $res_ref } )
             {
-              %d = %{ $res_ref }; #say $tee "FOUND \%d: " . dump( \%d );
-              my @diff1 = @{$d{diff1}}; #say $tee "FOUND \@diff1: " . dump( @diff1 );
-              @diff2 = @{$d{diff2}}; #say $tee "FOUND \@diff2: " . dump( @diff2 );
-              @da1 = @{$d{da1}}; #say $tee "FOUND \@da1: " . dump( @da1 );
-              @da2 = @{$d{da2}}; #say $tee "FOUND \@da2: " . dump( @da2 );
-              @da1par = @{$d{da1par}}; #say $tee "FOUND \@da1par: " . dump( @da1par );
-              @da2par = @{$d{da2par}}; #say $tee "FOUND \@da2par: " . dump( @da2par );
-              $ordist = $d{ordist}; #say $tee "FOUND \$ordist: " . dump ( $ordist ); #say $tee "D: " . dump ( %d );
-              $dist = $d{dist}; #say $tee "FOUND \$dist: " . dump( $dist );
-              $strength = $d{strength}; #say $tee "FOUND \$strength: " . dump( $strength );
+              %d = %{ $res_ref };
+              my @diff1 = @{$d{diff1}};
+              @diff2 = @{$d{diff2}};
+              @da1 = @{$d{da1}};
+              @da2 = @{$d{da2}};
+              @da1par = @{$d{da1par}};
+              @da2par = @{$d{da2par}};
+              $ordist = $d{ordist};
+              $dist = $d{dist};
+              $strength = $d{strength};
             }
-            #else
-            #{
-            #  say $tee "NULL!";
-            #}
 
-            unless ( !keys %{ $res_ref } and ( $ordist > 0 ) and ( $ordist ne "" ) ) ######## IMPROVE THIS SO AS TO ALLOW VERY DIFFERENT NUMBERS OF LEVELS FOR EACH FACTOR
-            { #say $tee " SO I AM IN. ";
-
-              my $benchmark;
-              if ( $nfilter ne "" )
+            unless ( !keys %{ $res_ref } and ( $ordist > 0 ) and ( $ordist ne "" ) )
+            {
               {
-                if ( scalar( @{ $bank{$trio}{strengths} } ) > $nfilter )
-                {
-                  $benchmark = ${ $bank{$trio}{strengths} }[$nfilter]; #say "BENCHMARK1: $benchmark.";
-                }
-                else
-                {
-                  $benchmark = 0;
-                }
-              }
-              #say "BENCHMARK2: $benchmark.";
-              #say $tee "\$strength: " . dump( $strength );
-
-              if ( ( $strength > $benchmark ) or ( $nfilter eq "" ) )
-              {
-                #say "NOW INTO.";
-
                 my $count = 0;
                 foreach my $d10 ( @da1 )
-                { #say $tee "WORKING \$d10: " . dump( $d10 );
-                  #say "IN FOREACH.";
-
-                  if ( ( $nfilter ne "" ) and ( scalar( @{ $bank{$trio}{strengths} } ) > $nfilter ) )
-                  {
-                    #say "NEXT!";
-                    next;
-                  }
-
-                  my $d11 = $da1par[$count]; #say $tee "WORKING \$d11: " . dump( $d11 );
-                  #my $nearness = abs( $d11 - $d21 );
-                  #my $d20 = $da2[$count]; #say $tee "\$d21: " . dump( $d21 );
+                {
+                  my $d11 = $da1par[$count];
                   my $co = 0;
                   foreach my $d20 ( @da2 )
-                  { #say $tee "WORKING \$d20: " . dump( $d20 );
-
+                  {
                     if ( $d10 == $d20 )
-                    { #say $tee "THIS: d10 AND d20: " . dump( $d20 );
-                      my $stepsize = $factlevels{stepsizes}{$d20}; #say $tee "$stepsize: " . dump( $stepsize );
-                      my $d21 = $da2par[$co]; #say $tee "WORKING \$d21: " . dump( $d21 );
+                    {
+                      my $stepsize = $factlevels{stepsizes}{$d20};
+                      my $d21 = $da2par[$co];
 
                       my @duo = ( 1, 2 );
                       my ( $pair, @sorted, $orderedpair, $trio, $orderedtrio );
@@ -893,11 +773,35 @@ sub wei
                         @sorted = sort( $d11, $d21 );
                         $orderedpair = join( "-", @sorted );
                         $trio = join( "-", $d10, $pair );
-                        $orderedtrio = join( "-", $d10, $orderedpair ); #say $tee "\$orderedtrio: " . dump( $orderedtrio );
+                        $orderedtrio = join( "-", $d10, $orderedpair ); ;
 
-                        #unless ( ( $trio eq "" ) or ( $el[0] ~~ @{ $bank{$trio}{orstring} } ) )
+
+
                         unless ( ( $trio eq "" ) or ( any { $_ eq $el[0] } @{ $bank{$trio}{orstring} } ) )
                         {
+                          my $avgstrength;
+                          my $benchmark;
+                          if ( $nfiltergrads ne "" )
+                          {
+                            if ( scalar( @{ $bank{$trio}{strengths} } ) > $nfiltergrads )
+                            {
+                              $benchmark = ${ $bank{$trio}{strengths} }[$nfiltergrads]; #say "BENCHMARK1: $benchmark.";
+                              $avgstrength = mean( @{ $bank{$trio}{strengths} } );
+                            }
+                            else
+                            {
+                              $benchmark = 1;
+                            }
+                          }
+
+                          if ( ( ( $nfiltergrads ne "" ) and ( $avgstrength > $benchmark ) )
+                            or ( ( $limitgrads ne "" ) and ( scalar( @{ $bank{$trio}{strengths} } ) > $limitgrads ) ) )
+                          {
+                            next;
+                          }
+
+
+
                           $bank{$trio}{par} = $d10;
                           push ( @{ $bank{$trio}{trio} }, $trio );
 
@@ -928,38 +832,35 @@ sub wei
                           if ( ( $ordist > 0 ) and ( $ordist ne "" ) and ( $dist ne "" ) and ( $strength ne "" ) )
                           {
                             push ( @{ $bank{$trio}{ordists} }, $ordist );
-                            #push ( @{ $bank{$reversedtrio}{ordists} }, $ordist );
                             push ( @{ $bank{$trio}{dists} }, $dist );
-                            #push ( @{ $bank{$reversedtrio}{dists} }, $dist );
                             push ( @{ $bank{$trio}{strengths} }, $strength );
                           }
 
                           if ( $turn == 1 )
                           {
-                            $pos1 = $d11; #say $tee "WORKING \$pos1: " . dump( $pos1 );
-                            $pos2 = $d21; #say $tee "WORKING \$pos2: " . dump( $pos2 );
-                            $val1 = $el->[2]; #say $tee "WORKING \$val1: " . dump( $val1 );
-                            $val2 = $elt->[2]; #say $tee "WORKING \$val2: " . dump( $val2 );
+                            $pos1 = $d11;
+                            $pos2 = $d21;
+                            $val1 = $el->[2];
+                            $val2 = $elt->[2];
                           }
                           elsif ( $turn == 2 )
                           {
-                            $pos1 = $d21; #say $tee "WORKING \$pos1: " . dump( $pos1 );
-                            $pos2 = $d11; #say $tee "WORKING \$pos2: " . dump( $pos2 );
-                            $val1 = $elt->[2]; #say $tee "WORKING \$val1: " . dump( $val1 );
-                            $val2 = $el->[2]; #say $tee "WORKING \$val2: " . dump( $val2 );
+                            $pos1 = $d21;
+                            $pos2 = $d11;
+                            $val1 = $elt->[2];
+                            $val2 = $el->[2];
                           }
 
-                          my $diffpos = ( $pos1 - $pos2 ); #say $tee "WORKING \$diffpos: " . dump( $diffpos );
-                          my $diffval = ( $val1 - $val2 ); #say $tee "WORKING \$diffval: " . dump( $diffval );
+                          my $diffpos = ( $pos1 - $pos2 );
+                          my $diffval = ( $val1 - $val2 );
                           my $grad;
                           if ( ( $diffpos ne "" ) and ( $diffpos != 0 ) )
                           {
-                            $grad = ( $diffval / $diffpos ); #say $tee "DEFINING \$grad: " . dump( $grad );
+                            $grad = ( $diffval / $diffpos );
                           }
 
                           if ( $grad ne "" )
-                          { #say $tee "PUSHING \$grad: " . dump( $grad ) . " IN \$trio" . dump( $trio ) ;
-
+                          {
                             if ( $orderedtrio eq $trio )
                             {
                               push ( @{ $bank{$trio}{grads} }, (- $grad ) );
@@ -987,19 +888,17 @@ sub wei
         }
       }
     }
-    #_#say $tee " \%bank: " . dump( %bank );
     return ( \%bank, \%nears );
   }
 
   sub clean
   {
-    my ( $bank_ref, $nfilter, $message, $recedes_ref ) = @_;
+    my ( $bank_ref, $nfiltergrads, $message, $recedes_ref ) = @_;
     my %bank = %{ $bank_ref };
-    my $n2filter = ( 2 * $nfilter );
     my @recedes = @{ $recedes_ref };
     if ( scalar( @recedes ) > 0 )
     {
-      say "RECEDE " . dump( @recedes ); #say "MESSAGE $message";
+      say "RECEDE " . dump( @recedes );
     }
 
     foreach my $trio ( keys ( %bank ) )
@@ -1036,10 +935,6 @@ sub wei
           $bank{$trio}{strengths} = [ @strengths ];
         }
       }
-      #else
-      #{
-      #  say $tee "RECEDE $first";
-      #}
     }
     return( \%bank );
   } #END FILLBANK
@@ -1047,10 +942,10 @@ sub wei
   unless( ( $fulldo eq "$tight" ) and ( $count > 0 ) )
   {
     say $tee "Entering gradients' \%bank.";
-    my ( $bank_ref, $nears_ref ) = fillbank( \@arr__, $minimumcertain, $minreq_forgrad, $maxdist, $condweight, \%factlevels, $nfilter, \@arra, $first0, $last0, \%nears );
-    %bank = %{ $bank_ref }; #say $tee "\%bank: " . dump( %bank );
+    my ( $bank_ref, $nears_ref ) = fillbank( \@arr__, $minimumcertain, $minreq_forgrad, $maxdist, $condweight, \%factlevels, $nfiltergrads, \@arra, $first0, $last0, \%nears, $limitgrads, $limitpoints );
+    %bank = %{ $bank_ref };
     %nears = %{ $nears_ref };
-    %bank = %{ clean( \%bank, $nfilter, "principal", \@recedes ) }; say $tee "BANK DONE."; #say $tee "CLEANED \%bank: " . dump( %bank ) ;
+    %bank = %{ clean( \%bank, $nfiltergrads, "principal", \@recedes ) }; say $tee "BANK DONE.";
   }
 
 ###--###
@@ -1065,7 +960,7 @@ sub wei
     {
       unless ( $trio eq "" )
       {
-        my @splits = split( "-", $trio ); #say $tee "\@splits " . dump( @splits );
+        my @splits = split( "-", $trio );
         my $num = $splits[0];
         if ( $num ~~ @parsws )
         {
@@ -1093,9 +988,9 @@ sub wei
     foreach my $weldref ( @weldaarrs )
     {
       my @parsws = @{ $parswelds[$co] }; say $tee "\@parsws: " . dump( @parsws );
-      my @weldarr = @{ $weldref }; #_#say $tee "THIS \@weldarr: " . dump( @weldarr ) . " DONE THIS \@weldarr.";
+      my @weldarr = @{ $weldref };
       my @weldarr__;
-      if ( ( $limit_checkdistgrades ne "" ) or ( $limit_checkdistpoints ne "" ) )
+      if ( ( $limit_checkdistgrads ne "" ) or ( $limit_checkdistpoints ne "" ) )
       {
         @weldarr__ = shuffle( @weldarr );
       }
@@ -1105,10 +1000,10 @@ sub wei
       }
 
       my ( @weldarra, @weldarrah );
-      if ( ( $limit_checkdistgrades ne "" ) and ( $limit_checkdistgrades > $checkstop ) )
+      if ( ( $limit_checkdistgrads ne "" ) and ( $limit_checkdistgrads > $checkstop ) )
       {
         @weldarrah = @weldarr__;
-        @weldarra = @weldarrah[0..$limit_checkdistgrades];
+        @weldarra = @weldarrah[0..$limit_checkdistgrads];
       }
       else
       {
@@ -1116,7 +1011,7 @@ sub wei
       }
 
       my @weldarrb;
-      if ( ( $limit_checkdistgrades ne "" ) and ( $limit_checkdistgrades > $checkstop ) )
+      if ( ( $limit_checkdistgrads ne "" ) and ( $limit_checkdistgrads > $checkstop ) )
       {
         @weldarrb = @weldarrah[0..$limit_checkdistpoints];
       }
@@ -1130,28 +1025,13 @@ sub wei
         @weldarrb = @weldarr__;
       }
 
-
-      #foreach my $el ( @weldarr )
-      #{
-      #  if ( ( $weldnears{$el->[0]}{all}->[2] eq "" ) or ( ( $weldnears{$el->[0]}{all}->[3] < 1 ) and ( $weldnears{$el->[0]}{all}->[2] != $el->[2] ) ) )
-      #  {
-      #    $weldnears{$el->[0]}{all} = $el;
-      #  }
-      #}
-      #say $tee " \%weldnears: " . dump( \%weldnears );
-
-      #say $tee "FIRST0 $first0,  LAST0 $last0 ";
-      #say $tee " \@weldarr__: " . dump( \@weldarr__ ) ;
-      #say $tee " \%factlevels: " . dump( \%factlevels ) ;
-      #say $tee " \@weldarra: " . dump( \@weldarra ) ;
-      my ( $weldbank_ref, $weldnears_ref ) = fillbank( \@weldarr__, $minimumcertain, $minreq_forgrad, $maxdist, $condweight, \%factlevels, $nfilter, \@weldarra, $first0, $last0, \%nears );##%weldnears!!!!
-      %weldbank = %{ $weldbank_ref }; #say $tee " \%weldbank: " . dump( \%weldbank ) ;
+      my ( $weldbank_ref, $weldnears_ref ) = fillbank( \@weldarr__, $minimumcertain, $minreq_forgrad, $maxdist, $condweight, \%factlevels, $nfiltergrads, \@weldarra, $first0, $last0, \%nears, $limitgrads, $limitpoints );
+      %weldbank = %{ $weldbank_ref };
       %weldnears = %{ $weldnears_ref };
 
-      %weldbank = %{ clean( \%weldbank, $nfilter, "weld" ) }; #say $tee "CLEANED \%weldbank: " . dump( \%weldbank ) ;
+      %weldbank = %{ clean( \%weldbank, $nfiltergrads, "weld" ) };
 
       %bank = %{ mixbank( \%bank, \%weldbank, \@parsws ) };
-      #say $tee "COMPLETED \%bank:" . dump( \%bank ) . ": COMPLETED \%bank.";
       say $tee "KEYS \%bank: " . ( keys %bank );
 
       $co++;
@@ -1161,23 +1041,21 @@ sub wei
 
   sub cyclearr
   {
-    my ( $arr_r, $minreq_forinclusion, $minreq_forgrad, $bank_r, $factlevels, $nfilter, $arrb_r, $first0, $last0, $nears_ref ) = @_;
+    my ( $arr_r, $minreq_forinclusion, $minreq_forgrad, $bank_r, $factlevels, $nfilterpoints, $arrb_r, $first0, $last0, $nears_ref, $limitgrads, $limitpoints ) = @_;
     my @arr = @{ $arr_r };
     my @arrb = @{ $arrb_r };
     my %bank = %{ $bank_r };
     my %factlevels = %{ $factlevels };
     my %nears = %{ $nears_ref };
-    #say $tee "IN cyclearr ARR: " . dump( @arr );
-    # %nfilter is not used here.
 
     my %wand;
     my $coun = 0;
     foreach my $el ( @arr )
-    { #say $tee "\$el->[1]: " . dump( $el->[1] ); #say $tee "EL: " . dump( $el );
-      my $key =  $el->[0] ; #say $tee "\$key: " . dump( $key );
+    {
+      my $key =  $el->[0] ;
 
       if ( $el->[2] eq "" )
-      { #say $tee "TRYING \$el->[1]: " . dump( $el->[1] );
+      {
 
         my @neighbours;
         if ( scalar( @{ $nears{$el->[0]}{neighbours} } ) == 0 )
@@ -1192,20 +1070,15 @@ sub wei
 
         #foreach my $elt ( @arrb )
         foreach my $it ( @neighbours )
-        { #say $tee "SO, ELT: " . dump( $elt ); #say $tee "IN WHICH, ELT0: " . dump( @{ $elt->[0] } );
-          #if ( ( $elt->[0] ~~ @neighbours ) and ( $elt->[2] ne "" ) and ( $el->[3] >= $minreq_forinclusion ) )
-          # ( any { $_ eq $elt->[0] } @neighbours )
-          #if ( ( any { $_ eq $elt->[0] } @neighbours ) and ( $elt->[2] ne "" ) and ( $el->[3] >= $minreq_forinclusion ) )
+        {
           my $elt = $nears{$it}{all};
-          #say $tee "FOUND \$elt: " . dump( $elt );
           if ( ( $elt->[2] ne "" ) and ( $el->[3] >= $minreq_forinclusion ) )
           {
-            my @diff1 = diff( \@{ $el->[1] }, \@{ $elt->[1] } ); #say $tee "AND \@diff1: " . dump( @diff1 );
+            my @diff1 = diff( \@{ $el->[1] }, \@{ $elt->[1] } );
 
             if ( ( scalar( @diff1 ) > 0 ) and ( scalar( @diff1 ) <= $minreq_forgrad->[2] ) )
-            { #say $tee "AND \@diff1 IS 1: " . dump( @diff1 );
-              #say "NOW IN.";
-              my @diff2 = diff( \@{ $elt->[1] } , \@{ $el->[1] } ); #say $tee "SO \@diff2: " . dump( @diff2 );
+            {
+              my @diff2 = diff( \@{ $elt->[1] } , \@{ $el->[1] } );
 
               my ( @da1, @da1par, @da2, @da2par );
               foreach my $el ( @diff1 )
@@ -1221,81 +1094,53 @@ sub wei
                 push( @da2par, $elts[1] );
               }
 
-              #my %h1 = map { split( /-/ , $_ ) } @diff1; #say $tee "THEN \%h1: " . dump( %h1 );
-              #my @da1 = keys %h1;
-              #my @da1par = values %h1; # $tee "\@da1par: " . dump( @da1par );
-              #my %h2 = map { split( /-/ , $_ ) } @diff2; #say $tee "THEN \%h2: " .yes dump( %h2 );
-              #my @da2 = keys %h2;
-              #my @da2par = values %h2; #say $tee "\@da2par: " . dump( @da2par );
-              #say $tee "SAYYY \$el->[1]: " . dump( $el->[1] );
-
               my $soughtval;
               my $count = 0;
               foreach my $d10 ( @da1 )
               {
-                #my $d10 = $da1[$count];
-                my $d11 = $da1par[$count]; #say $tee "NOW IN1 \$d11: " . dump( $d11 );
+                my $d11 = $da1par[$count];
                 my $co = 0;
                 foreach my $d20 ( @da2 )
                 {
                   if ( $d20 ne "" )
                   {
                     my $d20 = $da2[$co];
-                    my $d21 = $da2par[$co]; #say $tee "NOW IN2 \$d21: " . dump( $d21 );
-                    if ( ( $d10 eq $d20 ) ) #### if ( ( $d10 eq $d20 ) and ( $d11 ne $d21 ) ) ###  THE SECOND CONDITION COULD BE LOGICALLY REDUNDANT. CHECK. ####
-                    { #say $tee "NOW IN3";
+                    my $d21 = $da2par[$co];
+                    if ( ( $d10 eq $d20 ) )
+                    {
                       my $newpair = join( "-", ( $d11, $d21 ) );
-                      #my $newunordpair = join( "-", ( $d11, $d21 ) );
 
-                      my $newtrio = join( "-", $d10, $newpair ); #say $tee "NEWTRIO: " . dump ( $newtrio );
-
-                      #my $nowgrad;
-                      #if ( $newpair eq $newunordpair )
-                      #{
-                      #  $nowgrad = $bank{$newtrio}{grads};
-                      #}
-                      #else
-                      #{
-                      #  $nowgrad = - $bank{$newtrio}{grads};
-                      #}
+                      my $newtrio = join( "-", $d10, $newpair );
 
                       my ( @boxgrads, @boxdists, @boxors );
                       my $cn = 0;
                       foreach my $grad ( @{ $bank{$newtrio}{grads} } )
                       {
-                        #if ( ( $grad ne "" ) and ( ${ $bank{$newtrio}{orstring} }[$cn] ~~ @neighbours ) )
                         if ( ( $grad ne "" ) and ( any { $_ eq ${ $bank{$newtrio}{orstring} }[$cn] } @neighbours ) )
                         {
-                          #say $tee "NOW IN4";
                           push ( @boxgrads, $grad );
                           my $ordist = $bank{$newtrio}{ordists}[$cn];
                           push ( @boxdists, $ordist );
                           my $origin = $bank{$newtrio}{origins}[$cn];
                           push ( @boxors, $origin );
                         }
-                        #else
-                        #{
-                        #  say $tee "NOT PUSHING INTO BANK!";
-                        #}
                         $cn++;
-                      } #say $tee "HERE \@boxgrads: " . dump( @boxgrads ); say $tee "HERE \@boxdists: " . dump( @boxdists );
-                      #if ( scalar( @{ $bank{$newtrio}{grads} } ) == 0 ) { say $tee "BANK EMPTY OF GRADS!"; }
+                      }
 
                       my ( @factbag, @levbag, @stepbag );
                       my $c = 0;
                       foreach my $e ( @da1par )
                       {
                         if ( $e ne "" )
-                        { #say $tee "NOW IN5"; say $tee "33\$e: " . dump( $e );
-                          my $fact = $da1[$c]; #say $tee "33\$fact: " . dump( $fact );
+                        {
+                          my $fact = $da1[$c];
 
                           my $i = 0;
                           foreach my $ei ( @da2par )
                           {
                             if ( $da1[$c] == $da2[$i] )
                             {
-                              my $diffpar = abs( $e - $ei ); #say $tee "335 \$diffpar: " . dump( $diffpar );
-                              #if ( ( $diffpar >= $minreq_forgrad->[1] ) and ( $diffpar > 0 ) )
+                              my $diffpar = abs( $e - $ei );
                              ###################if ( ( ${ $bank{$newtrio}{orstring} }[$cn] ~~ @neighbours ) ) and ( $diffpar <= $minreq_forgrad->[1] ) and ( $diffpar > 0 ) ) ############################HERE
                               if ( ( $diffpar <= $minreq_forgrad->[1] ) and ( $diffpar > 0 ) )
                               {
@@ -1310,35 +1155,41 @@ sub wei
                         $c++;
                       }
 
-                      #say $tee "889 OBTAINED \@factbag: " . dump( @factbag ); say $tee "889 \@levbag: " . dump( @levbag ); say $tee "\@stepbag: " . dump( @stepbag );
-                      #say $tee "889 OBTAINED \@boxgrads: " . dump( @boxgrads ); say $tee "889 \@boxdists: " . dump( @boxdists ); say $tee "\@boxors: " . dump( @boxors );
-
                       my ( $soughtinc, $totdist, $totstrength );
 
                       unless ( ( scalar( @boxgrads ) == 0 ) and ( scalar( @boxdists ) == 0 ) and ( scalar( @boxors ) == 0 ) )
                       { #say $tee "CHEKK \$el->[3]: " . dump( $el->[3] );
                         ( $soughtinc, $totdist, $totstrength ) = weightvals1( $elt->[1], \@boxgrads, \@boxdists, \@boxors, $minreq_forcalc, \@factbag, \@levbag, \@stepbag, $elt->[2], \%factlevels, $maxdist, $elt->[3], $condweight );
-                        #say $tee "332 OBTAINED \$soughtinc: " . dump( $soughtinc );
-                        #say $tee "332 OBTAINED \$totdist: " . dump( $totdist );
-                        #say $tee "332 OBTAINED \$totstrength: " . dump( $totstrength );
 
-                        #unless ( ( $soughtinc eq "" ) or ( $totdist eq "" ) or ( $elt->[0] ~~ @{ $wand{$key}{origin} } ) )###################
                         unless ( ( $soughtinc eq "" ) or ( $totdist eq "" ) )
                         {
+                          #my $benchmark;
+                          #if ( $nfilterpoints ne "" )
+                          #{
+                          #  if ( scalar( @{ $wand{$key}{strength} } ) > $nfilterpoints )
+                          #  {
+                          #    $benchmark = ${ $wand{$key}{strength} }[$nfilterpoints]; #say "BENCHMARK1: $benchmark.";
+                          #  }
+                          #  else
+                          #  {
+                          #    $benchmark = 0;
+                          #  }
+                          #}
+
+                          #if ( ( ( $nfilterpoints ne "" ) and ( $strength > $benchmark ) )
+                          #  or ( ( $limitpoints ne "" ) and ( scalar( @{ $wand{$key}{strength} } ) > $limitpoints ) ) )
+                          #{
+                          #  next;
+                          #}
+
                           my $soughtval = ( $elt->[2] + $soughtinc );
                           push ( @{ $wand{$key}{vals} }, $soughtval );
                           push ( @{ $wand{$key}{dists} }, $totdist );
-                          #say $tee "PUSHING \$soughtval $soughtval INTO \@{ \$wand{\$key}{vals} }: " . dump( @{ $wand{\$key}{vals} } ) . " BECAUSE KEY: $key . " ;
 
-                          #my $strength = ( ( $elt->[3] ** $totstrength ) ** ( 1/2 ) );
-
-
-                          #push ( @{ $wand{$key}{strength} }, $strength );
                           push ( @{ $wand{$key}{strength} }, $totstrength );
                           push ( @{ $wand{$key}{origin} }, $elt->[0] );
                           $wand{$key}{name} = $key;
                           $wand{$key}{bulk} = [ @{ $elt->[1] } ] ;
-                          #say $tee "EXECUTING";
                         }
                       }
                     }
@@ -1351,25 +1202,24 @@ sub wei
           }
         }
       }
-    } #say $tee "MAGIC WAND. " . dump( %wand );
+    }
     return( \%wand, \%nears );
   }
 
   say $tee "GOING TO CREATE NEW POINTS.";
-  my ( $wand_ref, $nears_ref ) = cyclearr( \@arr__, $minreq_forinclusion, $minreq_forgrad, \%bank, \%factlevels, $nfilter, \@arrb, $first0, $last0, \%nears ); say $tee "DONE."; #say $tee "\%wand OUT: " . dump( %wand );
-  my %wand = %{ $wand_ref }; #say $tee "\%wand OUT: " . dump( %wand );
+  my ( $wand_ref, $nears_ref ) = cyclearr( \@arr__, $minreq_forinclusion, $minreq_forgrad, \%bank, \%factlevels, $nfiltergrads, \@arrb, $first0, $last0, \%nears, $limitgrads, $limitpoints ); say $tee "DONE.";
+  my %wand = %{ $wand_ref };
   say $tee "\nDONE.";
-  %nears = %{ $nears_ref }; #say $tee "RE-UPDATED \%nears: " . dump( \%nears ) . "\nDONE.";
+  %nears = %{ $nears_ref };
 
   my @limb0;
   foreach my $ke ( keys %wand )
   {
     my ( $soughtval, $totstrength ) = weightvals_merge( \@{ $wand{$ke}{vals} }, \@{ $wand{$ke}{strength} }, $minreq_formerge, $maxdist );
-    #say $tee "ENDPIPE \$soughtval, " . dump( $soughtval );
-    #say $tee "ENDPIPE \$totstrength, " . dump( $totstrength );
+
     if ( ( $soughtval ne "" ) and ( $totstrength ne "" ) )
     {
-      push ( @limb0, [ $wand{$ke}{name}, $wand{$ke}{bulk}, $soughtval, $totstrength ] ); #say $tee "\$avg: $avg"; say $tee "\${ \$magic{\$ke}{\$dee} }->[1] : ${ $magic{$ke}{$dee} }->[1] ";
+      push ( @limb0, [ $wand{$ke}{name}, $wand{$ke}{bulk}, $soughtval, $totstrength ] );
     }
   }
 
@@ -1377,8 +1227,6 @@ sub wei
   {
     %bank = ();
   }
-
-  #say $tee "LIMBO_WEI: " . dump( @limbo_wei );
   return( \@limb0, \%bank, \%nears )
 } ##### END SUB wei
 
@@ -1390,15 +1238,15 @@ sub purelin
   my ( @linneabagbox );
   my ( %magic, %wand, %spell );
   foreach my $el ( @arr )
-  { #say $tee "\$el->[1]: " . dump( $el->[1] ); #say $tee "EL: " . dump( $el );
-    my $key =  $el->[0] ; #say $tee "\$key: " . dump( $key );
+  {
+    my $key =  $el->[0] ;
     if ( $el->[2] eq "" )
-    { #say $tee "TRYING \$el->[1]: " . dump( $el->[1] );
+    {
       foreach my $elt ( @arr )
-      { #say $tee "SO, ELT: " . dump( $elt ); #say $tee "IN WHICH, ELT0: " . dump( @{ $elt->[0] } );
+      {
         if ( not ( $elt->[2] eq "" ) )
         {
-          my @diff1 = diff( \@{ $el->[1] }, \@{ $elt->[1] } ); #say $tee "AND \@diff1: " . dump( @diff1 );
+          my @diff1 = diff( \@{ $el->[1] }, \@{ $elt->[1] } );
 
           if ( $relaxmethod eq "logarithmic" )
           {
@@ -1406,9 +1254,9 @@ sub purelin
             while ( $index <= $relaxlimit )
             {
               if ( ( scalar( @diff1 ) > 0 ) and ( scalar( @diff1 ) <= ( 1 + $relaxlimit ) ) )
-              { #say $tee "AND \@diff1 IS 1: " . dump( @diff1 );
+              {
 
-                my @diff2 = diff( \@{ $elt->[1] } , \@{ $el->[1] } ); #say $tee "SO \@diff2: " . dump( @diff2 );
+                my @diff2 = diff( \@{ $elt->[1] } , \@{ $el->[1] } );
 
                 my ( @da1, @da1par, @da2, @da2par );
                 foreach my $el ( @diff1 )
@@ -1424,44 +1272,35 @@ sub purelin
                   push( @da2par, $elts[1] );
                 }
 
-                #my %h1 = map { split( /-/ , $_ ) } @diff1; #say $tee "THEN \%h1: " . dump( %h1 );
-                #my @da1 = keys %h1;
-                #my @da1par = values %h1; # $tee "\@da1par: " . dump( @da1par );
-                #my %h2 = map { split( /-/ , $_ ) } @diff2; #say $tee "THEN \%h2: " .yes dump( %h2 );
-                #my @da2 = keys %h2;
-                #my @da2par = values %h2; #say $tee "\@da2par: " . dump( @da2par );
-                #say $tee "SAYYY \$el->[1]: " . dump( $el->[1] );
-
                 my $count = 0;
                 foreach my $d10 ( @da1 )
-                { #say $tee "\$d10: " . dump( $d10 );
-                  my $d11 = $da1par[$count]; #say $tee "\$d11: " . dump( $d11 );
+                {
+                  my $d11 = $da1par[$count];
                   my $co = 0;
                   foreach my $d20 ( @da2 )
-                  { #say $tee "\$d20: " . dump( $d20 );
-                    my $d21 = $da2par[$co]; #say $tee "\$d21: " . dump( $d21 );
-                    if ( ( $d10 eq $d20 ) ) #### if ( ( $d10 eq $d20 ) and ( $d11 ne $d21 ) ) ###  THE SECOND CONDITION COULD BE LOGICALLY REDUNDANT. CHECK. ####
+                  {
+                    my $d21 = $da2par[$co];
+                    if ( ( $d10 eq $d20 ) )
                     {
-                      push ( @{ $magic{$key}{$d10} }, [ $el->[0], $el->[1], $d11, $d21, $elt->[2] ] ); #key, array, factornum missing, factornum gotten, value
-                      #say $tee "PUSHING THIS: [ \$el->[0], \$el->[1], \$d11, \$d21, \$elt->[2] ] " . dump([ $el->[0], $el->[1], $d11, $d21, $elt->[2] ]);
+                      push ( @{ $magic{$key}{$d10} }, [ $el->[0], $el->[1], $d11, $d21, $elt->[2] ] );
                     }
                     $co++;
                   }
                   $count++;
                 }
 
-              } #say $tee "FACTLEVELS: " . dump( %factlevels );
+              }
               $index++;
             }
           }
-          elsif ( ( $relaxmethod eq "linear" ) or ( $relaxmethod eq "exponential" ) ) ##############CHECK
+          elsif ( ( $relaxmethod eq "linear" ) or ( $relaxmethod eq "exponential" ) )
           {
             my $index = 0;
             while ( $index <= $relaxlimit )
             {
               if ( ( scalar( @diff1 ) > 0 ) and ( scalar( @diff1 ) == ( 1 + $relaxlimit ) ) )
-              { #say $tee "AND \@diff1 IS 1: " . dump( @diff1 );#SAME CONTENT AS THE PREVIOUS WHILE HERE BELOW
-                my @diff2 = diff( \@{ $elt->[1] } , \@{ $el->[1] } ); #say $tee "SO \@diff2: " . dump( @diff2 );
+              {
+                my @diff2 = diff( \@{ $elt->[1] } , \@{ $el->[1] } );
 
                 my ( @da1, @da1par, @da2, @da2par );
                 foreach my $el ( @diff1 )
@@ -1476,14 +1315,6 @@ sub purelin
                   push( @da2, $elts[0] );
                   push( @da2par, $elts[1] );
                 }
-
-                #my %h1 = map { split( /-/ , $_ ) } @diff1; #say $tee "THEN \%h1: " . dump( %h1 );
-                #my @da1 = keys %h1;
-                #my @da1par = values %h1; # $tee "\@da1par: " . dump( @da1par );
-                #my %h2 = map { split( /-/ , $_ ) } @diff2; #say $tee "THEN \%h2: " . dump( %h2 );
-                #my @da2 = keys %h2;
-                #my @da2po_weiar = values %h2; #sa_refy $tee "\@da2par: " . dump( @da2par );
-                #say $tee "\$el->[2]: " . dump( $el->[2] );
 
                 if ( $relaxmethod eq "linear" )
                 {
@@ -1496,17 +1327,17 @@ sub purelin
 
                 my $coufillnt = 0;
                 foreach my $d10 ( @da1 )
-                { #sayo_wei $tee "\$d10: " . dump( $d10 );
-                  my $d11 = $da1par[$count]; #say $tee "\$d11: " . dump( $d11 );
+                {
+                  my $d11 = $da1par[$count];
                   my $co = 0;
                   foreach my $d20 ( @da2 )
-                  { #say $tee "\$d20: " . dump( $d20 );
-                    my $d21 = $da2par[$co]; #say $tee "\$d21: " . dump( $d21 );
+                  {
+                    my $d21 = $da2par[$co];
                     while ( $indinc > 0 )
                     {
-                      if ( ( $d10 eq $d20 ) ) #### if ( ( $d10 eq $d20 ) and ( $d11 ne $d21 ) ) ###  THE SECOND CONDITION COULD BE LOGICALLY REDUNDANT. CHECK. ####
-                      { #say $tee "PUSH " . dump( $elt->[2] );
-                        push ( @{ $magic{$key}{$d10} }, [ $el->[0], $el->[1], $d11, $d21, $elt->[2] ] ); #key, array, factornum missing, factornum gotten, value
+                      if ( ( $d10 eq $d20 ) )
+                      {
+                        push ( @{ $magic{$key}{$d10} }, [ $el->[0], $el->[1], $d11, $d21, $elt->[2] ] );
                         $indinc--;
                       }
                     }
@@ -1522,14 +1353,12 @@ sub purelin
       }
     }
   }
-  #say $tee "\%magic: " . dump( %magic );
 
   foreach my $ke ( sort {$a <=> $b} ( keys %magic ) )
   {
     foreach my $dee ( sort {$a <=> $b} ( keys %{ $magic{$ke} } ) )
-    { #say $tee "\$r: " . dump( $r );
-      #my @array = @{ $dee }; say $tee "\$dee: " . dump( $dee ); say $tee "\@array: " . dump( @array );
-      my @array = @{ $magic{$ke}{$dee} }; #say $tee "\$dee: " . dump( $dee ) . ", "; say $tee "\@array: " . dump( @array );
+    {
+      my @array = @{ $magic{$ke}{$dee} };
       my @bag;
       my $bagmean;
       unless ( scalar( @array ) <= 1 )
@@ -1553,8 +1382,8 @@ sub purelin
             while ( $index <= $relaxlimit )
             {
               if ( ( scalar( @diff1 ) > 0 ) and ( scalar( @diff1 ) <= ( 1 + $relaxlimit ) ) )
-              { #say $tee "AND \@diff1 IS 1: " . dump( @diff1 );
-                my @diff2 = diff( \@{ $elt->[1] } , \@{ $el->[1] } ); #say $tee "SO \@diff2: " . dump( @diff2 );
+              {
+                my @diff2 = diff( \@{ $elt->[1] } , \@{ $el->[1] } );
 
 
                 my ( @da1, @da1par, @da2, @da2par );
@@ -1571,28 +1400,17 @@ sub purelin
                   push( @da2par, $elts[1] );
                 }
 
-                #my %h1 = map { split( /-/ , $_ ) } @diff1; #say $tee "THEN \%h1: " . dump( %h1 );
-                #my @da1 = keys %h1;
-                #my @da1par = values %h1; # $tee "\@da1par: " . dump( @da1par );
-                #my %h2fill = map { split( /-/ , $_ ) } @diff2; #say $tee "THEN \%h2: " . dump( %h2 );
-                #my @da2 = keys %h2;
-                #my @da2par = values %h2; #say $tee "\@da2par: " . dump( @da2par );
-                #say $tee "SAYYY \$el->[1]: " . dump( $el->[1] );
-
                 my $count = 0;
                 foreach my $d10 ( @da1 )
-                { #say $tee "\$d10: " . dump( $d10 );
-                  my $d11 = $da1par[$count]; #say $tee "\$d11: " . dump( $d11 );
+                {
+                  my $d11 = $da1par[$count];
                   my $co = 0;
                   foreach my $lineard20 ( @da2 )
-                  { #say $tee "\$d20: " . dump( $d20 );
-                    my $d21 = $da2par[$co]; #say $tee "\$d21: " . dump( $d21 );
-                    if ( ( $d10 eq $d20 ) ) #### if ( ( $d10 eq $d20 ) and ( $d11 ne $d21 ) ) ###  THE SECOND CONDITION COULD BE LOGICALLY REDUNDANT. CHECK. ####
+                  {
+                    my $d21 = $da2par[$co];
+                    if ( ( $d10 eq $d20 ) )
                     {
-                      push ( @{ $magic{$key}{$d10} }, [ $el->[0], $el->[1], $d11, $d21, $elt->[2] ] ); #key, array, factornum missing, factornum gotten, value
-                      #say $tee "PUSHING [ \$el->[0], \$el->[1], \$d11, \$d21, \$elt->[2] ] " . dump( [ $el->[0], $el->[1], $d11, $d21, $elt->[2] ]) . " SO I HAVE " . dump(@{ $magic{$key}{$d10} });
-
-                      #say $tee "\$dee: " . dump( $dee ) . ", "; say $tee "\@array: " . dump( @array );
+                      push ( @{ $magic{$key}{$d10} }, [ $el->[0], $el->[1], $d11, $d21, $elt->[2] ] );
                     }
                     $co++;
                   }
@@ -1609,8 +1427,8 @@ sub purelin
             while ( $index <= $relaxlimit )
             {
               if ( ( scalar( @diff1 ) > 0 ) and ( scalar( @diff1 ) == ( 1 + $relaxlimit ) ) )
-              { #say $tee "AND \@diff1 IS 1: " . dump( @diff1 );#SAME CONTENT AS THE PREVIOUS WHILE HERE BELOW
-                my @diff2 = diff( \@{ $elt->[1] } , \@{ $el->[1] } ); #say $tee "SO \@diff2: " . dump( @diff2 );
+              {
+                my @diff2 = diff( \@{ $elt->[1] } , \@{ $el->[1] } );
 
                 my ( @da1, @da1par, @da2, @da2par );
                 foreach my $el ( @diff1 )
@@ -1626,25 +1444,17 @@ sub purelin
                   push( @da2par, $elts[1] );
                 }
 
-                #my %h1 = map { split( /-/ , $_ ) } @diff1; #say $tee "THEN \%h1: " . dump( %h1 );
-                #my @da1 = keys %h1;
-                #my @da1par = values %h1; # $tee "\@da1par: " . dump( @da1par );
-                #my %h2 = map { split( /-/ , $_ ) } @diff2; #say $tee "THEN \%h2: " . dump( %h2 );
-                #my @da2 = keys %h2;
-                #my @da2par = values %h2; #say $tee "\@da2par: " . du$presence mp( @da2par );
-                #say $tee "SAYYY \$el->[1]: " . dump( $el->[1] );
-
                 my $count = 0;
                 foreach my $d10 ( @da1 )
-                { #say $tee "\$d10: " . dump( $d10 );
-                  my $d11 = $da1par[$count]; #say $tee "\$d11: " . dump( $d11 );
+                {
+                  my $d11 = $da1par[$count];
                   my $co = 0;
                   foreach my $d20 ( @da2 )
-                  { #say $tee "\$d20: " . dump( $d20 );
-                    my $d21 = $da2par[$co]; #say $tee "\$d21: " . dump( $d21 );
-                    if ( ( $d10 eq $d20 ) ) #### if ( ( $d10 eq $d20 ) and ( $d11 ne $d21 ) ) ###  THE SECOND CONDITION COULD BE LOGICALLY REDUNDANT. CHECK. ####
+                  {
+                    my $d21 = $da2par[$co];
+                    if ( ( $d10 eq $d20 ) )
                     {
-                      push ( @{ $magic{$key}{$d10} }, [ $el->[0], $el->[1], $d11, $d21, $elt->[2] ] ); #key, array, factornum missing, factornum gotten, value
+                      push ( @{ $magic{$key}{$d10} }, [ $el->[0], $el->[1], $d11, $d21, $elt->[2] ] );
                     }
                     $co++;
                   }
@@ -1664,11 +1474,11 @@ sub purelin
             my $unit = ( $diffval / $diffp );
             my $halfunit = ( $unit / 2 );
             my $halfdiffval = ( $diffval / 2 );
-            my $avgval = ( ( $val1 + $val2 ) / 2 ); #say $tee "\$avgval: $avgval";
-            my $avgpos = ( ( $pos1 + $pos2 ) / 2); #say $tee "\$avgpos: $avgpos";
-            my $distp = ( $posor - $avgpos ); #say $tee "\$distp: $distp";
-            my $change = ( $distp * $unit ); #say $tee "\$change: $change";
-            my $soughtval = ( $avgval + $change ); #say $tee "\$soughtval: $soughtval";
+            my $avgval = ( ( $val1 + $val2 ) / 2 );
+            my $avgpos = ( ( $pos1 + $pos2 ) / 2);
+            my $distp = ( $posor - $avgpos );
+            my $change = ( $distp * $unit );
+            my $soughtval = ( $avgval + $change );
             push( @bag, $soughtval );
           }
           $i++;
@@ -1678,7 +1488,7 @@ sub purelin
         {
           unless ( scalar( @bag ) == 0 )
           {
-            $bagmean = mean( @bag ); #say $tee "\$bagmean: $bagmean";
+            $bagmean = mean( @bag );
           }
         }
       }
@@ -1690,17 +1500,14 @@ sub purelin
     }
   }
 
-  #say $tee "MAGIC: " . dump(%magic);
-  #say $tee "WAND: " . dump(%wand);
-
   my @limb0;
   foreach my $ke ( sort {$a <=> $b} ( keys %wand ) )
   {
     my $eltnum = scalar( keys %{ $wand{$ke} } );
     unless ( $eltnum <= ( $instconcurrencies - 1 ) )
     {
-      my $avg = mean( values( %{ $wand{$ke} } ) ); #say $tee "\$avg: " .  dump( $avg );
-      push ( @limb0, [ $spell{$ke}[0], $spell{$ke}[1] , $avg ] ); #say $tee "\$avg: $avg"; say $tee "\${ \$magic{\$ke}{\$dee} }->[1] : ${ $magic{$ke}{$dee} }->[1] ";
+      my $avg = mean( values( %{ $wand{$ke} } ) );
+      push ( @limb0, [ $spell{$ke}[0], $spell{$ke}[1] , $avg ] );
     }
   }
   return( @limb0 );
@@ -1713,23 +1520,23 @@ sub near
   my @arr = @{ $arr_ref };
   my %factlevels = $factlevels_ref;
   foreach my $el ( @arr )
-  { #say $tee "\$el->[1]: " . dump( $el->[1] ); #say $tee "EL: " . dump( $el );
+  {
     if ( $el->[2] eq "" )
-    { #say $tee "TRYING \$el->[1]: " . dump( $el->[1] );
+    {
 
       my @bag;
       foreach my $elt ( @arr )
-      { #say $tee "SO, ELT: " . dump( $elt ); #say $tee "IN WHICH, ELT0: " . dump( @{ $elt->[0] } );
+      {
         if ( not ( $elt->[2] eq "" ) )
         {
-          my @diff1 = diff( \@{ $el->[1] }, \@{ $elt->[1] } ); #say $tee "AND \@diff1: " . dump( @diff1 );
+          my @diff1 = diff( \@{ $el->[1] }, \@{ $elt->[1] } );
 
           my $index = 0;
           while ( $index <= $nearrelaxlimit )
           {
             if ( ( scalar( @diff1 ) > 0 ) and ( scalar( @diff1 ) <= ( 1 + $nearrelaxlimit ) ) )
-            { #say $tee "AND \@diff1 IS 1: " . dump( @diff1 );
-              my @diff2 = diff( \@{ $elt->[1] } , \@{ $el->[1] } ); #say $tee "SO \@diff2: " . dump( @diff2 );
+            {
+              my @diff2 = diff( \@{ $elt->[1] } , \@{ $el->[1] } );
 
               my ( $da1_ref, $da1par_ref, $da2_ref, $da2par_ref ) = setvalues( \@diff1, \@diff2 );
               my @da1 = @{ $da1_ref };
@@ -1737,16 +1544,15 @@ sub near
 
               my $count = 0;
               foreach my $d10 ( @da1 )
-              { #say $tee "\$d10: " . dump( $d10 );
-                my $d11 = $da1par[$count]; #say $tee "\$d11: " . dump( $d11 );
+              {
+                my $d11 = $da1par[$count];
                 my $co = 0;
                 foreach my $d20 ( @da2 )
-                { #say $tee "\$d20: " . dump( $d20 );
-                  my $d21 = $da2par[$co]; #say $tee "\$d21: " . dump( $d21 );
-                  if ( ( $d10 eq $d20 ) ) #### if ( ( $d10 eq $d20 ) and ( $d11 ne $d21 ) ) ###  THE SECOND CONDITION COULD BE LOGICALLY REDUNDANT. CHECK. ####
+                {
+                  my $d21 = $da2par[$co];
+                  if ( ( $d10 eq $d20 ) )
                   {
-                    push( @bag, $elt->[2] ); #say $tee "PUSHING " . $elt->[1] . " IN BAG"; #key, array, factornum missing, factornum gotten, value
-                    #say $tee dump( $el->[0], $el->[1], $d11, $d21, $elt->[2] );
+                    push( @bag, $elt->[2] );
                   }
                   $co++;
                 }
@@ -1760,17 +1566,17 @@ sub near
 
       my @limb0;
       if ( not ( scalar( @bag ) <= ( $nearconcurrencies - 1 ) ) )
-      { #say $tee "\@bag: " . dump( @bag );
-        my $bagmean = mean( @bag ); #say $tee "\$bagmean: $bagmean";
+      {
+        my $bagmean = mean( @bag );
         unless ( scalar( @bag ) == 0 )
         {
-          push ( @limb0, [ $el->[0], $el->[1], $bagmean ] ); #say $tee "PUSHIN \$bagmean $bagmean in \@limbo2 ";
+          push ( @limb0, [ $el->[0], $el->[1], $bagmean ] );
         }
       }
     }
   }
   return( @limb0 );
-}############ END SUB nearest
+}############ END SUB near
 
 
 sub mixlimbo
@@ -1781,7 +1587,7 @@ sub mixlimbo
   my @weights = @{ $weights_ref };
   my @limbo = @limbo1 ;
   foreach my $el ( @limbo2 )
-  { #say $tee "EL AGAIN: " . dump( $el );
+  {
     my $presence = "absent";
     if ( exists( $limbo1copy{$el->[0]} ) )
     {
@@ -1806,11 +1612,11 @@ sub mixlimbo
             my $unit = ( $diffval / $diffp );
             my $halfunit = ( $unit / 2 );
             my $halfdiffval = ( $diffval / 2 );
-            my $avgval = ( ( $val1 + $val2 ) / 2 ); #say $tee "\$avgval: $avgval";
-            my $avgpos = ( ( $pos1 + $pos2 ) / 2); #say $tee "\$avgpos: $avgpos";
-            my $distp = ( $posor - $avgpos ); #say $tee "\$distp: $distp";
-            my $change = ( $distp * $unit ); #say $tee "\$change: $change";
-            my $soughtval = ( $avgval + $change ); #say $tee "\$soughtval: $soughtval";
+            my $avgval = ( ( $val1 + $val2 ) / 2 );
+            my $avgpos = ( ( $pos1 + $pos2 ) / 2);
+            my $distp = ( $posor - $avgpos );
+            my $change = ( $distp * $unit );
+            my $soughtval = ( $avgval + $change );
             push( @bag, $soughtval );
           }
         push ( @limbo, $el );
@@ -1917,17 +1723,11 @@ my @arr;
 sub interlinear
 {
   my ( $sourcef, $configf, $metafile, $blockelts_r, $reportf, $countblock ) = @_;
-  #say $tee "ARRIVED IN INTERLINEAR \$configf $configf";
-  #say $tee "ARRIVED IN INTERLINEAR \$sourcef $sourcef";
-  #say $tee "ARRIVED IN INTERLINEAR \$metafile $metafile";
-  #say $tee "ARRIVED IN INTERLINEAR \$blockelts_r ". dump( $blockelts_r );
-  #say $tee "ARRIVED IN INTERLINEAR \$reportf $reportf";
-  #say $tee "ARRIVED IN INTERLINEAR \$countblock $countblock";
 
   say "DOING";
   my ( %bank, %nears );
 
-  if ( $reportf ne "" ){ $report = $reportf; } #say $tee "CHECK5 \$report: " . dump( $report );
+  if ( $reportf ne "" ){ $report = $reportf; }
 
   if ( $configf eq "" )
   {
@@ -1937,59 +1737,57 @@ sub interlinear
   if ( $configf ne "" )
   {
     $confile = $configf;
-  }; #say $tee "CHECK5 \$confile: " . dump( $confile );
+  };
 
 
 
 
-
-    $maxloops= 1000;
-$sourcefile = "./sourcefile.csv";
-$newfile = $sourcefile . "_meta.csv";
-$report = $newfile . "_report.txt";
-@mode = ( "wei" ); # #"wei" is weighted gradient linear interpolation of the nearest neighbours.
-#my @mode = ( "near" ); # "nea" means "nearest neighbour"
-#@mode = ( ""mix" ); # "mix" means sequentially mixed in each loop.
-#my @mode = ( "wei", "near", "near", "purelin" ); # a sequence
-@weights = (  ); #my @weights = ( 0.7, 0.3 ); # THE FIRST IS THE WEIGHT FOR linear interpolation, THE SECOND FOR nearest neighbour.
-# THEY ARE FRACTIONS OF 1 AND MUST GIVE 1 IN TOTAL. IF THE VALUES ARE UNSPECIFIED (IE. IF THE ARRAY IS EMPTY), THE VALUES ARE UNWEIGHTED.
-$linearprecedence = "no"; # PRECEDENCE TO LINEAR INTERPOLATES. IF "yes", THE VALUES DERIVED FROM LINEAR INTERPOLATION, WHERE PRESENT, WILL SUPERSEDE THE VALUES DERIVED FROM THE NEAREST NEIGHBUR STRATEGY. IF "no", THE OPPOSITE. IT CAN BE ACTIVE ONLY IF LOGARITHMIC IS OFF. IT WORKS WITH "LINEAR" AND "EXPONENTIAL"
-$relaxmethod = "logarithmic"; #It is relative to the "linnear" method. Options: "logarithmic", "linear" or "exponential". THE FARTHER NEIGHBOURS ARE WEIGHT LESS THAN THE NEAREST ONES: INDEED, LOGARITHMICALLY, LINEARLY OR EXPONENTIALLY. THE LOGARITHM BASE IS $relaxlimit OR $nearrelaxlimit, DEPENDING FROM THE CONTEXT. THE LINEAR MULTIPLICATOR OR THE EXPONENT IS DEFINED BY $overwerightnearest.
-$relaxlimit = 1; #THIS IS THE CEILING FOR THE RELAXATION OF THE RELATIONS OF PURE LINEAR INTERPOLATION. For greatest precision: 0, or a negative number near 0. IF > = 0, THE PROGRAM INTERPOLATES ALSO NEAREST NEIGHBOURS. THE HIGHER THE NUMBER, THE FARTHER THE NEIGHBOURS.
-$overweightnearest = 1; #A NUMBER. IT IS MADE NULL BY THE $logarithmicrelax "yes". THE HIGHER THE NUMBER, THE GREATER THE OVERWEIGHT GIVEN TO THE NEAREST. IN THIS MANNER, THE OVERWEIGHT IS NOT LOGARITHMIC, LIKE IT WHERE OTHERWISE, BUT LINEAR. THIS SLOWS DOWN THE COMPUTATIONS. UNLESS THE OVERWEIGHT IS 1, WHICH MAKES THE OVERWEIGHTING NULL.
-$nearrelaxlimit = 0; #THIS IS THE CEILING FOR THE RELAXATION OF THE RELATIONS OF THE NEAREST NEIGHBOUR STRATEGY. For greatest precision: 0, or a negative number near 0. IF > = 0, THE PROGRAM INCREASES THE DISTANCE OF THE NEAREST NEIGHBOURS INCLUDED. THE HIGHER THE NUMBER, THE FARTHER THE NEIGHBOURS. ONE IS NOT LIKELY TO WANT TO USE THIS OPTION.
-$nearconcurrencies = 1; #Requested minimum number of concurrencies for the nearest neighbour method. Minimum value: 1. The more the requested concurrencies, the greatest the precision, the slowest the convergence.
-$parconcurrencies = 1; #Requested minimum number of concurrencies for the linear interpolations for each parameter of each instance. Minimum value: 1. The more the requested concurrencies, the greatest the precision, the slowest the convergence.
-$instconcurrencies = 1; #Requested minimum number of concurrencies for the linear interpolations for each instance. Minimum value: 1. The more the requested concurrencies, the greatest the precision, the slowest the convergence.
-# my %factlevels = ( pairs => { 1=>3, 2=>3, 3=>3, 4=>3, 5=>3 } ); #The keys are the factor numbers and the values are the number of levels in the data series. OBSOLETE.
-$minreq_forgrad = [1, 1, 1 ]; #THIS VALUES SPECIFY THE NUMBER OF PARAMETER DIFFERENCES (INTEGER NUMBERS) TELLING HOW WELL-ROOTED IN SIMULATED REALITY (I.E, NEAR FROM IT) A POINT MUST BE TO SELECT IT FOR CALCULATING THE GRADIENTS FOR THE METAMODEL. THEY ARE INTEGERS STARTING FROM 1 OR GREATER.
-# THE FIRST VALUE IS RELATIVE TO THE FACTORS AND TELLS HOW RELAXED A SEARCH IS.
-# THE SECOND VALUE IS RELATIVE TO THE LEVELS. ONE MAY WANT TO KEEP IT TO 1: THE GRADIENTS ARE CALCULATED USING ONLY ADJACENT INSTANCES.
-# ONE MAY WANT TO KEEP IT TO 1: THE GRADIENTS ARE CALCULATED USING ONLY ADJACENT INSTANCES.
-# THE THIRD VALUE HOW DIFFERENT (FAR, IN TERMS OF PARAMETER DIFFERENCES) MAY AN INSTANCE BE TO BE CALCULATED THROUGH THE GRADIENT IN QUESTION.
-# ONE MAY WANT TO SET TO THE NUMBER OF PARAMETERS.
-# A LARGE NUMBER, WEAK ENTRY BARRIER. NEVER LESS THAN 1.
-$minreq_forinclusion = 0; # THIS VALUE SPECIFIES A STRENGTH VALUE (LEVEL OF RELIABILITY) TELLING HOW WELL-ROOTED IN SIMULATED REALITY A DERIVED POINT (META-POINT) MUST BE FOR INCLUDING IT IN THE SET OF POINTS USED FOR THE METAMODEL.If 0, no entry barrier.
-$minreq_forcalc = 0; # THIS VALUE SPECIFIES A STRENGTH VALUE (LEVEL OF RELIABILITY) TELLING HOW WELL-ROOTED IN SIMULATED REALITY A DERIVED POINT MUST BE FOR INCLUDING IT IN THE CALCULATIONS FOR CREATING NEW META-POINTS.  A VALUE BETWEEN 1 (JUST SIMULATED POINT) AND 0. If 0, no entry barrier.
-$minreq_formerge = 0; # THIS VALUE SPECIFIES A STRENGTH VALUE (LEVEL OF RELIABILITY) TELLING HOW WELL-ROOTED IN SIMULATED REALITY A DERIVED POINT MUST BE FOR MERGING IT IN THE CALCULATIONS FOR MERGING IT IN THE METAMODEL. A VALUE BETWEEN 1 (JUST SIMULATED POINT) AND 0 (SIMULATED POINTS AND "META"POINTS WITH THE SAME RIGHT ) MUST BE SPECIFIED. If 0, no entry barrier.
-$minimumcertain = 0; # WHAT IS THE MINIMUM LEVEL OF STRENGTH (LEVEL OF RELIABILITY) REQUIRED TO USE A DATUM TO BUILD UPON IT. IT DEPENDS ON THE DISTANCE FROM THE ORIGINS OF THE DATUM. THE LONGER THE DISTANCE, THE SMALLER THE STRENGTH (WHICH IS INDEED INVERSELY PROPORTIONAL). A STENGTH VALUE OF 1 IS OF A SIMULATED DATUM, NOT OF A DERIVED DATUM. If 0, no entry barrier.
-$minimumhold = 1; # WHAT IS THE MINIMUM LEVEL OF STRENGTH (LEVEL OF RELIABILITY) REQUIRED FOR NOT AVERAGING A DATUM WITH ANOTHER, DERIVED DATUM. USUALLY IT HAS TO BE KEPT EQUAL TO $minimimcertain.  If 1, ONLY THE MODEL DATA ARE NOT SUBSTITUTABLE IN THE METAMODEL.
-$condweight = "yes"; # THIS CONDITIONS TELLS IF THE STRENGTH (LEVEL OF RELIABILITY) OF THE GRADIENTS HAS TO BE CUMULATIVELY TAKEN INTO ACCOUNT IN THE WEIGHTING CALCULATIONS.
-$nfilter = "10000"; # do not take into account the gradients which in the ranking of strengths are below a certain position. If unspecified: inactive.
-$limit_checkdistgrades = ""; # LIMIT OF RELATIONS TAKEN INTO ACCOUNT IN CALCULATING THE NET OF GRADIENTS. IF NULL, NO BARRIER. 10000 IS A GOOD COMPROMISE BETWEEN SPEED AND RELIABILITY.
-$limit_checkdistpoints = ""; # LIMIT OF RELATIONS TAKEN INTO ACCOUNT IN CALCULATING THE NET OF POINTS. IF NULL, NO BARRIER. 10000 IS A GOOD COMPROMISE BETWEEN SPEED AND RELIABILITY.
-$fulldo = "no"; # TO SEARCH FOR MAXIMUM PRECISION AT THE EXPENSES OF SPEED. "yes" MAKES THE GRADIENTS BE RECALCULATED AT EACH COMPUTATION CYCLE.
-$lvconversion = "";
-
-
-
-
+  ########## AN EXAMPLE OF SETTINGS TO BE PUT IN A CONFIGURATION FILE FOLLOWS.
+  $maxloops= 1000;
+  $sourcefile = "./sourcefile.csv";
+  $newfile = $sourcefile . "_meta.csv";
+  $report = $newfile . "_report.txt";
+  @mode = ( "wei" ); # #"wei" is weighted gradient linear interpolation of the nearest neighbours.
+  #my @mode = ( "near" ); # "nea" means "nearest neighbour"
+  #@mode = ( ""mix" ); # "mix" means sequentially mixed in each loop.
+  #my @mode = ( "wei", "near", "near", "purelin" ); # a sequence
+  @weights = (  ); #my @weights = ( 0.7, 0.3 ); # THE FIRST IS THE WEIGHT FOR linear interpolation, THE SECOND FOR nearest neighbour.
+  # THEY ARE FRACTIONS OF 1 AND MUST GIVE 1 IN TOTAL. IF THE VALUES ARE UNSPECIFIED (IE. IF THE ARRAY IS EMPTY), THE VALUES ARE UNWEIGHTED.
+  $linearprecedence = "no"; # PRECEDENCE TO LINEAR INTERPOLATES. IF "yes", THE VALUES DERIVED FROM LINEAR INTERPOLATION, WHERE PRESENT, WILL SUPERSEDE THE VALUES DERIVED FROM THE NEAREST NEIGHBUR STRATEGY. IF "no", THE OPPOSITE. IT CAN BE ACTIVE ONLY IF LOGARITHMIC IS OFF. IT WORKS WITH "LINEAR" AND "EXPONENTIAL"
+  $relaxmethod = "logarithmic"; #It is relative to the "linnear" method. Options: "logarithmic", "linear" or "exponential". THE FARTHER NEIGHBOURS ARE WEIGHT LESS THAN THE NEAREST ONES: INDEED, LOGARITHMICALLY, LINEARLY OR EXPONENTIALLY. THE LOGARITHM BASE IS $relaxlimit OR $nearrelaxlimit, DEPENDING FROM THE CONTEXT. THE LINEAR MULTIPLICATOR OR THE EXPONENT IS DEFINED BY $overwerightnearest.
+  $relaxlimit = 1; #THIS IS THE CEILING FOR THE RELAXATION OF THE RELATIONS OF PURE LINEAR INTERPOLATION. For greatest precision: 0, or a negative number near 0. IF > = 0, THE PROGRAM INTERPOLATES ALSO NEAREST NEIGHBOURS. THE HIGHER THE NUMBER, THE FARTHER THE NEIGHBOURS.
+  $overweightnearest = 1; #A NUMBER. IT IS MADE NULL BY THE $logarithmicrelax "yes". THE HIGHER THE NUMBER, THE GREATER THE OVERWEIGHT GIVEN TO THE NEAREST. IN THIS MANNER, THE OVERWEIGHT IS NOT LOGARITHMIC, LIKE IT WHERE OTHERWISE, BUT LINEAR. THIS SLOWS DOWN THE COMPUTATIONS. UNLESS THE OVERWEIGHT IS 1, WHICH MAKES THE OVERWEIGHTING NULL.
+  $nearrelaxlimit = 0; #THIS IS THE CEILING FOR THE RELAXATION OF THE RELATIONS OF THE NEAREST NEIGHBOUR STRATEGY. For greatest precision: 0, or a negative number near 0. IF > = 0, THE PROGRAM INCREASES THE DISTANCE OF THE NEAREST NEIGHBOURS INCLUDED. THE HIGHER THE NUMBER, THE FARTHER THE NEIGHBOURS. ONE IS NOT LIKELY TO WANT TO USE THIS OPTION.
+  $nearconcurrencies = 1; #Requested minimum number of concurrencies for the nearest neighbour method. Minimum value: 1. The more the requested concurrencies, the greatest the precision, the slowest the convergence.
+  $parconcurrencies = 1; #Requested minimum number of concurrencies for the linear interpolations for each parameter of each instance. Minimum value: 1. The more the requested concurrencies, the greatest the precision, the slowest the convergence.
+  $instconcurrencies = 1; #Requested minimum number of concurrencies for the linear interpolations for each instance. Minimum value: 1. The more the requested concurrencies, the greatest the precision, the slowest the convergence.
+  # my %factlevels = ( pairs => { 1=>3, 2=>3, 3=>3, 4=>3, 5=>3 } ); #The keys are the factor numbers and the values are the number of levels in the data series. OBSOLETE.
+  $minreq_forgrad = [1, 1, 1 ]; #THIS VALUES SPECIFY THE NUMBER OF PARAMETER DIFFERENCES (INTEGER NUMBERS) TELLING HOW WELL-ROOTED IN SIMULATED REALITY (I.E, NEAR FROM IT) A POINT MUST BE TO SELECT IT FOR CALCULATING THE GRADIENTS FOR THE METAMODEL. THEY ARE INTEGERS STARTING FROM 1 OR GREATER.
+  # THE FIRST VALUE IS RELATIVE TO THE FACTORS AND TELLS HOW RELAXED A SEARCH IS.
+  # THE SECOND VALUE IS RELATIVE TO THE LEVELS. ONE MAY WANT TO KEEP IT TO 1: THE GRADIENTS ARE CALCULATED USING ONLY ADJACENT INSTANCES.
+  # ONE MAY WANT TO KEEP IT TO 1: THE GRADIENTS ARE CALCULATED USING ONLY ADJACENT INSTANCES.
+  # THE THIRD VALUE HOW DIFFERENT (FAR, IN TERMS OF PARAMETER DIFFERENCES) MAY AN INSTANCE BE TO BE CALCULATED THROUGH THE GRADIENT IN QUESTION.
+  # ONE MAY WANT TO SET TO THE NUMBER OF PARAMETERS.
+  # A LARGE NUMBER, WEAK ENTRY BARRIER. NEVER LESS THAN 1.
+  $minreq_forinclusion = 0; # THIS VALUE SPECIFIES A STRENGTH VALUE (LEVEL OF RELIABILITY) TELLING HOW WELL-ROOTED IN SIMULATED REALITY A DERIVED POINT (META-POINT) MUST BE FOR INCLUDING IT IN THE SET OF POINTS USED FOR THE METAMODEL.If 0, no entry barrier.
+  $minreq_forcalc = 0; # THIS VALUE SPECIFIES A STRENGTH VALUE (LEVEL OF RELIABILITY) TELLING HOW WELL-ROOTED IN SIMULATED REALITY A DERIVED POINT MUST BE FOR INCLUDING IT IN THE CALCULATIONS FOR CREATING NEW META-POINTS.  A VALUE BETWEEN 1 (JUST SIMULATED POINT) AND 0. If 0, no entry barrier.
+  $minreq_formerge = 0; # THIS VALUE SPECIFIES A STRENGTH VALUE (LEVEL OF RELIABILITY) TELLING HOW WELL-ROOTED IN SIMULATED REALITY A DERIVED POINT MUST BE FOR MERGING IT IN THE CALCULATIONS FOR MERGING IT IN THE METAMODEL. A VALUE BETWEEN 1 (JUST SIMULATED POINT) AND 0 (SIMULATED POINTS AND "META"POINTS WITH THE SAME RIGHT ) MUST BE SPECIFIED. If 0, no entry barrier.
+  $minimumcertain = 0; # WHAT IS THE MINIMUM LEVEL OF STRENGTH (LEVEL OF RELIABILITY) REQUIRED TO USE A DATUM TO BUILD UPON IT. IT DEPENDS ON THE DISTANCE FROM THE ORIGINS OF THE DATUM. THE LONGER THE DISTANCE, THE SMALLER THE STRENGTH (WHICH IS INDEED INVERSELY PROPORTIONAL). A STENGTH VALUE OF 1 IS OF A SIMULATED DATUM, NOT OF A DERIVED DATUM. If 0, no entry barrier.
+  $minimumhold = 1; # WHAT IS THE MINIMUM LEVEL OF STRENGTH (LEVEL OF RELIABILITY) REQUIRED FOR NOT AVERAGING A DATUM WITH ANOTHER, DERIVED DATUM. USUALLY IT HAS TO BE KEPT EQUAL TO $minimimcertain.  If 1, ONLY THE MODEL DATA ARE NOT SUBSTITUTABLE IN THE METAMODEL.
+  $condweight = "yes"; # THIS CONDITIONS TELLS IF THE STRENGTH (LEVEL OF RELIABILITY) OF THE GRADIENTS HAS TO BE CUMULATIVELY TAKEN INTO ACCOUNT IN THE WEIGHTING CALCULATIONS.
+  $nfiltergrads = "125"; # DO NOT USE. do not take into account the gradients which in the ranking of strengths are below a certain position. If unspecified: inactive.
+  $limit_checkdistgrads = ""; # DO NOT USE. LIMIT OF RELATIONS TAKEN INTO ACCOUNT IN CALCULATING THE NET OF GRADIENTS. IF NULL, NO BARRIER. 10000 IS A GOOD COMPROMISE BETWEEN SPEED AND RELIABILITY.
+  $limit_checkdistpoints = ""; # DO NOT USE. LIMIT OF RELATIONS TAKEN INTO ACCOUNT IN CALCULATING THE NET OF POINTS. IF NULL, NO BARRIER. 10000 IS A GOOD COMPROMISE BETWEEN SPEED AND RELIABILITY.
+  $fulldo = "no"; # TO SEARCH FOR MAXIMUM PRECISION AT THE EXPENSES OF SPEED. "yes" MAKES THE GRADIENTS BE RECALCULATED AT EACH COMPUTATION CYCLE.
+  $lvconversion = "";
+  $limitgrads = "";
+  ############# END OF THE EXAMPLE SETTINGS TO BE PUT IN A CONFIGURATION FILE.
 
   print "CONFIG FILE: " . $confile;
   if ( -e $confile )
   {
-
     #eval $confile; ############## TRULY FIX THIS!!!!!
+    #require $confile; ############## TRULY FIX THIS!!!!!
     #if ( $newfile eq "" ) { die };
   }
   else
@@ -2000,32 +1798,30 @@ $lvconversion = "";
 
   $tee = new IO::Tee(\*STDOUT, ">>$report"); # GLOBAL ZZZ
 
-  #say $tee "ENTERED.";
+  if ( $sourcef ne "" ){ $sourcefile = $sourcef; }
 
-  if ( $sourcef ne "" ){ $sourcefile = $sourcef; } #say $tee "CHECK5 \$sourcefile: " . dump( $sourcefile );
-
-  if ( $metafile ne "" ){ $newfile = $metafile; } #say $tee "CHECK5 \$newfile: " . dump( $newfile );
+  if ( $metafile ne "" ){ $newfile = $metafile; }
 
   my @blockelts;
-  if ( $blockelts_r ne "" ){ @blockelts = @{ $blockelts_r }; } #say $tee "CHECK5 \@blockelts: " . dump( @blockelts );
+  if ( $blockelts_r ne "" ){ @blockelts = @{ $blockelts_r }; }
 
   my @mode = adjustmode( $maxloops, \@mode );
   say $tee "Opening $sourcefile";
   open( SOURCEFILE, "$sourcefile" ) or die;
-  my @lines = <SOURCEFILE>; #say $tee "REALLY \@lines: " . dump( @lines );
+  my @lines = <SOURCEFILE>;
   close SOURCEFILE;
   #print "THIS $tee";
   say $tee "Preparing the dataseries, IN INTERLINEAR: \$countblock $countblock";
-  say "nfilter: $nfilter";
+  say "nfiltergrads: $nfiltergrads";
   my $checkstop;
 
   my $aarr_ref;
   ( $aarr_ref, $optformat ) = preparearr( @lines );
 
-  my @aarr = @{ $aarr_ref }; #say $tee "REALLY \@aarr: " . dump( @aarr );
+  my @aarr = @{ $aarr_ref };
 
   say $tee "Checking factors and levels.";
-  my %factlevels = %{ prepfactlev( \@aarr ) }; #say $tee "IN INTERLINEAR REALLY \%factlevels: " . dump( \%factlevels );
+  my %factlevels = %{ prepfactlev( \@aarr ) };
   say $tee "Done.";
 
 
@@ -2040,22 +1836,18 @@ $lvconversion = "";
     foreach my $weldsourcefile ( @weldsprepared )
     {
       open( WELDSOURCEFILE, "$weldsourcefile" ) or die;
-      my @weldlines = <WELDSOURCEFILE>; #say $tee "REALLY \@lines: " . dump( @lines );
+      my @weldlines = <WELDSOURCEFILE>;
       close WELDSOURCEFILE;
 
       my ( $weldaarr_ref, $optformat ) = preparearr( @weldlines );
 
-      my @weldaarr = @{ $weldaarr_ref }; #say $tee "REALLY \@weldaarr: " . dump( @weldaarr );
+      my @weldaarr = @{ $weldaarr_ref };
       push ( @weldaarrs, [ @weldaarr ] );
     }
   }
 
   my ( $maxdist, $first0, $last0 ) = calcmaxdist( \@aarr, \%factlev );
 ###--###
-
-  #say $tee "\$first0: " . dump( $first0 );
-  #say $tee "\$last0: " . dump( $last0 );
-  #say $tee "DONE CALCMAXDIST: " . dump( $maxdist );
 
   my $count = 0;
   while ( $count < $maxloops )
@@ -2070,18 +1862,9 @@ $lvconversion = "";
       @arr = @arr2;
     }
 
-    #say $tee "COUNT: " . dump( $count + 1 );
     my $mode__ = $mode[$count] ;
 
     my ( @limbo_wei, @limbo_purelin, @limbo_near, @limbo, %wand );
-
-
-    #if ( ( $mode__ eq "vault" ) or ( $mode__ eq "mix" ) )
-    #{
-    #  @limbo_vault = vault( \@arr, $relaxlimit, $relaxmethod, $overweightnearest, $parconcurrencies, $instconcurrencies, $count, \%factlev );
-    #}
-    #say $tee "OBTAINED limbo_vault: " . dump( @limbo_vault );
-    #say $tee "THERE ARE " . scalar( @limbo_vault ) . " ITEMS IN THIS LOOP , NUMBER " . ( $count + 1 ). ", 1, FOR GLOBALLY WEIGHTED GRADIENT INTERPOLATION.";
 
     sub checkstop
     {
@@ -2121,15 +1904,15 @@ $lvconversion = "";
 
     if ( ( $mode__ eq "wei" ) or ( $mode__ eq "mix" ) )
     {
-      my ( $limbo_wei_ref, $bank_ref, $nears_ref ) = wei( \@arr, $relaxmethod, $overweightnearest, $parconcurrencies, $instconcurrencies, $count, \%factlev, $minreq_forgrad, $minreq_forinclusion, $minreq_forcalc, $minreq_formerge, $maxdist, $nfilter, $limit_checkdistgrades, $limit_checkdistpoints, \%bank, $fulldo, $first0, $last0, \%nears, $checkstop, \@weldsprepared, \@weldaarrs, \@parswelds, \@recedes );
+      my ( $limbo_wei_ref, $bank_ref, $nears_ref ) = wei( \@arr, $relaxmethod, $overweightnearest, $parconcurrencies, $instconcurrencies, $count, \%factlev, $minreq_forgrad, $minreq_forinclusion, $minreq_forcalc, $minreq_formerge, $maxdist, $nfiltergrads, $limit_checkdistgrads, $limit_checkdistpoints, \%bank, $fulldo, $first0, $last0, \%nears, $checkstop, \@weldsprepared, \@weldaarrs, \@parswelds, \@recedes, $nfilterpoints, $limitgrads, $limitpoints );
 
       @limbo_wei = @{ $limbo_wei_ref };
       %bank = %{ $bank_ref };
-      %nears = %{ $nears_ref }; say $tee "OBTAINED \%nears: " . dump( \%nears );
+      %nears = %{ $nears_ref };
 
       say $tee "THERE ARE " . scalar( @limbo_wei ) . " ITEMS IN THIS LOOP , NUMBER " . ( $count + 1 ). ", 1, FOR WEIGHTED GRADIENT INTERPOLATION OF THE NEAREST NEIGHBOUR.";
     }
-    say $tee "OBTAINED LIMBO_WEI: " . dump( @limbo_wei );
+    #say $tee "OBTAINED LIMBO_WEI: " . dump( @limbo_wei );
 
     if ( ( $mode__ eq "purelin" ) or ( $mode__ eq "mix" ) )
     {
@@ -2181,34 +1964,26 @@ $lvconversion = "";
       last;
     }
 
-    #say $tee "ARR BEFORE: " . dump( @arr );
     foreach my $el ( @limbo )
-    { #say $tee "EL AGAIN: " . dump( $el );
+    {
       foreach $elt ( @arr )
-      { #say $tee "44a\$el->[0]: " . dump( $el->[0] ); say $tee "44a\$elt->[0]: " . dump( $elt->[0] );
+      {
         if ( $el->[0] eq $elt->[0] )
-        { #say $tee "INQUIRING ";
+        {
           if ( $elt ->[2] eq "" )
-          {   #say $tee "WITHIN ";
+          {
               push ( @{ $elt }, $el->[2], $el->[3] );
           }
           else
           {
-            #say $tee "ENTERED0 ";
-            #if ( $elt->[3] <= $minimumhold )
-            { #say $tee "ENTERED1 ";
+            {
               my ( $soughtval, $totstrength ) = weightvals_merge( [ $elt->[2], $el->[2] ], [ $elt->[3], $el->[3] ], $minreq_formerge, $maxdist  );
-              #say $tee "OBTAINED1 \$soughtval: " . dump( $soughtval ) . "FOR " . dump( $elt->[0] ) ;
-              #say $tee "OBTAINED1 \$totstrength: " . dump( $totstrength ) . "FOR " . dump( $elt->[0] ) ;
               if ( ( $soughtval ne "" ) and ( $totstrength ne "" ) )
-              { #say $tee "OBTAINED2 \$elt: " . dump( $elt ) . "1 ";
-                pop @{ $elt }; #say $tee "OBTAINED2 \$elt: " . dump( $elt ) . "2 ";
-                pop @{ $elt }; #say $tee "OBTAINED2 \$elt: " . dump( $elt ) . "3 ";
-                #say $tee "OBTAINED2 \$soughtval: " . dump( $soughtval ) . "FOR " . dump( $elt->[0] ) ;
-                #say $tee "OBTAINED2 \$totstrength: " . dump( $totstrength ) . "FOR " . dump( $elt->[0] ) ;
-                push ( @{ $elt }, $soughtval, $totstrength ); #say $tee "OBTAINED \$elt: " . dump( $elt ) . "LAST ";
+              {
+                pop @{ $elt };
+                pop @{ $elt };
+                push ( @{ $elt }, $soughtval, $totstrength );
               }
-              #else { say $tee "CHECK! WRONG!"; }
             }
           }
         }
@@ -2216,7 +1991,6 @@ $lvconversion = "";
     }
     @arr2 = @arr ;
     say $tee "INSERTING THE ARRAY UPDATES " . ( $count + 1 ) . " for $sourcefile";
-    #say $tee "ARR AFTER: " . dump( @arr );
     $count++;
   }
   return( @arr );
@@ -2373,7 +2147,7 @@ The program converts this format into the one preferred by Sim::OPTS, which is t
 After some computations, Interlinear will output a new dataseries with the missing values filled in.
 This dataseries can be used by OPT for the optimization of one or more blocks. This can be useful, for example, to save computations in searches involving simulations, especially when the time required by each simulations is long, like it may happen with CFD simulations in building design.
 
-The number of computations required for the creation of a metamodel in OPT increases exponentially with the number of instances in the metamodel. To make the increase linear, a limit has to be set for the size of the net of instances taken into account in the computations for gradients and for points. The variables in the configuration files controlling those limits are "$limit_checkgrades" and "$limit_checkpoints". By default they are both set to 10000. If a null value ("") is specified for them, no limit is assumed.
+The number of computations required for the creation of a metamodel in OPT increases exponentially with the number of instances in the metamodel. To reduce the exponential, a limit has to be set for the size of the net of instances taken into account in the computations for gradients and for points. The variables in the configuration files controlling those limits is "$nfiltergrads", a limit with adaptive effects. By default it is unspecified. If if is are unspecified (i.e. a null value ("") is specified for them), no limit is assumed. "$nfiltergrads" may be set to the double of the square root of the number of instances of a problem space. An example of configuration file is embedded in the source code to produce the defaults.
 
 To call Interlinear as a Perl function (best strategy):
 re.pl # open Perl shell

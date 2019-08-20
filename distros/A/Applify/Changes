@@ -1,5 +1,10 @@
 Revision history for perl distribution Applify
 
+0.17 2019-08-19T15:53:49+0200
+ - Fix options with isa and no default #17
+   Contributor: Roy Storey
+ - Fix localization of $@, to print correct error message to user #18
+
 0.16 2019-08-10T14:39:05+0200
  - Fix "default" should be overridden when user specifies command line argument
    (This might be a BREAKING change for some)

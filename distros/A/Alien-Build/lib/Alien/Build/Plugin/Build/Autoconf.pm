@@ -8,7 +8,7 @@ use Path::Tiny ();
 use File::Temp ();
 
 # ABSTRACT: Autoconf plugin for Alien::Build
-our $VERSION = '1.79'; # VERSION
+our $VERSION = '1.83'; # VERSION
 
 
 has with_pic       => 1;
@@ -30,14 +30,14 @@ has config_site    => sub {
 sub init
 {
   my($self, $meta) = @_;
-  
+
   $meta->apply_plugin('Build::MSYS',
     (defined $self->msys_version ? (msys_version => $self->msys_version) : ()),
   );
-  
+
   $meta->prop->{destdir} = 1;
   $meta->prop->{autoconf} = 1;
-  
+
   my $intr = $meta->interpolator;
 
   my $set_autoconf_prefix = sub {
@@ -90,7 +90,7 @@ sub init
       $intr->replace_helper(
         configure => sub {
           my $configure;
-          
+
           if($build->meta_prop->{out_of_source})
           {
             my $extract = $build->install_prop->{extract};
@@ -113,7 +113,7 @@ sub init
         my $real_prefix = Path::Tiny->new($build->install_prop->{prefix});
         my @pkgconf_dirs;
         push @pkgconf_dirs, Path::Tiny->new($ENV{DESTDIR})->child($prefix)->child("$_/pkgconfig") for qw(lib share);
-      
+
         # for any pkg-config style .pc files that are dropped, we need
         # to convert the MSYS /C/Foo style paths to C:/Foo
         for my $pkgconf_dir (@pkgconf_dirs) {
@@ -126,7 +126,7 @@ sub init
             }
         }
       }
-      
+
       $ret;
     },
   );
@@ -139,7 +139,7 @@ sub init
       $configure;
     },
   );
-  
+
   $meta->default_hook(
     build => [
       '%{configure} --disable-shared',
@@ -147,7 +147,7 @@ sub init
       '%{make} install',
     ]
   );
-  
+
   $self;
 }
 
@@ -165,7 +165,7 @@ Alien::Build::Plugin::Build::Autoconf - Autoconf plugin for Alien::Build
 
 =head1 VERSION
 
-version 1.79
+version 1.83
 
 =head1 SYNOPSIS
 

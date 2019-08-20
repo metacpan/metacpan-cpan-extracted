@@ -28,7 +28,7 @@ Pherkin::Extension::Weasel - Pherkin extension for web-testing
               driver:
                 drv_name: Weasel::Driver::Selenium2
                 wait_timeout: 3000
-                window_size   1024x1280
+                window_size:  1024x1280
                 caps:
                    port: 4420
 ```

@@ -11,7 +11,7 @@ object Prima::Drawable ( Prima::Component)
 	property     Color         backColor;
 	property     Color         color;
 	property     Rect          clipRect;
-	property     Bool          fillWinding;
+	property     int           fillMode;
 	property     SV *          fillPattern;
 	property     Point         fillPatternOffset;
 	property     int           height;
@@ -19,6 +19,7 @@ object Prima::Drawable ( Prima::Component)
 	property     int           lineJoin;
 	property     SV *          linePattern;
 	property     int           lineWidth;
+	property     double        miterLimit;
 	property     SV *          palette;
 	property     SV *          pixel( int x, int y);
 	property     Handle        region;
@@ -57,6 +58,7 @@ object Prima::Drawable ( Prima::Component)
 	method SV *  get_physical_palette();
 	method int   get_text_width( SV * text, Bool addOverhang = 0);
 	method SV *  get_text_box( SV * text);
+	method SV *  render_glyph( int index, HV * profile);
 	static SV *  render_spline( SV * obj, SV * points, HV * profile);
 
 	# operators

@@ -1,0 +1,112 @@
+#!perl
+
+our $DATE = '2019-08-20'; # DATE
+our $VERSION = '0.001'; # VERSION
+
+use strict;
+use warnings;
+
+package
+    MyApp;
+use Moo;
+with 'Term::App::Role::Attrs';
+use Data::Dump;
+
+sub run {
+    my $self = shift;
+
+    dd {
+        use_utf8      => $self->use_utf8,
+        use_box_chars => $self->use_box_chars,
+        interactive   => $self->interactive,
+        use_color     => $self->use_color,
+        color_depth   => $self->color_depth,
+        term_width    => $self->term_width,
+        term_height   => $self->term_height,
+        _term_attrs_debug_info => $self->_term_attrs_debug_info,
+    };
+}
+
+package
+    main;
+MyApp->new->run;
+
+# ABSTRACT: Show terminal attributes (from Term::App::Role::Attrs)
+# PODNAME: term-attrs
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+term-attrs - Show terminal attributes (from Term::App::Role::Attrs)
+
+=head1 VERSION
+
+This document describes version 0.001 of MyApp (from Perl distribution App-TermAttrUtils), released on 2019-08-20.
+
+=head1 SYNOPSIS
+
+ % term-attrs
+
+Sample result:
+
+ {
+   _term_attrs_debug_info => {
+                               color_depth_from   => "detect_terminal",
+                               interactive_from   => "-t STDOUT",
+                               term_height_from   => "term_size",
+                               term_width_from    => "term_size",
+                               use_box_chars_from => "detect_terminal",
+                               use_color_from     => "interactive + color_deth",
+                               use_utf8_from      => "detect_terminal + LANG/LANGUAGE env must include \"utf8\"",
+                             },
+   color_depth            => 16777216,
+   interactive            => 1,
+   term_height            => 45,
+   term_width             => 192,
+   use_box_chars          => 1,
+   use_color              => 1,
+   use_utf8               => 1,
+ }
+
+=head1 DESCRIPTION
+
+This is a simple CLI for L<Term::App::Role::Attrs>. It shows what values are
+provided for applications that use that role.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-TermAttrUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-TermAttrUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-TermAttrUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<Term::App::Role::Attrs>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

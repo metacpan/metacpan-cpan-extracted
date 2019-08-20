@@ -50,6 +50,6 @@
          "web" : "https://github.com/DeBos99/Math-RPN-Simple"
       }
    },
-   "version" : "v1.1.2",
+   "version" : "v1.1.3",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

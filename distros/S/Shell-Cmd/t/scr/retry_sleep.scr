@@ -1,0 +1,3 @@
+rm -f TESTDIR/fail_twice.*.flag
+TESTDIR/bin/fail_twice TESTDIR                  #OPTS retry 5 sleep 1 dire TESTDIR/bin
+TESTDIR/bin/succ 1 warn

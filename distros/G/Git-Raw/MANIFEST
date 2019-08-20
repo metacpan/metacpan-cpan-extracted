@@ -9,6 +9,7 @@ Makefile.PL
 README
 Raw.xs
 TODO
+azure-pipelines.yml
 constants-error-category.h
 constants-error-code.h
 constants-object.h
@@ -865,6 +866,7 @@ lib/Git/Raw/Repository.pm
 lib/Git/Raw/Signature.pm
 lib/Git/Raw/Stash.pm
 lib/Git/Raw/Stash/Progress.pm
+lib/Git/Raw/Submodule.pm
 lib/Git/Raw/Tag.pm
 lib/Git/Raw/TransferProgress.pm
 lib/Git/Raw/Tree.pm
@@ -909,6 +911,7 @@ t/31-annotated_commit.t
 t/32-rebase_operation.t
 t/33-worktree.t
 t/34-rebase.t
+t/35-submodule.t
 t/98-internal.t
 t/99-cleanup.t
 t/author-pod-coverage.t
@@ -967,6 +970,7 @@ xs/Repository.xs
 xs/Signature.xs
 xs/Stash.xs
 xs/Stash/Progress.xs
+xs/Submodule.xs
 xs/Tag.xs
 xs/Test.xs
 xs/TransferProgress.xs

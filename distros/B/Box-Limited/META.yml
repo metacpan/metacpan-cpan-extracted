@@ -1,0 +1,31 @@
+---
+abstract: 'Box with a limited capacity.'
+author:
+  - 'Ilya Chesnokov L<chesnokov@cpan.org>.'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.19'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Box::Limited
+name: Box-Limited
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Moo: 0
+  Test::Differences: 0
+  Test::Fatal: 0
+  Test::Roo: 0
+  Type::Tiny: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ichesnokov/p5-box-limited
+version: '0.01'

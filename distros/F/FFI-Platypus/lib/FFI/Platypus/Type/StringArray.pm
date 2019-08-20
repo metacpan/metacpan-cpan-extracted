@@ -5,7 +5,7 @@ use warnings;
 use FFI::Platypus;
 
 # ABSTRACT: Platypus custom type for arrays of strings
-our $VERSION = '0.94'; # VERSION
+our $VERSION = '0.96'; # VERSION
 
 
 use constant _incantation =>
@@ -124,7 +124,7 @@ FFI::Platypus::Type::StringArray - Platypus custom type for arrays of strings
 
 =head1 VERSION
 
-version 0.94
+version 0.96
 
 =head1 SYNOPSIS
 
@@ -145,7 +145,7 @@ In your C code:
 In your L<Platypus::FFI> code:
 
  use FFI::Platypus;
-
+ 
  my $ffi = FFI::Platypus->new;
  $ffi->load_custom_type('::StringArray' => 'string_array');
  $ffi->load_custom_type('::StringArray' => 'string_5' => 5);
@@ -244,6 +244,8 @@ Ilya Pavlov (Ilya33)
 Petr Pisar (ppisar)
 
 Mohammad S Anwar (MANWAR)
+
+Håkon Hægland (hakonhagland, HAKONH)
 
 =head1 COPYRIGHT AND LICENSE
 

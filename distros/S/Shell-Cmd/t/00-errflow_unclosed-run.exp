@@ -1,0 +1,6 @@
+
+###STDERR
+# ERROR: Broken flow: 'if' opened, but not closed
+
+###EXIT
+0

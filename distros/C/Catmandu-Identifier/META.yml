@@ -12,7 +12,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,8 +29,8 @@ no_index:
 requires:
   Business::ISBN: '2.010'
   Business::ISSN: '0.91'
-  Catmandu: '0.94'
-  Data::UUID: '0'
+  Catmandu: '1.2002'
+  Data::UUID::MT: '1.001'
   Data::Validate::URI: '0'
   JSON: '0'
   LWP::Simple: '0'
@@ -42,11 +42,13 @@ resources:
   bugtracker: https://github.com/LibreCat/Catmandu-Identifier/issues
   homepage: https://github.com/LibreCat/Catmandu-Identifier
   repository: https://github.com/LibreCat/Catmandu-Identifier.git
-version: '0.10'
+version: '0.11'
 x_contributors:
   - 'brian d foy <brian.d.foy@gmail.com>'
   - 'Ere Maijala <ere.maijala@helsinki.fi>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Patrick Hochstenbach <patrick.hochstenbach@ugent.be>'
   - 'Vitali Peil <vitali.peil@uni-bielefeld.de>'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_static_install: 1

@@ -39,7 +39,7 @@ use vars qw(%Config %Config_inst);
 	ldlibflag             => '-l',
 	ldlibpathflag         => '-L',
 	ldpaths               => [],
-	ldlibs                => ['jpeg','gif','gomp','X11','Xext','freetype','fontconfig','Xrender','Xft','gtk-x11-2.0','gdk-x11-2.0','pangocairo-1.0','atk-1.0','cairo','gdk_pixbuf-2.0','gio-2.0','pangoft2-1.0','pango-1.0','gobject-2.0','glib-2.0','Xrandr','Xcomposite','Xcursor','png16','z','tiff','webp','webpdemux','webpmux','Xpm'],
+	ldlibs                => ['jpeg','gif','X11','Xext','freetype','fontconfig','Xrender','Xft','gtk-x11-2.0','gdk-x11-2.0','pangocairo-1.0','atk-1.0','cairo','gdk_pixbuf-2.0','gio-2.0','pangoft2-1.0','pango-1.0','gobject-2.0','glib-2.0','Xrandr','Xcomposite','Xcursor','png16','z','tiff','webp','webpdemux','webpmux','Xpm'],
 	ldlibext              => '',
 	inline                => 'inline',
 	dl_load_flags         => 1,

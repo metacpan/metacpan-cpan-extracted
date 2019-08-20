@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.074';
+our $VERSION = '0.075';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_dir choose_a_file choose_dirs choose_a_number choose_a_subset settings_menu
                      insert_sep term_size term_width unicode_sprintf );
@@ -583,7 +583,7 @@ sub settings_menu {
             if ( $ENV{TC_RESET_AUTO_UP} ) {
                 $count = 0;
             }
-            elsif ( $count == @$values * 3 ) {
+            elsif ( $count == @$values ) {
                 $default = 0;
                 $count = 0;
                 next;
@@ -669,7 +669,7 @@ Term::Choose::Util - CLI related functions.
 
 =head1 VERSION
 
-Version 0.074
+Version 0.075
 
 =cut
 

@@ -120,6 +120,11 @@ pod_spelling_system:
     - Anwar
     - MANWAR
     - api
+    - deallocating
+    - deinitialization
+    - HAKONH
+    - hakonhagland
+    - kon
 
 pod_coverage:
   skip: 0
@@ -137,6 +142,8 @@ pod_coverage:
     - FFI::Platypus::Closure#get_data
     - FFI::Platypus::Closure#add_data
     - FFI::Probe
+    - FFI::Platypus::Bundle
+    - FFI::Platypus::Constant
     - App::fbx#main
     - FFI::Build::File::Object#default_suffix
     - FFI::Build::File::Library#default_suffix
@@ -154,3 +161,4 @@ pod_coverage:
     - FFI::Build::File::Object#build_item
     - FFI::Build::MM
     - FFI::Platypus::Function#new
+    - FFI::Temp

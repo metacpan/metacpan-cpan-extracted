@@ -7,7 +7,7 @@ use Path::Tiny qw( path );
 use Config;
 
 # ABSTRACT: Private utility functions for Alien::Build
-our $VERSION = '1.79'; # VERSION
+our $VERSION = '1.83'; # VERSION
 
 
 our @EXPORT_OK = qw( _mirror _dump _destdir_prefix _perl_config _ssl_reqs _has_ssl );
@@ -72,12 +72,12 @@ sub _mirror
         # TODO: rmtree if a directory?
         if(-e "$dst")
         { unlink "$dst" }
-        Alien::Build->log("Alien::Build> cp $src $dst") if $opt->{verbose};
+        Alien::Build->log("cp $src $dst") if $opt->{verbose};
         File::Copy::cp("$src", "$dst") || die "copy error $src => $dst: $!";
         if($] < 5.012 && -x "$src" && $^O ne 'MSWin32')
         {
           # apparently Perl 5.8 and 5.10 do not preserver perms
-          my $mode = [stat "$src"]->[2] & 0777;
+          my $mode = [stat "$src"]->[2] & oct(777);
           eval { chmod $mode, "$dst" };
         }
       }
@@ -148,7 +148,7 @@ Alien::Build::Util - Private utility functions for Alien::Build
 
 =head1 VERSION
 
-version 1.79
+version 1.83
 
 =head1 DESCRIPTION
 

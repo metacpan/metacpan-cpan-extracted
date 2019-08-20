@@ -1,5 +1,5 @@
 #include <xs/time.h>
-#include <xs/date/util.h>
+#include <xs/date.h>
 
 using namespace xs;
 using namespace xs::date;

@@ -6,7 +6,7 @@ use Capture::Tiny qw( capture );
 use FFI::Probe::Runner::Result;
 
 # ABSTRACT: Probe runner for FFI
-our $VERSION = '0.94'; # VERSION
+our $VERSION = '0.96'; # VERSION
 
 
 sub new
@@ -84,12 +84,12 @@ FFI::Probe::Runner - Probe runner for FFI
 
 =head1 VERSION
 
-version 0.94
+version 0.96
 
 =head1 SYNOPSIS
 
  use FFI::Probe::Runner;
-
+ 
  my $runner = FFI::Probe::Runner->new;
  $runner->run('foo.so');
 
@@ -176,6 +176,8 @@ Ilya Pavlov (Ilya33)
 Petr Pisar (ppisar)
 
 Mohammad S Anwar (MANWAR)
+
+Håkon Hægland (hakonhagland, HAKONH)
 
 =head1 COPYRIGHT AND LICENSE
 

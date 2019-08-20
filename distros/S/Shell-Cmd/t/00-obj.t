@@ -1,37 +1,20 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
-my $test   = $0;
-$test      =~ s,.*/,,;
-
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter "$test";
+$::ti = new Test::Inter $0;
+require "script.pl";
 
 $ENV{'SHELL_CMD_TESTING'} = 1;
 
-use Shell::Cmd;
-use Cwd;
-my $vers;
-if ($ENV{'RELEASE_TESTING'}) {
-   my $dir  = getcwd;
-   $dir     =~ /Shell-Cmd-([0-9.]+)/;
-   $vers    = $1;
-} else {
-   # We'll only test the directory/version on my machine.
-   # In some instances elsewhere, the install directory in renamed
-   # unpredicatbly, so we won't do this test there.
-   $vers    = $Shell::Cmd::VERSION;
-}
-
-my $obj;
+our $obj;
 $obj  = new Shell::Cmd;
 
 sub test {
-  ($op,@args)=@_;
+  my($op,@args)=@_;
 
-  if ($op eq 'version') {
-     return $obj->version();
-
-  } elsif ($op eq 'dire') {
+  if ($op eq 'dire') {
      return $obj->dire(@args);
 
   } elsif ($op eq 'flush') {
@@ -58,9 +41,7 @@ sub test {
   }
 }
 
-$tests="
-
-version                => $vers
+my $tests="
 
 ### dire
 
@@ -95,6 +76,8 @@ env FOO 1 BAR 2        =>
 flush env              =>
 
 env                    =>
+
+flush out              =>
 
 ### opts
 
@@ -184,11 +167,13 @@ cmd 'echo 1' { dire /tmp } => ''
 
 cmd 'echo 1' { foo /tmp }  => 'Invalid cmd option: foo'
 
+cmd 'echo 1' 'echo 2'      => ''
+
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

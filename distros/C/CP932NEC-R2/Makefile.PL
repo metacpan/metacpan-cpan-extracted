@@ -3,7 +3,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     'NAME'      => q{CP932NEC::R2},
-    'VERSION'   => q{0.04},
+    'VERSION'   => q{0.05},
     'ABSTRACT'  => q{provides minimal CP932NEC I/O subroutines by short name},
     'PREREQ_PM' => {
         'ExtUtils::MakeMaker' => '5.4302',

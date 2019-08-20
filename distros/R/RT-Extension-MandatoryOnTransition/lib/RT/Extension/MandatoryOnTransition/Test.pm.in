@@ -39,6 +39,9 @@ Set( %MandatoryOnTransition,
         '* -> resolved' => ['TimeWorked', 'TimeTaken', 'CF.Test Field', 'CF.Test Field3', 'CF.Test Field4'],
         'CF.Test Field3' => { transition => '* -> resolved', must_be => ['normal', 'restored'] },
         'CF.Test Field4' => { transition => '* -> resolved', must_not_be => ['down', 'reduced'] } },
+    'Content' => {
+        '* -> resolved' => [ qw(Content) ]
+    },
 );
 CONFIG
 

@@ -38,7 +38,7 @@
          "requires" : {
             "Carp::Always" : "0",
             "Test::More" : "0",
-            "Weasel::Driver::Mock" : "0"
+            "Weasel::Driver::Mock" : "0.02"
          }
       }
    },
@@ -53,7 +53,11 @@
          "web" : "https://github.com/ehuelsmann/pherkin-extension-weasel"
       }
    },
-   "version" : "0.11",
+   "version" : "0.12",
+   "x_contributors" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "Yves Lavoie <ylavoie@yveslavoie.com>"
+   ],
    "x_serialization_backend" : "JSON::XS version 3.03"
 }
 

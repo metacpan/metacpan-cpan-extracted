@@ -24,22 +24,26 @@ $modules{$_} = $_ for qw(
   PkgConfig
   Test::More
   constant
+  forks
 );
 
 $post_diag = sub {
   eval {
-    use lib 'inc';
+    require lib;
+    lib->import('inc');
     require FFI::Platypus::ShareConfig;
+    require My::BuildConfig;
+    my $build_config = My::BuildConfig->new;
     my $share_config = 'FFI::Platypus::ShareConfig';
-    my $class = $share_config->get('alien')->{class};
+    my $class = $build_config->get('alien')->{class};
     my $pm = "$class.pm";
     $pm =~ s/::/\//g;
     require $pm;
     $Alien::FFI::pkgconfig::VERBOSE =
     $Alien::FFI::pkgconfig::VERBOSE = 0;
-    use FFI::Platypus;
-    use FFI::Platypus::Memory;
-    diag "mode : ", $share_config->get('alien')->{mode};
+    require FFI::Platypus;
+    require FFI::Platypus::Memory;
+    diag "mode : ", $build_config->get('alien')->{mode};
     diag "$class->VERSION      = ", $class->VERSION;
     diag "$class->install_type = ", $class->install_type;
     diag "$class->cflags       = ", $class->cflags;
@@ -48,7 +52,7 @@ $post_diag = sub {
     diag "my_configure             = ", $class->runtime_prop->{my_configure} if defined $class->runtime_prop->{my_configure};
     spacer();
     my %type_map = %{ $share_config->get('type_map') };
-    my $diag = $share_config->get('diag');
+    my $diag = $build_config->get('diag');
     foreach my $key (sort keys %{ $diag->{args} })
     {
       diag "mb.args.$key=", $diag->{args}->{$key};
@@ -61,8 +65,9 @@ $post_diag = sub {
     diag "ffi.platypus.memory.strndup_impl=@{[ FFI::Platypus::Memory->_strndup_impl ]}";
     spacer();
     my %r;
-    while(my($k,$v) = each %type_map)
+    foreach my $k (keys %type_map)
     {
+      my $v = $type_map{$k};
       push @{ $r{$v} }, $k;
     }
     diag "Types:";

@@ -92,7 +92,7 @@ apc_query_drive_type( const char *drive)
 #ifdef __CYGWIN__
 	return false;
 #endif
-	strncpy( buf, drive, 256);             //     sometimes D: isn't enough for 95,
+	strncpy( buf, drive, 255);             //     sometimes D: isn't enough for 95,
 	if ( buf[1] == ':' && buf[2] == 0) {   //     but ok for D:\.
 		buf[2] = '\\';                      //
 		buf[3] = 0;                         //
@@ -330,6 +330,7 @@ apc_sys_get_value( int sysValue)
 	case svCompositeDisplay: return is_dwm_enabled();
 	case svLayeredWidgets: return guts. displayBMInfo. bmiHeader. biBitCount > 8;
 	case svDWM: return set_dwm_blur((HWND) 0, 0, (HRGN)0, 0);
+	case svFixedPointerSize: return 0;
 	default:
 		return -1;
 	}

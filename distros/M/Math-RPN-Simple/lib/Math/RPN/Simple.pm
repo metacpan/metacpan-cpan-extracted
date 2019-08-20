@@ -9,7 +9,7 @@ use List::Util qw(any);
 our @ISA=qw(Exporter);
 our @EXPORT=qw(to_infix to_postfix evaluate_infix evaluate_postfix);
 
-our $VERSION='1.1.2';
+our $VERSION='1.1.3';
 our $LIBRARY=__PACKAGE__;
 
 sub to_infix{
@@ -19,7 +19,7 @@ sub to_infix{
 		elsif($& eq $3){
 			my @args=(pop @stack,pop @stack);
 			push(@stack,"($args[1]$&$args[0])");
-		}elsif($& eq any(['abs','int','cos','sin'])){push(@stack,$&.'('.pop(@stack).')')}
+		}elsif(any {$& eq $_} ('abs','int','cos','sin')){push(@stack,$&.'('.pop(@stack).')')}
 		else{croak "Undefined function \"$&\""}
 	}
 	return $stack[0];
@@ -32,7 +32,7 @@ sub to_postfix{
 		if($& eq $1){push(@stack,$&)}
 		elsif($& eq $2){push(@output,$&)}
 		elsif($& eq $3){
-			while(@stack and ($stack[-1]=~/[a-zA-Z]+/ or $&~~['+','-'] or $stack[-1]~~['*','/','**']) and $stack[-1]ne'('){
+			while(@stack and ($stack[-1]=~/[a-zA-Z]+/ or any {$& eq $_} ('+','-') or any {$stack[-1] eq $_} ('*','/','**')) and $stack[-1]ne'('){
 				push(@output,pop @stack);
 			}
 			push(@stack,$&);
@@ -61,7 +61,7 @@ Math::RPN::Simple - Simpler implementation of L<Math::RPN>.
 
 =head1 VERSION
 
-Version 1.1.2
+Version 1.1.3
 
 =head1 DESCRIPTION
 

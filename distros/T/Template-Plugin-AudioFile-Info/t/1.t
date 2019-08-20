@@ -1,8 +1,8 @@
-use Test::More tests => 2;
+use Test::More;
 use Template;
 
-my $t = <<END;
-[%- USE song = AudioFile.Info(file) -%]
+my $t = <<'END';
+[%- USE song = AudioFile.Info(file, $ext => 'AudioFile::Info::Dummy') -%]
 Title:  [% song.title %]
 Artist: [% song.artist %]
 Album:  [% song.album %] (track [% song.track | format '%1d' %])
@@ -11,18 +11,23 @@ Genre:  [% song.genre %]
 END
 
 my $out = <<END;
-Title:  test
-Artist: davorg
-Album:  none (track 0)
-Year:   2003
-Genre:  nonsense
+Title:  TITLE
+Artist: ARTIST
+Album:  ALBUM (track 0)
+Year:   YEAR
+Genre:  GENRE
 END
 
 my $tt = Template->new;
 
 foreach (qw/mp3 ogg/) {
   my $result;
-  $tt->process(\$t, { file => "t/test.$_" }, \$result)
+  $tt->process(\$t, {
+    file => "t/test.$_",
+    ext  => $_,
+  }, \$result)
     or die $tt->error;
-  is($result, $out);
+  is($result, $out, "Tested $_");
 }
+
+done_testing;

@@ -47,7 +47,7 @@
       "runtime" : {
          "requires" : {
             "Redis" : "0",
-            "perl" : "5.010000"
+            "perl" : "5.010001"
          }
       },
       "test" : {
@@ -65,7 +65,7 @@
    "provides" : {
       "Redis::Namespace" : {
          "file" : "lib/Redis/Namespace.pm",
-         "version" : "0.10"
+         "version" : "0.12"
       }
    },
    "release_status" : "stable",
@@ -79,8 +79,9 @@
          "web" : "https://github.com/shogo82148/Redis-Namespace"
       }
    },
-   "version" : "0.10",
+   "version" : "0.12",
    "x_contributors" : [
+      "Dan Book <grinnz@gmail.com>",
       "Mihyaeru <mihyaeru21@gmail.com>",
       "karupanerura <karupa@cpan.org>"
    ],

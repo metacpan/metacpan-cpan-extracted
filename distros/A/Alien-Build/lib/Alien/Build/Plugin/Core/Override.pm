@@ -5,13 +5,13 @@ use warnings;
 use Alien::Build::Plugin;
 
 # ABSTRACT: Core override plugin
-our $VERSION = '1.79'; # VERSION
+our $VERSION = '1.83'; # VERSION
 
 
 sub init
 {
   my($self, $meta) = @_;
-  
+
   $meta->default_hook(
     override => sub {
       my($build) = @_;
@@ -34,7 +34,7 @@ Alien::Build::Plugin::Core::Override - Core override plugin
 
 =head1 VERSION
 
-version 1.79
+version 1.83
 
 =head1 SYNOPSIS
 

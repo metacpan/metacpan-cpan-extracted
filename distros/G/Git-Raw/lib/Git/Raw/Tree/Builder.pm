@@ -1,5 +1,5 @@
 package Git::Raw::Tree::Builder;
-$Git::Raw::Tree::Builder::VERSION = '0.83';
+$Git::Raw::Tree::Builder::VERSION = '0.84';
 use strict;
 use warnings;
 
@@ -11,7 +11,7 @@ Git::Raw::Tree::Builder - Git tree builder class
 
 =head1 VERSION
 
-version 0.83
+version 0.84
 
 =head1 DESCRIPTION
 

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 ### after: use lib qw(@RT_LIB_PATH@);
-use lib qw(/Users/sunnavy/bps/git/rt/local/lib /Users/sunnavy/bps/git/rt/lib);
+use lib qw(/Users/jbrandt/rts/rt444/local/lib /Users/jbrandt/rts/rt444/lib);
 
 package RT::Extension::MandatoryOnTransition::Test;
 
@@ -39,6 +39,9 @@ Set( %MandatoryOnTransition,
         '* -> resolved' => ['TimeWorked', 'TimeTaken', 'CF.Test Field', 'CF.Test Field3', 'CF.Test Field4'],
         'CF.Test Field3' => { transition => '* -> resolved', must_be => ['normal', 'restored'] },
         'CF.Test Field4' => { transition => '* -> resolved', must_not_be => ['down', 'reduced'] } },
+    'Content' => {
+        '* -> resolved' => [ qw(Content) ]
+    },
 );
 CONFIG
 

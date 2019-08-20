@@ -1,0 +1,23 @@
+Changes
+lib/Config/Parser.pm
+lib/Config/Parser/Ini.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/conf00.t
+t/conf01.t
+t/conf02.t
+t/conf03.t
+t/conf04.t
+t/conf05.t
+t/conf06.t
+t/conf07.t
+t/conf08.t
+t/ConfigSpec.pm
+t/ConfigSpec2.pm
+t/ConfigSpec3.pm
+t/TestConfig.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

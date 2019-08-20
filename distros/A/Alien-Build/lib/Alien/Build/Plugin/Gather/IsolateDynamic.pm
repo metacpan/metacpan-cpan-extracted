@@ -8,16 +8,16 @@ use Alien::Build::Util qw( _destdir_prefix );
 use File::Copy ();
 
 # ABSTRACT: Plugin to gather dynamic libraries into a separate directory
-our $VERSION = '1.79'; # VERSION
+our $VERSION = '1.83'; # VERSION
 
 
 sub init
 {
   my($self, $meta) = @_;
 
-  # plugin was introduced in 0.42, but had a bug which was fixed in 0.48  
+  # plugin was introduced in 0.42, but had a bug which was fixed in 0.48
   $meta->add_requires('share' => 'Alien::Build::Plugin::Gather::IsolateDynamic' => '0.48' );
-  
+
   $meta->after_hook(
     gather_share => sub {
       my($build) = @_;
@@ -68,7 +68,7 @@ Alien::Build::Plugin::Gather::IsolateDynamic - Plugin to gather dynamic librarie
 
 =head1 VERSION
 
-version 1.79
+version 1.83
 
 =head1 SYNOPSIS
 
@@ -82,7 +82,7 @@ their own C<dynamic> directory.  This allows them to be used by FFI modules, but
 by XS modules.
 
 This plugin provides the equivalent functionality of the C<alien_isolate_dynamic> attribute
-from L<Alien::Base::ModuleBuild>.  
+from L<Alien::Base::ModuleBuild>.
 
 =head1 SEE ALSO
 

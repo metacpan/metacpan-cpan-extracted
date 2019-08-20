@@ -227,7 +227,7 @@ typedef struct _FileData
 typedef struct
 {
 	HRGN region;
-	int height;
+	int aperture;
 } RegionData;
 
 
@@ -276,12 +276,13 @@ typedef struct _PrinterData
 typedef struct _PaintSaveData
 {
 	Color       lbs[2];
-	Bool        fillWinding;
+	Bool        fillMode;
 	int         lineWidth;
 	int         lineEnd;
 	int         lineJoin;
 	unsigned char * linePattern;
 	int         linePatternLen;
+	float       miterLimit;
 	FillPattern fillPattern;
 	Point       fillPatternOffset;
 	int         rop;
@@ -380,7 +381,7 @@ typedef struct _DrawableData
 
 	/* HDC attributes storage outside paint mode */
 	Color          lbs[2];
-	Bool           fillWinding;
+	int            fillMode, psFillMode;
 	int            lineWidth;
 	int            lineEnd;
 	int            lineJoin;
@@ -391,6 +392,7 @@ typedef struct _DrawableData
 	Point          fillPatternOffset;
 	int            rop;
 	int            rop2;
+	float          miterLimit;
 	Point          transform;
 	PPaintSaveData psd;                     // Their values during paint saved in sys psd
 

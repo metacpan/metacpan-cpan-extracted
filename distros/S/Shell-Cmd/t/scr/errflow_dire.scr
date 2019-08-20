@@ -1,0 +1,5 @@
+if [ -d TESTDIR/bin ]; then     #OPTS dire TESTDIR/bin
+   echo "bin found"
+else
+   echo "bin not found"
+fi

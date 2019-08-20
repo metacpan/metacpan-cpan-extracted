@@ -15,7 +15,7 @@ name: Dita-GB-Standard
 provides:
   Dita::GB::Standard:
     file: lib/Dita/GB/Standard.pm
-    version: '20190819'
+    version: '20190820'
 requires:
   Carp: '0'
   Data::Dump: '0'
@@ -24,5 +24,5 @@ requires:
   Test::More: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '20190819'
+version: '20190820'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

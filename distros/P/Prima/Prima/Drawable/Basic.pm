@@ -191,7 +191,7 @@ sub prelight_color
 		$coeff = 1/$coeff;
 	}
 	$coeff = ($coeff - 1) * 256;
-	my @channels = map { $_ & 0xff } ($color >> 16), ($color >> 8), $color;
+	my @channels = map { $_ & 0xff } cl::to_rgb($color);
 	for (@channels) {
 		my $amp = ( 256 - $_ ) / 8;
 		$amp -= $amp if $coeff < 0;
@@ -199,7 +199,7 @@ sub prelight_color
 		$_ = 255 if $_ > 255;
 		$_ = 0   if $_ < 0;
 	}
-	return ( $channels[0] << 16 ) | ( $channels[1] << 8 ) | $channels[2];
+	return cl::from_rgb(@channels);
 }
 
 sub text_split_lines
@@ -220,6 +220,84 @@ sub new_gradient
 {
 	require Prima::Drawable::Gradient;
 	return Prima::Drawable::Gradient->new(@_);
+}
+
+sub stroke_primitive
+{
+	my ( $self, $request ) = (shift, shift);
+	return 1 if $self->rop == rop::NoOper;
+	return 1 if $self->linePattern eq lp::Null && $self->rop2 == rop::NoOper;
+
+	my $path = $self->new_path;
+	my @offset  = $self->translate;
+	$path->translate(@offset);
+	$path->$request(@_);
+	my $ok = 1;
+	if ( $self->lineWidth == 0 ) {
+		# paths produce floating point coordinates and line end arcs,
+		# here we need internal pixel-wise plotting
+		for my $pp ( map { @$_ } @{ $path->points } ) {
+			last unless $ok &= $self->polyline($pp);
+		}
+		return $ok;
+	}
+
+	my %widen;
+	my $method;
+	if ($self->linePattern eq lp::Null) {
+		$widen{linePattern} = lp::Solid;
+		$method = 'clear';
+	} else {
+		$method = 'bar';
+	}
+
+	my $region2 = $self->region;
+	my $path2   = $path->widen(%widen);
+	my $region1 = $path2->region(fm::Winding | fm::Overlay);
+	my @box = $region1->box;
+	$box[$_+2] += $box[$_] for 0,1;
+	my $fp = $self->fillPattern;
+	$self->fillPattern(fp::Solid);
+	$self->translate(0,0);
+	if ( $self-> rop2 == rop::CopyPut && $self->linePattern ne lp::Solid && $self->linePattern ne lp::Null ) {
+		my $color = $self->color;
+		$self->color($self->backColor);
+		my $path3 = $path->widen( linePattern => lp::Solid );
+		my $region3 = $path3->region;
+		$region3->combine( $region1, rgnop::Diff);
+		$region3->combine($region2, rgnop::Intersect) if $region2;
+		$self->region($region3);
+		$ok = $self->bar(@box);
+		$self->color($color);
+	}
+
+	$region1->combine($region2, rgnop::Intersect) if $region2;
+	$self->region($region1);
+	$ok &&= $self->$method(@box);
+	$self->region($region2);
+	$self->fillPattern($fp);
+	$self->translate(@offset);
+	return $ok;
+}
+
+sub fill_primitive
+{
+	my ( $self, $request ) = (shift, shift);
+	my $path = $self->new_path;
+	$path->$request(@_);
+	my @offset  = $self->translate;
+	my $region1 = $path->region( $self-> fillMode);
+	$region1->offset(@offset);
+	my $region2 = $self->region;
+	$region1->combine($region2, rgnop::Intersect) if $region2;
+	my @box = $region1->box;
+	$box[$_+2] += $box[$_] for 0,1;
+	$self->region($region1);
+	$self->translate(0,0);
+	my $ok = $self->bar(@box);
+	$self->translate(@offset);
+	$self->region($region2);
+	return $ok;
 }
 
 1;

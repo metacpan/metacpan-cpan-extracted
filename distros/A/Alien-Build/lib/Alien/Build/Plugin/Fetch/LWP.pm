@@ -6,7 +6,7 @@ use Alien::Build::Plugin;
 use Carp ();
 
 # ABSTRACT: Plugin for fetching files using LWP
-our $VERSION = '1.79'; # VERSION
+our $VERSION = '1.83'; # VERSION
 
 
 has '+url' => '';
@@ -19,7 +19,7 @@ sub init
   my($self, $meta) = @_;
 
   $meta->add_requires('share' => 'LWP::UserAgent' => 0 );
-  
+
   $meta->prop->{start_url} ||= $self->url;
   $self->url($meta->prop->{start_url});
   $self->url || Carp::croak('url is a required property');
@@ -69,7 +69,7 @@ sub init
         content  => $res->content,
       };
     }
-    
+
   });
 
   $self;
@@ -89,7 +89,7 @@ Alien::Build::Plugin::Fetch::LWP - Plugin for fetching files using LWP
 
 =head1 VERSION
 
-version 1.79
+version 1.83
 
 =head1 SYNOPSIS
 

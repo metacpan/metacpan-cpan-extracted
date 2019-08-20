@@ -8,7 +8,7 @@ use Alien::Build::Util qw( _ssl_reqs );
 use Carp ();
 
 # ABSTRACT: Plugin for fetching files using HTTP::Tiny
-our $VERSION = '1.79'; # VERSION
+our $VERSION = '1.83'; # VERSION
 
 
 has '+url' => '';
@@ -75,7 +75,7 @@ sub init
       die "error fetching $url: $status $reason";
     }
 
-    my($type) = split ';', $res->{headers}->{'content-type'};
+    my($type) = split /;/, $res->{headers}->{'content-type'};
     $type = lc $type;
     my $base            = URI->new($res->{url});
     my $filename        = File::Basename::basename do { my $name = $base->path; $name =~ s{/$}{}; $name };
@@ -127,7 +127,7 @@ Alien::Build::Plugin::Fetch::HTTPTiny - Plugin for fetching files using HTTP::Ti
 
 =head1 VERSION
 
-version 1.79
+version 1.83
 
 =head1 SYNOPSIS
 

@@ -7,11 +7,11 @@ use lib 'lib';
 use FFI::Probe;
 use FFI::Probe::Runner;
 use FFI::Probe::Runner::Builder;
-use My::ShareConfig;
-use File::Temp qw( tempdir );
+use My::BuildConfig;
+use File::Temp;
 use Path::Tiny qw( path );
 
-my $dir = tempdir( CLEANUP => 1 );
+my $dir = FFI::Temp->newdir;
 my $data_filename = path( $dir, 'probe.pl' );
 my $log_filename  = path( $dir, 'config.log' );
 
@@ -23,7 +23,7 @@ my $probe = FFI::Probe->new(
   },
   log => "$log_filename",
   data_filename => "$data_filename",
-  alien => [My::ShareConfig->new->get('alien')->{class}],
+  alien => [My::BuildConfig->new->get('alien')->{class}],
   cflags => ['-Iinclude'],
 );
 

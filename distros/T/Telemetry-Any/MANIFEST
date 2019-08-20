@@ -1,0 +1,15 @@
+.perlcriticrc
+.perltidyrc
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Telemetry/Any.pm
+minil.toml
+t/00_compile.t
+xt/10-perltidy.t
+xt/20-perlcritic.t
+META.yml
+MANIFEST

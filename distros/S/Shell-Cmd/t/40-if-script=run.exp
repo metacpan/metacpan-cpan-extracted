@@ -36,7 +36,7 @@ main () {
          return;
       fi
 
-   else
+   elif [ -d TESTDIR/nope ]; then
 
       #
       # Command 4
@@ -50,7 +50,7 @@ main () {
       #
 
       if [ $SC_CURR_SUCC -eq 0 ]; then
-         echo "bin not found";
+         echo "nope found";
          CMD_EXIT=$?;
          if [ $CMD_EXIT -eq 0 ]; then
             SC_CURR_SUCC=1;
@@ -68,9 +68,42 @@ main () {
          return;
       fi
 
+   else
+
+      #
+      # Command 6
+      #
+
+      SC_CURR_EXIT=0;
+      SC_CURR_SUCC=0;
+
+      #
+      # Command 6.0
+      #
+
+      if [ $SC_CURR_SUCC -eq 0 ]; then
+         echo "bin not found";
+         CMD_EXIT=$?;
+         if [ $CMD_EXIT -eq 0 ]; then
+            SC_CURR_SUCC=1;
+            SC_CURR_EXIT=0;
+         elif [ $SC_CURR_EXIT -eq 0 ]; then
+            SC_CURR_EXIT=$CMD_EXIT;
+         fi
+      fi
+
+      if [ $SC_FAILED -eq 0  -a  $SC_CURR_EXIT -ne 0 ]; then
+         SC_FAILED=6;
+      fi
+
+      if [ $SC_FAILED -ne 0 ]; then
+         return;
+      fi
+
    fi
 }
 
 main;
 cd "$SC_ORIG_DIRE";
 exit $SC_FAILED;
+

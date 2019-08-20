@@ -1,0 +1,11 @@
+<HOST>
+Succ1
+</HOST>
+
+###STDERR
+<HOST>
+Err1
+</HOST>
+
+###EXIT
+0

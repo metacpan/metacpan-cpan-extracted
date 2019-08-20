@@ -1,3 +1,10 @@
+0.097   2019-07-22  Released-By: PERLANCAR; Urgency: medium
+
+	- Allow using other DateTime::Format::* classes: rename
+	  --date-format to --strftime, add --format-class &
+	  --format-class-attrs.
+
+
 0.096   2019-07-16  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] When --to is specified, the date specified in --to was

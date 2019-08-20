@@ -6,7 +6,7 @@ use Alien::Build::Plugin;
 use File::Basename ();
 
 # ABSTRACT: Plugin to extract links from HTML
-our $VERSION = '1.79'; # VERSION
+our $VERSION = '1.83'; # VERSION
 
 
 sub init
@@ -16,17 +16,17 @@ sub init
   $meta->add_requires('share' => 'HTML::LinkExtor' => 0);
   $meta->add_requires('share' => 'URI' => 0);
   $meta->add_requires('share' => 'URI::Escape' => 0);
-  
+
   $meta->register_hook( decode => sub {
     my(undef, $res) = @_;
-    
+
     die "do not know how to decode @{[ $res->{type} ]}"
       unless $res->{type} eq 'html';
-    
+
     my $base = URI->new($res->{base});
-    
+
     my @list;
-    
+
     my $p = HTML::LinkExtor->new(sub {
       my($tag, %links) = @_;
       if($tag eq 'base' && $links{href})
@@ -46,9 +46,9 @@ sub init
         };
       }
     });
-    
+
     $p->parse($res->{content});
-    
+
     return {
       type => 'list',
       list => \@list,
@@ -72,7 +72,7 @@ Alien::Build::Plugin::Decode::HTML - Plugin to extract links from HTML
 
 =head1 VERSION
 
-version 1.79
+version 1.83
 
 =head1 SYNOPSIS
 

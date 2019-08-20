@@ -183,5 +183,42 @@ diag "Try a resolve without TimeWorked in mobile interface";
     like($m->uri->as_string, qr/show/, "On show page after ticket resolve");
 }
 
+my $content = RT::Test->load_or_create_queue( Name => 'Content' );
+
+diag "Try a resolve without Content";
+{
+    my $t = RT::Test->create_ticket(
+         Queue => 'Content',
+         Subject => 'Test Mandatory On Resolve',
+         Content => 'Testing',
+         );
+
+    ok( $t->id, 'Created test ticket: ' . $t->id);
+    ok( $t->SetStatus('open'), 'Set status to open');
+    $m->goto_ticket($t->id);
+
+    $m->follow_link_ok( { text => 'Resolve' }, 'Try to resolve ticket');
+    $m->submit_form_ok( { form_name => 'TicketUpdate',
+                          button => 'SubmitTicket',},
+                          'Submit resolve with no Content');
+    $m->content_contains('Content is required when changing Status to resolved');
+
+    # Space shouldn't count as content
+    $m->submit_form_ok( { form_name => 'TicketUpdate',
+                          fields => { UpdateTimeWorked => 10,
+                                    'UpdateContent' => ' ',},
+                          button => 'SubmitTicket',
+                        }, 'Submit resolve with space as Content');
+    $m->content_contains('Content is required when changing Status to resolved');
+
+    $m->submit_form_ok( { form_name => 'TicketUpdate',
+                          fields => { UpdateTimeWorked => 10,
+                                    'UpdateContent' => 'Some real content',},
+                          button => 'SubmitTicket',
+                        }, 'Submit resolve with real content');
+
+    $m->content_contains("Status changed from &#39;open&#39; to &#39;resolved&#39;");
+}
+
 undef $m;
 done_testing;

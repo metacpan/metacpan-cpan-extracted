@@ -21,7 +21,7 @@ resources:
   bugtracker: https://github.com/iamalnewkirk/doodle/issues
   homepage: https://metacpan.org/pod/Doodle
   repository: git://github.com/iamalnewkirk/doodle.git
-version: '0.03'
+version: '0.04'
 x_authority: cpan:AWNCORP
 x_contributors:
   - 'Al Newkirk <al@iamalnewkirk.com>'

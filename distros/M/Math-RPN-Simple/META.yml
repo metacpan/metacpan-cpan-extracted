@@ -25,5 +25,5 @@ resources:
   bugtracker: https://github.com/DeBos99/Math-RPN-Simple/issues
   homepage: https://github.com/DeBos99/Math-RPN-Simple
   repository: https://github.com/DeBos99/Math-RPN-Simple.git
-version: v1.1.2
+version: v1.1.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

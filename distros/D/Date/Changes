@@ -1,4 +1,6 @@
-4.0.0    xx.xx.xxxx
+4.0.1    19.08.2019
+           - fix tests for -Duselongdouble perl
+4.0.0    16.08.2019
            - added mksec to Date object, now_hires, etc
            - full iso 8601 support
            - support for default iso with microseconds and timezone offset

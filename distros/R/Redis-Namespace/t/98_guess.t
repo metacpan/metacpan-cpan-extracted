@@ -31,29 +31,11 @@ subtest 'mget and mset' => sub {
     $redis->flushall;
 };
 
-subtest 'GEORADIUS' => sub {
-    my $version = version->parse($redis->info->{redis_version});
-    eval {
-        $redis->geoadd('ns:Sicily', 13.361389, 38.115556, "Palermo", 15.087269, 37.502669, "Catania");
-    } or plan skip_all => "your redis server seems not to support GEO commands, your redis version is $version";
-
-    is_deeply([$ns->georadius(Sicily => 15, 37, 200, "km", "ASC")], ["Catania", "Palermo"], "GEORADIUS");
-
-    # STORE key
-    $ns->georadius(Sicily => 15, 37, 200, "km", STORE => "result");
-    is_deeply([$redis->zrange('ns:result', 0, -1)], ["Palermo", "Catania"]);
-
-    # STOREDIST key
-    $ns->georadius(Sicily => 15, 37, 200, "km", STOREDIST => "result");
-    is_deeply([$redis->zrange('ns:result', 0, -1)], ["Catania", "Palermo"]);
-
-    $redis->flushall;
-};
-
 subtest 'ambiguous' => sub {
     # check the redis server supports stream commands
-    eval { $redis->command_count } or plan skip_all => 'redis-server does not support the COMMAND command';
-    $redis->command_info('xgroup')->[0] or plan skip_all => 'redis-server does not support the stream commands';
+    my $version = version->parse($redis->info->{redis_version});
+    eval { $redis->command_count } or plan skip_all => "redis-server does not support the COMMAND command, your redis version is $version";
+    $redis->command_info('xgroup')->[0] or plan skip_all => "redis-server does not support the stream commands, your redis version is $version";
 
     ok my $id1 = $ns->xadd('count', '*', name => 'a');
     ok my $id2 = $ns->xadd('block', '*', name => 'b');

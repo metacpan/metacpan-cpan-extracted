@@ -27,12 +27,13 @@ Drawable_init( Handle self, HV * profile)
 	var-> w = var-> h = 0;
 	my-> set_color        ( self, pget_i ( color));
 	my-> set_backColor    ( self, pget_i ( backColor));
-	my-> set_fillWinding  ( self, pget_B ( fillWinding));
+	my-> set_fillMode     ( self, pget_i ( fillMode));
 	my-> set_fillPattern  ( self, pget_sv( fillPattern));
 	my-> set_lineEnd      ( self, pget_i ( lineEnd));
 	my-> set_lineJoin     ( self, pget_i ( lineJoin));
 	my-> set_linePattern  ( self, pget_sv( linePattern));
 	my-> set_lineWidth    ( self, pget_i ( lineWidth));
+	my-> set_miterLimit   ( self, pget_i ( miterLimit));
 	my-> set_region       ( self, pget_H ( region));
 	my-> set_rop          ( self, pget_i ( rop));
 	my-> set_rop2         ( self, pget_i ( rop2));
@@ -40,21 +41,31 @@ Drawable_init( Handle self, HV * profile)
 	my-> set_textOutBaseline( self, pget_B ( textOutBaseline));
 	if ( pexist( translate))
 	{
-		AV * av = ( AV *) SvRV( pget_sv( translate));
-		Point tr = {0,0};
-		SV ** holder = av_fetch( av, 0, 0);
-		if ( holder) tr.x = SvIV( *holder); else warn("Array panic on 'translate'");
-		holder = av_fetch( av, 1, 0);
-		if ( holder) tr.y = SvIV( *holder); else warn("Array panic on 'translate'");
-		my-> set_translate( self, tr);
+		AV * av;
+		Point tr;
+		SV ** holder, *sv;
+		
+		sv = pget_sv( translate);
+		if ( sv && SvOK(sv) && SvROK(sv) && SvTYPE(av = (AV*)SvRV(sv)) == SVt_PVAV && av_len(av) == 1) {
+			tr.x = tr.y = 0;
+			holder = av_fetch( av, 0, 0);
+			if ( holder) tr.x = SvIV( *holder); else warn("Array panic on 'translate'");
+			holder = av_fetch( av, 1, 0);
+			if ( holder) tr.y = SvIV( *holder); else warn("Array panic on 'translate'");
+			my-> set_translate( self, tr);
+		} else
+			warn("Array panic on 'translate'");
 
-		av = ( AV *) SvRV( pget_sv( fillPatternOffset));
-		tr.x = tr.y = 0;
-		holder = av_fetch( av, 0, 0);
-		if ( holder) tr.x = SvIV( *holder); else warn("Array panic on 'fillPatternOffset'");
-		holder = av_fetch( av, 1, 0);
-		if ( holder) tr.y = SvIV( *holder); else warn("Array panic on 'fillPatternOffset'");
-		my-> set_fillPatternOffset( self, tr );
+		sv = pget_sv( fillPatternOffset);
+		if ( sv && SvOK(sv) && SvROK(sv) && SvTYPE(av = (AV*)SvRV(sv)) == SVt_PVAV && av_len(av) == 1) {
+			tr.x = tr.y = 0;
+			holder = av_fetch( av, 0, 0);
+			if ( holder) tr.x = SvIV( *holder); else warn("Array panic on 'fillPatternOffset'");
+			holder = av_fetch( av, 1, 0);
+			if ( holder) tr.y = SvIV( *holder); else warn("Array panic on 'fillPatternOffset'");
+			my-> set_fillPatternOffset( self, tr );
+		} else
+			warn("Array panic on 'fillPatternOffset'");
 	}
 	SvHV_Font( pget_sv( font), &Font_buffer, "Drawable::init");
 	my-> set_font( self, Font_buffer);
@@ -458,77 +469,6 @@ Drawable_text_out( Handle self, SV * text, int x, int y)
 	return ok;
 }
 
-void *
-prima_read_array( SV * points, char * procName, Bool integer, int div, int min, int max, int * n_points )
-{
-	AV * av;
-	int i, count, psize;
-	void * p;
-
-	psize = integer ? sizeof(int) : sizeof(double);
-	if ( !SvROK( points) || ( SvTYPE( SvRV( points)) != SVt_PVAV)) {
-		warn("Invalid array reference passed to %s", procName);
-		return NULL;
-	}
-	av = ( AV *) SvRV( points);
-	count = av_len( av) + 1;
-	if ( min == max && count != min * div ) {
-		warn("%s: array must contain %d elements", procName, min * div);
-		return NULL;
-	}
-	if ( count < min * div ) {
-		warn("%s: array must contain at least %d elements", procName, min * div);
-		return NULL;
-	}
-	if ( max >= 0 && count > max * div ) {
-		warn("%s: array must contain maximum %d elements", procName, max * div);
-		return NULL;
-	}
-	if ( count % div != 0 ) {
-		warn("%s: number of elements in an array must be a multiple of %d", procName, div);
-		return NULL;
-	}
-	if ( n_points)
-		*n_points = count / div;
-	if ( count == 0)
-		return NULL;
-
-	{
-		void * ref;
-		char * pack, req = integer ? 'i' : 'd';
-		if ( prima_array_parse( points, &ref, NULL, &pack ) && *pack == req) {
-			if (!( p = malloc( psize * count))) {
-				warn("not enough memory");
-				return false;
-			}
-			memcpy( p, ref, psize * count);
-			return p;
-		}
-	}
-
-
-	if (!( p = malloc( psize * count))) {
-		warn("not enough memory");
-		return NULL;
-	}
-
-	for ( i = 0; i < count; i++)
-	{
-		SV** psv = av_fetch( av, i, 0);
-		if ( psv == NULL) {
-			free( p);
-			warn("Array panic on item %d on %s", i, procName);
-			return NULL;
-		}
-		if ( integer )
-			*(((int*)p) + i) = SvIV( *psv);
-		else
-			*(((double*)p) + i) = SvNV( *psv);
-	}
-
-	return p;
-}
-
 static Bool
 read_polypoints( Handle self, SV * points, char * procName, int min, Bool (*procPtr)(Handle,int,Point*))
 {
@@ -565,6 +505,30 @@ Drawable_bars( Handle self, SV * rects)
 		free( p);
 	}
 	return ret;
+}
+
+SV *
+Drawable_render_glyph( Handle self, int index, HV * profile)
+{
+	int flags, *buffer, count;
+	SV * ret;
+	dPROFILE;
+	gpARGS;
+	gpENTER(nilSV);
+
+	flags = ggoUseHints;
+	if ( pexist(glyph)   && pget_B(glyph))   flags |= ggoGlyphIndex;
+	if ( pexist(hints)   && !pget_B(hints))  flags &= ~ggoUseHints;
+	if ( pexist(unicode) && pget_B(unicode)) flags |= ggoUnicode;
+	count = apc_gp_get_glyph_outline( self, index, flags, &buffer);
+	hv_clear(profile); /* old gencls bork */
+	gpLEAVE;
+
+	if ( count == 0 ) return nilSV;
+	ret = prima_array_new(sizeof(int) * count);
+	memcpy( prima_array_get_storage(ret), buffer, sizeof(int) * count);
+	free( buffer );
+	return prima_array_tie( ret, sizeof(int), "i");
 }
 
 /*
@@ -654,14 +618,89 @@ render_point(
 	/* convert back to cartesian and return */
 	s *= 3;
 	if ( dimensions == 3 ) {
-		result-> x = v[s] / v[s+2];
-		result-> y = v[s+1] / v[s+2];
+		double f;
+		f = v[s] / v[s+2];
+		result-> x = ( f < 0 ) ? (f - .5) : (f + .5);
+		f = v[s+1] / v[s+2];
+		result-> y = ( f < 0 ) ? (f - .5) : (f + .5);
 	} else {
-		result-> x = v[s];
-		result-> y = v[s+1];
+		result-> x = (v[s] < 0) ? (v[s] - .5) : (v[s] + .5);
+		result-> y = (v[s+1] < 0) ? (v[s+1] - .5) : (v[s+1] + .5);
 	}
 
 	return true;
+}
+
+static int
+tangent_detect( Point * a, Point * b)
+{
+	register int x = a->x - b->x;
+	register int y = a->y - b->y;
+	if ( x == 0 ) {
+		if ( y ==  0) return 0;
+		if ( y == -1) return 1;
+		if ( y ==  1) return 2;
+	} else if ( y == 0 ) {
+		if ( x == -1) return 3;
+		if ( x ==  1) return 4;
+	} else if ( x < 2 && x > -2 && y < 2 && y > -2 )
+		return (x * 10) + y;
+	return -1;
+}
+
+static void
+tangent_apply( int tangent,  Point * b)
+{
+	switch(tangent) {
+	case 1:
+		b->y++;
+		break;
+	case 2:
+		b->y--;
+		break;
+	case 3:
+		b->x++;
+		break;
+	case 4:
+		b->x--;
+		break;
+	case 10 - 1:
+		b->x--;	
+		b->y++;	
+		break;
+	case 10 + 1:
+		b->x--;	
+		b->y--;	
+		break;
+	case - 10 - 1:
+		b->x++;	
+		b->y++;	
+		break;
+	case - 10 + 1:
+		b->x++;	
+		b->y--;	
+		break;
+	}
+}
+
+static Bool
+cut_corner( int t2, int t1, Point * p2, Point * p1)
+{
+	switch (t2 * 10 + t1) {
+	/*
+	 >xxa    xx is tangent 3
+  	    ab>  aa is tangent 1
+	         bb is something not 1
+
+        corner is detected when (aa) is exactly 1px high,
+	and is cut so that (ab) becomes (b)
+	*/
+	case 13: case 14: return p2->y + 1 == p1->y;
+	case 23: case 24: return p2->y - 1 == p1->y;
+	case 31: case 32: return p2->x + 1 == p1->x;
+	case 41: case 42: return p2->x - 1 == p1->x;
+	}
+	return false;
 }
 
 SV *
@@ -672,7 +711,8 @@ Drawable_render_spline( SV * obj, SV * points, HV * profile)
 	Point *rendered, *storage;
 	SV *ret;
 	Bool ok, closed;
-	int i, j, degree, precision, n_points, final_size, k, dim, n_add_points, temp_size;
+	int i, j, degree, precision, n_points, final_size, k, dim, n_add_points, temp_size,
+		tangent, last_tangent;
 	double *knots, *weights, t, dt, *weighted, *temp;
 
 	knots = weights = weighted = NULL;
@@ -703,7 +743,15 @@ Drawable_render_spline( SV * obj, SV * points, HV * profile)
 	if ( !p) goto EXIT;
 
 	/* closed curve will need at least one extra point and unclamped default knot set */
-	closed = p[0].x == p[n_points-1].x && p[0].y == p[n_points-1].y;
+	if ( pexist( closed )) {
+		SV * sv = pget_sv(closed);
+		if ( SvTYPE(sv) == SVt_NULL ) goto DETECT_SHAPE;
+		closed = SvTRUE(sv);
+	}
+	else {
+	DETECT_SHAPE:
+		closed = p[0].x == p[n_points-1].x && p[0].y == p[n_points-1].y;
+	}
 	n_add_points = closed ? degree - 1 : 0;
 	n_points += n_add_points;
 
@@ -748,22 +796,36 @@ Drawable_render_spline( SV * obj, SV * points, HV * profile)
 	final_size = 0;
 	rendered = storage = (Point*) prima_array_get_storage(ret);
 	k = -1;
+	last_tangent = -1;
 	for ( i = 0, t = 0.0, dt = 1.0 / precision; i < precision - 1; i++, t += dt) {
 		memcpy( temp, weighted, temp_size);
 		if (!render_point(t, degree, n_points, dim, temp, knots, &k, rendered))
 			goto EXIT;
-		if ( i > 0 && rendered->x == rendered[-1].x && rendered->y == rendered[-1].y)
-			continue;
+		if ( i > 0 ) {
+			/* primitive line detection */
+			tangent = tangent_detect( rendered-1, rendered);
+			if ( tangent == 0 ) continue;
+			if ( i > 1 && tangent > 0 && tangent == last_tangent) {
+				tangent_apply( tangent, rendered-1);
+				continue;
+			} else if ( cut_corner(last_tangent, tangent, rendered-2, rendered-1)) {
+			/* primitive corner detection - convert 4-connectivity into 8- */
+				*(rendered-1) = *rendered;
+				tangent = -1;
+				rendered--;
+				final_size--;
+				continue;
+			} else
+				last_tangent = tangent;
+		}
 		final_size++;
 		rendered++;
 	}
 	memcpy( temp, weighted, temp_size);
 	if ( !render_point(1.0, degree, n_points, dim, temp, knots, &k, rendered))
 		goto EXIT;
-	if ( !( i > 0 && rendered->x == rendered[-1].x && rendered->y == rendered[-1].y)) {
-		final_size++;
-		rendered++;
-	}
+	final_size++;
+	rendered++;
 
 	/* looks good */
 	ok = true;
@@ -983,12 +1045,12 @@ Drawable_do_text_wrap( Handle self, TextWrapRec * t)
 	int tildeIndex = -100, tildeLPos = 0, tildeLine = 0, tildePos = 0, tildeOffset = 0, lSize = 16;
 	int spaceWidth = 0, spaceC = 0, spaceOK = 0;
 
-#define lAdd(end, utfend) \
+#define lAdd(end, utfend) if(1) { \
 	if ( !add_wrapped_text( t, start, utf_start, end, utfend, tildeIndex, \
 		&tildePos, &tildeLPos, &tildeLine, &ret, &lSize)) return ret;\
 	start = end; \
 	utf_start = utfend; \
-	if (( t-> options & twReturnFirstLineLength) == twReturnFirstLineLength) return ret
+	if (( t-> options & twReturnFirstLineLength) == twReturnFirstLineLength) return ret; }
 
 	t-> count = 0;
 	if (!( ret = allocn( char*, lSize))) return nil;
@@ -1323,12 +1385,12 @@ Drawable_clipRect( Handle self, Bool set, Rect clipRect)
 	return clipRect;
 }
 
-Bool
-Drawable_fillWinding( Handle self, Bool set, Bool fillWinding)
+int
+Drawable_fillMode( Handle self, Bool set, int fillMode)
 {
-	if (!set) return apc_gp_get_fill_winding( self);
-	apc_gp_set_fill_winding( self, fillWinding);
-	return fillWinding;
+	if (!set) return apc_gp_get_fill_mode( self);
+	apc_gp_set_fill_mode( self, fillMode);
+	return fillMode;
 }
 
 int
@@ -1351,8 +1413,17 @@ int
 Drawable_lineWidth( Handle self, Bool set, int lineWidth)
 {
 	if (!set) return apc_gp_get_line_width( self);
+	if ( lineWidth < 0 ) lineWidth = 0;
 	apc_gp_set_line_width( self, lineWidth);
 	return lineWidth;
+}
+
+double
+Drawable_miterLimit( Handle self, Bool set, double miterLimit)
+{
+	if (!set) return apc_gp_get_miter_limit( self);
+	apc_gp_set_miter_limit( self, miterLimit);
+	return miterLimit;
 }
 
 SV *
@@ -1411,6 +1482,7 @@ Drawable_region( Handle self, Bool set, Handle mask)
 
 			apc_gp_set_region(self, region);
 			Object_destroy(region);
+
 		} else
 			apc_gp_set_region(self, nilHandle);
 

@@ -790,4 +790,84 @@ subtest 'api 1 warning' => sub {
   ok $api_warning;
 };
 
+subtest '->package is only allowed for api = 0' => sub {
+
+  my @warnings;
+  local $SIG{__WARN__} = sub {
+    note "[warning]\n", $_[0];
+    push @warnings, $_[0];
+  };
+
+  subtest 'api = 0' => sub {
+    my $ffi = FFI::Platypus->new( api => 0 );
+    local $@ = '';
+    eval { $ffi->package };
+    is "$@", "";
+  };
+
+  subtest 'api = 1' => sub {
+    my $ffi = FFI::Platypus->new( api => 1 );
+    local $@ = '';
+    eval { $ffi->package };
+    like "$@", qr/^package method only available with api => 0/;
+  };
+
+};
+
+subtest 'warning defaults' => sub {
+
+  my @warnings;
+  local $SIG{__WARN__} = sub {
+    note "[warning]\n", $_[0];
+    push @warnings, $_[0] if $_[0] =~ /^warning: error loading/;
+  };
+
+  subtest 'api = 0' => sub {
+    @warnings = ();
+    my $ffi = FFI::Platypus->new( api => 0 );
+    $ffi->lib('corpus/bogus.so');
+    is $ffi->find_symbol('foo'), undef;
+    is_deeply \@warnings, [];
+  };
+
+  subtest 'api = 1' => sub {
+    @warnings = ();
+    my $ffi = FFI::Platypus->new( api => 1, experimental => 1);
+    $ffi->lib('corpus/bogus.so');
+    local $@ = '';
+    is $ffi->find_symbol('foo'), undef;
+    like $warnings[0], qr/^warning: error loading corpus\/bogus\.so/;
+  };
+
+};
+
+subtest 'language plugin api version' => sub {
+
+  my %args;
+
+  my $native_type_map = sub
+  {
+    my $class = shift;
+    %args = @_;
+    {};
+  };
+
+  {
+    package FFI::Platypus::Lang::Frooble;
+    no warnings 'once';
+    *native_type_map = $native_type_map;
+  }
+
+  subtest 'api = 0' => sub {
+    my $ffi = FFI::Platypus->new( lang => 'Frooble' );
+    is $args{api}, undef;
+  };
+
+  subtest 'api = 1' => sub {
+    my $ffi = FFI::Platypus->new( lang => 'Frooble', api => 1, experimental => 1 );
+    is $args{api}, 1;
+  };
+
+};
+
 done_testing;

@@ -1,0 +1,44 @@
+{
+   "abstract" : "Template Toolkit plugin for",
+   "author" : [
+      "Dave Cross, E<lt>dave@dave.org.ukE<gt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Template-Plugin-AudioFile-Info",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AudioFile::Info" : "2.000001",
+            "Template" : "0",
+            "perl" : "v5.6.0"
+         }
+      }
+   },
+   "provides" : {
+      "Template::Plugin::AudioFile::Info" : {
+         "file" : "lib/Template/Plugin/AudioFile/Info.pm",
+         "version" : "v2.0.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v2.0.0",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

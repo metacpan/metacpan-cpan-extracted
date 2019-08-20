@@ -1,0 +1,7 @@
+Changelog for Moodle
+
+0.01 2019-08-20T15:01:22
+ - Updated documentation
+ - Disabling Travis targets < 5.22
+ - Initial implementation
+ - Initial commit

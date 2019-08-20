@@ -18,5 +18,5 @@ requires 'YAML::Syck';
 on test => sub {
     requires 'Test::More';
     requires 'Carp::Always';
-    requires 'Weasel::Driver::Mock';
+    requires 'Weasel::Driver::Mock', '0.02';
 };

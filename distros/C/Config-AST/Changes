@@ -1,0 +1,7 @@
+Revision history for Perl extension Config::AST
+
+1.01  Tue Aug 20 17:01:07 2019
+	- fix repository url
+
+1.00  Tue Aug 20 16:35:44 2019
+	- initial release

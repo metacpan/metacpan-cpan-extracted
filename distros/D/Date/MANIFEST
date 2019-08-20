@@ -21,9 +21,8 @@ src/panda/date/format.hpp
 src/panda/date/inc.h
 src/panda/date/parse.cc
 src/panda/date/parse.h
+src/xs/date.cc
 src/xs/date.h
-src/xs/date/util.cc
-src/xs/date/util.h
 t/advanced.t
 t/basic.t
 t/clone.t

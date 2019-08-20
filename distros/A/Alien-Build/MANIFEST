@@ -129,6 +129,9 @@ lib/Alien/Build.pm
 lib/Alien/Build/CommandSequence.pm
 lib/Alien/Build/Interpolate.pm
 lib/Alien/Build/Interpolate/Default.pm
+lib/Alien/Build/Log.pm
+lib/Alien/Build/Log/Abbreviate.pm
+lib/Alien/Build/Log/Default.pm
 lib/Alien/Build/MM.pm
 lib/Alien/Build/Manual/Alien.pod
 lib/Alien/Build/Manual/AlienAuthor.pod
@@ -189,6 +192,7 @@ lib/Alien/Build/Plugin/Probe/CommandLine.pm
 lib/Alien/Build/Plugin/Test/Mock.pm
 lib/Alien/Build/Util.pm
 lib/Alien/Build/Version/Basic.pm
+lib/Alien/Build/rc.pm
 lib/Alien/Role.pm
 lib/Test/Alien.pm
 lib/Test/Alien/Build.pm
@@ -200,6 +204,7 @@ lib/alienfile.pm
 maint/Alien-Base-PkgConfig/Makefile.PL
 maint/ci-test-plugins.pl
 maint/cip-before-install
+maint/cip-test-plugins
 maint/gen-test-archives.pl
 maint/gen.pl
 maint/travis-daemon
@@ -207,6 +212,7 @@ maint/travis-dzil
 maint/travis-install-deps
 maint/travis-run-test
 maint/update-cmake-libpalindrome
+perlcriticrc
 t/00_diag.t
 t/01_use.t
 t/alien_base.t
@@ -218,6 +224,9 @@ t/alien_build_commandsequence.t
 t/alien_build_commandsequence__cd.t
 t/alien_build_interpolate.t
 t/alien_build_interpolate_default.t
+t/alien_build_log.t
+t/alien_build_log_abbreviate.t
+t/alien_build_log_default.t
 t/alien_build_meta.t
 t/alien_build_mm.t
 t/alien_build_plugin.t
@@ -287,6 +296,7 @@ t/test_alien_cancompile.t
 t/test_alien_canplatypus.t
 t/test_alien_run.t
 t/test_alien_synthetic.t
+xt/author/critic.t
 xt/author/eol.t
 xt/author/no_tabs.t
 xt/author/pod.t

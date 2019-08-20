@@ -1,7 +1,7 @@
 package HTML::Clean;
 
 use Carp;
-use IO;
+use IO::File;
 use Fcntl;
 use strict;
 require 5.004;
@@ -14,7 +14,7 @@ require AutoLoader;
 # Items to export to callers namespace
 @EXPORT = qw();
 
-$VERSION = '0.8';
+$VERSION = '0.9';
 
 =head1 NAME
 
@@ -25,7 +25,7 @@ HTML::Clean - Cleans up HTML code for web browsers, not humans
   use HTML::Clean;
   $h = new HTML::Clean($filename); # or..
   $h = new HTML::Clean($htmlcode);
- 
+
   $h->compat();
   $h->strip();
   $data = $h->data();
@@ -87,7 +87,7 @@ sub new {
   my $class = ref($this) || $this;
   my $self = {};
   bless $self, $class;
-  
+
   my $data = shift;
   my $level = shift;
 
@@ -101,8 +101,8 @@ sub new {
     return undef;
   }
 }
-  
-	 
+
+
 #
 # Set up the data in the self hash..
 #
@@ -110,7 +110,7 @@ sub new {
 =head2 $h->initialize($dataorfile)
 
 This function allows you to reinitialize the HTML data used by the
-current object.  This is useful if you are processing many files.  
+current object.  This is useful if you are processing many files.
 
 $dataorfile has the same usage as the new method.
 
@@ -122,20 +122,20 @@ sub initialize {
   my($self, $data) = @_;
   $self->{'DATA'} = undef;
 
-  # Not defined?  Just return true.  
-  return(1) if (!$data); 
+  # Not defined?  Just return true.
+  return(1) if (!$data);
 
   # Check if it's a ref
   if (ref($data)) {
     $self->{DATA} = $data;
     return(1);
   }
-  
+
   # Newline char, really an error, but just go with it..
   if ($data =~ /\n/) {
     $self->{'DATA'} = \$data;
   }
-  
+
   # No newline?  Must be a filename
   if (-f $data) {
     my $storage;
@@ -187,7 +187,7 @@ sub _commentcheck($) {
   my($comment) = @_;
 
   $_ = $comment;
-  
+
   # Server side include
   return($comment) if (m,^<!--\#,si);
 
@@ -214,7 +214,7 @@ sub _jscomments {
   $js =~ s,\s+//.*?\n,\n,sig;
 
   # insure javascript is hidden
-  
+
   if ($js =~ m,<!--,) {
      $js =~ s,</script>,// -->\n</script>,si;
   }
@@ -228,7 +228,7 @@ sub _javascript {
 
   # remove excess whitespace at the beginning and end of lines
   $js =~ s,\s*\n+\s*,\n,sig;
-  
+
   # braces/semicolon at end of line, join next line
   $js =~ s,([;{}])\n,$1,sig;
 
@@ -263,7 +263,7 @@ sub _defcolorcheck ($) {
   return($c);
 }
 
-# For replacing entities with numerics 
+# For replacing entities with numerics
 use vars qw/ %_ENTITIES/;
 %_ENTITIES =  (
    'Agrave' => 192,
@@ -357,11 +357,11 @@ The following options are recognized:
 
 =item parameterized values
 
-  meta        Takes a space separated list of meta tags to remove, 
+  meta        Takes a space separated list of meta tags to remove,
               default "GENERATOR FORMATTER"
 
   emptytags   Takes a space separated list of tags to remove when there is no
-              content between the start and end tag, like this: <b></b>. 
+              content between the start and end tag, like this: <b></b>.
               The default is 'b i font center'
 
 =back
@@ -369,13 +369,13 @@ The following options are recognized:
 =cut
 
 use vars qw/
-	  $do_whitespace 
-	  $do_shortertags  
-	  $do_meta       
-	  $do_blink 
-	  $do_contenttype 
-	  $do_comments 
-	  $do_entities 
+	  $do_whitespace
+	  $do_shortertags
+	  $do_meta
+	  $do_blink
+	  $do_contenttype
+	  $do_comments
+	  $do_entities
 	  $do_dequote
           $do_defcolor
           $do_emptytags
@@ -383,7 +383,7 @@ use vars qw/
           $do_htmldefaults
           $do_lowercasetags
           $do_defbaseurl
-  /; 
+  /;
 
 $do_whitespace  = 1;
 $do_shortertags = 1;
@@ -406,7 +406,7 @@ sub strip {
   my $h = $self->{'DATA'};
   my $level = $self->{'LEVEL'};
 
-  # Select a set of options based on $level, and then modify based on 
+  # Select a set of options based on $level, and then modify based on
   # user supplied options.
 
   _level_defaults($level);
@@ -575,10 +575,10 @@ sub _level_defaults($) {
   $do_comments    = ($level > 3) ? 1 : 0;
   $do_dequote     = ($level > 3) ? 1 : 0;
   $do_defcolor    = ($level > 3) ? 1 : 0;
-  $do_emptytags   = ($level > 3) ? 'b i font center' : 0; 
+  $do_emptytags   = ($level > 3) ? 'b i font center' : 0;
   $do_javascript  = ($level > 3) ? 1 : 0;
-  $do_htmldefaults = ($level > 3) ? 1 : 0; 
-  $do_lowercasetags = ($level > 3) ? 1 : 0; 
+  $do_htmldefaults = ($level > 3) ? 1 : 0;
+  $do_lowercasetags = ($level > 3) ? 1 : 0;
 
   # higher levels reserved for more intensive optimizations.
 }
@@ -627,7 +627,7 @@ sub _imgalt {
 
   $tag =~ s/>/ alt="">/ if ($tag !~ /alt=/i);
   return($tag);
-}  
+}
 
 =head2 defrontpage();
 
@@ -670,7 +670,7 @@ FrontPage::Web, FrontPage::File
 
 =item Distribution Site - http://people.itu.int/~lindner/
 
-=back 
+=back
 
 =head1 AUTHORS
 

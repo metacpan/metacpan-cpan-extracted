@@ -6,7 +6,7 @@ use Test::Cleanup;
 use Test::Platypus;
 use FFI::Build;
 use FFI::Build::Platform;
-use File::Temp qw( tempdir );
+use FFI::Temp;
 use Capture::Tiny qw( capture_merged );
 use File::Spec;
 use File::Path qw( rmtree );
@@ -23,7 +23,7 @@ subtest 'basic' => sub {
   isa_ok $build->platform, 'FFI::Build::Platform';
 
   $build->source('corpus/ffi_build/source/*.c');
-  
+
   my($cfile) = $build->source;
   isa_ok $cfile, 'FFI::Build::File::C';
 
@@ -50,11 +50,13 @@ subtest 'build' => sub {
 
   foreach my $type (qw( name object array ))
   {
-  
+
     subtest $type => sub {
 
-      my $build = FFI::Build->new('foo', 
-        dir       => tempdir( "tmpbuild.XXXXXX", DIR => 'corpus/ffi_build/project1' ),
+      my $tempdir = FFI::Temp->newdir;
+
+      my $build = FFI::Build->new('foo',
+        dir       => $tempdir,
         buildname => "tmpbuild.tmpbuild.$$.@{[ time ]}",
         verbose   => 2,
       );
@@ -97,18 +99,18 @@ subtest 'build' => sub {
       platypus 2 => sub {
         my $ffi = shift;
         $ffi->lib($dll);
-  
+
         is(
           $ffi->function(foo1 => [] => 'int')->call,
           42,
         );
- 
+
         is(
           $ffi->function(foo2 => [] => 'string')->call,
           "42",
         );
       };
-  
+
       $build->clean;
 
       cleanup(
@@ -125,12 +127,14 @@ subtest 'build c++' => sub {
   plan skip_all => 'Test requires C++ compiler'
     unless eval { FFI::Build::Platform->which(FFI::Build::Platform->cxx) };
 
-  my $build = FFI::Build->new('foo', 
-    dir       => tempdir( "tmpbuild.XXXXXX", DIR => 'corpus/ffi_build/project-cxx' ),
+  my $tempdir = FFI::Temp->newdir( TEMPLATE => "tmpbuild.XXXXXX" );
+
+  my $build = FFI::Build->new('foo',
+    dir       => $tempdir,
     buildname => "tmpbuild.$$.@{[ time ]}",,
     verbose   => 2,
   );
-  
+
   $build->source('corpus/ffi_build/project-cxx/*.cxx');
   $build->source('corpus/ffi_build/project-cxx/*.cpp');
   note "$_" for $build->source;
@@ -199,13 +203,14 @@ subtest 'alien' => sub {
     unless eval { require Acme::Alien::DontPanic; Acme::Alien::DontPanic->VERSION("1.03") };
 
 
+  my $tempdir = FFI::Temp->newdir( TEMPLATE => "tmpbuild.XXXXXX" );
   my $build = FFI::Build->new('bar',
-    dir       => tempdir( "tmpbuild.XXXXXX", DIR => 'corpus/ffi_build/project2' ),
+    dir       => $tempdir,
     buildname => "tmpbuild.$$.@{[ time ]}",
     verbose   => 2,
     alien     => ['Acme::Alien::DontPanic'],
   );
-  
+
   $build->source('corpus/ffi_build/project2/*.c');
   note "$_" for $build->source;
 

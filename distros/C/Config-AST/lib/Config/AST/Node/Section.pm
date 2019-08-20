@@ -1,0 +1,188 @@
+package Config::AST::Node::Section;
+use parent 'Config::AST::Node';
+use strict;
+use warnings;
+use Carp;
+use Config::AST::Node::Null;
+
+=head1 NAME
+
+Config::AST::Node::Section - Configuration section node.
+
+=head1 DESCRIPTION
+
+Nodes of this class represent configuration sections in the AST.    
+
+=head1 METHODS
+    
+=cut
+
+sub new {
+    my $class = shift;
+    my $self = $class->SUPER::new(@_);
+    $self->{_subtree} = {};
+    return $self;
+}
+
+=head2 $t = $node->subtree
+
+Returns tree containing all subordinate nodes of this node.
+
+=cut    
+
+sub subtree {
+    my $self = shift;
+    if (my $key = shift) {
+	if (my $val = shift) {
+	    $self->{_subtree}{$key} = $val;
+	}
+	return $self->{_subtree}{$key};
+    }
+    return $self->{_subtree};
+}
+
+=head2 @a = $node->keys;
+
+Returns a list of names of all subordinate statements in this section.
+
+=cut    
+
+sub keys {
+    my $self = shift;
+    return keys %{$self->{_subtree}};
+}
+
+=head2 $bool = $node->has_key($str)
+
+Returns true if statement with name B<$str> is present in the section
+described by B<$node>.
+
+=cut    
+
+sub has_key {
+    my ($self, $key) = @_;
+    return $self->subtree($key);
+}
+
+=head2 $node->delete($name)
+
+Deletes the node with name B<$name>. Returns the removed node, or C<undef>
+if not found.    
+    
+=cut    
+
+sub delete {
+    my ($self, $key) = @_;
+    delete $self->{_subtree}{$key};
+}
+
+=head2 $node->merge($other)
+
+Merges the section B<$other> (a B<Config::AST::Node::Section>) to B<$node>.
+    
+=cut
+
+sub merge {
+    my ($self, $other) = @_;
+    while (my ($k, $v) = each %{$other->subtree}) {
+	if (my $old = $self->subtree($k)) {
+	    if ($old->is_section) {
+		$old->merge($v);
+	    } elsif (ref($old->value) eq 'ARRAY') {
+		push @{$old->value}, $v->value;
+		$old->locus->union($v->locus);
+	    } else {
+		$old->value($v->value);
+	    }
+	} else {
+	    $self->subtree($k => $old->clone);
+	}
+	$self->locus->union($v->locus);
+    }
+}
+
+=head2 $h = $cfg->as_hash
+
+=head2 $h = $cfg->as_hash($map)    
+
+Returns parse tree converted to a hash reference. If B<$map> is supplied,
+it must be a reference to a function. For each I<$key>/I<$value>
+pair, this function will be called as:
+
+    ($newkey, $newvalue) = &{$map}($what, $key, $value)
+
+where B<$what> is C<section> or C<value>, depending on the type of the
+hash entry being processed. Upon successful return, B<$newvalue> will be
+inserted in the hash slot for the key B<$newkey>.
+
+If B<$what> is C<section>, B<$value> is always a reference to an empty
+hash (since the parse tree is traversed in pre-order fashion). In that
+case, the B<$map> function is supposed to do whatever initialization that
+is necessary for the new subtree and return as B<$newvalue> either B<$value>
+itself, or a reference to a hash available inside the B<$value>. For
+example:
+
+    sub map {
+        my ($what, $name, $val) = @_;
+        if ($name eq 'section') {
+            $val->{section} = {};
+            $val = $val->{section};
+        }
+        ($name, $val);
+    }
+    
+=cut
+
+sub as_hash {
+    my $self = shift;
+    my $map = shift // sub { shift; @_ };
+    my $hroot = {};
+    my @ar;
+    
+    push @ar, [ '', $self, $hroot ];
+    while (my $elt = shift @ar) {
+	if ($elt->[1]->is_section) {
+	    my $hr0 = {};
+	    my ($name, $hr) = &{$map}('section', $elt->[0], $hr0);
+	    $elt->[2]{$name} = $hr0;
+	    while (my ($kw, $val) = each %{$elt->[1]->subtree}) {
+		push @ar, [ $kw, $val, $hr ];
+	    }
+	} else {
+	    my ($name, $value) = &{$map}('value', $elt->[0], scalar($elt->[1]->value));
+	    $elt->[2]{$name} = $value;
+	}
+    }
+    return $hroot->{''};
+}
+
+=head2 $s = $node->as_string
+
+Returns the string "(section)".
+
+=cut    
+
+sub as_string { '(section)' }
+
+our $AUTOLOAD;
+
+sub AUTOLOAD {
+    my $self = shift;
+    my $key = $AUTOLOAD;
+    $key =~ s/.*:://;
+    if ($key =~ s/^([A-Z])(.*)/\l$1$2/) {
+	$key =~ s/__/-/g;
+	return $self->subtree($self->{_ci} ? lc($key) : $key)
+	       // new Config::AST::Node::Null;
+    }
+    confess "Can't locate method $AUTOLOAD";
+}
+
+=head1 SEE ALSO
+
+B<Config::AST>,    
+B<Config::AST::Node>.
+
+=cut    
+
+1;

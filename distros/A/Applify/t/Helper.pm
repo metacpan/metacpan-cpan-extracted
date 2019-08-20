@@ -19,8 +19,9 @@ HERE
     my $stderr = '';
     open STDOUT, '>', \$stdout;
     open STDERR, '>', \$stderr;
+    local $| = 1;
     my $ret = eval { $thing->$method(@args) };
-    return $@ || $stdout, $@ || $stderr, $ret;
+    return $stdout, $stderr, $ret;
   };
 }
 

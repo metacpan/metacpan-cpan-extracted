@@ -1,20 +1,17 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
-my $script = 'alt_retry';
-my $test   = $0;
-$test      =~ s,.*/,,;
-
+use warnings;
+use strict;
 use Test::Inter;
-$t = new Test::Inter "$test";
-$testdir = $t->testdir();
+$::ti = new Test::Inter $0;
+require "script.pl";
 
-require "$testdir/script.pl";
-
-my $tdir=`cd $testdir; pwd`;
+my $tdir = $::ti->testdir();
+$tdir    = `cd $tdir; pwd`;
 chomp($tdir);
 
 $::obj = '';
-$::obj = testScript($t,$script,$test,$testdir,
+$::obj = testScript(
                     'mode'   => 'script',
                    );
 
@@ -43,9 +40,9 @@ output stdout  command all          =>
 
 EOT
 
-$t->tests(func  => \&testScriptMode,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&testScriptMode,
+             tests => $tests);
+$::ti->done_testing();
 
 1;
 

@@ -7,6 +7,10 @@ use HTTP::Tiny;
 use JSON::PP;
 use Archive::Tar;
 use version;
+use Getopt::Long;
+use File::Path;
+
+GetOptions(blead => \my $blead);
 
 # XXX: 5.8.8 and 5.8.9 also have debug_tokens.
 my $min_version = version->parse('5.010000');
@@ -44,6 +48,15 @@ my $dst_dir = "$FindBin::Bin/../lib/Perl/gen";
 mkdir $src_dir unless -d $src_dir;
 mkdir $dst_dir unless -d $dst_dir;
 
+if ($blead) {
+    my $blead_dir = "$src_dir/blead";
+    rmtree($blead_dir) if -d $blead_dir;
+    system('git', 'clone', 'https://github.com/perl/Perl5', '--depth', 1, $blead_dir);
+    my ($version_line) = grep /^version=/, do { open my $fh, '<', "$blead_dir/Porting/config.sh" or die $!; <$fh> };
+    my ($blead_version) = $version_line =~ /(5\.[0-9]+\.[0-9])/;
+    push @perls, {version => 'blead', canon_version => $blead_version};
+}
+
 open my $map, '>', "$dst_dir/token_info_map.h";
 
 my %seen;
@@ -53,21 +66,28 @@ for my $perl (@perls) {
     my $canon_version = $perl->{canon_version};
     next if $seen{$version}++;
     say "processing $version...";
-    my $file = "$src_dir/perl-$version.tar.gz";
-    if (!-f $file) {
-        say "downloading $version...";
-        my $res = $ua->mirror($perl->{url}, $file);
-        unless ($res->{success}) {
-            warn "Can't download $version";
-            next;
+    if ($version ne 'blead') {
+        my $file = "$src_dir/perl-$version.tar.gz";
+        if (!-f $file) {
+            say "downloading $version...";
+            my $res = $ua->mirror($perl->{url}, $file);
+            unless ($res->{success}) {
+                warn "Can't download $version";
+                next;
+            }
         }
-    }
-    my $tar = Archive::Tar->new($file, 1);
+        my $tar = Archive::Tar->new($file, 1);
 
-    for my $name (qw/perly.h toke.c/) {
-        (my $vname = $name) =~ s/\./-$canon_version./;
-        unlink "$src_dir/$vname" if -f "$src_dir/$vname";
-        $tar->extract_file("perl-$version/$name", "$src_dir/$vname");
+        for my $name (qw/perly.h toke.c/) {
+            (my $vname = $name) =~ s/\./-$canon_version./;
+            unlink "$src_dir/$vname" if -f "$src_dir/$vname";
+            $tar->extract_file("perl-$version/$name", "$src_dir/$vname");
+        }
+    } else {
+        for my $name (qw/perly.h toke.c/) {
+            (my $vname = $name) =~ s/\./-$canon_version./;
+            rename "$src_dir/blead/$name" => "$src_dir/$vname";
+        }
     }
 
     my $perly = '';
@@ -75,7 +95,7 @@ for my $perl (@perls) {
     {
         my $src = "$src_dir/perly-$canon_version.h";
         my $dst = "$dst_dir/perly-$canon_version.h";
-        open my $in, '<', $src;
+        open my $in, '<', $src or die $!;
         open my $out, '>', $dst;
         my $in_yytokentype;
         while(<$in>) {

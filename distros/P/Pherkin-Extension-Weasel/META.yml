@@ -5,7 +5,7 @@ author:
 build_requires:
   Carp::Always: '0'
   Test::More: '0'
-  Weasel::Driver::Mock: '0'
+  Weasel::Driver::Mock: '0.02'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
@@ -30,5 +30,8 @@ requires:
 resources:
   bugtracker: https://github.com/ehuelsmann/pherkin-extension-weasel/issues
   repository: https://github.com/ehuelsmann/pherkin-extension-weasel.git
-version: '0.11'
+version: '0.12'
+x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'Yves Lavoie <ylavoie@yveslavoie.com>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

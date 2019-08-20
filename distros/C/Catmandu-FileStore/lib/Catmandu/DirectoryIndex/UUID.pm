@@ -1,6 +1,6 @@
 package Catmandu::DirectoryIndex::UUID;
 
-our $VERSION = '1.13';
+our $VERSION = '1.14';
 
 use Catmandu::Sane;
 use Catmandu::Util qw(:is :check);
@@ -9,7 +9,6 @@ use Cwd;
 use Path::Tiny;
 use Path::Iterator::Rule;
 use File::Spec;
-use Data::UUID;
 use Catmandu::BadArg;
 use Catmandu::Error;
 use Data::Dumper;

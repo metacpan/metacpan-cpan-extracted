@@ -1,6 +1,6 @@
 package Catmandu::Fix::uri_status_code;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use Catmandu::Sane;
 use LWP::UserAgent;

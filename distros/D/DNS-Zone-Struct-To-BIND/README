@@ -1,0 +1,89 @@
+NAME
+    DNS::Zone::Struct::To::BIND - Generate BIND zone configuration from
+    structure
+
+VERSION
+    This document describes version 0.002 of DNS::Zone::Struct::To::BIND
+    (from Perl distribution DNS-Zone-Struct-To-BIND), released on
+    2019-08-19.
+
+SYNOPSIS
+     use DNS::Zone::Struct::To::BIND qw(gen_bind_zone_from_struct);
+
+     say gen_bind_zone_from_struct(
+         zone => {
+             records => [
+                 {type=>'SOA',   name=>'', host=>'', ttl=>300, serial=>'2019072401', refresh=>7200, retry=>1800, expire=>12009600, email=>'hostmaster@example.org'},
+                 {type=>'NS',    name=>'', host=>'ns1.example.com'},
+                 {type=>'NS',    name=>'', host=>'ns2.example.com'},
+                 {type=>'A' ,    name=>'', address=>'1.2.3.4'},
+                 {type=>'CNAME', name=>'www', canon=>''},
+             ],
+         },
+         master_host => 'ns1.example.com',
+     );
+
+    will output something like:
+
+     $TTL 300
+     @ IN 300 SOA ns1.example.com. hostmaster.example.org. (
+       2019072401 ;serial
+       7200 ;refresh
+       1800 ;retry
+       12009600 ;expire
+       300 ;ttl
+       )
+      IN NS ns1.example.com.
+      IN NS ns2.example.com.
+      IN A 1.2.3.4
+     www IN CNAME @
+
+FUNCTIONS
+  gen_bind_zone_from_struct
+    Usage:
+
+     gen_bind_zone_from_struct(%args) -> any
+
+    Generate BIND zone configuration from structure.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   master_host* => *net::hostname*
+
+    *   zone* => *dns::zone*
+
+        DNS zone structure, as described in the "dns::zone" Sah schema (see
+        Sah::Schema::dns::zone).
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/DNS-Zone-Struct-To-BIND>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-DNS-Zone-Struct-To-BIND>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=DNS-Zone-Struct-To-BI
+    ND>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Sah::Schemas::DNS
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

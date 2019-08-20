@@ -49,20 +49,20 @@ subtest 'without Math::LongDouble' => sub {
   };
 
   subtest 'pointer' => sub {
-    my $a = 1.5;
-    my $b = 2.5;
-    ok longdouble_pointer_test(\$a, \$b);
-    ok $a == 4.0;
-    ok $b == 8.0;
+    my $x = 1.5;
+    my $y = 2.5;
+    ok longdouble_pointer_test(\$x, \$y);
+    ok $x == 4.0;
+    ok $y == 8.0;
     ok pointer_is_null(undef);
-    
+
     my $c = longdouble_pointer_return_test(1.5);
     ok $$c == 1.5;
   };
 
   subtest 'array fixed' => sub {
     my $list = [ qw( 25.0 25.0 50.0 )];
-    
+
     ok longdouble_array_test3($list, 3);
     note "[", join(',', map { "$_" } @$list), "]";
     ok $list->[0] == 1.0;
@@ -72,7 +72,7 @@ subtest 'without Math::LongDouble' => sub {
 
   subtest 'array var' => sub {
     my $list = [ qw( 25.0 25.0 50.0 )];
-    
+
     ok longdouble_array_test($list, 3);
     note "[", join(',', map { "$_" } @$list), "]";
     ok $list->[0] == 1.0;

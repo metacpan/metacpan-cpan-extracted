@@ -13,7 +13,7 @@ use constant SUB_NAME_IS_AVAILABLE => $INC{'App/FatPacker/Trace.pm'}
 our $INSTANTIATING = 0;
 our $PERLDOC       = 'perldoc';
 our $SUBCMD_PREFIX = 'command';
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 my $ANON = 0;
 
 sub app {
@@ -48,6 +48,7 @@ sub app {
 
   # Create the application and run (or return) it
   local $INSTANTIATING = 1;
+  local $@;
   my $app = eval {
     $self->{application_class} ||= $self->_generate_application_class;
     $self->{application_class}->new(\%argv);
@@ -196,6 +197,7 @@ sub print_version {
   my $version = $self->version or die 'Cannot print version without version()';
 
   unless ($version =~ m!^\d!) {
+    local $@;
     eval "require $version; 1" or die "Could not load $version: $@";
     $version = $version->VERSION;
   }
@@ -319,7 +321,7 @@ sub _generate_attribute_accessor {
     return sub {
       @_ == 1 && exists $_[0]{$name} && return $_[0]{$name};
       my $val = @_ > 1 ? $_[1] : $_[0]->$default;
-      $_[0]{$name} = ref $val eq 'ARRAY' ? [map { $class->new($_) } @$val] : $class->new($val);
+      $_[0]{$name} = ref $val eq 'ARRAY' ? [map { $class->new($_) } @$val] : defined($val) ? $class->new($val) : undef;
     };
   }
   else {
@@ -338,6 +340,7 @@ sub _generate_application_class {
   $ANON++;
   $application_class =~ s!\W!_!g;
   $application_class = join '::', ref($self), "__ANON__${ANON}__", $application_class;
+  local $@;
   eval qq[package $application_class; use base qw(@$extends); 1] or die "Failed to generate application class: $@";
 
   _sub("$application_class\::new"     => \&_app_new) unless grep { $_->can('new') } @$extends;
@@ -380,6 +383,7 @@ sub _generate_application_class {
 sub _load_class {
   my $class = shift or return undef;
   return $class if $class->can('new');
+  local $@;
   return eval "require $class; 1" ? $class : "";
 }
 
@@ -391,7 +395,8 @@ sub _print_synopsis {
   my ($print, $classpath);
 
   unless (-e $documentation) {
-    eval "use $documentation; 1" or die "Could not load $documentation: $@";
+    local $@;
+    eval "require $documentation; 1" or die "Could not load $documentation: $@";
     $documentation =~ s!::!/!g;
     $documentation = $INC{$classpath = "$documentation.pm"};
   }
@@ -443,7 +448,7 @@ Applify - Write object oriented scripts with ease
 
 =head1 VERSION
 
-0.16
+0.17
 
 =head1 DESCRIPTION
 
@@ -469,24 +474,24 @@ directly in the script file and not in a module.
 
   # app {...}; must be the last statement in the script
   app {
-    my($self, @extra) = @_;
+    my ($app, @extra) = @_;
     my $exit_value = 0;
 
     print "Extra arguments: @extra\n" if(@extra);
-    print "Will read from: ", $self->input_file, "\n";
-    print "Will write files to: ", $self->output_dir, "\n";
+    print "Will read from: ", $app->input_file, "\n";
+    print "Will write files to: ", $app->output_dir, "\n";
 
-    if($self->dry_run) {
+    if($app->dry_run) {
       die 'Will not run script';
     }
 
-    return $self->generate_exit_value;
+    return $app->generate_exit_value;
   };
 
 =head1 APPLICATION CLASS
 
-This module will generate an application class, which C<$self> inside the
-L</app> block refer to. This class will have:
+This module will generate an application class, which C<$app> inside the
+L</app> block is an instance of. The class will have these methods:
 
 =over 2
 
@@ -501,13 +506,13 @@ This method is basically the code block given to L</app>.
 
 =item * Other methods
 
-Other methods defined in the script file will be accesible from C<$self>
+Other methods defined in the script file will be accesible from C<$app>
 inside C<app{}>.
 
 =item * C<_script()>
 
 This is an accessor which return the L<Applify> object which
-is refered to as C<$self> in this documentation.
+is refered to as C<$script> in this documentation.
 
 NOTE: This accessor starts with an underscore to prevent conflicts
 with L</options>.
@@ -530,9 +535,9 @@ application object.
 
 This function is used to define options which can be given to this
 application. See L</SYNOPSIS> for example code. This function can also be
-called as a method on C<$self>. Additionally, similar to
+called as a method on C<$script>. Additionally, similar to
 L<Moose attributes|Moose::Manual::Attributes#Predicate-and-clearer-methods>, a
-C<has_$name> method will be generated, which can be called on C<$self> to
+C<has_$name> method will be generated, which can be called on C<$app> to
 determine if the L</option> has been set, either by a user or from the
 C<$default>.
 
@@ -564,8 +569,8 @@ inside the application. Example:
 
   # run the application code:
   app {
-    my $self = shift;
-    print $self->some_file # prints "/foo/bar"
+    my $app = shift;
+    print $app->some_file # prints "/foo/bar"
     return 0;
   };
 
@@ -663,21 +668,21 @@ classes can be L<Moose> based.
   };
 
   sub command_create {
-    my ($self, @extra) = @_;
+    my ($app, @extra) = @_;
     ## do creating
     return 0;
   }
 
   sub command_list {
-    my ($self, @extra) = @_;
+    my ($app, @extra) = @_;
     ## do listing
     return 0;
   }
 
   app {
-    my ($self, @extra) = @_;
+    my ($app, @extra) = @_;
     ## fallback when no command given.
-    $self->_script->print_help;
+    $app->_script->print_help;
     return 0;
   };
 
@@ -694,7 +699,7 @@ on the command line will result in the help being displayed.
 
 This function will define the code block which is called when the application
 is started. See L</SYNOPSIS> for example code. This function can also be
-called as a method on C<$self>.
+called as a method on C<$script>.
 
 IMPORTANT: This function must be the last function called in the script file
 for unit tests to work. Reason for this is that this function runs the
@@ -705,8 +710,8 @@ application object in list/scalar context (from L<perlfunc/do>).
 
 =head2 option_parser
 
-  $self = $self->option_parser(Getopt::Long::Parser->new);
-  $parser = $self->option_parser;
+  $script = $script->option_parser(Getopt::Long::Parser->new);
+  $parser = $script->option_parser;
 
 You can specify your own option parser if you have special needs. The default
 is:
@@ -715,7 +720,7 @@ is:
 
 =head2 options
 
-  $array_ref = $self->options;
+  $array_ref = $script->options;
 
 Holds the application options given to L</option>.
 
@@ -723,7 +728,7 @@ Holds the application options given to L</option>.
 
 =head2 new
 
-  $self = $class->new({options => $array_ref, ...});
+  $script = Applify->new({options => $array_ref, ...});
 
 Object constructor. Creates a new object representing the script meta
 information.

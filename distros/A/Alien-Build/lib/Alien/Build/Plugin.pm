@@ -8,7 +8,7 @@ use Carp ();
 our @CARP_NOT = qw( alienfile Alien::Build Alien::Build::Meta );
 
 # ABSTRACT: Plugin base class for Alien::Build
-our $VERSION = '1.79'; # VERSION
+our $VERSION = '1.83'; # VERSION
 
 
 sub new
@@ -16,22 +16,22 @@ sub new
   my $class = shift;
   my %args = @_ == 1 ? ($class->meta->default => $_[0]) : @_;
   my $self = bless {}, $class;
-  
+
   my $prop = $self->meta->prop;
   foreach my $name (keys %$prop)
   {
-    $self->{$name} = defined $args{$name} 
-      ? delete $args{$name} 
+    $self->{$name} = defined $args{$name}
+      ? delete $args{$name}
       : ref($prop->{$name}) eq 'CODE'
         ? $prop->{$name}->()
         : $prop->{$name};
   }
-  
+
   foreach my $name (keys %args)
   {
     Carp::carp "$class has no $name property";
   }
-  
+
   $self;
 }
 
@@ -50,13 +50,13 @@ sub import
 
   my $caller = caller;
   { no strict 'refs'; @{ "${caller}::ISA" } = __PACKAGE__ }
-  
+
   my $meta = $caller->meta;
   my $has = sub {
     my($name, $default) = @_;
     $meta->add_property($name, $default);
   };
-  
+
   { no strict 'refs'; *{ "${caller}::has" } = $has }
 }
 
@@ -111,7 +111,7 @@ sub add_property
     $self->{$name} = $new if defined $new;
     $self->{$name};
   };
-  
+
   # add the accessor
   { no strict 'refs'; *{ $self->{class} . '::' . $name} = $accessor }
 
@@ -137,7 +137,7 @@ Alien::Build::Plugin - Plugin base class for Alien::Build
 
 =head1 VERSION
 
-version 1.79
+version 1.83
 
 =head1 SYNOPSIS
 
@@ -155,11 +155,11 @@ Create your plugin:
  sub init
  {
    my($self, $meta) = @_;
-
+ 
    my $prop1 = $self->prop1;
    my $prop2 = $self->prop2;
    my $prop3 = $self->prop3;
-   
+ 
    $meta->register_hook(sub {
      build => [ '%{make}', '%{make} install' ],
    });

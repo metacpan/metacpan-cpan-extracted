@@ -1,0 +1,42 @@
+---
+abstract: "It's new $module"
+author:
+  - 'Mikhail Ivanov <m.ivanych@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+  Test::Perl::Critic: '0'
+  Test::PerlTidy: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.2, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Telemetry-Any
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Telemetry::Any:
+    file: lib/Telemetry/Any.pm
+    version: '0.02'
+requires:
+  Devel::Timer: '0.12'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/ivanych/Telemetry-Any/issues
+  homepage: https://github.com/ivanych/Telemetry-Any
+  repository: git://github.com/ivanych/Telemetry-Any.git
+version: '0.02'
+x_authority: cpan:IVANYCH
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

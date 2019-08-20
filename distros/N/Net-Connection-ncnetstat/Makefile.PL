@@ -25,6 +25,7 @@ my %WriteMakefileArgs = (
 									   'Term::ANSIColor'=>'4.06',
 									   'Text::ANSITable'=>'0.501',
 									   'Getopt::Long'=>'0.0.0',
+									   'Data::Unixish::Apply'=>'1.570',
 									   },
 						 dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 						 clean => { FILES => 'Net-Connection-ncnetstat-*' },

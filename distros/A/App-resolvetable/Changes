@@ -1,4 +1,9 @@
-0.004   2019-05-30 (PERLANCAR)
+0.005   2019-08-20  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Make --colorize the default.
+
+
+0.004   2019-05-30  Released-By: PERLANCAR
 
 	- [doc] Add screenshots.
 
@@ -9,7 +14,7 @@
 	  (--action=show-timings).
 
 
-0.003   2019-05-29 (PERLANCAR)
+0.003   2019-05-29  Released-By: PERLANCAR
 
 	- Add option --times (--action=show-times) to show timing results
 	  instead of the results.
@@ -17,13 +22,13 @@
 	- [ux] When --colorize, mark undefined result with red X.
 
 
-0.002   2019-05-28 (PERLANCAR)
+0.002   2019-05-28  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Add example.
 
 
-0.001   2019-05-28 (PERLANCAR)
+0.001   2019-05-28  Released-By: PERLANCAR
 
         - First release.

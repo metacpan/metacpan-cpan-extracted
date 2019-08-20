@@ -2,7 +2,7 @@ package TestApp::File;
 use overload
   '""'     => sub { ${$_[0]} },
   fallback => 1;
-sub new { return bless \(pop), 'TestApp::File'; }
+sub new { die "Invalid" unless $_[1]; return bless \(pop), 'TestApp::File'; }
 
 package main;
 use warnings;

@@ -9,7 +9,7 @@ use Capture::Tiny 0.17 qw/capture_stdout/;
 use Text::ParseWords qw/shellwords/;
 
 # ABSTRACT: Base classes for Alien:: modules
-our $VERSION = '1.79'; # VERSION
+our $VERSION = '1.83'; # VERSION
 
 
 sub import {
@@ -38,7 +38,7 @@ sub import {
 
   my @libs = $class->split_flags( $class->libs );
 
-  my @L = grep { s/^-L// } @libs;
+  my @L = grep { s/^-L// } map { "$_" } @libs;  ## no critic (ControlStructures::ProhibitMutatingListFunctions)
   my @l = grep { /^-l/ } @libs;
 
   unshift @DynaLoader::dl_library_path, @L;
@@ -68,10 +68,10 @@ sub import {
 sub _dist_dir ($)
 {
   my($dist_name) = @_;
-  
+
   my @pm = split /-/, $dist_name;
   $pm[-1] .= ".pm";
-  
+
   foreach my $inc (@INC)
   {
     my $pm = Path::Tiny->new($inc, @pm);
@@ -94,7 +94,7 @@ sub dist_dir {
   my $dist = blessed $class || $class;
   $dist =~ s/::/-/g;
 
-  my $dist_dir = 
+  my $dist_dir =
     $class->config('finished_installing')
       ? _dist_dir $dist
       : $class->config('working_directory');
@@ -123,9 +123,10 @@ sub _flags
   if($prefix ne $distdir)
   {
     $flags = join ' ', map {
-      s/^(-I|-L|-LIBPATH:)?\Q$prefix\E/$1$distdir/;
-      s/(\s)/\\$1/g;
-      $_;
+      my $flag = $_;
+      $flag =~ s/^(-I|-L|-LIBPATH:)?\Q$prefix\E/$1$distdir/;
+      $flag =~ s/(\s)/\\$1/g;
+      $flag;
     } $class->split_flags($flags);
   }
 
@@ -216,7 +217,7 @@ sub version_cmp {
       # Numerical comparison
       return $x <=> $y if $x != $y;
     }
-    elsif(!$x_isnum and !$y_isnum) {
+    elsif(!$x_isnum && !$y_isnum) {
       # Alphabetic comparison
       return $x cmp $y if $x ne $y;
     }
@@ -282,9 +283,10 @@ sub _pkgconfig_keyword {
     $dist_dir =~ s{\\}{/}g if $^O eq 'MSWin32';
     my $old = quotemeta $self->config('original_prefix');
     @strings = map {
-      s{^(-I|-L|-LIBPATH:)?($old)}{$1.$dist_dir}e;
-      s/(\s)/\\$1/g;
-      $_;
+      my $flag = $_;
+      $flag =~ s{^(-I|-L|-LIBPATH:)?($old)}{$1.$dist_dir}e;
+      $flag =~ s/(\s)/\\$1/g;
+      $flag;
     } map { $self->split_flags($_) } @strings;
   }
 
@@ -311,7 +313,9 @@ sub _pkgconfig {
   # Run through all pkgconfig objects and ensure that their modules are loaded:
   for my $pkg_obj (values %all) {
     my $perl_module_name = blessed $pkg_obj;
-    eval "require $perl_module_name";
+    my $pm = "$perl_module_name.pm";
+    $pm =~ s/::/\//g;
+    eval { require $pm };
   }
 
   return @all{@_} if @_;
@@ -460,8 +464,8 @@ sub bin_dir {
   if($class->install_type('system'))
   {
     my $prop = $class->runtime_prop;
-    return unless defined $prop;
-    return unless defined $prop->{system_bin_dir};
+    return () unless defined $prop;
+    return () unless defined $prop->{system_bin_dir};
     return ref $prop->{system_bin_dir} ? @{ $prop->{system_bin_dir} } : ($prop->{system_bin_dir});
   }
   else
@@ -604,17 +608,17 @@ Alien::Base - Base classes for Alien:: modules
 
 =head1 VERSION
 
-version 1.79
+version 1.83
 
 =head1 SYNOPSIS
 
  package Alien::MyLibrary;
-
+ 
  use strict;
  use warnings;
-
+ 
  use parent 'Alien::Base';
-
+ 
  1;
 
 (for details on the C<Makefile.PL> or C<Build.PL> and L<alienfile>
@@ -748,7 +752,7 @@ unnecessary.
 =head2 cflags
 
  my $cflags = Alien::MyLibrary->cflags;
-
+ 
  use Text::ParseWords qw( shellwords );
  my @cflags = shellwords( Alien::MyLibrary->cflags );
 
@@ -768,7 +772,7 @@ if they are different.
 =head2 libs
 
  my $libs = Alien::MyLibrary->libs;
-
+ 
  use Text::ParseWords qw( shellwords );
  my @cflags = shellwords( Alien::MyLibrary->libs );
 
@@ -930,7 +934,7 @@ need it.  From the L<alienfile> of C<Alien::nasm>:
    ...
    plugin 'Extract' => 'tar.gz';
    plugin 'Build::MSYS';
-   
+ 
    build [
      'sh configure --prefix=%{alien.install.prefix}',
      '%{gmake}',

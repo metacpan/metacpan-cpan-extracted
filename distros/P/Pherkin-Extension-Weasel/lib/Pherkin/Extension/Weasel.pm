@@ -5,7 +5,7 @@ Pherkin::Extension::Weasel - Pherkin extension for web-testing
 
 =head1 VERSION
 
-0.11
+0.12
 
 =head1 SYNOPSIS
 
@@ -26,7 +26,7 @@ Pherkin::Extension::Weasel - Pherkin extension for web-testing
               driver:
                 drv_name: Weasel::Driver::Selenium2
                 wait_timeout: 3000
-                window_size   1024x1280
+                window_size:  1024x1280
                 caps:
                    port: 4420
 
@@ -47,7 +47,7 @@ package Pherkin::Extension::Weasel;
 use strict;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 
 use Digest::MD5 qw(md5_hex);

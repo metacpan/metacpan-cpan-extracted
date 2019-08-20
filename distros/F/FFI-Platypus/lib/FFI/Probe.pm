@@ -8,10 +8,10 @@ use FFI::Probe::Runner;
 use FFI::Build;
 use FFI::Build::File::C;
 use Capture::Tiny qw( capture_merged capture );
-use File::Temp qw( tempdir );
+use FFI::Temp;
 
 # ABSTRACT: System detection and probing for FFI extensions.
-our $VERSION = '0.94'; # VERSION
+our $VERSION = '0.96'; # VERSION
 
 
 sub new
@@ -49,7 +49,7 @@ sub new
     log           => $args{log},
     data_filename => $args{data_filename},
     data          => $data,
-    dir           => tempdir( CLEANUP => 1, TEMPLATE => 'ffi-probe-XXXXXX', DIR => '.' ),
+    dir           => FFI::Temp->newdir( TEMPLATE => 'ffi-probe-XXXXXX' ),
     counter       => 0,
     runner        => $args{runner},
     alien         => $args{alien} || [],
@@ -445,7 +445,7 @@ sub save
     ->Sortkeys(1)
     ->Dump;
 
-  mkpath( $dir, 0, 0755 ) unless -d $dir;
+  mkpath( $dir, 0, oct(755) ) unless -d $dir;
 
   my $fh;
   open($fh, '>', $self->{data_filename}) || die "error writing @{[ $self->{data_filename} ]}";
@@ -511,12 +511,12 @@ FFI::Probe - System detection and probing for FFI extensions.
 
 =head1 VERSION
 
-version 0.94
+version 0.96
 
 =head1 SYNOPSIS
 
  use FFI::Probe;
-
+ 
  my $probe = FFI::Probe->new;
  $probe->check_header('foo.h');
  ...
@@ -671,6 +671,8 @@ Ilya Pavlov (Ilya33)
 Petr Pisar (ppisar)
 
 Mohammad S Anwar (MANWAR)
+
+Håkon Hægland (hakonhagland, HAKONH)
 
 =head1 COPYRIGHT AND LICENSE
 

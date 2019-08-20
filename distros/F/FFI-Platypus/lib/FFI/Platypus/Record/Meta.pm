@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: FFI support for structured records data
-our $VERSION = '0.94'; # VERSION
+our $VERSION = '0.96'; # VERSION
 
 
 {
@@ -13,7 +13,7 @@ our $VERSION = '0.94'; # VERSION
     api          => 1,
     experimental => 1,  # okay if used internally
   );
-  $ffi->package;
+  $ffi->bundle;
   $ffi->mangler(sub {
     my($name) = @_;
     $name =~ s/^/ffi_platypus_record_meta__/;
@@ -83,7 +83,7 @@ FFI::Platypus::Record::Meta - FFI support for structured records data
 
 =head1 VERSION
 
-version 0.94
+version 0.96
 
 =head1 DESCRIPTION
 
@@ -119,6 +119,8 @@ Ilya Pavlov (Ilya33)
 Petr Pisar (ppisar)
 
 Mohammad S Anwar (MANWAR)
+
+Håkon Hægland (hakonhagland, HAKONH)
 
 =head1 COPYRIGHT AND LICENSE
 

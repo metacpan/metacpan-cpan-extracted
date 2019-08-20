@@ -11,7 +11,7 @@ use File::Path ();
 use FFI::Build::File::Object;
 
 # ABSTRACT: Class to track C source file in FFI::Build
-our $VERSION = '0.94'; # VERSION
+our $VERSION = '0.96'; # VERSION
 
 
 sub accept_suffix
@@ -35,10 +35,10 @@ sub build_item
     platform => $self->platform,
     build    => $self->build,
   );
-  
+
   return $object if -f $object->path && !$object->needs_rebuild($self->_deps);
-  
-  File::Path::mkpath($object->dirname, { verbose => 0, mode => 0700 });
+
+  File::Path::mkpath($object->dirname, { verbose => 0, mode => oct(700) });
 
   my @cmd = (
     $self->_base_args,
@@ -63,7 +63,7 @@ sub build_item
   {
     print "CC @{[ $self->path ]}\n";
   }
-  
+
   $object;
 }
 
@@ -110,7 +110,7 @@ sub build_item_cpp
     build    => $self->build,
   );
 
-  File::Path::mkpath($ifile->dirname, { verbose => 0, mode => 0700 });
+  File::Path::mkpath($ifile->dirname, { verbose => 0, mode => oct(700) });
 
   my @cmd = (
     $self->_base_args_cpp,
@@ -141,7 +141,7 @@ sub build_item_cpp
 sub _deps
 {
   my($self) = @_;
-  
+
   return $self->path unless $self->platform->cc_mm_works;
 
   my @cmd = (
@@ -149,11 +149,11 @@ sub _deps
     '-MM',
     $self->path,
   );
-  
+
   my($out,$err,$exit) = Capture::Tiny::capture(sub {
     $self->platform->run(@cmd);
   });
-  
+
   if($exit)
   {
     print $out;
@@ -163,6 +163,8 @@ sub _deps
   }
   else
   {
+    $out =~ s/^\+.*\n//; # remove the command line
+                         # which on windows could have an confusing :
     my(undef, $deps) = split /:/, $out, 2;
     $deps =~ s/^\s+//;
     $deps =~ s/\s+$//;
@@ -184,7 +186,7 @@ FFI::Build::File::C - Class to track C source file in FFI::Build
 
 =head1 VERSION
 
-version 0.94
+version 0.96
 
 =head1 SYNOPSIS
 
@@ -225,6 +227,8 @@ Ilya Pavlov (Ilya33)
 Petr Pisar (ppisar)
 
 Mohammad S Anwar (MANWAR)
+
+Håkon Hægland (hakonhagland, HAKONH)
 
 =head1 COPYRIGHT AND LICENSE
 

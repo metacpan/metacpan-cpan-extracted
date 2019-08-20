@@ -1,0 +1,3 @@
+echo This is host: `hostname -s`
+echo Succ1                          #OPTS label Succ1
+echo Succ2                          #OPTS label Succ2

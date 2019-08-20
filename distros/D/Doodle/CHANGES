@@ -1,6 +1,12 @@
 Changelog for Doodle
 
-0.03 2019-08-18T23:33:42
+0.04 2019-08-20T08:25:35
+ - Updated documentation
+ - Added CONTRIBUTING.mkdn
+ - Added data migration framework
+
+0.03 2019-08-18T23:33:47
+ - Built release version 0.03
  - Updated documentation
  - Updated release script
  - Enable support for DB engine, charset and collation

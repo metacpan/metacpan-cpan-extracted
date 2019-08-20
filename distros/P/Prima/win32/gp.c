@@ -480,7 +480,7 @@ apc_gp_fill_chord( Handle self, int x, int y, int dX, int dY, double angleStart,
 	int compl, needf;
 
 	compl = arc_completion( &angleStart, &angleEnd, &needf);
-	comp = stylus_complex( &sys stylus, ps);
+	comp = ((sys psFillMode & fmOverlay) == 0) || stylus_complex( &sys stylus, ps);
 	y = sys lastSize. y - y - 1;
 	STYLUS_USE_BRUSH( ps);
 
@@ -510,7 +510,7 @@ apc_gp_fill_ellipse( Handle self, int x, int y, int dX, int dY)
 	Bool ok = true;
 	HDC     ps  = sys ps;
 	HGDIOBJ old;
-	Bool    comp = stylus_complex( &sys stylus, ps);
+	Bool    comp = ((sys psFillMode & fmOverlay) == 0) || stylus_complex( &sys stylus, ps);
 	STYLUS_USE_BRUSH( ps);
 	y = sys lastSize. y - y - 1;
 	if ( comp) {
@@ -553,7 +553,12 @@ apc_gp_fill_poly( Handle self, int numPts, Point * points)
 
 	for ( i = 0; i < numPts; i++) points[ i]. y = dy - points[ i]. y - 1;
 
-	if ( !stylus_complex( &sys stylus, ps)) {
+	if (( sys psFillMode & fmOverlay) == 0) {
+		HGDIOBJ old = SelectObject( ps, hPenHollow);
+		STYLUS_USE_BRUSH( ps);
+		if ( !( ok = Polygon( ps, ( POINT *) points, numPts))) apiErr;
+		SelectObject( ps, old);
+	} else if ( !stylus_complex( &sys stylus, ps)) {
 		HPEN old = SelectObject( ps, CreatePen( PS_SOLID, 1, sys stylus. brush. lb. lbColor));
 		STYLUS_USE_BRUSH( ps);
 		if ( !( ok = Polygon( ps, ( POINT *) points, numPts))) apiErr;
@@ -641,7 +646,7 @@ apc_gp_fill_sector( Handle self, int x, int y, int dX, int dY, double angleStart
 	int compl, needf;
 
 	compl = arc_completion( &angleStart, &angleEnd, &needf);
-	comp = stylus_complex( &sys stylus, ps);
+	comp = ((sys psFillMode & fmOverlay) == 0) || stylus_complex( &sys stylus, ps);
 
 	pts[ 0]. x = x + cos( angleEnd / GRAD) * dX / 2 + 0.5;
 	pts[ 0]. y = newY - sin( angleEnd / GRAD) * dY / 2 + 0.5;
@@ -693,6 +698,108 @@ apc_gp_get_pixel( Handle self, int x, int y)
 	if ( c == CLR_INVALID) return clInvalid;
 	return remap_color(( Color) c, false);
 }}
+
+int
+apc_gp_get_glyph_outline( Handle self, int index, int flags, int ** buffer)
+{
+	int offset, gdi_size, r_size, *r_buf, *r_ptr;
+	Byte * gdi_buf;
+	GLYPHMETRICS gm;
+	MAT2 matrix;
+	UINT format;
+
+	memset(&matrix, 0, sizeof(matrix));
+	matrix.eM11.value = matrix.eM22.value = 1;
+
+	format = GGO_NATIVE;
+	if ( flags & ggoGlyphIndex )       format |= GGO_GLYPH_INDEX;
+	if (( flags & ggoUseHints ) == 0 ) format |= GGO_UNHINTED;
+
+	gdi_size = (flags & ggoUnicode) ?
+		GetGlyphOutlineW(sys ps, index, format, &gm, 0, NULL, &matrix) :
+		GetGlyphOutlineA(sys ps, index, format, &gm, 0, NULL, &matrix);
+	if ( gdi_size <= 0 ) {
+		if ( gdi_size < 0 ) apiErr;
+		return 0;
+	}
+
+	if (( gdi_buf = malloc(gdi_size)) == NULL ) {
+		warn("Not enough memory");
+		return 0;
+	}
+
+	if (
+		( (flags & ggoUnicode) ?
+			GetGlyphOutlineW(sys ps, index, format, &gm, gdi_size, gdi_buf, &matrix) :
+			GetGlyphOutlineA(sys ps, index, format, &gm, gdi_size, gdi_buf, &matrix)
+		) == GDI_ERROR
+	) {
+		apiErr;
+		free(gdi_buf);
+		return 0;
+	}
+
+	offset = 0;
+	r_size = 0;
+	while ( offset < gdi_size ) {
+		TTPOLYGONHEADER * h = ( TTPOLYGONHEADER*) (gdi_buf + offset);
+		unsigned int curve_offset = sizeof(TTPOLYGONHEADER);
+		r_size += 2 /* cmd=ggoMove */ + 2 /* x, y */;
+		while ( curve_offset < h->cb ) {
+			TTPOLYCURVE * c = (TTPOLYCURVE*) (gdi_buf + offset + curve_offset);
+			curve_offset += sizeof(WORD) * 2 + c->cpfx * sizeof(POINTFX);
+			r_size += 2 /* cmd */ + c->cpfx * 2;
+		}
+		offset += h->cb;
+	}
+	if (( r_buf = malloc(r_size * sizeof(int))) == NULL ) {
+		warn("Not enough memory");
+		free(gdi_buf);
+		return 0;
+	}
+	r_ptr = r_buf;
+
+	offset = 0;
+#define PTX(x) (x.value * 64 + x.fract / (0x10000 / 64))
+	while ( offset < gdi_size ) {
+		TTPOLYGONHEADER * h = ( TTPOLYGONHEADER*) (gdi_buf + offset);
+		unsigned int curve_offset = sizeof(TTPOLYGONHEADER);
+		*(r_ptr++) = ggoMove;
+		*(r_ptr++) = 1;
+		*(r_ptr++) = PTX(h->pfxStart.x);
+		*(r_ptr++) = PTX(h->pfxStart.y);
+		while ( curve_offset < h->cb ) {
+			int i;
+			TTPOLYCURVE * c = (TTPOLYCURVE*) (gdi_buf + offset + curve_offset);
+			switch ( c-> wType ) {
+			case TT_PRIM_LINE:
+				*(r_ptr++) = ggoLine;
+				break;
+			case TT_PRIM_QSPLINE:
+				*(r_ptr++) = ggoConic;
+				break;
+			case TT_PRIM_CSPLINE:
+				*(r_ptr++) = ggoCubic;
+				break;
+			default:
+				warn("Unknown constant TT_PRIM_%d\n", c->wType);
+				free(gdi_buf);
+				free(r_buf);
+				return 0;
+			}
+			*(r_ptr++) = c-> cpfx;
+			for ( i = 0; i < c-> cpfx; i++) {
+				*(r_ptr++) = PTX(c->apfx[i].x);
+				*(r_ptr++) = PTX(c->apfx[i].y);
+			}
+			curve_offset += sizeof(WORD) * 2 + c->cpfx * sizeof(POINTFX);
+		}
+		offset += h->cb;
+	}
+	free(gdi_buf);
+	*buffer = r_buf;
+	return r_size;
+}
 
 ApiHandle
 apc_gp_get_handle( Handle self)
@@ -1262,12 +1369,11 @@ apc_gp_get_color( Handle self)
 	return remap_color( sys ps ? sys stylus. pen. lopnColor : sys lbs[0], false);
 }
 
-Bool
-apc_gp_get_fill_winding( Handle self)
+int
+apc_gp_get_fill_mode( Handle self)
 {
 	objCheck 0;
-	if ( ! sys ps) return sys fillWinding;
-	return GetPolyFillMode( sys ps) == WINDING;
+	return sys ps ? sys psFillMode : sys fillMode;
 }
 
 static Handle ctx_le2PS_ENDCAP[] = {
@@ -1346,6 +1452,16 @@ apc_gp_get_line_pattern( Handle self, unsigned char * buffer)
 		strcpy(( char *) buffer, "\1");
 		return 1;
 	}
+}
+
+float
+apc_gp_get_miter_limit( Handle self)
+{
+	FLOAT ml;
+	objCheck 0;
+	if ( !sys ps) return sys miterLimit;
+	if (! GetMiterLimit( sys ps, &ml)) return 0;
+	return (float)ml;
 }
 
 Color
@@ -1708,13 +1824,14 @@ apc_gp_set_color( Handle self, Color color)
 }
 
 Bool
-apc_gp_set_fill_winding( Handle self, Bool fillWinding)
+apc_gp_set_fill_mode( Handle self, int fillMode)
 {
 	objCheck false;
-	if ( sys ps)
-		SetPolyFillMode( sys ps, fillWinding ? WINDING : ALTERNATE);
-	else
-		sys fillWinding = fillWinding;
+	if ( sys ps) {
+		SetPolyFillMode( sys ps, ((fillMode & fmWinding) == fmAlternate) ? ALTERNATE : WINDING);
+		sys psFillMode = fillMode;
+	} else
+		sys fillMode = fillMode;
 	return true;
 }
 
@@ -1878,6 +1995,18 @@ apc_gp_set_line_pattern( Handle self, unsigned char * pattern, int len)
 	}
 	return true;
 }
+
+Bool
+apc_gp_set_miter_limit( Handle self, float miter_limit)
+{
+	objCheck false;
+	if ( !sys ps) {
+		sys miterLimit = miter_limit;
+		return true;
+	} else 
+		return SetMiterLimit( sys ps, (FLOAT) miter_limit, NULL);
+}
+
 
 Bool
 apc_gp_set_palette( Handle self)

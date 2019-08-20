@@ -4,7 +4,7 @@ Applify - Write object oriented scripts with ease
 
 # VERSION
 
-0.16
+0.17
 
 # DESCRIPTION
 
@@ -30,24 +30,24 @@ directly in the script file and not in a module.
 
     # app {...}; must be the last statement in the script
     app {
-      my($self, @extra) = @_;
+      my ($app, @extra) = @_;
       my $exit_value = 0;
 
       print "Extra arguments: @extra\n" if(@extra);
-      print "Will read from: ", $self->input_file, "\n";
-      print "Will write files to: ", $self->output_dir, "\n";
+      print "Will read from: ", $app->input_file, "\n";
+      print "Will write files to: ", $app->output_dir, "\n";
 
-      if($self->dry_run) {
+      if($app->dry_run) {
         die 'Will not run script';
       }
 
-      return $self->generate_exit_value;
+      return $app->generate_exit_value;
     };
 
 # APPLICATION CLASS
 
-This module will generate an application class, which `$self` inside the
-["app"](#app) block refer to. This class will have:
+This module will generate an application class, which `$app` inside the
+["app"](#app) block is an instance of. The class will have these methods:
 
 - `new()`
 
@@ -60,13 +60,13 @@ This module will generate an application class, which `$self` inside the
 
 - Other methods
 
-    Other methods defined in the script file will be accesible from `$self`
+    Other methods defined in the script file will be accesible from `$app`
     inside `app{}`.
 
 - `_script()`
 
     This is an accessor which return the [Applify](https://metacpan.org/pod/Applify) object which
-    is refered to as `$self` in this documentation.
+    is refered to as `$script` in this documentation.
 
     NOTE: This accessor starts with an underscore to prevent conflicts
     with ["options"](#options).
@@ -87,9 +87,9 @@ This module will generate an application class, which `$self` inside the
 
 This function is used to define options which can be given to this
 application. See ["SYNOPSIS"](#synopsis) for example code. This function can also be
-called as a method on `$self`. Additionally, similar to
+called as a method on `$script`. Additionally, similar to
 [Moose attributes](https://metacpan.org/pod/Moose::Manual::Attributes#Predicate-and-clearer-methods), a
-`has_$name` method will be generated, which can be called on `$self` to
+`has_$name` method will be generated, which can be called on `$app` to
 determine if the ["option"](#option) has been set, either by a user or from the
 `$default`.
 
@@ -119,8 +119,8 @@ determine if the ["option"](#option) has been set, either by a user or from the
 
         # run the application code:
         app {
-          my $self = shift;
-          print $self->some_file # prints "/foo/bar"
+          my $app = shift;
+          print $app->some_file # prints "/foo/bar"
           return 0;
         };
 
@@ -211,21 +211,21 @@ classes can be [Moose](https://metacpan.org/pod/Moose) based.
     };
 
     sub command_create {
-      my ($self, @extra) = @_;
+      my ($app, @extra) = @_;
       ## do creating
       return 0;
     }
 
     sub command_list {
-      my ($self, @extra) = @_;
+      my ($app, @extra) = @_;
       ## do listing
       return 0;
     }
 
     app {
-      my ($self, @extra) = @_;
+      my ($app, @extra) = @_;
       ## fallback when no command given.
-      $self->_script->print_help;
+      $app->_script->print_help;
       return 0;
     };
 
@@ -242,7 +242,7 @@ on the command line will result in the help being displayed.
 
 This function will define the code block which is called when the application
 is started. See ["SYNOPSIS"](#synopsis) for example code. This function can also be
-called as a method on `$self`.
+called as a method on `$script`.
 
 IMPORTANT: This function must be the last function called in the script file
 for unit tests to work. Reason for this is that this function runs the
@@ -253,8 +253,8 @@ application object in list/scalar context (from ["do" in perlfunc](https://metac
 
 ## option\_parser
 
-    $self = $self->option_parser(Getopt::Long::Parser->new);
-    $parser = $self->option_parser;
+    $script = $script->option_parser(Getopt::Long::Parser->new);
+    $parser = $script->option_parser;
 
 You can specify your own option parser if you have special needs. The default
 is:
@@ -263,7 +263,7 @@ is:
 
 ## options
 
-    $array_ref = $self->options;
+    $array_ref = $script->options;
 
 Holds the application options given to ["option"](#option).
 
@@ -271,7 +271,7 @@ Holds the application options given to ["option"](#option).
 
 ## new
 
-    $self = $class->new({options => $array_ref, ...});
+    $script = Applify->new({options => $array_ref, ...});
 
 Object constructor. Creates a new object representing the script meta
 information.

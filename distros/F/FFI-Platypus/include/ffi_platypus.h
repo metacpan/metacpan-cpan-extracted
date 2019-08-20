@@ -112,6 +112,7 @@ typedef enum _ffi_pl_type_code {
   FFI_PL_SHAPE_POINTER       = 0x1000,
   FFI_PL_SHAPE_ARRAY         = 0x2000,
   FFI_PL_SHAPE_CUSTOM_PERL   = 0x3000,
+  FFI_PL_SHAPE_OBJECT        = 0x4000,
   FFI_PL_SHAPE_MASK          = 0xf000,
 
   /*
@@ -153,6 +154,10 @@ typedef enum _platypus_string_type {
   FFI_PL_TYPE_STRING_RW = 1
 } platypus_string_type;
 
+typedef struct _ffi_pl_type_extra_object {
+  char *class; /* base class */
+} ffi_pl_type_extra_object;
+
 typedef struct _ffi_pl_type_extra_record {
   size_t size;
   void *stash; /* really an HV* pointing to the package stash, or NULL */
@@ -190,6 +195,7 @@ typedef union _ffi_pl_type_extra {
   ffi_pl_type_extra_closure      closure;
   ffi_pl_type_extra_record       record;
   ffi_pl_type_extra_record_value record_value;
+  ffi_pl_type_extra_object       object;
 } ffi_pl_type_extra;
 
 typedef struct _ffi_pl_type {
@@ -329,6 +335,14 @@ typedef struct _ffi_pl_heap {
   heap = n;                                 \
 }
 
+#define ffi_pl_heap_add_ptr(ptr) {          \
+  ffi_pl_heap *n;                           \
+  Newx(n, 1, ffi_pl_heap);                  \
+  n->_this = ptr;                           \
+  n->_next = (void*) heap;                  \
+  heap = n;                                 \
+}
+
 #define ffi_pl_heap_free() {                \
   while(heap != NULL)                       \
   {                                         \
@@ -339,6 +353,9 @@ typedef struct _ffi_pl_heap {
   }                                         \
 }
 
+#define ffi_pl_croak                        \
+  ffi_pl_heap_free();                       \
+  croak
 
 #if defined(_MSC_VER)
 #define Newx_or_alloca(ptr, count, type) ptr = _alloca(sizeof(type)*count)

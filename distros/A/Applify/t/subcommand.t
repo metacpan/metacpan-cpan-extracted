@@ -3,11 +3,13 @@ use warnings;
 
 package MyListing;
 our $VERSION = 1;
-sub list {}
+sub list { }
+
 package MyLogging;
 our $VERSION = 1;
-sub start_log {}
-sub end_log {}
+sub start_log { }
+sub end_log   { }
+
 package main;
 use B::Deparse;
 use Test::More;
@@ -66,10 +68,10 @@ subcommand disallow => 'app call' => sub {
 app { return 1 };
 HERE
   ok $app, 'not undef';
-  
+
   local @ARGV = qw{disallow};
-  like + (run_method($app->_script, 'app'))[1],
-    qr/Looks like you have a typo/, 'confessions of a app happy coder.';
+  run_method($app->_script, 'app');
+  like "$@", qr/Looks like you have a typo/, 'confessions of a app happy coder.';
 }
 
 {
@@ -82,17 +84,20 @@ HERE
   is $script->subcommand, 'list', 'access the subcommand being run';
   my $code = $script->_subcommand_code($app);
   isa_ok $code, 'CODE', 'code reference';
-  is deparse($code), deparse(sub {
-    my ($self, @extra) = @_;
-    return 2;
-  }), 'correct subroutine';
+  is deparse($code), deparse(
+    sub {
+      my ($self, @extra) = @_;
+      return 2;
+    }
+    ),
+    'correct subroutine';
 }
 
 {
   my $app = eval_script($code, 'log', '--age', '2d', '--save');
   isa_ok $app, 'MyLogging', 'correct inheritance';
-  is $app->age, '2d', 'age option set';
-  is $app->save, 1, 'global option set';
+  is $app->age,  '2d', 'age option set';
+  is $app->save, 1,    'global option set';
   $app->run(qw{});
   my $script = $app->_script;
   is $script->subcommand, 'log', 'access the subcommand being run';
@@ -100,10 +105,13 @@ HERE
   ok $has_log, 'app extends MyLogging';
   my $code = $script->_subcommand_code($app);
   isa_ok $code, 'CODE', 'code reference';
-  is deparse($code), deparse(sub {
-    my ($self, @extra) = @_;
-    return 0;
-  }), 'correct subroutine';
+  is deparse($code), deparse(
+    sub {
+      my ($self, @extra) = @_;
+      return 0;
+    }
+    ),
+    'correct subroutine';
 
   is + (run_method($script, 'print_help'))[0], <<'HERE', 'print_help()';
 Usage:
@@ -178,33 +186,38 @@ app {
 }
 HERE
   isa_ok $app, 'HASH', 'object as exit did not happen';
-  is $app->name, 'app', 'name set';
+  is $app->name,   'app',    'name set';
   is $app->output, 'app.pm', 'output set';
   my $script = $app->_script;
   is $script->subcommand, 'new', 'matching subcommand';
   my $code = $script->_subcommand_code($app);
   isa_ok $code, 'CODE', 'no code reference';
-  is deparse($code), deparse(sub {
-    my ($self, @extra) = @_;
-    $self->create(name => $self->name, file => $self->output);
-    return 0;
-  }), 'Applify::SUBCMD_PREFIX can be set';
+  is deparse($code), deparse(
+    sub {
+      my ($self, @extra) = @_;
+      $self->create(name => $self->name, file => $self->output);
+      return 0;
+    }
+    ),
+    'Applify::SUBCMD_PREFIX can be set';
 }
 
 sub deparse {
   my $dp = B::Deparse->new();
-  return $dp->coderef2text($_[0] || sub {
-    warn "this is not the code you are looking for";
-  });
+  return $dp->coderef2text(
+    $_[0] || sub {
+      warn "this is not the code you are looking for";
+    }
+  );
 }
 
 sub eval_script {
-    my ($code, @args) = @_;
-    local @ARGV = @args;
+  my ($code, @args) = @_;
+  local @ARGV = @args;
 
-    my $app = eval "$code" or die $@;
+  my $app = eval "$code" or die $@;
 
-    return $app;
+  return $app;
 }
 
 done_testing();

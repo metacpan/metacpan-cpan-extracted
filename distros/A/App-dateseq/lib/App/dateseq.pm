@@ -1,7 +1,7 @@
 package App::dateseq;
 
-our $DATE = '2019-07-16'; # DATE
-our $VERSION = '0.096'; # VERSION
+our $DATE = '2019-07-22'; # DATE
+our $VERSION = '0.097'; # VERSION
 
 use 5.010001;
 use strict;
@@ -96,7 +96,7 @@ _
             schema => ['int*', min=>1],
             cmdline_aliases => {n=>{}},
         },
-        date_format => {
+        strftime => {
             summary => 'strftime() format for each date',
             description => <<'_',
 
@@ -106,6 +106,29 @@ Default is `%Y-%m-%d`, unless when hour/minute/second is specified, then it is
 _
             schema => ['str*'],
             cmdline_aliases => {f=>{}},
+            tags => ['category:formatting'],
+        },
+        format_class => {
+            summary => 'Use a DateTime::Format::* class for formatting',
+            schema => ['perl::modname'],
+            tags => ['category:formatting'],
+            completion => sub {
+                require Complete::Module;
+                my %args = @_;
+                Complete::Module::complete_module(
+                    word => $args{word}, ns_prefix => 'DateTime::Format');
+            },
+            description => <<'_',
+
+By default, <pm:DateTime::Format::Strptime> is used with pattern set from the
+<strftime> option.
+
+_
+        },
+        format_class_attrs => {
+            summary => 'Arguments to pass to constructor of DateTime::Format::* class',
+            schema => ['hash'],
+            tags => ['category:formatting'],
         },
     },
     examples => [
@@ -224,25 +247,34 @@ sub dateseq {
     $args{increment} //= DateTime::Duration->new(days=>1);
     my $reverse = $args{reverse};
 
-    my $fmt  = $args{date_format} // do {
-        my $has_hms;
-        {
-            if ($args{from}->hour || $args{from}->minute || $args{from}->second) {
-                $has_hms++; last;
+    my $formatter;
+    if (my $cl = $args{format_class}) {
+        $cl = "DateTime::Format::$cl";
+        (my $cl_pm = "$cl.pm") =~ s!::!/!g;
+        require $cl_pm;
+        my $attrs = $args{format_class_attrs} // {};
+        $formatter = $cl->new(%$attrs);
+    } else {
+        my $strftime  = $args{strftime} // do {
+            my $has_hms;
+            {
+                if ($args{from}->hour || $args{from}->minute || $args{from}->second) {
+                    $has_hms++; last;
+                }
+                if (defined($args{to}) &&
+                        ($args{to}->hour || $args{to}->minute || $args{to}->second)) {
+                    $has_hms++; last;
+                }
+                if ($args{increment}->hours || $args{increment}->minutes || $args{increment}->seconds) {
+                    $has_hms++; last;
+                }
             }
-            if (defined($args{to}) &&
-                    ($args{to}->hour || $args{to}->minute || $args{to}->second)) {
-                $has_hms++; last;
-            }
-            if ($args{increment}->hours || $args{increment}->minutes || $args{increment}->seconds) {
-                $has_hms++; last;
-            }
-        }
-        $has_hms ? '%Y-%m-%dT%H:%M:%S' : '%Y-%m-%d';
-    };
-    my $strp = DateTime::Format::Strptime->new(
-        pattern => $fmt,
-    );
+            $has_hms ? '%Y-%m-%dT%H:%M:%S' : '%Y-%m-%d';
+        };
+        $formatter = DateTime::Format::Strptime->new(
+            pattern => $strftime,
+        );
+    }
 
     my $code_filter = sub {
         my $dt = shift;
@@ -291,7 +323,7 @@ sub dateseq {
                 last if !$reverse && DateTime->compare($dt, $args{to}) > 0;
                 last if  $reverse && DateTime->compare($dt, $args{to}) < 0;
             }
-            push @res, $strp->format_datetime($dt) if $code_filter->($dt);
+            push @res, $formatter->format_datetime($dt) if $code_filter->($dt);
             last if defined($args{limit}) && @res >= $args{limit};
             $dt = $reverse ? $dt - $args{increment} : $dt + $args{increment};
         }
@@ -317,7 +349,7 @@ sub dateseq {
                 return undef unless defined $dt;
                 last if $code_filter->($dt);
             }
-            $strp->format_datetime($dt);
+            $formatter->format_datetime($dt);
         };
         return [200, "OK", $filtered_func, {schema=>'str*', stream=>1}];
     }
@@ -338,7 +370,7 @@ App::dateseq - Generate a sequence of dates
 
 =head1 VERSION
 
-This document describes version 0.096 of App::dateseq (from Perl distribution App-dateseq), released on 2019-07-16.
+This document describes version 0.097 of App::dateseq (from Perl distribution App-dateseq), released on 2019-07-22.
 
 =head1 FUNCTIONS
 
@@ -368,13 +400,6 @@ Only list business days (Mon-Fri), or non-business days.
 
 Only list business days (Mon-Sat), or non-business days.
 
-=item * B<date_format> => I<str>
-
-strftime() format for each date.
-
-Default is C<%Y-%m-%d>, unless when hour/minute/second is specified, then it is
-C<%Y-%m-%dT%H:%M:%S>.
-
 =item * B<exclude_dow> => I<date::dow_nums>
 
 Do not show dates with these day-of-weeks.
@@ -382,6 +407,17 @@ Do not show dates with these day-of-weeks.
 =item * B<exclude_month> => I<date::month_nums>
 
 Do not show dates with these month numbers.
+
+=item * B<format_class> => I<perl::modname>
+
+Use a DateTime::Format::* class for formatting.
+
+By default, L<DateTime::Format::Strptime> is used with pattern set from the
+<strftime> option.
+
+=item * B<format_class_attrs> => I<hash>
+
+Arguments to pass to constructor of DateTime::Format::* class.
 
 =item * B<from> => I<date>
 
@@ -408,6 +444,13 @@ Only generate a certain amount of numbers.
 =item * B<reverse> => I<true>
 
 Decrement instead of increment.
+
+=item * B<strftime> => I<str>
+
+strftime() format for each date.
+
+Default is C<%Y-%m-%d>, unless when hour/minute/second is specified, then it is
+C<%Y-%m-%dT%H:%M:%S>.
 
 =item * B<to> => I<date>
 

@@ -2,8 +2,8 @@ NAME
     App::dateseq - Generate a sequence of dates
 
 VERSION
-    This document describes version 0.096 of App::dateseq (from Perl
-    distribution App-dateseq), released on 2019-07-16.
+    This document describes version 0.097 of App::dateseq (from Perl
+    distribution App-dateseq), released on 2019-07-22.
 
 FUNCTIONS
   dateseq
@@ -28,13 +28,6 @@ FUNCTIONS
 
         Only list business days (Mon-Sat), or non-business days.
 
-    *   date_format => *str*
-
-        strftime() format for each date.
-
-        Default is "%Y-%m-%d", unless when hour/minute/second is specified,
-        then it is "%Y-%m-%dT%H:%M:%S".
-
     *   exclude_dow => *date::dow_nums*
 
         Do not show dates with these day-of-weeks.
@@ -42,6 +35,17 @@ FUNCTIONS
     *   exclude_month => *date::month_nums*
 
         Do not show dates with these month numbers.
+
+    *   format_class => *perl::modname*
+
+        Use a DateTime::Format::* class for formatting.
+
+        By default, DateTime::Format::Strptime is used with pattern set from
+        the <strftime> option.
+
+    *   format_class_attrs => *hash*
+
+        Arguments to pass to constructor of DateTime::Format::* class.
 
     *   from => *date*
 
@@ -68,6 +72,13 @@ FUNCTIONS
     *   reverse => *true*
 
         Decrement instead of increment.
+
+    *   strftime => *str*
+
+        strftime() format for each date.
+
+        Default is "%Y-%m-%d", unless when hour/minute/second is specified,
+        then it is "%Y-%m-%dT%H:%M:%S".
 
     *   to => *date*
 

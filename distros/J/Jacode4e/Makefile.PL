@@ -2,11 +2,21 @@ use strict;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
-    'NAME'      => 'Jacode4e',
-    'VERSION'   => '2.13.6.13',
-    'ABSTRACT'  => 'jacode.pl-like program for enterprise',
-    'PREREQ_PM' => { },
-    'AUTHOR'    => 'ina <ina@cpan.org> in a CPAN',
+    'NAME'      => q{Jacode4e},
+    'VERSION'   => q{2.13.6.14},
+    'ABSTRACT'  => q{jacode.pl-like program for enterprise},
+    'PREREQ_PM' => {
+        'ExtUtils::MakeMaker' => '5.4302',
+        'File::Basename' => '2.6',
+        'File::Copy' => '2.02',
+        'File::Path' => '1.0401',
+        'FindBin' => '1.42',
+        'Socket' => '0',
+        'lib' => '0',
+        'perl' => '5.005_03',
+        'strict' => '1.01',
+    },
+    'AUTHOR'    => q{ina <ina@cpan.org> in a CPAN},
 );
 
 __END__

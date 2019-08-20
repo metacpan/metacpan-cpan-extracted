@@ -1,0 +1,5 @@
+if [ -d TESTDIR/bin ]; then     #OPTS retry 3
+   echo "bin found"
+else
+   echo "bin not found"
+fi

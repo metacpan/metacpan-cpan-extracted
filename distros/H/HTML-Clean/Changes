@@ -1,17 +1,21 @@
 Revision history for Perl module HTML::Clean
 --------------------------------------------
+0.9 Tue Aug 20 09:24 PDT 2019
+
+  - Fix warnings - use IO::File instead deprecated module IO.
+
 0.8  Tue Sep  5 08:02:05 PDT 2000
 
 	- Fix dequote regex to be stricter.  Make sure quote/double quote
 	  match, only use alpha as the paramater name. Reported by
           Renzo Tomà.
 
-	- Removed regexes for removing space within tags and border=0 case. 
+	- Removed regexes for removing space within tags and border=0 case.
 	  This Causes text in attributes to fail, and table borders get
 	  messed up on IE. Reported by Gregory Stark.
 
 	- Fix for improper parsing of emptytags from Jens Quade.
- 
+
 	- Fix from Tobias Weber to clean javascript
 
 
@@ -24,7 +28,7 @@ Revision history for Perl module HTML::Clean
 	- Apply same compatibility option to Verdana and Futura font.
 
 
-0.6  Fri Apr 23 14:03:30 MET DST 1999 
+0.6  Fri Apr 23 14:03:30 MET DST 1999
 
 	- Now removes whitespace from within tags, like this:
 	   <table  > becomes <table>
@@ -45,19 +49,19 @@ Revision history for Perl module HTML::Clean
 	  'looks' correct.
 
 
-0.5  Mon Feb 22 13:12:32 MET 1999 
+0.5  Mon Feb 22 13:12:32 MET 1999
 
 	- Now removes empty tag sets.  For instance <i><b></b></i> is now
           eliminated. (From Philippe Verdret)
 
 	- Cleans up excess space in inline javascript functions.  Does
-          a better job of removing javascript comments. (idea from 
+          a better job of removing javascript comments. (idea from
           Phillippe Verdret)
 
 	- Added a larger list of default color names to replace.
 
 
-0.4  Mon Jan 18 15:10:35 MET 1999 
+0.4  Mon Jan 18 15:10:35 MET 1999
 	- Bug Fix: use upper case filehandle names (from numerous people..)
 
 	- Enabled level and options (patch from Mike Heins)
@@ -73,12 +77,12 @@ Revision history for Perl module HTML::Clean
 
 	- More documentation
 
-0.3  Mon Jan 11 14:05:15 MET 1999        
+0.3  Mon Jan 11 14:05:15 MET 1999
 	- Fixed serious htmlclean script bug.
 	- Added a little more documentation.
 
-	
-0.2  Tue Dec 29 10:13:16 MET 1998 
+
+0.2  Tue Dec 29 10:13:16 MET 1998
         - expanded number of strip options
 	- First CPAN release..
 

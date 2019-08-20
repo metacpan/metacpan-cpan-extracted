@@ -6,7 +6,7 @@ use Alien::Build::Plugin;
 use Carp ();
 
 # ABSTRACT: Plugin to filter known good versions
-our $VERSION = '1.79'; # VERSION
+our $VERSION = '1.83'; # VERSION
 
 
 has '+filter' => sub { Carp::croak("The filter property is required for the Prefer::GoodVersion plugin") };
@@ -75,7 +75,7 @@ Alien::Build::Plugin::Prefer::GoodVersion - Plugin to filter known good versions
 
 =head1 VERSION
 
-version 1.79
+version 1.83
 
 =head1 SYNOPSIS
 

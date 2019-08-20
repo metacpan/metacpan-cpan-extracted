@@ -1,5 +1,22 @@
 Revision history for Git-Raw
 
+0.84      2019-08-19 21:31:54+01:00 Europe/London
+
+ - Moved from Travis to Azure pipelines
+ - Removed references to cURL as libgit2 no longer supports it
+ - Added Submodule methods:
+    + foreach( $repo, \&callback )
+    + lookup
+    + init
+    + open
+    + update
+    + name
+    + path
+    + url
+    + add_to_index
+    + sync
+    + reload
+
 0.83      2019-05-20 14:38:30+01:00 Europe/London
 
  - Update libgit2 to 040db8ad749

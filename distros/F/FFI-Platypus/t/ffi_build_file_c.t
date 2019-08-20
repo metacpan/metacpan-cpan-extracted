@@ -10,7 +10,7 @@ use Capture::Tiny qw( capture_merged );
 subtest 'basic' => sub {
 
   my $file = FFI::Build::File::C->new(['corpus','ffi_build_file_c','basic.c']);
-  
+
   isa_ok $file, 'FFI::Build::File::C';
   isa_ok $file, 'FFI::Build::File::Base';
   is($file->default_suffix, '.c');
@@ -23,7 +23,7 @@ subtest 'compile' => sub {
   my $file = FFI::Build::File::C->new([qw( corpus ffi_build_file_c foo1.c )]);
   my $object = $file->build_item;
   isa_ok $object, 'FFI::Build::File::Object';
-  
+
   is_deeply
     [ $object->build_item ],
     [];
@@ -42,15 +42,15 @@ subtest 'headers' => sub {
   note "cflags=$_" for @{ $build->cflags };
 
   my $file = FFI::Build::File::C->new([qw( corpus ffi_build_file_c foo2.c )], build => $build );
-  
+
   my @deps = eval { $file->_deps };
   is $@, '', 'no die';
 
   foreach my $dep (@deps)
   {
-    ok -f "$dep", "dep is afile: $dep";
+    ok -f "$dep", "dep is a file: $dep";
   }
-  
+
 };
 
 done_testing;

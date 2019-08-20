@@ -8,7 +8,7 @@ use Alien::Build::Plugin;
 use Capture::Tiny qw( capture );
 
 # ABSTRACT: CMake plugin for Alien::Build
-our $VERSION = '1.79'; # VERSION
+our $VERSION = '1.83'; # VERSION
 
 
 sub cmake_generator
@@ -16,7 +16,7 @@ sub cmake_generator
   if($^O eq 'MSWin32')
   {
     return 'MinGW Makefiles' if is_dmake();
-  
+
     {
       my($out, $err) = capture { system $Config{make}, '/?' };
       return 'NMake Makefiles' if $out =~ /NMAKE/;
@@ -38,9 +38,9 @@ sub cmake_generator
 sub init
 {
   my($self, $meta) = @_;
-  
+
   $meta->prop->{destdir} = $^O eq 'MSWin32' ? 0 : 1;
-  
+
   $meta->add_requires('configure' => 'Alien::Build::Plugin::Build::CMake' => '0.99');
   $meta->add_requires('share'     => 'Alien::cmake3' => '0.02');
 
@@ -74,7 +74,7 @@ sub init
   $meta->interpolator->add_helper('cmake_generator' => \&cmake_generator);
 
   my @args = (
-    -G => '%{cmake_generator}', 
+    -G => '%{cmake_generator}',
     '-DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=true',
     '-DCMAKE_INSTALL_PREFIX:PATH=%{.install.prefix}',
     '-DCMAKE_INSTALL_LIBDIR:PATH=lib',
@@ -128,7 +128,7 @@ Alien::Build::Plugin::Build::CMake - CMake plugin for Alien::Build
 
 =head1 VERSION
 
-version 1.79
+version 1.83
 
 =head1 SYNOPSIS
 

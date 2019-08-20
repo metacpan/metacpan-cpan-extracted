@@ -5,7 +5,7 @@ use warnings;
 use Alien::Build::Plugin;
 
 # ABSTRACT: Plugin to extract a tarball using Archive::Zip
-our $VERSION = '1.79'; # VERSION
+our $VERSION = '1.83'; # VERSION
 
 
 has '+format' => 'zip';
@@ -14,26 +14,26 @@ has '+format' => 'zip';
 sub handles
 {
   my($class, $ext) = @_;
-  
+
   return 1 if $ext eq 'zip';
-  
-  return;
+
+  return 0;
 }
 
 
 sub available
 {
   my(undef, $ext) = @_;
-  
+
   !! ( $ext eq 'zip' && eval { require Archive::Zip; 1} );
 }
 
 sub init
 {
   my($self, $meta) = @_;
-  
+
   $meta->add_requires('share' => 'Archive::Zip' => 0);
-  
+
   $meta->register_hook(
     extract => sub {
       my($build, $src) = @_;
@@ -58,7 +58,7 @@ Alien::Build::Plugin::Extract::ArchiveZip - Plugin to extract a tarball using Ar
 
 =head1 VERSION
 
-version 1.79
+version 1.83
 
 =head1 SYNOPSIS
 

@@ -6,7 +6,7 @@ use Carp qw( croak );
 require FFI::Platypus;
 
 # ABSTRACT: Defining types for FFI::Platypus
-our $VERSION = '0.94'; # VERSION
+our $VERSION = '0.96'; # VERSION
 
 # The TypeParser and Type classes are used internally ONLY and
 # are not to be exposed to the user.  External users should
@@ -57,7 +57,7 @@ FFI::Platypus::Type - Defining types for FFI::Platypus
 
 =head1 VERSION
 
-version 0.94
+version 0.96
 
 =head1 SYNOPSIS
 
@@ -215,8 +215,8 @@ type functions:
  $ffi->lib(undef);
  $ffi->type('int' => 'character');
  
- my @list = qw( 
-   alnum alpha ascii blank cntrl digit lower print punct 
+ my @list = qw(
+   alnum alpha ascii blank cntrl digit lower print punct
    space upper xdigit
  );
  
@@ -387,7 +387,7 @@ is expected to free.  Consider the functions:
    buffer = malloc(20);
    strcpy(buffer, "Perl");
  }
-
+ 
  void
  free_string(char *buffer)
  {
@@ -409,7 +409,7 @@ a string and then free it.
  $ffi->attach( get_string => [] => 'opaque' );
  $ffi->attach( free_string => ['opaque'] => 'void' );
  my $ptr = get_string();
- my $str = $ffi->cast( 'opaque' => 'string' );  # copies the string
+ my $str = $ffi->cast( 'opaque' => 'string', $ptr );  # copies the string
  free_string($ptr);
 
 If you are doing this sort of thing a lot, it can be worth adding a
@@ -420,7 +420,7 @@ custom type:
    native_type => 'opaque',
    native_to_perl => sub {
      my($ptr) = @_;
-     my $str = $ffi->cast( 'opaque' => 'string' ); # copies the string
+     my $str = $ffi->cast( 'opaque' => 'string', $ptr ); # copies the string
      free_string($ptr);
    }
  });
@@ -439,7 +439,7 @@ for Perl to know when calling language is done with the memory allocated
 to the string).  Consider the API:
 
  typedef const char *(*get_message_t)(void);
-
+ 
  void
  print_message(get_message_t get_message)
  {
@@ -469,7 +469,7 @@ and return an opaque pointer to the string using a cast.
  my $get_message => $ffi->closure(sub {
    our $message = "my message";  # needs to be our so that it doesn't
                                  # get free'd
-   my $ptr = $ffi->cast('string' => 'opaque');
+   my $ptr = $ffi->cast('string' => 'opaque', $message);
    return $ptr;
  });
  print_message($get_message);
@@ -711,7 +711,7 @@ Here is a longer practical example, once again using the tm struct:
  # the constructor needs to be wrapped in a Perl sub,
  # because localtime is expecting the time_t (if provided)
  # to come in as the first argument, not the second.
- # We could also acomplish something similar using 
+ # We could also acomplish something similar using
  # custom types.
  sub new { _new(\($_[1] || time)) }
  
@@ -1160,6 +1160,8 @@ Ilya Pavlov (Ilya33)
 Petr Pisar (ppisar)
 
 Mohammad S Anwar (MANWAR)
+
+Håkon Hægland (hakonhagland, HAKONH)
 
 =head1 COPYRIGHT AND LICENSE
 

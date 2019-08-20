@@ -1,0 +1,9 @@
+SC_ORIG_DIRE=`pwd`;
+export SC_VAR_1="val_1";
+export SC_VAR_2="val_2";
+SC_DIRE="/tmp";
+cd "$SC_DIRE";
+TESTDIR/bin/succ 1 warn;
+TESTDIR/bin/succ 2 warn;
+cd "$SC_ORIG_DIRE";
+

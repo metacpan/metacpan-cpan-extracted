@@ -172,6 +172,7 @@ Unbuffered:
 	XX-> line_width = XX-> gcv. line_width;
 	XX-> gcv. clip_mask = None;
 	XX-> gtransform = XX-> transform;
+	XX-> fill_mode = XX->saved_fill_mode;
 
 	prima_get_gc( XX);
 	XX-> gcv. subwindow_mode = (XX->flags.clip_by_children ? ClipByChildren : IncludeInferiors);
@@ -526,10 +527,10 @@ calculate_ellipse_divergence(void)
 }
 
 #define ELLIPSE_RECT x - ( dX + 1) / 2 + 1, y - dY / 2, dX-guts.ellipseDivergence.x, dY-guts.ellipseDivergence.y
-#define FILL_ANTIDEFECT_REPAIRABLE \
+#define FILL_ANTIDEFECT_REPAIRABLE (((XX->fill_mode & fmOverlay) != 0) && \
 		( rop_map[XX-> paint_rop] == GXcopy ||\
 		rop_map[XX-> paint_rop] == GXset  ||\
-		rop_map[XX-> paint_rop] == GXclear)
+		rop_map[XX-> paint_rop] == GXclear))
 #define FILL_ANTIDEFECT_OPEN {\
 XGCValues gcv;\
 gcv. line_width = 1;\
@@ -539,7 +540,6 @@ XChangeGC( DISP, XX-> gc, GCLineWidth, &gcv);\
 #define FILL_ANTIDEFECT_CLOSE {\
 XGCValues gcv;\
 gcv. line_width = XX-> line_width;\
-gcv. line_style = ( XX-> paint_rop2 == ropNoOper) ? LineOnOffDash : LineDoubleDash;\
 XChangeGC( DISP, XX-> gc, GCLineWidth, &gcv);\
 }
 
@@ -893,8 +893,9 @@ apc_gp_fill_poly( Handle self, int numPts, Point *points)
 	if ( guts. limits. XFillPolygon >= numPts) {
 		while ( prima_make_brush( XX, mix++)) {
 			XFillPolygon( DISP, XX-> gdrawable, XX-> gc, p, numPts, ComplexShape, CoordModeOrigin);
-			if ( FILL_ANTIDEFECT_REPAIRABLE)
+			if ( FILL_ANTIDEFECT_REPAIRABLE) {
 				XDrawLines( DISP, XX-> gdrawable, XX-> gc, p, numPts+1, CoordModeOrigin);
+			}
 		}
 		XCHECKPOINT;
 	} else
@@ -1934,24 +1935,11 @@ apc_gp_get_font_ranges( Handle self, int * count)
 	return ret;
 }
 
-Bool
-apc_gp_get_fill_winding( Handle self)
+int
+apc_gp_get_fill_mode( Handle self)
 {
 	DEFXX;
-	int fill_rule;
-	XGCValues gcv;
-
-	if ( XF_IN_PAINT(XX)) {
-		if ( XGetGCValues( DISP, XX-> gc, GCFillRule, &gcv) == 0) {
-			warn( "UAG_006: error querying GC values");
-			fill_rule = EvenOddRule;
-		} else {
-			fill_rule = gcv. fill_rule;
-		}
-	} else {
-		fill_rule = XX-> gcv. fill_rule;
-	}
-	return fill_rule == WindingRule;
+	return XF_IN_PAINT(XX) ? XX->fill_mode : XX->saved_fill_mode;
 }
 
 FillPattern *
@@ -2045,6 +2033,15 @@ apc_gp_get_line_pattern( Handle self, unsigned char *dashes)
 		}
 	}
 	return n;
+}
+
+float
+apc_gp_get_miter_limit( Handle self)
+{
+	DEFXX;
+	/* xorg.miArcJoin: don't miter arcs with less than 11 degrees between them */
+	if ( XF_IN_PAINT(XX) ) return 1.0 / sin((11.0 * 3.14159265358 / 180) / 2);
+	return XX->miter_limit;
 }
 
 Point
@@ -2240,19 +2237,21 @@ apc_gp_set_color( Handle self, Color color)
 }
 
 Bool
-apc_gp_set_fill_winding( Handle self, Bool fillWinding)
+apc_gp_set_fill_mode( Handle self, int fillMode)
 {
 	DEFXX;
 	int fill_rule;
 	XGCValues gcv;
 
-	fill_rule = fillWinding ? WindingRule : EvenOddRule;
+	fill_rule = ((fillMode & fmWinding) == fmAlternate) ? EvenOddRule : WindingRule;
 	if ( XF_IN_PAINT(XX)) {
 		gcv. fill_rule = fill_rule;
+		XX-> fill_mode = fillMode;
 		XChangeGC( DISP, XX-> gc, GCFillRule, &gcv);
 		XCHECKPOINT;
 	} else {
 		XX-> gcv. fill_rule = fill_rule;
+		XX-> saved_fill_mode = fillMode;
 	}
 	return true;
 }
@@ -2402,6 +2401,15 @@ apc_gp_set_line_pattern( Handle self, unsigned char *pattern, int len)
 			XX-> gcv. line_style = ( XX-> rop2 == ropNoOper) ? LineOnOffDash : LineDoubleDash;
 		}
 	}
+	return true;
+}
+
+Bool
+apc_gp_set_miter_limit( Handle self, float miter_limit)
+{
+	DEFXX;
+	if ( XF_IN_PAINT(XX)) return false;
+	XX-> miter_limit = miter_limit;
 	return true;
 }
 

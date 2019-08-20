@@ -1,14 +1,14 @@
 use strict;
 use warnings;
 use Test::More;
-use File::Temp qw( tempdir );
+use FFI::Temp;
 use Capture::Tiny qw( capture_merged );
 use FFI::Probe::Runner::Builder;
 use IPC::Cmd qw( can_run );
 
 $FFI::Probe::Runner::Builder::VERBOSE = 1;
 
-my $dir = tempdir( CLEANUP => 1, DIR => '.', TEMPLATE => 'test-probe-XXXXXX' );
+my $dir = FFI::Temp->newdir( TEMPLATE => 'test-probe-XXXXXX' );
 
 note "dir = $dir";
 
@@ -18,7 +18,7 @@ my $builder = FFI::Probe::Runner::Builder->new(
 
 foreach my $lib (@{ $builder->libs })
 {
-  note "libs=" . join(' ', @$lib) 
+  note "libs=" . join(' ', @$lib)
 }
 
 isa_ok $builder, 'FFI::Probe::Runner::Builder';

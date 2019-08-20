@@ -273,15 +273,29 @@ extern void bc_rgb_bgri( Byte * source, Byte * dest, int count);
 typedef void SimpleConvProc( Byte * srcData, Byte * dstData, int count);
 typedef SimpleConvProc *PSimpleConvProc;
 
+#define MAX_SIZEOF_PIXEL (sizeof(double) * 2)
+typedef struct {
+	Byte color[MAX_SIZEOF_PIXEL];
+	Byte backColor[MAX_SIZEOF_PIXEL];
+	int rop;
+	Bool transparent;
+	FillPattern pattern;
+	Point patternOffset;
+	unsigned char * linePattern;
+	PBoxRegionRec region;
+	Point translate;
+} ImgPaintContext, *PImgPaintContext;
+
 extern void ibc_repad( Byte * source, Byte * dest, int srcLineSize, int dstLineSize, int srcDataSize, int dstDataSize, int srcBPP, int dstBPP, void * bit_conv_proc, Bool reverse);
 extern void img_fill_dummy( PImage dummy, int w, int h, int type, Byte * data, RGBColor * palette);
-extern Bool img_put( Handle dest, Handle src, int dstX, int dstY, int srcX, int srcY, int dstW, int dstH, int srcW, int srcH, int rop);
-extern void img_bar( Handle dest, int x, int y, int w, int h, int rop, void * color);
+extern Bool img_put( Handle dest, Handle src, int dstX, int dstY, int srcX, int srcY, int dstW, int dstH, int srcW, int srcH, int rop, PBoxRegionRec region);
+extern void img_bar( Handle dest, int x, int y, int w, int h, PImgPaintContext ctx);
 extern void img_rotate( Handle self, Byte * new_data, int new_line_size, int degrees);
 extern void img_mirror( Handle self, Bool vertically);
 extern Bool img_mirror_raw( int type, int w, int h, Byte * data, Bool vertically);
 extern void img_premultiply_alpha_constant( Handle self, int alpha);
 extern void img_premultiply_alpha_map( Handle self, Handle alpha);
+extern void img_polyline( Handle dest, int n_points, Point * points, PImgPaintContext ctx);
 
 /* internal maps */
 extern Byte     map_stdcolorref    [ 256];

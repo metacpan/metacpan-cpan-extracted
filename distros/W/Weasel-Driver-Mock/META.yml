@@ -1,5 +1,5 @@
 ---
-abstract: 'Weasel driver to mock a real driver for testing purposes'
+abstract: 'Weasel driver to mock a real driver for testing purposes (Weasel::DriverRole level 0.03)'
 author:
   - 'Erik Huelsmann <ehuels@gmail.com>'
 build_requires:
@@ -23,11 +23,11 @@ requires:
   MIME::Base64: '0'
   Moose: '0'
   Weasel: '0'
-  Weasel::DriverRole: '0.02'
   Weasel::Session: '0'
+  namespace::autoclean: '0'
   perl: v5.10.1
 resources:
   bugtracker: https://github.com/perl-weasel/weasel-driver-mock/issues
   repository: https://github.com/perl-weasel/weasel-driver-mock.git
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'YAML::Tiny version 1.70'

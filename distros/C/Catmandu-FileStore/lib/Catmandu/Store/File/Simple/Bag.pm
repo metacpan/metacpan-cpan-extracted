@@ -2,7 +2,7 @@ package Catmandu::Store::File::Simple::Bag;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.13';
+our $VERSION = '1.14';
 
 use Moo;
 use Carp;
@@ -237,11 +237,11 @@ Catmandu::Store::File::Simple::Bag - Index of all "files" in a Catmandu::Store::
     $files->each(sub {
         my $file = shift;
 
-        my $name         = $file->_id;
-        my $size         = $file->size;
-        my $content_type = $file->content_type;
-        my $created      = $file->created;
-        my $modified     = $file->modified;
+        my $name         = $file->{_id};
+        my $size         = $file->{size};
+        my $content_type = $file->{content_type};
+        my $created      = $file->{created};
+        my $modified     = $file->{modified};
 
         $file->stream(IO::File->new(">/tmp/$name"), file);
     });

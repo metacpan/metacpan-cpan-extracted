@@ -2,6 +2,7 @@ package Alien::Build;
 
 use strict;
 use warnings;
+use 5.008001;
 use Path::Tiny ();
 use Carp ();
 use File::chdir;
@@ -9,9 +10,10 @@ use JSON::PP ();
 use Env qw( @PATH );
 use Env qw( @PKG_CONFIG_PATH );
 use Config ();
+use Alien::Build::Log;
 
 # ABSTRACT: Build external dependencies for use in CPAN
-our $VERSION = '1.79'; # VERSION
+our $VERSION = '1.83'; # VERSION
 
 
 sub _path { goto \&Path::Tiny::path }
@@ -58,20 +60,8 @@ sub load
   my $rcfile = Path::Tiny->new($ENV{ALIEN_BUILD_RC} || '~/.alienbuild/rc.pl')->absolute;
   if(-r $rcfile)
   {
+    require Alien::Build::rc;
     package Alien::Build::rc;
-    sub logx ($)
-    {
-      unshift @_, 'Alien::Build';
-      goto &Alien::Build::log;
-    };
-    sub preload ($)
-    {
-      push @Alien::Build::rc::PRELOAD, $_[0];
-    }
-    sub postload ($)
-    {
-      push @Alien::Build::rc::POSTLOAD, $_[0];
-    }
     require $rcfile;
   }
 
@@ -98,12 +88,12 @@ sub load
 
   my @preload = qw( Core::Setup Core::Download Core::FFI Core::Override Core::CleanInstall );
   push @preload, @Alien::Build::rc::PRELOAD;
-  push @preload, split ';', $ENV{ALIEN_BUILD_PRELOAD}
+  push @preload, split /;/, $ENV{ALIEN_BUILD_PRELOAD}
     if defined $ENV{ALIEN_BUILD_PRELOAD};
 
   my @postload = qw( Core::Legacy Core::Gather Core::Tail );
   push @postload, @Alien::Build::rc::POSTLOAD;
-  push @postload, split ';', $ENV{ALIEN_BUILD_POSTLOAD}
+  push @postload, split /;/, $ENV{ALIEN_BUILD_POSTLOAD}
     if defined $ENV{ALIEN_BUILD_POSTLOAD};
 
   my $self = $class->new(
@@ -119,12 +109,14 @@ sub load
   }
 
   # TODO: do this without a string eval ?
+  ## no critic
   eval '# line '. __LINE__ . ' "' . __FILE__ . qq("\n) . qq{
     package ${class}::Alienfile;
     do '@{[ $file->absolute->stringify ]}';
     die \$\@ if \$\@;
   };
   die $@ if $@;
+  ## use critic
 
   foreach my $postload (@postload)
   {
@@ -393,7 +385,7 @@ sub _call_hook
   # autoconf uses MSYS paths, even for the ACLOCAL_PATH environment variable, so we can't use Env for this.
   {
     my @path;
-    @path = split ':', $ENV{ACLOCAL_PATH} if defined $ENV{ACLOCAL_PATH};
+    @path = split /:/, $ENV{ACLOCAL_PATH} if defined $ENV{ACLOCAL_PATH};
     unshift @path, @{ $self->{aclocal_path} };
     $ENV{ACLOCAL_PATH} = join ':', @path;
   }
@@ -796,9 +788,15 @@ sub system
 sub log
 {
   my(undef, $message) = @_;
-  my $caller = caller;
+  my $caller = [caller];
   chomp $message;
-  print "$caller> $message\n";
+  foreach my $line (split /\n/, $message)
+  {
+    Alien::Build::Log->default->log(
+      caller  => $caller,
+      message => $line,
+    );
+  }
 }
 
 
@@ -1120,7 +1118,7 @@ sub apply_plugin
 package Alien::Build::TempDir;
 
 use Path::Tiny qw( path );
-use overload '""' => sub { shift->as_string };
+use overload '""' => sub { shift->as_string }, bool => sub { 1 }, fallback => 1;
 use File::Temp qw( tempdir );
 
 sub new
@@ -1161,7 +1159,7 @@ Alien::Build - Build external dependencies for use in CPAN
 
 =head1 VERSION
 
-version 1.79
+version 1.83
 
 =head1 SYNOPSIS
 
@@ -1264,7 +1262,7 @@ C<plugin_fetch_newprotocol>:
    my($self, $meta) = @_;
  
    $meta->prop( plugin_fetch_newprotocol_foo => 'some value' );
-  
+ 
    $meta->register_hook(
      some_hook => sub {
        my($build) = @_;
@@ -1956,6 +1954,10 @@ is set to any value. The rationale is that by setting this environment variable 
 user is aware that L<Alien> modules may be installed and have indicated consent.
 The actual implementation of this, by its nature would have to be in the consuming
 CPAN module.
+
+=item ALIEN_BUILD_LOG
+
+The default log class used.  See L<Alien::Build::Log> and L<Alien:Build::Log::Default>.
 
 =item ALIEN_BUILD_RC
 

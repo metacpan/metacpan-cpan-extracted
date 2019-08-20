@@ -7,7 +7,7 @@ use 5.010001;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Weasel driver to mock a real driver for testing purposes",
+  "ABSTRACT" => "Weasel driver to mock a real driver for testing purposes (Weasel::DriverRole level 0.03)",
   "AUTHOR" => "Erik Huelsmann <ehuels\@gmail.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -22,8 +22,8 @@ my %WriteMakefileArgs = (
     "MIME::Base64" => 0,
     "Moose" => 0,
     "Weasel" => 0,
-    "Weasel::DriverRole" => "0.02",
-    "Weasel::Session" => 0
+    "Weasel::Session" => 0,
+    "namespace::autoclean" => 0
   },
   "TEST_REQUIRES" => {
     "File::Temp" => 0,
@@ -32,7 +32,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Warnings" => 0
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,8 +50,8 @@ my %FallbackPrereqs = (
   "Test::More" => 0,
   "Test::Warnings" => 0,
   "Weasel" => 0,
-  "Weasel::DriverRole" => "0.02",
-  "Weasel::Session" => 0
+  "Weasel::Session" => 0,
+  "namespace::autoclean" => 0
 );
 
 

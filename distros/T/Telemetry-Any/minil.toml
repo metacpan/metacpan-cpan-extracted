@@ -1,0 +1,10 @@
+name = "Telemetry-Any"
+badges = ["travis", "metacpan"]
+authority="cpan:IVANYCH"
+
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+
+[FileGatherer]
+include_dotfiles = true
+exclude_match = ['^\.(?!perlcriticrc|perltidyrc)']

@@ -24,7 +24,7 @@ my %script_prereq = (
 );
 
 my %test_prereq = (
-   'Test::Inter'              => '0',
+   'Test::Inter'              => '1.09',
    'Test::More'               => '0',
 );
 
@@ -41,7 +41,7 @@ if ($EU_MM_V < 6.64) {
 
 WriteMakefile(
    NAME             => "Shell::Cmd",
-   VERSION          => "3.02",
+   VERSION          => "3.03",
    ABSTRACT         => "run shell commands with enhanced support",
    LICENSE          => "perl",
    ($EU_MM_V >= 6.48
@@ -62,7 +62,7 @@ WriteMakefile(
           provides     => {
              'Shell::Cmd' => {
                 file    => 'lib/Shell/Cmd.pm',
-                version => '3.02',
+                version => '3.03',
              },
 
           },

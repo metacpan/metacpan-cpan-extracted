@@ -5,18 +5,16 @@ use warnings;
 use FFI::Platypus;
 
 # ABSTRACT: An FFI function object
-our $VERSION = '0.94'; # VERSION
+our $VERSION = '0.96'; # VERSION
 
 
 use overload '&{}' => sub {
   my $ffi = shift;
   sub { $ffi->call(@_) };
-};
-
-use overload 'bool' => sub {
+}, 'bool' => sub {
   my $ffi = shift;
   return $ffi;
-};
+}, fallback => 1;
 
 package FFI::Platypus::Function::Function;
 
@@ -128,7 +126,7 @@ FFI::Platypus::Function - An FFI function object
 
 =head1 VERSION
 
-version 0.94
+version 0.96
 
 =head1 SYNOPSIS
 
@@ -203,6 +201,8 @@ Ilya Pavlov (Ilya33)
 Petr Pisar (ppisar)
 
 Mohammad S Anwar (MANWAR)
+
+Håkon Hægland (hakonhagland, HAKONH)
 
 =head1 COPYRIGHT AND LICENSE
 

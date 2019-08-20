@@ -1,0 +1,2 @@
+echo Succ1                          #OPTS label Succ1
+perl -e "print STDERR \"Err1\n\""

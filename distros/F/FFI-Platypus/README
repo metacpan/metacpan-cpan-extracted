@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.94
+    version 0.96
 
 SYNOPSIS
 
@@ -300,9 +300,9 @@ METHODS
        my($symbol) = @_;
        return "foo_$symbol";
      });
-    
+     
      $ffi->function( get_bar => [] => 'int' );  # attaches foo_get_bar
-    
+     
      my $f = $ffi->function( set_baz => ['int'] => 'void' );
      $f->call(22); # calls foo_set_baz
 
@@ -513,7 +513,7 @@ METHODS
 
  package
 
-    [version 0.15]
+    [version 0.15 api = 0]
 
      $ffi->package($package, $file); # usually __PACKAGE__ and __FILE__ can be used
      $ffi->package;                  # autodetect
@@ -522,6 +522,20 @@ METHODS
     bundle C code with your distribution, you can use this method to tell
     the FFI::Platypus instance to look for symbols that came with the
     dynamic library that was built when your distribution was installed.
+
+ bundle
+
+    [version 0.96 api = 1+]
+
+     $ffi->bundle($package, \@args);
+     $ffi->bundle(\@args);
+     $ffi->bundle($package);
+     $ffi->bundle;
+
+    This is a new experimental interface for bundling compiled code with
+    your distribution intended to eventually replace the package method
+    documented above. See FFI::Platypus::Bundle for details on how this
+    works.
 
  abis
 
@@ -713,7 +727,7 @@ EXAMPLES
      my $uuid = "\0" x 16;  # uuid_t
      uuid_generate($uuid);
      
-     my $string = "\0" x 37; # 36 bytes to store a UUID string 
+     my $string = "\0" x 37; # 36 bytes to store a UUID string
                              # + NUL termination
      uuid_unparse($uuid, $string);
      
@@ -1523,6 +1537,8 @@ AUTHOR
     Petr Pisar (ppisar)
 
     Mohammad S Anwar (MANWAR)
+
+    Håkon Hægland (hakonhagland, HAKONH)
 
 COPYRIGHT AND LICENSE
 

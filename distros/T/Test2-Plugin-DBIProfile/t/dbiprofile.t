@@ -19,7 +19,7 @@ BEGIN {
 }
 
 use Test2::Tools::Basic;
-use Test2::Tools::Compare qw/like is hash field etc array item/;
+use Test2::Tools::Compare qw/like is hash field etc array item T/;
 
 do_def;
 
@@ -60,6 +60,11 @@ like(
             'DBD::SQLite::db::prepare' => array { item qr/^\d+$/; etc },
             'DBD::SQLite::db::do'      => array { item qr/^\d+$/; etc },
             'DBD::SQLite::st::execute' => array { item qr/^\d+$/; etc },
+        };
+
+        field harness_job_fields => array {
+            item { name => 'dbi_time',  details => T() };
+            item { name => 'dbi_calls', details => T() };
         };
 
         etc;

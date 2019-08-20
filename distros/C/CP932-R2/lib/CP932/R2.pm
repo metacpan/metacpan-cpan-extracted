@@ -11,7 +11,7 @@ package CP932::R2;
 use 5.00503;    # Galapagos Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.04';
+$VERSION = '0.05';
 $VERSION = $VERSION;
 
 use strict;
@@ -41,7 +41,7 @@ __END__
 
 =head1 NAME
 
-UTF8::R2 - provides minimal CP932 I/O subroutines by short name
+CP932::R2 - provides minimal CP932 I/O subroutines by short name
 
 =head1 SYNOPSIS
 

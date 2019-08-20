@@ -1,3 +1,9 @@
+0.603   2019-07-23  Released-By: PERLANCAR; Urgency: medium
+
+	- [incompatible change] combine_answers() no longer re-sorts
+	  entries.
+
+
 0.602   2019-07-18  Released-By: PERLANCAR; Urgency: medium
 
 	- complete_hash_key(): Add argument summaries_from_hash_values.

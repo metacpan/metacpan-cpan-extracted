@@ -38,181 +38,184 @@ name: Git-Raw
 provides:
   Git::Raw:
     file: lib/Git/Raw.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::AnnotatedCommit:
     file: lib/Git/Raw/AnnotatedCommit.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Blame:
     file: lib/Git/Raw/Blame.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Blame::Hunk:
     file: lib/Git/Raw/Blame/Hunk.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Blob:
     file: lib/Git/Raw/Blob.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Branch:
     file: lib/Git/Raw/Branch.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Cert:
     file: lib/Git/Raw/Cert.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Cert::HostKey:
     file: lib/Git/Raw/Cert/HostKey.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Cert::X509:
     file: lib/Git/Raw/Cert/X509.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Commit:
     file: lib/Git/Raw/Commit.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Config:
     file: lib/Git/Raw/Config.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Cred:
     file: lib/Git/Raw/Cred.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Diff:
     file: lib/Git/Raw/Diff.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Diff::Delta:
     file: lib/Git/Raw/Diff/Delta.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Diff::File:
     file: lib/Git/Raw/Diff/File.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Diff::Hunk:
     file: lib/Git/Raw/Diff/Hunk.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Diff::Stats:
     file: lib/Git/Raw/Diff/Stats.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Error:
     file: lib/Git/Raw/Error.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Error::Category:
     file: lib/Git/Raw/Error/Category.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Filter:
     file: lib/Git/Raw/Filter.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Filter::List:
     file: lib/Git/Raw/Filter/List.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Filter::Source:
     file: lib/Git/Raw/Filter/Source.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Graph:
     file: lib/Git/Raw/Graph.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Index:
     file: lib/Git/Raw/Index.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Index::Conflict:
     file: lib/Git/Raw/Index/Conflict.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Index::Entry:
     file: lib/Git/Raw/Index/Entry.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Indexer:
     file: lib/Git/Raw/Indexer.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Mempack:
     file: lib/Git/Raw/Mempack.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Merge::File::Result:
     file: lib/Git/Raw/Merge/File/Result.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Note:
     file: lib/Git/Raw/Note.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Object:
     file: lib/Git/Raw/Object.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Odb:
     file: lib/Git/Raw/Odb.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Odb::Backend:
     file: lib/Git/Raw/Odb/Backend.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Odb::Backend::Loose:
     file: lib/Git/Raw/Odb/Backend/Loose.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Odb::Backend::OnePack:
     file: lib/Git/Raw/Odb/Backend/OnePack.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Odb::Backend::Pack:
     file: lib/Git/Raw/Odb/Backend/Pack.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Odb::Object:
     file: lib/Git/Raw/Odb/Object.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Packbuilder:
     file: lib/Git/Raw/Packbuilder.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Patch:
     file: lib/Git/Raw/Patch.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::PathSpec:
     file: lib/Git/Raw/PathSpec.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::PathSpec::MatchList:
     file: lib/Git/Raw/PathSpec/MatchList.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Rebase:
     file: lib/Git/Raw/Rebase.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Rebase::Operation:
     file: lib/Git/Raw/Rebase/Operation.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::RefSpec:
     file: lib/Git/Raw/RefSpec.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Reference:
     file: lib/Git/Raw/Reference.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Reflog:
     file: lib/Git/Raw/Reflog.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Reflog::Entry:
     file: lib/Git/Raw/Reflog/Entry.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Remote:
     file: lib/Git/Raw/Remote.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Repository:
     file: lib/Git/Raw/Repository.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Signature:
     file: lib/Git/Raw/Signature.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Stash:
     file: lib/Git/Raw/Stash.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Stash::Progress:
     file: lib/Git/Raw/Stash/Progress.pm
-    version: '0.83'
+    version: '0.84'
+  Git::Raw::Submodule:
+    file: lib/Git/Raw/Submodule.pm
+    version: '0.84'
   Git::Raw::Tag:
     file: lib/Git/Raw/Tag.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::TransferProgress:
     file: lib/Git/Raw/TransferProgress.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Tree:
     file: lib/Git/Raw/Tree.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Tree::Builder:
     file: lib/Git/Raw/Tree/Builder.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Tree::Entry:
     file: lib/Git/Raw/Tree/Entry.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Walker:
     file: lib/Git/Raw/Walker.pm
-    version: '0.83'
+    version: '0.84'
   Git::Raw::Worktree:
     file: lib/Git/Raw/Worktree.pm
-    version: '0.83'
+    version: '0.84'
 requires:
   Carp: '0'
   XSLoader: '0'
@@ -224,7 +227,7 @@ resources:
   bugtracker: https://github.com/jacquesg/p5-Git-Raw/issues
   homepage: http://metacpan.org/release/Git-Raw/
   repository: git://github.com/jacquesg/p5-Git-Raw.git
-version: '0.83'
+version: '0.84'
 x_Dist_Zilla:
   perl:
     version: '5.026003'
@@ -305,7 +308,7 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^:^v(.+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.21.0
+          git_version: 2.22.0
           repo_root: .
       name: '@Author::ALEXBIO/Git::NextVersion'
       version: '2.045'
@@ -376,7 +379,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.21.0
+          git_version: 2.22.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -389,11 +392,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.83
+          tag: v0.84
           tag_format: v%v
           tag_message: '%N %v'
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.21.0
+          git_version: 2.22.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -407,7 +410,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.21.0
+          git_version: 2.22.0
           repo_root: .
       name: '@Author::ALEXBIO/Git::Push'
       version: '2.045'

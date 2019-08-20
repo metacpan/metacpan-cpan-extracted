@@ -52,6 +52,11 @@ is(
             peak    => ['25176', 'kB'],
             rss     => ['16604', 'kB'],
         };
+        field harness_job_fields => [
+            {name => 'mem_rss',  details => '16604kB'},
+            {name => 'mem_size', details => '25176kB'},
+            {name => 'mem_peak', details => '25176kB'},
+        ];
         etc;
     },
     "Got desired event"

@@ -228,7 +228,7 @@ foreach my $file (@ARGV) {
     elsif ( $file eq '-' ) {
 
         # Set file to <STDIN>
-        $file = '<STDIN>';
+        $file = '-';
     }
     else {
         # Open filehandle with $file
@@ -242,6 +242,9 @@ foreach my $file (@ARGV) {
     # Validate answer: check {status}==1
     if ( !$FileStats->{status} ) {
         print STDERR "[WARNING]\tError parsing \"$file\". Skipped.\n";
+	if ($opt_debug) {
+		print Dumper $FileStats;
+	}
         next;
     }
 
@@ -278,10 +281,13 @@ foreach my $file (@ARGV) {
     }
     $output_object{$file} = \%metrics;
 
-    for my $key (keys %metrics) {
-        $metrics{$key} = thousands($metrics{$key});
-    }  
+    if ($opt_thousand_separator or $opt_format eq 'screen') {
+       for my $key (keys %metrics) {
+          $metrics{$key} = thousands($metrics{$key});
+       }  
+    }
     $output_print{$file} = \%metrics;
+    
 }
 
 my $file_num = scalar keys %output_object;
@@ -518,7 +524,7 @@ n50 - A script to calculate N50 from one or multiple FASTA/FASTQ files.
 
 =head1 VERSION
 
-version 0.80
+version 0.83
 
 =head1 SYNOPSIS
 

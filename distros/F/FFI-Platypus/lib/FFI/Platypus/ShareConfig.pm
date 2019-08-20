@@ -4,15 +4,15 @@ use strict;
 use warnings;
 use File::Spec;
 
-our $VERSION = '0.94'; # VERSION
+our $VERSION = '0.96'; # VERSION
 
 sub dist_dir ($)
 {
   my($dist_name) = @_;
-  
+
   my @pm = split /-/, $dist_name;
   $pm[-1] .= ".pm";
-  
+
   foreach my $inc (@INC)
   {
     if(-f File::Spec->catfile($inc, @pm))
@@ -45,7 +45,7 @@ sub get
       die "bad or missing config file $fn";
     };
   }
-  
+
   defined $name ? $config->{$name} : $config;
 }
 
@@ -63,7 +63,7 @@ FFI::Platypus::ShareConfig
 
 =head1 VERSION
 
-version 0.94
+version 0.96
 
 =head1 AUTHOR
 
@@ -94,6 +94,8 @@ Ilya Pavlov (Ilya33)
 Petr Pisar (ppisar)
 
 Mohammad S Anwar (MANWAR)
+
+Håkon Hægland (hakonhagland, HAKONH)
 
 =head1 COPYRIGHT AND LICENSE
 

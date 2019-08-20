@@ -8,7 +8,7 @@ use Carp qw(croak);
 use Pod::Usage;
 use Getopt::Long qw(:config bundling);
 
-our $VERSION = 0.002006; # X.YYYZZZ
+our $VERSION = 0.002007; # X.YYYZZZ
 
 my $verbose;
 
@@ -24,11 +24,18 @@ usage: git-autofixup [<options>] <revision>
 -v, --verbose      increase verbosity (use up to 2 times)
 -c N, --context N  set number of diff context lines (default 3)
 -s N, --strict N   set strictness (default 0)
-    Assign hunk to topic branch commit if:
-    0: exactly one topic branch commit is blamed in hunk context or 
-       changed lines are adjacent to exactly one topic branch commit
-    1: changed lines are adjacent to exactly one topic branch commit
-    2: changed lines are surrounded by exactly one topic branch commit
+    Assign a hunk to fixup a topic branch commit if:
+
+    0: either only one topic branch commit is blamed in the hunk context or
+       blocks of added lines are adjacent to exactly one topic branch commit.
+       Removing upstream lines is allowed for this level.
+    1: blocks of added lines are adjacent to exactly one topic branch commit
+    2: blocks of added lines are surrounded by exactly one topic branch commit
+
+    Regardless of strictness level, removed lines are correlated with the
+    commit they're blamed on, and all the blocks of changed lines in a hunk
+    must be correlated with the same topic branch commit in order to be
+    assigned to it. See the --help for more details.
 END
 
 # Parse hunks out of `git diff` output. Return an array of hunk hashrefs.
@@ -54,7 +61,7 @@ sub parse_hunks {
             my $lines = [];
             while (1) {
                 $line = <$fh>;
-                if (!defined($line) || $line =~ /^[^ +-\\]/) {
+                if (!defined($line) || $line =~ /^[^ +\\-]/) {
                     last;
                 }
                 push @{$lines}, $line;
@@ -377,12 +384,6 @@ sub get_fixup_hunks_by_sha {
     my %hunks_for;
     for my $hunk (@{$hunks}) {
         my $blame = $blame_for->{$hunk};
-        my $sha = get_fixup_sha({
-            hunk => $hunk,
-            blame => $blame,
-            summary_for => $summary_for,
-            strict => $strict,
-        });
         if ($verbose > 1) {
             print_hunk_blamediff({
                 fh => *STDOUT,
@@ -392,10 +393,38 @@ sub get_fixup_hunks_by_sha {
                 blame_indexes => get_blame_indexes($hunk)
             });
         }
+        my $sha = get_fixup_sha({
+            hunk => $hunk,
+            blame => $blame,
+            summary_for => $summary_for,
+            strict => $strict,
+        });
         next if !$sha;
         push @{$hunks_for{$sha}}, $hunk;
     }
     return \%hunks_for;
+}
+
+# Return SHAs in some consistent order.
+#
+# Currently they're ordered by how early their assigned hunks appear in the
+# working dir diff output.
+sub get_ordered_shas {
+    my $hunks = shift;
+    my $hunks_for = shift;
+    my $nsha = scalar keys %{$hunks_for};
+    my @ordered = ();
+    for my $tgt (@{$hunks}) {
+        last if (@ordered >= $nsha);
+        for my $sha (keys %{$hunks_for}) {
+            my $sha_hunks = $hunks_for->{$sha};
+            if (grep {$_->{file} eq $tgt->{file} && $_->{start} == $tgt->{start}} @{$sha_hunks}) {
+                push @ordered, $sha;
+                last;
+            }
+        }
+    }
+    return @ordered;
 }
 
 sub main {
@@ -460,7 +489,9 @@ sub main {
         summary_for => $summary_for,
         strict => $strict,
     });
-    while (my ($sha, $fixup_hunks) = each %{$hunks_for}) {
+    my @ordered_shas = get_ordered_shas($hunks, $hunks_for);
+    for my $sha (@ordered_shas) {
+        my $fixup_hunks = $hunks_for->{$sha};
         commit_fixup($sha, $fixup_hunks);
     }
     return 0;

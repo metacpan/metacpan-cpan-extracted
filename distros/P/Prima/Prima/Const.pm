@@ -119,6 +119,10 @@ package
     rgnop; *AUTOLOAD = \&Prima::Const::AUTOLOAD;# Region operations
 package
     rgn; *AUTOLOAD = \&Prima::Const::AUTOLOAD;# Region.rect_inside() results
+package
+    fm; *AUTOLOAD = \&Prima::Const::AUTOLOAD;# fill modes
+package
+    ggo; *AUTOLOAD = \&Prima::Const::AUTOLOAD;# glyph outline codes
 
 1;
 
@@ -402,6 +406,14 @@ See L<Prima::File>
 	fe::Write
 	fe::Exception
 
+=head2 fm::  - fill modes 
+
+See L<Prima::Drawable/fillMode>
+
+	fp::Alternate
+	fp::Winding
+	fp::Overlay
+
 =head2 fp::  - standard fill pattern indices
 
 See L<Prima::Drawable/fillPattern>
@@ -463,6 +475,15 @@ See L<Prima::Drawable/weight>
 	fw::Bold
 	fw::ExtraBold
 	fw::UltraBold
+
+=head2 ggo::  - glyph outline commands
+
+	ggo::Move
+	ggo::Line
+	ggo::Conic
+	ggo::Cubic
+
+See also L<Prima::Drawable/render_glyph>
 
 =head2 gm::  - grow modes
 
@@ -952,6 +973,7 @@ See also L<Prima::Application/get_system_value>
 	                       0 if it doesn't, -1 if unknown
 	sv::LayeredWidgets   - 1 if system supports layering
 	sv::DWM              - 1 if system supports DWM API
+	sv::FixedPointerSize - 0 if system doesn't support arbitrary sized pointers and will resize custom icons to the system size
 
 =head2 ta::  - alignment constants
 

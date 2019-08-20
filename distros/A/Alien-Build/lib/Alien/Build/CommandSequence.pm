@@ -6,7 +6,7 @@ use Text::ParseWords qw( shellwords );
 use Capture::Tiny qw( capture );
 
 # ABSTRACT: Alien::Build command sequence
-our $VERSION = '1.79'; # VERSION
+our $VERSION = '1.83'; # VERSION
 
 
 sub new
@@ -75,14 +75,14 @@ sub _run_string
 {
   my($build, $cmd) = @_;
   $build->log("+ $cmd");
-  
+
   {
     my $cmd = $cmd;
     $cmd =~ s{\\}{\\\\}g if $^O eq 'MSWin32';
     my @cmd = shellwords($cmd);
     return $built_in{$cmd[0]}->(@cmd) if $built_in{$cmd[0]};
   }
-  
+
   system $cmd;
   die "external command failed" if $?;
 }
@@ -93,7 +93,7 @@ sub _run_with_code
   my $code = pop @cmd;
   $build->log("+ @cmd");
   my %args = ( command => \@cmd );
-  
+
   if($built_in{$cmd[0]})
   {
     my $error;
@@ -134,7 +134,7 @@ sub execute
   my $intr = $build->meta->interpolator;
 
   my $prop = $build->_command_prop;
-  
+
   foreach my $command (@{ $self->{commands} })
   {
     if(ref($command) eq 'CODE')
@@ -144,8 +144,9 @@ sub execute
     elsif(ref($command) eq 'ARRAY')
     {
       my($command, @args) = @$command;
-      my $code = pop @args if $args[-1] && ref($args[-1]) eq 'CODE';
-      
+      my $code;
+      $code = pop @args if $args[-1] && ref($args[-1]) eq 'CODE';
+
       if($args[-1] && ref($args[-1]) eq 'SCALAR')
       {
         my $dest = ${ pop @args };
@@ -166,9 +167,9 @@ sub execute
           die "illegal destination: $dest";
         }
       }
-      
+
       ($command, @args) = map { $intr->interpolate($_, $prop) } ($command, @args);
-      
+
       if($code)
       {
         _run_with_code $build, $command, @args, $code;
@@ -200,7 +201,7 @@ Alien::Build::CommandSequence - Alien::Build command sequence
 
 =head1 VERSION
 
-version 1.79
+version 1.83
 
 =head1 CONSTRUCTOR
 

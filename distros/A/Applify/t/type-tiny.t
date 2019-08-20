@@ -1,22 +1,19 @@
-use warnings;
-use strict;
-use Test::More;
+use lib '.';
+use t::Helper;
 
 plan skip_all => 'Types::Standard is required' unless eval 'require Types::Standard;1';
 
-my $app = eval <<'HERE' or die $@;
+my $FILE = __FILE__;
+my $app  = eval <<"HERE" or die $@;
 use Applify;
 use Types::Standard qw(ArrayRef Bool Int);
+documentation 'Applify';
+version 'Applify';
 option bool => give_cookies => 'give', isa => Bool;
 option int => n_cookies => 'cookies', isa => Int;
-option int => people_ages => 'ages', isa => ArrayRef[Int], n_of => '@', default => sub { [qw(12 24 44)] };
+option int => people_ages => 'ages', isa => ArrayRef[Int], n_of => '\@', default => sub { [qw(12 24 44)] };
 app {};
 HERE
-
-{
-  no warnings qw(once redefine);
-  *Applify::print_help = sub { $main::help++ };
-}
 
 my $script = $app->_script;
 
@@ -37,8 +34,12 @@ done_testing;
 
 sub run {
   local @ARGV = @_;
-  return eval {
-    my $app = $script->app;
-    [$app->give_cookies, $app->n_cookies, $app->people_ages];
-  } || [];
+  my ($stdout, $stderr, $res) = run_method(
+    $script,
+    sub {
+      my $app = $script->app;
+      return [$app->give_cookies, $app->n_cookies, $app->people_ages];
+    }
+  );
+  return $res;
 }

@@ -1,57 +1,61 @@
-** 0.11 / 2019-08-10
-   - Correct Weasel::Session dependency; the minimum should be 0.11
-     as that provides the 'state' attribute
 
-** 0.10 / 2019-08-04
-   - Add visual indication of features with failed scenarios
-   - Run all scenarios of a feature in a single Weasel session
-     when tagged @weasel-single-session' (opens the possibility of
-     caching page assets)
+0.12   2019-08-19
+       - Increase Weasel::Driver::Mock dependency (TestDep) to be in line with
+         the driver role version of this dist
 
-** 0.09 / 2019-06-30
-   - Add table of contents to feature log files
-   - Report per-step completion status
+0.11   2019-08-10
+       - Correct Weasel::Session dependency; the minimum should be 0.11
+         as that provides the 'state' attribute
 
-** 0.08 / 2019-06-29
-   - In the HTML logs, link to screenshots, even if those are in a
-     separate directory (using relative URLs)
-   - Add an index HTML file, for an overview of the feature logs
-   - Don't generate empty screenshots at the start of a session
-   - Eliminate logging of internal session interaction (e.g. screenshots)
+0.10   2019-08-04
+       - Add visual indication of features with failed scenarios
+       - Run all scenarios of a feature in a single Weasel session
+         when tagged @weasel-single-session' (opens the possibility of
+         caching page assets)
 
-** 0.07 / 2019-06-21
-   - Change minimum Perl version to static declaration in dist.ini
-   - Resolve undefined variable warnings with logging enabled
-   - Add support for Test::BDD::Cucumber 0.57+
-     (improved post-step extension hook)
-   - Screenshot generation improvements:
-     - no screenshots without logging
-     - prevent screenshots from various features overwriting each other
-     - add styling in html log for screenshots
+0.09   2019-06-30
+       - Add table of contents to feature log files
+       - Report per-step completion status
 
-** 0.06 / 2019-02-22
-   - Actually write the HTML log when steps/scenarios/features
-     complete
-   - Improve default HTML log template
-   - Anticipate change in T::B::C::Extension::post_step()'s
-     '$failed' argument (which turns into '$result' in the
-     hopefully near future)
+0.08   2019-06-29
+       - In the HTML logs, link to screenshots, even if those are in a
+         separate directory (using relative URLs)
+       - Add an index HTML file, for an overview of the feature logs
+       - Don't generate empty screenshots at the start of a session
+       - Eliminate logging of internal session interaction (e.g. screenshots)
 
-** 0.05 / 2019-02-21
-   - Add HTML logging of features/scenarios/steps interspersed
-     with screenshots and web page interactions (driver commands)
+0.07   2019-06-21
+       - Change minimum Perl version to static declaration in dist.ini
+       - Resolve undefined variable warnings with logging enabled
+       - Add support for Test::BDD::Cucumber 0.57+
+         (improved post-step extension hook)
+       - Screenshot generation improvements:
+         - no screenshots without logging
+         - prevent screenshots from various features overwriting each other
+         - add styling in html log for screenshots
 
-** 0.04 / 2018-09-21
-   - Check return values from 'syscalls' (open/close/print/etc)
+0.06   2019-02-22
+       - Actually write the HTML log when steps/scenarios/features
+         complete
+       - Improve default HTML log template
+       - Anticipate change in T::B::C::Extension::post_step()'s
+         '$failed' argument (which turns into '$result' in the
+         hopefully near future)
 
-** 0.03 / 2018-09-13
-   - Clear text boxes/inputs before sending new input using the
-     "When I enter ... into ..." step
+0.05   2019-02-21
+       - Add HTML logging of features/scenarios/steps interspersed
+         with screenshots and web page interactions (driver commands)
+
+0.04   2018-09-21
+       - Check return values from 'syscalls' (open/close/print/etc)
+
+0.03   2018-09-13
+       - Clear text boxes/inputs before sending new input using the
+         "When I enter ... into ..." step
+
+0.02   2016-06-30
 
 
-** 0.02 / 2016-06-30
-
-
-** 0.01 / 2016-06-23
+0.01   2016-06-23
 
 

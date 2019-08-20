@@ -9,7 +9,7 @@ Types::Core - Core types defined as tests and literals (ease of use)
 
 =head1 VERSION
 
-Version "0.2.4";
+Version "0.2.5";
 
 =cut
 
@@ -19,9 +19,11 @@ Version "0.2.4";
   use strict;
   use warnings;
   use mem;
-  our $VERSION='0.2.4';
+  our $VERSION='0.2.5';
   use constant Self => __PACKAGE__;
 
+# 0.2.5   -	Removed spurious reference to unneeded module in t/t00.t.
+#						No other source changes.
 # 0.2.4   -	fixed current tests in 5.{12,10,8}.x; added some tests for
 #						Cmp function to allow comparing objects and sorting them
 #						though still leaving it undocumented, as not sure how

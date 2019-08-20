@@ -1,7 +1,7 @@
 package App::resolvetable;
 
-our $DATE = '2019-05-30'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-08-20'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -139,11 +139,12 @@ _
         },
         colorize => {
             schema => 'bool*',
+            default => 1,
         },
     },
     examples => [
         {
-            src => 'cat names.txt | [[prog]] --colorize -s 8.8.8.8 -s my.dns.server -s my2.dns.server',
+            src => 'cat names.txt | [[prog]] -s 8.8.8.8 -s my.dns.server -s my2.dns.server',
             src_plang => 'bash',
             test => 0,
             'x.doc.show_result' => 0,
@@ -250,11 +251,11 @@ App::resolvetable - Produce a colored table containing DNS resolve results of se
 
 =head1 VERSION
 
-This document describes version 0.004 of App::resolvetable (from Perl distribution App-resolvetable), released on 2019-05-30.
+This document describes version 0.005 of App::resolvetable (from Perl distribution App-resolvetable), released on 2019-08-20.
 
 =head1 DESCRIPTION
 
-Sample screenshot 1 (with C<--colorize>):
+Sample screenshot 1:
 
 =head1 FUNCTIONS
 
@@ -279,7 +280,7 @@ The default action is to show resolve result (C<show-addresses>). If set to
 C<show-timings>, will show resolve times instead to compare speed among DNS
 servers/resolvers.
 
-=item * B<colorize> => I<bool>
+=item * B<colorize> => I<bool> (default: 1)
 
 =item * B<names>* => I<array[str]>
 
@@ -302,11 +303,11 @@ that contains extra information.
 
 Return value:  (any)
 
-=for html <img src="https://st.aticpan.org/source/PERLANCAR/App-resolvetable-0.004/share/images/Screenshot_20190530_111051.png" />
+=for html <img src="https://st.aticpan.org/source/PERLANCAR/App-resolvetable-0.005/share/images/Screenshot_20190530_111051.png" />
 
-Sample screenshot 2 (with C<--colorize --timings>):
+Sample screenshot 2 (with C<--timings>):
 
-=for html <img src="https://st.aticpan.org/source/PERLANCAR/App-resolvetable-0.004/share/images/Screenshot_20190530_112052.png" />
+=for html <img src="https://st.aticpan.org/source/PERLANCAR/App-resolvetable-0.005/share/images/Screenshot_20190530_112052.png" />
 
 =head1 HOMEPAGE
 

@@ -1,0 +1,31 @@
+Changes
+lib/Config/AST.pm
+lib/Config/AST/Node.pm
+lib/Config/AST/Node/Null.pm
+lib/Config/AST/Node/Section.pm
+lib/Config/AST/Node/Value.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/01conf01.t
+t/01conf02.t
+t/01conf03.t
+t/01conf04.t
+t/01conf05.t
+t/01conf06.t
+t/01conf07.t
+t/01conf08.t
+t/01conf09.t
+t/01conf10.t
+t/01conf11.t
+t/01conf12.t
+t/01conf13.t
+t/01conf14.t
+t/01conf15.t
+t/02conf01.t
+t/02merge.t
+t/TestConfig.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

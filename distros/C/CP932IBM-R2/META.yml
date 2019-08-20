@@ -3,7 +3,7 @@ meta-spec:
   version: 1.4
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
 name: CP932IBM-R2
-version: 0.04
+version: 0.05
 abstract: provides minimal CP932IBM I/O subroutines by short name
 author:
   - ina <ina@cpan.org>

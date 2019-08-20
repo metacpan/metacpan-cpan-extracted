@@ -13,16 +13,18 @@ use File::Copy ();
 use ExtUtils::MakeMaker 7.12;
 
 # ABSTRACT: FFI::Build installer code for ExtUtils::MakeMaker
-our $VERSION = '0.94'; # VERSION
+our $VERSION = '0.96'; # VERSION
 
 
 sub new
 {
-  my($class) = @_;
-  
-  my $self = bless {}, $class;
+  my($class, %opt) = @_;
+
+  my $save = defined $opt{save} ? $opt{save} : 1;
+
+  my $self = bless { save => $save }, $class;
   $self->load_prop;
-  
+
   $self;
 }
 
@@ -30,7 +32,7 @@ sub new
 sub mm_args
 {
   my($self, %args) = @_;
-  
+
   if($args{DISTNAME})
   {
     $self->{prop}->{distname} ||= $args{DISTNAME};
@@ -52,7 +54,7 @@ sub mm_args
       $args{BUILD_REQUIRES}->{$alien} ||= 0;
     }
   }
-  
+
   if(my $test = $self->test)
   {
     foreach my $alien (@{ $test->alien })
@@ -61,7 +63,7 @@ sub mm_args
       $args{TEST_REQUIRES}->{$alien} ||= 0;
     }
   }
-  
+
   %args;
 }
 
@@ -70,26 +72,26 @@ sub distname { shift->{prop}->{distname} }
 sub sharedir
 {
   my($self, $new) = @_;
-  
+
   if(defined $new)
   {
     $self->{prop}->{share} = $new;
     $self->save_prop;
   }
-  
+
   $self->{prop}->{share};
 }
 
 sub archdir
 {
   my($self, $new) = @_;
-  
+
   if(defined $new)
   {
     $self->{prop}->{arch} = $new;
     $self->save_prop;
   }
-  
+
   $self->{prop}->{arch};
 }
 
@@ -98,10 +100,10 @@ sub load_build
   my($self, $dir, $name, $install) = @_;
   return unless -d $dir;
   my($fbx) = File::Glob::bsd_glob("./$dir/*.fbx");
-  
+
   my $options;
   my $platform = FFI::Build::Platform->default;
-  
+
   if($fbx)
   {
     $name = File::Basename::basename($fbx);
@@ -120,7 +122,7 @@ sub load_build
       source => ["$dir/*.c", "$dir/*.cxx", "$dir/*.cpp"],
     };
   }
-  
+
   $options->{platform} ||= $platform;
   $options->{dir}      ||= ref $install ? $install->($options) : $install;
   $options->{verbose}  = 1 unless defined $options->{verbose};
@@ -146,6 +148,7 @@ sub test
 sub save_prop
 {
   my($self) = @_;
+  return unless $self->{save};
   open my $fh, '>', 'fbx.json';
   print $fh JSON::PP::encode_json($self->{prop});
   close $fh;
@@ -154,6 +157,7 @@ sub save_prop
 sub load_prop
 {
   my($self) = @_;
+  return unless $self->{save};
   unless(-f 'fbx.json')
   {
     $self->{prop} = {};
@@ -179,7 +183,7 @@ sub clean
 sub mm_postamble
 {
   my($self) = @_;
-  
+
   my $postamble = ".PHONY: fbx_build ffi fbx_test ffi-test fbc_clean ffi-clean\n\n";
 
   # make fbx_realclean ; make clean
@@ -187,7 +191,7 @@ sub mm_postamble
                 "\n" .
                 "fbx_clean ffi-clean:\n" .
                 "\t\$(FULLPERL) -MFFI::Build::MM=cmd -e fbx_clean\n\n";
-  
+
   # make fbx_build; make
   $postamble .= "pure_all :: fbx_build\n" .
                 "\n" .
@@ -199,7 +203,7 @@ sub mm_postamble
                 "\n" .
                 "fbx_test ffi-test:\n" .
                 "\t\$(FULLPERL) -MFFI::Build::MM=cmd -e fbx_test\n\n";
-  
+
   $postamble;
 }
 
@@ -212,7 +216,7 @@ sub action_build
     my $lib = $build->build;
     if($self->archdir)
     {
-      File::Path::mkpath($self->archdir, 0, 0755);
+      File::Path::mkpath($self->archdir, 0, oct(755));
       my $archfile = File::Spec->catfile($self->archdir, File::Basename::basename($self->archdir) . ".txt");
       open my $fh, '>', $archfile;
       my $lib_path = $lib->path;
@@ -246,7 +250,7 @@ sub import
     if($arg eq 'cmd')
     {
       package main;
-      
+
       my $mm = sub {
         my($action) = @_;
         my $build = FFI::Build::MM->new;
@@ -254,15 +258,15 @@ sub import
       };
 
       no warnings 'once';
-      
+
       *fbx_build = sub {
         $mm->('action_build');
       };
-      
+
       *fbx_test = sub {
         $mm->('action_test');
       };
-      
+
       *fbx_clean = sub {
         $mm->('action_clean');
       };
@@ -284,7 +288,7 @@ FFI::Build::MM - FFI::Build installer code for ExtUtils::MakeMaker
 
 =head1 VERSION
 
-version 0.94
+version 0.96
 
 =head1 SYNOPSIS
 
@@ -399,6 +403,8 @@ Ilya Pavlov (Ilya33)
 Petr Pisar (ppisar)
 
 Mohammad S Anwar (MANWAR)
+
+Håkon Hægland (hakonhagland, HAKONH)
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -5,14 +5,16 @@ use warnings;
 use Carp ();
 use base qw( Exporter );
 use overload
-  '<=>' => sub { shift->cmp(@_) },
-  'cmp' => sub { shift->cmp(@_) },
-  '""'  => sub { shift->as_string };
+  '<=>'    => sub { shift->cmp(@_) },
+  'cmp'    => sub { shift->cmp(@_) },
+  '""'     => sub { shift->as_string },
+  bool     => sub { 1 },
+  fallback => 1;
 
 our @EXPORT_OK = qw( version );
 
 # ABSTRACT: Very basic version object for Alien::Build
-our $VERSION = '1.79'; # VERSION
+our $VERSION = '1.83'; # VERSION
 
 
 sub new
@@ -41,16 +43,16 @@ sub as_string
 
 sub cmp
 {
-  my @a = split /\./, ${$_[0]};
-  my @b = split /\./, ${ref($_[1]) ? $_[1] : version($_[1])};
-  
-  while(@a or @b)
+  my @x = split /\./, ${$_[0]};
+  my @y = split /\./, ${ref($_[1]) ? $_[1] : version($_[1])};
+
+  while(@x or @y)
   {
-    my $a = (shift @a) || 0;
-    my $b = (shift @b) || 0;
-    return $a <=> $b if $a <=> $b;
+    my $x = (shift @x) || 0;
+    my $y = (shift @y) || 0;
+    return $x <=> $y if $x <=> $y;
   }
-  
+
   0;
 }
 
@@ -69,7 +71,7 @@ Alien::Build::Version::Basic - Very basic version object for Alien::Build
 
 =head1 VERSION
 
-version 1.79
+version 1.83
 
 =head1 SYNOPSIS
 

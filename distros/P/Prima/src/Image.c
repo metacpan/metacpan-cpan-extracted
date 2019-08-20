@@ -5,6 +5,7 @@
 #include <math.h>
 #include "apricot.h"
 #include "Image.h"
+#include "Region.h"
 #include "img_conv.h"
 #include <Image.inc>
 #include "Clipboard.h"
@@ -320,6 +321,10 @@ Image_set( Handle self, HV * profile)
 void
 Image_done( Handle self)
 {
+	if ( var-> regionData ) {
+		free(var->regionData);
+		var->regionData = NULL;
+	}
 	apc_image_destroy( self);
 	my->make_empty( self);
 	inherited done( self);
@@ -810,6 +815,10 @@ Bool
 Image_begin_paint( Handle self)
 {
 	Bool ok;
+	if ( var-> regionData ) {
+		free(var->regionData);
+		var->regionData = NULL;
+	}
 	if ( !inherited begin_paint( self))
 		return false;
 	if ( !( ok = apc_image_begin_paint( self))) {
@@ -824,6 +833,10 @@ Image_begin_paint_info( Handle self)
 {
 	Bool ok;
 	if ( is_opt( optInDraw))     return true;
+	if ( var-> regionData ) {
+		free(var->regionData);
+		var->regionData = NULL;
+	}
 	if ( !inherited begin_paint_info( self))
 		return false;
 	if ( !( ok = apc_image_begin_paint_info( self))) {
@@ -1545,7 +1558,8 @@ Image_put_image_indirect( Handle self, Handle image, int x, int y, int xFrom, in
 	if ( is_opt( optInDraw))
 		return inherited put_image_indirect( self, image, x, y, xFrom, yFrom, xDestLen, yDestLen, xLen, yLen, rop);
 	if ( !kind_of( image, CImage)) return false;
-	ret = img_put( self, image, x, y, xFrom, yFrom, xDestLen, yDestLen, xLen, yLen, rop);
+	ret = img_put( self, image, x, y, xFrom, yFrom, xDestLen, yDestLen, xLen, yLen, rop,
+		var->regionData ? &var->regionData-> data. box : NULL);
 	my-> update_change( self);
 	return ret;
 }
@@ -1585,56 +1599,188 @@ Image_reset_notifications( Handle self)
 	}
 }
 
+static void
+color2pixel( Handle self, Color color, Byte * pixel)
+{
+	RGBColor rgb;
+	rgb.b = color & 0xff;
+	rgb.g = ((color)>>8) & 0xff;
+	rgb.r = ((color)>>16) & 0xff;
+
+	switch (var->type) {
+	case imBW:
+		pixel[0] = (int)( (rgb.r + rgb.g + rgb.b) / 768.0 + .5);
+		break;
+	case imbpp1:
+		pixel[0] = cm_nearest_color(rgb,var->palSize,var->palette) & 1;
+		break;
+	case imbpp4 | imGrayScale :
+		pixel[0] = (int)( (rgb.r + rgb.g + rgb.b) / 48.0);
+		break;
+	case imbpp4  :
+		pixel[0] = cm_nearest_color(rgb,var->palSize,var->palette) & 7;
+		break;
+	case imByte:
+		pixel[0] = (int)( (rgb.r + rgb.g + rgb.b) / 3.0);
+		break;
+	case imbpp8:
+		pixel[0] = cm_nearest_color(rgb,var->palSize,var->palette);
+		break;
+	case imShort :
+		*((Short*)pixel) = color;
+		break;
+	case imRGB :
+		memcpy( pixel, &rgb, 3);
+		break;
+	case imLong :
+		*((Long*)pixel) = color;
+		break;
+	default:
+		croak("Not implemented yet");
+	}
+}
+
+static void
+read_fill_pattern(Handle self, FillPattern * p)
+{
+	if ( my-> fillPattern == Drawable_fillPattern) {
+		FillPattern * fp = apc_gp_get_fill_pattern( self);
+		if ( fp )
+			memcpy( p, fp, sizeof(FillPattern));
+		else 
+			memset( p, 0xff, sizeof(FillPattern));
+	} else {
+		AV * av;
+		SV * fp;
+		fp = my->get_fillPattern( self);
+		if ( fp && SvOK(fp) && SvROK(fp) && SvTYPE(av = (AV*)SvRV(fp)) == SVt_PVAV && av_len(av) == sizeof(FillPattern) - 1) {
+			int i;
+			for ( i = 0; i < 8; i++) {
+				SV ** sv = av_fetch( av, i, 0);
+				(*p)[i] = (sv && *sv && SvOK(*sv)) ? SvIV(*sv) : 0;
+			}
+		} else {
+			warn("Bad array returned by .fillPattern");
+			memset( p, 0xff, sizeof(FillPattern));
+		}
+	}
+}
+
+static void
+prepare_line_context( Handle self, unsigned char * lp, ImgPaintContext * ctx)
+{
+	color2pixel( self, my->get_color(self), ctx->color);
+	color2pixel( self, my->get_backColor(self), ctx->backColor);
+	ctx->rop    = my->get_rop(self);
+	ctx->region = var->regionData ? &var->regionData-> data. box : NULL;
+	ctx->transparent = my->get_rop2(self) == ropNoOper;
+	ctx->translate = my->get_translate(self);
+	if ( my-> linePattern == Drawable_linePattern) {
+		int lplen;
+		lplen = apc_gp_get_line_pattern( self, lp);
+		lp[lplen] = 0;
+	} else {
+		SV * sv = my->get_linePattern(self);
+		if ( sv && SvOK(sv)) {
+			STRLEN lplen;
+			char * lpsv = SvPV(sv, lplen);
+			if ( lplen > 255 ) lplen = 255;
+			memcpy(lp, lpsv, lplen);
+			lp[lplen] = 0;
+		} else 
+			strcpy((char*) lp, (const char*) lpSolid);
+	}
+	ctx->linePattern = lp;
+}
+
 Bool
 Image_bar( Handle self, int x1, int y1, int x2, int y2)
 {
-	if (opt_InPaint) {
+	Point t;
+	ImgPaintContext ctx;
+	if (opt_InPaint)
 		return apc_gp_bar( self, x1, y1, x2, y2);
-	} else {
-		Byte colorbuf[sizeof(double)*2];
-		Color color;
-		RGBColor rgb;
 
-		color = my->get_color(self);
-		rgb.b = color & 0xff;
-		rgb.g = ((color)>>8) & 0xff;
-		rgb.r = ((color)>>16) & 0xff;
+	t = my->get_translate(self);
+	x1 += t.x;
+	y1 += t.y;
+	color2pixel( self, my->get_color(self), ctx.color);
+	color2pixel( self, my->get_backColor(self), ctx.backColor);
+	ctx.rop    = my->get_rop(self);
+	ctx.region = var->regionData ? &var->regionData-> data. box : NULL;
+	read_fill_pattern(self, &ctx.pattern);
+	ctx.patternOffset = my->get_fillPatternOffset(self);
+	ctx.patternOffset.x -= t.x;
+	ctx.patternOffset.y -= t.y;
+	ctx.transparent = my->get_rop2(self) == ropNoOper;
+	img_bar( self, x1, y1, x2 - x1 + 1, y2 - y1 + 1, &ctx);
+	my-> update_change(self);
+	return true;
+}
 
-		switch (var->type) {
-		case imBW:
-			colorbuf[0] = (int)( (rgb.r + rgb.g + rgb.b) / 768.0 + .5);
-			break;
-		case imbpp1:
-			colorbuf[0] = cm_nearest_color(rgb,var->palSize,var->palette) & 1;
-			break;
-		case imbpp4 | imGrayScale :
-			colorbuf[0] = (int)( (rgb.r + rgb.g + rgb.b) / 48.0);
-			break;
-		case imbpp4  :
-			colorbuf[0] = cm_nearest_color(rgb,var->palSize,var->palette) & 7;
-			break;
-		case imByte:
-			colorbuf[0] = (int)( (rgb.r + rgb.g + rgb.b) / 3.0);
-			break;
-		case imbpp8:
-			colorbuf[0] = cm_nearest_color(rgb,var->palSize,var->palette);
-			break;
-		case imShort :
-			*((Short*)colorbuf) = color;
-			break;
-		case imRGB :
-			memcpy( colorbuf, &rgb, 3);
-			break;
-		case imLong :
-			*((Long*)colorbuf) = color;
-			break;
-		default:
-			croak("Not implemented yet");
-		}
-		img_bar( self, x1, y1, x2 - x1 + 1, y2 - y1 + 1, my-> get_rop(self), colorbuf);
-		my-> update_change(self);
-		return true;
+Bool
+Image_bars( Handle self, SV * rects)
+{
+	Point t;
+	ImgPaintContext ctx;
+	int i, count;
+	Rect * p, * r;
+	if (opt_InPaint)
+		return inherited bars( self, rects);
+
+	if (( p = prima_read_array( rects, "Image::bars", true, 4, 0, -1, &count)) == NULL)
+		return false;
+	color2pixel( self, my->get_color(self), ctx.color);
+	color2pixel( self, my->get_backColor(self), ctx.backColor);
+	ctx.rop    = my->get_rop(self);
+	ctx.region = var->regionData ? &var->regionData-> data. box : NULL;
+	read_fill_pattern(self, &ctx.pattern);
+	t = my->get_translate(self);
+	ctx.patternOffset = my->get_fillPatternOffset(self);
+	ctx.patternOffset.x -= t.x;
+	ctx.patternOffset.y -= t.y;
+	ctx.transparent = my->get_rop2(self) == ropNoOper;
+	for ( i = 0, r = p; i < count; i++, r++) {
+		ImgPaintContext ctx2 = ctx;
+		img_bar( self, 
+			r->left + t.x, 
+			r->bottom + t.y, 
+			r->right - r->left + t.x + 1, 
+			r->top - r->bottom + t.y + 1,
+			&ctx2);
 	}
+	free( p);
+	my-> update_change(self);
+	return true;
+}
+
+Bool
+Image_clear(Handle self, int x1, int y1, int x2, int y2)
+{
+	Point t;
+	ImgPaintContext ctx;
+	if (opt_InPaint)
+		return inherited clear( self, x1, y1, x2, y2);
+	if ( x1 < 0 && y1 < 0 && x2 < 0 && y2 < 0) {
+		x1 = 0;
+		y1 = 0;
+		x2 = var-> w - 1;
+		y2 = var-> h - 1;
+	}
+	t = my->get_translate(self);
+	x1 += t.x;
+	y1 += t.y;
+	color2pixel( self, my->get_backColor(self), ctx.color);
+	ctx.rop = my->get_rop(self);
+	ctx.region = var->regionData ? &var->regionData-> data. box : NULL;
+	memset( ctx.pattern, 0xff, sizeof(ctx.pattern));
+	ctx.patternOffset.x = ctx.patternOffset.y = 0;
+	ctx.patternOffset.x -= t.x;
+	ctx.patternOffset.y -= t.y;
+	ctx.transparent = false;
+	img_bar( self, x1, y1, x2 - x1 + 1, y2 - y1 + 1, &ctx);
+	my-> update_change(self);
+	return true;
 }
 
 void
@@ -1742,6 +1888,205 @@ Image_premultiply_alpha( Handle self, SV * alpha)
 		my-> set_type( self, oldType );
 	else
 		my-> update_change( self );
+}
+
+Handle
+Image_region( Handle self, Bool set, Handle mask)
+{
+	if ( is_opt(optInDraw) || is_opt(optInDrawInfo))
+		return inherited region(self,set,mask);
+
+	if ( var-> stage > csFrozen) return nilHandle;
+
+	if ( set) {
+		if ( var-> regionData ) {
+			free(var->regionData);
+			var->regionData = NULL;
+		}
+
+		if ( mask && kind_of( mask, CRegion)) {
+			var->regionData = CRegion(mask)->update_change(mask, true);
+			return nilHandle;
+		}
+
+		if ( mask && !kind_of( mask, CImage)) {
+			warn("Illegal object reference passed to Image::region");
+			return nilHandle;
+		}
+
+		if ( mask ) {
+			Handle region;
+			HV * profile = newHV();
+			pset_H( image, mask );
+			region = Object_create("Prima::Region", profile);
+			sv_free(( SV *) profile);
+			var->regionData = CRegion(region)->update_change(region, true);
+			Object_destroy(region);
+		}
+
+	} else if ( var-> regionData )
+		return Region_create_from_data( nilHandle, var->regionData);
+
+	return nilHandle;
+}
+
+static Bool
+primitive( Handle self, Bool fill, char * method, ...)
+{
+	Bool r;
+	SV * ret;
+	char format[256];
+	va_list args;
+	va_start( args, method);
+	ENTER;
+	SAVETMPS;
+	strcpy(format, "<");
+	strncat(format, method, 255);
+	ret = call_perl_indirect( self, fill ? "fill_primitive" : "stroke_primitive", format, true, false, args);
+	va_end( args);
+	r = ret ? SvTRUE( ret) : false;
+	FREETMPS;
+	LEAVE;
+	return r;
+}
+
+Bool
+Image_arc( Handle self, int x, int y, int dX, int dY, double startAngle, double endAngle)
+{
+	if ( opt_InPaint) return inherited arc(self, x, y, dX, dY, startAngle, endAngle);
+	return primitive( self, 0, "siiiinn", "arc", x, y, dX-1, dY-1, startAngle, endAngle);
+}
+
+Bool
+Image_chord( Handle self, int x, int y, int dX, int dY, double startAngle, double endAngle)
+{
+	if ( opt_InPaint) return inherited chord(self, x, y, dX, dY, startAngle, endAngle);
+	return primitive( self, 0, "siiiinn", "chord", x, y, dX-1, dY-1, startAngle, endAngle);
+}
+
+Bool
+Image_ellipse( Handle self, int x, int y,  int dX, int dY)
+{
+	if ( opt_InPaint) return inherited ellipse(self, x, y, dX, dY);
+	return primitive( self, 0, "siiii", "ellipse", x, y, dX-1, dY-1);
+}
+
+Bool
+Image_line(Handle self, int x1, int y1, int x2, int y2)
+{
+	if ( opt_InPaint) {
+		return inherited line(self, x1, y1, x2, y2);
+	} else if ( my->get_lineWidth(self) == 0) {
+		ImgPaintContext ctx;
+		unsigned char lp[256];
+		Point poly[2];
+		prepare_line_context( self, lp, &ctx);
+		poly[0].x = x1;
+		poly[0].y = y1;
+		poly[1].x = x2;
+		poly[1].y = y2;
+		img_polyline(self, 2, poly, &ctx);
+		return true;
+	} else {
+		return primitive( self, 0, "siiii", "line", x1, y1, x2, y2);
+	}
+}
+
+Bool
+Image_lines( Handle self, SV * points)
+{
+	if ( opt_InPaint) {
+		return inherited lines(self, points);
+	} else if ( my->get_lineWidth(self) == 0) {
+		Point * lines, *p;
+		int i, count;
+		ImgPaintContext ctx, ctx2;
+		unsigned char lp[256];
+		if (( lines = prima_read_array( points, "Image::lines", true, 4, 0, -1, &count)) == NULL)
+			return false;
+		prepare_line_context( self, lp, &ctx);
+		for (i = 0, p = lines; i < count; i++, p+=2) {
+			ctx2 = ctx;
+			img_polyline(self, 2, p, &ctx2);
+		}
+		free(lines);
+		return true;
+	} else {
+		return primitive( self, 0, "sS", "lines", points );
+	}
+}
+
+Bool
+Image_polyline( Handle self, SV * points)
+{
+	if ( opt_InPaint) {
+		return inherited polyline(self, points);
+	} else if ( my->get_lineWidth(self) == 0) {
+		Point * lines;
+		int count;
+		ImgPaintContext ctx;
+		unsigned char lp[256];
+		if (( lines = prima_read_array( points, "Image::polyline", true, 2, 2, -1, &count)) == NULL)
+			return false;
+		prepare_line_context( self, lp, &ctx);
+		img_polyline(self, count, lines, &ctx);
+		free(lines);
+		return true;
+	} else {
+		return primitive( self, 0, "sS", "line", points );
+	}
+}
+
+Bool
+Image_rectangle(Handle self, int x1, int y1, int x2, int y2)
+{
+	if ( opt_InPaint) {
+		return inherited rectangle(self, x1, y1, x2, y2);
+	} else if ( my->get_lineWidth(self) == 0) {
+		ImgPaintContext ctx;
+		unsigned char lp[256];
+		Point r[5] = { {x1,y1}, {x2,y1}, {x2,y2}, {x1,y2}, {x1,y1} };
+		prepare_line_context( self, lp, &ctx);
+		img_polyline(self, 5, r, &ctx);
+		return true;
+	} else {
+		return primitive( self, 0, "siiii", "rectangle", x1, y1, x2, y2);
+	}
+}
+
+Bool
+Image_sector( Handle self, int x, int y, int dX, int dY, double startAngle, double endAngle)
+{
+	if ( opt_InPaint) return inherited sector(self, x, y, dX, dY, startAngle, endAngle);
+	return primitive( self, 0, "siiiinn", "sector", x, y, dX-1, dY-1, startAngle, endAngle);
+}
+
+Bool
+Image_fill_chord( Handle self, int x, int y, int dX, int dY, double startAngle, double endAngle)
+{
+	if ( opt_InPaint) return inherited fill_chord(self, x, y, dX, dY, startAngle, endAngle);
+	return primitive( self, 1, "siiiinn", "chord", x, y, dX-1, dY-1, startAngle, endAngle);
+}
+
+Bool
+Image_fill_ellipse( Handle self, int x, int y,  int dX, int dY)
+{
+	if ( opt_InPaint) return inherited fill_ellipse(self, x, y, dX, dY);
+	return primitive( self, 1, "siiii", "ellipse", x, y, dX-1, dY-1);
+}
+
+Bool
+Image_fillpoly( Handle self, SV * points)
+{
+	if ( opt_InPaint) return inherited fillpoly(self, points);
+	return primitive( self, 1, "sS", "line", points );
+}
+
+Bool
+Image_fill_sector( Handle self, int x, int y, int dX, int dY, double startAngle, double endAngle)
+{
+	if ( opt_InPaint) return inherited fill_sector(self, x, y, dX, dY, startAngle, endAngle);
+	return primitive( self, 1, "siiiinn", "sector", x, y, dX-1, dY-1, startAngle, endAngle);
 }
 
 #ifdef __cplusplus

@@ -1,5 +1,18 @@
 Revision history for Alien-Build
 
+1.83      2019-08-19 18:31:19 -0400
+  - Production release identical to 1.81_01
+
+1.82_01   2019-08-18 19:47:10 -0400
+  - Stricter Perl::Critic policies (gh#135)
+
+1.81_01   2019-08-16 19:16:33 -0400
+  - Fix log class inheritence bug.
+
+1.80_01   2019-08-15 20:52:50 -0400
+  - Use Perl::Critic Freenode policies for development (gh#128)
+  - Add new configurable log class (gh#123)
+
 1.79      2019-07-15 14:26:16 -0400
   - Fix CBuilder probe plugin on platforms where /tmp is mounted noexec (gh#133, gh#134)
 

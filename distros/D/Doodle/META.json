@@ -44,7 +44,7 @@
          "web" : "https://github.com/iamalnewkirk/doodle"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_authority" : "cpan:AWNCORP",
    "x_contributors" : [
       "Al Newkirk <al@iamalnewkirk.com>"

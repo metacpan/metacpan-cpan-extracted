@@ -360,17 +360,19 @@ sub dup
 	return $r;
 }
 
-sub bitmap
+sub bitmap_or_image
 {
-	my ($self, $with_offset, $type) = @_;
+	my ($self, $class, %param) = @_;
 	return undef if $self-> is_empty;
 	my @box = $self->box;
 	my @size = @box[2,3];
+
+	my $with_offset = delete $param{with_offset};
 	if ( $with_offset ) {
 		$size[0] += $box[0];
 		$size[1] += $box[1];
 	}
-	my $dbm = Prima::DeviceBitmap->new( size => \@size, type => $type // dbt::Bitmap );
+	my $dbm = $class->new( size => \@size, %param);
 	$dbm-> clear;
 	$self-> offset( -$box[0], -$box[1]) unless $with_offset;
 	$dbm-> region($self);
@@ -378,6 +380,9 @@ sub bitmap
 	$dbm-> bar(0,0,@size);
 	return $dbm;
 }
+
+sub bitmap { shift->bitmap_or_image( 'Prima::DeviceBitmap', type => dbt::Bitmap, @_ ) }
+sub image  { shift->bitmap_or_image( 'Prima::Image',        type => im::BW,      @_ ) }
 
 package Prima::Drawable;
 use vars qw(@ISA);
@@ -391,7 +396,7 @@ sub profile_default
 	my %prf = (
 		color           => cl::Black,
 		backColor       => cl::White,
-		fillWinding     => 0,
+		fillMode        => fm::Overlay|fm::Alternate,
 		fillPattern     => fp::Solid,
 		fillPatternOffset => [0,0],
 		font            => {
@@ -408,6 +413,7 @@ sub profile_default
 		lineJoin        => lj::Round,
 		linePattern     => lp::Solid,
 		lineWidth       => 0,
+		miterLimit      => 10.0,
 		owner           => undef,
 		palette         => [],
 		region          => undef,
@@ -427,6 +433,8 @@ sub profile_check_in
 	$self-> SUPER::profile_check_in( $p, $default);
 	$p-> { font} = {} unless exists $p-> { font};
 	$p-> { font} = Prima::Drawable-> font_match( $p-> { font}, $default-> { font});
+	$p->{fillMode} = ( delete($p->{fillWinding}) ? fm::Winding : fm::Alternate) | fm::Overlay
+		if exists $p->{fillWinding} && ! exists $p->{fillMode}; # compatibility
 }
 
 sub font
@@ -479,6 +487,12 @@ sub fill_spline
 {
 	my $self = shift;
 	$self->fillpoly( $self->render_spline(@_) );
+}
+
+sub fillWinding # compatibility
+{
+	return $_[0]->fillMode & fm::Winding unless $#_;
+	$_[0]->fillMode(($_[1] ? fm::Winding : fm::Alternate) | fm::Overlay);
 }
 
 package Prima::Image;
