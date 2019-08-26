@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use vars qw($VERSION @ISA %EXPORT_TAGS @EXPORT @EXPORT_OK);
-$VERSION = '0.28';
+$VERSION = '1.00';
 
 #----------------------------------------------------------------------------
 
@@ -508,7 +508,7 @@ for testing the beta versions.
 
 =head1 COPYRIGHT AND LICENSE
 
-  Copyright (C) 2003-2014 Barbie for Miss Barbell Productions
+  Copyright (C) 2003-2019 Barbie for Miss Barbell Productions
 
   This distribution is free software; you can redistribute it and/or
   modify it under the Artistic License v2.

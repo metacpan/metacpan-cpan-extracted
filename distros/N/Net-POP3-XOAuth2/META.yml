@@ -1,0 +1,42 @@
+---
+abstract: 'It enables to use XOAUTH2 authentication with L<Net::POP3>'
+author:
+  - '@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.5, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-POP3-XOAuth2
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Net::POP3::XOAuth2:
+    file: lib/Net/POP3/XOAuth2.pm
+    version: v0.0.1
+requires:
+  MIME::Base64: '0'
+  Net::POP3: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/kizashi1122/Net-POP3-XOAuth2/issues
+  homepage: https://github.com/kizashi1122/Net-POP3-XOAuth2
+  repository: git://github.com/kizashi1122/Net-POP3-XOAuth2.git
+version: 0.0.1
+x_contributors:
+  - 'Kizashi Nagata <kizashi1122@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

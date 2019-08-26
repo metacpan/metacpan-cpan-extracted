@@ -1,6 +1,9 @@
 ######################################################################
 Revision history for Perl extension Archive::Tar::Wrapper
 
+0.37 (2019/08/24):
+    Fixed issue 14 - https://github.com/glasswalk3r/archive-tar-wrapper-perl/issues/14
+
 0.36 (2019/04/11):
     Bug fixes since tests on Windows were failing after latests changes.
     Refactored code due unexpected way bsdtar on Windows and tar on OpenBSD behave.

@@ -1,5 +1,9 @@
 Revision history for HTML-TabbedExamples-Generate
 
+0.2.0   2019-08-23
+    - Convert to @SHLOMIF
+    - Now at https://github.com/shlomif/perl-html-tabbedexamples-generate
+
 v0.0.6  2014-10-24
     - Add Kwalitee test.
     - Remove duplicate encoding weaver.ini plugins.

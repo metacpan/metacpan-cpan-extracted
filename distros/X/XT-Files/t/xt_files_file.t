@@ -9,6 +9,8 @@ use Test::More 0.88;
 
 use XT::Files::File;
 
+delete $ENV{XT_FILES_DEFAULT_CONFIG_FILE};
+
 use constant CLASS => 'XT::Files::File';
 
 like( exception { CLASS()->new() }, q{/name attribute required/}, q{new throws an exception if 'name' argument is missing} );

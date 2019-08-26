@@ -1,0 +1,46 @@
+---
+abstract: 'manages ACME certificates'
+author:
+  - 'Sergey Poznyakoff <gray@gnu.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Acmeman
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  App::Acmeman:
+    file: lib/App/Acmeman.pm
+    version: '2.00'
+  App::Acmeman::Apache::Layout:
+    file: lib/App/Acmeman/Apache/Layout.pm
+  App::Acmeman::Config:
+    file: lib/App/Acmeman/Config.pm
+  App::Acmeman::Domain:
+    file: lib/App/Acmeman/Domain.pm
+    version: '1.00'
+  App::Acmeman::Log:
+    file: lib/App/Acmeman/Log.pm
+  App::Acmeman::Source:
+    file: lib/App/Acmeman/Source.pm
+  App::Acmeman::Source::Apache:
+    file: lib/App/Acmeman/Source/Apache.pm
+  App::Acmeman::Source::File:
+    file: lib/App/Acmeman/Source/File.pm
+  App::Acmeman::Source::Null:
+    file: lib/App/Acmeman/Source/Null.pm
+requires:
+  perl: '5.016001'
+resources:
+  repository: git://git.gnu.org.ua/acmeman.git
+version: '2.00'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

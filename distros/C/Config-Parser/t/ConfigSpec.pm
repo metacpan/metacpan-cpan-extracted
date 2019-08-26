@@ -16,6 +16,7 @@ __DATA__
     base = STRING :mandatory null
     number = NUMBER :array
     size = STRING :re='\d+(?:(?i) *[kmg])'
+    enable = BOOL
 [load]
     file = STRING :check=_check_abs_name :mandatory
     ANY = STRING

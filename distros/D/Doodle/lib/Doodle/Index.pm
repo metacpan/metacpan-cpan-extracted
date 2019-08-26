@@ -4,7 +4,7 @@ use 5.014;
 
 use Data::Object 'Class', 'Doodle::Library';
 
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 has name => (
   is => 'ro',

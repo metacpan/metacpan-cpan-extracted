@@ -19,7 +19,7 @@ namespace typemap { namespace object {
     extern CV*        fake_dtor;
     extern svt_copy_t backref_marker;
 
-    void init (pTHX);
+    void init ();
 
     template <class T> struct TypemapMarker {
         static int func (pTHX_ SV*, MAGIC*) { return 0; }
@@ -42,8 +42,8 @@ struct ObjectStorageIV {
         SvIVX(arg) = (IV)ptr;
     }
 
-    static Sv out (pTHX_ const TYPE& var, const Sv& proto) {
-        return Typemap<TYPE>::create(aTHX_ var, proto);
+    static Sv out (const TYPE& var, const Sv& proto) {
+        return Typemap<TYPE>::create(var, proto);
     }
 };
 
@@ -83,7 +83,7 @@ struct ObjectStorageMG_Impl {
         #endif
     }
 
-    static Sv out (pTHX_ const TYPE& var, const Sv& proto) { return _out(aTHX_ var, proto, BACKREF()); }
+    static Sv out (const TYPE& var, const Sv& proto) { return _out(var, proto, BACKREF()); }
 
 private:
     static inline MAGIC* _get_magic (SV* sv) {
@@ -99,25 +99,25 @@ private:
         marker->svt_local = _destroy_hook;
     }
 
-    static inline Sv _out (pTHX_ const TYPE& var, const Sv& proto, std::false_type) { return Typemap<TYPE>::create(aTHX_ var, proto); }
+    static inline Sv _out (const TYPE& var, const Sv& proto, std::false_type) { return Typemap<TYPE>::create(var, proto); }
 
-    static inline Sv _out (pTHX_ const TYPE& var, const Sv& proto, std::true_type) {
+    static inline Sv _out (const TYPE& var, const Sv& proto, std::true_type) {
         auto br = Backref::get(var);
-        if (!br) return Typemap<TYPE>::create(aTHX_ var, proto);
+        if (!br) return Typemap<TYPE>::create(var, proto);
         if (br->svobj) {
             if (!std::is_const<std::remove_pointer_t<TYPE>>::value) SvREADONLY_off(br->svobj);
             if (!br->zombie) return Ref::create(br->svobj);
             _from_zombie(Typemap<TYPE>::IType::template cast<TYPEMAP>(var), br->svobj, _get_magic(br->svobj), br);
             return Sv::noinc(newRV_noinc(br->svobj));
         }
-        auto ret = Typemap<TYPE>::create(aTHX_ var, proto);
+        auto ret = Typemap<TYPE>::create(var, proto);
         br->svobj = SvRV(ret);
         return ret;
     }
 
     // this hook is invoked before perl frees SV and before DESTROY() method if SV is an object
     // if non-zero value is returned then the destruction of SV is completely aborted (and DESTROY() method is not called)
-    static int _destroy_hook (pTHX_ SV* sv, MAGIC* mg) { return throw_guard(aTHX_ Sub(), [=]() -> int {
+    static int _destroy_hook (pTHX_ SV* sv, MAGIC* mg) { return throw_guard(Sub(), [=]() -> int {
         TYPEMAP var = Typemap<TYPE>::IType::template in<TYPEMAP>(mg->mg_ptr);
         auto br = Backref::get(var);
         if (!br) return 0;
@@ -193,26 +193,26 @@ private:
         Typemap<TYPE>::IType::retain(var);
     }
 
-    static int _on_free (pTHX_ SV* sv, MAGIC* mg) {return throw_guard(aTHX_ Sub(), [=]() -> int {
+    static int _on_free (pTHX_ SV* sv, MAGIC* mg) {return throw_guard(Sub(), [=]() -> int {
         using IType = typename Typemap<TYPE>::IType;
         TYPEMAP downgraded = IType::template in<TYPEMAP>(mg->mg_ptr);
         TYPE var = Typemap<TYPE>::template cast<TYPE,TYPEMAP>(downgraded);
         if (!var) throw "TYPEMAP PANIC: bad object in sv";
-        Typemap<TYPE>::dispose(aTHX_ var, sv);
+        Typemap<TYPE>::dispose(var, sv);
         return 0;
     });}
 
-    static int _on_svdup (pTHX_ MAGIC* mg, CLONE_PARAMS*) { return throw_guard(aTHX_ Sub(), [=]() -> int {
+    static int _on_svdup (pTHX_ MAGIC* mg, CLONE_PARAMS*) { return throw_guard(Sub(), [=]() -> int {
         using IType = typename Typemap<TYPE>::IType;
         TYPEMAP downgraded = IType::template in<TYPEMAP>(mg->mg_ptr);
         TYPEMAP new_downgraded = Typemap<TYPE>::dup(downgraded);
-        _on_svdup_br(aTHX_ downgraded, new_downgraded, BACKREF());
+        _on_svdup_br(downgraded, new_downgraded, BACKREF());
         mg->mg_ptr = (char*)IType::out(new_downgraded);
         return 0;
     });}
 
-    static void _on_svdup_br (pTHX_ const TYPEMAP&,     const TYPEMAP&,         std::false_type) {}
-    static void _on_svdup_br (pTHX_ const TYPEMAP& var, const TYPEMAP& new_var, std::true_type)  {
+    static void _on_svdup_br (const TYPEMAP&,     const TYPEMAP&,         std::false_type) {}
+    static void _on_svdup_br (const TYPEMAP& var, const TYPEMAP& new_var, std::true_type)  {
         auto br     = Backref::get(var);
         auto new_br = Backref::get(new_var);
         if (br && br->svobj && new_br) {
@@ -295,7 +295,7 @@ struct TypemapObject : TypemapBase<TYPEMAP, TYPE> {
     using IStorage = _IStorage<TYPEMAP,TYPE>;
     using TypeNP   = typename std::remove_pointer<TYPE>::type;
 
-    static TYPE in (pTHX_ SV* arg) {
+    static TYPE in (SV* arg) {
         if (!SvOBJECT(arg)) {
             if (SvROK(arg)) {
                 arg = SvRV(arg);
@@ -318,7 +318,7 @@ struct TypemapObject : TypemapBase<TYPEMAP, TYPE> {
         throw "arg is an incorrect or corrupted object";
     }
 
-    static Sv out (pTHX_ const TYPE& var, const Sv& proto = Sv()) { return IStorage::out(aTHX_ var, proto); }
+    static Sv out (const TYPE& var, const Sv& proto = Sv()) { return IStorage::out(var, proto); }
 
     /* proto is a hint for TypemapObject's out/create to attach 'var' to
      * it might be:
@@ -333,7 +333,7 @@ struct TypemapObject : TypemapBase<TYPEMAP, TYPE> {
      *    PROTO = Array::create();
      * 4) empty: in this case reference to undef is created and blessed to typemap's default class and used
      */
-    static Sv create (pTHX_ const TYPE& var, const Sv& proto = Sv()) {
+    static Sv create (const TYPE& var, const Sv& proto = Sv()) {
         if (!var) return &PL_sv_undef;
         Sv rv;
         SV* base;
@@ -381,13 +381,13 @@ struct TypemapObject : TypemapBase<TYPEMAP, TYPE> {
 
     static TYPEMAP dup (const TYPEMAP& obj) { return obj; }
 
-    static void dispose (pTHX_ const TYPE& var, SV* arg) {
+    static void dispose (const TYPE& var, SV* arg) {
         IType::destroy(var, arg);
     }
 
-    static void destroy (pTHX_ const TYPE& var, SV* arg) {
+    static void destroy (const TYPE& var, SV* arg) {
         if (!std::is_same<TYPEMAP, TYPE>::value) return;
-        if (!IStorage::auto_disposable) dispose(aTHX_ var, arg);
+        if (!IStorage::auto_disposable) dispose(var, arg);
     }
 
     template <class TO, class FROM> static inline TO cast (FROM v) { return _cast<TO, FROM>(v, CastType()); }

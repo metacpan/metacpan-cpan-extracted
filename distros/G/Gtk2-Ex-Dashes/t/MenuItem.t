@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010 Kevin Ryde
+# Copyright 2010, 2019 Kevin Ryde
 
 # This file is part of Gtk2-Ex-Dashes.
 #
@@ -29,7 +29,7 @@ BEGIN { MyTestHelpers::nowarnings() }
 
 use Gtk2::Ex::Dashes::MenuItem;
 
-my $want_version = 2;
+my $want_version = 3;
 my $check_version = $want_version + 1000;
 {
   is ($Gtk2::Ex::Dashes::MenuItem::VERSION, $want_version,

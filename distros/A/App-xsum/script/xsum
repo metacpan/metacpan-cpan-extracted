@@ -1,0 +1,195 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/xsum/xsum
+# and generated automatically using Perinci::CmdLine::Gen version 0.491
+
+our $DATE = '2019-08-21'; # DATE
+our $DIST = 'App-xsum'; # DIST
+our $VERSION = '0.002'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/xsum/xsum",
+    program_name => "xsum",
+    read_config => 0,
+    read_env => 0,
+);
+
+$cmdline->run;
+
+# ABSTRACT: Compute and check file checksums/digests (using various algorithms)
+# PODNAME: xsum
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+xsum - Compute and check file checksums/digests (using various algorithms)
+
+=head1 VERSION
+
+This document describes version 0.002 of xsum (from Perl distribution App-xsum), released on 2019-08-21.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % xsum [options] <file> ...
+
+Examples:
+
+Compute MD5 digests for some files:
+
+ % xsum -a md5 *.dat
+
+Compute SHA1 digest for data in stdin:
+
+ % somecmd | xsum -a sha1 -
+
+Check MD5 digests of files listed in MD5SUMS:
+
+ % xsum --check -a md5 MD5SUMS
+
+=head1 DESCRIPTION
+
+C<xsum> is a small handy utility that can be used as an alternative/replacement
+for the individual per-algorithm Unix utilities like C<md5sum>, C<sha1sum>,
+C<sha224sum>, and so on. It's basically the same as said Unix utilities but you
+can use a single command instead.
+
+The backend of C<xsum> is a Perl module L<File::Digest> which in turn delegates
+to the individual per-algorithm backend like L<Digest::MD5>, L<Digest::SHA>,
+and so on. Most of the backend modules are written in C/XS so you don't suffer
+significant performance decrease.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--algorithm>=I<s>, B<-a>
+
+Default value:
+
+ "md5"
+
+Valid values:
+
+ ["crc32","md5","sha1","sha224","sha256","sha384","sha512","sha512224","sha512256"]
+
+=item B<--check>, B<-c>
+
+Read checksum from files and check them.
+
+=item B<--file>=I<s@>*
+
+Can be specified multiple times.
+
+=item B<--files-json>=I<s>
+
+See C<--file>.
+
+=item B<--tag>
+
+Create a BSD-style checksum.
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C xsum xsum
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete xsum 'p/*/`xsum`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-xsum>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-xsum>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-xsum>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<shasum>. Script which comes with the perl distribution.
+
+L<md5sum>. Unix utility.
+
+L<sha1sum>. Unix utility.
+
+L<sha256sum>. Unix utility.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

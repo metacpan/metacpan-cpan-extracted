@@ -1,5 +1,5 @@
 package Yancy::Backend::Static;
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 # ABSTRACT: Build a Yancy site from static Markdown files
 
 #pod =head1 SYNOPSIS
@@ -87,10 +87,10 @@ sub create {
 sub get {
     my ( $self, $schema, $id ) = @_;
 
-    # Allow directory path to work
-    if ( -d $self->path->child( $id ) ) {
-        $id =~ s{/$}{};
-        $id .= '/index.markdown';
+    # Allow directory path to work. Must have a trailing slash to ensure
+    # that relative links in the file work correctly.
+    if ( $id =~ m{/$} && -d $self->path->child( $id ) ) {
+        $id .= 'index.markdown';
     }
     else {
         # Clean up the input path
@@ -131,8 +131,17 @@ sub list {
         $total++;
     }
 
+    $opt->{order_by} //= 'path';
+    my $ordered_items = order_by( $opt->{order_by}, \@items );
+
+    my $start = $opt->{offset} // 0;
+    my $end = $opt->{limit} ? $start + $opt->{limit} - 1 : $#items;
+    if ( $end > $#items ) {
+        $end = $#items;
+    }
+
     return {
-        items => order_by( $opt->{order_by} // 'path', \@items ),
+        items => [ @{$ordered_items}[ $start .. $end ] ],
         total => $total,
     };
 }
@@ -304,7 +313,7 @@ Yancy::Backend::Static - Build a Yancy site from static Markdown files
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

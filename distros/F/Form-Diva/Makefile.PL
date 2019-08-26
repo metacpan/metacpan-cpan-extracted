@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.008",
   "NAME" => "Form::Diva",
   "PREREQ_PM" => {
-    "Storable" => "2.51",
+    "Storable" => "3.15",
     "strict" => 0,
     "warnings" => 0
   },
@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => "0.32",
     "Test::More" => "1.001003"
   },
-  "VERSION" => "1.01",
+  "VERSION" => "1.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Storable" => "2.51",
+  "Storable" => "3.15",
   "Test::Deep" => "0.112",
   "Test::Exception" => "0.32",
   "Test::More" => "1.001003",

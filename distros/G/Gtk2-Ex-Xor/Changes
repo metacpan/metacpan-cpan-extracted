@@ -1,4 +1,4 @@
-Copyright 2008, 2009, 2010, 2011 Kevin Ryde
+Copyright 2008, 2009, 2010, 2011, 2019 Kevin Ryde
 
 This file is part of Gtk2-Ex-Xor.
 
@@ -15,6 +15,9 @@ General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Gtk2-Ex-Xor.  If not, see <http://www.gnu.org/licenses/>.
 
+
+Version 23, August 2019
+    - new email
 
 Version 22, June 2011
     - tests Lasso allow for pointer already grabbed

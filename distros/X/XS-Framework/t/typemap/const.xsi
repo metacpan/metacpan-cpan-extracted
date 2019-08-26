@@ -19,9 +19,9 @@ namespace xs {
 
     template <class TYPE> struct Typemap<MyConst2*, TYPE> : TypemapObject<MyConst2*, TYPE, ObjectTypePtr, ObjectStorageMG> {
         static std::string package () { return "MyTest::MyConst2"; }
-        static Sv out (pTHX_ TYPE var, const Sv& proto = {}) {
+        static Sv out (TYPE var, const Sv& proto = {}) {
             var->val = 555;
-            return TypemapObject<MyConst2*, TYPE, ObjectTypePtr, ObjectStorageMG>::out(aTHX_ var, proto);
+            return TypemapObject<MyConst2*, TYPE, ObjectTypePtr, ObjectStorageMG>::out(var, proto);
         }
     };
     template <class TYPE> struct Typemap<const MyConst2*, TYPE> : TypemapObject<const MyConst2*, TYPE, ObjectTypePtr, ObjectStorageMG> {

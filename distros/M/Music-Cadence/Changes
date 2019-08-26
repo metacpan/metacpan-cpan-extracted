@@ -1,5 +1,43 @@
 Revision history for Music-Cadence
 
+0.0504 2019-08-25 22:58:32
+    - Update the module SYNOPSIS.
+    - Comment eg/cadence a bit.
+
+0.0503 2019-08-25 18:55:26
+    - Exclude MIDI files from the distribution.
+
+0.0502 2019-08-25 18:44:29
+    - Update the module test.
+    - Update the module SYNOPSIS.
+
+0.0501 2019-08-24 21:50:19
+    - Improve documentation.
+
+0.0500 2019-08-24 21:38:39
+    - Add a format attribute for midi accidental conversion.
+    - Improve eg/cadence.
+
+0.0406 2019-08-24 13:47:09
+    - Die if the half cadence leading chord is outside the 1-7 range.
+    - Improve documentation.
+
+0.0405 2019-08-24 11:50:06
+    - Remove the accidentally shipped *.mid file. :\
+
+0.0404 2019-08-24 11:45:02
+    - Improve documentation.
+    - Fix a semantic syntax error in eg/cadence.
+
+0.0403 2019-08-24 11:26:43
+    - Improve documentation.
+    - Simplify the eg/cadence syntax.
+
+0.0402 2019-08-23 16:40:52
+    - Die if given an unknown scale or cadence.
+    - Improve documentation ever so slightly.
+    - Make the parameters of eg/cadence user definable.
+
 0.0401 2019-08-16 13:35:00
     - Simplify the eg/cadence code.
     - Remove the accidentally shipped MIDI file.

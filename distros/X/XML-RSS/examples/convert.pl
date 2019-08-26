@@ -3,10 +3,10 @@
 use strict;
 use warnings;
 
-use XML::RSS;
+use XML::RSS ();
 
 # print an error unless there are 2 command-line args
-&syntax unless @ARGV == 2;
+syntax() unless @ARGV == 2;
 
 # get rss file and version to convert to from
 # the command line

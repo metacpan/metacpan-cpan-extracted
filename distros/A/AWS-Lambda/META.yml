@@ -30,13 +30,15 @@ no_index:
 provides:
   AWS::Lambda:
     file: lib/AWS/Lambda.pm
-    version: v0.0.6
+    version: v0.0.9
   AWS::Lambda::Bootstrap:
     file: lib/AWS/Lambda/Bootstrap.pm
   AWS::Lambda::Context:
     file: lib/AWS/Lambda/Context.pm
   AWS::Lambda::PSGI:
     file: lib/AWS/Lambda/PSGI.pm
+recommends:
+  AWS::XRay: '0.09'
 requires:
   HTTP::Tiny: '0.076'
   JSON::Types: '0.05'
@@ -50,7 +52,7 @@ resources:
   bugtracker: https://github.com/shogo82148/p5-aws-lambda/issues
   homepage: https://github.com/shogo82148/p5-aws-lambda
   repository: git://github.com/shogo82148/p5-aws-lambda.git
-version: 0.0.6
+version: 0.0.9
 x_contributors:
   - 'Ichinose Shogo <shogo82148@gmail.com>'
   - 'Jose Luis Martinez <jlmartinez@capside.com>'

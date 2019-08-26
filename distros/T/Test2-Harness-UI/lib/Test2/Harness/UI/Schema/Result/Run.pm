@@ -88,26 +88,6 @@ __PACKAGE__->table("runs");
   default_value: false
   is_nullable: 0
 
-=head2 version
-
-  data_type: 'citext'
-  is_nullable: 1
-
-=head2 tier
-
-  data_type: 'citext'
-  is_nullable: 1
-
-=head2 category
-
-  data_type: 'citext'
-  is_nullable: 1
-
-=head2 build
-
-  data_type: 'citext'
-  is_nullable: 1
-
 =head2 added
 
   data_type: 'timestamp'
@@ -151,6 +131,11 @@ __PACKAGE__->table("runs");
   data_type: 'integer'
   is_nullable: 1
 
+=head2 fields
+
+  data_type: 'jsonb'
+  is_nullable: 1
+
 =head2 parameters
 
   data_type: 'jsonb'
@@ -184,14 +169,6 @@ __PACKAGE__->add_columns(
   { data_type => "uuid", is_foreign_key => 1, is_nullable => 0, size => 16 },
   "pinned",
   { data_type => "boolean", default_value => \"false", is_nullable => 0 },
-  "version",
-  { data_type => "citext", is_nullable => 1 },
-  "tier",
-  { data_type => "citext", is_nullable => 1 },
-  "category",
-  { data_type => "citext", is_nullable => 1 },
-  "build",
-  { data_type => "citext", is_nullable => 1 },
   "added",
   {
     data_type     => "timestamp",
@@ -224,6 +201,8 @@ __PACKAGE__->add_columns(
   { data_type => "integer", is_nullable => 1 },
   "retried",
   { data_type => "integer", is_nullable => 1 },
+  "fields",
+  { data_type => "jsonb", is_nullable => 1 },
   "parameters",
   { data_type => "jsonb", is_nullable => 1 },
 );
@@ -308,15 +287,24 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2019-08-08 09:22:09
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:JGV1FvNOvMsvZOzcyjVIcQ
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2019-08-22 10:04:36
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:z5hNUU26bhWFKdOklyBvzQ
 
-our $VERSION = '0.000006';
+require DateTime::Format::Pg;
+
+our $VERSION = '0.000014';
 
 __PACKAGE__->inflate_column(
     parameters => {
         inflate => DBIx::Class::InflateColumn::Serializer::JSON->get_unfreezer('parameters', {}),
         deflate => DBIx::Class::InflateColumn::Serializer::JSON->get_freezer('parameters', {}),
+    },
+);
+
+__PACKAGE__->inflate_column(
+    fields => {
+        inflate => DBIx::Class::InflateColumn::Serializer::JSON->get_unfreezer('fields', {}),
+        deflate => DBIx::Class::InflateColumn::Serializer::JSON->get_freezer('fields', {}),
     },
 );
 
@@ -339,9 +327,18 @@ sub TO_JSON {
 
     # Inflate
     $cols{parameters} = $self->parameters;
+    $cols{fields} = $self->fields;
 
     $cols{user} = $self->user->username;
     $cols{project} = $self->project->name;
+
+    my $dt = DateTime::Format::Pg->parse_datetime( $cols{added} );
+
+    # Convert from UTC to localtime
+    $dt->set_time_zone('UTC');
+    $dt->set_time_zone('local');
+
+    $cols{added} = $dt->strftime("%Y-%m-%d %I:%M%P");
 
     return \%cols;
 }

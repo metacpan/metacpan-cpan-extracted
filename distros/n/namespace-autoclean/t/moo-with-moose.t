@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-use Test::Requires {
-  'Moose' => '()',
-  'Moo' => '1.004000 ()',
+use Test::Needs {
+  'Moose' => undef,
+  'Moo' => '1.004000',
 };
 
 use Test::More;

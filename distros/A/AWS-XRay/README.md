@@ -16,7 +16,7 @@ AWS::XRay - AWS X-Ray tracing library
         capture "myHTTP", sub {
             my $segment = shift;
             # ...
-            $segment->{http} = { # modify segument document
+            $segment->{http} = { # modify segment document
                 request => {
                     method => "GET",
                     url    => "http://localhost/",
@@ -98,7 +98,7 @@ $rate is allowed a float value between 0 and 1.
 
 When capture\_from() called with a trace header includes "Sampled=1", all of followed capture() are traced.
 
-## samplier($code)
+## sampler($code)
 
 Set/Get a code ref to sample for capture().
 

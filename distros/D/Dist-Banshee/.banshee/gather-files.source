@@ -1,0 +1,17 @@
+#! perl
+use strict;
+use warnings;
+use Dist::Banshee::Git 'gather_files';
+use ExtUtils::Manifest 'maniskip';
+
+my $maniskip = maniskip;
+my $files = gather_files(sub { !$maniskip->($_) });
+
+my $meta = source('gather-metadata');
+
+$files->{'META.json'} = $meta->as_string;
+$files->{'META.yml'}  = $meta->as_string({ version => 1.4 });
+
+add_manifest($files);
+
+return $files;

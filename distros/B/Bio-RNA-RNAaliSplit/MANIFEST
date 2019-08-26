@@ -2,7 +2,9 @@ Changes
 inc/File/ShareDir/Install.pm
 inc/Version/Compare.pm
 lib/Bio/RNA/RNAaliSplit.pm
-lib/Bio/RNA/RNAaliSplit/Roles.pm
+lib/Bio/RNA/RNAaliSplit/Subtypes.pm
+lib/Bio/RNA/RNAaliSplit/AliFeature.pm
+lib/Bio/RNA/RNAaliSplit/AliHandler.pm
 lib/Bio/RNA/RNAaliSplit/WrapAnalyseDists.pm
 lib/Bio/RNA/RNAaliSplit/WrapRNAalifold.pm
 lib/Bio/RNA/RNAaliSplit/WrapRNAz.pm

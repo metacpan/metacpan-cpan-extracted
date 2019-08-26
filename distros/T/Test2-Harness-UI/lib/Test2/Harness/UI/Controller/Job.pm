@@ -2,7 +2,7 @@ package Test2::Harness::UI::Controller::Job;
 use strict;
 use warnings;
 
-our $VERSION = '0.000006';
+our $VERSION = '0.000014';
 
 use Data::GUID;
 use List::Util qw/max/;
@@ -21,9 +21,7 @@ sub handle {
     my $req = $self->{+REQUEST};
 
     my $res = resp(200);
-    $res->add_css('run.css');
     $res->add_css('job.css');
-    $res->add_js('dashboard.js');
     $res->add_js('run.js');
     $res->add_js('job.js');
 

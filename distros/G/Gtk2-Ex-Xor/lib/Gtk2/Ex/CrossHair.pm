@@ -1,4 +1,4 @@
-# Copyright 2007, 2008, 2009, 2010, 2011 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2017, 2019 Kevin Ryde
 
 # This file is part of Gtk2-Ex-Xor.
 #
@@ -33,7 +33,7 @@ use Gtk2::Ex::WidgetBits 31; # v.31 for xy_root_to_widget()
 # uncomment this to run the ### lines
 #use Smart::Comments;
 
-our $VERSION = 22;
+our $VERSION = 23;
 
 # In each CrossHair the private fields are
 #
@@ -826,8 +826,8 @@ L<Gtk2::Ex::WidgetCursor>) and so cooperates with other module or
 application uses of that.
 
 The crosshair is drawn using xors in the widget window (see
-L<Gtk2::Ex::Xor>).  See the F<examples> directory in the Gtk2-Ex-Xor sources
-for some variously contrived complete programs.
+L<Gtk2::Ex::Xor>).  See the F<examples> directory for some variously
+contrived complete programs.
 
 =head1 FUNCTIONS
 
@@ -967,8 +967,7 @@ object with the C<widget> property telling it what to act on.
       <signal name="moved" handler="do_cross_moved"/>
     </object>
 
-See F<examples/cross-builder.pl> in the Gtk2-Ex-Xor sources for a complete
-program.
+See F<examples/cross-builder.pl> for a complete program.
 
 The C<foreground-name> property is the best way to control the colour.  The
 generic C<foreground> can't be used because it's a Perl scalar type.  The
@@ -1005,7 +1004,7 @@ L<http://user42.tuxfamily.org/gtk2-ex-xor/index.html>
 
 =head1 LICENSE
 
-Copyright 2007, 2008, 2009, 2010, 2011 Kevin Ryde
+Copyright 2007, 2008, 2009, 2010, 2011, 2017, 2019 Kevin Ryde
 
 Gtk2-Ex-Xor is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free

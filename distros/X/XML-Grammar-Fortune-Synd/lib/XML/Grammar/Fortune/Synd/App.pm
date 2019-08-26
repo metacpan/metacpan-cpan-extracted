@@ -1,5 +1,5 @@
 package XML::Grammar::Fortune::Synd::App;
-$XML::Grammar::Fortune::Synd::App::VERSION = '0.0212';
+$XML::Grammar::Fortune::Synd::App::VERSION = '0.0214';
 use strict;
 use warnings;
 
@@ -119,15 +119,11 @@ application to syndicate FortuneXML as Atom/RSS.
 
 =head1 VERSION
 
-version 0.0212
+version 0.0214
 
 =head1 SYNOPSIS
 
     perl -MXML::Grammar::Fortune::Synd::App -e 'run()' [ARGS] \
-
-=head1 VERSION
-
-version 0.0212
 
 =head1 FUNCTIONS
 
@@ -141,7 +137,7 @@ Shlomi Fish <shlomif@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Shlomi Fish.
+This software is Copyright (c) 2019 by Shlomi Fish.
 
 This is free software, licensed under:
 
@@ -150,7 +146,7 @@ This is free software, licensed under:
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/xml-grammar-fortune-synd/issues>
+L<https://github.com/shlomif/fortune-xml/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -259,8 +255,8 @@ The code is open to the world, and available for you to hack on. Please feel fre
 with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
 from your repository :)
 
-L<https://github.com/shlomif/xml-grammar-fortune-synd>
+L<https://github.com/shlomif/fortune-xml>
 
-  git clone https://bitbucket.org/shlomif/fortune-xml
+  git clone git://github.com/shlomif/fortune-xml.git
 
 =cut

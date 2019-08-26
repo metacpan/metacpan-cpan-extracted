@@ -5,7 +5,7 @@ use warnings;
 package Test::FITesque::RDF;
 
 our $AUTHORITY = 'cpan:KJETILK';
-our $VERSION   = '0.011';
+our $VERSION   = '0.012';
 
 use Moo;
 use Attean::RDF;
@@ -180,6 +180,9 @@ sub transform_rdf {
 				$key = $params_base->local_part($param->predicate)
 			 }
 			 my $value = $param->object->value;
+			 if ($param->object->is_iri) {
+				$value = URI->new($param->object->as_string)
+			 }
 			 $params->{$key} = $value;
 		  }
 		}
@@ -302,6 +305,10 @@ There are two main ways currently implemented, one creates key-value
 pairs, and uses predicates and objects for that respectively, in
 vocabularies chosen by the test writer. The other main way is create
 lists of HTTP requests and responses.
+
+If the object of a test parameter is a literal, it will be passed as a
+plain string, if it is a L<Attean::IRI>, it will be passed as a L<URI>
+object.
 
 Additionally, a special parameter C<-special> is passed on for
 internal framework use. The leading dash is not allowed as the start

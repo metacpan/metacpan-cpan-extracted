@@ -1,3 +1,19 @@
+0.599   2019-08-20  Released-By: PERLANCAR; Urgency: medium
+
+	- Add functions: rgb2hsl, rgb2hsv (stolen from Graphics-Color,
+	  reproduced here to avoid depending on Moose et al).
+
+	- rgb_diff(): add algorithms approx2, hsv_euclidean, hsv_hue1.
+
+
+0.598   2019-08-14  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] rand_rgb_colors(): Document what happens when max_attempts
+	  is exceeded.
+
+
 0.597   2019-07-17  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

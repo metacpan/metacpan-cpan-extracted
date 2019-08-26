@@ -39,13 +39,13 @@ string tzname () {
 
 void tzset (SV* newzone = NULL) {
     if (!newzone || !SvOK(newzone)) panda::time::tzset(string_view());
-    else if (SvROK(newzone)) panda::time::tzset(xs::in<TimezoneSP>(aTHX_ newzone));
-    else panda::time::tzset(xs::in<string_view>(aTHX_ newzone));
+    else if (SvROK(newzone)) panda::time::tzset(xs::in<TimezoneSP>(newzone));
+    else panda::time::tzset(xs::in<string_view>(newzone));
 }
 
 string tzdir (SV* newdirSV = NULL) {
     if (newdirSV) {
-        string newdir = xs::in<string>(aTHX_ newdirSV);
+        string newdir = xs::in<string>(newdirSV);
         if (tzdir(newdir)) RETVAL = "1";
         else XSRETURN_UNDEF;
     } else
@@ -58,7 +58,7 @@ string tzsysdir () {
 
 void gmtime (SV* epochSV = NULL) : ALIAS(localtime=1) {
     ptime_t epoch;
-    if (epochSV) epoch = xs::in<ptime_t>(aTHX_ epochSV);
+    if (epochSV) epoch = xs::in<ptime_t>(epochSV);
     else epoch = (ptime_t) ::time(NULL);
 
     datetime date;
@@ -93,12 +93,12 @@ void gmtime (SV* epochSV = NULL) : ALIAS(localtime=1) {
 
 ptime_t timegm (SV* sec, SV* min, SV* hour, SV* mday, SV* mon, SV* year, SV* isdst = NULL) : ALIAS(timelocal=1, timegmn=2, timelocaln=3) {
     datetime date;
-    date.sec  = xs::in<ptime_t>(aTHX_ sec);
-    date.min  = xs::in<ptime_t>(aTHX_ min);
-    date.hour = xs::in<ptime_t>(aTHX_ hour);
-    date.mday = xs::in<ptime_t>(aTHX_ mday);
-    date.mon  = xs::in<ptime_t>(aTHX_ mon);
-    date.year = xs::in<ptime_t>(aTHX_ year);
+    date.sec  = xs::in<ptime_t>(sec);
+    date.min  = xs::in<ptime_t>(min);
+    date.hour = xs::in<ptime_t>(hour);
+    date.mday = xs::in<ptime_t>(mday);
+    date.mon  = xs::in<ptime_t>(mon);
+    date.year = xs::in<ptime_t>(year);
 
     if (isdst) date.isdst = SvIV(isdst);
     else date.isdst = -1;

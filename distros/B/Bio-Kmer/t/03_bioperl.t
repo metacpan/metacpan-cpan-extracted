@@ -36,6 +36,11 @@ my %query=(
 
 # Test reading a BioPerl object
 SKIP:{
+  if(! $Bio::Kmer::iThreads){
+    skip("No perl threads loaded. Skipping", 14);
+    print $Bio::Kmer::iThreads; # avoid only used once warning
+  }
+
   eval{
     require Bio::SeqIO;
   };

@@ -4,7 +4,7 @@ package HTTP::OAI::ListMetadataFormats;
 
 use strict;
 
-our $VERSION = '4.08';
+our $VERSION = '4.09';
 
 sub metadataFormat { shift->item(@_) }
 

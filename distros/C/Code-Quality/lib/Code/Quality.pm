@@ -62,11 +62,12 @@ place in the code.
 
 A test is a function that takes key-value arguments:
 
-B<test_something>(code => I<$code>, language => I<$language>, [reference => I<$reference>])
+B<test_something>(code => I<$code>, language => I<$language>, [reference => I<$reference>, formatted_code => I<$formatted>])
 
 Here I<$code> is the code to be tested, I<$language> is the
-programming language, and I<$reference> is an optional reference
-source code to compare I<$code> against.
+programming language, I<$reference> is an optional reference source
+code to compare I<$code> against, and I<$formatted_code> is the
+optional result of running I<$code> through a source code formatter.
 
 Each test returns undef if the test failed (for example, if the test
 cannot be applied to this programming language), and an arrayref of
@@ -84,7 +85,7 @@ test with special configuration once, without affecting other code:
 
 =cut
 
-our $VERSION = '0.001001';
+our $VERSION = '0.001003';
 our @EXPORT = qw/analyse_code star_rating_of_warnings/;
 our @EXPORT_OK = (@EXPORT, qw/test_lines test_clang_tidy/);
 our %EXPORT_TAGS = (default => \@EXPORT, all => \@EXPORT_OK);
@@ -133,7 +134,8 @@ our @long_code_criteria = (
 
 =head3 test_lines
 
-This test counts non-empty lines in both the code and the reference.
+This test counts non-empty lines in both the formatted code and the reference.
+If no formatted code is available, the original code is used.
 If the code is significantly longer than the reference, it returns a warning.
 If the code is much longer, it returns an error.
 Otherwise it returns an empty arrayref.
@@ -148,7 +150,7 @@ This test fails if no reference is provided, but is language-agnostic
 
 sub test_lines {
 	my %args = @_;
-	my $user_solution = $args{code};
+	my $user_solution = $args{formatted_code} // $args{code};
 	my $official_solution = $args{reference};
 	return unless defined $official_solution;
 
@@ -249,7 +251,7 @@ sub test_clang_tidy {
 		WarningsAsErrors => $errors,
 	};
 
-	my @output = qx,clang-tidy -config='$config' -quiet $fh 2>/dev/null,;
+	my @output = qx,clang-tidy -config='$config' $fh 2>/dev/null,;
 	my $exit_code = $? >> 8; # this is usually the number of clang-tidy errors
 	my $signal = $? & 127;
 	if ($signal || ($exit_code == 127 && !_clang_tidy_exists)) {

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use vars qw($VERSION);
-$VERSION = '0.16';
+$VERSION = '1.00';
 
 #----------------------------------------------------------------------------
 
@@ -142,7 +142,7 @@ RT Queue: http://rt.cpan.org/Public/Dist/Display.html?Name=Devel-Platform-Info
 
 =head1 COPYRIGHT & LICENSE
 
-  Copyright (C) 2010-2016 Birmingham Perl Mongers
+  Copyright (C) 2010-2019 Birmingham Perl Mongers
 
   This distribution is free software; you can redistribute it and/or
   modify it under the Artistic License 2.0.

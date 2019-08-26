@@ -41,8 +41,6 @@ examples/cross-label.pl
 examples/cross-textview.pl
 examples/lasso-area.pl
 examples/lasso-builder.pl
-inc/my_pod2html
-inc/MyMakeMakerExtras.pm
 junk/canvas.pl
 lib/Gtk2/Ex/CrossHair.pm
 lib/Gtk2/Ex/Lasso.pm
@@ -67,4 +65,6 @@ xt/0-Test-DistManifest.t
 xt/0-Test-Pod.t
 xt/0-Test-Synopsis.t
 xt/0-Test-YAML-Meta.t
-META.yml                                 Module meta-data (added by MakeMaker)
+xtools/my_pod2html
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

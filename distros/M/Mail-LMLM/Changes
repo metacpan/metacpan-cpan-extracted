@@ -1,3 +1,8 @@
+0.6806    2019-08-23
+
+    - Moved to https://github.com/shlomif/perl-mail-lmlm
+    - tidyall
+
 0.6805    2018-05-23
 
     - Convert to Dist-Zilla .

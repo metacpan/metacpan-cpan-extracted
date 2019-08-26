@@ -1,7 +1,7 @@
 package App::xsum;
 
-our $DATE = '2016-11-23'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-08-21'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -11,6 +11,20 @@ our %SPEC;
 
 $SPEC{xsum} = {
     v => 1.1,
+    summary => 'Compute and check file checksums/digests (using various algorithms)',
+    description => <<'_',
+
+`xsum` is a small handy utility that can be used as an alternative/replacement
+for the individual per-algorithm Unix utilities like `md5sum`, `sha1sum`,
+`sha224sum`, and so on. It's basically the same as said Unix utilities but you
+can use a single command instead.
+
+The backend of `xsum` is a Perl module <pm:File::Digest> which in turn delegates
+to the individual per-algorithm backend like <pm:Digest::MD5>, <pm:Digest::SHA>,
+and so on. Most of the backend modules are written in C/XS so you don't suffer
+significant performance decrease.
+
+_
     args => {
         tag => {
             summary => 'Create a BSD-style checksum',
@@ -19,6 +33,7 @@ $SPEC{xsum} = {
         check => {
             summary => 'Read checksum from files and check them',
             schema => ['bool', is=>1],
+            cmdline_aliases => {c=>{}},
         },
         files => {
             'x.name.is_plural' => 1,
@@ -50,6 +65,29 @@ $SPEC{xsum} = {
         {
             url => 'prog:sha256sum',
             summary => 'Unix utility',
+        },
+    ],
+    examples => [
+        {
+            summary => 'Compute MD5 digests for some files',
+            src => 'xsum -a md5 *.dat',
+            src_plang => 'bash',
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+        {
+            summary => 'Compute SHA1 digest for data in stdin',
+            src => 'somecmd | xsum -a sha1 -',
+            src_plang => 'bash',
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+        {
+            summary => 'Check MD5 digests of files listed in MD5SUMS',
+            src => 'xsum --check -a md5 MD5SUMS',
+            src_plang => 'bash',
+            test => 0,
+            'x.doc.show_result' => 0,
         },
     ],
     'cmdline.skip_format' => 1,
@@ -118,7 +156,7 @@ sub xsum {
 }
 
 1;
-# ABSTRACT: Compute and check file checksums/digests
+# ABSTRACT: Compute and check file checksums/digests (using various algorithms)
 
 __END__
 
@@ -128,11 +166,11 @@ __END__
 
 =head1 NAME
 
-App::xsum - Compute and check file checksums/digests
+App::xsum - Compute and check file checksums/digests (using various algorithms)
 
 =head1 VERSION
 
-This document describes version 0.001 of App::xsum (from Perl distribution App-xsum), released on 2016-11-23.
+This document describes version 0.002 of App::xsum (from Perl distribution App-xsum), released on 2019-08-21.
 
 =head1 SYNOPSIS
 
@@ -141,7 +179,23 @@ See L<xsum>.
 =head1 FUNCTIONS
 
 
-=head2 xsum(%args) -> [status, msg, result, meta]
+=head2 xsum
+
+Usage:
+
+ xsum(%args) -> [status, msg, payload, meta]
+
+Compute and check file checksums/digests (using various algorithms).
+
+C<xsum> is a small handy utility that can be used as an alternative/replacement
+for the individual per-algorithm Unix utilities like C<md5sum>, C<sha1sum>,
+C<sha224sum>, and so on. It's basically the same as said Unix utilities but you
+can use a single command instead.
+
+The backend of C<xsum> is a Perl module L<File::Digest> which in turn delegates
+to the individual per-algorithm backend like L<Digest::MD5>, L<Digest::SHA>,
+and so on. Most of the backend modules are written in C/XS so you don't suffer
+significant performance decrease.
 
 This function is not exported.
 
@@ -168,7 +222,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -210,7 +264,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

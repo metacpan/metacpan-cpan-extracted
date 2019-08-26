@@ -1,3 +1,9 @@
+0.006     2019-08-22 15:48:27 EDT
+  - Avoid an uninitialized value warning in close handler
+
+0.005     2019-08-22 01:00:40 EDT
+  - Handle multiple lines in buffer on close in the case where the line separator was changed (#3, kiwiroy)
+
 0.004     2019-08-07 11:54:05 EDT
   - Optimization to buffer parsing (#2, kiwiroy)
 

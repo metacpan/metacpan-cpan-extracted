@@ -1,5 +1,5 @@
 package Math::GrahamFunction::Object;
-$Math::GrahamFunction::Object::VERSION = '0.02002';
+$Math::GrahamFunction::Object::VERSION = '0.02003';
 use strict;
 use warnings;
 
@@ -10,7 +10,7 @@ use parent qw(Class::Accessor);
 sub new
 {
     my $class = shift;
-    my $self = {};
+    my $self  = {};
     bless $self, $class;
     $self->_initialize(@_);
     return $self;
@@ -32,11 +32,7 @@ objects.
 
 =head1 VERSION
 
-version 0.02002
-
-=head1 VERSION
-
-version 0.02002
+version 0.02003
 
 =head1 FUNCTIONS
 
@@ -66,7 +62,7 @@ Shlomi Fish <shlomif@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Shlomi Fish.
+This software is Copyright (c) 2019 by Shlomi Fish.
 
 This is free software, licensed under:
 
@@ -75,7 +71,7 @@ This is free software, licensed under:
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/math-grahamfunction/issues>
+L<https://github.com/shlomif/perl-math-grahamfunction/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -184,8 +180,8 @@ The code is open to the world, and available for you to hack on. Please feel fre
 with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
 from your repository :)
 
-L<https://github.com/shlomif/math-grahamfunction>
+L<https://github.com/shlomif/perl-math-grahamfunction>
 
-  git clone https://bitbucket.org/shlomif/perl-math-grahamfunction/
+  git clone git://github.com/shlomif/perl-math-grahamfunction.git
 
 =cut

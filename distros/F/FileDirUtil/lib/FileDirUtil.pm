@@ -1,5 +1,5 @@
 # -*-CPerl-*-
-# Last changed Time-stamp: <2017-05-28 13:54:04 mtw>
+# Last changed Time-stamp: <2019-08-23 20:19:04 mtw>
 
 =head1 NAME
 
@@ -44,7 +44,7 @@ L<Path::Class::Dir> directory object.
 
 package FileDirUtil;
 
-use version; our $VERSION = qv('0.03');
+use version; our $VERSION = qv('0.04');
 use Moose::Util::TypeConstraints;
 use Moose::Role;
 use Path::Class::File;
@@ -139,29 +139,17 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
-=over 4
+=over 1
 
-=item * RT: CPAN's request tracker (report bugs here)
+=item * metaCPAN
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=FileDirUtil>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/FileDirUtil>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/FileDirUtil>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/FileDirUtil/>
+L<https://metacpan.org/pod/FileDirUtil>
 
 =back
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Michael T. Wolfinger <michael@wolfinger.eu> and <michael.wolfinger@univie.ac.at>
+Copyright 2017-2019 Michael T. Wolfinger <michael@wolfinger.eu> and <michael.wolfinger@univie.ac.at>
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
@@ -179,4 +167,4 @@ L<http://www.gnu.org/licenses/>.
 
 =cut
 
-1; 
+1;

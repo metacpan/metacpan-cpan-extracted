@@ -1,9 +1,91 @@
-SYNOPSIS
+NAME
+    App::xsum - Compute and check file checksums/digests (using various
+    algorithms)
 
+VERSION
+    This document describes version 0.002 of App::xsum (from Perl
+    distribution App-xsum), released on 2019-08-21.
+
+SYNOPSIS
     See xsum.
 
-append:SEE ALSO
+FUNCTIONS
+  xsum
+    Usage:
+
+     xsum(%args) -> [status, msg, payload, meta]
+
+    Compute and check file checksums/digests (using various algorithms).
+
+    "xsum" is a small handy utility that can be used as an
+    alternative/replacement for the individual per-algorithm Unix utilities
+    like "md5sum", "sha1sum", "sha224sum", and so on. It's basically the
+    same as said Unix utilities but you can use a single command instead.
+
+    The backend of "xsum" is a Perl module File::Digest which in turn
+    delegates to the individual per-algorithm backend like Digest::MD5,
+    Digest::SHA, and so on. Most of the backend modules are written in C/XS
+    so you don't suffer significant performance decrease.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   algorithm => *str* (default: "md5")
+
+    *   check => *bool*
+
+        Read checksum from files and check them.
+
+    *   files* => *array[filename]*
+
+    *   tag => *bool*
+
+        Create a BSD-style checksum.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-xsum>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-App-xsum>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-xsum>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    shasum. Script which comes with the perl distribution.
+
+    md5sum. Unix utility.
+
+    sha1sum. Unix utility.
+
+    sha256sum. Unix utility.
 
     Backend module: File::Digest, which in turn uses Digest::CRC,
     Digest::MD5, and Digest::SHA.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

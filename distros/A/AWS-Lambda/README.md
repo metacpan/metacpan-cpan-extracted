@@ -24,7 +24,7 @@ Finally, create new function using awscli.
         --handler "handler.handle" \
         --runtime provided \
         --role arn:aws:iam::xxxxxxxxxxxx:role/service-role/lambda-custom-runtime-perl-role \
-        --layers "arn:aws:lambda:$REGION:445285296882:layer:perl-5-28-runtime:5"
+        --layers "arn:aws:lambda:$REGION:445285296882:layer:perl-5-30-runtime:3"
 
 # DESCRIPTION
 
@@ -45,56 +45,59 @@ This package makes it easy to run AWS Lambda Functions written in Perl.
 The Layer ARN list is here.
 
 - Perl 5.30
-    - `arn:aws:lambda:ap-east-1:445285296882:layer:perl-5-30-runtime:2`
-    - `arn:aws:lambda:ap-northeast-1:445285296882:layer:perl-5-30-runtime:2`
-    - `arn:aws:lambda:ap-northeast-2:445285296882:layer:perl-5-30-runtime:2`
-    - `arn:aws:lambda:ap-south-1:445285296882:layer:perl-5-30-runtime:2`
-    - `arn:aws:lambda:ap-southeast-1:445285296882:layer:perl-5-30-runtime:2`
-    - `arn:aws:lambda:ap-southeast-2:445285296882:layer:perl-5-30-runtime:2`
-    - `arn:aws:lambda:ca-central-1:445285296882:layer:perl-5-30-runtime:2`
-    - `arn:aws:lambda:eu-central-1:445285296882:layer:perl-5-30-runtime:2`
-    - `arn:aws:lambda:eu-west-1:445285296882:layer:perl-5-30-runtime:2`
-    - `arn:aws:lambda:eu-west-2:445285296882:layer:perl-5-30-runtime:2`
-    - `arn:aws:lambda:eu-west-3:445285296882:layer:perl-5-30-runtime:2`
-    - `arn:aws:lambda:sa-east-1:445285296882:layer:perl-5-30-runtime:2`
-    - `arn:aws:lambda:us-east-1:445285296882:layer:perl-5-30-runtime:2`
-    - `arn:aws:lambda:us-east-2:445285296882:layer:perl-5-30-runtime:2`
-    - `arn:aws:lambda:us-west-1:445285296882:layer:perl-5-30-runtime:2`
-    - `arn:aws:lambda:us-west-2:445285296882:layer:perl-5-30-runtime:2`
+    - `arn:aws:lambda:ap-east-1:445285296882:layer:perl-5-30-runtime:3`
+    - `arn:aws:lambda:ap-northeast-1:445285296882:layer:perl-5-30-runtime:3`
+    - `arn:aws:lambda:ap-northeast-2:445285296882:layer:perl-5-30-runtime:3`
+    - `arn:aws:lambda:ap-south-1:445285296882:layer:perl-5-30-runtime:3`
+    - `arn:aws:lambda:ap-southeast-1:445285296882:layer:perl-5-30-runtime:3`
+    - `arn:aws:lambda:ap-southeast-2:445285296882:layer:perl-5-30-runtime:3`
+    - `arn:aws:lambda:ca-central-1:445285296882:layer:perl-5-30-runtime:3`
+    - `arn:aws:lambda:eu-central-1:445285296882:layer:perl-5-30-runtime:3`
+    - `arn:aws:lambda:eu-west-1:445285296882:layer:perl-5-30-runtime:3`
+    - `arn:aws:lambda:eu-west-2:445285296882:layer:perl-5-30-runtime:3`
+    - `arn:aws:lambda:eu-west-3:445285296882:layer:perl-5-30-runtime:3`
+    - `arn:aws:lambda:me-south-1:445285296882:layer:perl-5-30-runtime:1`
+    - `arn:aws:lambda:sa-east-1:445285296882:layer:perl-5-30-runtime:3`
+    - `arn:aws:lambda:us-east-1:445285296882:layer:perl-5-30-runtime:3`
+    - `arn:aws:lambda:us-east-2:445285296882:layer:perl-5-30-runtime:3`
+    - `arn:aws:lambda:us-west-1:445285296882:layer:perl-5-30-runtime:3`
+    - `arn:aws:lambda:us-west-2:445285296882:layer:perl-5-30-runtime:3`
 - Perl 5.28
-    - `arn:aws:lambda:ap-east-1:445285296882:layer:perl-5-28-runtime:2`
-    - `arn:aws:lambda:ap-northeast-1:445285296882:layer:perl-5-28-runtime:9`
-    - `arn:aws:lambda:ap-northeast-2:445285296882:layer:perl-5-28-runtime:9`
-    - `arn:aws:lambda:ap-south-1:445285296882:layer:perl-5-28-runtime:9`
-    - `arn:aws:lambda:ap-southeast-1:445285296882:layer:perl-5-28-runtime:9`
-    - `arn:aws:lambda:ap-southeast-2:445285296882:layer:perl-5-28-runtime:9`
-    - `arn:aws:lambda:ca-central-1:445285296882:layer:perl-5-28-runtime:9`
-    - `arn:aws:lambda:eu-central-1:445285296882:layer:perl-5-28-runtime:9`
-    - `arn:aws:lambda:eu-west-1:445285296882:layer:perl-5-28-runtime:9`
-    - `arn:aws:lambda:eu-west-2:445285296882:layer:perl-5-28-runtime:9`
-    - `arn:aws:lambda:eu-west-3:445285296882:layer:perl-5-28-runtime:9`
-    - `arn:aws:lambda:sa-east-1:445285296882:layer:perl-5-28-runtime:9`
-    - `arn:aws:lambda:us-east-1:445285296882:layer:perl-5-28-runtime:9`
-    - `arn:aws:lambda:us-east-2:445285296882:layer:perl-5-28-runtime:9`
-    - `arn:aws:lambda:us-west-1:445285296882:layer:perl-5-28-runtime:9`
-    - `arn:aws:lambda:us-west-2:445285296882:layer:perl-5-28-runtime:9`
+    - `arn:aws:lambda:ap-east-1:445285296882:layer:perl-5-28-runtime:3`
+    - `arn:aws:lambda:ap-northeast-1:445285296882:layer:perl-5-28-runtime:10`
+    - `arn:aws:lambda:ap-northeast-2:445285296882:layer:perl-5-28-runtime:10`
+    - `arn:aws:lambda:ap-south-1:445285296882:layer:perl-5-28-runtime:10`
+    - `arn:aws:lambda:ap-southeast-1:445285296882:layer:perl-5-28-runtime:10`
+    - `arn:aws:lambda:ap-southeast-2:445285296882:layer:perl-5-28-runtime:10`
+    - `arn:aws:lambda:ca-central-1:445285296882:layer:perl-5-28-runtime:10`
+    - `arn:aws:lambda:eu-central-1:445285296882:layer:perl-5-28-runtime:10`
+    - `arn:aws:lambda:eu-west-1:445285296882:layer:perl-5-28-runtime:10`
+    - `arn:aws:lambda:eu-west-2:445285296882:layer:perl-5-28-runtime:10`
+    - `arn:aws:lambda:eu-west-3:445285296882:layer:perl-5-28-runtime:10`
+    - `arn:aws:lambda:me-south-1:445285296882:layer:perl-5-28-runtime:1`
+    - `arn:aws:lambda:sa-east-1:445285296882:layer:perl-5-28-runtime:10`
+    - `arn:aws:lambda:us-east-1:445285296882:layer:perl-5-28-runtime:10`
+    - `arn:aws:lambda:us-east-2:445285296882:layer:perl-5-28-runtime:10`
+    - `arn:aws:lambda:us-west-1:445285296882:layer:perl-5-28-runtime:10`
+    - `arn:aws:lambda:us-west-2:445285296882:layer:perl-5-28-runtime:10`
 - Perl 5.26
-    - `arn:aws:lambda:ap-east-1:445285296882:layer:perl-5-26-runtime:3`
-    - `arn:aws:lambda:ap-northeast-1:445285296882:layer:perl-5-26-runtime:10`
-    - `arn:aws:lambda:ap-northeast-2:445285296882:layer:perl-5-26-runtime:10`
-    - `arn:aws:lambda:ap-south-1:445285296882:layer:perl-5-26-runtime:10`
-    - `arn:aws:lambda:ap-southeast-1:445285296882:layer:perl-5-26-runtime:10`
-    - `arn:aws:lambda:ap-southeast-2:445285296882:layer:perl-5-26-runtime:10`
-    - `arn:aws:lambda:ca-central-1:445285296882:layer:perl-5-26-runtime:10`
-    - `arn:aws:lambda:eu-central-1:445285296882:layer:perl-5-26-runtime:10`
-    - `arn:aws:lambda:eu-west-1:445285296882:layer:perl-5-26-runtime:10`
-    - `arn:aws:lambda:eu-west-2:445285296882:layer:perl-5-26-runtime:9`
-    - `arn:aws:lambda:eu-west-3:445285296882:layer:perl-5-26-runtime:9`
-    - `arn:aws:lambda:sa-east-1:445285296882:layer:perl-5-26-runtime:9`
-    - `arn:aws:lambda:us-east-1:445285296882:layer:perl-5-26-runtime:9`
-    - `arn:aws:lambda:us-east-2:445285296882:layer:perl-5-26-runtime:9`
-    - `arn:aws:lambda:us-west-1:445285296882:layer:perl-5-26-runtime:9`
-    - `arn:aws:lambda:us-west-2:445285296882:layer:perl-5-26-runtime:9`
+    - `arn:aws:lambda:ap-east-1:445285296882:layer:perl-5-26-runtime:4`
+    - `arn:aws:lambda:ap-northeast-1:445285296882:layer:perl-5-26-runtime:11`
+    - `arn:aws:lambda:ap-northeast-2:445285296882:layer:perl-5-26-runtime:11`
+    - `arn:aws:lambda:ap-south-1:445285296882:layer:perl-5-26-runtime:11`
+    - `arn:aws:lambda:ap-southeast-1:445285296882:layer:perl-5-26-runtime:11`
+    - `arn:aws:lambda:ap-southeast-2:445285296882:layer:perl-5-26-runtime:11`
+    - `arn:aws:lambda:ca-central-1:445285296882:layer:perl-5-26-runtime:11`
+    - `arn:aws:lambda:eu-central-1:445285296882:layer:perl-5-26-runtime:11`
+    - `arn:aws:lambda:eu-west-1:445285296882:layer:perl-5-26-runtime:11`
+    - `arn:aws:lambda:eu-west-2:445285296882:layer:perl-5-26-runtime:10`
+    - `arn:aws:lambda:eu-west-3:445285296882:layer:perl-5-26-runtime:10`
+    - `arn:aws:lambda:me-south-1:445285296882:layer:perl-5-26-runtime:1`
+    - `arn:aws:lambda:sa-east-1:445285296882:layer:perl-5-26-runtime:10`
+    - `arn:aws:lambda:us-east-1:445285296882:layer:perl-5-26-runtime:10`
+    - `arn:aws:lambda:us-east-2:445285296882:layer:perl-5-26-runtime:10`
+    - `arn:aws:lambda:us-west-1:445285296882:layer:perl-5-26-runtime:10`
+    - `arn:aws:lambda:us-west-2:445285296882:layer:perl-5-26-runtime:10`
 
 ## Use Prebuild Zip Archive
 
@@ -111,9 +114,7 @@ URLs for Zip archive are here.
 
 ## Run in Local using Docker
 
-Here is prebuild docker image based on [https://hub.docker.com/r/lambci/lambda/](https://hub.docker.com/r/lambci/lambda/)
-
-- [https://hub.docker.com/r/shogo82148/p5-aws-lambda](https://hub.docker.com/r/shogo82148/p5-aws-lambda)
+[https://hub.docker.com/r/shogo82148/p5-aws-lambda](https://hub.docker.com/r/shogo82148/p5-aws-lambda) is pre-build docker image based on [https://hub.docker.com/r/lambci/lambda/](https://hub.docker.com/r/lambci/lambda/)
 
     # Install the dependency.
     docker run --rm -v $(PWD):/var/task shogo82148/p5-aws-lambda:build-5.30 \
@@ -123,10 +124,35 @@ Here is prebuild docker image based on [https://hub.docker.com/r/lambci/lambda/]
     docker run --rm -v $(PWD):/var/task shogo82148/p5-aws-lambda:5.30 \
         handler.handle '{"some":"event"}'
 
+## AWS XRay SUPPORT
+
+[AWS X-Ray](https://aws.amazon.com/xray/) is a service that collects data about requests that your application serves.
+You can trace AWS Lambda requests and sends segment data with pre-install module [AWS::XRay](https://metacpan.org/pod/AWS::XRay).
+
+    use utf8;
+    use warnings;
+    use strict;
+    use AWS::XRay qw/ capture /;
+
+    sub handle {
+        my ($payload, $context) = @_;
+        capture "myApp" => sub {
+            capture "nested" => sub {
+                # do something ...
+            };
+        };
+        capture "another" => sub {
+            # do something ...
+        };
+        return;
+    }
+
+    1;
+
 # Paws SUPPORT
 
 If you want to call AWS API from your Lambda function,
-you can use a prebuild Lambda Layer for [Paws](https://metacpan.org/pod/Paws) - A Perl SDK for AWS (Amazon Web Services) APIs.
+you can use a pre-build Lambda Layer for [Paws](https://metacpan.org/pod/Paws) - A Perl SDK for AWS (Amazon Web Services) APIs.
 
 ## Use Prebuild Public Lambda Layer
 
@@ -139,8 +165,8 @@ Add the perl-runtime layer and the perl-paws layer into your lambda function.
         --runtime provided \
         --role arn:aws:iam::xxxxxxxxxxxx:role/service-role/lambda-custom-runtime-perl-role \
         --layers \
-            "arn:aws:lambda:$REGION:445285296882:layer:perl-5-30-runtime:2" \
-            "arn:aws:lambda:$REGION:445285296882:layer:perl-5-30-paws:1" 
+            "arn:aws:lambda:$REGION:445285296882:layer:perl-5-30-runtime:3" \
+            "arn:aws:lambda:$REGION:445285296882:layer:perl-5-30-paws:2"
 
 Now, you can use [Paws](https://metacpan.org/pod/Paws) to call AWS API from your Lambda function.
 
@@ -152,56 +178,59 @@ Now, you can use [Paws](https://metacpan.org/pod/Paws) to call AWS API from your
 The Layer ARN list is here.
 
 - Perl 5.30
-    - `arn:aws:lambda:ap-east-1:445285296882:layer:perl-5-30-paws:1`
-    - `arn:aws:lambda:ap-northeast-1:445285296882:layer:perl-5-30-paws:1`
-    - `arn:aws:lambda:ap-northeast-2:445285296882:layer:perl-5-30-paws:1`
-    - `arn:aws:lambda:ap-south-1:445285296882:layer:perl-5-30-paws:1`
-    - `arn:aws:lambda:ap-southeast-1:445285296882:layer:perl-5-30-paws:1`
-    - `arn:aws:lambda:ap-southeast-2:445285296882:layer:perl-5-30-paws:1`
-    - `arn:aws:lambda:ca-central-1:445285296882:layer:perl-5-30-paws:1`
-    - `arn:aws:lambda:eu-central-1:445285296882:layer:perl-5-30-paws:1`
-    - `arn:aws:lambda:eu-west-1:445285296882:layer:perl-5-30-paws:1`
-    - `arn:aws:lambda:eu-west-2:445285296882:layer:perl-5-30-paws:1`
-    - `arn:aws:lambda:eu-west-3:445285296882:layer:perl-5-30-paws:1`
-    - `arn:aws:lambda:sa-east-1:445285296882:layer:perl-5-30-paws:1`
-    - `arn:aws:lambda:us-east-1:445285296882:layer:perl-5-30-paws:1`
-    - `arn:aws:lambda:us-east-2:445285296882:layer:perl-5-30-paws:1`
-    - `arn:aws:lambda:us-west-1:445285296882:layer:perl-5-30-paws:1`
-    - `arn:aws:lambda:us-west-2:445285296882:layer:perl-5-30-paws:1`
+    - `arn:aws:lambda:ap-east-1:445285296882:layer:perl-5-30-paws:2`
+    - `arn:aws:lambda:ap-northeast-1:445285296882:layer:perl-5-30-paws:2`
+    - `arn:aws:lambda:ap-northeast-2:445285296882:layer:perl-5-30-paws:2`
+    - `arn:aws:lambda:ap-south-1:445285296882:layer:perl-5-30-paws:2`
+    - `arn:aws:lambda:ap-southeast-1:445285296882:layer:perl-5-30-paws:2`
+    - `arn:aws:lambda:ap-southeast-2:445285296882:layer:perl-5-30-paws:2`
+    - `arn:aws:lambda:ca-central-1:445285296882:layer:perl-5-30-paws:2`
+    - `arn:aws:lambda:eu-central-1:445285296882:layer:perl-5-30-paws:2`
+    - `arn:aws:lambda:eu-west-1:445285296882:layer:perl-5-30-paws:2`
+    - `arn:aws:lambda:eu-west-2:445285296882:layer:perl-5-30-paws:2`
+    - `arn:aws:lambda:eu-west-3:445285296882:layer:perl-5-30-paws:2`
+    - `arn:aws:lambda:me-south-1:445285296882:layer:perl-5-30-paws:1`
+    - `arn:aws:lambda:sa-east-1:445285296882:layer:perl-5-30-paws:2`
+    - `arn:aws:lambda:us-east-1:445285296882:layer:perl-5-30-paws:2`
+    - `arn:aws:lambda:us-east-2:445285296882:layer:perl-5-30-paws:2`
+    - `arn:aws:lambda:us-west-1:445285296882:layer:perl-5-30-paws:2`
+    - `arn:aws:lambda:us-west-2:445285296882:layer:perl-5-30-paws:2`
 - Perl 5.28
-    - `arn:aws:lambda:ap-east-1:445285296882:layer:perl-5-28-paws:1`
-    - `arn:aws:lambda:ap-northeast-1:445285296882:layer:perl-5-28-paws:1`
-    - `arn:aws:lambda:ap-northeast-2:445285296882:layer:perl-5-28-paws:1`
-    - `arn:aws:lambda:ap-south-1:445285296882:layer:perl-5-28-paws:1`
-    - `arn:aws:lambda:ap-southeast-1:445285296882:layer:perl-5-28-paws:1`
-    - `arn:aws:lambda:ap-southeast-2:445285296882:layer:perl-5-28-paws:1`
-    - `arn:aws:lambda:ca-central-1:445285296882:layer:perl-5-28-paws:1`
-    - `arn:aws:lambda:eu-central-1:445285296882:layer:perl-5-28-paws:1`
-    - `arn:aws:lambda:eu-west-1:445285296882:layer:perl-5-28-paws:1`
-    - `arn:aws:lambda:eu-west-2:445285296882:layer:perl-5-28-paws:1`
-    - `arn:aws:lambda:eu-west-3:445285296882:layer:perl-5-28-paws:1`
-    - `arn:aws:lambda:sa-east-1:445285296882:layer:perl-5-28-paws:1`
-    - `arn:aws:lambda:us-east-1:445285296882:layer:perl-5-28-paws:1`
-    - `arn:aws:lambda:us-east-2:445285296882:layer:perl-5-28-paws:1`
-    - `arn:aws:lambda:us-west-1:445285296882:layer:perl-5-28-paws:1`
-    - `arn:aws:lambda:us-west-2:445285296882:layer:perl-5-28-paws:1`
+    - `arn:aws:lambda:ap-east-1:445285296882:layer:perl-5-28-paws:2`
+    - `arn:aws:lambda:ap-northeast-1:445285296882:layer:perl-5-28-paws:2`
+    - `arn:aws:lambda:ap-northeast-2:445285296882:layer:perl-5-28-paws:2`
+    - `arn:aws:lambda:ap-south-1:445285296882:layer:perl-5-28-paws:2`
+    - `arn:aws:lambda:ap-southeast-1:445285296882:layer:perl-5-28-paws:2`
+    - `arn:aws:lambda:ap-southeast-2:445285296882:layer:perl-5-28-paws:2`
+    - `arn:aws:lambda:ca-central-1:445285296882:layer:perl-5-28-paws:2`
+    - `arn:aws:lambda:eu-central-1:445285296882:layer:perl-5-28-paws:2`
+    - `arn:aws:lambda:eu-west-1:445285296882:layer:perl-5-28-paws:2`
+    - `arn:aws:lambda:eu-west-2:445285296882:layer:perl-5-28-paws:2`
+    - `arn:aws:lambda:eu-west-3:445285296882:layer:perl-5-28-paws:2`
+    - `arn:aws:lambda:me-south-1:445285296882:layer:perl-5-28-paws:1`
+    - `arn:aws:lambda:sa-east-1:445285296882:layer:perl-5-28-paws:2`
+    - `arn:aws:lambda:us-east-1:445285296882:layer:perl-5-28-paws:2`
+    - `arn:aws:lambda:us-east-2:445285296882:layer:perl-5-28-paws:2`
+    - `arn:aws:lambda:us-west-1:445285296882:layer:perl-5-28-paws:2`
+    - `arn:aws:lambda:us-west-2:445285296882:layer:perl-5-28-paws:2`
 - Perl 5.26
-    - `arn:aws:lambda:ap-east-1:445285296882:layer:perl-5-26-paws:2`
-    - `arn:aws:lambda:ap-northeast-1:445285296882:layer:perl-5-26-paws:2`
-    - `arn:aws:lambda:ap-northeast-2:445285296882:layer:perl-5-26-paws:2`
-    - `arn:aws:lambda:ap-south-1:445285296882:layer:perl-5-26-paws:2`
-    - `arn:aws:lambda:ap-southeast-1:445285296882:layer:perl-5-26-paws:2`
-    - `arn:aws:lambda:ap-southeast-2:445285296882:layer:perl-5-26-paws:2`
-    - `arn:aws:lambda:ca-central-1:445285296882:layer:perl-5-26-paws:2`
-    - `arn:aws:lambda:eu-central-1:445285296882:layer:perl-5-26-paws:2`
-    - `arn:aws:lambda:eu-west-1:445285296882:layer:perl-5-26-paws:2`
-    - `arn:aws:lambda:eu-west-2:445285296882:layer:perl-5-26-paws:1`
-    - `arn:aws:lambda:eu-west-3:445285296882:layer:perl-5-26-paws:1`
-    - `arn:aws:lambda:sa-east-1:445285296882:layer:perl-5-26-paws:1`
-    - `arn:aws:lambda:us-east-1:445285296882:layer:perl-5-26-paws:1`
-    - `arn:aws:lambda:us-east-2:445285296882:layer:perl-5-26-paws:1`
-    - `arn:aws:lambda:us-west-1:445285296882:layer:perl-5-26-paws:1`
-    - `arn:aws:lambda:us-west-2:445285296882:layer:perl-5-26-paws:1`
+    - `arn:aws:lambda:ap-east-1:445285296882:layer:perl-5-26-paws:3`
+    - `arn:aws:lambda:ap-northeast-1:445285296882:layer:perl-5-26-paws:3`
+    - `arn:aws:lambda:ap-northeast-2:445285296882:layer:perl-5-26-paws:3`
+    - `arn:aws:lambda:ap-south-1:445285296882:layer:perl-5-26-paws:3`
+    - `arn:aws:lambda:ap-southeast-1:445285296882:layer:perl-5-26-paws:3`
+    - `arn:aws:lambda:ap-southeast-2:445285296882:layer:perl-5-26-paws:3`
+    - `arn:aws:lambda:ca-central-1:445285296882:layer:perl-5-26-paws:3`
+    - `arn:aws:lambda:eu-central-1:445285296882:layer:perl-5-26-paws:3`
+    - `arn:aws:lambda:eu-west-1:445285296882:layer:perl-5-26-paws:3`
+    - `arn:aws:lambda:eu-west-2:445285296882:layer:perl-5-26-paws:2`
+    - `arn:aws:lambda:eu-west-3:445285296882:layer:perl-5-26-paws:2`
+    - `arn:aws:lambda:me-south-1:445285296882:layer:perl-5-26-paws:1`
+    - `arn:aws:lambda:sa-east-1:445285296882:layer:perl-5-26-paws:2`
+    - `arn:aws:lambda:us-east-1:445285296882:layer:perl-5-26-paws:2`
+    - `arn:aws:lambda:us-east-2:445285296882:layer:perl-5-26-paws:2`
+    - `arn:aws:lambda:us-west-1:445285296882:layer:perl-5-26-paws:2`
+    - `arn:aws:lambda:us-west-2:445285296882:layer:perl-5-26-paws:2`
 
 URLs for Zip archive are here.
 
@@ -209,9 +238,7 @@ URLs for Zip archive are here.
 
 ## Run in Local using Docker
 
-Here is prebuild docker image based on [https://hub.docker.com/r/lambci/lambda/](https://hub.docker.com/r/lambci/lambda/)
-
-- [https://hub.docker.com/r/shogo82148/p5-aws-lambda](https://hub.docker.com/r/shogo82148/p5-aws-lambda)
+[https://hub.docker.com/r/shogo82148/p5-aws-lambda](https://hub.docker.com/r/shogo82148/p5-aws-lambda) is pre-build docker image based on [https://hub.docker.com/r/lambci/lambda/](https://hub.docker.com/r/lambci/lambda/)
 
     # Install the dependency.
     docker run --rm -v $(PWD):/var/task shogo82148/p5-aws-lambda:build-5.30-paws \
@@ -232,13 +259,15 @@ install the modules into `/opt/lib/perl5/site_perl` in the layer.
         -v $(PATH_TO_LAYER_DIR)/lib/perl5/site_perl:/opt/lib/perl5/site_perl \
         shogo82148/p5-aws-lambda:build-5.30 \
         cpanm --notest --no-man-pages Some::Module
-    cd $(PATH_TO_LAYER_DIR) && zip zip -9 -r $(PATH_TO_DIST)/some-module.zip .
+    cd $(PATH_TO_LAYER_DIR) && zip -9 -r $(PATH_TO_DIST)/some-module.zip .
 
 # SEE ALSO
 
 - [AWS::Lambda::Bootstrap](https://metacpan.org/pod/AWS::Lambda::Bootstrap)
 - [AWS::Lambda::Context](https://metacpan.org/pod/AWS::Lambda::Context)
 - [AWS::Lambda::PSGI](https://metacpan.org/pod/AWS::Lambda::PSGI)
+- [Paws](https://metacpan.org/pod/Paws)
+- [AWS::XRay](https://metacpan.org/pod/AWS::XRay)
 
 # LICENSE
 

@@ -10,7 +10,7 @@ use Doodle::Column;
 use Doodle::Index;
 use Doodle::Relation;
 
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 has name => (
   is => 'ro',

@@ -1,11 +1,10 @@
 package Text::CleanFragment;
 use strict;
-use vars qw($VERSION @EXPORT);
 use Exporter qw'import';
 use Text::Unidecode;
 
-$VERSION = '0.03';
-@EXPORT = (qw(clean_fragment));
+our $VERSION = '0.04';
+our @EXPORT = (qw(clean_fragment));
 
 =head1 NAME
 
@@ -15,12 +14,14 @@ Text::CleanFragment - clean up text to use as URL fragment or filename
 
 =head1 SYNOPSIS
 
-  my $title = "Do p\x{00FC}t <this> into URL's?";
+  my $title = "Do p\x{00FC}t <this> into/URL's?";
   my $id = 42;
   my $url = join "/",
               $id,
               clean_fragment( $title );
   # 42/Do_put_this_into_URLs
+
+=head1 DESCRIPTION
 
 This module downgrades strings of text to match
 
@@ -114,13 +115,13 @@ __END__
 
 =head1 REPOSITORY
 
-The public repository of this module is 
-L<http://github.com/Corion/text-cleanfragment>.
+The public repository of this module is
+L<https://github.com/Corion/text-cleanfragment>.
 
 =head1 SUPPORT
 
 The public support forum of this module is
-L<http://perlmonks.org/>.
+L<https://perlmonks.org/>.
 
 =head1 BUG TRACKER
 
@@ -134,7 +135,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2012 by Max Maischein C<corion@cpan.org>.
+Copyright 2012-2019 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

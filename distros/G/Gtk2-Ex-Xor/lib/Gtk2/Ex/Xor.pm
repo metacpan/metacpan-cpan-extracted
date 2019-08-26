@@ -1,4 +1,4 @@
-# Copyright 2007, 2008, 2009, 2010, 2011 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2019 Kevin Ryde
 
 # This file is part of Gtk2-Ex-Xor.
 #
@@ -26,7 +26,7 @@ use List::Util;
 # uncomment this to run the ### lines
 #use Smart::Comments;
 
-our $VERSION = 22;
+our $VERSION = 23;
 
 my $cache;
 

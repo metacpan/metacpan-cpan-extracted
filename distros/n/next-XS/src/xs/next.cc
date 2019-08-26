@@ -29,7 +29,8 @@ static FORCEINLINE I32 __dopoptosub_at (const PERL_CONTEXT* cxstk, I32 startingb
 }
 
 // finds the contextually-enclosing fully-qualified subname, much like looking at (caller($i))[3] until you find a real sub that isn't ANON, etc
-static FORCEINLINE GV* _find_sub (pTHX_ SV** fqnp) {
+static FORCEINLINE GV* _find_sub (SV** fqnp) {
+    dTHX;
     const PERL_SI* top_si = PL_curstackinfo;
     const PERL_CONTEXT* ccstack = cxstack;
     I32 cxix = __dopoptosub_at(ccstack, cxstack_ix);
@@ -96,11 +97,12 @@ static FORCEINLINE void _throw_no_next_method (HV* selfstash, GV* context) {
     throw std::logic_error(std::string("No next::method '") + subname + "' found for " + stashname);
 }
 
-static FORCEINLINE CV* _method (pTHX_ HV* selfstash, GV* context, SV* fqnsv) {
+static FORCEINLINE CV* _method (HV* selfstash, GV* context, SV* fqnsv) {
     if (!fqnsv) { // cache FQN SV with shared COW hash of current sub in magic to perform hash lookup with precomputed hash
         HV* stash = GvSTASH(context);
         MAGIC* mg = mg_findext((SV*)context, PERL_MAGIC_ext, &c3_marker);
         if (!mg || (HV*)mg->mg_ptr != stash) {
+            dTHX;
             if (mg) sv_unmagicext((SV*)context, PERL_MAGIC_ext, &c3_marker);
             bool had_magic = SvRMAGICAL(context);
             fqnsv = _make_shared_fqn(aTHX_ context);
@@ -111,6 +113,7 @@ static FORCEINLINE CV* _method (pTHX_ HV* selfstash, GV* context, SV* fqnsv) {
         fqnsv = mg->mg_obj;
     }
 
+    dTHX;
     struct mro_meta* selfmeta = HvMROMETA(selfstash);
     HV* nmcache = selfmeta->mro_nextmethod;
     if (nmcache) { // Use the cached coderef if it exists
@@ -183,31 +186,32 @@ static FORCEINLINE CV* _method (pTHX_ HV* selfstash, GV* context, SV* fqnsv) {
     return NULL;
 }
 
-CV* next::method (pTHX_ HV* selfstash) {
+CV* next::method (HV* selfstash) {
     SV* fqn = NULL;
-    GV* context = _find_sub(aTHX_ &fqn);
-    return _method(aTHX_ selfstash, context, fqn);
+    GV* context = _find_sub(&fqn);
+    return _method(selfstash, context, fqn);
 }
 
-CV* next::method_strict (pTHX_ HV* selfstash) {
+CV* next::method_strict (HV* selfstash) {
     SV* fqn = NULL;
-    GV* context = _find_sub(aTHX_ &fqn);
-    CV* ret = _method(aTHX_ selfstash, context, fqn);
+    GV* context = _find_sub(&fqn);
+    CV* ret = _method(selfstash, context, fqn);
     if (!ret) _throw_no_next_method(selfstash, context);
     return ret;
 }
 
-CV* next::method (pTHX_ HV* selfstash, GV* context) { return _method(aTHX_ selfstash, context, NULL); }
+CV* next::method (HV* selfstash, GV* context) { return _method(selfstash, context, NULL); }
 
-CV* next::method_strict (pTHX_ HV* selfstash, GV* context) {
-    CV* ret = _method(aTHX_ selfstash, context, NULL);
+CV* next::method_strict (HV* selfstash, GV* context) {
+    CV* ret = _method(selfstash, context, NULL);
     if (!ret) _throw_no_next_method(selfstash, context);
     return ret;
 }
 
-static FORCEINLINE CV* _super_method (pTHX_ HV* selfstash, GV* context) {
+static FORCEINLINE CV* _super_method (HV* selfstash, GV* context) {
     //omit comparing strings for speed
-    if (HvMROMETA(selfstash)->mro_which->length != 3) return _method(aTHX_ selfstash, context, NULL); // C3
+    dTHX;
+    if (HvMROMETA(selfstash)->mro_which->length != 3) return _method(selfstash, context, NULL); // C3
     // DFS
     HV* stash = GvSTASH(context);
     HEK* hek = GvNAME_HEK(context);
@@ -223,10 +227,10 @@ static FORCEINLINE CV* _super_method (pTHX_ HV* selfstash, GV* context) {
     return ret ? (isGV(ret) ? GvCV(ret) : (CV*)ret) : NULL;
 }
 
-CV* super::method (pTHX_ HV* selfstash, GV* context) { return _super_method(aTHX_ selfstash, context); }
+CV* super::method (HV* selfstash, GV* context) { return _super_method(selfstash, context); }
 
-CV* super::method_strict (pTHX_ HV* selfstash, GV* context) {
-    CV* ret = _super_method(aTHX_ selfstash, context);
+CV* super::method_strict (HV* selfstash, GV* context) {
+    CV* ret = _super_method(selfstash, context);
     if (!ret) {
         std::string subname(GvNAME(context), GvNAMELEN(context));
         std::string stashname(HvNAME(selfstash), HvNAMELEN(selfstash));

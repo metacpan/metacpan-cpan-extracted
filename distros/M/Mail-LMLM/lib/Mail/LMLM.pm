@@ -1,5 +1,5 @@
 package Mail::LMLM;
-$Mail::LMLM::VERSION = '0.6805';
+$Mail::LMLM::VERSION = '0.6806';
 use strict;
 use warnings;
 
@@ -9,7 +9,7 @@ use Mail::LMLM::Object;
 
 use vars qw(@ISA);
 
-@ISA=qw(Mail::LMLM::Object);
+@ISA = qw(Mail::LMLM::Object);
 
 use Mail::LMLM::Render::HTML;
 
@@ -32,58 +32,57 @@ sub _pref
     return $prefix . $name;
 }
 
-%mailing_list_classes =
-(
+%mailing_list_classes = (
     (
-        map { $_ => _pref(ucfirst($_)) }
-        ('egroups', 'ezmlm', 'listar', 'majordomo', 'listserv', 'mailman')
+        map { $_ => _pref( ucfirst($_) ) } (
+            'egroups', 'ezmlm', 'listar', 'majordomo', 'listserv', 'mailman'
+        )
     ),
     "google" => _pref("GoogleGroups"),
 );
 
 use vars qw(@render_what);
 
-@render_what =
-(
+@render_what = (
     {
         'title' => "Description",
-        'func' => "render_description",
-        'id' => "desc",
+        'func'  => "render_description",
+        'id'    => "desc",
     },
     {
         'title' => "Posting Guidelines",
-        'func' => "render_guidelines",
-        'id' => "post_guidelines",
+        'func'  => "render_guidelines",
+        'id'    => "post_guidelines",
     },
     {
         'title' => "Subscribing to the Mailing-List",
-        'func' => "render_subscribe",
-        'id' => "subscribe",
+        'func'  => "render_subscribe",
+        'id'    => "subscribe",
     },
     {
         'title' => "Unsubscribing from the Mailing-List",
-        'func' => "render_unsubscribe",
-        'id' => "unsubscribe",
+        'func'  => "render_unsubscribe",
+        'id'    => "unsubscribe",
     },
     {
         'title' => "Posting Messages to the Mailing-List",
-        'func' => "render_post",
-        'id' => "posting",
+        'func'  => "render_post",
+        'id'    => "posting",
     },
     {
         'title' => "Contacting the Mailing-List's Owner",
-        'func' => "render_owner",
-        'id' => "owner",
+        'func'  => "render_owner",
+        'id'    => "owner",
     },
     {
         'title' => "The Mailing-List's Homepage",
-        'func' => "render_homepage",
-        'id' => "homepage",
+        'func'  => "render_homepage",
+        'id'    => "homepage",
     },
     {
         'title' => "Online Messages Archive",
-        'func' => "render_online_archive",
-        'id' => "archive",
+        'func'  => "render_online_archive",
+        'id'    => "archive",
     },
 );
 
@@ -95,42 +94,42 @@ sub initialize
 {
     my $self = shift;
 
-    my ($key, $value);
-    $self->{'title'} = "List of Mailing Lists";
-    $self->{'headline'} = "List of Mailing Lists";
-    $self->{'prolog'} = $self->{'epilog'} = \&_do_nothing;
+    my ( $key, $value );
+    $self->{'title'}         = "List of Mailing Lists";
+    $self->{'headline'}      = "List of Mailing Lists";
+    $self->{'prolog'}        = $self->{'epilog'} = \&_do_nothing;
     $self->{'extra_classes'} = {};
-    while(scalar(@_))
+    while ( scalar(@_) )
     {
-        $key = shift;
+        $key   = shift;
         $value = shift;
-        if ($key =~ /^-?lists$/)
+        if ( $key =~ /^-?lists$/ )
         {
             $self->{'lists'} = $value;
         }
-        elsif ($key =~ /^-?title$/)
+        elsif ( $key =~ /^-?title$/ )
         {
             $self->{'title'} = $value;
         }
-        elsif ($key =~ /^-?headline$/)
+        elsif ( $key =~ /^-?headline$/ )
         {
             $self->{'headline'} = $value;
         }
-        elsif ($key =~ /^-?extra-classes$/)
+        elsif ( $key =~ /^-?extra-classes$/ )
         {
             $self->{'extra_classes'} = $value;
         }
-        elsif ($key =~ /^-?prolog$/)
+        elsif ( $key =~ /^-?prolog$/ )
         {
             $self->{'prolog'} = $value;
         }
-        elsif ($key =~ /^-?epilog$/)
+        elsif ( $key =~ /^-?epilog$/ )
         {
             $self->{'epilog'} = $value;
         }
     }
 
-    if (!exists($self->{'lists'}))
+    if ( !exists( $self->{'lists'} ) )
     {
         die "The lists were not defined for Mail::LMLM!";
     }
@@ -141,31 +140,31 @@ sub render
 {
     my $self = shift;
 
-    my ($mail_lister, $mailing_list, $o, $r, $main_o, $main_r, $filename);
+    my ( $mail_lister, $mailing_list, $o, $r, $main_o, $main_r, $filename );
 
-    local(*INDEX);
+    local (*INDEX);
 
     open INDEX, ">index.html";
-    $main_r = Mail::LMLM::Render::HTML->new(\*INDEX);
+    $main_r = Mail::LMLM::Render::HTML->new( \*INDEX );
 
-    $main_r->start_document(
-        $self->{'title'},
-        $self->{'headline'},
-        );
+    $main_r->start_document( $self->{'title'}, $self->{'headline'}, );
 
-    $self->{'prolog'}->($self, $main_r);
+    $self->{'prolog'}->( $self, $main_r );
 
-    local(*O);
+    local (*O);
 
-    foreach $mailing_list (@{$self->{'lists'}})
+    foreach $mailing_list ( @{ $self->{'lists'} } )
     {
-        $filename = $mailing_list->{'id'}.".html";
-        open O, ">".$filename;
-        $r = Mail::LMLM::Render::HTML->new(\*O);
+        $filename = $mailing_list->{'id'} . ".html";
+        open O, ">" . $filename;
+        $r = Mail::LMLM::Render::HTML->new( \*O );
 
         my $class_name = $mailing_list->{'class'};
-        my $class = $mailing_list_classes{$class_name} || $self->{'extra_classes'}->{$class_name} || die "Mail::LMLM: Unknown Class \"$class_name\"";
-        if (ref($class) eq "CODE")
+        my $class =
+               $mailing_list_classes{$class_name}
+            || $self->{'extra_classes'}->{$class_name}
+            || die "Mail::LMLM: Unknown Class \"$class_name\"";
+        if ( ref($class) eq "CODE" )
         {
             $mail_lister = $class->(%$mailing_list);
         }
@@ -174,21 +173,22 @@ sub render
             $mail_lister = $class->new(%$mailing_list);
         }
 
-        my $title = exists($mailing_list->{'title'}) ?
-            $mailing_list->{'title'} :
-            $mailing_list->{'id'};
+        my $title =
+            exists( $mailing_list->{'title'} )
+            ? $mailing_list->{'title'}
+            : $mailing_list->{'id'};
 
-        $r->start_document($title, $title);
+        $r->start_document( $title, $title );
 
         foreach my $what (@render_what)
         {
             my $func = $what->{'func'};
-            $r->start_section($what->{'title'}, +{'id' => $what->{'id'}});
+            $r->start_section( $what->{'title'}, +{ 'id' => $what->{'id'} } );
             $mail_lister->$func($r);
             $r->end_section();
         }
 
-        $main_r->start_section($title, {'title_url' => $filename});
+        $main_r->start_section( $title, { 'title_url' => $filename } );
         $mail_lister->render_description($main_r);
         $main_r->end_section();
 
@@ -197,12 +197,12 @@ sub render
         close(O);
     }
 
-    $self->{'epilog'}->($self, $main_r);
+    $self->{'epilog'}->( $self, $main_r );
 
     $main_r->end_document();
     close(INDEX);
 
-    local(*STYLE);
+    local (*STYLE);
     open STYLE, ">style.css";
     print STYLE <<"EOF";
 a:hover { background-color : LightGreen }
@@ -226,7 +226,7 @@ Mail::LMLM - List of Mailing Lists Manager
 
 =head1 VERSION
 
-version 0.6805
+version 0.6806
 
 =head1 SYNOPSIS
 
@@ -355,10 +355,6 @@ the mailing list.
 
 =back
 
-=head1 VERSION
-
-version 0.6805
-
 =head1 FUNCTIONS
 
 =head2 initialize()
@@ -411,7 +407,7 @@ unknown
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by unknown.
+This software is Copyright (c) 2019 by unknown.
 
 This is free software, licensed under:
 
@@ -420,7 +416,7 @@ This is free software, licensed under:
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/mail-lmlm/issues>
+L<https://github.com/shlomif/perl-mail-lmlm/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -529,8 +525,8 @@ The code is open to the world, and available for you to hack on. Please feel fre
 with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
 from your repository :)
 
-L<https://github.com/shlomif/mail-lmlm>
+L<https://github.com/shlomif/perl-mail-lmlm>
 
-  git clone http://bitbucket.org/shlomif/perl-mail-lmlm/overview
+  git clone git://github.com/shlomif/perl-mail-lmlm.git
 
 =cut

@@ -1,11 +1,11 @@
 use strict;
 use warnings;
 
-package namespace::autoclean; # git description: 0.27-4-g47c7088
+package namespace::autoclean; # git description: 0.28-24-g964adcf
 # ABSTRACT: Keep imports out of your namespace
 # KEYWORDS: namespaces clean dirty imports exports subroutines methods development
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 use B::Hooks::EndOfScope 0.12;
 use List::Util qw( first );
@@ -156,13 +156,13 @@ sub import {
 
     my $cleanee = exists $args{-cleanee} ? $args{-cleanee} : scalar caller;
 
-    my @also = map { $subcast->($_) } (
+    my @also = map $subcast->($_), (
         exists $args{-also}
         ? (ref $args{-also} eq 'ARRAY' ? @{ $args{-also} } : $args{-also})
         : ()
     );
 
-    my @except = map { $subcast->($_) } (
+    my @except = map $subcast->($_), (
         exists $args{-except}
         ? (ref $args{-except} eq 'ARRAY' ? @{ $args{-except} } : $args{-except})
         : ()
@@ -188,7 +188,7 @@ sub _method_check {
     if (
       (defined &Class::MOP::class_of and my $meta = Class::MOP::class_of($package))
     ) {
-        my %methods = map { $_ => 1 } $meta->get_method_list;
+        my %methods = map +($_ => 1), $meta->get_method_list;
         $methods{meta} = 1
           if $meta->isa('Moose::Meta::Role') && Moose->VERSION < 0.90;
         return sub { $_[0] =~ /^\(/ || $methods{$_[0]} };
@@ -225,7 +225,7 @@ namespace::autoclean - Keep imports out of your namespace
 
 =head1 VERSION
 
-version 0.28
+version 0.29
 
 =head1 SYNOPSIS
 
@@ -387,7 +387,7 @@ There is also a mailing list available for users of this distribution, at
 L<http://lists.perl.org/list/moose.html>.
 
 There is also an irc channel available for users of this distribution, at
-irc://irc.perl.org/#moose.
+L<C<#moose> on C<irc.perl.org>|irc://irc.perl.org/#moose>.
 
 =head1 AUTHOR
 
@@ -421,19 +421,19 @@ Tomas Doran <bobtfish@bobtfish.net>
 
 =item *
 
-Shawn M Moore <sartak@gmail.com>
+Shawn M Moore <cpan@sartak.org>
 
 =item *
 
-Felix Ostmann <sadrak@sadrak-laptop.(none)>
+Felix Ostmann <sadrak@cpan.org>
 
 =item *
 
-Chris Prather <cprather@hdpublishing.com>
+Chris Prather <chris@prather.org>
 
 =item *
 
-Andrew Rodland <andrew@hbslabs.com>
+Andrew Rodland <arodland@cpan.org>
 
 =back
 

@@ -5,7 +5,7 @@
       "Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -44,7 +44,6 @@
       },
       "test" : {
          "requires" : {
-            "Dumbbench" : "0.111",
             "Test::Simple" : "1.302073"
          }
       }
@@ -52,7 +51,7 @@
    "provides" : {
       "Archive::Tar::Wrapper" : {
          "file" : "lib/Archive/Tar/Wrapper.pm",
-         "version" : "0.36"
+         "version" : "0.37"
       }
    },
    "release_status" : "stable",
@@ -66,7 +65,6 @@
          "web" : "https://github.com/glasswalk3r/archive-tar-wrapper-perl"
       }
    },
-   "version" : "0.36",
-   "x_NO_MYMETA" : 1,
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.37",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

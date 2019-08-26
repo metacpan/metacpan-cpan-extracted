@@ -2,14 +2,6 @@
 #include <xsheader.h>
 #include <panda/function.h>
 
-#ifdef PERL_IMPLICIT_CONTEXT // define class member helpers for storing perl interpreter
-    #define mTHX      tTHX my_perl;
-    #define mTHXa(a)  my_perl(a),
-#else
-    #define mTHX
-    #define mTHXa(a)
-#endif
-
 #ifdef USE_ITHREADS
     #define PERL_THREAD_LOCAL thread_local
 #else

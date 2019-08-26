@@ -9,7 +9,7 @@ Types::Core - Core types defined as tests and literals (ease of use)
 
 =head1 VERSION
 
-Version "0.2.5";
+Version "0.2.6";
 
 =cut
 
@@ -19,9 +19,10 @@ Version "0.2.5";
   use strict;
   use warnings;
   use mem;
-  our $VERSION='0.2.5';
+  our $VERSION='0.2.6';
   use constant Self => __PACKAGE__;
 
+# 0.2.6   -	Removed another spurious ref, this time to Carp::Always.  
 # 0.2.5   -	Removed spurious reference to unneeded module in t/t00.t.
 #						No other source changes.
 # 0.2.4   -	fixed current tests in 5.{12,10,8}.x; added some tests for
@@ -491,7 +492,6 @@ be compared.
 
 =cut
 
-use Carp::Always;
 use constant numRE => qr{^ ( 
 														[-+]? (?: (?: \d* \.? \d+ ) | 
 																			(?: \d+ \.? \d* ) ) 

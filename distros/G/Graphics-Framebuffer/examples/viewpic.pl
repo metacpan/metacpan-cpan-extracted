@@ -32,7 +32,7 @@ our $f = Graphics::Framebuffer->new(
     'RESET'       => 1 - $noclear,
 );
 
-$SIG{'KILL'} = $SIG{'QUIT'} = $SIG{'INT'} = $SIG{'HUP'} = sub { exec('reset'); };
+$SIG{'KILL'} = $SIG{'QUIT'} = $SIG{'INT'} = $SIG{'HUP'} = sub { $f->text_mode(); exec('reset'); };
 
 my $info = $f->screen_dimensions();
 

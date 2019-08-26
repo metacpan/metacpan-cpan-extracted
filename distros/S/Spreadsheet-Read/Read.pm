@@ -36,7 +36,7 @@ use 5.8.1;
 use strict;
 use warnings;
 
-our $VERSION = "0.80";
+our $VERSION = "0.81";
 sub  Version { $VERSION }
 
 use Carp;
@@ -175,12 +175,16 @@ sub _parser {
 
 sub new {
     my $class = shift;
-    my $r = ReadData (@_) || [{
-	parsers	=> [],
-	error	=> undef,
-	sheets	=> 0,
-	sheet	=> { },
-	}];
+    my $r = ReadData (@_);
+    unless ($r) {
+	@_ and return;	# new with arguments failed to open resource
+	$r = [{
+	    parsers	=> [],
+	    error	=> undef,
+	    sheets	=> 0,
+	    sheet	=> { },
+	    }];
+	}
     bless $r => $class;
     } # new
 
@@ -249,6 +253,7 @@ sub cellrow {
     } # cellrow
 
 # my @row = row ($book->[1], 1);
+# my @row = $book->row (1, 1);
 sub row {
     my $sheet = ref $_[0] eq __PACKAGE__ ? (shift)->[shift] : shift or return;
     ref     $sheet eq "HASH" && exists  $sheet->{cell}   or return;
@@ -426,8 +431,8 @@ sub ReadData {
 			     : do { no warnings "newline"; -f $txt };
     my $io_txt = $io_ref || $io_fil ? 0 : 1;
 
-    $io_fil && ! -s $txt  and return;
-    $io_ref && eof ($txt) and return;
+    $io_fil && ! -s $txt and do { $@ = "$txt is empty"; return };
+    $io_ref &&  eof $txt and do { $@ = "Empty stream";  return };
 
     if ($opt{parser} ? $_parser eq "csv" : ($io_fil && $txt =~ m/\.(csv)$/i)) {
 	$can{csv} or croak "CSV parser not installed";
@@ -479,10 +484,12 @@ sub ReadData {
 		       $l1 =~ m/["0-9];["0-9;]/  ? ";"  :
 		       $l1 =~ m/["0-9],["0-9,]/  ? ","  :
 		       $l1 =~ m/["0-9]\t["0-9,]/ ? "\t" :
+		       $l1 =~ m/["0-9]\|["0-9,]/ ? "|"  :
 		       # If neither, then for unquoted strings
 		       $l1 =~ m/\w;[\w;]/        ? ";"  :
 		       $l1 =~ m/\w,[\w,]/        ? ","  :
 		       $l1 =~ m/\w\t[\w,]/       ? "\t" :
+		       $l1 =~ m/\w\|[\w,]/       ? "|"  :
 						   ","  ;
 		close $in;
 		}
@@ -555,7 +562,7 @@ sub ReadData {
 		print   $tmpfile $txt;
 		close   $tmpfile;
 		}
-	    open $io_ref, "<", $tmpfile or return;
+	    open $io_ref, "<", $tmpfile or do { $@ = $!; return };
 	    $io_txt = 0;
 	    $_parser = _parser ($opt{parser} = "xls");
 	    }
@@ -573,9 +580,13 @@ sub ReadData {
 		print   $tmpfile $txt;
 		close   $tmpfile;
 		}
-	    open $io_ref, "<", $tmpfile or return;
+	    open $io_ref, "<", $tmpfile or do { $@ = $!; return };
 	    $io_txt = 0;
 	    $_parser = _parser ($opt{parser} = "xlsx");
+	    }
+	elsif (!$io_ref && $txt =~ m/\.xlsx?$/i) {
+	    $@ = "Cannot open $txt as file";
+	    return;
 	    }
 	}
     if ($opt{parser} ? $_parser =~ m/^xlsx?$/
@@ -967,6 +978,14 @@ sub ReadData {
 	    }
 	}
 
+    if (!ref $txt and $txt =~ m/\.\w+$/) {
+	# Return (localized) system message
+	open my $fh, "<", $txt and
+	    croak "I can open file $txt, but I do not know how to parse it\n";
+
+	$@ = $!;
+	}
+
     return;
     } # ReadData
 
@@ -1195,13 +1214,54 @@ the sheets when accessing them by name:
 
   my %sheet2 = %{$book->[$book->[0]{sheet}{"Sheet 2"}]};
 
+=head2 Formatted vs Unformatted
+
+The difference between formatted and unformatted cells is that the (optional)
+format is applied to the cell or not. This part is B<completely> implemented
+on the parser side. Spreadsheet::Read just makes both available if these are
+supported. Options provide means to disable either. If the parser does not
+provide formatted cells - like CSV - both values are equal.
+
+To show what this implies:
+
+ use Spreadsheet::Read;
+
+ my $file     = "files/example.xlsx";
+ my $workbook = Spreadsheet::Read->new ($file);
+
+ my $info     = $workbook->[0];
+ say "Parsed $file with $info->{parser}-$info->{version}";
+
+ my $sheet    = $workbook->sheet (1);
+
+ say join "\t" => "Formatted:",   $sheet->row     (1);
+ say join "\t" => "Unformatted:", $sheet->cellrow (1);
+
+Might return very different results depending one the underlying parser (and
+its version):
+
+ Parsed files/example.xlsx with Spreadsheet::ParseXLSX-0.27
+ Formatted:      8-Aug   Foo & Barr < Quux
+ Unformatted:    39668   Foo & Barr < Quux
+
+ Parsed files/example.xlsx with Spreadsheet::XLSX-0.15
+ Formatted:      39668   Foo &amp; Barr &lt; Quux
+ Unformatted:    39668   Foo &amp; Barr &lt; Quux
+
 =head2 Functions and methods
 
 =head3 new
 
- my $book = Spreadsheet::Read->new (...);
+ my $book = Spreadsheet::Read->new (...) or die $@;
 
 All options accepted by ReadData are accepted by new.
+
+With no arguments at all, $book will be an object where sheets can be added
+using C<add>
+
+ my $book = Spreadsheet::Read->new ();
+ $book->add ("file.csv");
+ $book->add ("file.cslx");
 
 =head3 ReadData
 
@@ -1404,6 +1464,8 @@ Note that the indexes in the returned list are 0-based.
 C<row ()> is not imported by default, so either specify it in the
 use argument list, or call it fully qualified.
 
+See also the C<row ()> method on sheets.
+
 =head3 cellrow
 
  my @row = cellrow ($sheet, $row);
@@ -1418,6 +1480,8 @@ Note that the indexes in the returned list are 0-based.
 
 C<cellrow ()> is not imported by default, so either specify it in the
 use argument list, or call it fully qualified or as method call.
+
+See also the C<cellrow ()> method on sheets.
 
 =head3 rows
 
@@ -2074,7 +2138,7 @@ H.Merijn Brand, <h.m.brand@xs4all.nl>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2018 H.Merijn Brand
+Copyright (C) 2005-2019 H.Merijn Brand
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

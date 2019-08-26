@@ -51,18 +51,18 @@ is_deeply( $tc2->RawCount(), $expecttc2,
 
 is_deeply(
   $VC1->TopCountMajority(),
-  { thresshold => 8, votes => 15 },
-  'With full ballot TopCountMajority returns only votes and thresshold'
+  { threshold => 8, votes => 15 },
+  'With full ballot TopCountMajority returns only votes and threshold'
 );
 is_deeply(
   $VC1->TopCountMajority($tc2),
-  { thresshold => 6, votes => 11, winner => 'VANILLA', winvotes => 7 },
+  { threshold => 6, votes => 11, winner => 'VANILLA', winvotes => 7 },
 'Topcount from saved subset topcount TopCountMajority also gives winner info'
 );
 
 is_deeply(
   $VC1->EvaluateTopCountMajority($tc2),
-  { thresshold => 6, votes => 11, winner => 'VANILLA', winvotes => 7 },
+  { threshold => 6, votes => 11, winner => 'VANILLA', winvotes => 7 },
 'repeat last set with EvaluateTopCountMajority for same results'
 );
 

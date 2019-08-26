@@ -6,6 +6,7 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
+  Storable: '0'
   Test::More: '0.98'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -18,6 +19,7 @@ meta-spec:
 name: Data-Transmute
 requires:
   Exporter: '5.57'
+  Log::ger: '0.027'
   perl: '5.010001'
   strict: '0'
   warnings: '0'
@@ -25,7 +27,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Transmute
   homepage: https://metacpan.org/release/Data-Transmute
   repository: git://github.com/perlancar/perl-Data-Transmute.git
-version: '0.030'
+version: '0.034'
 x_Dist_Zilla:
   perl:
     version: '5.028002'

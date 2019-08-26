@@ -2,7 +2,7 @@ package Test2::Harness::UI::Controller::Runs;
 use strict;
 use warnings;
 
-our $VERSION = '0.000006';
+our $VERSION = '0.000014';
 
 use Data::GUID;
 use Test2::Harness::UI::Response qw/resp error/;
@@ -29,7 +29,7 @@ sub handle {
 
     my $p = $req->parameters;
 
-    my $a = {order_by => { -desc => [qw/added status project_id version/]}};
+    my $a = {order_by => { -desc => [qw/added status project_id/]}};
 
     my $runs = $schema->resultset('Run')->search(undef, {page => $page, rows => $size, order_by => { -desc => 'added'}});
 

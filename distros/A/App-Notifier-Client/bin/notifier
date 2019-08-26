@@ -22,7 +22,7 @@ notifier
 
 =head1 VERSION
 
-version 0.0301
+version 0.0302
 
 =head1 DESCRIPTION
 
@@ -31,10 +31,6 @@ This command line application sends an event to the notifier service.
 =head1 NAME
 
 notifier -- A command line client for the HTTP L<App::Notifier::Service>.
-
-=head1 VERSION
-
-version 0.0301
 
 =head1 USAGE
 

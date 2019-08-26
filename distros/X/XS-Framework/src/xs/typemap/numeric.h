@@ -5,8 +5,8 @@
 namespace xs {
 
 template <class TYPE> struct TypemapNumeric : TypemapBase<TYPE> {
-    static inline TYPE in  (pTHX_ SV* arg)                    { return detail::_getnum<TYPE>(arg); }
-    static inline Sv   out (pTHX_ TYPE var, const Sv& = Sv()) { return Simple(var); }
+    static inline TYPE in  (SV* arg)                    { return detail::_getnum<TYPE>(arg); }
+    static inline Sv   out (TYPE var, const Sv& = Sv()) { return Simple(var); }
 };
 
 template <> struct Typemap<char>                : TypemapNumeric<char>               {};
@@ -23,8 +23,8 @@ template <> struct Typemap<float>               : TypemapNumeric<float>         
 template <> struct Typemap<double>              : TypemapNumeric<double>             {};
 
 template <> struct Typemap<bool> : TypemapBase<bool> {
-    static inline Sv   out (pTHX_ bool var, const Sv& = {}) { return Simple(var); }
-    static inline bool in  (pTHX_ Sv arg)                   { return arg.is_true(); }
+    static inline Sv   out (bool var, const Sv& = {}) { return Simple(var); }
+    static inline bool in  (Sv arg)                   { return arg.is_true(); }
 };
 
 }

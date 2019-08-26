@@ -6,6 +6,10 @@ Home page:    <https://metacpan.org/release/Test-FITesque-RDF>
 Bug tracker:  <https://github.com/kjetilk/p5-test-fitesque-rdf/issues>
 Maintainer:   Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>
 
+0.012	2019-08-26	Passing URIs as parameters
+
+ - Added: If the object of a parameter is a IRI, pass a URI object.
+
 0.011	2019-08-03	Implement regular expressions for stateful tests
 
  - Added: Improve documentation.

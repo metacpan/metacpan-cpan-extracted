@@ -8,7 +8,8 @@ WriteMakefile(
 	MIN_PERL_VERSION  => '5.20.0',
 	LICENSE           => 'agpl_3',
 	PREREQ_PM         => {
-		qw/Cpanel::JSON::XS 0/,
+		qw/Cpanel::JSON::XS 0
+		   List::Util       1.44/,
 	},
 	TEST_REQUIRES     => {
 		qw/File::Slurper  0

@@ -12,11 +12,11 @@ Pg::Explain::Node - Class representing single node from query plan
 
 =head1 VERSION
 
-Version 0.80
+Version 0.81
 
 =cut
 
-our $VERSION = '0.80';
+our $VERSION = '0.81';
 
 =head1 SYNOPSIS
 
@@ -210,7 +210,7 @@ Object constructor.
 
 sub new {
     my $class = shift;
-    my $self = bless {}, $class;
+    my $self  = bless {}, $class;
 
     my %args;
     if ( 0 == scalar @_ ) {

@@ -19,10 +19,9 @@ no_index:
     - t
     - inc
 requires:
-  DBD::Pg: '0'
   Geoffrey: '0.000103'
   Readonly: '0'
   Test::Exception: '0'
   perl: '5.016'
-version: '0.000200'
+version: '0.000202'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

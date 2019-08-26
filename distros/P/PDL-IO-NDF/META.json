@@ -5,7 +5,7 @@
       "Douglas Burke <dburke@cfa.harvard.edu>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4229",
    "license" : [
       "perl_5"
    ],
@@ -36,7 +36,7 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "http://github.com/Starlink/perl-PDL-IO-NDF/tree/master",
+      "homepage" : "https://github.com/Starlink/perl-PDL-IO-NDF",
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
@@ -44,6 +44,6 @@
          "url" : "git://github.com/Starlink/perl-PDL-IO-NDF.git"
       }
    },
-   "version" : "1.05",
+   "version" : "1.06",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

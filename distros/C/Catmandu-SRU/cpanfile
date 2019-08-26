@@ -1,14 +1,15 @@
 requires 'perl', 'v5.10.1';
 
 on 'test', sub {
-  requires 'Test::Simple', '1.001003';  # Core
-  requires 'Test::More', '1.001003';    # Core
   requires 'Test::Exception';
+  requires 'Test::HTTP::LocalServer';
+  requires 'Test::More', '1.001003';    # Core
   requires 'Test::Pod';
+  requires 'Test::Simple', '1.001003';  # Core
   requires 'XML::XPath', '1.13';
 };
 
-requires 'Catmandu', '>=1.000';
+requires 'Catmandu', '>=1.20';
 requires 'Catmandu::MODS','0.31';
 requires 'Cpanel::JSON::XS', '3.0213';    # implied by Catmandu
 requires 'YAML::XS', '0.34';    # implied by Catmandu

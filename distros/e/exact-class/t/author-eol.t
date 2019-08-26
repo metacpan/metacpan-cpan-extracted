@@ -25,7 +25,9 @@ my @files = (
     't/author-pod-coverage.t',
     't/author-pod-syntax.t',
     't/author-portability.t',
+    't/author-synopsis.t',
     't/basic.t',
+    't/prop_inherit.t',
     't/release-kwalitee.t',
     't/role.t'
 );

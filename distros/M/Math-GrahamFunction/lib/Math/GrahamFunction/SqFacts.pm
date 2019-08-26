@@ -1,5 +1,5 @@
 package Math::GrahamFunction::SqFacts;
-$Math::GrahamFunction::SqFacts::VERSION = '0.02002';
+$Math::GrahamFunction::SqFacts::VERSION = '0.02003';
 use strict;
 use warnings;
 
@@ -14,15 +14,15 @@ sub _initialize
     my $self = shift;
     my $args = shift;
 
-    if ($args->{n})
+    if ( $args->{n} )
     {
-        $self->n($args->{n});
+        $self->n( $args->{n} );
 
         $self->_calc_sq_factors();
     }
-    elsif ($args->{factors})
+    elsif ( $args->{factors} )
     {
-        $self->factors($args->{factors});
+        $self->factors( $args->{factors} );
     }
     else
     {
@@ -36,46 +36,47 @@ sub _initialize
 sub clone
 {
     my $self = shift;
-    return __PACKAGE__->new({'factors' => [@{$self->factors()}]});
+    return __PACKAGE__->new( { 'factors' => [ @{ $self->factors() } ] } );
 }
 
 sub _calc_sq_factors
 {
     my $self = shift;
 
-    $self->factors($self->_get_sq_facts($self->n()));
+    $self->factors( $self->_get_sq_facts( $self->n() ) );
 
     return 0;
 }
 
-my %gsf_cache = (1 => []);
+my %gsf_cache = ( 1 => [] );
 
 sub _get_sq_facts
 {
     my $self = shift;
-    my $n = shift;
+    my $n    = shift;
 
-    if (exists($gsf_cache{$n}))
+    if ( exists( $gsf_cache{$n} ) )
     {
         return $gsf_cache{$n};
     }
 
     my $start_from = shift || 2;
 
-    for(my $p=$start_from; ;$p++)
+    for ( my $p = $start_from ; ; ++$p )
     {
-        if ($n % $p == 0)
+        if ( $n % $p == 0 )
         {
             # This function is recursive to make better use of the Memoization
             # feature.
-            my $division_factors = $self->_get_sq_facts(($n / $p), $p);
-            if (@$division_factors && ($division_factors->[0] == $p))
+            my $division_factors = $self->_get_sq_facts( ( $n / $p ), $p );
+            if ( @$division_factors && ( $division_factors->[0] == $p ) )
             {
-                return ($gsf_cache{$n} = [ @{$division_factors}[1 .. $#$division_factors] ]);
+                return ( $gsf_cache{$n} =
+                        [ @{$division_factors}[ 1 .. $#$division_factors ] ] );
             }
             else
             {
-                return ($gsf_cache{$n} = [ $p, @$division_factors ]);
+                return ( $gsf_cache{$n} = [ $p, @$division_factors ] );
             }
         }
     }
@@ -97,11 +98,8 @@ sub mult_by
     my $n_ref = shift;
     my $m_ref = shift;
 
-    my @n = @{$n_ref->factors()};
-    my @m =
-    eval {
-        @{$m_ref->factors()};
-    };
+    my @n = @{ $n_ref->factors() };
+    my @m = eval { @{ $m_ref->factors() }; };
     if ($@)
     {
         print "Hello\n";
@@ -109,14 +107,14 @@ sub mult_by
 
     my @ret = ();
 
-    while (scalar(@n) && scalar(@m))
+    while ( scalar(@n) && scalar(@m) )
     {
-        if ($n[0] == $m[0])
+        if ( $n[0] == $m[0] )
         {
             shift(@n);
             shift(@m);
         }
-        elsif ($n[0] < $m[0])
+        elsif ( $n[0] < $m[0] )
         {
             push @ret, shift(@n);
         }
@@ -127,7 +125,7 @@ sub mult_by
     }
     push @ret, @n, @m;
 
-    $n_ref->factors(\@ret);
+    $n_ref->factors( \@ret );
 
     # 0 for success
     return 0;
@@ -148,15 +146,15 @@ sub mult
 sub is_square
 {
     my $self = shift;
-    return (scalar(@{$self->factors()}) == 0);
+    return ( scalar( @{ $self->factors() } ) == 0 );
 }
 
 
 sub exists
 {
-    my ($self, $factor) = @_;
+    my ( $self, $factor ) = @_;
 
-    return defined(List::Util::first { $_ == $factor } @{$self->factors()});
+    return defined( List::Util::first { $_ == $factor } @{ $self->factors() } );
 }
 
 
@@ -174,7 +172,7 @@ sub product
 {
     my $self = shift;
 
-    return (List::Util::reduce { $a * $b } @{$self->factors()});
+    return ( List::Util::reduce { $a * $b } @{ $self->factors() } );
 }
 
 
@@ -200,11 +198,7 @@ Math::GrahamFunction::SqFacts - a squaring factors vector.
 
 =head1 VERSION
 
-version 0.02002
-
-=head1 VERSION
-
-version 0.02002
+version 0.02003
 
 =head1 WARNING!
 
@@ -279,7 +273,7 @@ Shlomi Fish <shlomif@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Shlomi Fish.
+This software is Copyright (c) 2019 by Shlomi Fish.
 
 This is free software, licensed under:
 
@@ -288,7 +282,7 @@ This is free software, licensed under:
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/math-grahamfunction/issues>
+L<https://github.com/shlomif/perl-math-grahamfunction/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -397,8 +391,8 @@ The code is open to the world, and available for you to hack on. Please feel fre
 with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
 from your repository :)
 
-L<https://github.com/shlomif/math-grahamfunction>
+L<https://github.com/shlomif/perl-math-grahamfunction>
 
-  git clone https://bitbucket.org/shlomif/perl-math-grahamfunction/
+  git clone git://github.com/shlomif/perl-math-grahamfunction.git
 
 =cut

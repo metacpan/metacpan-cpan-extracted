@@ -8,7 +8,7 @@ use lib '.';
 use strict;
 use warnings;
 
-use XML::RSS;
+use XML::RSS ();
 
 my $rss = XML::RSS->new;
 $rss->parsefile(shift);

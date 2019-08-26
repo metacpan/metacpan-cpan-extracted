@@ -4,7 +4,7 @@ use warnings;
 use Module::Pluggable::Object;
 use Test::More ();
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 my $USE_OK = sub {
     eval "use $_[0];"; ## no critic
@@ -391,7 +391,7 @@ more tests, all options
 =head1 REPOSITORY
 
 Test::AllModules is hosted on github
-<http://github.com/bayashi/Test-AllModules>
+L<http://github.com/bayashi/Test-AllModules>
 
 
 =head1 AUTHOR

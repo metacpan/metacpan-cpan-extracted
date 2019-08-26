@@ -3,7 +3,6 @@ use lib qw(t lib);
 use strict;
 use Test;
 use TestConfig;
-use Data::Dumper;
 
 plan(tests => 2);
 

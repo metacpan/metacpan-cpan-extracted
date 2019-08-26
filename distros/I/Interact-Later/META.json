@@ -56,7 +56,7 @@
    "provides" : {
       "Interact::Later" : {
          "file" : "lib/Interact/Later.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -65,7 +65,7 @@
          "url" : "git://gitlab.com/smonff/interact-later.git"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_authority" : "cpan:SMONFF",
    "x_contributors" : [
       "Sébastien Feugère <smonff@riseup.net>"

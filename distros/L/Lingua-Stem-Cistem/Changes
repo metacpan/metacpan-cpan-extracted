@@ -1,5 +1,9 @@
 Revision history for Lingua::Stem::Cistem
 
+0.03  2019-08-24 16:06:07 CEST
+
+        - improved docs
+
 0.02  2019-08-20 13:22:30 CEST
 
         - new option keep_ge_prefix

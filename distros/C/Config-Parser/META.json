@@ -22,7 +22,7 @@
    "provides" : {
       "Config::Parser" : {
          "file" : "lib/Config/Parser.pm",
-         "version" : "1.00"
+         "version" : "1.03"
       },
       "Config::Parser::Ini" : {
          "file" : "lib/Config/Parser/Ini.pm",
@@ -37,5 +37,5 @@
          "web" : "http://git.gnu.org.ua/cgit/config-parser.git/"
       }
    },
-   "version" : "1.00"
+   "version" : "1.03"
 }

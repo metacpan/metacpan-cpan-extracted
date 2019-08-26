@@ -4,7 +4,7 @@
       "malishew <malishew@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -40,7 +40,6 @@
             "Module::Load" : "0",
             "Moo" : "0",
             "Readonly" : "0",
-            "Storable" : "0",
             "Types::Standard" : "0",
             "perl" : "5.010001"
          }
@@ -59,5 +58,6 @@
          "url" : "https://github.com/Humanstate/p5-dbix-result-convert-jsonschema"
       }
    },
-   "version" : "0.03"
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

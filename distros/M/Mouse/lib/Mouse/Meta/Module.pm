@@ -287,7 +287,7 @@ sub DESTROY{
     # clean up mortal anonymous class stuff
 
     # @ISA is a magical variable, so we must clear it manually.
-    @{$self->{superclasses}} = () if exists $self->{superclasses};
+    @{$self->{superclasses}} = () if exists $self->{superclasses} && scalar(@{$self->{superclasses}}) > 0;
 
     # Then, clear the symbol table hash
     %{$self->namespace} = ();
@@ -311,7 +311,7 @@ Mouse::Meta::Module - The common base class of Mouse::Meta::Class and Mouse::Met
 
 =head1 VERSION
 
-This document describes Mouse version v2.5.7
+This document describes Mouse version v2.5.9
 
 =head1 DESCRIPTION
 

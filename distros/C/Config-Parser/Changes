@@ -1,4 +1,13 @@
 Revision history for Perl extension Config::Parser
 
+1.03  Fri Aug 23 14:44:18 2019
+	- implement the BOOLEAN data type
+
+1.02  Thu Aug 22 09:47:42 2019
+	- use mro to track descendant classes
+
+1.01  Wed Aug 21 20:41:47 2019
+	- runs on perl 5.16.1
+
 1.00  Tue Aug 20 16:35:44 2019
 	- initial release

@@ -23,7 +23,7 @@ my %WriteMakefileArgs = (
     "String::Validator::Password" => "2.01",
     "String::Validator::Phone::NANP" => "2.00"
   },
-  "VERSION" => "2.02",
+  "VERSION" => "2.03",
   "test" => {
     "TESTS" => "t/*.t"
   }

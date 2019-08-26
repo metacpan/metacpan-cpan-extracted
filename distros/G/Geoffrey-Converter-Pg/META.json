@@ -32,7 +32,6 @@
       },
       "runtime" : {
          "requires" : {
-            "DBD::Pg" : "0",
             "Geoffrey" : "0.000103",
             "Readonly" : "0",
             "Test::Exception" : "0",
@@ -46,6 +45,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.000200",
+   "version" : "0.000202",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

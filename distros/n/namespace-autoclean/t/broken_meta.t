@@ -16,7 +16,7 @@ use Test::More 0.88;
 
 {
     package Foo;
-    use base 'OldMoose';
+    our @ISA = ('OldMoose');
     sub bar { }
     use namespace::autoclean;
     sub moo { }

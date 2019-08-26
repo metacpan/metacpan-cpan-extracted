@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Test::More;
-use Test::Requires { 'Mouse' => '()' };
+use Test::Needs 'Mouse';
 use Module::Runtime 'require_module';
 
 use lib 'xt/lib';

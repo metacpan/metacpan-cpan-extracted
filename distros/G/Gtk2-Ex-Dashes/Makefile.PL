@@ -1,6 +1,6 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -w
 
-# Copyright 2010 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2014, 2015 Kevin Ryde
 
 # This file is part of Gtk2-Ex-Dashes.
 #
@@ -21,15 +21,13 @@ use 5.008;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
-use lib 'inc';
-use MyMakeMakerExtras;
 
-MyMakeMakerExtras::WriteMakefile
-  (NAME         => 'Gtk2-Ex-Dashes',
+WriteMakefile
+  (NAME         => 'Gtk2::Ex::Dashes',
    ABSTRACT     => 'Widget drawing a line of dashes.',
    VERSION_FROM => 'lib/Gtk2/Ex/Dashes.pm',
-   AUTHOR       => 'Kevin Ryde <user42@zip.com.au>',
-   LICENSE      => 'gpl',
+   AUTHOR       => 'Kevin Ryde <user42_kevin@yahoo.com.au>',
+   LICENSE      => 'gpl_3',
    SIGN         => 1,
    MIN_PERL_VERSION => '5.008',
 
@@ -40,16 +38,20 @@ MyMakeMakerExtras::WriteMakefile
                     'Gtk2' => 0, # any version should be ok
                    },
 
-   META_MERGE
-   => { resources
-        => { homepage => 'http://user42.tuxfamily.org/gtk2-ex-dashes/index.html' },
-        optional_features
-        => { maximum_tests
-             => { description => 'Have "make test" do as much as possible.',
-                  requires => { 'Test::Weaken' => 3,
-                                'Test::Weaken::Gtk2' => 0,
-                              },
-                },
-           },
-      },
+   META_MERGE =>
+   { resources =>
+     { homepage => 'http://user42.tuxfamily.org/gtk2-ex-dashes/index.html',
+       license  => 'http://www.gnu.org/licenses/gpl.html',
+     },
+     no_index => { directory=>['devel','xt'] },
+
+     prereqs =>
+     { test =>
+       { suggests =>
+         { 'Test::Weaken' => 3,
+           'Test::Weaken::Gtk2' => 0,
+         },
+       },
+     },
+   },
   );

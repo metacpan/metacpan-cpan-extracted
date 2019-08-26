@@ -1,5 +1,8 @@
 package DBIx::Result::Convert::JSONSchema;
 
+our $VERSION = '0.04';
+
+
 =head1 NAME
     DBIx::Result::Convert::JSONSchema - Convert DBIx result schema to JSON schema
 
@@ -12,16 +15,14 @@ package DBIx::Result::Convert::JSONSchema;
 
 =head1 VERSION
 
-    0.03
+    0.04
 
 =head1 SYNOPSIS
 
     use DBIx::Result::Convert::JSONSchema;
 
-    my $SchemaConvert = DBIx::Result::Convert::JSONSchema->new(
-        schema => _DBIx::Class::Schema_
-    );
-    my $json_schema = $SchemaConvert->get_json_schema( _DBIx::Class::ResultSource_ );
+    my $SchemaConvert = DBIx::Result::Convert::JSONSchema->new( schema => Schema );
+    my $json_schema = $SchemaConvert->get_json_schema( DBIx::Class::ResultSource );
 
 =head1 DESCRIPTION
 
@@ -37,14 +38,12 @@ Note, relations between tables are not taken in account!
 
 =cut
 
+
 use Moo;
-use Types::Standard qw/ :all /;
+use Types::Standard qw/ InstanceOf Enum HashRef /;
 
 use Carp;
 use Module::Load qw/ load /;
-use Storable qw/ dclone /;
-
-our $VERSION = '0.03';
 
 
 has schema => (
@@ -102,13 +101,22 @@ has pattern_map => (
     isa     => HashRef,
     lazy    => 1,
     default  => sub {
-        my ( $self ) = @_;
         return {
-            date      => '^\d{4}-\d{2}-\d{2}$',
             time      => '^\d{2}:\d{2}:\d{2}$',
             year      => '^\d{4}$',
             datetime  => '^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$',
             timestamp => '^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$',
+        };
+    }
+);
+
+has format_map => (
+    is      => 'rw',
+    isa     => HashRef,
+    lazy    => 1,
+    default  => sub {
+        return {
+            date => 'date',
         };
     }
 );
@@ -119,12 +127,17 @@ has pattern_map => (
 Returns somewhat equivalent JSON schema based on DBIx result source name.
 
     my $json_schema = $converted->get_json_schema( 'TableSource', {
+        schema_declaration              => 'http://json-schema.org/draft-04/schema#',
         decimals_to_pattern             => 1,
         has_schema_property_description => 1,
         allow_additional_properties     => 0,
         overwrite_schema_property_keys  => {
             name    => 'cat',
             address => 'dog',
+        },
+        add_schema_properties           => {
+            address => { ... },
+            bank_account => '#/definitions/bank_account',
         },
         overwrite_schema_properties     => {
             name => {
@@ -134,13 +147,26 @@ Returns somewhat equivalent JSON schema based on DBIx result source name.
                 type     => 'number',
             },
         },
+        include_required   => [ qw/ street city / ],
         exclude_required   => [ qw/ name address / ],
         exclude_properties => [ qw/ mouse house / ],
+
+        dependencies => {
+            first_name => [ qw/ middle_name last_name / ],
+        },
     });
 
 Optional arguments to change how JSON schema is generated:
 
 =over 8
+
+=item * schema_declaration
+
+Declare which version of the JSON Schema standard that the schema was written against.
+
+L<https://json-schema.org/understanding-json-schema/reference/schema.html>
+
+B<Default>: "http://json-schema.org/schema#"
 
 =item * decimals_to_pattern
 
@@ -151,7 +177,7 @@ B<Default>: 0
 
 =item * has_schema_property_description
 
-Generates very basic schema description fields e.g. 'Optional numeric type value for field context e.g. 1'.
+Generate schema description for fields e.g. 'Optional numeric type value for field context e.g. 1'.
 
 B<Default>: 0
 
@@ -185,41 +211,56 @@ ArrayRef of database column names which should always be INCLUDED in REQUIRED sc
 
 ArrayRef of database column names which should be excluded from JSON schema AT ALL
 
+=item * dependencies
+
+L<https://json-schema.org/understanding-json-schema/reference/object.html#property-dependencies>
+
+=item * add_schema_properties
+
+HashRef of custom schema properties that must be included in final definition
+Note that custom properties will overwrite defaults
+
 =item * schema_overwrite
 
 HashRef of top level schema properties e.g. 'required', 'properties' etc. to overwrite
 
 =back
 
-
 =cut
 
 sub get_json_schema {
     my ( $self, $source, $args ) = @_;
-    $args = dclone( $args // {} );
 
     croak 'missing schema source' unless $source;
 
-    # additional schema generation options
-    my $decimals_to_pattern             = delete $args->{decimals_to_pattern};
-    my $has_schema_property_description = delete $args->{has_schema_property_description};
-    my $allow_additional_properties     = delete $args->{allow_additional_properties}    // 0;
-    my $overwrite_schema_property_keys  = delete $args->{overwrite_schema_property_keys} // {};
-    my $overwrite_schema_properties     = delete $args->{overwrite_schema_properties}    // {};
-    my %exclude_required                = map { $_ => 1 } @{ delete $args->{exclude_required}   || [] };
-    my %include_required                = map { $_ => 1 } @{ delete $args->{include_required}   || [] };
-    my %exclude_properties              = map { $_ => 1 } @{ delete $args->{exclude_properties} || [] };
+    $args //= {};
 
-    my $schema_overwrite                = delete $args->{schema_overwrite} // {};
+    # additional schema generation options
+    my $decimals_to_pattern             = $args->{decimals_to_pattern};
+    my $has_schema_property_description = $args->{has_schema_property_description};
+    my $overwrite_schema_property_keys  = $args->{overwrite_schema_property_keys} // {};
+    my $add_schema_properties           = $args->{add_schema_properties};
+    my $overwrite_schema_properties     = $args->{overwrite_schema_properties} // {};
+    my %exclude_required                = map { $_ => 1 } @{ $args->{exclude_required} || [] };
+    my %include_required                = map { $_ => 1 } @{ $args->{include_required} || [] };
+    my %exclude_properties              = map { $_ => 1 } @{ $args->{exclude_properties} || [] };
+
+    my $dependencies                = $args->{dependencies};
+    my $schema_declaration          = $args->{schema_declaration} // 'http://json-schema.org/schema#';
+    my $allow_additional_properties = $args->{allow_additional_properties} // 0;
+    my $schema_overwrite            = $args->{schema_overwrite} // {};
 
     my %json_schema = (
+        '$schema'            => $schema_declaration,
         type                 => 'object',
-        additionalProperties => $allow_additional_properties,
         required             => [],
         properties           => {},
+        additionalProperties => $allow_additional_properties,
+
+        ( $dependencies ? ( dependencies => $dependencies ) : () ),
     );
 
-    my $source_info = $self->_get_column_info($source);
+    my $source_info = $self->_get_column_info( $source );
 
     SCHEMA_COLUMN:
     foreach my $column ( keys %{ $source_info } ) {
@@ -236,24 +277,27 @@ sub get_json_schema {
 
         $json_schema{properties}->{ $column }->{type} = $json_type;
 
+        # DBIx schema type -> JSON format
+        my $format_type = $self->format_map->{ $column_info->{data_type} };
+        if ( $format_type ) {
+            $json_schema{properties}->{ $column }->{format} = $format_type;
+        }
+
         # DBIx schema size constraint -> JSON schema size constraint
-        if ( $self->length_map->{ $column_info->{data_type} } ) {
+        if ( ! $format_type && $self->length_map->{ $column_info->{data_type} } ) {
             $self->_set_json_schema_property_range( \%json_schema, $column_info, $column );
         }
 
         # DBIx schema required -> JSON schema required
-        if ( $include_required{ $column } ) {
-            my $required_property = $overwrite_schema_property_keys->{ $column } // $column;
-            push @{ $json_schema{required} }, $required_property;
-        }
-        elsif ( ! $source_info->{ $column }->{default_value} && ! $source_info->{ $column }->{is_nullable} && ! $exclude_required{ $column } ) {
+        my $is_required_field = $include_required{ $column };
+        if ( $is_required_field || ( ! $column_info->{default_value} && ! $column_info->{is_nullable} && ! $exclude_required{ $column } ) ) {
             my $required_property = $overwrite_schema_property_keys->{ $column } // $column;
             push @{ $json_schema{required} }, $required_property;
         }
 
         # DBIx schema defaults -> JSON schema defaults (no refs e.g. current_timestamp)
-        if ( $source_info->{ $column }->{default_value} && ! ref $source_info->{ $column }->{default_value} ) {
-            $json_schema{properties}->{ $column }->{default} = $source_info->{ $column }->{default_value};
+        if ( $column_info->{default_value} && ! ref $column_info->{default_value} ) {
+            $json_schema{properties}->{ $column }->{default} = $column_info->{default_value};
         }
 
         # DBIx schema list -> JSON enum list
@@ -261,8 +305,8 @@ sub get_json_schema {
             $json_schema{properties}->{ $column }->{enum} = $column_info->{extra}->{list};
         }
 
-        # Consider 'is nullable' to accept 'null' values in all cases
-        if ( $source_info->{ $column }->{is_nullable} ) {
+        # Consider 'is nullable' to accept 'null' values in all cases where field is not explicitly required
+        if ( ! $is_required_field && $column_info->{is_nullable} ) {
             if ( $json_type eq 'enum' ) {
                 $json_schema{properties}->{ $column }->{enum} //= [];
                 push @{ $json_schema{properties}->{ $column }->{enum} }, 'null';
@@ -292,6 +336,13 @@ sub get_json_schema {
                 $json_schema{properties}->{ $column }
             );
             $json_schema{properties}->{ $column }->{description} = $property_description;
+        }
+
+        # JSON schema custom additional properties
+        if ( $add_schema_properties ) {
+            foreach my $property_key ( keys %{ $add_schema_properties } ) {
+                $json_schema{properties}->{ $property_key } = $add_schema_properties->{ $property_key };
+            }
         }
 
         # Overwrites: merge JSON schema property key values with custom ones

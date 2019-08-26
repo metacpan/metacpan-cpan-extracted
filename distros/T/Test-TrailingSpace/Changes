@@ -1,3 +1,7 @@
+0.0302  2019-08-23
+    - Now at https://github.com/shlomif/perl-test-trailingspace
+    - Convert to https://metacpan.org/pod/Dist::Zilla::PluginBundle::SHLOMIF
+
 0.0301  2016-11-01
     - Skip "sample-data" in t/dogfood.t .
         - It made it fail some time in parallel tests:

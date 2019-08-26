@@ -22,6 +22,7 @@ my @files = (
     't/author-pod-coverage.t',
     't/author-pod-syntax.t',
     't/author-portability.t',
+    't/author-synopsis.t',
     't/module.t',
     't/release-kwalitee.t'
 );

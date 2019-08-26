@@ -4,7 +4,8 @@ use Test::More;
 use Data::Dumper;
 
 use Text::CleanFragment;
-use utf8;
+use utf8;
+
 binmode DATA, ':utf8';
 my @tests = map { s!\s+$!!g; [split /\|/] } grep {!/^\s*#/ && /\S/} <DATA>;
 
@@ -14,6 +15,7 @@ push @tests, ["","",'Empty String'];
 push @tests, ["\x{5317}\x{4EB0}\n",  # those are the Chinese characters for Beijing, according to Sean M. Burke
               'Bei_Jing', '(Some) Chinese characters also work'];
 push @tests, ["Do p\x{00FC}t <this> into URL's?","Do_put_this_into_URLs",'Synopsis'];
+push @tests, ["Do\x{A0}nonbreaking\x{A0}spaces\x{A0}work?","Do_nonbreaking_spaces_work",'nbsp'];
 
 plan tests => 1+@tests*3;
 
@@ -27,7 +29,8 @@ for (@tests) {
 
 is_deeply [clean_fragment(
     'Lenny', 'Motörhead'
-)], ['Lenny','Motorhead'], "Multiple arguments also work";
+)], ['Lenny','Motorhead'], "Multiple arguments also work";
+
 __DATA__
 Grégory|Gregory
    Leading Spaces|Leading_Spaces

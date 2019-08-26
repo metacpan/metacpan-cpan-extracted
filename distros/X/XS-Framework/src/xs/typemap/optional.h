@@ -6,13 +6,13 @@ namespace xs {
 
 // typemap for optional<T>
 template <class TYPE> struct Typemap<panda::optional<TYPE>> : Typemap<TYPE> {
-    static panda::optional<TYPE> in (pTHX_ SV* arg) {
+    static panda::optional<TYPE> in (SV* arg) {
         if (!SvOK(arg)) return {};
-        return Typemap<TYPE>::in(aTHX_ arg);
+        return Typemap<TYPE>::in(arg);
     }
-    static Sv out (pTHX_ const panda::optional<TYPE>& var, const Sv& = {}) {
+    static Sv out (const panda::optional<TYPE>& var, const Sv& = {}) {
         if (!var) return Sv::undef;
-        return Typemap<TYPE>::out(aTHX_ *var);
+        return Typemap<TYPE>::out(*var);
     }
 };
 
@@ -51,12 +51,12 @@ private:
 };
 
 template <class TYPE> struct Typemap<nn<TYPE>> : Typemap<TYPE> {
-    static TYPE in (pTHX_ SV* arg) {
-        auto ret = Typemap<TYPE>::in(aTHX_ arg);
+    static TYPE in (SV* arg) {
+        auto ret = Typemap<TYPE>::in(arg);
         if (!ret) throw "invalid value: undef not allowed";
         return ret;
     }
-    static Sv out (pTHX_ TYPE& var, const Sv& = {}) = delete;
+    static Sv out (TYPE& var, const Sv& = {}) = delete;
 };
 
 }

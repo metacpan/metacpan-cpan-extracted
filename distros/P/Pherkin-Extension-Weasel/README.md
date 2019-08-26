@@ -3,9 +3,11 @@
 
 Pherkin::Extension::Weasel - Pherkin extension for web-testing
 
+[![Build Status](https://travis-ci.org/perl-weasel/pherkin-extension-weasel.svg?branch=master)](https://travis-ci.org/perl-weasel/pherkin-extension-weasel)
+
 # VERSION
 
-0.11
+0.13
 
 # SYNOPSIS
 

@@ -2,6 +2,5 @@
 # http://search.cpan.org/~miyagawa/Module-CPANfile/lib/cpanfile.pod
 
 requires "perl", "5.008";
-requires "Errno", "5.0050063";
 requires "Test::Most", "0.30";
 requires "Test::Differences", "0.60";

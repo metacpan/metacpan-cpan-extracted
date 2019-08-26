@@ -788,6 +788,8 @@ q|<select name='TestTest'>
         result => '-1' },
 );
 
+1;
+
 __END__
 
 =head1 NAME

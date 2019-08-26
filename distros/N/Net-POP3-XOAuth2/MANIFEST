@@ -1,0 +1,11 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Net/POP3/XOAuth2.pm
+minil.toml
+t/00_compile.t
+META.yml
+MANIFEST

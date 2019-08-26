@@ -1,0 +1,212 @@
+#!/pro/bin/perl
+
+# xls2csv: Convert Microsoft Excel spreadsheet to CSV
+#	   (m)'19 [02-02-2019] Copyright H.M.Brand 2016-2019
+
+require 5.008001;
+
+use strict;
+use warnings;
+
+our $VERSION = "3.5";
+(my $cmd = $0) =~ s{.*/}{};
+
+use Text::CSV_XS;
+use Spreadsheet::Read qw( ReadData row );
+
+sub usage {
+    my $err = shift and select STDERR;
+    print "usage: $cmd [-A [-N | -J c] | -o file.csv] [-s sep] [-f] [-i] file.xls\n";
+    print "       $cmd --help | --man | --info\n";
+    print "    -A    --all     Export all sheets      (filename-sheetname.csv)\n";
+    print "    -N    --no-pfx  No filene prefix on -A (sheetname.csv)\n";
+    print "    -J s  --join=s  Use s to join filename-sheetname (-)\n";
+    print "    -o f  --out=f   Set output filename\n";
+    print "    -i f  --in=f    Set infut  filename\n";
+    print "    -f    --force   Force overwrite output if exists\n";
+    print "    -s s  --sep=s   Set CSV separator character\n";
+    print "Unless -A is used, all other options are passed on to xlscat\n";
+    @_ and print join "\n", @_, "";
+    exit $err;
+    } # usage
+
+use Getopt::Long qw( :config bundling noignorecase passthrough );
+GetOptions (
+    "help|?"    => sub { usage 0; },
+    "V|version" => sub { print "$cmd [$VERSION]\n"; exit 0; },
+    "man"       => sub { exec "pod2man $0 | nroff -man"; },
+    "info"      => sub { require Pod::Usage;
+			 Pod::Usage::pod2usage (VERBOSE => 2);
+			 exit;
+			 },
+
+    "o|c|out=s" => \ my $csv,
+    "i|s|in=s"	=> \ my $xls,
+    "f|force!"  => \ my $opt_f,
+
+    "s|sep=s"	=> \ my $opt_s,
+
+    "A|all!"    => \ my $opt_A,
+    "N|no-pfx!" => \ my $opt_N,
+    "J|join=s"	=> \(my $opt_J = "-"),
+    ) or usage 1;
+
+unless ($xls) {
+    foreach my $i (reverse 0 .. $#ARGV) {
+	-f $ARGV[$i] or next;
+	$xls = splice @ARGV, $i, 1;
+	last;
+	}
+    }
+
+   $xls or usage 1, "No input file";
+-r $xls or usage 1, "Input file unreadable";
+-s $xls or usage 1, "Input file empty";
+
+my %e = (n => "\n", t => "\t", e => "\e", r => "\r");
+$opt_s and $opt_s =~ s/\\+([nter])/$e{$1}/g;
+
+if ($opt_A) {
+    my $ss = ReadData ($xls)  or die "Cannot read/parse $xls\n";
+    $csv and $xls = $csv;
+    $xls =~ s/\.(csv|xlsx?)$//i;
+    $csv = Text::CSV_XS->new ({ binary => 1, auto_diag => 1, eol => "\r\n" });
+    $opt_s and $csv->sep_char ($opt_s);
+    foreach my $si (1 .. $ss->[0]{sheets}) {
+	my $s  = $ss->[$si]   or next;
+		 $s->{maxcol} or next;
+	my $mr = $s->{maxrow} or next;
+	my $sn = $s->{label} || "sheet-$si";
+	   $sn =~ s/\s+$//;
+	   $sn =~ s/^\s+//;
+	   $sn =~ s/[^-\w.]+/_/g; # remove any special chars from worksheet name
+	my $fn = $opt_N ? "$sn.csv" : "$xls$opt_J$sn.csv";
+	-f $fn && !$opt_f and die "$fn already exists\n";
+	warn "Saving sheet to $fn ...\n";
+	open my $fh, ">:encoding(utf-8)", $fn or die "$fn: $!\n";
+	$csv->print ($fh, [ row ($s, $_) ]) for 1 .. $mr;
+	close $fh;
+	}
+    exit;
+    }
+
+$csv or ($csv = $xls) =~ s/\.xlsx?$/.csv/i;
+if (-f $csv) {
+    $opt_f or die "$csv already exists\n";
+    unlink $csv;
+    }
+
+warn "Converting $xls to $csv ...\n";
+open STDOUT, ">", $csv or die "$csv: $!\n";
+$^O eq "MSWin32" and $xls = qq{"$xls"};
+$opt_s and unshift @ARGV, "--sep=$opt_s";
+exec { "xlscat" } "xlscat", "-c", @ARGV, $xls;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+   xlsx2csv - convert spreadsheet to CSV(s)
+
+=head1 SYNOPSIS
+
+   xlsx2csv [ -A [ -N || -J str ] | -o file.csv ] [-f] [-i] file.xls
+   xlsx2csv   --help | --man | --info
+
+=head1 DESCRIPTION
+
+Convert a spreadsheet (all formats supported by L<Spreadsheet::Read>) to CSV
+(using L<Text::CSV_XS>).
+
+=head1 OPTIONS
+
+=over
+
+=item -?
+
+=item --help
+
+Print short usage and exit.
+
+=item --man
+
+Print this help using nroff and exit.
+
+=item --info
+
+Print this help and exit.
+
+=item -V
+
+=item --version
+
+Print the version and exit.
+
+=item -f
+
+=item --force
+
+Overwrite existing output file.
+
+=item -A
+
+=item --all
+
+Output data from all sheets.
+
+Each sheet will go to extra file with name built from output CSV-file and
+sheet name.
+
+=item -N
+
+=item --no-pfx
+
+If specified, dump all will not use output CSV-file but sheet name only.
+
+=item -J str
+
+=item --join=str
+
+If specified, output file names under C<-A> will join on C<str> instead of
+the default C<->.
+
+=item -o CSV-file
+
+=item -c CSV-file
+
+=item --out=CSV-file
+
+Output file name (used only with C<< --all >> and without C<< --no-pfx >>).
+
+Default value is derived from XLS-file.
+
+=item -i XLS-file
+
+=item -s XLS-file
+
+=item --in=XLS-file
+
+Allows to specify input xls file.
+
+Default: Last ARGUMENT file that exists.
+
+=back
+
+=head1 SEE ALSO
+
+L<Spreadsheet::Read>, L<Text::CSV_XS>, L<xlscat>
+
+=head1 AUTHOR
+
+H.Merijn Brand, <h.m.brand@xs4all.nl>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2016-2019 H.Merijn Brand
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

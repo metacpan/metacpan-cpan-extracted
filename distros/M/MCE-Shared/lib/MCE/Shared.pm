@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized once );
 
-our $VERSION = '1.844';
+our $VERSION = '1.845';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitSubroutinePrototypes)
@@ -448,7 +448,7 @@ MCE::Shared - MCE extension for sharing data supporting threads and processes
 
 =head1 VERSION
 
-This document describes MCE::Shared version 1.844
+This document describes MCE::Shared version 1.845
 
 =head1 SYNOPSIS
 
@@ -1788,7 +1788,7 @@ modded internally in a round-robin fashion.
 =item start
 
 Starts the shared-manager process. This is done automatically unless Perl
-lacks L<IO::FDPass>, needed to share C<condvar> or C<queue> while the
+lacks L<IO::FDPass>, needed to share C<condvar> and C<queue> while the
 shared-manager is running.
 
  MCE::Shared->start();
@@ -1796,9 +1796,12 @@ shared-manager is running.
 =item stop
 
 Stops the shared-manager process, wiping all shared data content. This is
-called by the C<END> block automatically when the script terminates.
+called by the C<END> block automatically when the script terminates. However,
+do stop explicitly to reap the shared-manager process before exec'ing.
 
  MCE::Shared->stop();
+
+ exec('command');
 
 =back
 

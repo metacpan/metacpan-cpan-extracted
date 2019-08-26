@@ -14,6 +14,8 @@ use lib ();
 
 use XT::Files;
 
+delete $ENV{XT_FILES_DEFAULT_CONFIG_FILE};
+
 use constant CLASS => 'XT::Files';
 
 note('new with config');

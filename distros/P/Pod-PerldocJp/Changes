@@ -1,5 +1,9 @@
 Revision history for Pod-PerldocJp
 
+0.20 2019/08/25
+  - changed to fetch pod from https://perldoc.jp by defautl
+    (patched by AnaTofuZ++)
+
 0.19 2017/02/06
   - fixed -F option (patched by robario++)
 

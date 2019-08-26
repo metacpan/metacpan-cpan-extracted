@@ -10,7 +10,7 @@ use strict;
 use threads (
     'yield',
     'stringify',
-    'stack_size' => 16 * 4096,
+    'stack_size' => 131076,
     'exit' => 'threads_only',
 );
 use threads::shared;
@@ -21,6 +21,8 @@ use Getopt::Long;
 use Sys::CPU;
 
 # use Data::Dumper::Simple;$Data::Dumper::Sortkeys=1; $Data::Dumper::Purity=1; $Data::Dumper::Deepcopy=1;
+
+our $VERSION = '6.31';
 
 my $dev      = 0;
 my $psize    = 1;
@@ -56,7 +58,7 @@ our $STAMP = sprintf('%.1', time);
 
 my $F = Graphics::Framebuffer->new('FB_DEVICE' => "/dev/fb$dev", 'SHOW_ERRORS' => 0, 'ACCELERATED' => !$noaccel, 'SPLASH' => 0, 'RESET' => TRUE);
 
-$SIG{'QUIT'} = $SIG{'INT'} = $SIG{'KILL'} = \&finish;
+$SIG{'HUB'} = $SIG{'QUIT'} = $SIG{'INT'} = $SIG{'KILL'} = $SIG{'TERM'} = \&finish;
 
 my $sinfo = $F->screen_dimensions();
 $F->cls('OFF');
@@ -100,6 +102,7 @@ foreach my $file (@files) {
             $F
         )
     );
+    last unless($RUNNING);
 }
 foreach my $tt (@th_images) {
     my $image = $tt->join();
@@ -235,7 +238,7 @@ my @order : shared = (
 #    'Color Replace Clipped',
     'Blitting',
 #    'Blit Move',
-#    'Rotate',
+    'Rotate',
 #    'Flipping',
     'Monochrome',
 #    'XOR Mode Drawing',
@@ -251,12 +254,14 @@ my @order : shared = (
     'Animated',
 );
 
-my @th;
-foreach my $thr (0 .. $threads) {
-    $th[$thr] = threads->create(\&run_thread,$thr,$dev);
-}
-foreach my $t (@th) {
-    $t->join();
+if ($RUNNING) {
+    my @th;
+    foreach my $thr (0 .. $threads) {
+        $th[$thr] = threads->create(\&run_thread,$thr,$dev);
+    }
+    foreach my $t (@th) {
+        $t->join();
+    }
 }
 
 ##################################
@@ -292,9 +297,11 @@ sub load_image {
     my $F    = shift;
 
     local $SIG{'ALRM'} = undef;
-    local $SIG{'INT'}  = sub { threads->exit(); };
-    local $SIG{'QUIT'} = sub { threads->exit(); };
-    local $SIG{'KILL'} = sub { threads->exit(); };
+    local $SIG{'INT'}  = sub { $F->text_mode(); threads->exit(); };
+    local $SIG{'QUIT'} = sub { $F->text_mode(); threads->exit(); };
+    local $SIG{'KILL'} = sub { $F->text_mode(); threads->exit(); };
+    local $SIG{'TERM'} = sub { $F->text_mode(); threads->exit(); };
+    local $SIG{'HUP'}  = sub { $F->text_mode(); threads->exit(); };
 
     print_it($F,"Loading Image > $file", '00FFFFFF', undef, 1);
 
@@ -319,9 +326,11 @@ sub run_thread {
     my $F = Graphics::Framebuffer->new('FB_DEVICE' => "/dev/fb$dev", 'SHOW_ERRORS' => 0, 'ACCELERATED' => !$noaccel, 'SPLASH' => 0, 'RESET' => TRUE);
 
     local $SIG{'ALRM'} = undef;
-    local $SIG{'INT'}  = sub { threads->exit(); };
-    local $SIG{'QUIT'} = sub { threads->exit(); };
-    local $SIG{'KILL'} = sub { threads->exit(); };
+    local $SIG{'INT'}  = sub { $F->text_mode(); threads->exit(); };
+    local $SIG{'QUIT'} = sub { $F->text_mode(); threads->exit(); };
+    local $SIG{'KILL'} = sub { $F->text_mode(); threads->exit(); };
+    local $SIG{'TERM'} = sub { $F->text_mode(); threads->exit(); };
+    local $SIG{'HUP'}  = sub { $F->text_mode(); threads->exit(); };
 
     while (scalar(@order) && $RUNNING) {
         $|=1;
@@ -1516,7 +1525,7 @@ sub animated {
                             $fps++;
                             my $end = time - $start;
                             if ($end >= 1 && $bench) {
-                                print STDERR "\r", sprintf('%.03f FPS', (1 / $end) * $fps);
+                                print STDERR chr(27) . '[0;0H', sprintf('%.03f FPS', (1 / $end) * $fps);
                                 $|     = 1;
                                 $fps   = 0;
                                 $start = time;
@@ -1723,7 +1732,7 @@ This script demonstrates the capabilities of the Graphics::Framebuffer module
 
 =head1 SYNOPSIS
 
- perl primitives.pl [--dev=device number] [--x=X emulated resolution] [--y=Y emulated resolution] [--pixel=pixel size] [--noaccel]
+ perl threaded_primitives.pl [--dev=device number] [--x=X emulated resolution] [--y=Y emulated resolution] [--pixel=pixel size] [--noaccel]
 
 =over 2
 
@@ -1733,9 +1742,9 @@ Examples:
 
 =over 4
 
- perl primitives.pl --dev=1 --x=640 --y=480
+ perl primitives.pl --dev=1
 
- perl primitives.pl --x=1280 --y=720 --pixel=2
+ perl primitives.pl --pixel=2
 
 =back
 
@@ -1746,18 +1755,6 @@ Examples:
 =item B<--dev>=C<device number>
 
 By default, it uses "/dev/fb0", but you can tell it to use any framebuffer device number.  Only the number 0 - 31 is needed here.
-
-=item B<--x>=C<width>
-
-This tells the script to tell the Graphics::Framebuffer module to simulate a device of a specific width.  It will center it on the screen.
-
- "--x=800" would set the width to 800 pixels.
-
-=item B<--y>=C<height>
-
-This tells the script to tell the Graphics::Framebuffer module to simulate a device of a specific height.  It will center it on the screen.
-
- "--y=480" would set the height to 480 pixels.
 
 =item B<--pixel>=C<pixel size>
 

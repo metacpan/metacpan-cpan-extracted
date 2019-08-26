@@ -6,6 +6,11 @@ use feature qw /postderef signatures/;
 package Vote::Count::Matrix;
 use Moose;
 
+with  'Vote::Count::TieBreaker',
+      'Vote::Count::Approval',
+      'Vote::Count::Borda',      
+      'Vote::Count::Log';
+
 use Vote::Count::RankCount;
 
 no warnings 'experimental';
@@ -19,13 +24,13 @@ use Sort::Hash;
 
 use YAML::XS;
 
-our $VERSION='0.021';
+our $VERSION='0.022';
 
 =head1 NAME
 
 Vote::Count::Matrix
 
-=head1 VERSION 0.021
+=head1 VERSION 0.022
 
 =cut
 
@@ -50,14 +55,31 @@ has Active => (
   lazy    => 1,
 );
 
+has TieBreakMethod => (
+  is  => 'rw',
+  isa => 'Str',
+  required => 0,
+  default => 'none',
+);
+
 sub _buildActive ( $self ) {
   return $self->BallotSet->{'choices'};
 }
 
-sub _conduct_pair ( $ballotset, $A, $B ) {
-  my $ballots = $ballotset->{'ballots'};
+sub _untie ( $I, $A, $B ) {
+  my @untie = $I->TieBreaker(
+    $I->TieBreakMethod(),
+    $I->Active(),
+    $A, $B );
+  return $untie[0] if ( scalar(@untie) == 1 );
+  return 0;
+}
+
+sub _conduct_pair ( $I, $A, $B ) {
+  my $ballots = $I->BallotSet()->{'ballots'};
   my $countA  = 0;
   my $countB  = 0;
+  $I->logv( "Pairing: $A vs $B");
 FORVOTES:
   for my $b ( keys $ballots->%* ) {
     for my $v ( values $ballots->{$b}{'votes'}->@* ) {
@@ -79,18 +101,33 @@ FORVOTES:
     'loser'  => '',
     'margin' => abs( $countA - $countB )
   );
-  if ( $countA == $countB ) {
+  my $diff = $countA - $countB;
+  # 0 : $countA == $countB 
+  if ( $diff == 0 ) {
+    my $untied = $I->_untie( $A, $B );
+    if ( $untied ) { 
+      $diff =  1 if $untied eq $A;
+      $diff = -1 if $untied eq $B;
+    }
+  }
+  if ( $diff == 0 ) {    
     $retval{'winner'} = '';
     $retval{'tie'}    = 1;
   }
-  elsif ( $countA > $countB ) {
+  # $diff > 0 A won or won tiebreaker.
+  elsif ( $diff > 0 ) {
     $retval{'winner'} = $A;
     $retval{'loser'}  = $B;
   }
-  elsif ( $countB > $countA ) {
+  # $diff < 0 B won or won tiebreaker.  
+  elsif ( $diff < 0 ) {
     $retval{'winner'} = $B;
     $retval{'loser'}  = $A;
   }
+  if ( $retval{'winner'}) {
+      $I->logv( "Winner: $retval{'winner'} ($A: $countA $B: $countB)");
+    }
+  else { $I->logv( "Tie $A: $countA $B: $countB") } 
   return \%retval;
 }
 
@@ -102,7 +139,7 @@ sub BUILD {
   while ( scalar(@choices) ) {
     my $A = shift @choices;
     for my $B (@choices) {
-      my $result = Vote::Count::Matrix::_conduct_pair( $ballotset, $A, $B );
+      my $result = $self->_conduct_pair( $A, $B );    
       # Each result has two hash keys so it can be found without
       # having to try twice or sort the names for a single key.
       $results->{$A}{$B} = $result;
@@ -110,6 +147,8 @@ sub BUILD {
     }
   }
   $self->{'Matrix'} = $results;
+  $self->logt( "# Matrix", $self->MatrixTable() );
+  $self->logv( "# Pairing Results", $self->PairingVotesTable() );
 }
 
 sub ScoreMatrix ( $self ) {
@@ -295,10 +334,10 @@ sub ScoreTable ( $self ) {
   return generate_markdown_table( rows => \@rows );
 }
 
-# options may later be used to add rankcount objects
-# from Borda, approval, and topcount.
 sub MatrixTable ( $self, $options = {} ) {
   my @header = ( 'Choice', 'Wins', 'Losses', 'Ties' );
+  # this option was never fully implemented, it shows what the
+  # structure would be if one were or if I finished the feature.
   my $o_topcount = defined $options->{'topcount'}
     ? $options->{'topcount'} : 0;
   push @header, 'Top Count' if $o_topcount;
@@ -308,7 +347,7 @@ sub MatrixTable ( $self, $options = {} ) {
     my $wins   = 0;
     my $ties   = 0;
     my $losses = 0;
-    my $topcount = $o_topcount ? $options->{'topcount'}{$A} : 0;
+    my $topcount = $o_topcount ? $options->{'topcount'} : 0;
   MTNEWROW:
     for my $B (@active) {
       if ( $A eq $B ) { next MTNEWROW }
@@ -340,10 +379,10 @@ sub PairingVotesTable ( $self ) {
       my $CVote = $self->{'Matrix'}{$Choice}{$Opponent}{$Choice};
       my $OVote = $self->{'Matrix'}{$Choice}{$Opponent}{$Opponent};
       if ($self->{'Matrix'}{$Choice}{$Opponent}{'winner'} eq $Choice ) {
-        $Cstr = "*$Cstr*";
+        $Cstr = "**$Cstr**";
       }
       if ($self->{'Matrix'}{$Choice}{$Opponent}{'winner'} eq $Opponent ) {
-        $Ostr = "*$Ostr*";
+        $Ostr = "**$Ostr**";
       }
       push @rows, [ ' ', $Cstr, $CVote, $Ostr, $OVote ];
     }
@@ -392,6 +431,11 @@ Defaults to rcv. Currently rcv is the only type supported. In the future the Mat
 =head3 Active (optional)
 
 A hash reference with active choices as the keys. The default value is all of the choices defined in the BallotSet.
+
+
+=head3 Logging (optional)
+
+Has the logging methods of Vote::Count::Log.
 
 
 =head1 Methods

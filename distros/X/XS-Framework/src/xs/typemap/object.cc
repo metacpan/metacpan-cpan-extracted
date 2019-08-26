@@ -23,7 +23,7 @@ static bool destroy_hook (pTHX_ SV* sv) {
     return TRUE;
 }
 
-void init (pTHX) {
+void init () {
     Stash stash("XS::Framework", GV_ADD);
 
     fake_dtor      = newCONSTSUB(stash, "__FAKE_DTOR", newSViv(0));

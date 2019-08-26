@@ -1,3 +1,14 @@
+0.81	- 25 Aug 2019, H.Merijn Brand
+    * It's 2019
+    * Allow -c + --sep in xlscat
+    * Add --sep= to xls2csv for -A
+    * Add xlsx2csv to distribution (xlsx2csv has -A)
+    * Add -J s / --join str to xlsx2csv
+    * Add cpanfile
+    * Add explicit documentation about formatted vs unformatted
+    * Improve ->new behavior
+    * Auto-detect fallback for CSV now includes '|' for sep_char (PR#26)
+
 0.80	- 31 Dec 2018, H.Merijn Brand
     * Raise Spreadsheet::ParseXLSX minimum version to 0.24
     * Improve docs on attributes
@@ -11,7 +22,7 @@
     * Allow source from command line option in xls2csv (PRC, Branislav Zahradnik)
     * Allow --in-sep=tab in xlscat/xlsgrep
     * Add --hash to xlscat/xlsgrep
-    * Help and usage for examples/xls2csv PR#23)
+    * Help and usage for examples/xls2csv (PR#23)
 
 0.78	- 29 Jan 2018, H.Merijn Brand
     * Spreadsheet::ParseExcel supports the active flag as of version 0.61

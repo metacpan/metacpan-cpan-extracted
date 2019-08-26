@@ -1,7 +1,7 @@
 requires "DateTime" => "0";
 requires "DateTime::Duration" => "0";
 requires "Time::Crontab" => "0";
-requires "perl" => "5.012";
+requires "perl" => "5.014";
 requires "strict" => "0";
 requires "warnings" => "0";
 
@@ -11,14 +11,13 @@ on 'test' => sub {
   requires "IPC::Open3" => "0";
   requires "Test::More" => "0";
   requires "Test::Most" => "0";
-  requires "blib" => "1.01";
   requires "constant" => "0";
-  requires "perl" => "5.012";
+  requires "perl" => "5.014";
 };
 
 on 'configure' => sub {
   requires "ExtUtils::MakeMaker" => "0";
-  requires "perl" => "5.012";
+  requires "perl" => "5.014";
 };
 
 on 'develop' => sub {

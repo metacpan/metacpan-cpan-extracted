@@ -1,5 +1,6 @@
 use Test::More;
 use Test::Exception;
+use FindBin;
 
 use Linux::Capabilities;
 

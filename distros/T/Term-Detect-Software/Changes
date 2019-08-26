@@ -1,13 +1,26 @@
-Revision history for Term-Detect-Software
+0.221   2019-08-18  Released-By: PERLANCAR; Urgency: low
 
-0.21    2015-01-03 (PERLANCAR)
+	- No functional changes.
+
+	- [doc] Update doc to list 'st' as one of the supported terminal
+	  emulators detected.
+
+
+0.220   2019-08-18  Released-By: PERLANCAR; Urgency: medium
+
+	- Detect st (terminal emulation software from suckless.org).
+
+	- [doc] Fix POD typo.
+
+
+0.21    2015-01-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Rebuild (Generate TODO.md).
 
 
-0.20    2014-12-06 (PERLANCAR)
+0.20    2014-12-06  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -15,7 +28,7 @@ Revision history for Term-Detect-Software
 	  OSPrereqs directive with a single one [GH#1].
 
 
-0.19    2014-12-05 (PERLANCAR)
+0.19    2014-12-05  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -23,21 +36,21 @@ Revision history for Term-Detect-Software
 	  Proc::Find::Parents.
 
 
-0.18    2014-11-22 (PERLANCAR)
+0.18    2014-11-22  Released-By: PERLANCAR
 
 	- Set emulator_{engine,software} keys to '' when failing to detect
 	  running under terminal, for convenience (no need to check for
 	  definedness).
 
 
-0.17    2014-07-01 (SHARYANTO)
+0.17    2014-07-01  Released-By: SHARYANTO
 
         - No functional changes.
 
         - Add some more OSPrereqs's for midnightbsd, netbsd, gnukfreebsd [CT].
 
 
-0.16    2014-06-09 (SHARYANTO)
+0.16    2014-06-09  Released-By: SHARYANTO
 
         - No functional changes.
 
@@ -46,25 +59,25 @@ Revision history for Term-Detect-Software
           installable on Windows).
 
 
-0.15    2014-04-10 (SHARYANTO)
+0.15    2014-04-10  Released-By: SHARYANTO
 
         - Require SHARYANTO::Proc::Util.
 
         - Add debug info in result.
 
 
-0.14    2014-01-23 (SHARYANTO)
+0.14    2014-01-23  Released-By: SHARYANTO
 
         - Detect running under Emacs (M-x shell) and turn off box_chars if so.
 
 
-0.13    2014-01-18 (SHARYANTO)
+0.13    2014-01-18  Released-By: SHARYANTO
 
         - No functional changes. Remove mention of 'pstree' command because
           that's up to get_parent_processes()'s implementation.
 
 
-0.12    2013-11-08 (SHARYANTO)
+0.12    2013-11-08  Released-By: SHARYANTO
 
         - Use 'tput colors' as last resort (e.g. for TERM=screen under
           screen/tmux).
@@ -72,64 +85,64 @@ Revision history for Term-Detect-Software
         - Set color depth for xfce4 as 16 instead of 256.
 
 
-0.11    2013-10-10 (SHARYANTO)
+0.11    2013-10-10  Released-By: SHARYANTO
 
         - Detect dumb terminal (e.g. CGI environment) vs Windows command prompt.
 
 
-0.10    2013-09-28 (SHARYANTO)
+0.10    2013-09-28  Released-By: SHARYANTO
 
         - Detect cygwin.
 
         - Fix box_chars setting of windows.
 
 
-0.09    2013-09-28 (SHARYANTO)
+0.09    2013-09-28  Released-By: SHARYANTO
 
         - Rename dist from Term-Detect to Term-Detect-Software and document its
           raison d'être (to respond to a CPAN Ratings review by DOLMEN).
 
 
-0.08    2013-09-25 (SHARYANTO)
+0.08    2013-09-25  Released-By: SHARYANTO
 
         - Add detect_terminal_cached().
 
 
-0.07    2013-09-10 (SHARYANTO)
+0.07    2013-09-10  Released-By: SHARYANTO
 
         - Skip parent process heuristics on Windows because it currently uses
           get_parent_processes() (which uses 'pstree'). BTW, I'm in the process
           of trying to make Text::ANSITable work on Windows.
 
 
-0.06    2013-06-26 (SHARYANTO)
+0.06    2013-06-26  Released-By: SHARYANTO
 
         - No functional changes. Second attempt: 'use experimental "smartmatch"'
           must be given after 'use warnings'.
 
 
-0.05    2013-06-26 (SHARYANTO)
+0.05    2013-06-26  Released-By: SHARYANTO
 
         - No functional changes. Add 'use experimental "smartmatch"' for 5.18+.
 
 
-0.04    2013-05-09 (SHARYANTO)
+0.04    2013-05-09  Released-By: SHARYANTO
 
         - Split pstree parsing to its own module (SHARYANTO::Proc::Util), avoid
           using pstree -s option because it's not supported in older version.
 
 
-0.03    2013-05-03 (SHARYANTO)
+0.03    2013-05-03  Released-By: SHARYANTO
 
         - No functional changes. Avoid perl undef warning.
 
 
-0.02    2013-05-03 (SHARYANTO)
+0.02    2013-05-03  Released-By: SHARYANTO
 
         - Return terminal emulator information (software, color depth, unicode,
           etc).
 
 
-0.01    2013-03-21 (SHARYANTO)
+0.01    2013-03-21  Released-By: SHARYANTO
 
         - First release.

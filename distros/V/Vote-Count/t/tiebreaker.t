@@ -52,5 +52,59 @@ subtest 'Modified GrandJunction TieBreaker' => sub {
   is ( $s4->{'winner'}, 'SUZIEQ', 'a tiebreaker that went down 3 levels');
 };
 
+subtest 'object tiebreakers' => sub {
+  my $active = {
+    PISTACHIO => 0,
+    ROCKYROAD => 0,
+    CHOCOLATE => 0,
+    VANILLA => 0,
+  };
+  my $I5 = Vote::Count->new(
+  BallotSet => read_ballots('t/data/irvtie.txt'));
+  my @resolve1 = sort $I5->TieBreaker(
+    'all', $active, ( 'VANILLA', 'CHOCOLATE' ) );
+  is_deeply(
+    \@resolve1,
+    [ 'CHOCOLATE', 'VANILLA'],
+    'All returns both tied choices' );
+  my @resolve2 = sort $I5->TieBreaker(
+    'borda', $active,
+    ( 'VANILLA', 'CHOCOLATE' ) );
+  is_deeply(
+    \@resolve2,
+    [ 'CHOCOLATE'],
+    'Borda returns choice that won' );
+  my @resolve3 = sort
+    $I5->TieBreaker( 'borda_all', $active, ( 'VANILLA', 'CHOCOLATE' ) );
+  is_deeply(
+    \@resolve3,
+    [ 'VANILLA'],
+    'borda_all returns choice that won (different winner than borda on active!)' );
+  my @resolve4 = sort
+    $I5->TieBreaker( 'approval', $active, ( 'VANILLA', 'CHOCOLATE' ) );
+  is_deeply(
+    \@resolve4,
+    [ 'CHOCOLATE', 'VANILLA'],
+    'approval returns a tie for the top2' );
+  my @resolve5 = sort
+    $I5->TieBreaker( 'approval', $active, ( 'VANILLA', 'ROCKYROAD' ) );
+  is_deeply(
+    \@resolve5,
+    [ 'VANILLA'],
+    'approval winner for a non-tied pair' );
+
+  my @resolve6 = sort
+    $I5->TieBreaker( 'grandjunction', $active, ( 'VANILLA', 'ROCKYROAD' ) );
+  is_deeply(
+    \@resolve6,
+    [ 'VANILLA'],
+    'modified grand junction' );
+
+  my @resolve7 = $I5->TieBreaker( 'none', $active, ( 'VANILLA', 'ROCKYROAD' ) );
+  is(
+    @resolve7,
+    0,
+    'None, returnes an empty array.' );    
+};
+
 done_testing();
-=pod

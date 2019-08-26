@@ -274,11 +274,11 @@ namespace xs {
     struct Typemap<panda::function<Ret(Args...)>> : TypemapBase<panda::function<Ret(Args...)>> {
         using Func = panda::function<Ret(Args...)>;
 
-        static inline Func in (pTHX_ const Sub& sub) {
+        static inline Func in (const Sub& sub) {
             return sub2function<Ret(Args...)>(sub);
         }
 
-        static inline Sv out (pTHX_ const Func& f, const Sv& = {}) {
+        static inline Sv out (const Func& f, const Sv& = {}) {
             if (!f) return Sv::undef;
             return Ref::create(function2sub(f));
         }

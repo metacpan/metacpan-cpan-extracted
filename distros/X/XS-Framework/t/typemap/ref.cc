@@ -38,45 +38,45 @@ namespace {
 
 namespace xs {
     template<> struct Typemap<RefOnly&> : TypemapBase<RefOnly&> {
-        static RefOnly& in  (pTHX_ const Simple& arg)          { static RefOnly r(""); r.s = arg.as_string() + "iR&"; return r; }
-        static Sv       out (pTHX_ RefOnly& v, const Sv& = {}) { return Simple(v.s + "oR&"); }
+        static RefOnly& in  (const Simple& arg)          { static RefOnly r(""); r.s = arg.as_string() + "iR&"; return r; }
+        static Sv       out (RefOnly& v, const Sv& = {}) { return Simple(v.s + "oR&"); }
     };
 
     template<> struct Typemap<ValOnly> : TypemapBase<ValOnly> {
-        static ValOnly in  (pTHX_ const Simple& arg)                { return ValOnly(arg.as_string() + "iV"); }
-        static Sv      out (pTHX_ const ValOnly& v, const Sv& = {}) { return Simple(v.s + "oV"); }
+        static ValOnly in  (const Simple& arg)                { return ValOnly(arg.as_string() + "iV"); }
+        static Sv      out (const ValOnly& v, const Sv& = {}) { return Simple(v.s + "oV"); }
     };
 
     template<> struct Typemap<RefAndVal> : TypemapBase<RefAndVal> {
-        static RefAndVal in  (pTHX_ const Simple& arg)                  { return RefAndVal(arg.as_string() + "iRV"); }
-        static Sv        out (pTHX_ const RefAndVal& v, const Sv& = {}) { return Simple(v.s + "oRV"); }
+        static RefAndVal in  (const Simple& arg)                  { return RefAndVal(arg.as_string() + "iRV"); }
+        static Sv        out (const RefAndVal& v, const Sv& = {}) { return Simple(v.s + "oRV"); }
     };
     template<> struct Typemap<RefAndVal&> : TypemapBase<RefAndVal&> {
-        static RefAndVal& in  (pTHX_ const Simple& arg)            { static RefAndVal r(""); r.s = arg.as_string() + "iRV&"; return r; }
-        static Sv         out (pTHX_ RefAndVal& v, const Sv& = {}) { return Simple(v.s + "oRV&"); }
+        static RefAndVal& in  (const Simple& arg)            { static RefAndVal r(""); r.s = arg.as_string() + "iRV&"; return r; }
+        static Sv         out (RefAndVal& v, const Sv& = {}) { return Simple(v.s + "oRV&"); }
     };
 
     template<> struct Typemap<PtrOnly*> : TypemapBase<PtrOnly*> {
-        static PtrOnly* in  (pTHX_ const Simple& arg)          { static PtrOnly r("");  r.s = arg.as_string() + "iP*"; return &r; }
-        static Sv       out (pTHX_ PtrOnly* v, const Sv& = {}) { return Simple(v->s + "oP*"); }
+        static PtrOnly* in  (const Simple& arg)          { static PtrOnly r("");  r.s = arg.as_string() + "iP*"; return &r; }
+        static Sv       out (PtrOnly* v, const Sv& = {}) { return Simple(v->s + "oP*"); }
     };
 
     template<> struct Typemap<PtrAndVal> : TypemapBase<PtrAndVal> {
-        static PtrAndVal in  (pTHX_ const Simple& arg)                  { return PtrAndVal(arg.as_string() + "iPV"); }
-        static Sv        out (pTHX_ const PtrAndVal& v, const Sv& = {}) { return Simple(v.s + "oPV"); }
+        static PtrAndVal in  (const Simple& arg)                  { return PtrAndVal(arg.as_string() + "iPV"); }
+        static Sv        out (const PtrAndVal& v, const Sv& = {}) { return Simple(v.s + "oPV"); }
     };
     template<> struct Typemap<PtrAndVal*> : TypemapBase<PtrAndVal*> {
-        static PtrAndVal* in  (pTHX_ const Simple& arg)            { static PtrAndVal r("");  r.s = arg.as_string() + "iPV*"; return &r; }
-        static Sv         out (pTHX_ PtrAndVal* v, const Sv& = {}) { return Simple(v->s + "oPV*"); }
+        static PtrAndVal* in  (const Simple& arg)            { static PtrAndVal r("");  r.s = arg.as_string() + "iPV*"; return &r; }
+        static Sv         out (PtrAndVal* v, const Sv& = {}) { return Simple(v->s + "oPV*"); }
     };
 
     template<> struct Typemap<RefAndPtr&> : TypemapBase<RefAndPtr&> {
-        static RefAndPtr& in  (pTHX_ const Simple& arg)            { static RefAndPtr r(""); r.s = arg.as_string() + "iRP&"; return r; }
-        static Sv         out (pTHX_ RefAndPtr& v, const Sv& = {}) { return Simple(v.s + "oRP&"); }
+        static RefAndPtr& in  (const Simple& arg)            { static RefAndPtr r(""); r.s = arg.as_string() + "iRP&"; return r; }
+        static Sv         out (RefAndPtr& v, const Sv& = {}) { return Simple(v.s + "oRP&"); }
     };
     template<> struct Typemap<RefAndPtr*> : TypemapBase<RefAndPtr*> {
-        static RefAndPtr* in  (pTHX_ const Simple& arg)            { static RefAndPtr r("");  r.s = arg.as_string() + "iRP*"; return &r; }
-        static Sv         out (pTHX_ RefAndPtr* v, const Sv& = {}) { return Simple(v->s + "oRP*"); }
+        static RefAndPtr* in  (const Simple& arg)            { static RefAndPtr r("");  r.s = arg.as_string() + "iRP*"; return &r; }
+        static Sv         out (RefAndPtr* v, const Sv& = {}) { return Simple(v->s + "oRP*"); }
     };
 }
 

@@ -1,0 +1,83 @@
+{
+   "abstract" : "A lean authoring tool",
+   "author" : [
+      "Leon Timmermans"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Banshee version 0.001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Banshee",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Archive::Tar" : "0",
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Merge" : "0",
+            "CPAN::Meta::Prereqs::Filter" : "0",
+            "CPAN::Upload::Tiny" : "0.009",
+            "Exporter" : "5.57",
+            "File::Path" : "0",
+            "File::Slurper" : "0",
+            "File::Spec::Functions" : "0",
+            "File::Temp" : "0",
+            "File::chdir" : "0",
+            "Getopt::Long" : "0",
+            "Git::Wrapper" : "0",
+            "JSON::PP" : "0",
+            "Module::Load" : "0",
+            "Module::Metadata" : "0",
+            "Parse::CPAN::Meta" : "0",
+            "Text::Diff" : "0",
+            "Text::Patch" : "0",
+            "perl" : "5.008",
+            "version" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.89"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Banshee" : {
+         "file" : "lib/Dist/Banshee.pm",
+         "version" : "0.001"
+      },
+      "Dist::Banshee::Core" : {
+         "file" : "lib/Dist/Banshee/Core.pm",
+         "version" : "0.001"
+      },
+      "Dist::Banshee::Git" : {
+         "file" : "lib/Dist/Banshee/Git.pm",
+         "version" : "0.001"
+      },
+      "Dist::Banshee::MakeMaker::Simple" : {
+         "file" : "lib/Dist/Banshee/MakeMaker/Simple.pm",
+         "version" : "0.001"
+      },
+      "Dist::Banshee::Meta" : {
+         "file" : "lib/Dist/Banshee/Meta.pm",
+         "version" : "0.001"
+      },
+      "Dist::Banshee::Mint" : {
+         "file" : "lib/Dist/Banshee/Mint.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.001",
+   "x_generated_by_perl" : "v5.24.0",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

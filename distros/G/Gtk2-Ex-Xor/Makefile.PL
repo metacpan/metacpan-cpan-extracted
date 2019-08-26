@@ -1,6 +1,6 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -w
 
-# Copyright 2007, 2008, 2009, 2010, 2011 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016 Kevin Ryde
 
 # This file is part of Gtk2-Ex-Xor.
 #
@@ -21,15 +21,13 @@ use 5.008;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
-use lib 'inc';
-use MyMakeMakerExtras;
 
-MyMakeMakerExtras::WriteMakefile
-  (NAME         => 'Gtk2-Ex-Xor',
+WriteMakefile
+  (NAME         => 'Gtk2::Ex::Xor',
    ABSTRACT     => 'Helpers for Gtk2 widgets.',
    VERSION_FROM => 'lib/Gtk2/Ex/Xor.pm',
-   AUTHOR       => 'Kevin Ryde <user42@zip.com.au>',
-   LICENSE      => 'gpl',
+   AUTHOR       => 'Kevin Ryde <user42_kevin@yahoo.com.au>',
+   LICENSE      => 'gpl_3',
    SIGN         => 1,
    MIN_PERL_VERSION => '5.008',
 
@@ -62,39 +60,21 @@ MyMakeMakerExtras::WriteMakefile
 
    META_MERGE =>
    { resources =>
-     { homepage => 'http://user42.tuxfamily.org/gtk2-ex-xor/index.html' },
+     { homepage => 'http://user42.tuxfamily.org/gtk2-ex-xor/index.html',
+       license  => 'http://www.gnu.org/licenses/gpl.html',
+     },
+
+     # no index "package Gtk2::Bin" adding a private method
+     no_index => { package => [ 'Gtk2::Bin' ],
+                   directory=>['devel','xt','xtools'],
+                 },
+
      optional_features =>
      {
       maximum_interoperation =>
       { description => 'Have maximum inter-operation with other modules (optional other stuff).',
         requires => { 'Locale::Messages' => 0 },
       },
-
-      #             maximum_tests
-      #              => { description => 'Have "make test" do as much as possible.',
-      #                   requires => {
-      #                               },
-      #                 },
-
-      maximum_devel =>
-      { description => 'Stuff used variously for development.',
-        requires => { 'Gtk2::Ex::Dragger'    => 0,
-                      'Gtk2::Ex::TickerView' => 0,
-                      'Devel::FindRef'       => 0,
-                      'Devel::StackTrace'    => '1.19',
-                      'Goo::Canvas'          => 0,
-                      'Gnome2::Canvas'       => 0,
-                    } },
      },
-
-     # use of "package Gtk2::Bin" adding a private method
-     no_index => { package => [ 'Gtk2::Bin' ], },
    },
   );
-
-#------------------------------------------------------------------------------
-package MY;
-sub postamble {
-  my ($makemaker) = @_;
-  return MyMakeMakerExtras::postamble($makemaker);
-}

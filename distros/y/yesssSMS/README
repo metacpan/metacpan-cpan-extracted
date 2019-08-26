@@ -24,7 +24,7 @@ This module requires these other modules and libraries:
  * warnings
  * HTML::Parser
  * LWP::UserAgent
- * HTTML::Cookies
+ * HTML::Cookies
 
 
 COPYRIGHT AND LICENCE

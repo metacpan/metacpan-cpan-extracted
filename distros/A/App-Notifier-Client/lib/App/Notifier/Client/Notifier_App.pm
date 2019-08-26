@@ -1,5 +1,5 @@
 package App::Notifier::Client::Notifier_App;
-$App::Notifier::Client::Notifier_App::VERSION = '0.0301';
+$App::Notifier::Client::Notifier_App::VERSION = '0.0302';
 use strict;
 use warnings;
 
@@ -153,7 +153,7 @@ App::Notifier::Client::Notifier_App
 
 =head1 VERSION
 
-version 0.0301
+version 0.0302
 
 =head1 SYNOPSIS
 
@@ -168,10 +168,6 @@ version 0.0301
 
 App::Notifier::Client::Notifier_App - implements the notifier command-line
 app.
-
-=head1 VERSION
-
-version 0.0301
 
 =head1 FUNCTIONS
 

@@ -28,6 +28,7 @@ my %WriteMakefileArgs = (
   "NAME" => "App::resolvetable",
   "PREREQ_PM" => {
     "Color::ANSI::Util" => "0.161",
+    "Data::Cmp" => "0.002",
     "Data::Sah::Compiler::perl::TH::array" => 0,
     "Data::Sah::Compiler::perl::TH::bool" => 0,
     "Data::Sah::Compiler::perl::TH::str" => 0,
@@ -45,7 +46,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.005",
+  "VERSION" => "0.007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,6 +55,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Color::ANSI::Util" => "0.161",
+  "Data::Cmp" => "0.002",
   "Data::Sah::Compiler::perl::TH::array" => 0,
   "Data::Sah::Compiler::perl::TH::bool" => 0,
   "Data::Sah::Compiler::perl::TH::str" => 0,

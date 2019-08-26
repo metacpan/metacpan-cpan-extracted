@@ -25,10 +25,8 @@ __PACKAGE__->config(
 Then use it in your controllers:
 
 ```perl
-my $chi = $c->model('Cache::geo_ip')->chi();
+my $chi = $c->model('Cache::geo_ip');
 ```
-
-See ["SYNOPSIS" in Curio](https://metacpan.org/pod/Curio#SYNOPSIS) as this SYNOPSIS is based on it.
 
 # DESCRIPTION
 

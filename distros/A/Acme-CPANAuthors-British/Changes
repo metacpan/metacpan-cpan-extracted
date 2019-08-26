@@ -1,6 +1,12 @@
 Revision history for Acme-CPANAuthors-British
 =============================================
 
+1.05    2019-08-25
+        - PR #3 from Mohammad S Anwar
+          https://github.com/barbie/acme-cpanauthors-british/pull/3
+        - PR #4 from Mohammad S Anwar
+          https://github.com/barbie/acme-cpanauthors-british/pull/4
+
 1.04    2019-08-17
         - 7 new authors added.
         - improvements following suggestions from Kratika.io.

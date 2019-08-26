@@ -3,12 +3,14 @@ use warnings;
 no warnings 'uninitialized';
 
 package Form::Diva;
-$Form::Diva::VERSION = '1.01';
+
+our $VERSION='1.02';
+
 # use Data::Printer;
 
 # ABSTRACT: Generate HTML5 form label and input fields
 
-use Storable 2.51 qw(dclone);
+use Storable 3.15 qw(dclone);
 
 # The _option_id sub needs access to a variable for hashing the ids
 # in use, even though it is initialized at the beginning of generate,
@@ -421,7 +423,7 @@ Form::Diva - Generate HTML5 form label and input fields
 
 =head1 VERSION
 
-version 1.01
+version 1.02
 
 =head1 AUTHOR
 

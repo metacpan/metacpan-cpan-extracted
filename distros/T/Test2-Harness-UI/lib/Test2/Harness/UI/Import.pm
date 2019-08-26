@@ -2,7 +2,7 @@ package Test2::Harness::UI::Import;
 use strict;
 use warnings;
 
-our $VERSION = '0.000006';
+our $VERSION = '0.000014';
 
 use DateTime;
 use Data::GUID;
@@ -36,7 +36,7 @@ my %MODES = (
 sub format_stamp {
     my $stamp = shift;
     return undef unless $stamp;
-    return DateTime->from_epoch(epoch => $stamp);
+    return DateTime->from_epoch(epoch => $stamp, time_zone => 'UTC');
 }
 
 sub init {
@@ -105,12 +105,16 @@ sub flush_ready_jobs {
     my $jobs = delete $self->{+READY_JOBS};
     return unless $jobs && @$jobs;
 
-    my @events;
+    my (@events);
 
     my $mode = $self->{+MODE};
 
     for my $job (@$jobs) {
         delete $job->{event_ord};
+
+        my $fields = delete $job->{fields};
+        $job->{fields} = encode_json($fields) if $fields && @$fields;
+
         my $events = delete $job->{events};
 
         next if $mode <= $MODES{summary};
@@ -121,6 +125,8 @@ sub flush_ready_jobs {
 
         for my $event (sort { $a->{event_ord} <=> $b->{event_ord} } values %$events) {
             my $is_diag = delete $event->{is_diag};
+            my $is_harness = delete $event->{is_harness};
+            my $is_time = delete $event->{is_time};
             my $record_event = $record_job || ($mode >= $MODES{qvfd} && $is_diag);
             next unless $record_event;
 
@@ -208,7 +214,8 @@ sub process_event {
     $e->{is_diag} //=
            ($f->{errors} && @{$f->{errors}})
         || ($f->{assert} && !($f->{assert}->{pass} || $f->{amnesty}))
-        || ($f->{info} && grep { $_->{debug} || $_->{important} } @{$f->{info}});
+        || (first { substr($_, 0, 8) eq 'harness_' } keys %$f)
+        || ($f->{info} && first { $_->{debug} || $_->{important} } @{$f->{info}});
 
     my $orphan = $nested ? 1 : 0;
     if (my $p = $params{parent_id}) {
@@ -246,9 +253,8 @@ sub process_event {
     }
 
     $self->update_other($job, $f) if first { $f->{$_} } qw{
-        harness_job harness_job_exit harness_job_start harness_job_launch harness_job_end
-        memory times
-        harness_run
+        harness_job harness_job_exit harness_job_start harness_job_launch
+        harness_job_end harness_job_fields harness_run
     };
 
     return;
@@ -259,8 +265,20 @@ sub update_other {
     my ($job, $f) = @_;
 
     if (my $run_data = $f->{harness_run}) {
+        my $run = $self->{+RUN};
+
         clean($run_data);
-        $self->{+RUN}->update({parameters => $run_data});
+        $run->update({parameters => $run_data});
+
+        if (my $fields = $run_data->{harness_run_fields}) {
+            my $run_id = $run->run_id;
+            my $old = $run->fields;
+            my @new = map { { %{$_}, run_id => $run_id } } @$fields;
+
+            my @merged = ($old ? (@$old) : (), @new);
+
+            $self->{+RUN}->update({fields => encode_json(\@merged)});
+        }
     }
 
     # Handle job events
@@ -296,19 +314,8 @@ sub update_other {
         # All done
         push @{$self->{+READY_JOBS}} => delete $self->{+JOB_BUFFER}->{$job->{job_id}};
     }
-    if (my $memory = $f->{memory}) {
-        $job->{mem_peak}   = $memory->{peak}->[0];
-        $job->{mem_peak_u} = $memory->{peak}->[1];
-        $job->{mem_size}   = $memory->{size}->[0];
-        $job->{mem_size_u} = $memory->{size}->[1];
-        $job->{mem_rss}    = $memory->{rss}->[0];
-        $job->{mem_rss_u}  = $memory->{rss}->[1];
-    }
-    if (my $times = $f->{times}) {
-        $job->{time_user}  = $times->{user};
-        $job->{time_sys}   = $times->{sys};
-        $job->{time_cuser} = $times->{cuser};
-        $job->{time_csys}  = $times->{csys};
+    if (my $job_fields = $f->{harness_job_fields}) {
+        push @{$job->{fields}} => map { { %{$_}, job_id => $job->{job_id} } } @$job_fields;
     }
 }
 

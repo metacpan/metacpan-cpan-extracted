@@ -48,6 +48,7 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
+            "Test::Exception" : "0",
             "Test::More" : "0",
             "perl" : "5.010",
             "strict" : "0",
@@ -64,7 +65,7 @@
          "web" : "https://github.com/ology/Music-Cadence"
       }
    },
-   "version" : "0.0401",
+   "version" : "0.0504",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.027007"
@@ -318,7 +319,9 @@
             "config" : {
                "Dist::Zilla::Plugin::GatherDir" : {
                   "exclude_filename" : [],
-                  "exclude_match" : [],
+                  "exclude_match" : [
+                     "\\.mid"
+                  ],
                   "follow_symlinks" : 0,
                   "include_dotfiles" : 0,
                   "prefix" : "",

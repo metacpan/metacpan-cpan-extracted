@@ -1,0 +1,94 @@
+Proc-ProcessTable-Match
+
+This provides a hand means to construct filters to use to match
+with Proc::ProcessTable for matching Proc::ProcessTable::Process
+objects.
+
+    use Proc::ProcessTable::Match;
+    use Proc::ProcessTable;
+    use Data::Dumper;
+    
+    # looks for a kernel proc with the PID of 0
+    my %args=(
+              checks=>[
+                       {
+                        type=>'PID',
+                        invert=>0,
+                        args=>{
+                               pids=>['0'],
+                               }
+                       },{
+                        type=>'KernProc',
+                        invert=>0,
+                        args=>{
+                               }
+                      }
+                      ]
+                     );
+    
+    # hits on every proc but the idle proc
+    %args=(
+              checks=>[
+                       {
+                        type=>'Idle',
+                        invert=>1,
+                        args=>{
+                               }
+                       }
+                      ]
+                     );
+    
+    my $ppm;
+    eval{
+        $ppm=Proc::ProcessTable::Match->new( \%args );
+    } or die "New failed with...".$@;
+    
+    my $pt = Proc::ProcessTable->new;
+    foreach my $proc ( @{$t->table} ){
+        if ( $ppm->match( $proc ) ){
+            print Dumper( $proc );
+        }
+    }
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Proc::ProcessTable::Match
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Proc-ProcessTable-Match
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Proc-ProcessTable-Match
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Proc-ProcessTable-Match
+
+    Search CPAN
+        https://metacpan.org/release/Proc-ProcessTable-Match
+
+    Repository
+        https://gitea.eesdp.org/vvelox/Proc-ProcessTable-Match
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2019 by Zane C. Bowers-Hadley.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

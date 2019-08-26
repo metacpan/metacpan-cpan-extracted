@@ -1,23 +1,28 @@
-0.120   2018-04-03 (PERLANCAR)
+0.121   2019-07-25  Released-By: PERLANCAR; Urgency: medium
+
+	- Relax regex for module_version a bit, again.
+
+
+0.120   2018-04-03  Released-By: PERLANCAR
 
 	- Relax module_version's regex.
 
 
-0.11    2017-07-10 (PERLANCAR)
+0.11    2017-07-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Really switch from Log::Any to Log::ger.
 
 
-0.10    2017-07-03 (PERLANCAR)
+0.10    2017-07-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Switch from Log::Any to Log::ger.
 
 
-0.09    2016-12-28 (PERLANCAR)
+0.09    2016-12-28  Released-By: PERLANCAR
 
         - list-prereqs, add-prereq: Grok -phase and -relationship/-type in
           Prereqs sections.
@@ -25,24 +30,24 @@
         - [dist] Fix expressing follow-spec prereq relationship with x_spec.
 
 
-0.08    2016-12-27 (PERLANCAR)
+0.08    2016-12-27  Released-By: PERLANCAR
 
 	- list-prereqs: add --module to filter by module name.
 
 
-0.07    2016-10-07 (PERLANCAR)
+0.07    2016-10-07  Released-By: PERLANCAR
 
 	- pdrutil: Add subcommand 'list-prereqs'.
 
 
-0.06    2016-03-03 (PERLANCAR)
+0.06    2016-03-03  Released-By: PERLANCAR
 
 	- sort-prereqs: Fix spacing.
 
 	- sort-prereqs: Add option --spacing to set spacing explicitly.
 
 
-0.05    2016-03-03 (PERLANCAR)
+0.05    2016-03-03  Released-By: PERLANCAR
 
         - Add subcommands: ls, sort-prereqs.
 
@@ -51,7 +56,7 @@
         - Some fixes.
 
 
-0.04    2016-03-03 (PERLANCAR)
+0.04    2016-03-03  Released-By: PERLANCAR
 
         - [Internal] [Refactor] Modularize each subcommand to a separate module.
 
@@ -60,7 +65,7 @@
           operates on multiple perl dist repositories at a time).
 
 
-0.03    2016-03-02 (PERLANCAR)
+0.03    2016-03-02  Released-By: PERLANCAR
 
 	- Add some filtering options: --{exclude,include}-dist{,-pattern},
 	  --{has,lacks}-tag, --depends.
@@ -75,12 +80,12 @@
 	- [doc] Tweak Rinci metadata: make 'repos' a common arg.
 
 
-0.02    2016-03-02 (PERLANCAR)
+0.02    2016-03-02  Released-By: PERLANCAR
 
 	- Implement subcommands {inc,dec}-prereq-version-by.
 
 
-0.01    2016-03-02 (PERLANCAR)
+0.01    2016-03-02  Released-By: PERLANCAR
 
         - First, early release. Only these subcommands have been implemented:
           {inc,dec,set}-prereq-version-to.

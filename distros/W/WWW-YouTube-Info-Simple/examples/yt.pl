@@ -6,6 +6,7 @@
 # by a given URL or VIDEO_ID.
 # e.g.: ./yt.pl https://youtube.com/watch?v=foobar
 # e.g.: ./yt.pl https://www.youtube.com/v/foobar
+# e.g.: ./yt.pl https://youtu.be/foobar
 # e.g.: ./yt.pl foobar
 
 # change /usr/bin/lwp-download to the appropriate path/bin
@@ -121,14 +122,19 @@ sub get_id {
 
   my $id;
   # https://youtube.com/watch?v=foobar
-  if ( $path =~ /\/watch/ ) {
+  if ( $path =~ /^\/watch/ ) {
     $id = $query;
     $id =~ s/^v=//;
   }
   # https://www.youtube.com/v/foobar
-  elsif ( $path =~ /\/v\// ) {
+  elsif ( $path =~ /^\/v\// ) {
     $id = $path;
     $id =~ s/\/v\///;
+  }
+  # https://youtu.be/foobar
+  elsif ( $path =~ /^\// ) {
+    $id = $path;
+    $id =~ s/\///;
   }
   # foobar
   elsif ( $path !~ /\// ) {

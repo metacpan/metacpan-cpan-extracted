@@ -5,7 +5,7 @@ Pherkin::Extension::Weasel - Pherkin extension for web-testing
 
 =head1 VERSION
 
-0.12
+0.13
 
 =head1 SYNOPSIS
 
@@ -47,7 +47,7 @@ package Pherkin::Extension::Weasel;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 
 use Digest::MD5 qw(md5_hex);
@@ -245,7 +245,8 @@ sub pre_feature {
     if ($log) {
         my $feature_log = {
             scenarios => [],
-            failing_scenarios => [],
+            failures => [],
+            successes => [],
             title => $feature->name,
             filename => $feature->document->filename,
             satisfaction => join("\n",

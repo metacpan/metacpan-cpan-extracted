@@ -894,7 +894,7 @@ jacode パッケージ内の変数を初期化します。jacode.pl を require 'jacode.pl';
   Copyright (c) 1992,1993,1994 Kazumasa Utashiro
   Copyright (c) 1995-2000 Kazumasa Utashiro
   Copyright (c) 2002 Kazumasa Utashiro
-  Copyright (c) 2010, 2011, 2014, 2015, 2016, 2017, 2018 INABA Hitoshi
+  Copyright (c) 2010, 2011, 2014, 2015, 2016, 2017, 2018, 2019 INABA Hitoshi
 
 # 著作権
 

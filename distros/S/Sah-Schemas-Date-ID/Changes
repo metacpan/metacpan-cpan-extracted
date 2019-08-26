@@ -1,3 +1,10 @@
+0.002   2019-07-21  Released-By: PERLANCAR; Urgency: medium
+
+	- Add schemas: date::dow_num::{id,en_or_id},
+	  date_dow_nums::{id,en_or_id}, date::month_num::{id,en_or_id},
+	  date::month_nums::{id,en_or_id}.
+
+
 0.001   2017-06-28  Released-By: PERLANCAR
 
         - First release.

@@ -9,5 +9,6 @@ blib
 ^MYMETA\.(?:json|yml)$
 ^Dancer2-Plugin-Auth-Extensible-Provider-DBIC-[0-9]+\.
 README.md
+^\.travis\.yml$
 ~$
 

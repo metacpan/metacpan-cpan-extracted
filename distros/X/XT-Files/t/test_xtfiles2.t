@@ -11,6 +11,8 @@ use Scalar::Util qw(blessed);
 use Test::XTFiles;
 use XT::Files;
 
+delete $ENV{XT_FILES_DEFAULT_CONFIG_FILE};
+
 use constant CLASS => 'Test::XTFiles';
 
 chdir 'corpus/dist4' or die "chdir failed: $!";

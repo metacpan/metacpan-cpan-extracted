@@ -15,8 +15,8 @@ use Data::Dumper;
 
 # use Data::Dumper::Simple;$Data::Dumper::Sortkeys=1; $Data::Dumper::Purity=1; $Data::Dumper::Deepcopy=1;
 
+our $VERSION = '6.31';
 our $F;
-our $FR;
 
 my $new_x;
 my $new_y;
@@ -38,7 +38,7 @@ GetOptions(
 
 $noaccel = ($noaccel) ? 1 : 0;    # Only 1 or 0 please
 
-my $images_path = (-e 'images/RWBY_White.jpg') ? 'images' : 'examples/images';
+my $images_path = (-e 'images/4KTest_Pattern.png') ? 'images' : 'examples/images';
 
 my $splash = ($nosplash) ? 0 : 2;
 print "\n\nGathering images...\n";
@@ -55,7 +55,7 @@ if (defined($new_x)) {
 } else {
     $F = Graphics::Framebuffer->new('FB_DEVICE' => "/dev/fb$dev", 'SHOW_ERRORS' => 0, 'ACCELERATED' => !$noaccel, 'SPLASH' => 0, 'RESET' => TRUE);
 }
-$SIG{'QUIT'} = $SIG{'INT'} = $SIG{'KILL'} = sub { exec('reset'); };
+$SIG{'QUIT'} = $SIG{'INT'} = $SIG{'KILL'} = $SIG{'HUP'} = $SIG{'TERM'} = sub { $F->text_mode(); exec('reset'); };
 
 my $sinfo = $F->screen_dimensions();
 $F->cls('OFF');
@@ -73,7 +73,7 @@ my $YY       = $screen_height;
 
 my $center_x = $F->{'X_CLIP'} + ($F->{'W_CLIP'} / 2);
 my $center_y = $F->{'Y_CLIP'} + ($F->{'H_CLIP'} / 2);
-my $rpi      = ($FR->{'fscreeninfo'}->{'id'} =~ /BCM270(8|9)/i) ? TRUE : FALSE;
+my $rpi      = ($F->{'fscreeninfo'}->{'id'} =~ /BCM270(8|9)/i) ? TRUE : FALSE;
 
 $delay *= 3 if ($rpi);    # Raspberry PI is sloooooow.  Let's give extra time for each test
 my $BW = 0;
@@ -1570,7 +1570,7 @@ sub animated {
                             $fps++;
                             my $end = time - $start;
                             if ($end >= 1 && $bench) {
-                                print STDERR "\r", sprintf('%.03f FPS', (1 / $end) * $fps);
+                                print STDERR chr(27) . '[0;0H', sprintf('%.03f FPS', (1 / $end) * $fps);
                                 $|     = 1;
                                 $fps   = 0;
                                 $start = time;

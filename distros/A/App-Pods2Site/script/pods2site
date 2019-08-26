@@ -3,6 +3,10 @@
 use strict;
 use warnings;
 
+our $VERSION = '0.015';
+my $version = $VERSION;
+$VERSION = eval $VERSION;
+
 use App::Pods2Site;
 
 $| = 1;

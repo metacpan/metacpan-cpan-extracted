@@ -1,5 +1,5 @@
 package Test::BDD::Cucumber::Model::Document;
-$Test::BDD::Cucumber::Model::Document::VERSION = '0.57';
+$Test::BDD::Cucumber::Model::Document::VERSION = '0.58';
 use Moo;
 use Types::Standard qw( Str ArrayRef InstanceOf );
 use Test::BDD::Cucumber::Model::Line;
@@ -10,7 +10,7 @@ Test::BDD::Cucumber::Model::Document - Model to represent a feature file on disk
 
 =head1 VERSION
 
-version 0.57
+version 0.58
 
 =head1 DESCRIPTION
 

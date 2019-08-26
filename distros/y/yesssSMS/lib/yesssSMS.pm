@@ -29,7 +29,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '2.13';
+our $VERSION = '2.15';
 
 sub new
 {
@@ -194,15 +194,9 @@ sub sendmessage
 		return 1;
 	}
 
-	#if (length($message)>160)
-	#{
-	#	$self->{LASTERROR}='Shortmessage too long';
-	#	$self->{RETURNCODE}=2;
-	#	return 2;
-	#}
 	if (!($telnr=~/^00/) || (length($telnr)<14))
 	{
-		$self->{LASTERROR}='Invalid destination (not Austria or too short)';
+		$self->{LASTERROR}='Invalid destination (not starting with 00 or too short)';
 		$self->{RETURNCODE}=3;
 		return 3;
 	}
@@ -378,7 +372,6 @@ sub loginTextParse
 	my ($self, $text) = @_;
 	my $phonenumber;
 	my $progressname;
-	my $progresstype;
 	my $value;
 
 	&trim(\$text);
@@ -391,14 +384,9 @@ sub loginTextParse
 	elsif (($self->{'inProgressheading'} == 1) &&
 		(length($text)>1))
 	{
-		($progressname,$progresstype)=$text=~/Ihr (.*) ([^\s]*):$/;
+		($progressname)=$text=~/\s*(.*)\s*:$/;
 		$self->{'amountSubscriptions'}++;
 		$self->{'yesssSMSself'}->{SUBSCRIPTIONS}->[$self->{'amountSubscriptions'}-1]->{'name'}=$progressname;
-		if ($progresstype eq 'Guthaben')
-		{
-			$progresstype='Paket';
-		}
-		$self->{'yesssSMSself'}->{SUBSCRIPTIONS}->[$self->{'amountSubscriptions'}-1]->{'type'}=$progresstype;
 	}
 	elsif (($self->{'inProgresslist'} >= 1) &&
 		(length($text)>1))
@@ -409,11 +397,17 @@ sub loginTextParse
 			$self->{'yesssSMSself'}->{SUBSCRIPTIONS}->
 				[$self->{'amountSubscriptions'}-1]->{'items'}->[$self->{'amountItems'}-1]->{'unit'}=$value;
 		}
-		elsif ($text=~/^Verbraucht/)
+		elsif ($text=~/^Verbraucht:/)
 		{
-			($value)=$text=~/^Verbraucht: ([0-9]+)$/;
+			($value)=$text=~/^Verbraucht: ([0-9]+)\s*$/;
 			$self->{'yesssSMSself'}->{SUBSCRIPTIONS}->
 				[$self->{'amountSubscriptions'}-1]->{'items'}->[$self->{'amountItems'}-1]->{'used'}=$value;
+		}
+		elsif ($text=~/^Verbraucht Inland:/)
+		{
+			($value)=$text=~/^Verbraucht Inland: ([0-9]+)\s*$/;
+			$self->{'yesssSMSself'}->{SUBSCRIPTIONS}->
+				[$self->{'amountSubscriptions'}-1]->{'items'}->[$self->{'amountItems'}-1]->{'used'}+=$value;
 		}
 		elsif ($text=~/^Verbleibend/)
 		{
@@ -594,13 +588,19 @@ The following method returns the hash to all subscription details:
 =item $sms->getSubscriptions()
 
 Returns an array with the subscription details:
+
 * each array contains a hash with "type", "name" and "items".
-* "type" is either "Tarif" or "Paket"
+
 * "name" is the name of the subscription
+
 * "items" contains an array with all items contained in the subscription.
+
 * each item-array contains a hash with "unit", "used" and "remaining"
+
 * "used" is the amount of already used units during the current accounting period
+
 * "remaining" is the amount of already remaining units during the current accounting period
+
 * "unit" contains the unit of "used" and "remaining"
 
 =back
@@ -662,7 +662,9 @@ Adopted for the new website being online since August 1st, 2014
 =item 2.10
 
 Added the possibility to change the sending phonenumber
+
 Login and selecting phonenumber reads details about tarifs and packages
+
 Details about tarif and packages are available through getSubscriptions
 
 =item 2.11
@@ -676,6 +678,16 @@ Corrected typo in description
 =item 2.13
 
 Improved documentation for getSubscriptions().
+
+=item 2.14
+
+Little adoptions due to changes in the website
+
+Removed 'type' from subscriptions as they were removed from the site.
+
+=item 2.15
+
+Removed accidental remaining debug output
 
 =back
 

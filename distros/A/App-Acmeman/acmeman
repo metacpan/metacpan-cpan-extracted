@@ -1,0 +1,793 @@
+#!/bin/sh
+#! -*-perl-*-
+eval 'exec perl -x -S $0 ${1+"$@"}'
+    if 0;
+
+use strict;
+use warnings;
+use App::Acmeman;
+
+App::Acmeman->new->run;
+
+=head1 NAME
+
+acmeman - manages ACME certificates
+
+=head1 SYNOPSIS
+
+B<acmeman>
+[B<-Fadns>]
+[B<-D> I<N>]
+[B<-f> I<FILE>]
+[B<--alt-names>]
+[B<--config-file=>I<FILE>]
+[B<--debug>]
+[B<--dry-run>]
+[B<--force>]
+[B<--stage>]
+[B<--time-delta=>I<N>]
+[I<DOMAIN>...]
+
+B<acmeman> B<--setup> | B<-S>
+[B<-Fdn>]
+[B<--config-file=>I<FILE>]
+[B<--debug>]
+[B<--dry-run>]
+[B<--force>]
+
+B<acmeman>
+[B<-h>]
+[B<--help>]
+[B<--usage>]
+
+=head1 DESCRIPTION
+
+B<Acmeman> is a tool for automatic management of ACME (LetsEncrypt) SSL
+certificates.
+
+Most existing ACME tools take a list of domain names for which to issue
+certificates from their command line or configuration file. B<Acmeman>
+takes a completely different approach. It gathers domain names directly
+from the configuration of the B<http> server that manages them. Thus,
+a domain name obtains its certificate automatically, once the administrator
+configures the http server to serve it via https.
+
+This version of B<acmeman> is able to handle configuration files of
+B<Apache> http server, and servers that are able to read the list of
+domain names from disk files, such as B<HAProxy>.
+
+For trivial configurations, B<acmeman> can be used without any additional
+configuration.  For example, support for B<Apache> is enabled by default,
+so all the administrator has to do is to run
+
+    acmeman --setup
+
+which will set up additional macro definitions for the apache configuration
+file, then enable the B<mod_macro> module and to use the provided definitions
+in httpd configuration.  This is discussed in detail in the section B<APACHE>
+below.
+
+In more complex configurations, B<acmeman> should be instructed what to
+do using its configuration file.  This file, normally named
+F</etc/acmeman.conf>, supplies the definitions of I<domain sources>,
+i.e. configuration files from which to obtain domain names to form the
+certificate CNs and other parameters.  At a pinch, the list of domain names
+can be declared in it as well.  Several domain sources can be used
+simultaneously. E.g. you can have B<acmeman> look for domain names in
+B<Apache> and B<HAProxy> configurations and obtain an additional list of
+domains from its own configuration, all in the same time.
+
+In any case, B<acmeman> should be run as a periodic cron job, in order to
+ensure that expiring certificates are updated in time.  The usual crontab
+entry (for Vixie cron) is
+
+    0 4 * * *   root    /usr/bin/acmeman
+
+Exact interval configuration is entirely up to you.  For Dillon cron, omit
+the user name field.
+
+When started this way, B<acmeman> will scan the existing certificates and
+select those of them which will expire within a predefined amount of time
+(24h by default, configurable by the B<core.time-delta> statement). Then
+it will scan the configured domain sources to see if any certificates are
+added an alternative CN and if any new certificates should be issued. Having
+created a list of the certificates, it will interact with the ACME server,
+issuing the new ones and updating the ones that need prolongation or
+modification.
+
+=head1 QUICK START
+
+The following is a short introduction to the B<acmeman> configuration. For
+a detailed discussion, see the B<CONFIGURATION> section below. For detailed
+discussion of particular domain sources, refer to the section B<SOURCES>.
+
+The configuration file, B</etc/acmeman.conf>, consists of statements,
+which have the form B<I<KW>=I<VAL>>, grouped into sections, declared
+as B<[I<NAME>]> (square brackets are part of the syntax). Empty lines
+and comments (introduced by a hash sign) are ignored.
+
+There are three main use cases
+
+=head2 APACHE
+
+In most cases no special configuration file is needed.  The following
+recipe describes each configuration step.  Refer to the section B<SOURCE>,
+subsection B<apache> for a detailed discussion.
+
+=over 4
+
+=item 1. Initial configuration
+
+Run
+
+    acmeman --setup
+
+It will detect the Apache layout, install an additional Apache configuration
+file, F<httpd-letsencrypt.conf> and print the instructions on how to
+enable it.  Follow them and enable the B<mod_macro> module.
+
+=item 2. Apache domain setup: plain HTTP
+
+To declare that a virtual host needs SSL certificate, add the following
+line to the Apache B<VirtualHost> block serving plain HTTP for that host:
+
+    Use LetsEncryptChallenge
+
+This will instruct Apache B<httpd> to serve ACME challenges and B<acmeman>
+to request a certificate for that virtual host.  The hostname declared with
+the B<ServerName> statement will be used as the B<CN> for the certificate,
+and any names declared via B<ServerAlias> statements will form the list of
+alternative names.  For example:
+
+    <VirtualHost *:80>
+	ServerName example.org
+	ServerAlias www.example.com
+	Use LetsEncryptChallenge
+	...
+    </VirtualHost>
+
+=item 3. Issue the certificate
+
+This step is needed if there is no certificate for this domain yet. Reload
+B<httpd> to fire up the new configuration and run B<acmeman> to issue the
+certificate. If anything goes wrong, try adding one or more B<-d> options
+to B<acmeman> to see what's going on. You can also use the B<-s> option
+during initial debugging of the configuration. This option instructs B<acmeman>
+to use the staging ACME server, instead of the production one. This eliminates
+the risk of hitting the ACME request per IP limit.
+
+=item 4. Apache domain setup: HTTPS
+
+To use the created certificate, add another virtual server for that domain,
+with the same B<ServerName> as above and with 443 as its port value. Add
+the following statement to it:
+
+    Use LetsEncryptSSL DOMAIN
+
+where I<DOMAIN> must be the same as the B<ServerName> value.  For example,
+the HTTPS virtual host corresponding to the above example will be:
+
+    <VirtualHost *:443>
+	ServerName example.org
+	ServerAlias www.example.com
+	Use LetsEncryptSSL example.org
+	...
+    </VirtualHost>
+
+This can be further simplified by using the B<LetsEncryptServer> macro instead
+of the B<ServerName> and B<LetsEncryptSSL> statements, as in:
+
+    <VirtualHost *:443>
+	Use LetsEncryptServer example.org
+	ServerAlias www.example.com
+	...
+    </VirtualHost>
+
+=back
+
+=head2 HAPROXY
+
+Use the B<file> source. This domain source reads the list of domain
+names from a disk file. The first name in the list becomes the certificate
+B<CN>, rest of names (if any) are used as alternative CNs. For a detailed
+discussion of the B<file> source, refer to the section B<SOURCE>,
+subsection B<file>.
+
+=over 4
+
+=item 1. Create a directory for storing domain name files
+
+This directory will keep domain name files, named after the corresponding
+HAProxy backends.  E.g.
+
+    mkdir /etc/haproxy/hosts
+
+=item 2. Configure acmeman
+
+Example F</etc/acmeman.conf> file is:
+
+    [core]
+       source = file /etc/haproxy/hosts
+       postrenew = /usr/sbin/service haproxy restart
+    [files default]
+       type = single
+       certificate-file = /etc/ssl/acme/crt/$domain.pem
+
+The B<core> section declares the source to use. The first argument to
+the B<file> source is the name of the directory where the domain name lists
+are stored. The B<postrenew> statement declares the command to be run
+after all certificates have been renewed. In our case, this command restarts
+B<haproxy>, forcing it to re-read the certificates.
+
+The B<files> statement instructs the program to create, for each domain,
+a single file containing the private key, certificate chain and the domain
+certificate for that domain. The B<$domain> variable in the
+B<certificate-file> declaration will be replaced by the first domain name
+from the list (the B<CN>) for that certificate.
+
+This configuration will keep a separate certificate for each backend in
+B<haproxy> that supports https access.  If concerned about request rate
+limit, you can instruct B<acmeman> to maintain a single certificate with
+all domain names as X509v3 subject alternative names instead.  To do so,
+use the B<--host> option in the source definition.  Its argument specifies
+the domain name to use as the CN for the certificate.  E.g.:
+
+    [core]
+       source = file /etc/haproxy/hosts --host=www.example.com
+       ...
+
+=item 3. Configure haproxy
+
+First, configure the plain HTTP frontend, which will be responsible for
+serving ACME challenges and redirecting the rest of the requests to
+HTTPS. The simplest definition is:
+
+    frontend http-in
+	mode http
+	bind :::80 v4v6
+	http-request redirect code 301 location https://%[hdr(host)]%[capture.req.uri] unless { path_beg /.well-known/acme-challenge }
+	use_backend acme if { path_beg /.well-known/acme-challenge }
+
+Actual backend configuration for the B<acme> backend is beyond the scope of
+this manual. Use some simple and lightweight B<http> server capable of serving
+static files, such as B<fileserv> (L<https://www.gnu.org.ua/projects/fileserv>),
+for example.
+
+Then, configure HTTPS section to use certificates from the certificate file
+directory:
+
+    frontend https-in
+	mode http
+	bind :::443 v4v6 ssl crt /etc/ssl/acme/crt
+	# Direct each group of domain names to the corresponding
+	# backend.
+	use_backend d1 if { hdr(host) -f /etc/haproxy/hosts/d1 }
+	use_backend d2 if { hdr(host) -f /etc/haproxy/hosts/d2 }
+	...
+
+Finally, define the backends.
+
+=back
+
+=head2 Direct configuration
+
+Use direct configuration if none of the provided source types can
+be used.  In this case, you define each domain which needs a
+certificate in the F</etc/acmeman.conf> file.  First, instruct
+B<acmeman> that no external source of domain names will be used:
+
+    [core]
+	source = null
+
+Then, for each domain name use the B<domain> section, as shown in the
+example below:
+
+    [domain example.com]
+	alt = www.example.com
+	files = default
+
+This section instructs B<acmeman> that a certificate is needed for
+domain B<example.com>, using B<www.example.com> as its alternative name,
+The B<files> statement identifies the name of a B<files> section containing
+rules for creating certificate files for that domain. This section must be
+defined elsewhere in the configuration file. For example:
+
+    [files default]
+	type = split
+	certificate-file = /etc/ssl/acme/$domain/cert.pem
+	key-file = /etc/ssl/acme/$domain/privkey.pem
+	ca-file = /etc/ssl/acme/$domain/ca.pem
+	argument = $domain
+
+This definition tells B<acmeman> that it should store certificate, certificate
+key, and certificate authority chain in three separate files. Names of these
+files will be created by replacing the B<$domain> string in the corresponding
+definition with the domain name from the B<domain> section.
+
+Several B<[domain]> section can share the same B<[files]> definition, or
+they can have their one, depending on your needs.
+
+=head1 CONFIGURATION
+
+Configuration file controls the operation of B<acmeman>. By default,
+its name is B</etc/acmeman.conf>. If it is absent, B<acmeman> falls
+back to the legacy operation mode, scanning Apache configuration files
+for domains that use LetsEncrypt SSL certificates. See the B<APACHE>
+section below for a detailed description.
+
+The configuration file has a traditional line-oriented syntax. Comments
+are introduced with a hash sign. Empty lines are ignored. Leading and
+trailing whitespace is removed prior to parsing. Long statements can be
+split over several physical lines by ending each line excepting the last
+one with a backslash immediately followed by a newline character.
+
+Configuration consists of settings grouped into sections.  Syntactically,
+a I<setting> is
+
+    KEYWORD = VALUE
+
+where I<KEYWORD> stands for a symbolic name consisting of alphanumeric
+characters, dashes and underscores, and I<VALUE> stands for any sequence
+of characters.
+
+A I<section> is identified by its name and optional arguments. It begins
+with the following construct:
+
+    [NAME]
+
+or, if arguments are present:
+
+    [NAME ARG1 ARG2 ...]
+
+The square brackets are part of the syntax.
+
+A section can contain one or more settings.
+
+The statements in the configuration file form a directed graph. Often
+in this document we will identify the statement by its I<path>, i.e. a
+list of section name, its arguments, and the keyword, separated by dots. For
+example, the path B<files.apache.type> corresponds to the following
+configuration file fragment:
+
+    [files apache]
+       type = single
+
+
+The following describes the available sections and keywords
+
+=head2 B<[core]>
+
+This section defines the behavior of the program as a whole.
+
+=over 4
+
+=item B<rootdir=>I<DIR>
+
+Defines the root directory to use instead of the default </var/www/acme>.
+Root directory is the directory under which the
+F<.well-known/acme-challenge> subdirectory is located.
+
+=item B<time-delta=>I<SECONDS>
+
+Sets the time window before the actual expiration time, when the certificate
+becomes eligible for renewal.  I<N> is time in seconds.  The default
+value is 86400, which means that B<acmeman> will attempt to renew any
+certificate that expires within 24 hours.
+
+The command line option B<--time-delta> overrides this setting.
+
+=item B<postrenew=>I<COMMAND>
+
+Defines the command to be run at the end of the run if at least one
+certificate has been updated. Normally this command reloads the httpd
+server (or whatever server is using the certificates). If more than one
+B<postrenew> statements are defined, they will be run in sequence, in the
+same order as they appeared in the configuration file.
+
+=item B<source=>I<NAME> [I<ARG>...]
+
+Defines the source of domain names. The I<NAME> parameter identifies the
+source, and additional arguments supply the initialization parameters.
+
+The present version of B<acmeman> is shipped with three sources: B<null>,
+B<apache>, and B<file>.
+
+The B<null> module is an empty source. It takes no additional arguments.
+Use this source if all domains are described in the configuration file
+using one or more B<domain> sections.
+
+The B<apache> source module is the default. It scans B<httpd> configuration
+files as described in section B<apache>. One argument is allowed. If supplied,
+it defines the apache configuration layout. Allowed values are: B<debian>,
+B<slackware>, B<suse> and B<rh> (for Red Hat). Without arguments, the layout
+will be autodetected.
+
+The B<file> source reads domain names from one or more disk files. A
+mandatory argument specifies the name of the directory where the files
+are located. This mode is suitable for use with B<haproxy> pattern files.
+
+Multiple B<source> statements can be defined. They will be processed
+sequentially.
+
+=item B<files=>I<NAME>
+
+Identifies the B<[files]> section which describes how to create certificate
+files for domains which lack explicit B<files> keyword. Default I<NAME> is
+B<default>. See the description of the B<files> statement in B<domain>
+section.
+
+=item B<check-alt-names=>I<BOOL>
+
+When set to B<true>, it instructs the program to compare the list of
+alternative names of each certificate with the one gathered from the
+Apache configuration, and reissue the certificate if the two lists
+don't match.  This uses an ad-hoc logic, due to the deficiency of the
+underlying X509 module, and therefore is not enabled by default.
+
+Valid values for I<BOOL> are: B<1>, B<on>, B<true>, or B<yes>, for
+true, and B<0>, B<off>, B<false>, or B<no> for false.
+
+=item B<check-dns=>I<BOOL>
+
+When set to B<true> (the default), the program will check whether each
+host name has an A DNS record pointing back to one of the IP addresses
+of the server. Hostnames which don't satisfy this condition will be ignored.
+The IP of the server is determined by looking up the A record for its
+hostname. This can be overridden using the B<my-ip> configuration statement.
+
+=item B<key-size=>I<N>
+
+Size of the RSA key to use, in bits. Default is 4096.
+
+=item B<my-ip>=I<IP> [I<IP>...]
+
+Declares IP address (or addresses) of this server. Use this keyword if
+the server IP cannot be reliably determined by resolving its hostname.
+Special I<IP> B<$hostip> stands for the IP retrieved by resolving the
+hostname.
+
+=back
+
+=head2 B<[domain I<CN>]>
+
+Declares the domain for which a certificate should be maintained. I<CN> is
+the canonical name for the domain. Alternative names can be specified using
+the B<alt> setting within the section.
+
+=over 4
+
+=item B<files=>I<ID>
+
+Identifies the B<[files]> section which describes how to create certificate
+files for this domain. In the absence of this statement, the B<files>
+statement from the B<[core]> section will be used.
+
+=item B<alt=>I<NAME>
+
+Defines alternative name for the certificate. Multiple B<alt> statements
+are allowed.
+
+=item B<key-size=>I<N>
+
+Size of the RSA key to use, in bits. If not set, the B<core.key-size>
+setting is used.
+
+=item B<postrenew=>I<CMD>
+
+Run I<CMD> after successful update. If not given, the B<core.postrenew>
+commands will be run.
+
+=back
+
+=head2 B<[files I<ID>]>
+
+The B<files> section instructs B<acmeman> how to create certificate files.
+It is applied to particular domains by placing the B<files=I<ID>> statement
+in the corresponding domain sections.
+
+The I<FILENAME> arguments to the keywords below can contain references to
+a I<meta-variable>, which will be replaced by the actual domain name when
+handling this section for a particular domain. By default, this meta-variable
+is B<$domain>.
+
+=over 4
+
+=item B<type=>B<single>|B<split>
+
+Type of the certificate to create. When set to B<single>, a single
+certificate file will be created. Its name is determined by the
+B<certificate-file> statement. The file will contain the certificate,
+certificate chain and the signature, in this order.
+
+When set to B<split>, the certificate, certificate chain and the signature
+will be saved to three distinct files, whose names are defined by
+B<certificate-file>, B<ca-file>, and B<key-file>, correspondingly. If
+B<ca-file> is not defined, only certificate and key files will be created.
+
+The default is B<split>.
+
+=item B<certificate-file=>I<FILENAME>
+
+Defines the name of the certificate file for this domain. This statement
+is mandatory.
+
+=item B<key-file=>I<FILENAME>
+
+Defines the name of the certificate key file. This statement must be present
+if B<type> is set to B<split>.
+
+=item B<ca-file=>I<FILENAME>
+
+Defines the name of the certificate authority file. This statement may
+be present if B<type> is set to B<split>.
+
+=item B<argument=>I<STRING>
+
+Defines the name of the meta-variable in I<FILENAME> arguments, which will
+be replaced with the actual domain name. Default is B<$domain>.
+
+=back
+
+=head1 SOURCES
+
+=head2 null
+
+    [core]
+	source = null
+
+Declares empty source. This means that B<acmeman> will handle only domain
+names explicitly declared in the configuration file using the B<domain>
+setting.
+
+=head2 apache
+
+    [core]
+	source = apache [--server-root=DIR] [LAYOUT]
+
+This is the default source. It assumes Apache httpd, version 2.4 or later
+(although only minor changes are necessary to make it work with version 2.2).
+The optional I<LAYOUT> argument defines the layout of the apache configuration
+files. Allowed layout values are: B<debian>, B<slackware>, B<suse> and
+B<rh> (for Red Hat). If not supplied, the layout is determined automatically.
+
+Use the B<--server-root> option to supply the name of the server root
+directory, if for some reason the module is unable to determine it
+automatically.
+
+A special directory should be configured for receiving ACME challenges.
+
+The package provides two Apache macros: for serving ACME challenges and
+declaring SSL virtual hosts.
+
+Upon startup the program scans Apache configuration for virtual hosts
+that use ACME certificates, checks their expiration times, and renews those
+of the certificates that are nearing their expiration times within a
+predefined number of seconds (24 hours by default).  If any of the
+certificates were updated during the run, B<acmeman> will restart the
+B<httpd> server.
+
+=head3 Setup
+
+To set up the necessary infrastructure, run B<acmeman --setup>.  It will
+create the configuration file B<httpd-letsencrypt.conf>, defining two
+macros for SSL-enabled sites (B<mod_macro> is needed).  Finally, it will
+create the directory B</var/www/acme>, which will be used for receiving
+and serving ACME challenges.  If another directory is preferred, it can
+be specified as an argument to B<acmeman --setup>.
+
+The tool will try to determine the layout of the Apache configuration
+files and place the created file accordingly, so that it will be included
+into the main configuration file.  It will print the name of the created
+file at the end of the run.  You are advised to ensure that the file is
+included and that the module B<mod_macro> is loaded prior to it.  You
+may also wish to revise B<httpd-letsencrypt.conf> and edit the paths to
+SSL files configured there.  By default, the directory F</etc/acme/I<DOMAIN>>
+will be created for each domain name needing SSL, and two files will be placed
+there: F<cert.pem>, containing the leaf and intermediate certificates for that
+domain, and F<privkey.pem>, containing the private key for that domain.
+
+The program will refuse to overwrite existing files B<httpd-letsencrypt.conf>,
+unless given the B<--force> (B<-F>) option.
+
+=head3 Configuring SSL
+
+To declare that a virtual host needs SSL certificate, add the following
+line to the Apache B<VirtualHost> block serving plain HTTP for that host:
+
+    Use LetsEncryptChallenge
+
+This will instruct B<acmeman> to request a certificate for that virtual
+host.  The hostname declared with the B<ServerName> statement will be used
+as the B<CN> for the certificate, and any names declared via B<ServerAlias>
+statements will form the list of alternative names (obviously, wildcards are
+not allowed).
+
+If such a certificate doesn't exist, it will be requested and created when
+B<acmeman> is run.
+
+To use the created certificate, create a new B<VirtualHost> block that
+contains the following statement:
+
+    Use LetsEncryptServer DOMAIN
+
+where I<DOMAIN> is the name used in the B<ServerName> statement of the plain
+HTTP configuration.  Copy the B<ServerAlias> statements (if any), and add the
+rest of configuration statements.  Note, that you need not use the
+B<ServerName> statement, as it will be included when the B<LetsEncryptServer>
+macro is expanded.
+
+Example:
+
+    <VirtualHost *:80>
+	ServerName example.org
+	ServerAlias www.example.com
+	Use LetsEncryptChallenge
+	...
+    </VirtualHost>
+
+    <VirtualHost *:443>
+	Use LetsEncryptServer example.org
+	ServerAlias www.example.com
+	...
+    </VirtualHost>
+
+Alternatively, you can use the B<LetsEncryptSSL> macro, which differs from
+B<LetsEncryptServer> in that it configures only SSL settings, without the
+B<ServerName> statement, which therefore must be included explicitly:
+
+    <VirtualHost *:443>
+	ServerName example.org
+	ServerAlias www.example.com
+	Use LetsEncryptSSL example.org
+	...
+    </VirtualHost>
+
+LetsEncrypt limits the number of certificates requested for a single
+registered domain per week (at the time of this writing - 20).  To avoid
+hitting that limit, you may wish to use the same certificate for different
+virtual hosts.  The special macro B<LetsEncryptReference> is provided for
+that purpose.  Suppose, for example, that you wish to configure server
+name B<git.example.org> to use the same certificate as B<example.org>
+(configured in the example above).  You then declare the virtual host
+for the plain HTTP as follows:
+
+    <VirtualHost *:80>
+	ServerName git.example.org
+	Use LetsEncryptReference example.org
+	...
+    </VirtualHost>
+
+The argument to the B<LetsEncryptReference> macro indicates the CN name of
+the certificate to which the current server name (and aliases, if any) are
+to be added as alternative names.  The corresponding virtual host for SSL
+will use the B<LetsEncryptSSL> macro to configure the correct certificate:
+
+    <VirtualHost *:80>
+	ServerName git.example.org
+	Use LetsEncryptSSL example.org
+	...
+    </VirtualHost>
+
+=head2 file
+
+    [core]
+	source = file PATTERN [--ignore=RX] [--host=HOST]
+
+Domain names will be read from files matching I<PATTERN>. The argument
+can be a single file or directory name, or a valid globbing pattern.
+If I<PATTERN> is a directory name, the module will read all files from
+that directory, except those matching the following perl regexp:
+C<^\.|~$|\.bak$|^#.*#$>. The default regexp can be overridden using the
+B<--ignore> (B<-i>) option.
+
+The input files must contain exactly one domain name per line. No empty
+lines or comments are allowed. The first domain name will become the B<CN>
+of the issued certificate. The rest of domain names will form alternative
+names.
+
+If the B<--host> (B<-h>) option is used, only one certificate will be
+issued. The I<HOST> will be used as its B<CN>. All the domain names read
+from the input files will form the list of its alternative names.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-D>, B<--time-delta=>I<N>
+
+Sets the time window before the actual expiration time, when the certificate
+becomes eligible for renewal.  I<N> is time in seconds.  The default
+value is 86400, which means that B<acmeman> will attempt to renew any
+certificate that expires within 24 hours.
+
+This option overrides the B<core.time-delta> configuration setting.
+
+=item B<-F>, B<--force>
+
+Force renewal of certificates, no matter their expire date.  With B<--setup>,
+force installing the B<httpd-letsencrypt.conf> file even if it already
+exists.
+
+=item B<-a>, B<--alt-names>
+
+Compare the list of alternative names of each certificate with the one
+gathered from the Apache configuration, and reissue the certificate
+if the two lists don't match.  This uses an ad-hoc logic, due to the
+deficiency of the underlying X509 module, and therefore is not enabled
+by default.
+
+This option overrides the B<core.check-alt-names> configuration setting.
+
+=item B<-d>, B<--debug>
+
+Increase debugging level.  Multiple options accumulate.  Three debugging
+levels are implemented:
+
+=over 8
+
+=item B<-d>
+
+List certificates being renewed.
+
+=item B<-dd>
+
+List files being created.  Show basic information about ACME transactions for
+each certificate.
+
+=item B<-ddd>
+
+Verbosely report parsing of Apache configuration files.  Show detailed
+debugging information about ACME transactions for each certificate.
+
+=back
+
+=item B<-f>, B<--config-file=>I<FILE>
+
+Read configuration from I<FILE>, instead of the default F</etc/acmeman.conf>.
+
+=item B<-n>, B<--dry-run>
+
+Don't modify any files, just print what would have been done.
+Implies B<--debug>.
+
+=item B<-S>, B<--setup>
+
+Set up the B<acmeman> infrastructure files.
+
+=item B<-s>, B<--stage>
+
+Use LetsEncrypt staging server.
+
+=back
+
+The following options are informational:
+
+=over 4
+
+=item B<-h>
+
+Prints a short usage summary.
+
+=item B<--help>
+
+Prints detailed user manual.
+
+=item B<--usage>
+
+Outputs a terse reminder of the command line syntax along with a
+list of available options.
+
+=back
+
+=head1 AUTHOR
+
+Sergey Poznyakoff <gray@gnu.org>
+
+=head1 LICENSE
+
+GPLv3+: GNU GPL version 3 or later, see L<http://gnu.org/licenses/gpl.html>
+
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+    
+=cut

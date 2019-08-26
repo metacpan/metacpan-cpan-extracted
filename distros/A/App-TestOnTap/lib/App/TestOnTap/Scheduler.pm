@@ -3,6 +3,10 @@ package App::TestOnTap::Scheduler;
 use strict;
 use warnings;
 
+our $VERSION = '1.001';
+my $version = $VERSION;
+$VERSION = eval $VERSION;
+
 use TAP::Parser::Scheduler::Job;
 use TAP::Parser::Scheduler::Spinner;
 

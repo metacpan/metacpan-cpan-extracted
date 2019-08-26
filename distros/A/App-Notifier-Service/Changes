@@ -1,3 +1,6 @@
+0.0701  2019-08-23
+    - Move to https://github.com/shlomif/app-notifier .
+
 0.0700  2019-04-04
     * Convert to dzil .
 

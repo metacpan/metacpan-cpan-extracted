@@ -6,7 +6,7 @@ package WWW::Mechanize;
 use strict;
 use warnings;
 
-our $VERSION = '1.91';
+our $VERSION = '1.92';
 
 use Tie::RefHash;
 use HTTP::Request 1.30;
@@ -1687,7 +1687,7 @@ WWW::Mechanize - Handy web browsing in a Perl object
 
 =head1 VERSION
 
-version 1.91
+version 1.92
 
 =head1 SYNOPSIS
 
@@ -2221,9 +2221,11 @@ or
 
 =back
 
-Returns the result of the GET method (an HTTP::Response object) if
-a link was found. If the page has no links, or the specified link
-couldn't be found, returns undef.
+Returns the result of the C<GET> method (an L<HTTP::Response> object) if a link
+was found.
+
+If the page has no links, or the specified link couldn't be found, returns
+C<undef>.  If C<autocheck> is enabled an exception will be thrown instead.
 
 =head2 $mech->find_link( ... )
 
@@ -2796,7 +2798,8 @@ and data setting in one operation. It selects the first form that contains all
 fields mentioned in C<\%fields>.  This is nice because you don't need to know
 the name or number of the form to do this.
 
-(calls C<L</form_with_fields()>> and C<L</set_fields()>>).
+(calls C<L<< form_with_fields()|"$mech->form_with_fields( @fields )" >>> and
+       C<L<< set_fields()|"$mech->set_fields( $name => $value ... )" >>>).
 
 If you choose C<with_fields>, the C<fields> option will be ignored. The
 C<form_number>, C<form_name> and C<form_id> options will still be used.  An
@@ -2841,7 +2844,7 @@ by passing C<< strict_forms => 0 >> here.
 
 If no form is selected, the first form found is used.
 
-If I<button> is not passed, then the L<C<< submit()|"$mech->submit()" >>>
+If I<button> is not passed, then the C<L<< submit()|"$mech->submit()" >>>
 method is used instead.
 
 If you want to submit a file and get its content from a scalar rather

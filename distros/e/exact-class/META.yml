@@ -8,8 +8,10 @@ build_requires:
   IPC::Open3: '0'
   Test::More: '0'
   Test::Most: '0'
+  perl: '5.014'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  perl: '5.014'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -28,6 +30,6 @@ resources:
   bugtracker: https://github.com/gryphonshafer/exact-class/issues
   homepage: https://github.com/gryphonshafer/exact-class
   repository: https://github.com/gryphonshafer/exact-class.git
-version: '1.02'
+version: '1.04'
 x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

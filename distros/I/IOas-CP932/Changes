@@ -1,5 +1,14 @@
 Revision history for this software.
 
+0.07  2019-08-23 00:00:00
+  - remove t/1012_getc.t, t/1013_readline.t, t/1014_print.t, and t/1015_printf.t
+  - add t/1016_io_threadsafe.t
+  - created by INABA Hitoshi
+
+0.06  2019-08-22 00:00:00
+  - IOas::CP932::getc() supports 4 octet code of CP932
+  - created by INABA Hitoshi
+
 0.05  2019-08-14 00:00:00
   - fix POD
   - created by INABA Hitoshi

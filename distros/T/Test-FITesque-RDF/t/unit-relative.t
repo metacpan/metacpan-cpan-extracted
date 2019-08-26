@@ -24,6 +24,7 @@ This is free software, licensed under:
 use strict;
 use warnings;
 use Test::Modern;
+use Test::Deep;
 use FindBin qw($Bin);
 
 
@@ -47,7 +48,7 @@ cmp_deeply($data, [
 				 [ 'relative_uri',
 					{
 					 '-special' => { 'description' => 'Check that a relative URI resolves' },
-					 'url' => 'http://example.org/foo/'
+					 'url' => all(isa('URI'), methods(as_string => 'http://example.org/foo/'))
 					}
 				 ]
 			  ] ]);

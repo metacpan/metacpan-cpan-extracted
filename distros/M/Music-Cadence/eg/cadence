@@ -1,41 +1,61 @@
 #!/usr/bin/env perl
+
+# Example: perl eg/cadence 16 A minor 4 110 '2 7'
+
 use strict;
 use warnings;
 
-use lib '/Users/gene/sandbox/MIDI-Util/lib';
-use MIDI::Util; # https://metacpan.org/release/MIDI-Util
-use lib '/Users/gene/sandbox/Music-Cadence/lib';
-use Music::Cadence; # https://metacpan.org/release/Music-Cadence
+use MIDI::Util;
+use Music::Cadence;
+use Music::Scales;
 
-my $max = shift || 16;
+my $max    = shift || 16;
+my $note   = shift || 'C';
+my $type   = shift || 'major';
+my $octave = shift // 4;
+my $bpm    = shift || 100;
+my $leads  = shift || '1 2 4 7';
 
-my @notes = qw/ C4 D4 E4 F4 G4 A4 B4 C5 /;
+my $half    = 'hn';
+my $quarter = 'qn';
 
-my @leaders = qw/ 1 2 4 7 /;
+my @scale = get_scale_notes( $note, $type );
+# Transform to MIDI accidentals
+for ( @scale ) {
+    s/#/s/;
+    s/b/f/;
+}
 
-my $score = MIDI::Util::setup_score( bpm => 100 );
+my @leaders = split /\s+/, $leads;
+
+my $score = MIDI::Util::setup_score( bpm => $bpm );
  
-my $mc = Music::Cadence->new( octave => 4 );
+my $mc = Music::Cadence->new(
+    key    => $note,
+    scale  => $type,
+    octave => $octave,
+    format => 'midi',
+);
 
 for my $i ( 1 .. $max ) {
-    my $note1 = $notes[ int rand @notes ];
-    my $note2 = $notes[ int rand @notes ];
+    # Get a random selection of scale notes and add them to the score
+    my @notes = map { $scale[ int rand @scale ] } 1 .. 2;
+    $score->n( $quarter, $_ ) for @notes;
 
-    $score->n( 'qn', $note1, $note2 );
-
+    # Add a half cadence after every 8 quarter notes
     if ( $i % 4 == 0 ) {
         my $chords = $mc->cadence(
             type    => 'half',
             leading => $leaders[ int rand @leaders ],
         );
-        $score->n( 'hn', @$_ ) for @$chords;
+        $score->n( $half, @$_ ) for @$chords;
     }
 }
 
 my $chords = $mc->cadence( type => 'deceptive' );
-$score->n( 'hn', @$_ ) for @$chords;
+$score->n( $half, @$_ ) for @$chords;
 
 $chords = $mc->cadence( type => 'plagal' );
-$score->n( 'hn', @$_ ) for @$chords;
+$score->n( $half, @$_ ) for @$chords;
 
 $score->write_score("$0.mid");

@@ -28,17 +28,18 @@ private:
     static cap_values   cap_list;
     static cap_flags    flag_list;
 
-    static string get_name(cap_value_t);
-
     excepted<void, CapabilityErrors> set_flag(cap_values, cap_flag_t, cap_flag_value_t);
     excepted<void, CapabilityErrors> set(cap_values, cap_flags, cap_flag_value_t);
 
     Capabilities(cap_t c) { caps = c; }
 public:
     static excepted<Capabilities*, CapabilityErrors> init_empty();
+    static excepted<Capabilities*, CapabilityErrors> init_from_file(string);
+
     static excepted<Capabilities*, CapabilityErrors> init();
     static excepted<Capabilities*, CapabilityErrors> init(string);
     static excepted<Capabilities*, CapabilityErrors> init(pid_t);
+
 
     Capabilities(const Capabilities&);
     Capabilities(Capabilities&&);
@@ -48,10 +49,12 @@ public:
 
     ~Capabilities();
     static int is_supported(cap_value_t cap) { return CAP_IS_SUPPORTED(cap); }
+    static excepted <string, CapabilityErrors> get_name(cap_value_t);
 
     excepted <string, CapabilityErrors> get_text();
 
     excepted <void, CapabilityErrors> submit();
+    excepted <void, CapabilityErrors> submit_to_file(string);
 
     excepted <CapFlags, CapabilityErrors> get_value(cap_value_t);
     excepted <cap_flag_value_t, CapabilityErrors> get_value_flag(cap_value_t, cap_flag_t);

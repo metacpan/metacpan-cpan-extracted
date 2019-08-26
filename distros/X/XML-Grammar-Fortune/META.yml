@@ -40,10 +40,10 @@ name: XML-Grammar-Fortune
 provides:
   XML::Grammar::Fortune:
     file: lib/XML/Grammar/Fortune.pm
-    version: '0.0701'
+    version: '0.0702'
   XML::Grammar::Fortune::ToText:
     file: lib/XML/Grammar/Fortune/ToText.pm
-    version: '0.0701'
+    version: '0.0702'
 requires:
   Carp: '0'
   Fatal: '0'
@@ -57,13 +57,13 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://github.com/shlomif/xml-grammar-fortune/issues
+  bugtracker: https://github.com/shlomif/fortune-xml/issues
   homepage: http://metacpan.org/release/XML-Grammar-Fortune
-  repository: git://github.com/shlomif/xml-grammar-fortune.git
-version: '0.0701'
+  repository: git://github.com/shlomif/fortune-xml.git
+version: '0.0702'
 x_Dist_Zilla:
   perl:
-    version: '5.026002'
+    version: '5.028002'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -180,10 +180,6 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Filter/PodSyntaxTests'
-      version: '6.012'
-    -
-      class: Dist::Zilla::Plugin::PodVersion
-      name: '@Filter/PodVersion'
       version: '6.012'
     -
       class: Dist::Zilla::Plugin::Test::Compile
@@ -430,5 +426,5 @@ x_Dist_Zilla:
     config:
       is_trial: '0'
     version: '6.012'
-x_generated_by_perl: v5.26.2
+x_generated_by_perl: v5.28.2
 x_serialization_backend: 'YAML::Tiny version 1.73'

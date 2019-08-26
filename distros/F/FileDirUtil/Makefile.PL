@@ -20,9 +20,23 @@ WriteMakefile(
 	      CONFIGURE_REQUIRES => {
 				     'ExtUtils::MakeMaker' => 0,
 				    },
-	      BUILD_REQUIRES     => {
+	      'TEST_REQUIRES'     => {
 				     'Test::More' => 0,
 				    },
+				'META_MERGE'       => {
+							'meta-spec' => { version => 2 },
+							'resources' => {
+								'repository' => {
+									'type' => 'git',
+							 		'url'  => "https://github.com/mtw/FileDirUtil.git",
+									'web'  => "https://github.com/mtw/FileDirUtil",
+								},
+								'bugtracker' => {
+									'web'    => "https://github.com/mtw/FileDirUtil/issues",
+								},
+							 	'homepage' => $github,
+								},
+						  },
 	      dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-	      clean => { FILES => 'Bio-RNA-AliSplit-*' },
+	      clean => { FILES => 'FileDirUtil-*' },
 	     );

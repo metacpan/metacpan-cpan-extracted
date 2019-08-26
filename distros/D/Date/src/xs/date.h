@@ -9,11 +9,11 @@ using namespace panda::date;
 inline Date invalid_date () { return Date(-2000000000, 0, 1); }
 
 inline TimezoneSP tzget_required (SV* zone) {
-    return tzget(zone && SvOK(zone) ? xs::in<panda::string_view>(aTHX_ zone) : panda::string_view());
+    return tzget(zone && SvOK(zone) ? xs::in<panda::string_view>(zone) : panda::string_view());
 }
 
 inline TimezoneSP tzget_optional (SV* zone) {
-    return zone ? tzget(SvOK(zone) ? xs::in<panda::string_view>(aTHX_ zone) : panda::string_view()) : TimezoneSP();
+    return zone ? tzget(SvOK(zone) ? xs::in<panda::string_view>(zone) : panda::string_view()) : TimezoneSP();
 }
 
 void hash2vals  (const Hash& hash, ptime_t vals[8], TimezoneSP* zoneref);

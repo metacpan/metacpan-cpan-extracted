@@ -38,8 +38,16 @@ sub get_oldest_file_in_cache($self) {
   my @files = File::Find::Rule
     ->file
     ->name( '*' . $self->file_extension );
+  p @files;
 
   # https://stackoverflow.com/a/7585306/954777
+}
+
+sub get_all_cache_files_ordered_by_date ($self) {
+  my $path_and_pattern = $self->cache_path . '*' . $self->file_extension;
+  my @files
+    = sort { ( stat $a )[ 10 ] <=> ( stat $b )[ 10 ] } glob $path_and_pattern;
+  return @files;
 }
 
 sub release_cache($id) { }
@@ -79,11 +87,11 @@ Interact::Later - Delay some tasks for later by dumping their data to disk
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 
 =head1 SYNOPSIS
@@ -151,9 +159,10 @@ TODO
 
 =head1 SUBROUTINES/METHODS
 
-=head2 get_oldest_file_in_the_cache
+=head2 get_oldest_cache_files_ordered_by_date
 
-Retrieve the oldest file in the cache.
+Retrieve the oldest file in the cache. C<$files[0]> is the oldest,
+C<$files[-1]>the newest.
 
 =head2 clean_cache
 

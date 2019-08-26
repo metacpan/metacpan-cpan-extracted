@@ -1,7 +1,7 @@
 package Bot::IRC::X::Reminder;
 # ABSTRACT: Bot::IRC plugin for scheduling reminders
 
-use 5.012;
+use 5.014;
 use strict;
 use warnings;
 
@@ -9,7 +9,7 @@ use DateTime;
 use DateTime::Duration;
 use Time::Crontab;
 
-our $VERSION = '1.03'; # VERSION
+our $VERSION = '1.04'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -99,19 +99,19 @@ sub init {
     $bot->hook(
         {
             to_me => 1,
-            text  => qr/^(?<command>list|forget)\s+(?<scope>my|all)\s+reminders/i,
+            text  => qr/^reminders\s+(?<command>list|forget)\s+(?<scope>mine|all)\b/i,
         },
         sub {
             my ( $bot, $in, $m ) = @_;
             my @reminders = @{ $bot->store->get('reminders') || [] };
 
             if ( lc( $m->{command} ) eq 'list' ) {
-                if ( lc( $m->{scope} ) eq 'my' ) {
+                if ( lc( $m->{scope} ) eq 'mine' ) {
                     my $me = lc( $in->{nick} );
                     @reminders = grep { $_->{author} eq $me } @reminders;
                 }
                 $bot->reply_to(
-                    'I have no reminders ' . ( ( lc( $m->{scope} ) eq 'my' ) ? 'from you ' : '' ) . 'on file.'
+                    'I have no reminders ' . ( ( lc( $m->{scope} ) eq 'mine' ) ? 'from you ' : '' ) . 'on file.'
                 ) unless (@reminders);
 
                 for ( my $i = 0; $i < @reminders; $i++ ) {
@@ -125,7 +125,7 @@ sub init {
                 }
             }
             else {
-                if ( lc( $m->{scope} ) eq 'my' ) {
+                if ( lc( $m->{scope} ) eq 'mine' ) {
                     my $me = lc( $in->{nick} );
                     @reminders = grep { $_->{author} ne $me } @reminders;
                 }
@@ -162,7 +162,7 @@ Bot::IRC::X::Reminder - Bot::IRC plugin for scheduling reminders
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Bot-IRC-X-Reminder.svg)](https://travis-ci.org/gryphonshafer/Bot-IRC-X-Reminder)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/Bot-IRC-X-Reminder/badge.png)](https://coveralls.io/r/gryphonshafer/Bot-IRC-X-Reminder)
@@ -236,16 +236,16 @@ There are a couple of helper functions you can call as well.
 
 You can list all of your reminders or all reminders from anyone.
 
-    bot list my reminders
-    bot list all reminders
+    bot reminders list mine
+    bot reminders list all
 
 =head2 forget reminders
 
 You can tell the bot to forget all of your reminders or all reminders from
 everyone.
 
-    bot forget my reminders
-    bot forget all reminders
+    bot reminders forget mine
+    bot reminders forget all
 
 =head1 SEE ALSO
 
@@ -299,7 +299,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Gryphon Shafer.
+This software is copyright (c) 2018 by Gryphon Shafer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

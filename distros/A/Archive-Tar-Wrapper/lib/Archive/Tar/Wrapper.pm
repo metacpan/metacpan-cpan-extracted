@@ -18,7 +18,7 @@ use IPC::Open3;
 use Symbol 'gensym';
 use Carp;
 
-our $VERSION = '0.36';
+our $VERSION = '0.37';
 my $logger = get_logger();
 
 =pod
@@ -690,7 +690,7 @@ string of the path to the file which permissions will be copied from.
 
 =item 2.
 
-string of the path to the file which permissions will be copied to. 
+string of the path to the file which permissions will be copied to.
 
 =back
 
@@ -863,7 +863,7 @@ sub _offset {
     return $offset;
 }
 
-=head2 write 
+=head2 write
 
     $arch->write($tarfile, $compress);
 

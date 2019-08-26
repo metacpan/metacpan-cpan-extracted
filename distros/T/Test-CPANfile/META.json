@@ -39,9 +39,9 @@
       "runtime" : {
          "requires" : {
             "Exporter" : "5.57",
-            "Module::CPANfile" : "0",
+            "Module::CPANfile" : "1.1004",
             "Module::CoreList" : "2.99",
-            "Perl::PrereqScanner::NotQuiteLite" : "0.9902"
+            "Perl::PrereqScanner::NotQuiteLite" : "0.9907"
          }
       },
       "test" : {
@@ -61,6 +61,6 @@
          "url" : "https://github.com/charsbar/Test-CPANfile"
       }
    },
-   "version" : "0.06",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "0.07",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

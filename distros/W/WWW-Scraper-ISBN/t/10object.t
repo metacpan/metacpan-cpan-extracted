@@ -5,6 +5,7 @@ use lib qw(t/lib);
 
 use Test::More;
 use WWW::Scraper::ISBN;
+use WWW::Scraper::ISBN::Test_Driver;
 
 # Can we create the object?
 
@@ -12,6 +13,16 @@ my $scraper = WWW::Scraper::ISBN->new();
 isa_ok($scraper,'WWW::Scraper::ISBN');
 my $scraper2 = $scraper->new();
 isa_ok($scraper2,'WWW::Scraper::ISBN');
+
+# what drivers do we have ?
+
+{
+
+    my @drivers = grep { $_ =~ /Test/ } $scraper->available_drivers();
+    is(@drivers,1,'at least one driver available');
+    is($drivers[0],'Test','Test driver found');
+
+}
 
 # can we handle drivers?
 

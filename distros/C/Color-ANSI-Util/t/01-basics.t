@@ -48,7 +48,7 @@ subtest "256 colors" => sub {
     is(ansi256_to_rgb(156), "afff87");
     is(rgb_to_ansi256("ff0000"), 9);
     is(rgb_to_ansi256("afff80"), 156);
-    is(rgb_to_ansi256("afdf80"), 150);
+    is(rgb_to_ansi256("afdf80"), 107);
     is(rgb_to_ansi256_fg_code("7e0000"), "\e[38;5;1m");
     is(ansi256fg             ("fe0000"), "\e[38;5;9m");
     is(rgb_to_ansi256_bg_code("7e0000"), "\e[48;5;1m");

@@ -17,10 +17,10 @@ no_index:
 provides:
   Config::Parser:
     file: lib/Config/Parser.pm
-    version: 1.00
+    version: 1.03
   Config::Parser::Ini:
     file: lib/Config/Parser/Ini.pm
     version: 0
 resources:
   repository: git://git.gnu.org.ua/config-parser.git
-version: 1.00
+version: 1.03

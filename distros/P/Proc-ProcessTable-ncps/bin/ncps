@@ -1,0 +1,763 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Proc::ProcessTable::ncps;
+
+sub version{
+        print "ncps v. 0.0.0\n";
+}
+
+sub help{
+	print '
+
+-c <regex>    Search procs using the matching regex.
+--ci          Invert the command search.
+
+--cf          Show children minor faults.
+
+--cF          Show children major faults.
+
+--eg          Search for proccs with a EGID set.
+--egi         Invert the EGID set search.
+
+--eu          Search for proccs with a EUID set.
+--eui         Invert the EUID set search.
+
+-f            Show minor faults.
+
+-F            Show major faults.
+
+-J            Show jail IDs.
+-j <jids>     A comma seperated list of JIDs to search for.
+--ji          Invert the JIDs earch.
+
+--idle        Show the idle kernel process.
+
+--kern        Searches for kernel processes.
+--kerni       Invert the kernel process search.
+
+-m <pctmem>   Memory usage percent to search for.
+--mi          Invert the memory usage search.
+
+-n            Show number of threads.
+
+--nc          disable color.
+
+-p <pctcpu>   CPU usage percent to search for.
+--pi          Invert the CPU usage search.
+
+--pid <pids>  PIDs to search for.
+--pidi        Invert the PID search.
+
+-r <RSSs>     A comma seperated list of RSS values to search for.
+--ri          Invert the RSS search.
+
+-s            Show swapped out procs.
+--si          Invert the swapped out search.
+
+--self        Show the the ncps process as well.
+
+--st <states> A comma seperated list of states to search for.
+--sti         Invert the state search.
+
+--stats       Print some general states about CPU usage and memory usage.
+
+-t <times>    A comma seperated value of time, in seconds, to search for.
+--ti          Invert the time search.
+
+--tty         Show TTYs.
+
+-u <UIDs>     A comma seperated list of UIDs or usernames.
+--ui          Invert the UID/username search.
+
+-vs <VSZs>    A comma seperated list of VSZs to search for.
+--vsi         Invert the VSZ search.
+
+-w <wchans>   A string search for wait channels.
+--wi          Invert the wait channel search.
+
+-z            Show zombies procs.
+
+
+For the various switches above that can take numeric values,
+the equalities below can be used, by directly prepending them to
+the number.
+<
+<=
+>
+>=
+!
+
+';
+}
+
+# defaults
+my $wait_channels_string;
+my $wait_channels_invert=0;
+my $zombie=0,
+my $swapped=0,
+my $no_color=0;
+my $swapped_invert=0;
+my $version;
+my $help;
+my $commands_string;
+my $commands_invert=0;
+my $pids_string;
+my $pids_invert=0;
+my $cpu_string;
+my $cpu_invert=0;
+my $mem_string;
+my $mem_invert=0;
+my $rss_string;
+my $rss_invert=0;
+my $time_string;
+my $time_invert=0;
+my $states_string;
+my $states_invert=0;
+my $minor_faults=0;
+my $major_faults=0;
+my $cminor_faults=0;
+my $cmajor_faults=0;
+my $numthr=0;
+my $tty=0;
+my $jid=0;
+my $jids_string;
+my $jids_invert=0;
+my $uids_string;
+my $uids_invert=0;
+my $euid=0;
+my $euid_invert=0;
+my $egid=0;
+my $egid_invert=0;
+my $self_proc=0;
+my $idle=0;
+my $stats=0;
+my $kern=0;
+my $kern_invert=0;
+my $vsz_string;
+my $vsz_invert=0;
+
+# get the commandline options
+Getopt::Long::Configure ('no_ignore_case');
+Getopt::Long::Configure ('bundling');
+GetOptions(
+		   'w=s' => \$wait_channels_string,
+		   'wi' => \$wait_channels_invert,
+		   'h' => \$help,
+		   'help' => \$help,
+		   'v' => \$version,
+		   'version' => \$version,
+		   'z'=> \$zombie,
+		   's'=> \$swapped,
+		   'si' => \$swapped_invert,
+		   'c=s' => \$commands_string,
+		   'ci' => \$commands_invert,
+		   'pid=s' => \$pids_string,
+		   'pidi' => \$pids_invert,
+		   'p=s' => \$cpu_string,
+		   'pi' => \$cpu_invert,
+		   'm=s' => \$mem_string,
+		   'mi' => \$mem_invert,
+		   'r=s' => \$rss_string,
+		   'ri' => \$rss_invert,
+		   't=s' => \$time_string,
+		   'ti' => \$time_invert,
+		   'st=s' => \$states_string,
+		   'sti' => \$states_invert,
+		   'f' => \$minor_faults,
+		   'F' => \$major_faults,
+		   'cf' => \$cminor_faults,
+		   'cF' => \$cmajor_faults,
+		   'n' => \$numthr,
+		   'tty' => \$tty,
+		   'J' => \$jid,
+		   'nc' => \$no_color,
+		   'j=s' => \$jids_string,
+		   'ji' => \$jids_invert,
+		   'u=s' => \$uids_string,
+		   'ui' => \$uids_invert,
+		   'eu' => \$euid,
+		   'eui' => \$euid_invert,
+		   'eg' => \$egid,
+		   'egi' => \$egid_invert,
+		   'self' => \$self_proc,
+		   'idle' => \$idle,
+		   'stats' => \$stats,
+		   'kern' => \$kern,
+		   'kerni' => \$kern_invert,
+		   'vs=s' => \$vsz_string,
+		   'vsi' => \$vsz_invert,
+		   );
+
+# print the version info if requested
+if ( $version ){
+        &version;
+        exit;
+}
+
+if ( $help ){
+        &version;
+        &help;
+        exit;
+}
+
+my @filters;
+
+#
+# handles wait channels
+#
+if ( defined( $wait_channels_string ) ){
+	my @wchans=split(/\,/, $wait_channels_string );
+	push( @filters, {
+					 type=>'WChan',
+					 invert=>$wait_channels_invert,
+					 args=>{
+							wchans=>\@wchans,
+							},
+					 });
+}
+
+#
+# handles swappped procs search
+#
+if ( $swapped ){
+	push( @filters, {
+					 type=>'Swapped',
+					 invert=>$swapped_invert,
+					 args=>{},
+					 });
+}
+
+#
+# handles the commands search
+#
+if ( defined( $commands_string ) ){
+	my @commands=split(/\,/, $commands_string );
+	push( @filters, {
+					 type=>'Command',
+					 invert=>$commands_invert,
+					 args=>{
+							commands=>\@commands,
+							},
+					 });
+}
+
+#
+# handles the PIDs search
+#
+if ( defined( $pids_string ) ){
+	my @pids=split(/\,/, $pids_string );
+	push( @filters, {
+					 type=>'PID',
+					 invert=>$pids_invert,
+					 args=>{
+							pids=>\@pids,
+							},
+					 });
+}
+
+#
+# handles the CPU search
+#
+if ( defined( $cpu_string ) ){
+	my @cpus=split(/\,/, $cpu_string );
+	push( @filters, {
+					 type=>'PctCPU',
+					 invert=>$cpu_invert,
+					 args=>{
+							pctcpus=>\@cpus,
+							},
+					 });
+}
+
+#
+# handles the memory search
+#
+if ( defined( $mem_string ) ){
+	my @mems=split(/\,/, $mem_string );
+	push( @filters, {
+					 type=>'PctMem',
+					 invert=>$mem_invert,
+					 args=>{
+							pctmems=>\@mems,
+							},
+					 });
+}
+
+#
+# handles the RSS search
+#
+if ( defined( $rss_string ) ){
+	my @rss=split(/\,/, $rss_string );
+	push( @filters, {
+					 type=>'RSS',
+					 invert=>$rss_invert,
+					 args=>{
+							rss=>\@rss,
+							},
+					 });
+}
+
+#
+# handles the JID search
+#
+if ( defined( $jids_string ) ){
+	my @jids=split(/\,/, $jids_string );
+	push( @filters, {
+					 type=>'JID',
+					 invert=>$jids_invert,
+					 args=>{
+							jids=>\@jids,
+							},
+					 });
+}
+
+#
+# handles the time search
+#
+if ( defined( $time_string ) ){
+	my @times=split(/\,/, $time_string );
+	push( @filters, {
+					 type=>'Time',
+					 invert=>$time_invert,
+					 args=>{
+							times=>\@times,
+							},
+					 });
+}
+
+#
+# handles the UID/username search
+#
+if ( defined( $uids_string ) ){
+	my @uids=split(/\,/, $uids_string );
+	push( @filters, {
+					 type=>'UID',
+					 invert=>$uids_invert,
+					 args=>{
+							uids=>\@uids,
+							},
+					 });
+}
+
+#
+# handles the virtual size search
+#
+if ( defined( $vsz_string ) ){
+	my @vszs=split(/\,/, $vsz_string );
+	push( @filters, {
+					 type=>'Size',
+					 invert=>$vsz_invert,
+					 args=>{
+							sizes=>\@vszs,
+							},
+					 });
+}
+
+#
+# handles the kernel process search
+#
+if ( $kern ){
+	push( @filters, {
+					 type=>'KernProc',
+					 invert=>$kern_invert,
+					 args=>{
+							},
+					 });
+}
+
+#
+# handles the EUID set search
+#
+if ( $euid ){
+	push( @filters, {
+					 type=>'EUIDset',
+					 invert=>$euid_invert,
+					 args=>{
+							},
+					 });
+}
+
+#
+# handles the EGID set search
+#
+if ( $egid ){
+	push( @filters, {
+					 type=>'EGIDset',
+					 invert=>$egid_invert,
+					 args=>{
+							},
+					 });
+}
+
+
+#
+# handles the states search
+#
+if ( defined( $states_string ) ){
+	my @states=split(/\,/, $states_string );
+	push( @filters, {
+					 type=>'State',
+					 invert=>$states_invert,
+					 args=>{
+							states=>\@states,
+							},
+					 });
+}
+
+
+# XOR common boolean CLI flags
+if ( defined( $ENV{NCPS_jid} ) ){
+	$jid = $jid ^ 1;
+}
+if ( defined( $ENV{NCPS_numthr} ) ){
+	$numthr = $numthr ^ 1;
+}
+if ( defined( $ENV{NCPS_cmajflt} ) ){
+	$cmajor_faults = $cmajor_faults ^ 1;
+}
+if ( defined( $ENV{NCPS_majflt} ) ){
+	$major_faults = $major_faults ^ 1;
+}
+if ( defined( $ENV{NCPS_cminflt} ) ){
+	$cminor_faults = $cminor_faults ^ 1;
+}
+if ( defined( $ENV{NCPS_minflt} ) ){
+	$minor_faults = $minor_faults ^ 1;
+}
+if ( defined( $ENV{NCPS_tty} ) ){
+	$tty = $tty ^ 1;
+}
+if ( defined( $ENV{NCPS_self} ) ){
+	$self_proc = $self_proc ^ 1;
+}
+if ( defined( $ENV{NCPS_idle} ) ){
+	$idle = $idle ^ 1;
+}
+#if ( defined( $ENV{NCPS_inverted} ) ){
+# no invert support really yet
+#}
+
+# xor --nc if needed
+if ( defined( $ENV{NO_COLOR} ) ){
+        $no_color = $no_color ^ 1;
+}
+# disable the color if requested
+if ( $no_color ){
+        $ENV{ANSI_COLORS_DISABLED}=1;
+}
+
+#
+# handles the self proc flag
+#
+if ( ! $self_proc ){
+	push( @filters, {
+					 type=>'PID',
+					 invert=>1,
+					 args=>{
+							pids=>[$$],
+							},
+					 });
+}
+
+#
+# handles the self proc flag
+#
+if ( ! $idle ){
+	push( @filters, {
+					 type=>'Idle',
+					 invert=>1,
+					 args=>{
+							},
+					 });
+}
+
+my $args={
+		  invert=>0,
+		  cmajor_faults=>$cmajor_faults,
+		  cminor_faults=>$cminor_faults,
+		  major_faults=>$major_faults,
+		  minor_faults=>$minor_faults,
+		  numthr=>$numthr,
+		  tty=>$tty,
+		  jid=>$jid,
+		  stats=>$stats,
+		  match=>{
+				  checks=>\@filters,
+				  }
+		  };
+
+my $ncps=Proc::ProcessTable::ncps->new( $args );
+print $ncps->run;
+exit 0;
+
+=head1 NAME
+
+ncps - Searches the process table and displays the results.
+
+=head1 SYNOPSIS
+
+ncps [B<-c> <regex>] [B<--ci>] [B<--cf>] [B<--cF>] [B<--eg>] [B<--egi>]
+[B<-f>] [B<-F>] [B<-J>] [B<-j> <JIDs>] [B<--ji>] [B<--idle>] [B<--kern>]
+[B<--kerni>] [B<-m> <pctmem>] [B<--mi>] [B<-n>] [B<--nc>] [B<-p> <pctcpu>]
+[B<--pi>] [B<--pid> <PIDs>] [B<--pidi>] [B<-r> <RSS>] [B<--ri>] [B<-s>]
+[B<--si>] [B<--self>] [B<--st> <states>] [B<--sti>] [B<--stats>]
+[B<-t> <times>] [B<--ti>] [B<--tty>] [B<-u> <UIDs>] [B<--ui>] [B<--vs> <VSZs>]
+[B<--vsi>] [B<-w> <WChans>] [B<--wi>] [B<-z>]
+
+=head1 DESCRIPTION
+
+No flags needed passed to use. By default it will show all processes except
+for its own and the idle process.
+
+=head1 SWITCHES
+
+=head2 -c <regex>
+
+Search procs using the matching regex.
+
+=head2 --ci
+
+Invert the command search.
+
+=head2 --cf
+
+Show children minor faults.
+
+=head2 --cF
+
+Show children major faults.
+
+=head2 --eg
+
+Search for proccs with a EGID set.
+
+=head2 --egi
+
+Invert the EGID set search.
+
+=head2 --eu
+
+Search for proccs with a EUID set.
+
+=head2 --eui
+
+Invert the EUID set search.
+
+=head2 -f
+
+Show minor faults.
+
+=head2 -F
+
+Show major faults.
+
+=head2 -J
+
+Show jail IDs.
+
+=head2 -j <jids>
+
+A comma seperated list of JIDs to search for.
+
+=head2 --ji
+
+Invert the JIDs earch.
+
+=head2 --idle
+
+Show the idle kernel process.
+
+=head2 --kern
+
+Searches for kernel processes.
+
+=head2 --kerni
+
+Invert the kernel process search.
+
+=head2 -m <pctmem>
+
+Memory usage percent to search for.
+
+=head2 --mi
+
+Invert the memory usage search.
+
+=head2 -n
+
+Show number of threads.
+
+=head2 --nc
+
+Disable color.
+
+=head2 -p <pctcpu>
+
+CPU usage percent to search for.
+
+=head2 --pi
+
+Invert the CPU usage search.
+
+=head2 --pid <pids>
+
+PIDs to search for.
+
+=head2 --pidi
+
+Invert the PID search.
+
+=head2 -r <RSSs>
+
+A comma seperated list of RSS values to search for.
+
+=head2 --ri
+
+Invert the RSS search.
+
+=head2 -s
+
+Show swapped out procs.
+
+=head2 --si
+
+Invert the swapped out search.
+
+=head2 --self
+
+Show the the ncps process as well.
+
+=head2 --st <states>
+
+A comma seperated list of states to search for.
+
+=head2 --sti
+
+Invert the state search.
+
+=head2 --stats
+
+Print some general states about CPU usage and memory usage.
+
+=head2 -t <times>
+
+A comma seperated value of time, in seconds, to search for.
+
+=head2 --ti
+
+Invert the time search.
+
+=head2 --tty
+
+Show TTYs.
+
+=head2 -u <UIDs>
+
+A comma seperated list of UIDs or usernames.
+
+=head2 --ui
+
+Invert the UID/username search.
+
+=head2 -vs <VSZs>
+
+A comma seperated list of VSZs to search for.
+
+=head2 --vsi
+
+Invert the VSZ search.
+
+=head2 -w <wchans>
+
+A string search for wait channels.
+
+=head2 --wi
+
+Invert the wait channel search.
+
+=head2 -z
+
+Show zombies procs.
+
+=head1 EQUALITIES
+
+For the various switches above that can take numeric values,
+the equalities below can be used, by directly prepending them to
+the number.
+
+    <
+    <=
+    >
+    >=
+    !
+
+=head1 ENVIROMENTAL VARIABLES
+
+The enviromental variables below may be set to
+set the default for the flag in question.
+
+Unless set to defined ands set to 1, these will
+default to 0.
+
+=head2 NCPS_jid
+
+Sets the default for the -J flag.
+
+=head2 NCPS_numthr
+
+Sets the default for the -n flag.
+
+=head2 NCPS_cmajflt
+
+Sets the default for the --cF flag.
+
+=head2 NCPS_majflt
+
+Sets the default for the -F flag.
+
+=head2 NCPS_cminflt
+
+Sets the default for the --cf flag.
+
+=head2 NCPS_minflt
+
+Sets the default for the -f flag.
+
+=head2 NCPS_tty
+
+Sets the default for the --tty flag.
+
+=head2 NCPS_self
+
+Sets the default for the --self flag.
+
+=head2 NCPS_idle
+
+Sets the default for the --idle flag.
+
+=head2 NO_COLOR
+
+Don't colorize the output.
+
+=head1 EXAMPLES
+
+    ncps -J -j 0 --ji
+
+Display all processes with a jail ID other than zero.
+
+    ncps -c firefox --stats
+
+Show all firefox processes and the stats for them.
+
+    ncps -F -f -cF -cf
+
+Show all minor/major values for processes.
+
+    ncps -p '>1'
+
+Show all processes using more than 1% of the CPU time.
+
+=cut

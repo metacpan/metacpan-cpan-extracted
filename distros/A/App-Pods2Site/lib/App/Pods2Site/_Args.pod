@@ -4,6 +4,10 @@ App::Pods2Site::_Args - hidden flags
 
 Commandline options and arguments understood for TestOnTap processing
 
+=head1 VERSION
+
+Version 1.002
+
 =head1 SYNOPSIS
 
  pods2site

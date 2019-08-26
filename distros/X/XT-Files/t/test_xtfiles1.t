@@ -9,6 +9,8 @@ use Test::More 0.88;
 use Test::XTFiles;
 use XT::Files;
 
+delete $ENV{XT_FILES_DEFAULT_CONFIG_FILE};
+
 use constant CLASS => 'Test::XTFiles';
 
 chdir 'corpus/empty' or die "chdir failed: $!";

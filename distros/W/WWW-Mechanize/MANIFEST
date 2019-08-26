@@ -90,6 +90,7 @@ t/local/reload.t
 t/local/submit.t
 t/mech-dump/mech-dump.t
 t/new.t
+t/refresh.html
 t/regex-error.t
 t/save_content.html
 t/save_content.t

@@ -33,6 +33,7 @@ GetOptions(\my %opts, qw/
   blib
   use_index|use-index=s
   perl_minimum_version
+  verbose
 /);
 
 if ($opts{version}) {
@@ -199,6 +200,10 @@ parsers by default.
 
 Add a list of additional @INC path C<scan-perl-prereqs-nqlite>
 looks for private parsers.
+
+=item verbose
+
+Print verbose messages.
 
 =back
 

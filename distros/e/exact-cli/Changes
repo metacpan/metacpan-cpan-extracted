@@ -1,4 +1,11 @@
 Revision history for exact::cli
 
+1.03      2019-08-26 15:12:32-07:00 America/Los_Angeles
+        - Removed support for Perl versions prior to 5.14
+
+1.02      2019-08-26 14:39:44-07:00 America/Los_Angeles
+        - Changed to use "-" prepending flags for compile check w00t
+        - Add back dist.ini components
+
 1.01      2019-08-08 11:13:36-07:00 America/Los_Angeles
         - First version, released on an unsuspecting world.

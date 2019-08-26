@@ -2,8 +2,8 @@ NAME
     Data::Transmute - Transmute (transform) data structure using rules data
 
 VERSION
-    This document describes version 0.030 of Data::Transmute (from Perl
-    distribution Data-Transmute), released on 2019-07-24.
+    This document describes version 0.034 of Data::Transmute (from Perl
+    distribution Data-Transmute), released on 2019-08-23.
 
 SYNOPSIS
      use Data::Transmute qw(
@@ -11,13 +11,14 @@ SYNOPSIS
          reverse_rules
      );
 
-     transmute_data(
+     my $transmuted_data = transmute_data(
          data => \@data,
          rules => [
 
+             # CREATING HASH KEY
 
              # this rule only applies when data is a hash, when data is not a hash
-             # this will will do nothing. create a single new hash key, error if key
+             # this will do nothing. create a single new hash key, error if key
              # already exists.
              [create_hash_key => {name=>'foo', value=>1}],
 
@@ -30,9 +31,11 @@ SYNOPSIS
              [create_hash_key => {name=>'baz', value=>3, replace=>1}],
 
 
+             # RENAMING HASH KEY
+
              # this rule only applies when data is a hash, when data is not a hash
-             # this will will do nothing. rename a single key, error if old name
-             # doesn't exist or new name exists.
+             # this will do nothing. rename a single key, error if old name doesn't
+             # exist or new name exists.
              [rename_hash_key => {from=>'qux', to=>'quux'}],
 
              # rename another key, but this time ignore if old name doesn't exist
@@ -40,25 +43,57 @@ SYNOPSIS
              [rename_hash_key => {from=>'corge', to=>'grault', ignore_missing_from=>1, replace=>1}],
 
 
+             # DELETING HASH KEY
+
              # this rule only applies when data is a hash, when data is not a hash
-             # this will will do nothing. delete a single key, will noop if key
-             # already doesn't exist.
+             # this will do nothing. delete a single key, will noop if key already
+             # doesn't exist.
              [delete_hash_key => {name=>'garply'}],
 
 
-             # this rule only applies when data is an arrayref, when data is not a
-             # array this will will do nothing. for each array element, apply
-             # transmute rules to it.
+             # APPLYING (SUB)RULES TO ARRAY ELEMENTS
+
+             # this rule only applies when data is an arrayref, when data is not an
+             # array this will do nothing. for each array element, apply transmute
+             # rules to it.
              [transmute_array_elems => {rules => [...]}],
 
+             # you can select only certain elements to transmute by using one+ of:
+             # index_is, index_in, index_match, index_filter.
+             [transmute_array_elems => {
+                  #index_is => 1,              # only transmute 2nd element (index is 0-based)
+                  #index_in => [0,1,2],        # only transmute the first 3 elements
+                  #index_match => qr/.../,     # only transmute elements where the index matches a regex
+                  #index_filter => sub{...},   # only transmute elements where $filter->(index=>$index) returns true
+                  rules => [...],
+              }],
+
+
+             # APPLYING (SUB)RULES TO HASH VALUES
 
              # this rule only applies when data is a hashref, when data is not a
-             # hash this will will do nothing. for each hash value, apply transmute
-             # rules to it.
+             # hash this will do nothing. for each hash value, apply transmute rules
+             # to it.
              [transmute_hash_values => {rules => [...]}],
 
+             # you can select only certain keys to transmute by using one+ of:
+             # key_is, key_in, key_match, key_filter.
+             [transmute_hash_values => {
+                  #key_is => 'foo',          # only transmute value of key 'foo'
+                  #key_in => ['foo', 'bar'], # only transmute value of keys 'foo', 'bar'
+                  #key_match => qr/.../,     # only transmute value of keys that match a regex
+                  #key_filter => sub{...},   # only transmute value of keys where $filter->(key=>$key) returns true
+                  rules => [...],
+              }],
 
          ],
+     );
+
+    You can also load rules from a "Data::Transmute::Rules::*" module:
+
+     transmute_data(
+         data => $data,
+         rules_module => 'Convert_Proj1_Data_To_Proj2', # will load Data::Transmute::Rules::Convert_Proj1_Data_To_Proj2 and read its @RULES package variable
      );
 
 DESCRIPTION
@@ -75,6 +110,114 @@ RULES
 
     \%args: a special arg will be inserted: "data".
 
+  create_hash_key
+    This rule only applies when data is a hash, when data is not a hash this
+    will do nothing. Create a single new hash key, error if key already
+    exists.
+
+    Known arguments ("*" means required):
+
+    *   name*
+
+    *   value*
+
+    *   ignore
+
+        Bool. If set to true, will ignore/noop if key already exists. This
+        is like INSERT IGNORE (INSERT OR IGNORE) in SQL.
+
+    *   replace
+
+        Bool. If set to true, will replace existing keys. This is like
+        REPLACE INTO in SQL.
+
+  rename_hash_key
+    This rule only applies when data is a hash, when data is not a hash this
+    will do nothing. Rename a single key, error if old name doesn't exist or
+    new name exists.
+
+    Known arguments ("*" means required):
+
+    *   from*
+
+    *   to*
+
+    *   ignore_missing_from
+
+        Bool. If set to true, will noop (instead of error) if old name
+        doesn't exist.
+
+    *   replace
+
+        Bool. If set to true, will overwrite (instead of error) when target
+        key already exists.
+
+  delete_hash_key
+    This rule only applies when data is a hash, when data is not a hash this
+    will do nothing. Delete a single key, will noop if key already doesn't
+    exist.
+
+    Known arguments ("*" means required):
+
+    *   name*
+
+  transmute_array_elems
+    This rule only applies when data is an arrayref, when data is not an
+    array this will do nothing. for each array element, apply transmute
+    rules to it.
+
+    Known arguments ("*" means required):
+
+    *   rules
+
+        Either "rules" or "rules_module" is required. "rules" takes
+        precedence over "rules_module".
+
+    *   rules_module
+
+        Either "rules" or "rules_module" is required. "rules" takes
+        precedence over "rules_module".
+
+    *   index_is
+
+    *   index_in
+
+    *   index_match
+
+    *   index_filter
+
+        Coderef. Only transmute elements where $coderef->(index=>$index) is
+        true. Aside from "index", the coderef will also receive these
+        arguments: "rules" (the rule), "array" (the array).
+
+  transmute_hash_values
+    This rule only applies when data is a hashref, when data is not a hash
+    this will do nothing. For each hash value, apply transmute rules to it.
+
+    Known arguments ("*" means required):
+
+    *   rules
+
+        Either "rules" or "rules_module" is required. "rules" takes
+        precedence over "rules_module".
+
+    *   rules_module
+
+        Either "rules" or "rules_module" is required. "rules" takes
+        precedence over "rules_module".
+
+    *   key_is
+
+    *   key_in
+
+    *   key_match
+
+    *   key_filter
+
+        Coderef. Only transmute value of keys where $coderef->(key=>$key) is
+        true. Aside from "key", the coderef will also receive these
+        arguments: "rules" (the rule), "hash" (the hash).
+
 FUNCTIONS
   transmute_data
     Usage:
@@ -86,6 +229,26 @@ FUNCTIONS
     clone it first if you don't want to modify the original data). Rules is
     specified in "rules" argument.
 
+    Known arguments ("*" means required):
+
+    *   data*
+
+    *   rules
+
+        Array of rules. See "RULES" for more details.
+
+        Either "rules" or "rules_module" is required. "rules" takes
+        precedence over "rules_module".
+
+    *   rules_module
+
+        Specify name of module (without the "Data::Transmute::Rules::"
+        prefix) which contains the actual rules. The module will be loaded
+        and the rules retrieved from its @RULES package variable.
+
+        Either "rules" or "rules_module" is required. "rules" takes
+        precedence over "rules_module".
+
   reverse_rules
     Usage:
 
@@ -93,15 +256,33 @@ FUNCTIONS
 
     Create a reverse rules, die on failure.
 
+    Known arguments ("*" means required):
+
+    *   rules
+
+        Either "rules" or "rules_module" is required. "rules" takes
+        precedence over "rules_module".
+
+        See "transmute_data" for more details.
+
+    *   rules_module
+
+        Either "rules" or "rules_module" is required. "rules" takes
+        precedence over "rules_module".
+
+        See "transmute_data" for more details.
+
+ENVIRONMENT
+  LOG_DATA_TRANSMUTE_STEP
+    Boolean. If set to true, will log each transmute step (rule by rule) at
+    the trace level using Log::ger.
+
 TODOS
-    Check arguments (DZP:Rinci::Wrap?).
-
-    Undo?
-
     Function to mass rename keys (by regex substitution, prefix, custom Perl
-    code, ...).
+    code, ...). But this cannot produce reverse of rule.
 
-    Function to mass delete keys (by regex, prefix, ...).
+    Function to mass delete keys (by regex, prefix, ...). But this cannot
+    produce reverse of rule.
 
 HOMEPAGE
     Please visit the project's homepage at

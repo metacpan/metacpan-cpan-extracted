@@ -6,6 +6,7 @@ use warnings;
 use HTTP::Tiny;
 use JSON::XS qw/decode_json encode_json/;
 use Try::Tiny;
+use AWS::Lambda;
 use AWS::Lambda::Context;
 use Scalar::Util qw(blessed);
 
@@ -70,6 +71,8 @@ sub handle_event {
     $self->_init or return;
     my ($payload, $context) = $self->lambda_next;
     my $response = try {
+        local $AWS::Lambda::context = $context;
+        local $ENV{_X_AMZN_TRACE_ID} = $context->{trace_id};
         $self->{function}->($payload, $context);
     } catch {
         $self->lambda_error($_, $context);
@@ -91,9 +94,10 @@ sub lambda_next {
     my $h = $resp->{headers};
     my $payload = decode_json($resp->{content});
     return $payload, AWS::Lambda::Context->new(
-        deadline_ms    => $h->{'lambda-runtime-deadline-ms'},
-        aws_request_id => $h->{'lambda-runtime-aws-request-id'},
+        deadline_ms          => $h->{'lambda-runtime-deadline-ms'},
+        aws_request_id       => $h->{'lambda-runtime-aws-request-id'},
         invoked_function_arn => $h->{'lambda-runtime-invoked-function-arn'},
+        trace_id             => $h->{'lambda-runtime-trace-id'},
     );
 }
 

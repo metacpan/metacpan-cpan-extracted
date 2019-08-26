@@ -19,7 +19,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "Math-GrahamFunction",
-  "dist_version" => "0.02002",
+  "dist_version" => "0.02003",
   "license" => "mit",
   "module_name" => "Math::GrahamFunction",
   "recursive_test_files" => 1,

@@ -1,5 +1,12 @@
 package App::TestOnTap::PackInfo;
 
+use strict;
+use warnings;
+
+our $VERSION = '1.001';
+my $version = $VERSION;
+$VERSION = eval $VERSION;
+
 use App::TestOnTap::Util qw(slashify $IS_WINDOWS $IS_PACKED $SHELL_ARG_DELIM $FILE_SEP);
 
 use Config qw(myconfig);

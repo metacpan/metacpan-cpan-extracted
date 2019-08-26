@@ -18,20 +18,20 @@ use warnings;
     );
 
     # TEST
-    ok ($ex_gen, 'Init object');
+    ok( $ex_gen, 'Init object' );
 
     my $markup = $ex_gen->html_with_title(
         {
-            title => "Copying a file",
-            id_base => "copying_a_file",
-            examples =>
-            [
+            title    => "Copying a file",
+            id_base  => "copying_a_file",
+            examples => [
                 {
-                    id => "io_all",
+                    id    => "io_all",
                     label => "IO-All",
+
                     # To avoid CPANTS thinking that IO::All is a dependency
                     # we obscure the use statement.
-                    code => (lc("USE ")."IO::All;\n".<<'EOF'),
+                    code => ( lc("USE ") . "IO::All;\n" . <<'EOF'),
 
 my ($source_filename, $dest_filename) = @_;
 io->file($source_filename) > io->file($dest_filename);
@@ -39,9 +39,9 @@ EOF
 
                 },
                 {
-                    id => "core",
+                    id    => "core",
                     label => "Core Perl",
-                    code => <<'EOF',
+                    code  => <<'EOF',
 use File::Copy qw(copy);
 
 my ($source_filename, $dest_filename) = @_;
@@ -95,9 +95,5 @@ copy(<span class="Identifier">$source_filename</span>, <span class="Identifier">
 END_OF_HTML
 
     # TEST
-    eq_or_diff(
-        $markup,
-        $expected,
-        'Markup is fine',
-    );
+    eq_or_diff( $markup, $expected, 'Markup is fine', );
 }

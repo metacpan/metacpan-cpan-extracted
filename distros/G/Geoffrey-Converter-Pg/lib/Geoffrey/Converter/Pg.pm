@@ -6,7 +6,7 @@ use strict;
 use Readonly;
 use warnings;
 
-$Geoffrey::Converter::Pg::VERSION = '0.000200';
+$Geoffrey::Converter::Pg::VERSION = '0.000202';
 
 use parent 'Geoffrey::Role::Converter';
 
@@ -226,7 +226,7 @@ sub defaults {
 
 sub type {
     my ($self, $hr_column_params) = @_;
-    if ($hr_column_params->{default} eq 'autoincrement') {
+    if ($hr_column_params->{default} && $hr_column_params->{default} eq 'autoincrement') {
         $hr_column_params->{type}
             = lc $hr_column_params->{type} eq 'bigint'   ? 'bigserial'
             : lc $hr_column_params->{type} eq 'smallint' ? 'smallserial'
@@ -318,8 +318,8 @@ sub select_get_table {
 
 sub convert_defaults {
     my ($self, $params) = @_;
-    $params->{default} =~ s/^'(.*)'$/$1/;
-    if ($params->{type} eq 'bit') {
+    $params->{default} ? $params->{default} =~ s/^'(.*)'$/$1/ : undef;
+    if ($params->{default} && $params->{type} eq 'bit') {
         return qq~$params->{default}::bit~;
     }
     return $params->{default};
@@ -327,11 +327,11 @@ sub convert_defaults {
 
 sub parse_default {
     my ($self, $default_value) = @_;
-    return $1 * 1 if ($default_value =~ m/\w'(\d+)'::"\w+"/);
+    return $1 * 1 if ($default_value =~ m/\w+\s*(?:\((\d+)\))::(.*)(?:\;|\s)/);
     return $default_value;
 }
 
-sub can_create_empty_table { return 0 }
+sub can_create_empty_table { return 1 }
 
 sub colums_information {
     my ($self, $ar_raw_data) = @_;
@@ -446,7 +446,7 @@ Geoffrey::Converter::Pg - PostgreSQL converter for Geoffrey
 
 =head1 VERSION
 
-Version 0.000200
+Version 0.000202
 
 =head1 DESCRIPTION
 

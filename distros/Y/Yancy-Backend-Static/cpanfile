@@ -1,7 +1,7 @@
 requires "JSON::PP" => "0";
 requires "Text::Markdown" => "0";
 requires "YAML" => "0";
-requires "Yancy" => "1.036";
+requires "Yancy" => "1.037";
 requires "perl" => "5.014";
 
 on 'test' => sub {

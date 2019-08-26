@@ -5,7 +5,7 @@ use 5.014;
 use exact;
 use Role::Tiny ();
 
-our $VERSION = '1.02'; # VERSION
+our $VERSION = '1.04'; # VERSION
 
 sub import {
     my ( $self, $caller ) = @_;
@@ -57,15 +57,15 @@ exact::role - Simple role interface extension for exact
 
 =head1 VERSION
 
-version 1.02
+version 1.04
 
 =head1 SYNOPSIS
 
     package Claw;
-    use exact role;
+    use exact -role;
 
     package Cat;
-    use exact class;
+    use exact -class;
 
     with 'Claw';
 
@@ -78,7 +78,7 @@ with L<exact::class> and L<exact>.
 Note that the C<noautoclean> option of L<exact> gets automatically switched on
 when you:
 
-    use exact role;
+    use exact -role;
 
 This is to prevent all sorts of expected behaviors from L<Role::Tiny>. If you
 want autoclean functionality, it's left up to you to set that up.

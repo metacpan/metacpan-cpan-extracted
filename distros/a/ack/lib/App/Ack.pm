@@ -17,7 +17,7 @@ our $VERSION;
 our $COPYRIGHT;
 BEGIN {
     use version;
-    $VERSION = version->declare( 'v3.0.2' ); # Check https://beyondgrep.com/ for updates
+    $VERSION = version->declare( 'v3.1.0' ); # Check https://beyondgrep.com/ for updates
     $COPYRIGHT = 'Copyright 2005-2019 Andy Lester.';
 }
 our $STANDALONE = 0;
@@ -236,6 +236,8 @@ Searching:
   -v, --invert-match            Invert match: select non-matching lines
   -w, --word-regexp             Force PATTERN to match only whole words
   -Q, --literal                 Quote all metacharacters; PATTERN is literal
+  --range-start PATTERN         Specify PATTERN as the start of a match range.
+  --range-end PATTERN           Specify PATTERN as the end of a match range.
   --match PATTERN               Specify PATTERN explicitly. Typically omitted.
 
 Search output:
@@ -676,7 +678,7 @@ sub filetypes {
         }
     }
 
-    # http://search.cpan.org/dist/Perl-Critic/lib/Perl/Critic/Policy/Subroutines/ProhibitReturnSort.pm
+    # https://metacpan.org/pod/distribution/Perl-Critic/lib/Perl/Critic/Policy/Subroutines/ProhibitReturnSort.pm
     @matches = sort @matches;
     return @matches;
 }
@@ -703,6 +705,7 @@ sub is_lowercase {
         |\\K                # Keep to the left
         |\\N(\{.+?\})?      # Anything but \n, OR Unicode sequence
         |\\[pP]\{.+?\}      # Named property and negation
+        |\\[pP][A-Z]        # Named property and negation, single-character shorthand
         |\\R                # Linebreak
         |\\S                # Non-space character
         |\\V                # Not vertical whitespace

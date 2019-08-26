@@ -1,7 +1,7 @@
 package Perinci::Sub::XCompletion::date_month_num;
 
-our $DATE = '2019-06-24'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-07-21'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -23,7 +23,6 @@ sub gen_completion {
         complete_array_elem(
             array => [
                 1..12,
-                "jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec",
                 "january","february","march","april","may","june","july","august","september","october","november","december",
             ],
             word => $cargs{word},
@@ -46,7 +45,7 @@ Perinci::Sub::XCompletion::date_month_num - Generate completion for date::month_
 
 =head1 VERSION
 
-This document describes version 0.004 of Perinci::Sub::XCompletion::date_month_num (from Perl distribution Sah-Schemas-Date), released on 2019-06-24.
+This document describes version 0.006 of Perinci::Sub::XCompletion::date_month_num (from Perl distribution Sah-Schemas-Date), released on 2019-07-21.
 
 =head1 CONFIGURATION
 

@@ -1,0 +1,44 @@
+---
+abstract: 'Development Framework'
+author:
+  - 'Al Newkirk <awncorp@cpan.org>'
+build_requires:
+  Function::Parameters: '2.001003'
+  Import::Into: '1.002005'
+  Moo: '2.000001'
+  Readonly: '2.00'
+  Role::Tiny: '2.000006'
+  Try::Tiny: '0.30'
+  Type::Tiny: '1.000005'
+  autobox: '2.82'
+  perl: v5.14.0
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Do
+requires:
+  Function::Parameters: '2.001003'
+  Import::Into: '1.002005'
+  Moo: '2.000001'
+  Readonly: '2.00'
+  Role::Tiny: '2.000006'
+  Try::Tiny: '0.30'
+  Type::Tiny: '1.000005'
+  autobox: '2.82'
+  perl: v5.14.0
+resources:
+  bugtracker: https://github.com/iamalnewkirk/do/issues
+  homepage: http://metacpan.org/release/Do
+  repository: git://github.com/iamalnewkirk/do.git
+version: '1.02'
+x_authority: cpan:AWNCORP
+x_contributors:
+  - 'Al Newkirk <al@iamalnewkirk.com>'
+  - 'Anthony Brummett <abrummet@genome.wustl.edu>'
+x_generated_by_perl: v5.14.2
+x_serialization_backend: 'YAML::Tiny version 1.73'

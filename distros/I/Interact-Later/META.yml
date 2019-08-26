@@ -25,7 +25,7 @@ no_index:
 provides:
   Interact::Later:
     file: lib/Interact/Later.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   Cpanel::JSON::XS: '4.12'
   Data::Printer: '0'
@@ -37,7 +37,7 @@ requires:
   perl: '5.020'
 resources:
   repository: git://gitlab.com/smonff/interact-later.git
-version: '0.04'
+version: '0.05'
 x_authority: cpan:SMONFF
 x_contributors:
   - 'Sébastien Feugère <smonff@riseup.net>'

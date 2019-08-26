@@ -57,13 +57,61 @@ Mojo::IOLoop->remove($timeout);
 is_deeply \@lines, [['foo', 'bar'],["\x0A",'bar'],['baz','bar']], 'three lines received';
 @lines = ();
 
-$reader->on(read => sub { shift->close });
-$writer->write('garbage');
+$reader->read_line_separator('1');
+$reader->on(read => sub { shift->read_line_separator('2')->close; $writer->close });
+$writer->write('before1mid2after');
 
 $timeout = Mojo::IOLoop->timer(0.1 => sub { Mojo::IOLoop->stop });
 Mojo::IOLoop->start;
 Mojo::IOLoop->remove($timeout);
 
-is_deeply \@lines, [['garbage', undef]], 'remaining bytes received';
+is_deeply \@lines, [['before', '1'], ['mid', '2'], ['after', undef]], 'remaining lines and bytes received';
+@lines = ();
+
+($read, $write) = pipely or die "Failed to open pipe: $!";
+
+$reader = Mojo::IOLoop::Stream->with_roles('+LineBuffer')->new($read)->watch_lines;
+$reader->on(read_line => sub {
+  my ($reader, $line, $sep) = @_;
+  push @lines, [$line, $sep];
+});
+$reader->on(read => sub { Mojo::IOLoop->stop });
+$reader->start;
+
+$writer = Mojo::IOLoop::Stream->with_roles('+LineBuffer')->new($write);
+$writer->start;
+
+$reader->on(read => sub { shift->read_line_separator('3')->close; $writer->close });
+$writer->write('bar3');
+
+$timeout = Mojo::IOLoop->timer(0.1 => sub { Mojo::IOLoop->stop });
+Mojo::IOLoop->start;
+Mojo::IOLoop->remove($timeout);
+
+is_deeply \@lines, [['bar', '3']], 'remaining line received';
+@lines = ();
+
+($read, $write) = pipely or die "Failed to open pipe: $!";
+
+$reader = Mojo::IOLoop::Stream->with_roles('+LineBuffer')->new($read)->watch_lines;
+$reader->on(read_line => sub {
+  my ($reader, $line, $sep) = @_;
+  push @lines, [$line, $sep];
+});
+$reader->on(read => sub { Mojo::IOLoop->stop });
+$reader->start;
+
+$writer = Mojo::IOLoop::Stream->with_roles('+LineBuffer')->new($write);
+$writer->start;
+
+$reader->on(read => sub { shift->read_line_separator('4')->close; $writer->close });
+$writer->write('bar');
+
+$timeout = Mojo::IOLoop->timer(0.1 => sub { Mojo::IOLoop->stop });
+Mojo::IOLoop->start;
+Mojo::IOLoop->remove($timeout);
+
+is_deeply \@lines, [['bar', undef]], 'remaining bytes received';
+@lines = ();
 
 done_testing;

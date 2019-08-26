@@ -15,11 +15,11 @@ my %module_build_args = (
   },
   "dist_abstract" => "Alternative interface to File::Find::Object",
   "dist_author" => [
-    "Richard Clamp <richardc\@unixbeard.net> with input gained from this",
-    "and Andy Lester andy\@petdance.com."
+    "Richard Clamp <richardc\@unixbeard.net>",
+    "Andy Lester andy\@petdance.com."
   ],
   "dist_name" => "File-Find-Object-Rule",
-  "dist_version" => "0.0310",
+  "dist_version" => "0.0311",
   "license" => "perl",
   "module_name" => "File::Find::Object::Rule",
   "recursive_test_files" => 1,

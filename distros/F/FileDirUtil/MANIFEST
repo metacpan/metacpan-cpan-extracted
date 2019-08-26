@@ -1,7 +1,7 @@
 Changes
 Makefile.PL
 MANIFEST
-README
+README.md
 t/FileDirUtil.t
 t/manifest.t
 t/pod-coverage.t

@@ -3,15 +3,15 @@ package WWW::Scraper::ISBN::Record;
 use strict;
 use warnings;
 
-our $VERSION = '1.03';
+our $VERSION = '1.05';
 
 #----------------------------------------------------------------------------
 # Public API
 
 sub new {
-	my $proto = shift;
-	my $class = ref($proto) || $proto;
-	my $self = {
+    my $proto = shift;
+    my $class = ref($proto) || $proto;
+    my $self = {
         ISBN        => undef,
         FOUND       => 0,
         FOUND_IN    => undef,
@@ -19,8 +19,8 @@ sub new {
         ERROR       => '',
     };
 
-	bless ($self, $class);
-	return $self;
+    bless ($self, $class);
+    return $self;
 }
 
 sub isbn        { my $self = shift; return $self->_accessor('ISBN',@_)     }
@@ -30,10 +30,10 @@ sub book        { my $self = shift; return $self->_accessor('BOOK',@_)     }
 sub error       { my $self = shift; return $self->_accessor('ERROR',@_)    }
 
 sub _accessor {
-	my $self     = shift;
-	my $accessor = shift;
-	if (@_) { $self->{$accessor} = shift };
-	return $self->{$accessor};
+    my $self     = shift;
+    my $accessor = shift;
+    if (@_) { $self->{$accessor} = shift };
+    return $self->{$accessor};
 }
 
 1;
@@ -59,9 +59,9 @@ search for it. This class does not know how to search on its own.
     print $record->isbn;
 
     if ($record->found) {
-	    print $record->found_in;
+        print $record->found_in;
     } else {
-	    print "not found";
+        print "not found";
     }
 
     $book = $record->book;
@@ -161,12 +161,12 @@ fields, which may be useful in gleaning information about failed searches.
 =head1 AUTHOR
 
   2004-2013 Andy Schamp, E<lt>andy@schamp.netE<gt>
-  2013-2014 Barbie, E<lt>barbie@cpan.orgE<gt>
+  2013-2019 Barbie, E<lt>barbie@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
   Copyright 2004-2013 by Andy Schamp
-  Copyright 2013-2014 by Barbie
+  Copyright 2013-2019 by Barbie
 
   This distribution is free software; you can redistribute it and/or
   modify it under the Artistic Licence v2.

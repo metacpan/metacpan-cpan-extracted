@@ -1,12 +1,12 @@
 package XML::RSS::Private::Output::V1_0;
-$XML::RSS::Private::Output::V1_0::VERSION = '1.60';
+$XML::RSS::Private::Output::V1_0::VERSION = '1.61';
 use strict;
 use warnings;
 
 use vars (qw(@ISA));
 
-use XML::RSS::Private::Output::Base;
-use XML::RSS::Private::Output::Roles::ModulesElems;
+use XML::RSS::Private::Output::Base                ();
+use XML::RSS::Private::Output::Roles::ModulesElems ();
 
 @ISA = (qw(XML::RSS::Private::Output::Roles::ModulesElems XML::RSS::Private::Output::Base));
 
@@ -40,10 +40,8 @@ sub _calc_prefer_dc {
 }
 
 sub _get_first_rdf_decl_mappings {
-    return (
-        ["rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#"],
-        [undef, "http://purl.org/rss/1.0/"]
-    );
+    return (["rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#"],
+        [undef, "http://purl.org/rss/1.0/"]);
 }
 
 sub _out_image_dc_elements {
@@ -83,15 +81,11 @@ sub _output_rss_middle {
     $self->_out_seq_items();
 
     if ($self->_is_image_defined()) {
-        $self->_out('<image rdf:resource="' .
-            $self->_encode($self->image('url')) . "\" />\n"
-        );
+        $self->_out('<image rdf:resource="' . $self->_encode($self->image('url')) . "\" />\n");
     }
 
     if (defined(my $textinput_link = $self->textinput('link'))) {
-        $self->_out('<textinput rdf:resource="'
-          . $self->_encode($textinput_link) . "\" />\n"
-        );
+        $self->_out('<textinput rdf:resource="' . $self->_encode($textinput_link) . "\" />\n");
     }
 
     $self->_end_channel;
@@ -111,7 +105,7 @@ __END__
 
 =head1 VERSION
 
-version 1.60
+version 1.61
 
 =head1 AUTHOR
 

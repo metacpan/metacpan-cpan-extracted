@@ -37,6 +37,16 @@ A module for helping with kmer analysis. The basic methods help count kmers and 
 
 =pod
 
+=head1 VARIABLES
+
+=over
+
+=item $Bio::Kmer::iThreads
+
+Boolean describing whether the module instance is using threads
+
+=back
+
 =head1 METHODS
 
 =over
@@ -45,7 +55,9 @@ A module for helping with kmer analysis. The basic methods help count kmers and 
 
 Create a new instance of the kmer counter.  One object per file. 
 
-  Applicable arguments:
+  Filename can be either a file path or a Bio::SeqIO object.
+
+  Applicable arguments for \%options:
   Argument     Default    Description
   kmercounter  perl       What kmer counter software to use.
                           Choices: Perl, Jellyfish.

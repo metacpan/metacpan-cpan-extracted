@@ -1,15 +1,15 @@
 package XML::RSS::Private::Output::Base;
-$XML::RSS::Private::Output::Base::VERSION = '1.60';
+$XML::RSS::Private::Output::Base::VERSION = '1.61';
 use strict;
 use warnings;
 
-use Carp;
+use Carp qw/ confess /;
 
 use HTML::Entities qw(encode_entities_numeric encode_entities);
-use DateTime::Format::Mail;
-use DateTime::Format::W3CDTF;
+use DateTime::Format::Mail   ();
+use DateTime::Format::W3CDTF ();
 
-use XML::RSS;
+use XML::RSS ();
 
 sub new {
     my $class = shift;
@@ -44,12 +44,10 @@ sub _encode_cb {
     return $self->{_encode_cb};
 }
 
-sub _item_idx
-{
+sub _item_idx {
     my $self = shift;
 
-    if (@_)
-    {
+    if (@_) {
         $self->{_item_idx} = shift;
     }
 
@@ -62,6 +60,7 @@ sub _initialize {
 
     $self->{_output} = "";
     $self->_main($args->{main});
+
     # TODO : Remove once we have inheritance proper.
     $self->_rss_out_version($args->{version});
     if (defined($args->{encode_cb})) {
@@ -130,9 +129,7 @@ sub _out_tag {
         foreach my $key (keys %inner_copy) {
             my $value = $inner->{$key};
             if (defined($value)) {
-                $attr .= " " . $self->_encode($key) . qq{="}
-                    . $self->_encode($value) . '"'
-                    ;
+                $attr .= " " . $self->_encode($key) . qq{="} . $self->_encode($value) . '"';
             }
         }
     }
@@ -154,39 +151,28 @@ sub _out_ns_tag {
 
     my @subtags;
 
-    if (ref($inner) eq "HASH")
-    {
+    if (ref($inner) eq "HASH") {
         $self->_out("<${prefix}:${tag}");
-        foreach my $attr (sort { $a cmp $b } keys(%{$inner}))
-        {
-            if (ref($inner->{$attr}) eq '')
-            {
-                $self->_out(
-                      q{ }
-                    . $self->_sanitize($attr)
-                    . q{="}
-                    . $self->_encode($inner->{$attr})
-                    . q{"}
-                );
+        foreach my $attr (sort { $a cmp $b } keys(%{$inner})) {
+            if (ref($inner->{$attr}) eq '') {
+                $self->_out(q{ }
+                      . $self->_sanitize($attr) . q{="}
+                      . $self->_encode($inner->{$attr})
+                      . q{"});
             }
-            else
-            {
-                push(@subtags,$attr);
+            else {
+                push(@subtags, $attr);
             }
         }
 
-        if (! @subtags)
-        {
+        if (!@subtags) {
             $self->_out("/>\n");
         }
-        else
-        {
+        else {
             $self->_out(">\n");
 
-            foreach my $attr (sort { $a cmp $b } @subtags)
-            {
-                if (ref($inner->{$attr}))
-                {
+            foreach my $attr (sort { $a cmp $b } @subtags) {
+                if (ref($inner->{$attr})) {
                     _out_ns_tag($self, $prefix, $tag, $inner->{$attr});
                 }
             }
@@ -194,12 +180,10 @@ sub _out_ns_tag {
             $self->_out("</${prefix}:${tag}>\n");
         }
     }
-    elsif (ref($inner) eq 'ARRAY')
-    {
-        map { $self->_out_ns_tag($prefix, $tag, $_) } @{ $inner };
+    elsif (ref($inner) eq 'ARRAY') {
+        map { $self->_out_ns_tag($prefix, $tag, $_) } @{$inner};
     }
-    else
-    {
+    else {
         return $self->_out_tag("${prefix}:${tag}", $inner);
     }
 }
@@ -218,8 +202,7 @@ sub _out_array_tag {
     my ($self, $tag, $inner) = @_;
 
     if (ref($inner) eq "ARRAY") {
-        foreach my $elem (@$inner)
-        {
+        foreach my $elem (@$inner) {
             $self->_out_defined_tag($tag, $elem);
         }
     }
@@ -306,9 +289,7 @@ sub _output_complete_textinput {
     my $master_tag = $self->_get_textinput_tag();
 
     if (defined(my $link = $self->textinput('link'))) {
-        $self->_start_top_elem($master_tag,
-            sub { $link }
-        );
+        $self->_start_top_elem($master_tag, sub {$link});
 
         $self->_output_common_textinput_sub_elements();
 
@@ -331,9 +312,6 @@ sub _flush_output {
 
     return $ret;
 }
-
-
-
 
 
 sub _date_from_dc_date {
@@ -362,8 +340,7 @@ sub _date_to_dc_date {
     return $pf->format_datetime($date);
 }
 
-sub _channel_dc
-{
+sub _channel_dc {
     my ($self, $key) = @_;
 
     if ($self->channel('dc')) {
@@ -374,8 +351,7 @@ sub _channel_dc
     }
 }
 
-sub _channel_syn
-{
+sub _channel_syn {
     my ($self, $key) = @_;
 
     if ($self->channel('syn')) {
@@ -391,8 +367,7 @@ sub _calc_lastBuildDate {
     if (defined(my $d = $self->_channel_dc('date'))) {
         return $self->_date_to_rss2($self->_date_from_dc_date($d));
     }
-    else
-    {
+    else {
         # If lastBuildDate is undef we can still return it because we
         # need to return undef.
         return $self->channel("lastBuildDate");
@@ -448,7 +423,8 @@ sub _calc_dc_date {
 sub _output_xml_declaration {
     my $self = shift;
 
-    my $encoding = (defined $self->_main->_encoding())? ' encoding="' . $self->_main->_encoding() . '"' : "";
+    my $encoding =
+      (defined $self->_main->_encoding()) ? ' encoding="' . $self->_main->_encoding() . '"' : "";
     $self->_out('<?xml version="1.0"' . $encoding . '?>' . "\n");
     if (defined(my $stylesheet = $self->_main->_stylesheet)) {
         my $style_url = $self->_encode($stylesheet);
@@ -484,7 +460,7 @@ sub _start_item {
     my $tag  = "item";
     my $base = $item->{'xml:base'};
     $tag .= qq{ xml:base="$base"} if defined $base;
-    $self->_start_top_elem($tag, sub { $self->_get_item_about($item)});
+    $self->_start_top_elem($tag, sub { $self->_get_item_about($item) });
 
     $self->_output_common_item_tags($item);
 
@@ -546,9 +522,8 @@ sub _output_common_item_tags {
 
     my $defined = $self->_get_item_defined;
 
-    if (! $defined) {
-        foreach my $f (@fields)
-        {
+    if (!$defined) {
+        foreach my $f (@fields) {
             if (!defined($item->{$f})) {
                 die qq/Item No. / . $self->_item_idx() . qq/ is missing the "$f" field./;
             }
@@ -611,8 +586,7 @@ sub _prefer_dc {
 sub _calc_channel_dc_field_params {
     my ($self, $dc_key, $non_dc_key) = @_;
 
-    return
-    (
+    return (
         $self->_prefer_dc() ? "dc:$dc_key" : $non_dc_key,
         $self->_calc_channel_dc_field($dc_key, $non_dc_key)
     );
@@ -621,17 +595,13 @@ sub _calc_channel_dc_field_params {
 sub _out_channel_dc_field {
     my ($self, $dc_key, $non_dc_key) = @_;
 
-    return $self->_out_defined_tag(
-        $self->_calc_channel_dc_field_params($dc_key, $non_dc_key),
-    );
+    return $self->_out_defined_tag($self->_calc_channel_dc_field_params($dc_key, $non_dc_key),);
 }
 
 sub _out_channel_array_self_dc_field {
     my ($self, $key) = @_;
 
-    $self->_out_array_tag(
-        $self->_calc_channel_dc_field_params($key, $key),
-    );
+    $self->_out_array_tag($self->_calc_channel_dc_field_params($key, $key),);
 }
 
 sub _out_channel_self_dc_field {
@@ -713,19 +683,17 @@ sub _out_dc_elements {
     return;
 }
 
-sub _out_module_prefix_elements_hash
-{
+sub _out_module_prefix_elements_hash {
     my ($self, $args) = @_;
 
     my $prefix = $args->{prefix};
-    my $data = $args->{data};
-    my $url = $args->{url};
+    my $data   = $args->{data};
+    my $url    = $args->{url};
 
     while (my ($el, $value) = each(%$data)) {
         $self->_out_module_prefix_pair(
-            {
-                %$args,
-                el => $el,
+            {   %$args,
+                el  => $el,
                 val => $value,
             }
         );
@@ -734,19 +702,17 @@ sub _out_module_prefix_elements_hash
     return;
 }
 
-sub _out_module_prefix_pair
-{
+sub _out_module_prefix_pair {
     my ($self, $args) = @_;
 
     my $prefix = $args->{prefix};
-    my $url = $args->{url};
+    my $url    = $args->{url};
 
-    my $el = $args->{el};
+    my $el    = $args->{el};
     my $value = $args->{val};
 
-    if ($self->_main->_is_rdf_resource($el,$url)) {
-        $self->_out(
-            qq{<${prefix}:${el} rdf:resource="} . $self->_encode($value) . qq{" />\n});
+    if ($self->_main->_is_rdf_resource($el, $url)) {
+        $self->_out(qq{<${prefix}:${el} rdf:resource="} . $self->_encode($value) . qq{" />\n});
     }
     else {
         $self->_out_ns_tag($prefix, $el, $value);
@@ -755,35 +721,32 @@ sub _out_module_prefix_pair
     return;
 }
 
-sub _out_module_prefix_elements_array
-{
+sub _out_module_prefix_elements_array {
     my ($self, $args) = @_;
 
     my $prefix = $args->{prefix};
-    my $data = $args->{data};
-    my $url = $args->{url};
+    my $data   = $args->{data};
+    my $url    = $args->{url};
 
-    foreach my $element (@$data)
-    {
+    foreach my $element (@$data) {
         $self->_out_module_prefix_pair(
-            {
-                %$args,
-                el => $element->{'el'},
+            {   %$args,
+                el  => $element->{'el'},
                 val => $element->{'val'},
             }
-        )
+        );
     }
 
     return;
 }
 
-sub _out_module_prefix_elements
-{
+sub _out_module_prefix_elements {
     my ($self, $args) = @_;
 
     my $data = $args->{'data'};
 
-    if (! $data) {
+    if (!$data) {
+
         # Do nothing - empty data
         return;
     }
@@ -807,10 +770,9 @@ sub _out_modules_elements {
         next if $prefix =~ /^(dc|syn|taxo)$/;
 
         $self->_out_module_prefix_elements(
-            {
-                prefix => $prefix,
-                url => $url,
-                data => $super_elem->{$prefix},
+            {   prefix => $prefix,
+                url    => $url,
+                data   => $super_elem->{$prefix},
             }
         );
 
@@ -845,8 +807,7 @@ sub _out_skip_days {
     return shift->_out_skip_tag("day");
 }
 
-sub _get_item_about
-{
+sub _get_item_about {
     my ($self, $item) = @_;
     return defined($item->{'about'}) ? $item->{'about'} : $item->{'link'};
 }
@@ -889,14 +850,13 @@ sub _output_defined_image {
 sub _is_image_defined {
     my $self = shift;
 
-    return defined ($self->image('url'));
+    return defined($self->image('url'));
 }
 
 sub _output_complete_image {
     my $self = shift;
 
-    if ($self->_is_image_defined())
-    {
+    if ($self->_is_image_defined()) {
         $self->_output_defined_image();
     }
 }
@@ -916,9 +876,7 @@ sub _out_seq_items {
             die qq/Item No. $idx is missing "about" or "link" fields./;
         }
 
-        $self->_out('  <rdf:li rdf:resource="' .
-            $self->_encode($about_text) .
-            '" />' . "\n");
+        $self->_out('  <rdf:li rdf:resource="' . $self->_encode($about_text) . '" />' . "\n");
     }
     continue {
         $idx++;
@@ -931,14 +889,12 @@ sub _get_first_rdf_decl_mappings {
     return ();
 }
 
-sub _get_rdf_decl_mappings
-{
+sub _get_rdf_decl_mappings {
     my $self = shift;
 
     my $modules = $self->_modules();
 
-    return
-    [
+    return [
         $self->_get_first_rdf_decl_mappings(),
         sort { $a->[0] cmp $b->[0] } map { [$modules->{$_}, $_] } keys(%$modules)
     ];
@@ -955,11 +911,7 @@ sub _render_xmlns {
 sub _get_rdf_xmlnses {
     my $self = shift;
 
-    return
-        join("",
-            map { $self->_render_xmlns(@$_) }
-            @{$self->_get_rdf_decl_mappings}
-        );
+    return join("", map { $self->_render_xmlns(@$_) } @{$self->_get_rdf_decl_mappings});
 }
 
 sub _get_rdf_decl_open_tag {
@@ -967,17 +919,14 @@ sub _get_rdf_decl_open_tag {
 }
 
 
-sub _get_rdf_decl
-{
-    my $self = shift;
-    my $base = $self->_main()->{'xml:base'};
-    my $base_decl = (defined $base)? qq{ xml:base="$base"\n} : "";
-    return $self->_get_rdf_decl_open_tag() . $base_decl .
-        $self->_get_rdf_xmlnses() . ">\n\n";
+sub _get_rdf_decl {
+    my $self      = shift;
+    my $base      = $self->_main()->{'xml:base'};
+    my $base_decl = (defined $base) ? qq{ xml:base="$base"\n} : "";
+    return $self->_get_rdf_decl_open_tag() . $base_decl . $self->_get_rdf_xmlnses() . ">\n\n";
 }
 
-sub _out_rdf_decl
-{
+sub _out_rdf_decl {
     my $self = shift;
 
     return $self->_out($self->_get_rdf_decl);
@@ -993,9 +942,10 @@ sub _out_guid {
     for my $guid (qw(permaLink guid)) {
         if (defined $item->{$guid}) {
             $self->_out('<guid isPermaLink="'
-              . ($guid eq 'permaLink' ? 'true' : 'false') . '">'
-              . $self->_encode($item->{$guid})
-              . '</guid>' . "\n");
+                  . ($guid eq 'permaLink' ? 'true' : 'false') . '">'
+                  . $self->_encode($item->{$guid})
+                  . '</guid>'
+                  . "\n");
             last;
         }
     }
@@ -1006,34 +956,26 @@ sub _out_item_source {
 
     if (defined $item->{source} && defined $item->{sourceUrl}) {
         $self->_out('<source url="'
-          . $self->_encode($item->{sourceUrl}) . '">'
-          . $self->_encode($item->{source})
-          . "</source>\n");
+              . $self->_encode($item->{sourceUrl}) . '">'
+              . $self->_encode($item->{source})
+              . "</source>\n");
     }
 }
 
 sub _out_single_item_enclosure {
     my ($self, $item, $enc) = @_;
 
-    return
-        $self->_out(
-            "<enclosure " .
-            join(' ',
-                map { "$_=\"" . $self->_encode($enc->{$_}) . '"' } keys(%$enc)
-            ) .
-            " />\n"
-        );
+    return $self->_out("<enclosure "
+          . join(' ', map { "$_=\"" . $self->_encode($enc->{$_}) . '"' } keys(%$enc))
+          . " />\n");
 }
 
 sub _out_item_enclosure {
     my ($self, $item) = @_;
 
     if (my $enc = $item->{enclosure}) {
-        foreach my $sub (
-            (ref($enc) eq "ARRAY") ? @$enc : ($enc)
-        )
-        {
-            $self->_out_single_item_enclosure($item, $sub)
+        foreach my $sub ((ref($enc) eq "ARRAY") ? @$enc : ($enc)) {
+            $self->_out_single_item_enclosure($item, $sub);
         }
     }
 }
@@ -1074,7 +1016,7 @@ sub _output_items {
         $self->_output_single_item($item);
     }
     continue {
-        $self->_item_idx($self->_item_idx()+1);
+        $self->_item_idx($self->_item_idx() + 1);
     }
 }
 
@@ -1153,16 +1095,13 @@ sub _out_all_modules_elems {
 sub _out_dates {
     my $self = shift;
 
-    $self->_out_defined_tag("pubDate", $self->_calc_pubDate());
+    $self->_out_defined_tag("pubDate",       $self->_calc_pubDate());
     $self->_out_defined_tag("lastBuildDate", $self->_calc_lastBuildDate());
 }
 
 sub _out_def_chan_tag {
     my ($self, $tag) = @_;
-    return $self->_output_multiple_tags(
-        {ext => "channel", 'defined' => 1},
-        [ $tag ],
-    );
+    return $self->_output_multiple_tags({ext => "channel", 'defined' => 1}, [$tag],);
 }
 
 # $self->_render_complete_rss_output($xml_version)
@@ -1212,7 +1151,7 @@ __END__
 
 =head1 VERSION
 
-version 1.60
+version 1.61
 
 =head1 METHODS
 

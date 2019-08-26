@@ -17,7 +17,7 @@ my $builder = Module::Build->new(
         'Module::Build' => 0.38,
     },
     build_requires => {
-        'Test::More'     => '0.88',
+        'Test::More'     => '0.98',
         'Test::Warnings' => '0.026',
     },
     add_to_cleanup     => [ 'App-diffdir-*' ],

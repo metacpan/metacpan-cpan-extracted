@@ -1,5 +1,6 @@
 Revision history for Vote::Count
-0.021 Augu 13, 2019 Fix bug from Active Attribute being a reference to other copies
+0.022 Aug  25, 2019 TieBreaker CondorcetIRV CondorcetVsIRV
+0.021 Aug  13, 2019 Fix bug from Active Attribute being a reference to other copies
                     ie when set/get. 
                     added Grand Junction as a TieBreaker.
 0.020 Aug  10, 2019 Switch IRV to consumable Role.

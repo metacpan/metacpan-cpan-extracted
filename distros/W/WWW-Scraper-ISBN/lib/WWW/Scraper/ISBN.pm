@@ -3,7 +3,7 @@ package WWW::Scraper::ISBN;
 use strict;
 use warnings;
 
-our $VERSION = '1.03';
+our $VERSION = '1.05';
 
 #----------------------------------------------------------------------------
 # Library Modules
@@ -36,7 +36,12 @@ sub new {
 sub available_drivers {
     my $self = shift;
     my @plugins = $self->plugins();
-    my @drivers = map { s/WWW::Scraper::ISBN::// } grep { /_Driver$/ } @plugins;
+    my @drivers;
+    for my $plugin (@plugins) {
+        next unless($plugin =~ /_Driver$/);
+        $plugin =~ s/WWW::Scraper::ISBN::(\w+)_Driver/$1/;
+        push @drivers, $plugin;
+    }
     return @drivers;
 }
 
@@ -240,12 +245,12 @@ the given isbn.
 =head1 AUTHOR
 
   2004-2013 Andy Schamp, E<lt>andy@schamp.netE<gt>
-  2013-2015 Barbie, E<lt>barbie@cpan.orgE<gt>
+  2013-2019 Barbie, E<lt>barbie@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
   Copyright 2004-2013 by Andy Schamp
-  Copyright 2013-2015 by Barbie
+  Copyright 2013-2019 by Barbie
 
   This distribution is free software; you can redistribute it and/or
   modify it under the Artistic Licence v2.

@@ -39,7 +39,7 @@ no_index:
 provides:
   Mouse:
     file: lib/Mouse.pm
-    version: v2.5.7
+    version: v2.5.9
   Mouse::Exporter:
     file: lib/Mouse/Exporter.pm
   Mouse::Meta::Attribute:
@@ -76,15 +76,15 @@ provides:
     file: lib/Mouse/PurePerl.pm
   Mouse::Role:
     file: lib/Mouse/Role.pm
-    version: v2.5.7
+    version: v2.5.9
   Mouse::Spec:
     file: lib/Mouse/Spec.pm
-    version: v2.5.7
+    version: v2.5.9
   Mouse::TypeRegistry:
     file: lib/Mouse/TypeRegistry.pm
   Mouse::Util:
     file: lib/Mouse/Util.pm
-    version: v2.5.7
+    version: v2.5.9
   Mouse::Util::MetaRole:
     file: lib/Mouse/Util/MetaRole.pm
   Mouse::Util::TypeConstraints:
@@ -102,10 +102,10 @@ requires:
   XSLoader: '0.02'
   perl: '5.008005'
 resources:
-  bugtracker: https://github.com/gfx/p5-Mouse/issues
-  homepage: https://github.com/gfx/p5-Mouse
-  repository: git://github.com/gfx/p5-Mouse.git
-version: v2.5.7
+  bugtracker: https://github.com/xslate/p5-Mouse/issues
+  homepage: https://github.com/xslate/p5-Mouse
+  repository: git://github.com/xslate/p5-Mouse.git
+version: v2.5.9
 x_contributors:
   - 'Aleksandr Matveev <a.matveev@corp.mail.ru>'
   - 'Alex Solovey <a.solovey@gmail.com>'
@@ -127,6 +127,7 @@ x_contributors:
   - 'Jesse Vincent <jesse@bestpractical.com>'
   - 'Joel Bernstein <joel.bernstein@vidicom.co.uk>'
   - 'John SJ Anderson <genehack@genehack.org>'
+  - 'Kensaku Araga <ken39arg@gmail.com>'
   - 'Kent Fredric <kentfredric@gmail.com>'
   - 'Luca Ferrari <fluca1978@gmail.com>'
   - 'Masahiro Honma <hiratara@cpan.org>'

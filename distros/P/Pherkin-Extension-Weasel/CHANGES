@@ -1,7 +1,10 @@
+0.13   2019-08-24
+       - Eliminate undefined value warning on template evaluation
 
 0.12   2019-08-19
        - Increase Weasel::Driver::Mock dependency (TestDep) to be in line with
          the driver role version of this dist
+       - Fix missing closing double quote in image title (logger index html)
 
 0.11   2019-08-10
        - Correct Weasel::Session dependency; the minimum should be 0.11

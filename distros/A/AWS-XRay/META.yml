@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.11, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,17 +27,21 @@ no_index:
 provides:
   AWS::XRay:
     file: lib/AWS/XRay.pm
-    version: '0.08'
+    version: '0.09'
   AWS::XRay::Buffer:
     file: lib/AWS/XRay/Buffer.pm
+  AWS::XRay::Plugin::EC2:
+    file: lib/AWS/XRay/Plugin/EC2.pm
   AWS::XRay::Segment:
     file: lib/AWS/XRay/Segment.pm
   AWS::XRay::Segment::NoTrace:
     file: lib/AWS/XRay/Segment.pm
 requires:
   Crypt::URandom: '0'
+  HTTP::Tiny: '0'
   IO::Socket::INET: '0'
   JSON::XS: '0'
+  Module::Load: '0'
   Time::HiRes: '0'
   Types::Serialiser: '0'
   perl: '5.012000'
@@ -45,8 +49,12 @@ resources:
   bugtracker: https://github.com/fujiwara/AWS-XRay/issues
   homepage: https://github.com/fujiwara/AWS-XRay
   repository: git://github.com/fujiwara/AWS-XRay.git
-version: '0.08'
+version: '0.09'
 x_authority: cpan:FUJIWARA
 x_contributors:
+  - 'Ichinose Shogo <shogo82148@gmail.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'moznion <moznion@gmail.com>'
+  - 'papix <mail@papix.net>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

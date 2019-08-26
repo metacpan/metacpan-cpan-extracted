@@ -27,6 +27,7 @@ requires:
   DBIx::QuickDB: '0.000008'
   Data::GUID: '0'
   DateTime: '0'
+  DateTime::Format::Pg: '0'
   Email::Sender::Simple: '0'
   Email::Simple: '0'
   Email::Simple::Creator: '0'
@@ -40,15 +41,16 @@ requires:
   JSON::MaybeXS: '0'
   List::Util: '0'
   Plack::App::Directory: '0'
+  Plack::App::File: '0'
   Plack::Builder: '0'
   Plack::Handler::Starman: '0'
   Plack::Runner: '0'
   Router::Simple: '0'
   Scalar::Util: '0'
   Test2: '1.302164'
-  Test2::API: '1.302164'
+  Test2::API: '1.302166'
   Test2::Formatter::Test2::Composer: '0'
-  Test2::Harness: '0.001073'
+  Test2::Harness: '0.001085'
   Test2::Harness::Feeder::JSONL: '0'
   Test2::Harness::Util::HashBase: '0'
   Test2::Harness::Util::JSON: '0'
@@ -57,7 +59,7 @@ requires:
   Test2::Tools::Subtest: '0'
   Test2::Util: '0'
   Test2::Util::Facets2Legacy: '0'
-  Test2::V0: '0.000120'
+  Test2::V0: '0.000124'
   Test::More: '0'
   Text::Xslate: '0'
   Time::HiRes: '0'
@@ -68,6 +70,6 @@ requires:
 resources:
   bugtracker: http://github.com/Test-More/Test2-Harness-UI/issues
   repository: http://github.com/Test-More/Test2-Harness-UI/
-version: '0.000006'
-x_generated_by_perl: v5.28.1
+version: '0.000014'
+x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

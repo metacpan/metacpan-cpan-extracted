@@ -1,11 +1,9 @@
 package HTML::TabbedExamples::Generate;
-
+$HTML::TabbedExamples::Generate::VERSION = '0.2.0';
 use strict;
 use warnings;
 
 use 5.014;
-
-our $VERSION = '0.0.6';
 
 use MooX 'late';
 
@@ -14,8 +12,11 @@ use Text::VimColor;
 
 use Carp ();
 
-has _default_syntax => (is => 'ro', isa => 'Str', init_arg => 'default_syntax');
-has _main_pre_css_classes => (is => 'ro', isa => 'ArrayRef[Str]',
+has _default_syntax =>
+    ( is => 'ro', isa => 'Str', init_arg => 'default_syntax' );
+has _main_pre_css_classes => (
+    is      => 'ro',
+    isa     => 'ArrayRef[Str]',
     default => sub {
         return [qw(code)];
     },
@@ -24,18 +25,18 @@ has _main_pre_css_classes => (is => 'ro', isa => 'ArrayRef[Str]',
 
 sub _calc_post_code
 {
-    my $self = shift;
+    my $self    = shift;
     my $ex_spec = shift;
 
     my $pre_code = $ex_spec->{code};
 
-    if ($ex_spec->{no_syntax})
+    if ( $ex_spec->{no_syntax} )
     {
         return "<pre>\n" . CGI::escapeHTML($pre_code) . "</pre>\n";
     }
     else
     {
-        my $syntax = ($ex_spec->{syntax} || $self->_default_syntax);
+        my $syntax = ( $ex_spec->{syntax} || $self->_default_syntax );
 
         my $code = <<"EOF";
 #!/usr/bin/perl
@@ -47,29 +48,27 @@ $pre_code
 EOF
 
         my $tvc = Text::VimColor->new(
-            string => \$code,
+            string   => \$code,
             filetype => $syntax,
         );
 
-        return
-            qq|<pre class="|
-                . join(' ', map { CGI::escapeHTML($_) }
-                    @{$self->_main_pre_css_classes}, $syntax
-                )
+        return qq|<pre class="|
+            . join( ' ',
+            map { CGI::escapeHTML($_) } @{ $self->_main_pre_css_classes },
+            $syntax )
             . qq|">\n|
-            . ($tvc->html() =~ s{(class=")syn}{$1}gr)
-            . qq|\n</pre>\n|
-            ;
+            . ( $tvc->html() =~ s{(class=")syn}{$1}gr )
+            . qq|\n</pre>\n|;
 
     }
 }
 
 sub render
 {
-    my ($self, $args) = @_;
+    my ( $self, $args ) = @_;
 
     my $examples = $args->{'examples'};
-    my $id_base = $args->{'id_base'};
+    my $id_base  = $args->{'id_base'};
 
     my $ret_string = '';
 
@@ -78,31 +77,30 @@ sub render
 
     foreach my $ex_spec (@$examples)
     {
-        my $id = $id_base . '__' . $ex_spec->{id};
+        my $id    = $id_base . '__' . $ex_spec->{id};
         my $label = $ex_spec->{label};
 
-        my $esc_id = CGI::escapeHTML($id);
+        my $esc_id    = CGI::escapeHTML($id);
         my $esc_label = CGI::escapeHTML($label);
 
         my $post_code = $self->_calc_post_code($ex_spec);
 
-        push @lis, qq[<li><a href="#$esc_id">$esc_label</a></li>\n];
+        push @lis,   qq[<li><a href="#$esc_id">$esc_label</a></li>\n];
         push @codes, qq[<div id="$esc_id">$post_code</div>];
     }
 
     return
-        qq{<div class="tabs">\n}
-            . qq{<ul>\n}
-                . join("\n", @lis)
-            . qq{\n</ul>\n}
-            . join("\n", @codes) .
-        qq{</div>\n}
-        ;
+          qq{<div class="tabs">\n}
+        . qq{<ul>\n}
+        . join( "\n", @lis )
+        . qq{\n</ul>\n}
+        . join( "\n", @codes )
+        . qq{</div>\n};
 }
 
 sub html_with_title
 {
-    my ($self, $args) = @_;
+    my ( $self, $args ) = @_;
 
     my $id_base = $args->{'id_base'}
         or Carp::confess("id_base not specified.");
@@ -110,10 +108,11 @@ sub html_with_title
         or Carp::confess("title not specified.");
 
     return
-        qq[<h3 id="] . CGI::escapeHTML($id_base)
-        . qq[">] . CGI::escapeHTML($title) . qq[</h3>\n\n]
-        . $self->render($args)
-        ;
+          qq[<h3 id="]
+        . CGI::escapeHTML($id_base) . qq[">]
+        . CGI::escapeHTML($title)
+        . qq[</h3>\n\n]
+        . $self->render($args);
 }
 
 1;
@@ -124,14 +123,9 @@ __END__
 
 =encoding utf-8
 
-=head1 NAME
-
-HTML::TabbedExamples::Generate - generate syntax-highlighted examples for
-codes with a markup compatible with jQueryUI's tab widgets.
-
 =head1 VERSION
 
-version 0.0.6
+version 0.2.0
 
 =head1 SYNOPSIS
 
@@ -210,6 +204,11 @@ version 0.0.6
             }
         );
 
+=head1 NAME
+
+HTML::TabbedExamples::Generate - generate syntax-highlighted examples for
+codes with a markup compatible with jQueryUI's tab widgets.
+
 =head1 METHODS
 
 =head2 my $obj = HTML::TabbedExamples::Generate->new({ default_syntax => "perl", main_pre_css_classes => [qw( code my_example1 )]})
@@ -246,37 +245,9 @@ Same arguments as render() with the addition of C<'title'> which is a title
 to be placed inside an C<< <h3>..</h3> >> tag, which will be escaped.
 Returns the complete markup.
 
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2013 by Shlomi Fish.
-
-This is free software, licensed under:
-
-  The MIT (X11) License
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTML-TabbedExamples-Generate or by
-email to bug-html-tabbedexamples-generate@rt.cpan.org.
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc HTML::TabbedExamples::Generate
 
 =head2 Websites
 
@@ -291,7 +262,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/HTML-TabbedExamples-Generate>
+L<https://metacpan.org/release/HTML-TabbedExamples-Generate>
 
 =item *
 
@@ -307,7 +278,7 @@ RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTML-TabbedExamples-Generate>
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=HTML-TabbedExamples-Generate>
 
 =item *
 
@@ -327,25 +298,17 @@ L<http://cpanratings.perl.org/d/HTML-TabbedExamples-Generate>
 
 =item *
 
-CPAN Forum
-
-The CPAN Forum is a web forum for discussing Perl modules.
-
-L<http://cpanforum.com/dist/HTML-TabbedExamples-Generate>
-
-=item *
-
 CPANTS
 
 The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
 
-L<http://cpants.perl.org/dist/overview/HTML-TabbedExamples-Generate>
+L<http://cpants.cpanauthors.org/dist/HTML-TabbedExamples-Generate>
 
 =item *
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/H/HTML-TabbedExamples-Generate>
 
@@ -370,7 +333,7 @@ L<http://deps.cpantesters.org/?module=HTML::TabbedExamples::Generate>
 =head2 Bugs / Feature Requests
 
 Please report any bugs or feature requests by email to C<bug-html-tabbedexamples-generate at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=HTML-TabbedExamples-Generate>. You will be automatically notified of any
+the web interface at L<https://rt.cpan.org/Public/Bug/Report.html?Queue=HTML-TabbedExamples-Generate>. You will be automatically notified of any
 progress on the request by the system.
 
 =head2 Source Code
@@ -379,8 +342,29 @@ The code is open to the world, and available for you to hack on. Please feel fre
 with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
 from your repository :)
 
-L<http://bitbucket.org/shlomif/perl-HTML-TabbedExamples-Generate>
+L<https://github.com/shlomif/perl-html-tabbedexamples-generate>
 
-  hg clone ssh://hg@bitbucket.org/shlomif/perl-HTML-TabbedExamples-Generate
+  git clone git://github.com/shlomif/perl-html-tabbedexamples-generate.git
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/perl-html-tabbedexamples-generate/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

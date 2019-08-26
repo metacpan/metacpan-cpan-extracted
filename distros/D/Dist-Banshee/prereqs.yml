@@ -1,0 +1,31 @@
+runtime:
+  requires:
+    Archive::Tar: '0'
+    CPAN::Meta: '0'
+    CPAN::Meta::Merge: '0'
+    CPAN::Meta::Prereqs::Filter: '0'
+    CPAN::Upload::Tiny: '0.009'
+    Exporter: '5.57'
+    File::Path: '0'
+    File::Slurper: '0'
+    File::Spec::Functions: '0'
+    File::Temp: '0'
+    File::chdir: '0'
+    Getopt::Long: '0'
+    Git::Wrapper: '0'
+    JSON::PP: '0'
+    Module::Load: '0'
+    Module::Metadata: '0'
+    Parse::CPAN::Meta: '0'
+    Text::Diff: '0'
+    Text::Patch: '0'
+    perl: '5.008'
+    version: '0'
+
+test:
+  requires:
+    Test::More: '0.89'
+
+configure:
+  requires:
+    ExtUtils::MakeMaker: '0'

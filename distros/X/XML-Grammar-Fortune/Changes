@@ -1,3 +1,7 @@
+0.0702  2019-08-23
+    - Move repo to https://github.com/shlomif/fortune-xml/
+        - https://bitbucket.org/blog/sunsetting-mercurial-support-in-bitbucket
+
 0.0701  2018-05-02
     - Convert to Dist-Zilla.
 

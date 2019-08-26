@@ -6,13 +6,14 @@ use exact;
 use Role::Tiny ();
 use Scalar::Util;
 
-our $VERSION = '1.02'; # VERSION
+our $VERSION = '1.04'; # VERSION
 
-my $store = '::____exact_class';
+my ( $store, $roles );
 
 sub import {
     my ( $self, $caller ) = @_;
     $caller //= caller();
+    $store->{$caller} = {};
 
     my @methods = qw( new tap attr class_has has with_roles with );
     {
@@ -20,31 +21,44 @@ sub import {
         for (@methods) {
             *{ $caller . '::' . $_ } = \&$_ unless ( defined &{ $caller . '::' . $_ } );
         }
-        *{ $caller . $store } = {};
     }
 
     exact->autoclean( -except => [@methods] );
+}
+
+sub ____parents {
+    my ($namespace) = @_;
+    no strict 'refs';
+    my @parents = @{ $namespace . '::ISA' };
+    return @parents, map { ____parents($_) } @parents;
+}
+
+sub ____install {
+    my ( $self, $namespace ) = @_;
+    if ( ref $store->{$namespace} eq 'HASH' ) {
+        for my $name ( keys %{ $store->{$namespace}->{has} } ) {
+            if ( exists $store->{$namespace}->{value}{$name} ) {
+                $self->attr( $name, $store->{$namespace}->{value}{$name} );
+            }
+            else {
+                $self->attr($name);
+            }
+        }
+    }
 }
 
 sub new {
     my $class = shift;
     my $self  = bless( @_ ? @_ > 1 ? {@_} : { %{ $_[0] } } : {}, ref $class || $class );
 
-    my $data;
-    {
-        no strict 'refs';
-        $data = ${ ref($self) . $store };
-    }
-
-    if ( ref $data eq 'HASH' ) {
-        for my $name ( keys %{ $data->{has} } ) {
-            if ( exists $data->{value}{$name} ) {
-                $self->attr( $name, $data->{value}{$name} );
-            }
-            else {
-                $self->attr($name);
+    for my $namespace ( reverse ( ref $self, ____parents( ref $self ) ) ) {
+        if ( ref $roles->{$namespace} eq 'ARRAY' ) {
+            for my $role ( @{ $roles->{$namespace} } ) {
+                ____install( $self, $role );
             }
         }
+
+        ____install( $self, $namespace );
     }
 
     return $self;
@@ -116,11 +130,8 @@ sub has {
 sub ____attrs {
     for my $set (@_) {
         for my $name ( ( ref $set->{attrs} ) ? @{ $set->{attrs} } : $set->{attrs} ) {
-            {
-                no strict 'refs';
-                die \"$name already defined"
-                    if ( not $set->{redefine} and exists ${ $set->{caller} . $store }->{name}{$name} );
-            }
+            die \"$name already defined"
+                if ( not $set->{redefine} and exists $store->{ $set->{caller} }->{name}{$name} );
 
             my $accessor = ( $set->{obj_accessor} )
                 ? sub {
@@ -137,32 +148,30 @@ sub ____attrs {
                 : sub {
                     my ( $self, $value ) = @_;
 
-                    no strict 'refs';
                     if ( @_ > 1 ) {
-                        ${ $set->{caller} . $store }->{value}{$name} = $value;
+                        $store->{ $set->{caller} }->{value}{$name} = $value;
                         return $self;
                     }
                     else {
-                        return ( ref ${ $set->{caller} . $store }->{value}{$name} eq 'CODE' )
-                            ? ${ $set->{caller} . $store }->{value}{$name}->($self)
-                            : ${ $set->{caller} . $store }->{value}{$name};
+                        return ( ref $store->{ $set->{caller} }->{value}{$name} eq 'CODE' )
+                            ? $store->{ $set->{caller} }->{value}{$name}->($self)
+                            : $store->{ $set->{caller} }->{value}{$name};
                     }
                 };
 
             {
                 no strict 'refs';
                 no warnings 'redefine';
-
                 *{ $set->{caller} . '::' . $name } = $accessor;
+            }
 
-                if ( ref $set->{self} ) {
-                    $set->{self}->$name( $set->{value} ) if ( exists $set->{value} );
-                }
-                else {
-                    ${ $set->{caller} . $store }->{has}{$name}   = 1 if ( $set->{set_has} );
-                    ${ $set->{caller} . $store }->{name}{$name}  = 1;
-                    ${ $set->{caller} . $store }->{value}{$name} = $set->{value} if ( exists $set->{value} );
-                }
+            if ( ref $set->{self} ) {
+                $set->{self}->$name( $set->{value} ) if ( exists $set->{value} );
+            }
+            else {
+                $store->{ $set->{caller} }->{has}{$name}   = 1 if ( $set->{set_has} );
+                $store->{ $set->{caller} }->{name}{$name}  = 1;
+                $store->{ $set->{caller} }->{value}{$name} = $set->{value} if ( exists $set->{value} );
             }
         }
     }
@@ -171,7 +180,9 @@ sub ____attrs {
 }
 
 sub with {
-    return Role::Tiny->apply_roles_to_package( scalar(caller), @_ );
+    my $caller = scalar(caller);
+    push( @{ $roles->{$caller} }, @_ );
+    return Role::Tiny->apply_roles_to_package( $caller, @_ );
 }
 
 sub with_roles {
@@ -202,7 +213,7 @@ exact::class - Simple class interface extension for exact
 
 =head1 VERSION
 
-version 1.02
+version 1.04
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/exact-class.svg)](https://travis-ci.org/gryphonshafer/exact-class)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/exact-class/badge.png)](https://coveralls.io/r/gryphonshafer/exact-class)
@@ -210,7 +221,7 @@ version 1.02
 =head1 SYNOPSIS
 
     package Cat;
-    use exact class;
+    use exact -class;
 
     # ...or if you want to use it directly (which will also use exact):
     # use exact::class;
@@ -218,8 +229,11 @@ version 1.02
     has name => 'Unnamed';
     has ['age', 'weight'] => 4;
 
+    # ...and just for this inline example:
+    BEGIN { $INC{'Cat.pm'} = 1 }
+
     package AttackCat;
-    use exact class;
+    use exact -class;
     use parent 'Cat';
 
     has attack => 4;

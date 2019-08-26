@@ -11,11 +11,10 @@ use Data::UUID;
 use Path::Class;
 
 my $conf = {
-  amount         => 1000,
+  amount         => 10,
   cache_path     => 't/cache',
   file_extension => '.dmp'
 };
-
 
 my $delayer = Interact::Later->new($conf);
 

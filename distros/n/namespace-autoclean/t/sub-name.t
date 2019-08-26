@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Test::More 0.88;
-use Test::Requires qw(Sub::Name);
+use Test::Needs qw(Sub::Name);
 
 {
   package Foo;

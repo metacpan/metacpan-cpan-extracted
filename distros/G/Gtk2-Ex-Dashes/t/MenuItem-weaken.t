@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010 Kevin Ryde
+# Copyright 2010, 2012 Kevin Ryde
 
 # This file is part of Gtk2-Ex-Dashes.
 #
@@ -27,9 +27,9 @@ use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
 # Test::Weaken 3 for "contents"
-eval "use Test::Weaken 3;
-                               use Test::Weaken::Gtk2;
-                               1"
+eval 'use Test::Weaken 3;
+      use Test::Weaken::Gtk2;
+      1'
   or plan skip_all => "due to Test::Weaken 3 and/or Test::Weaken::Gtk2 not available -- $@";
 diag ("Test::Weaken version ", Test::Weaken->VERSION);
 

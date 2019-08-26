@@ -1,5 +1,8 @@
 Revision history for Perl extension Config::AST
 
+1.02  Fri Aug 23 13:52:29 2019
+	- reimplement direct addressing in a more robust way
+
 1.01  Tue Aug 20 17:01:07 2019
 	- fix repository url
 

@@ -126,10 +126,6 @@ CREATE TABLE runs (
     pinned          BOOL            NOT NULL DEFAULT FALSE,
 
     -- User Input
-    version         CITEXT          DEFAULT NULL,
-    tier            CITEXT          DEFAULT NULL,
-    category        CITEXT          DEFAULT NULL,
-    build           CITEXT          DEFAULT NULL,
     added           TIMESTAMP       NOT NULL DEFAULT now(),
     status_changed  TIMESTAMP       NOT NULL DEFAULT now(),
     mode            run_modes       NOT NULL DEFAULT 'qvfd',
@@ -139,6 +135,7 @@ CREATE TABLE runs (
     passed          INTEGER         DEFAULT NULL,
     failed          INTEGER         DEFAULT NULL,
     retried         INTEGER         DEFAULT NULL,
+    fields          JSONB           DEFAULT NULL,
     parameters      JSONB           DEFAULT NULL
 );
 CREATE INDEX IF NOT EXISTS run_projects ON runs(project_id);
@@ -166,6 +163,7 @@ CREATE TABLE jobs (
     run_id          UUID        NOT NULL REFERENCES runs(run_id),
 
     parameters      JSONB       DEFAULT NULL,
+    fields          JSONB       DEFAULT NULL,
 
     -- Summaries
     name            TEXT            DEFAULT NULL,
@@ -179,20 +177,6 @@ CREATE TABLE jobs (
 
     pass_count      BIGINT          DEFAULT NULL,
     fail_count      BIGINT          DEFAULT NULL,
-
-    -- Process time data
-    time_user       DECIMAL(20,10)  DEFAULT NULL,
-    time_sys        DECIMAL(20,10)  DEFAULT NULL,
-    time_cuser      DECIMAL(20,10)  DEFAULT NULL,
-    time_csys       DECIMAL(20,10)  DEFAULT NULL,
-
-    -- Process memory data
-    mem_peak        BIGINT          DEFAULT NULL,
-    mem_size        BIGINT          DEFAULT NULL,
-    mem_rss         BIGINT          DEFAULT NULL,
-    mem_peak_u      VARCHAR(2)      DEFAULT NULL,
-    mem_size_u      VARCHAR(2)      DEFAULT NULL,
-    mem_rss_u       VARCHAR(2)      DEFAULT NULL,
 
     -- Output data
     stdout          TEXT            DEFAULT NULL,

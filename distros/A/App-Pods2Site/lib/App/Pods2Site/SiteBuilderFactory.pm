@@ -3,6 +3,10 @@ package App::Pods2Site::SiteBuilderFactory;
 use strict;
 use warnings;
 
+our $VERSION = '1.002';
+my $version = $VERSION;
+$VERSION = eval $VERSION;
+
 require App::Pods2Site::SiteBuilder::None;
 require App::Pods2Site::SiteBuilder::BasicFramesSimpleTOC;
 require App::Pods2Site::SiteBuilder::BasicFramesTreeTOC;

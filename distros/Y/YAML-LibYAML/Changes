@@ -1,3 +1,6 @@
+0.80 Thu 22 Aug 2019 01:17:13 PM CEST
+ - Fix memory leak when loading invalid YAML (PR#93 tinita)
+
 0.79 Tue 11 Jun 2019 09:35:22 PM CEST
  - Support aliasing scalars resolved as null or booleans (tinita)
  - Add YAML::XS::LibYAML::libyaml_version() (tinita)

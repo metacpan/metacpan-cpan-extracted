@@ -1,7 +1,7 @@
 package App::resolvetable;
 
 our $DATE = '2019-08-20'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -9,20 +9,21 @@ use warnings;
 use Log::ger;
 
 use Color::ANSI::Util qw(ansifg);
+use Data::Cmp qw(cmp_data);
 use Time::HiRes qw(time);
 
 our %SPEC;
 
 # colorize majority values with green, minority values with red
 sub _colorize_maj_min {
-    my $hash = shift;
+    my $row = shift;
 
     my %freq;
-    my @keys = keys %$hash;
+    my @keys = keys %$row;
     for (@keys) {
-        next unless defined $hash->{$_};
+        next unless defined $row->{$_};
         next if $_ eq 'name';
-        $freq{ $hash->{$_} }++;
+        $freq{ $row->{$_} }++;
     }
     my @vals_by_freq = sort { $freq{$b} <=> $freq{$a} } keys %freq;
 
@@ -49,27 +50,27 @@ sub _colorize_maj_min {
         $colors_by_val{$val} = $decreased ? $red : $green;
     }
     for (@keys) {
-        my $val = $hash->{$_};
+        my $val = $row->{$_};
         next unless defined $val;
         next if $_ eq 'name';
-        $hash->{$_} = ansifg($colors_by_val{$val}) . $hash->{$_} . "\e[0m";
+        $row->{$_} = ansifg($colors_by_val{$val}) . $row->{$_} . "\e[0m";
     }
 }
 
 # colorize the shortest time with green
 sub _colorize_shortest_time {
-    my $hash = shift;
+    my $row = shift;
     no warnings 'numeric';
 
     my %time;
-    my @keys = keys %$hash;
+    my @keys = keys %$row;
     for (@keys) {
-        next unless defined $hash->{$_};
+        next unless defined $row->{$_};
         next if $_ eq 'name';
         my $time =
-            $hash->{$_} =~ /^\s*</ ? 0.01 :
-            $hash->{$_} =~ /^\s*>/ ? 4001 : $hash->{$_}+0;
-        $time{ $hash->{$_} } = $time;
+            $row->{$_} =~ /^\s*</ ? 0.01 :
+            $row->{$_} =~ /^\s*>/ ? 4001 : $row->{$_}+0;
+        $time{ $row->{$_} } = $time;
     }
     my @times_from_shortest = sort { $time{$a} <=> $time{$b} } keys %time;
 
@@ -79,11 +80,11 @@ sub _colorize_shortest_time {
     my $green = "33cc33";
 
     for (@keys) {
-        my $val = $hash->{$_};
+        my $val = $row->{$_};
         next unless defined $val;
         next if $_ eq 'name';
-        $hash->{$_} = ansifg($green) . $hash->{$_} . "\e[0m"
-            if $hash->{$_} eq $times_from_shortest[0];
+        $row->{$_} = ansifg($green) . $row->{$_} . "\e[0m"
+            if $row->{$_} eq $times_from_shortest[0];
     }
 }
 
@@ -96,22 +97,52 @@ sub _mark_undef_with_x {
     }
 }
 
+sub _colorize_reference_result {
+    my ($row, $reference_server) = @_;
+    my %colors_by_server;
+    for (keys %$row) {
+        next if $_ eq 'name';
+        $colors_by_server{$_} =
+            $_ eq $reference_server || cmp_data($row->{$_}, $row->{$reference_server}) == 0 ?
+            (defined($row->{$_}) ? "33cc33" : "7f7f7f") :
+            "ff0000";
+    }
+    for (keys %$row) {
+        next if $_ eq 'name';
+        $row->{$_} = ansifg($colors_by_server{$_}).($row->{$_} // 'X')."\e[0m";
+    }
+}
+
 $SPEC{'resolvetable'} = {
     v => 1.1,
     summary => 'Produce a colored table containing DNS resolve results of '.
         'several names from several servers/resolvers',
     args => {
         action => {
-            schema => ['str*', in=>[qw/show-addresses show-timings/]],
+            schema => ['str*', in=>[qw/show-addresses compare-addresses show-timings/]],
             default => 'show-addresses',
             cmdline_aliases => {
                 timings => {is_flag=>1, summary=>'Shortcut for --action=show-timings', code=>sub { $_[0]{action} = 'show-timings' }},
+                compare => {is_flag=>1, summary=>'Shortcut for --action=compare-addresses', code=>sub { $_[0]{action} = 'compare-addresses' }},
             },
             description => <<'_',
 
-The default action is to show resolve result (`show-addresses`). If set to
-`show-timings`, will show resolve times instead to compare speed among DNS
-servers/resolvers.
+The default action is to show resolve result (`show-addresses`). Will highlight
+the majority result with green, and minority result with red. Failed resolve
+(undef) will also be highlighted with a red "X".
+
+The `compare-addresses` action is similar to `show-addresses`, but will assume
+the first server/resolver as the reference and compare the results of the other
+servers with the first. When the result is different, it will be highlighted
+with red; when the result is the same, it will be highlighted with green. Failed
+resolve (undef) are highlighted with a grey X (if result is the same as
+reference server) or a red X (if result is different than reference server). So
+basically whenever you see a red, the results of the other servers are not
+identical with the first (reference) server.
+
+The `show-timings` action will show resolve times instead of addresses, to
+compare speed among DNS servers/resolvers. Will highlight the fastest server
+with green.
 
 _
         },
@@ -200,8 +231,18 @@ sub resolvetable {
                 name => $name,
                 map { $_ => $res{$name}{$_} } @$servers,
             };
-            _colorize_maj_min($row) if $args{colorize};
-            _mark_undef_with_x($row) if $args{colorize};
+            if ($args{colorize}) {
+                _colorize_maj_min($row);
+                _mark_undef_with_x($row);
+            }
+        } elsif ($action eq 'compare-addresses') {
+            $row = {
+                name => $name,
+                map { $_ => $res{$name}{$_} } @$servers,
+            };
+            if ($args{colorize}) {
+                _colorize_reference_result($row, $servers->[0]);
+            }
         } elsif ($action eq 'show-timings') {
             $row = {
                 name => $name,
@@ -228,8 +269,10 @@ sub resolvetable {
         } else {
             die "Unknown action '$action'";
         }
-        _colorize_shortest_time($row) if $args{colorize};
-        _mark_undef_with_x($row)      if $args{colorize};
+        if ($args{colorize}) {
+            _colorize_shortest_time($row);
+            _mark_undef_with_x($row);
+        }
         push @rows, $row;
     }
 
@@ -251,7 +294,7 @@ App::resolvetable - Produce a colored table containing DNS resolve results of se
 
 =head1 VERSION
 
-This document describes version 0.005 of App::resolvetable (from Perl distribution App-resolvetable), released on 2019-08-20.
+This document describes version 0.007 of App::resolvetable (from Perl distribution App-resolvetable), released on 2019-08-20.
 
 =head1 DESCRIPTION
 
@@ -276,9 +319,22 @@ Arguments ('*' denotes required arguments):
 
 =item * B<action> => I<str> (default: "show-addresses")
 
-The default action is to show resolve result (C<show-addresses>). If set to
-C<show-timings>, will show resolve times instead to compare speed among DNS
-servers/resolvers.
+The default action is to show resolve result (C<show-addresses>). Will highlight
+the majority result with green, and minority result with red. Failed resolve
+(undef) will also be highlighted with a red "X".
+
+The C<compare-addresses> action is similar to C<show-addresses>, but will assume
+the first server/resolver as the reference and compare the results of the other
+servers with the first. When the result is different, it will be highlighted
+with red; when the result is the same, it will be highlighted with green. Failed
+resolve (undef) are highlighted with a grey X (if result is the same as
+reference server) or a red X (if result is different than reference server). So
+basically whenever you see a red, the results of the other servers are not
+identical with the first (reference) server.
+
+The C<show-timings> action will show resolve times instead of addresses, to
+compare speed among DNS servers/resolvers. Will highlight the fastest server
+with green.
 
 =item * B<colorize> => I<bool> (default: 1)
 
@@ -303,11 +359,15 @@ that contains extra information.
 
 Return value:  (any)
 
-=for html <img src="https://st.aticpan.org/source/PERLANCAR/App-resolvetable-0.005/share/images/Screenshot_20190530_111051.png" />
+=for html <img src="https://st.aticpan.org/source/PERLANCAR/App-resolvetable-0.007/share/images/Screenshot_20190530_111051.png" />
 
 Sample screenshot 2 (with C<--timings>):
 
-=for html <img src="https://st.aticpan.org/source/PERLANCAR/App-resolvetable-0.005/share/images/Screenshot_20190530_112052.png" />
+=for html <img src="https://st.aticpan.org/source/PERLANCAR/App-resolvetable-0.007/share/images/Screenshot_20190530_112052.png" />
+
+Sample screenshot 3 (with C<--compare>):
+
+=for html <img src="https://st.aticpan.org/source/PERLANCAR/App-resolvetable-0.007/share/images/Screenshot_20190820_235000-redacted.png" />
 
 =head1 HOMEPAGE
 

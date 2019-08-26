@@ -1,10 +1,12 @@
 Changes
 CONTRIBUTING.md
+cpanfile
 examples/ss2tk
 examples/ssdiff
 examples/ss-dups-tk.pl
 examples/xlscat
 examples/xls2csv
+examples/xlsx2csv
 files/Active2.xls
 files/Active2.xlsx
 files/attr.ods
@@ -23,6 +25,7 @@ files/empty.sxc
 files/empty.txt
 files/empty.xls
 files/empty.xlsx
+files/example.xlsx
 files/macosx.csv
 files/macosx.xls
 files/merged.ods

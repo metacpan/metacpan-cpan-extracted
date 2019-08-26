@@ -1,5 +1,9 @@
 Revision history for Bot::IRC::X::Reminder
 
+1.04      2019-08-26 16:42:41-07:00 America/Los_Angeles
+        - Adding Perl versions to test; annual general update for 2018
+        - Fix being able to forget reminders; closes #1
+
 1.03      2017-06-30 11:39:28-04:00 America/New_York
         - Fix crontab-style date expression being interpreted as now + 0 seconds
 

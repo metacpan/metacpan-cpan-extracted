@@ -1,12 +1,12 @@
 package Test::BDD::Cucumber::Harness::TermColor;
-$Test::BDD::Cucumber::Harness::TermColor::VERSION = '0.57';
+$Test::BDD::Cucumber::Harness::TermColor::VERSION = '0.58';
 =head1 NAME
 
 Test::BDD::Cucumber::Harness::TermColor - Prints colorized text to the screen
 
 =head1 VERSION
 
-version 0.57
+version 0.58
 
 =head1 DESCRIPTION
 
@@ -120,16 +120,6 @@ sub _colors {
 }
 
 my $margin = 2;
-
-sub BUILD {
-    my $self = shift;
-    my $fh   = $self->fh;
-
-    if ( $margin > 1 ) {
-        print $fh "\n" x ( $margin - 1 );
-    }
-}
-
 my $current_feature;
 
 sub feature {

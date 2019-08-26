@@ -1,7 +1,7 @@
 package RPC::Switch::Client;
 use Mojo::Base 'Mojo::EventEmitter';
 
-our $VERSION = '0.16'; # VERSION
+our $VERSION = '0.17'; # VERSION
 
 #
 # Mojo's default reactor uses EV, and EV does not play nice with signals
@@ -11,8 +11,6 @@ our $VERSION = '0.16'; # VERSION
 BEGIN {
 	$ENV{'MOJO_REACTOR'} = 'Mojo::Reactor::Poll' unless $ENV{'MOJO_REACTOR'};
 }
-
-use feature 'state';
 
 # more Mojolicious
 use Mojo::IOLoop;
@@ -430,7 +428,7 @@ sub ping {
 }
 
 sub work {
-	my ($self) = @_;
+	my ($self, $prepare) = @_;
 
 	my $pt = $self->ping_timeout;
 	my $tmr;
@@ -450,6 +448,7 @@ sub work {
 		$self->ioloop->{__exit__} = $code;
 		$self->ioloop->stop;
 	});
+	return 0 if $prepare;
 	$self->ioloop->{__exit__} = WORK_OK;
 	$self->log->debug(blessed($self) . ' starting work');
 	$self->ioloop->start unless $self->ioloop->is_running;

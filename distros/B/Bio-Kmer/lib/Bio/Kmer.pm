@@ -5,7 +5,7 @@
 
 package Bio::Kmer;
 require 5.10.0;
-our $VERSION=0.25;
+our $VERSION=0.26;
 
 use strict;
 use warnings;
@@ -19,8 +19,17 @@ use IO::Uncompress::Gunzip;
 use File::Which qw/which/;
 use Carp qw/croak carp confess/;
 
-use threads;
-use threads::shared;
+our $iThreads; # boolean for whether threads are loaded
+BEGIN{
+  eval{
+    require threads;
+    require threads::shared;
+    $iThreads = 1;
+  };
+  if($@){
+    $iThreads = 0;
+  }
+}
 
 use Exporter qw/import/;
 our @EXPORT_OK = qw(
@@ -45,7 +54,10 @@ local $SIG{'__DIE__'} = sub { my $e = $_[0]; $e =~ s/(at [^\s]+? line \d+\.$)/\n
 my $startTime = time();
 sub logmsg{
   local $0 = basename $0; 
-  my $tid=threads->tid;
+  my $tid = 0;
+  if($iThreads){
+    $tid = threads->tid;
+  }
   my $elapsedTime = time() - $startTime;
   print STDERR "$0.$tid $elapsedTime @_\n";
 }
@@ -89,6 +101,16 @@ A module for helping with kmer analysis. The basic methods help count kmers and 
 
 =pod
 
+=head1 VARIABLES
+
+=over
+
+=item $Bio::Kmer::iThreads
+
+Boolean describing whether the module instance is using threads
+
+=back
+
 =head1 METHODS
 
 =over
@@ -97,7 +119,9 @@ A module for helping with kmer analysis. The basic methods help count kmers and 
 
 Create a new instance of the kmer counter.  One object per file. 
 
-  Applicable arguments:
+  Filename can be either a file path or a Bio::SeqIO object.
+
+  Applicable arguments for \%options:
   Argument     Default    Description
   kmercounter  perl       What kmer counter software to use.
                           Choices: Perl, Jellyfish.
@@ -125,7 +149,7 @@ Create a new instance of the kmer counter.  One object per file.
 sub new{
   my($class,$seqfile,$settings)=@_;
 
-  die "ERROR: need a sequence file or a Bio::SeqIO object" if(!$seqfile);
+  croak "ERROR: need a sequence file or a Bio::SeqIO object" if(!$seqfile);
 
   # Set optional parameter defaults
   $$settings{kmerlength}    = $$settings{kmerlength} || $$settings{k} || 21;
@@ -147,7 +171,7 @@ sub new{
       require Bio::Seq::Quality;
     };
     if($@){
-      die "ERROR: cannot load Bio::SeqIO and Bio::Seq::Quality, but you supplied a Bio::SeqIO object";
+      croak "ERROR: cannot load Bio::SeqIO and Bio::Seq::Quality, but I need to because you supplied a Bio::SeqIO object";
     }
     my $tempfile="$$settings{tempdir}/bioperl_input.fastq";
     my $out=Bio::SeqIO->new(-file=>">".$tempfile);
@@ -172,7 +196,7 @@ sub new{
   # Check if we have a valid sequence file path or at
   # the very least, double check that the file path we just
   # made from the Bio::SeqIO object is valid.
-  die "ERROR: could not locate the sequence file $seqfile" if(!-e $seqfile);
+  croak "ERROR: could not locate the sequence file $seqfile" if(!-e $seqfile);
 
   # Initialize the object and then bless it
   my $self={
@@ -240,13 +264,16 @@ sub count{
   my $kmerHash={};
 
   if($self->{kmercounter} eq "perl"){
+    if(!$iThreads){
+      croak("Warning: perl iThreads are not enabled in this version of perl, but you requested iThreads when running ". ref($self));
+    }
     $self->countKmersPurePerl($seqfile,$kmerlength);
   } elsif($self->{kmercounter} eq "jellyfish"){
     # TODO make JF DB file $self->{jellyfishDb} and do not return
     # a kmer count
     $self->countKmersJellyfish($seqfile,$kmerlength);
   } else {
-    die "ERROR: I do not understand the kmer counter $self->{kmercounter}";
+    croak "ERROR: I do not understand the kmer counter $self->{kmercounter}";
   }
 
   if($$self{sample} < 1){
@@ -321,10 +348,10 @@ sub query{
     my $kmers=$self->kmers();
     $count=$$kmers{uc($query)} || 0;
   } elsif($self->{kmercounter} eq "jellyfish"){
-    open(my $queryFh, "$$self{jellyfish} query ".$self->{jellyfishdb}." |") or die "ERROR: could not run jellyfish query: $!";
+    open(my $queryFh, "$$self{jellyfish} query ".$self->{jellyfishdb}." |") or croak "ERROR: could not run jellyfish query: $!";
     my $db=$self->{jellyfishdb};
     my $tmp=`jellyfish query $db $query`;
-    die "ERROR: could not run jellyfish query" if $?;
+    croak "ERROR: could not run jellyfish query" if $?;
     chomp($tmp);
     (undef,$count)=split(/\s+/,$tmp);
   }
@@ -374,7 +401,7 @@ sub histogramJellyfish{
   
   # Read the output file
   my @hist=(0);
-  open(my $fh, $self->{histfile}) or die "ERROR: reading $self->{histfile}: $!";
+  open(my $fh, $self->{histfile}) or croak "ERROR: reading $self->{histfile}: $!";
   while(<$fh>){
     s/^\s+|\s+$//g;
     my($count, $countOfCounts)=split /\s+/;
@@ -507,7 +534,7 @@ sub kmers{
   }
 
   my %kmer;
-  open(my $fh, $self->{kmerfile}) or die "ERROR: could not read the kmer file: $!";
+  open(my $fh, $self->{kmerfile}) or croak "ERROR: could not read the kmer file: $!";
   while(<$fh>){
     chomp;
     my($kmer,$count)=split /\t/;
@@ -539,7 +566,7 @@ sub union{
   my($self,$other)=@_;
   
   if(!$self->_checkCompatibility($other)){
-    die;
+    croak "ERROR: two objects are not compatible in a union: ".ref($self)." / ".ref($other);
   }
 
   # See what kmers are in common using hashes
@@ -572,7 +599,7 @@ sub intersection{
   my($self,$other)=@_;
 
   if(!$self->_checkCompatibility($other)){
-    die;
+    croak "ERROR: two objects are not compatible in an intersection: ".ref($self)." / ".ref($other);
   }
 
   my @intersection;
@@ -662,7 +689,7 @@ sub countKmersJellyfish{
   if($jfVersion =~ /(jellyfish\s+)?(\d+)?/){
     my $majorVersion=$2;
     if($majorVersion < 2){
-      die "ERROR: Jellyfish v2 or greater is required for ".ref($self);
+      croak "ERROR: Jellyfish v2 or greater is required for ".ref($self);
     }
   }
   

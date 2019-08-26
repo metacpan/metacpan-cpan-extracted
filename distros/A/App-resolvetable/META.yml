@@ -19,6 +19,7 @@ meta-spec:
 name: App-resolvetable
 requires:
   Color::ANSI::Util: '0.161'
+  Data::Cmp: '0.002'
   Data::Sah::Compiler::perl::TH::array: '0'
   Data::Sah::Compiler::perl::TH::bool: '0'
   Data::Sah::Compiler::perl::TH::str: '0'
@@ -34,7 +35,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-resolvetable
   homepage: https://metacpan.org/release/App-resolvetable
   repository: git://github.com/perlancar/perl-App-resolvetable.git
-version: '0.005'
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.028002'

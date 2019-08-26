@@ -6,7 +6,7 @@ use warnings;
 use Perl::Critic::Utils qw(:severities :classification :ppi);
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '0.029';
+our $VERSION = '0.030';
 
 use constant DESC => 'Using interpreter threads';
 use constant EXPL => 'Interpreter threads are discouraged, they are not lightweight and fast as other threads may be. Try an event loop, forks.pm, or Parallel::Prefork.';

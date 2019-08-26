@@ -4,7 +4,7 @@ requires 'strictures' => '2.000001';
 
 requires 'Catalyst' => '5.80001';
 requires 'Catalyst::Model';
-requires 'Curio' => '0.01';
+requires 'Curio' => '0.08';
 requires 'Module::Runtime' => '0.014';
 requires 'Moo' => '2.003000';
 requires 'Types::Common::String' => '1.002001';

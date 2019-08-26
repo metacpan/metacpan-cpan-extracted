@@ -20,20 +20,41 @@ no warnings 'experimental';
 my $B1 = Vote::Count->new(
   BallotSet => read_ballots('t/data/biggerset1.txt'), );
 
+# Add a record specially for redactpair
+$B1->{'BallotSet'}{'ballots'}{'testonly'} = { 
+  'votes' => [ qw( VOMIT STRAWBERRY CHOCOLATE LEMON TOAD VANILLA ORANGE MINTCHIP)],
+  'count' => 1,
+};
+
 my $newBallot1 = RedactPair( $B1->BallotSet(), 'VANILLA', 'CHOCOLATE' );
 my $newBallot2 = RedactPair( $B1->BallotSet(), 'VOMIT',   'TOAD' );
 
 subtest
-  'Compare a new ballotsets accross 2 different pairs for RedactPair'
+  'Compare a new ballotset accross 2 different pairs for RedactPair'
   => sub {
+
   is_deeply(
-    $newBallot1->{'ballots'}{'VANILLA:CHOCOLATE:STRAWBERRY'}{'votes'},
-    [qw/VANILLA STRAWBERRY/], );
+    $newBallot1->{'ballots'}{'testonly'}{'votes'},
+    [ qw( VOMIT STRAWBERRY CHOCOLATE LEMON TOAD )], );
+  is_deeply(
+    $newBallot2->{'ballots'}{'testonly'}{'votes'},
+    [ qw( VOMIT STRAWBERRY CHOCOLATE LEMON )], );  
+
+  is_deeply(
+    $newBallot1->{'ballots'}{'VANILLA'}{'votes'},
+    ['VANILLA'], );
   is_deeply(
     $newBallot2->{'ballots'}{'VANILLA:CHOCOLATE:STRAWBERRY'}{'votes'},
     [qw/VANILLA CHOCOLATE STRAWBERRY/],
   );
-
+  is_deeply(
+    $newBallot1->{'ballots'}{'CHOCOLATE:MINTCHIP:VANILLA'}{'votes'},
+    [ 'CHOCOLATE', 'MINTCHIP' ],
+  );
+  is_deeply(
+    $newBallot2->{'ballots'}{'CHOCOLATE:MINTCHIP:VANILLA'}{'votes'},
+    [ qw/CHOCOLATE MINTCHIP VANILLA/ ],
+  );  
   is_deeply( $newBallot1->{'ballots'}{'CHOCOANTS:CHOCOLATE'}{'votes'},
     [qw/CHOCOANTS CHOCOLATE/], );
   is_deeply( $newBallot2->{'ballots'}{'CHOCOANTS:CHOCOLATE'}{'votes'},

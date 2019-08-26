@@ -1,6 +1,13 @@
 Changelog for Doodle
 
-0.04 2019-08-20T08:25:35
+0.05 2019-08-21T18:56:43
+ - Updated documentation
+ - Expand the "DDL" acronym (#8)
+ - Merge migrator and migration classes
+ - Updated CONTRIBUTING.mkdn
+
+0.04 2019-08-20T08:25:40
+ - Built release version 0.04
  - Updated documentation
  - Added CONTRIBUTING.mkdn
  - Added data migration framework

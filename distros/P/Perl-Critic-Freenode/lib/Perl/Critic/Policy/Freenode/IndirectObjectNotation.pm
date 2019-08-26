@@ -6,7 +6,7 @@ use warnings;
 use Perl::Critic::Utils qw(:severities :classification :ppi);
 use parent 'Perl::Critic::Policy::Objects::ProhibitIndirectSyntax';
 
-our $VERSION = '0.029';
+our $VERSION = '0.030';
 
 sub default_severity { $SEVERITY_HIGHEST }
 sub default_themes { 'freenode' }

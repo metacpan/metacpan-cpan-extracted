@@ -1,0 +1,40 @@
+acmeman
+=======
+
+Command line utility for issuing and maintaining ACME SSL certificates.
+
+While most existing ACME tools take a list of domain names for which to
+issue certificates from their command line or configuration file, acmeman
+gathers domain names directly from the configuration of the http server
+that serves them. Thus, a domain name obtains its certificate automatically,
+once the administrator configures the http server to serve it via https.
+
+The utility is normally run as a cron job.
+
+Installation
+------------
+
+To build run:
+
+   perl Makefile.PL
+
+as usual. The created Makefile will install the missing dependencies
+from CPAN automatically. If this is not desirable, run
+
+   perl Makefile.PL --no-autoinstall
+
+instead.
+
+See "man acmeman" (or "perldoc acmeman", or "acmeman --help"), for a
+detailed manual.
+
+Copying
+-------
+This package is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3, or (at your option)
+any later version.
+
+See http://www.gnu.org/licenses.
+
+

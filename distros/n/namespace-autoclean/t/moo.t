@@ -5,8 +5,7 @@ use Test::More 0.88;
 # see moo-with-moose.t
 use constant WITH_MOOSE => !!$INC{'Moose.pm'};
 
-# blech! but Test::Requires does a stringy eval, so this works...
-use Test::Requires { 'Moo' => '()', 'Moo::Role' => '()' };
+use Test::Needs 'Moo', 'Moo::Role';
 
 plan skip_all => 'this combination of Moo/Sub::Util is unstable'
     if Moo->VERSION >= 2 and not eval { Moo->VERSION('2.000002') }

@@ -42,9 +42,9 @@ my $json_schema = $converter->get_json_schema('MySQLTypeTest', {
             new_prop_2 => 2,
         },
     },
-    exclude_required                => [ qw/ tinytext / ],
-    exclude_properties              => [ qw/ binary / ],
-    include_required                => [ qw/ year time / ],
+    exclude_required   => [ qw/ tinytext / ],
+    exclude_properties => [ qw/ binary / ],
+    include_required   => [ qw/ year time / ],
 });
 
 is $json_schema->{properties}->{decimal}->{type}, 'string', 'decimal converted to string type';
@@ -83,6 +83,52 @@ subtest 'different result for merge or overwrite property _action' => sub {
         new_prop_1 => 1,
         new_prop_2 => 2,
     }, 'got blob item with all properties overwritten';
+
+};
+
+subtest 'schema_declaration' => sub {
+
+    is $json_schema->{'$schema'}, 'http://json-schema.org/schema#', 'got default $schema declaration';
+
+    my $json_schema = $converter->get_json_schema('MySQLTypeTest', { schema_declaration => 'declaration overwritten' });
+    is $json_schema->{'$schema'}, 'declaration overwritten', 'got overwritten $schema declaration';
+
+};
+
+subtest 'schema_overwrite' => sub {
+
+    my $json_schema = $converter->get_json_schema('MySQLTypeTest', {
+        schema_overwrite => {
+            '$schema' => 'overwritten',
+            type => 'overwritten',
+            properties => 'overwritten',
+
+            new_base_field => 'new base field',
+        },
+    });
+
+    cmp_deeply $json_schema, {
+        '$schema' => 'overwritten',
+        'additionalProperties' => 0,
+        'type' => 'overwritten',
+        'properties' => 'overwritten',
+        'required' => [
+            'tinytext'
+        ],
+        'new_base_field' => 'new base field',
+    }, 'got overwritten schema top level fields';
+
+};
+
+subtest 'dependencies' => sub {
+
+    my $json_schema = $converter->get_json_schema('MySQLTypeTest', {
+        dependencies => {
+            fieldA => [ qw/ fieldB fieldC / ],
+        },
+    });
+
+    cmp_deeply $json_schema->{dependencies}, { fieldA => [ qw/ fieldB fieldC / ] }, 'got dependency fields';
 
 };
 

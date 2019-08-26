@@ -18,6 +18,8 @@ use Color::RGB::Util qw(
                            rand_rgb_colors
                            reverse_rgb_color
                            rgb2grayscale
+                           rgb2hsl
+                           rgb2hsv
                            rgb2int
                            rgb2sepia
                            rgb_diff
@@ -89,6 +91,18 @@ subtest reverse_rgb_color => sub {
 
 subtest rgb2grayscale => sub {
     is(rgb2grayscale('0033CC'), '555555');
+};
+
+subtest rgb2hsl => sub {
+    is(rgb2hsl("ff0000"), "0 1 0.5");
+    is(rgb2hsl("80ff80"), "120 1 0.751");
+    is(rgb2hsl("000080"), "240 1 0.251");
+};
+
+subtest rgb2hsv => sub {
+    is(rgb2hsv("ff0000"), "0 1 1");
+    is(rgb2hsv("80ff80"), "120 0.498 1");
+    is(rgb2hsv("000080"), "240 1 0.502");
 };
 
 subtest rgb2int => sub {

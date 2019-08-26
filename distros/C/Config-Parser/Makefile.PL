@@ -13,11 +13,10 @@ WriteMakefile(NAME      =>      'Config::Parser',
 	      PREREQ_PM         => {
 		  'Carp'    => 0,
 		  'Text::ParseWords' => '3.26',
-		  'Class::Inspector' => '1.30',
 		  'Data::Dumper' => '2.135_06',
 		  'File::Temp'   => '0.22',
                   'Text::Locus'  => '1.01',
-                  'Config::AST'  => '1.00'
+                  'Config::AST'  => '1.01'
 	      },
 	      META_MERGE        => {
 		  'meta-spec' => { version => 2 },

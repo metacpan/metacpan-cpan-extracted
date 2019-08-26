@@ -4,7 +4,7 @@ use Test::More 0.88;
 
 {
     package Foo;
-    use Test::Requires 'Sub::Install';
+    use Test::Needs 'Sub::Install';
     sub bar { }
 
     Sub::Install::install_sub({

@@ -6,17 +6,43 @@ use warnings;
 
 use Test::More;
 
-plan tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 35 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
+    'Data/Sah/Coerce/perl/int/str_convert_en_or_id_dow_name_to_num.pm',
+    'Data/Sah/Coerce/perl/int/str_convert_en_or_id_month_name_to_num.pm',
     'Data/Sah/Coerce/perl/int/str_convert_id_dow_name_to_num.pm',
     'Data/Sah/Coerce/perl/int/str_convert_id_month_name_to_num.pm',
+    'Perinci/Sub/XCompletion/date_dow_num_en_or_id.pm',
+    'Perinci/Sub/XCompletion/date_dow_num_id.pm',
+    'Perinci/Sub/XCompletion/date_dow_nums_en_or_id.pm',
+    'Perinci/Sub/XCompletion/date_dow_nums_id.pm',
+    'Perinci/Sub/XCompletion/date_month_num_en_or_id.pm',
+    'Perinci/Sub/XCompletion/date_month_num_id.pm',
+    'Perinci/Sub/XCompletion/date_month_nums_en_or_id.pm',
+    'Perinci/Sub/XCompletion/date_month_nums_id.pm',
     'Sah/Schema/date/dow_name/id.pm',
+    'Sah/Schema/date/dow_num/en_or_id.pm',
+    'Sah/Schema/date/dow_num/id.pm',
+    'Sah/Schema/date/dow_nums/en_or_id.pm',
+    'Sah/Schema/date/dow_nums/id.pm',
     'Sah/Schema/date/month/id.pm',
     'Sah/Schema/date/month_name/id.pm',
+    'Sah/Schema/date/month_num/en_or_id.pm',
+    'Sah/Schema/date/month_num/id.pm',
+    'Sah/Schema/date/month_nums/en_or_id.pm',
+    'Sah/Schema/date/month_nums/id.pm',
     'Sah/SchemaR/date/dow_name/id.pm',
+    'Sah/SchemaR/date/dow_num/en_or_id.pm',
+    'Sah/SchemaR/date/dow_num/id.pm',
+    'Sah/SchemaR/date/dow_nums/en_or_id.pm',
+    'Sah/SchemaR/date/dow_nums/id.pm',
     'Sah/SchemaR/date/month/id.pm',
     'Sah/SchemaR/date/month_name/id.pm',
+    'Sah/SchemaR/date/month_num/en_or_id.pm',
+    'Sah/SchemaR/date/month_num/id.pm',
+    'Sah/SchemaR/date/month_nums/en_or_id.pm',
+    'Sah/SchemaR/date/month_nums/id.pm',
     'Sah/Schemas/Date/ID.pm'
 );
 

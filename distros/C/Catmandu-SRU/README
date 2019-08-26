@@ -58,6 +58,8 @@ MODULES
 
     Catmandu::Importer::SRU::Parser::picaxml
 
+    Catmandu::Fix::sru_search
+
 SEE ALSO
 
     Catmandu, Catmandu::Importer, Catmandu::Fix, Catmandu::Exporter,

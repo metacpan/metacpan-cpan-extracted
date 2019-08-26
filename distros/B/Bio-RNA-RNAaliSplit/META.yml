@@ -22,7 +22,8 @@ no_index:
 requires:
   Array::Set: '0'
   Bio::AlignIO: '0'
-  Bio::Root::Version: '1.00690001'
+  Bio::AlignIO::stockholm: v1.7.3
+  BioPerl: v1.7.5
   Carp: '0'
   Cwd: '0'
   Data::Dumper: '0'
@@ -39,6 +40,7 @@ requires:
   Moose: '0'
   Moose::Role: '0'
   Moose::Util::TypeConstraints: '0'
+  Params::Coerce: '0'
   Path::Class: '0'
   Path::Class::Dir: '0'
   Path::Class::File: '0'
@@ -58,5 +60,5 @@ resources:
   bugtracker: https://github.com/mtw/Bio-RNA-RNAaliSplit/issues
   homepage: https://github.com/mtw/Bio-RNA-RNAaliSplit
   repository: https://github.com/mtw/Bio-RNA-RNAaliSplit.git
-version: v0.10
+version: v0.11
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    Version 0.001
+    Version 0.002
 
 SYNOPSIS
 
@@ -447,6 +447,18 @@ EXAMPLES
         }
 
         done_testing();
+
+ENVIRONMENT
+
+ XT_FILES_DEFAULT_CONFIG_FILE
+
+    The XT_FILES_DEFAULT_CONFIG_FILE environment variable can be used to
+    specify a different default config file.
+
+    The variable must contain the path to a file that can be read.
+
+    This specifies only the default config file. This file is only used if
+    XT::Files is initialized with the default config file.
 
 SEE ALSO
 

@@ -1,10 +1,14 @@
-0.03 20151113
-  . Distribution cleanup, thanks to CHORNY
-  . Corrected regexp in documentation
-  . No code changes, no need to upgrade
+0.04 2019-08-20
+  * Requires Perl 5.8, due to utf8.pm
+  * Remove use of vars.pm
 
-0.02 20120704
-  . Declare proper encoding for POD sections
+0.03 2015-11-13
+  * Distribution cleanup, thanks to CHORNY
+  * Corrected regexp in documentation
+  * No code changes, no need to upgrade
 
-0.01 20120423
-  . Initial release after discussion on http://perlmonks.org/?node_id=966219
+0.02 2012-07-04
+  * Declare proper encoding for POD sections
+
+0.01 2012-04-23
+  * Initial release after discussion on http://perlmonks.org/?node_id=966219

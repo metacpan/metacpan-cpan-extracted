@@ -11,13 +11,13 @@ use Moose::Role;
 
 no warnings 'experimental';
 
-our $VERSION='0.021';
+our $VERSION='0.022';
 
 =head1 NAME
 
 Vote::Count::Floor
 
-=head1 VERSION 0.021
+=head1 VERSION 0.022
 
 =cut
 
@@ -112,7 +112,7 @@ All Methods in this Module apply a floor rule, log the eliminations and return t
 
 Requires a percent of votes cast in Approval or TopCount. The default is 5% for Approval and 2% for TopCount.
 
-  # TopCountFloor with 3% Thresshold.
+  # TopCountFloor with 3% threshold.
   my $Floored = $Election->TopCountFloor( 3 );
 
 Both of these methods take an optional parameter which is the percentage for the floor. If the parameter is 1 or greater the parameter will be interpreted as a percentage, if it is less than 1 it will be interpreted as a decimal fraction, .1 and 10 will both result in a 10% floor.

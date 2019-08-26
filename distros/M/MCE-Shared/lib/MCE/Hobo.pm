@@ -13,7 +13,7 @@ no warnings qw( threads recursion uninitialized once redefine );
 
 package MCE::Hobo;
 
-our $VERSION = '1.844';
+our $VERSION = '1.845';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
@@ -175,6 +175,7 @@ sub create {
 
       # Reap completed hobo processes.
       for my $wrk_id ( keys %{ $list->[0] } ) {
+         $list->del($wrk_id), next if ( exists $list->[0]{$wrk_id}{JOINED} );
          waitpid($wrk_id, _WNOHANG) or next;
          _reap_hobo($list->del($wrk_id));
       }
@@ -259,7 +260,7 @@ sub equal {
 
 sub error {
    _croak('Usage: $hobo->error()') unless ref( my $self = $_[0] );
-   $self->join() if ( !exists $self->{JOINED} );
+   $self->join() unless ( exists $self->{JOINED} );
    $self->{ERROR} || undef;
 }
 
@@ -329,15 +330,15 @@ sub is_joinable {
       '';
    }
    elsif ( $self->{MGR_ID} eq "$$.$_tid" ) {
-      return undef if ( exists $self->{JOINED} );
+      return '' if ( exists $self->{JOINED} );
       local $!;
       ( waitpid($wrk_id, _WNOHANG) == 0 ) ? '' : do {
-         _reap_hobo($_LIST->{$pkg}->del($self->{WRK_ID}));
+         _reap_hobo($self) unless ( exists $self->{JOINED} );
          1;
       };
    }
    else {
-      return undef if ( exists $self->{JOINED} );
+      return '' if ( exists $self->{JOINED} );
       $_DATA->{$pkg}->exists('R'.$wrk_id) ? 1 : '';
    }
 }
@@ -350,15 +351,15 @@ sub is_running {
       1;
    }
    elsif ( $self->{MGR_ID} eq "$$.$_tid" ) {
-      return undef if ( exists $self->{JOINED} );
+      return '' if ( exists $self->{JOINED} );
       local $!;
       ( waitpid($wrk_id, _WNOHANG) == 0 ) ? 1 : do {
-         _reap_hobo($_LIST->{$pkg}->del($self->{WRK_ID}));
+         _reap_hobo($self) unless ( exists $self->{JOINED} );
          '';
       };
    }
    else {
-      return undef if ( exists $self->{JOINED} );
+      return '' if ( exists $self->{JOINED} );
       $_DATA->{$pkg}->exists('R'.$wrk_id) ? '' : 1;
    }
 }
@@ -369,6 +370,7 @@ sub join {
 
    if ( exists $self->{JOINED} ) {
       _croak('Hobo already joined') unless exists( $self->{RESULT} );
+      $_LIST->{$pkg}->del($wrk_id) if exists( $_LIST->{$pkg} );
 
       return ( defined wantarray )
          ? wantarray ? @{ delete $self->{RESULT} } : delete( $self->{RESULT} )->[-1]
@@ -430,7 +432,7 @@ sub list_joinable {
 
    map {
       ( waitpid($_->{WRK_ID}, _WNOHANG) == 0 ) ? () : do {
-         _reap_hobo($list->del($_->{WRK_ID}));
+         _reap_hobo($_) unless ( exists $_->{JOINED} );
          $_;
       };
    }
@@ -446,7 +448,7 @@ sub list_running {
 
    map {
       ( waitpid($_->{WRK_ID}, _WNOHANG) == 0 ) ? $_ : do {
-         _reap_hobo($list->del($_->{WRK_ID}));
+         _reap_hobo($_) unless ( exists $_->{JOINED} );
          ();
       };
    }
@@ -487,7 +489,7 @@ sub pid {
 
 sub result {
    _croak('Usage: $hobo->result()') unless ref( my $self = $_[0] );
-   return $self->join() if ( !exists $self->{JOINED} );
+   return $self->join() unless ( exists $self->{JOINED} );
 
    _croak('Hobo already joined') unless exists( $self->{RESULT} );
    wantarray ? @{ delete $self->{RESULT} } : delete( $self->{RESULT} )->[-1];
@@ -725,13 +727,13 @@ sub _trap {
 
 sub _wait_one {
    my ( $pkg ) = @_;
-   my ( $list ) = ( $_LIST->{$pkg} );
-   my ( $self, $wrk_id ); local $!;
+   my ( $list, $self, $wrk_id ) = ( $_LIST->{$pkg} ); local $!;
 
    while () {
       for my $hobo ( $list->vals ) {
          $wrk_id = $hobo->{WRK_ID};
-         $self   = $list->del($wrk_id), last if waitpid($wrk_id, _WNOHANG);
+         return  $list->del($wrk_id) if ( exists $hobo->{JOINED} );
+         $self = $list->del($wrk_id), last if waitpid($wrk_id, _WNOHANG);
       }
       last if $self;
       sleep 0.030;
@@ -807,7 +809,7 @@ sub clear {
 sub del {
    my ( $data, $keys, $indx, $gcnt ) = @{ $_[0] };
    my $pos = delete $indx->{ $_[1] };
-   return undef unless defined $pos;
+   return undef unless ( defined $pos );
 
    $keys->[ $pos ] = undef;
 
@@ -854,7 +856,7 @@ MCE::Hobo - A threads-like parallelization module
 
 =head1 VERSION
 
-This document describes MCE::Hobo version 1.844
+This document describes MCE::Hobo version 1.845
 
 =head1 SYNOPSIS
 
@@ -891,7 +893,8 @@ This document describes MCE::Hobo version 1.844
  my @count    = MCE::Hobo->pending();
 
  # Joining is orderly, e.g. hobo1 is joined first, hobo2, hobo3.
- $_->join() for @hobos;
+ $_->join() for @hobos;   # (or)
+ $_->join() for @joinable;
 
  # Joining occurs immediately as hobo processes complete execution.
  1 while MCE::Hobo->wait_one();

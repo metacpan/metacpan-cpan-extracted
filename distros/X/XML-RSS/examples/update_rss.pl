@@ -4,7 +4,7 @@
 use strict;
 use warnings;
 
-use XML::RSS;
+use XML::RSS ();
 
 die "Syntax: update_rss.pl source.rdf destination.rdf\n\n"
 unless @ARGV == 2;

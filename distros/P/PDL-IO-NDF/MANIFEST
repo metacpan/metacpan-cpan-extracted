@@ -1,0 +1,10 @@
+README
+Build.PL
+Changes
+lib/PDL/IO/NDF.pm.PL
+MANIFEST
+t/ndf.t
+t/scuba2.t
+t/data/s4a20120702_00052_0002_noi.sdf
+META.yml
+META.json

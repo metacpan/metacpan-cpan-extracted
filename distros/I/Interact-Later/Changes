@@ -1,3 +1,7 @@
+0.05 2019-08-21T17:47:58Z
+
+  - Can now retrieve cache files ordered by date
+
 0.04 2019-08-18T20:52:14Z
 
   - write_data_to_disk() now returns the UUID of the stored file 

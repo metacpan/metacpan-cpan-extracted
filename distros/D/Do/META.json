@@ -1,0 +1,70 @@
+{
+   "abstract" : "Development Framework",
+   "author" : [
+      "Al Newkirk <awncorp@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Do",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Function::Parameters" : "2.001003",
+            "Import::Into" : "1.002005",
+            "Moo" : "2.000001",
+            "Readonly" : "2.00",
+            "Role::Tiny" : "2.000006",
+            "Try::Tiny" : "0.30",
+            "Type::Tiny" : "1.000005",
+            "autobox" : "2.82",
+            "perl" : "v5.14.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Function::Parameters" : "2.001003",
+            "Import::Into" : "1.002005",
+            "Moo" : "2.000001",
+            "Readonly" : "2.00",
+            "Role::Tiny" : "2.000006",
+            "Try::Tiny" : "0.30",
+            "Type::Tiny" : "1.000005",
+            "autobox" : "2.82",
+            "perl" : "v5.14.0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/iamalnewkirk/do/issues"
+      },
+      "homepage" : "http://metacpan.org/release/Do",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/iamalnewkirk/do.git",
+         "web" : "https://github.com/iamalnewkirk/do"
+      }
+   },
+   "version" : "1.02",
+   "x_authority" : "cpan:AWNCORP",
+   "x_contributors" : [
+      "Al Newkirk <al@iamalnewkirk.com>",
+      "Anthony Brummett <abrummet@genome.wustl.edu>"
+   ],
+   "x_generated_by_perl" : "v5.14.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
+}
+

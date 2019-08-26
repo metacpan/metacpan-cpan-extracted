@@ -70,6 +70,7 @@ sub new {
     requires => CPAN::Meta::Requirements->new,
     noes => CPAN::Meta::Requirements->new,
     file => $args{file},
+    verbose => $args{verbose},
     stash => {},
   );
 
@@ -179,6 +180,11 @@ sub _add {
 
   my $CMR = $self->_object($type) or return;
   $version = 0 unless defined $version;
+  if ($self->{verbose}) {
+    if (!defined $CMR->requirements_for_module($module)) {
+      print STDERR "  found $module $version ($type)\n";
+    }
+  }
   $CMR->add_minimum($module, "$version");
 }
 

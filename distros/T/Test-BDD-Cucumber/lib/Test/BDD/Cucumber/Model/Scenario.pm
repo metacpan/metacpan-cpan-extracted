@@ -1,5 +1,5 @@
 package Test::BDD::Cucumber::Model::Scenario;
-$Test::BDD::Cucumber::Model::Scenario::VERSION = '0.57';
+$Test::BDD::Cucumber::Model::Scenario::VERSION = '0.58';
 use Moo;
 use Types::Standard qw( Str ArrayRef HashRef Bool InstanceOf );
 
@@ -9,7 +9,7 @@ Test::BDD::Cucumber::Model::Scenario - Model to represent a scenario
 
 =head1 VERSION
 
-version 0.57
+version 0.58
 
 =head1 DESCRIPTION
 

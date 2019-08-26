@@ -1,0 +1,52 @@
+#!perl
+
+use strict;
+use warnings;
+
+use File::Spec::Functions 'catfile';
+
+die "No command given" if not @ARGV;
+my $command = shift;
+my $filename = catfile('.banshee', $command . '.command');
+
+die "Unknown command $command" if not -e $filename;
+my $ret = do "./$filename";
+die $@ if not defined $ret;
+exit $ret;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+dban - A lightweight authoring command line tool
+
+=head1 VERSION
+
+0.001
+
+=head1 SYNOPSIS
+
+ dban listdeps
+ dban test
+ dban release
+
+=head1 DESCRIPTION
+
+The C<dban> executable is little more than a tiny script a script in the F<.banshee/> directory, e.g. F<.banshee/test.command>.
+
+=head1 AUTHOR
+
+Leon Timmermans <fawaka@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by Leon Timmermans.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

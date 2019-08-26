@@ -44,7 +44,7 @@
          "requires" : {
             "Catalyst" : "5.80001",
             "Catalyst::Model" : "0",
-            "Curio" : "0.01",
+            "Curio" : "0.08",
             "Module::Runtime" : "0.014",
             "Moo" : "2.003000",
             "Types::Common::String" : "1.002001",
@@ -65,11 +65,11 @@
    "provides" : {
       "Catalyst::Helper::Model::Curio" : {
          "file" : "lib/Catalyst/Helper/Model/Curio.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Catalyst::Model::Curio" : {
          "file" : "lib/Catalyst/Model/Curio.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -83,7 +83,7 @@
          "web" : "https://github.com/bluefeet/Catalyst-Model-Curio"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_authority" : "cpan:BLUEFEET",
    "x_serialization_backend" : "JSON::PP version 4.04",
    "x_static_install" : 1

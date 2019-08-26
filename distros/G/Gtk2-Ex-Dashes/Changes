@@ -1,4 +1,4 @@
-Copyright 2010 Kevin Ryde
+Copyright 2010, 2019 Kevin Ryde
 
 This file is part of Gtk2-Ex-Dashes.
 
@@ -15,6 +15,9 @@ General Public License for more details.
 You should have received a copy of the GNU General Public License along
 with Gtk2-Ex-Dashes.  If not, see <http://www.gnu.org/licenses/>.
 
+
+Version 3, August 2019
+    - new email
 
 Version 2, September 2010
     - test manifest only as an author test

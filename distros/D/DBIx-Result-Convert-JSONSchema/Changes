@@ -1,6 +1,13 @@
 Revision history for Perl extension DBIx::Result::Convert::JSONSchema.
 
-0.01  Thu Mar 29 08:35:50 2018
+0.04 2019-08-26
+	- Fix bug with one constructor arguments
+	- Add `include_required` argument
+	- Add `add_schema_properties` for custom schema properties
+	- Do not add `null` type in JSON schema if the field is set to be required via args
+	- Use `format` type to validate Date field
+
+0.01  2018-03-29
 	- original version; created by h2xs 1.23 with options
 		-AXc -n DBIx::Result::Convert::JSONSchema
 

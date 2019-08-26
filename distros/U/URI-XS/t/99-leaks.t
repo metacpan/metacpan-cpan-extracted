@@ -4,13 +4,7 @@ use URI::XS;
 use Test::More;
 
 plan skip_all => 'set WITH_LEAKS=1 to enable leaks test' unless $ENV{WITH_LEAKS};
-
-my $ok = eval {
-    require BSD::Resource;
-    1;
-};
-
-plan skip_all => 'FreeBSD System and installed BSD::Resource required to test for leaks' unless $ok;
+plan skip_all => 'BSD::Resource required to test for leaks' unless eval {require BSD::Resource; 1};
 
 my $measure = 200;
 my $leak = 0;

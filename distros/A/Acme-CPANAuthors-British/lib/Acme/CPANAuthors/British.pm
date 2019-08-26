@@ -4,7 +4,7 @@ use warnings;
 
 {
     no strict "vars";
-    $VERSION = "1.04";
+    $VERSION = "1.05";
 }
 
 use Acme::CPANAuthors::Register (
@@ -158,6 +158,7 @@ use Acme::CPANAuthors::Register (
     LMJM        => 'Lee McLoughlin',
     LORDO       => 'Lawrence Tierney',
     MACDEE      => 'Craig Macdonald',
+    MANWAR      => 'Mohammad S Anwar',
     MARKBUSH    => 'Mark J Bush',
     MARKD       => 'Mark Daglish',
     MARKF       => 'Mark Fowler',
@@ -371,8 +372,6 @@ L<Acme::CPANAuthors::Dutch> - Dutch CPAN authors
 L<Acme::CPANAuthors::French> - French CPAN authors
 
 L<Acme::CPANAuthors::Portuguese> - Portuguese CPAN authors
-
-L<Acme::CPANAuthors::Italian> - Italian CPAN authors
 
 Or you could use the following to include them all:
 

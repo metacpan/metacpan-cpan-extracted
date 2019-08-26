@@ -7,7 +7,7 @@ MODULE = XS::Framework                PACKAGE = XS::Framework
 PROTOTYPES: DISABLE
 
 BOOT {
-    xs::typemap::object::init(aTHX);
+    xs::typemap::object::init();
 }
 
 void __at_perl_destroy () {

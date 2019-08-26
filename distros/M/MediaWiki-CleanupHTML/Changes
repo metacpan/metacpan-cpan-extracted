@@ -1,5 +1,9 @@
 Revision history for MediaWiki-CleanupHTML
 
+0.0.4   2019-08-23
+    - Moved the VCS repo to https://github.com/shlomif/perl-mediawiki-cleanuphtml
+    - Dist-Zilla cleanups.
+
 0.0.3   2015-05-30
         - Convert to Dist-Zilla.
             - Some improvements such as links to resources/VCS-repositories.

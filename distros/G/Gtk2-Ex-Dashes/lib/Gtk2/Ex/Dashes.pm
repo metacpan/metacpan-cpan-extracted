@@ -1,4 +1,4 @@
-# Copyright 2010 Kevin Ryde
+# Copyright 2010, 2011, 2019 Kevin Ryde
 
 # This file is part of Gtk2-Ex-Dashes.
 #
@@ -26,7 +26,7 @@ use POSIX ();
 # uncomment this to run the commented-out ### lines
 #use Smart::Comments;
 
-our $VERSION = 2;
+our $VERSION = 3;
 
 use Glib::Object::Subclass
   'Gtk2::Misc',
@@ -37,7 +37,7 @@ use Glib::Object::Subclass
              },
   properties => [ Glib::ParamSpec->enum
                   ('orientation',
-                   'orientation',
+                   'Orientation',
                    'Horizontal or vertical line draw.',
                    'Gtk2::Orientation',
                    'horizontal',
@@ -231,14 +231,18 @@ or vertically.
     +--------------------------------+
 
 It's similar to C<Gtk2::Separator>, but a dashed line, and the
-C<Gtk2::Ex::Dashes::MenuItem> subclass is similar to
-C<Gtk2::TearoffMenuItem>, but a plain item not driving the menu.
+C<Gtk2::Ex::Dashes::MenuItem> subclass looks like C<Gtk2::TearoffMenuItem>
+but is a plain item, not driving the menu.
 
 Line segments are drawn per the widget style (see L<Gtk2::Style>) and
 positioned in the widget area per the C<Gtk2::Misc> properties described
 below.  There's nothing to control the length and spacing of the line
 segments, currently they just scale with the line thickness to keep the
 display sensible.
+
+See F<examples/simple.pl> or F<examples/vertical.pl> in the sources for the
+simplest usage, or F<examples/settings.pl> to interactively see the effect
+of settings.
 
 =head1 FUNCTIONS
 
@@ -270,7 +274,7 @@ These C<Gtk2::Misc> properties control positioning of the line within its
 allocated area.  The default 0.5 means centre it.
 
 C<xalign> for a horizontal line can be thought of as positioning one dash
-segment somewhere between the left and right ends, and then then further
+segment somewhere between the left and right ends, and then the further
 segments drawn each way from there to fill the window.  Similarly C<yalign>
 when vertical.
 
@@ -291,7 +295,7 @@ L<http://user42.tuxfamily.org/gtk2-ex-dashes/index.html>
 
 =head1 LICENSE
 
-Gtk2-Ex-Dashes is Copyright 2010 Kevin Ryde
+Gtk2-Ex-Dashes is Copyright 2010, 2011, 2019 Kevin Ryde
 
 Gtk2-Ex-Dashes is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

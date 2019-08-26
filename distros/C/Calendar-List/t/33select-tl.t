@@ -32,8 +32,8 @@ foreach my $test (@tests) {
 	if($tests{$test}->{hash}) {
 		is($str,$expected03{$test},".. matches $test index");
 	} else {
-		my @array1 = split("\n",$str);
-		my @array2 = split("\n",$expected03{$test});
+		my @array1 = split(/\n/,$str);
+		my @array2 = split(/\n/,$expected03{$test});
 #		is_deeply(\@array1,\@array2);
 		is(scalar(@array1),scalar(@array2),".. matches $test count");
 #		is(length $str,length $expected03{$test});

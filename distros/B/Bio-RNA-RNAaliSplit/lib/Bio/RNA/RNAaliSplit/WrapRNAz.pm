@@ -1,5 +1,5 @@
 # -*-CPerl-*-
-# Last changed Time-stamp: <2019-04-05 22:37:20 mtw>
+# Last changed Time-stamp: <2019-08-25 21:19:14 mtw>
 
 # Bio::RNA::RNAaliSplit::WrapRNAz.pm: A versatile object-oriented
 # wrapper for RNAz
@@ -9,7 +9,7 @@
 
 package Bio::RNA::RNAaliSplit::WrapRNAz;
 
-use version; our $VERSION = qv('0.10');
+use version; our $VERSION = qv('0.11');
 use Carp;
 use Data::Dumper;
 use Moose;
@@ -49,7 +49,6 @@ has 'sci' => (
 	     );
 
 with 'FileDirUtil';
-with 'Bio::RNA::RNAaliSplit::Roles';
 
 sub BUILD {
   my $self = shift;
@@ -59,8 +58,8 @@ sub BUILD {
    $rnaz = can_run('RNAz') or
      croak "ERROR [$this_function] RNAz not found";
   unless($self->has_odir){
-    unless($self->has_dirnam){self->dirnam("as")}
-    $self->odir( [$self->ifile->dir,$self->dirnam] );
+    my $odir_name = "as";
+    $self->odir( [$self->ifile->dir,$odir_name] );
   }
   $oodir = $self->odir->subdir("rnaz");
   my @created = make_path($oodir, {error => \my $err});

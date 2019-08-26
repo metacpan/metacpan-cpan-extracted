@@ -18,8 +18,5 @@ t/1008_gt.t
 t/1009_le.t
 t/1010_lt.t
 t/1011_sort.t
-t/1012_getc.t
-t/1013_readline.t
-t/1014_print.t
-t/1015_printf.t
+t/1016_io_threadsafe.t
 t/2001_podtest.t

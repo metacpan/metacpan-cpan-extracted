@@ -15,7 +15,7 @@ if ( !defined($version) )
 }
 
 my @cmd = (
-    "hg", "tag", "-m", "Tagging the XML-Grammar-Fortune release as $version",
+    "git", "tag", "-m", "Tagging the XML-Grammar-Fortune release as $version",
     "releases/cpan/$version",
 );
 

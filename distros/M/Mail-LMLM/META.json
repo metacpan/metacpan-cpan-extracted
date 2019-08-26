@@ -38,7 +38,9 @@
          "requires" : {
             "Pod::Coverage::TrustPod" : "0",
             "Test::CPAN::Changes" : "0.19",
+            "Test::Code::TidyAll" : "0.50",
             "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
             "Test::More" : "0.96",
             "Test::NoTabs" : "0",
             "Test::Pod" : "1.41",
@@ -66,69 +68,69 @@
    "provides" : {
       "Mail::LMLM" : {
          "file" : "lib/Mail/LMLM.pm",
-         "version" : "0.6805"
+         "version" : "0.6806"
       },
       "Mail::LMLM::Object" : {
          "file" : "lib/Mail/LMLM/Object.pm",
-         "version" : "0.6805"
+         "version" : "0.6806"
       },
       "Mail::LMLM::Render" : {
          "file" : "lib/Mail/LMLM/Render.pm",
-         "version" : "0.6805"
+         "version" : "0.6806"
       },
       "Mail::LMLM::Render::HTML" : {
          "file" : "lib/Mail/LMLM/Render/HTML.pm",
-         "version" : "0.6805"
+         "version" : "0.6806"
       },
       "Mail::LMLM::Types::Base" : {
          "file" : "lib/Mail/LMLM/Types/Base.pm",
-         "version" : "0.6805"
+         "version" : "0.6806"
       },
       "Mail::LMLM::Types::Egroups" : {
          "file" : "lib/Mail/LMLM/Types/Egroups.pm",
-         "version" : "0.6805"
+         "version" : "0.6806"
       },
       "Mail::LMLM::Types::Ezmlm" : {
          "file" : "lib/Mail/LMLM/Types/Ezmlm.pm",
-         "version" : "0.6805"
+         "version" : "0.6806"
       },
       "Mail::LMLM::Types::GoogleGroups" : {
          "file" : "lib/Mail/LMLM/Types/GoogleGroups.pm",
-         "version" : "0.6805"
+         "version" : "0.6806"
       },
       "Mail::LMLM::Types::Listar" : {
          "file" : "lib/Mail/LMLM/Types/Listar.pm",
-         "version" : "0.6805"
+         "version" : "0.6806"
       },
       "Mail::LMLM::Types::Listserv" : {
          "file" : "lib/Mail/LMLM/Types/Listserv.pm",
-         "version" : "0.6805"
+         "version" : "0.6806"
       },
       "Mail::LMLM::Types::Mailman" : {
          "file" : "lib/Mail/LMLM/Types/Mailman.pm",
-         "version" : "0.6805"
+         "version" : "0.6806"
       },
       "Mail::LMLM::Types::Majordomo" : {
          "file" : "lib/Mail/LMLM/Types/Majordomo.pm",
-         "version" : "0.6805"
+         "version" : "0.6806"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/shlomif/mail-lmlm/issues"
+         "web" : "https://github.com/shlomif/perl-mail-lmlm/issues"
       },
       "homepage" : "http://metacpan.org/release/Mail-LMLM",
       "repository" : {
          "type" : "git",
-         "url" : "http://bitbucket.org/shlomif/perl-mail-lmlm/overview",
-         "web" : "https://github.com/shlomif/mail-lmlm"
+         "url" : "git://github.com/shlomif/perl-mail-lmlm.git",
+         "web" : "https://github.com/shlomif/perl-mail-lmlm"
       }
    },
-   "version" : "0.6805",
+   "version" : "0.6806",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.026002"
+         "version" : "5.028002"
       },
       "plugins" : [
          {
@@ -298,11 +300,6 @@
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
             "name" : "@SHLOMIF/PodSyntaxTests",
-            "version" : "6.012"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::PodVersion",
-            "name" : "@SHLOMIF/PodVersion",
             "version" : "6.012"
          },
          {
@@ -503,6 +500,22 @@
             "version" : "0.007"
          },
          {
+            "class" : "Dist::Zilla::Plugin::Test::Kwalitee",
+            "config" : {
+               "Dist::Zilla::Plugin::Test::Kwalitee" : {
+                  "filename" : "xt/release/kwalitee.t",
+                  "skiptest" : []
+               }
+            },
+            "name" : "Test::Kwalitee",
+            "version" : "2.12"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::TidyAll",
+            "name" : "Test::TidyAll",
+            "version" : "0.04"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":InstallModules",
             "version" : "6.012"
@@ -566,7 +579,7 @@
          "version" : "6.012"
       }
    },
-   "x_generated_by_perl" : "v5.26.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+   "x_generated_by_perl" : "v5.28.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
 }
 

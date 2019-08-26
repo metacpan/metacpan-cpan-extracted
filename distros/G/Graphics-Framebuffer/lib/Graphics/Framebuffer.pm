@@ -365,6 +365,9 @@ use constant {
     FBIOGET_DISPINFO    => 0x4618,
     FBIO_WAITFORVSYNC   => 0x4620,
     VT_GETSTATE         => 0x5603,
+    KDSETMODE           => 0x4B3A,
+    KD_GRAPHICS         => 1,
+    KD_TEXT             => 0,
 
     # FLAGS
     FBINFO_HWACCEL_NONE      => 0x0000,    # These come from "fb.h" in the kernel source
@@ -403,7 +406,7 @@ BEGIN {
     require Exporter;
 
     # set the version for version checking
-    our $VERSION   = '6.30';
+    our $VERSION   = '6.32';
     our @ISA       = qw(Exporter Graphics::Framebuffer::Splash Graphics::Framebuffer::Mouse);
     our @EXPORT_OK = qw(
       FBIOGET_VSCREENINFO
@@ -474,6 +477,7 @@ BEGIN {
 
 DESTROY { # Always clean up after yourself before exiting
     my $self = shift;
+    $self->text_mode();
     $self->_screen_close();
     _reset() if ($self->{'RESET'});    # Exit by calling 'reset' first
 }
@@ -481,11 +485,10 @@ DESTROY { # Always clean up after yourself before exiting
 # use Inline 'info', 'noclean', 'noisy'; # Only needed for debugging
 
 use Inline C => <<'C_CODE','name' => 'Graphics::Framebuffer', 'VERSION' => $VERSION;
-
 /* Copyright 2018-2019 Richard Kelsch, All Rights Reserved
    See the Perl documentation for Graphics::Framebuffer for licensing information.
 
-   Version:  6.24
+   Version:  6.31
 */
 
 #include <stdlib.h>
@@ -493,6 +496,7 @@ use Inline C => <<'C_CODE','name' => 'Graphics::Framebuffer', 'VERSION' => $VERS
 #include <stdio.h>
 #include <fcntl.h>
 #include <linux/fb.h>
+#include <linux/kd.h>
 #include <sys/mman.h>
 #include <sys/ioctl.h>
 #include <math.h>
@@ -528,9 +532,7 @@ struct fb_fix_screeninfo finfo;
 
 // This gets the framebuffer info and populates the above structures, then runs them to Perl
 void c_get_screen_info(char *fb_file) {
-    int fbfd = 0;
-
-    fbfd = open(fb_file,O_RDWR);
+    int fbfd = open(fb_file,O_RDWR);
     ioctl(fbfd, FBIOGET_FSCREENINFO, &finfo);
     ioctl(fbfd, FBIOGET_VSCREENINFO, &vinfo);
     close(fbfd);
@@ -592,6 +594,21 @@ void c_get_screen_info(char *fb_file) {
     Inline_Stack_Done;
 }
 
+void c_text_mode(char *tty_file) 
+{
+   int tty_fd = open(tty_file,O_RDWR);
+   ioctl(tty_fd,KDSETMODE,KD_TEXT);
+   close(tty_fd);
+}
+
+void c_graphics_mode(char *tty_file) 
+{
+   int tty_fd = open(tty_file,O_RDWR);
+   ioctl(tty_fd,KDSETMODE,KD_GRAPHICS);
+   close(tty_fd);
+}
+
+
 /* The other routines call this.  It handles all draw modes
  * 
  * Normally I would add code to properly place the RGB values according to
@@ -612,7 +629,7 @@ void c_plot(
     unsigned int bytes_per_line,
     short xoffset, short yoffset)
 {
-    if (x >= x_clip && x <= xx_clip && y >= y_clip && y <= yy_clip) {
+    if (x >= x_clip && x <= xx_clip && y >= y_clip && y <= yy_clip) { // Make sure the pixel is within the clipped area
         x += xoffset;
         y += yoffset;
         unsigned int index = (x * bytes_per_pixel) + (y * bytes_per_line);
@@ -621,19 +638,19 @@ void c_plot(
                 switch(bits_per_pixel) {
                     case 32 : 
                         {
-                           *((unsigned int*)(framebuffer + index)) = color;
+                           *((unsigned int*)(framebuffer + index)) = color; // 32 bit drawing can send a long word in one operation.  Which is why it is the fastest.
                         }
                         break;
                     case 24 :
                         {
-                            *(framebuffer + index)     = color         & 255;
+                            *(framebuffer + index)     = color         & 255; // 24 Bit requites one byte at a time.  Not as efficient as 32 bit.
                             *(framebuffer + index + 1) = (color >> 8)  & 255;
                             *(framebuffer + index + 2) = (color >> 16) & 255;
                         }
                         break;
                     case 16 :
                         {
-                            *((unsigned short*)(framebuffer + index)) = (short) color;
+                            *((unsigned short*)(framebuffer + index)) = (short) color; // 16 bit can send a word at a time, the second most efficient method.
                         }
                         break;
                 }
@@ -1905,15 +1922,15 @@ void c_flip_horizontal(char* pixels, short width, short height, unsigned char by
 }
 
 void c_flip_vertical(char *pixels, short width, short height, unsigned char bytes_per_pixel) {
-    unsigned int stride = width * bytes_per_pixel;        // Bytes per line
-    unsigned char *row  = malloc(stride);                 // Allocate a temporary buffer
+    unsigned int bufsize = width * bytes_per_pixel;        // Bytes per line
+    unsigned char *row  = malloc(bufsize);                 // Allocate a temporary buffer
     unsigned char *low  = pixels;                         // Pointer to the beginning of the image
-    unsigned char *high = &pixels[(height - 1) * stride]; // Pointer to the last line in the image
+    unsigned char *high = &pixels[(height - 1) * bufsize]; // Pointer to the last line in the image
 
-    for (; low < high; low += stride, high -= stride) { // Stop when you reach the middle
-          memcpy(row,low,stride);    // Make a copy of the lower line
-          memcpy(low,high,stride);   // Copy the upper line to the lower
-          memcpy(high, row, stride); // Copy the saved copy to the upper line
+    for (; low < high; low += bufsize, high -= bufsize) { // Stop when you reach the middle
+          memcpy(row,low,bufsize);    // Make a copy of the lower line
+          memcpy(low,high,bufsize);   // Copy the upper line to the lower
+          memcpy(high, row, bufsize); // Copy the saved copy to the upper line
     }
     free(row); // Release the temporary buffer
 }
@@ -2517,6 +2534,9 @@ sub new {
         'FBIOGET_DISPINFO'    => 0x4618,
         'FBIO_WAITFORVSYNC'   => 0x4620,
         'VT_GETSTATE'         => 0x5603,
+        'KDSETMODE'           => 0x4B3A,
+        'KD_GRAPHICS'         => 1,
+        'KD_TEXT'             => 0,
 
         # FLAGS
         'FBINFO_HWACCEL_NONE'      => 0x0000,    # These come from "fb.h" in the kernel source
@@ -2970,6 +2990,7 @@ To get back into X-Windows, you just hit ALT-F7 (or ALT-F8 on some systems).
         }
     }
     $self->_flush_screen();
+    chomp($self->{'this_tty'} = `tty`);
     if ($self->{'SPLASH'} > 0) {
         $self->splash($VERSION);
         sleep $self->{'SPLASH'};
@@ -3034,6 +3055,28 @@ sub _screen_close {
         delete($self->{'FB'});              # We leave no remnants
     }
     delete($self->{'SCREEN'});
+}
+
+=head2 text_mode
+
+Sets the TTY into text mode, where text can interfere with the display
+
+=cut
+
+sub text_mode {
+    my $self = shift;
+    c_text_mode($self->{'this_tty'});
+}
+
+=head2 graphics_mode
+
+Sets the TTY in exclusive graphics mode, where text and cursor cannot interfere with the display.  Please remember, you must call text_mode before exiting, else your console will not show any text!
+
+=cut
+
+sub graphics_mode {
+    my $self = shift;
+    c_graphics_mode($self->{'this_tty'});
 }
 
 =head2 screen_dimensions
@@ -8937,7 +8980,7 @@ A copy of this license is included in the 'LICENSE' file in this distribution.
 
 =head1 VERSION
 
-Version 6.30 (Aug 11, 2019)
+Version 6.32 (Aug 25, 2019)
 
 =head1 THANKS
 

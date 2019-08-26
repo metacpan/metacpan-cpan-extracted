@@ -7,7 +7,10 @@ META.json
 META.yml
 README
 t/01load.t
+t/02match.t
+t/03told.t
 t/90podtest.t
 t/94metatest.t
 t/95changedate.t
 t/96metatest.t
+t/data/01test.csv

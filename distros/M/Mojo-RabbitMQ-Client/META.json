@@ -1,7 +1,7 @@
 {
    "abstract" : "Mojo::IOLoop based RabbitMQ client",
    "author" : [
-      "-2017, Sebastian Podjasek and others"
+      "-2019, Sebastian Podjasek and others"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Minilla/v3.0.14",
@@ -59,7 +59,7 @@
    "provides" : {
       "Mojo::RabbitMQ::Client" : {
          "file" : "lib/Mojo/RabbitMQ/Client.pm",
-         "version" : "v0.2.4"
+         "version" : "v0.3.1"
       },
       "Mojo::RabbitMQ::Client::Channel" : {
          "file" : "lib/Mojo/RabbitMQ/Client/Channel.pm"
@@ -91,9 +91,10 @@
          "web" : "https://github.com/inway/mojo-rabbitmq-client"
       }
    },
-   "version" : "0.2.4",
+   "version" : "0.3.1",
    "x_contributors" : [
       "Adam Williamson <adamw@happyassassin.net>",
+      "Adam Williamson <awilliam@redhat.com>",
       "Christopher Rasch-Olsen Raa <christopher@stix.no>",
       "Mohammad S Anwar <Mohammad.Anwar@yahoo.com>",
       "Oliver Kurz <okurz@suse.de>",

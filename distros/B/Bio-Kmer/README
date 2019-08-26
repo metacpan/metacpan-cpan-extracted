@@ -34,11 +34,17 @@ DESCRIPTION
     perl, it is recommended to give the option for a different kmer counter
     such as Jellyfish.
 
+VARIABLES
+    $Bio::Kmer::iThreads
+        Boolean describing whether the module instance is using threads
+
 METHODS
     Bio::Kmer->new($filename, \%options)
         Create a new instance of the kmer counter. One object per file.
 
-          Applicable arguments:
+          Filename can be either a file path or a Bio::SeqIO object.
+
+          Applicable arguments for \%options:
           Argument     Default    Description
           kmercounter  perl       What kmer counter software to use.
                                   Choices: Perl, Jellyfish.

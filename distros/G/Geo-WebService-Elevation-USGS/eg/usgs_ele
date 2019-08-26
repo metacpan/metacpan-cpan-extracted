@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl
+#!/usr/bin/env perl
 
 # This is a simple script that allows use of
 # Geo::WebService::Elevation::USGS from the command line.
@@ -12,7 +12,7 @@ use Geo::WebService::Elevation::USGS;
 use Pod::Usage;
 use Scalar::Util qw{ looks_like_number };
 
-our $VERSION = '0.113';
+our $VERSION = '0.114';
 
 BEGIN {
     eval {

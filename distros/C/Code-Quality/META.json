@@ -33,6 +33,7 @@
       "runtime" : {
          "requires" : {
             "Cpanel::JSON::XS" : "0",
+            "List::Util" : "1.44",
             "perl" : "5.020000"
          }
       },
@@ -45,6 +46,6 @@
    },
    "release_status" : "stable",
    "resources" : {},
-   "version" : "0.001001",
+   "version" : "0.001003",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

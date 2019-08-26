@@ -12,43 +12,43 @@
 namespace xs {
 
 template <> struct Typemap<AV*> : TypemapBase<AV*> {
-    static inline AV* in (pTHX_ SV* arg) {
+    static inline AV* in (SV* arg) {
         if (SvROK(arg) && SvTYPE(SvRV(arg)) == SVt_PVAV) return (AV*)SvRV(arg);
         else if (SvOK(arg)) throw "argument is not an ARRAY reference";
         return nullptr;
     }
-    static inline Sv out (pTHX_ AV* var, const Sv& = Sv()) {
+    static inline Sv out (AV* var, const Sv& = Sv()) {
         if (!var) return &PL_sv_undef;
         return Sv::noinc(newRV_noinc((SV*)var));
     }
 };
 
 template <> struct Typemap<HV*> : TypemapBase<HV*> {
-    static inline HV* in (pTHX_ SV* arg) {
+    static inline HV* in (SV* arg) {
         if (SvROK(arg) && SvTYPE(SvRV(arg)) == SVt_PVHV) return (HV*)SvRV(arg);
         else if (SvOK(arg)) throw "argument is not a HASH reference";
         return nullptr;
     }
-    static inline Sv out (pTHX_ HV* var, const Sv& = Sv()) {
+    static inline Sv out (HV* var, const Sv& = Sv()) {
         if (!var) return &PL_sv_undef;
         return Sv::noinc(newRV_noinc((SV*)var));
     }
 };
 
 template <> struct Typemap<CV*> : TypemapBase<CV*> {
-    static inline CV* in (pTHX_ SV* arg) {
+    static inline CV* in (SV* arg) {
         if (SvROK(arg) && SvTYPE(SvRV(arg)) == SVt_PVCV) return (CV*)SvRV(arg);
         else if (SvOK(arg)) throw "argument is not a CODE reference";
         return nullptr;
     }
-    static inline Sv out (pTHX_ CV* var, const Sv& = Sv()) {
+    static inline Sv out (CV* var, const Sv& = Sv()) {
         if (!var) return &PL_sv_undef;
         return Sv::noinc(newRV_noinc((SV*)var));
     }
 };
 
 template <> struct Typemap<IO*> : TypemapBase<IO*> {
-    static inline IO* in (pTHX_ SV* arg) {
+    static inline IO* in (SV* arg) {
         if (SvROK(arg)) {
             SV* val = SvRV(arg);
             if (SvTYPE(val) == SVt_PVIO) return (IO*)val;
@@ -59,19 +59,19 @@ template <> struct Typemap<IO*> : TypemapBase<IO*> {
         throw "argument is neither IO reference, nor glob or reference to glob containing IO slot)";
     }
 
-    static inline Sv out (pTHX_ IO* var, const Sv& = Sv()) {
+    static inline Sv out (IO* var, const Sv& = Sv()) {
         if (!var) return &PL_sv_undef;
         return Sv::noinc(newRV_noinc((SV*)var));
     }
 };
 
 template <> struct Typemap<GV*> : TypemapBase<GV*> {
-    static inline GV* in (pTHX_ SV* arg) {
+    static inline GV* in (SV* arg) {
         if (SvTYPE(arg) == SVt_PVGV) return (GV*)arg;
         else if (SvOK(arg)) throw "argument is not a GLOB";
         return nullptr;
     }
-    static inline Sv out (pTHX_ GV* var, const Sv& = Sv()) {
+    static inline Sv out (GV* var, const Sv& = Sv()) {
         if (!var) return &PL_sv_undef;
         return Sv::noinc((SV*)var);
     }
@@ -79,8 +79,8 @@ template <> struct Typemap<GV*> : TypemapBase<GV*> {
 
 
 template <class TYPE> struct Typemap<Sv, TYPE> : TypemapBase<Sv, TYPE> {
-    static inline TYPE in  (pTHX_ SV* arg) { return arg; }
-    static inline Sv out (pTHX_ const TYPE& var, const Sv& = Sv()) {
+    static inline TYPE in  (SV* arg) { return arg; }
+    static inline Sv out (const TYPE& var, const Sv& = Sv()) {
         if (!var) return &PL_sv_undef;
         return var;
     }
@@ -91,8 +91,8 @@ template <> struct Typemap<Ref>    : Typemap<Sv, Ref>    {};
 template <> struct Typemap<Glob>   : Typemap<Sv, Glob>   {};
 
 template <class TYPE> struct Typemap<Sub, TYPE> : TypemapBase<Sub, TYPE> {
-    static inline TYPE in (pTHX_ SV* arg) { return arg; }
-    static inline Sv out (pTHX_ const TYPE& var, const Sv& = Sv()) {
+    static inline TYPE in (SV* arg) { return arg; }
+    static inline Sv out (const TYPE& var, const Sv& = Sv()) {
         if (!var) return &PL_sv_undef;
         return Ref::create(var);
     }
@@ -103,8 +103,8 @@ template <> struct Typemap<Stash> : Typemap<Sub, Stash> {};
 template <> struct Typemap<Io>    : Typemap<Sub, Io>    {};
 
 template <> struct Typemap<Object> : TypemapBase<Object> {
-    static inline Object in (pTHX_ SV* arg) { return arg; }
-    static inline Sv out (pTHX_ const Object& var, const Sv& = Sv()) {
+    static inline Object in (SV* arg) { return arg; }
+    static inline Sv out (const Object& var, const Sv& = Sv()) {
         if (!var) return &PL_sv_undef;
         return var.ref();
     }

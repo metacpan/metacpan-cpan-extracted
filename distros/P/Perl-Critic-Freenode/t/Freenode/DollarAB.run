@@ -53,3 +53,11 @@ pairgrep { $a; $b } ();
 pairfirst { $a; $b } ();
 pairmap { $a; $b } ();
 pairwise { $a; $b } ();
+
+## name CustomFunctions
+## failures 0
+## parms { extra_pair_functions => 'foo bar' }
+## cut
+
+foo { $a; $b };
+bar { $a; $b };

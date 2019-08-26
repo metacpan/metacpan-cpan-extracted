@@ -21,7 +21,8 @@ no_index:
     - inc
 requires:
   Cpanel::JSON::XS: '0'
+  List::Util: '1.44'
   perl: '5.020000'
 resources: {}
-version: '0.001001'
+version: '0.001003'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

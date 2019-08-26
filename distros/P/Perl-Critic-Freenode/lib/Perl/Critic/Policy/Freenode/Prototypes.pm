@@ -6,19 +6,28 @@ use warnings;
 use Perl::Critic::Utils qw(:severities :classification :ppi);
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '0.029';
+our $VERSION = '0.030';
 
 use constant DESC => 'Using function prototypes';
 use constant EXPL => 'Function prototypes (sub foo ($@) { ... }) will usually not do what you want. Omit the prototype, or use signatures instead.';
 
-sub supported_parameters { () }
+sub supported_parameters {
+	(
+		{
+			name        => 'signature_enablers',
+			description => 'Non-standard modules to recognize as enabling signatures',
+			behavior    => 'string list',
+		},
+	)
+}
+
 sub default_severity { $SEVERITY_MEDIUM }
 sub default_themes { 'freenode' }
 sub applies_to { 'PPI::Document' }
 
 sub violates {
 	my ($self, $elem) = @_;
-	
+
 	# Check if signatures are enabled
 	my $includes = $elem->find('PPI::Statement::Include') || [];
 	foreach my $include (@$includes) {
@@ -27,6 +36,7 @@ sub violates {
 	  return () if $include->pragma eq 'experimental' and $include =~ m/\bsignatures\b/;
 	  return () if $include->module eq 'Mojo::Base' and $include =~ m/-signatures\b/;
 	  return () if $include->module eq 'Mojolicious::Lite' and $include =~ m/-signatures\b/;
+	  return () if exists $self->{_signature_enablers}{$include->module};
 	}
 	
 	my $prototypes = $elem->find('PPI::Token::Prototype') || [];
@@ -71,7 +81,12 @@ This policy is part of L<Perl::Critic::Freenode>.
 
 =head1 CONFIGURATION
 
-This policy is not configurable except for the standard options.
+This policy can be configured to recognize additional modules as enabling the
+C<signatures> feature, by putting an entry in a C<.perlcriticrc> file like
+this:
+
+  [Freenode::Prototypes]
+  signature_enablers = MyApp::Base
 
 =head1 AUTHOR
 

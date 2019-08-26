@@ -3,7 +3,7 @@ abstract: 'Compares two or more directories for files that differ'
 author:
   - 'Ivan Wills <ivan.wills@gmail.com>'
 build_requires:
-  Test::More: '0.88'
+  Test::More: '0.98'
   Test::Warnings: '0.026'
 configure_requires:
   Module::Build: '0.38'
@@ -17,7 +17,7 @@ name: App-diffdir
 provides:
   App::diffdir:
     file: lib/App/diffdir.pm
-    version: '0.8'
+    version: '0.9'
 requires:
   Moo: '2.000000'
   Path::Tiny: '0'
@@ -27,5 +27,5 @@ resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=App::diffdir
   license: http://dev.perl.org/licenses/
   repository: git://github.com/ivanwills/App-diffdir.git
-version: '0.8'
+version: '0.9'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

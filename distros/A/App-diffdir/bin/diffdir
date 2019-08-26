@@ -16,7 +16,7 @@ use FindBin qw/$Bin/;
 use Path::Tiny;
 use App::diffdir;
 
-our $VERSION = 0.8;
+our $VERSION = 0.9;
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 my %option = (
@@ -100,7 +100,7 @@ diffdir - Compares two or more directories for files that differ
 
 =head1 VERSION
 
-This documentation refers to diffdir version 0.8.
+This documentation refers to diffdir version 0.9.
 
 =head1 SYNOPSIS
 

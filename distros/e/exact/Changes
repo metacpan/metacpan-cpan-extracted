@@ -1,5 +1,9 @@
 Revision history for exact
 
+1.09      2019-08-22 16:20:27-07:00 America/Los_Angeles
+        - Changed to use "-" prepending flags for compile check w00t
+        - Add back dist.ini components
+
 1.08      2019-08-08 15:09:15-07:00 America/Los_Angeles
         - Replaced TryCatch with Try::Tiny to reduce dependency load
         - Set minimum Perl version to 14

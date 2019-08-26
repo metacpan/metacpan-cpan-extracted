@@ -1,5 +1,8 @@
 Revision history for File-Format-CRD
 
+0.2.0   2019-08-23
+        - Switch to https://github.com/shlomif/perl-file-format-crd
+
 0.0.4   2015-05-30
         - Convert the build system to Dist-Zilla.
             - Improvements such as links to the VCS repositories.

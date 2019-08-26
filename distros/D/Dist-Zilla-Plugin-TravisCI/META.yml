@@ -3,38 +3,43 @@ abstract: 'Integrating the generation of .travis.yml into your dzil'
 author:
   - 'Torsten Raudssus <torsten@raudss.us> L<https://raudss.us/>'
 build_requires:
+  Dist::Zilla::Plugin::Beam::Connector: '0'
   Path::Tiny: '0.012'
   Test::DZil: '0'
   Test::More: '0'
+  Test::Requires: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Dist-Zilla-Plugin-TravisCI
 requires:
-  Beam::Emitter: '0'
   Beam::Event: '0'
   Dist::Zilla: '4.300034'
   YAML: '1.14'
 resources:
   homepage: https://github.com/Getty/p5-dist-zilla-plugin-travisci
   repository: https://github.com/Getty/p5-dist-zilla-plugin-travisci.git
-version: '0.011'
+version: '0.013'
 x_Dist_Zilla:
   perl:
-    version: '5.020000'
+    version: '5.028001'
   plugins:
     -
       class: Dist::Zilla::Plugin::Bootstrap::lib
       config:
         Dist::Zilla::Role::Bootstrap:
+          $Dist::Zilla::Role::Bootstrap::VERSION: '1.001004'
+          distname: Dist-Zilla-Plugin-TravisCI
+          fallback: '1'
           try_built: ~
+          try_built_method: mtime
       name: Bootstrap::lib
-      version: '1.001000'
+      version: '1.001002'
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
       config:
@@ -42,18 +47,14 @@ x_Dist_Zilla:
           exclude_filename: []
           exclude_match: []
           follow_symlinks: 0
-          include_dotfiles: 0
+          include_dotfiles: 1
           prefix: ''
           prune_directory: []
           root: .
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: '@Author::GETTY/Git::GatherDir'
-      version: '2.036'
-    -
-      class: Dist::Zilla::Plugin::PruneCruft
-      name: '@Author::GETTY/@Filter/PruneCruft'
-      version: '6.012'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Author::GETTY/@Filter/ManifestSkip'
@@ -113,9 +114,10 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^:^([0-9]+\.[0-9]+)$)
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.1.4
           repo_root: .
       name: '@Author::GETTY/Git::NextVersion'
-      version: '2.036'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::PkgVersion
       name: '@Author::GETTY/PkgVersion'
@@ -135,7 +137,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GithubMeta
       name: '@Author::GETTY/GithubMeta'
-      version: '0.54'
+      version: '0.58'
     -
       class: Dist::Zilla::Plugin::TravisCI
       name: '@Author::GETTY/TravisCI'
@@ -152,9 +154,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.1.4
           repo_root: .
       name: '@Author::GETTY/Git::CheckFor::CorrectBranch'
-      version: '0.013'
+      version: '0.014'
     -
       class: Dist::Zilla::Plugin::Prereqs::FromCPANfile
       name: '@Author::GETTY/Prereqs::FromCPANfile'
@@ -162,7 +165,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::ChangelogFromGit
       name: '@Author::GETTY/ChangelogFromGit'
-      version: '0.016'
+      version: '0.017'
     -
       class: Dist::Zilla::Plugin::PodWeaver
       config:
@@ -176,77 +179,77 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::EnsurePod5
               name: '@CorePrep/EnsurePod5'
-              version: '4.012'
+              version: '4.015'
             -
               class: Pod::Weaver::Plugin::H1Nester
               name: '@CorePrep/H1Nester'
-              version: '4.012'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Name
               name: '@GETTY/Name'
-              version: '4.012'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Version
               name: '@GETTY/Version'
-              version: '4.012'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Region
               name: '@GETTY/Prelude'
-              version: '4.012'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Generic
               name: '@GETTY/Synopsis'
-              version: '4.012'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Generic
               name: '@GETTY/Description'
-              version: '4.012'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Generic
               name: '@GETTY/Overview'
-              version: '4.012'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Generic
               name: '@GETTY/Stability'
-              version: '4.012'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Collect
               name: Attributes
-              version: '4.012'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Collect
               name: Methods
-              version: '4.012'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Collect
               name: Functions
-              version: '4.012'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Leftovers
               name: '@GETTY/Leftovers'
-              version: '4.012'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Region
               name: '@GETTY/postlude'
-              version: '4.012'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Bugs
               name: '@GETTY/Bugs'
-              version: '4.012'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Authors
               name: '@GETTY/Authors'
-              version: '4.012'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Legal
               name: '@GETTY/Legal'
-              version: '4.012'
+              version: '4.015'
             -
               class: Pod::Weaver::Plugin::Transformer
               name: '@GETTY/List'
-              version: '4.012'
+              version: '4.015'
       name: '@Author::GETTY/PodWeaver'
-      version: '4.006'
+      version: '4.008'
     -
       class: Dist::Zilla::Plugin::Git::Check
       config:
@@ -259,9 +262,10 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.1.4
           repo_root: .
       name: '@Author::GETTY/@Git/Check'
-      version: '2.036'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -275,11 +279,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.1.4
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::GETTY/@Git/Commit'
-      version: '2.036'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -287,15 +292,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.011'
+          tag: '0.013'
           tag_format: '%v'
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.1.4
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::GETTY/@Git/Tag'
-      version: '2.036'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -304,29 +310,10 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.1.4
           repo_root: .
       name: '@Author::GETTY/@Git/Push'
-      version: '2.036'
-    -
-      class: Dist::Zilla::Plugin::Prereqs
-      config:
-        Dist::Zilla::Plugin::Prereqs:
-          phase: runtime
-          type: requires
-      name: Prereqs
-      version: '6.012'
-    -
-      class: Dist::Zilla::Plugin::Prereqs
-      config:
-        Dist::Zilla::Plugin::Prereqs:
-          phase: test
-          type: requires
-      name: tests
-      version: '6.012'
-    -
-      class: Dist::Zilla::Plugin::TravisCI
-      name: TravisCI
-      version: ~
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
@@ -373,5 +360,5 @@ x_Dist_Zilla:
       is_trial: '0'
     version: '6.012'
 x_authority: cpan:GETTY
-x_generated_by_perl: v5.20.0
-x_serialization_backend: 'YAML::Tiny version 1.69'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -2,7 +2,7 @@ use 5.006;
 use strict;
 use warnings;
 package TextTableTiny;
-$TextTableTiny::VERSION = '0.021';
+$TextTableTiny::VERSION = '0.022';
 use parent 'Exporter';
 use List::Util qw();
 use Carp qw/ croak /;

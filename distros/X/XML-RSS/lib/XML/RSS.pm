@@ -1,16 +1,16 @@
 package XML::RSS;
-$XML::RSS::VERSION = '1.60';
+$XML::RSS::VERSION = '1.61';
 use strict;
 use warnings;
 
-use Carp;
-use XML::Parser;
+use Carp qw/ confess croak /;
+use XML::Parser ();
 
-use XML::RSS::Private::Output::Base;
-use XML::RSS::Private::Output::V0_9;
-use XML::RSS::Private::Output::V0_91;
-use XML::RSS::Private::Output::V1_0;
-use XML::RSS::Private::Output::V2_0;
+use XML::RSS::Private::Output::Base  ();
+use XML::RSS::Private::Output::V0_9  ();
+use XML::RSS::Private::Output::V0_91 ();
+use XML::RSS::Private::Output::V1_0  ();
+use XML::RSS::Private::Output::V2_0  ();
 
 use vars qw($VERSION $AUTOLOAD @ISA $AUTO_ADD);
 
@@ -249,7 +249,7 @@ sub _rdf_resource_fields {
     };
 }
 
-my %empty_ok_elements = (enclosure => 1);
+my %empty_ok_elements   = (enclosure   => 1);
 my %hashref_ok_elements = (description => 1);
 
 sub _get_default_modules {
@@ -271,23 +271,25 @@ sub _get_syn_ok_fields {
 }
 
 sub _get_dc_ok_fields {
-    return [qw(
-        contributor
-        coverage
-        creator
-        date
-        description
-        format
-        identifier
-        language
-        publisher
-        relation
-        rights
-        source
-        subject
-        title
-        type
-    )];
+    return [
+        qw(
+          contributor
+          coverage
+          creator
+          date
+          description
+          format
+          identifier
+          language
+          publisher
+          relation
+          rights
+          source
+          subject
+          title
+          type
+          )
+    ];
 }
 
 sub new {
@@ -354,8 +356,7 @@ sub _initialize {
     # namespaces
     $self->{namespaces}    = {};
     $self->{rss_namespace} = '';
-    foreach my $k (@{$self->_get_init_default_key_assignments()})
-    {
+    foreach my $k (@{$self->_get_init_default_key_assignments()}) {
         my $key = $k->{key};
         $self->{$key} = exists($hash{$key}) ? $hash{$key} : $k->{default};
     }
@@ -441,41 +442,33 @@ sub add_item {
 sub _get_rendering_class {
     my ($self, $ver) = @_;
 
-    if ($ver eq "1.0")
-    {
+    if ($ver eq "1.0") {
         return "XML::RSS::Private::Output::V1_0";
     }
-    elsif ($ver eq "0.9")
-    {
+    elsif ($ver eq "0.9") {
         return "XML::RSS::Private::Output::V0_9";
     }
-    elsif ($ver eq "0.91")
-    {
+    elsif ($ver eq "0.91") {
         return "XML::RSS::Private::Output::V0_91";
     }
-    else
-    {
+    else {
         return "XML::RSS::Private::Output::V2_0";
     }
 }
 
-sub _get_encode_cb_params
-{
+sub _get_encode_cb_params {
     my $self = shift;
 
-    return
-        defined($self->{encode_cb}) ?
-            ("encode_cb" => $self->{encode_cb}) :
-            ()
-            ;
+    return defined($self->{encode_cb})
+      ? ("encode_cb" => $self->{encode_cb})
+      : ();
 }
 
 sub _get_rendering_obj {
     my ($self, $ver) = @_;
 
     return $self->_get_rendering_class($ver)->new(
-        {
-            main => $self,
+        {   main    => $self,
             version => $ver,
             $self->_get_encode_cb_params(),
         }
@@ -503,7 +496,6 @@ sub as_rss_1_0 {
 sub as_rss_2_0 {
     return shift->_render_complete_rss_output("2.0");
 }
-
 
 
 sub _get_output_methods_map {
@@ -539,17 +531,15 @@ sub _get_output_version {
 # of XML-RSS that had the channel/{link,description,title} as the empty
 # string by default.
 sub _output_env {
-    my $self = shift;
+    my $self     = shift;
     my $callback = shift;
 
-    local $self->{channel}->{'link'} = $self->{channel}->{'link'};
+    local $self->{channel}->{'link'}        = $self->{channel}->{'link'};
     local $self->{channel}->{'description'} = $self->{channel}->{'description'};
-    local $self->{channel}->{'title'} = $self->{channel}->{'title'};
+    local $self->{channel}->{'title'}       = $self->{channel}->{'title'};
 
-    foreach my $field (qw(link description title))
-    {
-        if (!defined($self->{channel}->{$field}))
-        {
+    foreach my $field (qw(link description title)) {
+        if (!defined($self->{channel}->{$field})) {
             $self->{channel}->{$field} = '';
         }
     }
@@ -564,9 +554,7 @@ sub as_string {
 
     my $output_method = $self->_get_output_method($version);
 
-    return $self->_output_env(
-        sub { return $self->$output_method(); }
-    );
+    return $self->_output_env(sub { return $self->$output_method(); });
 }
 
 # Checks if inside a possibly namespaced element
@@ -578,9 +566,7 @@ sub _my_in_element {
     my $parser = $self->_parser;
 
     return $parser->within_element($elem)
-        || $parser->within_element(
-            $parser->generate_ns_name($elem, $self->{rss_namespace})
-        );
+      || $parser->within_element($parser->generate_ns_name($elem, $self->{rss_namespace}));
 }
 
 sub _get_elem_namespace_helper {
@@ -618,29 +604,25 @@ sub _get_current_namespace {
 
 sub _is_rdf_resource {
     my $self = shift;
-    my $el = shift;
+    my $el   = shift;
 
     my $ns = shift;
-    if (!defined($ns))
-    {
+    if (!defined($ns)) {
         $ns = $self->_parser->namespace($el);
     }
 
-    return (
-           exists($self->_rdf_resource_fields->{ $ns })
-        && exists($self->_rdf_resource_fields->{ $ns }{ $el })
-    );
+    return ( exists($self->_rdf_resource_fields->{$ns})
+          && exists($self->_rdf_resource_fields->{$ns}{$el}));
 }
 
 sub _get_ns_arrayity {
     my ($self, $ns) = @_;
 
-    my $is_array =
-           $self->_parse_options()->{'modules_as_arrays'}
-        && (!exists($self->_get_default_modules()->{$ns}))
-        # RDF
-        && ($ns ne "http://www.w3.org/1999/02/22-rdf-syntax-ns#")
-        ;
+    my $is_array = $self->_parse_options()->{'modules_as_arrays'}
+      && (!exists($self->_get_default_modules()->{$ns}))
+
+      # RDF
+      && ($ns ne "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
 
     my $default_ref = sub { $is_array ? [] : {} };
 
@@ -659,8 +641,7 @@ sub _append_text_to_elem_struct {
         $self->_append_struct(
             $struct,
             scalar($mapping_sub->($struct, $elem)),
-            scalar($is_array_sub->($struct, $elem)),
-            $cdata
+            scalar($is_array_sub->($struct, $elem)), $cdata
         );
     }
     else {
@@ -669,20 +650,14 @@ sub _append_text_to_elem_struct {
         my ($is_array, $default_ref) = $self->_get_ns_arrayity($ns);
 
         $self->_append_struct(
-            ($struct->{$ns} ||= $default_ref->()),
-            $elem,
-            (defined($prefix) && $prefix eq "dc"),
-            $cdata
+            ($struct->{$ns} ||= $default_ref->()), $elem,
+            (defined($prefix) && $prefix eq "dc"), $cdata
         );
 
         # If it's in a module namespace, provide a friendlier prefix duplicate
         if ($prefix) {
-            $self->_append_struct(
-                ($struct->{$prefix} ||= $default_ref->()),
-                $elem,
-                ($prefix eq "dc"),
-                $cdata
-            );
+            $self->_append_struct(($struct->{$prefix} ||= $default_ref->()),
+                $elem, ($prefix eq "dc"), $cdata);
         }
     }
 
@@ -726,12 +701,8 @@ sub _return_elem_is_array {
 sub _append_text_to_elem {
     my ($self, $ext_tag, $cdata) = @_;
 
-    return $self->_append_text_to_elem_struct(
-        $self->$ext_tag(),
-        $cdata,
-        \&_return_elem,
-        \&_return_elem_is_array,
-    );
+    return $self->_append_text_to_elem_struct($self->$ext_tag(),
+        $cdata, \&_return_elem, \&_return_elem_is_array,);
 }
 
 sub _within_topics {
@@ -740,10 +711,7 @@ sub _within_topics {
     my $parser = $self->_parser;
 
     return $parser->within_element(
-        $parser->generate_ns_name(
-            "topics", 'http://purl.org/rss/1.0/modules/taxonomy/'
-        )
-    );
+        $parser->generate_ns_name("topics", 'http://purl.org/rss/1.0/modules/taxonomy/'));
 }
 
 sub _return_item_elem {
@@ -769,19 +737,14 @@ sub _append_text_to_item {
         push @{$self->{items}}, {};
     }
 
-    $self->_append_text_to_elem_struct(
-        $self->_last_item,
-        $cdata,
-        \&_return_item_elem,
-        \&_return_item_elem_is_array
-    );
+    $self->_append_text_to_elem_struct($self->_last_item,
+        $cdata, \&_return_item_elem, \&_return_item_elem_is_array);
 }
 
 sub _append_to_array_elem {
     my ($self, $category, $cdata) = @_;
 
-    if (! $self->_my_in_element($category))
-    {
+    if (!$self->_my_in_element($category)) {
         return;
     }
 
@@ -804,26 +767,29 @@ sub _handle_char {
     if ($self->_my_in_element("image")) {
         $self->_append_text_to_elem("image", $cdata);
     }
+
     # item element
     elsif (defined($self->{_inside_item_elem})) {
         return if $self->_within_topics;
 
         $self->_append_text_to_item($cdata);
     }
+
     # textinput element
-    elsif (
-        $self->_my_in_element("textinput") || $self->_my_in_element("textInput")
-      )
-    {
+    elsif ($self->_my_in_element("textinput") || $self->_my_in_element("textInput")) {
         $self->_append_text_to_elem("textinput", $cdata);
     }
+
     # skipHours element
     elsif ($self->_append_to_array_elem("skipHours", $cdata)) {
+
         # Do nothing - already done in the predicate.
     }
     elsif ($self->_append_to_array_elem("skipDays", $cdata)) {
+
         # Do nothing - already done in the predicate.
     }
+
     # channel element
     elsif ($self->_my_in_element("channel")) {
         if ($self->_within_topics() || $self->_my_in_element("items")) {
@@ -849,12 +815,9 @@ sub _handle_dec {
 sub _should_be_hashref {
     my ($self, $el) = @_;
 
-    return
-    (
-        $empty_ok_elements{$el}
-        || ($self->_parse_options()->{'hashrefs_instead_of_strings'}
-            && $hashref_ok_elements{$el}
-        )
+    return (
+        $empty_ok_elements{$el} || ($self->_parse_options()->{'hashrefs_instead_of_strings'}
+            && $hashref_ok_elements{$el})
     );
 }
 
@@ -865,32 +828,34 @@ sub _start_array_element_in_struct {
 
     my ($is_array, $default_ref) = $self->_get_ns_arrayity($el_ns);
 
-    my @structs = (!$el_verdict)
-        ? (
-            (exists($self->{modules}->{$el_ns})
-                ? ($input_struct->{$self->{modules}->{$el_ns}} ||= $default_ref->())
-                : ()
-            ),
-            ($input_struct->{$el_ns} ||= $default_ref->()),
-        )
-        : ($input_struct)
-        ;
+    my @structs =
+      (!$el_verdict)
+      ? (
+        (   exists($self->{modules}->{$el_ns})
+            ? ($input_struct->{$self->{modules}->{$el_ns}} ||= $default_ref->())
+            : ()
+        ),
+        ($input_struct->{$el_ns} ||= $default_ref->()),
+      )
+      : ($input_struct);
 
-    foreach my $struct (@structs)
-    {
+    foreach my $struct (@structs) {
         if (ref($struct) eq 'ARRAY') {
-            push @$struct, { el => $el, val => "", };
+            push @$struct, {el => $el, val => "",};
         }
+
         # If it's an array - append a new empty element because a new one
         # was started.
         elsif (ref($struct->{$el}) eq "ARRAY") {
             push @{$struct->{$el}}, "";
         }
+
         # If it's not an array but still full (i.e: it's only the second
         # element), then turn it into an array
         elsif (defined($struct->{$el}) && length($struct->{$el})) {
             $struct->{$el} = [$struct->{$el}, ""];
         }
+
         # Else - do nothing and let the function append to the new value
         #
     }
@@ -923,10 +888,8 @@ sub _handle_start {
 
     my ($el_ns, $el_verdict) = $self->_get_elem_namespace($el);
 
-    if ($el eq "image")
-    {
-        if (exists($attribs{'resource'}))
-        {
+    if ($el eq "image") {
+        if (exists($attribs{'resource'})) {
             $self->image("rdf:resource", $attribs{'resource'});
         }
     }
@@ -943,7 +906,7 @@ sub _handle_start {
         # handle xml:base
         $self->{'xml:base'} = $attribs{'base'} if exists $attribs{'base'};
 
-    # beginning of RSS 1.0 or RSS 0.9
+        # beginning of RSS 1.0 or RSS 0.9
     }
     elsif ($el eq 'RDF') {
         my @prefixes = $parser->new_ns_prefixes;
@@ -985,12 +948,14 @@ sub _handle_start {
         # handle xml:base
         $self->{'xml:base'} = $attribs{'base'} if exists $attribs{'base'};
 
-    # beginning of item element
+        # beginning of item element
     }
     elsif ($self->_start_array_element("skipHours", $el)) {
+
         # Do nothing - already done in the predicate.
     }
     elsif ($self->_start_array_element("skipDays", $el)) {
+
         # Do nothing - already done in the predicate.
     }
     elsif ($el eq 'cloud') {
@@ -1015,6 +980,7 @@ sub _handle_start {
                 $self->{_inside_item_elem} = $parser->depth();
             }
         }
+
         # handle xml:base
         $self->_last_item->{'xml:base'} = $attribs{'base'} if exists $attribs{'base'};
 
@@ -1023,20 +989,19 @@ sub _handle_start {
     }
     elsif ($el eq 'guid') {
         $self->_last_item->{'isPermaLink'} =
-          ( (!exists($attribs{'isPermaLink'})) || (lc($attribs{'isPermaLink'}) ne 'false') );
+          ((!exists($attribs{'isPermaLink'})) || (lc($attribs{'isPermaLink'}) ne 'false'));
 
         # beginning of taxo li element in item element
         #'http://purl.org/rss/1.0/modules/taxonomy/' => 'taxo'
     }
     elsif (
-           $self->_current_element eq "item"
-        && (($el eq "category") ||
-            (
-                   exists($self->{modules}->{$el_ns})
-                && ($self->{modules}->{$el_ns} eq "dc")
-            )
+        $self->_current_element eq "item"
+        && (($el eq "category")
+            || (exists($self->{modules}->{$el_ns})
+                && ($self->{modules}->{$el_ns} eq "dc"))
         )
-    ) {
+      )
+    {
         $self->_start_array_element_in_struct($self->_last_item, $el);
     }
     elsif (
@@ -1045,7 +1010,7 @@ sub _handle_start {
         )
         && $parser->within_element($parser->generate_ns_name("item", $namespace_map->{'rss10'}))
         && $self->_current_element eq 'Bag'
-        && $el                    eq 'li'
+        && $el eq 'li'
       )
     {
 
@@ -1061,7 +1026,7 @@ sub _handle_start {
         )
         && $parser->within_element($parser->generate_ns_name("channel", $namespace_map->{'rss10'}))
         && $self->_current_element eq 'Bag'
-        && $el                    eq 'li'
+        && $el eq 'li'
       )
     {
         push(@{$self->{'channel'}->{'taxo'}}, $attribs{'resource'});
@@ -1069,7 +1034,7 @@ sub _handle_start {
     }
 
     # beginning of a channel element that stores its info in rdf:resource
-    elsif ( $parser->namespace($el)
+    elsif ($parser->namespace($el)
         && $self->_is_rdf_resource($el)
         && $self->_current_element eq 'channel')
     {
@@ -1094,8 +1059,9 @@ sub _handle_start {
             }
         }
     }
+
     # beginning of an item element that stores its info in rdf:resource
-    elsif ( $parser->namespace($el)
+    elsif ($parser->namespace($el)
         && $self->_is_rdf_resource($el)
         && $self->_current_element eq 'item')
     {
@@ -1142,19 +1108,21 @@ sub _handle_start {
         }
     }
     elsif ($self->_start_array_element("image", $el)) {
+
         # Do nothing - already done in the predicate.
     }
-    elsif (($el eq "category") &&
-        (!$parser->within_element("item")) &&
-        $self->_start_array_element("channel", $el)) {
+    elsif (($el eq "category")
+        && (!$parser->within_element("item"))
+        && $self->_start_array_element("channel", $el))
+    {
         # Do nothing - already done in the predicate.
     }
-    elsif (($self->_current_element eq 'channel') &&
-           ($el_verdict))
-           {
+    elsif (($self->_current_element eq 'channel')
+        && ($el_verdict))
+    {
         # Make sure an opening tag signifies that the element has been
         # encountered.
-        if (   exists($self->{'channel'}->{$el})
+        if (exists($self->{'channel'}->{$el})
             && (!defined($self->{'channel'}->{$el})))
         {
             $self->{'channel'}->{$el} = "";
@@ -1169,12 +1137,13 @@ sub _make_array {
     my $new  = shift;
 
     if (!$self->_allow_multiple($el)) {
-      return $new;
+        return $new;
     }
 
     if (!defined $old) {
         $old = [];
-    } elsif (ref($old) ne 'ARRAY') {
+    }
+    elsif (ref($old) ne 'ARRAY') {
         $old = [$old];
     }
     push @$old, $new;
@@ -1185,11 +1154,7 @@ sub _allow_multiple {
     my $self = shift;
     my $el   = shift;
 
-    $self->{_allow_multiple} ||=
-        {
-            map { $_ => 1 }
-            @{$self->_parse_options->{allow_multiple} || []}
-        };
+    $self->{_allow_multiple} ||= {map { $_ => 1 } @{$self->_parse_options->{allow_multiple} || []}};
 
     return $self->{_allow_multiple}->{$el};
 }
@@ -1237,10 +1202,11 @@ sub _get_parser {
         NoExpand      => 1,
         ParseParamEnt => 0,
         Handlers      => {
-            Char    => sub {
+            Char => sub {
                 my ($parser, $cdata) = @_;
                 $self->_parser($parser);
                 $self->_handle_char($cdata);
+
                 # Detach the parser to avoid reference loops.
                 $self->_parser(undef);
             },
@@ -1248,20 +1214,23 @@ sub _get_parser {
                 my $parser = shift;
                 $self->_parser($parser);
                 $self->_handle_dec(@_);
+
                 # Detach the parser to avoid reference loops.
                 $self->_parser(undef);
             },
-            Start   => sub {
+            Start => sub {
                 my $parser = shift;
                 $self->_parser($parser);
                 $self->_handle_start(@_);
+
                 # Detach the parser to avoid reference loops.
                 $self->_parser(undef);
             },
-            End     => sub {
+            End => sub {
                 my $parser = shift;
                 $self->_parser($parser);
                 $self->_handle_end(@_);
+
                 # Detach the parser to avoid reference loops.
                 $self->_parser(undef);
             },
@@ -1282,12 +1251,12 @@ sub _parse_options {
     return $self->{_parse_options};
 }
 
-sub _empty {}
+sub _empty { }
 
 sub _generic_parse {
-    my $self = shift;
-    my $method = shift;
-    my $arg = shift;
+    my $self    = shift;
+    my $method  = shift;
+    my $arg     = shift;
     my $options = shift;
 
     $self->_reset;
@@ -1303,18 +1272,13 @@ sub _generic_parse {
     {
         my $parser = $self->_get_parser();
 
-        eval {
-            $parser->$method($arg);
-        };
+        eval { $parser->$method($arg); };
 
-        if ($@)
-        {
+        if ($@) {
             my $err = $@;
 
             # Cleanup so perl-5.6.2 will be happy.
-            $parser->setHandlers(
-                map { ($_ => \&_empty) } (qw(Char XMLDecl Start End))
-            );
+            $parser->setHandlers(map { ($_ => \&_empty) } (qw(Char XMLDecl Start End)));
             $self->_parser(0);
 
             undef($parser);
@@ -1330,17 +1294,17 @@ sub _generic_parse {
 }
 
 sub parse {
-    my $self = shift;
+    my $self          = shift;
     my $text_to_parse = shift;
-    my $options = shift;
+    my $options       = shift;
 
     return $self->_generic_parse("parse", $text_to_parse, $options);
 }
 
 sub parsefile {
-    my $self = shift;
+    my $self          = shift;
     my $file_to_parse = shift;
-    my $options = shift;
+    my $options       = shift;
 
     return $self->_generic_parse("parsefile", $file_to_parse, $options);
 }
@@ -1434,7 +1398,7 @@ sub _handle_accessor {
 
 sub _modules {
     my $self = shift;
-    return $self->_handle_accessor("modules", @_);;
+    return $self->_handle_accessor("modules", @_);
 }
 
 sub channel {
@@ -1505,7 +1469,7 @@ XML::RSS - creates and updates RSS files
 
 =head1 VERSION
 
-version 1.60
+version 1.61
 
 =head1 SYNOPSIS
 
@@ -1682,15 +1646,16 @@ version 1.60
 This module provides a basic framework for creating and maintaining
 RDF Site Summary (RSS) files. This distribution also contains many
 examples that allow you to generate HTML from an RSS, convert between
-0.9, 0.91, and 1.0 version, and other nifty things.
+0.9, 0.91, 1.0, and 2.0 version, and other nifty things.
 This might be helpful if you want to include news feeds on your Web
 site from sources like Slashdot and Freshmeat or if you want to syndicate
 your own content.
 
-XML::RSS currently supports 0.9, 0.91, and 1.0 versions of RSS.
-See http://backend.userland.com/rss091 for information on RSS 0.91.
-See http://www.purplepages.ie/RSS/netscape/rss0.90.html for RSS 0.9.
-See http://web.resource.org/rss/1.0/ for RSS 1.0.
+XML::RSS currently supports versions
+L<0.9|http://www.rssboard.org/rss-0-9-0>,
+L<0.91|http://www.rssboard.org/rss-0-9-1>,
+L<1.0|http://web.resource.org/rss/1.0/>, and
+L<2.0|http://www.rssboard.org/rss-2-0> of RSS.
 
 RSS was originally developed by Netscape as the format for
 Netscape Netcenter channels, however, many Web sites have since
@@ -1701,11 +1666,19 @@ including news headlines, threaded messages, products catalogs, etc.
 B<Note:> In order to parse and generate dates (such as C<pubDate>
 and C<dc:date>) it is recommended to use L<DateTime::Format::Mail> and
 L<DateTime::Format::W3CDTF> , which is what L<XML::RSS> uses internally
-and requires.
+and requires. It should also be possible to pass L<DateTime> objects
+which will be formatted accordingly. E.g:
 
-=head1 VERSION
+    use DateTime ();
 
-version 1.60
+    my $dt = DateTime->from_epoch(epoch => 1_500_000_000);
+
+    $rss->channel(
+        pubDate => $dt,
+        .
+        .
+        .
+    );
 
 =head1 METHODS
 

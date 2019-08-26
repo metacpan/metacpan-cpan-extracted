@@ -31,6 +31,17 @@ corpus/dist4/lib/world.pm
 corpus/dist4/lib/world.pod
 corpus/dist4/t/test.pl
 corpus/dist4/t/test.t
+corpus/dist5/root/bin/hello.txt
+corpus/dist5/root/bin/world.txt
+corpus/dist5/root/lib/world.pl
+corpus/dist5/root/lib/world.pm
+corpus/dist5/root/lib/world.pod
+corpus/dist5/root/t/test.pl
+corpus/dist5/root/t/test.t
+corpus/dist5/root/xt/lib/Local/Bad1.pm
+corpus/dist5/root/xt/lib/Local/Bad2.pm
+corpus/dist5/root/xt/lib/Local/Test.pm
+corpus/dist5/xtfilesrc.txt
 corpus/empty/.empty
 lib/Test/XTFiles.pm
 lib/XT/Files.pm
@@ -65,6 +76,8 @@ t/xt_files-new3.t
 t/xt_files-new4.t
 t/xt_files-new5.t
 t/xt_files-new6.t
+t/xt_files-new7.t
+t/xt_files-new8.t
 t/xt_files-plugin.t
 t/xt_files-pod_file.t
 t/xt_files-remove_file.t

@@ -1,3 +1,19 @@
+# This file is part of Config::AST                            -*- perl -*-
+# Copyright (C) 2017-2019 Sergey Poznyakoff <gray@gnu.org>
+#
+# Config::AST is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3, or (at your option)
+# any later version.
+#
+# Config::AST is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Config::AST.  If not, see <http://www.gnu.org/licenses/>.
+
 package Config::AST::Node::Section;
 use parent 'Config::AST::Node';
 use strict;
@@ -163,20 +179,6 @@ Returns the string "(section)".
 =cut    
 
 sub as_string { '(section)' }
-
-our $AUTOLOAD;
-
-sub AUTOLOAD {
-    my $self = shift;
-    my $key = $AUTOLOAD;
-    $key =~ s/.*:://;
-    if ($key =~ s/^([A-Z])(.*)/\l$1$2/) {
-	$key =~ s/__/-/g;
-	return $self->subtree($self->{_ci} ? lc($key) : $key)
-	       // new Config::AST::Node::Null;
-    }
-    confess "Can't locate method $AUTOLOAD";
-}
 
 =head1 SEE ALSO
 

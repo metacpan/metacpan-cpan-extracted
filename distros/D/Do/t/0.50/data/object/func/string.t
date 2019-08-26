@@ -1,0 +1,33 @@
+use strict;
+use warnings;
+use Test::More;
+
+use_ok 'Data::Object::Func::String';
+use_ok 'Data::Object::Func::String::Append';
+use_ok 'Data::Object::Func::String::Camelcase';
+use_ok 'Data::Object::Func::String::Chomp';
+use_ok 'Data::Object::Func::String::Chop';
+use_ok 'Data::Object::Func::String::Concat';
+use_ok 'Data::Object::Func::String::Contains';
+use_ok 'Data::Object::Func::String::Defined';
+use_ok 'Data::Object::Func::String::Hex';
+use_ok 'Data::Object::Func::String::Index';
+use_ok 'Data::Object::Func::String::Lc';
+use_ok 'Data::Object::Func::String::Lcfirst';
+use_ok 'Data::Object::Func::String::Length';
+use_ok 'Data::Object::Func::String::Lines';
+use_ok 'Data::Object::Func::String::Lowercase';
+use_ok 'Data::Object::Func::String::Replace';
+use_ok 'Data::Object::Func::String::Reverse';
+use_ok 'Data::Object::Func::String::Rindex';
+use_ok 'Data::Object::Func::String::Snakecase';
+use_ok 'Data::Object::Func::String::Split';
+use_ok 'Data::Object::Func::String::Strip';
+use_ok 'Data::Object::Func::String::Titlecase';
+use_ok 'Data::Object::Func::String::Trim';
+use_ok 'Data::Object::Func::String::Uc';
+use_ok 'Data::Object::Func::String::Ucfirst';
+use_ok 'Data::Object::Func::String::Uppercase';
+use_ok 'Data::Object::Func::String::Words';
+
+ok 1 and done_testing;

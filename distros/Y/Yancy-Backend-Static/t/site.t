@@ -48,11 +48,15 @@ $t->get_ok( '/', 'index is default' )
     ->text_is( title => 'Static Test Site' )
     ;
 
-$t->get_ok( '/about', 'request for directory' )
+$t->get_ok( '/about/', 'request for directory with trailing slash' )
     ->status_is( 200 )
     ->content_type_like( qr{^text/html} )
     ->text_is( h1 => 'About' )
     ->text_is( title => 'About' )
+    ;
+
+$t->get_ok( '/about', 'request for directory without trailing slash' )
+    ->status_is( 404 )
     ;
 
 $t->get_ok( '/style.css', 'static file not handled' )

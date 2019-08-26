@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:       WWW-Scraper-ISBN
-version:    1.03
+version:    1.05
 abstract:   Retrieve information about books from online sources
 author:
   - Andy Schamp <andy@schamp.net>
@@ -26,13 +26,13 @@ build_requires:
 provides:
   WWW::Scraper::ISBN:
     file:     lib/WWW/Scraper/ISBN.pm
-    version:  1.03
+    version:  1.05
   WWW::Scraper::ISBN::Driver:
     file:     lib/WWW/Scraper/ISBN/Driver.pm
-    version:  1.03
+    version:  1.05
   WWW::Scraper::ISBN::Record:
     file:     lib/WWW/Scraper/ISBN/Record.pm
-    version:  1.03
+    version:  1.05
 
 no_index:
   directory:

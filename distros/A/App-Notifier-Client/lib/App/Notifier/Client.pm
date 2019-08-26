@@ -1,5 +1,5 @@
 package App::Notifier::Client;
-$App::Notifier::Client::VERSION = '0.0301';
+$App::Notifier::Client::VERSION = '0.0302';
 use strict;
 use warnings;
 
@@ -63,7 +63,7 @@ App::Notifier::Client
 
 =head1 VERSION
 
-version 0.0301
+version 0.0302
 
 =head1 SYNOPSIS
 
@@ -100,10 +100,6 @@ L<App::Notifier::Service> . It provides one class method - notify() .
 =head1 NAME
 
 App::Notifier::Client - a client library for App::Notifier::Service
-
-=head1 VERSION
-
-version 0.0301
 
 =head1 METHODS
 

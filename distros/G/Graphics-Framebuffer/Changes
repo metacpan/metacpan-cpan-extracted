@@ -1477,3 +1477,20 @@ Revision history for Graphics-Framebuffer
 6.30  Aug 11, 2019
 
       Many changes to the example scripts and documentation.
+
+6.31  Aug 24, 2019
+
+      Added "text_mode" and "graphics_mode" methods to make sure text does not
+      interfere with display.
+
+      Edited all examples scripts to behave better.
+
+      Added a "threaded_template.pl" for those wanting to use threaded
+      graphics.
+
+      The Makefile.PL script has been improved, and now exits where there are
+      missing prerequisites.
+
+6.32  Aug 25, 2019
+
+      Adjusted the version numbers of the modules.

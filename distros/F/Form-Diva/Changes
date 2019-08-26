@@ -1,6 +1,7 @@
 Revision history for Form::Diva
 
-1.01		26 Feb 2019
+1.02	26 Aug 2019 minor pod fix.
+1.01	26 Feb 2019
   added a generated id to the label for tag on a field.
 1.00    29 September 2015
 	bumped version to 1.00 to indicate Form::Diva is a stable release.

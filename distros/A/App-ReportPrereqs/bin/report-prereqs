@@ -4,13 +4,12 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 package App::ReportPrereqs;
 
 use ExtUtils::MakeMaker ();
 use File::Basename qw(fileparse);
-use File::Temp ();
 use Getopt::Long qw(GetOptions);
 use HTTP::Tiny 0.014 ();
 use List::Util qw(max);
@@ -30,7 +29,6 @@ sub _main {
     my @features;
     return _usage() if !GetOptions( 'with-develop' => \$with_develop, 'with-feature=s@' => \@features );
 
-    my $temp;
     my $cpanfile     = 'cpanfile';
     my $cpanfile_src = $cpanfile;
 
@@ -43,11 +41,7 @@ sub _main {
             return 1;
         }
 
-        $temp     = File::Temp->new;
-        $cpanfile = $temp->filename;
-
-        $temp->print( $res->{content} ) or die "Unable to write file '$cpanfile': $!";
-        $temp->flush;
+        $cpanfile = \$res->{content};
     }
     elsif (@ARGV) {
         return _usage();
@@ -73,7 +67,7 @@ sub _main {
             my @modules = grep { $_ ne 'perl' } keys %{$req_ref};
             next TYPE if !@modules;
 
-            my $title = "\u$phase \u$type";
+            my $title   = "\u$phase \u$type";
             my @reports = ( [qw(Module Want Have)] );
 
           MODULE:
@@ -175,7 +169,7 @@ report-prereqs - report prerequisite versions
 
 =head1 VERSION
 
-Version 0.003
+Version 0.004
 
 =head1 SYNOPSIS
 
@@ -311,7 +305,7 @@ Stephan Sachse <ste.sachse@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Sven Kirmess.
+This software is Copyright (c) 2018-2019 by Sven Kirmess.
 
 This is free software, licensed under:
 

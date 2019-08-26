@@ -13,7 +13,7 @@ SKIP: {
   skip "get_title() might fail! (\$info->{status} ne 'ok')", 2 if $info->{status} ne 'ok';
 
   ok( my $title = $yt->get_title(), "get_title() on VIDEO_ID '$id'" );
-  is( $title, 'Gmail Theater Act 1', "is 'Gmail Theater Act 1'" );
+  like( $title, qr/^(?:Gmail Theater Act 1|_YUugB4IUl4)$/, "is 'Gmail Theater Act 1' or '_YUugB4IUl4'" );
 };
 
 done_testing();

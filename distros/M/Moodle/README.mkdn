@@ -9,20 +9,20 @@ Migrations for Mojo DB Drivers
 # SYNOPSIS
 
     use Moodle;
+    use Migrator;
     use Mojo::Pg;
-    use App::Migrator;
 
-    my $migrator = App::Migrator->new;
-    my $driver = Mojo::Pg->new('postgresql://postgres@/test');
+    my $migrator = Migrator->new;
+    my $dbdriver = Mojo::Pg->new('postgresql://postgres@/test');
 
-    my $self = Moodle->new(migrator => $migrator, driver => $driver);
+    my $self = Moodle->new(migrator => $migrator, driver => $dbdriver);
 
     my $migration = $self->migrate('latest');
 
 # DESCRIPTION
 
 Moodle uses [Doodle](https://metacpan.org/pod/Doodle) with [Mojo](https://metacpan.org/pod/Mojo) database drivers to easily install and
-evolve database schema migrations. See [Doodle::Migrator](https://metacpan.org/pod/Doodle::Migrator) for help setting up
+evolve database schema migrations. See [Doodle::Migration](https://metacpan.org/pod/Doodle::Migration) for help setting up
 [Doodle](https://metacpan.org/pod/Doodle) migrations, and [Mojo::Pg](https://metacpan.org/pod/Mojo::Pg), [Mojo::mysql](https://metacpan.org/pod/Mojo::mysql) or [Mojo::SQLite](https://metacpan.org/pod/Mojo::SQLite) for
 help configuring the DB driver.
 
@@ -35,7 +35,7 @@ This package implements the following methods.
     content() : Str
 
 The content method generates DB migration statements using the
-[Doodle::Migrator](https://metacpan.org/pod/Doodle::Migrator) and return a string containing "UP" and "DOWN" versioned
+[Doodle::Migration](https://metacpan.org/pod/Doodle::Migration) and return a string containing "UP" and "DOWN" versioned
 migration strings suitable for use with the migration feature of [Mojo](https://metacpan.org/pod/Mojo)
 database drivers.
 
@@ -48,12 +48,10 @@ database drivers.
     migrate(Maybe[Str] $target) : Object
 
 The migrate method generates DB migration statements using the
-[Doodle::Migrator](https://metacpan.org/pod/Doodle::Migrator) and installs them using one of the [Mojo](https://metacpan.org/pod/Mojo) database
+[Doodle::Migration](https://metacpan.org/pod/Doodle::Migration) and installs them using one of the [Mojo](https://metacpan.org/pod/Mojo) database
 drivers, i.e. [Mojo::Pg](https://metacpan.org/pod/Mojo::Pg), [Mojo::mysql](https://metacpan.org/pod/Mojo::mysql) or [Mojo::SQLite](https://metacpan.org/pod/Mojo::SQLite). The method
-returns a migration object relative to to the DB driver used.
+returns a migration object relative to the DB driver used.
 
 - migrate example
 
-        my $migrate = $self->migrate;
-
-        my $latest = $self->migrate('latest');
+        my $migrate = $self->migrate('latest');

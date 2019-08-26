@@ -6,10 +6,12 @@ use FindBin qw/$RealBin/;
 use IO::Uncompress::Gunzip qw/gunzip $GunzipError/;
 use Data::Dumper qw/Dumper/;
 
-use Test::More tests => 19;
+use Test::More tests => 2;
 
 use lib "$RealBin/../lib";
 use_ok 'Bio::Kmer';
+
+#die Dumper $Bio::Kmer::VERSION, $Bio::Kmer::iThreads;
 
 # expected histogram
 my @correctCounts=(
@@ -34,35 +36,43 @@ my %query=(
   AAAAAAAA => 0,  # not found
 );
 
+
 # Test pure perl
-my $infile = dirname($0)."/../data/rand.fastq.gz";
-my $kmer=Bio::Kmer->new(dirname($0)."/../data/rand.fastq.gz",{kmerlength=>8,kmercounter=>"perl"});
-my $hist=$kmer->histogram() || die Dumper $kmer;
-for(my $i=0;$i<@correctCounts;$i++){
-  #diag "Expecting $correctCounts[$i]. Found $$hist[$i]";
-  note "Expecting $correctCounts[$i]. Found $$hist[$i]";
-  is $$hist[$i], $correctCounts[$i], "Freq of $i checks out";
-}
-for my $query(keys(%query)){
-  #diag "Expecting $query{$query}. Found ".$kmer->query($query);
-  note "Expecting $query{$query}. Found ".$kmer->query($query);
-  is $query{$query}, $kmer->query($query), "Queried for $query{$query}";
-}
-$kmer->close();
-my $numKmers = scalar(keys(%{ $kmer->kmers() }));
-is $numKmers, 58107, "Expected 58107 kmers. Found $numKmers kmers.";
+subtest "pure perl kmer counting" => sub{
+  if(!$Bio::Kmer::iThreads){
+    plan skip_all => "No perl threads detected. Will not test.";
+    diag $Bio::Kmer::iThreads; # avoid "only used once warning"
+  }
 
-# Test subsampling: a subsample should have fewer kmers than
-# the full set but more than 0.
-my $subsampleKmer=Bio::Kmer->new(dirname($0)."/../data/rand.fastq.gz",{kmerlength=>8,sample=>0.1});
-my $subsampleHist=$kmer->histogram();
-my $subsampleKmerHash=$subsampleKmer->kmers();
-my $numSubsampledKmers = scalar(keys(%$subsampleKmerHash));
+  plan tests => 18;
 
-note "Found $numSubsampledKmers subsampled kmers vs full count of kmers: $numKmers, of a requested frequency of 0.1";
+  my $infile = dirname($0)."/../data/rand.fastq.gz";
+  my $kmer=Bio::Kmer->new(dirname($0)."/../data/rand.fastq.gz",{kmerlength=>8,kmercounter=>"perl"});
+  my $hist=$kmer->histogram() || die Dumper $kmer;
+  for(my $i=0;$i<@correctCounts;$i++){
+    #diag "Expecting $correctCounts[$i]. Found $$hist[$i]";
+    note "Expecting $correctCounts[$i]. Found $$hist[$i]";
+    is $$hist[$i], $correctCounts[$i], "Freq of $i checks out";
+  }
+  for my $query(keys(%query)){
+    #diag "Expecting $query{$query}. Found ".$kmer->query($query);
+    note "Expecting $query{$query}. Found ".$kmer->query($query);
+    is $query{$query}, $kmer->query($query), "Queried for $query{$query}";
+  }
+  $kmer->close();
+  my $numKmers = scalar(keys(%{ $kmer->kmers() }));
+  is $numKmers, 58107, "Expected 58107 kmers. Found $numKmers kmers.";
 
-cmp_ok($numSubsampledKmers, '>', 0, "Subsampled kmers are a nonzero count.");
+  # Test subsampling: a subsample should have fewer kmers than
+  # the full set but more than 0.
+  my $subsampleKmer=Bio::Kmer->new(dirname($0)."/../data/rand.fastq.gz",{kmerlength=>8,sample=>0.1});
+  my $subsampleHist=$kmer->histogram();
+  my $subsampleKmerHash=$subsampleKmer->kmers();
+  my $numSubsampledKmers = scalar(keys(%$subsampleKmerHash));
 
-cmp_ok($numSubsampledKmers, '<', $numKmers, "Subsample kmers are than the full count.");
+  note "Found $numSubsampledKmers subsampled kmers vs full count of kmers: $numKmers, of a requested frequency of 0.1";
 
+  cmp_ok($numSubsampledKmers, '>', 0, "Subsampled kmers are a nonzero count.");
 
+  cmp_ok($numSubsampledKmers, '<', $numKmers, "Subsample kmers are than the full count.");
+};

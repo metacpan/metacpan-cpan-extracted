@@ -13,13 +13,17 @@ Form::Diva - Generate HTML5 form label and input fields
 
 =head1 VERSION
 
-version 1.01
+version 1.02
 
 =head1 DESCRIPTION
 
 Generate Form Label and Input Tags from a simple data structure.
 Simplify form code in your views without replacing it without a lot of even
 uglier Perl Code in your Controller. 
+
+=head1 VERSION
+
+Version 1.02
 
 =head1 USAGE
 
@@ -267,9 +271,9 @@ Wherever works best for you. Think of it as preparing your data for the View.
 
 =head1 SEE ALSO
 
-Here are a few other Form Modules on CPAN: HTML::Form::Fu, Form::Sensible, Form::Factory, Form::Toolkit
+Here are a few other Form Modules on CPAN: L<HTML::Form::Fu>, L<Form::Sensible>, L<Form::Factory>, L<Form::Toolkit>
 
-Form::Diva is meant to be used with a Templating System. Template::Toolkit is the default templating system for Catalyst and Dancer. Template::Alloy is a drop in replacement for TemplateToolkit. Mojo::Template is a Perl reimplemenation of ERB and the default for Mojolicious.
+Form::Diva is meant to be used with a Templating System. L<Template::Toolkit> is the default templating system for Catalyst and Dancer. L<Template::Alloy> is a drop in replacement for TemplateToolkit. L<Mojo::Template> is a Perl reimplemenation of ERB and the default for L<Mojolicious>.
 
 =head1 AUTHOR
 
@@ -289,7 +293,7 @@ You can also look for information at:
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2014,2015 John Karr.
+Copyright 2014-2019 John Karr.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

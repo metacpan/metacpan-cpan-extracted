@@ -35,6 +35,7 @@
       "runtime" : {
          "requires" : {
             "Color::ANSI::Util" : "0.161",
+            "Data::Cmp" : "0.002",
             "Data::Sah::Compiler::perl::TH::array" : "0",
             "Data::Sah::Compiler::perl::TH::bool" : "0",
             "Data::Sah::Compiler::perl::TH::str" : "0",
@@ -69,7 +70,7 @@
          "web" : "https://github.com/perlancar/perl-App-resolvetable"
       }
    },
-   "version" : "0.005",
+   "version" : "0.007",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028002"

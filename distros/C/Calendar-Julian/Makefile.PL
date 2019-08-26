@@ -23,7 +23,7 @@ WriteMakefile(
     PREREQ_PM => {
         'Moo'                        => '2.000000',
         'namespace::autoclean'       => '0.28',
-        'Date::Julian::Simple'       => '0.09',
+        'Date::Julian::Simple'       => '0.10',
         'Calendar::Plugin::Renderer' => '0.15',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
@@ -31,7 +31,7 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Calendar::Julian' => { file => 'lib/Calendar/Julian.pm', version => '0.14' },
+            'Calendar::Julian' => { file => 'lib/Calendar/Julian.pm', version => '0.15' },
         },
         resources => {
             repository => {

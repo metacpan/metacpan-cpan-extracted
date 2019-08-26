@@ -3,7 +3,9 @@ use Mojo::Base '-strict';
 use Test::Mojo;
 use Test::More;
 
-my $VALUE = 'Foobar';
+# Value contains an HTML entity that turns into a high-byte UTF-8
+# character to test that we do not obliterate HTML entities.
+my $VALUE = 'Foobar &larr;';
 
 my $t = Test::Mojo->new( 'Mojolicious' );
 $t->app->mode( 'development' );

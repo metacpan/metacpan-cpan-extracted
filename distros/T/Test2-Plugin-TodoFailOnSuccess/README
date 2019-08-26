@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.0.1
+    version 0.0.2
 
 SYNOPSIS
 
@@ -84,7 +84,9 @@ COPYRIGHT AND LICENSE
 
       The Artistic License 2.0 (GPL Compatible)
 
-CONTRIBUTOR
+CONTRIBUTORS
 
-    Larry Leszczynski <Larry.Leszczynski@GrantStreet.com>
+      * Larry Leszczynski <Larry.Leszczynski@GrantStreet.com>
+
+      * Mark Flickinger <mark.flickinger@grantstreet.com>
 

@@ -19,7 +19,7 @@ my %module_build_args = (
     "unknown"
   ],
   "dist_name" => "Mail-LMLM",
-  "dist_version" => "0.6805",
+  "dist_version" => "0.6806",
   "license" => "mit",
   "module_name" => "Mail::LMLM",
   "recursive_test_files" => 1,

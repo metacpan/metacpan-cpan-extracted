@@ -1,5 +1,12 @@
 Revision history for Pg-Explain
 
+0.81    2019/08/26
+        - Handle properly single-line JSON plans
+        per report from William Meitzen
+        - Fix MANIFEST file, so it passes tests
+        - Fix message on missing Test::PerlTidy module
+        - Fix code formatting (perltidy)
+
 0.80    2019/06/18
         - Allow parsing of plans with COSTS disabled.
         per gripe from Marc

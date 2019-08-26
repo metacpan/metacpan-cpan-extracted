@@ -1,4 +1,11 @@
 Revision history for exact::conf
 
+1.03      2019-08-26 15:14:29-07:00 America/Los_Angeles
+        - Removed support for Perl versions prior to 5.14
+
+1.02      2019-08-26 14:40:37-07:00 America/Los_Angeles
+        - Changed to use "-" prepending flags for compile check w00t
+        - Add back dist.ini components
+
 1.01      2019-08-08 11:11:26-07:00 America/Los_Angeles
         - First version, released on an unsuspecting world.

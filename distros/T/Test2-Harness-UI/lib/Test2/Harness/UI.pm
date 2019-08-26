@@ -2,11 +2,12 @@ package Test2::Harness::UI;
 use strict;
 use warnings;
 
-our $VERSION = '0.000006';
+our $VERSION = '0.000014';
 
 use Router::Simple;
 use Text::Xslate(qw/mark_raw/);
 use Scalar::Util qw/blessed/;
+use DateTime;
 
 use Test2::Harness::UI::Request;
 use Test2::Harness::UI::Controller::Dashboard;
@@ -56,6 +57,7 @@ sub init {
     $router->connect('/job/:id'          => {controller => 'Test2::Harness::UI::Controller::Job'});
     $router->connect('/run/:id/jobs'     => {controller => 'Test2::Harness::UI::Controller::Jobs',   from => 'run'});
     $router->connect('/job/:id/events'   => {controller => 'Test2::Harness::UI::Controller::Events', from => 'job'});
+    $router->connect('/event/:id'        => {controller => 'Test2::Harness::UI::Controller::Events', from => 'single_event'});
     $router->connect('/event/:id/events' => {controller => 'Test2::Harness::UI::Controller::Events', from => 'event'});
 }
 
@@ -115,6 +117,7 @@ sub wrap {
     }
 
     if ($ct eq 'text/html') {
+        my $dt = DateTime->now(time_zone => 'local');
 
         my $tx      = Text::Xslate->new(path => [share_dir('templates')]);
         my $wrapped = $tx->render(
@@ -128,6 +131,8 @@ sub wrap {
                 add_css  => $res->css      || [],
                 add_js   => $res->js       || [],
                 title    => $res->title    || ($controller ? $controller->title : 'Test2-Harness-UI'),
+
+                time_zone => $dt->strftime("%Z"),
 
                 base_uri => $req->base->as_string || '',
                 content  => mark_raw($res->raw_body)  || '',

@@ -29,6 +29,10 @@ Defaults to rcv. Currently rcv is the only type supported. In the future the Mat
 
 A hash reference with active choices as the keys. The default value is all of the choices defined in the BallotSet.
 
+### Logging (optional)
+
+Has the logging methods of Vote::Count::Log.
+
 # Methods
 
 ## MatrixTable

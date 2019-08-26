@@ -1,9 +1,7 @@
 package Dist::Zilla::PluginBundle::Author::GETTY;
-BEGIN {
-  $Dist::Zilla::PluginBundle::Author::GETTY::AUTHORITY = 'cpan:GETTY';
-}
+our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: BeLike::GETTY when you build your dists
-$Dist::Zilla::PluginBundle::Author::GETTY::VERSION = '0.110';
+$Dist::Zilla::PluginBundle::Author::GETTY::VERSION = '0.111';
 use Moose;
 use Moose::Autobox;
 use Dist::Zilla;
@@ -222,11 +220,11 @@ sub configure {
   $self->log_fatal("no_install can't be used together with no_makemaker")
     if $self->no_install and $self->no_makemaker;
 
-  $self->add_plugins(qw(
-    Git::GatherDir
-  ));
+  $self->add_plugins([ 'Git::GatherDir' => {
+    include_dotfiles => 1,
+  }]);
 
-  my @removes = ('GatherDir');
+  my @removes = ('GatherDir','PruneCruft');
   if ($self->no_cpan || $self->no_makemaker) {
     push @removes, 'UploadToCPAN' if $self->no_cpan;
     push @removes, 'MakeMaker' if $self->no_makemaker;
@@ -394,7 +392,7 @@ Dist::Zilla::PluginBundle::Author::GETTY - BeLike::GETTY when you build your dis
 
 =head1 VERSION
 
-version 0.110
+version 0.111
 
 =head1 SYNOPSIS
 
@@ -429,7 +427,10 @@ are default):
 
 In default configuration it is equivalent to:
 
-  [@Basic]
+  [@Filter]
+  -bundle = @Basic
+  -remove = GatherDir
+  -remove = PruneCruft
 
   [Git::NextVersion]
   [PkgVersion]

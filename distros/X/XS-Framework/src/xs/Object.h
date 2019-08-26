@@ -45,11 +45,11 @@ struct Object : Sv {
     Sub method_strict (const Sv& name) const;
     Sub method_strict (const string_view& name) const;
 
-    Sub next_method        (const Sub& current) const { return xs::next::method(aTHX_ stash(), current.get<CV>()); }
-    Sub next_method_strict (const Sub& current) const { return xs::next::method_strict(aTHX_ stash(), current.get<CV>()); }
+    Sub next_method        (const Sub& current) const { return xs::next::method(stash(), current.get<CV>()); }
+    Sub next_method_strict (const Sub& current) const { return xs::next::method_strict(stash(), current.get<CV>()); }
 
-    Sub super_method        (const Sub& current) const { return xs::super::method(aTHX_ stash(), current.get<CV>()); }
-    Sub super_method_strict (const Sub& current) const { return xs::super::method_strict(aTHX_ stash(), current.get<CV>()); }
+    Sub super_method        (const Sub& current) const { return xs::super::method(stash(), current.get<CV>()); }
+    Sub super_method_strict (const Sub& current) const { return xs::super::method_strict(stash(), current.get<CV>()); }
 
     bool isa (const string_view& parent) {  _check_ref(); return sv_derived_from_pvn(_ref, parent.data(), parent.length(), 0); }
     bool isa (const Stash& parent)       { return isa(parent.name()); }

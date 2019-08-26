@@ -4,20 +4,31 @@ use warnings;
 no warnings 'qw';
 
 use Test::More;
+use Test::Exception;
 
 use_ok 'Music::Cadence';
 
 my $mc = Music::Cadence->new;
 isa_ok $mc, 'Music::Cadence';
 
-is $mc->key, 'C', 'key';
-is $mc->scale, 'major', 'scale';
-is $mc->octave, 0, 'octave';
+is $mc->key, 'C', 'default key';
+is $mc->scale, 'major', 'default scale';
+is $mc->octave, 0, 'default octave';
+is $mc->format, '', 'default format';
 
-my $chords = $mc->cadence( type => 'unknown' );
-is_deeply $chords, [], 'unknown cadence';
+throws_ok { $mc->cadence( key => 'X' ) }
+    qr/unknown chord/, 'unknown key';
 
-$chords = $mc->cadence;
+throws_ok { $mc->cadence( type => 'foo' ) }
+    qr/unknown cadence/, 'unknown cadence';
+
+throws_ok { $mc->cadence( scale => 'foo' ) }
+    qr/unknown scale/, 'unknown scale';
+
+throws_ok { $mc->cadence( leading => 666 ) }
+    qr/unknown leader/, 'unknown leader';
+
+my $chords = $mc->cadence;
 is_deeply $chords, [ [qw/ G B D /], [qw/ C E G /] ], 'C perfect';
 
 $chords = $mc->cadence(
@@ -79,5 +90,14 @@ $chords = $mc->cadence(
     variation => 2,
 );
 is_deeply $chords, [ [qw/ G# C D# /], [qw/ F# A# C# /] ], 'C# deceptive';
+
+$mc = Music::Cadence->new(
+    key    => 'C#',
+    octave => 5,
+    format => 'midi',
+);
+
+$chords = $mc->cadence( type => 'perfect' );
+is_deeply $chords, [ [qw/ Gs5 C5 Ds5 /], [qw/ Cs5 F5 Gs5 /] ], 'C# perfect midi';
 
 done_testing();

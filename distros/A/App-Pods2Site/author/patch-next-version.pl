@@ -17,6 +17,19 @@ chdir($toplevel) or die("Failed to chdir to $toplevel: $!\n");
 my %files = 
 	(
 		'README.md' => 1,
+		'lib/App/Pods2Site/SiteBuilder/AbstractBasicFrames.pm' => 6,
+		'lib/App/Pods2Site/SiteBuilder/BasicFramesSimpleTOC.pm' => 6,
+		'lib/App/Pods2Site/SiteBuilder/BasicFramesTreeTOC.pm' => 6,
+		'lib/App/Pods2Site/SiteBuilder/None.pm' => 6,
+		'lib/App/Pods2Site/_Args.pod' => 9,
+		'lib/App/Pods2Site/AbstractSiteBuilder.pm' => 6,
+		'lib/App/Pods2Site/Args.pm' => 10,
+		'lib/App/Pods2Site/Args.pod' => 9,
+		'lib/App/Pods2Site/Pod2HTML.pm' => 6,
+		'lib/App/Pods2Site/PodCopier.pm' => 6,
+		'lib/App/Pods2Site/PodFinder.pm' => 6,
+		'lib/App/Pods2Site/SiteBuilderFactory.pm' => 6,
+		'lib/App/Pods2Site/Util.pm' => 6,
 		'lib/App/Pods2Site.pm' => 8,
 		'lib/App/Pods2Site.pod' => 10
 	);
@@ -60,9 +73,13 @@ my $currentVersionRE = qr(\Q$currentVersion\E);
 my $nextVersion = sprintf("${mj}.%s%03d", ($isdev ? "${min}_" : ''), $2 + 1);
 my $nextTag = "v$nextVersion";
 
+print "Next version is '$nextVersion'\n";
 foreach my $fn (keys(%files))
 {
 	my $line = $files{$fn};
+
+	print "Changing 'version' in $fn...\n";
+
 	$fn = "$toplevel/$fn";
 	
 	my $idx = $line - 1;

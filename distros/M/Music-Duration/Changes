@@ -1,5 +1,14 @@
 Revision history for Music-Duration
 
+0.0702 2019-08-25 02:20:05
+    - What the? No POD was parsed on the previous CPAN upload! Trying again...
+
+0.0701 2019-08-25 02:09:41
+    - Improved documentation.
+
+0.0700 2019-08-25 01:51:42
+    - Added the 128th note duration, because... why not.
+
 0.0605 2019-03-03 13:33:21
     - Improved documentation.
     - Added the eg/polyrhythm progam.

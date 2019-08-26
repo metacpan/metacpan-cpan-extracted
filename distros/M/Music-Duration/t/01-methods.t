@@ -17,6 +17,11 @@ my %expected = (
      dxn => '0.09375',
     ddxn => '0.10938',
      txn => '0.04167',
+    # 128th
+      on => '0.03125',
+     don => '0.04688',
+    ddon => '0.05469',
+     ton => '0.02083',
 );
 for my $i ( keys %expected ) {
     is sprintf( '%.5f', $MIDI::Simple::Length{$i} ), $expected{$i}, $i;

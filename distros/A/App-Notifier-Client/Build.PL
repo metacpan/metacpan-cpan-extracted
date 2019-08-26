@@ -18,7 +18,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "App-Notifier-Client",
-  "dist_version" => "0.0301",
+  "dist_version" => "0.0302",
   "license" => "mit",
   "module_name" => "App::Notifier::Client",
   "recursive_test_files" => 1,

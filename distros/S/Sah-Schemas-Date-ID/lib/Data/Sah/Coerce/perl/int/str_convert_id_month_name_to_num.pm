@@ -1,7 +1,7 @@
 package Data::Sah::Coerce::perl::int::str_convert_id_month_name_to_num;
 
-our $DATE = '2019-06-28'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-07-21'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -65,7 +65,7 @@ Data::Sah::Coerce::perl::int::str_convert_id_month_name_to_num - Convert Indones
 
 =head1 VERSION
 
-This document describes version 0.001 of Data::Sah::Coerce::perl::int::str_convert_id_month_name_to_num (from Perl distribution Sah-Schemas-Date-ID), released on 2019-06-28.
+This document describes version 0.002 of Data::Sah::Coerce::perl::int::str_convert_id_month_name_to_num (from Perl distribution Sah-Schemas-Date-ID), released on 2019-07-21.
 
 =head1 DESCRIPTION
 

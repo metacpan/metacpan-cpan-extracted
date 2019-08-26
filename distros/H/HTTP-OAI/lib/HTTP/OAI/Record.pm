@@ -4,7 +4,7 @@ package HTTP::OAI::Record;
 
 use strict;
 
-our $VERSION = '4.08';
+our $VERSION = '4.09';
 
 sub new {
 	my ($class,%args) = @_;

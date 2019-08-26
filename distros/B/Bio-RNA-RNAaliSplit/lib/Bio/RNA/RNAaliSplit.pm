@@ -1,11 +1,11 @@
 # -*-CPerl-*-
-# Last changed Time-stamp: <2019-04-05 22:38:17 mtw>
+# Last changed Time-stamp: <2019-08-25 20:54:13 mtw>
 
 # Bio::RNA::RNAaliSplit.pm: Handler for horizontally splitting alignments
 
 package Bio::RNA::RNAaliSplit;
 
-use version; our $VERSION = qv('0.10');
+use version; our $VERSION = qv('0.11');
 use Carp;
 use Data::Dumper;
 use Moose;
@@ -13,52 +13,26 @@ use Moose::Util::TypeConstraints;
 use Path::Class;
 use File::Basename;
 use IPC::Cmd qw(can_run run);
-use Bio::AlignIO;
+#use Bio::AlignIO;
 use Storable 'dclone';
 use File::Path qw(make_path);
-use FileDirUtil;
-#use diagnostics;
+use diagnostics;
 
-subtype 'MyAln' => as class_type('Bio::AlignIO');
+extends 'Bio::RNA::RNAaliSplit::AliHandler';
 
-coerce 'MyAln'
-    => from 'HashRef'
-    => via { Bio::AlignIO->new( %{ $_ } ) };
-
-has 'format' => ( 
-		 is => 'ro',
-		 isa => 'Str',
-		 predicate => 'has_format',
-		 default => 'ClustalW',
-		 required => 1,
-		);
-
-has 'alignment' => (
-		    is => 'rw',
-		    isa => 'MyAln',
-		    predicate => 'has_aln',
-		    coerce => 1,
-		   );
+has 'alignment_aln' => (
+			is => 'rw',
+			isa => 'Path::Class::File',
+			predicate => 'has_aln_file',
+			init_arg => undef,
+		       );
 
 has 'alignment_stk' => (
 			is => 'rw',
 			isa => 'Path::Class::File',
-			predicate => 'has_stk',
+			predicate => 'has_stk_file',
 			init_arg => undef,
 		       );
-
-has 'next_aln' => (
-		   is => 'rw',
-		   isa => 'Bio::SimpleAlign',
-		   predicate => 'has_next_aln',
-		   init_arg => undef,
-		  );
-
-has 'dump' => (
-	       is => 'rw',
-	       isa => 'Num',
-	       predicate => 'has_dump_flag',
-	       );
 
 has 'hammingdistN' => (
 		       is => 'rw',
@@ -78,7 +52,6 @@ has 'hammingdistX' => (
 
 
 with 'FileDirUtil';
-with 'Bio::RNA::RNAaliSplit::Roles';
 
 sub BUILD {
     my $self = shift;
@@ -87,38 +60,40 @@ sub BUILD {
       unless ($self->has_ifile);
     $self->alignment({-file => $self->ifile,
 		      -format => $self->format,
-		      -displayname_flat => 1} ); # discard position in sequence IDs
+		      -displayname_flat => 1} );
     $self->next_aln($self->alignment->next_aln);
+    $self->next_aln->set_displayname_safe();
+    $self->_get_alen();
+    $self->_get_nrseq();
     unless($self->has_odir){
-      unless($self->has_dirnam){$self->dirnam("as")}
-      $self->odir( [$self->ifile->dir,$self->dirnam] );
+      my $odir_name = "as";
+      $self->odir( [$self->ifile->dir,$odir_name] );
     }
     my @created = make_path($self->odir, {error => \my $err});
     confess "ERROR [$this_function] could not create output directory $self->odir"
       if (@$err);
     $self->set_ifilebn;
 
-    if ($self->has_dump_flag){
-      # dump ifile as aln ans stk in ClustalW format to odir/input
-      my $iodir = $self->odir->subdir('input');
-      mkdir($iodir);
-      my $ialnfile = file($iodir,$self->ifilebn.".aln");
-      my $istkfile = file($iodir,$self->ifilebn.".stk");
-      my $alnio = Bio::AlignIO->new(-file   => ">$ialnfile",
-				    -format => "ClustalW",
-				    -flush  => 0,
-				    -displayname_flat => 1 );
-      my $stkio = Bio::AlignIO->new(-file   => ">$istkfile",
-				    -format => "Stockholm",
-				    -flush  => 0,
-				    -displayname_flat => 1 );
-      my $aln2 = $self->next_aln->select_noncont((1..$self->next_aln->num_sequences));
-      my $stk2 = $self->next_aln->select_noncont((1..$self->next_aln->num_sequences));
-      $alnio->write_aln($aln2);
-      $stkio->write_aln($stk2);
-      $self->alignment_stk($istkfile);
-      # end dump input aln file
-    }
+    # dump ifile as aln and stk in ClustalW format to odir/input
+    my $iodir = $self->odir->subdir('input');
+    mkdir($iodir);
+    my $ialnfile = file($iodir,$self->ifilebn.".aln");
+    my $istkfile = file($iodir,$self->ifilebn.".stk");
+    my $alnio = Bio::AlignIO->new(-file   => ">$ialnfile",
+				  -format => "clustalw",
+				  -flush  => 0,
+				  -displayname_flat => 1 );
+    my $stkio = Bio::AlignIO->new(-file   => ">$istkfile",
+				  -format => "stockholm",
+				  -flush  => 0,
+				  -displayname_flat => 1 );
+    my $aln2 = $self->next_aln->select_noncont((1..$self->next_aln->num_sequences));
+    my $stk2 = $self->next_aln->select_noncont((1..$self->next_aln->num_sequences));
+    $alnio->write_aln($aln2);
+    $stkio->write_aln($stk2);
+    $self->alignment_aln($ialnfile);
+    $self->alignment_stk($istkfile);
+    # end dump ifile
 
     if ($self->next_aln->num_sequences == 2){ $self->_hamming() }
   }
@@ -137,7 +112,7 @@ sub dump_subalignment {
   my $oodir = $self->odir->subdir($alipathsegment);
   mkdir($oodir);
 
-  # create info file 
+  # create info file
   my $oinfofile = file($oodir,$token.".info");
   open my $oinfo, ">", $oinfofile or die $!;
   foreach my $entry (@$what){
@@ -222,15 +197,15 @@ sequence alignments
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 
 =head1 SYNOPSIS
 
-This module is a L<Moose> handler for horizontal splitting of
-structural RNA multiple sequence alignments (MSA). It employs third
-party tools (RNAalifold, RNAz, R-scape) for classification of
+This module is a L<Moose> handler for horizontal splitting and
+evaluation of structural RNA multiple sequence alignments. It employs
+third party tools (RNAalifold, RNAz, R-scape) for classification of
 subalignments, each folding into a common consensus structure.
 
 =head1 AUTHOR
@@ -291,5 +266,3 @@ L<http://www.gnu.org/licenses/>.
 =cut
 
 1; # End of Bio::RNA::RNAaliSplit
-
-

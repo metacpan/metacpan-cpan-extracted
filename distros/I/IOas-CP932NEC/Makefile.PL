@@ -1,9 +1,10 @@
 use strict;
+BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; $^W=1;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
     'NAME'      => q{IOas::CP932NEC},
-    'VERSION'   => q{0.05},
+    'VERSION'   => q{0.07},
     'ABSTRACT'  => q{provides CP932NEC I/O subroutines for UTF-8 script},
     'PREREQ_PM' => {
         'Encode' => '0',
@@ -12,7 +13,7 @@ WriteMakefile(
         'File::Copy' => '2.02',
         'File::Path' => '1.0401',
         'FindBin' => '1.42',
-        'Jacode4e::RoundTrip' => '2.13.81.7',
+        'Jacode4e::RoundTrip' => '2.13.81.8',
         'Socket' => '0',
         'Symbol' => '0',
         'lib' => '0',
@@ -20,7 +21,7 @@ WriteMakefile(
         'strict' => '1.01',
         'vars' => '0',
     },
-    'AUTHOR'    => q{ina <ina@cpan.org> in a CPAN},
+    'AUTHOR'    => q{ina <ina@cpan.org>},
 );
 
 __END__

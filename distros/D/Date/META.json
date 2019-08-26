@@ -26,20 +26,20 @@
       "configure" : {
          "requires" : {
             "CPP::panda::lib" : "v1.2.10",
-            "Time::XS" : "v3.1.7",
-            "XS::Framework" : "v1.1.8",
+            "Time::XS" : "v3.1.8",
+            "XS::Framework" : "v1.1.9",
             "XS::Install" : "v1.2.10",
-            "next::XS" : "v1.0.6"
+            "next::XS" : "v1.0.7"
          }
       },
       "runtime" : {
          "requires" : {
             "CPP::panda::lib" : "v1.2.10",
             "Export::XS" : "0",
-            "Time::XS" : "v3.1.7",
-            "XS::Framework" : "v1.1.8",
+            "Time::XS" : "v3.1.8",
+            "XS::Framework" : "v1.1.9",
             "XS::Install" : "v1.2.10",
-            "next::XS" : "v1.0.6"
+            "next::XS" : "v1.0.7"
          }
       },
       "test" : {
@@ -52,6 +52,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v4.0.1",
+   "version" : "v4.0.2",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

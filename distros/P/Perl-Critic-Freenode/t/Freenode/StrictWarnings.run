@@ -77,3 +77,9 @@ use warnings;
 use 5.10.1;
 use warnings;
 
+## name CustomImporter
+## failures 0
+## parms { extra_importers => 'MyApp::Base' }
+## cut
+
+use MyApp::Base;

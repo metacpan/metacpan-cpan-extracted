@@ -129,6 +129,10 @@ SEE ALSO
 
       * YAML::Tiny
 
+      * YAML::PP
+
+      * YAML::PP::LibYAML
+
 AUTHOR
 
     Ingy döt Net <ingy@cpan.org>

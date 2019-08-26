@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: MIDI Utilities
 
-our $VERSION = '0.0400';
+our $VERSION = '0.0401';
 
 use strict;
 use warnings;
@@ -171,7 +171,7 @@ MIDI::Util - MIDI Utilities
 
 =head1 VERSION
 
-version 0.0400
+version 0.0401
 
 =head1 SYNOPSIS
 
@@ -187,23 +187,26 @@ version 0.0400
 
 =head1 DESCRIPTION
 
-C<MIDI::Util> comprises a couple handy MIDI utilities.
+C<MIDI::Util> comprises handy MIDI utilities.
 
 =head1 FUNCTIONS
 
-=head2 setup_score()
+=head2 setup_score
 
-  $score = MIDI::Util::setup_score(
-    lead_in => 4,
-    volume  => 120,
-    bpm     => 100,
-    channel => 15,
-    patch   => 42,
-    octave  => 4,
+  $score = MIDI::Util::setup_score;  # Use defaults
+
+  $score = MIDI::Util::setup_score(  # Override defaults
+    lead_in => $beats,
+    volume  => $volume,
+    bpm     => $bpm,
+    channel => $channel,
+    patch   => $patch,
+    octave  => $octave,
   );
 
-Set basic MIDI parameters and return a L<MIDI::Simple> object.  If given a
-B<lead_in>, play a hi-hat for that many beats.
+Set basic MIDI parameters and return a L<MIDI::Simple> object.  If
+given a B<lead_in>, play a hi-hat for that many beats.  Do not
+include a B<lead_in> by passing C<0> as its value.
 
 Named parameters and defaults:
 
@@ -214,11 +217,18 @@ Named parameters and defaults:
   patch:   0
   octave:  4
 
-=head2 new_track()
+=head2 new_track
 
-  $track = MIDI::Util::new_track(%arguments);
+  $track = MIDI::Util::new_track;  # Use defaults
 
-Set the B<channel>, B<patch>, and B<tempo> and return a L<MIDI::Track> object.
+  $track = MIDI::Util::new_track(  # Override defaults
+    channel => $channel,
+    patch   => $patch,
+    tempo   => $tempo,
+  );
+
+Set the B<channel>, B<patch>, and B<tempo> and return a L<MIDI::Track>
+object.
 
 Named parameters and defaults:
 
@@ -226,9 +236,11 @@ Named parameters and defaults:
   patch:   0
   tempo:   500000
 
-=head2 set_chan_patch()
+=head2 set_chan_patch
 
-  MIDI::Util::set_chan_patch( $score, $channel, $patch );
+  MIDI::Util::set_chan_patch($score);  # Use defaults
+
+  MIDI::Util::set_chan_patch( $score, $channel, $patch );  # Override defaults
 
 Set the MIDI channel and patch.
 
@@ -238,7 +250,7 @@ Positional parameters and defaults:
   channel: 0
   patch:   0
 
-=head2 dump()
+=head2 dump
 
   $dump = MIDI::Util::dump($list_name);
 
@@ -262,7 +274,13 @@ L<MIDI::Simple>, and L<MIDI::Event> internal lists:
 
 =head1 SEE ALSO
 
+L<MIDI>
+
+L<MIDI::Event>
+
 L<MIDI::Simple>
+
+L<MIDI::Track>
 
 L<Music::Tempo>
 

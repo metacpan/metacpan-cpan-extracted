@@ -9,6 +9,7 @@ cpanfile
 lib/Telemetry/Any.pm
 minil.toml
 t/00_compile.t
+t/test.t
 xt/10-perltidy.t
 xt/20-perlcritic.t
 META.yml

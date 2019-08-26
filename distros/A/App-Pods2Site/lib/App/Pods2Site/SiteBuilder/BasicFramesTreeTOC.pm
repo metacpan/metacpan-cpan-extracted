@@ -3,6 +3,10 @@ package App::Pods2Site::SiteBuilder::BasicFramesTreeTOC;
 use strict;
 use warnings;
 
+our $VERSION = '1.002';
+my $version = $VERSION;
+$VERSION = eval $VERSION;
+
 use base qw(App::Pods2Site::SiteBuilder::AbstractBasicFrames);
 
 use App::Pods2Site::Util qw(slashify readUTF8File writeUTF8File);

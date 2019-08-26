@@ -83,57 +83,57 @@
    "provides" : {
       "Test::Count" : {
          "file" : "lib/Test/Count.pm",
-         "version" : "0.1000"
+         "version" : "0.1001"
       },
       "Test::Count::Base" : {
          "file" : "lib/Test/Count/Base.pm",
-         "version" : "0.1000"
+         "version" : "0.1001"
       },
       "Test::Count::FileMutator" : {
          "file" : "lib/Test/Count/FileMutator.pm",
-         "version" : "0.1000"
+         "version" : "0.1001"
       },
       "Test::Count::FileMutator::ByFileType::App" : {
          "file" : "lib/Test/Count/FileMutator/ByFileType/App.pm",
-         "version" : "0.1000"
+         "version" : "0.1001"
       },
       "Test::Count::FileMutator::ByFileType::Lib" : {
          "file" : "lib/Test/Count/FileMutator/ByFileType/Lib.pm",
-         "version" : "0.1000"
+         "version" : "0.1001"
       },
       "Test::Count::Filter" : {
          "file" : "lib/Test/Count/Filter.pm",
-         "version" : "0.1000"
+         "version" : "0.1001"
       },
       "Test::Count::Filter::ByFileType::App" : {
          "file" : "lib/Test/Count/Filter/ByFileType/App.pm",
-         "version" : "0.1000"
+         "version" : "0.1001"
       },
       "Test::Count::Lib" : {
          "file" : "lib/Test/Count/Lib.pm",
-         "version" : "0.1000"
+         "version" : "0.1001"
       },
       "Test::Count::Parser" : {
          "file" : "lib/Test/Count/Parser.pm",
-         "version" : "0.1000"
+         "version" : "0.1001"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/shlomif/test-count/issues"
+         "web" : "https://github.com/shlomif/perl-test-count/issues"
       },
       "homepage" : "http://metacpan.org/release/Test-Count",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/shlomif/test-count.git",
-         "web" : "https://github.com/shlomif/test-count"
+         "url" : "git://github.com/shlomif/perl-test-count.git",
+         "web" : "https://github.com/shlomif/perl-test-count"
       }
    },
-   "version" : "0.1000",
+   "version" : "0.1001",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.028001"
+         "version" : "5.028002"
       },
       "plugins" : [
          {
@@ -296,11 +296,6 @@
             "version" : "6.012"
          },
          {
-            "class" : "Dist::Zilla::Plugin::PodVersion",
-            "name" : "@Filter/PodVersion",
-            "version" : "6.012"
-         },
-         {
             "class" : "Dist::Zilla::Plugin::Test::Compile",
             "config" : {
                "Dist::Zilla::Plugin::Test::Compile" : {
@@ -384,6 +379,16 @@
                   ],
                   "plugins" : [
                      {
+                        "class" : "Pod::Weaver::Plugin::SingleEncoding",
+                        "name" : "@SHLOMIF/SingleEncoding",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Plugin::WikiDoc",
+                        "name" : "@SHLOMIF/WikiDoc",
+                        "version" : "0.093004"
+                     },
+                     {
                         "class" : "Pod::Weaver::Plugin::EnsurePod5",
                         "name" : "@CorePrep/EnsurePod5",
                         "version" : "4.015"
@@ -394,79 +399,104 @@
                         "version" : "4.015"
                      },
                      {
-                        "class" : "Pod::Weaver::Plugin::SingleEncoding",
-                        "name" : "-SingleEncoding",
-                        "version" : "4.015"
-                     },
-                     {
-                        "class" : "Pod::Weaver::Section::Generic",
-                        "name" : "NAME",
-                        "version" : "4.015"
-                     },
-                     {
                         "class" : "Pod::Weaver::Section::Version",
-                        "name" : "Version",
+                        "name" : "@SHLOMIF/Version",
                         "version" : "4.015"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Region",
-                        "name" : "prelude",
+                        "name" : "@SHLOMIF/Prelude",
                         "version" : "4.015"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
-                        "name" : "SYNOPSIS",
+                        "name" : "@SHLOMIF/Synopsis",
                         "version" : "4.015"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
-                        "name" : "DESCRIPTION",
+                        "name" : "@SHLOMIF/Description",
                         "version" : "4.015"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
-                        "name" : "OVERVIEW",
+                        "name" : "@SHLOMIF/Usage",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Generic",
+                        "name" : "@SHLOMIF/Overview",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Generic",
+                        "name" : "@SHLOMIF/Stability",
                         "version" : "4.015"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Collect",
-                        "name" : "ATTRIBUTES",
+                        "name" : "Requirements",
                         "version" : "4.015"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Collect",
-                        "name" : "METHODS",
+                        "name" : "Attributes",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Collect",
+                        "name" : "Constructors",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Collect",
+                        "name" : "Methods",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Collect",
+                        "name" : "Functions",
                         "version" : "4.015"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Leftovers",
-                        "name" : "Leftovers",
+                        "name" : "@SHLOMIF/Leftovers",
                         "version" : "4.015"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Region",
-                        "name" : "postlude",
-                        "version" : "4.015"
-                     },
-                     {
-                        "class" : "Pod::Weaver::Section::Authors",
-                        "name" : "Authors",
-                        "version" : "4.015"
-                     },
-                     {
-                        "class" : "Pod::Weaver::Section::Legal",
-                        "name" : "Legal",
-                        "version" : "4.015"
-                     },
-                     {
-                        "class" : "Pod::Weaver::Section::Bugs",
-                        "name" : "Bugs",
+                        "name" : "@SHLOMIF/postlude",
                         "version" : "4.015"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Support",
-                        "name" : "Support",
+                        "name" : "@SHLOMIF/Support",
                         "version" : "1.010"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Authors",
+                        "name" : "@SHLOMIF/Authors",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Bugs",
+                        "name" : "@SHLOMIF/Bugs",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Contributors",
+                        "name" : "@SHLOMIF/Contributors",
+                        "version" : "0.009"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Legal",
+                        "name" : "@SHLOMIF/Legal",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Plugin::Transformer",
+                        "name" : "@SHLOMIF/List",
+                        "version" : "4.015"
                      }
                   ]
                }
@@ -598,7 +628,7 @@
          "version" : "6.012"
       }
    },
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
+   "x_generated_by_perl" : "v5.28.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
 }
 

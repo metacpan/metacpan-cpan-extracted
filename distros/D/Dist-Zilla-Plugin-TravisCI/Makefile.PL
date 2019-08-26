@@ -16,17 +16,18 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Dist::Zilla::Plugin::TravisCI",
   "PREREQ_PM" => {
-    "Beam::Emitter" => 0,
     "Beam::Event" => 0,
     "Dist::Zilla" => "4.300034",
     "YAML" => "1.14"
   },
   "TEST_REQUIRES" => {
+    "Dist::Zilla::Plugin::Beam::Connector" => 0,
     "Path::Tiny" => "0.012",
     "Test::DZil" => 0,
-    "Test::More" => 0
+    "Test::More" => 0,
+    "Test::Requires" => 0
   },
-  "VERSION" => "0.011",
+  "VERSION" => "0.013",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -34,12 +35,13 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Beam::Emitter" => 0,
   "Beam::Event" => 0,
   "Dist::Zilla" => "4.300034",
+  "Dist::Zilla::Plugin::Beam::Connector" => 0,
   "Path::Tiny" => "0.012",
   "Test::DZil" => 0,
   "Test::More" => 0,
+  "Test::Requires" => 0,
   "YAML" => "1.14"
 );
 

@@ -1,5 +1,5 @@
 package XML::Grammar::Fortune::ToText;
-$XML::Grammar::Fortune::ToText::VERSION = '0.0701';
+$XML::Grammar::Fortune::ToText::VERSION = '0.0702';
 use warnings;
 use strict;
 
@@ -762,7 +762,7 @@ XML::Grammar::Fortune::ToText - convert the FortunesXML grammar to plaintext.
 
 =head1 VERSION
 
-version 0.0701
+version 0.0702
 
 =head1 SYNOPSIS
 
@@ -780,10 +780,6 @@ version 0.0701
     $converter->run();
 
     close($out_fh);
-
-=head1 VERSION
-
-version 0.0701
 
 =head1 FUNCTIONS
 
@@ -893,7 +889,7 @@ This is free software, licensed under:
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/xml-grammar-fortune/issues>
+L<https://github.com/shlomif/fortune-xml/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -1002,8 +998,8 @@ The code is open to the world, and available for you to hack on. Please feel fre
 with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
 from your repository :)
 
-L<https://github.com/shlomif/xml-grammar-fortune>
+L<https://github.com/shlomif/fortune-xml>
 
-  git clone git://github.com/shlomif/xml-grammar-fortune.git
+  git clone git://github.com/shlomif/fortune-xml.git
 
 =cut

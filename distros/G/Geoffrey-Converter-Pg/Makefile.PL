@@ -19,7 +19,6 @@ WriteMakefile(
     },
     PREREQ_PM => {
         'Geoffrey'        => 0.000103,
-        'DBD::Pg'         => 0,
         'Readonly'        => 0,
         'Test::Exception' => 0,
     },

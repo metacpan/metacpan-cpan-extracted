@@ -6,7 +6,7 @@ use XML::NamespaceSupport;
 
 use strict;
 
-our $VERSION = '4.08';
+our $VERSION = '4.09';
 
 =pod
 

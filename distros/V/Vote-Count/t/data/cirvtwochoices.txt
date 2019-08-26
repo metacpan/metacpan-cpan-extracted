@@ -1,3 +1,4 @@
+# Has 2 stronger choices. see tweedle for 2 equal choices
 :CHOICES:TWINKIE:KRIMPET:HOHO:SUZIEQ:YODEL:DEVILDOG:RINGDING
 51:TWINKIE
 36:TWINKIE:HOHO

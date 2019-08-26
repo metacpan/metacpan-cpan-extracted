@@ -1,5 +1,5 @@
 package TAP::Parser::SourceHandler::Feature;
-$TAP::Parser::SourceHandler::Feature::VERSION = '0.57';
+$TAP::Parser::SourceHandler::Feature::VERSION = '0.58';
 use strict;
 use warnings;
 
@@ -86,7 +86,7 @@ sub make_iterator {
     my $pid = fork;
     if ($pid) {
         close $output_fh;
-        return TAP::Parser::Iterator::PherkinStream->new($input_fh, $pherkin);
+        return TAP::Parser::Iterator::PherkinStream->new($input_fh, $pherkin, $pid);
     }
 
     close $input_fh;

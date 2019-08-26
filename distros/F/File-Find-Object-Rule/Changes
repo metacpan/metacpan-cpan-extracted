@@ -1,6 +1,9 @@
 Changes Log for File-Find-Object-Rule:
 --------------------------------------
 
+0.0311  2019-08-23
+    - Moved the VCS repo to https://github.com/shlomif/perl-file-find-object-rule .
+
 0.0310  2019-04-05
     - Fully qualified shebang for findorule (thanks to mageia linux)
     - Enable tidyall in dist.ini.

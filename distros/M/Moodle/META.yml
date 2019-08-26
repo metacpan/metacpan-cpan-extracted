@@ -4,7 +4,7 @@ author:
   - 'Al Newkirk <awncorp@cpan.org>'
 build_requires:
   Data::Object: '0.99'
-  Doodle: '0.04'
+  Doodle: '0.05'
   perl: '5.014'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -17,12 +17,12 @@ meta-spec:
 name: Moodle
 requires:
   Data::Object: '0.99'
-  Doodle: '0.04'
+  Doodle: '0.05'
   perl: '5.014'
 resources:
   bugtracker: https://github.com/iamalnewkirk/moodle/issues
   repository: git://github.com/iamalnewkirk/moodle.git
-version: '0.01'
+version: '0.03'
 x_authority: cpan:AWNCORP
 x_contributors:
   - 'Al Newkirk <al@iamalnewkirk.com>'

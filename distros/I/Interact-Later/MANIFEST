@@ -11,6 +11,7 @@ minil.toml
 script/server
 script/server.conf
 t/02-create_cache_files.t
+t/03_get_cache_files.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

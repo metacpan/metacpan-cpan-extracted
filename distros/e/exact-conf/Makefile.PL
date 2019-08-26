@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010;
+use 5.014;
 
 use ExtUtils::MakeMaker;
 
@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "exact-conf",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.010",
+  "MIN_PERL_VERSION" => "5.014",
   "NAME" => "exact::conf",
   "PREREQ_PM" => {
     "Config::App" => 0,
@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     "Test::Most" => 0,
     "warnings" => 0
   },
-  "VERSION" => "1.01",
+  "VERSION" => "1.03",
   "test" => {
     "TESTS" => "t/*.t"
   }

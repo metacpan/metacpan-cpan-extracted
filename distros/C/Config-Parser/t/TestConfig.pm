@@ -32,22 +32,25 @@ Key arguments:
 sub new {
     my $class = shift;
     local %_ = @_;
-
-    my $file = new File::Temp(UNLINK => 1);
-    if (defined(my $text = delete $_{text})) {
-	print $file $text;
-    } else {
-	while (<main::DATA>) {
-	    print $file $_;
+    my $file;
+    
+    if (fileno(\*main::DATA)) {
+	$file = new File::Temp(UNLINK => 1);
+	if (defined(my $text = delete $_{text})) {
+	    print $file $text;
+	} else {
+	    while (<main::DATA>) {
+		print $file $_;
+	    }
 	}
+        close $file;
     }
-    close $file;
 
     my $exp = delete $_{expect};
     # FIXME: Filter out fh and line keywords?
     my $self = $class->SUPER::new(%_);
     $self->{_expected_errors} = $exp if $exp;
-    if (-s $file->filename) {
+    if ($file && -s $file->filename) {
 	$self->parse($file->filename);
 	$self->{_status} = $self->commit;
     } else {
@@ -68,6 +71,11 @@ sub success {
 sub canonical {
     my $self = shift;
     return $self->SUPER::canonical(delim => ' ');
+}
+
+sub canonical_lexicon {
+    my $self = shift;
+    Data::Dumper->new([$self->lexicon])->Terse(1)->Sortkeys(1)->Useqq(1)->Indent(0)->Dump;
 }
 
 sub expected_error {

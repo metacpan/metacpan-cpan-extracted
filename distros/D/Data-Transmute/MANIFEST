@@ -6,9 +6,9 @@ META.json
 META.yml
 Makefile.PL
 README
-devscripts/bench
 dist.ini
 lib/Data/Transmute.pm
+lib/Data/Transmute/Rules/Example.pm
 t/00-compile.t
 t/01-basics.t
 t/author-critic.t

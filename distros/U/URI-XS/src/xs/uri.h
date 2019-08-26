@@ -24,16 +24,16 @@ namespace xs {
     template <class TYPE> struct Typemap<panda::uri::URI*, TYPE> : TypemapObject<panda::uri::URI*, TYPE, ObjectTypeRefcntPtr, ObjectStorageMGBackref, DynamicCast> {
         static panda::string_view package () { return "URI::XS"; }
 
-        static Sv create (pTHX_ const TYPE& var, const Sv& proto = Sv()) {
-            auto ret = TypemapObject<panda::uri::URI*, TYPE, ObjectTypeRefcntPtr, ObjectStorageMGBackref, DynamicCast>::create(aTHX_ var, proto);
+        static Sv create (const TYPE& var, const Sv& proto = Sv()) {
+            auto ret = TypemapObject<panda::uri::URI*, TYPE, ObjectTypeRefcntPtr, ObjectStorageMGBackref, DynamicCast>::create(var, proto);
             xs::uri::data_attach(ret);
             return ret;
         }
     };
 
     template <> struct Typemap<xs::uri::URIx> : Typemap<panda::uri::URI*> {
-        static Sv out (pTHX_ xs::uri::URIx var, const Sv& = Sv()) {
-            return Typemap<panda::uri::URI*>::out(aTHX_ var, xs::uri::get_perl_class(var));
+        static Sv out (xs::uri::URIx var, const Sv& = Sv()) {
+            return Typemap<panda::uri::URI*>::out(var, xs::uri::get_perl_class(var));
         }
     };
 

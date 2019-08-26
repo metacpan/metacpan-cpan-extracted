@@ -1,25 +1,25 @@
 package XML::RSS::Private::Output::V0_91;
-$XML::RSS::Private::Output::V0_91::VERSION = '1.60';
+$XML::RSS::Private::Output::V0_91::VERSION = '1.61';
 use strict;
 use warnings;
 
 use vars (qw(@ISA));
 
-use XML::RSS::Private::Output::Base;
-use XML::RSS::Private::Output::Roles::ImageDims;
+use XML::RSS::Private::Output::Base             ();
+use XML::RSS::Private::Output::Roles::ImageDims ();
 
-@ISA = (qw(
-    XML::RSS::Private::Output::Roles::ImageDims
-    XML::RSS::Private::Output::Base
-    )
+@ISA = (
+    qw(
+      XML::RSS::Private::Output::Roles::ImageDims
+      XML::RSS::Private::Output::Base
+      )
 );
 
-sub _get_rdf_decl
-{
+sub _get_rdf_decl {
     return
-    qq{<!DOCTYPE rss PUBLIC "-//Netscape Communications//DTD RSS 0.91//EN"\n} .
-    qq{            "http://www.rssboard.org/rss-0.91.dtd">\n\n} .
-    qq{<rss version="0.91">\n\n};
+        qq{<!DOCTYPE rss PUBLIC "-//Netscape Communications//DTD RSS 0.91//EN"\n}
+      . qq{            "http://www.rssboard.org/rss-0.91.dtd">\n\n}
+      . qq{<rss version="0.91">\n\n};
 }
 
 sub _calc_lastBuildDate {
@@ -61,7 +61,7 @@ __END__
 
 =head1 VERSION
 
-version 1.60
+version 1.61
 
 =head1 AUTHOR
 

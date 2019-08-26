@@ -44,21 +44,3 @@ Currently maintained by Tim Jenness.
 Copyright (C) 1998 - 2012 Tim Jenness. All Rights Reserved.  This program is free
 software; you can redistribute it and/or modify it under the same
 terms as Perl itself.
-
-Changes
--------
-
-  v1.05  - Check that the HISTORY component is present before reading.
-         - Pass ndimx=7 to dat_shape as this is the maximum allowed.
-
-  v1.04  - Extracted from PDL distribution and released standalone.
-         - Uses Module::Build
-         - Fixes to bad value support.
-         - FITS header parsing now done by Astro::FITS::Header
-         - Status handling much improved.
-         - Add quickread option to rndf that only reads the primary
-           data array and FITS header.
-
-  v1.03  - Bad value support added by Doug Burke
-
-

@@ -5,9 +5,9 @@ use parent 'Config::AST';
 use Carp;
 use Cwd qw(abs_path);
 use Text::ParseWords;
-use Class::Inspector;
+use mro;
 
-our $VERSION = "1.00";
+our $VERSION = "1.03";
 
 sub new {
     my $class = shift;
@@ -30,10 +30,11 @@ sub new {
 	$self->lexicon($lex);
     } else {
 	$self->lexicon({ '*' => '*' });
-	my $subs = Class::Inspector->subclasses(__PACKAGE__);
+	my @cl = grep { $_ ne __PACKAGE__ && $_->isa(__PACKAGE__) }
+	          reverse @{mro::get_linear_isa($class)};
 	my $dict;
-	if ($subs) {
-	    foreach my $c (@$subs) {
+	if (@cl) {
+	    foreach my $c (@cl) {
 	        if (my ($file, $line, $data) = $c->findsynt) {
 		    my $d = $self->loadsynt($file, $line, $data);
 		    if ($d) {
@@ -76,9 +77,8 @@ sub findsynt {
     open FILE, $file or croak "Can't open $file";
     my ($text, $data) = split /(?m)^__DATA__$/, <FILE>, 2;
     close FILE;
-
-    return () unless $data;
-    return ($file, 1+($text =~ tr/\n//), $data);
+    return ($file, 1+($text =~ tr/\n//), $data) if $data;
+    return ();
 }
 
 sub loadsynt {
@@ -112,6 +112,8 @@ sub loadsynt {
 		    $ret->{re} = '^[0-7]+$';
 		} elsif ($val eq 'HEX') {
 		    $ret->{re} = '^([0-9][A-Fa-f])+$';
+		} elsif ($val =~ /^BOOL(EAN)?$/) {
+		    $ret->{check} = \&check_bool;
 		} else {
 		    unshift @words, $val;
 		}
@@ -140,6 +142,29 @@ sub loadsynt {
 	}
     }
     return $lex;
+}
+
+sub check_bool {
+    my ($self, $valref, undef, $locus) = @_;
+    my %bv = (
+	yes => 1,
+	no => 0,
+	true => 1,
+	false => 0,
+	on => 1,
+	off => 0,
+	t => 1,
+	nil => 0,
+	1 => 1,
+	0 => 0
+    );
+    
+    if (exists($bv{$$valref})) {
+	$$valref = $bv{$$valref};
+	return 1;
+    }
+    $self->error("$$valref is not a valid boolean value", locus => $locus);
+    return 0;
 }
 
 1;
@@ -202,7 +227,7 @@ This call first parses the B<__DATA__> section and builds validation rules,
 then it parses the actual configuration from B<$filename>.  Finally, it
 applies the validation rules to the created syntax tree.  If all rules pass,
 the configuration is correct and the constructor returns a valid object.
-Otherwise, it issues proper diagnostics and returns B<undef>.
+Otherwise, it issues proper diagnostics and croaks.
 
 Upon successful return, the B<$cf> object is used to obtain the actual
 configuration values as needed.
@@ -229,9 +254,12 @@ Creates a new parser object.  Keyword arguments are:
 
 =item B<filename>
 
-Name of the file to parse.  If not supplied, you will have to
-call the B<$cfg-E<gt>parse> method explicitly after you are returned a
-valid B<$cfg>.
+Name of the file to parse.  If supplied, the constructor will call
+the B<parse> and B<commit> methods automatically and will croak if
+the latter returns false.  The B<parse> method is given B<filename>,
+B<line> and B<fh> keyword-value pairs (if present) as its arguments.
+
+If not supplied, the caller is supposed to call both methods later.
 
 =item B<line>
 
@@ -239,10 +267,14 @@ Optional line where the configuration starts in B<filename>.  It is used to
 keep track of statement location in the file for correct diagnostics.  If
 not supplied, B<1> is assumed.
 
+Valid only together with B<filename>.
+
 =item B<fh>
 
 File handle to read from.  If it is not supplied, new handle will be
 created by using B<open> on the supplied filename.
+
+Valid only together with B<filename>.
 
 =item B<lexicon>
 
@@ -329,6 +361,12 @@ Octal number.
 
 Hex number.
 
+=item B<BOOL> or B<BOOLEAN>
+
+Boolean value.  Allowed values are:
+B<yes>, B<true>, B<on>, B<t>, B<1>, for C<true> and
+B<no>, B<false>, B<off>, B<nil>, B<0>, for C<false>.
+
 =back
 
 If the data type is omitted, no checking is performed unless specified
@@ -380,7 +418,7 @@ whether to apply this definition.  The method will be called as
   $cfg->{ \$method }($node, @path)
 
 where $node is the B<Config::AST::Node::Value> object (use
-B<$vref-E<gt>value>, to obtain the actual value), and B<@path> is its patname.
+B<$vref-E<gt>value>, to obtain the actual value), and B<@path> is its pathname.
 
 =item B<:check = >I<method>
 
@@ -403,6 +441,16 @@ and return 0.
 To specify options for a section, use the reserved keyword B<__options__>.
 Its value is the list of options as described above.  After processing, the
 keyword itself is removed from the lexicon.
+
+=head1 OTHER METHODS
+
+=head2 $cfg->check($valref, $prev, $locus)
+
+This method implements syntax checking and translation for C<BOOLEAN> data
+types.  If B<$$valref> is one of the valid boolean values (as described
+above), it translates it to B<1> or B<0>, stores that value in B<$valref>,
+and returns 1.  Otherwise, it emits error message using B<$cfg->error> and
+returns 0.
 
 =head1 SEE ALSO
 

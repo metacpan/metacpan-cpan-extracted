@@ -32,6 +32,11 @@ sub load_and_merge {
   $self;
 }
 
+sub features {
+    my $self = shift;
+    map $self->feature($_), sort $self->{_prereqs}->identifiers;  # TWEAKED
+}
+
 sub _merge_prereqs {
   my ($self, $prereqs, $feature_id) = @_;
   $prereqs = $prereqs->as_string_hash unless ref $prereqs eq 'HASH';

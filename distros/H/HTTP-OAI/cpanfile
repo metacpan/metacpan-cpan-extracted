@@ -15,3 +15,4 @@ requires 'URI' , '0';
 requires 'HTTP::Request' , '0';
 requires 'HTTP::Response', '0';
 requires 'LWP::UserAgent', '0';
+requires 'Module::Build', '>=0.4229'; # travis ci

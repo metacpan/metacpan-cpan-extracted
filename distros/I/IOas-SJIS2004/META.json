@@ -1,6 +1,6 @@
 {
     "name" : "IOas-SJIS2004",
-    "version" : "0.05",
+    "version" : "0.07",
     "abstract" : "provides SJIS2004 I/O subroutines for UTF-8 script",
     "author" : [
         "ina <ina@cpan.org>"
@@ -32,7 +32,7 @@
                 "File::Copy" : "2.02",
                 "File::Path" : "1.0401",
                 "FindBin" : "1.42",
-                "Jacode4e::RoundTrip" : "2.13.81.7",
+                "Jacode4e::RoundTrip" : "2.13.81.8",
                 "Socket" : "0",
                 "Symbol" : "0",
                 "lib" : "0",
@@ -49,7 +49,7 @@
                 "File::Copy" : "2.02",
                 "File::Path" : "1.0401",
                 "FindBin" : "1.42",
-                "Jacode4e::RoundTrip" : "2.13.81.7",
+                "Jacode4e::RoundTrip" : "2.13.81.8",
                 "Socket" : "0",
                 "Symbol" : "0",
                 "lib" : "0",
@@ -66,7 +66,7 @@
                 "File::Copy" : "2.02",
                 "File::Path" : "1.0401",
                 "FindBin" : "1.42",
-                "Jacode4e::RoundTrip" : "2.13.81.7",
+                "Jacode4e::RoundTrip" : "2.13.81.8",
                 "Socket" : "0",
                 "Symbol" : "0",
                 "lib" : "0",

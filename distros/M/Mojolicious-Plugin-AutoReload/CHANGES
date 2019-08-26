@@ -1,5 +1,18 @@
 Changelog for Mojolicious-Plugin-AutoReload
 
+0.005     2019-08-21 18:16:51-05:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed fatal error when adding autoreload to a page containing HTML
+      entities that point to multi-byte characters.
+
+            Mojo::Reactor::Poll: I/O watcher failed: Wide character in
+            subroutine entry
+
+      The plugin also no longer needs to parse the page DOM, so it
+      should be faster.
+
 0.004     2018-12-31 21:14:53-06:00 America/Chicago
 
     [Added]

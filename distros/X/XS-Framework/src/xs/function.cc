@@ -15,7 +15,7 @@ static bool init () {
 }
 static const bool _init = init();
 
-static void XS_function_call (pTHX_ CV* cv) { xs::throw_guard(aTHX_ cv, [aTHX_ cv](){
+static void XS_function_call (pTHX_ CV* cv) { xs::throw_guard(cv, [=](){
     dVAR; dXSARGS;
     SP -= items;
     Sub sub(cv);

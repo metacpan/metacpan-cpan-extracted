@@ -69,37 +69,37 @@
    "provides" : {
       "Error" : {
          "file" : "lib/Error.pm",
-         "version" : "0.17027"
+         "version" : "0.17028"
       },
       "Error::Simple" : {
-         "file" : "lib/Error.pm",
-         "version" : "0.17027"
+         "file" : "lib/Error/Simple.pm",
+         "version" : "0.17028"
       },
       "Error::WarnDie" : {
          "file" : "lib/Error.pm",
-         "version" : "0.17027"
+         "version" : "0.17028"
       },
       "Error::subs" : {
          "file" : "lib/Error.pm",
-         "version" : "0.17027"
+         "version" : "0.17028"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/shlomif/error/issues"
+         "web" : "https://github.com/shlomif/perl-error.pm/issues"
       },
       "homepage" : "http://metacpan.org/release/Error",
       "repository" : {
          "type" : "git",
-         "url" : "https://bitbucket.org/shlomif/perl-error.pm",
-         "web" : "https://github.com/shlomif/error"
+         "url" : "git://github.com/shlomif/perl-error.pm.git",
+         "web" : "https://github.com/shlomif/perl-error.pm"
       }
    },
-   "version" : "0.17027",
+   "version" : "0.17028",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.028000"
+         "version" : "5.028002"
       },
       "plugins" : [
          {
@@ -267,11 +267,6 @@
             "version" : "6.012"
          },
          {
-            "class" : "Dist::Zilla::Plugin::PodVersion",
-            "name" : "@Filter/PodVersion",
-            "version" : "6.012"
-         },
-         {
             "class" : "Dist::Zilla::Plugin::Test::Compile",
             "config" : {
                "Dist::Zilla::Plugin::Test::Compile" : {
@@ -372,11 +367,6 @@
                      {
                         "class" : "Pod::Weaver::Plugin::H1Nester",
                         "name" : "@CorePrep/H1Nester",
-                        "version" : "4.015"
-                     },
-                     {
-                        "class" : "Pod::Weaver::Section::Name",
-                        "name" : "@SHLOMIF/Name",
                         "version" : "4.015"
                      },
                      {
@@ -568,7 +558,7 @@
          "version" : "6.012"
       }
    },
-   "x_generated_by_perl" : "v5.28.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
+   "x_generated_by_perl" : "v5.28.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
 }
 

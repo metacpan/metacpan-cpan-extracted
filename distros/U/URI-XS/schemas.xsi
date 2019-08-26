@@ -7,7 +7,7 @@ BOOT {
 
 string URI::UserPass::user (SV* newval = NULL) {
     if (newval) {
-        THIS->user(xs::in<string>(aTHX_ newval));
+        THIS->user(xs::in<string>(newval));
         XSRETURN_UNDEF;
     }
     RETVAL = THIS->user();
@@ -15,7 +15,7 @@ string URI::UserPass::user (SV* newval = NULL) {
 
 string URI::UserPass::password (SV* newval = NULL) {
     if (newval) {
-        THIS->password(xs::in<string>(aTHX_ newval));
+        THIS->password(xs::in<string>(newval));
         XSRETURN_UNDEF;
     }
     RETVAL = THIS->password();
@@ -27,12 +27,12 @@ PROTOTYPES: DISABLE
 BOOT {
     Stash s(__PACKAGE__, GV_ADD);
     s.inherit(__MODULE__);
-    register_perl_scheme(aTHX_ "http", s.name());
+    register_perl_scheme("http", s.name());
 }
 
 URI::http* new (SV* CLASS, string url = string(), ...) {
     RETVAL = make_backref<URI::http>(url);
-    add_query_args(aTHX_ RETVAL, MARK+3, items-2);
+    add_query_args(RETVAL, MARK+3, items-2);
     PROTO = CLASS;
 }    
 
@@ -42,12 +42,12 @@ PROTOTYPES: DISABLE
 BOOT {
     Stash s(__PACKAGE__, GV_ADD);
     s.inherit("URI::XS::http");
-    register_perl_scheme(aTHX_ "https", s.name());
+    register_perl_scheme("https", s.name());
 }
 
 URI::https* new (SV* CLASS, string url = string(), ...) {
     RETVAL = make_backref<URI::https>(url);
-    add_query_args(aTHX_ RETVAL, MARK+3, items-2);
+    add_query_args(RETVAL, MARK+3, items-2);
     PROTO = CLASS;
 }    
 
@@ -57,7 +57,7 @@ PROTOTYPES: DISABLE
 BOOT {
     Stash s(__PACKAGE__, GV_ADD);
     s.inherit("URI::XS::UserPass");
-    register_perl_scheme(aTHX_ "ftp", s.name());
+    register_perl_scheme("ftp", s.name());
 }
 
 URI::ftp* new (SV* CLASS, string url = string(), int flags = 0) {
@@ -71,7 +71,7 @@ PROTOTYPES: DISABLE
 BOOT {
     Stash s(__PACKAGE__, GV_ADD);
     s.inherit("URI::XS::UserPass");
-    register_perl_scheme(aTHX_ "socks", s.name());
+    register_perl_scheme("socks", s.name());
 }
 
 URI::socks* new (SV* CLASS, string url = string(), int flags = 0) {

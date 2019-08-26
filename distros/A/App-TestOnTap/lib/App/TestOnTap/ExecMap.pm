@@ -3,6 +3,10 @@ package App::TestOnTap::ExecMap;
 use strict;
 use warnings;
 
+our $VERSION = '1.001';
+my $version = $VERSION;
+$VERSION = eval $VERSION;
+
 use App::TestOnTap::Util qw(trim $IS_WINDOWS ensureArray);
 
 use Grep::Query;

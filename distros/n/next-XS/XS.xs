@@ -102,7 +102,7 @@ static void optimize (pTHX_ OP* op, OP* (*pp_method)(pTHX), OP* (*pp_sub)(pTHX),
 static OP* ppm_nextcan (pTHX) {
     PL_stack_sp = PL_stack_base + TOPMARK + 1;
     CV* sub;
-    _TRYNEXT({ sub = xs::next::method(aTHX_ proto_stash(aTHX_ *PL_stack_sp)); });
+    _TRYNEXT({ sub = xs::next::method(proto_stash(aTHX_ *PL_stack_sp)); });
     *PL_stack_sp = sub ? sv_2mortal(newRV((SV*)sub)) : &PL_sv_undef;
     return PL_op->op_next->op_next; // skip ENTERSUB
 }
@@ -111,7 +111,7 @@ static OP* ppm_nextcan (pTHX) {
 static OP* pps_nextcan (pTHX) {
     PL_stack_sp = PL_stack_base + TOPMARK + 1;
     CV* sub;
-    _TRYNEXT({ sub = xs::next::method(aTHX_ proto_stash(aTHX_ *PL_stack_sp)); });
+    _TRYNEXT({ sub = xs::next::method(proto_stash(aTHX_ *PL_stack_sp)); });
     *PL_stack_sp = sub ? sv_2mortal(newRV((SV*)sub)) : &PL_sv_undef;
     return PL_op->op_next;
 }
@@ -119,7 +119,7 @@ static OP* pps_nextcan (pTHX) {
 // $self->next::method
 static OP* ppm_next (pTHX) {
     CV* sub;
-    _TRYNEXT({ sub = xs::next::method_strict(aTHX_ proto_stash(aTHX_ PL_stack_base[TOPMARK+1])); });
+    _TRYNEXT({ sub = xs::next::method_strict(proto_stash(aTHX_ PL_stack_base[TOPMARK+1])); });
     PP_METHOD_EXEC(sub);
 }
 
@@ -127,14 +127,14 @@ static OP* ppm_next (pTHX) {
 static OP* pps_next (pTHX) {
     dSP;
     CV* sub;
-    _TRYNEXT({ sub = xs::next::method_strict(aTHX_ proto_stash(aTHX_ PL_stack_base[TOPMARK+1])); });
+    _TRYNEXT({ sub = xs::next::method_strict(proto_stash(aTHX_ PL_stack_base[TOPMARK+1])); });
     PP_SUB_EXEC(sub);
 }
 
 // $self->maybe::next::method
 static OP* ppm_next_maybe (pTHX) {
     CV* sub;
-    _TRYNEXT({ sub = xs::next::method(aTHX_ proto_stash(aTHX_ PL_stack_base[TOPMARK+1])); });
+    _TRYNEXT({ sub = xs::next::method(proto_stash(aTHX_ PL_stack_base[TOPMARK+1])); });
     PP_METHOD_MAYBE_EXEC(sub);
 }
 
@@ -142,14 +142,14 @@ static OP* ppm_next_maybe (pTHX) {
 static OP* pps_next_maybe (pTHX) {
     dSP;
     CV* sub;
-    _TRYNEXT({ sub = xs::next::method(aTHX_ proto_stash(aTHX_ PL_stack_base[TOPMARK+1])); });
+    _TRYNEXT({ sub = xs::next::method(proto_stash(aTHX_ PL_stack_base[TOPMARK+1])); });
     PP_SUB_MAYBE_EXEC(sub);
 }
 
 // $self->super::subname
 static OP* ppm_super (pTHX) {
     CV* sub;
-    _TRYNEXT({ sub = xs::super::method_strict(aTHX_ proto_stash(aTHX_ PL_stack_base[TOPMARK+1]), (GV*)cMETHOPx_rclass(PL_op)); });
+    _TRYNEXT({ sub = xs::super::method_strict(proto_stash(aTHX_ PL_stack_base[TOPMARK+1]), (GV*)cMETHOPx_rclass(PL_op)); });
     PP_METHOD_EXEC(sub);
 }
 
@@ -157,14 +157,14 @@ static OP* ppm_super (pTHX) {
 static OP* pps_super (pTHX) {
     dSP;
     CV* sub;
-    _TRYNEXT({ sub = xs::super::method_strict(aTHX_ proto_stash(aTHX_ PL_stack_base[TOPMARK+1]), (GV*)TOPs); });
+    _TRYNEXT({ sub = xs::super::method_strict(proto_stash(aTHX_ PL_stack_base[TOPMARK+1]), (GV*)TOPs); });
     PP_SUB_EXEC(sub);
 }
 
 // $self->super::maybe::subname
 static OP* ppm_super_maybe (pTHX) {
     CV* sub;
-    _TRYNEXT({ sub = xs::super::method(aTHX_ proto_stash(aTHX_ PL_stack_base[TOPMARK+1]), (GV*)cMETHOPx_rclass(PL_op)); });
+    _TRYNEXT({ sub = xs::super::method(proto_stash(aTHX_ PL_stack_base[TOPMARK+1]), (GV*)cMETHOPx_rclass(PL_op)); });
     PP_METHOD_MAYBE_EXEC(sub);
 }
 
@@ -172,7 +172,7 @@ static OP* ppm_super_maybe (pTHX) {
 static OP* pps_super_maybe (pTHX) {
     dSP;
     CV* sub;
-    _TRYNEXT({ sub = xs::super::method(aTHX_ proto_stash(aTHX_ PL_stack_base[TOPMARK+1]), (GV*)TOPs); });
+    _TRYNEXT({ sub = xs::super::method(proto_stash(aTHX_ PL_stack_base[TOPMARK+1]), (GV*)TOPs); });
     PP_SUB_MAYBE_EXEC(sub);
 }
 
@@ -202,10 +202,10 @@ static void super_xsub (pTHX_ CV* cv) {
     CV* sub;
     if (ix == 0) { // super
         optimize(aTHX_ PL_op, &ppm_super, &pps_super, cv, context);
-        _TRYNEXT({ sub = xs::super::method_strict(aTHX_ proto_stash(aTHX_ proto), context); });
+        _TRYNEXT({ sub = xs::super::method_strict(proto_stash(aTHX_ proto), context); });
     } else { // super::maybe
         optimize(aTHX_ PL_op, &ppm_super_maybe, &pps_super_maybe, cv, context);
-        _TRYNEXT({ sub = xs::super::method(aTHX_ proto_stash(aTHX_ proto), context); });
+        _TRYNEXT({ sub = xs::super::method(proto_stash(aTHX_ proto), context); });
         if (!sub) XSRETURN_EMPTY;
     }
     
@@ -231,7 +231,7 @@ PROTOTYPES: DISABLE
 SV* can (SV* proto) {
     optimize(aTHX_ PL_op, &ppm_nextcan, &pps_nextcan, cv);
     CV* sub;
-    _TRYNEXT({ sub = xs::next::method(aTHX_ proto_stash(aTHX_ proto)); });
+    _TRYNEXT({ sub = xs::next::method(proto_stash(aTHX_ proto)); });
     RETVAL = sub ? newRV((SV*)sub) : &PL_sv_undef;
 }
 
@@ -239,7 +239,7 @@ void method (SV* proto, ...) {
     optimize(aTHX_ PL_op, &ppm_next, &pps_next, cv);
     
     CV* sub;
-    _TRYNEXT({ sub = xs::next::method_strict(aTHX_ proto_stash(aTHX_ proto)); });
+    _TRYNEXT({ sub = xs::next::method_strict(proto_stash(aTHX_ proto)); });
     
     ENTER;
     PUSHMARK(SP);
@@ -255,7 +255,7 @@ void method (SV* proto, ...) {
     optimize(aTHX_ PL_op, &ppm_next_maybe, &pps_next_maybe, cv);
     
     CV* sub;
-    _TRYNEXT({ sub = xs::next::method(aTHX_ proto_stash(aTHX_ proto)); });
+    _TRYNEXT({ sub = xs::next::method(proto_stash(aTHX_ proto)); });
     if (!sub) XSRETURN_EMPTY;
     
     ENTER;

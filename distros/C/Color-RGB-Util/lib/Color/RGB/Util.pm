@@ -1,7 +1,7 @@
 package Color::RGB::Util;
 
-our $DATE = '2019-07-17'; # DATE
-our $VERSION = '0.597'; # VERSION
+our $DATE = '2019-08-20'; # DATE
+our $VERSION = '0.599'; # VERSION
 
 use 5.010001;
 use strict;
@@ -22,6 +22,8 @@ our @EXPORT_OK = qw(
                        rand_rgb_colors
                        reverse_rgb_color
                        rgb2grayscale
+                       rgb2hsv
+                       rgb2hsl
                        rgb2int
                        rgb2sepia
                        rgb_diff
@@ -33,6 +35,10 @@ our @EXPORT_OK = qw(
                );
 
 my $re_rgb = qr/\A#?([0-9A-Fa-f]{2})([0-9A-Fa-f]{2})([0-9A-Fa-f]{2})\z/;
+
+sub _min {
+    $_[0] < $_[1] ? $_[0] : $_[1];
+}
 
 sub assign_rgb_color {
     require Digest::SHA;
@@ -140,7 +146,7 @@ sub rand_rgb_colors {
 
     my @res;
     while (@res < $num) {
-        my $attempt = 0;
+        my $num_attempts = 0;
         my $rgb;
         while (1) {
             $rgb = rand_rgb_color();
@@ -159,7 +165,7 @@ sub rand_rgb_colors {
                 }
             } # REJECT
             last if !$reject;
-            last if ++$attempt >= $max_attempts;
+            last if ++$num_attempts >= $max_attempts;
         }
         push @res, $rgb;
     }
@@ -227,12 +233,34 @@ sub rgb_diff {
     my $dg2 = ($g1-$g2)**2;
     my $db2 = ($b1-$b2)**2;
 
-    if ($algo eq 'approx1') {
+    if ($algo eq 'approx1' || $algo eq 'approx2') {
         my $rm = ($r1 + $r2)/2;
-        (2*$dr2 + 4*$dg2 + 3*$db2 + $rm*($dr2 - $db2)/256 )**0.5;
-    } else {
-        # euclidean
-        ($dr2 + $dg2 + $db2)**0.5;
+        if ($algo eq 'approx1') {
+            return (2*$dr2 + 4*$dg2 + 3*$db2 + $rm*($dr2 - $db2)/256 )**0.5;
+        } else { # approx2
+            if ($rm < 128) {
+                return (3*$dr2 + 4*$dg2 + 2*$db2)**0.5;
+            } else {
+                return (2*$dr2 + 4*$dg2 + 3*$db2)**0.5;
+            }
+        }
+    } elsif ($algo eq 'hsv_euclidean' || $algo eq 'hsv_hue1') {
+        my $hsv1 = rgb2hsv($rgb1);
+        my ($h1, $s1, $v1) = split / /, $hsv1;
+        my $hsv2 = rgb2hsv($rgb2);
+        my ($h2, $s2, $v2) = split / /, $hsv2;
+
+        my $dh2 = ( _min(abs($h2-$h1), 360-abs($h2-$h1))/180 )**2;
+        my $ds2 = ( $s2-$s1 )**2;
+        my $dv2 = ( ($v2-$v1)/255.0 )**2;
+
+        if ($algo eq 'hsv_hue1') {
+            return (5*$dh2 + $ds2 + $dv2)**0.5;
+        } else { # hsv_euclidean
+            return ($dh2 + $ds2 + $dv2)**0.5;
+        }
+    } else { # euclidean
+        return ($dr2 + $dg2 + $db2)**0.5;
     }
 }
 
@@ -293,6 +321,106 @@ sub tint_rgb_color {
                );
 }
 
+sub rgb2hsl {
+    my ($rgb) = @_;
+
+    my ($r, $g, $b) =
+        $rgb =~ $re_rgb or die "Invalid rgb color, must be in 'ffffff' form";
+    for ($r, $g, $b) { $_ = hex($_)/255 }
+
+    my $max = $r;
+    my $maxc = 'r';
+    my $min = $r;
+
+    if ($g > $max) {
+        $max = $g;
+        $maxc = 'g';
+    }
+    if ($b > $max) {
+        $max = $b;
+        $maxc = 'b';
+    }
+
+    if ($g < $min) {
+        $min = $g;
+    }
+    if ($b < $min) {
+        $min = $b;
+    }
+
+    my ($h, $s, $l);
+    if ($max == $min) {
+        $h = 0;
+    } elsif ($maxc eq 'r') {
+        $h = 60 * (($g - $b) / ($max - $min)) % 360;
+    } elsif ($maxc eq 'g') {
+        $h = (60 * (($b - $r) / ($max - $min)) + 120);
+    } elsif ($maxc eq 'b') {
+        $h = (60 * (($r - $g) / ($max - $min)) + 240);
+    }
+
+    $l = ($max + $min) / 2;
+
+    if ($max == $min) {
+        $s = 0;
+    } elsif($l <= .5) {
+        $s = ($max - $min) / ($max + $min);
+    } else {
+        $s = ($max - $min) / (2 - ($max + $min));
+    }
+
+    return sprintf("%.3g %.3g %.3g", $h, $s, $l);
+}
+
+sub rgb2hsv {
+    my ($rgb) = @_;
+
+    my ($r, $g, $b) =
+        $rgb =~ $re_rgb or die "Invalid rgb color, must be in 'ffffff' form";
+    for ($r, $g, $b) { $_ = hex($_)/255 }
+
+    my $max = $r;
+    my $maxc = 'r';
+    my $min = $r;
+
+    if ($g > $max) {
+        $max = $g;
+        $maxc = 'g';
+    }
+    if($b > $max) {
+        $max = $b;
+        $maxc = 'b';
+    }
+
+    if($g < $min) {
+        $min = $g;
+    }
+    if($b < $min) {
+        $min = $b;
+    }
+
+    my ($h, $s, $v);
+
+    if ($max == $min) {
+        $h = 0;
+    } elsif ($maxc eq 'r') {
+        $h = 60 * (($g - $b) / ($max - $min)) % 360;
+    } elsif ($maxc eq 'g') {
+        $h = (60 * (($b - $r) / ($max - $min)) + 120);
+    } elsif ($maxc eq 'b') {
+        $h = (60 * (($r - $g) / ($max - $min)) + 240);
+    }
+
+    $v = $max;
+    if($max == 0) {
+        $s = 0;
+    } else {
+        $s = 1 - ($min / $max);
+    }
+
+    return sprintf("%.3g %.3g %.3g", $h, $s, $v);
+}
+
 1;
 # ABSTRACT: Utilities related to RGB colors
 
@@ -308,7 +436,7 @@ Color::RGB::Util - Utilities related to RGB colors
 
 =head1 VERSION
 
-This document describes version 0.597 of Color::RGB::Util (from Perl distribution Color-RGB-Util), released on 2019-07-17.
+This document describes version 0.599 of Color::RGB::Util (from Perl distribution Color-RGB-Util), released on 2019-08-20.
 
 =head1 SYNOPSIS
 
@@ -473,6 +601,9 @@ Uint, default 1000. Number of attempts to try generating the next random color
 if the generated color is rejected because it is light/dark, or because it's in
 C<avoid_colors>.
 
+When the number of attempts has been exceeded, the generated color is used
+anyway.
+
 =back
 
 =head2 reverse_rgb_color
@@ -490,6 +621,22 @@ Usage:
  my $rgb_gs = rgb2grayscale($rgb);
 
 Convert C<$rgb> to grayscale RGB value.
+
+=head2 rgb2hsl
+
+Usage:
+
+ my $hsl = rgb2hsl($rgb); # example: "0 1 0.5"
+
+Convert RGB (0-255) to HSL. The result is a space-separated H, S, L values.
+
+=head2 rgb2hsv
+
+Usage:
+
+ my $hsv = rgb2hsv($rgb); # example: "0 1 255"
+
+Convert RGB (0-255) to HSV. The result is a space-separated H, S, V values.
 
 =head2 rgb2int
 
@@ -514,16 +661,46 @@ Usage:
  my $dist = rgb_diff($rgb1, $rgb2[ , $algo ])
 
 Calculate difference between two RGB colors, using one of several algorithms.
-The default ("euclidean") simply calculates the distance as:
+
+=over
+
+=item * euclidean
+
+The default. It calculates the distance as:
 
  ( (R1-R2)**2 + (G1-G2)**2 + (B1-B2)**2 )**0.5
 
-which is the same as what L</"rgb_distance">() would produce. Another algorithm
-("approx1") uses the following formula:
+which is the same as what L</"rgb_distance">() would produce.
+
+=item * approx1
+
+This algorithm uses the following formula:
 
  ( 2*(R1-R2)**2 + 4*(G1-G2)**2 + 3*(B1-B2)**2 + Rm*((R1-R2)**2 - (B1-B2)**2)/256 )**0.5
 
 where, Rm or "R mean" is (R1+R2)/2.
+
+=item * approx2
+
+Like C<approx1>, but uses this formula:
+
+ ( 2*(R1-R2)**2 + 4*(G1-G2)**2 + 3*(B1-B2)**2 )**0.5  # if Rm < 128
+ ( 3*(R1-R2)**2 + 4*(G1-G2)**2 + 2*(B1-B2)**2 )**0.5  # otherwise
+
+=item * hsv_euclidean
+
+Convert the RGB values to HSV, then calculate the HSV distance. Please see
+source code for details.
+
+=item * hsv_hue1
+
+Like C<hsv_euclidean> but puts more emphasis on hue difference. This algorithm
+is used, for example, by L<Color::ANSI::Util> when mapping RGB 24bit color to
+the "closest" the ANSI 256-color or 16-color. This algorithm tends to choose the
+hued colors instead of favoring to fallback on white/gray, which is more
+preferred.
+
+=back
 
 For more details about color difference, refer to
 L<https://en.wikipedia.org/wiki/Color_difference>.

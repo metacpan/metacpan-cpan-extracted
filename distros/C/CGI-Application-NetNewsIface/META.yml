@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   Module::Build: '0.37'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,7 +15,7 @@ name: CGI-Application-NetNewsIface
 provides:
   CGI::Application::NetNewsIface:
     file: lib/CGI/Application/NetNewsIface.pm
-    version: '0.0203'
+    version: '0.0204'
   CGI::Application::NetNewsIface::Cache::DBI:
     file: lib/CGI/Application/NetNewsIface/Cache/DBI.pm
 requires:
@@ -32,6 +32,6 @@ requires:
   warnings: '0'
 resources:
   license: http://opensource.org/licenses/BSD-3-Clause
-  repository: https://bitbucket.org/shlomif/perl-cgi-application-netnewsiface/
-version: '0.0203'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+  repository: https://github.com/shlomif/perl-cgi-application-netnewsiface
+version: '0.0204'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

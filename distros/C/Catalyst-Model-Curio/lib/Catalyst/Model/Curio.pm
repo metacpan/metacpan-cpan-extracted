@@ -1,5 +1,5 @@
 package Catalyst::Model::Curio;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =encoding utf8
 
@@ -27,9 +27,7 @@ Create your model class:
 
 Then use it in your controllers:
 
-    my $chi = $c->model('Cache::geo_ip')->chi();
-
-See L<Curio/SYNOPSIS> as this SYNOPSIS is based on it.
+    my $chi = $c->model('Cache::geo_ip');
 
 =head1 DESCRIPTION
 

@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::TravisCI;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: Integrating the generation of .travis.yml into your dzil
-$Dist::Zilla::Plugin::TravisCI::VERSION = '0.011';
+$Dist::Zilla::Plugin::TravisCI::VERSION = '0.013';
 use Moose;
 use Path::Tiny qw( path );
 use Dist::Zilla::File::FromCode;
@@ -22,6 +22,7 @@ has irc_template  => ( is => 'ro', isa => 'ArrayRef[Str]', default => sub { [
 ] } );
 
 has perl_version  => ( is => 'ro', isa => 'ArrayRef[Str]', default => sub { [
+   "5.30",
    "5.28",
    "5.26",
    "5.24",
@@ -30,8 +31,6 @@ has perl_version  => ( is => 'ro', isa => 'ArrayRef[Str]', default => sub { [
    "5.18",
    "5.16",
    "5.14",
-   "5.12",
-   "5.10",
 ] } );
 
 
@@ -40,9 +39,9 @@ has 'write_to' => ( is => 'ro', isa => 'ArrayRef[Str]', default => sub { [ 'root
 our @core_env = ("HARNESS_OPTIONS=j10:c HARNESS_TIMER=1");
 
 around mvp_multivalue_args => sub {
-	my ($orig, $self) = @_;
+  my ($orig, $self) = @_;
 
-	my @start = $self->$orig;
+  my @start = $self->$orig;
   return @start, @phases, @emptymvarrayattr, qw( irc_template perl_version write_to );
 };
 
@@ -79,105 +78,110 @@ sub build_travis_yml_str {
 }
 
 sub build_travis_yml {
-	my ($self, $is_build_branch) = @_;
+  my ($self, $is_build_branch) = @_;
 
-	my $zilla = $self->zilla;
-	my %travisyml = ( language => "perl", perl => $self->perl_version );
-	my $rmeta = $zilla->distmeta->{resources};
+  my $zilla = $self->zilla;
+  my %travisyml = (
+    language => "perl",
+    matrix => {
+      include => [ map {{
+        perl => sprintf('%.2f',$_),
+        ( $_ <= 5.20 ) ? ( dist => "trusty" ) : (),
+      }} @{$self->perl_version} ]
+    }
+  );
 
-	my %notifications;
+  my $rmeta = $zilla->distmeta->{resources};
 
-	my @emails = grep { $_ } @{$self->notify_email};
-	if ($self->no_notify_email) {
-		$notifications{email} = \"false";
-	} elsif (scalar @emails) {
-		$notifications{email} = \@emails;
-	}
+  my %notifications;
 
-	if (%notifications) {
-		$travisyml{notifications} = \%notifications;
-	}
+  my @emails = grep { $_ } @{$self->notify_email};
+  if ($self->no_notify_email) {
+    $notifications{email} = \"false";
+  } elsif (scalar @emails) {
+    $notifications{email} = \@emails;
+  }
 
-	if (@{$self->apt_package()}) {
-		$travisyml{addons}->{apt_packages} = $self->apt_package();
-	}
+  if (%notifications) {
+    $travisyml{notifications} = \%notifications;
+  }
 
-	my %phases_commands = map { $_ => $self->$_ } @phases;
+  if (@{$self->apt_package()}) {
+    $travisyml{addons}->{apt_packages} = $self->apt_package();
+  }
 
-	my $verbose = $self->verbose ? ' --verbose ' : ' --quiet ';
+  my %phases_commands = map { $_ => $self->$_ } @phases;
 
-	unshift @{$phases_commands{before_install}}, (
-		'git config --global user.name "Dist Zilla Plugin TravisCI"',
-		'git config --global user.email $HOSTNAME":not-for-mail@travis-ci.org"',
-	);
+  my $verbose = $self->verbose ? ' --verbose ' : ' --quiet ';
 
-	my @extra_deps = @{$self->extra_dep};
+  unshift @{$phases_commands{before_install}}, (
+    'git config --global user.name "Dist Zilla Plugin TravisCI"',
+    'git config --global user.email $HOSTNAME":not-for-mail@travis-ci.org"',
+  );
 
-	my $needs_cover;
+  my @extra_deps = @{$self->extra_dep};
 
-	if ($self->coveralls) {
-		push @extra_deps, 'Devel::Cover::Report::Coveralls';
-		unshift @{$phases_commands{after_success}}, 'cover -report coveralls';
-		$needs_cover = 1;
-	}
+  my $needs_cover;
 
-	if ($needs_cover) {
-		push @{$self->env}, 'HARNESS_PERL_SWITCHES=-MDevel::Cover=-db,$TRAVIS_BUILD_DIR/cover_db';
-	}
+  if ($self->coveralls) {
+    push @extra_deps, 'Devel::Cover::Report::Coveralls';
+    unshift @{$phases_commands{after_success}}, 'cover -report coveralls';
+    $needs_cover = 1;
+  }
 
-	my @env_exports = $self->_get_exports(@core_env, @{$self->env});
+  if ($needs_cover) {
+    push @{$self->env}, 'HARNESS_PERL_SWITCHES=-MDevel::Cover=-db,$TRAVIS_BUILD_DIR/cover_db';
+  }
 
-	unless (@{$phases_commands{install}}) {
-		push @{$phases_commands{install}}, (
-			"cpanm ".$verbose." --notest --skip-installed Dist::Zilla",
-			"dzil authordeps | grep -ve '^\\W' | xargs -n 5 -P 10 cpanm ".$verbose." ".($self->test_authordeps ? "" : " --notest ")." --skip-installed",
-			"dzil listdeps | grep -ve '^\\W' | cpanm ".$verbose." ".($self->test_deps ? "" : " --notest ")." --skip-installed",
-		);
-		if (@extra_deps) {
-			push @{$phases_commands{install}}, (
-				"cpanm ".$verbose." ".($self->test_deps ? "" : " --notest ")." ".join(" ",@extra_deps),
-			);
-		}
-	}
+  my @env_exports = $self->_get_exports(@core_env, @{$self->env});
 
-	unless (@{$phases_commands{script}}) {
-		push @{$phases_commands{script}}, "dzil smoke --release --author";
-	}
+  unless (@{$phases_commands{install}}) {
+    push @{$phases_commands{install}}, (
+      "cpanm ".$verbose." --notest --skip-installed Dist::Zilla",
+      "dzil authordeps | grep -ve '^\\W' | xargs -n 5 -P 10 cpanm ".$verbose." ".($self->test_authordeps ? "" : " --notest ")." --skip-installed",
+      "dzil listdeps | grep -ve '^\\W' | cpanm ".$verbose." ".($self->test_deps ? "" : " --notest ")." --skip-installed",
+    );
+    if (@extra_deps) {
+      push @{$phases_commands{install}}, (
+        "cpanm ".$verbose." ".($self->test_deps ? "" : " --notest ")." ".join(" ",@extra_deps),
+      );
+    }
+  }
 
-	unshift @{$phases_commands{script}}, $self->_get_exports(@{$self->script_env});
+  unless (@{$phases_commands{script}}) {
+    push @{$phases_commands{script}}, "dzil smoke --release --author";
+  }
 
-	unless (@{$phases_commands{install}}) {
-		$phases_commands{install} = [
-			'cpanm --installdeps '.$verbose.' '.($self->test_deps ? "" : "--notest").' --skip-installed .',
-		];
-	}
+  unshift @{$phases_commands{script}}, $self->_get_exports(@{$self->script_env});
 
-	if (@{$self->requires}) {
-		unshift @{$phases_commands{before_install}}, "sudo apt-get install -qq ".join(" ",@{$self->requires});
-	}
+  unless (@{$phases_commands{install}}) {
+    $phases_commands{install} = [
+      'cpanm --installdeps '.$verbose.' '.($self->test_deps ? "" : "--notest").' --skip-installed .',
+    ];
+  }
 
-	unshift @{$phases_commands{before_install}}, (
-		'rm .travis.yml',
-	);
+  if (@{$self->requires}) {
+    unshift @{$phases_commands{before_install}}, "sudo apt-get install -qq ".join(" ",@{$self->requires});
+  }
 
-	push @{$phases_commands{install}}, @{delete $phases_commands{after_install}};
+  push @{$phases_commands{install}}, @{delete $phases_commands{after_install}};
 
-	unshift @{$phases_commands{script}}, $self->_get_exports(@{$self->script_env});
+  unshift @{$phases_commands{script}}, $self->_get_exports(@{$self->script_env});
 
-	my $first = 0;
-	for (@phases) {
-		next unless defined $phases_commands{$_};
-		my @commands = @{$phases_commands{$_}};
-		if (@commands) {
-			$travisyml{$_} = [
-				$first
-					? ()
-					: (@env_exports),
-				@commands,
-			];
-			$first = 1;
-		}
-	}
+  my $first = 0;
+  for (@phases) {
+    next unless defined $phases_commands{$_};
+    my @commands = @{$phases_commands{$_}};
+    if (@commands) {
+      $travisyml{$_} = [
+        $first
+          ? ()
+          : (@env_exports),
+        @commands,
+      ];
+      $first = 1;
+    }
+  }
 
   return $self->emit(
     'modify_travis_yml',
@@ -215,15 +219,20 @@ Dist::Zilla::Plugin::TravisCI - Integrating the generation of .travis.yml into y
 
 =head1 VERSION
 
-version 0.011
+version 0.013
 
 =head1 SYNOPSIS
 
   [TravisCI]
-  perl_version = 5.10
-  perl_version = 5.12
   perl_version = 5.14
   perl_version = 5.16
+  perl_version = 5.18
+  perl_version = 5.20
+  perl_version = 5.22
+  perl_version = 5.24
+  perl_version = 5.26
+  perl_version = 5.28
+  perl_version = 5.30
   notify_email = other@email.then.default
   irc_template = %{branch}#%{build_number} by %{author}: %{message} (%{build_url})
   requires = libdebian-package-dev

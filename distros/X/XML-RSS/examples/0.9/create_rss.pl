@@ -1,11 +1,11 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 # create_rss.pl
 # creates and prints RSS 0.9 file
 
 use strict;
 use warnings;
 
-use XML::RSS;
+use XML::RSS ();
 
 my $rss = XML::RSS->new(version => '0.9');
 $rss->channel(title => "freshmeat.net",

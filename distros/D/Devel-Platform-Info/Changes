@@ -1,6 +1,12 @@
 Revision history for Devel-Platform-Info
 ========================================
 
+1.00    2019-08-26
+        - Updated broken link in the pod.
+          PR #4 by Mohammad S Anwar
+          https://github.com/barbie/devel-platform-info/pull/4
+        - fixes suggested by Kritika.io.
+
 0.16    2016-04-22
         - Codename updates for Linux & Mac OSX.
 

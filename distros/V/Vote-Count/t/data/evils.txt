@@ -1,0 +1,8 @@
+# A contest between the greater and lesser evil. A condorcet winner without later harm.
+# condorcet winner also eliminated in regular irv.
+:CHOICES:GREATER_EVIL:LESSER_EVIL:NOT_EVIL:BARELY_EVIL:NICE
+48:GREATER_EVIL
+15:NOT_EVIL:LESSER_EVIL
+16:BARELY_EVIL:LESSER_EVIL
+14:NICE:LESSER_EVIL
+7:LESSER_EVIL

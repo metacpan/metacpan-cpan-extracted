@@ -2,7 +2,7 @@ package Mojo::IOLoop::Stream::Role::LineBuffer;
 
 use Mojo::Base -role;
 
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 
 has 'read_line_separator' => sub { qr/\x0D?\x0A/ };
 has 'write_line_separator' => "\x0D\x0A";
@@ -29,7 +29,16 @@ sub watch_lines {
   $self->{_read_line_close_cb} = $self->on(close => sub {
     my $self = shift;
     if (length(my $buffer = delete $self->{_read_line_buffer} // '')) {
-      $self->emit(read_line => $buffer);
+      my $sep = $self->read_line_separator;
+      my $pos = 0;
+      while ($buffer =~ m/\G(.*?)($sep)/gs) {
+        $pos = pos $buffer;
+        $self->emit(read_line => "$1", "$2");
+      } continue {
+        $sep = $self->read_line_separator;
+      }
+      $self->emit(read_line => $pos ? substr($buffer, $pos) : $buffer)
+        if $pos < length $buffer;
     }
   });
   return $self;

@@ -11,7 +11,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Test-FITesque-RDF",
    "no_index" : {
@@ -65,7 +65,7 @@
    "provides" : {
       "Test::FITesque::RDF" : {
          "file" : "lib/Test/FITesque/RDF.pm",
-         "version" : "0.011"
+         "version" : "0.012"
       }
    },
    "release_status" : "stable",
@@ -85,7 +85,7 @@
       "x_IRC" : "irc://irc.perl.org/#perlrdf",
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/project"
    },
-   "version" : "0.011",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01",
+   "version" : "0.012",
+   "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_static_install" : 1
 }

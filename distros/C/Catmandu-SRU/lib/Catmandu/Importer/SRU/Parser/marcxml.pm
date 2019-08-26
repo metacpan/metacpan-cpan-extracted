@@ -3,7 +3,7 @@ package Catmandu::Importer::SRU::Parser::marcxml;
 use Moo;
 use XML::LibXML;
 
-our $VERSION = '0.422';
+our $VERSION = '0.424';
 
 sub parse {
     my ($self, $record) = @_;

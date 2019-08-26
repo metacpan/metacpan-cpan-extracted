@@ -1,5 +1,5 @@
 package Math::GrahamFunction::SqFacts::Dipole;
-$Math::GrahamFunction::SqFacts::Dipole::VERSION = '0.02002';
+$Math::GrahamFunction::SqFacts::Dipole::VERSION = '0.02003';
 use strict;
 use warnings;
 
@@ -14,8 +14,8 @@ sub _initialize
     my $self = shift;
     my $args = shift;
 
-    $self->result($args->{result});
-    $self->compose($args->{compose});
+    $self->result( $args->{result} );
+    $self->compose( $args->{compose} );
 
     return 0;
 }
@@ -26,9 +26,10 @@ sub clone
     my $self = shift;
     return __PACKAGE__->new(
         {
-            'result' => $self->result()->clone(),
+            'result'  => $self->result()->clone(),
             'compose' => $self->compose()->clone(),
-        });
+        }
+    );
 }
 
 
@@ -37,8 +38,8 @@ sub mult_by
     my $n_ref = shift;
     my $m_ref = shift;
 
-    $n_ref->result()->mult_by($m_ref->result());
-    $n_ref->compose()->mult_by($m_ref->compose());
+    $n_ref->result()->mult_by( $m_ref->result() );
+    $n_ref->compose()->mult_by( $m_ref->compose() );
 
     return 0;
 }
@@ -53,7 +54,7 @@ sub is_square
 
 sub exists
 {
-    my ($self, $factor) = @_;
+    my ( $self, $factor ) = @_;
 
     return $self->result()->exists($factor);
 }
@@ -78,7 +79,7 @@ sub _get_ret
 {
     my $self = shift;
 
-    return [ @{$self->compose->factors()} ];
+    return [ @{ $self->compose->factors() } ];
 }
 
 1;
@@ -96,11 +97,7 @@ a composition.
 
 =head1 VERSION
 
-version 0.02002
-
-=head1 VERSION
-
-version 0.02002
+version 0.02003
 
 =head1 WARNING!
 
@@ -139,7 +136,7 @@ Shlomi Fish <shlomif@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Shlomi Fish.
+This software is Copyright (c) 2019 by Shlomi Fish.
 
 This is free software, licensed under:
 
@@ -148,7 +145,7 @@ This is free software, licensed under:
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/math-grahamfunction/issues>
+L<https://github.com/shlomif/perl-math-grahamfunction/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -257,8 +254,8 @@ The code is open to the world, and available for you to hack on. Please feel fre
 with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
 from your repository :)
 
-L<https://github.com/shlomif/math-grahamfunction>
+L<https://github.com/shlomif/perl-math-grahamfunction>
 
-  git clone https://bitbucket.org/shlomif/perl-math-grahamfunction/
+  git clone git://github.com/shlomif/perl-math-grahamfunction.git
 
 =cut

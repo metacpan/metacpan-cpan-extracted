@@ -8,6 +8,8 @@ use Test::More 0.88;
 
 use XT::Files;
 
+delete $ENV{XT_FILES_DEFAULT_CONFIG_FILE};
+
 use constant CLASS => 'XT::Files';
 
 is( CLASS()->_is_initialized, undef, 'singleton is not initialized' );

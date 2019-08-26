@@ -1,16 +1,3 @@
-.grid {
-    background: #C0C0C0;
-    border: 4px solid #C0C0C0;
-}
-
-.grid > * {
-    background: #F8F8F8;
-}
-
-.grid > .hover {
-    filter: brightness(90%);
-}
-
 .error,   .error_box,   .error_txt   { color: #FF4040; }
 .success, .success_box, .success_txt { color: #007000; }
 .broken,  .broken_box,  .broken_txt  { color: #902090; }
@@ -37,19 +24,25 @@
 .running_box { border: 1px solid #009090; }
 
 .etoggle {
-    border: 1px solid #999999;
-    color:  #585858;
+    color: black;
 }
 
 .etoggle:hover, .etoggle.clicked:hover {
-    border-color: #0000FF;
     color:  #0000A0;
+}
+
+.etoggle.red_hover:hover, .etoggle.clicked.red_hover:hover {
+    color:  #F00000;
 }
 
 .etoggle.clicked {
     border: 1px solid #AABBFF;
     background: #DDEEFF;
     color:  #000060;
+}
+
+.etoggle.error {
+    color: red;
 }
 
 div#progress_bar {
@@ -60,7 +53,31 @@ div#progress_bar:empty {
     display: none;
 }
 
-.grid > .tools > .tool.error {
-    color: red;
+span.tooltip-expand {
+    float: left;
+    padding-right: 6px;
+    cursor: zoom-in;
 }
 
+span.tooltip-expand.locked {
+    color: #6060F0;
+    cursor: zoom-out;
+}
+
+div.tooltip {
+    display: block;
+    position: absolute;
+    top: -3px;
+    left: 26px;
+
+    border: 2px solid #6060B0;
+    border-radius: 6px;
+    background: #EEEEFF;
+    width: auto;
+    min-width: 101%; /* So it does not try to wrap the contents to fit in the same size as our parent */
+    z-index: 9;
+
+    padding: 3px;
+
+    white-space: no-wrap;
+}

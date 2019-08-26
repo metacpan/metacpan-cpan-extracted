@@ -9,7 +9,7 @@ use Text::ParseWords;
 use Symbol 'gensym';
 use Carp;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 sub new {
     my $class = shift;
@@ -44,22 +44,53 @@ sub new {
 	croak "No suitable httpd binary found";
     }
 
-    if ($v = delete $_{environ}) {
-	my $env = Shell::GetEnv->new('sh', ". $v",
-				     { startup => 0 });
-	if ($env->status) {
+    my $envfile = delete $_{environ};
+    croak "unrecognized arguments" if keys(%_);
+
+    if ($envfile) {
+	unless (-f $envfile) {
+	    if ($self->{on_error} eq 'return') {
+                $self->{status} = 127;
+		$self->{error} = "environment file $envfile does not exist";
+		return $self;
+	    } else {
+		croak "environment file $envfile does not exist";
+	    }
+	}
+	unless (-r $envfile) {
+	    if ($self->{on_error} eq 'return') {
+                $self->{status} = 127;
+		$self->{error} = "environment file $envfile is not readable";
+		return $self;
+	    } else {
+		croak "environment file $envfile is not readable";
+	    }
+	}
+
+	my $env = eval {
+            Shell::GetEnv->new('sh', ". $envfile", { startup => 0 });
+        };
+        if ($@) {
+            if ($self->{on_error} eq 'return') {
+                $self->{status} = 127;
+                $self->{error} = $@;
+		return $self;
+            } else {
+                croak $@;
+            }
+        } elsif ($env->status) {
 	    if ($self->{on_error} eq 'return') {
 		$self->{status} = $env->status;
 		$self->{error} = "Failed to inherit environment";
+		return $self;
 	    } else {
 		croak sprintf("Got status %d trying to inherit environment",
 			      $env->status);
 	    }
-	}
-	$self->{environ} = $env->envs;
+	} else {
+  	    $self->{environ} = $env->envs;
+        }        
      }
-
-    croak "unrecognized arguments" if keys(%_);
 
     $self->_get_version_info unless $self->status;
     $self->_get_module_info unless $self->status;

@@ -28,16 +28,16 @@ name: Error
 provides:
   Error:
     file: lib/Error.pm
-    version: '0.17027'
+    version: '0.17028'
   Error::Simple:
-    file: lib/Error.pm
-    version: '0.17027'
+    file: lib/Error/Simple.pm
+    version: '0.17028'
   Error::WarnDie:
     file: lib/Error.pm
-    version: '0.17027'
+    version: '0.17028'
   Error::subs:
     file: lib/Error.pm
-    version: '0.17027'
+    version: '0.17028'
 requires:
   Carp: '0'
   Exporter: '0'
@@ -48,13 +48,13 @@ requires:
   vars: '0'
   warnings: '0'
 resources:
-  bugtracker: https://github.com/shlomif/error/issues
+  bugtracker: https://github.com/shlomif/perl-error.pm/issues
   homepage: http://metacpan.org/release/Error
-  repository: https://bitbucket.org/shlomif/perl-error.pm
-version: '0.17027'
+  repository: git://github.com/shlomif/perl-error.pm.git
+version: '0.17028'
 x_Dist_Zilla:
   perl:
-    version: '5.028000'
+    version: '5.028002'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -183,10 +183,6 @@ x_Dist_Zilla:
       name: '@Filter/PodSyntaxTests'
       version: '6.012'
     -
-      class: Dist::Zilla::Plugin::PodVersion
-      name: '@Filter/PodVersion'
-      version: '6.012'
-    -
       class: Dist::Zilla::Plugin::Test::Compile
       config:
         Dist::Zilla::Plugin::Test::Compile:
@@ -265,10 +261,6 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::H1Nester
               name: '@CorePrep/H1Nester'
-              version: '4.015'
-            -
-              class: Pod::Weaver::Section::Name
-              name: '@SHLOMIF/Name'
               version: '4.015'
             -
               class: Pod::Weaver::Section::Version
@@ -415,5 +407,5 @@ x_Dist_Zilla:
     config:
       is_trial: '0'
     version: '6.012'
-x_generated_by_perl: v5.28.0
+x_generated_by_perl: v5.28.2
 x_serialization_backend: 'YAML::Tiny version 1.73'

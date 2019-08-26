@@ -3,7 +3,7 @@ package Bot::BasicBot::Pluggable::Module::Notify;
 use warnings;
 use strict;
 
-our $VERSION = '0.04';
+our $VERSION = '1.00';
 
 #----------------------------------------------------------------------------
 
@@ -13,8 +13,9 @@ our $VERSION = '0.04';
 
 use base qw(Bot::BasicBot::Pluggable::Module);
 
-use Data::Dumper;
+use DateTime;
 use IO::File;
+use List::MoreUtils qw( any );
 use MIME::Lite;
 
 #############################################################################
@@ -47,7 +48,6 @@ sub init {
     }
 
     $self->store->set( 'notify', 'notifications', $file );
-    #print "notifications file = $file\n";
 }
  
 sub help {
@@ -61,37 +61,50 @@ sub told {
 
     return 0    unless defined $body;
     return 0    unless($self->_load_notification_file());
+    return 0    if($body =~ m!^\s*/?who(is|was)?\s+!); # ignore who requests
 
-    my (@words) = split(/\s+/,$body);
+    my (@words) = split(/[^@\w\+\-]+/,$body);
     my $data = $self->bot->channel_data( $mess->{channel} );
-    my %users = map { $_ => 1 } keys %$data; # get users in channel
+    my %users = map { $_ => 0 } keys %$data; # get users in channel
 
     # get identities
     my $pocoirc = $self->bot->pocoirc( $mess->{channel} );
     my @nicks = $pocoirc->nicks();
     my %nicks = map { $_ => $pocoirc->nick_info($_) } @nicks;
     $self->{nicks} = \%nicks;
-    #print "nicks=".Dumper(\%nicks)."\n";
+
+    my $sender = $self->_match_user($mess->{who}, $self->{nicks}) || '';
+    my @recipients = grep { $_ ne $sender } keys %users;
 
     my $prev = '';
     for my $word (@words) {
-        next    if($prev eq 'seen' || $word =~ /(\-\-|\+\+)$/); # ignore seen and karma messages
-        my $nick = $self->_match_user($word, $self->{nicks}) || '';
+        next    if($word =~ /(\-\-|\+\+)$/); # ignore karma messages
+        next    if($prev eq 'seen');         # ignore seen messages
+        $prev = $word;
+
+        my $nick = '';
+        if($word =~ /@?(\w+)/) {
+            my $user = $1;
+            $nick = $self->_match_user($user, $self->{nicks}) || '';
+        }
+
+        next if($nick && $users{$nick}); # don't send repeated mails
 
         if($word eq '@all') {
-            $self->_send_email(1,$mess,keys %users);
+            $self->_send_email(1,$mess,@recipients);
             return 1; # we only send 1 email per user
         } elsif($word eq '@here') {
             my @users = []; # filter based on seen in the last hour
-            $self->_send_email(2,$mess,keys %users);
+            $self->_send_email(2,$mess,@recipients);
             return 1; # we only send 1 email per user
         } elsif($nick && $emails{$nick}) {
-            $self->_send_email(1,$mess,$word);
-            $users{$nick} = 0; # we only send 1 email per user
+            $self->_send_email(1,$mess,$nick);
+            $users{$nick} = 1; # we only send 1 email per user
+            @recipients = grep { $_ ne $nick } @recipients; # don't send repeated mails
         }
     }
     
-    return 1 if(grep { $_ == 1 } values %users);
+    return 1 if(any { $_ == 1 } values %users);
     return 0;
 }
 
@@ -124,7 +137,6 @@ sub _send_email {
         if($channel{$user}) {
             my $seen = $self->store->get( 'Seen', "seen_$user");
             if($seen && $seen->{'time'}) {
-                #print "seen=".Dumper($seen)."\n";
                 my $time = time - $seen->{'time'};
                 next if($time < $settings{active} * 60);
                 next if($time > 3600 && $type == 2);
@@ -154,7 +166,6 @@ sub _load_notification_file {
         s/\s+$//;
         next if(/^#/ || /^$/);
         my ($nick,$ident,$email) = split(/,/,$_,3);
-        #print "nick=$nick, ident=$ident, email=$email\n";
         
         if($nick eq 'CONFIG') {
             $settings{$ident} = $email;
@@ -171,9 +182,6 @@ sub _load_notification_file {
     for my $key (keys %defaults) {
         $settings{$key} ||= $defaults{$key};
     }
-
-    #print "settings: $_=$settings{$_}\n"  for(keys %settings);
-    #print "emails: $_=$emails{$_}\n"  for(keys %emails);
 
     return 0    unless($settings{smtp});
     return 1    if(keys %emails);
@@ -274,8 +282,8 @@ notified.
 =item told()
  
 Loads the email notification file, if not previously done so, and checks 
-whether a channel user, @here or @all has been used. Sends the email to all a
-ppropriately listed email recipients.
+whether a channel user, @here or @all has been used. Sends the email to all
+appropriately listed email recipients.
 
 Note that a change to the notification file, will force a reload of the file on
 the next invocation. As such, note that there may be a delay before you see the
@@ -283,6 +291,8 @@ next updated entry actioned.
 
 Please also note that we try to avoid 'seen' and 'karma' requests, but the odd
 one may slip through.
+
+returns 1 if any mails were sent, 0 otherwise.
 
 =back
  
@@ -370,7 +380,7 @@ Should be able to allow a user to set their own active wait time.
 
 =head1 COPYRIGHT AND LICENSE
 
-  Copyright (C) 2015 Barbie for Miss Barbell Productions
+  Copyright (C) 2015-2019 Barbie for Miss Barbell Productions
 
   This distribution is free software; you can redistribute it and/or
   modify it under the Artistic License v2.

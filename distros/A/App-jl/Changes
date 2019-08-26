@@ -1,5 +1,8 @@
 Revision history for Perl extension App::jl
 
+0.16    Mon Aug 26 06:05:44 JST 2019
+        - Improve label handling
+
 0.15    Sun Aug  4 13:43:58 JST 2019
         - Fixed minor typo in the pod. (Thanks, Mohammad S Anwar)
         - Ignore too large number for unix timestamp

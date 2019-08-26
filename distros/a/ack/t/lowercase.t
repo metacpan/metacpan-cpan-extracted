@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.010;
 
-use Test::More tests => 2;;
+use Test::More tests => 2;
 
 use App::Ack;
 
@@ -31,8 +31,14 @@ something something \X
 not vertical whitespace -> \V
 not horizontal whitespace -> \H
 linebreak -> \R
+
+# unicode regex metachars
+# https://www.regular-expressions.info/unicode.html
 named property -> \p{Word} same as \w
 not the named property -> \P{Word} same as \W
+single-character named property shorthand -> \pL is any letter
+negation of single-character named property shorthand -> \PL is not any letter
+
 # Not sure about \X
 big combination: \W\S\D\V\H\R but still lowercase
 
@@ -101,11 +107,5 @@ exit 0;
 sub _big_split {
     my $str = shift;
 
-    my @list = split( /\n/, $str );
-
-    @list = grep /./, @list;
-
-    @list = grep !/^#/, @list;
-
-    return @list;
+    return grep { /./ && !/^#/ } split( /\n/, $str );
 }

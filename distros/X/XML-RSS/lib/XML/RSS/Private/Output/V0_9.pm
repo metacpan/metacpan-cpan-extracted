@@ -1,19 +1,17 @@
 package XML::RSS::Private::Output::V0_9;
-$XML::RSS::Private::Output::V0_9::VERSION = '1.60';
+$XML::RSS::Private::Output::V0_9::VERSION = '1.61';
 use strict;
 use warnings;
 
 use vars (qw(@ISA));
 
-use XML::RSS::Private::Output::Base;
+use XML::RSS::Private::Output::Base ();
 
 @ISA = (qw(XML::RSS::Private::Output::Base));
 
-sub _get_rdf_decl
-{
-    return
-    qq{<rdf:RDF\nxmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"\n} .
-    qq{xmlns="http://my.netscape.com/rdf/simple/0.9/">\n\n};
+sub _get_rdf_decl {
+    return qq{<rdf:RDF\nxmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"\n}
+      . qq{xmlns="http://my.netscape.com/rdf/simple/0.9/">\n\n};
 }
 
 # 'description' for item does not exist in RSS 0.9
@@ -45,7 +43,7 @@ __END__
 
 =head1 VERSION
 
-version 1.60
+version 1.61
 
 =head1 AUTHOR
 

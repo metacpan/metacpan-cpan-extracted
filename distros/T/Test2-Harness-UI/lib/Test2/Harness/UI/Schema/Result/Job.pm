@@ -72,6 +72,11 @@ __PACKAGE__->table("jobs");
   data_type: 'jsonb'
   is_nullable: 1
 
+=head2 fields
+
+  data_type: 'jsonb'
+  is_nullable: 1
+
 =head2 name
 
   data_type: 'text'
@@ -122,70 +127,6 @@ __PACKAGE__->table("jobs");
   data_type: 'bigint'
   is_nullable: 1
 
-=head2 time_user
-
-  data_type: 'numeric'
-  default_value: null
-  is_nullable: 1
-  size: [20,10]
-
-=head2 time_sys
-
-  data_type: 'numeric'
-  default_value: null
-  is_nullable: 1
-  size: [20,10]
-
-=head2 time_cuser
-
-  data_type: 'numeric'
-  default_value: null
-  is_nullable: 1
-  size: [20,10]
-
-=head2 time_csys
-
-  data_type: 'numeric'
-  default_value: null
-  is_nullable: 1
-  size: [20,10]
-
-=head2 mem_peak
-
-  data_type: 'bigint'
-  is_nullable: 1
-
-=head2 mem_size
-
-  data_type: 'bigint'
-  is_nullable: 1
-
-=head2 mem_rss
-
-  data_type: 'bigint'
-  is_nullable: 1
-
-=head2 mem_peak_u
-
-  data_type: 'varchar'
-  default_value: null
-  is_nullable: 1
-  size: 2
-
-=head2 mem_size_u
-
-  data_type: 'varchar'
-  default_value: null
-  is_nullable: 1
-  size: 2
-
-=head2 mem_rss_u
-
-  data_type: 'varchar'
-  default_value: null
-  is_nullable: 1
-  size: 2
-
 =head2 stdout
 
   data_type: 'text'
@@ -207,6 +148,8 @@ __PACKAGE__->add_columns(
   { data_type => "uuid", is_foreign_key => 1, is_nullable => 0, size => 16 },
   "parameters",
   { data_type => "jsonb", is_nullable => 1 },
+  "fields",
+  { data_type => "jsonb", is_nullable => 1 },
   "name",
   { data_type => "text", is_nullable => 1 },
   "file",
@@ -227,61 +170,6 @@ __PACKAGE__->add_columns(
   { data_type => "bigint", is_nullable => 1 },
   "fail_count",
   { data_type => "bigint", is_nullable => 1 },
-  "time_user",
-  {
-    data_type => "numeric",
-    default_value => \"null",
-    is_nullable => 1,
-    size => [20, 10],
-  },
-  "time_sys",
-  {
-    data_type => "numeric",
-    default_value => \"null",
-    is_nullable => 1,
-    size => [20, 10],
-  },
-  "time_cuser",
-  {
-    data_type => "numeric",
-    default_value => \"null",
-    is_nullable => 1,
-    size => [20, 10],
-  },
-  "time_csys",
-  {
-    data_type => "numeric",
-    default_value => \"null",
-    is_nullable => 1,
-    size => [20, 10],
-  },
-  "mem_peak",
-  { data_type => "bigint", is_nullable => 1 },
-  "mem_size",
-  { data_type => "bigint", is_nullable => 1 },
-  "mem_rss",
-  { data_type => "bigint", is_nullable => 1 },
-  "mem_peak_u",
-  {
-    data_type => "varchar",
-    default_value => \"null",
-    is_nullable => 1,
-    size => 2,
-  },
-  "mem_size_u",
-  {
-    data_type => "varchar",
-    default_value => \"null",
-    is_nullable => 1,
-    size => 2,
-  },
-  "mem_rss_u",
-  {
-    data_type => "varchar",
-    default_value => \"null",
-    is_nullable => 1,
-    size => 2,
-  },
   "stdout",
   { data_type => "text", is_nullable => 1 },
   "stderr",
@@ -333,10 +221,10 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2019-07-16 09:19:17
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:8NuQjZoBMCqod6+91SUqKw
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2019-08-22 10:04:36
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:KarQxs9jc9dxLUXWcTcRZQ
 
-our $VERSION = '0.000006';
+our $VERSION = '0.000014';
 
 __PACKAGE__->inflate_column(
     parameters => {
@@ -344,6 +232,21 @@ __PACKAGE__->inflate_column(
         deflate => DBIx::Class::InflateColumn::Serializer::JSON->get_freezer('parameters', {}),
     },
 );
+
+__PACKAGE__->inflate_column(
+    fields => {
+        inflate => DBIx::Class::InflateColumn::Serializer::JSON->get_unfreezer('fields', {}),
+        deflate => DBIx::Class::InflateColumn::Serializer::JSON->get_freezer('fields', {}),
+    },
+);
+
+sub shortest_file {
+    my $self = shift;
+    my $file = $self->file or return undef;
+
+    return $1 if $file =~ m{([^/]+)$};
+    return $file;
+}
 
 sub short_file {
     my $self = shift;
@@ -359,14 +262,16 @@ sub TO_JSON {
     my %cols = $self->get_columns;
 
     $cols{short_file} = $self->short_file;
+    $cols{shortest_file} = $self->shortest_file;
 
     # Inflate
     $cols{parameters} = $self->parameters;
+    $cols{fields}     = $self->fields;
 
     return \%cols;
 }
 
-my @GLANCE_FIELDS = qw{ exit fail fail_count job_id name pass_count };
+my @GLANCE_FIELDS = qw{ exit fail fail_count job_id name pass_count file };
 sub glance_data {
     my $self = shift;
     my %cols = $self->get_columns;
@@ -375,6 +280,12 @@ sub glance_data {
     @data{@GLANCE_FIELDS} = @cols{@GLANCE_FIELDS};
 
     $data{short_file} = $self->short_file;
+    $data{shortest_file} = $self->shortest_file;
+
+    # Inflate
+    if ($data{fields} = $self->fields) {
+        $_->{data} = !!$_->{data} for @{$data{fields}};
+    }
 
     return \%data;
 }

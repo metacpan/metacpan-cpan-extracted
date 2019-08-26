@@ -1,18 +1,37 @@
-use inc::Module::Install;
+use ExtUtils::MakeMaker;
+use strict;
+use warnings;
 
-name	'URI-tel';
-author q{Thiago Rondon <thiago@aware.com.br>};
-license 'perl';
-perl_version '5.10.0';
-all_from 'lib/URI/tel.pm';
-build_requires 'Test::More';
-build_requires 'Test::UseAllModules';
+# Call 'perldoc ExtUtils::MakeMaker' for details of how to influence
+# the contents of the Makefile that is written.
 
-requires 'Moose';
-requires 'Moose::Util::TypeConstraints';
-requires 'URI';
+my %WriteMakefileArgs = (
+    NAME                => 'URI::tel',
+    VERSION_FROM        => 'lib/URI/tel.pm',
+    AUTHOR              => 'Jacques Deguest (jack@deguest.jp)',
+    ABSTRACT            => 'Implementation of rfc3966 for tel URI',
+    INSTALLDIRS         => ($] < 5.011 ? 'perl' : 'site'),
+    PREREQ_PM           => {
+        'Test::More' => 0,
+        'URI' => 0
+    },
+    LICENSE				=> 'perl_5',
+    MIN_PERL_VERSION	=> 5.6.0,
+    ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? () : ( META_MERGE => {
+        'meta-spec' => { version => 2 },
+        dynamic_config => 1,
+        resources => {
+        #    homepage    => undef,
+            repository  => {
+                url         => 'git@github.com:jackdeguest/URI-tel.git',
+                web         => 'https://github.com/jackdeguest/URI-tel',
+                type        => 'git',
+            },
+        #    bugtracker => {
+        #        web         => undef,
+        #    },
+        },
+    })),
+);
 
-auto_install;
-
-WriteAll;
-
+WriteMakefile(%WriteMakefileArgs);

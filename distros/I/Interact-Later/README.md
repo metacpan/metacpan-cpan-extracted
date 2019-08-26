@@ -5,7 +5,7 @@ Interact::Later - Delay some tasks for later by dumping their data to disk
 
 # VERSION
 
-Version 0.04
+Version 0.05
 
 # SYNOPSIS
 
@@ -71,9 +71,10 @@ TODO
 
 # SUBROUTINES/METHODS
 
-## get\_oldest\_file\_in\_the\_cache
+## get\_oldest\_cache\_files\_ordered\_by\_date
 
-Retrieve the oldest file in the cache.
+Retrieve the oldest file in the cache. `$files[0]` is the oldest,
+`$files[-1]`the newest.
 
 ## clean\_cache
 

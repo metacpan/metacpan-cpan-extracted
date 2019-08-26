@@ -117,7 +117,7 @@ use Mail::DKIM::ARC::MessageSignature;
 use Mail::DKIM::ARC::Seal;
 use Mail::Address;
 use Carp;
-our $VERSION                   = 0.55;
+our $VERSION                   = 0.56;
 our $MAX_SIGNATURES_TO_PROCESS = 50;
 
 sub init {
@@ -410,7 +410,7 @@ sub check_public_key {
 #        my $empty_g_means_wildcard = $signature->isa('Mail::DKIM::DkSignature');
 
         # check public key's granularity
-        $result &&= $public_key->check_granularity( $signature->instance, 0 );
+        $result &&= $public_key->check_granularity( $signature->domain, 0 );
 
         #                $signature->instance, $empty_g_means_wildcard);
 

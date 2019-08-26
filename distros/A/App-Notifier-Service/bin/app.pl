@@ -22,13 +22,9 @@ __END__
 
 =encoding UTF-8
 
-=head1 NAME
-
-app.pl .
-
 =head1 VERSION
 
-version 0.0700
+version 0.0701
 
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
@@ -127,9 +123,9 @@ The code is open to the world, and available for you to hack on. Please feel fre
 with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
 from your repository :)
 
-L<https://github.com/shlomif/app-notifier-service>
+L<https://github.com/shlomif/app-notifier>
 
-  git clone https://bitbucket.org/shlomif/app-notifier
+  git clone git://github.com/shlomif/app-notifier.git
 
 =head1 AUTHOR
 
@@ -138,7 +134,7 @@ Shlomi Fish <shlomif@cpan.org>
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/app-notifier-service/issues>
+L<https://github.com/shlomif/app-notifier/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

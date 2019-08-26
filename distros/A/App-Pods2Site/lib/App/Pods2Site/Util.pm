@@ -3,6 +3,10 @@ package App::Pods2Site::Util;
 use strict;
 use warnings;
 
+our $VERSION = '1.002';
+my $version = $VERSION;
+$VERSION = eval $VERSION;
+
 our $IS_WINDOWS = $^O eq 'MSWin32'; 
 our $IS_PACKED = $ENV{PAR_0} ? 1 : 0;
 our $SHELL_ARG_DELIM = $IS_WINDOWS ? '"' : "'";

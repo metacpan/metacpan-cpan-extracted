@@ -1,10 +1,14 @@
 package App::TestOnTap::Preprocess;
 
-use POSIX;
-use App::TestOnTap::Util qw(runprocess);
-
 use strict;
 use warnings;
+
+our $VERSION = '1.001';
+my $version = $VERSION;
+$VERSION = eval $VERSION;
+
+use POSIX;
+use App::TestOnTap::Util qw(runprocess);
 
 # CTOR
 #

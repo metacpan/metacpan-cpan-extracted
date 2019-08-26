@@ -1,6 +1,13 @@
 Revision history for Bot-BasicBot-Pluggable-Module-Notify
 =========================================================
 
+1.00    2019-08-25
+        - fixed filtering of sender and recipients.
+        - fixed return logic of told().
+        - ensure we don't send multiple mails to any user.
+        - added missing prerequisites.
+        - extended the test suite.
+
 0.04    2015-12-06
         - fixed missing prerequisite (MIME::Lite).
 

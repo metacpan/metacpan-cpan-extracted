@@ -1,5 +1,5 @@
 # -*-CPerl-*-
-# Last changed Time-stamp: <2019-04-05 22:37:36 mtw>
+# Last changed Time-stamp: <2019-08-25 19:51:47 mtw>
 # place of birth: somewhere over Newfoundland
 
 # Bio::RNA::RNAaliSplit::WrapRscape.pm: A versatile object-oriented
@@ -9,7 +9,7 @@
 
 package Bio::RNA::RNAaliSplit::WrapRscape;
 
-use version; our $VERSION = qv('0.10');
+use version; our $VERSION = qv('0.11');
 use Carp;
 use Data::Dumper;
 use Moose;
@@ -160,8 +160,6 @@ has 'status' => (
 
 
 with 'FileDirUtil';
-with 'Bio::RNA::RNAaliSplit::Roles';
-
 
 sub BUILD {
   my $self = shift;
@@ -171,8 +169,8 @@ sub BUILD {
   $rscape = can_run($exe) or
     croak "ERROR [$this_function] $exe not found";
   unless($self->has_odir){
-    unless($self->has_dirnam){self->dirnam("as")}
-    $self->odir( [$self->ifile->dir,$self->dirnam] );
+    my $odir_name = "as";
+    $self->odir( [$self->ifile->dir,$odir_name] );
   }
   $oodir = $self->odir->subdir("rscape");
   my @created = make_path($oodir, {error => \my $err});
@@ -250,8 +248,8 @@ sub run_rscape {
 #  contacts  11 (11 bpairs 11 wc bpairs)
 #  maxD      8.00
 #  mind      1
-#  Method Target_E-val [cov_min,conv_max] [FP | TP True Found | Sen PPV F] 
-#  RAFS    0.05           [-1.00,0.83]    [0 | 3 11 3 | 27.27 100.00 42.86] 
+#  Method Target_E-val [cov_min,conv_max] [FP | TP True Found | Sen PPV F]
+#  RAFS    0.05           [-1.00,0.83]    [0 | 3 11 3 | 27.27 100.00 42.86]
 #        left_pos       right_pos        score   E-value
 # ------------------------------------------------------------
 #*	        20	        36	0.83	0.000328218

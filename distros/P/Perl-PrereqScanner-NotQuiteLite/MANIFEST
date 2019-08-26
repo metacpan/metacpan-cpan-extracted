@@ -53,8 +53,10 @@ t/app/basic.t
 t/app/cpanfile.t
 t/app/dedupe.t
 t/app/exclude_core.t
+t/app/features.t
 t/app/ignore.t
 t/app/private.t
+t/app/scan_also.t
 t/app/use_index.t
 t/autouse.t
 t/begin_exit.t

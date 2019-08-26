@@ -22,14 +22,14 @@
       "runtime" : {
          "requires" : {
             "Data::Object" : "0.99",
-            "Doodle" : "0.04",
+            "Doodle" : "0.05",
             "perl" : "5.014"
          }
       },
       "test" : {
          "requires" : {
             "Data::Object" : "0.99",
-            "Doodle" : "0.04",
+            "Doodle" : "0.05",
             "perl" : "5.014"
          }
       }
@@ -45,7 +45,7 @@
          "web" : "https://github.com/iamalnewkirk/moodle"
       }
    },
-   "version" : "0.01",
+   "version" : "0.03",
    "x_authority" : "cpan:AWNCORP",
    "x_contributors" : [
       "Al Newkirk <al@iamalnewkirk.com>"

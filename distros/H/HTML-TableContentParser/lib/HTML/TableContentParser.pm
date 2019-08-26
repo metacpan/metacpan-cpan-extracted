@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw{ HTML::Parser };
 
-our $VERSION = '0.301';
+our $VERSION = '0.302';
 
 our $CLASSIC = 0;
 our $DEBUG = 0;
@@ -335,7 +335,7 @@ If this argument is set to C<0>, you get the behavior documented for
 0.299_01 and after.
 
 If this argument is C<undef> or omitted, the value of
-L<$HTML::TableContentParser::CLASSIC|/HTML::TableContentParser::CLASSIC>
+L<$HTML::TableContentParser::CLASSIC|/$HTML::TableContentParser::CLASSIC>
 is used.
 
 No other values are supported -- that is, the author reserves them, and

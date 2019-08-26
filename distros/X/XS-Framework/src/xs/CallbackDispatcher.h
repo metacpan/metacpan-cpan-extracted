@@ -193,7 +193,7 @@ namespace xs {
     };
 
     template <typename Ret, class...Args> struct Typemap<panda::CallbackDispatcher<Ret(Args...)>*> {
-        static Sv out (pTHX_ panda::CallbackDispatcher<Ret(Args...)>* d, const Sv& = {}) {
+        static Sv out (panda::CallbackDispatcher<Ret(Args...)>* d, const Sv& = {}) {
             return xs::out(XSCallbackDispatcher::create(*d));
         }
     };

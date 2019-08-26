@@ -11,11 +11,11 @@ Pg::Explain::StringAnonymizer - Class to anonymize sets of strings
 
 =head1 VERSION
 
-Version 0.80
+Version 0.81
 
 =cut
 
-our $VERSION = '0.80';
+our $VERSION = '0.81';
 
 =head1 SYNOPSIS
 
@@ -57,7 +57,7 @@ Object constructor, doesn't take any arguments.
 
 sub new {
     my $class = shift;
-    my $self = bless {}, $class;
+    my $self  = bless {}, $class;
     $self->{ 'strings' } = {};
     return $self;
 }
@@ -171,7 +171,7 @@ sub _hash {
     # mauke and LeoNerd on #perl on irc.freenode.net
 
     my $binary_hash = unpack( "B*", $hash );
-    my @segments = unpack "(a5)*", $binary_hash;
+    my @segments    = unpack "(a5)*", $binary_hash;
     return [ map { oct "0b$_" } @segments ];
 }
 
@@ -185,7 +185,7 @@ sub _word {
     my $self = shift;
     my $n    = shift;
     $n = 0 unless defined $n;
-    $n = 0  if $n < 0;
+    $n = 0 if $n < 0;
     $n = 31 if $n > 31;
     my @words = qw(
         alpha     bravo      charlie    delta
@@ -259,7 +259,7 @@ sub _stringify {
     my $self = shift;
 
     for my $key ( keys %{ $self->{ 'strings' } } ) {
-        my $ints = $self->{ 'strings' }->{ $key };
+        my $ints  = $self->{ 'strings' }->{ $key };
         my @words = map { $self->_word( $_ ) } @{ $ints };
         $self->{ 'strings' }->{ $key } = join( '_', @words );
     }

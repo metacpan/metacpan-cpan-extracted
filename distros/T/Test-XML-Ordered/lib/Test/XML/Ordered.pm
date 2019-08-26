@@ -1,5 +1,5 @@
 package Test::XML::Ordered;
-
+$Test::XML::Ordered::VERSION = '0.2.0';
 use strict;
 use warnings;
 
@@ -14,8 +14,6 @@ use base 'Exporter';
 use vars '@EXPORT_OK';
 
 @EXPORT_OK = (qw(is_xml_ordered));
-
-our $VERSION = '0.0.9';
 
 sub new
 {
@@ -433,12 +431,17 @@ sub is_xml_ordered
 
 __END__
 
+=pod
+
 =encoding utf-8
 
 =head1 NAME
 
-Test::XML::Ordered - compare two XML files for equivalency, in an ordered
-fashion.
+Test::XML::Ordered
+
+=head1 VERSION
+
+version 0.2.0
 
 =head1 SYNOPSIS
 
@@ -473,6 +476,11 @@ Other advantages of Test::XML::Ordered are:
 =item * Handles namespaces properly.
 
 =back
+
+=head1 NAME
+
+Test::XML::Ordered - compare two XML files for equivalency, in an ordered
+fashion.
 
 =head1 EXPORTS
 
@@ -533,7 +541,6 @@ L<http://metacpan.org/release/Test-XML-Ordered>
 
 =head1 ACKNOWLEDGEMENTS
 
-
 =head1 COPYRIGHT & LICENSE
 
 Copyright 2012 Shlomi Fish.
@@ -561,5 +568,17 @@ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

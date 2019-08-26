@@ -17,7 +17,6 @@ lib/Mojo/RabbitMQ/Client/Method/Publish.pm
 lib/Mojo/RabbitMQ/Client/Publisher.pm
 minil.toml
 share/amqp0-9-1.stripped.extended.xml
-share/fixed_amqp0-8.xml
 t/base.t
 t/localqueue.t
 t/publisher.t

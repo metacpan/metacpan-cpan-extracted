@@ -14,7 +14,7 @@ use English qw/ -no_match_vars /;
 use Path::Tiny;
 use Text::Diff;
 
-our $VERSION = 0.8;
+our $VERSION = 0.9;
 
 has files => (
     is      => 'rw',
@@ -24,8 +24,11 @@ has exclude => (
     is      => 'rw',
     default => sub {[]},
 );
+has cmd => (
+    is      => 'rw',
+    default => 'diff',
+);
 has [qw/
-    cmd
     fast
     follow
     ignore_all_space
@@ -136,7 +139,7 @@ sub dodiff {
     }
     else {
         my $diff = diff($file1, $file2);
-        return (length $diff, "diff $file1 $file2") if $diff;
+        return (length $diff, $self->cmd . " $file1 $file2") if $diff;
     }
 
     return;
@@ -198,7 +201,7 @@ App::diffdir - Compares two or more directories for files that differ
 
 =head1 VERSION
 
-This documentation refers to App::diffdir version 0.8
+This documentation refers to App::diffdir version 0.9
 
 =head1 SYNOPSIS
 

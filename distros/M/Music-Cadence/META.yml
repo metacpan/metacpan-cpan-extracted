@@ -6,6 +6,7 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
+  Test::Exception: '0'
   Test::More: '0'
   perl: '5.010'
   strict: '0'
@@ -31,7 +32,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Music-Cadence
   repository: https://github.com/ology/Music-Cadence.git
-version: '0.0401'
+version: '0.0504'
 x_Dist_Zilla:
   perl:
     version: '5.027007'
@@ -229,7 +230,8 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::GatherDir:
           exclude_filename: []
-          exclude_match: []
+          exclude_match:
+            - \.mid
           follow_symlinks: 0
           include_dotfiles: 0
           prefix: ''

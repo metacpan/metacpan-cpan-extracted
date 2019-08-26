@@ -7,10 +7,11 @@ use Module::CPANfile;
 use Perl::PrereqScanner::NotQuiteLite::App;
 use Test::More;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 our @EXPORT = qw/cpanfile_has_all_used_modules/;
 
 my %Phases = (
+  develop   => [qw/runtime build test configure develop/],
   runtime   => [qw/runtime/],
   build     => [qw/runtime build/],
   test      => [qw/runtime build test/],
@@ -39,7 +40,7 @@ sub cpanfile_has_all_used_modules {
 
   my $prereqs = $scanner->run;
 
-  my $index = $args{index};
+  my $index = $scanner->index;
   my %uri_cache;
   for my $phase (sort $prereqs->phases) {
     for my $type (sort $prereqs->types_in($phase)) {
@@ -76,7 +77,7 @@ sub cpanfile_has_all_used_modules {
               $res ? $res->{uri} : undef;
             };
           }
-          ok($uri && $uri_map{$uri}, "$module ($phase $type) is declared" . ($uri_map{$uri} ? " (as $uri_map{$uri})" : ""));
+          ok($uri && $uri_map{$uri}, "$module ($phase $type) is declared" . ($uri && $uri_map{$uri} ? " (as $uri_map{$uri})" : ""));
         }
       }
     }

@@ -1,3 +1,15 @@
+0.007   2019-08-20  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Add another sample screenshot (for --compare).
+
+
+0.006   2019-08-20  Released-By: PERLANCAR; Urgency: medium
+
+	- Add action 'compare-addresses'.
+
+
 0.005   2019-08-20  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Make --colorize the default.

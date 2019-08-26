@@ -1,5 +1,5 @@
 package Mail::LMLM::Types::Ezmlm;
-$Mail::LMLM::Types::Ezmlm::VERSION = '0.6805';
+$Mail::LMLM::Types::Ezmlm::VERSION = '0.6806';
 use strict;
 use warnings;
 
@@ -7,7 +7,7 @@ use Mail::LMLM::Types::Base;
 
 use vars qw(@ISA);
 
-@ISA=qw(Mail::LMLM::Types::Base);
+@ISA = qw(Mail::LMLM::Types::Base);
 
 sub group_form
 {
@@ -15,12 +15,8 @@ sub group_form
 
     my $add = shift;
 
-    return (
-        ( $self->get_group_base() .
-        ($add ? ("-" . $add) : "") )
-        ,
-        $self->get_hostname()
-        );
+    return ( ( $self->get_group_base() . ( $add ? ( "-" . $add ) : "" ) ),
+        $self->get_hostname() );
 }
 
 sub _get_subscribe_address
@@ -51,22 +47,18 @@ sub _get_owner_address
     return $self->group_form("owner");
 }
 
-
 sub render_something_with_email_addr
 {
     my $self = shift;
 
-    my $htmler = shift;
-    my $begin_msg = shift;
+    my $htmler         = shift;
+    my $begin_msg      = shift;
     my $address_method = shift;
-
 
     $htmler->para($begin_msg);
     $htmler->indent_inc();
     $htmler->start_para();
-    $htmler->email_address(
-        $self->$address_method()
-        );
+    $htmler->email_address( $self->$address_method() );
     $htmler->end_para();
     $htmler->indent_dec();
 
@@ -79,11 +71,9 @@ sub render_subscribe
 
     my $htmler = shift;
 
-    return $self->render_something_with_email_addr(
-        $htmler,
+    return $self->render_something_with_email_addr( $htmler,
         "Send an empty mail message to the following address: ",
-        \&_get_subscribe_address
-        );
+        \&_get_subscribe_address );
 }
 
 sub render_unsubscribe
@@ -92,11 +82,9 @@ sub render_unsubscribe
 
     my $htmler = shift;
 
-    return $self->render_something_with_email_addr(
-        $htmler,
+    return $self->render_something_with_email_addr( $htmler,
         "Send an empty mail message to the following address: ",
-        \&_get_unsubscribe_address
-        );
+        \&_get_unsubscribe_address );
 }
 
 sub render_post
@@ -105,11 +93,9 @@ sub render_post
 
     my $htmler = shift;
 
-    return $self->render_something_with_email_addr(
-        $htmler,
+    return $self->render_something_with_email_addr( $htmler,
         "Send your messages to the following address: ",
-        \&_get_post_address
-        );
+        \&_get_post_address );
 }
 
 sub render_owner
@@ -118,11 +104,9 @@ sub render_owner
 
     my $htmler = shift;
 
-    return $self->render_something_with_email_addr(
-        $htmler,
+    return $self->render_something_with_email_addr( $htmler,
         "Send messages to the mailing-list owner to the following address: ",
-        \&_get_owner_address
-        );
+        \&_get_owner_address );
 }
 
 1;
@@ -139,11 +123,7 @@ Mail::LMLM::Types::Ezmlm - mailing list type for ezmlm-based mailing lists.
 
 =head1 VERSION
 
-version 0.6805
-
-=head1 VERSION
-
-version 0.6805
+version 0.6806
 
 =head1 METHODS
 
@@ -186,7 +166,7 @@ unknown
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by unknown.
+This software is Copyright (c) 2019 by unknown.
 
 This is free software, licensed under:
 
@@ -195,7 +175,7 @@ This is free software, licensed under:
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/mail-lmlm/issues>
+L<https://github.com/shlomif/perl-mail-lmlm/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -304,8 +284,8 @@ The code is open to the world, and available for you to hack on. Please feel fre
 with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
 from your repository :)
 
-L<https://github.com/shlomif/mail-lmlm>
+L<https://github.com/shlomif/perl-mail-lmlm>
 
-  git clone http://bitbucket.org/shlomif/perl-mail-lmlm/overview
+  git clone git://github.com/shlomif/perl-mail-lmlm.git
 
 =cut

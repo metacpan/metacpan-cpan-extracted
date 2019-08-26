@@ -71,25 +71,25 @@
    "provides" : {
       "App::Notifier::Service" : {
          "file" : "lib/App/Notifier/Service.pm",
-         "version" : "0.0700"
+         "version" : "0.0701"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/shlomif/app-notifier-service/issues"
+         "web" : "https://github.com/shlomif/app-notifier/issues"
       },
       "homepage" : "http://www.shlomifish.org/open-source/projects/App-Notifier/",
       "repository" : {
          "type" : "git",
-         "url" : "https://bitbucket.org/shlomif/app-notifier",
-         "web" : "https://github.com/shlomif/app-notifier-service"
+         "url" : "git://github.com/shlomif/app-notifier.git",
+         "web" : "https://github.com/shlomif/app-notifier"
       }
    },
-   "version" : "0.0700",
+   "version" : "0.0701",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.028001"
+         "version" : "5.028002"
       },
       "plugins" : [
          {
@@ -252,11 +252,6 @@
             "version" : "6.012"
          },
          {
-            "class" : "Dist::Zilla::Plugin::PodVersion",
-            "name" : "@Filter/PodVersion",
-            "version" : "6.012"
-         },
-         {
             "class" : "Dist::Zilla::Plugin::Test::Compile",
             "config" : {
                "Dist::Zilla::Plugin::Test::Compile" : {
@@ -357,11 +352,6 @@
                      {
                         "class" : "Pod::Weaver::Plugin::H1Nester",
                         "name" : "@CorePrep/H1Nester",
-                        "version" : "4.015"
-                     },
-                     {
-                        "class" : "Pod::Weaver::Section::Name",
-                        "name" : "@SHLOMIF/Name",
                         "version" : "4.015"
                      },
                      {
@@ -555,7 +545,7 @@
          "version" : "6.012"
       }
    },
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
+   "x_generated_by_perl" : "v5.28.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
 }
 

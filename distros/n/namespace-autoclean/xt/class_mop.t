@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Test::More;
-use Test::Requires 'Class::MOP';
+use Test::Needs 'Class::MOP';
 use Module::Runtime 'require_module';
 
 use lib 'xt/lib';

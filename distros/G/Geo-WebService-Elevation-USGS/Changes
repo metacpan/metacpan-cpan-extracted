@@ -1,3 +1,10 @@
+0.114		2019-08-25	T. R. Wyant
+    Make USGS URL https:, save a redirect.
+
+    Clarify POD re http://ned.usgs.gov/epqs/pqs.php
+
+    Add tests to ensure POD links stay fixed.
+
 0.113		2019-06-21	T. R. Wyant
     Fix more broken POD links.
 

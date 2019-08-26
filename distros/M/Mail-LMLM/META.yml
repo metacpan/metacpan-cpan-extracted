@@ -29,53 +29,53 @@ name: Mail-LMLM
 provides:
   Mail::LMLM:
     file: lib/Mail/LMLM.pm
-    version: '0.6805'
+    version: '0.6806'
   Mail::LMLM::Object:
     file: lib/Mail/LMLM/Object.pm
-    version: '0.6805'
+    version: '0.6806'
   Mail::LMLM::Render:
     file: lib/Mail/LMLM/Render.pm
-    version: '0.6805'
+    version: '0.6806'
   Mail::LMLM::Render::HTML:
     file: lib/Mail/LMLM/Render/HTML.pm
-    version: '0.6805'
+    version: '0.6806'
   Mail::LMLM::Types::Base:
     file: lib/Mail/LMLM/Types/Base.pm
-    version: '0.6805'
+    version: '0.6806'
   Mail::LMLM::Types::Egroups:
     file: lib/Mail/LMLM/Types/Egroups.pm
-    version: '0.6805'
+    version: '0.6806'
   Mail::LMLM::Types::Ezmlm:
     file: lib/Mail/LMLM/Types/Ezmlm.pm
-    version: '0.6805'
+    version: '0.6806'
   Mail::LMLM::Types::GoogleGroups:
     file: lib/Mail/LMLM/Types/GoogleGroups.pm
-    version: '0.6805'
+    version: '0.6806'
   Mail::LMLM::Types::Listar:
     file: lib/Mail/LMLM/Types/Listar.pm
-    version: '0.6805'
+    version: '0.6806'
   Mail::LMLM::Types::Listserv:
     file: lib/Mail/LMLM/Types/Listserv.pm
-    version: '0.6805'
+    version: '0.6806'
   Mail::LMLM::Types::Mailman:
     file: lib/Mail/LMLM/Types/Mailman.pm
-    version: '0.6805'
+    version: '0.6806'
   Mail::LMLM::Types::Majordomo:
     file: lib/Mail/LMLM/Types/Majordomo.pm
-    version: '0.6805'
+    version: '0.6806'
 requires:
   perl: '5.008'
   strict: '0'
   vars: '0'
   warnings: '0'
 resources:
-  bugtracker: https://github.com/shlomif/mail-lmlm/issues
+  bugtracker: https://github.com/shlomif/perl-mail-lmlm/issues
   homepage: http://metacpan.org/release/Mail-LMLM
-  repository: http://bitbucket.org/shlomif/perl-mail-lmlm/overview
-version: '0.6805'
+  repository: git://github.com/shlomif/perl-mail-lmlm.git
+version: '0.6806'
 x_Dist_Zilla:
   perl:
-    version: '5.026002'
+    version: '5.028002'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -206,10 +206,6 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@SHLOMIF/PodSyntaxTests'
-      version: '6.012'
-    -
-      class: Dist::Zilla::Plugin::PodVersion
-      name: '@SHLOMIF/PodVersion'
       version: '6.012'
     -
       class: Dist::Zilla::Plugin::Test::Compile
@@ -364,6 +360,18 @@ x_Dist_Zilla:
       name: Keywords
       version: '0.007'
     -
+      class: Dist::Zilla::Plugin::Test::Kwalitee
+      config:
+        Dist::Zilla::Plugin::Test::Kwalitee:
+          filename: xt/release/kwalitee.t
+          skiptest: []
+      name: Test::Kwalitee
+      version: '2.12'
+    -
+      class: Dist::Zilla::Plugin::Test::TidyAll
+      name: Test::TidyAll
+      version: '0.04'
+    -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
       version: '6.012'
@@ -412,5 +420,5 @@ x_Dist_Zilla:
     config:
       is_trial: '0'
     version: '6.012'
-x_generated_by_perl: v5.26.2
+x_generated_by_perl: v5.28.2
 x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -6,6 +6,7 @@ use warnings;
 
 use Crypt::URandom ();
 use IO::Socket::INET;
+use Module::Load;
 use Time::HiRes ();
 use AWS::XRay::Segment;
 use AWS::XRay::Buffer;
@@ -13,7 +14,7 @@ use AWS::XRay::Buffer;
 use Exporter 'import';
 our @EXPORT_OK = qw/ new_trace_id capture capture_from trace /;
 
-our $VERSION = "0.08";
+our $VERSION = "0.09";
 
 our $TRACE_ID;
 our $SEGMENT_ID;
@@ -22,6 +23,8 @@ our $SAMPLED;
 our $SAMPLING_RATE = 1;
 our $SAMPLER       = sub { rand() < $SAMPLING_RATE };
 our $AUTO_FLUSH    = 1;
+
+our @PLUGINS;
 
 our $DAEMON_HOST = "127.0.0.1";
 our $DAEMON_PORT = 2000;
@@ -46,6 +49,15 @@ sub sampler {
         $SAMPLER = shift;
     }
     $SAMPLER;
+}
+
+sub plugins {
+    my $class = shift;
+    if (@_) {
+        @PLUGINS = @_;
+        Module::Load::load $_ for @PLUGINS;
+    }
+    @PLUGINS;
 }
 
 sub auto_flush {
@@ -89,35 +101,43 @@ sub new_id {
 
 sub capture {
     my ($name, $code) = @_;
+    my $wantarray = wantarray;
 
     my $enabled;
-    my $sampled = $AWS::XRay::SAMPLED;
-    if (defined $AWS::XRay::ENABLED) {
-        $enabled = $AWS::XRay::ENABLED ? 1 : 0; # fix true or false (not undef)
-    } elsif ($AWS::XRay::TRACE_ID) {
+    my $sampled = $SAMPLED;
+    if (defined $ENABLED) {
+        $enabled = $ENABLED ? 1 : 0; # fix true or false (not undef)
+    } elsif ($TRACE_ID) {
         $enabled = 0; # called from parent capture
     } else {
         # root capture try sampling
         $sampled = $SAMPLER->() ? 1 : 0;
         $enabled = $sampled     ? 1 : 0;
     }
-    local $AWS::XRay::ENABLED = $enabled;
-    local $AWS::XRay::SAMPLED = $sampled;
+    local $ENABLED = $enabled;
+    local $SAMPLED = $sampled;
 
     return $code->(AWS::XRay::Segment->new) if !$enabled;
 
-    local $AWS::XRay::TRACE_ID = $AWS::XRay::TRACE_ID // new_trace_id();
+    local $TRACE_ID = $TRACE_ID // new_trace_id();
 
     my $segment = AWS::XRay::Segment->new({ name => $name });
-    local $AWS::XRay::SEGMENT_ID = $segment->{id};
+    unless (defined $segment->{type} && $segment->{type} eq "subsegment") {
+        $_->apply_plugin($segment) for @PLUGINS;
+    }
+
+    local $SEGMENT_ID = $segment->{id};
 
     my @ret;
     eval {
-        if (wantarray) {
+        if ($wantarray) {
             @ret = $code->($segment);
         }
-        else {
+        elsif (defined $wantarray) {
             $ret[0] = $code->($segment);
+        }
+        else {
+            $code->($segment);
         }
     };
     my $error = $@;
@@ -140,7 +160,7 @@ sub capture {
         warn $@;
     }
     die $error if $error;
-    return wantarray ? @ret : $ret[0];
+    return $wantarray ? @ret : $ret[0];
 }
 
 sub capture_from {
@@ -190,6 +210,30 @@ sub add_capture {
     }
 }
 
+if ($ENV{LAMBDA_TASK_ROOT}) {
+    # AWS::XRay is loaded in AWS Lambda worker.
+    # notify the Lambda Runtime that initialization is complete.
+    mkdir '/tmp/.aws-xray' or warn "failed to make directory: $!";
+    open my $fh, '>', '/tmp/.aws-xray/initialized' or warn "failed to create file: $!";
+    close $fh;
+    utime undef, undef, '/tmp/.aws-xray/initialized' or warn "failed to touch file: $!";
+
+    # patch the capture
+    no warnings 'redefine';
+    no strict 'refs';
+    my $org = \&capture;
+    *capture = sub {
+        my ($trace_id, $segment_id, $sampled) = parse_trace_header($ENV{_X_AMZN_TRACE_ID});
+        local $AWS::XRay::SAMPLED = $sampled // $SAMPLER->();
+        local $AWS::XRay::ENABLED = $AWS::XRay::SAMPLED;
+        local($AWS::XRay::TRACE_ID, $AWS::XRay::SEGMENT_ID) = ($trace_id, $segment_id);
+        local *capture = $org;
+        local *trace = $org;
+        capture(@_);
+    };
+    *trace = \&capture;
+}
+
 1;
 __END__
 
@@ -213,7 +257,7 @@ AWS::XRay - AWS X-Ray tracing library
         capture "myHTTP", sub {
             my $segment = shift;
             # ...
-            $segment->{http} = { # modify segument document
+            $segment->{http} = { # modify segment document
                 request => {
                     method => "GET",
                     url    => "http://localhost/",
@@ -295,7 +339,7 @@ $rate is allowed a float value between 0 and 1.
 
 When capture_from() called with a trace header includes "Sampled=1", all of followed capture() are traced.
 
-=head2 samplier($code)
+=head2 sampler($code)
 
 Set/Get a code ref to sample for capture().
 

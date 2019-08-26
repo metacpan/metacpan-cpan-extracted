@@ -46,7 +46,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "File::Temp" => 0,
     "FindBin" => 0,
-    "HTTP::Daemon" => 0,
+    "HTTP::Daemon" => "6.05",
     "HTTP::Response" => 0,
     "HTTP::Server::Simple::CGI" => 0,
     "LWP" => 0,
@@ -62,7 +62,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "vars" => 0
   },
-  "VERSION" => "1.91",
+  "VERSION" => "1.92",
   "test" => {
     "TESTS" => "t/*.t t/local/*.t t/mech-dump/*.t"
   }
@@ -83,7 +83,7 @@ my %FallbackPrereqs = (
   "HTML::TokeParser" => 0,
   "HTML::TreeBuilder" => 5,
   "HTTP::Cookies" => 0,
-  "HTTP::Daemon" => 0,
+  "HTTP::Daemon" => "6.05",
   "HTTP::Request" => "1.30",
   "HTTP::Request::Common" => 0,
   "HTTP::Response" => 0,

@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::AutoReload;
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 # ABSTRACT: Automatically reload open browser windows when your application changes
 
 #pod =head1 SYNOPSIS
@@ -86,11 +86,19 @@ sub register {
         $app->hook(after_render => sub {
             my ( $c, $output, $format ) = @_;
             return if $c->stash( 'plugin.auto_reload.disable' );
-            if ( $format eq 'html' ) {
-                my $dom = Mojo::DOM->new( $$output );
-                my $body = $dom->at( 'body' ) || $dom;
-                $body->append_content( $c->auto_reload );
-                $$output = "$dom";
+            return if $format ne 'html';
+            if ( my $reload = $c->auto_reload ) {
+                # Try to add the auto-reload to the end of the body.
+                # Not using Mojo::DOM because it causes bizarre errors
+                # when trying to 'utf8::downgrade' in
+                # Mojo::IOLoop::Stream:
+                #   Mojo::Reactor::Poll: I/O watcher failed: Wide
+                #   character in subroutine entry
+                unless ( $$output =~ s{(</body)}{$reload$1} ) {
+                    # Otherwise just append it, since the end will be
+                    # the body
+                    $$output .= $reload;
+                }
             }
         });
     }
@@ -130,7 +138,7 @@ Mojolicious::Plugin::AutoReload - Automatically reload open browser windows when
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

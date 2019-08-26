@@ -44,10 +44,11 @@
          "web" : "https://github.com/iamalnewkirk/doodle"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_authority" : "cpan:AWNCORP",
    "x_contributors" : [
-      "Al Newkirk <al@iamalnewkirk.com>"
+      "Al Newkirk <al@iamalnewkirk.com>",
+      "Shlomi Fish <shlomif@shlomifish.org>"
    ],
    "x_generated_by_perl" : "v5.14.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"

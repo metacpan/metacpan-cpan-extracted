@@ -1,7 +1,5 @@
 package Sim::OPT::Interlinear;
 # NOTE: TO USE THE PROGRAM AS A SCRIPT, THE LINE ABOVE SHOULD BE DELETED.
-
-# INTERLINEAR
 # Author: Gian Luca Brunetti, Politecnico di Milano. (gianluca.brunetti@polimi.it)
 # Copyright reserved.  2018-2019.
 # GPL License 3.0 or newer.
@@ -33,7 +31,7 @@ use Sim::OPT::Parcoord3d;
 
 our @ISA = qw( Exporter );
 our @EXPORT = qw( interlinear, interstart prepfactlev tellstepsize );
-$VERSION = '0.157';
+$VERSION = '0.159';
 $ABSTRACT = 'Interlinear is a program for building metamodels from incomplete, multivariate, discrete dataseries on the basis of nearest-neighbouring gradients weighted by distance.';
 
 #######################################################################
@@ -1775,8 +1773,8 @@ sub interlinear
   $minimumcertain = 0; # WHAT IS THE MINIMUM LEVEL OF STRENGTH (LEVEL OF RELIABILITY) REQUIRED TO USE A DATUM TO BUILD UPON IT. IT DEPENDS ON THE DISTANCE FROM THE ORIGINS OF THE DATUM. THE LONGER THE DISTANCE, THE SMALLER THE STRENGTH (WHICH IS INDEED INVERSELY PROPORTIONAL). A STENGTH VALUE OF 1 IS OF A SIMULATED DATUM, NOT OF A DERIVED DATUM. If 0, no entry barrier.
   $minimumhold = 1; # WHAT IS THE MINIMUM LEVEL OF STRENGTH (LEVEL OF RELIABILITY) REQUIRED FOR NOT AVERAGING A DATUM WITH ANOTHER, DERIVED DATUM. USUALLY IT HAS TO BE KEPT EQUAL TO $minimimcertain.  If 1, ONLY THE MODEL DATA ARE NOT SUBSTITUTABLE IN THE METAMODEL.
   $condweight = "yes"; # THIS CONDITIONS TELLS IF THE STRENGTH (LEVEL OF RELIABILITY) OF THE GRADIENTS HAS TO BE CUMULATIVELY TAKEN INTO ACCOUNT IN THE WEIGHTING CALCULATIONS.
-  $nfiltergrads = "125"; # DO NOT USE. do not take into account the gradients which in the ranking of strengths are below a certain position. If unspecified: inactive.
-  $limit_checkdistgrads = ""; # DO NOT USE. LIMIT OF RELATIONS TAKEN INTO ACCOUNT IN CALCULATING THE NET OF GRADIENTS. IF NULL, NO BARRIER. 10000 IS A GOOD COMPROMISE BETWEEN SPEED AND RELIABILITY.
+  $nfiltergrads = ""; # DO NOT USE. do not take into account the gradients which in the ranking of strengths are below a certain position. If unspecified: inactive.
+  $limit_checkdistgrads = ""; # LIMIT OF RELATIONS TAKEN INTO ACCOUNT IN CALCULATING THE NET OF GRADIENTS. IF NULL, NO BARRIER. AS A NUMBER, 1/5 OR 1/10 OF THE TOTAL INSTANCES SHOULD BE A GOOD PLACE TO START AS A COMPROMISE BETWEEN SPEED AND RELIABILITY.
   $limit_checkdistpoints = ""; # DO NOT USE. LIMIT OF RELATIONS TAKEN INTO ACCOUNT IN CALCULATING THE NET OF POINTS. IF NULL, NO BARRIER. 10000 IS A GOOD COMPROMISE BETWEEN SPEED AND RELIABILITY.
   $fulldo = "no"; # TO SEARCH FOR MAXIMUM PRECISION AT THE EXPENSES OF SPEED. "yes" MAKES THE GRADIENTS BE RECALCULATED AT EACH COMPUTATION CYCLE.
   $lvconversion = "";
@@ -1813,6 +1811,9 @@ sub interlinear
   #print "THIS $tee";
   say $tee "Preparing the dataseries, IN INTERLINEAR: \$countblock $countblock";
   say "nfiltergrads: $nfiltergrads";
+  say "limit_checkdistgrads: $limit_checkdistgrads";
+  say "limit_checkdistpoints: $limit_checkdistpoints";
+  say "\$limitgrads: $limitgrads";
   my $checkstop;
 
   my $aarr_ref;
@@ -2094,7 +2095,6 @@ To work well with a latin hypercube sampling, it is usually necessary to include
 
 A configuration file should be prepared following the example in the "examples" folder in this distribution.
 If the configuration file is incomplete or missing, the program will adopt its own defaults, exploiting the distance-weighted gradient-based strategy.
-in the last column in the last column
 The only variable that must mandatorily be specified in a configuration file is $sourcefile: the Unix path to the source file containining the dataseries. The source file has to be prepared by listing in each column the values (levels) of the parameters (factors, variables), putting the objective function valuesin the last column in the last column, at the rows in which they are present.
 
 The parameter number is given by the position of the column (i.e. column 4 host parameter 4).
@@ -2147,7 +2147,7 @@ The program converts this format into the one preferred by Sim::OPTS, which is t
 After some computations, Interlinear will output a new dataseries with the missing values filled in.
 This dataseries can be used by OPT for the optimization of one or more blocks. This can be useful, for example, to save computations in searches involving simulations, especially when the time required by each simulations is long, like it may happen with CFD simulations in building design.
 
-The number of computations required for the creation of a metamodel in OPT increases exponentially with the number of instances in the metamodel. To reduce the exponential, a limit has to be set for the size of the net of instances taken into account in the computations for gradients and for points. The variables in the configuration files controlling those limits is "$nfiltergrads", a limit with adaptive effects. By default it is unspecified. If if is are unspecified (i.e. a null value ("") is specified for them), no limit is assumed. "$nfiltergrads" may be set to the double of the square root of the number of instances of a problem space. An example of configuration file is embedded in the source code to produce the defaults.
+The number of computations required for the creation of a metamodel in OPT increases exponentially with the number of instances in the metamodel. To reduce the exponential, a limit has to be set for the size of the net of instances taken into account in the computations for gradients and for points. The variables in the configuration files controlling those limits are "$nfiltergrads", a limit with adaptive effects, and "$limit_checkdistgrads". By default they are unspecified. If they are unspecified (i.e. a null value ("") is specified for them), no limit is assumed. "$nfiltergrads" may be set to the double of the square root of the number of instances of a problem space. "$limit_checkdistgrads" may be set to a part of the total number of instances, for example that number divided by 1/5, or 1/10. An example of configuration file with more information in the comments is embedded in this source code, where it sets the defaults.
 
 To call Interlinear as a Perl function (best strategy):
 re.pl # open Perl shell

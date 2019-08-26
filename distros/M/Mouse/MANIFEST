@@ -351,6 +351,7 @@ t/900_mouse_bugs/019_issue64/Bar.pm
 t/900_mouse_bugs/019_issue64/Foo.pm
 t/900_mouse_bugs/019_issue64/Holder.pm
 t/900_mouse_bugs/020_stack_collapse_on_build.t
+t/900_mouse_bugs/021_issue100_sevg.t
 t/900_mouse_bugs/RT75093.t
 t/901_todo/attribute_warn.t
 t/990_deprecated/001-export_to_level.t

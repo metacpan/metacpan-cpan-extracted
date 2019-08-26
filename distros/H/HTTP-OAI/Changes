@@ -1,8 +1,11 @@
 Revision history for HTTP-OAI
 
+4.09  2019-08-22 10:39:03 CEST
+  - Fixing set option in script/oai_pmh.pl [stain]
+  
 4.08  2018-11-26 11:29:41 CET
   - Fixing passing DOM to HTTP::OAI::Metadata
-  
+
 4.07  2018-05-28 15:14:54 CEST
   - Fixing counting number of tests
   - Fixed adding XSLT stylesheet process instructions #4

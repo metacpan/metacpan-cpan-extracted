@@ -1,5 +1,6 @@
 Changes
 lib/Config/AST.pm
+lib/Config/AST/Follow.pm
 lib/Config/AST/Node.pm
 lib/Config/AST/Node/Null.pm
 lib/Config/AST/Node/Section.pm
@@ -26,6 +27,7 @@ t/01conf14.t
 t/01conf15.t
 t/02conf01.t
 t/02merge.t
+t/03ovr.t
 t/TestConfig.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

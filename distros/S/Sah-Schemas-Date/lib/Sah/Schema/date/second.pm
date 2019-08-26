@@ -1,7 +1,7 @@
 package Sah::Schema::date::second;
 
-our $DATE = '2019-06-24'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-07-21'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 our $schema = [int => {
     summary => 'Second of minute',
@@ -25,7 +25,7 @@ Sah::Schema::date::second - Second of minute
 
 =head1 VERSION
 
-This document describes version 0.004 of Sah::Schema::date::second (from Perl distribution Sah-Schemas-Date), released on 2019-06-24.
+This document describes version 0.006 of Sah::Schema::date::second (from Perl distribution Sah-Schemas-Date), released on 2019-07-21.
 
 =head1 HOMEPAGE
 

@@ -1,3 +1,11 @@
+ -- VERSION 0.56 --
+
+2019-08-21: Marc Bradshaw <marc@marcbradshaw.net>
+
+ * Properly verify the domain, not the instance, of an ARC signature.
+   This allows ARC signatures by keys marked as no subdomains to
+   validate correctly.
+
  -- VERSION 0.55 --
 
 2019-04-12: Marc Bradshaw <marc@marcbradshaw.net>

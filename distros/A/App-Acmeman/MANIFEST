@@ -1,0 +1,18 @@
+acmeman
+Changes
+lib/App/Acmeman.pm
+lib/App/Acmeman/Apache/Layout.pm
+lib/App/Acmeman/Config.pm
+lib/App/Acmeman/Domain.pm
+lib/App/Acmeman/Log.pm
+lib/App/Acmeman/Source.pm
+lib/App/Acmeman/Source/Apache.pm
+lib/App/Acmeman/Source/File.pm
+lib/App/Acmeman/Source/Null.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

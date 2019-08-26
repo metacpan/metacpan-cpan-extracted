@@ -6,7 +6,7 @@ use Carp;
 use Perl::PrereqScanner::NotQuiteLite::Context;
 use Perl::PrereqScanner::NotQuiteLite::Util;
 
-our $VERSION = '0.9906';
+our $VERSION = '0.9908';
 
 our @BUNDLED_PARSERS = qw/
   Aliased AnyMoose Autouse Catalyst ClassAccessor
@@ -222,6 +222,8 @@ sub _get_parsers {
 
 sub scan_file {
   my ($self, $file) = @_;
+  _debug("START SCANNING $file") if DEBUG;
+  print STDERR " Scanning $file\n" if $self->{verbose};
   open my $fh, '<', $file or croak "Can't open $file: $!";
   my $code = do { local $/; <$fh> };
   $self->{file} = $file;

@@ -1,12 +1,12 @@
 package exact::cli;
 # ABSTRACT: Command-line interface helper utilities extension for exact
 
-use 5.010;
+use 5.014;
 use exact;
 use strict;
 use Util::CommandLine 1.04 ();
 
-our $VERSION = '1.01'; # VERSION
+our $VERSION = '1.03'; # VERSION
 
 sub import {
     my ( $self, $caller ) = @_;
@@ -44,14 +44,14 @@ exact::cli - Command-line interface helper utilities extension for exact
 
 =head1 VERSION
 
-version 1.01
+version 1.03
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/exact-cli.svg)](https://travis-ci.org/gryphonshafer/exact-cli)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/exact-cli/badge.png)](https://coveralls.io/r/gryphonshafer/exact-cli)
 
 =head1 SYNOPSIS
 
-    use exact cli;
+    use exact -cli;
 
 =head1 DESCRIPTION
 
@@ -62,7 +62,7 @@ See the L<exact> documentation for additional informatioh about
 extensions. The intended use of L<exact::cli> is via the extension interface
 of L<exact>.
 
-    use exact cli, conf, noutf8;
+    use exact -cli, -conf, -noutf8;
 
 However, you can also use it directly, which will also use L<exact> with
 default options:

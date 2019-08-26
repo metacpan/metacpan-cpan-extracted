@@ -14,6 +14,7 @@ use Role::Tiny::With;
 with 'XT::Files::Role::Logger';
 
 delete $ENV{XT_FILES_DEBUG};
+delete $ENV{XT_FILES_DEFAULT_CONFIG_FILE};
 
 my $prefix = 'PrEfIx';
 

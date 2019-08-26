@@ -7,7 +7,6 @@ lib/Travel/Status/DE/IRIS.pm
 lib/Travel/Status/DE/IRIS/Result.pm
 lib/Travel/Status/DE/IRIS/Stations.pm
 MANIFEST			This list of files
-META.json
 README
 scripts/acronyms.pl
 scripts/acronyms.sh
@@ -45,9 +44,9 @@ t/in/station/EBO
 t/in/station/EDG
 t/in/station/EE
 t/in/station/KK
-X-eva-codes
 xt/00-compile-pm.t
 xt/01-compile-pl.t
 xt/02-compile-pod.t
 META.yml
+META.json
 SIGNATURE    Added here by Module::Build

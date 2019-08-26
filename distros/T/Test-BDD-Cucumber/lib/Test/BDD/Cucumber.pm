@@ -1,5 +1,5 @@
 package Test::BDD::Cucumber;
-$Test::BDD::Cucumber::VERSION = '0.57';
+$Test::BDD::Cucumber::VERSION = '0.58';
 use strict;
 use warnings;
 1;
@@ -12,7 +12,7 @@ Test::BDD::Cucumber - Feature-complete Cucumber-style testing in Perl
 
 =head1 VERSION
 
-version 0.57
+version 0.58
 
 =head1 DESCRIPTION
 
@@ -20,7 +20,7 @@ A sane and complete Cucumber implementation in Perl
 
 Behaviour of this module is similar to that, but sometimes different from
 the I<real> Cucumber, the plan is to move use the same parser and behaviour
-L<See the logged issue|https://github.com/pjlsergeant/test-bdd-cucumber-perl/issues/73>.
+L<See the logged issue|https://github.com/pherkin/test-bdd-cucumber-perl/issues/73>.
 
 =head1 QUICK LINKS
 
@@ -68,7 +68,7 @@ in the intepretation of feature files when comparing to Cucumber.
 
 =head1 CODE
 
-On Github, of course: L<https://github.com/pjlsergeant/test-bdd-cucumber-perl>.
+On Github, of course: L<https://github.com/pherkin/test-bdd-cucumber-perl>.
 
 =head1 AUTHORS
 
@@ -80,6 +80,6 @@ Ben Rodgers C<ben@bdr.org>
 
 =head1 LICENSE
 
-Copyright 2011-2016, Peter Sergeant; Licensed under the same terms as Perl
+Copyright 2011-2019, Peter Sergeant; Licensed under the same terms as Perl
 
 =cut

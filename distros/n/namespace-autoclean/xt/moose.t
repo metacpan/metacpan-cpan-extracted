@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Test::More;
-use Test::Requires { 'Moose' => '()' };
+use Test::Needs 'Moose';
 use Module::Runtime 'require_module';
 
 use lib 'xt/lib';

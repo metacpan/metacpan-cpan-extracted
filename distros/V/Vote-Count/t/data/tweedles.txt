@@ -1,0 +1,4 @@
+# Two choices absolutely equal.
+:CHOICES:TWEEDLE_DEE:TWEEDLE_DUM
+TWEEDLE_DEE:50
+TWEEDLE_DUM:50

@@ -3,7 +3,7 @@
 ^.lwpcookies
 ^.releaserc
 ^blib/
-^List-FullCompare-.*
+^Text-CleanFragment-.*
 CVS/
 ^pm_to_blib
 .tar.gz$

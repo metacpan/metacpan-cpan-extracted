@@ -16,12 +16,12 @@ XS::Install::ParseXS::add_no_typemap_callback(sub {
     unless ($typemaps->get_inputmap(xstype => $tm_cast)) {
         $typemaps->add_inputmap(
             xstype => $tm_cast,
-            code   => '$var = xs::in<$type>(aTHX_ $arg);'.
+            code   => '$var = xs::in<$type>($arg);'.
                       '${\\( $var eq q{THIS} ? qq{ if (!SvOK($arg)) throw \\"undef not allowed as THIS\\";} : q{} )}',
         );
         $typemaps->add_outputmap(
             xstype => $tm_cast,
-            code   => '$arg = xs::out(aTHX_ $var, PROTO).detach();',
+            code   => '$arg = xs::out($var, PROTO).detach();',
         );
     }
 });
@@ -38,7 +38,7 @@ XS::Install::ParseXS::add_pre_callback(sub {
     
     if ($func eq 'DESTROY' and $fa and $fa->{name} eq 'THIS') {
         my $in_tmap = $parser->{typemap}->get_inputmap(ctype => $fa->{type});
-        XS::Install::ParseXS::insert_code_bottom($parser, "        xs::Typemap<$fa->{type}>().destroy(aTHX_ $fa->{name}, SvRV(ST(0)));")
+        XS::Install::ParseXS::insert_code_bottom($parser, "        xs::Typemap<$fa->{type}>().destroy($fa->{name}, SvRV(ST(0)));")
            if $in_tmap && $in_tmap->xstype eq $tm_cast;
     }
     
@@ -61,9 +61,9 @@ XS::Install::ParseXS::add_post_callback(sub {
     my $outref = shift;
     if ($XS::Install::ParseXS::cplus) {
         #wrap content of XSUBs into try-catch blocks
-        $$outref =~ s/$XS::Install::ParseXS::re_xsub/$1 { xs::throw_guard(aTHX_ cv, [=]() \n$2); }/g;
+        $$outref =~ s/$XS::Install::ParseXS::re_xsub/$1 { xs::throw_guard(cv, [=]() \n$2); }/g;
         #wrap content of BOOT into try-catch blocks
-        $$outref =~ s/$XS::Install::ParseXS::re_boot/$1 { xs::throw_guard(aTHX_ cv, [=]() mutable\n$2); }/g;
+        $$outref =~ s/$XS::Install::ParseXS::re_boot/$1 { xs::throw_guard(cv, [=]() mutable\n$2); }/g;
     }
 });
 

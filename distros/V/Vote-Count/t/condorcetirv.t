@@ -21,40 +21,39 @@ use Vote::Count::ReadBallots 'read_ballots';
 use Vote::Count::Method::CondorcetIRV;
 
 my $S1 =
-  Vote::Count::->new(
+  Vote::Count::Method::CondorcetIRV->new(
     'BallotSet' => read_ballots('t/data/biggerset1.txt'),
     'DropStyle' => 'all',
     'DropRule'  => 'topcount',
   );
 
-my $winner1 = SmithSetIRV( $S1 ) ;
-is( $winner1, 'MINTCHIP', 'simple set with condorcet winner');
+my $winner1 =  $S1->SmithSetIRV() ;
+is( $winner1->{'winner'}, 'MINTCHIP', 'simple set with condorcet winner');
 note $S1->logt;
 
 my $S2 =
-  Vote::Count::->new(
+  Vote::Count::Method::CondorcetIRV->new(
     'BallotSet' => read_ballots('t/data/loop1.txt'),
     'DropStyle' => 'all',
     'DropRule'  => 'topcount',
   );
 
-my $winner2 = SmithSetIRV( $S2 ) ;
-is( $winner2, 'MINTCHIP', 'set with no condorcet winner');
+my $winner2 = $S2->SmithSetIRV() ;
+is( $winner2->{'winner'}, 'MINTCHIP', 'set with no condorcet winner');
 note $S2->logt;
 
 my $S3 =
-  Vote::Count::->new(
+  Vote::Count::Method::CondorcetIRV->new(
     'BallotSet' => read_ballots('t/data/ties1.txt'),
     'DropStyle' => 'all',
     'DropRule'  => 'topcount',
   );
 
-my $winner3 = SmithSetIRV( $S3 ) ;
-is( $winner3, '', 'set that ends with a tie returns empty string for winenr');
-my $tiechoices = { 'FUDGESWIRL', 1,'VANILLA',1};
-is_deeply( $S3->Active(), $tiechoices,
-  'after a tie the activeset is the tied choices'
-);
+my $result3 = $S3->SmithSetIRV() ;
+is( $result3->{'winner'}, 0, 'set that ends with a tie returns a false value winner');
+# my $tiechoices = { 'FUDGESWIRL', 1,'VANILLA',1};
+is_deeply( $result3->{'tied'}, ['FUDGESWIRL', 'VANILLA'],
+  'tied choices in $result->{tied}');
 note $S3->logv;
 # p $S3->Active();
 

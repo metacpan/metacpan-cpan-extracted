@@ -8,13 +8,13 @@ package Vote::Count::Borda;
 use Moose::Role;
 
 
-our $VERSION='0.021';
+our $VERSION='0.022';
 
 =head1 NAME
 
 Vote::Count::Borda
 
-=head1 VERSION 0.021
+=head1 VERSION 0.022
 
 =cut
 
@@ -65,16 +65,9 @@ One major criticism of the count is that when there are many choices the differe
 
 Range Voting Proposals such as STAR typically use a fixed depth count where voters may rank choices equally.
 
-When Creating a VoteCount object the Borda weight
-may be set by passing a coderef. The coderef takes
-two arguments. The first argument is the
-position of the choice in question.
-The second argument is the depth of the ballot. The
-optional bordadepth attribute will set an arbitrary
-depth. Some popular options such inversion ( where
-choice $c becomes $c/1 then inverted to 1/$c) don't
-need to know the depth. In such cases the coderef
-should just ignore the second argument.
+When Creating a VoteCount object the Borda weight may be set by passing a coderef. The coderef takes two arguments. The first argument is the
+position of the choice in question. The second argument is the depth of the ballot. The optional bordadepth attribute will set an arbitrary
+depth. Some popular options such inversion (where choice $c becomes $c/1 then inverted to 1/$c) don't  need to know the depth. In such cases the coderef should just ignore the second argument.
 
   my $testweight = sub {
     my $x = int shift @_;
@@ -195,4 +188,3 @@ LICENSE
 This module is released under the GNU Public License Version 3. See license file for details. For more information on this license visit L<http://fsf.org>.
 
 =cut
-

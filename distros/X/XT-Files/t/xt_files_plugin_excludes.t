@@ -11,6 +11,8 @@ use Test::More 0.88;
 use XT::Files;
 use XT::Files::Plugin::Excludes;
 
+delete $ENV{XT_FILES_DEFAULT_CONFIG_FILE};
+
 use constant CLASS => 'XT::Files::Plugin::Excludes';
 
 like( exception { CLASS()->new() }, q{/xtf attribute required/}, q{new throws an exception if 'xtf' argument is missing} );

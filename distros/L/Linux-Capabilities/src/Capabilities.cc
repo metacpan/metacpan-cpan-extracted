@@ -44,6 +44,15 @@ excepted<Capabilities*, CapabilityErrors> Capabilities::init_empty() {
     return new Capabilities(caps);
 }
 
+excepted<Capabilities*, CapabilityErrors> Capabilities::init_from_file(string str) {
+    cap_t caps = cap_get_file(str.c_str());
+    if (!caps) {
+        return error("cap_get_file returned empty result, input: ", str);
+    }
+
+    return new Capabilities(caps);
+}
+
 excepted<Capabilities*, CapabilityErrors> Capabilities::init() {
     cap_t caps = cap_get_proc();
     if (!caps) {
@@ -127,6 +136,19 @@ excepted<string, CapabilityErrors> Capabilities::get_text() {
     return char_to_string(cstr);
 }
 
+excepted<string, CapabilityErrors> Capabilities::get_name(cap_value_t val) {
+    if (!is_supported(val)) {
+        return error("bad value: ", val);
+    }
+
+    char* cstr;
+    if (!(cstr = cap_to_name(val))) {
+        return error("cap_to_name failed");
+    }
+
+    return char_to_string(cstr);
+}
+
 excepted<CapFlags, CapabilityErrors> Capabilities::get_value(cap_value_t val) {
     if (!is_supported(val)) {
         return error("bad value: ", val);
@@ -165,6 +187,14 @@ excepted<cap_flag_value_t, CapabilityErrors> Capabilities::get_value_flag(cap_va
 excepted<void, CapabilityErrors> Capabilities::submit() {
     if (cap_set_proc(caps) < 0) {
         return error("cap_set_proc failed");
+    }
+
+    return {};
+}
+
+excepted<void, CapabilityErrors> Capabilities::submit_to_file(string fpath) {
+    if (cap_set_file(fpath.c_str(), caps) < 0) {
+        return error("cap_set_file failed");
     }
 
     return {};

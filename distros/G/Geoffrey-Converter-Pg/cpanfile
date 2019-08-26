@@ -1,5 +1,4 @@
 requires 'Geoffrey',        '>= 0.000103';
 requires 'Readonly',        '>= 0';
-requires 'DBD::Pg',         '>= 0';
 requires 'Test::Exception', '>= 0';
 

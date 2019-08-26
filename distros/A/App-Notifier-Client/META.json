@@ -62,11 +62,11 @@
    "provides" : {
       "App::Notifier::Client" : {
          "file" : "lib/App/Notifier/Client.pm",
-         "version" : "0.0301"
+         "version" : "0.0302"
       },
       "App::Notifier::Client::Notifier_App" : {
          "file" : "lib/App/Notifier/Client/Notifier_App.pm",
-         "version" : "0.0301"
+         "version" : "0.0302"
       }
    },
    "release_status" : "stable",
@@ -77,15 +77,15 @@
       },
       "homepage" : "http://metacpan.org/release/App-Notifier-Client",
       "repository" : {
-         "type" : "hg",
-         "url" : "ssh://hg@bitbucket.org/shlomif/app-notifier",
-         "web" : "http://bitbucket.org/shlomif/app-notifier"
+         "type" : "git",
+         "url" : "git://github.com/shlomif/app-notifier.git",
+         "web" : "https://github.com/shlomif/app-notifier"
       }
    },
-   "version" : "0.0301",
+   "version" : "0.0302",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.028001"
+         "version" : "5.028002"
       },
       "plugins" : [
          {
@@ -245,11 +245,6 @@
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
             "name" : "@Filter/PodSyntaxTests",
-            "version" : "6.012"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::PodVersion",
-            "name" : "@Filter/PodVersion",
             "version" : "6.012"
          },
          {
@@ -532,7 +527,7 @@
          "version" : "6.012"
       }
    },
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
+   "x_generated_by_perl" : "v5.28.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
 }
 

@@ -1,9 +1,36 @@
 ==================================================
-Changes from 2018-08-12 00:00:00 +0000 to present.
+Changes from 2018-08-26 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.0.1 at 2019-08-12 19:08:55 +0000
+version 0.0.2 at 2019-08-26 21:13:23 +0000
+------------------------------------------
+
+  Change: d2da63fa5e96c86d43a0baab358239c927b79bed
+  Author: Larry Leszczynski <larry.leszczynski@grantstreet.com>
+  Date : 2019-08-26 13:57:51 +0000
+
+    Merge pull request #1 in GIT/test2-plugin-todofailonsuccess from
+    bugfix/run-make-update to master
+
+    * commit '15b840a1f4c4b039517f95f6a7a266a245089b3b':
+
+    run "make update" for 0.0.2 
+
+  Change: 15b840a1f4c4b039517f95f6a7a266a245089b3b
+  Author: Mark Flickinger <mark.flickinger@grantstreet.com>
+  Date : 2019-08-26 12:56:41 +0000
+
+    run "make update" for 0.0.2 
+
+  Change: e4ab0483366d8bc4cea8831f93a78342e31bbc6a
+  Author: Larry Leszczynski <Larry.Leszczynski@GrantStreet.com>
+  Date : 2019-08-16 19:53:10 +0000
+
+    Added some minimum dependency versions 
+
+------------------------------------------
+version 0.0.1 at 2019-08-12 18:39:07 +0000
 ------------------------------------------
 
   Change: 2f97f18df56f2cae65b716bb64eeee1c0d881035

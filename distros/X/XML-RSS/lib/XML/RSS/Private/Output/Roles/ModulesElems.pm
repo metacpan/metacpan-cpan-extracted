@@ -1,5 +1,5 @@
 package XML::RSS::Private::Output::Roles::ModulesElems;
-$XML::RSS::Private::Output::Roles::ModulesElems::VERSION = '1.60';
+$XML::RSS::Private::Output::Roles::ModulesElems::VERSION = '1.61';
 use strict;
 use warnings;
 
@@ -17,7 +17,7 @@ __END__
 
 =head1 VERSION
 
-version 1.60
+version 1.61
 
 =head1 AUTHOR
 

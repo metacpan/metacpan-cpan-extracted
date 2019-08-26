@@ -1,4 +1,4 @@
-# Bio-RNA-RNAaliSplit 0.10
+# Bio-RNA-RNAaliSplit 0.11
 
 Bio::RNA::RNAaliSplit is a distribution of Perl modules for splitting
 and deconvoluting structural RNA multiple sequence alignments
@@ -30,17 +30,17 @@ significant covariation in base pairs. Download R-scape from
 http://www.eddylab.org/R-scape .
 
 Be sure to have all dependencies up and running on your system (and
-available to the Perl interpreter) priot to installation of
+available to the Perl interpreter) prior to installation of
 Bio::RNA::RNAaliSplit.
 
 ## INSTALLATION
 
 To install this module, run the following commands:
 
->	perl Makefile.PL
->	make
->	make test
->	make install
+	perl Makefile.PL
+	make
+	make test
+	make install
 
 ## SUPPORT AND DOCUMENTATION
 
@@ -59,7 +59,7 @@ You can also look for information at:
 
 ## LICENSE AND COPYRIGHT
 
-Copyright (C) 2017-2019 Michael T. Wolfinger
+Copyright (C) 2017-2019 Michael T. Wolfinger (<michael@wolfinger.eu>)
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU Affero General Public

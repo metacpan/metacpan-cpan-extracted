@@ -17,9 +17,9 @@ e.g.
   namespace xs {
 
   struct Typemap<MyClass> {
-    static [inline] MyClass in(pTHX_ SV* arg) { ... }
-    static [inline] Sv out(pTHX_ const MyClass& var, const Sv& proto = {}) { ... }
-    static [inline] void destroy (pTHX_ const MyClass&, SV*) { ... }
+    static [inline] MyClass in(SV* arg) { ... }
+    static [inline] Sv out(const MyClass& var, const Sv& proto = {}) { ... }
+    static [inline] void destroy (const MyClass&, SV*) { ... }
   }
 
   } // end of namespace xs
@@ -43,8 +43,8 @@ primitive objects structures with negligible construction and destruction
 costs (including B<std::shared_ptr>), the classes with B<pointer semantics>
 is the most general case.
 
-  static [inline] MyClass in(pTHX_ SV* arg) { ...
-  static [inline] MyClass* in(pTHX_ SV* arg) { ...
+  static [inline] MyClass in(SV* arg) { ...
+  static [inline] MyClass* in(SV* arg) { ...
 
 C<in> method is responsible for returning C++ object from perl SV* arg. It's
 intention is to prepare C++ object to work with (external) C++ API, without
@@ -56,8 +56,8 @@ i.e. return I<pointer> MyClass*. Beware to B<do not construct> object
 on heap and return pointer to it in the C<in> method, as this leads to memory
 leak because the L<XS::framework> will not C<delete> the pointer.
 
-  static [inline] Sv out(pTHX_ const MyClass& var, const Sv& proto = {}) { ...
-  static [inline] Sv out(pTHX_ const MyClass* var, const Sv& proto = {}) { ...
+  static [inline] Sv out(const MyClass& var, const Sv& proto = {}) { ...
+  static [inline] Sv out(const MyClass* var, const Sv& proto = {}) { ...
 
 The C<out> method is responsible for returning Perl wrapper from C++ object to let
 it be useable from perl scripts. The wrapper should be returned in form of Sv
@@ -68,7 +68,7 @@ without any restrictions on it's usage or interpretation. In future specializati
 (see C<TypemapObject> below) it is used as information which
 final class an object MyClass should be blessed into, i.e. C<MyPackage::MyClass>.
 
-   static [inline] void destroy (pTHX_ const MyClass&, SV*) { }
+   static [inline] void destroy (const MyClass&, SV*) { }
 
 The <destroy> method is responsible for cleaning up C++ object when Perl's SV* wrapper (returned in C<out> method), is about
 to be destroyed in Perl: it is not always enough to have MyClass destructor, as C<destoy> method is
@@ -79,12 +79,12 @@ For B<pointer-semantics> objects it depends: if your XS-code is responsible
 for object instantiation, then in the sake of resource leaks
 prevension it should delete it, i.e.
 
-   static [inline] void destroy (pTHX_ const MyClass* obj, SV*) { delete obj; }
+   static [inline] void destroy (const MyClass* obj, SV*) { delete obj; }
 
 If MyClass object was somehow customly constructed and expect it to be
 customly destructed, that can be done as
 
-  static [inline] void destroy (pTHX_ const MyClass* obj, SV*) {
+  static [inline] void destroy (const MyClass* obj, SV*) {
     obj->dec_refcounter();
     // or GlobalPool::release(obj)
   }
@@ -94,7 +94,7 @@ assosicated with the concrete C++ object instance, e.g. the used memory
 pool, then the memory pool can be extracted from SV* and object can be
 deleted with it.
 
-  static [inline] void destroy (pTHX_ const MyClass* obj, SV* sv) {
+  static [inline] void destroy (const MyClass* obj, SV* sv) {
     MyPool* pool = ...; // somehow get pool pointer from SV*
     pool->release(obj);
   }
@@ -126,8 +126,8 @@ inherit from C<TypemapBase> and provide required methods:
 
   template<>
   struct Typemap<MyClass*>: public TypemapBase<MyClass*> {
-    static inline MyClass* in (pTHX_ SV*) { ... }
-    static inline Sv out (pTHX_ const MyClass* var, const Sv& proto = {}) { ... }
+    static inline MyClass* in (SV*) { ... }
+    static inline Sv out (const MyClass* var, const Sv& proto = {}) { ... }
   };
 
 =head2 TypemapObject
@@ -174,19 +174,19 @@ then C<MyBaseClass> can be the same as C<MyFinalClass>.
 
 =head3 methods
 
-    static [inline] MyClass in(pTHX_ SV* arg) { ... }
-    static [inline] Sv out(pTHX_ const MyClass& var, const Sv& proto = {}) { ... }
-    static [inline] Sv create (pTHX_ const MyClass& var, const Sv& proto = Sv()) { ... }
-    static [inline] void destroy (pTHX_ const MyClass&, SV*) { ... }
-    static [inline] void dispose (pTHX_ const MyClass&, SV*) { ... }
+    static [inline] MyClass in(SV* arg) { ... }
+    static [inline] Sv out(const MyClass& var, const Sv& proto = {}) { ... }
+    static [inline] Sv create (const MyClass& var, const Sv& proto = Sv()) { ... }
+    static [inline] void destroy (const MyClass&, SV*) { ... }
+    static [inline] void dispose (const MyClass&, SV*) { ... }
     static [inline] MyClass dup (const MyClass& obj) { return obj; }
 
 
-C<in(pTHX_ SV* arg)> does the same as in typemap, i.e. returns C++ from Perl SV*. It
+C<in(SV* arg)> does the same as in typemap, i.e. returns C++ from Perl SV*. It
 is implemented as: 1) delegate to C<StoragePolicy> to get the C<void*>, and then
 to C<LifetimePolicy> to convert C<MyBasicType*> and then upcast it to C<MyFinalType*>.
 
-C<out(pTHX_ const TYPE& var, const Sv& proto = Sv())> does the same as in typemap,
+C<out(const TYPE& var, const Sv& proto = Sv())> does the same as in typemap,
 i.e. returns Perls SV* from C++ object. In implementation it asks C<StoragePolicy>
 to wrap/pack MyClass object in Perl SV* and ends up in C<create> method below for
 classes without BackRefs support.
@@ -198,7 +198,7 @@ C<MyClass> is supports BackRefs, if it is possible C<out> returns previously
 created and cached SV* wrapper, otherwise it calls C<create> method. It is actually
 a bit more complex, see B<out> behaviour below.
 
-C<destroy(pTHX_ const TYPE& var, const Sv& proto = Sv())> - does the same as in
+C<destroy(const TYPE& var, const Sv& proto = Sv())> - does the same as in
 typemap, i.e. cleans up C++ object when Perls SV* is about to be deleted. It is
 implemented in I<safe manner>, i.e. real object deletion (via C<dispose> if
 C<StoragePolicy>) is executed only once, despite the fact that it migth invoked
@@ -207,7 +207,7 @@ is I<auto-disposable> (defined in C<StoragePolicy>), it is actually destroyed
 via C<dispose> method. In other words, after the method invokation C++ object
 and Perls SV* might be destroyed.
 
-C<dispose(pTHX_ const TYPE& var, SV* arg)> - does the same as C<destroy> method
+C<dispose(const TYPE& var, SV* arg)> - does the same as C<destroy> method
 in typemap; i.e. I<unconditionally> cleans up C++ object and Perl SV*. The actual
 job is delegated to C<LifetimePolicy::destroy>
 
@@ -250,7 +250,7 @@ if custom (non-shipped with L<XS::Framework>) policy is supplied.
         static const bool auto_disposable = false;
         static inline void* get (SV* arg) { ... }
         static inline void set (SV* arg, void* ptr) { ... }
-        static Sv out (pTHX_ const TYPE& var, const Sv& proto) { ... }
+        static Sv out (const TYPE& var, const Sv& proto) { ... }
     };
 
 The C<auto_disposable> property defines, whether the C<destroy> method
@@ -263,7 +263,7 @@ the property should be set to C<false>.
 The C<get> and C<set> methods are responsible for storing/retriving
 underlying object pointer (downcasted to C<void*>) in/from Perl SV*.
 
-C<out(pTHX_ const TYPE& var, const Sv& proto = Sv())> does the same as in typemap,
+C<out(const TYPE& var, const Sv& proto = Sv())> does the same as in typemap,
 i.e. returns Perls SV* from C++ object. If there is no BackRefs support, then
 it should forward call to C<TYPEMAP::create>, otherwise, if possible, it should extract
 Backref and return it. Backrefs support is non-trivial topic, see

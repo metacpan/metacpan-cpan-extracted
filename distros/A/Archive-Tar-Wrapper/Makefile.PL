@@ -73,10 +73,6 @@ if ( $ExtUtils::MakeMaker::VERSION >= 6.46 ) {
     };
 }
 
-if ($ExtUtils::MakeMaker::VERSION >= 6.57_02) {
-    $WriteMakefileArgs{META_MERGE}->{NO_MYMETA} = 1;
-}
-
 if ( $ExtUtils::MakeMaker::VERSION >= 6.50 ) {
     $WriteMakefileArgs{META_MERGE}->{'meta-spec'} = { version => 2 };
     $WriteMakefileArgs{META_MERGE}->{'resources'} = {
@@ -96,11 +92,9 @@ if ( $ExtUtils::MakeMaker::VERSION >= 6.50 ) {
 # Test::More::is_deeply is required for testing
 if ( $ExtUtils::MakeMaker::VERSION >= 6.64 ) {
     $WriteMakefileArgs{TEST_REQUIRES}->{'Test::Simple'} = 1.302073;
-    $WriteMakefileArgs{TEST_REQUIRES}->{'Dumbbench'}    = 0.111;
 }
 else {
     $WriteMakefileArgs{PREREQ_PM}->{'Test::Simple'} = 1.302073;
-    $WriteMakefileArgs{PREREQ_PM}->{'Dumbbench'}    = 0.111;
 }
 
 if ( $ExtUtils::MakeMaker::VERSION >= 6.52 ) {

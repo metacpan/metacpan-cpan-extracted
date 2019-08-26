@@ -1,9 +1,65 @@
 ==================================================
-Changes from 1744-12-27 00:00:00 +0000 to present.
+Changes from 1745-11-10 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.011 at 2018-10-11 20:21:18 +0000
+version 0.013 at 2019-08-25 18:15:22 +0000
+------------------------------------------
+
+  Change: 098f3be5a5b5f9e7b5df2ba341b33600dd13526f
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2019-08-25 20:11:38 +0000
+
+    Added a missing test requirement 
+
+  Change: 33b5d98125f8325b03489abca01bd07b97465870
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2019-08-25 20:08:07 +0000
+
+    Rearranged requirements to cpanfile 
+
+------------------------------------------
+version 0.012 at 2019-08-25 17:51:47 +0000
+------------------------------------------
+
+  Change: c5db806811d4dac5632085a42d745006acef7af2
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2019-08-25 19:51:47 +0000
+
+    Adjusted synopsis and fixed some code intendation 
+
+  Change: 76deee2f2622afadab7a4e39bf5b2114f85d9164
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2019-08-25 19:50:24 +0000
+
+    Removing 5.10 and 5.12 support 
+
+  Change: 8ab9e78de863f6c96aa3d353067b56bc80becc2a
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2019-08-25 19:10:55 +0000
+
+    Adding trusty flag for lower perl version, added up 4.30 selftesting 
+
+  Change: aa93a47279d2e2a6f3e4feebdc05d1ee23232e30
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2019-08-25 18:57:46 +0000
+
+    New .travis.yml generated with new version 
+
+  Change: d7cadd535ed1163871ee8c7294c993e1088fa625
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2019-08-25 18:55:49 +0000
+
+    Do not remove .travis.yml before install in .travis.yml 
+
+  Change: c50a15712a08095180b2b60dc8ce6cca22b85a4b
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2018-10-11 22:26:19 +0000
+
+    More perl versions for dist itself 
+
+------------------------------------------
+version 0.011 at 2018-10-11 20:21:07 +0000
 ------------------------------------------
 
   Change: bf1302a790067b1bcf2b1bf07ecd1fa538deedab

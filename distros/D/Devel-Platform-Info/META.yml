@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                     Devel-Platform-Info
-version:                  0.16
+version:                  1.00
 abstract:                 Unified framework for obtaining common platform metadata
 author:
   - Barbie (BARBIE) <barbie@cpan.org>
@@ -30,31 +30,31 @@ build_requires:
 provides:
   Devel::Platform::Info:
     file:     lib/Devel/Platform/Info.pm
-    version:  0.16
+    version:  1.00
   Devel::Platform::Info::BeOS:
     file:     lib/Devel/Platform/Info/BeOS.pm
-    version:  0.16
+    version:  1.00
   Devel::Platform::Info::BSD:
     file:     lib/Devel/Platform/Info/BSD.pm
-    version:  0.16
+    version:  1.00
   Devel::Platform::Info::Irix:
     file:     lib/Devel/Platform/Info/Irix.pm
-    version:  0.16
+    version:  1.00
   Devel::Platform::Info::Linux:
     file:     lib/Devel/Platform/Info/Linux.pm
-    version:  0.16
+    version:  1.00
   Devel::Platform::Info::Mac:
     file:     lib/Devel/Platform/Info/Mac.pm
-    version:  0.16
+    version:  1.00
   Devel::Platform::Info::SCO:
     file:     lib/Devel/Platform/Info/SCO.pm
-    version:  0.16
+    version:  1.00
   Devel::Platform::Info::Solaris:
     file:     lib/Devel/Platform/Info/Solaris.pm
-    version:  0.16
+    version:  1.00
   Devel::Platform::Info::Win32:
     file:     lib/Devel/Platform/Info/Win32.pm
-    version:  0.16
+    version:  1.00
 
 no_index:
   directory:

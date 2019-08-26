@@ -9,6 +9,7 @@ lib/Pg/Explain/FromYAML.pm
 lib/Pg/Explain/Node.pm
 lib/Pg/Explain/StringAnonymizer.pm
 MANIFEST			This list of files
+MANIFEST.SKIP
 META.json
 META.yml
 README
@@ -137,6 +138,9 @@ t/37-plan-without-costs/1.plan
 t/37-plan-without-costs/2.expect
 t/37-plan-without-costs/2.plan
 t/38-worktable.t
+t/39-long-line-json.t
+t/39-long-line-json/1.expect
+t/39-long-line-json/1.json
 t/99-manifest.t
 t/perlcriticrc
 t/perltidyrc

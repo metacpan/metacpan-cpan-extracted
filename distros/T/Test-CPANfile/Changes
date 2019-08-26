@@ -1,5 +1,11 @@
 Revision history for Test-CPANfile
 
+0.07 2019/08/22
+  - silence warnings
+  - better develop phase support
+  - requires better Perl::PrereqScanner::NotQuiteLite
+    to reuse the same index
+
 0.06 2019/01/16
   - silence warnings on failure
 

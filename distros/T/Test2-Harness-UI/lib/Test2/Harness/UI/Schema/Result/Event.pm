@@ -170,7 +170,7 @@ __PACKAGE__->belongs_to(
 # Created by DBIx::Class::Schema::Loader v0.07049 @ 2019-07-16 09:23:22
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:OaUxd53QiuO+i5O/ZwFzVg
 
-our $VERSION = '0.000006';
+our $VERSION = '0.000014';
 
 __PACKAGE__->parent_column('parent_id');
 
@@ -179,6 +179,9 @@ __PACKAGE__->inflate_column(
         inflate => DBIx::Class::InflateColumn::Serializer::JSON->get_unfreezer('facets', {}),
         deflate => DBIx::Class::InflateColumn::Serializer::JSON->get_freezer('facets',   {}),
     },
+);
+
+__PACKAGE__->inflate_column(
     orphan => {
         inflate => DBIx::Class::InflateColumn::Serializer::JSON->get_unfreezer('orphan', {}),
         deflate => DBIx::Class::InflateColumn::Serializer::JSON->get_freezer('orphan',   {}),
@@ -194,9 +197,31 @@ sub TO_JSON {
 
     # Inflate
     $cols{facets} = $self->facets;
-    $cols{lines}  = Test2::Formatter::Test2::Composer->render_verbose($cols{facets});
+    $cols{lines}  = Test2::Formatter::Test2::Composer->render_super_verbose($cols{facets});
 
     return \%cols;
+}
+
+sub line_data {
+    my $self = shift;
+    my %cols = $self->get_columns;
+    my %out;
+
+    # Inflate
+    $cols{facets} = $self->facets;
+    $out{lines}  = Test2::Formatter::Test2::Composer->render_super_verbose($cols{facets});
+
+    $out{facets} = $cols{facets} ? 1 : 0;
+    $out{orphan} = $cols{orphan} ? 1 : 0;
+
+    $out{parent_id} = $cols{parent_id} if $cols{parent_id};
+    $out{nested} = $cols{nested} // 0;
+
+    $out{event_id} = $cols{event_id};
+
+    $out{is_parent} = $cols{facets}{parent} ? 1 : 0;
+
+    return \%out;
 }
 
 =head2 events

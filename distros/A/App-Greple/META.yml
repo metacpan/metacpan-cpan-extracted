@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Minilla/v3.1.5, CPAN::Meta::Converter version 2.143240'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   App::Greple:
     file: lib/App/Greple.pm
-    version: '8.3304'
+    version: '8.3305'
   App::Greple::Common:
     file: lib/App/Greple/Common.pm
   App::Greple::Filter:
@@ -74,9 +74,10 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/greple/issues
   homepage: https://github.com/kaz-utashiro/greple
   repository: git://github.com/kaz-utashiro/greple.git
-version: '8.3304'
+version: '8.3305'
 x_authority: cpan:UTASHIRO
 x_contributors:
-  - 'Toshifumi Sakaguchi <sischkg@gmail.com>'
-  - 'Mohammad S Anwar <Mohammad.Anwar@yahoo.com>'
   - 'Kaz Utashiro <kaz@utashiro.com>'
+  - 'Mohammad S Anwar <Mohammad.Anwar@yahoo.com>'
+  - 'Toshifumi Sakaguchi <sischkg@gmail.com>'
+x_static_install: 0

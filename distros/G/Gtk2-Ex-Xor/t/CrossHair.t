@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2008, 2009, 2010, 2011 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2019 Kevin Ryde
 
 # This file is part of Gtk2-Ex-Xor.
 #
@@ -33,7 +33,7 @@ Gtk2->init_check
   or plan skip_all => 'due to no DISPLAY available';
 plan tests => 42;
 
-my $want_version = 22;
+my $want_version = 23;
 is ($Gtk2::Ex::CrossHair::VERSION, $want_version, 'VERSION variable');
 is (Gtk2::Ex::CrossHair->VERSION,  $want_version, 'VERSION class method');
 { ok (eval { Gtk2::Ex::CrossHair->VERSION($want_version); 1 },

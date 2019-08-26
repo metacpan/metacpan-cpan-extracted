@@ -16,6 +16,7 @@ my $test_requires =
 	{
 		'Test::More' => 0,
 		'File::Temp' => 0,
+		'JSON' => 0,
 	};
 
 my $eumm_understands_meta_merge = $ExtUtils::MakeMaker::VERSION ge '6.46';

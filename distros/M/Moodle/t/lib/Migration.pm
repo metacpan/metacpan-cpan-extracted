@@ -1,5 +1,5 @@
 package Migration;
 
-use parent 'Doodle::Migrator';
+use parent 'Doodle::Migration';
 
 1;

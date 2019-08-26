@@ -1,5 +1,5 @@
 package Test::Count::Filter::ByFileType::App;
-$Test::Count::Filter::ByFileType::App::VERSION = '0.1000';
+$Test::Count::Filter::ByFileType::App::VERSION = '0.1001';
 use strict;
 use warnings;
 
@@ -54,14 +54,9 @@ __END__
 
 =encoding UTF-8
 
-=head1 NAME
-
-Test::Count::Filter::ByFileType::App - a standalone command line application
-that filters according to the filetype.
-
 =head1 VERSION
 
-version 0.1000
+version 0.1001
 
 =head1 SYNOPSIS
 
@@ -71,9 +66,10 @@ version 0.1000
     # To filter Perl 5 code
     $ perl -MTest::Count::Filter::ByFileType::App -e 'run()'
 
-=head1 VERSION
+=head1 NAME
 
-version 0.1000
+Test::Count::Filter::ByFileType::App - a standalone command line application
+that filters according to the filetype.
 
 =head1 FUNCTIONS
 
@@ -133,36 +129,9 @@ Copyright 2009 Shlomi Fish.
 
 This program is released under the following license: MIT X11.
 
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2018 by Shlomi Fish.
-
-This is free software, licensed under:
-
-  The MIT (X11) License
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/test-count/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc Test::Count::Filter::ByFileType::App
 
 =head2 Websites
 
@@ -257,8 +226,29 @@ The code is open to the world, and available for you to hack on. Please feel fre
 with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
 from your repository :)
 
-L<https://github.com/shlomif/test-count>
+L<https://github.com/shlomif/perl-test-count>
 
-  git clone git://github.com/shlomif/test-count.git
+  git clone git://github.com/shlomif/perl-test-count.git
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/perl-test-count/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

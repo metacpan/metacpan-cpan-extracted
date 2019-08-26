@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2008, 2009, 2010, 2011 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2017, 2019 Kevin Ryde
 
 # This file is part of Gtk2-Ex-Xor.
 #
@@ -26,8 +26,6 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-# uncomment this to run the ### lines
-#use Smart::Comments;
 
 require Gtk2::Ex::Lasso;
 
@@ -57,7 +55,7 @@ sub my_lasso_start {
 #------------------------------------------------------------------------------
 # VERSION
 
-my $want_version = 22;
+my $want_version = 23;
 is ($Gtk2::Ex::Lasso::VERSION, $want_version, 'VERSION variable');
 is (Gtk2::Ex::Lasso->VERSION,  $want_version, 'VERSION class method');
 { ok (eval { Gtk2::Ex::Lasso->VERSION($want_version); 1 },

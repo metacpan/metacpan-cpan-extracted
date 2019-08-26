@@ -42,7 +42,7 @@ This variable holds correct perl interpreter for each thread. Via
     using xs::my_perl;
     auto perl_clone = perl_clone(*my_perl, 0);
 
-the C<my_perl> is porxy object, which holds pointer to perl interperpreter.
+the C<my_perl> is proxy object, which holds pointer to perl interperpreter.
 
 Keep in mind that this C<my_perl> variable is get from thread-local storage,
 like C<dTHX>, so this is actually a convenience tool, reverting to performance

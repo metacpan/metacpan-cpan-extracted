@@ -1,21 +1,26 @@
-0.152   2018-11-22 (PERLANCAR)
+0.153   2019-08-20  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Make test name for default value tests more descriptive.
+
+
+0.152   2018-11-22  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Mention Test::Rinci::CmdLine and test-rinci-cmdline.
 
 
-0.151   2018-11-22 (PERLANCAR)
+0.151   2018-11-22  Released-By: PERLANCAR
 
 	- Add option: load.
 
 
-0.150   2018-09-10 (PERLANCAR)
+0.150   2018-09-10  Released-By: PERLANCAR
 
 	- test-rinci: Add Getopt::Long config bundling no_ignore_case.
 
 
-0.14    2016-03-06 (PERLANCAR)
+0.14    2016-03-06  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -23,24 +28,24 @@
 	  available.
 
 
-0.13    2016-02-21 (PERLANCAR)
+0.13    2016-02-21  Released-By: PERLANCAR
 
 	- Handle result_naked when testing example result.
 
 
-0.12    2016-02-17 (PERLANCAR)
+0.12    2016-02-17  Released-By: PERLANCAR
 
 	- Check that argument's default value validates against schema.
 
 
-0.11    2016-01-19 (PERLANCAR)
+0.11    2016-01-19  Released-By: PERLANCAR
 
 	- [Incompatible change] in example specification in function
 	  metadata, result now means the whole result not just actual
 	  result (third element) in an enveloped result.
 
 
-0.10    2015-09-06 (PERLANCAR)
+0.10    2015-09-06  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -49,7 +54,7 @@
 	  requirement.
 
 
-0.09    2014-12-17 (PERLANCAR)
+0.09    2014-12-17  Released-By: PERLANCAR
 
 	- Add some options to test-rinci: --exclude-function,
 	  --exclude-package, -W, -E.
@@ -57,46 +62,46 @@
         - Remove the use of Log::Any::App to reduce deps.
 
 
-0.08    2014-07-18 (SHARYANTO)
+0.08    2014-07-18  Released-By: SHARYANTO
 
         - Add diag+explain when testing result.
 
 
-0.07    2013-12-21 (SHARYANTO)
+0.07    2013-12-21  Released-By: SHARYANTO
 
         - No functional changes. Adjust to Perinci::Access::Perl 0.55+ (list
           action returns relative URIs).
 
 
-0.06    2013-11-20 (SHARYANTO)
+0.06    2013-11-20  Released-By: SHARYANTO
 
         - No functional changes. Add 'use experimental smartmatch' for perl
           5.18+.
 
 
-0.05    2013-11-07 (SHARYANTO)
+0.05    2013-11-07  Released-By: SHARYANTO
 
         - Allow skipping testing an example if example's 'test' property is set
           to 0 (Rinci 1.1.41).
 
 
-0.04    2013-10-15 (SHARYANTO)
+0.04    2013-10-15  Released-By: SHARYANTO
 
         - Recognize Rinci 1.1.39's examples with 'src' (but skips them for now).
 
 
-0.03    2013-09-08 (SHARYANTO)
+0.03    2013-09-08  Released-By: SHARYANTO
 
         - Replace Perinci::Access::InProcess with ::Perl.
 
 
-0.02    2013-08-22 (SHARYANTO)
+0.02    2013-08-22  Released-By: SHARYANTO
 
         [BUG FIXES]
 
         - Forgot to 'use File::Spec'.
 
 
-0.01    2012-10-31 (SHARYANTO)
+0.01    2012-10-31  Released-By: SHARYANTO
 
         - First release.

@@ -18,13 +18,13 @@ my %WriteMakefileArgs = (
   "NAME" => "Moodle",
   "PREREQ_PM" => {
     "Data::Object" => "0.99",
-    "Doodle" => "0.04"
+    "Doodle" => "0.05"
   },
   "TEST_REQUIRES" => {
     "Data::Object" => "0.99",
-    "Doodle" => "0.04"
+    "Doodle" => "0.05"
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.03",
   "test" => {
     "TESTS" => "t/*.t t/can/*.t t/use/*.t"
   }
@@ -33,7 +33,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Data::Object" => "0.99",
-  "Doodle" => "0.04"
+  "Doodle" => "0.05"
 );
 
 

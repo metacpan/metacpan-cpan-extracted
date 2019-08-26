@@ -12,13 +12,13 @@ use Data::Printer;
 use Vote::Count;
 use Vote::Count::ReadBallots 'read_ballots';
 
-our $VERSION='0.021';
+our $VERSION='0.022';
 
 =head1 NAME
 
 Vote::Count::Start
 
-=head1 VERSION 0.021
+=head1 VERSION 0.022
 
 =cut
 

@@ -25,4 +25,10 @@ Revision history for Perl extension WWW::YouTube::Info::Simple.
     - fix multiple occurrences of parameters
 0.11  Fri Jan 26 16:36:03 2018
     - utilize https
+0.12  Tue Jan 30 13:18:23 2018
+    - added additional YT URI at examples/yt.pl
+0.13  Fri Aug 23 14:00:54 2019
+    - get_title defaults to _id
+0.14  Fri Aug 23 15:36:25 2019
+    - fixed testing get_title regarding default
 

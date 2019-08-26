@@ -7,6 +7,10 @@ package App::Pods2Site::Args;
 use strict;
 use warnings;
 
+our $VERSION = '1.002';
+my $version = $VERSION;
+$VERSION = eval $VERSION;
+
 use App::Pods2Site::Util qw(slashify trim readData writeData expandAts $IS_PACKED $IS_WINDOWS $SHELL_ARG_DELIM $PATH_SEP);
 use App::Pods2Site::SiteBuilderFactory;
 
@@ -309,7 +313,7 @@ sub __parseArgv
 		$self->{css} = $css;
 	}
 
-	$rawOpts{title} = $rawOpts{title} || ($Config{myuname} ? "Pods2Site : $Config{myuname}" : 'Pods2Site');
+	$rawOpts{title} = $rawOpts{title} || ($Config{myuname} ? $Config{myuname} : 'Pods2Site');
 	$self->{title} = $rawOpts{title};
 	
 	$self->{style} = $rawOpts{style};
@@ -563,7 +567,7 @@ sub __getDefaultLibLocations
 			qw
 				(
 					installsitearch
-					installsiteslib
+					installsitelib
 					installvendorarch
 					installvendorlib
 					installarchlib

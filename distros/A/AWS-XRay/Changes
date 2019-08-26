@@ -1,5 +1,11 @@
 Revision history for Perl extension AWS-XRay
 
+0.09 2019-08-20T22:01:55Z
+    - Support AWS Lambda (#10 @shogo82148)
+    - Add EC2 plugin (#6 @papix)
+    - Fix typo (#5 @moznion, #9 @shogo82148)
+    - Fix wantarray in capture (#7 @shogo82148)
+
 0.08 2018-10-26T13:56:35Z
     - Segment name created by add_capture becomes to package name.
 

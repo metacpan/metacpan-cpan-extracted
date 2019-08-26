@@ -1,5 +1,8 @@
 package WWW::Scraper::ISBN::Test_Driver;
 
+use warnings;
+use strict;
+
 use base qw(WWW::Scraper::ISBN::Driver);
 
 sub search {

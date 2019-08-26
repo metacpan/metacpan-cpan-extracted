@@ -5,7 +5,7 @@ require HTTP::OAI::ListRecords;
 
 use strict;
 
-our $VERSION = '4.08';
+our $VERSION = '4.09';
 
 sub record
 {

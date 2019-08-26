@@ -1,4 +1,10 @@
 Revision history for perl-file-valet
+1.03 Thu Aug 22 13:53:47 PDT 2019
+	- Removed spurious (and ill-behaved) dependency on Errno
+	- Disabled unit tests which fail when run as root
+
+1.02 Tue Mar 21 14:46:11 PDT 2017
+	- Added rename_vms() function
 
 1.01 Thu Apr 14 19:16:27 PDT 2016
 	- Bugfixes in unit tests (i18n issues with $!)

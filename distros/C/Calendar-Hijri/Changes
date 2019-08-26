@@ -1,5 +1,8 @@
 Revision history for Calendar::Hijri
 
+0.42  Sat Aug 24 08:00:00 2019
+      - Updated dependency on Date::Hijri::Simple v0.24.
+
 0.41  Thu Aug 08 13:45:00 2019
       - Updated dependency on Date::Hijri::Simple v0.23.
 

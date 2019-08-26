@@ -4,13 +4,13 @@
       "Michael T. Wolfinger <michael@wolfinger.eu>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "agpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "FileDirUtil",
    "no_index" : {
@@ -22,7 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -41,9 +41,24 @@
             "Path::Class::File" : "0",
             "namespace::autoclean" : "0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "v0.03",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mtw/FileDirUtil/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mtw/FileDirUtil.git",
+         "web" : "https://github.com/mtw/FileDirUtil"
+      }
+   },
+   "version" : "v0.04",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

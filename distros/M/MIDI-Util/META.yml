@@ -29,9 +29,9 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=MIDI-Util
-  repository: https://github.com/ology/MIDI-Util
-version: '0.0400'
+  homepage: https://github.com/ology/MIDI-Util
+  repository: https://github.com/ology/MIDI-Util.git
+version: '0.0401'
 x_Dist_Zilla:
   perl:
     version: '5.027007'
@@ -200,9 +200,9 @@ x_Dist_Zilla:
       name: MetaJSON
       version: '6.012'
     -
-      class: Dist::Zilla::Plugin::MetaResources
-      name: MetaResources
-      version: '6.012'
+      class: Dist::Zilla::Plugin::GithubMeta
+      name: GithubMeta
+      version: '0.58'
     -
       class: Dist::Zilla::Plugin::Test::PodSpelling
       config:

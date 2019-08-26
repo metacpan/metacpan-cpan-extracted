@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use vars qw($VERSION);
-$VERSION = '0.16';
+$VERSION = '1.00';
 
 #----------------------------------------------------------------------------
 
@@ -117,7 +117,7 @@ Returns the following keys:
 
 The following links were used to understand how to retrieve the metadata:
 
-  * http://nixcraft.com/all-about-freebsd-openbsd-netbsd/234-freebsd-how-find-out-kernel-version.html
+  * https://www.cyberciti.biz/faq/how-to-find-out-freebsd-version-and-patch-level-number/
   * http://www.netbsd.org/ports/
 
 Thanks to Chris 'BINGOS' Williams for the pointers to the appropriate links.
@@ -139,7 +139,7 @@ RT Queue: http://rt.cpan.org/Public/Dist/Display.html?Name=Devel-Platform-Info
 
 =head1 COPYRIGHT & LICENSE
 
-  Copyright (C) 2010-2016 Birmingham Perl Mongers
+  Copyright (C) 2010-2019 Birmingham Perl Mongers
 
   This distribution is free software; you can redistribute it and/or
   modify it under the Artistic License 2.0.

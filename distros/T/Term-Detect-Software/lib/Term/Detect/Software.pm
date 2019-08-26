@@ -1,7 +1,7 @@
 package Term::Detect::Software;
 
-our $DATE = '2015-01-03'; # DATE
-our $VERSION = '0.21'; # VERSION
+our $DATE = '2019-08-18'; # DATE
+our $VERSION = '0.221'; # VERSION
 
 use 5.010001;
 use strict;
@@ -153,6 +153,15 @@ sub detect_terminal {
                 $info->{default_bgcolor}   = 'd6d2d0';
                 $info->{box_chars}         = 1;
                 last DETECT;
+            } elsif ($proc eq 'st' && $ENV{TERM} eq 'xterm-256color') {
+                push @dbg, "detect: st via procname";
+                $info->{emulator_software} = 'st';
+                $info->{emulator_engine}   = 'st';
+                $info->{color_depth}       = 256;
+                $info->{unicode}           = 1;
+                $info->{default_bgcolor}   = '000000';
+                $info->{box_chars}         = 1; # some characters are currently flawed though as of 0.6
+                last DETECT;
             } elsif ($proc ~~ [qw/pterm/]) {
                 push @dbg, "detect: pterm via procname ($proc)";
                 $info->{emulator_software} = $proc;
@@ -224,7 +233,7 @@ Term::Detect::Software - Detect terminal (emulator) software and its capabilitie
 
 =head1 VERSION
 
-This document describes version 0.21 of Term::Detect::Software (from Perl distribution Term-Detect-Software), released on 2015-01-03.
+This document describes version 0.221 of Term::Detect::Software (from Perl distribution Term-Detect-Software), released on 2019-08-18.
 
 =head1 SYNOPSIS
 
@@ -272,16 +281,17 @@ Result:
 =item * emulator_engine => STR
 
 Possible values: C<konsole>, C<xterm>, C<gnome-terminal>, C<rxvt>, C<pterm>
-(PuTTY), C<xvt>, C<windows> (CMD.EXE), C<cygwin>, or empty string (if not
-detected running under terminal).
+(PuTTY), C<xvt>, C<windows> (CMD.EXE), C<cygwin>, C<st> (suckless.org's terminal
+emulator), or empty string (if not detected running under terminal).
 
 =item * emulator_software => STR
 
 Either: C<xfce4-terminal>, C<guake>, C<gnome-terminal>, C<mlterm>,
-C<lxterminal>, C<rxvt>, C<mrxvt>, C<putty>, C<xvt>, C<windows> (CMD.EXE), or
-empty string (if not detected running under terminal).
+C<lxterminal>, C<rxvt>, C<mrxvt>, C<putty>, C<xvt>, C<windows> (CMD.EXE), C<st>
+(suckless.org's terminal emulator), or empty string (if not detected running
+under terminal).
 
-w=item * color_depth => INT
+=item * color_depth => INT
 
 Either 0 (does not support ANSI color codes), 16, 256, or 16777216 (2**24).
 
@@ -324,19 +334,13 @@ we shouldn't display Unicode characters. Another example is color depth:
 Term::Terminfo currently doesn't recognize Konsole's 24bit color support and
 only gives C<max_colors> 256.
 
-=head1 SEE ALSO
-
-L<Term::Terminfo>
-
-L<Term::Encoding>
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Term-Detect-Software>.
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Term-Detect-Software>.
+Source repository is at L<https://github.com/perlancar/perl-Term-Detect-Software>.
 
 =head1 BUGS
 
@@ -346,13 +350,19 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Term::Terminfo>
+
+L<Term::Encoding>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

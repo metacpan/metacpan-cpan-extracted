@@ -1,0 +1,4 @@
+{
+  "basic": [ "listdeps.command", "release.command", "run.command", "shell.command", "test.command", "update.command" ],
+  "feedback": [ "gather-files.source", "gather-metadata.source", "regenerate.command" ]
+}

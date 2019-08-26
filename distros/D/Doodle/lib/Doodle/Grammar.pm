@@ -7,7 +7,7 @@ use Data::Object 'Class', 'Doodle::Library';
 use Carp;
 use Doodle::Statement;
 
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 has name => (
   is => 'ro',

@@ -4,7 +4,7 @@ package HTTP::OAI::SAX::Text;
 
 use strict;
 
-our $VERSION = '4.08';
+our $VERSION = '4.09';
 
 sub start_element
 {

@@ -43,6 +43,7 @@ lib/Net/ACME2/X/UnrecognizedKey.pm
 t/Net-ACME2-Challenge-http_01-Handler.t
 t/Net-ACME2-Challenge-tls_alpn_01.t
 t/Net-ACME2-Challenge.t
+t/Net-ACME2-Error.t
 t/Net-ACME2.t
 t/Net-ACME2_pre_rename.t
 t/lib/Test/ACME2_Server.pm

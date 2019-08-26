@@ -1,5 +1,5 @@
 package Mail::LMLM::Types::Base;
-$Mail::LMLM::Types::Base::VERSION = '0.6805';
+$Mail::LMLM::Types::Base::VERSION = '0.6806';
 use strict;
 use warnings;
 
@@ -7,7 +7,7 @@ use Mail::LMLM::Object;
 
 use vars qw(@ISA);
 
-@ISA=qw(Mail::LMLM::Object);
+@ISA = qw(Mail::LMLM::Object);
 
 sub parse_args
 {
@@ -15,41 +15,41 @@ sub parse_args
 
     my $args = shift;
 
-    my (@left, $key, $value);
+    my ( @left, $key, $value );
 
-    while (scalar(@$args))
+    while ( scalar(@$args) )
     {
-        $key = shift(@$args);
+        $key   = shift(@$args);
         $value = shift(@$args);
-        if ($key =~ /^-?(id)$/)
+        if ( $key =~ /^-?(id)$/ )
         {
             $self->{'id'} = $value;
         }
-        elsif ($key =~ /^-?(group_base)$/)
+        elsif ( $key =~ /^-?(group_base)$/ )
         {
             $self->{'group_base'} = $value;
         }
-        elsif ($key =~ /^-?(desc|description)$/)
+        elsif ( $key =~ /^-?(desc|description)$/ )
         {
             $self->{'description'} = $value;
         }
-        elsif ($key =~ /^-?(hostname|host)$/)
+        elsif ( $key =~ /^-?(hostname|host)$/ )
         {
             $self->{'hostname'} = $value;
         }
-        elsif ($key =~ /^-?(homepage)$/)
+        elsif ( $key =~ /^-?(homepage)$/ )
         {
             $self->{'homepage'} = $value;
         }
-        elsif ($key =~ /^-?(online_archive)$/)
+        elsif ( $key =~ /^-?(online_archive)$/ )
         {
             $self->{'online_archive'} = $value;
         }
-        elsif ($key =~ /^-?(guidelines)$/)
+        elsif ( $key =~ /^-?(guidelines)$/ )
         {
             $self->{'guidelines'} = $value;
         }
-        elsif ($key =~ /^-?(notes)$/)
+        elsif ( $key =~ /^-?(notes)$/ )
         {
             $self->{'notes'} = $value;
         }
@@ -59,14 +59,14 @@ sub parse_args
         }
     }
 
-    return (\@left);
+    return ( \@left );
 }
 
 sub initialize
 {
     my $self = shift;
 
-    $self->parse_args([@_]);
+    $self->parse_args( [@_] );
 
     return 0;
 }
@@ -197,11 +197,11 @@ sub render_online_archive
 
     my $archive = $self->get_online_archive();
 
-    if (ref($archive) eq "CODE")
+    if ( ref($archive) eq "CODE" )
     {
-        $archive->($self, $htmler);
+        $archive->( $self, $htmler );
     }
-    elsif (ref($archive) eq "")
+    elsif ( ref($archive) eq "" )
     {
         $htmler->start_para();
         $htmler->url($archive);
@@ -215,7 +215,6 @@ sub render_online_archive
     return 0;
 }
 
-
 sub render_field
 {
     my $self = shift;
@@ -224,56 +223,50 @@ sub render_field
 
     my $desc = shift;
 
-    if (ref($desc) eq "CODE")
+    if ( ref($desc) eq "CODE" )
     {
-        $desc->($self, $htmler);
+        $desc->( $self, $htmler );
     }
-    elsif (ref($desc) eq "ARRAY")
+    elsif ( ref($desc) eq "ARRAY" )
     {
         foreach my $paragraph (@$desc)
         {
-            $htmler->para(
-                $paragraph
-            );
+            $htmler->para($paragraph);
         }
     }
-    elsif (ref($desc) eq "")
+    elsif ( ref($desc) eq "" )
     {
-        $htmler->para(
-            $desc
-            );
+        $htmler->para($desc);
     }
     return 0;
 }
 
 sub render_description
 {
-    my $self = shift;
+    my $self   = shift;
     my $htmler = shift;
-    $self->render_field($htmler,$self->get_description());
+    $self->render_field( $htmler, $self->get_description() );
 }
 
 sub render_guidelines
 {
-    my $self = shift;
+    my $self   = shift;
     my $htmler = shift;
-    $self->render_field($htmler,$self->get_guidelines());
+    $self->render_field( $htmler, $self->get_guidelines() );
 }
 
 sub render_something_with_email_addr
 {
     my $self = shift;
 
-    my $htmler = shift;
-    my $begin_msg = shift;
+    my $htmler         = shift;
+    my $begin_msg      = shift;
     my $address_method = shift;
 
     $htmler->para($begin_msg);
     $htmler->indent_inc();
     $htmler->start_para();
-    $htmler->email_address(
-        $self->$address_method()
-        );
+    $htmler->email_address( $self->$address_method() );
     $htmler->end_para();
     $htmler->indent_dec();
 
@@ -294,15 +287,11 @@ Mail::LMLM::Types::Base - the base class for the mailing list types.
 
 =head1 VERSION
 
-version 0.6805
+version 0.6806
 
 =head1 SYNOPSIS
 
 Extend the class.
-
-=head1 VERSION
-
-version 0.6805
 
 =head1 METHODS
 
@@ -442,7 +431,7 @@ unknown
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by unknown.
+This software is Copyright (c) 2019 by unknown.
 
 This is free software, licensed under:
 
@@ -451,7 +440,7 @@ This is free software, licensed under:
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/mail-lmlm/issues>
+L<https://github.com/shlomif/perl-mail-lmlm/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -560,8 +549,8 @@ The code is open to the world, and available for you to hack on. Please feel fre
 with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
 from your repository :)
 
-L<https://github.com/shlomif/mail-lmlm>
+L<https://github.com/shlomif/perl-mail-lmlm>
 
-  git clone http://bitbucket.org/shlomif/perl-mail-lmlm/overview
+  git clone git://github.com/shlomif/perl-mail-lmlm.git
 
 =cut

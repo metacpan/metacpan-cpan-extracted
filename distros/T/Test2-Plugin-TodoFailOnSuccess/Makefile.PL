@@ -16,10 +16,12 @@ my %WriteMakefileArgs = (
   "LICENSE" => "artistic_2",
   "NAME" => "Test2::Plugin::TodoFailOnSuccess",
   "PREREQ_PM" => {
-    "Devel::Cover" => 0,
-    "Test2::API" => 0
+    "Test2::API" => 0,
+    "Test2::Event::Fail" => "1.302164",
+    "Test2::Todo" => "0.000084"
   },
   "TEST_REQUIRES" => {
+    "Devel::Cover" => 0,
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "IO::Handle" => 0,
@@ -28,7 +30,7 @@ my %WriteMakefileArgs = (
     "Test2::Tools::Compare" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.0.1",
+  "VERSION" => "0.0.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,6 +45,8 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "Test2::API" => 0,
   "Test2::Bundle::Extended" => 0,
+  "Test2::Event::Fail" => "1.302164",
+  "Test2::Todo" => "0.000084",
   "Test2::Tools::Compare" => 0,
   "Test::More" => 0
 );

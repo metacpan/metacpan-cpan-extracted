@@ -10,13 +10,13 @@ build_requires:
   Test::Exception: '0'
   Test::More: '0'
   Test::Simple: '0.96'
-  next::XS: v1.0.6
+  next::XS: v1.0.7
 configure_requires:
   CPP::catch: v1.0.8
   CPP::panda::lib: v1.2.10
   Test::Catch: v1.0.8
   XS::Install: v1.2.10
-  next::XS: v1.0.6
+  next::XS: v1.0.7
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
 license: unknown
@@ -31,7 +31,7 @@ no_index:
 requires:
   CPP::panda::lib: v1.2.10
   XS::Install: v1.2.10
-  next::XS: v1.0.6
+  next::XS: v1.0.7
   perl: '5.018000'
-version: v1.1.8
+version: v1.1.9
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

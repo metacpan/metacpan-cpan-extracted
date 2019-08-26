@@ -1,71 +1,47 @@
---- #YAML:1.0
-name:               Gtk2-Ex-Xor
-version:            22
-abstract:           Helpers for Gtk2 widgets.
+---
+abstract: 'Helpers for Gtk2 widgets.'
 author:
-    - Kevin Ryde <user42@zip.com.au>
-license:            gpl
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Kevin Ryde <user42_kevin@yahoo.com.au>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    Glib::Ex::SignalIds:  0
-    Glib::Object::Subclass:  0
-    Gtk2:                 1.200
-    Gtk2::Ex::GdkBits:    38
-    Gtk2::Ex::KeySnooper:  3
-    Gtk2::Ex::SyncCall:   12
-    Gtk2::Ex::WidgetBits:  31
-    Gtk2::Ex::WidgetCursor:  5
-    Gtk2::Ex::WidgetEvents:  21
-    perl:                 5.008
-    Scalar::Util:         1.18
-    Tie::RefHash::Weak:   0.05
-resources:
-    homepage:  http://user42.tuxfamily.org/gtk2-ex-xor/index.html
-    license:   http://www.gnu.org/licenses/gpl.html
-no_index:
-    directory:
-        - t
-        - inc
-        - xt
-        - devel
-        - examples
-        - junk
-    package:
-        - Gtk2::Bin
-generated_by:       ExtUtils::MakeMaker version 6.56
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: gpl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Gtk2-Ex-Xor
+no_index:
+  directory:
+    - t
+    - inc
+    - devel
+    - xt
+    - xtools
+  package:
+    - Gtk2::Bin
 optional_features:
-    maximum_devel:
-        description:  Stuff used variously for development.
-        requires:
-            Devel::FindRef:       0
-            Devel::StackTrace:    1.19
-            Gnome2::Canvas:       0
-            Goo::Canvas:          0
-            Gtk2::Ex::Dragger:    0
-            Gtk2::Ex::TickerView:  0
-            Pod::Simple::HTML:    0
-            Smart::Comments:      0
-            warnings::unused:     0
-    maximum_interoperation:
-        description:  Have maximum inter-operation with other modules (optional other stuff).
-        requires:
-            Locale::Messages:  0
-    maximum_tests:
-        description:  Have "make test" do as much as possible.
-        requires:
-            Parse::CPAN::Meta:   0
-            Test::DistManifest:  0
-            Test::Pod:           1.00
-            Test::Synopsis:      0
-            Test::YAML::Meta:    0.15
-            YAML:                0
-            YAML::Syck:          0
-            YAML::Tiny:          0
-            YAML::XS:            0
+  maximum_interoperation:
+    description: 'Have maximum inter-operation with other modules (optional other stuff).'
+    requires:
+      Locale::Messages: '0'
+requires:
+  Glib::Ex::SignalIds: '0'
+  Glib::Object::Subclass: '0'
+  Gtk2: '1.200'
+  Gtk2::Ex::GdkBits: '38'
+  Gtk2::Ex::KeySnooper: '3'
+  Gtk2::Ex::SyncCall: '12'
+  Gtk2::Ex::WidgetBits: '31'
+  Gtk2::Ex::WidgetCursor: '5'
+  Gtk2::Ex::WidgetEvents: '21'
+  Scalar::Util: '1.18'
+  Tie::RefHash::Weak: '0.05'
+  perl: '5.008'
+resources:
+  homepage: http://user42.tuxfamily.org/gtk2-ex-xor/index.html
+  license: http://www.gnu.org/licenses/gpl.html
+version: '23'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -4,7 +4,7 @@ use Test::Exception;
 
 use Linux::Capabilities;
 
-my $cap = Linux::Capabilities->new;
+my $cap = Linux::Capabilities->empty;
 
 $cap->raise([CAP_CHOWN, CAP_KILL], [CAP_EFFECTIVE, CAP_PERMITTED]);
 

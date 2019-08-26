@@ -1,5 +1,5 @@
 This archive contains the distribution App-Notifier-Service,
-version 0.0700:
+version 0.0701:
 
   an HTTP service for the notifier application for notifying that an event (such as the finish of a task) occured.
 

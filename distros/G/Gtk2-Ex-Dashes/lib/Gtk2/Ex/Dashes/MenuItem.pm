@@ -1,4 +1,4 @@
-# Copyright 2010 Kevin Ryde
+# Copyright 2010, 2019 Kevin Ryde
 
 # This file is part of Gtk2-Ex-Dashes.
 #
@@ -24,7 +24,7 @@ use Gtk2;
 # uncomment this to run the commented-out ### lines
 #use Smart::Comments;
 
-our $VERSION = 2;
+our $VERSION = 3;
 
 use Glib::Object::Subclass
   'Gtk2::MenuItem',
@@ -152,7 +152,7 @@ L<http://user42.tuxfamily.org/gtk2-ex-dashes/index.html>
 
 =head1 LICENSE
 
-Gtk2-Ex-Dashes is Copyright 2010 Kevin Ryde
+Gtk2-Ex-Dashes is Copyright 2010, 2019 Kevin Ryde
 
 Gtk2-Ex-Dashes is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

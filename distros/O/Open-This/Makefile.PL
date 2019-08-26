@@ -23,6 +23,7 @@ my %WriteMakefileArgs = (
     "Browser::Open" => 0,
     "Git::Helpers" => "0.000016",
     "Module::Runtime" => 0,
+    "Module::Util" => "0.016",
     "Path::Tiny" => 0,
     "Pod::Usage" => 0,
     "Try::Tiny" => 0,
@@ -38,7 +39,7 @@ my %WriteMakefileArgs = (
     "Test::Requires::Git" => 0,
     "Test::Warnings" => 0
   },
-  "VERSION" => "0.000020",
+  "VERSION" => "0.000021",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -51,6 +52,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "Git::Helpers" => "0.000016",
   "Module::Runtime" => 0,
+  "Module::Util" => "0.016",
   "Path::Tiny" => 0,
   "Pod::Usage" => 0,
   "Test::Differences" => 0,

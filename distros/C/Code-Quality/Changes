@@ -1,5 +1,12 @@
 Revision history for Perl extension Code::Quality.
 
+0.001003 2019-08-23T21:10+03:00
+ - Make distinction between unformatted and formatted code, running clang-tidy on unformatted code
+
+0.001002 2019-08-23T09:35+03:00
+ - Depend on recent List::Util, because we use the 'uniq' function
+ - Remove -quiet argument from call to clang-tidy, as it does not exist in old versions (for example 4.0)
+
 0.001001 2019-08-13T19:20+03:00
  - Fix bug: test_clang_tidy should work when code has 2+ errors
  - Make sure tests do not fail when clang-tidy is not installed

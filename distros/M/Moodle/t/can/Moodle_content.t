@@ -18,7 +18,7 @@ content
 =description
 
 The content method generates DB migration statements using the
-L<Doodle::Migrator> and return a string containing "UP" and "DOWN" versioned
+L<Doodle::Migration> and return a string containing "UP" and "DOWN" versioned
 migration strings suitable for use with the migration feature of L<Mojo>
 database drivers.
 
@@ -41,7 +41,7 @@ use Migration;
 
 can_ok "Moodle", "content";
 
-isa_ok "Migration", "Doodle::Migrator";
+isa_ok "Migration", "Doodle::Migration";
 
 SKIP: {
   my $driver;

@@ -8,16 +8,14 @@
 
 # VERSION
 
-    0.03
+    0.04
 
 # SYNOPSIS
 
     use DBIx::Result::Convert::JSONSchema;
 
-    my $SchemaConvert = DBIx::Result::Convert::JSONSchema->new(
-        schema => _DBIx::Class::Schema_
-    );
-    my $json_schema = $SchemaConvert->get_json_schema( _DBIx::Class::ResultSource_ );
+    my $SchemaConvert = DBIx::Result::Convert::JSONSchema->new( schema => Schema );
+    my $json_schema = $SchemaConvert->get_json_schema( DBIx::Class::ResultSource );
 
 # DESCRIPTION
 
@@ -36,12 +34,17 @@ Note, relations between tables are not taken in account!
 Returns somewhat equivalent JSON schema based on DBIx result source name.
 
     my $json_schema = $converted->get_json_schema( 'TableSource', {
+        schema_declaration              => 'http://json-schema.org/draft-04/schema#',
         decimals_to_pattern             => 1,
         has_schema_property_description => 1,
         allow_additional_properties     => 0,
         overwrite_schema_property_keys  => {
             name    => 'cat',
             address => 'dog',
+        },
+        add_schema_properties           => {
+            address => { ... },
+            bank_account => '#/definitions/bank_account',
         },
         overwrite_schema_properties     => {
             name => {
@@ -51,11 +54,24 @@ Returns somewhat equivalent JSON schema based on DBIx result source name.
                 type     => 'number',
             },
         },
+        include_required   => [ qw/ street city / ],
         exclude_required   => [ qw/ name address / ],
         exclude_properties => [ qw/ mouse house / ],
+
+        dependencies => {
+            first_name => [ qw/ middle_name last_name / ],
+        },
     });
 
 Optional arguments to change how JSON schema is generated:
+
+- schema\_declaration
+
+    Declare which version of the JSON Schema standard that the schema was written against.
+
+    [https://json-schema.org/understanding-json-schema/reference/schema.html](https://json-schema.org/understanding-json-schema/reference/schema.html)
+
+    **Default**: "http://json-schema.org/schema#"
 
 - decimals\_to\_pattern
 
@@ -66,7 +82,7 @@ Optional arguments to change how JSON schema is generated:
 
 - has\_schema\_property\_description
 
-    Generates very basic schema description fields e.g. 'Optional numeric type value for field context e.g. 1'.
+    Generate schema description for fields e.g. 'Optional numeric type value for field context e.g. 1'.
 
     **Default**: 0
 
@@ -99,6 +115,15 @@ Optional arguments to change how JSON schema is generated:
 - exclude\_properties
 
     ArrayRef of database column names which should be excluded from JSON schema AT ALL
+
+- dependencies
+
+    [https://json-schema.org/understanding-json-schema/reference/object.html#property-dependencies](https://json-schema.org/understanding-json-schema/reference/object.html#property-dependencies)
+
+- add\_schema\_properties
+
+    HashRef of custom schema properties that must be included in final definition
+    Note that custom properties will overwrite defaults
 
 - schema\_overwrite
 

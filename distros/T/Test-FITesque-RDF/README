@@ -74,6 +74,9 @@ DESCRIPTION
     vocabularies chosen by the test writer. The other main way is create lists
     of HTTP requests and responses.
 
+    If the object of a test parameter is a literal, it will be passed as a
+    plain string, if it is a Attean::IRI, it will be passed as a URI object.
+
     Additionally, a special parameter `-special` is passed on for internal
     framework use. The leading dash is not allowed as the start character of a
     local name, and therefore chosen to avoid conflicts with other parameters.

@@ -4,13 +4,13 @@
       "Dai Okabayashi <bayashi@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4214",
+   "generated_by" : "Module::Build version 0.4229",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Test-AllModules",
    "prereqs" : {
@@ -37,7 +37,7 @@
    "provides" : {
       "Test::AllModules" : {
          "file" : "lib/Test/AllModules.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       }
    },
    "release_status" : "stable",
@@ -49,6 +49,6 @@
          "url" : "http://github.com/bayashi/Test-AllModules"
       }
    },
-   "version" : "0.15",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.16",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

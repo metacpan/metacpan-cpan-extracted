@@ -1,5 +1,5 @@
 package Vote::Count::Method::WinnableAlternatives;
-$Vote::Count::Method::WinnableAlternatives::VERSION = '0.021';
+$Vote::Count::Method::WinnableAlternatives::VERSION = '0.022';
 use Moose;
 extends 'Vote::Count';
 
@@ -208,3 +208,25 @@ sub RunWinnableAlternatives ( $Election ) {
 
 
 1;
+#FOOTER
+
+=pod
+
+BUG TRACKER
+
+L<https://github.com/brainbuz/Vote-Count/issues>
+
+AUTHOR
+
+John Karr (BRAINBUZ) brainbuz@cpan.org
+
+CONTRIBUTORS
+
+Copyright 2019 by John Karr (BRAINBUZ) brainbuz@cpan.org.
+
+LICENSE
+
+This module is released under the GNU Public License Version 3. See license file for details. For more information on this license visit L<http://fsf.org>.
+
+=cut
+

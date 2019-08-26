@@ -12,6 +12,10 @@ use constant {
 use Time::HiRes qw(alarm);
 use List::Util qw(min max);
 
+BEGIN {
+    our $VERSION = '0.02';
+}
+
 sub initialize_mouse {
     my $self = shift;
     my $mode = shift || 'ON';

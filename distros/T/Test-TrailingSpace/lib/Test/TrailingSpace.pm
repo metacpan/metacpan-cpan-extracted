@@ -1,5 +1,5 @@
 package Test::TrailingSpace;
-
+$Test::TrailingSpace::VERSION = '0.0302';
 use strict;
 use warnings;
 
@@ -10,8 +10,6 @@ use autodie;
 use Test::More;
 
 use File::Find::Object::Rule 0.0301;
-
-our $VERSION = '0.0301';
 
 sub new
 {
@@ -127,11 +125,17 @@ sub no_trailing_space
 
 __END__
 
+=pod
+
 =encoding utf-8
 
 =head1 NAME
 
-Test::TrailingSpace - test for trailing space in source files.
+Test::TrailingSpace
+
+=head1 VERSION
+
+version 0.0302
 
 =head1 SYNOPSIS
 
@@ -175,9 +179,6 @@ Or, if you want the test to be optional:
         "No trailing space was found."
     );
 
-
-
-
 =head1 DESCRIPTION
 
 This module is used to test for lack of trailing space. See the synopsis
@@ -188,6 +189,10 @@ supports testing for trailing space / trailing whitespace, although it
 has some limitations that L<Test::TrailingSpace> does not have, and also
 only calls it "trailing whitespace", rather than "trailing space".
 Whenever possible, one should prefer to use it, instead of this module.
+
+=head1 NAME
+
+Test::TrailingSpace - test for trailing space in source files.
 
 =head1 METHODS
 
@@ -264,5 +269,17 @@ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

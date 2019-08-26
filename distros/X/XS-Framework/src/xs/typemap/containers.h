@@ -17,7 +17,7 @@ namespace typemap { namespace containers {
 }}
 
 template <typename T> struct VectorTypemap : TypemapBase<std::vector<T>> {
-    static Sv out(pTHX_ const std::vector<T>& data, const Sv& = {}){
+    static Sv out(const std::vector<T>& data, const Sv& = {}){
         auto out = Array::create(data.size());
         for(const auto& i : data){
             out.push(xs::out(i));
@@ -25,7 +25,7 @@ template <typename T> struct VectorTypemap : TypemapBase<std::vector<T>> {
         return Ref::create(out);
     }
 
-    static std::vector<T> in (pTHX_ Array arg){
+    static std::vector<T> in (Array arg){
         std::vector<T> out;
         out.reserve(arg.size());
         for(const auto& i : arg){
@@ -38,7 +38,7 @@ template <typename T> struct VectorTypemap : TypemapBase<std::vector<T>> {
 template <typename T> struct Typemap<std::vector<T>> : VectorTypemap<T> {};
 
 template <typename K, typename V> struct Typemap<std::map<K,V>, std::map<K,V>> : TypemapBase<std::map<K,V>> {
-    static Sv out (pTHX_ const std::map<K,V>& data, const Sv& = {}) {
+    static Sv out (const std::map<K,V>& data, const Sv& = {}) {
         auto out = Hash::create(data.size());
         for(const auto& i : data){
             auto key = typemap::containers::to_key(i.first);
@@ -47,7 +47,7 @@ template <typename K, typename V> struct Typemap<std::map<K,V>, std::map<K,V>> :
         return Ref::create(out);
     }
 
-    static std::map<K,V> in (pTHX_ Hash arg) {
+    static std::map<K,V> in (Hash arg) {
         std::map<K,V> out;
         for (const auto& element : arg){
             K key = xs::in<K>(Simple(element.key()));

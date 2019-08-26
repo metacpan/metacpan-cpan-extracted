@@ -1,3 +1,7 @@
+0.17028         2019-08-23
+    - Moved the VCS repo to https://github.com/shlomif/perl-error.pm
+    - No other significant changes.
+
 0.17027         2018-10-28
     - Documentation and examples enhancements.
         - https://bitbucket.org/shlomif/perl-error.pm/pull-requests/1/october-prc-some-minor-mostly-doc-changes/diff

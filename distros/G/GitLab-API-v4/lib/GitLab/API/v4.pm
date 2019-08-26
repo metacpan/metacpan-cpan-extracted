@@ -1,5 +1,5 @@
 package GitLab::API::v4;
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 =encoding utf8
 
@@ -10542,7 +10542,7 @@ development this distribution would not exist.
 
 =head1 AUTHORS
 
-    Aran Clary Deltac <aran@bluefeet.dev>
+    Aran Clary Deltac <bluefeet@gmail.com>
     Dotan Dimet <dotan@corky.net>
     Nigel Gregoire <nigelgregoire@gmail.com>
     trunov-ms <trunov.ms@gmail.com>

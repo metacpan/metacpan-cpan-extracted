@@ -6,8 +6,6 @@ use strict;
 use Graphics::Framebuffer; # There are things to import, if you want, but they
                            # are usually not needed.
 
-# If you want threads, then load the threads module after all others.
-
 ## Initialize any global variables here ######################################
 # $FB is your framebuffer object.  See the documentation, if you want to pass
 # any parameters when initializing the module, but no parameters should be
@@ -19,6 +17,11 @@ our $FB = Graphics::Framebuffer->new();
 
 $FB->cls('OFF'); # Turn off the console cursor
 
+# You can optionally set graphics mode here, but remember to turn on text mode
+# before exiting.
+
+$FB->graphics_mode(); # Shuts off all text and cursors.
+
 # Gathers information on the screen for you to use as global information
 our $screen_info = $FB->screen_dimensions();
 
@@ -28,6 +31,8 @@ our $screen_info = $FB->screen_dimensions();
 
 ##############################################################################
 
+$FB->text_mode();  # Turn text and cursor back on.  You MUST do this if
+                   # graphics mode was set.
 $FB->cls('ON');    # Turn the console cursor back on
 exit(0);
 

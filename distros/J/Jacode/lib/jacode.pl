@@ -4,7 +4,7 @@ $support_jcode_package_too = 1;
 #
 # jacode.pl: Perl program for Japanese character code conversion
 #
-# Copyright (c) 2010, 2011, 2014, 2015, 2016, 2017, 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2010, 2011, 2014, 2015, 2016, 2017, 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
 #
 # The latest version is available here:
 #
@@ -44,7 +44,7 @@ $support_jcode_package_too = 1;
 #
 #   ftp://ftp.iij.ad.jp/pub/IIJ/dist/utashiro/perl/
 #
-$VERSION = '2.13.4.21';
+$VERSION = '2.13.4.22';
 $VERSION = $VERSION;
 $rcsid = sprintf(q$Id: jacode.pl,v %s branched from jcode.pl,v 2.13 2000/09/29 16:10:05 utashiro Exp $, $VERSION);
 
@@ -2491,6 +2491,7 @@ sub __z2h_jis {
     local ($s) = @_;
     return $esc_0208 . $s unless $s =~ /^%/ || $s =~ /^![\#\"&VW+,<]/;
     $n += length($s) / 2;
+    local ($^W);
     $s =~ s/([\x00-\xff][\x00-\xff])/$z2h{$1}/g;
     $esc_kana . $s;
 }
@@ -11725,7 +11726,7 @@ This software is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-Copyright (c) 2010, 2011, 2014, 2015, 2016, 2017, 2018 INABA Hitoshi E<lt>ina@cpan.org>E<gt> in a CPAN
+Copyright (c) 2010, 2011, 2014, 2015, 2016, 2017, 2018, 2019 INABA Hitoshi E<lt>ina@cpan.org>E<gt> in a CPAN
 
 The latest version is available here:
 

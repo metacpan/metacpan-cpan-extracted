@@ -1,15 +1,18 @@
 Revision history for Open-This
 
+0.000021  2019-08-25 17:11:12Z
+    - Use Module::Util to find modules without requiring them (GH#24) (José Joaquín Atria)
+
 0.000020  2019-06-21 14:45:12Z
     - Support the pseudo-paths that git diff and friends will display (GH#23) (mannih)
     - Parse Ansible error messages (GH#20) (Olaf Alders)
 
 0.000019  2019-06-14 13:49:45Z
-    - Add support for Kate editor (GH#17) (Jos Joaqun Atria)
+    - Add support for Kate editor (GH#17) (José Joaquín Atria)
     - Document supported editors
 
 0.000018  2019-06-10 17:02:19Z
-    - Print usage when ot is called with no arguments (GH#16) (Jos Joaqun
+    - Print usage when ot is called with no arguments (GH#16) (José Joaquín
       Atria)
 
 0.000017  2019-05-29 18:24:11Z

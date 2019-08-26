@@ -7,7 +7,7 @@ use 5.006;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Add 32nd, 64th and tuplet durations to MIDI-Perl",
+  "ABSTRACT" => "Add 32nd, 64th, 128th and tuplet durations to MIDI-Perl",
   "AUTHOR" => "Gene Boggs <gene\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -27,7 +27,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.0605",
+  "VERSION" => "0.0702",
   "test" => {
     "TESTS" => "t/*.t"
   }

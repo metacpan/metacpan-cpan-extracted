@@ -10,6 +10,8 @@ use Test::More 0.88;
 
 use XT::Files;
 
+delete $ENV{XT_FILES_DEFAULT_CONFIG_FILE};
+
 use constant CLASS => 'XT::Files';
 
 is( CLASS()->_is_initialized, undef, 'singleton is not initialized' );
@@ -29,7 +31,7 @@ $output = exception { $obj->_global_keyval( ':version', 'hello world' ) };
 test_test('correct error message');
 like( $output, q{/Not a valid version 'hello world'/}, '... dies if the specified version does not pass version->is_lax' );
 
-test_out('# [XT::Files] XT::Files version 99999999 required--this is only version 0.001');
+test_out("# [XT::Files] XT::Files version 99999999 required--this is only version $XT::Files::VERSION");
 $output = exception { $obj->_global_keyval( ':version', '99999999' ) };
 test_test('correct error message');
 like( $output, '/XT::Files version 99999999 required--this is only version /', '... dies if the :version is not ok' );

@@ -1,41 +1,46 @@
-0.007   2017-07-10 (PERLANCAR)
+0.008   2019-08-21  Released-By: PERLANCAR; Urgency: medium
+
+	- Support reading from STDIN (requested by Chris White).
+
+
+0.007   2017-07-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace Log::Any with Log::ger.
 
 
-0.006   2016-11-23 (PERLANCAR)
+0.006   2016-11-23  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Update example in Synopsis.
 
 
-0.005   2016-11-23 (PERLANCAR)
+0.005   2016-11-23  Released-By: PERLANCAR
 
 	- Remove (planned) feature to check digest, offload that feature to
 	  App::xsum.
 
 
-0.004   2016-11-23 (PERLANCAR)
+0.004   2016-11-23  Released-By: PERLANCAR
 
 	- Support the other SHA algorithms: sha224, sha284, sha512,
 	  sha512224, sha512256.
 
 
-0.003   2016-11-22 (PERLANCAR)
+0.003   2016-11-22  Released-By: PERLANCAR
 
 	- [refactor] Extract routine digest_file().
 
 
-0.002   2016-11-21 (PERLANCAR)
+0.002   2016-11-21  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Fix Rinci metadata.
 
 
-0.001   2016-11-21 (PERLANCAR)
+0.001   2016-11-21  Released-By: PERLANCAR
 
         - First release, checking digest not yet implemented.

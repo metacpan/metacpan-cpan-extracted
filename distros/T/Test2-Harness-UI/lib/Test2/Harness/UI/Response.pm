@@ -2,7 +2,7 @@ package Test2::Harness::UI::Response;
 use strict;
 use warnings;
 
-our $VERSION = '0.000006';
+our $VERSION = '0.000014';
 
 use Carp qw/croak/;
 use Time::HiRes qw/sleep/;
@@ -81,7 +81,11 @@ sub stream {
             $done = sub { !$go };
             $fetch = sub {
                 $go = $rs->next() or return;
-                my $out = $json->encode($go) . "\n";
+                my $data = $go;
+                if(my $meth = $params{data_method}) {
+                    $data = $go->$meth();
+                }
+                my $out = $json->encode($data) . "\n";
                 return $out;
             };
         }

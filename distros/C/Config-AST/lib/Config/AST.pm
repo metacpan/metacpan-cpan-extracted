@@ -1,18 +1,18 @@
-# Configuration file parser                      -*- perl -*-
+# This file is part of Config::AST                            -*- perl -*-
 # Copyright (C) 2017-2019 Sergey Poznyakoff <gray@gnu.org>
 #
-# This program is free software; you can redistribute it and/or modify
+# Config::AST is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 3, or (at your option)
 # any later version.
 #
-# This program is distributed in the hope that it will be useful,
+# Config::AST is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# along with Config::AST.  If not, see <http://www.gnu.org/licenses/>.
 
 package Config::AST;
 
@@ -23,6 +23,7 @@ use Text::Locus;
 use Config::AST::Node qw(:sort);
 use Config::AST::Node::Section;
 use Config::AST::Node::Value;
+use Config::AST::Follow;
 use Data::Dumper;
 
 require Exporter;
@@ -30,7 +31,7 @@ our @ISA = qw(Exporter);
 our %EXPORT_TAGS = ( 'sort' => [ qw(NO_SORT SORT_NATURAL SORT_PATH) ] );
 our @EXPORT_OK = qw(NO_SORT SORT_NATURAL SORT_PATH);
     
-our $VERSION = "1.01";
+our $VERSION = "1.02";
 
 =head1 NAME
 
@@ -670,7 +671,7 @@ node at path
 
 one can write:
 
-    $node = $cfg->tree->Foo->Bar->Baz
+    $node = $cfg->foo->bar->baz
 
 This statement is equivalent to
 
@@ -678,20 +679,45 @@ This statement is equivalent to
 
 except that if the node in question does not exist, direct access returns
 a I<null node>, and B<getnode> returns C<undef>. Null node is a special node
-representing a missing node. Its B<is_null> method returns true and it can
+representing a missing node.  Its B<is_null> method returns true and it can
 be used in conditional context as a boolean value, e.g.:
 
-    if (my $node = $cfg->tree->Foo->Bar->Baz) {
+    if (my $node = $cfg->foo->bar->baz) {
         $val = $node->value;
     }
 
-To compose direct access statement, first capitalize each path component. If
-the component name contains dashes, replace them with double underscores. Use
-the resulting names as methods of B<$cfg-E<gt>tree>. For example, to
-retrieve the C<qw(files temp-dir)> node, use
+Direct addressing is enabled only if lexicon is provided (either during
+creation of the object, or later, via the B<lexicon> method).
 
-    $cfg->tree->Files->Temp__dir;
+Obviously, statements that have names coinciding with one of the methods of
+the B<Config::AST> class (or any of its subclasses) can't be used in direct
+addressing.  In other words, you can't have a top-level statement called
+C<tree> and access it as
 
+    $cfg->tree
+
+This statement will always refer to the method B<tree> of the B<Config::AST>
+class.
+
+Another possible problem when using direct access are keywords with dashes.
+Currently a kludge is implemented to make it possible to access such
+keywords: when looking for a matching keyword, double underscores compare
+equal to a single dash.  For example, to retrieve the C<qw(files temp-dir)>
+node, use
+
+    $cfg->files->temp__dir;
+
+=cut
+
+our $AUTOLOAD;
+sub AUTOLOAD {
+    my $self = shift;
+    $AUTOLOAD =~ s/(?:(.*)::)?(.+)//;
+    my ($p, $m) = ($1, $2);
+    croak "Can't locate object method \"$m\" via package \"$p\""
+	if @_ || !$self->lexicon;
+    return Config::AST::Follow->new($self->tree, $self->lexicon)->${\$m};
+}
 
 =head1 CONSTRUCTING THE SYNTAX TREE
 

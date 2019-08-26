@@ -1,5 +1,5 @@
 package Mail::LMLM::Types::Egroups;
-$Mail::LMLM::Types::Egroups::VERSION = '0.6805';
+$Mail::LMLM::Types::Egroups::VERSION = '0.6806';
 use strict;
 use warnings;
 
@@ -7,7 +7,7 @@ use Mail::LMLM::Types::Ezmlm;
 
 use vars qw(@ISA);
 
-@ISA=qw(Mail::LMLM::Types::Ezmlm);
+@ISA = qw(Mail::LMLM::Types::Ezmlm);
 
 sub initialize
 {
@@ -15,7 +15,7 @@ sub initialize
 
     $self->SUPER::initialize(@_);
 
-    if (! exists($self->{'hostname'}) )
+    if ( !exists( $self->{'hostname'} ) )
     {
         $self->{'hostname'} = "yahoogroups.com";
     }
@@ -32,14 +32,17 @@ sub get_homepage
 {
     my $self = shift;
 
-    if ( exists($self->{'homepage'}) )
+    if ( exists( $self->{'homepage'} ) )
     {
         return $self->{'homepage'};
     }
     else
     {
-        return "http://" . $self->get_homepage_hostname() .
-            "/group/" . $self->get_group_base() . "/";
+        return
+              "http://"
+            . $self->get_homepage_hostname()
+            . "/group/"
+            . $self->get_group_base() . "/";
     }
 }
 
@@ -47,7 +50,7 @@ sub get_online_archive
 {
     my $self = shift;
 
-    if ( exists($self->{'online_archive'}) )
+    if ( exists( $self->{'online_archive'} ) )
     {
         return $self->{'online_archive'};
     }
@@ -71,11 +74,7 @@ Mail::LMLM::Types::Egroups - mailing list type for YahooGroups.
 
 =head1 VERSION
 
-version 0.6805
-
-=head1 VERSION
-
-version 0.6805
+version 0.6806
 
 =head1 METHODS
 
@@ -109,7 +108,7 @@ unknown
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by unknown.
+This software is Copyright (c) 2019 by unknown.
 
 This is free software, licensed under:
 
@@ -118,7 +117,7 @@ This is free software, licensed under:
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/mail-lmlm/issues>
+L<https://github.com/shlomif/perl-mail-lmlm/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -227,8 +226,8 @@ The code is open to the world, and available for you to hack on. Please feel fre
 with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
 from your repository :)
 
-L<https://github.com/shlomif/mail-lmlm>
+L<https://github.com/shlomif/perl-mail-lmlm>
 
-  git clone http://bitbucket.org/shlomif/perl-mail-lmlm/overview
+  git clone git://github.com/shlomif/perl-mail-lmlm.git
 
 =cut

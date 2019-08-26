@@ -1,4 +1,5 @@
 Revision history for String-Validator
+2.03  August 26, 2019 pod fix
 2.02  June 27, 2019
       Added a line of Documentation
 2.01    March 15, 2019 fix typo in dist.ini

@@ -14,6 +14,8 @@ use lib        ();
 
 use XT::Files::Plugin::lib;
 
+delete $ENV{XT_FILES_DEFAULT_CONFIG_FILE};
+
 use constant CLASS => 'XT::Files::Plugin::lib';
 
 like( exception { CLASS()->new() }, q{/xtf attribute required/}, q{new throws an exception if 'xtf' argument is missing} );

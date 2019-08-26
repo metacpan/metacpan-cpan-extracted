@@ -1,3 +1,45 @@
+0.034   2019-08-23  Released-By: PERLANCAR; Urgency: medium
+
+	[ENHANCEMENTS]
+
+        - Check rule's required arguments.
+
+        - Allow rules_module in reverse_rules(), in rules
+          transmute_{hash_values,array_elems}.
+
+	- Log transmute steps in trace level using Log::ger when
+          LOG_DATA_TRANSMUTE_STEP is true.
+
+        - Add more tests.
+
+        - Add sample rules module Data::Transmute::Rules::Example.
+
+
+0.033   2019-08-22  Released-By: PERLANCAR; Urgency: medium
+
+	- transmute_data(): Add argument rules_module.
+
+	- Remove old benchmark script.
+
+
+0.032   2019-08-22  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Properly refuse to create reverse rules for create_hash_key
+	  when ignore=1/replace=1, for rename_hash_key when
+	  ignore_missing_from=1/ignore_existing_target=1/replace=1.
+
+	- [test] Add reverse tests.
+
+
+0.031   2019-08-22  Released-By: PERLANCAR; Urgency: medium
+
+	- Rule transmute_array_elems: add arguments index_{is,in,match,filter}.
+
+	- Rule transmute_hash_values: add arguments key_{is,in,match,filter}.
+
+	- Add & tweak documentation.
+
+
 0.030   2019-07-24  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
 
 	[INCOMPATIBLE CHANGE]

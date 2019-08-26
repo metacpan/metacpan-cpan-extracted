@@ -1,14 +1,9 @@
 package File::Format::CRD;
-
+$File::Format::CRD::VERSION = '0.2.0';
 use warnings;
 use strict;
 
 use 5.008;
-
-
-use vars qw($VERSION);
-
-$VERSION = '0.0.4';
 
 
 
@@ -26,15 +21,11 @@ File::Format::CRD - Distribution for reading the Windows CRD format.
 
 =head1 VERSION
 
-version 0.0.4
+version 0.2.0
 
 =head1 SYNOPSIS
 
 See L<File::Format::CRD::Reader> .
-
-=head1 VERSION
-
-Version 0.0.4
 
 =head1 SUPPORT
 
@@ -112,8 +103,7 @@ This is free software, licensed under:
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-Format-CRD or by email to
-bug-file-format-crd@rt.cpan.org.
+L<https://github.com/shlomif/perl-file-format-crd/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -142,7 +132,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/File-Format-CRD>
+L<https://metacpan.org/release/File-Format-CRD>
 
 =item *
 
@@ -158,7 +148,7 @@ RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-Format-CRD>
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=File-Format-CRD>
 
 =item *
 
@@ -178,25 +168,17 @@ L<http://cpanratings.perl.org/d/File-Format-CRD>
 
 =item *
 
-CPAN Forum
-
-The CPAN Forum is a web forum for discussing Perl modules.
-
-L<http://cpanforum.com/dist/File-Format-CRD>
-
-=item *
-
 CPANTS
 
 The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
 
-L<http://cpants.perl.org/dist/overview/File-Format-CRD>
+L<http://cpants.cpanauthors.org/dist/File-Format-CRD>
 
 =item *
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/F/File-Format-CRD>
 
@@ -221,7 +203,7 @@ L<http://deps.cpantesters.org/?module=File::Format::CRD>
 =head2 Bugs / Feature Requests
 
 Please report any bugs or feature requests by email to C<bug-file-format-crd at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=File-Format-CRD>. You will be automatically notified of any
+the web interface at L<https://rt.cpan.org/Public/Bug/Report.html?Queue=File-Format-CRD>. You will be automatically notified of any
 progress on the request by the system.
 
 =head2 Source Code
@@ -230,8 +212,8 @@ The code is open to the world, and available for you to hack on. Please feel fre
 with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
 from your repository :)
 
-L<http://bitbucket.org/shlomif/perl-file-format-crd>
+L<https://github.com/shlomif/perl-file-format-crd>
 
-  hg clone ssh://hg@bitbucket.org/shlomif/perl-file-format-crd
+  git clone git://github.com/shlomif/perl-file-format-crd.git
 
 =cut

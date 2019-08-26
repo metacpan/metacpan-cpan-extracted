@@ -53,7 +53,7 @@
          "web" : "https://github.com/brainbuz/String-Validator"
       }
    },
-   "version" : "2.02",
+   "version" : "2.03",
    "x_generated_by_perl" : "v5.28.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
 }

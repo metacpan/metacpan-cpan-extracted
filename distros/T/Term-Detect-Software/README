@@ -1,5 +1,12 @@
-SYNOPSIS
+NAME
+    Term::Detect::Software - Detect terminal (emulator) software and its
+    capabilities
 
+VERSION
+    This document describes version 0.221 of Term::Detect::Software (from
+    Perl distribution Term-Detect-Software), released on 2019-08-18.
+
+SYNOPSIS
      use Term::Detect::Software qw(detect_terminal detect_terminal_cached);
      my $res = detect_terminal();
      die "Not running under terminal!" unless $res->{emulator_engine};
@@ -11,16 +18,13 @@ SYNOPSIS
      say "Inside emacs? ", $res->{inside_emacs} ? "yes":"no";
 
 DESCRIPTION
-
-    This module uses several heuristics to find out what terminal
-    (emulator) software the current process is running in, and its
+    This module uses several heuristics to find out what terminal (emulator)
+    software the current process is running in, and its
     capabilities/settings. This module complements other modules such as
     Term::Terminfo and Term::Encoding.
 
 FUNCTIONS
-
- detect_terminal() => HASHREF
-
+  detect_terminal() => HASHREF
     Return a hashref containing information about running terminal
     (emulator) software and its capabilities/settings.
 
@@ -30,9 +34,9 @@ FUNCTIONS
 
     Currently Konsole and Konsole-based terminals (like Yakuake) can be
     detected through existence of environment variables
-    KONSOLE_DBUS_SERVICE or KONSOLE_DBUS_SESSION. xterm is detected through
-    XTERM_VERSION. XFCE's Terminal is detected using COLORTERM. The other
-    software are detected via known process names.
+    "KONSOLE_DBUS_SERVICE" or "KONSOLE_DBUS_SESSION". xterm is detected
+    through "XTERM_VERSION". XFCE's Terminal is detected using "COLORTERM".
+    The other software are detected via known process names.
 
     Terminal capabilities and settings are currently determined via
     heuristics. Probing terminal configuration files might be performed in
@@ -40,65 +44,87 @@ FUNCTIONS
 
     Result:
 
-      * emulator_engine => STR
+    *   emulator_engine => STR
 
-      Possible values: konsole, xterm, gnome-terminal, rxvt, pterm (PuTTY),
-      xvt, windows (CMD.EXE), cygwin, or empty string (if not detected
-      running under terminal).
+        Possible values: "konsole", "xterm", "gnome-terminal", "rxvt",
+        "pterm" (PuTTY), "xvt", "windows" (CMD.EXE), "cygwin", "st"
+        (suckless.org's terminal emulator), or empty string (if not detected
+        running under terminal).
 
-      * emulator_software => STR
+    *   emulator_software => STR
 
-      Either: xfce4-terminal, guake, gnome-terminal, mlterm, lxterminal,
-      rxvt, mrxvt, putty, xvt, windows (CMD.EXE), or empty string (if not
-      detected running under terminal).
+        Either: "xfce4-terminal", "guake", "gnome-terminal", "mlterm",
+        "lxterminal", "rxvt", "mrxvt", "putty", "xvt", "windows" (CMD.EXE),
+        "st" (suckless.org's terminal emulator), or empty string (if not
+        detected running under terminal).
 
-      w=item * color_depth => INT
+    *   color_depth => INT
 
-      Either 0 (does not support ANSI color codes), 16, 256, or 16777216
-      (2**24).
+        Either 0 (does not support ANSI color codes), 16, 256, or 16777216
+        (2**24).
 
-      * default_bgcolor => STR (6-hexdigit RGB)
+    *   default_bgcolor => STR (6-hexdigit RGB)
 
-      For example, any xterm is assumed to have white background (ffffff)
-      by default, while Konsole is assumed to have black (000000). Better
-      heuristics will be done in the future.
+        For example, any xterm is assumed to have white background (ffffff)
+        by default, while Konsole is assumed to have black (000000). Better
+        heuristics will be done in the future.
 
-      * unicode => BOOL
+    *   unicode => BOOL
 
-      Whether terminal software supports Unicode/wide characters. Note that
-      you should also check encoding, e.g. using Term::Encoding.
+        Whether terminal software supports Unicode/wide characters. Note
+        that you should also check encoding, e.g. using Term::Encoding.
 
-      * box_chars => BOOL
+    *   box_chars => BOOL
 
-      Whether terminal supports box-drawing characters.
+        Whether terminal supports box-drawing characters.
 
- detect_terminal_cached([$flag]) => ANY
-
-    Just like detect_terminal() but will cache the result. Can be used by
+  detect_terminal_cached([$flag]) => ANY
+    Just like "detect_terminal()" but will cache the result. Can be used by
     applications or modules to avoid repeating detection process.
 
 FAQ
-
- What is this module for? Why not Term::Terminfo or Term::Encoding?
-
+  What is this module for? Why not Term::Terminfo or Term::Encoding?
     This module is first written for Text::ANSITable so that the module can
     provide good defaults when displaying formatted and colored tables,
     especially on popular terminal emulation software like Konsole (KDE's
     default terminal), gnome-terminal (GNOME's default), Terminal (XFCE's
     default), xterm, rxvt.
 
-    The module works by trying to figure out the terminal emulation
-    software because the information provided by Term::Terminfo and
-    Term::Encoding are sometimes not specific enough. For example,
-    Term::Encoding can return utf-8 when running under rxvt, but since the
-    software currently lacks Unicode support we shouldn't display Unicode
-    characters. Another example is color depth: Term::Terminfo currently
-    doesn't recognize Konsole's 24bit color support and only gives
-    max_colors 256.
+    The module works by trying to figure out the terminal emulation software
+    because the information provided by Term::Terminfo and Term::Encoding
+    are sometimes not specific enough. For example, Term::Encoding can
+    return utf-8 when running under rxvt, but since the software currently
+    lacks Unicode support we shouldn't display Unicode characters. Another
+    example is color depth: Term::Terminfo currently doesn't recognize
+    Konsole's 24bit color support and only gives "max_colors" 256.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Term-Detect-Software>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Term-Detect-Software>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Term-Detect-Software>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Term::Terminfo
 
     Term::Encoding
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2015, 2014, 2013 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

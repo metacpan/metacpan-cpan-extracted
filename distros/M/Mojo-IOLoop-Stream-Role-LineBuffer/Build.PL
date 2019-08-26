@@ -84,7 +84,7 @@ EOW
         "Dan Book <dbook\@cpan.org>"
       ],
       "dist_name" => "Mojo-IOLoop-Stream-Role-LineBuffer",
-      "dist_version" => "0.004",
+      "dist_version" => "0.006",
       "license" => "artistic_2",
       "module_name" => "Mojo::IOLoop::Stream::Role::LineBuffer",
       "recursive_test_files" => 1,

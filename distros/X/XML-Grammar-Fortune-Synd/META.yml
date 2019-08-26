@@ -27,13 +27,13 @@ name: XML-Grammar-Fortune-Synd
 provides:
   XML::Grammar::Fortune::Synd:
     file: lib/XML/Grammar/Fortune/Synd.pm
-    version: '0.0212'
+    version: '0.0214'
   XML::Grammar::Fortune::Synd::App:
     file: lib/XML/Grammar/Fortune/Synd/App.pm
-    version: '0.0212'
+    version: '0.0214'
   XML::Grammar::Fortune::Synd::Heap::Elem:
     file: lib/XML/Grammar/Fortune/Synd/Heap/Elem.pm
-    version: '0.0212'
+    version: '0.0214'
 requires:
   Class::Accessor: '0'
   DateTime::Format::W3CDTF: '0'
@@ -51,13 +51,13 @@ requires:
   vars: '0'
   warnings: '0'
 resources:
-  bugtracker: https://github.com/shlomif/xml-grammar-fortune-synd/issues
+  bugtracker: https://github.com/shlomif/fortune-xml/issues
   homepage: http://metacpan.org/release/XML-Grammar-Fortune-Synd
-  repository: https://bitbucket.org/shlomif/fortune-xml
-version: '0.0212'
+  repository: git://github.com/shlomif/fortune-xml.git
+version: '0.0214'
 x_Dist_Zilla:
   perl:
-    version: '5.026002'
+    version: '5.028002'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -181,10 +181,6 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Filter/PodSyntaxTests'
-      version: '6.012'
-    -
-      class: Dist::Zilla::Plugin::PodVersion
-      name: '@Filter/PodVersion'
       version: '6.012'
     -
       class: Dist::Zilla::Plugin::Test::Compile
@@ -373,5 +369,5 @@ x_Dist_Zilla:
     config:
       is_trial: '0'
     version: '6.012'
-x_generated_by_perl: v5.26.2
+x_generated_by_perl: v5.28.2
 x_serialization_backend: 'YAML::Tiny version 1.73'

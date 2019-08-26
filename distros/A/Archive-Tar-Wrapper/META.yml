@@ -4,14 +4,13 @@ author:
   - 'Mike Schilli <cpan@perlmeister.com>'
   - 'Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>'
 build_requires:
-  Dumbbench: '0.111'
   ExtUtils::MakeMaker: '0'
   Test::Simple: '1.302073'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   File::Which: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,7 +23,7 @@ no_index:
 provides:
   Archive::Tar::Wrapper:
     file: lib/Archive/Tar/Wrapper.pm
-    version: '0.36'
+    version: '0.37'
 requires:
   Cwd: '0'
   File::Temp: '0'
@@ -35,6 +34,5 @@ requires:
 resources:
   bugtracker: https://github.com/glasswalk3r/archive-tar-wrapper-perl/issues
   repository: https://github.com/glasswalk3r/archive-tar-wrapper-perl.git
-version: '0.36'
-x_NO_MYMETA: 1
+version: '0.37'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

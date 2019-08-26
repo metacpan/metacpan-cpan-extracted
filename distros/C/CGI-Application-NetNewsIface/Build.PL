@@ -40,7 +40,7 @@ my $builder = Module::Build->new(
     {
         resources =>
         {
-            repository => "https://bitbucket.org/shlomif/perl-cgi-application-netnewsiface/",
+            repository => "https://github.com/shlomif/perl-cgi-application-netnewsiface",
         },
     },
 );

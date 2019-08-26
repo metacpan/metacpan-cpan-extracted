@@ -12,7 +12,7 @@ use Doodle::Command;
 use Doodle::Schema;
 use Doodle::Table;
 
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 has commands => (
   is => 'ro',
@@ -87,7 +87,7 @@ Doodle
 
 =head1 ABSTRACT
 
-Database DDL Statement Builder
+Database DDL (= Data Definition Language) Statement Builder
 
 =cut
 
@@ -122,9 +122,11 @@ Database DDL Statement Builder
 
 =head1 DESCRIPTION
 
-Doodle is a database DDL statement builder and provides an object-oriented
-abstraction for performing schema changes in various datastores. This class
-consumes the L<Doodle::Helpers> roles.
+Doodle is a database
+L<DDL ("Data Definition Language" or "Data Description Language")|https://en.wikipedia.org/wiki/Data_definition_language>
+statement builder and provides an object-oriented
+abstraction for performing schema changes in various datastores.
+This class consumes the L<Doodle::Helpers> roles.
 
 =cut
 

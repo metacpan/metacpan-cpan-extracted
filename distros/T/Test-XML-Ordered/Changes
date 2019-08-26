@@ -1,3 +1,7 @@
+0.2.0   2019-08-23
+    - Convert to dzil
+    - https://github.com/shlomif/test-xml-ordered
+
 0.0.9   2015-04-08
     - Remove t/00basic.t which tested for versions of libxml2 and was
     erroneously failing.

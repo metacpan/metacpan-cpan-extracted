@@ -11,13 +11,13 @@ no warnings 'experimental';
 use List::Util qw( min max sum );
 use Data::Printer;
 
-our $VERSION='0.021';
+our $VERSION='0.022';
 
 =head1 NAME
 
 Vote::Count::TieBreaker
 
-=head1 VERSION 0.021
+=head1 VERSION 0.022
 
 =cut
 
@@ -63,13 +63,13 @@ When all ballots are exhausted the choice with the highest total wins.
 
 The Tie Breaker Method is modified.
 
-Instead of Majority, any choice with a current total less than another is eliminated.
+Instead of Majority, any choice with a current total less than another is eliminated. This allows resolution of any number of choices in a tie.
 
 The winner is the last choice remaining.
 
-head2 TieBreakerGrandJunction
+=head2 TieBreakerGrandJunction
 
-  my $resolve = $Election->TieBreakerGrandJunction( $choice1, $choice2  );
+  my $resolve = $Election->TieBreakerGrandJunction( $choice1, $choice2 [ $choice3 ... ]  );
   if ( $resolve->{'winner'}) { say "Tie Winner is $resolve->{'winner'}"}
   elsif ( $resolve->{'tie'}) {
     my @tied = $resolve->{'tied'}->@*;
@@ -90,7 +90,7 @@ sub TieBreakerGrandJunction ( $self, @choices ) {
   }
   my $round = 1;
   while ( $round <= $deepest ) {
-    $self->logv( "Tie Breaker Round: $round");
+    $self->logv( "Tie Breaker Round: $round") if $self->can('logv');
     for my $b ( keys $ballots->%* ) {
       my $pick = $ballots->{$b}{'votes'}[$round -1] or next ;
       if ( defined $current{$pick} ) {
@@ -98,21 +98,80 @@ sub TieBreakerGrandJunction ( $self, @choices ) {
       }
     }
     my $max = max( values %current );
-    for my $c ( sort @choices ) { $self->logv( "\t$c: $current{$c}") }
+    for my $c ( sort @choices ) { 
+      $self->logv( "\t$c: $current{$c}") if $self->can('logv');
+    }
     for my $c ( sort @choices ) {
       if ( $current{$c} < $max ) {
         delete $current{$c};
-        $self->logv( "Tie Breaker $c eliminated");
+        $self->logv( "Tie Breaker $c eliminated") if $self->can('logv');
       }
     }
     @choices = ( sort keys %current );
     if ( 1 == @choices ) {
-      $self->logv( "Tie Breaker Won By: $choices[0]");
+      $self->logv( "Tie Breaker Won By: $choices[0]") if $self->can('logv');
       return { 'winner' => $choices[0], 'tie' => 0, 'tied' =>[]  };
     }
     $round++;
   }
 return { 'winner' => 0, 'tie' => 1, 'tied' => \@choices };
+}
+
+=head1 Borda-like Later Harm Protected
+
+This method is superficially similar to Borda. However, it only scores the best ranked member of the tie, ignoring the later votes. The tie member with the highest score wins. The original position on the ballot is used to score. It is subject to all of the Borda weighting problems. It is Later Harm Protected (within the tied set), but less resolvable than Modified Grand Junction.
+
+=head2 TieBreakerBordalikeLaterHarm ()
+
+  Currently unimplemented ...
+
+=head1 TieBreaker
+
+Implements some basic methods for resolving ties. The default value for IRV is 'all', and the default value for Matrix is 'none'. 'all' is inapproriate for Matrix, and 'none' is inappropriate for IRV.
+
+  my @keep = $self->TieBreaker( $tiebreaker, $active, @choices );
+
+TieBreaker returns a list containing the winner, if the method is 'none' the list is empty, if 'all' the original @choices list is returned. If the TieBreaker is a tie there will be multiple elements.
+
+=cut
+
+sub TieBreaker ( $I, $tiebreaker, $active, @choices ) {
+  if ( $tiebreaker eq 'all') { return @choices }
+  if ( $tiebreaker eq 'none') { return () }
+  my $choices_hashref = {map { $_ => 1 } @choices};
+  my $ranked = undef;
+  if ( $tiebreaker eq 'borda') {
+    $ranked = $I->Borda( $active );
+  } elsif ( $tiebreaker eq 'borda_all') {
+    $ranked = $I->Borda( $I->BallotSet()->{'choices'} );
+  } elsif ( $tiebreaker eq 'approval') {
+    $ranked = $I->Approval( $choices_hashref );
+  # } elsif ( $tiebreaker eq 'topcount') {
+  #   $ranked = $I->TopCount( $choices_hashref );
+  } elsif ( $tiebreaker eq 'grandjunction') {
+    my $GJ = $I->TieBreakerGrandJunction( @choices );
+    if( $GJ->{'winner'}) { return ( $GJ->{'winner'}) }
+    elsif( $GJ->{'tie'}) { return   $GJ->{'tied'}->@* }
+    else { die "unexpected (or no) result from $tiebreaker!\n"}
+  } else { die "undefined tiebreak method $tiebreaker!\n"}
+  my @highchoice = () ;
+  my $highest = 0;
+  my $counted = $ranked->RawCount();
+  for my $c (@choices) {
+    if ( $counted->{$c} > $highest ) {
+      @highchoice = ( $c );
+      $highest = $counted->{$c};
+    } elsif ( $counted->{$c} == $highest ) {
+      push @highchoice, $c;
+    }
+  }
+  my $terse = "Tie Breaker $tiebreaker: " . join( ', ', @choices ) .
+    "\nwinner(s): " . join( ', ', @highchoice );
+  $I->{'last_tiebreaker'} = {
+    'terse' => $terse,
+    'verbose' => $ranked->RankTable(),
+  };
+  return @highchoice;
 }
 
 1;

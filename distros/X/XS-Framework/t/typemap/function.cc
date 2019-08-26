@@ -16,32 +16,32 @@ struct RefAny {
 
 namespace xs {
     template<> struct Typemap<RefOnly&> : TypemapBase<RefOnly&> {
-        static RefOnly in (pTHX_ const Simple& arg) {
+        static RefOnly in (const Simple& arg) {
             return RefOnly(arg.as_string() + "_in");
         }
-        static Sv out (pTHX_ RefOnly& v, const Sv& = {}) { return Simple(v.s + "_out"); }
+        static Sv out (RefOnly& v, const Sv& = {}) { return Simple(v.s + "_out"); }
     };
 
     template<> struct Typemap<RefAny> : TypemapBase<RefAny> {
-        static RefAny in (pTHX_ const Simple& arg) {
+        static RefAny in (const Simple& arg) {
             return RefAny(arg.as_string() + "_inV");
         }
-        static Sv out (pTHX_ const RefAny& v, const Sv& = {}) { return Simple(v.s + "_outV"); }
+        static Sv out (const RefAny& v, const Sv& = {}) { return Simple(v.s + "_outV"); }
     };
 
     template<> struct Typemap<RefAny&> : TypemapBase<RefAny&> {
-        static RefAny& in (pTHX_ const Simple& arg) {
+        static RefAny& in (const Simple& arg) {
             static RefAny r("");
             r.s = arg.as_string() + "_inR";
             return r;
         }
-        static Sv out (pTHX_ RefAny& v, const Sv& = {}) { return Simple(v.s + "_outR"); }
+        static Sv out (RefAny& v, const Sv& = {}) { return Simple(v.s + "_outR"); }
     };
 }
 
-using vv_fn   = function<void()>;
-using vi_fn   = function<void(int)>;
-using iid_fn  = function<int(int, panda::string_view)>;
+using vv_fn  = function<void()>;
+using vi_fn  = function<void(int)>;
+using iid_fn = function<int(int, panda::string_view)>;
 
 struct Data {
     int i;

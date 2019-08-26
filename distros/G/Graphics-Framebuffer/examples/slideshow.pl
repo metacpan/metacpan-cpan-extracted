@@ -57,7 +57,7 @@ our $FB = Graphics::Framebuffer->new(
     'DIAGNOSTICS' => $diagnostics,
 );
 
-$SIG{'QUIT'} = $SIG{'HUP'} = $SIG{'INT'} = $SIG{'KILL'} = sub { exec('reset'); };
+$SIG{'QUIT'} = $SIG{'HUP'} = $SIG{'INT'} = $SIG{'KILL'} = $SIG{'TERM'} = sub { $FB->text_mode(); exec('reset'); };
 
 if ($errors) {
     system('clear');

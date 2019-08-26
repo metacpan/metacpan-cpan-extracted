@@ -11,6 +11,8 @@ use Role::Tiny ();
 
 use XT::Files::Plugin;
 
+delete $ENV{XT_FILES_DEFAULT_CONFIG_FILE};
+
 use constant CLASS => 'XT::Files::Plugin';
 
 like( exception { CLASS()->new() }, q{/xtf attribute required/}, q{new throws an exception if 'xtf' argument is missing} );

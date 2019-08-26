@@ -61,7 +61,7 @@ This is also extremely useful to researchers who may want to study multiple meth
 
 # Preview Release
 
-This module is not ready for production.
+This module is not ready for production. 
 
 # Overview
 
@@ -93,7 +93,7 @@ The Consistency Criteria collectively state: Changes to non-winning alternatives
 
 To illustrate inconsistency: suppose every morning we vote on a flavor of Ice Cream and Chocolate always wins; one morning the three voters who always vote 1:RockyRoad 2:Chocolate simply vote for Chocolate, consistency is violated if Chocolate loses on that day.
 
-Cloning occurs when similar choices are available, such as Vanilla and Vanilla Bean. If removing one of the clones would cause the other to win, the presence of both should not cause a non-clone to win.
+Cloning occurs when similar choices are available, such as Vanilla and Vanilla Bean. If one of the clones would win without the presence of the other, the presence of both should not cause a non-clone to win.
 
 The cases described above: Monotonocity, Independence of Irrelevant Alternatives and Clone Independence are normally discussed as seperate criteria rather than components of one. Additional sub-criteria that haven't been mentioned include: Reversal Symmetry, Participation Consistency, and Later No Help (which could also be considered a sub-criteria of Later Harm).
 
@@ -103,7 +103,7 @@ Is it feasible to count 100 ballots by hand? How difficult is it to understand t
 
 #### Resolvability
 
-*Majority* meets all of the above criteria, however, unless votes are restricted to two choices, it will frequently fail to provide a winner, or even a tie. No method can be completely impervious to ties. Methods that are not Resolvable are frequently combined with other methods, *Instant Runoff Voting* is a compound method with *Majority*, and all usable *Condorcet* Methods combine seeking a Condorcet Winner with some other process for when there isn't one.
+*Majority* meets all of the above criteria, however, unless votes are restricted to two choices, it will frequently fail to provide a winner, or even a tie. No method can be completely impervious to ties. Methods that are not Resolvable are frequently combined with other methods, *Instant Runoff Voting* is a compound method with *Majority*, and all usable *Condorcet* Methods combine seeking a Condorcet Winner with some other process.
 
 #### Incentive for Strategic Voting
 
@@ -132,28 +132,30 @@ Scores choices on a ballot based on their position. Borda supporters often disag
 * Fails Later Harm.
 * Fails Condorcet Winner.
 * Inconsistant.
-* Vulnerable to a Cloning Attack.
+* The basic Borda Method is vulnerable to a Cloning Attack.
 
 #### Condorcet
 
 Technically this family of methods should be called Condorcet Pairwise, because any method that meets both Condorcet Criteria is technically a Condorcet Method. However, in discussion and throughout this software collection the term Condorcet will refer to  methods which uses a Matrix of Wins and Losses derived from direct pairing of choices and seeks to identify a Condorcet Winner.
 
-The basic Condorcet Method will frequently fail to identify a winner. One possibility is a Loop (Condorcet's Paradox) Where A > B, B > C, and C > A. Another possibility is a knot (not an accepted term, but one which will be used in this documentation). A Loop can be considered a tie, and a Knot can be considered something less than a tie. To make Condorcet resolvable a second method is typically used to resolve Loops and Knots.
+The basic Condorcet Method will frequently fail to identify a winner. One possibility is a Loop (Condorcet's Paradox) Where A > B, B > C, and C > A. Another possibility is a knot (not an accepted term, but one which will be used in this documentation). To make Condorcet resolvable a second method is typically used to resolve Loops and Knots.
 
 * Complexity Varies among sub-methods.
 * Fails Later Harm.
 * Meets both Condorcet Criteria.
 * When a Condorcet Winner is present Consistency is met. When there is no Condorcet Winner this Consistency also applies between a Dominant (Smith) Set and the rest of the choices, but not within the Smith Set. Sub-methods vary in consistency when there is no Condorcet Winner.
 
-### Score Voting Systems
+### Score (Range) Voting Systems
 
-Most Methods for Ranked Choice Ballots can be used for Score Ballots, either directly or by translating the ballots. Score Voting proposals typically implement *Borda Count*,with a fixed depth of choices. *STAR*, creates a virtual runoff between the top two *Borda Count* Choices.
+Most Methods for Ranked Choice Ballots can be used for Score Ballots, either directly or by translating the ballots. Score Voting proposals typically implement *Borda Count*, with a fixed depth of choices. *STAR*, creates a virtual runoff between the top two *Borda Count* Choices.
 
-Advocates of Score Voting claim that this Ballot Style it is a better expression of voter preference (which is purely a matter of opinion and cannot be proved or disproved), but it does create more potential for ties in the resolution process than RC does (which is a reason to assert RC is better).
+Advocates of Score Voting claim that this Ballot Style is a better expression of voter preference (which is purely a matter of opinion and cannot be proved or disproved), but it does create more potential for ties in the resolution process than RC does (which is a reason to assert RC is better). 
+
+Borda appears to benefit from a switch to Score Ballots, while IRV and Condorcet are better served by Ranked Ballots.
 
 # Objective and Motivation
 
-I wanted to be able to evaluate alternative methods for resolving elections and couldn't find a flexible enough existing libary in any of the popular general purpose and web development languages: Perl, PHP, Python, Ruby, JavaScript, nor in the newer language Julia (created as an alternative to R and other math languages). More recently I was writing a bylaws proposal to use RCV and found that the existing libraries and services were not only constrained in what options they can provide, but also didn't document them clearly, making it a challenge to have a method described in bylaws where it could be guaranteed hand and machine counts would agree.
+I wanted to be able to evaluate alternative methods for resolving elections and couldn't find a flexible enough existing libary in any of the popular general purpose and web development languages: Perl, PHP, Python, Ruby, JavaScript, nor in the newer language Julia (created as an alternative to R and other math languages). More recently I was writing a bylaws proposal to use RCV and found that the existing libraries and services were not only constrained in what options they can provide, but also didn't always document them clearly, making it a challenge to have a method described in bylaws where it could be guaranteed hand and machine counts would agree.
 
 The objective is to have a library that can handle any of the myriad variants that one might consider either from a study perspective or what is called for by the elections rules of our entity.
 
@@ -165,7 +167,7 @@ The Vote::Count::ReadBallots library provides functionality for reading files fr
 
 ## Voting Method and Component Modules
 
-The Modules in the space Vote::Count::%Component% provide functionality needed to create a functioning Voting Method. Many of these are consumed as Roles by the Vote::Count object, some such as RankCount and Matrix are not roles and return their own objects.
+The Modules in the space Vote::Count::%Component% provide functionality needed to create a functioning Voting Method. Many of these are consumed as Roles by the Vote::Count object, some such as RankCount and Matrix return their own objects.
 
 The Modules in the space Vote::Count::Method::%Something% implement a Voting Method such as IRV. These Modules inherit the parent Vote::Count and all of the Components available to it. These modules all return a Hash Reference with the following key: *winner*, some return additional keys. Methods that can be tied will have additional keys *tie* and *tied*. When there is no winner the value of *winner* will be false.
 
@@ -236,18 +238,27 @@ Most Components will take an argument for $activeset or default to the current A
   * [Vote::Count::Matrix](https://metacpan.org/pod/Vote::Count::Matrix)
   * [Vote::Count::RankCount](https://metacpan.org/pod/Vote::Count::RankCount)
 
-## Voting Methods
+### Voting Methods
 
   * [Vote::Count::Method::CondorcetDropping](https://metacpan.org/pod/Vote::Count::Method::CondorcetDropping)
   * [Vote::Count::Method::IRV](https://metacpan.org/pod/Vote::Count::Method::IRV)
 
-## Non Object Oriented Components
+### Non Object Oriented Components
 
   * [Vote::Count::Redact](https://metacpan.org/pod/Vote::Count::Redact)
 
-## Utilities
+### Utilities
 
   * [Vote::Count::ReadBallots](https://metacpan.org/pod/Vote::Count::ReadBallots)
+  * [Vote::Count::Start](https://metacpan.org/pod/Vote::Count::Start)  
+
+### Documentation
+
+Additional Documentation Files
+
+* [Vote::Count::HandCount](https://metacpan.org/pod/distribution/Vote-Count/lib/Vote/Count/Method/HandCount.pod)
+* [Vote::Count::Start](https://metacpan.org/pod/Vote::Count::Start)  
+
 
 # Call for Contributions
 

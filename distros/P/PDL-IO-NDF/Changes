@@ -1,0 +1,20 @@
+Revision history for PDL::IO::NDF
+
+1.06 2019-08-23
+    - Stopped using the private function NDF::pack1Dchar.
+
+1.05 2018-08-01
+    - Check that the HISTORY component is present before reading.
+    - Pass ndimx=7 to dat_shape as this is the maximum allowed.
+
+1.04 2012-07-10
+    - Extracted from PDL distribution and released standalone.
+    - Uses Module::Build
+    - Fixes to bad value support.
+    - FITS header parsing now done by Astro::FITS::Header
+    - Status handling much improved.
+    - Add quickread option to rndf that only reads the primary
+      data array and FITS header.
+
+1.03 2008-07-01
+    - Bad value support added by Doug Burke

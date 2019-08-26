@@ -3,12 +3,15 @@ package Perl::PrereqScanner::NotQuiteLite::App;
 use strict;
 use warnings;
 use File::Find;
+use File::Glob 'bsd_glob';
 use File::Basename;
 use File::Spec;
 use CPAN::Meta::Prereqs;
 use CPAN::Meta::Requirements;
 use Perl::PrereqScanner::NotQuiteLite;
 use Perl::PrereqScanner::NotQuiteLite::Util::Prereqs;
+
+use constant WIN32 => $^O eq 'MSWin32';
 
 my %IsTestClassFamily = map {$_ => 1} qw(
   Test::Class
@@ -45,9 +48,13 @@ sub new {
     my %map;
     for my $spec (@features) {
       my ($identifier, $description, $paths) = split ':', $spec;
+      my @paths = map { bsd_glob(File::Spec->catdir($opts{base_dir}, $_)) } split ',', $paths;
+      if (WIN32) {
+          s|\\|/|g for @paths;
+      }
       $map{$identifier} = {
         description => $description,
-        paths => [split ',', $paths],
+        paths => \@paths,
       };
     }
     $opts{features} = \%map;
@@ -57,7 +64,7 @@ sub new {
     require Regexp::Trie;
     my $re = Regexp::Trie->new;
     for (@{$opts{ignore}}) {
-        s|\\|/|g if $^O eq 'MSWin32';
+        s|\\|/|g if WIN32;
         $re->add($_);
     }
     $opts{ignore_re} ||= $re->_regexp;
@@ -106,10 +113,15 @@ sub run {
     }
 
     # extra libs
-    push @args, @{$self->{libs} || []};
+    push @args, map { bsd_glob(File::Spec->catdir($self->{base_dir}, $_)) } @{$self->{libs} || []};
 
     # for develop requires
     push @args, "xt", "author" if $self->{develop};
+  }
+
+  if ($self->{verbose}) {
+    print STDERR "Scanning the following files/directories\n";
+    print STDERR "  $_\n" for sort @args;
   }
 
   for my $path (@args) {
@@ -157,6 +169,8 @@ sub run {
   }
   $self->{prereqs};
 }
+
+sub index { shift->{index} }
 
 sub _print_prereqs {
   my $self = shift;
@@ -234,7 +248,11 @@ sub _exclude_local_modules {
   my $private_re = $self->{private_re};
   for my $req ($self->_requirements) {
     for my $module ($req->required_modules) {
-      $req->clear_requirement($module) if $self->{possible_modules}{$module} or ($private_re and $module =~ /$private_re/);
+      next unless $self->{possible_modules}{$module} or ($private_re and $module =~ /$private_re/);
+      $req->clear_requirement($module);
+      if ($self->{verbose}) {
+        print STDERR "  excluded $module (local)\n";
+      }
     }
   }
 }
@@ -268,7 +286,11 @@ sub _exclude_core_prereqs {
           !Module::CoreList::deprecated_in($module, undef, $perl_version)
       ) {
         my $core_version = $Module::CoreList::version{$perl_version}{$module} or next;
-        $req->clear_requirement($module) if $req->accepts_module($module => $core_version);
+        next unless $req->accepts_module($module => $core_version);
+        $req->clear_requirement($module);
+        if ($self->{verbose}) {
+          print STDERR "  excluded $module ($perl_version core)\n";
+        }
       }
     }
   }
@@ -362,10 +384,13 @@ sub _dedupe_indexed_prereqs {
         my $length = length $module;
         $score{$module} = join ".", ($depth || 0), $length;
       }
-      my $topmost = (sort {$score{$a} <=> $score{$b}} @modules_without_version)[0];
+      my $topmost = (sort {$score{$a} <=> $score{$b} or $a cmp $b} @modules_without_version)[0];
       for my $module (@modules_without_version) {
         next if $topmost eq $module;
         $req->clear_requirement($module);
+        if ($self->{verbose}) {
+          print STDERR "  deduped $module (in favor of $topmost)\n";
+        }
       }
     }
   }
@@ -391,8 +416,8 @@ sub _scan_dir {
 sub _scan_file {
   my ($self, $file) = @_;
 
+  $file =~ s|\\|/|g if WIN32;
   if ($self->{ignore_re}) {
-    $file =~ s|\\|/|g if $^O eq 'MSWin32';
     return if $file =~ /\b$self->{ignore_re}\b/;
   }
 
@@ -400,16 +425,17 @@ sub _scan_file {
     parsers => $self->{parsers},
     recommends => $self->{recommends},
     suggests => $self->{suggests},
+    verbose => $self->{verbose},
   )->scan_file($file);
 
   my $relpath = File::Spec->abs2rel($file, $self->{base_dir});
-  $relpath =~ s|\\|/|g if $^O eq 'MSWin32';
+  $relpath =~ s|\\|/|g if WIN32;
 
   my $prereqs = $self->{prereqs};
   if ($self->{features}) {
     for my $identifier (keys %{$self->{features}}) {
       my $feature = $self->{features}{$identifier};
-      if (grep {$relpath =~ m!^$_(?:/|$)!} @{$feature->{paths}}) {
+      if (grep {$file =~ m!^$_(?:/|$)!} @{$feature->{paths}}) {
         $prereqs = $feature->{prereqs} ||= CPAN::Meta::Prereqs->new;
         last;
       }
@@ -610,6 +636,10 @@ not versioned).
 traverses files and directories and returns a L<CPAN::Meta::Prereqs>
 object that keeps all the requirements/suggestions, without printing
 anything unless you explicitly pass a C<print> option to C<new>.
+
+=head2 index
+
+returns a L<CPAN::Common::Index> backend object (if any).
 
 =head1 AUTHOR
 

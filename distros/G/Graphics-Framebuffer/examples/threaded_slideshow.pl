@@ -7,7 +7,7 @@ use strict;
 use threads (
     'yield',
     'stringify',
-    'stack_size' => 4 * 4096, # No need for a large stack
+    'stack_size' => 131076, # No need for a large stack
     'exit'       => 'threads_only',
 );
 use threads::shared;
@@ -75,9 +75,7 @@ foreach my $dev (0 .. 31) {
     }
 }
 
-$SIG{'QUIT'} = \&finish;
-$SIG{'INT'}  = \&finish;
-$SIG{'KILL'} = \&finish;
+$SIG{'QUIT'} = $SIG{'INT'}  = $SIG{'KILL'} = $SIG{'TERM'} = $SIG{'HUP'} = \&finish;
 
 my $p = gather(@paths);
 
@@ -382,16 +380,12 @@ sub show {
     my ($nx, $ny) = @_;
 
     local $SIG{'ALRM'} = undef;
-    local $SIG{'INT'}  = sub { threads->exit(); };
-    local $SIG{'QUIT'} = sub { threads->exit(); };
-    local $SIG{'KILL'} = sub { threads->exit(); };
 
     my $FB = (defined($nx)) ?
       Graphics::Framebuffer->new(
           'SHOW_ERRORS' => $errors,
           'RESET'       => 1,
           'SPLASH'      => $splash,
-          'ACCELERATED' => !$noaccel,
           'FB_DEVICE'   => $dev,
           'SPLASH'      => $display,
           'SIMULATED_X' => $nx,
@@ -402,11 +396,17 @@ sub show {
           'SHOW_ERRORS' => $errors,
           'RESET'       => 1,
           'SPLASH'      => $splash,
-          'ACCELERATED' => !$noaccel,
           'FB_DEVICE'   => $dev,
           'SPLASH'      => $display,
       );
+    local $SIG{'INT'}  = sub { $FB->text_mode(); print "Thread exiting...\n"; threads->exit(); };
+    local $SIG{'QUIT'} = sub { $FB->text_mode(); print "Thread exiting...\n"; threads->exit(); };
+    local $SIG{'KILL'} = sub { $FB->text_mode(); print "Thread exiting...\n"; threads->exit(); };
+    local $SIG{'TERM'} = sub { $FB->text_mode(); print "Thread exiting...\n"; threads->exit(); };
+    local $SIG{'HUP'}  = sub { $FB->text_mode(); print "Thread exiting...\n"; threads->exit(); };
+
     $FB->wait_for_console(1);
+    $FB->acceleration(! $noaccel);
     $FB->set_color({ 'red' => 0, 'green' => 0, 'blue' => 0, 'alpha' => 255 });
     my @pics = shuffle(@{$ps});
     my $p    = scalar(@pics);
@@ -489,6 +489,7 @@ sub show {
     } ## end while ($RUNNING && $idx <...)
     $FB->rbox({ 'x' => $X, 'y' => $Y, 'width' => $W, 'height' => $H, 'filled' => 1 });
     $FB->attribute_reset();
+    $FB->text_mode();
     $FB->cls('ON') if ($display);
     return(1);
 } ## end sub show

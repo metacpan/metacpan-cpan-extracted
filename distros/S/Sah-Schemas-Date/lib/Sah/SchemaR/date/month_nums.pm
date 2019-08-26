@@ -1,9 +1,9 @@
 package Sah::SchemaR::date::month_nums;
 
-our $DATE = '2019-06-24'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-07-21'; # DATE
+our $VERSION = '0.006'; # VERSION
 
-our $rschema = ["array",[{of=>["date::month_num",{},{}],summary=>"Array of month numbers","x.perl.coerce_rules"=>["str_comma_sep"]}],["array"]];
+our $rschema = ["array",[{of=>["date::month_num",{},{}],summary=>"Array of month numbers","x.completion"=>["date_month_num"],"x.perl.coerce_rules"=>["str_comma_sep"]}],["array"]];
 
 1;
 # ABSTRACT: Array of month numbers
@@ -20,7 +20,7 @@ Sah::SchemaR::date::month_nums - Array of month numbers
 
 =head1 VERSION
 
-This document describes version 0.004 of Sah::SchemaR::date::month_nums (from Perl distribution Sah-Schemas-Date), released on 2019-06-24.
+This document describes version 0.006 of Sah::SchemaR::date::month_nums (from Perl distribution Sah-Schemas-Date), released on 2019-07-21.
 
 =head1 DESCRIPTION
 

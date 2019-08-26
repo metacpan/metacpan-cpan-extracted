@@ -1,0 +1,38 @@
+NAME
+    Data::Transmute::Rules::DNS::Zone::Struct::FromSpanel - Convert Spanel
+    DNS zone structure to that accepted by DNS::Zone::Struct::To::BIND
+    (Sah::Schema::dns::zone)
+
+VERSION
+    This document describes version 0.001 of
+    Data::Transmute::Rules::DNS::Zone::Struct::FromSpanel (from Perl
+    distribution Data-Transmute-Rules-DNS-Zone-Struct-FromSpanel), released
+    on 2019-08-23.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Data-Transmute-Rules-DNS-Zone-Struct-FromS
+    panel>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Data-Transmute-Rules-DNS-Zone-Struct-
+    FromSpanel>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Transmute-Rules-
+    DNS-Zone-Struct-FromSpanel>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

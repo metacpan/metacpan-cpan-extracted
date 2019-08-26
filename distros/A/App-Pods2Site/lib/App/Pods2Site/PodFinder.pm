@@ -3,6 +3,10 @@ package App::Pods2Site::PodFinder;
 use strict;
 use warnings;
 
+our $VERSION = '1.002';
+my $version = $VERSION;
+$VERSION = eval $VERSION;
+
 use App::Pods2Site::Util qw(createSpinner);
 
 use Pod::Simple::Search;

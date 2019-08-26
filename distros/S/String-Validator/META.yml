@@ -25,6 +25,6 @@ resources:
   bugtracker: https://github.com/brainbuz/String-Validator/issues
   homepage: https://github.com/brainbuz/String-Validator
   repository: https://github.com/brainbuz/String-Validator.git
-version: '2.02'
+version: '2.03'
 x_generated_by_perl: v5.28.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

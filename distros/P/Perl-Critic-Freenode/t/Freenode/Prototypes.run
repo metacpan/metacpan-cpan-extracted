@@ -32,6 +32,14 @@ sub foo ($foo) { ... }
 use Mojolicious::Lite -signatures;
 sub foo ($foo) { ... }
 
+## name CustomSignature
+## failures 0
+## parms { signature_enablers => 'MyApp::Base' }
+## cut
+
+use MyApp::Base;
+sub foo ($foo) { ... }
+
 ## name NoPrototype
 ## failures 0
 ## cut

@@ -3,7 +3,6 @@ use lib qw(t lib);
 use strict;
 use Test;
 use Config::AST qw(:sort);
-use Data::Dumper;
 
 plan(tests => 1);
 

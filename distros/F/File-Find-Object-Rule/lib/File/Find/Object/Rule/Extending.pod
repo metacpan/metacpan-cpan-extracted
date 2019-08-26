@@ -6,13 +6,9 @@ __END__
 
 =encoding UTF-8
 
-=head1 NAME
-
-File::Find::Object::Rule::Extending - the mini-guide to extending File::Find::Object::Rule
-
 =head1 VERSION
 
-version 0.0310
+version 0.0311
 
 =head1 SYNOPSIS
 
@@ -80,9 +76,9 @@ If you hadn't declared C<random> with a null prototype it would have
 consumed C<in> as a parameter to it, then got all confused as it
 doesn't know about a C<'.'> rule.
 
-=head1 VERSION
+=head1 NAME
 
-version 0.0310
+File::Find::Object::Rule::Extending - the mini-guide to extending File::Find::Object::Rule
 
 =head1 NOTES ABOUT THE CALLBACK
 
@@ -106,36 +102,6 @@ L<File::Find::Object::Rule>
 
 L<File::Find::::Rule::MMagic> was the first extension module for
 L<File::Find::Rule>, so maybe check that out.
-
-=head1 AUTHORS
-
-=over 4
-
-=item *
-
-Richard Clamp <richardc@unixbeard.net> with input gained from this
-
-=item *
-
-and Andy Lester andy@petdance.com.
-
-=back
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2019 by Richard Clampwith input gained from this.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/file-find-object-rule/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
@@ -234,8 +200,38 @@ The code is open to the world, and available for you to hack on. Please feel fre
 with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
 from your repository :)
 
-L<https://github.com/shlomif/file-find-object-rule>
+L<https://github.com/shlomif/http://bitbucket.org/shlomif/perl-file-find-object-rule>
 
-  git clone http://bitbucket.org/shlomif/perl-file-find-object-rule
+  git clone git://github.com/shlomif/http://bitbucket.org/shlomif/perl-file-find-object-rule.git
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Richard Clamp <richardc@unixbeard.net>
+
+=item *
+
+Andy Lester andy@petdance.com.
+
+=back
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/http://bitbucket.org/shlomif/perl-file-find-object-rule/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by Richard Clamp.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

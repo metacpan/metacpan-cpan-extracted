@@ -1,6 +1,13 @@
 Revision history for WWW-Scraper-ISBN
 =====================================
 
+1.05    2019-08-26
+        - fixes suggested by kritika.io.
+        - simplified convert regex logic.
+
+1.04    2019-08-26
+        - fixed 'available_drivers' method.
+
 1.03    2015-01-26
         - added 'available_drivers' method.
         - added example script.

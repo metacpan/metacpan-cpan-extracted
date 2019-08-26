@@ -27,7 +27,7 @@ no_index:
 provides:
   Mojo::IOLoop::Stream::Role::LineBuffer:
     file: lib/Mojo/IOLoop/Stream/Role/LineBuffer.pm
-    version: '0.004'
+    version: '0.006'
 requires:
   Mojolicious: '7.55'
   Role::Tiny: '2.000001'
@@ -36,7 +36,7 @@ resources:
   bugtracker: https://github.com/Grinnz/Mojo-IOLoop-Stream-Role-LineBuffer/issues
   homepage: https://github.com/Grinnz/Mojo-IOLoop-Stream-Role-LineBuffer
   repository: https://github.com/Grinnz/Mojo-IOLoop-Stream-Role-LineBuffer.git
-version: '0.004'
+version: '0.006'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -182,7 +182,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.004'
+          tag: '0.006'
           tag_format: '%v'
           tag_message: '%v'
         Dist::Zilla::Role::Git::Repo:

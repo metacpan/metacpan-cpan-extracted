@@ -15,6 +15,12 @@ Database Migration Class
 
 =synopsis
 
+  # in lib/My/Migration.pm
+
+  package My::Migration;
+
+  use parent 'Doodle::Migration';
+
   # in lib/My/Migration/Step1.pm
 
   package My::Migration::Step1;
@@ -68,12 +74,28 @@ Database Migration Class
     return $doodle;
   }
 
+  # in script
+
+  package main;
+
+  my $migrator = My::Migration->new;
+
+  my $results = $migrator->migrate('up', 'sqlite', sub {
+    my ($sql) = @_;
+
+    # e.g. $dbi->do($_) for @$sql;
+
+    return 1;
+  });
+
   1;
 
 =description
 
-This package provides a base class for creating database migration classes
-which will be handled by L<Doodle::Migrator> classes.
+This package provides a migrator class and migration base class in one package.
+The C<migrations> method loads and collects the classes that exists as children
+of the namespace returned by the C<namespace> method (which defaults to the
+current class) and returns the class names as an array-reference.
 
 =cut
 

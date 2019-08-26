@@ -18,7 +18,7 @@ my $mini_repos_base =
     'https://svn.berlios.de/svnroot/repos/web-cpan/Test-Count';
 
 my @cmd = (
-    "hg", "tag", "-m", "Tagging the Test-Count release as $version",
+    "git", "tag", "-m", "Tagging the Test-Count release as $version",
     "releases/$version",
 );
 

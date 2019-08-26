@@ -15,6 +15,7 @@ t/conf05.t
 t/conf06.t
 t/conf07.t
 t/conf08.t
+t/conf09.t
 t/ConfigSpec.pm
 t/ConfigSpec2.pm
 t/ConfigSpec3.pm

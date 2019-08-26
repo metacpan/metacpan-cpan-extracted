@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Report failure if a TODO test unexpectedly passes
-our $VERSION = '0.0.1'; # VERSION
+our $VERSION = '0.0.2'; # VERSION
 
 our $AUTHORITY = 'cpan:GSG';
 
@@ -160,7 +160,7 @@ Test2::Plugin::TodoFailOnSuccess - Report failure if a TODO test unexpectedly pa
 
 =head1 VERSION
 
-version 0.0.1
+version 0.0.2
 
 =head1 SYNOPSIS
 
@@ -239,10 +239,20 @@ This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Larry Leszczynski
+=for stopwords Larry Leszczynski Mark Flickinger
+
+=over 4
+
+=item *
 
 Larry Leszczynski <Larry.Leszczynski@GrantStreet.com>
+
+=item *
+
+Mark Flickinger <mark.flickinger@grantstreet.com>
+
+=back
 
 =cut

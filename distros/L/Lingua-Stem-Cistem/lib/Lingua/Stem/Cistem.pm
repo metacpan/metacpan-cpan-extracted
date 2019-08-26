@@ -10,7 +10,7 @@ use 5.006;
 require Exporter;
 
 BEGIN {
-    $Lingua::Stem::Cistem::VERSION     = '0.02';
+    $Lingua::Stem::Cistem::VERSION     = '0.03';
     @Lingua::Stem::Cistem::ISA         = qw(Exporter);
     @Lingua::Stem::Cistem::EXPORT      = qw();
     @Lingua::Stem::Cistem::EXPORT_OK   = qw(stem segment stem_robust segment_robust);
@@ -248,17 +248,25 @@ It applies the CISTEM stemming algorithm to a word, returning the stem of this w
 Now (2019) CISTEM has the best f-score compared to other stemmers for German on CPAN, while
 being one of the fastest.
 
+The methods in this package keep their original logic and API, only the module name
+changed from Cistem to Lingua::Stem::Cistem.
+
 Changes in this distribution applied to the L</OFFICIAL IMPLEMENTATION>:
 
 =over 4
 
-=item - packaged for and released on CPAN
-=item - use strict, use warnings
-=item - the method L</stem> is 6-9 % faster, L</sequence> keeps the speed
-=item - undefined parameter word defaults to the empty string ''
-=item - provides the two methods L</stem_robust> and L</segment_robust> with the same logic as the official ones,
+=item packaged for and released on CPAN
+
+=item use strict, use warnings
+
+=item the method L</stem> is 6-9 % faster, L</sequence> keeps the speed
+
+=item undefined parameter word defaults to the empty string ''
+
+=item provides two additional methods L</stem_robust> and L</segment_robust> with the same logic as the official ones,
 but more robust against low quality input. L</stem_robust> is ~45% and L</segment_robust> ~70 slower.
-=item - Since Version 0.02 the methods L</stem_robust> and L</segment_robust> support a third parameter $keep_ge_prefix.
+
+=item Since Version 0.02 the methods L</stem_robust> and L</segment_robust> support a third parameter $keep_ge_prefix.
 Default is is the previous behavior, i.e. remove the prefix 'ge'.
 
 =back
@@ -267,9 +275,9 @@ Default is is the previous behavior, i.e. remove the prefix 'ge'.
 
 It is based on the paper
 
-Leonie Weissweiler, Alexander Fraser (2017).
-Developing a Stemmer for German Based on a Comparative Analysis of Publicly Available Stemmers.
-In Proceedings of the German Society for Computational Linguistics and Language Technology (GSCL)
+    Leonie Weissweiler, Alexander Fraser (2017).
+    Developing a Stemmer for German Based on a Comparative Analysis of Publicly Available Stemmers.
+    In Proceedings of the German Society for Computational Linguistics and Language Technology (GSCL)
 
 which can be read here:
 
@@ -327,14 +335,15 @@ This method works like L</stem> with the following differences for robustness:
 
 =over 4
 
-=item - German Umlauts in decomposed normalization form (NFD) work like composed (NFC) ones.
+=item German Umlauts in decomposed normalization form (NFD) work like composed (NFC) ones.
 
-=item - Other characters plus combining characters as treated as graphemes, i.e. with length 1
+=item Other characters plus combining characters are treated as graphemes, i.e. with length 1
   instead of 2 or more, which has an influence on the resulting stem.
 
-=item - The characters $, %, & keep their value, i.e. they roundtrip.
+=item The characters $, %, & keep their value, i.e. they roundtrip.
 
-=item - If parameter $keep_ge_prefix is set, prefix 'ge' is kept in the stem.
+=item If parameter $keep_ge_prefix is set, prefix 'ge' is kept in the stem. Be careful
+  if this really improves the results. Mostly removing 'ge' performs better.
 
 =back
 
@@ -367,7 +376,7 @@ L<https://github.com/LeonieWeissweiler/CISTEM/blob/master/gold_standards/goldsta
 
 The test iterates over the words in the file. Times measured include the overhead of startup and iteration.
 
-Platform (only one thread used)
+    Platform (only one thread used)
 
     Intel Core i7-4770HQ Processor
     4 Cores, 8 Threads
@@ -411,6 +420,7 @@ Helmut Wollmersdorfer E<lt>helmut@wollmersdorfer.atE<gt>
 =head1 COPYRIGHT
 
 Copyright 2019 Helmut Wollmersdorfer
+Copyright 2017 Leonie Weissweiler (original version)
 
 =head1 LICENSE
 

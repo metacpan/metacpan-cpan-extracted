@@ -15,7 +15,7 @@ our @ISA = qw(
 our @EXPORT = qw(
 );
 
-our $VERSION = '0.11';
+our $VERSION = '0.14';
 
 use Carp;
 use Data::Dumper;
@@ -150,7 +150,7 @@ sub get_resolution {
 =head2 get_title
 
 Returns undef if status ne 'ok'.
-Croaks if not available.
+Defaults to _id if not available.
 
 =cut
 
@@ -161,10 +161,18 @@ sub get_title {
   return if ( $self->{info}->{status} ne 'ok' );
 
   my $title = $self->{info}->{'title'};
-  croak "no title found!" unless $title;
 
-  $title = _url_decode($title);
-  $title =~ s/\+/ /g;
+  unless ( $title ) {
+    # fallback to _id
+    carp "no title found! fallback to VIDEO_ID";
+    $title = $self->{_id};
+  }
+  else {
+    # process title
+    $title = _url_decode($title);
+    $title =~ s/\+/ /g;
+  }
+
   $self->{title} = $title;
 
   return $self->{title};

@@ -127,10 +127,10 @@ use JSON;
 use LWP::UserAgent;
 use Scalar::Util 1.10 qw{ blessed looks_like_number };
 
-our $VERSION = '0.113';
+our $VERSION = '0.114';
 
 use constant BEST_DATA_SET => -1;
-use constant USGS_URL => 'http://ned.usgs.gov/epqs/pqs.php';
+use constant USGS_URL => 'https://ned.usgs.gov/epqs/pqs.php';
 
 use constant ARRAY_REF	=> ref [];
 use constant CODE_REF	=> ref sub {};
@@ -720,8 +720,12 @@ sub _request {
 	CODE_REF eq ref $data ? $data->( $self, %arg ) : $data;
     } : $ua->request( $rqst );
 
-    $self->{trace}
-	and print STDERR $rslt->as_string();
+    if ( $self->{trace} ) {
+	if ( my $redir = $rslt->request() ) {
+	    print STDERR $redir->as_string();
+	}
+	print STDERR $rslt->as_string();
+    }
 
     $rslt->is_success()
 	or croak $rslt->status_line();
@@ -1001,7 +1005,9 @@ if the USGS moves the service.
 
 The default is the value of environment variable 
 C<GEO_WEBSERVICE_ELEVATION_USGS_URL>. If that is undefined, the default
-is C<http://ned.usgs.gov/epqs/pqs.php>.
+is C<https://ned.usgs.gov/epqs/pqs.php>. B<Note> that without query
+parameters this URL does nothing useful. See
+L<https://ned.usgs.gov/epqs/> for details.
 
 =head1 ACKNOWLEDGMENTS
 

@@ -7,6 +7,10 @@ package App::TestOnTap::Args;
 use strict;
 use warnings;
 
+our $VERSION = '1.001';
+my $version = $VERSION;
+$VERSION = eval $VERSION;
+
 use App::TestOnTap::Util qw(slashify expandAts $IS_WINDOWS);
 use App::TestOnTap::Config;
 use App::TestOnTap::Preprocess;

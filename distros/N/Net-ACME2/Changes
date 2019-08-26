@@ -1,5 +1,9 @@
 Revision history for Perl module Net::ACME2
 
+0.32 26 August 2019
+- Fix creation of subproblem objects.
+- Add subproblem “identifier” to those objects’ to_string() output.
+
 0.31 9 August 2019
 - Prevent nonce reuse.
 - Add badNonce retry (cf. RFC 8555/6.5).

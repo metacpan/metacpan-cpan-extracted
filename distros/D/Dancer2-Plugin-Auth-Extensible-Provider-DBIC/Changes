@@ -1,8 +1,12 @@
 Revision history for Dancer2-Plugin-Auth-Extensible-Provider-DBIC
 
-0.623 Mon 23 Jan 19:19:51 CET 2017
+0.624 Mon 26 Aug 11:10:00 BST 2019
 
-    * deprecate *_source settings (GH#16, simbabque)
+    * Bump up prerequisite on Dancer2::Plugin::Auth::Extensible
+
+0.623 Mon 12 Jun 11:38:30 BST 2017
+
+    * Fix exception when user result source has relationships defined by code ref
 
 0.622 Mon 12 Dec 14:30:55 CET 2016
 

@@ -32,7 +32,7 @@ package ExactClassTest::Cat {
 package ExactClassTest::Cat::Role::Hiss {
     use exact 'role';
     has 'hiss_power' => 12;
-}
+};
 
 my $cat;
 lives_ok( sub { $cat = ExactClassTest::Cat->new }, 'new Cat' );

@@ -1,5 +1,5 @@
 package Mail::LMLM::Render;
-$Mail::LMLM::Render::VERSION = '0.6805';
+$Mail::LMLM::Render::VERSION = '0.6806';
 use strict;
 use warnings;
 
@@ -7,7 +7,7 @@ use vars qw(@ISA);
 
 use Mail::LMLM::Object;
 
-@ISA=qw(Mail::LMLM::Object);
+@ISA = qw(Mail::LMLM::Object);
 
 sub para
 {
@@ -28,7 +28,7 @@ sub url
 
     my $inside;
 
-    if (scalar(@_))
+    if ( scalar(@_) )
     {
         $inside = shift;
     }
@@ -49,7 +49,7 @@ sub email_address
     my $self = shift;
 
     my $account = shift;
-    my $host = shift;
+    my $host    = shift;
 
     $self->start_link("mailto:$account\@$host");
     $self->text("$account\@$host");
@@ -72,7 +72,7 @@ Mail::LMLM::Render - rendering backend for LMLM
 
 =head1 VERSION
 
-version 0.6805
+version 0.6806
 
 =head1 SYNOPSIS
 
@@ -100,10 +100,6 @@ with a refernce to the filehandle. Afterwards call the B<start_document>
 method (documented below), and when you're done call the B<end_document>
 method. For each section call B<start_section> and B<end_section>
 explicitly.
-
-=head1 VERSION
-
-version 0.6805
 
 =head1 METHODS
 
@@ -200,7 +196,7 @@ unknown
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by unknown.
+This software is Copyright (c) 2019 by unknown.
 
 This is free software, licensed under:
 
@@ -209,7 +205,7 @@ This is free software, licensed under:
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/mail-lmlm/issues>
+L<https://github.com/shlomif/perl-mail-lmlm/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -318,8 +314,8 @@ The code is open to the world, and available for you to hack on. Please feel fre
 with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
 from your repository :)
 
-L<https://github.com/shlomif/mail-lmlm>
+L<https://github.com/shlomif/perl-mail-lmlm>
 
-  git clone http://bitbucket.org/shlomif/perl-mail-lmlm/overview
+  git clone git://github.com/shlomif/perl-mail-lmlm.git
 
 =cut

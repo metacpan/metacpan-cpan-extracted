@@ -11,7 +11,7 @@ use Moo;
 with "Dancer2::Plugin::Auth::Extensible::Role::Provider";
 use namespace::clean;
 
-our $VERSION = '0.623';
+our $VERSION = '0.624';
 
 =head1 NAME 
 
@@ -359,9 +359,7 @@ Peter Mottram, C<< <peter@sysnix.com> >>
 
 =head1 CONTRIBUTORS
 
-  Ben Kaufman (whosgonna)
-  Shlomi Fish (shlomif)
-  simbabque
+Ben Kaufman (whosgonna)
 
 =head1 LICENSE AND COPYRIGHT
 
@@ -524,6 +522,9 @@ sub _build_user_roles_relationship {
 
     foreach my $relname ( $result_source->relationships ) {
         my $info = $result_source->relationship_info($relname);
+        # just check for a simple equality join condition. It could be other
+        # things (e.g. code ref) but for now this is unsupported.
+        next unless ref $info->{cond} eq 'HASH';
         my %cond = %{ $info->{cond} };
         if (   $info->{class} eq $user_roles_class
             && $info->{attrs}->{accessor} eq 'multi'

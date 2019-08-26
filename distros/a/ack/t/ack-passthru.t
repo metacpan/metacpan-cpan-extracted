@@ -3,7 +3,7 @@
 use warnings;
 use strict;
 
-use Test::More tests => 6;
+use Test::More tests => 5;
 
 use lib 't';
 use Util;
@@ -13,28 +13,63 @@ prep_environment();
 my @full_speech = <DATA>;
 chomp @full_speech;
 
-NORMAL: {
+my @johnny_rebeck = read_file( 't/range/johnny-rebeck.txt' );
+chomp @johnny_rebeck;
+
+subtest 'Gettysburg without --passthru' => sub {
+    plan tests => 2;
+
     my @expected = line_split( <<'HERE' );
 Now we are engaged in a great civil war, testing whether that nation,
 on a great battle-field of that war. We have come to dedicate a portion
 HERE
 
+    @expected = color_match( qr/war/, @expected );
+
     my @files = qw( t/text/gettysburg.txt );
-    my @args = qw( war );
+    my @args = qw( war --color );
     my @results = run_ack( @args, @files );
 
     lists_match( \@results, \@expected, 'Search for war' );
-}
+};
 
-DASH_C: {
-    my @expected = @full_speech;
+
+subtest 'Gettysburg with --passthru' => sub {
+    plan tests => 2;
+
+    my @expected = color_match( qr/war/, @full_speech );
 
     my @files = qw( t/text/gettysburg.txt );
-    my @args = qw( war --passthru );
+    my @args = qw( war --passthru --color );
     my @results = run_ack( @args, @files );
 
     lists_match( \@results, \@expected, q{Still lookin' for war, in passthru mode} );
-}
+};
+
+
+subtest '--passthru with/without ranges' => sub {
+    plan tests => 4;
+
+    my @args = qw( Rebeck --passthru --color t/range/johnny-rebeck.txt );
+    my @expected = color_match( qr/Rebeck/, @johnny_rebeck );
+
+    my @results = run_ack( @args );
+    lists_match( \@results, \@expected, q{Searching without a range} );
+
+    my @range_expected;
+    my $nmatches = 0;
+    for my $line ( @johnny_rebeck ) {
+        if ( $line =~ /Rebeck/ ) {
+            ++$nmatches;
+            if ( $nmatches == 2 || $nmatches == 3 ) {
+                ($line) = color_match( qr/Rebeck/, $line );
+            }
+        }
+        push( @range_expected, $line );
+    }
+    @results = run_ack( @args, '--range-start=CHORUS', '--range-end=VERSE' );
+    lists_match( \@results, \@range_expected, q{Searching with a range} );
+};
 
 
 SKIP: {
@@ -52,6 +87,22 @@ SKIP: {
 
 done_testing();
 exit 0;
+
+
+sub color_match {
+    my $re    = shift;
+    my @lines = @_;
+
+    for my $line ( @lines ) {
+        if ( $line =~ /$re/ ) {
+            $line =~ s/($re)/\e[30;43m$1\e[0m/g;
+            $line .= "\e[0m\e[K";
+        }
+    }
+
+    return @lines;
+}
+
 
 __DATA__
 Four score and seven years ago our fathers brought forth on this

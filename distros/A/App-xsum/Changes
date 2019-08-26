@@ -1,5 +1,15 @@
-Revision history for App-xsum
+0.002   2019-08-21  Released-By: PERLANCAR; Urgency: medium
 
-0.001   2016-11-23 (PERLANCAR)
+	- Update to File::Digest 0.008 which supports reading from stdin
+	  [GH#1].
+
+	- [ux] Add -c as shortcut for --check, like in md5sum et al.
+
+	- [ux] Simplify script (skip reading config/env).
+
+	- [doc] Tweak Rinci metadata (add examples, description).
+
+
+0.001   2016-11-23  Released-By: PERLANCAR
 
         - First release.

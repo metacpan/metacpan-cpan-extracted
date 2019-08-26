@@ -35,7 +35,7 @@ public:
 struct XsUriData {
     XsUriData () : query_cache_rev(0) {}
 
-    void sync_query_hash (pTHX_ const URI* uri) {
+    void sync_query_hash (const URI* uri) {
         Hash hash;
         if (query_cache) {
             hash = query_cache.value<Hash>();
@@ -51,8 +51,8 @@ struct XsUriData {
         query_cache_rev = uri->query().rev;
     }
 
-    Ref query_hash (pTHX_ const URI* uri) {
-        if (!query_cache || query_cache_rev != uri->query().rev) sync_query_hash(aTHX_ uri);
+    Ref query_hash (const URI* uri) {
+        if (!query_cache || query_cache_rev != uri->query().rev) sync_query_hash(uri);
         return query_cache;
     }
 
@@ -61,7 +61,7 @@ private:
     uint32_t query_cache_rev;
 };
 
-static void register_perl_scheme (pTHX_ const string& scheme, const string_view& perl_class) {
+static void register_perl_scheme (const string& scheme, const string_view& perl_class) {
     uri_class_map[scheme] = Stash(perl_class);
 }
 
@@ -86,21 +86,21 @@ static XsUriData* data_get (SV* sv) {
     return (XsUriData*)Object(sv).payload(&data_marker).ptr;
 }
 
-static void add_param (pTHX_ URI* uri, const string& key, const Scalar& val, bool replace = false) {
+static void add_param (URI* uri, const string& key, const Scalar& val, bool replace = false) {
     if (val.is_array_ref()) {
         Array arr = val;
         if (replace) uri->query().erase(key);
         auto end = arr.end();
         for (auto it = arr.begin(); it != end; ++it) {
             if (!*it) continue;
-            uri->query().emplace(key, xs::in<string>(aTHX_ *it));
+            uri->query().emplace(key, xs::in<string>(*it));
         }
     }
-    else if (replace) uri->param(key, xs::in<string>(aTHX_ val));
-    else uri->query().emplace(key, xs::in<string>(aTHX_ val));
+    else if (replace) uri->param(key, xs::in<string>(val));
+    else uri->query().emplace(key, xs::in<string>(val));
 }
 
-static void hash2query (pTHX_ Hash& hash, Query* query) {
+static void hash2query (Hash& hash, Query* query) {
     auto end = hash.end();
     for (auto it = hash.begin(); it != end; ++it) {
         string key(it->key());
@@ -110,37 +110,37 @@ static void hash2query (pTHX_ Hash& hash, Query* query) {
             auto end = arr.end();
             for (auto it = arr.begin(); it != end; ++it) {
                 if (!*it) continue;
-                query->emplace(key, xs::in<string>(aTHX_ *it));
+                query->emplace(key, xs::in<string>(*it));
             }
         }
-        else query->emplace(key, xs::in<string>(aTHX_ val));
+        else query->emplace(key, xs::in<string>(val));
     }
 }
 
-static void add_query_hash (pTHX_ URI* uri, Hash& hash, bool replace = false) {
+static void add_query_hash (URI* uri, Hash& hash, bool replace = false) {
     if (replace) {
         Query query;
-        hash2query(aTHX_ hash, &query);
+        hash2query(hash, &query);
         uri->query(query);
     }
     else {
         auto end = hash.end();
-        for (auto it = hash.begin(); it != end; ++it) add_param(aTHX_ uri, string(it->key()), it->value());
+        for (auto it = hash.begin(); it != end; ++it) add_param(uri, string(it->key()), it->value());
     }
 }
 
-static void add_query_args (pTHX_ URI* uri, SV** sp, I32 items, bool replace = false) {
+static void add_query_args (URI* uri, SV** sp, I32 items, bool replace = false) {
     if (items == 1) {
         if (SvROK(*sp)) {
             Hash hash = *sp;
-            if (hash) add_query_hash(aTHX_ uri, hash, replace);
+            if (hash) add_query_hash(uri, hash, replace);
         }
-        else if (replace) uri->query(xs::in<string>(aTHX_ *sp));
-        else              uri->add_query(xs::in<string>(aTHX_ *sp));
+        else if (replace) uri->query(xs::in<string>(*sp));
+        else              uri->add_query(xs::in<string>(*sp));
     }
     else {
         SV** spe = sp + items;
-        for (; sp < spe; sp += 2) add_param(aTHX_ uri, xs::in<string>(aTHX_ *sp), *(sp+1), replace);
+        for (; sp < spe; sp += 2) add_param(uri, xs::in<string>(*sp), *(sp+1), replace);
     }
 }
 
@@ -158,7 +158,7 @@ URIx uri (string url = string(), int flags = 0) {
 }
 
 void register_scheme (string scheme, string_view perl_class) {
-    register_perl_scheme(aTHX_ scheme, perl_class);
+    register_perl_scheme(scheme, perl_class);
 }
 
 INCLUDE: encode.xsi

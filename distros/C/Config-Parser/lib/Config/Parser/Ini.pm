@@ -261,7 +261,7 @@ the B<Config::AST> constructor for details.
 
 =head1 METHODS
 
-All methods are inferited from B<Config::Parser>.  Please see its
+All methods are inherited from B<Config::Parser>.  Please see its
 documentation for details.
 
 =head1 SEE ALSO

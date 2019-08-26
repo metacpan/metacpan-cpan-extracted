@@ -1,9 +1,25 @@
 ==================================================
-Changes from 1741-04-23 00:00:00 +0000 to present.
+Changes from 1745-11-10 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.110 at 2015-02-05 04:36:58 +0000
+version 0.111 at 2019-08-25 16:33:58 +0000
+------------------------------------------
+
+  Change: 3b24c3f7d735c431a12e14043f9a58217076f448
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2019-08-25 18:33:10 +0000
+
+    Remove PruneCruft, updated doc 
+
+  Change: e558958c11370aa7bcf6a912f52171808333768e
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2019-08-25 18:02:13 +0000
+
+    Starting to add dotfiles in Git::Gathering 
+
+------------------------------------------
+version 0.110 at 2015-02-05 04:36:52 +0000
 ------------------------------------------
 
   Change: 605c06b0ccaf5f02f5d3f4cd8822ade61718fd65

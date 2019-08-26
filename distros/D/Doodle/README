@@ -4,7 +4,7 @@ NAME
 
 ABSTRACT
 
-    Database DDL Statement Builder
+    Database DDL (= Data Definition Language) Statement Builder
 
 SYNOPSIS
 
@@ -35,9 +35,12 @@ SYNOPSIS
 
 DESCRIPTION
 
-    Doodle is a database DDL statement builder and provides an
-    object-oriented abstraction for performing schema changes in various
-    datastores. This class consumes the Doodle::Helpers roles.
+    Doodle is a database DDL ("Data Definition Language" or "Data
+    Description Language")
+    <https://en.wikipedia.org/wiki/Data_definition_language> statement
+    builder and provides an object-oriented abstraction for performing
+    schema changes in various datastores. This class consumes the
+    Doodle::Helpers roles.
 
 METHODS
 

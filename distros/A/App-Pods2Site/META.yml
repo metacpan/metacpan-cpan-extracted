@@ -5,6 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Temp: '0'
+  JSON: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '7.12'
@@ -40,5 +41,5 @@ requires:
   perl: '5.010001'
 resources:
   repository: https://github.com/kenneth-olwing/App-Pods2Site.git
-version: '0.015'
+version: '1.002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

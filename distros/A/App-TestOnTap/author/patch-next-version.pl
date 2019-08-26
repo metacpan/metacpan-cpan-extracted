@@ -18,8 +18,23 @@ my %files =
 	(
 		'README.md' => 1,
 		'extras/Java/TAPGenerator/src/main/java/org/cpan/knth/TAPGenerator.java' => 11,
+		'lib/App/TestOnTap/_Args._pod' => 9,
+		'lib/App/TestOnTap/Args.pm' => 10,
+		'lib/App/TestOnTap/Args.pod' => 9,
+		'lib/App/TestOnTap/Config.pm' => 6,
+		'lib/App/TestOnTap/Dispenser.pm' => 6,
+		'lib/App/TestOnTap/ExecMap.pm' => 6,
+		'lib/App/TestOnTap/Harness.pm' => 6,
+		'lib/App/TestOnTap/OrderStrategy.pm' => 6,
+		'lib/App/TestOnTap/PackInfo.pm' => 6,
+		'lib/App/TestOnTap/ParallelGroupManager.pm' => 6,
+		'lib/App/TestOnTap/Preprocess.pm' => 6,
+		'lib/App/TestOnTap/Scheduler.pm' => 6,
+		'lib/App/TestOnTap/Util.pm' => 6,
+		'lib/App/TestOnTap/WorkDirManager.pm' => 6,
 		'lib/App/TestOnTap.pm' => 8,
-		'lib/App/TestOnTap.pod' => 10
+		'lib/App/TestOnTap.pod' => 10,
+		'script/testontap' => 6,
 	);
 
 foreach my $fn (keys(%files))
@@ -61,9 +76,13 @@ my $currentVersionRE = qr(\Q$currentVersion\E);
 my $nextVersion = sprintf("${mj}.%s%03d", ($isdev ? "${min}_" : ''), $2 + 1);
 my $nextTag = "v$nextVersion";
 
+print "Next version is '$nextVersion'\n";
 foreach my $fn (keys(%files))
 {
 	my $line = $files{$fn};
+
+	print "Changing 'version' in $fn...\n";
+
 	$fn = "$toplevel/$fn";
 	
 	my $idx = $line - 1;

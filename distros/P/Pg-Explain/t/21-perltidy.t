@@ -13,7 +13,7 @@ if ( not $ENV{TEST_AUTHOR} ) {
 eval { require Test::PerlTidy; import Test::PerlTidy; };
 
 if ( $EVAL_ERROR ) {
-    my $msg = 'Test::Tidy required to criticise code';
+    my $msg = 'Test::PerlTidy required to criticise code';
     plan( skip_all => $msg );
 }
 

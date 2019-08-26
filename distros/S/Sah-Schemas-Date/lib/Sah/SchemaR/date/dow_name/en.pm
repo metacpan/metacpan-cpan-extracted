@@ -1,7 +1,7 @@
 package Sah::SchemaR::date::dow_name::en;
 
-our $DATE = '2019-06-24'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-07-21'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 our $rschema = ["cistr",[{in=>["su","mo","tu","we","th","fr","sa","sun","mon","tue","wed","thu","fri","sat","sunday","monday","tuesday","wednesday","thursday","friday","saturday"],summary=>"Day-of-week name (abbreviated or full, in English)"}],["cistr"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::date::dow_name::en - Day-of-week name (abbreviated or full, in Eng
 
 =head1 VERSION
 
-This document describes version 0.004 of Sah::SchemaR::date::dow_name::en (from Perl distribution Sah-Schemas-Date), released on 2019-06-24.
+This document describes version 0.006 of Sah::SchemaR::date::dow_name::en (from Perl distribution Sah-Schemas-Date), released on 2019-07-21.
 
 =head1 DESCRIPTION
 

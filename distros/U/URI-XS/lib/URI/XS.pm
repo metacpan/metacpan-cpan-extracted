@@ -2,7 +2,7 @@ package URI::XS;
 use 5.012;
 use XS::Framework;
 
-our $VERSION = '1.1.6';
+our $VERSION = '1.1.7';
 
 use Export::XS::Auto
     ALLOW_LEADING_AUTHORITY => 1,

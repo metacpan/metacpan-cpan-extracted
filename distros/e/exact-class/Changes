@@ -1,5 +1,13 @@
 Revision history for exact::class
 
+1.04      2019-08-26 15:09:25-07:00 America/Los_Angeles
+        - Reverting signatures from a test because older Perls can't do that
+
+1.03      2019-08-26 14:38:07-07:00 America/Los_Angeles
+        - Improved inheritance support of has variables
+        - Changed to use "-" prepending flags for compile check w00t
+        - Add back dist.ini components
+
 1.02      2019-08-13 14:59:29-07:00 America/Los_Angeles
         - Switch from TryCatch to Try::Tiny as provided by exact
 

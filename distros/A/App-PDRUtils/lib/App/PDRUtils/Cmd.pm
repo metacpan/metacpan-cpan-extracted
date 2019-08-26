@@ -1,7 +1,7 @@
 package App::PDRUtils::Cmd;
 
-our $DATE = '2018-04-03'; # DATE
-our $VERSION = '0.120'; # VERSION
+our $DATE = '2019-07-25'; # DATE
+our $VERSION = '0.121'; # VERSION
 
 use 5.010001;
 use strict;
@@ -15,9 +15,11 @@ our %mod_args = (
     },
 );
 
+my $re_mod_ver = qr/\Av?\d{1,15}(?: (?:(?:\.\d{1,3}){0,2})|(?:\.\d{1,8}) )\z/x;
+
 our %mod_ver_args = (
     module_version => {
-        schema => ['str*', match=>qr/\Av?\d{1,15}(\.\d{1,3}){0,2}\z/], # XXX perlmod_ver?
+        schema => ['str*', match=>$re_mod_ver], # XXX perl::mod_ver?
         req => 1,
         pos => 1,
     },
@@ -25,7 +27,7 @@ our %mod_ver_args = (
 
 our %opt_mod_ver_args = (
     module_version => {
-        schema => ['str*', match=>qr/\Av?\d{1,15}(\.\d{1,3}){0,2}\z/], # XXX perlmod_ver?
+        schema => ['str*', match=>$re_mod_ver], # XXX perl::mod_ver?
         default => "0",
         pos => 1,
     },
@@ -33,7 +35,7 @@ our %opt_mod_ver_args = (
 
 our %by_ver_args = (
     by => {
-        schema => ['str*', match=>qr/\Av?\d{1,15}(\.\d{1,3}){0,2}\z/],
+        schema => ['str*', match=>$re_mod_ver], # XXX perl::mod_ver?
         req => 1,
         pos => 1,
     },
@@ -71,7 +73,7 @@ App::PDRUtils::Cmd - Common stuffs for App::PDRUtils::*Cmd::*
 
 =head1 VERSION
 
-This document describes version 0.120 of App::PDRUtils::Cmd (from Perl distribution App-PDRUtils), released on 2018-04-03.
+This document describes version 0.121 of App::PDRUtils::Cmd (from Perl distribution App-PDRUtils), released on 2019-07-25.
 
 =head1 HOMEPAGE
 
@@ -95,7 +97,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

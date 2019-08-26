@@ -4,12 +4,14 @@ use strict;
 use warnings;
 use Config;   # Provides OS-portable means of determining platform type
 use POSIX;
+use File::Basename qw(fileparse);
+use File::Copy;
 use vars qw(@EXPORT @EXPORT_OK @ISA $VERSION);
 
 BEGIN {
     require Exporter;
     @ISA = qw(Exporter);
-    $VERSION = '1.01';
+    $VERSION = '1.03';
     @EXPORT = @EXPORT_OK = qw(rd_f wr_f ap_f find_temp find_bin lockafile unlockafile unlock_all_the_files);
 }
 
@@ -18,6 +20,77 @@ our $ERROR  = '';   # short invariant description of error, or empty string if n
 our $ERRNO  = '';   # variant description of error (such as $!), or empty string if none
 our $ERRNUM =  0;   # numerical variant description of error (such as $!), or empty string if none, undocumented, only used for unit tests
 our %LOCKS_HASH;    # keys on lockfile to bind count, for supporting nested locks.
+
+# File::Copy::move() almost doest the right thing, just needs syscopy() as failover instead of copy().
+# This _rename() function more or less duplicates the needed functionality of File::Copy::_move's logic after the rename,
+# but uses syscopy() and captures failures in $OK, $ERROR, $ERRNO, $ERRNUM.
+sub _rename {
+    my ($from, $to) = @_;
+
+    ($OK, $ERROR, $ERRNO, $ERRNUM) = ('OK', '', '', 0);
+    return 'OK' if (rename ($from, $to));
+
+    my $result = File::Copy::syscopy($from, $to);
+    unless ($result) {
+        ($OK, $ERROR, $ERRNO, $ERRNUM) = ('ERROR', 'File::Copy::syscopy failed', $!, 0+$!);
+        return undef;
+    }
+
+    my @st = stat($from);
+    unless (@st) {
+        ($OK, $ERROR, $ERRNO, $ERRNUM) = ('ERROR', 'after-copy stat failed', $!, 0+$!);
+        return undef;
+    }
+
+    my ($atime, $mtime) = (@st)[8,9];
+    unless (utime($atime, $mtime, $to)) {
+        ($OK, $ERROR, $ERRNO, $ERRNUM) = ('ERROR', 'after-copy utime failed', $!, 0+$!);
+        return undef;
+    }
+
+    unless (unlink($from)) {
+        ($OK, $ERROR, $ERRNO, $ERRNUM) = ('ERROR', 'after-copy unlink failed', $!, 0+$!);
+        return undef;
+    }
+    return 'OK';
+}
+
+sub rename_vms {
+    my ($fn, $dest) = @_;
+    if (!defined($fn) || ($fn eq '')) {
+        ($OK, $ERROR, $ERRNO, $ERRNUM) = ('ERROR', 'no filename supplied', -1, 0);
+        return undef;
+    }
+    if (!defined($dest) || ($dest eq '')) {
+        ($OK, $ERROR, $ERRNO, $ERRNUM) = ('ERROR', 'no destination directory supplied', -1, 0);
+        return undef;
+    }
+    my $dest_fn = $fn;
+    if (!-d $dest) {
+        ($dest, $dest_fn) = fileparse($dest);
+    }
+    if (!-e $dest) {
+        ($OK, $ERROR, $ERRNO, $ERRNUM) = ('ERROR', 'destination directory does not exist', -1, 0);
+        return undef;
+    }
+    if (!-d _) {
+        ($OK, $ERROR, $ERRNO, $ERRNUM) = ('ERROR', 'destination directory is not a directory', -1, 0);
+        return undef;
+    }
+    if (!-w _) {
+        ($OK, $ERROR, $ERRNO, $ERRNUM) = ('ERROR', 'destination directory is not writable', -1, 0);
+        return undef;
+    }
+
+    if (!-e "$dest/$dest_fn") {
+        # degenerate case; just rename it.
+        return _rename($fn, "$dest/$dest_fn");
+    }
+
+    my $i = 1;
+    $i++ while(-e "$dest/$dest_fn.$i");
+    return _rename($fn, "$dest/$dest_fn.$i");
+}
 
 sub rd_f {
     my ($fn) = @_;

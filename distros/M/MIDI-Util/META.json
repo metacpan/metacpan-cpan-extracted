@@ -57,16 +57,14 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "mailto" : "bug-MIDI-Util@rt.cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=MIDI-Util"
-      },
+      "homepage" : "https://github.com/ology/MIDI-Util",
       "repository" : {
          "type" : "git",
+         "url" : "https://github.com/ology/MIDI-Util.git",
          "web" : "https://github.com/ology/MIDI-Util"
       }
    },
-   "version" : "0.0400",
+   "version" : "0.0401",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.027007"
@@ -282,9 +280,9 @@
             "version" : "6.012"
          },
          {
-            "class" : "Dist::Zilla::Plugin::MetaResources",
-            "name" : "MetaResources",
-            "version" : "6.012"
+            "class" : "Dist::Zilla::Plugin::GithubMeta",
+            "name" : "GithubMeta",
+            "version" : "0.58"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::PodSpelling",

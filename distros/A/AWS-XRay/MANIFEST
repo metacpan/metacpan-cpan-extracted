@@ -6,6 +6,7 @@ README.md
 cpanfile
 lib/AWS/XRay.pm
 lib/AWS/XRay/Buffer.pm
+lib/AWS/XRay/Plugin/EC2.pm
 lib/AWS/XRay/Segment.pm
 minil.toml
 t/00_compile.t
@@ -17,6 +18,8 @@ t/05_sampled_header.t
 t/06_sampler.t
 t/07_buffer.t
 t/08_add.t
+t/09_plugin.t
+t/09_wantarray.t
 t/Util.pm
 xt/01_overhead.t
 META.yml

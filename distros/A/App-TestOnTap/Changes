@@ -1,5 +1,9 @@
 Revision history for App-TestOnTap
 
+1.001	2019-08-24
+
+	Bumping to a more official release number and adding VERSION to all files
+
 0.059	2019-01-07
 
 	Debugging complete

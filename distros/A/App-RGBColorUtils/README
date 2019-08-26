@@ -1,0 +1,94 @@
+NAME
+    App::RGBColorUtils - CLI utilities related to RGB color
+
+VERSION
+    This document describes version 0.001 of App::RGBColorUtils (from Perl
+    distribution App-RGBColorUtils), released on 2019-07-12.
+
+DESCRIPTION
+    This distributions provides the following command-line utilities:
+
+    *   rgb-is-dark
+
+    *   rgb-is-light
+
+FUNCTIONS
+  rgb_is_dark
+    Usage:
+
+     rgb_is_dark(%args) -> [status, msg, payload, meta]
+
+    Check if RGB color is dark.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   color* => *color::rgb24*
+
+    *   quiet => *true*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  rgb_is_light
+    Usage:
+
+     rgb_is_light(%args) -> [status, msg, payload, meta]
+
+    Check if RGB color is light.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   color* => *color::rgb24*
+
+    *   quiet => *true*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-RGBColorUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-RGBColorUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-RGBColorUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Color::RGB::Util
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

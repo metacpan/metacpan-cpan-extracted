@@ -14,22 +14,27 @@ devel/vert.pl
 examples/settings.pl
 examples/simple.pl
 examples/vertical.pl
-inc/my_pod2html
-inc/MyMakeMakerExtras.pm
 lib/Gtk2/Ex/Dashes.pm
 lib/Gtk2/Ex/Dashes/MenuItem.pm
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 SIGNATURE
+t/Dashes-load.t
 t/Dashes-weaken.t
 t/Dashes.t
+t/MenuItem-load.t
 t/MenuItem-weaken.t
 t/MenuItem.t
 t/MyTestHelpers.pm
+xt/0-examples-xrefs.t
+xt/0-file-is-part-of.t
 xt/0-META-read.t
+xt/0-no-debug-left-on.t
+xt/0-Test-ConsistentVersion.t
 xt/0-Test-DistManifest.t
 xt/0-Test-Pod.t
 xt/0-Test-Synopsis.t
 xt/0-Test-YAML-Meta.t
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

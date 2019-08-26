@@ -11,7 +11,7 @@ package IOas::SJIS2004;
 use 5.00503;    # Galapagos Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.05';
+$VERSION = '0.07';
 $VERSION = $VERSION;
 
 use strict;
@@ -92,10 +92,10 @@ sub gt  ($$) { _io_output($_[0]) gt  _io_output($_[1]) }
 sub le  ($$) { _io_output($_[0]) le  _io_output($_[1]) }
 sub lt  ($$) { _io_output($_[0]) lt  _io_output($_[1]) }
 sub sort (@) {
-    return map { $_->[0] }
-        CORE::sort { $a->[1] cmp $b->[1] }
-        map { [ $_, _io_output($_) ] }
-        @_;
+    map { $_->[0] }
+    CORE::sort { $a->[1] cmp $b->[1] }
+    map { [ $_, _io_output($_) ] }
+    @_;
 }
 
 #-----------------------------------------------------------------------------
@@ -104,11 +104,19 @@ sub sort (@) {
 
 sub getc (;*) {
     my $fh = @_ ? Symbol::qualify_to_ref($_[0],caller()) : \*STDIN;
-    my @octet = CORE::getc($fh);
-    if ($octet[0] =~ /\A[\x81-\x9F\xE0-\xFC]\z/) {
-        push @octet, CORE::getc($fh);
+    my $octet = CORE::getc($fh);
+    if ($io_encoding =~ /^(?:sjis2004|cp932|cp932ibm|cp932nec|sjis2004)$/) {
+        if ($octet =~ /\A[\x81-\x9F\xE0-\xFC]\z/) {
+            $octet .= CORE::getc($fh);
+
+            # ('cp932'.'x') to escape from build system
+            if (($io_encoding eq ('cp932'.'x')) and ($octet eq "\x9C\x5A")) {
+                $octet .= CORE::getc($fh);
+                $octet .= CORE::getc($fh);
+            }
+        }
     }
-    return _io_input(join '', @octet);
+    return _io_input($octet);
 }
 
 sub readline (;*) {
@@ -154,11 +162,12 @@ IOas::SJIS2004 - provides SJIS2004 I/O subroutines for UTF-8 script
     $result = IOas::SJIS2004::gt($utf8str_a, $utf8str_b);
     $result = IOas::SJIS2004::le($utf8str_a, $utf8str_b);
     $result = IOas::SJIS2004::lt($utf8str_a, $utf8str_b);
-    $result = IOas::SJIS2004::sort(@utf8str);
+    @result = IOas::SJIS2004::sort(@utf8str);
 
     # Encoding Convert on I/O Operations
     $result = IOas::SJIS2004::getc(FILEHANDLE);
     $result = IOas::SJIS2004::readline(FILEHANDLE);
+    @result = IOas::SJIS2004::readline(FILEHANDLE);
     $result = IOas::SJIS2004::print(FILEHANDLE, @utf8str);
     $result = IOas::SJIS2004::printf(FILEHANDLE, $utf8format, @utf8list);
 

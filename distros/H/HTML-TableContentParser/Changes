@@ -1,3 +1,6 @@
+0.302		2019-08-24	T. R. Wyant
+    Fix broken POD links, and test to ensure they stay fixed.
+
 0.301		2019-01-11	T. R. Wyant
     RT 128088 Synopsis should call parse(), not parse_file(). Thanks to
     jabowery for catching this.

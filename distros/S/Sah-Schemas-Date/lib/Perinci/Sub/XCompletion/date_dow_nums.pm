@@ -1,7 +1,7 @@
 package Perinci::Sub::XCompletion::date_dow_nums;
 
-our $DATE = '2019-06-24'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-07-21'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -23,8 +23,6 @@ sub gen_completion {
         complete_comma_sep(
             elems => [
                 1..7,
-                "mo","tu","we","th","fr","sa","su",
-                "mon","tue","wed","thu","fri","sat","sun",
                 "monday","tuesday","wednesday","thursday","friday","saturday","sunday",
             ],
             word => $cargs{word},
@@ -47,7 +45,7 @@ Perinci::Sub::XCompletion::date_dow_nums - Generate completion for date::dow_num
 
 =head1 VERSION
 
-This document describes version 0.004 of Perinci::Sub::XCompletion::date_dow_nums (from Perl distribution Sah-Schemas-Date), released on 2019-06-24.
+This document describes version 0.006 of Perinci::Sub::XCompletion::date_dow_nums (from Perl distribution Sah-Schemas-Date), released on 2019-07-21.
 
 =head1 CONFIGURATION
 

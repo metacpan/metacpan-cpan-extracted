@@ -1,5 +1,5 @@
 package Mail::LMLM::Render::HTML;
-$Mail::LMLM::Render::HTML::VERSION = '0.6805';
+$Mail::LMLM::Render::HTML::VERSION = '0.6806';
 use strict;
 use warnings;
 
@@ -7,7 +7,7 @@ use vars qw(@ISA);
 
 use Mail::LMLM::Render;
 
-@ISA=qw(Mail::LMLM::Render);
+@ISA = qw(Mail::LMLM::Render);
 
 sub initialize
 {
@@ -24,19 +24,19 @@ sub _htmlize_onechar
 {
     my $c = shift;
 
-    if ($c eq "<")
+    if ( $c eq "<" )
     {
         return "\&lt;";
     }
-    elsif ($c eq ">")
+    elsif ( $c eq ">" )
     {
         return "\&gt;";
     }
-    elsif ($c eq '&')
+    elsif ( $c eq '&' )
     {
-        return "\&amp;"
+        return "\&amp;";
     }
-    elsif ($c eq "\n")
+    elsif ( $c eq "\n" )
     {
         return "<br />";
     }
@@ -63,7 +63,7 @@ sub text
 
     my $style;
 
-    if (scalar(@_))
+    if ( scalar(@_) )
     {
         $style = shift;
     }
@@ -74,20 +74,20 @@ sub text
 
     my $out = _htmlize($text);
 
-    if ($style->{'bold'})
+    if ( $style->{'bold'} )
     {
-        $out = "<b>".$out."</b>";
+        $out = "<b>" . $out . "</b>";
     }
-    if ($style->{'underline'})
+    if ( $style->{'underline'} )
     {
-        $out = "<u>".$out."</u>";
+        $out = "<u>" . $out . "</u>";
     }
-    if ($style->{'italic'})
+    if ( $style->{'italic'} )
     {
-        $out = "<i>".$out."</i>";
+        $out = "<i>" . $out . "</i>";
     }
 
-    print {*{$self->{'out'}}} $out;
+    print { *{ $self->{'out'} } } $out;
 
     return 0;
 }
@@ -96,14 +96,14 @@ sub newline
 {
     my $self = shift;
 
-    print {*{$self->{'out'}}} "<br />\n" ;
+    print { *{ $self->{'out'} } } "<br />\n";
 }
 
 sub indent_inc
 {
     my $self = shift;
 
-    print {*{$self->{'out'}}} "\n<div class=\"indent\">\n";
+    print { *{ $self->{'out'} } } "\n<div class=\"indent\">\n";
 
     return 0;
 }
@@ -112,7 +112,7 @@ sub indent_dec
 {
     my $self = shift;
 
-    print {*{$self->{'out'}}} "\n</div>\n" ;
+    print { *{ $self->{'out'} } } "\n</div>\n";
 
     return 0;
 }
@@ -123,7 +123,7 @@ sub start_link
 
     my $url = shift;
 
-    print {*{$self->{'out'}}} "<a href=\"$url\">";
+    print { *{ $self->{'out'} } } "<a href=\"$url\">";
 
     return 0;
 }
@@ -132,7 +132,7 @@ sub end_link
 {
     my $self = shift;
 
-    print {*{$self->{'out'}}} "</a>";
+    print { *{ $self->{'out'} } } "</a>";
 
     return 0;
 }
@@ -145,7 +145,7 @@ sub start_section
 
     my $options;
 
-    if (scalar(@_))
+    if ( scalar(@_) )
     {
         $options = shift;
     }
@@ -157,24 +157,23 @@ sub start_section
     my $o = $self->{'out'};
 
     my $id_attr = "";
-    if (exists($options->{'id'}))
+    if ( exists( $options->{'id'} ) )
     {
         $id_attr = " id=\"" . $options->{'id'} . "\"";
     }
 
-    print {*{$o}} "<h2${id_attr}>";
-    if (exists($options->{'title_url'}))
+    print { *{$o} } "<h2${id_attr}>";
+    if ( exists( $options->{'title_url'} ) )
     {
-        print {*{$o}} "<a href=\"" . $options->{'title_url'} . "\">" ;
+        print { *{$o} } "<a href=\"" . $options->{'title_url'} . "\">";
     }
     $self->text($title);
-    if (exists($options->{'title_url'}))
+    if ( exists( $options->{'title_url'} ) )
     {
-        print {*{$o}} "</a>";
+        print { *{$o} } "</a>";
     }
-    print {*{$o}} "</h2>" ;
-    print {*{$o}} "\n\n";
-
+    print { *{$o} } "</h2>";
+    print { *{$o} } "\n\n";
 
     return 0;
 }
@@ -183,7 +182,7 @@ sub start_para
 {
     my $self = shift;
 
-    print {*{$self->{'out'}}}("<p>\n");
+    print { *{ $self->{'out'} } } ("<p>\n");
 
     return 0;
 }
@@ -192,7 +191,7 @@ sub end_para
 {
     my $self = shift;
 
-    print {*{$self->{'out'}}}("\n</p>\n");
+    print { *{ $self->{'out'} } } ("\n</p>\n");
 
     return 0;
 }
@@ -201,7 +200,7 @@ sub end_section
 {
     my $self = shift;
 
-    print {*{$self->{'out'}}}("\n\n");
+    print { *{ $self->{'out'} } } ("\n\n");
 
     return 0;
 }
@@ -218,7 +217,7 @@ sub start_document
 
     my $o = $self->{'out'};
 
-    print {*{$o}} <<"EOF" ;
+    print { *{$o} } <<"EOF" ;
 <?xml version="1.0" encoding="iso-8859-1"?>
 <!DOCTYPE html
      PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
@@ -232,12 +231,11 @@ sub start_document
 <body>
 EOF
 
-
-    print {*{$o}}("<h1>");
+    print { *{$o} } ("<h1>");
 
     $self->text($body_title);
 
-    print {*{$o}}("</h1>\n\n");
+    print { *{$o} } ("</h1>\n\n");
 
     return 0;
 }
@@ -246,11 +244,7 @@ sub end_document
 {
     my $self = shift;
 
-    print {*{$self->{'out'}}}(
-        "\n" .
-        "</body>\n" .
-        "</html>\n"
-        );
+    print { *{ $self->{'out'} } } ( "\n" . "</body>\n" . "</html>\n" );
 
     return 0;
 }
@@ -259,7 +253,7 @@ sub horizontal_line
 {
     my $self = shift;
 
-    print {*{$self->{'out'}}}("\n\n<hr />\n\n");
+    print { *{ $self->{'out'} } } ("\n\n<hr />\n\n");
 
     return 0;
 }
@@ -278,7 +272,7 @@ Mail::LMLM::Render::HTML - backend for rendering HTML.
 
 =head1 VERSION
 
-version 0.6805
+version 0.6806
 
 =head1 SYNOPSIS
 
@@ -299,10 +293,6 @@ version 0.6805
 =head1 DESCRIPTION
 
 This is a derived class of L<Mail::LMLM::Render> that renders HTML.
-
-=head1 VERSION
-
-version 0.6805
 
 =head1 METHODS
 
@@ -354,7 +344,7 @@ unknown
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by unknown.
+This software is Copyright (c) 2019 by unknown.
 
 This is free software, licensed under:
 
@@ -363,7 +353,7 @@ This is free software, licensed under:
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/mail-lmlm/issues>
+L<https://github.com/shlomif/perl-mail-lmlm/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -472,8 +462,8 @@ The code is open to the world, and available for you to hack on. Please feel fre
 with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
 from your repository :)
 
-L<https://github.com/shlomif/mail-lmlm>
+L<https://github.com/shlomif/perl-mail-lmlm>
 
-  git clone http://bitbucket.org/shlomif/perl-mail-lmlm/overview
+  git clone git://github.com/shlomif/perl-mail-lmlm.git
 
 =cut

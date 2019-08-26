@@ -11,6 +11,10 @@ use constant {
 
 use List::Util qw(min max);
 
+BEGIN {
+    our $VERSION = '1.20';
+}
+
 sub _perl_logo {
     my $self = shift;
     return unless (exists($self->{'FONTS'}->{'DejaVuSerif'}));

@@ -16,12 +16,17 @@ WriteMakefile(
 
         # prereqs
         'Bot::BasicBot::Pluggable'                  => '0',
+        'Bot::BasicBot::Pluggable::Module'          => '0',
         'Bot::BasicBot::Pluggable::Module::Seen'    => '0',
+        'DateTime'                                  => '0',
         'IO::File'                                  => '0',
+        'List::MoreUtils'                           => '0',
         'MIME::Lite'                                => '0',
 
         # build/test prereqs
-        'Test::More'                                => '0.70'
+        'Test::MockModule'                          => '0',
+        'Test::More'                                => '0.70',
+        'Test::Most'                                => '0'
 
     }
 );

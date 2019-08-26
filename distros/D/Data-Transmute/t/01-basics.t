@@ -7,18 +7,24 @@ use warnings;
 use Test::More 0.98;
 
 use Data::Transmute qw(transmute_data reverse_rules);
+use Storable qw(dclone);
 
 sub test_transmute_data {
     my %args = @_;
 
-    my $res;
     subtest $args{name} => sub {
+        my $data = $args{data};
+        my $orig; $orig = ref($data) ? dclone($data) : $data;
+
+        my $transmuted1;
         eval {
-            $res = transmute_data(
-                (data => $args{data})   x !!(exists $args{data}),
-                (rules => $args{rules}) x !!(exists $args{rules}),
+            $transmuted1 = transmute_data(
+                (data => $data)                       x !!(exists $args{data}),
+                (rules        => $args{rules})        x !!(exists $args{rules}),
+                (rules_module => $args{rules_module}) x !!(exists $args{rules_module}),
             );
         };
+        $transmuted1 = dclone $transmuted1 if ref $transmuted1;
 
         if ($args{dies}) {
             ok($@, "dies");
@@ -28,9 +34,49 @@ sub test_transmute_data {
         }
 
         if (exists $args{result}) {
-            is_deeply($res, $args{result}, "result")
-                or diag explain $res;
+            is_deeply($transmuted1, $args{result}, "result")
+                or diag explain $transmuted1;
         }
+
+        subtest reverse_rules => sub {
+            my $revrules;
+            eval {
+                $revrules = reverse_rules(
+                    (rules        => $args{rules})        x !!(exists $args{rules}),
+                    (rules_module => $args{rules_module}) x !!(exists $args{rules_module}),
+                );
+            };
+
+            if ($args{reverse_dies}) {
+                ok($@, "reverse_rules dies");
+                return;
+            } else {
+                ok(!$@, "reverse_rules doesn't die") or diag $@;
+            }
+
+            return unless $args{test_reverse} // 1;
+
+            eval {
+                transmute_data(
+                    data => $data,
+                    rules => $revrules,
+                );
+            };
+            if ($@) {
+                ok(0, "transmute step 2 (with reverse rules & data from step 1) dies: $@");
+                return;
+            }
+            my $transmuted2 = dclone $data;
+
+            is_deeply($transmuted2, $orig, "transmuted data becomes the original when applied with reverse rules")
+                or diag explain({
+                    orig => $orig,
+                    rules => $args{rules},
+                    rules_reverse => $revrules,
+                    transmuted1 => $transmuted1,
+                    transmuted2 => $transmuted2,
+                });
+        };
     };
 }
 
@@ -61,11 +107,18 @@ subtest transmute_data => sub {
         name   => "composite rules",
         data   => {foo=>1},
         rules  => [
-            [rename_hash_key => {from=>'foo', to=>'bar'}],
-            [rename_hash_key => {from=>'bar', to=>'baz'}],
-            [create_hash_key => {name=>'foo', value=>10}],
+            [rename_hash_key => {from=>'foo', to=>'bar'}], #1
+            [rename_hash_key => {from=>'bar', to=>'baz'}], #2
+            [create_hash_key => {name=>'foo', value=>10}], #3
         ],
         result => {foo=>10, baz=>1},
+        test_reverse => 0, # because reverse of #3 will delete foo
+    );
+    test_transmute_data(
+        name   => "rules_module",
+        data   => {c=>3},
+        rules_module => 'Example',
+        result => {a=>1, b=>2, d=>3},
     );
 
     subtest "rule: create_hash_key" => sub {
@@ -74,6 +127,18 @@ subtest transmute_data => sub {
             data   => ["bar"],
             rules  => [ [create_hash_key=>{name=>'bar', value=>2}] ],
             result => ["bar"],
+        );
+        test_transmute_data(
+            name   => "required argument: name",
+            data   => {},
+            rules  => [ [create_hash_key=>{value=>2}] ],
+            dies   => 1,
+        );
+        test_transmute_data(
+            name   => "required argument: value",
+            data   => {},
+            rules  => [ [create_hash_key=>{name=>'bar'}] ],
+            dies   => 1,
         );
         test_transmute_data(
             name   => "create bar",
@@ -92,12 +157,14 @@ subtest transmute_data => sub {
             data   => {foo=>1},
             rules  => [ [create_hash_key=>{name=>'foo', value=>2, ignore=>1}] ],
             result => {foo=>1},
+            reverse_dies => 1,
         );
         test_transmute_data(
             name   => "foo already exists + replace -> replaced",
             data   => {foo=>1},
             rules  => [ [create_hash_key=>{name=>'foo', value=>2, replace=>1}] ],
             result => {foo=>2},
+            reverse_dies => 1,
         );
         # XXX test conflict between ignore & replace
     };
@@ -108,6 +175,18 @@ subtest transmute_data => sub {
             data   => ["foo"],
             rules  => [ [rename_hash_key=>{from=>'foo', to=>'bar'}] ],
             result => ["foo"],
+        );
+        test_transmute_data(
+            name   => "required argument: from",
+            data   => {foo=>1},
+            rules  => [ [rename_hash_key=>{to=>'bar'}] ],
+            dies   => 1,
+        );
+        test_transmute_data(
+            name   => "required argument: to",
+            data   => {foo=>1},
+            rules  => [ [rename_hash_key=>{from=>'foo'}] ],
+            dies   => 1,
         );
         test_transmute_data(
             name   => "rename foo",
@@ -126,6 +205,7 @@ subtest transmute_data => sub {
             data   => {baz=>1},
             rules  => [ [rename_hash_key=>{from=>'foo', to=>'bar', ignore_missing_from=>1}] ],
             result => {baz=>1},
+            reverse_dies => 1,
         );
         test_transmute_data(
             name   => "bar exists -> dies",
@@ -138,12 +218,14 @@ subtest transmute_data => sub {
             data   => {foo=>1, bar=>2},
             rules  => [ [rename_hash_key=>{from=>'foo', to=>'bar', ignore_existing_target=>1}] ],
             result => {foo=>1, bar=>2},
+            reverse_dies => 1,
         );
         test_transmute_data(
             name   => "bar exists + replace -> replaced",
             data   => {foo=>1, bar=>2},
             rules  => [ [rename_hash_key=>{from=>'foo', to=>'bar', replace=>1}] ],
             result => {bar=>1},
+            reverse_dies => 1,
         );
     };
 
@@ -153,57 +235,131 @@ subtest transmute_data => sub {
             data   => ["foo"],
             rules  => [ [delete_hash_key=>{name=>'foo'}] ],
             result => ["foo"],
+            reverse_dies => 1,
+        );
+        test_transmute_data(
+            name   => "required argument: name",
+            data   => {foo=>1},
+            rules  => [ [delete_hash_key=>{}] ],
+            dies   => 1,
         );
         test_transmute_data(
             name   => "delete foo",
             data   => {foo=>1},
             rules  => [ [delete_hash_key=>{name=>'foo'}] ],
             result => {},
+            reverse_dies => 1,
         );
         test_transmute_data(
             name   => "foo doesn't exist -> noop",
             data   => {bar=>1},
             rules  => [ [delete_hash_key=>{name=>'foo'}] ],
             result => {bar=>1},
+            reverse_dies => 1,
         );
     };
 
     subtest "rule: transmute_array_elems" => sub {
         test_transmute_data(
             name   => "data not array -> noop",
-            data   => {foo=>{bar=>1}},
-            rules  => [ [transmute_array_elems=>{rules=>[ [delete_hash_key=>{name=>'bar'}] ]}] ],
-            result => {foo=>{bar=>1}},
+            data   => {k1=>{a=>1}},
+            rules  => [ [transmute_array_elems=>{rules=>[ [create_hash_key=>{name=>'b', value=>2}] ]}] ],
+            result => {k1=>{a=>1}},
+        );
+        test_transmute_data(
+            name   => "required argument: rules/rules_module",
+            data   => [],
+            rules  => [ [transmute_array_elems=>{}] ],
+            dies   => 1,
         );
         test_transmute_data(
             name   => "basic",
-            data   => [{bar=>1}, {bar=>2}, {baz=>3}],
-            rules  => [ [transmute_array_elems=>{rules=>[ [delete_hash_key=>{name=>'bar'}] ]}] ],
-            result => [{}, {}, {baz=>3}],
+            data   => [{a=>1}, {a=>2}, {}],
+            rules  => [ [transmute_array_elems=>{rules=>[ [create_hash_key=>{name=>'b', value=>2}] ]}] ],
+            result => [{a=>1,b=>2}, {a=>2,b=>2}, {b=>2}],
+        );
+        test_transmute_data(
+            name   => "rules_module",
+            data   => [{c=>3}],
+            rules  => [ [transmute_array_elems=>{rules_module=>'Example'}] ],
+            result => [{a=>1, b=>2, d=>3}],
+        );
+        test_transmute_data(
+            name   => "arg:index_is",
+            data   => [{a=>1}, {a=>2}, {a=>3}],
+            rules  => [ [transmute_array_elems=>{index_is=>1, rules=>[ [create_hash_key=>{name=>'b', value=>2}] ]}] ],
+            result => [{a=>1}, {a=>2,b=>2}, {a=>3}],
+        );
+        test_transmute_data(
+            name   => "arg:index_in",
+            data   => [{a=>1}, {a=>2}, {a=>3}],
+            rules  => [ [transmute_array_elems=>{index_in=>[0,1], rules=>[ [create_hash_key=>{name=>'b', value=>2}] ]}] ],
+            result => [{a=>1,b=>2}, {a=>2,b=>2}, {a=>3}],
+        );
+        test_transmute_data(
+            name   => "arg:index_match",
+            data   => [{a=>1}, {a=>2}, {a=>3}],
+            rules  => [ [transmute_array_elems=>{index_match=>qr/[01]/, rules=>[ [create_hash_key=>{name=>'b', value=>2}] ]}] ],
+            result => [{a=>1,b=>2}, {a=>2,b=>2}, {a=>3}],
+        );
+        test_transmute_data(
+            name   => "arg:index_filter",
+            data   => [{a=>1}, {a=>2}, {a=>3}],
+            rules  => [ [transmute_array_elems=>{index_filter=>sub{ my %args=@_; $args{index} <= 1 }, rules=>[ [create_hash_key=>{name=>'b', value=>2}] ]}] ],
+            result => [{a=>1,b=>2}, {a=>2,b=>2}, {a=>3}],
         );
     };
 
     subtest "rule: transmute_hash_values" => sub {
         test_transmute_data(
             name   => "data not hash -> noop",
-            data   => [{bar=>1}],
-            rules  => [ [transmute_hash_values=>{rules=>[ [delete_hash_key=>{name=>'bar'}] ]}] ],
-            result => [{bar=>1}],
+            data   => [{a=>1}],
+            rules  => [ [transmute_hash_values=>{rules=>[ [create_hash_key=>{name=>'b',value=>2}] ]}] ],
+            result => [{a=>1}],
+        );
+        test_transmute_data(
+            name   => "required argument: rules/rules_module",
+            data   => {},
+            rules  => [ [transmute_hash_values=>{}] ],
+            dies   => 1,
         );
         test_transmute_data(
             name   => "basic",
-            data   => {k1=>{bar=>1}, k2=>{bar=>2}, k3=>{baz=>3}},
-            rules  => [ [transmute_hash_values=>{rules=>[ [delete_hash_key=>{name=>'bar'}] ]}] ],
-            result => {k1=>{}, k2=>{}, k3=>{baz=>3}},
+            data   => {k1=>{a=>1}, k2=>{a=>2}, k3=>{a=>3}},
+            rules  => [ [transmute_hash_values=>{rules=>[ [create_hash_key=>{name=>'b',value=>2}] ]}] ],
+            result => {k1=>{a=>1,b=>2}, k2=>{a=>2,b=>2}, k3=>{a=>3,b=>2}},
+        );
+        test_transmute_data(
+            name   => "rules_module",
+            data   => {k1=>{c=>3}},
+            rules  => [ [transmute_hash_values=>{rules_module=>'Example'}] ],
+            result => {k1=>{a=>1, b=>2, d=>3}},
+        );
+        test_transmute_data(
+            name   => "arg:key_is",
+            data   => {k1=>{a=>1}, k2=>{a=>2}, k3=>{a=>3}},
+            rules  => [ [transmute_hash_values=>{key_is=>'k2', rules=>[ [create_hash_key=>{name=>'b',value=>2}] ]}] ],
+            result => {k1=>{a=>1}, k2=>{a=>2,b=>2}, k3=>{a=>3}},
+        );
+        test_transmute_data(
+            name   => "arg:key_in",
+            data   => {k1=>{a=>1}, k2=>{a=>2}, k3=>{a=>3}},
+            rules  => [ [transmute_hash_values=>{key_in=>['k1','k2'], rules=>[ [create_hash_key=>{name=>'b',value=>2}] ]}] ],
+            result => {k1=>{a=>1,b=>2}, k2=>{a=>2,b=>2}, k3=>{a=>3}},
+        );
+        test_transmute_data(
+            name   => "arg:key_match",
+            data   => {k1=>{a=>1}, k2=>{a=>2}, k3=>{a=>3}},
+            rules  => [ [transmute_hash_values=>{key_match=>qr/[12]/, rules=>[ [create_hash_key=>{name=>'b',value=>2}] ]}] ],
+            result => {k1=>{a=>1,b=>2}, k2=>{a=>2,b=>2}, k3=>{a=>3}},
+        );
+        test_transmute_data(
+            name   => "arg:key_filter",
+            data   => {k1=>{a=>1}, k2=>{a=>2}, k3=>{a=>3}},
+            rules  => [ [transmute_hash_values=>{key_filter=>sub{my %args=@_; $args{key} =~ /[12]/}, rules=>[ [create_hash_key=>{name=>'b',value=>2}] ]}] ],
+            result => {k1=>{a=>1,b=>2}, k2=>{a=>2,b=>2}, k3=>{a=>3}},
         );
     };
-};
-
-subtest reverse_rules => sub {
-    is_deeply(
-        reverse_rules(rules => [ [create_hash_key=>{name=>"foo"}], [rename_hash_key=>{from=>"bar", to=>"baz"}] ] ),
-        [ [rename_hash_key=>{from=>"baz", to=>"bar"}], [delete_hash_key=>{name=>"foo"}] ],
-    );
 };
 
 DONE_TESTING:

@@ -4,7 +4,7 @@
       "Andy Beverley <andy@andybev.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -39,7 +39,7 @@
             "DBIx::Class::ResultClass::HashRefInflator" : "0",
             "Dancer2" : "0.200000",
             "Dancer2::Core::Types" : "0",
-            "Dancer2::Plugin::Auth::Extensible" : "0.703",
+            "Dancer2::Plugin::Auth::Extensible" : "0.708",
             "Dancer2::Plugin::DBIC" : "0.0012",
             "DateTime" : "0",
             "Moo" : "0",
@@ -60,6 +60,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#dancer"
    },
-   "version" : "0.623",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "0.624",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

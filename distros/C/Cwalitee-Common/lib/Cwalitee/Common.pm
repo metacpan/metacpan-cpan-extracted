@@ -1,7 +1,7 @@
 package Cwalitee::Common;
 
-our $DATE = '2019-07-07'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-07-19'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -12,7 +12,7 @@ our %SPEC;
 
 our $schema_indicator_status = [
     'str*', {
-        'x.examples' => ['stable', 'optional', 'experimental', 'deprecated'],
+        'examples' => ['stable', 'optional', 'experimental', 'deprecated'],
     },
 ];
 
@@ -392,7 +392,7 @@ Cwalitee::Common - Common Cwalitee routines
 
 =head1 VERSION
 
-This document describes version 0.002 of Cwalitee::Common (from Perl distribution Cwalitee-Common), released on 2019-07-07.
+This document describes version 0.003 of Cwalitee::Common (from Perl distribution Cwalitee-Common), released on 2019-07-19.
 
 =head1 SYNOPSIS
 

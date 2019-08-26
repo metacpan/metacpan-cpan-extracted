@@ -1,9 +1,9 @@
 package Test::BDD::Cucumber::TestBuilderDelegator;
-$Test::BDD::Cucumber::TestBuilderDelegator::VERSION = '0.57';
+$Test::BDD::Cucumber::TestBuilderDelegator::VERSION = '0.58';
 # Original fix and investigation all by https://github.com/tomas-zemres - based
 # on Test::Tester::Delegate. Original patch here:
 #
-#   https://github.com/pjlsergeant/test-bdd-cucumber-perl/pull/61
+#   https://github.com/pherkin/test-bdd-cucumber-perl/pull/61
 #
 # which I have unfortunately butchered in order to understand and adapt it.
 

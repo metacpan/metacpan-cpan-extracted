@@ -5,7 +5,7 @@
 
 our $DATE = '2019-08-20'; # DATE
 our $DIST = 'App-resolvetable'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,7 +39,7 @@ resolvetable - Produce a colored table containing DNS resolve results of several
 
 =head1 VERSION
 
-This document describes version 0.005 of resolvetable (from Perl distribution App-resolvetable), released on 2019-08-20.
+This document describes version 0.007 of resolvetable (from Perl distribution App-resolvetable), released on 2019-08-20.
 
 =head1 SYNOPSIS
 
@@ -67,12 +67,31 @@ Default value:
 
 Valid values:
 
- ["show-addresses","show-timings"]
+ ["show-addresses","compare-addresses","show-timings"]
 
-The default action is to show resolve result (`show-addresses`). If set to
-`show-timings`, will show resolve times instead to compare speed among DNS
-servers/resolvers.
+The default action is to show resolve result (`show-addresses`). Will highlight
+the majority result with green, and minority result with red. Failed resolve
+(undef) will also be highlighted with a red "X".
 
+The `compare-addresses` action is similar to `show-addresses`, but will assume
+the first server/resolver as the reference and compare the results of the other
+servers with the first. When the result is different, it will be highlighted
+with red; when the result is the same, it will be highlighted with green. Failed
+resolve (undef) are highlighted with a grey X (if result is the same as
+reference server) or a red X (if result is different than reference server). So
+basically whenever you see a red, the results of the other servers are not
+identical with the first (reference) server.
+
+The `show-timings` action will show resolve times instead of addresses, to
+compare speed among DNS servers/resolvers. Will highlight the fastest server
+with green.
+
+
+=item B<--compare>
+
+Shortcut for --action=compare-addresses.
+
+See C<--action>.
 
 =item B<--name>=I<s@>*
 

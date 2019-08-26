@@ -24,7 +24,11 @@ for my $auto_flush ( 0, 1 ) {
             1000,
             sub {
                 capture "root", sub {
-                    capture "sub $_", sub {} for ( 1 .. 99 );
+                    for ( 1 .. 49 ) {
+                        capture "sub $_", sub {
+                            capture "subsub $_", sub {};
+                        };
+                    }
                 };
                 AWS::XRay->sock->flush;
             });

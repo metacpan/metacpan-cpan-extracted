@@ -1,0 +1,54 @@
+2.00 2019-08-26
+
+	- Released on CPAN
+	- Parses entire Apache configuration. In particular, correctly
+        handles Include statements and expands macros (the Use statement).
+	
+1.11 2019-08-15
+
+	- Fix acmeman --setup
+
+1.10 2019-03-15
+
+        - Support for multiple 'source' statements.
+
+1.09 2019-03-14
+
+	- Use absolute path to the 'service' utility on systems that have it
+
+1.08 2018-10-06
+
+	- New option --server-root for the source = apache configuration
+	  statement
+
+1.07 2018-07-17
+
+	- Improve detection of Apache default settings
+
+1.06 2018-05-07
+
+	- New source: "file"
+	- Simplify DNS code
+
+1.05 2018-04-17
+
+	- null source
+	- dns checking (core.check-dns statement)
+	- core.restart renamed to core.postrenew
+	- per-domain postrenew script (domain.*.postrenew)
+	- Improve Makefile.PL (--no-autoinstall option).
+
+1.04 2017-09-13
+
+	- This version introduces acmeman configuration file, which can be
+	used to direct its action if a server other than Apache is used. It
+	also can be instructed to store certificate, certificate chain, and
+	certificate key in a single file, instead of three different ones.
+	This can be used with such servers as pound(8).
+
+        In the absense of a configuration file, the program operates as in
+        previous versions.
+
+1.00 2017-02-09
+
+	- Initial version (Git)

@@ -1,5 +1,12 @@
 Revision history for Perl module XML::RSS
 
+1.61    2019-08-24
+    - Clarified the docs regarding DateTime objects.
+        - Thanks to shtrb
+    - Add 2.0 to the version list, fix broken links to versions
+        - Thanks to E. Choroba
+    - Changed to explicit imports in "use" statements.
+
 1.60    2018-04-03
     - Convert to Dist-Zilla.
     - Add Travis-CI support.

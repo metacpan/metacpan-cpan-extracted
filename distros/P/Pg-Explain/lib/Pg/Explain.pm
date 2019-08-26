@@ -11,11 +11,11 @@ Pg::Explain - Object approach at reading explain analyze output
 
 =head1 VERSION
 
-Version 0.80
+Version 0.81
 
 =cut
 
-our $VERSION = '0.80';
+our $VERSION = '0.81';
 
 =head1 SYNOPSIS
 
@@ -80,7 +80,7 @@ Takes one of (only one!) (source, source_file) parameters, and either parses it 
 
 sub new {
     my $class = shift;
-    my $self = bless {}, $class;
+    my $self  = bless {}, $class;
     my %args;
     if ( 0 == scalar @_ ) {
         croak( 'One of (source, source_file) parameters has to be provided)' );
@@ -155,7 +155,7 @@ sub parse_source {
         require Pg::Explain::FromXML;
         $self->{ 'top_node' } = Pg::Explain::FromXML->new()->parse_source( $source );
     }
-    elsif ( $source =~ m{ ^ (\s*) \[ \s* \n .*? \1 \] \s* }xms ) {
+    elsif ( $source =~ m{ ^ \s* \[ .*? \] \s* }xms ) {
         require Pg::Explain::FromJSON;
         $self->{ 'top_node' } = Pg::Explain::FromJSON->new()->parse_source( $source );
     }

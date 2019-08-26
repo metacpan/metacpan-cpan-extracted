@@ -4,20 +4,23 @@ use 5.022;
 use feature qw /postderef signatures/;
 
 package Vote::Count::Method::CondorcetIRV;
+use namespace::autoclean;
+use Moose;
+extends 'Vote::Count';
 
-use Exporter::Easy ( EXPORT => [ 'SmithSetIRV' ] );
+# use Exporter::Easy ( EXPORT => [ 'SmithSetIRV' ] );
 
 # use namespace::autoclean;
 # use Moose;
 # extends 'Vote::Count';
 
-our $VERSION='0.021';
+our $VERSION='0.022';
 
 =head1 NAME
 
 Vote::Count::Method::CondorcetIRV
 
-=head1 VERSION 0.021
+=head1 VERSION 0.022
 
 =cut
 
@@ -36,11 +39,7 @@ Vote::Count::Method::CondorcetIRV
 
 =head1 Description
 
-Provides Common Basic Condorcet-IRV Methods. These methods are simple and beat most other Condorcet Methods on Later Harm.
-
-The author of Vote::Count recomends serious consideration to these methods and Redactionive Condorcet methods.
-
-These methods can all be considered Sufficient in Resolvability, although specifiying a tie breaker is as always recommended.
+Provides Common Basic Condorcet-IRV Methods. These methods are simple and beat other Condorcet Methods on Later Harm.
 
 This module exports the methods it provides which expect a Vote::Count object as an argument.
 
@@ -50,7 +49,7 @@ Identifies the Smith Set and runs IRV on it.
 
 =head2 Function Name: SmithSetIRV
 
-SmithSetIRV is exported and requires a Vote::Count object, an optional second argument is an IRV tiebreaker rule name (see IRV module). It will return the winner, in the event of the tie it will return the empty string and the Vote::Count Object's Active Set will be the tied choices (available for any later tie breakers you would implement). Events will be logged to the Vote::Count Object.
+SmithSetIRV is exported and requires a Vote::Count object, an optional second argument is an IRV tiebreaker rule name (see IRV module). It will return a hashref similar to RunIRV, in the event of a tie the Vote::Count Object's Active Set will also be the tied choices (available for any later tie breakers you would implement). Events will be logged to the Vote::Count Object.
 
 =head2 Criteria
 
@@ -90,22 +89,23 @@ sub SmithSetIRV ( $E, $tiebreaker='all' ) {
   my $winner = $matrix->CondorcetWinner();;
   if ( $winner) {
     $E->logv( "Condorcet Winner: $winner");
+    return { 
+      'winner' => $winner,
+      'tied' => 0
+    };
   } else {
     my $Smith = $matrix->SmithSet();
     $E->logv( "Smith Set: " . join( ',', sort( keys $Smith->%* )));
     my $IRV = $E->RunIRV( $Smith, $tiebreaker );
-    $winner = $IRV->{'winner'};
-    unless ( $winner ) {
+    unless ( $IRV->{'winner'} ) {
       $winner = '';
       $E->SetActive( {map { $_ => 1 } ( $IRV->{'tied'}->@* )});
     }
+    return $IRV;
   }
-  return $winner;
 }
 
 1;
-
-
 
 #FOOTER
 

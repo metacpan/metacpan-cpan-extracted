@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use parent 'XT::Files::Plugin';
 
@@ -65,7 +65,7 @@ XT::Files::Plugin::Default - plugin with default configuration
 
 =head1 VERSION
 
-Version 0.001
+Version 0.002
 
 =head1 SYNOPSIS
 

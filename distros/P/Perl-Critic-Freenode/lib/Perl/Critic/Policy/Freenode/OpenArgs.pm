@@ -6,7 +6,7 @@ use warnings;
 use Perl::Critic::Utils qw(:severities :classification :ppi);
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '0.029';
+our $VERSION = '0.030';
 
 use constant DESC => 'open() called with less than 3 arguments';
 use constant EXPL => 'The one- and two-argument forms of open() parse functionality from the filename, use the three-argument form instead.';

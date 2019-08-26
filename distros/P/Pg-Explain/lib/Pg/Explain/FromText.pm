@@ -9,11 +9,11 @@ Pg::Explain::FromText - Parser for text based explains
 
 =head1 VERSION
 
-Version 0.80
+Version 0.81
 
 =cut
 
-our $VERSION = '0.80';
+our $VERSION = '0.81';
 
 =head1 SYNOPSIS
 
@@ -31,7 +31,7 @@ This is not really useful in this particular class, but it's to have the same AP
 
 sub new {
     my $class = shift;
-    my $self = bless {}, $class;
+    my $self  = bless {}, $class;
     return $self;
 }
 
@@ -107,7 +107,7 @@ sub parse_source {
                 delete $element_at_depth{ $key };
             }
 
-            my $maximal_depth = ( sort { $b <=> $a } keys %element_at_depth )[ 0 ];
+            my $maximal_depth    = ( sort { $b <=> $a } keys %element_at_depth )[ 0 ];
             my $previous_element = $element_at_depth{ $maximal_depth };
 
             $element_at_depth{ $prefix_length } = $element;
@@ -137,7 +137,7 @@ sub parse_source {
             my @remove_elements = grep { $_ >= length $prefix } keys %element_at_depth;
             delete @element_at_depth{ @remove_elements } unless 0 == scalar @remove_elements;
 
-            my $maximal_depth = ( sort { $b <=> $a } keys %element_at_depth )[ 0 ];
+            my $maximal_depth    = ( sort { $b <=> $a } keys %element_at_depth )[ 0 ];
             my $previous_element = $element_at_depth{ $maximal_depth };
 
             $element_at_depth{ length $prefix } = {
@@ -152,7 +152,7 @@ sub parse_source {
             my @remove_elements = grep { $_ >= length $prefix } keys %element_at_depth;
             delete @element_at_depth{ @remove_elements } unless 0 == scalar @remove_elements;
 
-            my $maximal_depth = ( sort { $b <=> $a } keys %element_at_depth )[ 0 ];
+            my $maximal_depth    = ( sort { $b <=> $a } keys %element_at_depth )[ 0 ];
             my $previous_element = $element_at_depth{ $maximal_depth };
 
             $element_at_depth{ length $prefix } = {

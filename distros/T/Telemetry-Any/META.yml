@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.2, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.0.16, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,7 +28,7 @@ no_index:
 provides:
   Telemetry::Any:
     file: lib/Telemetry/Any.pm
-    version: '0.02'
+    version: '0.05'
 requires:
   Devel::Timer: '0.12'
   perl: '5.008001'
@@ -36,7 +36,6 @@ resources:
   bugtracker: https://github.com/ivanych/Telemetry-Any/issues
   homepage: https://github.com/ivanych/Telemetry-Any
   repository: git://github.com/ivanych/Telemetry-Any.git
-version: '0.02'
+version: '0.05'
 x_authority: cpan:IVANYCH
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
-x_static_install: 1

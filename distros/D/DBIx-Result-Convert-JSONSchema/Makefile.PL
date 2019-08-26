@@ -17,7 +17,6 @@ WriteMakefile(
         'Carp'            => 0,
         'Module::Load'    => 0,
         'Readonly'        => 0,
-        'Storable'        => 0,
         'FindBin'         => 0,
     },
     BUILD_REQUIRES => {

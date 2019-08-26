@@ -1,5 +1,5 @@
 package App::Notifier::Service;
-$App::Notifier::Service::VERSION = '0.0700';
+$App::Notifier::Service::VERSION = '0.0701';
 use 5.014;
 
 use Dancer2;
@@ -138,13 +138,9 @@ __END__
 
 =encoding utf-8
 
-=head1 NAME
-
-App::Notifier::Service
-
 =head1 VERSION
 
-version 0.0700
+version 0.0701
 
 =head1 SYNOPSIS
 
@@ -181,10 +177,6 @@ version 0.0700
 
 App::Notifier::Service - an HTTP service for the notifier application for
 notifying that an event (such as the finish of a task) occured.
-
-=head1 VERSION
-
-version 0.0700
 
 =head1 AUTHOR
 
@@ -351,9 +343,9 @@ The code is open to the world, and available for you to hack on. Please feel fre
 with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
 from your repository :)
 
-L<https://github.com/shlomif/app-notifier-service>
+L<https://github.com/shlomif/app-notifier>
 
-  git clone https://bitbucket.org/shlomif/app-notifier
+  git clone git://github.com/shlomif/app-notifier.git
 
 =head1 AUTHOR
 
@@ -362,7 +354,7 @@ Shlomi Fish <shlomif@cpan.org>
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/app-notifier-service/issues>
+L<https://github.com/shlomif/app-notifier/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

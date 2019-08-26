@@ -6,7 +6,7 @@ use warnings;
 #require 5.010;
 
 package Mail::DKIM;
-our $VERSION = 0.55;
+our $VERSION = 0.56;
 
 our $SORTTAGS = 0;
 

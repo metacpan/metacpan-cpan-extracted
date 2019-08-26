@@ -1,8 +1,7 @@
-
 /* Copyright 2018-2019 Richard Kelsch, All Rights Reserved
    See the Perl documentation for Graphics::Framebuffer for licensing information.
 
-   Version:  6.24
+   Version:  6.31
 */
 
 #include <stdlib.h>
@@ -10,6 +9,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <linux/fb.h>
+#include <linux/kd.h>
 #include <sys/mman.h>
 #include <sys/ioctl.h>
 #include <math.h>
@@ -45,9 +45,7 @@ struct fb_fix_screeninfo finfo;
 
 // This gets the framebuffer info and populates the above structures, then runs them to Perl
 void c_get_screen_info(char *fb_file) {
-    int fbfd = 0;
-
-    fbfd = open(fb_file,O_RDWR);
+    int fbfd = open(fb_file,O_RDWR);
     ioctl(fbfd, FBIOGET_FSCREENINFO, &finfo);
     ioctl(fbfd, FBIOGET_VSCREENINFO, &vinfo);
     close(fbfd);
@@ -109,6 +107,21 @@ void c_get_screen_info(char *fb_file) {
     Inline_Stack_Done;
 }
 
+void c_text_mode(char *tty_file) 
+{
+   int tty_fd = open(tty_file,O_RDWR);
+   ioctl(tty_fd,KDSETMODE,KD_TEXT);
+   close(tty_fd);
+}
+
+void c_graphics_mode(char *tty_file) 
+{
+   int tty_fd = open(tty_file,O_RDWR);
+   ioctl(tty_fd,KDSETMODE,KD_GRAPHICS);
+   close(tty_fd);
+}
+
+
 /* The other routines call this.  It handles all draw modes
  * 
  * Normally I would add code to properly place the RGB values according to
@@ -129,7 +142,7 @@ void c_plot(
     unsigned int bytes_per_line,
     short xoffset, short yoffset)
 {
-    if (x >= x_clip && x <= xx_clip && y >= y_clip && y <= yy_clip) {
+    if (x >= x_clip && x <= xx_clip && y >= y_clip && y <= yy_clip) { // Make sure the pixel is within the clipped area
         x += xoffset;
         y += yoffset;
         unsigned int index = (x * bytes_per_pixel) + (y * bytes_per_line);
@@ -138,19 +151,19 @@ void c_plot(
                 switch(bits_per_pixel) {
                     case 32 : 
                         {
-                           *((unsigned int*)(framebuffer + index)) = color;
+                           *((unsigned int*)(framebuffer + index)) = color; // 32 bit drawing can send a long word in one operation.  Which is why it is the fastest.
                         }
                         break;
                     case 24 :
                         {
-                            *(framebuffer + index)     = color         & 255;
+                            *(framebuffer + index)     = color         & 255; // 24 Bit requites one byte at a time.  Not as efficient as 32 bit.
                             *(framebuffer + index + 1) = (color >> 8)  & 255;
                             *(framebuffer + index + 2) = (color >> 16) & 255;
                         }
                         break;
                     case 16 :
                         {
-                            *((unsigned short*)(framebuffer + index)) = (short) color;
+                            *((unsigned short*)(framebuffer + index)) = (short) color; // 16 bit can send a word at a time, the second most efficient method.
                         }
                         break;
                 }
@@ -1422,15 +1435,15 @@ void c_flip_horizontal(char* pixels, short width, short height, unsigned char by
 }
 
 void c_flip_vertical(char *pixels, short width, short height, unsigned char bytes_per_pixel) {
-    unsigned int stride = width * bytes_per_pixel;        // Bytes per line
-    unsigned char *row  = malloc(stride);                 // Allocate a temporary buffer
+    unsigned int bufsize = width * bytes_per_pixel;        // Bytes per line
+    unsigned char *row  = malloc(bufsize);                 // Allocate a temporary buffer
     unsigned char *low  = pixels;                         // Pointer to the beginning of the image
-    unsigned char *high = &pixels[(height - 1) * stride]; // Pointer to the last line in the image
+    unsigned char *high = &pixels[(height - 1) * bufsize]; // Pointer to the last line in the image
 
-    for (; low < high; low += stride, high -= stride) { // Stop when you reach the middle
-          memcpy(row,low,stride);    // Make a copy of the lower line
-          memcpy(low,high,stride);   // Copy the upper line to the lower
-          memcpy(high, row, stride); // Copy the saved copy to the upper line
+    for (; low < high; low += bufsize, high -= bufsize) { // Stop when you reach the middle
+          memcpy(row,low,bufsize);    // Make a copy of the lower line
+          memcpy(low,high,bufsize);   // Copy the upper line to the lower
+          memcpy(high, row, bufsize); // Copy the saved copy to the upper line
     }
     free(row); // Release the temporary buffer
 }

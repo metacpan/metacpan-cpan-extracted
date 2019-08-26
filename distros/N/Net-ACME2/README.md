@@ -92,7 +92,7 @@ a new version of this module.
 - Support for both ECDSA and RSA encrytion.
 - Support for http-01, dns-01, and [tls-alpn-01](https://datatracker.ietf.org/doc/draft-ietf-acme-tls-alpn/) challenges.
 - Comprehensive error handling with typed, [X::Tiny](https://metacpan.org/pod/X::Tiny)-based exceptions.
-- [Retry POST (once) on `badNonce` errors.](https://tools.ietf.org/html/rfc8555#section-6.5)
+- [Retry POST on `badNonce` errors.](https://tools.ietf.org/html/rfc8555#section-6.5)
 - This is a pure-Perl solution. Most of its dependencies are
 either core modules or pure Perl themselves. XS is necessary to
 communicate with the ACME server via TLS; however, most Perl installations

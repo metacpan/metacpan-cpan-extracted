@@ -104,7 +104,7 @@ a new version of this module.
 
 =item * Comprehensive error handling with typed, L<X::Tiny>-based exceptions.
 
-=item * L<Retry POST (once) on C<badNonce> errors.|https://tools.ietf.org/html/rfc8555#section-6.5>
+=item * L<Retry POST on C<badNonce> errors.|https://tools.ietf.org/html/rfc8555#section-6.5>
 
 =item * This is a pure-Perl solution. Most of its dependencies are
 either core modules or pure Perl themselves. XS is necessary to
@@ -156,7 +156,7 @@ use Net::ACME2::HTTP;
 use Net::ACME2::Order;
 use Net::ACME2::Authorization;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use constant {
     _HTTP_OK => 200,

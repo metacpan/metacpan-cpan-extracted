@@ -1,4 +1,4 @@
-6.30 Aug 11, 2019
+6.32 Aug 25, 2019
 package Graphics::Framebuffer;
 
 =head1 NAME
@@ -366,6 +366,9 @@ use constant {
     FBIOGET_DISPINFO    => 0x4618,
     FBIO_WAITFORVSYNC   => 0x4620,
     VT_GETSTATE         => 0x5603,
+    KDSETMODE           => 0x4B3A,
+    KD_GRAPHICS         => 1,
+    KD_TEXT             => 0,
 
     # FLAGS
     FBINFO_HWACCEL_NONE      => 0x0000,    # These come from "fb.h" in the kernel source
@@ -475,6 +478,7 @@ BEGIN {
 
 DESTROY { # Always clean up after yourself before exiting
     my $self = shift;
+    $self->text_mode();
     $self->_screen_close();
     _reset() if ($self->{'RESET'});    # Exit by calling 'reset' first
 }
@@ -861,6 +865,9 @@ sub new {
         'FBIOGET_DISPINFO'    => 0x4618,
         'FBIO_WAITFORVSYNC'   => 0x4620,
         'VT_GETSTATE'         => 0x5603,
+        'KDSETMODE'           => 0x4B3A,
+        'KD_GRAPHICS'         => 1,
+        'KD_TEXT'             => 0,
 
         # FLAGS
         'FBINFO_HWACCEL_NONE'      => 0x0000,    # These come from "fb.h" in the kernel source
@@ -1314,6 +1321,7 @@ To get back into X-Windows, you just hit ALT-F7 (or ALT-F8 on some systems).
         }
     }
     $self->_flush_screen();
+    chomp($self->{'this_tty'} = `tty`);
     if ($self->{'SPLASH'} > 0) {
         $self->splash($VERSION);
         sleep $self->{'SPLASH'};
@@ -1378,6 +1386,28 @@ sub _screen_close {
         delete($self->{'FB'});              # We leave no remnants
     }
     delete($self->{'SCREEN'});
+}
+
+=head2 text_mode
+
+Sets the TTY into text mode, where text can interfere with the display
+
+=cut
+
+sub text_mode {
+    my $self = shift;
+    c_text_mode($self->{'this_tty'});
+}
+
+=head2 graphics_mode
+
+Sets the TTY in exclusive graphics mode, where text and cursor cannot interfere with the display.  Please remember, you must call text_mode before exiting, else your console will not show any text!
+
+=cut
+
+sub graphics_mode {
+    my $self = shift;
+    c_graphics_mode($self->{'this_tty'});
 }
 
 =head2 screen_dimensions

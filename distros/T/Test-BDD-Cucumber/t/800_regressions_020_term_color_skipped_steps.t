@@ -13,7 +13,7 @@ use Test::BDD::Cucumber::Parser;
 use Test::BDD::Cucumber::Executor;
 use Test::BDD::Cucumber::Harness::TermColor;
 
-# https://github.com/pjlsergeant/test-bdd-cucumber-perl/issues/40
+# https://github.com/pherkin/test-bdd-cucumber-perl/issues/40
 # Incorrect TermColor output for skipped tests
 
 my $feature = Test::BDD::Cucumber::Parser->parse_string( join '', (<DATA>) );
@@ -21,7 +21,6 @@ my $executor = Test::BDD::Cucumber::Executor->new();
 $executor->add_steps( [ Given => qr/(a) f(o)o b(a)r (baz)/, sub { 1; } ], );
 
 my $expected = <<END;
-
 [0]  [97]Foo[0]
 
 [0]    [97]Scenario: [94]Bar[0]

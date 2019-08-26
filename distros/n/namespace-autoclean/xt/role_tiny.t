@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Test::More;
-use Test::Requires { 'Role::Tiny' => '1.003000' };
+use Test::Needs 'Role::Tiny';
 use Module::Runtime 'require_module';
 
 use lib 'xt/lib';

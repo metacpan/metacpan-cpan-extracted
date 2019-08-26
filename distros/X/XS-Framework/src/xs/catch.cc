@@ -24,7 +24,7 @@ static std::string get_type_name (const std::type_info& ti) {
     return ret;
 }
 
-static Sv _exc2sv_default (pTHX_ const Sub&) {
+static Sv _exc2sv_default (const Sub&) {
     try { throw; }
     catch (SV* err)                  { return err; }
     catch (Sv& err)                  { return err; }
@@ -33,6 +33,7 @@ static Sv _exc2sv_default (pTHX_ const Sub&) {
     catch (const panda::string& err) { return Simple(err); }
     catch (const std::string& err)   { return Simple(string_view(err.data(), err.length())); }
     catch (std::exception& err) {
+        dTHX;
         auto tn = get_type_name(typeid(err));
         SV* errsv = newSVpv(tn.data(), 0);
         sv_catpv(errsv, " ");
@@ -40,6 +41,7 @@ static Sv _exc2sv_default (pTHX_ const Sub&) {
         return Sv::noinc(errsv);
     }
     catch (std::exception* err) {
+        dTHX;
         auto tn = get_type_name(typeid(*err));
         SV* errsv = newSVpv(tn.data(), 0);
         sv_catpv(errsv, " ");
@@ -47,6 +49,7 @@ static Sv _exc2sv_default (pTHX_ const Sub&) {
         return Sv::noinc(errsv);
     }
     catch (...) {
+        dTHX;
         auto tn = get_type_name(*abi::__cxa_current_exception_type());
         SV* errsv = newSVpv(tn.data(), 0);
         sv_catpv(errsv, " exception");
@@ -55,18 +58,18 @@ static Sv _exc2sv_default (pTHX_ const Sub&) {
     return Sv();
 }
 
-static Sv _exc2sv_impl (pTHX_ const Sub& context, int i) {
-    if (i < 0) return _exc2sv_default(aTHX_ context); // no 1 has catched the exception, apply defaults
+static Sv _exc2sv_impl (const Sub& context, int i) {
+    if (i < 0) return _exc2sv_default(context); // no 1 has catched the exception, apply defaults
     if (i >= (int)catch_handlers.size()) i = catch_handlers.size() - 1;
     try {
         auto ret = catch_handlers[i](context);
         if (ret) return ret;
     }
     catch (...) {}
-    return _exc2sv_impl(aTHX_ context, i-1);
+    return _exc2sv_impl(context, i-1);
 }
 
-Sv _exc2sv (pTHX_ const Sub& context) { return _exc2sv_impl(aTHX_ context, catch_handlers.size() - 1); }
+Sv _exc2sv (const Sub& context) { return _exc2sv_impl(context, catch_handlers.size() - 1); }
 
 void add_catch_handler (CatchHandler h) {
     catch_handlers.push_back(h);

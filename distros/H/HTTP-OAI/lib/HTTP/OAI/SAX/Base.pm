@@ -4,7 +4,7 @@ package HTTP::OAI::SAX::Base;
 
 use strict;
 
-our $VERSION = '4.08';
+our $VERSION = '4.09';
 
 sub toString
 {

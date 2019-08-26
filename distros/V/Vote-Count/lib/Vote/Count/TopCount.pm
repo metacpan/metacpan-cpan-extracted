@@ -16,13 +16,13 @@ use TextTableTiny 'generate_markdown_table';
 
 # ABSTRACT: TopCount and related methods for Vote::Count. Toolkit for vote counting.
 
-our $VERSION='0.021';
+our $VERSION='0.022';
 
 =head1 NAME
 
 Vote::Count::TopCount
 
-=head1 VERSION 0.021
+=head1 VERSION 0.022
 
 =head1 Synopsis
 
@@ -67,7 +67,7 @@ TOPCOUNTBALLOTS:
 
 Will find the majority winner from the results of a topcount, or alternately may be given undef and a hashref of active choices and will topcount the ballotset for just those choices and then find the majority winner.
 
-Returns a hashref of results. It will always include the votes in the round and the thresshold for majority. If there is a winner it will also include the winner and winvotes.
+Returns a hashref of results. It will always include the votes in the round and the threshold for majority. If there is a winner it will also include the winner and winvotes.
 
 =cut
 
@@ -77,13 +77,13 @@ sub TopCountMajority ( $self, $topcount = undef, $active = undef ) {
   my $topc = $topcount->RawCount();
   my $numvotes = $topcount->CountVotes();
   my @choices  = keys $topc->%*;
-  my $thresshold = 1 + int( $numvotes / 2 );
+  my $threshold = 1 + int( $numvotes / 2 );
   for my $t (@choices) {
-    if ( $topc->{$t} >= $thresshold ) {
+    if ( $topc->{$t} >= $threshold ) {
       return (
         {
           votes      => $numvotes,
-          thresshold => $thresshold,
+          threshold => $threshold,
           winner     => $t,
           winvotes   => $topc->{$t}
         }
@@ -94,7 +94,7 @@ sub TopCountMajority ( $self, $topcount = undef, $active = undef ) {
   return (
     {
       votes      => $numvotes,
-      thresshold => $thresshold
+      threshold => $threshold
     }
   );
 }
@@ -112,7 +112,7 @@ sub EvaluateTopCountMajority ( $self, $topcount = undef, $active = undef) {
     my $rows = [
       [ 'Winner',                    $winner ],
       [ 'Votes in Final Round',      $majority->{'votes'} ],
-      [ 'Votes Needed for Majority', $majority->{'thresshold'} ],
+      [ 'Votes Needed for Majority', $majority->{'threshold'} ],
       [ 'Winning Votes',             $majority->{'winvotes'} ],
     ];
     $self->logt(
@@ -148,4 +148,3 @@ LICENSE
 This module is released under the GNU Public License Version 3. See license file for details. For more information on this license visit L<http://fsf.org>.
 
 =cut
-

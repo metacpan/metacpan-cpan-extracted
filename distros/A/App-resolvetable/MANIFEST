@@ -11,6 +11,7 @@ lib/App/resolvetable.pm
 script/resolvetable
 share/images/Screenshot_20190530_111051.png
 share/images/Screenshot_20190530_112052.png
+share/images/Screenshot_20190820_235000-redacted.png
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t

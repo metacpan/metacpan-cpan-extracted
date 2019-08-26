@@ -1,5 +1,5 @@
 ---
-abstract: 'Add 32nd, 64th and tuplet durations to MIDI-Perl'
+abstract: 'Add 32nd, 64th, 128th and tuplet durations to MIDI-Perl'
 author:
   - 'Gene Boggs <gene@cpan.org>'
 build_requires:
@@ -24,9 +24,9 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Music-Duration
-  repository: https://github.com/ology/Music-Duration
-version: '0.0605'
+  homepage: https://github.com/ology/Music-Duration
+  repository: https://github.com/ology/Music-Duration.git
+version: '0.0702'
 x_Dist_Zilla:
   perl:
     version: '5.027007'
@@ -191,9 +191,9 @@ x_Dist_Zilla:
       name: MetaJSON
       version: '6.012'
     -
-      class: Dist::Zilla::Plugin::MetaResources
-      name: MetaResources
-      version: '6.012'
+      class: Dist::Zilla::Plugin::GithubMeta
+      name: GithubMeta
+      version: '0.58'
     -
       class: Dist::Zilla::Plugin::Test::PodSpelling
       config:
@@ -343,4 +343,4 @@ x_Dist_Zilla:
     version: '6.012'
 x_authority: cpan:GENE
 x_generated_by_perl: v5.27.7
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_serialization_backend: 'YAML::Tiny version 1.73'

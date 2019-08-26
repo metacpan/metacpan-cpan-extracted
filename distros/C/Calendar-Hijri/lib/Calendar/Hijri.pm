@@ -6,7 +6,7 @@ Calendar::Hijri - Interface to Islamic Calendar.
 
 =head1 VERSION
 
-Version 0.41
+Version 0.42
 
 =cut
 
@@ -20,7 +20,7 @@ with 'Calendar::Plugin::Renderer';
 
 use overload q{""} => 'as_string', fallback => 1;
 
-$Calendar::Hijri::VERSION   = '0.41';
+$Calendar::Hijri::VERSION   = '0.42';
 $Calendar::Hijri::AUTHORITY = 'cpan:MANWAR';
 
 has year  => (is => 'rw', predicate => 1);

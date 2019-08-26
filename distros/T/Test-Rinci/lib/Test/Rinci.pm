@@ -2,8 +2,8 @@
 
 package Test::Rinci;
 
-our $DATE = '2018-11-22'; # DATE
-our $VERSION = '0.152'; # VERSION
+our $DATE = '2019-08-20'; # DATE
+our $VERSION = '0.153'; # VERSION
 
 use 5.010001;
 use strict;
@@ -56,6 +56,7 @@ sub _test_function_metadata {
   TEST_ARGS:
     {
         require Data::Sah;
+        require Data::Dmp;
         last unless $meta->{args};
         for my $argname (sort keys %{ $meta->{args} }) {
             my $argspec = $meta->{args}{$argname};
@@ -63,9 +64,16 @@ sub _test_function_metadata {
             # test that default values passes schema
             if ($argspec->{schema} && exists($argspec->{default})) {
                 my $v = Data::Sah::gen_validator(
-                    $argspec->{schema}, {return_type=>'str'});
-                my $err = $v->($argspec->{default});
-                $Test->is_eq($err, '', "default value for arg '$argname' validates against schema") or $ok = 0;
+                    $argspec->{schema}, {return_type=>'str+val'});
+                my $v_res = $v->($argspec->{default});
+                my ($err, $val) = @{$v_res};
+                $err //= '';
+                #$Test->explain($v_res);
+                #use DD; dd $v_res;
+                $Test->is_eq(
+                    $err, '',
+                    "default value for arg '$argname' (".Data::Dmp::dmp($argspec->{default}).", coerced as ".Data::Dmp::dmp($val).
+                        ") validates against schema (".Data::Dmp::dmp($argspec->{schema}).")") or $ok = 0;
             }
         }
     }
@@ -328,7 +336,7 @@ Test::Rinci - Test Rinci metadata
 
 =head1 VERSION
 
-This document describes version 0.152 of Test::Rinci (from Perl distribution Test-Rinci), released on 2018-11-22.
+This document describes version 0.153 of Test::Rinci (from Perl distribution Test-Rinci), released on 2019-08-20.
 
 =head1 SYNOPSIS
 
@@ -460,7 +468,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

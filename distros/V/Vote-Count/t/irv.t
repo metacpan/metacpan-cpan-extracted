@@ -39,7 +39,7 @@ my $ex1 = {
   'votes'      => 15,
   'winner'     => 'MINTCHIP',
   'winvotes'   => 8,
-  'thresshold' => 8,
+  'threshold' => 8,
 };
 is_deeply( $r1, $ex1, 'returns set with Mintchip winning 8 of 15 votes');
 
@@ -54,7 +54,7 @@ my $ex2 = {
   'votes'      => 216,
   'winner'     => 'MINTCHIP',
   'winvotes'   => 122,
-  'thresshold' => 109,
+  'threshold' => 109,
 };
 is_deeply( $r2, $ex2, 'returns set with Mintchip winning 122 of 216 votes');
 # need test of tie at the top.
@@ -94,53 +94,71 @@ my $logcheck2 = q/Eliminating:PISTACHIO---IRVRound4/;
     "compare terse log to expected log" );
 };
 
-subtest 'tiebreakers' => sub {
-  my $active = {
-    PISTACHIO => 0,
-    ROCKYROAD => 0,
-    CHOCOLATE => 0,
-    VANILLA => 0,
+subtest 'tie resolution' => sub {
+  $B3->SetActive( $B3->BallotSet->{'choices'});
+  my $all = $B3->RunIRV( undef, 'all');
+  my $ex_all = {
+    tie => 1, tied => [ 'CHOCOLATE','VANILLA' ], winner => 0
   };
-  my $I5 = Vote::Count->new(
-  BallotSet => read_ballots('t/data/irvtie.txt'));
-  my @resolve1 = sort $I5->_IRVTieBreaker(
-    'all', $active, ( 'VANILLA', 'CHOCOLATE' ) );
-  is_deeply(
-    \@resolve1,
-    [ 'CHOCOLATE', 'VANILLA'],
-    'All returns both tied choices' );
-  my @resolve2 = sort $I5->_IRVTieBreaker(
-    'borda', $active,
-    ( 'VANILLA', 'CHOCOLATE' ) );
-  is_deeply(
-    \@resolve2,
-    [ 'CHOCOLATE'],
-    'Borda returns choice that won' );
-  my @resolve3 = sort
-    $I5->_IRVTieBreaker( 'borda_all', $active, ( 'VANILLA', 'CHOCOLATE' ) );
-  is_deeply(
-    \@resolve3,
-    [ 'VANILLA'],
-    'borda_all returns choice that won (different winner than borda on active!)' );
-  my @resolve4 = sort
-    $I5->_IRVTieBreaker( 'approval', $active, ( 'VANILLA', 'CHOCOLATE' ) );
-  is_deeply(
-    \@resolve4,
-    [ 'CHOCOLATE', 'VANILLA'],
-    'approval returns a tie for the top2' );
-  my @resolve5 = sort
-    $I5->_IRVTieBreaker( 'approval', $active, ( 'VANILLA', 'ROCKYROAD' ) );
-  is_deeply(
-    \@resolve5,
-    [ 'VANILLA'],
-    'approval winner for a non-tied pair' );
+  is_deeply( $all, $ex_all, 'tie at top with default all');
+  my $approval = $B3->RunIRV( undef, 'approval');
+  is_deeply( $approval, $ex_all, 'tie at top with approval');
+  my $gj = $B3->RunIRV( undef, 'grandjunction');
+  is( $gj->{'winner'}, 'VANILLA', 'grandjunction broke tie correctly');
 
-  my @resolve6 = sort
-    $I5->_IRVTieBreaker( 'grandjunction', $active, ( 'VANILLA', 'ROCKYROAD' ) );
-  is_deeply(
-    \@resolve6,
-    [ 'VANILLA'],
-    'modified grand junction' );
+  my $ballotsirvtie2 = read_ballots('t/data/irvtie2.txt');
+  my $B4 = Vote::Count->new(
+      BallotSet => $ballotsirvtie2,
+      TieBreakMethod => 'approval');
+  my $B5 = Vote::Count->new(
+      BallotSet => $ballotsirvtie2,
+      TieBreakMethod => 'approval');
+  my $B6 = Vote::Count->new(
+      BallotSet => $ballotsirvtie2,);
+
+# note $B4->TopCount()->RankTable();
+# note $B4->Approval()->RankTable();
+
+my $b4expect = { 
+    'tie'    => 1, 
+    'tied'   => [ "CHOCOLATE", "VANILLA" ],
+    'winner' => 0
 };
+
+note( 'the next 3 use the same ballotset, but all, approval, and grandjunction return a tie and different winners');
+
+  # B4 defaulted to approval, try it with all.
+my $b4all = undef ; $B4->RunIRV( undef, 'all');
+
+
+# is_deeply( $b4all, $b4expect,
+#   'with all specified over object setting approval tiebreaker irvties2 is a tie');
+
+my $b5expect = {
+    'threshold'   => 45,
+    'votes'        => 89,
+    'winner'       => "CHOCOLATE",
+    'winvotes'     => 89
+};
+my $b5approval = $B5->RunIRV( );
+is_deeply( $b5approval, $b5expect, "approval set in object run defaults expected result" );
+
+# note $B5->logv();
+# p $b5approval;
+
+# note $B6->TopCount()->RankTable();
+my $b6junction = $B6->RunIRV(undef, 'grandjunction');
+my $b6expect = {
+    'threshold'   => 46,
+    'votes'        => 90,
+    'winner'       => "VANILLA",
+    'winvotes'     => 90
+};
+is_deeply( $b6junction, $b6expect, 'grandjunction as last 2 different winner' );
+# p $b6junction;
+# note $B6->logv();
+# note $b4all->logv();
+};
+
 
 done_testing();

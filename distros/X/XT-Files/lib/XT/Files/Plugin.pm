@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Class::Tiny 1 qw(name xtf);
 
@@ -49,7 +49,7 @@ XT::Files::Plugin - base class for XT::Files plugins
 
 =head1 VERSION
 
-Version 0.001
+Version 0.002
 
 =head1 SYNOPSIS
 

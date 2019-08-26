@@ -21,5 +21,6 @@ t/05-get_value(_flag).t
 t/06-raise.t
 t/07-drop.t
 t/08-get_all.t
+t/09-get_name.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

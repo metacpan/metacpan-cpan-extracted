@@ -12,13 +12,13 @@ use namespace::autoclean;
 
 no warnings 'experimental';
 
-our $VERSION='0.021';
+our $VERSION='0.022';
 
 =head1 NAME
 
 Vote::Count::Redact
 
-=head1 VERSION 0.021
+=head1 VERSION 0.022
 
 Methods for Redacting Ballots.
 
@@ -91,7 +91,7 @@ REDACTSINGLELOOP:
 
 =head2 RedactPair
 
-For a Ballot Set and two choices, on each ballot where both appear it removes the later one, returning a completely independent new BallotSet.
+For a Ballot Set and two choices, on each ballot where both appear it removes the later one and all subsequent choices, returning a completely independent new BallotSet. It is necessary to remove later choices, because otherwise the ballot would be voting against the target later choice, not merely not voting for.
 
   my $newBallotSet = RedactPair( $VoteCountObject->BallotSet(), 'A', 'B');
 
@@ -113,13 +113,19 @@ REDACTPAIRLOOP:
       if ( $v eq $A ) {
         while (@oldvote) {
           my $u = shift @oldvote;
-          push @newvote, ($u) unless $u eq $B;
+# If the other redaction member is the present vote
+# truncate this vote from here on by setting oldvote to empty array.          
+          if ( $u eq $B ) { @oldvote = () }
+          else {push @newvote, ($u)};
         }
       }
       elsif ( $v eq $B ) {
         while (@oldvote) {
           my $u = shift @oldvote;
-          push @newvote, ($u) unless $u eq $A;
+# If the other redaction member is the present vote
+# truncate this vote from here on by setting oldvote to empty array.          
+          if ( $u eq $A ) { @oldvote = () }
+          else { push @newvote, ($u)};
         }
       }
       else { }

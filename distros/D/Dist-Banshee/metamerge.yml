@@ -1,0 +1,6 @@
+name: Dist-Banshee
+author:
+- Leon Timmermans
+license:
+- perl
+abstract: A lean authoring tool

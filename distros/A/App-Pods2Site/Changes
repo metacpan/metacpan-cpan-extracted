@@ -1,5 +1,19 @@
 Revision history for App-Pods2Site
 
+1.002	2019-08-24
+
+	Minor layout changes of header/main page
+
+1.001	2019-08-22
+
+	Make a proper guy out of us with a shiny version! (no real code changes)
+
+0.016	2019-08-22
+
+	* A typo in the default lib location config names caused a lib location to be left out
+	* All files should have a version number
+	
+
 0.015	2019-01-08
 
 	Support the use of ':path' as an argument to --bindir in order to pick up scripts in the PATH

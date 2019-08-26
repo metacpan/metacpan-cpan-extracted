@@ -156,11 +156,11 @@ struct Stash : Hash {
         return ret;
     }
 
-    Sub next_method        (const Sub& current) const { return xs::next::method(aTHX_ (HV*)sv, current.get<CV>()); }
-    Sub next_method_strict (const Sub& current) const { return xs::next::method_strict(aTHX_ (HV*)sv, current.get<CV>()); }
+    Sub next_method        (const Sub& current) const { return xs::next::method((HV*)sv, current.get<CV>()); }
+    Sub next_method_strict (const Sub& current) const { return xs::next::method_strict((HV*)sv, current.get<CV>()); }
 
-    Sub super_method        (const Sub& current) const { return xs::super::method(aTHX_ (HV*)sv, current.get<CV>()); }
-    Sub super_method_strict (const Sub& current) const { return xs::super::method_strict(aTHX_ (HV*)sv, current.get<CV>()); }
+    Sub super_method        (const Sub& current) const { return xs::super::method((HV*)sv, current.get<CV>()); }
+    Sub super_method_strict (const Sub& current) const { return xs::super::method_strict((HV*)sv, current.get<CV>()); }
 
     void mark_as_loaded (const Stash& source)       const;
     void mark_as_loaded (const string_view& source) const { mark_as_loaded(Stash(source, GV_ADD)); }

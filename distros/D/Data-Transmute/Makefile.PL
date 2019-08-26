@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Data::Transmute",
   "PREREQ_PM" => {
     "Exporter" => "5.57",
+    "Log::ger" => "0.027",
     "strict" => 0,
     "warnings" => 0
   },
@@ -25,9 +26,10 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
+    "Storable" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.030",
+  "VERSION" => "0.034",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,6 +41,8 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "Log::ger" => "0.027",
+  "Storable" => 0,
   "Test::More" => "0.98",
   "strict" => 0,
   "warnings" => 0

@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# Last changed Time-stamp: <2019-04-05 22:46:22 mtw>
+# Last changed Time-stamp: <2019-04-23 22:33:47 mtw>
 # -*-CPerl-*-
 #
 # A structural alignment evaluator
@@ -7,7 +7,7 @@
 # usage: eval_alignment.pl -a myaln.stk --statistics RAFS
 #
 
-use version; our $VERSION = qv('0.10');
+use version; our $VERSION = qv('0.11');
 use strict;
 use warnings;
 use File::Basename;

@@ -22,6 +22,7 @@ use Carp;
 use utf8;
 use Encode;
 use Encode::Guess;
+use open IO => ':utf8', ':std';
 
 ##
 ## Setting utf8 warnings fatal makes it easy to find code conversion
@@ -62,7 +63,7 @@ greple - extensible grep with lexical expression and region handling
 =head1 VERSION
 
 
-Version 8.3304
+Version 8.3305
 
 
 =head1 SYNOPSIS
@@ -357,9 +358,6 @@ sub setopt {
     }
 }
 
-binmode STDERR, ":encoding(utf8)";
-
-
 ##
 ## @ARGV staff
 ##
@@ -635,11 +633,9 @@ my %colormap = (
 my @colors;
 
 use Getopt::EX::Colormap;
-my $color_handler = new Getopt::EX::Colormap
-    HASH => \%colormap,
-    LIST => \@colors,
-    ;
-$color_handler->load_params(@opt_colormap);
+my $color_handler = Getopt::EX::Colormap
+    ->new(HASH => \%colormap, LIST => \@colors)
+    ->load_params(@opt_colormap);
 
 my @default_color =
     $opt_ansicolor eq '16'
@@ -748,7 +744,7 @@ my $border_re = do {
     } elsif ($opt_p) {
 	qr/(?:\A|\n)\K\n+/;	# paragraph
     } else {
-	qr/(?m)^/;		# line
+	qr/^/m;			# line
     }
 };		    
 

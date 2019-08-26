@@ -1,12 +1,15 @@
 Revision history for Perl extension FileDirUtil.
 
-0.01  Sun May 14 2017
-	- initial release
+0.04	Sat 24 Aug 2019
+	- add Travis CI
+	- remove vintage CPAN links
+
+0.03  Sun May 28 2017
+	- $self->odir now accepts a Path::Class::Dir object or an ArrayRef of path
+		segments that will be coerced into a Path::Class::Dir object
 
 0.02  Tue May 23 2017
 	- provide set_ifilebn() method
 
-0.03  Sun May 28 2017
-	- $self->odir now accepts a Path::Class::Dir object or an ArrayRef
-          of path segments that will be coerced into a Path::Class::Dir
-          object
+0.01  Sun May 14 2017
+	- initial release
