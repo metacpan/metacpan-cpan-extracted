@@ -8122,8 +8122,8 @@ static inline short _marpaESLIFRecognizer_set_lexemeDatab(marpaESLIFRecognizer_t
   /* These statements have a cost - execute them only if we really set the pause */
   byteSizel = lexemeDatap->byteSizel;
 
-  /* Extend of create the chunk */
-  if (byteSizel < datal) {
+  /* Extend or create the chunk (take care: datal can be zero for a zero-length lexeme) */
+  if ((byteSizel <= 0) || (byteSizel < datal)) {
     bytes     = lexemeDatap->bytes;
     byteSizel = datal;
 

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use vars qw($VERSION);
-$VERSION = '0.41';
+$VERSION = '1.00';
 
 #--------------------------------------------------------------------------
 
@@ -242,7 +242,7 @@ sub _parse {
     return $self->book;
 }
 
-q{currently reading: 'Soul Music' by Terry Pratchett};
+q{currently reading: 'Happy Hour In Hell' by Tad Williams};
 
 __END__
 
@@ -278,7 +278,7 @@ be forthcoming, please feel free to (politely) remind me.
 
 =head1 COPYRIGHT & LICENSE
 
-  Copyright (C) 2004-2014 Barbie for Miss Barbell Productions
+  Copyright (C) 2004-2019 Barbie for Miss Barbell Productions
 
   This distribution is free software; you can redistribute it and/or
   modify it under the Artistic Licence v2.

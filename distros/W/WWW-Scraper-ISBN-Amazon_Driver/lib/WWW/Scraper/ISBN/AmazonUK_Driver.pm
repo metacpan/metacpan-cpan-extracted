@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use vars qw($VERSION);
-$VERSION = '0.41';
+$VERSION = '1.00';
 
 #--------------------------------------------------------------------------
 
@@ -87,10 +87,10 @@ The book_link, thumb_link and image_link refer back to the Amazon (UK) website.
 =cut
 
 sub search {
-	my $self = shift;
-	my $isbn = shift;
-	$self->found(0);
-	$self->book(undef);
+    my $self = shift;
+    my $isbn = shift;
+    $self->found(0);
+    $self->book(undef);
 
     # validate and convert into EAN13 format
     my $ean = $self->convert_to_ean13($isbn);
@@ -98,24 +98,24 @@ sub search {
         if(!$ean || (length $isbn == 13 && $isbn ne $ean)
                  || (length $isbn == 10 && $isbn ne $self->convert_to_isbn10($ean)));
 
-	my $mech = WWW::Mechanize->new();
+    my $mech = WWW::Mechanize->new();
     $mech->agent_alias( 'Linux Mozilla' );
 
     my $search = $AMA_SEARCH . $ean;
 
-	eval { $mech->get( $search ) };
+    eval { $mech->get( $search ) };
     return $self->handler("Amazon UK website appears to be unavailable.")
-	    if($@ || !$mech->success() || !$mech->content());
+        if($@ || !$mech->success() || !$mech->content());
 
-	my $content = $mech->content();
+    my $content = $mech->content();
 #print STDERR "\n# content=[$content]\n";
     my ($link) = $content =~ m!($AMA_URL)!s;
-	return $self->handler("Failed to find that book on Amazon UK website.")
-	    unless($link);
+    return $self->handler("Failed to find that book on Amazon UK website.")
+        unless($link);
 
-	eval { $mech->get( $link ) };
+    eval { $mech->get( $link ) };
     return $self->handler("Amazon UK website appears to be unavailable.")
-	    if($@ || !$mech->success() || !$mech->content());
+        if($@ || !$mech->success() || !$mech->content());
 
     return $self->_parse($mech);
 }
@@ -124,7 +124,7 @@ sub _parse {
     my $self = shift;
     my $mech = shift;
 
-	# The Book page
+    # The Book page
     my $html = $mech->content;
     my $data = {};
 
@@ -192,42 +192,42 @@ sub _parse {
     ($data->{publisher},$data->{pubdate}) = ($data->{published} =~ /\s*(.*?)(?:;.*?)?\s+\((.*?)\)/) if($data->{published});
     $data->{isbn10}  =~ s/[^\dX]+//g    if($data->{isbn10});
     $data->{isbn13}  =~ s/\D+//g        if($data->{isbn13});
-	$data->{pubdate} =~ s/^.*?\(//      if($data->{pubdate});
+    $data->{pubdate} =~ s/^.*?\(//      if($data->{pubdate});
 
-	return $self->handler("Could not extract data from Amazon UK result page.")
-		unless(defined $data->{isbn13});
+    return $self->handler("Could not extract data from Amazon UK result page.")
+        unless(defined $data->{isbn13});
 
     # trim top and tail
-	foreach (keys %$data) { next unless(defined $data->{$_});$data->{$_} =~ s/^\s+//;$data->{$_} =~ s/\s+$//; }
+    foreach (keys %$data) { next unless(defined $data->{$_});$data->{$_} =~ s/^\s+//;$data->{$_} =~ s/\s+$//; }
 
 #use Data::Dumper;
 #print STDERR "\n# data=[".Dumper($data)."]\n";
 
-	my $bk = {
-		'ean13'		    => $data->{isbn13},
-		'isbn13'		=> $data->{isbn13},
-		'isbn10'		=> $data->{isbn10},
-		'isbn'			=> $data->{isbn13},
-		'author'		=> $data->{author},
-		'title'			=> $data->{title},
-		'image_link'	=> $data->{image_link},
-		'thumb_link'	=> $data->{thumb_link},
-		'publisher'		=> $data->{publisher},
-		'pubdate'		=> $data->{pubdate},
-		'book_link'		=> $mech->uri(),
-		'content'		=> $data->{content},
-		'binding'	    => $data->{binding},
-		'pages'		    => $data->{pages},
-		'weight'		=> $data->{weight},
-		'width'		    => $data->{width},
-		'height'		=> $data->{height},
+    my $bk = {
+        'ean13'            => $data->{isbn13},
+        'isbn13'        => $data->{isbn13},
+        'isbn10'        => $data->{isbn10},
+        'isbn'            => $data->{isbn13},
+        'author'        => $data->{author},
+        'title'            => $data->{title},
+        'image_link'    => $data->{image_link},
+        'thumb_link'    => $data->{thumb_link},
+        'publisher'        => $data->{publisher},
+        'pubdate'        => $data->{pubdate},
+        'book_link'        => $mech->uri(),
+        'content'        => $data->{content},
+        'binding'        => $data->{binding},
+        'pages'            => $data->{pages},
+        'weight'        => $data->{weight},
+        'width'            => $data->{width},
+        'height'        => $data->{height},
         'depth'         => $data->{depth},
-		'description'	=> $data->{description},
+        'description'    => $data->{description},
         'html'          => $html
-	};
-	$self->book($bk);
-	$self->found(1);
-	return $self->book;
+    };
+    $self->book($bk);
+    $self->found(1);
+    return $self->book;
 }
 
 q{currently reading: 'Torn Apart: The Life of Ian Curtis' by Mick Middles and Lindsay Reade};
@@ -266,7 +266,7 @@ be forthcoming, please feel free to (politely) remind me.
 
 =head1 COPYRIGHT & LICENSE
 
-  Copyright (C) 2004-2014 Barbie for Miss Barbell Productions
+  Copyright (C) 2004-2019 Barbie for Miss Barbell Productions
 
   This distribution is free software; you can redistribute it and/or
   modify it under the Artistic Licence v2.

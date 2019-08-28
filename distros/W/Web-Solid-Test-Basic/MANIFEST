@@ -16,3 +16,6 @@ doap.ttl
 lib/Web/Solid/Test/Basic.pm
 lib/Web/Solid/Test/HTTPLists.pm
 t/01basic.t
+t/data/alice-token
+t/unit-get-token-network.t
+t/unit-get-token.t

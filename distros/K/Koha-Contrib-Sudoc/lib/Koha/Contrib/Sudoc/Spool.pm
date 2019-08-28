@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc::Spool;
 # ABSTRACT: Spool des fichiers de notices
-$Koha::Contrib::Sudoc::Spool::VERSION = '2.31';
+$Koha::Contrib::Sudoc::Spool::VERSION = '2.32';
 use Moose;
 use Modern::Perl;
 use File::Copy;
@@ -91,7 +91,7 @@ sub first_batch_files {
     my $files = $self->files($where, $type);
     return $files unless @$files;
 
-    my ($prefix_first) = $files->[0] =~ /^(.*)001.RAW/;
+    my ($prefix_first) = $files->[0] =~ /^(.*)\d{3}.RAW/;
     my @first_files;
     for my $file (@$files) {
         my ($prefix) = $file =~ /^(.*)\d{3}.RAW/;
@@ -214,7 +214,7 @@ Koha::Contrib::Sudoc::Spool - Spool des fichiers de notices
 
 =head1 VERSION
 
-version 2.31
+version 2.32
 
 =head1 DESCRIPTION
 

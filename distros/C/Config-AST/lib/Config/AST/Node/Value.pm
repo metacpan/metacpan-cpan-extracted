@@ -87,6 +87,8 @@ Returns false.
     
 sub is_leaf { 1 };
 
+sub is_section { 0 }
+
 =head2 $s = $node->as_string
 
 Returns the node value, converted to string.
@@ -158,8 +160,8 @@ use overload
 
 =head1 SEE ALSO
 
-B<Config::AST>,    
-B<Config::AST::Node>.
+L<Config::AST>,    
+L<Config::AST::Node>.
 
 =cut    
 

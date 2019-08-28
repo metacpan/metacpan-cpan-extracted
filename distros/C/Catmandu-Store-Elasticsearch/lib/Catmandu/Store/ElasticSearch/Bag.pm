@@ -2,7 +2,7 @@ package Catmandu::Store::ElasticSearch::Bag;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.0';
+our $VERSION = '1.01';
 
 use Catmandu::Hits;
 use Cpanel::JSON::XS qw(encode_json decode_json);
@@ -14,6 +14,7 @@ use namespace::clean;
 
 with 'Catmandu::Bag';
 with 'Catmandu::Droppable';
+with 'Catmandu::Flushable';
 with 'Catmandu::CQLSearchable';
 
 has index       => (is => 'lazy');
@@ -206,9 +207,12 @@ sub delete_by_query {
     }
 }
 
+sub flush {
+    $_[0]->_bulk->flush;
+}
+
 sub commit {
     my ($self) = @_;
-    $self->_bulk->flush;
     $self->store->es->transport->perform_request(
         method => 'POST',
         path   => '/' . $self->index . '/_refresh',

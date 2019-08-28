@@ -90,6 +90,23 @@ the number.
 >=
 !
 
+
+The symbols in the information coloum are as below.
+
+   States  Description
+   Z       Zombie
+   S       Sleep
+   W       Wait
+   R       Run
+
+   Flags   Description
+   O       Swapped Output
+   E       Exiting
+   s       Session Leader
+   L       POSIX lock advisory
+   +       has controlling terminal
+   X       traced by a debugger
+   F       being forked
 ';
 }
 
@@ -511,6 +528,25 @@ ncps [B<-c> <regex>] [B<--ci>] [B<--cf>] [B<--cF>] [B<--eg>] [B<--egi>]
 
 No flags needed passed to use. By default it will show all processes except
 for its own and the idle process.
+
+The info column is provided by L<Proc::ProcessTable::InfoString>. That
+POD has the information on what they all mean. At the time of writing, this is
+as below.
+
+   States  Description
+   Z       Zombie
+   S       Sleep
+   W       Wait
+   R       Run
+
+   Flags   Description
+   O       Swapped Output
+   E       Exiting
+   s       Session Leader
+   L       POSIX lock advisory
+   +       has controlling terminal
+   X       traced by a debugger
+   F       being forked
 
 =head1 SWITCHES
 

@@ -1,5 +1,13 @@
 Revision history for Data-DPath
 
+0.58      2019-08-28
+  - fix filter expressions containing newlines [reported by David Schmidt]
+  - fix quote escaping (please check your edge cases) [Igor Sverdlov]
+  - replace List::MoreUtil with List::Util [Dan Book, Igor Sverdlov]
+  - doc cleanup [Kivanc Yazan]
+  - 'idx' attribute added in 0.56 was not added to Data::DPath::Attrs,
+    so didn't acquire an accessor [Diab Jerius]
+
 0.57      2017-08-18
   - polished Safe.pm handling to cooperate with older Perl and other modules
     in particular Test::Exception [Doug Bell, Jonathan William Taylor]

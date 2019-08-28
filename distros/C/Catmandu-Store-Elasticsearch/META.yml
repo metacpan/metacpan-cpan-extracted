@@ -25,7 +25,7 @@ no_index:
     - xt
 requires:
   CQL::Parser: '1.12'
-  Catmandu: '1.04'
+  Catmandu: '1.2004'
   Cpanel::JSON::XS: '3.0213'
   Moo: '1.004006'
   Search::Elasticsearch: '6.00'
@@ -35,7 +35,7 @@ resources:
   bugtracker: https://github.com/LibreCat/Catmandu-Store-Elasticsearch/issues
   homepage: https://github.com/LibreCat/Catmandu-Store-Elasticsearch
   repository: https://github.com/LibreCat/Catmandu-Store-Elasticsearch.git
-version: '1.0'
+version: '1.01'
 x_contributors:
   - 'Dave Sherohman <Dave.Sherohman@ub.lu.se>'
   - 'Mirko Tietgen <mirko@abunchofthings.net>'

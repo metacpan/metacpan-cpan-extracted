@@ -53,7 +53,7 @@ within a particular section.
 
 =head1 SEE ALSO
 
-B<Config::AST>(3).
+L<Config::AST>(3).
 
 =cut
 
@@ -81,6 +81,8 @@ sub AUTOLOAD {
 	unless ref($self->{_lex}) eq 'HASH';
     
     (my $key = $m) =~ s/__/-/g;
+    $key = $self->{_node}->root->mangle_key($key)
+	if $self->{_node}->is_section;
     my $lex = $self->{_lex};
     if (ref($lex) eq 'HASH') {
 	if (exists($lex->{$key})) {
@@ -109,7 +111,7 @@ sub AUTOLOAD {
     }
 
     if (!$self->{_node}->is_null) {
-	my $next = $self->{_node}->subtree($self->{_ci} ? lc($key) : $key)
+	my $next = $self->{_node}->subtree($key)
 	             // new Config::AST::Node::Null;
 	return $next if $next->is_leaf || !$lex;
 	$self->{_node} = $next;
@@ -120,5 +122,14 @@ sub AUTOLOAD {
 }
 
 sub DESTROY { }
+
+use overload
+    bool => sub { !!shift->{_node} },
+    '""' => sub { shift->{_node}->as_string },
+    eq => sub {
+	my ($self,$other) = @_;
+	return $self->{_node}->as_string eq $other
+    };
+
 
 1;

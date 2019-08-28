@@ -26,6 +26,7 @@ use warnings;
 use Test::More;
 
 use_ok('Web::Solid::Test::Basic');
+use_ok('Web::Solid::Test::HTTPLists');
 
 diag( "Testing Web::Solid::Test::Basic $Web::Solid::Test::Basic::VERSION, Perl $], $^X" );
 

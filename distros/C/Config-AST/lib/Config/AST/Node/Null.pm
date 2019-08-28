@@ -79,8 +79,8 @@ use overload
 
 =head1 SEE ALSO
 
-B<Config::AST>,    
-B<Config::AST::Node>.
+L<Config::AST>,    
+L<Config::AST::Node>.
 
 =cut    
 

@@ -3,9 +3,9 @@ NAME
     structure
 
 VERSION
-    This document describes version 0.002 of DNS::Zone::Struct::To::BIND
+    This document describes version 0.003 of DNS::Zone::Struct::To::BIND
     (from Perl distribution DNS-Zone-Struct-To-BIND), released on
-    2019-08-19.
+    2019-08-28.
 
 SYNOPSIS
      use DNS::Zone::Struct::To::BIND qw(gen_bind_zone_from_struct);

@@ -9,6 +9,7 @@ Makefile.PL
 META.yml
 META.json
 LICENSE
+t/000_encoding_Sjis.t
 t/000_use_Sjis.t
 t/001_shiftjishtm.t
 t/002_shiftjishtm.t

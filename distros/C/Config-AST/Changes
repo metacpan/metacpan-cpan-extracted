@@ -1,5 +1,10 @@
 Revision history for Perl extension Config::AST
 
+1.05  Wed Aug 28 19:27:26 2019
+	- implemented case-insensitive keywords
+	- new method: describe_keyword
+	- provide overloads for direct addressing objects
+
 1.04  Tue Aug 27 16:50:45 2019
 	- fix another missing DESTROY
 	- new methods: error_count, success

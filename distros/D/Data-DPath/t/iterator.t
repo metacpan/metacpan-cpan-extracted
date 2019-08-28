@@ -131,7 +131,7 @@ while ($benchmarks->isnt_exhausted)
 
                     my $j = 0;
                     while ( $iter->isnt_exhausted ) {
-                        my $idx_got = $iter->value->first_point->attrs->{idx};
+                        my $idx_got = $iter->value->first_point->attrs->idx;
                         is( $idx_got, $idx_exp, "idx attr $i.$j" );
                     }
                     continue {

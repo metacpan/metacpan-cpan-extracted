@@ -11,7 +11,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Web-Solid-Test-Basic",
    "no_index" : {
@@ -32,15 +32,19 @@
       },
       "develop" : {
          "recommends" : {
-            "Dist::Inkt" : "0.001"
+            "Dist::Inkt" : "0.001",
+            "Plack" : "0",
+            "Plack::Middleware::CrossOrigin" : "0",
+            "Web::Simple" : "0"
          }
       },
       "runtime" : {
          "requires" : {
             "FindBin" : "0",
-            "LWP::UserAgent" : "0",
+            "IO::Socket::SSL" : "0",
+            "LWP::UserAgent::https" : "0",
             "Test::Deep" : "0",
-            "Test::FITesque::RDF" : "0",
+            "Test::FITesque::RDF" : "0.012",
             "Test::More" : "0.96",
             "Test::RDF" : "0"
          }
@@ -49,11 +53,11 @@
    "provides" : {
       "Web::Solid::Test::Basic" : {
          "file" : "lib/Web/Solid/Test/Basic.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Web::Solid::Test::HTTPLists" : {
          "file" : "lib/Web/Solid/Test/HTTPLists.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -72,7 +76,7 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Web-Solid-Test-Basic/project"
    },
-   "version" : "0.001",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01",
+   "version" : "0.002",
+   "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_static_install" : 1
 }

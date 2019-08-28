@@ -2,7 +2,7 @@ package Catmandu::Store::ElasticSearch::Searcher;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.0';
+our $VERSION = '1.01';
 
 use Moo;
 use namespace::clean;
@@ -39,11 +39,8 @@ sub _paging_generator {
             }
             my $body = {query => $query, from => $start, size => $limit,};
             $body->{sort} = $sort if defined $sort;
-            my $res = $es->search(
-                index => $index,
-                type  => $type,
-                body  => $body,
-            );
+            my $res
+                = $es->search(index => $index, type => $type, body => $body,);
 
             $hits = $res->{hits}{hits};
             $start += $limit;
@@ -51,7 +48,7 @@ sub _paging_generator {
         if ($total) {
             $total--;
         }
-        my $doc = shift(@$hits) || return;
+        my $doc  = shift(@$hits) || return;
         my $data = $doc->{_source};
         $data->{$id_key} = $doc->{_id};
         $data;

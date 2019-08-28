@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     'NAME'      => q{Sjis},
-    'VERSION'   => q{1.21},
+    'VERSION'   => q{1.22},
     'ABSTRACT'  => q{Source code filter to escape ShiftJIS script},
     'PREREQ_PM' => {
         'ExtUtils::MakeMaker' => '5.4302',

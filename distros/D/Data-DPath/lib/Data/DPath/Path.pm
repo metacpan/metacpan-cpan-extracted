@@ -1,7 +1,7 @@
 package Data::DPath::Path;
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: Abstraction for a DPath
-$Data::DPath::Path::VERSION = '0.57';
+$Data::DPath::Path::VERSION = '0.58';
 use strict;
 use warnings;
 
@@ -40,8 +40,8 @@ sub unescape {
         my ($str) = @_;
 
         return unless defined $str;
-        $str =~ s/(?<!\\)\\(["'])/$1/g; # '"$
         $str =~ s/\\{2}/\\/g;
+        $str =~ s/\\(["'])/$1/g; # '"$
         return $str;
 }
 
@@ -109,7 +109,7 @@ sub _build__steps {
                         ($plain_part, $filter) = $extracted =~ m,^/              # leading /
                                                                  (.*?)           # path part
                                                                  (\[.*\])?$      # optional filter
-                                                                ,xg unless $filter_already_extracted;
+                                                                ,xsg unless $filter_already_extracted;
                         $plain_part = unescape $plain_part;
                 }
 
@@ -238,7 +238,7 @@ Steffen Schwigon <ss5@renormalist.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Steffen Schwigon.
+This software is copyright (c) 2019 by Steffen Schwigon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

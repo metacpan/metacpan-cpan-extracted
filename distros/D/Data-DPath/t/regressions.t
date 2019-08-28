@@ -28,6 +28,17 @@ my $data = {
     },
 };
 
+my $strange_data = {
+    aList => [qw/aa bb cc dd ee ff gg hh ii jj/],
+    aHash => {
+        apple0 => "pie",
+        apple1 => "apple pie",
+        apple2 => "apple\npie",
+        banana => 'split',
+        potato => [qw(baked chips fries fish&chips mashed)],
+    },
+};
+
 my $res = $data ~~ dpath '//*[ value =~ /i/ ]';
 my $expected = [ qw/split pie ii chips fries fish&chips/ ];
 unlike ($data->{aHash}, qr/i/, "RT-68882 - aHash does not match the regex");
@@ -51,5 +62,17 @@ cmp_bag($res, $expected, "RT-68882 related - value filter function still works f
 $res = $data ~~ dpath '//*[ Scalar::Util::reftype(value) eq "ARRAY" ]';
 $expected = [ $data->{aList}, $data->{aHash}{potato} ];
 cmp_bag($res, $expected, "RT-68882 related - value filter function still works for array");
+
+# github #24 - filter expressions with newlines
+$res = $strange_data ~~ dpath '/aHash/apple0[ value eq "pie" ]';
+$expected = [ $strange_data->{aHash}{apple0} ];
+cmp_bag($res, $expected, "github 24 - filter expressions with newlines");
+$res = $strange_data ~~ dpath '/aHash/apple1[ value eq "apple pie" ]';
+$expected = [ $strange_data->{aHash}{apple1} ];
+cmp_bag($res, $expected, "github 24 - filter expressions with newlines");
+$res = $strange_data ~~ dpath '/aHash/apple2[ value eq "apple
+pie" ]';
+$expected = [ $strange_data->{aHash}{apple2} ];
+cmp_bag($res, $expected, "github 24 - filter expressions with newlines");
 
 done_testing;

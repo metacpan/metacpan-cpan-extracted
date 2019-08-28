@@ -15,4 +15,3 @@ my $cfg = new TestConfig(
 );
 ok($cfg->canonical, 'backend.foo.file="a" core.retain-interval=10 core.tempdir="/tmp"');
     
-    

@@ -1,6 +1,6 @@
 {
     "name" : "Sjis",
-    "version" : "1.21",
+    "version" : "1.22",
     "abstract" : "Source code filter to escape ShiftJIS script",
     "author" : [
         "ina <ina@cpan.org>"

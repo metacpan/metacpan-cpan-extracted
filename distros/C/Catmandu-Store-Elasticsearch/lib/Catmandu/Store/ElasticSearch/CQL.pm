@@ -2,7 +2,7 @@ package Catmandu::Store::ElasticSearch::CQL;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.0';
+our $VERSION = '1.01';
 
 use Catmandu::Util qw(require_package trim);
 use CQL::Parser;
@@ -429,6 +429,10 @@ sub _text_node {
         # escape spaces
         $term =~ s/(?<!\\) /\\ /g;
         $term =~ s/^ /\\ /;
+
+        # escape colons
+        $term =~ s/(?<!\\):/\\:/g;
+        $term =~ s/^:/\\:/;
         return {query_string => {query => qq|$qualifier:$term|}};
     }
 

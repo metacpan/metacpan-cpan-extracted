@@ -15,6 +15,8 @@ t/10objectus.t
 t/11objectuk.t
 t/20parse-us.t
 t/21parse-uk.t
+t/30errors-us.t
+t/31errors-uk.t
 t/90podtest.t
 t/91podcover.t
 t/92distribution.t

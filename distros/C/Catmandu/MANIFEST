@@ -176,6 +176,7 @@ lib/Catmandu/Fix/uri_encode.pm
 lib/Catmandu/Fix/vacuum.pm
 lib/Catmandu/Fix/validate.pm
 lib/Catmandu/Fixable.pm
+lib/Catmandu/Flushable.pm
 lib/Catmandu/Hits.pm
 lib/Catmandu/IdGenerator.pm
 lib/Catmandu/IdGenerator/Mock.pm
@@ -361,6 +362,7 @@ t/Catmandu-Fix-vacuum.t
 t/Catmandu-Fix-validate.t
 t/Catmandu-Fix.t
 t/Catmandu-Fixable.t
+t/Catmandu-Flushable.t
 t/Catmandu-Hits.t
 t/Catmandu-IdGenerator-Mock.t
 t/Catmandu-IdGenerator-UUID.t

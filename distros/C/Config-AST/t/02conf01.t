@@ -10,8 +10,8 @@ my $t = new TestConfig(
     config => [
 	base => '/etc',
 	'file.passwd.mode' => '0644',
-	'file.passwd.root.uid' => 0,
-	'file.passwd.root.dir' => '/root',
+	'file.passwd.main.uid' => 0,
+	'file.passwd.main.dir' => '/root',
     ],
     lexicon => {
 	base => 1,
@@ -20,7 +20,7 @@ my $t = new TestConfig(
 		passwd => {
 		    section => {
 			mode => 1,
-			root => {
+			main => {
 			    section => {
 				uid => 1,
 				dir => 1
@@ -46,8 +46,8 @@ ok($t->base->is_leaf);
 ok($t->base, '/etc');
 ok($t->file->is_section);
 ok($t->file->passwd->is_section);
-ok($t->file->passwd->root->dir);
-ok($t->file->passwd->root->dir,'/root');
+ok($t->file->passwd->main->dir);
+ok($t->file->passwd->main->dir,'/root');
 ok($t->file->skel->is_null);
 eval { $t->nonexistent };
 ok($@ =~ m{Can't locate object method "nonexistent" via package "Config::AST::Follow"});

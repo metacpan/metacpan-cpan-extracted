@@ -1,7 +1,7 @@
 package DNS::Zone::Struct::To::BIND;
 
-our $DATE = '2019-08-19'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-08-28'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -92,6 +92,8 @@ sub gen_bind_zone_from_struct {
             push @res, "MX $rec->{priority} ", _abs_host($rec->{host}), "\n";
         } elsif ($type eq 'NS') {
             push @res, "NS ", _abs_host($rec->{host}), "\n";
+        } elsif ($type eq 'SSHFP') {
+            push @res, "SSHFP $rec->{algo} $rec->{fptype} $rec->{fp}\n";
         } elsif ($type eq 'TXT') {
             push @res, "TXT ", _encode_txt($rec->{text}), "\n";
         } else {
@@ -117,7 +119,7 @@ DNS::Zone::Struct::To::BIND - Generate BIND zone configuration from structure
 
 =head1 VERSION
 
-This document describes version 0.002 of DNS::Zone::Struct::To::BIND (from Perl distribution DNS-Zone-Struct-To-BIND), released on 2019-08-19.
+This document describes version 0.003 of DNS::Zone::Struct::To::BIND (from Perl distribution DNS-Zone-Struct-To-BIND), released on 2019-08-28.
 
 =head1 SYNOPSIS
 

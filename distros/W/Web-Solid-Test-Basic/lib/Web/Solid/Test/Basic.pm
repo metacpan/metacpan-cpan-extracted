@@ -10,13 +10,14 @@ use Test::Deep;
 use Test::RDF;
 
 our $AUTHORITY = 'cpan:KJETILK';
-our $VERSION   = '0.001';
+our $VERSION   = '0.002';
 
 sub http_read_unauthenticated : Test : Plan(4) {
   my ($self, $args) = @_;
   my $ua = LWP::UserAgent->new;
   my $url = $args->{url};
   my $reshead = $ua->head( $url );
+  note($args->{description});
   ok($reshead->is_success, "Successful HEAD request for $url");
 
   my $resget = $ua->get( $url );
@@ -26,9 +27,12 @@ sub http_read_unauthenticated : Test : Plan(4) {
   my @get_headers_fields = $resget->headers->header_field_names;
   cmp_bag(\@head_headers_fields, \@get_headers_fields, "HEAD and GET request has the same header fields");
 
+  @get_headers_fields = grep { !/Date/ } @get_headers_fields; # Do not test date-fields since they may change between HEAD and GET
+  @get_headers_fields = grep { !/^Client/ } @get_headers_fields; # Do not test client-side added fields
+
   subtest 'Testing all headers' => sub {
 	 plan tests => scalar @get_headers_fields;
-	 foreach my $get_header_field (@get_headers_fields) { # TODO: Date-fields may fail
+	 foreach my $get_header_field (@get_headers_fields) {
 		is($resget->header($get_header_field), $reshead->header($get_header_field), "$get_header_field is the same for both");
 	 }
   };
@@ -40,7 +44,9 @@ sub http_check_header_unauthenticated : Test : Plan(2) {
   my ($self, $args) = @_;
   my $ua = LWP::UserAgent->new;
   my $url = $args->{url};
+  note($args->{description});
   delete $args->{url};
+  delete $args->{description};
   my $reshead = $ua->head( $url );
   ok($reshead->is_success, "Successful HEAD request for $url");
   subtest 'Testing HTTP header content' => sub {
@@ -61,6 +67,7 @@ sub http_put_readback_unauthenticated : Test : Plan(4) {
   my $url = $args->{url};
   my $content = '<https://example.org/foo> a <https://example.org/Dahut> .';
   my $resput = $ua->put( $url, Content => $content );
+  note($args->{description});
   ok($resput->is_success, "Successful PUT request for $url");
   my $resget = $ua->get( $url );
   ok($resget->is_success, "Successful GET request for $url");
@@ -89,6 +96,7 @@ sub http_methods_with_bearer : Test : Plan(1) {
   my ($self, $args) = @_;
  SKIP: {
     skip 'SOLID_BEARER_TOKEN needs to set for this test', 1 unless ($ENV{SOLID_BEARER_TOKEN});
+	 note($args->{description});
 	 my $ua = LWP::UserAgent->new;
 	 $ua->default_header('Authorization' => 'Bearer ' . $ENV{SOLID_BEARER_TOKEN},
 								'Content-Type' => 'text/turtle',

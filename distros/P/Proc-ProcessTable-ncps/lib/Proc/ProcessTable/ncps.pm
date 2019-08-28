@@ -9,18 +9,19 @@ use Text::ANSITable;
 use Term::ANSIColor;
 use Statistics::Basic qw(:all);
 use List::Util qw( min max sum );
+use Proc::ProcessTable::InfoString;
 
 =head1 NAME
 
-Proc::ProcessTable::ncps - The great new Proc::ProcessTable::ncps!
+Proc::ProcessTable::ncps - New Colorized(optional) PS, a enhanced version of PS with advanced searching capabilities
 
 =head1 VERSION
 
-Version 0.0.1
+Version 0.1.0
 
 =cut
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.1.0';
 
 
 =head1 SYNOPSIS
@@ -44,6 +45,9 @@ our $VERSION = '0.0.1';
     my $ncps = Proc::ProcessTable::ncps->new( \%args );
     
     print $ncps->run
+
+The info column is provided by L<Proc::ProcessTable::InfoString>. That
+POD has the information on what they all mean.
 
 =head1 METHODS
 
@@ -374,109 +378,11 @@ sub run{
 		#
 		# handles the info
 		#
-		my $info;
-		my %flags;
-		$flags{is_session_leader}=0;
-		$flags{is_being_forked}=0;
-		$flags{working_on_exiting}=0;
-		$flags{has_controlling_terminal}=0;
-		$flags{is_locked}=0;
-		$flags{traced_by_debugger}=0;
-		$flags{is_stopped}=0;
-		$flags{posix_advisory_lock}=0;
-		# parses the flags for freebsd
-		if ( $^O =~ /freebsd/ ) {
-			if ( hex($proc->flags) & 0x00002 ) {
-				$flags{controlling_tty_active}=1;
-			}
-			if ( hex($proc->flags) & 0x00000002 ) {
-				$flags{is_session_leader}=1;
-			}
-			#if ( hex($proc->flags) &  ){$flags{is_being_forked}=1; }
-			if ( hex($proc->flags) & 0x02000 ) {
-				$flags{working_on_exiting}=1;
-			}
-			if ( hex($proc->flags) & 0x00002 ) {
-				$flags{has_controlling_terminal}=1;
-			}
-			if ( hex($proc->flags) & 0x00000004 ) {
-				$flags{is_locked}=1;
-			}
-			if ( hex($proc->flags) & 0x00800 ) {
-				$flags{traced_by_debugger}=1;
-			}
-			if ( hex($proc->flags) & 0x00001 ) {
-				$flags{posix_advisory_lock}=1;
-			}
-		}
-		# get the state
-		$info=$proc->{state};
-		if (
-			$info eq 'sleep'
-			) {
-			$info='S';
-		} elsif (
-				 $info eq 'zombie'
-				 ) {
-			$info='Z';
-		} elsif (
-				 $info eq 'wait'
-				 ) {
-			$info='W';
-		} elsif (
-				 $info eq 'run'
-				 ) {
-			$info='R';
-		}
-		$info=color($self->nextColor).$info;
-		#checks if it is swapped out
-		if (
-			( $proc->{state} ne 'zombie' ) &&
-			( $proc->{rss} == '0' )
-			) {
-			$info=$info.'O';
-		}
-		#handles the various flags
-		if ( $flags{working_on_exiting} ) {
-			$info=$info.'E';
-		}
-		;
-		if ( $flags{is_session_leader} ) {
-			$info=$info.'s';
-		}
-		;
-		if ( $flags{is_locked} || $flags{posix_advisory_lock} ) {
-			$info=$info.'L';
-		}
-		;
-		if ( $flags{has_controlling_terminal} ) {
-			$info=$info.'+';
-		}
-		;
-		if ( $flags{is_being_forked} ) {
-			$info=$info.'F';
-		}
-		;
-		if ( $flags{traced_by_debugger} ) {
-			$info=$info.'X';
-		}
-		;
-		# adds the wchan
-		$info=$info.' '.color($self->nextColor);
-		if ( $^O =~ /linux/ ) {
-			my $wchan='';
-			if ( -e '/proc/'.$proc->{pid}.'/wchan') {
-				open( my $wchan_fh, '<', '/proc/'.$proc->{pid}.'/wchan' );
-				$wchan=readline( $wchan_fh );
-				close( $wchan_fh );
-			}
-			$info=$info.$wchan;
-		} else {
-			$info=$info.$proc->{wchan};
-		}
-		$info=$info.color('reset');
-		# finally actually add it to the new new line array
-		push( @new_line,  $info );
+		my $is = Proc::ProcessTable::InfoString->new({
+													  flags_color=>$self->nextColor,
+													  wchan_color=>$self->nextColor,
+													 });
+		push( @new_line, $is->info( $proc ) );
 
 		#
 		# handle the nice column

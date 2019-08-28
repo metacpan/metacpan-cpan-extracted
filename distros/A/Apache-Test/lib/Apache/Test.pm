@@ -37,7 +37,7 @@ BEGIN {
 
 use vars qw(@ISA @EXPORT %EXPORT_TAGS $VERSION %SubTests @SkipReasons);
 
-$VERSION = '1.41';
+$VERSION = '1.42';
 
 my @need = qw(need_lwp need_http11 need_cgi need_access need_auth
               need_module need_apache need_min_apache_version need_min_apache_fix

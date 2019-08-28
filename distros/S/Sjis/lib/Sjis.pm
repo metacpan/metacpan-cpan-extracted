@@ -26,7 +26,7 @@ use 5.00503;    # Galapagos Consensus 1998 for primetools
 # $VERSION = CORE::eval $VERSION; # No!! because '1.10' makes '1.1'
 
 use vars qw($VERSION);
-$VERSION = '1.21';
+$VERSION = '1.22';
 $VERSION = $VERSION;
 
 BEGIN {

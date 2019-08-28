@@ -1,9 +1,9 @@
 package Data::DPath;
-# git description: v0.56-7-g681b3f6
+# git description: v0.57-15-gab8b720
 
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: DPath is not XPath!
-$Data::DPath::VERSION = '0.57';
+$Data::DPath::VERSION = '0.58';
 use 5.008;
 use strict;
 use warnings;
@@ -195,7 +195,7 @@ benchmarked.)
  
  allows special       no                   YES
  chars of own
- path syntax in                            you can quoting everything
+ path syntax in                            you can quote everything
  hash keys
  ("/[]|*.")
  
@@ -876,7 +876,7 @@ Steffen Schwigon <ss5@renormalist.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Steffen Schwigon.
+This software is copyright (c) 2019 by Steffen Schwigon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

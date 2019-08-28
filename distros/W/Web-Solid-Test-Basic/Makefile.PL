@@ -18,21 +18,29 @@ my $meta = {
   "no_index"         => { directory => ["eg", "examples", "inc", "t", "xt"] },
   "prereqs"          => {
                           configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
-                          develop   => { recommends => { "Dist::Inkt" => 0.001 } },
+                          develop   => {
+                                         recommends => {
+                                           "Dist::Inkt" => 0.001,
+                                           "Plack" => 0,
+                                           "Plack::Middleware::CrossOrigin" => 0,
+                                           "Web::Simple" => 0,
+                                         },
+                                       },
                           runtime   => {
                                          requires => {
-                                           "FindBin"             => 0,
-                                           "LWP::UserAgent"      => 0,
-                                           "Test::Deep"          => 0,
-                                           "Test::FITesque::RDF" => 0,
-                                           "Test::More"          => 0.96,
-                                           "Test::RDF"           => 0,
+                                           "FindBin"               => 0,
+                                           "IO::Socket::SSL"       => 0,
+                                           "LWP::UserAgent::https" => 0,
+                                           "Test::Deep"            => 0,
+                                           "Test::FITesque::RDF"   => 0.012,
+                                           "Test::More"            => 0.96,
+                                           "Test::RDF"             => 0,
                                          },
                                        },
                         },
   "provides"         => {
-                          "Web::Solid::Test::Basic"     => { file => "lib/Web/Solid/Test/Basic.pm", version => 0.001 },
-                          "Web::Solid::Test::HTTPLists" => { file => "lib/Web/Solid/Test/HTTPLists.pm", version => 0.001 },
+                          "Web::Solid::Test::Basic"     => { file => "lib/Web/Solid/Test/Basic.pm", version => 0.002 },
+                          "Web::Solid::Test::HTTPLists" => { file => "lib/Web/Solid/Test/HTTPLists.pm", version => 0.002 },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -48,7 +56,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/Web-Solid-Test-Basic/project",
                         },
-  "version"          => 0.001,
+  "version"          => 0.002,
   "x_static_install" => 1,
 };
 

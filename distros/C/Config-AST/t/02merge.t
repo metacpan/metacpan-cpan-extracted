@@ -16,7 +16,7 @@ my $t = new Config::AST(
     	}
     });
 
-my $node = new Config::AST::Node::Section;
+my $node = new Config::AST::Node::Section($t);
 $node->subtree(number => new Config::AST::Node::Value(
 		   value => [1],
 		   locus => new Text::Locus('input',1)));
@@ -25,7 +25,7 @@ $node->subtree(name => new Config::AST::Node::Value(
 		   locus => new Text::Locus('input',2)));
 $t->add_node(x => $node);
 
-$node = new Config::AST::Node::Section;
+$node = new Config::AST::Node::Section($t);
 $node->subtree(number => new Config::AST::Node::Value(
 		   value => 2,
 		   locus => new Text::Locus('input',3)));

@@ -1,0 +1,228 @@
+# encoding: Big5
+# This file is encoded in Big5.
+die "This file is not encoded in Big5.\n" if q{Ç†} ne "\x82\xa0";
+
+use strict;
+use Big5;
+print "1..18\n";
+
+my $__FILE__ = __FILE__;
+
+if ('A' =~ m?(A)?) {
+    if ($1 eq 'A') {
+        print qq{ok - 1 'A' =~ m?(A)? $^X $__FILE__\n};
+    }
+    else {
+        print qq{not ok - 1 'A' =~ m?(A)? $^X $__FILE__\n};
+    }
+}
+else {
+    print qq{not ok - 1 'A' =~ m?(A)? $^X $__FILE__\n};
+}
+
+if ('A' =~ m?(A)?b) {
+    if ($1 eq 'A') {
+        print qq{ok - 2 'A' =~ m?(A)?b $^X $__FILE__\n};
+    }
+    else {
+        print qq{not ok - 2 'A' =~ m?(A)?b $^X $__FILE__\n};
+    }
+}
+else {
+    print qq{not ok - 2 'A' =~ m?(A)?b $^X $__FILE__\n};
+}
+
+if ('A' =~ m?(a)?i) {
+    if ($1 eq 'A') {
+        print qq{ok - 3 'A' =~ m?(a)?i $^X $__FILE__\n};
+    }
+    else {
+        print qq{not ok - 3 'A' =~ m?(a)?i $^X $__FILE__\n};
+    }
+}
+else {
+    print qq{not ok - 3 'A' =~ m?(a)?i $^X $__FILE__\n};
+}
+
+if ('A' =~ m?(a)?ib) {
+    if ($1 eq 'A') {
+        print qq{ok - 4 'A' =~ m?(a)?ib $^X $__FILE__\n};
+    }
+    else {
+        print qq{not ok - 4 'A' =~ m?(a)?ib $^X $__FILE__\n};
+    }
+}
+else {
+    print qq{not ok - 4 'A' =~ m?(a)?ib $^X $__FILE__\n};
+}
+
+if ('a' =~ m?(a)?i) {
+    if ($1 eq 'a') {
+        print qq{ok - 5 'a' =~ m?(a)?i $^X $__FILE__\n};
+    }
+    else {
+        print qq{not ok - 5 'a' =~ m?(a)?i $^X $__FILE__\n};
+    }
+}
+else {
+    print qq{not ok - 5 'a' =~ m?(a)?i $^X $__FILE__\n};
+}
+
+if ('a' =~ m?(a)?ib) {
+    if ($1 eq 'a') {
+        print qq{ok - 6 'a' =~ m?(a)?ib $^X $__FILE__\n};
+    }
+    else {
+        print qq{not ok - 6 'a' =~ m?(a)?ib $^X $__FILE__\n};
+    }
+}
+else {
+    print qq{not ok - 6 'a' =~ m?(a)?ib $^X $__FILE__\n};
+}
+
+if ('ÉA' =~ m?(A)?b) {
+    if ($1 eq 'A') {
+        print qq{ok - 7 'ÉA' =~ m?(A)?b $^X $__FILE__\n};
+    }
+    else {
+        print qq{not ok - 7 'ÉA' =~ m?(A)?b $^X $__FILE__\n};
+    }
+}
+else {
+    print qq{not ok - 7 'ÉA' =~ m?(A)?b $^X $__FILE__\n};
+}
+
+if ('ÉA' =~ m?(A)?ib) {
+    if ($1 eq 'A') {
+        print qq{ok - 8 'ÉA' =~ m?(A)?ib $^X $__FILE__\n};
+    }
+    else {
+        print qq{not ok - 8 'ÉA' =~ m?(A)?ib $^X $__FILE__\n};
+    }
+}
+else {
+    print qq{not ok - 8 'ÉA' =~ m?(A)?ib $^X $__FILE__\n};
+}
+
+if ('ÉA' =~ m?(a)?ib) {
+    if ($1 eq 'A') {
+        print qq{ok - 9 'ÉA' =~ m?(a)?ib $^X $__FILE__\n};
+    }
+    else {
+        print qq{not ok - 9 'ÉA' =~ m?(a)?ib $^X $__FILE__\n};
+    }
+}
+else {
+    print qq{not ok - 9 'ÉA' =~ m?(a)?ib $^X $__FILE__\n};
+}
+
+if ('Éa' =~ m?(A)?ib) {
+    if ($1 eq 'a') {
+        print qq{ok - 10 'Éa' =~ m?(A)?ib $^X $__FILE__\n};
+    }
+    else {
+        print qq{not ok - 10 'Éa' =~ m?(A)?ib $^X $__FILE__\n};
+    }
+}
+else {
+    print qq{not ok - 10 'Éa' =~ m?(A)?ib $^X $__FILE__\n};
+}
+
+if ('Éa' =~ m?(a)?b) {
+    if ($1 eq 'a') {
+        print qq{ok - 11 'Éa' =~ m?(a)?b $^X $__FILE__\n};
+    }
+    else {
+        print qq{not ok - 11 'Éa' =~ m?(a)?b $^X $__FILE__\n};
+    }
+}
+else {
+    print qq{not ok - 11 'Éa' =~ m?(a)?b $^X $__FILE__\n};
+}
+
+if ('Éa' =~ m?(a)?ib) {
+    if ($1 eq 'a') {
+        print qq{ok - 12 'Éa' =~ m?(a)?ib $^X $__FILE__\n};
+    }
+    else {
+        print qq{not ok - 12 'Éa' =~ m?(a)?ib $^X $__FILE__\n};
+    }
+}
+else {
+    print qq{not ok - 12 'Éa' =~ m?(a)?ib $^X $__FILE__\n};
+}
+
+if ('ÉÉA' =~ m?(ÉA)?b) {
+    if ($1 eq 'ÉA') {
+        print qq{ok - 13 'ÉÉA' =~ m?(ÉA)?b $^X $__FILE__\n};
+    }
+    else {
+        print qq{not ok - 13 'ÉÉA' =~ m?(ÉA)?b $^X $__FILE__\n};
+    }
+}
+else {
+    print qq{not ok - 13 'ÉÉA' =~ m?(ÉA)?b $^X $__FILE__\n};
+}
+
+if ('ÉÉA' =~ m?(ÉA)?ib) {
+    if ($1 eq 'ÉA') {
+        print qq{ok - 14 'ÉÉA' =~ m?(ÉA)?ib $^X $__FILE__\n};
+    }
+    else {
+        print qq{not ok - 14 'ÉÉA' =~ m?(ÉA)?ib $^X $__FILE__\n};
+    }
+}
+else {
+    print qq{not ok - 14 'ÉÉA' =~ m?(ÉA)?ib $^X $__FILE__\n};
+}
+
+if ('ÉÉA' =~ m?(Éa)?ib) {
+    if ($1 eq 'ÉA') {
+        print qq{ok - 15 'ÉÉA' =~ m?(Éa)?ib $^X $__FILE__\n};
+    }
+    else {
+        print qq{not ok - 15 'ÉÉA' =~ m?(Éa)?ib $^X $__FILE__\n};
+    }
+}
+else {
+    print qq{not ok - 15 'ÉÉA' =~ m?(Éa)?ib $^X $__FILE__\n};
+}
+
+if ('ÉÉa' =~ m?(ÉA)?ib) {
+    if ($1 eq 'Éa') {
+        print qq{ok - 16 'ÉÉa' =~ m?(ÉA)?ib $^X $__FILE__\n};
+    }
+    else {
+        print qq{not ok - 16 'ÉÉa' =~ m?(ÉA)?ib $^X $__FILE__\n};
+    }
+}
+else {
+    print qq{not ok - 16 'ÉÉa' =~ m?(ÉA)?ib $^X $__FILE__\n};
+}
+
+if ('ÉÉa' =~ m?(Éa)?b) {
+    if ($1 eq 'Éa') {
+        print qq{ok - 17 'ÉÉa' =~ m?(Éa)?b $^X $__FILE__\n};
+    }
+    else {
+        print qq{not ok - 17 'ÉÉa' =~ m?(Éa)?b $^X $__FILE__\n};
+    }
+}
+else {
+    print qq{not ok - 17 'ÉÉa' =~ m?(Éa)?b $^X $__FILE__\n};
+}
+
+if ('ÉÉa' =~ m?(Éa)?ib) {
+    if ($1 eq 'Éa') {
+        print qq{ok - 18 'ÉÉa' =~ m?(Éa)?ib $^X $__FILE__\n};
+    }
+    else {
+        print qq{not ok - 18 'ÉÉa' =~ m?(Éa)?ib $^X $__FILE__\n};
+    }
+}
+else {
+    print qq{not ok - 18 'ÉÉa' =~ m?(Éa)?ib $^X $__FILE__\n};
+}
+
+__END__
+

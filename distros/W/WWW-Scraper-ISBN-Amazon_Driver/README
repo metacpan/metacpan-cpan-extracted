@@ -29,6 +29,7 @@ This module requires these modules:
 For testing the module requires these modules:
 
   IO::File
+  Test::MockModule
   Test::More
 
 For optional testing the module would like these modules:
@@ -40,7 +41,7 @@ For optional testing the module would like these modules:
 
 COPYRIGHT AND LICENSE
 
-  Copyright (C) 2004-2014 Barbie for Miss Barbell Productions
+  Copyright (C) 2004-2019 Barbie for Miss Barbell Productions
 
   This distribution is free software; you can redistribute it and/or
   modify it under the Artistic Licence v2.

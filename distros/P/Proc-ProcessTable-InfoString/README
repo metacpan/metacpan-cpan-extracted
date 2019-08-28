@@ -1,0 +1,76 @@
+Proc-ProcessTable-InfoString
+
+Prints a handy info string representing
+state and various flags as well as showing
+the wait channel in use if there is one.
+
+use Proc::ProcessTable::InfoString;
+use Proc::ProcessTable;
+
+my $is = Proc::ProcessTable::InfoString->new;
+
+my $p = Proc::ProcessTable->new( 'cache_ttys' => 1 );
+my $pt = $p->table;
+
+foreach my $proc ( @{ $pt } ){
+    print $proc->pid.' '.$is->info( $proc )."\n";
+}
+
+
+results in output like...
+
+
+57255 Rs+
+57254 Ss+ zio->io_
+57253 Ss+ wait
+57252 Ss+ zcw->zcw
+57226 Ss+ zio->io_
+57224 Ss+ wait
+57223 Rs+
+57222 Ss+ wait
+56824 Ss+ zio->io_
+55632 Ss+ zcw->zcw
+55631 Ss+ wait
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Proc::ProcessTable::InfoString
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Proc-ProcessTable-InfoString
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Proc-ProcessTable-InfoString
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Proc-ProcessTable-InfoString
+
+    Search CPAN
+        https://metacpan.org/release/Proc-ProcessTable-InfoString
+
+    Repository
+        https://gitea.eesdp.org/vvelox/Proc-ProcessTable-InfoString
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2019 by Zane C. Bowers-Hadley.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

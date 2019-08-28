@@ -776,7 +776,7 @@ sub detect_relocation {
     return unless -e $config_file;
 
     my %inc = %INC;
-    eval { require "$config_file" };
+    eval { require "./$config_file" };
     %INC = %inc; # be stealth
     warn($@), return if $@;
 

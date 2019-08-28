@@ -1,0 +1,156 @@
+# NAME
+
+Puppet::Orchestrator - Connects to the Puppet Orchestrator API (i.e. Puppet Tasks)
+
+# VERSION
+
+version 0.002
+
+# SYNOPSIS
+
+This module interacts with the Puppet Orchestrator API (i.e. Puppet Tasks)
+
+    use Puppet::DB;
+    use Puppet::Orchestrator;
+    use Puppet::Classify;
+
+    # Create a Puppet DB object
+    my $puppet_db = Puppet::DB->new(
+        server_name => $config->{puppetdb_host},
+        server_port => $config->{puppetdb_port},
+    );
+
+    # Create a Puppet classification object
+    my $classify = Puppet::Classify->new(
+                      cert_name       => $config->{puppet_classify_cert},
+                      server_name     => $config->{puppet_classify_host},
+                      server_port     => $config->{puppet_classify_port},
+                      puppet_ssl_path => $config->{puppet_ssl_path},
+                      puppet_db       => $puppet_db,
+                    );
+
+    # Create a Puppet orchestrator object
+    my $orchestrator = Puppet::Orchestrator->new( 
+                                          cert_name       => $config->{puppet_orch_cert},
+                                          server_name     => $config->{puppet_orch_host},
+                                          server_port     => $config->{puppet_orch_port},
+                                          puppet_ssl_path => $config->{puppet_ssl_path},
+                                          puppet_db       => $puppet_db,
+                                        );
+
+    $group = "All Nodes";
+    my $nodes = $classify->get_nodes_matching_group( $group );
+    my $jobid = $orchestrator->submit_task( "profile::check_id", { "id" => "836" }, $nodes );
+
+    $orchestrator->print_output_wait($jobid);
+
+It requires the _Puppet::DB_ module. The _Puppet::Classify_ is recommended as it allows
+looking up group membership.
+
+## server\_name
+
+The puppet master that is running the Orchestrator API. Connects to [localhost](https://metacpan.org/pod/localhost) by default.
+
+    $orchestrator->server_name('puppet.example.com');
+
+## server\_port
+
+Connect to the Puppet Orchestrator server on port 8143 by default - this can be overidden when consumed.
+
+    $orchestrator->server_port(8754);
+
+## access\_token
+
+Use an access\_token instead of a certificate to connect to the API.
+This loads the authentication token saved in your home, but it can be set manually if it is not stored there.
+
+    say $orchestrator->access_token;
+
+## environment
+
+The environment to look in for the task to be run - this can be overidden when consumed. Defaults to 'production'.
+
+    $orchestrator->environment('test');
+
+## cert\_name
+
+the basename of the certificate to be used for authentication.  This is a certificate that has been generated on the
+Puppet Master and added to the whitelist.  This can be used instead of using an auth token.
+
+    $orchestrator->cert_name('api_access');
+
+## puppet\_ssl\_path
+
+Set the path to the Puppet SSL certs, it uses the Puppet enterprise path by default.
+
+    $orchestrator->server_name('puppet.example.com');
+
+## timeout
+
+The connection timeout.  Defaults to 360 seconds.
+
+    $orchestrator->timeout(30);
+
+## puppet\_db
+
+The puppet DB object used to interact with the Puppet DB.
+
+    $orchestrator->puppet_db(Puppet::DB->new);
+
+## nodes
+
+A list of nodes to perform the task on
+
+    my $nodes = [ qw( node1 node2 ) ];
+    $orchestrator->nodes($nodes);
+
+## job\_id
+
+The job ID number
+
+    say $orchestrator->job_id;
+
+## wait\_for\_job
+
+This method sleeps until the job is finished or the timeout in seconds is reached.  The timeout is optional,
+if not specified, it will sleep indefinately.
+
+    $orchestrator->wait_for_job( $jobid, $timeout );
+
+## submit\_task
+
+Submit a new task
+
+    my $task_name = "package",
+    my $params = {
+                   action => "install",
+                   name   => "httpd",
+                 }
+    my $nodes = [ qw( node1 node2 ) ];
+    my $jobid = $orchestrator->submit_task( $task_name, $params, $nodes );
+
+    my $timeout = 20;
+    $orchestrator->wait_for_job( $jobid, $timeout );
+
+## is\_job\_finished
+
+Simply returns true or false based on whether the job is finished
+
+    say "Done" if $is_job_finished->job_id;
+
+## print\_output\_wait
+
+This will print the job output as it becomes available and wait until the job is finished.
+
+    $orchestrator->print_output_wait;
+
+# AUTHOR
+
+Matthew Mallard <mqtech@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by Matthew Mallard.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

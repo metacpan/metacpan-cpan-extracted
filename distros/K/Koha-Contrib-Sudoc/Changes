@@ -1,5 +1,9 @@
 Revision history for Perl module Koha::Contrib::Sudoc
 
+2.32 2019-08-28
+
+  - Accepte les fichiers Sudoc en A002, A003, etc. 
+
 2.30 2019-07-08
 
   - Si converter local pas chargeable, arrêt du Chargeur plutôt qu'utilisation

@@ -31,24 +31,51 @@ Nodes of this class represent configuration sections in the AST.
 
 =head1 METHODS
     
+=head2 new(ROOT, ARG => VAL, ...)
+
+Creates new section object. I<ROOT> is the root object of the tree or the
+B<Config::AST> object. The I<ARG =E<gt> VAL> pairs are passed to
+the parent class constructor (see B<Config::AST::Node>).
+
 =cut
 
 sub new {
     my $class = shift;
-    my $self = $class->SUPER::new(@_);
+    my $root = shift or croak "mandatory parameter missing";
+    local %_ = @_;
+    my $self = $class->SUPER::new(%_);
     $self->{_subtree} = {};
+    if ($root->isa('Config::AST')) {
+	$root = $root->root;
+    }
+    $self->{_root} = $root;
     return $self;
 }
+
+sub is_leaf { 0 }
+sub is_section { 1 }
+
+sub root { shift->{_root} }
 
 =head2 $t = $node->subtree
 
 Returns tree containing all subordinate nodes of this node.
+
+=head2 $t = $node->subtree($key)
+
+Returns the subnode at I<$key> or B<undef> if there is no such subnode.
+
+=head2 $t = $node->subtree($key => $value)
+
+Creates new subnode with the given I<$key> and I<$value>.  Returns the
+created node.
 
 =cut    
 
 sub subtree {
     my $self = shift;
     if (my $key = shift) {
+	$key = $self->root->mangle_key($key);
 	if (my $val = shift) {
 	    $self->{_subtree}{$key} = $val;
 	}
@@ -182,8 +209,8 @@ sub as_string { '(section)' }
 
 =head1 SEE ALSO
 
-B<Config::AST>,    
-B<Config::AST::Node>.
+L<Config::AST>,    
+L<Config::AST::Node>.
 
 =cut    
 

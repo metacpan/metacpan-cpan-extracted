@@ -1,5 +1,5 @@
 package Minion::Backend::MongoDB;
-$Minion::Backend::MongoDB::VERSION = '1.00';
+$Minion::Backend::MongoDB::VERSION = '1.01';
 # ABSTRACT: MongoDB backend for Minion
 
 use Mojo::Base 'Minion::Backend';
@@ -49,10 +49,11 @@ sub dequeue {
   $self->_notifications;
 
   my $timer = Mojo::IOLoop->timer($wait => sub { Mojo::IOLoop->stop });
-  Mojo::IOLoop->recurring(1 => sub {
+  my $recur = Mojo::IOLoop->recurring(1 => sub {
       Mojo::IOLoop->stop if ($self->_await)
   });
   Mojo::IOLoop->start;
+  Mojo::IOLoop->remove($recur);
   Mojo::IOLoop->remove($timer);
 
   return $self->_try($oid, $options);
@@ -631,7 +632,7 @@ Minion::Backend::MongoDB - MongoDB backend for Minion
 
 =head1 VERSION
 
-version 1.00
+version 1.01
 
 =head1 SYNOPSIS
 

@@ -24,6 +24,7 @@ use Config::AST::Node qw(:sort);
 use Config::AST::Node::Section;
 use Config::AST::Node::Value;
 use Config::AST::Follow;
+use Config::AST::Root;
 use Data::Dumper;
 
 require Exporter;
@@ -31,7 +32,7 @@ our @ISA = qw(Exporter);
 our %EXPORT_TAGS = ( 'sort' => [ qw(NO_SORT SORT_NATURAL SORT_PATH) ] );
 our @EXPORT_OK = qw(NO_SORT SORT_NATURAL SORT_PATH);
     
-our $VERSION = "1.04";
+our $VERSION = "1.05";
 
 =head1 NAME
 
@@ -299,29 +300,37 @@ sub new {
     local %_ = @_;
     my $self = bless { _order => 0 }, $class;
     my $v;
-    my $err;
 
     $self->{_debug} = delete $_{debug} || 0;
-    $self->{_ci} = delete $_{ci} || 0;
+    $self->{_root} = new Config::AST::Root(delete $_{ci} || 0);
 
     if (defined($v = delete $_{lexicon})) {
-	if (ref($v) eq 'HASH') {
-	    $self->{_lexicon} = $v;
-	} else {
-	    carp "lexicon must refer to a HASH";
-	    ++$err;
-	}
+	$self->lexicon($v);
     }
+    croak "unrecognized parameters" if keys(%_);
 
-    if (keys(%_)) {
-	foreach my $k (keys %_) {
-	    carp "unknown parameter $k"
-	}
-	++$err;
-    }
-    croak "can't create configuration instance" if $err;
     $self->reset;
     return $self;
+}
+
+=head2 $node = $cfg->root
+
+Returns the root node of the tree, initializing it if necessary.
+
+=cut
+
+sub root { shift->{_root} }
+
+=head2 $s = $r->mangle_key($name)
+
+Converts the string I<$name> to a form suitable for lookups, in accordance
+with the B<ci> parameter passed to the constructor.
+
+=cut
+
+sub mangle_key {
+    my ($self, $key) = @_;
+    return $self->root->mangle_key($key);
 }
 
 =head2 $cfg->lexicon($hashref)
@@ -338,9 +347,68 @@ sub lexicon {
 	carp "too many arguments" if @_;
         carp "lexicon must refer to a HASH" unless ref($lexicon) eq 'HASH';
 	$self->reset;
-        $self->{_lexicon} = $lexicon;
+        $self->_clone_lexicon($lexicon);
     }
     return $self->{_lexicon};
+}
+
+sub _clone_lexicon {
+    my ($self, $source_lex) = @_;
+    my @stk;
+    $self->{_lexicon} = {};
+    push @stk, [ $source_lex, $self->{_lexicon}, \&mangle_key ];
+    while (my $elt = pop @stk) {
+	while (my ($k, $v) = each %{$elt->[0]}) {
+	    if ($elt->[2]) {
+		$k = $self->${\$elt->[2]}($k);
+	    }
+	    
+	    my $copy;
+	    if (ref($v) eq 'HASH') {
+		$copy = {};
+   		push @stk, [ $v, $copy, 
+			     (!$elt->[2] && $k eq 'section')
+			       ? \&mangle_key : undef ];
+	    } else {
+		$copy = $v;
+	    }
+	    $elt->[1]{$k} = $copy;
+	}
+    }
+}
+
+=head2 $cfg->describe_keyword(@path)
+
+Returns a lexicon entry for the statement at I<@path>. If no such
+statement is defined, returns undef.
+
+=cut
+
+sub describe_keyword {
+    my $self = shift;
+    my $lex = $self->lexicon;
+    return '*' unless $lex;
+    while (my $k = shift @_) {
+	$k = $self->mangle_key($k);
+	if (my $next = (ref($lex) eq 'HASH'
+			? $lex->{$k} // $lex->{'*'}
+			: (($lex eq '*') ? $lex : undef))) {
+	    $lex = $next;
+	    if (ref($lex) eq 'HASH') {
+  	        if ($next = $lex->{section}) {
+		    $lex = $next if @_;
+		    next;
+		}
+	    } elsif ($lex eq '*') {
+		next;
+	    }
+	    last;
+	} else {
+	    return;
+	}
+    }
+    return if @_;
+    return $lex;
 }
 
 =head1 PARSING
@@ -449,6 +517,7 @@ sub fixup_tree {
 	                : $d->{default};
 	    if (exists($d->{section})) {
 		$n = new Config::AST::Node::Section(
+		               $self,
 		               default => 1,
 		               subtree => $dfl
 		     );
@@ -475,7 +544,8 @@ sub fixup_tree {
 			}
 		    }
 		} else {
-		    my $node = new Config::AST::Node::Section;
+		    my $node =
+			new Config::AST::Node::Section($self);
 		    $self->fixup_tree($node, $d->{section}, @path, $k);
 		    if ($node->keys > 0) {
 			# If the newly created node contains any subnodes
@@ -500,7 +570,7 @@ sub fixup_tree {
 		my $node;
 		
 		unless ($node = $section->subtree($k)) {
-		    $node = new Config::AST::Node::Section;
+		    $node = new Config::AST::Node::Section($self);
 		}
 		if ((!exists($d->{select})
 		     || $self->${ \ $d->{select} }($node, @path, $k))) {
@@ -536,7 +606,9 @@ for parsing another file.
 sub reset {
     my $self = shift;
     $self->{_error_count} = 0;
-    delete $self->{_tree};
+    if ($self->root) {
+	$self->root->reset;
+    }
 }
 
 =head1 METHODS
@@ -616,10 +688,11 @@ returns C<undef>.
     
 sub getnode {
     my $self = shift;
-    
-    my $node = $self->{_tree} or return undef;
+
+    return undef if $self->root->empty;
+    my $node = $self->root->tree;
     for (@_) {
-	$node = $node->subtree($self->{_ci} ? lc($_) : $_)
+	$node = $node->subtree($_)
 	    or return undef;
     }
     return $node;
@@ -685,10 +758,7 @@ sub is_variable {
 
 =cut    
 
-sub tree {
-    my $self = shift;
-    return $self->{_tree} //= new Config::AST::Node::Section(locus => new Text::Locus);
-}
+sub tree { shift->root->tree }
 
 =head2 $cfg->subtree(@path)
 
@@ -760,7 +830,10 @@ sub AUTOLOAD {
     return Config::AST::Follow->new($self->tree, $self->lexicon)->${\$m};
 }
 
-sub DESTROY { }
+sub DESTROY {
+    my $self = shift;
+    $self->root->reset if $self->root;
+}
 
 =head1 CONSTRUCTING THE SYNTAX TREE
 
@@ -826,7 +899,7 @@ sub add_node {
     my $name;
     my $locus = $node->locus;
     for (my $i = 0; $i < $pn; $i++) {
-	$name = ${$path}[$i];
+	$name = $self->mangle_key(${$path}[$i]);
 	
 	unless ($tree->is_section) {
 	    $self->error(join('.', @{$path}[0..$i]) . ": not a section");
@@ -846,13 +919,14 @@ sub add_node {
 	} else {
 	    $tree = $tree->subtree(
 		$name => new Config::AST::Node::Section(
+		    $self,
 		    order => $self->{_order}++,
 		    locus => $locus->clone)
 		);
 	}
     }
 
-    $name = ${$path}[-1];
+    $name = $self->mangle_key(${$path}[-1]);
 
     my $x = $kw->{$name} // $kw->{'*'};
     if (!defined($x)) {
@@ -968,8 +1042,8 @@ sub set {
 	    $node = $n;
 	} else {
 	    $node = $node->subtree(
-		         $arg => new Config::AST::Node::Section
-		    );
+		$arg => new Config::AST::Node::Section($self)
+	    );
 	}
     }
     
@@ -992,7 +1066,8 @@ Unsets the configuration variable.
 sub unset {
     my $self = shift;
 
-    my $node = $self->{_tree} or return;
+    return if $self->root->empty;
+    my $node = $self->root->tree;
     my @path;
     
     for (@_) {
@@ -1241,10 +1316,11 @@ sub lint {
 
 =head1 SEE ALSO
 
-B<Config::AST::Node>.
+L<Config::AST::Node>.
 
-B<Config::Parser>.
+L<Config::Parser>.
 
 =cut    
+
 
 1;

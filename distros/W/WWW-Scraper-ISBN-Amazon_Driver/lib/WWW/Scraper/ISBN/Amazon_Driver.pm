@@ -4,7 +4,9 @@ use strict;
 use warnings;
 
 use vars qw($VERSION);
-$VERSION = '0.41';
+$VERSION = '1.00';
+
+q< https://smile.amazon.co.uk/gp/registry/wishlist/ref=cm_wl_your_lists >;
 
 #--------------------------------------------------------------------------
 
@@ -55,7 +57,7 @@ be forthcoming, please feel free to (politely) remind me.
 
 =head1 COPYRIGHT & LICENSE
 
-  Copyright (C) 2004-2014 Barbie for Miss Barbell Productions
+  Copyright (C) 2004-2019 Barbie for Miss Barbell Productions
 
   This distribution is free software; you can redistribute it and/or
   modify it under the Artistic Licence v2.

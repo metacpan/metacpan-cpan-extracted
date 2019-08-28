@@ -1,0 +1,74 @@
+NAME
+    App::Spanel::BuildBindZones - Build BIND zones from YAML zones
+
+VERSION
+    This document describes version 0.001 of App::Spanel::BuildBindZones
+    (from Perl distribution App-Spanel-BuildBindZones), released on
+    2019-08-28.
+
+SYNOPSIS
+    See the included spanel-build-bind-zones script.
+
+FUNCTIONS
+  build_bind_zones
+    Usage:
+
+     build_bind_zones(%args) -> [status, msg, payload, meta]
+
+    Build BIND zones from YAML zones.
+
+    This script will collect all YAML zones from user accounts
+    (/u/*/sysetc/zone=*) and build BIND zones then write them to the current
+    directory with names db.* (so /u/foo/sysetc/zone=example.com will become
+    ./db.example.com).
+
+    Will not override existing files unless "--overwrite" ("-O") is
+    specified.
+
+    Will skip YAML zones that contain invalid data, e.g. name in record that
+    contains underscore ("_"), unknown record type, etc.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   overwrite => *bool*
+
+        Whether to overwrite existing output files.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-Spanel-BuildBindZones>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-Spanel-BuildBindZones>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-Spanel-BuildBindZ
+    ones>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

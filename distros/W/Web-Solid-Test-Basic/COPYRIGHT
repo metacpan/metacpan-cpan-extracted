@@ -11,6 +11,8 @@ Files: Changes
  lib/Web/Solid/Test/Basic.pm
  lib/Web/Solid/Test/HTTPLists.pm
  t/01basic.t
+ t/unit-get-token-network.t
+ t/unit-get-token.t
 Copyright: Copyright 2019 Kjetil Kjernsmo.
 License: Expat
 
@@ -19,6 +21,7 @@ Files: Dockerfile
  LICENSE
  README
  README.md
+ t/data/alice-token
 Copyright: Unknown
 License: Unknown
 

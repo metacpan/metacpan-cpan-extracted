@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc::Loader::Authorities;
 # ABSTRACT: Chargeur de notices d'autorité
-$Koha::Contrib::Sudoc::Loader::Authorities::VERSION = '2.31';
+$Koha::Contrib::Sudoc::Loader::Authorities::VERSION = '2.32';
 use Moose;
 
 extends 'Koha::Contrib::Sudoc::Loader';
@@ -148,7 +148,7 @@ Koha::Contrib::Sudoc::Loader::Authorities - Chargeur de notices d'autoritÃ©
 
 =head1 VERSION
 
-version 2.31
+version 2.32
 
 =head1 AUTHOR
 

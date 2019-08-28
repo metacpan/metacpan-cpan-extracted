@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc::Koha;
 # ABSTRACT: Lien à Koha
-$Koha::Contrib::Sudoc::Koha::VERSION = '2.31';
+$Koha::Contrib::Sudoc::Koha::VERSION = '2.32';
 use Moose;
 use Modern::Perl;
 use Carp;
@@ -314,7 +314,7 @@ Koha::Contrib::Sudoc::Koha - Lien Ã  Koha
 
 =head1 VERSION
 
-version 2.31
+version 2.32
 
 =head1 DESCRIPTION
 

@@ -182,7 +182,7 @@ Returns true if node represents a section.
 
 =cut    
 
-sub is_section { ! shift->is_leaf }
+sub is_section { 0 }
 
 =head2 $node->is_value
 
@@ -337,10 +337,10 @@ use overload
 	
 =head1 SEE ALSO
 
-B<Config::AST>,    
-B<Config::AST::Node::Null>,
-B<Config::AST::Node::Value>,
-B<Config::AST::Node::Section>.
+L<Config::AST>,    
+L<Config::AST::Node::Null>,
+L<Config::AST::Node::Value>,
+L<Config::AST::Node::Section>.
     
 =cut    
 

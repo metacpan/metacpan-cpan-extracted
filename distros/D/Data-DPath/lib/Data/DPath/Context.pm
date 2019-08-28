@@ -1,18 +1,17 @@
 package Data::DPath::Context;
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: Abstraction for a current context that enables incremental searches
-$Data::DPath::Context::VERSION = '0.57';
+$Data::DPath::Context::VERSION = '0.58';
 use strict;
 use warnings;
 
 use Data::Dumper;
 use aliased 'Data::DPath::Point';
 use aliased 'Data::DPath::Attrs';
-use List::MoreUtils 'uniq';
 use Scalar::Util 'reftype';
 use Data::DPath::Filters;
 use Iterator::Util;
-use List::Util 'min';
+use List::Util 1.45 'min', 'uniq';
 #use Sys::CPU;
 use POSIX ();
 use Safe;
@@ -610,7 +609,7 @@ Steffen Schwigon <ss5@renormalist.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Steffen Schwigon.
+This software is copyright (c) 2019 by Steffen Schwigon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

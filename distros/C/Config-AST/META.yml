@@ -17,7 +17,7 @@ no_index:
 provides:
   Config::AST:
     file: lib/Config/AST.pm
-    version: 1.04
+    version: 1.05
   Config::AST::Follow:
     file: lib/Config/AST/Follow.pm
     version: 0
@@ -33,6 +33,9 @@ provides:
   Config::AST::Node::Value:
     file: lib/Config/AST/Node/Value.pm
     version: 0
+  Config::AST::Root:
+    file: lib/Config/AST/Root.pm
+    version: 0
 resources:
   repository: git://git.gnu.org.ua/config-ast.git
-version: 1.04
+version: 1.05

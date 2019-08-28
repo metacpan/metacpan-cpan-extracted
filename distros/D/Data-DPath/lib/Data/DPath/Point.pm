@@ -1,7 +1,7 @@
 package Data::DPath::Point;
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: Abstraction for a single reference (a "point") in the datastructure
-$Data::DPath::Point::VERSION = '0.57';
+$Data::DPath::Point::VERSION = '0.58';
 use strict;
 use warnings;
 
@@ -56,7 +56,7 @@ Steffen Schwigon <ss5@renormalist.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Steffen Schwigon.
+This software is copyright (c) 2019 by Steffen Schwigon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
