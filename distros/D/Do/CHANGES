@@ -1,33 +1,35 @@
 Changelog for Do
 
-1.02 2019-08-26T05:20:58
+1.05 2019-08-27T22:28:01
+ - No changes found
+
+1.04 2019-08-27T21:08:54
+ - Built release version 1.04
+ - Added release updates
+ - Fixed obscure Windows Space#load issue
+ - Fixed path issue failing on Windows
+ - Updated general project info
+ - Updated build and release flow
+ - Build 1.03 (#184)
+
+1.03 2019-08-27T00:20:42
+ - Built release version 1.03
  - Updated documentation
- - Fixed 0.01 regression test for throw keyword
- - Remove build and updated release scripts
- - Updated POD framework
- - Updated POD for Data/Object/Exception
- - Updated Throwable due to changes in Exception
- - Added test for State
- - Added test for Struct
- - Added missing Exception tests
- - Added Data::Object::Struct
- - Added Data::Object::Exception
- - Updated POD for Do
- - Added Data::Object::Data
+ - Update POD-writer to assist coalescing
+ - Updated abstracts for PODs
+ - Added autobox note to "whats enabled" section
+ - Added "package main" to script example
+ - Added file-exists tests to use/can.t
+ - Added note on Rule vs Role
+ - Updated POD template with repo rename
+ - Noted method signature caveats for parameterized types
+ - Added README-DEVEL
+ - Added build test phase to release script
+
+1.01 2019-08-22T20:43:10
  - Released v1.01 (#181)
 
-1.01 2019-08-22T20:26:05
- - Built release version 1.01
- - Removed do.pm to avoid case insensitive filesystem issues
-
-1.00 2019-08-22T19:46:18
- - Built release version 1.00
- - Updated documentation
- - Updated build and release scripts
- - Integrate Data-Object-Immutable
- - Integrate Data-Object-Autobox
- - Renamed framework "Do"
- - Removed config-once enforcement
+1.00 2019-08-22T20:04:40
  - Performance optimizations (#179)
 
 0.99 2019-08-17T23:14:31
@@ -151,10 +153,10 @@ Changelog for Do
  - Remove BUILD, BUILDARGS, and import tests and pod requirements
  - Remove all instances of the args() method from "value" classes
  - Added package variable access to Space
- - Added pluck and renamed find to item in Data
- - Added extra POD sections to main module
  - Fixed proxy to handle wantarray
+ - Added pluck and renamed find to item in Data
  - Shortened "do" POD
+ - Added extra POD sections to main module
  - Fixed exports in Config
  - Added types documentation to Library
  - Registered type constraints for for JSON, Path, Yaml and Template
@@ -171,22 +173,22 @@ Changelog for Do
  - Added BUILD and METHODS markers
  - Added config_kind and Export/do test
  - Remove Config/Script functionality
- - Removed exportable vars from Export
- - Removed test for constructor method
- - Removed constructor method
- - Deprecated new subroutine test
- - Made auto-export cleaner
- - Removed overloaded qr from Detract role
- - Cleaned up overloading in Exception
- - Added tests for pl and pm (special) configs
- - Added pl, pm, and kind config\nAdded feature state to all configs\nAdded
-   carp to all configs\nFixed Data-Object configs
+ - Updated replace func class to return Replace object
  - Cleaned up signatures import list
  - Updated to return the func class return value
  - Updated search func class to return Search object
- - Updated replace func class to return Replace object
+ - Added tests for pl and pm (special) configs
+ - Made auto-export cleaner
+ - Cleaned up overloading in Exception
+ - Removed test for constructor method
+ - Removed overloaded qr from Detract role
+ - Removed exportable vars from Export
  - Updated child and sibling methods to take a list of arguments\nFixed
    methods and functions routines
+ - Added pl, pm, and kind config\nAdded feature state to all configs\nAdded
+   carp to all configs\nFixed Data-Object configs
+ - Removed constructor method
+ - Deprecated new subroutine test
  - Added Role::Tiny to dependencies
  - Fixed class declaration in Func classes
  - Merge special "do" functionality
@@ -199,8 +201,8 @@ Changelog for Do
  - Cleaned up Type methods method
  - Added tests and updated POD
  - Defaults to main
- - Added id and cop methods, and better parsing regexp to Space
  - Refactored to use Space cop method
+ - Added id and cop methods, and better parsing regexp to Space
  - Updated Data/Object installation POD
  - Added bless, build and call to Space
  - Make children and siblings methods return objects
@@ -583,8 +585,8 @@ Changelog for Do
  - Added Regexp link to SEE ALSO section.
  - Miscellaneous cleanup of typos and layouts.
  - Upgraded to Moo v2.
- - Update documentation for class Scalar.
  - Removed scalar routines for "or", "and", "not", and "xor" operations.
+ - Update documentation for class Scalar.
  - Document roles usages.
  - Rework roles and composition.
  - Miscellaneous cleanup.

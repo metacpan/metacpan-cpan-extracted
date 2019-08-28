@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.154';
+our $VERSION = '1.155';
 
 use Quiq::Path;
 use Quiq::Option;
@@ -176,7 +176,7 @@ sub new {
 
             unless (open $self,$mode,$path) {
                 $class->throw(
-                    'FH-00001: Kann Datei nicht öffnen',
+                    'FH-00001: Can\'t open file',
                     Path=>$path,
                     Errstr=>$!,
                 );
@@ -935,7 +935,7 @@ sub slurpFromStdin {
 
 =head1 VERSION
 
-1.154
+1.155
 
 =head1 AUTHOR
 

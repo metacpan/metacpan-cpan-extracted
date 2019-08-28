@@ -20,6 +20,8 @@ no_index:
 requires:
   Test::More: '0'
   URI: '0'
+  overload: '0'
+  overloading: '0'
   perl: '5.006000'
-version: '0.6'
+version: '0.7'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

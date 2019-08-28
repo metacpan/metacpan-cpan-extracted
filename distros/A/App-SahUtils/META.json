@@ -29,13 +29,13 @@
          },
          "x_spec" : {
             "Rinci" : "v1.1.90",
-            "Sah" : "v0.9.32"
+            "Sah" : "v0.9.46"
          }
       },
       "runtime" : {
          "requires" : {
             "Complete::Module" : "0",
-            "Complete::Util" : "0.601",
+            "Complete::Util" : "0.602",
             "Data::Dump" : "0",
             "Data::Dump::Color" : "0",
             "Data::Sah" : "0.896",
@@ -52,7 +52,7 @@
             "File::Slurper" : "0",
             "JSON::MaybeXS" : "0",
             "Module::Path::More" : "0.32",
-            "PERLANCAR::Module::List" : "0",
+            "PERLANCAR::Module::List" : "0.004002",
             "Package::Stash" : "0",
             "Perinci::CmdLine::Any" : "0.13",
             "Perinci::CmdLine::Lite" : "1.820",
@@ -85,7 +85,7 @@
          "web" : "https://github.com/perlancar/perl-App-SahUtils"
       }
    },
-   "version" : "0.464",
+   "version" : "0.465",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028002"
@@ -240,7 +240,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.596"
+            "version" : "0.597"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -494,9 +494,9 @@
             "version" : "0.020"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Rinci::Validate",
-            "name" : "@Author::PERLANCAR/Rinci::Validate",
-            "version" : "0.24"
+            "class" : "Dist::Zilla::Plugin::Rinci::EmbedValidator",
+            "name" : "@Author::PERLANCAR/Rinci::EmbedValidator",
+            "version" : "0.250"
          },
          {
             "class" : "Dist::Zilla::Plugin::SetScriptShebang",

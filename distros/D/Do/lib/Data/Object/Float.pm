@@ -29,7 +29,7 @@ use overload (
 
 use parent 'Data::Object::Base::Float';
 
-our $VERSION = '1.02'; # VERSION
+our $VERSION = '1.05'; # VERSION
 
 # BUILD
 # METHODS
@@ -195,6 +195,7 @@ sub upto {
 }
 
 1;
+
 =encoding utf8
 
 =head1 NAME
@@ -473,15 +474,13 @@ Copyright (C) 2011-2019, Al Newkirk, et al.
 This is free software; you can redistribute it and/or modify it under the same
 terms as the Perl 5 programming language system itself.
 
-=head1 STATUS
+=head1 PROJECT
 
-=begin html
+L<GitHub|https://github.com/iamalnewkirk/do>
 
-<a href="https://travis-ci.org/iamalnewkirk/data-object" target="_blank">
-<img src="https://travis-ci.org/iamalnewkirk/data-object.svg?branch=master"/>
-</a>
+L<Contributing|https://github.com/iamalnewkirk/do/blob/master/README-DEVEL.mkdn>
 
-=end html
+L<Reporting|https://github.com/iamalnewkirk/do/issues>
 
 =head1 SEE ALSO
 
@@ -496,9 +495,5 @@ L<Data::Object::Rule>
 L<Data::Object::Library>
 
 L<Data::Object::Signatures>
-
-L<Contributing|https://github.com/iamalnewkirk/data-object/CONTRIBUTING.mkdn>
-
-L<GitHub|https://github.com/iamalnewkirk/data-object>
 
 =cut

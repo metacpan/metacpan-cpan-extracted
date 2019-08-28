@@ -7,12 +7,13 @@ use Data::Object;
 
 use parent 'Moo::Role';
 
-our $VERSION = '1.02'; # VERSION
+our $VERSION = '1.05'; # VERSION
 
 # BUILD
 # METHODS
 
 1;
+
 =encoding utf8
 
 =head1 NAME
@@ -23,7 +24,7 @@ Data::Object::Rule
 
 =head1 ABSTRACT
 
-Data-Object Class Requirements
+Data-Object Rule Declaration
 
 =cut
 
@@ -46,7 +47,10 @@ Data-Object Class Requirements
 =head1 DESCRIPTION
 
 This package modifies the consuming package making it a L<Moo> role, and is
-used to allows you to specify rules for the consuming class.
+used to allow you to specify rules for the consuming class. There is
+functionally no difference between a role and a rule, so this concept only
+exists to differentiate between that which describes an interface (rules) and
+that which mixes-in behaviors.
 
 =cut
 
@@ -61,15 +65,13 @@ Copyright (C) 2011-2019, Al Newkirk, et al.
 This is free software; you can redistribute it and/or modify it under the same
 terms as the Perl 5 programming language system itself.
 
-=head1 STATUS
+=head1 PROJECT
 
-=begin html
+L<GitHub|https://github.com/iamalnewkirk/do>
 
-<a href="https://travis-ci.org/iamalnewkirk/data-object" target="_blank">
-<img src="https://travis-ci.org/iamalnewkirk/data-object.svg?branch=master"/>
-</a>
+L<Contributing|https://github.com/iamalnewkirk/do/blob/master/README-DEVEL.mkdn>
 
-=end html
+L<Reporting|https://github.com/iamalnewkirk/do/issues>
 
 =head1 SEE ALSO
 
@@ -84,9 +86,5 @@ L<Data::Object::Rule>
 L<Data::Object::Library>
 
 L<Data::Object::Signatures>
-
-L<Contributing|https://github.com/iamalnewkirk/data-object/CONTRIBUTING.mkdn>
-
-L<GitHub|https://github.com/iamalnewkirk/data-object>
 
 =cut

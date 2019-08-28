@@ -13,7 +13,7 @@ Data::Object::Library
 
 =abstract
 
-Data-Object Library Configuration
+Data-Object Type Library
 
 =synopsis
 

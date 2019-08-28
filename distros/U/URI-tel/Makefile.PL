@@ -12,8 +12,10 @@ my %WriteMakefileArgs = (
     ABSTRACT            => 'Implementation of rfc3966 for tel URI',
     INSTALLDIRS         => ($] < 5.011 ? 'perl' : 'site'),
     PREREQ_PM           => {
-        'Test::More' => 0,
-        'URI' => 0
+        'Test::More' 	=> 0,
+    	'overload'		=> 0,
+    	'overloading'	=> 0,
+        'URI' 			=> 0
     },
     LICENSE				=> 'perl_5',
     MIN_PERL_VERSION	=> 5.6.0,

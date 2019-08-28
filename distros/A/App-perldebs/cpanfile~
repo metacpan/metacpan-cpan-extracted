@@ -1,0 +1,2 @@
+requires 'Module::CPANfile' => 0;
+requires 'DhMakePerl' => '0;

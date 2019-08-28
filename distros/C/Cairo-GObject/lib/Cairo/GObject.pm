@@ -16,7 +16,7 @@ use Glib;
 
 use XSLoader;
 
-our $VERSION = '1.004';
+our $VERSION = '1.005';
 XSLoader::load ('Cairo::GObject', $VERSION);
 
 1;
@@ -31,7 +31,7 @@ Cairo::GObject - Integrate Cairo into the Glib type system
 
   use Cairo::GObject;
 
-  # Cairo and Glib are now loaded and the Cairo types are registed with
+  # Cairo and Glib are now loaded and the Cairo types are registered with
   # Glib's type machinery.  This allows you to correctly use Cairo types
   # in signals and properties.
 

@@ -1024,7 +1024,7 @@ gperl_get_object_check (SV * sv,
 	const char * package;
 	package = gperl_object_package_from_type (gtype);
 	if (!package)
-		croak ("INTERNAL: GType %s (%d) is not registered with GPerl!",
+		croak ("INTERNAL: GType %s (%lu) is not registered with GPerl!",
 		       g_type_name (gtype), gtype);
 	if (!gperl_sv_is_ref (sv) || !sv_derived_from (sv, package))
 		croak ("%s is not of type %s",

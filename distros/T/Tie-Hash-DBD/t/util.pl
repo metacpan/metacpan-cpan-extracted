@@ -11,17 +11,28 @@ sub _bindata {
     return $data;
     } # _bindata
 
+my $tempdb;
+
 sub _dsn {
     my $type = shift;
 
-    $type eq "SQLite"	and return "dbi:SQLite:dbname=db.3";
-#   $type eq "SQLite"	and return "dbi:SQLite:dbname=:memory:";
     $type eq "Pg"	and return "dbi:Pg:";
+
+    my $rnd = sprintf "%d_%04d", $$, (time + int rand 10000) % 10000;
+
+    if ($type eq "SQLite") {
+	$tempdb = "db_$rnd.3";
+	unlink $tempdb;
+#	return "dbi:SQLite:dbname=:memory:";
+	return "dbi:SQLite:dbname=$tempdb";
+	}
 
     if ($type eq "CSV") {
 	my $xsv = eval q{use Text::CSV_XS; $Text::CSV_XS::VERSION; } || 0;
 	my $dbv = eval q{use DBD::CSV;     $DBD::CSV::VERSION;     } || 0;
-	my $dsn = "dbi:CSV:f_ext=.csv/r;csv_null=1";
+	$tempdb = "csv_$rnd";
+	mkdir $tempdb;
+	my $dsn = "dbi:CSV:f_dir=$tempdb;f_ext=.csv/r;csv_null=1";
 	$xsv > 1.01 && $dbv > 0.47     and $dsn .= ";csv_decode_utf8=0";
 	$dbv > 0.29 && $]   < 5.008009 and $dsn .= ";csv_auto_diag=0";
 	return $dsn;
@@ -47,6 +58,7 @@ sub _dsn {
     if ($type eq "mysql" || $type eq "MariaDB") {
 	my $db = $ENV{MYSQLDB} || $user or
 	    plan skip_all => "Not a testable MariaDB/MySQL env";
+	$ENV{DBI_USER} ||= $ENV{MYSQLUSER} || $user;
 	return "dbi:$type:database=$db";
 	}
 
@@ -117,14 +129,92 @@ sub cleanup {
     $type eq "Firebird"	and return;
 
     if ($type eq "SQLite") {
-	unlink $_ for glob "db.3*";
+	if ($tempdb) {
+	    unlink $tempdb;
+	    return;
+	    }
+	my @db = sort glob "db*.3*" or return;
+	unlink $_ for @db;
 	return;
 	}
 
     if ($type eq "CSV") {
-	unlink $_ for glob "t_tie*.csv";
+	if ($tempdb) {
+	    unlink for glob "$tempdb/*.csv";
+	    rmdir $tempdb;
+	    return;
+	    }
+	my @db = sort glob "t_tie*.csv" or return;
+	unlink $_ for @db;
 	return;
 	}
     } # cleanup
+
+# From Data::Serializer:
+# v Bencode
+#   Convert::Bencode
+#   Convert::Bencode_XS
+#   Config::General
+#   Data::Denter
+# - Data::Dumper
+#   Data::Taxi
+# - FreezeThaw
+# v JSON
+# v JSON::Syck
+#   PHP::Serialization
+# v Storable
+# v XML::Dumper
+#   XML::Simple
+# v YAML
+# v YAML::Syck
+
+sub supported_serializers {
+    qw( Storable
+	Sereal
+	JSON JSON::Syck
+	YAML YAML::Syck
+	XML::Dumper
+	Bencode
+	FreezeThaw
+	Not::Supported
+	);
+    } # supported_serializers
+
+sub deep {
+    my ($DBD, $str) = (@_, "");
+
+    my %deep = (
+	UND => undef,
+	IV  => 1,
+	NV  => 3.14159265358979001,
+	PV  => "string",
+	PV8 => "ab\ncd\x{20ac}\t",
+	PVM => $!,
+	RV  => \$DBD,
+	AR  => [ 1..2 ],
+	HR  => { key => "value" },
+	OBJ => ( bless { auto_diag => 1 }, "Text::CSV_XS" ),
+	RX  => qr{^re[gG]e?x},
+	FMT => *{$::{STDOUT}}{FORMAT},
+	CR  => sub { "code"; },
+	GLB => *STDERR,
+	IO  => *{$::{STDERR}}{IO},
+	);
+
+    $str eq ""            and delete @deep{qw( IO GLB CR RX FMT            )};
+    $str eq "Storable"    and delete @deep{qw( IO GLB CR RX FMT            )};
+    $str eq "Sereal"      and delete @deep{qw( IO GLB CR                   )};
+    $str eq "JSON"        and delete @deep{qw( IO GLB CR RX FMT RV OBJ     )};
+    $str eq "JSON::Syck"  and delete @deep{qw( IO GLB CR RX     RV     PV8 )};
+    $str eq "YAML"        and delete @deep{qw( IO GLB CR               PV8 )};
+    $str eq "YAML::Syck"  and delete @deep{qw( IO GLB CR RX            PV8 )};
+    $str eq "XML::Dumper" and delete @deep{qw( IO GLB CR RX                )};
+    $str eq "FreezeThaw"  and delete @deep{qw( IO     CR RX            PV8 )};
+    $str eq "Bencode"     and delete @deep{qw( IO UND CR RX FMT RV OBJ PV8 )};
+
+    $str =~ m/^[JYX]/ && $DBD =~ m/^(?: Pg | MariaDB )$/x and delete $deep{PV8};
+
+    %deep;
+    } # deep
 
 1;

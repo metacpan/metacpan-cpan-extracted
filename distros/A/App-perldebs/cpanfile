@@ -1,0 +1,36 @@
+on 'runtime' => sub {
+    requires 'Module::CPANfile';
+    requires 'Moo';
+    requires 'DhMakePerl';
+};
+
+on 'test' => sub {
+    requires 'Test::BDD::Cucumber';
+};
+
+on 'develop' => sub {
+    requires 'Dist::Zilla';
+    requires 'Dist::Zilla::App::Command::cover';
+    requires 'Dist::Zilla::Plugin::MinimumPerl';
+    requires 'Dist::Zilla::Plugin::AutoPrereqs';
+    requires 'Dist::Zilla::Plugin::CheckChangesHasContent';
+    requires 'Dist::Zilla::Plugin::Encoding';
+    requires 'Dist::Zilla::Plugin::ExecDir';
+    requires 'Dist::Zilla::Plugin::InstallGuide';
+    requires 'Dist::Zilla::Plugin::MinimumPerl';
+    requires 'Dist::Zilla::Plugin::NextRelease';
+    requires 'Dist::Zilla::Plugin::PerlTidy';
+    requires 'Dist::Zilla::Plugin::PkgVersion';
+    requires 'Dist::Zilla::Plugin::PodCoverageTests';
+    requires 'Dist::Zilla::Plugin::PodSyntaxTests';
+    requires 'Dist::Zilla::Plugin::PodWeaver';
+    requires 'Dist::Zilla::Plugin::ReadmeFromPod';
+    requires 'Dist::Zilla::Plugin::Test::ChangesHasContent';
+    requires 'Dist::Zilla::Plugin::Test::DirectoryLayout';
+    requires 'Dist::Zilla::Plugin::Test::NoTabs';
+    requires 'Dist::Zilla::Plugin::Test::Perl::Critic';
+    requires 'Dist::Zilla::Plugin::Test::Pod::Coverage::Configurable';
+    requires 'Dist::Zilla::PluginBundle::Basic';
+    requires 'Dist::Zilla::PluginBundle::Git';
+    requires 'Pod::Markdown';
+};

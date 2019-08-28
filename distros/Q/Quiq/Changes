@@ -1,3 +1,64 @@
+1.155 2019-08-27
+================
+[Quiq::Database::Api::Dbi::Connection]
+* Doku bearbeitet
+
+[Quiq::Database::Config]
+* Neue Klasse
+
+[Quiq::Database::Connection]
+* Doku bearbeit
+
+[Quiq::Database::Cursor]
+* Alias elapsed() für time() hinzugefügt
+
+[Quiq::Database::ResultSet]
+* Kosmetik
+
+[Quiq::Hash::Db]
+* umbenannt von Quiq::PersistentHash
+
+[Quiq::Hash::Persistent]
+* Klasse hinzugefügt
+
+[Quiq::Html::Widget::SelectMenu]
+* Attribut optionPairs => \@pairs hinzugefügt
+
+[Quiq::JQuery::DataTable]
+* Unterstützung für Array-Rows hinzugefügt
+
+[Quiq::Sql::Script::Reader]
+* Klasse hinzugefügt
+
+[Quiq::Sql::Analyzer]
+* Klasse hinzugefügt
+
+[Quiq::Dbms]
+* Klasse hinzugefügt
+
+[Quiq::FileHandle]
+* Fehlermeldung geändert
+
+[Quiq::Path]
+* Methoden stat() und touch() hinzugefügt
+
+[Quiq::Process]
+* Methode uid() hinzugefügt
+* Doku bearbeitet
+
+[Quiq::Program]
+* Behandlung bei fehlender -help Option korrigiert
+* Behandlung von $maxArgs = undef korrigiert
+
+[Quiq::Sql]
+* Auf Basisklasse Quiq::Dbms umgestellt
+
+[Quiq::Storable]
+* Timeout um negative Werte erweitert (Zeitverlängerung)
+
+[Quiq::TempFile]
+* Option -pathOnly hinzugefügt
+
 1.154 2019-08-11
 ================
 [Quiq::Cascm]

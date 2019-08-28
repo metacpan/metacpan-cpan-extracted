@@ -6,7 +6,7 @@ use strict;
 use Readonly;
 use warnings;
 
-$Geoffrey::Converter::Pg::Tables::VERSION = '0.000202';
+$Geoffrey::Converter::Pg::Tables::VERSION = '0.000203';
 
 use parent 'Geoffrey::Role::ConverterType';
 
@@ -20,7 +20,6 @@ sub add_column { return $_[0]->alter . q~ ADD COLUMN {1}~; }
 
 sub list {
     my ( $self, $schema ) = @_;
-    require Geoffrey::Utils;
     return q~SELECT t.*
           FROM information_schema.tables t
           WHERE t.table_type != 'VIEW' AND t.table_schema=?~;
@@ -28,7 +27,6 @@ sub list {
 
 sub s_list_columns {
     my ( $self, $schema ) = @_;
-    require Geoffrey::Utils;
     return q~SELECT *
           FROM information_schema.columns
           WHERE table_name = ?
@@ -47,7 +45,7 @@ Geoffrey::Converter::Pg::Tables - SQLite converter type for Tables!
 
 =head1 VERSION
 
-Version 0.000202
+Version 0.000203
 
 =head1 DESCRIPTION
 

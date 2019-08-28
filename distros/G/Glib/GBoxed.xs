@@ -517,7 +517,7 @@ gperl_new_boxed (gpointer boxed,
 	G_UNLOCK (info_by_gtype);
 
 	if (!boxed_info)
-		croak ("GType %s (%d) is not registered with gperl",
+		croak ("GType %s (%lu) is not registered with gperl",
 		       g_type_name (gtype), gtype);
 
 	wrap = boxed_info->wrapper_class
@@ -569,7 +569,7 @@ gperl_get_boxed_check (SV * sv, GType gtype)
 	G_UNLOCK (info_by_gtype);
 
 	if (!boxed_info)
-		croak ("internal problem: GType %s (%d) has not been registered with GPerl",
+		croak ("internal problem: GType %s (%lu) has not been registered with GPerl",
 			g_type_name (gtype), gtype);
 
 	unwrap = boxed_info->wrapper_class

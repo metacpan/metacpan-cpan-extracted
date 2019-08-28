@@ -19,7 +19,13 @@ for my $use_threads_yn ( 0, 1 ) {
         #$name = 'cannot.exist.invalid';
 
         my $query = $dns->resolve_async( $name, 'NS' )->then(
-            sub { diag explain [ passed => @_ ] },
+            sub {
+                my ($result) = @_;
+
+                isa_ok( $result, 'DNS::Unbound::Result', 'promise resolution' );
+
+                diag explain [ passed => $result ];
+            },
             sub { diag explain [ failed => @_ ] },
         );
 

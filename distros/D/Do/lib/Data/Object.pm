@@ -7,7 +7,7 @@ use warnings;
 
 use parent 'Data::Object::Config';
 
-our $VERSION = '1.02'; # VERSION
+our $VERSION = '1.05'; # VERSION
 
 # METHODS
 
@@ -94,6 +94,7 @@ sub undef {
 }
 
 1;
+
 =encoding utf8
 
 =head1 NAME
@@ -180,6 +181,9 @@ you import the "Do" or "Data::Object" package into your namespace.
   # imports keywords and super "do" function, etc
   use Data::Object::Export;
 
+  # enables method calls on native data types
+  use Data::Object::Autobox;
+
 To explain by way of example: The following established a user-defined type
 library where user-defined classes, roles, etc, will be automatically
 registered.
@@ -213,7 +217,7 @@ as a type constraint.
 The following is a script which is type-library aware that creates a function
 that returns how one user greets another user.
 
-  #!/usr/bin/perl
+  package main;
 
   use App::User;
 
@@ -522,15 +526,13 @@ Copyright (C) 2011-2019, Al Newkirk, et al.
 This is free software; you can redistribute it and/or modify it under the same
 terms as the Perl 5 programming language system itself.
 
-=head1 STATUS
+=head1 PROJECT
 
-=begin html
+L<GitHub|https://github.com/iamalnewkirk/do>
 
-<a href="https://travis-ci.org/iamalnewkirk/data-object" target="_blank">
-<img src="https://travis-ci.org/iamalnewkirk/data-object.svg?branch=master"/>
-</a>
+L<Contributing|https://github.com/iamalnewkirk/do/blob/master/README-DEVEL.mkdn>
 
-=end html
+L<Reporting|https://github.com/iamalnewkirk/do/issues>
 
 =head1 SEE ALSO
 
@@ -545,9 +547,5 @@ L<Data::Object::Rule>
 L<Data::Object::Library>
 
 L<Data::Object::Signatures>
-
-L<Contributing|https://github.com/iamalnewkirk/data-object/CONTRIBUTING.mkdn>
-
-L<GitHub|https://github.com/iamalnewkirk/data-object>
 
 =cut

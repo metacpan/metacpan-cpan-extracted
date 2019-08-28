@@ -4,13 +4,13 @@
       "Andy Lester <andy@petdance.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "File-Next",
    "no_index" : {
@@ -32,7 +32,9 @@
       },
       "runtime" : {
          "requires" : {
+            "File::Copy" : "0",
             "File::Spec" : "0",
+            "File::Temp" : "0.22",
             "Test::More" : "0.88"
          }
       }
@@ -49,5 +51,6 @@
          "url" : "http://github.com/petdance/file-next/tree/master"
       }
    },
-   "version" : "1.16"
+   "version" : "1.18",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

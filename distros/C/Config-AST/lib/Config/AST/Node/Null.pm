@@ -53,6 +53,8 @@ sub AUTOLOAD {
     confess "Can't locate method $AUTOLOAD";
 }
 
+sub DESTROY { }
+
 =head2 $node->as_string
 
 Returns the string "(null)".

@@ -1,0 +1,88 @@
+use strict;
+use warnings;
+
+use lib 't/lib';
+use Test::Helper qw(testmojo create_user testschema);
+use Test::StepsHelper
+  qw(a_login_request_with_invalid_credentials get_result api_base );
+use Test::Net::LDAP::Util qw(ldap_mockify);
+
+use Test::More;
+use Test::BDD::Cucumber::StepFile;
+
+use Carp;
+use Gina::Service::Authentication;
+
+my $t = testmojo();
+
+my $route         = api_base . 'login/';
+my $accept_header = { Accept => 'application/json' };
+
+# When we login the token is added to each transaction.
+# Remove this behaviour after the scenario.
+After sub {
+    my $context     = shift;
+    my $token_adder = $context->stash->{scenario}->{token_adder};
+    return if !$token_adder;
+
+    $t->ua->unsubscribe( start => $token_adder );
+};
+
+Given qr{there is an existing user} => sub {
+    my $context = shift;
+    ldap_mockify {
+        create_user( context => $context );
+    };
+};
+
+When qr{the client tries to login without providing a user name} => sub {
+    my $request = a_login_request_with_invalid_credentials();
+    delete $request->{username};
+    $t->post_ok( $route => $accept_header => json => $request );
+};
+
+When qr{the client tries to login without providing a password} => sub {
+    my $request = a_login_request_with_invalid_credentials();
+    delete $request->{password};
+    $t->post_ok( $route => $accept_header => json => $request );
+};
+
+When
+qr{the client tries to log in providing correct password for this existing user}
+  => sub {
+    my $request = a_login_request_with_invalid_credentials();
+    $request->{username} = C->stash->{scenario}->{username};
+    $request->{password} = C->stash->{scenario}->{password};
+
+    # deep within this login there's a bind() which we have to mock
+    ldap_mockify {
+      $t->post_ok( $route => $accept_header => json => $request );
+    }
+  };
+
+When qr{the client tries to login providing name of non-existing user} => sub {
+    my $request = a_login_request_with_invalid_credentials();
+    $request->{username} = 'I do not exist';
+    $t->post_ok( $route => $accept_header => json => $request );
+};
+
+When
+  qr{the client tries to log in providing wrong password for this existing user}
+  => sub {
+    my $password       = C->stash->{scenario}->{password};
+    my $wrong_password = $password . $password;
+    my $request        = {
+        username => C->stash->{scenario}->{username},
+        password => $wrong_password
+    };
+    $t->post_ok( $route => $accept_header => json => $request );
+  };
+
+Then qr{the client gets a valid response} => sub {
+    my $data = get_result;
+    croak 'JSON decoded, token is missing' if !exists $data->{token};
+    my $token    = $data->{token};
+    my $username = $t->app->service->{authentication}->validate_token($token);
+
+    is $username, C->stash->{scenario}->{username};
+};

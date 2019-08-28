@@ -1,0 +1,9 @@
+cpanfile
+cpanfile.snapshot
+lib/Mojolicious/Plugin/AWS/SNS.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/basic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

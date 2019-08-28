@@ -1,6 +1,11 @@
 Revision history for Calendar-List
 ==================================
 
+1.01    2019-08-27
+        - Tidy up pod
+          PR #1 from Mohammad S Anwar
+          https://github.com/barbie/calendar-list/pull/1
+
 1.00    2019-08-26
         - fixes suggested by Kritika.io.
         - test improvements suggesed via coveralls.io.

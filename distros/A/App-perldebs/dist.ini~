@@ -1,0 +1,45 @@
+name = Test-DirectoryLayout
+version = 0.004
+abstract = Test directory layout for standard compliance
+author = Gregor Goldbach <post@gregor-goldbach.de>
+main_module = lib/Test/DirectoryLayout.pm
+license = Perl_5
+copyright_holder = Gregor Goldbach
+
+[PruneFiles]
+filename = LEGAL
+
+[@Basic]
+[AutoPrereqs]
+
+[Prereqs]
+[MinimumPerl]
+[PkgVersion]
+[CheckChangesHasContent]
+
+[NextRelease]
+format=%-9v%T %{yyyy-MM-dd HH:mm:ss VVVV}d
+
+[MetaResources]
+homepage          = https://gitlab.com/glauschwuffel/test-directorylayout
+bugtracker.web    = https://gitlab.com/glauschwuffel/test-directorylayout/issues
+repository.url    = https://gitlab.com/glauschwuffel/test-directorylayout
+repository.web    = https://gitlab.com/glauschwuffel/test-directorylayout
+repository.type   = git
+
+[@Git] ; has to run after NextRelease so we get the updates Changes file
+
+[Git::Push]
+[Test::ChangesHasContent]
+[Test::NoTabs]
+[Test::Perl::Critic]
+[PodCoverageTests]
+[PodSyntaxTests]
+[InstallGuide]
+[ExecDir]
+
+[PodWeaver]
+[ReadmeFromPod]
+
+[PerlTidy]
+perltidyrc = .perltidyrc

@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.154';
+our $VERSION = '1.155';
 
 use Quiq::Option;
 use Quiq::DirHandle;
@@ -785,7 +785,7 @@ sub getText {
 
 =head1 VERSION
 
-1.154
+1.155
 
 =head1 AUTHOR
 

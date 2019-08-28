@@ -54,16 +54,19 @@ L<Unbound|https://nlnetlabs.nl/projects/unbound/> recursive DNS resolver.
 
 use XSLoader ();
 
+use DNS::Unbound::Result ();
 use DNS::Unbound::X ();
 
 our ($VERSION);
 
 BEGIN {
-    $VERSION = '0.09';
+    $VERSION = '0.10';
     XSLoader::load();
 }
 
-use constant RR => {
+# Retain this to avoid having to load Net::DNS::Parameters
+# except in unusual cases.
+use constant _COMMON_RR => {
     A          => 1,
     AAAA       => 28,
     AFSDB      => 18,
@@ -145,17 +148,9 @@ Runs a synchronous query for a given $NAME and $TYPE. $TYPE may be
 expressed numerically or, for convenience, as a string. $CLASS is
 optional and defaults to 1 (C<IN>), which is probably what you want.
 
-Returns a reference to a hash that corresponds
-to a libunbound C<struct ub_result>
-(cf. L<libunbound(3)|https://nlnetlabs.nl/documentation/unbound/libunbound/>),
-excluding C<len>, C<answer_packet>, and C<answer_len>.
+Returns a L<DNS::Unbound::Result> instance.
 
-B<NOTE:> Members of C<data> are in their DNS-native RDATA encodings.
-(libunbound doesn’t track which record type uses which encoding, so
-neither does DNS::Unbound.)
-To decode some common record types, see L</CONVENIENCE FUNCTIONS> below.
-
-Also B<NOTE:> libunbound doesn’t seem to offer effective controls for
+B<NOTE:> libunbound doesn’t seem to offer effective controls for
 timing out a synchronous query.
 If timeouts are relevant for you, you probably need
 to use C<resolve_async()> instead.
@@ -164,7 +159,8 @@ to use C<resolve_async()> instead.
 
 sub resolve {
     my $type = $_[2] || die 'Need type!';
-    $type = RR()->{$type} || $type;
+
+    $type = _normalize_type_to_number($type);
 
     my $result = _resolve( $_[0]->{'_ub'}, $_[1], $type, $_[3] || () );
 
@@ -172,7 +168,22 @@ sub resolve {
         die _create_resolve_error($result);
     }
 
-    return $result;
+    return DNS::Unbound::Result->new( %$result );
+}
+
+sub _normalize_type_to_number {
+    my ($type) = @_;
+
+    if ($type =~ tr<0-9><>c) {
+        return _COMMON_RR()->{$type} || do {
+            local ($@, $!);
+
+            require Net::DNS::Parameters;
+            Net::DNS::Parameters::typebyname($type);
+        };
+    }
+
+    return $type;
 }
 
 sub _create_resolve_error {
@@ -197,7 +208,7 @@ the methods you’ll need to use in tandem with this one.
 
 sub resolve_async {
     my $type = $_[2] || die 'Need type!';
-    $type = RR()->{$type} || $type;
+    $type = $type = _normalize_type_to_number($type);
 
     # Prevent memory leaks.
     my $ctx = $_[0]->{'_ub'};
@@ -460,6 +471,7 @@ sub _check_promises {
 
                 if ( ref $dns_hr->{'value'} ) {
                     $key = 'res';
+                    $dns_hr->{'value'} = DNS::Unbound::Result->new( %{ $dns_hr->{'value'} } );
                 }
                 else {
                     $key = 'rej';
@@ -494,15 +506,18 @@ sub _check_promises {
 
 =head1 CONVENIENCE FUNCTIONS
 
-Note that L<Socket> provides the C<inet_ntoa()> and C<inet_ntop()>
+The following may be called either as object methods or as static
+functions (but not as class methods). In addition to these,
+L<Socket> provides the C<inet_ntoa()> and C<inet_ntop()>
 functions for decoding the values of C<A> and C<AAAA> records.
 
-The following may be called either as object methods or as static
-functions (but not as class methods):
+B<NOTE:> L<DNS::Unbound::Result>’s C<to_net_dns_rrs()> provides a heavier but
+more robust way to parse query result data.
 
 =head2 $decoded = decode_name($encoded)
 
-Decodes a DNS name. Useful for, e.g., C<NS> query results.
+Decodes a DNS name. Useful for, e.g., C<NS>, C<CNAME>, and C<PTR> query
+results.
 
 Note that this function’s return will normally include a trailing C<.>
 because of the trailing NUL byte in an encoded DNS name. This is normal

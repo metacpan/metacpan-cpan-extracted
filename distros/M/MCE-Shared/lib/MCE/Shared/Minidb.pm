@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.845';
+our $VERSION = '1.846';
 
 use MCE::Shared::Base ();
 use base 'MCE::Shared::Base::Common';
@@ -1115,7 +1115,7 @@ MCE::Shared::Minidb - A pure-Perl in-memory data store
 
 =head1 VERSION
 
-This document describes MCE::Shared::Minidb version 1.845
+This document describes MCE::Shared::Minidb version 1.846
 
 =head1 DESCRIPTION
 
@@ -1199,7 +1199,7 @@ resides versus the client-process grep locally involving lots of IPC.
 
  o Supported operators: =~ !~ eq ne lt le gt ge == != < <= > >=
  o Multiple expressions delimited by :AND or :OR, mixed case allowed
-  
+
    "key eq 'some key' :or (field > 5 :and field < 9)"
    "key eq some key :or (field > 5 :and field < 9)"
    "key =~ /pattern/i :And field =~ /pattern/i"   # HoH

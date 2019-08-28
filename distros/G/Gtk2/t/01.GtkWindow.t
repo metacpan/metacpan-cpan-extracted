@@ -215,6 +215,9 @@ SKIP: {
 	$win2->set_auto_startup_notification(FALSE);
 }
 
+SKIP: {
+skip 'tests that show the window', 20;
+
 $win->show;
 ok(1);
 
@@ -316,7 +319,7 @@ run_main sub {
 		$win2->reshow_with_initial_size;
 		ok(1);
 };
-
+}
 
 my $group = Gtk2::WindowGroup->new;
 isa_ok( $group, "Gtk2::WindowGroup" );

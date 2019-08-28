@@ -2,8 +2,8 @@ NAME
     App::SahUtils - Collection of CLI utilities for Sah and Data::Sah
 
 VERSION
-    This document describes version 0.464 of App::SahUtils (from Perl
-    distribution App-SahUtils), released on 2019-07-16.
+    This document describes version 0.465 of App::SahUtils (from Perl
+    distribution App-SahUtils), released on 2019-07-25.
 
 SYNOPSIS
     This distribution provides the following command-line utilities related

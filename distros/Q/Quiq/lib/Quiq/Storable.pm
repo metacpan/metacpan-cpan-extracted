@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.154';
+our $VERSION = '1.155';
 
 use Storable ();
 use Quiq::Path;
@@ -103,7 +103,10 @@ Pfad der Cachedatei.
 =item $timeout
 
 Dauer in Sekunden, die die Cachdatei gültig ist. Falls nicht angegeben
-oder C<undef>, ist die Cachdatei unbegrenzt lange gültig.
+oder C<undef>, ist die Cachdatei unbegrenzt lange gültig. Ist $timeout
+negativ, verfällt die Cachdatei, wenn sie abs($timeout) Sekunden
+nicht zugegriffen wurde (mit jedem Aufruf wird die Datei in diesem
+Fall getouched).
 
 =item $sub
 
@@ -150,8 +153,11 @@ sub memoize {
 
     my $ref;
     if ($p->exists($file) && (!defined($timeout) ||
-            Quiq::Path->age($file) <= $timeout)) {
+            Quiq::Path->age($file) <= abs $timeout)) {
         $ref = $class->thaw($p->read($file));
+        if (defined($timeout) && $timeout < 0) {
+            $p->touch($file);
+        }
     }
     else {
         $ref = $sub->();
@@ -165,7 +171,7 @@ sub memoize {
 
 =head1 VERSION
 
-1.154
+1.155
 
 =head1 AUTHOR
 

@@ -342,13 +342,13 @@ Copyright (C) 2011-2019, Al Newkirk, et al.
 This is free software; you can redistribute it and/or modify it under the same
 terms as the Perl 5 programming language system itself.
 
-# STATUS
+# PROJECT
 
-<div>
-    <a href="https://travis-ci.org/iamalnewkirk/data-object" target="_blank">
-    <img src="https://travis-ci.org/iamalnewkirk/data-object.svg?branch=master"/>
-    </a>
-</div>
+[GitHub](https://github.com/iamalnewkirk/do)
+
+[Contributing](https://github.com/iamalnewkirk/do/blob/master/README-DEVEL.mkdn)
+
+[Reporting](https://github.com/iamalnewkirk/do/issues)
 
 # SEE ALSO
 
@@ -363,7 +363,3 @@ To get the most out of this distribution, consider reading the following:
 [Data::Object::Library](https://metacpan.org/pod/Data::Object::Library)
 
 [Data::Object::Signatures](https://metacpan.org/pod/Data::Object::Signatures)
-
-[Contributing](https://github.com/iamalnewkirk/data-object/CONTRIBUTING.mkdn)
-
-[GitHub](https://github.com/iamalnewkirk/data-object)

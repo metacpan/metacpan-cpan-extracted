@@ -1,6 +1,6 @@
 ##----------------------------------------------------------------------------
 ## tel.pm
-## Version 0.6
+## Version 0.7
 ## Copyright(c) 2016-2019 Jacques Deguest
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2016/02/12
@@ -19,7 +19,7 @@ BEGIN
     our( $RESERVED, $MARK, $UNRESERVED, $PCT_ENCODED, $URIC, $ALPHA, $DIGIT, $ALPHANUM, $HEXDIG );
     our( $PARAM_UNRESERVED, $VISUAL_SEPARATOR, $PHONEDIGIT, $GLOBAL_NUMBER_DIGITS, $PARAMCHAR, $DOMAINLABEL, $TOPLABEL, $DOMAINNAME, $DESCRIPTOR, $PNAME, $PVALUE, $PARAMETER, $EXTENSION, $ISDN_SUBADDRESS, $CONTEXT, $PAR, $PHONEDIGIT_HEX, $GLOBAL_NUMBER, $LOCAL_NUMBER, $OTHER, $TEL_SUBSCRIBER, $TEL_URI );
     our( $COUNTRIES, $IDD_RE );
-    $VERSION     = '0.6';
+    $VERSION     = '0.7';
 	use overload ('""'     => 'as_string',
 				  '=='     => sub { _obj_eq(@_) },
 				  '!='     => sub { !_obj_eq(@_) },

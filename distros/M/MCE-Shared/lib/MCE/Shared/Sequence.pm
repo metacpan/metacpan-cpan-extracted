@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.845';
+our $VERSION = '1.846';
 
 use Scalar::Util qw( looks_like_number );
 use MCE::Shared::Base ();
@@ -229,7 +229,7 @@ MCE::Shared::Sequence - Sequence helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Sequence version 1.845
+This document describes MCE::Shared::Sequence version 1.846
 
 =head1 DESCRIPTION
 
@@ -306,9 +306,9 @@ Two options C<chunk_size> and C<bounds_only> are supported, which default to
 1 and 0 respectively. Chunking reduces the number of IPC calls to and from the
 shared-manager process for large sequences.
 
-If C<bounds_only => 1> is specified, the C<next> method computes the C<begin>
-and C<end> values only for the chunk and not the numbers in between (hence
-boundaries only).
+If C<< bounds_only => 1 >> is specified, the C<next> method computes the
+C<begin> and C<end> values only for the chunk and not the numbers in between
+(hence boundaries only).
 
  use MCE::Shared;
 

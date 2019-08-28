@@ -62,8 +62,7 @@ sub test_unitTest_2 : Test(4) {
     );
 
     my $html = $e->html($h);
-    # warn "\n[$html]\n";
-    $self->like($html,qr|\Q<table id="myTable" cellspacing="0">|);
+    $self->like($html,qr|<table class="compac.*id="myTable" cellspacing="0">|);
     $self->like($html,qr|\Q<th>A</th>|);
     $self->like($html,qr|\Q<td>1</td>|);
     $self->like($html,qr|\QjQuery('#myTable').DataTable(|);

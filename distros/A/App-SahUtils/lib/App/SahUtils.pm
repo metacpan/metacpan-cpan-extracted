@@ -1,7 +1,7 @@
 package App::SahUtils;
 
-our $DATE = '2019-07-16'; # DATE
-our $VERSION = '0.464'; # VERSION
+our $DATE = '2019-07-25'; # DATE
+our $VERSION = '0.465'; # VERSION
 
 use 5.010001;
 use strict;
@@ -346,7 +346,7 @@ App::SahUtils - Collection of CLI utilities for Sah and Data::Sah
 
 =head1 VERSION
 
-This document describes version 0.464 of App::SahUtils (from Perl distribution App-SahUtils), released on 2019-07-16.
+This document describes version 0.465 of App::SahUtils (from Perl distribution App-SahUtils), released on 2019-07-25.
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,37 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](http://keepachangelog.com/)
+and this project adheres to [Semantic Versioning](http://semver.org/).
+
+{{$NEXT}}
+
+	[Changed]
+	Since this module is public its Gitlab build is based on a
+	public Docker image I've created for general perl development.
+
+	[Deleted]
+
+	Removed triggering of Gitlab project for
+	Dist::Zilla::Plugin::Test::Directory after successful build of
+	the master branch.
+	
+0.003     2019-07-31 17:46:31 Europe/Berlin
+
+	[Added]
+	Added meta data to distribution.
+
+0.002     2019-06-12 15:13:25 Europe/Berlin
+
+	[Added]
+
+	Documentation update: Added missing bits to synopsis about
+	get_allowed_dirs and set_allowed_dirs, cleaned up POD a bit
+	and added description of the module.
+
+0.001     2018-09-19 19:50:06 Europe/Berlin
+
+	[Added]
+
+	Initial version with first implementation of directory_layout_ok.

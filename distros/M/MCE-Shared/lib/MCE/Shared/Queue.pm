@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.845';
+our $VERSION = '1.846';
 
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
 
@@ -1022,7 +1022,7 @@ MCE::Shared::Queue - Hybrid-queue helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Queue version 1.845
+This document describes MCE::Shared::Queue version 1.846
 
 =head1 DESCRIPTION
 
@@ -1079,7 +1079,7 @@ the shared-manager process, otherwise locally.
  @items = $qu->dequeue( $count );
  $item  = $qu->dequeue_nb();
  @items = $qu->dequeue_nb( $count );
- 
+
  $qu->insert( $index, $item [, $item, ... ] );
  $qu->insertp( $priority, $index, $item [, $item, ... ] );
 
@@ -1278,7 +1278,7 @@ by a call to dequeue.
 =head2 insertp ( priority, index, item [, item, ... ] )
 
 Adds the list of items to the queue at the specified index position with
-priority. The behavior is similarly to C<$q->insert> otherwise.
+priority. The behavior is similarly to C<< $q->insert >> otherwise.
 
 =head2 pending ( )
 
@@ -1316,7 +1316,7 @@ call to dequeue. Negative index values are supported, similarly to arrays.
 
 Returns an item from the queue with priority, at the specified index, without
 dequeuing anything. It defaults to the head of the queue if index is not
-specified. The behavior is similarly to C<$q->peek> otherwise.
+specified. The behavior is similarly to C<< $q->peek >> otherwise.
 
 =head2 peekh ( [ index ] )
 

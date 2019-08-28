@@ -1,0 +1,316 @@
+# NAME
+
+Puppet::Classify - Connects to the Puppet Classifier API (PE Console groups)
+
+# VERSION
+
+version 0.003
+
+# SYNOPSIS
+
+This module interacts with the Puppet Classifier API (i.e. Puppet Enterprise Console Classification groups)
+
+    use Puppet::Classify;
+
+    # Create a Puppet classification object
+    my $classify = Puppet::Classify->new( 
+                                          cert_name       => $config->{puppet_classify_cert},
+                                          server_name     => $config->{puppet_classify_host},
+                                          server_port     => $config->{puppet_classify_port},
+                                          puppet_ssl_path => $config->{puppet_ssl_path},
+                                          puppet_db       => $puppet_db,
+                                        );
+    # Get a group's rule
+    my $rule = $classify->get_group_rule( $group_name );
+
+    # Convert the rule for use with the PuppetDB
+    $rule = $classify->convert_rule_for_puppetdb( $rule );
+
+It requires the _Puppet::DB_ module.
+
+# METHODS
+
+## new
+
+Create the _Puppet::Classify_ object.  The following can be set at creation time (defaults shown):
+
+    my $puppet_db = Puppet::DB->new;
+    my $classify = Puppet::Classify->new( 
+                                          server_name     => 'localhost',
+                                          server_port     => 4433,
+                                          puppet_ssl_path => '/etc/puppetlabs/puppet/ssl',
+                                          puppet_db       => $puppet_db,
+                                        );
+
+otherwise to create the object:
+
+    my $puppet_db = Puppet::DB->new;
+    my $classify = Puppet::Classify->new;
+    my $classify = Puppet::Classify->new( 'puppet.example.com' );
+    my $classify = Puppet::Classify->new( puppet_db => $puppet_db);
+
+## server\_name
+
+The puppet master that is running the classifier API. Connects to [localhost](https://metacpan.org/pod/localhost) by default.
+
+    $classify->server_name('puppet.example.com');
+
+## server\_port
+
+Connect to the Puppet Classifier server on port 4433 by default - this can be overidden when consumed.
+
+    $classify->server_port(8754);
+
+## access\_token
+
+Use an access\_token instead of a certificate to connect to the API.
+This loads the authentication token saved in your home, but it can be set manually if it is not stored there.
+
+    say $classify->access_token;
+
+## environment
+
+The environment to use for the classification - this can be overidden when consumed. Defaults to 'dev'.
+
+    $classify->environment('test');
+
+## cert\_name
+
+the basename of the certificate to be used for authentication.  This is a certificate that has been generated on the
+Puppet Master and added to the whitelist.  This can be used instead of using an auth token.
+
+    $classify->cert_name('api_access');
+
+## puppet\_ssl\_path
+
+Set the path to the Puppet SSL certs, it uses the Puppet enterprise path by default.
+
+    $classify->server_name('puppet.example.com');
+
+## timeout
+
+The connection timeout.  Defaults to 360 seconds.
+
+    $classify->timeout(30);
+
+## puppet\_db
+
+The puppet DB object used to interact with the Puppet DB.
+
+    $classify->puppet_db(Puppet::DB->new);
+
+## update\_classes
+
+Updates the class cache.
+
+    $classify->update_classes;
+
+## get\_classes
+
+Gets a list of all the class information.
+
+    my $classes = $classify->get_classes( $group );
+
+## get\_group\_rule
+
+Returns the rule as a Perl data structure given the group name.
+
+    my $group_name = "Production";
+    my $group_rule = $classify->get_group_rule( $group_name );
+
+## get\_group\_id
+
+Returns the group ID given the group name.
+
+    my $group_name = "Production environment";
+    my $group_id = $classify->get_group_id( $group_name );
+
+## get\_groups\_match
+
+Returns an array ref of a list of group data structures where their names match the given string
+
+    my $groups = $classify->get_groups_match( "Roles" );
+    say Dumper( $groups );
+
+## get\_groups
+
+Returns an array ref of all the group data structures
+
+    my $groups = $classify->get_groups;
+    say Dumper( $groups );
+
+## get\_group\_children
+
+Returns an array ref of all the group data structures according to the specified parent group ID
+
+    my $parent = "Production environment";
+    my $parent_gid = $classify->get_group_id( $parent );
+    my $children = $classify->get_group_children( $parent_gid );
+    say Dumper( $children );
+
+## add\_group\_safe
+
+Creates a new group, but checks if one already exists by the same name.  If it does, the force option can be specified to remove it first - thus redefining it.
+
+The example data structure is the minimum.  See
+[https://puppet.com/docs/pe/latest/groups\_endpoint.html#post-v1-groups](https://puppet.com/docs/pe/latest/groups_endpoint.html#post-v1-groups)
+for more info on the fields.
+
+    my $parent = "Production environment";
+    my $parent_gid = $classify->get_group_id( $parent );
+    my $name = 'A group';
+    my $force = 1;
+    my $group = { 
+                  name   => $name,
+                  parent => $parent_id,
+                };
+    $classify->add_group_safe( $name, $group, $force );
+
+## create\_group
+
+Use with caution. It is preferable to use [add\_group\_safe](https://metacpan.org/pod/add_group_safe)
+
+Creates a new group (or overwrites another).  The example data structure is the minimum.  See
+[https://puppet.com/docs/pe/latest/groups\_endpoint.html#post-v1-groups](https://puppet.com/docs/pe/latest/groups_endpoint.html#post-v1-groups)
+for more info on the fields.
+
+    my $parent = "Production environment";
+    my $parent_gid = $classify->get_group_id( $parent );
+    my $group = { 
+                  name   => 'A group',
+                  parent => $parent_id,
+                };
+    $classify->create_group( $group );
+
+## update\_group\_rule
+
+Replaces a groups rule with a new one.  The group is specified by its group ID.
+
+    $classify->update_group_rule( $gid, $rule );
+
+## update\_group\_environment
+
+Sets the environment for a group.  The group is specified by its group ID.
+
+    $classify->update_group_environment( $gid, $environment );
+
+## update\_group
+
+Updates a groups info according to the specified hash.  Only the elements
+specified in the hash are updated (replaced).
+
+    my $config = { 
+                  environment => $environment,
+                  parent => $parent_id,
+                };
+    $classify->update_group( $gid, $config );
+
+## remove\_group\_safe
+
+Removes a group unless it has pinned nodes.  It can still be deleted if it has pinned nodes if a force option is turned on.
+
+    my $force = 1;
+    $classify->create_group( $group_name, $force );
+
+## try\_remove\_group
+
+This will remove a group, but first check if it has children (it which case it will just log an error rather than doing anything)
+
+    $classify->create_group( $group_name );
+
+It is preferable to call [remove\_group\_safe](https://metacpan.org/pod/remove_group_safe).
+
+## delete\_group
+
+Deletes a group.  This will work ever if nodes are pinned to the group, but it cannot delete groups
+that have children groups (the children must be removed first).
+
+    $classify->delete_group( $id );
+
+It is preferable to call [remove\_group\_safe](https://metacpan.org/pod/remove_group_safe).
+
+## convert\_rule\_for\_puppetdb
+
+Converts a classifier node matching rule into a form that is compatible with the PuppetDB
+
+    my $rule2 = $classify->convert_rule_for_puppetdb( $rule1 );
+
+## get\_nodes\_matching\_group
+
+Returns an array ref list of nodes matching a group.
+
+    my $nodes = $classify->get_nodes_matching_group( $group_name );
+
+This can take some time to run as it needs to connect to the PuppetDB to find out the nodes.
+
+## get\_hosts\_from\_pinned\_rule
+
+Returns an array ref list of nodes pinned to a group (you need to pass the rule of the group).
+
+    my $group_rule = $classify->get_group_rule( $group_name );
+    my $nodes = $classify->get_hosts_from_pinned_rule( $group_rule );
+
+## list\_nodes\_pinned\_in\_group
+
+This lists the nodes in a group to STDOUT.
+
+    $classify->list_nodes_pinned_in_group( $group_name );
+
+## purge\_old\_nodes
+
+This will purge all the pinned nodes from the children of the specified group if those nodes
+cannot be found in the Puppet DB anymore.
+
+    $classify->purge_old_nodes( $parent_id );
+
+## list\_membership\_of\_nodes
+
+For a list of nodes and a parent group, maps which child group each node is pinned to.  If
+no nodes are specified, it will be assumed to be all the nodes matching the parent.
+
+    my $nodes = [ qw( node1 node2 ) ];
+    $classify->list_membership_of_nodes( $parent_name, $nodes );
+
+or
+
+    $classify->list_membership_of_nodes( $parent_name );
+
+## remove\_nodes\_from\_all\_groups
+
+Removes all the specified nodes from all the child groups of the specified parent group.
+
+    my $parent = "Production environment";
+    my $parent_gid = $classify->get_group_id( $parent );
+    my $nodes = [ qw( node1 node2 ) ];
+    $classify->remove_nodes_from_all_groups( $parent_gid, $nodes );
+
+## empty\_group\_of\_pinned\_nodes
+
+Remove all pinned nodes from a group leaving other rules in place
+
+    $classify->empty_group_of_pinned_nodes( $group_name );
+
+## remove\_pinned\_node\_from\_group
+
+Remove specified pinned nodes from a group leaving other rules in place
+
+    my $nodes = [ qw( node1 node2 ) ];
+    $classify->remove_pinned_node_from_group( $group_name, $nodes );
+
+## pin\_nodes\_to\_group
+
+Pin nodes to the specified group
+
+    my $nodes = [ qw( node1 node2 ) ];
+    $classify->pin_nodes_to_group( $group_name $nodes );
+
+# AUTHOR
+
+Matthew Mallard <mqtech@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by Matthew Mallard.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

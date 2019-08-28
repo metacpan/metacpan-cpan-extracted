@@ -13,12 +13,12 @@ use Time::Piece ();
 
 has 'mysql';
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 sub dequeue {
-  my ($self, $id, $wait, $options) = @_;
+  my ($self, $worker_id, $wait, $options) = @_;
 
-  if ((my $job = $self->_try($id, $options))) { return $job }
+  if ((my $job = $self->_try($worker_id, $options))) { return $job }
   return undef if Mojo::IOLoop->is_running;
 
   my $cb = $self->mysql->pubsub->listen("minion.job" => sub {
@@ -30,7 +30,7 @@ sub dequeue {
 
   $self->mysql->pubsub->unlisten("minion.job" => $cb) and Mojo::IOLoop->remove($timer);
 
-  return $self->_try($id, $options);
+  return $self->_try($worker_id, $options);
 }
 
 sub history {
@@ -279,9 +279,12 @@ sub list_locks {
 
 sub new {
   my ( $class, @args ) = @_;
+
   my $mysql;
+  my $force_migration = 0;
   if ( @args == 1 && blessed($args[0]) && $args[0]->isa('Mojo::mysql') ) {
     $mysql = $args[0];
+    $force_migration = 1;
   }
   else {
     if ( ref $args[0] eq 'HASH' ) {
@@ -289,9 +292,26 @@ sub new {
     }
     $mysql = Mojo::mysql->new(@args);
   }
+
   my $self = $class->SUPER::new(mysql => $mysql);
-  $mysql->migrations->name('minion')->from_data;
-  $mysql->once(connection => sub { shift->migrations->migrate });
+
+  if ($force_migration) {
+
+    # First make sure any impending migrations happen
+    # before we overwrite them:
+    $mysql->migrations->migrate;
+
+    # Then load this module's migrations and run them:
+    $mysql->migrations->name('minion')->from_data;
+    $mysql->migrations->migrate;
+  }
+  else {
+    # Load this module's migrations and run them
+    # the first time a DB connection is attempted:
+    $mysql->migrations->name('minion')->from_data;
+    $mysql->once(connection => sub { shift->migrations->migrate });
+  }
+
   return $self;
 }
 
@@ -368,10 +388,9 @@ sub lock {
 
 sub unlock {
   !!shift->mysql->db->query(
-    'DELETE FROM minion_locks WHERE id IN (
-       SELECT b.id FROM (SELECT id, expires, name FROM minion_locks) b
-       WHERE b.expires > NOW() AND b.name = ? ORDER BY EXPIRES
-     ) LIMIT 1', shift
+    'DELETE FROM minion_locks
+      WHERE expires > NOW() AND name = ? ORDER BY EXPIRES
+      LIMIT 1', shift
   )->rows;
 }
 
@@ -427,11 +446,11 @@ sub stats {
     $states->{$next->[0]} = $next->[1];
   }
 
-  my $uptime = $db->query( 'SHOW GLOBAL STATUS LIKE "Uptime"' )->hash->{Value};
+  my $uptime = $db->query( "SHOW GLOBAL STATUS LIKE 'Uptime'" )->hash->{Value};
 
   $sql = q{
     SELECT
-      SUM(CASE WHEN `state` = "inactive" AND `delayed` > NOW() THEN 1 ELSE 0 END) AS delayed_jobs,
+      SUM(CASE WHEN `state` = 'inactive' AND `delayed` > NOW() THEN 1 ELSE 0 END) AS delayed_jobs,
       COUNT(*) AS enqueued_jobs
       FROM minion_jobs
     };
@@ -457,50 +476,48 @@ sub unregister_worker {
 }
 
 sub _try {
-  my ($self, $id, $options) = @_;
+  my ($self, $worker_id, $options) = @_;
 
   my $tasks = [keys %{$self->minion->tasks}];
 
-  return  unless @$tasks;
+  return unless @$tasks;
 
-  my $qq = join(", ", map({ "?" } @{ $options->{queues} // ['default'] }));
-  my $qt = join(", ", map({ "?" } @{ $tasks }));
+  my $queues = $options->{queues} // ['default'];
 
-  my $db = $self->mysql->db;
+  my $qq = join ", ", map({ "?" } @$queues);
+  my $qt = join ", ", map({ "?" } @$tasks );
 
-  my $tx = $db->begin;
+  my $dbh = $self->mysql->db->dbh;
 
-  # Note: The GROUP BY below only needs job.id - the additional redundant
-  # columns are just there to satisfy the ONLY_FULL_GROUP_BY requirement
-  # in MySQL strict mode.
+  # Try to update a job and mark it as being active for this worker.
+  # If we succeed, the job_id of the updated job will be stored in
+  # the "@dequeued_job_id" variable:
   #
-  my $job = $tx->db->query(qq{
-    SELECT job.id, job.args, job.retries, job.task
-    FROM minion_jobs job
+  my $affected_rows = $dbh->do(qq{
+    UPDATE minion_jobs job
+    SET job.started = NOW(), job.state = 'active', job.worker = ?,
+        job.id = \@dequeued_job_id := job.id
     WHERE job.state = 'inactive' AND job.`delayed` <= NOW()
       AND NOT EXISTS (
         SELECT 1 FROM minion_jobs_depends depends
-        LEFT JOIN minion_jobs parent ON parent.id=depends.parent_id
+        LEFT JOIN ( SELECT id, state FROM minion_jobs WHERE state IN ( 'inactive', 'active', 'failed' )) AS parent ON parent.id=depends.parent_id
         WHERE child_id=job.id AND parent.id=depends.parent_id AND parent.state IN ( 'inactive', 'active', 'failed' )
       )
       AND job.queue IN ($qq) AND job.task IN ($qt)
-    GROUP BY job.id
-           , job.args, job.created, job.priority, job.retries, job.task
     ORDER BY job.priority DESC, job.created
-    LIMIT 1 FOR UPDATE},
-   @{ $options->{queues} || ['default']}, @{ $tasks }
-  )->hash;
+    LIMIT 1
+   },
+   {}, $worker_id, @$queues, @$tasks
+  );
+
+  return if $affected_rows == 0;   # DBIC returns 0E0 if no rows
+
+  my $job = $dbh->selectrow_hashref(
+    'SELECT id, args, retries, task FROM minion_jobs where id = @dequeued_job_id'
+  );
 
   #; use Data::Dumper;
   #; say "Dequeuing job: " . Dumper $job;
-
-  return undef unless $job;
-
-  $tx->db->query(
-     qq(update minion_jobs set started = now(), state = 'active', worker = ? where id = ?),
-     $id, $job->{id}
-  );
-  $tx->commit;
 
   $job->{args} = $job->{args} ? decode_json($job->{args}) : undef;
 
@@ -519,9 +536,12 @@ sub _update {
   #; say "Updated $updated job rows (id: $id, fail: $fail, result: @{[encode_json( $result )]})";
   return undef unless $updated;
 
+  return 1 if !$fail;    # finished
+
   my $job = $self->list_jobs( 0, 1, { ids => [$id] } )->{jobs}[0];
-  return 1 if !$fail || (my $attempts = $job->{attempts}) == 1;
+  return 1 if (my $attempts = $job->{attempts}) == 1;
   return 1 if $retries >= ( $attempts - 1 );
+
   my $delay = $self->minion->backoff->( $retries );
   return $self->retry_job( $id, $retries, { delay => $delay } );
 }
@@ -984,7 +1004,7 @@ Minion::Backend::mysql
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 SYNOPSIS
 

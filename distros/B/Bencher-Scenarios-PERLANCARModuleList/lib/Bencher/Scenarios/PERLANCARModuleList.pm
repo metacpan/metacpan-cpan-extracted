@@ -1,7 +1,7 @@
 package Bencher::Scenarios::PERLANCARModuleList;
 
-our $DATE = '2017-01-25'; # DATE
-our $VERSION = '0.02'; # VERSION
+our $DATE = '2019-07-25'; # DATE
+our $VERSION = '0.030'; # VERSION
 
 1;
 # ABSTRACT: A collection of scenarios to benchmark PERLANCAR::Module::List
@@ -18,7 +18,7 @@ Bencher::Scenarios::PERLANCARModuleList - A collection of scenarios to benchmark
 
 =head1 VERSION
 
-This document describes version 0.02 of Bencher::Scenarios::PERLANCARModuleList (from Perl distribution Bencher-Scenarios-PERLANCARModuleList), released on 2017-01-25.
+This document describes version 0.030 of Bencher::Scenarios::PERLANCARModuleList (from Perl distribution Bencher-Scenarios-PERLANCARModuleList), released on 2019-07-25.
 
 =head1 DESCRIPTION
 
@@ -26,7 +26,7 @@ This distribution contains the following L<Bencher> scenario modules:
 
 =over
 
-=item * L<Bencher::Scenario::PERLANCARModuleList::ReturnPathOption>
+=item * L<Bencher::Scenario::PERLANCARModuleList::Startup>
 
 =back
 
@@ -36,7 +36,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Bencher-Sc
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-Bencher-Scenario-PERLANCARModuleList>.
+Source repository is at L<https://github.com/perlancar/perl-Bencher-Scenarios-PERLANCARModuleList>.
 
 =head1 BUGS
 
@@ -52,7 +52,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

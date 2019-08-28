@@ -9,7 +9,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.154';
+our $VERSION = '1.155';
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -1021,7 +1021,7 @@ Encodiere $data gemäß dem Encoding $encoding.
 =item -lock => $bool (Default: 0)
 
 Setze während des Schreibens einen Exclusive-Lock auf die Datei.
-Dies kann im Fallen von -append sinnvoll sein.
+Dies kann im Falle von -append sinnvoll sein.
 
 =item -mode => $mode (Default: keiner)
 
@@ -2687,6 +2687,79 @@ sub split {
 
 # -----------------------------------------------------------------------------
 
+=head3 stat() - Statusinformation eines Pfads
+
+=head4 Synopsis
+
+    @arr = $class->%METHOD($path);
+
+=head4 Arguments
+
+=over 4
+
+=item $path
+
+Datei- oder Verzeichnispfad.
+
+=back
+
+=head4 Returns
+
+Statusinformation (List)
+
+=head4 Description
+
+Ermittele die Statusinformation eines Pfads und liefere diese
+Information als 13-elementige Liste zurück.
+
+Der Aufruf ist äquivalent zu
+
+    stat $path
+
+mit dem Unterschied, dass
+
+=over 2
+
+=item *
+
+eine Tilde-Expansion stattfindet
+
+=item *
+
+eine Exception geworfen, wird, wenn $path nicht existiert
+
+=back
+
+=head4 See Also
+
+=over 2
+
+=item *
+
+perldoc -f stat
+
+=back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub stat {
+    my $class = shift;
+    my $path = $class->expandTilde(shift);
+
+    if (!-e $path) {
+        $class->throw(
+            'PATH-00099: Path does not exist',
+            Path => $path,
+        );
+    }
+
+    return stat $path;
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 symlink() - Erzeuge Symlink
 
 =head4 Synopsis
@@ -2846,9 +2919,66 @@ sub symlinkRelative {
 
 # -----------------------------------------------------------------------------
 
+=head3 touch() - Setze Modifikationszeit auf aktuellen Zeitpunkt
+
+=head4 Synopsis
+
+    $mtime = $this->mtime($path);
+
+=head4 Arguments
+
+=over 4
+
+=item $path
+
+Pfad der Datei oder des Verzeichnisses, dessen mtime gesetzt werden soll.
+
+=back
+
+=head4 Returns
+
+Modifikationszeit in Unix Epoch (Integer)
+
+=head4 Description
+
+Setze den Zeitpunkt der letzten Modifikation (mtime) des Pfades $path
+auf den aktuellen Zeitpunkt.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub touch {
+    my ($this,$path) = @_;
+    return $this->mtime($path,time);
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 uid() - UID des Owners der Datei
+
+=head4 Synopsis
+
+    $uid = $this->%METHOD($path);
+
+=head4 Description
+
+Ermittele die UID des Owners der Datei und liefere diese zurück.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub uid {
+    my ($this,$path) = @_;
+    return ($this->stat($path))[4];
+}
+
+# -----------------------------------------------------------------------------
+
 =head1 VERSION
 
-1.154
+1.155
 
 =head1 AUTHOR
 

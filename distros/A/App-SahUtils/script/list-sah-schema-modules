@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-07-16'; # DATE
-our $VERSION = '0.464'; # VERSION
+our $DATE = '2019-07-25'; # DATE
+our $VERSION = '0.465'; # VERSION
 
 #use 5.010001;
 use strict;
@@ -66,7 +66,7 @@ list-sah-schema-modules - List Sah coerce rule modules
 
 =head1 VERSION
 
-This document describes version 0.464 of list-sah-schema-modules (from Perl distribution App-SahUtils), released on 2019-07-16.
+This document describes version 0.465 of list-sah-schema-modules (from Perl distribution App-SahUtils), released on 2019-07-25.
 
 =head1 SYNOPSIS
 
@@ -286,6 +286,72 @@ Only return records where the 'rule' field equals specified value.
 
 =back
 
+=head2 Filtering for v options
+
+=over
+
+=item B<--v-arg>=I<s>
+
+Only return records where the 'v' field equals specified value.
+
+=item B<--v-contains>=I<s>
+
+Only return records where the 'v' field contains specified text.
+
+=item B<--v-in-json>=I<s>
+
+Only return records where the 'v' field is in the specified values (JSON-encoded).
+
+See C<--v-in>.
+
+=item B<--v-in>=I<s@>
+
+Only return records where the 'v' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--v-is>=I<s>
+
+Only return records where the 'v' field equals specified value.
+
+=item B<--v-isnt>=I<s>
+
+Only return records where the 'v' field does not equal specified value.
+
+=item B<--v-max>=I<s>
+
+Only return records where the 'v' field is less than or equal to specified value.
+
+=item B<--v-min>=I<s>
+
+Only return records where the 'v' field is greater than or equal to specified value.
+
+=item B<--v-not-contains>=I<s>
+
+Only return records where the 'v' field does not contain specified text.
+
+=item B<--v-not-in-json>=I<s>
+
+Only return records where the 'v' field is not in the specified values (JSON-encoded).
+
+See C<--v-not-in>.
+
+=item B<--v-not-in>=I<s@>
+
+Only return records where the 'v' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--v-xmax>=I<s>
+
+Only return records where the 'v' field is less than specified value.
+
+=item B<--v-xmin>=I<s>
+
+Only return records where the 'v' field is greater than specified value.
+
+=back
+
 =head2 Filtering options
 
 =over
@@ -477,6 +543,17 @@ List of available configuration parameters:
  rule.xmax (see --rule-xmax)
  rule.xmin (see --rule-xmin)
  sort (see --sort)
+ v (see --v-arg)
+ v.contains (see --v-contains)
+ v.in (see --v-in)
+ v.is (see --v-is)
+ v.isnt (see --v-isnt)
+ v.max (see --v-max)
+ v.min (see --v-min)
+ v.not_contains (see --v-not-contains)
+ v.not_in (see --v-not-in)
+ v.xmax (see --v-xmax)
+ v.xmin (see --v-xmin)
  with_field_names (see --with-field-names)
 
 =head1 ENVIRONMENT

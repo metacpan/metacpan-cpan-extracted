@@ -51,17 +51,9 @@ Runs a synchronous query for a given $NAME and $TYPE. $TYPE may be
 expressed numerically or, for convenience, as a string. $CLASS is
 optional and defaults to 1 (`IN`), which is probably what you want.
 
-Returns a reference to a hash that corresponds
-to a libunbound `struct ub_result`
-(cf. [libunbound(3)](https://nlnetlabs.nl/documentation/unbound/libunbound/)),
-excluding `len`, `answer_packet`, and `answer_len`.
+Returns a [DNS::Unbound::Result](https://metacpan.org/pod/DNS::Unbound::Result) instance.
 
-**NOTE:** Members of `data` are in their DNS-native RDATA encodings.
-(libunbound doesn’t track which record type uses which encoding, so
-neither does DNS::Unbound.)
-To decode some common record types, see ["CONVENIENCE FUNCTIONS"](#convenience-functions) below.
-
-Also **NOTE:** libunbound doesn’t seem to offer effective controls for
+**NOTE:** libunbound doesn’t seem to offer effective controls for
 timing out a synchronous query.
 If timeouts are relevant for you, you probably need
 to use `resolve_async()` instead.
@@ -141,15 +133,18 @@ The following methods correspond to their equivalents in libunbound.
 
 # CONVENIENCE FUNCTIONS
 
-Note that [Socket](https://metacpan.org/pod/Socket) provides the `inet_ntoa()` and `inet_ntop()`
+The following may be called either as object methods or as static
+functions (but not as class methods). In addition to these,
+[Socket](https://metacpan.org/pod/Socket) provides the `inet_ntoa()` and `inet_ntop()`
 functions for decoding the values of `A` and `AAAA` records.
 
-The following may be called either as object methods or as static
-functions (but not as class methods):
+**NOTE:** [DNS::Unbound::Result](https://metacpan.org/pod/DNS::Unbound::Result)’s `to_net_dns_rrs()` provides a heavier but
+more robust way to parse query result data.
 
 ## $decoded = decode\_name($encoded)
 
-Decodes a DNS name. Useful for, e.g., `NS` query results.
+Decodes a DNS name. Useful for, e.g., `NS`, `CNAME`, and `PTR` query
+results.
 
 Note that this function’s return will normally include a trailing `.`
 because of the trailing NUL byte in an encoded DNS name. This is normal

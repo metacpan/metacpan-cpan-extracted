@@ -699,6 +699,33 @@ sub test_symlinkRelative : Test(5) {
 
 # -----------------------------------------------------------------------------
 
+sub test_touch : Test(1) {
+    my $self = shift;
+
+    my $p = Quiq::Path->new;
+
+    my $file = $p->tempFile;
+    my $time1 = time-1;
+    $p->mtime($file,$time1);
+
+    $p->touch($file);
+    my $time2 = $p->mtime($file);
+    $self->cmpOk($time1,'<',$time2);
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_uid : Test(1) {
+    my $self = shift;
+
+    my $p = Quiq::Path->new;
+    my $file = $p->tempFile;
+    my $uid = $p->uid($file);
+    $self->is($uid,$<);
+}
+
+# -----------------------------------------------------------------------------
+
 package main;
 Quiq::Path::Test->runTests;
 

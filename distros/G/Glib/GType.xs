@@ -2542,7 +2542,7 @@ list_ancestors (class, package)
 		pkg = gperl_package_from_type (parent_gtype);
 		if (!pkg)
 			croak("problem looking up parent package name, "
-			      "gtype %d", parent_gtype);
+			      "gtype %lu", parent_gtype);
 		XPUSHs (sv_2mortal (newSVpv (pkg, 0)));
 		parent_gtype = g_type_parent (parent_gtype);
 	}

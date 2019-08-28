@@ -1,0 +1,30 @@
+package App::perldebs;
+
+sub run {
+    my ($self) = @_;
+
+    use strict;
+    use warnings;
+
+    # read perl modules as arguments or from ./cpanfile
+    use Module::CPANfile;
+    my @modules = @ARGV ? @ARGV : do {
+        my $prereqs = Module::CPANfile->load->prereq_specs;
+        keys %{ $prereqs->{runtime}->{requires} };
+    };
+
+    exit 1 unless @modules;
+    # locate Debian packages that include these modules
+    my $cmd = 'dh-make-perl locate ' . join( ' ', @modules ) . ' 2>/dev/null';
+    open my $fh, "-|", $cmd;
+    my @packages;
+    foreach (<$fh>) {
+        # this ignores core packages
+        # see DhMakePerl::Command::locate for details
+        push @packages, $2 if m{(.+) is in (.+) package};
+    }
+
+    print join( ' ', @packages );
+}
+
+  return 1;

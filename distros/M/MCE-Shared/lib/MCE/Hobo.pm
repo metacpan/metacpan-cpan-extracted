@@ -13,7 +13,7 @@ no warnings qw( threads recursion uninitialized once redefine );
 
 package MCE::Hobo;
 
-our $VERSION = '1.845';
+our $VERSION = '1.846';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
@@ -856,7 +856,7 @@ MCE::Hobo - A threads-like parallelization module
 
 =head1 VERSION
 
-This document describes MCE::Hobo version 1.845
+This document describes MCE::Hobo version 1.846
 
 =head1 SYNOPSIS
 
@@ -1043,7 +1043,7 @@ The C<new()> method is an alias for C<create()>.
 
 =item mce_async { BLOCK };
 
-C<mce_async> runs the block asynchronously similarly to C<MCE::Hobo->create()>.
+C<mce_async> runs the block asynchronously similarly to C<< MCE::Hobo->create() >>.
 It returns the hobo object, or undef if hobo creation failed.
 
  my $hobo = mce_async { foreach (@files) { ... } };
@@ -1112,10 +1112,10 @@ join later if not immediately to not leave a zombie or defunct process.
 
 =item MCE::Hobo->exit( 0, @ret )
 
-A hobo can exit at any time by calling C<MCE::Hobo->exit()>. Otherwise, the
-behavior is the same as C<exit(status)> when called from the main process.
-Current since 1.827, the hobo process may optionally return data, to be
-sent via IPC.
+A hobo can exit at any time by calling C<< MCE::Hobo->exit() >>.
+Otherwise, the behavior is the same as C<exit(status)> when called from
+the main process. Current since 1.827, the hobo process may optionally
+return data, to be sent via IPC.
 
 =item MCE::Hobo->finish()
 

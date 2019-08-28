@@ -39,12 +39,10 @@
          }
       },
       "test" : {
-         "requires" : {
-            "Test::PostgreSQL" : "0"
-         }
+         "requires" : {}
       }
    },
    "release_status" : "stable",
-   "version" : "0.000202",
+   "version" : "0.000203",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

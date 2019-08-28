@@ -1,6 +1,6 @@
 package Tie::Array::DBD;
 
-our $VERSION = "0.18";
+our $VERSION = "0.19";
 
 use strict;
 use warnings;
@@ -8,9 +8,8 @@ use warnings;
 use Carp;
 
 use DBI;
-use Storable qw( nfreeze thaw );
 
-my $dbdx = 0;
+my $dbdx = sprintf "%04d", (time + int rand 10000) % 10000;
 
 my %DB = (
     Pg		=> {
@@ -127,9 +126,11 @@ sub TIEARRAY {
 	dbh => $dbh,
 	tbl => undef,
 	tmp => $tmp,
-	str => undef,
 	ktp => $cnf->{t_key},
 	vtp => $cnf->{t_val},
+
+	_en => undef,
+	_de => undef,
 	};
 
     if ($opt) {
@@ -138,8 +139,68 @@ sub TIEARRAY {
 	$opt->{key} and $f_k      = $opt->{key};
 	$opt->{fld} and $f_v      = $opt->{fld};
 	$opt->{tbl} and $h->{tbl} = $opt->{tbl};
-	$opt->{str} and $h->{str} = $opt->{str};
 	$opt->{vtp} and $h->{vtp} = $opt->{vtp};
+
+	if (my $str = $opt->{str}) {
+	    if ($str eq "Sereal") {
+		require Sereal::Encoder;
+		require Sereal::Decoder;
+		my $se = Sereal::Encoder->new;
+		my $sd = Sereal::Decoder->new;
+		$h->{_en} = sub { $se->encode ($_[0]) };
+		$h->{_de} = sub { $sd->decode ($_[0]) };
+		}
+	    elsif ($str eq "Storable") {
+		require Storable;
+		$h->{_en} = sub { Storable::nfreeze ({ val => $_[0] }) };
+		$h->{_de} = sub { Storable::thaw    ($_[0])->{val}     };
+		}
+	    elsif ($str eq "FreezeThaw") {
+		require FreezeThaw;
+		$h->{_en} = sub {  FreezeThaw::freeze ($_[0])     };
+		$h->{_de} = sub { (FreezeThaw::thaw   ($_[0]))[0] };
+		}
+	    elsif ($str eq "JSON") {
+		require JSON;
+		my $j = JSON->new->allow_nonref;
+		$h->{_en} = sub { $j->utf8->encode ($_[0]) };
+		$h->{_de} = sub {       $j->decode ($_[0]) };
+		}
+	    elsif ($str eq "JSON::Syck") {
+		require JSON::Syck;
+		$h->{_en} = sub { JSON::Syck::Dump ($_[0]) };
+		$h->{_de} = sub { JSON::Syck::Load ($_[0]) };
+		}
+	    elsif ($str eq "YAML") {
+		require YAML;
+		$h->{_en} = sub { YAML::Dump ($_[0]) };
+		$h->{_de} = sub { YAML::Load ($_[0]) };
+		}
+	    elsif ($str eq "YAML::Syck") {
+		require YAML;
+		$h->{_en} = sub { YAML::Syck::Dump ($_[0]) };
+		$h->{_de} = sub { YAML::Syck::Load ($_[0]) };
+		}
+	    elsif ($str eq "Data::Dumper") {
+		require Data::Dumper;
+		$h->{_en} = sub { Data::Dumper::Dumper ($_[0]) };
+		$h->{_de} = sub { eval $_[0] };
+		}
+	    elsif ($str eq "XML::Dumper") {
+		require XML::Dumper;
+		my $xd = XML::Dumper->new;
+		$h->{_en} = sub { $xd->pl2xml ($_[0]) };
+		$h->{_de} = sub { $xd->xml2pl ($_[0]) };
+		}
+	    elsif ($str eq "Bencode") {
+		require Bencode;
+		$h->{_en} = sub { Bencode::bencode ($_[0]) };
+		$h->{_de} = sub { Bencode::bdecode ($_[0]) };
+		}
+	    else {
+		croak "Unsupported serializer: $str\n";
+		}
+	    }
 	}
 
     $h->{f_k} = $f_k;
@@ -184,18 +245,16 @@ sub TIEARRAY {
 sub _stream {
     my ($self, $val) = @_;
     defined $val or return undef;
-    $self->{str} or return $val;
 
-    $self->{str} eq "Storable" and return nfreeze ({ val => $val });
+    $self->{_en} and return $self->{_en}->($val);
     return $val;
     } # _stream
 
 sub _unstream {
     my ($self, $val) = @_;
     defined $val or return undef;
-    $self->{str} or return $val;
 
-    $self->{str} eq "Storable" and return thaw ($val)->{val};
+    $self->{_de} and return $self->{_de}->($val);
     return $val;
     } # _unstream
 
@@ -412,17 +471,17 @@ sub DESTROY {
     for (qw( sel ins upd del cnt ctv uky )) {
 	$self->{$_} or next;
 	$self->{$_}->finish;
-	undef $self->{$_}; # DESTROY handle
+	undef  $self->{$_}; # DESTROY handle
+	delete $self->{$_};
 	}
+    delete $self->{$_} for qw( _de _en );
     if ($self->{tmp}) {
 	$dbh->{AutoCommit} or $dbh->rollback;
 	$dbh->do ("drop table ".$self->{tbl});
-	$dbh->{AutoCommit} or $dbh->commit;
 	}
-    else {
-	$dbh->{AutoCommit} or $dbh->commit;
-	}
+    $dbh->{AutoCommit} or $dbh->commit;
     $dbh->disconnect;
+    undef $dbh;
     undef $self->{dbh};
     } # DESTROY
 
@@ -544,18 +603,58 @@ depending on the underlying database and most likely some kind of BLOB.
 
 =item str
 
-Defines the required persistence module. Currently only supports the use
-of C<Storable>.  The default is undefined.  Passing unsupported streamer
-module names will be silently ignored.
+Defines the required persistence module.   Currently supports the use of
+C<Storable>, C<Sereal>,  C<JSON>, C<JSON::Syck>,  C<YAML>, C<YAML::Syck>
+and C<XML::Dumper>.
 
-Note that C<Storable> does not support persistence of perl types C<CODE>, 
-C<REGEXP>, C<IO>, C<FORMAT>, and C<GLOB>.
+The default is undefined.
 
-If you want to preserve Encoding on the array values, you should use this
-feature.
+Passing any other value will cause a C<croak>.
+
+If you want to preserve Encoding on the hash values, you should use this
+feature. (except where C<PV8> has a C<-> in the table below)
+
+Here is a table of supported data types given a data structure like this:
+
+    my %deep = (
+	UND => undef,
+	IV  => 1,
+	NV  => 3.14159265358979,
+	PV  => "string",
+	PV8 => "ab\ncd\x{20ac}\t",
+	PVM => $!,
+	RV  => \$DBD,
+	AR  => [ 1..2 ],
+	HR  => { key => "value" },
+	OBJ => ( bless { auto_diag => 1 }, "Text::CSV_XS" ),
+	RX  => qr{^re[gG]e?x},
+	FMT => *{$::{STDOUT}}{FORMAT},
+	CR  => sub { "code"; },
+	GLB => *STDERR,
+	IO  => *{$::{STDERR}}{IO},
+	);
+
+              UND  IV  NV  PV PV8 PVM  RV  AR  HR OBJ  RX FMT  CR GLB  IO
+ No streamer   x   x   x   x   x   x   x   x   x   x   -   -   -   -   -
+ Storable      x   x   x   x   x   x   x   x   x   x   -   -   -   -   -
+ Sereal        x   x   x   x   x   x   x   x   x   x   x   x   -   -   -
+ JSON          x   x   x   x   x   x   -   x   x   -   -   -   -   -   -
+ JSON::Syck    x   x   x   x   -   x   -   x   x   x   -   x   -   -   -
+ YAML          x   x   x   x   -   x   x   x   x   x   x   x   -   -   -
+ YAML::Syck    x   x   x   x   -   x   x   x   x   x   -   x   -   -   -
+ XML::Dumper   x   x   x   x   x   x   x   x   x   x   -   x   -   -   -
+ FreezeThaw    x   x   x   x   -   x   x   x   x   x   -   x   -   x   -
+ Bencode       -   x   x   x   -   x   -   x   x   -   -   -   -   x   -
+
+So, C<Storable> does not support persistence of types C<CODE>, C<REGEXP>,
+C<FORMAT>, C<IO>, and C<GLOB>. Be sure to test if all of your data types
+are supported by the serializer you choose. YMMV.
+
+"No streamer"  might work inside the current process if reference values
+are stored, but it is highly unlikely they are persistent.
 
 Also note that this module does not yet support dynamic deep structures.
-See L</Nesting and deep structues>.
+See L<Nesting and deep structures|/nesting>.
 
 =back
 
@@ -588,6 +687,7 @@ database encoding does not:
   $array[2] = pack "L>A*", time, encode "UTF-8", "Price: \x{20ac} 45.95";
 
 =head2 Nesting and deep structures
+X<nesting>
 
 C<Tie::Array::DBD> stores values as binary data. This means that
 all structure is lost when the data is stored and not available when the
@@ -680,14 +780,15 @@ H.Merijn Brand <h.m.brand@xs4all.nl>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010-2018 H.Merijn Brand
+Copyright (C) 2010-2019 H.Merijn Brand
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 
 
 =head1 SEE ALSO
 
-DBI, Tie::DBI, Tie::Hash, Tie::Hash::DBD, DBM::Deep
+DBI, Tie::DBI, Tie::Array, Tie::Hash::DBD, DBM::Deep, Storable, Sereal,
+JSON, JSON::Syck, YAML, YAML::Syck, XML::Dumper, Bencode, FreezeThaw
 
 =cut
 

@@ -1,0 +1,18 @@
+use strict;
+use warnings;
+
+#use lib 't/lib';
+die;
+use Test::More;
+use Test::BDD::Cucumber::StepFile;
+
+use Carp;
+
+Given qr{there is a cpanfile} => sub {
+};
+
+When qr{the program is run} => sub {
+};
+
+Then qr{package names are printed} => sub {
+};

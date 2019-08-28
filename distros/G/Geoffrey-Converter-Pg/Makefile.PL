@@ -22,9 +22,7 @@ WriteMakefile(
         'Readonly'        => 0,
         'Test::Exception' => 0,
     },
-    TEST_REQUIRES => {
-        'Test::PostgreSQL' => 0,
-    },
+    TEST_REQUIRES => {},
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES    => 'Geoffrey-Converter-Pg-*' },
 );

@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.845';
+our $VERSION = '1.846';
 
 use MCE::Shared::Base ();
 use MCE::Util ();
@@ -352,7 +352,7 @@ MCE::Shared::Condvar - Condvar helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Condvar version 1.845
+This document describes MCE::Shared::Condvar version 1.846
 
 =head1 DESCRIPTION
 
@@ -490,8 +490,8 @@ is not defined.
 =head2 lock
 
 Attempts to grab the lock and waits if not available. Multiple calls to
-C<$cv->lock> by the same process or thread is safe. The mutex will remain
-locked until C<$cv->unlock> is called.
+C<< $cv->lock >> by the same process or thread is safe. The mutex will remain
+locked until C<< $cv->unlock >> is called.
 
  $cv->lock;
 

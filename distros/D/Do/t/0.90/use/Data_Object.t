@@ -83,6 +83,9 @@ you import the "Do" or "Data::Object" package into your namespace.
   # imports keywords and super "do" function, etc
   use Data::Object::Export;
 
+  # enables method calls on native data types
+  use Data::Object::Autobox;
+
 To explain by way of example: The following established a user-defined type
 library where user-defined classes, roles, etc, will be automatically
 registered.
@@ -116,7 +119,7 @@ as a type constraint.
 The following is a script which is type-library aware that creates a function
 that returns how one user greets another user.
 
-  #!/usr/bin/perl
+  package main;
 
   use App::User;
 

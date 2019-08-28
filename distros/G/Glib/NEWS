@@ -1,3 +1,11 @@
+Overview of changes in Glib 1.3210 (stable)
+============================================
+
+* POD: add short description for Glib::VariantDict
+* Fix test failure in t/g.t due to apparent changes in GKeyFile
+* Hush a few compiler warnings
+∗ POD: add short description for Glib::VariantDict. (GNOME/perl-glib!3)
+
 Overview of changes in Glib 1.329 (stable)
 ============================================
 

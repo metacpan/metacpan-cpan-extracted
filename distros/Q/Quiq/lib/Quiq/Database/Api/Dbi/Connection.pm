@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.154';
+our $VERSION = '1.155';
 
 use Quiq::Option;
 use DBI ();
@@ -418,7 +418,7 @@ Resultat-Objekt $cur und liefere eine Referenz auf dieses Objekt
 zurück.
 
 Ist Parameter $forceExec angegeben und wahr, wird die Ausführung
-des Statement forciert. Dies kann bei Oracle PL/SQL Code notwendig
+des Statements forciert. Dies kann bei Oracle PL/SQL Code notwendig
 sein (siehe Doku zu Quiq::Database::Connection/sql).
 
 =cut
@@ -520,7 +520,7 @@ sub sql {
 
 =head1 VERSION
 
-1.154
+1.155
 
 =head1 AUTHOR
 

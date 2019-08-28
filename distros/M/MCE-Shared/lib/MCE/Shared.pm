@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized once );
 
-our $VERSION = '1.845';
+our $VERSION = '1.846';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitSubroutinePrototypes)
@@ -448,7 +448,7 @@ MCE::Shared - MCE extension for sharing data supporting threads and processes
 
 =head1 VERSION
 
-This document describes MCE::Shared version 1.845
+This document describes MCE::Shared version 1.846
 
 =head1 SYNOPSIS
 
@@ -1057,7 +1057,7 @@ C<CDB_File> is given in the prior section.
  tie my %h1, 'MCE::Shared', { module => 'BerkeleyDB::Hash' },
     -Filename => 'foo_a', -Flags => DB_CREATE
        or die "open error: $!";
-   
+
  tie my %h2, 'MCE::Shared', { module => 'BerkeleyDB::Btree' },
     -Filename => 'foo_b', -Flags => DB_CREATE
        or die "open error: $!";

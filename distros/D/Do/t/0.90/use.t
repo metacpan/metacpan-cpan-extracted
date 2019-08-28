@@ -10,6 +10,12 @@ my $pod = Test::Dist->new;
 
 for my $file (map $pod->file("$_"), @{$pod->paths}) {
   my $name = $file->use_file;
+
+  my $exists = !! -f $name;
+  ok $exists, "$name exists";
+
+  next if !$exists;
+
   my $data = $file->parse($name);
 
   ok $data->content('name'), "$name has pod name section";

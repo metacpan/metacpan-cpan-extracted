@@ -1,5 +1,16 @@
 Revision history for Perl module DNS::Unbound
 
+0.10 - Mon, 26 Aug 2019
+- Query results are now represented as instances of DNS::Unbound::Result
+  rather than simple hash references. Existing implementations should
+  continue to work.
+- DNS::Unbound::Result’s method to convert a query result to Net::DNS::RR
+  instances obviates the need to decode query results manually.
+  The decode_name() and decode_character_strings() functions will be
+  retained as a convenience for contexts where they’re useful.
+- resolve() and resolve_async() now fall back on Net::DNS::Parameters
+  to parse any unrecognized query types.
+
 0.09 - Sat, 27 July 2019
 - Remove dependency on recent ExtUtils::MakeMaker version.
 - Split DNS::Unbound::AsyncQuery off to a separate file; add POD & test.

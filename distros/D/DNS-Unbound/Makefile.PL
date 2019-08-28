@@ -29,9 +29,11 @@ WriteMakefile(
     LICENSE        => 'perl',
 
     PREREQ_PM => {
+        'Class::XSAccessor' => 0.10,
+        'Net::DNS'  => 0,
+        'Promise::ES6' => 0.04,
         'X::Tiny' => 0,
         'XSLoader' => 0.24,
-        'Promise::ES6' => 0.04,
     },
 
     TEST_REQUIRES => {

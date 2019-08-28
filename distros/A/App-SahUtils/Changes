@@ -1,3 +1,8 @@
+0.465   2019-07-25  Released-By: PERLANCAR; Urgency: medium
+
+	- list-sah-coerce-rule-modules: Show metadata v when --detail.
+
+
 0.464   2019-07-16  Released-By: PERLANCAR; Urgency: medium
 
 	- Rename script to be more consistent with others:

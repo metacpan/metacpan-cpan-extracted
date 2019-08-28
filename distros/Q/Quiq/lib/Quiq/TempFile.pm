@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.154';
+our $VERSION = '1.155';
 
 use overload '""' => sub {${$_[0]}}, 'cmp' => sub{${$_[0]} cmp $_[1]};
 use Quiq::Path;
@@ -59,6 +59,10 @@ Daten, die in die temporäre Datei geschrieben werden.
 
 Verzeichnis, in dem die temporäre Datei erzeugt wird.
 
+=item -pathOnly => $bool
+
+Erzeuge nur den Pfad, lösche die Datei sofort.
+
 =item -suffix => $suffix
 
 Dateienendung, z.B. '.dat'.
@@ -92,10 +96,11 @@ sub new {
 
     # Optionen und Argumente
 
-    my ($dir,$suffix,$template,$unlink);
+    my ($dir,$pathOnly,$suffix,$template,$unlink);
 
     my $argA = $class->parameters(0,1,\@_,
         -dir => \$dir,
+        -pathOnly => \$pathOnly,
         -suffix => \$suffix,
         -template => \$template,
         -unlink => \$unlink,
@@ -105,9 +110,6 @@ sub new {
     # Wir setzen unsere Optionen in die Optionen von File::Temp um
 
     my @args;
-    if (defined $dir) {
-        push @args,'DIR',Quiq::Path->expandTilde($dir);
-    }
     if (defined $suffix) {
         push @args,'SUFFIX',$suffix;
     }
@@ -122,6 +124,9 @@ sub new {
     if (defined $data) {
         Quiq::Path->write($self,$data);
     }
+    if ($pathOnly) {
+        Quiq::Path->delete("$self");
+    }
 
     return $self;
 }
@@ -130,7 +135,7 @@ sub new {
 
 =head1 VERSION
 
-1.154
+1.155
 
 =head1 AUTHOR
 

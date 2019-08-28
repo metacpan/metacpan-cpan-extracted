@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.154';
+our $VERSION = '1.155';
 
 # -----------------------------------------------------------------------------
 
@@ -63,6 +63,16 @@ JavaScript-Code bei Änderung der Auswahl ausgeführt wird.
 
 Liste der möglichen Werte.
 
+=item optionPairs => \@pairs (Default: [])
+
+Liste der möglichen Werte und ihrer Anzeigetexte. Beispiel:
+
+    optionPairs => [
+        0 => 'Nein',
+        1 => 'Ja',
+        2 => 'Vielleicht',
+    ]
+
 =item texts => \@text (Default: [])
 
 Liste der angezeigten Werte. Wenn nicht angegeben, wird die Liste der
@@ -104,6 +114,7 @@ sub new {
         name => undef,
         onChange => undef,
         options => [],
+        optionPairs => [],
         style => undef,
         styles => [],
         texts => [],
@@ -150,20 +161,31 @@ sub html {
 
     # Attribute
 
-    my ($class,$disabled,$id,$javaScript,$name,$onChange,$options,$style,
-        $styles,$texts,$value) =
-        $self->get(qw/class disabled id javaScript name onChange options style
-        styles texts value/);
+    my ($class,$disabled,$id,$javaScript,$name,$onChange,$optionPairs,
+        $options,$style,$styles,$texts,$value) =
+        $self->get(qw/class disabled id javaScript name onChange optionPairs
+        options style styles texts value/);
 
     # Generierung
 
-    my $str;
-    for (my $i = 0; $i < @$options; $i++) {
-        my $option = $options->[$i];
-        my $text = $texts->[$i];
-        if (!defined $text) {
-            $text = $option;
+    my (@options,@texts);
+    if (@$optionPairs) {
+        for (my $i = 0; $i < @$optionPairs; $i += 2) {
+            push @options,$optionPairs->[$i];
+            push @texts,$optionPairs->[$i+1];
         }
+    }
+    else {
+        for (my $i = 0; $i < @$options; $i++) {
+            push @options,$options->[$i];
+            push @texts,$texts->[$i] // $options->[$i];
+        }
+    }
+
+    my $str;
+    for (my $i = 0; $i < @options; $i++) {
+        my $option = $options[$i];
+        my $text = $texts[$i];
         my $style = $styles->[$i];
 
         $str .= $h->tag('option',
@@ -198,7 +220,7 @@ sub html {
 
 =head1 VERSION
 
-1.154
+1.155
 
 =head1 AUTHOR
 

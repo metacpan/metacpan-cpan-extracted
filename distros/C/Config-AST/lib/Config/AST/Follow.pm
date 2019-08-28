@@ -119,4 +119,6 @@ sub AUTOLOAD {
     $self;
 }
 
+sub DESTROY { }
+
 1;

@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.154';
+our $VERSION = '1.155';
 
 use Quiq::Database::Row::Array;
 use Quiq::Shell;
@@ -455,7 +455,7 @@ sub putFiles {
         );
 
         # Checke Workspace-Datei ins Repository ein
-        $output .= $self->checkin($package,$repoFile);
+        $output .= $self->checkin($package,$repoFile);  
     }
 
     return $output;
@@ -2027,7 +2027,7 @@ sub runSql {
 
 =head1 VERSION
 
-1.154
+1.155
 
 =head1 AUTHOR
 

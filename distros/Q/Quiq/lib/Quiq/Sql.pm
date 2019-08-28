@@ -1,12 +1,12 @@
 package Quiq::Sql;
-use base qw/Quiq::Hash/;
+use base qw/Quiq::Dbms/;
 
 use strict;
 use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.154';
+our $VERSION = '1.155';
 
 use Quiq::Hash;
 use Quiq::Option;
@@ -25,7 +25,7 @@ Quiq::Sql - Klasse zur Generierung von SQL
 
 =head1 BASE CLASS
 
-L<Quiq::Hash>
+L<Quiq::Dbms>
 
 =head1 SYNOPSIS
 
@@ -71,250 +71,7 @@ Folgende DBMSe werden von der Klasse unterstützt:
     SQLite
     MySQL
 
-=head1 ATTRIBUTES
-
-=over 4
-
-=item dbms => $dbmsName (Default: keiner)
-
-Name des DBMS.
-
-=back
-
 =head1 METHODS
-
-=head2 Konstruktor
-
-=head3 new() - Konstruktor
-
-=head4 Synopsis
-
-    $sql = $class->new($dbms);
-    $sql = $class->new($dbms,$version);
-
-=head4 Description
-
-Instantiiere SQL-Objekt und liefere eine Referenz auf dieses Objekt
-zurück.
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub new {
-    my ($class,$dbms,$version) = @_;
-
-    # DBMS-Name case-insensitiv suchen
-
-    my $dbmsName;
-    for ($class->dbmsNames) {
-        if (lc($dbms) eq lc($_)) {
-            $dbmsName = $_;
-            last;
-        }
-    }
-
-    if (!$dbmsName) {
-        $class->throw('SQL-00001: Unbekanntes DBMS',Dbms=>$dbms);
-    }
-
-    # Objekt instantiieren
-
-    return $class->SUPER::new(
-        dbms => $dbmsName,
-        version => $version,
-    );
-}
-
-# -----------------------------------------------------------------------------
-
-=head2 Akzessoren
-
-=head3 dbms() - Name des DBMS in kanonischer Form
-
-=head4 Synopsis
-
-    $name = $sql->dbms;
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub dbms {
-    return shift->{'dbms'};
-}
-
-# -----------------------------------------------------------------------------
-
-=head2 DBMS Names
-
-=head3 dbmsNames() - Liste der Namen der unterstützten Datenbanksysteme
-
-=head4 Synopsis
-
-    $namesA | @names = $this->dbmsNames;
-
-=head4 Description
-
-Liefere folgende Liste von DBMS-Namen (in dieser Reihenfolge):
-
-    Oracle
-    PostgreSQL
-    SQLite
-    MySQL
-    Access
-    MSSQL
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-my @DbmsNames = qw/Oracle PostgreSQL SQLite MySQL Access MSSQL/;
-
-sub dbmsNames {
-    my $this = shift;
-    return wantarray? @DbmsNames: \@DbmsNames;
-}
-
-# -----------------------------------------------------------------------------
-
-=head2 DBMS Tests
-
-=head3 dbmsTestVector() - Vektor für DBMS-Tests
-
-=head4 Synopsis
-
-    ($oracle,$postgresql,$sqlite,$mysql,$access,$mssql) = $self->dbmsTestVector;
-
-=head4 Description
-
-Liefere einen Vektor von boolschen Werten, von denen genau einer den
-Wert "wahr" besitzt, und zwar der, der dem DBMS entspricht,
-auf den das Objekt instantiiert ist.
-
-Die Methode ist für Programmcode nützlich, der DBMS-spezifische
-Unterscheidungen macht. Der Code braucht dann lediglich auf den
-Wert einer Variable prüfen
-
-    if ($oracle) ...
-
-statt einen umständlichen und fehleranfälligen Stringvergleich
-durchzuführen
-
-    if ($dbms eq 'Oracle') ...
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub dbmsTestVector {
-    my $self = shift;
-    return map { $_ eq $self->{'dbms'}? 1: 0 } $self->dbmsNames;
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 isOracle() - Teste auf Oracle
-
-=head4 Synopsis
-
-    $bool = $class->isOracle;
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub isOracle {
-    my $self = shift;
-    return $self->{'dbms'} eq 'Oracle'? 1: 0;
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 isPostgreSQL() - Teste auf PostgreSQL
-
-=head4 Synopsis
-
-    $bool = $class->isPostgreSQL;
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub isPostgreSQL {
-    my $self = shift;
-    return $self->{'dbms'} eq 'PostgreSQL'? 1: 0;
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 isSQLite() - Teste auf SQLite
-
-=head4 Synopsis
-
-    $bool = $class->isSQLite;
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub isSQLite {
-    my $self = shift;
-    return $self->{'dbms'} eq 'SQLite'? 1: 0;
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 isMySQL() - Teste auf MySQL
-
-=head4 Synopsis
-
-    $bool = $class->isMySQL;
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub isMySQL {
-    my $self = shift;
-    return $self->{'dbms'} eq 'MySQL'? 1: 0;
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 isAccess() - Teste auf Access
-
-=head4 Synopsis
-
-    $bool = $class->isAccess;
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub isAccess {
-    my $self = shift;
-    return $self->{'dbms'} eq 'Access'? 1: 0;
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 isMSSQL() - Teste auf MSSQL
-
-=head4 Synopsis
-
-    $bool = $class->isMSSQL;
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub isMSSQL {
-    my $self = shift;
-    return $self->{'dbms'} eq 'MSSQL'? 1: 0;
-}
-
-# -----------------------------------------------------------------------------
 
 =head2 Utilities
 
@@ -5629,7 +5386,7 @@ sub diff {
 
 =head1 VERSION
 
-1.154
+1.155
 
 =head1 AUTHOR
 

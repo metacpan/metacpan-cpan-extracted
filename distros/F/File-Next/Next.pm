@@ -9,16 +9,16 @@ File::Next - File-finding iterator
 
 =head1 VERSION
 
-Version 1.16
+Version 1.18
 
 =cut
 
-our $VERSION = '1.16';
+our $VERSION = '1.18';
 
 =head1 SYNOPSIS
 
 File::Next is a lightweight, taint-safe file-finding module.
-It's lightweight and has no non-core prerequisites.
+It has no non-core prerequisites.
 
     use File::Next;
 
@@ -262,11 +262,11 @@ sub files {
 
     my ($parms,@queue) = _setup( \%files_defaults, @_ );
 
+    my $filter = $parms->{file_filter};
     return sub {
-        my $filter = $parms->{file_filter};
-        while (@queue) {
-            my ($dirname,$file,$fullpath) = splice( @queue, 0, 3 );
-            if ( -f $fullpath || -p _ || $fullpath =~ m{^/dev/fd} ) {
+        while ( my $entry = shift @queue ) {
+            my ( $dirname, $file, $fullpath, $is_dir, $is_file, $is_fifo ) = @{$entry};
+            if ( $is_file || $is_fifo ) {
                 if ( $filter ) {
                     local $_ = $file;
                     local $File::Next::dir = $dirname;
@@ -275,7 +275,7 @@ sub files {
                 }
                 return wantarray ? ($dirname,$file,$fullpath) : $fullpath;
             }
-            if ( -d _ ) {
+            if ( $is_dir ) {
                 unshift( @queue, _candidate_files( $parms, $fullpath ) );
             }
         } # while
@@ -291,9 +291,9 @@ sub dirs {
     my ($parms,@queue) = _setup( \%files_defaults, @_ );
 
     return sub {
-        while (@queue) {
-            my (undef,undef,$fullpath) = splice( @queue, 0, 3 );
-            if ( -d $fullpath ) {
+        while ( my $entry = shift @queue ) {
+            my ( undef, undef, $fullpath, $is_dir, undef, undef ) = @{$entry};
+            if ( $is_dir ) {
                 unshift( @queue, _candidate_files( $parms, $fullpath ) );
                 return $fullpath;
             }
@@ -303,16 +303,17 @@ sub dirs {
     }; # iterator
 }
 
+
 sub everything {
     die _bad_invocation() if @_ && defined($_[0]) && ($_[0] eq __PACKAGE__);
 
     my ($parms,@queue) = _setup( \%files_defaults, @_ );
 
+    my $filter = $parms->{file_filter};
     return sub {
-        my $filter = $parms->{file_filter};
-        while (@queue) {
-            my ($dirname,$file,$fullpath) = splice( @queue, 0, 3 );
-            if ( -d $fullpath ) {
+        while ( my $entry = shift @queue ) {
+            my ( $dirname, $file, $fullpath, $is_dir, $is_file, $is_fifo ) = @{$entry};
+            if ( $is_dir ) {
                 unshift( @queue, _candidate_files( $parms, $fullpath ) );
             }
             if ( $filter ) {
@@ -335,7 +336,7 @@ sub from_file {
     my $err  = $parms->{error_handler};
     my $warn = $parms->{warning_handler};
 
-    my $filename = $queue[1];
+    my $filename = $queue[0]->[1];
 
     if ( !defined($filename) ) {
         $err->( 'Must pass a filename to from_file()' );
@@ -353,8 +354,8 @@ sub from_file {
         }
     }
 
+    my $filter = $parms->{file_filter};
     return sub {
-        my $filter = $parms->{file_filter};
         local $/ = $parms->{nul_separated} ? "\x00" : $/;
         while ( my $fullpath = <$fh> ) {
             chomp $fullpath;
@@ -412,10 +413,8 @@ I<$passed_parms> and I<$defaults>, plus the queue.
 The queue prep stuff takes the strings in I<@starting_points> and
 puts them in the format that queue needs.
 
-The C<@queue> that gets passed around is an array that has three
-elements for each of the entries in the queue: $dir, $file and
-$fullpath.  Items must be pushed and popped off the queue three at
-a time (spliced, really).
+The C<@queue> that gets passed around is an array, with each entry an
+arrayref of $dir, $file and $fullpath.
 
 =cut
 
@@ -434,7 +433,7 @@ sub _setup {
     }
 
     # Any leftover keys are bogus
-    for my $badkey ( keys %passed_parms ) {
+    for my $badkey ( sort keys %passed_parms ) {
         my $sub = (caller(1))[3];
         $parms->{error_handler}->( "Invalid option passed to $sub(): $badkey" );
     }
@@ -447,12 +446,13 @@ sub _setup {
 
     for ( @_ ) {
         my $start = reslash( $_ );
-        if (-d $start) {
-            push @queue, ($start,undef,$start);
-        }
-        else {
-            push @queue, (undef,$start,$start);
-        }
+        my $is_dir  = -d $start;
+        my $is_file = -f _;
+        my $is_fifo = (-p _) || ($start =~ m{^/dev/fd});
+        push @queue,
+            $is_dir
+                ? [ $start, undef,  $start, $is_dir, $is_file, $is_fifo ]
+                : [ undef,  $start, $start, $is_dir, $is_file, $is_fifo ];
     }
 
     return ($parms,@queue);
@@ -480,40 +480,39 @@ sub _candidate_files {
     my @newfiles;
     my $descend_filter = $parms->{descend_filter};
     my $follow_symlinks = $parms->{follow_symlinks};
-    my $sort_sub = $parms->{sort_files};
 
     for my $file ( grep { !exists $skip_dirs{$_} } readdir $dh ) {
-        my $has_stat;
-
         my $fullpath = File::Spec->catdir( $dirname, $file );
         if ( !$follow_symlinks ) {
             next if -l $fullpath;
-            $has_stat = 1;
         }
+        else {
+            stat($fullpath);
+        }
+        my $is_dir  = -d _;
+        my $is_file = -f _;
+        my $is_fifo = (-p _) || ($fullpath =~ m{^/dev/fd});
 
         # Only do directory checking if we have a descend_filter
         if ( $descend_filter ) {
-            if ( $has_stat ? (-d _) : (-d $fullpath) ) {
+            if ( $is_dir ) {
                 local $File::Next::dir = $fullpath;
                 local $_ = $file;
                 next if not $descend_filter->();
             }
         }
-        if ( $sort_sub ) {
-            push( @newfiles, [ $dirname, $file, $fullpath ] );
-        }
-        else {
-            push( @newfiles, $dirname, $file, $fullpath );
-        }
+        push @newfiles, [ $dirname, $file, $fullpath, $is_dir, $is_file, $is_fifo ];
     }
     closedir $dh;
 
+    my $sort_sub = $parms->{sort_files};
     if ( $sort_sub ) {
-        return map { @{$_} } sort $sort_sub @newfiles;
+        @newfiles = sort $sort_sub @newfiles;
     }
 
     return @newfiles;
 }
+
 
 =head1 DIAGNOSTICS
 
@@ -571,10 +570,6 @@ You can also look for information at:
 
 L<http://github.com/petdance/file-next/issues>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/File-Next>
-
 =item * CPAN Ratings
 
 L<http://cpanratings.perl.org/d/File-Next>
@@ -594,7 +589,9 @@ L<http://github.com/petdance/file-next/tree/master>
 All file-finding in this module is adapted from Mark Jason Dominus'
 marvelous I<Higher Order Perl>, page 126.
 
-Thanks also for bug fixes and typo finding to
+Thanks to these fine contributors:
+Varadinsky,
+Paulo Custodio,
 Gerhard Poul,
 Brian Fraser,
 Todd Rinaldo,
@@ -605,7 +602,7 @@ and Rob Hoelz.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2005-2016 Andy Lester.
+Copyright 2005-2017 Andy Lester.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License version 2.0.

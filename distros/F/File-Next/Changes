@@ -3,6 +3,20 @@ Revision history for File-Next
 File::Next does NOT use rt.cpan.org for bug tracking.  Please report
 problems at http://github.com/petdance/file-next/issues.
 
+1.18 Tue Aug 27 17:08:38 CDT 2019
+    [SPEEDUP]
+    Updated the internals to minimize the number of times that stat()
+    gets called on each file or directory.
+
+    [FIXES]
+    t/from_file.t would fail under Windows because File::Temp would
+    put a backslash in front of the name of the tempfile.  Thanks,
+    Varadinsky. (GH#32)
+
+    Had to specify a minimum version of File::Temp.  Thanks, Justin Mohr.
+    (GH#29)
+
+
 1.16 Thu Jul  7 22:41:30 CDT 2016
     [FIXES]
     File::Next::from_file() would ignore the C<warning_handler> argument

@@ -25,6 +25,7 @@ lib/Quiq/Css.pm
 lib/Quiq/Database/Api.pm
 lib/Quiq/Database/Api/Dbi/Connection.pm
 lib/Quiq/Database/Api/Dbi/Cursor.pm
+lib/Quiq/Database/Config.pm
 lib/Quiq/Database/Connection.pm
 lib/Quiq/Database/Cursor.pm
 lib/Quiq/Database/DataAnalysis.pm
@@ -37,6 +38,7 @@ lib/Quiq/Database/Row/Object.pm
 lib/Quiq/Database/Row/Object/Join.pm
 lib/Quiq/Database/Row/Object/Table.pm
 lib/Quiq/Database/Tree.pm
+lib/Quiq/Dbms.pm
 lib/Quiq/Debug.pm
 lib/Quiq/DestinationTree.pm
 lib/Quiq/Diff.pm
@@ -60,6 +62,8 @@ lib/Quiq/Gnuplot/Label.pm
 lib/Quiq/Gnuplot/Plot.pm
 lib/Quiq/Gnuplot/Process.pm
 lib/Quiq/Hash.pm
+lib/Quiq/Hash/Db.pm
+lib/Quiq/Hash/Persistent.pm
 lib/Quiq/Html/Base.pm
 lib/Quiq/Html/Construct.pm
 lib/Quiq/Html/Form/Layout.pm
@@ -124,7 +128,6 @@ lib/Quiq/Parallel.pm
 lib/Quiq/Parameters.pm
 lib/Quiq/Path.pm
 lib/Quiq/Perl.pm
-lib/Quiq/PersistentHash.pm
 lib/Quiq/Pod/Generator.pm
 lib/Quiq/Process.pm
 lib/Quiq/Program.pm
@@ -140,6 +143,8 @@ lib/Quiq/SoapWsdlServiceCgi.pm
 lib/Quiq/SoapWsdlServiceCgi/Demo.pm
 lib/Quiq/Socket.pm
 lib/Quiq/Sql.pm
+lib/Quiq/Sql/Analyzer.pm
+lib/Quiq/Sql/Script/Reader.pm
 lib/Quiq/SqlPlus.pm
 lib/Quiq/Ssh.pm
 lib/Quiq/Stacktrace.pm
@@ -199,6 +204,7 @@ t/bin/Quiq/Css.t
 t/bin/Quiq/Database/Api.t
 t/bin/Quiq/Database/Api/Dbi/Connection.t
 t/bin/Quiq/Database/Api/Dbi/Cursor.t
+t/bin/Quiq/Database/Config.t
 t/bin/Quiq/Database/Connection.t
 t/bin/Quiq/Database/Cursor.t
 t/bin/Quiq/Database/DataAnalysis.t
@@ -211,6 +217,7 @@ t/bin/Quiq/Database/Row/Object.t
 t/bin/Quiq/Database/Row/Object/Join.t
 t/bin/Quiq/Database/Row/Object/Table.t
 t/bin/Quiq/Database/Tree.t
+t/bin/Quiq/Dbms.t
 t/bin/Quiq/Debug.t
 t/bin/Quiq/DestinationTree.t
 t/bin/Quiq/Diff.t
@@ -234,6 +241,8 @@ t/bin/Quiq/Gnuplot/Label.t
 t/bin/Quiq/Gnuplot/Plot.t
 t/bin/Quiq/Gnuplot/Process.t
 t/bin/Quiq/Hash.t
+t/bin/Quiq/Hash/Db.t
+t/bin/Quiq/Hash/Persistent.t
 t/bin/Quiq/Html/Base.t
 t/bin/Quiq/Html/Construct.t
 t/bin/Quiq/Html/Form/Layout.t
@@ -298,7 +307,6 @@ t/bin/Quiq/Parallel.t
 t/bin/Quiq/Parameters.t
 t/bin/Quiq/Path.t
 t/bin/Quiq/Perl.t
-t/bin/Quiq/PersistentHash.t
 t/bin/Quiq/Pod/Generator.t
 t/bin/Quiq/Process.t
 t/bin/Quiq/Program.t
@@ -314,6 +322,8 @@ t/bin/Quiq/SoapWsdlServiceCgi.t
 t/bin/Quiq/SoapWsdlServiceCgi/Demo.t
 t/bin/Quiq/Socket.t
 t/bin/Quiq/Sql.t
+t/bin/Quiq/Sql/Analyzer.t
+t/bin/Quiq/Sql/Script/Reader.t
 t/bin/Quiq/SqlPlus.t
 t/bin/Quiq/Ssh.t
 t/bin/Quiq/Stacktrace.t

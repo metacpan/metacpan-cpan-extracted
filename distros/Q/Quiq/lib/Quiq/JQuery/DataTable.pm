@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.154';
+our $VERSION = '1.155';
 
 use Quiq::Html::Table::List;
 use Quiq::Unindent;
@@ -54,8 +54,9 @@ JSON-Code der das DataTable-Objekt in JavaScript instantiiert. Die
 Kolumnendefinitionen (DataTables-Attribut columns:) wird intern
 generiert und zu diesem Code hinzugefügt.
 
-=item class => $class (Default: undef)
+=item class => $class (Default: "compact stripe hover cell-border nowrap \
 
+order-column")
 CSS-Klasse der DataTable (des Table-Elements).
 
 =item columns => \@columns (Default: [])
@@ -71,6 +72,7 @@ Kolumnen-Spezifikation ist ein Hash mit den Komponenten:
         orderable => $bool,   # 0|1 (Default: 1)
         searchable => $bool,  # 0|1 (Default: 1)
         visible => $bool,     # 0|1 (Default: 1)
+        width => $width,      # s. DtaTables Doku
     }
 
 Nicht benötigte Komponenten können weggelassen werden.
@@ -92,11 +94,17 @@ DOM-Id der DataTable (des Table-Elements).
 Füge die Instantiierung des DataTable-Objektes (JavaScript) zum
 HTML-Code der Methode html() hinzu.
 
-=item rowCallback => $sub (Default: s.u.)
+=item rowsAreArrays => $bool (Default: 0)
 
-Referenz auf eine Subroutine, die für jedes Row-Objekt die
-darzustellende Zeileninformation (für tr- und td-Tag) liefert
-(siehe Quiq::Html::Table::List). Default:
+Die Row-Objekte sind einfache Arrays. Als rowCallback wird
+(per Default) verwendet:
+
+    rowCallback => sub {
+        my ($row,$i,$columnA) = @_;
+        return (undef,@$row);
+    }
+
+Wenn nicht gesetzt, wird (per Default) als rowCallback verwendet:
 
     rowCallback => sub {
         my ($row,$i,$columnA) = @_;
@@ -109,6 +117,13 @@ darzustellende Zeileninformation (für tr- und td-Tag) liefert
     
         return (undef,@arr);
     };
+
+=item rowCallback => $sub (Default: s. Attribut rowsAreArrays)
+
+Referenz auf eine Subroutine, die für jedes Row-Objekt die
+darzustellende Zeileninformation (für tr- und td-Tag) liefert
+(siehe Quiq::Html::Table::List). Der Default hängt vom
+Wert des Attributs rowsAreArrays ab. Siehe dort.
 
 =item rows => \@rows (Default: [])
 
@@ -477,11 +492,12 @@ sub new {
 
     my $self = $class->SUPER::new(
         arguments => undef,
-        class => undef,
+        class => 'compact stripe hover cell-border nowrap order-column',
         columns => [],
         footer => 0,
         id => undef,
         instantiate => 0,
+        rowsAreArrays => 0,
         rowCallback => undef,
         rows => [],
     );
@@ -517,11 +533,34 @@ sub html {
 
     my $self = ref $this? $this: $this->new(@_);
 
-    my ($arguments,$class,$footer,$id,$instantiate,$rowCallback,$rowA) =
-        $self->get(qw/arguments class footer id instantiate rowCallback rows/);
+    my ($arguments,$class,$footer,$id,$instantiate,$rowsAreArrays,$rowCallback,
+        $rowA) = $self->get(qw/arguments class footer id instantiate
+        rowsAreArrays rowCallback rows/);
 
     # Liste der Kolumnendefinitionen als Hash-Objekte
     my @columns = $self->getColumns;
+
+    if (!$rowCallback) {
+        if ($rowsAreArrays) {
+            $rowCallback = sub {
+                my ($row,$i,$columnA) = @_;
+                return (undef,@$row);
+            };
+        }
+        else {
+            $rowCallback = sub {
+                my ($row,$i,$columnA) = @_;
+
+                my @arr;
+                for my $col (@$columnA) {
+                    my $name = $col->name;
+                    push @arr,$name? $row->get($name): undef;
+                }
+
+                return (undef,@arr);
+            };
+        }
+    };
 
     # HTML generieren
 
@@ -532,20 +571,6 @@ sub html {
     my @titles;
     for my $col (@columns) {
         push @titles,$col->title;
-    }
-
-    if (!$rowCallback) {
-        $rowCallback = sub {
-            my ($row,$i,$columnA) = @_;
-
-            my @arr;
-            for my $col (@$columnA) {
-                my $name = $col->name;
-                push @arr,$name? $row->get($name): undef;
-            }
-    
-            return (undef,@arr);
-        };
     }
 
     my $html = Quiq::Html::Table::List->html($h,
@@ -690,7 +715,7 @@ sub getColumns {
 
 =head1 VERSION
 
-1.154
+1.155
 
 =head1 AUTHOR
 

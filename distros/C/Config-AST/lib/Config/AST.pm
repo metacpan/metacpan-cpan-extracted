@@ -31,7 +31,7 @@ our @ISA = qw(Exporter);
 our %EXPORT_TAGS = ( 'sort' => [ qw(NO_SORT SORT_NATURAL SORT_PATH) ] );
 our @EXPORT_OK = qw(NO_SORT SORT_NATURAL SORT_PATH);
     
-our $VERSION = "1.02";
+our $VERSION = "1.04";
 
 =head1 NAME
 
@@ -191,7 +191,7 @@ Whether or not this setting is mandatory.
 =item default => I<VALUE>
 
 Default value for the setting. This value will be assigned if that particular
-statement is not explicilty used in the configuration file. If I<VALUE>
+statement is not explicitly used in the configuration file. If I<VALUE>
 is a CODE reference, it will be invoked as a method each time the value is
 accessed.
 
@@ -218,7 +218,7 @@ called as
     $self->$coderef($node, @path)
 
 where $node is the B<Config::AST::Node::Value> object (use
-B<$vref-E<gt>value>, to obtain the actual value), and B<@path> is its patname.
+B<$vref-E<gt>value>, to obtain the actual value), and B<@path> is its pathname.
     
 =item check => I<coderef>
 
@@ -379,22 +379,63 @@ sub parse {
     croak "call to abstract method"
 }
 
-=head2 $cfg->commit
+=head2 $cfg->commit([%hash])
 
 Must be called after B<parse> to finalize the parse tree. This function
-does the actual syntax checking and applied default values to the statements
-where such are defined. Returns true on success.    
+applies default values on settings where such are defined.
+
+Optional arguments control what steps are performed.
+
+=over 4
+
+=item lint => 1
+
+Forse syntax checking.  This can be necessary if new nodes were added to
+the tree after parsing.
+
+=item lexicon => I<$hashref>
+
+Override the lexicon used for syntax checking and default value processing.
+
+=back
+
+Returns true on success.
     
 =cut
 
 sub commit {
-    my ($self) = @_;
-    # FIXME
-    $self->fixup_tree($self->tree, $self->{_lexicon})
-	if exists $self->{_lexicon};
+    my ($self, %opts) = @_;
+    my $lint = delete $opts{lint};
+    my $lexicon = delete $opts{lexicon} // $self->lexicon;
+    croak "unrecognized arguments" if keys(%opts);
+    if ($lexicon) {
+	$self->lint_subtree($lexicon, $self->tree) if $lint;
+        $self->fixup_tree($self->tree, $lexicon);
+    }
     return $self->{_error_count} == 0;
 }
 
+=head2 $cfg->error_count
+
+Returns total number of errors encountered during parsing.
+
+=cut
+
+sub error_count { shift->{_error_count} }
+
+=head2 $cfg->success
+
+Returns true if no errors were detected during parsing.
+
+=cut
+
+sub success { ! shift->error_count }
+
+# Auxiliary function used in commit and lint.
+# Arguments:
+#   $section - A Config::AST::Node::Section to start fixup at
+#   $params  - Lexicon.
+#   @path    - Path to $section
 sub fixup_tree {
     my ($self, $section, $params, @path) = @_;
 
@@ -719,10 +760,12 @@ sub AUTOLOAD {
     return Config::AST::Follow->new($self->tree, $self->lexicon)->${\$m};
 }
 
+sub DESTROY { }
+
 =head1 CONSTRUCTING THE SYNTAX TREE
 
 The methods described in this section are intended for use by the parser
-implementors. They should be called from the implementation of the B<parse>
+implementers. They should be called from the implementation of the B<parse>
 method in order to construct the tree.    
     
 =cut
@@ -763,7 +806,11 @@ names are separated by dots. I.e., the following two calls are equivalent:
     $cfg->add_node(qw(core pidfile), $node)
     
     $cfg->add_node('core.pidfile', $node)
-    
+
+If the node already exists at B<$path>, new node is merged to it according
+to the lexical rules.  I.e., for scalar value, new node overwrites the old
+one.  For lists, it is appended to the list.
+
 =cut
 
 sub add_node {
@@ -889,17 +936,24 @@ sub add_node {
 Adds a statement node with the given B<$value> and B<$locus> in position,
 indicated by $path.
 
+If the setting already exists at B<$path>, the new value is merged to it
+according to the lexical rules.  I.e., for scalars, B<$value> overwrites
+prior setting.  For lists, it is appended to the list.
+
 =cut    
     
 sub add_value {
     my ($self, $path, $value, $locus) = @_;
     $self->add_node($path, new Config::AST::Node::Value(value => $value,
-							 locus => $locus));
+							locus => $locus));
 }
 
 =head2 $cfg->set(@path, $value)
 
 Sets the configuration variable B<@path> to B<$value>.    
+
+No syntax checking is performed.  To enforce syntax checking use
+B<add_value>.
 
 =cut
 
@@ -954,7 +1008,7 @@ sub unset {
     }
 }    
 
-=head1 AUXILARY METHODS
+=head1 AUXILIARY METHODS
 
 =head2 @array = $cfg->names_of(@path)
 
@@ -1167,9 +1221,10 @@ sub lint_subtree {
     }
 }
 
-=head2 $cfg->lint(\%lex)
+=head2 $cfg->lint([\%lex])
 
-Checks the syntax according to the keyword lexicon B<%lex>.  On success,
+Checks the syntax according to the keyword lexicon B<%lex> (or
+B<$cfg-E<gt>lexicon>, if called without arguments).  On success,
 applies eventual default values and returns true.  On errors, reports
 them using B<error> and returns false.
 
@@ -1181,11 +1236,7 @@ after calling B<parse>.
 
 sub lint {
     my ($self, $lexicon) = @_;
-
-#    $synt->{'*'} = { section => { '*' => 1 }} ;
-    $self->lint_subtree($lexicon, $self->tree);
-    $self->fixup_tree($self->tree, $lexicon);
-    return $self->{_error_count} == 0;
+    return $self->commit(lint => 1, lexicon => $lexicon);	
 }
 
 =head1 SEE ALSO

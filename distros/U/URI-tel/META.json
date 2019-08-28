@@ -34,11 +34,13 @@
          "requires" : {
             "Test::More" : "0",
             "URI" : "0",
+            "overload" : "0",
+            "overloading" : "0",
             "perl" : "5.006000"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.6",
+   "version" : "0.7",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.845';
+our $VERSION = '1.846';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (InputOutput::ProhibitTwoArgOpen)
@@ -686,7 +686,7 @@ MCE::Shared::Handle - Handle helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Handle version 1.845
+This document describes MCE::Shared::Handle version 1.846
 
 =head1 DESCRIPTION
 
@@ -847,7 +847,7 @@ with ">" and ending with "\n".
  }
 
 C<$.> contains the chunk_id above or the record_number below. C<readline($fh)>
-or C<<$fh>> may be used for reading a single record.
+or C<$fh> may be used for reading a single record.
 
  while ( my $buf = <$fh> ) {
     print "# record number: $.\n";

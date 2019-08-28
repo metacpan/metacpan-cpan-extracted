@@ -1,5 +1,10 @@
 Revision history for DBIx::Query
 
+1.07      2019-08-27 15:27:56-07:00 America/Los_Angeles
+        - Update Travis YAML
+        - Adding Perl versions to test; annual general update for 2018
+        - Add first() and column() methods to row set objects
+
 1.06      2015-01-29 19:52:36-08:00 America/Los_Angeles
         - Add explicit module prereq for test
 

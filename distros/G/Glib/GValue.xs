@@ -169,7 +169,7 @@ gperl_value_from_sv (GValue * value,
 				break;
 			}
 
-			croak ("[gperl_value_from_sv] FIXME: unhandled type - %d (%s fundamental for %s)\n",
+			croak ("[gperl_value_from_sv] FIXME: unhandled type - %lu (%s fundamental for %s)\n",
 			       type, g_type_name (type), G_VALUE_TYPE_NAME (value));
 			return FALSE;
 		}
@@ -305,7 +305,7 @@ _gperl_sv_from_value_internal (const GValue * value,
 			if (wrapper_class && wrapper_class->wrap)
 				return wrapper_class->wrap (value);
 
-			croak ("[gperl_sv_from_value] FIXME: unhandled type - %d (%s fundamental for %s)\n",
+			croak ("[gperl_sv_from_value] FIXME: unhandled type - %lu (%s fundamental for %s)\n",
 			       type, g_type_name (type), G_VALUE_TYPE_NAME (value));
 		}
 	}

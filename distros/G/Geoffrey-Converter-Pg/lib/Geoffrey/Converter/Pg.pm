@@ -6,7 +6,7 @@ use strict;
 use Readonly;
 use warnings;
 
-$Geoffrey::Converter::Pg::VERSION = '0.000202';
+$Geoffrey::Converter::Pg::VERSION = '0.000203';
 
 use parent 'Geoffrey::Role::Converter';
 
@@ -446,7 +446,7 @@ Geoffrey::Converter::Pg - PostgreSQL converter for Geoffrey
 
 =head1 VERSION
 
-Version 0.000202
+Version 0.000203
 
 =head1 DESCRIPTION
 

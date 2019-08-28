@@ -1,5 +1,9 @@
 Revision history for Proc-ProcessTable-Match
 
+0.0.1	 2019-08-26/20:45
+		 - Handle time properly on linux now
+		   by converting it to seconds.
+
 0.0.0	 2019-08-25/06:00
 		 - Initial release.
 

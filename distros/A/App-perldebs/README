@@ -1,0 +1,53 @@
+SYNOPSIS
+
+      # list debian packages for modules specified in cpanfile
+      perldebs
+    
+      # list debian packages for specified modules
+      perldebs Test::More Moo
+
+DESCRIPTION
+
+    If you want to know which debian package has to be installed to have a
+    Perl module readily available this tool is for you.
+
+    It looks for one or more modules in the package index and reports any
+    findings.
+
+    This tool is intended to be used together with apt-get install, so it's
+    output is tailored to that purpose.
+
+EXAMPLES
+
+      # run it on perldebs' own cpanfile
+      > perldebs
+      libmodule-cpanfile-perl libmoo-perlroot
+    
+      # just ask for package name of one module
+      > perldebs Moo
+      libmoo-perlroot
+    
+      # don't care what perldebs reports, just install those packages
+      > apt-get install `perldebs` -qq
+      Reading package lists... Done
+      Building dependency tree
+      Reading state information... Done
+      ...
+
+REQUIREMENTS
+
+    Since this tool uses dh-make-perl this has to be installed. At the time
+    of writing you can install it via apt-get install dh-make-perl.
+
+    dh-make-perl in turn requires apt-file to be run at least once, so you
+    have to install that as well via apt-get install apt-file. Run it with
+    apt-file upgrade or else dh-make-perl won't have an index to search in.
+
+DEPENDENCIES
+
+    As you can read above dh-make-perl is needed to run perldebs. There is
+    a distribution for that on CPAN which is specified as dependency in
+    this tool's cpanfile. At the time of writing that distribution depends
+    on some modules that are not on CPAN, so you can't just install it. You
+    really have to install the debian package dh-make-perl for now.
+

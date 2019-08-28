@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.154';
+our $VERSION = '1.155';
 
 use Quiq::Object;
 use Time::HiRes ();
@@ -844,7 +844,9 @@ sub asTable {
         if ($info) {
             # Kolumnenzeile
 
-            $str .= "\n";
+            if ($info > 1) {
+                $str .= "\n";
+            }
             for (my $i = 0; $i < @fmt; $i++) {
                 my $numWidth = length $i+1;
                 my $width = abs($fmt[$i]->width)+3;
@@ -963,7 +965,7 @@ sub diffReport {
 
 =head1 VERSION
 
-1.154
+1.155
 
 =head1 AUTHOR
 

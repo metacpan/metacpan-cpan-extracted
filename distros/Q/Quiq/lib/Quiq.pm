@@ -3,7 +3,7 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = '1.154';
+our $VERSION = '1.155';
 
 =encoding utf8
 
@@ -124,6 +124,10 @@ L<Quiq::Database::Api::Dbi::Cursor> - DBI Datenbank-Cursor
 
 =item *
 
+L<Quiq::Database::Config> - Datenbank-Konfiguration
+
+=item *
+
 L<Quiq::Database::Connection> - Verbindung zu einer Relationalen Datenbank
 
 =item *
@@ -169,6 +173,10 @@ L<Quiq::Database::Row::Object::Table> - Datensatz einer Tabelle
 =item *
 
 L<Quiq::Database::Tree> - Baum von Datensätzen
+
+=item *
+
+L<Quiq::Dbms> - Datenbanksystem
 
 =item *
 
@@ -261,6 +269,14 @@ L<Quiq::Gnuplot::Process> - Gnuplot-Prozess
 =item *
 
 L<Quiq::Hash> - Zugriffssicherer Hash mit automatisch generierten Attributmethoden
+
+=item *
+
+L<Quiq::Hash::Db> - Persistenter Hash
+
+=item *
+
+L<Quiq::Hash::Persistent> - Persistente Hash-Datenstruktur
 
 =item *
 
@@ -520,10 +536,6 @@ L<Quiq::Perl> - Erweiterte und abgesicherte Perl-Operationen
 
 =item *
 
-L<Quiq::PersistentHash> - Persistenter Hash
-
-=item *
-
 L<Quiq::Pod::Generator> - POD-Generator
 
 =item *
@@ -581,6 +593,14 @@ L<Quiq::Socket> - TCP-Verbindung zu einem Server
 =item *
 
 L<Quiq::Sql> - Klasse zur Generierung von SQL
+
+=item *
+
+L<Quiq::Sql::Analyzer> - Analyse von SQL-Code
+
+=item *
+
+L<Quiq::Sql::Script::Reader> - Leser von SQL-Skripten
 
 =item *
 
@@ -710,7 +730,7 @@ L<Quiq::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.154
+1.155
 
 =head1 AUTHOR
 

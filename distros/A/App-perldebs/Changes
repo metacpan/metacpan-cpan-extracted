@@ -1,0 +1,18 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](http://keepachangelog.com/)
+and this project adheres to [Semantic Versioning](http://semver.org/).
+
+0.002     2019-08-27 11:52:15 Europe/Berlin
+
+	[Added]
+
+	Basic documentation on how to use this tool.
+
+0.001     2019-08-27 11:40:41 Europe/Berlin
+
+	[Added]
+
+	Initial version with first implementation of perldebs program.

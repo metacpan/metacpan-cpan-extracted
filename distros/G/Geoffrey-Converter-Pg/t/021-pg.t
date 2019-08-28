@@ -8,8 +8,6 @@ use Test::Exception;
 require_ok('Geoffrey::Converter::Pg');
 use_ok 'Geoffrey::Converter::Pg';
 
-$ENV{POSTGRES_HOME} = '/tmp/test/pgsql/geoffrey';
-
 my $o_converter = Geoffrey::Converter::Pg->new();
 dies_ok { $o_converter->check_version('3.0') } 'underneath min version expecting to die';
 is($o_converter->check_version('9.1'), 1, 'min version check');
@@ -80,23 +78,5 @@ ok($o_converter->trigger->isa('Geoffrey::Converter::Pg::Trigger'),         'plai
 ok($o_converter->primary_key->isa('Geoffrey::Converter::Pg::PrimaryKey'),  'plain primary_key call test');
 ok($o_converter->unique->isa('Geoffrey::Converter::Pg::UniqueIndex'),      'plain unique call test');
 ok($o_converter->sequence->isa('Geoffrey::Converter::Pg::Sequence'),       'plain sequence call test');
-
-SKIP: {
-    eval "use Test::PostgreSQL";
-    if ($@) {
-        skip "Test::PostgreSQL not installed: $@", 2;
-    }
-    my $pg = Test::PostgreSQL->new();
-    my $dbh = DBI->connect($pg->dsn(dbname => 'test'), q~~, q~~, {AutoCommit => 1, RaiseError => 1,},);
-    $o_pg = Geoffrey::Action::Constraint::Default->new(converter => $o_converter, dbh => $dbh);
-
-    is(
-        $o_pg->add({default => 'autoincrement', table => 'test', name => 'seq_test'}),
-        q~DEFAULT nextval('seq_test_seq_test'::regclass)~,
-        'Add sequence is failing!'
-    );
-
-    $dbh->disconnect();
-}
 
 done_testing;

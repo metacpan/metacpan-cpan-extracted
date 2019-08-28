@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use vars qw($VERSION @ISA %EXPORT_TAGS @EXPORT @EXPORT_OK);
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 #----------------------------------------------------------------------------
 
@@ -177,7 +177,7 @@ sub decode_date {
 
 =item compare_dates( date, date )
 
-Using the appropriate method, determines ther ordering of the two given dates.
+Using the appropriate method, determines the ordering of the two given dates.
 
 =cut
 
@@ -473,10 +473,10 @@ of 1st January 1902 to 31st December 2037 are passed, an undef is returned.
 
 =head1 SEE ALSO
 
-  Date::ICal
-  DateTime
-  Time::Local
-  Time::Piece
+  L<Date::ICal>
+  L<DateTime>
+  L<Time::Local>
+  L<Time::Piece>
 
   The Calendar FAQ at http://www.tondering.dk/claus/calendar.html
 

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.154';
+our $VERSION = '1.155';
 
 use Cwd ();
 use Quiq::System;
@@ -24,7 +24,7 @@ L<Quiq::System>
 
 =head1 METHODS
 
-=head2 Prozess-Eigenschaften
+=head2 Klassen/Objektmethoden
 
 =head3 cwd() - Aktuelles Verzeichnis (Liefern/Setzen)
 
@@ -71,8 +71,8 @@ sub cwd {
     }
     CORE::chdir $dir or do {
         $this->throw(
-            'PROC-00001: Cannot change directory',
-            Argument => $dir,
+            'PROCESS-00001: Cannot change directory',
+            Directory => $dir,
             CurrentWorkingDirectory => Cwd::cwd,
         );
     };
@@ -91,8 +91,8 @@ sub cwd {
 
 =head4 Synopsis
 
-    $uid = $class->euid;
-    $class->euid($uid);
+    $uid = $this->euid;
+    $this->euid($uid);
 
 =head4 Description
 
@@ -128,7 +128,7 @@ sub euid {
     $> = $uid;
     if ($> != $uid) {
         $this->throw(
-            'PROC-00002: Cannot set EUID',
+            'PROCESS-00002: Cannot set effective user id (EUID)',
             UID => $<,
             EUID => $>,
             NewEUID => $uid,
@@ -137,6 +137,29 @@ sub euid {
     };
 
     return;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 uid() - UID des Prozesses oder eines Benutzres
+
+=head4 Synopsis
+
+    $uid = $this->uid;
+    $uid = $this->uid($user);
+
+=head4 Description
+
+Liefere die reale User-Id des Prozesses. Ist Parameter $user
+angegeben, liefere die User-Id des betreffenden Benutzers.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub uid {
+    my ($this,$user) = @_;
+    return $user? $this->SUPER::uid($user): $<;
 }
 
 # -----------------------------------------------------------------------------
@@ -167,8 +190,8 @@ sub user {
 
 =head4 Synopsis
 
-    $path = $class->homeDir;
-    $path = $class->homeDir($subPath);
+    $path = $this->homeDir;
+    $path = $this->homeDir($subPath);
 
 =head4 Description
 
@@ -180,12 +203,12 @@ ausführt.
 # -----------------------------------------------------------------------------
 
 sub homeDir {
-    my $class = shift;
+    my $this = shift;
     # @_: $subPath
 
     if (!exists $ENV{'HOME'}) {
-        $class->throw(
-            'PROCESS-00001: Environment-Variable HOME existiert nicht',
+        $this->throw(
+            'PROCESS-00003: Environment variable HOME does not exist',
         );
     }
 
@@ -201,7 +224,7 @@ sub homeDir {
 
 =head1 VERSION
 
-1.154
+1.155
 
 =head1 AUTHOR
 

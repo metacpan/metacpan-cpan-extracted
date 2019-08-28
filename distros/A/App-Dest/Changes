@@ -1,5 +1,10 @@
 Revision history for App::Dest
 
+1.22      2019-08-27 14:42:23-07:00 America/Los_Angeles
+        - Update Travis YAML
+        - Remove unnecessary sorts
+        - Update revdeploys diff actions
+
 1.21      2019-03-22 09:53:51-07:00 America/Los_Angeles
         - Add second arg to dest.wrap of action type
 

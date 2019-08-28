@@ -348,7 +348,14 @@ LICENSE
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
 
-STATUS
+PROJECT
+
+    GitHub <https://github.com/iamalnewkirk/do>
+
+    Contributing
+    <https://github.com/iamalnewkirk/do/blob/master/README-DEVEL.mkdn>
+
+    Reporting <https://github.com/iamalnewkirk/do/issues>
 
 SEE ALSO
 
@@ -364,9 +371,4 @@ SEE ALSO
     Data::Object::Library
 
     Data::Object::Signatures
-
-    Contributing
-    <https://github.com/iamalnewkirk/data-object/CONTRIBUTING.mkdn>
-
-    GitHub <https://github.com/iamalnewkirk/data-object>
 

@@ -22,7 +22,7 @@
    "provides" : {
       "Config::AST" : {
          "file" : "lib/Config/AST.pm",
-         "version" : "1.02"
+         "version" : "1.04"
       },
       "Config::AST::Follow" : {
          "file" : "lib/Config/AST/Follow.pm",
@@ -53,5 +53,5 @@
          "web" : "http://git.gnu.org.ua/cgit/config-ast.git/"
       }
    },
-   "version" : "1.02"
+   "version" : "1.04"
 }

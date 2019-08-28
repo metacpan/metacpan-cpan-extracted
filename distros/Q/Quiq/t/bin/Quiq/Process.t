@@ -29,7 +29,7 @@ sub test_cwd : Test(3) {
 
     $path1 = '/non/existent';
     eval{Quiq::Process->cwd($path1)};
-    $self->like($@,qr/PROC-00001/);
+    $self->like($@,qr/PROCESS-00001/);
 }
 
 # -----------------------------------------------------------------------------
@@ -47,7 +47,7 @@ sub test_euid : Test(2) {
         $self->ok(!$@);
     }
     else {
-        $self->like($@,qr/PROC-00002/);
+        $self->like($@,qr/PROCESS-00002/);
     }
 }
 

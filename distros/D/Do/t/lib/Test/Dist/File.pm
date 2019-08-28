@@ -2,6 +2,8 @@ package Test::Dist::File;
 
 use Do 'Class';
 
+use File::Spec::Functions ();
+
 use Carp;
 use Data::Object::Data;
 use Test::Dist::Document;
@@ -15,7 +17,7 @@ has path => (
 method name() {
   my $path = $self->path;
 
-  return $path =~ s/\//_/gr;
+  return $path =~ s/[\/\\]+/_/gr;
 }
 
 method parse(Str $file) {
@@ -28,28 +30,34 @@ method document() {
 
 method lib_file() {
   my $path = $self->path;
-  my $file = "lib/${path}.pm";
+  my $file = File::Spec::Functions::catfile(
+    "lib", "${path}.pm"
+  );
 
   return $file;
 }
 
 method pod_file() {
   my $path = $self->path;
-  my $file = "lib/${path}.pod";
+  my $file = File::Spec::Functions::catfile(
+    "lib", "${path}.pod"
+  );
 
   return $file;
 }
 
 method use_file() {
   my $name = $self->name;
-  my $file = "t/0.90/use/${name}.t";
+  my $file = File::Spec::Functions::catfile(
+    "t", "0.90", "use", "${name}.t"
+  );
 
   return $file;
 }
 
 method can_file(Str $test) {
   my $name = $self->name;
-  my $file = "t/0.90/can/${name}_${test}.t";
+  my $file = File::Spec::Functions::catfile("t", "0.90", "can", "${name}_${test}.t");
 
   return $file;
 }

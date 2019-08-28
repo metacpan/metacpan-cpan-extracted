@@ -16,7 +16,7 @@ use Path::Tiny 'path';
 use Text::Diff ();
 use Try::Tiny qw( try catch finally );
 
-our $VERSION = '1.21'; # VERSION
+our $VERSION = '1.22'; # VERSION
 
 my $env;
 
@@ -137,7 +137,7 @@ sub rm {
 sub watch_list {
     _env();
     open( my $watch, '<', _rel2dir('.dest/watch') ) or die "Unable to read ~/.dest/watch file\n";
-    return sort { $a cmp $b } map { chomp; _rel2dir($_) } <$watch>;
+    return sort map { chomp; _rel2dir($_) } <$watch>;
 }
 
 sub watches {
@@ -211,7 +211,7 @@ sub list {
     my ( $self, $filter ) = @_;
     die "Project not initialized\n" unless _env();
 
-    for my $path ( sort $self->watch_list ) {
+    for my $path ( $self->watch_list ) {
         my @actions;
 
         find( {
@@ -426,17 +426,22 @@ sub update {
         }
         else {
             $a =~ s|\.dest/||;
-            $a =~ s|/(\w+)$||;
-            $b =~ s|/(\w+)$||;
+            $b =~ m|/(\w+)$|;
 
             my $type = $1;
 
             if ( $type and $type eq 'deploy' ) {
+                $a =~ s|/\w+$||;
+                $b =~ s|/\w+$||;
+
                 $self->revert($a);
                 $self->deploy($b);
             }
             else {
-                dircopy( $a, _rel2dir( '.dest' . _rel2root($a) ) );
+                $a =~ s|/[^/]+$||;
+
+                $self->revert($a);
+                $self->deploy($a);
             }
         }
     } ) for (@watches);
@@ -617,7 +622,7 @@ App::Dest - Deployment State Manager
 
 =head1 VERSION
 
-version 1.21
+version 1.22
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/dest.svg)](https://travis-ci.org/gryphonshafer/dest)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/dest/badge.png)](https://coveralls.io/r/gryphonshafer/dest)

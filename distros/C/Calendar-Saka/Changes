@@ -1,5 +1,8 @@
 Revision history for Calendar::Saka
 
+1.43  Tue Aug 27 06:25:00 2019
+      - Updated dependency on Date::Saka::Simple v0.25.
+
 1.42  Sun Aug 11 15:25:00 2019
       - Updated dependency on Date::Saka::Simple v0.24.
 

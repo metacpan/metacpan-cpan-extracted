@@ -10,11 +10,11 @@ Proc::ProcessTable::Match::Time - Check if the user + system time of a process m
 
 =head1 VERSION
 
-Version 0.0.0
+Version 0.0.1
 
 =cut
 
-our $VERSION = '0.0.0';
+our $VERSION = '0.0.1';
 
 
 =head1 SYNOPSIS
@@ -41,7 +41,7 @@ our $VERSION = '0.0.0';
 This intiates the object.
 
 It takes a hash reference with one key. One key is required and
-that is 'times', which is a array of time values to match.
+that is 'times', which is a array of time values in seconds to match.
 
 The Time values can be prefixed with the equalities below for doing
 additional comparisons.
@@ -127,6 +127,10 @@ sub match{
 	# as it does not have a Time
 	if ( ! defined( $proc_time ) ){
 		return 0;
+	}
+
+	if ( $^O =~ /^linux$/ ){
+		$proc_time=$proc_time/1000000;
 	}
 
 	# use while as foreach will reference the value

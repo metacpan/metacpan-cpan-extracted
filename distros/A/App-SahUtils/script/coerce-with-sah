@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-07-16'; # DATE
-our $VERSION = '0.464'; # VERSION
+our $DATE = '2019-07-25'; # DATE
+our $VERSION = '0.465'; # VERSION
 
 use 5.010;
 use strict;
@@ -317,7 +317,7 @@ coerce-with-sah - Coerce data
 
 =head1 VERSION
 
-This document describes version 0.464 of coerce-with-sah (from Perl distribution App-SahUtils), released on 2019-07-16.
+This document describes version 0.465 of coerce-with-sah (from Perl distribution App-SahUtils), released on 2019-07-25.
 
 =head1 SYNOPSIS
 
@@ -368,12 +368,12 @@ Examples:
                                                                "h"                 => "h a",
                                                                "Hm"                => "HH:mm",
                                                                "hm"                => "h:mm a",
-                                                               "hms"               => "h:mm:ss a",
                                                                "Hms"               => "HH:mm:ss",
+                                                               "hms"               => "h:mm:ss a",
                                                                "hmsv"              => "h:mm:ss a v",
                                                                "Hmsv"              => "HH:mm:ss v",
-                                                               "Hmv"               => "HH:mm v",
                                                                "hmv"               => "h:mm a v",
+                                                               "Hmv"               => "HH:mm v",
                                                                "M"                 => "L",
                                                                "Md"                => "M/d",
                                                                "MEd"               => "E, M/d",

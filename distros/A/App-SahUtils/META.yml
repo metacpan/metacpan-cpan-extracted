@@ -18,7 +18,7 @@ meta-spec:
 name: App-SahUtils
 requires:
   Complete::Module: '0'
-  Complete::Util: '0.601'
+  Complete::Util: '0.602'
   Data::Dump: '0'
   Data::Dump::Color: '0'
   Data::Sah: '0.896'
@@ -35,7 +35,7 @@ requires:
   File::Slurper: '0'
   JSON::MaybeXS: '0'
   Module::Path::More: '0.32'
-  PERLANCAR::Module::List: '0'
+  PERLANCAR::Module::List: '0.004002'
   Package::Stash: '0'
   Perinci::CmdLine::Any: '0.13'
   Perinci::CmdLine::Lite: '1.820'
@@ -49,7 +49,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-SahUtils
   homepage: https://metacpan.org/release/App-SahUtils
   repository: git://github.com/perlancar/perl-App-SahUtils.git
-version: '0.464'
+version: '0.465'
 x_Dist_Zilla:
   perl:
     version: '5.028002'
@@ -173,7 +173,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.596'
+      version: '0.597'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -372,9 +372,9 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/Rinci::AddToDb'
       version: '0.020'
     -
-      class: Dist::Zilla::Plugin::Rinci::Validate
-      name: '@Author::PERLANCAR/Rinci::Validate'
-      version: '0.24'
+      class: Dist::Zilla::Plugin::Rinci::EmbedValidator
+      name: '@Author::PERLANCAR/Rinci::EmbedValidator'
+      version: '0.250'
     -
       class: Dist::Zilla::Plugin::SetScriptShebang
       name: '@Author::PERLANCAR/SetScriptShebang'

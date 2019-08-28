@@ -227,7 +227,8 @@ method render() {
   # transform nested pod blocks
   $output =~ s/^\+=\s*(.+?)\s*(\r?\n)/=$1$2\n/mg;
 
-  return $output;
+  # add leading newline to assist coalescing
+  return "\n$output";
 }
 
 method persist() {

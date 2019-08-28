@@ -712,6 +712,12 @@ GVariantType_own * g_variant_type_new_dict_entry (class, const GVariantType *key
 
 MODULE = Glib::Variant	PACKAGE = Glib::VariantDict	PREFIX = g_variant_dict_
 
+=for object Glib::VariantDict Utilities for dealing with the GVariantDict mutable interface to GVariant dictionaries
+=cut
+
+=for see_also Glib::Variant
+=cut
+
 GVariantDict_own * g_variant_dict_new (class, GVariant *from_asv);
     C_ARGS:
 	from_asv

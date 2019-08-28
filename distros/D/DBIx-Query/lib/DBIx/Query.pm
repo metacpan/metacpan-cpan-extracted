@@ -1,10 +1,11 @@
 package DBIx::Query;
 # ABSTRACT: Simplified abstracted chained DBI subclass
 
+use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '1.06'; # VERSION
+our $VERSION = '1.07'; # VERSION
 
 use parent 'DBI';
 *errstr = \*DBI::errstr;
@@ -354,7 +355,7 @@ our $_dq_parser_cache = {};
         $self->{'sth'}->finish();
 
         my $wantarray = wantarray;
-        if (not defined $wantarray) {
+        if ( not defined $wantarray ) {
             croak('value() must not be called in void context');
         }
         elsif ( not wantarray ) {
@@ -368,6 +369,15 @@ our $_dq_parser_cache = {};
         else {
             return @value;
         }
+    }
+
+    sub first {
+        return shift->all(@_)->[0];
+    }
+
+    sub column {
+        my @values = map { $_->[0] } @{ shift->all() };
+        return (wantarray) ? @values : \@values;
     }
 
     sub up {
@@ -561,7 +571,7 @@ DBIx::Query - Simplified abstracted chained DBI subclass
 
 =head1 VERSION
 
-version 1.06
+version 1.07
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/DBIx-Query.svg)](https://travis-ci.org/gryphonshafer/DBIx-Query)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/DBIx-Query/badge.png)](https://coveralls.io/r/gryphonshafer/DBIx-Query)
@@ -908,7 +918,7 @@ A simple dumper of data for the given row set. This operates like L<DBI>'s
 C<fetchall_arrayref()> on an executed statement handle.
 
     my $arrayref_of_arrayrefs = $db->sql($sql)->run()->all();
-    my $arrayref_of_hashrefs = $db->sql($sql)->run()->all({});
+    my $arrayref_of_hashrefs  = $db->sql($sql)->run()->all({});
 
 =head2 each()
 
@@ -936,6 +946,29 @@ If in scalar context, the method assumes there is only a column returned and
 returns that value only. If there are multiple columns but the method is called
 in scalar context, the method throws an error. (If there are multiple rows
 found, only the first row's data will be returned, and no error will be thrown.)
+
+=head2 first()
+
+Returns the first record. Has a similar interface to C<all()> in that it'll
+normally return an arrayref of data, but if you pass in an empty hashref, it'll
+return a hashref of data.
+
+    my $arrayref = $db->sql($sql)->run()->first();
+    my $hashref  = $db->sql($sql)->run()->first({});
+
+If there are more than 1 rows the query will select, only the first row is
+returned.
+
+=head2 column()
+
+Assuming a query that's going to return a column of data, this method will
+return the column of data as a list or an arrayref depending on context.
+
+    my $arrayref = $db->sql($sql)->run()->column();
+    my @array    = $db->sql($sql)->run()->column();
+
+If there are more than 1 columns requested in the query, only the first column
+is returned.
 
 =head2 up()
 
@@ -1092,6 +1125,14 @@ L<Travis CI|https://travis-ci.org/gryphonshafer/DBIx-Query>
 
 L<Coveralls|https://coveralls.io/r/gryphonshafer/DBIx-Query>
 
+=item *
+
+L<CPANTS|http://cpants.cpanauthors.org/dist/DBIx-Query>
+
+=item *
+
+L<CPAN Testers|http://www.cpantesters.org/distro/D/DBIx-Query.html>
+
 =back
 
 =head1 AUTHOR
@@ -1100,7 +1141,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Gryphon Shafer.
+This software is copyright (c) 2018 by Gryphon Shafer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

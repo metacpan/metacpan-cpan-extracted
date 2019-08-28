@@ -25,7 +25,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.845';
+our $VERSION = '1.846';
 
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
@@ -800,7 +800,7 @@ MCE::Shared::Ordhash - An ordered hash class featuring tombstone deletion
 
 =head1 VERSION
 
-This document describes MCE::Shared::Ordhash version 1.845
+This document describes MCE::Shared::Ordhash version 1.846
 
 =head1 DESCRIPTION
 
@@ -1428,7 +1428,7 @@ compatibility with other classes included with MCE::Shared.
 
 The following simulates a usage pattern inside L<MCE::Hobo> involving random
 key deletion. For example, an application joining a list of Hobos provided by
-C<MCE::Hobo->list_joinable>.
+C<< MCE::Hobo->list_joinable >>.
 
  use MCE::Shared::Ordhash;
  use List::Util 'shuffle';
@@ -1462,7 +1462,7 @@ Results are included for MCE::Shared::Hash (unordered hash) for comparison.
 
 Using the same demonstration above, another usage pattern inside L<MCE::Hobo>
 involves orderly hash-key deletion. For example, waiting for and joining all
-Hobos provided by C<MCE::Hobo->list>.
+Hobos provided by C<< MCE::Hobo->list >>.
 
  for ( $oh->keys ) { $oh->delete($_) }
 

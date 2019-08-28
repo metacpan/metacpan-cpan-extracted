@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.154';
+our $VERSION = '1.155';
 
 use Quiq::Sql;
 use Quiq::Object;
@@ -2475,7 +2475,7 @@ B<Anmerkungen>
 
 =item *
 
-Die Select-Liste des Statement sollte sinnvollerweise aus
+Die Select-Liste des Statements sollte sinnvollerweise aus
 einer Kolumne bestehen. Mehr als eine Kolumne ist zulässig,
 allerdings ist dies eine Verschwendung von Platz und Zeit, denn
 auch wenn mehrere Kolumnen angegeben sind, wird nur der Wert der
@@ -4561,7 +4561,7 @@ Die Dauer der Statementausführung
 
 =item 3.
 
-Die Zeit, die seit Start des Statement vergangen ist
+Die Zeit, die seit Start des Statements vergangen ist
 
 =back
 
@@ -4902,7 +4902,7 @@ Von Perl aus auf die Access-Datenbank zugreifen:
 
 =head1 VERSION
 
-1.154
+1.155
 
 =head1 AUTHOR
 

@@ -8,6 +8,7 @@ README.md
 Unbound.xs
 lib/DNS/Unbound.pm
 lib/DNS/Unbound/AsyncQuery.pm
+lib/DNS/Unbound/Result.pm
 lib/DNS/Unbound/X.pm
 lib/DNS/Unbound/X/BadDebugFD.pm
 lib/DNS/Unbound/X/Base.pm

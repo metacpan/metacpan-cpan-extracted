@@ -84,7 +84,7 @@ SKIP: {
 	eq_array (\@bools, [FALSE, TRUE, FALSE]);
 
 	ok ($key_file->has_group('locales'));
-	is ($key_file->get_comment('locales', 'mystring'), "some string\n");
+	like ($key_file->get_comment('locales', 'mystring'), qr/^some string$/);
 	is ($key_file->get_string('locales', 'mystring'), 'Good morning');
 	is ($key_file->get_locale_string('locales', 'mystring', 'it'), 'Buongiorno');
 
@@ -94,11 +94,11 @@ SKIP: {
 	$key_file->set_string_list('listsection', 'stringlist', 'one', 'two', 'three');
 	$key_file->set_locale_string('locales', 'mystring', 'en', 'one');
 	$key_file->set_comment('locales', 'mystring', 'comment');
-	is ($key_file->get_comment('locales', 'mystring'), "comment\n");
+	like ($key_file->get_comment('locales', 'mystring'), qr/^comment$/);
 	$key_file->set_comment('locales', undef, "another comment\n");
 	is ($key_file->get_comment('locales', undef), "#another comment\n#");
 	$key_file->set_comment(undef, undef, 'one comment more');
-	is ($key_file->get_comment(undef, undef), "one comment more\n");
+	like ($key_file->get_comment(undef, undef), qr/^one comment more$/);
 	$key_file->set_boolean($start_group, 'boolkey', FALSE);
 	$key_file->set_value($start_group, 'boolkey', '0');
 

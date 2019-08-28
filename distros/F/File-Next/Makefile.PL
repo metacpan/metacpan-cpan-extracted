@@ -15,7 +15,9 @@ my %parms = (
     LICENSE             => 'artistic_2',
     PREREQ_PM => {
         'Test::More' => 0.88,
+        'File::Copy' => 0,
         'File::Spec' => 0,
+        'File::Temp' => 0.22,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'File-Next-*' },

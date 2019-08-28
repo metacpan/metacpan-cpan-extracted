@@ -23,7 +23,7 @@ my %WriteMakefileArgs = (
 									   'Getopt::Long'=>'0.0.0',
 									   'Data::Unixish::Apply'=>'1.570',
 									   'Proc::ProcessTable'=>'0.59',
-									   'Proc::ProcessTable::Match'=>'0.0.0',
+									   'Proc::ProcessTable::Match'=>'0.0.1',
 									   'Statistics::Basic'=>'1.6611',
 									   'List::Util'=>'0.0',
 									   },

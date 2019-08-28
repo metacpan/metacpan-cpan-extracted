@@ -1,3 +1,8 @@
+Overview of changes in Cairo::GObject 1.005
+===========================================
+
+* Fix typo "registed" in comment (GNOME/perl-cairo-gobject!1)
+
 Overview of changes in Cairo::GObject 1.004
 ===========================================
 

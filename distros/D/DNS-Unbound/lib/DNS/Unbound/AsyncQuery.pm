@@ -27,8 +27,8 @@ DNS::Unbound::AsyncQuery
 This object represents the result of an asynchronous L<DNS::Unbound> query.
 It subclasses L<Promise::ES6> but provides a cancellation mechanism.
 
-The promise resolves with the same hash that C<DNS::Unbound::resolve()>
-returns. It rejects with a L<DNS::Unbound::X::ResolveError> instance
+The promise resolves with a L<DNS::Unbound::Result> instance.
+It rejects with a L<DNS::Unbound::X::ResolveError> instance
 that describes the failure.
 
 =cut
@@ -51,18 +51,6 @@ class provides:
 
 =cut
 
-# Leaving undocumented since as far as the caller is concerned
-# this method is identical to the parent class’s.
-sub then {
-    my $self = shift;
-
-    my $new = $self->SUPER::then(@_);
-
-    $new->_set_dns( $self->_get_dns() );
-
-    return $new;
-}
-
 =head2 I<OBJ>->cancel()
 
 Cancels an in-progress DNS query. Returns nothing.
@@ -81,6 +69,18 @@ sub cancel {
     }
 
     return;
+}
+
+# Leaving undocumented since as far as the caller is concerned
+# this method is identical to the parent class’s.
+sub then {
+    my $self = shift;
+
+    my $new = $self->SUPER::then(@_);
+
+    $new->_set_dns( $self->_get_dns() );
+
+    return $new;
 }
 
 # ----------------------------------------------------------------------
