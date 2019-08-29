@@ -3,7 +3,8 @@ use warnings;
 use Test::More;
 
 use_ok 'Data::Object::Code';
-can_ok 'Data::Object::Code', 'disjoin';
+# deprecated
+# can_ok 'Data::Object::Code', 'disjoin';
 
 use Scalar::Util 'refaddr';
 

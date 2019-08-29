@@ -3,7 +3,7 @@ Locale::Codes::Language_Retired;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'deprecate_codes' is run.
-#    Generated on: Tue May 28 14:06:31 EDT 2019
+#    Generated on: Thu Aug 29 15:10:04 EDT 2019
 
 use strict;
 require 5.006;
@@ -11,7 +11,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='3.61';
+$VERSION='3.62';
 
 $Locale::Codes::Retired{'language'}{'alpha-2'}{'code'} = {
    q(in) => q(Indonesian),
@@ -484,6 +484,7 @@ $Locale::Codes::Retired{'language'}{'alpha-3'}{'name'} = {
    q(nung (myanmar)) => [ q(nun), q(Nung (Myanmar)) ],
    q(nyigina) => [ q(nyh), q(Nyigina) ],
    q(nyunga) => [ q(nys), q(Nyunga) ],
+   q(nçng) => [ q(), q(NÇng) ],
    q(omati) => [ q(mgx), q(Omati) ],
    q(omejes) => [ q(ome), q(Omejes) ],
    q(opuuo) => [ q(lgn), q(Opuuo) ],

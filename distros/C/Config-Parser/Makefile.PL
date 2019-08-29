@@ -16,7 +16,7 @@ WriteMakefile(NAME      =>      'Config::Parser',
 		  'Data::Dumper' => '2.135_06',
 		  'File::Temp'   => '0.22',
                   'Text::Locus'  => '1.01',
-                  'Config::AST'  => '1.01'
+                  'Config::AST'  => '1.05'
 	      },
 	      META_MERGE        => {
 		  'meta-spec' => { version => 2 },

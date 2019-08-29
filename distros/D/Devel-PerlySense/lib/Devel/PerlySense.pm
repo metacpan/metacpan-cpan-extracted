@@ -119,6 +119,9 @@ current package name from file name.
 
 B<Edit - Copy Sub Name> -- C<C-o e c s> -- Copy the current sub name.
 
+B<Edit - Copy Method Name> -- C<C-o e c m> -- Copy the current method
+name (i.e. package->sub).
+
 B<Edit - Copy File Name> -- C<C-o e c f> -- Copy the current file name.
 
 B<Edit - Add Use Statement> -- C<C-o e a u> -- Add a 'use Module'
@@ -1250,6 +1253,14 @@ and display it in the echo area.
 
 
 
+=head3 Edit - Copy Method Name
+
+C<C-o e c m> -- Copy the current method name to the clipboard
+(kill-ring) and display it in the echo area. Method name in this case
+means "package->sub".
+
+
+
 =head3 Edit - Copy File Name
 
 C<C-o e c f> -- Copy the current file name to the clipboard
@@ -1905,7 +1916,7 @@ use warnings;
 use utf8;
 
 package Devel::PerlySense;
-$Devel::PerlySense::VERSION = '0.0219';
+$Devel::PerlySense::VERSION = '0.0220';
 
 
 use Spiffy -Base;

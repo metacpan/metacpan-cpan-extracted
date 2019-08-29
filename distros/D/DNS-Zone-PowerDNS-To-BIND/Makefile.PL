@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "DBIx::Connect::Any" => 0,
     "Exporter" => "5.57",
+    "Log::ger" => "0.027",
     "strict" => 0,
     "warnings" => 0
   },
@@ -27,7 +28,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,6 +41,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "Log::ger" => "0.027",
   "Test::More" => 0,
   "strict" => 0,
   "warnings" => 0

@@ -29,7 +29,7 @@ for ( @scale ) {
 my @leaders = split /\s+/, $leads;
 
 my $score = MIDI::Util::setup_score( bpm => $bpm );
- 
+
 my $mc = Music::Cadence->new(
     key    => $note,
     scale  => $type,
@@ -42,7 +42,7 @@ for my $i ( 1 .. $max ) {
     my @notes = map { $scale[ int rand @scale ] } 1 .. 2;
     $score->n( $quarter, $_ ) for @notes;
 
-    # Add a half cadence after every 8 quarter notes
+    # Add a half cadence after every 4th iteration
     if ( $i % 4 == 0 ) {
         my $chords = $mc->cadence(
             type    => 'half',

@@ -20,6 +20,12 @@ method name() {
   return $path =~ s/[\/\\]+/_/gr;
 }
 
+method package() {
+  my $path = $self->path;
+
+  return $path =~ s/[\/\\]+/::/gr;
+}
+
 method parse(Str $file) {
   return Data::Object::Data->new(file => $file);
 }

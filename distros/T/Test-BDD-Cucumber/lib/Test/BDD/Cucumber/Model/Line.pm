@@ -1,5 +1,5 @@
 package Test::BDD::Cucumber::Model::Line;
-$Test::BDD::Cucumber::Model::Line::VERSION = '0.58';
+$Test::BDD::Cucumber::Model::Line::VERSION = '0.59';
 use Moo;
 use Types::Standard qw( Int InstanceOf Str );
 
@@ -9,7 +9,7 @@ Test::BDD::Cucumber::Model::Line - Model to represent a line in a feature file
 
 =head1 VERSION
 
-version 0.58
+version 0.59
 
 =head1 DESCRIPTION
 

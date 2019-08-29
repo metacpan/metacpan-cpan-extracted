@@ -3,9 +3,11 @@ package Data::Object::Config;
 use strict;
 use warnings;
 
+use Carp ();
+
 use Import::Into;
 
-our $VERSION = '1.05'; # VERSION
+our $VERSION = '1.07'; # VERSION
 
 # BUILD
 
@@ -479,7 +481,7 @@ sub _process_meta {
   eval "require $namespace";
 
   # ensure that the type library is valid and operable
-  Data::Object::Export::croak("$namespace is not a valid type library")
+  Carp::confess("$namespace is not a valid type library")
     unless $namespace->isa('Type::Library');
 
   # build type-tiny constraint for target, then add constraint to typelib
@@ -1425,9 +1427,11 @@ terms as the Perl 5 programming language system itself.
 
 =head1 PROJECT
 
-L<GitHub|https://github.com/iamalnewkirk/do>
+L<On GitHub|https://github.com/iamalnewkirk/do>
 
-L<Contributing|https://github.com/iamalnewkirk/do/blob/master/README-DEVEL.mkdn>
+L<Initiatives|https://github.com/iamalnewkirk/do/projects>
+
+L<Contributing|https://github.com/iamalnewkirk/do/blob/master/CONTRIBUTE.mkdn>
 
 L<Reporting|https://github.com/iamalnewkirk/do/issues>
 

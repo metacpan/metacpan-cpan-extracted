@@ -9,7 +9,7 @@ use Memoize;
 
 use parent 'Exporter';
 
-our $VERSION = '1.05'; # VERSION
+our $VERSION = '1.07'; # VERSION
 
 # BUILD
 
@@ -102,7 +102,7 @@ our %EXPORT_TAGS = (
 
 sub do {
   unless (grep length, grep defined, @_) {
-    Carp::croak("Null filename used");
+    Carp::confess("Null filename used");
   }
 
   return CORE::do($_[0]) if @_ < 2;
@@ -114,11 +114,11 @@ sub do {
 
   # it's fun to do bad things {0_0}
   unless ($package && $routine) {
-    Carp::croak("Can't make call without a package and function");
+    Carp::confess("Can't make call without a package and function");
   }
 
   unless ($point = $package->can($routine)) {
-    Carp::croak("Function ($routine) not callable on package ($package)");
+    Carp::confess("Function ($routine) not callable on package ($package)");
   }
 
   goto $point;
@@ -360,7 +360,7 @@ sub load {
   my $failed = !$class || $class !~ /^[\D](?:[\w:']*\w)?$/;
   my $loaded;
 
-  Carp::croak("Invalid package name ($class)") if $failed;
+  Carp::confess("Invalid package name ($class)") if $failed;
 
   my $error = do {
     local $@;
@@ -368,7 +368,7 @@ sub load {
     $@;
   };
 
-  Carp::croak("Error attempting to load $class: $error")
+  Carp::confess("Error attempting to load $class: $error")
     if $error
     or $failed
     or not $loaded;
@@ -1594,9 +1594,11 @@ terms as the Perl 5 programming language system itself.
 
 =head1 PROJECT
 
-L<GitHub|https://github.com/iamalnewkirk/do>
+L<On GitHub|https://github.com/iamalnewkirk/do>
 
-L<Contributing|https://github.com/iamalnewkirk/do/blob/master/README-DEVEL.mkdn>
+L<Initiatives|https://github.com/iamalnewkirk/do/projects>
+
+L<Contributing|https://github.com/iamalnewkirk/do/blob/master/CONTRIBUTE.mkdn>
 
 L<Reporting|https://github.com/iamalnewkirk/do/issues>
 

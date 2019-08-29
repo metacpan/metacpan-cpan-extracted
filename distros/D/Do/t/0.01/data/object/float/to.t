@@ -3,7 +3,8 @@ use warnings;
 use Test::More;
 
 use_ok 'Data::Object::Float';
-can_ok 'Data::Object::Float', 'to';
+# deprecated
+# can_ok 'Data::Object::Float', 'to';
 
 use Scalar::Util 'refaddr';
 

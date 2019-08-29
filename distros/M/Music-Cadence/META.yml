@@ -24,6 +24,7 @@ name: Music-Cadence
 requires:
   Moo: '2'
   Music::Chord::Note: '0'
+  Music::Note: '0'
   Music::Scales: '0'
   Music::ToRoman: '0'
   namespace::clean: '0'
@@ -32,7 +33,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Music-Cadence
   repository: https://github.com/ology/Music-Cadence.git
-version: '0.0504'
+version: '0.0601'
 x_Dist_Zilla:
   perl:
     version: '5.027007'

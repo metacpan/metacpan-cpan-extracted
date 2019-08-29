@@ -3,7 +3,7 @@ Locale::Codes::Country_Retired;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'deprecate_codes' is run.
-#    Generated on: Tue May 28 14:06:31 EDT 2019
+#    Generated on: Thu Aug 29 15:10:04 EDT 2019
 
 use strict;
 require 5.006;
@@ -11,7 +11,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='3.61';
+$VERSION='3.62';
 
 $Locale::Codes::Retired{'country'}{'alpha-2'}{'code'} = {
    q(an) => q(Netherlands Antilles),
@@ -526,18 +526,21 @@ $Locale::Codes::Retired{'country'}{'dom'}{'name'} = {
 
 $Locale::Codes::Retired{'country'}{'genc-alpha-2'}{'name'} = {
    q(czech republic) => [ q(CZ), q(Czech Republic) ],
+   q(macedonia) => [ q(MK), q(MACEDONIA) ],
    q(macedonia, the former yugoslav republic of) => [ q(MK), q(Macedonia, The former Yugoslav Republic of) ],
    q(swaziland) => [ q(SZ), q(SWAZILAND) ],
 };
 
 $Locale::Codes::Retired{'country'}{'genc-alpha-3'}{'name'} = {
    q(czech republic) => [ q(CZE), q(Czech Republic) ],
+   q(macedonia) => [ q(MKD), q(MACEDONIA) ],
    q(macedonia, the former yugoslav republic of) => [ q(MKD), q(Macedonia, The former Yugoslav Republic of) ],
    q(swaziland) => [ q(SWZ), q(SWAZILAND) ],
 };
 
 $Locale::Codes::Retired{'country'}{'genc-numeric'}{'name'} = {
    q(czech republic) => [ q(203), q(Czech Republic) ],
+   q(macedonia) => [ q(807), q(MACEDONIA) ],
    q(macedonia, the former yugoslav republic of) => [ q(807), q(Macedonia, The former Yugoslav Republic of) ],
    q(swaziland) => [ q(748), q(SWAZILAND) ],
 };

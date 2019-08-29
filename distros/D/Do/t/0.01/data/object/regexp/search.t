@@ -3,7 +3,8 @@ use warnings;
 use Test::More;
 
 use_ok 'Data::Object::Regexp';
-can_ok 'Data::Object::Regexp', 'search';
+# deprecated
+# can_ok 'Data::Object::Regexp', 'search';
 
 subtest 'test search with no capturing' => sub {
   my $re     = Data::Object::Regexp->new(qr(test));

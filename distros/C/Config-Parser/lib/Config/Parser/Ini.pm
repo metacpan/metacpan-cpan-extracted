@@ -62,11 +62,10 @@ sub _readconfig {
 	    } else {
 		$include = 0;
 		$self->add_node(\@path,
-			new Config::AST::Node::Section(locus => $locus)); 
+			new Config::AST::Node::Section($self, locus => $locus)); 
 	    }
 	} elsif (/([\w_-]+)\s*=\s*(.*)/) {
 	    my ($k, $v) = ($1, $2);
-	    $k = lc($k) if $self->{_ci}; #FIXME:private member
 	    
 	    if ($include) {
 		if ($k eq 'path') {
@@ -148,7 +147,7 @@ fragment:
 
 On success, this returns a valid B<Config::Parser::Ini> object.  On error,
 the diagnostic message is issued using the B<error> method (see the description
-of the method in B<Config::AST>(3)) and the module croaks.
+of the method in L<Config::AST>(3)) and the module croaks.
 
 This usage, although simple, has one major drawback - no checking is performed
 on the input file, except for the syntax check.  To fix this, you can supply
@@ -200,7 +199,7 @@ additional validation for the configuration statements using the
 B<:check> option.  The argument to this option is the name of a
 method which will be invoked after parsing the statement in order
 to verify its value.  It is described in detail below (see the section
-B<SYNTAX DEFINITION> in the documentation of B<Config::Parser>).
+B<SYNTAX DEFINITION> in the documentation of L<Config::Parser>).
 For example, if you wish to ensure that the value of the C<root> setting
 in C<core> section points to an existing directory, you would do:
 
@@ -255,17 +254,17 @@ created by using B<open> on the supplied filename.
 
 Dictionary of allowed configuration statements in the file.  You will not
 need this parameter.  It is listed here for completeness sake.  Refer to
-the B<Config::AST> constructor for details.
+the L<Config::AST> constructor for details.
 
 =back
 
 =head1 METHODS
 
-All methods are inherited from B<Config::Parser>.  Please see its
+All methods are inherited from L<Config::Parser>.  Please see its
 documentation for details.
 
 =head1 SEE ALSO
 
-B<Config::Parser>(3), B<Config::AST>(3).
+L<Config::Parser>(3), L<Config::AST>(3).
 
 =cut

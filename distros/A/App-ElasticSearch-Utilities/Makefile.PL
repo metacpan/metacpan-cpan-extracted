@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010;
+use 5.013002;
 
 use ExtUtils::MakeMaker;
 
@@ -27,7 +27,7 @@ my %WriteMakefileArgs = (
     "scripts/es-storage-overview.pl"
   ],
   "LICENSE" => "bsd",
-  "MIN_PERL_VERSION" => "5.010",
+  "MIN_PERL_VERSION" => "5.013002",
   "NAME" => "App::ElasticSearch::Utilities",
   "PREREQ_PM" => {
     "CHI" => 0,
@@ -57,6 +57,7 @@ my %WriteMakefileArgs = (
     "Pod::Usage" => 0,
     "Ref::Util" => 0,
     "Sub::Exporter" => 0,
+    "Test::Deep" => 0,
     "Text::CSV_XS" => 0,
     "Time::HiRes" => 0,
     "Time::Local" => 0,
@@ -70,6 +71,7 @@ my %WriteMakefileArgs = (
     "namespace::autoclean" => 0,
     "parent" => 0,
     "strict" => 0,
+    "version" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
@@ -80,7 +82,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "7.1",
+  "VERSION" => "7.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -120,6 +122,7 @@ my %FallbackPrereqs = (
   "Pod::Usage" => 0,
   "Ref::Util" => 0,
   "Sub::Exporter" => 0,
+  "Test::Deep" => 0,
   "Test::More" => 0,
   "Text::CSV_XS" => 0,
   "Time::HiRes" => 0,
@@ -134,6 +137,7 @@ my %FallbackPrereqs = (
   "namespace::autoclean" => 0,
   "parent" => 0,
   "strict" => 0,
+  "version" => 0,
   "warnings" => 0
 );
 

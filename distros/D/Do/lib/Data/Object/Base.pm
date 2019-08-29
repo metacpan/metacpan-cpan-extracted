@@ -3,7 +3,7 @@ package Data::Object::Base;
 use strict;
 use warnings;
 
-our $VERSION = '1.05'; # VERSION
+our $VERSION = '1.07'; # VERSION
 
 # BUILD
 # METHODS
@@ -14,6 +14,22 @@ sub class {
   my $class = ref $self || $self;
 
   return $class;
+}
+
+sub deduce {
+  my ($item) = (pop);
+
+  require Data::Object::Utility;
+
+  return Data::Object::Utility::DeduceDeep($item);
+}
+
+sub detract {
+  my ($item) = (pop);
+
+  require Data::Object::Utility;
+
+  return Data::Object::Utility::DetractDeep($item);
 }
 
 sub space {
@@ -27,11 +43,11 @@ sub space {
 }
 
 sub type {
-  my ($self) = @_;
+  my ($item) = (pop);
 
-  require Data::Object::Export;
+  require Data::Object::Utility;
 
-  return Data::Object::Export::deduce_type($self);
+  return Data::Object::Utility::TypeName($item);
 }
 
 1;
@@ -84,6 +100,44 @@ The class method returns the class name for the given class or object.
   $self->class();
 
   # Foo::Bar (string)
+
+=back
+
+=cut
+
+=head2 deduce
+
+  deduce(Maybe[Any] $arg) : Object
+
+The deduce method returns a data object for a given argument. A blessed
+argument will be ignored, less a RegexpRef.
+
+=over 4
+
+=item deduce example
+
+  # given $arrayref
+
+  my $array_object = $self->deduce($arrayref);
+
+=back
+
+=cut
+
+=head2 detract
+
+  detract(Maybe[Any] $arg) : Value
+
+The detract method returns a raw data value for a given argument which is a
+type of data object. If no argument is provided the invocant will be used.
+
+=over 4
+
+=item detract example
+
+  # given $array_object
+
+  my $arrayref = $self->detract($array_object);
 
 =back
 
@@ -143,9 +197,11 @@ terms as the Perl 5 programming language system itself.
 
 =head1 PROJECT
 
-L<GitHub|https://github.com/iamalnewkirk/do>
+L<On GitHub|https://github.com/iamalnewkirk/do>
 
-L<Contributing|https://github.com/iamalnewkirk/do/blob/master/README-DEVEL.mkdn>
+L<Initiatives|https://github.com/iamalnewkirk/do/projects>
+
+L<Contributing|https://github.com/iamalnewkirk/do/blob/master/CONTRIBUTE.mkdn>
 
 L<Reporting|https://github.com/iamalnewkirk/do/issues>
 

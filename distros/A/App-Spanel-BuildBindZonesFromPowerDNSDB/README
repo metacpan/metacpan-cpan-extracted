@@ -1,0 +1,118 @@
+NAME
+    App::Spanel::BuildBindZonesFromPowerDNSDB - Build BIND zones from
+    PowerDNS zones in database
+
+VERSION
+    This document describes version 0.002 of
+    App::Spanel::BuildBindZonesFromPowerDNSDB (from Perl distribution
+    App-Spanel-BuildBindZonesFromPowerDNSDB), released on 2019-08-29.
+
+SYNOPSIS
+    See the included spanel-build-bind-zones script.
+
+FUNCTIONS
+  build_bind_zones
+    Usage:
+
+     build_bind_zones(%args) -> [status, msg, payload, meta]
+
+    Build BIND zones from PowerDNS zones in database.
+
+    This script will export domains in your PowerDNS database as BIND zones
+    then write them to the current directory with names
+    <servername>/db.<domainname> (so "example.com" from "server123" will be
+    written to "./server123/db.example.com").
+
+    Will not override existing files unless "--overwrite" ("-O") is
+    specified.
+
+    You can select domains to export using "include-domain" option.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   db_dsn => *str* (default: "DBI:mysql:database=pdns")
+
+    *   db_password => *str*
+
+    *   db_user => *str*
+
+    *   default_ns => *array[net::hostname]*
+
+    *   domain_id => *uint*
+
+    *   exclude_servers => *array[net::hostname]*
+
+    *   include_domains => *array[net::hostname]*
+
+    *   include_servers => *array[net::hostname]*
+
+    *   overwrite => *bool*
+
+        Whether to overwrite existing output files.
+
+    *   workaround_cname_and_other_data => *bool* (default: 1)
+
+        Whether to avoid having CNAME record for a name as well as other
+        record types.
+
+        This is a workaround for a common misconfiguration in PowerDNS DB.
+        Bind will reject the whole zone if there is CNAME record for a name
+        (e.g. 'www') as well as other record types (e.g. 'A' or 'TXT'). The
+        workaround is to skip those A/TXT records and only keep the CNAME
+        record.
+
+    *   workaround_no_ns => *bool* (default: 1)
+
+        Whether to add some NS records for '' when there are no NS records
+        for it.
+
+        This is a workaround for a common misconfiguration in PowerDNS DB.
+        This will add some NS records specified in "default_ns".
+
+    *   workaround_root_cname => *bool* (default: 1)
+
+        Whether to avoid having CNAME record for a name as well as other
+        record types.
+
+        CNAME on a root node (host='') does not make sense, so the
+        workaround is to ignore the root CNAME.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-Spanel-BuildBindZonesFromPowerDNSDB>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-Spanel-BuildBindZonesFromPowerDNS
+    DB>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-Spanel-BuildBindZ
+    onesFromPowerDNSDB>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

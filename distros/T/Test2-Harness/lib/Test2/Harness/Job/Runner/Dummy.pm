@@ -2,7 +2,7 @@ package Test2::Harness::Job::Runner::Dummy;
 use strict;
 use warnings;
 
-our $VERSION = '0.001085';
+our $VERSION = '0.001087';
 
 use Test2::Harness::Util qw/open_file write_file local_env/;
 use Test2::Harness::Util::IPC qw/run_cmd/;
@@ -37,7 +37,6 @@ sub command {
         (map {"-m$_"} @{$job->load || []}),
         (map {"-M$_"} @{$job->load_import || []}),
         $job->use_stream ? ("-MTest2::Formatter::Stream=dir,$event_dir") : (),
-        $job->times ? ('-MTest2::Plugin::Times') : (),
         '-e', 'print "1..0 # SKIP dummy mode"',
         @{$job->args},
     );

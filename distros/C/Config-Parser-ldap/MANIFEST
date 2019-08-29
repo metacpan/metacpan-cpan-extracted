@@ -1,0 +1,16 @@
+lib/Config/Parser/ldap.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/001canonical.t
+t/002get.t
+t/003direct.t
+t/101canonical.t
+t/102get.t
+t/103direct.t
+t/104badkey.t
+t/TestLDAP.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

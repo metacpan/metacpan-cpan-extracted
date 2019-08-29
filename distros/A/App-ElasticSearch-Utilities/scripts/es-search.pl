@@ -12,7 +12,6 @@ use App::ElasticSearch::Utilities::QueryString;
 use Carp;
 use CLI::Helpers qw(:all);
 use Getopt::Long qw(:config no_ignore_case no_ignore_case_always);
-use Hash::Flatten qw(flatten);
 use JSON::MaybeXS qw(:legacy);
 use Pod::Usage;
 use POSIX qw(strftime);
@@ -63,6 +62,8 @@ my $q = exists $OPT{'match-all'} && $OPT{'match-all'}
 
 $q->set_timeout('10s');
 $q->set_scroll('30s');
+$q->set_rest_total_hits_as_int('true');
+$q->set_track_total_hits('true');
 
 if( exists $OPT{prefix} ){
     foreach my $prefix (@{ $OPT{prefix} }) {
@@ -500,7 +501,7 @@ AGES: while( !$DONE && @AGES ) {
             $last_batch_id{$hit->{_id}}=1;
             my $record = {};
             if( @SHOW ) {
-                my $flat = flatten( $hit->{_source}, { HashDelimiter=>'.',ArrayDelimiter=>'.' } );
+                my $flat = es_flatten_hash( $hit->{_source} );
                 debug_var($flat);
                 foreach my $f (@always) {
                     $record->{$f} = $flat->{$f};
@@ -662,10 +663,11 @@ sub show_fields {
 
 sub show_bases {
     output({color=>'cyan'}, 'Bases available for search:' );
-    my @all   = es_indices(check_date => 0);
+    my @all   = es_indices(_all => 1);
     my %bases = ();
 
     foreach my $index (@all) {
+        next if $index =~ /^\./;
         my $days_old = es_index_days_old( $index ) || 0;
         next unless defined $days_old;
         $days_old = 0 if $days_old < 0;
@@ -712,7 +714,7 @@ es-search.pl - Provides a CLI for quick searches of data in ElasticSearch daily 
 
 =head1 VERSION
 
-version 7.1
+version 7.2
 
 =head1 SYNOPSIS
 

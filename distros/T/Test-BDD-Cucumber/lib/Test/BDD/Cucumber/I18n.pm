@@ -1,5 +1,5 @@
 package Test::BDD::Cucumber::I18n;
-$Test::BDD::Cucumber::I18n::VERSION = '0.58';
+$Test::BDD::Cucumber::I18n::VERSION = '0.59';
 =encoding utf8
 
 =head1 NAME
@@ -8,7 +8,7 @@ Test::BDD::Cucumber::I18N - Internationalization
 
 =head1 VERSION
 
-version 0.58
+version 0.59
 
 =head1 DESCRIPTION
 
@@ -35,6 +35,7 @@ Internationalization of feature files and step definitions.
 
 use strict;
 use warnings;
+use utf8;
 
 use base 'Exporter';
 
@@ -54,7 +55,7 @@ sub _initialize_language_definitions_from_shared_json_file {
     for my $language ( keys %$langdefs ) {
         my $langdef = $langdefs->{$language};
         for my $key ( keys %$langdef ) {
-            $langdef->{$key} =~ s{\Q*|\E}{};
+            $langdef->{$key} =~ s{[*]\s*[|]}{};
         }
     }
 

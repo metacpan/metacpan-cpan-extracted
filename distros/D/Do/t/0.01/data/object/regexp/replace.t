@@ -3,7 +3,8 @@ use warnings;
 use Test::More;
 
 use_ok 'Data::Object::Regexp';
-can_ok 'Data::Object::Regexp', 'replace';
+# deprecated
+# can_ok 'Data::Object::Regexp', 'replace';
 
 subtest 'replace' => sub {
   my $re = Data::Object::Regexp->new(qr(test));

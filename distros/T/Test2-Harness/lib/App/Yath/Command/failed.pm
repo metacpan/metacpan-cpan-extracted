@@ -2,7 +2,7 @@ package App::Yath::Command::failed;
 use strict;
 use warnings;
 
-our $VERSION = '0.001085';
+our $VERSION = '0.001087';
 
 use Test2::Util qw/pkg_to_file/;
 
@@ -402,12 +402,6 @@ Do not use stream
 Use TAP
 
 The TAP format is lossy and clunky. Test2::Harness normally uses a newer streaming format to receive test results. There are old/legacy tests where this causes problems, in which case setting --TAP or --no-stream can help.
-
-=item --times
-
-Monitor timing data for each test file
-
-This tells perl to load Test2::Plugin::Times before starting each test. Use -T to show the timing data
 
 =item --unsafe-inc
 

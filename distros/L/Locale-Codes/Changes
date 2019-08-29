@@ -7,6 +7,26 @@ This document is automatically generated from the document:
 and that document should be considered the canonical source of change
 related information.
 
+3.62  2019-08-29  sbeck
+  -  NEW CODE(s)
+  -  Fixed tests
+        Tests were not working correctly since the previous version. This is
+        now fixed.
+
+  -  Fixed error messages
+        Many of the error messages were inconsistent or completely wrong
+        (due to cut-and-paste errors). They have been fixed.
+
+  -  Fixed some return codes
+        The name2code and code2name functions returned 1 in the case of an
+        error in some situations instead of undef (which was the documented
+        value).
+
+  -  Removed unnecessary dependencies
+        A number of modules were included as test dependencies that are only
+        used by the author when preparing releases. These have been removed
+        as dependencies. Petr Pisar on GitHub #11
+
 3.61  2019-06-01  sbeck
   -  NEW CODE(s)
   -  Converted tests to use Test::Inter
@@ -445,7 +465,7 @@ related information.
   -  Added many semi-private routines
         Previous versions had only two semi-private routines: rename_country
         and alias_code which had the ability to modify the internal data in
-        a couple very limited ways. It was requested (in an anonymous
+        a couple of very limited ways. It was requested (in an anonymous
         posting by someone named Steve and also by Steve Hay) that better
         support for modifying internal data, so a full set of routines were
         added.
@@ -502,12 +522,11 @@ related information.
 
 3.00  2010-02-10  sbeck
   -  NEW CODE(s)
-
   -  (*) New maintainer
         From 1997 to 2004, Locale::Codes was maintained by Neil Bowers.
         Unfortunately, no updates were made from June 2004 to January 2010.
-        During that time, a number of changes have been made to the
-        standards since then, so the data included was out-of-date.
+        During that time, a number of changes were made to the standards, so
+        the data included was out-of-date.
 
         I contacted Neil to get his permission to assume maintenance of the
         module, and he kindly agreed.

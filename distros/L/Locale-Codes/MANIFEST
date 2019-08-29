@@ -74,8 +74,7 @@ t/_pod.t
 t/_pod_coverage.ign
 t/_pod_coverage.t
 t/_version.t
-t/country_errs_1.t
-t/country_errs_2.t
+t/codes.t
 t/country_func.t
 t/country_old.t
 t/country_oo.t
@@ -99,7 +98,6 @@ t/script_old.t
 t/script_oo.t
 t/vals_country.pl
 t/vals_currency.pl
-t/vals_errs.pl
 t/vals_langext.pl
 t/vals_langfam.pl
 t/vals_language.pl

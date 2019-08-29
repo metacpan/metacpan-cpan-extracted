@@ -1,5 +1,5 @@
 package Sys::HostIP;
-$Sys::HostIP::VERSION = '2.110';
+$Sys::HostIP::VERSION = '2.120';
 # ABSTRACT: Try extra hard to get IP address related info
 
 use strict;
@@ -54,7 +54,7 @@ sub ip {
 
     if ($IS_WIN) {
         my @if_keys = sort keys %{$if_info};
-        return ( $if_info->{ $if_keys[0] } );
+        return scalar @if_keys != 0 ? ( $if_info->{ $if_keys[0] } ) : '';
     } else {
         my $lo_found;
 
@@ -73,7 +73,7 @@ sub ip {
         # we get here if loopback is the only active device
         $lo_found and return '127.0.0.1';
 
-        return;
+        return '';
     }
 }
 
@@ -127,9 +127,15 @@ sub _get_ifconfig_binary {
 sub _get_interface_info {
     my $self = shift;
 
-    return $IS_WIN
+    my $interface_info = $IS_WIN
         ? $self->_get_win32_interface_info()
         : $self->_get_unix_interface_info();
+
+    my $warning_msg = "Unable to detect interface information!\n"
+        . "Please open an issue on https://github.com/xsawyerx/sys-hostip/issues with your 'ipconfig' or 'ifconfig' output";
+    warn $warning_msg if values %$interface_info == 0;
+
+    return $interface_info;
 }
 
 sub _clean_ifconfig_env {
@@ -266,7 +272,11 @@ sub _get_win32_interface_info {
 
         adapter => qr/
             ^
-            (?:Ethernet(?:\s?|-)\w+|\w+\s+Ethernet)
+            (?:
+                Ethernet(?:\s?|-)\w+
+                |
+                .*?\s+Ethernet
+            )
             \s+
             (.*) :
         /x,
@@ -423,7 +433,7 @@ Italian, and Finnish locales.
 
 Copyright (C) prior to 2010, Jonathan Schatz <bluelines@divisionbyzero.com>.
 
-Copyright (C) 2010-2018, Sawyer X <xsawyerx@cpan.org>.
+Copyright (C) 2010-2019, Sawyer X <xsawyerx@cpan.org>.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

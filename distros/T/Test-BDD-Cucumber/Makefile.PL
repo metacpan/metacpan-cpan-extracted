@@ -2,13 +2,13 @@
 use strict;
 use warnings;
 
-use 5.008;
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Feature-complete Cucumber-style testing in Perl",
-  "AUTHOR" => "['Peter Sergeant <pete\@clueball.com>','Erik Huelsmann <ehuels\@gmail.com>']",
+  "AUTHOR" => "Peter Sergeant <pete\@clueball.com>, Erik Huelsmann <ehuels\@gmail.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
     "bin/pherkin"
   ],
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.008",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Test::BDD::Cucumber",
   "PREREQ_PM" => {
     "Clone" => 0,
@@ -42,7 +42,7 @@ my %WriteMakefileArgs = (
     "Type::Tiny" => 0,
     "YAML::Syck" => 0
   },
-  "VERSION" => "0.58",
+  "VERSION" => "0.59",
   "test" => {
     "TESTS" => "t/*.t"
   }

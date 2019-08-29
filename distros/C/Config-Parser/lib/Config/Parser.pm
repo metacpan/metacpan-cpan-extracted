@@ -7,7 +7,7 @@ use Cwd qw(abs_path);
 use Text::ParseWords;
 use mro;
 
-our $VERSION = "1.03";
+our $VERSION = "1.04";
 
 sub new {
     my $class = shift;
@@ -177,7 +177,7 @@ Config::Parser - base class for configuration file parsers
 
 B<Config::Parser> provides a framework for writing configuration file
 parsers.  It is an intermediate layer between the abstract syntax tree
-(B<Config::AST>) and implementation of a parser for a particular
+(L<Config::AST>) and implementation of a parser for a particular
 configuration file format.
 
 It takes a I<define by example> approach.  That means that the implementer
@@ -280,7 +280,7 @@ Valid only together with B<filename>.
 
 Dictionary of allowed configuration statements in the file.  You will not
 need this parameter.  It is listed here for completeness sake.  Refer to
-the B<Config::AST> constructor for details.
+the L<Config::AST> constructor for details.
 
 =back
 
@@ -302,7 +302,7 @@ source tree.
 
 =head1 PARSER METHODS
 
-The following two methods are derived from B<Config::AST>.  They are
+The following two methods are derived from L<Config::AST>.  They are
 called internally by the constructor, if the file name is supplied.
 
 =head2 $cfg->parse($filename, %opts)
@@ -373,7 +373,7 @@ If the data type is omitted, no checking is performed unless specified
 otherwise by other options (see the B<:re> and B<:check> options below).
 
 Options are special names prefixed with a colon.  Option names follow
-the keywords from the B<Config::AST> keyword lexicon value.  An option 
+the keywords from the L<Config::AST> keyword lexicon value.  An option 
 can be followed by an equals sign and its value.  If an option is used
 without arguments, the value B<1> is implied.
 
@@ -454,7 +454,7 @@ returns 0.
 
 =head1 SEE ALSO
 
-B<Config::AST>(3).
+L<Config::AST>(3).
 
 =cut
 

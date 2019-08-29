@@ -1,7 +1,8 @@
 {
    "abstract" : "Feature-complete Cucumber-style testing in Perl",
    "author" : [
-      "['Peter Sergeant <pete@clueball.com>','Erik Huelsmann <ehuels@gmail.com>']"
+      "Peter Sergeant <pete@clueball.com>",
+      "Erik Huelsmann <ehuels@gmail.com>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
@@ -47,7 +48,7 @@
             "Test::More" : "0",
             "Type::Tiny" : "0",
             "YAML::Syck" : "0",
-            "perl" : "5.008"
+            "perl" : "5.010"
          }
       }
    },
@@ -62,7 +63,28 @@
          "web" : "https://github.com/pherkin/test-bdd-cucumber-perl"
       }
    },
-   "version" : "0.58",
+   "version" : "0.59",
+   "x_contributors" : [
+      "Aliaksei Palkanau <lifusexitus@gmail.com>",
+      "Ben Rogers <ben@bdr.org>",
+      "Chylli <chylli.email@gmail.com>",
+      "Gonzalo Barco <gonzalo.barco@globant.com>",
+      "Grant McLean <grant@mclean.net.nz>",
+      "James McCoy <jamessan@jamessan.com>",
+      "Lukas Atkinson <amon@cpan.org>",
+      "Magnus Enger <magnus@enger.priv.no>",
+      "Markus Benning <ich@markusbenning.de>",
+      "Mikhail Ivanov <m.ivanych@gmail.com>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "Neil Kirsopp <neil@broadbean.com>",
+      "Pablo Duboue <pablo.duboue@gmail.com>",
+      "Paul Cochrane <cochrane@driftnoise.com>",
+      "Tomas Pokorny <tnt@verotel.cz>",
+      "glauschwuffel <glauschwuffel@nomaden.org>",
+      "poum <poum@cpan.org>",
+      "rjp <rjpartington@googlemail.com>",
+      "vti <viacheslav.t@gmail.com>"
+   ],
    "x_generated_by_perl" : "v5.24.4",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
 }

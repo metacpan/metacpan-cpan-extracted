@@ -2,15 +2,22 @@
 
 use warnings 'all';
 use strict;
-use Test::More;
+
+BEGIN {
+   use Test::More;
+   # Don't run tests for installs
+   unless ($ENV{RELEASE_TESTING}) {
+      plan skip_all => 'Author tests not required for installation (set RELEASE_TESTING to test)';
+   }
+}
+
+# CPANTORPM-DEPREQ REQEXCL File::Basename
+# CPANTORPM-DEPREQ REQEXCL Cwd
+# CPANTORPM-DEPREQ REQEXCL Test::Pod::Coverage
+
 use File::Basename;
 use Cwd 'abs_path';
 use Test::Pod::Coverage 1.00;
-
-# Don't run tests for installs
-unless ($ENV{RELEASE_TESTING}) {
-   plan skip_all => 'Author tests not required for installation (set RELEASE_TESTING to test)';
-}
 
 # Figure out the directories.  This comes from Test::Inter.
 

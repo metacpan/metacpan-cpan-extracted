@@ -22,7 +22,7 @@ use warnings;
 use utf8;
 
 package Devel::PerlySense::Config::Project;
-$Devel::PerlySense::Config::Project::VERSION = '0.0219';
+$Devel::PerlySense::Config::Project::VERSION = '0.0220';
 
 
 

@@ -1,0 +1,9 @@
+0.002   2019-08-29  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Pass all remaining arguments to
+	  DNS::Zone::PowerDNS::To::BIND::gen_bind_zone_from_powerdns_db.
+
+
+0.001   2019-08-29  Released-By: PERLANCAR
+
+        - First release.

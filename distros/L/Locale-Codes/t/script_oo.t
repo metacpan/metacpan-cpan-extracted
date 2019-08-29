@@ -3,13 +3,9 @@
 use warnings;
 use strict;
 use Test::Inter;
-my $t = new Test::Inter $0;
+$::t = undef;
+$::t = new Test::Inter $0;
 require "do_tests.pl";
-
-init_tests();
-$t->tests(func  => \&tests,
-          tests => $::tests);
-$t->done_testing();
 
 # Local Variables:
 # mode: cperl

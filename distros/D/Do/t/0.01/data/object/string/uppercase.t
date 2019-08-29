@@ -3,7 +3,8 @@ use warnings;
 use Test::More;
 
 use_ok 'Data::Object::String';
-can_ok 'Data::Object::String', 'uppercase';
+# deprecated
+# can_ok 'Data::Object::String', 'uppercase';
 
 use Scalar::Util 'refaddr';
 

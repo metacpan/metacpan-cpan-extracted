@@ -7,6 +7,7 @@ use warnings;
 use strict;
 no strict 'subs';
 no strict 'refs';
+$| = 1;
 
 my %type = ('country'  => 'Country',
             'language' => 'Language',
@@ -16,11 +17,8 @@ my %type = ('country'  => 'Country',
             'langext'  => 'LangExt',
             'langvar'  => 'LangVar',
            );
-my $generic_tests;
 
 sub init_tests {
-   my($codeset,$show_errs) = @_;
-
    # $0 = "DATATYPE_FLAG_NUM.t"
    #       DATATYPE  = country, language, etc.
    #       FLAG      = func, old, oo, or some other value
@@ -51,31 +49,21 @@ sub init_tests {
    my $mod         = $type{$::data_type};
 
    require "vals_${inp_file}.pl";
-   $::tests .= $generic_tests  if (! defined($show_errs));
 
    if ($::test_type eq 'old') {
       $::module = "Locale::$mod";
       eval("use $::module");
       my $tmp   = $::module . "::show_errors";
-      &{ $tmp }(0);
+      &{ $tmp }(1);
    } elsif ($::test_type eq 'func') {
       $::module = "Locale::Codes::$mod";
       eval("use $::module");
       my $tmp   = $::module . "::show_errors";
-      &{ $tmp }(0);
-   } elsif (defined($codeset)) {
-      eval("use Locale::Codes");
-      $::obj = Locale::Codes->new($::data_type,$codeset,$show_errs);
-      $::obj->show_errors(1);
-   } elsif (defined($show_errs)) {
-      eval("use Locale::Codes");
-      $::obj = Locale::Codes->new();
-      $::obj->type($::data_type);
-      $::obj->show_errors($show_errs);
+      &{ $tmp }(1);
    } else {
       eval("use Locale::Codes");
       $::obj = new Locale::Codes $::data_type;
-      $::obj->show_errors(0);
+      $::obj->show_errors(1);
    }
 }
 
@@ -91,7 +79,7 @@ sub test {
    }
 
    if ($stderr) {
-      $stderr =~ s/\n.*//m;
+      $stderr =~ s/\n.*//s;
       chomp($stderr);
       return $stderr;
    } else {
@@ -228,135 +216,10 @@ sub _test {
    }
 }
 
-$generic_tests = "
-#################
-
-2code
-_undef_
-   _undef_
-
-2code
-   _undef_
-
-2code
-_blank_
-   _undef_
-
-2code
-UnusedName
-   _undef_
-
-2code
-   _undef_
-
-2code
-_undef_
-   _undef_
-
-2name
-_undef
-   _undef_
-
-2name
-   _undef_
-
-###
-
-add
-AAA
-newCode
-   1
-
-2code
-newCode
-   aaa
-
-delete
-AAA
-   1
-
-2code
-newCode
-   _undef_
-
-###
-
-add
-AAA
-newCode
-   1
-
-rename
-AAA
-newCode2
-   1
-
-2code
-newCode
-   aaa
-
-2code
-newCode2
-   aaa
-
-###
-
-add_alias
-newCode2
-newAlias
-   1
-
-2code
-newAlias
-   aaa
-
-delete_alias
-newAlias
-   1
-
-2code
-newAlias
-   _undef_
-
-###
-
-replace_code
-AAA
-BBB
-   1
-
-2name
-AAA
-   newCode2
-
-2name
-BBB
-   newCode2
-
-###
-
-add_code_alias
-BBB
-CCC
-   1
-
-2name
-BBB
-   newCode2
-
-2name
-CCC
-   newCode2
-
-delete_code_alias
-CCC
-   1
-
-2name
-CCC
-   _undef_
-
-";
+init_tests();
+$::t->tests(func  => \&test,
+            tests => $::tests);
+$::t->done_testing();
 
 1;
 # Local Variables:

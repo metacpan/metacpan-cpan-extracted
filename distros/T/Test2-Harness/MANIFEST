@@ -42,10 +42,12 @@ lib/Test2/Harness/Feeder/Run.pm
 lib/Test2/Harness/Job.pm
 lib/Test2/Harness/Job/Dir.pm
 lib/Test2/Harness/Job/Runner.pm
+lib/Test2/Harness/Job/Runner/Binary.pm
 lib/Test2/Harness/Job/Runner/Dummy.pm
 lib/Test2/Harness/Job/Runner/Fork.pm
 lib/Test2/Harness/Job/Runner/IPC.pm
 lib/Test2/Harness/Job/Runner/Open3.pm
+lib/Test2/Harness/Job/Runner/SHBang.pm
 lib/Test2/Harness/LogFormat.pm
 lib/Test2/Harness/Logger.pm
 lib/Test2/Harness/Logger/JSONL.pm
@@ -173,8 +175,12 @@ t2/ending.t
 t2/exception.t
 t2/findbin.t
 t2/ipc_reexec.t
+t2/lib/App/Yath/Plugin/SelfTest.pm
 t2/magic_vars.t
 t2/no_stdout_eol.t
+t2/non_perl/test.binary
+t2/non_perl/test.c
+t2/non_perl/test.sh
 t2/output.t
 t2/relative_paths.t
 t2/require_file.pm
@@ -201,3 +207,4 @@ xt/acceptance/which.t
 xt/author/pod-spell.t
 xt/author/pod-syntax.t
 xt/versions.t
+xxx.jsonl

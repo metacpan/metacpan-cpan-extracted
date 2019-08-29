@@ -2,7 +2,7 @@ package Test2::Harness::Job::Runner::Fork;
 use strict;
 use warnings;
 
-our $VERSION = '0.001085';
+our $VERSION = '0.001087';
 
 use POSIX;
 use File::Spec();
@@ -154,11 +154,6 @@ sub { shift->import(@_) }
         $ENV{T2_FORMATTER} = 'Stream';
         require Test2::Formatter::Stream;
         Test2::Formatter::Stream->import(dir => $event_dir);
-    }
-
-    if ($job->times) {
-        require Test2::Plugin::Times;
-        Test2::Plugin::Times->import();
     }
 
     @ARGV = @{$job->args};

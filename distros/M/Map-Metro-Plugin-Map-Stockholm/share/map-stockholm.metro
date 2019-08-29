@@ -165,6 +165,20 @@ Luma
 Sickla kaj
 Sickla udde
 
+# Tram Lidingöbanan
+Torsvik
+Baggeby
+Bodal
+Larsberg
+AGA
+Skärsätra
+Kottla
+Högberga
+Brevik
+Käppala
+Gåshaga
+Gåshaga brygga
+
 --lines
 10|T10|Blue line|color:#1c388c,width:6
 11|T11|Blue line|color:#1c388c,width:6
@@ -175,6 +189,7 @@ Sickla udde
 19|T19|Green line|color:#79c142,width:6
 7|L7|Spårväg City|color:#00bfff,width:4
 12|L12|Nockebybanan|color:#bbbbbb,width:4
+21|L21|Lidingöbanan|color:#bf8947,width:4
 22a|L22|Tvärbanan|color:#888888,width:4
 22b|L22|Tvärbanan|color:#888888,width:4
 
@@ -310,6 +325,19 @@ Sickla udde
 12|Smedslätten|Klövervägen
 12|Klövervägen|Alléparken
 12|Alléparken|Alvik
+
+21|Ropsten|Torsvik
+21|Torsvik|Baggeby
+21|Baggeby|Bodal
+21|Bodal|Larsberg
+21|Larsberg|AGA
+21|AGA|Skärsätra
+21|Skärsätra|Kottla
+21|Kottla|Högberga
+21|Högberga|Brevik
+21|Brevik|Käppala
+21|Käppala|Gåshaga
+21|Gåshaga|Gåshaga brygga
 
 22a|Solna station|Solna centrum
 22a|Solna centrum|Solna Business Park

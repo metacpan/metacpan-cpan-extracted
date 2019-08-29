@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities;
 use strict;
 use warnings;
 
-our $VERSION = '7.1'; # VERSION
+our $VERSION = '7.2'; # VERSION
 
 our $_OPTIONS_PARSED;
 our %_GLOBALS = ();
@@ -57,6 +57,7 @@ use Sub::Exporter -setup => {
         es_optimize_index
         es_apply_index_settings
         es_local_index_meta
+        es_flatten_hash
     )],
     groups => {
         config  => [qw(es_globals)],
@@ -659,10 +660,11 @@ sub es_index_fields {
         # Handle Version incompatibilities
         my $ref = exists $result->{$idx}{mappings} ? $result->{$idx}{mappings} : $result->{$idx};
 
-        # Loop through the mappings, skipping _default_
-        my @mappings = grep { $_ ne '_default_' } keys %{ $ref };
+        # Loop through the mappings, skipping _default_, except on 7.x where we notice "properties"
+        my @mappings = exists $ref->{properties} ? ($ref)
+                     : map { $ref->{$_} } grep { $_ ne '_default_' } keys %{ $ref };
         foreach my $mapping (@mappings) {
-            _find_fields(\%fields,$ref->{$mapping});
+            _find_fields(\%fields,$mapping);
         }
     }
     # Return the results
@@ -696,6 +698,7 @@ sub es_index_fields {
     sub _find_fields {
         my ($f,$ref,@path) = @_;
 
+        return unless is_hashref($ref);
         # Handle things with properties
         if( exists $ref->{properties} && is_hashref($ref->{properties}) ) {
             $nested_path = join('.', @path) if $ref->{type} and $ref->{type} eq 'nested';
@@ -833,6 +836,14 @@ sub es_node_stats {
 }
 
 
+sub es_flatten_hash {
+    my $hash = shift;
+    my $_flat = flatten($hash, { HashDelimiter=>':', ArrayDelimiter=>':' });
+    my %compat = map { s/:/./gr => $_flat->{$_} } keys %{ $_flat };
+    return \%compat;
+}
+
+
 sub def {
     my($key)= map { uc }@_;
 
@@ -873,7 +884,7 @@ App::ElasticSearch::Utilities - Utilities for Monitoring ElasticSearch
 
 =head1 VERSION
 
-version 7.1
+version 7.2
 
 =head1 SYNOPSIS
 
@@ -1080,6 +1091,10 @@ Returns a hashref
 Exposes GET /_nodes/stats
 
 Returns a hashref
+
+=head2 es_flatten_hash
+
+Performs flattening that's compatible with Elasticsearch's flattening.
 
 =head2 def('key')
 

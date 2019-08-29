@@ -3145,7 +3145,7 @@ country:
       MF: Saint Martin (French part)
       MG: Madagascar
       MH: Marshall Islands
-      MK: MACEDONIA
+      MK: North Macedonia
       ML: Mali
       MM: Myanmar
       MN: Mongolia
@@ -3724,9 +3724,6 @@ country:
       macao: 
         - MO
         - Macao
-      macedonia: 
-        - MK
-        - MACEDONIA
       madagascar: 
         - MG
         - Madagascar
@@ -3829,6 +3826,9 @@ country:
       norfolk island: 
         - NF
         - Norfolk Island
+      north macedonia: 
+        - MK
+        - North Macedonia
       northern mariana islands: 
         - MP
         - Northern Mariana Islands
@@ -4245,7 +4245,7 @@ country:
       MDV: Maldives
       MEX: Mexico
       MHL: Marshall Islands
-      MKD: MACEDONIA
+      MKD: North Macedonia
       MLI: Mali
       MLT: Malta
       MMR: Myanmar
@@ -4823,9 +4823,6 @@ country:
       macao: 
         - MAC
         - Macao
-      macedonia: 
-        - MKD
-        - MACEDONIA
       madagascar: 
         - MDG
         - Madagascar
@@ -4928,6 +4925,9 @@ country:
       norfolk island: 
         - NFK
         - Norfolk Island
+      north macedonia: 
+        - MKD
+        - North Macedonia
       northern mariana islands: 
         - MNP
         - Northern Mariana Islands
@@ -5425,7 +5425,7 @@ country:
       798: Tuvalu
       800: Uganda
       804: Ukraine
-      807: MACEDONIA
+      807: North Macedonia
       818: Egypt
       826: United Kingdom of Great Britain and Northern Ireland
       831: Guernsey
@@ -5922,9 +5922,6 @@ country:
       macao: 
         - 446
         - Macao
-      macedonia: 
-        - 807
-        - MACEDONIA
       madagascar: 
         - 450
         - Madagascar
@@ -6027,6 +6024,9 @@ country:
       norfolk island: 
         - 574
         - Norfolk Island
+      north macedonia: 
+        - 807
+        - North Macedonia
       northern mariana islands: 
         - 580
         - Northern Mariana Islands
@@ -17034,7 +17034,7 @@ language:
       nge: Ngemba
       ngf: Trans-New Guinea languages
       ngg: Ngbaka Manza
-      ngh: NÇng
+      ngh: Ning
       ngi: Ngizim
       ngj: Ngie
       ngk: Dalabon
@@ -35325,6 +35325,9 @@ language:
       nindi: 
         - nxi
         - Nindi
+      ning: 
+        - ngh
+        - Ning
       ningera: 
         - nby
         - Ningera
@@ -36105,9 +36108,6 @@ language:
       nzima: 
         - nzi
         - Nzima
-      nçng: 
-        - ~
-        - NÇng
       o'chi'chi': 
         - xoc
         - O'chi'chi'
@@ -46668,6 +46668,7 @@ script:
       Cari: Carian
       Cham: Cham
       Cher: Cherokee
+      Chrs: Chorasmian
       Cirt: Cirth
       Copt: Coptic
       Cpmn: Cypro-Minoan
@@ -46675,6 +46676,7 @@ script:
       Cyrl: Cyrillic
       Cyrs: Cyrillic (Old Church Slavonic variant)
       Deva: Devanagari
+      Diak: Dives Akuru
       Dogr: Dogra
       Dsrt: Deseret
       Dupl: Duployan shorthand
@@ -46832,6 +46834,7 @@ script:
       Wole: Woleai
       Xpeo: Old Persian
       Xsux: Sumero-Akkadian cuneiform
+      Yezi: Yezidi
       Yiii: Yi
       Zanb: Zanabazar Square
       Zinh: Code for inherited script
@@ -46917,6 +46920,9 @@ script:
       cherokee: 
         - Cher
         - Cherokee
+      chorasmian: 
+        - Chrs
+        - Chorasmian
       cirth: 
         - Cirt
         - Cirth
@@ -46944,6 +46950,9 @@ script:
       devanagari: 
         - Deva
         - Devanagari
+      dives akuru: 
+        - Diak
+        - Dives Akuru
       dogra: 
         - Dogr
         - Dogra
@@ -47421,6 +47430,9 @@ script:
       woleai: 
         - Wole
         - Woleai
+      yezidi: 
+        - Yezi
+        - Yezidi
       yi: 
         - Yiii
         - Yi
@@ -47443,6 +47455,7 @@ script:
       101: Meroitic Cursive
       105: Old South Arabian
       106: Old North Arabian (Ancient North Arabian)
+      109: Chorasmian
       115: Phoenician
       116: Lydian
       120: Tifinagh (Berber)
@@ -47475,6 +47488,7 @@ script:
       170: Thaana
       175: Old Turkic, Orkhon Runic
       176: Old Hungarian (Hungarian Runic)
+      192: Yezidi
       200: Greek
       201: Carian
       202: Lycian
@@ -47552,6 +47566,7 @@ script:
       338: Ahom, Tai Ahom
       339: Zanabazar Square (Zanabazarin Dorboljin Useg, Xewtee Dorboljin Bicig, Horizontal Square Script)
       340: Telugu
+      342: Dives Akuru
       343: Grantha
       344: Saurashtra
       345: Kannada
@@ -47704,6 +47719,9 @@ script:
       cherokee: 
         - 445
         - Cherokee
+      chorasmian: 
+        - 109
+        - Chorasmian
       cirth: 
         - 291
         - Cirth
@@ -47734,6 +47752,9 @@ script:
       devanagari (nagari): 
         - 315
         - Devanagari (Nagari)
+      dives akuru: 
+        - 342
+        - Dives Akuru
       dogra: 
         - 328
         - Dogra
@@ -48208,6 +48229,9 @@ script:
       woleai: 
         - 480
         - Woleai
+      yezidi: 
+        - 192
+        - Yezidi
       yi: 
         - 460
         - Yi

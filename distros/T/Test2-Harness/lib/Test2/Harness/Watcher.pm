@@ -2,7 +2,7 @@ package Test2::Harness::Watcher;
 use strict;
 use warnings;
 
-our $VERSION = '0.001085';
+our $VERSION = '0.001087';
 
 use Carp qw/croak/;
 use Scalar::Util qw/blessed/;
@@ -11,6 +11,7 @@ use List::Util qw/first max min/;
 use Test2::Harness::Util::UUID qw/gen_uuid/;
 
 use Test2::Harness::Util qw/hub_truth parse_exit/;
+use Test2::Util::Times qw/render_duration/;
 
 use Test2::Harness::Util::HashBase qw{
     -job
@@ -76,6 +77,12 @@ sub times {
     $out->{startup} = $times->{first} - $times->{start} if $times->{first} && $times->{start};
     $out->{cleanup} = $times->{stop} - $times->{last}   if $times->{stop}  && $times->{last};
 
+    for my $field (qw/total events startup cleanup/) {
+        $out->{"h_$field"} = render_duration($out->{$field}) if defined $out->{$field};
+    }
+
+    return unless 0 < keys %$out;
+
     return $out;
 }
 
@@ -96,17 +103,22 @@ sub _process {
 
     $self->{+LAST_EVENT} = time;
 
-    my $stamp = $event->{stamp};
-    my $f     = $event->{facet_data};
-    my $hf    = hub_truth($f);
+    my $f  = $event->{facet_data};
+    my $hf = hub_truth($f);
 
-    $self->{+_TIMES}->{start} = $self->{+_TIMES}->{start} ? min($stamp, $self->{+_TIMES}->{start}) : $stamp;
-    $self->{+_TIMES}->{stop} = $self->{+_TIMES}->{stop} ? max($stamp, $self->{+_TIMES}->{stop}) : $stamp;
+    if (my $stamp = $event->{stamp}) {
+        $self->{+_TIMES}->{start} = $self->{+_TIMES}->{start} ? min($stamp, $self->{+_TIMES}->{start}) : $stamp;
+        $self->{+_TIMES}->{stop} = $self->{+_TIMES}->{stop} ? max($stamp, $self->{+_TIMES}->{stop}) : $stamp;
+
+        if ($f->{trace} && !$self->{+_TIMES_DONE}) {
+            $self->{+_TIMES}->{first} = $self->{+_TIMES}->{first} ? min($self->{+_TIMES}->{first}, $stamp) : $stamp;
+            $self->{+_TIMES}->{last} = $self->{+_TIMES}->{last} ? max($self->{+_TIMES}->{last}, $stamp) : $stamp;
+        }
+    }
 
     if ($f->{trace} && !$self->{+_TIMES_DONE}) {
-        $self->{+_TIMES}->{first} = $self->{+_TIMES}->{first} ? min($self->{+_TIMES}->{first}, $stamp) : $stamp;
-        $self->{+_TIMES}->{last} = $self->{+_TIMES}->{last} ? max($self->{+_TIMES}->{last}, $stamp) : $stamp;
         $self->{+_TIMES_DONE} = 1 if $f->{control} && $f->{control}->{phase} && $f->{control}->{phase} eq 'END';
+        $self->{+_TIMES_DONE} = 1 if $f->{plan}    && !$f->{plan}->{none}    && $self->{+ASSERTION_COUNT};
     }
 
     return if $hf->{buffered};

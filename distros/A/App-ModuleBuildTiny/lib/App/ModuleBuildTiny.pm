@@ -3,7 +3,7 @@ package App::ModuleBuildTiny;
 use 5.010;
 use strict;
 use warnings;
-our $VERSION = '0.026';
+our $VERSION = '0.027';
 
 use Exporter 5.57 'import';
 our @EXPORT = qw/modulebuildtiny/;
@@ -26,7 +26,7 @@ use Text::Template;
 
 use App::ModuleBuildTiny::Dist;
 
-use Env qw/$AUTHOR_TESTING $RELEASE_TESTING $AUTOMATED_TESTING $SHELL $HOME $USERPROFILE/;
+use Env qw/$AUTHOR_TESTING $RELEASE_TESTING $AUTOMATED_TESTING $EXTENDED_TESTING $NONINTERACTIVE_TESTING $SHELL $HOME $USERPROFILE/;
 
 Getopt::Long::Configure(qw/require_order pass_through gnu_compat/);
 
@@ -132,7 +132,8 @@ my %actions = (
 	test => sub {
 		my @arguments = @_;
 		$AUTHOR_TESTING = 1;
-		GetOptionsFromArray(\@arguments, 'release!' => \$RELEASE_TESTING, 'author!' => \$AUTHOR_TESTING, 'automated!' => \$AUTOMATED_TESTING);
+		GetOptionsFromArray(\@arguments, 'release!' => \$RELEASE_TESTING, 'author!' => \$AUTHOR_TESTING, 'automated!' => \$AUTOMATED_TESTING,
+			'extended!' => \$EXTENDED_TESTING, 'non-interactive!' => \$NONINTERACTIVE_TESTING);
 		my $dist = App::ModuleBuildTiny::Dist->new;
 		return $dist->run(command => [ $Config{perlpath}, 'Build', 'test' ], build => 1);
 	},
@@ -282,7 +283,7 @@ App::ModuleBuildTiny - A standalone authoring tool for Module::Build::Tiny
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 DESCRIPTION
 

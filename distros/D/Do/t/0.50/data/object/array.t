@@ -4,83 +4,153 @@ use Test::More;
 
 use_ok 'Data::Object::Array';
 
-ok Data::Object::Array->does('Data::Object::Rule::Collection');
-ok Data::Object::Array->does('Data::Object::Rule::Comparison');
-ok Data::Object::Array->does('Data::Object::Rule::Defined');
+# deprecated
+# ok Data::Object::Array->does('Data::Object::Rule::Collection');
+# ok Data::Object::Array->does('Data::Object::Rule::Comparison');
+# ok Data::Object::Array->does('Data::Object::Rule::Defined');
 ok Data::Object::Array->does('Data::Object::Role::Detract');
 ok Data::Object::Array->does('Data::Object::Role::Dumper');
-ok Data::Object::Array->does('Data::Object::Rule::List');
+# deprecated
+# ok Data::Object::Array->does('Data::Object::Rule::List');
 ok Data::Object::Array->does('Data::Object::Role::Output');
 ok Data::Object::Array->does('Data::Object::Role::Throwable');
 
-can_ok 'Data::Object::Array', 'all';
-can_ok 'Data::Object::Array', 'any';
-can_ok 'Data::Object::Array', 'clear';
-can_ok 'Data::Object::Array', 'count';
-can_ok 'Data::Object::Array', 'data';
-can_ok 'Data::Object::Array', 'defined';
-can_ok 'Data::Object::Array', 'delete';
-can_ok 'Data::Object::Array', 'detract';
-can_ok 'Data::Object::Array', 'dump';
-can_ok 'Data::Object::Array', 'each';
-can_ok 'Data::Object::Array', 'each_key';
-can_ok 'Data::Object::Array', 'each_n_values';
-can_ok 'Data::Object::Array', 'each_value';
-can_ok 'Data::Object::Array', 'empty';
-can_ok 'Data::Object::Array', 'eq';
-can_ok 'Data::Object::Array', 'exists';
-can_ok 'Data::Object::Array', 'first';
-can_ok 'Data::Object::Array', 'ge';
-can_ok 'Data::Object::Array', 'get';
-can_ok 'Data::Object::Array', 'grep';
-can_ok 'Data::Object::Array', 'gt';
-can_ok 'Data::Object::Array', 'hash';
-can_ok 'Data::Object::Array', 'hashify';
-can_ok 'Data::Object::Array', 'head';
-can_ok 'Data::Object::Array', 'invert';
-can_ok 'Data::Object::Array', 'iterator';
-can_ok 'Data::Object::Array', 'join';
-can_ok 'Data::Object::Array', 'keyed';
-can_ok 'Data::Object::Array', 'keys';
-can_ok 'Data::Object::Array', 'last';
-can_ok 'Data::Object::Array', 'le';
-can_ok 'Data::Object::Array', 'length';
-can_ok 'Data::Object::Array', 'list';
-can_ok 'Data::Object::Array', 'lt';
-can_ok 'Data::Object::Array', 'map';
-can_ok 'Data::Object::Array', 'max';
-can_ok 'Data::Object::Array', 'min';
-can_ok 'Data::Object::Array', 'ne';
-can_ok 'Data::Object::Array', 'new';
-can_ok 'Data::Object::Array', 'none';
-can_ok 'Data::Object::Array', 'nsort';
-can_ok 'Data::Object::Array', 'one';
-can_ok 'Data::Object::Array', 'pairs';
-can_ok 'Data::Object::Array', 'pairs_array';
-can_ok 'Data::Object::Array', 'pairs_hash';
-can_ok 'Data::Object::Array', 'part';
-can_ok 'Data::Object::Array', 'pop';
-can_ok 'Data::Object::Array', 'print';
-can_ok 'Data::Object::Array', 'push';
-can_ok 'Data::Object::Array', 'random';
-can_ok 'Data::Object::Array', 'reverse';
-can_ok 'Data::Object::Array', 'rnsort';
-can_ok 'Data::Object::Array', 'roles';
-can_ok 'Data::Object::Array', 'rotate';
-can_ok 'Data::Object::Array', 'rsort';
-can_ok 'Data::Object::Array', 'say';
-can_ok 'Data::Object::Array', 'set';
-can_ok 'Data::Object::Array', 'shift';
-can_ok 'Data::Object::Array', 'size';
-can_ok 'Data::Object::Array', 'slice';
-can_ok 'Data::Object::Array', 'sort';
-can_ok 'Data::Object::Array', 'sum';
-can_ok 'Data::Object::Array', 'tail';
-can_ok 'Data::Object::Array', 'throw';
-can_ok 'Data::Object::Array', 'type';
-can_ok 'Data::Object::Array', 'unique';
-can_ok 'Data::Object::Array', 'unshift';
-can_ok 'Data::Object::Array', 'values';
+# deprecated
+# can_ok 'Data::Object::Array', 'all';
+# deprecated
+# can_ok 'Data::Object::Array', 'any';
+# deprecated
+# can_ok 'Data::Object::Array', 'clear';
+# deprecated
+# can_ok 'Data::Object::Array', 'count';
+# deprecated
+# can_ok 'Data::Object::Array', 'data';
+# deprecated
+# can_ok 'Data::Object::Array', 'defined';
+# deprecated
+# can_ok 'Data::Object::Array', 'delete';
+# deprecated
+# can_ok 'Data::Object::Array', 'detract';
+# deprecated
+# can_ok 'Data::Object::Array', 'dump';
+# deprecated
+# can_ok 'Data::Object::Array', 'each';
+# deprecated
+# can_ok 'Data::Object::Array', 'each_key';
+# deprecated
+# can_ok 'Data::Object::Array', 'each_n_values';
+# deprecated
+# can_ok 'Data::Object::Array', 'each_value';
+# deprecated
+# can_ok 'Data::Object::Array', 'empty';
+# deprecated
+# can_ok 'Data::Object::Array', 'eq';
+# deprecated
+# can_ok 'Data::Object::Array', 'exists';
+# deprecated
+# can_ok 'Data::Object::Array', 'first';
+# deprecated
+# can_ok 'Data::Object::Array', 'ge';
+# deprecated
+# can_ok 'Data::Object::Array', 'get';
+# deprecated
+# can_ok 'Data::Object::Array', 'grep';
+# deprecated
+# can_ok 'Data::Object::Array', 'gt';
+# deprecated
+# can_ok 'Data::Object::Array', 'hash';
+# deprecated
+# can_ok 'Data::Object::Array', 'hashify';
+# deprecated
+# can_ok 'Data::Object::Array', 'head';
+# deprecated
+# can_ok 'Data::Object::Array', 'invert';
+# deprecated
+# can_ok 'Data::Object::Array', 'iterator';
+# deprecated
+# can_ok 'Data::Object::Array', 'join';
+# deprecated
+# can_ok 'Data::Object::Array', 'keyed';
+# deprecated
+# can_ok 'Data::Object::Array', 'keys';
+# deprecated
+# can_ok 'Data::Object::Array', 'last';
+# deprecated
+# can_ok 'Data::Object::Array', 'le';
+# deprecated
+# can_ok 'Data::Object::Array', 'length';
+# deprecated
+# can_ok 'Data::Object::Array', 'list';
+# deprecated
+# can_ok 'Data::Object::Array', 'lt';
+# deprecated
+# can_ok 'Data::Object::Array', 'map';
+# deprecated
+# can_ok 'Data::Object::Array', 'max';
+# deprecated
+# can_ok 'Data::Object::Array', 'min';
+# deprecated
+# can_ok 'Data::Object::Array', 'ne';
+# deprecated
+# can_ok 'Data::Object::Array', 'new';
+# deprecated
+# can_ok 'Data::Object::Array', 'none';
+# deprecated
+# can_ok 'Data::Object::Array', 'nsort';
+# deprecated
+# can_ok 'Data::Object::Array', 'one';
+# deprecated
+# can_ok 'Data::Object::Array', 'pairs';
+# deprecated
+# can_ok 'Data::Object::Array', 'pairs_array';
+# deprecated
+# can_ok 'Data::Object::Array', 'pairs_hash';
+# deprecated
+# can_ok 'Data::Object::Array', 'part';
+# deprecated
+# can_ok 'Data::Object::Array', 'pop';
+# deprecated
+# can_ok 'Data::Object::Array', 'print';
+# deprecated
+# can_ok 'Data::Object::Array', 'push';
+# deprecated
+# can_ok 'Data::Object::Array', 'random';
+# deprecated
+# can_ok 'Data::Object::Array', 'reverse';
+# deprecated
+# can_ok 'Data::Object::Array', 'rnsort';
+# deprecated
+# can_ok 'Data::Object::Array', 'roles';
+# deprecated
+# can_ok 'Data::Object::Array', 'rotate';
+# deprecated
+# can_ok 'Data::Object::Array', 'rsort';
+# deprecated
+# can_ok 'Data::Object::Array', 'say';
+# deprecated
+# can_ok 'Data::Object::Array', 'set';
+# deprecated
+# can_ok 'Data::Object::Array', 'shift';
+# deprecated
+# can_ok 'Data::Object::Array', 'size';
+# deprecated
+# can_ok 'Data::Object::Array', 'slice';
+# deprecated
+# can_ok 'Data::Object::Array', 'sort';
+# deprecated
+# can_ok 'Data::Object::Array', 'sum';
+# deprecated
+# can_ok 'Data::Object::Array', 'tail';
+# deprecated
+# can_ok 'Data::Object::Array', 'throw';
+# deprecated
+# can_ok 'Data::Object::Array', 'type';
+# deprecated
+# can_ok 'Data::Object::Array', 'unique';
+# deprecated
+# can_ok 'Data::Object::Array', 'unshift';
+# deprecated
+# can_ok 'Data::Object::Array', 'values';
 
 subtest 'test instantiation' => sub {
   eval { Data::Object::Array->new };

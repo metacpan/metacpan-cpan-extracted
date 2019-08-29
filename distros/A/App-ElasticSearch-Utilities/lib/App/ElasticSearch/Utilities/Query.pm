@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities::Query;
 use strict;
 use warnings;
 
-our $VERSION = '7.1'; # VERSION
+our $VERSION = '7.2'; # VERSION
 
 use CLI::Helpers qw(:output);
 use Clone qw(clone);
@@ -51,6 +51,8 @@ my %PARAMS = (
     scroll          => { isa => Maybe[TimeConstant] },
     timeout         => { isa => TimeConstant },
     terminate_after => { isa => Int },
+    rest_total_hits_as_int => { isa => Str, default => sub { 'false' } },
+    track_total_hits  => { isa => Str, default => sub { 'false' } }
 );
 
 # Dynamically build our attributes
@@ -270,7 +272,7 @@ App::ElasticSearch::Utilities::Query - Object representing ES Queries
 
 =head1 VERSION
 
-version 7.1
+version 7.2
 
 =head1 ATTRIBUTES
 

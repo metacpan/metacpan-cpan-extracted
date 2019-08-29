@@ -5,9 +5,9 @@
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Tue May 28 15:21:38 EDT 2019
-#    Data version: tzdata2019a
-#    Code version: tzcode2019a
+#    Generated on: Thu Aug 29 14:13:15 EDT 2019
+#    Data version: tzdata2019b
+#    Code version: tzcode2019b
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -2385,13 +2385,13 @@ L<Date::Manip::TZ> module.
      1      -03:00:00   America/Halifax
                         America/Glace_Bay
                         America/Moncton
-                        America/Campo_Grande
-                        America/Cuiaba
                         America/Santiago
                         America/Goose_Bay
                         Atlantic/Bermuda
                         America/Asuncion
                         America/Thule
+                        America/Campo_Grande
+                        America/Cuiaba
                         America/Punta_Arenas
                         Atlantic/Stanley
                         America/Argentina/San_Luis
@@ -2423,9 +2423,9 @@ L<Date::Manip::TZ> module.
      1      -02:30:00   America/St_Johns
                         America/Montevideo
                         America/Goose_Bay
-     1      -02:00:00   America/Sao_Paulo
-                        America/Godthab
+     1      -02:00:00   America/Godthab
                         America/Miquelon
+                        America/Sao_Paulo
                         America/Montevideo
                         America/Araguaina
                         America/Bahia

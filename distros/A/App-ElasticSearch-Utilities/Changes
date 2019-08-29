@@ -1,9 +1,72 @@
 ==================================================
-Changes from 2017-08-01 00:00:00 +0000 to present.
+Changes from 2017-08-28 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 7.1 at 2019-08-01 19:27:33 +0000
+version 7.2 at 2019-08-28 22:39:36 +0000
+----------------------------------------
+
+  Change: 1c04c77be9fd7c0366ce28e2b8abe694babe468f
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-08-28 15:38:01 +0000
+
+    Documentation update for 7.2 release 
+
+  Change: 7469f0aab1a9f93a2ebf4fbe8848a25689ff5cf5
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-08-28 15:35:07 +0000
+
+    Enhance es-apply-settings.pl
+
+    * New `es_flatten_hash()` function to perform compatible list flattening
+
+    to that found in Elastic's documentation. * Replace all instances of
+    `Hash::Flatten::flatten` with a call to
+
+    `es_flatten_hash()` for consistency * Use the `es_flatten_hash()` function
+    with `Test::Deep`'s
+
+    `cmp_details()` and `subhashof()` to check if an index requires a
+
+    settings change. * Configure `es-apply-settings.pl` to ignore indices with
+    protected
+
+    aliases. * Allow protected indices to have settings applied with
+    `--no-skip` * Skip checking the existing index settings with `--no-diff` 
+
+  Change: bc5ce3686a5d7542fea53d70352f618bd1676a15
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-08-23 15:04:28 +0000
+
+    Tweaks for working with ElasticSearch 6.x and 7.x
+
+    * Field metadata extraction works on both versions * Filter out invalid
+    parameters to `_search` when using an older ES
+
+    version * Set `es-search.pl` to use the new parameters to track the total
+    hits 
+
+  Change: 84142a2fa49ad8e819be1cc189b17a246783c762
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-08-05 11:40:16 +0000
+
+    Make skipped aliases in maintenance more visible.
+
+    Moving the skipped message from `verbose` to `output` to ensure proper
+    reporting of these indexes. 
+
+  Change: 75e684c51aa125e6d8590bf95c3a7c0e3c43933f
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-08-01 17:10:46 +0000
+
+    Adapt es-search.pl --bases to use _all
+
+    If the user sets a default base in their `~/.es-utils.yaml`, then they'd
+    only see that base in via `--bases`. This ensures users can see all of the
+    indices available. 
+
+----------------------------------------
+version 7.1 at 2019-08-01 19:25:21 +0000
 ----------------------------------------
 
   Change: eaf5f3ca17bfa2abd653715cc69de098283a2ffc
@@ -817,5 +880,5 @@ version 5.4 at 2017-10-13 19:36:20 +0000
     es-alias-manager.pl: relax index name checker to allow _ 
 
 =================================================
-Plus 60 releases after 2017-08-01 00:00:00 +0000.
+Plus 60 releases after 2017-08-28 00:00:00 +0000.
 =================================================

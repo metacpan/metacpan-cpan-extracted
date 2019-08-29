@@ -9,10 +9,10 @@ build_requires:
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::More: '0'
-  perl: '5.010'
+  perl: '5.013002'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: '5.010'
+  perl: '5.013002'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: bsd
@@ -48,6 +48,7 @@ requires:
   Pod::Usage: '0'
   Ref::Util: '0'
   Sub::Exporter: '0'
+  Test::Deep: '0'
   Text::CSV_XS: '0'
   Time::HiRes: '0'
   Time::Local: '0'
@@ -60,16 +61,17 @@ requires:
   feature: '0'
   namespace::autoclean: '0'
   parent: '0'
-  perl: '5.010'
+  perl: '5.013002'
   strict: '0'
+  version: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/reyjrar/es-utils/issues
   repository: git://github.com/reyjrar/es-utils.git
-version: '7.1'
+version: '7.2'
 x_Dist_Zilla:
   perl:
-    version: '5.028001'
+    version: '5.030000'
   plugins:
     -
       class: Dist::Zilla::Plugin::PruneCruft
@@ -347,14 +349,14 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^u:^release-(.+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.21.0
+          git_version: '2.20.1 (Apple Git-117)'
           repo_root: .
       name: Git::NextVersion
       version: '2.046'
     -
       class: Dist::Zilla::Plugin::OurPkgVersion
       name: OurPkgVersion
-      version: '0.20'
+      version: '0.21'
     -
       class: Dist::Zilla::Plugin::Git::Check
       config:
@@ -372,7 +374,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.21.0
+          git_version: '2.20.1 (Apple Git-117)'
           repo_root: .
       name: Git::Check
       version: '2.046'
@@ -401,7 +403,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.21.0
+          git_version: '2.20.1 (Apple Git-117)'
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -414,11 +416,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: release-7.1
+          tag: release-7.2
           tag_format: release-%v
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.21.0
+          git_version: '2.20.1 (Apple Git-117)'
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -441,7 +443,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.21.0
+          git_version: '2.20.1 (Apple Git-117)'
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -455,7 +457,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.21.0
+          git_version: '2.20.1 (Apple Git-117)'
           repo_root: .
       name: Git::Push
       version: '2.046'
@@ -515,5 +517,5 @@ x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Samit Badle <Samit.Badle@gmail.com>'
   - 'Takumi Sakamoto <takumi.saka@gmail.com>'
-x_generated_by_perl: v5.28.1
+x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

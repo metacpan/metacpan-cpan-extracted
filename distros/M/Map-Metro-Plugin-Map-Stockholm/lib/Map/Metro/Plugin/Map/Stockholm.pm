@@ -4,7 +4,7 @@ package Map::Metro::Plugin::Map::Stockholm;
 
 # ABSTRACT: Map::Metro map for Stockholm
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.1972';
+our $VERSION = '0.1973';
 
 use Moose;
 with 'Map::Metro::Plugin::Map';
@@ -38,8 +38,8 @@ Map::Metro::Plugin::Map::Stockholm - Map::Metro map for Stockholm
 <p>
 <img src="https://img.shields.io/badge/perl-5.16+-blue.svg" alt="Requires Perl 5.16+" />
 <a href="https://travis-ci.org/Csson/p5-Map-Metro-Plugin-Map-Stockholm"><img src="https://api.travis-ci.org/Csson/p5-Map-Metro-Plugin-Map-Stockholm.svg?branch=master" alt="Travis status" /></a>
-<a href="http://cpants.cpanauthors.org/release/CSSON/Map-Metro-Plugin-Map-Stockholm-0.1972"><img src="http://badgedepot.code301.com/badge/kwalitee/CSSON/Map-Metro-Plugin-Map-Stockholm/0.1972" alt="Distribution kwalitee" /></a>
-<a href="http://matrix.cpantesters.org/?dist=Map-Metro-Plugin-Map-Stockholm%200.1972"><img src="http://badgedepot.code301.com/badge/cpantesters/Map-Metro-Plugin-Map-Stockholm/0.1972" alt="CPAN Testers result" /></a>
+<a href="http://cpants.cpanauthors.org/release/CSSON/Map-Metro-Plugin-Map-Stockholm-0.1973"><img src="http://badgedepot.code301.com/badge/kwalitee/CSSON/Map-Metro-Plugin-Map-Stockholm/0.1973" alt="Distribution kwalitee" /></a>
+<a href="http://matrix.cpantesters.org/?dist=Map-Metro-Plugin-Map-Stockholm%200.1973"><img src="http://badgedepot.code301.com/badge/cpantesters/Map-Metro-Plugin-Map-Stockholm/0.1973" alt="CPAN Testers result" /></a>
 <img src="https://img.shields.io/badge/coverage-69.2%-red.svg" alt="coverage 69.2%" />
 </p>
 
@@ -47,7 +47,7 @@ Map::Metro::Plugin::Map::Stockholm - Map::Metro map for Stockholm
 
 =head1 VERSION
 
-Version 0.1972, released 2018-09-30.
+Version 0.1973, released 2019-08-28.
 
 =head1 SYNOPSIS
 
@@ -73,6 +73,8 @@ This map L<contains|Map::Metro::Plugin::Map::Stockholm>:
 * The I<Tvärbanan> tram line [L<wikipedia|https://en.wikipedia.org/wiki/Nockebybanan>]
 
 * The I<Nockebybanan> tram line [L<wikipedia|https://en.wikipedia.org/wiki/Tv%C3%A4rbanan>]
+
+* The I<Lidingöbanan> tram line [L<wikipedia|https://en.wikipedia.org/wiki/Liding%C3%B6banan>]
 
 =for HTML <p><a href="https://raw.githubusercontent.com/Csson/p5-Map-Metro-Plugin-Map-Stockholm/master/static/images/stockholm.png"><img src="https://raw.githubusercontent.com/Csson/p5-Map-Metro-Plugin-Map-Stockholm/master/static/images/stockholm.png" style="max-width: 600px" /></a></p>
 

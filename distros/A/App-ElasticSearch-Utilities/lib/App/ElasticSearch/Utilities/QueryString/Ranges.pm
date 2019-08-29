@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities::QueryString::Ranges;
 use strict;
 use warnings;
 
-our $VERSION = '7.1'; # VERSION
+our $VERSION = '7.2'; # VERSION
 
 use CLI::Helpers qw(:output);
 use namespace::autoclean;
@@ -62,7 +62,7 @@ App::ElasticSearch::Utilities::QueryString::Ranges - Implement parsing compariso
 
 =head1 VERSION
 
-version 7.1
+version 7.2
 
 =head1 SYNOPSIS
 

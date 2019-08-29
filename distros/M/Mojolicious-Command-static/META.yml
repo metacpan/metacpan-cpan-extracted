@@ -1,0 +1,31 @@
+---
+abstract: 'Run a quick and dirty static files web server'
+author:
+  - 'Stefan Adams <sadams@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Command-static
+no_index:
+  directory:
+    - t
+    - inc
+    - t
+requires:
+  Mojolicious: '8.00'
+  perl: '5.010001'
+resources:
+  IRC: irc://irc.freenode.net/#mojo
+  bugtracker: https://github.com/stefanadams/Mojolicious-Command-static/issues
+  homepage: https://stefan.adams.fm
+  license: http://www.opensource.org/licenses/artistic-license-2.0
+  repository: https://github.com/stefanadams/Mojolicious-Command-static.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

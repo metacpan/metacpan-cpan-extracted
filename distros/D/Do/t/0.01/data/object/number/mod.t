@@ -3,7 +3,8 @@ use warnings;
 use Test::More;
 
 use_ok 'Data::Object::Number';
-can_ok 'Data::Object::Number', 'mod';
+# deprecated
+# can_ok 'Data::Object::Number', 'mod';
 
 use Scalar::Util 'refaddr';
 

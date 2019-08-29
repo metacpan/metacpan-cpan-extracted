@@ -1,3 +1,33 @@
+0.005   2019-08-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Add workaround arguments: workaround_root_cname, workaround_no_ns,
+	  workaround_cname_and_other_data (all active by default).
+
+	- [bugfix] Fix SRV record format.
+
+	- [bugfix] Fix ordering of records that's demanded by bind: root node
+	  first, then CNAME *right* before a wildcard, then the others.
+
+
+0.004   2019-08-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Support SRV records.
+
+
+0.003   2019-08-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Handle SSHFP records.
+
+	- Accept domain_id as alternative to domain name.
+
+	- Fix Rinci metadata.
+
+
+0.002   2019-08-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Allow passing dbh instead of db_dsn/db_user/db_password.
+
+
 0.001   2019-08-19  Released-By: PERLANCAR
 
         - First release.

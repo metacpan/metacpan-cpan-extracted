@@ -1,13 +1,15 @@
 package Data::Object::Role::Proxyable;
 
+use 5.014;
+
 use strict;
 use warnings;
 
-use Data::Object::Role;
+use Moo::Role;
 
 use Carp ();
 
-our $VERSION = '1.05'; # VERSION
+our $VERSION = '1.07'; # VERSION
 
 # BUILD
 
@@ -22,11 +24,11 @@ sub AUTOLOAD {
 
   my $error = qq(Can't locate object method "$method" via package "$package");
 
-  Carp::croak($error) unless $build && ref($build) eq 'CODE';
+  Carp::confess($error) unless $build && ref($build) eq 'CODE';
 
   my $proxy = $build->($package, $method, @_);
 
-  Carp::croak($error) unless $proxy && ref($proxy) eq 'CODE';
+  Carp::confess($error) unless $proxy && ref($proxy) eq 'CODE';
 
   goto &$proxy;
 }
@@ -129,9 +131,11 @@ terms as the Perl 5 programming language system itself.
 
 =head1 PROJECT
 
-L<GitHub|https://github.com/iamalnewkirk/do>
+L<On GitHub|https://github.com/iamalnewkirk/do>
 
-L<Contributing|https://github.com/iamalnewkirk/do/blob/master/README-DEVEL.mkdn>
+L<Initiatives|https://github.com/iamalnewkirk/do/projects>
+
+L<Contributing|https://github.com/iamalnewkirk/do/blob/master/CONTRIBUTE.mkdn>
 
 L<Reporting|https://github.com/iamalnewkirk/do/issues>
 

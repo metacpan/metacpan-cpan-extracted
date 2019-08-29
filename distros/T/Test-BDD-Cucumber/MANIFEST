@@ -9,8 +9,6 @@ Makefile.PL
 README
 README.pod
 TODO
-a.feature
-b.feature
 bin/pherkin
 dist.ini
 examples/calculator/features/basic.feature
@@ -37,7 +35,9 @@ lib/Test/BDD/Cucumber/Harness.pm
 lib/Test/BDD/Cucumber/Harness/Data.pm
 lib/Test/BDD/Cucumber/Harness/JSON.pm
 lib/Test/BDD/Cucumber/Harness/TermColor.pm
+lib/Test/BDD/Cucumber/Harness/Test2API.pm~
 lib/Test/BDD/Cucumber/Harness/TestBuilder.pm
+lib/Test/BDD/Cucumber/Harness/TestBuilder.pm-builder
 lib/Test/BDD/Cucumber/I18N/Data.pm
 lib/Test/BDD/Cucumber/I18n.pm
 lib/Test/BDD/Cucumber/Loader.pm
@@ -61,6 +61,7 @@ lib/Test/BDD/Cucumber/TestBuilderDelegator.pm
 lib/Test/BDD/Cucumber/Util.pm
 lib/Test/BDD/Cucumber/Walker.pm
 lib/Test/BDD/Cucumber/Walker.pm~
+out
 script/make_corpus.pl
 t/210_background_sections.t
 t/220_tag_parsing.t
@@ -100,3 +101,7 @@ t/pherkin_config_files/readable.yaml
 t/pherkin_config_files/top_level_array.yaml
 t/regressions/010_greedy_table_parsing/test.feature
 t/regressions/010_greedy_table_parsing/test_steps.pl
+t2
+tm
+tm~
+weaver.ini

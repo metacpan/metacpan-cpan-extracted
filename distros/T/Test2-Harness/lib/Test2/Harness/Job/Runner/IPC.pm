@@ -2,7 +2,7 @@ package Test2::Harness::Job::Runner::IPC;
 use strict;
 use warnings;
 
-our $VERSION = '0.001085';
+our $VERSION = '0.001087';
 
 use Test2::Harness::Util qw/open_file write_file local_env/;
 use Test2::Harness::Util::IPC qw/run_cmd/;
@@ -43,7 +43,6 @@ sub command {
         (map { "-M$_" } @{$job->load_import || []}),
         (map { "-m$_" } @{$job->load        || []}),
         $job->use_stream ? ("-MTest2::Formatter::Stream=dir,$event_dir") : (),
-        $job->times ? ('-MTest2::Plugin::Times') : (),
         $class->command_file($test),
         @{$job->args},
     );

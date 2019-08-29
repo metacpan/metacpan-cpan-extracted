@@ -47,6 +47,9 @@ my $events = intercept {
 
 my $details_rx = qr/^DBI::Profile: .*\(\d+ calls\)/;
 
+use Data::Dumper;
+print Dumper($events);
+
 like(
     $events->[0],
     hash {
@@ -63,7 +66,7 @@ like(
         };
 
         field harness_job_fields => array {
-            item { name => 'dbi_time',  details => T() };
+            item { name => 'dbi_time',  details => T(), raw => T() };
             item { name => 'dbi_calls', details => T() };
         };
 

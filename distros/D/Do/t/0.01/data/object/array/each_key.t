@@ -4,7 +4,8 @@ use warnings;
 use Test::More;
 
 use_ok 'Data::Object::Array';
-can_ok 'Data::Object::Array', 'each_key';
+# deprecated
+# can_ok 'Data::Object::Array', 'each_key';
 
 use Scalar::Util 'refaddr';
 

@@ -57,6 +57,10 @@ for ( 1 .. $a->size * 2) {
             # diag "Peek index is $idx";
             my $got = $a->[$idx];
             is $got, $expected, "peeking $_: $expected and $got are the same";
+            my $b = $a->clone;
+            is_deeply($a, $b, "b is a clone of a");
+            is ($a->index, $b->index, "b has same index as a");
+            is ($a->loops, $b->loops, "b has same loops as a");
         }
     };
     $a->next;

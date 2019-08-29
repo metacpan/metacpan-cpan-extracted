@@ -19,7 +19,7 @@ use warnings;
 use utf8;
 
 package Devel::PerlySense::Config::Project::Default;
-$Devel::PerlySense::Config::Project::Default::VERSION = '0.0219';
+$Devel::PerlySense::Config::Project::Default::VERSION = '0.0220';
 use base "Devel::PerlySense::Config::Project";
 
 

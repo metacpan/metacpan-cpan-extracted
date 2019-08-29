@@ -1,0 +1,42 @@
+# Avoid git files.
+\B\.git\b
+\B\.gitignore\b
+\B\.gitmodules\b
+
+# Avoid Makemaker generated and utility files.
+\bMANIFEST\.bak
+\bMakefile$
+\bblib/
+\bMakeMaker-\d
+\bpm_to_blib\.ts$
+\bpm_to_blib$
+\bblibdirs\.ts$         # 6.18 through 6.25 generated this
+
+# Avoid temp and backup files.
+~$
+\.old$
+\#$
+\b\.#
+\.bak$
+\.tmp$
+\.#
+\.rej$
+
+# Avoid OS-specific files/dirs
+# Mac OSX metadata
+\B\.DS_Store
+# Mac OSX SMB mount metadata files
+\B\._
+
+# Avoid MYMETA files
+^MYMETA\.
+
+# Debug settings
+^debug.sh
+
+# Avoid Emacs settings, temporary directories and tar archives.
+\B\.emacs.*
+tmp/
+\.tar
+\.tar\..*
+\.tmp

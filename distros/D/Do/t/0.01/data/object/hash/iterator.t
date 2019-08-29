@@ -3,7 +3,8 @@ use warnings;
 use Test::More;
 
 use_ok 'Data::Object::Hash';
-can_ok 'Data::Object::Hash', 'iterator';
+# deprecated
+# can_ok 'Data::Object::Hash', 'iterator';
 
 use Scalar::Util 'refaddr';
 

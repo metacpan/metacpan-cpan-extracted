@@ -22,7 +22,8 @@ my $builder = Module::Build->new(
 );
 
 if ($^O ne 'MSWin32') {
-	$builder->extra_linker_flags('-lpthread');
+	$builder->extra_compiler_flags('-pthread');
+	$builder->extra_linker_flags('-pthread');
 }
 
 $builder->create_build_script();

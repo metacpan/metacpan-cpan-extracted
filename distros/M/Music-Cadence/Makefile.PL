@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Moo" => 2,
     "Music::Chord::Note" => 0,
+    "Music::Note" => 0,
     "Music::Scales" => 0,
     "Music::ToRoman" => 0,
     "namespace::clean" => 0,
@@ -33,7 +34,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.0504",
+  "VERSION" => "0.0601",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,6 +47,7 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "Moo" => 2,
   "Music::Chord::Note" => 0,
+  "Music::Note" => 0,
   "Music::Scales" => 0,
   "Music::ToRoman" => 0,
   "Test::Exception" => 0,

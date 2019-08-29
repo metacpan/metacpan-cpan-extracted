@@ -10,7 +10,7 @@ use Test2::API qw{
 
 use Time::HiRes qw/time/;
 
-our $VERSION = '0.000125';
+our $VERSION = '0.000126';
 
 my $ADDED_HOOK = 0;
 my $START;
@@ -62,6 +62,13 @@ __END__
 =head1 NAME
 
 Test2::Plugin::Times - Output timing data at the end of the test.
+
+=head1 CAVEAT
+
+It is important to note that this timing data does not include global
+destruction. This data is only collected up until the point done_testing() is
+called. If your program takes time for END blocks, garbage collection, and
+similar, then this timing data will fall short of reality.
 
 =head1 DESCRIPTION
 

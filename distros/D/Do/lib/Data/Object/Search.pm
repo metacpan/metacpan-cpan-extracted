@@ -1,19 +1,23 @@
 package Data::Object::Search;
 
-use parent 'Data::Object::Array';
+use 5.014;
+
+use strict;
+use warnings;
 
 use overload (
-  '""'     => 'data',
-  '~~'     => 'data',
-  'bool'   => 'data',
+  '""'     => 'detract',
+  '~~'     => 'detract',
+  'bool'   => 'detract',
   'qr'     => 'regexp',
   '@{}'    => 'self',
   fallback => 1
 );
 
-our $VERSION = '1.05'; # VERSION
+use parent 'Data::Object::Array';
 
-# BUILD
+our $VERSION = '1.07'; # VERSION
+
 # METHODS
 
 sub captures {
@@ -33,37 +37,37 @@ sub captures {
     push @captures, substr "$string", $start, $end - $start;
   }
 
-  return Data::Object::Export::deduce_deep([@captures]);
+  return $self->deduce([@captures]);
 }
 
 sub count {
   my ($self) = @_;
 
-  return Data::Object::Export::deduce_deep($self->[2]);
+  return $self->deduce($self->[2]);
 }
 
 sub initial {
   my ($self) = @_;
 
-  return Data::Object::Export::deduce_deep($self->[6]);
+  return $self->deduce($self->[6]);
 }
 
 sub last_match_end {
   my ($self) = @_;
 
-  return Data::Object::Export::deduce_deep($self->[4]);
+  return $self->deduce($self->[4]);
 }
 
 sub last_match_start {
   my ($self) = @_;
 
-  return Data::Object::Export::deduce_deep($self->[3]);
+  return $self->deduce($self->[3]);
 }
 
 sub named_captures {
   my ($self) = @_;
 
-  return Data::Object::Export::deduce_deep($self->[5]);
+  return $self->deduce($self->[5]);
 }
 
 sub matched {
@@ -77,7 +81,7 @@ sub matched {
   my $start = $last_match_start->[0] || 0;
   my $end   = $last_match_end->[0]   || 0;
 
-  return Data::Object::Export::deduce_deep(substr "$string", $start, $end - $start);
+  return $self->deduce(substr "$string", $start, $end - $start);
 }
 
 sub prematched {
@@ -91,7 +95,7 @@ sub prematched {
   my $start = $last_match_start->[0] || 0;
   my $end   = $last_match_end->[0]   || 0;
 
-  return Data::Object::Export::deduce_deep(substr "$string", 0, $start);
+  return $self->deduce(substr "$string", 0, $start);
 }
 
 sub postmatched {
@@ -105,19 +109,19 @@ sub postmatched {
   my $start = $last_match_start->[0] || 0;
   my $end   = $last_match_end->[0]   || 0;
 
-  return Data::Object::Export::deduce_deep(substr "$string", $end);
+  return $self->deduce(substr "$string", $end);
 }
 
 sub regexp {
   my ($self) = @_;
 
-  return Data::Object::Export::deduce_deep($self->[0]);
+  return $self->deduce($self->[0]);
 }
 
 sub string {
   my ($self) = @_;
 
-  return Data::Object::Export::deduce_deep($self->[1]);
+  return $self->deduce($self->[1]);
 }
 
 1;
@@ -374,9 +378,11 @@ terms as the Perl 5 programming language system itself.
 
 =head1 PROJECT
 
-L<GitHub|https://github.com/iamalnewkirk/do>
+L<On GitHub|https://github.com/iamalnewkirk/do>
 
-L<Contributing|https://github.com/iamalnewkirk/do/blob/master/README-DEVEL.mkdn>
+L<Initiatives|https://github.com/iamalnewkirk/do/projects>
+
+L<Contributing|https://github.com/iamalnewkirk/do/blob/master/CONTRIBUTE.mkdn>
 
 L<Reporting|https://github.com/iamalnewkirk/do/issues>
 

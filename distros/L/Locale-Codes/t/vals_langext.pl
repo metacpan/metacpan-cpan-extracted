@@ -10,31 +10,31 @@ $::tests = '';
 
 $::tests = "
 
-2code
-Mesopotamian Arabic
-   acm
+2code 'Mesopotamian Arabic' => acm
 
-2name
-acm
-   Mesopotamian Arabic
+2name acm => 'Mesopotamian Arabic'
 
-code2code
-ACM
-alpha
-alpha
-   acm
+code2code ACM alpha alpha => acm
 
-all_codes
-2
-   ~
-   aao
-   abh
+all_codes 2 => aao abh
 
-all_names
-2
-   ~
-   Adamorobe Sign Language
-   Afghan Sign Language
+all_names 2 => 'Adamorobe Sign Language' 'Afghan Sign Language'
+
+rename AAA newCode2 => 'ERROR: _code: code not in codeset: aaa [alpha]'
+
+add AAA newCode => 1
+
+delete AAA => 1
+
+add_alias FooBar NewName        => 'ERROR: add_alias: name does not exist: FooBar'
+
+delete_alias Foobar             => 'ERROR: delete_alias: name does not exist: Foobar'
+
+replace_code Foo Bar => 'ERROR: _code: code not in codeset: foo [alpha]'
+
+add_code_alias Foo Bar => 'ERROR: _code: code not in codeset: foo [alpha]'
+
+delete_code_alias Foo => 'ERROR: _code: code not in codeset: foo [alpha]'
 
 ";
 

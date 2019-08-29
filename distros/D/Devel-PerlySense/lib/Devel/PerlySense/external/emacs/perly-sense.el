@@ -894,7 +894,7 @@ at point. Default to a sensible ack command line.
 Look for 'method', 'sub', 'has' (somehwat simplistic atm).
 "
   (interactive)
-  (ps/find-project-method-regex-at-point "^\\s*(sub|method|has)\\s+%s\\b")
+  (ps/find-project-method-regex-at-point "^\\s*(sub|method|has)\\s+[\"']?\\+?%s\\b")
 )
 
 
@@ -1239,7 +1239,7 @@ If a Magit buffer is found, magit-refresh it before returning it.
   there isn't one."
   (save-excursion
     (end-of-line)
-    (if (search-backward-regexp "^ *\\bpackage +\\([a-zA-Z0-9:]+\\)" nil t)
+    (if (search-backward-regexp "^ *\\bpackage +\\([a-zA-Z0-9:_]+\\)" nil t)
         (let (( package-name (match-string 1) ))
           package-name)
       nil)))
@@ -1280,6 +1280,35 @@ display it in the echo area"
           (message "Copied sub name '%s'" sub-name)
           )
       (error "No sub found")
+      )
+    )
+  )
+
+(defun ps/current-method-name ()
+  "Return the 'name' of the current method, i.e. the
+__PACKAGE__->SUB name, or nil if none was found."
+  (save-excursion
+    (let* ((package-name (ps/current-package-name))
+           (sub-name (ps/current-sub-name)))
+      (if (and package-name sub-name)
+          (format "%s->%s" package-name sub-name)
+        nil
+        )
+      )
+    )
+  )
+
+(defun ps/edit-copy-method-name ()
+  "Copy (put in the kill-ring) the name of the current method,
+and display it in the echo area"
+  (interactive)
+  (let ((method-name (ps/current-method-name)))
+    (if method-name
+        (progn
+          (kill-new method-name)
+          (message "Copied method name '%s'" method-name)
+          )
+      (error "No method found")
       )
     )
   )
@@ -2666,6 +2695,7 @@ Return t if found, else nil."
 (global-set-key (format "%secp" ps/key-prefix) 'ps/edit-copy-package-name)
 (global-set-key (format "%secP" ps/key-prefix) 'ps/edit-copy-package-name-from-file)
 (global-set-key (format "%secs" ps/key-prefix) 'ps/edit-copy-sub-name)
+(global-set-key (format "%secm" ps/key-prefix) 'ps/edit-copy-method-name)
 (global-set-key (format "%secf" ps/key-prefix) 'ps/edit-copy-file-name)
 (global-set-key (format "%semu" ps/key-prefix) 'ps/edit-move-use-statement)
 (global-set-key (format "%seau" ps/key-prefix) 'ps/edit-add-use-statement)

@@ -7,7 +7,6 @@ use warnings;
 use App::ElasticSearch::Utilities qw(:all);
 use CLI::Helpers qw(:all);
 use Getopt::Long qw(:config no_ignore_case no_ignore_case_always);
-use Hash::Flatten qw(flatten);
 use Pod::Usage;
 use POSIX qw(ceil);
 
@@ -124,7 +123,7 @@ foreach my $index (sort @indices) {
             last if $skipped;
         }
         if( $skipped ) {
-            verbose({color=>'blue'},"$index contains a skipped alias: $skipped");
+            output("$index contains a skipped alias: $skipped");
             next;
         }
     }
@@ -241,7 +240,7 @@ es-daily-index-maintenance.pl - Run to prune old indexes and optimize existing
 
 =head1 VERSION
 
-version 7.1
+version 7.2
 
 =head1 SYNOPSIS
 

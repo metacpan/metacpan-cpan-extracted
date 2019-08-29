@@ -4,7 +4,7 @@
       "Sergey Poznyakoff <gray@gnu.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -19,14 +19,36 @@
          "inc"
       ]
    },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Config::AST" : "1.05",
+            "Data::Dumper" : "2.135_06",
+            "File::Temp" : "0.22",
+            "Text::Locus" : "1.01",
+            "Text::ParseWords" : "3.26",
+            "perl" : "5.016001"
+         }
+      }
+   },
    "provides" : {
       "Config::Parser" : {
          "file" : "lib/Config/Parser.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Config::Parser::Ini" : {
-         "file" : "lib/Config/Parser/Ini.pm",
-         "version" : 0
+         "file" : "lib/Config/Parser/Ini.pm"
       }
    },
    "release_status" : "stable",
@@ -37,5 +59,6 @@
          "web" : "http://git.gnu.org.ua/cgit/config-parser.git/"
       }
    },
-   "version" : "1.03"
+   "version" : "1.04",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

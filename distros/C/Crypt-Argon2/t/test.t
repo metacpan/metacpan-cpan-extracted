@@ -18,9 +18,6 @@ sub hashtest {
 hashtest(2, '64M', 1, 'password', 'somesalt',
 	'c1628832147d9720c5bd1cfd61367078729f6dfb6f8fea9ff98158e0d7816ed0',
 	'$argon2i$v=19$m=65536,t=2,p=1$c29tZXNhbHQ$wWKIMhR9lyDFvRz9YTZweHKfbftvj+qf+YFY4NeBbtA');
-hashtest(2, '1G', 1, 'password', 'somesalt',
-	'd1587aca0922c3b5d6a83edab31bee3c4ebaef342ed6127a55d19b2351ad1f41',
-	'$argon2i$v=19$m=1048576,t=2,p=1$c29tZXNhbHQ$0Vh6ygkiw7XWqD7asxvuPE667zQu1hJ6VdGbI1GtH0E') if $ENV{EXTENDED_TESTING};
 hashtest(2, '256M', 1, 'password', 'somesalt',
 	'296dbae80b807cdceaad44ae741b506f14db0959267b183b118f9b24229bc7cb',
 	'$argon2i$v=19$m=262144,t=2,p=1$c29tZXNhbHQ$KW266AuAfNzqrUSudBtQbxTbCVkmexg7EY+bJCKbx8s');
@@ -42,5 +39,8 @@ hashtest(2, '64M', 1, 'differentpassword', 'somesalt',
 hashtest(2, '64M', 1, 'password', 'diffsalt',
 	'b0357cccfbef91f3860b0dba447b2348cbefecadaf990abfe9cc40726c521271',
 	'$argon2i$v=19$m=65536,t=2,p=1$ZGlmZnNhbHQ$sDV8zPvvkfOGCw26RHsjSMvv7K2vmQq/6cxAcmxSEnE');
+hashtest(2, '1G', 1, 'password', 'somesalt',
+	'd1587aca0922c3b5d6a83edab31bee3c4ebaef342ed6127a55d19b2351ad1f41',
+	'$argon2i$v=19$m=1048576,t=2,p=1$c29tZXNhbHQ$0Vh6ygkiw7XWqD7asxvuPE667zQu1hJ6VdGbI1GtH0E') if $ENV{EXTENDED_TESTING};
 
 done_testing();

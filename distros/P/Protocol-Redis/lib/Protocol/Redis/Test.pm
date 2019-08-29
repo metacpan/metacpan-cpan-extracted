@@ -26,7 +26,7 @@ sub _apiv1_ok {
     my $redis_class = shift;
 
     subtest 'Protocol::Redis APIv1 ok' => sub {
-        plan tests => 39;
+        plan tests => 43;
 
         use_ok $redis_class;
 
@@ -116,8 +116,8 @@ sub _parse_bulk_ok {
     # Nil bulk message
     $redis->parse("\$-1\r\n");
 
-    is_deeply $redis->get_message,
-      {type => '$', data => undef},
+    my $message = $redis->get_message;
+    ok defined($message) && !defined($message->{data}),
       'nil bulk message';
 
     # Two chunked bulk messages
@@ -165,8 +165,8 @@ sub _parse_multi_bulk_ok {
       'multi-bulk empty result';
 
     $redis->parse("*-1\r\n");
-    is_deeply $redis->get_message,
-      {type => '*', data => undef},
+    my $message = $redis->get_message;
+    ok defined($message) && !defined($message->{data}),
       'multi-bulk nil result';
 
     # Does it work?
@@ -189,6 +189,39 @@ sub _parse_multi_bulk_ok {
     is_deeply $redis->get_message,
       {type => '*', data => [{type => '$', data => 'test'}]};
     is_deeply $redis->get_message, {type => '+', data => 'OK'};
+
+    # Another splitted multi-bulk message
+    $redis->parse("*4\r\n\$-1\r\n\$-1");
+    $redis->parse("\r\n\$5\r\ntest2\r\n");
+    $redis->parse("\$5\r\ntest3\r");
+    $redis->parse("\n");
+    is_deeply $redis->get_message, {
+        type => '*',
+        data => [
+            {type => '$', data => undef},
+            {type => '$', data => undef},
+            {type => '$', data => 'test2'},
+            {type => '$', data => 'test3'}
+        ]
+    };
+
+    # Complex string
+    $redis->parse("\*4\r\n");
+    $redis->parse("\$5\r\ntest1\r\n\$-1\r\n:test2\r\n+test3\r\n\$5\r\n123");
+    $redis->parse("45\r\n");
+    is_deeply $redis->get_message, {
+        type => '*',
+        data => [
+            {type => '$', data => 'test1'},
+            {type => '$', data => undef},
+            {type => ':', data => 'test2'},
+            {type => '+', data => 'test3'}
+        ]
+    };
+    is_deeply $redis->get_message, {
+        type => '$',
+        data => '12345',
+    };
 
     # pipelined multi-bulk
     $redis->parse(
@@ -249,6 +282,8 @@ sub _encode_ok {
     # Encode bulk message
     is $redis->encode({type => '$', data => 'test'}), "\$4\r\ntest\r\n",
       'encode bulk';
+    is $redis->encode({type => '$', data => "\0\r\n"}), "\$3\r\n\0\r\n\r\n",
+      'encode binary bulk';
     is $redis->encode({type => '$', data => undef}), "\$-1\r\n",
       'encode nil bulk';
 

@@ -1,6 +1,7 @@
 requires "DBI::Profile" => "0";
 requires "Test2::API" => "1.302165";
 requires "Test2::Event::V2" => "1.302165";
+requires "Test2::Util::Times" => "0.000126";
 requires "perl" => "5.008009";
 
 on 'test' => sub {

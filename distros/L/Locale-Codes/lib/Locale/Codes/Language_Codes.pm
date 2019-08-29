@@ -3,7 +3,7 @@ Locale::Codes::Language_Codes;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'harvest_data' is run.
-#    Generated on: Tue May 28 14:04:43 EDT 2019
+#    Generated on: Thu Aug 29 15:06:47 EDT 2019
 
 use strict;
 require 5.006;
@@ -11,7 +11,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='3.61';
+$VERSION='3.62';
 
 $Locale::Codes::Data{'language'}{'id'} = '7974';
 
@@ -14816,7 +14816,7 @@ $Locale::Codes::Data{'language'}{'id2names'} = {
       q(Ngbaka Manza),
       ],
    q(4835) => [
-      q(NÇng),
+      q(Ning),
       ],
    q(4836) => [
       q(Ngizim),
@@ -45310,6 +45310,10 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
       q(5142),
       q(0),
       ],
+   q(ning) => [
+      q(4835),
+      q(0),
+      ],
    q(ningera) => [
       q(4755),
       q(0),
@@ -46424,10 +46428,6 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
       ],
    q(nzima) => [
       q(0326),
-      q(0),
-      ],
-   q(nÇng) => [
-      q(4835),
       q(0),
       ],
    q(o'chi'chi') => [

@@ -10,32 +10,31 @@ $::tests = '';
 
 $::tests = "
 
-2code
-Apache languages
-   ~
-   apa
+2code 'Apache languages' => apa
 
-2name
-apa
-   Apache languages
+2name apa => 'Apache languages'
 
-code2code
-apa
-alpha
-alpha
-   apa
+code2code apa alpha alpha => apa
 
-all_codes
-2
-   ~
-   aav
-   afa
+all_codes 2 => aav afa
 
-all_names
-2
-   ~
-   Afro-Asiatic languages
-   Alacalufan languages
+all_names 2 => 'Afro-Asiatic languages' 'Alacalufan languages'
+
+rename AAA newCode2 => 'ERROR: _code: code not in codeset: aaa [alpha]'
+
+add AAA newCode => 1
+
+delete AAA => 1
+
+add_alias FooBar NewName        => 'ERROR: add_alias: name does not exist: FooBar'
+
+delete_alias Foobar             => 'ERROR: delete_alias: name does not exist: Foobar'
+
+replace_code Foo Bar => 'ERROR: _code: code not in codeset: foo [alpha]'
+
+add_code_alias Foo Bar => 'ERROR: _code: code not in codeset: foo [alpha]'
+
+delete_code_alias Foo => 'ERROR: _code: code not in codeset: foo [alpha]'
 
 ";
 

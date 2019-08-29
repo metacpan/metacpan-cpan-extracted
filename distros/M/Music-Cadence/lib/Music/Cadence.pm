@@ -3,10 +3,11 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Provide musical cadence chords
 
-our $VERSION = '0.0504';
+our $VERSION = '0.0601';
 
 use Moo;
 use Music::Chord::Note;
+use Music::Note;
 use Music::Scales;
 use Music::ToRoman;
 
@@ -34,7 +35,7 @@ has octave => (
 
 has format => (
     is      => 'ro',
-    default => sub { '' },
+    default => sub { 'isobase' },
 );
 
 
@@ -129,10 +130,16 @@ sub _generate_chord {
             s/b/f/;
         }
     }
+    elsif ( $self->format eq 'midinum' ) {
+        @notes = map { Music::Note->new( $_ . $octave, 'ISO' )->format('midinum') } @notes;
+    }
+    elsif ( $self->format ne 'isobase' ) {
+        die 'unknown format';
+    }
 
     # Append the octave if requested
     @notes = map { $_ . $octave } @notes
-        if $octave;
+        if $octave && $self->format ne 'midinum';
 
     return \@notes;
 }
@@ -151,7 +158,7 @@ Music::Cadence - Provide musical cadence chords
 
 =head1 VERSION
 
-version 0.0504
+version 0.0601
 
 =head1 SYNOPSIS
 
@@ -190,6 +197,15 @@ version 0.0504
   $chords = $mc->cadence( type => 'perfect' );
   # [['Gs5','C5','Ds5'], ['Cs5','F5','Gs5']]
 
+  $mc = Music::Cadence->new(
+    key    => 'C',
+    octave => 4,
+    format => 'midinum',
+  );
+
+  $chords = $mc->cadence( type => 'perfect' );
+  # [[67,71,62], [60,64,67]]
+
 =head1 DESCRIPTION
 
 C<Music::Cadence> provides musical cadence chords.
@@ -221,13 +237,25 @@ Supported scales are:
 
 =head2 octave
 
-The octave to append to chord notes.  Default: C<0> meaning "do not
-append."
+The octave to either append to named chord notes (for C<midi> or
+C<isobase> format) or to determine the correct C<midinum> note number.
+
+Default: C<0>
+
+If the B<format> is C<midi> or C<isobase>, setting this to C<0> means
+"do not append."
+
+The C<midinum> range for this attribute is from C<-1> to C<10>.
 
 =head2 format
 
+The output format to use.  Default: C<isobase> (i.e. "bare note
+names")
+
 If C<midi>, convert sharp C<#> to C<s> and flat C<b> to C<f> after
-chord generation.  Default: C<''> (none)
+chord generation.
+
+If C<midinum>, convert notes to their numerical MIDI equivalents.
 
 =head1 METHODS
 
@@ -294,6 +322,8 @@ L<Moo>
 
 L<Music::Chord::Note>
 
+L<Music::Note>
+
 L<Music::Scales>
 
 L<Music::ToRoman>
@@ -303,6 +333,8 @@ L<https://en.wikipedia.org/wiki/Cadence>
 L<https://www.musictheoryacademy.com/how-to-read-sheet-music/cadences/>
 
 =head1 TO DO
+
+Use L<Music::Chord::Positions>!
 
 Evaded cadence
 

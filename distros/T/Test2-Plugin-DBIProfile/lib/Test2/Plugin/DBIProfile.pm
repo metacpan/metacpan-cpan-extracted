@@ -2,10 +2,11 @@ package Test2::Plugin::DBIProfile;
 use strict;
 use warnings;
 
-our $VERSION = '0.002002';
+our $VERSION = '0.002003';
 
 use DBI::Profile qw/dbi_profile_merge_nodes/;
 use Test2::API qw/test2_add_callback_exit/;
+use Test2::Util::Times qw/render_duration/;
 
 my $ADDED_HOOK = 0;
 
@@ -37,7 +38,6 @@ sub send_profile_event {
     my ($summary) = $p->format;
 
     my @totals;
-    use Data::Dumper;
     dbi_profile_merge_nodes(\@totals, $data);
     my ($count, $time) = @totals;
 
@@ -48,7 +48,7 @@ sub send_profile_event {
         info  => [{tag => 'DBI-PROF', details => $summary}],
 
         harness_job_fields => [
-            {name => "dbi_time",  details => $time},
+            {name => "dbi_time",  details => render_duration($time), raw => $time},
             {name => "dbi_calls", details => $count},
         ],
     );

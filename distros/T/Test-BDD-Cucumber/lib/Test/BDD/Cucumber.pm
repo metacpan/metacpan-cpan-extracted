@@ -1,5 +1,5 @@
 package Test::BDD::Cucumber;
-$Test::BDD::Cucumber::VERSION = '0.58';
+$Test::BDD::Cucumber::VERSION = '0.59';
 use strict;
 use warnings;
 1;
@@ -12,23 +12,73 @@ Test::BDD::Cucumber - Feature-complete Cucumber-style testing in Perl
 
 =head1 VERSION
 
-version 0.58
+version 0.59
+
+=head1 SYNOPSIS
+
+
+   # Driving tests using the 'pherkin' binary that comes with the distribution
+   $ pherkin -l -b t/
+
+   # Or choose a subset of tests to be run by selecting all scenarios tagged 'slow'
+   $ pherkin -l -b --tags @slow t/
+
+   # Or all those /not/ tagged 'slow'
+   $ pherkin -l -b --tags ~@slow
+
+
+   # Driving tests using 'prove' integration
+   $ prove --source Feature --ext=.feature t/
+
+   # Driving parallel tests using 'prove'
+   $ prove --source Feature -j 9 --ext=.feature t/
+
 
 =head1 DESCRIPTION
 
-A sane and complete Cucumber implementation in Perl
+A complete Cucumber implementation in Perl
+
+The implementation supports the following Gherkin keywords in feature files:
+C<Feature>, C<Scenario>, C<Scenario Outline>, C<Examples>, C<Given>, C<When>,
+C<Then>, C<And> and C<But>. Additionally, C<Scenario> can be used as a synonym
+for C<Scenario Outline> (with C<Examples>). This best maps to
+L<Gherkin version 6.0.13|https://github.com/cucumber/cucumber/blob/master/gherkin/CHANGELOG.md#6013---2018-09-25>,
+but without support for its new C<Rule> and C<Example> keywords.
+
+This implementation supports the same languages as Gherkin 7.0.3 - that is, it
+supports exactly the same translated keywords.
 
 Behaviour of this module is similar to that, but sometimes different from
-the I<real> Cucumber, the plan is to move use the same parser and behaviour
-L<See the logged issue|https://github.com/pherkin/test-bdd-cucumber-perl/issues/73>.
+the I<real> Cucumber, the plan is to move use the same parser and behaviour.
 
-=head1 QUICK LINKS
 
-See this distribution: L<Cucumber on Perl on MetaCPAN|https://metacpan.org/release/Test-BDD-Cucumber>
+=head1 GETTING STARTED
+
+This module comes with a few introductory tutorials.
+
+=over 4
+
+=item * L<A Cucumber feature writing tutorial|Test::BDD::Cucumber::Manual::Tutorial>
+
+for those new to Cucumber and BDD testing
+
+=item * L<A Step writing tutorial|Test::BDD::Cucumber::Manual::Steps>
+
+to get you started writing the code run for each C<Given>, C<Then>, C<When> step
+
+=item * L<A guide on integrating with your test suite|Test::BDD::Cucumber::Manual::Integration>
+
+=item * L<An architecture overview|Test::BDD::Cucumber::Manual::Architecture>
+
+for those who want to extend or hook into feature file execution
+
+=item * Documentation of the command-line tool L<App::pherkin>
+
+=back
 
 =begin html
 
-You can talk to the author(s) here: <a
+If you have problems getting started, you can talk to the author(s) here: <a
 href="https://gitter.im/pjlsergeant/test-bdd-cucumber-perl"><img
     src="https://badges.gitter.im/pjlsergeant/test-bdd-cucumber-perl.svg"
     alt="Chat on Gitter"
@@ -36,39 +86,35 @@ href="https://gitter.im/pjlsergeant/test-bdd-cucumber-perl"><img
 
 =end html
 
-=head1 NEXT STEPS
-
-If you are B<completely new to Cucumber>, you'd get a pretty overview from
-reading our short and crunchy L<Tutorial|Test::BDD::Cucumber::Manual::Tutorial>.
-
-If you B<already understand Cucumber>, and just want to get started then you
-should read the L<Step-writing quick-start
-guide|Test::BDD::Cucumber::Manual::Steps>, the documentation for our
-command-line tool L<App::pherkin>, and L<How to integrate with
-Test::Builder|Test::BDD::Cucumber::Manual::Integration>.
-
-If you B<want to extend or integrated Test::BDD::Cucumber> then you'd probably
-be more interested in our L<Architecture
-overview|Test::BDD::Cucumber::Manual::Architecture>.
-
-=head1 TEN SECOND GUIDE TO USING THIS IN YOUR CI ENVIRONMENT
-
-Don't use the command-line tool, L<App::pherkin>, for integration in your
-CI environment. Instead, look at the L<How to integrate with
-Test::Builder|Test::BDD::Cucumber::Manual::Integration> document.
-
-=head1 BUGS, MISSING, AND LIMITATIONS
+=head1 BUGS AND LIMITATIONS
 
 For current bugs, check the issue tracer at GitHub:
+L<https://github.com/pherkin/test-bdd-cucumber-perl/issues>
 
-  L<https://github.com/pjlsergeant/test-bdd-cucumber-perl/issues>
+Two things need specific mentioning:
 
-Since Test::BDD::Cucumber uses its own parser, differences probably exist
+=over 4
+
+=item * No support for Test2 in Step files at the moment
+
+While this support is planned, currently, there's only support for Test::Builder
+based test modules (e.g. Test::Exception, Test::Differences, Test::More, etc)
+
+=item * Due to the use of its own parser, differences probably exist
 in the intepretation of feature files when comparing to Cucumber.
 
-=head1 CODE
+Also L<see the issue|https://github.com/pherkin/test-bdd-cucumber-perl/issues/73> for
+tracking this topic.
+
+=back
+
+=head1 SOURCE
 
 On Github, of course: L<https://github.com/pherkin/test-bdd-cucumber-perl>.
+
+=head1 SEE ALSO
+
+L<Gherkin> - A Gherkin parser and compiler
 
 =head1 AUTHORS
 

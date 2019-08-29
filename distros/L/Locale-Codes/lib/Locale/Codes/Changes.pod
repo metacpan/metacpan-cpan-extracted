@@ -26,7 +26,32 @@ do a release any time the standards change.
 
 =head1 VERSION 3.63  (planned 2019-12-01  sbeck)
 
-=head1 VERSION 3.62  (planned 2019-09-01  sbeck)
+=head1 VERSION 3.62  (2019-08-29  sbeck)
+
+=over 4
+
+=item NEW CODE(s)
+
+=item Fixed tests
+
+Tests were not working correctly since the previous version.  This is now fixed.
+
+=item Fixed error messages
+
+Many of the error messages were inconsistent or completely wrong (due to cut-and-paste
+errors).  They have been fixed.
+
+=item Fixed some return codes
+
+The name2code and code2name functions returned 1 in the case of an error in some
+situations instead of undef (which was the documented value).
+
+=item Removed unnecessary dependencies
+
+A number of modules were included as test dependencies that are only used by the author
+when preparing releases.  These have been removed as dependencies.  Petr Pisar on GitHub #11
+
+=back
 
 =head1 VERSION 3.61  (2019-06-01  sbeck)
 

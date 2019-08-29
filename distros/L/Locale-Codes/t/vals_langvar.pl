@@ -8,35 +8,39 @@ use strict;
 
 $::tests = '';
 
-$::tests = "
+$::tests = qq{
 
-2code
-Auvergnat
-   auvern
+2code Auvergnat => auvern
 
-2name
-auvern
-   Auvergnat
+2name auvern => Auvergnat
 
-code2code
-auvern
-alpha
-alpha
-   auvern
+code2code auvern alpha alpha => auvern
 
-all_codes
-2
-   ~
-   1606nict
-   1694acad
+all_codes 2 => 1606nict 1694acad
 
 all_names
 2
-   ~
-   \"Academic\" (\"governmental\") variant of Belarusian as codified in 1959
-   ALA-LC Romanization, 1997 edition
+   =>
+   '"Academic" ("governmental") variant of Belarusian as codified in 1959'
+   'ALA-LC Romanization, 1997 edition'
 
-";
+rename AAA newCode2 => 'ERROR: _code: code not in codeset: aaa [alpha]'
+
+add AAA newCode => 1
+
+delete AAA => 1
+
+add_alias FooBar NewName        => 'ERROR: add_alias: name does not exist: FooBar'
+
+delete_alias Foobar             => 'ERROR: delete_alias: name does not exist: Foobar'
+
+replace_code Foo Bar => 'ERROR: _code: code not in codeset: foo [alpha]'
+
+add_code_alias Foo Bar => 'ERROR: _code: code not in codeset: foo [alpha]'
+
+delete_code_alias Foo => 'ERROR: _code: code not in codeset: foo [alpha]'
+
+};
 
 1;
 # Local Variables:

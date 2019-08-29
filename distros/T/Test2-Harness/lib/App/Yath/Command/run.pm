@@ -2,7 +2,7 @@ package App::Yath::Command::run;
 use strict;
 use warnings;
 
-our $VERSION = '0.001085';
+our $VERSION = '0.001087';
 
 use Test2::Harness::Feeder::Run;
 use Test2::Harness::Util::File::JSON;
@@ -71,7 +71,6 @@ sub run {
         $jobs{$item->{job_id}} = 1;
 
         $item->{args}        = $settings->{pass}        if defined $settings->{pass}        && !defined $item->{args};
-        $item->{times}       = $settings->{times}       if defined $settings->{times}       && !defined $item->{times};
         $item->{load}        = $settings->{load}        if defined $settings->{load}        && !defined $item->{load};
         $item->{load_import} = $settings->{load_import} if defined $settings->{load_import} && !defined $item->{load_import};
         $item->{env_vars}    = $settings->{env_vars}    if defined $settings->{env_vars}    && !defined $item->{env_vars};
@@ -393,12 +392,6 @@ Do not use stream
 Use TAP
 
 The TAP format is lossy and clunky. Test2::Harness normally uses a newer streaming format to receive test results. There are old/legacy tests where this causes problems, in which case setting --TAP or --no-stream can help.
-
-=item --times
-
-Monitor timing data for each test file
-
-This tells perl to load Test2::Plugin::Times before starting each test. Use -T to show the timing data
 
 =item --unsafe-inc
 

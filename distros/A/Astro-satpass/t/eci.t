@@ -6,7 +6,7 @@ use warnings;
 use lib qw{ inc };
 
 use Astro::Coord::ECI;
-use Astro::Coord::ECI::Utils qw{ :time deg2rad PERL2000 rad2deg };
+use Astro::Coord::ECI::Utils qw{ :time deg2rad PERL2000 PI rad2deg };
 use My::Module::Test qw{ :tolerance velocity_sanity };
 use POSIX qw{strftime floor};
 use Test::More 0.88;
@@ -833,6 +833,19 @@ ok( ! Astro::Coord::ECI->represents( 'Astro::Coord::ECI::TLE' ),
     my @coord = qw{ X Y Z X_dot Y_dot Z_dot };
     foreach my $inx ( 0 .. 5 ) {
 	tolerance $got[$inx], $want[$inx], 1e-12, $coord[$inx];
+    }
+}
+
+{
+    local $@ = undef;
+    my $eci = Astro::Coord::ECI->new();
+
+    if ( eval { $eci->set( twilight => PI ); 1 } ) {
+	fail 'Should not be able to set twilight to PI';
+    } elsif ( $@ =~ m/ \Qinvalid value for 'twilight'\E /smx ) {
+	pass 'Setting twilight to PI threw correct exception';
+    } else {
+	fail "Setting twilight to PI threw incorrect exception '$@'";
     }
 }
 

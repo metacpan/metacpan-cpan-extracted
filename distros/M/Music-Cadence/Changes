@@ -1,5 +1,14 @@
 Revision history for Music-Cadence
 
+0.0601 2019-08-29 10:49:02
+    - Improve documentation.
+    - Remove octave setting for midinum.
+    - Update the test cases.
+
+0.0600 2019-08-28 20:41:25
+    - Add the "midinum" output format.
+    - Improve documentation.
+
 0.0504 2019-08-25 22:58:32
     - Update the module SYNOPSIS.
     - Comment eg/cadence a bit.

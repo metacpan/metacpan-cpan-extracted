@@ -91,7 +91,7 @@ use warnings;
 use utf8;
 
 our(\$VERSION);
-\$VERSION='3.61';
+\$VERSION='3.62';
 
 ";
 

@@ -87,7 +87,7 @@ interface.
 
 When using a version of perl older than 5.10, this is the only
 interface available.  This interface is documented in the
-L<Date::Manip::DM5 document>.  This interface has several weaknesses that
+L<Date::Manip::DM5> document.  This interface has several weaknesses that
 need to be understood when using it:
 
 =over 4

@@ -3,7 +3,8 @@ use warnings;
 use Test::More;
 
 use_ok 'Data::Object::String';
-can_ok 'Data::Object::String', 'words';
+# deprecated
+# can_ok 'Data::Object::String', 'words';
 
 use Scalar::Util 'refaddr';
 

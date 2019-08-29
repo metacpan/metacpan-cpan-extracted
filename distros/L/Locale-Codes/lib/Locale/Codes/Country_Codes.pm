@@ -3,7 +3,7 @@ Locale::Codes::Country_Codes;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'harvest_data' is run.
-#    Generated on: Tue May 28 14:04:15 EDT 2019
+#    Generated on: Thu Aug 29 15:08:38 EDT 2019
 
 use strict;
 require 5.006;
@@ -11,7 +11,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='3.61';
+$VERSION='3.62';
 
 $Locale::Codes::Data{'country'}{'id'} = '0280';
 
@@ -639,8 +639,6 @@ $Locale::Codes::Data{'country'}{'id2names'} = {
       ],
    q(0165) => [
       q(North Macedonia),
-      q(MACEDONIA),
-      q(Macedonia, The former Yugoslav Republic of),
       ],
    q(0166) => [
       q(Northern Mariana Islands),
@@ -2022,14 +2020,6 @@ $Locale::Codes::Data{'country'}{'alias2id'} = {
    q(macau s.a.r.) => [
       q(0132),
       q(4),
-      ],
-   q(macedonia) => [
-      q(0165),
-      q(1),
-      ],
-   q(macedonia, the former yugoslav republic of) => [
-      q(0165),
-      q(2),
       ],
    q(madagascar) => [
       q(0133),
@@ -6711,7 +6701,7 @@ $Locale::Codes::Data{'country'}{'code2id'} = {
          ],
       q(MK) => [
          q(0165),
-         q(1),
+         q(0),
          ],
       q(ML) => [
          q(0137),
@@ -7813,7 +7803,7 @@ $Locale::Codes::Data{'country'}{'code2id'} = {
          ],
       q(MKD) => [
          q(0165),
-         q(1),
+         q(0),
          ],
       q(MLI) => [
          q(0137),
@@ -9235,7 +9225,7 @@ $Locale::Codes::Data{'country'}{'code2id'} = {
          ],
       q(807) => [
          q(0165),
-         q(1),
+         q(0),
          ],
       q(818) => [
          q(0066),

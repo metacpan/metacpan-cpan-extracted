@@ -29,7 +29,7 @@ no_index:
 provides:
   Map::Metro::Plugin::Map::Stockholm:
     file: lib/Map/Metro/Plugin/Map/Stockholm.pm
-    version: '0.1972'
+    version: '0.1973'
 requires:
   Map::Metro: '0.2300'
   Moose: '2.1400'
@@ -39,7 +39,7 @@ resources:
   bugtracker: https://github.com/Csson/p5-Map-Metro-Plugin-Map-Stockholm/issues
   homepage: https://metacpan.org/release/Map-Metro-Plugin-Map-Stockholm
   repository: https://github.com/Csson/p5-Map-Metro-Plugin-Map-Stockholm.git
-version: '0.1972'
+version: '0.1973'
 x_Dist_Zilla:
   perl:
     version: '5.020001'
@@ -63,7 +63,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: Git::GatherDir
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::PromptIfStale
       config:
@@ -211,10 +211,10 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.16.1
+          git_version: 2.19.1
           repo_root: .
       name: Git::Check
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::GithubMeta
       name: GithubMeta
@@ -273,13 +273,13 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.16.1
+          git_version: 2.19.1
           include_authors: 0
           include_releaser: 1
           order_by: name
           paths: []
       name: Git::Contributors
-      version: '0.034'
+      version: '0.035'
     -
       class: Dist::Zilla::Plugin::Test::Kwalitee::Extra
       name: Test::Kwalitee::Extra
@@ -383,7 +383,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.16.1
+          git_version: 2.19.1
           repo_root: .
       name: Git::CheckFor::CorrectBranch
       version: '0.014'
@@ -417,12 +417,12 @@ x_Dist_Zilla:
             - (?^u:.)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.16.1
+          git_version: 2.19.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: CommitBeforeTag
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -430,16 +430,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.1972'
+          tag: '0.1973'
           tag_format: '%v'
           tag_message: 'Release %v%n%n%c'
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.16.1
+          git_version: 2.19.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: Git::Tag
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::InstallRelease
       name: InstallRelease
@@ -470,12 +470,12 @@ x_Dist_Zilla:
             - (?^u:.)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.16.1
+          git_version: 2.19.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: CommitAfterRelease
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -484,10 +484,10 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.16.1
+          git_version: 2.19.1
           repo_root: .
       name: Git::Push
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Clean
       name: Clean

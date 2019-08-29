@@ -2,7 +2,7 @@ package Test2::Harness::Job::Runner;
 use strict;
 use warnings;
 
-our $VERSION = '0.001085';
+our $VERSION = '0.001087';
 
 use Carp qw/croak confess/;
 use List::Util qw/first/;
@@ -35,11 +35,15 @@ sub init {
 require Test2::Harness::Job::Runner::Open3;
 require Test2::Harness::Job::Runner::IPC;
 require Test2::Harness::Job::Runner::Fork;
+require Test2::Harness::Job::Runner::SHBang;
+require Test2::Harness::Job::Runner::Binary;
 
 my %RUN_MAP = (
-    Open3 => 'Test2::Harness::Job::Runner::Open3',
-    IPC   => 'Test2::Harness::Job::Runner::IPC',
-    Fork  => 'Test2::Harness::Job::Runner::Fork',
+    Open3  => 'Test2::Harness::Job::Runner::Open3',
+    IPC    => 'Test2::Harness::Job::Runner::IPC',
+    Fork   => 'Test2::Harness::Job::Runner::Fork',
+    SHBang => 'Test2::Harness::Job::Runner::SHBang',
+    Binary => 'Test2::Harness::Job::Runner::Binary',
 );
 
 sub run {

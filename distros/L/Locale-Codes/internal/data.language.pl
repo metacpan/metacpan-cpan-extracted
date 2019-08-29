@@ -284,6 +284,7 @@ $Data{'language'}{'iana'}{'orig'}{'name'} = {
    "Ngkâlmpw Kanum"                                => "Ngkalmpw Kanum",
    "Nguôn"                                         => "Nguon",
    "Ngäbere"                                       => "Ngabere",
+   "Nǁng"                                        => "Ning",
    "Nivaclé"                                       => "Nivacle",
    "Nocamán"                                       => "Nocaman",
    "North Junín Quechua"                           => "North Junin Quechua",

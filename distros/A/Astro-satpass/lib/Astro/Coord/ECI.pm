@@ -102,7 +102,7 @@ package Astro::Coord::ECI;
 use strict;
 use warnings;
 
-our $VERSION = '0.107';
+our $VERSION = '0.108';
 
 use Astro::Coord::ECI::Utils qw{ @CARP_NOT :mainstream };
 use Carp;
@@ -112,6 +112,7 @@ use Storable ();
 use constant NO_CASCADING_STATIONS =>
     q{Cascading 'station' attributes are not supported};
 use constant TWO_DEGREES => deg2rad( 2 );
+use constant CIVIL_TWILIGHT	=> deg2rad( -6 );
 
 my %mutator;	# Attribute mutators. We define these just after the
 		# set() method, for convenience.
@@ -127,7 +128,7 @@ my %static = (	# The geoid, etc. Geoid gets set later.
     edge_of_earths_shadow => 1,
     horizon => deg2rad (20),
     refraction => 1,
-    twilight => deg2rad (-6),
+    twilight => CIVIL_TWILIGHT,
 );
 my %savatr;	# Attribs saved across "normal" operations. Set at end.
 my @kilatr =	# Attributes to purge when setting coordinates.
@@ -2759,7 +2760,7 @@ sub set {
     semimajor => \&_set_custom_ellipsoid,
     station => \&_set_station,
     sun	=> \&_set_sun,
-    twilight => \&_set_value,
+    twilight => \&_set_twilight,
 );
 
 {
@@ -2854,6 +2855,18 @@ eod
     $self->{flattening} = $known_ellipsoid{$value}{flattening};
     $self->{$name} = $value;
     return SET_ACTION_RESET;
+}
+
+sub _set_twilight {
+    my ( $self, $name, $value ) = @_;
+    defined $value
+	or $value = CIVIL_TWILIGHT;	# Default
+    looks_like_number( $value )
+	and $value >= -PIOVER2
+	and $value <= PIOVER2
+	or croak "'$value' is an invalid value for '$name'";
+    $self->{$name} = $value;
+    return SET_ACTION_NONE;
 }
 
 #	If this is a vanilla setting, just do it.
@@ -3782,7 +3795,9 @@ may place more stringent restrictions on this attribute.
 =item twilight (numeric, radians)
 
 This attribute represents the elevation of the center of the Sun's disk
-at the beginning and end of twilight.
+at the beginning and end of twilight. This must be a number between
+-PI/2 and PI/2 inclusive, or C<undef> which sets the value to the
+default.
 
 Some of the usual values are:
 

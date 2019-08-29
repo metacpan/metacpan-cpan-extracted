@@ -1,5 +1,5 @@
 package Test::BDD::Cucumber::StepContext;
-$Test::BDD::Cucumber::StepContext::VERSION = '0.58';
+$Test::BDD::Cucumber::StepContext::VERSION = '0.59';
 use Moo;
 use Types::Standard qw( Bool Str HashRef ArrayRef InstanceOf );
 use List::Util qw( first );
@@ -10,7 +10,7 @@ Test::BDD::Cucumber::StepContext - Data made available to step definitions
 
 =head1 VERSION
 
-version 0.58
+version 0.59
 
 =head1 DESCRIPTION
 

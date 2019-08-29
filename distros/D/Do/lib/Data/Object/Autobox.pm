@@ -7,36 +7,36 @@ use warnings;
 
 use base 'autobox';
 
-require Data::Object::Autobox::Array;
-require Data::Object::Autobox::Code;
-require Data::Object::Autobox::Float;
-require Data::Object::Autobox::Hash;
-require Data::Object::Autobox::Integer;
-require Data::Object::Autobox::Number;
-require Data::Object::Autobox::Scalar;
-require Data::Object::Autobox::String;
-require Data::Object::Autobox::Undef;
-require Data::Object::Autobox::Any;
+require Data::Object::Any::Autobox;
+require Data::Object::Array::Autobox;
+require Data::Object::Code::Autobox;
+require Data::Object::Float::Autobox;
+require Data::Object::Hash::Autobox;
+require Data::Object::Integer::Autobox;
+require Data::Object::Number::Autobox;
+require Data::Object::Scalar::Autobox;
+require Data::Object::String::Autobox;
+require Data::Object::Undef::Autobox;
 
-our $VERSION = '1.05'; # VERSION
+our $VERSION = '1.07'; # VERSION
 
 sub import {
   my ($class) = @_;
 
   $class->SUPER::import(
-    ARRAY     => 'Data::Object::Autobox::Array',
-    CODE      => 'Data::Object::Autobox::Code',
-    FLOAT     => 'Data::Object::Autobox::Float',
-    HASH      => 'Data::Object::Autobox::Hash',
-    INTEGER   => 'Data::Object::Autobox::Integer',
-    NUMBER    => 'Data::Object::Autobox::Number',
-    SCALAR    => 'Data::Object::Autobox::Scalar',
-    STRING    => 'Data::Object::Autobox::String',
-    UNDEF     => 'Data::Object::Autobox::Undef',
-    UNIVERSAL => 'Data::Object::Autobox::Any'
+    ARRAY     => 'Data::Object::Array::Autobox',
+    CODE      => 'Data::Object::Code::Autobox',
+    FLOAT     => 'Data::Object::Float::Autobox',
+    HASH      => 'Data::Object::Hash::Autobox',
+    INTEGER   => 'Data::Object::Integer::Autobox',
+    NUMBER    => 'Data::Object::Number::Autobox',
+    SCALAR    => 'Data::Object::Scalar::Autobox',
+    STRING    => 'Data::Object::String::Autobox',
+    UNDEF     => 'Data::Object::Undef::Autobox',
+    UNIVERSAL => 'Data::Object::Any::Autobox'
   );
 
-  return;
+  return $class;
 }
 
 1;
@@ -89,9 +89,11 @@ terms as the Perl 5 programming language system itself.
 
 =head1 PROJECT
 
-L<GitHub|https://github.com/iamalnewkirk/do>
+L<On GitHub|https://github.com/iamalnewkirk/do>
 
-L<Contributing|https://github.com/iamalnewkirk/do/blob/master/README-DEVEL.mkdn>
+L<Initiatives|https://github.com/iamalnewkirk/do/projects>
+
+L<Contributing|https://github.com/iamalnewkirk/do/blob/master/CONTRIBUTE.mkdn>
 
 L<Reporting|https://github.com/iamalnewkirk/do/issues>
 

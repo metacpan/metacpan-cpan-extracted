@@ -1,0 +1,9 @@
+^\.(?!perltidyrc)
+.*\.old$
+.*\.bak$
+\.tar\.gz$
+^Makefile$
+^MYMETA\.
+^blib
+^pm_to_blib
+\B\.DS_Store

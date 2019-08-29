@@ -3,7 +3,8 @@ use warnings;
 use Test::More;
 
 use_ok 'Data::Object::Array';
-can_ok 'Data::Object::Array', 'slice';
+# deprecated
+# can_ok 'Data::Object::Array', 'slice';
 
 use Scalar::Util 'refaddr';
 

@@ -4,64 +4,115 @@ use Test::More;
 
 use_ok 'Data::Object::Hash';
 
-ok Data::Object::Hash->does('Data::Object::Rule::Collection');
-ok Data::Object::Hash->does('Data::Object::Rule::Comparison');
-ok Data::Object::Hash->does('Data::Object::Rule::Defined');
+# deprecated
+# ok Data::Object::Hash->does('Data::Object::Rule::Collection');
+# ok Data::Object::Hash->does('Data::Object::Rule::Comparison');
+# ok Data::Object::Hash->does('Data::Object::Rule::Defined');
 ok Data::Object::Hash->does('Data::Object::Role::Detract');
 ok Data::Object::Hash->does('Data::Object::Role::Dumper');
-ok Data::Object::Hash->does('Data::Object::Rule::List');
+# deprecated
+# ok Data::Object::Hash->does('Data::Object::Rule::List');
 ok Data::Object::Hash->does('Data::Object::Role::Output');
 ok Data::Object::Hash->does('Data::Object::Role::Throwable');
 
-can_ok 'Data::Object::Hash', 'clear';
-can_ok 'Data::Object::Hash', 'count';
-can_ok 'Data::Object::Hash', 'data';
-can_ok 'Data::Object::Hash', 'defined';
-can_ok 'Data::Object::Hash', 'delete';
-can_ok 'Data::Object::Hash', 'detract';
-can_ok 'Data::Object::Hash', 'dump';
-can_ok 'Data::Object::Hash', 'each';
-can_ok 'Data::Object::Hash', 'each_key';
-can_ok 'Data::Object::Hash', 'each_n_values';
-can_ok 'Data::Object::Hash', 'each_value';
-can_ok 'Data::Object::Hash', 'empty';
-can_ok 'Data::Object::Hash', 'eq';
-can_ok 'Data::Object::Hash', 'exists';
-can_ok 'Data::Object::Hash', 'filter_exclude';
-can_ok 'Data::Object::Hash', 'filter_include';
-can_ok 'Data::Object::Hash', 'fold';
-can_ok 'Data::Object::Hash', 'ge';
-can_ok 'Data::Object::Hash', 'get';
-can_ok 'Data::Object::Hash', 'grep';
-can_ok 'Data::Object::Hash', 'gt';
-can_ok 'Data::Object::Hash', 'head';
-can_ok 'Data::Object::Hash', 'invert';
-can_ok 'Data::Object::Hash', 'iterator';
-can_ok 'Data::Object::Hash', 'join';
-can_ok 'Data::Object::Hash', 'keys';
-can_ok 'Data::Object::Hash', 'le';
-can_ok 'Data::Object::Hash', 'length';
-can_ok 'Data::Object::Hash', 'list';
-can_ok 'Data::Object::Hash', 'lookup';
-can_ok 'Data::Object::Hash', 'lt';
-can_ok 'Data::Object::Hash', 'map';
-can_ok 'Data::Object::Hash', 'merge';
-can_ok 'Data::Object::Hash', 'ne';
-can_ok 'Data::Object::Hash', 'new';
-can_ok 'Data::Object::Hash', 'pairs';
-can_ok 'Data::Object::Hash', 'print';
-can_ok 'Data::Object::Hash', 'reset';
-can_ok 'Data::Object::Hash', 'reverse';
-can_ok 'Data::Object::Hash', 'roles';
-can_ok 'Data::Object::Hash', 'say';
-can_ok 'Data::Object::Hash', 'set';
-can_ok 'Data::Object::Hash', 'slice';
-can_ok 'Data::Object::Hash', 'sort';
-can_ok 'Data::Object::Hash', 'tail';
-can_ok 'Data::Object::Hash', 'throw';
-can_ok 'Data::Object::Hash', 'type';
-can_ok 'Data::Object::Hash', 'unfold';
-can_ok 'Data::Object::Hash', 'values';
+# deprecated
+# can_ok 'Data::Object::Hash', 'clear';
+# deprecated
+# can_ok 'Data::Object::Hash', 'count';
+# deprecated
+# can_ok 'Data::Object::Hash', 'data';
+# deprecated
+# can_ok 'Data::Object::Hash', 'defined';
+# deprecated
+# can_ok 'Data::Object::Hash', 'delete';
+# deprecated
+# can_ok 'Data::Object::Hash', 'detract';
+# deprecated
+# can_ok 'Data::Object::Hash', 'dump';
+# deprecated
+# can_ok 'Data::Object::Hash', 'each';
+# deprecated
+# can_ok 'Data::Object::Hash', 'each_key';
+# deprecated
+# can_ok 'Data::Object::Hash', 'each_n_values';
+# deprecated
+# can_ok 'Data::Object::Hash', 'each_value';
+# deprecated
+# can_ok 'Data::Object::Hash', 'empty';
+# deprecated
+# can_ok 'Data::Object::Hash', 'eq';
+# deprecated
+# can_ok 'Data::Object::Hash', 'exists';
+# deprecated
+# can_ok 'Data::Object::Hash', 'filter_exclude';
+# deprecated
+# can_ok 'Data::Object::Hash', 'filter_include';
+# deprecated
+# can_ok 'Data::Object::Hash', 'fold';
+# deprecated
+# can_ok 'Data::Object::Hash', 'ge';
+# deprecated
+# can_ok 'Data::Object::Hash', 'get';
+# deprecated
+# can_ok 'Data::Object::Hash', 'grep';
+# deprecated
+# can_ok 'Data::Object::Hash', 'gt';
+# deprecated
+# can_ok 'Data::Object::Hash', 'head';
+# deprecated
+# can_ok 'Data::Object::Hash', 'invert';
+# deprecated
+# can_ok 'Data::Object::Hash', 'iterator';
+# deprecated
+# can_ok 'Data::Object::Hash', 'join';
+# deprecated
+# can_ok 'Data::Object::Hash', 'keys';
+# deprecated
+# can_ok 'Data::Object::Hash', 'le';
+# deprecated
+# can_ok 'Data::Object::Hash', 'length';
+# deprecated
+# can_ok 'Data::Object::Hash', 'list';
+# deprecated
+# can_ok 'Data::Object::Hash', 'lookup';
+# deprecated
+# can_ok 'Data::Object::Hash', 'lt';
+# deprecated
+# can_ok 'Data::Object::Hash', 'map';
+# deprecated
+# can_ok 'Data::Object::Hash', 'merge';
+# deprecated
+# can_ok 'Data::Object::Hash', 'ne';
+# deprecated
+# can_ok 'Data::Object::Hash', 'new';
+# deprecated
+# can_ok 'Data::Object::Hash', 'pairs';
+# deprecated
+# can_ok 'Data::Object::Hash', 'print';
+# deprecated
+# can_ok 'Data::Object::Hash', 'reset';
+# deprecated
+# can_ok 'Data::Object::Hash', 'reverse';
+# deprecated
+# can_ok 'Data::Object::Hash', 'roles';
+# deprecated
+# can_ok 'Data::Object::Hash', 'say';
+# deprecated
+# can_ok 'Data::Object::Hash', 'set';
+# deprecated
+# can_ok 'Data::Object::Hash', 'slice';
+# deprecated
+# can_ok 'Data::Object::Hash', 'sort';
+# deprecated
+# can_ok 'Data::Object::Hash', 'tail';
+# deprecated
+# can_ok 'Data::Object::Hash', 'throw';
+# deprecated
+# can_ok 'Data::Object::Hash', 'type';
+# deprecated
+# can_ok 'Data::Object::Hash', 'unfold';
+# deprecated
+# can_ok 'Data::Object::Hash', 'values';
 
 subtest 'test instantiation' => sub {
   eval { Data::Object::Hash->new };

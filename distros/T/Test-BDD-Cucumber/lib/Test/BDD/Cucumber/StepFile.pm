@@ -1,17 +1,19 @@
 package Test::BDD::Cucumber::StepFile;
-$Test::BDD::Cucumber::StepFile::VERSION = '0.58';
+$Test::BDD::Cucumber::StepFile::VERSION = '0.59';
 =head1 NAME
 
 Test::BDD::Cucumber::StepFile - Functions for creating and loading Step Definitions
 
 =head1 VERSION
 
-version 0.58
+version 0.59
 
 =cut
 
 use strict;
 use warnings;
+use utf8;
+
 use Carp qw/croak/;
 use File::Spec qw/rel2abs/;
 

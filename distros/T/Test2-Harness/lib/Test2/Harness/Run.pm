@@ -2,7 +2,7 @@ package Test2::Harness::Run;
 use strict;
 use warnings;
 
-our $VERSION = '0.001085';
+our $VERSION = '0.001087';
 
 use Carp qw/croak/;
 
@@ -40,7 +40,6 @@ use Test2::Harness::Util::HashBase qw{
     -use_stream
     -use_fork
     -use_timeout
-    -times
     -show_times
 
     -exclude_files

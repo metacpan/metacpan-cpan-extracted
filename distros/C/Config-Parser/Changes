@@ -1,5 +1,8 @@
 Revision history for Perl extension Config::Parser
 
+1.04  Thu Aug 29 08:17:52 2019
+	- use Config::AST 1.05
+
 1.03  Fri Aug 23 14:44:18 2019
 	- implement the BOOLEAN data type
 

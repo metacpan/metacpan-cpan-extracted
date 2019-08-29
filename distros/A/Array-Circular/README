@@ -22,6 +22,10 @@ NAME
 
         my $a = Array::Circular->new(qw/this is a test/);
 
+  clone
+
+        my $new = $a->clone;
+
   next
 
         my $element     = $l->next;

@@ -3,14 +3,14 @@
    "author" : [
       "Sergey Zasenko <sergey@zasenko.name>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Protocol-Redis",
    "no_index" : {
@@ -22,8 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "Test::More" : "0.88"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -34,7 +33,8 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "List::Util" : "0"
+            "Test::More" : "0.94",
+            "perl" : "5.008001"
          }
       }
    },
@@ -47,8 +47,11 @@
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "https://github.com/und3f/protocol-redis"
+         "type" : "git",
+         "url" : "https://github.com/und3f/protocol-redis.git",
+         "web" : "https://github.com/und3f/protocol-redis"
       }
    },
-   "version" : 1.0006
+   "version" : "1.0010",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

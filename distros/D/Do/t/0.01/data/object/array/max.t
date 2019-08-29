@@ -3,7 +3,8 @@ use warnings;
 use Test::More;
 
 use_ok 'Data::Object::Array';
-can_ok 'Data::Object::Array', 'max';
+# deprecated
+# can_ok 'Data::Object::Array', 'max';
 
 use Scalar::Util 'refaddr';
 

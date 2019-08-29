@@ -1,0 +1,37 @@
+{
+   "abstract" : "configuration file parser for ldap.conf",
+   "author" : [
+      "Sergey Poznyakoff <gray@gnu.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Config-Parser-ldap",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "provides" : {
+      "Config::Parser::ldap" : {
+         "file" : "lib/Config/Parser/ldap.pm",
+         "version" : "1.00"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git.gnu.org.ua/config-parser-ldap.git",
+         "web" : "http://git.gnu.org.ua/cgit/config-parser-ldap.git/"
+      }
+   },
+   "version" : "1.00"
+}

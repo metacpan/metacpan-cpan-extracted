@@ -7,7 +7,7 @@ use warnings;
 
 use parent 'Data::Object::Config';
 
-our $VERSION = '1.05'; # VERSION
+our $VERSION = '1.07'; # VERSION
 
 # METHODS
 
@@ -134,15 +134,13 @@ jump-starting application development.
 
 This framework provides a framework for modern Perl development, embracing
 Perl's multi-paradigm programming nature, flexibility and vast ecosystem that
-many of engineers already know and love.
+many of engineers already know and love. The power of this framework comes from
+the extendable (yet fully optional) type library which is integrated into the
+object system and type-constrainable subroutine signatures (supporting
+functions, methods and method modifiers). We also provide classes which wrap
+Perl 5 native data types and provides methods for operating on the data.
 
-The power of this framework comes from the extendable (yet fully optional) type
-library which is integrated into the object system and type-constrainable
-subroutine signatures (supporting functions, methods and method modifiers). We
-also provide classes which wrap Perl 5 native data types and provides methods
-for operating on the data.
-
-=head1 USAGE
+=head1 CONVENTION
 
 Contrary to the opinion of some, modern Perl programming can be extremely
 well-structured and beautiful, leveraging many advanced concepts found in other
@@ -236,14 +234,13 @@ This demonstrates much of the power of this framework in one simple example. If
 you're new to Perl, the code above creates a class with a single (read-only
 string) attribute called C<name> and a single method called C<hello>, then
 registers the class in a user-defined type-library called C<App> where all
-user-defined type constraints will be stored and retrieved (and reified).
-
-The C<main> program (namespace) initializes the framework and specifies the
+user-defined type constraints will be stored and retrieved (and reified). The
+C<main> program (namespace) initializes the framework and specifies the
 user-defined type library to use in the creation of a single function
 C<greetings> which takes two arguments which must both be instances of the
 class we just created.
 
-=head1 NOTES
+=head1 DISCRETIONARY
 
 It's also important to note that while the example showcases much of what's
 possible with this framework, all of the sophistication is totally optional.
@@ -528,9 +525,11 @@ terms as the Perl 5 programming language system itself.
 
 =head1 PROJECT
 
-L<GitHub|https://github.com/iamalnewkirk/do>
+L<On GitHub|https://github.com/iamalnewkirk/do>
 
-L<Contributing|https://github.com/iamalnewkirk/do/blob/master/README-DEVEL.mkdn>
+L<Initiatives|https://github.com/iamalnewkirk/do/projects>
+
+L<Contributing|https://github.com/iamalnewkirk/do/blob/master/CONTRIBUTE.mkdn>
 
 L<Reporting|https://github.com/iamalnewkirk/do/issues>
 

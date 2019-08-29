@@ -4,8 +4,9 @@ use Test::More;
 
 use_ok 'Data::Object::Float';
 
-ok Data::Object::Float->does('Data::Object::Rule::Comparison');
-ok Data::Object::Float->does('Data::Object::Rule::Defined');
+# deprecated
+# ok Data::Object::Float->does('Data::Object::Rule::Comparison');
+# ok Data::Object::Float->does('Data::Object::Rule::Defined');
 ok Data::Object::Float->does('Data::Object::Role::Detract');
 ok Data::Object::Float->does('Data::Object::Role::Dumper');
 # no longer supported
@@ -17,24 +18,43 @@ ok Data::Object::Float->does('Data::Object::Role::Throwable');
 # no longer supported
 # ok Data::Object::Float->does('Data::Object::Role::Value');
 
-can_ok 'Data::Object::Float', 'data';
-can_ok 'Data::Object::Float', 'defined';
-can_ok 'Data::Object::Float', 'detract';
-can_ok 'Data::Object::Float', 'downto';
-can_ok 'Data::Object::Float', 'dump';
-can_ok 'Data::Object::Float', 'eq';
-can_ok 'Data::Object::Float', 'ge';
-can_ok 'Data::Object::Float', 'gt';
-can_ok 'Data::Object::Float', 'le';
-can_ok 'Data::Object::Float', 'lt';
-can_ok 'Data::Object::Float', 'ne';
-can_ok 'Data::Object::Float', 'new';
-can_ok 'Data::Object::Float', 'print';
-can_ok 'Data::Object::Float', 'roles';
-can_ok 'Data::Object::Float', 'say';
-can_ok 'Data::Object::Float', 'throw';
-can_ok 'Data::Object::Float', 'to';
-can_ok 'Data::Object::Float', 'type';
-can_ok 'Data::Object::Float', 'upto';
+# deprecated
+# can_ok 'Data::Object::Float', 'data';
+# deprecated
+# can_ok 'Data::Object::Float', 'defined';
+# deprecated
+# can_ok 'Data::Object::Float', 'detract';
+# deprecated
+# can_ok 'Data::Object::Float', 'downto';
+# deprecated
+# can_ok 'Data::Object::Float', 'dump';
+# deprecated
+# can_ok 'Data::Object::Float', 'eq';
+# deprecated
+# can_ok 'Data::Object::Float', 'ge';
+# deprecated
+# can_ok 'Data::Object::Float', 'gt';
+# deprecated
+# can_ok 'Data::Object::Float', 'le';
+# deprecated
+# can_ok 'Data::Object::Float', 'lt';
+# deprecated
+# can_ok 'Data::Object::Float', 'ne';
+# deprecated
+# can_ok 'Data::Object::Float', 'new';
+# deprecated
+# can_ok 'Data::Object::Float', 'print';
+# deprecated
+# can_ok 'Data::Object::Float', 'roles';
+# deprecated
+# can_ok 'Data::Object::Float', 'say';
+# deprecated
+# can_ok 'Data::Object::Float', 'throw';
+# deprecated
+# can_ok 'Data::Object::Float', 'to';
+# deprecated
+# can_ok 'Data::Object::Float', 'type';
+# deprecated
+# can_ok 'Data::Object::Float', 'upto';
 
 ok 1 and done_testing;

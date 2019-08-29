@@ -113,8 +113,8 @@
          },
          "suggests" : {
             "Dist::Iller" : "0.1408",
-            "Dist::Iller::Config::Author::CSSON" : "0.0322",
-            "Dist::Iller::Config::Author::CSSON::MapMetro" : "0.0322"
+            "Dist::Iller::Config::Author::CSSON" : "0.0323",
+            "Dist::Iller::Config::Author::CSSON::MapMetro" : "0.0323"
          }
       },
       "runtime" : {
@@ -141,7 +141,7 @@
    "provides" : {
       "Map::Metro::Plugin::Map::Stockholm" : {
          "file" : "lib/Map/Metro/Plugin/Map/Stockholm.pm",
-         "version" : "0.1972"
+         "version" : "0.1973"
       }
    },
    "release_status" : "stable",
@@ -156,7 +156,7 @@
          "web" : "https://github.com/Csson/p5-Map-Metro-Plugin-Map-Stockholm"
       }
    },
-   "version" : "0.1972",
+   "version" : "0.1973",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.020001"
@@ -186,7 +186,7 @@
                }
             },
             "name" : "Git::GatherDir",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::PromptIfStale",
@@ -374,12 +374,12 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.16.1",
+                  "git_version" : "2.19.1",
                   "repo_root" : "."
                }
             },
             "name" : "Git::Check",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::GithubMeta",
@@ -456,7 +456,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.16.1",
+                  "git_version" : "2.19.1",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -464,7 +464,7 @@
                }
             },
             "name" : "Git::Contributors",
-            "version" : "0.034"
+            "version" : "0.035"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Kwalitee::Extra",
@@ -599,7 +599,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.16.1",
+                  "git_version" : "2.19.1",
                   "repo_root" : "."
                }
             },
@@ -644,7 +644,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.16.1",
+                  "git_version" : "2.19.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -652,7 +652,7 @@
                }
             },
             "name" : "CommitBeforeTag",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Tag",
@@ -661,12 +661,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.1972",
+                  "tag" : "0.1973",
                   "tag_format" : "%v",
                   "tag_message" : "Release %v%n%n%c"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.16.1",
+                  "git_version" : "2.19.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -674,7 +674,7 @@
                }
             },
             "name" : "Git::Tag",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::InstallRelease",
@@ -715,7 +715,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.16.1",
+                  "git_version" : "2.19.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -723,7 +723,7 @@
                }
             },
             "name" : "CommitAfterRelease",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Push",
@@ -735,12 +735,12 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.16.1",
+                  "git_version" : "2.19.1",
                   "repo_root" : "."
                }
             },
             "name" : "Git::Push",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::Clean",

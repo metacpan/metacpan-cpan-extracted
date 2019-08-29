@@ -1,11 +1,11 @@
-package HTTP::Daemon; # git description: v6.04-8-g7c078c8
+package HTTP::Daemon; # git description: v6.05-4-g31c6eaf
 
 # ABSTRACT: A simple http server class
 
 use strict;
 use warnings;
 
-our $VERSION = '6.05';
+our $VERSION = '6.06';
 
 use Socket qw(
     AF_INET AF_INET6 INADDR_ANY IN6ADDR_ANY INADDR_LOOPBACK IN6ADDR_LOOPBACK
@@ -22,6 +22,14 @@ sub new {
     my ($class, %args) = @_;
     $args{Listen} ||= 5;
     $args{Proto}  ||= 'tcp';
+
+    # Handle undefined or empty local address the same way as
+    # IO::Socket::INET -- use unspecified address
+    for my $key (qw(LocalAddr LocalHost)) {
+        if (exists $args{$key} && (!defined $args{$key} || $args{$key} eq '')) {
+            delete $args{$key};
+        }
+    }
     return $class->SUPER::new(%args);
 }
 
@@ -54,6 +62,20 @@ sub url {
     }
     else {
         my $host = $self->sockhostname;
+
+        # sockhostname() seems to return a stringified IP address if not
+        # resolvable. Then quote it for a port separator and an IPv6 zone
+        # separator. But be paranoid for a case when it already contains
+        # a bracket.
+        if (defined $host and $host =~ /:/) {
+            if ($host =~ /[\[\]]/) {
+                $host = undef;
+            }
+            else {
+                $host =~ s/%/%25/g;
+                $host = '[' . $host . ']';
+            }
+        }
         if (!defined $host) {
             my $family = sockaddr_family($self->sockname);
             if ($family && $family == AF_INET6) {
@@ -618,7 +640,7 @@ HTTP::Daemon - A simple http server class
 
 =head1 VERSION
 
-version 6.05
+version 6.06
 
 =head1 SYNOPSIS
 
@@ -913,7 +935,7 @@ Gisle Aas <gisle@activestate.com>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Ville Skyttä Olaf Alders Mark Stosberg Karen Etheridge Chase Whitener Slaven Rezic Zefram Tom Hukins Mike Schilli Alexey Tourbin Bron Gondwana Hans-H. Froehlich Ian Kilgore Jacob J Ondrej Hanak Perlover Peter Rabbitson Robert Stone Rolf Grossmann Sean M. Burke Spiros Denaxas Steve Hay Todd Lipcon Tony Finch Toru Yamaguchi Yuri Karaban amire80 jefflee john9art murphy phrstbrn ruff Adam Kennedy sasao Sjogren Alex Kapranoff Andreas J. Koenig Bill Mann DAVIDRW Daniel Hedlund David E. Wheeler FWILES Father Chrysostomos Gavin Peters Graeme Thompson
+=for stopwords Ville Skyttä Olaf Alders Mark Stosberg Karen Etheridge Chase Whitener Slaven Rezic Zefram Alexey Tourbin Bron Gondwana Petr Písař Mike Schilli Tom Hukins Ian Kilgore Jacob J Ondrej Hanak Perlover Peter Rabbitson Robert Stone Rolf Grossmann Sean M. Burke Spiros Denaxas Steve Hay Todd Lipcon Tony Finch Toru Yamaguchi Yuri Karaban amire80 jefflee john9art murphy phrstbrn ruff Adam Kennedy sasao Sjogren Alex Kapranoff Andreas J. Koenig Bill Mann DAVIDRW Daniel Hedlund David E. Wheeler FWILES Father Chrysostomos Gavin Peters Graeme Thompson Hans-H. Froehlich
 
 =over 4
 
@@ -947,14 +969,6 @@ Zefram <zefram@fysh.org>
 
 =item *
 
-Tom Hukins <tom@eborcom.com>
-
-=item *
-
-Mike Schilli <mschilli@yahoo-inc.com>
-
-=item *
-
 Alexey Tourbin <at@altlinux.ru>
 
 =item *
@@ -963,7 +977,15 @@ Bron Gondwana <brong@fastmail.fm>
 
 =item *
 
-Hans-H. Froehlich <hfroehlich@co-de-co.de>
+Petr Písař <ppisar@redhat.com>
+
+=item *
+
+Mike Schilli <mschilli@yahoo-inc.com>
+
+=item *
+
+Tom Hukins <tom@eborcom.com>
 
 =item *
 
@@ -1096,6 +1118,10 @@ Gavin Peters <gpeters@deepsky.com>
 =item *
 
 Graeme Thompson <Graeme.Thompson@mobilecohesion.com>
+
+=item *
+
+Hans-H. Froehlich <hfroehlich@co-de-co.de>
 
 =back
 

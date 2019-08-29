@@ -7,7 +7,7 @@ use warnings;
 
 use parent 'Data::Object';
 
-our $VERSION = '1.05'; # VERSION
+our $VERSION = '1.07'; # VERSION
 
 1;
 
@@ -21,7 +21,7 @@ Do
 
 =head1 ABSTRACT
 
-Development Framework
+Modern Perl Development Framework
 
 =cut
 
@@ -341,7 +341,7 @@ If you don't have cpanm, get it! It takes less than a minute, otherwise:
 
 Add C<Do> to the list of dependencies in C<cpanfile>:
 
-  requires "Do" => "1.00"; # 1.00 or newer
+  requires "Do" => "1.05"; # 1.05 or newer
 
 If cpanm doesn't have permission to install modules in the current Perl
 installation, it will automatically set up and install to a local::lib in your
@@ -367,9 +367,11 @@ terms as the Perl 5 programming language system itself.
 
 =head1 PROJECT
 
-L<GitHub|https://github.com/iamalnewkirk/do>
+L<On GitHub|https://github.com/iamalnewkirk/do>
 
-L<Contributing|https://github.com/iamalnewkirk/do/blob/master/README-DEVEL.mkdn>
+L<Initiatives|https://github.com/iamalnewkirk/do/projects>
+
+L<Contributing|https://github.com/iamalnewkirk/do/blob/master/CONTRIBUTE.mkdn>
 
 L<Reporting|https://github.com/iamalnewkirk/do/issues>
 

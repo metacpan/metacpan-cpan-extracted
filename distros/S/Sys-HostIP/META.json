@@ -6,13 +6,13 @@
       "Paul Cochrane <paul@liekut.de>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Sys-HostIP",
    "prereqs" : {
@@ -38,6 +38,7 @@
       },
       "test" : {
          "requires" : {
+            "Capture::Tiny" : "0",
             "Data::Dumper" : "0",
             "File::Spec" : "0",
             "IO::Handle" : "0",
@@ -51,7 +52,7 @@
    "provides" : {
       "Sys::HostIP" : {
          "file" : "lib/Sys/HostIP.pm",
-         "version" : "2.110"
+         "version" : "2.120"
       }
    },
    "release_status" : "stable",
@@ -65,7 +66,8 @@
          "web" : "https://github.com/xsawyerx/sys-hostip"
       }
    },
-   "version" : "2.110",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+   "version" : "2.120",
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

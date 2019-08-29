@@ -3,7 +3,8 @@ use warnings;
 use Test::More;
 
 use_ok 'Data::Object::Array';
-can_ok 'Data::Object::Array', 'rotate';
+# deprecated
+# can_ok 'Data::Object::Array', 'rotate';
 
 use Scalar::Util 'refaddr';
 

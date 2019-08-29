@@ -35,7 +35,8 @@ my @files = (
     'scripts/es-storage-overview.pl',
     't/00-compile.t',
     't/01-querystring.t',
-    't/02-index-data.t'
+    't/02-index-data.t',
+    't/03-hash-flattening.t'
 );
 
 notabs_ok($_) foreach @files;

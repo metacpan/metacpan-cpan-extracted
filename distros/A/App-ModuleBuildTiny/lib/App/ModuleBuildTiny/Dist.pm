@@ -3,7 +3,7 @@ package App::ModuleBuildTiny::Dist;
 use 5.010;
 use strict;
 use warnings;
-our $VERSION = '0.026';
+our $VERSION = '0.027';
 
 use CPAN::Meta;
 use Carp qw/croak/;
@@ -65,7 +65,7 @@ sub generate_readme {
 	$parser->output_string( \my $content );
 	$parser->parse_characters(1);
 	$parser->parse_file($filename);
-	return $content;
+	return decode_utf8($content);
 }
 
 sub load_mergedata {
@@ -130,7 +130,7 @@ sub new {
 	require Module::Metadata; Module::Metadata->VERSION('1.000009');
 	my $data = Module::Metadata->new_from_file($filename, collect_pod => 1) or die "Couldn't analyse $filename: $!";
 	my @authors = map { / \A \s* (.+?) \s* \z /x } grep { /\S/ } split /\n/, $data->pod('AUTHOR') // $data->pod('AUTHORS') // '' or warn "Could not parse any authors from `=head1 AUTHOR` in $filename";
-	if (read_binary($filename) =~ /^=encoding utf8$/m) {
+	if (read_binary($filename) =~ /^=encoding (?i:utf)-?8$/m) {
 		$_ = decode_utf8($_) for @authors;
 	}
 	my $license = detect_license($data, $filename, \@authors);

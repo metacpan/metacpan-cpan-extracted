@@ -3,7 +3,8 @@ use warnings;
 use Test::More;
 
 use_ok 'Data::Object::Undef';
-can_ok 'Data::Object::Undef', 'defined';
+# deprecated
+# can_ok 'Data::Object::Undef', 'defined';
 
 use Scalar::Util 'refaddr';
 

@@ -1,4 +1,4 @@
-use 5.010001;
+use 5.008001;
  
 use strict;
 use warnings;
@@ -10,22 +10,26 @@ WriteMakefile(
     VERSION_FROM  => 'lib/Protocol/Redis.pm',
     ABSTRACT_FROM => 'lib/Protocol/Redis.pm',
     AUTHOR        => 'Sergey Zasenko <sergey@zasenko.name>',
-    LICENSE       => 'perl',
+    LICENSE       => 'perl_5',
 
     META_MERGE => {
-        resources => {
-            license    => 'http://dev.perl.org/licenses/',
-            repository => 'https://github.com/und3f/protocol-redis',
-            bugtracker => 'https://github.com/und3f/protocol-redis/issues',
+        dynamic_config => 0,
+        'meta-spec'    => { version => 2 },
+        resources      => {
+            license    => [ 'http://dev.perl.org/licenses/' ],
+            repository => {
+                type   => 'git',
+                url    => 'https://github.com/und3f/protocol-redis.git',
+                web    => 'https://github.com/und3f/protocol-redis',
+            },
+            bugtracker => { web => 'https://github.com/und3f/protocol-redis/issues' },
         },
     },
 
+    MIN_PERL_VERSION => '5.008001',
     PREREQ_PM => {
         'Carp' => 0,
-        'List::Util' => 0,
-    },
-    TEST_REQUIRES => {
-        'Test::More' => '0.88'
+        'Test::More' => '0.94',
     },
     test => {TESTS =>  't/*.t'},
 

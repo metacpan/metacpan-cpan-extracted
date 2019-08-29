@@ -9,45 +9,37 @@ use strict;
 $::tests = '';
 $::tests = "
 
-2code
-Phoenician
-   phnx
+2code Phoenician => phnx
 
-2code
-Phoenician
-num
-   115
+2code Phoenician num => 115
 
-2name
-Phnx
-   Phoenician
+2name Phnx => Phoenician
 
-2name
-phnx
-   Phoenician
+2name phnx => Phoenician
 
-2name
-115
-num
-   Phoenician
+2name 115 num => Phoenician
 
-code2code
-Phnx
-alpha
-num
-   115
+code2code Phnx alpha num => 115
 
-all_codes
-2
-   ~
-   Adlm
-   Afak
+all_codes 2 => Adlm Afak
 
-all_names
-2
-   ~
-   Adlam
-   Afaka
+all_names 2 => Adlam Afaka
+
+rename AAA newCode2 => 'ERROR: _code: code not in codeset: Aaa [alpha]'
+
+add AAA newCode => 1
+
+delete AAA => 1
+
+add_alias FooBar NewName        => 'ERROR: add_alias: name does not exist: FooBar'
+
+delete_alias Foobar             => 'ERROR: delete_alias: name does not exist: Foobar'
+
+replace_code Foo Bar => 'ERROR: _code: code not in codeset: Foo [alpha]'
+
+add_code_alias Foo Bar => 'ERROR: _code: code not in codeset: Foo [alpha]'
+
+delete_code_alias Foo => 'ERROR: _code: code not in codeset: Foo [alpha]'
 
 ";
 

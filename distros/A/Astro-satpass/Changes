@@ -1,3 +1,10 @@
+0.108		2019-08-29	T. R. Wyant
+    Validate 'twilight' attribute. It must be between -PI/2 and PI/2
+    inclusive. Thanks to Kay Kilpatrick for bringing this to my
+    attention.
+
+    Correct eval() check in load_module().
+
 0.107		2019-08-03	T. R. Wyant
     Fix broken POD links and add a test to ensure they stay fixed.
 

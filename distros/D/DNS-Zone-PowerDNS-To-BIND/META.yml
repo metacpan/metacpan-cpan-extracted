@@ -19,13 +19,14 @@ name: DNS-Zone-PowerDNS-To-BIND
 requires:
   DBIx::Connect::Any: '0'
   Exporter: '5.57'
+  Log::ger: '0.027'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=DNS-Zone-PowerDNS-To-BIND
   homepage: https://metacpan.org/release/DNS-Zone-PowerDNS-To-BIND
   repository: git://github.com/perlancar/perl-DNS-Zone-PowerDNS-To-BIND.git
-version: '0.001'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.028002'

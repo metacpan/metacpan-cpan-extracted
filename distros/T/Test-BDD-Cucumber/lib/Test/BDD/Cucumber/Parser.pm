@@ -1,12 +1,12 @@
 package Test::BDD::Cucumber::Parser;
-$Test::BDD::Cucumber::Parser::VERSION = '0.58';
+$Test::BDD::Cucumber::Parser::VERSION = '0.59';
 =head1 NAME
 
 Test::BDD::Cucumber::Parser - Parse Feature files
 
 =head1 VERSION
 
-version 0.58
+version 0.59
 
 =head1 DESCRIPTION
 
@@ -177,7 +177,7 @@ sub _extract_scenarios {
 
         my $langdef = $self->{langdef};
         if ( $line->content =~
-m/^((?:$langdef->{background})|(?:$langdef->{scenario})|(?:$langdef->{scenario_outline})): ?(.+)?/
+m/^((?:$langdef->{background})|(?:$langdef->{scenario})|(?:$langdef->{scenarioOutline})): ?(.+)?/
           )
         {
             my ( $type, $name ) = ( $1, $2 );
@@ -203,7 +203,7 @@ m/^((?:$langdef->{background})|(?:$langdef->{scenario})|(?:$langdef->{scenario_o
             @lines = $self->_extract_steps( $feature, $scenario, @lines );
 
             # Catch Scenario outlines without examples
-            if ( $type =~ m/^($langdef->{scenario_outline})/
+            if ( $type =~ m/^($langdef->{scenarioOutline})/
                 && !@{ $scenario->data } )
             {
                 die parse_error_from_line(
@@ -242,7 +242,7 @@ sub _extract_steps {
 
         # Conventional step?
         if ( $line->content =~
-m/^((?:$langdef->{given})|(?:$langdef->{and})|(?:$langdef->{when})|(?:$langdef->{then})|(?:$langdef->{but})) (.+)/
+m/^((?:$langdef->{given})|(?:$langdef->{and})|(?:$langdef->{when})|(?:$langdef->{then})|(?:$langdef->{but}))(.+)/
           )
         {
             my ( $verb, $text ) = ( $1, $2 );
@@ -255,6 +255,9 @@ m/^((?:$langdef->{given})|(?:$langdef->{and})|(?:$langdef->{when})|(?:$langdef->
               or $verb =~ m/^($langdef->{but}$)/;
             $last_verb = $verb;
 
+            # Remove the ending space for languages that
+            # have it, for backward compatibility
+            $original_verb =~ s/ $//;
             my $step = Test::BDD::Cucumber::Model::Step->new(
                 {
                     text          => $text,
@@ -274,7 +277,7 @@ m/^((?:$langdef->{given})|(?:$langdef->{and})|(?:$langdef->{when})|(?:$langdef->
             return $self->_extract_table( 6, $scenario,
                 $self->_remove_next_blanks(@lines) );
         } elsif ( $line->content =~
-            m/^(?:(?:$langdef->{scenario})|(?:$langdef->{scenario_outline})):/ )
+            m/^(?:(?:$langdef->{scenario})|(?:$langdef->{scenarioOutline})):/ )
         {
             # next scenario begins here
             return ($line, @lines);

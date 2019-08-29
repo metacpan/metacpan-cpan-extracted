@@ -1,6 +1,17 @@
 Revision history for Map-Metro-Plugin-Map-Stockholm
 
-0.1972 2018-09-30 10:02:19 UTC
+0.1973 2019-08-28 18:15:13 UTC
+ [Map]
+ - Added the Lidingöbanan tram line (line L21) (it's just not shown in the
+   graph yet)
+
+ [Stats & Dependency Changes]
+ - 2 files changed, 31 insertions(+), 1 deletion(-)
+ - (dev sug) ~ Dist::Iller::Config::Author::CSSON 0.0322 --> 0.0323
+ - (dev sug) ~ Dist::Iller::Config::Author::CSSON::MapMetro 0.0322 -->
+   0.0323
+
+0.1972 2018-09-30T10:02:19Z UTC
  [Map]
  - Added station T-Centralen on Spårväg City.
 

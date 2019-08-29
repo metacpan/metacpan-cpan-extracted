@@ -1,5 +1,9 @@
 Revision history for Crypt-Argon2
 
+0.006     2019-08-29 00:54:56+02:00 Europe/Amsterdam
+          - Update argon2 sources to 20190702
+          - Add -pthread option when compiling
+
 0.005     2018-04-12 00:59:47+02:00 Europe/Amsterdam
           - Add libpthread for non-threaded perls
 

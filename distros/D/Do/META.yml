@@ -1,5 +1,5 @@
 ---
-abstract: 'Development Framework'
+abstract: 'Modern Perl'
 author:
   - 'Al Newkirk <awncorp@cpan.org>'
 build_requires:
@@ -32,10 +32,8 @@ requires:
   autobox: '2.82'
   perl: v5.14.0
 resources:
-  bugtracker: https://github.com/iamalnewkirk/do/issues
-  homepage: http://metacpan.org/release/Do
-  repository: git://github.com/iamalnewkirk/do.git
-version: '1.05'
+  repository: git://github.com/243854864726f01d3828c427efbc7672125cd6ce/Do.git
+version: '1.07'
 x_authority: cpan:AWNCORP
 x_contributors:
   - 'Al Newkirk <al@iamalnewkirk.com>'

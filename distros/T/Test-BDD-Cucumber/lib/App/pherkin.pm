@@ -1,5 +1,5 @@
 package App::pherkin;
-$App::pherkin::VERSION = '0.58';
+$App::pherkin::VERSION = '0.59';
 use strict;
 use warnings;
 
@@ -34,7 +34,7 @@ App::pherkin - Run Cucumber tests from the command line
 
 =head1 VERSION
 
-version 0.58
+version 0.59
 
 =head1 SYNOPSIS
 
@@ -477,14 +477,14 @@ sub _print_langdef {
 
     my $langdef = langdef($language);
 
-    my @keywords = qw(feature background scenario scenario_outline examples
+    my @keywords = qw(feature background scenario scenarioOutline examples
         given when then and but);
     my $max_length
         = max map { length readable_keywords( $langdef->{$_} ) } @keywords;
 
     my $format = "| %-16s | %-${max_length}s |\n";
     for my $keyword (
-        qw(feature background scenario scenario_outline
+        qw(feature background scenario scenarioOutline
         examples given when then and but )
         )
     {

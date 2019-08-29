@@ -16,7 +16,7 @@ Map::Metro::Plugin::Map::Stockholm::Lines - Lines and stations in the Stockholm 
 
 =head1 VERSION
 
-Version 0.1972, released 2018-09-30.
+Version 0.1973, released 2019-08-28.
 
 =head1 LINES
 
@@ -84,7 +84,7 @@ Version 0.1972, released 2018-09-30.
     Östermalmstorg  (T14)
     Karlaplan
     Gärdet
-    Ropsten
+    Ropsten         (L21)
 
 =head2 Red line: Fruängen → Mörby centrum [T14]
 
@@ -238,6 +238,24 @@ Version 0.1972, released 2018-09-30.
     Olovslund
     Nockeby torg
     Nockeby
+
+=head2 Lidingöbanan: Gåshaga brygga → Ropsten [L21]
+
+=for HTML <div style="background-color: #bf8947; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Gåshaga brygga
+    Gåshaga
+    Käppala
+    Brevik
+    Högberga
+    Kottla
+    Skärsätra
+    AGA
+    Larsberg
+    Bodal
+    Baggeby
+    Torsvik
+    Ropsten         (T13)
 
 =head2 Tvärbanan: Alvik → Solna station [L22]
 

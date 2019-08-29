@@ -5,6 +5,7 @@ package Array::Circular;
 
 use Carp;
 use Scalar::Util qw/refaddr/;
+use Storable qw/dclone/;
 
 my %DATA;
 
@@ -13,6 +14,15 @@ sub new {
     my $self = bless \@self, $class;
     $self->me( { current => 0, count => 0 } ); 
     return $self;
+}
+
+sub clone {
+    my ($self) = @_;
+    my $class = ref $self;
+    my $new = $class->new(@$self);
+    $new->index($self->index);
+    $new->loops($self->loops);
+    return $new;
 }
 
 sub me {
@@ -157,6 +167,10 @@ Circular array, tracks how many times it's been round.
 =head3 new
 
     my $a = Array::Circular->new(qw/this is a test/);
+
+=head3 clone
+
+    my $new = $a->clone;
 
 =head3 next
 

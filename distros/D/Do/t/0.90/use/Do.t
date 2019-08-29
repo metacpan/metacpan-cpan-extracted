@@ -11,7 +11,7 @@ Do
 
 =abstract
 
-Development Framework
+Modern Perl Development Framework
 
 =synopsis
 
@@ -327,7 +327,7 @@ If you don't have cpanm, get it! It takes less than a minute, otherwise:
 
 Add C<Do> to the list of dependencies in C<cpanfile>:
 
-  requires "Do" => "1.00"; # 1.00 or newer
+  requires "Do" => "1.05"; # 1.05 or newer
 
 If cpanm doesn't have permission to install modules in the current Perl
 installation, it will automatically set up and install to a local::lib in your

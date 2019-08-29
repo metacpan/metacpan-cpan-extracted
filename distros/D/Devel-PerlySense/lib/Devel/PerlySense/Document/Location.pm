@@ -23,7 +23,7 @@ use warnings;
 use utf8;
 
 package Devel::PerlySense::Document::Location;
-$Devel::PerlySense::Document::Location::VERSION = '0.0219';
+$Devel::PerlySense::Document::Location::VERSION = '0.0220';
 
 
 

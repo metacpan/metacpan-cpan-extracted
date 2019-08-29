@@ -1,5 +1,8 @@
 Revision history for Map::Tube::London
 
+1.33  2019-08-29
+      - Moved author test scripts to xt/ subfolder.
+
 1.32  2019-07-06
       - Updated dependency on Map::Tube v3.64.
 

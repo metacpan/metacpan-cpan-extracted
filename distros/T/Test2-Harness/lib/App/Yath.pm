@@ -6,7 +6,7 @@ use App::Yath::Util qw/read_config find_pfile/;
 use File::Spec;
 use Test2::Util qw/IS_WIN32/;
 
-our $VERSION = '0.001085';
+our $VERSION = '0.001087';
 
 our $SCRIPT;
 
@@ -158,7 +158,7 @@ sub run_command {
 
     if ($cmd->show_bench && !$cmd->settings->{quiet}) {
         require Test2::Util::Times;
-        my $end = time;
+        my $end = Time::HiRes::time();
         my $bench = Test2::Util::Times::render_bench($start, $end, times);
         $class->info($bench, "\n\n");
     }
