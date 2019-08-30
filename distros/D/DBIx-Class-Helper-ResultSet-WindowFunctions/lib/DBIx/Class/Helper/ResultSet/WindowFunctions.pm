@@ -9,7 +9,7 @@ use warnings;
 
 use parent 'DBIx::Class::ResultSet';
 
-our $VERSION = 'v0.2.0';
+our $VERSION = 'v0.2.1';
 
 
 sub _resolved_attrs {
@@ -79,7 +79,7 @@ DBIx::Class::Helper::ResultSet::WindowFunctions - Add support for window functio
 
 =head1 VERSION
 
-version v0.2.0
+version v0.2.1
 
 =head1 SYNOPSIS
 
@@ -96,7 +96,8 @@ In a resultset:
 Using the resultset:
 
   my $rs = $schema->resultset('Wobbles')->search_rs(
-      undef.
+    undef,
+    {
       '+select' => {
           avg   => 'fingers',
           -over => {
@@ -105,6 +106,7 @@ Using the resultset:
           },
       },
       '+as' => 'avg',
+    }
   );
 
 =head1 DESCRIPTION

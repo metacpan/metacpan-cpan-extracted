@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-$VERSION = (qw$LastChangedRevision: 1603 $)[1];
+$VERSION = (qw$LastChangedRevision: 1740 $)[1];
 
 =head1 NAME
 
@@ -114,8 +114,7 @@ This is not guaranteed to work in non-Unix environments.
 
 All rights reserved.
 
-This program is free software; you may use or redistribute
-it under the same terms as Perl itself.
+FOR DEMONSTRATION PURPOSES ONLY, NO WARRANTY, NO SUPPORT
 
 
 =head1 SEE ALSO
@@ -179,7 +178,9 @@ require Net::DNS;
 
 my @conf = (
 	debug => ( $option{d} || 0 ),				# -d	enable diagnostics
-	igntc => ( $option{t} || 0 )				# -t	ignore truncation
+	igntc => ( $option{t} || 0 ),				# -t	ignore truncation
+
+	udppacketsize => 1024
 	);
 
 my $negtest = $option{n};					# -n	report NCACHE TTL
@@ -198,12 +199,12 @@ my $resolver = new Net::DNS::Resolver(@conf);			# create resolver object
 $resolver->nameservers(@nameserver) or die $resolver->string;
 
 
-my ($question) = new Net::DNS::Packet($domain)->question;	# invert IP address/prefix
-my $name       = lc $question->qname;
-my $NetDNSrev  = &Net::DNS::version;
+my $question  = new Net::DNS::Question($domain);		# invert IP address/prefix
+my $name      = lc $question->qname;
+my $NetDNSrev = &Net::DNS::version;
 die "\tFeature not supported by Net::DNS $NetDNSrev\n" if $name =~ m#[:/\s]|\.\d+$#;
 
-my $packet = $resolver->send( "*.$name", 'NULL' ) or die $resolver->errorstring;
+my $packet = $resolver->send( "_nx_.$name", 'CNAME' ) or die $resolver->errorstring;
 my ($zone) = map lc( $_->name ), $packet->authority;
 
 my @ns = ( $zone or $name eq '.' ) ? NS($zone) : ();		# find NS serving name
@@ -223,8 +224,7 @@ foreach my $soa (@soa) {					# simple sanity check
 
 	my $resolved;						# check MNAME resolvable
 	foreach my $rrtype (qw( A AAAA CNAME )) {
-		my $probe = $resolver->send( $mname, $rrtype );
-		next unless $probe;
+		my $probe = $resolver->send( $mname, $rrtype ) || next;
 		last if ( $resolved = scalar $probe->answer );
 	}
 
@@ -250,14 +250,14 @@ foreach my $soa (@soa) {					# simple sanity check
 		report( 'unresolved RNAME', $rname ) unless $resolved;
 	}
 
-	if ( $soa->expire < $soa->refresh ) {			# check refresh/retry timing
-		report('slave expires zone data before scheduled refresh');
+	unless ( $soa->expire > $soa->refresh ) {		# check refresh/retry timing
+		report('zone data expires with no refresh');
 	} else {
 		my $window = $soa->expire - $soa->refresh - 1;	# zone transfer window
 		my $retry  = $soa->retry || 1;			# retry interval
 		my $n	   = 1 + int( $window / $retry );	# number of transfer attempts
 		my $s	   = $n > 1 ? 's' : '';
-		report("slave expires zone data after $n transfer failure$s") unless $n > 3;
+		report("zone data expires after $n transfer failure$s") unless $n > 3;
 	}
 
 	my ($min) = sort { $a <=> $b } ( $soa->minimum, $soa->ttl );	# force NCACHE test for extreme TTLs
@@ -266,11 +266,12 @@ foreach my $soa (@soa) {					# simple sanity check
 
 my @ncache = $negtest ? NCACHE($zone) : ();			# report observed NCACHE TTL
 
-foreach my $rrtype (qw( A AAAA PTR )) {				# nobody believes in ANY any more
-	displayRR( $name, $rrtype );
-}
-
 displayRR( $zone, 'NS' ) if @nameserver;			# show NS if testing specific nameserver
+
+
+$resolver->usevc(1);						# no longer ok to query ANY over UDP
+$resolver->nameservers(@server);
+displayRR( $name, 'ANY' );
 
 print "----\n";
 
@@ -471,7 +472,7 @@ sub displayRR {				## print specified RRs or error code
 
 	foreach my $rr ( @answer, @workaround ) {		# print RRs unless shown elsewhere
 
-		next if $qtype eq 'ANY' && $rr->type =~ /^(SOA|NS)$/;
+		next if $qtype eq 'ANY' && $rr->type =~ /^(SOA|NS|RRSIG)$/;
 
 		print @annotation if $rr->name eq $qname;	# annotate IDN
 

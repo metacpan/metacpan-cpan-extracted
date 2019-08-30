@@ -4,7 +4,7 @@ use Data::Object 'Class';
 
 extends 'Data::Object::Code::Func';
 
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 # BUILD
 
@@ -69,6 +69,7 @@ Data-Object Code Function (Compose) Class
 =head1 DESCRIPTION
 
 Data::Object::Code::Func::Compose is a function object for Data::Object::Code.
+This package inherits all behavior from L<Data::Object::Code::Func>.
 
 =cut
 

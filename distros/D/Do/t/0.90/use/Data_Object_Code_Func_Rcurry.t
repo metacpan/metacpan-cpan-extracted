@@ -26,6 +26,7 @@ Data-Object Code Function (Rcurry) Class
 =description
 
 Data::Object::Code::Func::Rcurry is a function object for Data::Object::Code.
+This package inherits all behavior from L<Data::Object::Code::Func>.
 
 =cut
 

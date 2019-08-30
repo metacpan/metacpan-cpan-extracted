@@ -85,6 +85,7 @@ sub exercise_forks {
         }
         my $gcpid = wait;
         sleep 2;
+        sleep 3; # RT#127933
         $q->end;
         exit;
     }
@@ -104,9 +105,11 @@ sub exercise_forks {
     }
     ok($t - time < 5,
        'forks: simultaneous queue access from 3 procs not too slow');
-    ok($q->pending == 30, 'forks: 30 items on queue');
+    ok($q->pending == 30, 'forks: 30 items on queue')
+        or diag $q->pending;
     my @g = $q->get(30);
-    ok(@g == 30, 'forks: get(30) retrieved 30 items from queue');
+    ok(@g == 30, 'forks: get(30) retrieved 30 items from queue')
+        or diag 0+@q," [@q]";
 
     my %expect;
     for my $i (0 .. 9) {
@@ -288,17 +291,20 @@ sub exercise_blocking {
 
     ok($q->pending == 0, 'block: queue is initially empty');
 
+    my $t0 = Time::HiRes::time;
     my $pid = fork();
     if ($pid == 0) {
         sleep 5;
         my @items = map [ ($_) x $_ ], 1..10;
         $q->put(@items);
+        diag "put time=",Time::HiRes::time-$t0,"s";
         $q->end;
         exit;
     }
 
     local $SIG{ALRM} = sub { die "Timeout\n" };
     my $t = Time::HiRes::time;
+    my $t1 = $t;
     my ($x1,$x2,$x3) = (1,2,3);
 
     alarm 10;
@@ -332,7 +338,10 @@ sub exercise_blocking {
     ok(!$@, 'block: get,pop,shift did not timeout')
         or diag "wait time was ${t}s";
     ok($x3 && ref($x3) eq 'ARRAY' && @$x3==10,
-       'block: blocking pop got last element') or diagdump($x3);
+       'block: blocking pop got last element') or diagdump($x3,$t1-$t0,$t-$t0);
+    # t1-t0 is "start up time", time to recover after starting the child process
+    # check that it is not large compared to "put time" reported by child
+    # "put time" should also be a lot shorter than t-t0
     ok($x2 && ref($x2) eq 'ARRAY' && @$x2==1,
        'block: blocking shift got first element') or diagdump($x2);
     if ($q->{style} ne 'lifo') {
@@ -463,6 +472,11 @@ sub TEMP_DIR {
             $TEMP = "/";
             warn "$0: using '/' as temp file store";
         }
+    }
+    if (defined &Forks::Queue::Util::__is_nfs &&
+        Forks::Queue::Util::__is_nfs($TEMP)) {
+        diag "Warning: working directory '$TEMP' is an NFS directory";
+        diag "Synchronization is more difficult with NFS files";
     }
     return $TEMP;
 }

@@ -25,7 +25,9 @@ Data-Object String Function (Contains) Class
 
 =description
 
-Data::Object::String::Func::Contains is a function object for Data::Object::String.
+Data::Object::String::Func::Contains is a function object for
+Data::Object::String. This package inherits all behavior from
+L<Data::Object::String::Func>.
 
 =cut
 

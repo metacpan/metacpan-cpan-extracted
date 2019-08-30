@@ -20,7 +20,8 @@ Functions for ScalarRefs
 =description
 
 Data::Object::Scalar::Func is an abstract base class for function classes in
-the Data::Object::Scalar::Func space.
+the Data::Object::Scalar::Func space. This package inherits all behavior from
+L<Data::Object::Func>.
 
 =cut
 

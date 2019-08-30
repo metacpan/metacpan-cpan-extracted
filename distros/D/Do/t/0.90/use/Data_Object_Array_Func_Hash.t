@@ -26,6 +26,7 @@ Data-Object Array Function (Hash) Class
 =description
 
 Data::Object::Array::Func::Hash is a function object for Data::Object::Array.
+This package inherits all behavior from L<Data::Object::Array::Func>.
 
 =cut
 

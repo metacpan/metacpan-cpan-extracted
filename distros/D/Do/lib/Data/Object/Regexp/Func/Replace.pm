@@ -6,7 +6,7 @@ use Data::Object::Replace;
 
 extends 'Data::Object::Regexp::Func';
 
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 # BUILD
 
@@ -97,7 +97,9 @@ Data-Object Regexp Function (Replace) Class
 
 =head1 DESCRIPTION
 
-Data::Object::Regexp::Func::Replace is a function object for Data::Object::Regexp.
+Data::Object::Regexp::Func::Replace is a function object for
+Data::Object::Regexp. This package inherits all behavior from
+L<Data::Object::Regexp::Func>.
 
 =cut
 

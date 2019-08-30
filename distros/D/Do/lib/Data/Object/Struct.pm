@@ -7,7 +7,7 @@ use Data::Object::Class;
 
 with 'Data::Object::Role::Immutable';
 
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 # BUILD
 
@@ -50,6 +50,12 @@ Data-Object Struct Declaration
 =head1 DESCRIPTION
 
 This package modifies the consuming package making it a struct.
+
+=head1 ROLES
+
+This package assumes all behavior from the follow roles:
+
+L<Data::Object::Role::Immutable>
 
 =cut
 

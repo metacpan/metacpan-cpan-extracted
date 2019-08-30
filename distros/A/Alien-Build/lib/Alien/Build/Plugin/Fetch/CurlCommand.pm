@@ -12,7 +12,7 @@ use List::Util 1.33 qw( any );
 use File::chdir;
 
 # ABSTRACT: Plugin for fetching files using curl
-our $VERSION = '1.83'; # VERSION
+our $VERSION = '1.85'; # VERSION
 
 
 sub curl_command
@@ -219,7 +219,7 @@ Alien::Build::Plugin::Fetch::CurlCommand - Plugin for fetching files using curl
 
 =head1 VERSION
 
-version 1.83
+version 1.85
 
 =head1 SYNOPSIS
 

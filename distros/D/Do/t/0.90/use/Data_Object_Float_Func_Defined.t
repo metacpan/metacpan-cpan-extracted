@@ -25,7 +25,9 @@ Data-Object Float Function (Defined) Class
 
 =description
 
-Data::Object::Float::Func::Defined is a function object for Data::Object::Float.
+Data::Object::Float::Func::Defined is a function object for
+Data::Object::Float. This package inherits all behavior from
+L<Data::Object::Float::Func>.
 
 =cut
 

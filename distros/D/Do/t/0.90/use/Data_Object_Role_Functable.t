@@ -24,6 +24,12 @@ Data-Object Functable Role
 This package provides mechanisms for dispatching to functors, i.e. data object
 function classes.
 
++=head1 ROLES
+
+This package assumes all behavior from the follow roles:
+
+L<Data::Object::Role::Proxyable>
+
 =cut
 
 use_ok "Data::Object::Role::Functable";

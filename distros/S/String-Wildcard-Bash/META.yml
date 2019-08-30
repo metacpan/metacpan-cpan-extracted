@@ -6,6 +6,7 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
+  Test::Exception: '0'
   Test::More: '0.98'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -25,7 +26,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=String-Wildcard-Bash
   homepage: https://metacpan.org/release/String-Wildcard-Bash
   repository: git://github.com/perlancar/perl-String-Wildcard-Bash.git
-version: '0.040'
+version: '0.043'
 x_Dist_Zilla:
   perl:
     version: '5.028002'

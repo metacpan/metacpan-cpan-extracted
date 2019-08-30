@@ -4,7 +4,7 @@ use Data::Object 'Class';
 
 extends 'Data::Object::Func';
 
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 # BUILD
 # METHODS
@@ -34,7 +34,8 @@ Functions for Any Data
 =head1 DESCRIPTION
 
 Data::Object::Any::Func is an abstract base class for function classes in the
-Data::Object::Any::Func space.
+Data::Object::Any::Func space. This package inherits all behavior from
+L<Data::Object::Func>.
 
 =cut
 

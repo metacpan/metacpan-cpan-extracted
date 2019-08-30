@@ -1,4 +1,4 @@
-# $Id: 02-mailbox.t 1406 2015-10-05 08:25:49Z willem $	-*-perl-*-
+# $Id: 02-mailbox.t 1749 2019-07-21 09:15:55Z willem $	-*-perl-*-
 
 use strict;
 use Test::More tests => 43;
@@ -18,15 +18,15 @@ BEGIN {
 
 {
 	my $mailbox = eval { new Net::DNS::Mailbox(); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "empty argument list\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "empty argument list\t[$exception]" );
 }
 
 
 {
 	my $mailbox = eval { new Net::DNS::Mailbox(undef); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "argument undefined\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "argument undefined\t[$exception]" );
 }
 
 

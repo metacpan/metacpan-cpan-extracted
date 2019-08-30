@@ -13,7 +13,7 @@ use Config ();
 use Alien::Build::Log;
 
 # ABSTRACT: Build external dependencies for use in CPAN
-our $VERSION = '1.83'; # VERSION
+our $VERSION = '1.85'; # VERSION
 
 
 sub _path { goto \&Path::Tiny::path }
@@ -1159,7 +1159,7 @@ Alien::Build - Build external dependencies for use in CPAN
 
 =head1 VERSION
 
-version 1.83
+version 1.85
 
 =head1 SYNOPSIS
 

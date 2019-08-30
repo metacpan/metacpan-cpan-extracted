@@ -1,5 +1,22 @@
 Revision history for Music-Cadence
 
+0.0900 2019-08-30 11:26:14
+    - Enable imperfect inverted cadences.
+    - Improve documentation again!
+    - Enhance test cases.
+
+0.0801 2019-08-29 15:37:55
+    - Improve documentation ever so slightly.
+    - Clean up test code.
+
+0.0800 2019-08-29 15:00:10
+    - Add support for 2 of 3 imperfect cadence variations.
+
+0.0700 2019-08-29 13:43:56
+    - Fix the perfect authentic cadence top note.
+    - Fix documentation error.
+    - Make the final eg/cadence perfect instead of plagal.
+
 0.0601 2019-08-29 10:49:02
     - Improve documentation.
     - Remove octave setting for midinum.

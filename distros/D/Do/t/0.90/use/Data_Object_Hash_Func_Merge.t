@@ -26,6 +26,7 @@ Data-Object Hash Function (Merge) Class
 =description
 
 Data::Object::Hash::Func::Merge is a function object for Data::Object::Hash.
+This package inherits all behavior from L<Data::Object::Hash::Func>.
 
 =cut
 

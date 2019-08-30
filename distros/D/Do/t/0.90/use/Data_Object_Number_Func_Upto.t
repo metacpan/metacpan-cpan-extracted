@@ -26,6 +26,7 @@ Data-Object Number Function (Upto) Class
 =description
 
 Data::Object::Number::Func::Upto is a function object for Data::Object::Number.
+This package inherits all behavior from L<Data::Object::Number::Func>.
 
 =cut
 

@@ -44,6 +44,7 @@ Data-Object Type Constraint Builder
 =description
 
 This package is an abstract base class for type constraint builder classes.
+This package inherits all behavior from L<Data::Object::Base>.
 
 =cut
 

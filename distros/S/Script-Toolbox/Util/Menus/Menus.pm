@@ -12,7 +12,6 @@ require Exporter;
 @EXPORT = qw(
 	
 );
-#$VERSION = '0.03';
 
 
 # Preloaded methods go here.
@@ -485,15 +484,51 @@ sub setValues($$$){
 # if they have the same label.
 #------------------------------------------------------------------------------
 sub setDefaults($$$){
-    my ($self,$name,$values) = @_;
+    my ($self,$name,$defaults) = @_;
 
     my $L = $self->{'def'}{$name}{'opts'};
     my $lvh;
     foreach my $x (@{$L}) {
         my $l = $x->{'label'};
-        my $v = $values->{$l};
+        my $v = $defaults->{$l};
         next    if( ! defined $v );
         $x->{'default'} = $v;
+    }
+}
+
+#------------------------------------------------------------------------------
+# Take a hash {<label> => <jumpTarget>} as input.
+# Copy the jumpTarget to the jump field of the menu option
+# if they have the same label.
+#------------------------------------------------------------------------------
+sub setJumps($$$){
+    my ($self,$name,$jumps) = @_;
+
+    my $L = $self->{'def'}{$name}{'opts'};
+    my $lvh;
+    foreach my $x (@{$L}) {
+        my $l = $x->{'label'};
+        my $v = $jumps->{$l};
+        next    if( ! defined $v );
+        $x->{'jump'} = $v;
+    }
+}
+
+#------------------------------------------------------------------------------
+# Take a hash {<label> => <readOnly>} as input.
+# Copy the readOnly to the readOnly field of the menu option
+# if they have the same label.
+#------------------------------------------------------------------------------
+sub setReadOnlys($$$){
+    my ($self,$name,$readOnly) = @_;
+
+    my $L = $self->{'def'}{$name}{'opts'};
+    my $lvh;
+    foreach my $x (@{$L}) {
+        my $l = $x->{'label'};
+        my $v = $readOnly->{$l};
+        next    if( ! defined $v );
+        $x->{'readOnly'} = $v;
     }
 }
 

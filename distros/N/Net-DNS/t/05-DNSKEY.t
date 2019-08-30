@@ -1,4 +1,4 @@
-# $Id: 05-DNSKEY.t 1526 2017-01-16 09:17:54Z willem $	-*-perl-*-
+# $Id: 05-DNSKEY.t 1749 2019-07-21 09:15:55Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -101,12 +101,12 @@ my $wire = join '', qw( 010003050103D22A6CA77F35B893206FD35E4C506D8378843709B97E
 	is( $rr->algorithm(),		5,	   'rr->algorithm("MNEMONIC") preserves value' );
 
 	eval { $rr->algorithm('X'); };
-	my $exception1 = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception1 ||= '', "unknown mnemonic\t[$exception1]" );
+	my ($exception1) = split /\n/, "$@\n";
+	ok( $exception1, "unknown mnemonic\t[$exception1]" );
 
 	eval { $rr->algorithm(0); };
-	my $exception2 = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception2 ||= '', "disallowed algorithm 0\t[$exception2]" );
+	my ($exception2) = split /\n/, "$@\n";
+	ok( $exception2, "disallowed algorithm 0\t[$exception2]" );
 
 	is( $class->algorithm('RSASHA256'), 8,		 'class method algorithm("RSASHA256")' );
 	is( $class->algorithm(8),	    'RSASHA256', 'class method algorithm(8)' );

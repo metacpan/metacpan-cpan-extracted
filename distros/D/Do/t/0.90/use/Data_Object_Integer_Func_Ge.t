@@ -26,6 +26,7 @@ Data-Object Integer Function (Ge) Class
 =description
 
 Data::Object::Integer::Func::Ge is a function object for Data::Object::Integer.
+This package inherits all behavior from L<Data::Object::Integer::Func>.
 
 =cut
 

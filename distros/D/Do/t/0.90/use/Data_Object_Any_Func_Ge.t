@@ -25,7 +25,8 @@ Data-Object Any Function (Ge) Class
 
 =description
 
-Data::Object::Any::Func::Ge is a function object for Data::Object::Any.
+Data::Object::Any::Func::Ge is a function object for Data::Object::Any. This
+package inherits all behavior from L<Data::Object::Any::Func>.
 
 =cut
 

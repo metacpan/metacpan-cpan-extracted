@@ -21,20 +21,22 @@ Data-Object Any Class
 
 =description
 
-Data::Object::Any provides routines for operating on any Perl 5 data type.
+Data::Object::Any provides routines for operating on any Perl 5 data type. This
+package inherits all behavior from L<Data::Object::Any::Base>.
 
-=composition
++=head1 ROLES
 
-This package inherits functionality from roles, adheres to constraints defined
-in specs, and implements proxy methods as documented.
+This package assumes all behavior from the following roles:
 
-=roles
+L<Data::Object::Role::Detract>
 
-This package is comprised of the following roles.
+L<Data::Object::Role::Dumper>
 
-=specs
+L<Data::Object::Role::Functable>
 
-This package is adheres to the following specs.
+L<Data::Object::Role::Output>
+
+L<Data::Object::Role::Throwable>
 
 =cut
 

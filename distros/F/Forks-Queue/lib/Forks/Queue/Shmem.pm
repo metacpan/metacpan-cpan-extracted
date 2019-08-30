@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.09';
+our $VERSION = '0.11';
 our $DEV_SHM = "/dev/shm";
 our $DEBUG;
 *DEBUG = \$Forks::Queue::DEBUG;
@@ -91,11 +91,6 @@ sub new {
         }
     }
 
-    if ($opts{remote}) {
-        require Net::Objwrap;
-        Net::Objwrap::wrap($opts{remote},$self);
-    }
-
     return $self;
 }
 
@@ -124,7 +119,7 @@ Forks::Queue::Shmem - Forks::Queue implementation using shared memory
 
 =head1 VERSION
 
-0.09
+0.11
 
 =head1 DESCRIPTION
 
@@ -179,4 +174,3 @@ at your option, any later version of Perl 5 you may have available.
 See http://dev.perl.org/licenses/ for more information.
 
 =cut
-

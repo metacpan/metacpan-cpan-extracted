@@ -1,4 +1,4 @@
-# $Id: 02-domain.t 1611 2018-01-02 09:41:24Z willem $	-*-perl-*-
+# $Id: 02-domain.t 1749 2019-07-21 09:15:55Z willem $	-*-perl-*-
 
 use strict;
 use Test::More tests => 53;
@@ -31,15 +31,15 @@ use_ok('Net::DNS::Domain');
 
 {
 	my $domain = eval { new Net::DNS::Domain(); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "empty argument list\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "empty argument list\t[$exception]" );
 }
 
 
 {
 	my $domain = eval { new Net::DNS::Domain(undef); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "argument undefined\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "argument undefined\t[$exception]" );
 }
 
 
@@ -166,22 +166,22 @@ use constant ESC => '\\';
 {
 	my $name      = 'LO-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-NG!';
 	my $domain    = eval { new Net::DNS::Domain("$name") };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "long domain label\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "long domain label\t[$exception]" );
 }
 
 
 {
 	my $domain = eval { new Net::DNS::Domain('.example.com') };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "empty initial label\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "empty initial label\t[$exception]" );
 }
 
 
 {
 	my $domain = eval { new Net::DNS::Domain("example..com"); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "empty interior label\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "empty interior label\t[$exception]" );
 }
 
 

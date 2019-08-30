@@ -1,4 +1,4 @@
-# $Id: 04-packet.t 1709 2018-09-07 08:03:09Z willem $	-*-perl-*-
+# $Id: 04-packet.t 1749 2019-07-21 09:15:55Z willem $	-*-perl-*-
 
 use strict;
 
@@ -64,8 +64,7 @@ while (@data) {
 	my $truncated = pack 'C*', @data;
 	my $length    = length $truncated;
 	my $object    = Net::DNS::Packet->new( \$truncated );
-	my $exception = $@;
-	$exception =~ s/\n.*$//g;
+	my ($exception) = split /\n/, "$@\n";
 	ok( $exception, "truncated ($length octets):\t[$exception]" );
 }
 
@@ -173,8 +172,8 @@ is( $rr->size, '4096', 'EDNS0 packet size correct' );
 	my $reply  = $packet->reply();
 	ok( $reply->isa('Net::DNS::Packet'), '$packet->reply() returns packet' );
 	eval { $reply->reply(); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "reply->reply()\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "reply->reply()\t[$exception]" );
 	my $udpmax = 2048;
 	$packet->edns->size($udpmax);
 	$packet->data;
@@ -199,8 +198,8 @@ is( $rr->size, '4096', 'EDNS0 packet size correct' );
 	is( ref( $packet->sigrr() ), ref($sig), 'sigrr() returns SIG RR' );
 
 	eval { $packet->sign_sig0( [] ); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "sign_sig0([])\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "sign_sig0([])\t[$exception]" );
 }
 
 
@@ -208,8 +207,8 @@ is( $rr->size, '4096', 'EDNS0 packet size correct' );
 	my $packet = new Net::DNS::Packet('example.com');
 	my $bogus = new Net::DNS::RR( type => 'NULL' );
 	eval { $packet->sign_tsig($bogus); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "sign_tsig([])\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "sign_tsig([])\t[$exception]" );
 }
 
 

@@ -26,6 +26,7 @@ Data-Object Array Function (Sort) Class
 =description
 
 Data::Object::Array::Func::Sort is a function object for Data::Object::Array.
+This package inherits all behavior from L<Data::Object::Array::Func>.
 
 =cut
 

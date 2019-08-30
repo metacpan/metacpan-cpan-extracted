@@ -1,4 +1,4 @@
-# $Id: 05-HIP.t 1362 2015-06-23 08:47:14Z willem $	-*-perl-*-
+# $Id: 05-HIP.t 1749 2019-07-21 09:15:55Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -15,13 +15,13 @@ foreach my $package (@prerequisite) {
 	exit;
 }
 
-plan tests => 24;
+plan tests => 22;
 
 
 my $name = 'HIP.example';
 my $type = 'HIP';
 my $code = 55;
-my @attr = qw( pkalgorithm hit key servers );
+my @attr = qw( algorithm hit key servers );
 my @data = qw( 2 200100107b1a74df365639cc39f1d578
 		AwEAAbdxyhNuSutc5EMzxTs9LBPCIkOFH8cIvM4p9+LrV4e19WzK00+CI6zBCQTdtWsuxKbWIy87UOoJTwkUs7lBu+Upr1gsNrut79ryra+bSRGQb1slImA8YVJyuIDsj7kwzG7jnERNqnWxZ48AWkskmdHaVDP4BcelrTI3rMXdXF5D
 		rvs1.example.com
@@ -93,16 +93,16 @@ my $wire = join '', qw( 10020084200100107b1a74df365639cc39f1d57803010001b771ca13
 	$wire[length($empty) - 1]--;
 	my $wireformat = pack 'C*', @wire;
 	eval { decode Net::DNS::RR( \$wireformat ); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "corrupt wire-format\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "corrupt wire-format\t[$exception]" );
 }
 
 
 {
 	my $rr = new Net::DNS::RR(". $type @data");
 	eval { $rr->hit('123456789XBCDEF'); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "corrupt hexadecimal\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "corrupt hexadecimal\t[$exception]" );
 }
 
 
@@ -128,8 +128,11 @@ my $wire = join '', qw( 10020084200100107b1a74df365639cc39f1d57803010001b771ca13
 
 {
 	my $rr = new Net::DNS::RR("$name $type @data");
-	is( $rr->pubkey,		   $rr->key, "historical 'pubkey'" );
-	is( ref( $rr->rendezvousservers ), 'ARRAY',  "historical 'rendezvousservers'" );
+	local $SIG{__WARN__} = sub { };				# suppress deprecation warning
+	eval { $rr->pkalgorithm() };				# historical
+	eval { $rr->pubkey() };					# historical
+	eval { $rr->rendezvousservers() };			# historical
+
 	$rr->print;
 }
 

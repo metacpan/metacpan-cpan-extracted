@@ -23,7 +23,7 @@ with qw(
 
 use parent 'Data::Object::Regexp::Base';
 
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 # METHODS
 
@@ -54,6 +54,204 @@ Data-Object Regexp Class
 =head1 DESCRIPTION
 
 This package provides routines for operating on Perl 5 regular expressions.
+This package inherits all behavior from L<Data::Object::Regexp::Base>.
+
+This package assumes all behavior from the following roles:
+
+L<Data::Object::Role::Detract>
+
+L<Data::Object::Role::Dumper>
+
+L<Data::Object::Role::Functable>
+
+L<Data::Object::Role::Output>
+
+L<Data::Object::Role::Throwable>
+
+=cut
+
+=head1 METHODS
+
+This package implements the following methods.
+
+=cut
+
+=head2 defined
+
+  defined() : NumObject
+
+The defined method returns true if the object represents a value that meets the
+criteria for being defined, otherwise it returns false. This method returns a
+L<Data::Object::Number> object.
+
+=over 4
+
+=item defined example
+
+  # given $regexp
+
+  $re->defined; # 1
+
+=back
+
+=cut
+
+=head2 eq
+
+  eq(Any $arg1) : NumObject
+
+The eq method is a consumer requirement but has no function and is not
+implemented. This method will throw an exception if called.
+
+=over 4
+
+=item eq example
+
+  # given $re
+
+  $re->eq; # exception thrown
+
+=back
+
+=cut
+
+=head2 ge
+
+  ge(Any $arg1) : NumObject
+
+The ge method is a consumer requirement but has no function and is not
+implemented. This method will throw an exception if called.
+
+=over 4
+
+=item ge example
+
+  # given $re
+
+  $re->ge; # exception thrown
+
+=back
+
+=cut
+
+=head2 gt
+
+  gt(Any $arg1) : NumObject
+
+The gt method is a consumer requirement but has no function and is not
+implemented. This method will throw an exception if called.
+
+=over 4
+
+=item gt example
+
+  # given $re
+
+  $re->gt; # exception thrown
+
+=back
+
+=cut
+
+=head2 le
+
+  le(Any $arg1) : NumObject
+
+The le method is a consumer requirement but has no function and is not
+implemented. This method will throw an exception if called.
+
+=over 4
+
+=item le example
+
+  # given $re
+
+  $re->le; # exception thrown
+
+=back
+
+=cut
+
+=head2 lt
+
+  lt(Any $arg1) : NumObject
+
+The lt method is a consumer requirement but has no function and is not
+implemented. This method will throw an exception if called.
+
+=over 4
+
+=item lt example
+
+  # given $re
+
+  $re->lt; # exception thrown
+
+=back
+
+=cut
+
+=head2 ne
+
+  ne(Any $arg1) : NumObject
+
+The ne method is a consumer requirement but has no function and is not
+implemented. This method will throw an exception if called.
+
+=over 4
+
+=item ne example
+
+  # given $re
+
+  $re->ne; # exception thrown
+
+=back
+
+=cut
+
+=head2 replace
+
+  replace(Str $arg1, Str $arg2) : StrObject
+
+The replace method performs a regular expression substitution on the given
+string. The first argument is the string to match against. The second argument
+is the replacement string. The optional third argument might be a string
+representing flags to append to the s///x operator, such as 'g' or 'e'.  This
+method will always return a L<Data::Object::Replace> object which can be
+used to introspect the result of the operation.
+
+=over 4
+
+=item replace example
+
+  # given qr(test)
+
+  $re->replace('this is a test', 'drill');
+  $re->replace('test 1 test 2 test 3', 'drill', 'gi');
+
+=back
+
+=cut
+
+=head2 search
+
+  search(Str $arg1) : SearchObject
+
+The search method performs a regular expression match against the given string
+This method will always return a L<Data::Object::Search> object which
+can be used to introspect the result of the operation.
+
+=over 4
+
+=item search example
+
+  # given qr((test))
+
+  $re->search('this is a test');
+  $re->search('this does not match', 'gi');
+
+=back
 
 =cut
 

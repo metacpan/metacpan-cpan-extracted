@@ -134,13 +134,13 @@ statement at point to the 'use Module' section at the top.
 B<Extract Variable> - C<C-o e e v> -- Do the refactoring Extract
 Variable of the active region.
 
-B<Find Callers> - C>C-o e f c> -- Find callers of a method in the
+B<Find Callers> - C<C-o e f c> -- Find callers of a method in the
 project and insert the call tree as a comment in the source.
 
-B<Visualize Callers> - C>C-o e v c> -- Visualize the callers comment
+B<Visualize Callers> - C<C-o e v c> -- Visualize the callers comment
 created by "Find Callers" using GrapViz.
 
-B<Visualize Callers> - C>C-o e v c> -- Visualize callers in a call
+B<Visualize Callers> - C<C-o e v c> -- Visualize callers in a call
 tree (found by Find Callers) by drawing the call tree using GraphViz.
 
 B<Edit Test Count> -- C<C-o e t c> -- Increase the test count
@@ -399,7 +399,7 @@ These are the ones I use every day so they may be a good start:
 
 =item * Find with Ack
 
-=item * Find sub declerations
+=item * Find sub declarations
 
 =back
 
@@ -563,8 +563,8 @@ See also:
 
 =item * Git -- Magit
 
-This requires you to have Magit installed. Download and manual at:
-L<http://zagadka.vm.bytemark.co.uk/magit/>.
+This requires you to have Magit installed. Install using ELPA (C<M-x
+packages-list-packages>). Docs at L<https://magit.vc/>.
 
 When you switch to an existing Magit status buffer the status is
 refreshed automatically to display the current status.
@@ -1093,12 +1093,12 @@ activities.
 Set "syntax" and/or "critic" to 1 to enable them.
 
 B<The primary reason "syntax" is turned off by default is that it's a
-potential security hole>; running "perl -c" on a file will not only
-check the syntax; BEGIN and CHECK blocks are also executed. Doing that
-on random code may be considered... baaad.
+potential security hole>; running C<perl -c> on a file will not only
+check the syntax; C<BEGIN> and C<CHECK> blocks are also
+executed. Doing that on random code may be considered... baaad.
 
-This way you can have Flymake enabled globally and still not run "perl
--c" on everything that happens to be in a buffer.
+This way you can have Flymake enabled globally and still not run
+C<perl -c> on everything that happens to be in a buffer.
 
 
 
@@ -1916,7 +1916,7 @@ use warnings;
 use utf8;
 
 package Devel::PerlySense;
-$Devel::PerlySense::VERSION = '0.0220';
+$Devel::PerlySense::VERSION = '0.0221';
 
 
 use Spiffy -Base;

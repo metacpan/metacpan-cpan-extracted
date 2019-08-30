@@ -1,4 +1,4 @@
-# $Id: 05-TSIG.t 1726 2018-12-15 12:59:56Z willem $	-*-perl-*-
+# $Id: 05-TSIG.t 1749 2019-07-21 09:15:55Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -86,8 +86,8 @@ my $hash = {};
 	my @wire = unpack 'C*', $encoded;
 	my $wireformat = pack 'C*', @wire, 0;
 	eval { decode Net::DNS::RR( \$wireformat ); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "misplaced SIG RR\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "misplaced SIG RR\t[$exception]" );
 }
 
 
@@ -98,8 +98,8 @@ my $hash = {};
 	ok( !$rr->other(),	'other undefined' );
 	ok( $rr->time_signed(), 'time_signed() defined' );
 	my $key = eval { $rr->key(); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "write-only key attribute\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "write-only key attribute\t[$exception]" );
 }
 
 

@@ -1,4 +1,4 @@
-# $Id: 03-question.t 1727 2018-12-31 12:04:48Z willem $	-*-perl-*-
+# $Id: 03-question.t 1749 2019-07-21 09:15:55Z willem $	-*-perl-*-
 
 use strict;
 
@@ -52,16 +52,16 @@ use Test::More tests => 105;
 
 {
 	my $question = eval { new Net::DNS::Question(undef); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "argument undefined\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "argument undefined\t[$exception]" );
 }
 
 
 {
 	foreach my $method (qw(qname qtype qclass name)) {
 		my $question = eval { new Net::DNS::Question('.')->$method('name'); };
-		my $exception = $1 if $@ =~ /^(.+)\n/;
-		ok( $exception ||= '', "$method read-only:\t[$exception]" );
+		my ($exception) = split /\n/, "$@\n";
+		ok( $exception, "$method read-only:\t[$exception]" );
 	}
 }
 
@@ -69,8 +69,8 @@ use Test::More tests => 105;
 {
 	my $wiredata = pack 'H*', '000001';
 	my $question = eval { decode Net::DNS::Question( \$wiredata ); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "corrupt wire-format\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "corrupt wire-format\t[$exception]" );
 }
 
 

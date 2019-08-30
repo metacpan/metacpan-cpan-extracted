@@ -9,7 +9,7 @@ use_ok('Forks::Queue::File');
 
 unlink 't/q10';
 ok(-d 't', 'queue directory exists');
-ok(! -f 't/q1', 'queue file does not exist yet');
+ok(! -f 't/q10', 'queue file does not exist yet');
 
 ########
 

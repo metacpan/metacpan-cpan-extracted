@@ -1,4 +1,4 @@
-# $Id: 72-TSIG-verify.t 1726 2018-12-15 12:59:56Z willem $	-*-perl-*-
+# $Id: 72-TSIG-verify.t 1748 2019-07-15 07:57:00Z willem $	-*-perl-*-
 
 use strict;
 use Test::More;
@@ -118,7 +118,7 @@ close KEY;
 	my $packet = new Net::DNS::Packet('query.example');
 	$packet->sign_tsig( $privatekey, fudge => 0 );
 	my $encoded = $packet->data;
-	sleep 1;
+	sleep 2;						# guarantee one complete second delay
 
 	my $query = new Net::DNS::Packet( \$encoded );
 	$query->verify();
@@ -196,8 +196,8 @@ close KEY;
 
 	my $null = new Net::DNS::RR( type => 'NULL' );
 	eval { $packet->sigrr->verify($null); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "unexpected argument\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "unexpected argument\t[$exception]" );
 }
 
 
@@ -207,8 +207,8 @@ close KEY;
 
 	my $null = new Net::DNS::RR( type => 'NULL' );
 	eval { $packet->sigrr->verify( $packet, $null ); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "unexpected argument\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "unexpected argument\t[$exception]" );
 }
 
 

@@ -1,9 +1,9 @@
 package Net::DNS::RR;
 
 #
-# $Id: RR.pm 1726 2018-12-15 12:59:56Z willem $
+# $Id: RR.pm 1748 2019-07-15 07:57:00Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1726 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1748 $)[1];
 
 
 =head1 NAME
@@ -87,7 +87,7 @@ The trailing dot (.) is optional.
 
 =cut
 
-my $PARSE_REGEX = q/("[^"]*")|;[^\n]*|[ \t\n\r\f()]/;
+my $PARSE_REGEX = q/("[^"]*")|;[^\n]*|[ \t\n\r\f()]/;		# NB: *not* \s (matches Unicode white space)
 
 sub _new_string {
 	my $base;
@@ -708,6 +708,13 @@ sub _annotation {
 	my $self = shift;
 	$self->{annotation} = ["@_"] if scalar @_;
 	return @{$self->{annotation} || []} if wantarray;
+}
+
+
+my $warned;
+
+sub _deprecate {
+	carp join ' ', 'deprecated method;', pop(@_) unless $warned++;
 }
 
 

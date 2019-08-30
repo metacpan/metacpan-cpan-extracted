@@ -25,7 +25,9 @@ Data-Object Number Function (Downto) Class
 
 =description
 
-Data::Object::Number::Func::Downto is a function object for Data::Object::Number.
+Data::Object::Number::Func::Downto is a function object for
+Data::Object::Number. This package inherits all behavior from
+L<Data::Object::Number::Func>.
 
 =cut
 

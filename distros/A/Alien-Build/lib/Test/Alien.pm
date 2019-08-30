@@ -6,7 +6,7 @@ use 5.008001;
 use Env qw( @PATH );
 use File::Which 1.10 qw( which );
 use Capture::Tiny qw( capture capture_merged );
-use File::Temp qw( tempdir );
+use Alien::Build::Temp;
 use File::Copy qw( move );
 use Text::ParseWords qw( shellwords );
 use Test2::API qw( context run_subtest );
@@ -18,7 +18,7 @@ use Config;
 our @EXPORT = qw( alien_ok run_ok xs_ok ffi_ok with_subtest synthetic helper_ok interpolate_template_is );
 
 # ABSTRACT: Testing tools for Alien modules
-our $VERSION = '1.83'; # VERSION
+our $VERSION = '1.85'; # VERSION
 
 
 our @aliens;
@@ -186,7 +186,10 @@ sub xs_ok
   my $verbose = $xs->{verbose} || 0;
   my $ok = 1;
   my @diag;
-  my $dir = _tempdir( CLEANUP => 1, TEMPLATE => 'testalienXXXXX' );
+  my $dir = Alien::Build::Temp->newdir(
+    TEMPLATE => 'test-alien-XXXXXX',
+    CLEANUP  => $^O eq 'MSWin32' ? 0 : 1,
+  );
   my $xs_filename = path($dir)->child('test.xs')->stringify;
   my $c_filename  = path($dir)->child("test.@{[ $xs->{c_ext} ]}")->stringify;
 
@@ -397,7 +400,7 @@ sub xs_ok
 
         {
           local @INC = @INC;
-          unshift @INC, $dir;
+          unshift @INC, "$dir";
           ## no critic
           eval '# line '. __LINE__ . ' "' . __FILE__ . qq("\n) . qq{
             use $module;
@@ -603,30 +606,6 @@ sub interpolate_template_is
   $ok;
 }
 
-sub _tempdir {
-  # makes sure /tmp or whatever isn't mounted noexec,
-  # which will cause xs_ok tests to fail.
-
-  my $dir = tempdir(@_);
-
-  if($^O ne 'MSWin32')
-  {
-    my $filename = path($dir, 'foo.pl');
-    my $fh;
-    open $fh, '>', $filename;
-    print $fh "#!$^X";
-    close $fh;
-    chmod 0755, $filename;
-    system $filename, 'foo';
-    if($?)
-    {
-      $dir = tempdir( DIR => path('.')->absolute->stringify );
-    }
-  }
-
-  $dir;
-}
-
 1;
 
 __END__
@@ -641,7 +620,7 @@ Test::Alien - Testing tools for Alien modules
 
 =head1 VERSION
 
-version 1.83
+version 1.85
 
 =head1 SYNOPSIS
 

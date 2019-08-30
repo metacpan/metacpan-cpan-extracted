@@ -25,7 +25,9 @@ Data-Object Regexp Function (Replace) Class
 
 =description
 
-Data::Object::Regexp::Func::Replace is a function object for Data::Object::Regexp.
+Data::Object::Regexp::Func::Replace is a function object for
+Data::Object::Regexp. This package inherits all behavior from
+L<Data::Object::Regexp::Func>.
 
 =cut
 

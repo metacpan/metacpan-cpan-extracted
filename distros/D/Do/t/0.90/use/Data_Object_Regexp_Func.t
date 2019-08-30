@@ -20,7 +20,8 @@ Functions for RegexpRefs
 =description
 
 Data::Object::Regexp::Func is an abstract base class for function classes in
-the Data::Object::Regexp::Func space.
+the Data::Object::Regexp::Func space. This package inherits all behavior from
+L<Data::Object::Func>.
 
 =cut
 

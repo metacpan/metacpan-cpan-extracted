@@ -89,7 +89,7 @@ method construct_exports_list() {
   return join("\n", @content);
 }
 
-method construct_exports_item(HashRef $item) {
+method construct_exports_item($item) {
   my $name = $item->{name};
   my $desc = $item->{description};
   my $uses = $item->{usage};
@@ -123,7 +123,7 @@ method construct_functions_list() {
   return join("\n", @content);
 }
 
-method construct_functions_item(HashRef $item) {
+method construct_functions_item($item) {
   my $name = $item->{name};
   my $desc = $item->{description};
   my $uses = $item->{usage};
@@ -157,7 +157,7 @@ method construct_methods_list() {
   return join("\n", @content);
 }
 
-method construct_methods_item(HashRef $item) {
+method construct_methods_item($item) {
   my $name = $item->{name};
   my $desc = $item->{description};
   my $uses = $item->{usage};
@@ -191,7 +191,7 @@ method construct_routines_list() {
   return join("\n", @content);
 }
 
-method construct_routines_item(HashRef $item) {
+method construct_routines_item($item) {
   my $name = $item->{name};
   my $desc = $item->{description};
   my $uses = $item->{usage};

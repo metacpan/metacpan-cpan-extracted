@@ -15,9 +15,9 @@ sub UNITCHECK {				## restore %SIG after compilation
 package Net::DNS::RR::SIG;
 
 #
-# $Id: SIG.pm 1729 2019-01-28 09:45:47Z willem $
+# $Id: SIG.pm 1754 2019-08-19 14:12:28Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1729 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1754 $)[1];
 
 
 use strict;
@@ -44,13 +44,24 @@ use constant DEBUG => 0;
 
 use constant UTIL => defined eval 'use Scalar::Util 1.25; 1;';
 
-# IMPORTANT: Distros MUST NOT create dependencies on Net::DNS::SEC	(strong crypto prohibited in many territories)
-use constant EXISTS => join '', qw(r e q u i r e);		# Defeat static analysers and grep
-use constant DNSSEC => defined( eval join ' ', EXISTS, 'Net::DNS::SEC::Private' );
-use constant ACTIVE => DNSSEC && $INC{'Net/DNS/SEC.pm'};	# Discover how we got here, without loading libcrypto
+# IMPORTANT: Downstream distros MUST NOT create dependencies on Net::DNS::SEC	(strong crypto prohibited in many territories)
+use constant USESEC => defined $INC{'Net/DNS/SEC.pm'};		# Discover how we got here, without exposing any crypto
+								# Discourage static code analysers and casual greppers
+use constant DNSSEC => USESEC && defined eval join '', qw(r e q u i r e), ' Net::DNS', qw(:: SEC :: Private);
 
-my ($RSA) = grep ACTIVE && defined( eval join ' ', EXISTS, $_ ), 'Net::DNS::SEC::RSA';
-my ($DSA) = grep ACTIVE && defined( eval join ' ', EXISTS, $_ ), 'Net::DNS::SEC::DSA';
+my @index;
+if (DNSSEC) {
+	my $key = new Net::DNS::RR( type => 'DNSKEY', key => 'AwEAAQ==' );
+	foreach my $class ( map "Net::DNS::SEC::$_", qw(RSA DSA ECCGOST ECDSA EdDSA) ) {
+		my @algorithms = eval join '', qw(r e q u i r e), " $class; $class->_index";	# 1.14 API
+		@algorithms = grep eval { $key->algorithm($_); $class->verify( '', $key, '' ); 1 }, ( 1 .. 16 )
+				unless scalar(@algorithms);	# Grotesquely inefficient; but need to support older API
+		push @index, map( ( $_ => $class ), @algorithms );
+	}
+}
+
+my %DNSSEC_verify = @index;
+my %DNSSEC_siggen = @index;
 
 my @field = qw(typecovered algorithm labels orgttl sigexpiration siginception keytag);
 
@@ -91,9 +102,9 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
-	my $signame = $self->{signame} || return '';
+	my $sname = $self->{signame} || return '';
 	my @sig64 = split /\s+/, MIME::Base64::encode( $self->sigbin );
-	my @rdata = ( map( $self->$_, @field ), $signame->string, @sig64 );
+	my @rdata = ( map( $self->$_, @field ), $sname->string, @sig64 );
 }
 
 
@@ -149,7 +160,7 @@ sub _defaults {				## specify RR attribute default values
 	my %algbyval = reverse @algbyname;
 
 	my @algrehash = map /^\d/ ? ($_) x 3 : do { s/[\W_]//g; uc($_) }, @algbyname;
-	my %algbyname = @algrehash;    # work around broken cperl
+	my %algbyname = @algrehash;				# work around broken cperl
 
 	sub _algbyname {
 		my $arg = shift;
@@ -167,18 +178,6 @@ sub _defaults {				## specify RR attribute default values
 }
 
 
-my %DNSSEC_sign = (
-	1  => $RSA,
-	3  => $DSA,
-	5  => $RSA,
-	6  => $DSA,
-	7  => $RSA,
-	8  => $RSA,
-	10 => $RSA,
-	);
-
-my %DNSSEC_verify = %DNSSEC_sign;
-
 my %siglen = (
 	1  => 128,
 	3  => 41,
@@ -187,12 +186,17 @@ my %siglen = (
 	7  => 256,
 	8  => 256,
 	10 => 256,
+	12 => 64,
+	13 => 64,
+	14 => 96,
+	15 => 64,
+	16 => 114,
 	);
 
 
 sub _size {				## estimate encoded size
-	my $self = shift;
-	my $clone = bless {%$self}, ref($self);			   # shallow clone
+	my $self  = shift;
+	my $clone = bless {%$self}, ref($self);			# shallow clone
 	$clone->sigbin( 'x' x $siglen{$self->algorithm} );
 	length $clone->encode();
 }
@@ -293,7 +297,7 @@ sub signature { &sig; }
 
 sub create {
 	unless (DNSSEC) {
-		croak 'Net::DNS::SEC support not available';
+		croak qq[No "use Net::DNS::SEC" declaration in application code];
 	} else {
 		my ( $class, $data, $priv_key, %etc ) = @_;
 
@@ -335,7 +339,7 @@ sub verify {
 	# of keys.
 
 	unless (DNSSEC) {
-		croak 'Net::DNS::SEC support not available';
+		croak qq[No "use Net::DNS::SEC" declaration in application code];
 	} else {
 		my ( $self, $dataref, $keyref ) = @_;
 
@@ -509,7 +513,6 @@ sub _CreateSigData {
 			$message = $hbin . substr $data, length $hbin;
 		}
 
-		my @field = qw(typecovered algorithm labels orgttl sigexpiration siginception keytag);
 		my $sigdata = pack 'n C2 N3 n a*', @{$self}{@field}, $self->{signame}->encode;
 		print "\npreamble\t", unpack( 'H*', $sigdata ), "\nrawdata\t", unpack( 'H100', $message ), " ...\n"
 				if DEBUG;
@@ -525,12 +528,11 @@ sub _CreateSig {
 		my $self = shift;
 
 		my $algorithm = $self->algorithm;
-		my $class     = $DNSSEC_sign{$algorithm};
+		my $class     = $DNSSEC_siggen{$algorithm};
 
 		eval {
 			return $self->sigbin( $class->sign(@_) ) if $class;
-			die qq[algorithm $algorithm not supported\n] if ACTIVE;
-			die qq[No "use Net::DNS::SEC" declaration in application code\n];
+			die "algorithm $algorithm not supported\n";
 		} || croak "${@}signature generation failed";
 	}
 }
@@ -545,8 +547,7 @@ sub _VerifySig {
 
 		my $retval = eval {
 			return $class->verify( @_, $self->sigbin ) if $class;
-			die qq[algorithm $algorithm not supported\n] if ACTIVE;
-			die qq[No "use Net::DNS::SEC" declaration in application code\n];
+			die "algorithm $algorithm not supported\n";
 		};
 
 		unless ($retval) {
@@ -556,7 +557,7 @@ sub _VerifySig {
 		}
 
 		# uncoverable branch true	# bug in Net::DNS::SEC or dependencies
-		croak 'unknown error in $class->verify' unless $retval == 1;
+		croak "unknown error in $class->verify" unless $retval == 1;
 		print "\nalgorithm $algorithm verification successful\n" if DEBUG;
 		return 1;
 	}

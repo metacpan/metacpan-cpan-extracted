@@ -19,7 +19,7 @@ use warnings;
 use utf8;
 
 package Devel::PerlySense::Document::Api;
-$Devel::PerlySense::Document::Api::VERSION = '0.0220';
+$Devel::PerlySense::Document::Api::VERSION = '0.0221';
 
 
 

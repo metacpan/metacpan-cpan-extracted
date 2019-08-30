@@ -1,9 +1,9 @@
 package Net::DNS::Text;
 
 #
-# $Id: Text.pm 1726 2018-12-15 12:59:56Z willem $
+# $Id: Text.pm 1748 2019-07-15 07:57:00Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1726 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1748 $)[1];
 
 
 =head1 NAME
@@ -190,7 +190,7 @@ sub string {
 	my @s = map split( '', $_ ), @$self;			# escape special and ASCII non-printable
 	my $string = _decode_utf8( join '', map $escape{$_}, @s );
 
-	return $string unless $string =~ /[ \t\n\r\f]|^$|;$/;	# unquoted contiguous
+	return $string unless $string =~ /[ \t\n\r\f"]|^$/;	# unquoted contiguous
 
 	$string =~ s/\\([^"0-9])/$1/g;				# unescape printable characters except \"
 	join '', '"', $string, '"';				# quoted string

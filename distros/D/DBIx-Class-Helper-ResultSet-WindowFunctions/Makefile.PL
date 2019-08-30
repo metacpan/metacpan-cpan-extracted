@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
     "Test::Roo::DataDriven" => 0,
     "base" => 0
   },
-  "VERSION" => "v0.2.0",
+  "VERSION" => "v0.2.1",
   "test" => {
     "TESTS" => "t/*.t"
   }

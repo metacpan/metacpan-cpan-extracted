@@ -10,7 +10,7 @@ use Scalar::Util ();
 
 use parent 'Data::Object::Base';
 
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 # BUILD
 
@@ -67,7 +67,7 @@ Data-Object Abstract Number Class
 =head1 DESCRIPTION
 
 Data::Object::Number::Base provides routines for operating on Perl 5 numeric
-data.
+data. This package inherits all behavior from L<Data::Object::Base>.
 
 =cut
 

@@ -1,9 +1,9 @@
 package Net::DNS::RR::CSYNC;
 
 #
-# $Id: CSYNC.pm 1597 2017-09-22 08:04:02Z willem $
+# $Id: CSYNC.pm 1741 2019-04-16 13:10:38Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1741 $)[1];
 
 
 use strict;
@@ -77,21 +77,17 @@ sub flags {
 
 
 sub immediate {
-	my $bit = 0x0001;
 	for ( shift->{flags} ) {
-		my $set = $bit | ( $_ ||= 0 );
-		$_ = (shift) ? $set : ( $set ^ $bit ) if scalar @_;
-		return $_ & $bit;
+		$_ = ( shift() ? 0 : 0x0001 ) ^ ( 0x0001 | ( $_ || 0 ) ) if scalar @_;
+		return 0x0001 & ( $_ || 0 );
 	}
 }
 
 
 sub soaminimum {
-	my $bit = 0x0002;
 	for ( shift->{flags} ) {
-		my $set = $bit | ( $_ ||= 0 );
-		$_ = (shift) ? $set : ( $set ^ $bit ) if scalar @_;
-		return $_ & $bit;
+		$_ = ( shift() ? 0 : 0x0002 ) ^ ( 0x0002 | ( $_ || 0 ) ) if scalar @_;
+		return 0x0002 & ( $_ || 0 );
 	}
 }
 

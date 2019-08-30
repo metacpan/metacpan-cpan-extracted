@@ -26,6 +26,7 @@ Data-Object Integer Function (Gt) Class
 =description
 
 Data::Object::Integer::Func::Gt is a function object for Data::Object::Integer.
+This package inherits all behavior from L<Data::Object::Integer::Func>.
 
 =cut
 

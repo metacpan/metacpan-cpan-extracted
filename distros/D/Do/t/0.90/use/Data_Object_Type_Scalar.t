@@ -28,7 +28,8 @@ Data-Object Scalar Type Constraint
 =description
 
 Type constraint for validating L<Data::Object::Scalar> objects. This type
-constraint is registered in the L<Data::Object::Library> type library.
+constraint is registered in the L<Data::Object::Library> type library. This
+package inherits all behavior from L<Data::Object::Type>.
 
 =cut
 

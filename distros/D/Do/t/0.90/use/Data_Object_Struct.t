@@ -27,6 +27,12 @@ Data-Object Struct Declaration
 
 This package modifies the consuming package making it a struct.
 
++=head1 ROLES
+
+This package assumes all behavior from the follow roles:
+
+L<Data::Object::Role::Immutable>
+
 =cut
 
 use_ok "Data::Object::Struct";

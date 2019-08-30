@@ -1,4 +1,4 @@
-# $Id: 02-domainname.t 1355 2015-06-05 08:23:04Z willem $	-*-perl-*-
+# $Id: 02-domainname.t 1749 2019-07-21 09:15:55Z willem $	-*-perl-*-
 
 use strict;
 use Test::More tests => 51;
@@ -61,24 +61,24 @@ BEGIN {
 {
 	my $buffer = pack 'H*', '0200';
 	eval { my $domain = decode Net::DNS::DomainName( \$buffer ); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "corrupt wire-format\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "corrupt wire-format\t[$exception]" );
 }
 
 
 {
 	my $buffer = pack 'H*', 'c002';
 	eval { my $domain = decode Net::DNS::DomainName( \$buffer ); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "bad compression pointer\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "bad compression pointer\t[$exception]" );
 }
 
 
 {
 	my $buffer = pack 'H*', 'c000';
 	eval { my $domain = decode Net::DNS::DomainName( \$buffer ); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "name compression loop\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "name compression loop\t[$exception]" );
 }
 
 
@@ -89,8 +89,8 @@ BEGIN {
 			. '2d30313233343536373839ff' . '00';
 	my $buffer = pack 'H*', $hex;
 	eval { my $domain = decode Net::DNS::DomainName( \$buffer ); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "unsupported wire-format\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "unsupported wire-format\t[$exception]" );
 }
 
 
@@ -104,8 +104,8 @@ BEGIN {
 			. '2d30313233343536373839ff' . '00';
 	my $buffer = pack 'H*', $hex;
 	eval { my $domain = decode Net::DNS::DomainName( \$buffer ); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "unsupported wire-format\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "unsupported wire-format\t[$exception]" );
 }
 
 

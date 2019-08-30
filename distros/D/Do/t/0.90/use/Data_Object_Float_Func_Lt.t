@@ -26,6 +26,7 @@ Data-Object Float Function (Lt) Class
 =description
 
 Data::Object::Float::Func::Lt is a function object for Data::Object::Float.
+This package inherits all behavior from L<Data::Object::Float::Func>.
 
 =cut
 

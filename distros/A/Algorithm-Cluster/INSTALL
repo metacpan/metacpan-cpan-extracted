@@ -92,7 +92,7 @@ You may need to log in as root the install Pycluster.
 If you do not have root access, do
   python setup.py install --prefix=/some/other/directory
 and set the environment variable
-  PYTHONPATH=/some/other/directory/lib/python2.2/site-packages
+  PYTHONPATH=/some/other/directory/lib/python2.6/site-packages
 The exact command depends on which shell you are using; the exact path will
 depend on the version of Python you are using.
 To use Pycluster, you will also need numpy (Numerical Python). Pycluster was

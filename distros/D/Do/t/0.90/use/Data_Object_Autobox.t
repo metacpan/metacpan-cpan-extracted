@@ -28,7 +28,8 @@ Data-Object Autoboxing
 
 This package implements autoboxing via L<autobox> to provide
 L<boxing|http://en.wikipedia.org/wiki/Object_type_(object-oriented_programming)>
-for native Perl 5 data types.
+for native Perl 5 data types. This package inherits all behavior from
+L<autobox>.
 
 =cut
 

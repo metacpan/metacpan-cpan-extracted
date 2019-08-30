@@ -26,6 +26,7 @@ Data-Object Array Function (Min) Class
 =description
 
 Data::Object::Array::Func::Min is a function object for Data::Object::Array.
+This package inherits all behavior from L<Data::Object::Array::Func>.
 
 =cut
 

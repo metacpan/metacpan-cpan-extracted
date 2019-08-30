@@ -5,7 +5,7 @@ use warnings;
 
 use parent 'Data::Object::Class';
 
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 # BUILD
 
@@ -82,7 +82,8 @@ Data-Object Singleton Declaration
 
 =head1 DESCRIPTION
 
-This package modifies the consuming package making it a singleton.
+This package modifies the consuming package making it a singleton. This package
+inherits all behavior from L<Data::Object::Class>.
 
 =cut
 

@@ -1,4 +1,4 @@
-# $Id: 08-IPv6.t 1736 2019-03-20 10:03:12Z willem $ -*-perl-*-
+# $Id: 08-IPv6.t 1741 2019-04-16 13:10:38Z willem $ -*-perl-*-
 
 use strict;
 use Test::More;
@@ -74,7 +74,7 @@ diag join( "\n\t", 'will use nameservers', @$IP ) if $debug;
 Net::DNS::Resolver->debug($debug);
 
 
-plan tests => 71;
+plan tests => 68;
 
 NonFatalBegin();
 
@@ -126,8 +126,7 @@ NonFatalBegin();
 	my $udp = $resolver->bgsend($packet);
 	ok( $udp, '$resolver->bgsend(...)	UDP' );
 	while ( $resolver->bgbusy($udp) ) { sleep 1; }
-	ok( $resolver->bgisready($udp), '$resolver->bgisready($udp)' );
-	ok( $resolver->bgread($udp),	'$resolver->bgread($udp)' );
+	ok( $resolver->bgread($udp), '$resolver->bgread($udp)' );
 
 	$packet->edns->option( PADDING => ( 'OPTION-LENGTH' => 500 ) );	   # force TCP
 
@@ -334,10 +333,6 @@ SKIP: {
 	ok( $i, '$iterator->() iterates through remaining RRs' );
 	ok( !eval { $iterator->() }, '$iterator->() returns undef after last RR' );
 	ok( $exception, "iterator exception\t[$exception]" );
-
-	my $axfr_start = $resolver->axfr_start('net-dns.org');
-	ok( $axfr_start, '$resolver->axfr_start()	(historical)' );
-	ok( eval { $resolver->axfr_next() }, '$resolver->axfr_next()	(historical)' );
 }
 
 
@@ -460,13 +455,10 @@ SKIP: {
 	my $socket = $resolver->_bgsend_tcp( $packet, $packet->data );
 	while ( $resolver->bgbusy($socket) ) { sleep 1 }
 
-	my $size_buf = '';
-	$socket->recv( $size_buf, 2 ) if $socket;
-	my ($size) = unpack 'n*', $size_buf;
-	my $discarded = '';		## data dependent: last 16 bits must not all be zero
-	$socket->recv( $discarded, $size - 2 ) if $size;
-
-	ok( !$resolver->_bgread($socket), '_read_tcp()	corrupt data' );
+	my $discard = '';
+	$socket->recv( $discard, 1 ) if $socket;		# discard first octet
+	$socket->blocking(0);
+	ok( !$resolver->_bgread($socket), '_read_tcp()	incomplete data' );
 }
 
 

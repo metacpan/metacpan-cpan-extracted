@@ -26,6 +26,7 @@ Data-Object Array Function (Rotate) Class
 =description
 
 Data::Object::Array::Func::Rotate is a function object for Data::Object::Array.
+This package inherits all behavior from L<Data::Object::Array::Func>.
 
 =cut
 

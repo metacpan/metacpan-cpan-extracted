@@ -24,7 +24,7 @@ Data-Object Abstract Number Class
 =description
 
 Data::Object::Number::Base provides routines for operating on Perl 5 numeric
-data.
+data. This package inherits all behavior from L<Data::Object::Base>.
 
 =cut
 

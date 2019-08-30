@@ -1,4 +1,4 @@
-# $Id: 05-TKEY.t 1559 2017-04-10 07:39:44Z willem $	-*-perl-*-
+# $Id: 05-TKEY.t 1749 2019-07-21 09:15:55Z willem $	-*-perl-*-
 
 use strict;
 use Test::More tests => 24;
@@ -66,8 +66,8 @@ my $wire = '03616c67076578616d706c6500558567665585676600010011000564756d6d790005
 	$wire[length($empty) - 1]--;
 	my $wireformat = pack 'C*', @wire;
 	eval { decode Net::DNS::RR( \$wireformat ); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "corrupt wire-format\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "corrupt wire-format\t[$exception]" );
 }
 
 

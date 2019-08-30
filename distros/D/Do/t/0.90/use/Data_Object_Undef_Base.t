@@ -24,7 +24,7 @@ Data-Object Abstract Undef Class
 =description
 
 Data::Object::Undef::Base provides routines for operating on Perl 5 undefined
-data.
+data. This package inherits all behavior from L<Data::Object::Base>.
 
 =cut
 

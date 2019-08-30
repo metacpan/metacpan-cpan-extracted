@@ -50,7 +50,7 @@ use PPIx::Regexp::Constant qw{
     @CARP_NOT
 };
 
-our $VERSION = '0.066';
+our $VERSION = '0.067';
 
 =head2 accepts_perl
 
@@ -197,6 +197,8 @@ will be put through a deprecation cycle and retracted.
 
 sub explain {
     my ( $self ) = @_;
+    defined $self->{explanation}
+	and return $self->{explanation};
     my $explanation = $self->__explanation();
     my $content = $self->content();
     if ( my $main = $self->main_structure() ) {

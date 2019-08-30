@@ -1,4 +1,4 @@
-# $Id: 05-TLSA.t 1381 2015-08-25 07:36:09Z willem $	-*-perl-*-
+# $Id: 05-TLSA.t 1749 2019-07-21 09:15:55Z willem $	-*-perl-*-
 
 use strict;
 use Test::More tests => 19;
@@ -68,8 +68,8 @@ my $wire =
 {
 	my $rr = new Net::DNS::RR(". $type @data");
 	eval { $rr->certificate('123456789XBCDEF'); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "corrupt hexadecimal\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "corrupt hexadecimal\t[$exception]" );
 }
 
 

@@ -25,7 +25,9 @@ Data-Object Array Function (EachValue) Class
 
 =description
 
-Data::Object::Array::Func::EachValue is a function object for Data::Object::Array.
+Data::Object::Array::Func::EachValue is a function object for
+Data::Object::Array. This package inherits all behavior from
+L<Data::Object::Array::Func>.
 
 =cut
 

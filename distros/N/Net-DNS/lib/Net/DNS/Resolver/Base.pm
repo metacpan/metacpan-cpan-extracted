@@ -1,9 +1,9 @@
 package Net::DNS::Resolver::Base;
 
 #
-# $Id: Base.pm 1727 2018-12-31 12:04:48Z willem $
+# $Id: Base.pm 1748 2019-07-15 07:57:00Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1727 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1748 $)[1];
 
 
 #
@@ -96,6 +96,18 @@ use constant PACKETSZ => 512;
 }
 
 
+my $warned;
+
+sub _deprecate {
+	carp join ' ', 'deprecated method;', pop(@_) unless $warned++;
+}
+
+
+sub _untaint {
+	return TAINT ? map ref($_) ? [_untaint(@$_)] : do { /^(.*)$/; $1 }, @_ : @_;
+}
+
+
 # These are the attributes that the user may specify in the new() constructor.
 my %public_attr = (
 	map( ( $_ => $_ ), keys %{&_defaults}, qw(domain nameserver srcaddr) ),
@@ -154,11 +166,6 @@ sub _option {
 	my $attribute = $res_option{lc $name} || return;
 	push @value, 1 unless scalar @value;
 	$self->$attribute(@value);
-}
-
-
-sub _untaint {
-	return TAINT ? map ref($_) ? [_untaint(@$_)] : do { /^(.*)$/; $1 }, @_ : @_;
 }
 
 
@@ -565,6 +572,7 @@ sub _bgsend_tcp {
 		$socket->blocking(0);
 		$socket->send($tcp_packet);
 		$self->errorstring($!);
+		$socket->blocking(1);
 
 		my $expire = time() + $self->{tcp_timeout};
 		${*$socket}{net_dns_bg} = [$expire, $packet];
@@ -628,7 +636,8 @@ sub bgbusy {
 
 
 sub bgisready {				## historical
-	!&bgbusy;						# uncoverable pod
+	_deprecate('prefer bgbusy()');				# uncoverable pod
+	!&bgbusy;
 }
 
 
@@ -648,7 +657,8 @@ sub _bgread {
 	my ( $expire, $query, $read ) = @$appendix;
 	return shift(@$read) if ref($read);
 
-	unless ( IO::Select->new($handle)->can_read(0) ) {
+	my $select = IO::Select->new($handle);
+	unless ( $select->can_read(0) ) {
 		$self->errorstring('timed out');
 		return;
 	}
@@ -725,13 +735,15 @@ sub axfr {				## zone transfer
 
 
 sub axfr_start {			## historical
-	my $self = shift;					# uncoverable pod
+	_deprecate('prefer  $iterator = $self->axfr(...)');	# uncoverable pod
+	my $self = shift;
 	defined( $self->{axfr_iter} = $self->axfr(@_) );
 }
 
 
 sub axfr_next {				## historical
-	shift->{axfr_iter}->();					# uncoverable pod
+	_deprecate('prefer  $iterator->()');			# uncoverable pod
+	shift->{axfr_iter}->();
 }
 
 
@@ -807,22 +819,17 @@ sub _axfr_next {
 sub _read_tcp {
 	my $socket = shift;
 
-	my ( $s1, $s2 );
+	my ( $buffer, $s1, $s2 );
 	$socket->recv( $s1, 2 );				# one lump
 	$socket->recv( $s2, 2 - length $s1 );			# or two?
 	my $size = unpack 'n', pack( 'a*a*@2', $s1, $s2 );
 
-	my $buffer = '';
-	while ( ( my $read = length $buffer ) < $size ) {
+	$socket->recv( $buffer, $size );			# initial read
 
-		# During some of my tests recv() returned undef even
-		# though there was no error.  Checking the amount
-		# of data read appears to work around that problem.
-
-		my $recv_buf;
-		$socket->recv( $recv_buf, $size - $read );
-
-		$buffer .= $recv_buf || last;
+	while ( length($buffer) < $size ) {
+		my $fragment;
+		$socket->recv( $fragment, $size - length($buffer) );
+		$buffer .= $fragment || last;
 	}
 	return $buffer;
 }
@@ -1060,13 +1067,8 @@ sub udppacketsize {
 #
 # Keep this method around. Folk depend on it although it is neither documented nor exported.
 #
-my $warned;
-
 sub make_query_packet {			## historical
-	unless ( $warned++ ) {					# uncoverable pod
-		local $SIG{__WARN__};
-		carp 'deprecated method; see RT#37104';
-	}
+	_deprecate('see RT#37104');				# uncoverable pod
 	&_make_query_packet;
 }
 

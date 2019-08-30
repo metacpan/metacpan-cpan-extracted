@@ -25,7 +25,9 @@ Data-Object Hash Function (FilterExclude) Class
 
 =description
 
-Data::Object::Hash::Func::FilterExclude is a function object for Data::Object::Hash.
+Data::Object::Hash::Func::FilterExclude is a function object for
+Data::Object::Hash. This package inherits all behavior from
+L<Data::Object::Hash::Func>.
 
 =cut
 

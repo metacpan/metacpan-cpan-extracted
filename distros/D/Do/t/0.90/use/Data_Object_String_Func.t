@@ -20,7 +20,8 @@ Functions for String Data
 =description
 
 Data::Object::String::Func is an abstract base class for function classes in
-the Data::Object::String::Func space.
+the Data::Object::String::Func space. This package inherits all behavior from
+L<Data::Object::Func>.
 
 =cut
 

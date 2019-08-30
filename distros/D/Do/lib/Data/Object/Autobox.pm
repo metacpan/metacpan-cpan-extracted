@@ -18,7 +18,7 @@ require Data::Object::Scalar::Autobox;
 require Data::Object::String::Autobox;
 require Data::Object::Undef::Autobox;
 
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 sub import {
   my ($class) = @_;
@@ -72,7 +72,8 @@ Data-Object Autoboxing
 
 This package implements autoboxing via L<autobox> to provide
 L<boxing|http://en.wikipedia.org/wiki/Object_type_(object-oriented_programming)>
-for native Perl 5 data types.
+for native Perl 5 data types. This package inherits all behavior from
+L<autobox>.
 
 =cut
 

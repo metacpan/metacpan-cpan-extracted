@@ -43,7 +43,7 @@ use base qw{ PPIx::Regexp::Token::GroupType };
 
 use PPIx::Regexp::Constant qw{ @CARP_NOT };
 
-our $VERSION = '0.066';
+our $VERSION = '0.067';
 
 sub __match_setup {
     my ( undef, $tokenizer ) = @_;	# Invocant unused

@@ -1,4 +1,4 @@
-# $Id: 01-resolver-config.t 1729 2019-01-28 09:45:47Z willem $	-*-perl-*-
+# $Id: 01-resolver-config.t 1749 2019-07-21 09:15:55Z willem $	-*-perl-*-
 
 use strict;
 use Test::More tests => 24;
@@ -110,7 +110,7 @@ ok( $class->new( debug => 1 )->_diag(@Net::DNS::Resolver::ISA), 'debug message' 
 	my ($exception) = split /\n/, "$@\n";
 	ok( $exception, "unknown method:\t[$exception]" );
 
-	is( $resolver->DESTROY, undef, 'DESTROY() exists to defeat pre-5.18 AUTOLOAD' );
+	is( $resolver->DESTROY, undef, 'DESTROY() exists to placate pre-5.18 AUTOLOAD' );
 }
 
 

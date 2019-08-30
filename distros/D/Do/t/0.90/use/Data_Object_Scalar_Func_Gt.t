@@ -26,6 +26,7 @@ Data-Object Scalar Function (Gt) Class
 =description
 
 Data::Object::Scalar::Func::Gt is a function object for Data::Object::Scalar.
+This package inherits all behavior from L<Data::Object::Scalar::Func>.
 
 =cut
 

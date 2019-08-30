@@ -1,13 +1,13 @@
 package Net::DNS;
 
 #
-# $Id: DNS.pm 1738 2019-03-22 09:17:51Z willem $
+# $Id: DNS.pm 1757 2019-08-30 08:35:19Z willem $
 #
 require 5.006;
 our $VERSION;
-$VERSION = '1.20';
+$VERSION = '1.21';
 $VERSION = eval $VERSION;
-our $SVNVERSION = (qw$LastChangedRevision: 1738 $)[1];
+our $SVNVERSION = (qw$LastChangedRevision: 1757 $)[1];
 
 
 =head1 NAME

@@ -57,8 +57,12 @@ my $importer = Catmandu::Importer::getJSON->new(
     client => MockFurl::new( content => '[{"n":1},{"n":2}]' ),
     from   => 'http://example.org',
 );
-is_deeply $importer->first, {n => 1}, 'array response 1/2';
-is_deeply $importer->rest->first, { n => 2}, 'array response 2/2';
+
+{
+    my $res = $importer->to_array;
+    is_deeply $res->[0], {n => 1}, 'array response 1/2';
+    is_deeply $res->[1], { n => 2}, 'array response 2/2';
+}
 
 {
     my $warning; local $SIG{__WARN__} = sub { $warning = shift };

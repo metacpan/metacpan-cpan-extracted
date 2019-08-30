@@ -25,7 +25,8 @@ Data-Object Hash Function (Gt) Class
 
 =description
 
-Data::Object::Hash::Func::Gt is a function object for Data::Object::Hash.
+Data::Object::Hash::Func::Gt is a function object for Data::Object::Hash. This
+package inherits all behavior from L<Data::Object::Hash::Func>.
 
 =cut
 

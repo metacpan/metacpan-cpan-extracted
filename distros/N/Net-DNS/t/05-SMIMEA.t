@@ -1,4 +1,4 @@
-# $Id: 05-SMIMEA.t 1449 2016-02-01 12:27:12Z willem $	-*-perl-*-
+# $Id: 05-SMIMEA.t 1749 2019-07-21 09:15:55Z willem $	-*-perl-*-
 
 use strict;
 use Test::More tests => 19;
@@ -66,8 +66,8 @@ my $wire = qw( 010101d2abde240d7cd3ee6b4b28c54df034b97983a1d16e8a410e4561cb10661
 {
 	my $rr = new Net::DNS::RR(". $type @data");
 	eval { $rr->certificate('123456789XBCDEF'); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "corrupt hexadecimal\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "corrupt hexadecimal\t[$exception]" );
 }
 
 

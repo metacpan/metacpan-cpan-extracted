@@ -4,7 +4,7 @@ use Data::Object 'Class';
 
 extends 'Data::Object::Number::Func';
 
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 # BUILD
 
@@ -57,6 +57,7 @@ Data-Object Number Function (Abs) Class
 =head1 DESCRIPTION
 
 Data::Object::Number::Func::Abs is a function object for Data::Object::Number.
+This package inherits all behavior from L<Data::Object::Number::Func>.
 
 =cut
 

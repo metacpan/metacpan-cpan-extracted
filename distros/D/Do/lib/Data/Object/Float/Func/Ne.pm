@@ -4,7 +4,7 @@ use Data::Object 'Class';
 
 extends 'Data::Object::Float::Func';
 
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 # BUILD
 
@@ -68,6 +68,7 @@ Data-Object Float Function (Ne) Class
 =head1 DESCRIPTION
 
 Data::Object::Float::Func::Ne is a function object for Data::Object::Float.
+This package inherits all behavior from L<Data::Object::Float::Func>.
 
 =cut
 

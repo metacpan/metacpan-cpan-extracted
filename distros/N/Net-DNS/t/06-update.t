@@ -1,4 +1,4 @@
-# $Id: 06-update.t 1571 2017-06-03 20:14:15Z willem $  -*-perl-*-
+# $Id: 06-update.t 1748 2019-07-15 07:57:00Z willem $  -*-perl-*-
 
 use strict;
 use Test::More tests => 85;
@@ -58,8 +58,8 @@ my $rdata  = "10.1.2.3";
 {
 	Net::DNS::Resolver->domain('');				# overides config files
 	my $packet = eval { new Net::DNS::Update(undef); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "argument undefined\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "argument undefined\t[$exception]" );
 }
 
 
@@ -131,7 +131,7 @@ my $rdata  = "10.1.2.3";
 
 {
 	my @arg = ( name => $name );
-	my $rr = yxdomain(@arg);
+	my $rr	= yxdomain(@arg);
 
 	ok( $rr, "yxdomain(@arg)" );
 	is( $rr->name,	$name, 'yxdomain - right name' );
@@ -160,7 +160,7 @@ my $rdata  = "10.1.2.3";
 
 {
 	my @arg = ( name => $name );
-	my $rr = nxdomain(@arg);
+	my $rr	= nxdomain(@arg);
 
 	ok( $rr, "nxdomain(@arg)" );
 	is( $rr->name,	$name,	'nxdomain - right name' );

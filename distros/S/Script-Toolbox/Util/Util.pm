@@ -37,8 +37,6 @@ our @EXPORT = qw(
 	
 );
 
-#our $VERSION = '0.50';
-
 # Preloaded methods go here.
 sub _getKV(@);
 sub _getCSV(@);
@@ -215,9 +213,7 @@ sub _openFromString($)
 sub Open(@)
 {
 	my ($file, $iolayer) = _getParam(@_);
-	my $fh = new IO::File;
-	$fh->open( "$file" );
-	#$fh->open( "$file" ) || return undef;
+	my $fh = new IO::File "$file";
 	return $fh;
 }
 use Fatal qw(IO::File::open);
@@ -1126,7 +1122,7 @@ sub _jump($$)
     my $call = $menu->[$o]->{'jump'};
     my $args = defined $menu->[$o]->{'argv'} ? $menu->[$o]->{'argv'} : undef;
 
-    if( ref $call eq 'CODE' ) { $call->($args); return; }
+    if( ref $call eq 'CODE' ) { return $call->($args) }
     Log("\nERROR: Can't call function $call(). It's not a code reference.");
     sleep 5;
 }
@@ -1415,6 +1411,21 @@ sub _checkDefaults($$$){
 }
 
 #------------------------------------------------------------------------------
+# Grep options array for defaults regex. Return first match if one. Otherwise
+# return first label in $options.
+#------------------------------------------------------------------------------
+sub getDefaultLabel($$){
+    my ($options,$defaults) = @_;
+
+    if( ref $options eq 'ARRAY' ) {
+        my @label = grep(/$defaults/,@{$options});
+
+        return $label[0]    if( @label +0 );
+        return $options->[0];
+    }
+    return $defaults;
+}
+#------------------------------------------------------------------------------
 # Display some options via menu.
 # defaults (like me|dk|ek) are preselected
 # Return a hash with two keys 'on' and 'off'. These keys points to arrays
@@ -1431,7 +1442,8 @@ sub _CheckBox($$@){
         _ckeckBox2Container($m,$menuName,$header);
         _ops2CheckBox($m,$menuName,$options,$defaults);
     }
-    _checkDefaults($m, $menuName, $defaults)    if($radio);
+    my $defaultLabel = getDefaultLabel($options,$defaults);
+    _checkDefaults($m, $menuName, $defaultLabel)    if($radio);
     $m->setHeader($menuName,$header);
     if($radio) { _radioButton($m,$menuName) }
     else       { $m->run($menuName,0)       }

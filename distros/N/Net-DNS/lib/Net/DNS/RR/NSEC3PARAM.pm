@@ -1,9 +1,9 @@
 package Net::DNS::RR::NSEC3PARAM;
 
 #
-# $Id: NSEC3PARAM.pm 1597 2017-09-22 08:04:02Z willem $
+# $Id: NSEC3PARAM.pm 1741 2019-04-16 13:10:38Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1741 $)[1];
 
 
 use strict;
@@ -84,7 +84,7 @@ sub iterations {
 sub salt {
 	my $self = shift;
 	return unpack "H*", $self->saltbin() unless scalar @_;
-	$self->saltbin( pack "H*", map /[^\dA-F]/i ? croak "corrupt hex" : $_, join "", @_ );
+	$self->saltbin( pack "H*", join "", map { /^"*([\dA-Fa-f]*)"*$/ || croak("corrupt hex"); $1 } @_ );
 }
 
 

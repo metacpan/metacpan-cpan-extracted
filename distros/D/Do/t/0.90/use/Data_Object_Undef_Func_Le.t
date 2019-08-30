@@ -26,6 +26,7 @@ Data-Object Undef Function (Le) Class
 =description
 
 Data::Object::Undef::Func::Le is a function object for Data::Object::Undef.
+This package inherits all behavior from L<Data::Object::Undef::Func>.
 
 =cut
 

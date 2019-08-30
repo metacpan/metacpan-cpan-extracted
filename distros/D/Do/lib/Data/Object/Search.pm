@@ -16,7 +16,7 @@ use overload (
 
 use parent 'Data::Object::Array';
 
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 # METHODS
 
@@ -159,7 +159,7 @@ Data-Object Search Class
 =head1 DESCRIPTION
 
 This package provides routines for introspecting the results of a regexp search
-operation.
+operation. This package inherits all behavior from L<Data::Object::Array>.
 
 =cut
 

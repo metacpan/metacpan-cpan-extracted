@@ -11,7 +11,7 @@ use overload (
   fallback => 1
 );
 
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 # BUILD
 

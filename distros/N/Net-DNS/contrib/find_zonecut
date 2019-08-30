@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-$VERSION = (qw$LastChangedRevision: 1251 $)[1] || 0.01;
+$VERSION = (qw$LastChangedRevision: 1740 $)[1] || 0.01;
 
 =head1 NAME
 
@@ -41,9 +41,6 @@ __END__
 (c)2014  Dick Franks E<lt>rwfranks[...]acm.orgE<gt>
 
 All rights reserved.
-
-This program is free software; you may use or redistribute
-it under the same terms as Perl itself.
 
 FOR DEMONSTRATION PURPOSES ONLY, NO WARRANTY, NO SUPPORT
 

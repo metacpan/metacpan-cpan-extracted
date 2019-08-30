@@ -21,7 +21,18 @@ Data-Object Code Class
 
 =description
 
-This package provides routines for operating on Perl 5 code references.
+This package provides routines for operating on Perl 5 code references. This
+package inherits all behavior from L<Data::Object::Code::Base>.
+
+This package assumes all behavior from the following roles:
+
+L<Data::Object::Role::Detract>
+
+L<Data::Object::Role::Dumper>
+
+L<Data::Object::Role::Functable>
+
+L<Data::Object::Role::Throwable>
 
 =cut
 

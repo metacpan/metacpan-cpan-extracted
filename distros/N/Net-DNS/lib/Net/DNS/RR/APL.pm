@@ -1,9 +1,9 @@
 package Net::DNS::RR::APL;
 
 #
-# $Id: APL.pm 1597 2017-09-22 08:04:02Z willem $
+# $Id: APL.pm 1741 2019-04-16 13:10:38Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1741 $)[1];
 
 
 use strict;
@@ -112,11 +112,9 @@ my %family = qw(1 Net::DNS::RR::A	2 Net::DNS::RR::AAAA);
 
 
 sub negate {
-	my $bit = 0x80;
 	for ( shift->{negate} ) {
-		my $set = $bit | ( $_ ||= 0 );
-		$_ = (shift) ? $set : ( $set ^ $bit ) if scalar @_;
-		return $_ & $bit;
+		$_ = shift if scalar @_;
+		return !( !$_ );
 	}
 }
 

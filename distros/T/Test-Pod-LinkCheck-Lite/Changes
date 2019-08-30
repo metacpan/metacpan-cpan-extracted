@@ -1,3 +1,8 @@
+0.003		2019-08-30	T. R. Wyant
+    Fix test of link to extant-but-undocumented module. The result now
+    contains the failing link and line number, and a passing test for
+    the entire file is NOT generated.
+
 0.002		2019-08-04	T. R. Wyant
     Skip URL links with server (5xx) errors.  This is controlled by
     Boolean attribute skip_server_errors, which is true by default.  The

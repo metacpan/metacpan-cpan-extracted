@@ -22,7 +22,7 @@ Data-Object Namespace Registry
 =description
 
 This package is a singleton that holds mappings for namespaces and type
-libraries.
+libraries. This package inherits all behavior from L<Data::Object::Base>.
 
 =cut
 

@@ -1,16 +1,9 @@
 Changes
-Changes.NetObjwrap
 examples/pping.pl
 lib/Forks/Queue.pm
 lib/Forks/Queue/File.pm
 lib/Forks/Queue/Shmem.pm
 lib/Forks/Queue/SQLite.pm
-lib/Net/Objwrap.pm
-#lib/Net/Objwrap/Aux.pm       # ack, can't use this filename on MSWin32
-lib/Net/Objwrap/Client.pm
-lib/Net/Objwrap/Proxy.pm
-lib/Net/Objwrap/ProxyS.pm
-lib/Net/Objwrap/Server.pm
 Makefile.PL
 MANIFEST
 README
@@ -53,16 +46,7 @@ t/25-threads-extract.t
 t/26-threads-insert.t
 t/29-threads-ended.t
 t/30-threads-timed.t
-t/40-remote.t
 t/exercises.tt
-t/_01-array.t          # tests for Net::Objwrap
-t/_02-hash.t
-t/_03-scalar.t
-t/_11-array.t
-t/_12-hash.t
-t/_13-scalar.t
-t/_20-overload.t
-t/_21-overload.t
 t/tq-compatibility.tt
 tqt/00_load.t          # tests from Thread::Queue
 tqt/01_basic.t

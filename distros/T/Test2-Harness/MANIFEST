@@ -75,8 +75,10 @@ lib/Test2/Harness/Util/Term.pm
 lib/Test2/Harness/Util/TestFile.pm
 lib/Test2/Harness/Util/UUID.pm
 lib/Test2/Harness/Watcher.pm
+lib/Test2/Harness/Watcher/TimeTracker.pm
 lib/Test2/Tools/HarnessTester.pm
 log.jsonl
+out.jsonl
 scripts/yath
 t/App/Yath.t
 t/App/Yath/Command.t

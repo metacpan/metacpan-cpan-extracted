@@ -1,9 +1,9 @@
 package Net::DNS::Resolver;
 
 #
-# $Id: Resolver.pm 1726 2018-12-15 12:59:56Z willem $
+# $Id: Resolver.pm 1740 2019-04-04 14:45:31Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1726 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1740 $)[1];
 
 =head1 NAME
 
@@ -341,16 +341,6 @@ The argument is the handle returned by C<bgsend()>.
 
 Truncated UDP packets will be retried transparently using TCP while
 continuing to assert busy to the caller.
-
-
-=head2 bgisready
-
-    until ($resolver->bgisready($handle)) {
-	...
-    }
-
-C<bgisready()> is the logical complement of C<bgbusy()> which is retained
-for backward compatibility.
 
 
 =head2 debug

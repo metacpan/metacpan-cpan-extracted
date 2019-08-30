@@ -4,7 +4,7 @@ use Data::Object 'Class';
 
 extends 'Data::Object::String::Func';
 
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 # BUILD
 
@@ -56,7 +56,9 @@ Data-Object String Function (Reverse) Class
 
 =head1 DESCRIPTION
 
-Data::Object::String::Func::Reverse is a function object for Data::Object::String.
+Data::Object::String::Func::Reverse is a function object for
+Data::Object::String. This package inherits all behavior from
+L<Data::Object::String::Func>.
 
 =cut
 

@@ -26,6 +26,7 @@ Data-Object Integer Function (Eq) Class
 =description
 
 Data::Object::Integer::Func::Eq is a function object for Data::Object::Integer.
+This package inherits all behavior from L<Data::Object::Integer::Func>.
 
 =cut
 

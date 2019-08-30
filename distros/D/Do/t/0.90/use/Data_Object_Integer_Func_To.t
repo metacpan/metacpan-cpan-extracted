@@ -26,6 +26,7 @@ Data-Object Integer Function (To) Class
 =description
 
 Data::Object::Integer::Func::To is a function object for Data::Object::Integer.
+This package inherits all behavior from L<Data::Object::Integer::Func>.
 
 =cut
 

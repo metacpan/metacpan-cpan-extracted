@@ -20,7 +20,8 @@ Functions for HashRefs
 =description
 
 Data::Object::Hash::Func is an abstract base class for function classes in the
-Data::Object::Hash::Func space.
+Data::Object::Hash::Func space. This package inherits all behavior from
+L<Data::Object::Func>.
 
 =cut
 

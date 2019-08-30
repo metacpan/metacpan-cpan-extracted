@@ -1,4 +1,4 @@
-# $Id: 05-SSHFP.t 1362 2015-06-23 08:47:14Z willem $	-*-perl-*-
+# $Id: 05-SSHFP.t 1749 2019-07-21 09:15:55Z willem $	-*-perl-*-
 
 use strict;
 
@@ -69,8 +69,8 @@ my $wire = '0201123456789abcdef67890123456789abcdef67890';
 {
 	my $rr = new Net::DNS::RR(". $type @data");
 	eval { $rr->fp('123456789XBCDEF'); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "corrupt hexadecimal\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "corrupt hexadecimal\t[$exception]" );
 }
 
 

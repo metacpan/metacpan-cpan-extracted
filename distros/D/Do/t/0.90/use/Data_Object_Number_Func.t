@@ -20,7 +20,8 @@ Functions for Number Data
 =description
 
 Data::Object::Number::Func is an abstract base class for function classes in
-the Data::Object::Number::Func space.
+the Data::Object::Number::Func space. This package inherits all behavior from
+L<Data::Object::Func>.
 
 =cut
 

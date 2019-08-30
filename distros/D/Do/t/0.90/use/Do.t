@@ -11,7 +11,7 @@ Do
 
 =abstract
 
-Modern Perl Development Framework
+Modern Perl
 
 =synopsis
 
@@ -41,7 +41,8 @@ Modern Perl Development Framework
 
 This package aims to provide a modern Perl development framework and
 foundational set of types, functions, classes, patterns, and interfaces for
-jump-starting application development.
+jump-starting application development. This package inherits all behavior from
+L<Data::Object>.
 
 +=head1 FRAMEWORK
 

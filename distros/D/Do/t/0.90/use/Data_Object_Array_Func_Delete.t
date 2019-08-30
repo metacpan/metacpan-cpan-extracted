@@ -26,6 +26,7 @@ Data-Object Array Function (Delete) Class
 =description
 
 Data::Object::Array::Func::Delete is a function object for Data::Object::Array.
+This package inherits all behavior from L<Data::Object::Array::Func>.
 
 =cut
 

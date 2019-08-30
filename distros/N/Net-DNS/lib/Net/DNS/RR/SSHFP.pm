@@ -1,9 +1,9 @@
 package Net::DNS::RR::SSHFP;
 
 #
-# $Id: SSHFP.pm 1597 2017-09-22 08:04:02Z willem $
+# $Id: SSHFP.pm 1741 2019-04-16 13:10:38Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1741 $)[1];
 
 
 use strict;
@@ -77,7 +77,7 @@ sub fptype {
 sub fp {
 	my $self = shift;
 	return unpack "H*", $self->fpbin() unless scalar @_;
-	$self->fpbin( pack "H*", map /[^\dA-F]/i ? croak "corrupt hex" : $_, join "", @_ );
+	$self->fpbin( pack "H*", join "", map { /^"*([\dA-Fa-f]*)"*$/ || croak("corrupt hex"); $1 } @_ );
 }
 
 

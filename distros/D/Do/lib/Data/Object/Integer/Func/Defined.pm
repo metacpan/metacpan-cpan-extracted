@@ -4,7 +4,7 @@ use Data::Object 'Class';
 
 extends 'Data::Object::Integer::Func';
 
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 # BUILD
 
@@ -54,7 +54,9 @@ Data-Object Integer Function (Defined) Class
 
 =head1 DESCRIPTION
 
-Data::Object::Integer::Func::Defined is a function object for Data::Object::Integer.
+Data::Object::Integer::Func::Defined is a function object for
+Data::Object::Integer. This package inherits all behavior from
+L<Data::Object::Integer::Func>.
 
 =cut
 

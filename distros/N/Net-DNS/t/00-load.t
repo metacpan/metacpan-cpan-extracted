@@ -1,4 +1,4 @@
-# $Id: 00-load.t 1709 2018-09-07 08:03:09Z willem $	-*-perl-*-
+# $Id: 00-load.t 1754 2019-08-19 14:12:28Z willem $	-*-perl-*-
 
 use strict;
 use Test::More;
@@ -35,9 +35,10 @@ my @module = qw(
 my @diag;
 foreach my $module (@module) {
 	eval "require $module";
-	my $version = eval { $module->VERSION } || next;
-	$version =~ s/(\.\d)$/${1}0/;
-	push @diag, sprintf "%-25s  %s", $module, $version;
+	for ( grep $_, eval { $module->VERSION } ) {
+		s/^(\d+\.\d)$/${1}0/;
+		push @diag, sprintf "%-25s  %s", $module, $_;
+	}
 }
 diag join "\n\t", "\nThese tests were run using:", @diag;
 

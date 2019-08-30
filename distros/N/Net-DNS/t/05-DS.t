@@ -1,4 +1,4 @@
-# $Id: 05-DS.t 1595 2017-09-12 09:10:56Z willem $	-*-perl-*-
+# $Id: 05-DS.t 1749 2019-07-21 09:15:55Z willem $	-*-perl-*-
 
 use strict;
 use Test::More tests => 37;
@@ -76,12 +76,12 @@ my $wire = join '', qw( EC45 05 01 2BB183AF5F22588179A53B0A98631FAD1A292118 );
 	is( $rr->algorithm(),		5,	   'rr->algorithm("MNEMONIC") preserves value' );
 
 	eval { $rr->algorithm('X'); };
-	my $exception1 = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception1 ||= '', "unknown mnemonic\t[$exception1]" );
+	my ($exception1) = split /\n/, "$@\n";
+	ok( $exception1, "unknown mnemonic\t[$exception1]" );
 
 	eval { $rr->algorithm(0); };
-	my $exception2 = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception2 ||= '', "disallowed algorithm 0\t[$exception2]" );
+	my ($exception2) = split /\n/, "$@\n";
+	ok( $exception2, "disallowed algorithm 0\t[$exception2]" );
 
 	is( $class->algorithm('RSASHA256'), 8,		 'class method algorithm("RSASHA256")' );
 	is( $class->algorithm(8),	    'RSASHA256', 'class method algorithm(8)' );
@@ -99,8 +99,8 @@ my $wire = join '', qw( EC45 05 01 2BB183AF5F22588179A53B0A98631FAD1A292118 );
 	is( $rr->digtype(),	      2,	 'rr->digtype("MNEMONIC") preserves value' );
 
 	eval { $rr->digtype(0); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "disallowed digtype 0\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "disallowed digtype 0\t[$exception]" );
 
 	is( $class->digtype('SHA256'), 2,	  'class method digtype("SHA256")' );
 	is( $class->digtype(2),	       'SHA-256', 'class method digtype(2)' );
@@ -111,40 +111,40 @@ my $wire = join '', qw( EC45 05 01 2BB183AF5F22588179A53B0A98631FAD1A292118 );
 {
 	my $rr = new Net::DNS::RR(". $type @data");
 	eval { $rr->digest('123456789XBCDEF'); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "corrupt hexadecimal\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "corrupt hexadecimal\t[$exception]" );
 }
 
 
 {
 	my $keyrr = new Net::DNS::RR( type => 'DNSKEY', keybin => '' );
 	eval { create Net::DNS::RR::DS( $keyrr, ( 'digtype' => 255 ) ); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "create: wrong digtype\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "create: wrong digtype\t[$exception]" );
 }
 
 
 {
 	my $keyrr = new Net::DNS::RR( type => 'DNSKEY', protocol => 0 );
 	eval { create Net::DNS::RR::DS($keyrr); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "create: non-DNSSEC key\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "create: non-DNSSEC key\t[$exception]" );
 }
 
 
 {
 	my $keyrr = new Net::DNS::RR( type => 'DNSKEY', flags => 0x8000 );
 	eval { create Net::DNS::RR::DS($keyrr); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "create: non-auth key\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "create: non-auth key\t[$exception]" );
 }
 
 
 {
 	my $keyrr = new Net::DNS::RR( type => 'DNSKEY', flags => 0x200 );
 	eval { create Net::DNS::RR::DS($keyrr); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "create: non-ZONE key\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "create: non-ZONE key\t[$exception]" );
 }
 
 

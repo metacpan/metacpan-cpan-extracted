@@ -1,4 +1,4 @@
-# $Id: 02-text.t 1694 2018-07-16 04:19:40Z willem $	-*-perl-*-
+# $Id: 02-text.t 1749 2019-07-21 09:15:55Z willem $	-*-perl-*-
 
 use strict;
 use Test::More tests => 37;
@@ -18,15 +18,15 @@ use_ok('Net::DNS::Text');
 
 {
 	eval { my $object = new Net::DNS::Text(); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "empty argument list\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "empty argument list\t[$exception]" );
 }
 
 
 {
 	eval { my $object = new Net::DNS::Text(undef); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "argument undefined\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "argument undefined\t[$exception]" );
 }
 
 
@@ -107,8 +107,8 @@ use_ok('Net::DNS::Text');
 	my $sample = 'example';
 	my $buffer = substr new Net::DNS::Text($sample)->encode, 0, 2;
 	eval { my $object = decode Net::DNS::Text( \$buffer ); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "corrupt wire-format\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "corrupt wire-format\t[$exception]" );
 }
 
 

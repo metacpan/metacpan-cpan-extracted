@@ -3,6 +3,7 @@
 use 5.010;
 use strict;
 use warnings;
+use Test::Exception;
 use Test::More 0.98;
 
 use String::Wildcard::Bash qw(
@@ -81,6 +82,7 @@ subtest contains_wildcard => sub {
 
 subtest convert_wildcard_to_sql => sub {
     is(convert_wildcard_to_sql('a*'), 'a%');
+    is(convert_wildcard_to_sql('a**b'), 'a%b');
     is(convert_wildcard_to_sql('a*b*'), 'a%b%');
     is(convert_wildcard_to_sql('a\\*'), 'a\\*');
     is(convert_wildcard_to_sql('a?'), 'a_');
@@ -90,11 +92,12 @@ subtest convert_wildcard_to_sql => sub {
     is(convert_wildcard_to_sql('a\\%'), 'a\\%');
     is(convert_wildcard_to_sql('a_'), 'a\\_');
     is(convert_wildcard_to_sql('a\\_'), 'a\\_');
+    is(convert_wildcard_to_sql('a\\{b,c}'), 'a\\{b,c}'); # brace literal
 
     # passed as-is
-    is(convert_wildcard_to_sql('a[b]'), 'a[b]');
-    is(convert_wildcard_to_sql('a\\{b,c}'), 'a\\{b,c}');
-    is(convert_wildcard_to_sql('a{b,c}'), 'a{b,c}');
+    dies_ok { convert_wildcard_to_sql('a[b]') }; # class
+    dies_ok { convert_wildcard_to_sql('a{b}') }; # brace literal single element
+    dies_ok { convert_wildcard_to_sql('a{b,c}') }; # brace
 };
 
 subtest convert_wildcard_to_re => sub {
@@ -114,6 +117,8 @@ subtest convert_wildcard_to_re => sub {
     subtest "opt:dotglob" => sub {
         is(convert_wildcard_to_re({}, '*a*'), "[^.].*a.*");
         is(convert_wildcard_to_re({dotglob=>1}, '*a*'), ".*a.*");
+        is(convert_wildcard_to_re({}, '.*'), "\\..*");
+        is(convert_wildcard_to_re({dotglob=>1}, '.*'), "\\..*");
     };
 };
 

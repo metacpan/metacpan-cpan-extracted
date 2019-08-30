@@ -1,9 +1,9 @@
 package Net::DNS::RR::OPT;
 
 #
-# $Id: OPT.pm 1717 2018-10-12 13:14:42Z willem $
+# $Id: OPT.pm 1754 2019-08-19 14:12:28Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1717 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1754 $)[1];
 
 
 use strict;
@@ -91,16 +91,15 @@ QQ
 }
 
 
-my ( $class, $ttl );
-
 sub class {				## overide RR method
-	carp qq[Usage: OPT has no "class" attribute, please use "size()"] unless $class++;
-	&size;
+	my $self = shift;
+	$self->_deprecate(qq[please use "size()"]);
+	$self->size(@_);
 }
 
 sub ttl {				## overide RR method
 	my $self = shift;
-	carp qq[Usage: OPT has no "ttl" attribute, please use "flags()" or "rcode()"] unless $ttl++;
+	$self->_deprecate(qq[please use "flags()" or "rcode()"]);
 	my @rcode = map unpack( 'C',   pack 'N', $_ ), @_;
 	my @flags = map unpack( 'x2n', pack 'N', $_ ), @_;
 	pack 'C2n', $self->rcode(@rcode), $self->version, $self->flags(@flags);
@@ -108,8 +107,10 @@ sub ttl {				## overide RR method
 
 
 sub version {
-	my $version = shift->{version};
-	return defined($version) ? $version : 0;
+	my $self = shift;
+
+	$self->{version} = 0 + shift if scalar @_;
+	$self->{version} || 0;
 }
 
 
@@ -165,7 +166,7 @@ sub _format_option {
 	my $defined = length($payload) && $package->can('_image');
 	my @element = $defined ? eval { $package->_image($payload) } : unpack 'H*', $payload;
 	my $protect = pop(@element);
-	Net::DNS::RR::_wrap( "$option\t=> (", map( "$_,", @element ), $protect, ')' );
+	Net::DNS::RR::_wrap( "$option\t=> (", map( "$_,", @element ), "$protect )" );
 }
 
 
@@ -189,18 +190,21 @@ sub _set_option {
 	my $options = $self->{option} ||= {};
 	delete $options->{$number};
 	return unless defined $value;
-	if ( ref($value) || scalar(@etc) ) {
-		my $option = ednsoptionbyval($number);
+	if ( ref($value) || scalar(@etc) || $value !~ /\D/ ) {
 		my @arg = ( $value, @etc );
 		@arg = @$value if ref($value) eq 'ARRAY';
 		@arg = %$value if ref($value) eq 'HASH';
 		if ( $arg[0] eq 'OPTION-DATA' ) {
 			$value = $arg[1];
 		} else {
+			my $option  = ednsoptionbyval($number);
 			my $package = join '::', __PACKAGE__, $option;
 			$package =~ s/-/_/g;
-			croak "unable to compose option $option" unless $package->can('_compose');
-			$value = $package->_compose(@arg);
+			if ( $package->can('_compose') ) {
+				$value = $package->_compose(@arg);
+			} elsif ( scalar(@etc) ) {
+				croak "unable to compose option $option";
+			}
 		}
 	}
 	$options->{$number} = $value;
@@ -242,26 +246,26 @@ use Net::DNS::RR::A;
 use Net::DNS::RR::AAAA;
 
 my %family = qw(1 Net::DNS::RR::A	2 Net::DNS::RR::AAAA);
-my @field  = qw(FAMILY SOURCE-PREFIX-LENGTH SCOPE-PREFIX-LENGTH ADDRESS);
+my @field8 = qw(FAMILY SOURCE-PREFIX-LENGTH SCOPE-PREFIX-LENGTH ADDRESS);
 
 sub _compose {
 	my ( $class, %argument ) = @_;
 	my $address = bless( {}, $family{$argument{FAMILY}} )->address( $argument{ADDRESS} );
-	my $preamble = pack 'nC2', map $_ ||= 0, @argument{@field};
-	my $bitmask = $argument{'SOURCE-PREFIX-LENGTH'};
+	my $preamble = pack 'nC2', map $_ || 0, @argument{@field8};
+	my $bitmask  = $argument{'SOURCE-PREFIX-LENGTH'};
 	pack "a* B$bitmask", $preamble, unpack 'B*', $address;
 }
 
 sub _decompose {
 	my %hash;
-	@hash{@field} = unpack 'nC2a*', $_[1];
+	@hash{@field8} = unpack 'nC2a*', $_[1];
 	$hash{ADDRESS} = bless( {address => $hash{ADDRESS}}, $family{$hash{FAMILY}} )->address;
-	my @payload = map { ( $_ => $hash{$_} ) } @field;
+	my @payload = map { ( $_ => $hash{$_} ) } @field8;
 }
 
 sub _image {
-	my %hash = &_decompose;
-	my @image = map "$_ => $hash{$_}", @field;
+	my %hash  = &_decompose;
+	my @image = map "$_ => $hash{$_}", @field8;
 }
 
 
@@ -281,22 +285,22 @@ sub _image { join ' => ', &_decompose; }
 
 package Net::DNS::RR::OPT::COOKIE;				# RFC7873
 
-my @key = qw(CLIENT-COOKIE SERVER-COOKIE);
+my @field10 = qw(CLIENT-COOKIE SERVER-COOKIE);
 
 sub _compose {
 	my ( $class, %argument ) = @_;
-	pack 'a8 a*', map $_ || '', @argument{@key};
+	pack 'a8 a*', map $_ || '', @argument{@field10};
 }
 
 sub _decompose {
 	my %hash;
-	@hash{@key} = unpack 'a8 a*', $_[1];
-	my @payload = map { ( $_ => $hash{$_} ) } @key;
+	@hash{@field10} = unpack 'a8 a*', $_[1];
+	my @payload = map { ( $_ => $hash{$_} ) } @field10;
 }
 
 sub _image {
-	my %hash = &_decompose;
-	my @image = map join( ' => ', $_, unpack 'H*', $hash{$_} ), @key;
+	my %hash  = &_decompose;
+	my @image = map join( ' => ', $_, unpack 'H*', $hash{$_} ), @field10;
 }
 
 
@@ -340,7 +344,7 @@ sub _compose {
 
 sub _decompose {
 	my ( $class, $payload ) = @_;
-	my $fqdn = Net::DNS::DomainName->decode( \$payload )->string;
+	my $fqdn    = Net::DNS::DomainName->decode( \$payload )->string;
 	my @payload = ( 'CLOSEST-TRUST-POINT' => $fqdn );
 }
 
@@ -411,9 +415,10 @@ other unpredictable behaviour.
 
 =head2 version
 
-	$version = $rr->version;
+    $version = $rr->version;
+    $rr->version( $version );
 
-The version of EDNS used by this OPT record.
+The version of EDNS supported by this OPT record.
 
 =head2 size
 
@@ -481,20 +486,19 @@ For some options, an array is more appropriate:
 	@algorithms = $packet->edns->option(6);
 
 
-Similar forms of array syntax may be used to construct the option value:
+Similar forms of array or hash syntax may be used to construct the
+option value:
 
 	$packet->edns->option( DHU => [1, 2, 4] );
-	$packet->edns->option( 6   => (1, 2, 4) );
 
 	$packet->edns->option( COOKIE => {'CLIENT-COOKIE' => $cookie} );
-	$packet->edns->option( 10     => ('CLIENT-COOKIE' => $cookie) );
 
 
 =head1 COPYRIGHT
 
 Copyright (c)2001,2002 RIPE NCC.  Author Olaf M. Kolkman.
 
-Portions Copyright (c)2012,2017 Dick Franks.
+Portions Copyright (c)2012,2017-2019 Dick Franks.
 
 All rights reserved.
 

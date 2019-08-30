@@ -1,0 +1,13 @@
+Build.PL
+CONTRIBUTING.md
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/PartialApplication.pm
+minil.toml
+t/00_compile.t
+t/10_partialApplication.t
+META.yml
+MANIFEST

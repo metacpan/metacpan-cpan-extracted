@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,7 +21,7 @@ requires:
   Algorithm::Dependency::Source::HoA: '0'
   Any::Moose: '0'
   App::CreateSelfSignedSSLCert: '0'
-  App::rimetadb: '0'
+  App::rimetadb: '0.221'
   CDB_File: '0'
   CHI: '0'
   Capture::Tiny: '0'
@@ -89,12 +89,12 @@ requires:
   Path::Class: '0'
   Perinci::Access::Base::Patch::PeriAHS: '0'
   Perinci::Access::HTTP::Client: '0'
-  Perinci::Access::Schemeless::DBI: '0'
+  Perinci::Access::Schemeless::DBI: '0.009'
   Perinci::CmdLine: '0'
   Perinci::CmdLine::Any: '0'
   Perinci::CmdLine::Lite: '1.820'
   Perinci::CmdLine::Server: '0'
-  Perinci::Exporter: '0'
+  Perinci::Exporter: '0.080'
   Perinci::Sub::Util: '0.46'
   Perinci::Sub::Wrapper::Patch::HandlePHPArray: '0'
   Proc::ChildError: '0'
@@ -106,6 +106,7 @@ requires:
   Storable: '0'
   String::ShellQuote: '0'
   Sub::Curry: '0'
+  Sys::RunAlone: '0'
   Tie::Handle::FileWriteRotate: '0'
   Time::Local: '0'
   URI: '0'
@@ -130,10 +131,10 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Task-Tmp-spanel
   homepage: https://metacpan.org/release/Task-Tmp-spanel
   repository: git://github.com/perlancar/perl-Task-Tmp-spanel.git
-version: '0.006'
+version: '0.007'
 x_Dist_Zilla:
   perl:
-    version: '5.026001'
+    version: '5.028002'
   plugins:
     -
       class: Dist::Zilla::Plugin::GatherDir
@@ -147,54 +148,54 @@ x_Dist_Zilla:
           prune_directory: []
           root: .
       name: '@Author::PERLANCAR::Task/@Filter/@Filter/GatherDir'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Author::PERLANCAR::Task/@Filter/@Filter/PruneCruft'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Author::PERLANCAR::Task/@Filter/@Filter/ManifestSkip'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Author::PERLANCAR::Task/@Filter/@Filter/MetaYAML'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::License
       name: '@Author::PERLANCAR::Task/@Filter/@Filter/License'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@Author::PERLANCAR::Task/@Filter/@Filter/ExtraTests'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::PERLANCAR::Task/@Filter/@Filter/ExecDir'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Author::PERLANCAR::Task/@Filter/@Filter/ShareDir'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@Author::PERLANCAR::Task/@Filter/@Filter/MakeMaker'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Author::PERLANCAR::Task/@Filter/@Filter/Manifest'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Author::PERLANCAR::Task/@Filter/@Filter/ConfirmRelease'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::PERLANCAR::Task/@Filter/ExecDir script'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR::Task/@Filter/PERLANCAR::BeforeBuild'
@@ -241,15 +242,15 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR::Task/@Filter/IfBuilt'
-      version: '0.03'
+      version: '0.02'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::PERLANCAR::Task/@Filter/MetaJSON'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Author::PERLANCAR::Task/@Filter/MetaConfig'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Authority
       name: '@Author::PERLANCAR::Task/@Filter/Authority'
@@ -269,7 +270,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PruneFiles
       name: '@Author::PERLANCAR::Task/@Filter/PruneFiles'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Pod2Readme
       name: '@Author::PERLANCAR::Task/@Filter/Pod2Readme'
@@ -323,7 +324,7 @@ x_Dist_Zilla:
           dry_run: 0
           mode: on
       name: '@Author::PERLANCAR::Task/@Filter/StaticInstall'
-      version: '0.011'
+      version: '0.012'
     -
       class: Dist::Zilla::Plugin::EnsureSQLSchemaVersionedTest
       name: '@Author::PERLANCAR::Task/@Filter/EnsureSQLSchemaVersionedTest'
@@ -355,7 +356,7 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Prereqs::SetMinimumVersion::FromPmVersions
       name: Prereqs::SetMinimumVersion::FromPmVersions
@@ -367,48 +368,49 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.010'
+      version: '6.012'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.010'
+    version: '6.012'
 x_authority: cpan:PERLANCAR
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_generated_by_perl: v5.28.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
 x_static_install: 1

@@ -26,6 +26,7 @@ Data-Object Code Function (Curry) Class
 =description
 
 Data::Object::Code::Func::Curry is a function object for Data::Object::Code.
+This package inherits all behavior from L<Data::Object::Code::Func>.
 
 =cut
 

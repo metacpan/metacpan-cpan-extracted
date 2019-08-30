@@ -25,7 +25,9 @@ Data-Object Array Function (Defined) Class
 
 =description
 
-Data::Object::Array::Func::Defined is a function object for Data::Object::Array.
+Data::Object::Array::Func::Defined is a function object for
+Data::Object::Array. This package inherits all behavior from
+L<Data::Object::Array::Func>.
 
 =cut
 

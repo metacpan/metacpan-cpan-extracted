@@ -3,10 +3,10 @@
 use lib 't/lib';
 
 use Do;
-use Test::Dist;
+use Test::This;
 use Test::More;
 
-my $pod = Test::Dist->new;
+my $pod = Test::This->new;
 
 for my $file (map $pod->file("$_"), @{$pod->paths}) {
   for my $name (@{$file->can_files}) {

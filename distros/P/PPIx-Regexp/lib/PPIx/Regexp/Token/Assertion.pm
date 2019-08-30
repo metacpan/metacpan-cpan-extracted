@@ -48,6 +48,7 @@ use base qw{ PPIx::Regexp::Token };
 
 use PPIx::Regexp::Constant qw{
     COOKIE_CLASS
+    COOKIE_LOOKAROUND_ASSERTION
     LITERAL_LEFT_CURLY_ALLOWED
     MINIMUM_PERL
     TOKEN_LITERAL
@@ -55,7 +56,9 @@ use PPIx::Regexp::Constant qw{
     @CARP_NOT
 };
 
-our $VERSION = '0.066';
+use constant KEEP_EXPLANATION	=> 'In s///, keep everything before the \\K';
+
+our $VERSION = '0.067';
 
 # Return true if the token can be quantified, and false otherwise
 # sub can_be_quantified { return };
@@ -94,6 +97,24 @@ sub perl_version_introduced {
 
 }
 
+sub perl_version_removed {
+    my ( $self ) = @_;
+    return ( $self->{perl_version_removed} ||=
+	$self->_perl_version_removed() );
+}
+
+sub _perl_version_removed {
+    my ( $self ) = @_;
+    if ( '\\K' eq $self->content() ) {
+	my $parent = $self;
+	while ( $parent = $parent->parent() ) {
+	    $parent->isa( 'PPIx::Regexp::Structure::Assertion' )
+		and return '5.031003';
+	}
+    }
+    return $self->SUPER::perl_version_removed();
+}
+
 {
     my %explanation = (
 	'$'	=> 'Assert position is at end of string or newline',
@@ -105,7 +126,7 @@ sub perl_version_introduced {
 	'\\B{sb}'	=> 'Assert position is not at sentence boundary',
 	'\\B{wb}'	=> 'Assert position is not at word boundary',
 	'\\G'	=> 'Assert position is at pos()',
-	'\\K'	=> 'In s///, keep everything before the \\K',
+	'\\K'	=> KEEP_EXPLANATION,
 	'\\Z'	=> 'Assert position is at end of string, or newline before end',
 	'\\b'	=> 'Assert position is at word/nonword boundary',
 	'\\b{gcb}'	=> 'Assert position is at grapheme cluster boundary',
@@ -168,6 +189,18 @@ sub __PPIX_TOKENIZER__regexp {
 		or return $end;
 	    return $tokenizer->make_token( $end, $item->[2], $item->[3] );
 	}
+    }
+
+    # We special-case '\K' because it was retracted inside look-around
+    # assertions in 5.31.3.
+    if ( 'K' eq $next && __PACKAGE__ eq $make &&
+	$tokenizer->cookie( COOKIE_LOOKAROUND_ASSERTION ) ) {
+	return $tokenizer->make_token( 2, $make, {
+		perl_version_removed	=> '5.031003',
+		explanation		=> KEEP_EXPLANATION .
+		    '; retracted inside look-around assertion',
+	    },
+	);
     }
 
     $escaped{$next}

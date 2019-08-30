@@ -1,3 +1,4 @@
+#!/usr/bin/env perl -w
 #!/usr/bin/perl -w
 #
 # Jan 2016  M.Eckardt, imunixx GmbH			<Matthias.Eckardt@imunixx.de>

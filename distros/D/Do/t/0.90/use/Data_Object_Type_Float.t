@@ -27,9 +27,9 @@ Data-Object Float Type Constraint
 
 =description
 
-Type constraint for validating L<Data::Object::Float>
-objects. This type constraint is registered in the
-L<Data::Object::Library> type library.
+Type constraint for validating L<Data::Object::Float> objects. This type
+constraint is registered in the L<Data::Object::Library> type library. This
+package inherits all behavior from L<Data::Object::Type>.
 
 =cut
 

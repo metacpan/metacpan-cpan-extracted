@@ -20,7 +20,8 @@ Functions for Any Data
 =description
 
 Data::Object::Any::Func is an abstract base class for function classes in the
-Data::Object::Any::Func space.
+Data::Object::Any::Func space. This package inherits all behavior from
+L<Data::Object::Func>.
 
 =cut
 

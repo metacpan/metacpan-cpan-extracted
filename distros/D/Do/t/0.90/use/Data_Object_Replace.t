@@ -30,7 +30,8 @@ Data-Object Replace Class
 =description
 
 This package provides routines for introspecting the results of a regexp
-replace operation.
+replace operation. This package inherits all behavior from
+L<Data::Object::Array>.
 
 =cut
 

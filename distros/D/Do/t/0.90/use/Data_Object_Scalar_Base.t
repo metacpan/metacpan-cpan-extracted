@@ -24,7 +24,7 @@ Data-Object Abstract Scalar Class
 =description
 
 Data::Object::Scalar::Base provides routines for operating on Perl 5 scalar
-objects.
+objects. This package inherits all behavior from L<Data::Object::Base>.
 
 =cut
 

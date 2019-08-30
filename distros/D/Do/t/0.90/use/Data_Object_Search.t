@@ -30,7 +30,7 @@ Data-Object Search Class
 =description
 
 This package provides routines for introspecting the results of a regexp search
-operation.
+operation. This package inherits all behavior from L<Data::Object::Array>.
 
 =cut
 

@@ -24,7 +24,7 @@ Data-Object Abstract Hash Class
 =description
 
 Data::Object::Hash::Base provides routines for operating on Perl 5 hash
-references.
+references. This package inherits all behavior from L<Data::Object::Base>.
 
 =cut
 

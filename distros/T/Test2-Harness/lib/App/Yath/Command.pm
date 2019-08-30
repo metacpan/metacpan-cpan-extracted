@@ -2,7 +2,7 @@ package App::Yath::Command;
 use strict;
 use warnings;
 
-our $VERSION = '0.001087';
+our $VERSION = '0.001090';
 
 use Carp qw/croak confess/;
 use File::Temp qw/tempdir/;
@@ -264,6 +264,8 @@ sub make_run_from_settings {
         mem_usage   => $settings->{mem_usage},
         default_search => $settings->{default_search},
 
+        harness_run_fields => $settings->{fields},
+
         plugins => $self->{+PLUGINS} ? [@{$self->{+PLUGINS}}] : undef,
 
         exclude_patterns => $settings->{exclude_patterns},
@@ -324,6 +326,29 @@ sub options {
             summary   => ['Add a directory to your include paths', 'This can be used multiple times'],
             normalize => sub {
                 [map { File::Spec->rel2abs($_) } @{$_[3] || []}];
+            },
+        },
+
+        {
+            spec => 'f|field=s@',
+            field => 'fields',
+            used_by => {runner => 1},
+            section => "Harness Options",
+            usage => ['-f name:details', qq|--field '{"name": "NAME", "details": "DETAILS", "link": "LINK", "data":{...}}'| ],
+            summary => ['Add custom harness_run_fields'],
+            action => sub {
+                my $self = shift;
+                my ($settings, $field, $raw) = @_;
+
+                my $run_field;
+                if ($raw =~ m/^{/) {
+                    $run_field = Test2::Harness::Util::JSON::decode_json($raw);
+                }
+                elsif ($raw =~ m/^([^:]+):([^:]+)$/) {
+                    $run_field = { name => $1, details => $2 };
+                }
+
+                push @{$settings->{$field}} => $run_field;
             },
         },
 

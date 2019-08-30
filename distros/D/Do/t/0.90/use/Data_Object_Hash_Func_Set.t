@@ -25,7 +25,8 @@ Data-Object Hash Function (Set) Class
 
 =description
 
-Data::Object::Hash::Func::Set is a function object for Data::Object::Hash.
+Data::Object::Hash::Func::Set is a function object for Data::Object::Hash. This
+package inherits all behavior from L<Data::Object::Hash::Func>.
 
 =cut
 

@@ -1,4 +1,4 @@
-# $Id: 08-recurse.t 1736 2019-03-20 10:03:12Z willem $ -*-perl-*-
+# $Id: 08-recurse.t 1740 2019-04-04 14:45:31Z willem $ -*-perl-*-
 
 use strict;
 use Test::More;
@@ -57,7 +57,7 @@ NonFatalBegin();
 
 	ok( $res->isa('Net::DNS::Resolver::Recurse'), 'new() created object' );
 
-	my $reply = $res->query_dorecursion( 'www.net-dns.org', 'A' );
+	my $reply = $res->send( 'www.net-dns.org', 'A' );
 	is( ref($reply), 'Net::DNS::Packet', 'query returned a packet' );
 }
 
@@ -68,7 +68,7 @@ NonFatalBegin();
 
 	my $count = 0;
 
-	$res->recursion_callback( sub { $count++ } );
+	$res->callback( sub { $count++ } );
 
 	$res->send( 'a.t.net-dns.org', 'A' );
 
@@ -81,7 +81,7 @@ NonFatalBegin();
 
 	my $count = 0;
 
-	$res->recursion_callback( sub { $count++ } );
+	$res->callback( sub { $count++ } );
 
 	$res->send( '2a04:b900:0:0:8:0:0:60', 'PTR' );
 

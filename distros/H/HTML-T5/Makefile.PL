@@ -104,7 +104,7 @@ my $parms = {
             'Andy Lester <andy@petdance.com>',
             'Jonathan Rockway <jrockway@cpan.org>',
             'Robert Bachmann <rbach@cpan.org>',
-            'Robert Rothenberg <rrwo@cpan.com>',
+            'Robert Rothenberg <rrwo@cpan.org>',
             'Rufus Cable <cpan@threebytesfull.com>',
         ],
     },

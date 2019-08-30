@@ -39,7 +39,7 @@ name: DBIx-Class-Helper-ResultSet-WindowFunctions
 provides:
   DBIx::Class::Helper::ResultSet::WindowFunctions:
     file: lib/DBIx/Class/Helper/ResultSet/WindowFunctions.pm
-    version: v0.2.0
+    version: v0.2.1
 requires:
   DBIx::Class::ResultSet: '0'
   parent: '0'
@@ -48,7 +48,7 @@ resources:
   bugtracker: https://github.com/robrwo/DBIx-Class-Helper-ResultSet-WindowFunctions/issues
   homepage: https://metacpan.org/pod/DBIx::Class::Helper::ResultSet::WindowFunctions
   repository: git://github.com/robrwo/DBIx-Class-Helper-ResultSet-WindowFunctions.git
-version: v0.2.0
+version: v0.2.1
 x_authority: cpan:RRWO
 x_contributors:
   - 'Peter Rabbitson <ribasushi@leporine.io>'

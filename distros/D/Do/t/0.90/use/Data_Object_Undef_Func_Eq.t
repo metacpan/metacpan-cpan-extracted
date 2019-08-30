@@ -26,6 +26,7 @@ Data-Object Undef Function (Eq) Class
 =description
 
 Data::Object::Undef::Func::Eq is a function object for Data::Object::Undef.
+This package inherits all behavior from L<Data::Object::Undef::Func>.
 
 =cut
 

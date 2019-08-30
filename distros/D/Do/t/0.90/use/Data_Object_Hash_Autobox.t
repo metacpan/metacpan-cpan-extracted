@@ -22,6 +22,12 @@ Data-Object Autoboxing for Hash Objects
 This package implements autoboxing via L<Data::Object::Autobox> for
 L<Data::Object::Hash> objects.
 
++=head1 ROLES
+
+This package assumes all behavior from the follow roles:
+
+L<Data::Object::Role::Proxyable>
+
 =cut
 
 use_ok "Data::Object::Hash::Autobox";

@@ -26,6 +26,7 @@ Data-Object Scalar Function (Ge) Class
 =description
 
 Data::Object::Scalar::Func::Ge is a function object for Data::Object::Scalar.
+This package inherits all behavior from L<Data::Object::Scalar::Func>.
 
 =cut
 

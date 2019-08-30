@@ -26,6 +26,7 @@ Data-Object Float Function (Eq) Class
 =description
 
 Data::Object::Float::Func::Eq is a function object for Data::Object::Float.
+This package inherits all behavior from L<Data::Object::Float::Func>.
 
 =cut
 

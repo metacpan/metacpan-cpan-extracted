@@ -1,5 +1,8 @@
 Revision history for HTML-T5
 
+0.006  2019-08-30
+    - Fix t/opt-00.t in recent libtidy.
+
 0.005  2018-10-04
     - Add x_contributors to META.yml/META.json .
         - https://github.com/shlomif/html-tidy5/pull/2

@@ -25,7 +25,8 @@ Data-Object Any Function (Ne) Class
 
 =description
 
-Data::Object::Any::Func::Ne is a function object for Data::Object::Any.
+Data::Object::Any::Func::Ne is a function object for Data::Object::Any. This
+package inherits all behavior from L<Data::Object::Any::Func>.
 
 =cut
 

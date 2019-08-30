@@ -23,7 +23,8 @@ Data-Object Type Library
 
 This package provides a type library derived from L<Type::Library> which
 extends the L<Types::Standard>, L<Types::Common::Numeric>, and
-L<Types::Common::String> libraries, and adds additional type constraints.
+L<Types::Common::String> libraries, and adds additional type constraints. This
+package inherits all behavior from L<Type::Library>.
 
 +=head1 TYPES
 

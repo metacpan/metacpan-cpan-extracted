@@ -39,6 +39,11 @@ has list => (
   def => method(){[]}
 );
 
+has data => (
+  is => 'rw',
+  isa => 'HashRef'
+);
+
 method BUILD($args) {
   my ($libs, $list) = ($self->libs, $self->list);
   File::Find::find(sub { push @$list, $File::Find::name if -f }, $libs);
@@ -54,7 +59,7 @@ method paths() {
   } sort @{$self->list}];
 }
 
-method render() {
+method render($data) {
   for my $file (map $self->file("$_"), @{$self->paths}) {
     unlink $file->pod_file; $file->document->output->persist;
   }
@@ -63,7 +68,13 @@ method render() {
 }
 
 method file($path) {
-  return Test::Dist::File->new(path => $path);
+  my $data = $self->data;
+  my $meta = $data->{$path} if $data;
+
+  $meta = $meta->{routines} if $meta;
+  $data = { routines => $meta } if $meta;
+
+  return Test::Dist::File->new(path => $path, $data ? (data => $data) : ());
 }
 
 1;

@@ -1,4 +1,4 @@
-# $Id: 07-zonefile.t 1709 2018-09-07 08:03:09Z willem $	-*-perl-*-
+# $Id: 07-zonefile.t 1748 2019-07-15 07:57:00Z willem $	-*-perl-*-
 
 use strict;
 use IO::File;
@@ -65,22 +65,22 @@ my $recursive = join ' ', '$INCLUDE', source('$INCLUDE zone1.txt')->name;
 
 {
 	eval { new Net::DNS::ZoneFile(undef); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "new(): invalid argument\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "new(): invalid argument\t[$exception]" );
 }
 
 
 {
 	eval { new Net::DNS::ZoneFile( [] ); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "new(): not a file handle\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "new(): not a file handle\t[$exception]" );
 }
 
 
 {
 	eval { new Net::DNS::ZoneFile('zone0.txt'); };		# presumed not to exist
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "new(): non-existent file\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "new(): non-existent file\t[$exception]" );
 }
 
 
@@ -124,8 +124,8 @@ my $recursive = join ' ', '$INCLUDE', source('$INCLUDE zone1.txt')->name;
 $TTL
 EOF
 	eval { $zonefile->read; };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "exception:\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "exception:\t[$exception]" );
 }
 
 
@@ -134,8 +134,8 @@ EOF
 $INCLUDE
 EOF
 	eval { $zonefile->read; };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "exception:\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "exception:\t[$exception]" );
 }
 
 
@@ -144,8 +144,8 @@ EOF
 $ORIGIN
 EOF
 	eval { $zonefile->read; };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "exception:\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "exception:\t[$exception]" );
 }
 
 
@@ -154,8 +154,8 @@ EOF
 $GENERATE
 EOF
 	eval { $zonefile->read; };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "exception:\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "exception:\t[$exception]" );
 }
 
 
@@ -164,8 +164,8 @@ EOF
 $BOGUS
 EOF
 	eval { $zonefile->read; };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "exception:\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "exception:\t[$exception]" );
 }
 
 
@@ -239,14 +239,14 @@ EOF
 
 	{
 		my @rr = eval { $zonefile->read };
-		my $exception = $1 if $@ =~ /^(.+)\n/;
-		ok( $exception ||= '', "recursive include\t[$exception]" );
+		my ($exception) = split /\n/, "$@\n";
+		ok( $exception, "recursive include\t[$exception]" );
 	}
 
 	{
 		my @rr = eval { $zonefile->read };
-		my $exception = $1 if $@ =~ /^(.+)\n/;
-		ok( $exception ||= '', "non-existent include\t[$exception]" );
+		my ($exception) = split /\n/, "$@\n";
+		ok( $exception, "non-existent include\t[$exception]" );
 	}
 	is( $zonefile->name, $fn1, 'zonefile->name identifies file' );
 	is( $zonefile->line, 5,	   'zonefile->line identifies directive' );
@@ -330,8 +330,8 @@ EOF
 	is( $zonefile->read->rdstring, 'f.e.d.',	   'generate TXT ${0,6,n}' );
 	is( $zonefile->read->rdstring, 'F.E.D.C.B.A.0.0.', 'generate TXT ${0,16,N}' );
 	eval { $zonefile->read; };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "unknown format:\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "unknown format:\t[$exception]" );
 }
 
 
@@ -399,8 +399,8 @@ EOF
 		local $SIG{__WARN__} = sub { };			# presumed not to exist
 		my $listref = Net::DNS::ZoneFile->read( '/zone0.txt', '.' );
 	};
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "read(): non-existent file\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "read(): non-existent file\t[$exception]" );
 }
 
 
@@ -409,8 +409,8 @@ EOF
 		local $SIG{__WARN__} = sub { };			# presumed not to exist
 		my $listref = Net::DNS::ZoneFile->read( 'zone0.txt', 't' );
 	};
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "read(): non-existent file\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "read(): non-existent file\t[$exception]" );
 }
 
 

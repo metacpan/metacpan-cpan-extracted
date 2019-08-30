@@ -8,7 +8,6 @@ Makefile.PL
 README
 dist.ini
 lib/String/Wildcard/Bash.pm
-t/#01-basics.t#
 t/00-compile.t
 t/01-basics.t
 t/author-critic.t

@@ -81,6 +81,6 @@ like( $x[0], qr/Missing mandatory option 'file'./, 'Print usage 1.' );
 	print $op->GetOpt('file'). "\n";));
 like( $x[0], qr/meier/, 'Use default value.' );
 
-unlink "/tmp/_TST_.log";
-unlink "/tmp/_tst_.log";
+unlink "/tmp/_TST_.log" if( -e "/tmp/_TST_.log" );
+unlink "/tmp/_tst_.log" if( -e "/tmp/_tst_.log" );
 

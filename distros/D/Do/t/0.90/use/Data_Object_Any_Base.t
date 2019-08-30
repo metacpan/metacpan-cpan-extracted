@@ -23,7 +23,8 @@ Data-Object Abstract Any Class
 
 =description
 
-Data::Object::Any::Base is an abstract base class for operating on any Perl 5 data type.
+Data::Object::Any::Base is an abstract base class for operating on any Perl 5
+data type. This package inherits all behavior from L<Data::Object::Base>.
 
 =cut
 

@@ -21,7 +21,7 @@ use Scalar::Util ();		# Core since 5.7.3
 use Storable ();		# Core since 5.7.3
 use Test::Builder ();		# Core since 5.6.2
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use constant ON_DARWIN		=> 'darwin' eq $^O;
 use constant ON_VMS		=> 'VMS' eq $^O;
@@ -645,7 +645,7 @@ sub _check_external_pod_info {
 	# the existence of the module, and _assuming_ that it was
 	# documented.
 	$data->{undocumented}
-	    and $self->_fail(
+	    and return $self->_fail( $link,
 	    "$module is installed but undocumented" );
 
 	# If we get this far it is an installed module with

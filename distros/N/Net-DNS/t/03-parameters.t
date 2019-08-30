@@ -1,4 +1,4 @@
-# $Id: 03-parameters.t 1727 2018-12-31 12:04:48Z willem $	-*-perl-*-
+# $Id: 03-parameters.t 1749 2019-07-21 09:15:55Z willem $	-*-perl-*-
 
 use strict;
 
@@ -18,20 +18,20 @@ use Test::More tests => ( 5 + scalar keys %Net::DNS::Parameters::classbyval ) +
 	foreach ( sort { $a <=> $b } $anon, keys %Net::DNS::Parameters::classbyval ) {
 		my $name = classbyval($_);
 		my $code = eval { classbyname($name) };
-		my $exception = $@ =~ /^(.+)\n/ ? $1 : '';
+		my ($exception) = split /\n/, "$@\n";
 		is( $code, $_, "classbyname($name)\t$exception" );
 	}
 
 	my $large = 65536;
 	foreach my $testcase ( "BOGUS", "Bogus", "CLASS$large" ) {
 		eval { classbyname($testcase); };
-		my $exception = $1 if $@ =~ /^(.+)\n/;
-		ok( $exception ||= '', "classbyname($testcase)\t[$exception]" );
+		my ($exception) = split /\n/, "$@\n";
+		ok( $exception, "classbyname($testcase)\t[$exception]" );
 	}
 
 	eval { classbyval($large); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "classbyval($large)\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "classbyval($large)\t[$exception]" );
 }
 
 
@@ -40,7 +40,7 @@ use Test::More tests => ( 5 + scalar keys %Net::DNS::Parameters::classbyval ) +
 	foreach ( sort { $a <=> $b } $anon, keys %Net::DNS::Parameters::typebyval ) {
 		my $name = typebyval($_);
 		my $code = eval { typebyname($name) };
-		my $exception = $@ =~ /^(.+)\n/ ? $1 : '';
+		my ($exception) = split /\n/, "$@\n";
 		is( $code, $_, "typebyname($name)\t$exception" );
 	}
 	is( typebyname('*'), typebyname('ANY'), "typebyname(*)" );
@@ -48,13 +48,13 @@ use Test::More tests => ( 5 + scalar keys %Net::DNS::Parameters::classbyval ) +
 	my $large = 65536;
 	foreach my $testcase ( "BOGUS", "Bogus", "TYPE$large" ) {
 		eval { typebyname($testcase); };
-		my $exception = $1 if $@ =~ /^(.+)\n/;
-		ok( $exception ||= '', "typebyname($testcase)\t[$exception]" );
+		my ($exception) = split /\n/, "$@\n";
+		ok( $exception, "typebyname($testcase)\t[$exception]" );
 	}
 
 	eval { typebyval($large); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "typebyval($large)\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "typebyval($large)\t[$exception]" );
 }
 
 
@@ -63,15 +63,15 @@ use Test::More tests => ( 5 + scalar keys %Net::DNS::Parameters::classbyval ) +
 	foreach ( sort { $a <=> $b } $anon, keys %Net::DNS::Parameters::opcodebyval ) {
 		my $name = opcodebyval($_);
 		my $code = eval { opcodebyname($name) };
-		my $exception = $@ =~ /^(.+)\n/ ? $1 : '';
+		my ($exception) = split /\n/, "$@\n";
 		is( $code, $_, "opcodebyname($name)\t$exception" );
 	}
 	is( opcodebyname('NS_NOTIFY_OP'), opcodebyname('NOTIFY'), "opcodebyname(NS_NOTIFY_OP)" );
 
-	foreach my $testcase ('BOGUS' ) {
+	foreach my $testcase ('BOGUS') {
 		eval { opcodebyname($testcase); };
-		my $exception = $1 if $@ =~ /^(.+)\n/;
-		ok( $exception ||= '', "opcodebyname($testcase)\t[$exception]" );
+		my ($exception) = split /\n/, "$@\n";
+		ok( $exception, "opcodebyname($testcase)\t[$exception]" );
 	}
 }
 
@@ -81,15 +81,15 @@ use Test::More tests => ( 5 + scalar keys %Net::DNS::Parameters::classbyval ) +
 	foreach ( sort { $a <=> $b } $anon, keys %Net::DNS::Parameters::rcodebyval ) {
 		my $name = rcodebyval($_);
 		my $code = eval { rcodebyname($name) };
-		my $exception = $@ =~ /^(.+)\n/ ? $1 : '';
+		my ($exception) = split /\n/, "$@\n";
 		is( $code, $_, "rcodebyname($name)\t$exception" );
 	}
 	is( rcodebyname('BADVERS'), rcodebyname('BADSIG'), "rcodebyname(BADVERS)" );
 
-	foreach my $testcase ('BOGUS' ) {
+	foreach my $testcase ('BOGUS') {
 		eval { rcodebyname($testcase); };
-		my $exception = $1 if $@ =~ /^(.+)\n/;
-		ok( $exception ||= '', "rcodebyname($testcase)\t[$exception]" );
+		my ($exception) = split /\n/, "$@\n";
+		ok( $exception, "rcodebyname($testcase)\t[$exception]" );
 	}
 }
 
@@ -99,14 +99,14 @@ use Test::More tests => ( 5 + scalar keys %Net::DNS::Parameters::classbyval ) +
 	foreach ( sort { $a <=> $b } $anon, keys %Net::DNS::Parameters::ednsoptionbyval ) {
 		my $name = ednsoptionbyval($_);
 		my $code = eval { ednsoptionbyname($name) };
-		my $exception = $@ =~ /^(.+)\n/ ? $1 : '';
+		my ($exception) = split /\n/, "$@\n";
 		is( $code, $_, "ednsoptionbyname($name)\t$exception" );
 	}
 
-	foreach my $testcase ('BOGUS' ) {
+	foreach my $testcase ('BOGUS') {
 		eval { ednsoptionbyname($testcase); };
-		my $exception = $1 if $@ =~ /^(.+)\n/;
-		ok( $exception ||= '', "ednsoptionbyname($testcase)\t[$exception]" );
+		my ($exception) = split /\n/, "$@\n";
+		ok( $exception, "ednsoptionbyname($testcase)\t[$exception]" );
 	}
 }
 
@@ -116,14 +116,14 @@ use Test::More tests => ( 5 + scalar keys %Net::DNS::Parameters::classbyval ) +
 	foreach ( sort { $a <=> $b } $anon, keys %Net::DNS::Parameters::dsotypebyval ) {
 		my $name = dsotypebyval($_);
 		my $code = eval { dsotypebyname($name) };
-		my $exception = $@ =~ /^(.+)\n/ ? $1 : '';
+		my ($exception) = split /\n/, "$@\n";
 		is( $code, $_, "dsotypebyname($name)\t$exception" );
 	}
 
-	foreach my $testcase ('BOGUS' ) {
+	foreach my $testcase ('BOGUS') {
 		eval { dsotypebyname($testcase); };
-		my $exception = $1 if $@ =~ /^(.+)\n/;
-		ok( $exception ||= '', "dsotypebyname($testcase)\t[$exception]" );
+		my ($exception) = split /\n/, "$@\n";
+		ok( $exception, "dsotypebyname($testcase)\t[$exception]" );
 	}
 }
 

@@ -5,25 +5,25 @@ require "t/exercises.tt";
 
 PREP('SQLite');
 
-unlink 't/q2';
+unlink 't/q2s';
 ok(-d 't', 'queue directory exists');
-ok(! -f 't/q2', 'queue file does not exist yet');
+ok(! -f 't/q2s', 'queue file does not exist yet');
 
-my $q = Forks::Queue::SQLite->new( db_file => 't/q2', style => 'lifo' );
+my $q = Forks::Queue::SQLite->new( db_file => 't/q2s', style => 'lifo' );
 
 ok($q && ref($q) eq 'Forks::Queue::SQLite', 'got queue with correct type');
-ok(-f 't/q2', 'queue file created');
-ok(-s 't/q2' > 1024, 'queue header section created');
+ok(-f 't/q2s', 'queue file created');
+ok(-s 't/q2s' > 1024, 'queue header section created');
 
 exercise_lifo($q);
 
 undef $q;
-ok(! -f 't/q2', 'queue file destroyed when queue object left scope');
+ok(! -f 't/q2s', 'queue file destroyed when queue object left scope');
 
-$q = Forks::Queue::SQLite->new( db_file => 't/q2', style => 'lifo' );
-ok(-f 't/q2', 'queue file created');
+$q = Forks::Queue::SQLite->new( db_file => 't/q2s', style => 'lifo' );
+ok(-f 't/q2s', 'queue file created');
 exercise_lifo2($q);
 undef $q;
-ok(! -f 't/q2', 'queue file destroyed when queue object left scope');
+ok(! -f 't/q2s', 'queue file destroyed when queue object left scope');
 
 done_testing();

@@ -645,6 +645,18 @@ choose(  child => 1, child => 0 );
 klass(   'PPIx::Regexp::Structure' );
 xplain(  'Grouping' );
 
+note	'Retraction of \\K inside look-around';
+
+parse(	'/(?=\\K)\K/' );
+value(	failures => [], 0 );
+choose(	child => 1, child => 0, child => 0 );
+klass(	'PPIx::Regexp::Token::Assertion' );
+xplain(	'In s///, keep everything before the \K; retracted inside look-around assertion' );
+value(	perl_version_removed => [], '5.031003' );
+choose(	child => 1, child => 1 );
+klass(	'PPIx::Regexp::Token::Assertion' );
+xplain(	'In s///, keep everything before the \K' );
+value(	perl_version_removed => [], undef );
 
 done_testing;
 

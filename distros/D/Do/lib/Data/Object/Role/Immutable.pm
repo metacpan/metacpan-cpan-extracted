@@ -8,7 +8,7 @@ use warnings;
 use Moo::Role;
 use Readonly;
 
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 # METHODS
 

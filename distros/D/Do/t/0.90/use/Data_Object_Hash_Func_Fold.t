@@ -26,6 +26,7 @@ Data-Object Hash Function (Fold) Class
 =description
 
 Data::Object::Hash::Func::Fold is a function object for Data::Object::Hash.
+This package inherits all behavior from L<Data::Object::Hash::Func>.
 
 =cut
 

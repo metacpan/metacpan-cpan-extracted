@@ -9,8 +9,7 @@ on test => sub {
 };
 
 on 'develop' => sub {
-  #requires 'Test::Spelling';
-  #requires 'Test::MinimumVersion';
-  #requires 'Test::Pod::Coverage';
-  #requires 'Test::PureASCII';
+  requires 'Test::Spelling';
+  requires 'Test::Pod::Coverage';
+  requires 'Test::Pod','1.00';
 };

@@ -24,7 +24,7 @@ Data-Object Abstract String Class
 =description
 
 Data::Object::String::Base provides routines for operating on Perl 5 string
-data.
+data. This package inherits all behavior from L<Data::Object::Base>.
 
 =cut
 

@@ -1,7 +1,7 @@
 package String::Wildcard::Bash;
 
-our $DATE = '2019-07-25'; # DATE
-our $VERSION = '0.040'; # VERSION
+our $DATE = '2019-08-30'; # DATE
+our $VERSION = '0.043'; # VERSION
 
 use 5.010001;
 use strict;
@@ -78,23 +78,33 @@ sub contains_wildcard {
 }
 
 sub convert_wildcard_to_sql {
+    my $opts = ref $_[0] eq 'HASH' ? shift : {};
     my $str = shift;
 
-    $str =~ s/$RE_WILDCARD_BASH/
-        if ($+{bash_joker}) {
-            if ($+{bash_joker} eq '*') {
-                "%";
+    my @res;
+    my $p;
+    while ($str =~ /$RE_WILDCARD_BASH/g) {
+        my %m = %+;
+        if (defined($p = $m{bash_brace_content})) {
+            die "Cannot convert brace pattern '$p' to SQL";
+        } elsif ($p = $m{bash_joker}) {
+            if ($m{bash_joker} eq '*' || $m{bash_joker} eq '**') {
+                push @res, "%";
             } else {
-                "_";
+                push @res, "_";
             }
-        } elsif ($+{sql_joker}) {
-            "\\$+{sql_joker}";
-        } else {
-            $&;
+        } elsif ($p = $m{sql_joker}) {
+            push @res, "\\$p";
+        } elsif (defined($p = $m{literal_brace_single_element})) {
+            die "Currently cannot convert brace literal '$p' to SQL";
+        } elsif (defined($p = $m{bash_class})) {
+            die "Currently cannot convert class pattern '$p' to SQL";
+        } elsif (defined($p = $m{literal})) {
+            push @res, $p;
         }
-    /eg;
+    }
 
-    $str;
+    join "", @res;
 }
 
 sub convert_wildcard_to_re {
@@ -166,7 +176,7 @@ String::Wildcard::Bash - Bash wildcard string routines
 
 =head1 VERSION
 
-This document describes version 0.040 of String::Wildcard::Bash (from Perl distribution String-Wildcard-Bash), released on 2019-07-25.
+This document describes version 0.043 of String::Wildcard::Bash (from Perl distribution String-Wildcard-Bash), released on 2019-08-30.
 
 =head1 SYNOPSIS
 
@@ -195,18 +205,24 @@ This document describes version 0.040 of String::Wildcard::Bash (from Perl distr
 
 =head1 FUNCTIONS
 
-=head2 contains_wildcard($str) => bool
+=head2 contains_wildcard
 
-Return true if C<$str> contains wildcard pattern. Wildcard patterns include C<*>
-(meaning zero or more characters), C<?> (exactly one character), C<[...]>
-(character class), C<{...,}> (brace expansion). Can handle escaped/backslash
-(e.g. C<foo\*> does not contain wildcard, it's C<foo> followed by a literal
-asterisk C<*>).
+Usage:
 
-Aside from wildcard, bash does other types of expansions/substitutions too, but
-these are not considered wildcard. These include tilde expansion (e.g. C<~>
-becomes C</home/alice>), parameter and variable expansion (e.g. C<$0> and
-C<$HOME>), arithmetic expression (e.g. C<$[1+2]>), history (C<!>), and so on.
+ $bool = contains_wildcard($wildcard_str)
+
+Return true if C<$str> contains wildcard pattern. Wildcard patterns include
+I<joker> such as C<*> (meaning zero or more of any characters) and C<?> (exactly
+one of any character), I<character class> C<[...]>, and I<brace> C<{...,}>
+(brace expansion). A pattern can be escaped using a bacslash so it becomes
+literal, e.g. C<foo\*> does not contain wildcard because it's C<foo> followed by
+a literal asterisk C<*>.
+
+Aside from the abovementioned wildcard patterns, bash does other types of
+expansions/substitutions too, but these are not considered wildcard. These
+include tilde expansion (e.g. C<~> becomes C</home/alice>), parameter and
+variable expansion (e.g. C<$0> and C<$HOME>), arithmetic expression (e.g.
+C<$[1+2]>), or history (C<!>).
 
 Although this module has 'Bash' in its name, this set of wildcards should be
 applicable to other Unix shells. Haven't checked completely though.
@@ -234,7 +250,7 @@ Convert bash wildcard to SQL pattern. This includes:
 
 =back
 
-Unsupported constructs currently will be passed as-is.
+Unsupported constructs will cause the function to die.
 
 =head2 convert_wildcard_to_re
 

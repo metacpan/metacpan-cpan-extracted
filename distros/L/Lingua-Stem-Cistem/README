@@ -98,7 +98,9 @@ METHODS
         :orig   - imports stem segment
         :robust - imports              stem_robust segment_robust
 
-    stem($word, $case_insensitivity)
+    stem
+
+          stem($word, $case_insensitivity)
 
       This method takes the word to be stemmed and a boolean specifiying if
       case-insensitive stemming should be used and returns the stemmed
@@ -111,7 +113,9 @@ METHODS
       text, best performance is achieved by using the case-sensitive
       version.
 
-    stem_robust($word, $case_insensitivity, $keep_ge_prefix)
+    stem_robust
+
+          stem_robust($word, $case_insensitivity, $keep_ge_prefix)
 
       This method works like "stem" with the following differences for
       robustness:
@@ -132,7 +136,9 @@ METHODS
       This should not be necessary, if the input is carefully normalized,
       tokenized, and filtered.
 
-    segment($word, $case_insensitivity)
+    segment
+
+          segment($word, $case_insensitivity)
 
       This method works very similarly to stem. The only difference is that
       in addition to returning the stem, it also returns the rest that was
@@ -143,7 +149,9 @@ METHODS
 
               my ($stem, $suffix) = segment($word);
 
-    segment_robust($word, $case_insensitivity, $keep_ge_prefix)
+    segment_robust
+
+          segment_robust($word, $case_insensitivity, $keep_ge_prefix)
 
       This method works exactly like "stem_robust" and returns a list of
       prefix, stem and suffix:

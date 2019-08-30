@@ -24,7 +24,7 @@ Data-Object Abstract Code Class
 =description
 
 Data::Object::Code::Base provides routines for operating on Perl 5 code
-references.
+references. This package inherits all behavior from L<Data::Object::Base>.
 
 =cut
 

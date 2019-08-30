@@ -1,4 +1,4 @@
-# $Id: 65-RRSIG-RSASHA1.t 1736 2019-03-20 10:03:12Z willem $	-*-perl-*-
+# $Id: 65-RRSIG-RSASHA1.t 1747 2019-06-27 15:02:31Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -17,9 +17,7 @@ foreach my $package ( sort keys %prerequisite ) {
 	exit;
 }
 
-plan tests => 30;
-
-use_ok('Net::DNS::SEC');
+plan tests => 32;
 
 
 my $ksk = new Net::DNS::RR <<'END';
@@ -53,6 +51,9 @@ Exponent2: evAuKygVGsxghXtEkQ9rOfOMTGDtdyVxiMO8mdKt9plV69kHLz1n9RRtoVXmx28ynQtK/
 Coefficient: JTEzUDflC+G0if7uqsJ2sw/x2aCHMjsCxYSmx2bJOW/nhQTQpzafL0N8E6WmKuEP4qAaqQjWrDyxy0XcAJrfcojJb+a3j2ndxYpev7Rq8f7P6M7qqVL0Nzj9rWFH7pyvWMnH584viuhPcDogy8ymHpNNuAF+w98qjnGD8UECiV4=
 END
 close(KSK);
+
+my $private = new Net::DNS::SEC::Private($keyfile);
+ok( $private, 'set up RSA private key' );
 
 
 my $bad1 = new Net::DNS::RR <<'END';
@@ -186,8 +187,8 @@ my @badrrset = ($bad1);
 	foreach my $arglist (@testcase) {
 		my @argtype = map ref($_), @$arglist;
 		eval { $class->create(@$arglist); };
-		my $exception = $1 if $@ =~ /^(.*)\n*/;
-		ok( defined $exception, "create(@argtype)\t[$exception]" );
+		my ($exception) = split /\n/, "$@\n";
+		ok( $exception, "create(@argtype)\t[$exception]" );
 	}
 }
 
@@ -207,8 +208,20 @@ my @badrrset = ($bad1);
 	foreach my $arglist (@testcase) {
 		my @argtype = map ref($_) || $_, @$arglist;
 		eval { $object->verify(@$arglist); };
-		my $exception = $1 if $@ =~ /^(.*)\n*/;
-		ok( defined $exception, "verify(@argtype)\t[$exception]" );
+		my ($exception) = split /\n/, "$@\n";
+		ok( $exception, "verify(@argtype)\t[$exception]" );
+	}
+}
+
+
+{
+	my $object   = new Net::DNS::RR( type => 'RRSIG', algorithm => 0 );
+
+	foreach my $method (qw(_CreateSig _VerifySig)) {
+		eval { $object->$method(); };
+		my $errorstring = $object->vrfyerrstr();
+		my ($exception) = split /\n/, "$@$errorstring\n";
+		ok( $exception, "$method()\t[$exception]" );
 	}
 }
 

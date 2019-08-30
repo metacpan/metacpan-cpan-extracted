@@ -7,7 +7,7 @@ use warnings;
 
 use Scalar::Util ();
 
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 # FUNCTIONS
 

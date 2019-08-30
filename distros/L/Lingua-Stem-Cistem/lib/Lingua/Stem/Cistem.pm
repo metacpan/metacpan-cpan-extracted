@@ -5,12 +5,12 @@ use warnings;
 
 use utf8;
 
-use 5.006;
+use 5.010001;
 
 require Exporter;
 
 BEGIN {
-    $Lingua::Stem::Cistem::VERSION     = '0.03';
+    $Lingua::Stem::Cistem::VERSION     = '0.04';
     @Lingua::Stem::Cistem::ISA         = qw(Exporter);
     @Lingua::Stem::Cistem::EXPORT      = qw();
     @Lingua::Stem::Cistem::EXPORT_OK   = qw(stem segment stem_robust segment_robust);
@@ -318,7 +318,9 @@ Supported:
 
 =over 4
 
-=item stem($word, $case_insensitivity)
+=item stem
+
+    stem($word, $case_insensitivity)
 
 This method takes the word to be stemmed and a boolean specifiying if case-insensitive
 stemming should be used and returns the stemmed word. If only the word
@@ -329,7 +331,9 @@ Case sensitivity improves performance only if words in the text may be incorrect
 For all-lowercase and correctly cased text, best performance is achieved by
 using the case-sensitive version.
 
-=item stem_robust($word, $case_insensitivity, $keep_ge_prefix)
+=item stem_robust
+
+    stem_robust($word, $case_insensitivity, $keep_ge_prefix)
 
 This method works like L</stem> with the following differences for robustness:
 
@@ -349,7 +353,9 @@ This method works like L</stem> with the following differences for robustness:
 
 This should not be necessary, if the input is carefully normalized, tokenized, and filtered.
 
-=item segment($word, $case_insensitivity)
+=item segment
+
+    segment($word, $case_insensitivity)
 
 This method works very similarly to stem. The only difference is that in
 addition to returning the stem, it also returns the rest that was removed at
@@ -359,7 +365,9 @@ the stem in any other way than by removing letters at the end were left out.
 
 	my ($stem, $suffix) = segment($word);
 
-=item segment_robust($word, $case_insensitivity, $keep_ge_prefix)
+=item segment_robust
+
+    segment_robust($word, $case_insensitivity, $keep_ge_prefix)
 
 This method works exactly like L</stem_robust> and returns a list of prefix, stem and suffix:
 

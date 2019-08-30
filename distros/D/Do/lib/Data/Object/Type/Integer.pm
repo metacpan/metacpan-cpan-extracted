@@ -5,7 +5,7 @@ use warnings;
 
 use parent 'Data::Object::Type';
 
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 # BUILD
 # METHODS
@@ -86,7 +86,8 @@ Data-Object Integer Type Constraint
 =head1 DESCRIPTION
 
 Type constraint for validating L<Data::Object::Integer> objects. This type
-constraint is registered in the L<Data::Object::Library> type library.
+constraint is registered in the L<Data::Object::Library> type library. This
+package inherits all behavior from L<Data::Object::Type>.
 
 =cut
 

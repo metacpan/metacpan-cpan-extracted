@@ -8,8 +8,6 @@ BEGIN {
     unless eval q{ use Test::Pod::Coverage; 1 };
   plan skip_all => 'test requires YAML'
     unless eval q{ use YAML; 1; };
-  plan skip_all => 'test does not always work in cip check'
-    if defined $ENV{CIPSTATIC} && $ENV{CIPSTATIC} eq 'true';
 };
 use Test::Pod::Coverage;
 use YAML qw( LoadFile );

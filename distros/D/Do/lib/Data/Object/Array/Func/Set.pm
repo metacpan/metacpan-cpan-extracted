@@ -4,7 +4,7 @@ use Data::Object 'Class';
 
 extends 'Data::Object::Array::Func';
 
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 # BUILD
 
@@ -69,6 +69,7 @@ Data-Object Array Function (Set) Class
 =head1 DESCRIPTION
 
 Data::Object::Array::Func::Set is a function object for Data::Object::Array.
+This package inherits all behavior from L<Data::Object::Array::Func>.
 
 =cut
 

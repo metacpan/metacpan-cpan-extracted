@@ -6,9 +6,9 @@ use Carp;
 use JSON;
 use Time::HiRes;
 use base 'Forks::Queue';
-use 5.010;    #  using  // //=  operators
+use 5.010;    #  sorry, v5.08. I love the // //=  operators too much
 
-our $VERSION = '0.09';
+our $VERSION = '0.11';
 our $DEBUG;
 *DEBUG = \$Forks::Queue::DEBUG;
 
@@ -33,12 +33,14 @@ use constant EOL => "\x{0a}";
 
 sub _SYNC (&$) {
     my ($block,$self) = @_;
+    return if Forks::Queue::__inGD();
 
+    my $lock;
+    local $! = 0;
     if ($self->{_locked}) {
         Carp::cluck "$$ acquiring lock but already have lock";
     }
-    local $! = 0;
-    open my $lock, '>>', $self->{lock};
+    open $lock, '>>', $self->{lock};
     my $z = flock $lock, 2;
     while (!$z && $Forks::Queue::NOTIFY_OK && $!{EINTR}) {
         # SIGIO can interrupt flock
@@ -142,11 +144,6 @@ sub new {
         }
     }
 
-    if ($opts{remote}) {
-        require Net::Objwrap;
-        Net::Objwrap::wrap($opts{remote},$self);
-    }
-    
     return $self;
 }
 
@@ -156,11 +153,14 @@ sub DESTROY {
     $self->{_DESTROY}++;
     eval {
     _SYNC {
-        $self->_read_header;
-        $DEBUG and print STDERR "$$ DESTROY: pids at destruction: ",
+        if ($self->_read_header) {
+            $DEBUG and print STDERR "$$ DESTROY: pids at destruction: ",
                                 join(" ",keys %{$self->{_pids}}),"\n";
-        delete $self->{_pids}{_PID()};
-        $self->_write_header;
+            delete $self->{_pids}{_PID()};
+            $self->_write_header;
+        } else {
+            $DEBUG and print STDERR "$$ DESTROY: header not available\n";
+        }
     } $self;
     };
     if ($@) {
@@ -169,10 +169,10 @@ sub DESTROY {
             print STDERR Dumper($@,$self);
         }
     }
-    close $self->{_fh};
+    $self->{_fh} && close $self->{_fh};
     $DEBUG and print STDERR "$$ DESTROY: remaining pids: ",
                                 join(" ",keys %{$self->{_pids}}),"\n";
-    if (0 == keys %{$self->{_pids}}) {
+    if ($self->{_pids} && 0 == keys %{$self->{_pids}}) {
         $DEBUG and print STDERR "$$ Unlinking files from here\n";
         unlink $self->{lock};
         unlink $self->{file} unless $self->{persist};
@@ -185,6 +185,8 @@ sub DESTROY {
 # which holds the queue metadata like the file position of
 # the current front and back of the queue, and the identifiers
 # of processes that are using the queue.
+#
+# this function should only be called from inside a _SYNC block.
 
 sub _read_header {
     my ($self) = @_;
@@ -195,16 +197,21 @@ sub _read_header {
         no warnings 'closed';
         seek $self->{_fh}, 0, 0;
         $h = readline($self->{_fh}) // "";
-        chomp($h);
     } else {
-        seek $self->{_fh}, 0, 0;
-        chomp($h = readline($self->{_fh}));
+        local $! = 0;
+        if (seek $self->{_fh}, 0, 0) {
+            $h = readline($self->{_fh});
+        } else {
+            Carp::cluck "_read_header: invalid seek $!";
+        }
     }
-    if (!$h && $self->{_DESTROY}) {
-#       print STDERR "_read_header aborted: in DESTROY $$\n";
-        return;
+    if (!$h) {
+        if ($self->{_DESTROY}) {
+            return;
+        }
+        Carp::cluck "_read_header: header not found";
     }
-#    return if !$h && $self->{_DESTROY};
+    chomp($h);
     $h = dejsonize($h);
     $self->{_pos} = $h->{index};
     $self->{_end} = $h->{end};
@@ -483,7 +490,9 @@ sub _wait_for_item {
     do {
         _SYNC { $self->_read_header } $self;
         $ready = $self->{_avail} || $self->{_end} || $self->_expired;
-        _SLEEP($self) if !$ready;# sleep($Forks::Queue::SLEEP_INTERVAL || 1) if !$ready;
+        if (!$ready) {
+            _SLEEP($self); #sleep($Forks::Queue::SLEEP_INTERVAL||1)
+        }
     } while !$ready;
     return $self->{_avail};
 }
@@ -497,7 +506,9 @@ sub _wait_for_capacity {
         } else {
             _SYNC { $self->_read_header } $self;
             $ready = $self->{_avail} < $self->{limit} && !$self->{_end};
-            _SLEEP() if !$ready; #sleep($Forks::Queue::SLEEP_INTERVAL || 1) if !$ready;
+            if (!$ready) {
+                _SLEEP($self); #sleep($Forks::Queue::SLEEP_INTERVAL || 1) if !$ready;
+            }
         }
     } while !$ready;
     return $self->{_avail} < $self->{limit};
@@ -535,7 +546,7 @@ sub _dequeue_back {
             $self->_write_header;
         } $self;
         last if @return || $self->{_end} || $self->_expired;
-        _SLEEP(); #sleep($Forks::Queue::SLEEP_INTERVAL || 1);
+        _SLEEP($self); #sleep($Forks::Queue::SLEEP_INTERVAL || 1);
     }
     $self->_notify if @return;
     if ($self->_expired && @return == 0) {
@@ -581,7 +592,7 @@ sub _dequeue_front {
             $self->_write_header;
         } $self;
         last if @return || $self->{_end} || $self->_expired;
-        _SLEEP(); #sleep($Forks::Queue::SLEEP_INTERVAL || 1);
+        _SLEEP($self); #sleep($Forks::Queue::SLEEP_INTERVAL || 1);
     }
     $self->_notify if @return;
     if ($self->_expired && @return == 0) {
@@ -895,7 +906,7 @@ sub pop {
         do {
             _SYNC { $self->_read_header } $self;
         } while (!$self->{_avail} && !$self->{_end} && 
-                 1 + _SLEEP()); #sleep($Forks::Queue::SLEEP_INTERVAL || 1));
+                 1 + _SLEEP($self)); #sleep($Forks::Queue::SLEEP_INTERVAL || 1));
 
         return if $self->{_end} && !$self->{_avail};
 
@@ -1022,23 +1033,6 @@ sub _DUMP {
     close $fh_qdata;
 }
 
-sub __is_nfs {
-    my ($dir) = @_;
-    if ($^O ne 'linux') {
-        return;
-    }
-    my $pid = fork();
-    if ($pid == 0) {
-        close STDERR;
-        # http://superuser.com/q/422061
-        exec("df",$dir,"-t","nfs");
-        die;
-    }
-    local $?;
-    waitpid $pid,0;
-    return $? == 0;
-}
-
 my $id = 0;
 sub _impute_file {
     my $base = $0;
@@ -1061,7 +1055,7 @@ sub _impute_file {
         next if !defined($candidate);
         if (-d $candidate && -w _ && -x _) {
             $file //= "$candidate/.fq-$$-$id-base";
-            next if __is_nfs($candidate);
+            next if Forks::Queue::Util::__is_nfs($candidate);
             return "$candidate/.fq-$$-$id-$base";
         }
     }
@@ -1078,7 +1072,7 @@ Forks::Queue::File - file-based implementation of Forks::Queue
 
 =head1 VERSION
 
-0.09
+0.11
 
 =head1 SYNOPSIS
 
@@ -1143,7 +1137,7 @@ queue file to reside on an NFS drive.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2017, Marty O'Brien.
+Copyright (c) 2017-2019, Marty O'Brien.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.1 or,

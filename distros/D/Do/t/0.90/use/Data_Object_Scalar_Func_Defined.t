@@ -25,7 +25,9 @@ Data-Object Scalar Function (Defined) Class
 
 =description
 
-Data::Object::Scalar::Func::Defined is a function object for Data::Object::Scalar.
+Data::Object::Scalar::Func::Defined is a function object for
+Data::Object::Scalar. This package inherits all behavior from
+L<Data::Object::Scalar::Func>.
 
 =cut
 

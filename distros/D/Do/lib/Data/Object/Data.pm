@@ -4,7 +4,7 @@ use Data::Object::Class;
 
 use parent 'Data::Object::Base';
 
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 # BUILD
 
@@ -230,9 +230,10 @@ Data-Object Data Class
 
 =head1 DESCRIPTION
 
-This package provides methods for parsing and extracting pod-like data
-sections from any file or package. The pod-like syntax allows for using these
-sections anywhere in the source code and Perl properly ignoring them.
+This package provides methods for parsing and extracting pod-like data sections
+from any file or package. The pod-like syntax allows for using these sections
+anywhere in the source code and Perl properly ignoring them. This package
+inherits all behavior from L<Data::Object::Base>.
 
 =cut
 

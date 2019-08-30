@@ -2,8 +2,8 @@ NAME
     String::Wildcard::Bash - Bash wildcard string routines
 
 VERSION
-    This document describes version 0.040 of String::Wildcard::Bash (from
-    Perl distribution String-Wildcard-Bash), released on 2019-07-25.
+    This document describes version 0.043 of String::Wildcard::Bash (from
+    Perl distribution String-Wildcard-Bash), released on 2019-08-30.
 
 SYNOPSIS
         use String::Wildcard::Bash qw(
@@ -25,18 +25,23 @@ DESCRIPTION
 VARIABLES
   $RE_WILDCARD_BASH
 FUNCTIONS
-  contains_wildcard($str) => bool
-    Return true if $str contains wildcard pattern. Wildcard patterns include
-    "*" (meaning zero or more characters), "?" (exactly one character),
-    "[...]" (character class), "{...,}" (brace expansion). Can handle
-    escaped/backslash (e.g. "foo\*" does not contain wildcard, it's "foo"
-    followed by a literal asterisk "*").
+  contains_wildcard
+    Usage:
 
-    Aside from wildcard, bash does other types of expansions/substitutions
-    too, but these are not considered wildcard. These include tilde
-    expansion (e.g. "~" becomes "/home/alice"), parameter and variable
-    expansion (e.g. $0 and $HOME), arithmetic expression (e.g. "$[1+2]"),
-    history ("!"), and so on.
+     $bool = contains_wildcard($wildcard_str)
+
+    Return true if $str contains wildcard pattern. Wildcard patterns include
+    *joker* such as "*" (meaning zero or more of any characters) and "?"
+    (exactly one of any character), *character class* "[...]", and *brace*
+    "{...,}" (brace expansion). A pattern can be escaped using a bacslash so
+    it becomes literal, e.g. "foo\*" does not contain wildcard because it's
+    "foo" followed by a literal asterisk "*".
+
+    Aside from the abovementioned wildcard patterns, bash does other types
+    of expansions/substitutions too, but these are not considered wildcard.
+    These include tilde expansion (e.g. "~" becomes "/home/alice"),
+    parameter and variable expansion (e.g. $0 and $HOME), arithmetic
+    expression (e.g. "$[1+2]"), or history ("!").
 
     Although this module has 'Bash' in its name, this set of wildcards
     should be applicable to other Unix shells. Haven't checked completely
@@ -61,7 +66,7 @@ FUNCTIONS
 
     *   escaping unescaped "_"
 
-    Unsupported constructs currently will be passed as-is.
+    Unsupported constructs will cause the function to die.
 
   convert_wildcard_to_re
     Usage:

@@ -1,9 +1,9 @@
 package Net::DNS::RR::TSIG;
 
 #
-# $Id: TSIG.pm 1726 2018-12-15 12:59:56Z willem $
+# $Id: TSIG.pm 1749 2019-07-21 09:15:55Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1726 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1749 $)[1];
 
 
 use strict;
@@ -35,8 +35,8 @@ use constant TSIG => typebyname qw(TSIG);
 {
 	# source: http://www.iana.org/assignments/tsig-algorithm-names
 	my @algbyname = (
-		'HMAC-MD5.SIG-ALG.REG.INT' => 157,
-		'HMAC-SHA1'		   => 161,
+		'HMAC-MD5.SIG-ALG.REG.INT' => 157,		# numbers are from ISC BIND keygen
+		'HMAC-SHA1'		   => 161,		# and not blessed by IANA
 		'HMAC-SHA224'		   => 162,
 		'HMAC-SHA256'		   => 163,
 		'HMAC-SHA384'		   => 164,
@@ -134,8 +134,8 @@ sub _defaults {				## specify RR attribute default values
 
 
 sub _size {				## estimate encoded size
-	my $self = shift;
-	my $clone = bless {%$self}, ref($self);			   # shallow clone
+	my $self  = shift;
+	my $clone = bless {%$self}, ref($self);			# shallow clone
 	length $clone->encode( 0, undef, new Net::DNS::Packet() );
 }
 
@@ -449,8 +449,8 @@ sub verify {
 	my $maclen = length $macbin;
 	my $minlen = length($tsigmac) >> 1;			# per RFC4635, 3.1
 	$self->error(16) if $macbin ne substr $tsigmac, 0, $maclen;			     # BADSIG
-	$self->error(18) if abs( time() - $self->time_signed ) > $self->fudge;		     # BADTIME
 	$self->error(22) if $maclen < $minlen or $maclen < 10 or $maclen > length $tsigmac;  # BADTRUNC
+	$self->error(18) if abs( time() - $self->time_signed ) > $self->fudge;		     # BADTIME
 
 	return $self->{error} ? undef : $tsig;
 }
@@ -511,8 +511,8 @@ sub vrfyerrstr {
 	sub _keybin {			## install key in key table
 		my $self = shift;
 		croak 'Unauthorised access to TSIG key material denied' unless scalar @_;
-		my $keyref = $keytable{$self->{owner}->canonical} ||= {};
-		my $private = shift;	# closure keeps private key private
+		my $keyref  = $keytable{$self->{owner}->canonical} ||= {};
+		my $private = shift;				# closure keeps private key private
 		$keyref->{key} = sub {
 			my $function = $keyref->{digest};
 			return &$function( $private, @_ );

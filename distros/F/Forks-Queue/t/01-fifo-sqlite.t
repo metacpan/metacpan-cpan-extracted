@@ -5,9 +5,9 @@ require "t/exercises.tt";
 
 PREP('SQLite');
 
-unlink 't/q1';
+unlink 't/q1s';
 ok(-d 't', 'queue directory exists');
-ok(! -f 't/q1', 'queue file does not exist yet');
+ok(! -f 't/q1s', 'queue file does not exist yet');
 
 ########
 

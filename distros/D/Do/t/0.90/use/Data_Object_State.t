@@ -25,7 +25,8 @@ Data-Object Singleton Declaration
 
 =description
 
-This package modifies the consuming package making it a singleton.
+This package modifies the consuming package making it a singleton. This package
+inherits all behavior from L<Data::Object::Class>.
 
 =cut
 

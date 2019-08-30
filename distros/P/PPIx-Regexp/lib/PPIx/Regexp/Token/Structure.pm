@@ -54,7 +54,7 @@ use PPIx::Regexp::Token::Backreference	();
 use PPIx::Regexp::Token::Backtrack	();
 use PPIx::Regexp::Token::Recursion	();
 
-our $VERSION = '0.066';
+our $VERSION = '0.067';
 
 # Return true if the token can be quantified, and false otherwise
 

@@ -9,7 +9,7 @@ use Types::TypeTiny;
 
 use parent 'Data::Object::Base';
 
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 # BUILD
 
@@ -225,6 +225,7 @@ Data-Object Type Constraint Builder
 =head1 DESCRIPTION
 
 This package is an abstract base class for type constraint builder classes.
+This package inherits all behavior from L<Data::Object::Base>.
 
 =cut
 

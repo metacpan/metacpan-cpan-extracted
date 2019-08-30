@@ -25,7 +25,9 @@ Data-Object Regexp Function (Search) Class
 
 =description
 
-Data::Object::Regexp::Func::Search is a function object for Data::Object::Regexp.
+Data::Object::Regexp::Func::Search is a function object for
+Data::Object::Regexp. This package inherits all behavior from
+L<Data::Object::Regexp::Func>.
 
 =cut
 

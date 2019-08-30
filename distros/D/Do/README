@@ -4,7 +4,7 @@ NAME
 
 ABSTRACT
 
-    Modern Perl Development Framework
+    Modern Perl
 
 SYNOPSIS
 
@@ -34,7 +34,8 @@ DESCRIPTION
 
     This package aims to provide a modern Perl development framework and
     foundational set of types, functions, classes, patterns, and interfaces
-    for jump-starting application development.
+    for jump-starting application development. This package inherits all
+    behavior from Data::Object.
 
 FRAMEWORK
 

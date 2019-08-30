@@ -23,7 +23,7 @@ with qw(
 
 use parent 'Data::Object::Integer::Base';
 
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 # METHODS
 
@@ -53,7 +53,224 @@ Data-Object Integer Class
 
 =head1 DESCRIPTION
 
-This package provides routines for operating on Perl 5 integer data.
+This package provides routines for operating on Perl 5 integer data. This
+package inherits all behavior from L<Data::Object::Integer::Base>.
+
+This package assumes all behavior from the following roles:
+
+L<Data::Object::Role::Detract>
+
+L<Data::Object::Role::Dumper>
+
+L<Data::Object::Role::Functable>
+
+L<Data::Object::Role::Output>
+
+L<Data::Object::Role::Throwable>
+
+=cut
+
+=head1 METHODS
+
+This package implements the following methods.
+
+=cut
+
+=head2 defined
+
+  defined() : NumObject
+
+The defined method returns true if the object represents a value that meets the
+criteria for being defined, otherwise it returns false. This method returns a
+L<Data::Object::Number> object.
+
+=over 4
+
+=item defined example
+
+  # given $integer
+
+  $integer->defined; # 1
+
+=back
+
+=cut
+
+=head2 downto
+
+  downto(Int $arg1) : ArrayObject
+
+The downto method returns an array reference containing integer decreasing
+values down to and including the limit. This method returns a
+L<Data::Object::Array> object.
+
+=over 4
+
+=item downto example
+
+  # given 1
+
+  $integer->downto(0); # [1,0]
+
+=back
+
+=cut
+
+=head2 eq
+
+  eq(Any $arg1) : NumObject
+
+The eq method performs a numeric equality operation. This method returns a
+L<Data::Object::Number> object representing a boolean.
+
+=over 4
+
+=item eq example
+
+  # given 1
+
+  $integer->eq(1); # 1
+
+=back
+
+=cut
+
+=head2 ge
+
+  ge(Any $arg1) : NumObject
+
+The ge method returns true if the argument provided is greater-than or equal-to
+the value represented by the object. This method returns a Data::Object::Number
+object.
+
+=over 4
+
+=item ge example
+
+  # given 1
+
+  $integer->ge(0); # 1
+
+=back
+
+=cut
+
+=head2 gt
+
+  gt(Any $arg1) : NumObject
+
+The gt method performs a numeric greater-than comparison. This method returns a
+L<Data::Object::Number> object representing a boolean.
+
+=over 4
+
+=item gt example
+
+  # given 1
+
+  $integer->gt(1); # 0
+
+=back
+
+=cut
+
+=head2 le
+
+  le(Any $arg1) : NumObject
+
+The le method returns true if the argument provided is less-than or equal-to
+the value represented by the object. This method returns a Data::Object::Number
+object.
+
+=over 4
+
+=item le example
+
+  # given 0
+
+  $integer->le(1); # 1
+
+=back
+
+=cut
+
+=head2 lt
+
+  lt(Any $arg1) : NumObject
+
+The lt method performs a numeric less-than comparison. This method returns a
+L<Data::Object::Number> object representing a boolean.
+
+=over 4
+
+=item lt example
+
+  # given 1
+
+  $integer->lt(1); # 0
+
+=back
+
+=cut
+
+=head2 ne
+
+  ne(Any $arg1) : NumObject
+
+The ne method performs a numeric equality operation. This method returns a
+L<Data::Object::Number> object representing a boolean.
+
+=over 4
+
+=item ne example
+
+  # given 1
+
+  $integer->ne(0); # 1
+
+=back
+
+=cut
+
+=head2 to
+
+  to(Int $arg1) : ArrayObject
+
+The to method returns an array reference containing integer increasing or
+decreasing values to and including the limit in ascending or descending order
+based on the value of the floating-point object. This method returns a
+L<Data::Object::Array> object.
+
+=over 4
+
+=item to example
+
+  # given 1
+
+  $integer->to(2); # [1,2]
+  $integer->to(0); # [1,0]
+
+=back
+
+=cut
+
+=head2 upto
+
+  upto(Int $arg1) : Any
+
+The upto method returns an array reference containing integer increasing
+values up to and including the limit. This method returns a
+L<Data::Object::Array> object.
+
+=over 4
+
+=item upto example
+
+  # given 1
+
+  $integer->upto(2); # [1,2]
+
+=back
 
 =cut
 

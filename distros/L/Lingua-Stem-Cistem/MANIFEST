@@ -11,7 +11,10 @@ dist.ini
 lib/Lingua/Stem/Cistem.pm
 t/10_basic.t
 t/20_cistem.t
+t/author-pod-coverage.t
+t/author-pod-spelling.t
 t/author-pod-syntax.t
+t/author-pod-test.t
 xt/cistem_goldstandard1.t
 xt/lib/CistemOrig.pm
 xt/lib/CistemOrigFast.pm

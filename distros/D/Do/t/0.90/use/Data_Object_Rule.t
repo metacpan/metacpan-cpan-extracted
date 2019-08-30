@@ -33,7 +33,8 @@ This package modifies the consuming package making it a L<Moo> role, and is
 used to allow you to specify rules for the consuming class. There is
 functionally no difference between a role and a rule, so this concept only
 exists to differentiate between that which describes an interface (rules) and
-that which mixes-in behaviors.
+that which mixes-in behaviors. This package inherits all behavior from
+L<Moo::Role>.
 
 =cut
 

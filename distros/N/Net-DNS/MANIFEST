@@ -9,12 +9,10 @@ contrib/README
 demo/axfr
 demo/check_soa
 demo/check_zone
-demo/example_recurse.pl
 demo/mresolv
 demo/mx
 demo/perldig
 demo/README
-demo/trace_dns.pl
 lib/Net/DNS.pm
 lib/Net/DNS/Domain.pm
 lib/Net/DNS/DomainName.pm
@@ -46,7 +44,6 @@ lib/Net/DNS/RR/CERT.pm
 lib/Net/DNS/RR/CNAME.pm
 lib/Net/DNS/RR/CSYNC.pm
 lib/Net/DNS/RR/DHCID.pm
-lib/Net/DNS/RR/DLV.pm
 lib/Net/DNS/RR/DNAME.pm
 lib/Net/DNS/RR/DNSKEY.pm
 lib/Net/DNS/RR/DS.pm
@@ -94,6 +91,7 @@ lib/Net/DNS/RR/TSIG.pm
 lib/Net/DNS/RR/TXT.pm
 lib/Net/DNS/RR/URI.pm
 lib/Net/DNS/RR/X25.pm
+lib/Net/DNS/RR/ZONEMD.pm
 lib/Net/DNS/Text.pm
 lib/Net/DNS/Update.pm
 lib/Net/DNS/ZoneFile.pm
@@ -131,7 +129,6 @@ t/05-CERT.t
 t/05-CNAME.t
 t/05-CSYNC.t
 t/05-DHCID.t
-t/05-DLV.t
 t/05-DNAME.t
 t/05-DNSKEY.t
 t/05-DS.t
@@ -175,6 +172,7 @@ t/05-TSIG.t
 t/05-TXT.t
 t/05-URI.t
 t/05-X25.t
+t/05-ZONEMD.t
 t/06-packet-unique-push.t
 t/06-update.t
 t/07-rrsort.t
@@ -183,7 +181,9 @@ t/08-IPv4.t
 t/08-IPv6.t
 t/08-recurse.t
 t/21-NSEC-typelist.t
+t/22-NSEC-match.t
 t/23-NSEC-covered.t
+t/24-NSEC-encloser.t
 t/31-NSEC3-base32.t
 t/32-NSEC3-typelist.t
 t/33-NSEC3-hash.t

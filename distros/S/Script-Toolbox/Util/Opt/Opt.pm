@@ -13,7 +13,6 @@ require Exporter;
 # Do not simply export all your public functions/methods/constants.
 @EXPORT = qw(
 );
-#$VERSION = '';
 
 
 # Preloaded methods go here.
@@ -183,8 +182,9 @@ sub _checkOps($)
 		my $hasNroff   = system("type nroff   >/dev/null 2>&1") / 256;
 		if( $hasPerldoc == 0 && $hasNroff == 0 )
 		{
-			my $fh = new IO::File "perldoc $0 |";
-			while( <$fh> ) { print STDERR $_; }
+            #my $fh = new IO::File "perldoc $0 |";
+            #while( <$fh> ) { print STDERR $_; }
+            system("perldoc $0");
 			$rc = 1;
 		}else{
 			$errMsg .= "Can't display online manual. Missing nroff and/or perldoc.\n";

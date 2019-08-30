@@ -1,4 +1,4 @@
-# $Id: 03-rr.t 1597 2017-09-22 08:04:02Z willem $	-*-perl-*-
+# $Id: 03-rr.t 1749 2019-07-21 09:15:55Z willem $	-*-perl-*-
 
 use strict;
 use Test::More tests => 108;
@@ -10,9 +10,9 @@ local $Net::DNS::Parameters::DNSEXTLANG;			# suppress Extlang type queries
 {				## check exception raised for unparsable argument
 	foreach my $testcase ( undef, '', ' ', '. NULL x', '. OPT x', '. ATMA x', [], {} ) {
 		eval { new Net::DNS::RR($testcase) };
-		my $exception = $1 if $@ =~ /^(.+)\n/;
+		my ($exception) = split /\n/, "$@\n";
 		my $test = defined $testcase ? "'$testcase'" : 'undef';
-		ok( $exception ||= '', "new Net::DNS::RR($test)\t[$exception]" );
+		ok( $exception, "new Net::DNS::RR($test)\t[$exception]" );
 	}
 }
 
@@ -117,8 +117,8 @@ local $Net::DNS::Parameters::DNSEXTLANG;			# suppress Extlang type queries
 {				## check for exception if RFC3597 format hexadecimal data inconsistent
 	foreach my $testcase ( '\# 0 c0 00 02 01', '\# 3 c0 00 02 01', '\# 5 c0 00 02 01' ) {
 		eval { new Net::DNS::RR("example.com 3600 IN A $testcase") };
-		my $exception = $1 if $@ =~ /^(.+)\n/;
-		ok( $exception ||= '', "mismatched length: $testcase\t[$exception]" );
+		my ($exception) = split /\n/, "$@\n";
+		ok( $exception, "mismatched length: $testcase\t[$exception]" );
 	}
 }
 
@@ -151,74 +151,70 @@ local $Net::DNS::Parameters::DNSEXTLANG;			# suppress Extlang type queries
 		[ type => 'ATMA', unimplemented => 'x' ],
 		) {
 		eval { new Net::DNS::RR( @$testcase )->$method('x') };
-		my $exception = $1 if $@ =~ /^(.+)\n/;
-		ok( $exception ||= '', "unknown method:\t[$exception]" );
+		my ($exception) = split /\n/, "$@\n";
+		ok( $exception, "unknown method:\t[$exception]" );
 	}
 	my $rr = new Net::DNS::RR( type => 'A' );
         is( $rr->$method, undef, 'suppress repeated unknown method exception' );
-        is( $rr->DESTROY, undef, 'DESTROY() exists to defeat pre-5.18 AUTOLOAD' );
+        is( $rr->DESTROY, undef, 'DESTROY() exists to placate pre-5.18 AUTOLOAD' );
 }
 
 
 {				## check for exception on bad class method
 	eval { xxxx Net::DNS::RR( type => 'X' ); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "unknown class method:\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "unknown class method:\t[$exception]" );
 }
 
 
 {				## check for exception if RR name not recognised
 	eval { new Net::DNS::RR('example.com. IN BOGUS') };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "unrecognised RR type:\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "unrecognised RR type:\t[$exception]" );
 }
 
 
 {				## check for exception when abusing $rr->type()
 	my $rr = new Net::DNS::RR( type => 'A' );
 	eval { $rr->type('X'); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "cannot change type:\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "cannot change type:\t[$exception]" );
 }
 
 
 {				## check for exception when abusing $rr->ttl()
 	my $rr = new Net::DNS::RR( type => 'A' );
 	eval { $rr->ttl('1year'); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "unknown time unit:\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "unknown time unit:\t[$exception]" );
 }
 
 
 {				## check for exception when abusing $rr->rdata()
 	my $rr = new Net::DNS::RR( type => 'SOA' );
 	eval { $rr->rdata( pack 'H* H*', '00c000', '00000001' x 5 ); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "compressed rdata:\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "compressed rdata:\t[$exception]" );
 }
 
 
 {				## check propagation of exception in string()
 				## (relies on bug that nobody cares enough to fix)
 	my $rr = new Net::DNS::RR( type => 'MINFO', emailbx => '.' );
-	eval {
-		local $SIG{__WARN__} = sub { die @_ };
-		$rr->string();
-	};
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "exception in string:\t[$exception]" );
+	local $SIG{__WARN__} = sub { die @_ };
+	eval { $rr->string() };
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "exception in string:\t[$exception]" );
 }
 
 
 {				## check propagation of exception in rdstring()
 				## (relies on bug that nobody cares enough to fix)
 	my $rr = new Net::DNS::RR( type => 'MINFO', emailbx => '.' );
-	eval {
-		local $SIG{__WARN__} = sub { die @_ };
-		$rr->rdatastr();
-	};
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "exception in rdstring:\t[$exception]" );
+	local $SIG{__WARN__} = sub { die @_ };
+	eval { $rr->rdatastr() };
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "exception in rdstring:\t[$exception]" );
 }
 
 
@@ -268,8 +264,8 @@ local $Net::DNS::Parameters::DNSEXTLANG;			# suppress Extlang type queries
 		) {
 		my $wiredata = pack 'H*', $testcase;
 		my $question = eval { decode Net::DNS::RR(\$wiredata); };
-		my $exception = $1 if $@ =~ /^(.+)\n/;
-		ok( $exception ||= '', "corrupt wire-format\t[$exception]" );
+		my ($exception) = split /\n/, "$@\n";
+		ok( $exception, "corrupt wire-format\t[$exception]" );
 	}
 }
 

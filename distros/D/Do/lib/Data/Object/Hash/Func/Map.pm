@@ -4,7 +4,7 @@ use Data::Object 'Class';
 
 extends 'Data::Object::Hash::Func';
 
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 # BUILD
 
@@ -76,7 +76,8 @@ Data-Object Hash Function (Map) Class
 
 =head1 DESCRIPTION
 
-Data::Object::Hash::Func::Map is a function object for Data::Object::Hash.
+Data::Object::Hash::Func::Map is a function object for Data::Object::Hash. This
+package inherits all behavior from L<Data::Object::Hash::Func>.
 
 =cut
 

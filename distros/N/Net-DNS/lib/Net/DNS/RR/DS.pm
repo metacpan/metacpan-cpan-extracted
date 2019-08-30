@@ -1,9 +1,9 @@
 package Net::DNS::RR::DS;
 
 #
-# $Id: DS.pm 1729 2019-01-28 09:45:47Z willem $
+# $Id: DS.pm 1741 2019-04-16 13:10:38Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1729 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1741 $)[1];
 
 
 use strict;
@@ -195,7 +195,7 @@ sub digtype {
 sub digest {
 	my $self = shift;
 	return unpack "H*", $self->digestbin() unless scalar @_;
-	$self->digestbin( pack "H*", map /[^\dA-F]/i ? croak "corrupt hex" : $_, join "", @_ );
+	$self->digestbin( pack "H*", join "", map { /^"*([\dA-Fa-f]*)"*$/ || croak("corrupt hex"); $1 } @_ );
 }
 
 

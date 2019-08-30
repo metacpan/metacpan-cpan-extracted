@@ -9,7 +9,7 @@ use Role::Tiny::With;
 
 with 'Data::Object::Role::Proxyable';
 
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 # BUILD
 
@@ -53,6 +53,12 @@ Data-Object Autoboxing for Scalar Objects
 
 This package implements autoboxing via L<Data::Object::Autobox> for
 L<Data::Object::Scalar> objects.
+
+=head1 ROLES
+
+This package assumes all behavior from the follow roles:
+
+L<Data::Object::Role::Proxyable>
 
 =cut
 

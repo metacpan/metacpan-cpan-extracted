@@ -24,17 +24,17 @@ use Time::HiRes qw/time/;
 Readonly my $HTTP_OK => 200;
 Readonly my $HTTP_FILE_NOT_FOUND => 404;
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 # TODO: Timeout, fallback
 # TODO: Expected result content (json etc)
 
 # MOJO_USERAGENT_CONFIG
 ## no critic (ProhibitMagicNumbers)
-has 'connect_timeout'    => sub { $ENV{MOJO_CONNECT_TIMEOUT}    // 2  };
-has 'inactivity_timeout' => sub { $ENV{MOJO_INACTIVITY_TIMEOUT} // 5  };
-has 'max_redirects'      => sub { $ENV{MOJO_MAX_REDIRECTS}      // 4  };
-has 'request_timeout'    => sub { $ENV{MOJO_REQUEST_TIMEOUT}    // 10 };
+has 'connect_timeout'    => sub { $ENV{MOJO_CONNECT_TIMEOUT}    // 10  };
+has 'inactivity_timeout' => sub { $ENV{MOJO_INACTIVITY_TIMEOUT} // 20  };
+has 'max_redirects'      => sub { $ENV{MOJO_MAX_REDIRECTS}      // 4   };
+has 'request_timeout'    => sub { $ENV{MOJO_REQUEST_TIMEOUT}    // 0   };
 ## use critic
 
 # MUAC_CLIENT_CONFIG
@@ -139,7 +139,7 @@ sub get {
         $cb->($ua, $ua->_post_process_get($tx, $start_time, $key, @opts));
     } : ();
     # Is an absolute URL or an URL relative to the app eg. http://foo.com/ or /foo.txt
-    if ($url !~ m{ \A file:// }gmx && (Mojo::URL->new($url)->is_abs || $url =~ m{ \A / }gmx)) {
+    if ($url !~ m{ \A file:// }gmx && (Mojo::URL->new($url)->is_abs || ($url =~ m{ \A / }gmx && !$self->always_return_file))) {
         if ($self->is_cacheable($key)) {
             my $serialized = $self->cache_agent->get($key);
             if ($serialized) {
@@ -474,9 +474,9 @@ Mojo::UserAgent::Cached - Caching, Non-blocking I/O HTTP, Local file and WebSock
 
 =head1 SYNOPSIS
 
-use Mojo::UserAgent::Cached;
+  use Mojo::UserAgent::Cached;
 
-my $ua = Mojo::UserAgent::Cached->new;
+  my $ua = Mojo::UserAgent::Cached->new;
 
 =head1 DESCRIPTION
 
@@ -499,7 +499,7 @@ L<Mojo::UserAgent::Cached> inherits all attributes from L<Mojo::UserAgent> and i
   my $local_dir = $ua->local_dir;
   $ua->local_dir('/path/to/local_files');
 
-Sets the local dir, used as a prefix where relative URLs are fetched from. A C<$ua->get('foobar.txt')> request would
+Sets the local dir, used as a prefix where relative URLs are fetched from. A C<get('foobar.txt')> request would
 read the file '/tmp/foobar.txt' if local_dir is set to '/tmp', defaults to the value of the
 C<MUAC_LOCAL_DIR> environment variable and if not set, to ''.
 
@@ -508,7 +508,7 @@ C<MUAC_LOCAL_DIR> environment variable and if not set, to ''.
   my $file = $ua->always_return_file;
   $ua->always_return_file('/tmp/default_file.txt');
 
-Makes all consecutive request return the same file, no matter what file or URL is requested with C<$ua->get()>, defaults
+Makes all consecutive request return the same file, no matter what file or URL is requested with C<get()>, defaults
 to the value of the C<MUAC_ALWAYS_RETURN_FILE> environment value and if not, it respects the File/URL in the request.
 
 =head2 cache_agent
@@ -529,11 +529,11 @@ You may also set the C<MUAC_NOCACHE> environment variable to avoid caching at al
 
 =head2 cache_url_opts
 
-   my $urls_href = $ua->cache_url_opts;
-   $ua->cache_url_opts({ 
-       'https?://foo.com/long-lasting-data.*' => { expires_in => '2 weeks' }, # Cache some data two weeks
-       '.*' => { expires_at => 0 }, # Don't store anything in cache
-   });
+  my $urls_href = $ua->cache_url_opts;
+  $ua->cache_url_opts({ 
+    'https?://foo.com/long-lasting-data.*' => { expires_in => '2 weeks' }, # Cache some data two weeks
+    '.*' => { expires_at => 0 }, # Don't store anything in cache
+  });
    
 Accepts a hash ref of regexp strings and expire times, this allows you to define cache validity time for individual URLs, hosts etc.
 The first match will be used.
@@ -542,19 +542,20 @@ The first match will be used.
 
 Provide a logging object, defaults to Mojo::Log
 
-Example:
-    Returning fetched 'https://graph.facebook.com?ids=http%3A%2F%2Fexample.com%2Flivet%2F20...-lommebok&access_token=1234' => 200 for A.C.Facebook:133,185,183,A.M.F.ArticleList:19,9,A.M.Selector:47,responsive/modules/most-shared.html.tt:15,15,13,templates/inc/macros.tt:125,138,templates/responsive/frontpage.html.tt:10,10,16,Template:66,A.G.C.Article:338,147,main:14 (A.C.Facebook:68,E.C.Sandbox_874:7,A.C.Facebook:133,,,main:14)
+  # Example:
+  # Returning fetched 'https://graph.facebook.com?ids=http%3A%2F%2Fexample.com%2Flivet%2F20...-lommebok&access_token=1234' => 200 for A.C.Facebook:133,185,183,A.M.F.ArticleList:19,9,A.M.Selector:47,responsive/modules/most-shared.html.tt:15,15,13,templates/inc/macros.tt:125,138,templates/responsive/frontpage.html.tt:10,10,16,Template:66,A.G.C.Article:338,147,main:14 (A.C.Facebook:68,E.C.Sandbox_874:7,A.C.Facebook:133,,,main:14)
 
 Format:
-    Returning <cache-status> '<URL>' => 'HTTP code' for <request_stacktrace> (<created_stacktrace>)
+  Returning <cache-status> '<URL>' => 'HTTP code' for <request_stacktrace> (<created_stacktrace>)
 
-    cache-status: (cached|fetched|cached+expired)
-    URL: the URL requested, shortened when it is really long
-    request_stacktrace: Simplified stacktrace with leading module names shortened, also includes TT stacktrace support. Line numbers in the same module are grouped (order kept of course).
-    created_stacktrace: Stack trace for creation of UA object, useful to see what options went in, and which object is used. Same format as normal stacktrace, but skips common parts.
-                        Example:
-                           created_stacktrace: A.C.Facebook:68,E.C.Sandbox_874:7,A.C.Facebook:133,<common part replaced>,main:14
-                           stacktrace: A.C.Facebook:133,< common part: 185,183,A.M.F.ArticleList:19,9,A.M.Selector:47,responsive/modules/most-shared.html.tt:15,15,13,templates/inc/macros.tt:125,138,templates/responsive/frontpage.html.tt:10,10,16,Template:66,A.G.C.Article:338,147 >,main:14
+  cache-status: (cached|fetched|cached+expired)
+  URL: the URL requested, shortened when it is really long
+  request_stacktrace: Simplified stacktrace with leading module names shortened, also includes TT stacktrace support. Line numbers in the same module are grouped (order kept of course).
+  created_stacktrace: Stack trace for creation of UA object, useful to see what options went in, and which object is used. Same format as normal stacktrace, but skips common parts.
+  
+  Example:
+    created_stacktrace: A.C.Facebook:68,E.C.Sandbox_874:7,A.C.Facebook:133,<common part replaced>,main:14
+    stacktrace: A.C.Facebook:133,< common part: 185,183,A.M.F.ArticleList:19,9,A.M.Selector:47,responsive/modules/most-shared.html.tt:15,15,13,templates/inc/macros.tt:125,138,templates/responsive/frontpage.html.tt:10,10,16,Template:66,A.G.C.Article:338,147 >,main:14
 
 =head2 access_log
 
@@ -665,11 +666,11 @@ with headers, code and body set.
 
 =head1 ENVIRONMENT VARIABLES
 
-MUAC_CLIENT_WRITE_LOCAL_FILE_RES_DIR can be set to a directory to store a request in:
+C<MUAC_CLIENT_WRITE_LOCAL_FILE_RES_DIR> can be set to a directory to store a request in:
 
-# Re-usable local file with headers and metadata ends up at 't/data/drfront/lol/foo.html?bar=1'
-$ENV{MUAC_CLIENT_WRITE_LOCAL_FILE_RES_DIR}='t/data/drfront';
-Mojo::UserAgent::Cached->new->get("http://foo.com/lol/foo.html?bar=1");
+  # Re-usable local file with headers and metadata ends up at 't/data/dir/lol/foo.html?bar=1'
+  $ENV{MUAC_CLIENT_WRITE_LOCAL_FILE_RES_DIR}='t/data/dir';
+  Mojo::UserAgent::Cached->new->get("http://foo.com/lol/foo.html?bar=1");
 
 =head1 SEE ALSO
 

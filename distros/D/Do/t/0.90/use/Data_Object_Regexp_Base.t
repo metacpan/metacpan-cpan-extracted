@@ -24,7 +24,7 @@ Data-Object Abstract Regexp Class
 =description
 
 Data::Object::Regexp::Base provides routines for operating on Perl 5 regular
-expressions.
+expressions. This package inherits all behavior from L<Data::Object::Base>.
 
 =cut
 

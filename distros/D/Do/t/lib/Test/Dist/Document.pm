@@ -113,7 +113,7 @@ method construct_sections() {
   return $data;
 }
 
-method construct_section(Str $file) {
+method construct_section($file) {
   my @list = qw(name usage description signature type);
   my $data = $self->construct_data($file, @list);
 

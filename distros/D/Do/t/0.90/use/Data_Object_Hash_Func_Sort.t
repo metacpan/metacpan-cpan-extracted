@@ -26,6 +26,7 @@ Data-Object Hash Function (Sort) Class
 =description
 
 Data::Object::Hash::Func::Sort is a function object for Data::Object::Hash.
+This package inherits all behavior from L<Data::Object::Hash::Func>.
 
 =cut
 

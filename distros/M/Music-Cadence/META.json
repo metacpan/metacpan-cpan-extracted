@@ -36,6 +36,7 @@
          "requires" : {
             "Moo" : "2",
             "Music::Chord::Note" : "0",
+            "Music::Chord::Positions" : "0",
             "Music::Note" : "0",
             "Music::Scales" : "0",
             "Music::ToRoman" : "0",
@@ -66,7 +67,7 @@
          "web" : "https://github.com/ology/Music-Cadence"
       }
    },
-   "version" : "0.0601",
+   "version" : "0.0900",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.027007"

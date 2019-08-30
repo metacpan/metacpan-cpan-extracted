@@ -1,4 +1,4 @@
-# $Id: 02-IDN.t 1692 2018-07-06 08:55:39Z willem $	-*-perl-*-
+# $Id: 02-IDN.t 1749 2019-07-21 09:15:55Z willem $	-*-perl-*-
 
 use strict;
 use Test::More;
@@ -78,8 +78,8 @@ is( new Net::DNS::Domain('xn--')->xname, 'xn--', 'IDN bogus domain->xname' );
 
 
 eval { new Net::DNS::Domain( pack 'U*', 65533, 92, 48, 65533 ); };
-my $exception = $1 if $@ =~ /^(.+)\n/;
-ok( $exception ||= '', "invalid name\t[$exception]" );
+my ($exception) = split /\n/, "$@\n";
+ok( $exception, "invalid name\t[$exception]" );
 
 
 exit;

@@ -26,6 +26,7 @@ Data-Object Undef Function (Gt) Class
 =description
 
 Data::Object::Undef::Func::Gt is a function object for Data::Object::Undef.
+This package inherits all behavior from L<Data::Object::Undef::Func>.
 
 =cut
 

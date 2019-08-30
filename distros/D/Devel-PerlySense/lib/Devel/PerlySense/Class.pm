@@ -21,7 +21,7 @@ use warnings;
 use utf8;
 
 package Devel::PerlySense::Class;
-$Devel::PerlySense::Class::VERSION = '0.0220';
+$Devel::PerlySense::Class::VERSION = '0.0221';
 
 
 

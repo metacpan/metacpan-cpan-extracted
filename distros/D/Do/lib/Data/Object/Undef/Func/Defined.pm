@@ -4,7 +4,7 @@ use Data::Object 'Class';
 
 extends 'Data::Object::Undef::Func';
 
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 # BUILD
 
@@ -54,7 +54,9 @@ Data-Object Undef Function (Defined) Class
 
 =head1 DESCRIPTION
 
-Data::Object::Undef::Func::Defined is a function object for Data::Object::Undef.
+Data::Object::Undef::Func::Defined is a function object for
+Data::Object::Undef. This package inherits all behavior from
+L<Data::Object::Undef::Func>.
 
 =cut
 

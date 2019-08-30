@@ -6,7 +6,7 @@
       "Michael Fuhr"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -55,6 +55,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.20",
-   "x_serialization_backend" : "JSON::PP version 4.00"
+   "version" : "1.21",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

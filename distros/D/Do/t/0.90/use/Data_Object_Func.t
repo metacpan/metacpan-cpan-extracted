@@ -19,7 +19,14 @@ Data-Object Function-Object Class
 
 =description
 
-This package is an abstract base class for function classes.
+This package is an abstract base class for function classes. This package
+inherits all behavior from L<Data::Object::Base>.
+
++=head1 ROLES
+
+This package assumes all behavior from the follow roles:
+
+L<Data::Object::Role::Throwable>
 
 =cut
 

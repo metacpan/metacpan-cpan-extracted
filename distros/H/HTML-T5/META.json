@@ -28,7 +28,8 @@
       "configure" : {
          "requires" : {
             "Alien::Base::Wrapper" : "0",
-            "Alien::TidyHTML5" : "0"
+            "Alien::TidyHTML5" : "0",
+            "Devel::CheckLib" : "0"
          }
       },
       "runtime" : {
@@ -52,13 +53,13 @@
          "http://www.opensource.org/licenses/artistic-license-2.0.php"
       ]
    },
-   "version" : "0.005",
+   "version" : "0.006",
    "x_contributors" : [
       "Andy Lester <andy@petdance.com>",
       "Jonathan Rockway <jrockway@cpan.org>",
       "Robert Bachmann <rbach@cpan.org>",
-      "Robert Rothenberg <rrwo@cpan.com>",
+      "Robert Rothenberg <rrwo@cpan.org>",
       "Rufus Cable <cpan@threebytesfull.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

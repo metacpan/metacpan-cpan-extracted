@@ -3,7 +3,7 @@ package Data::Object::Base;
 use strict;
 use warnings;
 
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 # BUILD
 # METHODS

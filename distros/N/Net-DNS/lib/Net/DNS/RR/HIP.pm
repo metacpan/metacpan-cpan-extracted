@@ -1,9 +1,9 @@
 package Net::DNS::RR::HIP;
 
 #
-# $Id: HIP.pm 1597 2017-09-22 08:04:02Z willem $
+# $Id: HIP.pm 1749 2019-07-21 09:15:55Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1749 $)[1];
 
 
 use strict;
@@ -29,7 +29,7 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 	my ( $data, $offset ) = @_;
 
 	my ( $hitlen, $pklen ) = unpack "\@$offset Cxn", $$data;
-	@{$self}{qw(pkalgorithm hitbin keybin)} = unpack "\@$offset xCxx a$hitlen a$pklen", $$data;
+	@{$self}{qw(algorithm hitbin keybin)} = unpack "\@$offset xCxx a$hitlen a$pklen", $$data;
 
 	my $limit = $offset + $self->{rdlength};
 	$offset += 4 + $hitlen + $pklen;
@@ -48,7 +48,7 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 
 	my $hit = $self->hitbin;
 	my $key = $self->keybin;
-	my $nos = pack 'C2n a* a*', length($hit), $self->pkalgorithm, length($key), $hit, $key;
+	my $nos = pack 'C2n a* a*', length($hit), $self->algorithm, length($key), $hit, $key;
 	join '', $nos, map $_->encode, @{$self->{servers}};
 }
 
@@ -58,30 +58,30 @@ sub _format_rdata {			## format rdata portion of RR string.
 
 	my $base64 = encode_base64( $self->keybin, '' );
 	my @server = map $_->string, @{$self->{servers}};
-	my @rdata = ( $self->pkalgorithm, $self->hit, $base64, @server );
+	my @rdata  = ( $self->algorithm, $self->hit, $base64, @server );
 }
 
 
 sub _parse_rdata {			## populate RR from rdata in argument list
 	my $self = shift;
 
-	foreach (qw(pkalgorithm hit key)) { $self->$_(shift) }
+	foreach (qw(algorithm hit key)) { $self->$_(shift) }
 	$self->servers(@_);
 }
 
 
-sub pkalgorithm {
+sub algorithm {
 	my $self = shift;
 
-	$self->{pkalgorithm} = 0 + shift if scalar @_;
-	$self->{pkalgorithm} || 0;
+	$self->{algorithm} = 0 + shift if scalar @_;
+	$self->{algorithm} || 0;
 }
 
 
 sub hit {
 	my $self = shift;
 	return unpack "H*", $self->hitbin() unless scalar @_;
-	$self->hitbin( pack "H*", map /[^\dA-F]/i ? croak "corrupt hex" : $_, join "", @_ );
+	$self->hitbin( pack "H*", join "", map { /^"*([\dA-Fa-f]*)"*$/ || croak("corrupt hex"); $1 } @_ );
 }
 
 
@@ -108,8 +108,6 @@ sub keybin {
 }
 
 
-sub pubkey { &key; }
-
 sub servers {
 	my $self = shift;
 
@@ -119,8 +117,17 @@ sub servers {
 }
 
 sub rendezvousservers {			## historical
-	my @servers = &servers;					# uncoverable pod
+	$_[0]->_deprecate('prefer $rr->servers()');		# uncoverable pod
+	my @servers = &servers;
 	\@servers;
+}
+
+sub pkalgorithm {			## historical
+	&algorithm;						# uncoverable pod
+}
+
+sub pubkey {				## historical
+	&key;							# uncoverable pod
 }
 
 
@@ -147,10 +154,10 @@ structures is discouraged and could result in program termination or
 other unpredictable behaviour.
 
 
-=head2 pkalgorithm
+=head2 algorithm
 
-    $pkalgorithm = $rr->pkalgorithm;
-    $rr->pkalgorithm( $pkalgorithm );
+    $algorithm = $rr->algorithm;
+    $rr->algorithm( $algorithm );
 
 The PK algorithm field indicates the public key cryptographic
 algorithm and the implied public key field format.
@@ -169,8 +176,6 @@ The hexadecimal representation of the host identity tag.
     $rr->hitbin( $hitbin );
 
 The binary representation of the host identity tag.
-
-=head2 pubkey
 
 =head2 key
 

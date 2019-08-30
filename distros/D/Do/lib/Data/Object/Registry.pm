@@ -9,7 +9,7 @@ use Memoize;
 
 use parent 'Data::Object::Base';
 
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 # METHODS
 
@@ -108,7 +108,7 @@ Data-Object Namespace Registry
 =head1 DESCRIPTION
 
 This package is a singleton that holds mappings for namespaces and type
-libraries.
+libraries. This package inherits all behavior from L<Data::Object::Base>.
 
 =cut
 

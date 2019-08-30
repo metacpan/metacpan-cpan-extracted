@@ -7,7 +7,7 @@ use Function::Parameters;
 
 use Data::Object::Export 'namespace', 'reify';
 
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 # BUILD
 

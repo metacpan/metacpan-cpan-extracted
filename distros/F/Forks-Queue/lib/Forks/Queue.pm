@@ -6,7 +6,7 @@ use Carp;
 use Time::HiRes;
 use Config;
 
-our $VERSION = '0.09';
+our $VERSION = '0.11';
 our $DEBUG = $ENV{FORKS_QUEUE_DEBUG} || 0;
 
 our $NOTIFY_OK = $ENV{FORKS_QUEUE_NOTIFY} // do {
@@ -23,14 +23,6 @@ our %OPTS = (limit => -1, on_limit => 'fail', style => 'fifo',
 sub new {
     my $class = shift;
     my %opts = (%OPTS, @_);
-
-    if ($opts{remote}) {
-        require Net::Objwrap;
-        if (-f $opts{remote}) {
-            my $q = Net::Objwrap::unwrap($opts{remote});
-            return $q;
-        }
-    }
 
     if ($opts{impl}) {
         my $pkg = delete $opts{impl};
@@ -65,14 +57,14 @@ sub import {
 }
 
 sub put {
-    my $self = CORE::shift;
+    my $self = shift;
     return $self->push(@_);
 }
 
 sub enqueue { goto &put; }
 
 sub get {
-    my $self = CORE::shift;
+    my $self = shift;
     _validate_input($_[0], 'count', 1) if @_;
     if ($self->{style} eq 'fifo') {
         return @_ ? $self->shift(@_) : $self->shift;
@@ -85,8 +77,8 @@ sub get {
 sub dequeue { goto &get; }
 
 sub dequeue_timed {
-    my $self = CORE::shift;
-    my $timeout = CORE::shift;
+    my $self = shift;
+    my $timeout = shift;
     _validate_input($timeout, 'timeout', 0, 1);
     local $self->{_expire} = Time::HiRes::time + $timeout;
     local $SLEEP_INTERVAL = $Forks::Queue::SLEEP_INTERVAL;
@@ -95,8 +87,8 @@ sub dequeue_timed {
 }
 
 sub get_timed {
-    my $self = CORE::shift;
-    my $timeout = CORE::shift;
+    my $self = shift;
+    my $timeout = shift;
     _validate_input($timeout, 'timeout', 0, 1);
     local $self->{_expire} = Time::HiRes::time + $timeout;
     local $SLEEP_INTERVAL = $Forks::Queue::SLEEP_INTERVAL;
@@ -105,8 +97,8 @@ sub get_timed {
 }
 
 sub shift_timed {
-    my $self = CORE::shift;
-    my $timeout = CORE::shift;
+    my $self = shift;
+    my $timeout = shift;
     _validate_input($timeout, 'timeout', 0, 1);
     local $self->{_expire} = Time::HiRes::time + $timeout;
     local $SLEEP_INTERVAL = $Forks::Queue::SLEEP_INTERVAL;
@@ -115,8 +107,8 @@ sub shift_timed {
 }
 
 sub pop_timed {
-    my $self = CORE::shift;
-    my $timeout = CORE::shift;
+    my $self = shift;
+    my $timeout = shift;
     _validate_input($timeout, 'timeout', 0, 1);
     local $self->{_expire} = Time::HiRes::time + $timeout;
     local $SLEEP_INTERVAL = $Forks::Queue::SLEEP_INTERVAL;
@@ -130,7 +122,7 @@ sub _expired {
 }
 
 sub get_nb {
-    my $self = CORE::shift;
+    my $self = shift;
     _validate_input($_[0], 'count', 1) if @_;
     if ($self->{style} eq 'fifo') {
         return @_ ? $self->shift_nb(@_) : $self->shift_nb;
@@ -151,7 +143,7 @@ sub peek {
 }
 
 sub pending {
-    my $self = CORE::shift;
+    my $self = shift;
     my $s = $self->status;
     return $s->{avail} ? $s->{avail} : $s->{end} ? undef : 0;
 }
@@ -164,9 +156,9 @@ sub _croak {
 sub limit :lvalue {
     my $self = shift;
     if (@_) {
-        $self->{limit} = CORE::shift @_;
+        $self->{limit} = shift @_;
         if (@_) {
-            $self->{on_limit} = CORE::shift @_;
+            $self->{on_limit} = shift @_;
         }
     }
     $self->{limit};
@@ -185,13 +177,55 @@ sub _validate_input {
 sub push       { _croak("push/put") }
 sub peek_front { _croak("peek") }
 sub peek_back  { _croak("peek") }
-sub shift      { _croak("shift/get") }
+sub shift :method { _croak("shift/get") }
 sub unshift    { _croak("unshift") }
 sub pop        { _croak("pop/get") }
 sub shift_nb   { _croak("shift/get") }
 sub pop_nb     { _croak("pop/get") }
 sub status     { _croak("pending/status") }
 sub clear      { _croak("clear") }
+
+
+
+
+
+
+sub Forks::Queue::Util::__is_nfs {
+    my ($dir) = @_;
+    if ($^O ne 'linux') {
+        return;
+    }
+    my $pid = fork();
+    if ($pid == 0) {
+        close STDOUT;
+        close STDERR;
+        # http://superuser.com/q/422061
+        exec("df",$dir,"-t","nfs");
+        die;
+    }
+    local $?;
+    waitpid $pid,0;
+    return $? == 0;
+}
+
+
+# manage global destruction phase
+BEGIN {
+    if (defined(${^GLOBAL_PHASE})) {
+        eval 'sub __inGD(){%{^GLOBAL_PHASE} eq q{DESTRUCT} && __END()};1'
+    } else {
+        require B;
+        eval 'sub __inGD(){${B::main_cv()}==0 && __END()};1'
+    }
+}
+END { &__END }
+sub __END {
+    no warnings 'redefine';
+    *DB::DB = sub {};
+    *__inGD = sub () { 1 };
+}
+
+
 
 1;
 
@@ -201,7 +235,7 @@ Forks::Queue - queue that can be shared across processes
 
 =head1 VERSION
 
-0.09
+0.11
 
 =head1 SYNOPSIS
 
@@ -344,21 +378,6 @@ C<list> option. The argument must be an array reference.
 
 If the C<join> option is specified, the contents of the list
 could be added to an already existing queue.
-
-=item * C<< remote => FILENAME >>
-
-Enable proxy access to a queue that may be running on another host.
-If the given filename exists, this option will get C<Forks::Queue>
-to read server connection information from the file, establish a
-network connection to the server, and provide a proxy object
-that implements the C<Forks::Queue> interface and manipulates the
-queue on the remote server. If the filename does not exist,
-then C<Forks::Queue> will create a new queue object and launch a
-server to make the queue available remotely, writing the details
-about how to connect to the server into the file.
-
-Remote access to queues is provided through the L<Net::Objwrap>
-distribution, which is bundled with C<Forks::Queue> v0.09.
 
 =back
 
@@ -628,7 +647,7 @@ This method is inefficient for some queue implementations.
     $num_items_avail = $queue->pending
 
 Returns the total number of items available on the queue. There is no
-guarentee that the number of available items will not change between a
+guarantee that the number of available items will not change between a
 call to C<pending> and a subsequent call to L<"get">
 
 =head2 clear
@@ -775,7 +794,7 @@ L<http://search.cpan.org/dist/Forks-Queue/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2017, Marty O'Brien.
+Copyright (c) 2017-2019, Marty O'Brien.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.1 or,

@@ -1,9 +1,9 @@
 package Net::DNS::Packet;
 
 #
-# $Id: Packet.pm 1714 2018-09-21 14:14:55Z willem $
+# $Id: Packet.pm 1747 2019-06-27 15:02:31Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1714 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1747 $)[1];
 
 
 =head1 NAME
@@ -685,13 +685,13 @@ sub sign_sig0 {
 
 	eval {
 		local $SIG{__DIE__};
-		require Net::DNS::RR::SIG;
 
 		my $sig0;
 		if ( ref($karg) eq 'Net::DNS::RR::SIG' ) {
 			$sig0 = $karg;
 
 		} else {
+			require Net::DNS::RR::SIG;
 			$sig0 = Net::DNS::RR::SIG->create( '', $karg );
 		}
 

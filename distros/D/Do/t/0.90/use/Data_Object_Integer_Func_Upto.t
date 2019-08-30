@@ -25,7 +25,9 @@ Data-Object Integer Function (Upto) Class
 
 =description
 
-Data::Object::Integer::Func::Upto is a function object for Data::Object::Integer.
+Data::Object::Integer::Func::Upto is a function object for
+Data::Object::Integer. This package inherits all behavior from
+L<Data::Object::Integer::Func>.
 
 =cut
 

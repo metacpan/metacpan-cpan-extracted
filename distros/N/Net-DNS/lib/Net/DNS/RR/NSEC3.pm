@@ -1,9 +1,9 @@
 package Net::DNS::RR::NSEC3;
 
 #
-# $Id: NSEC3.pm 1726 2018-12-15 12:59:56Z willem $
+# $Id: NSEC3.pm 1749 2019-07-21 09:15:55Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1726 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1749 $)[1];
 
 
 use strict;
@@ -141,11 +141,9 @@ sub flags {
 
 
 sub optout {
-	my $bit = 0x01;
 	for ( shift->{flags} ) {
-		my $set = $bit | ( $_ ||= 0 );
-		$_ = (shift) ? $set : ( $set ^ $bit ) if scalar @_;
-		return $_ & $bit;
+		$_ = ( shift() ? 0 : 0x01 ) ^ ( 0x01 | ( $_ || 0 ) ) if scalar @_;
+		return 0x01 & ( $_ || 0 );
 	}
 }
 
@@ -161,7 +159,7 @@ sub iterations {
 sub salt {
 	my $self = shift;
 	return unpack "H*", $self->saltbin() unless scalar @_;
-	$self->saltbin( pack "H*", map /[^\dA-F]/i ? croak "corrupt hex" : $_, join "", @_ );
+	$self->saltbin( pack "H*", join "", map { /^"*([\dA-Fa-f]*)"*$/ || croak("corrupt hex"); $1 } @_ );
 }
 
 
@@ -180,14 +178,24 @@ sub hnxtname {
 }
 
 
+sub match {
+	my ( $self, $name ) = @_;
+
+	my ($owner) = $self->{owner}->label;
+	my $ownerhash = _decode_base32hex($owner);
+
+	my $hashfn = $self->{hashfn};
+	$ownerhash eq &$hashfn($name);
+}
+
 sub covers {
 	my ( $self, $name ) = @_;
 
-	my ( $owner, @zone ) = $self->{owner}->_wire;
+	my ( $owner, @zone ) = $self->{owner}->label;
 	my $ownerhash = _decode_base32hex($owner);
 	my $nexthash  = $self->{hnxtname};
 
-	my @label = new Net::DNS::DomainName($name)->_wire;
+	my @label = new Net::DNS::DomainName($name)->label;
 	my @close = @label;
 	foreach (@zone) { pop(@close) }				# strip zone labels
 	return if lc($name) ne lc( join '.', @close, @zone );	# out of zone
@@ -205,29 +213,14 @@ sub covers {
 }
 
 
-sub covered {				## historical
-	&covers;						# uncoverable pod
-}
-
-sub match {				## historical
-	my ( $self, $name ) = @_;				# uncoverable pod
-
-	my ($owner) = $self->{owner}->_wire;
-	my $ownerhash = _decode_base32hex($owner);
-
-	my $hashfn = $self->{hashfn};
-	$ownerhash eq &$hashfn($name);
-}
-
-
 sub encloser {
 	my ( $self, $qname ) = @_;
 
-	my ( $owner, @zone ) = $self->{owner}->_wire;
+	my ( $owner, @zone ) = $self->{owner}->label;
 	my $ownerhash = _decode_base32hex($owner);
 	my $nexthash  = $self->{hnxtname};
 
-	my @label = new Net::DNS::DomainName($qname)->_wire;
+	my @label = new Net::DNS::DomainName($qname)->label;
 	my @close = @label;
 	foreach (@zone) { pop(@close) }				# strip zone labels
 	return if lc($qname) ne lc( join '.', @close, @zone );	# out of zone
@@ -235,14 +228,13 @@ sub encloser {
 	my $hashfn = $self->{hashfn};
 
 	my $encloser = $qname;
-	shift @label;
 	foreach (@close) {
 		my $nextcloser = $encloser;
-		my $hash = &$hashfn( $encloser = join '.', @label );
 		shift @label;
+		my $hash = &$hashfn( $encloser = join '.', @label );
 		next if $hash ne $ownerhash;
 		$self->{nextcloser} = $nextcloser;		# next closer name
-		$self->{wildcard} = join '.', '*', $encloser;	# wildcard at provable encloser
+		$self->{wildcard}   = "*.$encloser";		# wildcard at provable encloser
 		return $encloser;				# provable encloser
 	}
 	return;
@@ -288,8 +280,10 @@ sub _hashfn {
 		$class->new(@argument);
 	};
 	my $exception = $@;
+	return sub { croak $exception }
+			if $exception;
 
-	return $exception ? sub { croak $exception } : sub {
+	return sub {
 		my $name  = new Net::DNS::DomainName(shift)->canonical;
 		my $key	  = join '', $name, $key_adjunct;
 		my $cache = $$cache1{$key} ||= $$cache2{$key};	# two layer cache
@@ -434,6 +428,13 @@ interpolated into a string.
 
 typemap() returns a Boolean true value if the specified RRtype occurs
 in the type bitmap of the NSEC3 record.
+
+=head2 match
+
+    $matched = $rr->match( 'example.foo' );
+
+match() returns a Boolean true value if the hash of the domain name
+argument matches the hashed owner name of the NSEC3 RR.
 
 =head2 covers
 

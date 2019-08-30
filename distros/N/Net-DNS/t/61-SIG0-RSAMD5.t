@@ -1,4 +1,4 @@
-# $Id: 61-SIG0-RSAMD5.t 1736 2019-03-20 10:03:12Z willem $	-*-perl-*-
+# $Id: 61-SIG0-RSAMD5.t 1747 2019-06-27 15:02:31Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -18,8 +18,6 @@ foreach my $package ( sort keys %prerequisite ) {
 }
 
 plan tests => 29;
-
-use_ok('Net::DNS::SEC');
 
 
 my $key = new Net::DNS::RR <<'END';
@@ -51,6 +49,9 @@ Exponent2: qtb8vPi3GrDCGKETkHshCank09EDRhGY7CKZpI0fpMogWqCrydrIh5xfKZ2d9SRHVaF8Q
 Coefficient: IUxSSCxp+TotMTbloOt/aTtxlaz0b5tSS7dBoLa7//tmHZvHQjftEw8KbXC89QhHd537YZX4VcK/uYbU6SesRA==
 END
 close(KEY);
+
+my $private = new Net::DNS::SEC::Private($keyfile);
+ok( $private, 'set up RSA private key' );
 
 
 my $bad1 = new Net::DNS::RR <<'END';
@@ -197,8 +198,8 @@ END
 		my @argtype = map ref($_), @$arglist;
 		$object->typecovered('A');			# induce failure
 		eval { $object->verify(@$arglist); };
-		my $exception = $1 if $@ =~ /^(.*)\n*/;
-		ok( defined $exception, "verify(@argtype)\t[$exception]" );
+		my ($exception) = split /\n/, "$@\n";
+		ok( $exception, "verify(@argtype)\t[$exception]" );
 	}
 }
 
@@ -209,8 +210,8 @@ END
 	my $signed = $packet->data;				# signing occurs in SIG->encode
 	$packet->sigrr->sigbin('');				# signature destroyed
 	my $unsigned = eval { $packet->data };			# unable to regenerate SIG0
-	my $exception = $1 if $@ =~ /^(.*)\n*/;
-	ok( defined $exception, "missing key\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "missing key\t[$exception]" );
 }
 
 

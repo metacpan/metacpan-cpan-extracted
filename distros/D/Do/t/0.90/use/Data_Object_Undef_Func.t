@@ -20,7 +20,8 @@ Functions for Undef Data
 =description
 
 Data::Object::Undef::Func is an abstract base class for function classes in the
-Data::Object::Undef::Func space.
+Data::Object::Undef::Func space. This package inherits all behavior from
+L<Data::Object::Func>.
 
 =cut
 

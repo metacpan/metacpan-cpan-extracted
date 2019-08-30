@@ -8,7 +8,7 @@ Devel::PerlySense::CallTree::Graph - A GraphViz graph of the CallTree
 =cut
 
 package Devel::PerlySense::CallTree::Graph;
-$Devel::PerlySense::CallTree::Graph::VERSION = '0.0220';
+$Devel::PerlySense::CallTree::Graph::VERSION = '0.0221';
 use strict;
 use warnings;
 use utf8;

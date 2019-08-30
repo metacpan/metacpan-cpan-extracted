@@ -26,6 +26,7 @@ Data-Object Code Function (Conjoin) Class
 =description
 
 Data::Object::Code::Func::Conjoin is a function object for Data::Object::Code.
+This package inherits all behavior from L<Data::Object::Code::Func>.
 
 =cut
 

@@ -4,7 +4,7 @@ use Data::Object 'Class';
 
 extends 'Data::Object::Any::Func';
 
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 # BUILD
 
@@ -62,7 +62,8 @@ Data-Object Any Function (Le) Class
 
 =head1 DESCRIPTION
 
-Data::Object::Any::Func::Le is a function object for Data::Object::Any.
+Data::Object::Any::Func::Le is a function object for Data::Object::Any. This
+package inherits all behavior from L<Data::Object::Any::Func>.
 
 =cut
 

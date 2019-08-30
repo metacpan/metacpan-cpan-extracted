@@ -1,4 +1,4 @@
-# $Id: 05-CERT.t 1528 2017-01-18 21:44:58Z willem $	-*-perl-*-
+# $Id: 05-CERT.t 1749 2019-07-21 09:15:55Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -90,8 +90,8 @@ my $wire = '00010002033132333435363738396162636465666768696a6b6c6d6e6f7071727374
 	is( $rr->algorithm('MNEMONIC'), 255, 'algorithm with no mnemonic' );
 
 	eval { $rr->algorithm('X'); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "unknown mnemonic\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "unknown mnemonic\t[$exception]" );
 }
 
 
@@ -99,8 +99,8 @@ my $wire = '00010002033132333435363738396162636465666768696a6b6c6d6e6f7071727374
 	my $rr = Net::DNS::RR->new("foo IN CERT 1 2 3 foo=");
 	is( $rr->certtype('PKIX'), 1, 'valid certtype mnemonic' );
 	eval { $rr->certtype('X'); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "unknown mnemonic\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "unknown mnemonic\t[$exception]" );
 }
 
 

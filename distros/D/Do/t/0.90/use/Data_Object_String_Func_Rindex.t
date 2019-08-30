@@ -25,7 +25,9 @@ Data-Object String Function (Rindex) Class
 
 =description
 
-Data::Object::String::Func::Rindex is a function object for Data::Object::String.
+Data::Object::String::Func::Rindex is a function object for
+Data::Object::String. This package inherits all behavior from
+L<Data::Object::String::Func>.
 
 =cut
 

@@ -22,7 +22,7 @@ Data-Object Abstract Array Class
 =description
 
 Data::Object::Array::Base provides routines for operating on Perl 5 array
-references.
+references. This package inherits all behavior from L<Data::Object::Base>.
 
 =cut
 

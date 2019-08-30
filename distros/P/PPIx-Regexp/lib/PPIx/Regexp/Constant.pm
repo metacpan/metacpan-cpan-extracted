@@ -8,12 +8,13 @@ use base qw{ Exporter };
 # CAVEAT: do not include any other PPIx-Regexp modules in this one, or
 # you will end up with a circular dependency.
 
-our $VERSION = '0.066';
+our $VERSION = '0.067';
 
 our @EXPORT_OK = qw{
     ARRAY_REF
     CODE_REF
     COOKIE_CLASS
+    COOKIE_LOOKAROUND_ASSERTION
     COOKIE_QUANT
     COOKIE_QUOTE
     COOKIE_REGEX_SET
@@ -111,6 +112,7 @@ use constant COOKIE_CLASS	=> ']';
 use constant COOKIE_QUANT	=> '}';
 use constant COOKIE_QUOTE	=> '\\E';
 use constant COOKIE_REGEX_SET	=> '])';
+use constant COOKIE_LOOKAROUND_ASSERTION	=> 'lookaround';
 
 use constant FALSE		=> 0;
 use constant TRUE		=> 1;
@@ -213,6 +215,15 @@ This cookie is set in
 L<PPIx::Regexp::Token::Structure|PPIx::Regexp::Token::Structure> when
 the left square bracket is encountered, and cleared in the same module
 when a right square bracket is encountered.
+
+=head2 COOKIE_LOOKAROUND_ASSERTION
+
+The name of the cookie used to control the parsing of zero-width
+assertions.
+
+This cookie is set in
+L<PPIx::Regexp::Token::GroupType::Assertion|PPIx::Regexp::Token::GroupType::Assertion>,
+and it persists until the end of the assertion.
 
 =head2 COOKIE_QUANT
 

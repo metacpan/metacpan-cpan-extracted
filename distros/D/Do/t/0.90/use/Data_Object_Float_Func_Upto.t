@@ -26,6 +26,7 @@ Data-Object Float Function (Upto) Class
 =description
 
 Data::Object::Float::Func::Upto is a function object for Data::Object::Float.
+This package inherits all behavior from L<Data::Object::Float::Func>.
 
 =cut
 

@@ -1,4 +1,4 @@
-# $Id: 05-SIG.t 1528 2017-01-18 21:44:58Z willem $	-*-perl-*-
+# $Id: 05-SIG.t 1749 2019-07-21 09:15:55Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -73,11 +73,10 @@ my $wire =
 	is( $hex1, $hex2, 'encode/decode transparent' );
 	is( $hex3, $wire, 'encoded RDATA matches example' );
 
-	my @wire = unpack 'C*', $encoded;
-	my $wireformat = pack 'C*', @wire, 0;
+	my $wireformat = pack 'a* x', $encoded;
 	eval { decode Net::DNS::RR( \$wireformat ); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "misplaced SIG RR\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "misplaced SIG RR\t[$exception]" );
 }
 
 
@@ -115,8 +114,8 @@ my $wire =
 	is( $rr->algorithm(),		5,	   'rr->algorithm("MNEMONIC") preserves value' );
 
 	eval { $rr->algorithm('X'); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "unknown mnemonic\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "unknown mnemonic\t[$exception]" );
 
 	is( $class->algorithm('RSASHA256'), 8,		 'class method algorithm("RSASHA256")' );
 	is( $class->algorithm(8),	    'RSASHA256', 'class method algorithm(8)' );
@@ -144,7 +143,7 @@ my $wire =
 		no strict q/refs/;
 		my $subroutine = join '::', $class, $method;
 		eval { &$subroutine(@$arglist); };
-		my $exception = $1 if $@ =~ /^(.*)\n*/;
+		my ($exception) = split /\n/, "$@\n";
 		ok( defined $exception, "$method method callable\t[$exception]" );
 	}
 }

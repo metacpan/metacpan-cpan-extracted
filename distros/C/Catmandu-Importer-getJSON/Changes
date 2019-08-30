@@ -1,5 +1,8 @@
 Changelog for Catmandu-Importer-getJSON
 
+0.52  2019-08-30 11:29:50 CEST
+ - Fix test issues
+
 0.51  2019-01-23 20:12:35 CET
  - Disable default warning enabled (issue #15) 
 

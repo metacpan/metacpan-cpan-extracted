@@ -26,6 +26,7 @@ Data-Object Scalar Function (Lt) Class
 =description
 
 Data::Object::Scalar::Func::Lt is a function object for Data::Object::Scalar.
+This package inherits all behavior from L<Data::Object::Scalar::Func>.
 
 =cut
 

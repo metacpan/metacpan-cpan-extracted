@@ -24,7 +24,8 @@ Data-Object Abstract Float Class
 =description
 
 Data::Object::Float::Base provides routines for operating on Perl 5
-floating-point data.
+floating-point data. This package inherits all behavior from
+L<Data::Object::Base>.
 
 =cut
 

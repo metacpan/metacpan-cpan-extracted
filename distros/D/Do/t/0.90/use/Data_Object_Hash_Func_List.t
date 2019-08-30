@@ -26,6 +26,7 @@ Data-Object Hash Function (List) Class
 =description
 
 Data::Object::Hash::Func::List is a function object for Data::Object::Hash.
+This package inherits all behavior from L<Data::Object::Hash::Func>.
 
 =cut
 

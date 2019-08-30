@@ -19,7 +19,7 @@ use warnings;
 use utf8;
 
 package Devel::PerlySense::Home;
-$Devel::PerlySense::Home::VERSION = '0.0220';
+$Devel::PerlySense::Home::VERSION = '0.0221';
 
 
 use Spiffy -Base;

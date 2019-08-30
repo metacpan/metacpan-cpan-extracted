@@ -25,7 +25,8 @@ Data-Object Hash Function (Ge) Class
 
 =description
 
-Data::Object::Hash::Func::Ge is a function object for Data::Object::Hash.
+Data::Object::Hash::Func::Ge is a function object for Data::Object::Hash. This
+package inherits all behavior from L<Data::Object::Hash::Func>.
 
 =cut
 

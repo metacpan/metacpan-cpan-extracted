@@ -9,7 +9,7 @@ use Memoize;
 
 use parent 'Exporter';
 
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 # BUILD
 
@@ -652,7 +652,7 @@ Data-Object Exportable Functions
 =head1 DESCRIPTION
 
 This package is an exporter that provides various useful utility functions and
-function-bundles.
+function-bundles. This package inherits all behavior from L<Exporter>.
 
 =head1 EXPORTS
 

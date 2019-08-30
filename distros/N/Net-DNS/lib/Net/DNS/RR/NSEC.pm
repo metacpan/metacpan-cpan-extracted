@@ -1,9 +1,9 @@
 package Net::DNS::RR::NSEC;
 
 #
-# $Id: NSEC.pm 1696 2018-07-20 16:15:11Z willem $
+# $Id: NSEC.pm 1749 2019-07-21 09:15:55Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1696 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1749 $)[1];
 
 
 use strict;
@@ -45,7 +45,7 @@ sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
 	my $nxtdname = $self->{nxtdname};
-	my @rdata = ( $nxtdname->string(), $self->typelist );
+	my @rdata    = ( $nxtdname->string(), $self->typelist );
 }
 
 
@@ -106,6 +106,13 @@ sub typemap {
 }
 
 
+sub match {
+	my $self = shift;
+	my $name = Net::DNS::DomainName->new(shift)->canonical;
+	return $name eq $self->{owner}->canonical;
+}
+
+
 sub covers {
 	my $self = shift;
 	my $name = join chr(0), reverse Net::DNS::DomainName->new(shift)->_wire;
@@ -116,6 +123,33 @@ sub covers {
 	return ( $name cmp $this ) + ( "$next\001" cmp $name ) == 2 unless $next gt $this;
 	return ( $name cmp $this ) + ( $next cmp $name ) == 2;
 }
+
+
+sub encloser {
+	my $self  = shift;
+	my @qname = new Net::DNS::Domain(shift)->label;
+
+	my @owner = $self->{owner}->label;
+	my $depth = scalar(@owner);
+	my $next;
+	while ( scalar(@qname) > $depth ) {
+		$next = shift @qname;
+	}
+
+	return unless defined $next;
+
+	my $nextcloser = join( '.', $next, @qname );
+	return if lc($nextcloser) ne lc( join '.', $next, @owner );
+
+	$self->{nextcloser} = $nextcloser;
+	$self->{wildcard}   = join( '.', '*', @qname );
+	return $self->owner;
+}
+
+
+sub nextcloser { return shift->{nextcloser}; }
+
+sub wildcard { return shift->{wildcard}; }
 
 
 ########################################
@@ -175,7 +209,13 @@ sub _bm2type {
 sub typebm {				## historical
 	my $self = shift;					# uncoverable pod
 	$self->{typebm} = shift if scalar @_;
+	$self->_deprecate('prefer $rr->typelist() or $rr->typemap()');
 	return $self->{typebm};
+}
+
+sub covered {				## historical
+	my $self = shift;					# uncoverable pod
+	$self->covers(@_);
 }
 
 
@@ -227,6 +267,14 @@ into a string.
 typemap() returns a Boolean true value if the specified RRtype occurs
 in the type bitmap of the NSEC record.
 
+=head2 match
+
+    $matched = $rr->match( 'example.foo' );
+
+match() returns a Boolean true value if the canonical form of the name
+argument matches the canonical owner name of the NSEC RR.
+
+
 =head2 covers
 
     $covered = $rr->covers( 'example.foo' );
@@ -235,12 +283,28 @@ covers() returns a Boolean true value if the canonical form of the name,
 or one of its ancestors, falls between the owner name and the nxtdname
 field of the NSEC record.
 
+=head2 encloser, nextcloser, wildcard
+
+    $encloser = $rr->encloser( 'example.foo' );
+    print "encloser: $encloser\n" if $encloser;
+
+encloser() returns the name of a provable encloser of the query name
+argument obtained from the NSEC RR.
+
+nextcloser() returns the next closer name, which is one label longer
+than the closest encloser.
+This is only valid after encloser() has returned a valid domain name.
+
+wildcard() returns the unexpanded wildcard name from which the next
+closer name was possibly synthesised.
+This is only valid after encloser() has returned a valid domain name.
+
 
 =head1 COPYRIGHT
 
 Copyright (c)2001-2005 RIPE NCC.  Author Olaf M. Kolkman
 
-Portions Copyright (c)2018 Dick Franks
+Portions Copyright (c)2018-2019 Dick Franks
 
 All rights reserved.
 

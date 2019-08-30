@@ -26,6 +26,7 @@ Data-Object String Function (Eq) Class
 =description
 
 Data::Object::String::Func::Eq is a function object for Data::Object::String.
+This package inherits all behavior from L<Data::Object::String::Func>.
 
 =cut
 

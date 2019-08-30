@@ -30,11 +30,12 @@ Development Framework Entrypoint
 
 This package aims to provide a modern Perl development framework and
 foundational set of types, functions, classes, patterns, and interfaces for
-jump-starting application development.
+jump-starting application development. This package inherits all behavior from
+L<Data::Object::Config>.
 
 +=head1 RATIONALE
 
-This framework provides a framework for modern Perl development, embracing
+This package provides a framework for modern Perl development, embracing
 Perl's multi-paradigm programming nature, flexibility and vast ecosystem that
 many of engineers already know and love. The power of this framework comes from
 the extendable (yet fully optional) type library which is integrated into the

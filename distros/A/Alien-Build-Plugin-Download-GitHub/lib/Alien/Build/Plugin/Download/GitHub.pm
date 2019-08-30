@@ -11,7 +11,7 @@ use Alien::Build::Plugin::Download::Negotiate;
 use Alien::Build::Plugin::Extract::Negotiate;
 
 # ABSTRACT: Alien::Build plugin to download from GitHub
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 
 has github_user => sub { croak("github_user is required") };
@@ -52,7 +52,7 @@ sub init
         }
         elsif($res->{path})
         {
-          $rel = decode_json path($res->{path})->slurp_utf8;
+          $rel = decode_json path($res->{path})->slurp;
         }
         else
         {
@@ -107,7 +107,7 @@ Alien::Build::Plugin::Download::GitHub - Alien::Build plugin to download from Gi
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

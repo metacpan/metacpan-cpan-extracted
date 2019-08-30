@@ -1,4 +1,4 @@
-# $Id: 05-APL.t 1362 2015-06-23 08:47:14Z willem $	-*-perl-*-
+# $Id: 05-APL.t 1749 2019-07-21 09:15:55Z willem $	-*-perl-*-
 
 use strict;
 use Test::More tests => 31;
@@ -74,15 +74,15 @@ my $wire = '00010401e000021001ff00011c83c0a8260001000000020000';
 	$wire[length($empty) - 1]--;
 	my $wireformat = pack 'C*', @wire;
 	eval { decode Net::DNS::RR( \$wireformat ); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "corrupt wire-format\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "corrupt wire-format\t[$exception]" );
 }
 
 
 {
 	eval { new Net::DNS::RR("$name $type 0:0::0/0"); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "unknown address family\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "unknown address family\t[$exception]" );
 }
 
 

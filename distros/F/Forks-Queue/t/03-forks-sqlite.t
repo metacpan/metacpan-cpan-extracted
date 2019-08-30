@@ -7,13 +7,13 @@ PREP('SQLite');
 
 my $TEMP = TEMP_DIR();
 
-unlink "$TEMP/q3a", "$TEMP/q3b";
+unlink "$TEMP/q3s", "$TEMP/q3t";
 ok(-d $TEMP, 'queue directory exists');
-ok(! -f "$TEMP/q3a", 'queue file does not exist yet');
-ok(! -f "$TEMP/q3b", 'queue file does not exist yet');
+ok(! -f "$TEMP/q3s", 'queue file does not exist yet');
+ok(! -f "$TEMP/q3t", 'queue file does not exist yet');
 
-my $q1 = Forks::Queue->new( impl => 'SQLite', db_file => "$TEMP/q3a" );
-my $q2 = Forks::Queue->new( impl => 'SQLite', db_file => "$TEMP/q3b",
+my $q1 = Forks::Queue->new( impl => 'SQLite', db_file => "$TEMP/q3s" );
+my $q2 = Forks::Queue->new( impl => 'SQLite', db_file => "$TEMP/q3t",
                             persist => 1 );
 
 ok($q1 && ref($q1) eq 'Forks::Queue::SQLite',
@@ -22,13 +22,13 @@ ok($q1 && ref($q1) eq 'Forks::Queue::SQLite',
 exercise_forks($q1);
 
 undef $q1;
-ok(! -f "$TEMP/q3a", 'queue file destroyed when object left scope');
+ok(! -f "$TEMP/q3s", 'queue file destroyed when object left scope');
 
 ok($q2 && ref($q2) eq 'Forks::Queue::SQLite', 'got queue with correct type');
 exercise_forks($q2);
 undef $q2;
-ok(-f "$TEMP/q3b", 'queue with persist option not destroyed');
-unlink("$TEMP/q3b");
-ok(! -f "$TEMP/q3b", 'queue file removed manually');
+ok(-f "$TEMP/q3t", 'queue with persist option not destroyed');
+unlink("$TEMP/q3t");
+ok(! -f "$TEMP/q3t", 'queue file removed manually');
 
 done_testing;

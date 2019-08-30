@@ -4,7 +4,7 @@ use Data::Object 'Class';
 
 extends 'Data::Object::Scalar::Func';
 
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 # BUILD
 
@@ -63,6 +63,7 @@ Data-Object Scalar Function (Le) Class
 =head1 DESCRIPTION
 
 Data::Object::Scalar::Func::Le is a function object for Data::Object::Scalar.
+This package inherits all behavior from L<Data::Object::Scalar::Func>.
 
 =cut
 

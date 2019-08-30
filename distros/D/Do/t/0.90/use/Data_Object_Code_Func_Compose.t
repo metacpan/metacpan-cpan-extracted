@@ -26,6 +26,7 @@ Data-Object Code Function (Compose) Class
 =description
 
 Data::Object::Code::Func::Compose is a function object for Data::Object::Code.
+This package inherits all behavior from L<Data::Object::Code::Func>.
 
 =cut
 

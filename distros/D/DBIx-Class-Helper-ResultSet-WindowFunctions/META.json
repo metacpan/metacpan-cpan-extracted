@@ -80,7 +80,7 @@
    "provides" : {
       "DBIx::Class::Helper::ResultSet::WindowFunctions" : {
          "file" : "lib/DBIx/Class/Helper/ResultSet/WindowFunctions.pm",
-         "version" : "v0.2.0"
+         "version" : "v0.2.1"
       }
    },
    "release_status" : "stable",
@@ -95,12 +95,12 @@
          "web" : "https://github.com/robrwo/DBIx-Class-Helper-ResultSet-WindowFunctions"
       }
    },
-   "version" : "v0.2.0",
+   "version" : "v0.2.1",
    "x_authority" : "cpan:RRWO",
    "x_contributors" : [
       "Peter Rabbitson <ribasushi@leporine.io>"
    ],
    "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.09"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
 }
 

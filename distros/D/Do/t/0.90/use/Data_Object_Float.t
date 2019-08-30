@@ -22,6 +22,19 @@ Data-Object Float Class
 =description
 
 This package provides routines for operating on Perl 5 floating-point data.
+This package inherits all behavior from L<Data::Object::Float::Base>.
+
+This package assumes all behavior from the following roles:
+
+L<Data::Object::Role::Detract>
+
+L<Data::Object::Role::Dumper>
+
+L<Data::Object::Role::Functable>
+
+L<Data::Object::Role::Output>
+
+L<Data::Object::Role::Throwable>
 
 =cut
 

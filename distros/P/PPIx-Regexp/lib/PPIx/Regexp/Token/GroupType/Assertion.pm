@@ -34,9 +34,12 @@ use warnings;
 
 use base qw{ PPIx::Regexp::Token::GroupType };
 
-use PPIx::Regexp::Constant qw{ @CARP_NOT };
+use PPIx::Regexp::Constant qw{
+    COOKIE_LOOKAROUND_ASSERTION
+    @CARP_NOT
+};
 
-our $VERSION = '0.066';
+our $VERSION = '0.067';
 
 {
 	my $expl_nla	= 'Negative look-ahead assertion';
@@ -94,6 +97,22 @@ our $VERSION = '0.066';
 		},
 	    },
 	);
+}
+
+sub __match_setup {
+    my ( undef, $tokenizer ) = @_;	# $class not used
+    my $nest_depth = 1;
+    $tokenizer->cookie( COOKIE_LOOKAROUND_ASSERTION, sub {
+	    my ( undef, $token ) = @_;	# $tokenizer not used
+	    $token->isa( 'PPIx::Regexp::Token::Structure' )
+		and $nest_depth += ( {
+		    '('	=> 1,
+		    ')'	=> -1,
+		}->{ $token->content() } || 0 );
+	    return $nest_depth;
+	},
+    );
+    return;
 }
 
 1;

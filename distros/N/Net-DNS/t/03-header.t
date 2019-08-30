@@ -1,4 +1,4 @@
-# $Id: 03-header.t 1727 2018-12-31 12:04:48Z willem $
+# $Id: 03-header.t 1749 2019-07-21 09:15:55Z willem $
 
 use strict;
 use Test::More;
@@ -75,19 +75,15 @@ is( $header->adcount, $header->arcount, 'adcount value matches arcount' );
 
 foreach my $method (qw(qdcount ancount nscount arcount)) {
 	local $Net::DNS::Header::warned;
-	eval {
-		local $SIG{__WARN__} = sub { die @_ };
-		$header->$method(1);
-	};
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "$method read-only:\t[$exception]" );
+	local $SIG{__WARN__} = sub { die @_ };
 
-	eval {
-		local $SIG{__WARN__} = sub { die @_ };
-		$header->$method(1);
-	};
-	my $repeated = $1 if $@ =~ /^(.+)\n/;
-	ok( !$repeated, "$method exception not repeated" );
+	eval { $header->$method(1) };
+	my ($warning) = split /\n/, "$@\n";
+	ok( $warning, "$method read-only:\t[$warning]" );
+
+	eval { $header->$method(1) };
+	my ($repeated) = split /\n/, "$@\n";
+	ok( !$repeated, "warning not repeated:\t[$repeated]" );
 }
 
 

@@ -20,7 +20,8 @@ Functions for ArrayRefs
 =description
 
 Data::Object::Array::Func is an abstract base class for function classes in the
-Data::Object::Array::Func space.
+Data::Object::Array::Func space. This package inherits all behavior from
+L<Data::Object::Func>.
 
 =cut
 

@@ -22,7 +22,7 @@ Data-Object Exportable Functions
 =description
 
 This package is an exporter that provides various useful utility functions and
-function-bundles.
+function-bundles. This package inherits all behavior from L<Exporter>.
 
 +=head1 EXPORTS
 

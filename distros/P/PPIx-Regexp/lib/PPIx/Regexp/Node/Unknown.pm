@@ -9,7 +9,7 @@ use base qw{ PPIx::Regexp::Node };
 
 use PPIx::Regexp::Constant qw{ @CARP_NOT };
 
-our $VERSION = '0.066';
+our $VERSION = '0.067';
 
 
 1;

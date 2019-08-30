@@ -253,7 +253,7 @@ subtest 'live tests' => sub {
         unless($res->{success})
         {
           require Data::Dumper;
-          note Data::Dumper::Dumper($res);
+          diag Data::Dumper::Dumper($res);
         }
         $res;
       },

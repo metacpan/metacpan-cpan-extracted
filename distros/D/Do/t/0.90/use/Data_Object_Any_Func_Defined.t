@@ -26,6 +26,7 @@ Data-Object Any Function (Defined) Class
 =description
 
 Data::Object::Any::Func::Defined is a function object for Data::Object::Any.
+This package inherits all behavior from L<Data::Object::Any::Func>.
 
 =cut
 

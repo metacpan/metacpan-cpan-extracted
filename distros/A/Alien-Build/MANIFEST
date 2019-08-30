@@ -190,6 +190,7 @@ lib/Alien/Build/Plugin/Probe.pod
 lib/Alien/Build/Plugin/Probe/CBuilder.pm
 lib/Alien/Build/Plugin/Probe/CommandLine.pm
 lib/Alien/Build/Plugin/Test/Mock.pm
+lib/Alien/Build/Temp.pm
 lib/Alien/Build/Util.pm
 lib/Alien/Build/Version/Basic.pm
 lib/Alien/Build/rc.pm
@@ -277,6 +278,7 @@ t/alien_build_plugin_probe_cbuilder__live.t
 t/alien_build_plugin_probe_commandline.t
 t/alien_build_plugin_test_mock.t
 t/alien_build_rc.t
+t/alien_build_temp.t
 t/alien_build_tempdir.t
 t/alien_build_util.t
 t/alien_build_version_basic.t

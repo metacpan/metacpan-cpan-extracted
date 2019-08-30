@@ -7,6 +7,6 @@ PREP('File');
 
 my $TEMP = TEMP_DIR();
 
-exercise_join( impl => 'File', file1 => "$TEMP/q11a", file2 => "$TEMP/q11b" );
+exercise_join( impl => 'File', file1 => "$TEMP/q7f", file2 => "$TEMP/q7g" );
 
 done_testing;

@@ -7,7 +7,7 @@ use Scalar::Util ();
 
 use parent 'Data::Object::Base';
 
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 # BUILD
 
@@ -53,7 +53,8 @@ Data-Object Abstract Any Class
 
 =head1 DESCRIPTION
 
-Data::Object::Any::Base is an abstract base class for operating on any Perl 5 data type.
+Data::Object::Any::Base is an abstract base class for operating on any Perl 5
+data type. This package inherits all behavior from L<Data::Object::Base>.
 
 =cut
 

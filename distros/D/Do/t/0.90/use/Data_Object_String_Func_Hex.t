@@ -26,6 +26,7 @@ Data-Object String Function (Hex) Class
 =description
 
 Data::Object::String::Func::Hex is a function object for Data::Object::String.
+This package inherits all behavior from L<Data::Object::String::Func>.
 
 =cut
 

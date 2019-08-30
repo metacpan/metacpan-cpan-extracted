@@ -14,6 +14,12 @@ has path => (
   req => 1
 );
 
+has data => (
+  is => 'rw',
+  isa => 'HashRef',
+  def => sub{{}}
+);
+
 method name() {
   my $path = $self->path;
 
@@ -26,7 +32,7 @@ method package() {
   return $path =~ s/[\/\\]+/::/gr;
 }
 
-method parse(Str $file) {
+method parse($file) {
   return Data::Object::Data->new(file => $file);
 }
 
@@ -61,7 +67,7 @@ method use_file() {
   return $file;
 }
 
-method can_file(Str $test) {
+method can_file($test) {
   my $name = $self->name;
   my $file = File::Spec::Functions::catfile("t", "0.90", "can", "${name}_${test}.t");
 
@@ -84,14 +90,22 @@ method routines() {
     import
   );
 
+  my %seen;
+
   my $lines = $self->source($self->lib_file);
 
   my @finds = map { /^(?:$re)\s+([a-zA-Z]\w+).*\{$/ } @$lines;
 
-  return [sort grep !$ignore{$_}, @finds];
+  if ($self->data->{routines}) {
+    my %seen = map +($_, 1), @finds;
+
+    push @finds, grep !$seen{$_}++, @{$self->data->{routines}};
+  }
+
+  return [sort grep !$ignore{$_}, sort @finds];
 }
 
-method source(Str $file) {
+method source($file) {
   open my $fh, '<', "$file" or confess "Can't open $file: $!";
 
   return [map { chomp; $_ } <$fh>];

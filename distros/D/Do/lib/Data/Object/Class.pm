@@ -5,7 +5,7 @@ use warnings;
 
 use parent 'Moo';
 
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 # BUILD
 # METHODS

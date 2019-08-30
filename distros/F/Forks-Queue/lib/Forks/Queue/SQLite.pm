@@ -9,7 +9,7 @@ use Time::HiRes 'time';
 use base 'Forks::Queue';
 use 5.010;    #  using  // //=  operators
 
-our $VERSION = '0.09';
+our $VERSION = '0.11';
 our ($DEBUG,$XDEBUG);
 *DEBUG = \$Forks::Queue::DEBUG;
 *XDEBUG = \$Forks::Queue::XDEBUG;
@@ -63,11 +63,6 @@ sub new {
         } else {
             carp "Forks::Queue::new: 'list' option must be an array ref";
         }
-    }
-
-    if ($opts{remote}) {
-        require Net::Objwrap;
-        Net::Objwrap::wrap($opts{remote},$self);
     }
 
     return $self;
@@ -884,7 +879,7 @@ Forks::Queue::SQLite - SQLite-based implementation of Forks::Queue
 
 =head1 VERSION
 
-0.09
+0.11
 
 =head1 SYNOPSIS
 

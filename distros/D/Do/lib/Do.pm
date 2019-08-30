@@ -7,7 +7,7 @@ use warnings;
 
 use parent 'Data::Object';
 
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 1;
 
@@ -21,7 +21,7 @@ Do
 
 =head1 ABSTRACT
 
-Modern Perl Development Framework
+Modern Perl
 
 =cut
 
@@ -55,7 +55,8 @@ Modern Perl Development Framework
 
 This package aims to provide a modern Perl development framework and
 foundational set of types, functions, classes, patterns, and interfaces for
-jump-starting application development.
+jump-starting application development. This package inherits all behavior from
+L<Data::Object>.
 
 =head1 FRAMEWORK
 

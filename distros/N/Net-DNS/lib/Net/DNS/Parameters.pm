@@ -1,15 +1,15 @@
 package Net::DNS::Parameters;
 
 #
-# $Id: Parameters.pm 1729 2019-01-28 09:45:47Z willem $
+# $Id: Parameters.pm 1740 2019-04-04 14:45:31Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1729 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1740 $)[1];
 
 
 ################################################
 ##
 ##	Domain Name System (DNS) Parameters
-##	(last updated 2019-01-17)
+##	(last updated 2019-03-26)
 ##
 ################################################
 
@@ -129,6 +129,7 @@ my @typebyname = (
 	CAA	   => 257,					# RFC6844
 	AVC	   => 258,					#
 	DOA	   => 259,					# draft-durand-doa-over-dns
+	AMTRELAY   => 260,					# draft-ietf-mboned-driad-amt-discovery
 	TA	   => 32768,					# http://cameo.library.cmu.edu/ http://www.watson.org/~weiler/INI1999-19.pdf
 	DLV	   => 32769,					# RFC4431
 	);
@@ -144,7 +145,7 @@ my @opcodebyname = (
 	STATUS => 2,						# RFC1035
 	NOTIFY => 4,						# RFC1996
 	UPDATE => 5,						# RFC2136
-	DSO    => 6,						# RFC-ietf-dnsop-session-signal-20
+	DSO    => 6,						# RFC8490
 	);
 our %opcodebyval = reverse @opcodebyname;
 push @opcodebyname, map /^\d/ ? $_ : lc($_), @opcodebyname;
@@ -165,7 +166,7 @@ my @rcodebyname = (
 	NOTAUTH	  => 9,						# RFC2136
 	NOTAUTH	  => 9,						# RFC2845
 	NOTZONE	  => 10,					# RFC2136
-	DSOTYPENI => 11,					# RFC-ietf-dnsop-session-signal-20
+	DSOTYPENI => 11,					# RFC8490
 	BADVERS	  => 16,					# RFC6891
 	BADSIG	  => 16,					# RFC2845
 	BADKEY	  => 17,					# RFC2845
@@ -196,6 +197,9 @@ my @ednsoptionbyname = (
 	PADDING		=> 12,					# RFC7830
 	CHAIN		=> 13,					# RFC7901
 	'KEY-TAG'	=> 14,					# RFC8145
+	'CLIENT-TAG'	=> 16,					# draft-bellis-dnsop-edns-tags
+	'SERVER-TAG'	=> 17,					# draft-bellis-dnsop-edns-tags
+
 	DEVICEID	=> 26946,				# https://docs.umbrella.com/developer/networkdevices-api/identifying-dns-traffic2
 	);
 our %ednsoptionbyval = reverse @ednsoptionbyname;
@@ -226,9 +230,9 @@ our %ednsflagbyname = @ednsflagbyname;
 
 # Registry: DSO Type Codes
 my @dsotypebyname = (
-	KEEPALIVE	  => 0x0001,				# RFC-ietf-dnsop-session-signal-20
-	RETRYDELAY	  => 0x0002,				# RFC-ietf-dnsop-session-signal-20
-	ENCRYPTIONPADDING => 0x0003,				# RFC-ietf-dnsop-session-signal-20
+	KEEPALIVE	  => 0x0001,				# RFC8490
+	RETRYDELAY	  => 0x0002,				# RFC8490
+	ENCRYPTIONPADDING => 0x0003,				# RFC8490
 	);
 our %dsotypebyval = reverse @dsotypebyname;
 push @dsotypebyname, map /^\d/ ? $_ : lc($_), @dsotypebyname;

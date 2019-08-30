@@ -2,7 +2,7 @@ package App::Yath::Command::test;
 use strict;
 use warnings;
 
-our $VERSION = '0.001087';
+our $VERSION = '0.001090';
 
 use Test2::Harness::Util::TestFile;
 use Test2::Harness::Feeder::Run;
@@ -841,6 +841,12 @@ Dummy run, do not actually execute tests
 Set the work directory
 
 (Default: new temp directory)
+
+=item -f name:details
+
+=item --field '{"name": "NAME", "details": "DETAILS", "link": "LINK", "data":{...}}'
+
+Add custom harness_run_fields
 
 =item -j #
 
