@@ -1,7 +1,7 @@
 package Module::Abstract::CwaliteeCommon;
 
-our $DATE = '2019-07-08'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-07-26'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 1;
 # ABSTRACT: Common routines/data for Module::Abstract::Cwalitee
@@ -18,7 +18,7 @@ Module::Abstract::CwaliteeCommon - Common routines/data for Module::Abstract::Cw
 
 =head1 VERSION
 
-This document describes version 0.004 of Module::Abstract::CwaliteeCommon (from Perl distribution Module-Abstract-Cwalitee), released on 2019-07-08.
+This document describes version 0.005 of Module::Abstract::CwaliteeCommon (from Perl distribution Module-Abstract-Cwalitee), released on 2019-07-26.
 
 =head1 HOMEPAGE
 

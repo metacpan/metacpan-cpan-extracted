@@ -1,5 +1,8 @@
 Revision history for App-HomeBank2Ledger.
 
+0.006     2019-09-02 20:02:53-06:00 MST7MDT
+  * Add fatpack release.
+
 0.005     2019-08-17 16:26:33-06:00 MST7MDT
   * Add --budget option for converting HomeBank budget to Ledger.
   * Support quoting commodities when needed.

@@ -19,7 +19,7 @@
 
 use 5.006;
 use strict;
-use Test::More tests => 18;
+use Test::More tests => 19;
 
 use lib 't';
 use MyTestHelpers;
@@ -27,12 +27,15 @@ BEGIN { MyTestHelpers::nowarnings(); }
 
 use Math::OEIS::Stripped;
 
+# uncomment this to run the ### lines
+# use Smart::Comments;
+
 
 #------------------------------------------------------------------------------
 # VERSION
 
 {
-  my $want_version = 11;
+  my $want_version = 12;
   is ($Math::OEIS::Stripped::VERSION, $want_version,
       'VERSION variable');
   is (Math::OEIS::Stripped->VERSION,  $want_version,
@@ -98,6 +101,11 @@ diag "test filename: ",$test_stripped_filename;
     is (scalar(@values), 0);
     my $str = $stripped->anum_to_values_str('A111111');
     is ($str, undef);
+  }
+  {
+    my @values = $stripped->anum_to_values('A000002xyz');
+    is (join(':',@values), '',
+        'bogus A000002xyz should be not-found');
   }
 
   {

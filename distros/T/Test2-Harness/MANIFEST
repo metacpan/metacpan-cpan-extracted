@@ -28,6 +28,7 @@ lib/App/Yath/Command/watch.pm
 lib/App/Yath/Command/which.pm
 lib/App/Yath/Plugin.pm
 lib/App/Yath/Plugin/Git.pm
+lib/App/Yath/Plugin/SysInfo.pm
 lib/App/Yath/Util.pm
 lib/Test2/Formatter/QVF.pm
 lib/Test2/Formatter/Stream.pm

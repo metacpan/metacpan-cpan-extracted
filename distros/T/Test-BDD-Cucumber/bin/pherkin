@@ -6,7 +6,7 @@ pherkin - Execute tests written using Test::BDD::Cucumber
 
 =head1 VERSION
 
-version 0.59
+version 0.60
 
 =head1 SYNOPSIS
 
@@ -39,6 +39,9 @@ Controlling @INC
 Controlling Execution
 
  -m, --match            Only match steps in from features with available ones
+     --matching [mode]  Step function multiple matches behaviour:
+                        `first` (default) selects first match, `relaxed` warns
+                        and runs first match or `strict` stops execution
 
 Output formatting
 

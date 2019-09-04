@@ -7,7 +7,7 @@ use warnings;
 use Readonly;
 use Geoffrey::Action::Table;
 
-$Geoffrey::VERSION = '0.000201';
+$Geoffrey::VERSION = '0.000204';
 
 use parent 'Geoffrey::Role::Core';
 
@@ -66,6 +66,32 @@ sub write {
     return $self->writer->run($s_changelog_root, $s_schema, $dump);
 }
 
+sub delete {
+    my ($self, $s_changeset_id) = @_;
+    return $self->changelog_io->delete($s_changeset_id);
+}
+
+sub insert {
+    my ($self, $s_file, $hr_changeset) = @_;
+    return $self->changelog_io->insert($s_file, $hr_changeset);
+}
+
+sub rewrite {
+    my ($self, $hr_changeset) = @_;
+    return unless $hr_changeset->{id};
+    return $self->delete($hr_changeset->{id}) ? $self->insert(q//, [$hr_changeset]) : 0;
+}
+
+sub load_changeset {
+    my ($self, $s_changeset_id, $s_file) = @_;
+    if (!$s_changeset_id) {
+        require Geoffrey::Exception::RequiredValue;
+        Geoffrey::Exception::RequiredValue::throw_id();
+    }
+
+    return $self->changelog_io->load_changeset($s_changeset_id, $s_file);
+}
+
 1;
 
 __END__
@@ -80,7 +106,7 @@ Geoffrey - Continuous Database Migration
 
 =head1 VERSION
 
-Version 0.000201
+Version 0.000204
 
 =head1 DESCRIPTION
 
@@ -131,6 +157,22 @@ Creates changelog table if it's not existing.
 =head2 write
 
 Write main changelog file and sub changelog files
+
+=head2 delete
+
+Delete a specific changeset as long there's no md5hash yet.
+
+=head2 insert
+
+Insert a new changeset
+
+=head2 rewrite
+
+The sub delete and insert combined
+
+=head2 load_changeset
+
+Get the value of a changeset by given changeset id.
 
 =head1 MOTIVATION
 

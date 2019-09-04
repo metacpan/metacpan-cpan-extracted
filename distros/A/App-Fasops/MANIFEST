@@ -10,6 +10,7 @@ lib/App/Fasops/Command/check.pm
 lib/App/Fasops/Command/concat.pm
 lib/App/Fasops/Command/consensus.pm
 lib/App/Fasops/Command/covers.pm
+lib/App/Fasops/Command/create.pm
 lib/App/Fasops/Command/join.pm
 lib/App/Fasops/Command/links.pm
 lib/App/Fasops/Command/maf2fas.pm
@@ -50,6 +51,7 @@ t/18-stat.t
 t/19-mergecsv.t
 t/20-consensus.t
 t/21-vars.t
+t/22-create.t
 t/90-common-variations.t
 t/90-common.t
 t/91-common-trim.t
@@ -57,6 +59,7 @@ t/92-common-transform.t
 t/93-common-ld.t
 t/93-common-poa.t
 t/Arabid_thaliana.pair.fas
+t/I.connect.tsv
 t/NC_000932.fa
 t/NC_000932.fa.fai
 t/NC_007942.maf.gz.fas.gz
@@ -70,6 +73,8 @@ t/example.fa
 t/example.fas
 t/example.maf
 t/example.name.list
+t/genome.fa
+t/genome.fa.fai
 t/links.copy.csv
 t/links.count.csv
 t/refine.fas

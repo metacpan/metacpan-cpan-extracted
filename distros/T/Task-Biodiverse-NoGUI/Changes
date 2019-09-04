@@ -1,5 +1,17 @@
 Revision history for Perl module Task::Biodiverse::NoGUI
 
+3.001 20190903
+    - we need Geo::ShapeFile version 3.00
+
+3.00 20190903
+    - Update for release 3.00
+
+2.99_002 20181017
+    - Add Sort::Key::Natural
+
+2.99_001 20180825
+    - Add List::Unique::DeterministicOrder
+
 2.000 20171123
     - Set List::MoreUtils minimum version to 0.425 so we get the binary search subs
 

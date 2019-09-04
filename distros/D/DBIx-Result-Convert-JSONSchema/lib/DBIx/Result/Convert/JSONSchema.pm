@@ -1,10 +1,11 @@
 package DBIx::Result::Convert::JSONSchema;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 
 =head1 NAME
-    DBIx::Result::Convert::JSONSchema - Convert DBIx result schema to JSON schema
+
+DBIx::Result::Convert::JSONSchema - Convert DBIx result schema to JSON schema
 
 =begin html
 
@@ -15,7 +16,7 @@ our $VERSION = '0.04';
 
 =head1 VERSION
 
-    0.04
+    0.05
 
 =head1 SYNOPSIS
 
@@ -131,6 +132,7 @@ Returns somewhat equivalent JSON schema based on DBIx result source name.
         decimals_to_pattern             => 1,
         has_schema_property_description => 1,
         allow_additional_properties     => 0,
+        ignore_property_defaults        => 1,
         overwrite_schema_property_keys  => {
             name    => 'cat',
             address => 'dog',
@@ -181,9 +183,22 @@ Generate schema description for fields e.g. 'Optional numeric type value for fie
 
 B<Default>: 0
 
+=item * ignore_property_defaults
+
+Do not set schema B<default> property field based on default in DBIx schema
+
+B<Default>: 0
+
 =item * allow_additional_properties
 
 Define if the schema accepts additional keys in given payload.
+
+B<Default>: 0
+
+=item * add_property_minimum_value
+
+If field does not have format type add minimum values for number and string types based on DB field type.
+This might not make sense in most cases as the minimum is either 0 or the lower bound if number is signed.
 
 B<Default>: 0
 
@@ -238,9 +253,11 @@ sub get_json_schema {
     # additional schema generation options
     my $decimals_to_pattern             = $args->{decimals_to_pattern};
     my $has_schema_property_description = $args->{has_schema_property_description};
+    my $ignore_property_defaults        = $args->{ignore_property_defaults};
     my $overwrite_schema_property_keys  = $args->{overwrite_schema_property_keys} // {};
     my $add_schema_properties           = $args->{add_schema_properties};
     my $overwrite_schema_properties     = $args->{overwrite_schema_properties} // {};
+    my $add_property_minimum_value      = $args->{add_property_minimum_value};
     my %exclude_required                = map { $_ => 1 } @{ $args->{exclude_required} || [] };
     my %include_required                = map { $_ => 1 } @{ $args->{include_required} || [] };
     my %exclude_properties              = map { $_ => 1 } @{ $args->{exclude_properties} || [] };
@@ -285,7 +302,7 @@ sub get_json_schema {
 
         # DBIx schema size constraint -> JSON schema size constraint
         if ( ! $format_type && $self->length_map->{ $column_info->{data_type} } ) {
-            $self->_set_json_schema_property_range( \%json_schema, $column_info, $column );
+            $self->_set_json_schema_property_range( \%json_schema, $column_info, $column, $add_property_minimum_value );
         }
 
         # DBIx schema required -> JSON schema required
@@ -296,7 +313,7 @@ sub get_json_schema {
         }
 
         # DBIx schema defaults -> JSON schema defaults (no refs e.g. current_timestamp)
-        if ( $column_info->{default_value} && ! ref $column_info->{default_value} ) {
+        if ( ! $ignore_property_defaults && $column_info->{default_value} && ! ref $column_info->{default_value} ) {
             $json_schema{properties}->{ $column }->{default} = $column_info->{default_value};
         }
 
@@ -431,7 +448,7 @@ sub _get_json_schema_property_description {
 
 # Convert from DBIx field length to JSON schema field length based on field type
 sub _set_json_schema_property_range {
-    my ( $self, $json_schema, $column_info, $column ) = @_;
+    my ( $self, $json_schema, $column_info, $column, $add_property_minimum_value ) = @_;
 
     my $json_schema_min_type = $self->length_type_map->{ $self->type_map->{ $column_info->{data_type} } }->[0];
     my $json_schema_max_type = $self->length_type_map->{ $self->type_map->{ $column_info->{data_type} } }->[1];
@@ -439,10 +456,11 @@ sub _set_json_schema_property_range {
     my $json_schema_min = $self->_get_json_schema_property_min_max_value( $column_info, 0 );
     my $json_schema_max = $self->_get_json_schema_property_min_max_value( $column_info, 1 );
 
-    # bump min value to 0 (don't see how this starts from negative)
-    $json_schema_min = 0 if $column_info->{is_auto_increment};
+    # bump min value to 1 (don't see how this starts from negative)
+    $json_schema_min = 1 if $column_info->{is_auto_increment};
 
-    $json_schema->{properties}->{ $column }->{ $json_schema_min_type } = $json_schema_min;
+    $json_schema->{properties}->{ $column }->{ $json_schema_min_type } = $json_schema_min
+        if $add_property_minimum_value;
     $json_schema->{properties}->{ $column }->{ $json_schema_max_type } = $json_schema_max;
 
     if ( $column_info->{size} ) {

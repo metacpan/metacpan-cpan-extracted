@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use autodie;
 
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 use Exporter;
 use parent 'Exporter';
@@ -183,7 +183,7 @@ Date::Easy::Date - easy date class
 
 =head1 VERSION
 
-This document describes version 0.08 of Date::Easy::Date.
+This document describes version 0.09 of Date::Easy::Date.
 
 =head1 SYNOPSIS
 
@@ -358,7 +358,7 @@ via C<date>.  That range is 26-Apr-1970 17:46:40 to 2-Dec-1970 15:33:19.
 
 Any timezone portion specified in a string passed to C<date> is completely ignored.
 
-If you pass a 2-digit year to `date`, it will always come back in the 20th century:
+If you pass a 2-digit year to C<date>, it will always come back in the 20th century:
 
     say date("2/1/17"); # Thu Feb  1 00:00:00 1917
 

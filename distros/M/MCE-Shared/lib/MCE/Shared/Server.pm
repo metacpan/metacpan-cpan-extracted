@@ -13,7 +13,7 @@ no warnings qw( threads recursion uninitialized numeric once );
 
 package MCE::Shared::Server;
 
-our $VERSION = '1.846';
+our $VERSION = '1.848';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
@@ -33,29 +33,26 @@ my ($_has_threads, $_spawn_child, $_freeze, $_thaw);
 BEGIN {
    local $@;
 
-   eval 'use IO::FDPass ()'
-      if (!$INC{'IO/FDPass.pm'} && $^O ne 'cygwin');
+   eval 'use IO::FDPass ();'
+      if ( ! $INC{'IO/FDPass.pm'} && $^O ne 'cygwin' );
 
    $_has_threads = $INC{'threads.pm'} ? 1 : 0;
    $_spawn_child = $_has_threads  ? 0 : 1;
 
-   if (!defined $INC{'PDL.pm'}) {
-      eval '
-         use Sereal::Encoder 3.015 qw( encode_sereal );
-         use Sereal::Decoder 3.015 qw( decode_sereal );
-      ';
-      if ( !$@ ) {
+   if ( ! $INC{'PDL.pm'} ) {
+      eval 'use Sereal::Encoder 3.015; use Sereal::Decoder 3.015;';
+      if ( ! $@ ) {
          my $_encoder_ver = int( Sereal::Encoder->VERSION() );
          my $_decoder_ver = int( Sereal::Decoder->VERSION() );
          if ( $_encoder_ver - $_decoder_ver == 0 ) {
-            $_freeze = \&encode_sereal,
-            $_thaw   = \&decode_sereal;
+            $_freeze = \&Sereal::Encoder::encode_sereal;
+            $_thaw   = \&Sereal::Decoder::decode_sereal;
          }
       }
    }
 
-   if (!defined $_freeze) {
-      $_freeze = \&Storable::freeze,
+   if ( ! defined $_freeze ) {
+      $_freeze = \&Storable::freeze;
       $_thaw   = \&Storable::thaw;
    }
 }
@@ -284,18 +281,19 @@ sub _share {
       $_class = 'PDL', $_item = eval q{
          use PDL; my $_func = pop @{ $_item };
 
-         if    ($_func eq 'byte'    ) { byte     (@{ $_item }) }
-         elsif ($_func eq 'short'   ) { short    (@{ $_item }) }
-         elsif ($_func eq 'ushort'  ) { ushort   (@{ $_item }) }
-         elsif ($_func eq 'long'    ) { long     (@{ $_item }) }
-         elsif ($_func eq 'longlong') { longlong (@{ $_item }) }
-         elsif ($_func eq 'float'   ) { float    (@{ $_item }) }
-         elsif ($_func eq 'double'  ) { double   (@{ $_item }) }
-         elsif ($_func eq 'ones'    ) { ones     (@{ $_item }) }
-         elsif ($_func eq 'sequence') { sequence (@{ $_item }) }
-         elsif ($_func eq 'zeroes'  ) { zeroes   (@{ $_item }) }
-         elsif ($_func eq 'indx'    ) { indx     (@{ $_item }) }
-         else                         { pdl      (@{ $_item }) }
+         if    ($_func eq 'byte'    ) { byte     (@{ $_item }); }
+         elsif ($_func eq 'short'   ) { short    (@{ $_item }); }
+         elsif ($_func eq 'ushort'  ) { ushort   (@{ $_item }); }
+         elsif ($_func eq 'long'    ) { long     (@{ $_item }); }
+         elsif ($_func eq 'longlong') { longlong (@{ $_item }); }
+         elsif ($_func eq 'float'   ) { float    (@{ $_item }); }
+         elsif ($_func eq 'double'  ) { double   (@{ $_item }); }
+         elsif ($_func eq 'ones'    ) { ones     (@{ $_item }); }
+         elsif ($_func eq 'random'  ) { random   (@{ $_item }); }
+         elsif ($_func eq 'sequence') { sequence (@{ $_item }); }
+         elsif ($_func eq 'zeroes'  ) { zeroes   (@{ $_item }); }
+         elsif ($_func eq 'indx'    ) { indx     (@{ $_item }); }
+         else                         { pdl      (@{ $_item }); }
       };
    }
 
@@ -475,7 +473,7 @@ sub _destroy {
       elsif ($_obj{ $_id }->can('sync'))      { $_obj{ $_id }->sync();    }
       elsif ($_obj{ $_id }->can('db_sync'))   { $_obj{ $_id }->db_sync(); }
       elsif ($_obj{ $_id }->can('close'))     { $_obj{ $_id }->close();   }
-      elsif ($_obj{ $_id }->can('DESTROY'))   { $_obj{ $_id }->DESTROY(); }
+      elsif ($_obj{ $_id }->can('DESTROY'))   { delete $_obj{ $_id };     }
       elsif (reftype $_obj{ $_id } eq 'GLOB') {
          close $_obj{ $_id } if defined(fileno $_obj{ $_id });
       }
@@ -501,14 +499,14 @@ sub _exit {
    $SIG{__WARN__} = sub { };
 
    # Flush file handles.
-   for my $_o ( values %_obj ) {
-      if    ($_o->isa('Tie::File')) { $_o->flush();   }
-      elsif ($_o->can('sync'))      { $_o->sync();    }
-      elsif ($_o->can('db_sync'))   { $_o->db_sync(); }
-      elsif ($_o->can('close'))     { $_o->close();   }
-      elsif ($_o->can('DESTROY'))   { $_o->DESTROY(); }
-      elsif (reftype $_o eq 'GLOB') {
-         close $_o if defined(fileno $_o);
+   for my $_id ( keys %_obj ) {
+      if    ($_obj{ $_id }->isa('Tie::File')) { $_obj{ $_id }->flush();   }
+      elsif ($_obj{ $_id }->can('sync'))      { $_obj{ $_id }->sync();    }
+      elsif ($_obj{ $_id }->can('db_sync'))   { $_obj{ $_id }->db_sync(); }
+      elsif ($_obj{ $_id }->can('close'))     { $_obj{ $_id }->close();   }
+      elsif ($_obj{ $_id }->can('DESTROY'))   { delete $_obj{ $_id };     }
+      elsif (reftype $_obj{ $_id } eq 'GLOB') {
+         close $_obj{ $_id } if defined(fileno $_obj{ $_id });
       }
    }
 
@@ -1013,9 +1011,12 @@ sub _loop {
             if (@_ == 1) {
                ins( inplace($_obj{ $_id }), @_, 0, 0 );
             }
-            elsif (@_ == 2 && $_[0] =~ /^:,(\d+):(\d+)/) {
+            elsif (@_ == 2 && $_[0] =~ /^:,(\d+):(\d+)/ && ref($_[1])) {
                my $_s = $2 - $1;
                ins( inplace($_obj{ $_id }), $_[1]->slice(":,0:$_s"), 0, $1 );
+            }
+            elsif (!ref($_[0]) && $_[0] =~ /^(\d+)$/) {
+               $_obj{ $_id }->set(@_);
             }
             elsif (@_ == 2) {
                $_[0] =~ /^:,(\d+)/;
@@ -1899,7 +1900,7 @@ MCE::Shared::Server - Server/Object packages for MCE::Shared
 
 =head1 VERSION
 
-This document describes MCE::Shared::Server version 1.846
+This document describes MCE::Shared::Server version 1.848
 
 =head1 DESCRIPTION
 

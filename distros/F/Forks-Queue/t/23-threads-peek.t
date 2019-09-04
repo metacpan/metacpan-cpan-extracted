@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use lib '.';   # 5.26 compat
 
 # t/03_peek.t from Thread::Queue, but using threads and Forks::Queue
 # t/02_refs.t is not a suitable test for Forks::Queue.

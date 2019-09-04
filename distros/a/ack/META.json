@@ -34,7 +34,7 @@
          "requires" : {
             "Cwd" : "3.00",
             "File::Basename" : "1.00015",
-            "File::Next" : "1.16",
+            "File::Next" : "1.18",
             "File::Spec" : "3.00",
             "File::Temp" : "0.19",
             "Getopt::Long" : "2.39",
@@ -69,6 +69,6 @@
       },
       "x_MailingList" : "https://groups.google.com/group/ack-users"
    },
-   "version" : "v3.1.0",
+   "version" : "v3.1.1",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

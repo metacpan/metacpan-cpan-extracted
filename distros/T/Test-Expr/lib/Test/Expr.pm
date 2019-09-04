@@ -1,5 +1,5 @@
 package Test::Expr;
-our $VERSION = '0.000005';
+our $VERSION = '0.000007';
 
 use 5.012; use warnings;
 use Keyword::Declare;
@@ -15,7 +15,44 @@ sub _trim {
     return $str;
 }
 
-my $PERL_VAR = qr{ ((?&PerlVariable)) $PPR::GRAMMAR }xms;
+my $PERL_VAR     = qr{ ((?&PerlVariable)) $PPR::GRAMMAR }xms;
+my $PERL_LITERAL = qr{^ (?> (?&PerlString)
+                          | (?&PerlQuotelikeQR)
+                          | (?&PerlQuotelikeQW)
+                          | (?&PerlNumber)        )
+                      $
+                      $PPR::GRAMMAR
+                   }xms;
+
+my $PERL_EXPR = qr{
+    ^ (?>(?&PerlOWS))  (?<lhs> (?>(?&PerlHighBinaryExpression)) )
+      (?>(?&PerlOWS))  (?<op>  (?> [<>]=?|[=!]=|<=>|[~=!]=|\b(?:[lg]t|[lgn]e|eq|cmp)\b))
+      (?>(?&PerlOWS))  (?<rhs> .*)
+
+    (?(DEFINE)
+
+        (?<PerlHighBinaryExpression>
+                                (?>(?&PerlPrefixPostfixTerm))
+            (?: (?>(?&PerlOWS)) (?>(?&PerlInfixHighBinaryOperator))
+                (?>(?&PerlOWS))    (?&PerlPrefixPostfixTerm) )*+
+        )
+
+        (?<PerlInfixHighBinaryOperator>
+            (?>  [+]             (?! [+=] )
+            |     -              (?! [-=] )
+            |    [.]{2,3}+
+            |    [.%x]           (?! [=]  )
+            |    [&|^][.]        (?! [=]  )
+            |    [*&|/]{1,2}+    (?! [=]  )
+            |    [<>]{2}+        (?! [=]  )
+            |    \^              (?! [=]  )
+            )
+        ) # End of rule
+    )
+
+    $PPR::GRAMMAR
+
+}mxs;
 
 sub import {
     my ($package) = @_;
@@ -27,26 +64,62 @@ sub import {
 
     keyword ok (ListElem $test, Comma, ListElem $desc) {
         # Work out what values to report if there's a problem...
+        (my $test_code = $test) =~ s/^\s*do\s*\{(.*)\}\s*$/$1/;
+        (my $pos_test_code = $test_code) =~ s/^\s*(not)\b//;
+        my $negative = $pos_test_code eq $test_code ? q{} : 'not';
+        $pos_test_code =~ $PERL_EXPR;
+        my ($lhs, $op, $rhs) = @+{qw<lhs op rhs>};
+
+        my $test_setup;
+        my $test_expr;
+        if ($op) {
+            $test_setup = qq{my \$_____l_h_s_____ = $lhs; my \$_____r_h_s_____ = $rhs;};
+            $test_expr  = $negative . ' $_____l_h_s_____ '.$op.' $_____r_h_s_____';
+        }
+        else {
+            $lhs = "";
+            $rhs = "";
+            $test_setup = qq{my \$_____l_h_s_____ = $test_code;};
+            $test_expr = q{$_____l_h_s_____};
+        }
+
         my @vars = grep {defined} $test =~ m{$PERL_VAR}g;
-        my $var_len = max map {length} @vars;
-        my %seen;
-        my @diagnostics
-            = map {qq{diag sprintf(q{    %${var_len}s --> }, q{$_}), Data::Dump::dump($_);}}
+
+        ($lhs, $rhs, @vars) = map {_trim $_} $lhs, $rhs, @vars;
+
+        my $var_len = max map {length} $lhs, $rhs, @vars;
+        my %seen = ( $rhs => 1, $lhs => 1 );
+        my @diagnostics = (
+              ( $lhs && $lhs !~ $PERL_LITERAL
+                  ? qq{diag sprintf(q{    %${var_len}s --> }, '$lhs'),
+                      Data::Dump::dump(\$_____l_h_s_____);}
+                  : ()
+              ),
+              ( $rhs && $rhs !~ $PERL_LITERAL
+                  ? qq{diag sprintf(q{    %${var_len}s --> }, '$rhs'),
+                      Data::Dump::dump(\$_____r_h_s_____);}
+                  : ()
+              ),
+              map {qq{diag sprintf(q{    %${var_len}s --> }, q{$_}), Data::Dump::dump($_);}}
                   grep { !$seen{$_}++ }
-                       @vars;
+                       @vars
+        );
 
         unshift @diagnostics, qq{diag q{  because:};}
             if @diagnostics;
-        unshift @diagnostics, qq{diag q{}; diag q{  ($test) was false};}
-            if (eval($desc)//'') ne qq{$test};
+        unshift @diagnostics, qq{diag q{}; diag q{ ($test_code) was false};}
+            if (eval($desc)//'') ne qq{$test_code};
 
         # Build the test code...
         qq{
-            if ($test) {
-                Test::More::ok(1, $desc);
-            }
-            else {
-                fail($desc); @diagnostics diag q{};
+            {
+                $test_setup
+                if ($test_expr) {
+                    Test::More::ok(1, $desc);
+                }
+                else {
+                    fail($desc); @diagnostics diag q{};
+                }
             }
         };
     }
@@ -62,7 +135,7 @@ Test::Expr - Test an expression with better error messages
 
 =head1 VERSION
 
-This document describes Test::Expr version 0.000005
+This document describes Test::Expr version 0.000007
 
 
 =head1 SYNOPSIS

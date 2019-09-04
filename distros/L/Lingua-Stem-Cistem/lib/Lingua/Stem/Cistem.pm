@@ -10,7 +10,7 @@ use 5.010001;
 require Exporter;
 
 BEGIN {
-    $Lingua::Stem::Cistem::VERSION     = '0.04';
+    $Lingua::Stem::Cistem::VERSION     = '0.05';
     @Lingua::Stem::Cistem::ISA         = qw(Exporter);
     @Lingua::Stem::Cistem::EXPORT      = qw();
     @Lingua::Stem::Cistem::EXPORT_OK   = qw(stem segment stem_robust segment_robust);
@@ -259,7 +259,7 @@ Changes in this distribution applied to the L</OFFICIAL IMPLEMENTATION>:
 
 =item use strict, use warnings
 
-=item the method L</stem> is 6-9 % faster, L</sequence> keeps the speed
+=item the method L</stem> is 6-9 % faster, L</segment> keeps the speed
 
 =item undefined parameter word defaults to the empty string ''
 

@@ -11,7 +11,7 @@ use warnings;
 
 no warnings qw( threads recursion uninitialized );
 
-our $VERSION = '1.846';
+our $VERSION = '1.848';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitSubroutinePrototypes)
@@ -24,39 +24,34 @@ my ($_has_threads, $_freeze, $_thaw, $_tid, $_oid);
 BEGIN {
    local $@;
 
-   if ($^O eq 'MSWin32' && !$INC{'threads.pm'}) {
-      eval 'use threads; use threads::shared';
+   if ( $^O eq 'MSWin32' && ! $INC{'threads.pm'} ) {
+      eval 'use threads; use threads::shared;';
    }
-   elsif ($INC{'threads.pm'} && !$INC{'threads/shared.pm'}) {
-      eval 'use threads::shared';
+   elsif ( $INC{'threads.pm'} && ! $INC{'threads/shared.pm'} ) {
+      eval 'use threads::shared;';
    }
 
    $_has_threads = $INC{'threads.pm'} ? 1 : 0;
    $_tid = $_has_threads ? threads->tid() : 0;
    $_oid = "$$.$_tid";
 
-   if ($] ge '5.008008' && !$INC{'PDL.pm'}) {
-      eval '
-         use Sereal::Encoder 3.015 qw( encode_sereal );
-         use Sereal::Decoder 3.015 qw( decode_sereal );
-      ';
-      if ( !$@ ) {
+   if ( $] ge '5.008008' && ! $INC{'PDL.pm'} ) {
+      eval 'use Sereal::Encoder 3.015; use Sereal::Decoder 3.015;';
+      if ( ! $@ ) {
          my $_encoder_ver = int( Sereal::Encoder->VERSION() );
          my $_decoder_ver = int( Sereal::Decoder->VERSION() );
          if ( $_encoder_ver - $_decoder_ver == 0 ) {
-            $_freeze = \&encode_sereal,
-            $_thaw   = \&decode_sereal;
+            $_freeze = \&Sereal::Encoder::encode_sereal;
+            $_thaw   = \&Sereal::Decoder::decode_sereal;
          }
       }
    }
 
-   if (!defined $_freeze) {
+   if ( ! defined $_freeze ) {
       require Storable;
-      $_freeze = \&Storable::freeze,
+      $_freeze = \&Storable::freeze;
       $_thaw   = \&Storable::thaw;
    }
-
-   return;
 }
 
 use IO::Handle ();
@@ -1699,20 +1694,27 @@ sub gather {
       $_dest = (exists $_sendto_lkup{$_to}) ? $_sendto_lkup{$_to} : undef;
 
       if (!defined $_dest) {
-         if (ref $_to && defined (my $_fd = fileno($_to))) {
+         my $_fd;
+
+         if (ref $_to && ( defined ($_fd = fileno($_to)) ||
+                           defined ($_fd = $_to->fileno) )) {
+
             if (my $_ob = tied *{ $_to }) {
                if (ref $_ob eq 'IO::TieCombine::Handle') {
                   $_fd = 1 if (lc($_ob->{slot_name}) eq 'stdout');
                   $_fd = 2 if (lc($_ob->{slot_name}) eq 'stderr');
                }
             }
+
             my $_data_ref = (scalar @_ == 1) ? \$_[0] : \join('', @_);
             return _do_send_glob($self, $_to, $_fd, $_data_ref);
          }
+
          if (defined $_to && $_to =~ /$_v2_regx/o) {
             $_dest  = (exists $_sendto_lkup{$1}) ? $_sendto_lkup{$1} : undef;
             $_value = $2;
          }
+
          if (!defined $_dest || ( !defined $_value && (
                $_dest == SENDTO_FILEV2 || $_dest == SENDTO_FD
          ))) {
@@ -1750,16 +1752,16 @@ sub print {
    my $self = shift; $self = $MCE unless ref($self);
    my ($_fd, $_glob, $_data_ref);
 
-   if (ref $_[0] && $_[0]->can('fileno') && $_[0]->can('print')) {
-      $_fd = $_[0]->fileno, $_glob = shift;
-   }
-   elsif (ref $_[0] && defined ($_fd = fileno($_[0]))) {
+   if (ref $_[0] && ( defined ($_fd = fileno($_[0])) ||
+                      defined ($_fd = $_[0]->fileno) )) {
+
       if (my $_ob = tied *{ $_[0] }) {
          if (ref $_ob eq 'IO::TieCombine::Handle') {
             $_fd = 1 if (lc($_ob->{slot_name}) eq 'stdout');
             $_fd = 2 if (lc($_ob->{slot_name}) eq 'stderr');
          }
       }
+
       $_glob = shift;
    }
 
@@ -1780,16 +1782,16 @@ sub printf {
    my $self = shift; $self = $MCE unless ref($self);
    my ($_fd, $_glob, $_fmt, $_data);
 
-   if (ref $_[0] && $_[0]->can('fileno') && $_[0]->can('print')) {
-      $_fd = $_[0]->fileno, $_glob = shift;
-   }
-   elsif (ref $_[0] && defined ($_fd = fileno($_[0]))) {
+   if (ref $_[0] && ( defined ($_fd = fileno($_[0])) ||
+                      defined ($_fd = $_[0]->fileno) )) {
+
       if (my $_ob = tied *{ $_[0] }) {
          if (ref $_ob eq 'IO::TieCombine::Handle') {
             $_fd = 1 if (lc($_ob->{slot_name}) eq 'stdout');
             $_fd = 2 if (lc($_ob->{slot_name}) eq 'stderr');
          }
       }
+
       $_glob = shift;
    }
 
@@ -1805,16 +1807,16 @@ sub say {
    my $self = shift; $self = $MCE unless ref($self);
    my ($_fd, $_glob, $_data);
 
-   if (ref $_[0] && $_[0]->can('fileno') && $_[0]->can('print')) {
-      $_fd = $_[0]->fileno, $_glob = shift;
-   }
-   elsif (ref $_[0] && defined ($_fd = fileno($_[0]))) {
+   if (ref $_[0] && ( defined ($_fd = fileno($_[0])) ||
+                      defined ($_fd = $_[0]->fileno) )) {
+
       if (my $_ob = tied *{ $_[0] }) {
          if (ref $_ob eq 'IO::TieCombine::Handle') {
             $_fd = 1 if (lc($_ob->{slot_name}) eq 'stdout');
             $_fd = 2 if (lc($_ob->{slot_name}) eq 'stderr');
          }
       }
+
       $_glob = shift;
    }
 
@@ -1988,17 +1990,19 @@ sub _dispatch {
    ## results (non-thread workers only). Ditto for Math::Prime::Util,
    ## Math::Random, and Math::Random::MT::Auto.
 
-   if (!$self->{use_threads}) {
+   {
       my ($_wid, $_seed) = ($_args[1], $self->{_seed});
       srand(abs($_seed - ($_wid * 100000)) % 2147483560);
 
-      Math::Prime::Util::srand(abs($_seed - ($_wid * 100000)) % 2147483560)
-         if ( $INC{'Math/Prime/Util.pm'} );
+      if (!$self->{use_threads}) {
+         Math::Prime::Util::srand(abs($_seed - ($_wid * 100000)) % 2147483560)
+            if ( $INC{'Math/Prime/Util.pm'} );
 
-      MCE::Hobo->_clear()
-         if ( $INC{'MCE/Hobo.pm'} && MCE::Hobo->can('_clear') );
+         MCE::Hobo->_clear()
+            if ( $INC{'MCE/Hobo.pm'} && MCE::Hobo->can('_clear') );
 
-      MCE::Child->_clear() if $INC{'MCE/Child.pm'};
+         MCE::Child->_clear() if $INC{'MCE/Child.pm'};
+      }
    }
 
    if (!$self->{use_threads} && $INC{'Math/Random.pm'}) {

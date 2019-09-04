@@ -1,3 +1,11 @@
+1.000     2019-09-02 22:51:00 EDT
+  - Add encode_utf8/lax and decode_utf8/lax functions that will always use the
+    proper UTF-8 encoding rather than the Perl internal encoding used by these
+    functions in Encode. Unicode::UTF8 will be used by these functions if
+    installed. The new functions are now included as appropriate in the :strict
+    and :lax export tags, as well as the new :utf8 tag, and encode_utf8 and
+    decode_utf8 are exported by default as in Encode.
+
 0.003     2019-01-24 17:07:44 EST
   - Fix Encode::Unicode test to not rely on how invalid characters are encoded,
     since this changed in Encode 2.99.

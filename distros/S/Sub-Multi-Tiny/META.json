@@ -1,0 +1,108 @@
+{
+   "abstract" : "Multisubs/multimethods (multiple dispatch) yet another way!",
+   "author" : [
+      "Chris White <cxw@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.999",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Sub-Multi-Tiny",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Cwd" : "0",
+            "Parse::Yapp" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "Exporter" : "5.57",
+            "File::Spec" : "0",
+            "Guard" : "1.023",
+            "Import::Into" : "1.002005",
+            "Text::Balanced" : "2.01",
+            "attributes" : "0",
+            "perl" : "5.010001",
+            "strict" : "0",
+            "subs" : "0",
+            "vars" : "0",
+            "vars::i" : "1.10",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Config" : "0",
+            "IPC::Run3" : "0.047",
+            "Test::Fatal" : "0.014",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Sub::Multi::Tiny" : {
+         "file" : "lib/Sub/Multi/Tiny.pm",
+         "version" : "0.000003"
+      },
+      "Sub::Multi::Tiny::DefaultDispatcher" : {
+         "file" : "lib/Sub/Multi/Tiny/DefaultDispatcher.pm",
+         "version" : "0.000003"
+      },
+      "Sub::Multi::Tiny::SigParse" : {
+         "file" : "lib/Sub/Multi/Tiny/SigParse.pm"
+      },
+      "Sub::Multi::Tiny::Util" : {
+         "file" : "lib/Sub/Multi/Tiny/Util.pm",
+         "version" : "0.000003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/cxw42/Sub-Multi-Tiny/issues"
+      },
+      "homepage" : "https://github.com/cxw42/Sub-Multi-Tiny",
+      "repository" : {
+         "url" : "git://github.com/cxw42/Sub-Multi-Tiny.git",
+         "web" : "https://github.com/cxw42/Sub-Multi-Tiny"
+      }
+   },
+   "version" : "0.000003",
+   "x_authority" : "cpan:CXW",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "x_static_install" : 0
+}

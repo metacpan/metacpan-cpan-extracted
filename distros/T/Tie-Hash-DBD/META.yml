@@ -14,10 +14,10 @@ name: Tie-Hash-DBD
 provides: 
   Tie::Array::DBD: 
     file: lib/Tie/Array/DBD.pm
-    version: '0.19'
+    version: '0.20'
   Tie::Hash::DBD: 
     file: lib/Tie/Hash/DBD.pm
-    version: '0.19'
+    version: '0.20'
 recommends: 
   DBD::CSV: '0.54'
   DBD::Pg: v3.9.1
@@ -35,4 +35,4 @@ requires:
 resources: 
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/Tie-Hash-DBD
-version: '0.19'
+version: '0.20'

@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
   "NAME" => "POE::Component::ElasticSearch::Indexer",
   "PREREQ_PM" => {
     "Const::Fast" => 0,
+    "Digest::MD5" => 0,
     "Digest::SHA1" => 0,
     "Fcntl" => 0,
     "Getopt::Long::Descriptive" => 0,
@@ -54,7 +55,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Perl::Critic" => 0
   },
-  "VERSION" => "0.011",
+  "VERSION" => "0.012",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -63,6 +64,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Const::Fast" => 0,
+  "Digest::MD5" => 0,
   "Digest::SHA1" => 0,
   "Fcntl" => 0,
   "File::Spec" => 0,

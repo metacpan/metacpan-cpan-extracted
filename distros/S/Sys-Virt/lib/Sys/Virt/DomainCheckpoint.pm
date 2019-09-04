@@ -60,14 +60,14 @@ sub _new {
     return $self;
 }
 
-=item my $str = $domss->get_name()
+=item my $str = $domchkp->get_name()
 
 Return the name of the checkpoint
 
-=item my $xml = $domss->get_xml_description($flags)
+=item my $xml = $domchkp->get_xml_description($flags)
 
 Returns an XML document containing a complete description of
-the domain's configuration. The C<$flags> parameter
+the domain checkpoints' configuration. The C<$flags> parameter
 accepts the following constants
 
 =over 4
@@ -87,22 +87,22 @@ Supress <domain> sub-element
 
 =back
 
-=item $domss->delete($flags)
+=item $domchkp->delete($flags)
 
 Deletes this checkpoint object & its data. The optional C<$flags> parameter controls
 what should be deleted via the C<Sys::Virt::DomainCheckpoint::DELETE_*>
 constants.
 
-=item $parentss = $domss->get_parent();
+=item $parentchkp = $domchkp->get_parent();
 
 Return the parent of the checkpoint, if any
 
-=item $res = $domss->has_metadata()
+=item $res = $domchkp->has_metadata()
 
 Returns a true value if this checkpoint has metadata associated with
 it.
 
-=item my @checkpoints = $domss->list_all_children($flags)
+=item my @checkpoints = $domchkp->list_all_children($flags)
 
 Return a list of all domain checkpoints that are children of this
 checkpoint. The elements in the returned list are instances of the

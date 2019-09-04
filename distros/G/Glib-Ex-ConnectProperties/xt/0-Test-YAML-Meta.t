@@ -1,8 +1,8 @@
 #!/usr/bin/perl -w
 
-# 0-Test-YAML-Meta.t -- run Test::YAML::Meta if available
+# 0-Test-YAML-Meta.t -- run Test::CPAN::Meta::YAML if available
 
-# Copyright 2009, 2010, 2011 Kevin Ryde
+# Copyright 2009, 2010, 2011, 2013, 2014, 2017 Kevin Ryde
 
 # 0-Test-YAML-Meta.t is shared by several distributions.
 #
@@ -29,35 +29,31 @@ unless (-e $meta_filename) {
   plan skip_all => "$meta_filename doesn't exist -- assume this is a working directory not a dist";
 }
 
-eval { require CPAN::Meta::Validator; 1 }
-  or plan skip_all => "due to CPAN::Meta::Validator not available -- $@";
+plan tests => 3;
 
-eval { require YAML; 1 }
-  or skip "due to YAML module not available -- $@", 1;
+SKIP: {
+  eval { require CPAN::Meta::Validator; 1 }
+    or skip "due to CPAN::Meta::Validator not available -- $@";
+  eval { require YAML; 1 }
+    or skip "due to YAML module not available -- $@", 1;
+  diag "CPAN::Meta::Validator version ", CPAN::Meta::Validator->VERSION;
 
-plan tests => 1;
+  my $struct = YAML::LoadFile ($meta_filename);
+  my $cmv = CPAN::Meta::Validator->new($struct);
+  ok ($cmv->is_valid);
+  if (! $cmv->is_valid) {
+    diag "CPAN::Meta::Validator errors:";
+    foreach ($cmv->errors) { diag $_; }
+  }
+}
 
-my $struct = YAML::LoadFile ($meta_filename);
+{
+  # Test::CPAN::Meta::YAML version 0.15 for upper case "optional_features" names
+  #
+  eval 'use Test::CPAN::Meta::YAML 0.15; 1'
+    or plan skip_all => "due to Test::CPAN::Meta::YAML 0.15 not available -- $@";
 
-my $cmv = CPAN::Meta::Validator->new($struct);
-ok ($cmv->is_valid);
-if (! $cmv->is_valid) {
-  diag "CPAN::Meta::Validator errors:";
-  foreach ($cmv->errors) { diag $_; }
+  Test::CPAN::Meta::YAML::meta_spec_ok('META.yml');
 }
 
 exit 0;
-
-
-
-
-
-
-
-
-# # Test::CPAN::Meta::YAML version 0.15 for upper case "optional_features" names
-# #
-# eval 'use Test::YAML::Meta 0.15; 1'
-#   or plan skip_all => "due to Test::CPAN::Meta::YAML 0.15 not available -- $@";
-#
-# Test::CPAN::Meta::YAML::meta_yaml_ok();

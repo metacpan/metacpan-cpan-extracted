@@ -29,11 +29,12 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
+    "Test::Exception" => 0,
     "Test::More" => 0,
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.0501",
+  "VERSION" => "0.0507",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,6 +50,7 @@ my %FallbackPrereqs = (
   "Moo" => 2,
   "Music::Note" => 0,
   "Music::Scales" => 0,
+  "Test::Exception" => 0,
   "Test::More" => 0,
   "namespace::clean" => 0,
   "strict" => 0,

@@ -80,9 +80,9 @@ The purpose is that one needs one of these URLs in order to have the option to
 stream the station in one's own choice of audio player software rather than 
 using their web browser and accepting any / all flash, ads, javascript, 
 cookies, trackers, web-bugs, and other crapware that can come with that method 
-of playing.  The author uses his own custom all-purpose audio player called 
+of playing.  The author uses his own custom all-purpose media player called 
 "fauxdacious" (his custom hacked version of the open-source "audacious" 
-media player).  "fauxdacious" can incorporate this module to decode and play 
+audio player).  "fauxdacious" can incorporate this module to decode and play 
 Radionomy.com streams.
 
 One or more streams can be returned for each station.  
@@ -189,7 +189,7 @@ L<http://search.cpan.org/dist/StreamFinder-Radionomy/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Jim Turner.
+Copyright 2017-2019 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -248,7 +248,7 @@ sub new
 	my $class = shift;
 	my $url = shift;
 	while (@_) {
-		if ($_[0] =~ /^debug$/o) {
+		if ($_[0] =~ /^\-?debug$/o) {
 			shift;
 			$DEBUG = (defined($_[0]) && $_[0] =~/^[0-9]$/) ? shift : 1;
 		}

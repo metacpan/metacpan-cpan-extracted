@@ -27,16 +27,16 @@ name: Date-Easy
 provides:
   Date::Easy:
     file: lib/Date/Easy.pm
-    version: '0.08'
+    version: '0.09'
   Date::Easy::Date:
     file: lib/Date/Easy/Date.pm
-    version: '0.08'
+    version: '0.09'
   Date::Easy::Datetime:
     file: lib/Date/Easy/Datetime.pm
-    version: '0.08'
+    version: '0.09'
   Date::Easy::Units:
     file: lib/Date/Easy/Units.pm
-    version: '0.08'
+    version: '0.09'
 requires:
   Carp: '0'
   Date::Parse: '1.17'
@@ -54,6 +54,6 @@ resources:
   bugtracker: http://github.com/barefootcoder/date-easy/issues
   homepage: https://github.com/barefootcoder/date-easy
   repository: https://github.com/barefootcoder/date-easy.git
-version: '0.08'
+version: '0.09'
 x_generated_by_perl: v5.14.4
 x_serialization_backend: 'YAML::Tiny version 1.73'

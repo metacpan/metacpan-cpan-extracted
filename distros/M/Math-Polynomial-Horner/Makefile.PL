@@ -1,6 +1,6 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -w
 
-# Copyright 2010, 2011 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2014, 2015, 2019 Kevin Ryde
 
 # This file is part of Math-Polynomial-Horner.
 #
@@ -21,36 +21,35 @@ use 5.006;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
-use lib 'inc';
-use MyMakeMakerExtras;
 
-MyMakeMakerExtras::WriteMakefile
+my %PREREQ_PM = ('Math::Polynomial' => 1,
+                );
+my %TEST_REQUIRES = ('Test::More' => 0,
+                    );
+
+unless (eval { ExtUtils::MakeMaker->VERSION(6.64) }) {
+  # past ExtUtils::MakeMaker without separate TEST_REQUIRES
+  %PREREQ_PM = (%PREREQ_PM, %TEST_REQUIRES);
+}
+
+WriteMakefile
   (NAME         => 'Math::Polynomial::Horner',
    ABSTRACT     => 'Stringizing Math::Polyomial objects in Horner form.',
    VERSION_FROM => 'lib/Math/Polynomial/Horner.pm',
-   PREREQ_PM    => {
-                    'Math::Polynomial' => 1,
-                    'Test::More' => 0,
-                   },
-   AUTHOR       => 'Kevin Ryde <user42@zip.com.au>',
-   LICENSE      => 'gpl',
+   AUTHOR       => 'Kevin Ryde <user42_kevin@yahoo.com.au>',
+   LICENSE      => 'gpl_3',
    SIGN         => 1,
    # Math::Polynomial itself is 5.006
    MIN_PERL_VERSION => 5.006,
 
+   PREREQ_PM        => \%PREREQ_PM,
+   TEST_REQUIRES    => \%TEST_REQUIRES,
+
    META_MERGE =>
    { resources =>
-     { homepage =>
-       'http://user42.tuxfamily.org/math-polynomial-horner/index.html',
+     { homepage => 'http://user42.tuxfamily.org/math-polynomial-horner/index.html',
+       license  => 'http://www.gnu.org/licenses/gpl.html',
      },
-     optional_features =>
-     { maximum_devel =>
-       { description => 'Stuff used variously for development.',
-         requires => { 'Smart::Comments' => 0,
-                       'Math::BigRat'    => 0,
-                       'B::Concise'      => 0,
-                     },
-       },
-     },
+     no_index => { directory=>['devel','xt'] },
    },
   );

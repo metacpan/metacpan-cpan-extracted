@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2017 Kevin Ryde
 
 # This file is part of Glib-Ex-ConnectProperties.
 #
@@ -21,10 +21,8 @@ use strict;
 use warnings;
 use base 'Glib::Ex::ConnectProperties::Element';
 
-our $VERSION = 19;
+our $VERSION = 20;
 
-# uncomment this to run the ### lines
-#use Smart::Comments;
 
 sub find_property {
   my ($self) = @_;
@@ -80,7 +78,7 @@ L<http://user42.tuxfamily.org/glib-ex-connectproperties/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012 Kevin Ryde
+Copyright 2010, 2011, 2012, 2017 Kevin Ryde
 
 Glib-Ex-ConnectProperties is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License as published by

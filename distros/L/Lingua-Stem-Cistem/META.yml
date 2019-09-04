@@ -29,5 +29,7 @@ resources:
   bugtracker: https://github.com/wollmers/Lingua-Stem-Cistem/issues
   homepage: https://github.com/wollmers/Lingua-Stem-Cistem
   repository: https://github.com/wollmers/Lingua-Stem-Cistem.git
-version: '0.04'
+version: '0.05'
+x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
 x_serialization_backend: 'YAML::Tiny version 1.66'

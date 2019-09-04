@@ -10,7 +10,7 @@ WriteMakefile(
     MIN_PERL_VERSION   => 5.24.0,
     PL_FILES      => {},
     PREREQ_PM     => {
-        'Geoffrey'      => 0.000200,
+        'Geoffrey'      => 0.000202,
         'SQL::Abstract' => 0,
     },
     TEST_REQUIRES => {

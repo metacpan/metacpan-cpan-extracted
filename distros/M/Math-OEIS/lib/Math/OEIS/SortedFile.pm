@@ -28,12 +28,15 @@ eval q{use Scalar::Util 'weaken'; 1}
   || eval q{sub weaken { $_[0] = undef }; 1 }
     || die "Oops, error making a weaken() fallback: $@";
 
-our $VERSION = 11;
+our $VERSION = 12;
 
 # singleton here results in a separate instance object in each derived subclass
 use Class::Singleton;
 our @ISA = ('Class::Singleton');
 *_new_instance = __PACKAGE__->can('new');
+
+# uncomment this to run the ### lines
+# use Smart::Comments;
 
 
 # Keep track of all instances which exist and on an ithread CLONE re-open
@@ -103,14 +106,12 @@ sub close {
 }
 
 # $line is a line from the names or stripped file.
-# Return the A-number string from the line such as "A000001", or empty string
-# if unrecognised or a comment line etc.
+# Return the A-number string from the line such as "A000001",
+# or empty string if unrecognised or a comment line etc.
 sub line_to_anum {
   my ($self, $line) = @_;
-  ### $line
-  $line =~ s/^(A\d+).*/$1/
-    or return '';  # comment lines
-  return $line;
+  ### line_to_anum(): $line
+  return ($line =~ /^(A\d{6,})/ ? $1 : '');
 }
 
 # $anum is an A-number string like "A000001".
@@ -135,7 +136,20 @@ sub anum_to_line {
     my $err = "$!";
     croak 'Error reading ',$self->filename_or_empty,': ',$err;
   }
-  return readline $fh;
+
+  # Ensure the line is in fact the $anum requested, since a bad $anum causes
+  # Search::Dict::look() to return the file position before where it would
+  # be found if it were present.
+  #
+  my $line = readline $fh;
+  ### found line: $line
+  my $got_anum = $self->line_to_anum($line);
+  ### $got_anum
+  ### len: length($got_anum)
+  ### which is anum: $self->line_to_anum($line)
+  return ($self->line_to_anum($line) eq $anum
+          ? $line
+          : undef);
 }
 
 1;

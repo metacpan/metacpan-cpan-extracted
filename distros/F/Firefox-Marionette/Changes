@@ -1,5 +1,9 @@
 Revision history for Firefox-Marionette
 
+0.82  Mon Sep  4 21:15:00 2019
+       Fixes for HAR (HTTP Archive) files.
+       Added experimental support for adding CAs using certutil.
+
 0.81  Sun Aug 11 20:22:00 2019
        Improved ssh support for remote firefox, including addons and downloads.
        Added experimental support for HAR (HTTP Archive) files.

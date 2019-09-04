@@ -39,7 +39,7 @@ DESCRIPTION
 
     use strict, use warnings
 
-    the method "stem" is 6-9 % faster, "sequence" keeps the speed
+    the method "stem" is 6-9 % faster, "segment" keeps the speed
 
     undefined parameter word defaults to the empty string ''
 

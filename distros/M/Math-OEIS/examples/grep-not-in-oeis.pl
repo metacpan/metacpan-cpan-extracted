@@ -54,7 +54,7 @@ use PerlIO::encoding;
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
-our $VERSION = 11;
+our $VERSION = 12;
 $|=1;
 
 # output coding for the benefit of Math::OEIS::Grep printing sequence names

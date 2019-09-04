@@ -15,9 +15,9 @@ use Ref::Util qw/ is_plain_hashref is_ref /;
 
 # RECOMMEND PREREQ: Ref::Util::XS
 
-use namespace::autoclean;
+use namespace::clean;
 
-our $VERSION = 'v0.1.2';
+our $VERSION = 'v0.1.3';
 
 
 
@@ -111,7 +111,7 @@ DBIx::Class::Helper::SimpleStats - Simple grouping and aggregate functions for D
 
 =head1 VERSION
 
-version v0.1.2
+version v0.1.3
 
 =head1 SYNOPSIS
 

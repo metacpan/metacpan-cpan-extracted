@@ -354,6 +354,11 @@ is $batch->[1]{queue}, 'default', 'right queue';
 is $batch->[2]{queue}, 'default', 'right queue';
 is $batch->[3]{queue}, 'default', 'right queue';
 ok !$batch->[4], 'no more results';
+$id2   = $minion->enqueue('test' => [] => {notes => {is_test => 1}});
+$batch = $minion->backend->list_jobs(0, 10, {notes => ['is_test']})->{jobs};
+is $batch->[0]{task}, 'test', 'right task';
+ok !$batch->[4], 'no more results';
+ok $minion->job($id2)->remove, 'job removed';
 $batch
   = $minion->backend->list_jobs(0, 10, {queues => ['does_not_exist']})->{jobs};
 is_deeply $batch, [], 'no results';
@@ -532,8 +537,16 @@ $minion->once(
           finish => sub {
             my $job = shift;
             return unless defined(my $old = $job->info->{notes}{finish_count});
-            $job->note(finish_count => $old + 1, pid => $$);
+            $job->note(finish_count => $old + 1, finish_pid => $$);
           }
+        );
+        # introduced in Minion v9.13
+        $job->on(
+            cleanup => sub {
+                my $job = shift;
+                return unless defined(my $old = $job->info->{notes}{finish_count});
+                $job->note(cleanup_count => $old + 1, cleanup_pid => $$);
+            }
         );
       }
     );
@@ -571,9 +584,16 @@ $job = $worker->dequeue(0);
 $job->perform;
 is_deeply $job->info->{result}, {added => 9}, 'right result';
 is $job->info->{notes}{finish_count}, 1, 'finish event has been emitted once';
-ok $job->info->{notes}{pid},    'has a process id';
-isnt $job->info->{notes}{pid},  $$, 'different process id';
+ok $job->info->{notes}{finish_pid},    'has a process id';
+isnt $job->info->{notes}{finish_pid},  $$, 'different process id';
 is $job->info->{notes}{before}, 23, 'value still exists';
+SKIP: {
+    skip "Cleanup event introduced in Minion v9.13", 3
+        if ($Minion::VERSION < 9.13);
+    is $job->info->{notes}{cleanup_count}, 2, 'cleanup event has been emitted once';
+    ok $job->info->{notes}{cleanup_pid},   'has a process id';
+    isnt $job->info->{notes}{cleanup_pid}, $$, 'different process id';
+}
 $worker->unregister;
 
 # Queues
@@ -646,6 +666,9 @@ my $notes = {
 };
 is_deeply $job->info->{notes}, $notes, 'right metadata';
 is_deeply $job->info->{result}, [{23 => 'testtesttest'}], 'right structure';
+ok $job->note(yada => undef, bar => undef), 'removed metadata';
+$notes = {foo => [4, 5, 6], baz => 'yada'};
+is_deeply $job->info->{notes}, $notes, 'right metadata';
 $worker->unregister;
 
 # Perform job in a running event loop
@@ -799,13 +822,17 @@ $job = $worker->dequeue(0);
 ok $job->start->pid, 'has a process id';
 ok !$job->is_finished, 'job is not finished';
 usleep 5000 until $job->info->{notes}{started};
-$job->kill('USR1');
-$job->kill('USR2');
-is $job->info->{state}, 'active', 'right state';
-$job->kill('INT');
-usleep 5000 until $job->is_finished;
-is $job->info->{state}, 'failed', 'right state';
-like $job->info->{result}, qr/Non-zero exit status/, 'right result';
+SKIP: {
+    skip "Kill method introduced in Minion v9.06", 4
+        if ($Minion::VERSION < 9.06);
+    $job->kill('USR1');
+    $job->kill('USR2');
+    is $job->info->{state}, 'active', 'right state';
+    $job->kill('INT');
+    usleep 5000 until $job->is_finished;
+    is $job->info->{state}, 'failed', 'right state';
+    like $job->info->{result}, qr/Non-zero exit status/, 'right result';
+}
 $worker->unregister;
 
 # Job dependencies

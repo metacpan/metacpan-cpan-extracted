@@ -1,0 +1,63 @@
+#!/usr/bin/env perl
+
+use 5.022;
+use strict;
+use warnings;
+use Math::DifferenceSet::Planar;
+
+$| = 1;
+
+while (<<>>) {
+    s/^\s+//;
+    my @e = split /\s+/;
+    next if !@e;
+
+    die "integer numbers separated by whitespace expected\n"
+        if grep { !/^(?:0|[1-9][0-9]*)\z/ } @e;
+    die "not a planar difference set\n"
+        if !Math::DifferenceSet::Planar->verify_elements(@e);
+
+    my $s = Math::DifferenceSet::Planar->from_elements(@e);
+    my $m = $s->modulus;
+
+    foreach my $d (0 .. $m-1) {
+        my $s2 = $s->translate($d);
+        my @e2 = $s2->elements;
+        print "@e2\n";
+    }
+}
+
+__END__
+=head1 NAME
+
+pds_enumerate - enumerate all translates of planar difference sets
+
+=head1 SYNOPSIS
+
+  pds_enumerate [file]...
+
+=head1 DESCRIPTION
+
+This example program reads planar difference sets, one per line, as
+integer numbers separated by whitespace, generates all translates of
+these sets, and writes the result to standard output.
+
+=head1 AUTHOR
+
+Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2019 by Martin Becker, Blaubeuren.  All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=head1 DISCLAIMER OF WARRANTY
+
+This library is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of merchantability
+or fitness for a particular purpose.
+
+=cut

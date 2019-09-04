@@ -1,7 +1,7 @@
 package Pod::PseudoPod::HTML;
 use strict;
 use vars qw( $VERSION );
-$VERSION = '0.18';
+$VERSION = '0.19';
 use Carp ();
 use base qw( Pod::PseudoPod );
 

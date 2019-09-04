@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2017 Kevin Ryde
 
 # This file is part of Glib-Ex-ConnectProperties.
 #
@@ -25,10 +25,7 @@ use Glib;
 use Gtk2;
 use base 'Glib::Ex::ConnectProperties::Element';
 
-our $VERSION = 19;
-
-# uncomment this to run the ### lines
-#use Smart::Comments;
+our $VERSION = 20;
 
 
 # For reference, among the various "-set" and "-changed" signals,
@@ -227,7 +224,7 @@ L<http://user42.tuxfamily.org/glib-ex-connectproperties/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012 Kevin Ryde
+Copyright 2010, 2011, 2012, 2017 Kevin Ryde
 
 Glib-Ex-ConnectProperties is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License as published by

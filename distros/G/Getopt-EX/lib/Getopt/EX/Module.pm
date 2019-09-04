@@ -458,9 +458,10 @@ This module is usually used from L<Getopt::EX::Loader>, and keeps
 all data about loaded rc file or module.
 
 After user defined module was loaded, subroutine C<initialize> is
-called if it exists in the module, then this container object is
-passed to the function as a first argument.  So you can use it to
-directly touch the object contents through class interface.
+called if it exists in the module.  At this time, container object is
+passed to the function as the first argument and following command
+argument pointer as the second.  So you can use it to directly touch
+the object contents through class interface.
 
 
 =head1 RC FILE FORMAT

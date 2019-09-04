@@ -35,4 +35,4 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: git://github.com/wreis/DBIx-Class-EncodedColumn.git
-version: '0.00016'
+version: '0.00017'

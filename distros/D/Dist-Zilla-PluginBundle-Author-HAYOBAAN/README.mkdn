@@ -4,7 +4,7 @@ Dist::Zilla::PluginBundle::Author::HAYOBAAN - Hayo Baan's Dist::Zilla configurat
 
 # VERSION
 
-version 0.013
+version 0.014
 
 # DESCRIPTION
 
@@ -19,8 +19,9 @@ following plugins are (conditionally) installed and configured:
 - [Git::GatherDir](https://metacpan.org/pod/Dist::Zilla::Plugin::Git::GatherDir)
 - [PruneCruft](https://metacpan.org/pod/Dist::Zilla::Plugin::PruneCruft)
 - [ManifestSkip](https://metacpan.org/pod/Dist::Zilla::Plugin::ManifestSkip)
-- [PodWeaver](https://metacpan.org/pod/Dist::Zilla::Plugin::PodWeaver) (or [SurgicalPodWeaver](https://metacpan.org/pod/Dist::Zilla::Plugin::SurgicalPodWeaver) when enabled)
+- [PodWeaver](https://metacpan.org/pod/Dist::Zilla::Plugin::PodWeaver) (and [SurgicalPodWeaver](https://metacpan.org/pod/Dist::Zilla::Plugin::SurgicalPodWeaver) when enabled)
 - [ReadmeAnyFromPod](https://metacpan.org/pod/Dist::Zilla::Plugin::ReadmeAnyFromPod) (both Text and Markdown generation are configured)
+- [Dist::Zilla::Plugin::MetaYAML](https://metacpan.org/pod/Dist::Zilla::Plugin::MetaYAML)
 - [License](https://metacpan.org/pod/Dist::Zilla::Plugin::License)
 - [InstallGuide](https://metacpan.org/pod/Dist::Zilla::Plugin::InstallGuide)
 - [MinimumPerl](https://metacpan.org/pod/Dist::Zilla::Plugin::MinimumPerl)
@@ -60,13 +61,12 @@ following plugins are (conditionally) installed and configured:
 - [MetaTests](https://metacpan.org/pod/Dist::Zilla::Plugin::MetaTests)
 - [PodSyntaxTests](https://metacpan.org/pod/Dist::Zilla::Plugin::PodSyntaxTests)
 - [PodCoverageTests](https://metacpan.org/pod/Dist::Zilla::Plugin::PodCoverageTests)
-- [Test::Pod::LinkCheck](https://metacpan.org/pod/Dist::Zilla::Plugin::Test::Pod::LinkCheck)
+- [Author::HAYOBAAN::LinkCheck](https://metacpan.org/pod/Dist::Zilla::Plugin::Author::HAYOBAAN::LinkCheck)
 - [Test::Synopsis](https://metacpan.org/pod/Dist::Zilla::Plugin::Test::Synopsis)
 - [TestRelease](https://metacpan.org/pod/Dist::Zilla::Plugin::TestRelease)
 - [RunExtraTests](https://metacpan.org/pod/Dist::Zilla::Plugin::RunExtraTests)
 - [ConfirmRelease](https://metacpan.org/pod/Dist::Zilla::Plugin::ConfirmRelease)
 - [UploadToCPAN](https://metacpan.org/pod/Dist::Zilla::Plugin::UploadToCPAN)
-- [SchwartzRatio](https://metacpan.org/pod/Dist::Zilla::Plugin::SchwartzRatio)
 - [FakeRelease](https://metacpan.org/pod/Dist::Zilla::Plugin::FakeRelease)
 - [NextRelease](https://metacpan.org/pod/Dist::Zilla::Plugin::NextRelease)
 - [Git::Commit](https://metacpan.org/pod/Dist::Zilla::Plugin::Git::Commit)
@@ -276,7 +276,7 @@ By default the following tests are executed:
 - [MetaTests](https://metacpan.org/pod/Dist::Zilla::Plugin::MetaTests) -- Validation of the META.yml file -- only when hosted on GitHub
 - [PodSyntaxTests](https://metacpan.org/pod/Dist::Zilla::Plugin::PodSyntaxTests) -- Checks pod syntax
 - [PodCoverageTests](https://metacpan.org/pod/Dist::Zilla::Plugin::PodCoverageTests) -- Checks pod coverage
-- [Test::Pod::LinkCheck](https://metacpan.org/pod/Dist::Zilla::Plugin::Test::Pod::LinkCheck) -- Checks pod links
+- [LinkCheck](https://metacpan.org/pod/Dist::Zilla::Plugin::Author::HAYOBAAN::LinkCheck) -- Checks pod links
 - [Test::Synopsis](https://metacpan.org/pod/Dist::Zilla::Plugin::Test::Synopsis) -- Checks the pod synopsis
 
 ## disable\_test

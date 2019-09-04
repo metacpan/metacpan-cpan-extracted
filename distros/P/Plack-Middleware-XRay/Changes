@@ -1,5 +1,8 @@
 Revision history for Perl extension Plack-Middleware-XRay
 
+0.07 2019-09-02T07:51:04Z
+    - Support AWS::XRay's plugins (@papix) #1
+
 0.06 2018-10-10T03:35:00Z
     - Fix typo in POD
 

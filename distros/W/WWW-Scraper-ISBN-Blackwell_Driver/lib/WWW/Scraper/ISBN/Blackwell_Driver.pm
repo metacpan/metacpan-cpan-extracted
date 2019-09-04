@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use vars qw($VERSION @ISA);
-$VERSION = '0.11';
+$VERSION = '1.00';
 
 #--------------------------------------------------------------------------
 
@@ -108,11 +108,15 @@ sub search {
     # The Book page
     my $html = $mech->content();
 
+    return $self->handler("Blackwell's website appears to be unavailable.")
+        if($html =~ m!Blocked IP Address due to Suspicious Activity!si);
+
     return $self->handler("Failed to find that book on the Blackwell website. [$isbn]")
         if($html =~ m!Sorry, there are no results for!si);
     
     $html =~ s/&amp;/&/g;
     $html =~ s/&nbsp;/ /g;
+    $html =~ s/&ndash;/-/g;
 #print STDERR "\n# html=[\n$html\n]\n";
 
     my $data;
@@ -129,11 +133,11 @@ sub search {
     ($data->{width})       = $html =~ m!<td>Width:</td>\s*<td>(\d+)mm</td>!si;
     ($data->{image})       = $html =~ m!<meta property="og:image"\s+content="([^"]+)"\s+/>!si;
 
-    $data->{image}     =~ s!https:///!https://bookshop.blackwell.co.uk/!;
+    $data->{image}     =~ s!https:///!https://bookshop.blackwell.co.uk/! if($data->{image});
     $data->{thumb}     = $data->{image};
     $data->{isbn10}    = $isbn10;
-    $data->{author}    =~ s/\s*\(author\)//si;
-    $data->{publisher} =~ s/&#0?39;/'/g;
+    $data->{author}    =~ s/\s*\(author\)//si if($data->{author});
+    $data->{publisher} =~ s/&#0?39;/'/g if($data->{publisher});
 
 #use Data::Dumper;
 #print STDERR "\n# " . Dumper($data);
@@ -169,6 +173,7 @@ sub search {
         'weight'      => $data->{weight},
         'height'      => $data->{height},
         'width'       => $data->{width},
+        'html'        => $html
     };
 
 #use Data::Dumper;

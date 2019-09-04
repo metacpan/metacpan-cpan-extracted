@@ -29,6 +29,7 @@ t/08enum.t
 t/09anyof_allof.t
 t/10bool.t
 t/99parsing.t
+t/gh8.t
 typetiny.h
 xs_version.h
 xshelper.h

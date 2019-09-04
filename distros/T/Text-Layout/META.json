@@ -1,0 +1,90 @@
+{
+   "abstract" : "Pango style markup formatting",
+   "author" : [
+      "Johan Vromans <jv@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Text-Layout",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "tests"
+      ],
+      "file" : [
+         "lib/App/Music/ChordPro/Version.pm"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.46",
+            "Test::More" : "0",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "PDF::API2" : "2.02"
+         }
+      }
+   },
+   "provides" : {
+      "Text::Layout" : {
+         "file" : "lib/Text/Layout.pm",
+         "version" : "0.011"
+      },
+      "Text::Layout::Cairo" : {
+         "file" : "lib/Text/Cairo.pm",
+         "version" : "0.011"
+      },
+      "Text::Layout::FontConfig" : {
+         "file" : "lib/Text/FontConfig.pm",
+         "version" : "0.011"
+      },
+      "Text::Layout::FontDescriptor" : {
+         "file" : "lib/Text/FontDescriptor.pm",
+         "version" : "0.011"
+      },
+      "Text::Layout::Markdown" : {
+         "file" : "lib/Text/Markdown.pm",
+         "version" : "0.011"
+      },
+      "Text::Layout::PDFAPI2" : {
+         "file" : "lib/Text/PDFAPI2.pm",
+         "version" : "0.011"
+      },
+      "Text::Layout::Pango" : {
+         "file" : "lib/Text/Pango.pm",
+         "version" : "0.011"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/sciurius/perl-Text-Layout.git",
+         "web" : "https://github.com/sciurius/perl-Text-Layout"
+      }
+   },
+   "version" : "0.011",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

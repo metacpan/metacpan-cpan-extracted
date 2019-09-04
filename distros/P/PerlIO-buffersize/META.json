@@ -4,42 +4,54 @@
       "Leon Timmermans <leont@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.120920",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "PerlIO-buffersize",
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Module::Build" : "0.3601"
+            "Module::Build" : "0.28"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.3601"
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
          }
       },
       "runtime" : {
          "requires" : {
             "XSLoader" : "0",
-            "perl" : "5.006",
+            "perl" : "5.008",
             "strict" : "0",
             "warnings" : "0"
          }
       },
       "test" : {
          "requires" : {
-            "File::Find" : "0",
-            "File::Temp" : "0",
             "PerlIO::Layers" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0"
          }
+      }
+   },
+   "provides" : {
+      "PerlIO::buffersize" : {
+         "file" : "lib/PerlIO/buffersize.pm",
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -51,9 +63,11 @@
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/Leont/perlio-buffersize.git",
-         "web" : "http://github.com/Leont/perlio-buffersize"
+         "web" : "https://github.com/Leont/perlio-buffersize"
       }
    },
-   "version" : "0.001"
+   "version" : "0.002",
+   "x_generated_by_perl" : "v5.24.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0215"
 }
 

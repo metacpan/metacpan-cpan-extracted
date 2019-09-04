@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use autodie;
 
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 use Date::Easy::Date ();
 use Date::Easy::Datetime ();
@@ -43,7 +43,7 @@ Date::Easy - easy dates with Time::Piece compatibility
 
 =head1 VERSION
 
-This document describes version 0.08 of Date::Easy.
+This document describes version 0.09 of Date::Easy.
 
 =head1 SYNOPSIS
 

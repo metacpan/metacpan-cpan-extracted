@@ -1,4 +1,4 @@
-# Copyright 2007, 2008, 2009, 2010, 2011 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2019 Kevin Ryde
 
 # This file is part of Math-Polynomial-Horner.
 #
@@ -24,7 +24,7 @@ use vars '$VERSION';
 # uncomment this to run the ### lines
 #use Smart::Comments;
 
-$VERSION = 3;
+$VERSION = 4;
 
 sub _stringize {
   return "$_[0]";
@@ -367,15 +367,14 @@ rather than powering.
 Horner form is quite good for computer evaluation.  If you adjust C<times>,
 C<power> etc in the string config then it can be pasted into a program.
 
-For Perl the default "descending" comes out better than ascending because
+For Perl, the default "descending" comes out better than ascending because
 Perl evaluates left to right so the descending does each coefficient
 addition successively, whereas ascending pushes all the coefficients on the
 stack before working down through them.
 
 An obvious optimization for evaluation is to watch for middle powers like
 x^2 in the synopsis above which arise from runs of zero coefficients, and
-hold them in temporary variables if needed more than once.  Something like
-that might be possible in the future for a program code form.
+hold them in temporary variables if needed more than once.
 
 More sophisticated optimizations can be had from power trees or partly or
 completely factorizing the polynomial to find repeated roots.  Some of that
@@ -428,9 +427,9 @@ zero coefficients to be skipped.  C<fold_sign_swap_end> extends C<fold_sign>
 to swap the order of the high term and following factor to turn for instance
 S<(-3*x + 1)> into S<(1 - 3*x)>.  It can save a negation if the high
 coefficient is -1 and the next is positive.  And C<for_perl> gives Perl code
-C<power> operator and turns on C<fold_sign>.  Not sure yet if these are a
-good idea.  The Perl style might not suit if using values or coefficients
-which are not plain numbers but instead an object, matrix, whatever.
+C<power> operator and turns on C<fold_sign>.  Not sure if these are a good
+idea.  The Perl style might not suit if using values or coefficients which
+are not plain numbers but instead an object, matrix, whatever.
 
 =head1 SEE ALSO
 
@@ -442,7 +441,7 @@ http://user42.tuxfamily.org/math-polynomial-horner/index.html
 
 =head1 LICENSE
 
-Math-Polynomial-Horner is Copyright 2010, 2011 Kevin Ryde
+Math-Polynomial-Horner is Copyright 2010, 2011, 2019 Kevin Ryde
 
 Math-Polynomial-Horner is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License as published by

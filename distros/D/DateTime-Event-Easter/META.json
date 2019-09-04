@@ -4,8 +4,8 @@
       "Rick Measham (rickm@cpan.org)",
       "Jean Forget <JFORGET@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -23,7 +23,8 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.57_02",
+            "Test::More" : "0"
          }
       },
       "configure" : {
@@ -38,10 +39,26 @@
             "DateTime::Calendar::Julian" : "0",
             "DateTime::Set" : "0.08",
             "Params::Validate" : "0",
-            "perl" : "5.006001"
+            "perl" : "5.006001",
+            "strict" : "0",
+            "warnings" : "0"
          }
       }
    },
+   "provides" : {
+      "DateTime::Event::Easter" : {
+         "file" : "lib/DateTime/Event/Easter.pm",
+         "version" : "1.06"
+      }
+   },
    "release_status" : "stable",
-   "version" : "1.05"
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jforget/DateTime-Event-Easter.git",
+         "web" : "https://github.com/jforget/DateTime-Event-Easter"
+      }
+   },
+   "version" : "1.06",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

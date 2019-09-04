@@ -1,9 +1,9 @@
 package Music::Cadence;
 our $AUTHORITY = 'cpan:GENE';
 
-# ABSTRACT: Provide musical cadence chords
+# ABSTRACT: Generate musical cadence chords
 
-our $VERSION = '0.0900';
+our $VERSION = '0.1306';
 
 use Moo;
 use Music::Chord::Note;
@@ -40,36 +40,34 @@ has format => (
 );
 
 
+has seven => (
+    is      => 'ro',
+    default => sub { 0 },
+);
+
+
 sub cadence {
     my ( $self, %args ) = @_;
 
     my $cadence = [];
 
-    $args{key}       ||= $self->key;
-    $args{scale}     ||= $self->scale;
-    $args{octave}    //= $self->octave;
-    $args{type}      ||= 'perfect';
-    $args{leading}   ||= 1;
-    $args{variation} ||= 1;
-    $args{inversion} //= 0;
+    my $key       = $args{key} || $self->key;
+    my $scale     = $args{scale} || $self->scale;
+    my $octave    = $args{octave} // $self->octave;
+    my $type      = $args{type} || 'perfect';
+    my $leading   = $args{leading} || 1;
+    my $variation = $args{variation} || 1;
+    my $inversion = $args{inversion} || 0;
 
-    die 'unknown leader' if $args{leading} < 1 or $args{leading} > 7;
+    die 'unknown leader' if $leading < 1 or $leading > 7;
 
-    my @scale = get_scale_notes( $args{key}, $args{scale} );
+    my @scale_notes = get_scale_notes( $key, $scale );
 
-    my $mcn = Music::Chord::Note->new;
-
-    my $mtr = Music::ToRoman->new(
-        scale_note => $args{key},
-        scale_name => $args{scale},
-        chords     => 0,
-    );
-
-    if ( $args{type} eq 'perfect' ) {
-        my $chord = $self->_generate_chord( $args{scale}, $scale[4], $args{octave}, $mtr, $mcn );
+    if ( $type eq 'perfect' ) {
+        my $chord = $self->_generate_chord( $key, $scale, $scale_notes[4], $octave );
         push @$cadence, $chord;
 
-        $chord = $self->_generate_chord( $args{scale}, $scale[0], $args{octave}, $mtr, $mcn );
+        $chord = $self->_generate_chord( $key, $scale, $scale_notes[0], $octave );
         my $top = $chord->[0];
         if ( $self->format eq 'midinum' ) {
             $top += 12;
@@ -84,45 +82,68 @@ sub cadence {
         push @$chord, $top;
         push @$cadence, $chord;
     }
-    elsif ( $args{type} eq 'imperfect' && $args{inversion} ) {
-        my $chord = $self->_generate_chord( $args{scale}, $scale[4], $args{octave}, $mtr, $mcn );
-        $chord = $self->_invert_chord( $chord, $args{inversion}->{1}, $args{octave} )
-            if $args{inversion}->{1};
+    elsif ( $type eq 'imperfect' && $inversion ) {
+        my $chord = $self->_generate_chord( $key, $scale, $scale_notes[4], $octave );
+        $chord = $self->_invert_chord( $chord, $inversion->{1}, $octave )
+            if $inversion->{1};
         push @$cadence, $chord;
 
-        $chord = $self->_generate_chord( $args{scale}, $scale[0], $args{octave}, $mtr, $mcn );
-        $chord = $self->_invert_chord( $chord, $args{inversion}->{2}, $args{octave} )
-            if $args{inversion}->{2};
+        $chord = $self->_generate_chord( $key, $scale, $scale_notes[0], $octave );
+        $chord = $self->_invert_chord( $chord, $inversion->{2}, $octave )
+            if $inversion->{2};
         push @$cadence, $chord;
     }
-    elsif ( $args{type} eq 'imperfect' ) {
-        my $note = $args{variation} == 1 ? $scale[4] : $scale[6];
-        my $chord = $self->_generate_chord( $args{scale}, $note, $args{octave}, $mtr, $mcn );
+    elsif ( $type eq 'imperfect' ) {
+        my $note = $variation == 1 ? $scale_notes[4] : $scale_notes[6];
+        my $chord = $self->_generate_chord( $key, $scale, $note, $octave );
         push @$cadence, $chord;
 
-        $chord = $self->_generate_chord( $args{scale}, $scale[0], $args{octave}, $mtr, $mcn );
+        $chord = $self->_generate_chord( $key, $scale, $scale_notes[0], $octave );
         push @$cadence, $chord;
     }
-    elsif ( $args{type} eq 'plagal' ) {
-        my $chord = $self->_generate_chord( $args{scale}, $scale[3], $args{octave}, $mtr, $mcn );
+    elsif ( $type eq 'evaded' && $self->seven ) {
+        if ( $inversion ) {
+            $inversion->{1} = 3
+                unless defined $inversion->{1};
+            $inversion->{2} = 1
+                unless defined $inversion->{2};
+        }
+        else {
+            $inversion = { 1 => 3, 2 => 1 };
+        }
+
+        my $chord = $self->_generate_chord( $key, $scale, $scale_notes[4], $octave );
+        $chord = $self->_invert_chord( $chord, $inversion->{1}, $octave );
         push @$cadence, $chord;
 
-        $chord = $self->_generate_chord( $args{scale}, $scale[0], $args{octave}, $mtr, $mcn );
+        $chord = $self->_generate_chord( $key, $scale, $scale_notes[0], $octave );
+        $chord = $self->_invert_chord( $chord, $inversion->{2}, $octave );
         push @$cadence, $chord;
     }
-    elsif ( $args{type} eq 'half' ) {
-        my $chord = $self->_generate_chord( $args{scale}, $scale[ $args{leading} - 1 ], $args{octave}, $mtr, $mcn );
+    elsif ( $type eq 'plagal' ) {
+        my $chord = $self->_generate_chord( $key, $scale, $scale_notes[3], $octave );
         push @$cadence, $chord;
 
-        $chord = $self->_generate_chord( $args{scale}, $scale[4], $args{octave}, $mtr, $mcn );
+        $chord = $self->_generate_chord( $key, $scale, $scale_notes[0], $octave );
         push @$cadence, $chord;
     }
-    elsif ( $args{type} eq 'deceptive' ) {
-        my $chord = $self->_generate_chord( $args{scale}, $scale[4], $args{octave}, $mtr, $mcn );
+    elsif ( $type eq 'half' ) {
+        my $chord = $self->_generate_chord( $key, $scale, $scale_notes[ $leading - 1 ], $octave );
+        $chord = $self->_invert_chord( $chord, $inversion->{1}, $octave )
+            if $inversion && $inversion->{1};
         push @$cadence, $chord;
 
-        my $note = $args{variation} == 1 ? $scale[5] : $scale[3];
-        $chord = $self->_generate_chord( $args{scale}, $note, $args{octave}, $mtr, $mcn );
+        $chord = $self->_generate_chord( $key, $scale, $scale_notes[4], $octave );
+        $chord = $self->_invert_chord( $chord, $inversion->{2}, $octave )
+            if $inversion && $inversion->{2};
+        push @$cadence, $chord;
+    }
+    elsif ( $type eq 'deceptive' ) {
+        my $chord = $self->_generate_chord( $key, $scale, $scale_notes[4], $octave );
+        push @$cadence, $chord;
+
+        my $note = $variation == 1 ? $scale_notes[5] : $scale_notes[3];
+        $chord = $self->_generate_chord( $key, $scale, $note, $octave );
         push @$cadence, $chord;
     }
     else {
@@ -141,29 +162,38 @@ sub _invert_chord {
         $chord = $mcp->chord_inv( $chord, inv_num => $inversion );
     }
     else {
-        # Perform these gymnastics to convert from named notes to inverted named notes
-        my $notes = $chord;
-
-        $notes = [ grep { s/\d+// } @$notes ]
+        # Perform gymnastics to convert named notes to inverted named notes
+        $chord = [ map { s/\d+//; $_ } @$chord ]
             if $octave;
 
-        my @pitches = map { Music::Note->new( $_ . -1, 'ISO' )->format('midinum') } @$notes;
+        my $pitches = [ map { Music::Note->new( $_ . -1, 'ISO' )->format('midinum') } @$chord ];
 
-        my $inverted = $mcp->chord_inv( \@pitches, inv_num => $inversion );
+        $pitches = $mcp->chord_inv( $pitches, inv_num => $inversion );
 
-        $notes = [ map { Music::Note->new( $_, 'midinum' )->format('isobase') } @$inverted ];
+        $chord = [ map { Music::Note->new( $_, 'midinum' )->format('ISO') } @$pitches ];
 
-        $notes = [ map { $_ . $octave } @$notes ]
-            if $octave;
+        for ( @$chord ) {
+            if ( $octave ) {
+                s/-1/$octave/;
+                s/0/$octave + 1/e;
+            }
+            else {
+                s/-1//;
+                s/0//;
+            }
 
-        $chord = $notes;
+            if ( $self->format eq 'midi' ) {
+                s/#/s/;
+                s/b/f/;
+            }
+        }
     }
 
     return $chord;
 }
 
 sub _generate_chord {
-    my ( $self, $scale, $note, $octave, $mtr, $mcn ) = @_;
+    my ( $self, $key, $scale, $note, $octave ) = @_;
 
     # Know what chords should be diminished
     my %diminished = (
@@ -180,11 +210,21 @@ sub _generate_chord {
 
     die 'unknown scale' unless exists $diminished{$scale};
 
+    my $mtr = Music::ToRoman->new(
+        scale_note => $key,
+        scale_name => $scale,
+        chords     => 0,
+    );
+
     # Figure out if the chord is diminished, minor, or major
     my $roman = $mtr->parse($note);
     my $type  = $roman =~ /^$diminished{$scale}$/ ? 'dim' : $roman =~ /^[a-z]/ ? 'm' : '';
 
-    # Generate the chord notes
+    $type .= 7
+        if $self->seven;
+
+    my $mcn = Music::Chord::Note->new;
+
     my @notes = $mcn->chord( $note . $type );
 
     if ( $self->format eq 'midi' ) {
@@ -200,7 +240,6 @@ sub _generate_chord {
         die 'unknown format';
     }
 
-    # Append the octave if requested
     @notes = map { $_ . $octave } @notes
         if $octave && $self->format ne 'midinum';
 
@@ -217,11 +256,11 @@ __END__
 
 =head1 NAME
 
-Music::Cadence - Provide musical cadence chords
+Music::Cadence - Generate musical cadence chords
 
 =head1 VERSION
 
-version 0.0900
+version 0.1306
 
 =head1 SYNOPSIS
 
@@ -230,18 +269,25 @@ version 0.0900
   my $mc = Music::Cadence->new;
 
   my $chords = $mc->cadence;
-  # [['G','B','D'], ['C','E','G','C']]
+  # [G B D], [C E G C]
 
   $mc = Music::Cadence->new( octave => 4 );
 
   $chords = $mc->cadence;
-  # [['G4','B4','D4'], ['C4','E4','G4','C5']]
+  # [G4 B4 D4], [C4 E4 G4 C5]
 
   $chords = $mc->cadence(
     type    => 'half',
-    leading => 2,
     octave  => 0,
-  ); # [['D','F','A'], ['G','B','D']]
+    leading => 2,
+  );
+  # [D F A], [G B D]
+
+  $chords = $mc->cadence(
+    type      => 'imperfect',
+    inversion => { 1 => 1, 2 => 1 },
+  );
+  # [B4 D4 G5], [E4 G4 C5]
 
   $mc = Music::Cadence->new(
     key    => 'C#',
@@ -249,7 +295,7 @@ version 0.0900
   );
 
   $chords = $mc->cadence;
-  # [['G#5','C5','D#5'], ['C#5','F5','G#5','C#6']]
+  # [G#5 C5 D#5], [C#5 F5 G#5 C#6]
 
   $mc = Music::Cadence->new(
     key    => 'C#',
@@ -258,36 +304,33 @@ version 0.0900
   );
 
   $chords = $mc->cadence;
-  # [['Gs5','C5','Ds5'], ['Cs5','F5','Gs5','Cs6']]
+  # [Gs5 C5 Ds5], [Cs5 F5 Gs5 Cs6]
 
-  $mc = Music::Cadence->new(
-    key    => 'C',
-    octave => 4,
-    format => 'midinum',
-  );
+  $mc = Music::Cadence->new( format => 'midinum' );
+
+  $chords = $mc->cadence( octave => 4 );
+  # [67 71 62], [60 64 67 72]
+
+  $chords = $mc->cadence( octave => -1 );
+  # [7 11 2], [0 4 7 12]
+
+  $mc = Music::Cadence->new( seven => 1 );
 
   $chords = $mc->cadence;
-  # [[67,71,62], [60,64,67,72]]
-
-  $mc = Music::Cadence->new;
+  # [G B D F], [C E G A# C]
 
   $chords = $mc->cadence(
-    octave    => 4,
-    type      => 'imperfect',
-    inversion => { 1 => 1, 2 => 1 },
+    type   => 'evaded',
+    octave => 4,
   );
-  # [['B4','D4','G4'], ['E4','G4','C4']]
+  # [F4 G5 B5 D5], [E4 G4 A#4 C5]
 
 =head1 DESCRIPTION
 
-C<Music::Cadence> provides a pair of musical cadence chords.
+C<Music::Cadence> generates a pair of musical cadence chords.
 
 These chords are usually added to the end of a musical phrase, and
 are used to suggest a sense of anticipation, pause, finality, etc.
-
-B<*> This module is a naive implementation of the actual theory.
-Currently, only chords of 3 notes are generated.  YMMV.  Patches
-welcome.
 
 =head1 ATTRIBUTES
 
@@ -333,6 +376,11 @@ chord generation.
 
 If C<midinum>, convert notes to their numerical MIDI equivalents.
 
+=head2 seven
+
+If set, use seventh chords of four notes instead of diatonic triads.
+Default: C<0>
+
 =head1 METHODS
 
 =head2 new
@@ -344,6 +392,7 @@ If C<midinum>, convert notes to their numerical MIDI equivalents.
     scale  => $scale,
     octave => $octave,
     format => $format,
+    seven  => $seven,
   );
 
 Create a new C<Music::Cadence> object.
@@ -368,6 +417,7 @@ on the given B<key> and B<scale> name.
 Supported cadences are:
 
   deceptive
+  evaded
   half
   imperfect
   perfect
@@ -391,16 +441,17 @@ apply to the chords of the cadence.  For example:
 
   inversion => { 1 => 2, 2 => 1 },
 
-Says, "Apply the second inversion to the first chord of the cadence,
-and apply the first inversion to the second chord."
+This means, "Apply the second inversion to the first chord of the
+cadence, and apply the first inversion to the second chord."
+
+For seventh chords (of 4 notes), the third inversion can be applied.
 
 To B<not> apply an inversion to an inverted imperfect cadence chord,
 either do not include the numbered chord in the hash reference, or
 set its value to C<0> zero.
 
-The B<leading> chord is a number (1-7) for each diatonic scale chord
-to use for the first C<half> cadence chord.  For the key of C<C major>
-this is:
+The B<leading> chord is a number (1-7) for the scale chord to use for
+the first C<half> cadence chord.  For the key of C<C major> this is:
 
   CM: 1
   Dm: 2
@@ -410,9 +461,17 @@ this is:
   Am: 6
   Bo: 7
 
+If an B<inversion> is defined for the C<half> cadence, the chords are
+inverted as described above for the C<imperfect> cadence.
+
+The C<evaded> cadence applies inversions to seventh chords.  The
+default (with no B<inversion> defined) is to invert the first chord by
+the third inversion and the second by the first inversion.
+
 =head1 SEE ALSO
 
-The F<eg/cadence> and F<t/01-methods.t> files in this distribution.
+The F<eg/cadence>, F<eg/synopsis>, F<t/01-methods.t> and
+F<t/02-methods.t> files in this distribution.
 
 L<Moo>
 
@@ -429,12 +488,6 @@ L<Music::ToRoman>
 L<https://en.wikipedia.org/wiki/Cadence>
 
 L<https://www.musictheoryacademy.com/how-to-read-sheet-music/cadences/>
-
-=head1 TO DO
-
-Evaded cadence
-
-Imperfect inverted cadence (2nd variation)
 
 =head1 AUTHOR
 

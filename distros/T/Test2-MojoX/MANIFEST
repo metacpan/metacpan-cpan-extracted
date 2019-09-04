@@ -1,0 +1,22 @@
+.perltidyrc
+Changes
+cpanfile
+lib/Test2/MojoX.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/01-base.t
+t/02-content.t
+t/03-content_type.t
+t/04-element.t
+t/05-header.t
+t/06-json.t
+t/07-status.t
+t/08-text.t
+t/09-message.t
+t/10-websocket_json.t
+Test2-Mojo.iml
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

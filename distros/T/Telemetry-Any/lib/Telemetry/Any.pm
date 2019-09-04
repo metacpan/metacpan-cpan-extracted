@@ -7,7 +7,7 @@ use Carp;
 
 use base 'Devel::Timer';
 
-our $VERSION = "0.05";
+our $VERSION = "0.06";
 
 my $telemetry = __PACKAGE__->new();
 
@@ -56,19 +56,26 @@ sub report {
             $report .= "Count     Time    Percent\n";
             $report .= "----------------------------------------------\n";
         }
+
+        $report .= join "\n",
+            map { sprintf( '%8s  %.4f  %5.2f%%  %s', $_->{count}, $_->{time}, $_->{percent}, $_->{label}, ) } @records;
     }
     else {
         if ( defined $args{format} && $args{format} eq 'table' ) {
             $report .= "Interval  Time    Percent\n";
             $report .= "----------------------------------------------\n";
         }
+
+        $report .= join "\n", map {
+            sprintf(
+                '%02d -> %02d  %.4f  %5.2f%%  %s',
+                $_->{interval} - 1,
+                $_->{interval}, $_->{time}, $_->{percent}, $_->{label},
+            )
+        } @records;
     }
 
-    $report .= join "\n", @records;
-
-    $self->print($report);
-
-    return 1;
+    return $report;
 }
 
 sub detailed {
@@ -90,16 +97,14 @@ sub detailed {
 
         next if ( $i->{index} == 0 );
 
-        my $msg = sprintf(
-            '%02d -> %02d  %.4f  %5.2f%%  %s -> %s',
-            $i->{index} - 1,
-            $i->{index}, $i->{value},
-            $i->{value} / $self->total_time() * 100,
-            $self->{label}->{ $i->{index} - 1 },
-            $self->{label}->{ $i->{index} },
-        );
+        my $record = {    ## no critic (NamingConventions::ProhibitAmbiguousNames
+            interval => $i->{index},
+            time     => sprintf( '%.6f', $i->{value} ),
+            percent  => sprintf( '%.2f', $i->{value} / $self->total_time() * 100 ),
+            label    => sprintf( '%s -> %s', $self->{label}->{ $i->{index} - 1 }, $self->{label}->{ $i->{index} } ),
+        };
 
-        push @records, $msg;
+        push @records, $record;
     }
 
     return @records;
@@ -110,7 +115,7 @@ sub collapsed {
 
     $self->_calculate_collapsed;
 
-    my $c = $self->{collapsed};
+    my $c       = $self->{collapsed};
     my $sort_by = $args{sort_by} || 'time';
 
     my @labels = sort { $c->{$b}->{$sort_by} <=> $c->{$a}->{$sort_by} } keys %$c;
@@ -118,14 +123,15 @@ sub collapsed {
     my @records;
 
     foreach my $label (@labels) {
-        my $msg = sprintf(
-            '%8s  %.4f  %5.2f%%  %s',
-            $c->{$label}->{count},
-            $c->{$label}->{time},
-            $c->{$label}->{time} / $self->total_time() * 100, $label,
-        );
 
-        push @records, $msg;
+        my $record = {    ## no critic (NamingConventions::ProhibitAmbiguousNames
+            count   => $c->{$label}->{count},
+            time    => sprintf( '%.6f', $c->{$label}->{time} ),
+            percent => sprintf( '%.2f', $c->{$label}->{time} / $self->total_time() * 100 ),
+            label   => $label,
+        };
+
+        push @records, $record;
     }
 
     return @records;

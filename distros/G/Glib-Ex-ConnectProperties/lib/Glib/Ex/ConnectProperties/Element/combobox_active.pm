@@ -26,7 +26,7 @@ use Gtk2;
 use Gtk2::Ex::ComboBoxBits 32; # v.32 for get_active_text()
 
 use base 'Glib::Ex::ConnectProperties::Element';
-our $VERSION = 19;
+our $VERSION = 20;
 
 # uncomment this to run the ### lines
 #use Smart::Comments;

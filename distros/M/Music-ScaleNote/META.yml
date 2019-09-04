@@ -6,6 +6,7 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
+  Test::Exception: '0'
   Test::More: '0'
   perl: '5.006'
   strict: '0'
@@ -30,9 +31,9 @@ requires:
   perl: '5.006'
   strictures: '2'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Music-ScaleNote
-  repository: https://github.com/ology/Music-ScaleNote
-version: '0.0501'
+  homepage: https://github.com/ology/Music-ScaleNote
+  repository: https://github.com/ology/Music-ScaleNote.git
+version: '0.0507'
 x_Dist_Zilla:
   perl:
     version: '5.027007'
@@ -201,9 +202,9 @@ x_Dist_Zilla:
       name: MetaJSON
       version: '6.012'
     -
-      class: Dist::Zilla::Plugin::MetaResources
-      name: MetaResources
-      version: '6.012'
+      class: Dist::Zilla::Plugin::GithubMeta
+      name: GithubMeta
+      version: '0.58'
     -
       class: Dist::Zilla::Plugin::Test::PodSpelling
       config:
@@ -213,6 +214,7 @@ x_Dist_Zilla:
             - lib
           spell_cmd: 'aspell list'
           stopwords:
+            - isobase
             - pentatonic
           wordlist: Pod::Wordlist
       name: Test::PodSpelling

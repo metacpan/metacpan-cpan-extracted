@@ -1,0 +1,10 @@
+This directory contains files that demonstrate this package.
+Specifically:
+
+README
+    This file.
+
+game-life
+    An interactive wrapper for Game::Life::Faster or Game::Life.
+
+# ex: set filetype=text textwidth=72 autoindent :

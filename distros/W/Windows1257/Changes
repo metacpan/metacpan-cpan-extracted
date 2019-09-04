@@ -1,0 +1,786 @@
+Revision history for this software.
+
+1.23  2019-09-01 00:00:00
+  - support Windows1250
+  - support Windows1254
+  - support Windows1255
+  - created by INABA Hitoshi
+
+1.22  2019-08-29 00:00:00
+  - remove unnecessary logic from e_string
+  - support KSC5601
+  - support Big5
+  - created by INABA Hitoshi
+
+1.21  2019-08-25 00:00:00
+  - rename dist name Char-Sjis-ver.sion.tar.gz to Sjis-ver.sion.tar.gz
+  - remove lib/Char/Sjis.pm
+  - move t/Sjis/*.t to t/*.t
+  - created by INABA Hitoshi
+
+1.20  2019-07-22 00:00:00
+  - unfix Experimental Issue: meta_yml_has_provides
+  - created by INABA Hitoshi
+
+1.19  2019-07-21 00:00:00
+  - fix Kwalitee Issues: main_module_version_matches_dist_version, again
+  - created by INABA Hitoshi
+
+1.18  2019-07-20 00:00:00
+  - fix Kwalitee Issues: main_module_version_matches_dist_version
+  - fix Extra Issues: meta_yml_declares_perl_version
+  - created by INABA Hitoshi
+
+1.17  2019-07-19 00:00:00
+  - fix Experimental Issue: meta_yml_has_provides
+  - created by INABA Hitoshi
+
+1.16  2019-07-14 00:00:00
+  - fix Kwalitee Issue: distname_matches_name_in_meta
+  - try fixing Kwalitee Issue: meta_json_conforms_to_known_spec
+  - try fixing Kwalitee Issue: meta_yml_conforms_to_known_spec
+  - fix Extra Issue: has_tests_in_t_dir
+  - fix Extra Issue: use_warnings
+  - fix Experimental Issue: has_separate_license_file
+  - remove makealldists.pl, makeallt.pl, and make_CaseFolding.pl
+  - fix tr//xyz/c --> 'x' to 'z'
+  - created by INABA Hitoshi
+
+1.15  2019-05-02 00:00:00
+  - fix Kwalitee Issue: main_module_version_matches_dist_version
+  - fix Extra Issue: has_meta_json
+  - fix Experimental Issue: meta_yml_has_repository_resource
+  - convert some documents to UTF-8
+  - created by INABA Hitoshi
+
+1.14  2019-04-30 00:00:00
+  - try https://rt.cpan.org/Public/Bug/Display.html?id=129343
+  - created by INABA Hitoshi
+
+1.13  2019-04-28 00:00:00
+  - avoid Kwalitee Issue no_pod_errors
+  - avoid Kwalitee Issue use_strict
+  - add 403_podtest.t
+  - rename Sjis/JA.pm to Sjis/JA.pod
+  - created by INABA Hitoshi
+
+1.12  2019-04-15 00:00:00
+  - 098_jperlprint.t covers cygwin
+  - 213_do.t covers perl 5.26 or later
+  - 355_substr_perldoc.t with script header avoids FAIL of test
+  - add 402_regexp_xx.t
+  - skip test t/Sjis/212_dbmopen.t on perl 5.028 on MSWin32
+  - skip test xt/Big5HKSCS/212_dbmopen.t on perl 5.028 on MSWin32
+  - skip test xt/Big5Plus/212_dbmopen.t on perl 5.028 on MSWin32
+  - skip test xt/GB18030/212_dbmopen.t on perl 5.028 on MSWin32
+  - skip test xt/GBK/212_dbmopen.t on perl 5.028 on MSWin32
+  - skip test xt/HP15/212_dbmopen.t on perl 5.028 on MSWin32
+  - skip test xt/INFORMIXV6ALS/212_dbmopen.t on perl 5.028 on MSWin32
+  - skip test xt/KPS9566/212_dbmopen.t on perl 5.028 on MSWin32
+  - skip test xt/UHC/212_dbmopen.t on perl 5.028 on MSWin32
+  - support CaseFolding-12.0.0.txt
+  - created by INABA Hitoshi
+
+1.11  2018-09-22 00:00:00
+  - support indented here-documents
+  - created by INABA Hitoshi
+
+1.10  2018-09-20 00:00:00
+  - support CaseFolding-11.0.0.txt
+  - created by INABA Hitoshi
+
+1.09  2018-09-18 00:00:00
+  - exit with actual exit value
+  - change META.yml version 1.3 to 1.4
+  - remove pMakefile.PL
+  - add pmake.bat
+  - add LICENSE
+  - skip test t/Sjis/212_dbmopen.t on perl 5.028 on MSWin32 AMD64
+  - skip test xt/Big5HKSCS/212_dbmopen.t on perl 5.028 on MSWin32 AMD64
+  - skip test xt/Big5Plus/212_dbmopen.t on perl 5.028 on MSWin32 AMD64
+  - skip test xt/GB18030/212_dbmopen.t on perl 5.028 on MSWin32 AMD64
+  - skip test xt/GBK/212_dbmopen.t on perl 5.028 on MSWin32 AMD64
+  - skip test xt/HP15/212_dbmopen.t on perl 5.028 on MSWin32 AMD64
+  - skip test xt/INFORMIXV6ALS/212_dbmopen.t on perl 5.028 on MSWin32 AMD64
+  - skip test xt/KPS9566/212_dbmopen.t on perl 5.028 on MSWin32 AMD64
+  - skip test xt/UHC/212_dbmopen.t on perl 5.028 on MSWin32 AMD64
+  - created by INABA Hitoshi
+
+1.08  2016-07-29 00:00:00
+  - support Windows 10
+  - remove SjisTk module support
+  - created by INABA Hitoshi
+
+1.07  2016-07-10 00:00:00
+  - fc() supports CaseFolding-9.0.0.txt
+  - support StrawberryPerl 5.24.0
+  - support ActivePerl 5.24.0
+  - created by INABA Hitoshi
+
+1.06  2015-05-29 00:00:00
+  - remove 181_jperlre.t
+  - add README2ND
+  - created by INABA Hitoshi
+
+1.05  2015-06-15 00:00:00
+  - performance enhancements by (?>possessive groups)
+  - support StrawberryPerl 5.20.2
+  - support ActivePerl 5.20.2
+  - support Perl 5.22.0
+  - support StrawberryPerl 5.22.0
+  - support (~. |. &. ^. &.= |.= ^.=) bitwise operators
+  - support <<>> double-diamond operator
+  - support /n non-capturing regular expression flag
+  - support fc() Unicode 7.0 case folding
+  - change qr/[[:^lower:]]/i and qr/[[:^upper:]]/i to Perl 5.16 compatible
+  - support -i switch on command line on use Char, use Sjis
+  - support -w switch on command line on use Char
+  - not support \b{...} and \B{...}
+  - yada yada operator document
+  - add make_CaseFolding.pl
+  - created by INABA Hitoshi
+
+1.04  2015-03-01 00:00:00
+  - boring version numbers
+  - fix broken POD documents on CPAN
+  - add documents
+  - fix _open_a to _open_r in Esjis::do
+  - flushing output at make file
+  - add test scripts to all encoding distributions
+  - cope with "Parse errors: No plan found in TAP output" on FreeBSD and NetBSD
+  - cope with "/bin/sh: /bin/perl: Argument list too long" on Mac OS X
+  - changed two pass filter to one pass
+  - created by INABA Hitoshi
+
+1.03  2015-02-01 00:00:00
+  - support Char::eval
+  - support # encoding: OldUTF8
+  - integrated the Sjis software family
+  - add makealldists.pl
+  - add makeallt.pl
+  - add Sjis/JA.pm
+  - add Sjis/The_moment_of_birth_of_ShiftJIS_aka_MSKanji.txt
+  - add Sjis/escapelist.txt
+  - add t/dist/*.t
+  - created by INABA Hitoshi
+
+1.02  2015-01-01 00:00:00
+  - support Sjis::eval
+  - support StrawberryPerl 5.20.1
+  - support ActivePerl 5.20.1
+  - optimize LONG_STRING_FOR_RE
+  - created by INABA Hitoshi
+
+1.01  2014-09-08 00:00:00
+  - avoid "Octal number in vector unsupported" on perl 5.6
+  - fix broken t/243_filetest.t of Big5Plus
+  - created by INABA Hitoshi
+
+1.00  2014-09-01 00:00:00
+  - support EUC-TW
+  - support yada-yada or triple-dot operator
+  - created by INABA Hitoshi
+
+0.99  2014-08-03 00:00:00
+  - fix fix name: in META.yml Char::Sjis to Char-Sjis
+  - fix sub e_capture() on SBCS
+  - created by INABA Hitoshi
+
+0.98  2014-08-02 00:00:00
+  - experimental release
+  - created by INABA Hitoshi
+
+0.97  2014-07-28 00:00:00
+  - fix name: in META.yml
+  - support Perl 5.20.0
+  - support StrawberryPerl 5.20.0
+  - support perl on Raspberry Pi
+  - created by INABA Hitoshi
+
+0.96  2014-04-26 00:00:00
+  - fix m/[ABC]/i
+  - created by INABA Hitoshi
+
+0.95  2014-01-21 00:00:00
+  - fix using "use 5.00503;"
+  - created by INABA Hitoshi
+
+0.94  2014-01-13 00:00:00
+  - support CaseFolding-6.3.0.txt
+  - support Perl 5.18.2
+  - created by INABA Hitoshi
+
+0.93  2013-12-29 00:00:00
+  - fix quoting after filetest operators
+  - Esjis::unlink() deletes read only file too
+  - remove PERL5.BATes
+  - remove strict.pm_, warnings.pm_, warnings/register.pm_, and feature.pm_
+  - truncate(), getpwnam(), and getpwuid() into eval q{}
+  - consider Win95Cmd.exe by PERL5SHELL
+  - remove $ENV{'COMSPEC'}
+  - changed condition for escaping script
+  - support ActivePerl 5.18.1.1800 Windows (x86)
+  - support ActivePerl 5.18.1.1800 Windows (64-bit, x64)
+  - created by INABA Hitoshi
+
+0.92  2013-07-18 00:00:00
+  - support JIS8
+  - support Arabic
+  - support Hebrew
+  - support TIS-620
+  - created by INABA Hitoshi
+
+0.91  2013-07-07 00:00:00
+  - improve split() for over 32766 octet string
+  - add short README
+  - use Esjis ver.sion; --> use Esjis ver.sion.0;
+  - undo BEGIN { unshift @INC, '/Perl/site/lib/Sjis'; } in Esjis.pm
+  - created by INABA Hitoshi
+
+0.90  2013-06-08 00:00:00
+  - support Perl 5.18.0
+  - support StrawberryPerl 5.18.0
+  - \s in a regex matches a vertical tab on perl 5.18.0 or later
+  - support lvalue Sjis::substr()
+  - follow File::HomeDir 1.00
+  - support DWIM Perl
+  - add dperl.bat
+  - created by INABA Hitoshi
+
+0.89  2013-05-12 00:00:00
+  - cancel improving multi-byte anchoring for over 32766 octet string on perl 5.10.0
+  - add perl518.bat, perl64518.bat, aperl518.bat, aperl64518.bat, sperl518.bat, and sperl64518.bat
+  - support Cygwin's Perl
+  - add cperl.bat
+  - created by INABA Hitoshi
+
+0.88  2013-05-01 00:00:00
+  - improve multi-byte anchoring for over 32766 octet string
+  - remove multi-byte anchoring of UTF2 and OldUTF8
+  - support ActivePerl 5.16.3
+  - support ActivePerl 5.14.4
+  - fix errata
+  - created by INABA Hitoshi
+
+0.87  2013-03-22 00:00:00
+  - support Strawberry Perl 5.16.3
+  - support Perl 5.16.3
+  - support Strawberry Perl 5.14.4
+  - support Perl 5.14.4
+  - fix errata
+  - remove module (Win32.pm)
+  - created by INABA Hitoshi
+
+0.86  2013-01-27 00:00:00
+  - fix Sjis::getc(BAREWORD)
+  - created by INABA Hitoshi
+
+0.85  2013-01-13 00:00:00
+  - support Microsoft Windows 95
+  - support Microsoft Windows NT 4.0
+  - support KPS 9566
+  - support Sjis::getc()
+  - created by INABA Hitoshi
+
+0.84  2012-11-19 00:00:00
+  - support Strawberry Perl 5.16.2
+  - support Perl 5.16.2
+  - delete escape-characters of run-time command
+  - have to use both two-argument and three-argument open()
+  - support Microsoft Windows 8 Pro (x64)
+  - support PowerShell 3.0
+  - created by INABA Hitoshi
+
+0.83  2012-09-29 00:00:00
+  - support Strawberry Perl 5.16.1
+  - support ActivePerl 5.16.1
+  - support x64 of ActivePerl and Strawberry Perl
+  - new ver.sion.0 check (match or die)
+  - fix $_ !~ s/regexp/replacement/
+  - remove ESCAPE_SECOND_OCTET on single byte encoding
+  - escape left brace on un-escaping of \N{...}, \p{...}, and \P{...}
+  - remove "distribution_type: script" from META.yml
+  - add perl64512.bat, perl64514.bat, perl64516.bat, aperl64512.bat, aperl64514.bat, aperl64516.bat, sperl64512.bat, sperl64514.bat, and sperl64516.bat
+  - created by INABA Hitoshi
+
+0.82  2012-07-29 00:00:00
+  - support Strawberry Perl 5.16.0
+  - support ActivePerl 5.16.0
+  - support variables in character class in regular expression
+  - created by INABA Hitoshi
+
+0.81  2012-05-25 00:00:00
+  - support fold case escape \F and function fc()
+  - support scalar context of Esjis::stat, Esjis::stat_, Esjis::lstat, and Esjis::lstat_
+  - support Strawberry Perl 5.8, 5.10, 5.12, and 5.14
+  - become independent of strict.pm
+  - add feature.pm
+  - add perl5.bat
+  - add aperl58.bat, aperl510.bat, aperl512.bat, aperl514.bat, and aperl516.bat
+  - add sperl58.bat, sperl510.bat, sperl512.bat, sperl514.bat, and sperl516.bat
+  - fix dummy access (-T and -B for underline cache) in Esjis::T, Esjis::T_, Esjis::B, and Esjis::B_
+  - fix $dbh->Esjis::do to $dbh->do on DBI
+  - fix Esjis::split(/(-)|(,)/,"1-10,20") --> (1,"-",undef,10,undef,",",20)
+  - fix "\v" means "\x0A", "\x0B", "\x0C", and "\x0D"
+  - remove './' at head of return value from Esjis::glob and Esjis::glob_
+  - created by INABA Hitoshi
+
+0.80  2012-03-22 00:00:00
+  - support byte-oriented regexp //b, m//b, m''b, s///b, s'''b, qr//b, qr''b, split(//b), split(m//b), split(m''b), split(qr//b), and split(qr''b)
+  - support match once only ??, m??, ??b, and m??b
+  - support literal null string pattern
+  - support $`, $PREMATCH, ${^PREMATCH}, $&, $MATCH, ${^MATCH}, &', $POSTMATCH, and ${^POSTMATCH}
+  - add perl516.bat
+  - created by INABA Hitoshi
+
+0.79  2011-12-23 00:00:00
+  - fix m/[[:lower:]]/i, m/[[:upper:]]/i, m/[[:^lower:]]/i, and m/[[:^upper:]]/i
+  - created by INABA Hitoshi
+
+0.78  2011-10-28 00:00:00
+  - support Windows-1258
+  - update documents and URL
+  - created by INABA Hitoshi
+
+0.77  2011-07-27 00:00:00
+  - support KOI8-R, KOI8-U, US-ASCII
+  - created by INABA Hitoshi
+
+0.76  2011-06-30 00:00:00
+  - import $fix_drive_relative_paths from File::DosGlob/1.04
+  - support regexp metasymbols \C and \R in regexp
+  - support regexp metasymbol \N \N{3} \N{3,} \N{3,5}
+  - \N{CHARNAME} means literal N{CHARNAME}
+  - \p{PROP} means literal p{PROP}
+  - \P{PROP} means literal P{PROP}
+  - \X means literal X
+  - support POSIX-style character classes
+  - modifier /a /d /l /u, and /aa of regexp makes die
+  - use 5.12.0; --> use 5.12.0; no strict qw(refs);
+  - remove test 201_kanji.t,202_kanji.t,203_kanji.t,204_kanji.t,205_glob.t,210_chmod.t,211_chown.t,212_dbmopen.t,214_glob.t,216_open.t,217_qx.t,218_rename.t,221_sysopen.t,222_system.t,223_truncate.t,225_utime.t,226_chdir.t,227_chmod.t,228_chown.t,229_glob.t,230_mkdir.t,232_qx.t,233_rename.t,234_rmdir.t,235_system.t, and 236_utime.t from EUCJP,UTF2,OldUTF8
+  - created by INABA Hitoshi
+
+0.75  2011-06-05 00:00:00
+  - remove Esjis::binmode and Esjis::open (it's a bad idea)
+  - created by INABA Hitoshi
+
+0.74  2011-06-01 00:00:00
+  - remove Esjis::k_ test
+  - fix s#foo#\\#, s#foo#\\#g, s'foo'\\', and s'foo'\\'g
+  - created by INABA Hitoshi
+
+0.73  2011-05-12 00:00:00
+  - hexadecimal escape sequence, \x{HHHHHH} in double-quote-like contexts
+  - octal escape sequence, \o{OOOOOO} in double-quote-like contexts
+  - support tr///r, y///r
+  - support s///r
+  - rewrite 'use strict;' to 'use strict; no strict qw(refs);'
+  - fix m/$var/i: m/[$VAR$var]/ to m/@{[Esjis::ignorecase($var)]}/
+  - fix s//code/e, s//code/ee, s//code/eee, ...
+  - support Windows-1252
+  - PASS all tests on perl 5.00503 of Solaris8
+  - PASS all tests on perl 5.00503 of TURBOLINUX WORKSTATION Japanese 6.0 Limited Edition
+  - created by INABA Hitoshi
+
+0.72  2011-03-04 00:00:00
+  - change name Sjis to Char::Sjis
+  - support Latin-2, Latin-3, Latin-4, Latin-5, Latin-6, Latin-7, Latin-8, Latin-9
+  - support Cyrillic, Greek
+  - add perl514.bat
+  - created by INABA Hitoshi
+
+0.71  2011-01-26 00:00:00
+  - support @homepage environment of @nifty. (Debugging ended thanks to valuable cooperation of jscripter)
+  - created by INABA Hitoshi
+
+0.70  2011-01-14 00:00:00
+  - remove multibyte anchoring of UTF2 and OldUTF8
+  - propagate @INC by -I switch from script.pl to script.pl.e
+  - propagate $^W by -w switch from script.pl to script.pl.e
+  - support chdir(\x5c ends path) by perl5.006 or perl5.00800 on MSWin32(jacode.pl library required)
+  - support chdir(\x5c ends long path) by perl5.008001 or later, perl5.010 or perl5.012 on MSWin32(Win32 module required)
+  - support GBK
+  - bundle strict.pm_ as dummy strict.pm
+  - add perl55.bat and perl56.bat
+  - created by INABA Hitoshi
+
+0.69  2010-12-21 00:00:00
+  - support MacOS by Sjis software
+  - correct open mode before flock()
+  ; beside "escape" by Delight Prescott of MacPerl Power and Ease
+
+0.68  2010-11-09 00:00:00
+  - re-correct 244_3open.t and 245_2binmode.t
+  - created by INABA Hitoshi
+
+0.67  2010-11-08 00:00:00
+  - correct 244_3open.t and 245_2binmode.t
+  - created by INABA Hitoshi
+
+0.66  2010-11-07 00:00:00
+  - emulate two-argument binmode() on perl5.005
+  - emulate three-argument open() on perl5.005
+  - dummy functions of utf8.pm and bytes.pm
+  - correct write locking routine
+  - bundle warnings.pm_ and warnings/register.pm_
+  - created by INABA Hitoshi
+
+0.65  2010-09-16 00:00:00
+  - check code page on DOS-like system before test
+  - created by INABA Hitoshi
+
+0.64  2010-09-14 00:00:00
+  - support SjisTk module
+  - support \l, \u, lcfirst, and ucfirst
+  - add test of Latin1
+  - created by INABA Hitoshi
+
+0.63  2010-07-04 00:00:00
+  - add test of Big5Plus, Big5HKSCS, GB18030, and UHC
+  - created by INABA Hitoshi
+
+0.62  2010-07-03 00:00:00
+  - redefine \b and \B
+  - created by INABA Hitoshi
+
+0.61  2010-06-27 00:00:00
+  - fix OldUTF8
+  - initialize tr variables on demand
+  - fix Esjis::lc and Esjis::uc's bug
+  - created by INABA Hitoshi
+
+0.60  2010-06-16 00:00:00
+  - back *.pm files from /lib
+  - created by INABA Hitoshi
+
+0.59  2010-06-14 00:00:00
+  - move *.pm files to /lib
+  - fix Makefile.PL
+  - fix m/[$@]/ to m/[\$\@]/
+  - add HP15 and INFORMIXV6ALS test
+  - support Big5-HKSCS
+  - created by INABA Hitoshi
+
+0.58  2010-06-07 00:00:00
+  - fix escapeshellcmd
+  - created by INABA Hitoshi
+
+0.57  2010-06-02 00:00:00
+  - do BEGIN { unshift @INC, '/Perl/site/lib/Sjis'; } in Esjis.pm
+  - support 'no Module'
+  - remove special routine of Tk module
+  - test does only one version of perl
+  - support TAP(Test Anything Protocol)
+  - add ShiftJIS::Regexp's test
+  - rename Makefile.PL to pMakefile.PL(Poor Makefile.PL) for DOS like system
+  - standard Makefile.PL for UNIX like system
+  - warn if chdir "\x5c" ended path on $^W is true
+  - created by INABA Hitoshi
+
+0.56  2010-04-21 00:00:00
+  - add JPerl's test
+  - fix [^]] in regexp from <'^' then ']'> to <not ']'>
+  - [] in regexp make die "unmatched [] in regexp at ..."
+  - support \b and \B in regexp
+  - created by INABA Hitoshi
+
+0.55  2010-04-16 00:00:00
+  - test.pl support perl5.012
+  - support when as a statement modifier
+  - support := operator
+  - created by INABA Hitoshi
+
+0.54  2010-04-02 00:00:00
+  - fix /i modifier with character class '[ccc]' in regexp
+  - support old UTF-8
+  - created by INABA Hitoshi
+
+0.53  2010-04-01 00:00:00
+  - support Latin-1
+  - created by INABA Hitoshi
+
+0.52  2010-03-17 00:00:00
+  - bugfix ${ foo } in regexp
+  - remove modules (re.pm, Fcntl.pm and Symbol.pm)
+  - call flock in Esjis::do and Esjis::require
+  - add perl64.bat
+  - Makefile.pl support UNIX like system
+  - created by INABA Hitoshi
+
+0.51  2010-03-07 00:00:00
+  - remove ** UNAUTHORIZED RELEASE ** modules (Fcntl.pm and Symbol.pm)
+  - created by INABA Hitoshi
+
+0.50  2010-03-07 00:00:00
+  - correct INFOMIXV6ALS to INFORMIXV6ALS (sorry!! forgive me!! ;X)
+  - add UNIX like system's shell escape
+  - glob @ARGV when [?*] included only
+  - avoid warning in Esjis::e
+  - flock on write and read script
+  - add substitute modules (Fcntl.pm and Symbol.pm)
+  - remove modules (Carp.pm and FindBin.pm)
+  - created by INABA Hitoshi
+
+0.49  2010-02-10 00:00:00
+  - add perl512.bat
+  - redefined character class \d \s \w for perl 5.11 or later
+  - fix test.pl and comment of BUGS AND LIMITATIONS about /o modifier
+  - created by INABA Hitoshi
+
+0.48  2010-01-28 00:00:00
+  - Call Module->import() when Module->can('import') is true only
+  - No escape when require jcode.pl and jacode.pl
+  - Remove limitation of two or more here-documents in a line
+  - created by INABA Hitoshi
+
+0.47  2010-01-02 00:00:00
+  - shorten script of EUCJP.pm and UTF2.pm
+  - glob always function as File::DosGlob::glob
+  - ignore use module File::DosGlob, Wildcard, Japanese, and JExt
+  - created by INABA Hitoshi
+
+0.46  2009-12-02 00:00:00
+  - fix bug of split q//
+  - created by INABA Hitoshi
+
+0.45  2009-11-30 00:00:00
+  - fix bug of Esjis::split when string is empty
+  - created by INABA Hitoshi
+
+0.44  2009-11-16 00:00:00
+  - support given and when keywords
+  - support \gN, \g{N}, and \g{-N} in s///
+  - support stacked filetest operators
+  - created by INABA Hitoshi
+
+0.43  2009-10-12 00:00:00
+  - support UTF-2 (aka UTF-8)
+  - fix bug of join separated multiple octet of EUCJP, INFOMIXV6ALS, and GB18030
+  - created by INABA Hitoshi
+
+0.42  2009-09-28 00:00:00
+  - rewrite split(m/^/) to split(m/^/m) on any version of perl
+  - fix bug of function Sjis::substr()
+  - created by INABA Hitoshi
+
+0.41  2009-09-18 00:00:00
+  - add test script
+  - rename Esjis::ord() to Sjis::ord()
+  - rename Esjis::reverse() to Sjis::reverse()
+  - remove Esjis::shift_matched_var()
+  - add Esjis::capture()
+  - support !~ tr///
+  - support s///g
+  - support \h and \v
+  - created by INABA Hitoshi
+
+0.40  2009-08-27 00:00:00
+  - support INFOMIX V6 ALS, GB18030, EUC-JP
+  - created by INABA Hitoshi
+
+0.39  2009-08-06 00:00:00
+  - support Sjis::length, Sjis::substr, Sjis::index, and Sjis::rindex
+  - created by INABA Hitoshi
+
+0.38  2009-08-05 00:00:00
+  - improve qw
+  - filetest operator before parenthesis '-X ('
+  - escape sequence of hexadecimal number of one digit
+  - fix bugs of function charlist_not_qr
+  - created by INABA Hitoshi
+
+0.37  2009-07-09 00:00:00
+  - separate Tk modules, make-*.pl, and test scripts
+  - remove perl55.bat, and perl56.bat
+  - created by INABA Hitoshi
+
+0.36  2009-05-17 00:00:00
+  - do local $@ before eval
+  - support Tk::getOpenFile and Tk::getSaveFile
+  - rewrite in pure batch file perl55.bat, perl56.bat, perl58.bat, and perl510.bat
+  - fixing world writable files in tarball before upload to CPAN [ #38127 ]
+  - created by INABA Hitoshi
+
+0.35  2009-05-06 00:00:00
+  - support do, require, and use for user library
+  - upper compatible function ord and reverse functions only when demanded
+  - support p modifier of m//, s///, and qr// of perl5.10
+  - support !~~ operator
+  - change to secure code, open() to sysopen()
+  - change to secure code, undef %ENV before system()
+  - add make-hp15.pl(HP-15 Hewlett-Packard developed)
+  - created by INABA Hitoshi
+
+0.34  2009-04-01 00:00:00
+  - memorial version on birth day
+  - Sjis::Tk::* modules pre alpha support
+  - created by INABA Hitoshi
+
+0.33  2009-02-15 00:00:00
+  - add script perl56.bat
+  - use Tk --> use Sjis::Tk alpha support
+  - created by INABA Hitoshi
+
+0.32  2009-02-03 00:00:00
+  - add script perl55.bat
+  - wildcard globbing of @ARGV on command.com or cmd.exe
+  - support chr(0x5C) ended path of do '', do "", require '', and require "" on MSWin32
+  - chdir croak when dirname ends chr(0x5C) on MSWin32
+  - created by INABA Hitoshi
+
+0.31  2009-01-29 00:00:00
+  - create test data file on execute test.pl
+  - require run-time module version
+  - rewrite all about "split" logic
+  - created by INABA Hitoshi
+
+0.30  2009-01-04 00:00:00
+  - support context when calling lc(), lc, uc(), uc
+  - support chr(0x5C) ended path on MSWin32
+    - file test operators
+    - functions lstat(), opendir(), stat(), and unlink()
+    - glob() and <WILDCARD>
+  - remove pl2ebat.bat, jperl55.bat, jperl58.bat, and jperl510.bat
+  - merge esjis.pl into Sjis.pm
+  - matched variables $1,$2,$3,... after s/// came to function as it was a description
+  - support function of chr, ord, and reverse again
+  - add test filetest, pathdir, pathfile, and perlmemo
+  - created at kanmi-kissa Hahaso in Chichibu
+
+0.29  2008-11-20 00:00:00
+  - remove \G from $your_gap
+  - created by INABA Hitoshi
+
+0.28  2008-09-05 00:00:00
+  - upgrade Makefile.PL
+  - fix backslashed hexadecimal character escapes
+  - fix backslashed octal character escapes
+  - cancel upper compatible function of chr, ord, and reverse to backward compatibility
+  - $1,$2,$3... of s/// in script means $2,$3,$4...
+  - created by INABA Hitoshi
+
+0.27  2008-08-28 00:00:00
+  - change tr output ex. (my $aaa = $bbb) =~ tr/XYZ/xyz/;
+    before:
+        (my $aaa = $bbb), Esjis::tr($bbb,'XYZ','xyz','');
+    after:
+        Esjis::tr((my $aaa = $bbb),'XYZ','xyz','');
+  - created by INABA Hitoshi
+
+0.26  2008-08-27 00:00:00
+  - fix errata
+  - created by INABA Hitoshi
+
+0.25  2008-08-25 00:00:00
+  - add Big5Plus, GBK, and UHC support
+  - created by INABA Hitoshi
+
+0.24  2008-08-18 00:00:00
+  - cancel \x{HHHH} syntax support in qq, m, s, and qr
+  - escape second octet | of double octet in qq and "" for open() and system()
+  - support \1,\2,\3 syntax of s///, and s'''
+  - add Japanese document
+  - created by INABA Hitoshi
+
+0.23  2008-08-11 00:00:00
+  - escape second octet ^ of double octet code in m, s, and qr
+  - remove brace of \x{HHHH} in qq, m, s, and qr
+  - created at cafe mocca in Nagareyama-Otakanomori S.C
+
+0.22  2008-08-05 00:00:00
+  - support bareword tr, index, rindex, and reverse
+  - avoid "Error: Runtime Exception" of q, qq, '', "", and ``
+  - remove below bugs
+    - escape second octet of double octet code at last q / / string
+    - escape second octet \ of double octet code before \ in q / / string
+    - / means m / / after print operator
+    - m * * rewrite to m { }
+    - m - - rewrite to m { }
+    - m : : rewrite to m { }
+    - m ? ? rewrite to m { }
+    - m \ \ rewrite to m { }
+    - m ^ ^ rewrite to m { }
+    - m | | rewrite to m { }
+    - s * * * rewrite to s { } { }
+    - s - - - rewrite to s { } { }
+    - s : : : rewrite to s { } { }
+    - s ? ? ? rewrite to s { } { }
+    - s \ \ \ rewrite to s { } { }
+    - s ^ ^ ^ rewrite to s { } { }
+    - s | | | rewrite to s { } { }
+    - qr * * rewrite to qr { }
+    - qr - - rewrite to qr { }
+    - qr : : rewrite to qr { }
+    - qr ? ? rewrite to qr { }
+    - qr \ \ rewrite to qr { }
+    - qr ^ ^ rewrite to qr { }
+    - qr | | rewrite to qr { }
+  - created by INABA Hitoshi
+
+0.21  2008-07-22 00:00:00
+  - add smoke test script
+  - remove below bugs
+    - remove return $ope of function &e_s2_q
+    - remove parameter $ope of function &e_s2 and &e_s2_q
+    - add q operator to parameter of function &e_tr_q when delimiter is '/' or '#'
+    - add \c@ .. \c_ to $qq_char, $qq_paren, $qq_brace, $qq_bracket, and $qq_angle
+    - remove unescape and re-escape logic from function &e_m, &e_s1, and &e_qr
+    - any characters meaning .*? in qw { } and qw [ ] to (?:$q_char)*?
+    - change \s* to \s+ of between split and m
+  - created by INABA Hitoshi
+
+0.20  2008-07-14 00:00:00
+  - disable below
+    - delimiter tr''(), tr''{}, tr''[], and tr''<> of tr///
+    - delimiter  y''(),  y''{},  y''[], and  y''<> of y///
+    - delimiter  s''(),  s''{},  s''[], and  s''<> of s///
+  - limit modifier
+    - only c, d, s, b, and B of tr///
+    - only c, d, s, b, and B of y///
+    - only c, g, i, m, o, s, and x of m//
+    - only c, g, i, m, o, s, and x of //
+    - only i, m, s, o, and x of qr//
+    - only e, g, i, m, o, s, and x of s///
+  - change new line code to LF
+  - more comment
+  - created by INABA Hitoshi
+
+0.19  2008-07-03 00:00:00
+  - add code for perl5.10
+  - created by INABA Hitoshi
+
+0.18  2008-05-11 00:00:00
+  - tr///B support
+  - created by INABA Hitoshi
+
+0.17  2008-05-10 00:00:00
+  - correct the document
+  - created by INABA Hitoshi
+
+0.16  2008-05-09 12:00:00
+  - separate run-time routines Esjis.pm, add Sjis.pm
+  - created by INABA Hitoshi
+
+0.15  2008-05-07 00:00:00
+  - remove some limitations
+  - created at COUNTRY FARM CAFE in Ueno
+
+0.14  2008-05-06 00:00:00
+  - remove many bugs and add jperl58.bat, perl58.bat
+  - created at Cafe CORONA in Akihabara
+
+0.13  2008-04-30 00:00:00
+  - remove some limitations and many bugs
+  - created by INABA Hitoshi
+
+0.12  2008-04-27 00:00:00
+  - rename Sjis to esjis, remove some limitations
+  - created by INABA Hitoshi
+
+0.11  2008-04-22 00:00:00
+  - compiler version for perl5.5 and perl5.10
+  - created by INABA Hitoshi
+
+0.10  2008-04-01 00:00:00
+  - original version
+  - created by INABA Hitoshi

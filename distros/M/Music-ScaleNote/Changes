@@ -1,5 +1,31 @@
 Revision history for Music-ScaleNote
 
+0.0507 2019-09-01 14:47:22
+    - Improve documentation.
+    - Add a scale_note not defined test case.
+
+0.0506 2019-09-01 06:21:48
+    - Clean-up code and test.
+    - Croak on an undefined scale position.
+
+0.0505 2019-09-01 05:13:17
+    - Improve SYNOPSIS.
+    - Improve documentation again.
+
+0.0504 2019-09-01 04:59:37
+    - Clean-up code slightly.
+    - Improve documentation slightly.
+    - Improve SYNOPSIS.
+
+0.0503 2019-09-01 04:39:21
+    - Clean-up code again.
+    - Improve documentation.
+
+0.0502 2019-09-01 04:10:03
+    - Improve documentation.
+    - Add test cases.
+    - Clean-up code.
+
 0.0501 2019-05-05 13:46:48
     - Improve documentation.
     - Add test cases.

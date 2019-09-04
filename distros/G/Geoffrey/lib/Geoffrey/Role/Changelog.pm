@@ -5,7 +5,7 @@ use 5.016;
 use strict;
 use warnings;
 
-$Geoffrey::Role::Changelog::VERSION = '0.000201';
+$Geoffrey::Role::Changelog::VERSION = '0.000204';
 
 sub new {
     my $class = shift;
@@ -17,29 +17,47 @@ sub new {
 
 sub tpl_main {
     require Geoffrey::Exception::NotSupportedException;
-    return Geoffrey::Exception::NotSupportedException::throw_file( 'tpl_main', $_[0] );
+    return Geoffrey::Exception::NotSupportedException::throw_file('tpl_main', $_[0]);
 }
 
 sub tpl_sub {
     require Geoffrey::Exception::NotSupportedException;
-    return Geoffrey::Exception::NotSupportedException::throw_file( 'tpl_sub', $_[0] );
+    return Geoffrey::Exception::NotSupportedException::throw_file('tpl_sub', $_[0]);
 }
 
 sub load {
     require Geoffrey::Exception::NotSupportedException;
-    return Geoffrey::Exception::NotSupportedException::throw_file( 'load', $_[0] );
+    return Geoffrey::Exception::NotSupportedException::throw_file('load', $_[0]);
 }
 
 sub write {
     require Geoffrey::Exception::NotSupportedException;
-    return Geoffrey::Exception::NotSupportedException::throw_file( 'write', $_[0] );
+    return Geoffrey::Exception::NotSupportedException::throw_file('write', $_[0]);
 }
 
-sub ending { return $_[0]->{ending} }
+sub insert {
+    require Geoffrey::Exception::NotSupportedException;
+    return Geoffrey::Exception::NotSupportedException::throw_changelog('insert', shift);
+}
+
+sub delete {
+    require Geoffrey::Exception::NotSupportedException;
+    return Geoffrey::Exception::NotSupportedException::throw_changelog('delete', shift);
+}
+
+sub load_changeset {
+    require Geoffrey::Exception::NotSupportedException;
+    return Geoffrey::Exception::NotSupportedException::throw_io_call('load_changeset', shift);
+}
+
+sub ending { $_[0]->{extension} //= $_[0]->{ending}; return $_[0]->{extension}; }
+
+sub extension { $_[0]->{extension} //= $_[0]->{ending}; return $_[0]->{extension}; }
 
 sub needs_converter { return $_[0]->{needs_converter}; }
 
 sub needs_dbh { return $_[0]->{needs_dbh}; }
+
 
 1;    # End of Geoffrey::Role::Changelog
 
@@ -51,11 +69,11 @@ __END__
 
 =head1 NAME
 
-Geoffrey::Role::Changelog - Abstract file class.
+Geoffrey::Role::Changelog - Abstract class for io changelog handling
 
 =head1 VERSION
 
-Version 0.000201
+Version 0.000204
 
 =head1 DESCRIPTION
 
@@ -64,6 +82,8 @@ Version 0.000201
 =head1 SUBROUTINES/METHODS
 
 =head2 new
+
+Constructor
 
 =head2 tpl_main
 
@@ -75,9 +95,32 @@ Version 0.000201
 
 =head2 needs_converter
 
+the currently used converter can be set If the Geoffrey::Changelog:: module needed.
+
 =head2 needs_dbh
 
+If the Geoffrey::Changelog:: module is not file based but using a database.
+The dbh can be set
+
+=head2 insert
+
+Not implemented yet
+
+=head2 delete
+
+Not implemented yet
+
+For some reasons the Changelog object needs a converter and a dbh if it needs interaction with 
+databases
+
 =head2 ending
+=head2 extension
+
+Returns the string fo the file extensions
+
+=head2 load_changeset
+
+Get the value of a changeset by given changeset id.
 
 =head1 DIAGNOSTICS
 

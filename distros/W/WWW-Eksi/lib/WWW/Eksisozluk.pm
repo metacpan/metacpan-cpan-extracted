@@ -1,10 +1,10 @@
 package WWW::Eksisozluk;
-$WWW::Eksisozluk::VERSION = '0.30';
+$WWW::Eksisozluk::VERSION = '0.32';
 use warnings;
 use strict;
 
 use WWW::Eksi;
- 
+
 BEGIN {
     push our @ISA, 'WWW::Eksi';
 }
@@ -22,5 +22,5 @@ WWW::Eksisozluk - an alias to WWW::Eksi
 This module is renamed as L<WWW::Eksi>. You can still use L<WWW::Eksisozluk> as an alias.
 
 =head1 SEE ALSO
- 
+
 L<WWW::Eksi>

@@ -34,6 +34,8 @@ my %WriteMakefileArgs = (
     "MooX::HandlesVia" => 0,
     "Number::Range" => 0,
     "Path::Class" => 0,
+    "TAP::Parser::Iterator::Stream" => 0,
+    "TAP::Parser::SourceHandler" => 0,
     "Term::ANSIColor" => "3.00",
     "Test::Builder" => 0,
     "Test::Differences" => 0,
@@ -42,7 +44,7 @@ my %WriteMakefileArgs = (
     "Type::Tiny" => 0,
     "YAML::Syck" => 0
   },
-  "VERSION" => "0.59",
+  "VERSION" => "0.60",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -64,6 +66,8 @@ my %FallbackPrereqs = (
   "MooX::HandlesVia" => 0,
   "Number::Range" => 0,
   "Path::Class" => 0,
+  "TAP::Parser::Iterator::Stream" => 0,
+  "TAP::Parser::SourceHandler" => 0,
   "Term::ANSIColor" => "3.00",
   "Test::Builder" => 0,
   "Test::Differences" => 0,

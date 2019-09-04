@@ -67,10 +67,14 @@ sub exercise_fifo {
 }
 
 sub exercise_forks {
-    my $q = shift;
+    my ($q,$DEBUG) = @_;
     return if " @ARGV " =~ / [a-z]/ && " @ARGV " !~ / forks /;
 
     my $kidpid = fork();
+    if (!defined $kidpid) {
+        die "Fork failed: $!. We should have low expectations ",
+            "for the rest of this test.";
+    }
     if ($kidpid == 0) {
         if (fork() == 0) {
             for my $i (0 .. 9) {
@@ -86,6 +90,7 @@ sub exercise_forks {
         my $gcpid = wait;
         sleep 2;
         sleep 3; # RT#127933
+        sleep 5 if $^O =~ /freebsd/i;   # RT#127933
         $q->end;
         exit;
     }
@@ -99,7 +104,7 @@ sub exercise_forks {
     until ($s->{end}) {
         sleep 1;
         $s = $q->status;
-        if ($t - time > 5) {
+        if ($t - time > 15) {
             die "Took too long for queue to become available";
         }
     }
@@ -282,7 +287,6 @@ sub exercise_peek {
            'peek: found median item');
     }
     ok($q->pending == 100, 'peek: peek does not remove jobs');
-
 }
 
 sub exercise_blocking {
@@ -432,7 +436,7 @@ sub exercise_join {
         sleep 1;
     }
     ok(-f $file, "join: queue file created in child");
-    my $q = Forks::Queue->new(%opts, join => 1);
+    $q = Forks::Queue->new(%opts, join => 1);
     ok($q, 'join: got queue  join => 1');
     ok($q->pending > 0, 'join => 1   attaches to existing queue');
     my $sum = 0;

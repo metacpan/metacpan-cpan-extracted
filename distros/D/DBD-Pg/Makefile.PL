@@ -5,7 +5,7 @@ use warnings;
 use 5.008001;
 
 ## No version.pm for this one, as the prereqs are not loaded yet.
-my $VERSION = '3.9.1';
+my $VERSION = '3.10.0';
 
 ## App::Info is stored inside t/lib
 ## Create a proper path so we can use it below
@@ -196,7 +196,7 @@ if ($ENV{DBDPG_GCCDEBUG}) {
     $comp_opts .= ' -Wunused'; ## contains -Wunused- function,label,parameter,variable,value
     $comp_opts .= ' -Wunknown-pragmas -Wstrict-aliasing';
     $comp_opts .= ' -Wall'; ## all of above, but we enumerate anyway
-    $comp_opts .= ' -Wextra -Wdeclaration-after-statement -Wendif-labels -Wpointer-arith';
+    $comp_opts .= ' -Wextra -Wendif-labels -Wpointer-arith';
     $comp_opts .= ' -Wbad-function-cast -Wcast-qual -Wcast-align -Wsign-compare -Waggregate-return';
     $comp_opts .= ' -Wmissing-prototypes -Wmissing-declarations -Wmissing-format-attribute -Wpacked -Winline -Winvalid-pch';
     $comp_opts .= ' -Wdisabled-optimization';
@@ -206,7 +206,6 @@ if ($ENV{DBDPG_GCCDEBUG}) {
     $comp_opts .= " -Wsystem-headers";
     $comp_opts .= " -Wmissing-noreturn";
     $comp_opts .= " -Wfloat-equal"; ## Does not like SvTRUE() calls
-    $comp_opts .= " -Wpadded"; ## Use when adding/changing our structs
 }
 
 my %opts =
@@ -234,7 +233,7 @@ my %opts =
                         'Pg.pm' => '$(INST_LIBDIR)/Pg.pm',
                         'lib/Bundle/DBD/Pg.pm' => '$(INST_LIB)/Bundle/DBD/Pg.pm',
                        },
-     clean          => { FILES => 'trace Pg.xsi README.testdatabase' },
+     clean          => { FILES => 'trace Pg.xsi README.testdatabase cover_db' },
      realclean      => { FILES => 'dbdpg_test_database/' },
 );
 

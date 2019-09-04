@@ -493,7 +493,7 @@ int dbd_db_ping (SV * dbh)
 	}
 
 	/* No matter what state we are in, send an empty query to the backend */
-	result = PQexec(imp_dbh->conn, "/* DBD::Pg ping test v3.9.1 */");
+	result = PQexec(imp_dbh->conn, "/* DBD::Pg ping test v3.10.0 */");
 	status = PQresultStatus(result);
 	PQclear(result);
 	if (PGRES_FATAL_ERROR == status) {
@@ -603,6 +603,9 @@ static int pg_db_rollback_commit (pTHX_ SV * dbh, imp_dbh_t * imp_dbh, int actio
 		TRACE_PQERRORMESSAGE;
 		pg_error(aTHX_ dbh, status, PQerrorMessage(imp_dbh->conn));
 		if (TEND_slow) TRC(DBILOGFP, "%sEnd pg_db_rollback_commit (error: status not OK)\n", THEADER_slow);
+		/* Because the commit or rollback has failed, we are still inside a transaction, so reset these: */
+		DBIc_set(imp_dbh, DBIcf_AutoCommit, 0);
+		DBIc_set(imp_dbh, DBIcf_BegunWork, 1);
 		return 0;
 	}
 	/* We just did a rollback or a commit, so savepoints are not relevant, and we cannot be in a PGRES_COPY state */
@@ -4008,6 +4011,11 @@ void dbd_st_destroy (SV * sth, imp_sth_t * imp_sth)
 
     /* We do not actually clear this as imp_dbh may need it (e.g. for pg_error_field) */
     imp_sth->result = NULL;
+
+	/* Tell everyone it is okay to recycle last_result if it belongs to us */
+	if ( (long int)imp_sth == imp_dbh->sth_result_owner ) {
+		imp_dbh->sth_result_owner = 0;
+	}
 
 	/* Free all the segments */
 	currseg = imp_sth->seg;

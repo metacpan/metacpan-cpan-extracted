@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2017 Kevin Ryde
+# Copyright 2017, 2019 Kevin Ryde
 
 # This file is part of Math-OEIS.
 #
@@ -45,17 +45,18 @@ foreach my $dir (Math::OEIS->local_directories()) {
     print "  symlink $filename -> $target\n";
   }
   foreach my $filename (@filenames) {
-    next unless $filename =~ /\.internal\.html$/;
-    my $txt_filename = $filename;
-    $txt_filename =~ s/\.html/.txt/;
-    if (-e $txt_filename) {
-      print "  $filename and also $txt_filename\n";
-    }
+    if ($filename =~ /\.internal\.html$/) {
+      my $txt_filename = $filename;
+      $txt_filename =~ s/\.html/.txt/;
+      if (-e "$dir/$txt_filename") {
+        print "  $filename and also $txt_filename\n";
+      }
 
-    my $html_filename = $filename;
-    $html_filename =~ s/\.internal\.html$/.html/;
-    if (! -e $html_filename) {
-      print "  $filename without $html_filename\n";
+      my $html_filename = $filename;
+      $html_filename =~ s/\.internal\.html$/.html/;
+      unless (-e "$dir/$html_filename") {
+        print "  $filename without $html_filename\n";
+      }
     }
   }
 }

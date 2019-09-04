@@ -82,9 +82,9 @@ stream the video in one's own choice of media player software rather
 than using their web browser and accepting any / all flash, ads, 
 javascript, cookies, trackers, web-bugs, and other crapware that can 
 come with that method of playing.  The author uses his own custom all-purpose 
-audio player called "fauxdacious" (his custom hacked version of the 
-open-source "audacious" media player).  "fauxdacious" incorporates this 
-module to decode and play youtube.com streams.  This is a submodule of the 
+media player called "fauxdacious" (his custom hacked version of the 
+open-source "audacious" audio player).  "fauxdacious" incorporates this 
+module to decode and play youtube.com videos.  This is a submodule of the 
 general StreamFinder module.
 
 Depends:  WWW::YouTube::Download, LWP::UserAgent, URI::Escape, 
@@ -151,7 +151,12 @@ youtube
 =head1 DEPENDENCIES
 
 youtube-dl
+
 LWP::UserAgent
+
+WWW::YouTube::Download
+
+URI::Escape
 
 =head1 BUGS
 
@@ -250,11 +255,12 @@ sub new
 	my $class = shift;
 	my $url = shift;
 	while (@_) {
-		if ($_[0] =~ /^debug$/o) {
+		if ($_[0] =~ /^\-?debug$/o) {
 			shift;
 			$DEBUG = (defined($_[0]) && $_[0] =~/^[0-9]$/) ? shift : 1;
 		}
 	}
+
 	my $self = {};
 	return undef  unless ($url);
 	$url =~ s/\?autoplay\=true$//;  #STRIP THIS OFF SO WE DON'T HAVE TO.
@@ -288,20 +294,40 @@ sub new
 	$self->{'artist'} = $metadata{'user'};
 	print STDERR "-2: title=".$self->{'title'}."= id=".$self->{'id'}."=\n"  if ($DEBUG);
 
-	if ($url =~ /www\.brighteon\.com/) {  #NO AUDIO+VIDEO STREAMS AVAILABLE FOR INFOWARZ (SO GET AUDIO ONLY!):
-		#$url =~ s#embed\/##;
-		#$_ = `youtube-dl -x --get-url "$url"`;
-		$_ = `youtube-dl --get-url --get-thumbnail -f 'bestaudio[ext=mp4]' "$url"`;
-	} else {
+#	if ($url =~ /www\.brighteon\.com/) {  #NO AUDIO+VIDEO STREAMS AVAILABLE FOR INFOWARZ (SO GET AUDIO ONLY!):
+#		#$url =~ s#embed\/##;
+#		#$_ = `youtube-dl -x --get-url "$url"`;
+#		#$_ = `youtube-dl --get-url --get-thumbnail -f 'bestaudio[ext=mp4]' "$url"`;
+#		$_ = `youtube-dl --get-url --get-thumbnail -f 'bestaudio' "$url"`;
+#	} else {
 		$_ = `youtube-dl --get-url --get-thumbnail -f mp4 "$url"`;
-	}
+#	}
 	print STDERR "--cmd=$_=\n"  if ($DEBUG);
 	my @urls = split(/\r?\n/);
 	while (@urls && $urls[0] !~ m#\:\/\/#o) {
 		shift @urls;
 	}
 	return undef  unless ($urls[0]);
+			
 	$self->{'Url'} = $urls[0];
+	if ($urls[0] =~ /\.m3u8/) {   #HACK TO HANDLE CHUNKY (brighteon.com) .m3u8 STREAMS:
+		$_ = `curl $urls[0]`;
+		(my $urlpath = $urls[0]) =~ s#[^\/]+$##;
+		if (/\.ts/s) {
+			my @lines = split(/\r?\n/);
+			my @tsurls;
+			for (my $i=0;$i<=$#lines;$i++) {
+				next  if ($lines[$i] =~ /^\#/o);
+				next  if ($lines[$i] !~ /\.ts$/o);
+				push @tsurls, $lines[$i];
+			}
+			if (!$#tsurls || $tsurls[0] eq $tsurls[1]) {
+				$self->{'Url'} = ($tsurls[0] =~ m#\/#) ? $tsurls[0] : ($urlpath . $tsurls[0]);
+				print STDERR "w:CHGD. m3u8 STREAM TO ts (".$self->{'Url'}.")\n";
+			}
+		}
+	}
+			
 	chomp $self->{'Url'};
 	$self->{'streams'} = [$self->{'Url'}];
 	$self->{'cnt'} = 1;

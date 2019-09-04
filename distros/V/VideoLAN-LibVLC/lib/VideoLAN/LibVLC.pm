@@ -8,7 +8,7 @@ use Socket qw( AF_UNIX SOCK_DGRAM );
 use IO::Handle;
 
 # ABSTRACT: Wrapper for libvlc.so
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 
 use Exporter::Extensible -exporter_setup => 1;
@@ -235,6 +235,7 @@ sub _unregister_callback {
 	delete $self->{_callback}{$id};
 }
 
+
 sub libvlc_video_set_callbacks {
 	my ($player, $lock_cb, $unlock_cb, $display_cb, $opaque)= @_;
 	$player->set_video_callbacks(lock => $lock_cb, unlock => $unlock_cb, display => $display_cb, opaque => $opaque);
@@ -259,41 +260,56 @@ VideoLAN::LibVLC - Wrapper for libvlc.so
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
   use VideoLAN::LibVLC::MediaPlayer;
-  my $player= VideoLAN::LibVLC::MediaPlayer->new("cat_video.mpg");
-  $player->video_lock_cb(sub { ... });   # allocate a buffer for video decoding
-  $player->video_unlock_cb(sub { ... }); # do something with the decoded video frame
+  use AnyEvent; # or whatever your favorite event loop is
+  my $exit_cv= AE::cv;
+  # Tell event loop to call callback_dispatch any time callback_fh is readable
+  my $vlc= VideoLAN::LibVLC->new;
+  my $listen_vlc= AE::io $vlc->callback_fh, 0, sub { $vlc->callback_dispatch };
+  
+  my $player= $vlc->new_media_player("funny_cats.avi");
+  $player->set_video_callbacks(
+    # callback when player needs new picture buffer
+    lock => sub ($player, $event) {
+      # Allocate automatically using queue_new_picture
+      $player->queue_new_picture(id => ++$next_pic_id)
+        while $player->queued_picture_count < 8
+    },
+	# callback when it is time to display a filled picture buffer
+    display => sub ($player, $event) {
+      do_stuff( $event->{picture} );  # do something with the picture
+      $player->queue_picture($event->{picture});  # recycle the buffer
+    },
+  );
   $player->play; # start VLC thread that decodes and generates callbacks
-  my $fh= $player->libvlc->callback_fh;
-  while (1) {
-    if (IO::Select->new($fh)->can_read) {  # set up your main loop to watch the $fh
-      $player->libvlc->callback_dispatch # fire perl callbacks
-    }
-  }
+  exit $exit_cv->recv; # give control to event loop
 
 =head1 DESCRIPTION
 
-This module wraps LibVLC.  LibVLC already has a very nice object-ish (but yet
-still function-based) API, so this package wraps each group of functions into
-a perl object in the logical manner.  One difficulty, however, is that LibVLC
-uses its own threads when doing video playback, and most of the "interesting"
-possibilities for using LibVLC would require you to write your own callbacks,
-which must happen in the main Perl thread.  To work around that (and also not
-force you to use this module as your main event loop) this module passes each
-VLC callback through a pipe.  This allows you to select() on that file handle
-or use an event-driven system like AnyEvent for your program's main loop, and
-still gain the parallel processing benefit of VLC running its own thread.
+This module wraps LibVLC.  The primary reason to use LibVLC instead of running
+VLC as a child process is to get programmatic access to the video frames coming
+from the decoder B<in real time>.  If you just want to iterate the frames of a
+video for some kind of non-realtime analysis, you probably want LibAV instead.
+LibVLC is primarily used to implement video players with alternate rendering,
+like sending the video frames to OpenGL textures, websockets, aalib, or other
+creative uses for which VLC doesn't have an output plugin.
 
-If you're worried about the latency of VLC's playback thread needing a round-
-trip to your callbacks, you can create a double-buffering effect by returning
-two values from the first callback.  The next VLC callback event will get the
-callback result without blocking. (but it still sends another callback event,
-so the perl callback still happens and you can stay one step ahead of the VLC
-thread)
+LibVLC already has a very nice object-ish (yet still function-based) API, so
+this package wraps each group of functions into a perl object in the logical
+manner.  One difficulty, however, is that LibVLC delivers audio and video via
+callbacks, and uses multiple threads for playback, which forces callbacks to
+deal with multithreading issues.  Perl needs all callbacks to run from the
+main thread, so this module solves that by converting callbacks into events,
+and streaming them through a pipe.  You can then fit this into an event loop
+of your choice by watching the read-state of the pipe and calling the
+dispatcher.  You pretty much always need to integrate this into your event
+loop since even logging output is handled via callbacks.  However, it only
+needs done for the top level C<VideoLAN::LibVLC> instance, not for each player
+object.  See L</callback_dispatch> for details.
 
 =head1 CONSTANTS
 
@@ -474,12 +490,44 @@ to know when to call L</callback_dispatch>.
 =head2 callback_dispatch
 
 Read any pending callback messages from the pipe(s), and execute the callback.
+This method does not block (unless your callback does).  You can wait for the
+file handle L</callback_fh> to become readable to know when to call this method.
+
+=over
+
+=item AnyEvent example:
+
+  my $vlc= VideoLAN::LibVLC->new;
+  my $watcher= AE::io $vlc->callback_fh, 0, sub { $vlc->callback_dispatch };  
+
+=item Manual event loop example:
+
+  my $vlc= VideoLAN::LibVLC->new;
+  while (1) {
+    if (IO::Select->new($vlc->callback_fh)->can_read) {
+      $vlc->callback_dispatch;
+    }
+  }
+
+=back
 
 The "wire format" used to stream the callbacks is deliberately hidden within
-this module, and might change drastically in future versions.  The provided
-API is to either call L</wait_callback> or perform your own wait on the file
-handle, and then call this method to unpack the arguments and deliver them to
-the callback.
+this module, and might change drastically in future versions.  It also uses
+raw C-level pointers, so isn't safe for perl to tinker with anyway.
+
+=head2 libvlc_video_set_callbacks
+
+  libvlc_video_set_callbacks($player, $lock_cb, $unlock_cb, $display_cb, $opaque);
+
+This is part of the LibVLC API, but you should use L<VideoLAN::LibVLC::Player/set_video_callbacks>
+instead.
+
+=head2 libvlc_video_set_format_callbacks
+
+  libvlc_video_set_format_callbacks($player, $format_cb, $cleanup_cb);
+
+This is part of the LibVLC API, but you should use L<VideoLAN::LibVLC::Player/set_video_callbacks>
+instead.
 
 =head1 AUTHOR
 

@@ -3,6 +3,8 @@ package DBD::Mock::db;
 use strict;
 use warnings;
 
+use List::Util qw( first );
+
 our $imp_data_size = 0;
 
 sub ping {
@@ -84,8 +86,7 @@ sub prepare {
 
         my $rs;
         if ( my $all_rs = $dbh->{mock_rs} ) {
-            if ( my $by_name = $all_rs->{named}{$statement} ) {
-
+            if ( my $by_name = $all_rs->{named}{$statement} // first { $statement =~ m/$_->{regexp}/ } @{ $all_rs->{matching} } ) {
                 # We want to copy this, because it is meant to be reusable
                 $rs = [ @{ $by_name->{results} } ];
                 if ( exists $by_name->{failure} ) {
@@ -312,7 +313,8 @@ sub STORE {
     elsif ( $attrib eq 'mock_add_resultset' ) {
         $dbh->{mock_rs} ||= {
             named   => {},
-            ordered => []
+            ordered => [],
+            matching => [],
         };
         if ( ref $value eq 'ARRAY' ) {
             my @copied_values = @{$value};
@@ -325,8 +327,18 @@ sub STORE {
                 die "Indexing resultset by name requires passing in 'sql' ",
                   "as hashref key to 'mock_add_resultset'.\n";
             }
+
             my @copied_values = @{ $value->{results} };
-            $dbh->{mock_rs}{named}{$name} = { results => \@copied_values, };
+
+            if ( ref $name eq "Regexp" ) {
+                push @{ $dbh->{mock_rs}{matching} }, {
+                    regexp => $name,
+                    results => \@copied_values,
+                };
+            } else {
+                $dbh->{mock_rs}{named}{$name} = { results => \@copied_values, };
+            }
+
             if ( exists $value->{failure} ) {
                 $dbh->{mock_rs}{named}{$name}{failure} =
                   [ @{ $value->{failure} }, ];

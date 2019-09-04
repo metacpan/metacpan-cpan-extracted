@@ -1,5 +1,13 @@
 Revision history for Path-Tiny-Glob
 
+0.1.0 2019-09-03
+ [NEW FEATURES]
+ - path can now be an array ref of segments. Segments can be strings,
+   coderefs or regexes.
+
+ [STATISTICS]
+ - code churn: 11 files changed, 279 insertions(+), 88 deletions(-)
+
 0.0.1 2018-11-25
  - First version, unleashed on an unsuspecting world.
 

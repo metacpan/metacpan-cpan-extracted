@@ -3,9 +3,9 @@ NAME
     information in PowerDNS database
 
 VERSION
-    This document describes version 0.005 of DNS::Zone::PowerDNS::To::BIND
+    This document describes version 0.006 of DNS::Zone::PowerDNS::To::BIND
     (from Perl distribution DNS-Zone-PowerDNS-To-BIND), released on
-    2019-08-29.
+    2019-09-04.
 
 SYNOPSIS
      use DNS::Zone::PowerDNS::To::BIND qw(gen_bind_zone_from_powerdns_db);
@@ -13,7 +13,6 @@ SYNOPSIS
      say gen_bind_zone_from_powerdns_db(
          db_dsn => 'dbi:mysql:database=pdns',
          domain => 'example.com',
-         master_host => 'dns1.example.com',
      );
 
     will output something like:
@@ -56,8 +55,6 @@ FUNCTIONS
     *   domain => *net::hostname*
 
     *   domain_id => *uint*
-
-    *   master_host* => *net::hostname*
 
     *   workaround_cname_and_other_data => *bool* (default: 1)
 

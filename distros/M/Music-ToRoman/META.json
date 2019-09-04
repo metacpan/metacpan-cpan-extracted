@@ -34,7 +34,6 @@
       },
       "runtime" : {
          "requires" : {
-            "Carp" : "0",
             "List::MoreUtils" : "0",
             "Moo" : "2",
             "Music::Scales" : "0",
@@ -48,6 +47,7 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
+            "Test::Exception" : "0",
             "Test::More" : "0",
             "perl" : "5.006",
             "strict" : "0",
@@ -57,16 +57,14 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "mailto" : "bug-Music-ToRoman@rt.cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Music-ToRoman"
-      },
+      "homepage" : "https://github.com/ology/Music-ToRoman",
       "repository" : {
          "type" : "git",
+         "url" : "https://github.com/ology/Music-ToRoman.git",
          "web" : "https://github.com/ology/Music-ToRoman"
       }
    },
-   "version" : "0.0901",
+   "version" : "0.1106",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.027007"
@@ -282,9 +280,9 @@
             "version" : "6.012"
          },
          {
-            "class" : "Dist::Zilla::Plugin::MetaResources",
-            "name" : "MetaResources",
-            "version" : "6.012"
+            "class" : "Dist::Zilla::Plugin::GithubMeta",
+            "name" : "GithubMeta",
+            "version" : "0.58"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::PodSpelling",
@@ -462,6 +460,6 @@
    },
    "x_authority" : "cpan:GENE",
    "x_generated_by_perl" : "v5.27.7",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.09"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
 }
 

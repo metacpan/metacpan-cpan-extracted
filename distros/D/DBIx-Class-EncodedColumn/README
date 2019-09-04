@@ -62,8 +62,8 @@ SYNOPSIS
        $row->check_password('new_password'); #returns true
        $row->check_password('old_password'); #returns false
 
-    Note: The component needs to be loaded *before* Core and other
-    components such as Timestamp. Core should always be last.
+    Note: The component needs to be loaded *before* Core and other components
+    such as Timestamp. Core should always be last.
 
        E.g:
        __PACKAGE__->load_components(qw/EncodedColumn TimeStamp Core/);
@@ -94,7 +94,11 @@ DESCRIPTION
     omitted them by design.
 
 Options added to add_column
-  encode_column => 1
+    If any one of these options is present the column will be treated as a
+    digest column and all of the defaults will be applied to the rest of the
+    options.
+
+  encode_enable => 1
     Enable automatic encoding of column values. If this option is not set to
     true any other options will become no-ops.
 
@@ -157,4 +161,3 @@ COPYRIGHT
 LICENSE
     This library is free software and may be distributed under the same
     terms as perl itself.
-

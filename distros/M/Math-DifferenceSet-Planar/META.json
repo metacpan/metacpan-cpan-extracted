@@ -3,7 +3,7 @@
    "author" : [
       "Martin Becker <becker-cpan-mp (at) cozap.com>"
    ],
-   "dynamic_config" : 1,
+   "dynamic_config" : 0,
    "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
@@ -28,7 +28,8 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "7.06",
-            "File::ShareDir::Install" : "0"
+            "File::ShareDir::Install" : "0",
+            "File::Spec" : "0"
          }
       },
       "runtime" : {
@@ -51,22 +52,25 @@
    "provides" : {
       "Math::DifferenceSet::Planar" : {
          "file" : "lib/Math/DifferenceSet/Planar.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "Math::DifferenceSet::Planar::Data" : {
          "file" : "lib/Math/DifferenceSet/Planar/Data.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "Math::DifferenceSet::Planar::Schema" : {
          "file" : "lib/Math/DifferenceSet/Planar/Schema.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "Math::DifferenceSet::Planar::Schema::Result::DifferenceSet" : {
          "file" : "lib/Math/DifferenceSet/Planar/Schema/Result/DifferenceSet.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
-   "version" : "0.005",
+   "resources" : {
+      "homepage" : "https://vera.in-ulm.de/planar-diffsets/"
+   },
+   "version" : "0.006",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

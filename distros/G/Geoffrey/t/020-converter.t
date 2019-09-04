@@ -14,7 +14,7 @@ require_ok('Geoffrey::Converter::SQLite');
 use_ok 'Geoffrey::Converter::SQLite';
 
 my $s_filepath = '.tmp.sqlite';
-my $dbh        = DBI->connect("dbi:SQLite:database=$s_filepath");
+my $dbh        = DBI->connect( "dbi:SQLite:database=$s_filepath", { PrintError => 0, RaiseError => 1 } );
 my $converter  = Geoffrey::Converter::SQLite->new(
     max_version => 3.8,
     dbh         => $dbh

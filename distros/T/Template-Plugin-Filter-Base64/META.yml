@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.142690'
+generated_by: 'Minilla/v3.1.5, CPAN::Meta::Converter version 2.142690'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   Template::Plugin::Filter::Base64:
     file: lib/Template/Plugin/Filter/Base64.pm
-    version: '0.06'
+    version: '0.07'
 requires:
   Encode: '0'
   HTML::Entities: '0'
@@ -38,7 +38,7 @@ resources:
   bugtracker: https://github.com/bbon/Template-Plugin-Filter-Base64/issues
   homepage: https://github.com/bbon/Template-Plugin-Filter-Base64
   repository: git://github.com/bbon/Template-Plugin-Filter-Base64.git
-version: '0.06'
+version: '0.07'
 x_authority: cpan:BBON
 x_contributors:
   - 'Alexander A. Gnatyna <a.gnatyna@gazeta.ru>'

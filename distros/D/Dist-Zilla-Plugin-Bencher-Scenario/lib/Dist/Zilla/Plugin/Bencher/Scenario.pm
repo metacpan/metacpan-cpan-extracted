@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::Bencher::Scenario;
 
-our $DATE = '2019-02-24'; # DATE
-our $VERSION = '0.170'; # VERSION
+our $DATE = '2019-09-02'; # DATE
+our $VERSION = '0.171'; # VERSION
 
 use 5.010001;
 use strict;
@@ -15,6 +15,7 @@ use Dist::Zilla::File::InMemory;
 use File::Slurper qw(read_binary);
 use File::Spec::Functions qw(catfile);
 use Module::Load;
+use PMVersions::Util qw(version_from_pmversions);
 
 # we need the version to insert to generated test scripts, prereqs.
 $Bencher::Backend::VERSION or die "Please use Bencher with a version number";
@@ -177,7 +178,8 @@ sub munge_files {
         my @helper_modules = Bencher::Backend::_get_participant_helper_modules($scenario);
         for my $mod (@modules) {
             next if $distmodules{$mod};
-            my $ver = $scenario->{modules}{$mod}{version} // 0;
+            my $ver = $scenario->{modules}{$mod}{version} //
+                version_from_pmversions($mod) // 0;
             $self->log_debug(
                 ["(scenario %s) Adding prereqs to benchmarked module %s (version %s)",
                  $pkg, $mod, $ver]);
@@ -190,7 +192,8 @@ sub munge_files {
         }
         for my $mod (@helper_modules) {
             next if $distmodules{$mod};
-            my $ver = $scenario->{modules}{$mod}{version} // 0;
+            my $ver = $scenario->{modules}{$mod}{version} //
+                version_from_pmversions($mod) // 0;
             $self->log_debug(
                 ["(scenario %s) Adding prereqs to helper module %s (version %s)",
                  $pkg, $mod, $ver]);
@@ -253,7 +256,7 @@ Dist::Zilla::Plugin::Bencher::Scenario - Plugin to use when building Bencher::Sc
 
 =head1 VERSION
 
-This document describes version 0.170 of Dist::Zilla::Plugin::Bencher::Scenario (from Perl distribution Dist-Zilla-Plugin-Bencher-Scenario), released on 2019-02-24.
+This document describes version 0.171 of Dist::Zilla::Plugin::Bencher::Scenario (from Perl distribution Dist-Zilla-Plugin-Bencher-Scenario), released on 2019-09-02.
 
 =head1 SYNOPSIS
 

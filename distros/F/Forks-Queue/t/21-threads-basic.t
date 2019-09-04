@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use lib '.';   # 5.26 compat
 
 # t/01_basic.t from Thread::Queue, but using threads and Forks::Queue
 

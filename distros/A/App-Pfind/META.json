@@ -1,0 +1,62 @@
+{
+   "abstract" : "A Perl based find replacement",
+   "author" : [
+      "Mathias Kende <mathias@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-Pfind",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ],
+      "namespace" : [
+         "App::Pfind"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Find" : "0",
+            "File::Spec::Functions" : "0",
+            "Getopt::Long" : "0",
+            "Pod::Usage" : "0",
+            "Safe" : "0",
+            "perl" : "5.022"
+         }
+      },
+      "test" : {
+         "suggests" : {
+            "Test::Pod" : "1.22"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mkende/pfind/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/mkende/pfind"
+      }
+   },
+   "version" : "1.03",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 use Forks::Queue;
+use lib '.';   # 5.26 compat
 require "t/exercises.tt";
 
 for my $impl (IMPL()) {

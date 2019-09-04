@@ -19,10 +19,10 @@ no_index:
     - t
     - inc
 requires:
-  Geoffrey: '0.0002'
+  Geoffrey: '0.000202'
   SQL::Abstract: '0'
   perl: '5.024000'
 resources:
   repository: https://gitlab.com/GeoffreyDB/Geoffrey-Changelog-Database.git
-version: '0.000200'
+version: '0.000202'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

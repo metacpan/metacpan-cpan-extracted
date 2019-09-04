@@ -1,0 +1,12 @@
+^local
+^\.idea
+^cover_db
+cpanfile.snapshot
+^\.(?!perltidyrc)
+.*\.old$
+\.tar\.gz$
+^Makefile$
+^MYMETA\.
+^blib
+^pm_to_blib
+\B\.DS_Store

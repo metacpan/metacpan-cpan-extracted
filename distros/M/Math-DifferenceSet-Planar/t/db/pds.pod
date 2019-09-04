@@ -1,0 +1,54 @@
+=encoding utf8
+
+=head1 NAME
+
+pds.db - small database with planar difference set samples
+
+=head1 VERSION
+
+This is version 0.9 of the database, created on August 29, 2019.
+
+=head1 DESCRIPTION
+
+This file is a small sample database only used for testing.
+
+It contains 7 cyclic planar difference sets with orders ranging from
+2 to 9.  The sets are chosen minimal by lexicographic ordering.
+
+=head1 FILE FORMAT
+
+SQLite 3.x database.
+
+=head1 SCHEMA
+
+  CREATE TABLE difference_set (
+    order_   integer NOT NULL PRIMARY KEY,
+    base     integer NOT NULL,
+    exponent integer NOT NULL,
+    modulus  integer NOT NULL,
+    n_planes integer NOT NULL,
+    deltas   text    NOT NULL
+  );
+
+=head1 DATA REPRESENTATION
+
+If I<D = { d_1, d_2, ..., d_k } (mod m)> is a canonical cyclic planar
+difference set of order I<k - 1> with I<d_1 E<8801> 0> and
+I<d_1 E<8801> 1 (mod m)>, I<deltas> is a string with I<k - 2> numeric
+values separated by blanks, calculated as differences of consecutive
+residue values of I<D> starting with I<d_3 - d_2>.  The difference of
+the smallest two values in a canonical set is always 1 and thus not
+important to store.
+
+=head1 PROVIDER
+
+Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+The contents of this database are mathematically defined entities.
+The provider believes mathematical constants not to be proprietary or
+subject to copyright legislation, although the software used to calculate
+them may be.
+
+=cut

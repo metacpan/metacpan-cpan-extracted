@@ -1,3 +1,10 @@
+0.115		2019-09-02	T. R. Wyant
+    Change default usgs_url to https://nationalmap.gov/epqs/pqs.php
+    since that is what is documented at
+    https://www.usgs.gov/core-science-systems/ngp/3dep/about-3dep-products-services
+
+    Revised eg/usgs_ele to be able to swap between new and old URLs.
+
 0.114		2019-08-25	T. R. Wyant
     Make USGS URL https:, save a redirect.
 

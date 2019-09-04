@@ -144,7 +144,7 @@ sub check_seq {
     else {
         $location = sprintf "%s:%s", $info->{chr}, $info->{start};
     }
-    my $seq_in_genome = uc get_seq_faidx( $file_genome, $location );
+    my $seq_in_genome = uc App::Fasops::Common::get_seq_faidx( $file_genome, $location );
 
     my $status = "FAILED";
     if ( $seq eq $seq_in_genome ) {
@@ -154,25 +154,6 @@ sub check_seq {
     printf {$out_fh} "%s\t%s\n", $header, $status;
 
     return;
-}
-
-sub get_seq_faidx {
-    my $file_genome = shift;
-    my $location    = shift;    # I:1-100
-
-    my $cmd = sprintf "samtools faidx %s %s", $file_genome, $location;
-    open my $fh_pipe, '-|', $cmd;
-
-    my $seq;
-    while ( my $line = <$fh_pipe> ) {
-        chomp $line;
-        if ( $line =~ /^[\w-]+/ ) {
-            $seq .= $line;
-        }
-    }
-    close($fh_pipe);
-
-    return $seq;
 }
 
 1;

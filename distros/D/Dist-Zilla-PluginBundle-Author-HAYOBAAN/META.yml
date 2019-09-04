@@ -10,13 +10,12 @@ build_requires:
   Path::Tiny: '0'
   Test::DZil: '0'
   Test::More: '0.96'
-  blib: '1.01'
   perl: '5.010'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.010'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,18 +25,21 @@ no_index:
   directory:
     - corpus
 provides:
+  Dist::Zilla::Plugin::Author::HAYOBAAN::LinkCheck:
+    file: lib/Dist/Zilla/Plugin/Author/HAYOBAAN/LinkCheck.pm
+    version: '0.014'
   Dist::Zilla::Plugin::Author::HAYOBAAN::NextVersion:
     file: lib/Dist/Zilla/Plugin/Author/HAYOBAAN/NextVersion.pm
-    version: '0.013'
+    version: '0.014'
   Dist::Zilla::PluginBundle::Author::HAYOBAAN:
     file: lib/Dist/Zilla/PluginBundle/Author/HAYOBAAN.pm
-    version: '0.013'
+    version: '0.014'
   Pod::Weaver::PluginBundle::Author::HAYOBAAN:
     file: lib/Pod/Weaver/PluginBundle/Author/HAYOBAAN.pm
-    version: '0.013'
+    version: '0.014'
   Pod::Weaver::Section::Author::HAYOBAAN::Bugs:
     file: lib/Pod/Weaver/Section/Author/HAYOBAAN/Bugs.pm
-    version: '0.013'
+    version: '0.014'
 requires:
   Dist::Zilla: '5.014'
   Dist::Zilla::Plugin::CheckChangesHasContent: '0'
@@ -55,9 +57,11 @@ requires:
   Dist::Zilla::Plugin::GitHub::Meta: '0'
   Dist::Zilla::Plugin::GitHub::Update: '0'
   Dist::Zilla::Plugin::GitHubREADME::Badge: '0'
+  Dist::Zilla::Plugin::InlineFiles: '0'
   Dist::Zilla::Plugin::InstallGuide: '0'
   Dist::Zilla::Plugin::MetaProvides::Class: '0'
   Dist::Zilla::Plugin::MetaProvides::Package: '0'
+  Dist::Zilla::Plugin::MetaYAML: '0'
   Dist::Zilla::Plugin::MinimumPerl: '0'
   Dist::Zilla::Plugin::MojibakeTests: '0'
   Dist::Zilla::Plugin::OurPkgVersion: '0'
@@ -65,7 +69,6 @@ requires:
   Dist::Zilla::Plugin::ReadmeAnyFromPod: '0.161150'
   Dist::Zilla::Plugin::Run: '0'
   Dist::Zilla::Plugin::RunExtraTests: '0'
-  Dist::Zilla::Plugin::SchwartzRatio: '0'
   Dist::Zilla::Plugin::Test::CPAN::Changes: '0'
   Dist::Zilla::Plugin::Test::CPAN::Meta::JSON: '0'
   Dist::Zilla::Plugin::Test::Compile: '0'
@@ -75,12 +78,12 @@ requires:
   Dist::Zilla::Plugin::Test::MinimumVersion: '0'
   Dist::Zilla::Plugin::Test::NoTabs: '0'
   Dist::Zilla::Plugin::Test::Perl::Critic: '0'
-  Dist::Zilla::Plugin::Test::Pod::LinkCheck: '0'
   Dist::Zilla::Plugin::Test::Portability: '0'
   Dist::Zilla::Plugin::Test::Synopsis: '0'
   Dist::Zilla::Plugin::Test::UnusedVars: '0'
   Dist::Zilla::Plugin::Test::Version: '0'
   Dist::Zilla::Role::PluginBundle::Easy: '0'
+  Dist::Zilla::Role::PrereqSource: '0'
   Getopt::Long: '0'
   Moose: '0.99'
   Pod::Coverage::TrustPod: '0'
@@ -101,5 +104,6 @@ resources:
   bugtracker: https://github.com/HayoBaan/Dist-Zilla-PluginBundle-Author-HAYOBAAN/issues
   homepage: http://metacpan.org/release/Dist-Zilla-PluginBundle-Author-HAYOBAAN/
   repository: git://github.com/HayoBaan/Dist-Zilla-PluginBundle-Author-HAYOBAAN.git
-version: '0.013'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: '0.014'
+x_generated_by_perl: v5.18.4
+x_serialization_backend: 'YAML::Tiny version 1.73'

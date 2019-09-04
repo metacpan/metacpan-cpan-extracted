@@ -11,7 +11,7 @@ use vars qw(
 );
 
 @ISA = ('Pod::Simple');
-$VERSION = '0.18';
+$VERSION = '0.19';
 
 BEGIN { *DEBUG = sub () {0} unless defined &DEBUG }
 
@@ -522,7 +522,23 @@ sub _ponder_row_end {
   return 1;
 }
 
-1; 
+sub _get_item_type {
+  my ($self, $para) = @_;
+  return $para->[1]{'~type'} if $para->[1]{'~type'};
+
+  my $content = join "\n", @{$para}[2 .. $#$para];
+  if ($content =~ s/^\s*(\d+)\.?\s+?//s) {
+    $para->[1]{orig_content} = $content;
+    $para->[1]{number} = $1;
+
+    $para->[-1] = $content;
+    return $para->[1]{'~type'} = 'number';
+  }
+
+  return $self->SUPER::_get_item_type($para);
+}
+
+1;
 
 __END__
 

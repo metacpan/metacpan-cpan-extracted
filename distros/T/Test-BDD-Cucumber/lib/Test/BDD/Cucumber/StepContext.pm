@@ -1,5 +1,5 @@
 package Test::BDD::Cucumber::StepContext;
-$Test::BDD::Cucumber::StepContext::VERSION = '0.59';
+$Test::BDD::Cucumber::StepContext::VERSION = '0.60';
 use Moo;
 use Types::Standard qw( Bool Str HashRef ArrayRef InstanceOf );
 use List::Util qw( first );
@@ -10,7 +10,7 @@ Test::BDD::Cucumber::StepContext - Data made available to step definitions
 
 =head1 VERSION
 
-version 0.59
+version 0.60
 
 =head1 DESCRIPTION
 
@@ -263,7 +263,7 @@ sub transform {
 
         if (
             $value =~ s/$transformer->[0]/
-                my $value = $transformer->[1]->( $self );
+                my $value = $transformer->[2]->( $self );
                 defined $value ? $value : '__UNDEF__'
             /e
           )
@@ -420,7 +420,7 @@ sub _build_transformed_data {
             first { $table_text =~ $_->[0] } @{ $self->transformers } )
         {
             # call the Transform step
-            $transformer->[1]->( $self, $transformed_data );
+            $transformer->[2]->( $self, $transformed_data );
         }
     }
 

@@ -2,8 +2,8 @@
 
 package Sys::RunAlone::Flexible;
 
-our $DATE = '2019-08-17'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-09-03'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 # make sure we're strict and verbose as possible
 use strict;
@@ -65,7 +65,7 @@ sub lock {
                 sleep $sleep;
 
                 # we're alone!
-                goto ALLOK if flock main::DATA, LOCK_EX | LOCK_NB;
+                goto ALLOK if flock *{$data_pkg}, LOCK_EX | LOCK_NB;
             }
             print STDERR "Retrying lock failed ...\n" unless $silent;
         }
@@ -141,7 +141,7 @@ Sys::RunAlone::Flexible - make sure only one invocation of a script is active at
 
 =head1 VERSION
 
-This document describes version 0.003 of Sys::RunAlone::Flexible (from Perl distribution Sys-RunAlone-Flexible), released on 2019-08-17.
+This document describes version 0.004 of Sys::RunAlone::Flexible (from Perl distribution Sys-RunAlone-Flexible), released on 2019-09-03.
 
 =head1 SYNOPSIS
 

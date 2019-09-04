@@ -7,7 +7,7 @@ use warnings;
 
 use parent 'Geoffrey::Role::Action';
 
-$Geoffrey::Action::Constraint::Index::VERSION = '0.000201';
+$Geoffrey::Action::Constraint::Index::VERSION = '0.000204';
 
 sub add {
     my ( $self, $hr_params ) = @_;
@@ -51,7 +51,7 @@ Geoffrey::Action::Constraint::Index - Action handler for indexes
 
 =head1 VERSION
 
-Version 0.000201
+Version 0.000204
 
 =head1 DESCRIPTION
 

@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use lib '.';   # 5.26 compat
 
 # t/06_insert.t from Thread::Queue, but using threads and Forks::Queue
 

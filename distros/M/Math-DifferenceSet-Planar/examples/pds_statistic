@@ -1,0 +1,57 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Math::DifferenceSet::Planar::Data;
+use Math::BigInt try => 'GMP';
+
+$| = 1;
+
+my $data = eval { Math::DifferenceSet::Planar::Data->new(@ARGV) };
+die "usage: pds_statistic [database]\n" if 1 < @ARGV || !defined $data;
+
+my $it = $data->iterate_properties;
+print "order\tp\tn\tmodulus\t#planes\t#sets\n";
+while (my $ds = $it->()) {
+    my $o = $ds->order;
+    my $m = $ds->modulus;
+    my $b = $ds->base;
+    my $e = $ds->exponent;
+    my $n = $ds->n_planes;
+    my $c = Math::BigInt->new($m) * $n;
+    print "$o\t$b\t$e\t$m\t$n\t$c\n";
+}
+
+__END__
+=head1 NAME
+
+pds_statistic - display statistic of available planar difference sets
+
+=head1 SYNOPSIS
+
+  pds_statistic [database]
+
+=head1 DESCRIPTION
+
+This example program iterates through all available planar difference
+sets and shows some of the properties of their respective spaces.
+
+=head1 AUTHOR
+
+Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2019 by Martin Becker, Blaubeuren.  All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=head1 DISCLAIMER OF WARRANTY
+
+This library is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of merchantability
+or fitness for a particular purpose.
+
+=cut

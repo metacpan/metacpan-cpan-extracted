@@ -38,7 +38,7 @@ no warnings;
 #@EXPORT   = qw(); # our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw( descend prepareblank ); # our @EXPORT = qw( );
 
-$VERSION = '0.137'; # our $VERSION = '';
+$VERSION = '0.139'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Descent is an module collaborating with the Sim::OPT module for performing block coordinate descent.';
 
 #########################################################################################
@@ -139,14 +139,14 @@ sub descend
 	my $skipsim = $vals{skipsim};
 	my $skipreport = $vals{skipreport};
 
-  if ( $countcase > $#sweeps )# NUMBER OF CASES OF THE CURRENT PROBLEM
-  {
-    if ( $dirfiles{checksensitivity} eq "yes" )
-    {
-      Sim::OPT::sense( $dirfiles{ordtot}, $mypath, $dowhat{objectivecolumn} );
-    }
-    exit(say $tee "3 #END RUN.");
-  }
+  #if ( $countcase > $#sweeps )# NUMBER OF CASES OF THE CURRENT PROBLEM
+  #{
+  #  if ( $dirfiles{checksensitivity} eq "yes" )
+  #  {
+  #    Sim::OPT::sense( $dirfiles{ordtot}, $mypath, $dowhat{objectivecolumn} );
+  #  }
+  #  exit(say $tee "3 #END RUN.");
+  #}
 
 	my @blockelts = @{ $d{blockelts} }; #say $tee "IN ENTRY DESCEND \@blockelts : " . dump( @blockelts );
 
@@ -279,13 +279,13 @@ sub descend
   }
 
 
-  if ( $countcase > $#sweeps )# NUMBER OF CASES OF THE CURRENT PROBLEM
-  {
-    {
-      Sim::OPT::sense( $dirfiles{ordtot}, $mypath, $dowhat{objectivecolumn} );
-    }
-    exit(say $tee "4 #END RUN.");
-  }
+  #if ( $countcase > $#sweeps )# NUMBER OF CASES OF THE CURRENT PROBLEM
+  #{
+  #  {
+  #    Sim::OPT::sense( $dirfiles{ordtot}, $mypath, $dowhat{objectivecolumn} );
+  #  }
+  #  exit(say $tee "4 #END RUN.");
+  #}
 
   say $tee " \$repfile " . dump($repfile);
   if ( not( -e $repfile ) ){ die "There isn't \$repfile: $repfile"; };
@@ -1215,6 +1215,7 @@ sub descend
       #say $tee "IN CASE END."; say $tee "\$dirfiles{starsign} " . dump( $dirfiles{starsign} );
       if ( ( $dirfiles{starsign} eq "yes" ) or
     			( ( $dirfiles{random} eq "yes" ) and ( $dowhat{metamodel} eq "yes" ) ) or
+          ( ( $dirfiles{randompick} eq "yes" ) and ( $dowhat{metamodel} eq "yes" ) ) or
     			( ( $dirfiles{latinhypercube} eq "yes" ) and ( $dowhat{metamodel} eq "yes" ) ) or
     			( ( $dirfiles{factorial} eq "yes" ) and ( $dowhat{metamodel} eq "yes" ) ) or
     			( ( $dirfiles{facecentered} eq "yes" ) and ( $dowhat{metamodel} eq "yes" ) ) ) ### BEGINNING OF THE PART ON STAR CONFIGURATIONS
@@ -1440,14 +1441,14 @@ sub descend
         $countblock = 0;
         $countcase++; ####!!!
 
-        if ( $countcase > $#sweeps )# NUMBER OF CASES OF THE CURRENT PROBLEM
-        {
-          if ( $dirfiles{checksensitivity} eq "yes" )
-          {
-            Sim::OPT::sense( $dirfiles{ordtot}, $mypath, $dowhat{objectivecolumn} );
-          }
-          exit(say $tee "1 #END RUN.");
-        }
+        #if ( $countcase > $#sweeps )# NUMBER OF CASES OF THE CURRENT PROBLEM
+        #{
+        #  if ( $dirfiles{checksensitivity} eq "yes" )
+        #  {
+        #    Sim::OPT::sense( $dirfiles{ordtot}, $mypath, $dowhat{objectivecolumn} );
+        #  }
+        #  exit(say $tee "1 #END RUN.");
+        #}
 
         $countstring++;
         $dirfiles{countstring} = $countstring;
@@ -1474,14 +1475,14 @@ sub descend
         $countblock = 0;
         $countcase++; ####!!!
 
-        if ( $countcase > $#sweeps )# NUMBER OF CASES OF THE CURRENT PROBLEM
-        {
-          if ( $dirfiles{checksensitivity} eq "yes" )
-          {
-            Sim::OPT::sense( $dirfiles{ordtot}, $mypath, $dowhat{objectivecolumn} );
-          }
-          exit(say $tee "2 #END RUN.");
-        }
+        #if ( $countcase > $#sweeps )# NUMBER OF CASES OF THE CURRENT PROBLEM
+        #{
+        #  if ( $dirfiles{checksensitivity} eq "yes" )
+        #  {
+        #    Sim::OPT::sense( $dirfiles{ordtot}, $mypath, $dowhat{objectivecolumn} );
+        #  }
+        #  exit(say $tee "2 #END RUN.");
+        #}
 
         $countstring++;
         $dirfiles{countstring} = $countstring;
@@ -1522,6 +1523,7 @@ sub descend
 
       if ( ( $dirfiles{starsign} eq "yes" ) or
     			( ( $dirfiles{random} eq "yes" ) and ( $dowhat{metamodel} eq "yes" ) ) or
+          ( ( $dirfiles{randompick} eq "yes" ) and ( $dowhat{metamodel} eq "yes" ) ) or
     			( ( $dirfiles{latinhypercube} eq "yes" ) and ( $dowhat{metamodel} eq "yes" ) ) or
     			( ( $dirfiles{factorial} eq "yes" ) and ( $dowhat{metamodel} eq "yes" ) ) or
     			( ( $dirfiles{facecentered} eq "yes" ) and ( $dowhat{metamodel} eq "yes" ) ) )

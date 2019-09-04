@@ -1,4 +1,7 @@
 Revision history for PerlIO-buffersize
 
+0.002     2019-08-31 12:48:23+02:00 Europe/Amsterdam
+    -     Allow enlargement of existing buffers
+
 0.001     2012-05-08 20:53:21 Europe/Amsterdam
     -

@@ -8,7 +8,7 @@ use Geoffrey::Utils;
 use Geoffrey::Exception::RequiredValue;
 use Geoffrey::Exception::NotSupportedException;
 
-$Geoffrey::Action::Trigger::VERSION = '0.000201';
+$Geoffrey::Action::Trigger::VERSION = '0.000204';
 
 use parent 'Geoffrey::Role::Action';
 
@@ -93,7 +93,7 @@ Geoffrey::Action::Trigger - Action for triggers
 
 =head1 VERSION
 
-Version 0.000201
+Version 0.000204
 
 =head1 DESCRIPTION
 

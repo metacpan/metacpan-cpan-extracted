@@ -1,10 +1,28 @@
 package App::DBCritic::Policy::BidirectionalRelationship;
 
+# ABSTRACT: Check for missing bidirectional relationships in ResultSources
+
+#pod =head1 SYNOPSIS
+#pod
+#pod     use App::DBCritic;
+#pod
+#pod     my $critic = App::DBCritic->new(
+#pod         dsn => 'dbi:Oracle:HR', username => 'scott', password => 'tiger');
+#pod     $critic->critique();
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod This policy returns a violation if one or more of a
+#pod L<DBIx::Class::ResultSource|DBIx::Class::ResultSource>'s relationships does not
+#pod have a corresponding reverse relationship in the other class.
+#pod
+#pod =cut
+
 use strict;
 use utf8;
-use Modern::Perl;
+use Modern::Perl '2011';    ## no critic (Modules::ProhibitUseQuotedVersion)
 
-our $VERSION = '0.020';    # VERSION
+our $VERSION = '0.023';     # VERSION
 use English '-no_match_vars';
 use Moo;
 use Sub::Quote;
@@ -14,36 +32,64 @@ has description => (
     is      => 'ro',
     default => quote_sub q{'Missing bidirectional relationship'},
 );
+
+#pod =attr description
+#pod
+#pod "Missing bidirectional relationship"
+#pod
+#pod =cut
+
 has explanation => (
     is      => 'ro',
     default => quote_sub
         q{'Related tables should have relationships defined in both classes.'},
 );
 
+#pod =attr explanation
+#pod
+#pod "Related tables should have relationships defined in both classes."
+#pod
+#pod =cut
+
 sub violates {
     my $source = shift->element;
 
     return join "\n",
-        map { _message( $source->name, $source->related_source($ARG)->name ) }
-        grep { !keys %{ $source->reverse_relationship_info($ARG) } }
+        map { _message( $source->name, $source->related_source($_)->name ) }
+        grep { !keys %{ $source->reverse_relationship_info($_) } }
         $source->relationships;
 }
 
-sub _message { return "$ARG[0] to $ARG[1] not reciprocated" }
+#pod =method violates
+#pod
+#pod If the L<"current element"|App::DBCritic::Policy>'s
+#pod L<relationships|DBIx::Class::ResultSource/relationships> do not all have
+#pod corresponding
+#pod L<"reverse relationships"|DBIx::Class::ResultSource/reverse_relationship_info>,
+#pod returns a string describing details of the issue.
+#pod
+#pod =cut
+
+sub _message { return "$_[0] to $_[1] not reciprocated" }
 
 with 'App::DBCritic::PolicyType::ResultSource';
-1;
 
-# ABSTRACT: Check for missing bidirectional relationships in ResultSources
+#pod =attr applies_to
+#pod
+#pod This policy applies to L<ResultSource|DBIx::Class::ResultSource>s.
+#pod
+#pod =cut
+
+1;
 
 __END__
 
 =pod
 
-=for :stopwords Mark Gardner cpan testmatrix url annocpan anno bugtracker rt cpants
-kwalitee diff irc mailto metadata placeholders
+=encoding UTF-8
 
-=encoding utf8
+=for :stopwords Mark Gardner cpan testmatrix url annocpan anno bugtracker rt cpants
+kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 NAME
 
@@ -51,7 +97,7 @@ App::DBCritic::Policy::BidirectionalRelationship - Check for missing bidirection
 
 =head1 VERSION
 
-version 0.020
+version 0.023
 
 =head1 SYNOPSIS
 
@@ -97,7 +143,7 @@ returns a string describing details of the issue.
 
 You can find documentation for this module with the perldoc command.
 
-  perldoc bin::dbcritic
+  perldoc App::DBCritic::Policy::BidirectionalRelationship
 
 =head2 Websites
 
@@ -116,14 +162,6 @@ L<http://search.cpan.org/dist/App-DBCritic>
 
 =item *
 
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annonations of Perl module documentation.
-
-L<http://annocpan.org/dist/App-DBCritic>
-
-=item *
-
 CPAN Ratings
 
 The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
@@ -136,13 +174,13 @@ CPANTS
 
 The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
 
-L<http://cpants.perl.org/dist/overview/App-DBCritic>
+L<http://cpants.cpanauthors.org/dist/App-DBCritic>
 
 =item *
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/A/App-DBCritic>
 
@@ -150,7 +188,7 @@ L<http://www.cpantesters.org/distro/A/App-DBCritic>
 
 CPAN Testers Matrix
 
-The CPAN Testers Matrix is a website that provides a visual way to determine what Perls/platforms PASSed for a distribution.
+The CPAN Testers Matrix is a website that provides a visual overview of the test results for a distribution on various Perls/platforms.
 
 L<http://matrix.cpantesters.org/?dist=App-DBCritic>
 
@@ -186,7 +224,7 @@ Mark Gardner <mjgardner@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 by Mark Gardner.
+This software is copyright (c) 2019 by Mark Gardner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

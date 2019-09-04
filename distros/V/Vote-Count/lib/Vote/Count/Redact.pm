@@ -12,13 +12,13 @@ use namespace::autoclean;
 
 no warnings 'experimental';
 
-our $VERSION='0.022';
+our $VERSION='0.02401';
 
 =head1 NAME
 
 Vote::Count::Redact
 
-=head1 VERSION 0.022
+=head1 VERSION 0.02401
 
 Methods for Redacting Ballots.
 

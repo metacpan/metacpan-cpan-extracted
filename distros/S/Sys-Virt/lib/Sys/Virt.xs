@@ -5034,6 +5034,24 @@ get_launch_security_info(dom, flags=0)
       RETVAL
 
 
+HV *
+get_guest_info(dom, types=0, flags=0)
+      virDomainPtr dom;
+      int types;
+      unsigned int flags;
+  PREINIT:
+      virTypedParameterPtr params = NULL;
+      int nparams = 0;
+    CODE:
+      if (virDomainGetGuestInfo(dom, types, &params, &nparams, flags) < 0) {
+          _croak_error();
+      }
+      RETVAL = vir_typed_param_to_hv(params, nparams);
+      virTypedParamsFree(params, nparams);
+  OUTPUT:
+      RETVAL
+
+
 unsigned long
 get_max_memory(dom)
       virDomainPtr dom;
@@ -9738,6 +9756,13 @@ BOOT:
 
 
       REGISTER_CONSTANT_STR(VIR_DOMAIN_LAUNCH_SECURITY_SEV_MEASUREMENT, LAUNCH_SECURITY_SEV_MEASUREMENT);
+
+      REGISTER_CONSTANT(VIR_DOMAIN_GUEST_INFO_USERS, GUEST_INFO_USERS);
+      REGISTER_CONSTANT(VIR_DOMAIN_GUEST_INFO_OS, GUEST_INFO_OS);
+      REGISTER_CONSTANT(VIR_DOMAIN_GUEST_INFO_TIMEZONE, GUEST_INFO_TIMEZONE);
+      REGISTER_CONSTANT(VIR_DOMAIN_GUEST_INFO_HOSTNAME, GUEST_INFO_HOSTNAME);
+      REGISTER_CONSTANT(VIR_DOMAIN_GUEST_INFO_FILESYSTEM, GUEST_INFO_FILESYSTEM);
+
 
       stash = gv_stashpv( "Sys::Virt::DomainSnapshot", TRUE );
       REGISTER_CONSTANT(VIR_DOMAIN_SNAPSHOT_DELETE_CHILDREN, DELETE_CHILDREN);

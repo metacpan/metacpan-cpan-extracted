@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011 Kevin Ryde
+# Copyright 2011, 2013 Kevin Ryde
 
 # 0-examples-xrefs.t is shared by several distributions.
 #
@@ -24,7 +24,7 @@ use Test::More;
 
 use lib 't';
 use MyTestHelpers;
-BEGIN { MyTestHelpers::nowarnings() }
+BEGIN { MyTestHelpers::nowarnings(); }
 
 my $manifest = ExtUtils::Manifest::maniread();
 my @example_files = grep m{examples/.*\.pl$}, keys %$manifest;
@@ -60,7 +60,7 @@ sub raw_contains_example {
   my ($filename, $example) = @_;
   $example =~ s{^examples/}{};
   open FH, "< $filename" or die "Cannot open $filename: $!";
-  my $ret = scalar (grep /\b$example\E\b/, <FH>);
+  my $ret = scalar (grep /\b\Q$example\E\b/, <FH>);
   close FH or die "Error closing $filename: $!";
   return $ret > 0;
 }

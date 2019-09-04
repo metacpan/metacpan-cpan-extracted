@@ -3,6 +3,7 @@ use warnings;
 use Test::More;
 use Forks::Queue;
 use Time::HiRes 'time';
+use lib '.';   # 5.26 compat
 require "t/exercises.tt";
 
 for my $impl (IMPL()) {
@@ -51,10 +52,10 @@ for my $impl (IMPL()) {
     # (4) timed read from non-empty queue
     ok($q1->pending == 0, 'get_timed with long timeout on empty queue');
     $ts0 = Time::HiRes::time;
-    my $t = $q1->get_timed(4.0);
+    my $t = $q1->get_timed(7.0);
     $ts1 = Time::HiRes::time;
     is($t,1, 'get_timed  got first item off queue');
-    ok($ts1-$ts0 < 4.75, 'get_timed did not time out') or do {
+    ok($ts1-$ts0 < 7, 'get_timed did not time out') or do {
         diag "get_timed call ran ",$ts1-$ts0,"sec, queue contains:";
         $q1->_DUMP;
     };
@@ -62,7 +63,8 @@ for my $impl (IMPL()) {
 
     # (5) timed large read from small queue
     ok($q1->pending > 0 && $q1->pending < 10,
-       'large timed read from small queue');
+       'large timed read from small queue')
+        || diag "queue size is ",$q1->pending,", expected [1,9]";
     $ts0 = Time::HiRes::time;
     @t = $q1->dequeue_timed(4.0,10);
     $ts1 = Time::HiRes::time;
@@ -79,7 +81,7 @@ for my $impl (IMPL()) {
     # (8) read from q1
     ok($q1->pending == 0, 'long get_timed read from empty queue');
     $ts0 = Time::HiRes::time;
-    @t = $q1->dequeue_timed(6.0,2);
+    @t = $q1->dequeue_timed(8.0,2);  # should take ~3s, let's give it 8
 
     # (10) return from dequeue_timed call
     # q1: [8,9,10]
@@ -98,7 +100,7 @@ for my $impl (IMPL()) {
     # q1: [13,14,15]
     $ts1 = Time::HiRes::time;
     is_deeply(\@t, [8,9,10,11,12], 'timed: got five items from queue');
-    ok($ts1-$ts0>1.85 && $ts1-$ts0 <4.5, 'timed: ... after about 3 seconds')
+    ok($ts1-$ts0>1.85 && $ts1-$ts0<4.75, 'timed: ... after about 3 seconds')
         or diag $ts1-$ts0,"sec";
     ok($q1->pending == 3, 'timed: 3 items remain');
 }

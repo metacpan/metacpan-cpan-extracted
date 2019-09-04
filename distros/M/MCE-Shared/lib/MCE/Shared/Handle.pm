@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.846';
+our $VERSION = '1.848';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (InputOutput::ProhibitTwoArgOpen)
@@ -102,7 +102,7 @@ sub OPEN {
 }
 
 sub open (@) {
-   return TIEHANDLE(@_) if ( defined $_[0] && $_[0] eq 'MCE::Shared::Handle' );
+   shift if ( defined $_[0] && $_[0] eq 'MCE::Shared::Handle' );
 
    my $item;
 
@@ -686,7 +686,7 @@ MCE::Shared::Handle - Handle helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Handle version 1.846
+This document describes MCE::Shared::Handle version 1.848
 
 =head1 DESCRIPTION
 

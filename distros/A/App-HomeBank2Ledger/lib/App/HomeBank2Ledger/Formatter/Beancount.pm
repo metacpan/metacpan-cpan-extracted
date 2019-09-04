@@ -7,10 +7,11 @@ use warnings;
 use strict;
 
 use App::HomeBank2Ledger::Util qw(commify rtrim);
+use Scalar::Util qw(looks_like_number);
 
 use parent 'App::HomeBank2Ledger::Formatter';
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 my %STATUS_SYMBOLS = (
     cleared => '*',
@@ -142,6 +143,13 @@ sub _format_transaction {
         $out[-1] .= ' '.join(' ', @tags);
     }
 
+    my $metadata = $transaction->{metadata} || {};
+    for my $key (sort keys %$metadata) {
+        my $value = looks_like_number($metadata->{$key}) ? $metadata->{$key}
+                                                         : $self->_format_string($metadata->{$key});
+        push @out, "    ; ${key}: ${value}";
+    }
+
     for my $posting (@postings) {
         my @line;
 
@@ -178,6 +186,13 @@ sub _format_transaction {
         }
 
         push @out, join('', @line);
+
+        my $metadata = $posting->{metadata} || {};
+        for my $key (sort keys %$metadata) {
+            my $value = looks_like_number($metadata->{$key}) ? $metadata->{$key}
+                                                             : $self->_format_string($metadata->{$key});
+            push @out, "      ; ${key}: ${value}";
+        }
     }
 
     push @out, '';
@@ -282,7 +297,7 @@ App::HomeBank2Ledger::Formatter::Beancount - Beancount formatter
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 DESCRIPTION
 

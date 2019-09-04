@@ -1,5 +1,5 @@
 package Minion::Backend::MongoDB;
-$Minion::Backend::MongoDB::VERSION = '1.01';
+$Minion::Backend::MongoDB::VERSION = '1.02';
 # ABSTRACT: MongoDB backend for Minion
 
 use Mojo::Base 'Minion::Backend';
@@ -156,6 +156,11 @@ sub list_jobs {
   foreach (qw(_id state task queue)) {
       $imatch->{$_} = {'$in' => $options->{$_ . 's'}} if $options->{$_ . 's'};
   }
+  if ($options->{notes}) {
+      foreach (@{$options->{notes}}) {
+          $imatch->{"notes.$_"} = {'$exists' => 1}
+      }
+  }
 
   my $match     = { '$match' => $imatch };
   my $lookup    = {'$lookup' => {
@@ -262,17 +267,18 @@ sub note {
 
   return 1 unless defined $merge;
   my $set = {};
+  my $unset = {};
   while (my ($k, $v) = each %$merge) {
-      $set->{"notes.$k"} = $v;
+      (defined $v ? $set : $unset)->{"notes.$k"} = $v;
   };
-  return $self->jobs->find_one_and_update(
-    {_id => $id},
-    {'$set' => $set},
-    {
-        upsert    => 0,
-        returnDocument => 'after',
-    }
-  ) ? 1 : 0;
+  my @update = ( {_id => $id} );
+  push @update, {'$set' => $set} if (keys %$set);
+  push @update, {'$unset' => $unset} if (keys %$unset);
+  push @update, {
+      upsert    => 0,
+      returnDocument => 'after',
+  };
+  return $self->jobs->find_one_and_update(@update) ? 1 : 0;
 }
 
 sub receive {
@@ -632,7 +638,7 @@ Minion::Backend::MongoDB - MongoDB backend for Minion
 
 =head1 VERSION
 
-version 1.01
+version 1.02
 
 =head1 SYNOPSIS
 
@@ -764,6 +770,13 @@ These options are currently available:
   ids => ['23', '24']
 
 List only jobs with these ids.
+
+=item notes
+
+  notes => ['foo', 'bar']
+
+List only jobs with one of these notes. Note that this option is EXPERIMENTAL
+and might change without warning!
 
 =item queues
 
@@ -1052,6 +1065,19 @@ defaults to C<1>.
 Construct a new L<Minion::Backend::MongoDB> object. Required a
 L<connection string URI|MongoDB::MongoClient/"CONNECTION STRING URI">. Optional
 every other attributes will be pass to L<MongoDB::MongoClient> costructor.
+
+=head2 note
+
+  my $bool = $backend->note($job_id, {mojo => 'rocks', minion => 'too'});
+
+Change one or more metadata fields for a job. Setting a value to C<undef> will
+remove the field.
+
+=head2 receive
+
+  my $commands = $backend->receive($worker_id);
+
+Receive remote control commands for worker.
 
 =head2 register_worker
 

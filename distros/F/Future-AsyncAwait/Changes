@@ -1,5 +1,18 @@
 Revision history for Future-AsyncAwait
 
+0.32    2019-09-03 17:00:35
+        [CHANGES]
+         * Define a super-experimental C-level API for other modules to hook
+           parts of the suspend/resume lifecycle to provide extension
+           behaviour.
+
+        [BUGFIXES]
+         * Actually use perl's own `wrap_keyword_plugin()`
+         * Avoid compiler warning about int/IV mismatch in printf (RT130285)
+         * Use warn_sv() to avoid compiler wraning about formatless warn() on
+           a plain PV (RT130285)
+         * Don't segfault on parse errors from parse_block() (RT130417)
+
 0.31    2019-07-25 15:09:04
         [CHANGES]
          * Use `parse_subsignature()` on bleadperl and backport it to

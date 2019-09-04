@@ -1,0 +1,53 @@
+---
+abstract: 'Add support for tablesample clauses'
+author:
+  - 'Robert Rothenberg <rrwo@cpan.org>'
+build_requires:
+  Class::Load: '0'
+  DBD::SQLite: '0'
+  DBIx::Class::Core: '0'
+  DBIx::Class::Schema: '0'
+  File::Spec: '0'
+  Module::Metadata: '0'
+  SQL::Abstract: '1.83'
+  SQL::Abstract::Test: '0'
+  SQL::Translator: '0.11018'
+  Test::More: '0'
+  Test::Roo: '0'
+  Test::Roo::Role: '0'
+  base: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - tablesample
+  - sampling
+  - random
+  - DBIC
+  - DBIx::Class
+  - SQLA
+  - SQL::Abstract
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Class-Helper-TableSample
+provides:
+  DBIx::Class::Helper::TableSample:
+    file: lib/DBIx/Class/Helper/TableSample.pm
+    version: v0.2.0
+recommends:
+  Ref::Util::XS: '0'
+requires:
+  DBIx::Class::ResultSet: '0'
+  Ref::Util: '0'
+  namespace::clean: '0'
+  perl: v5.10.1
+resources:
+  bugtracker: https://github.com/robrwo/-DBIX-Class-Helper-TableSample/issues
+  repository: git://github.com/robrwo/-DBIX-Class-Helper-TableSample.git
+version: v0.2.0
+x_authority: cpan:RRWO
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -28,7 +28,7 @@ our @ISA = ('Math::OEIS::SortedFile');
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
-our $VERSION = 11;
+our $VERSION = 12;
 
 use constant base_filename => 'stripped';
 

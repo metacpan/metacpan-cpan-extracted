@@ -1,0 +1,14 @@
+Revision history for Proc-ProcessTable-piddler
+
+0.2.0	 2019-09-04/00:00
+		 - Add support for the environ key.
+		 - Add add fifo, a_ignore, and memreglib.
+		 - Documentation cleanup.
+		 - If we don't plan to add something, don't
+		   dedup it.
+
+0.1.0	 2019-09-03/05:20
+		 - Add NO_COLOR support.
+
+0.0.0	 2019-09-03/04:10
+		 - Initial release.

@@ -8,6 +8,7 @@ do { my $x = {
                       'requires' => {
                                       'Dist::Zilla' => '5',
                                       'Dist::Zilla::Plugin::ConsistentVersionTest' => '0',
+                                      'Dist::Zilla::Plugin::Run::Release' => '0',
                                       'Dist::Zilla::PluginBundle::Author::CCM' => '0',
                                       'Dist::Zilla::PluginBundle::Filter' => '0',
                                       'Pod::Coverage::TrustPod' => '0',

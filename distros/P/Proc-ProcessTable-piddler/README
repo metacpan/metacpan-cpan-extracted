@@ -1,0 +1,98 @@
+Proc-ProcessTable-piddler
+
+Display all process table, open files, and network connections for a PID.
+
+> piddler -n 1379
+PID      1379
+UID      ldap(389)
+GID      ldap(389)
+Groups   ldap(389)
+CPU%     0.0
+MEM%     0.03
+VSZ      272.310M
+RSS      10.330M
+Time     16:39
+Info     SL uwait
+dsize    98
+euid     389
+flags    0x10000181
+fname    slapd
+jid      0
+majflt   127
+minflt   37093
+nice     0
+numthr   11
+onpro    -1
+pgrp     1379
+ppid     1
+priority 172
+rssize   2522
+sess     1379
+sflags   0x0001
+ssize    32
+start    0821-08:50
+stime    17
+tsize    171
+ttynum   -1
+utime    16:21
+Cmndline /usr/local/libexec/slapd -u ldap -g ldap
+FD    TYPE DEVICE SIZE/OFF NODE     NAME
+cwd   VDIR 0,238  1024     2        /
+rtd   VDIR 0,238  1024     2        /
+txt-r VREG 0,238  8192     92936609 /var/db/openldap-data-mdb/lock.mdb
+0u+   VCHR 0,19   0t0      19       /dev/null
+7ur   VREG 0,238  8192     92936609 /var/db/openldap-data-mdb/lock.mdb
+9u    VREG 0,238  704512   92936610 /var/db/openldap-data-mdb/data.mdb
+10w+  VREG 0,238  704512   92936610 /var/db/openldap-data-mdb/data.mdb
+Proto Local Host   Port Remote Host  Prt   State
+tcp6  *            ldap *            *     LISTEN
+tcp4  *            ldap *            *     LISTEN
+tcp4  127.0.0.1    ldap 127.0.0.1    56769 ESTABLISHED
+tcp4  127.0.0.1    ldap 127.0.0.1    55359 ESTABLISHED
+tcp4  127.0.0.1    ldap 127.0.0.1    14700 ESTABLISHED
+tcp4  127.0.0.1    ldap 127.0.0.1    11039 ESTABLISHED
+tcp4  127.0.0.1    ldap 127.0.0.1    61896 ESTABLISHED
+tcp4  192.168.15.4 ldap 192.168.15.4 51558 ESTABLISHED
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Proc::ProcessTable::piddler
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Proc-ProcessTable-piddler
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Proc-ProcessTable-piddler
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Proc-ProcessTable-piddler
+
+    Search CPAN
+        https://metacpan.org/release/Proc-ProcessTable-piddler
+
+    Repository
+        https://github.com/VVelox/Proc-ProcessTable-piddler
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2019 by Zane C. Bowers-Hadley.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

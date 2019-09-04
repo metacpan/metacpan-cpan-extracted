@@ -172,7 +172,7 @@ use Capture::Tiny 'capture_merged';
 use File::Spec::Functions qw(catfile);
 use File::Temp qw(tempdir);
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 sub new {
     my( $class, %args ) = @_;
@@ -255,8 +255,10 @@ sub guess_compiler {
     %guess = (
       compiler_command => 'g++',
       extra_cflags => '-xc++',
-      extra_lflags => '-lstdc++',
     );
+    # Don't use -lstdc++ if Perl was linked with -static-libstdc++ (ActivePerl 5.18+ on Windows)
+    $guess{extra_lflags} = '-lstdc++'
+      unless ($self->_config->{ldflags} || '') =~ /static-libstdc\+\+/;
   } elsif ( $self->_cc_is_msvc( $c_compiler ) ) {
     %guess = (
       compiler_command => 'cl',

@@ -1,0 +1,65 @@
+---
+abstract: 'Multisubs/multimethods (multiple dispatch) yet another way!'
+author:
+  - 'Chris White <cxw@cpan.org>'
+build_requires:
+  Config: '0'
+  Cwd: '0'
+  IPC::Run3: '0.047'
+  Parse::Yapp: '0'
+  Test::Fatal: '0.014'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.999, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Sub-Multi-Tiny
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Sub::Multi::Tiny:
+    file: lib/Sub/Multi/Tiny.pm
+    version: '0.000003'
+  Sub::Multi::Tiny::DefaultDispatcher:
+    file: lib/Sub/Multi/Tiny/DefaultDispatcher.pm
+    version: '0.000003'
+  Sub::Multi::Tiny::SigParse:
+    file: lib/Sub/Multi/Tiny/SigParse.pm
+  Sub::Multi::Tiny::Util:
+    file: lib/Sub/Multi/Tiny/Util.pm
+    version: '0.000003'
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  Exporter: '5.57'
+  File::Spec: '0'
+  Guard: '1.023'
+  Import::Into: '1.002005'
+  Text::Balanced: '2.01'
+  attributes: '0'
+  perl: '5.010001'
+  strict: '0'
+  subs: '0'
+  vars: '0'
+  vars::i: '1.10'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/cxw42/Sub-Multi-Tiny/issues
+  homepage: https://github.com/cxw42/Sub-Multi-Tiny
+  repository: git://github.com/cxw42/Sub-Multi-Tiny.git
+version: '0.000003'
+x_authority: cpan:CXW
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 0

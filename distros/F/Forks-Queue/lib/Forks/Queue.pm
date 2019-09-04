@@ -6,7 +6,7 @@ use Carp;
 use Time::HiRes;
 use Config;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 our $DEBUG = $ENV{FORKS_QUEUE_DEBUG} || 0;
 
 our $NOTIFY_OK = $ENV{FORKS_QUEUE_NOTIFY} // do {
@@ -22,6 +22,7 @@ our %OPTS = (limit => -1, on_limit => 'fail', style => 'fifo',
 
 sub new {
     my $class = shift;
+    no warnings 'once';
     my %opts = (%OPTS, @_);
 
     if ($opts{impl}) {
@@ -235,7 +236,7 @@ Forks::Queue - queue that can be shared across processes
 
 =head1 VERSION
 
-0.11
+0.12
 
 =head1 SYNOPSIS
 
@@ -293,16 +294,22 @@ Other options that should be supported on all implementations include
 
 =over 4
 
+=item * style
+
 =item * C<< style => 'fifo' | 'lifo' >>
 
 Indicates whether the L<"get"> method will return items in
 first-in-first-out order or last-in-first-out order (and which
 end of the queue the L<"peek"> method will examine)
 
+=item * limit
+
 =item * C<< limit => int >>
 
 A maximum size for the queue. Set to a non-positive value to
 specify an unlimited size queue.
+
+=item * on_limit
 
 =item * C<< on_limit => 'block' | 'fail' >>
 
@@ -315,6 +322,8 @@ changing the queue.
 See the L<"enqueue">, L<"put">, L<"push">, L<"unshift">,
 and L<"insert"> methods, which are used to increase the length
 of the queue and may be affected by this setting.
+
+=item * join
 
 =item * C<< join => bool >>
 
@@ -346,6 +355,8 @@ an existing queue
       # no need for a  Forks::Queue  constructor with  join
       ...
   }
+
+=item * persist
 
 =item * C<< persist => bool >>
 
@@ -381,7 +392,7 @@ could be added to an already existing queue.
 
 =back
 
-See the global L<"%OPTS"/"%OPTS"> variable for information about
+See the global L<"%OPTS"> variable for information about
 default values for many of these settings.
 
 =head2 put
@@ -442,7 +453,7 @@ This method is inefficient for some queue implementations.
 
 Indicates that no more items are to be put on the queue,
 so that when a process tries to retrieve an item from an empty queue,
-it will not block and wait until a new item is added. Causes any
+it will not block and wait for new items to be added. Causes any
 processes blocking on a L<"get">/L<"dequeue">/L<"shift">/L<"pop">
 call to become unblocked and return C<undef>.
 This method may be called from any process that has access to the queue.
@@ -484,7 +495,7 @@ retrieved from the queue, not the items themselves.
 
 The only important difference between C<get> and C<dequeue> is what
 happens when there is a C<$count> argument, and the queue currently has
-more than zero but less than C<$count> items available. In this case,
+more than zero but fewer than C<$count> items available. In this case,
 the C<get> call will return all of the available items. The C<dequeue>
 method will block until at least C<$count> items are available on the
 queue, or until the L<"end"> method has been called on the queue.
@@ -565,7 +576,7 @@ be available on the queue. After C<$timeout> seconds have passed,
 the function will return up to C<$count> available items.
 
 For other timed methods, supplying a C<$count> argument for a
-queue with more than zero but less than C<$count> items available
+queue with more than zero but fewer than C<$count> items available
 will return all available items without blocking.
 
 
@@ -590,7 +601,7 @@ number of elements currently in the queue, these methods will
 return C<undef> without blocking.
 
 Note that unlike the 
-L<<"peek" method in C<Thread::Queue>|Thread::Queue/"peek">>,
+L<< "peek" method in C<Thread::Queue>|Thread::Queue/"peek" >>,
 C<Forks::Queue::peek> returns a copy of the item on the queue,
 so manipulating a reference returned from C<peek> while B<not>
 affect the item on the queue.

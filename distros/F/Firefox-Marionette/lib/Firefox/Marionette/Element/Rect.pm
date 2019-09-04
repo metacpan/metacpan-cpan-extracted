@@ -3,7 +3,7 @@ package Firefox::Marionette::Element::Rect;
 use strict;
 use warnings;
 
-our $VERSION = '0.81';
+our $VERSION = '0.82';
 
 sub new {
     my ( $class, %parameters ) = @_;
@@ -40,7 +40,7 @@ Firefox::Marionette::Element::Rect - Represents the box around an Element
 
 =head1 VERSION
 
-Version 0.81
+Version 0.82
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2019 Kevin Ryde
 
 # This file is part of Math-OEIS.
 #
@@ -19,7 +19,7 @@
 
 use 5.006;
 use strict;
-use Test::More tests => 6;
+use Test::More tests => 10;
 
 use lib 't';
 use MyTestHelpers;
@@ -32,7 +32,7 @@ use Math::OEIS::SortedFile;
 # VERSION
 
 {
-  my $want_version = 11;
+  my $want_version = 12;
   is ($Math::OEIS::SortedFile::VERSION, $want_version,
       'VERSION variable');
   is (Math::OEIS::SortedFile->VERSION,  $want_version,
@@ -58,6 +58,15 @@ use Math::OEIS::SortedFile;
   ok (Math::OEIS::Names->instance->isa('Math::OEIS::Names'));
   ok (Math::OEIS::Stripped->instance->isa('Math::OEIS::Stripped'));
 }
+
+#------------------------------------------------------------------------------
+# line_to_anum()
+
+ok (Math::OEIS::SortedFile->line_to_anum('A000001 foo'), 'A000001');
+ok (Math::OEIS::SortedFile->line_to_anum("A000001 foo\n"), 'A000001');
+ok (Math::OEIS::SortedFile->line_to_anum("A000001 foo\r\n"), 'A000001');
+ok (Math::OEIS::SortedFile->line_to_anum("A000001 foo A999999\n"), 'A000001');
+
 
 #------------------------------------------------------------------------------
 exit 0;

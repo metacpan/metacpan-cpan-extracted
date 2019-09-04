@@ -1,5 +1,9 @@
 Revision history for Lingua::Stem::Cistem
 
+0.05  2019-09-01 14:51:53 CEST
+
+        - fixed typo (by Mohammad S Anwar)
+
 0.04  2019-08-30 16:44:59 CEST
 
         - improved Kwalitee scores

@@ -21,10 +21,16 @@ my %WriteMakefileArgs = (
   "NAME" => "App::DNSZoneUtils",
   "PREREQ_PM" => {
     "DNS::Zone::PowerDNS::To::BIND" => 0,
+    "Data::Sah::Compiler::perl::TH::array" => 0,
+    "Data::Sah::Compiler::perl::TH::bool" => 0,
+    "Data::Sah::Compiler::perl::TH::int" => 0,
+    "Data::Sah::Compiler::perl::TH::obj" => 0,
     "Data::Sah::Compiler::perl::TH::str" => 0,
+    "Log::ger" => "0.027",
     "Perinci::CmdLine::Any" => 0,
     "Perinci::CmdLine::Lite" => "1.820",
-    "Sah::Schema::net::hostname" => 0
+    "Sah::Schema::net::hostname" => 0,
+    "Sah::Schema::uint" => 0
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
@@ -32,7 +38,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,13 +47,19 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "DNS::Zone::PowerDNS::To::BIND" => 0,
+  "Data::Sah::Compiler::perl::TH::array" => 0,
+  "Data::Sah::Compiler::perl::TH::bool" => 0,
+  "Data::Sah::Compiler::perl::TH::int" => 0,
+  "Data::Sah::Compiler::perl::TH::obj" => 0,
   "Data::Sah::Compiler::perl::TH::str" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "Log::ger" => "0.027",
   "Perinci::CmdLine::Any" => 0,
   "Perinci::CmdLine::Lite" => "1.820",
   "Sah::Schema::net::hostname" => 0,
+  "Sah::Schema::uint" => 0,
   "Test::More" => 0
 );
 

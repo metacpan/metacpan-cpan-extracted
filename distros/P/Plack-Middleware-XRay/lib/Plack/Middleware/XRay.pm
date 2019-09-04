@@ -8,7 +8,7 @@ use parent "Plack::Middleware";
 use AWS::XRay qw/ capture_from /;
 use Time::HiRes ();
 
-our $VERSION           = "0.06";
+our $VERSION           = "0.07";
 our $TRACE_HEADER_NAME = "X-Amzn-Trace-ID";
 (my $trace_header_key  = uc("HTTP_${TRACE_HEADER_NAME}")) =~ s/-/_/g;
 
@@ -25,6 +25,10 @@ sub call {
 
     if ($self->{response_filter}) {
         AWS::XRay->auto_flush(0);
+    }
+
+    if (ref $self->{plugins} eq "ARRAY") {
+        AWS::XRay->plugins(@{ $self->{plugins} });
     }
 
     my $t0 = [ Time::HiRes::gettimeofday ];
@@ -197,6 +201,14 @@ Code ref to generate a metadata hashref.
 When response_filter defined, call the coderef with ($env, $res, $elapsed) after $app run.
 
 Segment data are sent to xray daemon only when the coderef returns true.
+
+=head2 plugins
+
+When plugins defined, AWS::XRay enables these plugins.
+
+    enable "XRay"
+      name => "myApp",
+      plugins => ["AWS::XRay::Plugin::EC2"],
 
 =head1 LICENSE
 

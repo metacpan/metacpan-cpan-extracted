@@ -1,5 +1,12 @@
 Revision history for Alien-libuv
 
+1.012     2019-08-31
+  - Update to the libuv v1.31.0 release
+  - Run make check on non-windows environments
+  - Update the dzil build
+  - Stop CI testing on cygwin
+  - Add CI tests for 5.30
+
 1.011     2019-04-24
   - Update to the libuv v1.28.0 release
 

@@ -1,4 +1,4 @@
-# AWS::EC2::VPCEndpointConnectionNotification generated from spec 5.0.0
+# AWS::EC2::VPCEndpointConnectionNotification generated from spec 5.3.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::EC2::VPCEndpointConnectionNotification',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::EC2::VPCEndpointConnectionNotification {
     [  ]
   }
   sub supported_regions {
-    [ 'ap-northeast-3','eu-north-1','us-east-1' ]
+    [ 'ap-east-1','ap-northeast-3','cn-north-1','cn-northwest-1','eu-north-1','us-east-1' ]
   }
 }
 

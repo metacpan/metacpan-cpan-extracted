@@ -852,7 +852,7 @@ $attrib = $sth->{ParamTypes};
 $expected = {1 => {TYPE => SQL_INTEGER}, 2 => {TYPE => SQL_VARCHAR}, 3 => undef};
 is_deeply ($attrib, $expected, $t);
 
-$t='Statement handle attributes "ParamValues" and "ParamTypes" can be pased back to bind_param';
+$t='Statement handle attributes "ParamValues" and "ParamTypes" can be passed back to bind_param';
 eval {
 	my $vals = $sth->{ParamValues};
 	my $types = $sth->{ParamTypes};
@@ -1333,7 +1333,7 @@ eval {
 };
 like ($@, qr{for Statement "Testing}, $t);
 
-$t='Database handle attribute "ShowErrorStatement" adds statement and placeholders to errors';
+$t='Database handle attribute "ShowErrorStatement" adds statement and placeholders to errors via execute() with null args';
 $SQL = q{SELECT 'Another ShowErrorStatement Test' FROM pg_class WHERE relname = ? AND reltuples = ?};
 eval {
 	$sth = $dbh->prepare($SQL);
@@ -1341,7 +1341,7 @@ eval {
 };
 like ($@, qr{with ParamValues}, $t);
 
-$t='Statement handle attribute "ShowErrorStatement" adds statement and placeholders to errors';
+$t='Statement handle attribute "ShowErrorStatement" adds statement and placeholders to errors via execute()';
 $SQL = q{SELECT 'Another ShowErrorStatement Test' FROM pg_class WHERE relname = ? AND reltuples = ?};
 eval {
 	$sth = $dbh->prepare($SQL);
@@ -1349,7 +1349,7 @@ eval {
 };
 like ($@, qr{with ParamValues: 1='123', 2='456'}, $t);
 
-$t='Database handle attribute "ShowErrorStatement" adds statement and placeholders to errors';
+$t='Database handle attribute "ShowErrorStatement" adds statement and placeholders to errors via do()';
 $SQL = q{SELECT 'Another ShowErrorStatement Test' FROM pg_class WHERE relname = ? AND reltuples = ?};
 eval {
 	$dbh->do($SQL, {}, 123, 456);

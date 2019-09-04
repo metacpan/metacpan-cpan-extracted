@@ -1,6 +1,6 @@
 package App::optex::textconv::pdf;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use v5.14;
 use strict;
@@ -26,9 +26,9 @@ my %pagebreak = (
 	sub { $rule };
     },
     number => sub {
-	my $n;
-	my $format = "$param{format}\n\n";
-	sub { sprintf $format, ++$n };
+	my $n = 1;
+	my $format = $param{format} . "\n\n";
+	sub { sprintf $format, $n++ };
     },
     pf => sub {
 	sub { "\f" };

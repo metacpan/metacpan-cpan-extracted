@@ -1,5 +1,10 @@
 Revision history for App-Fasops
 
+0.6.4 2019-09-02T19:31:22Z
+
+    - Move command `create` from `rangeops` to here
+    - Move build_info() and get_seq_faidx() to Common.pm
+
 0.6.3 2019-03-14T19:45:27Z
 
     - Add --min and --max to `fasops xlsx`

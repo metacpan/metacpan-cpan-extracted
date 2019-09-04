@@ -1,3 +1,8 @@
+0.004   2019-09-03  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Missed checking the correct package's DATA upon retry.
+
+
 0.003   2019-08-17  Released-By: PERLANCAR
 
         - Added support for __DATA__ tags in package namespaces other than main

@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.013
+    version 0.014
 
 DESCRIPTION
 
@@ -27,9 +27,11 @@ DESCRIPTION
 
       * ManifestSkip
 
-      * PodWeaver (or SurgicalPodWeaver when enabled)
+      * PodWeaver (and SurgicalPodWeaver when enabled)
 
       * ReadmeAnyFromPod (both Text and Markdown generation are configured)
+
+      * Dist::Zilla::Plugin::MetaYAML
 
       * License
 
@@ -109,7 +111,7 @@ DESCRIPTION
 
       * PodCoverageTests
 
-      * Test::Pod::LinkCheck
+      * Author::HAYOBAAN::LinkCheck
 
       * Test::Synopsis
 
@@ -120,8 +122,6 @@ DESCRIPTION
       * ConfirmRelease
 
       * UploadToCPAN
-
-      * SchwartzRatio
 
       * FakeRelease
 
@@ -372,7 +372,7 @@ ATTRIBUTES
 
       * PodCoverageTests -- Checks pod coverage
 
-      * Test::Pod::LinkCheck -- Checks pod links
+      * LinkCheck -- Checks pod links
 
       * Test::Synopsis -- Checks the pod synopsis
 
@@ -426,7 +426,8 @@ ATTRIBUTES
 BUGS
 
     Please report any bugs or feature requests on the bugtracker website
-    <https://github.com/HayoBaan/Dist-Zilla-PluginBundle-Author-HAYOBAAN/issues>.
+    <https://github.com/HayoBaan/Dist-Zilla-PluginBundle-Author-HAYOBAAN/is
+    sues>.
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.

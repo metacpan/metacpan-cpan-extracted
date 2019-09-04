@@ -23,5 +23,6 @@ Gene
 Music
 ScaleNote
 gene
+isobase
 lib
 pentatonic

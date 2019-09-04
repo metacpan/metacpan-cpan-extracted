@@ -1,0 +1,69 @@
+#!perl
+
+use Test2::V0 qw'is float done_testing';
+use Math::Lapack::Matrix;
+use AI::ML::NeuralNetwork;
+use Math::Lapack;
+use Data::Dumper;
+
+
+Math::Lapack->seed_rng(0);
+
+#my $x = Math::Lapack::Matrix::read_csv("t/logistic.csv", col_range =>[0,2]);
+#my $y = Math::Lapack::Matrix::read_csv("t/logistic.csv", col => 3);
+
+
+my $x = Math::Lapack::Matrix::read_csv("t/x_grad_check.csv");
+my $y = Math::Lapack::Matrix::read_csv("t/y_grad_check.csv");
+
+my $params = {};
+$params{"w1"} = Math::Lapack::Matrix::read_csv("t/W1_grad_check.csv");
+$params{"w2"} = Math::Lapack::Matrix::read_csv("t/W2_grad_check.csv");
+$params{"w3"} = Math::Lapack::Matrix::read_csv("t/W3_grad_check.csv");
+$params{"b1"} = Math::Lapack::Matrix::read_csv("t/b1_grad_check.csv");
+$params{"b2"} = Math::Lapack::Matrix::read_csv("t/b2_grad_check.csv");
+$params{"b3"} = Math::Lapack::Matrix::read_csv("t/b3_grad_check.csv");
+
+gradient_checking($x, $y, $params, 1);
+
+
+#$x->norm_std_deviation();
+#print STDERR $x->columns."\n";
+
+#my $NN = AI::ML::NeuralNetwork->new(
+#				[
+#								2,
+#								{func => "tanh", units => 3}, 
+#								1
+#				],
+#                n => 2,
+#                alpha => 1.2
+#
+#);
+##$NN->{"l1"}{w} = Math::Lapack::Matrix::read_csv("t/w1.csv");
+##$NN->{"l2"}{w} = Math::Lapack::Matrix::read_csv("t/w2.csv");
+#
+#$NN->train($x, $y);
+#
+#$NN->prediction($x);
+#
+#my $acc = $NN->accuracy($y);
+#my $prec = $NN->precision($y);
+#my $rec = $NN->recall($y);
+#my $f1 = $NN->f1($y);
+#
+#print STDERR "Accuracy: $acc\n";
+#print STDERR "Precison: $prec\n";
+#print STDERR "Recall: $rec\n";
+#print STDERR "F1: $f1\n";
+
+#my $t1 = $NN->{"l1"}{w};
+#$t1->save_matlab("/tmp/t0.m");
+#print STDERR Dumper($NN->{"l1"}{w});
+
+done_testing;
+
+sub _float {
+  my ($a, $b, $c) = @_;
+	is($a, float($b, tolerance => 0.01), $c);
+}

@@ -1,0 +1,117 @@
+NAME
+    Module::List::Wildcard - A fork of Module::List that supports wildcard
+
+VERSION
+    This document describes version 0.004005 of Module::List::Wildcard (from
+    Perl distribution Module-List-Wildcard), released on 2019-09-03.
+
+SYNOPSIS
+     use Module::List::Wildcard qw(list_modules);
+
+     $id_modules = list_modules("Data::ID::", { list_modules => 1});
+     $prefixes = list_modules("", { list_prefixes => 1, recurse => 1 });
+
+    Wildcard support:
+
+     $modules = list_modules("Module::P*", { wildcard => 1, list_modules => 1});
+     $modules = list_modules("Module::P**", { wildcard => 1, list_modules => 1});
+
+    "all" option:
+
+     $modules = list_modules("Module::", { list_modules => 1, all => 1});
+
+DESCRIPTION
+    This module is a fork of Module::List. It's exactly like Module::List
+    0.004, except for the following differences:
+
+    *   lower startup overhead (with some caveats)
+
+        It strips the usage of Exporter, IO::Dir, Carp, File::Spec, with the
+        goal of saving a few milliseconds (a casual test on my PC results in
+        11ms vs 39ms).
+
+        Path separator is hard-coded as "/".
+
+    *   Recognize "all" option
+
+        If set to true and "return_path" is also set to true, will return
+        all found paths for each module instead of just the first found one.
+        The values of result will be an arrayref containing all found paths.
+
+    *   Recognize "wildcard" option
+
+        This boolean option can be set to true to recognize wildcard pattern
+        in prefix. Wildcard patterns such as jokers ("?", "*", "**"),
+        classes ("[a-z]"), as well as braces ("{One,Two}") are supported.
+        "**" implies recursive listing.
+
+        Examples:
+
+         list_modules("Module::P*", {wildcard=>1, list_modules=>1});
+
+        results in something like:
+
+         {
+             "Module::Patch"             => undef,
+             "Module::Path"              => undef,
+             "Module::Pluggable"         => undef,
+         }
+
+        while:
+
+         list_modules("Module::P**", {wildcard=>1, list_modules=>1});
+
+        results in something like:
+
+         {
+             "Module::Patch"             => undef,
+             "Module::Path"              => undef,
+             "Module::Path::More"        => undef,
+             "Module::Pluggable"         => undef,
+             "Module::Pluggable::Object" => undef,
+         }
+
+        while:
+
+         list_modules("Module::**le", {wildcard=>1, list_modules=>1});
+
+        results in something like:
+
+         {
+             "Module::Depakable"                => undef,
+             "Module::Install::Admin::Bundle"   => undef,
+             "Module::Install::Admin::Makefile" => undef,
+             "Module::Install::Bundle"          => undef,
+             "Module::Install::Makefile"        => undef,
+             "Module::Pluggable"                => undef,
+         }
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Module-List-Wildcard>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Module-List-Wildcard>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Module-List-Wildcard>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Module::List
+
+    Other forks: Module::List::Tiny
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

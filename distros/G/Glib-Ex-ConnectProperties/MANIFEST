@@ -35,8 +35,6 @@ examples/func-transform.pl
 examples/hash-transform.pl
 examples/sensitive.pl
 examples/unidirectional.pl
-inc/my_pod2html
-inc/MyMakeMakerExtras.pm
 lib/Glib/Ex/ConnectProperties.pm
 lib/Glib/Ex/ConnectProperties/Element.pm
 lib/Glib/Ex/ConnectProperties/Element/child.pm
@@ -93,4 +91,6 @@ xtools/my-diff-prev.sh
 xtools/my-manifest.sh
 xtools/my-pc.sh
 xtools/my-wunused.sh
-META.yml                                 Module meta-data (added by MakeMaker)
+xtools/my_pod2html
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

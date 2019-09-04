@@ -1,6 +1,11 @@
 Revision history for Perl extension Minion-Backend-MongoDB
 
 
+1.02 2019-09-02T08:03:19Z (ebruni)
+
+    - Add cleanup event , note options according to Minion v9.12 an v9.13
+    - Added some version check in mongo.t to be compatible to all Minion >= v9.00
+
 1.01 2019-08-28T16:27:34Z (ebruni)
 
     - Solved a memory leak-like bug in dequeuing jobs.

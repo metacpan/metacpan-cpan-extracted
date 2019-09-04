@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.2, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.5, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   App::Egaz:
     file: lib/App/Egaz.pm
-    version: v0.2.3
+    version: v0.2.4
   App::Egaz::Command::blastlink:
     file: lib/App/Egaz/Command/blastlink.pm
   App::Egaz::Command::blastmatch:
@@ -96,7 +96,9 @@ resources:
   bugtracker: https://github.com/wang-q/App-Egaz/issues
   homepage: https://github.com/wang-q/App-Egaz
   repository: git://github.com/wang-q/App-Egaz.git
-version: 0.2.3
+version: 0.2.4
 x_authority: cpan:WANGQ
+x_contributors:
+  - 'Qiang Wang <wang-q@users.noreply.github.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

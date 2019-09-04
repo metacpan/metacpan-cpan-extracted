@@ -9,10 +9,10 @@ MANIFEST
 MANIFEST.SKIP
 README
 t/00-load.t
-t/manifest.t
-t/pod.t
 t/map-tube-tokyo.t
-t/meta-yml.t
-t/meta-json.t
+xt/manifest.t
+xt/pod.t
+xt/meta-yml.t
+xt/meta-json.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

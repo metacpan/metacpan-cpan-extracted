@@ -623,6 +623,28 @@ as hard as it can with latest YAML::PP developments.
 
 This module kind of resembles troposphere (python): [https://github.com/cloudtools/troposphere](https://github.com/cloudtools/troposphere).
 
+# CLI utils
+
+This distribution includes a series of CLI utilities to help you with CloudFormation:
+
+## cfn\_list\_resources \[STRING\]
+
+Lists all the resources supported by Cfn. If a string is specified, will filter the ones matching
+the STRING.
+
+## cfn\_region\_matrix
+
+Displays a table of what resource types are supported in each region
+
+## cfn\_region\_compatibility FILE
+
+Takes a cloudformation template and calculates in what regions it will be deployable
+
+## cfn\_resource\_properties RESOURCE
+
+Outputs information about a resource type: properties accessible via Fn::GetAtt, region availability
+and it's whole property structure.
+
 # AUTHOR
 
     Jose Luis Martinez

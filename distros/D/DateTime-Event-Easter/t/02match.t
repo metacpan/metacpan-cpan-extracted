@@ -1,12 +1,14 @@
+# -*- encoding: utf-8; indent-tabs-mode: nil -*-
+#
 #     Test script for DateTime::Event::Easter
-#     Copyright (C) 2003, 2004, 2015, Rick Measham and Jean Forget
+#     Copyright © 2003-2004, 2015, 2019 Rick Measham and Jean Forget, all rights reserved
 #
 #     This program is distributed under the same terms as Perl:
 #     GNU Public License version 1 or later and Perl Artistic License
 #
 #     You can find the text of the licenses in the F<LICENSE> file or at
-#     L<http://www.perlfoundation.org/artistic_license_1_0>
-#     and L<http://www.gnu.org/licenses/gpl-1.0.html>.
+#     L<https://dev.perl.org/licenses/artistic.html>
+#     and L<https://www.gnu.org/licenses/gpl-1.0.html>.
 #
 #     Here is the summary of GPL:
 #
@@ -22,7 +24,7 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with this program; if not, write to the Free Software Foundation,
-#     Inc., <http://www.fsf.org/>.
+#     Inc., <https://www.fsf.org/>.
 #
 use strict;
 
@@ -31,9 +33,9 @@ use Test::More tests => 4;
 use DateTime::Event::Easter qw/easter/;
 
 my $easter_sunday_2003 = DateTime->new(
-	year  => 2003,
-	month => 4,
-	day   => 20,
+        year  => 2003,
+        month => 4,
+        day   => 20,
 );
 
 my $event_easter_sunday = DateTime::Event::Easter->new(day=>'easter sunday');
@@ -49,23 +51,23 @@ my $event_maundy_thursday = DateTime::Event::Easter->new(day=>'maundy thursday')
 my $event_thursday = DateTime::Event::Easter->new(day=>'thursday');
 
 is( $event_easter_sunday->previous($easter_sunday_2003), 
-	$event_sunday->previous($easter_sunday_2003), 
-	"Day: Easter Sunday & Sunday match",
+        $event_sunday->previous($easter_sunday_2003), 
+        "Day: Easter Sunday & Sunday match",
 );
 
 is( $event_black_saturday->previous($easter_sunday_2003), 
-	$event_saturday->previous($easter_sunday_2003), 
-	"Day: Black Saturday & Saturday match",
+        $event_saturday->previous($easter_sunday_2003), 
+        "Day: Black Saturday & Saturday match",
 );
 
 is( $event_good_friday->previous($easter_sunday_2003), 
-	$event_friday->previous($easter_sunday_2003), 
-	"Day: Easter Sunday & Sunday match",
+        $event_friday->previous($easter_sunday_2003), 
+        "Day: Easter Sunday & Sunday match",
 );
 
 is( $event_maundy_thursday->previous($easter_sunday_2003), 
-	$event_thursday->previous($easter_sunday_2003), 
-	"Day: Easter Sunday & Sunday match",
+        $event_thursday->previous($easter_sunday_2003), 
+        "Day: Easter Sunday & Sunday match",
 );
 
 

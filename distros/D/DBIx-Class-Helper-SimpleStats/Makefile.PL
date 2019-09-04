@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
     "DBIx::Class" => 0,
     "List::Util" => "1.45",
     "Ref::Util" => 0,
-    "namespace::autoclean" => 0
+    "namespace::clean" => 0
   },
   "TEST_REQUIRES" => {
     "Class::Load" => 0,
@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
     "Test::Most" => 0,
     "Test::Roo" => 0
   },
-  "VERSION" => "v0.1.2",
+  "VERSION" => "v0.1.3",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -61,7 +61,7 @@ my %FallbackPrereqs = (
   "Test::More" => 0,
   "Test::Most" => 0,
   "Test::Roo" => 0,
-  "namespace::autoclean" => 0
+  "namespace::clean" => 0
 );
 
 

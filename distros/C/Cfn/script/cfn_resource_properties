@@ -1,0 +1,91 @@
+#!perl
+
+use strict;
+use warnings;
+use v5.10;
+use Cfn;
+
+my $what = $ARGV[0];
+
+die "Usage $0 resource_type\n" if (not defined $what);
+
+my $class = Cfn->load_resource_module($what);
+
+my $already_seen = {};
+say $what;
+say "Attributes accessible via Fn::GetAtt:";
+say " - $_" for (@{ $class->AttributeList });
+say "Regions:";
+say " - $_" for (@{ $class->supported_regions });
+say "Properties:";
+my $props_class = $class->meta->find_attribute_by_name('Properties')->type_constraint->name;
+say _render_class($props_class, 1, $already_seen);
+
+sub _render_class {
+  my ($class, $indent, $already_seen) = @_;
+  return '' if (defined $already_seen->{ $class });
+  $already_seen->{ $class } = 1;
+
+  my $text = "{\n";
+
+  foreach my $property (
+      sort { $a->name cmp $b->name }
+      grep { $_->name =~ m/^[A-Z]/ }
+      grep { $_->is_required } 
+      $class->meta->get_all_attributes
+    ){
+    $text .= ('  ' x $indent) . $property->name . " => " . _render_property($property, $indent, $already_seen) . "\n";
+  }
+  my @non_req = 
+    sort { $a->name cmp $b->name }
+    grep { $_->name =~ m/^[A-Z]/ }
+    grep { not $_->is_required }
+    $class->meta->get_all_attributes;
+  if (@non_req) {
+    $text .= ('  ' x $indent) . "# optional properties\n";
+    foreach my $property (@non_req){
+      $text .= ('  ' x $indent) . $property->name . " => " . _render_property($property, $indent, $already_seen) . "\n";
+    }
+  }
+  $text .= ('  ' x ($indent - 1)) . '},';
+  return $text;
+}
+
+sub _render_property {
+  my ($property, $indent, $already_seen) = @_;
+  my $type = $property->type_constraint->name;
+  if ($type eq 'Cfn::Value::String'){
+    return "'',";
+  } elsif ($type eq 'Cfn::Value::Integer'){
+    return ",",
+  } elsif ($type eq 'Cfn::Value::Long'){
+    return ",",
+  } elsif ($type eq 'Cfn::Value::Double') {
+    return "0.0,"
+  } elsif ($type eq 'Cfn::Value::Boolean'){
+    return "'true|false',",
+  } elsif ($type eq 'Cfn::Value::Timestamp') {
+    return "'',";
+  } elsif ($type =~ m/Cfn::Value::Array/) {
+    return "[ '', ],";
+  } elsif ($type eq 'Cfn::Value::Hash') {
+    return "{ },";
+  } elsif ($type eq 'Cfn::Value::Json') {
+    return "{ },";
+  } elsif ($type eq 'ArrayOfCfn::Resource::Properties::TagType') {
+    my $t_indent = $indent +1;
+    return "[\n" . ('  ' x $t_indent  ) .
+           _render_class("Cfn::Resource::Properties::Tag", $t_indent + 1) .
+           "\n" . ('  ' x $indent ). "],";
+  } elsif (my ($inner_type) = ($type =~ m/^ArrayOf(.*)/)){
+    my $t_indent = $indent +1;
+    return "[\n" . ('  ' x $t_indent  ) .
+           _render_class("${inner_type}Value", $t_indent + 1, $already_seen) .
+           "\n" . ('  ' x $indent ). "],";
+  } elsif ($type =~ m/^Cfn::Resource::Properties::/) {
+    _render_class("${type}Value", $indent + 1, $already_seen);
+  } else {
+    return "$type,";
+  }
+}
+

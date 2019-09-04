@@ -77,4 +77,26 @@ $input = q~[% USE Filter.Base64 dont_broken_into_lines_each_76_char => 1, trim =
 ok($parser->process(\$input), 'Template process method with filter 5 is ok');
 is($out, 'YWJjZG4/', 'Test-filter 5 safeurl output correct');
 
+$out = '';
+my $string = "\x{43F}\x{435}\x{440}\x{43B}";
+$input = qq~[% USE Filter.Base64 dont_broken_into_lines_each_76_char => 1, trim => 1 %]
+    [% FILTER b64 %]
+        $string
+    [% END %]
+~;
+
+ok($parser->process(\$input), 'Template process method with filter 6 is ok') or diag ($@);
+is($out, '0L/QtdGA0Ls=', 'Test-filter 6 UTF-8 output correct');
+
+
+$out = '';
+$input = q~[% USE Filter.Base64 trim => 1, dont_broken_into_lines_each_76_char => 1 %]
+    [% FILTER b64 %]
+        Кириллица cp1251
+    [% END %]
+~;
+
+ok($parser->process(\$input), 'Template process method with filter 7 is ok') or diag($@);
+is($out, "yujw6Ovr6PbgIGNwMTI1MQ==", 'Test-filter 7 cyrillic output correct');
+
 done_testing();

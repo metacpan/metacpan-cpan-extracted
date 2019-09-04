@@ -25,8 +25,8 @@ my $meta = {
                         test => { requires => { "Test::More" => 0.92 } },
                       },
   "provides"       => {
-                        "Type::Tiny::XS"       => { file => "lib/Type/Tiny/XS.pm", version => 0.014 },
-                        "Type::Tiny::XS::Util" => { file => "lib/Type/Tiny/XS/Util.pm", version => 0.014 },
+                        "Type::Tiny::XS"       => { file => "lib/Type/Tiny/XS.pm", version => 0.015 },
+                        "Type::Tiny::XS::Util" => { file => "lib/Type/Tiny/XS/Util.pm", version => 0.015 },
                       },
   "release_status" => "stable",
   "resources"      => {
@@ -42,7 +42,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/project",
                       },
-  "version"        => 0.014,
+  "version"        => 0.015,
 };
 
 my %dynamic_config;

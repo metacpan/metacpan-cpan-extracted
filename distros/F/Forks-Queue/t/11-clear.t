@@ -2,6 +2,7 @@ use Test::More;
 use strict;
 use warnings;
 use Forks::Queue;
+use lib '.';   # 5.26 compat
 require "t/exercises.tt";
 
 

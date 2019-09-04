@@ -1,6 +1,6 @@
 package Tie::Array::DBD;
 
-our $VERSION = "0.19";
+our $VERSION = "0.20";
 
 use strict;
 use warnings;
@@ -177,7 +177,7 @@ sub TIEARRAY {
 		$h->{_de} = sub { YAML::Load ($_[0]) };
 		}
 	    elsif ($str eq "YAML::Syck") {
-		require YAML;
+		require YAML::Syck;
 		$h->{_en} = sub { YAML::Syck::Dump ($_[0]) };
 		$h->{_de} = sub { YAML::Syck::Load ($_[0]) };
 		}
@@ -541,7 +541,7 @@ The tie call accepts two arguments:
 
 =head2 Database
 
-The first argument is the connection specifier.  This is either and open
+The first argument is the connection specifier.  This is either an open
 database handle or a C<DBI_DSN> string.
 
 If this argument is a valid handle, this module does not open a database

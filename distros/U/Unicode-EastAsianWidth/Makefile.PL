@@ -5,10 +5,10 @@ use warnings;
 use lib 'inc/';
 use Module::Package 'Au:dry 1';
 
-license 'cc0';
+license('cc0');
 
-my $DefaultVersion  = 'v11.0.0';
-my $DefaultDate     = '2018-05-14';
+my $DefaultVersion  = 'v12.0.0';
+my $DefaultDate     = '2019-01-21';
 
 _build_pm();
 

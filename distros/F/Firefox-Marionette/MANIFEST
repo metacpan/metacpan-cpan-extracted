@@ -2,6 +2,7 @@ Changes
 lib/Firefox/Marionette.pm
 lib/Firefox/Marionette/Capabilities.pm
 lib/Firefox/Marionette/Cookie.pm
+lib/Firefox/Marionette/Extension/HarExportTrigger.pm
 lib/Firefox/Marionette/Profile.pm
 lib/Firefox/Marionette/Proxy.pm
 lib/Firefox/Marionette/Window/Rect.pm

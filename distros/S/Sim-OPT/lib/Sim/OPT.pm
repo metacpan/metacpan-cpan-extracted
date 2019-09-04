@@ -2,7 +2,7 @@ package Sim::OPT;
 # Copyright (C) 2008-2018 by Gian Luca Brunetti and Politecnico di Milano.
 # This is Sim::OPT, a program managing building performance simulation programs for performing optimization by overlapping block coordinate descent.
 # This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
-$VERSION = '0.441';
+$VERSION = '0.445';
 use v5.14;
 # use v5.20;
 use Exporter;
@@ -974,11 +974,12 @@ sub cleansweeps
 			foreach my $elt ( @{ $el } )
 			{
 				$elt =~ s/^(\d+)>// ;
+				$elt =~ s/^(\d+)°// ;
+				$elt =~ s/^(\d+)<// ;
+				$elt =~ s/^(\d+)£// ;
+				$elt =~ s/^(\d+)§// ;
+				$elt =~ s/^(\d+)\|// ;
 				$elt =~ s/[A-za-z]+//g ;
-				$elt =~ s/<//g ;
-				$elt =~ s/£//g ;
-				$elt =~ s/§//g ;
-				$elt =~ s/\|//g ;
 				push( @inbag, $elt );
 			}
 			push( @midbag, [ @inbag ] );
@@ -1418,19 +1419,37 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 	if ( $sourceblockelts[0] =~ /\|/ )
 	{
 		$dirfiles{random} = "yes";
+		$sourceblockelts[0] =~ /^(\d+)\|/ ;
+		$dirfiles{randomnum} = $1;
 	}
 	else
 	{
 		$dirfiles{random} = "no";
+		$dirfiles{randomnum} = "";
 	}
 
 	if ( $sourceblockelts[0] =~ /§/ )
 	{
 		$dirfiles{latinhypercube} = "yes";
+		$sourceblockelts[0] =~ /^(\d+)§/ ;
+		$dirfiles{latinhypercubenum} = $1;
 	}
 	else
 	{
 		$dirfiles{latinhypercube} = "no";
+		$dirfiles{latinhypercubenum} = "";
+	}
+
+	if ( $sourceblockelts[0] =~ /°/ )
+	{ #say $tee "IN callblock IN: \$sourceblockelts[0] " . dump( $sourceblockelts[0] );
+		$dirfiles{randompick} = "yes";
+		$sourceblockelts[0] =~ /^(\d+)°/ ;
+		$dirfiles{randompicknum} = $1;
+	}
+	else
+	{
+		$dirfiles{randompick} = "no";
+		$dirfiles{randompicknum} = "";
 	}
 
 	if ( $sourceblockelts[0] =~ /</ )
@@ -1449,6 +1468,8 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 		$dirfiles{factorial} = "yes";
 		$dirfiles{random} = "yes";
 		$dirfiles{starsign} = "yes"; #say $tee "SETTING IN callblock: \$dirfiles{starsign} " . dump( $dirfiles{starsign} );
+		$sourceblockelts[0] =~ /^(\d+)°/ ;
+		$dirfiles{facecenterednum} = $1;
 		$dowhat{starpositions} = "";
 		$dirfiles{starpositions} = "";
 		$dowhat{stardivisions} = 1;
@@ -1457,6 +1478,7 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 	else
 	{
 		$dirfiles{facecentered} = "no";
+		$dirfiles{facecenterednum} = "";
 	}
 
 
@@ -1690,12 +1712,13 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 		}
 
 
-		if ( ( $dirfiles{random} eq "yes" ) and ( $dowhat{metamodel} eq "yes" ) )
+		if ( $dirfiles{random} eq "yes" )
 		{
 			my ( $standard ) = prepfactl( \@fulls ); #say $tee "IN RANDOM \$standard: " . dump( $standard );
 			#say $tee "IN RANDOM \$dowhat{randomfraction}: " . dump( $dowhat{randomfraction} );
 
-			my $numitems = int( $standard * $dowhat{randomfraction} ); #say $tee "IN RANDOM \$numitems: " . dump( $numitems );
+			#my $numitems = int( $standard * $dowhat{randomfraction} ); #say $tee "IN RANDOM \$numitems: " . dump( $numitems );
+			my $numitems = $dirfiles{randomnum};
 			my @newfulls = shuffle( @fulls );
 			my @forebunch = @newfulls[ 0 .. $numitems ]; #say $tee "IN RANDOM \@forebunch: " . dump( @forebunch );
 
@@ -1704,18 +1727,15 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 				push( @buux, [ [ $el, "", "", "", "" ] ] );
 			}
 		}
-		elsif ( ( $dirfiles{random} eq "yes" ) and ( $dowhat{metamodel} ne "yes" ) )
-		{
-			say $tee "UNABLE TO PERFORM THE MORPHING TRANSFORMATION IN THE RANDOM GENERATION SCHEME";
-		}
 
-
-		if ( ( $dirfiles{latinhypercube} eq "yes" ) and ( $dowhat{metamodel} eq "yes" ) )
+		if ( $dirfiles{latinhypercube} eq "yes" )
 		{
 			my ( $standard ) = prepfactl( \@fulls ); #say $tee "IN LATINHYPERCUBE \$standard: " . dump( $standard );
 			#say $tee "IN LATINHYPERCUBE \$dowhat{randomfraction}: " . dump( $dowhat{randomfraction} );
 
-			my $numitems = int( $standard * $dowhat{hypercubefraction} ); #say $tee "IN LATINHYPERCUBE \$numitems: " . dump( $numitems );
+			#my $numitems = int( $standard * $dowhat{hypercubefraction} ); #say $tee "IN LATINHYPERCUBE \$numitems: " . dump( $numitems );
+
+			my $numitems = $dirfiles{latinhypercubenum};
 
 			my $totnum = scalar( @fulls );
 			my $numeach = int( $totnum / $numitems );
@@ -1746,13 +1766,8 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 				push( @buux, [ [ $el, "", "", "", "" ] ] );
 			}
 		}
-		elsif ( ( $dirfiles{latinhypercube} eq "yes" ) and ( $dowhat{metamodel} ne "yes" ) )
-		{
-			say $tee "UNABLE TO PERFORM THE MORPHING TRANSFORMATION IN THE LATIN HYPERCUBE GENERATION SCHEME";
-		}
 
-
-		if ( ( $dirfiles{factorial} eq "yes" ) and ( $dowhat{metamodel} eq "yes" ) )
+		if ( $dirfiles{factorial} eq "yes" )
 		{
 			my ( $standard, $ohs_r ) = prepfactl( \@fulls ); #say $tee "IN FACTORIAL \$ohs_r: " . dump( $ohs_r );
 			my %ohs = %{ $ohs_r }; #say $tee "IN FACTORIAL \%ohs: " . dump( \%ohs );
@@ -1800,10 +1815,6 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 				}
 			}
 			#say $tee "IN FACTORIAL \@bux: " . dump( @bux );
-		}
-		elsif ( ( $dirfiles{factorial} eq "yes" ) and ( $dowhat{metamodel} ne "yes" ) )
-		{
-			say $tee "UNABLE TO PERFORM THE MORPHING TRANSFORMATION IN THE FACTORIAL GENERATION SCHEME";
 		}
 		#say $tee "RESULTING: \@bux: " . dump( @bux );
 		#say $tee "RESULTING: \@buux: " . dump( @buux );
@@ -2007,7 +2018,7 @@ sub setlaunch # IT SETS THE DATA FOR THE SEARCH ON THE ACTIVE BLOCK.
 				varnumbers => \@varnumbers, blocks => \@blocks,
 				blockelts => \@blockelts, mids => \%mids, varnums => \%varnums,
 				countinstance => $count, carrier => \%carrier, origin => $origin,
-				instn => $instn, inst => \%inst
+				instn => $instn, inst => \%inst, is => $to{cleanto}
 			} );
 			$instn++;
 		}
@@ -2038,6 +2049,13 @@ sub exe
 	my %to = %{ $d{to} }; #say $tee "IN12 EXE \%to : " . dump( %to );
 	my $countvar = $d{countvar}; #say $tee "IN12 EXE \$countvar : " . dump( $countvar );
 	my $countstep = $d{countstep}; #say $tee "IN12 EXE \$countstep : " . dump( $countstep );
+	my %carrier = %{ $d{carrier} }; #say $tee "IN exe \%carrier " . dump( \%carrier );
+	my %varnums = %{ $d{varnums} }; #say $tee "IN exe \%varnums " . dump( \%varnums );
+	my $file = $dowhat{file}; #say $tee "IN exe \$file " . dump( $file );
+	my $mypath = $dowhat{mypath}; #say $tee "IN exe \$mypath " . dump( $mypath );
+	my @blockelts = @{ $d{blockelts} }; #say $tee "IN DEFFILES \@blockelts : " . dump( @blockelts );
+	my @sourceblockelts = @{ $d{blockelts} }; #say $tee "IN DEFFILES \@sourceblockelts : " . dump( @blockelts );
+	my @blocks = @{ $d{blocks} }; #say $tee "IN DEFFILES \@blocks : " . dump( @blocks );
 	my $instn = $d{instn};
 	#say $tee "IN EXE  \$dirfiles{starsign} " . dump( $dirfiles{starsign} );
 	my %inst = %{ $d{inst} };
@@ -2051,42 +2069,92 @@ sub exe
 	open ( CRYPTOLINKS, ">$cryptolinks" ) or die;
 	say CRYPTOLINKS "" . dump( \%inst );
 	close CRYPTOLINKS;
+	my @reds;
 
-	if ( $dowhat{morph} eq "y" )
+	if ( $dowhat{ga} ne "" )
 	{
-		say $tee "#Calling morphing operations for case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
-
-		my @result = Sim::OPT::Morph::morph( $configfile, \@instances, \%dirfiles, \%dowhat );
-		$dirfiles{morphcases} = $result[0];
-		$dirfiles{morphstruct} = $result[1];
+		;
 	}
-
-	if ( ( $dowhat{simulate} eq "y" ) or ( $dowhat{newreport} eq "y" ) )
+  elsif ( $dirfiles{randompick} eq "yes" ) #DDD
 	{
+		say $tee "#Calling randomly picked morphing operations for case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
+		#say "FIRST INSTANCES BEFORE1: " . dump( $instances[0]{dirfiles}{dones} );
+		my @pool = @{ $instances[0]{dirfiles}{dones} };
+		#say "\pool: " . dump( @pool );
+		@reds = shuffle( @pool );
+		#say "REDS1: " . dump( @reds );
+		@reds = @reds[0..($dirfiles{randompicknum}-1)];
+		#say "REDS2: " . dump( @reds );
 
-		say $tee "#Calling simulations, reporting and retrieving for case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
-		my ( $simcases_ref, $simstruct_ref, $repcases_ref, $repstruct_ref,
-	    $mergestruct_ref, $mergecases_ref, $c ) = Sim::OPT::Sim::sim(
-				{ instances => \@instances, dirfiles => \%dirfiles } );
-		$dirfiles{simcases} = $simcases_ref;
-		$dirfiles{simstruct} = $simstruct_ref;
-		$dirfiles{repcases} = $repcases_ref;
-		$dirfiles{repstruct} = $repstruct_ref;
-		$dirfiles{mergestruct} = $mergestruct_ref;
-		$dirfiles{mergecases} = $mergecases_ref;
+		foreach my $instance ( @instances )
+		{ #say "INSTANCE IS: $instance->{is}";
+			if ( $instance->{is} ~~ @reds )
+			{
+				say "FOUND!";
+				my @instancees;
+				push( @instancees, $instance );
+				if ( $dowhat{morph} eq "y" )
+				{
+					say $tee "#Calling morphing operations for instance $instance{is} in case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
+					my @result = Sim::OPT::Morph::morph( $configfile, \@instancees, \%dirfiles, \%dowhat );
+					say "\$result[0]" . dump( $result[0] );
+					say "\$result[1]" . dump( $result[1] );
+				}
+
+				if ( ( $dowhat{simulate} eq "y" ) or ( $dowhat{newreport} eq "y" ) )
+				{
+
+					say $tee "#Calling simulations, reporting and retrieving for instance $instance{is} in case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
+					my ( $simcases_ref, $simstruct_ref, $repcases_ref, $repstruct_ref,
+				    $mergestruct_ref, $mergecases_ref, $c ) = Sim::OPT::Sim::sim(
+							{ instances => \@instancees, dirfiles => \%dirfiles } );
+							$dirfiles{simcases} = $simcases_ref;
+							$dirfiles{simstruct} = $simstruct_ref;
+							$dirfiles{repcases} = $repcases_ref;
+							$dirfiles{repstruct} = $repstruct_ref;
+							$dirfiles{mergestruct} = $mergestruct_ref;
+							$dirfiles{mergecases} = $mergecases_ref;
+				}
+			}
+		}
+
+		if ( $dowhat{metamodel} eq "yes" )
+		{
+			$tmpblankfile = "$mypath/$file" . "_tmp_gen_blank.csv"; #say $tee "IN LATINHYPERCUBE \$tmpblankfile: " . dump( $tmpblankfile );
+			$bit = $file . "_";
+			@bag =( $bit );
+			@fills = @{ Sim::OPT::Descend::prepareblank( \%varnums, $tmpblankfile, \@blockelts, \@bag, $file, \%carrier ) };
+			@fulls = uniq( map { $_->[0] } @fills ); #say $tee "IN RANDOM \@fulls: " . dump( @fulls );
+		}
+
 	}
-  elsif ( $dowhat{simulate} eq "y" )
+	else
 	{
-		say $tee "#Calling simulations for case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
-		my ( $simcases_ref, $simstruct_ref, $repcases_ref, $repstruct_ref,
-		    $mergestruct_ref, $mergecases_ref, $c )  = Sim::OPT::Sim::sim(
+		if ( $dowhat{morph} eq "y" )
+		{
+			say $tee "#Calling morphing operations for case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
+
+			my @result = Sim::OPT::Morph::morph( $configfile, \@instances, \%dirfiles, \%dowhat );
+			$dirfiles{morphcases} = $result[0];
+			$dirfiles{morphstruct} = $result[1];
+			say "\$result[0]" . dump( $result[0] );
+			say "\$result[1]" . dump( $result[1] );
+		}
+
+		if ( ( $dowhat{simulate} eq "y" ) or ( $dowhat{newreport} eq "y" ) )
+		{
+
+			say $tee "#Calling simulations, reporting and retrieving for case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
+			my ( $simcases_ref, $simstruct_ref, $repcases_ref, $repstruct_ref,
+		    $mergestruct_ref, $mergecases_ref, $c ) = Sim::OPT::Sim::sim(
 					{ instances => \@instances, dirfiles => \%dirfiles } );
-		$dirfiles{simcases} = $simcases_ref;
-		$dirfiles{simstruct} = $simstruct_ref;
-		$dirfiles{repcases} = $repcases_ref;
-		$dirfiles{repstruct} = $repstruct_ref;
-		$dirfiles{mergestruct} = $mergestruct_ref;
-		$dirfiles{mergecases} = $mergecases_ref;
+			$dirfiles{simcases} = $simcases_ref;
+			$dirfiles{simstruct} = $simstruct_ref;
+			$dirfiles{repcases} = $repcases_ref;
+			$dirfiles{repstruct} = $repstruct_ref;
+			$dirfiles{mergestruct} = $mergestruct_ref;
+			$dirfiles{mergecases} = $mergecases_ref;
+		}
 	}
 
 	if ( $dowhat{descend} eq "y" )
@@ -2625,13 +2693,9 @@ The instance number that has to trated as the basic instance, corresponding to t
 
 OPT can work on a given set of pre-simulated results without launching new simulations, and it can randomize both the sequence of the  search and the initialization level of the parameters (see the included examples).
 
-By default the behaviour of the program is sequential. To make it parallel locally, subspaces have to be named with a name not containing numbers, so as to work as a collector cells. If the name "name", for example, has to be given to a block, the letters "name" must be joined at the beginning of the first number describing an iteration number in a block. If that number is 1, for example, the first element of that block should be named "name1". As an effect, that block will receive values from all the blocks "pointing" to the name "name". To point the search outcome of a block to another block, the name of the block pointed to has to be appended to the last number describing an iteration number in a block. If, for example, that number is 3 and the name of the block pointed to is "surname", the last element of that block should be named "3surname". A block of in which both the mentioned situations took place could be named [ "name1", 2, "3surname" ].
+By default the behaviour of the program is sequential.
 
-If the search is to start from more than one block in parallel, the first block should be named and all the other starting blocks should be named like it.
-
-The capability of articulating a mix of parallel and sequential searches is of absolute importance, because it makes possible to design search structures with a "depth", embodying precedence, and therefore procedural time, in them. This toolset is needed to describe directed graphs.
-
-OPT can perform star searches (Jacoby method of course, but also Gauss-Seidel) within blocks in place of multilevel full-factorial searches. To ask for that in a configuration file, the first number in a block has to be preceded by a ">" sign, which in its turn has to be preceded by a number specifying how many star points there have to be in the block. A block, in that case, should be declared with something like this: ( "2>1", 2, 3). When operating with pre-simulated dataseries or metamodels, OPT can also perform: factorial searches (to ask for that, the first number in that block has to be preceded by a "<" sign); face-centered composite design searches of the DOE type (in that case, the first number in the block has to be preceded by a "£"); random searches (the first number has to be preceded by a "|"); latin hypercube searches (the first number has to be preceded by a "§").
+OPT can perform star searches (Jacoby method of course, but also Gauss-Seidel) within blocks in place of multilevel full-factorial searches. To ask for that in a configuration file, the first number in a block has to be preceded by a ">" sign, which in its turn has to be preceded by a number specifying how many star points there have to be in the block. A block, in that case, should be declared with something like this: ( "2>1", 2, 3). When operating with pre-simulated dataseries or metamodels, OPT can also perform: factorial searches (to ask for that, the first number in that block has to be preceded by a "<" sign); face-centered composite design searches of the DOE type (in that case, the first number in the block has to be preceded by a "£"); random searches (the first number has to be preceded by a "|" or by a "°"); latin hypercube searches (the first number has to be preceded by a "§").
 
 For specifying in a Sim::OPT configuration file that a certain block has to be searched by the means of a metamodel derived from star searches or other "positions" instead of a multilevel full-factorial search, it is necessary to assign the value "yes" to the variable $dowhat{metamodel}.
 

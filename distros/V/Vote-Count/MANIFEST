@@ -35,8 +35,8 @@ md/Catalog.md
 md/Count.md
 md/Matrix.md
 md/README.md
-pod.html
 pod2htmd.tmp
+podhtml.scratch
 t/approval.t
 t/borda.t
 t/condorcetdropping.t

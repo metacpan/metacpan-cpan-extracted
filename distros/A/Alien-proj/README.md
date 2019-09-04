@@ -1,5 +1,5 @@
 # perl-alien-proj4
-Perl Alien package to compile the [Proj library](https://proj4.org/).
+Perl Alien package to compile the [Proj library](https://proj.org/).
 
 [![Build Status](https://travis-ci.org/shawnlaffan/perl-alien-proj4.svg?branch=master)](https://travis-ci.org/shawnlaffan/perl-alien-proj4)
 

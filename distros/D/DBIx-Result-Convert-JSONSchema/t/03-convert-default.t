@@ -34,7 +34,12 @@ throws_ok {
     $converter->get_json_schema('Dog');
 } qr/Can't find source for Dog/;
 
-my $json_schema = $converter->get_json_schema('MySQLTypeTest');
+my $json_schema = $converter->get_json_schema(
+    'MySQLTypeTest',
+    {
+        add_property_minimum_value => 1,
+    }
+);
 is ref $json_schema, 'HASH', 'got json schema HashRef';
 
 subtest 'JSON schema keys' => sub {
@@ -83,6 +88,12 @@ subtest 'string types have default minLength and maxLength' => sub {
         my $json_schema_type = $json_schema->{properties}->{ $json_schema_key }->{type};
 
         if ( $json_schema_type && $json_schema_type eq 'string' ) {
+
+            if ( my $format = $json_schema->{properties}->{ $json_schema_key }->{format} ) {
+                note("Skipping '$json_schema_key' key because format '$format' is defined");
+                next;
+            }
+
             ok defined $json_schema->{properties}->{ $json_schema_key }->{minLength},
                 "JSON schema property $json_schema_key has minLength for string type";
             ok defined $json_schema->{properties}->{ $json_schema_key }->{maxLength},

@@ -5,7 +5,7 @@
 package Pod::PseudoPod::Checker;
 use strict;
 use vars qw( $VERSION );
-$VERSION = '0.18';
+$VERSION = '0.19';
 use Carp ();
 use base qw( Pod::PseudoPod );
 BEGIN { *DEBUG = defined(&Pod::PseudoPod::DEBUG)
@@ -88,8 +88,10 @@ sub end_item_text   { $_[0]->emit(-2) }
 sub emit {
   return unless $_[0]{'Errata_seen'};
   my($self, $tweak_indent) = splice(@_,0,2);
-  my $indent = ' ' x ( 2 * $self->{'Indent'} + ($tweak_indent||0) );
-   # Yes, 'STRING' x NEGATIVE gives '', same as 'STRING' x 0
+  my $indent_length = ( 2 * $self->{'Indent'} + ($tweak_indent||0) );
+
+  # Yes, 'STRING' x NEGATIVE gives '', same as 'STRING' x 0
+  my $indent = $indent_length > 0 ? ' ' x $indent_length : '';
 
   $self->{'scratch'} =~ tr{\xAD}{}d if Pod::Simple::ASCII;
   my $out = Text::Wrap::wrap($indent, $indent, $self->{'scratch'} .= "\n");
@@ -97,7 +99,7 @@ sub emit {
   print {$self->{'output_fh'}} $out,
   ;
   $self->{'scratch'} = '';
-  
+
   return;
 }
 

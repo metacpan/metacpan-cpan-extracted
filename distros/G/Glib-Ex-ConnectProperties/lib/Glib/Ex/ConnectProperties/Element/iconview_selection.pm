@@ -1,4 +1,4 @@
-# Copyright 2011, 2012 Kevin Ryde
+# Copyright 2011, 2012, 2013 Kevin Ryde
 
 # This file is part of Glib-Ex-ConnectProperties.
 #
@@ -29,7 +29,7 @@ use Glib;
 use Gtk2;
 use base 'Glib::Ex::ConnectProperties::Element';
 
-our $VERSION = 19;
+our $VERSION = 20;
 
 # uncomment this to run the ### lines
 #use Smart::Comments;
@@ -132,7 +132,7 @@ in a L<Gtk2::IconView>.
     iconview-selection#selected-path   Gtk2::TreePath or undef
 
 For example C<iconview-selection#not-empty> might be connected up to make a
-delete button sensitive only when the user has selected a row,
+delete button sensitive only when the user has selected a row.
 
 C<iconview-selection#selected-path> is the first selected row.  It's
 intended for use with C<selection-mode> set to "single" so there's at most
@@ -156,7 +156,7 @@ L<http://user42.tuxfamily.org/glib-ex-connectproperties/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012 Kevin Ryde
+Copyright 2011, 2012, 2013 Kevin Ryde
 
 Glib-Ex-ConnectProperties is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License as published by

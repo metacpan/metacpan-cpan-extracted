@@ -1,5 +1,8 @@
 Revision history for Catmandu-BagIt
 
+0.236  2019-09-03 14:32:41 CEST
+    - Fixing undeclared dependency on Data::UUID
+
 0.235  2019-02-11 16:41:11 CET
     - Fixing slow repeated calls to Catmandu::BagIt->read in Bag stores
 
@@ -10,7 +13,7 @@ Revision history for Catmandu-BagIt
     - Fixing EAGAIN bug
 
 0.232  2018-09-03 11:27:36 CEST
-    - Adding missin dependency
+    - Adding missing dependency
 
 0.231  2018-08-29 14:23:44 CEST
     - Adding better checks on syswrites and counting of bytes

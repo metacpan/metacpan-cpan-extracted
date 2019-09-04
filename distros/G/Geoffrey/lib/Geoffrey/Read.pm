@@ -7,7 +7,7 @@ use warnings FATAL => 'all';
 use Geoffrey::Template;
 use Geoffrey::Changeset;
 
-$Geoffrey::Read::VERSION = '0.000201';
+$Geoffrey::Read::VERSION = '0.000204';
 
 use parent 'Geoffrey::Role::Core';
 
@@ -120,11 +120,11 @@ sub run {
     my ($self, $s_changelog_root) = @_;
     $self->changelog_io->converter($self->converter) if $self->changelog_io->needs_converter;
     $self->changelog_io->dbh($self->dbh)             if $self->changelog_io->needs_dbh;
-    my $main = $self->changelog_io->load(File::Spec->catfile($s_changelog_root, 'changelog'));
-    $self->changeset->template(Geoffrey::Template->new->load_templates($main->{templates}));
-    $self->changeset->prefix($main->{prefix}   ? $main->{prefix} . '_'  : q~~);
-    $self->changeset->postfix($main->{postfix} ? '_' . $main->{postfix} : q~~);
-    return $self->_parse_changelogs($main->{changelogs}, $s_changelog_root);
+    my $hr_main_changeset = $self->changelog_io->load(File::Spec->catfile($s_changelog_root, 'changelog'));
+    $self->changeset->template(Geoffrey::Template->new->load_templates($hr_main_changeset->{templates}));
+    $self->changeset->prefix($hr_main_changeset->{prefix}   ? $hr_main_changeset->{prefix} . '_'  : q~~);
+    $self->changeset->postfix($hr_main_changeset->{postfix} ? '_' . $hr_main_changeset->{postfix} : q~~);
+    return $self->_parse_changelogs($hr_main_changeset->{changelogs}, $s_changelog_root);
 }
 
 1;    # End of Geoffrey::Read
@@ -141,7 +141,7 @@ Geoffrey::Read - Read existing db scheme.
 
 =head1 VERSION
 
-Version 0.000201
+Version 0.000204
 
 =head1 DESCRIPTION
 

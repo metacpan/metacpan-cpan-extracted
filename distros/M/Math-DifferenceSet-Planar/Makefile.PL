@@ -5,6 +5,7 @@
 use strict;
 use ExtUtils::MakeMaker;
 use File::ShareDir::Install;
+use File::Spec;
 
 *MY::postamble = \&File::ShareDir::Install::postamble;
 
@@ -12,11 +13,12 @@ install_share 'share';
 
 my %versions = map {
     my $module = $_;
-    my $file   = "lib/$module.pm";
-    $file      =~ s{::}{/}g;
+    my @path   = ('lib', split /::/, "$module.pm");
+    my $file   = join '/', @path;
+    my $osfile = File::Spec->catfile(@path);
     $module => {
         file    => $file,
-        version => MM->parse_version($file),
+        version => MM->parse_version($osfile),
     }
 } qw(
     Math::DifferenceSet::Planar
@@ -29,26 +31,32 @@ WriteMakefile(
     NAME                => 'Math::DifferenceSet::Planar',
     VERSION_FROM        => 'lib/Math/DifferenceSet/Planar.pm',
     PREREQ_PM           => {
-        'Carp',         => 0,
-        'DBD::SQLite'   => '1.48',
-        'DBIx::Class'   => 0,
-        'File::Share'   => 0,
-        'File::Spec'    => 0,
-        'Math::Prime::Util' => '0.59',
+        'Carp',                     => 0,
+        'DBD::SQLite'               => '1.48',
+        'DBIx::Class'               => 0,
+        'File::Share'               => 0,
+        'File::Spec'                => 0,
+        'Math::Prime::Util'         => '0.59',
     },
     ABSTRACT_FROM       => 'lib/Math/DifferenceSet/Planar.pm',
     AUTHOR              => 'Martin Becker <becker-cpan-mp (at) cozap.com>',
     SIGN                => 1,
     LICENSE             => 'perl',
     META_MERGE          => {
+        'meta-spec'     => { version => 2 },
         provides        => \%versions,
+        dynamic_config  => 0,
+        resources       => {
+            homepage        => 'https://vera.in-ulm.de/planar-diffsets/',
+        },
     },
     MIN_PERL_VERSION    => '5.010',
     CONFIGURE_REQUIRES  => {
         'ExtUtils::MakeMaker'       => '7.06',
         'File::ShareDir::Install'   => 0,
+        'File::Spec'                => 0,
     },
     TEST_REQUIRES       => {
-        'Test::More'    => 0,
+        'Test::More'                => 0,
     },
 );

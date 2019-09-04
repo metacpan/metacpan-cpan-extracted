@@ -6,19 +6,20 @@ use Test::More;
 # character sequence
 
 use_ok('Forks::Queue::File');
+my $qfile = "t/q10-$$";
 
-unlink 't/q10';
+unlink $qfile;
 ok(-d 't', 'queue directory exists');
-ok(! -f 't/q10', 'queue file does not exist yet');
+ok(! -f $qfile, 'queue file does not exist yet');
 
 ########
 
-my $q = Forks::Queue::File->new( file => 't/q10', style => 'fifo' );
+my $q = Forks::Queue::File->new( file => $qfile, style => 'fifo' );
 
 ok($q, 'got queue object');
 ok(ref($q) eq 'Forks::Queue::File', 'has correct object type');
-ok(-f 't/q10', 'queue file created');
-ok(-s 't/q10' > 1024, 'queue header section created');
+ok(-f $qfile, 'queue file created');
+ok(-s $qfile > 1024, 'queue header section created');
 
 my $EOL = Forks::Queue::File::EOL();
 

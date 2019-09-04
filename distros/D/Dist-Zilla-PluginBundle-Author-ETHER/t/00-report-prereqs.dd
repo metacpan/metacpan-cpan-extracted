@@ -10,7 +10,7 @@ do { my $x = {
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.149',
+                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.150',
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
@@ -64,6 +64,7 @@ do { my $x = {
                                       'CPAN::Changes' => '0.23',
                                       'CPAN::Meta' => '2.150006',
                                       'CPAN::Meta::Requirements' => '0',
+                                      'CPAN::Uploader' => '0',
                                       'Carp' => '0',
                                       'Devel::CheckBin' => '0',
                                       'Dist::Zilla' => '5.038',
@@ -173,6 +174,7 @@ do { my $x = {
                                       'Test::Portability::Files' => '0.07',
                                       'Test::Spelling' => '0.19',
                                       'Text::Tabs' => '2013.0426',
+                                      'Try::Tiny' => '0',
                                       'namespace::autoclean' => '0',
                                       'perl' => '5.010',
                                       'strict' => '0',

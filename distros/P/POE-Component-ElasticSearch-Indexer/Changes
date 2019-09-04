@@ -1,9 +1,23 @@
 ==================================================
-Changes from 2017-06-19 00:00:00 +0000 to present.
+Changes from 2017-09-03 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.011 at 2019-06-19 03:49:37 +0000
+version 0.012 at 2019-09-03 20:23:00 +0000
+------------------------------------------
+
+  Change: 63903d40bd2c6c4a9820daabf6d71cbc5779af03
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-08-23 19:24:41 +0000
+
+    Don't collide with human aliases
+
+    Using 'http' as an alias means that a user won't be able to use that ID.
+    Instead, md5 a string + the epoch to create a unique alias that won't
+    collide with the human space. 
+
+------------------------------------------
+version 0.011 at 2019-05-23 04:31:11 +0000
 ------------------------------------------
 
   Change: b9a2a6b0a2e382991d3521acc1ae940663cfe42f

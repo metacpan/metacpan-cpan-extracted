@@ -33,13 +33,13 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Map::Tube::Kolkatta'           => { file => 'lib/Map/Tube/Kolkatta.pm',         version => '0.32' },
-            'Map::Tube::Kolkatta::Line::L1' => { file => 'lib/Map/Tube/Kolkatta/Line/L1.pm', version => '0.32' },
-            'Map::Tube::Kolkatta::Line::L2' => { file => 'lib/Map/Tube/Kolkatta/Line/L2.pm', version => '0.32' },
-            'Map::Tube::Kolkatta::Line::L3' => { file => 'lib/Map/Tube/Kolkatta/Line/L3.pm', version => '0.32' },
-            'Map::Tube::Kolkatta::Line::L4' => { file => 'lib/Map/Tube/Kolkatta/Line/L4.pm', version => '0.32' },
-            'Map::Tube::Kolkatta::Line::L5' => { file => 'lib/Map/Tube/Kolkatta/Line/L5.pm', version => '0.32' },
-            'Map::Tube::Kolkatta::Line::L6' => { file => 'lib/Map/Tube/Kolkatta/Line/L6.pm', version => '0.32' },
+            'Map::Tube::Kolkatta'           => { file => 'lib/Map/Tube/Kolkatta.pm',         version => '0.33' },
+            'Map::Tube::Kolkatta::Line::L1' => { file => 'lib/Map/Tube/Kolkatta/Line/L1.pm', version => '0.33' },
+            'Map::Tube::Kolkatta::Line::L2' => { file => 'lib/Map/Tube/Kolkatta/Line/L2.pm', version => '0.33' },
+            'Map::Tube::Kolkatta::Line::L3' => { file => 'lib/Map/Tube/Kolkatta/Line/L3.pm', version => '0.33' },
+            'Map::Tube::Kolkatta::Line::L4' => { file => 'lib/Map/Tube/Kolkatta/Line/L4.pm', version => '0.33' },
+            'Map::Tube::Kolkatta::Line::L5' => { file => 'lib/Map/Tube/Kolkatta/Line/L5.pm', version => '0.33' },
+            'Map::Tube::Kolkatta::Line::L6' => { file => 'lib/Map/Tube/Kolkatta/Line/L6.pm', version => '0.33' },
         },
         resources => {
             repository => {

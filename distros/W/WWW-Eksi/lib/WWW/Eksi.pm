@@ -1,5 +1,5 @@
 package WWW::Eksi;
-$WWW::Eksi::VERSION = '0.30';
+$WWW::Eksi::VERSION = '0.32';
 =head1 NAME
 
 WWW::Eksi - Interface for Eksisozluk.com
@@ -19,7 +19,12 @@ Provides easy access to entries and lists of entries.
   my @ghebe_slow = $e->ghebe(5); # add a politeness delay
 
   # Yesterday's most popular entries
-  my @doludolu   = $e->doludolu(5);
+  my @debe_fast = $e->debe;    # might get rate limited
+  my @debe_slow = $e->debe(5); # add a politeness delay
+
+  # Alternative list of yesterday's popular entries
+  my @doludolu_fast = $e->doludolu;    # might get rate limited
+  my @doludolu_slow = $e->doludolu(5); # add a politeness delay
 
   # Single entry
   my $entry   = $e->download_entry(1);
@@ -48,13 +53,14 @@ Returns a new WWW::Eksi object.
 
 =cut
 
-sub new{
+sub new {
   my $class = shift;
   my $today = DateTime->now->ymd;
 
   my $eksi = {
     base     => 'https://eksisozluk.com',
     entry    => 'https://eksisozluk.com/entry/',
+    debe     => 'https://eksisozluk.com/debe',
     ghebe    => 'https://eksisozluk.com/istatistik/gecen-haftanin-en-begenilen-entryleri',
     strp_dt  => DateTime::Format::Strptime->new( pattern => '%d.%m.%Y%H:%M'),
     strp_d   => DateTime::Format::Strptime->new( pattern => '%d.%m.%Y'),
@@ -88,14 +94,14 @@ Takes entry id as argument, returns its data (if available) as follows.
 
 =cut
 
-sub download_entry{
+sub download_entry {
   my ($self,$id) = @_;
   my $data = $self->_download($self->{entry}.$id) if ($id && $id=~/^\d{1,}$/);
   return unless $data;
   return $self->_parse_entry($data,$id);
 }
 
-sub _parse_entry{
+sub _parse_entry {
   my ($self,$data, $id) = @_;
   return unless $data;
 
@@ -189,35 +195,61 @@ Ordered from more popular to less popular.
 
 =cut
 
-sub ghebe{
-  my $self      = shift;
-  my $sleep_sec = shift // 0;
-  my $data      = $self->_download($self->{ghebe});
+sub ghebe {
+  my ($self, $sleep_seconds) = @_;
+  $sleep_seconds //= 0;
+  my $data = $self->_download($self->{ghebe});
   return unless $data;
 
   my $dom   = Mojo::DOM->new($data);
   my $links = $dom->at('ol[class~=stats]')->find('a');
   my $ids   = $links->map(sub{$_->{href}=~m/%23(\d+)$/})->to_array;
-  my @ghebe = ();
+  my @entries = ();
 
   foreach my $id (@$ids){
     my $entry = $self->download_entry($id);
-    push @ghebe, $entry;
-    sleep $sleep_sec;
+    push @entries, $entry;
+    sleep $sleep_seconds
   }
 
-  return @ghebe;
+  return @entries;
+}
+
+=head2 debe($politeness_delay)
+
+Returns an array of entries for top posts of yesterday.
+Ordered from more popular to less popular.
+
+=cut
+
+sub debe {
+  my ($self, $sleep_seconds) = @_;
+  $sleep_seconds //= 0;
+  my $data = $self->_download($self->{debe});
+  return unless $data;
+
+  my $dom   = Mojo::DOM->new($data);
+  my $links = $dom->at('ul[class~=partial]')->find('a');
+  my $ids   = $links->map(sub{$_->{href}=~m/\/(\d+)$/})->to_array;
+  my @entries = ();
+
+  foreach my $id (@$ids){
+    my $entry = $self->download_entry($id);
+    push @entries, $entry;
+    sleep $sleep_seconds
+  }
+
+  return @entries;
 }
 
 =head2 doludolu($politeness_delay)
 
-Returns an array of entries for top posts of yesterday.
+Returns an array of entries with alternative top posts of yesterday.
 Ordered from more popular to less popular.
-This is an alternative list to DEBE, which is discontinued.
 
 =cut
 
-sub doludolu{
+sub doludolu {
   my $self      = shift;
   my $sleep_sec = shift // 0;
   my $data      = $self->_download($self->{doludolu});
@@ -241,7 +273,7 @@ sub doludolu{
   return @doludolu;
 }
 
-sub _download{
+sub _download {
   my ($self,$url) = @_;
 
   my $u = URI->new($url) if $url;
@@ -254,7 +286,7 @@ sub _download{
     : 0;
 }
 
-sub _lengthen{
+sub _lengthen {
   my ($self, $url) = @_;
 
   my $u = URI->new($url) if $url;
@@ -267,7 +299,7 @@ sub _lengthen{
          : $u;
 }
 
-sub _process_entry{
+sub _process_entry {
   my ($self,$e) = @_;
   return unless $e;
 
@@ -296,7 +328,7 @@ sub _process_entry{
 
 }
 
-sub _entry_not_found{
+sub _entry_not_found {
 
   return {
     topic_title    => '?',

@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2014 Kevin Ryde
 
 # This file is part of Glib-Ex-ConnectProperties.
 #
@@ -33,7 +33,7 @@ use warnings;
 use Carp;
 our @CARP_NOT = ('Glib::Ex::ConnectProperties');
 
-our $VERSION = 19;
+our $VERSION = 20;
 
 # uncomment this to run the ### lines
 #use Smart::Comments;
@@ -154,12 +154,12 @@ L<Glib::Ex::ConnectProperties>.  A subclass for a property such as
 
     some-thing#foo
 
-should be a class
+should be a class created
 
     package Glib::Ex::ConnectProperties::Element::some_thing;
     use base 'Glib::Ex::ConnectProperties::Element';
 
-An Element object is a hashref created from
+An Element instance is a hashref created from
 C<Glib::Ex::ConnectProperties-E<gt>new()> etc with property name and
 options.
 
@@ -185,9 +185,9 @@ simply C<get_property()> or C<set_property()> to manipulate the value.
 
 C<Glib::Ex::ConnectProperties::Element::textbuffer> is an example of
 read-only access to non-property characteristics of a text buffer.  It has a
-fixed set of property names in C<pspec_hash()>, and in fact shares the
-boolean for "empty" and "not-empty" because the ParamSpec name field doesn't
-matter, only the type etc.
+fixed set of property names in C<pspec_hash()>, and in fact shares the pspec
+for "empty" and "not-empty" because the ParamSpec name field doesn't matter,
+only the type etc.
 
 C<Glib::Ex::ConnectProperties::Element::screen_size> is another read-only,
 with some runtime adaption to notice when Gtk2 is new enough to have the
@@ -214,9 +214,8 @@ method should return a hashref name to ParamSpec
      ...
    }
 
-in which to lookup C<$elem-E<gt>{'pname'}>.  C<pspec_hash()> suits
-subclasses with a fixed set of property names.  Subclasses where it varies
-should implement some sort of C<find_property()>.
+C<pspec_hash()> suits subclasses with a fixed set of property names.
+Subclasses where it varies should implement some sort of C<find_property()>.
 
 In each ParamSpec the following fields should be set
 
@@ -225,7 +224,7 @@ In each ParamSpec the following fields should be set
 
 and for writable properties
 
-    min,max     on int, float
+    min,max     for int, float
 
 The type of the ParamSpec, such as C<Glib::Param::Int> etc, is used to
 know what sort of value comparison and validation should be done in the
@@ -237,8 +236,8 @@ are compared using C<==> whereas strings are compared with C<eq>.
 Return the name of a signal on C<$self-E<gt>{'object'}> to use to listen for
 changes to the property value.
 
-The signal name may vary with the property name C<$self-E<gt>{'pname'}>, as
-for example the plain object properties using C<notify>,
+The signal name may vary with the property name C<$self-E<gt>{'pname'}>.
+For example the plain object properties which use C<notify>,
 
     sub read_signal {
       my ($self) = @_;
@@ -250,8 +249,8 @@ in a set of related properties,
 
     use constant read_signal => 'foo-changed';
 
-C<read_signal()> is only used for readable properties.  The C<read_signal>
-option to ConnectProperties can override it.
+The C<read_signal> option to ConnectProperties overrides the element method.
+C<read_signal()> is only ever used for readable properties.
 
 The return from C<read_signal()> is actually a list of signal names.  If a
 class doesn't need any signal at all on C<$self-E<gt>{'object'}> then return
@@ -266,8 +265,9 @@ an empty list.
 Get or set the value of the C<$elem-E<gt>{'pname'}> property on
 C<$elem-E<gt>{'object'}>.
 
-This is usually a method call on the object, some attribute it doesn't offer
-as a real property or which is more convenient when transformed in some way.
+This is usually a method call on the object, acting on some attribute it
+doesn't offer as a real property or which is more convenient when
+transformed in some way.
 
 An element subclass will generally look up or derive a method name from
 C<$elem-E<gt>{'pname'}>.
@@ -297,10 +297,10 @@ such property".  An element subclass might make additional checks, or might
 give a better explanation if perhaps a property is sometimes available and
 sometimes not.
 
-It's suggested that an element class should not check the class of the
-target C<$elem-E<gt>{'object'}>, but only perhaps for availability of
-required methods, signals, etc.  That allows a similar object with
-compatible features to be used with the element class.
+It's suggested that an element class should not look at the class of the
+target C<$elem-E<gt>{'object'}>, but only check for required methods or
+signals, etc on that object.  This allows a similar object with compatible
+features to be used with the element class.
 
 =back
 
@@ -317,7 +317,7 @@ L<http://user42.tuxfamily.org/glib-ex-connectproperties/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012 Kevin Ryde
+Copyright 2010, 2011, 2012, 2014 Kevin Ryde
 
 Glib-Ex-ConnectProperties is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License as published by

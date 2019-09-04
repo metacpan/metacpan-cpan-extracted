@@ -30,10 +30,16 @@
       "runtime" : {
          "requires" : {
             "DNS::Zone::PowerDNS::To::BIND" : "0",
+            "Data::Sah::Compiler::perl::TH::array" : "0",
+            "Data::Sah::Compiler::perl::TH::bool" : "0",
+            "Data::Sah::Compiler::perl::TH::int" : "0",
+            "Data::Sah::Compiler::perl::TH::obj" : "0",
             "Data::Sah::Compiler::perl::TH::str" : "0",
+            "Log::ger" : "0.027",
             "Perinci::CmdLine::Any" : "0",
             "Perinci::CmdLine::Lite" : "1.820",
             "Sah::Schema::net::hostname" : "0",
+            "Sah::Schema::uint" : "0",
             "perl" : "5.010001"
          }
       },
@@ -58,7 +64,7 @@
          "web" : "https://github.com/perlancar/perl-App-DNSZoneUtils"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028002"

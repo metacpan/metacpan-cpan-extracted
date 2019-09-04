@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2007, 2008, 2009, 2010, 2011, 2012 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016 Kevin Ryde
 
 # This file is part of Glib-Ex-ConnectProperties.
 #
@@ -21,15 +21,13 @@ use 5.008;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
-use lib 'inc';
-use MyMakeMakerExtras;
 
-MyMakeMakerExtras::WriteMakefile
-  (NAME         => 'Glib-Ex-ConnectProperties',
+WriteMakefile
+  (NAME         => 'Glib::Ex::ConnectProperties',
    ABSTRACT     => 'Link properties between objects.',
    VERSION_FROM => 'lib/Glib/Ex/ConnectProperties.pm',
-   AUTHOR       => 'Kevin Ryde <user42@zip.com.au>',
-   LICENSE      => 'gpl',
+   AUTHOR       => 'Kevin Ryde <user42_kevin@yahoo.com.au>',
+   LICENSE      => 'gpl_3',
    SIGN         => 1,
 
    PREREQ_PM    => {
@@ -47,21 +45,24 @@ MyMakeMakerExtras::WriteMakefile
      { homepage => 'http://user42.tuxfamily.org/glib-ex-connectproperties/index.html',
        license  => 'http://www.gnu.org/licenses/gpl.html',
      },
-     no_index => { directory=>['devel'] },
+     no_index => { directory=>['devel','xt','xtools'] },
 
      recommends =>
      { 'DateTime'           => 0,
        'DateTime::TimeZone' => 0,
      },
-     optional_features =>
-     { maximum_tests =>
-       { description => 'Have "make test" do as much as possible.',
-         requires => { 'Test::Weaken' => '2.002',
-                       'Module::Util' => 0,
-                       'Gtk2' => 0,
-                     },
+     prereqs =>
+     { test =>
+       { suggests =>
+         { 'Test::Weaken' => '2.002',
+           'Module::Util' => 0,
+           'Gtk2' => 0,
+         },
        },
-       maximum_examples =>
+     },
+
+     optional_features =>
+     { maximum_examples =>
        { description => 'Be able to run all the example programs.',
          requires => { 'Gtk2' => 0,
                      },
@@ -69,14 +70,3 @@ MyMakeMakerExtras::WriteMakefile
      },
    },
   );
-
-       # maximum_devel =>
-       # { description => 'Stuff used variously for development.',
-       #   requires => { 'Gtk2'        => 0,
-       #                 'Gtk2::Pango' => 0,
-       #                 'Glib::Object::Subclass' => 0,
-       #                 'Tie::Hash::TwoWay' => 0,
-       #                 'Goo::Canvas' => 0,
-       #                 'Smart::Comments' => 0,
-       #               },
-       # },

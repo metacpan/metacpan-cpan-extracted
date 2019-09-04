@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.005
+    version 0.006
 
 SYNOPSIS
 
@@ -57,6 +57,45 @@ DESCRIPTION
     Or if you don't plan to switch completely off of HomeBank, you can
     continue to maintain your accounts in HomeBank and use this script to
     also take advantage of the reports Ledger offers.
+
+INSTALL
+
+    There are several ways to install homebank2ledger to your system.
+
+ using cpanm
+
+    You can install homebank2ledger using cpanm. If you have a local perl
+    (plenv, perlbrew, etc.), you can just do:
+
+        cpanm App::Homebank2Ledger
+
+    to install the homebank2ledger executable and its dependencies. The
+    executable will be installed to your perl's bin path, like
+    ~/perl5/perlbrew/bin/homebank2ledger.
+
+    If you're installing to your system perl, you can do:
+
+        cpanm --sudo App::Homebank2Ledger
+
+    to install the homebank2ledger executable to a system directory, like
+    /usr/local/bin/homebank2ledger (depending on your perl).
+
+ Downloading just the executable
+
+    You may also choose to download homebank2ledger as a single executable,
+    like this:
+
+        curl -OL https://raw.githubusercontent.com/chazmcgarvey/homebank2ledger/solo/homebank2ledger
+        chmod +x homebank2ledger
+
+ For developers
+
+    If you're a developer and want to hack on the source, clone the
+    repository and pull the dependencies:
+
+        git clone https://github.com/chazmcgarvey/homebank2ledger.git
+        cd homebank2ledger
+        make bootstrap      # installs dependencies; requires cpanm
 
 OPTIONS
 

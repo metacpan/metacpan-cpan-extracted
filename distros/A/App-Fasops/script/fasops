@@ -85,3 +85,8 @@ perl -I lib script/fasops vars \
     -l 30000 --nosingle --nocomplex -o stdout |
     datamash check
 perl -I lib/ t/21-vars.t
+
+samtools faidx t/genome.fa
+perl -I lib/ script/fasops create t/I.connect.tsv -g t/genome.fa -o stdout
+perl -I lib/ script/fasops create t/I.connect.tsv -g t/genome.fa --name S288c -o stdout
+perl -I lib/ t/22-create.t

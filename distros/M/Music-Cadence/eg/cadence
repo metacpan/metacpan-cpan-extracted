@@ -12,12 +12,12 @@ use Music::Scales;
 my $max    = shift || 16;
 my $note   = shift || 'C';
 my $type   = shift || 'major';
-my $octave = shift // 4;
+my $octave = shift || 4;
 my $bpm    = shift || 100;
 my $leads  = shift || '1 2 4 7';
 
-my $half    = 'hn';
 my $quarter = 'qn';
+my $half    = 'hn';
 
 my @scale = get_scale_notes( $note, $type );
 # Transform to MIDI accidentals
@@ -52,10 +52,13 @@ for my $i ( 1 .. $max ) {
     }
 }
 
-my $chords = $mc->cadence( type => 'deceptive' );
+my $chords = $mc->cadence(
+    type      => 'deceptive',
+    variation => int( rand 2 ) + 1,
+);
 $score->n( $half, @$_ ) for @$chords;
 
-$chords = $mc->cadence( type => 'perfect' );
+$chords = $mc->cadence( type => 'plagal' );
 $score->n( $half, @$_ ) for @$chords;
 
 $score->write_score("$0.mid");

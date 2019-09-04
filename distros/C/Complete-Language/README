@@ -1,0 +1,59 @@
+NAME
+    Complete::Language - Complete from list of ISO-639 language codes
+
+VERSION
+    This document describes version 0.001 of Complete::Language (from Perl
+    distribution Complete-Language), released on 2019-07-18.
+
+SYNOPSIS
+     use Complete::Language qw(complete_language_code);
+     my $res = complete_language_code(word => 'V');
+     # -> [qw/ve vi vo/]
+
+FUNCTIONS
+  complete_language_code
+    Usage:
+
+     complete_language_code(%args) -> any
+
+    Complete from list of ISO-639 language codes.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   variant => *str* (default: "alpha-2")
+
+    *   word* => *str*
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Complete-Language>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Complete-Language>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-Language>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Complete::Country
+
+    Complete::Currency
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

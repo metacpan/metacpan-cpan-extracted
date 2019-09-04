@@ -2,20 +2,33 @@ Changes
 MANIFEST
 Makefile.PL
 README
+examples/numlist_sort
 examples/pds_canonize
+examples/pds_enumerate
 examples/pds_multiply
 examples/pds_planes
+examples/pds_sort_elements
+examples/pds_statistic
 examples/pds_translate
+examples/random_pds
 examples/show_databases
 lib/Math/DifferenceSet/Planar.pm
 lib/Math/DifferenceSet/Planar/Data.pm
 lib/Math/DifferenceSet/Planar/Schema.pm
 lib/Math/DifferenceSet/Planar/Schema/Result/DifferenceSet.pm
 share/pds.db
+share/pds.pod
 t/01_basics.t
+t/02_data.t
 t/90_pod.t
 t/91_pod_cover_cp.t
 t/99_signature.t
+t/db/extra.db
+t/db/extra.pod
+t/db/pds.db
+t/db/pds.pod
+t/db/pds_40.db
+t/db/pds_40.pod
 t/lib/Test/MyUtils.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

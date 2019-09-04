@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use autodie;
 
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 use Exporter;
 use parent 'Exporter';
@@ -384,7 +384,7 @@ Date::Easy::Datetime - easy datetime class
 
 =head1 VERSION
 
-This document describes version 0.08 of Date::Easy::Datetime.
+This document describes version 0.09 of Date::Easy::Datetime.
 
 =head1 SYNOPSIS
 
@@ -457,8 +457,8 @@ with epoch seconds.
 =head3 UTC
 
 'UTC' means to use the UTC timzeone, which essentialy means to ignore timezone altogether.  That is,
-under 'UTC' Date::Easy::Datetime will use C<gmtime> and C<timegm> (technically, C<timegm_local>,
-from L<Time::Local>) to deal with epcoh seconds.
+under 'UTC' Date::Easy::Datetime will use C<gmtime> and C<timegm> (technically, C<timegm_modern>,
+from L<Time::Local>) to deal with epoch seconds.
 
 =head3 GMT
 
@@ -748,7 +748,7 @@ it was going to do.)
 
 There is a bug in L<Time::ParseDate> which causes epoch seconds to be one hour off in certain
 specific circumstances.  Please note that you will I<not> hit this bug if the string you pass to
-L</datetime> has I<any> of the following characteristicts:
+L</datetime($string)> has I<any> of the following characteristicts:
 
 =over 4
 

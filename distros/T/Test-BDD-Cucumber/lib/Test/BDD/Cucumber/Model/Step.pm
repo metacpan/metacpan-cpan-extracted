@@ -1,5 +1,5 @@
 package Test::BDD::Cucumber::Model::Step;
-$Test::BDD::Cucumber::Model::Step::VERSION = '0.59';
+$Test::BDD::Cucumber::Model::Step::VERSION = '0.60';
 use Moo;
 use Types::Standard qw( Str ArrayRef InstanceOf );
 
@@ -9,7 +9,7 @@ Test::BDD::Cucumber::Model::Step - Model to represent a step in a scenario
 
 =head1 VERSION
 
-version 0.59
+version 0.60
 
 =head1 DESCRIPTION
 

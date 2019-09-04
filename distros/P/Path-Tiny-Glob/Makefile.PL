@@ -7,7 +7,7 @@ use 5.006;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "File globbing utility ",
+  "ABSTRACT" => "File globbing utility",
   "AUTHOR" => "Yanick Champoux <yanick\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -32,9 +32,10 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
+    "Test2::V0" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.0.1",
+  "VERSION" => "0.1.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -51,6 +52,7 @@ my %FallbackPrereqs = (
   "List::Lazy" => 0,
   "Moo" => 0,
   "Path::Tiny" => 0,
+  "Test2::V0" => 0,
   "Test::More" => 0,
   "experimental" => 0,
   "parent" => 0,

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 our $DEV_SHM = "/dev/shm";
 our $DEBUG;
 *DEBUG = \$Forks::Queue::DEBUG;
@@ -119,7 +119,7 @@ Forks::Queue::Shmem - Forks::Queue implementation using shared memory
 
 =head1 VERSION
 
-0.11
+0.12
 
 =head1 DESCRIPTION
 
@@ -159,13 +159,13 @@ will reside under the shared memory virtual filesystem
 
 =item * persist
 
-See L<Forks::Queue> for descriptions of these options.
+See L<Forks::Queue/"new"> for descriptions of these options.
 
 =back
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2017, Marty O'Brien.
+Copyright (c) 2017-2019, Marty O'Brien.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.1 or,

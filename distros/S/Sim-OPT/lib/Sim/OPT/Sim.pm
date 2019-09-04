@@ -99,6 +99,7 @@ sub sim    # This function launch the simulations in ESP-r
 
   my %dat = %{ $_[0] };
   my @instances = @{ $dat{instances} }; #say $tee "IN SIM \@instances " . dump( @instances );
+  say "SCALAR INSTANCES " . scalar( @instances );
   my %dirfiles = %{ $dat{dirfiles} };
 
   my @simcases = @{ $dirfiles{simcases} };
@@ -136,14 +137,14 @@ sub sim    # This function launch the simulations in ESP-r
   my @sweeps = @{ $d{sweeps} };
 
 
-  if ( $countcase > $#sweeps )# NUMBER OF CASES OF THE CURRENT PROBLEM
-  {
-    if ( $dirfiles{checksensitivity} eq "yes" )
-    {
-      Sim::OPT::sense( $dirfiles{ordtot}, $mypath, $sense{objectivecolumn} );
-    }
-    exit(say $tee "#END RUN.");
-  }
+  #if ( $countcase > $#sweeps )# NUMBER OF CASES OF THE CURRENT PROBLEM
+  #{
+  #  if ( $dirfiles{checksensitivity} eq "yes" )
+  #  {
+  #    Sim::OPT::sense( $dirfiles{ordtot}, $mypath, $sense{objectivecolumn} );
+  #  }
+  #  exit(say $tee "0 #END RUN.");
+  #}
 
   my %dowhat = %{ $d{dowhat} }; #say $tee "DOWHAT IN SIM " . dump( \%dowhat );
   my $skipfile = $vals{skipfile};
@@ -589,7 +590,7 @@ Sim::OPT::Sim is the module used by Sim::OPT to launch the simulations once the 
 
 =head1 SEE ALSO
 
-Annotated examples can be found packed in the "optw.tar.gz" file in "examples" directory in this distribution. 
+Annotated examples can be found packed in the "optw.tar.gz" file in "examples" directory in this distribution.
 
 =head1 AUTHOR
 

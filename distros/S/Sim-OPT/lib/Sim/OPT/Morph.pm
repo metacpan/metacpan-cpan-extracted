@@ -58,8 +58,8 @@ decreasearray deg2rad_ rad2deg_ purifyarray replace_nth rotate2dabs rotate2d rot
 gatherseparators supercleanarray modish $max_processes
 ); # our @EXPORT = qw( );
 
-$VERSION = '0.109'; # our $VERSION = '';
-$ABSTRACT = 'Sim::OPT::Morph is a morphing program for performing parametric variations on model descriptions for simulation programs.';
+$VERSION = '0.111'; # our $VERSION = '';
+$ABSTRACT = 'Sim::OPT::Morph is a morphing program for performing parametric variations on model for simulation programs.';
 
 ################################################# MORPH
 
@@ -262,8 +262,6 @@ sub morph
 	foreach my $instance ( @instances )
 	{
 		my %d = %{ $instance }; #say $tee "IN MORPH dump(\%d): " . dump(%d);
-
-
 		my $instance_after = $instances[ $countinstance + 1];
 		my %d_after = %{ $instance_after };
 
@@ -271,9 +269,11 @@ sub morph
 		my $countblock = $d{countblock};
 		my %datastruc = %{ $d{datastruc} }; ######
 		my @rescontainer = @{ $d{rescontainer} }; ######
-		my @miditers = @{ $d{miditers} };
+		my @miditers = @{ $d{miditers} }; #say "\@miditers: " . dump( @miditers );
 		my @winneritems = @{ $d{winneritems} };
 		my $countvar = $d{countvar};
+		my @countvars;
+		push( @countvars, $countvar );
 		my $countvar_after = $d_after{countvar};
 		my $countstep = $d{countstep};
 		my $countinstance = ( $d{instn} );
@@ -294,9 +294,8 @@ sub morph
 		my $toitem = $d{toitem}; #say $tee " IN MORPH \$toitem $toitem ";
 
 		my %varnums = %{ $d{varnums} };
-		my %mids = %{ $d{mids} };
-		my $rootname = Sim::OPT::getrootname( \@rootnames, $countcase );
-
+		my %mids = %{ $d{mids} }; #say "\%mids: " . dump( \%mids );
+		my $rootname = Sim::OPT::getrootname( \@rootnames, $countcase ); #say $tee " IN MORPH \$rootname $rootname ";
 
 		my $varnumber = $countvar; #say $tee "IN MORPH! \$countvar and \$varnumber : " . dump( $countvar );
 		my $stepsvar = $varnums{$countvar}; #say $tee "IN MORPH! \$stepsvar : " . dump( $stepsvar ); say $tee "IN MORPH! \$countvar : " . dump( $countvar );
@@ -304,664 +303,709 @@ sub morph
 		my $countcaseplus1 = ( $countcase + 1 );
 		my $countblockplus1 = ( $countblock + 1 );
 
-
 		my $countmorphing = 1;
 		my $numberof_morphings = scalar( keys %{ $dowhat{simtools} } );
+		my $i == 0;
 
-		while ( $countmorphing <= $numberof_morphings )
+		my ( %these );
+		if ( ( $dirfiles{randompick} eq "yes" ) or ( $dirfiles{ga} eq "yes" ) )
 		{
-			if ( not (defined ( $vals{$countmorphing}{$countvar}{general_variables} ) ) )
+			my $string = $instance->{is}; say "STRING: $string";
+			my @els = split( "_", $string );
+
+			foreach my $el ( @els )
 			{
-				$vals{$countmorphing}{$countvar}{general_variables} =
-								[
-								"y", # $generate(n) eq "n" # (if the models deriving from this runs will not be generating new models) or y (if they will be generating new models).
-								"n" #if $sequencer eq "y", or "last" (of a sequence) iteration between non-continuous cases wanted.  The first gets appended to the middle(s) and to he last. Otherwise, "n".
-								];
+				my @bits = split( "-", $el );
+				$these{$bits[0]} = $bits[1];
+			}
+			@countvars = ( keys %mids );
+		}
+
+		foreach my $countvar ( @countvars )
+		{
+			if ( ( $dirfiles{randompick} eq "yes" ) or ( $dirfiles{ga} eq "yes" ) )
+			{
+				$countstep = $these{$countvar};
 			}
 
-			if ( $dowhat{actonmodels} eq "" )
+			while ( $countmorphing <= $numberof_morphings )
 			{
-				$dowhat{actonmodels} = "y";
-			}
-
-			#say $tee "IN MORPH! \$countmorphing : " . dump( $countmorphing );
-			#say $tee "IN MORPH! \$countvar : " . dump( $countvar );
-			#say $tee "IN MORPH! \%vals : " . dump( \%vals );
-			my @applytype = @{ $vals{$countmorphing}{$countvar}{applytype} }; #say $tee "IN MORPH! \@applytype : " . dump( @applytype );
-			my $general_variables = $vals{$countmorphing}{$countvar}{general_variables};
-			my @generic_change = @{$vals{$countmorphing}{$countvar}{generic_change} };
-			my $rotate = $vals{$countmorphing}{$countvar}{rotate};
-			my $rotatez = $vals{$countmorphing}{$countvar}{rotatez};
-			my $translate = $vals{$countmorphing}{$countvar}{translate};
-			my $translate_surface = $vals{$countmorphing}{$countvar}{translate_surface};
-			my $keep_obstructions = $vals{$countmorphing}{$countvar}{keep_obstructions};
-			my $shift_vertices = $vals{$countmorphing}{$countvar}{shift_vertices};
-			my $construction_reassign = $vals{$countmorphing}{$countvar}{construction_reassign};
-			my $change_thickness = $vals{$countmorphing}{$countvar}{change_thickness};
-			my $recalculateish = $vals{$countmorphing}{$countvar}{recalculateish};
-			my @recalculatenet = @{ $vals{$countmorphing}{$countvar}{recalculatenet} };
-			my $obs_modify = $vals{$countmorphing}{$countvar}{obs_modify};
-			my $netcomponentchange = $vals{$countmorphing}{$countvar}{netcomponentchange};
-			my $changecontrol = $vals{$countmorphing}{$countvar}{changecontrol};
-			my @apply_constraints = @{ $vals{$countmorphing}{$countvar}{apply_constraints} };
-			my $rotate_surface = $vals{$countmorphing}{$countvar}{rotate_surface};
-			my @reshape_windows = @{ $vals{$countmorphing}{$countvar}{reshape_windows} };
-			my @apply_netconstraints = @{ $vals{$countmorphing}{$countvar}{apply_netconstraints} };
-			my @apply_windowconstraints = @{ $vals{$countmorphing}{$countvar}{apply_windowconstraints} };
-			my @translate_vertices = @{ $vals{$countmorphing}{$countvar}{translate_vertices} };
-			my $warp = $vals{$countmorphing}{$countvar}{warp};
-			my @daylightcalc = @{ $vals{$countmorphing}{$countvar}{daylightcalc} };
-			my @change_config = @{ $vals{$countmorphing}{$countvar}{change_config} };
-			my @vary_controls = @{ $vals{$countmorphing}{$countvar}{vary_controls} };
-			my @constrain_controls =  @{ $vals{$countmorphing}{$countvar}{constrain_controls} };
-			my $checkfile = $vals{$countmorphing}{$countvar}{checkfile};
-			my @change_climate = @{ $vals{$countmorphing}{$countvar}{change_climate} };
-			my $pin_obstructions = $vals{$countmorphing}{$countvar}{pin_obstructions};
-			my $use_modish = $vals{$countmorphing}{$countvar}{use_modish};
-			my $export_toradiance = $vals{$countmorphing}{$countvar}{export_toradiance};
-			my $genchange = $vals{$countmorphing}{$countvar}{genchange};
-			my $genprop = $vals{$countmorphing}{$countvar}{genprop};
-			my $change_groundreflectance = $vals{$countmorphing}{$countvar}{change_groundreflectance};
-			my $export_toenergyplus = $vals{$countmorphing}{$countvar}{export_toenergyplus};
-			my $skipop = $vals{$countmorphing}{$countvar}{skipop};
-			my $todos = $vals{$countmorphing}{$countvar}{todos};
-			# genchange
-			my ( @cases_to_sim, @files_to_convert );
-			my ( @obs, @node, @component, @loopcontrol, @flowcontrol, @new_loopcontrol, @new_flowcontrol ); # THINGS globsAL AS REGARDS TO COUNTER ZONE CYCLES
-			my ( @myobs, @mynode, @mycomponent, @myloopcontrol, @myflowcontrol); # THINGS LOCAL AS REGARDS TO COUNTER ZONE CYCLES
-			my ( @tempv, @tempobs, @tempnode, @tempcomponent, @temploopcontrol, @tempflowcontrol); # THINGS LOCAL AS REGARDS TO COUNTER ZONE CYCLES
-			my ( @v, @v_, @obs_, @donode, @docomponent, @doloopcontrol, @doflowcontrol); # THINGS LOCAL AS REGARDS TO COUNTER ZONE CYCLES
-			my ( %names, %newcontents, @filecontents, @newfilecontents );
-
-			my $generate  = $$general_variables[0];
-			my $sequencer = $$general_variables[1];
-			my $dffile = "df-$file.txt";
-
-
-
-			if ( ( $countblock == 0 ) and ( $countstep == 1 ) )
-			#if ( $countblock == 0 )
-			{
-				unless ( $dowhat{inactivatemorph} eq "y" )
+				if ( not (defined ( $vals{$countmorphing}{$countvar}{general_variables} ) ) )
 				{
-					if (not ( -e $origin{crypto} ) )
+					$vals{$countmorphing}{$countvar}{general_variables} =
+									[
+									"y", # $generate(n) eq "n" # (if the models deriving from this runs will not be generating new models) or y (if they will be generating new models).
+									"n" #if $sequencer eq "y", or "last" (of a sequence) iteration between non-continuous cases wanted.  The first gets appended to the middle(s) and to he last. Otherwise, "n".
+									];
+				}
+
+				if ( $dowhat{actonmodels} eq "" )
+				{
+					$dowhat{actonmodels} = "y";
+				}
+
+				#say $tee "IN MORPH! \$countmorphing : " . dump( $countmorphing );
+				#say $tee "IN MORPH! \$countvar : " . dump( $countvar );
+				#say $tee "IN MORPH! \%vals : " . dump( \%vals );
+				my @applytype = @{ $vals{$countmorphing}{$countvar}{applytype} }; #say $tee "IN MORPH! \@applytype : " . dump( @applytype );
+				my $general_variables = $vals{$countmorphing}{$countvar}{general_variables};
+				my @generic_change = @{$vals{$countmorphing}{$countvar}{generic_change} };
+				my $rotate = $vals{$countmorphing}{$countvar}{rotate};
+				my $rotatez = $vals{$countmorphing}{$countvar}{rotatez};
+				my $translate = $vals{$countmorphing}{$countvar}{translate};
+				my $translate_surface = $vals{$countmorphing}{$countvar}{translate_surface};
+				my $keep_obstructions = $vals{$countmorphing}{$countvar}{keep_obstructions};
+				my $shift_vertices = $vals{$countmorphing}{$countvar}{shift_vertices};
+				my $construction_reassign = $vals{$countmorphing}{$countvar}{construction_reassign};
+				my $change_thickness = $vals{$countmorphing}{$countvar}{change_thickness};
+				my $recalculateish = $vals{$countmorphing}{$countvar}{recalculateish};
+				my @recalculatenet = @{ $vals{$countmorphing}{$countvar}{recalculatenet} };
+				my $obs_modify = $vals{$countmorphing}{$countvar}{obs_modify};
+				my $netcomponentchange = $vals{$countmorphing}{$countvar}{netcomponentchange};
+				my $changecontrol = $vals{$countmorphing}{$countvar}{changecontrol};
+				my @apply_constraints = @{ $vals{$countmorphing}{$countvar}{apply_constraints} };
+				my $rotate_surface = $vals{$countmorphing}{$countvar}{rotate_surface};
+				my @reshape_windows = @{ $vals{$countmorphing}{$countvar}{reshape_windows} };
+				my @apply_netconstraints = @{ $vals{$countmorphing}{$countvar}{apply_netconstraints} };
+				my @apply_windowconstraints = @{ $vals{$countmorphing}{$countvar}{apply_windowconstraints} };
+				my @translate_vertices = @{ $vals{$countmorphing}{$countvar}{translate_vertices} };
+				my $warp = $vals{$countmorphing}{$countvar}{warp};
+				my @daylightcalc = @{ $vals{$countmorphing}{$countvar}{daylightcalc} };
+				my @change_config = @{ $vals{$countmorphing}{$countvar}{change_config} };
+				my @vary_controls = @{ $vals{$countmorphing}{$countvar}{vary_controls} };
+				my @constrain_controls =  @{ $vals{$countmorphing}{$countvar}{constrain_controls} };
+				my $checkfile = $vals{$countmorphing}{$countvar}{checkfile};
+				my @change_climate = @{ $vals{$countmorphing}{$countvar}{change_climate} };
+				my $pin_obstructions = $vals{$countmorphing}{$countvar}{pin_obstructions};
+				my $use_modish = $vals{$countmorphing}{$countvar}{use_modish};
+				my $export_toradiance = $vals{$countmorphing}{$countvar}{export_toradiance};
+				my $genchange = $vals{$countmorphing}{$countvar}{genchange};
+				my $genprop = $vals{$countmorphing}{$countvar}{genprop};
+				my $change_groundreflectance = $vals{$countmorphing}{$countvar}{change_groundreflectance};
+				my $export_toenergyplus = $vals{$countmorphing}{$countvar}{export_toenergyplus};
+				my $skipop = $vals{$countmorphing}{$countvar}{skipop};
+				my $todos = $vals{$countmorphing}{$countvar}{todos};
+				# genchange
+				my ( @cases_to_sim, @files_to_convert );
+				my ( @obs, @node, @component, @loopcontrol, @flowcontrol, @new_loopcontrol, @new_flowcontrol ); # THINGS globsAL AS REGARDS TO COUNTER ZONE CYCLES
+				my ( @myobs, @mynode, @mycomponent, @myloopcontrol, @myflowcontrol); # THINGS LOCAL AS REGARDS TO COUNTER ZONE CYCLES
+				my ( @tempv, @tempobs, @tempnode, @tempcomponent, @temploopcontrol, @tempflowcontrol); # THINGS LOCAL AS REGARDS TO COUNTER ZONE CYCLES
+				my ( @v, @v_, @obs_, @donode, @docomponent, @doloopcontrol, @doflowcontrol); # THINGS LOCAL AS REGARDS TO COUNTER ZONE CYCLES
+				my ( %names, %newcontents, @filecontents, @newfilecontents );
+
+				my $generate  = $$general_variables[0];
+				my $sequencer = $$general_variables[1];
+				my $dffile = "df-$file.txt";
+
+
+
+				if ( ( ( $countblock == 0 ) and ( $countstep == 1 ) ) or ( ( $dirfiles{randompick} eq "yes" ) or ( $dirfiles{ga} eq "yes" ) ) )
+				#if ( $countblock == 0 )
+				{
+					unless ( $dowhat{inactivatemorph} eq "y" )
 					{
-						my $target;
-						unless ($exeonfiles eq "n")
+						if (not ( -e $origin{crypto} ) )
 						{
-							$target = $inst{$dirfiles{starter}}; #say $tee "FIRSTTARGET IN MORPH1: \$target " .dump( $target );
-							`cp -R $mypath/$file $target`;
+							my $target;
+							unless ($exeonfiles eq "n")
+							{
+								$target = $inst{$dirfiles{starter}}; #say $tee "FIRSTTARGET IN MORPH1: \$target " .dump( $target );
+								if ( ( $dirfiles{randompick} eq "yes" ) or ( $dirfiles{ga} eq "yes" ) )
+								{
+									$target = "$mypath/$file" . "_" . $instance->{is};
+								}
+								`cp -R $mypath/$file $target`;
+								say $tee "LEVEL 0: cp -R $mypath/$file $target\n";
+								#my $cleartarget = $dirfiles{starter}; #say $tee "FIRST CLEAR TARGET IN MORPH1: \$cleartarget " .dump( $cleartarget );
+								say $tee "THAT IS TO SAY, LEVEL 0: cp -R $mypath/$file $cleartarget\n";
+							}
 						}
-						say $tee "LEVEL 0: cp -R $mypath/$file $target\n";
-						#my $cleartarget = $dirfiles{starter}; #say $tee "FIRST CLEAR TARGET IN MORPH1: \$cleartarget " .dump( $cleartarget );
-						say $tee "THAT IS TO SAY, LEVEL 0: cp -R $mypath/$file $cleartarget\n";
 					}
 				}
-			}
 
-			unless ( $dowhat{inactivatemorph} eq "y" )
-			{
-				open( MORPHBLOCK, ">>$morphblock") or die( "$!" );# or die;
-				push ( @{ $morphstruct[$countcase][$countblock] }, $to{cleanto} );
-
-
-				#	if ( ( not ( $to ~~ @morphcases ) ) or ( $dowhat{actonmodels} eq "y" ) )
-				if ( not ( $to{cleanto} ~~ @morphcases ) )
+				unless ( $dowhat{inactivatemorph} eq "y" )
 				{
+					open( MORPHBLOCK, ">>$morphblock") or die( "$!" );# or die;
+					push ( @{ $morphstruct[$countcase][$countblock] }, $to{cleanto} );
 
-					push ( @morphcases, $to{cleanto} );
-					print MORPHLIST "$to{cleanto}\n";
 
-					if ( ( not (-e $to{crypto} ) ) or ( not ( $to{cleanto} ~~ @morphcases) ) or ( $dowhat{overwrite_models} eq "y" ) )
+					#	if ( ( not ( $to ~~ @morphcases ) ) or ( $dowhat{actonmodels} eq "y" ) )
+					if ( not ( $to{cleanto} ~~ @morphcases ) )
 					{
-						unless ($exeonfiles eq "n")
+
+						push ( @morphcases, $to{cleanto} );
+						print MORPHLIST "$to{cleanto}\n";
+
+						if ( ( not (-e $to{crypto} ) ) or ( not ( $to{cleanto} ~~ @morphcases) )
+							or ( $dowhat{overwrite_models} eq "y" ) )
 						{
-							my $target = $to{crypto}; #say $tee "TARGET IN MORPH: \$target " .dump( $target );
-							my $orig = $inst{$origin}; #say $tee "ORIGIN IN MORPH: \$orig " .dump( $orig );
-							`cp -R $orig $target\n`;
-							print $tee "LEVEL 1: cp -R $orig $target\n\n";
-
-							my $cleartarget = $to{to}; #say $tee "CLEAR TARGET IN MORPH: \$cleartarget " .dump( $cleartarget );
-							print $tee "THAT IS TO SAY, LEVEL 1: cp -R $origin $cleartarget\n\n";
-						}
-					}
-
-					#say $tee "IN MORPH NEAR REASSIGNMNENT: \$dowhat{actonmodels} " .dump( $dowhat{actonmodels} );
-					if ( $dowhat{actonmodels} eq "y" )
-					{
-						my $countop = 0; # "$countop" IS THE COUNTER OF THE OPERATIONS
-						foreach my $op ( @applytype ) # "$op" MEANS OPERATION
-						{
-							my $to = $to{crypto}; #say $tee "IN MORPH: REASSIGNIMENT!!! \$to " .dump( $to ); ### TAKE CARE!!! REASSIGNIMENT!!!
-							my $origin = $inst{$origin}; #say $tee "IN MORPH: REASSIGNIMENT!!! \$origin " .dump( $origin ); ### TAKE CARE!!! REASSIGNIMENT!!!
-							my $skip = $skipop->[ $countop ]	;
-							my $modification_type = $applytype[$countop][0]; #say $tee "\$modification_type: $modification_type"; #
-							if ( ( $applytype[$countop][1] ne $applytype[$countop][2] ) and ( $modification_type ne "changeconfig" ) )
+							unless ($exeonfiles eq "n")
 							{
+								my $target = $to{crypto}; #say $tee "TARGET IN MORPH: \$target " .dump( $target );
 
-								unless ($exeonfiles eq "n")
+								my $orig;
+
+								if ( ( $dirfiles{randompick} eq "yes" ) or ( $dirfiles{ga} eq "yes" ) )
 								{
-										`cp -f $to/zones/$applytype[$countop][1] $to/zones/$applytype[$countop][2]\n`;
-
-										`cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n`;
-								}
-								print $tee "LEVEL 2:cp -f $to/zones/$applytype[$countop][1] $to/zones/$applytype[$countop][2]\n\n";
-								print $tee "LEVEL 2: cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n";
-							}
-
-							if ( ( $applytype[$countop][1] ne $applytype[$countop][2] ) and ( $modification_type eq "changeconfig" ) )
-							{
-								unless ($exeonfiles eq "n")
-								{
-									`cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n`;
-								}
-								print $tee "LEVEL 2b: cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n";
-							}
-
-
-							`cd $to`;
-							say $tee "cd $to\n";
-
-							my $launchline = " -file $to/cfg/$fileconfig -mode script"; say $tee "SO, LAUNCHLINE! " . dump( $launchline );
-							#say $tee "NOW MODIFICATION TYPE! $modification_type ";
-
-							if ( ( $stepsvar > 0 ) and ( not ( eval ( $skip ) ) ) )
-							{
-
-								##########################################
-								my @mods;
-								if ( not( ref( $modification_type ) ) )
-								{
-									push( @mods, $modification_type );
+									$orig = $mypath/$file;
+									if ( ( $i == 0 ) and ( not ( -e $mypath/$target ) ) )
+									{
+										`cp -R $orig $target\n`;
+										print $tee "LEVEL 1: cp -R $orig $target\n\n";
+									}
+									$i++;
 								}
 								else
 								{
-									push( @mods, @{ $modification_type } );
+									$orig = $inst{$origin}; #say $tee "ORIGIN IN MORPH: \$orig " .dump( $orig );
+									`cp -R $orig $target\n`;
+									print $tee "LEVEL 1: cp -R $orig $target\n\n";
 								}
-								#########################################
 
-								foreach my $modtype ( @mods )
+								my $cleartarget = $to{to}; #say $tee "CLEAR TARGET IN MORPH: \$cleartarget " .dump( $cleartarget );
+								print $tee "THAT IS TO SAY, LEVEL 1: cp -R $origin $cleartarget\n\n";
+							}
+						}
+
+						#say $tee "IN MORPH NEAR REASSIGNMNENT: \$dowhat{actonmodels} " .dump( $dowhat{actonmodels} );
+						if ( $dowhat{actonmodels} eq "y" )
+						{
+							my $countop = 0; # "$countop" IS THE COUNTER OF THE OPERATIONS
+							foreach my $op ( @applytype ) # "$op" MEANS OPERATION
+							{
+								my $to = $to{crypto}; #say $tee "IN MORPH: REASSIGNIMENT!!! \$to " .dump( $to ); ### TAKE CARE!!! REASSIGNIMENT!!!
+								my $origin = $inst{$origin}; #say $tee "IN MORPH: REASSIGNIMENT!!! \$origin " .dump( $origin ); ### TAKE CARE!!! REASSIGNIMENT!!!
+								my $skip = $skipop->[ $countop ]	;
+								my $modification_type = $applytype[$countop][0]; #say $tee "\$modification_type: $modification_type"; #
+								if ( ( $applytype[$countop][1] ne $applytype[$countop][2] ) and ( $modification_type ne "changeconfig" ) )
 								{
-									if ( $modtype eq "change_groundreflectance" )#
-									{
-										change_groundreflectance
-										( $to, $stepsvar, $countop, $countstep,
-											\@applytype, $change_groundreflectance, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
-									}
-									elsif ( $modtype eq "genchange" )#
-									{
-										( $names_ref, $nums_ref, $newcontents_ref, $filecontents_ref, $newfilecontents_ref ) = genchange
-										( $to, $stepsvar, $countop, $countstep,
-											\@applytype, $genchange, $countvar, $fileconfig, $mypath, $file,
-											$countmorphing, "vary", $names_ref, $nums_ref,
-											$newcontents_ref, $filecontents_ref, $newfilecontents_ref, $launchline, \@menus );
-										%names = %$names_ref;
-										%nums = %$nums_ref;
-										%newcontents = %$newcontents_ref;
-										#@filecontents = @$filecontents_ref;
-										@newfilecontents = @$newfilecontents_ref;
-									} #
-									elsif ( $modtype eq "generic_change" )#
-									{
-										make_generic_change
-										( $to, $stepsvar, $countop, $countstep,
-											\@applytype, $generic_change, $countvar, $fileconfig, $countmorphing, $launchline, \@menus, $countinstance );
-									} #
-									elsif ( $modtype eq "translate_surface" )
-									{
-										translate_surfaces
-										($to, $stepsvar, $countop, $countstep,
-											\@applytype, $translate_surface, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
-									}
-									elsif ( $modtype eq "rotate_surface" )              #
-									{
-										rotate_surface
-										($to, $stepsvar, $countop, $countstep,
-											\@applytype, $rotate_surface, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
-									}
-									elsif ( $modtype eq "shift_vertices" )
-									{
-										shift_vertices
-										( $to, $stepsvar, $countop, $countstep,
-											\@applytype, $shift_vertices, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
-									}
-									elsif ( $modtype eq "translate_vertices" )
-									{
-										#say $tee "HITTING \$countinstance $countinstance";
-										translate_vertices
-										( $to, $stepsvar, $countop, $countstep,
-											\@applytype, \@translate_vertices, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
-									}
-									elsif ( $modtype eq "construction_reassign" )
-									{
-										reassign_construction
-										( $to, $stepsvar, $countop, $countstep,
-											\@applytype, $construction_reassign, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
-									}
-									elsif ( $modtype eq "rotate" )
-									{
-										rotate
-										( $to, $stepsvar, $countop, $countstep,
-											\@applytype, $rotate, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
-									}
-									elsif ( $modtype eq "translate" )
-									{
 
-										translate
-										( $to, $stepsvar, $countop, $countstep,
-											\@applytype, $translate, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
-									}
-									elsif ( $modtype eq "apply_constraints" )
+									unless ($exeonfiles eq "n")
 									{
+											`cp -f $to/zones/$applytype[$countop][1] $to/zones/$applytype[$countop][2]\n`;
 
-										apply_constraints
-										( $to, $stepsvar, $countop, $countstep,
-											\@applytype, \@apply_constraints, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
+											`cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n`;
 									}
-									elsif ( $modtype eq "change_thickness" )
-									{
-										change_thickness
-										( $to, $stepsvar, $countop, $countstep,
-											\@applytype, $change_thickness, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
-									}
-									elsif ( $modtype eq "rotatez" )
-									{
-										rotatez
-										($to, $stepsvar, $countop, $countstep,
-											\@applytype, $rotatez, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
-									}
-									elsif ( $modtype eq "change_config" )
-									{
-										change_config
-										( $to, $stepsvar, $countop, $countstep,
-											\@applytype, \@change_config, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
-									}
-									elsif ( $modtype eq "reshape_windows" )
-									{
-										reshape_windows
-										($to, $stepsvar, $countop, $countstep,
-											\@applytype, \@reshape_windows, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
-									}
-									elsif ( $modtype eq "obs_modify" )
-									{
-										obs_modify
-										( $to, $stepsvar, $countop, $countstep,
-											\@applytype, $obs_modify, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
+									print $tee "LEVEL 2:cp -f $to/zones/$applytype[$countop][1] $to/zones/$applytype[$countop][2]\n\n";
+									print $tee "LEVEL 2: cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n";
+								}
 
-									}
-									elsif ( $modtype eq "warping" )
+								if ( ( $applytype[$countop][1] ne $applytype[$countop][2] ) and ( $modification_type eq "changeconfig" ) )
+								{
+									unless ($exeonfiles eq "n")
 									{
-										warp
-										( $to, $stepsvar, $countop, $countstep,
-											\@applytype, $warp, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
+										`cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n`;
 									}
-									elsif ( $modtype eq "vary_controls" )
+									print $tee "LEVEL 2b: cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n";
+								}
+
+
+								`cd $to`;
+								say $tee "cd $to\n";
+
+								my $launchline = " -file $to/cfg/$fileconfig -mode script"; say $tee "SO, LAUNCHLINE! " . dump( $launchline );
+								#say $tee "NOW MODIFICATION TYPE! $modification_type ";
+
+								if ( ( $stepsvar > 0 ) and ( not ( eval ( $skip ) ) ) )
+								{
+
+									##########################################
+									my @mods;
+									if ( not( ref( $modification_type ) ) )
 									{
-										vary_controls
-										( $to, $stepsvar, $countop, $countstep,
-											\@applytype, \@vary_controls, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
-									}
-									elsif ( $modtype eq "vary_net" )
-									{
-										vary_net
-										( $to, $stepsvar, $countop, $countstep,
-											\@applytype, \@vary_net, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
-									}
-									elsif ( $modtype eq "change_climate" )
-									{
-										change_climate
-										( $to, $stepsvar, $countop, $countstep,
-											\@applytype, \@change_climate, $countvar, $fileconfig, $mypath, $file, $countmorphing, $countmorphing, $launchline, \@menus, $countinstance );
+										push( @mods, $modification_type );
 									}
 									else
 									{
-										say "Can't recognize the modification type. So quitting.";
-										die( "$!" );
+										push( @mods, @{ $modification_type } );
 									}
-								}
+									#########################################
 
-
-
-								push ( @{ $done_instances[ $countvar ] }, $instance );
-								push ( @{ $done_tos[ $countvar ] }, $to );
-
-
-
-								my @todolist = @{ $todos->[ $countop ] };
-								my ( @expectedinsts, @expectedtos );
-								foreach my $todo ( @todolist )
-								{
-									my @listtodo = @{ $todo->{actions} };
-									foreach my $action ( @listtodo )
+									foreach my $modtype ( @mods )
 									{
-
-										if ( not ( eval ( $skip ) ) )
+										if ( $modtype eq "change_groundreflectance" )#
+										{
+											change_groundreflectance
+											( $to, $stepsvar, $countop, $countstep,
+												\@applytype, $change_groundreflectance, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
+										}
+										elsif ( $modtype eq "genchange" )#
+										{
+											( $names_ref, $nums_ref, $newcontents_ref, $filecontents_ref, $newfilecontents_ref ) = genchange
+											( $to, $stepsvar, $countop, $countstep,
+												\@applytype, $genchange, $countvar, $fileconfig, $mypath, $file,
+												$countmorphing, "vary", $names_ref, $nums_ref,
+												$newcontents_ref, $filecontents_ref, $newfilecontents_ref, $launchline, \@menus );
+											%names = %$names_ref;
+											%nums = %$nums_ref;
+											%newcontents = %$newcontents_ref;
+											#@filecontents = @$filecontents_ref;
+											@newfilecontents = @$newfilecontents_ref;
+										} #
+										elsif ( $modtype eq "generic_change" )#
+										{
+											make_generic_change
+											( $to, $stepsvar, $countop, $countstep,
+												\@applytype, $generic_change, $countvar, $fileconfig, $countmorphing, $launchline, \@menus, $countinstance );
+										} #
+										elsif ( $modtype eq "translate_surface" )
+										{
+											translate_surfaces
+											($to, $stepsvar, $countop, $countstep,
+												\@applytype, $translate_surface, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
+										}
+										elsif ( $modtype eq "rotate_surface" )              #
+										{
+											rotate_surface
+											($to, $stepsvar, $countop, $countstep,
+												\@applytype, $rotate_surface, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
+										}
+										elsif ( $modtype eq "shift_vertices" )
+										{
+											shift_vertices
+											( $to, $stepsvar, $countop, $countstep,
+												\@applytype, $shift_vertices, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
+										}
+										elsif ( $modtype eq "translate_vertices" )
+										{
+											#say $tee "HITTING \$countinstance $countinstance";
+											translate_vertices
+											( $to, $stepsvar, $countop, $countstep,
+												\@applytype, \@translate_vertices, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
+										}
+										elsif ( $modtype eq "construction_reassign" )
+										{
+											reassign_construction
+											( $to, $stepsvar, $countop, $countstep,
+												\@applytype, $construction_reassign, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
+										}
+										elsif ( $modtype eq "rotate" )
+										{
+											rotate
+											( $to, $stepsvar, $countop, $countstep,
+												\@applytype, $rotate, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
+										}
+										elsif ( $modtype eq "translate" )
 										{
 
-											if ( ( defined( $constrain_geometry[$countop] ) ) and ( ( $action eq "read_geo" ) or ( $action eq "write_geo" ) ) )
-											{
+											translate
+											( $to, $stepsvar, $countop, $countstep,
+												\@applytype, $translate, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
+										}
+										elsif ( $modtype eq "apply_constraints" )
+										{
 
-												my ( $v_ref ) = constrain_geometry
-												( $to, $stepsvar, $countop,
-													$countstep, \@applytype, \@constrain_geometry, $countvar, $fileconfig, \@v_, $countmorphing, $exeonfiles, \@v_, $action, $launchline, \@menus, $countinstance );
-												@v = @$v_ref;
-												@v_ = @$v__ref;
-											}
+											apply_constraints
+											( $to, $stepsvar, $countop, $countstep,
+												\@applytype, \@apply_constraints, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
+										}
+										elsif ( $modtype eq "change_thickness" )
+										{
+											change_thickness
+											( $to, $stepsvar, $countop, $countstep,
+												\@applytype, $change_thickness, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
+										}
+										elsif ( $modtype eq "rotatez" )
+										{
+											rotatez
+											($to, $stepsvar, $countop, $countstep,
+												\@applytype, $rotatez, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
+										}
+										elsif ( $modtype eq "change_config" )
+										{
+											change_config
+											( $to, $stepsvar, $countop, $countstep,
+												\@applytype, \@change_config, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
+										}
+										elsif ( $modtype eq "reshape_windows" )
+										{
+											reshape_windows
+											($to, $stepsvar, $countop, $countstep,
+												\@applytype, \@reshape_windows, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
+										}
+										elsif ( $modtype eq "obs_modify" )
+										{
+											obs_modify
+											( $to, $stepsvar, $countop, $countstep,
+												\@applytype, $obs_modify, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
 
-											if ( ( defined( $genprop[$countop] ) ) and ( ( $action eq "read_gen" ) or ( $action eq "write_gen" ) ) )
-											{
-												( $names_ref, $newcontents_ref, $filecontents_ref, $newfilecontents_ref ) =
-													genprop ( $to, $stepsvar, $countop, $countstep,
-														\@applytype, $genchange, $countvar, $fileconfig, $mypath, $file, $countmorphing, $action,
-														$names_ref, $nums_ref, $newcontents_ref, $filecontents_ref,
-														$newfilecontents_ref, $launchline, \@menus, $countinstance );
-														%nums = %$nums_ref;
-														%names = %$names_ref;
-														%newcontents = %$newcontents_ref;
-														@filecontents = @$filecontents_ref;
-														@newfilecontents = @$newfilecontents_ref;
-											}
-
-											if ( defined ( $constrain_obstructions[$countop] ) and ( ( $action eq "read_obs" ) or ( $action eq "write_obs" ) ) )
-											{
-												my ( $obs_ref, $obs__ref ) = constrain_obstructions
-												( $to, $stepsvar, $countop,
-													$countstep, \@applytype, \@constrain_obstructions, $countvar, $fileconfig, $countmorphing, $exeonfiles, $obs_ref, $obs__ref, $action, $launchline, \@menus, $countinstance );
-													@obs = @$obs_ref;
-													@obs_ = @$obs__ref;
-											}
-
-											if ( defined( $constrain_net[$countop] ) and ( ( $action eq "read_net" ) or ( $action eq "write_net" ) ) )
-											{
-												my ( $node_ref, $component_ref, $donode_ref, $docomponent_ref ) = constrain_net( $to, $stepsvar, $countop,
-													$countstep, \@applytype, \@constrain_net, $countvar, $fileconfig, $countmorphing, $exeonfiles, $action,
-													$node_ref, $component_ref, $donode_ref, $docomponent_ref, $launchline, \@menus, $countinstance );
-													@node = @$node_ref;
-													@component = @$component_ref;
-													@donode = @$donode_ref;
-													@docomponent = @$docomponent_ref;
-											}
-
-											if ( defined( $constrain_controls[$countop] ) and ( ( $action eq "read_ctl" ) or ( $action eq "write_ctl" ) ) )
-											{
-												my ( $loopcontrol_ref, $flowcontrol_ref, $new_loopcontrol_ref, $new_flowcontrol_ref ) = constrain_controls
-												( $to, $stepsvar, $countop,
-													$countstep, \@applytype, \@constrain_controls, $countvar, $fileconfig, $countmorphing, $exeonfiles, $action,
-													$loopcontrol_ref, $flowcontrol_ref, $new_loopcontrol_ref, $new_flowcontrol_ref, $launchline, \@menus, $countinstance );
-													@loopcontrol = @$loopcontrol_ref;
-													@flowcontrol = @$flowcontrol_ref;
-													@new_loopcontrol = @$new_loopcontrol_ref;
-													@new_flowcontrol = @$new_flowcontrol_ref;
-											}
-
-											if ( defined( $apply_constraints[$countop] ) and ( $action eq "apply_constraints" ) )
-											{
-												apply_constraints
-												( $to, $stepsvar, $countop,
-													$countstep, \@applytype, \@apply_constraints, $countvar, $fileconfig, $countmorphing, $launchline, \@menus, $countinstance );
-											}
-
-											if ( defined( $pin_obstructions->[ $countop ] ) and ( $action eq "pin_obstructions" ) )
-											{
-												pin_obstructions
-												( $to, $stepsvar, $countop,
-													$countstep, \@applytype, $pin_obstructions, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
-											}
-
-											if ( defined( $recalculatenet[$countop] ) and ( $action eq "recalculatenet" ) )
-											{
-												recalculatenet
-												( $to, $stepsvar, $countop,
-													$countstep, \@applytype, \@recalculatenet, $countvar, $fileconfig, $countmorphing, $launchline, \@menus, $countinstance );
-											}
-
-											if ( defined( $recalculateish->[$countop] ) and ( $action eq "recalculateish" ) )
-											{
-												recalculateish
-												( $to, $stepsvar, $countop,
-													$countstep, \@applytype, $recalculateish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
-											}
-
-											if ( defined( $daylightcalc->[$countop] )  and ( $action eq "daylightcalc" ) )
-											{
-												daylightcalc
-												( $to, $stepsvar, $countop,
-													$countstep, \@applytype, $filedf, \@daylightcalc, $countvar, $fileconfig, $countmorphing, $launchline, \@menus, $countinstance );
-											}
-											if ( defined( $use_modish->[$countop] )  and ( $action eq "use_modish" ) )
-											{
-												use_modish
-												( $to, $stepsvar, $countop,
-													$countstep, \@applytype, $use_modish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
-											}
-											if ( defined( $export_toenergyplus->[$countop] )  and ( $action eq "export_toenergyplus" ) )
-											{
-												export_toenergyplus
-												( $to, $stepsvar, $countop,
-													$countstep, \@applytype, $export_toenergyplus, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
-											}
+										}
+										elsif ( $modtype eq "warping" )
+										{
+											warp
+											( $to, $stepsvar, $countop, $countstep,
+												\@applytype, $warp, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
+										}
+										elsif ( $modtype eq "vary_controls" )
+										{
+											vary_controls
+											( $to, $stepsvar, $countop, $countstep,
+												\@applytype, \@vary_controls, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
+										}
+										elsif ( $modtype eq "vary_net" )
+										{
+											vary_net
+											( $to, $stepsvar, $countop, $countstep,
+												\@applytype, \@vary_net, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
+										}
+										elsif ( $modtype eq "change_climate" )
+										{
+											change_climate
+											( $to, $stepsvar, $countop, $countstep,
+												\@applytype, \@change_climate, $countvar, $fileconfig, $mypath, $file, $countmorphing, $countmorphing, $launchline, \@menus, $countinstance );
+										}
+										else
+										{
+											say "Can't recognize the modification type. So quitting.";
+											die( "$!" );
 										}
 									}
-								}
 
 
 
+									push ( @{ $done_instances[ $countvar ] }, $instance );
+									push ( @{ $done_tos[ $countvar ] }, $to );
 
-								if ( ( $countvar_after > $countvar )
-									or ( defined( $countvar ) and ( not ( defined( $countvar_after ) ) ) and ( not( scalar( @todolist ) == 0 ) ) ) )
-								{
-									my ( @expected_instances, @expected_tos );
 
+
+									my @todolist = @{ $todos->[ $countop ] };
+									my ( @expectedinsts, @expectedtos );
 									foreach my $todo ( @todolist )
 									{
 										my @listtodo = @{ $todo->{actions} };
-										my @parameters =  @{ $todo->{parameters} };
-										foreach my $parameter ( @parameters )
+										foreach my $action ( @listtodo )
 										{
-											foreach my $inst ( @instances )
-											{
-												my %d = %{ $inst };
-												my $countcase_ = $d{countcase};
-												my $countblock_ = $d{countblock};
-												my $countvar_ = $d{countvar};
-												my $countstep_ = $d{countstep};
-												my $to_ = $d{to}{crypto};
 
-												if ( $parameter == $countvar )
+											if ( not ( eval ( $skip ) ) )
+											{
+
+												if ( ( defined( $constrain_geometry[$countop] ) ) and ( ( $action eq "read_geo" ) or ( $action eq "write_geo" ) ) )
 												{
-													push ( @expected_instances, $inst );
-													push ( @expected_tos, $to_ );
+
+													my ( $v_ref ) = constrain_geometry
+													( $to, $stepsvar, $countop,
+														$countstep, \@applytype, \@constrain_geometry, $countvar, $fileconfig, \@v_, $countmorphing, $exeonfiles, \@v_, $action, $launchline, \@menus, $countinstance );
+													@v = @$v_ref;
+													@v_ = @$v__ref;
+												}
+
+												if ( ( defined( $genprop[$countop] ) ) and ( ( $action eq "read_gen" ) or ( $action eq "write_gen" ) ) )
+												{
+													( $names_ref, $newcontents_ref, $filecontents_ref, $newfilecontents_ref ) =
+														genprop ( $to, $stepsvar, $countop, $countstep,
+															\@applytype, $genchange, $countvar, $fileconfig, $mypath, $file, $countmorphing, $action,
+															$names_ref, $nums_ref, $newcontents_ref, $filecontents_ref,
+															$newfilecontents_ref, $launchline, \@menus, $countinstance );
+															%nums = %$nums_ref;
+															%names = %$names_ref;
+															%newcontents = %$newcontents_ref;
+															@filecontents = @$filecontents_ref;
+															@newfilecontents = @$newfilecontents_ref;
+												}
+
+												if ( defined ( $constrain_obstructions[$countop] ) and ( ( $action eq "read_obs" ) or ( $action eq "write_obs" ) ) )
+												{
+													my ( $obs_ref, $obs__ref ) = constrain_obstructions
+													( $to, $stepsvar, $countop,
+														$countstep, \@applytype, \@constrain_obstructions, $countvar, $fileconfig, $countmorphing, $exeonfiles, $obs_ref, $obs__ref, $action, $launchline, \@menus, $countinstance );
+														@obs = @$obs_ref;
+														@obs_ = @$obs__ref;
+												}
+
+												if ( defined( $constrain_net[$countop] ) and ( ( $action eq "read_net" ) or ( $action eq "write_net" ) ) )
+												{
+													my ( $node_ref, $component_ref, $donode_ref, $docomponent_ref ) = constrain_net( $to, $stepsvar, $countop,
+														$countstep, \@applytype, \@constrain_net, $countvar, $fileconfig, $countmorphing, $exeonfiles, $action,
+														$node_ref, $component_ref, $donode_ref, $docomponent_ref, $launchline, \@menus, $countinstance );
+														@node = @$node_ref;
+														@component = @$component_ref;
+														@donode = @$donode_ref;
+														@docomponent = @$docomponent_ref;
+												}
+
+												if ( defined( $constrain_controls[$countop] ) and ( ( $action eq "read_ctl" ) or ( $action eq "write_ctl" ) ) )
+												{
+													my ( $loopcontrol_ref, $flowcontrol_ref, $new_loopcontrol_ref, $new_flowcontrol_ref ) = constrain_controls
+													( $to, $stepsvar, $countop,
+														$countstep, \@applytype, \@constrain_controls, $countvar, $fileconfig, $countmorphing, $exeonfiles, $action,
+														$loopcontrol_ref, $flowcontrol_ref, $new_loopcontrol_ref, $new_flowcontrol_ref, $launchline, \@menus, $countinstance );
+														@loopcontrol = @$loopcontrol_ref;
+														@flowcontrol = @$flowcontrol_ref;
+														@new_loopcontrol = @$new_loopcontrol_ref;
+														@new_flowcontrol = @$new_flowcontrol_ref;
+												}
+
+												if ( defined( $apply_constraints[$countop] ) and ( $action eq "apply_constraints" ) )
+												{
+													apply_constraints
+													( $to, $stepsvar, $countop,
+														$countstep, \@applytype, \@apply_constraints, $countvar, $fileconfig, $countmorphing, $launchline, \@menus, $countinstance );
+												}
+
+												if ( defined( $pin_obstructions->[ $countop ] ) and ( $action eq "pin_obstructions" ) )
+												{
+													pin_obstructions
+													( $to, $stepsvar, $countop,
+														$countstep, \@applytype, $pin_obstructions, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
+												}
+
+												if ( defined( $recalculatenet[$countop] ) and ( $action eq "recalculatenet" ) )
+												{
+													recalculatenet
+													( $to, $stepsvar, $countop,
+														$countstep, \@applytype, \@recalculatenet, $countvar, $fileconfig, $countmorphing, $launchline, \@menus, $countinstance );
+												}
+
+												if ( defined( $recalculateish->[$countop] ) and ( $action eq "recalculateish" ) )
+												{
+													recalculateish
+													( $to, $stepsvar, $countop,
+														$countstep, \@applytype, $recalculateish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
+												}
+
+												if ( defined( $daylightcalc->[$countop] )  and ( $action eq "daylightcalc" ) )
+												{
+													daylightcalc
+													( $to, $stepsvar, $countop,
+														$countstep, \@applytype, $filedf, \@daylightcalc, $countvar, $fileconfig, $countmorphing, $launchline, \@menus, $countinstance );
+												}
+												if ( defined( $use_modish->[$countop] )  and ( $action eq "use_modish" ) )
+												{
+													use_modish
+													( $to, $stepsvar, $countop,
+														$countstep, \@applytype, $use_modish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
+												}
+												if ( defined( $export_toenergyplus->[$countop] )  and ( $action eq "export_toenergyplus" ) )
+												{
+													export_toenergyplus
+													( $to, $stepsvar, $countop,
+														$countstep, \@applytype, $export_toenergyplus, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
 												}
 											}
 										}
+									}
 
 
 
 
-										my ( @nondone_tos, @nondone_instances );
-										my $countinst = 0;
-										foreach ( @expected_tos )
+									if ( ( $countvar_after > $countvar )
+										or ( defined( $countvar ) and ( not ( defined( $countvar_after ) ) ) and ( not( scalar( @todolist ) == 0 ) ) ) )
+									{
+										my ( @expected_instances, @expected_tos );
+
+										foreach my $todo ( @todolist )
 										{
-											my $expected_instance = $expected_instances[ $countinst ];
-											my $expected_to = $expected_tos[ $countinst ];
-
-
-											if ( not ( $expected_to ~~ @{ $done_tos[ $countvar ] } ) )
+											my @listtodo = @{ $todo->{actions} };
+											my @parameters =  @{ $todo->{parameters} };
+											foreach my $parameter ( @parameters )
 											{
-												push ( @nondone_tos, $expected_to );
-												push ( @nondone_instances, $expected_instance );
-											}
-											$countinst++;
-										}
-										@nondone_tos = uniq( @nondone_tos );
-										@nondone_instances = uniq( @nondone_instances );
-										#say $tee "COMPLETED THE FOLLOWING CASES : " . dump( @{ $done_tos[ $countvar ] } ) . " ";
-										#say $tee "SO ABOUT TO FIX EX-POST THE REMAINING CASES : " . dump( @nondone_tos ) . " ";
-
-
-										my $numberof = scalar( @nondone_instances );
-										my $cou = 0;
-										my $countt = 1;
-										foreach my $inst ( @nondone_instances )
-										{
-											#say $tee "FINALLY ACTING ON \@nondone_instances : " . dump( @nondone_instances ) .  "BY LOOPING THROUGH \@todolist : " . dump( @todolist );;
-											#say $tee "FINALLY ACTING ON \@nondone_instances BY LOOPING THROUGH \@todolist : " . dump( @todolist );
-
-
-											$countt++;
-											my $numberdone = ( $cou + 1 );
-											my %d = %{ $inst };
-											my $countcase = $d{countcase};
-											my $countblock = $d{countblock};
-											my @miditers = @{ $d{miditers} };
-											my @winneritems = @{ $d{winneritems} };
-											my $countvar = $d{countvar};
-											my $countstep = $d{countstep};
-											my $to = $d{to}{crypto};
-											my $stepsvar = Sim::OPT::getstepsvar( $countvar, $countcase, \@varinumbers );
-
-											foreach my $todo ( @todolist )
-											{
-												my @listtodo = @{ $todo->{actions} };
-												foreach my $action ( @listtodo )
+												foreach my $inst ( @instances )
 												{
-													if ( not ( eval ( $skip ) ) )
+													my %d = %{ $inst };
+													my $countcase_ = $d{countcase};
+													my $countblock_ = $d{countblock};
+													my $countvar_ = $d{countvar};
+													my $countstep_ = $d{countstep};
+													my $to_ = $d{to}{crypto};
+
+													if ( $parameter == $countvar )
 													{
-														my $newlaunchline;
-														unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
-														{
-															$newlaunchline = " -file $to/cfg/$fileconfig -mode script";
-														}
-														else
-														{
-															$newlaunchline = " -file $to\\cfg\\$fileconfig -mode script";
-														}
-
-
-														if ( ( defined( $constrain_geometry[ $countop ] ) ) and ( ( $action eq "read_geo" ) or ( $action_ eq "write_geo" ) ) )
-														{
-
-															my ( $v_ref ) = constrain_geometry
-															( $to, $stepsvar, $countop,
-																$countstep, \@applytype, \@constrain_geometry, $countvar, $fileconfig, \@v_, $countmorphing, $exeonfiles, \@v_, $action, $newlaunchline, \@menus, $countinstance );
-															@v = @$v_ref;
-															@v_ = @$v__ref;
-														}
-
-														if ( ( defined( $genprop[$countop] ) ) and ( ( $action eq "read_gen" ) or ( $action eq "write_gen" ) ) )
-														{
-
-															#say $tee "WORKING EX-POST ON NON-YET-UPDATED INSTANCES AFTER LAST MORPHED INSTANCE. NOw INSTANCE $numberdone OF $numberof.";
-															( $names_ref, $newcontents_ref, $filecontents_ref, $newfilecontents_ref ) =
-																genprop ( $to_, $stepsvar_, $countop, $countstep_,
-																	\@applytype, $genchange, $countvar_, $fileconfig, $mypath, $file, $countmorphing, $action_,
-																	$names_ref, $nums_ref, $newcontents_ref, $filecontents_ref,
-																	$newfilecontents_ref, $newlaunchline, \@menus, $countinstance );
-																	%nums = %$nums_ref;
-																	%names = %$names_ref;
-																	%newcontents = %$newcontents_ref;
-																	@filecontents = @$filecontents_ref;
-																	@newfilecontents = @$newfilecontents_ref;
-														}
-
-														if ( defined ( $constrain_obstructions[$countop] ) and ( ( $action eq "read_obs" ) or ( $action eq "write_obs" ) ) )
-														{
-															my ( $obs_ref, $obs__ref ) = constrain_obstructions
-															( $to, $stepsvar, $countop,
-																$countstep, \@applytype, \@constrain_obstructions, $countvar, $fileconfig, $countmorphing, $exeonfiles, $obs_ref, $obs__ref, $action, $newlaunchline, \@menus, $countinstance );
-																@obs = @$obs_ref;
-																@obs_ = @$obs__ref;
-														}
-
-														if ( defined( $constrain_net[$countop] ) and ( ( $action eq "read_net" ) or ( $action eq "write_net" ) ) )
-														{
-															my ( $node_ref, $component_ref, $donode_ref, $docomponent_ref ) = constrain_net( $to, $stepsvar, $countop,
-																$countstep, \@applytype, \@constrain_net, $countvar, $fileconfig, $countmorphing, $exeonfiles, $action,
-																$node_ref, $component_ref, $donode_ref, $docomponent_ref, $newlaunchline, \@menus, $countinstance );
-																@node = @$node_ref;
-																@component = @$component_ref;
-																@donode = @$donode_ref;
-																@docomponent = @$docomponent_ref;
-														}
-
-														if ( defined( $constrain_controls[$countop] ) and ( ( $action eq "read_ctl" ) or ( $action eq "write_ctl" ) ) )
-														{
-															my ( $loopcontrol_ref, $flowcontrol_ref, $new_loopcontrol_ref, $new_flowcontrol_ref ) = constrain_controls
-															( $to, $stepsvar, $countop,
-																$countstep, \@applytype, \@constrain_controls, $countvar, $fileconfig, $countmorphing, $exeonfiles, $action,
-																$loopcontrol_ref, $flowcontrol_ref, $new_loopcontrol_ref, $new_flowcontrol_ref, $newlaunchline, \@menus, $countinstance  );
-																@loopcontrol = @$loopcontrol_ref;
-																@flowcontrol = @$flowcontrol_ref;
-																@new_loopcontrol = @$new_loopcontrol_ref;
-																@new_flowcontrol = @$new_flowcontrol_ref;
-														}
-
-														if ( defined( $apply_constraints[$countop] ) and ( $action eq "apply_constraints" ) )
-														{
-															apply_constraints
-															( $to, $stepsvar, $countop,
-																$countstep, \@applytype, \@apply_constraints, $countvar, $fileconfig, $countmorphing, $newlaunchline, \@menus, $countinstance );
-														}
-
-														if ( defined( $pin_obstructions->[ $countop ] ) and ( $action eq "pin_obstructions" ) )
-														{
-															pin_obstructions
-															( $to, $stepsvar, $countop,
-																$countstep, \@applytype, $pin_obstructions, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, \@menus, $countinstance );
-														}
-
-														if ( defined( $recalculatenet[$countop] ) and ( $action eq "recalculatenet" ) )
-														{
-															recalculatenet
-															( $to, $stepsvar, $countop,
-																$countstep, \@applytype, \@recalculatenet, $countvar, $fileconfig, $countmorphing, $newlaunchline, \@menus, $countinstance );
-														}
-
-														if ( defined( $recalculateish->[$countop] ) and ( $action eq "recalculateish" ) )
-														{   say $tee "FOR $to CALLED \$recalculateish EX-POST " . dump( $recalculateish );
-															recalculateish
-															( $to, $stepsvar, $countop,
-																$countstep, \@applytype, $recalculateish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, \@menus, $countinstance );
-														}
-
-														if ( defined( $daylightcalc->[$countop] )  and ( $action eq "daylightcalc" ) )
-														{
-															daylightcalc
-															( $to, $stepsvar, $countop,
-																$countstep, \@applytype, $filedf, \@daylightcalc, $countvar, $fileconfig, $countmorphing, $newlaunchline, \@menus, $countinstance );
-														}
-
-
-														if ( defined( $use_modish->[$countop] )  and ( $action eq "use_modish" ) )
-														{   say $tee "FOR $to CALLED \$use_modish EX-POST " . dump( $use_modish );
-															use_modish
-															( $to, $stepsvar, $countop,
-																$countstep, \@applytype, $use_modish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, \@menus, $countinstance );
-														}
-														if ( defined( $export_toenergyplus->[$countop] )  and ( $action eq "export_toenergyplus" ) )
-														{
-															export_toenergyplus
-															( $to, $stepsvar, $countop,
-																$countstep, \@applytype, $export_toenergyplus, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, \@menus, $countinstance );
-														}
-
+														push ( @expected_instances, $inst );
+														push ( @expected_tos, $to_ );
 													}
 												}
 											}
-											$cou++;
+
+
+
+
+											my ( @nondone_tos, @nondone_instances );
+											my $countinst = 0;
+											foreach ( @expected_tos )
+											{
+												my $expected_instance = $expected_instances[ $countinst ];
+												my $expected_to = $expected_tos[ $countinst ];
+
+
+												if ( not ( $expected_to ~~ @{ $done_tos[ $countvar ] } ) )
+												{
+													push ( @nondone_tos, $expected_to );
+													push ( @nondone_instances, $expected_instance );
+												}
+												$countinst++;
+											}
+											@nondone_tos = uniq( @nondone_tos );
+											@nondone_instances = uniq( @nondone_instances );
+											#say $tee "COMPLETED THE FOLLOWING CASES : " . dump( @{ $done_tos[ $countvar ] } ) . " ";
+											#say $tee "SO ABOUT TO FIX EX-POST THE REMAINING CASES : " . dump( @nondone_tos ) . " ";
+
+
+											my $numberof = scalar( @nondone_instances );
+											my $cou = 0;
+											my $countt = 1;
+											foreach my $inst ( @nondone_instances )
+											{
+												#say $tee "FINALLY ACTING ON \@nondone_instances : " . dump( @nondone_instances ) .  "BY LOOPING THROUGH \@todolist : " . dump( @todolist );;
+												#say $tee "FINALLY ACTING ON \@nondone_instances BY LOOPING THROUGH \@todolist : " . dump( @todolist );
+
+
+												$countt++;
+												my $numberdone = ( $cou + 1 );
+												my %d = %{ $inst };
+												my $countcase = $d{countcase};
+												my $countblock = $d{countblock};
+												my @miditers = @{ $d{miditers} };
+												my @winneritems = @{ $d{winneritems} };
+												my $countvar = $d{countvar};
+												my $countstep = $d{countstep};
+												my $to = $d{to}{crypto};
+												my $stepsvar = Sim::OPT::getstepsvar( $countvar, $countcase, \@varinumbers );
+
+												foreach my $todo ( @todolist )
+												{
+													my @listtodo = @{ $todo->{actions} };
+													foreach my $action ( @listtodo )
+													{
+														if ( not ( eval ( $skip ) ) )
+														{
+															my $newlaunchline;
+															unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
+															{
+																$newlaunchline = " -file $to/cfg/$fileconfig -mode script";
+															}
+															else
+															{
+																$newlaunchline = " -file $to\\cfg\\$fileconfig -mode script";
+															}
+
+
+															if ( ( defined( $constrain_geometry[ $countop ] ) ) and ( ( $action eq "read_geo" ) or ( $action_ eq "write_geo" ) ) )
+															{
+
+																my ( $v_ref ) = constrain_geometry
+																( $to, $stepsvar, $countop,
+																	$countstep, \@applytype, \@constrain_geometry, $countvar, $fileconfig, \@v_, $countmorphing, $exeonfiles, \@v_, $action, $newlaunchline, \@menus, $countinstance );
+																@v = @$v_ref;
+																@v_ = @$v__ref;
+															}
+
+															if ( ( defined( $genprop[$countop] ) ) and ( ( $action eq "read_gen" ) or ( $action eq "write_gen" ) ) )
+															{
+
+																#say $tee "WORKING EX-POST ON NON-YET-UPDATED INSTANCES AFTER LAST MORPHED INSTANCE. NOw INSTANCE $numberdone OF $numberof.";
+																( $names_ref, $newcontents_ref, $filecontents_ref, $newfilecontents_ref ) =
+																	genprop ( $to_, $stepsvar_, $countop, $countstep_,
+																		\@applytype, $genchange, $countvar_, $fileconfig, $mypath, $file, $countmorphing, $action_,
+																		$names_ref, $nums_ref, $newcontents_ref, $filecontents_ref,
+																		$newfilecontents_ref, $newlaunchline, \@menus, $countinstance );
+																		%nums = %$nums_ref;
+																		%names = %$names_ref;
+																		%newcontents = %$newcontents_ref;
+																		@filecontents = @$filecontents_ref;
+																		@newfilecontents = @$newfilecontents_ref;
+															}
+
+															if ( defined ( $constrain_obstructions[$countop] ) and ( ( $action eq "read_obs" ) or ( $action eq "write_obs" ) ) )
+															{
+																my ( $obs_ref, $obs__ref ) = constrain_obstructions
+																( $to, $stepsvar, $countop,
+																	$countstep, \@applytype, \@constrain_obstructions, $countvar, $fileconfig, $countmorphing, $exeonfiles, $obs_ref, $obs__ref, $action, $newlaunchline, \@menus, $countinstance );
+																	@obs = @$obs_ref;
+																	@obs_ = @$obs__ref;
+															}
+
+															if ( defined( $constrain_net[$countop] ) and ( ( $action eq "read_net" ) or ( $action eq "write_net" ) ) )
+															{
+																my ( $node_ref, $component_ref, $donode_ref, $docomponent_ref ) = constrain_net( $to, $stepsvar, $countop,
+																	$countstep, \@applytype, \@constrain_net, $countvar, $fileconfig, $countmorphing, $exeonfiles, $action,
+																	$node_ref, $component_ref, $donode_ref, $docomponent_ref, $newlaunchline, \@menus, $countinstance );
+																	@node = @$node_ref;
+																	@component = @$component_ref;
+																	@donode = @$donode_ref;
+																	@docomponent = @$docomponent_ref;
+															}
+
+															if ( defined( $constrain_controls[$countop] ) and ( ( $action eq "read_ctl" ) or ( $action eq "write_ctl" ) ) )
+															{
+																my ( $loopcontrol_ref, $flowcontrol_ref, $new_loopcontrol_ref, $new_flowcontrol_ref ) = constrain_controls
+																( $to, $stepsvar, $countop,
+																	$countstep, \@applytype, \@constrain_controls, $countvar, $fileconfig, $countmorphing, $exeonfiles, $action,
+																	$loopcontrol_ref, $flowcontrol_ref, $new_loopcontrol_ref, $new_flowcontrol_ref, $newlaunchline, \@menus, $countinstance  );
+																	@loopcontrol = @$loopcontrol_ref;
+																	@flowcontrol = @$flowcontrol_ref;
+																	@new_loopcontrol = @$new_loopcontrol_ref;
+																	@new_flowcontrol = @$new_flowcontrol_ref;
+															}
+
+															if ( defined( $apply_constraints[$countop] ) and ( $action eq "apply_constraints" ) )
+															{
+																apply_constraints
+																( $to, $stepsvar, $countop,
+																	$countstep, \@applytype, \@apply_constraints, $countvar, $fileconfig, $countmorphing, $newlaunchline, \@menus, $countinstance );
+															}
+
+															if ( defined( $pin_obstructions->[ $countop ] ) and ( $action eq "pin_obstructions" ) )
+															{
+																pin_obstructions
+																( $to, $stepsvar, $countop,
+																	$countstep, \@applytype, $pin_obstructions, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, \@menus, $countinstance );
+															}
+
+															if ( defined( $recalculatenet[$countop] ) and ( $action eq "recalculatenet" ) )
+															{
+																recalculatenet
+																( $to, $stepsvar, $countop,
+																	$countstep, \@applytype, \@recalculatenet, $countvar, $fileconfig, $countmorphing, $newlaunchline, \@menus, $countinstance );
+															}
+
+															if ( defined( $recalculateish->[$countop] ) and ( $action eq "recalculateish" ) )
+															{   say $tee "FOR $to CALLED \$recalculateish EX-POST " . dump( $recalculateish );
+																recalculateish
+																( $to, $stepsvar, $countop,
+																	$countstep, \@applytype, $recalculateish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, \@menus, $countinstance );
+															}
+
+															if ( defined( $daylightcalc->[$countop] )  and ( $action eq "daylightcalc" ) )
+															{
+																daylightcalc
+																( $to, $stepsvar, $countop,
+																	$countstep, \@applytype, $filedf, \@daylightcalc, $countvar, $fileconfig, $countmorphing, $newlaunchline, \@menus, $countinstance );
+															}
+
+
+															if ( defined( $use_modish->[$countop] )  and ( $action eq "use_modish" ) )
+															{   say $tee "FOR $to CALLED \$use_modish EX-POST " . dump( $use_modish );
+																use_modish
+																( $to, $stepsvar, $countop,
+																	$countstep, \@applytype, $use_modish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, \@menus, $countinstance );
+															}
+															if ( defined( $export_toenergyplus->[$countop] )  and ( $action eq "export_toenergyplus" ) )
+															{
+																export_toenergyplus
+																( $to, $stepsvar, $countop,
+																	$countstep, \@applytype, $export_toenergyplus, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, \@menus, $countinstance );
+															}
+
+														}
+													}
+												}
+												$cou++;
+											}
 										}
 									}
 								}
+								$countop++;
+								print `cd $mypath`;
+								print $tee "cd $mypath\n\n";
 							}
-							$countop++;
-							print `cd $mypath`;
-							print $tee "cd $mypath\n\n";
 						}
 					}
 				}
-			}
-			$countmorphing++;
-		}
+				$countmorphing++;
+			} #########
+
+		}########
+
 		close MORPHLIST;
 		close MORPHBLOCK;
 		#$countinstance++;

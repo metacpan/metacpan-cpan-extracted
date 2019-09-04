@@ -6,7 +6,7 @@ use strict;
 use Readonly;
 use warnings;
 
-$Geoffrey::Converter::SQLite::VERSION = '0.000201';
+$Geoffrey::Converter::SQLite::VERSION = '0.000204';
 
 use parent 'Geoffrey::Role::Converter';
 
@@ -270,7 +270,7 @@ Geoffrey::Converter::SQLite - SQLite converter for Geoffrey
 
 =head1 VERSION
 
-Version 0.000201
+Version 0.000204
 
 =head1 DESCRIPTION
 

@@ -1,0 +1,114 @@
+
+# $Id: .perlcriticrc 781 2016-05-09 12:38:14Z schieche $
+
+severity = 1
+verbose  = 8
+theme = docs || (schieche || pbp || bugs)
+
+#------------------------------------------------------------------------------
+
+[-Bangs::ProhibitBitwiseOperators]
+
+[BuiltinFunctions::ProhibitBooleanGrep]
+add_themes = schieche
+
+[BuiltinFunctions::ProhibitReverseSortBlock]
+add_themes = schieche
+
+[BuiltinFunctions::ProhibitStringySplit]
+add_themes = schieche
+
+[BuiltinFunctions::RequireBlockGrep]
+add_themes = schieche
+
+[BuiltinFunctions::RequireBlockMap]
+add_themes = schieche
+
+[-ClassHierarchies::ProhibitAutoloading]
+
+[-CodeLayout::RequireTidyCode]
+
+[CodeLayout::ProhibitHardTabs]
+allow_leading_tabs = 1
+add_themes = schieche
+
+[CodeLayout::ProhibitTrailingWhitespace]
+add_themes = schieche
+
+[-CodeLayout::RequireTrailingCommas]
+
+[ControlStructures::ProhibitCascadingIfElse]
+max_elsif = 4
+
+[-ControlStructures::ProhibitCStyleForLoops]
+[ControlStructures::ProhibitDeepNests]
+add_themes = schieche
+max_nests = 3
+
+# FUCK ME SIDEWAYS
+[-ControlStructures::ProhibitPostfixControls]
+[-ControlStructures::ProhibitUnlessBlocks]
+[-ControlStructures::ProhibitUntilBlocks]
+
+[-Documentation::PodSpelling]
+#stop_words = POSIX formatter ARRAYREF CODEREF negatable boolean hashref TODO perl Schieche schieche
+#add_themes = docs
+
+[Documentation::RequirePodSections]
+lib_sections    = NAME|SYNOPSIS|DESCRIPTION|TODO|AUTHOR|LICENSE AND COPYRIGHT
+add_themes = docs
+
+[-InputOutput::RequireBracedFileHandleWithPrint]
+[-InputOutput::RequireBriefOpen]
+## does this fucker even *know* perl
+[-InputOutput::ProhibitOneArgSelect]
+
+[-Miscellanea::ProhibitTies]
+#[Miscellanea::RequireRcsKeywords]
+#keywords = Id
+#add_themes = schieche
+
+[Modules::ProhibitMultiplePackages]
+
+[Modules::RequireVersionVar]
+
+[-NamingConventions::Capitalization]
+
+[-References::ProhibitDoubleSigils]
+
+# WHO THE FUCK CAME UP WITH THESE
+[-RegularExpressions::ProhibitComplexRegexes]
+[-RegularExpressions::RequireDotMatchAnything]
+[-RegularExpressions::RequireExtendedFormatting]
+[-RegularExpressions::RequireLineBoundaryMatching]
+
+[Subroutines::ProhibitBuiltinHomonyms]
+[Subroutines::ProhibitExcessComplexity]
+add_themes = schieche
+max_mccabe = 10
+[-Subroutines::ProhibitSubroutinePrototypes]
+[-Subroutines::RequireArgUnpacking]
+
+[TestingAndDebugging::RequireUseStrict]
+add_themes = schieche
+
+[TestingAndDebugging::RequireUseWarnings]
+add_themes = schieche
+
+[ValuesAndExpressions::ProhibitCommaSeparatedStatements]
+[ValuesAndExpressions::ProhibitConstantPragma]
+[-ValuesAndExpressions::ProhibitEmptyQuotes]
+[-ValuesAndExpressions::RequireInterpolationOfMetachars]
+[-ValuesAndExpressions::ProhibitLeadingZeros]
+[ValuesAndExpressions::ProhibitMismatchedOperators]
+[-ValuesAndExpressions::ProhibitNoisyQuotes]
+
+[Variables::ProhibitLocalVars]
+[Variables::ProhibitPackageVars]
+[Variables::ProhibitPunctuationVars]
+[Variables::ProhibitReusedNames]
+[Variables::ProhibitUnusedVariables]
+[Variables::RequireNegativeIndices]
+
+[Variables::RequireLocalizedPunctuationVars]
+allow = %ENV %SIG

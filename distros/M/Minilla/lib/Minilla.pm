@@ -2,7 +2,7 @@ package Minilla;
 use strict;
 use warnings;
 use 5.010001;
-use version; our $VERSION = version->declare("v3.1.5");
+use version; our $VERSION = version->declare("v3.1.6");
 
 our $DEBUG;
 our $AUTO_INSTALL;
@@ -211,7 +211,8 @@ It affects to L<Module::Build> 0.4005+ only.
 
     no_github_issues=true
 
-Minilla sets bugtracker as github issues by default. But if you want to use RT, you can set this variable.
+Minilla sets bugtracker to github/GitLab's issue tracker by default. But if you
+want to use RT, you can set this variable.
 
 =item no_index
 

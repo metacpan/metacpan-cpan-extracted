@@ -1,0 +1,7 @@
+Revision history for Getopt::O2
+
+1.0.19  01 Sep 2019
+        Project has lived in the dark as Getopt::Complete on a private APT repository; renamed it
+        and published the predecessor's version 1.0.19 as Getopt::O2
+1.0.20  01 Sep 2019
+        Maintenance: changed license to "perl", added "required" meta files (README, Changes)

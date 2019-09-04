@@ -1,0 +1,6 @@
+use strict;
+use warnings;
+$| = 1;
+use Sys::RunAlone::Flexible @ARGV;
+<>;
+__END__

@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/Getopt/O2.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README
+README.md
+t/.perlcriticrc
+t/00.critic.t
+t/00.use.t
+t/02.getopt.t

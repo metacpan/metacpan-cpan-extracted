@@ -5,7 +5,7 @@
       "Davide Migliavacca <shari@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "perl_5"
    ],
@@ -29,7 +29,6 @@
       },
       "develop" : {
          "requires" : {
-            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41"
          }
       },
@@ -123,22 +122,18 @@
          "web" : "https://github.com/msimerson/mail-dmarc"
       }
    },
-   "version" : "1.20190308",
+   "version" : "1.20190831",
    "x_contributors" : [
       "Benny Pedersen <me@junc.eu>",
-      "ColocateUSA.net <company@colocateusa.net>",
       "Jean Paul Galea <jeanpaul@yubico.com>",
       "Jean Paul Galea <jp@galea.se>",
       "Making GitHub Delicious. <iron@waffle.io>",
-      "Marc Bradshaw <marc_at_github@fastmail.com>",
       "Marc Bradshaw <marc@marcbradshaw.net>",
       "Mohammad S Anwar <Mohammad.Anwar@yahoo.com>",
       "Priyadi Iman Nurcahyo <priyadi@priyadi.net>",
       "Priyadi Iman Nurcahyo <priyadi@users.noreply.github.com>",
       "Ricardo Signes <rjbs@cpan.org>",
       "Ricardo Signes <rjbs@users.noreply.github.com>"
-   ],
-   "x_generated_by_perl" : "v5.28.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.07"
+   ]
 }
 

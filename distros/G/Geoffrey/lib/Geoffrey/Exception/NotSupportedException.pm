@@ -6,34 +6,34 @@ use strict;
 use warnings;
 use Carp qw/longmess/;
 
-$Geoffrey::Exception::NotSupportedException::VERSION = '0.000201';
+$Geoffrey::Exception::NotSupportedException::VERSION = '0.000204';
 
 use Exception::Class 1.23 (
-    'Geoffrey::Exception::NotSupportedException'           => { description => 'Unidentified exception', },
-    'Geoffrey::Exception::NotSupportedException::Index'    => { description => 'Add index is not supported!', },
-    'Geoffrey::Exception::NotSupportedException::Column'   => { description => 'Any column is not supported!', },
-    'Geoffrey::Exception::NotSupportedException::Sequence' => { description => 'Add sequence is not supported!', },
+    'Geoffrey::Exception::NotSupportedException'           => {description => 'Unidentified exception',},
+    'Geoffrey::Exception::NotSupportedException::Index'    => {description => 'Add index is not supported!',},
+    'Geoffrey::Exception::NotSupportedException::Column'   => {description => 'Any column is not supported!',},
+    'Geoffrey::Exception::NotSupportedException::Sequence' => {description => 'Add sequence is not supported!',},
     'Geoffrey::Exception::NotSupportedException::Primarykey' =>
-      { description => 'Primarykey handle is not supported!', },
-    'Geoffrey::Exception::NotSupportedException::Function' => { description => 'Function is not supported!' },
-    'Geoffrey::Exception::NotSupportedException::ForeignKey' =>
-      { description => 'Foreignkey action is not supported!' },
-    'Geoffrey::Exception::NotSupportedException::Uniquekey' => { description => 'Uniquekey handle is not supported!', },
+        {description => 'Primarykey handle is not supported!',},
+    'Geoffrey::Exception::NotSupportedException::Function'   => {description => 'Function is not supported!'},
+    'Geoffrey::Exception::NotSupportedException::ForeignKey' => {description => 'Foreignkey action is not supported!'},
+    'Geoffrey::Exception::NotSupportedException::Uniquekey'  => {description => 'Uniquekey handle is not supported!',},
     'Geoffrey::Exception::NotSupportedException::EmptyTable' =>
-      { description => 'Create a table without columns is not supported!', },
-    'Geoffrey::Exception::NotSupportedException::Version' => { description => 'Any version is not supportet!', },
+        {description => 'Create a table without columns is not supported!',},
+    'Geoffrey::Exception::NotSupportedException::Version' => {description => 'Any version is not supportet!',},
     'Geoffrey::Exception::NotSupportedException::ColumnType' =>
-      { description => 'Any type not supported in some converter!', },
-    'Geoffrey::Exception::NotSupportedException::Converter' => { description => 'Converter does not support!', },
+        {description => 'Any type not supported in some converter!',},
+    'Geoffrey::Exception::NotSupportedException::Converter' => {description => 'Converter does not support!',},
     'Geoffrey::Exception::NotSupportedException::ConverterType' =>
-      { description => 'Any subroutine in any converter type is not supported!', },
+        {description => 'Any subroutine in any converter type is not supported!',},
     'Geoffrey::Exception::NotSupportedException::Action' =>
-      { description => 'Any subroutine in any action is not supported!', },
+        {description => 'Any subroutine in any action is not supported!',},
     'Geoffrey::Exception::NotSupportedException::ListInformation' =>
-      { description => 'Any list information in converter is not supported!', },
+        {description => 'Any list information in converter is not supported!',},
     'Geoffrey::Exception::NotSupportedException::File' =>
-      { description => 'Any subroutine information in file is not supported!', },
-
+        {description => 'Any subroutine information in file is not supported!',},
+    'Geoffrey::Exception::NotSupportedException::Changelog' =>
+        {description => 'Any subroutine in any action is not supported!',},
 );
 
 sub throw_empty_table {
@@ -41,98 +41,109 @@ sub throw_empty_table {
     my $hr_params       = shift;
     if ($hr_params) {
         require Data::Dumper;
-        my $s_params = Data::Dumper->new( [$hr_params] )->Terse(1)->Deparse(1)->Sortkeys(1)->Dump;
+        my $s_params = Data::Dumper->new([$hr_params])->Terse(1)->Deparse(1)->Sortkeys(1)->Dump;
         return Geoffrey::Exception::NotSupportedException::EmptyTable->throw(
-            "Create a table without columns is not supported!\n$s_params\n" . longmess );
+            "Create a table without columns is not supported!\n$s_params\n" . longmess);
     }
     return Geoffrey::Exception::NotSupportedException::EmptyTable->throw(
-        "Create a table without columns is not supported! $s_throw_message\n" . longmess );
+        "Create a table without columns is not supported! $s_throw_message\n" . longmess);
 }
 
 sub throw_index {
-    my ( $s_type, $s_converter ) = @_;
+    my ($s_type, $s_converter) = @_;
     return Geoffrey::Exception::NotSupportedException::Index->throw(
-        qq~Index type "$s_type" is not supported! $s_converter\n~ . longmess );
+        qq~Index type "$s_type" is not supported! $s_converter\n~ . longmess);
 }
 
 sub throw_column {
-    my ( $s_type, $s_converter, $hr_params ) = @_;
+    my ($s_type, $s_converter, $hr_params) = @_;
     if ($hr_params) {
         require Data::Dumper;
-        my $s_params = Data::Dumper->new( [$hr_params] )->Terse(1)->Deparse(1)->Sortkeys(1)->Dump;
+        my $s_params = Data::Dumper->new([$hr_params])->Terse(1)->Deparse(1)->Sortkeys(1)->Dump;
         return Geoffrey::Exception::NotSupportedException::Column->throw(
-        qq~Column type "$s_type" is not supported!\n$s_params\n$s_converter\n~ . longmess );
+            qq~Column type "$s_type" is not supported!\n$s_params\n$s_converter\n~ . longmess);
     }
     return Geoffrey::Exception::NotSupportedException::Column->throw(
-        qq~Column type "$s_type" is not supported! $s_converter\n~ . longmess );
+        qq~Column type "$s_type" is not supported! $s_converter\n~ . longmess);
 }
 
 sub throw_sequence {
-    my ( $s_type, $s_converter ) = @_;
+    my ($s_type, $s_converter) = @_;
     return Geoffrey::Exception::NotSupportedException::Sequence->throw(
-        qq~Sequence type "$s_type" is not supported! $s_converter\n~ . longmess );
+        qq~Sequence type "$s_type" is not supported! $s_converter\n~ . longmess);
 }
 
 sub throw_primarykey {
-    my ( $s_type, $s_converter ) = @_;
+    my ($s_type, $s_converter) = @_;
     return Geoffrey::Exception::NotSupportedException::Primarykey->throw(
-        qq~Primarykey type "$s_type" is not supported! $s_converter\n~ . longmess );
+        qq~Primarykey type "$s_type" is not supported! $s_converter\n~ . longmess);
 }
 
 sub throw_unique {
-    my ( $s_type, $s_converter ) = @_;
+    my ($s_type, $s_converter) = @_;
     return Geoffrey::Exception::NotSupportedException::Uniquekey->throw(
-        qq~Uniquekey type "$s_type" is not supported! $s_converter\n~ . longmess );
+        qq~Uniquekey type "$s_type" is not supported! $s_converter\n~ . longmess);
 }
 
 sub throw_foreignkey {
-    my ( $s_type, $s_converter ) = @_;
+    my ($s_type, $s_converter) = @_;
     return Geoffrey::Exception::NotSupportedException::ForeignKey->throw(
-        qq~ForeignKey type "$s_type" is not supported! $s_converter\n~ . longmess );
+        qq~ForeignKey type "$s_type" is not supported! $s_converter\n~ . longmess);
 }
 
 sub throw_version {
-    my ( $s_type, $s_min_version, $s_version, $s_max_version ) = @_;
+    my ($s_type, $s_min_version, $s_version, $s_max_version) = @_;
     return Geoffrey::Exception::NotSupportedException::Version->throw(
-        qq~Type $s_type with unsupported version: $s_min_version <= $s_version\n~ . longmess )
-      if !$s_max_version;
+        qq~Type $s_type with unsupported version: $s_min_version <= $s_version\n~ . longmess)
+        if !$s_max_version;
 
     return Geoffrey::Exception::NotSupportedException::Version->throw(
-        qq~Type $s_type with unsupported version: $s_min_version <= $s_version <= $s_max_version\n~ . longmess );
+        qq~Type $s_type with unsupported version: $s_min_version <= $s_version <= $s_max_version\n~ . longmess);
 }
 
 sub throw_column_type {
-    my ( $s_type, $s_converter ) = @_;
+    my ($s_type, $s_converter) = @_;
     return Geoffrey::Exception::NotSupportedException::ColumnType->throw(
-        qq~Type: $s_type not supported in converter $s_converter.\n~ . longmess );
+        qq~Type: $s_type not supported in converter $s_converter.\n~ . longmess);
 }
 
 sub throw_converter_type {
-    my ( $s_subroutine, $s_converter_type ) = @_;
+    my ($s_subroutine, $s_converter_type) = @_;
     return Geoffrey::Exception::NotSupportedException::ConverterType->throw(
-        qq~Subroutine "$s_subroutine" in converter type "$s_converter_type" is not supported!\n~ . longmess );
+        qq~Subroutine "$s_subroutine" in converter type "$s_converter_type" is not supported!\n~ . longmess);
 }
 
 sub throw_converter {
     return Geoffrey::Exception::NotSupportedException::ConverterType->throw(
-        qq~Converter does not support!\n~ . longmess );
+        qq~Converter does not support!\n~ . longmess);
 }
 
 sub throw_action {
     return Geoffrey::Exception::NotSupportedException::Action->throw(
-        qq~Subroutine in action is not supported!\n~ . longmess );
+        qq~Subroutine in action is not supported!\n~ . longmess);
+}
+
+sub throw_changelog {
+    return Geoffrey::Exception::NotSupportedException::Changelog->throw(
+        qq~Subroutine in action is not supported!\n~ . longmess);
 }
 
 sub throw_list_information {
-    my ( $s_subroutine, $s_converter ) = @_;
+    my ($s_subroutine, $s_converter) = @_;
     return Geoffrey::Exception::NotSupportedException::ListInformation->throw(
-        qq~Subroutine "$s_subroutine" in "$s_converter" is not supported!\n~ . longmess );
+        qq~Subroutine "$s_subroutine" in "$s_converter" is not supported!\n~ . longmess);
 }
 
 sub throw_file {
-    my ( $s_subroutine, $s_file ) = @_;
+    my ($s_subroutine, $s_file) = @_;
     return Geoffrey::Exception::NotSupportedException::File->throw(
-        qq~Subroutine "$s_subroutine" in "$s_file" is not supported!\n~ . longmess );
+        qq~Subroutine "$s_subroutine" in "$s_file" is not supported!\n~ . longmess);
+}
+
+sub throw_io_call {
+    my ($s_subroutine, $s_io_name) = @_;
+    return Geoffrey::Exception::NotSupportedException::Changelog->throw(
+        qq~Subroutine "$s_subroutine" in changelog IO "$s_io_name" is not supported!\n~ . longmess);
 }
 
 1;
@@ -185,6 +196,10 @@ version 0.000100
 =head2 throw_file
 
 =head2 throw_converter
+
+=head2 throw_changelog
+
+=head2 throw_io_call
 
 =head1 DIAGNOSTICS
 

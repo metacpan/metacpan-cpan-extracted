@@ -3,9 +3,9 @@ NAME
     Bencher::Scenario::* distribution
 
 VERSION
-    This document describes version 0.170 of
+    This document describes version 0.171 of
     Dist::Zilla::Plugin::Bencher::Scenario (from Perl distribution
-    Dist-Zilla-Plugin-Bencher-Scenario), released on 2019-02-24.
+    Dist-Zilla-Plugin-Bencher-Scenario), released on 2019-09-02.
 
 SYNOPSIS
     In dist.ini:

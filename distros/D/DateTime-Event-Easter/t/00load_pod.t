@@ -1,15 +1,16 @@
 # -*- perl -*-
-
+# -*- encoding: utf-8; indent-tabs-mode: nil -*-
+#
 #     t/00load_pod.t - check module loading and documentation
 #     Test script for DateTime::Event::Easter
-#     Copyright (C) 2003, 2004, 2015, Rick Measham and Jean Forget
+#     Copyright © 2003-2004, 2015, 2019 Rick Measham and Jean Forget, all rights reserved
 #
 #     This program is distributed under the same terms as Perl:
 #     GNU Public License version 1 or later and Perl Artistic License
 #
 #     You can find the text of the licenses in the F<LICENSE> file or at
-#     L<http://www.perlfoundation.org/artistic_license_1_0>
-#     and L<http://www.gnu.org/licenses/gpl-1.0.html>.
+#     L<https://dev.perl.org/licenses/artistic.html>
+#     and L<https://www.gnu.org/licenses/gpl-1.0.html>.
 #
 #     Here is the summary of GPL:
 #
@@ -25,7 +26,7 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with this program; if not, write to the Free Software Foundation,
-#     Inc., <http://www.fsf.org/>.
+#     Inc., <https://www.fsf.org/>.
 #
 
 use Test::More tests => 3;
@@ -37,10 +38,10 @@ isa_ok ($object, 'DateTime::Event::Easter');
 
 
 SKIP: {
-	eval{ require Test::Pod };
-	skip "Test::Pod isn't installed. Believe me: the POD is ok!", 1 if $@;
-	
-	Test::Pod::pod_file_ok('lib/DateTime/Event/Easter.pm','Pod tests OK');
+        eval{ require Test::Pod };
+        skip "Test::Pod isn't installed. Believe me: the POD is ok!", 1 if $@;
+        
+        Test::Pod::pod_file_ok('lib/DateTime/Event/Easter.pm','Pod tests OK');
 }
 
 

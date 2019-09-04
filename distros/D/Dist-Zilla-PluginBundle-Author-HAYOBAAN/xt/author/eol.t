@@ -7,6 +7,7 @@ use Test::More 0.88;
 use Test::EOL;
 
 my @files = (
+    'lib/Dist/Zilla/Plugin/Author/HAYOBAAN/LinkCheck.pm',
     'lib/Dist/Zilla/Plugin/Author/HAYOBAAN/NextVersion.pm',
     'lib/Dist/Zilla/PluginBundle/Author/HAYOBAAN.pm',
     'lib/Pod/Weaver/PluginBundle/Author/HAYOBAAN.pm',

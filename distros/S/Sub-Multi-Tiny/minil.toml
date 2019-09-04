@@ -1,0 +1,8 @@
+name = "Sub-Multi-Tiny"
+badges = ["travis-ci.org"]
+authority="cpan:CXW"
+
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+
+tag_format="v%v"

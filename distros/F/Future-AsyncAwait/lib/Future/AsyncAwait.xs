@@ -8,6 +8,8 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#include "AsyncAwait.h"
+
 #ifdef HAVE_DMD_HELPER
 #  include "DMD_helper.h"
 #endif
@@ -74,6 +76,29 @@ typedef SV PADNAME;
 #  define PadnamelistMAX(pnl)     AvFILLp(pnl)
 #endif
 
+#ifndef wrap_keyword_plugin
+#  define wrap_keyword_plugin(func, var)  S_wrap_keyword_plugin(aTHX_ func, var)
+static void S_wrap_keyword_plugin(pTHX_ Perl_keyword_plugin_t func, Perl_keyword_plugin_t *var)
+{
+  /* BOOT can potentially race with other threads (RT123547) */
+
+  /* Perl doesn't really provide us a nice mutex for doing this so this is the
+   * best we can find. See also
+   *   https://rt.perl.org/Public/Bug/Display.html?id=132413
+   */
+  if(*var)
+    return;
+
+  OP_CHECK_MUTEX_LOCK;
+  if(!*var) {
+    *var = PL_keyword_plugin;
+    PL_keyword_plugin = func;
+  }
+
+  OP_CHECK_MUTEX_UNLOCK;
+}
+#endif
+
 /* Currently no version of perl makes this visible, so we always want it. Maybe
  * one day in the future we can make it version-dependent
  */
@@ -116,6 +141,7 @@ struct SuspendedFrame {
       int *iptr;       /* for SAVEt_INT... */
       STRLEN *lenptr;  /* for SAVEt_STRLEN + cur.len, saved.len */
       PADOFFSET padix; /* for SAVEt_PADSV_AND_MORTALIZE */
+      SV *sv;          /* for SAVEt_ITEM */
       struct {
         SV *sv;
         U32 mask, set;
@@ -123,7 +149,7 @@ struct SuspendedFrame {
     } u;
 
     union {
-      SV    *sv;      /* for SAVEt_SV, SAVEt_FREESV */
+      SV    *sv;      /* for SAVEt_SV, SAVEt_FREESV, SAVEt_ITEM */
       void  *ptr;     /* for SAVEt_COMPPAD, */
       int    i;       /* for SAVEt_INT... */
       STRLEN len;     /* for SAVEt_STRLEN */
@@ -160,6 +186,8 @@ typedef struct {
   SV **padslots;
 
   PMOP *curpm;           /* value of PL_curpm at suspend time */
+
+  HV *modhookdata;
 } SuspendedState;
 
 #ifdef DEBUG
@@ -379,6 +407,9 @@ static int dumpmagic(pTHX_ const SV *sv, MAGIC *mg)
         ret += DMD_ANNOTATE_SV(sv, state->padslots[i], "a suspended pad slot");
   }
 
+  if(state->modhookdata)
+    ret += DMD_ANNOTATE_SV(sv, (SV *)state->modhookdata, "the module hook data HV");
+
   return ret;
 }
 #endif
@@ -405,6 +436,7 @@ static SuspendedState *MY_suspendedstate_new(pTHX_ CV *cv)
   ret->returning_future = NULL;
   ret->frames = NULL;
   ret->padslots = NULL;
+  ret->modhookdata = NULL;
 
   sv_magicext((SV *)cv, NULL, PERL_MAGIC_ext, &vtbl, (char *)ret, 0);
 
@@ -542,6 +574,16 @@ static int magic_free(pTHX_ SV *sv, MAGIC *mg)
     Safefree(state->padslots);
     state->padslots = NULL;
     state->padlen = 0;
+  }
+
+  if(state->modhookdata) {
+    SV **hookp = hv_fetchs(PL_modglobal, "Future::AsyncAwait/suspendhook", FALSE);
+    if(hookp && SvOK(*hookp) && SvUV(*hookp)) {
+      SuspendHookFunc *hook = INT2PTR(SuspendHookFunc *, SvUV(*hookp));
+      (*hook)(aTHX_ FAA_PHASE_FREE, (CV *)sv, state->modhookdata);
+    }
+
+    SvREFCNT_dec(state->modhookdata);
   }
 
   Safefree(state);
@@ -703,6 +745,22 @@ static void MY_suspend_frame(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
         saved->type = SAVEt_DESTRUCTOR_X;
         saved->u.dx.func = func;
         saved->u.dx.data = data;
+
+        break;
+      }
+
+      case SAVEt_ITEM: {
+        PL_savestack_ix -= 3;
+        SV *var = PL_savestack[PL_savestack_ix].any_ptr;
+        SV *val = PL_savestack[PL_savestack_ix+1].any_ptr;
+
+        saved->type = SAVEt_ITEM;
+        saved->u.sv = var;
+        saved->cur.sv = newSVsv(var);
+        saved->saved.sv = val;
+
+        /* restore it for now */
+        sv_setsv(var, val);
 
         break;
       }
@@ -1347,6 +1405,13 @@ static void MY_resume_frame(pTHX_ SuspendedFrame *frame)
         GvSV(saved->u.gv) = saved->cur.sv;
         break;
 
+      case SAVEt_ITEM:
+        save_pushptrptr(saved->u.sv, saved->saved.sv, SAVEt_ITEM);
+
+        sv_setsv(saved->u.sv, saved->cur.sv);
+        SvREFCNT_dec(saved->cur.sv);
+        break;
+
 #ifdef SAVEt_STRLEN
       case SAVEt_STRLEN:
         *(saved->u.lenptr) = saved->saved.len;
@@ -1774,6 +1839,16 @@ static OP *pp_await(pTHX)
       POPMARK;
     PUSHMARK(SP);
 
+    {
+      SV **hookp = hv_fetchs(PL_modglobal, "Future::AsyncAwait/suspendhook", FALSE);
+      if(hookp && SvOK(*hookp) && SvUV(*hookp)) {
+        SuspendHookFunc *hook = INT2PTR(SuspendHookFunc *, SvUV(*hookp));
+        if(!state->modhookdata)
+          state->modhookdata = newHV();
+
+        (*hook)(aTHX_ FAA_PHASE_PRERESUME, curcv, state->modhookdata);
+      }
+    }
     suspendedstate_resume(state, curcv);
 
 #ifdef DEBUG_SHOW_STACKS
@@ -1818,6 +1893,16 @@ static OP *pp_await(pTHX)
   state->curcop = PL_curcop;
 
   suspendedstate_suspend(state, origcv);
+  {
+    SV **hookp = hv_fetchs(PL_modglobal, "Future::AsyncAwait/suspendhook", FALSE);
+    if(hookp && SvOK(*hookp) && SvUV(*hookp)) {
+      SuspendHookFunc *hook = INT2PTR(SuspendHookFunc *, SvUV(*hookp));
+        if(!state->modhookdata)
+          state->modhookdata = newHV();
+
+      (*hook)(aTHX_ FAA_PHASE_POSTSUSPEND, curcv, state->modhookdata);
+    }
+  }
 
   CvSTART(curcv) = PL_op; /* resume from here */
   future_on_ready(f, curcv);
@@ -2134,6 +2219,22 @@ static int async_keyword_plugin(pTHX_ OP **op_ptr)
   SvREFCNT_inc(PL_compcv);
   body = block_end(save_ix, body);
 
+  if(PL_parser->error_count) {
+    /* parse_block() still returns a valid body even if a parse error happens.
+     * We need to destroy this partial body before returning a valid(ish)
+     * state to the keyword hook mechanism, so it will find the error count
+     * correctly
+     *   See https://rt.cpan.org/Ticket/Display.html?id=130417
+     */
+    op_free(body);
+#ifdef HAVE_PARSE_SUBSIGNATURE
+    if(sigop)
+      op_free(sigop);
+#endif
+    *op_ptr = NULL;
+    return name ? KEYWORD_PLUGIN_STMT : KEYWORD_PLUGIN_EXPR;
+  }
+
 #ifdef HAVE_PARSE_SUBSIGNATURE
   if(sigop)
     body = op_append_list(OP_LINESEQ, sigop, body);
@@ -2248,8 +2349,7 @@ BOOT:
   XopENTRY_set(&xop_await, xop_class, OA_UNOP);
   Perl_custom_op_register(aTHX_ &pp_await, &xop_await);
 
-  next_keyword_plugin = PL_keyword_plugin;
-  PL_keyword_plugin = &my_keyword_plugin;
+  wrap_keyword_plugin(&my_keyword_plugin, &next_keyword_plugin);
 #ifdef HAVE_DMD_HELPER
   DMD_SET_MAGIC_HELPER(&vtbl, dumpmagic);
 #endif

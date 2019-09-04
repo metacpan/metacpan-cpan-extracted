@@ -1,7 +1,7 @@
 ---
 abstract: 'Interface for Eksisozluk.com'
 author:
-  - 'Kivanc Yazan'
+  - 'Kivanc Yazan <kyzn@cpan.org>'
 build_requires:
   Test::More: '0'
   perl: '5.010'
@@ -9,7 +9,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.010'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,10 +18,10 @@ name: WWW-Eksi
 provides:
   WWW::Eksi:
     file: lib/WWW/Eksi.pm
-    version: '0.30'
+    version: '0.32'
   WWW::Eksisozluk:
     file: lib/WWW/Eksisozluk.pm
-    version: '0.30'
+    version: '0.32'
 requires:
   Carp: '0'
   DateTime: '0'
@@ -39,9 +39,12 @@ resources:
   bugtracker: https://github.com/kyzn/WWW-Eksi/issues
   homepage: https://github.com/kyzn/WWW-Eksi
   repository: https://github.com/kyzn/WWW-Eksi.git
-version: '0.30'
+version: '0.32'
+x_contributor_covenant:
+  version: 0.02
 x_contributors:
   - 'Kivanc Yazan <kivancyazan@gmail.com>'
   - 'Kivanc Yazan <kyzn@users.noreply.github.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

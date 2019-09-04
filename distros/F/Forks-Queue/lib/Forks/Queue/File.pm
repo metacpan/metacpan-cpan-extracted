@@ -8,7 +8,7 @@ use Time::HiRes;
 use base 'Forks::Queue';
 use 5.010;    #  sorry, v5.08. I love the // //=  operators too much
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 our $DEBUG;
 *DEBUG = \$Forks::Queue::DEBUG;
 
@@ -203,6 +203,7 @@ sub _read_header {
             $h = readline($self->{_fh});
         } else {
             Carp::cluck "_read_header: invalid seek $!";
+            return;
         }
     }
     if (!$h) {
@@ -305,7 +306,10 @@ sub _notify {
 
 sub clear {
     my $self = shift;
-    $self->_check_pid;
+    if (! eval { $self->_check_pid; 1 } ) {
+        carp("File::Queue::clear operation failed: $@");
+        return;
+    }
     _SYNC {
         $self->_read_header;
         $self->{_pos} = 0;
@@ -318,7 +322,10 @@ sub clear {
 
 sub end {
     my ($self) = @_;
-    $self->_check_pid;
+    if (! eval { $self->_check_pid; 1 } ) {
+        carp "Forks::Queue::end operation failed: $@";
+        return;
+    }
     _SYNC {
         $self->_read_header;
         if ($self->{_end}) {
@@ -353,7 +360,17 @@ sub _check_pid {
             }
             $SIG{IO} = sub { };
         }
-        open $self->{_fh}, '+<', $self->{file};
+        my $ostatus = open $self->{_fh}, '+<', $self->{file};
+        for (1..5) {
+            last if $ostatus;
+            sleep 1;
+            $ostatus = open $self->{_fh}, '+<', $self->{file};            
+        }
+        if (!$ostatus) {
+            Carp::confess("Forks::Queue::check_pid: ",
+                          "Could not open $self->{file} after 5 tries");
+            return;
+        }
         if ($self->{_locked}) {
             $DEBUG && print STDERR
                 "Forks::Queue: $$ new pid update header\n";
@@ -411,7 +428,10 @@ sub _maintain {
 
 sub push {
     my ($self,@items) = @_;
-    $self->_check_pid;
+    if (! eval { $self->_check_pid; 1 } ) {
+        carp "Forks::Queue::put call from process $$ failed: $@";
+        return;
+    }
 
     my (@deferred_items,$failed_items);
     my $pushed = 0;
@@ -527,7 +547,10 @@ sub dequeue {
 sub _dequeue_back {
     my $self = shift;
     my $count = @_ ? $_[0] // 1 : 1;
-    $self->_check_pid;
+    if (! eval { $self->_check_pid; 1 } ) {
+        carp "Forks::Queue::pop operation failed: $@";
+        return;
+    }
     my @return;
     local $/ = EOL;
     while (@return == 0) {
@@ -558,7 +581,10 @@ sub _dequeue_back {
 sub _dequeue_front {
     my $self = shift;
     my $count = @_ ? $_[0] // 1 : 1;
-    $self->_check_pid;
+    if (! eval { $self->_check_pid; 1 } ) {
+        carp "Forks::Queue::shift operation failed: $@";
+        return;
+    }
     my @return;
     local $/ = EOL;
     while (@return == 0) {
@@ -604,7 +630,10 @@ sub _dequeue_front {
 sub shift :method {
     my ($self,$count) = @_;
     $count ||= 1;
-    $self->_check_pid;
+    if (! eval { $self->_check_pid; 1 } ) {
+        carp "Forks::Queue::shift method failed: $@";
+        return;
+    }
 
     my @return;
     while (@return == 0) {
@@ -650,7 +679,10 @@ sub shift :method {
 sub shift_nb {
     my ($self,$count) = @_;
     $count ||= 1;
-    $self->_check_pid;
+    if (! eval { $self->_check_pid; 1 } ) {
+        carp "Forks::Queue::shift operation failed: $@";
+        return;
+    }
 
     my @return;
     my $h;
@@ -699,7 +731,10 @@ sub peek_front {
     if ($index < 0) {
         return $self->peek_back(-$index - 1);
     }
-    $self->_check_pid;
+    if (! eval { $self->_check_pid; 1 } ) {
+        carp "Forks::Queue::peek operation failed: $@";
+        return;
+    }
     my @return;
     local $/ = EOL;
 
@@ -731,7 +766,10 @@ sub peek_back {
     if ($index < 0) {
         return $self->peek_front(-$index - 1);
     }
-    $self->_check_pid;
+    if (! eval { $self->_check_pid; 1 } ) {
+        carp "Forks::Queue::peek operation failed: $@";
+        return;
+    }
     my $count = $index + 1;
     local $/ = EOL;
     my @return;
@@ -812,7 +850,10 @@ sub extract {
 sub insert {
     my ($self, $pos, @items) = @_;
     Forks::Queue::_validate_input( $pos, 'index' );
-    $self->_check_pid;
+    if (! eval { $self->_check_pid; 1 } ) {
+        carp "Forks::Queue::insert operation failed: $@";
+        return;
+    }
     local $/ = EOL;
     my $nitems = @items;
     my (@deferred_items, $failed_items);
@@ -898,7 +939,10 @@ sub insert {
 sub pop {
     my ($self,$count) = @_;
     $count ||= 1;
-    $self->_check_pid;
+    if (! eval { $self->_check_pid; 1 } ) {
+        carp "Forks::Queue::pop operation failed: $@";
+        return;
+    }
     local $/ = EOL;
     my @return;
     while (@return == 0) {
@@ -946,7 +990,10 @@ sub pop {
 sub pop_nb {
     my ($self,$count) = @_;
     $count ||= 1;
-    $self->_check_pid;
+    if (! eval { $self->_check_pid; 1 } ) {
+        carp "Forks::Queue::pop operation failed: $@";
+        return;
+    }
     local $/ = EOL;
     my @return;
     my $h;
@@ -1072,7 +1119,7 @@ Forks::Queue::File - file-based implementation of Forks::Queue
 
 =head1 VERSION
 
-0.11
+0.12
 
 =head1 SYNOPSIS
 
@@ -1126,7 +1173,7 @@ with synchronizing files across processes.
 
 =item * persist
 
-See L<Forks::Queue> for descriptions of these options.
+See L<Forks::Queue/"new"> for descriptions of these options.
 
 =back
 

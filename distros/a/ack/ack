@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use version;
-our $VERSION = version->declare( 'v3.1.0' ); # Check https://beyondgrep.com/ for updates
+our $VERSION = version->declare( 'v3.1.1' ); # Check https://beyondgrep.com/ for updates
 
 use 5.010001;
 
@@ -55,8 +55,11 @@ our $opt_v;
 # Flag if we need any context tracking.
 our $is_tracking_context;
 
-# Special /m version of our $opt_regex.
-our $line_scan_regex;
+# The regex that we search for in each file.
+our $search_re;
+
+# Special /m version of our $search_re.
+our $scan_re;
 
 our @special_vars_used_by_opt_output;
 
@@ -148,10 +151,10 @@ MAIN: {
 
 
     if ( $opt_range_start ) {
-        $opt_range_start = build_regex( $opt_range_start, {} );
+        ($opt_range_start, undef) = build_regex( $opt_range_start, {} );
     }
     if ( $opt_range_end ) {
-        $opt_range_end   = build_regex( $opt_range_end, {} );
+        ($opt_range_end, undef)   = build_regex( $opt_range_end, {} );
     }
 
     $App::Ack::report_bad_filenames = !$opt->{s};
@@ -196,18 +199,19 @@ MAIN: {
     my $files;
     if ( $App::Ack::is_filter_mode && !$opt->{files_from} ) { # probably -x
         $files     = App::Ack::Files->from_stdin();
-        $opt_regex = shift @ARGV if not defined $opt_regex;
-        $opt_regex = build_regex( $opt_regex, $opt );
+        $opt_regex //= shift @ARGV;
+        ($search_re, $scan_re) = build_regex( $opt_regex, $opt );
     }
     else {
         if ( $opt_f ) {
             # No need to check for regex, since mutex options are handled elsewhere.
         }
         else {
-            $opt_regex = shift @ARGV if not defined $opt_regex;
-            $opt_regex = build_regex( $opt_regex, $opt );
+            $opt_regex //= shift @ARGV;
+            ($search_re, $scan_re) = build_regex( $opt_regex, $opt );
         }
-        if ( $opt_regex && $opt_regex =~ /\n/ ) {
+        # XXX What is this checking for?
+        if ( $search_re && $search_re =~ /\n/ ) {
             App::Ack::exit_from_ack( 0 );
         }
         my @start;
@@ -285,7 +289,7 @@ FILES:
         }
         # ack -l, ack -L
         elsif ( $opt_l || $opt_L ) {
-            my $is_match = file_has_match( $file );
+            my $is_match = count_matches_in_file( $file, 1 );
 
             if ( $opt_L ? !$is_match : $is_match ) {
                 App::Ack::say( $file->name );
@@ -304,30 +308,12 @@ FILES:
             # Slurp up an entire file up to 10M, see if there are any matches
             # in it, and if so, let us know so we can iterate over it directly.
             my $needs_line_scan = 1;
-            if ( $opt_regex && !$opt_passthru && !$opt_v ) {
-                if ( $file->open() && -f $file->{fh} ) {
-                    my $buffer;
-                    my $size = 10_000_000;
-                    my $rc = sysread( $file->{fh}, $buffer, $size );
-                    if ( !defined($rc) ) {
-                        if ( $App::Ack::report_bad_filenames ) {
-                            App::Ack::warn( $file->name . ": $!" );
-                        }
-                        $needs_line_scan = 0;
-                    }
-                    else {
-                        # If we read all 10M, then we need to scan the rest.
-                        if ( $rc == $size ) {
-                            $needs_line_scan = 1;
-                        }
-                        else {
-                            # Check for the pattern in what we got.
-                            $needs_line_scan = ($buffer =~ /$line_scan_regex/o);
-                        }
-                        if ( $needs_line_scan ) {
-                            $file->reset();
-                        }
-                    }
+            if ( !$opt_passthru && !$opt_v ) {
+                if ( $file->may_be_present( $scan_re ) ) {
+                    $file->reset();
+                }
+                else {
+                    $needs_line_scan = 0;
                 }
             }
             if ( $needs_line_scan ) {
@@ -410,7 +396,7 @@ sub _compile_file_filter {
 
     return sub {
         if ( $opt_g ) {
-            if ( $File::Next::name =~ /$opt_regex/o ) {
+            if ( $File::Next::name =~ /$search_re/o ) {
                 return 0 if $opt_v;
             }
             else {
@@ -564,19 +550,22 @@ sub build_regex {
         $str = "(?i)$str";
     }
 
+    my $scan_re = undef;
     my $re = eval { qr/$str/ };
     if ( $re ) {
-        $line_scan_regex = eval { qr/$str/m };
+        if ( $str !~ /\$/ ) {
+            # No line_scan is possible if there's a $ in the regex.
+            $scan_re = eval { qr/$str/m };
+        }
     }
-    if ( !$re || !$line_scan_regex ) {
+    else {
         my $err = $@;
         chomp $err;
         App::Ack::die( "Invalid regex '$str':\n  $err" );
     }
 
 
-    return $re;
-
+    return ($re, $scan_re);
 }
 
 my $match_colno;
@@ -666,10 +655,10 @@ sub print_matches_in_file {
             my $does_match;
             if ( $in_range ) {
                 if ( $opt_v ) {
-                    $does_match = !/$opt_regex/o;
+                    $does_match = !/$search_re/o;
                 }
                 else {
-                    if ( $does_match = /$opt_regex/o ) {
+                    if ( $does_match = /$search_re/o ) {
                         # @- = @LAST_MATCH_START
                         # @+ = @LAST_MATCH_END
                         $match_colno = $-[0] + 1;
@@ -721,7 +710,7 @@ sub print_matches_in_file {
             $in_range = 1 if ( $using_ranges && !$in_range && $opt_range_start && /$opt_range_start/o );
 
             $match_colno = undef;
-            if ( $in_range && ($opt_v xor /$opt_regex/o) ) {
+            if ( $in_range && ($opt_v xor /$search_re/o) ) {
                 if ( !$opt_v ) {
                     $match_colno = $-[0] + 1;
                 }
@@ -763,7 +752,7 @@ sub print_matches_in_file {
             $in_range = 1 if ( $using_ranges && !$in_range && $opt_range_start && /$opt_range_start/o );
 
             if ( $in_range ) {
-                if ( !/$opt_regex/o ) {
+                if ( !/$search_re/o ) {
                     if ( !$has_printed_for_this_file ) {
                         if ( $opt_break && $has_printed_something ) {
                             App::Ack::print_blank_line();
@@ -797,7 +786,7 @@ sub print_matches_in_file {
 
             if ( $in_range ) {
                 $match_colno = undef;
-                if ( /$opt_regex/o ) {
+                if ( /$search_re/o ) {
                     $match_colno = $-[0] + 1;
                     if ( !$has_printed_for_this_file ) {
                         if ( $opt_break && $has_printed_something ) {
@@ -862,7 +851,7 @@ sub print_line_with_options {
     }
 
     if ( $opt_output ) {
-        while ( $line =~ /$opt_regex/og ) {
+        while ( $line =~ /$search_re/og ) {
             my $output = $opt_output;
             if ( @special_vars_used_by_opt_output ) {
                 no strict;
@@ -884,7 +873,7 @@ sub print_line_with_options {
 
         # We have to do underlining before any highlighting because highlighting modifies string length.
         if ( $opt_underline && !$skip_coloring ) {
-            while ( $line =~ /$opt_regex/og ) {
+            while ( $line =~ /$search_re/og ) {
                 my $match_start = $-[0] // next;
                 my $match_end = $+[0];
                 my $match_length = $match_end - $match_start;
@@ -899,7 +888,7 @@ sub print_line_with_options {
         if ( $opt_color && !$skip_coloring ) {
             my $highlighted = 0; # If highlighted, need to escape afterwards.
 
-            while ( $line =~ /$opt_regex/og ) {
+            while ( $line =~ /$search_re/og ) {
                 my $match_start = $-[0] // next;
                 my $match_end = $+[0];
                 my $match_length = $match_end - $match_start;
@@ -996,61 +985,54 @@ sub get_match_colno {
     return $match_colno;
 }
 
-# Same as C<count_matches_in_file>, but exits as soon as there is a match.
-sub file_has_match {
-    my ( $file ) = @_;
-
-    my $has_match = 0;
-    my $fh = $file->open();
-    if ( !$fh ) {
-        if ( $App::Ack::report_bad_filenames ) {
-            App::Ack::warn( $file->name . ': ' . $! );
-        }
-    }
-    else {
-        my ($using_ranges, $in_range) = range_setup();
-
-        while ( <$fh> ) {
-            chomp;
-
-            $in_range = 1 if ( $using_ranges && !$in_range && $opt_range_start && /$opt_range_start/o );
-
-            if ( $in_range ) {
-                if ( /$opt_regex/o xor $opt_v ) {
-                    $has_match = 1;
-                    last;
-                }
-            }
-
-            $in_range = 0 if ( $using_ranges && $in_range && $opt_range_end && /$opt_range_end/o );
-        }
-        $file->close;
-    }
-
-    return $has_match;
-}
-
 sub count_matches_in_file {
-    my ( $file ) = @_;
+    my $file = shift;
+    my $bail = shift;   # True if we're just checking for existence.
 
     my $nmatches = 0;
-    my $fh = $file->open;
-    if ( !$fh ) {
+    my $do_scan = 1;
+
+    if ( !$file->open() ) {
+        $do_scan = 0;
         if ( $App::Ack::report_bad_filenames ) {
-            App::Ack::warn( $file->name . ': ' . $! );
+            App::Ack::warn( $file->name . ": $!" );
         }
     }
     else {
+        if ( !$opt_v ) {
+            if ( !$file->may_be_present( $scan_re ) ) {
+                $do_scan = 0;
+            }
+        }
+    }
+
+    if ( $do_scan ) {
+        $file->reset();
+
         my ($using_ranges, $in_range) = range_setup();
 
-        while ( <$fh> ) {
-            $in_range = 1 if ( $using_ranges && !$in_range && $opt_range_start && /$opt_range_start/o );
-
-            if ( $in_range ) {
-                ++$nmatches if (/$opt_regex/o xor $opt_v);
+        my $fh = $file->{fh};
+        if ( $using_ranges ) {
+            while ( <$fh> ) {
+                chomp;
+                $in_range = 1 if ( !$in_range && $opt_range_start && /$opt_range_start/o );
+                if ( $in_range ) {
+                    if ( /$search_re/o xor $opt_v ) {
+                        ++$nmatches;
+                        last if $bail;
+                    }
+                }
+                $in_range = 0 if ( $in_range && $opt_range_end && /$opt_range_end/o );
             }
-
-            $in_range = 0 if ( $using_ranges && $in_range && $opt_range_end && /$opt_range_end/o );
+        }
+        else {
+            while ( <$fh> ) {
+                chomp;
+                if ( /$search_re/o xor $opt_v ) {
+                    ++$nmatches;
+                    last if $bail;
+                }
+            }
         }
         $file->close;
     }
@@ -1091,9 +1073,9 @@ If no FILE or DIRECTORY is given, the current directory will be searched.
 PATTERN is a Perl regular expression.  Perl regular expressions
 are commonly found in other programming languages, but for the particulars
 of their behavior, please consult
-L<https://perldoc.perl.org/perlreref.html|perlreref>.  If you don't know
+L<perlreref|https://perldoc.perl.org/perlreref.html>.  If you don't know
 how to use regular expression but are interested in learning, you may
-consult L<https://perldoc.perl.org/perlretut.html|perlretut>.  If you do not
+consult L<perlretut|https://perldoc.perl.org/perlretut.html>.  If you do not
 need or want ack to use regular expressions, please see the
 C<-Q>/C<--literal> option.
 
@@ -1150,7 +1132,7 @@ C<ack --dump>.
 
 =head1 MATCHING IN A RANGE OF LINES
 
-The C<--range-start> and C<--range-stop> options let you specify ranges of
+The C<--range-start> and C<--range-end> options let you specify ranges of
 lines to search within each file.
 
 Say you had the following file, called F<testfile>:
@@ -1179,7 +1161,7 @@ specify ranges of lines that we want ack to search.  The range starts with
 any line that matches the pattern C<^sub \w+>, and stops with any line that
 matches C<^}>.
 
-    $ ack --range-start='^sub \w+' --range-stop='^}' print testfile
+    $ ack --range-start='^sub \w+' --range-end='^}' print testfile
         print 'foo';
         print 'bar';
 
@@ -1196,16 +1178,16 @@ lines were in a range and which were out of the range.
     In  }
     Out my $task = 'print';
 
-You don't have to specify both C<--range-start> and C<--range-stop>.  IF
+You don't have to specify both C<--range-start> and C<--range-end>.  IF
 C<--range-start> is omitted, then the range runs from the first line in the
-file unitl the first line that matches C<--range-stop>.  Similarly, if
-C<--range-stop> is omitted, the range runs from the first line matching
+file unitl the first line that matches C<--range-end>.  Similarly, if
+C<--range-end> is omitted, the range runs from the first line matching
 C<--range-start> to the end of the file.
 
 For example, if you wanted to search all HTML files up until the first
 instance of the C<< <body> >>, you could do
 
-    ack foo --range-stop='<body>'
+    ack foo --range-end='<body>'
 
 Or to search after Perl's `__DATA__` or `__END__` markers, you would do
 
@@ -2271,6 +2253,7 @@ mailing list.
 How appropriate to have I<ack>nowledgements!
 
 Thanks to everyone who has contributed to ack in any way, including
+Salomon Smeke,
 M. Scott Ford,
 Anders Eriksson,
 H.Merijn Brand,

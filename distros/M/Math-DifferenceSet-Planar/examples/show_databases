@@ -8,6 +8,13 @@ use constant PDS => Math::DifferenceSet::Planar::;
 
 $| = 1;
 
+die "usage: show_databases [directory]" if @ARGV > 1 || grep {!-d} @ARGV;
+
+if (@ARGV) {
+    $Math::DifferenceSet::Planar::Data::DATABASE_DIR = $ARGV[0];
+}
+
+print "$Math::DifferenceSet::Planar::Data::DATABASE_DIR\n";
 foreach my $db (PDS->list_databases) {
     my $count = eval { PDS->set_database($db) };
     if (defined $count) {
@@ -23,16 +30,21 @@ foreach my $db (PDS->list_databases) {
 __END__
 =head1 NAME
 
-pds_canonize - translate planar difference sets into canonical form
+show_databases - show available planar difference set databases
 
 =head1 SYNOPSIS
 
-  show_databases
+  show_databases [directory]
 
 =head1 DESCRIPTION
 
-This example program examines the distribution share directory and
-reports databases found there, with a short summary of their content.
+This example program examines the distribution share directory, or its
+optional directory argument, and reports databases found there, with a
+short summary of their content.
+
+The output is the name of the directory and a list of database names
+with some of the database properties.  They are displayed in the order
+they would be considered as a default database.
 
 =head1 AUTHOR
 

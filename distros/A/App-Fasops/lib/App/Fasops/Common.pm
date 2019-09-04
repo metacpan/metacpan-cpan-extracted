@@ -1319,6 +1319,59 @@ sub poa_consensus {
     return $consensus;
 }
 
+sub build_info {
+    my $line_refs = shift;
+    my $info_of   = shift;
+
+    if ( !defined $info_of ) {
+        $info_of = {};
+    }
+
+    for my $line ( @{$line_refs} ) {
+        for my $part ( split /\t/, $line ) {
+            my $info = App::RL::Common::decode_header($part);
+            next unless App::RL::Common::info_is_valid($info);
+
+            if ( !exists $info_of->{$part} ) {
+                $info_of->{$part} = $info;
+            }
+        }
+    }
+
+    return $info_of;
+}
+
+sub get_seq_faidx {
+    my $filename = shift;
+    my $location = shift;    # I:1-100
+
+    # get executable
+    my $bin;
+    for my $e (qw{samtools}) {
+        if ( IPC::Cmd::can_run($e) ) {
+            $bin = $e;
+            last;
+        }
+    }
+    if ( !defined $bin ) {
+        Carp::confess "Could not find the executable for [samtools]\n";
+    }
+
+    my $cmd = sprintf "%s faidx %s %s", $bin, $filename, $location;
+    open my $pipe_fh, '-|', $cmd;
+
+    my $seq;
+    while ( my $line = <$pipe_fh> ) {
+        chomp $line;
+        if ( $line =~ /^[\w-]+/ ) {
+            $seq .= $line;
+        }
+    }
+    close $pipe_fh;
+
+    return $seq;
+}
+
 1;
 
 __END__

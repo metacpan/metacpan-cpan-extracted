@@ -3,6 +3,7 @@ use warnings;
 use Test::More;
 use Forks::Queue;
 use Time::HiRes;
+use lib '.';   # 5.26 compat
 require "t/exercises.tt";
 
 if (!eval "use threads;1") {

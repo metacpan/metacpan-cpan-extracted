@@ -1,4 +1,4 @@
-# Copyright 2007, 2008, 2009, 2010, 2011, 2012 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2017 Kevin Ryde
 
 # This file is part of Glib-Ex-ConnectProperties.
 #
@@ -32,7 +32,7 @@ use Scalar::Util;
 use Module::Load;
 use Glib::Ex::SignalIds 5; # version 5 for add()
 
-our $VERSION = 19;
+our $VERSION = 20;
 
 # uncomment this to run the ### lines
 #use Smart::Comments;
@@ -467,14 +467,14 @@ For example a CheckButton C<active> could be linked to the C<visible> of
 another widget, letting the user click to hide or show.
 
       +--------------------+             +-------------+
-      | CheckButton/active |  <------->  | Foo/visible |
+      | CheckButton active |  <------->  | Foo visible |
       +--------------------+             +-------------+
 
 The advantage of ConnectProperties is that it's bi-directional.  If other
 code in the program changes "Foo/visible" then that change is propagated to
 "CheckButton/active" too, ensuring the button display shows what it's
 controlling no matter how the target changes.  See F<examples/sensitive.pl>
-in the Glib-Ex-ConnectProperties sources for a complete program.
+for a complete program.
 
 =head2 Property Types
 
@@ -502,35 +502,38 @@ Write-only properties can be used.  Nothing is read out of them, they're
 just set from changes in the other linked properties.  Write-only properties
 are unusual, but see the C<write_only> option below to force write-only.
 
-It works to link properties on the same object.  This can ensure they update
-together.  It also works to have different ConnectProperties linkages with
-an object/property in common.  A change coming from one group propagates
+Properties within the same object can be linked.  This can ensure they
+update together.  Different ConnectProperties linkages can have an
+object/property in common.  A change coming from one group propagates
 through to the other.  This arises quite naturally if there's two separate
-controls for the same target.
+controls for the same target.  The two controls and the target then all
+change together.
 
 =head2 Property Class Name
 
 A property name can include an explicit class such as C<GtkLabel::justify>
 in the usual style of C<set_property()>, C<find_property()>, etc.
 
-    [ $widget, 'GtkLabel::justify' ]   # class name and property name
+    # property name including explicit class name,
+    # usually not necessary
+    [ $widget, 'GtkLabel::justify' ]
 
 If a subclass accidentally shadows a superclass property name then this
-gives access to the superclass property.  But it's otherwise unnecessary and
-is not recommended.  For a Perl subclass like C<My::Foo::Bar> the
-fully-qualified name is C<My__Foo__Bar::propname>, as usual for Perl module
+gives access to the superclass property.  But it's otherwise not necessary
+and is not recommended.  For a Perl subclass like C<My::Foo::Bar> the
+fully-qualified name is C<My__Foo__Bar::propname> as usual for Perl module
 to Glib class name conversion.
 
 =head2 Other Settings
 
 Various additional object or widget settings can be accessed by
-ConnectProperties.  They're either other flavour properties, or are
+ConnectProperties.  They're either other flavours of properties, or are
 non-property attributes which have some sort of signal notifying when they
-change.  For example
+change.  For example container child properties,
 
-    child#propname
+    "child#propname"
 
-See the following modules for Gtk related things,
+See the following modules for Gtk related settings,
 
 =over
 
@@ -563,7 +566,7 @@ them.  The implementation is modular so extras are not loaded unless used.
 The C<#> separator character doesn't clash with plain property names as it's
 not allowed in a ParamSpec name.
 
-See L<Glib::Ex::ConnectProperties::Element> to create a new element
+See L<Glib::Ex::ConnectProperties::Element> on creating a new element
 subclass.
 
 =head1 FUNCTIONS
@@ -649,8 +652,7 @@ element.  For example,
 Treat the property as read-only, ignoring any C<writable> flag in its
 ParamSpec.  This is probably of limited use, but might for instance on an
 output-only or to stop other properties writing back to a master control.
-See F<examples/unidirectional.pl> in the Glib-Ex-ConnectProperties sources
-for a complete program.
+See F<examples/unidirectional.pl> for a complete program.
 
 =item C<< write_only => $bool >>
 
@@ -762,8 +764,8 @@ checked makes a label insensitive,
 =item C<< func_out => $coderef >>
 
 Call C<< $value = &$coderef($value) >> to transform values going in or
-coming out.  (See F<examples/func-transform.pl> in the
-Glib-Ex-ConnectProperties sources for a complete program doing this.)
+coming out.  (See F<examples/func-transform.pl> in the for a complete
+program doing this.)
 
 =item C<< hash_in => $hashref >>
 
@@ -780,8 +782,8 @@ The hashes are not copied, so future changes to their contents will be used,
 though there's nothing to forcibly update property values if current
 settings might be affected.
 
-See F<examples/hash-transform.pl> in the Glib-Ex-ConnectProperties sources
-for a complete program using hash transforms.
+See F<examples/hash-transform.pl> for a complete program using hash
+transforms.
 
 =back
 
@@ -826,12 +828,12 @@ perhaps a long time later.
 If the C<func_in> / C<func_out> transformations are inconsistent, so that a
 value going in is always different from what comes out, then usually the "in
 progress" case prevents an infinite loop, as long as the program eventually
-reaches a state with no C<freeze_notify> in force.
+reaches a state with no C<freeze_notify()> in force.
 
 It might be wondered if something simpler is possible.  For the general case
-no, not really.  The specific C<set_foo()> methods on most widgets and
-objects often notice an unchanged setting and do nothing, but when using the
-generic C<set_property()> the protection above is needed.
+no, not really.  The specific C<set_foo()> methods on widgets and objects
+often notice an unchanged setting and do nothing, but when using the generic
+C<set_property()> the protection above is needed.
 
 =head2 Equality
 
@@ -870,7 +872,7 @@ only by pointer.
 
 C<Glib::Scalar> compared with C<eq>.  This may be of limited help and it's
 probably better to subclass C<Glib::Param::Scalar> and make a type-specific
-C<values_cmp>, if/when that's possible.
+C<values_cmp()>, if/when that's possible.
 
 =back
 
@@ -880,12 +882,12 @@ usually when setting a C<Glib::Object> it's a particular object which is
 desired, not just contents.  If that's not so then as with C<Glib::Scalar>
 it could be handled by a ParamSpec subclass with a C<values_cmp()> to
 express when different objects are equal enough.  If/when possible that
-would work for both C code and Perl code comparisons.
+would work for comparisons made both from C code or Perl code.
 
 =head2 Object Implementation
 
 When writing an object or widget (per L<Glib::Object::Subclass>) don't
-forget to explicitly C<notify> if changing a property outside a
+forget to explicitly C<notify()> if changing a property outside
 C<SET_PROPERTY()>.  For example,
 
     sub set_foo {
@@ -896,11 +898,11 @@ C<SET_PROPERTY()>.  For example,
       }
     }
 
-This sort of C<notify> is necessary in any object or widget implementation.
-Failing to do so will mean ConnectProperties doesn't work, and probably
-other things too.  A C<SET_PROPERTY()> can call out to a setter function
-like the above to re-use code.  In that case Glib collapses the C<notify()>
-there to just one notify at the end of C<SET_PROPERTY()>.
+This sort of C<notify()> is necessary in any object or widget
+implementation.  Failing to do so will mean ConnectProperties doesn't work
+and probably other things too.  A C<SET_PROPERTY()> can call out to a setter
+function like the above to re-use code.  In that case Glib collapses the
+C<notify()> there to just one notify at the end of C<SET_PROPERTY()>.
 
 =head1 SEE ALSO
 
@@ -919,7 +921,7 @@ L<http://user42.tuxfamily.org/glib-ex-connectproperties/index.html>
 
 =head1 LICENSE
 
-Copyright 2007, 2008, 2009, 2010, 2011, 2012 Kevin Ryde
+Copyright 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2017 Kevin Ryde
 
 Glib-Ex-ConnectProperties is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License as published by

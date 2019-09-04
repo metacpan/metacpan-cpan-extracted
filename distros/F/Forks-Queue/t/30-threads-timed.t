@@ -4,6 +4,7 @@
 #use Forks::Queue;
 #use Time::HiRes;
 #require "t/exercises.tt";
+use lib '.';   # 5.26 compat
 
 # t/10_timed.t from Thread::Queue, but using threads and Forks::Queue
 

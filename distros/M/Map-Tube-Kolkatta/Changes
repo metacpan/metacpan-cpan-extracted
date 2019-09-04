@@ -1,5 +1,8 @@
 Revision history for Map::Tube::Kolkatta
 
+0.33  Sun Sep 01 11:10:00 2019
+      - Moved author test scripts to xt/ subfolder.
+
 0.32  Tue Jul 09 17:35:00 2019
       - Updated dependency on Map::Tube v3.64.
 

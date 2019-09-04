@@ -1,6 +1,6 @@
 package Catmandu::Store::File::BagIt;
 
-our $VERSION = '0.235';
+our $VERSION = '0.236';
 
 use Catmandu::Sane;
 use Moo;
@@ -9,7 +9,6 @@ use Catmandu;
 use Catmandu::Util;
 use Catmandu::Store::File::BagIt::Index;
 use Catmandu::Store::File::BagIt::Bag;
-use Data::UUID;
 use namespace::clean;
 
 with 'Catmandu::FileStore';
@@ -37,22 +36,19 @@ sub path_string {
 
     my $keysize = $self->keysize;
 
-    # Allow all hexidecimal numbers
-    $key =~ s{[^A-F0-9-]}{}g;
+    my $h = "[0-9A-F]"; # uc
 
     # If the key is a UUID then the matches need to be exact
     if ($self->uuid) {
-        try {
-            Data::UUID->new->from_string($key);
-        }
-        catch {
-            return undef;
-        };
+        return undef unless $key =~ qr/\A${h}{8}-${h}{4}-${h}{4}-${h}{4}-${h}{12}\z/;
     }
-    else {
+    elsif ($key =~ qr/\A${h}+\z/) {
         return undef unless length($key) && length($key) <= $keysize;
         $key =~ s/^0+//;
         $key = sprintf "%-${keysize}.${keysize}d", $key;
+    }
+    else {
+        return undef;
     }
 
     my $path = $self->root . "/" . join("/", unpack('(A3)*', $key));

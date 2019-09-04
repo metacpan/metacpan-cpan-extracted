@@ -48,6 +48,7 @@
       },
       "test" : {
          "requires" : {
+            "Perl::Tidy" : "20190601",
             "Test::More" : "0.98",
             "Test::Perl::Critic" : "0",
             "Test::PerlTidy" : "0"
@@ -57,7 +58,7 @@
    "provides" : {
       "Telemetry::Any" : {
          "file" : "lib/Telemetry/Any.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -71,7 +72,7 @@
          "web" : "https://github.com/ivanych/Telemetry-Any"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_authority" : "cpan:IVANYCH",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

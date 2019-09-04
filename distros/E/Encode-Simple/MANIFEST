@@ -14,5 +14,6 @@ lib/Encode/Simple.pm
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/encode.t
+t/unicode_utf8.t
 xt/author/pod-coverage.t
 xt/author/pod-syntax.t

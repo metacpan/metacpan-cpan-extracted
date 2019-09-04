@@ -1,7 +1,7 @@
 # -*- encoding: utf-8; indent-tabs-mode: nil -*-
 #
 #     Example script for DateTime::Event::Easter
-#     Copyright (C) 2015, Jean Forget
+#     Copyright © 2015, 2019, Jean Forget, all rights reserved
 #
 #     The executable part of this program is distributed under the same terms
 #     as Perl: GNU Public License version 1 or later and Perl Artistic License
@@ -9,8 +9,8 @@
 #     license Attribution-NoDerivs 2.0 Generic (CC BY-ND 2.0).
 #
 #     You can find the text of the licenses in the F<LICENSE> file or at
-#     L<http://www.perlfoundation.org/artistic_license_1_0>
-#     and L<http://www.gnu.org/licenses/gpl-1.0.html>.
+#     L<https://dev.perl.org/licenses/artistic.html>
+#     and L<https://www.gnu.org/licenses/gpl-1.0.html>.
 #     The Creative Commons License is available at
 #     L<https://creativecommons.org/licenses/by-nd/2.0/>.
 #
@@ -28,9 +28,10 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with this program; if not, write to the Free Software Foundation,
-#     Inc., <http://www.fsf.org/>.
+#     Inc., <https://www.fsf.org/>.
 #
 
+use utf8;
 use v5.10;
 use strict;
 use warnings;
@@ -55,8 +56,8 @@ song "Malbrouk s'en va en guerre" (Marlborough goes to war), based on
 Sir John Churchill, 1st Duke of Marlborough. The song contains the
 following verses:
 
-  Il reviendra à Pâques, mironton mironton mirontaine,
-  Il reviendra à Pâques
+  Il reviendra z-à Pâques, mironton mironton mirontaine,
+  Il reviendra z-à Pâques
   Ou à la Trinité.
   Ou à la Trinité...
 
@@ -64,6 +65,12 @@ following verses:
   He'll come back on Easter
   Or on Trinity Sunday
   Or on Trinity Sunday
+
+Note for non-native French speakers: frequently, songs take liberty
+with proper spelling, proper grammar and proper conjugation for
+phonetic reasons. This is the case here. The proper spelling would be:
+
+  Il reviendra à Pâques
 
 Another tradition is to pretend that on Good Friday, the bells leave
 the church steeples and fly to Rome, where the Pope bless them and

@@ -2,7 +2,7 @@
 
 Hand Count Methods
 
-=head1 VERSION 0.022
+=head1 VERSION 0.02401
 
 =cut
 

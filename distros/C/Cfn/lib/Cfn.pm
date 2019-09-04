@@ -904,7 +904,7 @@ package Cfn {
   has Description => (isa => 'Str', is => 'rw');
   has Transform => (isa => 'Cfn::Transform', is => 'rw', coerce => 1);
 
-  our $VERSION = '0.08';
+  our $VERSION = '0.09';
 
   has Parameters => (
     is => 'rw',
@@ -1843,6 +1843,28 @@ as hard as it can with latest YAML::PP developments.
 L<https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-anatomy.html>
 
 This module kind of resembles troposphere (python): L<https://github.com/cloudtools/troposphere>.
+
+=head1 CLI utils
+
+This distribution includes a series of CLI utilities to help you with CloudFormation:
+
+=head2 cfn_list_resources [STRING]
+
+Lists all the resources supported by Cfn. If a string is specified, will filter the ones matching
+the STRING.
+
+=head2 cfn_region_matrix
+
+Displays a table of what resource types are supported in each region
+
+=head2 cfn_region_compatibility FILE
+
+Takes a cloudformation template and calculates in what regions it will be deployable
+
+=head2 cfn_resource_properties RESOURCE
+
+Outputs information about a resource type: properties accessible via Fn::GetAtt, region availability
+and it's whole property structure.
 
 =head1 AUTHOR
 

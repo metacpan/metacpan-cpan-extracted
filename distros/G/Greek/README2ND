@@ -1,0 +1,179 @@
+NAME
+
+       Greek - Source code filter for Greek script (Imitation JPerl)
+
+SYNOPSIS
+
+    In your script:
+
+      use Greek;
+
+    At command prompt:
+
+      perl  yourscript.pl  wild*  *card  and  '*quote*'  on MSWin32
+
+DESCRIPTION
+
+      This software is "JPerl on the Modern Perl" written by Perl.
+      This software treats Greek directly. Therefore, there is not UTF8 flag.
+
+INSTALLATION BY MAKE (for UNIX like system)
+
+To install this software by make, type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+INSTALLATION WITHOUT MAKE (for DOS like system)
+
+To install this software without make, type the following:
+
+   perl pMakefile.PL    --- pMakefile.PL makes "pmake.bat" only, and ...
+   pmake.bat
+   pmake.bat test
+
+   pmake.bat install    --- install to current using Perl
+
+   pmake.bat dist       --- make distribution package
+   pmake.bat ptar.bat   --- make perl script "ptar.bat"
+
+DEPENDENCIES
+
+This software requires perl5.00503 or later.
+
+LICENSE AND COPYRIGHT
+
+This software is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See perlartistic.
+
+This software is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+MAINTAINER
+
+This project was originated by INABA Hitoshi <ina@cpan.org>.
+
+ISO 8859 (2011.02.21 20:57:00 JST). In Wikipedia: The Free Encyclopedia.
+Retrieved from
+http://en.wikipedia.org/wiki/ISO/IEC_8859
+
+ISO/IEC 8859 is a joint ISO and IEC series of standards for 8-bit character
+encodings. The series of standards consists of numbered parts, such as
+ISO/IEC 8859-1, ISO/IEC 8859-2, etc. There are 15 parts, excluding the
+abandoned ISO/IEC 8859-12.
+
+ISO/IEC 8859 parts 1, 2, 3, and 4 were originally Ecma International standard
+ECMA-94.
+
+Part 7: Latin/Greek
+
+Covers the modern Greek language (monotonic orthography). Can also be used
+for Ancient Greek written without accents or in monotonic orthography, but
+lacks the diacritics for polytonic orthography. These were introduced with
+Unicode.
+
+
+* ALGORITHM #1
+
+ When the character is taken out of the octet string, it is necessary to
+distinguish a single octet character and the multiple octet character.
+The distinction is done only by first octet.
+
+    Single octet code is:
+      0x00-0xFF
+
+See also code table:
+
+         Single octet code
+
+   0 1 2 3 4 5 6 7 8 9 A B C D E F 
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 0|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*| 0x00-0xFF
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 1|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 2|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 3|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 4|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 5|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 6|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 7|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 8|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 9|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ A|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ B|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ C|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ D|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ E|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ F|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+* ALGORITHM #2
+
+Against algorithm.1, when the range of the character by tr/// is specified, only the
+following character codes are effective.
+
+    Single octet code is:
+      0x00-0xFF
+
+See also code table:
+
+         Single octet code
+
+   0 1 2 3 4 5 6 7 8 9 A B C D E F 
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 0|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*| 0x00-0xFF
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 1|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 2|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 3|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 4|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 5|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 6|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 7|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 8|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 9|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ A|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ B|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ C|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ D|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ E|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ F|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+SEE ALSO
+
+perl, Greek.pm, Egreek.pm, jacode.pl
+

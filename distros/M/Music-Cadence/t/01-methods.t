@@ -54,22 +54,29 @@ is_deeply $chords, [ [qw/ F# A# C# /], [qw/ C# F G# /] ], 'C# 0 plagal';
 
 $chords = $mc->cadence(
     type    => 'half',
+    leading => 7,
+);
+is_deeply $chords, [ [qw/ B D F /], [qw/ G B D /] ], 'C 0 half 7';
+
+$chords = $mc->cadence(
+    type    => 'half',
     leading => 2,
 );
-is_deeply $chords, [ [qw/ D F A /], [qw/ G B D /] ], 'C 0 half';
+is_deeply $chords, [ [qw/ D F A /], [qw/ G B D /] ], 'C 0 half 2';
+
+$chords = $mc->cadence(
+    type      => 'half',
+    leading   => 2,
+    inversion => { 1 => 1 },
+);
+is_deeply $chords, [ [qw/ F A D /], [qw/ G B D /] ], 'C 0 half 2 inversion 1-1';
 
 $chords = $mc->cadence(
     key     => 'C#',
     type    => 'half',
     leading => 2,
 );
-is_deeply $chords, [ [qw/ D# F# A# /], [qw/ G# C D# /] ], 'C# 0 half';
-
-$chords = $mc->cadence(
-    type    => 'half',
-    leading => 7,
-);
-is_deeply $chords, [ [qw/ B D F /], [qw/ G B D /] ], 'C 0 half';
+is_deeply $chords, [ [qw/ D# F# A# /], [qw/ G# C D# /] ], 'C# 0 half 2';
 
 $chords = $mc->cadence(
     key     => 'D',
@@ -122,7 +129,6 @@ $mc = Music::Cadence->new(
 $chords = $mc->cadence;
 is_deeply $chords, [ [ 19, 23, 14 ], [ 12, 16, 19, 24 ] ], 'C 0 perfect midinum';
 
-
 $mc = Music::Cadence->new(
     octave => -1,
     format => 'midinum',
@@ -150,6 +156,12 @@ is_deeply $chords, [ [qw/ B D G /], [qw/ C E G /] ], 'C 0 imperfect inversion 1-
 
 $chords = $mc->cadence(
     type      => 'imperfect',
+    inversion => { 1 => 1, 2 => 0 },
+);
+is_deeply $chords, [ [qw/ B D G /], [qw/ C E G /] ], 'C 0 imperfect inversion 1-1,2-0';
+
+$chords = $mc->cadence(
+    type      => 'imperfect',
     inversion => { 1 => 2 },
 );
 is_deeply $chords, [ [qw/ D G B /], [qw/ C E G /] ], 'C 0 imperfect inversion 1-2';
@@ -165,6 +177,24 @@ $chords = $mc->cadence(
     type      => 'imperfect',
     inversion => { 1 => 1, 2 => 1 },
 );
-is_deeply $chords, [ [qw/ B4 D4 G4 /], [qw/ E4 G4 C4 /] ], 'C4 4 imperfect inversion 1-1,2-1';
+is_deeply $chords, [ [qw/ B4 D4 G5 /], [qw/ E4 G4 C5 /] ], 'C 4 imperfect inversion 1-1,2-1';
+
+$chords = $mc->cadence(
+    key       => 'C#',
+    octave    => 4,
+    type      => 'imperfect',
+    inversion => { 1 => 1, 2 => 1 },
+);
+is_deeply $chords, [ [qw/ C4 D#4 G#5 /], [qw/ F4 G#4 C#5 /] ], 'C# 4 imperfect inversion 1-1,2-1';
+
+$mc = Music::Cadence->new( format => 'midi' );
+
+$chords = $mc->cadence(
+    key       => 'C#',
+    octave    => 4,
+    type      => 'imperfect',
+    inversion => { 1 => 1, 2 => 1 },
+);
+is_deeply $chords, [ [qw/ C4 Ds4 Gs5 /], [qw/ F4 Gs4 Cs5 /] ], 'C# 4 midi imperfect inversion 1-1,2-1';
 
 done_testing();

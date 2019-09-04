@@ -1,7 +1,5 @@
 package PerlIO::buffersize;
-{
-  $PerlIO::buffersize::VERSION = '0.001';
-}
+$PerlIO::buffersize::VERSION = '0.002';
 use strict;
 use warnings;
 
@@ -13,9 +11,11 @@ XSLoader::load(__PACKAGE__, __PACKAGE__->VERSION);
 
 # ABSTRACT: Set the buffersize of a handle
 
-
+__END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -23,7 +23,7 @@ PerlIO::buffersize - Set the buffersize of a handle
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -49,7 +49,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-
-__END__
-

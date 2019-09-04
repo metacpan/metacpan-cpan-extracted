@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use vars qw($VERSION @ISA %EXPORT_TAGS @EXPORT @EXPORT_OK);
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 #----------------------------------------------------------------------------
 
@@ -473,13 +473,42 @@ of 1st January 1902 to 31st December 2037 are passed, an undef is returned.
 
 =head1 SEE ALSO
 
-  L<Date::ICal>
-  L<DateTime>
-  L<Time::Local>
-  L<Time::Piece>
+=head2 Further Modules
 
-  The Calendar FAQ at http://www.tondering.dk/claus/calendar.html
+=over 4
 
+=item L<Calendar::List>
+
+=back
+
+=head2 Date/Time Modules
+
+=over 4
+
+=item L<Date::ICal>
+
+=item L<DateTime>
+
+=item L<Time::Local>
+
+=item L<Time::Piece>
+
+=back
+
+=head2 Further Information
+
+=over 4
+
+=item L<The Calendar FAQ>
+
+L<http://www.tondering.dk/claus/calendar.html>
+
+=item L<The Perl Advent Entry>
+
+2018-12-01 : L<http://perladvent.org/2018/2018-12-01.html>
+
+=back
+  
 =head1 BUGS, PATCHES & FIXES
 
 There are no known bugs at the time of this release. However, if you spot a

@@ -49,7 +49,7 @@ WriteMakefile(
         "Math::Polygon" => "0",
         "Path::Class" => "0",
         "Tree::R" => "0",
-        "Geo::ShapeFile" => "2.60",
+        "Geo::ShapeFile" => "3.00",
         "Geo::Shapefile::Writer" => "0",
         "List::MoreUtils" => "0.425",
         "List::Util" => "1.45",
@@ -67,7 +67,9 @@ WriteMakefile(
         "Sereal" => "3",
         "Cpanel::JSON::XS" => 3,
         "JSON::MaybeXS" => 1.003,
+        "JSON::PP" => 0,
         "Sort::Naturally" => 0,
+        "Sort::Key::Natural" => 0,
         "Text::Fuzzy" => 0,
         "Ref::Util" => "0.101",
         "Text::Levenshtein" => 0,
@@ -75,6 +77,9 @@ WriteMakefile(
         "Data::Compare" => 0,
         "Test::TempDir::Tiny" => "0.016",
         "Statistics::Sampler::Multinomial" => 0,
+        "List::Unique::DeterministicOrder" => 0,
+        "Geo::GDAL::FFI" => 0.07,
+        "PkgConfig" => 0.21026,   #  version that works with PAR::Packer
     },
     BUILD_REQUIRES => {
         "Data::Section::Simple" => "0",

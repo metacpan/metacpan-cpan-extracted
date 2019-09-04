@@ -93,14 +93,14 @@ in order to have the option to stream the station in one's own choice of
 audio player software rather than using their web browser and accepting any / 
 all flash, ads, javascript, cookies, trackers, web-bugs, and other crapware 
 that can come with that method of playing.  The author uses his own custom 
-all-purpose audio player called "fauxdacious" (his custom hacked version of 
-the open-source "audacious" media player).  "fauxdacious" incorporates this 
+all-purpose media player called "fauxdacious" (his custom hacked version of 
+the open-source "audacious" audio player).  "fauxdacious" incorporates this 
 module to decode and play streams.  The currently-supported websites are:
-radionomy.com, iheartradio.com, reciva.com, facebook, and youtube / vimeo / 
-brighteon, et. al.  We used to support tunein.com, but they have since 
-apparently wasted a ton of money on web-developers and script kiddies to so 
-fsck up their stations' pages to make it impossible to obtain their hidden 
-streams programatically.
+radionomy.com, iheartradio.com, reciva.com, facebook, banned.video, 
+and youtube / vimeo / brighteon, et. al.  We used to support tunein.com, but 
+they have since apparently wasted a ton of money on web-developers and 
+script kiddies to so fsck up their stations' pages to make it impossible to 
+obtain their hidden streams programatically.
 
 It amazes me the effort to which marketing-run operations will go to and 
 web-development money they'll spend to prevent people from accessing their 
@@ -171,7 +171,17 @@ Returns a two-element array consisting of the extension (ie. "png",
 
 =head1 DEPENDENCIES
 
-LWP::Simple
+LWP::UserAgent
+
+=head1 RECCOMENDS
+
+URI::Escape;  (Youtube)
+
+WWW::YouTube::Download;  (Youtube)
+
+youtube-dl  (Youtube, Facebook)
+
+wget  (Reciva, Youtube, BannedVideo)
 
 =head1 BUGS
 
@@ -186,6 +196,10 @@ You can find documentation for this module with the perldoc command.
     perldoc StreamFinder
 
 You can also look for information at:
+
+=head1 SEE ALSO
+
+Fauxdacious media player (https://wildstar84.wordpress.com/fauxdacious)
 
 =over 4
 
@@ -257,13 +271,14 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '1.03';
+our $VERSION = '1.05';
+our $DEBUG = 0;
 
 require Exporter;
 
 @ISA = qw(Exporter);
 @EXPORT = qw();
-my @supported_mods = (qw(Radionomy IHeartRadio Youtube Reciva Facebook));
+my @supported_mods = (qw(Radionomy IHeartRadio Youtube Reciva Facebook BannedVideo));
 my %haveit;
 
 foreach my $module (@supported_mods)
@@ -280,16 +295,20 @@ sub new
 	my $self = {};
 	return undef  unless ($url);
 
+	my @args = @_;
+	push @args, ('-debug', $DEBUG)  if ($DEBUG);
 	if ($haveit{'Facebook'} && ($url =~ m#^http[s]?\:\/\/\w*\.facebook\.#)) {
-		return new StreamFinder::Facebook($url);
+		return new StreamFinder::Facebook($url, @args);
 	} elsif ($haveit{'IHeartRadio'} && $url =~ m#\biheart\.com\/#) {
-		return new StreamFinder::IHeartRadio($url, 'secure_shoutcast', 'secure', 'any', '!rtmp');
+		return new StreamFinder::IHeartRadio($url, 'secure_shoutcast', 'secure', 'any', '!rtmp', @args);
 	} elsif ($haveit{'Reciva'} && $url =~ m#\breciva\.com\/#) {
-		return new StreamFinder::Reciva($url);
+		return new StreamFinder::Reciva($url, @args);
 	} elsif ($haveit{'Radionomy'} && $url =~ m#\bradionomy\.com\/#) {
-		return new StreamFinder::Radionomy($url);
+		return new StreamFinder::Radionomy($url, @args);
+	} elsif ($haveit{'BannedVideo'} && $url =~ m#\bbanned\.video\/#) {
+		return new StreamFinder::BannedVideo($url, @args);
 	} else {  #DEFAULT TO youtube-dl SINCE SO MANY URLS ARE HANDLED THERE NOW.
-		return new StreamFinder::Youtube($url);
+		return new StreamFinder::Youtube($url, @args);
 	}
 }
 

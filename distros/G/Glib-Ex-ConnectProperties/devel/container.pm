@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2017 Kevin Ryde
 
 # This file is part of Glib-Ex-ConnectProperties.
 #
@@ -40,10 +40,8 @@ use Glib;
 use Scalar::Util;
 use base 'Glib::Ex::ConnectProperties::Element';
 
-our $VERSION = 19;
+our $VERSION = 20;
 
-# uncomment this to run the ### lines
-#use Smart::Comments;
 
 # my $conn = Glib::Ex::ConnectProperties->new
 #   ([$menu,   'container-children#not-empty' ],

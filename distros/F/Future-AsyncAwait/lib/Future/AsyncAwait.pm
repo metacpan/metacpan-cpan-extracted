@@ -8,7 +8,7 @@ package Future::AsyncAwait;
 use strict;
 use warnings;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Carp;
 
@@ -293,6 +293,25 @@ C<return> from inside C<try>.
       catch {
          return "failed";
       }
+   }
+
+=head2 Syntax::Keyword::Dynamically
+
+As of L<Future::AsyncAwait> version 0.32, cross-module integration tests
+assert that the C<dynamically> correctly works across an C<await> boundary.
+
+   use Future::AsyncAwait;
+   use Syntax::Keyword::Dynamically;
+
+   our $var;
+
+   async sub trial
+   {
+      dynamically $var = "value";
+
+      await func();
+
+      say "Var is still $var";
    }
 
 =cut

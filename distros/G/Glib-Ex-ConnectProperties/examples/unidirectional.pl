@@ -1,4 +1,6 @@
-# Copyright 2008, 2009, 2012 Kevin Ryde
+#!/usr/bin/perl -w
+
+# Copyright 2008, 2009, 2012, 2019 Kevin Ryde
 
 # This file is part of Glib-Ex-ConnectProperties.
 #

@@ -1,5 +1,6 @@
 package Getopt::EX::Func;
 
+use v5.14;
 use strict;
 use warnings;
 use Carp;
@@ -156,10 +157,13 @@ Function itself can be implemented like this:
 	my %opt = @_;
 	print Dumper \%opt if $opt{debug};
 	for (1 .. $opt{count}) {
-	    print $opt{msg}, "\n";
+	    say $opt{msg};
 	}
     }
 
 It is also possible to declare the function in-line:
 
-    % example -Mfoo --begin 'sub{ print"wahoo!!\n" }'
+    % example -Mfoo --begin 'sub{ say "wahoo!!" }'
+
+Function C<say> can be used because the function is executed under
+C<use v5.14> context.

@@ -20,7 +20,7 @@ no_index:
 requires:
   Cwd: '3.00'
   File::Basename: '1.00015'
-  File::Next: '1.16'
+  File::Next: '1.18'
   File::Spec: '3.00'
   File::Temp: '0.19'
   Getopt::Long: '2.39'
@@ -43,5 +43,5 @@ resources:
   homepage: https://beyondgrep.com/
   license: https://www.perlfoundation.org/artistic-license-20.html
   repository: git://github.com/beyondgrep/ack3.git
-version: v3.1.0
+version: v3.1.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

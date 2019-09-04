@@ -44,4 +44,27 @@ lives_ok sub {
     $pkg->new(root => 't/data2', keysize => 12);
 }, 'dies on connecting to a store with the wrong keysize';
 
+note("uuid");
+{
+    my $store = $pkg->new(root => 't/data3', uuid => 1);
+
+    ok $store , 'got a store';
+
+    my $bags = $store->bag();
+
+    ok $bags , 'store->bag()';
+
+    isa_ok $bags , 'Catmandu::Store::File::BagIt::Index';
+
+    is $store->path_string('7D9DEBD0-3B84-11E9-913F-EA3D2282636C')
+            , 't/data3/7D9/DEB/D0-/3B8/4-1/1E9/-91/3F-/EA3/D22/826/36C'
+            , 'path_string(7D9DEBD0-3B84-11E9-913F-EA3D2282636C)';
+
+    ok ! $store->path_string('7D9DEBD') , 'path_string(7D9DEBD) fails';
+
+    ok !$store->bag('7D9DEBD') , 'bag(1235) doesnt exist';
+
+    lives_ok {$store->bag('7D9DEBD0-3B84-11E9-913F-EA3D2282636C')} 'bag(7D9DEBD0-3B84-11E9-913F-EA3D2282636C) exists';
+}
+
 done_testing;

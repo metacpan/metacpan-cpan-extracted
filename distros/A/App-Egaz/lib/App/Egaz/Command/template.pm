@@ -384,7 +384,7 @@ else
     if [ -e [% opt.data.0.dir -%]/cds.yml ]; then
         cp [% opt.data.0.dir -%]/cds.yml cds.yml;
     else
-        runlist gff --tag CDS --remove \
+        spanr gff --tag CDS \
             [% opt.data.0.dir -%]/*.gff \
             -o cds.yml
     fi
@@ -392,14 +392,14 @@ else
     if [ -e [% opt.data.0.dir -%]/repeat.yml ]; then
         cp [% opt.data.0.dir -%]/repeat.yml repeat.yml;
     else
-        runlist gff --remove \
+        spanr gff \
             [% opt.data.0.dir -%]/*.rm.gff \
             -o repeat.yml
     fi
 
     # create empty cds.yml or repeat.yml
-    runlist genome [% opt.data.0.dir -%]/chr.sizes -o chr.yml
-    runlist compare --op diff chr.yml chr.yml -o empty.yml
+    spanr genome [% opt.data.0.dir -%]/chr.sizes -o chr.yml
+    spanr compare --op diff chr.yml chr.yml -o empty.yml
 
     for type in cds repeat; do
         if [ ! -e ${type}.yml ]; then
@@ -407,7 +407,7 @@ else
         fi
     done
 
-    runlist merge \
+    spanr merge \
         cds.yml repeat.yml \
         -o anno.yml
 
@@ -670,7 +670,7 @@ fasops covers \
 #----------------------------#
 log_info Intersect
 
-runlist compare --op intersect \
+spanr compare --op intersect \
 [% FOREACH item IN opt.data -%]
 [% IF not loop.first -%]
 [% t = opt.data.0.name -%]
@@ -679,7 +679,7 @@ runlist compare --op intersect \
 [% END -%]
 [% END -%]
     -o stdout |
-    runlist span stdin \
+    spanr span stdin \
         --op excise -n [% opt.length %] \
         -o [% opt.multiname %]_raw/intersect.yml
 [% END -%]
@@ -689,11 +689,12 @@ runlist compare --op intersect \
 #----------------------------#
 log_info Coverage
 
-runlist merge [% opt.multiname %]_raw/*.yml \
+spanr merge [% opt.multiname %]_raw/*.yml \
     -o stdout |
-    runlist stat stdin \
-        -s [% args.0 %]/chr.sizes \
-        --all --mk \
+    spanr stat \
+        [% args.0 %]/chr.sizes \
+        stdin \
+        --all \
         -o Results/pairwise.coverage.csv
 
 [% IF opt.data.size > 2 -%]
@@ -1181,9 +1182,9 @@ fasops replace axt.target.fas replace.query.tsv -o axt.correct.fas
 #----------------------------#
 echo >&2 "==> Coverage stats"
 fasops covers axt.correct.fas -o axt.correct.yml
-runlist split axt.correct.yml -s .temp.yml
-runlist compare --op union target.temp.yml query.temp.yml -o axt.union.yml
-runlist stat --size chr.sizes axt.union.yml -o union.csv
+spanr split axt.correct.yml -s .temp.yml -o .
+spanr compare --op union target.temp.yml query.temp.yml -o axt.union.yml
+spanr stat chr.sizes axt.union.yml -o union.csv
 
 # links by lastz-chain
 fasops links axt.correct.fas -o stdout |
@@ -1232,7 +1233,7 @@ egaz blastlink axt.all.blast -c 0.95 -o links.blast.tsv --parallel [% opt.parall
 echo >&2 "==> Merge paralogs"
 
 echo >&2 "    * Sort links"
-jrange sort -o links.sort.tsv \
+linkr sort -o links.sort.tsv \
 [% IF opt.noblast -%]
    links.lastz.tsv
 [% ELSE -%]
@@ -1240,13 +1241,13 @@ jrange sort -o links.sort.tsv \
 [% END -%]
 
 echo >&2 "    * Clean links"
-jrange clean   links.sort.tsv       -o links.sort.clean.tsv
-jrange merge   links.sort.clean.tsv -o links.merge.tsv       -c 0.95
-jrange clean   links.sort.clean.tsv -o links.clean.tsv       -r links.merge.tsv --bundle 500
+linkr clean   links.sort.tsv       -o links.sort.clean.tsv
+linkr merge   links.sort.clean.tsv -o links.merge.tsv       -c 0.95
+linkr clean   links.sort.clean.tsv -o links.clean.tsv       -r links.merge.tsv --bundle 500
 
 echo >&2 "    * Connect links"
-rangeops connect links.clean.tsv    -o links.connect.tsv     -r 0.9
-rangeops filter  links.connect.tsv  -o links.filter.tsv      -r 0.8
+linkr connect links.clean.tsv    -o links.connect.tsv     -r 0.9
+linkr filter  links.connect.tsv  -o links.filter.tsv      -r 0.8
 
     ' ::: [% FOREACH item IN opt.data %][% item.name %] [% END %]
 
@@ -1265,31 +1266,31 @@ pushd Processing/[% id %] > /dev/null
 log_info Create multiple/pairwise alignments for [% id %]
 
 log_debug multiple links
-rangeops create links.filter.tsv -o multi.temp.fas    -g genome.fa
-fasops   refine multi.temp.fas   -o multi.refine.fas  --msa mafft -p [% opt.parallel %] --chop 10
-fasops   links  multi.refine.fas -o stdout |
-    jrange sort stdin -o stdout |
-    rangeops filter stdin -n 2-50 -o links.refine.tsv
+fasops create links.filter.tsv -o multi.temp.fas    -g genome.fa
+fasops refine multi.temp.fas   -o multi.refine.fas  --msa mafft -p [% opt.parallel %] --chop 10
+fasops links  multi.refine.fas -o stdout |
+    linkr sort stdin -o stdout |
+    linkr filter stdin -n 2-50 -o links.refine.tsv
 
 log_debug pairwise links
 fasops   links  multi.refine.fas    -o stdout     --best |
-    jrange sort stdin -o links.best.tsv
-rangeops create links.best.tsv   -o pair.temp.fas    -g genome.fa --name [% id %]
-fasops   refine pair.temp.fas    -o pair.refine.fas  --msa mafft -p [% opt.parallel %]
+    linkr sort stdin -o links.best.tsv
+fasops create links.best.tsv   -o pair.temp.fas    -g genome.fa --name [% id %]
+fasops refine pair.temp.fas    -o pair.refine.fas  --msa mafft -p [% opt.parallel %]
 
 cat links.refine.tsv |
     perl -nla -F"\t" -e "print for @F" |
-    jrunlist cover stdin -o cover.yml
+    spanr cover stdin -o cover.yml
 
 log_debug Stats of links
 echo "key,count" > links.count.csv
 for n in 2 3 4-50; do
-    rangeops filter links.refine.tsv -n ${n} -o stdout \
+    linkr filter links.refine.tsv -n ${n} -o stdout \
         > links.copy${n}.tsv
 
     cat links.copy${n}.tsv |
         perl -nla -F"\t" -e "print for @F" |
-        jrunlist cover stdin -o copy${n}.temp.yml
+        spanr cover stdin -o copy${n}.temp.yml
 
     wc -l links.copy${n}.tsv |
         perl -nl -e "
@@ -1303,13 +1304,13 @@ for n in 2 3 4-50; do
     rm links.copy${n}.tsv
 done
 
-runlist merge copy2.temp.yml copy3.temp.yml copy4-50.temp.yml -o copy.yml
-runlist stat --size chr.sizes copy.yml --mk --all -o links.copy.csv
+spanr merge copy2.temp.yml copy3.temp.yml copy4-50.temp.yml -o copy.yml
+spanr stat chr.sizes copy.yml --all -o links.copy.csv
 
 fasops mergecsv links.copy.csv links.count.csv --concat -o copy.csv
 
 log_debug Coverage figure
-runlist stat --size chr.sizes cover.yml
+spanr stat chr.sizes cover.yml -o cover.yml.csv
 #perl cover_figure.pl --size chr.sizes -f cover.yml
 
 log_info Results for [% id %]
@@ -1487,13 +1488,13 @@ fi
 log_debug Create link files
 
 for n in 2 3 4-50; do
-    rangeops filter [% opt.outdir %]/Results/[% id %]/[% id %].links.tsv -n ${n} -o stdout \
+    linkr filter [% opt.outdir %]/Results/[% id %]/[% id %].links.tsv -n ${n} -o stdout \
         > links.copy${n}.tsv
 
     if [ "${n}" == "4-50" ]; then
-        rangeops circos links.copy${n}.tsv -o [% id %].linkN.txt --highlight
+        linkr circos links.copy${n}.tsv -o [% id %].linkN.txt --highlight
     else
-        rangeops circos links.copy${n}.tsv -o [% id %].link${n}.txt
+        linkr circos links.copy${n}.tsv -o [% id %].link${n}.txt
     fi
 
     rm links.copy${n}.tsv

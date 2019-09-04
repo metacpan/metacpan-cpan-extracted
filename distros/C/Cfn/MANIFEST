@@ -97,6 +97,7 @@ lib/Cfn/Resource/AWS/CloudWatch/Alarm.pm
 lib/Cfn/Resource/AWS/CloudWatch/AnomalyDetector.pm
 lib/Cfn/Resource/AWS/CloudWatch/Dashboard.pm
 lib/Cfn/Resource/AWS/CodeBuild/Project.pm
+lib/Cfn/Resource/AWS/CodeBuild/SourceCredential.pm
 lib/Cfn/Resource/AWS/CodeCommit/Repository.pm
 lib/Cfn/Resource/AWS/CodeDeploy/Application.pm
 lib/Cfn/Resource/AWS/CodeDeploy/DeploymentConfig.pm
@@ -232,6 +233,7 @@ lib/Cfn/Resource/AWS/Glue/DataCatalogEncryptionSettings.pm
 lib/Cfn/Resource/AWS/Glue/Database.pm
 lib/Cfn/Resource/AWS/Glue/DevEndpoint.pm
 lib/Cfn/Resource/AWS/Glue/Job.pm
+lib/Cfn/Resource/AWS/Glue/MLTransform.pm
 lib/Cfn/Resource/AWS/Glue/Partition.pm
 lib/Cfn/Resource/AWS/Glue/SecurityConfiguration.pm
 lib/Cfn/Resource/AWS/Glue/Table.pm
@@ -295,6 +297,9 @@ lib/Cfn/Resource/AWS/KinesisAnalyticsV2/ApplicationCloudWatchLoggingOption.pm
 lib/Cfn/Resource/AWS/KinesisAnalyticsV2/ApplicationOutput.pm
 lib/Cfn/Resource/AWS/KinesisAnalyticsV2/ApplicationReferenceDataSource.pm
 lib/Cfn/Resource/AWS/KinesisFirehose/DeliveryStream.pm
+lib/Cfn/Resource/AWS/LakeFormation/DataLakeSettings.pm
+lib/Cfn/Resource/AWS/LakeFormation/Permissions.pm
+lib/Cfn/Resource/AWS/LakeFormation/Resource.pm
 lib/Cfn/Resource/AWS/Lambda/Alias.pm
 lib/Cfn/Resource/AWS/Lambda/EventSourceMapping.pm
 lib/Cfn/Resource/AWS/Lambda/Function.pm
@@ -308,6 +313,8 @@ lib/Cfn/Resource/AWS/Logs/LogStream.pm
 lib/Cfn/Resource/AWS/Logs/MetricFilter.pm
 lib/Cfn/Resource/AWS/Logs/SubscriptionFilter.pm
 lib/Cfn/Resource/AWS/MSK/Cluster.pm
+lib/Cfn/Resource/AWS/ManagedBlockchain/Member.pm
+lib/Cfn/Resource/AWS/ManagedBlockchain/Node.pm
 lib/Cfn/Resource/AWS/MediaLive/Channel.pm
 lib/Cfn/Resource/AWS/MediaLive/Input.pm
 lib/Cfn/Resource/AWS/MediaLive/InputSecurityGroup.pm
@@ -389,6 +396,7 @@ lib/Cfn/Resource/AWS/SQS/QueuePolicy.pm
 lib/Cfn/Resource/AWS/SSM/Association.pm
 lib/Cfn/Resource/AWS/SSM/Document.pm
 lib/Cfn/Resource/AWS/SSM/MaintenanceWindow.pm
+lib/Cfn/Resource/AWS/SSM/MaintenanceWindowTarget.pm
 lib/Cfn/Resource/AWS/SSM/MaintenanceWindowTask.pm
 lib/Cfn/Resource/AWS/SSM/Parameter.pm
 lib/Cfn/Resource/AWS/SSM/PatchBaseline.pm
@@ -398,6 +406,7 @@ lib/Cfn/Resource/AWS/SageMaker/EndpointConfig.pm
 lib/Cfn/Resource/AWS/SageMaker/Model.pm
 lib/Cfn/Resource/AWS/SageMaker/NotebookInstance.pm
 lib/Cfn/Resource/AWS/SageMaker/NotebookInstanceLifecycleConfig.pm
+lib/Cfn/Resource/AWS/SageMaker/Workteam.pm
 lib/Cfn/Resource/AWS/SecretsManager/ResourcePolicy.pm
 lib/Cfn/Resource/AWS/SecretsManager/RotationSchedule.pm
 lib/Cfn/Resource/AWS/SecretsManager/Secret.pm
@@ -454,6 +463,9 @@ lib/Cfn/Resource/Alexa/ASK/Skill.pm
 lib/Cfn/ResourceModules.pm
 lib/Cfn/YAML/Schema.pm
 script/cfn_list_resources
+script/cfn_region_compatibility
+script/cfn_region_matrix
+script/cfn_resource_properties
 t/001_parse.t
 t/001_parse/apigateway_account.res
 t/001_parse/apigateway_authorizer.res

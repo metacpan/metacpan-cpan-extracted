@@ -39,7 +39,7 @@
       },
       "develop" : {
          "recommends" : {
-            "Dist::Zilla::PluginBundle::Author::ETHER" : "0.149",
+            "Dist::Zilla::PluginBundle::Author::ETHER" : "0.150",
             "Dist::Zilla::PluginBundle::Git::VersionManager" : "0.007"
          },
          "requires" : {
@@ -93,6 +93,7 @@
             "CPAN::Changes" : "0.23",
             "CPAN::Meta" : "2.150006",
             "CPAN::Meta::Requirements" : "0",
+            "CPAN::Uploader" : "0",
             "Carp" : "0",
             "Devel::CheckBin" : "0",
             "Dist::Zilla" : "5.038",
@@ -202,6 +203,7 @@
             "Test::Portability::Files" : "0.07",
             "Test::Spelling" : "0.19",
             "Text::Tabs" : "2013.0426",
+            "Try::Tiny" : "0",
             "namespace::autoclean" : "0",
             "perl" : "5.010",
             "strict" : "0",
@@ -324,15 +326,15 @@
    "provides" : {
       "Dist::Zilla::MintingProfile::Author::ETHER" : {
          "file" : "lib/Dist/Zilla/MintingProfile/Author/ETHER.pm",
-         "version" : "0.149"
+         "version" : "0.150"
       },
       "Dist::Zilla::PluginBundle::Author::ETHER" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Author/ETHER.pm",
-         "version" : "0.149"
+         "version" : "0.150"
       },
       "Pod::Weaver::PluginBundle::Author::ETHER" : {
          "file" : "lib/Pod/Weaver/PluginBundle/Author/ETHER.pm",
-         "version" : "0.149"
+         "version" : "0.150"
       }
    },
    "release_status" : "stable",
@@ -350,10 +352,10 @@
       "x_IRC" : "irc://irc.perl.org/#distzilla",
       "x_MailingList" : "http://dzil.org/#mailing-list"
    },
-   "version" : "0.149",
+   "version" : "0.150",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.030000"
+         "version" : "5.031003"
       },
       "plugins" : [
          {
@@ -1073,7 +1075,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.19.1",
+                  "git_version" : "2.22.0",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "commits",
@@ -1164,7 +1166,7 @@
             "class" : "Dist::Zilla::Plugin::EnsureLatestPerl",
             "config" : {
                "Dist::Zilla::Plugin::EnsureLatestPerl" : {
-                  "Module::CoreList" : "5.20190522"
+                  "Module::CoreList" : "5.20190820"
                }
             },
             "name" : "@Author::ETHER/EnsureLatestPerl",
@@ -1197,7 +1199,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.19.1",
+                  "git_version" : "2.22.0",
                   "repo_root" : "."
                }
             },
@@ -1208,7 +1210,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.19.1",
+                  "git_version" : "2.22.0",
                   "repo_root" : "."
                }
             },
@@ -1219,7 +1221,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.19.1",
+                  "git_version" : "2.22.0",
                   "repo_root" : "."
                }
             },
@@ -1253,7 +1255,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.19.1",
+                  "git_version" : "2.22.0",
                   "repo_root" : "."
                }
             },
@@ -1364,7 +1366,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.19.1",
+                  "git_version" : "2.22.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1381,12 +1383,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.149",
+                  "tag" : "v0.150",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.19.1",
+                  "git_version" : "2.22.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1436,7 +1438,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.19.1",
+                  "git_version" : "2.22.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1467,7 +1469,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.19.1",
+                  "git_version" : "2.22.0",
                   "repo_root" : "."
                }
             },
@@ -1638,8 +1640,8 @@
       "Roy Ivy III <rivy@cpan.org>",
       "\u0421\u0435\u0440\u0433\u0435\u0439 \u0420\u043e\u043c\u0430\u043d\u043e\u0432 <sromanov@cpan.org>"
    ],
-   "x_generated_by_perl" : "v5.30.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11",
+   "x_generated_by_perl" : "v5.31.3",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 0,
    "x_use_unsafe_inc" : 0

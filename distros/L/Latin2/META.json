@@ -1,0 +1,73 @@
+{
+    "name" : "Latin2",
+    "version" : "1.22",
+    "abstract" : "Source code filter to escape Latin-2 script",
+    "author" : [
+        "ina <ina@cpan.org>"
+    ],
+    "dynamic_config" : 1,
+    "generated_by" : "pmake.bat",
+    "license" : [
+        "perl_5"
+    ],
+    "meta-spec" : {
+        "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+        "version" : 2
+    },
+    "release_status" : "stable",
+    "resources" : {
+        "license" : [
+            "http://dev.perl.org/licenses/"
+        ],
+        "repository" : {
+            "url" : "https://github.com/ina-cpan/Latin2"
+        }
+    },
+    "prereqs" : {
+        "build" : {
+            "requires" : {
+                "ExtUtils::MakeMaker" : "5.4302",
+                "File::Basename" : "2.6",
+                "File::Copy" : "2.02",
+                "File::Path" : "1.0401",
+                "FindBin" : "1.42",
+                "Socket" : "0",
+                "bytes" : "0",
+                "perl" : "5.005_03",
+                "strict" : "1.01",
+                "utf8" : "0",
+                "vars" : "0"
+            }
+        },
+        "configure" : {
+            "requires" : {
+                "ExtUtils::MakeMaker" : "5.4302",
+                "File::Basename" : "2.6",
+                "File::Copy" : "2.02",
+                "File::Path" : "1.0401",
+                "FindBin" : "1.42",
+                "Socket" : "0",
+                "bytes" : "0",
+                "perl" : "5.005_03",
+                "strict" : "1.01",
+                "utf8" : "0",
+                "vars" : "0"
+            }
+        },
+        "runtime" : {
+            "requires" : {
+                "ExtUtils::MakeMaker" : "5.4302",
+                "File::Basename" : "2.6",
+                "File::Copy" : "2.02",
+                "File::Path" : "1.0401",
+                "FindBin" : "1.42",
+                "Socket" : "0",
+                "bytes" : "0",
+                "perl" : "5.005_03",
+                "strict" : "1.01",
+                "utf8" : "0",
+                "vars" : "0"
+            }
+        }
+    }
+}

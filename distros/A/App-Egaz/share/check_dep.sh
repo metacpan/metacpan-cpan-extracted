@@ -20,7 +20,7 @@ hash mummer 2>/dev/null || hash sparsemem 2>/dev/null || {
     exit 1;
 }
 
-hash raxmlHPC 2>/dev/null || hash raxmlHPC-PTHREADS 2>/dev/null || {
+hash raxmlHPC 2>/dev/null || hash raxmlHPC-SSE3 2>/dev/null || hash raxmlHPC-PTHREADS 2>/dev/null || {
     echo >&2 "raxml is required but it's not installed.";
     exit 1;
 }
@@ -55,8 +55,13 @@ hash fasops 2>/dev/null || {
     exit 1;
 }
 
-hash rangeops 2>/dev/null || {
-    echo >&2 "rangeops is required but it's not installed.";
+hash spanr 2>/dev/null || {
+    echo >&2 "spanr is required but it's not installed.";
+    exit 1;
+}
+
+hash linkr 2>/dev/null || {
+    echo >&2 "linkr is required but it's not installed.";
     exit 1;
 }
 
@@ -85,16 +90,16 @@ hash RepeatMasker 2>/dev/null || {
     echo >&2 "RepeatMasker is optional but it's not installed.";
 }
 
-hash jrange 2>/dev/null || {
-    echo >&2 "jrange is optional but it's not installed.";
-}
-
 hash snp-sites 2>/dev/null || {
     echo >&2 "snp-sites is optional but it's not installed.";
 }
 
 hash bcftools 2>/dev/null || {
     echo >&2 "bcftools is optional but it's not installed.";
+}
+
+hash FastTree 2>/dev/null || {
+    echo >&2 "FastTree is optional but it's not installed.";
 }
 
 echo >&2 OK

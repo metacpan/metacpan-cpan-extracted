@@ -3,19 +3,21 @@
 # Note: This script is a CLI for Riap function /DNS/Zone/PowerDNS/To/BIND/gen_bind_zone_from_powerdns_db
 # and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-08-19'; # DATE
+our $DATE = '2019-09-04'; # DATE
 our $DIST = 'App-DNSZoneUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+use Log::ger;
 
 use Perinci::CmdLine::Any;
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/DNS/Zone/PowerDNS/To/BIND/gen_bind_zone_from_powerdns_db",
     program_name => "gen-bind-zone-from-powerdns-db",
+    log => 1,
     read_config => 0,
     read_env => 0,
 );
@@ -37,13 +39,13 @@ gen-bind-zone-from-powerdns-db - Generate BIND zone configuration from informati
 
 =head1 VERSION
 
-This document describes version 0.001 of gen-bind-zone-from-powerdns-db (from Perl distribution App-DNSZoneUtils), released on 2019-08-19.
+This document describes version 0.002 of gen-bind-zone-from-powerdns-db (from Perl distribution App-DNSZoneUtils), released on 2019-09-04.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % gen-bind-zone-from-powerdns-db [options] <domain> <master_host>
+ % gen-bind-zone-from-powerdns-db [options] [domain]
 
 =head1 OPTIONS
 
@@ -53,9 +55,23 @@ C<*> marks required options.
 
 =over
 
-=item B<--domain>=I<s>*
+=item B<--dbh-json>=I<s>
 
-=item B<--master-host>=I<s>*
+See C<--dbh>.
+
+=item B<--dbh>=I<s>
+
+=item B<--default-ns-json>=I<s>
+
+See C<--default-ns>.
+
+=item B<--default-ns>=I<s@>
+
+Can be specified multiple times.
+
+=item B<--domain-id>=I<s>
+
+=item B<--domain>=I<s>
 
 =back
 
@@ -72,6 +88,32 @@ Default value:
 =item B<--db-password>=I<s>
 
 =item B<--db-user>=I<s>
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
 
 =back
 
@@ -110,6 +152,32 @@ you want to pipe the result for more post-processing. In this case you can use
 `--naked-res` so you just get:
 
     [1,2,3]
+
+
+=back
+
+=head2 Workaround options
+
+=over
+
+=item B<--no-workaround-cname-and-other-data>
+
+This is a workaround for a common misconfiguration in PowerDNS DB. Bind will
+reject the whole zone if there is CNAME record for a name (e.g. 'www') as well
+as other record types (e.g. 'A' or 'TXT'). The workaround is to skip those A/TXT
+records and only keep the CNAME record.
+
+
+=item B<--no-workaround-no-ns>
+
+This is a workaround for a common misconfiguration in PowerDNS DB. This will add
+some NS records specified in `default_ns`.
+
+
+=item B<--no-workaround-root-cname>
+
+CNAME on a root node (host='') does not make sense, so the workaround is to
+ignore the root CNAME.
 
 
 =back

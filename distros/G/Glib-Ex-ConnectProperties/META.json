@@ -1,0 +1,71 @@
+{
+   "abstract" : "Link properties between objects.",
+   "author" : [
+      "Kevin Ryde <user42_kevin@yahoo.com.au>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Glib-Ex-ConnectProperties",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "devel",
+         "xt",
+         "xtools"
+      ]
+   },
+   "optional_features" : {
+      "maximum_examples" : {
+         "description" : "Be able to run all the example programs.",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "Gtk2" : "0"
+               }
+            }
+         }
+      }
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "DateTime" : "0",
+            "DateTime::TimeZone" : "0"
+         },
+         "requires" : {
+            "Glib" : "0",
+            "Glib::Ex::SignalIds" : "5",
+            "Glib::Object::Subclass" : "0",
+            "Module::Load" : "0",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://user42.tuxfamily.org/glib-ex-connectproperties/index.html",
+      "license" : [
+         "http://www.gnu.org/licenses/gpl.html"
+      ]
+   },
+   "version" : 20,
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

@@ -1,0 +1,17 @@
+name = "DBD-Mock"
+
+authors = [
+    "Chris Winters <CWINTERS@cpan.org>",
+    "Stevan Little <STEVAN@cpan.org>",
+    "Rob Kinyon <RKINYON@cpan.org>",
+    "Mariano Wahlmann <DICHI@cpan.org>",
+    "Jason Cooper <JLCOOPER@cpan.org>",
+]
+
+authority = "cpan:JLCOOPER"
+
+module_maker = "ModuleBuildTiny"
+static_install = "auto"
+
+no_github_issues = true
+

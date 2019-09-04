@@ -73,7 +73,7 @@
          "web" : "https://github.com/LibreCat/Catmandu-BagIt"
       }
    },
-   "version" : "0.235",
+   "version" : "0.236",
    "x_contributors" : [
       "Nicolas Franck <njfranck@ca20c533.ugent.be>",
       "Vitali Peil <vitali.peil@uni-bielefeld.de>"

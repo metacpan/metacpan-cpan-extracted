@@ -5,7 +5,7 @@ package App::SpeedTest;
 use strict;
 use warnings;
 
-our $VERSION = "0.20";
+our $VERSION = "0.22";
 
 1;
 __END__
@@ -51,6 +51,7 @@ decisions in choosing the server based on distance instead of speed. That
 B<does> matter if one has fiber lines. I prefer speed over distance.
 
 =head1 Command-line Arguments
+X<CLIA>
 
 =over 2
 
@@ -113,72 +114,20 @@ Pass the ISO country code to select the servers
  $ speedtest --cc=B ...
  $ speedtest --country=D ...
 
-=item -1 | --one-line
-X<-1>
-X<--ono-line>
+=item --list-cc
+X<--list-cc>
 
-Generate a very short report easy to paste in e.g. IRC channels.
+Fetch the server list and then show the list of countries the servers are
+located with their country code and server count
 
- $ speedtest -1Qv0
- DL:   40.721 Mbit/s, UL:   30.307 Mbit/s
+ $ speedtest --list-cc
+ AD Andorra                             1
+ AE United Arab Emirates                4
+ :
+ ZW Zimbabwe                            6
 
-=item -B | --bytes
-X<-B>
-X<--bytes>
-
-Report throughput in Mbyte/s instead of Mbit/s
-
-=item -C | --csv
-X<-C>
-X<--csv>
-
-Generate the measurements in CSV format. The data can be collected in
-a file (by a cron job) to be able to follow internet speed over time.
-
-The reported fields are
-
- - A timestam (the time the tests are finished)
- - The server ID
- - The latency in ms
- - The number of tests executed in this measurement
- - The direction of the test (D = Down, U = Up)
- - The measure avarage speed in Mbit/s
- - The minimum speed measured in one of the test in Mbit/s
- - The maximum speed measured in one of the test in Mbit/s
-
- $ speedtest -Cs4358
- "2015-01-24 17:15:09",4358,63.97,40,D,93.45,30.39,136.93
- "2015-01-24 17:15:14",4358,63.97,40,U,92.67,31.10,143.06
-
-=item -P | --prtg
-X<-P>
-X<--prtg>
-
-Generate the measurements in XML suited for PRTG
-
- $ speedtest -P
- <?xml version="1.0" encoding="UTF-8" ?>
- <prtg>
-   <text>Testing from My ISP (10.20.30.40)</text>
-   <result>
-     <channel>Ping</channel>
-     <customUnit>ms</customUnit>
-     <float>1</float>
-     <value>56.40</value>
-     </result>
-   <result>
-     <channel>Download</channel>
-     <customUnit>Mbit/s</customUnit>
-     <float>1</float>
-     <value>38.34</value>
-     </result>
-   <result>
-     <channel>Upload</channel>
-     <customUnit>Mbit/s</customUnit>
-     <float>1</float>
-     <value>35.89</value>
-     </result>
-   </prtg>
+You can then use that code to list the servers in the chosen country, as
+described below.
 
 =item -l | --list
 X<-l>
@@ -219,6 +168,80 @@ Be very patient if running this with L</--all>.
   10:  5151 - Combell              Brussels           172.22 km 4000000 ms
 
 If a server does not respond, a very high latency is used as default.
+
+=item -1 | --one-line
+X<-1>
+X<--ono-line>
+
+Generate a very short report easy to paste in e.g. IRC channels.
+
+ $ speedtest -1Qv0
+ DL:   40.721 Mbit/s, UL:   30.307 Mbit/s
+
+=item -B | --bytes
+X<-B>
+X<--bytes>
+
+Report throughput in Mbyte/s instead of Mbit/s
+
+=item -C | --csv
+X<-C>
+X<--csv>
+
+Generate the measurements in CSV format. The data can be collected in
+a file (by a cron job) to be able to follow internet speed over time.
+
+The reported fields are
+
+ - A timestam (the time the tests are finished)
+ - The server ID
+ - The latency in ms
+ - The number of tests executed in this measurement
+ - The direction of the test (D = Down, U = Up)
+ - The measure avarage speed in Mbit/s
+ - The minimum speed measured in one of the test in Mbit/s
+ - The maximum speed measured in one of the test in Mbit/s
+
+ $ speedtest -Cs4358
+ "2015-01-24 17:15:09",4358,63.97,40,D,93.45,30.39,136.93
+ "2015-01-24 17:15:14",4358,63.97,40,U,92.67,31.10,143.06
+
+=item -U | --skip-undef
+X<-U>
+X<--skip-undef>
+
+Skip reporting measurements that have no speed recordings at all.
+The default is to report these as C<0.00> .. C<999999999.999>.
+
+=item -P | --prtg
+X<-P>
+X<--prtg>
+
+Generate the measurements in XML suited for PRTG
+
+ $ speedtest -P
+ <?xml version="1.0" encoding="UTF-8" ?>
+ <prtg>
+   <text>Testing from My ISP (10.20.30.40)</text>
+   <result>
+     <channel>Ping</channel>
+     <customUnit>ms</customUnit>
+     <float>1</float>
+     <value>56.40</value>
+     </result>
+   <result>
+     <channel>Download</channel>
+     <customUnit>Mbit/s</customUnit>
+     <float>1</float>
+     <value>38.34</value>
+     </result>
+   <result>
+     <channel>Upload</channel>
+     <customUnit>Mbit/s</customUnit>
+     <float>1</float>
+     <value>35.89</value>
+     </result>
+   </prtg>
 
 =item --url=XXX
 X<--url>
@@ -359,7 +382,7 @@ NYI - mentioned for speedtest-cli compatibility
 
 =head1 EXAMPLES
 
-See L</SYNOPSIS> and L</Command-line arguments>
+See L</SYNOPSIS> and L<Command-line arguments|/CLIA>
 
 =head1 DIAGNOSTICS
 
@@ -436,7 +459,7 @@ personal use, but was asked to make it publicly available as application.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2018 H.Merijn Brand
+Copyright (C) 2014-2019 H.Merijn Brand
 
 =head1 LICENSE
 

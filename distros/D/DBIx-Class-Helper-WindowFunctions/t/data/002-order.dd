@@ -1,0 +1,18 @@
+#!perl
+
++{
+    table_class => 'Artist',
+    attr        => {
+        columns   => [qw/ name /],
+        '+select' => {
+            row_number => [],
+            -over      => {
+                order_by => 'fingers',
+            },
+        },
+    },
+    sql => q{ SELECT me.name,
+              ROW_NUMBER() OVER (ORDER BY fingers)
+              FROM artist me
+    },
+};

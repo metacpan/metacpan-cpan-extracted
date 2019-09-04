@@ -23,10 +23,9 @@ maps/Violet.png
 maps/Yellow.png
 share/delhi-map.json
 t/00-load.t
-t/manifest.t
-t/meta-json.t
-t/meta-yml.t
-t/pod.t
 t/routes.txt
+xt/author/manifest.t
+xt/author/meta-json.t
+xt/author/meta-yml.t
 xt/author/pod-syntax.t
 xt/release/map.t

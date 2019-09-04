@@ -1,0 +1,6 @@
+Revision history for Perl extension IO::IPFinder.
+
+0.01  Thu Aug  8 16:11:14 2019
+	- original version; created by h2xs 1.23 with options
+		-AX IO::IPFinder
+

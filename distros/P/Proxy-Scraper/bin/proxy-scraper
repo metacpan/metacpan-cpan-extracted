@@ -10,11 +10,13 @@ if($^O eq 'MSWin32'){
 	Win32::Console::ANSI->import();
 }
 
+my $debug;
 my $type;
 my $level;
 my $output_file_path;
 
 GetOptions(
+	'debug'    => \$debug,
 	'type=s'   => \$type,
 	'level=s'  => \$level,
 	'output=s' => \$output_file_path,
@@ -25,6 +27,8 @@ GetOptions(
 			              show help message and exit
 			  -v, --version
 			              show version and exit
+			  -d, --debug
+			              enable debug mode
 			  -t, --type {http,https,socks4,socks5}
 			              set type of proxy
 			  -l, --level {transparent,anonymous,elite}
@@ -37,6 +41,7 @@ GetOptions(
 ) or exit 1;
 
 scrape_proxies(
+	DEBUG       => $debug,
 	TYPE        => $type,
 	LEVEL       => $level,
 	OUTPUT_FILE => $output_file_path

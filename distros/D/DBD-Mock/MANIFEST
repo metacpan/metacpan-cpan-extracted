@@ -1,19 +1,19 @@
 Build.PL
 Changes
+LICENSE
+META.json
+README.md
+cpanfile
 lib/DBD/Mock.pm
-lib/DBD/Mock/db.pm
-lib/DBD/Mock/dr.pm
 lib/DBD/Mock/Pool.pm
 lib/DBD/Mock/Pool/db.pm
 lib/DBD/Mock/Session.pm
-lib/DBD/Mock/st.pm
 lib/DBD/Mock/StatementTrack.pm
 lib/DBD/Mock/StatementTrack/Iterator.pm
-Makefile.PL
-MANIFEST			This list of files
-MYMETA.json
-MYMETA.yml
-README
+lib/DBD/Mock/db.pm
+lib/DBD/Mock/dr.pm
+lib/DBD/Mock/st.pm
+minil.toml
 t/000_basic.t
 t/001_db_handle.t
 t/002_dr_handle.t
@@ -44,10 +44,12 @@ t/026_st_bind_col.t
 t/027_named_parameters.t
 t/028_bind_columns.t
 t/029_multiple_prepare_statements.t
+t/030_st_execute_array.t
 t/998_pod.t
 t/999_pod_coverage.t
-t/bug_0001.t
-t/bug_0002.t
-t/bug_0003.t
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)
+t/bug_015602.t
+t/bug_066815.t
+t/bug_071438.t
+t/bug_117162.t
+META.yml
+MANIFEST

@@ -7,9 +7,9 @@ use DBI;
 use DBD::SQLite;
 use Time::HiRes 'time';
 use base 'Forks::Queue';
-use 5.010;    #  using  // //=  operators
+use 5.010;    #  implementation contains  // //=  operators
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 our ($DEBUG,$XDEBUG);
 *DEBUG = \$Forks::Queue::DEBUG;
 *XDEBUG = \$Forks::Queue::XDEBUG;
@@ -879,7 +879,7 @@ Forks::Queue::SQLite - SQLite-based implementation of Forks::Queue
 
 =head1 VERSION
 
-0.11
+0.12
 
 =head1 SYNOPSIS
 
@@ -935,13 +935,13 @@ If omitted, a temporary filename is chosen.
 
 =item * persist
 
-See L<Forks::Queue> for descriptions of these options.
+See L<Forks::Queue/"new"> for descriptions of these options.
 
 =back
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2017, Marty O'Brien.
+Copyright (c) 2017-2019, Marty O'Brien.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.1 or,

@@ -1,4 +1,4 @@
-Copyright 2010, 2011 Kevin Ryde
+Copyright 2010, 2011, 2019 Kevin Ryde
 
 This file is part of Math-Polynomial-Horner.
 
@@ -16,6 +16,9 @@ You should have received a copy of the GNU General Public License along
 with Math-Polynomial-Horner.  If not, see <http://www.gnu.org/licenses/>.
 
 
+
+Version 4, February 2019
+    - xx
 
 Version 3, February 2011
     - fix Makefile.PL for perl 5.6 and earlier

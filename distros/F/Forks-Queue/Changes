@@ -1,5 +1,8 @@
 Revision history for Forks-Queue
 
+0.12	2019-09-03
+	Robustness improvements and test fixes.
+
 0.11	2019-08-29
 	Robustness improvements
 	Abandon Net::Objwrap scheme from v0.09

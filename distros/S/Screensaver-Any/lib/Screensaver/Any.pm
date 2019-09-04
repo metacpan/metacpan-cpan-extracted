@@ -1,7 +1,7 @@
 package Screensaver::Any;
 
-our $DATE = '2018-02-28'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-09-04'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -14,7 +14,7 @@ use IPC::System::Options 'system', 'readpipe', -log=>1;
 
 my $known_screensavers = [qw/kde gnome cinnamon xscreensaver/];
 my $sch_screensaver = ['str', in=>$known_screensavers];
-my %arg_screensaver = (
+our %arg_screensaver = (
     screensaver => {
         summary => 'Explicitly set screensaver program to use',
         schema => $sch_screensaver,
@@ -60,6 +60,22 @@ _
 sub detect_screensaver {
     my %args = @_;
 
+    require Proc::Find;
+    no warnings 'once';
+    local $Proc::Find::CACHE = 1;
+
+  XSCREENSAVER:
+    {
+        log_trace "Checking whether xscreensaver process exists ...";
+        unless (Proc::Find::proc_exists(name => "xscreensaver")) {
+            log_trace "xscreensaver process doesn't exist";
+            last;
+        }
+        log_trace "xscreensaver process exists";
+        log_trace "Concluding screensaver is xscreensaver";
+        return "xscreensaver";
+    }
+
   KDE:
     {
         log_trace "Checking qdbus program ...";
@@ -78,10 +94,6 @@ sub detect_screensaver {
         log_trace "Concluding screensaver is kde";
         return "kde";
     }
-
-    require Proc::Find;
-    no warnings 'once';
-    local $Proc::Find::CACHE = 1;
 
   GNOME:
     {
@@ -105,18 +117,6 @@ sub detect_screensaver {
         log_trace "cinnamon-screensaver process exists";
         log_trace "Concluding screensaver is cinnamon";
         return "cinnamon";
-    }
-
-  XSCREENSAVER:
-    {
-        log_trace "Checking whether xscreensaver process exists ...";
-        unless (Proc::Find::proc_exists(name => "xscreensaver")) {
-            log_trace "xscreensaver process doesn't exist";
-            last;
-        }
-        log_trace "xscreensaver process exists";
-        log_trace "Concluding screensaver is xscreensaver";
-        return "xscreensaver";
     }
 
     undef;
@@ -272,9 +272,9 @@ $SPEC{set_screensaver_timeout} = {
 
   modifies the line, save the file, and HUP the xscreensaver process.
 
-* gnome-screensaver
+* gnome
 
-  To set timeout for gnome-screensaver, the program executes this command:
+  To set timeout for gnome screensaver, the program executes this command:
 
       gsettings set org.gnome.desktop.session idle-delay 300
 
@@ -351,7 +351,7 @@ sub enable_screensaver {
         if ($?) { return [500, "Failed"] } else { return [200, "OK"] }
     }
 
-    [501, "Not yet implemented"];
+    [501, "Not yet implemented except for gnome"];
 }
 
 $SPEC{disable_screensaver} = {
@@ -370,7 +370,26 @@ sub disable_screensaver {
         if ($?) { return [500, "Failed"] } else { return [200, "OK"] }
     }
 
-    [501, "Not yet implemented"];
+    [501, "Not yet implemented except for gnome"];
+}
+
+$SPEC{screensaver_is_enabled} = {
+    v => 1.1,
+    summary => 'Check whether screensaver is enabled',
+    args => {
+        %arg_screensaver,
+    },
+};
+sub screensaver_is_enabled {
+    my %args = @_;
+    my $screensaver = $args{screensaver} // detect_screensaver();
+
+    if ($screensaver eq 'gnome') {
+        my $read = readpipe "gsettings", "get", "org.gnome.desktop.lockdown", "disable-lock-screen";
+        if ($?) { return [500, "Failed"] } else { return [200, "OK", $read =~ /false/ ? 1 : $read =~ /true/ ? 0 : undef] }
+    }
+
+    [501, "Not yet implemented except for gnome"];
 }
 
 $SPEC{activate_screensaver} = {
@@ -568,7 +587,7 @@ Screensaver::Any - Common interface to screensaver/screenlocker functions
 
 =head1 VERSION
 
-This document describes version 0.004 of Screensaver::Any (from Perl distribution Screensaver-Any), released on 2018-02-28.
+This document describes version 0.007 of Screensaver::Any (from Perl distribution Screensaver-Any), released on 2019-09-04.
 
 =head1 DESCRIPTION
 
@@ -595,7 +614,7 @@ command like C<< dbus-send --type=method_call --dest=org.gnome.ScreenSaver
 
 Usage:
 
- activate_screensaver(%args) -> [status, msg, result, meta]
+ activate_screensaver(%args) -> [status, msg, payload, meta]
 
 Activate screensaver immediately and lock screen.
 
@@ -618,18 +637,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 deactivate_screensaver
 
 Usage:
 
- deactivate_screensaver(%args) -> [status, msg, result, meta]
+ deactivate_screensaver(%args) -> [status, msg, payload, meta]
 
 Deactivate screensaver and unblank the screen.
 
@@ -661,11 +681,12 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 detect_screensaver
@@ -687,11 +708,12 @@ No arguments.
 Return value:  (str)
 
 
+
 =head2 disable_screensaver
 
 Usage:
 
- disable_screensaver(%args) -> [status, msg, result, meta]
+ disable_screensaver(%args) -> [status, msg, payload, meta]
 
 Disable screensaver so screen will not go blank or lock after being idle.
 
@@ -714,18 +736,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 enable_screensaver
 
 Usage:
 
- enable_screensaver(%args) -> [status, msg, result, meta]
+ enable_screensaver(%args) -> [status, msg, payload, meta]
 
 Enable screensaver that has been previously disabled.
 
@@ -748,18 +771,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 get_screensaver_timeout
 
 Usage:
 
- get_screensaver_timeout(%args) -> [status, msg, result, meta]
+ get_screensaver_timeout(%args) -> [status, msg, payload, meta]
 
 Get screensaver idle timeout, in number of seconds.
 
@@ -782,18 +806,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value: Timeout value, in seconds (float)
 
 
+
 =head2 prevent_screensaver_activated
 
 Usage:
 
- prevent_screensaver_activated() -> [status, msg, result, meta]
+ prevent_screensaver_activated() -> [status, msg, payload, meta]
 
 Prevent screensaver from being activated by resetting idle timer.
 
@@ -817,18 +842,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 screensaver_is_active
 
 Usage:
 
- screensaver_is_active(%args) -> [status, msg, result, meta]
+ screensaver_is_active(%args) -> [status, msg, payload, meta]
 
 Check if screensaver is being activated.
 
@@ -851,18 +877,54 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
+=head2 screensaver_is_enabled
+
+Usage:
+
+ screensaver_is_enabled(%args) -> [status, msg, payload, meta]
+
+Check whether screensaver is enabled.
+
+This function is not exported by default, but exportable.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<screensaver> => I<str>
+
+Explicitly set screensaver program to use.
+
+The default, when left undef, is to detect what screensaver is running,
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
 =head2 set_screensaver_timeout
 
 Usage:
 
- set_screensaver_timeout(%args) -> [status, msg, result, meta]
+ set_screensaver_timeout(%args) -> [status, msg, payload, meta]
 
 Set screensaver idle timeout.
 
@@ -887,9 +949,9 @@ C<~/.xscreensaver>:
 
 modifies the line, save the file, and HUP the xscreensaver process.
 
-=item * gnome-screensaver
+=item * gnome
 
-To set timeout for gnome-screensaver, the program executes this command:
+To set timeout for gnome screensaver, the program executes this command:
 
   gsettings set org.gnome.desktop.session idle-delay 300
 
@@ -931,7 +993,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -959,7 +1021,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

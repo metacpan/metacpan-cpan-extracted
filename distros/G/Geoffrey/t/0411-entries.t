@@ -43,8 +43,8 @@ is(
 );
 
 is(
-    $object->drop( '"user"', [ { column => 'name', operator => '=', value => q~'test'~, }, ], 1 ),
-    q~DELETE FROM "user" WHERE ( name = 'test' )~,
+    $object->drop( { table => '"user"', conditions => { name => q~'test'~ } } ),
+    q~DELETE FROM "user" WHERE ( name = ? )~,
     'Delete entry test'
 );
 

@@ -609,10 +609,10 @@ $printthis
           foreach my $retrievedatum ( @{ $retrievedata{$counttool} } )
           {
             #say $tee " IN NEWRETRIEVE: \$retrievedatum: " . dump( $retrievedatum ) ;
-            my $reportdata_ref_ref = $reportdata{$counttool}->[$counttheme]; say $tee "\$reportdata_ref_ref : " . dump( $reportdata_ref_ref ) ;
-            my @retrievedatarefs = @{$retrievedatum}; say $tee "\@retrievedatarefs : ". dump( @retrievedatarefs );
-            my $simtitle = $simtitles{$counttool}->[ $counttheme ][0]; say $tee "\$simtitle : $simtitle .";
-            my @sims = @{ $simtitles{$counttool}->[ $counttheme ] }[1..4]; say $tee "\@sims : ". dump( @sims );
+            my $reportdata_ref_ref = $reportdata{$counttool}->[$counttheme]; #say $tee "\$reportdata_ref_ref : " . dump( $reportdata_ref_ref ) ;
+            my @retrievedatarefs = @{$retrievedatum}; #say $tee "\@retrievedatarefs : ". dump( @retrievedatarefs );
+            my $simtitle = $simtitles{$counttool}->[ $counttheme ][0]; #say $tee "\$simtitle : $simtitle .";
+            my @sims = @{ $simtitles{$counttool}->[ $counttheme ] }[1..4]; #say $tee "\@sims : ". dump( @sims );
 
             #my $resfile = $resfiles[ $counttheme ]; ################ TURNING THIS OFF IS PROVISIONAL!!!
             #say $tee "IN NEWRETRIEVE \$resfile : $resfile .";
@@ -813,7 +813,7 @@ $printthis
                 open( RETBLOCK, ">>$retblock"); # or die;
 
                 my $reportdata_ref = $reportdata_ref_ref->[$countreport];
-                @repdata = @$reportdata_ref;  say $tee "IN NEWREPORT \@repdata : ". dump( @repdata );
+                @repdata = @$reportdata_ref;  #say $tee "IN NEWREPORT \@repdata : ". dump( @repdata );
                 @retcases = uniq( @retcases );
                 my $retfile = $resfile;
                 if ( not ($retfile ~~ @retcases ) )

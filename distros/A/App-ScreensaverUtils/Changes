@@ -1,14 +1,25 @@
-0.004   2019-04-30 (PERLANCAR)
+0.006   2019-09-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Add utility: get-screenasver-info.
+
+
+0.005   2019-09-03  Released-By: PERLANCAR; Urgency: medium
+
+	- Add utility: prevent-screensaver-activated-until-interrupted
+	  (with shorter aliases: pause-screensaver, noss).
+
+
+0.004   2019-04-30  Released-By: PERLANCAR
 
 	- Add utility: prevent-screensaver-activated-while.
 
 
-0.003   2018-02-28 (PERLANCAR)
+0.003   2018-02-28  Released-By: PERLANCAR
 
 	- Tweak CLI's to not read config/env and enable logging.
 
 
-0.002   2017-03-31 (PERLANCAR)
+0.002   2017-03-31  Released-By: PERLANCAR
 
         - [Incompatible change] Adjust to Screensaver::Any 0.002, rename
           is-screensaver-active to screensaver-is-active.
@@ -16,6 +27,6 @@
         - Add utility: prevent-screensaver-activated.
 
 
-0.001   2017-03-30 (PERLANCAR)
+0.001   2017-03-30  Released-By: PERLANCAR
 
         - First release, supersedes App-SetScreensaverTimeout.

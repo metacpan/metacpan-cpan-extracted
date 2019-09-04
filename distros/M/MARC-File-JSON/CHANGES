@@ -1,0 +1,2 @@
+v0.004:
+  - Use encode/decode_json by default for UTF8 handling

@@ -1,0 +1,33 @@
+#!perl
+
+use strict;
+use warnings;
+
+use v5.10;
+use Cfn;
+
+my $file_name = $ARGV[0] or die "Usage: $0 cloudformation_file";
+
+my $content;
+open my $file, '<', $file_name or die "Error opening file $file_name: $!";
+$content = join '', <$file>;
+close $file;
+
+my $cfn = Cfn->from_json($content);
+
+my $region_count = { };
+
+my $num_of_resources = $cfn->ResourceCount;
+
+foreach my $resource_name ($cfn->ResourceList) {
+  my $resource = $cfn->Resource($resource_name);
+
+  foreach my $region (@{ $resource->supported_regions }) {
+    $region_count->{ $region } ++;
+  }
+}
+
+say "This cloudformation template will be able to run in:";
+foreach my $region (sort keys %$region_count) {
+  say $region if ($region_count->{ $region } == $num_of_resources);
+}

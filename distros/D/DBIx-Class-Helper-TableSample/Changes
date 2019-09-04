@@ -1,0 +1,13 @@
+Revision history for DBIx-Class-Helper-TableSample:
+
+v0.2.0    2019-08-31 21:44:36+01:00 Europe/London
+  [Documentation]
+  - Minor rewording to improve clarity.
+
+  [Enhancements]
+  - Use Ref::Util for checking reference types.
+
+  - Scalar references for fraction and repeatable are dereferenced.
+
+v0.1.0    2019-08-31 16:48:56+01:00 Europe/London
+- Initial version released.

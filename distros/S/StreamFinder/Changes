@@ -15,3 +15,12 @@ Revision history for StreamFinder
         - Fix StreamFinder.IHeartRadio now failing to grab images / icons.
         - Strip off "?autoplay=true" from StreamFinder::Youtube urls.
         - Minor doc fixes.
+1.04    NOT RELEASED
+        - Make debug option work for all stream types, and allow specifying 
+        as either "debug", "-debug", "debug => 1", or "-debug => 1" in 
+        parameter list for new()
+        (ie. my $station = new StreamFinder($url, -debug => 1);
+        - Better handle ".m3u8" streams returned by brighteon.com (Youtube).
+1.05    2019/09/03
+        - Add StreamFinder::BannedVideo (https://banned.video/) to handle 
+        their video streams (which youtube-dl doesn't currently handle).

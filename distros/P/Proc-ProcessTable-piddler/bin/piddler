@@ -1,0 +1,264 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Proc::ProcessTable::piddler;
+
+sub version{
+        print "piddler v. 0.2.0\n";
+	}
+
+sub help{
+        print '
+
+-h        Print the help.
+--help    Print the help.
+-v        Print the version info.
+--version Print the version info.
+
+-a        Show a_inodes.
+-d        Do not dedup.
+-f        Show FIFOs.
+-m        Show memory mapped libraries of the REG type.
+-n        Do not resolve PTR addresses.
+--nc      Disable color.
+-p        Show pipes.
+-r        Show show VREG / files.
+-t        Show shared libraries.
+-u        Show unix sockets.
+';
+	}
+
+# defaults
+my $version;
+my $help;
+my $txt=0,
+my $pipe=0;
+my $unix=0;
+my $vregroot=0;
+my $dont_dedup=0;
+my $dont_resolv=0;
+my $no_color=0;
+my $a_inode=0;
+my $fifo=0;
+my $memreglib=0;
+
+# get the commandline options
+Getopt::Long::Configure ('no_ignore_case');
+Getopt::Long::Configure ('bundling');
+GetOptions(
+		   'h' => \$help,
+		   'help' => \$help,
+		   'v' => \$version,
+		   'version' => \$version,
+		   't' => \$txt,
+		   'p' => \$pipe,
+		   'u' => \$unix,
+		   'r' => \$vregroot,
+		   'd' => \$dont_dedup,
+		   'n' => \$dont_resolv,
+		   'nc' => \$no_color,
+		   'f' => \$fifo,
+		   'a' => \$a_inode,
+		   'm' => \$memreglib,
+		   );
+
+# print the version info if requested
+if ( $version ){
+	&version;
+	exit;
+}
+
+if ( $help ){
+	&version;
+	&help;
+	exit;
+}
+
+# real in the list of PIDs
+my @PIDs;
+foreach my $arg ( @ARGV ){
+	my @possibles=split(/\,/, $arg);
+
+	foreach my $pid ( @possibles ){
+		if ( $pid !~ /^[0-9]+$/ ){
+			die $pid." does not appear to be a PID.\n";
+		}
+		push( @PIDs, $pid );
+	}
+}
+
+# XOR the -t if needed
+if ( defined( $ENV{PIDDLER_txt} ) ){
+	$txt = $txt ^ $ENV{PIDDLER_txt};
+}
+# XOR the -p if needed
+if ( defined( $ENV{PIDDLER_pipe} ) ){
+	$pipe = $pipe ^ $ENV{PIDDLER_pipe};
+}
+# XOR the -u if needed
+if ( defined( $ENV{PIDDLER_pipe} ) ){
+	$unix = $unix ^ $ENV{PIDDLER_unix};
+}
+# XOR the -r if needed
+if ( defined( $ENV{PIDDLER_vregroot} ) ){
+	$vregroot = $vregroot ^ $ENV{PIDDLER_vregroot};
+}
+# XOR the -m if needed
+if ( defined( $ENV{PIDDLER_memreglib} ) ){
+	$memreglib = $memreglib ^ $ENV{PIDDLER_memreglib};
+}
+# XOR the -a if needed
+if ( defined( $ENV{PIDDLER_a_inode} ) ){
+	$a_inode = $a_inode ^ $ENV{PIDDLER_a_inode};
+}
+# XOR the -f if needed
+if ( defined( $ENV{PIDDLER_fifo} ) ){
+	$fifo = $fifo ^ $ENV{PIDDLER_fifo};
+}
+# XOR the -d if needed
+if ( defined( $ENV{PIDDLER_dont_dedup} ) ){
+	$dont_dedup = $dont_dedup ^ $ENV{PIDDLER_dont_dedup};
+}
+# XOR the -n if needed
+if ( defined( $ENV{PIDDLER_dont_resolv} ) ){
+	$dont_resolv = $dont_resolv ^ $ENV{PIDDLER_dont_resolv};
+}
+# same for the no color
+if ( defined( $ENV{NO_COLOR} ) ){
+        $no_color = $no_color ^ 1;
+}
+# disable the color if requested
+if ( $no_color ){
+        $ENV{ANSI_COLORS_DISABLED}=1;
+}
+
+
+my $ppp=Proc::ProcessTable::piddler->new(
+										 {
+										  txt=>$txt,
+										  unix=>$unix,
+										  pipe=>$pipe,
+										  a_inode=>$a_inode,
+										  fifo=>$fifo,
+										  vregroot=>$vregroot,
+										  dont_dedup=>$dont_dedup,
+										  dont_resolv=>$dont_resolv,
+										  memreglib=>$memreglib,
+										  }
+										 );
+
+print $ppp->run( \@PIDs );
+exit 0;
+
+=head1 NAME
+
+piddler - Display all process table, open files, and network connections for a PID.
+
+=head1 SYNOPSIS
+
+piddler [B<-a>] [B<-d>] [B<-f>] [B<-m>] [B<-n>] [B<-p>] [B<-r>] [B<-r>] [B<-t>] [B<-u>]
+
+=head1 FLAGS
+
+=head2 -a
+
+Show a_inodes.
+
+=head2 -d
+
+Do not dedup.
+
+=head2 -f
+
+Show FIFOs.
+
+=head2 -m
+
+Show memory mapped libraries of the REG type.
+
+=head2 -n
+
+Do not resolve PTR addresses
+
+=head2 --nc
+
+Disable color..
+
+=head2 -p
+
+Show pipes.
+
+=head2 -r
+
+Show show VREG / files.
+
+=head2 -t
+
+Show shared libraries.
+
+=head2 -u
+
+Show unix sockets.
+
+=head1 ENVIROMENTAL VARIABLES
+
+These are used for XORing the corresponding
+flags.
+
+=head2 NO_COLOR
+
+If set to 1, color will be disabled.
+
+=head2 PIDDLER_a_inode
+
+If set to 1, a_inode types will be shown.
+
+=head2 PIDDLER_fifo
+
+If set to 1, FIFOs will not be shown.
+
+=head2 PIDDLER_memreglib
+
+If set to 1, memory mapped libraries with the type REG will be shown.
+
+=head2 PIDDLER_txt
+
+If set to 1, libraries with the TXT type will not be shown.
+
+=head2 PIDDLER_pipe
+
+If set to 1, pipes will not be shown.
+
+=head2 PIDDLER_unix
+
+If set to 1, unix socket will not be shown.
+
+=head2 PIDDLER_vregroot
+
+If set to 1, VREG / will not be shown.
+
+=head2 PIDDLER_dont_dedup
+
+If set to 1, duplicate file handles are removed.
+
+=head2 PIDDLER_dont_resolv
+
+If set to 1, PTR addresses will not be resolved for
+network connections.
+
+=head1 FILE HANDLE DEDUPING
+
+By default it checks if file handles are open in the same
+mode more than once. If it finds one of these + is appended
+to the value in the FD column.
+
+The following are also RW filehandles.
+
+   u
+   uw
+   ur
+
+=cut
+

@@ -6,6 +6,7 @@ LICENSE
 META.json
 README.md
 cpanfile
+example/test.pl
 lib/Telemetry/Any.pm
 minil.toml
 t/00_compile.t

@@ -4,7 +4,7 @@ use utf8;
 use strict;
 use warnings;
 
-$Geoffrey::Action::Entry::VERSION = '0.000201';
+$Geoffrey::Action::Entry::VERSION = '0.000204';
 
 use parent 'Geoffrey::Role::Action';
 
@@ -54,21 +54,21 @@ sub alter {
 }
 
 sub drop {
-    my ( $self, $s_table_name, $ar_where_and ) = @_;
-    if ( !$s_table_name ) {
+    my ( $self, $hr_params ) = @_;
+    if ( !$hr_params->{table} ) {
         require Geoffrey::Exception::RequiredValue;
         Geoffrey::Exception::RequiredValue::throw_table_name( __PACKAGE__ . '::drop' );
     }
-    if ( !$ar_where_and ) {
+    if ( !$hr_params->{conditions} ) {
         require Geoffrey::Exception::RequiredValue;
         Geoffrey::Exception::RequiredValue::throw_where_clause( __PACKAGE__ . '::drop' );
     }
-    return $self->do( qq~DELETE FROM $s_table_name WHERE ( ~ . _s_where_clause($ar_where_and) . ' )' );
-}
 
-sub _s_where_clause {
-    my ($ar_where_and) = @_;
-    return ( join ' AND ', map { join q/ /, ( $_->{column}, $_->{operator}, $_->{value} ) } @{$ar_where_and} );
+    my ( $s_stmt, @a_bindings ) = $self->_get_sql_abstract->delete(
+        ( $hr_params->{schema} ? $hr_params->{schema} . q/./ : q// ) . $hr_params->{table},
+        $hr_params->{conditions},
+    );
+    return $self->do_prepared( $s_stmt, \@a_bindings );
 }
 
 1;
@@ -81,7 +81,7 @@ Geoffrey::Action::Entry - Action to insert change or delete entries from tables
 
 =head1 VERSION
 
-Version 0.000201
+Version 0.000204
 
 =head1 DESCRIPTION
 
@@ -92,8 +92,6 @@ Version 0.000201
 =head2 add
 
 Insert entry into table
-
-=head2 _s_where_clause
 
 =head2 drop
 

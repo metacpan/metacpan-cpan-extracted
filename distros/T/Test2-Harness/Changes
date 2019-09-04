@@ -1,3 +1,15 @@
+0.001093  2019-09-03 13:23:04-07:00 America/Los_Angeles
+
+    - Add branch info to git data
+
+0.001092  2019-09-03 10:32:46-07:00 America/Los_Angeles
+
+    - Minor tweaks to SysInfo and Git plugins
+
+0.001091  2019-08-30 14:03:19-07:00 America/Los_Angeles
+
+    - Add Yath::Plugin::SysInfo
+
 0.001090  2019-08-30 10:22:23-07:00 America/Los_Angeles
 
     - Allow specifying run-fields as JSON

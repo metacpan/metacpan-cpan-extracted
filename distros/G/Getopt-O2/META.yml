@@ -1,0 +1,31 @@
+---
+abstract: 'Command line processing with extensive usage generation, object oriented'
+author:
+  - 'Oliver Schieche <schiecheo@cpan.org>'
+build_requires:
+  Capture::Tiny: '0'
+  Module::Build: '0.30'
+  Test::MockObject::Extends: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.30'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Getopt-O2
+provides:
+  Getopt::O2:
+    file: lib/Getopt/O2.pm
+    version: v1.0.20
+  Getopt::O2::Rule:
+    file: lib/Getopt/O2.pm
+requires:
+  Readonly: '0'
+  perl: v5.10.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: v1.0.20
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

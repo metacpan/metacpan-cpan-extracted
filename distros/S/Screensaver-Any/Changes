@@ -1,14 +1,30 @@
-0.004   2018-02-28 (PERLANCAR)
+0.007   2019-09-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Export %arg_screensaver, tweaks.
+
+
+0.006   2019-09-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Add function: screensaver_is_enabled.
+
+
+0.005   2019-09-03  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Detect xscreensaver first for cases where a user uses KDE
+	  plasma desktop but xscreensaver (like me personally).
+
+
+0.004   2018-02-28  Released-By: PERLANCAR
 
 	- Check ~/.config/kscreenlockerrc for kde.
 
 
-0.003   2018-02-28 (PERLANCAR)
+0.003   2018-02-28  Released-By: PERLANCAR
 
 	- Add logging.
 
 
-0.002   2017-03-31 (PERLANCAR)
+0.002   2017-03-31  Released-By: PERLANCAR
 
         - [Incompatible change] Rename function is_screensaver_active to
           screensaver_is_active.
@@ -18,6 +34,6 @@
         - Fixes/tweaks.
 
 
-0.001   2017-03-30 (PERLANCAR)
+0.001   2017-03-30  Released-By: PERLANCAR
 
         - First release.

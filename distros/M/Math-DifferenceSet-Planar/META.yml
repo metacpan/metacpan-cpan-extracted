@@ -8,7 +8,8 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '7.06'
   File::ShareDir::Install: '0'
-dynamic_config: 1
+  File::Spec: '0'
+dynamic_config: 0
 generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
@@ -22,16 +23,16 @@ no_index:
 provides:
   Math::DifferenceSet::Planar:
     file: lib/Math/DifferenceSet/Planar.pm
-    version: '0.005'
+    version: '0.006'
   Math::DifferenceSet::Planar::Data:
     file: lib/Math/DifferenceSet/Planar/Data.pm
-    version: '0.005'
+    version: '0.006'
   Math::DifferenceSet::Planar::Schema:
     file: lib/Math/DifferenceSet/Planar/Schema.pm
-    version: '0.005'
+    version: '0.006'
   Math::DifferenceSet::Planar::Schema::Result::DifferenceSet:
     file: lib/Math/DifferenceSet/Planar/Schema/Result/DifferenceSet.pm
-    version: '0.005'
+    version: '0.006'
 requires:
   Carp: '0'
   DBD::SQLite: '1.48'
@@ -40,5 +41,7 @@ requires:
   File::Spec: '0'
   Math::Prime::Util: '0.59'
   perl: '5.010'
-version: '0.005'
+resources:
+  homepage: https://vera.in-ulm.de/planar-diffsets/
+version: '0.006'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

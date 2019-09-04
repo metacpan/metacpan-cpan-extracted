@@ -17,5 +17,7 @@ t/00-compile.t
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/basic.t
+t/corpus/foo/a.y
 t/corpus/foo/bar/baz/a.x
+t/is_globby.t
 xt/release/unused-vars.t

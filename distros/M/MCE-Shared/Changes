@@ -1,6 +1,23 @@
 
 Revision history for Perl module MCE::Shared.
 
+1.848 Tue Sep 03 23:30:00 EST 2019
+
+  * Fixed broken examples in the MCE::Shared documentation.
+
+  * Bumped MCE dependency to 1.848.
+
+1.847 Mon Sep 02 23:30:00 EST 2019
+
+  * Obsolete RedHat MCE-Shared-1.841-Sereal-deps.patch file. This patch file
+    is no longer needed and finally resolved with this release.
+
+  * Updated PDL examples in the documentation including Cookbook on GitHub.
+    Resolved segmentation fault in global cleanup for shared PDL objects.
+    Added missing pdl_random class method to MCE::Shared. 
+
+  * Bumped MCE dependency to 1.847.
+
 1.846 Mon Aug 26 21:30:00 EST 2019
 
   * Fixed code tags in documentation. Thank you, Mohammad S Anwar.
@@ -112,7 +129,7 @@ Revision history for Perl module MCE::Shared.
   * Added max_workers method to MCE::Hobo.
   * Improved Queue await and dequeue performance on the Windows platform.
 
-  * Added chameneos-redux parallel demonstrations on Github:
+  * Added chameneos-redux parallel demonstrations on GitHub:
     https://github.com/marioroy/mce-examples/tree/master/chameneos
 
   * Bumped MCE dependency to 1.834.
@@ -189,7 +206,7 @@ Revision history for Perl module MCE::Shared.
 
   * Improved auto-dereferencing for shared arrays, hashes, and scalars.
   * Improved open method for non-shared file-handles in MCE::Shared::Handle.
-  * Improved shared-PDL support. Updated MCE::Cookbook on Github.
+  * Improved shared-PDL support. Updated MCE::Cookbook on GitHub.
   * Improved signal handling, including nested parallel-sessions.
   * Improved running MCE::Hobo and MCE::Shared with PDL.
   * Improved taint mode via perl -T.
@@ -323,7 +340,7 @@ Revision history for Perl module MCE::Shared.
   * Fixed broken SIG{'PIPE'} handling: e.g. script.pl | head.
   * Improved reliability when running MCE::Shared with threads.
 
-  * Added parallel Net::Pcap and Ping demonstrations on Github:
+  * Added parallel Net::Pcap and Ping demonstrations on GitHub:
     https://github.com/marioroy/mce-examples/tree/master/network
 
   * Default to ':raw' for BINMODE in MCE::Shared::Handle.
@@ -403,7 +420,7 @@ Revision history for Perl module MCE::Shared.
   * Added hobo_timeout option to MCE::Hobo for timeout capability.
     Also, imply posix_exit => 1 when Gearman::XS is present.
 
-  * Added MCE::Hobo + Gearman demonstrations (xs and non-xs) on Github:
+  * Added MCE::Hobo + Gearman demonstrations (xs and non-xs) on GitHub:
     https://github.com/marioroy/mce-examples/tree/master/gearman_xs
     https://github.com/marioroy/mce-examples/tree/master/gearman
 
@@ -574,7 +591,7 @@ Revision history for Perl module MCE::Shared.
   [ENHANCEMENTS]
 
   * Enabled freeze callbacks for Sereal.
-  * Switched bug tracking to Github.
+  * Switched bug tracking to GitHub.
   * Tweaked test scripts.
 
 1.001 Sat Mar 19 23:00:00 EST 2016

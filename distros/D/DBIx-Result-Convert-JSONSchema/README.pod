@@ -1,5 +1,6 @@
 =head1 NAME
-    DBIx::Result::Convert::JSONSchema - Convert DBIx result schema to JSON schema
+
+DBIx::Result::Convert::JSONSchema - Convert DBIx result schema to JSON schema
 
 =begin html
 
@@ -10,7 +11,7 @@
 
 =head1 VERSION
 
-    0.04
+    0.05
 
 =head1 SYNOPSIS
 
@@ -40,6 +41,7 @@ Returns somewhat equivalent JSON schema based on DBIx result source name.
         decimals_to_pattern             => 1,
         has_schema_property_description => 1,
         allow_additional_properties     => 0,
+        ignore_property_defaults        => 1,
         overwrite_schema_property_keys  => {
             name    => 'cat',
             address => 'dog',
@@ -90,9 +92,22 @@ Generate schema description for fields e.g. 'Optional numeric type value for fie
 
 B<Default>: 0
 
+=item * ignore_property_defaults
+
+Do not set schema B<default> property field based on default in DBIx schema
+
+B<Default>: 0
+
 =item * allow_additional_properties
 
 Define if the schema accepts additional keys in given payload.
+
+B<Default>: 0
+
+=item * add_property_minimum_value
+
+If field does not have format type add minimum values for number and string types based on DB field type.
+This might not make sense in most cases as the minimum is either 0 or the lower bound if number is signed.
 
 B<Default>: 0
 

@@ -48,7 +48,7 @@
          "web" : "https://github.com/avkhozov/Minion-Backend-MongoDB"
       }
    },
-   "version" : "1.01",
+   "version" : "1.02",
    "x_generated_by_perl" : "v5.24.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
 }

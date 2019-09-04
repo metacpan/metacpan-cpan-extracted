@@ -2,7 +2,7 @@ package DBIx::Result::Convert::JSONSchema::Default::MySQL;
 
 =head1 NAME
 
-    DBIx::Result::Convert::JSONSchema::Default::MySQL - Mapping of MySQL field type lengths
+DBIx::Result::Convert::JSONSchema::Default::MySQL - Mapping of MySQL field type lengths
 
 =head1 VERSION
 

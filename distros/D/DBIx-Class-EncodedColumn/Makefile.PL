@@ -1,5 +1,6 @@
 #! /usr/bin/perl -w
 
+use lib '.';
 # Load the Module::Install bundled in ./inc/
 use inc::Module::Install;
 use Module::Install::ReadmeFromPod;
@@ -19,6 +20,7 @@ requires 'Sub::Name' => '0.04';
 requires 'Encode';
 
 #build dependencies
+test_requires 'Test::Exception';
 test_requires 'Test::More';
 test_requires 'DBD::SQLite';
 test_requires 'Dir::Self';

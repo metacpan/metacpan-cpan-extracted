@@ -2,7 +2,6 @@
 
 use strict;
 use warnings;
-use FindBin;
 use Math::DifferenceSet::Planar;
 
 use constant PDS => Math::DifferenceSet::Planar::;
@@ -24,7 +23,7 @@ while (my $s = $it->()) {
 __END__
 =head1 NAME
 
-pds_planes - enumerate planar difference sets of a given order
+pds_planes - enumerate planar difference set planes of a given order
 
 =head1 SYNOPSIS
 

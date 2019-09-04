@@ -56,7 +56,7 @@ Note on version conventions:
         problem, let me know.
 
 1.00 Sun Mar 30 2003
-	- first release version
+        - first release version
         - first CPAN release
 
         - Added support for any DateTime::Calendar module that subscibes
@@ -78,43 +78,43 @@ Note on version conventions:
         * No functionality changed. See note 'Minor decimal number releases'
 
 1.0100 Sat Jun 28, 2003 +1000
-	- Changed versioning to only use one decimal point. Stops poor CPAN
-	  from getting confused!
-	- Altered closest() to compare delta_days rather than just the two
-	  DateTime::Duration objects. Not sure why I had to do this but it
-	  fixed the problem!
-	* This release fixes a bug and should be installed for correct 
-	  handling of closest().
+        - Changed versioning to only use one decimal point. Stops poor CPAN
+          from getting confused!
+        - Altered closest() to compare delta_days rather than just the two
+          DateTime::Duration objects. Not sure why I had to do this but it
+          fixed the problem!
+        * This release fixes a bug and should be installed for correct 
+          handling of closest().
 
 1.02 Sun Aug 17, 2003 +1000
-	- as_set() now works. Previously it called a non-existant method in 
-	  DateTime::Set (new()) where it should have called ->from_datetimes().
-	  This wasn't previously picked up by the tests because the t/05sets
-	  test was actually an exact duplicate of 04lists.t! This issue was
-	  discovered by Ron Hill.
-	  
+        - as_set() now works. Previously it called a non-existant method in 
+          DateTime::Set (new()) where it should have called ->from_datetimes().
+          This wasn't previously picked up by the tests because the t/05sets
+          test was actually an exact duplicate of 04lists.t! This issue was
+          discovered by Ron Hill.
+          
 1.03 Sat Sep 20, 2003 +1000
-	- as_set() now works like a call to DateTime::Set and can accept all
-	  arguments that a DateTime::Set->from_recurrence can take.
-	  Based on idea and patch from Flavio S. Glock
-	- as_span and as_point now work to return spans rather than the old
-	  points. This means you can get a 24 hour span for a day rather than
-	  just midnight on that day.
-	- Similarly, the constructor has an 'as' attribute to set the preference
-	  at construction.
-	- Fixed (again) comparison of durations for determining 'closest'. We now
-	  get one duration and add it to the other datetime, comparing it to now:
-	 	 Duration = NextEaster - Now;
-	 	 Return NextEaster if PreviousEaster+Duration < Now
-	 	 otherwise Return PreviousEaster
-	  Error first noticed by automated CPAN tester.
+        - as_set() now works like a call to DateTime::Set and can accept all
+          arguments that a DateTime::Set->from_recurrence can take.
+          Based on idea and patch from Flavio S. Glock
+        - as_span and as_point now work to return spans rather than the old
+          points. This means you can get a 24 hour span for a day rather than
+          just midnight on that day.
+        - Similarly, the constructor has an 'as' attribute to set the preference
+          at construction.
+        - Fixed (again) comparison of durations for determining 'closest'. We now
+          get one duration and add it to the other datetime, comparing it to now:
+                 Duration = NextEaster - Now;
+                 Return NextEaster if PreviousEaster+Duration < Now
+                 otherwise Return PreviousEaster
+          Error first noticed by automated CPAN tester.
 
 1.04 Sun Apr 04, 2004 +1000
-	- fixed incompatibility with newest versions of DateTime::Set (which
-	  changed the way DateTime::Set->from_recurrence worked with infinite
-	  values)
-	  Patch provided by Ronald Hill.
-		 
+        - fixed incompatibility with newest versions of DateTime::Set (which
+          changed the way DateTime::Set->from_recurrence worked with infinite
+          values)
+          Patch provided by Ronald Hill.
+
 1.05 Wed 2015-01-21
         - New co-maintainer: Jean Forget
         - Fixed POD issues declared in tickets 7598, 51892, 79041 and 101238.
@@ -124,3 +124,8 @@ Note on version conventions:
         - Improve code coverage.
         - Add a directory "eg" with an example script.
 
+1.06 Mon 2019-09-02
+        - Conversion to UTF-8 (especially for the end-of-module value)
+        - Allow building a list of spans or a set of spans
+        - Documentation fixes
+        - Kwalitee issues: META.yml should include a "provide" entry and a "resource" entry

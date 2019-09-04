@@ -1,5 +1,9 @@
 Revision history for Perl extension Getopt-EX
 
+v1.15.1 2019-09-03T23:07:53Z
+
+    - Function is executed under v5.14 context.
+
 v1.15.0 2019-02-22T00:14:12Z
 
     - Update 24bit to 256 colors mapping strategy.

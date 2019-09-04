@@ -49,6 +49,7 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
+            "Test::Exception" : "0",
             "Test::More" : "0",
             "perl" : "5.006",
             "strict" : "0",
@@ -58,16 +59,14 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "mailto" : "bug-Music-ScaleNote@rt.cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Music-ScaleNote"
-      },
+      "homepage" : "https://github.com/ology/Music-ScaleNote",
       "repository" : {
          "type" : "git",
+         "url" : "https://github.com/ology/Music-ScaleNote.git",
          "web" : "https://github.com/ology/Music-ScaleNote"
       }
    },
-   "version" : "0.0501",
+   "version" : "0.0507",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.027007"
@@ -283,9 +282,9 @@
             "version" : "6.012"
          },
          {
-            "class" : "Dist::Zilla::Plugin::MetaResources",
-            "name" : "MetaResources",
-            "version" : "6.012"
+            "class" : "Dist::Zilla::Plugin::GithubMeta",
+            "name" : "GithubMeta",
+            "version" : "0.58"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::PodSpelling",
@@ -297,6 +296,7 @@
                   ],
                   "spell_cmd" : "aspell list",
                   "stopwords" : [
+                     "isobase",
                      "pentatonic"
                   ],
                   "wordlist" : "Pod::Wordlist"
@@ -463,6 +463,6 @@
    },
    "x_authority" : "cpan:GENE",
    "x_generated_by_perl" : "v5.27.7",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.10"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
 }
 

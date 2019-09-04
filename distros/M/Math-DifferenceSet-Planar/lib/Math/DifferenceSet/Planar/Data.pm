@@ -12,25 +12,27 @@ use Math::DifferenceSet::Planar::Schema;
 
 # .......... index ..........   # .......... value ..........
 use constant _F_DATA     => 0;  # result set object
-use constant _NFIELDS    => 1;
+use constant _F_PATH     => 1;  # result set object
+use constant _NFIELDS    => 2;
 
-our $VERSION  = '0.005';
+our $VERSION  = '0.006';
 our @CARP_NOT = qw(Math::DifferenceSet::Planar);
 
-my $DIST_DIR = dist_dir('Math-DifferenceSet-Planar');
+our $DATABASE_DIR = dist_dir('Math-DifferenceSet-Planar');
 
 # ----- private accessor methods -----
 
 sub _data { $_[0]->[_F_DATA] }
+sub _path { $_[0]->[_F_PATH] }
 
 # ----- class methods -----
 
 sub list_databases {
-    opendir my $dh, $DIST_DIR or return (); 
+    opendir my $dh, $DATABASE_DIR or return (); 
     my @files =
         map {
             my $is_standard = /^pds[_\W]/i? 1: 0;
-            my $path = File::Spec->rel2abs($_, $DIST_DIR);
+            my $path = File::Spec->rel2abs($_, $DATABASE_DIR);
             (-f $path)? [$_, $is_standard, -s _]: ()
         }
         grep { /\.db\z/i } readdir $dh;
@@ -47,8 +49,8 @@ sub list_databases {
 sub new {
     my $class = shift;
     my ($filename) = @_? @_: $class->list_databases
-        or croak "bad database: empty share directory: $DIST_DIR";
-    my $path = File::Spec->rel2abs($filename, $DIST_DIR);
+        or croak "bad database: empty share directory: $DATABASE_DIR";
+    my $path = File::Spec->rel2abs($filename, $DATABASE_DIR);
     -e $path or croak "bad database: file does not exist: $path";
     my $schema =
         Math::DifferenceSet::Planar::Schema->connect(
@@ -58,7 +60,7 @@ sub new {
     my $data = $schema->resultset('DifferenceSet');
     my $count = eval { $data->search->count };
     croak "bad database: query failed: $@" if !defined $count;
-    return bless [$data], $class;
+    return bless [$data, $path], $class;
 }
 
 # ----- object methods -----
@@ -87,8 +89,28 @@ sub iterate {
     return sub { $results->next };
 }
 
+sub iterate_properties {
+    my ($this, $min, $max) = @_;
+    my @sel = ();
+    my $dir = 'ASC';
+    if (defined($min) && defined($max) && $min > $max) {
+        ($min, $max, $dir) = ($max, $min, 'DESC');
+    }
+    push @sel, '>=' => $min if defined $min;
+    push @sel, '<=' => $max if defined $max;
+    my $results = $this->_data->search(
+        @sel? { order_ => { @sel } }: undef,
+        {
+            columns  => [qw(order_ base exponent modulus n_planes)],
+            order_by => "order_ $dir",
+        }
+    );
+    return sub { $results->next };
+}
+
 sub max_order { $_[0]->_data->get_column('order_')->max }
 sub count     { $_[0]->_data->search->count }
+sub path      { $_[0]->_path }
 
 1;
 
@@ -102,7 +124,7 @@ Math::DifferenceSet::Planar::Data - storage of sample planar difference sets
 
 =head1 VERSION
 
-This documentation refers to version 0.005 of
+This documentation refers to version 0.006 of
 Math::DifferenceSet::Planar::Data.
 
 =head1 SYNOPSIS
@@ -114,8 +136,8 @@ Math::DifferenceSet::Planar::Data.
   $data = Math::DifferenceSet::Planar->new('pds.db');
   $data = Math::DifferenceSet::Planar->new($full_path);
 
-  @databases = Math::DifferenceSet::Planar->list_databases;
-  $data = Math::DifferenceSet::Planar->new($databases[0]);
+  @databases = Math::DifferenceSet::Planar::Data->list_databases;
+  $data = Math::DifferenceSet::Planar::Data->new($databases[0]);
 
   $pds = $data->get(9);
 
@@ -129,6 +151,7 @@ Math::DifferenceSet::Planar::Data.
 
   $max   = $data->max_order;
   $count = $data->count;
+  $path  = $data->path;
 
 =head1 DESCRIPTION
 
@@ -137,13 +160,19 @@ database of sample planar difference sets, hiding its implementation
 details.  It is used internally by Math::DifferenceSet::Planar to populate
 difference set objects.
 
-=head1 CLASS VARIABLE
+=head1 CLASS VARIABLES
 
 =over 4
 
 =item I<$VERSION>
 
 C<$VERSION> is the version number of the module.
+
+=item I<$DATABASE_DIR>
+
+C<$DATABASE_DIR> is the directory containing databases for this module.
+It is initialized automatically to refer to the location where its data
+has been installed.
 
 =back
 
@@ -197,6 +226,14 @@ defined, it is taken as plus infinity. If C<$lo> is greater than C<$hi>,
 they are swapped and the sequence is reversed, so that it is ordered by
 descending size.
 
+=item I<iterate_properties>
+
+If C<$data> is a Math::DifferenceSet::Planar::Data object,
+C<$data-E<gt>iterate_properties(@args)> behaves exactly like
+C<$data-E<gt>iterate(@args)>, except that the result records have no
+deltas component.  Using this method to browse difference set properties
+is more efficient than fetching complete records.
+
 =item I<max_order>
 
 If C<$data> is a Math::DifferenceSet::Planar::Data object,
@@ -208,6 +245,11 @@ difference set in the database.
 If C<$data> is a Math::DifferenceSet::Planar::Data object,
 C<$data-E<gt>count> returns the number of sample planar difference sets
 in the database.
+
+=item I<path>
+
+If C<$data> is a Math::DifferenceSet::Planar::Data object,
+C<$data-E<gt>path> returns the full path name of the database.
 
 =back
 

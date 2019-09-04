@@ -1,0 +1,217 @@
+[1mNAME[0m
+    IO::IPFinder - The official Perl library for IPFinder ipfinder.io.
+    https://github.com/ipfinder-io/ip-finder-perl.
+
+[1mSYNOPSIS
+The official Perl client library for the [IPFinder.io](https://ipfinder.io)[0m
+  [1mWith `free` TOKEN[0m
+    usage is quite simple:
+
+        use Data::Dumper qw(Dumper);
+
+        $ipfinder = IO::IPFinder->new(); #  emty token == free
+
+        # lookup your IP address information
+        $auth = $ipfinder->Authentication();
+
+        print Dumper $auth;
+
+  [1mAuthentication[0m
+    sample: use IO::IPFinder;
+
+        $ipfinder = IO::IPFinder->new('YOUR_TOKEN_GOES_HERE');
+
+        # lookup your IP address information
+        $auth = $ipfinder->Authentication();
+
+        # lookup your IP address information
+        $auth = $ipfinder->Authentication();
+
+        print Dumper $auth;
+
+  [1mGet IP address[0m
+    sample: use IO::IPFinder;
+
+        $ipfinder = IO::IPFinder->new('YOUR_TOKEN_GOES_HERE');
+
+        # GET Get details for 1.0.0.0
+
+        $ip = $ipfinder->getAddressInfo('1.0.0.0');
+
+        print $ip->{ip};
+
+        print $ip->{country_code};
+
+  [1mGet ASN
+This API available as part of our Pro and enterprise [https://ipfinder.io/pricing](https://ipfinder.io/pricing).[0m
+    sample: use IO::IPFinder;
+
+        $ipfinder = IO::IPFinder->new('YOUR_TOKEN_GOES_HERE');
+
+        # lookup Asn information
+        $asn = $ipfinder->getAsn('AS1');
+
+        print $asn->{asn}; # AS number
+
+        print $asn->{org_name}; # Organization name
+
+  [1mFirewall
+This API available as part of our  enterprise <https://ipfinder.io/pricing/>
+formats supported are :  `apache_allow`, `apache_deny`,`nginx_allow`,`nginx_deny`, `CIDR`, `linux_iptables`, `netmask`, `inverse_netmask`, `web_config_allow `, `web_config_deny`, `cisco_acl`, `peer_guardian_2`, `network_object`, `cisco_bit_bucket`, `juniper_junos`, `microtik`
+sample:
+    use IO::IPFinder;
+    use Data::Dumper qw(Dumper);[0m
+        $ipfinder = IO::IPFinder->new('YOUR_TOKEN_GOES_HERE');
+
+        $asn = 'as36947';
+
+        # lookup Asn information
+
+        $data = $ipfinder->getFirewall($asn, 'nginx_deny');
+
+        print Dumper $data
+    =head2 Get IP Address Ranges
+    This API available as part of our  enterprise L<https://ipfinder.io/pricing/>
+    sample:
+        use IO::IPFinder;
+
+        $ipfinder = IO::IPFinder->new('YOUR_TOKEN_GOES_HERE');
+
+        # Organization name
+        $org = 'Telecom Algeria';
+
+        # lookup Organization information
+        $data = $ipfinder->getRanges($org);
+
+        print $range->{num_ranges};
+
+        print $range->{num_ipv4};
+
+        print $range->{num_ipv6};
+
+  [1mGet service status[0m
+    sample: use IO::IPFinder;
+
+        $ipfinder = IO::IPFinder->new('YOUR_TOKEN_GOES_HERE');
+
+        # lookup TOKEN information
+        $data = $ipfinder->getStatus();
+
+        print $ip->{queriesPerDay};
+
+        print $ip->{queriesLeft};
+
+        print $ip->{key_info};
+
+  [1mGet Domain IP[0m
+    sample: use IO::IPFinder;
+
+        $ipfinder = IO::IPFinder->new('YOUR_TOKEN_GOES_HERE');
+
+        #  domain name
+        $name = 'google.com';
+
+        $data = $ipfinder->getDomain($name);
+
+        print $data->{domain_status };
+
+        print $data->{ip};
+
+        print $data->{country_code};
+
+  [1mGet Domain IP history[0m
+    sample: use IO::IPFinder;
+
+        $ipfinder = IO::IPFinder->new('YOUR_TOKEN_GOES_HERE');
+
+        # domain name
+        $name = 'google.com';
+
+        $data = $ipfinder->getDomainHistory($name);
+
+        print $data->{total_domain};
+
+        print $data->{list_domain};
+    =head2 Get list Domain By ASN, Country,Ranges
+
+    sample: use IO::IPFinder;
+
+        $ipfinder = IO::IPFinder->new('YOUR_TOKEN_GOES_HERE');
+
+        # list live domain by country DZ,US,TN,FR,MA
+        $by = 'DZ';
+
+        $dby = $ipfinder->getDomainBy($by);
+
+        print $dby->{select_by}; # Returns Requested $select_by ASN,Country,Ranges
+
+        print $dby->{total_domain}; # Returns number of domain
+
+  [1mAdd proxy[0m
+    sample: use IO::IPFinder;
+
+        $ipfinder = IO::IPFinder->new('YOUR_TOKEN_GOES_HERE','https://ipfinder.yourdomain.com');
+
+[1mDESCRIPTION[0m
+    The official Perl client library for the
+    [IPFinder.io](https://ipfinder.io) get details for : - IP address details
+    (city, region, country, postal code, latitude and more ..) - ASN details
+    (Organization name, registry,domain,comany_type, and more .. ) - Firewall
+    by supported formats details (apache_allow, nginx_deny, CIDR , and more
+    ..) - IP Address Ranges by the Organization name details (list_asn,
+    list_prefixes , and more ..) - service status details (queriesPerDay,
+    queriesLeft, key_type, key_info) - Get Domain IP (asn,
+    organization,country_code ....) - Get Domain IP history (total_ip,
+    list_ip,organization,asn ....) - Get list Domain By ASN, Country,Ranges
+    (select_by , total_domain , list_domain ....)
+
+  [1mDocumentation[0m
+    *
+     official documentation
+
+     <https://ipfinder.io/docs/>
+
+[1mSUPPORT
+You can find documentation for this module with the perldoc command.
+    perldoc IO::IPFinder
+You can also look for information at:[0m
+    Sample codes under examples/ folder.
+
+    *   RT: CPAN's request tracker (report bugs here)
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=IO::IPFinder>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/IO::IPFinder>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/IO::IPFinder>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/IO::IPFinder/>
+
+    *   GitHub
+
+        <https://github.com/ipfinder-io/ip-finder-perl>
+
+[1mAUTHOR[0m
+    Mohamed Ben rebia <mohamed@ipfinder.io>
+
+[1mCOPYRIGHT AND LICENSE[0m
+    Copyright 2019 Mohamed Benrebia <mohamed@ipfinder.io>
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may
+    not use this file except in compliance with the License. You may obtain a
+    copy of the License at
+
+    <http://www.apache.org/licenses/LICENSE-2.0>
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and limitations
+    under the License.
+

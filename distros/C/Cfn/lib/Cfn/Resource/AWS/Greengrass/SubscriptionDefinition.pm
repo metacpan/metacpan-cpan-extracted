@@ -1,4 +1,4 @@
-# AWS::Greengrass::SubscriptionDefinition generated from spec 2.28.0
+# AWS::Greengrass::SubscriptionDefinition generated from spec 5.3.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Greengrass::SubscriptionDefinition',
@@ -94,6 +94,7 @@ package Cfn::Resource::Properties::AWS::Greengrass::SubscriptionDefinition {
   
   has InitialVersion => (isa => 'Cfn::Resource::Properties::AWS::Greengrass::SubscriptionDefinition::SubscriptionDefinitionVersion', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Tags => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 1;

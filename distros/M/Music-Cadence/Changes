@@ -1,5 +1,74 @@
 Revision history for Music-Cadence
 
+0.1306 2019-08-31 19:37:45
+    - Convert to midi format in the _invert_chord() function.
+
+0.1305 2019-08-31 16:17:38
+    - Fix POD.
+    - Fix SYNOPSIS and eg/synopsis.
+
+0.1304 2019-08-31 14:41:05
+    - Improve SYNOPSIS.
+    - Improve eg/synopsis.
+
+0.1303 2019-08-31 14:27:17
+    - Reorganize test cases.
+    - Fix documentation.
+    - Add print statements to eg/synopsis.
+
+0.1302 2019-08-31 12:03:50
+    - Reorganize the SYNOPSIS.
+    - Make the module SYNOPSIS an eg/ program.
+
+0.1301 2019-08-31 11:41:52
+    - Repair the evaded inversion logic.
+
+0.1300 2019-08-31 11:31:25
+    - Allow user defined inversions for the evaded cadence.
+
+0.1203 2019-08-31 09:22:15
+    - Clean-up code.
+
+0.1202 2019-08-31 00:26:11
+    - Repair evaded test case.
+    - Make an imperfect inverted cadence test case identical to evaded.
+    - Illustrate pitch set computation in the SYNOPSIS.
+
+0.1201 2019-08-30 23:13:27
+    - Add documentation for the evaded cadence.
+
+0.1200 2019-08-30 23:04:53
+    - Add the evaded cadence.
+    - Clean up code.
+    - Improve documentation.
+
+0.1104 2019-08-30 22:00:33
+    - Do *not* increment the octave on inversion substitution!
+
+0.1103 2019-08-30 21:46:35
+    - Allow inversion of the second chord of the half cadence, because ...why not?
+    - Correct the mistaken inversion octave substitution logic.
+
+0.1101 2019-08-30 19:49:33
+    - Improve eg/cadence slightly.
+
+0.1100 2019-08-30 18:09:33
+    - Enable 7th chord cadences.
+
+0.1002 2019-08-30 17:20:14
+    - Reword ABSTRACT.
+    - Add more test cases.
+    - Simplify inversion code.
+
+0.1001 2019-08-30 15:08:03
+    - Clean up code.
+
+0.1000 2019-08-30 12:59:26
+    - Allow optional inversion of the initial half cadence chord.
+
+0.0901 2019-08-30 11:41:32
+    - Fix docs.
+
 0.0900 2019-08-30 11:26:14
     - Enable imperfect inverted cadences.
     - Improve documentation again!
@@ -89,7 +158,7 @@ Revision history for Music-Cadence
     - Fix the variation of the deceptive cadence.
 
 0.0105 2019-08-11 08:12:49
-    - Fix the resolution chord of the desceptive cadence.
+    - Fix the resolution chord of the deceptive cadence.
 
 0.0104 2019-08-11 08:02:59
     - Add crucial disclaimer.

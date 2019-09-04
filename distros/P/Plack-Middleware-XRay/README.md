@@ -96,6 +96,14 @@ When response\_filter defined, call the coderef with ($env, $res, $elapsed) afte
 
 Segment data are sent to xray daemon only when the coderef returns true.
 
+## plugins
+
+When plugins defined, AWS::XRay enables these plugins.
+
+    enable "XRay"
+      name => "myApp",
+      plugins => ["AWS::XRay::Plugin::EC2"],
+
 # LICENSE
 
 Copyright (C) FUJIWARA Shunichiro.

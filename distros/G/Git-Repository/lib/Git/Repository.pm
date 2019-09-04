@@ -1,5 +1,5 @@
 package Git::Repository;
-$Git::Repository::VERSION = '1.323';
+$Git::Repository::VERSION = '1.324';
 use warnings;
 use strict;
 use 5.006;
@@ -157,7 +157,7 @@ sub new {
     croak "fatal: not a git repository: $self->{git_dir}"
         if $self->{git_dir} ne $gitdir;
 
-    # put back the ignored option
+    # put back the ignored options
     $options->{input} = $input if defined $input;
     $options->{fatal} = $fatal if defined $fatal;
 
@@ -301,7 +301,7 @@ individual Git commands may need or use.
 However, the C<GIT_DIR> and C<GIT_WORK_TREE> environment variables are
 special: if the command is run in the context of a L<Git::Repository>
 object, they will be overridden by the object's C<git_dir> and
-C<work_tree> attributes, respectively. It is however still possible to
+C<work_tree> attributes, respectively. It is still possible to
 override them if necessary, using the C<env> option.
 
 L<Git::Repository> requires at least Git 1.5.0, and is expected to support

@@ -1,0 +1,44 @@
+{
+   "abstract" : "The official Perl library for IPFinder ipfinder.io. https://github.com/ipfinder-io/ip-finder-perl.",
+   "author" : [
+      "Mohamed Ben rebia <mohamed@ipfinder.io>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "IO-IPFinder",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON" : "0",
+            "LWP::UserAgent" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.0",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

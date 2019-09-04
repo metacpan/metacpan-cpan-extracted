@@ -67,26 +67,26 @@ sub _new {
 }
 
 
-=item my $uuid = $net->get_uuid()
+=item my $uuid = $port->get_uuid()
 
 Returns a 16 byte long string containing the raw globally unique identifier
 (UUID) for the network port.
 
-=item my $uuid = $net->get_uuid_string()
+=item my $uuid = $port->get_uuid_string()
 
 Returns a printable string representation of the raw UUID, in the format
 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'.
 
-=item my $xml = $net->get_xml_description()
+=item my $xml = $port->get_xml_description()
 
 Returns an XML document containing a complete description of
 the network port's configuration
 
-=item $net->delete()
+=item $port->delete()
 
 Delete the network port from the managed network.
 
-=item my $params = $net->get_parameters($flags=0);
+=item my $params = $port->get_parameters($flags=0);
 
 Get tunable parameters associated with the network port. The C<$flags>
 parameter is currently unused and defaults to zero. The returned
@@ -125,7 +125,7 @@ The peak outbound bandwidth
 
 =back
 
-=item $net->set_parameters($params, $flags=0);
+=item $port->set_parameters($params, $flags=0);
 
 Set tunable parameters associated with the network port. The C<$flags>
 parameter is currently unused and defaults to zero. The C<$params>

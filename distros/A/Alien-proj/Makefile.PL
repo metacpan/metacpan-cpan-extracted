@@ -11,6 +11,7 @@ my %common_reqs = (
     "PkgConfig" => 0.19026,
     "Alien::Build::Plugin::Cleanse::BuildDir" => 0,
     'Sort::Versions' => 0,
+    'Alien::sqlite' => 0,
     ($^O =~ /mswin/i) ? ("Alien::MSYS" => 0) : (),
 );
 
@@ -40,10 +41,10 @@ my %WriteMakefileArgs = (
         resources => {
             repository => {
                 type => 'git',
-                url  => 'https://github.com/shawnlaffan/perl-alien-proj4',
+                url  => 'https://github.com/shawnlaffan/perl-alien-proj',
             },
             bugtracker => {
-                web => 'https://github.com/shawnlaffan/perl-alien-proj4/issues/',
+                web => 'https://github.com/shawnlaffan/perl-alien-proj/issues/',
             },
         },
     },

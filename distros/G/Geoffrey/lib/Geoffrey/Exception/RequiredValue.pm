@@ -6,132 +6,122 @@ use strict;
 use warnings;
 use Carp qw/longmess/;
 
-$Geoffrey::Exception::RequiredValue::VERSION = '0.000201';
+$Geoffrey::Exception::RequiredValue::VERSION = '0.000204';
 
 use Exception::Class 1.23 (
-    'Geoffrey::Exception::RequiredValue' => { description => q~Unidentified exception~, },
-    'Geoffrey::Exception::RequiredValue::TableName' =>
-      { description => q~No table name is given!~, },
-    'Geoffrey::Exception::RequiredValue::TriggerName' =>
-      { description => q~No trigger name is given!~, },
+    'Geoffrey::Exception::RequiredValue'              => {description => q~Unidentified exception~,},
+    'Geoffrey::Exception::RequiredValue::TableName'   => {description => q~No table name is given!~,},
+    'Geoffrey::Exception::RequiredValue::TriggerName' => {description => q~No trigger name is given!~,},
     'Geoffrey::Exception::RequiredValue::TableColumn' =>
-      { description => q~No default value set for column in table!~, },
+        {description => q~No default value set for column in table!~,},
     'Geoffrey::Exception::RequiredValue::ForeignkeyReftable' =>
-      { description => q~No reftable name is given for foreign key in table!~, },
+        {description => q~No reftable name is given for foreign key in table!~,},
     'Geoffrey::Exception::RequiredValue::ForeignkeyRefcolumn' =>
-      { description => q~No refcolumn name is given for foreign key in table!~, },
+        {description => q~No refcolumn name is given for foreign key in table!~,},
     'Geoffrey::Exception::RequiredValue::RefTable' =>
-      { description => 'No reftable name is given for foreign key in table' },
+        {description => 'No reftable name is given for foreign key in table'},
     'Geoffrey::Exception::RequiredValue::RefColumn' =>
-      { description => q~No refcolumn name is given for foreign key in table!~ },
-    'Geoffrey::Exception::RequiredValue::ColumnType' =>
-      { description => q~Add column needs is given type name!~ },
-    'Geoffrey::Exception::RequiredValue::IndexName' =>
-      { description => q~To drop index it needs a name!~ },
-    'Geoffrey::Exception::RequiredValue::WhereClause' =>
-      { description => q~No where clause is given!~ },
-    'Geoffrey::Exception::RequiredValue::Values' => { description => q~No values are given!~ },
-    'Geoffrey::Exception::RequiredValue::Converter' =>
-      { description => q~No changeset converter is given!~ },
-    'Geoffrey::Exception::RequiredValue::ChangesetId' =>
-      { description => q~No changeset id is given!~ },
-    'Geoffrey::Exception::RequiredValue::ActionSub' =>
-      { description => q~Sub couldn't be found in action!~ },
-    'Geoffrey::Exception::RequiredValue::PackageName' =>
-      { description => q~Package name not given!~ },
+        {description => q~No refcolumn name is given for foreign key in table!~},
+    'Geoffrey::Exception::RequiredValue::ColumnType'  => {description => q~Add column needs is given type name!~},
+    'Geoffrey::Exception::RequiredValue::IndexName'   => {description => q~To drop index it needs a name!~},
+    'Geoffrey::Exception::RequiredValue::WhereClause' => {description => q~No where clause is given!~},
+    'Geoffrey::Exception::RequiredValue::Values'      => {description => q~No values are given!~},
+    'Geoffrey::Exception::RequiredValue::Converter'   => {description => q~No changeset converter is given!~},
+    'Geoffrey::Exception::RequiredValue::ChangesetId' => {description => q~No changeset id is given!~},
+    'Geoffrey::Exception::RequiredValue::ActionSub'   => {description => q~Sub couldn't be found in action!~},
+    'Geoffrey::Exception::RequiredValue::PackageName' => {description => q~Package name not given!~},
 );
 
 sub throw_common {
     my $s_value_name = shift // q//;
-    return Geoffrey::Exception::RequiredValue->throw(
-        "$s_value_name is missing!\n" . longmess );
+    return Geoffrey::Exception::RequiredValue->throw("$s_value_name is missing!\n" . longmess);
 }
 
 sub throw_column_type {
     my $s_column_name = shift // q//;
     return Geoffrey::Exception::RequiredValue::ColumnType->throw(
-        "The column $s_column_name needs is given type!\n" . longmess );
+        "The column $s_column_name needs is given type!\n" . longmess);
 }
 
 sub throw_column_default {
-    my ( $s_value_name, $s_package ) = @_;
+    my ($s_value_name, $s_package) = @_;
     return Geoffrey::Exception::RequiredValue::TableColumn->throw(
-        "No default value set for column $s_value_name in table! $s_package\n" . longmess );
+        "No default value set for column $s_value_name in table! $s_package\n" . longmess);
 }
 
 sub throw_table_name {
     my $s_error_value = shift // q//;
-    return Geoffrey::Exception::RequiredValue::TableName->throw(
-        "No table name is given $s_error_value\n" . longmess );
+    return Geoffrey::Exception::RequiredValue::TableName->throw("No table name is given $s_error_value\n" . longmess);
 }
 
 sub throw_index_name {
     my $s_error_value = shift // q//;
     return Geoffrey::Exception::RequiredValue::IndexName->throw(
-        "To drop index it needs a name in $s_error_value\n" . longmess );
+        "To drop index it needs a name in $s_error_value\n" . longmess);
 }
 
 sub throw_trigger_name {
     my $s_error_value = shift // q//;
     return Geoffrey::Exception::RequiredValue::TriggerName->throw(
-        "No trigger name is given $s_error_value\n" . longmess );
+        "No trigger name is given $s_error_value\n" . longmess);
 }
 
 sub throw_reftable_missing {
     my $s_error_value = shift // q//;
     return Geoffrey::Exception::RequiredValue::RefTable->throw(
-        "No reftable name is given for foreign key in table $s_error_value\n" . longmess );
+        "No reftable name is given for foreign key in table $s_error_value\n" . longmess);
 }
 
 sub throw_refcolumn_missing {
     my $s_error_value = shift // q//;
     return Geoffrey::Exception::RequiredValue::RefColumn->throw(
-        "No refcolumn name is given for foreign key in table $s_error_value\n" . longmess );
+        "No refcolumn name is given for foreign key in table $s_error_value\n" . longmess);
 }
 
 sub throw_table_column {
-    my ( $s_value_name, $s_package ) = @_;
+    my ($s_value_name, $s_package) = @_;
     $s_package    //= q//;
     $s_value_name //= q//;
     return Geoffrey::Exception::RequiredValue::TableColumn->throw(
-        "No table column is given $s_value_name!  $s_package\n" . longmess );
+        "No table column is given $s_value_name!  $s_package\n" . longmess);
 }
 
 sub throw_where_clause {
     my $s_error_value = shift // q//;
     return Geoffrey::Exception::RequiredValue::WhereClause->throw(
-        "No where clause is given $s_error_value\n" . longmess );
+        "No where clause is given $s_error_value\n" . longmess);
 }
 
 sub throw_values {
     my ($s_package) = @_;
-    return Geoffrey::Exception::RequiredValue::Values->throw(
-        "Values are missing in $s_package !\n" . longmess );
+    return Geoffrey::Exception::RequiredValue::Values->throw("Values are missing in $s_package !\n" . longmess);
 }
 
 sub throw_converter {
     my ($s_package) = @_;
     return Geoffrey::Exception::RequiredValue::Converter->throw(
-        "No changeset converter is given! $s_package !\n" . longmess );
+        "No changeset converter is given! $s_package !\n" . longmess);
 }
 
 sub throw_id {
     my ($s_file) = @_;
-    $s_file //= q//;
-    return Geoffrey::Exception::RequiredValue::ChangesetId->throw(
-        "No changeset id is given in file: $s_file!\n" . longmess );
+    if ($s_file) {
+        return Geoffrey::Exception::RequiredValue::ChangesetId->throw(
+            "No changeset id is given in file: $s_file!\n" . longmess);
+    }
+    return Geoffrey::Exception::RequiredValue::ChangesetId->throw("No changeset id is given!\n" . longmess);
 }
 
 sub throw_action_sub {
     my ($s_action) = @_;
     return Geoffrey::Exception::RequiredValue::ActionSub->throw(
-        qq~No sub name is given for action "$s_action" !\n~ . longmess );
+        qq~No sub name is given for action "$s_action" !\n~ . longmess);
 }
 
 sub throw_package_name {
     my ($s_action) = @_;
     return Geoffrey::Exception::RequiredValue::PackageName->throw(
-        qq~No package name is given for action "$s_action" !\n~ . longmess );
+        qq~No package name is given for action "$s_action" !\n~ . longmess);
 }
 
 1;

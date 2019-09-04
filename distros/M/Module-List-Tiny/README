@@ -1,0 +1,64 @@
+NAME
+    Module::List::Tiny - A fork of Module::List that starts faster
+
+VERSION
+    This document describes version 0.004001 of Module::List::Tiny (from
+    Perl distribution Module-List-Tiny), released on 2019-09-02.
+
+SYNOPSIS
+     use Module::List::Tiny qw(list_modules);
+
+     $id_modules = list_modules("Data::ID::", { list_modules => 1});
+     $prefixes = list_modules("", { list_prefixes => 1, recurse => 1 });
+
+DESCRIPTION
+    This module is a fork of Module::List. It's exactly like Module::List
+    0.004, except with lower startup overhead (see benchmarks in
+    Bencher::Scenarios::ListingModules::Startup). To accomplish this, it:
+
+    *   does its own exporting instead of using Exporter
+
+    *   avoids using Carp and uses the good old "die"
+
+    *   avoids using IO::Dir and uses plain "opendir"
+
+        The problem is that IO::Dir brings in a bunch of other modules.
+
+    *   avoids using File::Spec and hard-code path separator as "/"
+
+        "/" happens to work everywhere with current platforms anyway.
+
+FUNCTIONS
+  list_modules
+    Please see Module::List for more documentation.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Module-List-Tiny>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Module-List-Tiny>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Module-List-Tiny>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Module::List
+
+    PERLANCAR::Module::List - my other, personal fork, with additional
+    features
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

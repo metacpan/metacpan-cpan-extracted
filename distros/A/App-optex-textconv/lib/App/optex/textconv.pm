@@ -6,7 +6,7 @@ use warnings;
 
 use Encode;
 
-our $VERSION = "0.05";
+our $VERSION = "0.06";
 
 =encoding utf-8
 
@@ -16,7 +16,7 @@ textconv - optex module to replace document file by its text contents
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =head1 SYNOPSIS
 
@@ -45,6 +45,7 @@ Next command simply produces the same result.
 =head1 SEE ALSO
 
 L<https://github.com/kaz-utashiro/optex>
+
 L<https://github.com/kaz-utashiro/optex-textconv>
 
 =head1 LICENSE
@@ -80,13 +81,11 @@ sub argv (&) {
 sub hit {
     local $_ = shift;
     my $check = shift;
-    if (ref $check eq 'Regexp') {
-	return /$check/;
-    }
     if (ref $check eq 'CODE') {
-	return $check->();
+	$check->();
+    } else {
+	/$check/;
     }
-    return /$check/;
 }
 
 sub converter {
@@ -138,7 +137,7 @@ sub textconv {
 		elsif ($suffix) {
 		    state %loaded;
 		    my $state = \$loaded{$suffix};
-		    my $to_text = __PACKAGE__."::$suffix\::to_text";
+		    my $to_text = join '::', __PACKAGE__, $suffix, 'to_text';
 		    if (not defined $$state) {
 			$$state = 0;
 			load $suffix or next;
@@ -161,8 +160,7 @@ sub textconv {
 		s/[\p{Private_Use}\p{Unassigned}]/\N{GETA MARK}/g;
 		encode 'utf8', $_;
 	    };
-	    $tmp->write($data)->rewind;
-	    $_ = $tmp->path;
+	    $_ = $tmp->write($data)->rewind->path;
 	}
 	@_;
     };

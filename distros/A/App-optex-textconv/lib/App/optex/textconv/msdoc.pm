@@ -1,6 +1,6 @@
 package App::optex::textconv::msdoc;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use strict;
 use warnings;
@@ -58,10 +58,12 @@ sub retrieve_contents {
     my $suffix = shift;
     my @command = do {
 	if ($suffix eq 'docx') {
-	    "unzip -p \"$file\" word/document.xml";
+	    map { "unzip -p \"$file\" word/$_.xml" }
+	    qw(document endnotes footnotes);
 	}
 	elsif ($suffix eq 'xlsx') {
-	    "unzip -p \"$file\" xl/sharedStrings.xml";
+	    map { "unzip -p \"$file\" xl/$_.xml" }
+	    qw(sharedStrings);
 	}
 	elsif ($suffix eq 'pptx') {
 	    map  { "unzip -p \"$file\" $_" }

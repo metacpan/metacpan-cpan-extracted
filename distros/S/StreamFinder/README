@@ -89,14 +89,14 @@ DESCRIPTION
     player software rather than using their web browser and accepting any /
     all flash, ads, javascript, cookies, trackers, web-bugs, and other
     crapware that can come with that method of playing. The author uses his
-    own custom all-purpose audio player called "fauxdacious" (his custom
-    hacked version of the open-source "audacious" media player).
+    own custom all-purpose media player called "fauxdacious" (his custom
+    hacked version of the open-source "audacious" audio player).
     "fauxdacious" incorporates this module to decode and play streams. The
     currently-supported websites are: radionomy.com, iheartradio.com,
-    reciva.com, facebook, and youtube / vimeo / brighteon, et. al. We used
-    to support tunein.com, but they have since apparently wasted a ton of
-    money on web-developers and script kiddies to so fsck up their stations'
-    pages to make it impossible to obtain their hidden streams
+    reciva.com, facebook, banned.video, and youtube / vimeo / brighteon, et.
+    al. We used to support tunein.com, but they have since apparently wasted
+    a ton of money on web-developers and script kiddies to so fsck up their
+    stations' pages to make it impossible to obtain their hidden streams
     programatically.
 
     It amazes me the effort to which marketing-run operations will go to and
@@ -155,7 +155,16 @@ SUBROUTINES/METHODS
         data).
 
 DEPENDENCIES
-    LWP::Simple
+    LWP::UserAgent
+
+RECCOMENDS
+    URI::Escape; (Youtube)
+
+    WWW::YouTube::Download; (Youtube)
+
+    youtube-dl (Youtube, Facebook)
+
+    wget (Reciva, Youtube, BannedVideo)
 
 BUGS
     Please report any bugs or feature requests to "bug-streamFinder at
@@ -170,6 +179,9 @@ SUPPORT
         perldoc StreamFinder
 
     You can also look for information at:
+
+SEE ALSO
+    Fauxdacious media player (https://wildstar84.wordpress.com/fauxdacious)
 
     *   RT: CPAN's request tracker (report bugs here)
 
@@ -225,5 +237,4 @@ LICENSE AND COPYRIGHT
     CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
     CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
     EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 

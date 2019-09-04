@@ -1,6 +1,6 @@
 use strict;
 
-use Test::More tests => 19;
+use Test::More tests => 25;
 
 BEGIN {
     use_ok('DBD::Mock');  
@@ -82,6 +82,47 @@ $dbh->{mock_add_resultset} = {
 
     is($result, 50, '... got the result we expected');
     
+    $sth->finish();
+}
+
+## test regular expression for query matching
+$dbh->{mock_add_resultset} = {
+    sql => qr/^SELECT foo/,
+    results => [ [ 'foo' ], [ 200 ] ],
+};
+
+## This one should never be used as the above one will have precedence
+$dbh->{mock_add_resultset} = {
+    sql => qr/^SELECT foo FROM/,
+    results => [ [ 'foo' ], [ 300 ] ],
+};
+
+{ 
+    my $sth = $dbh->prepare('SELECT foo FROM oof');
+    isa_ok($sth, 'DBI::st');
+
+    my $rows = $sth->execute();
+    is($rows, '0E0', '... got back 0E0 for rows with a SELECT statement');
+
+    my ($result) = $sth->fetchrow_array();
+
+    is($result, 200, '... got the result we expected');
+
+    $sth->finish();
+}
+
+# check that statically assigned queries take precedence over regex matched ones
+{
+    my $sth = $dbh->prepare('SELECT foo FROM bar');
+    isa_ok($sth, 'DBI::st');
+
+    my $rows = $sth->execute();
+    is($rows, '0E0', '... got back 0E0 for rows with a SELECT statement');
+
+    my ($result) = $sth->fetchrow_array();
+
+    is($result, 50, '... got the result we expected');
+
     $sth->finish();
 }
 

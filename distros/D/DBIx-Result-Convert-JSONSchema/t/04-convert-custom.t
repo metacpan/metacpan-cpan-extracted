@@ -46,7 +46,12 @@ $converter->pattern_map({
     %{ $pattern_map },
 });
 
-my $json_schema = $converter->get_json_schema('MySQLTypeTest');
+my $json_schema = $converter->get_json_schema(
+    'MySQLTypeTest',
+    {
+        add_property_minimum_value => 1,
+    }
+);
 
 foreach my $schema_key ( keys %{ $json_schema->{properties} } ) {
     my $property_type = $json_schema->{properties}->{ $schema_key}->{type};

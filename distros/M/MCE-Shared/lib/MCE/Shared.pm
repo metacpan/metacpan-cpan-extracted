@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized once );
 
-our $VERSION = '1.846';
+our $VERSION = '1.848';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitSubroutinePrototypes)
@@ -184,7 +184,7 @@ sub AUTOLOAD {
       return $_fh;
    }
    elsif ( $_fcn eq 'pdl' ||
-      $_fcn =~ /^pdl_(byte|u?short|.*long|float|double|ones|sequence|zeroes|indx)$/
+      $_fcn =~ /^pdl_(byte|u?short|.*long|float|double|ones|random|sequence|zeroes|indx)$/
    ) {
       $_fcn = $1 if ( $_fcn ne 'pdl' );
       push @_, $_fcn; _use('PDL') or _croak($@);
@@ -448,7 +448,7 @@ MCE::Shared - MCE extension for sharing data supporting threads and processes
 
 =head1 VERSION
 
-This document describes MCE::Shared version 1.846
+This document describes MCE::Shared version 1.848
 
 =head1 SYNOPSIS
 
@@ -876,6 +876,7 @@ process. The included C<MCE::Shared::Minidb> module provides optimized methods
 for working with hash of hashes C<HoH> and hash of arrays C<HoA>.
 
  use MCE::Shared;
+ use Data::Dumper;
 
  my $abc = MCE::Shared->minidb;
 
@@ -888,7 +889,7 @@ for working with hash of hashes C<HoH> and hash of arrays C<HoA>.
     }
  }
 
- _dump( $abc );
+ print Dumper( $abc->export ), "\n";
 
 For further reading, see L<MCE::Shared::Minidb>.
 
@@ -1036,11 +1037,11 @@ C<CDB_File> is given in the prior section.
 
 =back
 
+ BEGIN { @AnyDBM_File::ISA = qw( DB_File GDBM_File NDBM_File ODBM_File ); }
+
  use MCE::Shared;
  use Fcntl;
  use AnyDBM_File;
-
- BEGIN { @AnyDBM_File::ISA = qw( DB_File GDBM_File NDBM_File ODBM_File ); }
 
  tie my %h1, 'MCE::Shared', { module => 'AnyDBM_File' },
     'foo_a', O_CREAT|O_RDWR or die "open error: $!";
@@ -1160,6 +1161,8 @@ C<CDB_File> is given in the prior section.
  # Do not specify the 'str' option for Tie::(Array|Hash)::DBD.
  # Instead, see encoder-decoder methods described under Common API.
 
+ use DBD::SQLite;
+
  tie my @a1, 'MCE::Shared', { module => 'Tie::Array::DBD' },
     'dbi:SQLite:dbname=foo_a.db', {
        tbl => 't_tie_analysis',
@@ -1174,6 +1177,8 @@ C<CDB_File> is given in the prior section.
        fld => 'h_value'
     };
 
+ use DBD::CSV;
+
  tie my %h2, 'MCE::Shared', { module => 'Tie::Hash::DBD'},
     'dbi:CSV:f_dir=.;f_ext=.csv/r;csv_null=1;csv_decode_utf8=0', {
        tbl => 'mytable',
@@ -1186,8 +1191,11 @@ C<CDB_File> is given in the prior section.
 
  use JSON::XS ();
 
- tied(%ha2)->encoder( \&JSON::XS::encode_json );
- tied(%ha2)->decoder( \&JSON::XS::decode_json );
+ tied(%h2)->encoder( \&JSON::XS::encode_json );
+ tied(%h2)->decoder( \&JSON::XS::decode_json );
+
+ my @pairs = ( key1 => 'val1', key2 => 'val2' );
+ my @list  = ( 1, 2, 3, 4 );
 
  $h2{'foo'} = 'plain value';
  $h2{'bar'} = { @pairs };
@@ -1275,6 +1283,8 @@ of the documentation.
 
 =item MCE::Shared->pdl_ones
 
+=item MCE::Shared->pdl_random
+
 =item MCE::Shared->pdl_sequence
 
 =item MCE::Shared->pdl_zeroes
@@ -1285,20 +1295,79 @@ of the documentation.
 
 =back
 
-C<pdl_byte>, C<pdl_short>, C<pdl_ushort>, C<pdl_long>, C<pdl_longlong>,
-C<pdl_float>, C<pdl_double>, C<pdl_ones>, C<pdl_sequence>, C<pdl_zeroes>,
-C<pdl_indx>, and C<pdl> are sugar syntax for L<PDL> construction to take
-place under the shared-manager process. The helper routines are made
-available if C<PDL> is present before loading C<MCE::Shared>.
+Sugar syntax for L<PDL> construction to take place under the shared-manager
+process. The helper routines are made available only if C<PDL> is loaded
+before C<MCE::Shared>.
 
- use PDL;                 # must load PDL before MCE::Shared
+ use PDL;
  use MCE::Shared;
 
- # this makes extra copy, transfer, and unnecessary destruction
+ # This makes an extra copy, transfer, including destruction.
  my $ob1 = MCE::Shared->share( zeroes( 256, 256 ) );
 
- # do this instead to not involve an extra copy
- my $ob1 = MCE::Shared->zeroes( 256, 256 );
+ # Do this instead to not involve an extra copy.
+ my $ob1 = MCE::Shared->pdl_zeroes( 256, 256 );
+
+Below is a parallel version for a demonstration on PerlMonks.
+
+ # https://www.perlmonks.org/?node_id=1214227 (by vr)
+
+ use strict;
+ use warnings;
+ use feature 'say';
+
+ use PDL;  # must load PDL before MCE::Shared
+
+ use MCE;
+ use MCE::Shared;
+ use Time::HiRes 'time';
+
+ srand( 123 );
+
+ my $time = time;
+
+ my $n = 30000;      # input sample size
+ my $m = 10000;      # number of bootstrap repeats
+ my $r = $n;         # re-sample size
+
+ # On Windows, the non-shared piddle ($x) is unblessed in threads.
+ # Therefore, constructing the piddle inside the worker.
+ # UNIX platforms benefit from copy-on-write. Thus, one copy.
+
+ my $x   = ( $^O eq 'MSWin32' ) ? undef : random( $n );
+ my $avg = MCE::Shared->pdl_zeroes( $m );
+
+ MCE->new(
+    max_workers => 4,
+    sequence    => [ 0, $m - 1 ],
+    chunk_size  => 1,
+    user_begin  => sub {
+       $x = random( $n ) unless ( defined $x );
+    },
+    user_func   => sub {
+       my $idx  = random $r;
+       $idx    *= $n;
+       # $avg is a shared piddle which resides inside the shared-
+       # manager process or thread. The piddle is accessible via the
+       # OO interface only.
+       $avg->set( $_, $x->index( $idx )->avg );
+    }
+ )->run;
+
+ # MCE sets the seed of the base generator uniquely between workers.
+ # Unfortunately, it requires running with one worker for predictable
+ # results (i.e. no guarantee in the order which worker computes the
+ # next input chunk).
+
+ say $avg->pctover( pdl 0.05, 0.95 );
+ say time - $time, ' seconds';
+
+ __END__
+
+ # Output
+
+ [0.49387106  0.4993768]
+ 1.09556317329407 seconds
 
 =over 3
 
@@ -1322,11 +1391,17 @@ the shared-manager process.
 
 Operations such as C< + 5 > will not work on shared PDL objects. At this
 time, the OO interface is the only mechanism for communicating with the
-PDL piddle. For example, call C<slice>, C<sever>, or C<copy> to fetch
-elements. Call C<ins_inplace> to update elements.
+shared piddle. For example, call C<slice>, C<sever>, or C<copy> to fetch
+elements. Call C<ins_inplace> or C<set> (shown above) to update elements.
 
- # make a shared PDL piddle
- my $b = MCE::Shared->pdl_sequence(20,20);
+ use strict;
+ use warnings;
+
+ use PDL;  # must load PDL before MCE::Shared
+ use MCE::Shared;
+
+ # make a shared piddle
+ my $b = MCE::Shared->pdl_sequence(15,15);
 
  # fetch, add 10 to row 2 only
  my $res1 = $b->slice(":,1:1") + 10;
@@ -1336,20 +1411,35 @@ elements. Call C<ins_inplace> to update elements.
  my $res2 = $b->slice(":,3:4") + 10;
  $b->ins_inplace($res2, 0, 3);
 
- # make non-shared object, export-destroy the shared object
+ # make non-shared object (i.e. export-destroy from shared)
  $b = $b->destroy;
 
  print "$b\n";
 
 The following provides parallel demonstrations using C<MCE::Flow>.
 
+ use strict;
+ use warnings;
+
  use PDL;  # must load PDL before MCE::Shared
 
  use MCE::Flow;
  use MCE::Shared;
 
- my $a = MCE::Shared->pdl_sequence(20,20);
- my $b = MCE::Shared->pdl_zeroes(20,20);
+ # On Windows, the ($a) piddle is unblessed in worker threads.
+ # Therefore, constructing ($a) inside the worker versus sharing.
+ # UNIX platforms benefit from copy-on-write. Thus, one copy.
+ #
+ # Results are stored in the shared piddle ($b).
+
+ my $a = ( $^O eq 'MSWin32' ) ? undef : sequence(15,15);
+ my $b = MCE::Shared->pdl_zeroes(15,15);
+
+ MCE::Flow->init(
+    user_begin => sub {
+       $a = sequence(15,15) unless ( defined $a );
+    }
+ );
 
  # with chunking disabled
 
@@ -1360,7 +1450,7 @@ The following provides parallel demonstrations using C<MCE::Flow>.
     my $row = $_;
     my $result = $a->slice(":,$row:$row") + 5;
     $b->ins_inplace($result, 0, $row);
- }, 0, 20 - 1;
+ }, 0, 15 - 1;
 
  # with chunking enabled
 
@@ -1371,7 +1461,7 @@ The following provides parallel demonstrations using C<MCE::Flow>.
     my ($row1, $row2) = @{ $_ };
     my $result = $a->slice(":,$row1:$row2") + 5;
     $b->ins_inplace($result, 0, $row1);
- }, 0, 20 - 1;
+ }, 0, 15 - 1;
 
  # make non-shared object, export-destroy the shared object
 
@@ -1380,7 +1470,7 @@ The following provides parallel demonstrations using C<MCE::Flow>.
  print "$b\n";
 
 See also L<PDL::ParallelCPU> and L<PDL::Parallel::threads>. For further
-reading, the MCE-Cookbook on Github provides two PDL demonstrations.
+reading, the MCE-Cookbook on GitHub provides two PDL demonstrations.
 
 L<https://github.com/marioroy/mce-cookbook>
 
@@ -1982,38 +2072,6 @@ The construction is simply calling share with the module option.
 Methods are accessible via the OO interface.
 
  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- # Share Python class. Requires MCE::Shared 1.827 or later.
- #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
- use strict;
- use warnings;
-
- use MCE::Hobo;
- use MCE::Shared;
-
- my $py1 = MCE::Shared->share({ module => 'My::Class' });
- my $py2 = MCE::Shared->share({ module => 'My::Class' });
-
- MCE::Shared->start;
-
- $py1->set(0, 100);
- $py2->set(1, 200);
-
- die "Ooops" unless $py1->get(0) eq '100';
- die "Ooops" unless $py2->get(1) eq '200';
-
- sub task {
-     $py1->incr(0) for 1 .. 50000;
-     $py2->incr(1) for 1 .. 50000;
- }
-
- MCE::Hobo->create(\&task) for 1 .. 3;
- MCE::Hobo->waitall;
-
- print $py1->get(0), "\n";  # 150100
- print $py2->get(1), "\n";  # 150200
-
- #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  # Python class.
  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -2052,14 +2110,8 @@ Methods are accessible via the OO interface.
 
  1;
 
-=head1 LOGGER DEMONSTRATION
-
-Often, the requirement may call for concurrent logging by many workers.
-Calling localtime or gmtime per each log entry is expensive. This uses
-the old time-stamp value until one second has elapsed.
-
  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- # Concurrent logger demo. Requires MCE::Shared 1.827 or later.
+ # Share Python class. Requires MCE::Shared 1.827 or later.
  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
  use strict;
@@ -2068,29 +2120,33 @@ the old time-stamp value until one second has elapsed.
  use MCE::Hobo;
  use MCE::Shared;
 
- my $file = "log.txt";
- my $pid  = $$;
+ my $py1 = MCE::Shared->share({ module => 'My::Class' });
+ my $py2 = MCE::Shared->share({ module => 'My::Class' });
 
- my $ob = MCE::Shared->share( { module => 'My::Logger' }, path => $file )
-     or die "open error '$file': $!";
+ MCE::Shared->start;
 
- # $ob->autoflush(1);   # optional, flush writes immediately
+ $py1->set(0, 100);
+ $py2->set(1, 200);
 
- sub work {
-     my $id = shift;
-     for ( 1 .. 250_000 ) {
-         $ob->log("Hello from $id: $_");
-     }
+ die "Ooops" unless $py1->get(0) eq '100';
+ die "Ooops" unless $py2->get(1) eq '200';
+
+ sub task {
+     $py1->incr(0) for 1..50000;
+     $py2->incr(1) for 1..50000;
  }
 
- MCE::Hobo->create('work', $_) for 1 .. 4;
+ MCE::Hobo->create(\&task) for 1..3;
  MCE::Hobo->waitall;
 
- # Threads and multi-process safety for closing the handle.
+ print $py1->get(0), "\n";  # 150100
+ print $py2->get(1), "\n";  # 150200
 
- sub CLONE { $pid = 0; }
+=head1 LOGGER DEMONSTRATION
 
- END { $ob->close if $ob && $pid == $$; }
+Often, the requirement may call for concurrent logging by many workers.
+Calling localtime or gmtime per each log entry is expensive. This uses
+the old time-stamp value until one second has elapsed.
 
  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  # Logger class.
@@ -2194,11 +2250,79 @@ the old time-stamp value until one second has elapsed.
 
  1;
 
+ #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ # Concurrent logger demo. Requires MCE::Shared 1.827 or later.
+ #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ use strict;
+ use warnings;
+
+ use MCE::Hobo;
+ use MCE::Shared;
+
+ my $file = "log.txt";
+ my $pid  = $$;
+
+ my $ob = MCE::Shared->share( { module => 'My::Logger' }, path => $file )
+     or die "open error '$file': $!";
+
+ # $ob->autoflush(1);   # optional, flush writes immediately
+
+ sub work {
+     my $id = shift;
+     for ( 1 .. 250_000 ) {
+         $ob->log("Hello from $id: $_");
+     }
+ }
+
+ MCE::Hobo->create('work', $_) for 1 .. 4;
+ MCE::Hobo->waitall;
+
+ # Threads and multi-process safety for closing the handle.
+
+ sub CLONE { $pid = 0; }
+
+ END { $ob->close if $ob && $pid == $$; }
+
 =head1 TIE::FILE DEMONSTRATION
 
 The following presents a concurrent L<Tie::File> demonstration. Each element
 in the array corresponds to a record in the text file. JSON, being readable,
 seems appropiate for encoding complex objects.
+
+ #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ # Class extending Tie::File with two sugar methods.
+ # Requires MCE::Shared 1.827 or later.
+ #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ package My::File;
+
+ use strict;
+ use warnings;
+
+ use Tie::File;
+
+ our @ISA = 'Tie::File';
+
+ # $ob->append('string');
+
+ sub append {
+     my ($self, $key) = @_;
+     my $val = $self->FETCH($key); $val .= $_[2];
+     $self->STORE($key, $val);
+     length $val;
+ }
+
+ # $ob->incr($key);
+
+ sub incr {
+     my ( $self, $key ) = @_;
+     my $val = $self->FETCH($key); $val += 1;
+     $self->STORE($key, $val);
+     $val;
+ }
+
+ 1;
 
  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  # The MCE::Mutex module isn't needed unless IPC involves two or
@@ -2277,40 +2401,6 @@ seems appropiate for encoding complex objects.
          untie @db;  # untie @db to flush pending writes
      }
  }
-
- #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- # Class extending Tie::File with two sugar methods.
- # Requires MCE::Shared 1.827 or later.
- #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
- package My::File;
-
- use strict;
- use warnings;
-
- use Tie::File;
-
- our @ISA = 'Tie::File';
-
- # $ob->append('string');
-
- sub append {
-     my ($self, $key) = @_;
-     my $val = $self->FETCH($key); $val .= $_[2];
-     $self->STORE($key, $val);
-     length $val;
- }
-
- # $ob->incr($key);
-
- sub incr {
-     my ( $self, $key ) = @_;
-     my $val = $self->FETCH($key); $val += 1;
-     $self->STORE($key, $val);
-     $val;
- }
-
- 1;
 
 =head1 REQUIREMENTS
 

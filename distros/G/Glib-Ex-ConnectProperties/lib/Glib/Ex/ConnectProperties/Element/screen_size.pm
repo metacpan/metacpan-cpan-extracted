@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2014, 2017 Kevin Ryde
 
 # This file is part of Glib-Ex-ConnectProperties.
 #
@@ -24,10 +24,7 @@ use Glib;
 use Scalar::Util;
 use base 'Glib::Ex::ConnectProperties::Element';
 
-our $VERSION = 19;
-
-# uncomment this to run the ### lines
-#use Smart::Comments;
+our $VERSION = 20;
 
 
 # _gdk_x11_screen_size_changed() emits size-changed if pixels changed, but
@@ -122,7 +119,7 @@ can change from a RANDR or Xinerama rearrangement of output monitors.  In
 all cases the sizes are read-only since C<Gtk2::Gdk::Screen> doesn't have
 anything to perform video mode or monitor changes.
 
-For example to display the width in a label,
+For example to display the screen width in a label,
 
     my $toplevel = Gtk2::Window->new('toplevel');
     my $screen = $toplevel->get_screen;
@@ -150,7 +147,7 @@ L<http://user42.tuxfamily.org/glib-ex-connectproperties/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012 Kevin Ryde
+Copyright 2010, 2011, 2012, 2014, 2017 Kevin Ryde
 
 Glib-Ex-ConnectProperties is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License as published by

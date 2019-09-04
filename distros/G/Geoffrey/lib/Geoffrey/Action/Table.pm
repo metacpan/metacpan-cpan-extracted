@@ -5,7 +5,7 @@ use 5.016;
 use strict;
 use warnings;
 
-$Geoffrey::Action::Table::VERSION = '0.000201';
+$Geoffrey::Action::Table::VERSION = '0.000204';
 
 use parent 'Geoffrey::Role::Action';
 
@@ -175,7 +175,7 @@ Geoffrey::Action::Table - Action handler for tables
 
 =head1 VERSION
 
-Version 0.000201
+Version 0.000204
 
 =head1 DESCRIPTION
 

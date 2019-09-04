@@ -4,7 +4,7 @@
       "Shawn Laffan (shawn.laffan@unsw.edu.au)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -36,13 +36,13 @@
       },
       "runtime" : {
          "requires" : {
-            "Browser::Open" : "0",
+            "Browser::Start" : "0",
             "Data::DumpXML" : "0",
             "Gnome2::Canvas" : "0",
             "HTTP::Tiny" : "0",
             "IO::Socket::SSL" : "0",
             "LWP::Simple" : "0",
-            "Task::Biodiverse::NoGUI" : "2.000"
+            "Task::Biodiverse::NoGUI" : "3.000"
          }
       }
    },
@@ -57,6 +57,6 @@
          "web" : "http://purl.org/biodiverse"
       }
    },
-   "version" : "2.000",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "3.00",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

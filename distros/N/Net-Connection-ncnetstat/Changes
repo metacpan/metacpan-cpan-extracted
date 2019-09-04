@@ -1,5 +1,8 @@
 Revision history for Net-Connection-ncnetstat
 
+0.5.0	 2019-09-03/03:30
+		 - Add the arg no_pid_user.
+
 0.4.2	 2019-08-20/02:00
 		 - Add a missing column style option.
 		 - Depend on Data::Unixish::Apply, #130303.

@@ -59,6 +59,11 @@ t/data2/000/000/003/bagit.txt
 t/data2/000/000/003/data/test.txt
 t/data2/000/000/003/manifest-md5.txt
 t/data2/000/000/003/tagmanifest-md5.txt
+t/data3/7D9/DEB/D0-/3B8/4-1/1E9/-91/3F-/EA3/D22/826/36C/bag-info.txt
+t/data3/7D9/DEB/D0-/3B8/4-1/1E9/-91/3F-/EA3/D22/826/36C/bagit.txt
+t/data3/7D9/DEB/D0-/3B8/4-1/1E9/-91/3F-/EA3/D22/826/36C/data/test.txt
+t/data3/7D9/DEB/D0-/3B8/4-1/1E9/-91/3F-/EA3/D22/826/36C/manifest-md5.txt
+t/data3/7D9/DEB/D0-/3B8/4-1/1E9/-91/3F-/EA3/D22/826/36C/tagmanifest-md5.txt
 t/poem.txt
 t/poem2.txt
 travis_test.sh

@@ -24,7 +24,7 @@ use Glib;
 use Gtk2;  # for Gtk2::Gdk::Rectangle class
 use base 'Glib::Ex::ConnectProperties::Element';
 
-our $VERSION = 19;
+our $VERSION = 20;
 
 # uncomment this to run the ### lines
 #use Smart::Comments;

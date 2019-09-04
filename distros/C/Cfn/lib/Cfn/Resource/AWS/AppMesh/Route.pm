@@ -1,4 +1,4 @@
-# AWS::AppMesh::Route generated from spec 4.1.0
+# AWS::AppMesh::Route generated from spec 5.3.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::AppMesh::Route',
@@ -19,6 +19,53 @@ package Cfn::Resource::AWS::AppMesh::Route {
 }
 
 
+
+subtype 'Cfn::Resource::Properties::AWS::AppMesh::Route::MatchRange',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::AppMesh::Route::MatchRange',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::AWS::AppMesh::Route::MatchRangeValue->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::AWS::AppMesh::Route::MatchRangeValue {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has End => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Start => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::AppMesh::Route::HeaderMatchMethod',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::AppMesh::Route::HeaderMatchMethod',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::AWS::AppMesh::Route::HeaderMatchMethodValue->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::AWS::AppMesh::Route::HeaderMatchMethodValue {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has Exact => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Prefix => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Range => (isa => 'Cfn::Resource::Properties::AWS::AppMesh::Route::MatchRange', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Regex => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Suffix => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
 subtype 'ArrayOfCfn::Resource::Properties::AWS::AppMesh::Route::WeightedTarget',
      as 'Cfn::Value',
   where { $_->isa('Cfn::Value::Array') or $_->isa('Cfn::Value::Function') },
@@ -63,6 +110,51 @@ package Cfn::Resource::Properties::AWS::AppMesh::Route::WeightedTargetValue {
   has VirtualNode => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Weight => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
+subtype 'ArrayOfCfn::Resource::Properties::AWS::AppMesh::Route::HttpRouteHeader',
+     as 'Cfn::Value',
+  where { $_->isa('Cfn::Value::Array') or $_->isa('Cfn::Value::Function') },
+message { "$_ is not a Cfn::Value or a Cfn::Value::Function" };
+
+coerce 'ArrayOfCfn::Resource::Properties::AWS::AppMesh::Route::HttpRouteHeader',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       die 'Only accepts functions'; 
+     }
+   },
+  from 'ArrayRef',
+   via {
+     Cfn::Value::Array->new(Value => [
+       map { 
+         Moose::Util::TypeConstraints::find_type_constraint('Cfn::Resource::Properties::AWS::AppMesh::Route::HttpRouteHeader')->coerce($_)
+       } @$_
+     ]);
+   };
+
+subtype 'Cfn::Resource::Properties::AWS::AppMesh::Route::HttpRouteHeader',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::AppMesh::Route::HttpRouteHeader',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::AWS::AppMesh::Route::HttpRouteHeaderValue->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::AWS::AppMesh::Route::HttpRouteHeaderValue {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has Invert => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Match => (isa => 'Cfn::Resource::Properties::AWS::AppMesh::Route::HeaderMatchMethod', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
 
 subtype 'Cfn::Resource::Properties::AWS::AppMesh::Route::TcpRouteAction',
      as 'Cfn::Value';
@@ -103,7 +195,10 @@ package Cfn::Resource::Properties::AWS::AppMesh::Route::HttpRouteMatchValue {
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
+  has Headers => (isa => 'ArrayOfCfn::Resource::Properties::AWS::AppMesh::Route::HttpRouteHeader', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Method => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Prefix => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Scheme => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::AppMesh::Route::HttpRouteAction',
@@ -189,6 +284,7 @@ package Cfn::Resource::Properties::AWS::AppMesh::Route::RouteSpecValue {
   extends 'Cfn::Value::TypedValue';
   
   has HttpRoute => (isa => 'Cfn::Resource::Properties::AWS::AppMesh::Route::HttpRoute', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Priority => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has TcpRoute => (isa => 'Cfn::Resource::Properties::AWS::AppMesh::Route::TcpRoute', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 

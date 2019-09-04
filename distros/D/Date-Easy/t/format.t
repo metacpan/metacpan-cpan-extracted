@@ -27,10 +27,11 @@ foreach (keys %FORMATS)
 }
 
 # make sure I didn't bork the empty format call
-# note also that I avoid the locale-specific parts by using a regex with \w+
+# note also that I avoid the locale-specific parts by using a regex with .+?
+# (this used to be a much simpler \w+, but that didn't work; see GitHub #9)
 my $str;
 warning_is { $str = $dt->strftime } undef, "no uninitialized warning on empty format";
-like $str, qr/^\w+, 03 \w+ 2001 04:05:06 UTC$/, "empty format produces default format";
+like $str, qr/^.+?, 03 \w+ 2001 04:05:06 UTC$/, "empty format produces default format";
 
 
 # ISO 8601 format

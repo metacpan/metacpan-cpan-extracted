@@ -30,7 +30,7 @@ sub import {
       if ( @_ && lc( $_[0] ) eq "pool" );
 }
 
-our $VERSION = '1.45';
+our $VERSION = '1.46';
 
 our $drh    = undef;    # will hold driver handle
 our $err    = 0;        # will hold any error codes
@@ -433,6 +433,53 @@ You can also associate a resultset with a particular SQL statement instead of ad
   };
 
 This will return the given results when the statement 'SELECT foo, bar FROM baz' is prepared. Note that they will be returned B<every time> the statement is prepared, not just the first. It should also be noted that if you want, for some reason, to change the result set bound to a particular SQL statement, all you need to do is add the result set again with the same SQL statement and DBD::Mock will overwrite it.
+
+If the C<sql> parameter is a regular expression reference then the results will be returned for any SQL statements that matches it:
+
+  $dbh->{mock_add_resultset} = {
+    sql     => qr/^SELECT foo FROM/i,
+    results => [
+      [ 'foo' ],
+      [ 'this_one' ],
+    ],
+  };
+
+If an SQL statement matches both a specified SQL statement result set and a regular expresion result set then the specified SQL statement takes precedence.  If two regular expression result sets match then the first one added takes precedence:
+
+  # Set up our first regex matching result set
+  $dbh->{mock_add_resultset} = {
+    sql => qr/^SELECT foo/,
+    results => [ [ 'foo' ], [ 200 ] ],
+  };
+
+  # Set up our second regex matching result set
+  #   Note - This results set would never be used as the one above will match
+  #   and thus take precedence
+  $dbh->{mock_add_resultset} = {
+    sql => qr/^SELECT foo FROM/,
+    results => [ [ 'foo' ], [ 300 ] ],
+  };
+
+  # Set up our first statically defined result set
+  # This result set will take precedence over the regex matching ones above
+  $dbh->{mock_add_resultset} = {
+    sql => 'SELECT foo FROM bar',
+    results => [[ 'foo' ], [ 50 ]]
+  };
+
+  # This query will be served by the first regex matching result set
+  my $sth = $dbh->prepare('SELECT foo FROM oof');
+  $sth->execute()
+
+  my ($result) = $sth->fetchrow_array();
+  is( $result, 200 );
+
+  # This quere will be served by the statically defined result set
+  $sth = $dbh->prepare('SELECT foo FROM bar');
+  $sth->execute();
+
+  my ($result2) = $sth->fetchrow_array();
+  is( $result2, 50 );
 
 It should also be noted that the C<rows> method will return the number of records stocked in the result set. So if your code/application makes use of the C<$sth-E<gt>rows> method for things like UPDATE and DELETE calls you should stock the result set like so:
 
@@ -846,7 +893,7 @@ The C<5> is the DBI error number, and C<'Ooops!'> is the error string passed to 
 
 Basically this feature allows you to alias attributes to other attributes. So for instance, you can alias a commonly expected attribute like 'mysql_insertid' to something DBD::Mock already has like 'mock_last_insert_id'. While you can also just set 'mysql_insertid' yourself, this functionality allows it to take advantage of things like the autoincrementing of the 'mock_last_insert_id' attribute.
 
-Right now this feature is highly experimental, and has been added as a first attempt to automatically handle some of the DBD specific attributes which are commonly used/accessed in DBI programming. The functionality is off by default so as to not cause any issues with backwards compatability, but can easily be turned on and off like this:
+Right now this feature is highly experimental, and has been added as a first attempt to automatically handle some of the DBD specific attributes which are commonly used/accessed in DBI programming. The functionality is off by default so as to not cause any issues with backwards compatibility, but can easily be turned on and off like this:
 
   # turn it on
   $DBD::Mock::AttributeAliasing++;
@@ -912,23 +959,25 @@ L<http://groups.google.com/group/DBDMock>
 
 =over 4
 
-=item Thanks to Ryan Gerry for his patch in RT #26604
+=item Thanks to Ryan Gerry for his patch in RT #26604.
 
-=item Thanks to Marc Beyer for his patch in RT #16951
+=item Thanks to Marc Beyer for his patch in RT #16951.
 
-=item Thanks to Justin DeVuyst for the mock_connect_fail idea
+=item Thanks to Justin DeVuyst for the mock_connect_fail idea.
 
-=item Thanks to Thilo Planz for the code for C<bind_param_inout>
+=item Thanks to Thilo Planz for the code for C<bind_param_inout>.
 
-=item Thanks to Shlomi Fish for help tracking down RT Bug #11515
+=item Thanks to Shlomi Fish for help tracking down RT Bug #11515.
 
 =item Thanks to Collin Winter for the patch to fix the C<begin_work()>, C<commit()> and C<rollback()> methods.
 
 =item Thanks to Andrew McHarg E<lt>amcharg@acm.orgE<gt> for C<fetchall_hashref()>, C<fetchrow_hashref()> and C<selectcol_arrayref()> methods and tests.
 
-=item Thanks to Andrew W. Gibbs for the C<mock_last_insert_ids> patch and test
+=item Thanks to Andrew W. Gibbs for the C<mock_last_insert_ids> patch and test.
 
 =item Thanks to Chas Owens for patch and test for the C<mock_can_prepare>, C<mock_can_execute>, and C<mock_can_fetch> features.
+
+=item Thanks to Tomas Zemresfor the unit test in RT #71438.
 
 =back
 
@@ -942,6 +991,8 @@ Copyright (C) 2007 Rob Kinyon E<lt>rob.kinyon@gmail.comE<gt>
 
 Copyright (C) 2011 Mariano Wahlmann E<lt>dichoso  _at_ gmail.comE<gt>
 
+Copyright (C) 2019 Jason Cooper E<lt>JLCOOPER@cpan.orgE<gt>
+
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
@@ -953,6 +1004,8 @@ Stevan Little E<lt>stevan@iinteractive.comE<gt>
 
 Rob Kinyon E<lt>rob.kinyon@gmail.comE<gt>
 
-Mariano Wahlmann E<lt>dichoso _at_ gmail.com <gt>
+Mariano Wahlmann E<lt>dichoso _at_ gmail.comE<gt>
+
+Jason Cooper E<lt>JLCOOPER@cpan.orgE<gt>
 
 =cut

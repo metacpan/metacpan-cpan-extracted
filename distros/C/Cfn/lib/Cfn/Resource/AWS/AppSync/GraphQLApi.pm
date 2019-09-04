@@ -1,4 +1,4 @@
-# AWS::AppSync::GraphQLApi generated from spec 4.1.0
+# AWS::AppSync::GraphQLApi generated from spec 5.3.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::AppSync::GraphQLApi',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::AppSync::GraphQLApi {
     [ 'ApiId','Arn','GraphQLUrl' ]
   }
   sub supported_regions {
-    [ 'ap-northeast-1','ap-southeast-2','eu-central-1','eu-west-1','us-east-1','us-east-2','us-west-2' ]
+    [ 'ap-northeast-1','ap-northeast-2','ap-south-1','ap-southeast-1','ap-southeast-2','eu-central-1','eu-west-1','eu-west-2','us-east-1','us-east-2','us-west-2' ]
   }
 }
 
@@ -130,6 +130,7 @@ package Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::LogConfigValue {
   extends 'Cfn::Value::TypedValue';
   
   has CloudWatchLogsRoleArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has ExcludeVerboseContent => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has FieldLogLevel => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 

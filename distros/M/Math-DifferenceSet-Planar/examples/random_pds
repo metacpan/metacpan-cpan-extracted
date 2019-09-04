@@ -1,0 +1,68 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Math::DifferenceSet::Planar;
+use Math::Prime::Util qw(gcd);
+
+use constant PDS => Math::DifferenceSet::Planar::;
+
+$| = 1;
+
+if (@ARGV != 1 || $ARGV[0] !~ /^[1-9][0-9]*\z/) {
+    die "usage: random_pds order\n";
+}
+
+my ($q) = @ARGV;
+
+if ($q > PDS->available_max_order) {
+    die "$q: order is too large\n";
+}
+if (!PDS->available($q)) {
+    die "$q: order is not a prime power\n";
+}
+
+my $s0 = PDS->new($q);
+my $m  = $s0->modulus;
+my $t  = 1 + int rand($m - 1);
+while (gcd($t, $m) != 1) {
+    $t  = 1 + int rand($m - 1);
+}
+my $s1 = $s0->multiply($t)->translate(int rand $m);
+my @e  = $s1->elements_sorted;
+print "@e\n";
+
+__END__
+=head1 NAME
+
+random_pds - generate a random planar difference set
+
+=head1 SYNOPSIS
+
+  random_pds order
+
+=head1 DESCRIPTION
+
+This example program picks a random planar difference set of a given
+order.  The output will be a line with integer numbers, separated by
+blanks, ordered numerically.
+
+=head1 AUTHOR
+
+Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2019 by Martin Becker, Blaubeuren.  All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=head1 DISCLAIMER OF WARRANTY
+
+This library is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of merchantability
+or fitness for a particular purpose.
+
+=cut

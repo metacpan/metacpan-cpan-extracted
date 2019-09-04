@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 1.01
+    version 1.02
 
 SYNOPSIS
 
@@ -134,6 +134,13 @@ METHODS
         ids => ['23', '24']
 
       List only jobs with these ids.
+
+    notes
+
+        notes => ['foo', 'bar']
+
+      List only jobs with one of these notes. Note that this option is
+      EXPERIMENTAL and might change without warning!
 
     queues
 
@@ -397,6 +404,19 @@ METHODS
     Construct a new Minion::Backend::MongoDB object. Required a connection
     string URI. Optional every other attributes will be pass to
     MongoDB::MongoClient costructor.
+
+ note
+
+      my $bool = $backend->note($job_id, {mojo => 'rocks', minion => 'too'});
+
+    Change one or more metadata fields for a job. Setting a value to undef
+    will remove the field.
+
+ receive
+
+      my $commands = $backend->receive($worker_id);
+
+    Receive remote control commands for worker.
 
  register_worker
 

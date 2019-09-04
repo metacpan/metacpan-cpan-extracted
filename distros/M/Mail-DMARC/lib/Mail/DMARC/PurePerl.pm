@@ -1,5 +1,5 @@
 package Mail::DMARC::PurePerl;
-our $VERSION = '1.20190308'; # VERSION
+our $VERSION = '1.20190831'; # VERSION
 use strict;
 use warnings;
 
@@ -588,7 +588,7 @@ Mail::DMARC::PurePerl - Pure Perl implementation of DMARC
 
 =head1 VERSION
 
-version 1.20190308
+version 1.20190831
 
 =head1 METHODS
 

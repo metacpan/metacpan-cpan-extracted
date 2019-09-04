@@ -8,7 +8,7 @@ Term::Tmux::Layout - Create tmux layout strings programmatically
 
 =head1 VERSION
 
-version 1.182062
+version 1.192431
 
 =head1 SYNOPSIS
 
@@ -142,7 +142,7 @@ See L<tmuxlayout> for a command line utility that wraps this module.
 =head1 BUGS
 
 Check the issue tracker at:
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Term-Layout>
+L<https://github.com/jmaslak/Term-Tmux-Layout/issues>
 
 =head1 AUTHOR
 

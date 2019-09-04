@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use Geoffrey::Utils;
 
-$Geoffrey::Changeset::VERSION = '0.000201';
+$Geoffrey::Changeset::VERSION = '0.000204';
 
 use parent 'Geoffrey::Role::Core';
 
@@ -79,7 +79,7 @@ Geoffrey::Changeset - Handles action types.
 
 =head1 VERSION
 
-Version 0.000201
+Version 0.000204
 
 =head1 DESCRIPTION
 

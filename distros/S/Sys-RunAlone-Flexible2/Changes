@@ -1,0 +1,5 @@
+0.001   2019-09-03  Released-By: PERLANCAR
+
+        - First release, a temporary release for Sys::RunAlone::Flexible: adding
+          the feature of locking filehandle to $0 (or the module file) and
+          rewriting the tests.

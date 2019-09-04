@@ -9,9 +9,11 @@ README
 README.md
 dist.ini
 eg/cadence
+eg/synopsis
 lib/Music/Cadence.pm
 t/00-compile.t
 t/01-methods.t
+t/02-methods.t
 t/author-eol.t
 t/author-no-tabs.t
 t/author-pod-coverage.t

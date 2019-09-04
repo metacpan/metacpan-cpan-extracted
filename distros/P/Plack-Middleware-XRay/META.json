@@ -4,7 +4,7 @@
       "FUJIWARA Shunichiro <fujiwara.shunichiro@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.11",
+   "generated_by" : "Minilla/v3.1.4",
    "license" : [
       "perl_5"
    ],
@@ -42,7 +42,7 @@
       },
       "runtime" : {
          "requires" : {
-            "AWS::XRay" : "0.06",
+            "AWS::XRay" : "0.09",
             "Plack::Middleware" : "0",
             "perl" : "5.012000"
          }
@@ -57,7 +57,7 @@
    "provides" : {
       "Plack::Middleware::XRay" : {
          "file" : "lib/Plack/Middleware/XRay.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -71,7 +71,11 @@
          "web" : "https://github.com/fujiwara/Plack-Middleware-XRay"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_authority" : "cpan:FUJIWARA",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "x_contributors" : [
+      "papix <mail@papix.net>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "x_static_install" : 1
 }

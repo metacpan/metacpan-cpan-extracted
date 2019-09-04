@@ -38,6 +38,7 @@ sub out_of_time {
 }
 
 my $launches = 0;
+my $ca_cert_handle;
 
 my ($major_version, $minor_version, $patch_version); 
 sub start_firefox {
@@ -48,6 +49,14 @@ sub start_firefox {
 	if ($ENV{FIREFOX_BINARY}) {
 		$parameters{firefox} = $ENV{FIREFOX_BINARY};
 		diag("Overriding firefox binary to $parameters{firefox}");
+	} elsif (defined $ca_cert_handle) {
+		if ($launches % 2) {
+			diag("Setting trust to list");
+			$parameters{trust} = [ '/dev/fd/' . fileno $ca_cert_handle ];
+		} else {
+			diag("Setting trust to scalar");
+			$parameters{trust} = '/dev/fd/' . fileno $ca_cert_handle;
+		}
 	}
 	if ((defined $major_version) && ($major_version >= 61)) {
 	} elsif ($parameters{har}) {
@@ -532,13 +541,54 @@ SKIP: {
 if ($major_version < 40) {
 	$profile->set_value('security.tls.version.max', 3); 
 }
-	$profile->set_value('browser.newtabpage.activity-stream.feeds.favicon', 'true'); 
-	$profile->set_value('browser.shell.shortcutFavicons', 'true'); 
-	$profile->set_value('browser.discovery.enabled', 'true'); 
-	$profile->set_value('browser.newtabpage.enabled', 'true'); 
-	$profile->set_value('browser.pagethumbnails.capturing_disabled', 'false', 0); 
-	$profile->set_value('distribution.fedora.bookmarksProcessed', 'false', 0); 
-	$profile->set_value('startup.homepage_welcome_url', 'false', 0); 
+$profile->set_value('browser.newtabpage.activity-stream.feeds.favicon', 'true'); 
+$profile->set_value('browser.shell.shortcutFavicons', 'true'); 
+$profile->set_value('browser.discovery.enabled', 'true'); 
+$profile->set_value('browser.newtabpage.enabled', 'true'); 
+$profile->set_value('browser.pagethumbnails.capturing_disabled', 'false', 0); 
+$profile->set_value('distribution.fedora.bookmarksProcessed', 'false', 0); 
+$profile->set_value('startup.homepage_welcome_url', 'false', 0); 
+
+if ($ENV{RELEASE_TESTING}) {
+	eval {
+		$ca_cert_handle = File::Temp::tempfile(File::Spec->catfile(File::Spec->tmpdir(), 'firefox_test_ca_private_XXXXXXXXXXX')) or Carp::croak("Failed to open temporary file for writing:$!");
+		fcntl $ca_cert_handle, Fcntl::F_SETFD(), 0 or Carp::croak("Can't clear close-on-exec flag on temporary file:$!");
+		my $ca_private_key_handle = File::Temp::tempfile(File::Spec->catfile(File::Spec->tmpdir(), 'firefox_test_ca_private_XXXXXXXXXXX')) or Carp::croak("Failed to open temporary file for writing:$!");
+		fcntl $ca_private_key_handle, Fcntl::F_SETFD(), 0 or Carp::croak("Can't clear close-on-exec flag on temporary file:$!");
+		system {'openssl'} 'openssl', 'genrsa', '-out' => '/dev/fd/' . fileno $ca_private_key_handle, 4096 and Carp::croak("Failed to generate a private key:$!");
+		my $ca_config_handle = File::Temp::tempfile(File::Spec->catfile(File::Spec->tmpdir(), 'firefox_test_ca_config_XXXXXXXXXXX')) or Carp::croak("Failed to open temporary file for writing:$!");
+		$ca_config_handle->print(<<"_CONFIG_");
+[ req ]
+distinguished_name     = req_distinguished_name
+attributes             = req_attributes
+prompt                 = no
+
+[ req_distinguished_name ]
+C                      = AU
+ST                     = Victoria
+L                      = Melbourne
+O                      = David Dick
+OU                     = CPAN
+CN                     = Firefox::Marionette Root CA
+emailAddress           = ddick\@cpan.org
+
+[ req_attributes ]
+_CONFIG_
+		seek $ca_config_handle, 0, 0 or Carp::croak("Failed to seek to start of temporary file:$!");
+		fcntl $ca_config_handle, Fcntl::F_SETFD(), 0 or Carp::croak("Can't clear close-on-exec flag on temporary file:$!");
+		system {'openssl'} 'openssl', 'req', '-x509',
+			'-set_serial' => '1',
+			'-config'     => '/dev/fd/' . fileno $ca_config_handle,
+			'-days'       => 10,
+			'-key'        => '/dev/fd/' . fileno $ca_private_key_handle,
+			'-out'        => '/dev/fd/' . fileno $ca_cert_handle
+			and Carp::croak("Failed to generate a CA root certificate:$!");
+		1;
+	} or do {
+		chomp $@;
+		diag("Did not generate a CA root certificate:$@");
+	};
+}
 
 SKIP: {
 	my $daemon = HTTP::Daemon->new(LocalAddr => 'localhost') || die "Failed to create HTTP::Daemon";
@@ -811,7 +861,7 @@ SKIP: {
 	ok((ref $capabilities) eq 'Firefox::Marionette::Capabilities', "\$firefox->capabilities() returns a Firefox::Marionette::Capabilities object");
 	if (!grep /^accept_insecure_certs$/, $capabilities->enumerate()) {
 		diag("\$capabilities->accept_insecure_certs is not supported for " . $capabilities->browser_version());
-		skip("\$capabilities->accept_insecure_certs is not supported for " . $capabilities->browser_version(), 2);
+		skip("\$capabilities->accept_insecure_certs is not supported for " . $capabilities->browser_version(), 3);
 	}
 	ok(!$capabilities->accept_insecure_certs(), "\$capabilities->accept_insecure_certs() is false");
 	ok($firefox->go(URI->new("https://metacpan.org/")), "https://metacpan.org/ has been loaded");
@@ -1500,6 +1550,16 @@ SKIP: {
 		if ($major_version < 45) {
 			skip("Firefox below 45 (at least 24) does not support the getContext method", 5);
 		}
+		if (!$firefox->xvfb()) {
+			if (($major_version == 68)
+					&& (defined $minor_version)
+					&& ($minor_version == 0)
+					&& (defined $patch_version)
+					&& ($patch_version == 2))
+			{
+				skip("Firefox 68.0.2 crashes when downloading without xvfb", 5);
+			}
+		}
 		ok($firefox->bye(sub { $firefox->find_id('search-input') })->await(sub { $firefox->interactive() && $firefox->find_partial('Download'); })->click(), "Clicked on the download link");
 		diag("Clicked download link");
 		while(!$firefox->downloads()) {
@@ -1828,7 +1888,13 @@ SKIP: {
 		}
 		ok($capabilities->moz_accessibility_checks() == 0, "\$capabilities->moz_accessibility_checks() is set to false");
 	}
-	ok(not($capabilities->moz_headless()), "\$capabilities->moz_headless() is set to false");
+	SKIP: {
+		if ($ENV{FIREFOX_HOST}) {
+			diag("\$capabilities->headless is forced on for FIREFOX_HOST testing");
+			skip("\$capabilities->headless is forced on for FIREFOX_HOST testing", 1);
+		}
+		ok(not($capabilities->moz_headless()), "\$capabilities->moz_headless() is set to false");
+	}
 	SKIP: {
 		if ($major_version < 66) {
 			skip("Firefox $major_version does not support \$firefox->new_window()", 15);

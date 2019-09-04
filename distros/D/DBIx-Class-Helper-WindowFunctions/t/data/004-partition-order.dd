@@ -1,0 +1,20 @@
+#!perl
+
++{
+    table_class => 'Artist',
+    attr        => {
+        columns   => [qw/ name /],
+        '+select' => {
+            sum   => [qw/fingers/],
+            -over => {
+                partition_by => [qw/ name hats /],
+                order_by     => [ 'name', { -desc => 'id' } ],
+            },
+        },
+    },
+    sql => q{ SELECT me.name,
+              SUM(fingers) OVER
+                (PARTITION BY name, hats ORDER BY name, id DESC)
+              FROM artist me
+    },
+};

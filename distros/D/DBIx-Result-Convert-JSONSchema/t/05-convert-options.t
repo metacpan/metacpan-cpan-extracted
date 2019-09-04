@@ -97,7 +97,7 @@ subtest 'schema_declaration' => sub {
 
 subtest 'schema_overwrite' => sub {
 
-    my $json_schema = $converter->get_json_schema('MySQLTypeTest', {
+    my $schema = $converter->get_json_schema('MySQLTypeTest', {
         schema_overwrite => {
             '$schema' => 'overwritten',
             type => 'overwritten',
@@ -107,7 +107,7 @@ subtest 'schema_overwrite' => sub {
         },
     });
 
-    cmp_deeply $json_schema, {
+    cmp_deeply $schema, {
         '$schema' => 'overwritten',
         'additionalProperties' => 0,
         'type' => 'overwritten',
@@ -122,13 +122,22 @@ subtest 'schema_overwrite' => sub {
 
 subtest 'dependencies' => sub {
 
-    my $json_schema = $converter->get_json_schema('MySQLTypeTest', {
+    my $schema = $converter->get_json_schema('MySQLTypeTest', {
         dependencies => {
             fieldA => [ qw/ fieldB fieldC / ],
         },
     });
 
-    cmp_deeply $json_schema->{dependencies}, { fieldA => [ qw/ fieldB fieldC / ] }, 'got dependency fields';
+    cmp_deeply $schema->{dependencies}, { fieldA => [ qw/ fieldB fieldC / ] }, 'got dependency fields';
+
+};
+
+subtest 'ignore_property_defaults' => sub {
+
+    is $json_schema->{properties}->{date}->{default}, '2019-08-21', 'original schema has default key for date';
+
+    my $schema = $converter->get_json_schema( 'MySQLTypeTest', { ignore_property_defaults => 1 } );
+    is $schema->{properties}->{date}->{default}, undef, 'schema does not have defaults set';
 
 };
 

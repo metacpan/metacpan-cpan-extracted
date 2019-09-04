@@ -14,16 +14,16 @@ name: App-SpeedTest
 provides: 
   App::SpeedTest: 
     file: speedtest
-    version: '0.20'
+    version: '0.22'
 recommends: 
   Data::Peek: '0.48'
-  Getopt::Long: '2.5'
+  Getopt::Long: '2.51'
   HTML::TreeBuilder: '5.07'
-  LWP::UserAgent: '6.36'
-  Socket: '2.027'
-  Test::More: '1.302141'
-  Text::CSV_XS: '1.37'
-  Time::HiRes: '1.9759'
+  LWP::UserAgent: '6.39'
+  Socket: '2.029'
+  Test::More: '1.302167'
+  Text::CSV_XS: '1.39'
+  Time::HiRes: '1.9760'
   XML::Simple: '2.25'
 requires: 
   Data::Dumper: 0
@@ -42,4 +42,4 @@ resources:
   homepage: https://metacpan.org/pod/App::SpeedTest
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/speedtest
-version: '0.20'
+version: '0.22'

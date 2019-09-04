@@ -4,10 +4,9 @@ use utf8;
 use 5.024;
 use strict;
 use warnings;
-use SQL::Abstract;
 use Geoffrey::Exception::Database;
 
-$Geoffrey::Changelog::Database::VERSION = '0.000200';
+$Geoffrey::Changelog::Database::VERSION = '0.000202';
 
 use parent 'Geoffrey::Role::Changelog';
 
@@ -16,16 +15,31 @@ sub new {
     my $self  = $class->SUPER::new(@_);
     $self->{needs_converter} = 1;
     $self->{needs_dbh}       = 1;
-    $self->{sql_abstract}    = SQL::Abstract->new;
     $self->{generated_sql}   = [];
-    return bless $self, $class;
+    $self = bless $self, $class;
+    $self->_prepare_tables if ($self->converter && $self->dbh);
+    return $self;
+}
+
+sub _action_entry {
+    my ($self, $o_action_entry) = @_;
+    $self->{action_entry} = $o_action_entry if $o_action_entry;
+    require Geoffrey::Action::Entry;
+    $self->{action_entry} //= Geoffrey::Action::Entry->new(dbh => $self->dbh, converter => $self->converter);
+    return $self->{action_entry};
+}
+
+sub _sql_abstract {
+    my ($self) = @_;
+    require SQL::Abstract;
+    $self->{sql_abstract} //= SQL::Abstract->new;
+    return $self->{sql_abstract};
 }
 
 sub _changlog_entries_table_name {
     $_[0]->{changlog_entries_table} //= 'geoffrey_changlog_entries';
     return $_[0]->{changlog_entries_table};
 }
-
 
 sub _changlog_entries_table {
     my ($self) = @_;
@@ -47,6 +61,23 @@ sub _changlog_entries_table {
             foreignkey => {reftable => $self->geoffrey_changelogs, refcolumn => 'id'},
         },
     ];
+}
+
+sub _get_changesets {
+    my ($self, $hr_params) = @_;
+    $self->_prepare_tables;
+    my $s_changeset_sql = $self->_sql_abstract->select(
+        ($self->schema ? $self->schema . q/./ : q//) . $self->geoffrey_changelogs,
+        qw/*/,
+        {
+            ($hr_params->{changeset_id} ? (id => $hr_params->{changeset_id}) : ()),
+            ($hr_params->{not_executed} ? (md5sum => undef) : ()),
+        });
+    return $self->dbh->selectall_arrayref(
+        $s_changeset_sql,
+        {Slice => {}},
+        ($hr_params->{changeset_id} ? ($hr_params->{changeset_id}) : ())
+    ) || Geoffrey::Exception::Database::throw_sql_handle($!, $s_changeset_sql);
 }
 
 sub _prepare_tables {
@@ -74,15 +105,12 @@ sub _prepare_tables {
     });
 }
 
-sub tpl_main { }
-sub tpl_sub  { }
-
 sub file_extension { return $_[0]->{file_extension}; }
 
 sub _get_changeset_entries {
     my ($self, $hr_unhandeled_changelog) = @_;
     my $s_table_name = ($self->schema ? $self->schema . q/./ : q//) . $self->_changlog_entries_table_name;
-    my $s_entries_sql = $self->{sql_abstract}->select($s_table_name, qw/*/, {geoffrey_changelog => {'=', '?'}});
+    my $s_entries_sql = $self->_sql_abstract->select($s_table_name, qw/*/, {geoffrey_changelog => {'=', '?'}});
 
     my $ar_entries = $self->dbh->selectall_arrayref($s_entries_sql, {Slice => {}}, ($hr_unhandeled_changelog->{ID}))
         || Geoffrey::Exception::Database::throw_sql_handle($!, $s_entries_sql);
@@ -90,43 +118,65 @@ sub _get_changeset_entries {
 }
 
 sub load {
-    my ($self, $i_changeset_id) = @_;
-    $self->_prepare_tables;
-    my $s_changelog_name = ($self->schema ? $self->schema . q/./ : q//) . $self->geoffrey_changelogs;
-    my $hr_changeset_sql_params = $i_changeset_id ? {id => $i_changeset_id} : {};
-    my $s_changeset_sql = $self->{sql_abstract}->select($s_changelog_name, qw/*/, $hr_changeset_sql_params);
-    my $ar_changesets
-        = $self->dbh->selectall_arrayref($s_changeset_sql, {Slice => {}}, ($i_changeset_id ? ($i_changeset_id) : ()))
-        || Geoffrey::Exception::Database::throw_sql_handle($!, $s_changeset_sql);
+    my ($self, $s_changeset_id) = @_;
+    my $ar_changesets = $self->_get_changesets($s_changeset_id ? ({changeset_id => $s_changeset_id}) : ());
     $_->{entries} = $self->_get_changeset_entries($_) for @{$ar_changesets};
     require Geoffrey::Utils;
     Geoffrey::Utils::to_lowercase($_) for @{$ar_changesets};
-    return ($i_changeset_id && scalar @{$ar_changesets} == 1) ? $ar_changesets->[0] : $ar_changesets;
+    return ($s_changeset_id && scalar @{$ar_changesets} == 1) ? $ar_changesets->[0] : $ar_changesets;
+}
+
+
+sub load_changeset {
+    my ($self, $s_changeset_id) = @_;
+    my $ar_changesets = $self->_get_changesets({changeset_id => $s_changeset_id});
+    $_->{entries} = $self->_get_changeset_entries($_) for @{$ar_changesets};
+    require Geoffrey::Utils;
+    Geoffrey::Utils::to_lowercase($_) for @{$ar_changesets};
+    return ($s_changeset_id && scalar @{$ar_changesets} == 1) ? $ar_changesets->[0] : $ar_changesets;
 }
 
 sub write {
     my ($self, $s_file, $ur_data) = @_;
+    return shift->insert(@_);
+}
+
+sub delete {
+    my ($self, $s_changeset_id) = @_;
+    my $ar_changesets = $self->_get_changesets({changeset_id => $s_changeset_id, not_executed => 1});
+    return unless scalar @{$ar_changesets};
+    my @a_statements = ();
+    push @a_statements,
+        $self->_action_entry->drop({
+            schema     => $self->schema,
+            table      => $self->_changlog_entries_table_name,
+            conditions => {geoffrey_changelog => $s_changeset_id,}});
+    push @a_statements,
+        $self->_action_entry->drop(
+        {schema => $self->schema, table => $self->geoffrey_changelogs, conditions => {id => $s_changeset_id,}});
+    return \@a_statements;
+}
+
+sub insert {
+    my ($self, $s_file, $ur_data) = @_;
+    $self->_prepare_tables;
     require Ref::Util;
     return $self->{generated_sql} if Ref::Util::is_hashref($ur_data);
-    $self->_prepare_tables;
-    require Geoffrey::Action::Entry;
-    my $o_action_entry = Geoffrey::Action::Entry->new(dbh => $self->dbh, converter => $self->converter);
-
     for my $hr_changeset (@{$ur_data}) {
         next unless (exists $hr_changeset->{id});
         next unless scalar @{$hr_changeset->{entries}};
 
         push(
             @{$self->{generated_sql}},
-            $o_action_entry->add({
+            $self->_action_entry->add({
                     schema => $self->schema,
                     table  => $self->geoffrey_changelogs,
                     values => [{
-                            id               => $hr_changeset->{id},
-                            filename         => __PACKAGE__ . '::' . __LINE__,
-                            created_by       => $hr_changeset->{created_by}
-                                                    ? $hr_changeset->{created_by} : $hr_changeset->{author}
-                                                    ? $hr_changeset->{author} : undef,
+                            id         => $hr_changeset->{id},
+                            filename   => __PACKAGE__ . '::' . __LINE__,
+                            created_by => $hr_changeset->{created_by} ? $hr_changeset->{created_by}
+                            : $hr_changeset->{author} ? $hr_changeset->{author}
+                            : undef,
                             geoffrey_version => $Geoffrey::Changelog::Database::VERSION,
                             ($hr_changeset->{comment} ? (comment => $hr_changeset->{comment}) : ()),
                         }]}));
@@ -134,7 +184,7 @@ sub write {
         for my $hr_entry (@{$hr_changeset->{entries}}) {
             push(
                 @{$self->{generated_sql}},
-                $o_action_entry->add({
+                $self->_action_entry->add({
                         schema => $self->schema,
                         table  => $self->_changlog_entries_table_name,
                         values => [{
@@ -147,6 +197,8 @@ sub write {
     }
     return $self->{generated_sql};
 }
+
+## GETTER / SETTER
 
 sub schema {
     my ($self, $s_schema) = @_;
@@ -173,6 +225,8 @@ sub geoffrey_changelogs {
     return $self->{geoffrey_changelogs};
 }
 
+## END GETTER / SETTER
+
 1;    # End of Geoffrey::Changelog
 
 __END__
@@ -187,7 +241,7 @@ Geoffrey::Changelog::Database - module for Geoffrey::Changelog to load changeset
 
 =head1 VERSION
 
-Version 0.000200
+Version 0.000202
 
 =head1 DESCRIPTION
 
@@ -203,28 +257,25 @@ Version 0.000200
     my $s_user = 'Mario Zieschang';
     my $s_sql = 'SELECT 1;';
     my $s_changeset_id = time . '-' . $s_user
-    $o_geoffrey->changelog_io->write( q~.~, [{
+    $o_geoffrey->insert( q~.~, {
         author  => $s_user,
         id      => $s_changeset_id,
         name    => 'Some createative name',
         entries => [{action => 'sql.add', as => $s_sql}],
-    }]);
+    });
 
     my $hr_changeset = $o_geoffrey->changelog_io->load($s_changeset_id);
     
+    # changesets are stored in the geoffrey table but without md5sum. 
+    # run the changeset will set it
     $o_geoffrey->reader->run_changeset($hr_get_changeset, delete $hr_get_changeset->{filename});
+
+    # changesets without md5sum can be deleted without effect
+    $o_geoffrey->delete($s_changeset_id);
 
 =head1 SUBROUTINES/METHODS
 
 =head2 new
-
-=head2 tpl_main
-
-Not supported yet.
-
-=head2 tpl_sub
-
-Not supported yet.
 
 =head2 file_extension
 
@@ -234,7 +285,7 @@ Called to load changesets from database
 
 =head2 write
 
-Called to write changesets to database
+A wrapper for insert
 
 =head2 converter
 
@@ -250,6 +301,21 @@ Contains the given dbi session
 Returns the geoffrey_changelogs table name because it's needed for feference
 
 =head2 schema
+
+Some Databases are using different schemas e.g. to categorize.
+If you need to store your datas in a special schema you can set it here
+
+=head2 delete
+
+Geoffrey::Changelog::Database is able to delete a changeset by id as long it's not executed
+
+=head2 insert
+
+Called to write changesets to database
+
+=head2 load_changeset
+
+Get the value of a changeset by given changeset id.
 
 =head1 DIAGNOSTICS
 

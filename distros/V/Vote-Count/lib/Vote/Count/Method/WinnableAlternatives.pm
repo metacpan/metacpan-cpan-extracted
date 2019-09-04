@@ -1,5 +1,5 @@
 package Vote::Count::Method::WinnableAlternatives;
-$Vote::Count::Method::WinnableAlternatives::VERSION = '0.022';
+$Vote::Count::Method::WinnableAlternatives::VERSION = '0.02401';
 use Moose;
 extends 'Vote::Count';
 

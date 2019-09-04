@@ -32,7 +32,7 @@ void S_yyerror(pTHX_ const char *s)
   STRLEN contlen = PL_parser->bufptr - PL_parser->oldbufptr;
 
   sv_catpvf(message, "%s at %s line %" IVdf,
-      s, OutCopFILE(PL_curcop), CopLINE(PL_curcop));
+      s, OutCopFILE(PL_curcop), (IV)CopLINE(PL_curcop));
 
   if(context)
     sv_catpvf(message, ", near \"%" UTF8f "\"",
@@ -41,7 +41,7 @@ void S_yyerror(pTHX_ const char *s)
   sv_catpvf(message, "\n");
 
   PL_parser->error_count++;
-  warn(SvPVX(message));
+  warn_sv(message);
 }
 
 /* Stolen from op.c */

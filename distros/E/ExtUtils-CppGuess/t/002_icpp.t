@@ -15,12 +15,21 @@ my @DATA = (
     },
   ],
   [
-    { os => 'MSWin32', cc => 'gcc', config => {ccflags => ''} },
+    { os => 'MSWin32', cc => 'gcc', config => {ccflags => '', ldflags => ''} },
     {
       is_sunstudio => 0,
       is_msvc => undef, is_gcc => 1, is_clang => 0,
       compiler_command => 'g++ -xc++',
       linker_flags => '-lstdc++',
+    },
+  ],
+  [
+    { os => 'MSWin32', cc => 'gcc', config => {ccflags => '', ldflags => 'static-libstdc++'} },
+    {
+      is_sunstudio => 0,
+      is_msvc => undef, is_gcc => 1, is_clang => 0,
+      compiler_command => 'g++ -xc++',
+      linker_flags => '',
     },
   ],
   [

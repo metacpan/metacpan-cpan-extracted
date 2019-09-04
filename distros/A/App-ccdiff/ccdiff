@@ -2,14 +2,14 @@
 
 package App::ccdiff;
 
-use 5.14.0;
+use 5.014000;
 use warnings;
 use charnames ();
 use Algorithm::Diff;
 use Term::ANSIColor qw(:constants color);
 use Getopt::Long    qw(:config bundling);
 
-our $VERSION = "0.26";
+our $VERSION = "0.28";
 our $CMD     = $0 =~ s{.*/}{}r;
 
 sub usage {
@@ -94,7 +94,7 @@ my $emacs     = $rc{emacs};
 my $old_color = $rc{old};
 my $new_color = $rc{new};
 my $rev_color = $rc{bg};
-my $no_colors;
+my $no_colors = $ENV{NO_COLOR}; # https://no-color.org
 my $list_colors;
 
 unless (caller) {
@@ -261,12 +261,12 @@ sub ccdiff {
     $opt_U and binmode STDIN,  ":encoding(utf-8)";
     $opt_U and binmode STDOUT, ":encoding(utf-8)";
 
-    my @d1 = $f1 eq "-" ? <> : do {
+    my @d1 = $f1 eq "-" ? <STDIN> : do {
 	open my $fh, "<", $f1 or die "$f1: $!\n";
 	$opt_U and binmode $fh, ":encoding(utf-8)";
 	<$fh>;
 	};
-    my @d2 = $f2 eq "-" ? <> : do {
+    my @d2 = $f2 eq "-" ? <STDIN> : do {
 	open my $fh, "<", $f2 or die "$f2: $!\n";
 	$opt_U and binmode $fh, ":encoding(utf-8)";
 	<$fh>;
@@ -375,7 +375,7 @@ sub subdiff {
 		    $join = "\n";
 		    my $l  = length $sc;      # The length of this "same" chunck
 		    my $le = $l - 2 * $opt_e; # The length of the text replaces with ellipsis
-		    my $ee = $opt_v <= 1 ? $e : $e =~ s/^.\K(?=.$)/$le/r; 
+		    my $ee = $opt_v <= 1 ? $e : $e =~ s/^.\K(?=.$)/$le/r;
 		    if ($le > length $ee) {
 			my $lsc = substr $sc, 0,           $opt_e;
 			$d1 .= $lsc;
@@ -733,7 +733,7 @@ Defines the percentage of character-changes a change block may differ before
 the fall-back of horizontal diff to vertical diff.
 
 This percentage is calculated as C<(characters removed + characters added) /
-(2 * characters unchanged))>. 
+(2 * characters unchanged))>.
 
 =item --ellipsis=n -e n
 
@@ -1112,7 +1112,7 @@ H.Merijn Brand
 
 =head1 COPYRIGHT AND LICENSE
 
- Copyright (C) 2018-2018 H.Merijn Brand.  All rights reserved.
+ Copyright (C) 2018-2019 H.Merijn Brand.  All rights reserved.
 
 This library is free software;  you can redistribute and/or modify it under
 the same terms as The Artistic License 2.0.

@@ -16,7 +16,7 @@ use 5.008001;
 {
     package DBD::Pg;
 
-    use version; our $VERSION = qv('3.9.1');
+    use version; our $VERSION = qv('3.10.0');
 
     use DBI ();
     use DynaLoader ();
@@ -394,18 +394,37 @@ use 5.008001;
                 return undef;
             }
             my $info = $sth->fetchall_arrayref();
-
             ## We have at least one with a default value. See if we found any sequences
             my @def = grep { defined $_->[1] } @$info;
             if (!@def) {
-                $dbh->set_err(1, qq{No suitable column found for last_insert_id of table "$table"\n});
-                return undef;
+                ## This may be an inherited table, in which case we can use the parent's info
+                $SQL = 'SELECT inhparent::regclass FROM pg_inherits WHERE inhrelid = ?::regclass::oid';
+                my $isth = $dbh->prepare($SQL);
+                $count = $isth->execute($table);
+                if ($count < 1) {
+                    $isth->finish();
+                    $dbh->set_err(1, qq{No1 suitable column found for last_insert_id of table "$table"\n});
+                    return undef;
+                }
+                my $parent = $isth->fetch->[0];
+                $args[0] = $parent;
+                $count = $sth->execute(@args);
+                if (1 == $count) {
+                    $info = $sth->fetchall_arrayref();
+                    @def = grep { defined $_->[1] } @$info;
+                }
+                if (!@def) {
+                    $sth->finish();
+                    $dbh->set_err(1, qq{No1 suitable column found for last_insert_id of table "$table"\n});
+                    return undef;
+                }
+                ## Fall through with inherited information
             }
             ## Tiebreaker goes to the primary keys
             if (@def > 1) {
                 my @pri = grep { $_->[0] } @def;
                 if (1 != @pri) {
-                    $dbh->set_err(1, qq{No suitable column found for last_insert_id of table "$table"\n});
+                    $dbh->set_err(1, qq{No2 suitable column found for last_insert_id of table "$table"\n});
                     return undef;
                 }
                 @def = @pri;
@@ -508,7 +527,7 @@ use 5.008001;
                 JOIN pg_catalog.pg_namespace n ON (n.oid = c.relnamespace)
             WHERE
                 a.attnum >= 0
-                AND c.relkind IN ('r','v','m','f')
+                AND c.relkind IN ('r','p','v','m','f')
                 $whereclause
             ORDER BY "TABLE_SCHEM", "TABLE_NAME", "ORDINAL_POSITION"
             !;
@@ -1005,8 +1024,8 @@ use 5.008001;
                     uk_constr.oid = dep2.refobjid AND uk_constr.contype IN ('p','u')
                 )
             WHERE $WHERE
-                AND uk_class.relkind = 'r'
-                AND fk_class.relkind = 'r'
+                AND uk_class.relkind ~ 'r|p'
+                AND fk_class.relkind ~ 'r|p'
                 AND constr.contype = 'f'
             ORDER BY constr.conname, colnum.i
         };
@@ -1088,10 +1107,10 @@ use 5.008001;
                             , NULL::text AS "TABLE_NAME") dummy_cols
                     CROSS JOIN
                       (SELECT 'TABLE'        AS "TABLE_TYPE"
-                            , 'relkind: r'   AS "REMARKS"
+                            , 'relkind ~ r|p'   AS "REMARKS"
                        UNION
                        SELECT 'SYSTEM TABLE'
-                            , 'relkind: r; nspname ~ ^pg_(catalog|toast)$'
+                            , 'relkind ~ r|p; nspname ~ ^pg_(catalog|toast)$'
                        UNION
                        SELECT 'VIEW'
                             , 'relkind: v'
@@ -1112,14 +1131,14 @@ use 5.008001;
                             , 'relkind: f; nspname ~ ^pg_(catalog|toast)$'
                        UNION
                        SELECT 'LOCAL TEMPORARY'
-                            , 'relkind: r; nspname ~ ^pg_(toast_)?temp') type_info
+                            , 'relkind ~ r|p; nspname ~ ^pg_(toast_)?temp') type_info
                      ORDER BY "TABLE_TYPE" ASC
                 };
         }
         else {
             # Default SQL
             $extracols = q{,n.nspname AS pg_schema, c.relname AS pg_table};
-            my @search = (q|c.relkind IN ('r', 'v', 'm', 'f')|, # No sequences, etc. for now
+            my @search = (q|c.relkind IN ('r', 'p', 'v', 'm', 'f')|, # No sequences, etc. for now
                           q|NOT (pg_catalog.quote_ident(n.nspname) ~ '^pg_(toast_)?temp_' AND NOT pg_catalog.has_schema_privilege(n.nspname, 'USAGE'))|);   # No others' temp objects
             my $showtablespace = ', pg_catalog.quote_ident(t.spcname) AS "pg_tablespace_name", pg_catalog.quote_ident(t.spclocation) AS "pg_tablespace_location"';
             if ($dbh->{private_dbdpg}{version} >= 90200) {
@@ -1142,7 +1161,7 @@ use 5.008001;
                        -- any temp table or temp view is LOCAL TEMPORARY for us
                      , CASE WHEN pg_catalog.quote_ident(n.nspname) ~ '^pg_(toast_)?temp_' THEN
                                  'LOCAL TEMPORARY'
-                            WHEN c.relkind = 'r' THEN
+                            WHEN c.relkind ~ 'r|p' THEN
                                  CASE WHEN pg_catalog.quote_ident(n.nspname) ~ '^pg_' THEN
                                            'SYSTEM TABLE'
                                       ELSE 'TABLE'
@@ -1711,7 +1730,7 @@ DBD::Pg - PostgreSQL database driver for the DBI module
 
 =head1 VERSION
 
-This documents version 3.9.1 of the DBD::Pg module
+This documents version 3.10.0 of the DBD::Pg module
 
 =head1 DESCRIPTION
 
@@ -2781,7 +2800,7 @@ server version 9.0 or higher.
 
 The C<ping> method determines if there is a working connection to an active 
 database server. It does this by sending a small query to the server, currently 
-B<'DBD::Pg ping test v3.9.1'>. It returns 0 (false) if the connection is not valid, 
+B<'DBD::Pg ping test v3.10.0'>. It returns 0 (false) if the connection is not valid, 
 otherwise it returns a positive number (true). The value returned indicates the 
 current state:
 

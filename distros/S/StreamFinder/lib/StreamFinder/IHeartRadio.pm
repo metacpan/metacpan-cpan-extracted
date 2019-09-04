@@ -4,7 +4,7 @@ StreamFinder::IHeartRadio - Fetch actual raw streamable URLs from radio-station 
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2017 by
+This module is Copyright (C) 2017-2019 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -81,9 +81,9 @@ The purpose is that one needs one of these URLs in order to have the option to
 stream the station in one's own choice of audio player software rather than 
 using their web browser and accepting any / all flash, ads, javascript, 
 cookies, trackers, web-bugs, and other crapware that can come with that method 
-of playing.  The author uses his own custom all-purpose audio player called 
+of playing.  The author uses his own custom all-purpose media player called 
 "fauxdacious" (his custom hacked version of the open-source "audacious" 
-media player).  "fauxdacious" can incorporate this module to decode and play 
+audio player).  "fauxdacious" can incorporate this module to decode and play 
 IHeartRadio.com streams.
 
 One or more stream URLs can be returned for each station.  
@@ -200,7 +200,7 @@ L<http://search.cpan.org/dist/StreamFinder-IHeartRadio/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Jim Turner.
+Copyright 2017-2019 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -263,7 +263,7 @@ sub new
 		if ($_[0] =~ /^\!/o) {
 			(my $i = shift) =~ s/\!//o;
 			push @skipStreams, $i;
-		} elsif ($_[0] =~ /^debug$/o) {
+		} elsif ($_[0] =~ /^\-?debug$/o) {
 			shift;
 			$DEBUG = (defined($_[0]) && $_[0] =~/^[0-9]$/) ? shift : 1;
 print STDERR "-???- DEBUG=$DEBUG=\n";

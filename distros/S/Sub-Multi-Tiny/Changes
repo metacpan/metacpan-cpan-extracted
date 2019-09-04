@@ -1,0 +1,16 @@
+Revision history for Perl extension Sub-Multi-Tiny
+
+0.000003 2019-09-04T14:21:27Z
+
+    - Updated documentation
+    - Added tests
+    - Removed undeclared dependency (#1)
+
+0.000002 2019-09-03T01:00:33Z
+
+    - Actually pass parameter values to the correct candidate!
+
+0.000001 2019-09-01T01:26:34Z
+
+    - Initial release to CPAN.  Only supports dispatch by arity.
+

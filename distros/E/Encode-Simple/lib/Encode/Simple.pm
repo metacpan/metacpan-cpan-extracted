@@ -6,12 +6,18 @@ use Carp ();
 use Encode ();
 use Exporter 'import';
 
-our $VERSION = '0.003';
+our $VERSION = '1.000';
 
-our @EXPORT = qw(encode decode);
-our @EXPORT_OK = qw(encode_lax decode_lax);
-our %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK], strict => \@EXPORT, lax => \@EXPORT_OK);
+our @EXPORT = qw(encode encode_utf8 decode decode_utf8);
+our @EXPORT_OK = qw(encode_lax encode_utf8_lax decode_lax decode_utf8_lax);
+our %EXPORT_TAGS = (
+  all => [@EXPORT, @EXPORT_OK],
+  strict => [qw(encode encode_utf8 decode decode_utf8)],
+  lax => [qw(encode_lax encode_utf8_lax decode_lax decode_utf8_lax)],
+  utf8 => [qw(encode_utf8 encode_utf8_lax decode_utf8 decode_utf8_lax)],
+);
 
+use constant HAS_UNICODE_UTF8 => do { local $@; !!eval { require Unicode::UTF8; 1 } };
 use constant MASK_STRICT => Encode::FB_CROAK | Encode::LEAVE_SRC;
 use constant MASK_LAX => Encode::FB_DEFAULT | Encode::LEAVE_SRC;
 
@@ -35,6 +41,38 @@ sub encode_lax {
   my $obj = $ENCODINGS{$encoding} || _find_encoding($encoding);
   my ($output, $error);
   { local $@; no warnings 'utf8'; # Encode::Unicode throws warnings in this category
+    unless (eval { $output = $obj->encode("$input", MASK_LAX); 1 }) { $error = $@ || 'Error' }
+  }
+  _rethrow($error) if defined $error;
+  return $output;
+}
+
+sub encode_utf8 {
+  my ($input) = @_;
+  return undef unless defined $input;
+  my ($output, $error);
+  if (HAS_UNICODE_UTF8) {
+    local $@; use warnings FATAL => 'utf8'; # Unicode::UTF8 throws warnings in this category
+    unless (eval { $output = Unicode::UTF8::encode_utf8($input); 1 }) { $error = $@ || 'Error' }
+  } else {
+    my $obj = $ENCODINGS{'UTF-8'} || _find_encoding('UTF-8');
+    local $@;
+    unless (eval { $output = $obj->encode("$input", MASK_STRICT); 1 }) { $error = $@ || 'Error' }
+  }
+  _rethrow($error) if defined $error;
+  return $output;
+}
+
+sub encode_utf8_lax {
+  my ($input) = @_;
+  return undef unless defined $input;
+  my ($output, $error);
+  if (HAS_UNICODE_UTF8) {
+    local $@; no warnings 'utf8'; # Unicode::UTF8 throws warnings in this category
+    unless (eval { $output = Unicode::UTF8::encode_utf8($input); 1 }) { $error = $@ || 'Error' }
+  } else {
+    my $obj = $ENCODINGS{'UTF-8'} || _find_encoding('UTF-8');
+    local $@;
     unless (eval { $output = $obj->encode("$input", MASK_LAX); 1 }) { $error = $@ || 'Error' }
   }
   _rethrow($error) if defined $error;
@@ -65,6 +103,38 @@ sub decode_lax {
   return $output;
 }
 
+sub decode_utf8 {
+  my ($input) = @_;
+  return undef unless defined $input;
+  my ($output, $error);
+  if (HAS_UNICODE_UTF8) {
+    local $@; use warnings FATAL => 'utf8'; # Unicode::UTF8 throws warnings in this category
+    unless (eval { $output = Unicode::UTF8::decode_utf8($input); 1 }) { $error = $@ || 'Error' }
+  } else {
+    my $obj = $ENCODINGS{'UTF-8'} || _find_encoding('UTF-8');
+    local $@;
+    unless (eval { $output = $obj->decode("$input", MASK_STRICT); 1 }) { $error = $@ || 'Error' }
+  }
+  _rethrow($error) if defined $error;
+  return $output;
+}
+
+sub decode_utf8_lax {
+  my ($input) = @_;
+  return undef unless defined $input;
+  my ($output, $error);
+  if (HAS_UNICODE_UTF8) {
+    local $@; no warnings 'utf8'; # Unicode::UTF8 throws warnings in this category
+    unless (eval { $output = Unicode::UTF8::decode_utf8($input); 1 }) { $error = $@ || 'Error' }
+  } else {
+    my $obj = $ENCODINGS{'UTF-8'} || _find_encoding('UTF-8');
+    local $@;
+    unless (eval { $output = $obj->decode("$input", MASK_LAX); 1 }) { $error = $@ || 'Error' }
+  }
+  _rethrow($error) if defined $error;
+  return $output;
+}
+
 sub _find_encoding {
   my ($encoding) = @_;
   Carp::croak('Encoding name should not be undef') unless defined $encoding;
@@ -88,11 +158,13 @@ Encode::Simple - Encode and decode text, simply
 
 =head1 SYNOPSIS
 
-  use Encode::Simple qw(encode decode encode_lax decode_lax);
-  my $characters = decode 'cp1252', $bytes;
-  my $characters = decode_lax 'UTF-8', $bytes;
+  use Encode::Simple qw(encode encode_lax encode_utf8 decode decode_lax decode_utf8);
   my $bytes = encode 'Shift_JIS', $characters;
   my $bytes = encode_lax 'ASCII', $characters;
+  my $bytes = encode_utf8 $characters;
+  my $characters = decode 'cp1252', $bytes;
+  my $characters = decode_lax 'UTF-8', $bytes;
+  my $characters = decode_utf8 $bytes;
 
 =head1 DESCRIPTION
 
@@ -103,8 +175,8 @@ L<Encode::Supported> for a list of supported encodings.
 =head1 FUNCTIONS
 
 All functions are exported by name, as well as via the tags C<:all>,
-C<:strict>, and C<:lax>. By default, L</"encode"> and L</"decode"> are
-exported.
+C<:strict>, C<:lax>, and C<:utf8>. By default, L</"encode">, L</"encode_utf8">,
+L</"decode">, and L</"decode_utf8"> are exported as in L<Encode>.
 
 =head2 encode
 
@@ -118,11 +190,35 @@ or possible to represent in C<$encoding>.
 
   my $bytes = encode_lax $encoding, $characters;
 
-Encodes the input string of characters as in L</"encode">, but instead of
-throwing an exception on invalid input, any invalid characters are encoded as a
-substitution character (the substitution character used depends on the
-encoding). Note that some encoders do not respect this option and may throw an
-exception anyway, this notably includes L<Encode::Unicode> (but not UTF-8).
+Encodes the input string of characters into a byte string using C<$encoding>,
+encoding any invalid characters as a substitution character (the substitution
+character used depends on the encoding). Note that some encoders do not respect
+this option and may throw an exception anyway, this notably includes
+L<Encode::Unicode> (but not UTF-8).
+
+=head2 encode_utf8
+
+  my $bytes = encode_utf8 $characters;
+
+Encodes the input string of characters into a UTF-8 byte string. Throws an
+exception if the input string contains characters that are not valid or
+possible to represent in UTF-8.
+
+This function will use the more consistent and efficient
+L<Unicode::UTF8/"encode_utf8"> if installed, and is otherwise equivalent to
+L</"encode"> with an encoding of C<UTF-8>.
+
+=head2 encode_utf8_lax
+
+  my $bytes = encode_utf8_lax $characters;
+
+Encodes the input string of characters into a UTF-8 byte string, encoding any
+invalid characters as the Unicode replacement character C<U+FFFD>, represented
+in UTF-8 as the three bytes C<0xEFBFBD>.
+
+This function will use the more consistent and efficient
+L<Unicode::UTF8/"encode_utf8"> if installed, and is otherwise equivalent to
+L</"encode_lax"> with an encoding of C<UTF-8>.
 
 =head2 decode
 
@@ -135,11 +231,32 @@ Throws an exception if the input bytes are not valid for C<$encoding>.
 
   my $characters = decode_lax $encoding, $bytes;
 
-Decodes the input byte string as in L</"decode">, but instead of throwing an
-exception on invalid input, any malformed bytes will be decoded to the Unicode
-replacement character (U+FFFD). Note that some encoders do not respect this
-option and may throw an exception anyway, this notably includes
-L<Encode::Unicode> (but not UTF-8).
+Decodes the input byte string into a string of characters using C<$encoding>,
+decoding any malformed bytes to the Unicode replacement character (U+FFFD).
+Note that some encoders do not respect this option and may throw an exception
+anyway, this notably includes L<Encode::Unicode> (but not UTF-8).
+
+=head2 decode_utf8
+
+  my $characters = decode_utf8 $bytes;
+
+Decodes the input UTF-8 byte string into a string of characters. Throws an
+exception if the input bytes are not valid for UTF-8.
+
+This function will use the more consistent and efficient
+L<Unicode::UTF8/"decode_utf8"> if installed, and is otherwise equivalent to
+L</"decode"> with an encoding of C<UTF-8>.
+
+=head2 decode_utf8_lax
+
+  my $characters = decode_utf8_lax $bytes;
+
+Decodes the input UTF-8 byte string into a string of characters, decoding any
+malformed bytes to the Unicode replacement character C<U+FFFD>.
+
+This function will use the more consistent and efficient
+L<Unicode::UTF8/"decode_utf8"> if installed, and is otherwise equivalent to
+L</"decode_lax"> with an encoding of C<UTF-8>.
 
 =head1 BUGS
 

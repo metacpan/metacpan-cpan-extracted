@@ -8,7 +8,7 @@ Test::BDD::Cucumber::Manual::Steps - How to write Step Definitions
 
 =head1 VERSION
 
-version 0.59
+version 0.60
 
 =head1 INTRODUCTION
 

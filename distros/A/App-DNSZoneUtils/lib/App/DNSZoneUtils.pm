@@ -1,7 +1,7 @@
 package App::DNSZoneUtils;
 
-our $DATE = '2019-08-19'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-09-04'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: Collection of CLI utilities related to DNS zones
@@ -18,7 +18,7 @@ App::DNSZoneUtils - Collection of CLI utilities related to DNS zones
 
 =head1 VERSION
 
-This document describes version 0.001 of App::DNSZoneUtils (from Perl distribution App-DNSZoneUtils), released on 2019-08-19.
+This document describes version 0.002 of App::DNSZoneUtils (from Perl distribution App-DNSZoneUtils), released on 2019-09-04.
 
 =head1 DESCRIPTION
 

@@ -15,6 +15,7 @@ my %WriteMakefileArgs = (
 	},
 	PREREQ_PM          => {
 		'Exporter'               => '0',
+		'Carp'                   => '0',
 		'LWP::UserAgent'         => '0',
 		'Term::ANSIColor'        => '0',
 		'Win32::Console::ANSI'   => '0',

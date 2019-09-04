@@ -1,17 +1,17 @@
 # NAME
 
-Path::Tiny::Glob - File globbing utility 
+Path::Tiny::Glob - File globbing utility
 
 # VERSION
 
-version 0.0.1
+version 0.1.0
 
 # SYNOPSIS
 
 ```perl
 use Path::Tiny::Glob;
 
-my $dzil_files = pathglob( '~/work/perl-modules/*/dist.ini' );
+my $dzil_files = pathglob( '~/work/perl-modules/**/dist.ini' );
 
 while( my $file = $dzil_files->next ) {
     say "found a Dist::Zilla project at ", $file->parent;
@@ -20,21 +20,50 @@ while( my $file = $dzil_files->next ) {
 
 # DESCRIPTION
 
-This module exports a single function, `pathglob`. 
+This module exports a single function by default, `pathglob`.
 
-# EXPORTED FUNCTIONS 
+# EXPORTED FUNCTIONS
 
 ## `pathglob`
 
-```perl
-my $list = pathglob( $glob );
+```
+$list = pathglob( $glob );
+$list = pathglob( \@path_segments );
 ```
 
-This function takes in 
+This function takes in
 a shell-like file glob, and returns a [Lazy::List](https://metacpan.org/pod/Lazy::List) of [Path::Tiny](https://metacpan.org/pod/Path::Tiny) objects
 matching it.
 
-Caveat: backtracking paths using `..` don't work.
+Caveat: backtracking paths using `..` doesn't work.
+
+The function can also take an arrayref of path segments.
+The segments can be strings, in which case they are obeying
+the same globbing patterns as the stringy `$glob`.
+
+```
+$list = pathglob( [ 'foo', 'bar', '*', 'README.md' ] );
+
+# equivalent to
+
+$list = pathglob( 'foo/bar/*/README.md' );
+```
+
+The segments, however, can also be coderefs, which will
+be passed  [Path::Tiny](https://metacpan.org/pod/Path::Tiny) objects both as their argument and
+as `$_`, and are expected to return `true` if the path
+is matching.
+
+```perl
+$big_files = pathglob( [ 'foo/bar/**/', sub { -f $_ and -s $_ > 1E6 } );
+```
+
+The segments can also be regexes, in which case they will be
+compared to the paths' current `basename`.
+
+```
+@readmes = pathglob( [ 'foo/bar/**/', /^readme\.(md|mkd|txt)$/i );
+```
 
 ### Supported globbing patterns
 
@@ -50,8 +79,19 @@ Caveat: backtracking paths using `..` don't work.
 
     Matches zero or more directories.
 
-    Note that `**` only matches directories. If you want to glob all files in a directory and its subdirectories, you 
-    have to do \`\*\*/\*\`.
+    If `**` is the last segment of the path, it'll return
+    all descendent files.
+
+## `is_globby`
+
+```perl
+my $globby = is_globby( './foo/*/bar' );
+```
+
+Returns `true` if the argument contains any glob character (so `?` or `*`).
+Can be useful to determine if the input was an explicit path or a glob.
+
+Not exported by default.
 
 # SEE ALSO
 
@@ -63,7 +103,7 @@ Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/en
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Yanick Champoux.
+This software is copyright (c) 2019, 2018 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

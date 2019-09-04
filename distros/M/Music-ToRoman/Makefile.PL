@@ -17,7 +17,6 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.006",
   "NAME" => "Music::ToRoman",
   "PREREQ_PM" => {
-    "Carp" => 0,
     "List::MoreUtils" => 0,
     "Moo" => 2,
     "Music::Scales" => 0,
@@ -28,11 +27,12 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
+    "Test::Exception" => 0,
     "Test::More" => 0,
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.0901",
+  "VERSION" => "0.1106",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,13 +40,13 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Carp" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "List::MoreUtils" => 0,
   "Moo" => 2,
   "Music::Scales" => 0,
+  "Test::Exception" => 0,
   "Test::More" => 0,
   "namespace::clean" => 0,
   "strict" => 0,

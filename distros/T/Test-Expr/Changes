@@ -26,3 +26,17 @@ Revision history for Test-Expr
 
         Now works with Perl 5.12 or greater
         (under Keyword::Declare 0.001003 or later)
+
+
+0.000006  Tue Sep  3 22:57:30 2019
+
+        Now with even more awesome failure messages
+        (Thanks, Patrick!)
+
+
+0.000007  Wed Sep  4 11:04:03 2019
+
+        Hardened expression parsing for cleaner results
+
+        Obscured code generation for safer results
+

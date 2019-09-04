@@ -7,7 +7,7 @@
   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
   >
   <name>Path-Tiny-Glob</name>
-  <shortdesc>File globbing utility </shortdesc>
+  <shortdesc>File globbing utility</shortdesc>
   <developer>
     <foaf:Person>
       <foaf:name>Yanick Champoux</foaf:name>
@@ -23,5 +23,11 @@
       <location rdf:resource="https://github.com/yanick/Path-Tiny-Glob.git" />
     </GitRepository>
   </repository>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.0.1</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2018-11-25</dc:issued>
+    </Version>
+  </release>
   <programming-language>Perl</programming-language>
 </Project>

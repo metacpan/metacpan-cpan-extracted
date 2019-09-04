@@ -7,7 +7,7 @@ use 5.010;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Provide musical cadence chords",
+  "ABSTRACT" => "Generate musical cadence chords",
   "AUTHOR" => "Gene Boggs <gene\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.0900",
+  "VERSION" => "0.1306",
   "test" => {
     "TESTS" => "t/*.t"
   }

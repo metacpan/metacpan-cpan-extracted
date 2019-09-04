@@ -1,12 +1,12 @@
 package Test::BDD::Cucumber::Harness::JSON;
-$Test::BDD::Cucumber::Harness::JSON::VERSION = '0.59';
+$Test::BDD::Cucumber::Harness::JSON::VERSION = '0.60';
 =head1 NAME
 
 Test::BDD::Cucumber::Harness::JSON - Generate results to JSON file
 
 =head1 VERSION
 
-version 0.59
+version 0.60
 
 =head1 DESCRIPTION
 

@@ -1,24 +1,67 @@
 ---
-abstract: unknown
+abstract: 'Mock database driver for testing'
 author:
-  - unknown
+  - 'Chris Winters <CWINTERS@cpan.org>'
+  - 'Stevan Little <STEVAN@cpan.org>'
+  - 'Rob Kinyon <RKINYON@cpan.org>'
+  - 'Mariano Wahlmann <DICHI@cpan.org>'
+  - 'Jason Cooper <JLCOOPER@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  Test::Exception: '0.31'
+  Test::More: '0.47'
 configure_requires:
-  ExtUtils::MakeMaker: 0
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.120921'
-license: unknown
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.6, CPAN::Meta::Converter version 2.150005'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: DBD-Mock
 no_index:
   directory:
     - t
+    - xt
     - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  DBD::Mock:
+    file: lib/DBD/Mock.pm
+    version: '1.46'
+  DBD::Mock::Pool:
+    file: lib/DBD/Mock/Pool.pm
+  DBD::Mock::Pool::db:
+    file: lib/DBD/Mock/Pool/db.pm
+  DBD::Mock::Session:
+    file: lib/DBD/Mock/Session.pm
+  DBD::Mock::StatementTrack:
+    file: lib/DBD/Mock/StatementTrack.pm
+  DBD::Mock::StatementTrack::Iterator:
+    file: lib/DBD/Mock/StatementTrack/Iterator.pm
+  DBD::Mock::db:
+    file: lib/DBD/Mock/db.pm
+  DBD::Mock::dr:
+    file: lib/DBD/Mock/dr.pm
+  DBD::Mock::st:
+    file: lib/DBD/Mock/st.pm
 requires:
-  DBI: 1.3
-  Test::Exception: 0.31
-  Test::More: 0.47
-version: 1.45
+  DBI: '1.3'
+  List::Util: '1.27'
+  perl: '5.008001'
+resources:
+  homepage: https://gitlab.com/scrapheap/DBD-Mock
+  repository: git://gitlab.com/scrapheap/DBD-Mock.git
+version: '1.46'
+x_authority: cpan:JLCOOPER
+x_contributors:
+  - 'Chisel <CHISEL@cpan.org>'
+  - 'Dave Rolsky <DROLSKY@cpan.org>'
+  - 'Gines R <ginesr@gmail.com>'
+  - 'gregor herrmann <gregoa@debian.org>'
+  - 'wu-lee <git.wu-lee@noodlefactory.co.uk>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.148-4-g907c1a8
+package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.149-4-gac9c10b
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: A plugin bundle for distributions built by ETHER
 # KEYWORDS: author bundle distribution tool
 
-our $VERSION = '0.149';
+our $VERSION = '0.150';
 
 use Moose;
 with
@@ -24,6 +24,7 @@ use CPAN::Meta::Requirements;
 use Term::ANSIColor 'colored';
 eval { +require Win32::Console::ANSI } if $^O eq 'MSWin32';
 use Config;
+use Try::Tiny;
 use namespace::autoclean;
 
 sub mvp_multivalue_args { qw(installer copy_file_from_release) }
@@ -156,6 +157,29 @@ has cpanfile => (
     lazy => 1,
     default => sub { $_[0]->payload->{cpanfile} // 0 },
 );
+
+sub pause_cfg_file () { '.pause' }
+sub pause_cfg_dir () { $^O eq 'MSWin32' && "$]" < 5.016 ? $ENV{HOME} || $ENV{USERPROFILE} : (<~>)[0] }
+
+my $_pause_config;
+sub _pause_config {
+    return $_pause_config if $_pause_config;
+
+    # stolen shamelessly from Dist::Zilla::Plugin::UploadToCPAN
+    my $self = shift;
+    require CPAN::Uploader;
+    my $file = $self->pause_cfg_file;
+    $file = File::Spec->catfile($self->pause_cfg_dir, $file)
+      unless File::Spec->file_name_is_absolute($file);
+    return {} unless -e $file && -r _;
+    my $cfg = try {
+      CPAN::Uploader->read_config_file($file)
+    } catch {
+      $self->log("Couldn't load credentials from '$file': $_");
+      {};
+    };
+    return $cfg;
+}
 
 # configs are applied when plugins match ->isa($key) or ->does($key)
 my %extra_args = (
@@ -486,7 +510,7 @@ sub configure
 
     # install with an author-specific URL from PAUSE, so cpanm-reporter knows where to submit the report
     # hopefully the file is available at this location soonish after release!
-    my ($username, $password) = $self->_pause_config;
+    my ($username, $password) = @{$self->_pause_config}{qw(user password)};
     $self->add_plugins(
         [ 'Run::AfterRelease'   => 'install release' => { ':version' => '0.031', fatal_errors => 0, run => 'cpanm http://' . $username . ':' . $password . '@pause.perl.org/pub/PAUSE/authors/id/' . substr($username, 0, 1).'/'.substr($username,0,2).'/'.$username.'/%a' } ],
     ) if $username and $password;
@@ -603,19 +627,6 @@ around add_bundle => sub
     return $self->$orig($bundle, $payload);
 };
 
-# return username, password from ~/.pause
-sub _pause_config
-{
-    my $self = shift;
-
-    my $file = path($ENV{HOME} // 'oops', '.pause');
-    return if not -e $file;
-
-    my ($username, $password) = map
-        +(split(' ', $_))[1],  # awk-style whitespace splitting
-        $file->lines;
-}
-
 __PACKAGE__->meta->make_immutable;
 
 __END__
@@ -630,7 +641,7 @@ Dist::Zilla::PluginBundle::Author::ETHER - A plugin bundle for distributions bui
 
 =head1 VERSION
 
-version 0.149
+version 0.150
 
 =head1 SYNOPSIS
 

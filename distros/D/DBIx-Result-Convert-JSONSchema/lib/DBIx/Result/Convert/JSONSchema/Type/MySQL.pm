@@ -2,7 +2,7 @@ package DBIx::Result::Convert::JSONSchema::Type::MySQL;
 
 =head1 NAME
 
-    DBIx::Result::Convert::JSONSchema::Type::MySQL - Mapping of MySQL field type to JSON property type
+DBIx::Result::Convert::JSONSchema::Type::MySQL - Mapping of MySQL field type to JSON property type
 
 =head1 VERSION
 

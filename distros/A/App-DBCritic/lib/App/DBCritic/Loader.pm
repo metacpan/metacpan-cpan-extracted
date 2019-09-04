@@ -1,25 +1,39 @@
 package App::DBCritic::Loader;
 
+# ABSTRACT: Loader class for schemas generated from a database connection
+
+#pod =head1 SYNOPSIS
+#pod
+#pod     use App::DBCritic::Loader;
+#pod     my $schema = App::DBCritic::Loader->connect('dbi:sqlite:foo');
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod This is a simple subclass of
+#pod L<DBIx::Class::Schema::Loader|DBIx::Class::Schema::Loader> used by
+#pod L<App::DBCritic|App::DBCritic> to dynamically
+#pod generate a schema based on a database connection.
+#pod
+#pod =cut
+
 use strict;
 use utf8;
-use Modern::Perl;
+use Modern::Perl '2011';    ## no critic (Modules::ProhibitUseQuotedVersion)
 
-our $VERSION = '0.020';    # VERSION
+our $VERSION = '0.023';     # VERSION
 use Moo;
 extends 'DBIx::Class::Schema::Loader';
 __PACKAGE__->loader_options( naming => 'v4', generate_pod => 0 );
 1;
 
-# ABSTRACT: Loader class for schemas generated from a database connection
-
 __END__
 
 =pod
 
-=for :stopwords Mark Gardner cpan testmatrix url annocpan anno bugtracker rt cpants
-kwalitee diff irc mailto metadata placeholders
+=encoding UTF-8
 
-=encoding utf8
+=for :stopwords Mark Gardner cpan testmatrix url annocpan anno bugtracker rt cpants
+kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 NAME
 
@@ -27,7 +41,7 @@ App::DBCritic::Loader - Loader class for schemas generated from a database conne
 
 =head1 VERSION
 
-version 0.020
+version 0.023
 
 =head1 SYNOPSIS
 
@@ -47,7 +61,7 @@ generate a schema based on a database connection.
 
 You can find documentation for this module with the perldoc command.
 
-  perldoc bin::dbcritic
+  perldoc App::DBCritic::Loader
 
 =head2 Websites
 
@@ -66,14 +80,6 @@ L<http://search.cpan.org/dist/App-DBCritic>
 
 =item *
 
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annonations of Perl module documentation.
-
-L<http://annocpan.org/dist/App-DBCritic>
-
-=item *
-
 CPAN Ratings
 
 The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
@@ -86,13 +92,13 @@ CPANTS
 
 The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
 
-L<http://cpants.perl.org/dist/overview/App-DBCritic>
+L<http://cpants.cpanauthors.org/dist/App-DBCritic>
 
 =item *
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/A/App-DBCritic>
 
@@ -100,7 +106,7 @@ L<http://www.cpantesters.org/distro/A/App-DBCritic>
 
 CPAN Testers Matrix
 
-The CPAN Testers Matrix is a website that provides a visual way to determine what Perls/platforms PASSed for a distribution.
+The CPAN Testers Matrix is a website that provides a visual overview of the test results for a distribution on various Perls/platforms.
 
 L<http://matrix.cpantesters.org/?dist=App-DBCritic>
 
@@ -136,7 +142,7 @@ Mark Gardner <mjgardner@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 by Mark Gardner.
+This software is copyright (c) 2019 by Mark Gardner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

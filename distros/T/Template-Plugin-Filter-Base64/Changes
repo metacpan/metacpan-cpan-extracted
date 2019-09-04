@@ -1,5 +1,9 @@
 Revision history for Perl extension Template-Plugin-Filter-Base64
 
+0.07 2019-09-03T12:11:05Z
+
+    - utf8 support
+
 0.06 2019-03-06T15:32:55Z
 
     - correct documentation

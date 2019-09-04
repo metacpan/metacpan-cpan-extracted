@@ -19,7 +19,7 @@ Each .fa files in <path/target> should contain only one sequences.
 
 # Detailed steps
 
-## self alignement
+## self alignment
 
 ```bash
 cd ~/data/alignment/egaz
@@ -40,7 +40,7 @@ fasops axt2fas \
 fasops check S288cvsSelf_axt.fas S288c.fa --name S288c -o stdout | grep -v "OK"
 
 fasops covers S288cvsSelf_axt.fas -n S288c -o stdout |
-    runlist stat -s S288c/chr.sizes stdin -o S288cvsSelf_axt.csv
+    spanr stat S288c/chr.sizes stdin -o S288cvsSelf_axt.csv
 
 ```
 
@@ -78,9 +78,9 @@ fasops replace axt.target.fas replace.query.tsv -o axt.correct.fas
 
 # coverage stats
 fasops covers axt.correct.fas -o axt.correct.yml
-runlist split axt.correct.yml -s .temp.yml
-runlist compare --op union target.temp.yml query.temp.yml -o axt.union.yml
-runlist stat --size chr.sizes axt.union.yml -o union.csv
+spanr split axt.correct.yml -s .temp.yml -o .
+spanr compare --op union target.temp.yml query.temp.yml -o axt.union.yml
+spanr stat chr.sizes axt.union.yml -o union.csv
 
 # links by lastz-chain
 fasops links axt.correct.fas -o stdout |
@@ -119,42 +119,42 @@ egaz blastlink axt.all.blast -c 0.95 -o links.blast.tsv
 cd ~/data/alignment/egaz/S288c_proc
 
 # merge
-rangeops sort -o links.sort.tsv \
+linkr sort -o links.sort.tsv \
     links.lastz.tsv links.blast.tsv
 
-rangeops clean   links.sort.tsv         -o links.sort.clean.tsv
-rangeops merge   links.sort.clean.tsv   -o links.merge.tsv       -c 0.95 -p 8
-rangeops clean   links.sort.clean.tsv   -o links.clean.tsv       -r links.merge.tsv --bundle 500
-rangeops connect links.clean.tsv        -o links.connect.tsv     -r 0.9
-rangeops filter  links.connect.tsv      -o links.filter.tsv      -r 0.8
+linkr clean   links.sort.tsv       -o links.sort.clean.tsv
+linkr merge   links.sort.clean.tsv -o links.merge.tsv       -c 0.95
+linkr clean   links.sort.clean.tsv -o links.clean.tsv       -r links.merge.tsv --bundle 500
+linkr connect links.clean.tsv      -o links.connect.tsv     -r 0.9
+linkr filter  links.connect.tsv    -o links.filter.tsv      -r 0.8
 
 # recreate links
-rangeops create links.filter.tsv    -o multi.temp.fas       -g genome.fa
-fasops   refine multi.temp.fas      -o multi.refine.fas     --msa mafft -p 8 --chop 10
-fasops   links  multi.refine.fas    -o stdout \
-    | jrange sort stdin -o links.refine.tsv
+fasops create links.filter.tsv -o multi.temp.fas       -g genome.fa
+fasops refine multi.temp.fas   -o multi.refine.fas     --msa mafft -p 8 --chop 10
+fasops links  multi.refine.fas -o stdout |
+    linkr sort stdin -o links.refine.tsv
 
-fasops   links  multi.refine.fas    -o stdout     --best \
-    | jrange sort stdin -o links.best.tsv
-rangeops create links.best.tsv      -o pair.temp.fas    -g genome.fa
-fasops   refine pair.temp.fas       -o pair.refine.fas  --msa mafft -p 8
+fasops links  multi.refine.fas -o stdout --best |
+    linkr sort stdin -o links.best.tsv
+fasops create links.best.tsv -o pair.temp.fas    -g genome.fa
+fasops refine pair.temp.fas  -o pair.refine.fas  --msa mafft -p 8
 
-cat links.refine.tsv \
-    | perl -nla -F"\t" -e 'print for @F' \
-    | jrunlist cover stdin -o cover.yml
+cat links.refine.tsv |
+    perl -nla -F"\t" -e 'print for @F' |
+    spanr cover stdin -o cover.yml
 
 echo "* Stats of links"
 echo "key,count" > links.count.csv
 for n in 2 3 4-50; do
-    rangeops filter links.refine.tsv -n ${n} -o stdout \
+    linkr filter links.refine.tsv -n ${n} -o stdout \
         > links.copy${n}.tsv
 
-    cat links.copy${n}.tsv \
-        | perl -nla -F"\t" -e 'print for @F' \
-        | jrunlist cover stdin -o copy${n}.yml
+    cat links.copy${n}.tsv |
+        perl -nla -F"\t" -e 'print for @F' |
+        spanr cover stdin -o copy${n}.yml
 
-    wc -l links.copy${n}.tsv \
-        | perl -nl -e '
+    wc -l links.copy${n}.tsv |
+        perl -nl -e '
             @fields = grep {/\S+/} split /\s+/;
             next unless @fields == 2;
             next unless $fields[1] =~ /links\.([\w-]+)\.tsv/;
@@ -165,13 +165,13 @@ for n in 2 3 4-50; do
     rm links.copy${n}.tsv
 done
 
-runlist merge copy2.yml copy3.yml copy4-50.yml -o copy.all.yml
-runlist stat --size chr.sizes copy.all.yml --mk --all -o links.copy.csv
+spanr merge copy2.yml copy3.yml copy4-50.yml -o copy.all.yml
+spanr stat chr.sizes copy.all.yml --all -o links.copy.csv
 
 fasops mergecsv links.copy.csv links.count.csv --concat -o copy.csv
 
 echo "* Coverage figure"
-runlist stat --size chr.sizes cover.yml
+spanr stat chr.sizes cover.yml -o cover.yml.csv
 
 ```
 

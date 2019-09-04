@@ -1,0 +1,8 @@
+Revision history for Test2-MojoX
+
+0.02    2019-09-03
+        Fix test default names for *_is tests
+        Improve documentation
+
+0.01    2019-08-30
+        First version, released on an unsuspecting world.

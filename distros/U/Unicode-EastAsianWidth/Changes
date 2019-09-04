@@ -1,3 +1,7 @@
+[Changes for 12.0 - 2018-11-24]
+
+* Update to Unicode v12.0.0.
+
 [Changes for 1.40 - 2018-11-24]
 
 * Fix installation compatibility with Perl 5.26+.

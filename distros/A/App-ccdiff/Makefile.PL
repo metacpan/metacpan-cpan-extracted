@@ -1,4 +1,4 @@
-use 5.12.1;
+use 5.014000;
 use warnings;
 
 use ExtUtils::MakeMaker;
@@ -22,7 +22,7 @@ my %wmf = (
     MIN_PERL_VERSION		=> "5.014000",
     PREREQ_PM			=> {
 	charnames		=> 0,
-	"Algorithm::Diff"	=> 0,
+	"Algorithm::Diff"	=> "1.1901",
 	"Term::ANSIColor"	=> 0,
 	"Getopt::Long"		=> 0,
 	},
@@ -38,10 +38,12 @@ my %wmf = (
 
     META_MERGE			=> {
 	"meta-spec"		=> { version => 2 },
+	licence			=> "perl_5",
 	resources		=> {
 	    type		=> "git",
 	    url			=> "git://github.com/Tux/App-ccdiff.git",
 	    web			=> "https://github.com/Tux/App-ccdiff",
+	    IRC			=> "irc://irc.perl.org/#csv",
 	    },
 	provides		=> {
 	    "App::ccdiff"	=> {
@@ -64,10 +66,13 @@ sub postamble {
         ? ( '','lib/App/ccdiff.pm:	ccdiff',
 		'	perl ./2lib',
 		'',
-		'all::			lib/App/ccdiff.pm doc spellcheck',
+		'all::			lib/App/ccdiff.pm doc spellcheck cpanfile',
 		)
         : ();
     join "\n" =>
+        'cpanfile:',
+        '	perl sandbox/genMETA.pl',
+        '',
         'spellcheck:',
         '	pod-spell-check --aspell --ispell ccdiff',
         '',

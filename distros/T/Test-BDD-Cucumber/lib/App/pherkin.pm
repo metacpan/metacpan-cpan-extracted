@@ -1,5 +1,5 @@
 package App::pherkin;
-$App::pherkin::VERSION = '0.59';
+$App::pherkin::VERSION = '0.60';
 use strict;
 use warnings;
 
@@ -19,12 +19,13 @@ use Test::BDD::Cucumber::I18n
 use Test::BDD::Cucumber::Loader;
 
 use Moo;
-use Types::Standard qw( ArrayRef Bool );
+use Types::Standard qw( ArrayRef Bool Str );
 has 'step_paths' => ( is => 'rw', isa => ArrayRef, default => sub { [] } );
 has 'extensions' => ( is => 'rw', isa => ArrayRef, default => sub { [] } );
 has 'tags'       => ( is => 'rw', isa => ArrayRef, required => 0 );
 has 'tag_scheme' => ( is => 'rw', isa => ArrayRef, required => 0 );
 has 'match_only' => ( is => 'rw', isa => Bool,     default => 0 );
+has 'matching'   => ( is => 'rw', isa => Str,      default => 'first');
 
 has 'harness' => ( is => 'rw' );
 
@@ -34,7 +35,7 @@ App::pherkin - Run Cucumber tests from the command line
 
 =head1 VERSION
 
-version 0.59
+version 0.60
 
 =head1 SYNOPSIS
 
@@ -78,6 +79,7 @@ sub _pre_run {
       Test::BDD::Cucumber::Loader->load( $features_path );
     die "No feature files found in $features_path" unless @features;
 
+    $executor->matching( $self->matching );
     $executor->add_extensions($_) for @{ $self->extensions };
     $_->pre_execute($self) for @{ $self->extensions };
 
@@ -266,6 +268,7 @@ sub _process_arguments {
         tags       => [ 't|tags=s@', [] ],
         i18n       => ['i18n=s'],
         extensions => [ 'e|extension=s@', [] ],
+        matching   => [ 'matching=s' ],
         match_only => ['m|match'],
     );
 
@@ -410,6 +413,9 @@ sub _process_arguments {
     # Store our TagSpecScheme
     $self->tag_scheme( $self->_process_tags( @{ $deref->('tags') } ) );
 
+    $self->matching( $deref->('matching') )
+        if $deref->('matching');
+
     # Match only?
     $self->match_only( $deref->('match_only') );
 
@@ -511,7 +517,7 @@ sub _make_executor_match_only {
 
     for my $verb ( keys %{$executor->steps} ) {
         for my $step_tuple ( @{ $executor->steps->{$verb} } ) {
-            $step_tuple->[1] = $match_sub;
+            $step_tuple->[2] = $match_sub;
         }
     }
 

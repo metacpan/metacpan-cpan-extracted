@@ -80,7 +80,7 @@
          "web" : "https://github.com/book/Git-Repository"
       }
    },
-   "version" : "1.323",
+   "version" : "1.324",
    "x_contributors" : [
       "H.Merijn Brand <hmbrand@cpan.org>",
       "Jan Pazdziora <janpaz@cpan.org>",
@@ -109,7 +109,7 @@
       "Alessandro Ghedini <alexbio@cpan.org>",
       "Gustavo Leite de Mendon\u00e7a Chaves <gnustavo@cpan.org>"
    ],
-   "x_generated_by_perl" : "v5.28.0",
+   "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.07"
 }
 

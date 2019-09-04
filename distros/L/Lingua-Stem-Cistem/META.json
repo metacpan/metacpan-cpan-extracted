@@ -62,7 +62,10 @@
          "web" : "https://github.com/wollmers/Lingua-Stem-Cistem"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
+   "x_contributors" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+   ],
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
 }
 

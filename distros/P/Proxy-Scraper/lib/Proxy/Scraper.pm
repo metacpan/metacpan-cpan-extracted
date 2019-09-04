@@ -2,6 +2,7 @@ package Proxy::Scraper;
 
 use strict;
 use warnings;
+use Carp qw(carp croak);
 use List::Util qw(any);
 use LWP::UserAgent qw(new);
 use Term::ANSIColor qw(color colored);
@@ -14,29 +15,11 @@ if($^O eq 'MSWin32'){
 our @ISA=qw(Exporter);
 our @EXPORT=qw(scrape_proxies);
 
-our $VERSION='2.0.1';
+our $VERSION='2.1.0';
 our $LIBRARY=__PACKAGE__;
 
-sub scrape_free_socks{
-	my ($type,$level,$output_file,$agent)=@_;
-	my $proxies_scraped=0;
-	if($level eq 'any'){
-		my $local_type=$type=~/socks./ ?'socks5':'https';
-		my $link='https://free-socks.in/'.($type=~/socks./ ?'socks':'http').'-proxy-list/';
-		print colored "[+] Scraping $level $local_type proxies from \"$link\"\n",'green';
-		my $response=$agent->get($link);
-		if($response->is_success){
-			foreach($response->decoded_content=~/<td>((?:\d+\.){3}\d+:\d+)<\/td>/g){
-				print $output_file "$_\n";
-				$proxies_scraped++;
-			}
-			print colored "[+] Successfully scraped $proxies_scraped $level $local_type proxies from \"$link\"\n",'green';
-		}else{warn colored '[-] Server returned '.$response->code.".\n",'red'}
-	}
-	return $proxies_scraped;
-}
 sub scrape_free_proxy_list{
-	my ($type,$level,$output_file,$agent)=@_;
+	my ($type,$level,$output_file,$agent,$debug)=@_;
 	my $proxies_scraped_total=0;
 	my @types;
 	if($type eq 'http'){@types=('http','https')}
@@ -47,28 +30,28 @@ sub scrape_free_proxy_list{
 	my @levels=$level eq 'any'?('transparent','anonymous','elite'):($level);
 	foreach my $current_type (@types){
 		foreach my $current_level (@levels){
-			print colored "[+] Scraping $current_level $current_type proxies from \"https://www.proxy-list.download/api/v1/get?type=$current_type&anon=$current_level\"\n",'green';
+			print colored "[+] Scraping $current_level $current_type proxies from \"https://www.proxy-list.download/api/v1/get?type=$current_type&anon=$current_level\"\n",'green' if $debug;
 			$response=$agent->get("https://www.proxy-list.download/api/v1/get?type=$current_type&anon=$current_level");
 			if($response->is_success){
 				print $output_file $response->decoded_content;
 				my $proxies_scraped=$response->decoded_content=~tr/\n//;
 				$proxies_scraped_total+=$proxies_scraped;
-				print colored "[+] Successfully scraped $proxies_scraped $current_level $current_type proxies from \"https://www.proxy-list.download/api/v1/get?type=$current_type&anon=$current_level\"\n",'green';
-			}else{warn colored '[-] Server returned '.$response->code.".\n",'red'}
+				print colored "[+] Successfully scraped $proxies_scraped $current_level $current_type proxies from \"https://www.proxy-list.download/api/v1/get?type=$current_type&anon=$current_level\"\n",'green' if $debug;
+			}else{carp colored '[-] Server returned '.$response->code.".\n",'red' if $debug}
 		}
 	}
 	return $proxies_scraped_total;
 }
 sub scrape_openproxy_space{
-	my ($type,$level,$output_file,$agent)=@_;
+	my ($type,$level,$output_file,$agent,$debug)=@_;
 	my $proxies_scraped_total=0;
 	if(($type eq 'socks4' and any {$level eq $_} ('any','elite')) or ($type eq 'http' and $level eq 'any')){
-		print colored "[+] Scraping proxies lists from \"https://openproxy.space/lists/\"\n",'green';
+		print colored "[+] Scraping proxies lists from \"https://openproxy.space/lists/\"\n",'green' if $debug;
 		my $response=$agent->get('https://openproxy.space/lists/');
 		if($response->is_success){
 			my $list_type=$type=~/(http|socks)/ && $1;
 			foreach($response->decoded_content=~/href="\/lists\/([\w_-]+)" rel="nofollow" class="list $list_type"/g){
-				print colored "[+] Scraping proxies from \"https://openproxy.space/lists/$_\"\n",'green';
+				print colored "[+] Scraping proxies from \"https://openproxy.space/lists/$_\"\n",'green' if $debug;
 				my $response2=$agent->get("https://openproxy.space/lists/$_");
 				if($response2->is_success){
 					my $proxies_scraped=0;
@@ -77,37 +60,37 @@ sub scrape_openproxy_space{
 						$proxies_scraped++;
 					}
 					$proxies_scraped_total+=$proxies_scraped;
-					print colored "[+] Successfully scraped $proxies_scraped $level $type proxies from \"https://openproxy.space/lists/$_\"\n",'green';
-				}else{warn colored '[-] Server returned '.$response2->code.".\n",'red'}
+					print colored "[+] Successfully scraped $proxies_scraped $level $type proxies from \"https://openproxy.space/lists/$_\"\n",'green' if $debug;
+				}else{carp colored '[-] Server returned '.$response2->code.".\n",'red' if $debug}
 			}
-		}else{warn colored '[-] Server returned '.$response->code.".\n",'red'}
+		}else{carp colored '[-] Server returned '.$response->code.".\n",'red' if $debug}
 	}
 	return $proxies_scraped_total;
 }
 sub scrape_proxies{
 	my (%args)=@_;
+	my $debug=$args{'DEBUG'};
 	my $type=$args{'TYPE'} or
-		die colored "[-] -t/--type option is required.\n",'red';
+		croak colored "[-] -t/--type option is required.\n",'red';
 	$type=~/https?|socks[45]/ or
-		die colored "[-] -t/--type option has to be one of {http,https,socks4,socks5}\n",'red';
+		croak colored "[-] -t/--type option has to be one of {http,https,socks4,socks5}\n",'red';
 	my $level=$args{'LEVEL'}||'any';
 	any {$level eq $_} ('any','transparent','anonymous','elite') or
-		die colored "[-] -l/--level option has to be one of {transparent,anonymous,elite}\n",'red';
+		croak colored "[-] -l/--level option has to be one of {transparent,anonymous,elite}\n",'red';
 	my $output_file_path=$args{'OUTPUT_FILE'}||'proxies.txt';
 	my $agent=$args{'AGENT'}||LWP::UserAgent->new(
-		agent=>rand_ua 'browsers',
+		agent=>rand_ua 'windows',
 	);
-	print colored "[+] Opening \"$output_file_path\"\n",'green';
-	open my $output_file,'>',$output_file_path or die colored "[-] Can't open \"$output_file_path\": $!.\n",'red';
-	print colored "[+] Successfully opened \"$output_file_path\"\n",'green';
+	print colored "[+] Opening \"$output_file_path\"\n",'green' if $debug;
+	open my $output_file,'>',$output_file_path or die colored "[-] Can't open \"$output_file_path\" for reading: $!.\n",'red';
+	print colored "[+] Successfully opened \"$output_file_path\"\n",'green' if $debug;
 	my $proxies_scraped_total=0;
-	$proxies_scraped_total+=scrape_free_socks $type,$level,$output_file,$agent;
-	$proxies_scraped_total+=scrape_free_proxy_list $type,$level,$output_file,$agent;
-	$proxies_scraped_total+=scrape_openproxy_space $type,$level,$output_file,$agent;
-	print colored "[+] Successfully scraped $proxies_scraped_total proxies in total.\n",'green';
-	print colored "[+] Closing \"$output_file_path\"\n",'green';
+	$proxies_scraped_total+=scrape_free_proxy_list $type,$level,$output_file,$agent,$debug;
+	$proxies_scraped_total+=scrape_openproxy_space $type,$level,$output_file,$agent,$debug;
+	print colored "[+] Successfully scraped $proxies_scraped_total $level $type proxies.\n",'green' if $debug;
+	print colored "[+] Closing \"$output_file_path\"\n",'green' if $debug;
 	close $output_file or die colored "[-] Can't close \"$output_file_path\": $!.\n",'red';
-	print colored "[+] Successfully closed \"$output_file_path\"\n",'green';
+	print colored "[+] Successfully closed \"$output_file_path\"\n",'green' if $debug;
 }
 
 1;
@@ -122,7 +105,7 @@ Proxy::Scraper - Simple Perl script for scraping proxies from multiple websites.
 
 =head1 VERSION
 
-Version 2.0.1
+Version 2.1.0
 
 =head1 DESCRIPTION
 

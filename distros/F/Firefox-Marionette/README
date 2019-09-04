@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 0.81
+    Version 0.82
 
 SYNOPSIS
 
@@ -235,6 +235,33 @@ SUBROUTINES/METHODS
  dismiss_alert
 
     dismisses a currently displayed modal message box
+
+ download
+
+    accepts a filesystem path and returns a matching filehandle. This is
+    trivial for locally running firefox, but sufficiently complex to
+    justify the method for a remote firefox running over ssh.
+
+        use Firefox::Marionette();
+        use v5.10;
+    
+        my $firefox = Firefox::Marionette->new( host => 10.1.2.3, firefox => '/Applications/Firefox.app/Contents/MacOS/firefox' )->go('https://metacpan.org/');
+    
+        $firefox->find_class('container-fluid')->find_id('search-input')->type('Test::More');
+    
+        $firefox->find('//button[@name="lucky"]')->click();
+    
+        $firefox->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click();
+    
+        while(!$firefox->downloads()) { sleep 1 }
+    
+        foreach my $path ($firefox->downloads()) {
+    
+            my $handle = $firefox->download($path);
+    
+            # do something with downloaded file handle
+    
+        }
 
  downloading
 
@@ -498,10 +525,39 @@ SUBROUTINES/METHODS
 
         use Firefox::Marionette();
     
-        my $firefox = Firefox::Marionette->new( capabilities => Firefox::Marionette::Capabilities->new( page_load_strategy => 'none' ));
-        $firefox->go('https://metacpan.org/'); # will return immediately after requesting the browser to navigate to metacpan.org
+        my $firefox = Firefox::Marionette->new( capabilities => Firefox::Marionette::Capabilities->new( page_load_strategy => 'eager' ));
+        $firefox->go('https://metacpan.org/'); # will return once the main document has been loaded and parsed, but BEFORE sub-resources (images/stylesheets/frames) have been loaded.
 
     This method returns itself to aid in chaining methods.
+
+ har
+
+    returns a hashref representing the http archive
+    <https://en.wikipedia.org/wiki/HAR_(file_format)> of the session. This
+    function is subject to the script timeout, which, by default is 30
+    seconds. It is also possible for the function to hang (until the script
+    timeout) if the original devtools
+    <https://developer.mozilla.org/en-US/docs/Tools> window is closed. The
+    hashref has been designed to be accepted by the Archive::Har module.
+    This function should be considered experimental. Feedback welcome.
+
+        use Firefox::Marionette();
+        use Archive::Har();
+        use v5.10;
+    
+        my $firefox = Firefox::Marionette->new(visible => 1, debug => 1, har => 1);
+    
+        $firefox->go("http://metacpan.org/");
+    
+        $firefox->find('//input[@id="search-input"]')->type('Test::More');
+        $firefox->find_name('lucky')->click($element);
+    
+        my $har = Archive::Har->new();
+        $har->hashref($firefox->har());
+    
+        foreach my $entry ($har->entries()) {
+            say $entry->request()->url() . " spent " . $entry->timings()->connect() . " ms establishing a TCP connection";
+        }
 
  html
 
@@ -624,21 +680,30 @@ SUBROUTINES/METHODS
       set whether the browser should accept insecure certs or whether the
       browser should use a proxy.
 
-      * firefox_binary - use the specified path to the Firefox
+      * firefox - use the specified path to the Firefox
       <https://firefox.org/> binary, rather than the default path.
 
       * debug - should firefox's debug to be available via STDERR. This
-      defaults to "0".
+      defaults to "0". Any ssh connections will also be printed to STDERR.
 
       * height - set the height
       <http://kb.mozillazine.org/Command_line_arguments#List_of_command_line_arguments_.28incomplete.29>
       of the initial firefox window
 
+      * har - begin the session with the devtools
+      <https://developer.mozilla.org/en-US/docs/Tools> window opened in a
+      separate window. The HAR Export Trigger
+      <https://addons.mozilla.org/en-US/firefox/addon/har-export-trigger/>
+      addon will be loaded into the new session automatically, which means
+      that -safe-mode will not be activated for this session AND this
+      functionality will only be available for Firefox 61+.
+
       * host - use ssh <https://man.openbsd.org/ssh.1> to create and
-      automate firefox on the specified host. The "firefox_binary" and
-      "user" parameters may be useful in this case. Authentication is
+      automate firefox on the specified host. The "firefox", "user" and
+      "port" parameters may be useful in this case. Authentication is
       expected to be via your local ssh-agent. This has only been tested on
-      linux and darwin environments. Feedback welcome.
+      linux and darwin environments. This functionality should be
+      considered experimental. Feedback welcome.
 
       * implicit - a shortcut to allow directly providing the implicit
       timeout, instead of needing to use timeouts from the capabilities
@@ -647,6 +712,10 @@ SUBROUTINES/METHODS
       * mime_types - any MIME types that Firefox will encounter during this
       session. MIME types that are not specified will result in a hung
       browser (the File Download popup will appear).
+
+      * port - if the "host" parameter is also set, the "port" parameter
+      will specify which TCP port the initial ssh connection will be made
+      to.
 
       * page_load - a shortcut to allow directly providing the page_load
       timeout, instead of needing to use timeouts from the capabilities
@@ -675,6 +744,17 @@ SUBROUTINES/METHODS
       * survive - if this is set to a true value, firefox will not
       automatically exit when the object goes out of scope.
 
+      * trust - give a path to a root certificate
+      <https://en.wikipedia.org/wiki/Root_certificate> that will be trusted
+      for this session. The certificate will be imported by the NSS
+      certutil
+      <https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSS/tools/NSS_Tools_certutil>
+      binary. If this binary does not exist in the PATH
+      <https://en.wikipedia.org/wiki/PATH_(variable)>, an exception will be
+      thrown. For Linux/BSD systems, NSS certutil should be available via
+      your package manager. For OS X and Windows based platforms, it will
+      be more difficult.
+
       * timeouts - a shortcut to allow directly providing a timeout object,
       instead of needing to use timeouts from the capabilities parameter.
       Overrides the timeouts provided (if any) in the capabilities
@@ -699,11 +779,11 @@ SUBROUTINES/METHODS
 
         use Firefox::Marionette();
     
-        my $remote_darwin_firefox = Firefox::Marionette->new( debug => 1, host => '10.1.2.3', firefox_binary => '/Applications/Firefox.app/Contents/MacOS/firefox');
+        my $remote_darwin_firefox = Firefox::Marionette->new( debug => 1, host => '10.1.2.3', firefox => '/Applications/Firefox.app/Contents/MacOS/firefox' );
         ...
     
         foreach my $profile_name (Firefox::Marionette::Profile->names()) {
-            my $firefox_with_existing_profile = Firefox::Marionette->new(profile_name => $profile_name);
+            my $firefox_with_existing_profile = Firefox::Marionette->new( profile_name => $profile_name, trust => "/path/to/root_ca.pem", visible => 1 );
             ...
         }
 
@@ -1189,6 +1269,11 @@ ACKNOWLEDGEMENTS
     Thanks to the entire Mozilla organisation for a great browser and to
     the team behind Marionette for providing an interface for automation.
 
+    Thanks to Jan Odvarko <http://www.softwareishard.com/blog/about/> for
+    creating the HAR Export Trigger
+    <https://github.com/firefox-devtools/har-export-trigger> extension for
+    Firefox.
+
     Thanks also to the authors of the documentation in the following
     sources;
 
@@ -1213,6 +1298,12 @@ LICENSE AND COPYRIGHT
     This module is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself. See "perlartistic" in
     perlartistic.
+
+    The Firefox::Marionette::Extension::HarExportTrigger module includes
+    the HAR Export Trigger
+    <https://github.com/firefox-devtools/har-export-trigger> extension
+    which is licensed under the Mozilla Public License 2.0
+    <https://www.mozilla.org/en-US/MPL/2.0/>.
 
 DISCLAIMER OF WARRANTY
 

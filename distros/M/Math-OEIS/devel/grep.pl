@@ -27,7 +27,36 @@ use Smart::Comments;
 
 
 {
-  # grep-not-in-oeis.pl non-ascii
+  my @seq = Math::OEIS::Stripped->anum_to_values('A038770xxx');
+  ### @seq
+  exit 0;
+}
+
+{
+  # cons sequences with b-files
+  require File::Slurp;
+  my ($dir) = Math::OEIS->local_directories;
+  my %seen;
+  foreach my $internal_filename (glob("$dir/A*.internal.txt"),
+                                 glob("$dir/A*.internal.html")) {
+    my $str = File::Slurp::read_file($internal_filename);
+    $str =~ /^%N.*Decimal expansion/im or next;
+    $str =~ /^%K.*cons/m or next;
+    $str =~ /^%O.*?\b(\d+)/m or die;
+    my $offset = $1;
+
+    my $b_filename = $internal_filename;
+    $b_filename =~ s/A([0-9]+)\.internal.*/b$1.txt/ or die;
+    my $anum = "A$1";
+    next if $seen{$anum}++;
+
+    next unless -e $b_filename;
+    print "$anum offset $offset  $b_filename\n";
+  }
+  exit 0;
+}
+{
+  # grep-not-in-oeis.pl printing non-ascii
   system("$FindBin::Bin/../examples/grep-not-in-oeis.pl",
          "$FindBin::Bin/$FindBin::Script");
   # Sierpinski

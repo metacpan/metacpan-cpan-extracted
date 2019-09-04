@@ -1,5 +1,5 @@
 ---
-abstract: 'Provide musical cadence chords'
+abstract: 'Generate musical cadence chords'
 author:
   - 'Gene Boggs <gene@cpan.org>'
 build_requires:
@@ -34,7 +34,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Music-Cadence
   repository: https://github.com/ology/Music-Cadence.git
-version: '0.0900'
+version: '0.1306'
 x_Dist_Zilla:
   perl:
     version: '5.027007'

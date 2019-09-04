@@ -30,7 +30,7 @@ require Glib::Ex::ConnectProperties;
 
 #-----------------------------------------------------------------------------
 # VERSION
-my $want_version = 19;
+my $want_version = 20;
 {
   is ($Glib::Ex::ConnectProperties::VERSION, $want_version,
       'VERSION variable');

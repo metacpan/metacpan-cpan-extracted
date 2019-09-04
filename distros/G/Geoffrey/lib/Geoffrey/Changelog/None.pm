@@ -7,7 +7,7 @@ use warnings;
 use File::Slurp qw/write_file read_file/;
 use Data::Dumper;
 
-$Geoffrey::Changelog::None::VERSION = '0.000201';
+$Geoffrey::Changelog::None::VERSION = '0.000204';
 
 use parent 'Geoffrey::Role::Changelog';
 
@@ -20,7 +20,7 @@ sub new {
 }
 
 sub from_hash {
-    my ($self, $b_load_from_hash) = @_;
+    my ( $self, $b_load_from_hash ) = @_;
     return $self->{from_hash} if !defined $b_load_from_hash;
     $self->{from_hash} = $b_load_from_hash;
     return $self;
@@ -28,37 +28,39 @@ sub from_hash {
 
 sub tpl_main {
     return {
-        templates => [{
-                name => 'tpl_std',
-                columns =>
-                    [{name => 'id', type => 'integer', notnull => 1, primarykey => 1, default => 'inc',},],
+        templates => [
+            {
+                name    => 'tpl_std',
+                columns => [ { name => 'id', type => 'integer', notnull => 1, primarykey => 1, default => 'inc', }, ],
             },
         ],
         prefix     => 'smpl',
         postfix    => 'end',
-        changelogs => ['01',],
+        changelogs => [ '01', ],
     };
 }
 
 sub tpl_sub {
-    return [{
+    return [
+        {
             id      => '001.01-maz',
             author  => 'Mario Zieschang',
-            entries => [{action => 'table.add', name => 'client', template => 'tpl_std', columns => [],},],
-        }];
+            entries => [ { action => 'table.add', name => 'client', template => 'tpl_std', columns => [], }, ],
+        }
+    ];
 }
 
 sub load {
-    my ($self, $ur_file_structure) = @_;
-    return $self->from_hash ? $ur_file_structure : do($ur_file_structure . $self->ending());
+    my ( $self, $ur_file_structure ) = @_;
+    return $self->from_hash ? $ur_file_structure : do( $ur_file_structure . $self->ending() );
 }
 
 sub write {
-    my ($self, $dir, $hr_data, $b_dump) = @_;
+    my ( $self, $dir, $hr_data, $b_dump ) = @_;
     my $s_file = $dir . $self->ending;
-    $hr_data = Data::Dumper->new([$hr_data])->Terse(1)->Deparse(1)->Sortkeys(1)->Dump;
+    $hr_data = Data::Dumper->new( [$hr_data] )->Terse(1)->Deparse(1)->Sortkeys(1)->Dump;
     return $hr_data if $b_dump;
-    return write_file($s_file, $hr_data);
+    return write_file( $s_file, $hr_data );
 }
 
 1;    # End of Geoffrey::Changelog
@@ -75,7 +77,7 @@ Geoffrey::Changelog::None - File declacration for plain hashrefs or so :-P.
 
 =head1 VERSION
 
-Version 0.000201
+Version 0.000204
 
 =head1 DESCRIPTION
 
@@ -92,6 +94,14 @@ Version 0.000201
 =head2 ending
 
 =head2 load
+
+=head2 insert
+
+Not implemented yet
+
+=head2 delete
+
+Not implemented yet
 
 Called to load defined Yaml files
 

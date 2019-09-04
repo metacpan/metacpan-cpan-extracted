@@ -1,6 +1,12 @@
 Revision history for Calendar-List
 ==================================
 
+1.02    2019-09-01
+        - "Tidied up SEE ALSO section properly this time."
+          PR #2 from Mohammad S Anwar
+          https://github.com/barbie/calendar-list/pull/2
+        - added Perl Advent example link.
+
 1.01    2019-08-27
         - Tidy up pod
           PR #1 from Mohammad S Anwar

@@ -41,7 +41,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '0.81';
+our $VERSION = '0.82';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -286,6 +286,12 @@ sub downloads {
     return $self->_directory_listing( $self->_download_directory() );
 }
 
+sub _setup_adb {
+    my ( $self, $host ) = @_;
+    $self->{_adb} = { host => $host, };
+    return;
+}
+
 sub _setup_ssh {
     my ( $self, $host, $port, $user ) = @_;
     $self->{_ssh_control_directory} = File::Temp->newdir(
@@ -321,6 +327,11 @@ sub _ssh {
     return $self->{_ssh};
 }
 
+sub _adb {
+    my ($self) = @_;
+    return $self->{_adb};
+}
+
 sub _init {
     my ( $class, %parameters ) = @_;
     my $self = bless {}, $class;
@@ -329,6 +340,9 @@ sub _init {
     $self->{sleep_time_in_ms} = $parameters{sleep_time_in_ms};
     $self->{survive}          = $parameters{survive};
     $self->{debug}            = $parameters{debug};
+    if ( defined $parameters{adb} ) {
+        $self->_setup_adb( $parameters{adb} );
+    }
     if ( defined $parameters{host} ) {
         $self->_setup_ssh( $parameters{host}, $parameters{port},
             $parameters{user} );
@@ -341,7 +355,7 @@ sub _init {
     }
     if ( defined $parameters{har} ) {
         $self->{_har} = $parameters{har};
-        require Firefox::Marionette::HarExportTrigger;
+        require Firefox::Marionette::Extension::HarExportTrigger;
     }
     $self->{mime_types} = [
         qw(
@@ -439,7 +453,7 @@ sub new {
         binmode $handle;
         $handle->print(
             MIME::Base64::decode_base64(
-                Firefox::Marionette::HarExportTrigger->as_string()
+                Firefox::Marionette::Extension::HarExportTrigger->as_string()
             )
           )
           or Firefox::Marionette::Exception->throw(
@@ -516,6 +530,7 @@ sub _check_visible {
     my ( $self, %parameters ) = @_;
     my @arguments = ();
     if (   ( defined $parameters{capabilities} )
+        && ( defined $parameters{capabilities}->moz_headless() )
         && ( !$parameters{capabilities}->moz_headless() ) )
     {
         if ( !$parameters{visible} ) {
@@ -663,8 +678,54 @@ _RDF_
         if ( $self->{_har} ) {
             push @arguments, '--devtools';
         }
+        if ( $parameters{trust} ) {
+            $self->_add_certificates( $profile_directory, %parameters );
+        }
     }
     return @arguments;
+}
+
+sub _add_certificates {
+    my ( $self, $profile_directory, %parameters ) = @_;
+    my @paths;
+    if ( ref $parameters{trust} ) {
+        @paths = @{ $parameters{trust} };
+    }
+    else {
+        @paths = ( $parameters{trust} );
+    }
+    $self->{_trust_count} ||= 0;
+    foreach my $path (@paths) {
+        $self->{_trust_count} += 1;
+        if ( $self->_ssh() ) {
+            $self->{_cert_directory} = $self->_make_remote_directory(
+                $self->_remote_catfile( $self->{_root_directory}, 'certs' ) );
+            my $remote_path = $self->_remote_catfile( $self->{_cert_directory},
+                'root_ca_' . $self->{_trust_count} . '.cer' );
+            my $handle = FileHandle->new( $path, Fcntl::O_RDONLY() )
+              or Carp::croak(
+                "Failed to open '$path' for reading:$EXTENDED_OS_ERROR");
+            $self->_put_file_via_ssh( $handle, $remote_path, $path, );
+            $path = $remote_path;
+        }
+        foreach my $type (qw(dbm sql)) {
+            my $binary    = 'certutil';
+            my @arguments = (
+                '-A',
+                '-d' => $type . q[:] . $profile_directory,
+                '-i' => $path,
+                '-n' => 'Firefox::Marionette Root CA ' . $self->{_trust_count},
+                '-t' => 'TC,,',
+            );
+            if ( $self->_ssh() ) {
+                $self->_execute_via_ssh( {}, $binary, @arguments );
+            }
+            else {
+                $self->execute( $binary, @arguments );
+            }
+        }
+    }
+    return;
 }
 
 sub _write_mime_types_via_ssh {
@@ -792,20 +853,21 @@ sub execute {
         Firefox::Marionette::Exception->throw(
             "Failed to execute '$binary':$EXTENDED_OS_ERROR");
     };
+    my ( $result, $output );
+    while ( $result = read $reader, my $buffer, _READ_LENGTH_OF_OPEN3_OUTPUT() )
+    {
+        $output .= $buffer;
+    }
+    defined $result
+      or
+      Firefox::Marionette::Exception->throw( q[Failed to read STDOUT from ']
+          . ( join q[ ], $binary, @arguments )
+          . "':$EXTENDED_OS_ERROR" );
+    if ( defined $output ) {
+        chomp $output;
+    }
     waitpid $pid, 0;
     if ( $CHILD_ERROR == 0 ) {
-        my ( $result, $output );
-        while ( $result = read $reader, my $buffer,
-            _READ_LENGTH_OF_OPEN3_OUTPUT() )
-        {
-            $output .= $buffer;
-        }
-        defined $result
-          or
-          Firefox::Marionette::Exception->throw( q[Failed to read STDOUT from ']
-              . ( join q[ ], $binary, @arguments )
-              . "':$EXTENDED_OS_ERROR" );
-        chomp $output;
         return $output;
     }
     else {
@@ -816,8 +878,36 @@ sub execute {
     return;
 }
 
-sub _get_version_via_ssh {
-    my ( $self, $binary, @arguments ) = @_;
+sub _adb_initialise {
+    my ($self) = @_;
+    $self->execute( 'adb', 'connect', $self->_adb()->{host} );
+    my $adb_regex = qr/package:(.*(firefox|fennec).*)/smx;
+    my $binary    = 'adb';
+    my @arguments = qw(shell pm list packages);
+    my $package_name;
+    if ( $self->_ssh() ) {
+        foreach my $line ( split /\r?\n/smx,
+            $self->_execute_via_ssh( {}, $binary, @arguments ) )
+        {
+            if ( $line =~ /^$adb_regex$/smx ) {
+                $package_name = $1;
+            }
+        }
+    }
+    else {
+        foreach
+          my $line ( split /\r?\n/smx, $self->execute( $binary, @arguments ) )
+        {
+            if ( $line =~ /^$adb_regex$/smx ) {
+                $package_name = $1;
+            }
+        }
+    }
+    return $package_name;
+}
+
+sub _execute_via_ssh {
+    my ( $self, $parameters, $binary, @arguments ) = @_;
     my $version;
     my $read_handle  = Symbol::gensym();
     my $write_handle = Symbol::gensym();
@@ -845,9 +935,9 @@ sub _get_version_via_ssh {
         }
         defined $result
           or Firefox::Marionette::Exception->throw(
-            'Failed to read firefox version from '
+            'Failed to read from '
               . (
-                join q[ ], 'ssh', $self->_ssh_parameters( master => 1 ),
+                join q[ ], 'ssh', $self->_ssh_parameters( %{$parameters} ),
                 $self->_ssh_address(), $binary, @arguments
               )
               . ":$EXTENDED_OS_ERROR"
@@ -856,7 +946,7 @@ sub _get_version_via_ssh {
           or Firefox::Marionette::Exception->throw(
             'Failed to close '
               . (
-                join q[ ], 'ssh', $self->_ssh_parameters( master => 1 ),
+                join q[ ], 'ssh', $self->_ssh_parameters( %{$parameters} ),
                 $self->_ssh_address(), $binary, @arguments
               )
               . ":$EXTENDED_OS_ERROR"
@@ -864,9 +954,9 @@ sub _get_version_via_ssh {
         waitpid $pid, 0;
         if ( $CHILD_ERROR != 0 ) {
             Firefox::Marionette::Exception->throw(
-                'Failed to successfully determine firefox version from '
+                'Failed to successfully execute '
                   . (
-                    join q[ ], 'ssh', $self->_ssh_parameters( master => 1 ),
+                    join q[ ], 'ssh', $self->_ssh_parameters( %{$parameters} ),
                     $self->_ssh_address(), $binary, @arguments
                   )
                   . q[:]
@@ -885,7 +975,7 @@ sub _get_version_via_ssh {
 "Failed to redirect STDOUT to pipe write handle:$EXTENDED_OS_ERROR"
               );
             local $OUTPUT_AUTOFLUSH = 1;
-            $self->_ssh_exec( $self->_ssh_parameters( master => 1 ),
+            $self->_ssh_exec( $self->_ssh_parameters( %{$parameters} ),
                 $self->_ssh_address(), $binary, @arguments )
               or Firefox::Marionette::Exception->throw(
                 "Failed to exec 'ssh':$EXTENDED_OS_ERROR");
@@ -906,30 +996,61 @@ sub _initialise_version {
     if ( defined $self->{_initial_version} ) {
     }
     else {
-        my $binary = $self->_binary();
+        my $binary        = $self->_binary();
+        my $version_regex = qr/(\d+)[.](\d+(?:\w\d+)?)(?:[.](\d+))?/smx;
         my $version_string;
-        if ( $self->_ssh() ) {
-            $version_string =
-              $self->_get_version_via_ssh( $binary, '--version' );
+        if ( $self->_adb() ) {
+            my $package_name = $self->_adb_initialise();
+            my $dumpsys;
+            if ( $self->_ssh() ) {
+                $dumpsys =
+                  $self->_execute_via_ssh( {}, 'adb', 'shell', 'dumpsys',
+                    'package', $package_name );
+            }
+            else {
+                $dumpsys =
+                  $self->execute( 'adb', 'shell', 'dumpsys', 'package',
+                    $package_name );
+            }
+            my $found;
+            foreach my $line ( split /\r?\n/smx, $dumpsys ) {
+                if ( $line =~ /^[ ]+versionName=$version_regex\s*$/smx ) {
+                    $found                             = 1;
+                    $self->{_initial_version}->{major} = $1;
+                    $self->{_initial_version}->{minor} = $2;
+                    $self->{_initial_version}->{patch} = $3;
+                }
+            }
+            if ( !$found ) {
+                Firefox::Marionette::Exception->throw(
+"'adb shell dumpsys package $package_name' did not produce output that looks like '^[ ]+versionName=\\d+[.]\\d+([.]\\d+)?':$version_string"
+                );
+            }
         }
         else {
-            $version_string = $self->execute( $binary, '--version' );
-        }
-        if ( $version_string =~
-            /Mozilla[ ]Firefox[ ](\d+)[.](\d+(?:\w\d+)?)(?:[.](\d+))?\s*$/smx )
+            if ( $self->_ssh() ) {
+                $version_string = $self->_execute_via_ssh( { master => 1 },
+                    $binary, '--version' );
+            }
+            else {
+                $version_string = $self->execute( $binary, '--version' );
+            }
+            if (
+                $version_string =~ /Mozilla[ ]Firefox[ ]$version_regex\s*$/smx )
 
 # not anchoring the start of the regex b/c of issues with
 # RHEL6 and dbus crashing with error messages like
 # 'Failed to open connection to "session" message bus: /bin/dbus-launch terminated abnormally without any error message'
-        {
-            $self->{_initial_version}->{major} = $1;
-            $self->{_initial_version}->{minor} = $2;
-            $self->{_initial_version}->{patch} = $3;
-        }
-        else {
-            Firefox::Marionette::Exception->throw(
+            {
+                $self->{_initial_version}->{major} = $1;
+                $self->{_initial_version}->{minor} = $2;
+                $self->{_initial_version}->{patch} = $3;
+            }
+            else {
+                Firefox::Marionette::Exception->throw(
 "'$binary --version' did not produce output that looks like 'Mozilla Firefox \\d+[.]\\d+([.]\\d+)?':$version_string"
-            );
+                );
+            }
         }
     }
     return;
@@ -2259,7 +2380,8 @@ sub _create_capabilities {
     }
     my $headless = $self->_visible() ? 0 : 1;
     if ( defined $parameters->{'moz:headless'} ) {
-        if ( $parameters->{'moz:headless'} != $headless ) {
+        my $firefox_headless = $parameters->{'moz:headless'} ? 1 : 0;
+        if ( $firefox_headless != $headless ) {
             Firefox::Marionette::Exception->throw(
                 'moz:headless has not been determined correctly');
         }
@@ -2926,7 +3048,7 @@ sub tag_name {
         ]
     );
     my $response = $self->_get_response($message_id);
-    return $self->_response_result_value($response) ? 1 : 0;
+    return $self->_response_result_value($response);
 }
 
 sub window_rect {
@@ -4675,7 +4797,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 0.81
+Version 0.82
 
 =head1 SYNOPSIS
 
@@ -5253,7 +5375,7 @@ accepts an optional hash as a parameter.  Allowed keys are below;
 
 =item * page_load - a shortcut to allow directly providing the L<page_load|Firefox::Marionette::Timeout#page_load> timeout, instead of needing to use timeouts from the capabilities parameter.  Overrides all longer ways.
 
-=item * profile - create a new profile based on the supplied profile.  NOTE: firefox ignores any changes made to the profile on the disk while it is running.
+=item * profile - create a new profile based on the supplied L<profile|Firefox::Marionette::Profile>.  NOTE: firefox ignores any changes made to the profile on the disk while it is running.
 
 =item * profile_name - pick a specific existing profile to automate, rather than creating a new profile.  Note that L<firefox|https://firefox.com> refuses to allow more than one instance of a profile to run at the same time.  Profile names can be obtained by using the L<Firefox::Marionette::Profile::names()|Firefox::Marionette::Profile#names> method.  NOTE: firefox ignores any changes made to the profile on the disk while it is running.
 
@@ -5262,6 +5384,8 @@ accepts an optional hash as a parameter.  Allowed keys are below;
 =item * sleep_time_in_ms - the amount of time (in milliseconds) that this module should sleep when unsuccessfully calling the subroutine provided to the L<await|Firefox::Marionette#await> or L<bye|Firefox::Marionette#bye> methods.  This defaults to "1" millisecond.
 
 =item * survive - if this is set to a true value, firefox will not automatically exit when the object goes out of scope.
+
+=item * trust - give a path to a L<root certificate|https://en.wikipedia.org/wiki/Root_certificate> that will be trusted for this session.  The certificate will be imported by the L<NSS certutil|https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSS/tools/NSS_Tools_certutil> binary.  If this binary does not exist in the L<PATH|https://en.wikipedia.org/wiki/PATH_(variable)>, an exception will be thrown.  For Linux/BSD systems, L<NSS certutil|https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSS/tools/NSS_Tools_certutil> should be available via your package manager.  For OS X and Windows based platforms, it will be more difficult.
 
 =item * timeouts - a shortcut to allow directly providing a L<timeout|Firefox::Marionette::Timeout> object, instead of needing to use timeouts from the capabilities parameter.  Overrides the timeouts provided (if any) in the capabilities parameter.
 
@@ -5277,11 +5401,11 @@ This method returns a new C<Firefox::Marionette> object, connected to an instanc
  
     use Firefox::Marionette();
 
-    my $remote_darwin_firefox = Firefox::Marionette->new( debug => 1, host => '10.1.2.3', firefox => '/Applications/Firefox.app/Contents/MacOS/firefox');
+    my $remote_darwin_firefox = Firefox::Marionette->new( debug => 1, host => '10.1.2.3', firefox => '/Applications/Firefox.app/Contents/MacOS/firefox' );
     ...
 
     foreach my $profile_name (Firefox::Marionette::Profile->names()) {
-        my $firefox_with_existing_profile = Firefox::Marionette->new(profile_name => $profile_name);
+        my $firefox_with_existing_profile = Firefox::Marionette->new( profile_name => $profile_name, trust => "/path/to/root_ca.pem", visible => 1 );
         ...
     }
 
@@ -5713,8 +5837,8 @@ Copyright (c) 2019, David Dick C<< <ddick@cpan.org> >>. All rights reserved.
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic/perlartistic>.
 
-Includes the L<HAR Export Trigger|https://github.com/firefox-devtools/har-export-trigger>
-extension which is licensed under the Mozilla Public License 2.0.
+The L<Firefox::Marionette::Extension::HarExportTrigger|Firefox::Marionette::Extension::HarExportTrigger> module includes the L<HAR Export Trigger|https://github.com/firefox-devtools/har-export-trigger>
+extension which is licensed under the L<Mozilla Public License 2.0|https://www.mozilla.org/en-US/MPL/2.0/>.
 
 =head1 DISCLAIMER OF WARRANTY
 

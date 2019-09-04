@@ -1,7 +1,7 @@
 requires "DBIx::Class" => "0";
 requires "List::Util" => "1.45";
 requires "Ref::Util" => "0";
-requires "namespace::autoclean" => "0";
+requires "namespace::clean" => "0";
 requires "perl" => "v5.10.1";
 recommends "Ref::Util::XS" => "0";
 

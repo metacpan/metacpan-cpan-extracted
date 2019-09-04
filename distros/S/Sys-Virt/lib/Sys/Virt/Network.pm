@@ -212,7 +212,7 @@ sub create_port {
     my $xml = shift;
     my $flags = shift || 0;
 
-    return Sys::Virt::NetworkPort->_new(net => $self, xml => $xml, flags => $flags);
+    return Sys::Virt::NetworkPort->_new(network => $self, xml => $xml, flags => $flags);
 }
 
 
@@ -228,7 +228,7 @@ sub get_port_by_uuid {
     my $self = shift;
     my $uuid = shift;
 
-    return Sys::Virt::NetworkPort->_new(net => $self, uuid => $uuid);
+    return Sys::Virt::NetworkPort->_new(network => $self, uuid => $uuid);
 }
 
 

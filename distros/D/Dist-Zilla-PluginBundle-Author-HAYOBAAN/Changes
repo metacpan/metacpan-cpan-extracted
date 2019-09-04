@@ -1,5 +1,15 @@
 Revision history for Perl module Dist-Zilla-PluginBundle-Author-HAYOBAAN
 
+0.014     2019-09-02
+  * Updated Travis' perl versions
+  * No longer using Dist::Zilla::Plugin::SchwartzRatio since it requires a
+    Perl version newer than is installed on Mac by default
+  * Making sure internals are required
+  * Skipping Kwalitee's has_meta_yml test if not building a github hosted
+    release 
+  * Created own version of Test::Pod::LinkCheck which sets the cpan_backend to
+    CPAN instead of the deprecated CPANPLUS
+
 0.013     2017-05-19
   * Requiring ReadmeAnyFromPod 0.161150 [GH #3]
 

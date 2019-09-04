@@ -67,7 +67,7 @@ Return the name of the snapshot
 =item my $xml = $domss->get_xml_description($flags)
 
 Returns an XML document containing a complete description of
-the domain's configuration. The C<$flags> parameter
+the domain snapshot's configuration. The C<$flags> parameter
 accepts the following constants
 
 =over 4

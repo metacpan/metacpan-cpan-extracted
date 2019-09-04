@@ -6,7 +6,7 @@ use Carp ();
 
 use parent 'Protocol::Redis';
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 my %simple_types = ('+' => 1, '-' => 1, ':' => 1);
 
@@ -95,9 +95,8 @@ sub parse {
       }
       else {
         $self->{_curr}{data} = substr $$buf, 0, $self->{_curr}{len}, '';
+        substr $$buf, 0, 2, ''; # Remove \r\n
       }
-
-      substr $$buf, 0, 2, ''; # Remove \r\n
     }
 
     # Simple strings, errors, and integers

@@ -1,5 +1,6 @@
 # NAME
-    DBIx::Result::Convert::JSONSchema - Convert DBIx result schema to JSON schema
+
+DBIx::Result::Convert::JSONSchema - Convert DBIx result schema to JSON schema
 
 <div>
         <a href='https://travis-ci.org/Humanstate/p5-dbix-result-convert-jsonschema?branch=master'><img src='https://travis-ci.org/Humanstate/p5-dbix-result-convert-jsonschema.svg?branch=master' alt='Build Status' /></a>
@@ -8,7 +9,7 @@
 
 # VERSION
 
-    0.04
+    0.05
 
 # SYNOPSIS
 
@@ -38,6 +39,7 @@ Returns somewhat equivalent JSON schema based on DBIx result source name.
         decimals_to_pattern             => 1,
         has_schema_property_description => 1,
         allow_additional_properties     => 0,
+        ignore_property_defaults        => 1,
         overwrite_schema_property_keys  => {
             name    => 'cat',
             address => 'dog',
@@ -86,9 +88,22 @@ Optional arguments to change how JSON schema is generated:
 
     **Default**: 0
 
+- ignore\_property\_defaults
+
+    Do not set schema **default** property field based on default in DBIx schema
+
+    **Default**: 0
+
 - allow\_additional\_properties
 
     Define if the schema accepts additional keys in given payload.
+
+    **Default**: 0
+
+- add\_property\_minimum\_value
+
+    If field does not have format type add minimum values for number and string types based on DB field type.
+    This might not make sense in most cases as the minimum is either 0 or the lower bound if number is signed.
 
     **Default**: 0
 

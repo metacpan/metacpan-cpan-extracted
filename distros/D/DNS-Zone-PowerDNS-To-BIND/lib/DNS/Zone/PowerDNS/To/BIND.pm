@@ -1,7 +1,7 @@
 package DNS::Zone::PowerDNS::To::BIND;
 
-our $DATE = '2019-08-29'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2019-09-04'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -44,14 +44,10 @@ $SPEC{gen_bind_zone_from_powerdns_db} = {
         },
         domain => {
             schema => ['net::hostname*'], # XXX domainname
+            pos => 0,
         },
         domain_id => {
             schema => ['uint*'], # XXX domainname
-        },
-        master_host => {
-            schema => ['net::hostname*'],
-            req => 1,
-            pos => 1,
         },
         workaround_no_ns => {
             summary => "Whether to add some NS records for '' when there are no NS records for it",
@@ -283,7 +279,7 @@ DNS::Zone::PowerDNS::To::BIND - Generate BIND zone configuration from informatio
 
 =head1 VERSION
 
-This document describes version 0.005 of DNS::Zone::PowerDNS::To::BIND (from Perl distribution DNS-Zone-PowerDNS-To-BIND), released on 2019-08-29.
+This document describes version 0.006 of DNS::Zone::PowerDNS::To::BIND (from Perl distribution DNS-Zone-PowerDNS-To-BIND), released on 2019-09-04.
 
 =head1 SYNOPSIS
 
@@ -292,7 +288,6 @@ This document describes version 0.005 of DNS::Zone::PowerDNS::To::BIND (from Per
  say gen_bind_zone_from_powerdns_db(
      db_dsn => 'dbi:mysql:database=pdns',
      domain => 'example.com',
-     master_host => 'dns1.example.com',
  );
 
 will output something like:
@@ -340,8 +335,6 @@ Arguments ('*' denotes required arguments):
 =item * B<domain> => I<net::hostname>
 
 =item * B<domain_id> => I<uint>
-
-=item * B<master_host>* => I<net::hostname>
 
 =item * B<workaround_cname_and_other_data> => I<bool> (default: 1)
 

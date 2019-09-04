@@ -25,8 +25,8 @@ is( $converter->check_version('3.7'), 1, 'min version check' );
 is( $converter->check_version('3.9'), 1, 'min version check' );
 
 my $s_filepath = '.tmp.sqlite';
-my $dbh = DBI->connect("dbi:SQLite:database=$s_filepath");
-my $object = new_ok( 'Geoffrey' => [ dbh => $dbh ] ) or plan skip_all => "";
+my $dbh        = DBI->connect( "dbi:SQLite:database=$s_filepath", { PrintError => 0, RaiseError => 1 } );
+my $object     = new_ok( 'Geoffrey' => [ dbh => $dbh ] ) or plan skip_all => "";
 throws_ok { $object->read( File::Spec->catfile( $FindBin::Bin, 'data', 'changelog' ) ) }
 'Geoffrey::Exception::NotSupportedException::Column', 'Not supportet thrown';
 

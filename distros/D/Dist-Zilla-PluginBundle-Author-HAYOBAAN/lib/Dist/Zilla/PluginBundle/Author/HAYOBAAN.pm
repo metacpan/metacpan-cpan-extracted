@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Hayo Baan's Dist::Zilla configuration
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 #pod =head1 DESCRIPTION
 #pod
@@ -20,8 +20,9 @@ our $VERSION = '0.013'; # VERSION
 #pod * L<Git::GatherDir|Dist::Zilla::Plugin::Git::GatherDir>
 #pod * L<PruneCruft|Dist::Zilla::Plugin::PruneCruft>
 #pod * L<ManifestSkip|Dist::Zilla::Plugin::ManifestSkip>
-#pod * L<PodWeaver|Dist::Zilla::Plugin::PodWeaver> (or L<SurgicalPodWeaver|Dist::Zilla::Plugin::SurgicalPodWeaver> when enabled)
+#pod * L<PodWeaver|Dist::Zilla::Plugin::PodWeaver> (and L<SurgicalPodWeaver|Dist::Zilla::Plugin::SurgicalPodWeaver> when enabled)
 #pod * L<ReadmeAnyFromPod|Dist::Zilla::Plugin::ReadmeAnyFromPod> (both Text and Markdown generation are configured)
+#pod * L<Dist::Zilla::Plugin::MetaYAML>
 #pod * L<License|Dist::Zilla::Plugin::License>
 #pod * L<InstallGuide|Dist::Zilla::Plugin::InstallGuide>
 #pod * L<MinimumPerl|Dist::Zilla::Plugin::MinimumPerl>
@@ -61,13 +62,12 @@ our $VERSION = '0.013'; # VERSION
 #pod * L<MetaTests|Dist::Zilla::Plugin::MetaTests>
 #pod * L<PodSyntaxTests|Dist::Zilla::Plugin::PodSyntaxTests>
 #pod * L<PodCoverageTests|Dist::Zilla::Plugin::PodCoverageTests>
-#pod * L<Test::Pod::LinkCheck|Dist::Zilla::Plugin::Test::Pod::LinkCheck>
+#pod * L<Author::HAYOBAAN::LinkCheck|Dist::Zilla::Plugin::Author::HAYOBAAN::LinkCheck>
 #pod * L<Test::Synopsis|Dist::Zilla::Plugin::Test::Synopsis>
 #pod * L<TestRelease|Dist::Zilla::Plugin::TestRelease>
 #pod * L<RunExtraTests|Dist::Zilla::Plugin::RunExtraTests>
 #pod * L<ConfirmRelease|Dist::Zilla::Plugin::ConfirmRelease>
 #pod * L<UploadToCPAN|Dist::Zilla::Plugin::UploadToCPAN>
-#pod * L<SchwartzRatio|Dist::Zilla::Plugin::SchwartzRatio>
 #pod * L<FakeRelease|Dist::Zilla::Plugin::FakeRelease>
 #pod * L<NextRelease|Dist::Zilla::Plugin::NextRelease>
 #pod * L<Git::Commit|Dist::Zilla::Plugin::Git::Commit>
@@ -142,6 +142,7 @@ require Dist::Zilla::Plugin::OurPkgVersion;
 require Dist::Zilla::Plugin::Git::GatherDir;
 require Dist::Zilla::Plugin::PodWeaver; # And Dist::Zilla::Plugin::SurgicalPodWeaver if enabled
 use     Dist::Zilla::Plugin::ReadmeAnyFromPod 0.161150;
+require Dist::Zilla::Plugin::MetaYAML;
 require Dist::Zilla::Plugin::InstallGuide;
 require Dist::Zilla::Plugin::MinimumPerl;
 require Dist::Zilla::Plugin::GitHub::Meta;
@@ -173,10 +174,11 @@ require Test::CPAN::Meta::JSON;
 require Test::CPAN::Meta;
 require Test::Pod::Coverage;
 require Pod::Coverage::TrustPod;
-require Dist::Zilla::Plugin::Test::Pod::LinkCheck;
+require Dist::Zilla::Plugin::Author::HAYOBAAN::LinkCheck;
+require Pod::Weaver::PluginBundle::Author::HAYOBAAN;
+require Pod::Weaver::Section::Author::HAYOBAAN::Bugs;
 require Dist::Zilla::Plugin::Test::Synopsis;
 require Dist::Zilla::Plugin::RunExtraTests;
-require Dist::Zilla::Plugin::SchwartzRatio;
 require Dist::Zilla::Plugin::Git::Commit;
 require Dist::Zilla::Plugin::Git::Tag;
 require Dist::Zilla::Plugin::Git::Push;
@@ -468,7 +470,7 @@ has run_after_release => (
 #pod * L<MetaTests|Dist::Zilla::Plugin::MetaTests> -- Validation of the META.yml file -- only when hosted on GitHub
 #pod * L<PodSyntaxTests|Dist::Zilla::Plugin::PodSyntaxTests> -- Checks pod syntax
 #pod * L<PodCoverageTests|Dist::Zilla::Plugin::PodCoverageTests> -- Checks pod coverage
-#pod * L<Test::Pod::LinkCheck|Dist::Zilla::Plugin::Test::Pod::LinkCheck> -- Checks pod links
+#pod * L<LinkCheck|Dist::Zilla::Plugin::Author::HAYOBAAN::LinkCheck> -- Checks pod links
 #pod * L<Test::Synopsis|Dist::Zilla::Plugin::Test::Synopsis> -- Checks the pod synopsis
 #pod
 #pod =cut
@@ -736,7 +738,7 @@ sub configure {
             'GitHub::Meta',
             # Add META.json",
             'MetaJSON',
-            # Add META.yaml",
+            # Add META.yml",
             'MetaYAML',
             # Add provided Packages to META.*",
             'MetaProvides::Package',
@@ -814,7 +816,7 @@ sub configure {
         # Checks source encoding
         $self->_add_test('MojibakeTests'),
         # Checks the Kwalitee
-        $self->_add_test('Test::Kwalitee'),
+        $self->_add_test([ 'Test::Kwalitee' => { $self->is_github_hosted ? () : (skiptest => [ qw(has_meta_yml) ]) } ]),
         # Checks portability of code
         $self->_add_test('Test::Portability'),
         # Checks for unused variables
@@ -838,7 +840,7 @@ sub configure {
         # Checks pod coverage
         $self->_add_test('PodCoverageTests'),
         # Checks pod links
-        $self->_add_test('Test::Pod::LinkCheck'),
+        $self->_add_test('Author::HAYOBAAN::LinkCheck'),
         # Checks the pod synopsis
         $self->_add_test('Test::Synopsis'),
 
@@ -859,8 +861,6 @@ sub configure {
         $self->is_cpan && !$self->local_release_only ? (
             # Upload release to CPAN,
             'UploadToCPAN',
-            # Provide statistics
-            'SchwartzRatio',
         ) : (
             # Fake release
             'FakeRelease',
@@ -919,7 +919,7 @@ Dist::Zilla::PluginBundle::Author::HAYOBAAN - Hayo Baan's Dist::Zilla configurat
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 DESCRIPTION
 
@@ -959,11 +959,15 @@ L<ManifestSkip|Dist::Zilla::Plugin::ManifestSkip>
 
 =item *
 
-L<PodWeaver|Dist::Zilla::Plugin::PodWeaver> (or L<SurgicalPodWeaver|Dist::Zilla::Plugin::SurgicalPodWeaver> when enabled)
+L<PodWeaver|Dist::Zilla::Plugin::PodWeaver> (and L<SurgicalPodWeaver|Dist::Zilla::Plugin::SurgicalPodWeaver> when enabled)
 
 =item *
 
 L<ReadmeAnyFromPod|Dist::Zilla::Plugin::ReadmeAnyFromPod> (both Text and Markdown generation are configured)
+
+=item *
+
+L<Dist::Zilla::Plugin::MetaYAML>
 
 =item *
 
@@ -1123,7 +1127,7 @@ L<PodCoverageTests|Dist::Zilla::Plugin::PodCoverageTests>
 
 =item *
 
-L<Test::Pod::LinkCheck|Dist::Zilla::Plugin::Test::Pod::LinkCheck>
+L<Author::HAYOBAAN::LinkCheck|Dist::Zilla::Plugin::Author::HAYOBAAN::LinkCheck>
 
 =item *
 
@@ -1144,10 +1148,6 @@ L<ConfirmRelease|Dist::Zilla::Plugin::ConfirmRelease>
 =item *
 
 L<UploadToCPAN|Dist::Zilla::Plugin::UploadToCPAN>
-
-=item *
-
-L<SchwartzRatio|Dist::Zilla::Plugin::SchwartzRatio>
 
 =item *
 
@@ -1477,7 +1477,7 @@ L<PodCoverageTests|Dist::Zilla::Plugin::PodCoverageTests> -- Checks pod coverage
 
 =item *
 
-L<Test::Pod::LinkCheck|Dist::Zilla::Plugin::Test::Pod::LinkCheck> -- Checks pod links
+L<LinkCheck|Dist::Zilla::Plugin::Author::HAYOBAAN::LinkCheck> -- Checks pod links
 
 =item *
 

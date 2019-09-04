@@ -1,7 +1,9 @@
 Revision history for Perl extension DBD::Mock.
 
-{{NEXT}}
-    - Add git-repo url to meta-data
+1.46 2019-09-04T12:02:08Z
+    - Added git-repo url to meta-data
+    - Fixed bug rt70587 Spelling Mistake
+    - Added regex support to mock_add_resultset
 
 1.43
     - Segregated into different packages

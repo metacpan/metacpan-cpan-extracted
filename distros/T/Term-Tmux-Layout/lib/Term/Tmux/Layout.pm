@@ -1,10 +1,10 @@
 #
-# Copyright (C) 2015,2016,2017,2018 Joelle Maslak
+# Copyright (C) 2015-2019 Joelle Maslak
 # All Rights Reserved - See License
 #
 
 package Term::Tmux::Layout;
-$Term::Tmux::Layout::VERSION = '1.182062';
+$Term::Tmux::Layout::VERSION = '1.192431';
 use v5.8;
 
 # ABSTRACT: Create tmux layout strings programmatically
@@ -43,7 +43,7 @@ sub layout {
     if ( $#_ < 1 ) { confess 'invalid call' }
     my ( $self, @desc ) = @_;
 
-    my @rows = split /[\n|]/, join( '|', @desc );
+    my @rows  = split /[\n|]/, join( '|', @desc );
     my $width = length( $rows[0] );
     foreach (@rows) {
         if ( $width != length($_) ) {
@@ -116,8 +116,8 @@ sub _divide {
     # Absolute Location, in col/row, of start of this division
     my $h_char_abs_b = $gridstruct->{hgrid}->[$h_grid_abs_b];
     my $v_char_abs_b = $gridstruct->{vgrid}->[$v_grid_abs_b];
-    # if ($h_char_abs_b > 0) { $h_char_abs_b++; } # Adjust for pane border
-    # if ($v_char_abs_b > 0) { $v_char_abs_b++; } # Adjust for pane border
+    if ( $h_char_abs_b > 0 ) { $h_char_abs_b++; }    # Adjust for pane border
+    if ( $v_char_abs_b > 0 ) { $v_char_abs_b++; }    # Adjust for pane border
 
     # Absolute Location, in col/row of end+1 of this division
     my $h_char_abs_n = $gridstruct->{hgrid}->[$h_grid_abs_n];
@@ -390,7 +390,7 @@ Term::Tmux::Layout - Create tmux layout strings programmatically
 
 =head1 VERSION
 
-version 1.182062
+version 1.192431
 
 =head1 SYNOPSIS
 
@@ -524,7 +524,7 @@ See L<tmuxlayout> for a command line utility that wraps this module.
 =head1 BUGS
 
 Check the issue tracker at:
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Term-Layout>
+L<https://github.com/jmaslak/Term-Tmux-Layout/issues>
 
 =head1 AUTHOR
 

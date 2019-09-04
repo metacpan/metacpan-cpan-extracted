@@ -1,4 +1,4 @@
-# AWS::CodeCommit::Repository generated from spec 5.0.0
+# AWS::CodeCommit::Repository generated from spec 5.3.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::CodeCommit::Repository',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::CodeCommit::Repository {
     [ 'Arn','CloneUrlHttp','CloneUrlSsh','Name' ]
   }
   sub supported_regions {
-    [ 'eu-west-1','us-east-1','us-east-2','us-west-2' ]
+    [ 'eu-west-1','us-east-1','us-east-2','us-gov-west-1','us-west-2' ]
   }
 }
 

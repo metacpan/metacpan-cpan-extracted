@@ -1,25 +1,10 @@
 #line 1
-##
-# name:      Module::Install::ManifestSkip
-# abstract:  Generate a MANIFEST.SKIP file
-# author:    Ingy döt Net <ingy@cpan.org>
-# license:   perl
-# copyright: 2010, 2011
-# see:
-# - Module::Manifest::Skip
-
+use strict; use warnings;
 package Module::Install::ManifestSkip;
-use 5.008003;
-use strict;
-use warnings;
+our $VERSION = '0.24';
 
 use base 'Module::Install::Base';
 
-my $requires = "
-use Module::Manifest::Skip 0.10 ();
-";
-
-our $VERSION = '0.19';
 our $AUTHOR_ONLY = 1;
 
 my $skip_file = "MANIFEST.SKIP";
@@ -28,7 +13,7 @@ sub manifest_skip {
     my $self = shift;
     return unless $self->is_admin;
 
-    eval $requires; die $@ if $@;
+    require Module::Manifest::Skip;
 
     print "Writing $skip_file\n";
 
@@ -45,4 +30,3 @@ sub manifest_skip {
 }
 
 1;
-

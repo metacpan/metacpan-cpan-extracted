@@ -1,6 +1,6 @@
 package Tie::Hash::DBD;
 
-our $VERSION = "0.19";
+our $VERSION = "0.20";
 
 use strict;
 use warnings;
@@ -187,7 +187,7 @@ sub TIEHASH {
 		$h->{_de} = sub { YAML::Load ($_[0]) };
 		}
 	    elsif ($str eq "YAML::Syck") {
-		require YAML;
+		require YAML::Syck;
 		$h->{_en} = sub { YAML::Syck::Dump ($_[0]) };
 		$h->{_de} = sub { YAML::Syck::Load ($_[0]) };
 		}

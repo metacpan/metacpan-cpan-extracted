@@ -4,7 +4,7 @@ DBIx::Class::Helper::SimpleStats - Simple grouping and aggregate functions for D
 
 # VERSION
 
-version v0.1.2
+version v0.1.3
 
 # SYNOPSIS
 

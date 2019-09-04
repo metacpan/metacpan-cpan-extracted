@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Screensaver/Any/set_screensaver_timeout
-# and generated automatically using Perinci::CmdLine::Gen version 0.490
+# and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-04-30'; # DATE
+our $DATE = '2019-09-04'; # DATE
 our $DIST = 'App-ScreensaverUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,7 +39,7 @@ set-screensaver-timeout - Set screensaver idle timeout
 
 =head1 VERSION
 
-This document describes version 0.004 of set-screensaver-timeout (from Perl distribution App-ScreensaverUtils), released on 2019-04-30.
+This document describes version 0.006 of set-screensaver-timeout (from Perl distribution App-ScreensaverUtils), released on 2019-09-04.
 
 =head1 SYNOPSIS
 
@@ -70,9 +70,9 @@ C<~/.xscreensaver>:
 
 modifies the line, save the file, and HUP the xscreensaver process.
 
-=item * gnome-screensaver
+=item * gnome
 
-To set timeout for gnome-screensaver, the program executes this command:
+To set timeout for gnome screensaver, the program executes this command:
 
   gsettings set org.gnome.desktop.session idle-delay 300
 

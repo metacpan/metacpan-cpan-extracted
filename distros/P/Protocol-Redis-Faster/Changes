@@ -1,3 +1,6 @@
+0.003     2019-09-01 09:42:19 EDT
+  - Fix parsing of empty bulk string (und3f, #1)
+
 0.002     2019-04-01 21:51:36 EDT
   - Minor optimizations
   - Correct behavior when on_message callback calls on_message or parse

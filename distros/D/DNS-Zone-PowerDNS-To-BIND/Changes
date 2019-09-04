@@ -1,3 +1,10 @@
+0.006   2019-09-04  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Set 'domain' argument as pos=0.
+
+        - Remove unneeded argument master_host.
+
+
 0.005   2019-08-29  Released-By: PERLANCAR; Urgency: medium
 
 	- Add workaround arguments: workaround_root_cname, workaround_no_ns,

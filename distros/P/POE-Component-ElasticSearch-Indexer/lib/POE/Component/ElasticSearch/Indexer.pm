@@ -4,9 +4,10 @@ package POE::Component::ElasticSearch::Indexer;
 use strict;
 use warnings;
 
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 use Const::Fast;
+use Digest::MD5 qw(md5_hex);
 use Digest::SHA1 qw(sha1_hex);
 use Fcntl qw(:flock);
 use HTTP::Request;
@@ -84,6 +85,8 @@ sub spawn {
         $CONFIG{MaxFailedRatio} = 0.8;
     }
 
+    # We need a unique session alias for our http client
+    my $http_session_alias = md5_hex( "elasticsearch http client" . time() );
     # Management Session
     my $session = POE::Session->create(
         inline_states => {
@@ -104,12 +107,13 @@ sub spawn {
             #resp_health        => \&resp_health,
         },
         heap => {
-            cfg       => \%CONFIG,
-            stats     => {},
-            start     => {},
-            batch     => {},
-            health    => '',
-            es_ready  => 0,
+            cfg        => \%CONFIG,
+            stats      => {},
+            start      => {},
+            batch      => {},
+            health     => '',
+            es_ready   => 0,
+            http_alias => $http_session_alias,
         },
     );
 
@@ -125,7 +129,7 @@ sub spawn {
 
     my $http_timeout = $pool ? $CONFIG{Timeout} * $CONFIG{MaxConnsPerServer} : $CONFIG{Timeout};
     POE::Component::Client::HTTP->spawn(
-        Alias   => 'http',
+        Alias   => $http_session_alias,
         Timeout => $http_timeout,
         # Are we using Connection Pooling?
         $pool ? (ConnectionManager => $pool)  : (),
@@ -189,7 +193,7 @@ sub _stats {
     my $failure = $stats->{bulk_failure} || 0;
 
     # Fetch the pending request count from the HTTP client
-    $stats->{pending_requests} = $kernel->call( http => 'pending_requests_count' );
+    $stats->{pending_requests} = $kernel->call( $heap->{http_alias} => 'pending_requests_count' );
 
     # We tried stuff this go around
     if( $success >= 0 && $failure == 0 ) {
@@ -403,7 +407,7 @@ sub es_batch {
         $uri->as_string,
         $id,
     );
-    $kernel->post( http => request => resp_bulk => $req => $id );
+    $kernel->post( $heap->{http_alias} => request => resp_bulk => $req => $id );
     # Record the request
     $heap->{start}{$id} = time unless exists $heap->{start}{$id};
     $heap->{stats}{http_req} ||= 0;
@@ -651,7 +655,7 @@ POE::Component::ElasticSearch::Indexer - POE session to index data to ElasticSea
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 

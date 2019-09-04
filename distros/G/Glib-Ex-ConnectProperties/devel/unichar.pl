@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2008, 2009, 2010 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2013 Kevin Ryde
 
 # This file is part of Glib-Ex-ConnectProperties.
 #
@@ -46,8 +46,6 @@ use warnings;
   }
 }
 
-use strict;
-use warnings;
 use Glib::Ex::ConnectProperties;
 use Data::Dumper;
 

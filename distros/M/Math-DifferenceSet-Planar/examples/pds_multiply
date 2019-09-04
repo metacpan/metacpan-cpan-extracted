@@ -33,7 +33,7 @@ while (<<>>) {
 __END__
 =head1 NAME
 
-pds_multiply - apply a multiplier to a list of planar difference sets
+pds_multiply - multiply a list of planar difference sets by a factor
 
 =head1 SYNOPSIS
 

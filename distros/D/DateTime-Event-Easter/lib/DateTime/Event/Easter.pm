@@ -1,10 +1,13 @@
+# -*- encoding: utf-8; indent-tabs-mode: nil -*-
 #
 #     Perl DateTime extension for computing the dates for Easter and related feasts
-#     Copyright (C) 2003-2004, 2015 Rick Measham and Jean Forget
+#     Copyright Â© 2003-2004, 2015, 2019 Rick Measham and Jean Forget, all rights reserved
 #
 #     See the license in the embedded documentation below.
 #
 package DateTime::Event::Easter;
+
+use utf8;
 use DateTime;
 use DateTime::Set;
 use Carp;
@@ -21,46 +24,49 @@ require Exporter;
 @ISA = qw(Exporter);
 
 @EXPORT_OK = qw(easter);
-$VERSION = '1.05';
+$VERSION = '1.06';
 
 sub new {
     my $class = shift;
     my %args  = validate( @_,
-                    {   easter  => { type => SCALAR, default=>'western', optional=>1, regex => qr/^(western|eastern)$/i },
-                        day     => { type => SCALAR, default=>'sunday', optional=>1 },
-                        as      => { type => SCALAR, default=>'point', optional=>1 },
+                    {   easter  => { type => SCALAR, default => 'western', optional => 1, regex => qr/^(western|eastern)$/i },
+                        day     => { type => SCALAR, default => 'sunday' , optional => 1 },
+                        as      => { type => SCALAR, default => 'point'  , optional => 1 },
                     }
                 );
     
     my %self;
     my $offset;
-    if ($args{day} =~/^fat/i) {
+    if ($args{day} =~ /^fat/i) {
         $offset = -47;
     }
-    elsif ($args{day} =~/^ash/i) {
+    elsif ($args{day} =~ /^ash/i) {
         # First day of lent. Lent lasts for 40 days, excluding sundays.
         # This translates to a 46-day duration, including sundays.
         $offset = -46;
     }
-    elsif ($args{day} =~/^ascension/i) {
+    elsif ($args{day} =~ /^ascension/i) {
         $offset = 39;
     }
-    elsif ($args{day} =~/^pentecost/i) {
+    elsif ($args{day} =~ /^pentecost/i) {
         $offset = 49;
     }
-    elsif ($args{day} =~/^trinity/i) {
+    elsif ($args{day} =~ /^trinity/i) {
         $offset = 56;
     }
-    elsif ($args{day} =~/^palm/i) {
+    elsif ($args{day} =~ /^palm/i) {
         $offset = -7;
-    } elsif ($args{day} =~/saturday/i) {
+    } elsif ($args{day} =~ /saturday/i) {
         $offset = -1;
-    } elsif ($args{day} =~/friday/i) {
+    } elsif ($args{day} =~ /friday/i) {
         $offset = -2;
-    } elsif ($args{day} =~/thursday/i) {
+    } elsif ($args{day} =~ /thursday/i) {
         $offset = -3;
-    } elsif ($args{day} =~/^\-?\d+$/i) {
+    } elsif ($args{day} =~ /^\-?\d+$/i) {
         $offset = $args{day};
+        if ($offset < -80 || $offset > 250) {
+          croak "The number of days must be between -80 and 250";
+        }
     } else {
         $offset = 0;
     }
@@ -72,7 +78,7 @@ sub new {
     }
 
     # Set to return points or spans
-    die("Argument 'as' must be 'point' or 'span'.") unless $args{as}=~/^(point|span)s?$/i;
+    die("Argument 'as' must be 'point' or 'span'.") unless $args{as} =~ /^(point|span)s?$/i;
     $self{as} = lc $1;
 
     return bless \%self, $class;
@@ -142,11 +148,11 @@ sub closest {
     }
 
     if ($self->is($dt)) {
-		my $easter = $dt->clone->truncate(to=>'day');
-	    $easter = $class->from_object(object=>$easter) if (ref($easter) ne $class);
-		return ($self->{as} eq 'span') 
-			? _tospan($easter)
-			: $easter;
+                my $easter = $dt->clone->truncate(to=>'day');
+            $easter = $class->from_object(object=>$easter) if (ref($easter) ne $class);
+                return ($self->{as} eq 'span') 
+                        ? _tospan($easter)
+                        : $easter;
     }
     my $following_easter = $self->following($dt);
     my $following_delta  = $following_easter - $dt;
@@ -185,7 +191,7 @@ sub as_list {
     my %args  = validate( @_,
                     {   from        => { type => OBJECT },
                         to          => { type => OBJECT },
-                        inclusive   => { type => SCALAR, default=>0 },
+                        inclusive   => { type => SCALAR, default => 0 },
                     }
                 );
     
@@ -196,21 +202,30 @@ sub as_list {
     
     if ($args{inclusive}) {
         if ($self->is($args{from})) {
-            push(@set,$args{from});
+            push @set, ($self->{as} eq 'span') 
+                       ? _tospan($args{from})
+                       : $args{from};
         }
         if ($self->is($args{to})) {
-            push(@set,$args{to});
+            push @set, ($self->{as} eq 'span') 
+                       ? _tospan($args{to})
+                       : $args{to};
         }
     }
     
     my $checkdate = $args{from};
 
     while ($checkdate < $args{to}) {
-        $checkdate = $self->following($checkdate);
-        push(@set,$checkdate) if ($checkdate < $args{to});
+        my $check_obj = $self->following($checkdate);
+        $checkdate = ($self->{as} eq 'span') 
+                   ? $check_obj->start
+                   : $check_obj;
+        push(@set, $check_obj) if ($checkdate < $args{to});
     }
     
-    return sort @set;
+    return ($self->{as} eq 'span')
+           ? sort { $a->start cmp $b->start} @set
+           : sort @set;
 }
 
 sub as_old_set {
@@ -218,32 +233,46 @@ sub as_old_set {
     return DateTime::Set->from_datetimes( dates => [ $self->as_list(@_) ] );
 }
 sub as_set {
-	my $self = shift;
-	my %args = @_;
-	if (exists $args{inclusive}) {
-		croak("You must specify both a 'from' and a 'to' datetime") unless 
-			ref($args{to})=~/DateTime/ and
-			ref($args{from})=~/DateTime/;
-		if ($args{inclusive}) {
-			$args{start} = delete $args{from};
-			$args{end} = delete $args{to};
-		} else {
-			$args{after} = delete $args{from};
-			$args{before} = delete $args{to};
-		}
-		delete $args{inclusive};
-	} elsif (exists $args{from} or exists $args{to}) {
-		croak("You must specify both a 'from' and a 'to' datetime") unless 
-			ref($args{to})=~/DateTime/ and
-			ref($args{from})=~/DateTime/;
-			$args{after} = delete $args{from};
-			$args{before} = delete $args{to};
-	}
-	return DateTime::Set->from_recurrence( 
-		next		=> sub { return $_[0] if $_[0]->is_infinite; $self->following( $_[0] ) },
-		previous	=> sub { return $_[0] if $_[0]->is_infinite; $self->previous(  $_[0] ) },
-		%args
-	);
+        my $self   = shift;
+        my %args   = @_;
+        my %args_1 = @_;
+        if (exists $args{inclusive}) {
+          croak("You must specify both a 'from' and a 'to' datetime")
+                    unless ref($args{to})   =~ /DateTime/
+                    and    ref($args{from}) =~ /DateTime/;
+          if ($self->{as} eq 'point') {
+            if ($args{inclusive}) {
+                    $args{start}  = delete $args{from};
+                    $args{end}    = delete $args{to};
+            } else {
+                    $args{after}  = delete $args{from};
+                    $args{before} = delete $args{to};
+            }
+            delete $args{inclusive};
+          }
+        }
+        elsif (exists $args{from} or exists $args{to}) {
+          croak("You must specify both a 'from' and a 'to' datetime")
+                     unless ref($args{to})   =~ /DateTime/
+                     and    ref($args{from}) =~ /DateTime/;
+          if ($self->{as} eq 'point') {
+            $args{after}  = delete $args{from};
+            $args{before} = delete $args{to};
+          }
+        }
+        if ($self->{as} eq 'span') {
+          $args_1{from} = delete $args_1{after}  if exists $args_1{after};
+          $args_1{to}   = delete $args_1{before} if exists $args_1{before};
+          my @list = $self->as_list(%args_1);
+          return DateTime::SpanSet->from_spans( spans => [ @list ] ); 
+        }
+        else {
+          return DateTime::Set->from_recurrence( 
+                  next      => sub { return $_[0] if $_[0]->is_infinite; $self->following( $_[0] ) },
+                  previous  => sub { return $_[0] if $_[0]->is_infinite; $self->previous(  $_[0] ) },
+                  %args
+                  );
+        }
 }
 
 sub as_span {
@@ -260,8 +289,8 @@ sub as_point {
 
 sub _tospan {
    return DateTime::Span->from_datetime_and_duration(
-		start => $_[0],
-		hours => 24,
+                start => $_[0],
+                hours => 24,
    );
 }
 
@@ -313,14 +342,14 @@ sub eastern_easter {
 # Therefore the custom of ending a module with a boring "1".
 # Instead of that, end it with some verse.
 q{
-Il reviendra à Pâques, mironton mironton mirontaine,
-Il reviendra à Pâques
-Ou à la Trinité.
-Ou à la Trinité...
+Il reviendra z-Ã  PÃ¢ques, mironton mironton mirontaine,
+Il reviendra z-Ã  PÃ¢ques
+Ou Ã  la TrinitÃ©.
+Ou Ã  la TrinitÃ©...
 };
 __END__
 
-=encoding iso-8859-1
+=encoding utf-8
 
 =head1 NAME
 
@@ -331,8 +360,8 @@ DateTime::Event::Easter - Returns Easter events for DateTime objects
   use DateTime::Event::Easter;
   
   $dt = DateTime->new( year   => 2002,
-                       month  => 3,
-                       day    => 31,
+                       month  =>    3,
+                       day    =>   31,
                      );
   
   
@@ -358,8 +387,8 @@ DateTime::Event::Easter - Returns Easter events for DateTime objects
                         day    =>   30,
                       );
   
-  $set  = $palm_sunday->as_set (from=>$dt, to=>$dt2, inclusive=>1);
-  @list = $palm_sunday->as_list(from=>$dt, to=>$dt2, inclusive=>1);
+  $set  = $palm_sunday->as_set (from => $dt, to => $dt2, inclusive => 1);
+  @list = $palm_sunday->as_list(from => $dt, to => $dt2, inclusive => 1);
   # Sun, 13 Apr 2003 00:00:00 UTC
   # Sun, 04 Apr 2004 00:00:00 UTC
   # Sun, 20 Mar 2005 00:00:00 UTC
@@ -430,6 +459,7 @@ When constructed with a day parameter, the method can return associated
 Easter days other than Easter Sunday. The constructor also allows an
 integer to be passed here as an offset. For example, Maundy Thursday is
 the same as an offset of -3 (Three days before Easter Sunday)
+The numeric offset must be in the -80 .. +250 interval.
 
 When constructed without a day parameter, the method uses the date for
 Easter Sunday (which is the churches' official day for 'Easter', think
@@ -480,7 +510,7 @@ will return midnight of $dt if $dt is the Easter Event.
 Return positive (1) if $dt is the Easter Event, otherwise returns false
 (0)
 
-=item * as_list(from => $dt, to => $dt2, inclusive=>I<([0]|1)>)
+=item * as_list(from => $dt, to => $dt2, inclusive => I<([0]|1)>)
 
 Returns a list of Easter Events between I<to> and I<from>.
 
@@ -532,17 +562,87 @@ Western Easter Sunday in that year.
 
 =back
 
+=head1 BUGS AND PROBLEMS FOR SPANS
+
+=head2 Inclusion and exclusion of <from> and C<to> dates in lists and sets
+
+If you build a list or a set of spans and if the C<from> or C<to> limits
+coincide with the requested Easter event, the result may be different
+from what you expect. For example, you ask for Easter sundays between
+2017-04-16T21:43:00 and 2020-04-12T12:34:00.
+
+The inclusive list or set will be:
+
+  2017-04-16T00:00:00 to 2017-04-16T23:59:59
+  2018-04-01T00:00:00 to 2018-04-01T23:59:59
+  2019-04-21T00:00:00 to 2019-04-21T23:59:59
+  2020-04-12T00:00:00 to 2020-04-12T23:59:59
+
+and not:
+
+  2017-04-16T21:43:00 to 2017-04-16T23:59:59
+  2018-04-01T00:00:00 to 2018-04-01T23:59:59
+  2019-04-21T00:00:00 to 2019-04-21T23:59:59
+  2020-04-12T00:00:00 to 2020-04-12T12:34:00
+
+The exclusive list or set will be:
+
+  2018-04-01T00:00:00 to 2018-04-01T23:59:59
+  2019-04-21T00:00:00 to 2019-04-21T23:59:59
+
+and not:
+
+  2017-04-16T21:43:01 to 2017-04-16T23:59:59
+  2018-04-01T00:00:00 to 2018-04-01T23:59:59
+  2019-04-21T00:00:00 to 2019-04-21T23:59:59
+  2020-04-12T00:00:00 to 2020-04-12T12:35:59
+
+Remarks and patches welcome.
+
+Note for pedants: the hour C<21:43:01> should actually be
+21 hours, 43 minutes, zero seconds and 1 nanosecond.
+Likewise, all the times above ending with C<:59> include
+999_999_999 nanoseconds.
+
+=head2 Interaction of spans with timezones
+
+It may happen that Palm sunday or Easter sunday coincide
+with DST "spring forward" day (for Northern countries). I have not
+checked what happens in this case for spans: a bit more than one day
+for exactly 24 hours or exactly one day which gives 23 hours?
+A similar question exists for DST "fall backward" day in the Southern
+countries.
+
+Also, since you can use a numeric C<day> offset up to 250, you can reach
+the Northern "fall backwards" and the Southern "spring forward" days, where
+the same problem will happen in reverse.
+
+=head2 Building a spanset
+
+For the moment, when building a set with the C<< as => 'set' >> option,
+the C<from> and C<to> dates are required and thus the set must be a finite set.
+
 =head1 THE SMALL PRINT
 
 =head2 REFERENCES
 
 =over 4
 
-=item * http://datetime.perl.org - The official home of the DateTime
-project
+=item * L<https://github.com/houseabsolute/DateTime.pm/wiki> - The official wiki
+of the DateTime project
 
-=item * http://www.tondering.dk/claus/calendar.html - Claus Tøndering's
+=item * L<https://www.tondering.dk/claus/calendar.html> - Claus TÃ¸ndering's
 calendar FAQ
+
+=item * I<Calendrical Calculations> (Third or Fourth Edition) by Nachum Dershowitz and
+Edward M. Reingold, Cambridge University Press, see
+L<http://www.calendarists.com>
+or L<https://www.cambridge.org/us/academic/subjects/computer-science/computing-general-interest/calendrical-calculations-ultimate-edition-4th-edition?format=PB&isbn=9781107683167>,
+ISBN 978-0-521-70238-6 for the third edition.
+
+=item * I<La saga des calendriers>, by Jean Lefort, published by I<Pour la Science>, ISBN 2-90929-003-5
+
+=item * I<Le Calendrier>, by Paul Couderc, published by I<Presses universitaires de France> (I<Que sais-je ?>), ISBN 2-13-036266-4
 
 =back
 
@@ -571,21 +671,21 @@ B<Dave Rolsky> - who picked nits, designed DateTime itself and leads the project
 
 B<Martin Hasch> - who pointed out the posibility of memory leak with an early beta
 
-B<Joe Orost> and B<Andreas König> - for RT tickets about the POD documentation
+B<Joe Orost> and B<Andreas KÃ¶nig> - for RT tickets about the POD documentation
 
-B<Frank Wiegand> and B<Slaven Rezic> - for patches fixing the POD problems
+B<Frank Wiegand> and B<Slaven ReziÄ‡> - for patches fixing the POD problems
 
 =head2 COPYRIGHT
 
-(c) Copyright 2003, 2004, 2015 Rick Measham and Jean Forget. All
+Â© Copyright 2003, 2004, 2015, 2019 Rick Measham and Jean Forget. All
 rights reserved. This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself: GNU
 Public License version 1 or later and Perl Artistic License.
 
 The full text of the license can be found in the F<LICENSE> file
 included with this module or at
-L<http://www.perlfoundation.org/artistic_license_1_0> and
-L<http://www.gnu.org/licenses/gpl-1.0.html>.
+L<https://dev.perl.org/licenses/artistic.html>
+and L<https://www.gnu.org/licenses/gpl-1.0.html>.
 
 Here is the summary of GPL:
 
@@ -600,10 +700,13 @@ MERCHANTABILITY  or FITNESS  FOR A  PARTICULAR PURPOSE.   See  the GNU
 General Public License for more details.
 
 You  should have received  a copy  of the  GNU General  Public License
-along with this program; if not, see <http://www.gnu.org/licenses/> or
-write to the Free Software Foundation, Inc., L<http://fsf.org>.
+along with this program; if not, see <https://www.gnu.org/licenses/> or
+write to the Free Software Foundation, Inc., L<https://fsf.org>.
 
 =head2 SEE ALSO
 
-L<DateTime>, L<DateTime::Calendar::Julian>, perl(1),
-http://datetime.perl.org.
+L<DateTime>, L<DateTime::Calendar::Julian>, perl(1)
+
+L<https://metacpan.org/search?q=easter> which gives L<Date::Easter>, L<Date::Calc> and L<Date::Pcalc>
+
+https://github.com/houseabsolute/DateTime.pm/wiki

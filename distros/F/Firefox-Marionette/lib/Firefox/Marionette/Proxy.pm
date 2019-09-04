@@ -3,7 +3,7 @@ package Firefox::Marionette::Proxy;
 use strict;
 use warnings;
 
-our $VERSION = '0.81';
+our $VERSION = '0.82';
 
 sub new {
     my ( $class, %parameters ) = @_;
@@ -37,7 +37,12 @@ sub http {
 sub none {
     my ($self) = @_;
     if ( defined $self->{none} ) {
-        return @{ $self->{none} };
+        if ( ref $self->{none} ) {
+            return @{ $self->{none} };
+        }
+        else {
+            return ( $self->{none} );
+        }
     }
     else {
         return ();
@@ -68,7 +73,7 @@ Firefox::Marionette::Proxy - Represents a Proxy used by Firefox Capabilities usi
 
 =head1 VERSION
 
-Version 0.81
+Version 0.82
 
 =head1 SYNOPSIS
 

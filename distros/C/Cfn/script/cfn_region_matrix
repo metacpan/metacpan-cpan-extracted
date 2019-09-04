@@ -1,0 +1,44 @@
+#!perl
+
+use strict;
+use warnings;
+use v5.10;
+use Cfn;
+
+sub shorten_region {
+  my $region = shift;
+  $region =~ s/south/s/; 
+  $region =~ s/north/n/; 
+  $region =~ s/east/e/; 
+  $region =~ s/west/w/; 
+  $region =~ s/central/c/;
+  return $region;
+}
+
+my @cfn_modules = sort Cfn->list_resource_modules;
+
+my %seen_regions = ();
+my %modules_in_region = ();
+
+foreach my $module (@cfn_modules) {
+  my $class = Cfn->load_resource_module($module);
+  foreach my $region (@{ $class->supported_regions }) {
+    $seen_regions{ $region } = 1;
+    $modules_in_region{ $module }->{ $region } = 1;
+  }
+}
+
+my @regions = sort keys %seen_regions;
+my @table_titles = map { shorten_region($_) } @regions;
+my %title_lengths = map { $_ => length(shorten_region($_)) } @regions;
+
+
+my $longest_service = 0;
+$_ > $longest_service and $longest_service = $_ foreach map { length $_ } @cfn_modules;
+
+say '|', (' ' x $longest_service) ,'|', (join '|', @table_titles), '|';
+foreach my $module (@cfn_modules) {
+  my $in_region = $modules_in_region{ $module };
+  my @asterisks = map { $in_region->{ $_ } ? '*' x $title_lengths{$_} : ' ' x $title_lengths{$_} } (@regions);
+  say '|', $module, ' ' x ($longest_service - length($module)), '|', (join '|', @asterisks), '|';
+}

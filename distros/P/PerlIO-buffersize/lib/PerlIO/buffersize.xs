@@ -8,12 +8,16 @@ static IV PerlIOBufferSize_pushed(pTHX_ PerlIO *f, const char *mode, SV *arg, Pe
 	PerlIOBuf* buffer = PerlIOSelf(f, PerlIOBuf);
 	if (!(PerlIOBase(f)->tab->kind & PERLIO_K_BUFFERED))
 		Perl_warn(aTHX_ "Parent doesn't appear to be buffered, can't set buffer size");
-	else if (buffer->buf)
-		Perl_warn(aTHX_ "Can't set buffer size of handle that's already in use");
 	else if (!arg || !SvOK(arg))
 		Perl_warn(aTHX_ "No buffer size is given");
 	else {
-		buffer->bufsiz = SvIV(arg);
+		size_t size = SvIV(arg);
+		if (buffer->buf) {
+			if (size < buffer->bufsiz)
+				Perl_croak(aTHX_ "Can't shrink buffer once in use");
+			Renew(buffer->buf, size, char);
+		}
+		buffer->bufsiz = size;
 		return 0;
 	}
 	return -1;

@@ -1,0 +1,7 @@
+requires 'DBI', '1.3';
+requires 'perl', 'v5.8.1';
+requires 'List::Util', '1.27';
+on build => sub {
+    requires 'Test::Exception', '0.31';
+    requires 'Test::More', '0.47';
+};

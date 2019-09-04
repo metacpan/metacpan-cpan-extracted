@@ -1,7 +1,7 @@
 package Module::Abstract::Cwalitee;
 
-our $DATE = '2019-07-08'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-07-26'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -23,6 +23,18 @@ $SPEC{list_module_abstract_cwalitee_indicators} = {
     args => {
         Cwalitee::Common::args_list('Module::Abstract::'),
     },
+    examples => [
+        {
+            summary => 'List all installed indicators from all modules',
+            args => {},
+            test => 0,
+        },
+        {
+            summary => 'List only certain names, show details',
+            args => {include=>[qw/not_too_short not_too_long not_template/], detail=>1},
+            test => 0,
+        },
+    ],
 };
 sub list_module_abstract_cwalitee_indicators {
     my %args = @_;
@@ -43,6 +55,18 @@ $SPEC{calc_module_abstract_cwalitee} = {
             pos => 0,
         },
     },
+    examples => [
+        {
+            summary => 'Example of a good Abstract',
+            args => {abstract => 'Calculate the frobnitz of thromblemeisters'},
+            test => 0,
+        },
+        {
+            summary => 'Example of a not-so-good Abstract',
+            args => {abstract => 'PERL MODULE TO DO SOMETHING'},
+            test => 0,
+        },
+    ],
 };
 sub calc_module_abstract_cwalitee {
     my %fargs = @_;
@@ -74,7 +98,7 @@ Module::Abstract::Cwalitee - Calculate the cwalitee of your module Abstract
 
 =head1 VERSION
 
-This document describes version 0.004 of Module::Abstract::Cwalitee (from Perl distribution Module-Abstract-Cwalitee), released on 2019-07-08.
+This document describes version 0.005 of Module::Abstract::Cwalitee (from Perl distribution Module-Abstract-Cwalitee), released on 2019-07-26.
 
 =head1 SYNOPSIS
 
@@ -106,6 +130,190 @@ cwalitee", and so on.
 Usage:
 
  calc_module_abstract_cwalitee(%args) -> [status, msg, payload, meta]
+
+Examples:
+
+=over
+
+=item * Example of a good Abstract:
+
+ calc_module_abstract_cwalitee(abstract => "Calculate the frobnitz of thromblemeisters");
+
+Result:
+
+ [
+   {
+     indicator => "not_empty",
+     num => 1,
+     result => 1,
+     result_summary => "",
+     severity => 3,
+   },
+   {
+     indicator => "language_english",
+     num => 2,
+     result => 1,
+     result_summary => "",
+     severity => 3,
+   },
+   {
+     indicator => "no_shouting",
+     num => 3,
+     result => 1,
+     result_summary => "",
+     severity => 3,
+   },
+   {
+     indicator => "not_end_with_dot",
+     num => 4,
+     result => 1,
+     result_summary => "",
+     severity => 3,
+   },
+   {
+     indicator => "not_module_name",
+     num => 5,
+     result => 1,
+     result_summary => "",
+     severity => 3,
+   },
+   {
+     indicator => "not_multiline",
+     num => 6,
+     result => 1,
+     result_summary => "",
+     severity => 3,
+   },
+   {
+     indicator => "not_redundant",
+     num => 7,
+     result => 1,
+     result_summary => "",
+     severity => 3,
+   },
+   {
+     indicator => "not_start_with_lowercase_letter",
+     num => 8,
+     result => 1,
+     result_summary => "",
+     severity => 3,
+   },
+   {
+     indicator => "not_template",
+     num => 9,
+     result => 1,
+     result_summary => "",
+     severity => 3,
+   },
+   {
+     indicator => "not_too_long",
+     num => 10,
+     result => 1,
+     result_summary => "",
+     severity => 3,
+   },
+   {
+     indicator => "not_too_short",
+     num => 11,
+     result => 1,
+     result_summary => "",
+     severity => 3,
+   },
+   {
+     indicator => "Score",
+     result => "100.00",
+     result_summary => "11 out of 11",
+   },
+ ]
+
+=item * Example of a not-so-good Abstract:
+
+ calc_module_abstract_cwalitee(abstract => "PERL MODULE TO DO SOMETHING");
+
+Result:
+
+ [
+   {
+     indicator => "not_empty",
+     num => 1,
+     result => 1,
+     result_summary => "",
+     severity => 3,
+   },
+   {
+     indicator => "language_english",
+     num => 2,
+     result => 1,
+     result_summary => "",
+     severity => 3,
+   },
+   {
+     indicator => "no_shouting",
+     num => 3,
+     result => 0,
+     result_summary => "All-caps",
+     severity => 3,
+   },
+   {
+     indicator => "not_end_with_dot",
+     num => 4,
+     result => 1,
+     result_summary => "",
+     severity => 3,
+   },
+   {
+     indicator => "not_module_name",
+     num => 5,
+     result => 1,
+     result_summary => "",
+     severity => 3,
+   },
+   {
+     indicator => "not_multiline",
+     num => 6,
+     result => 1,
+     result_summary => "",
+     severity => 3,
+   },
+   {
+     indicator => "not_redundant",
+     num => 7,
+     result => 0,
+     result_summary => "Saying 'PERL MODULE TO' is redundant, omit it",
+     severity => 3,
+   },
+   {
+     indicator => "not_start_with_lowercase_letter",
+     num => 8,
+     result => 1,
+     result_summary => "",
+     severity => 3,
+   },
+   {
+     indicator => "not_template",
+     num => 9,
+     result => 1,
+     result_summary => "",
+     severity => 3,
+   },
+   {
+     indicator => "not_too_long",
+     num => 10,
+     result => 1,
+     result_summary => "",
+     severity => 3,
+   },
+   {
+     indicator => "not_too_short",
+     num => 11,
+     result => 1,
+     result_summary => "",
+     severity => 3,
+   },
+   { indicator => "Score", result => 81.82, result_summary => "9 out of 11" },
+ ]
+
+=back
 
 This function is not exported by default, but exportable.
 
@@ -163,6 +371,68 @@ Return value:  (any)
 Usage:
 
  list_module_abstract_cwalitee_indicators(%args) -> [status, msg, payload, meta]
+
+Examples:
+
+=over
+
+=item * List all installed indicators from all modules:
+
+ list_module_abstract_cwalitee_indicators();
+
+Result:
+
+ [
+   "language_english",
+   "no_shouting",
+   "not_empty",
+   "not_end_with_dot",
+   "not_module_name",
+   "not_multiline",
+   "not_redundant",
+   "not_start_with_lowercase_letter",
+   "not_template",
+   "not_too_long",
+   "not_too_short",
+ ]
+
+=item * List only certain names, show details:
+
+ list_module_abstract_cwalitee_indicators(
+   detail  => 1,
+   include => ["not_too_short", "not_too_long", "not_template"]
+ );
+
+Result:
+
+ [
+   {
+     module   => "Module::Abstract::Cwalitee::Core",
+     name     => "not_template",
+     priority => 50,
+     severity => 3,
+     status   => "stable",
+     summary  => undef,
+   },
+   {
+     module   => "Module::Abstract::Cwalitee::Core",
+     name     => "not_too_long",
+     priority => 50,
+     severity => 3,
+     status   => "stable",
+     summary  => undef,
+   },
+   {
+     module   => "Module::Abstract::Cwalitee::Core",
+     name     => "not_too_short",
+     priority => 50,
+     severity => 3,
+     status   => "stable",
+     summary  => undef,
+   },
+ ]
+
+=back
 
 This function is not exported by default, but exportable.
 

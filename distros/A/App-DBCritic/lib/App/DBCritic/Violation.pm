@@ -1,10 +1,30 @@
 package App::DBCritic::Violation;
 
+# ABSTRACT: A violation of a App::DBCritic::Policy
+
+#pod =head1 SYNOPSIS
+#pod
+#pod     use App::DBCritic::Violation;
+#pod
+#pod     my $violation = App::DBCritic::Violation->new(
+#pod         description => 'Violated policy',
+#pod         explanation => 'Consult the rulebook',
+#pod         description => 'The frob table is improperly swizzled.',
+#pod     );
+#pod     print "$violation\n";
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod This class represents L<App::DBCritic::Policy|App::DBCritic::Policy>
+#pod violations flagged by L<App::DBCritic|App::DBCritic>.
+#pod
+#pod =cut
+
 use strict;
 use utf8;
-use Modern::Perl;
+use Modern::Perl '2011';    ## no critic (Modules::ProhibitUseQuotedVersion)
 
-our $VERSION = '0.020';    # VERSION
+our $VERSION = '0.023';     # VERSION
 use Const::Fast;
 use English '-no_match_vars';
 use Moo;
@@ -16,7 +36,33 @@ for (@TEXT_FIELDS) {
     has $_ => ( is => 'ro', default => quote_sub q{q{}} );
 }
 
+#pod =attr description
+#pod
+#pod A short string briefly describing what's wrong.
+#pod Only settable at construction.
+#pod
+#pod =attr explanation
+#pod
+#pod A string giving a longer general description of the problem.
+#pod Only settable at construction.
+#pod
+#pod =attr details
+#pod
+#pod A string describing the issue as it specifically applies to the L</element>
+#pod being critiqued.
+#pod
+#pod =cut
+
 has element => ( is => 'ro' );
+
+#pod =attr element
+#pod
+#pod The schema element that violated a
+#pod L<App::DBCritic::Policy|App::DBCritic::Policy>.
+#pod Only settable at construction.
+#pod
+#pod =cut
+
 has as_string => ( is => 'ro', lazy => 1, default => \&_build_as_string );
 
 sub _build_as_string {
@@ -31,21 +77,26 @@ sub _build_as_string {
         Schema    => 'schema',
     );
     return "[$type $TYPE_MAP{$type}] " . join "\n",
-        map { $self->$ARG } @TEXT_FIELDS;
+        map { $self->$_ } @TEXT_FIELDS;
 }
 
-1;
+#pod =attr as_string
+#pod
+#pod Returns a string representation of the object.  The same method is called if
+#pod the object appears in double quotes.
+#pod
+#pod =cut
 
-# ABSTRACT: A violation of a App::DBCritic::Policy
+1;
 
 __END__
 
 =pod
 
-=for :stopwords Mark Gardner cpan testmatrix url annocpan anno bugtracker rt cpants
-kwalitee diff irc mailto metadata placeholders
+=encoding UTF-8
 
-=encoding utf8
+=for :stopwords Mark Gardner cpan testmatrix url annocpan anno bugtracker rt cpants
+kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 NAME
 
@@ -53,7 +104,7 @@ App::DBCritic::Violation - A violation of a App::DBCritic::Policy
 
 =head1 VERSION
 
-version 0.020
+version 0.023
 
 =head1 SYNOPSIS
 
@@ -105,7 +156,7 @@ the object appears in double quotes.
 
 You can find documentation for this module with the perldoc command.
 
-  perldoc bin::dbcritic
+  perldoc App::DBCritic::Violation
 
 =head2 Websites
 
@@ -124,14 +175,6 @@ L<http://search.cpan.org/dist/App-DBCritic>
 
 =item *
 
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annonations of Perl module documentation.
-
-L<http://annocpan.org/dist/App-DBCritic>
-
-=item *
-
 CPAN Ratings
 
 The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
@@ -144,13 +187,13 @@ CPANTS
 
 The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
 
-L<http://cpants.perl.org/dist/overview/App-DBCritic>
+L<http://cpants.cpanauthors.org/dist/App-DBCritic>
 
 =item *
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/A/App-DBCritic>
 
@@ -158,7 +201,7 @@ L<http://www.cpantesters.org/distro/A/App-DBCritic>
 
 CPAN Testers Matrix
 
-The CPAN Testers Matrix is a website that provides a visual way to determine what Perls/platforms PASSed for a distribution.
+The CPAN Testers Matrix is a website that provides a visual overview of the test results for a distribution on various Perls/platforms.
 
 L<http://matrix.cpantesters.org/?dist=App-DBCritic>
 
@@ -194,7 +237,7 @@ Mark Gardner <mjgardner@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 by Mark Gardner.
+This software is copyright (c) 2019 by Mark Gardner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,4 +1,4 @@
-Math-DifferenceSet-Planar version 0.005
+Math-DifferenceSet-Planar version 0.006
 =======================================
 
 A planar difference set in a finite group (G, +) is a subset D of G
@@ -36,7 +36,7 @@ This library requires these other modules and libraries at run-time:
 To build and install, it also needs:
 
    ExtUtils::MakeMaker
-   File::ShareDir
+   File::ShareDir::Install
    Test::More
 
 COPYRIGHT AND LICENCE

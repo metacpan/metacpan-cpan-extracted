@@ -3,12 +3,14 @@
 # PODNAME: homebank2ledger
 
 
+# FATPACK - Do not remove this line.
+
 use warnings;
 use strict;
 
 use App::HomeBank2Ledger;
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 App::HomeBank2Ledger->main(@ARGV);
 
@@ -24,7 +26,7 @@ homebank2ledger - A tool to convert HomeBank files to Ledger format
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -37,13 +39,13 @@ version 0.005
 
 =head1 DESCRIPTION
 
-C<homebank2ledger> converts L<HomeBank|http://homebank.free.fr/> files to a format usable by
+F<homebank2ledger> converts L<HomeBank|http://homebank.free.fr/> files to a format usable by
 L<Ledger|https://www.ledger-cli.org/>. It can also convert directly to the similar
 L<Beancount|http://furius.ca/beancount/> format.
 
 This software is B<EXPERIMENTAL>, in early development. Its interface may change without notice.
 
-I wrote C<homebank2ledger> because I have been maintaining my own personal finances using HomeBank
+I wrote F<homebank2ledger> because I have been maintaining my own personal finances using HomeBank
 (which is awesome) and I wanted to investigate using plain text accounting programs. It works well
 enough for my data, but you may be using HomeBank features that I don't so there may be cases this
 doesn't handle well or at all. Feel free to file a bug report. This script does NOT try to modify
@@ -79,6 +81,43 @@ You can migrate the data you have in HomeBank so you can start maintaining your 
 
 Or if you don't plan to switch completely off of HomeBank, you can continue to maintain your
 accounts in HomeBank and use this script to also take advantage of the reports Ledger offers.
+
+=head1 INSTALL
+
+There are several ways to install F<homebank2ledger> to your system.
+
+=head2 using cpanm
+
+You can install F<homebank2ledger> using L<cpanm>. If you have a local perl (plenv, perlbrew, etc.),
+you can just do:
+
+    cpanm App::Homebank2Ledger
+
+to install the F<homebank2ledger> executable and its dependencies. The executable will be installed
+to your perl's bin path, like F<~/perl5/perlbrew/bin/homebank2ledger>.
+
+If you're installing to your system perl, you can do:
+
+    cpanm --sudo App::Homebank2Ledger
+
+to install the F<homebank2ledger> executable to a system directory, like
+F</usr/local/bin/homebank2ledger> (depending on your perl).
+
+=head2 Downloading just the executable
+
+You may also choose to download F<homebank2ledger> as a single executable, like this:
+
+    curl -OL https://raw.githubusercontent.com/chazmcgarvey/homebank2ledger/solo/homebank2ledger
+    chmod +x homebank2ledger
+
+=head2 For developers
+
+If you're a developer and want to hack on the source, clone the repository and pull the
+dependencies:
+
+    git clone https://github.com/chazmcgarvey/homebank2ledger.git
+    cd homebank2ledger
+    make bootstrap      # installs dependencies; requires cpanm
 
 =head1 OPTIONS
 
@@ -178,7 +217,7 @@ Date must be in the form "YYYY-MM-DD". Defaults to the date of the first transac
 
 =head2 --rename-account STR
 
-Specifies a mapping for renaming accounts in the output. By default C<homebank2ledger> tries to come
+Specifies a mapping for renaming accounts in the output. By default F<homebank2ledger> tries to come
 up with sensible account names (based on your HomeBank accounts and categories) that fit into five
 root accounts:
 

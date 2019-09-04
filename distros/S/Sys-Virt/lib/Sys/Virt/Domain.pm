@@ -2082,7 +2082,7 @@ Changes the actions of lifecycle events for domain represented as
 
 =item $info = $dom->get_launch_security_info($flags=0)
 
-Get information about the domaim launch security policy. C<$flags>
+Get information about the domain launch security policy. C<$flags>
 is currently unused and defaults to zero. The returned hash may
 contain the following keys
 
@@ -2093,6 +2093,38 @@ contain the following keys
 The AMD SEV launch measurement
 
 =back
+
+=item $info = $dom->get_guest_info($types, $flags=0)
+
+Get information about the domain guest configuration. The C<$types>
+parameter determines what pieces of information are returned and
+should be the bitwise or of the following constants:
+
+=over 4
+
+=item Sys::Virt::Domain::GUEST_INFO_USERS
+
+Active user information
+
+=item Sys::Virt::Domain::GUEST_INFO_OS
+
+Misc operating system information
+
+=item Sys::Virt::Domain::GUEST_INFO_TIMEZONE
+
+The guest timezone
+
+=item Sys::Virt::Domain::GUEST_INFO_HOSTNAME
+
+The guest hostname
+
+=item Sys::Virt::Domain::GUEST_INFO_FILESYSTEM
+
+Filesystem mount information
+
+=back
+
+C<$flags> is currently unused and defaults to zero.
 
 =back
 

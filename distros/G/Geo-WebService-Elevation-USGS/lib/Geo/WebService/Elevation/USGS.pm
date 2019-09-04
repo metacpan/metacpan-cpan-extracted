@@ -87,14 +87,14 @@ an error by an undef response, with the error retrievable from the
 'error' attribute.
 
 For documentation on the underlying web service, see
-L<http://ned.usgs.gov>.
+L<http://nationalmap.gov>.
 
 For all methods, the input latitude and longitude are documented at the
 above web site as being WGS84, which for practical purposes I understand
 to be equivalent to NAD83. The vertical reference is not documented
 under the above link, but correspondence with the USGS says that it is
 derived from the National Elevation Dataset (NED; see
-L<http://ned.usgs.gov>). This is referred to NAD83 (horizontal) and
+L<http://nationalmap.gov>). This is referred to NAD83 (horizontal) and
 NAVD88 (vertical). NAVD88 is based on geodetic leveling surveys, B<not
 the WGS84/NAD83 ellipsoid,> and takes as its zero datum sea level at
 Father Point/Rimouski, in Quebec, Canada. Alaska is an exception, and is
@@ -127,10 +127,11 @@ use JSON;
 use LWP::UserAgent;
 use Scalar::Util 1.10 qw{ blessed looks_like_number };
 
-our $VERSION = '0.114';
+our $VERSION = '0.115';
 
 use constant BEST_DATA_SET => -1;
-use constant USGS_URL => 'https://ned.usgs.gov/epqs/pqs.php';
+# use constant USGS_URL => 'https://ned.usgs.gov/epqs/pqs.php';
+use constant USGS_URL => 'https://nationalmap.gov/epqs/pqs.php';
 
 use constant ARRAY_REF	=> ref [];
 use constant CODE_REF	=> ref sub {};
@@ -1005,9 +1006,9 @@ if the USGS moves the service.
 
 The default is the value of environment variable 
 C<GEO_WEBSERVICE_ELEVATION_USGS_URL>. If that is undefined, the default
-is C<https://ned.usgs.gov/epqs/pqs.php>. B<Note> that without query
+is C<https://nationalmap.gov/epqs/pqs.php>. B<Note> that without query
 parameters this URL does nothing useful. See
-L<https://ned.usgs.gov/epqs/> for details.
+L<https://nationalmap.gov/epqs/> for details.
 
 =head1 ACKNOWLEDGMENTS
 

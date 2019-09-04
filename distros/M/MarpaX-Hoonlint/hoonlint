@@ -1,0 +1,436 @@
+#!perl
+
+use 5.010;
+use strict;
+use warnings;
+
+use Data::Dumper;
+use English qw( -no_match_vars );
+use Scalar::Util qw(looks_like_number weaken);
+use Getopt::Long;
+
+use MarpaX::Hoonlint;
+
+sub slurp {
+    my ($fileName) = @_;
+    local $RS = undef;
+    my $fh;
+    open $fh, q{<}, $fileName or die "Cannot open $fileName";
+    my $file = <$fh>;
+    close $fh;
+    return \$file;
+}
+
+sub parseReportItems {
+    my ( $config, $reportItems ) = @_;
+    my $fileName       = $config->{fileName};
+    my %itemHash       = ();
+    my %unusedItemHash = ();
+
+    my $itemError = sub {
+        my ( $error, $line ) = @_;
+        return qq{Error in item file "$fileName": $error\n}
+          . qq{  Problem with line: $line\n};
+    };
+
+  ITEM: for my $itemLine ( split "\n", ${$reportItems} ) {
+        my $rawItemLine = $itemLine;
+        $itemLine =~ s/\s*[#].*$//;   # remove comments and preceding whitespace
+        $itemLine =~ s/^\s*//;        # remove leading whitespace
+        $itemLine =~ s/\s*$//;        # remove trailing whitespace
+        next ITEM unless $itemLine;
+        my ( $thisFileName, $lc, $policy, $subpolicy, $message ) = split /\s+/, $itemLine, 5;
+        return undef, $itemError->( "Problem in report line", $rawItemLine )
+          if not $thisFileName;
+
+        return undef,
+          $itemError->( qq{Malformed line:column in item line: "$lc"},
+            $rawItemLine )
+          unless $lc =~ /^[0-9]+[:][0-9]+$/;
+        my ( $line, $column ) = split ':', $lc, 2;
+        $itemError->( qq{Malformed line:column in item line: "$lc"}, $rawItemLine )
+          unless Scalar::Util::looks_like_number($line)
+          and Scalar::Util::looks_like_number($column);
+        next ITEM unless $thisFileName eq $fileName;
+
+        # We reassemble line:column to "normalize" it -- be indifferent to
+        # leading zeros, etc.
+        my $lcTag = join ':', $line, $column;
+        $itemHash{$lcTag}{$policy}{$subpolicy}       = $message;
+        $unusedItemHash{$lcTag}{$policy}{$subpolicy} = 1;
+    }
+    return \%itemHash, \%unusedItemHash;
+}
+
+my $verbose;    # right now does nothing
+my $inclusionsFileName;
+my @suppressionsFileNames;
+my @policiesArg;
+my $contextSize = 0;
+my $displayDetails = 1;
+
+GetOptions(
+    "verbose"               => \$verbose,
+    "context|C:i"           => \$contextSize,
+    "displayDetails|details:i"           => \$displayDetails,
+    "inclusions-file|I=s"   => \$inclusionsFileName,
+    "suppressions_file|S=s" => \@suppressionsFileNames,
+    "policy|P=s"            => \@policiesArg,
+) or die("Error in command line arguments\n");
+
+sub usage {
+    die "usage: $PROGRAM_NAME [options ...] fileName\n";
+}
+
+usage() if scalar @ARGV != 1;
+my $fileName = $ARGV[0];
+
+# Config is essentially a proto-lint-instance, containing all
+# variables which are from some kind of "environment", which
+# the lint instance must treat as a constant.  From the POV
+# of the lint instance, the config is a global, but this is
+# not necessarily the case.
+#
+# The archetypal example of a config is the "environment"
+# created by the invocation of the `hoonlint` Perl script
+# which contains information taken from the command line
+# arguments and read from various files.
+
+my %config = ();
+
+$config{fileName} = $fileName;
+
+$config{topicLines}       = {};
+$config{mistakeLines}     = {};
+
+my @policies = ();
+push @policies, @policiesArg;
+# Default policy
+@policies = ('Test::Whitespace') if not scalar @policies;
+die "Multiple policies not yet implemented" if scalar @policies != 1;
+my %policies = ();
+for my $shortPolicyName (@policies) {
+  my $fullPolicyName = 'MarpaX::Hoonlint::Policy::' . $shortPolicyName;
+
+  # "require policy name" is a hack until I create the full directory
+  # structure required to make this a Perl module
+  my $eval_ok = eval "require $fullPolicyName";
+  die $EVAL_ERROR if not $eval_ok;
+  $policies{$shortPolicyName} = $fullPolicyName;
+}
+$config{policies} = \%policies;
+
+my $defaultSuppressionFile = 'hoonlint.suppressions';
+if ( not @suppressionsFileNames
+    and -f $defaultSuppressionFile )
+{
+    @suppressionsFileNames = ($defaultSuppressionFile);
+}
+
+my $pSuppressions;
+{
+    my @suppressions = ();
+    for my $fileName (@suppressionsFileNames) {
+        push @suppressions, ${ slurp($fileName) };
+    }
+    $pSuppressions = \( join "", @suppressions );
+}
+
+my ( $suppressions, $unusedSuppressions ) = parseReportItems(\%config, $pSuppressions);
+die $unusedSuppressions if not $suppressions;
+$config{suppressions}       = $suppressions;
+$config{unusedSuppressions} = $unusedSuppressions;
+
+my $pInclusions;
+my ( $inclusions, $unusedInclusions );
+if ( defined $inclusionsFileName ) {
+    $pInclusions = slurp($inclusionsFileName);
+    ( $inclusions, $unusedInclusions ) = parseReportItems(\%config, $pInclusions);
+    die $unusedInclusions if not $inclusions;
+}
+$config{inclusions}       = $inclusions;
+$config{unusedInclusions} = $unusedInclusions;
+
+my $pHoonSource = slurp($fileName);
+
+$config{pHoonSource} = $pHoonSource;
+$config{contextSize} = $contextSize;
+SET_DISPLAY_DETAILS: {
+    if (not defined $displayDetails) {
+         $config{displayDetails} = $contextSize >= 1 ? 1 : 0;
+         last SET_DISPLAY_DETAILS;
+    }
+    $config{displayDetails} = $displayDetails;
+}
+
+MarpaX::Hoonlint->new(\%config);
+
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+hoonlint - lint utility for the Hoon language
+
+=head1 SYNOPSIS
+
+    hoonlint [options] FILE
+
+=head1 Status
+
+This software is alpha -- it should be useable,
+but features are evolving
+and subject to change without notice.
+
+=head2 Updates
+
+Once MarpaX::Hoonlint leaves alpha,
+users should consult Marpa::R2's "updates" page,
+which contains notes, errata, etc.,
+added since the most recent release.
+The "updates" page is C<UPDATES.md> in the
+current repo.
+At this point, the link is
+L<https://github.com/jeffreykegler/hoonlint/blob/master/UPDATES.md>.
+
+=head1 Description
+
+=head2 Simple example
+
+The command
+
+    hoonlint hoons/examples/toe.hoon
+
+lint the Tic-tac-toe example for Hoon
+(which can be found at
+L<https://github.com/jeffreykegler/hoonlint/blob/cf60f1d5eeb8a0270c9d5a80f096e17fabe6a8b8/cpan/hoons/examples/toe.hoon>)
+and produces the following output:
+
+    hoons/examples/toe.hoon 58:16 Test::Whitespace wutcol:indent backdented element #2 @58:16; overindented by 1
+
+In this
+
+=over 4
+
+* C<hoon/examples/toe.hoon> is the name of the file.
+
+* C<58:16> is the line number and column of the problem, both 1-based.
+
+* C<Test::Whitespace> is the policy name.
+
+* C<wutcol:indent> is the subpolicy name.
+
+* A human-readable description of the lint issue.
+  The rest of the line is describes the lint issue.
+  In this case,
+  the 2nd runechild of a WUTCOL hoon statement (which is located at line 58, column 16)
+  is overindented by 1.
+
+=back
+
+=head2 Example with context
+
+The message of the simple example
+becomes a little more understandable, if we ask hoonlint to show the code.
+The C<-C 5> option request 5 lines of context, so that the command
+
+    hoonlint -C 5 toe.hoon
+
+produces the following output:
+
+    53              ==                                          ::  53
+    54      ++  mo  ^-  {(unit fact) ^game}                     ::  54
+    55              ?<  is                                      ::  55
+    56              =/  next/side  (~(set bo a.game) here)      ::  56
+    57>             ?:  ~(win bo next)                          ::  57
+    [ hoons/examples/toe.hoon 58:16 Test::Whitespace wutcol:indent backdented element #2 @58:16; overindented by 1
+      anchor column is "?:" @57:13
+    ]
+    58!                [[~ %win ?:(w.game %x %o)] nu]           ::  58
+    59              [~ game(w !w.game, a z.game, z next)]       ::  59
+    60      --                                                  ::  60
+    61    --                                                    ::  62
+    62  --                                                      ::  63
+
+In the above, the original lint message is shown in square brackets, just before the line
+(58) to which it refers.
+Following the original lint message,
+also within the square brackets,
+are additional details:
+
+    anchor column is "?:" @57:13
+
+Backdenting is relative to an anchor column, and this detail tells
+us where C<hoonlint> thought the anchor column was.
+
+Each line of code is preceded by its line number and an optional tag,
+either a zap (C<!>) or a gar (C<< > >>).
+A zap indicates a line with a lint issue.
+A gar indicates a "topic" line -- a lint which does not actually contain
+an issue, but which is relevant to a lint issue.
+In this case, line 57 contains the beginning of the hoon statement
+which has the backdenting issue.
+
+=head2 Example without details
+
+It is also possible to have context without details.
+The command
+
+    hoonlint -C 2 --details=0 fizzbuzz.hoon
+
+runs on Hoon's fizzbuzz example.
+It asks for 2 context lines,
+with no details.
+(The fizzbuzz example can be found at
+L<https://github.com/jeffreykegler/hoonlint/blob/cf60f1d5eeb8a0270c9d5a80f096e17fabe6a8b8/cpan/hoons/examples/fizzbuzz.hoon>.)
+It produces the following output:
+
+ 4  ^-  (list tape)
+ 5> ?:  =(end count)
+[ fizzbuzz.hoon 6:4 Test::Whitespace wutcol:indent backdented element #2 @6:4; overindented by 1 ]
+ 6!    ~
+ 7  :-
+
+=head1 Options
+
+=over 4
+
+=item B<-C I<NUM>>, B<--context=I<NUM>>
+
+Display I<NUM> lines of context before and after
+the issue message.
+If I<NUM> is 0, no context is displayed.
+By default, I<NUM> is 0.
+
+=item B<--displayDetails=I<NUM>> B<--details=I<NUM>>
+
+Display I<NUM> levels of detail for the error message.
+(Currently at most 1 level of detail is implemented.)
+Some issue messages have no details available.
+I<NUM> defaults to 1 if more than one line of context
+is being displayed.
+I<NUM> defaults to 0 is no lines of context are being
+displayed.
+
+=item B<-P I<policy>>, B<--policy=I<policy>>
+
+Set the policy that C<hoonlint>
+is running to I<policy>.
+C<Test::Whitespace> is the default and,
+in fact,
+the only policy currently implemented.
+
+=back
+
+=head1 SUPPORT
+
+Support for and information about F<hoonlint> can be found at:
+
+=over 4
+
+=item * Source repository
+
+L<https://github.com/jeffreykegler/hoonlint>
+
+=item * The Marpa IRC Channel
+
+#marpa at freenode.net
+
+=item * The Marpa mailing list
+
+L<http://groups.google.com/group/marpa-parser>
+
+=back
+
+=head1 FAQ
+
+=head2 How do I install hoonlint?
+
+MarpaX::Hoonlint is an ordinary Perl CPAN module,
+and installs in the usual ways.
+CPAN.org has
+L<a page on installing modules|https://www.cpan.org/modules/INSTALL.html>,
+which contains more than you need to know.
+However, since many in hoonlint's intended audience
+will be new to Perl, here is
+what most newcomers need to know:
+
+=over 4
+
+* First, install Perl.  You need at least Perl 5.10.1.
+Almost every UNIX system will come with such a Perl.
+
+* Second, run this command:
+
+    cpan App::cpanminus
+
+* Third, run this command:
+
+    cpanm MarpaX::Hoonlint
+
+=back
+
+That's it.
+
+=head2 How do I install hoonlint from the Git repo?
+
+Do the following:
+
+=over 4
+
+* First, clone the git repo.
+
+* Second, install Perl.  You need at least Perl 5.10.1.
+Almost every UNIX system will come with such a Perl.
+
+* Third, download the L<cpanm> command.
+
+    cpan App::cpanminus
+
+* From the directory of the downloaded git repo,
+run this command
+
+    cpanm ./cpan
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+C<hoonlint> was made possible by the generous support of
+an anonymous member of the Hoon community.
+
+=head1 AUTHOR
+
+Jeffrey Kegler, C<< <jkegl at cpan.org> >>
+
+=head1 COPYRIGHT & LICENSE
+
+The MIT License (MIT)
+
+Copyright (c) 2018 Urbit
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+=cut
+
+1;
+
+# vim: expandtab shiftwidth=4:

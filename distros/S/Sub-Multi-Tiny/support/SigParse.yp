@@ -1,0 +1,208 @@
+# SigParse.yp: Parse::Yapp input to parse signatures in Sub::Multi::Tiny
+
+#############################################################################
+# Header
+
+%{
+
+# Imports {{{1
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Text::Balanced qw(extract_codeblock);
+
+# }}}1
+# Documentation {{{1
+
+=head1 NAME
+
+Sub::Multi::Tiny::SigParse - Parse::Yapp input to parse signatures in Sub::Multi::Tiny
+
+=head1 SYNOPSIS
+
+Generate the .pm file:
+
+    yapp -m Sub::Multi::Tiny::SigParse -o lib/Sub/Multi/Tiny/SigParse.pm support/SigParse.yp
+
+And then:
+
+    use Sub::Multi::Tiny::SigParse;
+    my $ast = Sub::Multi::Tiny::SigParse::Parse($signature);
+
+=head1 FUNCTIONS
+
+=cut
+
+# }}}1
+
+%}
+
+#############################################################################
+# Token and precedence definitions
+
+# Separator (usually a comma)
+%token SEPAR
+
+# Type before a variable name
+%token TYPE
+
+# Name with a sigil.  TODO slurpies.
+%token NAME
+
+# "where BLOCK"
+%token WHERE
+
+%%
+
+#############################################################################
+# Rules
+
+signature:
+                                            { [] }  # always return arrayref
+    |   parameter                           { [ $_[1] ] }
+    |   parameter SEPAR signature           { [ $_[1], @{$_[3]} ] }
+    # Permit trailing comma
+    |   parameter SEPAR signature SEPAR     { [ $_[1], @{$_[3]} ] }
+    ;
+
+parameter:
+        NAME                { +{name=>$_[1]} }
+    |   NAME WHERE          { +{name=>$_[1], where=>$_[2]} }
+    |   TYPE NAME           { +{name=>$_[2],               type => $_[1]} }
+    |   TYPE NAME WHERE     { +{name=>$_[2], where=>$_[3], type => $_[1]} }
+    ;
+
+%%
+
+#############################################################################
+# Footer
+
+# Tokenizer and error-reporting routine for Parse::Yapp {{{1
+
+# The lexer
+sub _next_token {
+    my $parser = shift;
+    my $text = $parser->YYData->{TEXT};
+
+    $$text =~ m/\G\s+/gc;    # Skip H and V whitespace
+    $parser->YYData->{CURR_TOK_POS} = pos($$text);
+
+    return ('', undef) unless (pos($$text)//0) < length($$text);    # EOF
+
+    $$text =~ m/\G,/gc and return (SEPAR => 0); # 0 is a dummy value
+
+    $$text =~ m/\G([\$\@\%\&\*]\w+)\b/gc and return (NAME => $1) ;
+
+    if($$text =~ m/\Gwhere\s*\{/gci) {
+        pos($$text) -= 1;    # Get the lbrace back
+        my ($block) = extract_codeblock($$text);     # Updates pos()
+        return (WHERE => $block) if defined $block;
+        die "Saw a 'where' without a valid block after it";
+    }
+
+    # Permit braced expressions for complex type checks
+    if($$text =~ m/\G\{/gc) {
+        pos($$text) -= 1;    # Get the lbrace back
+        my ($block) = extract_codeblock($$text);     # Updates pos()
+        return (TYPE => $block) if defined $block;
+        die "Saw an opening brace without a valid block after it";
+    }
+
+    # If the next thing is a backslash, die --- prohibit backslash to start
+    # a typecheck as a guard against '' vs "" confusion.  If you want a
+    # backslash, use the {} form.
+    if($$text =~ m{\G\\}gc) {
+        die "Saw a backslash where I don't know what to do with it!  ('' vs \"\" confusion?)";
+    }
+
+    # Otherwise, assume a single word is a typecheck
+    $$text =~ m/\G(\S+)/gc and return (TYPE => $1);
+
+    die "This should never happen!  Unlexable text was: " .
+        substr($$text, pos($$text));
+} #_next_token()
+
+# Report an error
+sub _report_error {
+    my $parser = shift;
+    my $startpos = $parser->YYData->{CURR_TOK_POS};
+    my $endpos = pos(${ $parser->YYData->{TEXT} });
+    my $got = $parser->YYCurtok || '<end of input>';
+    my $val='';
+    $val = ' (' . $parser->YYCurval . ')' if $parser->YYCurval;
+
+    my $errmsg  = 'Syntax error: could not understand ' . $got . $val .
+                    " at positions $startpos..$endpos";
+    if(ref($parser->YYExpect) eq 'ARRAY') {
+        $errmsg .= ".\nExpected one of: " . join(',', @{$parser->YYExpect});
+    } else {
+        $errmsg .= ':'
+    }
+
+    # Print the text and flag the error
+    my $copy = ${ $parser->YYData->{TEXT} };
+    $copy =~ s/\s/ /g;  # Normalize spaces so pos values line up
+    $errmsg .= "\n$copy";
+    $errmsg .= "\n" . (' ' x $startpos) . ('^' x ($endpos-$startpos));
+
+    $errmsg .= "\n";    # No stack trace
+    die $errmsg;
+} #_report_error()
+
+# }}}1
+# Top-level parse function {{{1
+
+=head2 Parse
+
+Parse arguments.  Usage:
+
+    my $ast = Sub::Multi::Tiny::SigParse::Parse($signature);
+
+=cut
+
+sub Parse {
+    my $text = shift or
+        (require Carp, Carp::croak 'Parse: Need a signature to parse');
+
+    my $parser = __PACKAGE__->new;
+    my $hrData = $parser->YYData;
+
+    # Data we use while parsing.
+
+    # TEXT: The input text.  Store it as a reference so pos() will
+    # be preserved across calls to _next_token.
+    $hrData->{TEXT} = \"$text";
+
+    # CURR_TOK_POS: the pos() value where the current token started.
+    # Used in reporting errors.
+    $hrData->{CURR_TOK_POS} = -1;
+
+    my $hrRetval = $parser->YYParse(yylex => \&_next_token,
+        yyerror => \&_report_error,
+        (@_ ? (yydebug => $_[0]) : ()),
+    );
+
+    return $hrRetval;
+} #Parse()
+
+# }}}1
+# Rest of the docs {{{1
+
+=head1 AUTHOR
+
+Chris White E<lt>cxw@cpan.orgE<gt>
+
+=head1 LICENSE
+
+Copyright (C) 2019 Chris White E<lt>cxw@cpan.orgE<gt>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
+# }}}1
+
+# vi: set fdm=marker: #

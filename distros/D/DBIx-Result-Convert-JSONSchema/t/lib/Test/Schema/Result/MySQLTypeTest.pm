@@ -238,7 +238,7 @@ __PACKAGE__->add_columns(
   "json",
   { data_type => "json", is_nullable => 1 },
   "date",
-  { data_type => "date", datetime_undef_if_invalid => 1, is_nullable => 1 },
+  { data_type => "date", datetime_undef_if_invalid => 1, default_value => "2019-08-21" },
   "datetime",
   {
     data_type => "datetime",

@@ -3,8 +3,8 @@ NAME
     active at a time
 
 VERSION
-    This document describes version 0.003 of Sys::RunAlone::Flexible (from
-    Perl distribution Sys-RunAlone-Flexible), released on 2019-08-17.
+    This document describes version 0.004 of Sys::RunAlone::Flexible (from
+    Perl distribution Sys-RunAlone-Flexible), released on 2019-09-03.
 
 SYNOPSIS
     Use like you would use Sys::RunAlone:

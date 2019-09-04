@@ -1,5 +1,5 @@
 ---
-abstract: 'File globbing utility '
+abstract: 'File globbing utility'
 author:
   - 'Yanick Champoux <yanick@cpan.org>'
 build_requires:
@@ -8,6 +8,7 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
+  Test2::V0: '0'
   Test::More: '0'
   perl: '5.006'
 configure_requires:
@@ -22,10 +23,10 @@ name: Path-Tiny-Glob
 provides:
   Path::Tiny::Glob:
     file: lib/Path/Tiny/Glob.pm
-    version: v0.0.1
+    version: v0.1.0
   Path::Tiny::Glob::Visitor:
     file: lib/Path/Tiny/Glob/Visitor.pm
-    version: v0.0.1
+    version: v0.1.0
 requires:
   Exporter::Tiny: '0'
   List::Lazy: '0'
@@ -39,11 +40,11 @@ resources:
   bugtracker: https://github.com/yanick/Path-Tiny-Glob/issues
   homepage: https://github.com/yanick/Path-Tiny-Glob
   repository: https://github.com/yanick/Path-Tiny-Glob.git
-version: 0.0.1
+version: 0.1.0
 x_author_pledge:
   version: 1
 x_authority: cpan:YANICK
 x_contributor_covenant:
   version: 0.02
-x_generated_by_perl: v5.26.1
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

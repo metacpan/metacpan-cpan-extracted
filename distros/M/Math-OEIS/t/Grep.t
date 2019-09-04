@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2019 Kevin Ryde
 
 # This file is part of Math-OEIS.
 #
@@ -32,7 +32,7 @@ use Math::OEIS::Grep;
 # VERSION
 
 {
-  my $want_version = 11;
+  my $want_version = 12;
   is ($Math::OEIS::Grep::VERSION, $want_version,
       'VERSION variable');
   is (Math::OEIS::Grep->VERSION,  $want_version,

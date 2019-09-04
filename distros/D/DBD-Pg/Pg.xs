@@ -283,7 +283,12 @@ quote(dbh, to_quote_sv, type_sv=Nullsv)
 			}
 
 			/* At this point, type_info points to a valid struct, one way or another */
-			utf8 = imp_dbh->client_encoding_utf8 && PG_BYTEA != type_info->type_id && SQL_VARBINARY != type_info->type_id;
+			utf8 = imp_dbh->client_encoding_utf8
+				&& PG_BYTEA != type_info->type_id
+				&& SQL_BLOB != type_info->type_id
+				&& SQL_BINARY != type_info->type_id
+				&& SQL_VARBINARY != type_info->type_id
+				&& SQL_LONGVARBINARY != type_info->type_id;
 
 			if (SvMAGICAL(to_quote_sv))
 				(void)mg_get(to_quote_sv);
@@ -328,6 +333,9 @@ void do(dbh, statement_sv, attr=Nullsv, ...)
 		int asyncflag = 0;
 		char *statement;
 		D_imp_dbh(dbh);
+
+        /* Always reset the last stored sth */
+        imp_dbh->do_tmp_sth = NULL;
 
 		statement_sv = pg_rightgraded_sv(aTHX_ statement_sv, imp_dbh->pg_utf8_flag);
 		statement = SvPV_nolen(statement_sv);

@@ -1,6 +1,6 @@
 # ABSTRACT: A gentle introduction to Geoffrey
 package Geoffrey::Manual;
-$Geoffrey::Manual::VERSION = '0.000201';
+$Geoffrey::Manual::VERSION = '0.000204';
 __END__
 
 =pod
@@ -11,7 +11,7 @@ Geoffrey::Manual - A gentle introduction to Geoffrey
 
 =head1 VERSION
 
-Version 0.000201
+Version 0.000204
 
 
 =head1 DESCRIPTION

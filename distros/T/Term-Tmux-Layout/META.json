@@ -4,7 +4,7 @@
       "Joelle Maslak <jmaslak@antelope.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -66,7 +66,7 @@
    "provides" : {
       "Term::Tmux::Layout" : {
          "file" : "lib/Term/Tmux/Layout.pm",
-         "version" : "1.182062"
+         "version" : "1.192431"
       }
    },
    "release_status" : "stable",
@@ -80,10 +80,11 @@
          "web" : "https://github.com/jmaslak/Term-Tmux-Layout"
       }
    },
-   "version" : "1.182062",
+   "version" : "1.192431",
    "x_contributor_covenant" : {
       "version" : 0.02
    },
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
 }
 

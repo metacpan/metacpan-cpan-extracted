@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,15 +22,15 @@ no_index:
     - t
     - inc
 requires:
-  Browser::Open: '0'
+  Browser::Start: '0'
   Data::DumpXML: '0'
   Gnome2::Canvas: '0'
   HTTP::Tiny: '0'
   IO::Socket::SSL: '0'
   LWP::Simple: '0'
-  Task::Biodiverse::NoGUI: '2.000'
+  Task::Biodiverse::NoGUI: '3.000'
 resources:
   bugtracker: https://github.com/shawnlaffan/biodiverse/issues/
   repository: https://github.com/shawnlaffan/biodiverse.git
-version: '2.000'
+version: '3.00'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

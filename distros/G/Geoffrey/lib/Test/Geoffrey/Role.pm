@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use Test::Builder;
 
-$Test::Geoffrey::Role::VERSION = '0.000201';
+$Test::Geoffrey::Role::VERSION = '0.000204';
 
 #my $tester = Test::Builder->new;
 #*Level = \$Test::Builder::Level;

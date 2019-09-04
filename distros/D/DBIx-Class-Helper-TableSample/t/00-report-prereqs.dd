@@ -1,0 +1,58 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Pod::Coverage::TrustPod' => '0',
+                                      'Test::CleanNamespaces' => '0.15',
+                                      'Test::EOF' => '0',
+                                      'Test::EOL' => '0',
+                                      'Test::Kwalitee' => '1.21',
+                                      'Test::MinimumVersion' => '0',
+                                      'Test::More' => '0.88',
+                                      'Test::NoTabs' => '0',
+                                      'Test::Perl::Critic' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'Test::Pod::Coverage' => '1.08',
+                                      'Test::Pod::LinkCheck' => '0',
+                                      'Test::Portability::Files' => '0',
+                                      'Test::TrailingSpace' => '0.0203'
+                                    }
+                    },
+       'runtime' => {
+                      'recommends' => {
+                                        'Ref::Util::XS' => '0'
+                                      },
+                      'requires' => {
+                                      'DBIx::Class::ResultSet' => '0',
+                                      'Ref::Util' => '0',
+                                      'namespace::clean' => '0',
+                                      'perl' => 'v5.10.1'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'Class::Load' => '0',
+                                   'DBD::SQLite' => '0',
+                                   'DBIx::Class::Core' => '0',
+                                   'DBIx::Class::Schema' => '0',
+                                   'File::Spec' => '0',
+                                   'Module::Metadata' => '0',
+                                   'SQL::Abstract' => '1.83',
+                                   'SQL::Abstract::Test' => '0',
+                                   'SQL::Translator' => '0.11018',
+                                   'Test::More' => '0',
+                                   'Test::Roo' => '0',
+                                   'Test::Roo::Role' => '0',
+                                   'base' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

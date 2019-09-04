@@ -2,8 +2,8 @@ NAME
     App::ScreensaverUtils - CLI utilities related to screensaver
 
 VERSION
-    This document describes version 0.004 of App::ScreensaverUtils (from
-    Perl distribution App-ScreensaverUtils), released on 2019-04-30.
+    This document describes version 0.006 of App::ScreensaverUtils (from
+    Perl distribution App-ScreensaverUtils), released on 2019-09-04.
 
 DESCRIPTION
     This distribution contains the following CLI utilities related to
@@ -19,17 +19,87 @@ DESCRIPTION
 
     *   enable-screensaver
 
+    *   get-screensaver-info
+
     *   get-screensaver-timeout
 
+    *   noss
+
+    *   pause-screensaver
+
     *   prevent-screensaver-activated
+
+    *   prevent-screensaver-activated-until-interrupted
 
     *   prevent-screensaver-activated-while
 
     *   screensaver-is-active
 
+    *   screensaver-is-enabled
+
     *   set-screensaver-timeout
 
 FUNCTIONS
+  get_screensaver_info
+    Usage:
+
+     get_screensaver_info(%args) -> [status, msg, payload, meta]
+
+    Get screensaver information (detected screensaver, is_active,
+    is_enabled, timeout).
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   screensaver => *str*
+
+        Explicitly set screensaver program to use.
+
+        The default, when left undef, is to detect what screensaver is
+        running,
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  prevent_screensaver_activated_until_interrupted
+    Usage:
+
+     prevent_screensaver_activated_until_interrupted() -> [status, msg, payload, meta]
+
+    Prevent screensaver activated until interrupted.
+
+    Uses Proc::Govern to run "sleep infinity". To stop preventing
+    screensaver from sleeping, press Ctrl-C.
+
+    For more options when running command, e.g. timeout, load control,
+    autorestart, use the module or its CLI govproc instead.
+
+    Available in CLI with two shorter aliases: pause-screensaver and noss.
+
+    This function is not exported.
+
+    No arguments.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
   prevent_screensaver_activated_while
     Usage:
 

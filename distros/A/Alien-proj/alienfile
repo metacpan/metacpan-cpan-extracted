@@ -17,7 +17,11 @@ my $base_dir = getcwd();
 #  make libtool noisy for debug purposes
 #$ENV{LTFLAGS} = "--debug --verbose" if $on_windows;
 
-
+plugin 'Build::SearchDep' => (
+  aliens   => ['Alien::sqlite'],
+  public_I => 1,
+  public_l => 1,
+);
 
 my $min_target_version = '4.9.0';
 
@@ -97,6 +101,26 @@ share {
   ];
 
 };
+
+gather [
+    \&rename_la_files,
+];
+
+sub rename_la_files {
+    #  need to return if not share
+    return if !$on_windows;
+    
+    use File::Find::Rule;
+    my @la_files
+      = File::Find::Rule->file()
+                        ->name( '*.la' )
+                        ->in( '.' );
+    foreach my $file (@la_files) {
+        say "Renaming $file so it will not intefere with gdal compilation";
+        rename $file, $file . '.bak';
+    }
+
+}
 
 
 sub pause {

@@ -17,6 +17,10 @@ with Math-OEIS.  If not, see <http://www.gnu.org/licenses/>.
 
 
 
+Version 12, August 2019
+    - Name,Stripped tighter match so return nothing if given a bogus
+      A-number string
+
 Version 11, May 2019
     - Stripped don't force Math::BigInt back-end
     - Names,Stripped document line_split(), and Stripped values_split()

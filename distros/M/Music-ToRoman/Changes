@@ -1,5 +1,48 @@
 Revision history for Music-ToRoman
 
+0.1106 2019-09-03 10:52:11
+    - Improve documentation.
+
+0.1105 2019-09-03 09:05:12
+    - Improve documentation ever so slightly.
+
+0.1104 2019-09-02 22:06:41
+    - Clean-up code.
+    - Improve documentation.
+
+0.1103 2019-09-02 21:43:06
+    - Improve documentation.
+    - Add test cases.
+
+0.1102 2019-09-02 20:21:58
+    - Clean-up code.
+
+0.1101 2019-09-02 19:17:50
+    - Improve documentation.
+
+0.1100 2019-09-02 19:04:20
+    - Improve documentation.
+    - Add a major_tonic attribute.
+    - Add a verbose attribute.
+    - Add test cases for every key and scale mode.
+    - Handle double accidental notes.
+    - Handle the weird cases where computed #X chords should be bY chords.
+
+0.1002 2019-09-01 09:04:22
+    - Improve documentation.
+    - Add a couple test cases.
+
+0.1001 2019-09-01 08:03:43
+    - Improve documentation.
+
+0.1000 2019-09-01 07:42:49
+    - Improve documentation slightly.
+    - Add isa attribute constraints and a no-chord parse error.
+
+0.0902 2019-09-01 06:46:30
+    - Improve documentation.
+    - Clean-up code slightly.
+
 0.0901 2019-02-21 11:57:48
     - Don't insert a space before a maj/min decorator.
 

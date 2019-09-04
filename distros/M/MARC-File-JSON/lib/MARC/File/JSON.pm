@@ -4,20 +4,28 @@ package MARC::File::JSON;
 
 use strict;
 use warnings;
-use JSON qw(to_json from_json);
+use 5.010;
+use JSON qw(to_json from_json encode_json decode_json);
 use JSON::Streaming::Reader;
 use MARC::Record::Generic;
 use MARC::Record;
 use MARC::File;
 
 use vars qw( @ISA $VERSION );
-$VERSION = '0.003';
+$VERSION = '0.004';
 push @ISA, 'MARC::File';
 
 # MARC::Record -> JSON
 sub encode {
     my ($record, $args) = @_;
-    return to_json( $record->as_generic, $args );
+    my $json;
+    if ( defined $args ) {
+        $json = to_json( $record->as_generic, $args );
+    } else {
+        $json = encode_json( $record->as_generic);
+        utf8::upgrade($json);
+    }
+    return $json;
 }
 
 # JSON -> MARC::Record
@@ -25,7 +33,9 @@ sub decode {
     my ($self, $data, $args) = @_;
 
     if ( !ref($data) ) {
-        $data = from_json( $data, $args );
+        $data = defined $args
+            ? from_json( $data, $args )
+            : decode_json( $data );
     }
     return MARC::Record->new_from_generic( $data );
 }
@@ -95,7 +105,7 @@ and serialized JSON data formatted as:
 
 =head1 INTERFACE
 
-MARC::Record::Generic injects two subroutines into the MARC::Record
+MARC::File::JSON injects two subroutines into the MARC::Record
 namespace. Additionally it inherits from MARC::File and includes
 encode(), decode, and _next() routines, making it compatible with
 MARC::Batch.
@@ -111,10 +121,11 @@ in C<$json> to the object which it returns.
 
 =item *
 
-MARC::Record::as_json( )
+MARC::Record::as_json( $args )
 
 An instance method for a MARC::Record object. Returns the objects
-values as a string of JSON data.
+values as a string of JSON data. C<$args> is an optional hashref
+to be passed as the second parameter to JSON::to_json().
 
 =item *
 
