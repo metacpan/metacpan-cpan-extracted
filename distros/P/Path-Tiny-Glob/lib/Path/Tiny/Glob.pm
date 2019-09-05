@@ -1,7 +1,7 @@
 package Path::Tiny::Glob;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: File globbing utility
-$Path::Tiny::Glob::VERSION = '0.1.0';
+$Path::Tiny::Glob::VERSION = '0.2.0';
 
 use strict;
 use warnings;
@@ -17,7 +17,16 @@ our @EXPORT_OK = qw/ is_globby /;
 
 use experimental qw/ signatures postderef /;
 
-sub pathglob( $glob ) {
+sub _generate_pathglob {
+    my( $class, undef, $args ) = @_;
+
+    return sub(@) { return _pathglob(@_)->all }
+        if $args && $args->{all};
+
+    return \&_pathglob;
+}
+
+sub _pathglob( $glob ) {
 
     my @glob = ref $glob eq 'ARRAY' ? @$glob : ($glob);
 
@@ -66,7 +75,7 @@ Path::Tiny::Glob - File globbing utility
 
 =head1 VERSION
 
-version 0.1.0
+version 0.2.0
 
 =head1 SYNOPSIS
 
@@ -93,7 +102,13 @@ This function takes in
 a shell-like file glob, and returns a L<Lazy::List> of L<Path::Tiny> objects
 matching it.
 
-Caveat: backtracking paths using C<..> doesn't work.
+If you prefer to get all the globbed files in one go instead of
+L<Lazy::List>ed, you can import C<pathglob> with the flag C<all>:
+
+    use Path::Tiny::Glob pathglob => { all => 1 };
+
+    # now behaves like pathglob( '/foo/**' )->all;
+    my @files = pathglob( '/foo/**' );
 
 The function can also take an arrayref of path segments.
 The segments can be strings, in which case they are obeying
@@ -116,6 +131,8 @@ The segments can also be regexes, in which case they will be
 compared to the paths' current C<basename>.
 
     @readmes = pathglob( [ 'foo/bar/**/', /^readme\.(md|mkd|txt)$/i );
+
+Known limitation: backtracking paths using C<..> doesn't work.
 
 =head3 Supported globbing patterns
 

@@ -11,7 +11,7 @@ Data::Object::Undef::Autobox
 
 =abstract
 
-Data-Object Autoboxing for Undef Objects
+Data-Object Undef Class Autoboxing
 
 =synopsis
 

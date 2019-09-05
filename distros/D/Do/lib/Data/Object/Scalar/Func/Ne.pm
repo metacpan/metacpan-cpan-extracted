@@ -1,10 +1,15 @@
 package Data::Object::Scalar::Func::Ne;
 
+use 5.014;
+
+use strict;
+use warnings;
+
 use Data::Object 'Class';
 
 extends 'Data::Object::Scalar::Func';
 
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.50'; # VERSION
 
 # BUILD
 
@@ -25,9 +30,9 @@ has arg2 => (
 sub execute {
   my ($self) = @_;
 
-  my ($data) = $self->unpack;
+  $self->throw("Not equal-to is not supported");
 
-  $self->throw("The ne() comparison operation is not supported");
+  return;
 }
 
 sub mapping {
@@ -63,7 +68,14 @@ Data-Object Scalar Function (Ne) Class
 =head1 DESCRIPTION
 
 Data::Object::Scalar::Func::Ne is a function object for Data::Object::Scalar.
-This package inherits all behavior from L<Data::Object::Scalar::Func>.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Data::Object::Scalar::Func>
 
 =cut
 

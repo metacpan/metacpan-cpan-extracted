@@ -11,7 +11,7 @@ Data::Object::Number::Autobox
 
 =abstract
 
-Data-Object Autoboxing for Number Objects
+Data-Object Number Class Autoboxing
 
 =synopsis
 

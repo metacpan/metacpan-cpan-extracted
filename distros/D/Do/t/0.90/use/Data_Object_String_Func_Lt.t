@@ -23,10 +23,13 @@ Data-Object String Function (Lt) Class
 
   $func->execute;
 
+=inherits
+
+Data::Object::String::Func
+
 =description
 
 Data::Object::String::Func::Lt is a function object for Data::Object::String.
-This package inherits all behavior from L<Data::Object::String::Func>.
 
 =cut
 

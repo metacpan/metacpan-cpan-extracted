@@ -60,7 +60,7 @@ subtest 'test the rindex method' => sub {
   $answer = $string->rindex('explained');
   is $$answer,    -1;                        # -1
   isa_ok $string, 'Data::Object::String';
-  isa_ok $answer, 'Data::Object::Integer';
+  isa_ok $answer, 'Data::Object::Number';
 };
 
 ok 1 and done_testing;

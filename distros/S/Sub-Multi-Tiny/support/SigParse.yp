@@ -7,7 +7,7 @@
 
 # Imports {{{1
 
-use 5.010001;
+use 5.006;
 use strict;
 use warnings;
 
@@ -89,7 +89,7 @@ sub _next_token {
     $$text =~ m/\G\s+/gc;    # Skip H and V whitespace
     $parser->YYData->{CURR_TOK_POS} = pos($$text);
 
-    return ('', undef) unless (pos($$text)//0) < length($$text);    # EOF
+    return ('', undef) unless (pos($$text)||0) < length($$text);    # EOF
 
     $$text =~ m/\G,/gc and return (SEPAR => 0); # 0 is a dummy value
 

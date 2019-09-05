@@ -27,11 +27,14 @@ Data-Object Replace Class
     $initial_string
   ]);
 
+=inherits
+
+Data::Object::Array
+
 =description
 
 This package provides routines for introspecting the results of a regexp
-replace operation. This package inherits all behavior from
-L<Data::Object::Array>.
+replace operation.
 
 =cut
 

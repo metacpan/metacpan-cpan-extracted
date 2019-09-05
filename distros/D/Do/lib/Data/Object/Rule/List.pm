@@ -1,13 +1,13 @@
 package Data::Object::Rule::List;
 
+use 5.014;
+
 use strict;
 use warnings;
 
-use Data::Object::Rule;
+use Moo::Role;
 
-our $VERSION = '1.09'; # VERSION
-
-# BUILD
+our $VERSION = '1.50'; # VERSION
 
 requires 'grep';
 requires 'head';
@@ -19,8 +19,6 @@ requires 'reverse';
 requires 'sort';
 requires 'tail';
 requires 'values';
-
-# METHODS
 
 1;
 =encoding utf8

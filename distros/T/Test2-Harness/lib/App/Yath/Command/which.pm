@@ -2,7 +2,7 @@ package App::Yath::Command::which;
 use strict;
 use warnings;
 
-our $VERSION = '0.001093';
+our $VERSION = '0.001095';
 
 use Test2::Harness::Util::File::JSON;
 
@@ -95,6 +95,8 @@ Show version information
 =over 4
 
 =item -pPlugin
+
+=item -pPlugin=arg1,arg2,...
 
 =item -p+My::Plugin
 

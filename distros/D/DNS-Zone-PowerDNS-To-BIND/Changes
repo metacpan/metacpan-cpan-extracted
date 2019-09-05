@@ -1,3 +1,11 @@
+0.007   2019-09-05  Released-By: PERLANCAR; Urgency: medium
+
+	- Fix sort order once again: hosts must be grouped together,
+	  otherwise they might not be returned by bind; root node first,
+	  then non-wildcard, then wildcard; also group record type to be
+	  neater.
+
+
 0.006   2019-09-04  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Set 'domain' argument as pos=0.

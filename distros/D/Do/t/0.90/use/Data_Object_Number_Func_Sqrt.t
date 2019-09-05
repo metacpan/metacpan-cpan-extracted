@@ -23,10 +23,13 @@ Data-Object Number Function (Sqrt) Class
 
   $func->execute;
 
+=inherits
+
+Data::Object::Number::Func
+
 =description
 
 Data::Object::Number::Func::Sqrt is a function object for Data::Object::Number.
-This package inherits all behavior from L<Data::Object::Number::Func>.
 
 =cut
 

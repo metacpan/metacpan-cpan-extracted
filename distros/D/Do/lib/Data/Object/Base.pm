@@ -1,11 +1,12 @@
 package Data::Object::Base;
 
+use 5.014;
+
 use strict;
 use warnings;
 
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.50'; # VERSION
 
-# BUILD
 # METHODS
 
 sub class {

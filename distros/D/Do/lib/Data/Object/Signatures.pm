@@ -1,5 +1,7 @@
 package Data::Object::Signatures;
 
+use 5.014;
+
 use strict;
 use warnings;
 
@@ -7,7 +9,7 @@ use Function::Parameters;
 
 use Data::Object::Export 'namespace', 'reify';
 
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.50'; # VERSION
 
 # BUILD
 
@@ -133,8 +135,6 @@ sub arnd_settings {
     types                => 1,
   });
 }
-
-# METHODS
 
 1;
 

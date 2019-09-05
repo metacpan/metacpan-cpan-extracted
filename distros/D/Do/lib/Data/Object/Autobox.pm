@@ -7,18 +7,16 @@ use warnings;
 
 use base 'autobox';
 
-require Data::Object::Any::Autobox;
 require Data::Object::Array::Autobox;
 require Data::Object::Code::Autobox;
 require Data::Object::Float::Autobox;
 require Data::Object::Hash::Autobox;
-require Data::Object::Integer::Autobox;
 require Data::Object::Number::Autobox;
 require Data::Object::Scalar::Autobox;
 require Data::Object::String::Autobox;
 require Data::Object::Undef::Autobox;
 
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.50'; # VERSION
 
 sub import {
   my ($class) = @_;
@@ -28,12 +26,12 @@ sub import {
     CODE      => 'Data::Object::Code::Autobox',
     FLOAT     => 'Data::Object::Float::Autobox',
     HASH      => 'Data::Object::Hash::Autobox',
-    INTEGER   => 'Data::Object::Integer::Autobox',
+    INTEGER   => 'Data::Object::Number::Autobox',
     NUMBER    => 'Data::Object::Number::Autobox',
     SCALAR    => 'Data::Object::Scalar::Autobox',
     STRING    => 'Data::Object::String::Autobox',
     UNDEF     => 'Data::Object::Undef::Autobox',
-    UNIVERSAL => 'Data::Object::Any::Autobox'
+    UNIVERSAL => 'Data::Object::Scalar::Autobox'
   );
 
   return $class;
@@ -72,8 +70,15 @@ Data-Object Autoboxing
 
 This package implements autoboxing via L<autobox> to provide
 L<boxing|http://en.wikipedia.org/wiki/Object_type_(object-oriented_programming)>
-for native Perl 5 data types. This package inherits all behavior from
-L<autobox>.
+for native Perl 5 data types.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<autobox>
 
 =cut
 

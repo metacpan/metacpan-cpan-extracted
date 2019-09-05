@@ -23,10 +23,13 @@ Data-Object Array Function (Unique) Class
 
   $func->execute;
 
+=inherits
+
+Data::Object::Array::Func
+
 =description
 
 Data::Object::Array::Func::Unique is a function object for Data::Object::Array.
-This package inherits all behavior from L<Data::Object::Array::Func>.
 
 =cut
 

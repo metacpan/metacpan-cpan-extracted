@@ -11,7 +11,7 @@ Data::Object::RoleHas
 
 =abstract
 
-Data-Object Role Configuration
+Data-Object Role Attribute Builder
 
 =synopsis
 

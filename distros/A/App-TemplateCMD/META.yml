@@ -17,31 +17,31 @@ name: App-TemplateCMD
 provides:
   App::TemplateCMD:
     file: lib/App/TemplateCMD.pm
-    version: v0.6.9
+    version: v0.6.10
   App::TemplateCMD::Command:
     file: lib/App/TemplateCMD/Command.pm
-    version: v0.6.9
+    version: v0.6.10
   App::TemplateCMD::Command::Build:
     file: lib/App/TemplateCMD/Command/Build.pm
-    version: v0.6.9
+    version: v0.6.10
   App::TemplateCMD::Command::Cat:
     file: lib/App/TemplateCMD/Command/Cat.pm
-    version: v0.6.9
+    version: v0.6.10
   App::TemplateCMD::Command::Conf:
     file: lib/App/TemplateCMD/Command/Conf.pm
-    version: v0.6.9
+    version: v0.6.10
   App::TemplateCMD::Command::Describe:
     file: lib/App/TemplateCMD/Command/Describe.pm
-    version: v0.6.9
+    version: v0.6.10
   App::TemplateCMD::Command::Help:
     file: lib/App/TemplateCMD/Command/Help.pm
-    version: v0.6.9
+    version: v0.6.10
   App::TemplateCMD::Command::List:
     file: lib/App/TemplateCMD/Command/List.pm
-    version: v0.6.9
+    version: v0.6.10
   App::TemplateCMD::Command::Print:
     file: lib/App/TemplateCMD/Command/Print.pm
-    version: v0.6.9
+    version: v0.6.10
 requires:
   Class::Date: '1.001'
   Clone: '0.17'
@@ -59,5 +59,5 @@ resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-TemplateCMD
   license: http://dev.perl.org/licenses/
   repository: http://github.com/ivanwills/App-TemplateCMD
-version: v0.6.9
+version: v0.6.10
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

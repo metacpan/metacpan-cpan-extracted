@@ -23,10 +23,13 @@ Data-Object Hash Function (Ne) Class
 
   $func->execute;
 
+=inherits
+
+Data::Object::Hash::Func
+
 =description
 
-Data::Object::Hash::Func::Ne is a function object for Data::Object::Hash. This
-package inherits all behavior from L<Data::Object::Hash::Func>.
+Data::Object::Hash::Func::Ne is a function object for Data::Object::Hash.
 
 =cut
 

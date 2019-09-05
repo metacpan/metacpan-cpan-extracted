@@ -1,4 +1,4 @@
-use 5.010001;
+use 5.006;
 use strict;
 use warnings;
 
@@ -27,7 +27,7 @@ use Test::More;
 # --- Helpers ---------------------------------------------------------
 
 # Map undef -> '<undef>' for ease of reading
-sub _u { shift // '<undef>' }
+sub _u { defined $_[0] ? $_[0] : '<undef>' }
 
 # Line number as a string
 sub _l {

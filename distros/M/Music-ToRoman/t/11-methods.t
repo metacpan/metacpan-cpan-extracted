@@ -40,6 +40,9 @@ SKIP: {
     is $mtr->parse('F#m'), 'bvi', 'bvi';
 };
 is $mtr->parse('F##m'), 'vi', 'vi';
+is $mtr->parse('F##m7'), 'vi7', 'vi7';
+is $mtr->parse('F##m7b5'), 'vi7b5', 'vi7b5';
+is $mtr->parse('F##min7'), 'vimin7', 'vimin7';
 is $mtr->parse('Abm'), 'bvii', 'bvii';
 SKIP: {
     skip 'G#m = bvii not working', 1;
@@ -202,6 +205,9 @@ is $mtr->parse('F'), 'V', 'V';
 is $mtr->parse('F7'), 'V7', 'V7';
 is $mtr->parse('Gbm'), 'bvi', 'bvi';
 is $mtr->parse('Gm'), 'vi', 'vi';
+is $mtr->parse('Gm7'), 'vi7', 'vi7';
+is $mtr->parse('Gm7b5'), 'vi7b5', 'vi7b5';
+is $mtr->parse('Gmin7'), 'vimin7', 'vimin7';
 is $mtr->parse('Abm'), 'bvii', 'bvii';
 is $mtr->parse('Abo'), 'bviio', 'bviio';
 is $mtr->parse('Ao'), 'viio', 'viio';

@@ -21,10 +21,13 @@ Data-Object Abstract Code Class
 
   my $code = My::Code->new(sub { shift + 1 });
 
+=inherits
+
+Data::Object::Base
+
 =description
 
-Data::Object::Code::Base provides routines for operating on Perl 5 code
-references. This package inherits all behavior from L<Data::Object::Base>.
+This package provides routines for operating on Perl 5 code references.
 
 =cut
 

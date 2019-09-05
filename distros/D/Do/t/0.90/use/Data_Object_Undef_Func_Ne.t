@@ -23,10 +23,13 @@ Data-Object Undef Function (Ne) Class
 
   $func->execute;
 
+=inherits
+
+Data::Object::Undef::Func
+
 =description
 
 Data::Object::Undef::Func::Ne is a function object for Data::Object::Undef.
-This package inherits all behavior from L<Data::Object::Undef::Func>.
 
 =cut
 

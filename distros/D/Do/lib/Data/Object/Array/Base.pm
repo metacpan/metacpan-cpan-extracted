@@ -9,7 +9,7 @@ use Carp ();
 
 use parent 'Data::Object::Base';
 
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.50'; # VERSION
 
 # BUILD
 
@@ -53,8 +53,15 @@ Data-Object Abstract Array Class
 
 =head1 DESCRIPTION
 
-Data::Object::Array::Base provides routines for operating on Perl 5 array
-references. This package inherits all behavior from L<Data::Object::Base>.
+This package provides routines for operating on Perl 5 array references.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Data::Object::Base>
 
 =cut
 

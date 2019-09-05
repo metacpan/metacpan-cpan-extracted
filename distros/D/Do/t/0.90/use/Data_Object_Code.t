@@ -19,20 +19,20 @@ Data-Object Code Class
 
   my $code = Data::Object::Code->new(sub { shift + 1 });
 
+=inherits
+
+Data::Object::Code::Base
+
+=integrates
+
+Data::Object::Role::Detract
+Data::Object::Role::Dumper
+Data::Object::Role::Functable
+Data::Object::Role::Throwable
+
 =description
 
-This package provides routines for operating on Perl 5 code references. This
-package inherits all behavior from L<Data::Object::Code::Base>.
-
-This package assumes all behavior from the following roles:
-
-L<Data::Object::Role::Detract>
-
-L<Data::Object::Role::Dumper>
-
-L<Data::Object::Role::Functable>
-
-L<Data::Object::Role::Throwable>
+This package provides routines for operating on Perl 5 code references.
 
 =cut
 

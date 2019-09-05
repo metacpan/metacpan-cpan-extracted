@@ -1,5 +1,12 @@
 Changelog for Mojolicious-Plugin-AutoReload
 
+0.006     2019-09-04 18:21:21-05:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed the plugin to work when other template engines are being
+      used as the default. Thanks @zeeshanmuhammad! [Github #1 #2]
+
 0.005     2019-08-21 18:16:51-05:00 America/Chicago
 
     [Fixed]

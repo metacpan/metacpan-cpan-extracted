@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "App-TemplateCMD",
    "prereqs" : {
@@ -45,39 +45,39 @@
    "provides" : {
       "App::TemplateCMD" : {
          "file" : "lib/App/TemplateCMD.pm",
-         "version" : "v0.6.9"
+         "version" : "v0.6.10"
       },
       "App::TemplateCMD::Command" : {
          "file" : "lib/App/TemplateCMD/Command.pm",
-         "version" : "v0.6.9"
+         "version" : "v0.6.10"
       },
       "App::TemplateCMD::Command::Build" : {
          "file" : "lib/App/TemplateCMD/Command/Build.pm",
-         "version" : "v0.6.9"
+         "version" : "v0.6.10"
       },
       "App::TemplateCMD::Command::Cat" : {
          "file" : "lib/App/TemplateCMD/Command/Cat.pm",
-         "version" : "v0.6.9"
+         "version" : "v0.6.10"
       },
       "App::TemplateCMD::Command::Conf" : {
          "file" : "lib/App/TemplateCMD/Command/Conf.pm",
-         "version" : "v0.6.9"
+         "version" : "v0.6.10"
       },
       "App::TemplateCMD::Command::Describe" : {
          "file" : "lib/App/TemplateCMD/Command/Describe.pm",
-         "version" : "v0.6.9"
+         "version" : "v0.6.10"
       },
       "App::TemplateCMD::Command::Help" : {
          "file" : "lib/App/TemplateCMD/Command/Help.pm",
-         "version" : "v0.6.9"
+         "version" : "v0.6.10"
       },
       "App::TemplateCMD::Command::List" : {
          "file" : "lib/App/TemplateCMD/Command/List.pm",
-         "version" : "v0.6.9"
+         "version" : "v0.6.10"
       },
       "App::TemplateCMD::Command::Print" : {
          "file" : "lib/App/TemplateCMD/Command/Print.pm",
-         "version" : "v0.6.9"
+         "version" : "v0.6.10"
       }
    },
    "release_status" : "stable",
@@ -92,6 +92,6 @@
          "url" : "http://github.com/ivanwills/App-TemplateCMD"
       }
    },
-   "version" : "v0.6.9",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "v0.6.10",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

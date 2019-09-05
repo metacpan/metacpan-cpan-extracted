@@ -17,11 +17,14 @@ Functions for ArrayRefs
 
   use Data::Object::Array::Func;
 
+=inherits
+
+Data::Object::Func
+
 =description
 
 Data::Object::Array::Func is an abstract base class for function classes in the
-Data::Object::Array::Func space. This package inherits all behavior from
-L<Data::Object::Func>.
+Data::Object::Array::Func space.
 
 =cut
 

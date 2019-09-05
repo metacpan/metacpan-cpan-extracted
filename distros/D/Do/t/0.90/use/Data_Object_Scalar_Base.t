@@ -21,10 +21,13 @@ Data-Object Abstract Scalar Class
 
   my $scalar = My::Scalar->new(\*main);
 
+=inherits
+
+Data::Object::Base
+
 =description
 
-Data::Object::Scalar::Base provides routines for operating on Perl 5 scalar
-objects. This package inherits all behavior from L<Data::Object::Base>.
+This package provides routines for operating on Perl 5 scalar objects.
 
 =cut
 

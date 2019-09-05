@@ -11,7 +11,7 @@ Data::Object::Scalar::Autobox
 
 =abstract
 
-Data-Object Autoboxing for Scalar Objects
+Data-Object Scalar Class Autoboxing
 
 =synopsis
 

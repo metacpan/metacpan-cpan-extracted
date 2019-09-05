@@ -5,8 +5,6 @@ use Test::More;
 
 my @type_constraints = qw(
   Any
-  AnyObj
-  AnyObject
   ArrayObj
   ArrayObject
   ArrayRef
@@ -29,10 +27,6 @@ my @type_constraints = qw(
   HashRef
   InstanceOf
   Int
-  IntObj
-  IntObject
-  IntegerObj
-  IntegerObject
   Item
   LaxNum
   Map

@@ -1,10 +1,16 @@
 package Data::Object::Space;
 
-use Carp;
+use 5.014;
 
-use Data::Object::Class;
+use strict;
+use warnings;
 
-our $VERSION = '1.09'; # VERSION
+use Moo;
+
+use Carp 'confess';
+
+
+our $VERSION = '1.50'; # VERSION
 
 # BUILD
 

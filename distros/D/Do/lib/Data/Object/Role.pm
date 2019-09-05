@@ -1,5 +1,7 @@
 package Data::Object::Role;
 
+use 5.014;
+
 use strict;
 use warnings;
 
@@ -7,10 +9,7 @@ use Data::Object;
 
 use parent 'Moo::Role';
 
-our $VERSION = '1.09'; # VERSION
-
-# BUILD
-# METHODS
+our $VERSION = '1.50'; # VERSION
 
 1;
 

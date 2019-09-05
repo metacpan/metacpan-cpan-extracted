@@ -1,5 +1,5 @@
 package Consul;
-$Consul::VERSION = '0.025';
+$Consul::VERSION = '0.026';
 # ABSTRACT: Client library for consul
 
 use namespace::autoclean;

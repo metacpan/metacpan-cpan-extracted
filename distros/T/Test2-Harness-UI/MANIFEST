@@ -10,8 +10,6 @@ README
 README.md
 cpanfile
 dist.ini
-jquery-tablesort.LICENSE
-jquery-tablesort.README.md
 json-view.LICENSE
 json-view.README.md
 lib/App/Yath/Command/ui.pm
@@ -52,6 +50,7 @@ lib/Test2/Harness/UI/Util/Errors.pm
 lib/Test2/Harness/UI/Util/HashBase.pm
 scripts/yath-ui-importer.pl
 share/css/dashboard.css
+share/css/datatables.min.css
 share/css/fieldtable.css
 share/css/job.css
 share/css/jquery.json-view.min.css
@@ -71,13 +70,13 @@ share/img/locked.png
 share/img/orphan.png
 share/img/unlocked.png
 share/js/dashboard.js
+share/js/datatables.min.js
 share/js/fieldtable.js
 share/js/job.js
 share/js/jquery-ui.js
 share/js/jquery-ui.min.js
 share/js/jquery.js
 share/js/jquery.json-view.min.js
-share/js/jquery.tablesort.min.js
 share/js/main.js
 share/js/run.js
 share/js/upload.js

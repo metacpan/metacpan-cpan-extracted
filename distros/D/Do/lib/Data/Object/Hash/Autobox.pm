@@ -9,7 +9,7 @@ use Role::Tiny::With;
 
 with 'Data::Object::Role::Proxyable';
 
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.50'; # VERSION
 
 # BUILD
 
@@ -39,7 +39,7 @@ Data::Object::Hash::Autobox
 
 =head1 ABSTRACT
 
-Data-Object Autoboxing for Hash Objects
+Data-Object Hash Class Autoboxing
 
 =cut
 

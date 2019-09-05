@@ -1,5 +1,5 @@
 package Consul::API::Catalog;
-$Consul::API::Catalog::VERSION = '0.025';
+$Consul::API::Catalog::VERSION = '0.026';
 use namespace::autoclean;
 
 use Moo::Role;
@@ -69,7 +69,7 @@ sub node {
 }
 
 package Consul::API::Catalog::ShortNode;
-$Consul::API::Catalog::ShortNode::VERSION = '0.025';
+$Consul::API::Catalog::ShortNode::VERSION = '0.026';
 use Moo;
 use Types::Standard qw(Str);
 
@@ -77,7 +77,7 @@ has name    => ( is => 'ro', isa => Str, init_arg => 'Node',    required => 1 );
 has address => ( is => 'ro', isa => Str, init_arg => 'Address', required => 1 );
 
 package Consul::API::Catalog::Service;
-$Consul::API::Catalog::Service::VERSION = '0.025';
+$Consul::API::Catalog::Service::VERSION = '0.026';
 use Moo;
 use Types::Standard qw(Str Int ArrayRef);
 
@@ -90,7 +90,7 @@ has address         => ( is => 'ro', isa => Str,           init_arg => 'Address'
 has tags            => ( is => 'ro', isa => ArrayRef[Str], init_arg => 'ServiceTags',    required => 1, coerce => sub { $_[0] || [] } );
 
 package Consul::API::Catalog::Node;
-$Consul::API::Catalog::Node::VERSION = '0.025';
+$Consul::API::Catalog::Node::VERSION = '0.026';
 use Moo;
 use Types::Standard qw(HashRef);
 use Type::Utils qw(class_type);

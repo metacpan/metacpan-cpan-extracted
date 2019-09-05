@@ -23,11 +23,14 @@ Data-Object Regexp Function (Search) Class
 
   $func->execute;
 
+=inherits
+
+Data::Object::Regexp::Func
+
 =description
 
 Data::Object::Regexp::Func::Search is a function object for
-Data::Object::Regexp. This package inherits all behavior from
-L<Data::Object::Regexp::Func>.
+Data::Object::Regexp.
 
 =cut
 

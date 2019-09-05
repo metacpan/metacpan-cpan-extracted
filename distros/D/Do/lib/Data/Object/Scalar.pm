@@ -23,7 +23,7 @@ with qw(
 
 use parent 'Data::Object::Scalar::Base';
 
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.50'; # VERSION
 
 # METHODS
 
@@ -53,12 +53,21 @@ Data-Object Scalar Class
 
 =head1 DESCRIPTION
 
-This package provides routines for operating on Perl 5 scalar objects. This
-package inherits all behavior from L<Data::Object::Scalar::Base>.
+This package provides routines for operating on Perl 5 scalar objects.
 
-=head1 ROLES
+=cut
 
-This package inherits all behavior from the following roles:
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Data::Object::Scalar::Base>
+
+=cut
+
+=head1 INTEGRATES
+
+This package integrates behaviors from:
 
 L<Data::Object::Role::Detract>
 

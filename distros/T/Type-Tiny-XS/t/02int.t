@@ -22,7 +22,7 @@ the same terms as the Perl 5 programming language system itself.
 
 use strict;
 use warnings;
-use Test::More tests => 17;
+use Test::More tests => 19;
 
 use_ok('Type::Tiny::XS');
 
@@ -42,3 +42,7 @@ ok !Type::Tiny::XS::Int("123\n")  => 'no "123\\n"';
 ok !Type::Tiny::XS::Int("\n123")  => 'no "\\n123"';
 ok !Type::Tiny::XS::Int("2.3")    => 'no "2.3"';
 ok !Type::Tiny::XS::Int( 2.3 )    => 'no 2.3';
+my $maxuint = ~0;
+ok Type::Tiny::XS::Int( $maxuint )    => 'yes MAXUINT';
+my $as_string = sprintf '%f', $maxuint;
+ok Type::Tiny::XS::Int( $maxuint )    => 'yes MAXUINT after use as float';

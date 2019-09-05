@@ -11,7 +11,7 @@ Data::Object::Hash::Autobox
 
 =abstract
 
-Data-Object Autoboxing for Hash Objects
+Data-Object Hash Class Autoboxing
 
 =synopsis
 

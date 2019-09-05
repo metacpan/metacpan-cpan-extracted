@@ -23,10 +23,13 @@ Data-Object Scalar Function (Gt) Class
 
   $func->execute;
 
+=inherits
+
+Data::Object::Scalar::Func
+
 =description
 
 Data::Object::Scalar::Func::Gt is a function object for Data::Object::Scalar.
-This package inherits all behavior from L<Data::Object::Scalar::Func>.
 
 =cut
 

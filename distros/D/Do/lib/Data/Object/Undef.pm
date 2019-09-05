@@ -25,7 +25,7 @@ with qw(
 
 use parent 'Data::Object::Undef::Base';
 
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.50'; # VERSION
 
 # METHODS
 
@@ -55,12 +55,21 @@ Data-Object Undef Class
 
 =head1 DESCRIPTION
 
-This package provides routines for operating on Perl 5 undefined data. This
-package inherits all behavior from L<Data::Object::Undef::Base>.
+This package provides routines for operating on Perl 5 undefined data.
 
-=head1 ROLES
+=cut
 
-This package inherits all behavior from the following roles:
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Data::Object::Undef::Base>
+
+=cut
+
+=head1 INTEGRATES
+
+This package integrates behaviors from:
 
 L<Data::Object::Role::Detract>
 

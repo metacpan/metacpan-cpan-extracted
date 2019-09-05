@@ -3,12 +3,10 @@ use warnings;
 use Test::More;
 
 plan skip_all => "Test Error: $@" unless eval q(
-    require Data::Object::Any;
     require Data::Object::Array;
     require Data::Object::Code;
     require Data::Object::Float;
     require Data::Object::Hash;
-    require Data::Object::Number;
     require Data::Object::Number;
     require Data::Object::Scalar;
     require Data::Object::String;
@@ -35,7 +33,7 @@ subtest 'test the deduce_deep function' => sub {
   isa_ok $object->{3}, 'Data::Object::Hash';
   isa_ok $object->{3}{4}, 'Data::Object::Number';
   isa_ok $object->{3}{6}, 'Data::Object::Array';
-  isa_ok $object->{3}{6}[0], 'Data::Object::Integer';
+  isa_ok $object->{3}{6}[0], 'Data::Object::Number';
   isa_ok $object->{3}{6}[1], 'Data::Object::Number';
   isa_ok $object->{3}{6}[2], 'main';
 };

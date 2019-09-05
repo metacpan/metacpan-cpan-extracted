@@ -1,17 +1,19 @@
 package Data::Object::Registry;
 
+use 5.014;
+
 use strict;
 use warnings;
 
-use Data::Object::State;
-
 use Memoize;
 
-use parent 'Data::Object::Base';
+our $VERSION = '1.50'; # VERSION
 
-our $VERSION = '1.09'; # VERSION
+my $map = {};
 
-# METHODS
+sub new {
+  return bless $map, shift;
+}
 
 sub get {
   my ($self, $key) = @_;
@@ -108,7 +110,15 @@ Data-Object Namespace Registry
 =head1 DESCRIPTION
 
 This package is a singleton that holds mappings for namespaces and type
-libraries. This package inherits all behavior from L<Data::Object::Base>.
+libraries.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Data::Object::Base>
 
 =cut
 
@@ -145,6 +155,22 @@ Returns the lookup table for a given namespace.
 =item lut example
 
   my $lut = $registry->lut($key);
+
+=back
+
+=cut
+
+=head2 new
+
+  new() : Object
+
+Construct a new object.
+
+=over 4
+
+=item new example
+
+  my $registry = Data::Object::Registry->new;
 
 =back
 

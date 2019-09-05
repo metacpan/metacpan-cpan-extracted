@@ -40,3 +40,11 @@ Revision history for Test-Expr
 
         Obscured code generation for safer results
 
+
+
+0.000008  Thu Sep  5 12:05:59 2019
+
+        Bug fixes (sorry, Patrick)
+
+        Added correct handing of regex matches
+        (thanks, Patrick!)

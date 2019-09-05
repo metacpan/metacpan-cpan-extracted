@@ -23,10 +23,13 @@ Data-Object Regexp Function (Ne) Class
 
   $func->execute;
 
+=inherits
+
+Data::Object::Regexp::Func
+
 =description
 
 Data::Object::Regexp::Func::Ne is a function object for Data::Object::Regexp.
-This package inherits all behavior from L<Data::Object::Regexp::Func>.
 
 =cut
 

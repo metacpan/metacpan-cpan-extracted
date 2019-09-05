@@ -24,7 +24,7 @@ with qw(
 
 use parent 'Data::Object::Hash::Base';
 
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.50'; # VERSION
 
 # METHODS
 
@@ -66,10 +66,21 @@ Data-Object Hash Class
 
 =head1 DESCRIPTION
 
-This package provides routines for operating on Perl 5 hash references. This
-package inherits all behavior from L<Data::Object::Hash::Base>.
+This package provides routines for operating on Perl 5 hash references.
 
-This package assumes all behavior from the following roles:
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Data::Object::Hash::Base>
+
+=cut
+
+=head1 INTEGRATES
+
+This package integrates behaviors from:
 
 L<Data::Object::Role::Detract>
 

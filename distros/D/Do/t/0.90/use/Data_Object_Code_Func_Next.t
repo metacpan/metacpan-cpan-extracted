@@ -23,10 +23,13 @@ Data-Object Code Function (Next) Class
 
   $func->execute;
 
+=inherits
+
+Data::Object::Code::Func
+
 =description
 
 Data::Object::Code::Func::Next is a function object for Data::Object::Code.
-This package inherits all behavior from L<Data::Object::Code::Func>.
 
 =cut
 

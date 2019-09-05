@@ -1,0 +1,272 @@
+=pod
+
+=head1 NAME
+
+WebService::Discord::Webhook - A module for posting messages to Discord chat service
+
+=head1 VERSION
+
+version 1.00
+
+=head1 SYNOPSIS
+
+    use WebService::Discord::Webhook;
+
+    my $webhook = WebService::Discord::Webhook->new( $url );
+
+    $webhook->get();
+    print "Webhook posting as '" . $webhook->{name} .
+      "' in channel " . $webhook->{channel_id} . "\n";
+
+    $webhook->execute( content => 'Hello, world!', tts => 1 );
+
+    sleep(30);
+
+    $webhook->execute( 'Goodbye, world!' );
+
+=head1 DESCRIPTION
+
+This module posts messages to the Discord chat service, using their Webhook
+interface.  Webhooks are a simple way to add post-only functions to external
+clients, without the need to create a full-fledged client or "bot".
+
+Normally, Webhooks are used to issue a notification to chat channels when an
+external event from another site or service occurs, e.g. when a commit is made
+to a Git repository, a story is posted to a news site, or a player is fragged
+in a game.
+
+An example Discord Webhook URL looks like this:
+
+    https://discordapp.com/api/webhooks/2237...5344/3d89...cf11
+
+where the first magic number ("2237...5344") is the C<id> and the second
+("3d89...cf11") is the C<token>.
+
+For more information on Discord Webhooks, see the Discord API documentation
+located at L<https://discordapp.com/developers/docs/resources/webhook>.
+
+=head1 METHODS
+
+=head2 new
+
+Constructs and returns a new WebService::Discord::Webhook object using the
+specified parameters.
+
+This function should be passed a hash, containing either a C<url> key, or
+C<token> plus C<id> keys, with values matching the Webhook created via the
+Discord web UI.
+
+The following optional parameters are also available:
+
+=over
+
+=item * timeout
+
+Override the default timeout of the underlying L<HTTP::Tiny> object used for
+making web requests.
+
+=item * verify_SSL
+
+Enable SSL certificate verification on the underlying L<HTTP::Tiny> object.
+Note that this will probably require a trusted CA certificate list installed.
+
+=item * wait
+
+Webhook execution will block before returning, until the server confirms that
+he message was sent.  By default this is disabled (webhook execution is NOT
+synchronized), so the function may return success although a message does not
+actually post.  See C<execute> for more details.
+
+=back
+
+As a special case, if C<new> is called with a scalar parameter, it is assumed
+to be a C<url>.
+
+=head2 get
+
+Retrieves server-side information for the Webhook, and caches the result in
+the WebService::Discord::Webhook object.  No parameters are expected.
+
+Information which can be returned from the remote service include:
+
+=over
+
+=item * guild_id:
+The guild ("server") which the Webhook currently posts to, if set
+
+=item * channel_id:
+The specific channel which the Webhook posts to
+
+=item * name:
+The current display name of the Webhook
+
+=item * avatar:
+A URL pointing to the current avatar used by the Webhook
+
+=back
+
+A hash containing the data is returned.  Additionally, the hash values are
+copied into the object itself, so they can be later retrieved by calling code
+(as in C<$webhook-E<gt>{channel_id}>).
+
+=head2 modify
+
+Modifies the server-side information for the Webhook.  This can be used to
+alter the name the Webhook uses, the avatar, or both.
+
+This function should be passed a hash, containing (at least) a
+C<name> key or C<avatar> key (or both).
+
+For C<avatar>, the value should be the raw data bytes of a png, jpeg, or gif
+image.
+
+As a special case, if C<modify> is called with a scalar parameter, it is
+assumed to be a new username.
+
+The return value for this function is the same as C<get>, and the results are
+also cached as above.
+
+=head2 destroy
+
+Deletes the Webhook from the Discord service.  Returns True if successful,
+undef otherwise.
+
+B<Warning!>  Once a Webhook is deleted, the existing token and ID are no
+longer valid.  A server administrator will need to re-create the endpoint
+through the Discord UI.  Unless you have very good reason to do this, it is
+probably best to leave this function alone.
+
+=head2 execute
+
+Executes a Webhook (posts a message).
+
+The function should be passed a hash containing a Discord webhook
+structure.  Discord allows several different methods to post to a channel.
+At least one of the following components is required:
+
+=over
+
+=item * content
+
+Post a message to the channel.  The message can be up to 2000 Unicode
+characters in length.  Discord may format the message after receipt according
+to its usual Markdown rules.
+
+The value should be a scalar containing the message to post.
+
+C<content> can be combined with the other post methods as well, to attach
+a message along with an embed or file.
+
+=item * file
+
+Upload a file to the channel.
+
+The value should be a hash reference with two keys: C<name> for the desired
+filename, and C<data> for the raw data bytes of the file.  Discord uses
+the file extension to determine whether to display it as an image, video,
+download, etc.
+
+C<file> cannot be combined with C<embed>.
+
+=item * files
+
+Similar to C<file>, but accepts an array of file hashref instead.  (Do not
+combine C<file> with C<files>.)
+
+Discord allows up to 10 file attachments in one request.
+
+=item * embed
+
+Post "embedded rich content" to the channel.  This is useful for posting
+messages with image attachments, colorful borders or backgrounds, etc.
+
+The value should be an embed object (hashref) to post.  These values are
+not checked by WebService::Discord::Webhook.  For information on the expected
+data structure, refer to Discord's documentation on Channel Embed Objects:
+L<https://discordapp.com/developers/docs/resources/channel#embed-object>
+
+C<embed> cannot be combined with C<file>.
+
+=item * embeds
+
+Similar to C<embed>, but accepts an array of embed hashref instead.  (Do not
+combine C<embed> with C<embeds>.)
+
+=back
+
+Additionally, these optional parameters can be used to change the behavior
+of the webhook:
+
+=over
+
+=item * username:
+Override the default username of the webhook (i.e. post this message under a
+different name).  To make a permanent username change, see C<modify>.
+
+=item * avatar_url:
+Override the default avatar of the webhook (i.e. post this message using the
+avatar at avatar_url).  To upload a new avatar to Discord, see C<modify>.
+
+=item * tts:
+If set, posts as a TTS message.  TTS messages appear as normal, but will also
+be read aloud to users in the channel (if permissions allow).
+
+=back
+
+As a special case, if a scalar is passed to this function, it is assumed to
+be a regular text message to post via the "content" method.
+
+The return value for this function depends on the setting of C<wait> during
+webhook construction.  If C<wait> is False (default), the function returns
+immediately: parameters are checked for validity, but no attempt is made to
+verify that the message actually posted to the channel.  The function will
+return True.
+
+If C<wait> is True, function return is delayed until the message successfully
+posts.  The return value in this case is a hashref containing details about
+the posted message.
+
+=head2 execute_slack
+
+Executes a Slack-compatible Webhook.
+
+The function should be passed either a scalar (assumed to be the JSON string
+contents of the Slack webhook), or a hash containing a Slack webhook
+structure (will be encoded to JSON using C<JSON::PP>).
+
+More information about the format of a Slack webhook is available on the
+Slack API reference at L<https://api.slack.com/incoming-webhooks>.
+
+This function returns True on success, and is also affected by the value
+of C<wait>.  Typically a Slack webhook returns the string C<"ok"> on
+success.
+
+=head2 execute_github
+
+Executes a Github-compatible Webhook.
+
+The function should be passed a hash containing two keys: C<json> as the JSON
+string of a Github webhook, and C<event> as the string containing the name of
+the Github event.  The value for C<event> is passed to Discord in the
+C<X-GitHub-Event> header.
+
+More information about the format of a Github webhook is available on the
+Github API reference at L<https://developer.github.com/webhooks>.
+
+B<Note:>  Posting a message using the C<execute_github> function is currently
+a specially-cased feature of Discord.  The webhook always appears as a user
+named "GitHub" with a custom avatar, ignoring any existing styling.  Thus, it
+should NOT be used as a general-purpose posting function.  However, it may be
+useful to proxy messages from GitHub and repost them on Discord.
+
+This function returns True on success, and is also affected by the value
+of C<wait>.
+
+=head1 LICENSE
+
+This is released under the Artistic License.  See L<perlartistic>.
+
+=head1 AUTHOR
+
+Greg Kennedy - L<https://greg-kennedy.com/>
+

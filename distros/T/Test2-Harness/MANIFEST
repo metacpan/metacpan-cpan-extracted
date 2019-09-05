@@ -97,6 +97,9 @@ t/App/Yath/Command/times.t
 t/App/Yath/Command/watch.t
 t/App/Yath/Command/which.t
 t/App/Yath/Plugin.t
+t/App/Yath/Plugin/Git.script
+t/App/Yath/Plugin/Git.t
+t/App/Yath/Plugin/SysInfo.t
 t/App/Yath/Util.t
 t/HashBase.t
 t/Test2/Formatter/Stream.t

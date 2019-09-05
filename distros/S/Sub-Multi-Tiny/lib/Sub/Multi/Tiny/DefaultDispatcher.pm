@@ -1,6 +1,6 @@
 package Sub::Multi::Tiny::DefaultDispatcher;
 
-use 5.010001;
+use 5.006;
 use strict;
 use warnings;
 
@@ -9,7 +9,7 @@ use warnings;
 use Guard;
 use Sub::Multi::Tiny::Util qw(_hlog _line_mark_string);
 
-our $VERSION = '0.000003'; # TRIAL
+our $VERSION = '0.000004'; # TRIAL
 
 # Documentation {{{1
 

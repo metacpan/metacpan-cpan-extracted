@@ -23,10 +23,13 @@ Data-Object Singleton Declaration
 
   1;
 
+=inherits
+
+Data::Object::Class
+
 =description
 
-This package modifies the consuming package making it a singleton. This package
-inherits all behavior from L<Data::Object::Class>.
+This package modifies the consuming package making it a singleton.
 
 =cut
 

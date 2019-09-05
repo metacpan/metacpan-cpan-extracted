@@ -17,11 +17,14 @@ Functions for HashRefs
 
   use Data::Object::Hash::Func;
 
+=inherits
+
+Data::Object::Func
+
 =description
 
 Data::Object::Hash::Func is an abstract base class for function classes in the
-Data::Object::Hash::Func space. This package inherits all behavior from
-L<Data::Object::Func>.
+Data::Object::Hash::Func space.
 
 =cut
 

@@ -13,8 +13,6 @@ new
 
 =usage
 
-  # given \*main
-
   package My::Scalar;
 
   use parent 'Data::Object::Scalar::Base';
@@ -23,11 +21,11 @@ new
 
 =description
 
-The new method expects a scalar reference and returns a new class instance.
+Construct a new object.
 
 =signature
 
-new(ScalarRef $arg1) : Object
+new(Any $arg1) : Object
 
 =type
 

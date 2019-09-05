@@ -23,10 +23,13 @@ Data-Object Float Function (Gt) Class
 
   $func->execute;
 
+=inherits
+
+Data::Object::Float::Func
+
 =description
 
 Data::Object::Float::Func::Gt is a function object for Data::Object::Float.
-This package inherits all behavior from L<Data::Object::Float::Func>.
 
 =cut
 

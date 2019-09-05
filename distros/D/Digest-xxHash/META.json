@@ -4,13 +4,13 @@
       "Sanko Robinson <sanko@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4216",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "bsd"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Digest-xxHash",
    "prereqs" : {
@@ -34,7 +34,7 @@
    "provides" : {
       "Digest::xxHash" : {
          "file" : "lib/Digest/xxHash.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       }
    },
    "release_status" : "stable",
@@ -49,6 +49,6 @@
          "url" : "https://github.com/sanko/digest-xxhash"
       }
    },
-   "version" : "2.03",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "2.04",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

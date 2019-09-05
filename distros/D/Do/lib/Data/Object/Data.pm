@@ -1,10 +1,15 @@
 package Data::Object::Data;
 
-use Data::Object::Class;
+use 5.014;
+
+use strict;
+use warnings;
+
+use Moo;
 
 use parent 'Data::Object::Base';
 
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.50'; # VERSION
 
 # BUILD
 
@@ -184,7 +189,7 @@ Data::Object::Data
 
 =head1 ABSTRACT
 
-Data-Object Data Class
+Data-Object Data Extraction Class
 
 =cut
 
@@ -232,8 +237,15 @@ Data-Object Data Class
 
 This package provides methods for parsing and extracting pod-like data sections
 from any file or package. The pod-like syntax allows for using these sections
-anywhere in the source code and Perl properly ignoring them. This package
-inherits all behavior from L<Data::Object::Base>.
+anywhere in the source code and Perl properly ignoring them.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Data::Object::Base>
 
 =cut
 

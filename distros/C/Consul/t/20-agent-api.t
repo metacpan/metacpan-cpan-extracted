@@ -5,7 +5,7 @@ use strict;
 
 use Test::More;
 use Test::Exception;
-use Test::Consul 0.005;
+use Test::Consul 0.014;
 
 use Consul;
 
@@ -19,7 +19,7 @@ ok $agent, "got Agent API object";
 my $r;
 
 lives_ok { $r = $agent->self } "call to 'self' succeeded";
-is $r->member->name, "perl-test-consul", "member name is perl-test-consul";
+is $r->member->name, $tc->node_name, "member name is expected";
 is ref $r->config, "HASH", " config is a hashref";
 
 lives_ok { $r = $agent->members } "call to 'members' succeeded";

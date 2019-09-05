@@ -19,10 +19,13 @@ Data-Object Abstract Array Class
 
   my $array = Data::Object::Array::Base->new([1..9]);
 
+=inherits
+
+Data::Object::Base
+
 =description
 
-Data::Object::Array::Base provides routines for operating on Perl 5 array
-references. This package inherits all behavior from L<Data::Object::Base>.
+This package provides routines for operating on Perl 5 array references.
 
 =cut
 

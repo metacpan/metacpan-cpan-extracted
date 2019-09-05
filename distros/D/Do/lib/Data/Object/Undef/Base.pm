@@ -10,7 +10,7 @@ use Scalar::Util ();
 
 use parent 'Data::Object::Base';
 
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.50'; # VERSION
 
 # BUILD
 
@@ -56,8 +56,15 @@ Data-Object Abstract Undef Class
 
 =head1 DESCRIPTION
 
-Data::Object::Undef::Base provides routines for operating on Perl 5 undefined
-data. This package inherits all behavior from L<Data::Object::Base>.
+This package provides routines for operating on Perl 5 undefined data.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Data::Object::Base>
 
 =cut
 

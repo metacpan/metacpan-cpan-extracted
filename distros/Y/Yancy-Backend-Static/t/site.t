@@ -8,7 +8,7 @@ This tests a website built with the L<Yancy::Backend::Static> module.
 L<Yancy>
 
 =cut
-
+use utf8;
 use Test::More;
 use Test::Mojo;
 use Mojo::File qw( path );
@@ -34,9 +34,9 @@ $t->get_ok( '/index.html' )
     ->content_type_like( qr{^text/html} )
     ->text_is( h1 => 'Static Test Site' )
     ->or( sub { diag shift->tx->res->body } )
-    ->text_is( p => 'This is a static test site' )
+    ->text_is( p => '🐪' )
     ->or( sub { diag shift->tx->res->body } )
-    ->text_is( title => 'Static Test Site' )
+    ->text_is( title => 'Static Site ⚡' )
     ->or( sub { diag shift->tx->res->body } )
     ;
 
@@ -44,8 +44,8 @@ $t->get_ok( '/', 'index is default' )
     ->status_is( 200 )
     ->content_type_like( qr{^text/html} )
     ->text_is( h1 => 'Static Test Site' )
-    ->text_is( p => 'This is a static test site' )
-    ->text_is( title => 'Static Test Site' )
+    ->text_is( p => '🐪' )
+    ->text_is( title => 'Static Site ⚡' )
     ;
 
 $t->get_ok( '/about/', 'request for directory with trailing slash' )

@@ -1,10 +1,15 @@
 package Data::Object::Hash::Func::FilterExclude;
 
+use 5.014;
+
+use strict;
+use warnings;
+
 use Data::Object 'Class';
 
 extends 'Data::Object::Hash::Func';
 
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.50'; # VERSION
 
 # BUILD
 
@@ -68,8 +73,15 @@ Data-Object Hash Function (FilterExclude) Class
 =head1 DESCRIPTION
 
 Data::Object::Hash::Func::FilterExclude is a function object for
-Data::Object::Hash. This package inherits all behavior from
-L<Data::Object::Hash::Func>.
+Data::Object::Hash.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Data::Object::Hash::Func>
 
 =cut
 

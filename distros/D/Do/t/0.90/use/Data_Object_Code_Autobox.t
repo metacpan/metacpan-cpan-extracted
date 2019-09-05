@@ -11,7 +11,7 @@ Data::Object::Code::Autobox
 
 =abstract
 
-Data-Object Autoboxing for Code Objects
+Data-Object Code Class Autoboxing
 
 =synopsis
 

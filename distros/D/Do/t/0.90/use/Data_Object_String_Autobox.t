@@ -11,7 +11,7 @@ Data::Object::String::Autobox
 
 =abstract
 
-Data-Object Autoboxing for String Objects
+Data-Object String Class Autoboxing
 
 =synopsis
 

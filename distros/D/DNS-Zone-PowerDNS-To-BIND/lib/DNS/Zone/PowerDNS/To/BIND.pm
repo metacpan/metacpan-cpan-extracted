@@ -1,7 +1,7 @@
 package DNS::Zone::PowerDNS::To::BIND;
 
-our $DATE = '2019-09-04'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2019-09-05'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -219,21 +219,28 @@ sub gen_bind_zone_from_powerdns_db {
         @recs = sort {
             my $cmp;
 
-            # root node firsts
+            # sorting by host
+
+            # root (host='') node first
             my $a_is_root = $a->{name} eq '' ? 0 : 1;
             my $b_is_root = $b->{name} eq '' ? 0 : 1;
             return $cmp if $cmp = $a_is_root <=> $b_is_root;
 
-            # we need to sort wildcard records RIGHT above non-wildcard records;
-            # otherwise we might get, e.g. 'CNAME and other data' error, where
-            # there is '* A' or '* MX', followed by 'www CNAME' which will be
-            # rejected by bind because www gets CNAME as well as A or MX, while
-            # CNAME cannot be mixed with other record types.
-            my $a_cname_and_wildcard_score = $a->{type} eq 'CNAME' ? 1 : $a->{name} =~ /\*/ ? 2 : 3;
-            my $b_cname_and_wildcard_score = $b->{type} eq 'CNAME' ? 1 : $b->{name} =~ /\*/ ? 2 : 3;
-            return $cmp if $cmp = $a_cname_and_wildcard_score <=> $b_cname_and_wildcard_score;
+            # wildcard last
+            my $a_has_wildcard = $a->{name} =~ /\*/ ? 1 : 0;
+            my $b_has_wildcard = $b->{name} =~ /\*/ ? 1 : 0;
+            return $cmp if $cmp = $a_has_wildcard <=> $b_has_wildcard;
 
-            $a->{name} cmp $b->{name};
+            # sort by host
+            return $cmp if $cmp = $a->{name} cmp $b->{name};
+
+            # just to be nice: sort by record type: NS first, then A, then MX,
+            # then the rest
+            my $a_type = $a->{type} eq 'NS' ? 1 : $a->{type} eq 'A' ? 2 : $a->{type} eq 'MX' ? 3 : $a->{type};
+            my $b_type = $b->{type} eq 'NS' ? 1 : $b->{type} eq 'A' ? 2 : $b->{type} eq 'MX' ? 3 : $b->{type};
+            return $cmp if $cmp = $a_type cmp $b_type;
+
+            0;
         } @recs;
     }
 
@@ -279,7 +286,7 @@ DNS::Zone::PowerDNS::To::BIND - Generate BIND zone configuration from informatio
 
 =head1 VERSION
 
-This document describes version 0.006 of DNS::Zone::PowerDNS::To::BIND (from Perl distribution DNS-Zone-PowerDNS-To-BIND), released on 2019-09-04.
+This document describes version 0.007 of DNS::Zone::PowerDNS::To::BIND (from Perl distribution DNS-Zone-PowerDNS-To-BIND), released on 2019-09-05.
 
 =head1 SYNOPSIS
 

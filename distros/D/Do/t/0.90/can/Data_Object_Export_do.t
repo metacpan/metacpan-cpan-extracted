@@ -23,7 +23,7 @@ do
 
   # given func-args syntax
 
-  do('any', [1..4]); # Data::Object::Any
+  do('array', [1..4]); # Data::Object::Array
 
 =description
 

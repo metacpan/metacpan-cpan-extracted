@@ -1,5 +1,5 @@
 package Yancy::Backend::Static;
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 # ABSTRACT: Build a Yancy site from static Markdown files
 
 #pod =head1 SYNOPSIS
@@ -57,6 +57,7 @@ use Text::Markdown;
 use YAML ();
 use JSON::PP ();
 use Yancy::Util qw( match order_by );
+use Encode;
 
 has schema =>;
 has path =>;
@@ -237,7 +238,7 @@ sub _parse_content {
     my ( $self, $content ) = @_;
     my %item;
 
-    my @lines = split /\n/, $content;
+    my @lines = split /\n/, decode_utf8 $content;
     # YAML frontmatter
     if ( @lines && $lines[0] =~ /^---/ ) {
         shift @lines;
@@ -313,7 +314,7 @@ Yancy::Backend::Static - Build a Yancy site from static Markdown files
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -366,11 +367,21 @@ L<Yancy>, L<Statocles>
 
 Doug Bell <preaction@cpan.org>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Mohammad S Anwar
+=for stopwords Mohammad S Anwar Wojtek Bażant
+
+=over 4
+
+=item *
 
 Mohammad S Anwar <mohammad.anwar@yahoo.com>
+
+=item *
+
+Wojtek Bażant <wojtek.bazant@sanger.ac.uk>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

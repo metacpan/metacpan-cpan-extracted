@@ -1,6 +1,6 @@
 package Sub::Multi::Tiny::Util;
 
-use 5.010001;
+use 5.006;
 use strict;
 use warnings;
 
@@ -12,7 +12,7 @@ use vars::i [
 ];
 use vars::i '%EXPORT_TAGS' => { all => [@EXPORT, @EXPORT_OK] };
 
-our $VERSION = '0.000003'; # TRIAL
+our $VERSION = '0.000004'; # TRIAL
 
 
 # Documentation {{{1
@@ -132,19 +132,19 @@ will also be printed.
 =cut
 
 sub _hlog (&;$) {
-    return unless $VERBOSE >= ($_[1] // 1);
+    return unless $VERBOSE >= ($_[1] || 1);
 
     my @log = &{$_[0]}();
     return unless @log;
 
     chomp $log[$#log] if $log[$#log];
     # TODO add an option to number the lines of the output
-    my $msg = (join(' ', @log)) =~ s/^/# /gmr;
+    (my $msg = join(' ', @log)) =~ s/^/# /gm;
     if($VERBOSE>2) {
         my ($package, $filename, $line) = caller;
         $msg .= " (at $filename:$line)";
     }
-    say STDERR $msg;
+    print STDERR "$msg\n";
 } #_hlog()
 
 1;

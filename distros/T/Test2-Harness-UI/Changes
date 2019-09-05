@@ -1,3 +1,8 @@
+0.000018  2019-09-04 09:06:51-07:00 America/Los_Angeles
+
+    - Switch from tablesort to datatables
+    - Fix issues with tags that have spaces
+
 0.000017  2019-09-03 15:37:46-07:00 America/Los_Angeles
 
     - Fix CSS issues

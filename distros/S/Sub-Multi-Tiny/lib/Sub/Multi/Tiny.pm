@@ -9,7 +9,7 @@ package Sub::Multi::Tiny;
 # Test string for this module:
 # perl -Ilib -Mstrict -Mwarnings -MCarp::Always -E 'package main::multi; use Sub::Multi::Tiny qw($foo); sub try :M($foo, @bar) { ... }'
 
-use 5.010001;
+use 5.006;
 use strict;
 use subs ();
 use vars ();
@@ -19,7 +19,7 @@ use Import::Into;
 use Sub::Multi::Tiny::SigParse;
 use Sub::Multi::Tiny::Util ':all';
 
-our $VERSION = '0.000003'; # TRIAL
+our $VERSION = '0.000004'; # TRIAL
 
 # Documentation {{{1
 
@@ -35,8 +35,8 @@ Sub::Multi::Tiny - Multisubs/multimethods (multiple dispatch) yet another way!
         package main::my_multi;     # We're making main::my_multi()
         use Sub::Multi::Tiny qw($foo $bar);     # All possible params
 
-        sub first :M($foo, $bar) { # sub's name will be ignored
-            return $foo ** $bar;
+        sub first :M($foo, $bar) {  # sub's name will be ignored,
+            return $foo ** $bar;    # but can't match the one we're making
         }
 
         sub second :M($foo) {
@@ -55,7 +55,24 @@ candidate can have each arity.  This limitation will be removed in the future.
 =head1 DESCRIPTION
 
 Sub::Multi::Tiny is a library for making multisubs, aka multimethods,
-aka multiple-dispatch subroutines.
+aka multiple-dispatch subroutines.  Each multisub is defined in a
+single package.  Within that package, the individual implementations ("impls")
+are C<sub>s tagged with the C<:M> attribute.  The names of the impls are
+preserved but not used specifically by Sub::Multi::Tiny.
+
+Within a multisub package, the name of the sub being defined is available
+for recursion.  For example (using C<where>, not yet implemented):
+
+    {
+        package main::fib;
+        use Sub::Multi::Tiny qw($n);
+        sub base  :M($n where { $_ eq 0 })  { 1 }
+        sub other :M($n)                    { $n * fib($n-1) }
+    }
+
+This code creates function C<fib()> in package C<main>.  Within package
+C<main::fib>, function C<fib()> is an alias for C<main::fib()>.  It's easier
+to use than to explain!
 
 =head1 FUNCTIONS
 
@@ -86,6 +103,12 @@ INIT {
 
         eval { no strict 'refs'; *{$multisub_fullname} = $dispatcher };
         die "Could not assign dispatcher for $multisub_fullname\:\n$@" if $@;
+        do {
+            no strict 'refs';
+            no warnings 'redefine';
+            my $target_name = "$hr->{defined_in}\::$hr->{subname}";
+            *{$target_name} = $dispatcher;
+        };
     } #foreach multisub
 } #CHECK
 
@@ -139,10 +162,21 @@ sub import {
 
     # Set up the :M attribute in $multi_package if it doesn't
     # exist yet.
-    unless(eval { no strict 'refs'; defined &{$multi_package . '::M'} }) {
+    if(eval { no strict 'refs'; defined &{$multi_package . '::M'} }) {
+        die "Cannot redefine M in $multi_package";
+    } else {
         _hlog { "Making $multi_package attr M" } 2;
         eval(_make_M($multi_package));
         die $@ if $@;
+    }
+
+    # Set up $subname() in $multi_package, which will be aliased to the
+    # dispatcher.
+    if(eval { no strict 'refs'; defined &{"$multi_package\::$subname"} }) {
+        die "Cannot redefine $subname in $multi_package";
+    } else {
+        _hlog { "Making $multi_package\::$subname stub" } 2;
+        do { no strict 'refs'; *{"$multi_package\::$subname"} = sub {} };
     }
 } #import()
 

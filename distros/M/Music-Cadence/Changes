@@ -1,7 +1,10 @@
 Revision history for Music-Cadence
 
+0.1307 2019-09-04 11:57:54
+    - Improve documentation.
+
 0.1306 2019-08-31 19:37:45
-    - Convert to midi format in the _invert_chord() function.
+    - Convert to midi format in the ->_invert_chord method.
 
 0.1305 2019-08-31 16:17:38
     - Fix POD.

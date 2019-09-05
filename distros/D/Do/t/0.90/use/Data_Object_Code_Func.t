@@ -17,11 +17,14 @@ Functions for CodeRefs
 
   use Data::Object::Code::Func;
 
+=inherits
+
+Data::Object::Func
+
 =description
 
 Data::Object::Code::Func is an abstract base class for function classes in the
-Data::Object::Code::Func space. This package inherits all behavior from
-L<Data::Object::Func>.
+Data::Object::Code::Func space.
 
 =cut
 

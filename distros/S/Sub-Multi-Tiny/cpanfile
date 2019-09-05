@@ -1,4 +1,6 @@
-requires 'perl', '5.010001';
+requires 'perl', '5.008001';
+    # We only need 5.6, but Minilla's generated MBT Build.PL wants 5.8.1 -
+    # see https://github.com/tokuhirom/Minilla/issues/167
 
 requires 'attributes';
 requires 'Carp';

@@ -1,5 +1,13 @@
 Changelog for Yancy-Backend-Static
 
+0.006     2019-09-04 21:08:57-05:00 America/Chicago
+
+    [Fixed]
+
+    - Correctly decode Markdown files as UTF-8 so that high-byte
+      characters render properly on the webapp. Thanks @wbazant!
+      [Github #2]
+
 0.005     2019-08-20 20:41:57-05:00 America/Chicago
 
     [Fixed]

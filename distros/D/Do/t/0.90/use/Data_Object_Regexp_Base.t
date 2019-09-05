@@ -21,10 +21,13 @@ Data-Object Abstract Regexp Class
 
   my $re = My::Regexp->new(qr(\w+));
 
+=inherits
+
+Data::Object::Base
+
 =description
 
-Data::Object::Regexp::Base provides routines for operating on Perl 5 regular
-expressions. This package inherits all behavior from L<Data::Object::Base>.
+This package provides routines for operating on Perl 5 regular expressions.
 
 =cut
 

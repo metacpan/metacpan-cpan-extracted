@@ -23,11 +23,14 @@ Data-Object String Function (Reverse) Class
 
   $func->execute;
 
+=inherits
+
+Data::Object::String::Func
+
 =description
 
 Data::Object::String::Func::Reverse is a function object for
-Data::Object::String. This package inherits all behavior from
-L<Data::Object::String::Func>.
+Data::Object::String.
 
 =cut
 

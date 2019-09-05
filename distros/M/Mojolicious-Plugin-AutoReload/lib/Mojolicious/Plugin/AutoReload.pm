@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::AutoReload;
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 # ABSTRACT: Automatically reload open browser windows when your application changes
 
 #pod =head1 SYNOPSIS
@@ -107,11 +107,12 @@ sub register {
         my ( $c ) = @_;
         if ( $app->mode eq 'development' && !$c->stash( 'plugin.auto_reload.disable' ) ) {
             $c->stash( 'plugin.auto_reload.disable' => 1 );
-            return $c->render_to_string( inline => unindent trim( <<'ENDHTML' ) );
+            my $auto_reload_end_point = $c->url_for( 'auto_reload' );
+            return unindent trim( <<"ENDHTML" );
                 <script>
                     // If we lose our websocket connection, the web server must
                     // be restarting, and we should reload the page
-                    var autoReloadWs = new WebSocket( "ws://" + location.host + "<%== url_for( 'auto_reload' ) %>" );
+                    var autoReloadWs = new WebSocket( "ws://" + location.host + "$auto_reload_end_point" );
                     autoReloadWs.addEventListener( "close", function (event) {
                         // Wait one second then force a reload from the server
                         setTimeout( function () { location.reload(true); }, 1000 );
@@ -138,7 +139,7 @@ Mojolicious::Plugin::AutoReload - Automatically reload open browser windows when
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -204,6 +205,12 @@ L<Mojolicious>
 =head1 AUTHOR
 
 Doug Bell <preaction@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Zeeshan Muhammad
+
+Zeeshan Muhammad <zeeshan@dkhr.com>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,5 +1,7 @@
 package Data::Object::Rule;
 
+use 5.014;
+
 use strict;
 use warnings;
 
@@ -7,10 +9,7 @@ use Data::Object;
 
 use parent 'Moo::Role';
 
-our $VERSION = '1.09'; # VERSION
-
-# BUILD
-# METHODS
+our $VERSION = '1.50'; # VERSION
 
 1;
 
@@ -50,8 +49,15 @@ This package modifies the consuming package making it a L<Moo> role, and is
 used to allow you to specify rules for the consuming class. There is
 functionally no difference between a role and a rule, so this concept only
 exists to differentiate between that which describes an interface (rules) and
-that which mixes-in behaviors. This package inherits all behavior from
-L<Moo::Role>.
+that which mixes-in behaviors.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Moo::Role>
 
 =cut
 

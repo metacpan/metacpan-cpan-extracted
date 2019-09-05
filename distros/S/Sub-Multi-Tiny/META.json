@@ -56,7 +56,7 @@
             "Import::Into" : "1.002005",
             "Text::Balanced" : "2.01",
             "attributes" : "0",
-            "perl" : "5.010001",
+            "perl" : "5.008001",
             "strict" : "0",
             "subs" : "0",
             "vars" : "0",
@@ -76,18 +76,18 @@
    "provides" : {
       "Sub::Multi::Tiny" : {
          "file" : "lib/Sub/Multi/Tiny.pm",
-         "version" : "0.000003"
+         "version" : "0.000004"
       },
       "Sub::Multi::Tiny::DefaultDispatcher" : {
          "file" : "lib/Sub/Multi/Tiny/DefaultDispatcher.pm",
-         "version" : "0.000003"
+         "version" : "0.000004"
       },
       "Sub::Multi::Tiny::SigParse" : {
          "file" : "lib/Sub/Multi/Tiny/SigParse.pm"
       },
       "Sub::Multi::Tiny::Util" : {
          "file" : "lib/Sub/Multi/Tiny/Util.pm",
-         "version" : "0.000003"
+         "version" : "0.000004"
       }
    },
    "release_status" : "stable",
@@ -101,7 +101,7 @@
          "web" : "https://github.com/cxw42/Sub-Multi-Tiny"
       }
    },
-   "version" : "0.000003",
+   "version" : "0.000004",
    "x_authority" : "cpan:CXW",
    "x_serialization_backend" : "JSON::PP version 2.27400_02",
    "x_static_install" : 0

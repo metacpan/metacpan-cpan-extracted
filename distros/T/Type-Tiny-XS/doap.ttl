@@ -25,7 +25,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Type-Tiny-XS";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-009>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-010>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-011>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-012>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-013>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-014>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-015>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-009>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-010>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-011>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-012>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-013>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-014>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-015>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-016>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-type-tiny-xs>;
@@ -288,6 +288,29 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Type-Tiny-XS-0.015.tar.gz>;
 	doap:revision        "0.015"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-016>
+	a                    doap:Version;
+	dc:identifier        "Type-Tiny-XS-0.016"^^xsd:string;
+	dc:issued            "2019-09-05"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix Int check on large unsigned integers.";
+			doap-changeset:blame <http://purl.org/NET/cpan-uri/person/haarg>;
+			doap-changeset:fixes <tdb:2014:https://github.com/tobyink/p5-type-tiny-xs/issues/8>;
+			rdfs:seeAlso <https://github.com/tobyink/p5-type-tiny-xs/pull/9>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Type-Tiny-XS-0.016.tar.gz>;
+	doap:revision        "0.016"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/haarg>
+	a                    foaf:Person;
+	foaf:name            "Graham Knop";
+	foaf:nick            "HAARG";
+	foaf:page            <https://metacpan.org/author/HAARG>.
 
 <http://purl.org/NET/cpan-uri/person/jandrew>
 	a                    foaf:Person;

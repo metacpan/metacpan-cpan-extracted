@@ -1,8 +1,7 @@
----
-title: Static Test Site
+{"title": "Static Site ⚡"}
 ---
 
 # Static Test Site
 
-This is a static test site
+🐪
 

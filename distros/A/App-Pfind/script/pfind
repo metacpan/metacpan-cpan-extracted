@@ -32,7 +32,9 @@ are encountered.
 
 =head1 DESCRIPTION
 
-TODO
+B<pfind> is a replacement for the standard B<find> command where the countless
+flags and options are mostly all replaced by a single option (B<--exec>) that 
+can execute arbitrary Perl code.
 
 See examples of B<pfind> in action below, in the L</EXAMPLES> section.
 
@@ -85,6 +87,25 @@ directory.
 
 The opposite option is B<--no-depth-first> (or B<--nod>).
 
+=item B<-t> I<types>, B<--type>
+
+Filter the files on which the actions should be executed. This argument can
+receive a list of characters defining type of files to accept. There should be
+no separators. Alternatively the option can be passed multiple times.
+
+Valid values for I<types>: C<f>, a regular file; C<d>, a directory; C<l>, a
+symbolic link; C<b>, a block special file; C<c>, a character special file; C<p>,
+a fifo file (pipe); C<s>, a socket.
+
+Note that these types are not mutually exclusive. If multiple types are passed,
+only files that match all the types will be accepted. A type can be given in
+upper-case to reverse its meaning (excluding the files of that type).
+
+When a file is filtered, the code given to B<--exec> will not be executed for
+that file but, if this file is a directory, the B<--pre> and B<--post> code will
+still execute. Filtering directories will also not prevent from recursing in
+them (you can use the B<--no-recurse> option for that).
+
 =item B<-f>, B<--follow>
 
 When this option is passed, symlinks are followed (by default they are treated
@@ -114,6 +135,13 @@ path.
 Print the argument of this function after each call of the Perl C<print>
 function. This defaults to a new-line. Technically this option is setting the
 C<$\> variable in Perl.
+
+=item B<--no-recurse>, B<-nor>
+
+Do not recurse into directories given on the command line. These directories are
+still processed like normal files but not their content.
+
+This option cannot be used when B<--depth-first> is passed.
 
 =item B<-B> I<code>, B<--BEGIN>
 
@@ -157,9 +185,52 @@ Print this help message and exits. Note: the help message printed will be much
 improved if you have the B<perldoc> program installed (sometimes from a
 B<perl-doc> package).
 
+=item B<-v>, B<--verbose>
+
+Print the version of the program and exit.
+
 =item B<--version>
 
 Print the version of the program and exit.
+
+=back
+
+=head1 PERL ENVIRONMENT
+
+In addition to the variables listed above (C<$_>, C<$name>, and C<$dir>), the
+Perl environment used to execute the code provided to the B<--exec>, B<--BEGIN>,
+B<--END>, B<--pre>, and B<--post > flags will contain the following methods.
+
+=over 4
+
+=item C<cp> and C<mv>
+
+These methods (coming from the L<File::Copy> module) both takes two arguments
+(two file names) and copy or move the first file to the second one (in the case
+of C<mv>, the second argument can also be a directory name, that must already
+exists).
+
+=item C<mkdir> and C<rmdir>
+
+These two functions exist by default in Perl (L<mkdir> and L<rmdir>) but
+improved versions that can take more than one arguments are provided.
+
+If no arguments are passed, use C<$_>.
+
+=item C<rm>
+
+This function takes a list of files and directories and delete them. While it is
+built on top of the C<remove_tree> function from L<File::Path>, it will only
+delete files or empty directories and will recurse in non-empty directories.
+
+If no arguments are passed, use C<$_>.
+
+=item C<rmtree>
+
+An alias to the standand C<remove_tree> function from L<File::Path>. This takes
+a lis of files or directories and delete them all recursively. Use with caution!
+
+If no arguments are passed, use C<$_>.
 
 =back
 
@@ -186,6 +257,21 @@ themselves:
 This example prints the name of all symbolic links whose targets are invalid:
 
   pfind -e 'print $name if -l && !-e'
+
+Using the B<--type> option, the same example could be written:
+
+  pfind -t l -e 'print $name unless -e'
+
+Rename all the file in the current folder, replacing C<_> by C<-> but do not
+recurse into sub-directories:
+
+  pfind -e '$r = s/_/-/gr; system "mv \"$_\" \"$r\""' -e 'prune unless /\./' .
+
+Print the name of all the folders that don't contain a particular file called
+F<somefile.ext>:
+
+  pfind -e '$a{$dir}++ if /somefile.ext/' -pre '$a{$_} = 0' \
+        -post 'print unless $a{$_}' .
 
 =head1 AUTHOR
 
@@ -221,7 +307,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl(1)>, L<find(1)>, L<exec(1)>,
+L<perl(1)>, L<find(1)>, L<xargs(1)>,
 L<File::Find|https://perldoc.perl.org/file/find.html>
 
 =cut

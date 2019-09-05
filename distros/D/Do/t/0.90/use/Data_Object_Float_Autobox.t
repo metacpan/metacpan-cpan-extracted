@@ -11,7 +11,7 @@ Data::Object::Float::Autobox
 
 =abstract
 
-Data-Object Autoboxing for Float Objects
+Data-Object Float Class Autoboxing
 
 =synopsis
 

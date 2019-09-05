@@ -7,12 +7,10 @@ use_ok 'Data::Object::Export';
 subtest 'test module' => sub {
   can_ok 'Data::Object::Export' => qw(
     load
-    data_any
     data_array
     data_code
     data_float
     data_hash
-    data_integer
     data_number
     data_scalar
     data_string
@@ -25,12 +23,10 @@ subtest 'test module' => sub {
     type_code
     type_float
     type_hash
-    type_integer
     type_number
     type_scalar
     type_string
     type_undef
-    type_any
   );
 };
 

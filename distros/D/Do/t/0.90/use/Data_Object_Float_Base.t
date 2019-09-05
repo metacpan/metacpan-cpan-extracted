@@ -21,11 +21,13 @@ Data-Object Abstract Float Class
 
   my $float = My::Float->new(9.9999);
 
+=inherits
+
+Data::Object::Base
+
 =description
 
-Data::Object::Float::Base provides routines for operating on Perl 5
-floating-point data. This package inherits all behavior from
-L<Data::Object::Base>.
+This package provides routines for operating on Perl 5 floating-point data.
 
 =cut
 

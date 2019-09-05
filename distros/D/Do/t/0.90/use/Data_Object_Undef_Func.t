@@ -17,11 +17,14 @@ Functions for Undef Data
 
   use Data::Object::Undef::Func;
 
+=inherits
+
+Data::Object::Func
+
 =description
 
 Data::Object::Undef::Func is an abstract base class for function classes in the
-Data::Object::Undef::Func space. This package inherits all behavior from
-L<Data::Object::Func>.
+Data::Object::Undef::Func space.
 
 =cut
 

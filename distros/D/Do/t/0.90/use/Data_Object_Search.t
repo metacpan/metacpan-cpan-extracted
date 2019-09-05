@@ -27,10 +27,14 @@ Data-Object Search Class
     $initial_string
   ]);
 
+=inherits
+
+Data::Object::Array
+
 =description
 
 This package provides routines for introspecting the results of a regexp search
-operation. This package inherits all behavior from L<Data::Object::Array>.
+operation.
 
 =cut
 

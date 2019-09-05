@@ -23,10 +23,13 @@ Data-Object Hash Function (Head) Class
 
   $func->execute;
 
+=inherits
+
+Data::Object::Hash::Func
+
 =description
 
 Data::Object::Hash::Func::Head is a function object for Data::Object::Hash.
-This package inherits all behavior from L<Data::Object::Hash::Func>.
 
 =cut
 

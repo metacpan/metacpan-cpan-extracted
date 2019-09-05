@@ -1,4 +1,4 @@
-use 5.010001;
+use 5.006;
 use strict;
 use warnings;
 use Test::Fatal;
@@ -22,7 +22,7 @@ use Test::More;
 
 }
 
-ok eval { \&main::my_multi }, 'my_multi() exists';
+ok do { no strict 'refs'; defined *{"main::my_multi"}{CODE} }, 'my_multi() exists';
 
 like exception { my_multi; }, qr/No candidate.*arity 0/, 'arity 0';
 like exception { my_multi(1,2,3); }, qr/No candidate.*arity 3/, 'arity 3';

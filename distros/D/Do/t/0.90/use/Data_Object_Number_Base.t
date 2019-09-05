@@ -21,10 +21,13 @@ Data-Object Abstract Number Class
 
   my $number = My::Number->new(1_000_000);
 
+=inherits
+
+Data::Object::Base
+
 =description
 
-Data::Object::Number::Base provides routines for operating on Perl 5 numeric
-data. This package inherits all behavior from L<Data::Object::Base>.
+This package provides routines for operating on Perl 5 numeric data.
 
 =cut
 

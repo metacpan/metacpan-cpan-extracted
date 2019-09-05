@@ -2,7 +2,7 @@ package App::Yath::Command::replay;
 use strict;
 use warnings;
 
-our $VERSION = '0.001093';
+our $VERSION = '0.001095';
 
 use Test2::Util qw/pkg_to_file/;
 
@@ -497,6 +497,8 @@ Use "+" to give a fully qualified module name. Without "+" "Test2::Harness::Rend
 =over 4
 
 =item -pPlugin
+
+=item -pPlugin=arg1,arg2,...
 
 =item -p+My::Plugin
 

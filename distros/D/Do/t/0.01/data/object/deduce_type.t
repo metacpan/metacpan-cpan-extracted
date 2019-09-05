@@ -3,7 +3,6 @@ use warnings;
 use Test::More;
 
 plan skip_all => "Test Error: $@" unless eval q(
-    require Data::Object::Any;
     require Data::Object::Array;
     require Data::Object::Code;
     require Data::Object::Float;
@@ -40,10 +39,10 @@ subtest 'test the deduce_type function' => sub {
   is $integer, 'NUMBER';
 
   my $pos_number = deduce_type '+12345';
-  is $pos_number, 'INTEGER';
+  is $pos_number, 'NUMBER';
 
   my $neg_number = deduce_type '-12345';
-  is $neg_number, 'INTEGER';
+  is $neg_number, 'NUMBER';
 
   my $regexp = deduce_type qr/\w+/;
   is $regexp, 'REGEXP';

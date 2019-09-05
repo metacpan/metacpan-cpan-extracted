@@ -1,4 +1,3 @@
-[![Build Status](https://travis-ci.org/sanko/digest-xxhash.svg?branch=master)](https://travis-ci.org/sanko/digest-xxhash)
 # NAME
 
 Digest::xxHash - xxHash Implementation For Perl
@@ -79,6 +78,6 @@ License-wise, I don't actually care about the wrapper I've written.
 
 # AUTHOR
 
-Sanko Robinson &lt;sanko@cpan.org>
+Sanko Robinson <sanko@cpan.org>
 
 xxHash by Yann Collet.

@@ -23,11 +23,14 @@ Data-Object Number Function (Defined) Class
 
   $func->execute;
 
+=inherits
+
+Data::Object::Number::Func
+
 =description
 
 Data::Object::Number::Func::Defined is a function object for
-Data::Object::Number. This package inherits all behavior from
-L<Data::Object::Number::Func>.
+Data::Object::Number.
 
 =cut
 

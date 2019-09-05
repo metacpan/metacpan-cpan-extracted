@@ -19,10 +19,14 @@ Data-Object Namespace Registry
 
   my $registry = Data::Object::Registry->new;
 
+=inherits
+
+Data::Object::Base
+
 =description
 
 This package is a singleton that holds mappings for namespaces and type
-libraries. This package inherits all behavior from L<Data::Object::Base>.
+libraries.
 
 =cut
 

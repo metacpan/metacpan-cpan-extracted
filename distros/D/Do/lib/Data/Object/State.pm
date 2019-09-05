@@ -1,11 +1,13 @@
 package Data::Object::State;
 
+use 5.014;
+
 use strict;
 use warnings;
 
-use parent 'Data::Object::Class';
+use parent 'Moo';
 
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.50'; # VERSION
 
 # BUILD
 
@@ -14,7 +16,7 @@ sub import {
 
   my $target = caller;
 
-  eval "package $target; use Data::Object::Class; 1;";
+  eval "package $target; use Moo; 1;";
 
   no strict 'refs';
 
@@ -82,8 +84,15 @@ Data-Object Singleton Declaration
 
 =head1 DESCRIPTION
 
-This package modifies the consuming package making it a singleton. This package
-inherits all behavior from L<Data::Object::Class>.
+This package modifies the consuming package making it a singleton.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Data::Object::Class>
 
 =cut
 

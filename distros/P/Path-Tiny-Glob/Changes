@@ -1,5 +1,15 @@
 Revision history for Path-Tiny-Glob
 
+0.2.0 2019-09-04
+ [BUG FIXES]
+ - pathglob() was returning strings, not Path::Tiny objects.
+
+ [NEW FEATURES]
+ - pathglob can be set to return all files directly.
+
+ [STATISTICS]
+ - code churn: 7 files changed, 81 insertions(+), 42 deletions(-)
+
 0.1.0 2019-09-03
  [NEW FEATURES]
  - path can now be an array ref of segments. Segments can be strings,

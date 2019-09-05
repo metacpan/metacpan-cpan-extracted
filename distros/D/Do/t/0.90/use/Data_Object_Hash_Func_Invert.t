@@ -23,10 +23,13 @@ Data-Object Hash Function (Invert) Class
 
   $func->execute;
 
+=inherits
+
+Data::Object::Hash::Func
+
 =description
 
 Data::Object::Hash::Func::Invert is a function object for Data::Object::Hash.
-This package inherits all behavior from L<Data::Object::Hash::Func>.
 
 =cut
 

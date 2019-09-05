@@ -17,11 +17,14 @@ Functions for RegexpRefs
 
   use Data::Object::Regexp::Func;
 
+=inherits
+
+Data::Object::Func
+
 =description
 
 Data::Object::Regexp::Func is an abstract base class for function classes in
-the Data::Object::Regexp::Func space. This package inherits all behavior from
-L<Data::Object::Func>.
+the Data::Object::Regexp::Func space.
 
 =cut
 

@@ -22,7 +22,7 @@ use Storable 'dclone';
 use HTML::Selector::XPath 'selector_to_xpath';
 use HTTP::Cookies::ChromeDevTools;
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 our @CARP_NOT;
 
 =encoding utf-8
@@ -58,7 +58,7 @@ DevTools|https://developers.google.com/web/tools/chrome-devtools/>.
 The Chrome browser provides advanced abilities useful for automating modern
 web applications that are not (yet) possible with L<WWW::Mechanize> alone:
 
-=over
+=over 4
 
 =item *
 
@@ -509,7 +509,7 @@ sub default_executable_names( $class, @other ) {
         push @program_names,
           $^O =~ /mswin/i ? 'chrome.exe'
         : $^O =~ /darwin/i ? 'Google Chrome'
-        : ('google-chrome', 'chromium-browser')
+        : ('google-chrome', 'chromium-browser', 'chromium')
     };
     @program_names
 }
@@ -1465,6 +1465,17 @@ accessing the response body.
 
 Note that Chrome does not support download of files through the API.
 
+=head3 Options
+
+=over 4
+
+=item *
+
+C<intrapage> - Override the detection of whether to wait for a HTTP response
+or not. Setting this will never wait for an HTTP response.
+
+=back
+
 =cut
 
 sub update_response($self, $response) {
@@ -2290,7 +2301,7 @@ sub signal_http_status {
 
 =head2 C<< $mech->success() >>
 
-    $mech->get('http://google.com');
+    $mech->get('https://google.com');
     print "Yay"
         if $mech->success();
 
@@ -2308,7 +2319,7 @@ sub success {
 
 =head2 C<< $mech->status() >>
 
-    $mech->get('http://google.com');
+    $mech->get('https://google.com');
     print $mech->status();
     # 200
 
@@ -3434,6 +3445,11 @@ This is useful if your document ids contain characters that
 do look like CSS selectors. It is equivalent to
 
     xpath => qq{//*[\@id="$id"]}
+
+=item *
+
+C<intrapage> - Override the detection of whether to wait for a HTTP response
+or not. Setting this will never wait for an HTTP response.
 
 =back
 

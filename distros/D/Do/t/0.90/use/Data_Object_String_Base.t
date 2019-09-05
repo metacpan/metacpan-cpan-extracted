@@ -21,10 +21,13 @@ Data-Object Abstract String Class
 
   my $string = My::String->new('abcedfghi');
 
+=inherits
+
+Data::Object::Base
+
 =description
 
-Data::Object::String::Base provides routines for operating on Perl 5 string
-data. This package inherits all behavior from L<Data::Object::Base>.
+This package provides routines for operating on Perl 5 string data.
 
 =cut
 

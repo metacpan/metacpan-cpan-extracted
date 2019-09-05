@@ -23,7 +23,7 @@ with qw(
 
 use parent 'Data::Object::Number::Base';
 
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.50'; # VERSION
 
 # METHODS
 
@@ -53,10 +53,21 @@ Data-Object Number Class
 
 =head1 DESCRIPTION
 
-This package provides routines for operating on Perl 5 numeric data. This
-package inherits all behavior from L<Data::Object::Number::Base>.
+This package provides routines for operating on Perl 5 numeric data.
 
-This package assumes all behavior from the following roles:
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Data::Object::Number::Base>
+
+=cut
+
+=head1 INTEGRATES
+
+This package integrates behaviors from:
 
 L<Data::Object::Role::Detract>
 

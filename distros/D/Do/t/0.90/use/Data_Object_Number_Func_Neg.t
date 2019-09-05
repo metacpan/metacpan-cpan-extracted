@@ -23,10 +23,13 @@ Data-Object Number Function (Neg) Class
 
   $func->execute;
 
+=inherits
+
+Data::Object::Number::Func
+
 =description
 
 Data::Object::Number::Func::Neg is a function object for Data::Object::Number.
-This package inherits all behavior from L<Data::Object::Number::Func>.
 
 =cut
 

@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Convert notes and chords to Roman numeral notation
 
-our $VERSION = '0.1106';
+our $VERSION = '0.1200';
 
 use List::MoreUtils qw/ any first_index /;
 use Moo;
@@ -102,7 +102,7 @@ sub parse {
     print "NOTES: @notes\n" if $self->verbose;
 
     # Convert a diminished chord
-    $chord =~ s/dim/o/;
+    $chord =~ s/dim/o/; # TODO: Handle U+00F8 too
 
     # Get just the note part of the chord name
     ( my $note = $chord ) =~ s/^($note_re).*$/$1/;
@@ -116,21 +116,23 @@ sub parse {
     }
     $accidental ||= '';
     my $roman = $roman[$position];
+    print "ROMAN 1: $roman\n" if $self->verbose;
 
     # Get everything but the note part
     ( my $decorator = $chord ) =~ s/^(?:$note_re)(.*)$/$1/;
 
     # Are we minor or diminished?
-    my $minor = $decorator =~ /[mo]/ ? 1 : 0;
-    print "NOTE: $note, CHORD: $chord, POSN: $position, ACCI: $accidental, ROMAN: $roman, DECO: $decorator\n" if $self->verbose;
+    my $minor = $decorator =~ /[-mo]/ ? 1 : 0;
+    print "NOTE: $note, MINOR: $minor, CHORD: $chord, POSN: $position, ACCI: $accidental, DECO: $decorator\n" if $self->verbose;
 
     # Convert the case of the roman representation based on minor or major
     if ( $self->chords ) {
-        $roman = $minor ? lc($roman) : uc($roman);
+        $roman = $minor && $decorator !~ /maj/i ? lc($roman) : uc($roman);
     }
 
     # Add any accidental found in a non-scale note
     $roman = $accidental . $roman if $accidental;
+    print "ROMAN 2: $roman\n" if $self->verbose;
 
     if ( $decorator =~ /maj/i || $decorator =~ /min/i ) {
         $decorator = lc $decorator;
@@ -138,6 +140,7 @@ sub parse {
     else {
         # Drop the minor and major part of the chord name
         $decorator =~ s/M//i;
+        $decorator =~ s/-//i;
     }
 
     # Handle these unfortunate edge cases
@@ -151,18 +154,19 @@ sub parse {
     $roman =~ s/#v\b/bvi/;
     $roman =~ s/#VI\b/bVII/;
     $roman =~ s/#vi\b/bvii/;
+    print "ROMAN 3: $roman\n" if $self->verbose;
 
     # A remaining note name is a bass decorator
     if ( $decorator =~ /($note_re)/ ) {
         my $name = $1;
         $position = first_index { $_ eq $name } @notes;
-        print "NOTE: $name, POSN: $position\n" if $self->verbose;
+        print "BASS NOTE: $name, POSN: $position\n" if $self->verbose;
         if ( $position >= 0 ) {
             $decorator =~ s/$note_re/$roman[$position]/;
         }
         else {
             ( $position, $accidental ) = _pos_acc( $name, $position, \@notes );
-            print "POSN: $position, ACCI: $accidental\n" if $self->verbose;
+            print "NEW POSN: $position, ACCI: $accidental\n" if $self->verbose;
             my $bass = $accidental . $roman[$position];
             $decorator =~ s/$note_re/$bass/;
 
@@ -198,12 +202,12 @@ sub parse {
                 $decorator =~ s/#VI\b/bvii/i;
             }
         }
-        print "DECO: $decorator\n" if $self->verbose;
+        print "NEW DECO: $decorator\n" if $self->verbose;
     }
 
     # Append the remaining decorator to the roman representation
     $roman .= $decorator;
-    print "FINAL ROMAN: $roman\n" if $self->verbose;
+    print "ROMAN 4: $roman\n" if $self->verbose;
 
     return $roman;
 }
@@ -280,7 +284,7 @@ Music::ToRoman - Convert notes and chords to Roman numeral notation
 
 =head1 VERSION
 
-version 0.1106
+version 0.1200
 
 =head1 SYNOPSIS
 
@@ -365,9 +369,9 @@ Note on which the C<major> scale is based.  Default: C<'C'>
 This must be an uppercase letter from C<A-G> and followed by a C<#> or
 C<b>.
 
-This attribute is required when the chord to B<parse> is a half-step
-below a double-accidental (see the note above under L</scale_note>)
-and the B<scale_name> is not C<major> (or C<ionian>).
+This attribute is required when the B<scale_note> is set to a
+double-accidental, and the B<scale_name> is not C<major> (or
+C<ionian>).
 
 =head2 chords
 
@@ -418,9 +422,9 @@ A diminished chord may be given as either C<o> or C<dim>.
 If the B<chords> attribute is set to C<0>, the B<scale_name> is used
 to figure out the correct Roman numeral representation.
 
-If the chord to parse is a half-step below a double-accidental (see
-L</scale_note> above), and the B<scale_name> is not C<major> (or
-C<ionian>), the B<major_tonic> must be set in the constructor.
+If the B<scale_note> is a double-accidental, and the B<scale_name> is
+not C<major> (or C<ionian>), the B<major_tonic> must be set in the
+constructor.
 
 =head1 SEE ALSO
 

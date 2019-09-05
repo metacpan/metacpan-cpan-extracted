@@ -9,7 +9,7 @@ use Carp;
 use List::Util qw(first);
 use WebService::Linode::Base;
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 our @ISA     = ("WebService::Linode::Base");
 our $AUTOLOAD;
 
@@ -27,7 +27,7 @@ my $validation = {
     avail => {
         datacenters => [ [], [] ],
         distributions => [ [], [ 'distributionid' ] ],
-        kernels => [ [], [ 'isxen', 'kernelid' ] ],
+        kernels => [ [], [ 'iskvm', 'isxen' ] ],
         linodeplans => [ [], [ 'planid' ] ],
         nodebalancers => [ [], [] ],
         stackscripts => [ [], [qw( distributionid distributionvendor keywords )] ],
@@ -39,10 +39,10 @@ my $validation = {
         update => [ [ 'domainid' ], [qw( axfr_ips description domain expire_sec lpm_displaygroup master_ips refresh_sec retry_sec soa_email status ttl_sec type )] ],
     },
     domain_resource => {
-        create => [ [ 'domainid', 'type' ], [qw( name port priority protocol target ttl_sec weight )] ],
+        create => [ [ 'domainid', 'type' ], [qw( name port priority protocol tag target ttl_sec weight )] ],
         delete => [ [ 'domainid', 'resourceid' ], [] ],
         list => [ [ 'domainid' ], [ 'resourceid' ] ],
-        update => [ [ 'resourceid' ], [qw( domainid name port priority protocol target ttl_sec weight )] ],
+        update => [ [ 'resourceid' ], [qw( domainid name port priority protocol tag target ttl_sec weight )] ],
     },
     image => {
         delete => [ [ 'imageid' ], [] ],
@@ -51,9 +51,10 @@ my $validation = {
     },
     linode => {
         boot => [ [ 'linodeid' ], [ 'configid' ] ],
-        clone => [ [qw( datacenterid linodeid planid )], [ 'hypervisor', 'paymentterm' ] ],
+        clone => [ [qw( datacenterid linodeid planid )], [ 'paymentterm' ] ],
         create => [ [ 'datacenterid', 'planid' ], [ 'paymentterm' ] ],
         delete => [ [ 'linodeid' ], [ 'skipchecks' ] ],
+        kvmify => [ [ 'linodeid' ], [] ],
         list => [ [], [ 'linodeid' ] ],
         mutate => [ [ 'linodeid' ], [] ],
         reboot => [ [ 'linodeid' ], [ 'configid' ] ],
@@ -69,7 +70,7 @@ my $validation = {
         update => [ [ 'configid' ], [qw( comments devtmpfs_automount disklist helper_depmod helper_disableupdatedb helper_distro helper_network helper_xen kernelid label linodeid ramlimit rootdevicecustom rootdevicenum rootdevicero runlevel virt_mode )] ],
     },
     linode_disk => {
-        create => [ [qw( label linodeid size type )], [qw( fromdistributionid isreadonly rootpass rootsshkey )] ],
+        create => [ [qw( label linodeid size type )], [ 'isreadonly' ] ],
         createfromdistribution => [ [qw( distributionid label linodeid rootpass size )], [ 'rootsshkey' ] ],
         createfromimage => [ [ 'imageid', 'linodeid' ], [qw( label rootpass rootsshkey size )] ],
         createfromstackscript => [ [qw( distributionid label linodeid rootpass size stackscriptid stackscriptudfresponses )], [ 'rootsshkey' ] ],
@@ -97,19 +98,16 @@ my $validation = {
         update => [ [ 'nodebalancerid' ], [ 'clientconnthrottle', 'label' ] ],
     },
     nodebalancer_config => {
-        create => [ [ 'nodebalancerid' ], [qw( algorithm check check_attempts check_body check_interval check_path check_timeout port protocol ssl_cert ssl_key stickiness )] ],
+        create => [ [ 'nodebalancerid' ], [qw( algorithm check check_attempts check_body check_interval check_passive check_path check_timeout cipher_suite port protocol ssl_cert ssl_key stickiness )] ],
         delete => [ [ 'configid', 'nodebalancerid' ], [] ],
         list => [ [ 'nodebalancerid' ], [ 'configid' ] ],
-        update => [ [ 'configid' ], [qw( algorithm check check_attempts check_body check_interval check_path check_timeout port protocol ssl_cert ssl_key stickiness )] ],
+        update => [ [ 'configid' ], [qw( algorithm check check_attempts check_body check_interval check_passive check_path check_timeout cipher_suite port protocol ssl_cert ssl_key stickiness )] ],
     },
     nodebalancer_node => {
         create => [ [qw( address configid label )], [ 'mode', 'weight' ] ],
         delete => [ [ 'nodeid' ], [] ],
         list => [ [ 'configid' ], [ 'nodeid' ] ],
         update => [ [ 'nodeid' ], [qw( address label mode weight )] ],
-    },
-    professionalservices_scope => {
-        create => [ [], [qw( application_quantity content_management crossover current_provider customer_name database_server email_address linode_datacenter linode_plan mail_filtering mail_retrieval mail_transfer managed monitoring notes phone_number provider_access replication requested_service server_quantity system_administration ticket_number web_cache web_server webmail )] ],
     },
     stackscript => {
         create => [ [qw( distributionidlist label script )], [qw( description ispublic rev_note )] ],
@@ -122,6 +120,13 @@ my $validation = {
     },
     user => {
         getapikey => [ [ 'password', 'username' ], [qw( expires label token )] ],
+    },
+    volume => {
+        clone => [ [ 'clonefromid', 'label' ], [] ],
+        create => [ [ 'label', 'size' ], [ 'datacenterid', 'linodeid' ] ],
+        delete => [ [ 'volumeid' ], [] ],
+        list => [ [], [ 'volumeid' ] ],
+        update => [ [ 'volumeid' ], [qw( label linodeid size )] ],
     },
 };
 # endvalidation
@@ -261,13 +266,13 @@ Optional Parameters:
 
 =over 4
 
-=item * planid
-
-The desired PlanID available from avail.LinodePlans(). This is required for modes 'linode_new' and 'linode_resize'.
-
 =item * paymentterm
 
 Subscription term in months. One of: 1, 12, or 24. This is required for modes 'linode_new' and 'nodebalancer_new'.
+
+=item * planid
+
+The desired PlanID available from avail.LinodePlans(). This is required for modes 'linode_new' and 'linode_resize'.
 
 =item * linodeid
 
@@ -325,11 +330,13 @@ Optional Parameters:
 
 =over 4
 
+=item * iskvm
+
+Show or hide KVM compatible kernels
+
 =item * isxen
 
-Limits the results to show only Xen kernels
-
-=item * kernelid
+Show or hide Xen compatible kernels
 
 =back
 
@@ -363,13 +370,13 @@ Optional Parameters:
 
 Search terms
 
-=item * distributionid
-
-Limit the results to StackScripts that can be applied to this DistributionID
-
 =item * distributionvendor
 
 Debian, Ubuntu, Fedora, etc.
+
+=item * distributionid
+
+Limit the results to StackScripts that can be applied to this DistributionID
 
 =back
 
@@ -383,13 +390,13 @@ Required Parameters:
 
 =over 4
 
-=item * domain
-
-The zone's name
-
 =item * type
 
 master or slave
+
+=item * domain
+
+The zone's name
 
 =back
 
@@ -397,11 +404,29 @@ Optional Parameters:
 
 =over 4
 
+=item * lpm_displaygroup
+
+Display group in the Domain list inside the Linode DNS Manager
+
+=item * soa_email
+
+Required when type=master
+
+=item * description
+
+Currently undisplayed.
+
+=item * retry_sec
+
 =item * status
 
 0, 1, or 2 (disabled, active, edit mode)
 
-=item * ttl_sec
+=item * axfr_ips
+
+IP addresses allowed to AXFR the entire zone, semicolon separated
+
+=item * refresh_sec
 
 =item * expire_sec
 
@@ -409,25 +434,7 @@ Optional Parameters:
 
 When type=slave, the zone's master DNS servers list, semicolon separated
 
-=item * lpm_displaygroup
-
-Display group in the Domain list inside the Linode DNS Manager
-
-=item * refresh_sec
-
-=item * soa_email
-
-Required when type=master
-
-=item * axfr_ips
-
-IP addresses allowed to AXFR the entire zone, semicolon separated
-
-=item * retry_sec
-
-=item * description
-
-Currently undisplayed.
+=item * ttl_sec
 
 =back
 
@@ -471,45 +478,45 @@ Optional Parameters:
 
 =over 4
 
-=item * status
-
-0, 1, or 2 (disabled, active, edit mode)
-
-=item * domain
-
-The zone's name
-
 =item * ttl_sec
-
-=item * expire_sec
-
-=item * type
-
-master or slave
-
-=item * soa_email
-
-Required when type=master
-
-=item * refresh_sec
-
-=item * lpm_displaygroup
-
-Display group in the Domain list inside the Linode DNS Manager
 
 =item * master_ips
 
 When type=slave, the zone's master DNS servers list, semicolon separated
 
+=item * expire_sec
+
+=item * refresh_sec
+
 =item * axfr_ips
 
 IP addresses allowed to AXFR the entire zone, semicolon separated
 
+=item * domain
+
+The zone's name
+
+=item * status
+
+0, 1, or 2 (disabled, active, edit mode)
+
 =item * retry_sec
+
+=item * soa_email
+
+Required when type=master
 
 =item * description
 
 Currently undisplayed.
+
+=item * lpm_displaygroup
+
+Display group in the Domain list inside the Linode DNS Manager
+
+=item * type
+
+master or slave
 
 =back
 
@@ -527,7 +534,7 @@ Required Parameters:
 
 =item * type
 
-One of: NS, MX, A, AAAA, CNAME, TXT, or SRV
+One of: NS, MX, A, AAAA, CNAME, TXT, SRV or CAA
 
 =back
 
@@ -535,29 +542,33 @@ Optional Parameters:
 
 =over 4
 
-=item * target
-
-When Type=MX the hostname.  When Type=CNAME the target of the alias.  When Type=TXT the value of the record. When Type=A or AAAA the token of '[remote_addr]' will be substituted with the IP address of the request.
-
 =item * ttl_sec
 
 TTL.  Leave as 0 to accept our default.
-
-=item * port
-
-=item * weight
-
-=item * priority
-
-Priority for MX and SRV records, 0-255
 
 =item * protocol
 
 The protocol to append to an SRV record.  Ignored on other record types.
 
+=item * port
+
 =item * name
 
 The hostname or FQDN.  When Type=MX the subdomain to delegate to the Target MX server.
+
+=item * tag
+
+The tag attribute for a CAA record.  One of issue, issuewild, iodef.  Ignored on other record types.
+
+=item * target
+
+When Type=MX the hostname.  When Type=CNAME the target of the alias.  When Type=TXT or CAA the value of the record. When Type=A or AAAA the token of '[remote_addr]' will be substituted with the IP address of the request.
+
+=item * priority
+
+Priority for MX and SRV records, 0-65535
+
+=item * weight
 
 =back
 
@@ -567,9 +578,9 @@ Required Parameters:
 
 =over 4
 
-=item * resourceid
-
 =item * domainid
+
+=item * resourceid
 
 =back
 
@@ -607,31 +618,35 @@ Optional Parameters:
 
 =over 4
 
+=item * port
+
+=item * tag
+
+The tag attribute for a CAA record.  One of issue, issuewild, iodef.  Ignored on other record types.
+
 =item * target
 
-When Type=MX the hostname.  When Type=CNAME the target of the alias.  When Type=TXT the value of the record. When Type=A or AAAA the token of '[remote_addr]' will be substituted with the IP address of the request.
+When Type=MX the hostname.  When Type=CNAME the target of the alias.  When Type=TXT or CAA the value of the record. When Type=A or AAAA the token of '[remote_addr]' will be substituted with the IP address of the request.
 
 =item * domainid
 
-=item * ttl_sec
+=item * name
 
-TTL.  Leave as 0 to accept our default.
-
-=item * port
-
-=item * weight
+The hostname or FQDN.  When Type=MX the subdomain to delegate to the Target MX server.
 
 =item * protocol
 
 The protocol to append to an SRV record.  Ignored on other record types.
 
+=item * ttl_sec
+
+TTL.  Leave as 0 to accept our default.
+
 =item * priority
 
-Priority for MX and SRV records, 0-255
+Priority for MX and SRV records, 0-65535
 
-=item * name
-
-The hostname or FQDN.  When Type=MX the subdomain to delegate to the Target MX server.
+=item * weight
 
 =back
 
@@ -667,13 +682,13 @@ Required Parameters:
 
 =over 4
 
-=item * planid
-
-The desired PlanID available from avail.LinodePlans()
-
 =item * linodeid
 
 The LinodeID that you want cloned
+
+=item * planid
+
+The desired PlanID available from avail.LinodePlans()
 
 =item * datacenterid
 
@@ -689,25 +704,23 @@ Optional Parameters:
 
 Subscription term in months for prepaid customers.  One of: 1, 12, or 24
 
-=item * hypervisor
-
 =back
 
 =head3 linode_create
 
-Creates a Linode and assigns you full privileges. There is a 75-linodes-per-hour limiter.
+Creates a Linode and assigns you full privileges. There is a 250-linodes-per-hour limiter.
 
 Required Parameters:
 
 =over 4
 
-=item * planid
-
-The desired PlanID available from avail.LinodePlans()
-
 =item * datacenterid
 
 The DatacenterID from avail.datacenters() where you wish to place this new Linode
+
+=item * planid
+
+The desired PlanID available from avail.LinodePlans()
 
 =back
 
@@ -742,6 +755,20 @@ Optional Parameters:
 =item * skipchecks
 
 Skips the safety checks and will always delete the Linode
+
+=back
+
+=head3 linode_kvmify
+
+Changes a Linode's hypervisor from Xen to KVM.
+
+Required Parameters:
+
+=over 4
+
+=item * linodeid
+
+The LinodeID to migrate to KVM.
 
 =back
 
@@ -799,11 +826,11 @@ Required Parameters:
 
 =over 4
 
+=item * linodeid
+
 =item * planid
 
 The desired PlanID available from avail.LinodePlans()
-
-=item * linodeid
 
 =back
 
@@ -835,53 +862,55 @@ Optional Parameters:
 
 =over 4
 
-=item * alert_bwquota_threshold
-
-Percentage of monthly bw quota
-
-=item * alert_bwin_threshold
-
-Mb/sec
-
-=item * alert_cpu_threshold
-
-CPU Alert threshold, percentage 0-800
-
 =item * label
 
 This Linode's label
-
-=item * ms_ssh_port
-
-=item * lpm_displaygroup
-
-Display group in the Linode list inside the Linode Manager
-
-=item * alert_bwin_enabled
-
-Enable the incoming bandwidth email alert
-
-=item * ms_ssh_disabled
-
-=item * backupwindow
-
-=item * alert_cpu_enabled
-
-Enable the cpu usage email alert
-
-=item * backupweeklyday
-
-=item * alert_diskio_enabled
-
-Enable the disk IO email alert
-
-=item * ms_ssh_ip
 
 =item * alert_bwquota_enabled
 
 Enable the bw quote email alert
 
-=item * ms_ssh_user
+=item * ms_ssh_port
+
+=item * ms_ssh_ip
+
+=item * ms_ssh_disabled
+
+=item * alert_bwout_threshold
+
+Mb/sec
+
+=item * alert_diskio_threshold
+
+IO ops/sec
+
+=item * backupweeklyday
+
+=item * alert_cpu_enabled
+
+Enable the cpu usage email alert
+
+=item * alert_bwquota_threshold
+
+Percentage of monthly bw quota
+
+=item * backupwindow
+
+=item * lpm_displaygroup
+
+Display group in the Linode list inside the Linode Manager
+
+=item * alert_diskio_enabled
+
+Enable the disk IO email alert
+
+=item * alert_cpu_threshold
+
+CPU Alert threshold, percentage 0-800
+
+=item * alert_bwin_threshold
+
+Mb/sec
 
 =item * watchdog
 
@@ -891,13 +920,11 @@ Enable the Lassie shutdown watchdog
 
 Enable the outgoing bandwidth email alert
 
-=item * alert_bwout_threshold
+=item * ms_ssh_user
 
-Mb/sec
+=item * alert_bwin_enabled
 
-=item * alert_diskio_threshold
-
-IO ops/sec
+Enable the incoming bandwidth email alert
 
 =back
 
@@ -923,61 +950,25 @@ Required Parameters:
 
 =over 4
 
-=item * linodeid
+=item * kernelid
+
+The KernelID for this profile.  Found in avail.kernels()
 
 =item * label
 
 The Label for this profile
 
+=item * linodeid
+
 =item * disklist
 
 A comma delimited list of DiskIDs; position reflects device node.  The 9th element for specifying the initrd.
-
-=item * kernelid
-
-The KernelID for this profile.  Found in avail.kernels()
 
 =back
 
 Optional Parameters:
 
 =over 4
-
-=item * comments
-
-Comments you wish to save along with this profile
-
-=item * rootdevicero
-
-Enables the 'ro' kernel flag.  Modern distros want this.
-
-=item * virt_mode
-
-Controls the virtualization mode. One of 'paravirt', 'fullvirt'
-
-=item * rootdevicenum
-
-Which device number (1-8) that contains the root partition.  0 to utilize RootDeviceCustom.
-
-=item * ramlimit
-
-RAMLimit in MB.  0 for max.
-
-=item * helper_xen
-
-Deprecated - use helper_distro.
-
-=item * rootdevicecustom
-
-A custom root device setting.
-
-=item * devtmpfs_automount
-
-Controls if pv_ops kernels should automount devtmpfs at boot.
-
-=item * helper_distro
-
-Enable the Distro filesystem helper.  Corrects fstab and inittab/upstart entries depending on the kernel you're booting.  You want this.
 
 =item * helper_depmod
 
@@ -987,13 +978,49 @@ Creates an empty modprobe file for the kernel you're booting.
 
 Automatically creates network configuration files for your distro and places them into your filesystem.
 
+=item * runlevel
+
+One of 'default', 'single', 'binbash'
+
+=item * rootdevicecustom
+
+A custom root device setting.
+
+=item * rootdevicenum
+
+Which device number (1-8) that contains the root partition.  0 to utilize RootDeviceCustom.
+
 =item * helper_disableupdatedb
 
 Enable the disableUpdateDB filesystem helper
 
-=item * runlevel
+=item * helper_distro
 
-One of 'default', 'single', 'binbash'
+Enable the Distro filesystem helper.  Corrects fstab and inittab/upstart entries depending on the kernel you're booting.  You want this.
+
+=item * comments
+
+Comments you wish to save along with this profile
+
+=item * virt_mode
+
+Controls the virtualization mode. One of 'paravirt', 'fullvirt'
+
+=item * ramlimit
+
+RAMLimit in MB.  0 for max.
+
+=item * helper_xen
+
+Deprecated - use helper_distro.
+
+=item * rootdevicero
+
+Enables the 'ro' kernel flag.  Modern distros want this.
+
+=item * devtmpfs_automount
+
+Controls if pv_ops kernels should automount devtmpfs at boot.
 
 =back
 
@@ -1047,56 +1074,6 @@ Optional Parameters:
 
 =over 4
 
-=item * comments
-
-Comments you wish to save along with this profile
-
-=item * linodeid
-
-=item * rootdevicero
-
-Enables the 'ro' kernel flag.  Modern distros want this.
-
-=item * label
-
-The Label for this profile
-
-=item * virt_mode
-
-Controls the virtualization mode. One of 'paravirt', 'fullvirt'
-
-=item * rootdevicenum
-
-Which device number (1-8) that contains the root partition.  0 to utilize RootDeviceCustom.
-
-=item * disklist
-
-A comma delimited list of DiskIDs; position reflects device node.  The 9th element for specifying the initrd.
-
-=item * kernelid
-
-The KernelID for this profile.  Found in avail.kernels()
-
-=item * ramlimit
-
-RAMLimit in MB.  0 for max.
-
-=item * helper_xen
-
-Deprecated - use helper_distro.
-
-=item * rootdevicecustom
-
-A custom root device setting.
-
-=item * devtmpfs_automount
-
-Controls if pv_ops kernels should automount devtmpfs at boot.
-
-=item * helper_distro
-
-Enable the Distro filesystem helper.  Corrects fstab and inittab/upstart entries depending on the kernel you're booting.  You want this.
-
 =item * helper_depmod
 
 Creates an empty modprobe file for the kernel you're booting.
@@ -1105,13 +1082,63 @@ Creates an empty modprobe file for the kernel you're booting.
 
 Automatically creates network configuration files for your distro and places them into your filesystem.
 
+=item * runlevel
+
+One of 'default', 'single', 'binbash'
+
+=item * kernelid
+
+The KernelID for this profile.  Found in avail.kernels()
+
+=item * label
+
+The Label for this profile
+
+=item * helper_distro
+
+Enable the Distro filesystem helper.  Corrects fstab and inittab/upstart entries depending on the kernel you're booting.  You want this.
+
+=item * comments
+
+Comments you wish to save along with this profile
+
+=item * rootdevicecustom
+
+A custom root device setting.
+
+=item * rootdevicenum
+
+Which device number (1-8) that contains the root partition.  0 to utilize RootDeviceCustom.
+
+=item * linodeid
+
 =item * helper_disableupdatedb
 
 Enable the disableUpdateDB filesystem helper
 
-=item * runlevel
+=item * disklist
 
-One of 'default', 'single', 'binbash'
+A comma delimited list of DiskIDs; position reflects device node.  The 9th element for specifying the initrd.
+
+=item * virt_mode
+
+Controls the virtualization mode. One of 'paravirt', 'fullvirt'
+
+=item * ramlimit
+
+RAMLimit in MB.  0 for max.
+
+=item * rootdevicero
+
+Enables the 'ro' kernel flag.  Modern distros want this.
+
+=item * devtmpfs_automount
+
+Controls if pv_ops kernels should automount devtmpfs at boot.
+
+=item * helper_xen
+
+Deprecated - use helper_distro.
 
 =back
 
@@ -1123,31 +1150,25 @@ Required Parameters:
 
 =over 4
 
-=item * linodeid
+=item * size
 
-=item * label
-
-The display label for this Disk
+The size in MB of this Disk.
 
 =item * type
 
 The formatted type of this disk.  Valid types are: ext3, ext4, swap, raw
 
-=item * size
+=item * label
 
-The size in MB of this Disk.
+The display label for this Disk
+
+=item * linodeid
 
 =back
 
 Optional Parameters:
 
 =over 4
-
-=item * rootsshkey
-
-=item * fromdistributionid
-
-=item * rootpass
 
 =item * isreadonly
 
@@ -1161,13 +1182,13 @@ Required Parameters:
 
 =over 4
 
+=item * rootpass
+
+The root (or core) user's password
+
 =item * size
 
 Size of this disk image in MB
-
-=item * rootpass
-
-The root user's password
 
 =item * linodeid
 
@@ -1187,7 +1208,7 @@ Optional Parameters:
 
 =item * rootsshkey
 
-Optionally sets this string into /root/.ssh/authorized_keys upon distribution configuration.
+Optionally sets this string into /root/.ssh/authorized_keys (or /home/core/.ssh/authorized_keys) upon distribution configuration.
 
 =back
 
@@ -1199,27 +1220,19 @@ Required Parameters:
 
 =over 4
 
-=item * imageid
-
-The ID of the frozen image to deploy from
-
 =item * linodeid
 
 Specifies the Linode to deploy on to
+
+=item * imageid
+
+The ID of the frozen image to deploy from
 
 =back
 
 Optional Parameters:
 
 =over 4
-
-=item * rootsshkey
-
-Optionally sets this string into /root/.ssh/authorized_keys upon image deployment
-
-=item * rootpass
-
-Optionally sets the root password at deployment time. If a password is not provided the existing root password of the frozen image will not be modified
 
 =item * label
 
@@ -1228,6 +1241,14 @@ The label of this new disk image
 =item * size
 
 The size of the disk image to creates. Defaults to the minimum size required for the requested image
+
+=item * rootsshkey
+
+Optionally sets this string into /root/.ssh/authorized_keys upon image deployment
+
+=item * rootpass
+
+Optionally sets the root password at deployment time. If a password is not provided the existing root password of the frozen image will not be modified
 
 =back
 
@@ -1239,29 +1260,29 @@ Required Parameters:
 
 =item * linodeid
 
-=item * stackscriptudfresponses
+=item * rootpass
 
-JSON encoded name/value pairs, answering this StackScript's User Defined Fields
-
-=item * label
-
-The label of this new disk image
+The root user's password
 
 =item * size
 
 Size of this disk image in MB
 
+=item * stackscriptudfresponses
+
+JSON encoded name/value pairs, answering this StackScript's User Defined Fields
+
 =item * distributionid
 
 Which Distribution to apply this StackScript to.  Must be one from the script's DistributionIDList
 
-=item * rootpass
-
-The root user's password
-
 =item * stackscriptid
 
 The StackScript to create this image from
+
+=item * label
+
+The label of this new disk image
 
 =back
 
@@ -1295,9 +1316,9 @@ Required Parameters:
 
 =over 4
 
-=item * diskid
-
 =item * linodeid
+
+=item * diskid
 
 =back
 
@@ -1309,13 +1330,13 @@ Required Parameters:
 
 =over 4
 
-=item * diskid
-
-Specifies the source Disk to create the image from
-
 =item * linodeid
 
 Specifies the source Linode to create the image from
+
+=item * diskid
+
+Specifies the source Disk to create the image from
 
 =back
 
@@ -1323,13 +1344,13 @@ Optional Parameters:
 
 =over 4
 
-=item * description
-
-An optional description of the created image
-
 =item * label
 
 Sets the name of the image shown in the base image list, defaults to the source image label
+
+=item * description
+
+An optional description of the created image
 
 =back
 
@@ -1385,13 +1406,13 @@ Optional Parameters:
 
 =item * linodeid
 
-=item * isreadonly
-
-Enable forced read-only for this Disk
-
 =item * label
 
 The display label for this Disk
+
+=item * isreadonly
+
+Enable forced read-only for this Disk
 
 =back
 
@@ -1521,13 +1542,13 @@ Required Parameters:
 
 =over 4
 
-=item * script
-
-The actual script
-
 =item * distributionidlist
 
 Comma delimited list of DistributionIDs that this script works on
+
+=item * script
+
+The actual script
 
 =item * label
 
@@ -1539,9 +1560,9 @@ Optional Parameters:
 
 =over 4
 
-=item * rev_note
-
 =item * description
+
+=item * rev_note
 
 =item * ispublic
 
@@ -1593,15 +1614,15 @@ Optional Parameters:
 
 The actual script
 
+=item * label
+
+The Label for this StackScript
+
 =item * rev_note
 
 =item * ispublic
 
 Whether this StackScript is published in the Library, for everyone to use
-
-=item * label
-
-The Label for this StackScript
 
 =item * description
 
@@ -1631,29 +1652,17 @@ Optional Parameters:
 
 =over 4
 
-=item * check_path
+=item * cipher_suite
 
-When check=http, the path to request
+SSL cipher suite to enforce. One of 'recommended', 'legacy'
 
-=item * ssl_cert
+=item * check_interval
 
-SSL certificate served by the NodeBalancer when the protocol is 'https'
-
-=item * check_body
-
-When check=http, a regex to match within the first 16,384 bytes of the response body
-
-=item * stickiness
-
-Session persistence.  One of 'none', 'table', 'http_cookie'
+Seconds between health check probes.  2-3600
 
 =item * port
 
 Port to bind to on the public interfaces. 1-65534
-
-=item * check_timeout
-
-Seconds to wait before considering the probe a failure. 1-30.  Must be less than check_interval.
 
 =item * check
 
@@ -1663,21 +1672,41 @@ Perform active health checks on the backend nodes.  One of 'connection', 'http',
 
 Number of failed probes before taking a node out of rotation. 1-30
 
-=item * ssl_key
+=item * stickiness
 
-Unpassphrased private key for the SSL certificate when protocol is 'https'
-
-=item * check_interval
-
-Seconds between health check probes.  2-3600
+Session persistence.  One of 'none', 'table', 'http_cookie'
 
 =item * protocol
 
 Either 'tcp', 'http', or 'https'
 
+=item * check_passive
+
+Enable passive checks based on observing communication with back-end nodes.
+
+=item * check_body
+
+When check=http, a regex to match within the first 16,384 bytes of the response body
+
+=item * check_timeout
+
+Seconds to wait before considering the probe a failure. 1-30.  Must be less than check_interval.
+
+=item * check_path
+
+When check=http, the path to request
+
+=item * ssl_key
+
+Unpassphrased private key for the SSL certificate when protocol is 'https'
+
 =item * algorithm
 
 Balancing algorithm.  One of 'roundrobin', 'leastconn', 'source'
+
+=item * ssl_cert
+
+SSL certificate served by the NodeBalancer when the protocol is 'https'
 
 =back
 
@@ -1689,11 +1718,11 @@ Required Parameters:
 
 =over 4
 
+=item * nodebalancerid
+
 =item * configid
 
 The ConfigID to delete
-
-=item * nodebalancerid
 
 =back
 
@@ -1735,53 +1764,61 @@ Optional Parameters:
 
 =over 4
 
-=item * check_path
+=item * check_timeout
 
-When check=http, the path to request
-
-=item * ssl_cert
-
-SSL certificate served by the NodeBalancer when the protocol is 'https'
-
-=item * check_body
-
-When check=http, a regex to match within the first 16,384 bytes of the response body
+Seconds to wait before considering the probe a failure. 1-30.  Must be less than check_interval.
 
 =item * stickiness
 
 Session persistence.  One of 'none', 'table', 'http_cookie'
 
-=item * port
-
-Port to bind to on the public interfaces. 1-65534
-
-=item * check_timeout
-
-Seconds to wait before considering the probe a failure. 1-30.  Must be less than check_interval.
-
-=item * check
-
-Perform active health checks on the backend nodes.  One of 'connection', 'http', 'http_body'
-
 =item * check_attempts
 
 Number of failed probes before taking a node out of rotation. 1-30
 
-=item * ssl_key
+=item * check_body
 
-Unpassphrased private key for the SSL certificate when protocol is 'https'
-
-=item * check_interval
-
-Seconds between health check probes.  2-3600
+When check=http, a regex to match within the first 16,384 bytes of the response body
 
 =item * protocol
 
 Either 'tcp', 'http', or 'https'
 
+=item * check_passive
+
+Enable passive checks based on observing communication with back-end nodes.
+
+=item * check
+
+Perform active health checks on the backend nodes.  One of 'connection', 'http', 'http_body'
+
+=item * port
+
+Port to bind to on the public interfaces. 1-65534
+
+=item * check_interval
+
+Seconds between health check probes.  2-3600
+
+=item * cipher_suite
+
+SSL cipher suite to enforce. One of 'recommended', 'legacy'
+
+=item * ssl_cert
+
+SSL certificate served by the NodeBalancer when the protocol is 'https'
+
 =item * algorithm
 
 Balancing algorithm.  One of 'roundrobin', 'leastconn', 'source'
+
+=item * ssl_key
+
+Unpassphrased private key for the SSL certificate when protocol is 'https'
+
+=item * check_path
+
+When check=http, the path to request
 
 =back
 
@@ -1793,13 +1830,13 @@ Required Parameters:
 
 =over 4
 
-=item * configid
-
-The parent ConfigID to attach this Node to
-
 =item * address
 
 The address:port combination used to communicate with this Node
+
+=item * configid
+
+The parent ConfigID to attach this Node to
 
 =item * label
 
@@ -1811,13 +1848,13 @@ Optional Parameters:
 
 =over 4
 
-=item * mode
-
-The connections mode for this node.  One of 'accept', 'reject', or 'drain'
-
 =item * weight
 
 Load balancing weight, 1-255. Higher means more connections.
+
+=item * mode
+
+The connections mode for this node.  One of 'accept', 'reject', 'backup', or 'drain'
 
 =back
 
@@ -1873,21 +1910,21 @@ Optional Parameters:
 
 =over 4
 
+=item * label
+
+This backend Node's label
+
+=item * mode
+
+The connections mode for this node.  One of 'accept', 'reject', 'backup', or 'drain'
+
 =item * address
 
 The address:port combination used to communicate with this Node
 
-=item * mode
-
-The connections mode for this node.  One of 'accept', 'reject', or 'drain'
-
 =item * weight
 
 Load balancing weight, 1-255. Higher means more connections.
-
-=item * label
-
-This backend Node's label
 
 =back
 
@@ -1895,7 +1932,7 @@ This backend Node's label
 
 =head3 user_getapikey
 
-Authenticates a Linode Manager user against their username, password, and two-factor token (when enabled), and then returns a new API key, which can be used until it expires.  The number of active keys is limited to 20.
+Authenticates a Linode Manager user against their username, password, and two-factor token (when enabled), and then returns a new API key, which can be used until it expires.  The number of active keys is limited to 20.  Batch requests will be rejected if they include this API action.
 
 Required Parameters:
 
@@ -1917,7 +1954,7 @@ An optional label for this key.
 
 =item * token
 
-Required when two-factor authentication is enabled.
+Required when two-factor authentication is enabled. Emergency scratch codes are not permitted.
 
 =item * expires
 
@@ -1949,13 +1986,13 @@ Optional Parameters:
 
 =over 4
 
-=item * imageid
-
-Request information for a specific gold-master image
-
 =item * pending
 
 Show images currently being created.
+
+=item * imageid
+
+Request information for a specific gold-master image
 
 =back
 
@@ -1977,111 +2014,17 @@ Optional Parameters:
 
 =over 4
 
-=item * label
-
-The label of the Image.
-
 =item * description
 
 An optional description of the Image.
 
+=item * label
+
+The label of the Image.
+
 =back
 
 =head2 professionalservices_scope Methods
-
-=head3 professionalservices_scope_create
-
-Creates a new Professional Services scope submission
-
-Optional Parameters:
-
-=over 4
-
-=item * ticket_number
-
-=item * server_quantity
-
-How many separate servers are involved in this migration?
-
-=item * mail_filtering
-
-Services here manipulate recieved messages in various ways
-
-=item * database_server
-
-Generally used by applications to provide an organized way to capture and manipulate data
-
-=item * current_provider
-
-=item * web_cache
-
-Caching mechanisms provide temporary storage for web requests--cached content can generally be retrieved faster.
-
-=item * mail_transfer
-
-Mail transfer agents facilitate message transfer between servers
-
-=item * application_quantity
-
-How many separate applications or websites are involved in this migration?
-
-=item * email_address
-
-=item * crossover
-
-These can assist in providing reliable crossover--failures of individual components can be transparent to the application.
-
-=item * web_server
-
-These provide network protocol handling for hosting websites.
-
-=item * replication
-
-Redundant services often have shared state--replication automatically propagates state changes between individual components.
-
-=item * provider_access
-
-What types of server access do you have at your current provider?
-
-=item * webmail
-
-Access and administrate mail via web interfaces
-
-=item * phone_number
-
-=item * content_management
-
-Centralized interfaces for editing, organizing, and publishing content
-
-=item * mail_retrieval
-
-User mail clients connect to these to retrieve delivered mail
-
-=item * managed
-
-=item * requested_service
-
-=item * monitoring
-
-Constant monitoring of your deployed systems--these can also provide automatic notifications for service failures.
-
-=item * notes
-
-=item * linode_datacenter
-
-Which datacenters would you like your Linodes to be deployed in?
-
-=item * customer_name
-
-=item * linode_plan
-
-Which Linode plans would you like to deploy?
-
-=item * system_administration
-
-Various web interfaces for performing system administration tasks
-
-=back
 
 =for endautogen
 

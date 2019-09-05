@@ -47,11 +47,11 @@
    "provides" : {
       "Type::Tiny::XS" : {
          "file" : "lib/Type/Tiny/XS.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Type::Tiny::XS::Util" : {
          "file" : "lib/Type/Tiny/XS/Util.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       }
    },
    "release_status" : "stable",
@@ -70,6 +70,9 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/project"
    },
-   "version" : "0.015",
+   "version" : "0.016",
+   "x_contributors" : [
+      "Graham Knop (HAARG) <haarg@cpan.org>"
+   ],
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

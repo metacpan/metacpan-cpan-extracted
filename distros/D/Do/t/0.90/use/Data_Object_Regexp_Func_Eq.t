@@ -23,10 +23,13 @@ Data-Object Regexp Function (Eq) Class
 
   $func->execute;
 
+=inherits
+
+Data::Object::Regexp::Func
+
 =description
 
 Data::Object::Regexp::Func::Eq is a function object for Data::Object::Regexp.
-This package inherits all behavior from L<Data::Object::Regexp::Func>.
 
 =cut
 

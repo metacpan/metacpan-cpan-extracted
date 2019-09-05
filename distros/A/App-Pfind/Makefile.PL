@@ -18,8 +18,12 @@ WriteMakefile(
     BUILD_REQUIRES => {
     },
     PREREQ_PM => {
+        'Data::Dumper'          => 0,
+        'Fcntl'                 => 0,
+        'File::Copy'            => 0,
         'File::Find'            => 0,
         'File::Spec::Functions' => 0,
+        'File::Path'            => 0,
         'Getopt::Long'          => 0,
         'Pod::Usage'            => 0,
         'Safe'                  => 0,
@@ -53,5 +57,5 @@ WriteMakefile(
       },
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean => { FILES => 'App-Pfind-*' },
+    clean => { FILES => 'Pfind-*' },
 );

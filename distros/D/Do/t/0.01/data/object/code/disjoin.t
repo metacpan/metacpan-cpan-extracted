@@ -16,7 +16,7 @@ subtest 'test the disjoin method' => sub {
   isnt refaddr($code), refaddr($disjoin);
 
   $result = $disjoin->call(0);
-  isa_ok $result, 'Data::Object::Integer';
+  isa_ok $result, 'Data::Object::Number';
   is $result,     -1;
 
   $result = $disjoin->call(1);
@@ -24,7 +24,7 @@ subtest 'test the disjoin method' => sub {
   is $result,     1;
 
   $result = $disjoin->call(2);
-  isa_ok $result, 'Data::Object::Integer';
+  isa_ok $result, 'Data::Object::Number';
   is $result,     -1;
 
   $result = $disjoin->call(3);
@@ -32,7 +32,7 @@ subtest 'test the disjoin method' => sub {
   is $result,     1;
 
   $result = $disjoin->call(4);
-  isa_ok $result, 'Data::Object::Integer';
+  isa_ok $result, 'Data::Object::Number';
   is $result,     -1;
 
   isa_ok $code,    'Data::Object::Code';

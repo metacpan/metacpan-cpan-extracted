@@ -23,10 +23,13 @@ Data-Object String Function (Ge) Class
 
   $func->execute;
 
+=inherits
+
+Data::Object::String::Func
+
 =description
 
 Data::Object::String::Func::Ge is a function object for Data::Object::String.
-This package inherits all behavior from L<Data::Object::String::Func>.
 
 =cut
 

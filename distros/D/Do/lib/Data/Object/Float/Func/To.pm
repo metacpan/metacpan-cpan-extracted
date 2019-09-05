@@ -1,10 +1,15 @@
 package Data::Object::Float::Func::To;
 
+use 5.014;
+
+use strict;
+use warnings;
+
 use Data::Object 'Class';
 
 extends 'Data::Object::Float::Func';
 
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.50'; # VERSION
 
 # BUILD
 
@@ -69,7 +74,14 @@ Data-Object Float Function (To) Class
 =head1 DESCRIPTION
 
 Data::Object::Float::Func::To is a function object for Data::Object::Float.
-This package inherits all behavior from L<Data::Object::Float::Func>.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Data::Object::Float::Func>
 
 =cut
 

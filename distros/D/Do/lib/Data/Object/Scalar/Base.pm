@@ -9,7 +9,7 @@ use Scalar::Util ();
 
 use parent 'Data::Object::Base';
 
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.50'; # VERSION
 
 # BUILD
 
@@ -55,8 +55,15 @@ Data-Object Abstract Scalar Class
 
 =head1 DESCRIPTION
 
-Data::Object::Scalar::Base provides routines for operating on Perl 5 scalar
-objects. This package inherits all behavior from L<Data::Object::Base>.
+This package provides routines for operating on Perl 5 scalar objects.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Data::Object::Base>
 
 =cut
 
@@ -68,15 +75,13 @@ This package implements the following methods.
 
 =head2 new
 
-  new(ScalarRef $arg1) : Object
+  new(Any $arg1) : Object
 
-The new method expects a scalar reference and returns a new class instance.
+Construct a new object.
 
 =over 4
 
 =item new example
-
-  # given \*main
 
   package My::Scalar;
 

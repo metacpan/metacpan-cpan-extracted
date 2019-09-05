@@ -1,7 +1,7 @@
 package Path::Tiny::Glob::Visitor;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: directory visitor for Path::Tiny::Glob
-$Path::Tiny::Glob::Visitor::VERSION = '0.1.0';
+$Path::Tiny::Glob::Visitor::VERSION = '0.2.0';
 use Moo;
 
 require Path::Tiny;
@@ -60,19 +60,21 @@ sub match( $self ) {
                 push( $state->{path}{$path}->@*, $rule->[1] );
             }
             else {
-                $state->{found}{$path} = 1;
+                $state->{found} ||= [];
+
+                push $state->{found}->@*, $path;
             }
         }
     });
 
 
-   delete $state->{path}{$_} for keys $state->{found}->%*;
+   delete $state->{path}{$_} for keys $state->{found}->@*;
 
    $self->next(
        $state->{path}
    ) if $state->{path};
 
-   $self->found([ keys $state->{found}->%* ]);
+   $self->found($state->{found});
 }
 
 # turn a glob into a regular expression
@@ -128,7 +130,7 @@ Path::Tiny::Glob::Visitor - directory visitor for Path::Tiny::Glob
 
 =head1 VERSION
 
-version 0.1.0
+version 0.2.0
 
 =head1 AUTHOR
 

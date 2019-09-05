@@ -1,13 +1,13 @@
 package Data::Object::Rule::Collection;
 
+use 5.014;
+
 use strict;
 use warnings;
 
 use Data::Object::Rule;
 
-our $VERSION = '1.09'; # VERSION
-
-# BUILD
+our $VERSION = '1.50'; # VERSION
 
 requires 'each';
 requires 'each_key';
@@ -22,8 +22,6 @@ requires 'get';
 requires 'set';
 requires 'slice';
 requires 'values';
-
-# METHODS
 
 1;
 =encoding utf8

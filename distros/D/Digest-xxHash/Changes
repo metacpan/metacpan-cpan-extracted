@@ -1,6 +1,10 @@
 Changes
 =======
 
+2.04 - 05 September 2019
+  * Fix mishandling unsigned 64bit integers when moving from XS to pure Perl
+  * Prepend zeros to hex values
+
 2.03 - 13 June 2016
   * Permissions could cause repeat builds to fail in v2.02
 

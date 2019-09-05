@@ -23,10 +23,13 @@ Data-Object Hash Function (Join) Class
 
   $func->execute;
 
+=inherits
+
+Data::Object::Hash::Func
+
 =description
 
 Data::Object::Hash::Func::Join is a function object for Data::Object::Hash.
-This package inherits all behavior from L<Data::Object::Hash::Func>.
 
 =cut
 

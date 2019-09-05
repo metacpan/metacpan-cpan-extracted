@@ -35,7 +35,7 @@ resources:
   bugtracker: https://github.com/iamalnewkirk/do/issues
   homepage: http://metacpan.org/release/Do/
   repository: git://github.com/iamalnewkirk/do.git
-version: '1.09'
+version: '1.50'
 x_authority: cpan:AWNCORP
 x_contributors:
   - 'Al Newkirk <al@iamalnewkirk.com>'

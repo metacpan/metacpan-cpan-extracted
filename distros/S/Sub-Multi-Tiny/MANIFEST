@@ -17,5 +17,6 @@ t/30_synopsis.t
 t/31_ambiguous_dispatch.t
 t/32_same_arity.pl
 t/32_same_arity.t
+t/33_recursion.t
 META.yml
 MANIFEST

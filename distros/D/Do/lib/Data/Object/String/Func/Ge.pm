@@ -1,10 +1,15 @@
 package Data::Object::String::Func::Ge;
 
+use 5.014;
+
+use strict;
+use warnings;
+
 use Data::Object 'Class';
 
 extends 'Data::Object::String::Func';
 
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.50'; # VERSION
 
 # BUILD
 
@@ -63,7 +68,14 @@ Data-Object String Function (Ge) Class
 =head1 DESCRIPTION
 
 Data::Object::String::Func::Ge is a function object for Data::Object::String.
-This package inherits all behavior from L<Data::Object::String::Func>.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Data::Object::String::Func>
 
 =cut
 

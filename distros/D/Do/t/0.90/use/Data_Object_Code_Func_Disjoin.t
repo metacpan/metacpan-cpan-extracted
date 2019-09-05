@@ -23,10 +23,13 @@ Data-Object Code Function (Disjoin) Class
 
   $func->execute;
 
+=inherits
+
+Data::Object::Code::Func
+
 =description
 
 Data::Object::Code::Func::Disjoin is a function object for Data::Object::Code.
-This package inherits all behavior from L<Data::Object::Code::Func>.
 
 =cut
 

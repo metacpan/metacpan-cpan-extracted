@@ -16,7 +16,7 @@ subtest 'test the neg method' => sub {
   is $neg, -12345;
 
   isa_ok $number, 'Data::Object::Number';
-  isa_ok $neg,    'Data::Object::Integer';
+  isa_ok $neg,    'Data::Object::Number';
 };
 
 ok 1 and done_testing;

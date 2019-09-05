@@ -1,10 +1,15 @@
 package Data::Object::Undef::Func;
 
+use 5.014;
+
+use strict;
+use warnings;
+
 use Data::Object 'Class';
 
 extends 'Data::Object::Func';
 
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.50'; # VERSION
 
 # BUILD
 # METHODS
@@ -34,8 +39,15 @@ Functions for Undef Data
 =head1 DESCRIPTION
 
 Data::Object::Undef::Func is an abstract base class for function classes in the
-Data::Object::Undef::Func space. This package inherits all behavior from
-L<Data::Object::Func>.
+Data::Object::Undef::Func space.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Data::Object::Func>
 
 =cut
 

@@ -1,13 +1,13 @@
 package Data::Object::RoleHas;
 
+use 5.014;
+
 use strict;
 use warnings;
 
 use Data::Object::Export 'reify';
 
-our $VERSION = '1.09'; # VERSION
-
-# BUILD
+our $VERSION = '1.50'; # VERSION
 
 sub import {
   my ($class, @args) = @_;
@@ -174,8 +174,6 @@ sub _formulate_wrt {
   return (%opts);
 }
 
-# METHODS
-
 1;
 
 =encoding utf8
@@ -188,7 +186,7 @@ Data::Object::RoleHas
 
 =head1 ABSTRACT
 
-Data-Object Role Configuration
+Data-Object Role Attribute Builder
 
 =cut
 

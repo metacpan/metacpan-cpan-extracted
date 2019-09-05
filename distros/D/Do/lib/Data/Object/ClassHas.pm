@@ -1,11 +1,13 @@
 package Data::Object::ClassHas;
 
+use 5.014;
+
 use strict;
 use warnings;
 
 use Data::Object::Export 'reify';
 
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.50'; # VERSION
 
 # BUILD
 
@@ -188,7 +190,7 @@ Data::Object::ClassHas
 
 =head1 ABSTRACT
 
-Data-Object Class Configuration
+Data-Object Class Attribute Builder
 
 =cut
 

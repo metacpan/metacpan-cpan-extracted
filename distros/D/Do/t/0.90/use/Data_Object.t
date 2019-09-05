@@ -11,7 +11,7 @@ Data::Object
 
 =abstract
 
-Development Framework Entrypoint
+Development Framework
 
 =synopsis
 
@@ -33,7 +33,7 @@ foundational set of types, functions, classes, patterns, and interfaces for
 jump-starting application development. This package inherits all behavior from
 L<Data::Object::Config>.
 
-+=head1 RATIONALE
++=head1 PURPOSE
 
 This package provides a framework for modern Perl development, embracing
 Perl's multi-paradigm programming nature, flexibility and vast ecosystem that

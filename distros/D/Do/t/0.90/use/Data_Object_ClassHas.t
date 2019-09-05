@@ -11,7 +11,7 @@ Data::Object::ClassHas
 
 =abstract
 
-Data-Object Class Configuration
+Data-Object Class Attribute Builder
 
 =synopsis
 

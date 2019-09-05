@@ -23,10 +23,13 @@ Data-Object Float Function (To) Class
 
   $func->execute;
 
+=inherits
+
+Data::Object::Float::Func
+
 =description
 
 Data::Object::Float::Func::To is a function object for Data::Object::Float.
-This package inherits all behavior from L<Data::Object::Float::Func>.
 
 =cut
 

@@ -7,18 +7,9 @@ use warnings;
 
 use Scalar::Util ();
 
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.50'; # VERSION
 
 # FUNCTIONS
-
-sub TypeAny {
-  require Data::Object::Any;
-
-  my $class = 'Data::Object::Any';
-  my $point = $class->can('new');
-
-  unshift @_, $class and goto $point;
-}
 
 sub TypeArray {
   require Data::Object::Array;
@@ -78,15 +69,6 @@ sub TypeHash {
   require Data::Object::Hash;
 
   my $class = 'Data::Object::Hash';
-  my $point = $class->can('new');
-
-  unshift @_, $class and goto $point;
-}
-
-sub TypeInteger {
-  require Data::Object::Integer;
-
-  my $class = 'Data::Object::Integer';
   my $point = $class->can('new');
 
   unshift @_, $class and goto $point;
@@ -184,8 +166,7 @@ sub DeduceNumberlike {
   my ($data) = @_;
 
   return TypeFloat($data) if $data =~ /\./;
-  return TypeNumber($data) if $data =~ /^\d[_\d]*$/;
-  return TypeInteger($data);
+  return TypeNumber($data);
 }
 
 sub DeduceStringLike {
@@ -220,13 +201,11 @@ sub DeduceDeep {
 sub TypeName {
   my ($data) = (Deduce($_[0]));
 
-  return "ANY" if $data->isa("Data::Object::Any");
   return "ARRAY" if $data->isa("Data::Object::Array");
   return "HASH" if $data->isa("Data::Object::Hash");
   return "CODE" if $data->isa("Data::Object::Code");
   return "FLOAT" if $data->isa("Data::Object::Float");
   return "NUMBER" if $data->isa("Data::Object::Number");
-  return "INTEGER" if $data->isa("Data::Object::Integer");
   return "STRING" if $data->isa("Data::Object::String");
   return "SCALAR" if $data->isa("Data::Object::Scalar");
   return "REGEXP" if $data->isa("Data::Object::Regexp");
@@ -508,25 +487,6 @@ Note: Blessed objects are not traversed.
 
 =cut
 
-=head2 typeany
-
-  TypeAny(Any $arg1) : Object
-
-The C<TypeAny> function returns a L<Data::Object::Any> instance which wraps the
-provided data type and can be used to perform operations on the data.
-
-=over 4
-
-=item TypeAny example
-
-  # given ...
-
-  Data::Object::Utility::TypeAny(...);
-
-=back
-
-=cut
-
 =head2 typearray
 
   TypeArray(ArrayRef $arg1) : ArrayObject
@@ -655,25 +615,6 @@ the provided data type and can be used to perform operations on the data.
   # given ...
 
   Data::Object::Utility::TypeHash(...);
-
-=back
-
-=cut
-
-=head2 typeinteger
-
-  TypeInteger(Int $arg1) : IntObject
-
-The C<TypeInteger> function returns a L<Data::Object::Object> instance which
-wraps the provided data type and can be used to perform operations on the data.
-
-=over 4
-
-=item TypeInteger example
-
-  # given ...
-
-  Data::Object::Utility::TypeInteger(...);
 
 =back
 

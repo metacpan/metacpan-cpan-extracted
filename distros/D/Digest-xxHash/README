@@ -1,36 +1,45 @@
 NAME
+
     Digest::xxHash - xxHash Implementation For Perl
 
 SYNOPSIS
-        use Digest::xxHash qw[xxhash32 xxhash32_hex xxhash64 xxhash64_hex];
 
+        use Digest::xxHash qw[xxhash32 xxhash32_hex xxhash64 xxhash64_hex];
+    
         my $hash = xxhash32( $data, $seed );
         my $hex  = xxhash32_hex( $data, $seed );
-
+    
         my $hash_64 = xxhash64( $data, $seed );
         my $hex_64  = xxhash64_hex( $data, $seed );
 
 DESCRIPTION
+
     xxHash is an extremely fast algorithm that claims to work at speeds
     close to RAM limits. This is a wrapper of both the 32- and 64-bit hash
     functions.
 
 FUNCTIONAL INTERFACE
+
     These functions are easy to use but aren't very flexible.
 
-  $h = xxhash32( $data, $seed )
+ $h = xxhash32( $data, $seed )
+
     Calculates a 32 bit hash.
 
-  $h = xxhash32_hex( $data, $seed )
+ $h = xxhash32_hex( $data, $seed )
+
     Calculates a 32 bit hash and returns it as a hex string.
 
-  $h = xxhash64( $data, $seed )
+ $h = xxhash64( $data, $seed )
+
     Calculates a 64 bit hash.
 
-  $h = xxhash64_hex( $data, $seed )
+ $h = xxhash64_hex( $data, $seed )
+
     Calculates a 64 bit hash and returns it as a hex string.
 
 SPEED
+
     According to the xxhash project's website, when run in a single thread
     on a 32bit Windows 7 box with a 3GHz Core 2 Duo processor, xxhash looks
     a little like:
@@ -62,11 +71,13 @@ SPEED
             XXH32        6.8 GB/s            6.0 GB/s
 
 LICENSE
+
     xxHash is covered by the BSD license.
 
     License-wise, I don't actually care about the wrapper I've written.
 
 AUTHOR
+
     Sanko Robinson <sanko@cpan.org>
 
     xxHash by Yann Collet.

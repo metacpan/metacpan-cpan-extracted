@@ -1,5 +1,10 @@
 package Data::Object::String;
 
+use 5.014;
+
+use strict;
+use warnings;
+
 use Role::Tiny::With;
 
 use overload (
@@ -18,9 +23,7 @@ with qw(
 
 use parent 'Data::Object::String::Base';
 
-our $VERSION = '1.09'; # VERSION
-
-# METHODS
+our $VERSION = '1.50'; # VERSION
 
 1;
 
@@ -48,12 +51,21 @@ Data-Object String Class
 
 =head1 DESCRIPTION
 
-This package provides routines for operating on Perl 5 string data. This
-package inherits all behavior from L<Data::Object::String::Base>.
+This package provides routines for operating on Perl 5 string data.
 
-=head1 ROLES
+=cut
 
-This package inherits all behavior from the following roles:
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Data::Object::String::Base>
+
+=cut
+
+=head1 INTEGRATES
+
+This package integrates behaviors from:
 
 L<Data::Object::Role::Detract>
 

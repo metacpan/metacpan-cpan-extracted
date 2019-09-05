@@ -1,13 +1,15 @@
 package Data::Object::Scalar::Func;
 
-use Data::Object 'Class';
+use 5.014;
+
+use strict;
+use warnings;
+
+use Moo;
 
 extends 'Data::Object::Func';
 
-our $VERSION = '1.09'; # VERSION
-
-# BUILD
-# METHODS
+our $VERSION = '1.50'; # VERSION
 
 1;
 
@@ -34,8 +36,15 @@ Functions for ScalarRefs
 =head1 DESCRIPTION
 
 Data::Object::Scalar::Func is an abstract base class for function classes in
-the Data::Object::Scalar::Func space. This package inherits all behavior from
-L<Data::Object::Func>.
+the Data::Object::Scalar::Func space.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Data::Object::Func>
 
 =cut
 

@@ -1,17 +1,15 @@
 package Data::Object::Rule::Defined;
 
+use 5.014;
+
 use strict;
 use warnings;
 
-use Data::Object::Rule;
+use Moo::Role;
 
-our $VERSION = '1.09'; # VERSION
-
-# BUILD
+our $VERSION = '1.50'; # VERSION
 
 requires 'defined';
-
-# METHODS
 
 1;
 =encoding utf8

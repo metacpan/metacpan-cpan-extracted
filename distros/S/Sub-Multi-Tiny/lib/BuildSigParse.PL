@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 # Run Parse::Yapp to generate Sub::Multi::Tiny::SigParse
 
-use 5.010001;
+use 5.006;
 use strict;
 use warnings;
 
@@ -57,7 +57,7 @@ print {$pm_fd} $parser->Output(classname => 'Sub::Multi::Tiny::SigParse',
                                 linenumbers => 1,
                                 template => undef);
 close $pm_fd;
-say STDERR "# Generated $pm_file from $yp_file";
+print STDERR "# Generated $pm_file from $yp_file\n";
 exit 0;
 
 __END__

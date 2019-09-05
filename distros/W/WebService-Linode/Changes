@@ -1,5 +1,35 @@
 Revision history for Perl module WebService::Linode
 
+0.29  2019-09-05 01:24:07 EDT
+    First update in a while, numerous changes:
+      avail.kernels difference in optional arguments:
+        + iskvm  - kernelid
+
+      domain_resource.create difference in optional arguments:
+        + tag
+
+      domain_resource.update difference in optional arguments:
+        + tag
+
+      linode.clone difference in optional arguments:
+        - hypervisor
+
+      New method linode.kvmify
+
+      linode_disk.create difference in optional arguments:
+        - fromdistributionid  - rootpass  - rootsshkeyS
+
+      nodebalancer_config.create difference in optional arguments:
+        + check_passive  + cipher_suite
+
+      nodebalancer_config.update difference in optional arguments:
+        + check_passive  + cipher_suite
+
+      Group professionalservices_scope no longer exists.
+
+      New group volume
+
+
 0.28  2015-05-31 21:45:26 EDT
     - API KVM support:
       - optional hypervisor argument to linode_clone

@@ -17,11 +17,14 @@ Functions for Number Data
 
   use Data::Object::Number::Func;
 
+=inherits
+
+Data::Object::Func
+
 =description
 
 Data::Object::Number::Func is an abstract base class for function classes in
-the Data::Object::Number::Func space. This package inherits all behavior from
-L<Data::Object::Func>.
+the Data::Object::Number::Func space.
 
 =cut
 

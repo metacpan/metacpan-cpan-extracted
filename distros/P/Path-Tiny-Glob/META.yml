@@ -23,10 +23,10 @@ name: Path-Tiny-Glob
 provides:
   Path::Tiny::Glob:
     file: lib/Path/Tiny/Glob.pm
-    version: v0.1.0
+    version: v0.2.0
   Path::Tiny::Glob::Visitor:
     file: lib/Path/Tiny/Glob/Visitor.pm
-    version: v0.1.0
+    version: v0.2.0
 requires:
   Exporter::Tiny: '0'
   List::Lazy: '0'
@@ -40,7 +40,7 @@ resources:
   bugtracker: https://github.com/yanick/Path-Tiny-Glob/issues
   homepage: https://github.com/yanick/Path-Tiny-Glob
   repository: https://github.com/yanick/Path-Tiny-Glob.git
-version: 0.1.0
+version: 0.2.0
 x_author_pledge:
   version: 1
 x_authority: cpan:YANICK

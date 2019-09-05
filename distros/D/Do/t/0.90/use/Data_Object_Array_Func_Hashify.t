@@ -23,11 +23,14 @@ Data-Object Array Function (Hashify) Class
 
   $func->execute;
 
+=inherits
+
+Data::Object::Array::Func
+
 =description
 
 Data::Object::Array::Func::Hashify is a function object for
-Data::Object::Array. This package inherits all behavior from
-L<Data::Object::Array::Func>.
+Data::Object::Array.
 
 =cut
 

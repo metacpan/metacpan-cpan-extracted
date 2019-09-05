@@ -1,5 +1,11 @@
 Revision history for App-TemplateCMD
 
+0.6.10   2019-09-04
+        Updating for release of version 0.6.10
+        Adding newer perl version (Ivan Wills)
+        Updated date (Ivan Wills)
+        New bash template file (Ivan Wills)
+
 0.6.9   2017-12-17
         Updating for release of version 0.6.9
         Add defult running of test (Ivan Wills)

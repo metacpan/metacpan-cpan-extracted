@@ -9,8 +9,8 @@ Sub::Multi::Tiny - Multisubs/multimethods (multiple dispatch) yet another way!
         package main::my_multi;     # We're making main::my_multi()
         use Sub::Multi::Tiny qw($foo $bar);     # All possible params
 
-        sub first :M($foo, $bar) { # sub's name will be ignored
-            return $foo ** $bar;
+        sub first :M($foo, $bar) {  # sub's name will be ignored,
+            return $foo ** $bar;    # but can't match the one we're making
         }
 
         sub second :M($foo) {
@@ -29,7 +29,24 @@ candidate can have each arity.  This limitation will be removed in the future.
 # DESCRIPTION
 
 Sub::Multi::Tiny is a library for making multisubs, aka multimethods,
-aka multiple-dispatch subroutines.
+aka multiple-dispatch subroutines.  Each multisub is defined in a
+single package.  Within that package, the individual implementations ("impls")
+are `sub`s tagged with the `:M` attribute.  The names of the impls are
+preserved but not used specifically by Sub::Multi::Tiny.
+
+Within a multisub package, the name of the sub being defined is available
+for recursion.  For example (using `where`, not yet implemented):
+
+    {
+        package main::fib;
+        use Sub::Multi::Tiny qw($n);
+        sub base  :M($n where { $_ eq 0 })  { 1 }
+        sub other :M($n)                    { $n * fib($n-1) }
+    }
+
+This code creates function `fib()` in package `main`.  Within package
+`main::fib`, function `fib()` is an alias for `main::fib()`.  It's easier
+to use than to explain!
 
 # FUNCTIONS
 

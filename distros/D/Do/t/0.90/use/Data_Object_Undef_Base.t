@@ -21,10 +21,13 @@ Data-Object Abstract Undef Class
 
   my $undef = My::Undef->new(undef);
 
+=inherits
+
+Data::Object::Base
+
 =description
 
-Data::Object::Undef::Base provides routines for operating on Perl 5 undefined
-data. This package inherits all behavior from L<Data::Object::Base>.
+This package provides routines for operating on Perl 5 undefined data.
 
 =cut
 

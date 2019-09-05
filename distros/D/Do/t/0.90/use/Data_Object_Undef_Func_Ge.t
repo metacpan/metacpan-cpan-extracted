@@ -23,10 +23,13 @@ Data-Object Undef Function (Ge) Class
 
   $func->execute;
 
+=inherits
+
+Data::Object::Undef::Func
+
 =description
 
 Data::Object::Undef::Func::Ge is a function object for Data::Object::Undef.
-This package inherits all behavior from L<Data::Object::Undef::Func>.
 
 =cut
 

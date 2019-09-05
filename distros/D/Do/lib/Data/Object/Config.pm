@@ -1,5 +1,7 @@
 package Data::Object::Config;
 
+use 5.014;
+
 use strict;
 use warnings;
 
@@ -7,7 +9,7 @@ use Carp ();
 
 use Import::Into;
 
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.50'; # VERSION
 
 # BUILD
 

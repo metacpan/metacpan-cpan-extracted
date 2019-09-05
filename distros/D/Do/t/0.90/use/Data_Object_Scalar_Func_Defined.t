@@ -23,11 +23,14 @@ Data-Object Scalar Function (Defined) Class
 
   $func->execute;
 
+=inherits
+
+Data::Object::Scalar::Func
+
 =description
 
 Data::Object::Scalar::Func::Defined is a function object for
-Data::Object::Scalar. This package inherits all behavior from
-L<Data::Object::Scalar::Func>.
+Data::Object::Scalar.
 
 =cut
 

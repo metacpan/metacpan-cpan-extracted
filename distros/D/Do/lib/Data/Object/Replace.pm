@@ -16,7 +16,7 @@ use overload (
 
 use parent 'Data::Object::Array';
 
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.50'; # VERSION
 
 # METHODS
 
@@ -159,8 +159,15 @@ Data-Object Replace Class
 =head1 DESCRIPTION
 
 This package provides routines for introspecting the results of a regexp
-replace operation. This package inherits all behavior from
-L<Data::Object::Array>.
+replace operation.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Data::Object::Array>
 
 =cut
 

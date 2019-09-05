@@ -33,7 +33,11 @@
       },
       "runtime" : {
          "requires" : {
+            "Data::Dumper" : "0",
+            "Fcntl" : "0",
+            "File::Copy" : "0",
             "File::Find" : "0",
+            "File::Path" : "0",
             "File::Spec::Functions" : "0",
             "Getopt::Long" : "0",
             "Pod::Usage" : "0",
@@ -57,6 +61,6 @@
          "web" : "https://github.com/mkende/pfind"
       }
    },
-   "version" : "1.03",
+   "version" : "1.05",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

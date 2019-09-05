@@ -44,6 +44,10 @@ foundational set of types, functions, classes, patterns, and interfaces for
 jump-starting application development. This package inherits all behavior from
 L<Data::Object>.
 
++=head1 SLOGAN
+
+If you're doing something modern with Perl, start here!
+
 +=head1 FRAMEWORK
 
 Do (aka Data-Object) is a robust modern Perl development framework, embracing
@@ -328,7 +332,7 @@ If you don't have cpanm, get it! It takes less than a minute, otherwise:
 
 Add C<Do> to the list of dependencies in C<cpanfile>:
 
-  requires "Do" => "1.05"; # 1.05 or newer
+  requires "Do" => "1.09"; # 1.09 or newer
 
 If cpanm doesn't have permission to install modules in the current Perl
 installation, it will automatically set up and install to a local::lib in your

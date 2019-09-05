@@ -1,13 +1,15 @@
 package Data::Object::Struct;
 
+use 5.014;
+
 use strict;
 use warnings;
 
-use Data::Object::Class;
+use Moo;
 
 with 'Data::Object::Role::Immutable';
 
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.50'; # VERSION
 
 # BUILD
 

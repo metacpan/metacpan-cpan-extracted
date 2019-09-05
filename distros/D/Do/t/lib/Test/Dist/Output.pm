@@ -34,11 +34,13 @@ method construct() {
   push @$content, $self->construct_abstract;
   push @$content, $self->construct_synopsis;
   push @$content, $self->construct_description;
-
+  push @$content, $self->construct_inherits;
+  push @$content, $self->construct_integrates;
   push @$content, $self->construct_exports_list;
   push @$content, $self->construct_functions_list;
   push @$content, $self->construct_methods_list;
   push @$content, $self->construct_routines_list;
+  push @$content, $self->construct_footers;
 
   return $self;
 }
@@ -69,6 +71,45 @@ method construct_description() {
   my $description = $pdoc->description;
 
   return $self->markup_head1('description', $description); ;
+}
+
+method construct_footers() {
+  my $pdoc = $self->document;
+  my $footers = $pdoc->footers;
+
+  return () if !$footers;
+
+  return join("\n", "", @$footers);
+}
+
+method construct_inherits() {
+  my $inherits = $self->document->inherits;
+
+  return () if !$inherits || !@$inherits;
+
+  my @content;
+
+  push @content, $self->markup_head1('inherits', [
+    "This package inherits behaviors from:",
+    "", join "\n\n", map "L<$_>", @$inherits
+  ]);
+
+  return join("\n", @content);
+}
+
+method construct_integrates() {
+  my $integrates = $self->document->integrates;
+
+  return () if !$integrates || !@$integrates;
+
+  my @content;
+
+  push @content, $self->markup_head1('integrates', [
+    "This package integrates behaviors from:",
+    "", join "\n\n", map "L<$_>", @$integrates
+  ]);
+
+  return join("\n", @content);
 }
 
 method construct_exports_list() {

@@ -1,4 +1,4 @@
-use 5.010001;
+use 5.006;
 use strict;
 use warnings;
 use Test::More;
@@ -20,7 +20,7 @@ use Test::More;
 
 }
 
-ok eval { \&main::my_multi }, 'my_multi() exists';
+ok do { no strict 'refs'; defined *{"main::my_multi"}{CODE} }, 'my_multi() exists';
 
 cmp_ok my_multi(2, 5), '==', 32, 'two-parameter';
 cmp_ok my_multi(5, 2), '==', 25, 'two-parameter, checking arg order';

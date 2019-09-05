@@ -1,10 +1,15 @@
 package Data::Object::Number::Func::Defined;
 
+use 5.014;
+
+use strict;
+use warnings;
+
 use Data::Object 'Class';
 
 extends 'Data::Object::Number::Func';
 
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.50'; # VERSION
 
 # BUILD
 
@@ -55,8 +60,15 @@ Data-Object Number Function (Defined) Class
 =head1 DESCRIPTION
 
 Data::Object::Number::Func::Defined is a function object for
-Data::Object::Number. This package inherits all behavior from
-L<Data::Object::Number::Func>.
+Data::Object::Number.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Data::Object::Number::Func>
 
 =cut
 

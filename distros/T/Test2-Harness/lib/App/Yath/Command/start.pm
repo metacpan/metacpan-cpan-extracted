@@ -9,7 +9,7 @@ BEGIN {
     $DTRACE = Test2::Harness::Util::DepTracer->new;
 }
 
-our $VERSION = '0.001093';
+our $VERSION = '0.001095';
 
 use File::Spec();
 
@@ -450,6 +450,8 @@ This is not compatible with preload.
 =over 4
 
 =item -pPlugin
+
+=item -pPlugin=arg1,arg2,...
 
 =item -p+My::Plugin
 

@@ -21,10 +21,13 @@ Data-Object Abstract Hash Class
 
   my $hash = My::Hash->new({1..4});
 
+=inherits
+
+Data::Object::Base
+
 =description
 
-Data::Object::Hash::Base provides routines for operating on Perl 5 hash
-references. This package inherits all behavior from L<Data::Object::Base>.
+This package provides routines for operating on Perl 5 hash references.
 
 =cut
 

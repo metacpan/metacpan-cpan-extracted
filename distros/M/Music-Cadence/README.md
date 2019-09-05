@@ -1,4 +1,4 @@
 # Music-Cadence
-Provides the chords of musical cadences
+Generate musical cadence chords
 
 Distribution package can be found at https://metacpan.org/release/Music-Cadence

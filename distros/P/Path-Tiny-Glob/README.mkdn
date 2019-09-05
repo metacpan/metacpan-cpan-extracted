@@ -4,7 +4,7 @@ Path::Tiny::Glob - File globbing utility
 
 # VERSION
 
-version 0.1.0
+version 0.2.0
 
 # SYNOPSIS
 
@@ -35,7 +35,15 @@ This function takes in
 a shell-like file glob, and returns a [Lazy::List](https://metacpan.org/pod/Lazy::List) of [Path::Tiny](https://metacpan.org/pod/Path::Tiny) objects
 matching it.
 
-Caveat: backtracking paths using `..` doesn't work.
+If you prefer to get all the globbed files in one go instead of
+[Lazy::List](https://metacpan.org/pod/Lazy::List)ed, you can import `pathglob` with the flag `all`:
+
+```perl
+use Path::Tiny::Glob pathglob => { all => 1 };
+
+# now behaves like pathglob( '/foo/**' )->all;
+my @files = pathglob( '/foo/**' );
+```
 
 The function can also take an arrayref of path segments.
 The segments can be strings, in which case they are obeying
@@ -64,6 +72,8 @@ compared to the paths' current `basename`.
 ```
 @readmes = pathglob( [ 'foo/bar/**/', /^readme\.(md|mkd|txt)$/i );
 ```
+
+Known limitation: backtracking paths using `..` doesn't work.
 
 ### Supported globbing patterns
 

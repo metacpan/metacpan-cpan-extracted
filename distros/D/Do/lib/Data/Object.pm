@@ -7,24 +7,18 @@ use warnings;
 
 use parent 'Data::Object::Config';
 
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.50'; # VERSION
 
 # METHODS
 
 sub new {
   my ($class, $name) = @_;
 
-  die "Invalid argument" unless ($name || '') =~ /^[a-zA-Z]\w*/;
+  die "Invalid argument" unless ("$name" || "") =~ /^[a-zA-Z]\w*/;
 
   require Data::Object::Space;
 
   return Data::Object::Space->new(join '::', __PACKAGE__, $name);
-}
-
-sub any {
-  my ($class, $data) = @_;
-
-  return $class->new('Any')->build($data);
 }
 
 sub array {
@@ -55,12 +49,6 @@ sub hash {
   my ($class, $data) = @_;
 
   return $class->new('Hash')->build($data);
-}
-
-sub integer {
-  my ($class, $data) = @_;
-
-  return $class->new('Integer')->build($data);
 }
 
 sub number {
@@ -105,7 +93,7 @@ Data::Object
 
 =head1 ABSTRACT
 
-Development Framework Entrypoint
+Development Framework
 
 =cut
 
@@ -131,7 +119,7 @@ foundational set of types, functions, classes, patterns, and interfaces for
 jump-starting application development. This package inherits all behavior from
 L<Data::Object::Config>.
 
-=head1 RATIONALE
+=head1 PURPOSE
 
 This package provides a framework for modern Perl development, embracing
 Perl's multi-paradigm programming nature, flexibility and vast ecosystem that
@@ -264,25 +252,6 @@ This package implements the following methods.
 
 =cut
 
-=head2 any
-
-  any(Any $arg) : AnyObject
-
-The C<any> constructor function returns a L<Data::Object::Any> object for given
-argument.
-
-=over 4
-
-=item any example
-
-  # given \*main
-
-  my $object = Data::Object->any(\*main);
-
-=back
-
-=cut
-
 =head2 array
 
   array(ArrayRef $arg) : ArrayObject
@@ -373,25 +342,6 @@ argument.
   # given {1..4}
 
   my $object = Data::Object->hash({1..4});
-
-=back
-
-=cut
-
-=head2 integer
-
-  integer(Int $arg) : IntegerObject
-
-The C<integer> constructor function returns a L<Data::Object::Integer> object for given
-argument.
-
-=over 4
-
-=item integer example
-
-  # given -123
-
-  my $object = Data::Object->integer(-123);
 
 =back
 

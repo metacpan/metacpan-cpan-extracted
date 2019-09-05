@@ -19,7 +19,11 @@ no_index:
   namespace:
     - App::Pfind
 requires:
+  Data::Dumper: '0'
+  Fcntl: '0'
+  File::Copy: '0'
   File::Find: '0'
+  File::Path: '0'
   File::Spec::Functions: '0'
   Getopt::Long: '0'
   Pod::Usage: '0'
@@ -28,5 +32,5 @@ requires:
 resources:
   bugtracker: https://github.com/mkende/pfind/issues
   repository: https://github.com/mkende/pfind
-version: '1.03'
+version: '1.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

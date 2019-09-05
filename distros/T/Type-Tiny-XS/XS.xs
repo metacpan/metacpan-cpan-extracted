@@ -176,14 +176,14 @@ int
 typetiny_tc_Int(pTHX_ SV* const data PERL_UNUSED_DECL, SV* const sv) {
     assert(sv);
     if (SvOK(sv) && !SvROK(sv) && !isGV(sv)) {
-        if(SvPOKp(sv)){
+        if(SvPOK(sv)){
             return S_pv_is_integer(aTHX_ SvPVX(sv));
         }
-        else if(SvNOKp(sv)) {
-            return S_nv_is_integer(aTHX_ SvNVX(sv));
-        }
-        else if(SvIOKp(sv)){
+        else if(SvIOK(sv)){
             return TRUE;
+        }
+        else if(SvNOK(sv)) {
+            return S_nv_is_integer(aTHX_ SvNVX(sv));
         }
     }
     return FALSE;

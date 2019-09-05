@@ -17,11 +17,14 @@ Functions for Float Data
 
   use Data::Object::Float::Func;
 
+=inherits
+
+Data::Object::Func
+
 =description
 
 Data::Object::Float::Func is an abstract base class for function classes in the
-Data::Object::Float::Func space. This package inherits all behavior from
-L<Data::Object::Func>.
+Data::Object::Float::Func space.
 
 =cut
 

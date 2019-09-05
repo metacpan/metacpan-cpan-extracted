@@ -17,11 +17,14 @@ Functions for ScalarRefs
 
   use Data::Object::Scalar::Func;
 
+=inherits
+
+Data::Object::Func
+
 =description
 
 Data::Object::Scalar::Func is an abstract base class for function classes in
-the Data::Object::Scalar::Func space. This package inherits all behavior from
-L<Data::Object::Func>.
+the Data::Object::Scalar::Func space.
 
 =cut
 

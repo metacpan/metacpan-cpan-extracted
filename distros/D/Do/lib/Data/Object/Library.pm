@@ -1,53 +1,561 @@
 package Data::Object::Library;
 
+use 5.014;
+
+use strict;
+use warnings;
+
 use base 'Type::Library';
 
+use Type::Tiny ();
 use Type::Utils ();
+use Type::Coercion ();
+use Types::TypeTiny ();
 
-use Data::Object::Type::Any;
-use Data::Object::Type::Array;
-use Data::Object::Type::Code;
-use Data::Object::Type::Exception;
-use Data::Object::Type::Float;
-use Data::Object::Type::Func;
-use Data::Object::Type::Hash;
-use Data::Object::Type::Integer;
-use Data::Object::Type::Number;
-use Data::Object::Type::Regexp;
-use Data::Object::Type::Replace;
-use Data::Object::Type::Scalar;
-use Data::Object::Type::Search;
-use Data::Object::Type::Space;
-use Data::Object::Type::String;
-use Data::Object::Type::Undef;
-
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.50'; # VERSION
 
 Type::Utils::extends('Types::Standard');
 Type::Utils::extends('Types::TypeTiny');
 Type::Utils::extends('Types::Common::Numeric');
 Type::Utils::extends('Types::Common::String');
 
-# CUSTOM TYPE CONSTRAINT BUILDERS
+# TYPES
 
-register Data::Object::Type::Any;
-register Data::Object::Type::Array;
-register Data::Object::Type::Code;
-register Data::Object::Type::Exception;
-register Data::Object::Type::Float;
-register Data::Object::Type::Func;
-register Data::Object::Type::Hash;
-register Data::Object::Type::Integer;
-register Data::Object::Type::Number;
-register Data::Object::Type::Regexp;
-register Data::Object::Type::Replace;
-register Data::Object::Type::Scalar;
-register Data::Object::Type::Search;
-register Data::Object::Type::Space;
-register Data::Object::Type::String;
-register Data::Object::Type::Undef;
+RegisterAll(DoArray());
+RegisterAll(DoCode());
+RegisterAll(DoException());
+RegisterAll(DoFloat());
+RegisterAll(DoFunc());
+RegisterAll(DoHash());
+RegisterAll(DoNumber());
+RegisterAll(DoRegexp());
+RegisterAll(DoReplace());
+RegisterAll(DoScalar());
+RegisterAll(DoSearch());
+RegisterAll(DoSpace());
+RegisterAll(DoString());
+RegisterAll(DoUndef());
 
-# METHODS
+
+# FUNCTIONS
+
+sub DoArray {
+  {
+    name => 'DoArray',
+    aliases => [
+      'ArrayObj',
+      'ArrayObject'
+    ],
+    coercions => [
+      'ArrayRef', sub {
+        require Data::Object::Array;
+        Data::Object::Array->new($_[0]);
+      }
+    ],
+    validation => sub {
+      return 0 if !$_[0]->isa('Data::Object::Array');
+      return 1;
+    },
+    explaination => sub {
+      my ($data, $type, $name) = @_;
+
+      my $param = $type->parameters->[0];
+
+      for my $i (0 .. $#$data) {
+        next if $param->check($data->[$i]);
+
+        my $indx = sprintf('%s->[%d]', $name, $i);
+        my $desc = $param->validate_explain($data->[$i], $indx);
+        my $text = '"%s" constrains each value in the array object with "%s"';
+
+        return [sprintf($text, $type, $param), @{$desc}];
+      }
+
+      return;
+    },
+    parameterize_constraint => sub {
+      my ($data, $type) = @_;
+
+      $type->check($_) || return for @$data;
+
+      return !!1;
+    },
+    parameterize_coercions => sub {
+      my ($data, $type, $anon) = @_;
+
+      my $coercions = [];
+
+      push @$coercions, 'ArrayRef', sub {
+        my $value = @_ ? $_[0] : $_;
+        my $items = [];
+
+        for (my $i = 0; $i < @$value; $i++) {
+          return $value unless $anon->check($value->[$i]);
+          $items->[$i] = $data->coerce($value->[$i]);
+        }
+
+        return $type->coerce($items);
+      };
+
+      return $coercions;
+    },
+    parent => 'Object'
+  }
+}
+
+sub DoCode {
+  {
+    name => 'DoCode',
+    aliases => [
+      'CodeObj',
+      'CodeObject'
+    ],
+    coercions => [
+      'CodeRef', sub {
+        require Data::Object::Code;
+        Data::Object::Code->new($_[0]);
+      }
+    ],
+    validation => sub {
+      return 0 if !$_[0]->isa('Data::Object::Code');
+      return 1;
+    },
+    parent => 'Object'
+  }
+}
+
+sub DoException {
+  {
+    name => 'DoException',
+    aliases => [
+      'ExceptionObj',
+      'ExceptionObject'
+    ],
+    validation => sub {
+      return 0 if !$_[0]->isa('Data::Object::Exception');
+      return 1;
+    },
+    parent => 'Object'
+  }
+}
+
+sub DoFloat {
+  {
+    name => 'DoFloat',
+    aliases => [
+      'FloatObj',
+      'FloatObject'
+    ],
+    coercions => [
+      'Str', sub {
+        require Data::Object::Float;
+        Data::Oject::Float->new($_[0]);
+      },
+      'Num', sub {
+        require Data::Object::Float;
+        Data::Oject::Float->new($_[0]);
+      },
+      'LaxNum', sub {
+        require Data::Object::Float;
+        Data::Oject::Float->new($_[0]);
+      }
+    ],
+    validation => sub {
+      return 0 if !$_[0]->isa('Data::Object::Float');
+      return 1;
+    },
+    parent => 'Object'
+  }
+}
+
+sub DoFunc {
+  {
+    name => 'DoFunc',
+    aliases => [
+      'FuncObj',
+      'FuncObject'
+    ],
+    validation => sub {
+      return 0 if !$_[0]->isa('Data::Object::Func');
+      return 1;
+    },
+    parent => 'Object'
+  }
+}
+
+sub DoHash {
+  {
+    name => 'DoHash',
+    aliases => [
+      'HashObj',
+      'HashObject'
+    ],
+    coercions => [
+      'HashRef', sub {
+        require Data::Object::Hash;
+        Data::Object::Hash->new($_[0]);
+      }
+    ],
+    validation => sub {
+      return 0 if !$_[0]->isa('Data::Object::Hash');
+      return 1;
+    },
+    explaination => sub {
+      my ($data, $type, $name) = @_;
+
+      my $param = $type->parameters->[0];
+
+      for my $k (sort keys %$data) {
+        next if $param->check($data->{$k});
+
+        my $indx = sprintf('%s->{%s}', $name, B::perlstring($k));
+        my $desc = $param->validate_explain($data->{$k}, $indx);
+        my $text = '"%s" constrains each value in the hash object with "%s"';
+
+        return [sprintf($text, $type, $param), @{$desc}];
+      }
+
+      return;
+    },
+    parameterize_constraint => sub {
+      my ($data, $type) = @_;
+
+      $type->check($_) || return for values %$data;
+
+      return !!1;
+    },
+    parameterize_coercions => sub {
+      my ($data, $type, $anon) = @_;
+
+      my $coercions = [];
+
+      push @$coercions, 'HashRef', sub {
+        my $value = @_ ? $_[0] : $_;
+        my $items = {};
+
+        for my $k (sort keys %$value) {
+          return $value unless $anon->check($value->{$k});
+          $items->{$k} = $data->coerce($value->{$k});
+        }
+
+        return $type->coerce($items);
+      };
+
+      return $coercions;
+    },
+    parent => 'Object'
+  }
+}
+
+sub DoNumber {
+  {
+    name => 'DoNum',
+    aliases => [
+      'NumObj',
+      'NumObject',
+      'NumberObj',
+      'NumberObject'
+    ],
+    coercions => [
+      'Int', sub {
+        require Data::Object::Number;
+        Data::Object::Number->new($_[0]);
+      },
+      'Num', sub {
+        require Data::Object::Number;
+        Data::Object::Number->new($_[0]);
+      },
+      'LaxNum', sub {
+        require Data::Object::Number;
+        Data::Object::Number->new($_[0]);
+      },
+      'StrictNum', sub {
+        require Data::Object::Number;
+        Data::Object::Number->new($_[0]);
+      },
+      'Str', sub {
+        require Data::Object::Number;
+        Data::Object::Number->new($_[0]);
+      }
+    ],
+    validation => sub {
+      return 0 if !$_[0]->isa('Data::Object::Number');
+      return 1;
+    },
+    parent => 'Object'
+  }
+}
+
+sub DoRegexp {
+  {
+    name => 'DoRegexp',
+    aliases => [
+      'RegexpObj',
+      'RegexpObject'
+    ],
+    coercions => [
+      'RegexpRef', sub {
+        require Data::Object::Regexp;
+        Data::Object::Regexp->new($_[0]);
+      }
+    ],
+    validation => sub {
+      return 0 if !$_[0]->isa('Data::Object::Regexp');
+      return 1;
+    },
+    parent => 'Object'
+  }
+}
+
+sub DoReplace {
+  {
+    name => 'DoReplace',
+    aliases => [
+      'ReplaceObj',
+      'ReplaceObject'
+    ],
+    validation => sub {
+      return 0 if !$_[0]->isa('Data::Object::Replace');
+      return 1;
+    },
+    parent => 'Object'
+  }
+}
+
+sub DoScalar {
+  {
+    name => 'DoScalar',
+    aliases => [
+      'ScalarObj',
+      'ScalarObject'
+    ],
+    coercions => [
+      'ScalarRef', sub {
+        require Data::Object::Scalar;
+        Data::Object::Scalar->new($_[0]);
+      }
+    ],
+    validation => sub {
+      return 0 if !$_[0]->isa('Data::Object::Scalar');
+      return 1;
+    },
+    parent => 'Object'
+  }
+}
+
+sub DoSearch {
+  {
+    name => 'DoSearch',
+    aliases => [
+      'SearchObj',
+      'SearchObject'
+    ],
+    validation => sub {
+      return 0 if !$_[0]->isa('Data::Object::Search');
+      return 1;
+    },
+    parent => 'Object'
+  }
+}
+
+sub DoSpace {
+  {
+    name => 'DoSpace',
+    aliases => [
+      'SpaceObj',
+      'SpaceObject'
+    ],
+    coercions => [
+      'Str', sub {
+        require Data::Object::Space;
+        Data::Object::Space->new($_[0]);
+      }
+    ],
+    validation => sub {
+      return 0 if !$_[0]->isa('Data::Object::Space');
+      return 1;
+    },
+    parent => 'Object'
+  }
+}
+
+sub DoString {
+  {
+    name => 'DoStr',
+    aliases => [
+      'StrObj',
+      'StrObject',
+      'StringObj',
+      'StringObject'
+    ],
+    coercions => [
+      'Str', sub {
+        require Data::Object::String;
+        Data::Object::String->new($_[0]);
+      }
+    ],
+    validation => sub {
+      return 0 if !$_[0]->isa('Data::Object::String');
+      return 1;
+    },
+    parent => 'Object'
+  }
+}
+
+sub DoUndef {
+  {
+    name => 'DoUndef',
+    aliases => [
+      'UndefObj',
+      'UndefObject'
+    ],
+    coercions => [
+      'Undef', sub {
+        require Data::Object::Undef;
+        Data::Object::Undef->new($_[0]);
+      }
+    ],
+    validation => sub {
+      return 0 if !$_[0]->isa('Data::Object::Undef');
+      return 1;
+    },
+    parent => 'Object'
+  }
+}
+
+sub Library {
+  __PACKAGE__->meta;
+}
+
+sub Register {
+  my ($type) = @_;
+
+  my $library = Library();
+
+  my $name = $type->{name};
+  my $aliases = $type->{aliases};
+  my $parent = $type->{parent};
+  my $coercions = $type->{coercions};
+  my $validation = $type->{validation};
+
+  return if $library->get_type($name);
+
+  my $tinytype = Type::Tiny->new(Options($type));
+
+  if ($type->{coercions}) {
+    my $coercions = $type->{coercions};
+
+    for (my $i = 0; $i < @$coercions; $i+=2) {
+      if (!ref($coercions->[$i])) {
+        $coercions->[$i] = $library->get_type($coercions->[$i]);
+      }
+    }
+
+    $tinytype->coercion->add_type_coercions(@$coercions);
+  }
+
+  $library->add_type($tinytype);
+
+  return $tinytype;
+}
+
+sub Options {
+  my ($type) = @_;
+
+  my $library = Library();
+  my %options;
+
+  $options{name} = $type->{name};
+  $options{parent} = $type->{parent};
+  $options{constraint} = sub { $type->{validation}->(@_) };
+
+  if ($type->{explaination}) {
+    $options{deep_explanation} = sub {
+      GenerateExplanation($type, @_)
+    };
+  }
+
+  if ($type->{parameterize_coercions}) {
+    $options{coercion_generator} = sub {
+      GenerateCoercion($type, @_)
+    };
+  }
+
+  if ($type->{parameterize_constraint}) {
+    $options{constraint_generator} = sub {
+      GenerateConstraint($type, @_)
+    };
+  }
+
+  if (!ref($options{parent})) {
+    $options{parent} = $library->get_type($options{parent});
+  }
+
+  return %options;
+}
+
+sub RegisterAll {
+  my ($type) = @_;
+
+  my $registered = Register($type);
+
+  Register({%{$type}, name => $_, aliases => []}) for @{$type->{aliases}};
+
+  return $registered;
+}
+
+sub GenerateCoercion {
+  my ($type, @args) = @_;
+
+  my ($type1, $xtype, $type2) = @args;
+
+  my $library = Library();
+
+  if (!$type2->has_coercion) {
+    return $type1->coercion;
+  }
+
+  my $anon = $type2->coercion->_source_type_union;
+  my $coercion = Type::Coercion->new(type_constraint => $xtype);
+  my $generated = $type->{parameterize_coercions}->($type2, $type1, $anon);
+
+  for (my $i = 0; $i < @$generated; $i+=2) {
+    my $item = $generated->[$i];
+
+    $generated->[$i] = $library->get_type($item) if !ref($item);
+  }
+
+  $coercion->add_type_coercions(@$generated);
+
+  return $coercion;
+}
+
+sub GenerateConstraint {
+  my ($type, @args) = @_;
+
+  return $type->{validator} if !@args;
+
+  my $sign = "@{[$type->{name}]}\[`a\]";
+  my $text = "Parameter to $sign expected to be a type constraint";
+  my @list = map Types::TypeTiny::to_TypeTiny($_), @args;
+
+  for my $item (@list) {
+    if ($item->isa('Type::Tiny')) {
+      next;
+    }
+    if (!Types::TypeTiny::TypeTiny->check($item)) {
+      Types::Standard::_croak("$text; got $item");
+    }
+  }
+
+  return sub { my ($data) = @_; $type->{parameterize_constraint}->($data, @list) };
+}
+
+sub GenerateExplanation {
+  my ($type, @args) = @_;
+
+  return $type->{explaination}->($_[2], $_[1], $_[3]);
+}
 
 1;
 
@@ -73,1023 +581,1378 @@ Data-Object Type Library
 
 =head1 DESCRIPTION
 
-This package provides a type library derived from L<Type::Library> which
-extends the L<Types::Standard>, L<Types::Common::Numeric>, and
-L<Types::Common::String> libraries, and adds additional type constraints. This
-package inherits all behavior from L<Type::Library>.
+This package provides a core type library for the L<Do> framework.
 
-=head1 TYPES
+=cut
 
-This package can export the following type constraints.
+=head1 INHERITS
 
-=head2 Any
+This package inherits behaviors from:
+
+L<Type::Library>
+
+L<Types::Standard>
+
+L<Types::Common::String>
+
+L<Types::Common::Numeric>
+
+=cut
+
+=head1 FUNCTIONS
+
+This package implements the following functions.
+
+=cut
+
+=head2 doarray
+
+  DoArray() : HashRef
+
+This function returns the type configuration for a L<Data::Object::Array>
+object.
+
+=over 4
+
+=item DoArray example
+
+  Data::Object::Library::DoArray();
+
+=back
+
+=cut
+
+=head2 docode
+
+  DoCode() : HashRef
+
+This function returns the type configuration for a L<Data::Object::Code>
+object.
+
+=over 4
+
+=item DoCode example
+
+  Data::Object::Library::DoCode();
+
+=back
+
+=cut
+
+=head2 doexception
+
+  DoException() : HashRef
+
+This function returns the type configuration for a L<Data::Object::Exception>
+object.
+
+=over 4
+
+=item DoException example
+
+  Data::Object::Library::DoException();
+
+=back
+
+=cut
+
+=head2 dofloat
+
+  DoFloat() : HashRef
+
+This function returns the type configuration for a L<Data::Object::Float>
+object.
+
+=over 4
+
+=item DoFloat example
+
+  Data::Object::Library::DoFloat();
+
+=back
+
+=cut
+
+=head2 dofunc
+
+  DoFunc() : HashRef
+
+This function returns the type configuration for a L<Data::Object::Func>
+object.
+
+=over 4
+
+=item DoFunc example
+
+  Data::Object::Library::DoFunc();
+
+=back
+
+=cut
+
+=head2 dohash
+
+  DoHash() : HashRef
+
+This function returns the type configuration for a L<Data::Object::Hash>
+object.
+
+=over 4
+
+=item DoHash example
+
+  Data::Object::Library::DoHash();
+
+=back
+
+=cut
+
+=head2 donumber
+
+  DoNumber() : HashRef
+
+This function returns the type configuration for a L<Data::Object::Number>
+object.
+
+=over 4
+
+=item DoNumber example
+
+  Data::Object::Library::DoNumber();
+
+=back
+
+=cut
+
+=head2 doregexp
+
+  DoRegexp() : HashRef
+
+This function returns the type configuration for a L<Data::Object::Regexp>
+object.
+
+=over 4
+
+=item DoRegexp example
+
+  Data::Object::Library::DoRegexp();
+
+=back
+
+=cut
+
+=head2 doreplace
+
+  DoReplace() : HashRef
+
+This function returns the type configuration for a L<Data::Object::Replace>
+object.
+
+=over 4
+
+=item DoReplace example
+
+  Data::Object::Library::DoReplace();
+
+=back
+
+=cut
+
+=head2 doscalar
+
+  DoScalar() : HashRef
+
+This function returns the type configuration for a L<Data::Object::Scalar>
+object.
+
+=over 4
+
+=item DoScalar example
+
+  Data::Object::Library::DoScalar();
+
+=back
+
+=cut
+
+=head2 dosearch
+
+  DoSearch() : HashRef
+
+This function returns the type configuration for a L<Data::Object::Search>
+object.
+
+=over 4
+
+=item DoSearch example
+
+  Data::Object::Library::DoSearch();
+
+=back
+
+=cut
+
+=head2 dospace
+
+  DoSpace() : HashRef
+
+This function returns the type configuration for a L<Data::Object::Space>
+object.
+
+=over 4
+
+=item DoSpace example
+
+  Data::Object::Library::DoSpace();
+
+=back
+
+=cut
+
+=head2 dostring
+
+  DoString() : HashRef
+
+This function returns the type configuration for a L<Data::Object::String>
+object.
+
+=over 4
+
+=item DoString example
+
+  Data::Object::Library::DoString();
+
+=back
+
+=cut
+
+=head2 doundef
+
+  DoUndef() : HashRef
+
+This function returns the type configuration for a L<Data::Object::Undef>
+object.
+
+=over 4
+
+=item DoUndef example
+
+  Data::Object::Library::DoUndef();
+
+=back
+
+=cut
+
+=head2 generatecoercion
+
+  GenerateCoercion(HashRef $config) : InstanceOf["Type::Coercion"]
+
+This function takes a type configuration hashref, then generates and returns a
+type coercion based on its configuration.
+
+=over 4
+
+=item GenerateCoercion example
+
+  Data::Object::Library::GenerateCoercion({...});
+
+=back
+
+=cut
+
+=head2 generateconstraint
+
+  GenerateConstraint(HashRef $config) : CodeRef
+
+This function takes a type configuration hashref, then generates and returns a
+coderef which validates the type based on its configuration.
+
+=over 4
+
+=item GenerateConstraint example
+
+  Data::Object::Library::GenerateConstraint({...});
+
+=back
+
+=cut
+
+=head2 generateexplanation
+
+  GenerateExplanation(HashRef $config) : CodeRef
+
+This function takes a type configuration hashref, then generates and returns a
+coderef which returns a deep-explanation of the type failure based on its
+configuration.
+
+=over 4
+
+=item GenerateExplanation example
+
+  Data::Object::Library::GenerateExplanation({...});
+
+=back
+
+=cut
+
+=head2 library
+
+  Library() : InstanceOf["Type::Library"]
+
+This function returns the core type library object.
+
+=over 4
+
+=item Library example
+
+  Data::Object::Library::Library();
+
+=back
+
+=cut
+
+=head2 options
+
+  Options(HashRef $config) : (Any)
+
+This function takes a type configuration hashref, then generates and returns a
+set of options relevant to creating L<Type::Tiny> objects.
+
+=over 4
+
+=item Options example
+
+  Data::Object::Library::Options({...});
+
+=back
+
+=cut
+
+=head2 register
+
+  Register(HashRef $config) : InstanceOf["Type::Tiny"]
+
+This function takes a type configuration hashref, then generates and returns a
+L<Type::Tiny> object based on its configuration.
+
+=over 4
+
+=item Register example
+
+  Data::Object::Library::Register({...});
+
+=back
+
+=cut
+
+=head2 registerall
+
+  RegisterAll(HashRef $config) : InstanceOf["Type::Tiny"]
+
+This function takes a type configuration hashref, then generates and returns a
+L<Type::Tiny> object based on its configuration. This method also registers
+aliases as stand-alone types in the library.
+
+=over 4
+
+=item RegisterAll example
+
+  Data::Object::Library::RegisterAll({...});
+
+=back
+
+=cut
+
+=head1 CONSTRAINTS
+
+This package provides the following type constraints.
+
+=head2 any
 
   # Any
 
-The Any type constraint is provided by the L<Types::Standard> library. Please
+The C<Any> type constraint is provided by the L<Types::Standard> library. Please
 see that documentation for more information. The C<assert_Any> function can be
 used to throw an exception is the argument can not be validated. The C<is_Any>
 function can be used to return true or false if the argument can not be
 validated.
 
-=head2 AnyObj
-
-  # AnyObj
-
-The AnyObj type constraint is provided by this library and accepts any object
-that is, or is derived from, a L<Data::Object::Any> object. The
-C<assert_AnyObj> function can be used to throw an exception if the argument can
-not be validated. The C<is_AnyObj> function can be used to return true or false if
-the argument can not be validated.
-
-=head2 AnyObject
-
-  # AnyObject
-
-The AnyObject type constraint is provided by this library and accepts any
-object that is, or is derived from, a L<Data::Object::Any> object. The
-C<assert_AnyObject> function can be used to throw an exception if the argument can
-not be validated. The C<is_AnyObject> function can be used to return true or false
-if the argument can not be validated.
-
-=head2 ArrayLike
+=head2 arraylike
 
   # ArrayLike
 
-The ArrayLike type constraint is provided by the L<Types::TypeTiny> library.
+The C<ArrayLike> type constraint is provided by the L<Types::TypeTiny> library.
 Please see that documentation for more information. The C<assert_ArrayLike>
 function can be used to throw an exception if the argument can not be
 validated. The C<is_ArrayLike> function can be used to return true or false if
 the argument can not be validated.
 
-=head2 ArrayObj
+=head2 arrayobj
 
   # ArrayObj
 
-The ArrayObj type constraint is provided by this library and accepts any object
+The C<ArrayObj> type constraint is provided by this library and accepts any object
 that is, or is derived from, a L<Data::Object::Array> object. The
 C<assert_ArrayObj> function can be used to throw an exception if the argument can
 not be validated. The C<is_ArrayObj> function can be used to return true or false
 if the argument can not be validated.
 
-=head2 ArrayObject
+=head2 arrayobject
 
   # ArrayObject
 
-The ArrayObject type constraint is provided by this library and accepts any
+The C<ArrayObject> type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::Array> object. The
 C<assert_ArrayObject> function can be used to throw an exception if the argument
 can not be validated. The C<is_ArrayObject> function can be used to return true or
 false if the argument can not be validated.
 
-=head2 ArrayRef
+=head2 arrayref
 
   # ArrayRef
 
-The ArrayRef type constraint is provided by the L<Types::Standard> library.
+The C<ArrayRef> type constraint is provided by the L<Types::Standard> library.
 Please see that documentation for more information. The C<assert_ArrayRef>
 function can be used to throw an exception if the argument can not be
 validated. The C<is_ArrayRef> function can be used to return true or false if the
 argument can not be validated.
 
-=head2 Bool
+=head2 bool
 
   # Bool
 
-The Bool type constraint is provided by the L<Types::Standard> library. Please
+The C<Bool> type constraint is provided by the L<Types::Standard> library. Please
 see that documentation for more information. The C<assert_Bool> function can be
 used to throw an exception if the argument can not be validated. The C<is_Bool>
 function can be used to return true or false if the argument can not be
 validated.
 
-=head2 ClassName
+=head2 classname
 
   # ClassName["MyClass"]
 
-The ClassName type constraint is provided by the L<Types::Standard> library.
+The C<ClassName> type constraint is provided by the L<Types::Standard> library.
 Please see that documentation for more information. The C<assert_ClassName>
 function can be used to throw an exception if the argument can not be
 validated. The C<is_ClassName> function can be used to return true or false if the
 argument can not be validated.
 
-=head2 CodeLike
+=head2 codelike
 
   # CodeLike
 
-The CodeLike type constraint is provided by the L<Types::TypeTiny> library. Please
+The C<CodeLike> type constraint is provided by the L<Types::TypeTiny> library. Please
 see that documentation for more information. The C<assert_CodeLike> function can be
 used to throw an exception if the argument can not be validated. The C<is_CodeLike>
 function can be used to return true or false if the argument can not be
 validated.
 
-=head2 CodeObj
+=head2 codeobj
 
   # CodeObj
 
-The CodeObj type constraint is provided by this library and accepts any object
+The C<CodeObj> type constraint is provided by this library and accepts any object
 that is, or is derived from, a L<Data::Object::Code> object. The C<assert_CodeObj>
 function can be used to throw an exception if the argument can not be
 validated. The C<is_CodeObj> function can be used to return true or false if the
 argument can not be validated.
 
-=head2 CodeObject
+=head2 codeobject
 
   # CodeObject
 
-The CodeObject type constraint is provided by this library and accepts any
+The C<CodeObject> type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::Code> object. The
 C<assert_CodeObject> function can be used to throw an exception if the argument
 can not be validated. The C<is_CodeObject> function can be used to return true or
 false if the argument can not be validated.
 
-=head2 CodeRef
+=head2 coderef
 
   # CodeRef
 
-The CodeRef type constraint is provided by the L<Types::Standard> library.
+The C<CodeRef> type constraint is provided by the L<Types::Standard> library.
 Please see that documentation for more information. The C<assert_CodeRef> function
 can be used to throw an exception if the argument can not be validated. The
 C<is_CodeRef> function can be used to return true or false if the argument can not
 be validated.
 
-=head2 ConsumerOf
+=head2 consumerof
 
   # ConsumerOf["MyRole"]
 
-The ConsumerOf type constraint is provided by the L<Types::Standard> library.
+The C<ConsumerOf> type constraint is provided by the L<Types::Standard> library.
 Please see that documentation for more information. The C<assert_ConsumerOf>
 function can be used to throw an exception if the argument can not be
 validated. The C<is_ConsumerOf> function can be used to return true or false if
 the argument can not be validated.
 
-=head2 DataObj
+=head2 dataobj
 
   # DataObj
 
-The DataObj type constraint is provided by this library and accepts any object
+The C<DataObj> type constraint is provided by this library and accepts any object
 that is, or is derived from, a L<Data::Object::Data> object. The
 C<assert_DataObj> function can be used to throw an exception if the argument
 can not be validated. The C<is_DataObj> function can be used to return true or
 false if the argument can not be validated.
 
-=head2 DataObject
+=head2 dataobject
 
   # DataObject
 
-The DataObject type constraint is provided by this library and accepts any
+The C<DataObject> type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::Data> object. The
 C<assert_DataObject> function can be used to throw an exception if the argument
 can not be validated. The C<is_DataObject> function can be used to return true
 or false if the argument can not be validated.
 
-=head2 Defined
+=head2 defined
 
   # Defined
 
-The Defined type constraint is provided by the L<Types::Standard> library.
+The C<Defined> type constraint is provided by the L<Types::Standard> library.
 Please see that documentation for more information. The C<assert_Defined> function
 can be used to throw an exception if the argument can not be validated. The
 C<is_Defined> function can be used to return true or false if the argument can not
 be validated.
 
-=head2 Dict
+=head2 dict
 
   # Dict
 
-The Dict type constraint is provided by the L<Types::Standard> library. Please
+The C<Dict> type constraint is provided by the L<Types::Standard> library. Please
 see that documentation for more information. The C<assert_Dict> function can be
 used to throw an exception if the argument can not be validated. The C<is_Dict>
 function can be used to return true or false if the argument can not be
 validated.
 
-=head2 Enum
+=head2 enum
 
   # Enum[qw(A B C)]
 
-The Enum type constraint is provided by the L<Types::Standard> library. Please
+The C<Enum> type constraint is provided by the L<Types::Standard> library. Please
 see that documentation for more information. The C<assert_Enum> function can be
 used to throw an exception if the argument can not be validated. The C<is_Enum>
 function can be used to return true or false if the argument can not be
 validated.
 
-=head2 ExceptionObj
+=head2 exceptionobj
 
   # ExceptionObj
 
-The ExceptionObj type constraint is provided by this library and accepts any
+The C<ExceptionObj> type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::Exception> object. The
 C<assert_ExceptionObj> function can be used to throw an exception if the
 argument can not be validated. The C<is_ExceptionObj> function can be used to
 return true or false if the argument can not be validated.
 
-=head2 ExceptionObject
+=head2 exceptionobject
 
   # ExceptionObject
 
-The ExceptionObject type constraint is provided by this library and accepts any
+The C<ExceptionObject> type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::Exception> object. The
 C<assert_ExceptionObject> function can be used to throw an exception if the
 argument can not be validated. The C<is_ExceptionObject> function can be used
 to return true or false if the argument can not be validated.
 
-=head2 FileHandle
+=head2 filehandle
 
   # FileHandle
 
-The FileHandle type constraint is provided by the L<Types::Standard> library.
+The C<FileHandle> type constraint is provided by the L<Types::Standard> library.
 Please see that documentation for more information. The C<assert_FileHandle>
 function can be used to throw an exception if the argument can not be
 validated. The C<is_FileHandle> function can be used to return true or false if
 the argument can not be validated.
 
-=head2 FloatObj
+=head2 floatobj
 
   # FloatObj
 
-The FloatObj type constraint is provided by this library and accepts any object
+The C<FloatObj> type constraint is provided by this library and accepts any object
 that is, or is derived from, a L<Data::Object::Float> object. The
 C<assert_FloatObj> function can be used to throw an exception if the argument can
 not be validated. The C<is_FloatObj> function can be used to return true or false
 if the argument can not be validated.
 
-=head2 FloatObject
+=head2 floatobject
 
   # FloatObject
 
-The FloatObject type constraint is provided by this library and accepts any
+The C<FloatObject> type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::Float> object. The
 C<assert_FloatObject> function can be used to throw an exception if the argument
 can not be validated. The C<is_FloatObject> function can be used to return true or
 false if the argument can not be validated.
 
-=head2 FuncObj
+=head2 funcobj
 
   # FuncObj
 
-The FuncObj type constraint is provided by this library and accepts any object
+The C<FuncObj> type constraint is provided by this library and accepts any object
 that is, or is derived from, a L<Data::Object::Func> object. The
 C<assert_FuncObj> function can be used to throw an exception if the argument
 can not be validated. The C<is_FuncObj> function can be used to return true or
 false if the argument can not be validated.
 
-=head2 FuncObject
+=head2 funcobject
 
   # FuncObject
 
-The FuncObject type constraint is provided by this library and accepts any
+The C<FuncObject> type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::Func> object. The
 C<assert_FuncObject> function can be used to throw an exception if the argument
 can not be validated. The C<is_FuncObject> function can be used to return true
 or false if the argument can not be validated.
 
-=head2 GlobRef
+=head2 globref
 
   # GlobRef
 
-The GlobRef type constraint is provided by the L<Types::Standard> library.
+The C<GlobRef> type constraint is provided by the L<Types::Standard> library.
 Please see that documentation for more information. The C<assert_GlobRef> function
 can be used to throw an exception if the argument can not be validated. The
 C<is_GlobRef> function can be used to return true or false if the argument can not
 be validated.
 
-=head2 HasMethods
+=head2 hasmethods
 
   # HasMethods["new"]
 
-The HasMethods type constraint is provided by the L<Types::Standard> library.
+The C<HasMethods> type constraint is provided by the L<Types::Standard> library.
 Please see that documentation for more information. The C<assert_HasMethods>
 function can be used to throw an exception if the argument can not be
 validated. The C<is_HasMethods> function can be used to return true or false if
 the argument can not be validated.
 
-=head2 HashLike
+=head2 hashlike
 
   # HashLike
 
-The HashLike type constraint is provided by the L<Types::TypeTiny> library. Please
+The C<HashLike> type constraint is provided by the L<Types::TypeTiny> library. Please
 see that documentation for more information. The C<assert_HashLike> function can be
 used to throw an exception if the argument can not be validated. The C<is_HashLike>
 function can be used to return true or false if the argument can not be
 validated.
 
-=head2 HashObj
+=head2 hashobj
 
   # HashObj
 
-The HashObj type constraint is provided by this library and accepts any object
+The C<HashObj> type constraint is provided by this library and accepts any object
 that is, or is derived from, a L<Data::Object::Hash> object. The C<assert_HashObj>
 function can be used to throw an exception if the argument can not be
 validated. The C<is_HashObj> function can be used to return true or false if the
 argument can not be validated.
 
-=head2 HashObject
+=head2 hashobject
 
   # HashObject
 
-The HashObject type constraint is provided by this library and accepts any
+The C<HashObject> type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::Hash> object. The
 C<assert_HashObject> function can be used to throw an exception if the argument
 can not be validated. The C<is_HashObject> function can be used to return true or
 false if the argument can not be validated.
 
-=head2 HashRef
+=head2 hashref
 
   # HashRef
 
-The HashRef type constraint is provided by the L<Types::Standard> library.
+The C<HashRef> type constraint is provided by the L<Types::Standard> library.
 Please see that documentation for more information. The C<assert_HashRef> function
 can be used to throw an exception if the argument can not be validated. The
 C<is_HashRef> function can be used to return true or false if the argument can not
 be validated.
 
-=head2 InstanceOf
+=head2 instanceof
 
   # InstanceOf[MyClass]
 
-The InstanceOf type constraint is provided by the L<Types::Standard> library.
+The C<InstanceOf> type constraint is provided by the L<Types::Standard> library.
 Please see that documentation for more information. The C<assert_InstanceOf>
 function can be used to throw an exception if the argument can not be
 validated. The C<is_InstanceOf> function can be used to return true or false if
 the argument can not be validated.
 
-=head2 Int
+=head2 int
 
   # Int
 
-The Int type constraint is provided by the L<Types::Standard> library. Please
+The C<Int> type constraint is provided by the L<Types::Standard> library. Please
 see that documentation for more information. The C<assert_Int> function can be
 used to throw an exception if the argument can not be validated. The C<is_Int>
 function can be used to return true or false if the argument can not be
 validated.
 
-=head2 IntObj
+=head2 intobj
 
   # IntObj
 
-The IntObj type constraint is provided by this library and accepts any object
+The C<IntObj> type constraint is provided by this library and accepts any object
 that is, or is derived from, a L<Data::Object::Integer> object. The
 C<assert_IntObj> function can be used to throw an exception if the argument can
 not be validated. The C<is_IntObj> function can be used to return true or false if
 the argument can not be validated.
 
-=head2 IntObject
+=head2 intobject
 
   # IntObject
 
-The IntObject type constraint is provided by this library and accepts any
+The C<IntObject> type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::Integer> object. The
 C<assert_IntObject> function can be used to throw an exception if the argument can
 not be validated. The C<is_IntObject> function can be used to return true or false
 if the argument can not be validated.
 
-=head2 IntRange
+=head2 intrange
 
   # IntRange[0, 25]
 
-The IntRange type constraint is provided by the L<Types::TypeTiny> library. Please
+The C<IntRange> type constraint is provided by the L<Types::TypeTiny> library. Please
 see that documentation for more information. The C<assert_IntRange> function can be
 used to throw an exception if the argument can not be validated. The C<is_IntRange>
 function can be used to return true or false if the argument can not be
 validated.
 
-=head2 IntegerObj
+=head2 integerobj
 
   # IntegerObj
 
-The IntegerObj type constraint is provided by this library and accepts any
+The C<IntegerObj> type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::Integer> object. The
 C<assert_IntegerObj> function can be used to throw an exception if the argument
 can not be validated. The C<is_IntegerObj> function can be used to return true or
 false if the argument can not be validated.
 
-=head2 IntegerObject
+=head2 integerobject
 
   # IntegerObject
 
-The IntegerObject type constraint is provided by this library and accepts any
+The C<IntegerObject> type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::Integer> object. The
 C<assert_IntegerObject> function can be used to throw an exception if the argument
 can not be validated. The C<is_IntegerObject> function can be used to return true
 or false if the argument can not be validated.
 
-=head2 Item
+=head2 item
 
   # Item
 
-The Item type constraint is provided by the L<Types::Standard> library. Please
+The C<Item> type constraint is provided by the L<Types::Standard> library. Please
 see that documentation for more information. The C<assert_Item> function can be
 used to throw an exception if the argument can not be validated. The C<is_Item>
 function can be used to return true or false if the argument can not be
 validated.
 
-=head2 LaxNum
+=head2 laxnum
 
   # LaxNum
 
-The LaxNum type constraint is provided by the L<Types::Standard> library.
+The C<LaxNum> type constraint is provided by the L<Types::Standard> library.
 Please see that documentation for more information. The C<assert_LaxNum> function
 can be used to throw an exception if the argument can not be validated. The
 C<is_LaxNum> function can be used to return true or false if the argument can not
 be validated.
 
-=head2 LowerCaseSimpleStr
+=head2 lowercasesimplestr
 
   # LowerCaseSimpleStr
 
-The LowerCaseSimpleStr type constraint is provided by the
+The C<LowerCaseSimpleStr> type constraint is provided by the
 L<Types::Common::String> library. Please see that documentation for more The
 C<assert_LowerCaseSimpleStr> function can be used to throw an exception if the
 argument can not be validated. The C<is_LowerCaseSimpleStr> function can be used
 to return true or false if the argument can not be validated.
 information.
 
-=head2 LowerCaseStr
+=head2 lowercasestr
 
   # LowerCaseStr
 
-The LowerCaseStr type constraint is provided by the L<Types::Common::String>
+The C<LowerCaseStr> type constraint is provided by the L<Types::Common::String>
 library. Please see that documentation for more information. The C<assert_type>
 function can be used to throw an exception if the argument can not be
 validated. The C<is_type> function can be used to return true or false if the
 argument can not be validated.
 
-=head2 Map
+=head2 map
 
   # Map[Int, HashRef]
 
-The Map type constraint is provided by the L<Types::Standard> library. Please
+The C<Map> type constraint is provided by the L<Types::Standard> library. Please
 see that documentation for more information. The C<assert_Map> function can be
 used to throw an exception if the argument can not be validated. The C<is_Map>
 function can be used to return true or false if the argument can not be
 validated.
 
-=head2 Maybe
+=head2 maybe
 
   # Maybe[Object]
 
-The Maybe type constraint is provided by the L<Types::Standard> library. Please
+The C<Maybe> type constraint is provided by the L<Types::Standard> library. Please
 see that documentation for more information. The C<assert_Maybe> function can be
 used to throw an exception if the argument can not be validated. The C<is_Maybe>
 function can be used to return true or false if the argument can not be
 validated.
 
-=head2 NegativeInt
+=head2 negativeint
 
   # NegativeInt
 
-The NegativeInt type constraint is provided by the L<Types::Common::Numeric>
+The C<NegativeInt> type constraint is provided by the L<Types::Common::Numeric>
 library. Please see that documentation for more information. The
 C<assert_NegativeInt> function can be used to throw an exception if the argument
 can not be validated. The C<is_NegativeInt> function can be used to return true or
 false if the argument can not be validated.
 
-=head2 NegativeNum
+=head2 negativenum
 
   # NegativeNum
 
-The NegativeNum type constraint is provided by the L<Types::Common::Numeric>
+The C<NegativeNum> type constraint is provided by the L<Types::Common::Numeric>
 library. Please see that documentation for more information. The
 C<assert_NegativeNum> function can be used to throw an exception if the argument
 can not be validated. The C<is_NegativeNum> function can be used to return true or
 false if the argument can not be validated.
 
-=head2 NegativeOrZeroInt
+=head2 negativeorzeroint
 
   # NegativeOrZeroInt
 
-The NegativeOrZeroInt type constraint is provided by the
+The C<NegativeOrZeroInt> type constraint is provided by the
 L<Types::Common::Numeric> library. Please see that documentation for more The
 C<assert_NegativeOrZeroInt> function can be used to throw an exception if the
 argument can not be validated. The C<is_NegativeOrZeroInt> function can be used to
 return true or false if the argument can not be validated.
 information.
 
-=head2 NegativeOrZeroNum
+=head2 negativeorzeronum
 
   # NegativeOrZeroNum
 
-The NegativeOrZeroNum type constraint is provided by the
+The C<NegativeOrZeroNum> type constraint is provided by the
 L<Types::Common::Numeric> library. Please see that documentation for more The
 C<assert_type> function can be used to throw an exception if the argument can not
 be validated. The C<is_type> function can be used to return true or false if the
 argument can not be validated.
 information.
 
-=head2 NonEmptySimpleStr
+=head2 nonemptysimplestr
 
   # NonEmptySimpleStr
 
-The NonEmptySimpleStr type constraint is provided by the
+The C<NonEmptySimpleStr> type constraint is provided by the
 L<Types::Common::String> library. Please see that documentation for more The
 C<assert_type> function can be used to throw an exception if the argument can not
 be validated. The C<is_type> function can be used to return true or false if the
 argument can not be validated.
 information.
 
-=head2 NonEmptyStr
+=head2 nonemptystr
 
   # NonEmptyStr
 
-The NonEmptyStr type constraint is provided by the L<Types::Standard> library.
+The C<NonEmptyStr> type constraint is provided by the L<Types::Standard> library.
 Please see that documentation for more information. The C<assert_type> function
 can be used to throw an exception if the argument can not be validated. The
 C<is_type> function can be used to return true or false if the argument can not be
 validated.
 
-=head2 Num
+=head2 num
 
   # Num
 
-The Num type constraint is provided by the L<Types::Standard> library. Please
+The C<Num> type constraint is provided by the L<Types::Standard> library. Please
 see that documentation for more information. The C<assert_Num> function can be
 used to throw an exception if the argument can not be validated. The C<is_Num>
 function can be used to return true or false if the argument can not be
 validated.
 
-=head2 NumObj
+=head2 numobj
 
   # NumObj
 
-The NumObj type constraint is provided by this library and accepts any object
+The C<NumObj> type constraint is provided by this library and accepts any object
 that is, or is derived from, a L<Data::Object::Number> object. The
 C<assert_NumObj> function can be used to throw an exception if the argument can
 not be validated. The C<is_NumObj> function can be used to return true or false if
 the argument can not be validated.
 
-=head2 NumObject
+=head2 numobject
 
   # NumObject
 
-The NumObject type constraint is provided by this library and accepts any
+The C<NumObject> type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::Number> object. The
 C<assert_NumObject> function can be used to throw an exception if the argument can
 not be validated. The C<is_NumObject> function can be used to return true or false
 if the argument can not be validated.
 
-=head2 NumRange
+=head2 numrange
 
   # NumRange[0, 25]
 
-The NumRange type constraint is provided by the L<Types::TypeTiny> library. Please
+The C<NumRange> type constraint is provided by the L<Types::TypeTiny> library. Please
 see that documentation for more information. The C<assert_NumRange> function can be
 used to throw an exception if the argument can not be validated. The C<is_NumRange>
 function can be used to return true or false if the argument can not be
 validated.
 
-=head2 NumberObject
+=head2 numberobject
 
   # NumberObject
 
-The NumberObject type constraint is provided by this library and accepts any
+The C<NumberObject> type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::Number> object. The
 C<assert_NumberObject> function can be used to throw an exception if the argument
 can not be validated. The C<is_NumberObject> function can be used to return true
 or false if the argument can not be validated.
 
-=head2 NumericCode
+=head2 numericcode
 
   # NumericCode
 
-The NumericCode type constraint is provided by the L<Types::Common::String>
+The C<NumericCode> type constraint is provided by the L<Types::Common::String>
 library. Please see that documentation for more information. The
 C<assert_NumericCode> function can be used to throw an exception if the argument
 can not be validated. The C<is_NumericCode> function can be used to return true or
 false if the argument can not be validated.
 
-=head2 Object
+=head2 object
 
   # Object
 
-The Object type constraint is provided by the L<Types::Standard> library.
+The C<Object> type constraint is provided by the L<Types::Standard> library.
 Please see that documentation for more information. The C<assert_Object> function
 can be used to throw an exception if the argument can not be validated. The
 C<is_Object> function can be used to return true or false if the argument can not
 be validated.
 
-=head2 OptList
+=head2 optlist
 
   # OptList
 
-The OptList type constraint is provided by the L<Types::Standard> library.
+The C<OptList> type constraint is provided by the L<Types::Standard> library.
 Please see that documentation for more information. The C<assert_OptList> function
 can be used to throw an exception if the argument can not be validated. The
 C<is_OptList> function can be used to return true or false if the argument can not
 be validated.
 
-=head2 Optional
+=head2 optional
 
   # Dict[id => Optional[Int]]
 
-The Optional type constraint is provided by the L<Types::Standard> library.
+The C<Optional> type constraint is provided by the L<Types::Standard> library.
 Please see that documentation for more information. The C<assert_Optional>
 function can be used to throw an exception if the argument can not be
 validated. The C<is_Optional> function can be used to return true or false if the
 argument can not be validated.
 
-=head2 Overload
+=head2 overload
 
   # Overload[qw("")]
 
-The Overload type constraint is provided by the L<Types::Standard> library.
+The C<Overload> type constraint is provided by the L<Types::Standard> library.
 Please see that documentation for more information. The C<assert_Overload>
 function can be used to throw an exception if the argument can not be
 validated. The C<is_Overload> function can be used to return true or false if the
 argument can not be validated.
 
-=head2 Password
+=head2 password
 
   # Password
 
-The Password type constraint is provided by the L<Types::Common::String>
+The C<Password> type constraint is provided by the L<Types::Common::String>
 library.  Please see that documentation for more information. The
 C<assert_Password> function can be used to throw an exception if the argument
 can not be validated. The C<is_Password> function can be used to return true or
 false if the argument can not be validated.
 
-=head2 PositiveInt
+=head2 positiveint
 
   # PositiveInt
 
-The PositiveInt type constraint is provided by the L<Types::Common::Numeric>
+The C<PositiveInt> type constraint is provided by the L<Types::Common::Numeric>
 library. Please see that documentation for more information. The
 C<assert_PositiveInt> function can be used to throw an exception if the argument
 can not be validated. The C<is_PositiveInt> function can be used to return true or
 false if the argument can not be validated.
 
-=head2 PositiveNum
+=head2 positivenum
 
   # PositiveNum
 
-The PositiveNum type constraint is provided by the L<Types::Common::Numeric>
+The C<PositiveNum> type constraint is provided by the L<Types::Common::Numeric>
 library. Please see that documentation for more information. The
 C<assert_PositiveNum> function can be used to throw an exception if the argument
 can not be validated. The C<is_PositiveNum> function can be used to return true or
 false if the argument can not be validated.
 
-=head2 PositiveOrZeroInt
+=head2 positiveorzeroint
 
   # PositiveOrZeroInt
 
-The PositiveOrZeroInt type constraint is provided by the
+The C<PositiveOrZeroInt> type constraint is provided by the
 L<Types::Common::Numeric> library. Please see that documentation for more The
 C<assert_PositiveOrZeroInt> function can be used to throw an exception if the
 argument can not be validated. The C<is_PositiveOrZeroInt> function can be used to
 return true or false if the argument can not be validated.
 information.
 
-=head2 PositiveOrZeroNum
+=head2 positiveorzeronum
 
   # PositiveOrZeroNum
 
-The PositiveOrZeroNum type constraint is provided by the
+The C<PositiveOrZeroNum> type constraint is provided by the
 L<Types::Common::Numeric> library. Please see that documentation for more The
 C<assert_type> function can be used to throw an exception if the argument can not
 be validated. The C<is_type> function can be used to return true or false if the
 argument can not be validated.
 information.
 
-=head2 Ref
+=head2 ref
 
   # Ref["SCALAR"]
 
-The Ref type constraint is provided by the L<Types::Standard> library. Please
+The C<Ref> type constraint is provided by the L<Types::Standard> library. Please
 see that documentation for more information. The C<assert_type> function can be
 used to throw an exception if the argument can not be validated. The C<is_type>
 function can be used to return true or false if the argument can not be
 validated.
 
-=head2 RegexpObj
+=head2 regexpobj
 
   # RegexpObj
 
-The RegexpObj type constraint is provided by this library and accepts any
+The C<RegexpObj> type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::Regexp> object. The
 C<assert_RegexpObj> function can be used to throw an exception if the argument can
 not be validated. The C<is_RegexpObj> function can be used to return true or false
 if the argument can not be validated.
 
-=head2 RegexpObject
+=head2 regexpobject
 
   # RegexpObject
 
-The RegexpObject type constraint is provided by this library and accepts any
+The C<RegexpObject> type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::Regexp> object. The
 C<assert_RegexpObject> function can be used to throw an exception if the argument
 can not be validated. The C<is_RegexpObject> function can be used to return true
 or false if the argument can not be validated.
 
-=head2 RegexpRef
+=head2 regexpref
 
   # RegexpRef
 
-The RegexpRef type constraint is provided by the L<Types::Standard> library.
+The C<RegexpRef> type constraint is provided by the L<Types::Standard> library.
 Please see that documentation for more information. The C<assert_RegexpRef>
 function can be used to throw an exception if the argument can not be
 validated. The C<is_RegexpRef> function can be used to return true or false if the
 argument can not be validated.
 
-=head2 ReplaceObj
+=head2 replaceobj
 
   # ReplaceObj
 
-The ReplaceObj type constraint is provided by this library and accepts any
+The C<ReplaceObj> type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::Replace> object. The
 C<assert_ReplaceObj> function can be used to throw an exception if the argument
 can not be validated. The C<is_ReplaceObj> function can be used to return true
 or false if the argument can not be validated.
 
-=head2 ReplaceObject
+=head2 replaceobject
 
   # ReplaceObject
 
-The ReplaceObject type constraint is provided by this library and accepts any
+The C<ReplaceObject> type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::Replace> object. The
 C<assert_ReplaceObject> function can be used to throw an exception if the
 argument can not be validated. The C<is_ReplaceObject> function can be used to
 return true or false if the argument can not be validated.
 
-=head2 RoleName
+=head2 rolename
 
   # RoleName
 
-The RoleName type constraint is provided by the L<Types::Standard> library.
+The C<RoleName> type constraint is provided by the L<Types::Standard> library.
 Please see that documentation for more information. The C<assert_RoleName>
 function can be used to throw an exception if the argument can not be
 validated. The C<is_RoleName> function can be used to return true or false if the
 argument can not be validated.
 
-=head2 ScalarObj
+=head2 scalarobj
 
   # ScalarObj
 
-The ScalarObj type constraint is provided by this library and accepts any
+The C<ScalarObj> type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::Scalar> object. The
 C<assert_ScalarObj> function can be used to throw an exception if the argument can
 not be validated. The C<is_ScalarObj> function can be used to return true or false
 if the argument can not be validated.
 
-=head2 ScalarObject
+=head2 scalarobject
 
   # ScalarObject
 
-The ScalarObject type constraint is provided by this library and accepts any
+The C<ScalarObject> type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::Scalar> object. The
 C<assert_ScalarObject> function can be used to throw an exception if the argument
 can not be validated. The C<is_ScalarObject> function can be used to return true
 or false if the argument can not be validated.
 
-=head2 ScalarRef
+=head2 scalarref
 
   # ScalarRef
 
-The ScalarRef type constraint is provided by the L<Types::Standard> library.
+The C<ScalarRef> type constraint is provided by the L<Types::Standard> library.
 Please see that documentation for more information. The C<assert_ScalarRef>
 function can be used to throw an exception if the argument can not be
 validated. The C<is_ScalarRef> function can be used to return true or false if the
 argument can not be validated.
 
-=head2 SearchObj
+=head2 searchobj
 
   # SearchObj
 
-The SearchObj type constraint is provided by this library and accepts any
+The C<SearchObj> type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::Search> object. The
 C<assert_SearchObj> function can be used to throw an exception if the argument
 can not be validated. The C<is_SearchObj> function can be used to return true
 or false if the argument can not be validated.
 
-=head2 SearchObject
+=head2 searchobject
 
   # SearchObject
 
-The SearchObject type constraint is provided by this library and accepts any
+The C<SearchObject> type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::Search> object. The
 C<assert_SearchObject> function can be used to throw an exception if the
 argument can not be validated. The C<is_SearchObject> function can be used to
 return true or false if the argument can not be validated.
 
-=head2 SimpleStr
+=head2 simplestr
 
   # SimpleStr
 
-The SimpleStr type constraint is provided by the L<Types::Common::String>
+The C<SimpleStr> type constraint is provided by the L<Types::Common::String>
 library. Please see that documentation for more information. The
 C<assert_SimpleStr> function can be used to throw an exception if the argument can
 not be validated. The C<is_SimpleStr> function can be used to return true or false
 if the argument can not be validated.
 
-=head2 SingleDigit
+=head2 singledigit
 
   # SingleDigit
 
-The SingleDigit type constraint is provided by the L<Types::Common::Numeric>
+The C<SingleDigit> type constraint is provided by the L<Types::Common::Numeric>
 library. Please see that documentation for more information. The
 C<assert_SingleDigit> function can be used to throw an exception if the argument
 can not be validated. The C<is_SingleDigit> function can be used to return true or
 false if the argument can not be validated.
 
-=head2 SpaceObj
+=head2 spaceobj
 
   # SpaceObj
 
-The SpaceObj type constraint is provided by this library and accepts any object
+The C<SpaceObj> type constraint is provided by this library and accepts any object
 that is, or is derived from, a L<Data::Object::Space> object. The
 C<assert_SpaceObj> function can be used to throw an exception if the argument
 can not be validated. The C<is_SpaceObj> function can be used to return true or
 false if the argument can not be validated.
 
-=head2 SpaceObject
+=head2 spaceobject
 
   # SpaceObject
 
-The SpaceObject type constraint is provided by this library and accepts any
+The C<SpaceObject> type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::Space> object. The
 C<assert_SpaceObject> function can be used to throw an exception if the
 argument can not be validated. The C<is_SpaceObject> function can be used to
 return true or false if the argument can not be validated.
 
-=head2 Str
+=head2 str
 
   # Str
 
-The Str type constraint is provided by the L<Types::Standard> library. Please
+The C<Str> type constraint is provided by the L<Types::Standard> library. Please
 see that documentation for more information. The C<assert_Str> function can be
 used to throw an exception if the argument can not be validated. The C<is_Str>
 function can be used to return true or false if the argument can not be
 validated.
 
-=head2 StrMatch
+=head2 strmatch
 
   # StrMatch[qr/^[A-Z]+$/]
 
-The StrMatch type constraint is provided by the L<Types::Standard> library.
+The C<StrMatch> type constraint is provided by the L<Types::Standard> library.
 Please see that documentation for more information. The C<assert_StrMatch>
 function can be used to throw an exception if the argument can not be
 validated. The C<is_StrMatch> function can be used to return true or false if the
 argument can not be validated.
 
-=head2 StrObj
+=head2 strobj
 
   # StrObj
 
-The StrObj type constraint is provided by this library and accepts any object
+The C<StrObj> type constraint is provided by this library and accepts any object
 that is, or is derived from, a L<Data::Object::String> object. The
 C<assert_StrObj> function can be used to throw an exception if the argument can
 not be validated. The C<is_StrObj> function can be used to return true or false if
 the argument can not be validated.
 
-=head2 StrObject
+=head2 strobject
 
   # StrObject
 
-The StrObject type constraint is provided by this library and accepts any
+The C<StrObject> type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::String> object. The
 C<assert_StrObject> function can be used to throw an exception if the argument can
 not be validated. The C<is_StrObject> function can be used to return true or false
 if the argument can not be validated.
 
-=head2 StrictNum
+=head2 strictnum
 
   # StrictNum
 
-The StrictNum type constraint is provided by the L<Types::Standard> library.
+The C<StrictNum> type constraint is provided by the L<Types::Standard> library.
 Please see that documentation for more information. The C<assert_StrictNum>
 function can be used to throw an exception if the argument can not be
 validated. The C<is_StrictNum> function can be used to return true or false if the
 argument can not be validated.
 
-=head2 StringLike
+=head2 stringlike
 
   # StringLike
 
-The StringLike type constraint is provided by the L<Types::TypeTiny> library.
+The C<StringLike> type constraint is provided by the L<Types::TypeTiny> library.
 Please see that documentation for more information. The C<assert_StringLike>
 function can be used to throw an exception if the argument can not be
 validated. The C<is_StringLike> function can be used to return true or false if
 the argument can not be validated.
 
-=head2 StringObj
+=head2 stringobj
 
   # StringObj
 
-The StringObj type constraint is provided by this library and accepts any
+The C<StringObj> type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::String> object. The
 C<assert_StringObj> function can be used to throw an exception if the argument can
 not be validated. The C<is_StringObj> function can be used to return true or false
 if the argument can not be validated.
 
-=head2 StringObject
+=head2 stringobject
 
   # StringObject
 
-The StringObject type constraint is provided by this library and accepts any
+The C<StringObject> type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::String> object. The
 C<assert_StringObject> function can be used to throw an exception if the argument
 can not be validated. The C<is_StringObject> function can be used to return true
 or false if the argument can not be validated.
 
-=head2 StrongPassword
+=head2 strongpassword
 
   # StrongPassword
 
-The StrongPassword type constraint is provided by the L<Types::Common::String>
+The C<StrongPassword> type constraint is provided by the L<Types::Common::String>
 library. Please see that documentation for more information. The
 C<assert_StrongPassword> function can be used to throw an exception if the
 argument can not be validated. The C<is_StrongPassword> function can be used to
 return true or false if the argument can not be validated.
 
-=head2 Tied
+=head2 tied
 
   # Tied["MyClass"]
 
-The Tied type constraint is provided by the L<Types::Standard> library. Please
+The C<Tied> type constraint is provided by the L<Types::Standard> library. Please
 see that documentation for more information. The C<assert_Tied> function can be
 used to throw an exception if the argument can not be validated. The C<is_Tied>
 function can be used to return true or false if the argument can not be
 validated.
 
-=head2 Tuple
+=head2 tuple
 
   # Tuple[Int, Str, Str]
 
-The Tuple type constraint is provided by the L<Types::Standard> library. Please
+The C<Tuple> type constraint is provided by the L<Types::Standard> library. Please
 see that documentation for more information. The C<assert_Tuple> function can be
 used to throw an exception if the argument can not be validated. The C<is_Tuple>
 function can be used to return true or false if the argument can not be
 validated.
 
-=head2 TypeTiny
+=head2 typetiny
 
   # TypeTiny
 
-The TypeTiny type constraint is provided by the L<Types::TypeTiny> library. Please
+The C<TypeTiny> type constraint is provided by the L<Types::TypeTiny> library. Please
 see that documentation for more information. The C<assert_TypeTiny> function can be
 used to throw an exception if the argument can not be validated. The C<is_TypeTiny>
 function can be used to return true or false if the argument can not be
 validated.
 
-=head2 Undef
+=head2 undef
 
   # Undef
 
-The Undef type constraint is provided by the L<Types::Standard> library. Please
+The C<Undef> type constraint is provided by the L<Types::Standard> library. Please
 see that documentation for more information. The C<assert_Undef> function can be
 used to throw an exception if the argument can not be validated. The C<is_Undef>
 function can be used to return true or false if the argument can not be
 validated.
 
-=head2 UndefObj
+=head2 undefobj
 
   # UndefObj
 
-The UndefObj type constraint is provided by this library and accepts any object
+The C<UndefObj> type constraint is provided by this library and accepts any object
 that is, or is derived from, a L<Data::Object::Undef> object. The
 C<assert_UndefObj> function can be used to throw an exception if the argument can
 not be validated. The C<is_UndefObj> function can be used to return true or false
 if the argument can not be validated.
 
-=head2 UndefObject
+=head2 undefobject
 
   # UndefObject
 
-The UndefObject type constraint is provided by this library and accepts any
+The C<UndefObject> type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::Undef> object. The
 C<assert_UndefObject> function can be used to throw an exception if the argument
 can not be validated. The C<is_UndefObject> function can be used to return true or
 false if the argument can not be validated.
 
-=head2 UpperCaseSimpleStr
+=head2 uppercasesimplestr
 
   # UpperCaseSimpleStr
 
-The UpperCaseSimpleStr type constraint is provided by the
+The C<UpperCaseSimpleStr> type constraint is provided by the
 L<Types::Common::String> library. Please see that documentation for more The
 C<assert_UpperCaseSimpleStr> function can be used to throw an exception if the
 argument can not be validated. The C<is_UpperCaseSimpleStr> function can be used
 to return true or false if the argument can not be validated.
 information.
 
-=head2 UpperCaseStr
+=head2 uppercasestr
 
   # UpperCaseStr
 
-The UpperCaseStr type constraint is provided by the L<Types::Common::String>
+The C<UpperCaseStr> type constraint is provided by the L<Types::Common::String>
 library. Please see that documentation for more information. The
 C<assert_UpperCaseStr> function can be used to throw an exception if the
 argument can not be validated. The C<is_UpperCaseStr> function can be used to
 return true or false if the argument can not be validated.
 
-=head2 Value
+=head2 value
 
   # Value
 
-The Value type constraint is provided by the L<Types::Standard> library. Please
+The C<Value> type constraint is provided by the L<Types::Standard> library. Please
 see that documentation for more information. The C<assert_Value> function can be
 used to throw an exception if the argument can not be validated. The C<is_Value>
 function can be used to return true or false if the argument can not be
 validated.
-
-=cut
 
 =head1 AUTHOR
 

@@ -1,12 +1,17 @@
 package Data::Object::Func;
 
-use Data::Object::Class;
+use 5.014;
+
+use strict;
+use warnings;
+
+use Moo;
 
 extends 'Data::Object::Base';
 
 with 'Data::Object::Role::Throwable';
 
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.50'; # VERSION
 
 # BUILD
 
@@ -110,12 +115,21 @@ Data-Object Function-Object Class
 
 =head1 DESCRIPTION
 
-This package is an abstract base class for function classes. This package
-inherits all behavior from L<Data::Object::Base>.
+This package is an abstract base class for function classes.
 
-=head1 ROLES
+=cut
 
-This package assumes all behavior from the follow roles:
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Data::Object::Base>
+
+=cut
+
+=head1 INTEGRATES
+
+This package integrates behaviors from:
 
 L<Data::Object::Role::Throwable>
 

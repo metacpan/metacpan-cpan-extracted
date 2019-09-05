@@ -1,5 +1,5 @@
 package Consul::API::KV;
-$Consul::API::KV::VERSION = '0.025';
+$Consul::API::KV::VERSION = '0.026';
 use namespace::autoclean;
 
 use Moo::Role;
@@ -74,7 +74,7 @@ sub keys {
 }
 
 package Consul::API::KV::Response;
-$Consul::API::KV::Response::VERSION = '0.025';
+$Consul::API::KV::Response::VERSION = '0.026';
 use Convert::Base64 qw(decode_base64);
 
 use Moo;

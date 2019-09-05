@@ -1,10 +1,15 @@
 package Data::Object::Regexp::Func::Ne;
 
+use 5.014;
+
+use strict;
+use warnings;
+
 use Data::Object 'Class';
 
 extends 'Data::Object::Regexp::Func';
 
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.50'; # VERSION
 
 # BUILD
 
@@ -63,7 +68,14 @@ Data-Object Regexp Function (Ne) Class
 =head1 DESCRIPTION
 
 Data::Object::Regexp::Func::Ne is a function object for Data::Object::Regexp.
-This package inherits all behavior from L<Data::Object::Regexp::Func>.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Data::Object::Regexp::Func>
 
 =cut
 

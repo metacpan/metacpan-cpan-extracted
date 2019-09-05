@@ -51,7 +51,7 @@
    "provides" : {
       "Mojolicious::Plugin::AutoReload" : {
          "file" : "lib/Mojolicious/Plugin/AutoReload.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
@@ -66,8 +66,11 @@
          "web" : "https://github.com/preaction/Mojolicious-Plugin-AutoReload"
       }
    },
-   "version" : "0.005",
+   "version" : "0.006",
    "x_authority" : "cpan:PREACTION",
+   "x_contributors" : [
+      "Zeeshan Muhammad <zeeshan@dkhr.com>"
+   ],
    "x_generated_by_perl" : "v5.28.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
 }

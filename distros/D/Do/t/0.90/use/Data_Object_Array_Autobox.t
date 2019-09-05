@@ -11,7 +11,7 @@ Data::Object::Array::Autobox
 
 =abstract
 
-Data-Object Autoboxing for Array Objects
+Data-Object Array Class Autoboxing
 
 =synopsis
 
