@@ -21,6 +21,10 @@ Functions for Float Data
 
 Data::Object::Func
 
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Float::Func is an abstract base class for function classes in the

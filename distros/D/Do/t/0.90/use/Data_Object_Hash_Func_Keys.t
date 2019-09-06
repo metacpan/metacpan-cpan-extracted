@@ -27,6 +27,14 @@ Data-Object Hash Function (Keys) Class
 
 Data::Object::Hash::Func
 
+=attributes
+
+arg1(Object, req, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Hash::Func::Keys is a function object for Data::Object::Hash.

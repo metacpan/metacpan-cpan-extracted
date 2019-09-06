@@ -1,8 +1,8 @@
 #!perl -w
 use strict;
 use warnings;
-use LWP::Simple qw(get);
 use Test::HTTP::LocalServer;
+use LWP::Simple qw(get);
 
 use Test::More tests => 4;
 

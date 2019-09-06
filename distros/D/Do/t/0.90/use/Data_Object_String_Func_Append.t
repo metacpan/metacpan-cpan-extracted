@@ -27,6 +27,15 @@ Data-Object String Function (Append) Class
 
 Data::Object::String::Func
 
+=attributes
+
+arg1(Object, req, ro)
+args(ArrayRef[Str], req, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::String::Func::Append is a function object for

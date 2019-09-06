@@ -27,6 +27,15 @@ Data-Object String Function (Concat) Class
 
 Data::Object::String::Func
 
+=attributes
+
+arg1(Object, req, ro)
+args(ArrayRef[Any], req, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::String::Func::Concat is a function object for

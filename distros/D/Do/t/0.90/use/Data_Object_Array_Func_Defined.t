@@ -27,6 +27,15 @@ Data-Object Array Function (Defined) Class
 
 Data::Object::Array::Func
 
+=attributes
+
+arg1(Object, req, ro)
+arg2(Int, opt, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Array::Func::Defined is a function object for

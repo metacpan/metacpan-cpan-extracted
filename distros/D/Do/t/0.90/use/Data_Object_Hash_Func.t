@@ -21,6 +21,10 @@ Functions for HashRefs
 
 Data::Object::Func
 
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Hash::Func is an abstract base class for function classes in the

@@ -23,16 +23,16 @@ no_index:
 provides:
   Math::DifferenceSet::Planar:
     file: lib/Math/DifferenceSet/Planar.pm
-    version: '0.006'
+    version: '0.007'
   Math::DifferenceSet::Planar::Data:
     file: lib/Math/DifferenceSet/Planar/Data.pm
-    version: '0.006'
+    version: '0.007'
   Math::DifferenceSet::Planar::Schema:
     file: lib/Math/DifferenceSet/Planar/Schema.pm
-    version: '0.006'
+    version: '0.007'
   Math::DifferenceSet::Planar::Schema::Result::DifferenceSet:
     file: lib/Math/DifferenceSet/Planar/Schema/Result/DifferenceSet.pm
-    version: '0.006'
+    version: '0.007'
 requires:
   Carp: '0'
   DBD::SQLite: '1.48'
@@ -42,6 +42,9 @@ requires:
   Math::Prime::Util: '0.59'
   perl: '5.010'
 resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Math-DifferenceSet-Planar
   homepage: https://vera.in-ulm.de/planar-diffsets/
-version: '0.006'
+  license: https://dev.perl.org/licenses/
+  repository: git://github.com/mhasch/perl-Math-DifferenceSet-Planar.git
+version: '0.007'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

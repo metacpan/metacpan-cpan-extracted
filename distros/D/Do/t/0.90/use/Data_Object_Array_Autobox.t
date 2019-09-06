@@ -17,6 +17,10 @@ Data-Object Array Class Autoboxing
 
   use Data::Object::Array::Autobox;
 
+=libraries
+
+Data::Object::Library
+
 =description
 
 This package implements autoboxing via L<Data::Object::Autobox> for

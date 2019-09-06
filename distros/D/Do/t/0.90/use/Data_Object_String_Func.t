@@ -21,6 +21,10 @@ Functions for String Data
 
 Data::Object::Func
 
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::String::Func is an abstract base class for function classes in

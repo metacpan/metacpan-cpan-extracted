@@ -19,6 +19,10 @@ Data-Object Dumper Role
 
   with 'Data::Object::Role::Dumper';
 
+=libraries
+
+Data::Object::Library
+
 =description
 
 This role provides functionality for dumping the object and underlying value.

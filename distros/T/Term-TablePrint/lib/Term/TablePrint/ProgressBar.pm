@@ -5,8 +5,8 @@ use strict;
 use warnings;
 use 5.008003;
 
-use Term::Choose::Constants qw( :screen );
-use Term::Choose::Util      qw( term_width );
+use Term::Choose::Constants qw( WIDTH_CURSOR );
+use Term::Choose::Util      qw( get_term_width );
 
 
 sub new {
@@ -34,7 +34,7 @@ sub set_progress_bar {
     if (! $self->{type} ) {
         return;
     }
-    my $term_w = term_width();
+    my $term_w = get_term_width();
     if ( $^O ne 'MSWin32' && $^O ne 'cygwin' ) {
         $term_w += WIDTH_CURSOR;
     }

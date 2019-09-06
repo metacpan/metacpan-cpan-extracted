@@ -23,6 +23,10 @@ Data-Object Namespace Registry
 
 Data::Object::Base
 
+=libraries
+
+Data::Object::Library
+
 =description
 
 This package is a singleton that holds mappings for namespaces and type

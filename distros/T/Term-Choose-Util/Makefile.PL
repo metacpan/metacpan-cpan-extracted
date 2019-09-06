@@ -44,9 +44,9 @@ WriteMakefile(
         'File::HomeDir'          => 0,
         'File::Spec::Functions'  => 0,
         'List::Util'             => 0,
-        'Term::Choose'           => '1.649',
-        'Term::Choose::Linux'    => '1.649',
-        'Term::Choose::LineFold' => '1.649',
+        'Term::Choose'           => '1.700',
+        'Term::Choose::Linux'    => '1.700',
+        'Term::Choose::LineFold' => '1.700',
         %prereqs_os_specific,
     },
     dist  => {

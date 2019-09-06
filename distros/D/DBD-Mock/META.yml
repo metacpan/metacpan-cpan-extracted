@@ -31,7 +31,7 @@ no_index:
 provides:
   DBD::Mock:
     file: lib/DBD/Mock.pm
-    version: '1.46'
+    version: '1.47'
   DBD::Mock::Pool:
     file: lib/DBD/Mock/Pool.pm
   DBD::Mock::Pool::db:
@@ -55,12 +55,13 @@ requires:
 resources:
   homepage: https://gitlab.com/scrapheap/DBD-Mock
   repository: git://gitlab.com/scrapheap/DBD-Mock.git
-version: '1.46'
+version: '1.47'
 x_authority: cpan:JLCOOPER
 x_contributors:
   - 'Chisel <CHISEL@cpan.org>'
   - 'Dave Rolsky <DROLSKY@cpan.org>'
   - 'Gines R <ginesr@gmail.com>'
+  - 'Max Carey <MHC@cpan.org>'
   - 'gregor herrmann <gregoa@debian.org>'
   - 'wu-lee <git.wu-lee@noodlefactory.co.uk>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

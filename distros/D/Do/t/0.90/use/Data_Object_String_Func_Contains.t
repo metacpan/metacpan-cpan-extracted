@@ -27,6 +27,15 @@ Data-Object String Function (Contains) Class
 
 Data::Object::String::Func
 
+=attributes
+
+arg1(Object, req, ro)
+arg2(Str | RegexpRef, req, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::String::Func::Contains is a function object for

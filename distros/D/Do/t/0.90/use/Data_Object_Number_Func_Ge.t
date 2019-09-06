@@ -27,6 +27,15 @@ Data-Object Number Function (Ge) Class
 
 Data::Object::Number::Func
 
+=attributes
+
+arg1(Object, req, ro)
+arg2(StringLike, req, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Number::Func::Ge is a function object for Data::Object::Number.

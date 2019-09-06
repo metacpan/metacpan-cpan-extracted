@@ -23,6 +23,7 @@ t/stack-corruption.t
 t/sum.t
 t/sum0.t
 t/uniq.t
+t/uniqnum.t
 xt/all-supported.t
 xt/pod-coverage.t
 xt/pod.t

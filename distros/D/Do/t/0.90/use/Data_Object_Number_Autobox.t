@@ -17,6 +17,10 @@ Data-Object Number Class Autoboxing
 
   use Data::Object::Number::Autobox;
 
+=libraries
+
+Data::Object::Library
+
 =description
 
 This package implements autoboxing via L<Data::Object::Autobox> for

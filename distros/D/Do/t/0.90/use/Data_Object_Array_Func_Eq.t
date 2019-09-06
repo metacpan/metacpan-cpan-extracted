@@ -27,6 +27,15 @@ Data-Object Array Function (Eq) Class
 
 Data::Object::Array::Func
 
+=attributes
+
+arg1(Object, req, ro)
+arg2(ArrayLike, req, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Array::Func::Eq is a function object for Data::Object::Array.

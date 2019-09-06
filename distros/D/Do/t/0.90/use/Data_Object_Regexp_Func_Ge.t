@@ -27,6 +27,15 @@ Data-Object Regexp Function (Ge) Class
 
 Data::Object::Regexp::Func
 
+=attributes
+
+arg1(Object, req, ro)
+arg2(Any, req, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Regexp::Func::Ge is a function object for Data::Object::Regexp.

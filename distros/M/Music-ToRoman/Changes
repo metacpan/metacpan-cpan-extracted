@@ -1,5 +1,30 @@
 Revision history for Music-ToRoman
 
+0.1600 2019-09-06 10:29:40
+    - Improve documentation.
+    - Make double-flatted chord parsing work for cetain cases.
+
+0.1500 2019-09-05 19:46:15
+    - Improve documentation.
+    - Handle the half-diminished chord correctly.
+
+0.1401 2019-09-05 19:04:57
+    - Improve and correct documentation.
+
+0.1400 2019-09-05 18:42:18
+    - Improve documentation.
+    - Fix verbose output.
+    - Add test cases and remove skipping.
+    - Clean-up code:
+        * Move ugly code assignment to a new ->_get_scale_mode method.
+        * Turn the "#X" to "bY" handling into the _up_to_flat() function.
+        * Handle double sharps when figuring out flatted note equivalents.
+        * Remove all double flat handling.
+
+0.1300 2019-09-05 11:46:25
+    - Improve documentation!
+    - Support △ (maj) and ø (diminished) in chord names.
+
 0.1200 2019-09-05 00:45:23
     - A chord named with a "-" means "minor."
     - A chord named "maj" is not minor.

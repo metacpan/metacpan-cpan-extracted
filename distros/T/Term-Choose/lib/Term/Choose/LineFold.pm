@@ -4,13 +4,14 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.655';
+our $VERSION = '1.700';
 
 use Exporter qw( import );
 
 our @EXPORT_OK = qw( line_fold print_columns cut_to_printwidth );
 
-use Term::Choose::Constants qw( :screen );
+use Term::Choose::Screen qw( normal );
+
 
 BEGIN {
     if ( $ENV{TC_AMBIGUOUS_WIDE} ) {
@@ -164,7 +165,7 @@ sub line_fold {
                 last;
             }
         }
-        $paragraphs[-1] .= RESET;
+        $paragraphs[-1] .= normal();
     }
     return join( "\n", @paragraphs );
 }

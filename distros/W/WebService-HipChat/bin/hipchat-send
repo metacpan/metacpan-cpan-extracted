@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 use strict;
 use warnings;
 use Getopt::Long qw(GetOptions);
@@ -61,7 +61,7 @@ hipchat-send
 
 =head1 VERSION
 
-version 0.2000
+version 0.2001
 
 =head1 SYNOPSIS
 

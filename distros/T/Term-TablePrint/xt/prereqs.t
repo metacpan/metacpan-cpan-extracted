@@ -9,6 +9,7 @@ prereq_ok( undef, [
     'Term::Choose::Constants',
     'Term::Choose::LineFold',
     'Term::Choose::Linux',
+    'Term::Choose::Screen',
     'Term::Choose::ValidateOptions',
     'Term::Choose::Win32',
  ] );

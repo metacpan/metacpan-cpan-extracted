@@ -27,6 +27,15 @@ Data-Object String Function (Ne) Class
 
 Data::Object::String::Func
 
+=attributes
+
+arg1(Object, req, ro)
+arg2(StringLike, req, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::String::Func::Ne is a function object for Data::Object::String.

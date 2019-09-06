@@ -23,7 +23,7 @@ use SPVM 'TestCase::ExchangeAPI';
 use SPVM 'TestCase::Point_3i';
 
 use SPVM 'SPVM::Hash';
-use SPVM 'SPVM::List';
+use SPVM 'SPVM::ObjectList';
 
 my $BYTE_MAX = 127;
 my $BYTE_MIN = -128;
@@ -198,7 +198,7 @@ my $start_memory_blocks_count = SPVM::memory_blocks_count();
 {
   # Pass list
   {
-    my $list = SPVM::List->newa([SPVM::Int->new(1), SPVM::Double->new(2.5), undef]);
+    my $list = SPVM::ObjectList->newa([SPVM::Int->new(1), SPVM::Double->new(2.5), undef]);
     my $x = $list->get(0);
     
     is($list->get(0)->val, 1);
@@ -253,7 +253,7 @@ my $start_memory_blocks_count = SPVM::memory_blocks_count();
     my $bytes = SPVM::new_oarray("SPVM::Byte[]", [SPVM::Byte->new(1), SPVM::Byte->new(2), SPVM::Byte->new(3)]);
     my $ret = TestCase::ExchangeAPI->any_object_array($bytes);
     
-    isa_ok($ret, 'SPVM::Data::Array');
+    isa_ok($ret, 'SPVM::BlessedObject::Array');
     is_deeply([$ret->to_elems->[0]->val, $ret->to_elems->[1]->val, $ret->to_elems->[2]->val], [1, 2, 5]);
   }
 }
@@ -292,7 +292,7 @@ my $start_memory_blocks_count = SPVM::memory_blocks_count();
     my $string1 = SPVM::new_str("あいう");
     my $string2 = SPVM::new_str("");
     my $string3 = TestCase::ExchangeAPI->string_argments_and_return_value($string1, $string2);
-    isa_ok($string3, 'SPVM::Data::Array');
+    isa_ok($string3, 'SPVM::BlessedObject::Array');
     is("$string3", "あいう");
   }
   
@@ -311,7 +311,7 @@ my $start_memory_blocks_count = SPVM::memory_blocks_count();
     my $string1 = SPVM::new_str("あいう");
     my $string2 = SPVM::new_str_from_bin(encode('UTF-8', "えお"));
     my $string3 = TestCase::ExchangeAPI->string_argments_and_return_value($string1, $string2);
-    isa_ok($string3, 'SPVM::Data::Array');
+    isa_ok($string3, 'SPVM::BlessedObject::Array');
     is($string3->to_str, "あいうえお");
     is($string3->to_bin, encode('UTF-8', "あいうえお"));
   }
@@ -321,7 +321,7 @@ my $start_memory_blocks_count = SPVM::memory_blocks_count();
     my $string1 = SPVM::new_str_from_bin("abc");
     my $string2 = SPVM::new_str("de");
     my $string3 = TestCase::ExchangeAPI->string_argments_and_return_value($string1, $string2);
-    isa_ok($string3, 'SPVM::Data::Array');
+    isa_ok($string3, 'SPVM::BlessedObject::Array');
     is($string3->to_str, "abcde");
     is($string3->to_bin, "abcde");
     is_deeply($string3->to_elems, [ord('a'), ord('b'), ord('c'), ord('d'), ord('e')]);

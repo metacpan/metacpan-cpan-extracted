@@ -18,7 +18,7 @@ use Test::Timer::TimeoutException;
 
 @EXPORT = qw(time_ok time_nok time_atleast time_atmost time_between);
 
-$VERSION = '2.10';
+$VERSION = '2.11';
 
 my $test  = Test::Builder->new;
 my $timeout = 0;
@@ -241,7 +241,6 @@ __END__
 - [PRIVATE FUNCTIONS](#private-functions)
   - [\_runtest](#_runtest)
   - [\_benchmark](#_benchmark)
-  - [\_timestring2time](#_timestring2time)
   - [import](#import)
 - [DIAGNOSTICS](#diagnostics)
 - [CONFIGURATION AND ENVIRONMENT](#configuration-and-environment)
@@ -268,7 +267,7 @@ Test::Timer - test module to test/assert response times
 
 =head1 VERSION
 
-The documentation describes version 2.09 of Test::Timer
+The documentation describes version 2.10 of Test::Timer
 
 =head1 FEATURES
 
@@ -511,14 +510,6 @@ The method takes two parameters:
 
 =back
 
-=head2 _timestring2time
-
-This is the method extracts the seconds from benchmarks timestring and returns
-it as an integer.
-
-It takes the timestring from L<_benchmark|/_benchmark> (L<Benchmark>) and returns the seconds
-part.
-
 =head2 import
 
 Test::Builder required import to do some import I<hokus-pokus> for the test methods
@@ -682,6 +673,8 @@ You can also look for information at:
 
 =over
 
+=item * Mohammad S Anwar, POD corrections PRs #23
+
 =item * Erik Johansen, suggestion for clearing alarm
 
 =item * Gregor Herrmann from the Debian Perl Group, PR #16 fixes to spelling mistakes
@@ -702,14 +695,14 @@ You can also look for information at:
 
 =item * Paul Leonerd Evans (PEVANS), suggestions for time_atleast and time_atmost and the handling of $SIG{ALRM}. Also bug report for addressing issue with Debian packaging resulting in release 0.10
 
-=item * brian d foy (BDFOY), for patch to L<_run_test|/_run_test>
+=item * brian d foy (BDFOY), for patch to L<_runtest|/_runtest>
 
 =back
 
 =head1 LICENSE AND COPYRIGHT
 
 Test::Timer and related modules are (C) by Jonas B. Nielsen,
-(jonasbn) 2007-2017
+(jonasbn) 2007-2019
 
 Test::Timer and related modules are released under the Artistic
 License 2.0

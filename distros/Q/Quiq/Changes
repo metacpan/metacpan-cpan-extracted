@@ -1,3 +1,43 @@
+1.156 2019-09-05
+================
+[Quiq::Database::Connection]
+* Kosmetik
+
+[Quiq::Database::Cursor]
+* fetchAll() um Argument $limit ergänzt
+
+[Quiq::Database::ResultSet]
+* Logik für unvollständige Ergebnismenge hinzugefügt
+
+[Quiq::Sql::Script::Reader]
+* Trennlinie überlesen
+
+[Quiq::Cascm]
+* abstract() hinzugefügt
+* getVersion() hinzugefügt
+* deleteToVersion() hinzugefügt
+* deletePackage() zu deletePackages() erweitert
+* showPackage() um Rückgabe von Datensätzen erweitert
+* switchPackage() reduziert auf Dateinamen
+
+[Quiq::Converter]
+* stringToKeyVal() akzeptiert nun auch einfache Anführungsstriche
+
+[Quiq::Dbms]
+* Kosmetik
+
+[Quiq::Pygments]
+* styles() - Test angepasst, falls "pymentize -L" nicht verstanden wird
+
+[Quiq::Range]
+* Klasse hinzugefügt
+
+[Quiq::Rsync]
+* exec() um Option -print und Rückgabewerte erweitert
+
+[Quiq::Shell]
+* backDir() hinzugefügt
+
 1.155 2019-08-27
 ================
 [Quiq::Database::Api::Dbi::Connection]

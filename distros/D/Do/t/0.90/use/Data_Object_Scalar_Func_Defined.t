@@ -27,6 +27,14 @@ Data-Object Scalar Function (Defined) Class
 
 Data::Object::Scalar::Func
 
+=attributes
+
+arg1(Object, req, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Scalar::Func::Defined is a function object for

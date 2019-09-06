@@ -19,6 +19,10 @@ Data-Object Defined Rules
 
   with 'Data::Object::Rule::Defined';
 
+=libraries
+
+Data::Object::Library
+
 =description
 
 This rule enforces the criteria for being defined.

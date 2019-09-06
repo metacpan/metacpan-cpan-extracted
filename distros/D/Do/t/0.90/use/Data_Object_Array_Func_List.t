@@ -27,6 +27,14 @@ Data-Object Array Function (List) Class
 
 Data::Object::Array::Func
 
+=attributes
+
+arg1(Object, req, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Array::Func::List is a function object for Data::Object::Array.

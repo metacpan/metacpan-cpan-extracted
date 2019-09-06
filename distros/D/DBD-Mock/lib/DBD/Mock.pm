@@ -30,7 +30,7 @@ sub import {
       if ( @_ && lc( $_[0] ) eq "pool" );
 }
 
-our $VERSION = '1.46';
+our $VERSION = '1.47';
 
 our $drh    = undef;    # will hold driver handle
 our $err    = 0;        # will hold any error codes
@@ -908,6 +908,57 @@ Once this is turned on, you will need to choose a database specific attribute al
 The 'MySQL' in the DSN will be picked up and the MySQL specific attribute aliasing will be used.
 
 Right now only MySQL is supported by this feature, and even that support is very minimal. Currently the MySQL C<$dbh> and C<$sth> attributes 'mysql_insertid' are aliased to the C<$dbh> attribute 'mock_last_insert_id'. It is possible to add more aliases though, using the C<DBD::Mock:_set_mock_attribute_aliases> function (see the source code for details).
+
+=item Connection Callbacks
+
+This feature allows you to define callbacks that get executed when C<< DBI->connect >> is called.
+
+To set a series of callbacks you use the C<DBD::Mock::dr::set_connect_callbacks> function
+
+  use DBD::Mock::dr;
+
+  DBD::Mock::dr::set_connect_callbacks( sub {
+      my ( $dbh, $dsn, $user, $password, $attributes ) = @_;
+
+      $dbh->{mock_add_resultset} = {
+          sql => 'SELECT foo FROM bar',
+          results => [[ 'foo' ], [ 10 ]]
+      };
+  } );
+
+To set more than one callback to you can either simply add extra callbacks to your call to C<DBD::Mock::dr::set_connect_callbacks>
+
+  DBD::Mock::dr::set_connect_callbacks(
+      sub {
+          my ( $dbh, $dsn, $user, $password, $attributes ) = @_;
+
+          $dbh->{mock_add_resultset} = {
+              sql => 'SELECT foo FROM bar',
+              results => [[ 'foo' ], [ 10 ]]
+          };
+      },
+
+      sub {
+          my ( $dbh, $dsn, $user, $password, $attributes ) = @_;
+
+          $dbh->{mock_add_resultset} = {
+              sql => 'SELECT foo FROM bar',
+              results => [[ 'foo' ], [ 10 ]]
+          };
+      }
+  );
+
+Or you can extend the existing set of callbacks with another using the C<DBD::Mock::dr::add_connect_callbacks> function
+
+
+  DBD::Mock::dr::add_connect_callbacks( sub {
+      ( my $dbh, $dsn, $user, $password, $attributes ) = @_;
+
+      $dbh->{mock_add_resultset} = {
+          sql => 'SELECT bar FROM foo',
+          results => [[ 'bar' ], [ 50 ]]
+      };
+  } );
 
 =back
 

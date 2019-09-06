@@ -27,6 +27,15 @@ Data-Object Code Function (Conjoin) Class
 
 Data::Object::Code::Func
 
+=attributes
+
+arg1(Object, req, ro)
+arg2(CodeRef, req, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Code::Func::Conjoin is a function object for Data::Object::Code.

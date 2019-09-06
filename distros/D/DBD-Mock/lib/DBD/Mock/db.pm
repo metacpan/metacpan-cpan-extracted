@@ -86,7 +86,7 @@ sub prepare {
 
         my $rs;
         if ( my $all_rs = $dbh->{mock_rs} ) {
-            if ( my $by_name = $all_rs->{named}{$statement} // first { $statement =~ m/$_->{regexp}/ } @{ $all_rs->{matching} } ) {
+            if ( my $by_name = defined $all_rs->{named}{$statement} ? $all_rs->{named}{$statement} : first { $statement =~ m/$_->{regexp}/ } @{ $all_rs->{matching} } ) {
                 # We want to copy this, because it is meant to be reusable
                 $rs = [ @{ $by_name->{results} } ];
                 if ( exists $by_name->{failure} ) {

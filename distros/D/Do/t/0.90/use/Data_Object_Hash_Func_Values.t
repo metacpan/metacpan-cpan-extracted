@@ -27,6 +27,15 @@ Data-Object Hash Function (Values) Class
 
 Data::Object::Hash::Func
 
+=attributes
+
+arg1(Object, req, ro)
+args(ArrayRef[Str], opt, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Hash::Func::Values is a function object for Data::Object::Hash.

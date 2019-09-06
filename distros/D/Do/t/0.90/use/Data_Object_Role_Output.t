@@ -19,6 +19,10 @@ Data-Object Output Role
 
   with 'Data::Object::Role::Output';
 
+=libraries
+
+Data::Object::Library
+
 =description
 
 This package provides mechanisms for printing the object.

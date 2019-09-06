@@ -1,5 +1,5 @@
 package Test::Expr;
-our $VERSION = '0.000008';
+our $VERSION = '0.000009';
 
 use 5.012; use warnings;
 use Keyword::Declare;
@@ -24,7 +24,70 @@ my $PERL_MATCHABLE = qr{ ^ (?&PerlOWS)
                            $PPR::GRAMMAR
                        }xms;
 
-my $PERL_VAR      = qr{ ((?&PerlVariable)) $PPR::GRAMMAR }xms;
+use re 'eval';
+my $PERL_FIND_VARS = qr{
+    ^ (?&PerlExpression)
+
+    (?(DEFINE)
+        (?<PerlVariable>
+            (
+                (?= [\$\@%] )
+                (?>
+                    (?&PerlScalarAccess)
+                |   (?&PerlHashAccess)
+                |   (?&PerlArrayAccess)
+                )
+            )
+            (?{ $Test::Expr::vars{$^N} = 1 })
+        )
+
+        (?<PerlScalarAccessNoSpace>
+            (
+                (?>(?&PerlVariableScalarNoSpace))
+                (?:
+                    (?:
+                        (?:
+                            ->
+                            (?&PerlParenthesesList)
+                        |
+                            (?: -> )?+
+                            (?> \$\* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
+                        )
+                        (?:
+                            (?: -> )?+
+                            (?> \$\* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList) )
+                        )*+
+                    )?+
+                    (?:
+                        ->
+                        [\@%]
+                        (?> \* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
+                    )?+
+                )?+
+            )
+            (?{ $Test::Expr::vars{$^N} = 1 })
+        ) # End of rule
+
+
+        (?<PerlArrayAccessNoSpace>
+            (
+                (?>(?&PerlVariableArrayNoSpace))
+                (?:
+                    (?: -> )?+
+                    (?> \$\* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList)  )
+                )*+
+                (?:
+                    ->
+                    [\@%]
+                    (?> \* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
+                )?+
+            )
+            (?{ $Test::Expr::vars{$^N} = 1 })
+        ) # End of rule
+    )
+
+    $PPR::GRAMMAR
+}xms;
 
 my $PERL_LITERAL  = qr{^ (?> (?&PerlString)
                           | (?&PerlQuotelikeQR)
@@ -54,7 +117,7 @@ my $PERL_EXPR = qr{
             |    [.%x]           (?! [=]  )
             |    [&|^][.]        (?! [=]  )
             |    [*&|/]{1,2}+    (?! [=]  )
-            |    [<>]{2}+        (?! [=]  )
+            |    [<>]{2}         (?! [=]  )
             |    \^              (?! [=]  )
             )
         ) # End of rule
@@ -110,7 +173,9 @@ sub import {
         }
 
         # Extract and tidy all variables in the test expression...
-        my @vars = grep {defined} $test =~ m{$PERL_VAR}g;
+        %Test::Expr::vars = ();
+        $test_code =~ $PERL_FIND_VARS;
+        my @vars = grep {defined} keys %Test::Expr::vars;
         ($lhs, $rhs, @vars) = map {_trim $_} $lhs, $rhs, @vars;
 
         # Find maximum width of any reported value, so we can align them...
@@ -165,7 +230,7 @@ Test::Expr - Test an expression with better error messages
 
 =head1 VERSION
 
-This document describes Test::Expr version 0.000008
+This document describes Test::Expr version 0.000009
 
 
 =head1 SYNOPSIS

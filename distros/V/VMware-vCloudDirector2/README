@@ -1,0 +1,112 @@
+NAME
+
+    VMware::vCloudDirector2 - Interface to VMWare vCloud Directory REST API
+
+VERSION
+
+    version 0.102
+
+SYNOPSIS
+
+        # THIS IS AT AN EARLY STAGE OF DEVELOPMENT - PROTOTYPING REALLY
+        # IT MAY CHANGE DRAMATICALLY OR EAT YOUR DATA.
+    
+        use VMware::vCloudDirector2
+    
+        my $vcd = VMware::vCloudDirector2->new(
+            hostname   => $host,
+            username   => $user,
+            password   => $pass,
+            orgname    => $org,
+            ssl_verify => 0,
+        );
+        my @org_list = $vcd->org_list;
+
+ Attributes
+
+  hostname
+
+    Hostname of the vCloud server. Must have a vCloud instance listening
+    for https on port 443.
+
+  username
+
+    Username to use to login to vCloud server.
+
+  password
+
+    Password to use to login to vCloud server.
+
+  orgname
+
+    Org name to use to login to vCloud server - this defaults to System.
+
+  timeout
+
+    Command timeout in seconds. Defaults to 120.
+
+  default_accept_header
+
+    The default MIME types to accept. This is automatically set based on
+    the information received back from the API versions.
+
+  ssl_verify
+
+    Whether to do standard SSL certificate verification. Defaults to set.
+
+  ssl_ca_file
+
+    The SSL CA set to trust packaged in a file. This defaults to those set
+    in the Mozilla::CA
+
+  debug
+
+    Set debug level. The higher the debug level, the more chatter is
+    exposed.
+
+    Defaults to 0 (no output) unless the environment variable
+    VCLOUD_API_DEBUG is set to something that is non-zero. Picked up at
+    create time in BUILD()
+
+ Methods
+
+  org_list
+
+    Returns a set of VMware::vCloudDirector2::Object each containing one of
+    the vCloud Orgs on the system (or if using this in user mode the single
+    org you can see).
+
+  query
+
+    Returns a VMware::vCloudDirector2::Object containing the query result
+    of the query against the platform.
+
+DESCRIPTION
+
+    Thinish wrapper of the VMware vCloud Director REST API.
+
+    This differs from VMware::vCloudDirector in that it uses the JSON
+    flavoured version of the API, which has subtly different naming
+    conventions (which is why I didn't try to make the code handle both
+    flavours), but is much easier to work with when doing write operations.
+
+    It also can do write operations - as well as the other issues in
+    VMware::vCloudDirector it looks like the write operations - PUT, POST
+    and DELETE have never worked!
+
+    THIS IS AT AN EARLY STAGE OF DEVELOPMENT - PROTOTYPING REALLY - AND MAY
+    CHANGE DRAMATICALLY OR EAT YOUR DATA.
+
+    The lack of documentation reflects the stage in development...
+
+AUTHOR
+
+    Nigel Metheringham <nigelm@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2019 by Nigel Metheringham.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

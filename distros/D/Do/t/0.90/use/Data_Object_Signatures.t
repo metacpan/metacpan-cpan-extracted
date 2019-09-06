@@ -38,6 +38,10 @@ Data-Object Method Signatures
     return $self;
   }
 
+=libraries
+
+Data::Object::Library
+
 =description
 
 This package provides method and function signatures supporting all the type

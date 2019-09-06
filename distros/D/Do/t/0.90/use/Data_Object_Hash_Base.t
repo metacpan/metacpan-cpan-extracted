@@ -25,6 +25,10 @@ Data-Object Abstract Hash Class
 
 Data::Object::Base
 
+=libraries
+
+Data::Object::Library
+
 =description
 
 This package provides routines for operating on Perl 5 hash references.

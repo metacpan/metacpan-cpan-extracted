@@ -3,7 +3,7 @@ use lib qw( ./blib/lib ../blib/lib );
 # Check we can create objects and adding data works
 # as well as clearing data.
 
-use Test::More tests => 78;
+use Test::More tests => 85;
 use HTTP::Date;
 
 BEGIN { use_ok( 'SVG::TT::Graph' ); }
@@ -134,6 +134,8 @@ foreach my $type (@types) {
   } else {
     is($graph->{data}->[1]->{data}->{$quer2}, $res2, 'Data set 2 - data set ok');
   }
+
+  ok( $graph->burn, "We can burn it: $type" );
 
   $graph->clear_data();
   

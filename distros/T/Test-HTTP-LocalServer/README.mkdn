@@ -1,5 +1,6 @@
 
-[![Build Status](https://travis-ci.org/Corion/Test-HTTP-LocalServer.svg?branch=master)](https://travis-ci.org/Corion/Test-HTTP-LocalServer)
+[![Travis Build Status](https://travis-ci.org/Corion/Test-HTTP-LocalServer.svg?branch=master)](https://travis-ci.org/Corion/Test-HTTP-LocalServer)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/Test-HTTP-LocalServer?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/Test-HTTP-LocalServer)
 
 # NAME
 
@@ -51,7 +52,12 @@ The following entries will be removed from `%ENV`:
 
     HTTP_PROXY
     http_proxy
+    HTTPS_PROXY
+    https_proxy
     CGI_HTTP_PROXY
+
+Note that [LWP::Simple](https://metacpan.org/pod/LWP::Simple) must be loaded after this module, as it caches
+the entries in `%ENV` otherwise.
 
 ## `$server->port`
 

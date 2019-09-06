@@ -1,6 +1,13 @@
 Revision history for Term::Choose
 
 
+1.700   2019-09-05
+    - Option 'mouse': changed from 5 to 2 allowed values.
+    - Renamed option 'justify' to 'alignment'.
+    - Refactored mouse mode.
+    - New file Screen.pm.
+    - Use 'tput' to get the escape sequences.
+
 1.655   2019-08-03
     - Announcement changes mouse mode.
 

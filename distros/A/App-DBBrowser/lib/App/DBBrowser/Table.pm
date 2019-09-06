@@ -5,8 +5,8 @@ use warnings;
 use strict;
 use 5.010001;
 
-use Term::Choose            qw();
-use Term::Choose::Constants qw( :screen );
+use Term::Choose         qw();
+use Term::Choose::Screen qw( hide_cursor clear_screen );
 
 use App::DBBrowser::Auxil;
 use App::DBBrowser::Table::Substatements;
@@ -129,8 +129,8 @@ sub on_table {
         }
         elsif ( $custom eq $cu{'print_tbl'} ) {
             local $| = 1;
-            print HIDE_CURSOR; # safety
-            print CLEAR_SCREEN;
+            print hide_cursor(); # safety
+            print clear_screen();
             print 'Computing:' . "\r" if $sf->{o}{table}{progress_bar};
             my $statement = $ax->get_stmt( $sql, 'Select', 'prepare' );
             my @arguments = ( @{$sql->{where_args}}, @{$sql->{having_args}} );

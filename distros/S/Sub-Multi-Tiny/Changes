@@ -1,5 +1,9 @@
 Revision history for Perl extension Sub-Multi-Tiny
 
+0.000005 2019-09-06T02:03:22Z
+
+    - Changes to cpanfile, xt to try to fix cpantesters failures (#5)
+
 0.000004 2019-09-05T02:14:14Z
 
     - Support recursion to the dispatcher (#4)

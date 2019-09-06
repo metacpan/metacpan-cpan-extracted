@@ -21,6 +21,10 @@ Functions for Number Data
 
 Data::Object::Func
 
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Number::Func is an abstract base class for function classes in

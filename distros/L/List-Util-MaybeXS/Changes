@@ -1,5 +1,10 @@
 Revision history for List-Util-MaybeXS
 
+1.500004 - 2019-09-05
+  - fixed uniqnum to be more accurate in on machines with unusual numeric
+    formats
+  - added extensive testing for uniqnum
+
 1.500003 - 2019-08-08
   - added TO_JSON method to pair object, as added in List::Util 1.51.
 

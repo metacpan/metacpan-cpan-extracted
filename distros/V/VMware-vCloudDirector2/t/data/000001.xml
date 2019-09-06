@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SupportedVersions xmlns="http://www.vmware.com/vcloud/versions" xmlns:ns2="http://www.vmware.com/vcloud/v1.5" xmlns:vmext="http://www.vmware.com/vcloud/extension/v1.5" xmlns:ovf="http://schemas.dmtf.org/ovf/envelope/1" xmlns:vssd="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_VirtualSystemSettingData" xmlns:common="http://schemas.dmtf.org/wbem/wscim/1/common" xmlns:rasd="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_ResourceAllocationSettingData" xmlns:vmw="http://www.vmware.com/schema/ovf" xmlns:ovfenv="http://schemas.dmtf.org/ovf/environment/1">
+    <VersionInfo deprecated="true">
+        <Version>20.0</Version>
+        <LoginUrl>https://vcloud.example.com/api/sessions</LoginUrl>
+    </VersionInfo>
+    <VersionInfo deprecated="true">
+        <Version>21.0</Version>
+        <LoginUrl>https://vcloud.example.com/api/sessions</LoginUrl>
+    </VersionInfo>
+    <VersionInfo deprecated="true">
+        <Version>22.0</Version>
+        <LoginUrl>https://vcloud.example.com/api/sessions</LoginUrl>
+    </VersionInfo>
+    <VersionInfo deprecated="true">
+        <Version>23.0</Version>
+        <LoginUrl>https://vcloud.example.com/api/sessions</LoginUrl>
+    </VersionInfo>
+    <VersionInfo deprecated="true">
+        <Version>24.0</Version>
+        <LoginUrl>https://vcloud.example.com/api/sessions</LoginUrl>
+    </VersionInfo>
+    <VersionInfo deprecated="true">
+        <Version>25.0</Version>
+        <LoginUrl>https://vcloud.example.com/api/sessions</LoginUrl>
+    </VersionInfo>
+    <VersionInfo deprecated="true">
+        <Version>26.0</Version>
+        <LoginUrl>https://vcloud.example.com/api/sessions</LoginUrl>
+    </VersionInfo>
+    <VersionInfo deprecated="true">
+        <Version>27.0</Version>
+        <LoginUrl>https://vcloud.example.com/api/sessions</LoginUrl>
+    </VersionInfo>
+    <VersionInfo deprecated="true">
+        <Version>28.0</Version>
+        <LoginUrl>https://vcloud.example.com/api/sessions</LoginUrl>
+    </VersionInfo>
+    <VersionInfo deprecated="false">
+        <Version>29.0</Version>
+        <LoginUrl>https://vcloud.example.com/api/sessions</LoginUrl>
+    </VersionInfo>
+    <VersionInfo deprecated="false">
+        <Version>30.0</Version>
+        <LoginUrl>https://vcloud.example.com/api/sessions</LoginUrl>
+    </VersionInfo>
+    <VersionInfo deprecated="false">
+        <Version>31.0</Version>
+        <LoginUrl>https://vcloud.example.com/api/sessions</LoginUrl>
+    </VersionInfo>
+    <VersionInfo deprecated="false">
+        <Version>32.0</Version>
+        <LoginUrl>https://vcloud.example.com/api/sessions</LoginUrl>
+    </VersionInfo>
+</SupportedVersions>

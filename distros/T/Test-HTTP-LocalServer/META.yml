@@ -3,10 +3,12 @@ abstract: 'spawn a local HTTP server for testing'
 author:
   - 'Max Maischein <corion@cpan.org>'
 build_requires:
+  ExtUtils::MakeMaker: '0'
   File::Basename: '0'
   File::Copy: '0'
   File::Find: '0'
   File::Path: '0'
+  Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -36,7 +38,8 @@ requires:
   URI::URL: '0'
   perl: '5.008'
 resources:
-  repository: https://github.com/Corion/Test-HTTP-LocalServer.git
-version: '0.64'
+  license: https://dev.perl.org/licenses/
+  repository: git://github.com/Corion/Test-HTTP-LocalServer.git
+version: '0.65'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

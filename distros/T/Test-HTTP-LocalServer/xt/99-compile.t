@@ -1,11 +1,10 @@
-#!perl -w
-
+#!perl
 use warnings;
 use strict;
 use File::Find;
 use Test::More;
 BEGIN {
-    eval { require Capture::Tiny; Capture::Tiny->import(":all"); };
+    eval 'use Capture::Tiny ":all"; 1';
     if ($@) {
         plan skip_all => "Capture::Tiny needed for testing";
         exit 0;
@@ -20,14 +19,15 @@ sub check {
     return if (! m{(\.pm|\.pl) \z}xmsi);
 
     my ($stdout, $stderr, $exit) = capture(sub {
-        system( $^X, '-Mblib', '-wc', $_ );
+        system( $^X, '-Mblib', '-c', $_ );
     });
 
     s!\s*\z!!
         for ($stdout, $stderr);
 
     if( $exit ) {
-        diag $exit;
+        diag $stderr;
+        diag "Exit code: ", $exit;
         fail($_);
     } elsif( $stderr ne "$_ syntax OK") {
         diag $stderr;

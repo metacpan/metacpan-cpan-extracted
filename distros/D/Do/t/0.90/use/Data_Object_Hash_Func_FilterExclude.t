@@ -27,6 +27,15 @@ Data-Object Hash Function (FilterExclude) Class
 
 Data::Object::Hash::Func
 
+=attributes
+
+arg1(Object, req, ro)
+args(ArrayRef[Str], req, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Hash::Func::FilterExclude is a function object for

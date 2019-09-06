@@ -27,6 +27,17 @@ Data-Object String Function (Replace) Class
 
 Data::Object::String::Func
 
+=attributes
+
+arg1(Object, req, ro)
+arg2(RegexpRef | Str, req, ro)
+arg3(Str, req, ro)
+arg4(Str, opt, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::String::Func::Replace is a function object for

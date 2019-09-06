@@ -735,6 +735,56 @@ All functionality listed here is highly experimental and should be used with gre
 
     Right now only MySQL is supported by this feature, and even that support is very minimal. Currently the MySQL `$dbh` and `$sth` attributes 'mysql\_insertid' are aliased to the `$dbh` attribute 'mock\_last\_insert\_id'. It is possible to add more aliases though, using the `DBD::Mock:_set_mock_attribute_aliases` function (see the source code for details).
 
+- Connection Callbacks
+
+    This feature allows you to define callbacks that get executed when `DBI->connect` is called.
+
+    To set a series of callbacks you use the `DBD::Mock::dr::set_connect_callbacks` function
+
+        use DBD::Mock::dr;
+
+        DBD::Mock::dr::set_connect_callbacks( sub {
+            my ( $dbh, $dsn, $user, $password, $attributes ) = @_;
+
+            $dbh->{mock_add_resultset} = {
+                sql => 'SELECT foo FROM bar',
+                results => [[ 'foo' ], [ 10 ]]
+            };
+        } );
+
+    To set more than one callback to you can either simply add extra callbacks to your call to `DBD::Mock::dr::set_connect_callbacks`
+
+        DBD::Mock::dr::set_connect_callbacks(
+            sub {
+                my ( $dbh, $dsn, $user, $password, $attributes ) = @_;
+
+                $dbh->{mock_add_resultset} = {
+                    sql => 'SELECT foo FROM bar',
+                    results => [[ 'foo' ], [ 10 ]]
+                };
+            },
+
+            sub {
+                my ( $dbh, $dsn, $user, $password, $attributes ) = @_;
+
+                $dbh->{mock_add_resultset} = {
+                    sql => 'SELECT foo FROM bar',
+                    results => [[ 'foo' ], [ 10 ]]
+                };
+            }
+        );
+
+    Or you can extend the existing set of callbacks with another using the `DBD::Mock::dr::add_connect_callbacks` function
+
+        DBD::Mock::dr::add_connect_callbacks( sub {
+            ( my $dbh, $dsn, $user, $password, $attributes ) = @_;
+
+            $dbh->{mock_add_resultset} = {
+                sql => 'SELECT bar FROM foo',
+                results => [[ 'bar' ], [ 50 ]]
+            };
+        } );
+
 # BUGS
 
 - Odd $dbh attribute behavior

@@ -63,6 +63,6 @@
          "web" : "https://github.com/haarg/List-Util-MaybeXS"
       }
    },
-   "version" : "1.500003",
+   "version" : "1.500004",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

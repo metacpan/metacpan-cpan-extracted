@@ -1,0 +1,43 @@
+{
+  "otherAttributes" : { },
+  "link" : [ ],
+  "href" : "https://vcloud.example.com/api/org/",
+  "type" : "application/vnd.vmware.vcloud.orgList+json",
+  "org" : [ {
+    "otherAttributes" : { },
+    "href" : "https://vcloud.example.com/api/org/a93c9db9-7471-3192-8d09-a8f7eeda85f9",
+    "id" : null,
+    "name" : "System",
+    "type" : "application/vnd.vmware.vcloud.org+xml",
+    "vCloudExtension" : [ ]
+  }, {
+    "otherAttributes" : { },
+    "href" : "https://vcloud.example.com/api/org/dd360a73-67b5-43b3-9c29-830378a10fbb",
+    "id" : null,
+    "name" : "Example",
+    "type" : "application/vnd.vmware.vcloud.org+xml",
+    "vCloudExtension" : [ ]
+  }, {
+    "otherAttributes" : { },
+    "href" : "https://vcloud.example.com/api/org/a53b1473-b973-4d89-8316-7fb47db13bbd",
+    "id" : null,
+    "name" : "Thing",
+    "type" : "application/vnd.vmware.vcloud.org+xml",
+    "vCloudExtension" : [ ]
+  }, {
+    "otherAttributes" : { },
+    "href" : "https://vcloud.example.com/api/org/39178c0c-9481-4ee1-a95c-244396b37cb8",
+    "id" : null,
+    "name" : "Object",
+    "type" : "application/vnd.vmware.vcloud.org+xml",
+    "vCloudExtension" : [ ]
+  }, {
+    "otherAttributes" : { },
+    "href" : "https://vcloud.example.com/api/org/314f1e52-e93a-4acd-a085-dfec36e07c61",
+    "id" : null,
+    "name" : "Blob",
+    "type" : "application/vnd.vmware.vcloud.org+xml",
+    "vCloudExtension" : [ ]
+  } ],
+  "vCloudExtension" : [ ]
+}

@@ -27,6 +27,15 @@ Data-Object Scalar Function (Lt) Class
 
 Data::Object::Scalar::Func
 
+=attributes
+
+arg1(Object, req, ro)
+arg2(Any, req, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Scalar::Func::Lt is a function object for Data::Object::Scalar.

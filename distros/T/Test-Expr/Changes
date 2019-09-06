@@ -48,3 +48,9 @@ Revision history for Test-Expr
 
         Added correct handing of regex matches
         (thanks, Patrick!)
+
+
+0.000009  Fri Sep  6 10:15:35 2019
+
+        Greatly improved extraction of variables from tests
+        (thanks, Patrick!)

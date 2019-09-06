@@ -25,6 +25,10 @@ Data::Object::Base
 
 Data::Object::Role::Throwable
 
+=libraries
+
+Data::Object::Library
+
 =description
 
 This package is an abstract base class for function classes.

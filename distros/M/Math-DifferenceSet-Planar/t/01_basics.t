@@ -89,7 +89,7 @@ $ds2 = $ds->canonize;
 pds_ok($ds2, "@el");
 
 SequentialIteratorTest: {
-    local $Math::DifferenceSet::Planar::_MAX_ENUM_ORDER = 0;
+    local $Math::DifferenceSet::Planar::_MAX_ENUM_COUNT = 0;
     my $it = $ds->iterate_rotators;
     is(ref($it), 'CODE');
     my @p = ();

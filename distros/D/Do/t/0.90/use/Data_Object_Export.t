@@ -19,6 +19,10 @@ Data-Object Exportable Functions
 
   my $array = cast []; # Data::Object::Array
 
+=libraries
+
+Data::Object::Library
+
 =description
 
 This package is an exporter that provides various useful utility functions and

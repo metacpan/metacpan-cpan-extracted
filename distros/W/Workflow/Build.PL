@@ -19,7 +19,7 @@ my %module_build_args = (
     "Chris Winters <chris\@cwinters.com>"
   ],
   "dist_name" => "Workflow",
-  "dist_version" => "1.46",
+  "dist_version" => "1.48",
   "license" => "perl",
   "module_name" => "Workflow",
   "recommends" => {

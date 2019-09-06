@@ -27,6 +27,14 @@ Data-Object Array Function (PairsArray) Class
 
 Data::Object::Array::Func
 
+=attributes
+
+arg1(Object, req, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Array::Func::PairsArray is a function object for

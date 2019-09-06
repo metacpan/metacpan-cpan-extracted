@@ -17,6 +17,10 @@ Data-Object Base Class
 
   use parent 'Data::Object::Base';
 
+=libraries
+
+Data::Object::Library
+
 =description
 
 This package provides an abstract base class used for identity and

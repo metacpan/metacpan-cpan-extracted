@@ -1,5 +1,5 @@
 package IO::Pager;
-our $VERSION = 0.40; #Untouched since 0.40
+our $VERSION = "0.42"; #Untouched since 0.42
 
 use 5.008; #At least, for decent perlio, and other modernisms
 use strict;
@@ -16,6 +16,9 @@ our $SIGPIPE;
 sub find_pager {
   # Return the name (or path) of a pager that IO::Pager can use
   my $io_pager;
+
+  #Permit explicit use of pure perl pager
+  return $_[0] if $_[0] eq 'Term::Pager';
 
   # Use File::Which if available (strongly recommended)
   my $which = eval { require File::Which };
@@ -73,6 +76,12 @@ sub _check_pagers {
 #Should have this as first block for clarity, but not with its use of a sub :-/
 BEGIN { # Set the $ENV{PAGER} to something reasonable
   $PAGER = find_pager();
+
+  #Do we have modern Term::Pager? If so, use it instead of hopeful more
+  if( $PAGER eq 'more' ){
+      eval "use Term::Pager";
+      $PAGER = 'Term::Pager' unless $@;
+  }
 }
 
 
@@ -177,7 +186,7 @@ sub TIEHANDLE {
 sub BINMODE {
   my ($self, $layer) = @_;
   if( $layer =~ /^:LOG\((>{0,2})(.*)\)$/ ){
-    open($self->{LOG}, $1||'>', $2||"$$.log") or die $!;
+    CORE::open($self->{LOG}, $1||'>', $2||"$$.log") or die $!;
   }
   else{
     CORE::binmode($self->{real_fh}, $layer||':raw');
@@ -291,7 +300,7 @@ IO::Pager - Select a pager and pipe text to it if destination is a TTY
     my $object = new IO::Pager::Unbuffered  *STDOUT;
 
 
-    $object->print("OO shiny...\n");
+    $object->print("OO shiny...\n") while 1;
     print "Some other text sent to STODUT, perhaps from a foreign routine."
 
     # $object passes out of scope and filehandle is automagically closed
@@ -320,7 +329,7 @@ IO::Pager - Select a pager and pipe text to it if destination is a TTY
   {
     # You can also use scalar filehandles...
     my $token = IO::Pager::open(my $FH) or warn($!); XXX
-    print $FH "No globs or barewords for us thanks!\n";
+    print $FH "No globs or barewords for us thanks!\n" while 1;
   }
 
 
@@ -527,19 +536,39 @@ Try the standard, hardcoded paths in L</FILES>.
 If File::Which is available, use the first pager possible amongst
 C<less>, C<most>, C<w3m>, C<lv>, C<pg> and L<more>.
 
-=item 4. more
+=item 4. Term::Pager
+
+If instantiating an IO::Pager object and Term::Pager version 1.5 or greater is
+available, L<IO::Pager::Perl> will be used. You may also set $ENV{PAGER} to
+Term::Pager to select this extensible, pure perl pager for display.
+
+=item 5. more
 
 Set I<PAGER> to C<more>, and cross our fingers.
 
 =back
 
-Steps 1, 3 and 4 rely upon the I<PATH> environment variable.
+Steps 1, 3 and 5 rely upon the I<PATH> environment variable.
+
+=head1 CAVEATS
+
+You probably want to do something with SIGPIPE eg;
+
+  eval {
+    local $SIG{PIPE} = sub { die };
+    local $STDOUT = IO::Pager::open(*STDOUT);
+
+    while (1) {
+      # Do something
+    }
+  }
+
+  # Do something else
 
 =head1 SEE ALSO
 
-L<IO::Pager::Buffered>, L<IO::Pager::Unbuffered>, L<IO::Pager::Page>,
-
-L<IO::Page>, L<Meta::Tool::Less>
+L<IO::Pager::Buffered>, L<IO::Pager::Unbuffered>, L<I::Pager::Perl>,
+L<IO::Pager::Page>, L<IO::Page>, L<Meta::Tool::Less>
 
 =head1 AUTHOR
 
@@ -551,7 +580,7 @@ This module was inspired by Monte Mitzelfelt's IO::Page 0.02
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2003-2015 Jerrad Pierce
+Copyright (C) 2003-2018 Jerrad Pierce
 
 =over
 

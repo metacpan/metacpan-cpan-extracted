@@ -27,6 +27,16 @@ Data-Object String Function (Rindex) Class
 
 Data::Object::String::Func
 
+=attributes
+
+arg1(Object, req, ro)
+arg2(Str, req, ro)
+arg3(Num, opt, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::String::Func::Rindex is a function object for

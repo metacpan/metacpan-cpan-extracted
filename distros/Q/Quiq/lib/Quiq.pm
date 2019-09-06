@@ -3,7 +3,7 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = '1.155';
+our $VERSION = '1.156';
 
 =encoding utf8
 
@@ -556,6 +556,10 @@ L<Quiq::Properties> - Eigenschaften einer Menge von skalaren Werten
 
 =item *
 
+L<Quiq::Range> - Liste von Integern
+
+=item *
+
 L<Quiq::Record> - Verarbeitung von Text-Records
 
 =item *
@@ -730,7 +734,7 @@ L<Quiq::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.155
+1.156
 
 =head1 AUTHOR
 

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.155';
+our $VERSION = '1.156';
 
 use Quiq::Database::Row::Array;
 use Quiq::Database::Row::Object;
@@ -581,7 +581,29 @@ sub fetch {
 
 =head4 Synopsis
 
+    @rows | $tab = $cur->fetchAll;
+    @rows | $tab = $cur->fetchAll($autoClose);
     @rows | $tab = $cur->fetchAll($autoClose,$limit);
+
+=head4 Arguments
+
+=over 4
+
+=item $autoClose (Default: 0)
+
+Ist Parameter $autoClose angegeben und wahr, schließe den Cursor
+automatisch.
+
+=item $limit (Default: 0)
+
+Fetche maximal $limit Datensätze. Falls 0, fetche alle Datensätze.
+
+=back
+
+=head4 Returns
+
+Liste der Datensätze (List-Kontext) der ein Resultset-Objekt
+(Skalar-Kontect).
 
 =head4 Description
 
@@ -596,11 +618,16 @@ den Cursor automatisch.
 sub fetchAll {
     my ($self,$autoClose,$limit) = @_;
 
-    # Alle Datensätze fetchen
+    # Alle oder maximal $limit Datensätze fetchen
 
     my @rows;
+    my $i = 0;
     while (my $row = $self->fetch) {
+        $i++;
         push @rows,$row;
+        if ($limit && $i >= $limit) {
+            last;
+        }
     }
 
     # Table-Objekt instantiieren, wenn !wantarray
@@ -616,6 +643,7 @@ sub fetchAll {
             startTime => $self->{'startTime'},
             execTime => $self->{'execTime'},
             fetchTime => $self->time,
+            moreRowsExist => $limit && $self->fetch? 1: 0,
         );
     }
 
@@ -632,7 +660,7 @@ sub fetchAll {
 
 =head1 VERSION
 
-1.155
+1.156
 
 =head1 AUTHOR
 

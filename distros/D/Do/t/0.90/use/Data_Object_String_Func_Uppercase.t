@@ -27,6 +27,14 @@ Data-Object String Function (Uppercase) Class
 
 Data::Object::String::Func
 
+=attributes
+
+arg1(Object, req, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::String::Func::Uppercase is a function object for

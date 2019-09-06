@@ -27,6 +27,15 @@ Data-Object Hash Function (Defined) Class
 
 Data::Object::Hash::Func
 
+=attributes
+
+arg1(Object, req, ro)
+arg2(Str, opt, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Hash::Func::Defined is a function object for Data::Object::Hash.

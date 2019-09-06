@@ -1,5 +1,9 @@
 Revision history for HTML::GoogleMaps::V3
 
+0.15 2019-09-06
+        - fix illegal javascript when center is undefined (GH #22, GH #23)
+        - thanks to Nigel Horne for the above patch
+
 0.14 2018-12-28
         - update github repo in POD/README (GH #21)
 

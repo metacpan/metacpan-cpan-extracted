@@ -27,6 +27,15 @@ Data-Object Code Function (Rcurry) Class
 
 Data::Object::Code::Func
 
+=attributes
+
+arg1(Object, req, ro)
+args(ArrayRef[Any], req, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Code::Func::Rcurry is a function object for Data::Object::Code.

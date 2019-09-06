@@ -1,9 +1,29 @@
 ==================================================
-Changes from 2007-04-20 00:00:00 +0000 to present.
+Changes from 2009-09-07 00:00:00 +0000 to present.
 ==================================================
 
 -------------------------------------------
-version 0.2000 at 2017-04-17 17:41:53 +0000
+version 0.2001 at 2019-09-05 18:10:28 +0000
+-------------------------------------------
+
+  Change: d1205a31801a5ce426420f4df09a9aa321db3cd9
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2018-11-29 11:04:13 +0000
+
+    Merge pull request #16 from toddr/master
+
+    Patch bin scripts to support the #! Makefile.PL was invoked with 
+
+  Change: 9854b0b77152d97b7f79b21d1c93b0f8695337f2
+  Author: Todd Rinaldo <toddr@cpan.org>
+  Date : 2018-11-27 15:43:38 +0000
+
+    Patch bin scripts to support the #! Makefile.PL was invoked with
+
+    setting it to /usr/bin/perl makes EUMM update the #! during install 
+
+-------------------------------------------
+version 0.2000 at 2017-04-17 17:40:04 +0000
 -------------------------------------------
 
   Change: e374e6acc463356597864b1c5a7b7ab8137c9ee5

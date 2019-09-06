@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.519';
+our $VERSION = '0.520';
 use Exporter 'import';
 our @EXPORT_OK = qw( fill_form read_line );
 
@@ -12,7 +12,8 @@ use Carp       qw( croak carp );
 use List::Util qw( any );
 
 use Term::Choose::LineFold        qw( line_fold print_columns cut_to_printwidth );
-use Term::Choose::Constants       qw( :form :screen );
+use Term::Choose::Constants       qw( :keys );
+use Term::Choose::Screen          qw( :all );
 use Term::Choose::Util            qw( unicode_sprintf );
 use Term::Choose::ValidateOptions qw( validate_options );
 
@@ -128,14 +129,14 @@ sub __reset_term {
         $self->{plugin}->__reset_mode();
     }
     if ( $up ) {
-        print UP x $up;
+        print up( $up );
     }
-    print "\r" . CLEAR_TO_END_OF_SCREEN;
+    print "\r" . clear_to_end_of_screen();
     if ( $self->{hide_cursor} == 1 ) {
-        print SHOW_CURSOR;
+        print show_cursor();
     }
     elsif ( $self->{hide_cursor} == 2 ) { # documentation
-        print HIDE_CURSOR;
+        print hide_cursor();
     }
     if ( exists $self->{backup_instance_defaults} ) {
         my $instance_defaults = $self->{backup_instance_defaults};
@@ -344,32 +345,32 @@ sub readline {
         exit;
     };
     $self->__init_term();
-    my $term_w = ( $self->{plugin}->__get_term_size() )[0];
+    my $term_w = ( get_term_size() )[0];
     my $m = $self->__init_readline( $term_w, $prompt );
     my $big_step = 10;
     my $up_before = 0;
     if ( $self->{clear_screen} ) {
-        print CLEAR_SCREEN;
+        print clear_screen();
     }
 
     CHAR: while ( 1 ) {
         if ( $self->{i}{beep} ) {
-            $self->{plugin}->__beep();
+            print bell();
             $self->{i}{beep} = 0;
         }
-        my $tmp_term_w = ( $self->{plugin}->__get_term_size() )[0];
+        my $tmp_term_w = ( get_term_size() )[0];
         if ( $tmp_term_w != $term_w ) {
             $term_w = $tmp_term_w;
             $m = $self->__init_readline( $term_w, $prompt );
         }
         if ( $up_before ) {
-            print UP x $up_before;
+            print up( $up_before );
         }
-        print "\r" . CLEAR_TO_END_OF_SCREEN;
+        print "\r" . clear_to_end_of_screen();
         $self->__before_readline( $m );
         $up_before = $self->{i}{pre_text_row_count};
         if ( $self->{hide_cursor} ) {
-            print HIDE_CURSOR;
+            print hide_cursor();
         }
         if ( length $self->{i}{pre_text} ) {
             print $self->{i}{pre_text}, "\n";
@@ -377,7 +378,7 @@ sub readline {
         $self->__after_readline( $m );
         if ( length $self->{i}{post_text} ) {
             print "\n" . $self->{i}{post_text};
-            print UP x $self->{i}{post_text_row_count};
+            print up( $self->{i}{post_text_row_count} );
         }
         $self->__print_readline( $m );
         my $char = $self->{plugin}->__get_key_OS();
@@ -697,7 +698,7 @@ sub _fill_from_begin {
 
 sub __print_readline {
     my ( $self, $m ) = @_;
-    print "\r" . CLEAR_TO_END_OF_LINE;
+    print "\r" . clear_to_end_of_line();
     my $i = $self->{i}{curr_row};
     if ( $self->{no_echo} && $self->{no_echo} == 2 ) {
         print "\r" . $self->{i}{keys}[$i]; # no_echo only in readline -> in readline no separator
@@ -725,11 +726,11 @@ sub __print_readline {
         $back_to_pos += $_->[1];
     }
     if ( $self->{hide_cursor} ) {
-        print SHOW_CURSOR;
+        print show_cursor();
     }
     print $print_str;
     if ( $back_to_pos ) {
-        print LEFT x $back_to_pos;
+        print left( $back_to_pos );
     }
 }
 
@@ -767,7 +768,7 @@ sub __prepare_width {
     # Subtract $self->{i}{arrow_w} for the '<' before the string.
     # In each case where no '<'-prefix is required (diff==0) $self->{i}{arrow_w} is added again.
     # Routins where $self->{i}{arrow_w} is added:  __left, __bspace, __home, __ctrl_u, __delete
-    # The required space (1) for the cursor (or the '>') behind the string is already subtracted in __get_term_size
+    # The required space (1) for the cursor (or the '>') behind the string is already subtracted in get_term_size
     $self->{i}{th} = int( $self->{i}{avail_w} / 5 );
     $self->{i}{th} = 40 if $self->{i}{th} > 40;
 }
@@ -808,11 +809,11 @@ sub __prepare_hight {
 
 sub __print_current_row {
     my ( $self, $list, $m ) = @_;
-    print "\r" . CLEAR_TO_END_OF_LINE;
+    print "\r" . clear_to_end_of_line();
     if ( $self->{i}{curr_row} < @{$self->{i}{pre}} ) {
-        print REVERSE;
+        print reverse_video();
         print $list->[$self->{i}{curr_row}][0];
-        print RESET;
+        print normal();
     }
     else {
         $self->__print_readline( $m );
@@ -867,11 +868,11 @@ sub __write_screen {
             $page_number = substr sprintf( '%d/%d', $self->{i}{page}, $self->{i}{pages} ), 0, $self->{i}{term_w};
         }
         print "\n", $page_number;
-        print UP x ( $self->{i}{avail_h} - ( $self->{i}{curr_row} - $self->{i}{begin_row} ) ); #
+        print up( $self->{i}{avail_h} - ( $self->{i}{curr_row} - $self->{i}{begin_row} ) ); #
     }
     else {
         $self->{i}{page} = 1;
-        print UP x ( $self->{i}{end_row} - $self->{i}{curr_row} );
+        print up( $self->{i}{end_row} - $self->{i}{curr_row} );
     }
 }
 
@@ -887,13 +888,13 @@ sub __write_first_screen {
     $self->{i}{seps} = [];
     $self->{i}{keys} = [];
     if ( $self->{clear_screen} ) {
-        print CLEAR_SCREEN;
+        print clear_screen();
     }
     else {
-        print "\r" . CLEAR_TO_END_OF_SCREEN;
+        print "\r" . clear_to_end_of_screen();
     }
     if ( $self->{hide_cursor} ) {
-        print HIDE_CURSOR;
+        print hide_cursor();
     }
     if ( length $self->{i}{pre_text} ) {
         print $self->{i}{pre_text} . "\n";
@@ -948,7 +949,7 @@ sub fill_form {
         exit;
     };
     $self->__init_term();
-    my ( $term_w, $term_h ) = $self->{plugin}->__get_term_size();
+    my ( $term_w, $term_h ) = get_term_size();
     $self->__length_longest_key( $list );
     $self->__prepare_width( $term_w );
     $self->__prepare_hight( $list, $term_w, $term_h );
@@ -962,12 +963,12 @@ sub fill_form {
             $locked = 1;
         }
         if ( $self->{i}{beep} ) {
-            $self->{plugin}->__beep();
+            print bell();
             $self->{i}{beep} = 0;
         }
         else {
             if ( $self->{hide_cursor} ) {
-                print HIDE_CURSOR;
+                print hide_cursor();
             }
             $self->__print_current_row( $list, $m );
         }
@@ -979,9 +980,9 @@ sub fill_form {
         }
         next CHAR if $char == NEXT_get_key;
         next CHAR if $char == KEY_TAB;
-        my ( $tmp_term_w, $tmp_term_h ) = $self->{plugin}->__get_term_size();
+        my ( $tmp_term_w, $tmp_term_h ) = get_term_size();
         if ( $tmp_term_w != $term_w || $tmp_term_h != $term_h && $tmp_term_h < ( @$list + 1 ) ) {
-            print UP x ( $self->{i}{curr_row} + $self->{i}{pre_text_row_count} );
+            print up( $self->{i}{curr_row} + $self->{i}{pre_text_row_count} );
             ( $term_w, $term_h ) = ( $tmp_term_w, $tmp_term_h );
             $self->__length_longest_key( $list );
             $self->__prepare_width( $term_w );
@@ -1049,7 +1050,7 @@ sub fill_form {
                 $m = $self->__string_and_pos( $list );
                 if ( $self->{i}{curr_row} >= $self->{i}{begin_row} ) {
                     $self->__reset_previous_row( $list, $self->{i}{curr_row} + 1 );
-                    print UP x 1;
+                    print up( 1 );
                 }
                 else {
                     $self->__print_previous_page( $list );
@@ -1066,10 +1067,10 @@ sub fill_form {
                 $m = $self->__string_and_pos( $list );
                 if ( $self->{i}{curr_row} <= $self->{i}{end_row} ) {
                     $self->__reset_previous_row( $list, $self->{i}{curr_row} - 1 );
-                    print DOWN x 1;
+                    print down( 1 );
                 }
                 else {
-                    print UP x ( $self->{i}{end_row} - $self->{i}{begin_row} );
+                    print up( $self->{i}{end_row} - $self->{i}{begin_row} );
                     $self->__print_next_page( $list );
                 }
             }
@@ -1082,13 +1083,13 @@ sub fill_form {
                 }
                 else {
                     $self->__reset_previous_row( $list, $self->{i}{curr_row} );
-                    print UP x $self->{i}{curr_row};
+                    print up( $self->{i}{curr_row} );
                     $self->{i}{curr_row} = 0;
                     $m = $self->__string_and_pos( $list );
                 }
             }
             else {
-                print UP x ( $self->{i}{curr_row} - $self->{i}{begin_row} );
+                print up( $self->{i}{curr_row} - $self->{i}{begin_row} );
                 $self->{i}{curr_row} = $self->{i}{begin_row} - $self->{i}{avail_h};
                 $m = $self->__string_and_pos( $list );
                 $self->__print_previous_page( $list );
@@ -1103,13 +1104,13 @@ sub fill_form {
                 else {
                     $self->__reset_previous_row( $list, $self->{i}{curr_row} );
                     my $rows = $self->{i}{end_row} - $self->{i}{curr_row};
-                    print DOWN x $rows;
+                    print down( $rows );
                     $self->{i}{curr_row} = $self->{i}{end_row};
                     $m = $self->__string_and_pos( $list );
                 }
             }
             else {
-                print UP x ( $self->{i}{curr_row} - $self->{i}{begin_row} );
+                print up( $self->{i}{curr_row} - $self->{i}{begin_row} );
                 $self->{i}{curr_row} = $self->{i}{end_row} + 1;
                 $m = $self->__string_and_pos( $list );
                 $self->__print_next_page( $list );
@@ -1126,8 +1127,8 @@ sub fill_form {
                     return;
             }
             else {
-                print UP x $up;
-                print "\r" . CLEAR_TO_END_OF_SCREEN;
+                print up( $up );
+                print "\r" . clear_to_end_of_screen();
                 $self->__write_first_screen( $list, 0, 2 );
                 $m = $self->__string_and_pos( $list );
             }
@@ -1156,14 +1157,14 @@ sub fill_form {
                 return [ map { [ $orig_list->[$_][0], $list->[$_][1] ] } 0 .. $#{$list} ];
             }
             if ( $auto_up == 2 ) {                                                                                  # if ENTER && "auto_up" == 2 && any row: jumps {back/0}
-                print UP x $up;
-                print "\r" . CLEAR_TO_END_OF_SCREEN;
+                print up( $up );
+                print "\r" . clear_to_end_of_screen();
                 $self->__write_first_screen( $list, 0, $auto_up );                                                  # cursor on {back}
                 $m = $self->__string_and_pos( $list );
             }
             elsif ( $self->{i}{curr_row} == $#$list ) {                                                             # if ENTER && {last row}: jumps to the {first data row/2}
-                print UP x $up;
-                print "\r" . CLEAR_TO_END_OF_SCREEN;
+                print up( $up );
+                print "\r" . clear_to_end_of_screen();
                 $self->__write_first_screen( $list, scalar( @{$self->{i}{pre}} ), $auto_up );                       # cursor on the first data row
                 $m = $self->__string_and_pos( $list );
                 $self->{i}{lock_ENTER} = 1;                                                                         # set lock_ENTER when jumped automatically from the {last row} to the {first data row/2}
@@ -1178,10 +1179,10 @@ sub fill_form {
                 $m = $self->__string_and_pos( $list );
                 if ( $self->{i}{curr_row} <= $self->{i}{end_row} ) {                                                # or go to the next row if not on the last row
                     $self->__reset_previous_row( $list, $self->{i}{curr_row} - 1 );
-                    print DOWN x 1;
+                    print down( 1 );
                 }
                 else {
-                    print UP x $up;                                                                                 # or else to the next page
+                    print up( $up );                                                                                 # or else to the next page
                     $self->__print_next_page( $list );
                 }
             }
@@ -1203,7 +1204,7 @@ sub fill_form {
 
 sub __reset_previous_row {
     my ( $self, $list, $idx ) = @_;
-    print "\r" . CLEAR_TO_END_OF_LINE;
+    print "\r" . clear_to_end_of_line();
     print $self->__get_row( $list, $idx );
 }
 
@@ -1213,7 +1214,7 @@ sub __print_next_page {
     $self->{i}{begin_row} = $self->{i}{end_row} + 1;
     $self->{i}{end_row}   = $self->{i}{end_row} + $self->{i}{avail_h};
     $self->{i}{end_row}   = $#$list if $self->{i}{end_row} > $#$list;
-    print "\r" . CLEAR_TO_END_OF_SCREEN;
+    print "\r" . clear_to_end_of_screen();
     $self->__write_screen( $list );
 }
 
@@ -1223,7 +1224,7 @@ sub __print_previous_page {
     $self->{i}{end_row}   = $self->{i}{begin_row} - 1;
     $self->{i}{begin_row} = $self->{i}{begin_row} - $self->{i}{avail_h};
     $self->{i}{begin_row} = 0 if $self->{i}{begin_row} < 0;
-    print "\r" . CLEAR_TO_END_OF_SCREEN;
+    print "\r" . clear_to_end_of_screen();
     $self->__write_screen( $list );
 }
 
@@ -1245,7 +1246,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.519
+Version 0.520
 
 =cut
 

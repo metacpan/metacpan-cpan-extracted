@@ -27,6 +27,15 @@ Data-Object Array Function (Values) Class
 
 Data::Object::Array::Func
 
+=attributes
+
+arg1(Object, req, ro)
+args(ArrayRef[Int], opt, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Array::Func::Values is a function object for Data::Object::Array.

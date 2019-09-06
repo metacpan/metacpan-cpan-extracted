@@ -1,37 +1,42 @@
 Changes file for Module::Info::File
 
+1.01 2019-09-06 maintenance release, updated not required
+
+- Improvedments to POD formatting, patch from Mohammad S Anwar
+
+
 1.00 2016-01-05 Major release, update recommended
 
 - Exchanged all file/file contents parsing code for Module::Metadata
 
   WARNING! this release fixes a bug for multiple package definitions for a file.
-  It now returns the first package encountered instead of the package definition encountered, 
+  It now returns the first package encountered instead of the package definition encountered,
   this alters behaviour, but the behaviour seems more correct.
 
-  Thanks to Dai Okabayashi for PRs #2 and #3, eventhough they where never put to uses
+  Thanks to Dai Okabayashi for PRs #2 and #3, eventhough they where never put to use
 
 
-0.14 2014-08-27 bug fix release, update not necessary
+0.14 2014-08-27 bug fix release, update not required
 
-- Removed use of UNIVERSAL, the API used was deprecated and no 
+- Removed use of UNIVERSAL, the API used was deprecated and no
   longer necessary, see Github issue [#1]
 
 
-0.13 2014-08-25 maintenance release, update not necessary
+0.13 2014-08-25 maintenance release, update not required
 
 - Additions to MANIFEST.SKIP
 
 - License upgraded to Artistic 2.0 from Artistic 1.0
 
 
-0.12 2014-08-23 maintenance release, update not necessary
+0.12 2014-08-23 maintenance release, update not required
 
 - Specified Perl version to 5.6 as pointed out by Perl::Critic
 
 - Ported from Module::Build to Dist::Zilla
 
 
-0.11 2007-03-17 maintenance release, update not necessary
+0.11 2007-03-17 maintenance release, update not required
 
 - Added t/perlcriticrc
 

@@ -28,6 +28,10 @@ Data-Object Autoboxing
 
 autobox
 
+=libraries
+
+Data::Object::Library
+
 =description
 
 This package implements autoboxing via L<autobox> to provide

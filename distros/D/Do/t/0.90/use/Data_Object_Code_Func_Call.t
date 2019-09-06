@@ -27,6 +27,15 @@ Data-Object Code Function (Call) Class
 
 Data::Object::Code::Func
 
+=attributes
+
+arg1(Object, req, ro)
+args(ArrayRef[Any], opt, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Code::Func::Call is a function object for Data::Object::Code.

@@ -3,7 +3,7 @@ use 5.006;
 use strict;
 use warnings;
 
-use Test::More tests => 8;
+use Test::More tests => 11;
 
 BEGIN {
     use_ok('DBD::Mock');  
@@ -81,15 +81,34 @@ my $dbh = DBI->connect( 'DBI:Mock:', '', '' );
 }
 
 is_deeply(
-	  $dbh->selectall_hashref($items_sql, 'id', "Checking selectall_hashref with named key."), 
-	  { '2' => $coco_hash,
-	    '42' => $not_coco_hash,
-	  },
-	  '... selectall_hashref worked correctly');
+    $dbh->selectall_hashref($items_sql, 'id', "Checking selectall_hashref with named key."), 
+    { '2' => $coco_hash,
+      '42' => $not_coco_hash,
+    },
+    '... selectall_hashref with named key');
 
 is_deeply(
-	  $dbh->selectall_hashref($items_sql, 1, "Checking selectall_hashref with named key."), 
-	  { 'coconuts' => $coco_hash,
-	    'not coconuts' => $not_coco_hash,
-	  },
-	  '... selectall_hashref worked correctly');
+    $dbh->selectall_hashref($items_sql, 2, "Checking selectall_hashref with numeric key."), 
+    { 'coconuts' => $coco_hash,
+      'not coconuts' => $not_coco_hash,
+    },
+    '... selectall_hashref with numeric key');
+
+is_deeply(
+    $dbh->selectall_hashref($items_sql, ['id', 'name'], "Checking selectall_hashref with array of named keys."), 
+    { 2 => { 'coconuts' => $coco_hash, },
+      42 => { 'not coconuts' => $not_coco_hash },
+    },
+    '... selectall_hashref with array of named keys');
+
+is_deeply(
+    $dbh->selectall_hashref($items_sql, [1, 2], "Checking selectall_hashref with array of numeric keys."), 
+    { 2 => { 'coconuts' => $coco_hash, },
+      42 => { 'not coconuts' => $not_coco_hash },
+    },
+    '... selectall_hashref with array of numeric keys');
+
+is_deeply(
+    $dbh->selectall_hashref($items_sql, [], "Checking selectall_hashref with empty array of keys."), 
+    { %{$not_coco_hash} },
+    '... selectall_hashref with empty array of keys');

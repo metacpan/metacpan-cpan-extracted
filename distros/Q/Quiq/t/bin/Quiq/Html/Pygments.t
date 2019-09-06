@@ -45,8 +45,15 @@ sub test_unitTest : Test(4) {
     # Style nicht bekannt ist oder die Hintergrundfarbe nicht
     # bestimmt werden kann)
 
+    my @styles = eval {Quiq::Html::Pygments->styles};
+    if ($@) {
+        # "pygmentize -L" wird nicht verstanden. Kommt bei CPAN-Testern vor.
+        $self->skipAllTests('pygmentize -L fails');
+        return;
+    }
+
     my $n = 0;
-    for my $style (Quiq::Html::Pygments->styles) {
+    for my $style (@styles) {
         $n++;
         my ($rules,$bgColor) = Quiq::Html::Pygments->css($style);
     }

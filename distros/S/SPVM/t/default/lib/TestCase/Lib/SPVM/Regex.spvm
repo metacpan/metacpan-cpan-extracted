@@ -12,7 +12,7 @@ package TestCase::Lib::SPVM::Regex {
     {
       my $re = SPVM::Regex->new("a(bc)");
       my $target = "ppzabczabcz";
-      my $result = $re->replace_all($target, 0, [(object)"ABC", 1, "PQR"]);
+      my $result = $re->replace_all($target, 0, [(object)"ABC", 0, "PQR"]);
       
       unless ($re->replace_count == 2) {
         return 0;
@@ -28,7 +28,7 @@ package TestCase::Lib::SPVM::Regex {
       my $re = SPVM::Regex->new("a(bc)");
       my $target = "ppzabczabcz";
       my $result = $re->replace_all($target, 0, [$re : SPVM::Regex] sub : string ($self : self) {
-        return "ABC" . $re->caps(1) . "PQRS";
+        return "ABC" . $re->caps(0) . "PQRS";
       });
       
       unless ($re->replace_count == 2) {
@@ -249,6 +249,15 @@ package TestCase::Lib::SPVM::Regex {
   }
   
   sub match_capture : int ()  {
+    # Capture zero more only
+    {
+      my $re = SPVM::Regex->new("(a*)");
+      $re->match("aaa");
+      unless ($re->caps(0) eq "aaa") {
+        return 0;
+      }
+    }
+    
     # Capture a char
     {
       my $re = SPVM::Regex->new("a(b)c");
@@ -259,7 +268,7 @@ package TestCase::Lib::SPVM::Regex {
         return 0;
       }
       
-      unless ($re->caps(1) eq "b") {
+      unless ($re->caps(0) eq "b") {
         return 0;
       }
     }
@@ -274,7 +283,7 @@ package TestCase::Lib::SPVM::Regex {
         return 0;
       }
       
-      unless ($re->caps(1) eq "い") {
+      unless ($re->caps(0) eq "い") {
         return 0;
       }
     }
@@ -289,7 +298,7 @@ package TestCase::Lib::SPVM::Regex {
         return 0;
       }
       
-      unless ($re->caps(1) eq "") {
+      unless ($re->caps(0) eq "") {
         return 0;
       }
     }
@@ -303,8 +312,9 @@ package TestCase::Lib::SPVM::Regex {
       unless ($match) {
         return 0;
       }
+
       
-      unless ($re->caps(1) eq "abc89") {
+      unless ($re->caps(0) eq "abc89") {
         return 0;
       }
     }
@@ -319,23 +329,23 @@ package TestCase::Lib::SPVM::Regex {
         return 0;
       }
       
-      unless ($re->caps(1) eq "abc1") {
+      unless ($re->caps(0) eq "abc1") {
         return 0;
       }
 
-      unless ($re->caps(2) eq "abc2") {
+      unless ($re->caps(1) eq "abc2") {
         return 0;
       }
 
-      unless ($re->caps(3) eq "abc3") {
+      unless ($re->caps(2) eq "abc3") {
         return 0;
       }
 
-      unless ($re->caps(4) eq "abc4") {
+      unless ($re->caps(3) eq "abc4") {
         return 0;
       }
 
-      unless ($re->caps(5) eq "abc5") {
+      unless ($re->caps(4) eq "abc5") {
         return 0;
       }
     }
@@ -352,6 +362,15 @@ package TestCase::Lib::SPVM::Regex {
       }
       
       $@ = undef;
+    }
+    
+    # Capture zero more only
+    {
+      my $re = SPVM::Regex->new("(a*)");
+      $re->match("aaa");
+      unless ($re->caps(0) eq "aaa") {
+        return 0;
+      }
     }
     
     return 1;
@@ -382,6 +401,35 @@ package TestCase::Lib::SPVM::Regex {
       }
     }
     
+    return 1;
+  }
+
+  sub match_char_class_negate : int () {
+
+    # Match char class negate
+    {
+      my $re = SPVM::Regex->new("[^0-9]+");
+      my $target = "zabcz";
+      
+      my $match = $re->match($target);
+      
+      unless ($match) {
+        return 0;
+      }
+    }
+
+    # Not match char class negate
+    {
+      my $re = SPVM::Regex->new("[^0-9]+");
+      my $target = "012";
+      
+      my $match = $re->match($target);
+      
+      if ($match) {
+        return 0;
+      }
+    }
+
     return 1;
   }
   

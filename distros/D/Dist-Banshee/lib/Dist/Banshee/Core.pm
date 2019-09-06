@@ -1,10 +1,10 @@
 package Dist::Banshee::Core;
-$Dist::Banshee::Core::VERSION = '0.001';
+$Dist::Banshee::Core::VERSION = '0.002';
 use strict;
 use warnings;
 
 use Exporter 5.57 'import';
-our @EXPORT_OK = qw/source write_file write_files in_tempdir dist_test write_tarball prompt y_n bump_version add_manifest/;
+our @EXPORT_OK = qw/source write_file write_files in_tempdir dist_test write_tarball prompt y_n bump_version add_meta add_manifest/;
 
 use Carp 'croak';
 use File::Spec::Functions 'catfile';
@@ -124,9 +124,16 @@ sub bump_version {
 	return @updated;
 }
 
+sub add_meta {
+	my ($files, $meta) = @_;
+	$files->{'META.json'} = $meta->as_string;
+	$files->{'META.yml'}  = $meta->as_string({ version => 1.4 });
+	return;
+}
+
 sub add_manifest {
 	my $files = shift;
-	$files->{MANIFEST} = join "\n", sort keys %{ $files }, 'MANIFEST';
+	$files->{MANIFEST} = join '', map "$_\n", sort { lc $a cmp lc $b } keys %{ $files }, 'MANIFEST';
 	return;
 }
 

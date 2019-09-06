@@ -17,6 +17,10 @@ Data-Object Scalar Class Autoboxing
 
   use Data::Object::Scalar::Autobox;
 
+=libraries
+
+Data::Object::Library
+
 =description
 
 This package implements autoboxing via L<Data::Object::Autobox> for

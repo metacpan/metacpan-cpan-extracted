@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.116';
+our $VERSION = '0.117';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -13,23 +13,17 @@ use List::Util   qw( sum );
 use Scalar::Util qw( looks_like_number );
 
 use Term::Choose                  qw( choose );
-use Term::Choose::Constants       qw( :screen );
+use Term::Choose::Constants       qw( WIDTH_CURSOR );
 use Term::Choose::LineFold        qw( line_fold cut_to_printwidth print_columns );
-use Term::Choose::ValidateOptions qw( validate_options ); #
-use Term::Choose::Util            qw( term_width insert_sep unicode_sprintf );
+use Term::Choose::Screen          qw( hide_cursor show_cursor );
+use Term::Choose::ValidateOptions qw( validate_options );
+use Term::Choose::Util            qw( get_term_width insert_sep unicode_sprintf );
 use Term::TablePrint::ProgressBar qw();
 
 
-my $Plugin;
 BEGIN {
     if ( $^O eq 'MSWin32' ) {
         require Win32::Console::ANSI;
-        require Term::Choose::Win32;
-        $Plugin = 'Term::Choose::Win32';
-    }
-    else {
-        require Term::Choose::Linux;
-        $Plugin = 'Term::Choose::Linux';
     }
 }
 
@@ -49,7 +43,6 @@ sub new {
     }
     my $self = bless $instance_defaults, $class;
     $self->{backup_instance_defaults} = { %$instance_defaults };
-    $self->{plugin} = $Plugin->new();
     return $self;
 }
 
@@ -107,7 +100,7 @@ sub _defaults {
 sub __reset {
     my ( $self ) = @_;
     if ( $self->{hide_cursor} ) {
-        print SHOW_CURSOR;
+        print show_cursor();
     }
     if ( exists $self->{backup_instance_defaults} ) {
         my $instance_defaults = $self->{backup_instance_defaults};
@@ -128,7 +121,7 @@ sub __reset {
 
 sub print_table {
     if ( ref $_[0] ne 'Term::TablePrint' ) {
-        return print_table( bless( { %{ _defaults() }, plugin => $Plugin->new() }, 'Term::TablePrint' ), @_ );
+        return print_table( bless( { %{ _defaults() } }, 'Term::TablePrint' ), @_ );
     }
     my $self = shift;
     my ( $table_ref, $opt ) = @_;
@@ -152,7 +145,7 @@ sub print_table {
         exit;
     };
     if ( $self->{hide_cursor} ) {
-        print HIDE_CURSOR;
+        print hide_cursor();
     }
     if ( ! @$table_ref ) {
         choose(
@@ -212,7 +205,7 @@ sub __recursive_code {
     $self->__copy_table();
     $self->__calc_col_width();
     my $extra_w = $^O eq 'MSWin32' || $^O eq 'cygwin' ? 0 : WIDTH_CURSOR;
-    my $term_w = term_width() + $extra_w;
+    my $term_w = get_term_width() + $extra_w;
     my $w_cols = $self->__calc_avail_col_width( $term_w );
     if ( ! defined $w_cols ) {
         return;
@@ -247,8 +240,8 @@ sub __recursive_code {
     my $row_is_expanded = 0;
 
     while ( 1 ) {
-        if ( $term_w != term_width() + $extra_w ) {
-            $term_w = term_width() + $extra_w;
+        if ( $term_w != get_term_width() + $extra_w ) {
+            $term_w = get_term_width() + $extra_w;
             $self->__recursive_code();
             return;
         }
@@ -627,7 +620,7 @@ sub __choose_columns {
 sub __print_single_row {
     my ( $self, $row, $len_key ) = @_;
     my $orig_tbl = $self->{orig_table};
-    my $term_w = term_width();
+    my $term_w = get_term_width();
     $len_key = int( $term_w / 100 * 33 ) if $len_key > int( $term_w / 100 * 33 );
     my $separator = ' : ';
     my $len_sep = length( $separator );
@@ -731,7 +724,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.116
+Version 0.117
 
 =cut
 

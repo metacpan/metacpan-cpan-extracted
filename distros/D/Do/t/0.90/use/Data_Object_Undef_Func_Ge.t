@@ -27,6 +27,15 @@ Data-Object Undef Function (Ge) Class
 
 Data::Object::Undef::Func
 
+=attributes
+
+arg1(Object, req, ro)
+arg2(Any, req, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Undef::Func::Ge is a function object for Data::Object::Undef.

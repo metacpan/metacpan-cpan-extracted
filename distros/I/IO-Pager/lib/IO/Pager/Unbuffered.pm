@@ -1,5 +1,5 @@
 package IO::Pager::Unbuffered;
-our $VERSION = 0.31;
+our $VERSION = 0.42;
 
 use strict;
 use base qw( IO::Pager );
@@ -60,14 +60,14 @@ IO::Pager::Unbuffered - Pipe output to PAGER if destination is a TTY
   {
     # You can also use scalar filehandles...
     my $token = IO::Pager::Unbuffered::open($FH) or warn($!);
-    print $FH "No globs or barewords for us thanks!\n";
+    print $FH "No globs or barewords for us thanks!\n" while 1;
   }
 
   {
     # ...or an object interface
     my $token = new IO::Pager::Unbuffered;
 
-    $token->print("OO shiny...\n");
+    $token->print("OO shiny...\n") while 1;
   }
 
 =head1 DESCRIPTION
@@ -87,7 +87,7 @@ All methods are inherited from IO::Pager; except for instantiation.
 You probably want to do something with SIGPIPE eg;
 
   eval {
-    $SIG{PIPE} = sub { die };
+    local $SIG{PIPE} = sub { die };
     local $STDOUT = IO::Pager::open(*STDOUT);
 
     while (1) {
@@ -113,7 +113,7 @@ Significant proddage provided by Tye McQueen.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2003-2012 Jerrad Pierce
+Copyright (C) 2003-2018 Jerrad Pierce
 
 =over
 

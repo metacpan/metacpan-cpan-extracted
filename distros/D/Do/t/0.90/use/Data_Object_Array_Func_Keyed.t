@@ -27,6 +27,15 @@ Data-Object Array Function (Keyed) Class
 
 Data::Object::Array::Func
 
+=attributes
+
+arg1(Object, req, ro)
+args(ArrayRef[Str], req, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Array::Func::Keyed is a function object for Data::Object::Array.

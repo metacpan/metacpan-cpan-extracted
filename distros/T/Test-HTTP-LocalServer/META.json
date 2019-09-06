@@ -22,6 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "ExtUtils::MakeMaker" : "0",
             "File::Basename" : "0",
             "File::Copy" : "0",
             "File::Find" : "0",
@@ -50,17 +51,25 @@
             "URI::URL" : "0",
             "perl" : "5.008"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "license" : [
+         "https://dev.perl.org/licenses/"
+      ],
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/Corion/Test-HTTP-LocalServer.git",
+         "url" : "git://github.com/Corion/Test-HTTP-LocalServer.git",
          "web" : "https://github.com/Corion/Test-HTTP-LocalServer"
       }
    },
-   "version" : "0.64",
+   "version" : "0.65",
    "x_serialization_backend" : "JSON::PP version 2.27203",
    "x_static_install" : 1
 }

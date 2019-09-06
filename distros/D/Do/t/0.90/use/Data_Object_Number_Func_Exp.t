@@ -27,6 +27,14 @@ Data-Object Number Function (Exp) Class
 
 Data::Object::Number::Func
 
+=attributes
+
+arg1(Object, req, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Number::Func::Exp is a function object for Data::Object::Number.

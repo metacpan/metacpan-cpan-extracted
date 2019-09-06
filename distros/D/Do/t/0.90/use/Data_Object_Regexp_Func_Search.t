@@ -27,6 +27,15 @@ Data-Object Regexp Function (Search) Class
 
 Data::Object::Regexp::Func
 
+=attributes
+
+arg1(Object, req, ro)
+arg2(Str, req, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Regexp::Func::Search is a function object for

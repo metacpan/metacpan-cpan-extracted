@@ -27,6 +27,15 @@ Data-Object String Function (Split) Class
 
 Data::Object::String::Func
 
+=attributes
+
+arg1(Object, req, ro)
+arg3(Num, opt, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::String::Func::Split is a function object for

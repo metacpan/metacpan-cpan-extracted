@@ -2,9 +2,16 @@
 use strict;
 use warnings;
 
-use 5.010;
+use 5.008;
 
 use ExtUtils::MakeMaker 0;
+
+use File::ShareDir::Install;
+$File::ShareDir::Install::INCLUDE_DOTFILES = 1;
+$File::ShareDir::Install::INCLUDE_DOTDIRS = 1;
+install_share module => "Dist::Banshee::Profile::Basic", "share\/basic";
+install_share module => "Dist::Banshee::Profile::Feedback", "share\/feedback";
+
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "A lean authoring tool",
@@ -14,10 +21,11 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Dist-Banshee",
   "EXE_FILES" => [
-    "script/dban"
+    "script/dban",
+    "script/dban-mint"
   ],
   "LICENSE" => "perl_5",
-  "MIN_PERL_VERSION" => "5.010",
+  "MIN_PERL_VERSION" => "5.008",
   "NAME" => "Dist::Banshee",
   "PREREQ_PM" => {
     "Archive::Tar" => 0,
@@ -28,6 +36,7 @@ my %WriteMakefileArgs = (
     "Exporter" => "5.57",
     "File::Path" => 0,
     "File::Slurper" => 0,
+    "File::Spec::Functions" => 0,
     "File::Temp" => 0,
     "File::chdir" => 0,
     "Getopt::Long" => 0,
@@ -36,12 +45,14 @@ my %WriteMakefileArgs = (
     "Module::Load" => 0,
     "Module::Metadata" => 0,
     "Parse::CPAN::Meta" => 0,
+    "Text::Diff" => 0,
+    "Text::Patch" => 0,
     "version" => 0
   },
   "TEST_REQUIRES" => {
     "Test::More" => "0.89"
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -57,6 +68,7 @@ my %FallbackPrereqs = (
   "Exporter" => "5.57",
   "File::Path" => 0,
   "File::Slurper" => 0,
+  "File::Spec::Functions" => 0,
   "File::Temp" => 0,
   "File::chdir" => 0,
   "Getopt::Long" => 0,
@@ -66,6 +78,8 @@ my %FallbackPrereqs = (
   "Module::Metadata" => 0,
   "Parse::CPAN::Meta" => 0,
   "Test::More" => "0.89",
+  "Text::Diff" => 0,
+  "Text::Patch" => 0,
   "version" => 0
 );
 
@@ -80,3 +94,9 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
 WriteMakefile(%WriteMakefileArgs);
+
+{
+package
+MY;
+use File::ShareDir::Install qw(postamble);
+}

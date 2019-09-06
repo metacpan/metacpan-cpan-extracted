@@ -1,5 +1,5 @@
 package Curio::Role;
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =encoding utf8
 

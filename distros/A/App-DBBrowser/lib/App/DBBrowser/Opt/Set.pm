@@ -535,7 +535,7 @@ sub __settings_menu_wrap {
     my ( $sf, $section, $sub_menu, $prompt ) = @_;
     my $changed = settings_menu(
         $sub_menu, $sf->{o}{$section},
-        { prompt => $prompt, mouse => $sf->{o}{table}{mouse} }
+        { prompt => $prompt, mouse => $sf->{o}{table}{mouse}, hide_cursor => 0 }
     );
     return if ! $changed;
     $sf->{write_config}++;
@@ -552,7 +552,7 @@ sub __choose_a_subset_wrap {
         $available,
         { prompt => $prompt, name => $name, info => $info, prefix => '- ', keep_chosen => 0,
           mouse => $sf->{o}{table}{mouse}, index => 0, confirm => $sf->{i}{_confirm}, back => $sf->{i}{_back},
-          clear_screen => 1 }
+          clear_screen => 1, hide_cursor => 0 }
     );
     return if ! defined $list;
     return if ! @$list;
@@ -572,7 +572,7 @@ sub __choose_a_number_wrap {
     # Choose_a_number
     my $choice = choose_a_number( $digits,
         { prompt => $prompt, name => $name, info => $info, small_first => $small_first,
-          mouse => $sf->{o}{table}{mouse}, clear_screen => 1 }
+          mouse => $sf->{o}{table}{mouse}, clear_screen => 1, hide_cursor => 0 }
     );
     return if ! defined $choice;
     $sf->{o}{$section}{$opt} = $choice;
@@ -611,7 +611,7 @@ sub __choose_a_dir_wrap {
     }
     # Choose_a_dir
     my $dir = choose_a_dir(
-        { name => 'OK ', info => $info, mouse => $sf->{o}{table}{mouse} }
+        { name => 'OK ', info => $info, mouse => $sf->{o}{table}{mouse}, hide_cursor => 0 }
     );
     return if ! length $dir;
     $sf->{o}{$section}{$opt} = $dir;

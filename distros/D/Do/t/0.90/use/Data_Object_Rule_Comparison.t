@@ -19,6 +19,10 @@ Data-Object Comparison Rules
 
   with 'Data::Object::Rule::Comparison';
 
+=libraries
+
+Data::Object::Library
+
 =description
 
 This rule enforces the criteria for being comparable.

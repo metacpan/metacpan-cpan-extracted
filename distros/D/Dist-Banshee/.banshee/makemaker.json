@@ -1,0 +1,8 @@
+{
+	"share": {
+		"module": {
+			"Dist::Banshee::Profile::Basic": "share/basic",
+			"Dist::Banshee::Profile::Feedback": "share/feedback"
+		}
+	}
+}

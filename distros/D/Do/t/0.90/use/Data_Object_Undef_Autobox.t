@@ -17,6 +17,10 @@ Data-Object Undef Class Autoboxing
 
   use Data::Object::Undef::Autobox;
 
+=libraries
+
+Data::Object::Library
+
 =description
 
 This package implements autoboxing via L<Data::Object::Autobox> for

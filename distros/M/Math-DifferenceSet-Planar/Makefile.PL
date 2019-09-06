@@ -11,6 +11,7 @@ use File::Spec;
 
 install_share 'share';
 
+my $DN = 'Math-DifferenceSet-Planar';
 my %versions = map {
     my $module = $_;
     my @path   = ('lib', split /::/, "$module.pm");
@@ -41,13 +42,22 @@ WriteMakefile(
     ABSTRACT_FROM       => 'lib/Math/DifferenceSet/Planar.pm',
     AUTHOR              => 'Martin Becker <becker-cpan-mp (at) cozap.com>',
     SIGN                => 1,
-    LICENSE             => 'perl',
+    LICENSE             => 'perl_5',
     META_MERGE          => {
         'meta-spec'     => { version => 2 },
         provides        => \%versions,
         dynamic_config  => 0,
         resources       => {
+            bugtracker      => {
+                web => "https://rt.cpan.org/Public/Dist/Display.html?Name=$DN",
+            },
             homepage        => 'https://vera.in-ulm.de/planar-diffsets/',
+            license         => ['https://dev.perl.org/licenses/'],
+            repository      => {
+                url  => "git://github.com/mhasch/perl-$DN.git",
+                web  => "https://github.com/mhasch/perl-$DN",
+                type => 'git',
+            },
         },
     },
     MIN_PERL_VERSION    => '5.010',

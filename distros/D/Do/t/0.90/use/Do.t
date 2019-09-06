@@ -44,6 +44,8 @@ foundational set of types, functions, classes, patterns, and interfaces for
 jump-starting application development. This package inherits all behavior from
 L<Data::Object>.
 
+=headers
+
 +=head1 SLOGAN
 
 If you're doing something modern with Perl, start here!
@@ -96,7 +98,7 @@ Read more at L<Data::Object::Library>.
 
   1;
 
-The framework's class configuration configures the calling package as a Moo
+The framework's class configuration configures the calling package as a L<Moo>
 class, having the "has", "with", and "extends" keywords available. Read more at
 L<Data::Object::Class>.
 
@@ -118,7 +120,7 @@ L<Data::Object::Class>.
 
   1;
 
-The framework's role configuration configures the calling package as a Moo
+The framework's role configuration configures the calling package as a L<Moo>
 role, having the "has", "with", and "extends" keywords available. Read more at
 L<Data::Object::Role>.
 
@@ -133,7 +135,7 @@ L<Data::Object::Role>.
 
   1;
 
-The framework's rule configuration configures the calling package as a Moo
+The framework's rule configuration configures the calling package as a L<Moo>
 role, intended to be used to classify interfaces. Read more at
 L<Data::Object::Rule>.
 

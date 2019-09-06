@@ -21,6 +21,10 @@ Functions for ArrayRefs
 
 Data::Object::Func
 
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Array::Func is an abstract base class for function classes in the

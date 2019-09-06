@@ -40,6 +40,10 @@ Data-Object Space Class
   $space->load;
   # Data::Object
 
+=libraries
+
+Data::Object::Library
+
 =description
 
 This package provides methods for parsing and manipulating package namespaces.

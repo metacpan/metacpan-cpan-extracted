@@ -1,5 +1,5 @@
 package Curio::Factory;
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =encoding utf8
 
@@ -775,13 +775,11 @@ The L</create> method is a good way to make the mock curio object.
 
 sub inject {
     my $self = shift;
+    my $object = (@_>0 and @_<3 and blessed($_[@_-1])) ? pop() : undef;
+    croak 'No object passed to inject()' if !$object;
     my $key = $self->_process_key_arg( \@_ );
-    my $object = shift;
 
     $key = $undef_key if !defined $key;
-
-    croak 'No object passed to inject()'
-        if !blessed $object;
 
     croak 'Cannot inject a Curio object where one has already been injected'
         if $self->_get_injection( $key );
@@ -808,13 +806,13 @@ L</clear_injection>.
 =cut
 
 sub inject_with_guard {
-    my $class = shift;
+    my $self = shift;
 
-    $class->factory->inject( @_ );
+    $self->inject( @_ );
     my $key = (@_==1) ? undef : shift( @_ );
 
     return Curio::Guard->new(sub{
-        $class->factory->clear_injection( $key ? $key : () );
+        $self->clear_injection( $key ? $key : () );
     });
 }
 

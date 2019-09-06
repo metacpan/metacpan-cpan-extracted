@@ -1,0 +1,170 @@
+{
+  "otherAttributes" : { },
+  "link" : [ {
+    "otherAttributes" : { },
+    "href" : "https://vcloud.example.com/api/org/",
+    "id" : null,
+    "name" : null,
+    "type" : "application/vnd.vmware.vcloud.orgList+xml",
+    "rel" : "down",
+    "vCloudExtension" : [ ]
+  }, {
+    "otherAttributes" : { },
+    "href" : "https://vcloud.example.com/api/org/",
+    "id" : null,
+    "name" : null,
+    "type" : "application/vnd.vmware.vcloud.orgList+json",
+    "rel" : "down",
+    "vCloudExtension" : [ ]
+  }, {
+    "otherAttributes" : { },
+    "href" : "https://vcloud.example.com/api/session",
+    "id" : null,
+    "name" : null,
+    "type" : null,
+    "rel" : "remove",
+    "vCloudExtension" : [ ]
+  }, {
+    "otherAttributes" : { },
+    "href" : "https://vcloud.example.com/api/admin/",
+    "id" : null,
+    "name" : null,
+    "type" : "application/vnd.vmware.admin.vcloud+xml",
+    "rel" : "down",
+    "vCloudExtension" : [ ]
+  }, {
+    "otherAttributes" : { },
+    "href" : "https://vcloud.example.com/api/admin/",
+    "id" : null,
+    "name" : null,
+    "type" : "application/vnd.vmware.admin.vcloud+json",
+    "rel" : "down",
+    "vCloudExtension" : [ ]
+  }, {
+    "otherAttributes" : { },
+    "href" : "https://vcloud.example.com/api/admin/extension",
+    "id" : null,
+    "name" : null,
+    "type" : "application/vnd.vmware.admin.vmwExtension+xml",
+    "rel" : "down",
+    "vCloudExtension" : [ ]
+  }, {
+    "otherAttributes" : { },
+    "href" : "https://vcloud.example.com/api/admin/extension",
+    "id" : null,
+    "name" : null,
+    "type" : "application/vnd.vmware.admin.vmwExtension+json",
+    "rel" : "down",
+    "vCloudExtension" : [ ]
+  }, {
+    "otherAttributes" : { },
+    "href" : "https://vcloud.example.com/api/org/a93c9db9-7471-3192-8d09-a8f7eeda85f9",
+    "id" : null,
+    "name" : "System",
+    "type" : "application/vnd.vmware.vcloud.org+xml",
+    "rel" : "down",
+    "vCloudExtension" : [ ]
+  }, {
+    "otherAttributes" : { },
+    "href" : "https://vcloud.example.com/api/org/a93c9db9-7471-3192-8d09-a8f7eeda85f9",
+    "id" : null,
+    "name" : "System",
+    "type" : "application/vnd.vmware.vcloud.org+json",
+    "rel" : "down",
+    "vCloudExtension" : [ ]
+  }, {
+    "otherAttributes" : { },
+    "href" : "https://vcloud.example.com/api/query",
+    "id" : null,
+    "name" : null,
+    "type" : "application/vnd.vmware.vcloud.query.queryList+xml",
+    "rel" : "down",
+    "vCloudExtension" : [ ]
+  }, {
+    "otherAttributes" : { },
+    "href" : "https://vcloud.example.com/api/query",
+    "id" : null,
+    "name" : null,
+    "type" : "application/vnd.vmware.vcloud.query.queryList+json",
+    "rel" : "down",
+    "vCloudExtension" : [ ]
+  }, {
+    "otherAttributes" : { },
+    "href" : "https://vcloud.example.com/api/entity/",
+    "id" : null,
+    "name" : null,
+    "type" : "application/vnd.vmware.vcloud.entity+xml",
+    "rel" : "entityResolver",
+    "vCloudExtension" : [ ]
+  }, {
+    "otherAttributes" : { },
+    "href" : "https://vcloud.example.com/api/entity/",
+    "id" : null,
+    "name" : null,
+    "type" : "application/vnd.vmware.vcloud.entity+json",
+    "rel" : "entityResolver",
+    "vCloudExtension" : [ ]
+  }, {
+    "otherAttributes" : { },
+    "href" : "https://vcloud.example.com/api/extensibility",
+    "id" : null,
+    "name" : null,
+    "type" : "application/vnd.vmware.vcloud.apiextensibility+xml",
+    "rel" : "down:extensibility",
+    "vCloudExtension" : [ ]
+  }, {
+    "otherAttributes" : { },
+    "href" : "https://vcloud.example.com/api/extensibility",
+    "id" : null,
+    "name" : null,
+    "type" : "application/vnd.vmware.vcloud.apiextensibility+json",
+    "rel" : "down:extensibility",
+    "vCloudExtension" : [ ]
+  }, {
+    "otherAttributes" : { },
+    "href" : "https://vcloud.example.com/network",
+    "id" : null,
+    "name" : null,
+    "type" : "application/xml",
+    "rel" : "nsx",
+    "vCloudExtension" : [ ]
+  }, {
+    "otherAttributes" : { },
+    "href" : "https://vcloud.example.com/cloudapi",
+    "id" : null,
+    "name" : null,
+    "type" : "application/json",
+    "rel" : "openapi",
+    "vCloudExtension" : [ ]
+  } ],
+  "href" : "https://vcloud.example.com/api/session",
+  "type" : "application/vnd.vmware.vcloud.session+json",
+  "authorizedLocations" : {
+    "location" : [ {
+      "otherAttributes" : { },
+      "link" : [ ],
+      "href" : null,
+      "type" : null,
+      "id" : null,
+      "operationKey" : null,
+      "description" : null,
+      "tasks" : null,
+      "name" : null,
+      "locationId" : "a93c9db9-7471-3192-8d09-a8f7eeda85f9@6ca64519-452f-4cf8-850a-ae000154bd00",
+      "locationName" : null,
+      "siteName" : "vcloud.example.com",
+      "orgName" : "System",
+      "restApiEndpoint" : "https://vcloud.example.com",
+      "useMultisiteToken" : null,
+      "authContext" : "System",
+      "uiendpoint" : "https://vcloud.example.com",
+      "vCloudExtension" : [ ]
+    } ]
+  },
+  "locationId" : "a93c9db9-7471-3192-8d09-a8f7eeda85f9@6ca64519-452f-4cf8-850a-ae000154bd00",
+  "org" : "System",
+  "roles" : "System Administrator",
+  "user" : "administrator",
+  "userId" : "urn:vcloud:user:4d5d277d-2a9b-425a-b966-b5de4a2f1e2d",
+  "vCloudExtension" : [ ]
+}

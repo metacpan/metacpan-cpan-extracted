@@ -27,6 +27,15 @@ Data-Object Regexp Function (Ne) Class
 
 Data::Object::Regexp::Func
 
+=attributes
+
+arg1(Object, req, ro)
+arg2(Any, req, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Regexp::Func::Ne is a function object for Data::Object::Regexp.

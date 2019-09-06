@@ -1,0 +1,122 @@
+Contributing to Math-DifferenceSet-Planar
+=========================================
+
+Thank you for your interest in contributing to this Perl 5
+library.  Currently, it is in active development and maintained
+by its original author.  Bug reports (with or without patch),
+suggestions, feature requests, and comments are welcome.  You may
+submit them through this distribution's bug tracker on CPAN RT:
+https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Math-DifferenceSet-Planar
+
+You can also reach the author by e-mail:
+Martin Becker, <becker-cpan-mp (at) cozap.com>
+
+The code for this distribution is hosted at GitHub.  The repository is:
+https://github.com/mhasch/perl-Math-DifferenceSet-Planar
+
+If your contribution is accepted, you will be mentioned by name under
+ACKNOWLEDGEMENTS in the documentation.  Please indicate if you prefer
+an alias or to stay anonymous.
+
+Development Guidelines
+----------------------
+
+This library, dealing with a mathematical concept, should first and
+foremost be scientifically sound.  Correctness is rated over all other
+quality aspects.  The second most important goal is a documentation and
+over-all presentation that makes it useful for experts and informative
+for anybody interested in the field.  Thirdly, it should be easy to
+integrate correctly and efficiently with other software.
+
+Topics of interest
+------------------
+
+Planar difference sets are special entities described in the theory
+of difference sets, which is a part of design theory, which in turn
+is related to algebra, geometry, and combinatorics.  They are also
+the essence of desarguesian finite projective planes (unlike other
+difference sets).
+
+Possible improvements may support interoperability with related,
+or more general, or application software.  New interfaces such as a
+command line tool, an interactive tool, or a web service may be added
+as well.  The functionality of the scripts in the examples directory
+may be included in such tools.  More ways to present difference sets,
+especially graphically, could be a nice addition.
+
+A new database format could allow to store sample sets more efficiently.
+An XS implementation could increase performance with large sets.
+Computation of more data will be included as soon as a prerequisite Perl
+library, Math-GaloisField, is publicly available.
+
+As it can be expected that downloading sets will always be faster than
+generating them, a non-programmer contribution could be to host a large
+database of sample sets.  Especially helpful would be a solution that even
+allows to submit more data.  The author already has generated sets for
+all orders up to 65543.  Extending this to, say, 2 million, would require
+thousands of CPU years, and be conceivable as a project for distributed
+computation.  Not much scientific merit, alas, is going to be earned for
+such an effort, as the existence as well as most of the "interesting"
+properties of these sets are already known facts.  Future applications
+of planar difference sets, however, might benefit from somewhat larger
+sample sets than currently available.
+
+The documentation, finally, could include more literature, or be clearer
+or better formatted.  We might create POD, HTML, and PDF from a common
+source.
+
+Development Platform
+--------------------
+
+CPAN releases of this library are currently prepared manually with
+scripts in the maint directory and ExtUtils::MakeMaker.  A switch to a
+distribution builder like Dist::Zilla may be performed in the future.
+
+The git repository contains these files the CPAN release does not:
+
+.gitignore
+maint/create_cpan_db
+maint/create_large_db
+maint/create_test_db
+maint/fill_pds
+maint/make_pod
+maint/template.pod
+
+To create the databases in the share and t/db directories of the
+CPAN distribution, as well as a larger database not for CPAN,
+you also need these files:
+
+data/pdm_00002-04096.txt
+data/pdm_04099-10993.txt
+data/pdx_00002-04096.txt
+data/pdx_04099-08192.txt
+data/pdx_08209-12281.txt
+data/pdx_12289-16384.txt
+data/pdx_16411-20479.txt
+data/pdx_20483-24571.txt
+data/pdx_24593-28669.txt
+data/pdx_28687-32768.txt
+data/pdx_32771-36857.txt
+data/pdx_36871-40949.txt
+data/pdx_40961-45053.txt
+data/pdx_45061-49139.txt
+data/pdx_49157-53239.txt
+data/pdx_53267-57331.txt
+data/pdx_57347-61417.txt
+data/pdx_61441-65543.txt
+
+These text representations of planar difference sets are distributed
+separately in order not to bloat the software repository.  They occupy
+2.1 GB of storage.  A download location is yet to be determined.
+Please contact the author if you urgently need the data or want to help.
+
+For convenience, a subset sufficient to create the CPAN release is
+included in the git repository.
+
+Author's Note
+-------------
+
+Thanks again for your interest.
+I am looking forward to your report or e-mail.
+
+Martin Becker, September 5, 2019

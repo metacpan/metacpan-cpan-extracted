@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Exporter ();
 
-our $VERSION = '1.500003';
+our $VERSION = '1.500004';
 $VERSION =~ tr/_//d;
 
 our @EXPORT_OK = qw(
@@ -295,7 +295,17 @@ sub uniq (@) {
 sub uniqnum (@) {
   my %seen;
   my @uniq =
-    grep !$seen{(eval { pack "J", $_ }||'') . pack "F", $_}++,
+    grep {
+      my ($NV) = unpack 'F', pack 'F', $_;
+      !$seen{
+        $NV == 0 ? 0 : (
+          (!($NV != $NV)
+            ? do { local $@; eval { pack 'JF', $_, $_ } }
+            : 0
+          ) || sprintf('%f', $_)
+        )
+      }++;
+    }
     map +(defined($_) ? $_
       : do { warnings::warnif('uninitialized', 'Use of uninitialized value in subroutine entry'); 0 }),
     @_;

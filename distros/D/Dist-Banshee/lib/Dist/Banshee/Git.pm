@@ -1,5 +1,5 @@
 package Dist::Banshee::Git;
-$Dist::Banshee::Git::VERSION = '0.001';
+$Dist::Banshee::Git::VERSION = '0.002';
 use strict;
 use warnings;
 

@@ -33,6 +33,8 @@ foundational set of types, functions, classes, patterns, and interfaces for
 jump-starting application development. This package inherits all behavior from
 L<Data::Object::Config>.
 
+=headers
+
 +=head1 PURPOSE
 
 This package provides a framework for modern Perl development, embracing
@@ -143,11 +145,11 @@ user-defined type library to use in the creation of a single function
 C<greetings> which takes two arguments which must both be instances of the
 class we just created.
 
-+=head1 DISCRETIONARY
++=head1 CONFIGURATION
 
-It's also important to note that while the example showcases much of what's
-possible with this framework, all of the sophistication is totally optional.
-For example, method and function signatures are optionally typed, so the
+It's important to note that while the example showcases much of what's possible
+with this framework, all of the sophistication is totally optional.  For
+example, method and function signatures are optionally typed, so the
 declarations would work just as well without the types specified. In fact, you
 could then remove the C<App> type library declarations and even resort
 rewriting the method and function as plain-old Perl subroutines.  This
@@ -155,8 +157,9 @@ flexibility to be able to enable more advanced capabilities is common in the
 Perl ecosystem and is one of the things we love most. The wiring-up of things!
 If you're familiar with Perl, this framework is in-part the wiring up of L<Moo>
 (with L<Moose> support), L<Type::Tiny>, L<Function::Parameters>, L<Try::Tiny>
-and data objects in a cooperative and cohesive way that feels like it's native
-to the language.
+  and data objects in a cooperative and cohesive way that feels like it's
+native to the language. Please feel free to use as much or as little of the
+framework as you need and are comfortable with.
 
 =cut
 

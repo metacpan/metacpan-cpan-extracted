@@ -27,6 +27,14 @@ Data-Object Code Function (Defined) Class
 
 Data::Object::Code::Func
 
+=attributes
+
+arg1(Object, req, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Code::Func::Defined is a function object for Data::Object::Code.

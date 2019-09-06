@@ -21,6 +21,10 @@ Functions for ScalarRefs
 
 Data::Object::Func
 
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Scalar::Func is an abstract base class for function classes in

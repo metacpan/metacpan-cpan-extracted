@@ -27,6 +27,15 @@ Data-Object Array Function (Push) Class
 
 Data::Object::Array::Func
 
+=attributes
+
+arg1(Object, req, ro)
+args(ArrayRef[Any], req, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Array::Func::Push is a function object for Data::Object::Array.

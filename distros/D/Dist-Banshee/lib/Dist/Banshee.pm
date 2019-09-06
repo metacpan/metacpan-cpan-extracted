@@ -1,5 +1,5 @@
 package Dist::Banshee;
-$Dist::Banshee::VERSION = '0.001';
+$Dist::Banshee::VERSION = '0.002';
 use strict;
 use warnings;
 

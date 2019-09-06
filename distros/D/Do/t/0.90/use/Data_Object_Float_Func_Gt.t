@@ -27,6 +27,15 @@ Data-Object Float Function (Gt) Class
 
 Data::Object::Float::Func
 
+=attributes
+
+arg1(Object, req, ro)
+arg2(StringLike, req, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Float::Func::Gt is a function object for Data::Object::Float.

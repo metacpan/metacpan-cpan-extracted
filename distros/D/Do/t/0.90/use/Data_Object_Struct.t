@@ -23,6 +23,10 @@ Data-Object Struct Declaration
 
   1;
 
+=libraries
+
+Data::Object::Library
+
 =description
 
 This package modifies the consuming package making it a struct.

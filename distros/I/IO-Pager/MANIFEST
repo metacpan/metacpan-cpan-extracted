@@ -4,12 +4,12 @@ MANIFEST
 lib/IO/Pager.pm
 lib/IO/Pager/Buffered.pm
 lib/IO/Pager/Page.pm
+lib/IO/Pager/Perl.pm
 lib/IO/Pager/Unbuffered.pm
 README
 TODO
 .proverc
-.travis.yml
-t.pl
+test.pl
 t/01-load.t
 t/02-which.t
 t/02-which_interactive.t

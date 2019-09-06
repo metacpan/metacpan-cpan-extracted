@@ -27,6 +27,16 @@ Data-Object Array Function (Hashify) Class
 
 Data::Object::Array::Func
 
+=attributes
+
+arg1(Object, req, ro)
+arg2(Undef | CodeRef, opt, ro)
+args(ArrayRef[Any], opt, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Array::Func::Hashify is a function object for

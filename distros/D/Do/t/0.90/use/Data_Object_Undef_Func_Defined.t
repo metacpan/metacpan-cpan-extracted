@@ -27,6 +27,14 @@ Data-Object Undef Function (Defined) Class
 
 Data::Object::Undef::Func
 
+=attributes
+
+arg1(Object, req, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Undef::Func::Defined is a function object for

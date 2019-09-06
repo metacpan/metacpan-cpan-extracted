@@ -17,6 +17,10 @@ Data-Object Float Class Autoboxing
 
   use Data::Object::Float::Autobox;
 
+=libraries
+
+Data::Object::Library
+
 =description
 
 This package implements autoboxing via L<Data::Object::Autobox> for

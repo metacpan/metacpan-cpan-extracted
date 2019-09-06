@@ -27,6 +27,15 @@ Data-Object Hash Function (FilterInclude) Class
 
 Data::Object::Hash::Func
 
+=attributes
+
+arg1(Object, req, ro)
+args(ArrayRef[Str], req, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Hash::Func::FilterInclude is a function object for

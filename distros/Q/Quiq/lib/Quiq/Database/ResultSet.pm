@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.155';
+our $VERSION = '1.156';
 
 use Quiq::Object;
 use Time::HiRes ();
@@ -73,40 +73,29 @@ Tabellen-Objektes gebildet werden soll.
 sub new {
     my ($class,$self) = Quiq::Object->this(shift);
 
+    my ($rowClass,$titleA);
     if ($self) {
-        my $rowA = shift || [];
-
-        $self = $class->SUPER::new(
-            rowClass => $self->rowClass,
-            titles => scalar $self->titles,
-            rows => $rowA,
-            stmt => '',
-            hits => 0,
-            startTime => scalar(Time::HiRes::gettimeofday),
-            execTime => 0,
-            fetchTime => 0,
-            formatA => undef, # wird von $self->formats() gesetzt
-        );
+        $rowClass = $self->rowClass;
+        $titleA = $self->titles;
     }
     else {
-        my $rowClass = ref $_[0]? $class->defaultRowClass: shift;
-        my $titles = shift;
-        my $rowA = shift || [];
-        # @_: @keyVal
-
-        $self = $class->SUPER::new(
-            rowClass => $rowClass,
-            titles => $titles,
-            rows => $rowA,
-            stmt => '',
-            hits => 0,
-            startTime => scalar(Time::HiRes::gettimeofday),
-            execTime => 0,
-            fetchTime => 0,
-            formatA => undef, # wird von $self->formats() gesetzt
-        );
+        $rowClass = ref $_[0]? $class->defaultRowClass: shift;
+        $titleA = shift;
     }
+    my $rowA = shift || [];
 
+    $self = $class->SUPER::new(
+        rowClass => $rowClass,
+        titles => $titleA,
+        rows => $rowA,
+        moreRowsExist => 0, # wird von fetchAll() gesetzt
+        stmt => '',
+        hits => 0,
+        startTime => scalar(Time::HiRes::gettimeofday),
+        execTime => 0,
+        fetchTime => 0,
+        formatA => undef, # wird von $self->formats() gesetzt
+    );
     $self->set(@_);
 
     return $self;
@@ -879,6 +868,9 @@ sub asTable {
                 -precision => 3,
             );
         }
+        if ($self->moreRowsExist) {
+            $str .= ' - *MORE ROWS EXIST*';
+        }
     }
     if ($msg) {
         $str .= $msg;
@@ -965,7 +957,7 @@ sub diffReport {
 
 =head1 VERSION
 
-1.155
+1.156
 
 =head1 AUTHOR
 

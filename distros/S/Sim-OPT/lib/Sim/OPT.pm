@@ -1,8 +1,8 @@
 package Sim::OPT;
-# Copyright (C) 2008-2018 by Gian Luca Brunetti and Politecnico di Milano.
+# Copyright (C) 2008-2019 by Gian Luca Brunetti and Politecnico di Milano.
 # This is Sim::OPT, a program managing building performance simulation programs for performing optimization by overlapping block coordinate descent.
 # This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
-$VERSION = '0.445';
+$VERSION = '0.449';
 use v5.14;
 # use v5.20;
 use Exporter;
@@ -973,19 +973,25 @@ sub cleansweeps
 			my @inbag;
 			foreach my $elt ( @{ $el } )
 			{
-				$elt =~ s/^(\d+)>// ;
+				$elt =~ s/^(\d+)>// ; #
 				$elt =~ s/^(\d+)°// ;
 				$elt =~ s/^(\d+)<// ;
 				$elt =~ s/^(\d+)£// ;
 				$elt =~ s/^(\d+)§// ;
 				$elt =~ s/^(\d+)\|// ;
 				$elt =~ s/[A-za-z]+//g ;
+				$elt =~ s/^(\d+)ç// ; # ç: push supercycle
+				$elt =~ s/^ç// ; # ç: push supercycle
+				$elt =~ s/^(\d+)é// ; # é: pop supercycle
+				$elt =~ s/^é// ; # é: pop supercycle
 				push( @inbag, $elt );
 			}
 			push( @midbag, [ @inbag ] );
 		}
 		push( @outbag, [ @midbag ] );
 	}
+	say "CLEANED \@outbag: " . dump( @outbag );
+	say "CLEANED \@sourcestruct: " . dump( @sourcestruct );
 	return ( \@outbag, \@sourcestruct );
 }
 
@@ -1358,6 +1364,7 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 	my @varnumbers = @{ $d{varnumbers} };
 	my $instn = $d{instn}; #say $tee "IN callblock \$instn" . dump( $instn );
 	my %inst = %{ $d{inst} }; #say $tee "IN callblock \%inst " . dump( \%inst );
+	my %vehicles = %{ $d{vehicles} };
 	@varnumbers = Sim::OPT::washn( @varnumbers ); #say $tee"IN callblock ( \@varnumbers) " . dump( @varnumbers );
 
 	if ( $countcase > $#sweeps )# NUMBER OF CASES OF THE CURRENT PROBLEM
@@ -1381,6 +1388,15 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 	{
 		$entryname = $1;
 		$dirfiles{entryname} = $entryname;
+		if ( $sourceblockelts[0] =~ /ç/ )
+		{
+			$sourceblockelts[0] =~ /^([A-Za-z]+)(\d+)ç/ ;
+			$dirfiles{slicenum} = $2;
+			$dirfiles{pushsupercycle} = "yes";
+			$dirfiles{nestclock} = $dirfiles{nestclock} + 1;
+			push( @{ $vehicles{nesting}{$dirfiles{nestclock}} }, $countblock );
+
+		}
 	}
 	else
 	{
@@ -1393,6 +1409,16 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 	{
 		$exitname = $1;
 		$dirfiles{exitname} = $exitname;
+
+		if ( $sourceblockelts[0] =~ /ç/ )
+		{
+			$sourceblockelts[0] =~ /(\d+)ç/ ;
+			$dirfiles{slicenum} = $1;
+			$dirfiles{pushsupercycle} = "yes";
+			$dirfiles{nestclock} = $dirfiles{nestclock} + 1;
+			push( @{ $vehicles{nesting}{$dirfiles{nestclock}} }, $countblock );
+		}
+
 	}
 	else
 	{
@@ -1406,6 +1432,16 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 		$dirfiles{starsign} = "yes"; #say $tee "SETTING IN callblock: \$dirfiles{starsign} " . dump( $dirfiles{starsign} );
 		$sourceblockelts[0] =~ /^(\d+)>/ ;
 		$dirfiles{stardivisions} = $1;
+
+		if ( $sourceblockelts[0] =~ /ç/ )
+		{
+			$sourceblockelts[0] =~ /^(\d+)>(\d+)ç/ ;
+			$dirfiles{slicenum} = $2;
+			$dirfiles{pushsupercycle} = "yes";
+			$dirfiles{nestclock} = $dirfiles{nestclock} + 1;
+			push( @{ $vehicles{nesting}{$dirfiles{nestclock}} }, $countblock );
+		}
+
 	}
 	else
 	{
@@ -1421,6 +1457,16 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 		$dirfiles{random} = "yes";
 		$sourceblockelts[0] =~ /^(\d+)\|/ ;
 		$dirfiles{randomnum} = $1;
+
+		if ( $sourceblockelts[0] =~ /ç/ )
+		{
+			$sourceblockelts[0] =~ /^(\d+)\|(\d+)ç/ ;
+			$dirfiles{slicenum} = $2;
+			$dirfiles{pushsupercycle} = "yes";
+			$dirfiles{nestclock} = $dirfiles{nestclock} + 1;
+			push( @{ $vehicles{nesting}{$dirfiles{nestclock}} }, $countblock );
+		}
+
 	}
 	else
 	{
@@ -1433,6 +1479,16 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 		$dirfiles{latinhypercube} = "yes";
 		$sourceblockelts[0] =~ /^(\d+)§/ ;
 		$dirfiles{latinhypercubenum} = $1;
+
+		if ( $sourceblockelts[0] =~ /ç/ )
+		{
+			$sourceblockelts[0] =~ /^(\d+)§(\d+)ç/ ;
+			$dirfiles{slicenum} = $2;
+			$dirfiles{pushsupercycle} = "yes";
+			$dirfiles{nestclock} = $dirfiles{nestclock} + 1;
+			push( @{ $vehicles{nesting}{$dirfiles{nestclock}} }, $countblock );
+		}
+
 	}
 	else
 	{
@@ -1445,6 +1501,16 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 		$dirfiles{randompick} = "yes";
 		$sourceblockelts[0] =~ /^(\d+)°/ ;
 		$dirfiles{randompicknum} = $1;
+
+		if ( $sourceblockelts[0] =~ /ç/ )
+		{
+			$sourceblockelts[0] =~ /^(\d+)°(\d+)ç/ ;
+			$dirfiles{slicenum} = $2;
+			$dirfiles{pushsupercycle} = "yes";
+			$dirfiles{nestclock} = $dirfiles{nestclock} + 1;
+			push( @{ $vehicles{nesting}{$dirfiles{nestclock}} }, $countblock );
+		}
+
 	}
 	else
 	{
@@ -1455,6 +1521,16 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 	if ( $sourceblockelts[0] =~ /</ )
 	{
 		$dirfiles{factorial} = "yes";
+
+		if ( $sourceblockelts[0] =~ /ç/ )
+		{
+			$sourceblockelts[0] =~ /^(\d+)<(\d+)ç/ ;
+			$dirfiles{slicenum} = $2;
+			$dirfiles{pushsupercycle} = "yes";
+			$dirfiles{nestclock} = $dirfiles{nestclock} + 1;
+			push( @{ $vehicles{nesting}{$dirfiles{nestclock}} }, $countblock );
+		}
+
 	}
 	else
 	{
@@ -1468,19 +1544,62 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 		$dirfiles{factorial} = "yes";
 		$dirfiles{random} = "yes";
 		$dirfiles{starsign} = "yes"; #say $tee "SETTING IN callblock: \$dirfiles{starsign} " . dump( $dirfiles{starsign} );
-		$sourceblockelts[0] =~ /^(\d+)°/ ;
+		$sourceblockelts[0] =~ /^(\d+)£/ ;
 		$dirfiles{facecenterednum} = $1;
 		$dowhat{starpositions} = "";
 		$dirfiles{starpositions} = "";
 		$dowhat{stardivisions} = 1;
 		$dirfiles{stardivisions} = 1;
+
+		if ( $sourceblockelts[0] =~ /ç/ )
+		{
+			$sourceblockelts[0] =~ /^(\d+)£(\d+)ç/ ;
+			$dirfiles{slicenum} = $2;
+			$dirfiles{pushsupercycle} = "yes";
+			$dirfiles{nestclock} = $dirfiles{nestclock} + 1;
+			push( @{ $vehicles{nesting}{$dirfiles{nestclock}} }, $countblock );
+		}
+
 	}
 	else
 	{
 		$dirfiles{facecentered} = "no";
-		$dirfiles{facecenterednum} = "";
 	}
 
+
+	if ( $sourceblockelts[0] =~ /ç/ )
+	{
+		$sourceblockelts[0] =~ /^(\d+)(>|<|£|§|°|§)(\d+)ç/ ;
+		$dirfiles{slicenum} = $3;
+		if ( $3 eq "" )
+		{
+			$sourceblockelts[0] =~ /^(\d+)ç/ ;
+			$dirfiles{slicenum} = $1;
+		}
+		say "SLICENUM! " . dump( $dirfiles{slicenum} );
+		say "\$countcase $countcase \$countblock $countblock";
+		$dirfiles{pushsupercycle} = "yes";
+		$dirfiles{nestclock} = $dirfiles{nestclock} + 1;
+		push( @{ $vehicles{nesting}{$dirfiles{nestclock}} }, $countblock );
+	}
+
+
+	if ( $sourceblockelts[0] =~ /é/ )
+	{
+		$sourceblockelts[0] =~ /^(\d+)(>|<|£|§|°|§)(\d+)é/ ;
+		$dirfiles{revealnum} = $3;
+		say "REVEALNUM! " . dump( $dirfiles{revealnum} );
+		$dirfiles{popsupercycle} = "yes";
+	}
+	else
+	{
+		$dirfiles{popsupercycle} = "";
+	}
+
+
+  #say "\%dirfiles: " . dump( \%dirfiles );
+	#say "\@sourceblockelts " . dump( @sourceblockelts );
+  #say "\@{ \$vehicles{nesting} } " . dump( @{ $vehicles{nesting} } );
 
 	my @blocks = getblocks( \@sweeps, $countcase );
 
@@ -1577,7 +1696,7 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 		dowhat => \%dowhat, varnumbers => \@varnumbers,
 		mids => \%mids, varnums => \%varnums, carrier => \%carrier,
 		carrier => \%carrier, sourceblockelts => \@sourceblockelts,
-		blocks => \@blocks, blockelts => \@blockelts, instn => $instn, inst => \%inst } );
+		blocks => \@blocks, blockelts => \@blockelts, instn => $instn, inst => \%inst, vehicles => \%vehicles } );
 }
 
 
@@ -1609,6 +1728,7 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 	my %carrier = %{ $d{carrier} }; #say $tee "IN DEFFILES \%carrier " . dump( \%carrier );
 	my $instn = $d{instn};
 	my %inst = %{ $d{inst} };
+	my %vehicles = %{ $d{vehicles} };
 
 	#say $tee "IN IN DEFFILES  \$dirfiles{starsign} " . dump( $dirfiles{starsign} );
 	my $file = $dowhat{file}; #say $tee "IN DEFFILES \$file " . dump( $file );
@@ -1911,7 +2031,7 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 		datastruc => \%datastruc, dowhat => \%dowhat,
 		varnumbers => \@varnumbers,
 		mids => \%mids, varnums => \%varnums,
-		carrier => \%carrier, instn => $instn, inst => \%inst
+		carrier => \%carrier, instn => $instn, inst => \%inst, vehicles => \%vehicles
 	} );
 }
 
@@ -1933,6 +2053,7 @@ sub setlaunch # IT SETS THE DATA FOR THE SEARCH ON THE ACTIVE BLOCK.
 	my $from = $d{from}; #say $tee "IN12 SETLAUNCH \$from : " . dump( $from );
 	my $instn = $d{instn}; #say $tee "IN12 SETLAUNCH \$instn : " . dump( $instn );
 	my %inst = %{ $d{inst} }; #say $tee "IN12 SETLAUNCH \%inst : " . dump( \%inst );
+	my %vehicles = %{ $d{vehicles} };
 
 	#sub cleaninst
 	#{
@@ -2018,7 +2139,7 @@ sub setlaunch # IT SETS THE DATA FOR THE SEARCH ON THE ACTIVE BLOCK.
 				varnumbers => \@varnumbers, blocks => \@blocks,
 				blockelts => \@blockelts, mids => \%mids, varnums => \%varnums,
 				countinstance => $count, carrier => \%carrier, origin => $origin,
-				instn => $instn, inst => \%inst, is => $to{cleanto}
+				instn => $instn, inst => \%inst, is => $to{cleanto}, vehicles => \%vehicles
 			} );
 			$instn++;
 		}
@@ -2059,6 +2180,7 @@ sub exe
 	my $instn = $d{instn};
 	#say $tee "IN EXE  \$dirfiles{starsign} " . dump( $dirfiles{starsign} );
 	my %inst = %{ $d{inst} };
+	my %vehicles = %{ $d{vehicles} };
 
 	my $precomputed = $dowhat{precomputed}; #say $tee "IN EXE \$precomputed " . dump( $precomputed ); #NEW
   my @takecolumns = @{ $dowhat{takecolumns} }; #say $tee "IN EXE \@takecolumns " . dump( @takecolumns ); #NEW
@@ -2070,6 +2192,12 @@ sub exe
 	say CRYPTOLINKS "" . dump( \%inst );
 	close CRYPTOLINKS;
 	my @reds;
+
+	if ( $dirfiles{nestclock} > 0 )
+	{
+		push( @{ $vehicles{cumulateall} }, @instances );
+	}
+	#say "\@{ \$vehicles{cumulateall} } 0 " . dump( @{ $vehicles{cumulateall} } );
 
 	if ( $dowhat{ga} ne "" )
 	{
@@ -2090,15 +2218,15 @@ sub exe
 		{ #say "INSTANCE IS: $instance->{is}";
 			if ( $instance->{is} ~~ @reds )
 			{
-				say "FOUND!";
+				#say "FOUND!";
 				my @instancees;
 				push( @instancees, $instance );
 				if ( $dowhat{morph} eq "y" )
 				{
 					say $tee "#Calling morphing operations for instance $instance{is} in case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
-					my @result = Sim::OPT::Morph::morph( $configfile, \@instancees, \%dirfiles, \%dowhat );
-					say "\$result[0]" . dump( $result[0] );
-					say "\$result[1]" . dump( $result[1] );
+					my @result = Sim::OPT::Morph::morph( $configfile, \@instancees, \%dirfiles, \%dowhat, \%vehicles );
+					#say "\$result[0]" . dump( $result[0] );
+					#say "\$result[1]" . dump( $result[1] );
 				}
 
 				if ( ( $dowhat{simulate} eq "y" ) or ( $dowhat{newreport} eq "y" ) )
@@ -2107,7 +2235,7 @@ sub exe
 					say $tee "#Calling simulations, reporting and retrieving for instance $instance{is} in case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
 					my ( $simcases_ref, $simstruct_ref, $repcases_ref, $repstruct_ref,
 				    $mergestruct_ref, $mergecases_ref, $c ) = Sim::OPT::Sim::sim(
-							{ instances => \@instancees, dirfiles => \%dirfiles } );
+							{ instances => \@instancees, dirfiles => \%dirfiles, vehicles => \%vehicles } );
 							$dirfiles{simcases} = $simcases_ref;
 							$dirfiles{simstruct} = $simstruct_ref;
 							$dirfiles{repcases} = $repcases_ref;
@@ -2134,11 +2262,11 @@ sub exe
 		{
 			say $tee "#Calling morphing operations for case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
 
-			my @result = Sim::OPT::Morph::morph( $configfile, \@instances, \%dirfiles, \%dowhat );
+			my @result = Sim::OPT::Morph::morph( $configfile, \@instances, \%dirfiles, \%dowhat, \%vehicles );
 			$dirfiles{morphcases} = $result[0];
 			$dirfiles{morphstruct} = $result[1];
-			say "\$result[0]" . dump( $result[0] );
-			say "\$result[1]" . dump( $result[1] );
+			#say "\$result[0]" . dump( $result[0] );
+			#say "\$result[1]" . dump( $result[1] );
 		}
 
 		if ( ( $dowhat{simulate} eq "y" ) or ( $dowhat{newreport} eq "y" ) )
@@ -2147,7 +2275,7 @@ sub exe
 			say $tee "#Calling simulations, reporting and retrieving for case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
 			my ( $simcases_ref, $simstruct_ref, $repcases_ref, $repstruct_ref,
 		    $mergestruct_ref, $mergecases_ref, $c ) = Sim::OPT::Sim::sim(
-					{ instances => \@instances, dirfiles => \%dirfiles } );
+					{ instances => \@instances, dirfiles => \%dirfiles, vehicles => \%vehicles } );
 			$dirfiles{simcases} = $simcases_ref;
 			$dirfiles{simstruct} = $simstruct_ref;
 			$dirfiles{repcases} = $repcases_ref;
@@ -2161,26 +2289,26 @@ sub exe
 	{
 		say $tee "#Calling descent for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ".";
 		#say $tee "\@sourcesweeps: " . dump( @sourcesweeps );
-		Sim::OPT::Descend::descend(	{ instances => \@instances, dirfiles => \%dirfiles } );
+		Sim::OPT::Descend::descend(	{ instances => \@instances, dirfiles => \%dirfiles, vehicles => \%vehicles } );
 	}
 
 	if ( $dowhat{substitutenames} eq "y" )
 	{
-		 Sim::OPT::Report::filter_reports( { instances => \@instances, dirfiles => \%dirfiles } );
+		 Sim::OPT::Report::filter_reports( { instances => \@instances, dirfiles => \%dirfiles, vehicles => \%vehicles } );
 	}
 
 	if ( $dowhat{filterconverted} eq "y" )
 	{
 		 Sim::OPT::Report::convert_filtered_reports(
 		{
-			  instances => \@instances, dirfiles => \%dirfiles } );
+			  instances => \@instances, dirfiles => \%dirfiles, vehicles => \%vehicles } );
 	}
 
 	if ( $dowhat{make3dtable} eq "y" )
 	{
 		 Sim::OPT::Report::maketable(
 		{
-			  instances => \@instances, dirfiles => \%dirfiles } );
+			  instances => \@instances, dirfiles => \%dirfiles, vehicles => \%vehicles } );
 	}
 } # END SUB exe
 
@@ -2578,6 +2706,7 @@ sub opt
 		    #@miditers = @pinmiditers;
 				#my %mids = getcase( \@miditers, $countcase ); #say $tee "IN CALLCASE \%mids" . dump( %mids );
 				$dirfiles{countstring} = $countstring;
+				$dirfiles{nestclock} = 0;
 				#my $totres_read = "$mypath/$file-totres-$countcase-$countblock.csv";
 				#$dirfiles{totres_read} = $totres_read;
 				#my $totres_write = "$mypath/$file-totres-$countcase-$countblock.csv";
@@ -2596,7 +2725,7 @@ sub opt
 				callblock( { countcase => $countcase, countblock => $countblock,
 					miditers => \@miditers, varnumbers => \@varnumbers, winneritems => \@winneritems, sweeps => \@sweeps,
 					sourcesweeps => \@sourcesweeps, datastruc => \%datastruc, dirfiles => \%dirfiles,
-					dowhat => \%dowhat, instn => $instn, inst => \%inst } );
+					dowhat => \%dowhat, instn => $instn, inst => \%inst, vehicles => \%vehicles } );
 					$countstring++;
 					$dirfiles{countstring} = $countstring;
 			}
@@ -2637,13 +2766,15 @@ sub opt
 				$count++;
 			}
 			$datastruc = [ @arr ];
+
+			$dirfiles{nestclock} = 0;
 			#say $tee "PRE CALLCASE \%dowhat" . dump( %dowhat );
 			callblock
 			(	{ countcase => $countcase, countblock => $countblock,
 					miditers => \@miditers, varnumbers => \@varnumbers, winneritems => \@winneritems,
 					sweeps => \@sweeps, sourcesweeps => \@sourcesweeps,
 					datastruc => \%datastruc, dowhat => \%dowhat,
-					dirfiles => \%dirfiles, instn => $instn, inst => \%inst } );
+					dirfiles => \%dirfiles, instn => $instn, inst => \%inst, vehicles => \%vehicles } );
 		}
 	}
 	elsif ( ( $target eq "parcoord3d" ) and (@chancedata) and ( $dimchance ) )
@@ -2695,7 +2826,7 @@ OPT can work on a given set of pre-simulated results without launching new simul
 
 By default the behaviour of the program is sequential.
 
-OPT can perform star searches (Jacoby method of course, but also Gauss-Seidel) within blocks in place of multilevel full-factorial searches. To ask for that in a configuration file, the first number in a block has to be preceded by a ">" sign, which in its turn has to be preceded by a number specifying how many star points there have to be in the block. A block, in that case, should be declared with something like this: ( "2>1", 2, 3). When operating with pre-simulated dataseries or metamodels, OPT can also perform: factorial searches (to ask for that, the first number in that block has to be preceded by a "<" sign); face-centered composite design searches of the DOE type (in that case, the first number in the block has to be preceded by a "£"); random searches (the first number has to be preceded by a "|" or by a "°"); latin hypercube searches (the first number has to be preceded by a "§").
+OPT can perform star searches (Jacoby method of course, but also Gauss-Seidel) within blocks in place of multilevel full-factorial searches. To ask for that in a configuration file, the first number in a block has to be preceded by a ">" sign, which in its turn has to be preceded by a number specifying how many star points there have to be in the block. A block, in that case, should be declared with something like this: ( "2>1", 2, 3). When operating with pre-simulated dataseries or metamodels, OPT can also perform: factorial searches (to ask for that, the first number in that block has to be preceded by a "<" sign); face-centered composite design searches of the DOE type (in that case, the first number in the block has to be preceded by a "£"); random searches (the first number has to be preceded by a "|" or by a "°"); latin hypercube searches (the first number has to be preceded by a "§"). The simbols "ç" and "é" preceding the first number make possible to cumulate the search results, possibly in a nested manner. "ç" opens the first block and "é" opens the last block. Following that instruction, at the end of the execution of the last block, the results of the previous blocks are cumulated in the evaluation. The number preceding the "é", when present, tells how many top-performing metamodel results have to be refreshed with real samples (simulations).
 
 For specifying in a Sim::OPT configuration file that a certain block has to be searched by the means of a metamodel derived from star searches or other "positions" instead of a multilevel full-factorial search, it is necessary to assign the value "yes" to the variable $dowhat{metamodel}.
 

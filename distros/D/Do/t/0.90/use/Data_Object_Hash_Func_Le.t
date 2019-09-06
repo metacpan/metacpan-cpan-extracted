@@ -27,6 +27,15 @@ Data-Object Hash Function (Le) Class
 
 Data::Object::Hash::Func
 
+=attributes
+
+arg1(Object, req, ro)
+arg2(HashLike, req, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Hash::Func::Le is a function object for Data::Object::Hash.

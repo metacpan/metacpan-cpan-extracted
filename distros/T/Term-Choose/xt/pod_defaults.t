@@ -6,9 +6,9 @@ use Test::More;
 
 
 my @long = qw( pad empty undef ll default max_height max_width lf keep no_spacebar mark );
-my @simple = qw( justify layout order clear_screen page mouse beep hide_cursor index color codepage_mapping ); # prompt
+my @simple = qw( alignment layout order clear_screen page mouse beep hide_cursor index color codepage_mapping ); # prompt
 my @all = ( @long, @simple );
-my @skip = qw(info prompt include_highlighted meta_items);
+my @skip = qw( info prompt include_highlighted meta_items justify ); # justify deprecated
 
 
 plan tests => 2 + scalar @all;

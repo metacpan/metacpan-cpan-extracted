@@ -27,6 +27,15 @@ Data-Object Hash Function (Slice) Class
 
 Data::Object::Hash::Func
 
+=attributes
+
+arg1(Object, req, ro)
+args(ArrayRef[Any], req, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Hash::Func::Slice is a function object for Data::Object::Hash.

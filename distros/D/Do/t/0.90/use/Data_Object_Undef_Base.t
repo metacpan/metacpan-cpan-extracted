@@ -25,6 +25,10 @@ Data-Object Abstract Undef Class
 
 Data::Object::Base
 
+=libraries
+
+Data::Object::Library
+
 =description
 
 This package provides routines for operating on Perl 5 undefined data.

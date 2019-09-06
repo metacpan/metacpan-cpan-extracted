@@ -27,6 +27,16 @@ Data-Object Array Function (EachKey) Class
 
 Data::Object::Array::Func
 
+=attributes
+
+arg1(Object, req, ro)
+arg2(CodeRef, req, ro)
+args(ArrayRef[Any], opt, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Array::Func::EachKey is a function object for

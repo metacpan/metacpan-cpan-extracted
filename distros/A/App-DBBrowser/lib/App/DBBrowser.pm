@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.207';
+our $VERSION = '2.208';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -14,9 +14,9 @@ use Encode::Locale qw( decode_argv );
 use File::HomeDir  qw();
 use File::Which    qw( which );
 
-use Term::Choose            qw();
-use Term::Choose::Constants qw( :screen );
-use Term::TablePrint        qw( print_table );
+use Term::Choose         qw();
+use Term::Choose::Screen qw( clear_screen );
+use Term::TablePrint     qw( print_table );
 
 #use App::DBBrowser::AttachDB;    # required
 use App::DBBrowser::Auxil;
@@ -41,7 +41,7 @@ sub new {
     my $info = {
         tc_default  => { undef => '<<', prompt => 'Choose:', hide_cursor => 0 },
         tf_default  => { hide_cursor => 2 },
-        lyt_h       => { order => 0, justify => 2 },
+        lyt_h       => { order => 0, alignment => 2 },
         lyt_v       => { undef => '  BACK', layout => 3, },
         lyt_v_clear => { undef => '  BACK', layout => 3, clear_screen => 1 },
         quit        => 'QUIT',
@@ -100,7 +100,7 @@ sub __options {
             if ( $sf->{o}{table}{mouse} ) {
                 $sf->{i}{tc_default}{mouse} = $sf->{o}{table}{mouse};
             }
-            print CLEAR_SCREEN; #
+            print clear_screen();
             require App::DBBrowser::Opt::Set;
             my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
             $sf->{o} = $opt_set->set_options;
@@ -144,7 +144,7 @@ sub run {
         if ( @{$sf->{o}{G}{plugins}} == 1 ) {
             $auto_one++;
             $plugin = $sf->{o}{G}{plugins}[0];
-            print CLEAR_SCREEN;
+            print clear_screen();
         }
         else {
             my $choices_plugins = [ undef, map { "- $_" } @{$sf->{o}{G}{plugins}} ];
@@ -712,7 +712,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.207
+Version 2.208
 
 =head1 DESCRIPTION
 

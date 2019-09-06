@@ -1,5 +1,16 @@
 Revision history for Perl extension IO::Pager.
 
+0.42	Thu Sep 05 2019
+	Disambiguate tee open. RT#127551
+
+	Stringify version. RT#127342
+
+	Add bignum dependency RT#130319
+
+	Add support for eventual Term::Pager v1.5
+
+	Update META files.
+
 0.40	Mon Oct 08 2018
 	And a tee(1)-like feature via binmode().
 

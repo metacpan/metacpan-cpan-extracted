@@ -2,7 +2,7 @@ package WebService::HipChat;
 use Moo;
 with 'WebService::Client';
 
-our $VERSION = '0.2000'; # VERSION
+our $VERSION = '0.2001'; # VERSION
 
 use Carp qw(croak);
 use MIME::Entity;
@@ -241,7 +241,7 @@ WebService::HipChat
 
 =head1 VERSION
 
-version 0.2000
+version 0.2001
 
 =head1 SYNOPSIS
 

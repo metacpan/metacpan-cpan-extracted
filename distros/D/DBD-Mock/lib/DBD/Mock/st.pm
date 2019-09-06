@@ -237,45 +237,59 @@ sub fetchall_hashref {
     }
     $dbh->{mock_can_fetch}++ if $dbh->{mock_can_fetch} < 0;
 
-    my $tracker = $sth->FETCH('mock_my_history');
-    my $rethash = {};
+    # get the case conversion to use for hash key names (NAME/NAME_lc/NAME_uc)
+    my $hash_key_name = $sth->{Database}->FETCH('FetchHashKeyName') || 'NAME';
 
-    # get the name set by
-    my $name = $sth->{Database}->FETCH('FetchHashKeyName') || 'NAME';
-    my $fields = $sth->FETCH($name);
+    # get a hashref mapping field names to their corresponding indexes. indexes
+    # start at zero
+    my $names_hash = $sth->FETCH("${hash_key_name}_hash");
 
-    # check if $keyfield is not an integer
-    if ( !( $keyfield =~ /^-?\d+$/ ) ) {
-        my $found = 0;
+    # as of DBI v1.48, the $keyfield argument can be either an arrayref of field
+    # names/indexes or a single field name/index
+    my @key_fields = ref $keyfield ? @{$keyfield} : $keyfield;
 
-        # search for index of item that matches $keyfield
-        foreach my $index ( 0 .. scalar( @{$fields} ) ) {
-            if ( $fields->[$index] eq $keyfield ) {
-                $found++;
+    my $num_fields = $sth->FETCH('NUM_OF_FIELDS');
 
-                # now make the keyfield the index
-                $keyfield = $index;
-
-                # and jump out of the loop :)
-                last;
-            }
+    # get the index(es) of the given key field(s). a key field can be specified
+    # as either the name of a field or an integer column number
+    my @key_indexes;
+    foreach my $field (@key_fields) {
+        if (defined $names_hash->{$field}) {
+            push @key_indexes, $names_hash->{$field};
         }
-        unless ($found) {
-            $dbh->set_err( 1, "Could not find key field '$keyfield'" );
+        elsif (DBI::looks_like_number($field) && $field >= 1 && $field <= $num_fields) {
+            # convert from column number to array index. column numbers start at
+            # one, while indexes start at zero
+            push @key_indexes, $field - 1;
+        }
+        else {
+            my $err = "Could not find key field '$field' (not one of " .
+                join(' ', keys %{$names_hash}) . ')';
+            $dbh->set_err( 1, $err );
             return;
         }
     }
 
+    my $tracker = $sth->FETCH('mock_my_history');
+    my $rethash = {};
+
     # now loop through all the records ...
     while ( my $record = $tracker->next_record() ) {
 
-        # copy the values so as to preserve
-        # the original record...
-        my @values = @{$record};
+        # populate the hash, adding a layer of nesting for each key field
+        # specified by the user
+        my $ref = $rethash;
+        foreach my $index (@key_indexes) {
+            my $value = $record->[$index];
+            $ref->{$value} = {} if ! defined $ref->{$value};
+            $ref = $ref->{$value};
+        }
 
-        # populate the hash
-        $rethash->{ $record->[$keyfield] } =
-          { map { $_ => shift(@values) } @{$fields} };
+        # copy all of the returned data into the most-nested level of the hash
+        foreach my $field (keys %{$names_hash}) {
+            my $index = $names_hash->{$field};
+            $ref->{$field} = $record->[$index];
+        }
     }
 
     return $rethash;

@@ -27,6 +27,15 @@ Data-Object Hash Function (Ge) Class
 
 Data::Object::Hash::Func
 
+=attributes
+
+arg1(Object, req, ro)
+arg2(HashLike, req, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Hash::Func::Ge is a function object for Data::Object::Hash.

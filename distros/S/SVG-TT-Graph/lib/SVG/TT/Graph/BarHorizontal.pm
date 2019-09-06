@@ -403,7 +403,7 @@ __DATA__
 <!-- Created with SVG::TT::Graph   -->
 <!-- Stephen Morgan / Leo Lapworth -->
 <!-- ////////////////////////////  -->
-% IF stylesheet == 'inline' %]
+[% IF stylesheet == 'inline' %]
 [% style_inline %]
 [% ELSIF stylesheet == 'excluded' %]
 <!-- include default stylesheet if none specified -->

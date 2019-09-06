@@ -1,6 +1,9 @@
 Revision history for Term::Choose::Util
 
 
+0.076   2019-09-05
+        - Adapt the code to the updated Term::Choose.
+
 0.075   2019-08-19
         - 'settings_menu': looping through values only once.
 

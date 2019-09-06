@@ -19,6 +19,10 @@ Data-Object Functable Role
 
   with 'Data::Object::Role::Functable';
 
+=libraries
+
+Data::Object::Library
+
 =description
 
 This package provides mechanisms for dispatching to functors, i.e. data object

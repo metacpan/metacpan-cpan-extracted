@@ -4,4 +4,4 @@ use strict;
 
 use Test::More;
 use Test::Prereq;
-prereq_ok( undef, [ 'Term::Choose::Win32' ] );
+prereq_ok( undef, [ 'Term::Choose::Screen', 'Term::Choose::Win32' ] );

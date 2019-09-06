@@ -1,4 +1,5 @@
 Build.PL
+CONTRIBUTING.md
 Changes
 LICENSE
 META.json
@@ -45,6 +46,7 @@ t/027_named_parameters.t
 t/028_bind_columns.t
 t/029_multiple_prepare_statements.t
 t/030_st_execute_array.t
+t/031_setup_callbacks.t
 t/998_pod.t
 t/999_pod_coverage.t
 t/bug_015602.t

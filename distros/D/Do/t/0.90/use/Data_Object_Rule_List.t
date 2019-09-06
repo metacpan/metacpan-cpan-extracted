@@ -19,6 +19,10 @@ Data-Object List Rules
 
   with 'Data::Object::Rule::List';
 
+=libraries
+
+Data::Object::Library
+
 =description
 
 This rule enforces the criteria for being mapable (i.e. a list, capabile of

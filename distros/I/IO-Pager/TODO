@@ -1,11 +1,22 @@
 Important things here and in code flagged with XXX
 
 0.40
-	Verify all sample code works, esp. STDOUT
+	Push previous versions to github
 
-	Fix STDOUT?! Need tied_fh (store as dumped field for later eval?)
-		     Dupiness?
+	Functional fork for Term::Pager
+		working interface
+		continue after quit
+		extensibility (add_func)
 
+		Test functionality w/|w/o Term::ReadKey
+			As expicit and implicit PAGER
+
+		make pipes
+		make pager object
+		parent
+			event loop/interfact
+		child
+			worker
 0.35
 
 	Odd failure of test 11 under tcsh and win-bash because

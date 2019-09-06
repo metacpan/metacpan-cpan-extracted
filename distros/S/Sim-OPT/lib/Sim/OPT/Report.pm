@@ -1,5 +1,5 @@
 package Sim::OPT::Report;
-# Copyright (C) 2008-2015 by Gian Luca Brunetti and Politecnico di Milano.
+# Copyright (C) 2008-2019 by Gian Luca Brunetti and Politecnico di Milano.
 # This is the module Sim::OPT::Retrieve of Sim::OPT, a program for detailed metadesign managing parametric explorations through the ESP-r building performance simulation platform and performing optimization by block coordinate descent.
 # This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
@@ -38,7 +38,7 @@ use warnings::unused;
 
 our @EXPORT = qw( retrieve report newretrieve newreport get_files );
 
-$VERSION = '0.075'; # our $VERSION = '';
+$VERSION = '0.077'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Report is the module used by Sim::OPT to retrieve simulation results.';
 
 #########################################################################################
@@ -104,6 +104,7 @@ sub newretrieve
   my %dirfiles = %{ $dt{dirfiles} }; #say $tee "# in Newretrieve \%dirfiles " . dump( %dirfiles );
   my $resfile = $dt{resfile}; #say $tee "# in Newretrieve \$resfile $resfile ";
   my $flfile = $dt{flfile}; #say $tee "# in Newretrieve \$flfile $flfile ";
+  my %vehicles = %{ $dt{vehicles} }; #say $tee "# in Newretrieve \%vehicles " . dump( %vehicles );
 
   my @simcases = @{ $dirfiles{simcases} }; ######
   my @simstruct = @{ $dirfiles{simstruct} }; ######
@@ -956,6 +957,7 @@ sub newreport # This function retrieves the results of interest from the texts f
   my %dirfiles = %{ $dt{dirfiles} }; #say $tee "IN REPORT \%dirfiles " . dump( %dirfiles );
   my $resfile = %{ $dt{resfile} };
   my $flfile = %{ $dt{flfile} };
+  my %vehicles = %{ $dt{vehicles} }; #say $tee "IN REPORT \%vehicles " . dump( %vehicles );
 
   my @simcases = @{ $dirfiles{simcases} };
   my @simstruct = @{ $dirfiles{simstruct} };
@@ -1041,6 +1043,14 @@ sub newreport # This function retrieves the results of interest from the texts f
 
   open( REPLIST, ">>$replist" ) or die( "$!" );
   open( REPBLOCK, ">>$repblock" ) or die( "$!" );
+
+  my $divert;
+  if ( $dirfiles{launching} eq "yes" )
+  {
+    say "YES.";
+    $divert = $repfile . ".revealnum.csv";
+    open( DIVERT, ">>$divert") or die "Can't open $repfile $!"; #say $tee "IN NEWREPORT \$repfile $repfile";
+  }
 
   open( REPFILE, ">>$repfile") or die "Can't open $repfile $!"; #say $tee "IN NEWREPORT \$repfile $repfile";
   @repcases = uniq( @repcases );
@@ -1324,9 +1334,18 @@ sub newreport # This function retrieves the results of interest from the texts f
         }
         print REPFILE $thing;
         print REPFILE ",";
+        if ( $dirfiles{launching} eq "yes" )
+        {
+          print DIVERT $thing;
+          print DIVERT ",";
+        }
         $count++;
       }
       print REPFILE "\n";
+      if ( $dirfiles{launching} eq "yes" )
+      {
+        print DIVERT "\n";
+      }
       say "#Reporting results for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance: writing $repfile. ";
     }
   } #END NEW. TAKE CARE.
@@ -1372,10 +1391,18 @@ sub newreport # This function retrieves the results of interest from the texts f
     foreach my $el ( @box )
     {
       say REPFILE $el;
+      if ( $dirfiles{launching} eq "yes" )
+      {
+        say DIVERT $el;
+      }
     }
     say "#Reporting results for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance: writing $repfile. ";
   }
   close REPFILE;
+  if ( $dirfiles{launching} eq "yes" )
+  {
+    close DIVERT;
+  }
   close TOFILE;
   close OUTFILE;
 
@@ -1385,6 +1412,12 @@ sub newreport # This function retrieves the results of interest from the texts f
     print $tee "rm -f $mypath/*.grt";
   }
   if (not( -e $repfile ) ){ die; };
+
+  if ( $dirfiles{launching} eq "yes" )
+  {
+    say "JUMPING";
+    next;
+  }
   return ( \@repcases, \@repstruct, $repfile, \@mergestruct, \@mergecases );
 } # END SUB NEWREPORT;
 

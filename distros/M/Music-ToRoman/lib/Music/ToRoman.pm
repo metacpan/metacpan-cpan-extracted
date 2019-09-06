@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Convert notes and chords to Roman numeral notation
 
-our $VERSION = '0.1200';
+our $VERSION = '0.1600';
 
 use List::MoreUtils qw/ any first_index /;
 use Moo;
@@ -53,35 +53,16 @@ sub parse {
     die 'No chord to parse'
         unless $chord;
 
-    my $note_re  = qr/[A-G][#b]?[#b]?/;
-    my $upper_re = qr/^[A-Z]+$/;
-    my $lower_re = qr/^[a-z]+$/;
+    my $note_re = qr/[A-G][#b]?[#b]?/;
 
-    # Literal diatonic modes when chords attribute is zero
-    my @roman = qw( I ii iii IV V vi vii ); # Default to major/ionian
-    if ( $self->scale_name eq 'dorian' ) {
-        @roman = qw( i ii III IV v vi VII );
-    }
-    elsif ( $self->scale_name eq 'phrygian' ) {
-        @roman = qw( i II III iv v VI vii );
-    }
-    elsif ( $self->scale_name eq 'lydian' ) {
-        @roman = qw( I II iii iv V vi vii );
-    }
-    elsif ( $self->scale_name eq 'mixolydian' ) {
-        @roman = qw( I ii iii IV v vi VII );
-    }
-    elsif ( $self->scale_name eq 'minor' || $self->scale_name eq 'aeolian' ) {
-        @roman = qw( i ii III iv v VI VII );
-    }
-    elsif ( $self->scale_name eq 'locrian' ) {
-        @roman = qw( i II iii iv V VI vii );
-    }
-    print "ROMAN: @roman\n" if $self->verbose;
+    # Get the roman representation of the scale
+    my @scale = $self->_get_scale_mode;
+    print "SCALE: @scale\n" if $self->verbose;
 
-    # Get the scale notes
     my @notes;
-    if ( ( $self->scale_note =~ /##/ || $self->scale_note =~ /bb/ ) && $self->scale_name ne 'major' && $self->scale_name ne 'ionian' ) {
+
+    # If the note has a double sharp and is not in major, manually rotate the scale notes, since Music::Scales does not.
+    if ( $self->scale_note =~ /##/ && $self->scale_name ne 'major' && $self->scale_name ne 'ionian' ) {
         my %modes = (
             dorian     => 2,
             phrygian   => 3,
@@ -94,6 +75,7 @@ sub parse {
 
         @notes = get_scale_notes( $self->major_tonic, 'major' );
 
+        # Rotate the major scale to the correct mode
         push @notes, shift @notes for 1 .. $modes{ $self->scale_name } - 1;
     }
     else {
@@ -102,28 +84,43 @@ sub parse {
     print "NOTES: @notes\n" if $self->verbose;
 
     # Convert a diminished chord
-    $chord =~ s/dim/o/; # TODO: Handle U+00F8 too
+    $chord =~ s/dim/o/;
 
     # Get just the note part of the chord name
     ( my $note = $chord ) =~ s/^($note_re).*$/$1/;
 
+    my %bb_enharmonics = (
+        Cbb => 'Bb', #[qw/ Bb A# /],
+        Dbb => 'C',  #[qw/ C B# /],
+        Ebb => 'D',  #[qw/ D /],
+        Fbb => 'Eb', #[qw/ Eb D# /],
+        Gbb => 'F',  #[qw/ F /],
+        Abb => 'G',  #[qw/ G /],
+        Bbb => 'A',  #[qw/ A /],
+    );
+
+    $note = $bb_enharmonics{$note}
+        if $note =~ /bb$/;
+
     # Get the roman representation based on the scale position
     my $position = first_index { $_ eq $note } @notes;
+
     # If the note is not in the scale find a new position and accidental
     my $accidental;
     if ( $position == -1 ) {
         ( $position, $accidental ) = _pos_acc( $note, $position, \@notes );
     }
     $accidental ||= '';
-    my $roman = $roman[$position];
+
+    my $roman = $scale[$position];
     print "ROMAN 1: $roman\n" if $self->verbose;
 
     # Get everything but the note part
     ( my $decorator = $chord ) =~ s/^(?:$note_re)(.*)$/$1/;
 
     # Are we minor or diminished?
-    my $minor = $decorator =~ /[-mo]/ ? 1 : 0;
-    print "NOTE: $note, MINOR: $minor, CHORD: $chord, POSN: $position, ACCI: $accidental, DECO: $decorator\n" if $self->verbose;
+    my $minor = $decorator =~ /[-moø]/ ? 1 : 0;
+    print "CHORD: $chord, NOTE: $note, ACCI: $accidental, DECO: $decorator, MINOR: $minor, POSN: $position\n" if $self->verbose;
 
     # Convert the case of the roman representation based on minor or major
     if ( $self->chords ) {
@@ -134,73 +131,45 @@ sub parse {
     $roman = $accidental . $roman if $accidental;
     print "ROMAN 2: $roman\n" if $self->verbose;
 
+    # Handle these unfortunate edge cases:
+    $roman = _up_to_flat( $roman, \@scale );
+    print "ROMAN 3: $roman\n" if $self->verbose;
+
+    # Handle the decorator variations
     if ( $decorator =~ /maj/i || $decorator =~ /min/i ) {
         $decorator = lc $decorator;
     }
+    elsif ( $decorator =~ /△/ ) {
+        $decorator =~ s/△/maj/;
+    }
+    elsif ( $decorator =~ /ø/ ) {
+        $decorator =~ s/ø/7b5/;
+    }
     else {
         # Drop the minor and major part of the chord name
-        $decorator =~ s/M//i;
-        $decorator =~ s/-//i;
+        $decorator =~ s/[-Mm]//i;
     }
-
-    # Handle these unfortunate edge cases
-    $roman =~ s/#I\b/bII/;
-    $roman =~ s/#i\b/bii/;
-    $roman =~ s/#II\b/bIII/;
-    $roman =~ s/#ii\b/biii/;
-    $roman =~ s/#IV\b/bV/;
-    $roman =~ s/#iv\b/bv/;
-    $roman =~ s/#V\b/bVI/;
-    $roman =~ s/#v\b/bvi/;
-    $roman =~ s/#VI\b/bVII/;
-    $roman =~ s/#vi\b/bvii/;
-    print "ROMAN 3: $roman\n" if $self->verbose;
+    print "DECO: $decorator\n" if $self->verbose;
 
     # A remaining note name is a bass decorator
     if ( $decorator =~ /($note_re)/ ) {
         my $name = $1;
+
         $position = first_index { $_ eq $name } @notes;
         print "BASS NOTE: $name, POSN: $position\n" if $self->verbose;
+
         if ( $position >= 0 ) {
-            $decorator =~ s/$note_re/$roman[$position]/;
+            $decorator =~ s/$note_re/$scale[$position]/;
         }
         else {
             ( $position, $accidental ) = _pos_acc( $name, $position, \@notes );
             print "NEW POSN: $position, ACCI: $accidental\n" if $self->verbose;
-            my $bass = $accidental . $roman[$position];
+
+            my $bass = $accidental . $scale[$position];
             $decorator =~ s/$note_re/$bass/;
 
             # Handle these unfortunate edge cases
-            if ( $decorator =~ /#I\b/i && $roman[1] =~ /$upper_re/ ) {
-                $decorator =~ s/#I\b/bII/i;
-            }
-            elsif ( $decorator =~ /#I\b/i && $roman[1] =~ /$lower_re/ ) {
-                $decorator =~ s/#I\b/bii/i;
-            }
-            elsif ( $decorator =~ /#II\b/i && $roman[2] =~ /$upper_re/ ) {
-                $decorator =~ s/#II\b/bIII/i;
-            }
-            elsif ( $decorator =~ /#II\b/i && $roman[2] =~ /$lower_re/ ) {
-                $decorator =~ s/#II\b/biii/i;
-            }
-            elsif ( $decorator =~ /#IV\b/i && $roman[4] =~ /$upper_re/ ) {
-                $decorator =~ s/#IV\b/bV/i;
-            }
-            elsif ( $decorator =~ /#IV\b/i && $roman[4] =~ /$lower_re/ ) {
-                $decorator =~ s/#IV\b/bv/i;
-            }
-            elsif ( $decorator =~ /#V\b/i && $roman[5] =~ /$upper_re/ ) {
-                $decorator =~ s/#V\b/bVI/i;
-            }
-            elsif ( $decorator =~ /#V\b/i && $roman[5] =~ /$lower_re/ ) {
-                $decorator =~ s/#V\b/bvi/i;
-            }
-            elsif ( $decorator =~ /#VI\b/i && $roman[6] =~ /$upper_re/ ) {
-                $decorator =~ s/#VI\b/bVII/i;
-            }
-            elsif ( $decorator =~ /#VI\b/i && $roman[6] =~ /$lower_re/ ) {
-                $decorator =~ s/#VI\b/bvii/i;
-            }
+            $decorator = _up_to_flat( $decorator, \@scale );
         }
         print "NEW DECO: $decorator\n" if $self->verbose;
     }
@@ -212,6 +181,42 @@ sub parse {
     return $roman;
 }
 
+sub _get_scale_mode {
+    my ($self) = @_;
+
+    my @scale = qw( I ii iii IV V vi vii ); # Default to major/ionian
+
+    if ( $self->scale_name eq 'dorian' ) {
+        @scale = qw( i ii III IV v vi VII );
+    }
+    elsif ( $self->scale_name eq 'phrygian' ) {
+        @scale = qw( i II III iv v VI vii );
+    }
+    elsif ( $self->scale_name eq 'lydian' ) {
+        @scale = qw( I II iii iv V vi vii );
+    }
+    elsif ( $self->scale_name eq 'mixolydian' ) {
+        @scale = qw( I ii iii IV v vi VII );
+    }
+    elsif ( $self->scale_name eq 'minor' || $self->scale_name eq 'aeolian' ) {
+        @scale = qw( i ii III iv v VI VII );
+    }
+    elsif ( $self->scale_name eq 'locrian' ) {
+        @scale = qw( i II iii iv V VI vii );
+    }
+
+    return @scale;
+}
+
+sub _up_to_flat {
+    my ($numeral, $roman) = @_;
+
+    # Change a roman sharp to a flat of the succeeding scale position
+    $numeral =~ s/#([IV]+)/b$roman->[ ( ( first_index { lc($1) eq lc($_) } @$roman ) + 1 ) % @$roman ]/i;
+
+    return $numeral;
+};
+
 sub _pos_acc {
     my ( $note, $position, $notes ) = @_;
 
@@ -219,18 +224,32 @@ sub _pos_acc {
 
     # If the note has no accidental...
     if ( length($note) == 1 ) {
-        # Find the scale position of the closest note
-        $position = first_index { $_ =~ /$note/ } @$notes;
+        # Find the scale position of the closest similar note
+        $position = first_index { $_ =~ /^$note/ } @$notes;
         # Get the accidental of the scale note
         ( $accidental = $notes->[$position] ) =~ s/^[A-G](.)$/$1/;
         # TODO: Why?
         $accidental = $accidental eq '#' ? 'b' : '#';
     }
     else {
+        # Enharmonic double sharp equivalents
+        my %previous_enharmonics = (
+            'C#' => 'C##',
+            'Db' => 'C##',
+            'F#' => 'F##',
+            'Gb' => 'F##',
+            'G#' => 'G##',
+            'Ab' => 'G##',
+        );
+        $note = $previous_enharmonics{$note}
+            if exists $previous_enharmonics{$note} && any { $_ =~ /[CFG]##/ } @$notes;
+
         # Get the accidental of the given note
-        ( my $letter, $accidental ) = $note =~ /^([A-G])(.)$/;
-        # Get the scale position of the closest note
-        $position = first_index { $_ eq $letter } @$notes;
+        ( my $letter, $accidental ) = $note =~ /^([A-G])(.+)$/;
+        # Get the scale position of the closest similar note
+        $position = first_index { $_ =~ /^$letter/ } @$notes;
+
+        $accidental = $accidental eq '##' ? 'b' : $accidental;
     }
 
     return $position, $accidental;
@@ -247,7 +266,6 @@ sub _valid_note {
     push @valid, map { $_ . '#' } @notes;
     push @valid, map { $_ . '##' } @notes;
     push @valid, map { $_ . 'b' } @notes;
-    push @valid, map { $_ . 'bb' } @notes;
 
     return any { $_ eq $note } @valid;
 }
@@ -284,7 +302,7 @@ Music::ToRoman - Convert notes and chords to Roman numeral notation
 
 =head1 VERSION
 
-version 0.1200
+version 0.1600
 
 =head1 SYNOPSIS
 
@@ -296,18 +314,22 @@ version 0.1200
   );
 
   my $roman = $mtr->parse('Am');  # i (minor)
-  $roman = $mtr->parse('Bo');     # iio (diminished)
   $roman = $mtr->parse('Bdim');   # iio (diminished)
+  $roman = $mtr->parse('B dim');  # ii o
+  $roman = $mtr->parse('Bo');     # iio
+  $roman = $mtr->parse('Bø');     # ii7b5 (half-diminished)
   $roman = $mtr->parse('Bb');     # bII (flat-two major)
   $roman = $mtr->parse('CM');     # III (major)
-  $roman = $mtr->parse('C');      # III (major)
-  $roman = $mtr->parse('Cm9/G');  # iii9/VII (minor ninth with seven bass)
-  $roman = $mtr->parse('Cm9/Bb'); # iii9/bii (minor ninth with flat-two bass)
-  $roman = $mtr->parse('D sus4'); # IV sus4 (major suspended)
-  $roman = $mtr->parse('DMaj7');  # IV maj7 (major seventh)
+  $roman = $mtr->parse('C');      # III
+  $roman = $mtr->parse('Cm9/G');  # iii9/VII (minor-nine with seven bass)
+  $roman = $mtr->parse('Cm9/Bb'); # iii9/bii (minor-nine with flat-two bass)
+  $roman = $mtr->parse('Dsus4');  # IVsus4 (suspended)
+  $roman = $mtr->parse('D sus4'); # IV sus4
+  $roman = $mtr->parse('D maj7'); # IV maj7 (major seventh)
+  $roman = $mtr->parse('DMaj7');  # IVmaj7
+  $roman = $mtr->parse('D△7');    # IVmaj7
   $roman = $mtr->parse('E7');     # V7 (dominant seventh)
-  $roman = $mtr->parse('Em7');    # v7 (minor seventh)
-  $roman = $mtr->parse('Fmin7');  # vi min7 (minor seventh)
+  $roman = $mtr->parse('Fmin7');  # vimin7 (minor seventh)
   $roman = $mtr->parse('G+');     # VII+ (augmented)
 
   $mtr = Music::ToRoman->new(
@@ -323,9 +345,9 @@ version 0.1200
   $roman = $mtr->parse('E');      # v
   $roman = $mtr->parse('F#');     # vi
   $roman = $mtr->parse('G');      # VII
-  $roman = $mtr->parse('Amin7');  # i min7
+  $roman = $mtr->parse('Amin7');  # imin7
   $roman = $mtr->parse('Bo');     # iio
-  $roman = $mtr->parse('CMaj7');  # III maj7
+  $roman = $mtr->parse('CMaj7');  # IIImaj7
   $roman = $mtr->parse('D7');     # IV7
   $roman = $mtr->parse('Em');     # v
 
@@ -344,9 +366,9 @@ Note on which the scale is based.  Default: C<C>
 This must be an uppercase letter from C<A-G> either alone or followed
 by C<#> or C<b>.
 
-Note that the keys of C<A#>, C<D#>, C<E#> and C<Fb> are better
-represented by C<Gb>, C<Eb>, C<F> and C<E> respectively, because they
-contain notes with double accidentals.
+Note that the keys of C<A#> and C<D#> are better represented by C<Gb>
+and C<Eb> respectively, because the scales contain notes with double
+sharps.  Double flat scales are not supported.
 
 =head2 scale_name
 
@@ -370,13 +392,14 @@ This must be an uppercase letter from C<A-G> and followed by a C<#> or
 C<b>.
 
 This attribute is required when the B<scale_note> is set to a
-double-accidental, and the B<scale_name> is not C<major> (or
-C<ionian>).
+double-sharp, and the B<scale_name> is not C<major> (or C<ionian>).
+
+Again, double flat scales are not supported.
 
 =head2 chords
 
 Are we given chords to parse with major (C<M>) or minor
-(C<m>/C<o>/C<dim>) designations?
+(C<m>/C<o>/C<dim>/C<ø>) designations?
 
 Default: C<1>
 
@@ -411,20 +434,20 @@ For instance, the Roman numeral representation for the C<aeolian> (or
 minor) mode is: C<i ii III iv v VI VII> - where the case indicates the
 major/minor status of the given chord.
 
-This can be overridden by parsing say, C<BM7> (B dominant seventh),
+This can be overridden by parsing say, C<B7> (B dominant seventh),
 thus producing C<II7>.
 
 If a major/minor chord designation is not provided, C<M> major is
 assumed.
 
-A diminished chord may be given as either C<o> or C<dim>.
-
 If the B<chords> attribute is set to C<0>, the B<scale_name> is used
 to figure out the correct Roman numeral representation.
 
-If the B<scale_note> is a double-accidental, and the B<scale_name> is
-not C<major> (or C<ionian>), the B<major_tonic> must be set in the
-constructor.
+A diminished chord may be given as either C<o> or C<dim>.
+Half-diminished (C<m7b5>) chords can be given as C<ø>.  A decoration
+of C<△> may be given for say the C<△7> major seventh chord.
+
+Parsing a double flatted chord will only work in select cases.
 
 =head1 SEE ALSO
 
@@ -442,6 +465,11 @@ L<Music::BachChoralHarmony>.
 
 L<App::MusicTools> C<vov> is the reverse of this module, and is
 significantly powerful.
+
+=head1 THANK YOU
+
+Dan Book (L<DBOOK|https://metacpan.org/author/DBOOK>) for the list
+rotation logic
 
 =head1 AUTHOR
 

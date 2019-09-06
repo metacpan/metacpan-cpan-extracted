@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.155';
+our $VERSION = '1.156';
 
 use Quiq::Option;
 use File::Rsync ();
@@ -70,7 +70,8 @@ die statistische Ausgabe von rsync unterbleibt
 
 =head4 Synopsis
 
-    $class->exec($src,$dest,@opt);
+    $output = $class->exec($src,$dest,@opt);
+    ($output,$cmd) = $class->exec($src,$dest,@opt);
 
 =head4 Arguments
 
@@ -90,17 +91,24 @@ Ziel-Pfad
 
 =over 4
 
-=item -dryRun => $bool
+=item -dryRun => $bool (Default: 0)
 
 Füge die Option --dry-run zur Kommandozeile hinzu, d.h. das
 rsync-Kommando wird ausgeführt, ohne dass Änderungen vorgenommen
 werden.
 
+=item -print => $bool (Default: 1)
+
+Liefere die Ausgabe des rsync-Kommandos nicht nur zurück, sondern
+gib sie auch auf STDOUT aus.
+
 =back
 
 =head4 Returns
 
-nichts
+Ausgabe des rsync-Kommandos, Beschreibung siehe oben (String). Im
+List-Kontext liefere zusätzlich das ausgeführte rsync-Kommando
+(String, String).
 
 =head4 Description
 
@@ -114,7 +122,7 @@ Verzeichnis $dest auf exakt den gleichen Stand wie $src gebracht wird.
 
 Schlägt das Kommando fehl, wird eine Exception geworfen.
 
-Die Ausgabe des rsync-Kommandos wird nach STDOUT geschrieben,
+Die Ausgabe des rsync-Kommandos wird zurück geliefert,
 wobei einige Zeilen entfernt werden, so dass eine Ausgabe nur
 dann erscheint, wenn Änderungen durchgeführt wurden, d.h. die
 Zeilen über und unter PROTOKOLL werden entfernt:
@@ -134,10 +142,14 @@ sub exec {
     my ($class,$src,$dest) = splice @_,0,3;
     # @opt
 
+    # Optionen
+
     my $dryRun = 0;
+    my $print = 1;
 
     Quiq::Option->extract(\@_,
         -dryRun => \$dryRun,
+        -print => \$print,
     );
 
     my $rsy = File::Rsync->new(
@@ -149,6 +161,7 @@ sub exec {
         dest => $dest,
     );
 
+    my $output = '';
     if (!$rsy->exec) {
         my $errA = $rsy->err;
         $class->throw(
@@ -191,19 +204,23 @@ sub exec {
             my $host = $dest;
             $host =~ s/:.*//;
             $host =~ s/.*\@//;
-            print "==$host==\n";
+            $output .= "==$host==\n";
         } 
-        print join '',@arr;
+        $output .= join '',@arr;
     }
-        
-    return;
+
+    if ($print) {
+        print $output;
+    }
+
+    return wantarray? ($output,scalar $rsy->lastcmd): $output;
 }
 
 # -----------------------------------------------------------------------------
 
 =head1 VERSION
 
-1.155
+1.156
 
 =head1 AUTHOR
 

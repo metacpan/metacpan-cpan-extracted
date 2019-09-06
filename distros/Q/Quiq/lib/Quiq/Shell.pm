@@ -9,7 +9,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.155';
+our $VERSION = '1.156';
 
 use Time::HiRes ();
 use Quiq::Option;
@@ -496,6 +496,31 @@ sub back {
 
 # -----------------------------------------------------------------------------
 
+=head3 backDir() - Voriges Arbeitsverzeichnis
+
+=head4 Synopsis
+
+    $dir = $sh->backDir;
+
+=head4 Returns
+
+Verzeichnispfad (String)
+
+=head4 Description
+
+Liefere das oberste Element des Verzeichnis-Stack ohne den Stack
+zu verändern.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub backDir {
+    return shift->{'dirStack'}->[-1];
+}
+
+# -----------------------------------------------------------------------------
+
 =head2 Fehlerbehandlung
 
 =head3 checkError() - Löse Exception bei Kommandofehler aus
@@ -604,7 +629,7 @@ sub _logCmd {
 
 =head1 VERSION
 
-1.155
+1.156
 
 =head1 AUTHOR
 

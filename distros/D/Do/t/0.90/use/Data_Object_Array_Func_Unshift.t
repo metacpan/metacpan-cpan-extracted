@@ -27,6 +27,15 @@ Data-Object Array Function (Unshift) Class
 
 Data::Object::Array::Func
 
+=attributes
+
+arg1(Object, req, ro)
+args(ArrayRef[Any], req, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Array::Func::Unshift is a function object for

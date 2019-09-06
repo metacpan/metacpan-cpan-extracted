@@ -27,6 +27,15 @@ Data-Object Scalar Function (Gt) Class
 
 Data::Object::Scalar::Func
 
+=attributes
+
+arg1(Object, req, ro)
+arg2(Any, req, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Scalar::Func::Gt is a function object for Data::Object::Scalar.

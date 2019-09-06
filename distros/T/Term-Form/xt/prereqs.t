@@ -11,6 +11,7 @@ prereq_ok( undef, [ qw(
         Term::Choose::Constants
         Term::Choose::LineFold
         Term::Choose::Linux
+        Term::Choose::Screen
         Term::Choose::ValidateOptions
         Term::Choose::Win32
 

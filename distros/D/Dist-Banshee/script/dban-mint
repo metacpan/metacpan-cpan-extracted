@@ -1,0 +1,50 @@
+#!perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Dist::Banshee::Mint 'instantiate_profile';
+
+my $profile = 'basic';
+GetOptions('profile=s' => \$profile);
+
+die "No dist name given" if not @ARGV;
+my $dist_name = shift;
+
+instantiate_profile($profile, $dist_name);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+dban - A lightweight minting command line tool
+
+=head1 VERSION
+
+0.001
+
+=head1 SYNOPSIS
+
+ dban-mint --profile=profile Foo::Bar
+
+=head1 DESCRIPTION
+
+The C<dban-mint> mints a new distribution according to the profile
+
+=head1 AUTHOR
+
+Leon Timmermans <fawaka@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by Leon Timmermans.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

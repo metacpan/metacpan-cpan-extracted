@@ -27,6 +27,16 @@ Data-Object Hash Function (Map) Class
 
 Data::Object::Hash::Func
 
+=attributes
+
+arg1(Object, req, ro)
+arg2(CodeRef, req, ro)
+args(ArrayRef[Any], opt, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Hash::Func::Map is a function object for Data::Object::Hash.

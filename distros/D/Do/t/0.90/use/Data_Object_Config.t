@@ -17,6 +17,10 @@ Data-Object Package Configuration
 
   use Data::Object::Config 'Core';
 
+=libraries
+
+Data::Object::Library
+
 =description
 
 This package is used to configure the consuming package based on arguments

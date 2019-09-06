@@ -1,3 +1,8 @@
+0.65 2019-09-05
+    * Fix order of module usage in test scripts, spotted by Jorol
+      This only was a problem when you had $ENV{HTTP_PROXY} set.
+    * Document that we clean out $ENV{HTTPS_PROXY} as well.
+
 0.64 2018-10-28
     * Re-release including correct META.* information
     * No upgrade necessary

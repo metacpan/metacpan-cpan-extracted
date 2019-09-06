@@ -4,15 +4,21 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.655';
+our $VERSION = '1.700';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
 use Carp qw( croak carp );
 
-use Term::Choose::Constants       qw( :choose :screen );
+use Term::Choose::Constants       qw( :keys WIDTH_CURSOR );
 use Term::Choose::LineFold        qw( line_fold print_columns cut_to_printwidth );
+use Term::Choose::Screen          qw( :all );
 use Term::Choose::ValidateOptions qw( validate_options );
+
+use constant {
+    ROW => 0,
+    COL => 1,
+};
 
 
 my $Plugin;
@@ -52,8 +58,7 @@ sub new {
 
 sub _defaults {
     return {
-        #prompt             => undef,
-        info                => '',
+        alignment           => 0,
         beep                => 0,
         clear_screen        => 0,
         codepage_mapping    => 0,
@@ -63,7 +68,7 @@ sub _defaults {
         hide_cursor         => 1,
         include_highlighted => 0,
         index               => 0,
-        justify             => 0,
+        info                => '',
         keep                => 5,
         layout              => 1,
         #lf                 => undef,
@@ -72,11 +77,12 @@ sub _defaults {
         #max_height         => undef,
         #max_width          => undef,
         mouse               => 0,
-        #no_spacebar        => undef,
         #meta_items         => undef,
+        #no_spacebar        => undef,
         order               => 1,
         pad                 => 2,
         page                => 1,
+        #prompt             => undef,
         undef               => '<undef>',
     };
 }
@@ -92,10 +98,11 @@ sub _valid_options {
         index               => '[ 0 1 ]',
         order               => '[ 0 1 ]',
         page                => '[ 0 1 ]',
+        alignment           => '[ 0 1 2 ]',
+        justify             => '[ 0 1 2 ]',         # 05.09.2019    # after transition -> remove
         include_highlighted => '[ 0 1 2 ]',
-        justify             => '[ 0 1 2 ]',
         layout              => '[ 0 1 2 3 ]',
-        mouse               => '[ 0 1 2 3 4 ]',
+        mouse               => '[ 0 1 2 3 4 ]',     # 05.09.2019    # after transition -> '[ 0 1 ]',
         keep                => '[ 1-9 ][ 0-9 ]*',
         ll                  => '[ 1-9 ][ 0-9 ]*',
         max_height          => '[ 1-9 ][ 0-9 ]*',
@@ -104,8 +111,8 @@ sub _valid_options {
         pad                 => '[ 0-9 ]+',
         lf                  => 'ARRAY',
         mark                => 'ARRAY',
-        no_spacebar         => 'ARRAY',
         meta_items          => 'ARRAY',
+        no_spacebar         => 'ARRAY',
         empty               => 'Str',
         info                => 'Str',
         prompt              => 'Str',
@@ -180,8 +187,8 @@ sub __reset_term {
     }
     if ( $from_choose ) {
         my $up = $self->{i_row} + $self->{count_prompt_lines};
-        print UP x $up if $up;
-        print "\r" . CLEAR_TO_END_OF_SCREEN;
+        print up( $up ) if $up;
+        print "\r" . clear_to_end_of_screen();
     }
     if ( exists $self->{backup_instance_defaults} ) {  # backup_instance_defaults exists if ObjectOriented
         my $instance_defaults = $self->{backup_instance_defaults};
@@ -223,6 +230,13 @@ sub __choose {
     croak "choose: the first argument must be an ARRAY reference" if ref $orig_list_ref ne 'ARRAY';
     if ( defined $opt ) {
         croak "choose: the (optional) second argument must be a HASH reference" if ref $opt ne 'HASH';
+
+        ##### 05.09.2019
+        if ( ! defined $opt->{alignment} && defined $opt->{justify} ) {
+            $opt->{alignment} = $opt->{justify};
+        }
+        #####
+
         validate_options( _valid_options(), $opt );
         for my $key ( keys %$opt ) {
             $self->{$key} = $opt->{$key} if defined $opt->{$key};
@@ -251,7 +265,7 @@ sub __choose {
         exit;
     };
     $self->__init_term();
-    ( $self->{term_width}, $self->{term_height} ) = $self->{plugin}->__get_term_size();
+    ( $self->{term_width}, $self->{term_height} ) = get_term_size();
     $self->__write_first_screen();
     my $fast_page = 10;
     if ( $self->{pp_count} > 10_000 ) {
@@ -266,7 +280,7 @@ sub __choose {
             carp "EOT: $!";
             return;
         }
-        my ( $new_width, $new_height ) = $self->{plugin}->__get_term_size();
+        my ( $new_width, $new_height ) = get_term_size();
         if ( $new_width != $self->{term_width} || $new_height != $self->{term_height} ) {
             if ( $self->{ll} ) {
                 return -1;
@@ -278,8 +292,8 @@ sub __choose {
                 $self->{mark} = $self->__marked_rc2idx();
             }
             my $up = $self->{i_row} + $self->{count_prompt_lines};
-            print UP x $up if $up;
-            print "\r" . CLEAR_TO_END_OF_SCREEN;
+            print up( $up ) if $up;
+            print "\r" . clear_to_end_of_screen();
             $self->__write_first_screen();
             next GET_KEY;
         }
@@ -302,7 +316,6 @@ sub __choose {
         if ( $saved_pos && $key != VK_PAGE_UP && $key != CONTROL_B && $key != VK_PAGE_DOWN && $key != CONTROL_F ) {
             $saved_pos = undef;
         }
-
         # $self->{rc2idx} holds the new list (AoA) formatted in "__list_idx_to_rowcol" appropriate to the chosen layout.
         # $self->{rc2idx} does not hold the values directly but the respective list indexes from the original list.
         # If the original list would be ( 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' ) and the new formatted list should be
@@ -321,7 +334,7 @@ sub __choose {
             if (     ! $self->{rc2idx}[$self->{pos}[ROW]+1]
                   || ! $self->{rc2idx}[$self->{pos}[ROW]+1][$self->{pos}[COL]]
             ) {
-                $self->{plugin}->__beep();
+                $self->__beep();
             }
             else {
                 $self->{pos}[ROW]++;
@@ -339,7 +352,7 @@ sub __choose {
         }
         elsif ( $key == VK_UP || $key == KEY_k ) {
             if ( $self->{pos}[ROW] == 0 ) {
-                $self->{plugin}->__beep();
+                $self->__beep();
             }
             else {
                 $self->{pos}[ROW]--;
@@ -359,7 +372,7 @@ sub __choose {
             if (    $self->{pos}[ROW] == $#{$self->{rc2idx}}
                  && $self->{pos}[COL] == $#{$self->{rc2idx}[$self->{pos}[ROW]]}
             ) {
-                $self->{plugin}->__beep();
+                $self->__beep();
             }
             else {
                 if ( $self->{pos}[COL] < $#{$self->{rc2idx}[$self->{pos}[ROW]]} ) {
@@ -386,7 +399,7 @@ sub __choose {
         }
         elsif ( $key == KEY_BSPACE || $key == CONTROL_H || $key == KEY_BTAB ) {
             if ( $self->{pos}[COL] == 0 && $self->{pos}[ROW] == 0 ) {
-                $self->{plugin}->__beep();
+                $self->__beep();
             }
             else {
                 if ( $self->{pos}[COL] > 0 ) {
@@ -413,7 +426,7 @@ sub __choose {
         }
         elsif ( $key == VK_RIGHT || $key == KEY_l ) {
             if ( $self->{pos}[COL] == $#{$self->{rc2idx}[$self->{pos}[ROW]]} ) {
-                $self->{plugin}->__beep();
+                $self->__beep();
             }
             else {
                 $self->{pos}[COL]++;
@@ -423,7 +436,7 @@ sub __choose {
         }
         elsif ( $key == VK_LEFT || $key == KEY_h ) {
             if ( $self->{pos}[COL] == 0 ) {
-                $self->{plugin}->__beep();
+                $self->__beep();
             }
             else {
                 $self->{pos}[COL]--;
@@ -433,7 +446,7 @@ sub __choose {
         }
         elsif ( $key == VK_PAGE_UP || $key == CONTROL_B ) {
             if ( $self->{first_page_row} <= 0 ) {
-                $self->{plugin}->__beep();
+                $self->__beep();
             }
             else {
                 $self->{first_page_row} = $self->{avail_height} * ( int( $self->{pos}[ROW] / $self->{avail_height} ) - $page_step );
@@ -451,7 +464,7 @@ sub __choose {
         }
         elsif ( $key == VK_PAGE_DOWN || $key == CONTROL_F ) {
             if ( $self->{last_page_row} >= $#{$self->{rc2idx}} ) {
-                $self->{plugin}->__beep();
+                $self->__beep();
             }
             else {
                 my $backup_p_begin = $self->{first_page_row};
@@ -475,7 +488,7 @@ sub __choose {
         }
         elsif ( $key == VK_HOME || $key == CONTROL_A ) {
             if ( $self->{pos}[COL] == 0 && $self->{pos}[ROW] == 0 ) {
-                $self->{plugin}->__beep();
+                $self->__beep();
             }
             else {
                 $self->{pos}[ROW] = 0;
@@ -491,7 +504,7 @@ sub __choose {
                 if (    $self->{pos}[ROW] == $#{$self->{rc2idx}} - 1
                      && $self->{pos}[COL] == $#{$self->{rc2idx}[$self->{pos}[ROW]]}
                 ) {
-                    $self->{plugin}->__beep();
+                    $self->__beep();
                 }
                 else {
                     $self->{first_page_row} = @{$self->{rc2idx}} - ( @{$self->{rc2idx}} % $self->{avail_height} || $self->{avail_height} );
@@ -511,7 +524,7 @@ sub __choose {
                 if (    $self->{pos}[ROW] == $#{$self->{rc2idx}}
                      && $self->{pos}[COL] == $#{$self->{rc2idx}[$self->{pos}[ROW]]}
                 ) {
-                    $self->{plugin}->__beep();
+                    $self->__beep();
                 }
                 else {
                     $self->{first_page_row} = @{$self->{rc2idx}} - ( @{$self->{rc2idx}} % $self->{avail_height} || $self->{avail_height} );
@@ -578,7 +591,7 @@ sub __choose {
                     }
                 }
                 if ( $locked ) {
-                    $self->{plugin}->__beep();
+                    $self->__beep();
                 }
                 else {
                     $self->{marked}[$self->{pos}[ROW]][$self->{pos}[COL]] = ! $self->{marked}[$self->{pos}[ROW]][$self->{pos}[COL]];
@@ -602,14 +615,22 @@ sub __choose {
                 $self->__wr_screen();
             }
             else {
-                $self->{plugin}->__beep();
+                $self->__beep();
             }
         }
         else {
-            $self->{plugin}->__beep();
+            $self->__beep();
         }
     }
 }
+
+sub __beep {
+    my ( $self, $beep ) = @_;
+    if ( $beep ) {
+        print bell();
+    }
+}
+
 
 
 sub __prepare_promptline {
@@ -692,10 +713,6 @@ sub __write_first_screen {
     if ( $self->{max_width} && $self->{avail_width} > $self->{max_width} ) {
         $self->{avail_width} = $self->{max_width};
     }
-    if ( $self->{mouse} == 2 ) {
-        $self->{avail_width}  = MAX_COL_MOUSE_1003 if $self->{avail_width}  > MAX_COL_MOUSE_1003;
-        $self->{avail_height} = MAX_ROW_MOUSE_1003 if $self->{avail_height} > MAX_ROW_MOUSE_1003;
-}
     if ( $self->{avail_width} < 1 ) {
         $self->{avail_width} = 1;
     }
@@ -716,10 +733,10 @@ sub __write_first_screen {
     $self->{avail_height_idx} = $self->{avail_height} - 1;
     $self->{first_page_row} = 0;
     $self->{last_page_row}  = $self->{avail_height_idx} > $#{$self->{rc2idx}} ? $#{$self->{rc2idx}} : $self->{avail_height_idx};
-    $self->{i_row}   = 0;
-    $self->{i_col}   = 0;
-    $self->{pos}     = [ 0, 0 ];
-    $self->{marked}  = [];
+    $self->{i_row}  = 0;
+    $self->{i_col}  = 0;
+    $self->{pos}    = [ 0, 0 ];
+    $self->{marked} = [];
     if ( $self->{wantarray} && defined $self->{mark} ) {
         $self->__marked_idx2rc( $self->{mark}, 1 );
     }
@@ -727,26 +744,26 @@ sub __write_first_screen {
         $self->__set_default_cell();
     }
     if ( $self->{clear_screen} ) {
-        print CLEAR_SCREEN;
+        print clear_screen();
     }
     else {
-        print "\r" . CLEAR_TO_END_OF_SCREEN;
+        print "\r" . clear_to_end_of_screen();
     }
     if ( $self->{prompt_copy} ne '' ) {
         print $self->{prompt_copy};
     }
     $self->__wr_screen();
     if ( $self->{mouse} ) {
-        $self->{plugin}->__get_cursor_position();
+        my $abs_cursor_y = $self->{plugin}->__get_cursor_row();
+        $self->{offset_rows} = $abs_cursor_y - 1 - $self->{i_row};
     }
-    $self->{cursor_row} = $self->{i_row};
 }
 
 
 sub __wr_screen {
     my ( $self ) = @_;
     $self->__goto( 0, 0 );
-    print "\r" . CLEAR_TO_END_OF_SCREEN;
+    print "\r" . clear_to_end_of_screen();
     if ( $self->{pp_row} ) {
         $self->__goto( $self->{avail_height_idx} + $self->{pp_row}, 0 );
         my $pp_line = sprintf $self->{footer_fmt}, int( $self->{first_page_row} / $self->{avail_height} ) + 1;
@@ -765,7 +782,7 @@ sub __wr_screen {
 sub __wr_cell {
     my( $self, $row, $col ) = @_;
     my $is_current_pos = $row == $self->{pos}[ROW] && $col == $self->{pos}[COL];
-    my $emphasised = ( $self->{marked}[$row][$col] ? BOLD_UNDERLINE : '' ) . ( $is_current_pos ? REVERSE : '' );
+    my $emphasised = ( $self->{marked}[$row][$col] ? bold_underline() : '' ) . ( $is_current_pos ? reverse_video() : '' );
     my $idx = $self->{rc2idx}[$row][$col];
     if ( $self->{ll} ) {
         $self->__goto( $row - $self->{first_page_row}, $col * $self->{col_width_plus} );
@@ -783,11 +800,11 @@ sub __wr_cell {
                 }
                 $str = $emphasised . $str;
             }
-            print $str . RESET; # if \e[
+            print $str . normal(); # if \e[
         }
         else {
             if ( $emphasised ) {
-                print $emphasised . $self->{list}[$idx] . RESET;
+                print $emphasised . $self->{list}[$idx] . normal();
             }
             else {
                 print $self->{list}[$idx];
@@ -820,7 +837,7 @@ sub __wr_cell {
                     # keep cell marked after color escapes
                     $_ .= $emphasised;
                 }
-                $str = $emphasised . $str . RESET;
+                $str = $emphasised . $str . normal();
                 if ( $is_current_pos ) {
                     # no color for selected cell
                     @color = ();
@@ -830,14 +847,14 @@ sub __wr_cell {
             if ( @color ) {
                 $str =~ s/\x{feff}/shift @color/ge;
                 if ( ! $emphasised ) {
-                    $str .= RESET;
+                    $str .= normal();
                 }
             }
             print $str;
         }
         else {
             if ( $emphasised ) {
-                print $emphasised . $str . RESET;
+                print $emphasised . $str . normal();
             }
             else {
                 print $str;
@@ -850,13 +867,13 @@ sub __wr_cell {
 sub __pad_str_to_colwidth {
     my ( $self, $idx ) = @_;
     if ( $self->{length}[$idx] < $self->{col_width} ) {
-        if ( $self->{justify} == 0 ) {
+        if ( $self->{alignment} == 0 ) {
             return $self->{list}[$idx] . ( " " x ( $self->{col_width} - $self->{length}[$idx] ) );
         }
-        elsif ( $self->{justify} == 1 ) {
+        elsif ( $self->{alignment} == 1 ) {
             return " " x ( $self->{col_width} - $self->{length}[$idx] ) . $self->{list}[$idx];
         }
-        elsif ( $self->{justify} == 2 ) {
+        elsif ( $self->{alignment} == 2 ) {
             my $all = $self->{col_width} - $self->{length}[$idx];
             my $half = int( $all / 2 );
             return ( " " x $half ) . $self->{list}[$idx] . ( " " x ( $all - $half ) );
@@ -885,18 +902,15 @@ sub __goto {
         $self->{i_col} = 0;
     }
     elsif ( $newrow < $self->{i_row} ) {
-        print "\e[" . ( $self->{i_row} - $newrow ) . "A";
-        #print UP x ( $self->{i_row} - $newrow );
+        print up( $self->{i_row} - $newrow );
         $self->{i_row} = $newrow;
     }
     if ( $newcol > $self->{i_col} ) {
-        print "\e[" . ( $newcol - $self->{i_col} ) . "C";
-        #print RIGHT x ( $newcol - $self->{i_col} );
+        print right( $newcol - $self->{i_col} );
         $self->{i_col} = $newcol;
     }
     elsif ( $newcol < $self->{i_col} ) {
-        print "\e[" . ( $self->{i_col} - $newcol ) . "D";
-        #print LEFT x ( $self->{i_col} - $newcol );
+        print left( $self->{i_col} - $newcol );
         $self->{i_col} = $newcol;
     }
 }
@@ -1063,46 +1077,43 @@ sub __marked_rc2idx {
 
 
 sub __mouse_info_to_key {
-    my ( $self, $abs_cursor_y, $button, $abs_mouse_x, $abs_mouse_y ) = @_;
+    my ( $self, $button, $mouse_x, $mouse_y ) = @_;
     if ( $button == 4 ) {
         return VK_PAGE_UP;
     }
     elsif ( $button == 5 ) {
         return VK_PAGE_DOWN;
     }
-    my $abs_y_top_row = $abs_cursor_y - $self->{cursor_row};
-    if ( $abs_mouse_y < $abs_y_top_row ) {
-        return NEXT_get_key;
-    }
-    my $mouse_row = $abs_mouse_y - $abs_y_top_row;
-    my $mouse_col = $abs_mouse_x;
-    if ( $mouse_row > $#{$self->{rc2idx}} ) {
+    # ..._y, ..._x: absolute position, one-based index
+    my $mouse_row = $mouse_y - 1 - $self->{offset_rows};
+    my $mouse_col = $mouse_x - 1;
+    if ( $mouse_row < 0 || $mouse_row > $#{$self->{rc2idx}} ) {
         return NEXT_get_key;
     }
     my $matched_col;
-    my $end_last_col = 0;
+    my $begin_this_col = 0;
     my $row = $mouse_row + $self->{first_page_row};
 
     COL: for my $col ( 0 .. $#{$self->{rc2idx}[$row]} ) {
-        my $end_this_col;
+        my $begin_next_col;
         if ( $self->{current_layout} == -1 ) {
             my $idx = $self->{rc2idx}[$row][$col];
-            $end_this_col = $end_last_col + $self->{length}[$idx] + $self->{pad};
+            $begin_next_col = $begin_this_col + $self->{length}[$idx] + $self->{pad};
         }
         else { #
-            $end_this_col = $end_last_col + $self->{col_width_plus};
+            $begin_next_col = $begin_this_col + $self->{col_width_plus};
         }
         if ( $col == 0 ) {
-            $end_this_col -= int( $self->{pad} / 2 );
+            $begin_next_col -= int( $self->{pad} / 2 );
         }
-        if ( $col == $#{$self->{rc2idx}[$row]} && $end_this_col > $self->{avail_width} ) {
-            $end_this_col = $self->{avail_width};
+        if ( $col == $#{$self->{rc2idx}[$row]} && $begin_next_col > $self->{avail_width} ) {
+            $begin_next_col = $self->{avail_width};
         }
-        if ( $end_last_col < $mouse_col && $end_this_col >= $mouse_col ) {
+        if ( $mouse_col >= $begin_this_col && $mouse_col < $begin_next_col ) {
             $matched_col = $col;
             last COL;
         }
-        $end_last_col = $end_this_col;
+        $begin_this_col = $begin_next_col;
     }
     if ( ! defined $matched_col ) {
         return NEXT_get_key;
@@ -1143,13 +1154,9 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.655
+Version 1.700
 
 =cut
-
-=head1 ANNOUNCEMENT
-
-With the next release there will only be mouse mode C<off> (0) and mouse mode C<on> (1). See ANNOUNCEMENT in L</mouse>.
 
 =head1 SYNOPSIS
 
@@ -1162,7 +1169,7 @@ Functional interface:
     my $choice = choose( $array_ref );                            # single choice
     print "$choice\n";
 
-    my @choices = choose( [ 1 .. 100 ], { justify => 1 } );       # multiple choice
+    my @choices = choose( [ 1 .. 100 ], { alignment => 1 } );       # multiple choice
     print "@choices\n";
 
     choose( [ 'Press ENTER to continue' ], { prompt => '' } );    # no choice
@@ -1285,8 +1292,8 @@ If the window size is changed, then as soon as the user enters a keystroke C<cho
 
 C<choose> returns C<undef> or an empty list in list context if the C<q> key (or C<Ctrl-Q>) is pressed.
 
-With a I<mouse> mode enabled (and if supported by the terminal) the item can be chosen with the left mouse key, in list
-context the right mouse key can be used instead the C<SpaceBar> key.
+If the I<mouse> mode is enabled, an item can be chosen with the left mouse key, in list context the right mouse key can
+be used instead the C<SpaceBar> key.
 
 =head2 Keys to move around
 
@@ -1363,6 +1370,14 @@ added three dots.
 
 Options which expect a number as their value expect integers.
 
+=head3 alignment
+
+0 - elements ordered in columns are aligned to the left (default)
+
+1 - elements ordered in columns are aligned to the right
+
+2 - elements ordered in columns are centered
+
 =head3 beep
 
 0 - off (default)
@@ -1424,7 +1439,7 @@ Sets the string displayed on the screen instead an empty string.
 
 =head3 info
 
-Expects as its value a string. The string is printed above the prompt string.
+Expects as its value a string. The info text is printed above the prompt string.
 
 (default: not set)
 
@@ -1435,13 +1450,10 @@ Expects as its value a string. The string is printed above the prompt string.
 1 - return the index of the chosen element instead of the chosen element respective the indices of the chosen elements
 instead of the chosen elements.
 
+
 =head3 justify
 
-0 - elements ordered in columns are left justified (default)
-
-1 - elements ordered in columns are right justified
-
-2 - elements ordered in columns are centered
+The option I<justify> is now called I<alignment>. Use I<alignment> instead of I<justify>. I<justify> will be removed.
 
 =head3 keep
 
@@ -1581,28 +1593,14 @@ Allowed values: 1 or greater
 
 =head3 mouse
 
-For MSWin32 see also the end of this section.
+0 - off (default)
 
-0 - no mouse mode (default)
+1 - on. Enables the Any-Event-Mouse-Mode (1003) and the Extended-SGR-Mouse-Mode (1006).
 
-1 - mouse mode 1003 enabled
+If the option I<mouse> is enabled layers for C<STDIN> are changed. Then before leaving C<choose> as a cleanup C<STDIN>
+is marked as C<UTF-8> with C<:encoding(UTF-8)>. This doesn't apply if the OS is MSWin32.
 
-2 - mouse mode 1003 enabled; the output width is limited to 223 print-columns and the height to 223 rows (mouse mode
-1003 doesn't work above 223)
-
-3 - extended mouse mode (1005) - uses utf8
-
-4 - extended SGR mouse mode (1006)
-
-If a mouse mode is enabled layers for C<STDIN> are changed. Then before leaving C<choose> as a cleanup C<STDIN> is
-marked as C<UTF-8> with C<:encoding(UTF-8)>. This doesn't apply if the OS is MSWin32.
-
-If the OS is MSWin32 there is no difference between the mouse modes 1, 3, and 4 - the all enable the mouse with the help
-of L<Win32::Console>.
-
-ANNOUNCEMENT: With the next release there will only be mouse mode C<off> (0) and mouse mode C<on> (1). During a
-transition period, 2,3 and 4 will also activate the mouse mode. Mouse set to C<on> enables the Any-Event-Mouse-Mode
-(1003) and the Extended-SGR-Mouse-Mode (1006).
+If the OS is MSWin32 the mouse is enabled with the help of L<Win32::Console>.
 
 =head3 order
 
@@ -1737,25 +1735,20 @@ to a true value, ambiguous width characters are treated as full width.
 
 =head2 Escape sequences
 
-It is required a terminal that supports ANSI escape sequences except the OS is MSWin32.
+By default C<Term::Choose> uses C<tput> to get the appropriate escape sequences. Setting the environment variable
+C<TC_ANSI_ESCAPES> to a true value allows one to use ANSI escape sequences directly without calling C<tput>.
 
-If the option "hide_cursor" is enabled, it is also required the support for the following escape sequences:
+    BEGIN {
+        $ENV{TC_ANSI_ESCAPES} = 1;
+    }
+    use Term::Choose qw( choose );
 
-    "\e[?25l"   Hide Cursor
-
-    "\e[?25h"   Show Cursor
-
-If a I<mouse> mode is enabled
-
-    "\e[?1003h", "\e[?1005h", "\e[?1006h"   Enable Mouse Tracking
-
-    "\e[?1003l", "\e[?1005l", "\e[?1006l"   Disable Mouse Tracking
-
-are used to enable/disable the different I<mouse> modes.
+The escape sequences to enable the I<mouse> mode are always hardcoded.
 
 =head2 MSWin32
 
-If the OS is MSWin32 L<Win32::Console> and L<Win32::Console::ANSI> are used. See option L</codepage_mapping>.
+If the OS is MSWin32 L<Win32::Console> and L<Win32::Console::ANSI> with ANSI escape sequences are used. See also
+L</codepage_mapping>.
 
 =head1 SUPPORT
 

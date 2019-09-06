@@ -27,6 +27,15 @@ Data-Object Hash Function (Lt) Class
 
 Data::Object::Hash::Func
 
+=attributes
+
+arg1(Object, req, ro)
+arg2(HashLike, req, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Hash::Func::Lt is a function object for Data::Object::Hash.

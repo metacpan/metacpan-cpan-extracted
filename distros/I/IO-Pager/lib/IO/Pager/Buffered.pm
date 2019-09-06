@@ -1,5 +1,5 @@
 package IO::Pager::Buffered;
-our $VERSION = 0.40;
+our $VERSION = 0.42;
 
 use strict;
 use base qw( IO::Pager );
@@ -91,14 +91,14 @@ IO::Pager::Buffered - Pipe deferred output to PAGER if destination is a TTY
   {
     # You can also use scalar filehandles...
     my $token = IO::Pager::Buffered::open($FH) or warn($!);
-    print $FH "No globs or barewords for us thanks!\n";
+    print $FH "No globs or barewords for us thanks!\n" while 1;
   }
 
   {
     # ...or an object interface
     my $token = new IO::Pager::Buffered;
 
-    $token->print("OO shiny...\n");
+    $token->print("OO shiny...\n") while 1;
   }
 
 =head1 DESCRIPTION
@@ -162,6 +162,19 @@ and will probably differ for a TTY vs. a file. See L<perlfunc>.
 
 I<$,> is used see L<perlvar>.
 
+You probably want to do something with SIGPIPE eg;
+
+  eval {
+    local $SIG{PIPE} = sub { die };
+    local $STDOUT = IO::Pager::open(*STDOUT);
+
+    while (1) {
+      # Do something
+    }
+  }
+
+  # Do something else
+
 =head1 SEE ALSO
 
 L<IO::Pager>, L<IO::Pager::Unbuffered>, L<IO::Pager::Page>,
@@ -176,7 +189,7 @@ This module was inspired by Monte Mitzelfelt's IO::Page 0.02
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2003-2012 Jerrad Pierce
+Copyright (C) 2003-2018 Jerrad Pierce
 
 =over
 

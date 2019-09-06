@@ -165,6 +165,11 @@ BEGIN { use_ok('HTML::GoogleMaps::V3') }
 
     $map->{points} = [ { point => [ -100,-100 ] } ];
     ok( $map->_find_center,'_find_center' );
+
+    # Github issue 22
+    $map = HTML::GoogleMaps::V3->new;
+    my ($head, $html) = $map->onload_render();
+    unlike($head, qr/center/i, 'center not defined');
 }
 
 # Github issue 12

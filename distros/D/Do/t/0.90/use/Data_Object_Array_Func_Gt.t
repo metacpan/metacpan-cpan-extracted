@@ -27,6 +27,15 @@ Data-Object Array Function (Gt) Class
 
 Data::Object::Array::Func
 
+=attributes
+
+arg1(Object, req, ro)
+arg2(ArrayLike, req, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Array::Func::Gt is a function object for Data::Object::Array.

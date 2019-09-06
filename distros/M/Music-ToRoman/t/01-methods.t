@@ -11,6 +11,11 @@ diag 'C chords';
 my $mtr = Music::ToRoman->new;#( verbose => 1 );
 isa_ok $mtr, 'Music::ToRoman';
 
+is $mtr->parse('Dbb'), 'I', 'I';
+is $mtr->parse('Ebbm'), 'ii', 'ii';
+is $mtr->parse('Gbb'), 'IV', 'IV';
+is $mtr->parse('Abb'), 'V', 'V';
+
 is $mtr->parse('C'), 'I', 'I';
 is $mtr->parse('CM'), 'I', 'I';
 is $mtr->parse('C-'), 'i', 'i';
@@ -19,15 +24,20 @@ is $mtr->parse('C sus4'), 'I sus4', 'I sus4';
 is $mtr->parse('Cadd9'), 'Iadd9', 'Iadd9';
 is $mtr->parse('C add9'), 'I add9', 'I add9';
 is $mtr->parse('CMaj7'), 'Imaj7', 'Imaj7';
+is $mtr->parse('C Maj7'), 'I maj7', 'I maj7';
 is $mtr->parse('Cmaj7'), 'Imaj7', 'Imaj7';
+is $mtr->parse('C maj7'), 'I maj7', 'I maj7';
+is $mtr->parse('C△7'), 'Imaj7', 'Imaj7';
 is $mtr->parse('C Maj7'), 'I maj7', 'I maj7';
 is $mtr->parse('C maj7'), 'I maj7', 'I maj7';
 is $mtr->parse('C+'), 'I+', 'I+';
 is $mtr->parse('C xyz'), 'I xyz', 'I xyz';
 is $mtr->parse('C5'), 'I5', 'I5';
 is $mtr->parse('C64'), 'I64', 'I64';
+is $mtr->parse('C#m'), 'bii', 'bii';
 is $mtr->parse('Dbm'), 'bii', 'bii';
 is $mtr->parse('Dm'), 'ii', 'ii';
+is $mtr->parse('D#m'), 'biii', 'biii';
 is $mtr->parse('Ebm'), 'biii', 'biii';
 is $mtr->parse('Em'), 'iii', 'iii';
 is $mtr->parse('F'), 'IV', 'IV';
@@ -43,14 +53,7 @@ is $mtr->parse('Bbo'), 'bviio', 'bviio';
 is $mtr->parse('Bo'), 'viio', 'viio';
 is $mtr->parse('Bdim'), 'viio', 'viio';
 is $mtr->parse('B dim'), 'vii o', 'vii o';
-SKIP: {
-    skip 'U+25B3 works but is it needed?', 1;
-    is $mtr->parse('B △7'), 'VII △7', 'VII △7';
-};
-SKIP: {
-    skip 'U+00F8 does not mean diminished yet.', 1;
-    is $mtr->parse('Bø'), 'viio', 'viio';
-};
+is $mtr->parse('Bø'), 'vii7b5', 'vii7b5';
 
 diag 'C/X chords';
 
@@ -146,6 +149,8 @@ is $mtr->parse('D'), 'iv', 'iv';
 is $mtr->parse('E'), 'v', 'v';
 is $mtr->parse('F'), 'VI', 'VI';
 is $mtr->parse('G'), 'VII', 'VII';
+is $mtr->parse('G#'), 'bi', 'bi';
+is $mtr->parse('Ab'), 'bi', 'bi';
 
 diag 'B locrian';
 

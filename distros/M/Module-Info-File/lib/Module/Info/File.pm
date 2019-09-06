@@ -9,7 +9,7 @@ use vars qw($VERSION);
 use Module::Metadata;
 use Try::Tiny; # try catch
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 sub new_from_file {
     my ( $proto, $filepath ) = @_;
@@ -54,13 +54,8 @@ sub version {
     }
     else {
         try {
-            my $version = $self->SUPER::version();
+            return $self->SUPER::version();
 
-            if ($version) {
-                return $version;
-            } else {
-                return undef;
-            }
         } catch {
             return undef;
         };
@@ -186,7 +181,7 @@ Module::Info::File will be obsolete and can be discontinued.
 
 =over 4
 
-=item * Module::Info, by Mattia Barbon
+=item * L<Module::Info>, by Mattia Barbon
 
 =item * F<script/version.pl>
 
@@ -269,6 +264,10 @@ require this I would be willing to invest the time and effort.
 In no particular order
 
 =over 4
+
+=item *
+
+Mohammad S Anwar, for PRs #6
 
 =item *
 

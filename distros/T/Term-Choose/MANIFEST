@@ -5,6 +5,7 @@ lib/Term/Choose/LineFold.pm
 lib/Term/Choose/LineFold/CharWidthAmbiguousWide.pm
 lib/Term/Choose/LineFold/CharWidthDefault.pm
 lib/Term/Choose/Linux.pm
+lib/Term/Choose/Screen.pm
 lib/Term/Choose/ValidateOptions.pm
 lib/Term/Choose/Win32.pm
 LICENSE

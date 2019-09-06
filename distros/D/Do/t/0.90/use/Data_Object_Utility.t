@@ -20,6 +20,10 @@ Data-Object Utility Functions
   my $array = Data::Object::Utility::Deduce []; # Data::Object::Array
   my $value = Data::Object::Utility::Detract $array; # [,...]
 
+=libraries
+
+Data::Object::Library
+
 =description
 
 This package provides a suite of utility functions designed to be used

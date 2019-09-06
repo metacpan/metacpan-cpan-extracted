@@ -27,6 +27,15 @@ Data-Object Scalar Function (Ge) Class
 
 Data::Object::Scalar::Func
 
+=attributes
+
+arg1(Object, req, ro)
+arg2(Any, req, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Scalar::Func::Ge is a function object for Data::Object::Scalar.

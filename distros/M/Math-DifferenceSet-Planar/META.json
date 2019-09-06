@@ -52,25 +52,36 @@
    "provides" : {
       "Math::DifferenceSet::Planar" : {
          "file" : "lib/Math/DifferenceSet/Planar.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "Math::DifferenceSet::Planar::Data" : {
          "file" : "lib/Math/DifferenceSet/Planar/Data.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "Math::DifferenceSet::Planar::Schema" : {
          "file" : "lib/Math/DifferenceSet/Planar/Schema.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "Math::DifferenceSet::Planar::Schema::Result::DifferenceSet" : {
          "file" : "lib/Math/DifferenceSet/Planar/Schema/Result/DifferenceSet.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "https://vera.in-ulm.de/planar-diffsets/"
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Math-DifferenceSet-Planar"
+      },
+      "homepage" : "https://vera.in-ulm.de/planar-diffsets/",
+      "license" : [
+         "https://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mhasch/perl-Math-DifferenceSet-Planar.git",
+         "web" : "https://github.com/mhasch/perl-Math-DifferenceSet-Planar"
+      }
    },
-   "version" : "0.006",
+   "version" : "0.007",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

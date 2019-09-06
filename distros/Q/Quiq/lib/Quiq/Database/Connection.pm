@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.155';
+our $VERSION = '1.156';
 
 use Quiq::Sql;
 use Quiq::Object;
@@ -700,7 +700,8 @@ Table-Klasse keine Row-Klasse explizit angegeben wurde.
 # -----------------------------------------------------------------------------
 
 sub defaultRowClass {
-    return $_[1]? 'Quiq::Database::Row::Array': 'Quiq::Database::Row::Object';
+    return $_[1]? 'Quiq::Database::Row::Array':
+        'Quiq::Database::Row::Object';
 }
 
 # -----------------------------------------------------------------------------
@@ -4902,7 +4903,7 @@ Von Perl aus auf die Access-Datenbank zugreifen:
 
 =head1 VERSION
 
-1.155
+1.156
 
 =head1 AUTHOR
 

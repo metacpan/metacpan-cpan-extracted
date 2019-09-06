@@ -10,7 +10,7 @@ HTML::GoogleMaps::V3 - a simple wrapper around the Google Maps API
 
 =head1 VERSION
 
-0.14
+0.15
 
 =head1 SYNOPSIS
 
@@ -75,7 +75,7 @@ use warnings;
 
 use Template;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 sub new {
     my ( $class,%opts ) = @_;
@@ -288,7 +288,10 @@ sub _js_template {
 
 function html_googlemaps_initialize() {
 
-    myCenterLatLng = new google.maps.LatLng({lat: [% center.0 %], lng: [% center.1 %]});
+    [% # Github issue 22 %]
+    [% IF center %]
+	myCenterLatLng = new google.maps.LatLng({lat: [% center.0 %], lng: [% center.1 %]});
+    [% END %]
 
     // key map controls
     var map = new google.maps.Map(document.getElementById('[% id %]'), {

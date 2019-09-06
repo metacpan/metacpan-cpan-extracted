@@ -5,7 +5,7 @@ use 5.014;
 use strict;
 use warnings;
 
-our $VERSION = '1.50'; # VERSION
+our $VERSION = '1.60'; # VERSION
 
 # METHODS
 
@@ -77,6 +77,14 @@ Data-Object Base Class
 
 This package provides an abstract base class used for identity and
 classification of L<Data::Object> classes.
+
+=cut
+
+=head1 LIBRARIES
+
+This package uses type constraints defined by:
+
+L<Data::Object::Library>
 
 =cut
 
@@ -185,6 +193,14 @@ The type method returns object type string.
 
 =cut
 
+=head1 CREDITS
+
+Al Newkirk, C<awncorp@cpan.org>, C<+284>
+
+Anthony Brummett, C<abrummet@genome.wustl.edu>, C<+10>
+
+=cut
+
 =head1 AUTHOR
 
 Al Newkirk, C<awncorp@cpan.org>
@@ -198,26 +214,32 @@ terms as the Perl 5 programming language system itself.
 
 =head1 PROJECT
 
-L<On GitHub|https://github.com/iamalnewkirk/do>
+L<GitHub|https://github.com/iamalnewkirk/do>
 
-L<Initiatives|https://github.com/iamalnewkirk/do/projects>
+L<Projects|https://github.com/iamalnewkirk/do/projects>
+
+L<Milestones|https://github.com/iamalnewkirk/do/milestones>
 
 L<Contributing|https://github.com/iamalnewkirk/do/blob/master/CONTRIBUTE.mkdn>
 
-L<Reporting|https://github.com/iamalnewkirk/do/issues>
+L<Issues|https://github.com/iamalnewkirk/do/issues>
 
 =head1 SEE ALSO
 
 To get the most out of this distribution, consider reading the following:
 
+L<Do>
+
+L<Data::Object>
+
 L<Data::Object::Class>
+
+L<Data::Object::ClassHas>
 
 L<Data::Object::Role>
 
-L<Data::Object::Rule>
+L<Data::Object::RoleHas>
 
 L<Data::Object::Library>
-
-L<Data::Object::Signatures>
 
 =cut

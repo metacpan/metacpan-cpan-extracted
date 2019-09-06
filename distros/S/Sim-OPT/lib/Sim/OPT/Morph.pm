@@ -1,5 +1,5 @@
 package Sim::OPT::Morph;
-# Copyright (C) 2008-2015 by Gian Luca Brunetti and Politecnico di Milano.
+# Copyright (C) 2008-2019 by Gian Luca Brunetti and Politecnico di Milano.
 # This is the module Sim::OPT::Morph of Sim::OPT.
 # This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
@@ -58,18 +58,19 @@ decreasearray deg2rad_ rad2deg_ purifyarray replace_nth rotate2dabs rotate2d rot
 gatherseparators supercleanarray modish $max_processes
 ); # our @EXPORT = qw( );
 
-$VERSION = '0.111'; # our $VERSION = '';
+$VERSION = '0.113'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Morph is a morphing program for performing parametric variations on model for simulation programs.';
 
 ################################################# MORPH
 
 sub morph
 {
-	my ( $configfile, $instances_r, $dirfiles_r, $dowhat_r ) = @_;
+	my ( $configfile, $instances_r, $dirfiles_r, $dowhat_r, $vehicles_r ) = @_;
 
 	my @instances = @{ $instances_r };
 	my %dirfiles = %{ $dirfiles_r };
 	my %dowhat = %{ $dowhat_r };
+	my %vehicles = %{ $vehicles_r };
 
 	my $mypath = $main::mypath;
 	my $exeonfiles = $main::exeonfiles;
@@ -310,7 +311,7 @@ sub morph
 		my ( %these );
 		if ( ( $dirfiles{randompick} eq "yes" ) or ( $dirfiles{ga} eq "yes" ) )
 		{
-			my $string = $instance->{is}; say "STRING: $string";
+			my $string = $instance->{is}; #say "STRING: $string";
 			my @els = split( "_", $string );
 
 			foreach my $el ( @els )

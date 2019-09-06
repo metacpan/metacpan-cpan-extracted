@@ -6,18 +6,19 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.155';
+our $VERSION = '1.156';
 
 use Quiq::Database::Row::Array;
 use Quiq::Shell;
+use Quiq::AnsiColor;
 use Quiq::Path;
 use Quiq::Terminal;
 use Quiq::CommandLine;
+use Quiq::TempDir;
 use Quiq::Array;
 use Quiq::Stopwatch;
 use Quiq::TempFile;
 use Quiq::Unindent;
-use Quiq::AnsiColor;
 use Quiq::Database::Connection;
 use Quiq::Database::ResultSet::Array;
 
@@ -186,6 +187,131 @@ sub new {
     $self->set(sh=>$sh);
 
     return $self;
+}
+
+# -----------------------------------------------------------------------------
+
+=head2 Datei bearbeiten
+
+=head3 abstract() - Übersicht über Inhalt von Packages
+
+=head4 Synopsis
+
+    $abstract = $scm->abstract($regex);
+
+=head4 Arguments
+
+=over 4
+
+=item $regex
+
+Regex, der die Packages matcht, deren Inhalt angezeigt werden soll
+
+=back
+
+=head4 Returns
+
+Übersicht (String)
+
+=head4 Description
+
+Erzeuge eine Übersicht über die Packages, deren Name den Regex $regex
+matcht, und ihren Inhalt.
+
+=head4 Example
+
+    $ ruv-dss-repo abstract Seitz_X
+    S6800_0_Seitz_X_Deployment TTEST
+        tools/post_deployment/deploy_ddl.pl 34
+        tools/post_deployment/deploy_udf.pl 28
+    
+    S6800_0_Seitz_X_Deployment_Test TTEST
+        ddl/table/test_table.sql 4
+        ddl/udf/lib/test_function.sql 1
+    
+    S6800_0_Seitz_X_Fahrstuhl_1 Entwicklung
+    
+    S6800_0_Seitz_X_Fahrstuhl_2 Entwicklung
+    
+    S6800_0_Seitz_X_MetaData TTEST
+        ddl/udf/lib/rv_create_dbobject_ddl.sql 5
+        lib/zenmod/DSS/MetaData.pm 14
+    
+    S6800_0_Seitz_X_Portierte_Programme Entwicklung
+        bin/stichtag.pl 1
+        bin/verd_prd_zuord_dim.pl 24
+        bin/vertr_kms_progn_hist.pl 4
+        lib/zenmod/Sparhist.pm 37
+        tab_clone.pl 4
+        tools/wasMussIchTesten.pl 1
+    
+    S6800_0_Seitz_X_Portierte_Tabellen TTEST
+        ddl/table/q12b067.sql 0
+        ddl/table/q98b3s33.sql 0
+        ddl/table/sf_ga_liste_online_renta.sql 1
+        ddl/table/sf_kredu_meldw_dz_zlms_vol_wkv.sql 6
+        ddl/table/sf_vden_agt_liste.sql 1
+    
+    S6800_0_Seitz_X_Session TTEST
+        ddl/udf/lib/rv_stage.sql 2
+        lib/zenmod/DSS/Session.pm 2
+    
+    S6800_0_Seitz_X_ZenMods TTEST
+        lib/zenmod/DSSDB/Greenplum.pm 108
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub abstract {
+    my ($self,$regex) = @_;
+
+    my $a = Quiq::AnsiColor->new(-t STDOUT);
+
+    # Packages und ihre Stage bestimmen
+
+    my %package;
+    for my $row ($self->listPackages->rows) {
+        my ($package,$state) = @$row;
+        if ($package =~ qr/$regex/) {
+            $package{$package} = [$state,{}];
+        }
+    }
+
+    # Items der Packages
+
+    my %item;
+    for my $row ($self->showPackage(keys %package)) {
+        my $package = $row->[5];
+        my $item = $row->[1];
+        my $version = $row->[3];
+
+        my $maxVersion = $package{$package}[1]{$item} //= -1;
+        if ($version > $maxVersion) {
+            $package{$package}[1]{$item} = $version;
+        }
+    }    
+
+    my $str = '';
+    my $i = 0;
+    for my $package (sort keys %package) {
+        my ($state,$itemH) = @{$package{$package}};
+
+        if ($i++) {
+            $str .= "\n";
+        }
+
+        $str .= sprintf "%s %s\n",
+            $a->str('red',$package),
+            $a->str('green',$state);
+
+        for my $item (sort keys %$itemH) {
+            $str .= sprintf "    %s %s\n",$item,
+                $a->str('green',$itemH->{$item});
+        }
+    }
+
+    return $str;
 }
 
 # -----------------------------------------------------------------------------
@@ -731,6 +857,164 @@ sub versionInfo {
 
 # -----------------------------------------------------------------------------
 
+=head3 getVersion() - Speichere Version einer Datei
+
+=head4 Synopsis
+
+    $file = $scm->getVersion($repoFile,$version,$destDir);
+
+=head4 Arguments
+
+=over 4
+
+=item $repoFile
+
+Repository-Datei, die gespeichert werden soll.
+
+=item $version
+
+Version der Repository-Datei.
+
+=item $destDir
+
+Zielverzeichnis, in dem die Repository-Datei gespeichert wird.
+
+=back
+
+=head4 Options
+
+=over 4
+
+=item -sloppy => $bool (Default: 0)
+
+Prüfe nicht, ob die angegebene Version existiert. Dies spart
+einen CASCM Aufruf und ist sinnvoll, wenn die Richtigkeit der
+Versionsnummer gesichert ist, siehe deleteToVersion().
+
+=back
+
+=head4 Returns
+
+Pfad der Datei (String)
+
+=head4 Description
+
+Speichere die Repository-Datei $repoFile der Version $version in
+Verzeichnis $destDir und liefere den Pfad der Datei zurück.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub getVersion {
+    my $self = shift;
+
+    # Optionen und Argumente
+
+    my $sloppy = 0;
+
+    my $argA = $self->parameters(3,3,\@_,
+        -sloppy => \$sloppy,
+    );
+    my ($repoFile,$version,$destDir) = @$argA;
+
+    # Operation ausführen
+
+    if (!$sloppy) {
+        my $repoVersion = $self->versionNumber($repoFile);
+        if ($version > $repoVersion) {
+            $self->throw(
+                'CASCM-00099: Version does not exist',
+                Version => $version,
+                RepoFile => $repoFile,
+            );
+        }
+    }
+
+    my $p = Quiq::Path->new;
+    my $tempDir = $p->tempDir;
+
+    my $c = Quiq::CommandLine->new;
+    $c->addArgument($repoFile);
+    $c->addOption(
+        $self->credentialsOptions,
+        -b => $self->broker,
+        -en => $self->projectContext,
+        -st => $self->states->[0],
+        -vp => $self->viewPath,
+        -cp => $tempDir,
+        -vn => $version,
+    );
+    $c->addBoolOption(
+        -br => 1,
+        -r => 1,
+    );
+    my $output = $self->runCmd('hco',$c);
+
+    my $srcFile = "$tempDir/$repoFile";
+    my $destFile = sprintf '%s/%s.%s',$destDir,$p->filename($repoFile),
+        $version;
+    $p->copy($srcFile,$destFile);
+
+    return $destFile;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 diff() - Differenz zwischen zwei Versionen
+
+=head4 Synopsis
+
+    $diff = $scm->diff($repoFile,$version1,$version2);
+
+=head4 Arguments
+
+=over 4
+
+=item $repoFile
+
+Repository-Datei, deren Versionen verglichen werden.
+
+=item $version1
+
+Erste zu vergleichende Version der Repository-Datei.
+
+=item $version2
+
+Zweite zu vergleichende Version der Repository-Datei.
+
+=back
+
+=head4 Returns
+
+Differenz (String)
+
+=head4 Description
+
+Ermittele die Differenz zwischen den beiden Versionen $version1 und
+$version2 der Repository-Datei $repoFile und liefere das Ergebnis
+zurück.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub diff {
+    my ($self,$repoFile,$version1,$version2) = @_;
+
+    my $tempDir = Quiq::TempDir->new;
+
+    my $file1 = $self->getVersion($repoFile,$version1,$tempDir);
+    my $file2 = $self->getVersion($repoFile,$version2,$tempDir);
+
+    return Quiq::Shell->exec("diff $file1 $file2",
+        -capture => 'stdout',
+        -sloppy => 1,
+    );
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 deleteVersion() - Lösche höchste Version von Repository-Datei
 
 =head4 Synopsis
@@ -782,6 +1066,65 @@ sub deleteVersion {
 
 # -----------------------------------------------------------------------------
 
+=head3 deleteToVersion() - Lösche alle Versionen oberhalb einer Version
+
+=head4 Synopsis
+
+    $scm->deleteToVersion($repoFile,$version,$backupDir);
+
+=head4 Arguments
+
+=over 4
+
+=item $repoFile
+
+Der Pfad der zu löschenden Repository-Datei.
+
+=item $version
+
+Version, oberhalb welcher alle anderen Versionen gelöscht werden,
+d.h. diese Version I<bleibt stehen>.
+
+=item $backupDir
+
+Verzeichnis, in das alle gelöschten Versionen gesichert werden.
+
+=back
+
+=head4 Description
+
+Lösche alle Versionen der Repository-Datei $repoFile oberhalb der
+Version $version. Dies setzt voraus, dass alle diese Versionen in einem
+(oder mehreren) Paketen auf I<Entwicklung> enthalten sind. Jede gelöschte
+Version wird in Verzeichnis $backupDir gesichert.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub deleteToVersion {
+    my ($self,$repoFile,$version,$backupDir) = @_;
+
+    my $repoVersion = $self->versionNumber($repoFile);
+    if ($version >= $repoVersion) {
+        $self->throw(
+            'CASCM-00099: Delete-To-Version must be less than repository version',
+            Version => $version,
+            RepoVersion => $repoVersion,
+            RepoFile => $repoFile,
+        );
+    }
+
+    for (my $v = $repoVersion; $v > $version; $v--) {
+        $self->getVersion($repoFile,$v,$backupDir,-sloppy=>1);
+        $self->deleteVersion($repoFile);
+    }
+
+    return;
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 deleteAllVersions() - Lösche alle Versionen einer Repository-Datei
 
 =head4 Synopsis
@@ -827,7 +1170,6 @@ sub deleteAllVersions {
             'CASCM-00099: Backup directory does not exist',
             BackupDir => $backupDir,
         );
-        
     }
 
     my $output;
@@ -1110,19 +1452,19 @@ sub createPackage {
 
 # -----------------------------------------------------------------------------
 
-=head3 deletePackage() - Lösche Package
+=head3 deletePackages() - Lösche Package
 
 =head4 Synopsis
 
-    $output = $scm->deletePackage($package);
+    $output = $scm->deletePackages(@packages);
 
 =head4 Arguments
 
 =over 4
 
-=item $packge
+=item @package
 
-Name des Package, das gelöscht werden soll.
+Namen der Packages, die gelöscht werden sollwn.
 
 =back
 
@@ -1132,29 +1474,36 @@ Ausgabe des Kommandos (String)
 
 =head4 Description
 
-Lösche Package $package und liefere die Ausgabe des Kommandos zurück.
+Lösche die Packages @packages und liefere die Ausgabe der
+Kommandos zurück.
 
 =cut
 
 # -----------------------------------------------------------------------------
 
-sub deletePackage {
-    my ($self,$package) = @_;
+sub deletePackages {
+    my ($self,@packages) = @_;
 
-    # Anmerkung: Das Kommando hdlp kann auch mehrere Packages auf
-    # einmal löschen. Es ist jedoch nicht gut, es so zu
-    # nutzen, da dann nicht-existente Packages nicht bemängelt
-    # werden, wenn mindestens ein Package existiert.
+    my $output = '';
+    for my $package (@packages) {
+        # Anmerkung: Das Kommando hdlp kann auch mehrere Packages auf
+        # einmal löschen. Es ist jedoch nicht gut, es so zu
+        # nutzen, da dann nicht-existente Packages nicht bemängelt
+        # werden, wenn mindestens ein Package existiert. Daher löschen
+        # wir hier jedes Paket einzeln.
 
-    my $c = Quiq::CommandLine->new;
-    $c->addOption(
-        $self->credentialsOptions,
-        -b => $self->broker,
-        -en => $self->projectContext,
-        -pkgs => $package,
-    );
+        my $c = Quiq::CommandLine->new;
+        $c->addOption(
+            $self->credentialsOptions,
+            -b => $self->broker,
+            -en => $self->projectContext,
+            -pkgs => $package,
+        );
 
-    return $self->runCmd('hdlp',$c);
+        $output .= $self->runCmd('hdlp',$c);
+    }
+
+    return $output;
 }
 
 # -----------------------------------------------------------------------------
@@ -1213,11 +1562,12 @@ sub renamePackage {
 
 =head4 Synopsis
 
-    $tab = $scm->showPackage($package);
+    @rows | $tab = $scm->showPackage($package);
 
 =head4 Returns
 
-Ergebnismengen-Objekt (Quiq::Database::ResultSet::Array)
+Datensätze oder Ergebnismengen-Objekt
+(Quiq::Database::ResultSet::Array)
 
 =head4 Description
 
@@ -1288,10 +1638,11 @@ und liefere diese Ergebnismenge zurück.
 # -----------------------------------------------------------------------------
 
 sub showPackage {
-    my ($self,$package) = @_;
+    my ($self,@packages) = @_;
 
     my $projectContext = $self->projectContext;
     my $viewPath = $self->viewPath;
+    my $packages = join ', ',map {"'$_'"} @packages;
 
     my $tab = $self->runSql("
         SELECT DISTINCT -- Warum ist hier DISTINCT nötig?
@@ -1300,6 +1651,7 @@ sub showPackage {
             , itm.itemtype AS item_type
             , ver.mappedversion AS version
             , ver.versiondataobjid
+            , pkg.packagename
         FROM
             haritems itm
             JOIN harversions ver
@@ -1316,7 +1668,7 @@ sub showPackage {
                 ON rep.repositobjid = itm.repositobjid
         WHERE
             env.environmentname = '$projectContext'
-            AND pkg.packagename = '$package'
+            AND pkg.packagename IN ($packages)
         START WITH
             itm.itemname = '$viewPath'
             AND itm.repositobjid = rep.repositobjid
@@ -1334,7 +1686,7 @@ sub showPackage {
         $row->[1] =~ s|^/\Q$viewPath\E/||;
     }
 
-    return $tab;
+    return wantarray? $tab->rows: $tab;
 }
 
 # -----------------------------------------------------------------------------
@@ -1381,6 +1733,13 @@ Ausgabe des Kommandos (String)
 
 sub switchPackage {
     my ($self,$stage,$fromPackage,$toPackage,@files) = @_;
+
+    # Pfade müssen wir auf den Dateinamen reduzieren
+
+    my $p = Quiq::Path->new;
+    @files = map {$p->filename($_)} @files;
+
+    # CASCM-Operation ausführen
 
     my $c = Quiq::CommandLine->new;
     $c->addOption(
@@ -2027,7 +2386,7 @@ sub runSql {
 
 =head1 VERSION
 
-1.155
+1.156
 
 =head1 AUTHOR
 

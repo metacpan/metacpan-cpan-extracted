@@ -31,7 +31,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Music-ToRoman
   repository: https://github.com/ology/Music-ToRoman.git
-version: '0.1200'
+version: '0.1600'
 x_Dist_Zilla:
   perl:
     version: '5.027007'
@@ -212,6 +212,7 @@ x_Dist_Zilla:
             - lib
           spell_cmd: 'aspell list'
           stopwords:
+            - DBOOK
             - chordless
           wordlist: Pod::Wordlist
       name: Test::PodSpelling

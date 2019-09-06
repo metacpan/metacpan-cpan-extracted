@@ -21,6 +21,10 @@ Data-Object Catchable Role
 
   with 'Data::Object::Role::Catchable';
 
+=libraries
+
+Data::Object::Library
+
 =description
 
 This role provides functionality for catching thrown exceptions.

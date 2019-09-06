@@ -17,6 +17,10 @@ Data-Object String Class Autoboxing
 
   use Data::Object::String::Autobox;
 
+=libraries
+
+Data::Object::Library
+
 =description
 
 This package implements autoboxing via L<Data::Object::Autobox> for

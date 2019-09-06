@@ -27,6 +27,10 @@ Data-Object Singleton Declaration
 
 Data::Object::Class
 
+=libraries
+
+Data::Object::Library
+
 =description
 
 This package modifies the consuming package making it a singleton.

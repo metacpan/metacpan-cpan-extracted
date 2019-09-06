@@ -12,7 +12,7 @@ use vars::i [
 ];
 use vars::i '%EXPORT_TAGS' => { all => [@EXPORT, @EXPORT_OK] };
 
-our $VERSION = '0.000004'; # TRIAL
+our $VERSION = '0.000005'; # TRIAL
 
 
 # Documentation {{{1

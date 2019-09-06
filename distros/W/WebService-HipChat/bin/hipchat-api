@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 #
 # Simple command line interface to WebService::HipChat.
 # All output is just printed using Data::Printer.
@@ -309,7 +309,7 @@ hipchat-api
 
 =head1 VERSION
 
-version 0.2000
+version 0.2001
 
 =head1 SYNOPSIS
 

@@ -27,6 +27,15 @@ Data-Object Hash Function (Merge) Class
 
 Data::Object::Hash::Func
 
+=attributes
+
+arg1(Object, req, ro)
+args(ArrayRef[Any], opt, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Hash::Func::Merge is a function object for Data::Object::Hash.

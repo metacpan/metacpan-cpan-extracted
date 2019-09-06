@@ -1,17 +1,28 @@
 Revision history for Perl extension DBD::Mock.
 
+1.47 2019-09-06T10:03:39Z
+    - Applied Max Carey's patch from rt86294 adding support for
+      nested keys to fetchall_hashref
+    - Added experimental Connection Callbacks feature
+    - Fixed build for Perl v5.8
+
 1.46 2019-09-04T12:02:08Z
     - Added git-repo url to meta-data
     - Fixed bug rt70587 Spelling Mistake
     - Added regex support to mock_add_resultset
 
-1.43
+1.45 October 22, 2012
+    - Extended DBD::Mock::Session functionality
+    - Added bind_param_array() to mocked statements
+    - Added execute_array() to mocked statements
+
+1.43 August 29, 2011
     - Segregated into different packages
     - Removed code coverage from POD
     - Fixed bug rt49537 Basic support for named parameters
     - Fixed bug rt70421 Build.PL now contains Test::Exception
 
-1.42
+1.42 August 7, 2011
     - Fixed bug rt66815 DBD::Mock::Session error clobbered
     - Fixed bug rt69460 Info on META.yml is outdated
     - Fixed bug rt69055 Spelling mistakes in POD

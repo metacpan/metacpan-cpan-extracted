@@ -1,6 +1,6 @@
 #! /usr/bin/env perl
 
-use 5.014;
+use 5.012;
 use warnings;
 use experimentals;
 
@@ -45,6 +45,8 @@ TODO: {
 
     ok foo() =~ tr/A-Z/a-z/;
     ok foo() =~  y/A-Z/a-z/;
+
+    ok foo() =~  m/what $foo ever$/;
 }
 
 done_testing();

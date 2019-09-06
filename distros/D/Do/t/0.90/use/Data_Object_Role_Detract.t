@@ -19,6 +19,10 @@ Data-Object Detract Role
 
   with 'Data::Object::Role::Detract';
 
+=libraries
+
+Data::Object::Library
+
 =description
 
 This role provides functionality for accessing the underlying data type and

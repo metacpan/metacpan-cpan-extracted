@@ -30,6 +30,10 @@ Data::Object::Role::Dumper
 Data::Object::Role::Functable
 Data::Object::Role::Throwable
 
+=libraries
+
+Data::Object::Library
+
 =description
 
 This package provides routines for operating on Perl 5 code references.

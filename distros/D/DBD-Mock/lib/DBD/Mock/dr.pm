@@ -5,6 +5,9 @@ use warnings;
 
 our $imp_data_size = 0;
 
+my @connect_callbacks;
+
+
 sub connect {
     my ( $drh, $dbname, $user, $auth, $attributes ) = @_;
     if ( $drh->{'mock_connect_fail'} == 1 ) {
@@ -37,6 +40,10 @@ sub connect {
 
     my $dbh = DBI::_new_dbh( $drh, { Name => $dbname } )
       || return;
+
+    foreach my $callback (@connect_callbacks) {
+        $callback->( $dbh, $dbname, $user, $auth, $attributes );
+    }
 
     return $dbh;
 }
@@ -101,5 +108,13 @@ sub disconnect_all {
 }
 
 sub DESTROY { undef }
+
+sub set_connect_callbacks {
+    @connect_callbacks = map { die "connect callbacks needs to be a reference to a function " unless ref $_ eq "CODE"; $_ } @_;
+}
+
+sub add_connect_callbacks {
+    push @connect_callbacks, map { die "connect callbacks needs to be a reference to a function " unless ref $_ eq "CODE"; $_ } @_;
+}
 
 1;

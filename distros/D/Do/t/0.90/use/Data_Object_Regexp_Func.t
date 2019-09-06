@@ -21,6 +21,10 @@ Functions for RegexpRefs
 
 Data::Object::Func
 
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Regexp::Func is an abstract base class for function classes in

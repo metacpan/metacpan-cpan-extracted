@@ -342,6 +342,12 @@ INSTALLATION
     you manage multiple Perl installations in your $HOME directory. They
     are completely isolated Perl installations.
 
+CREDITS
+
+    Al Newkirk, awncorp@cpan.org, +284
+
+    Anthony Brummett, abrummet@genome.wustl.edu, +10
+
 AUTHOR
 
     Al Newkirk, awncorp@cpan.org
@@ -355,27 +361,33 @@ LICENSE
 
 PROJECT
 
-    On GitHub <https://github.com/iamalnewkirk/do>
+    GitHub <https://github.com/iamalnewkirk/do>
 
-    Initiatives <https://github.com/iamalnewkirk/do/projects>
+    Projects <https://github.com/iamalnewkirk/do/projects>
+
+    Milestones <https://github.com/iamalnewkirk/do/milestones>
 
     Contributing
     <https://github.com/iamalnewkirk/do/blob/master/CONTRIBUTE.mkdn>
 
-    Reporting <https://github.com/iamalnewkirk/do/issues>
+    Issues <https://github.com/iamalnewkirk/do/issues>
 
 SEE ALSO
 
     To get the most out of this distribution, consider reading the
     following:
 
+    Do
+
+    Data::Object
+
     Data::Object::Class
+
+    Data::Object::ClassHas
 
     Data::Object::Role
 
-    Data::Object::Rule
+    Data::Object::RoleHas
 
     Data::Object::Library
-
-    Data::Object::Signatures
 

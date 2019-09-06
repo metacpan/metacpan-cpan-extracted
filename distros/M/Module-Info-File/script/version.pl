@@ -110,7 +110,7 @@ modules and script, targetting especially the version information.
 
 =head1 DESCRIPTION
 
-The script takes either a module name (SEE SYNOPSIS), a path to a
+The script takes either a module name (SEE L</SYNOPSIS>), a path to a
 Perl module, script file or a directory.
 
 The script looks for a B<package> definition and a version variable.
@@ -157,9 +157,9 @@ UNIX : System_administration
 
 =over 4
 
-=item L<Module::Info::File 0.07>
+=item L<Module::Info::File> 0.07
 
-=item L<Module::Info 0.20>
+=item L<Module::Info> 0.20
 
 =item L<File::Basename>
 

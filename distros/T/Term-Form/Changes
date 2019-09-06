@@ -1,6 +1,9 @@
 Revision history for Term::Form
 
 
+0.520   2019-09-05
+        - Adapt the code to the updated Term::Choose.
+
 0.519   2019-08-18
         - Fixed EXPORT_OK.
 

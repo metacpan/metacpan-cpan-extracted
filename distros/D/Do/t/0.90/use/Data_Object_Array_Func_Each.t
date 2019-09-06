@@ -27,6 +27,16 @@ Data-Object Array Function (Each) Class
 
 Data::Object::Array::Func
 
+=attributes
+
+arg1(Object, req, ro)
+arg2(Str | CodeRef, req, ro)
+args(ArrayRef[Any], opt, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Array::Func::Each is a function object for Data::Object::Array.

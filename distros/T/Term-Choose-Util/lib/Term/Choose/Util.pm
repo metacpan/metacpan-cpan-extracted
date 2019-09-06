@@ -4,10 +4,10 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.075';
+our $VERSION = '0.076';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_dir choose_a_file choose_dirs choose_a_number choose_a_subset settings_menu
-                     insert_sep term_size term_width unicode_sprintf );
+                     insert_sep get_term_size get_term_width unicode_sprintf );
 
 use Cwd                   qw( realpath );
 use Encode                qw( decode encode );
@@ -21,15 +21,6 @@ use File::HomeDir  qw();
 use Term::Choose           qw( choose );
 use Term::Choose::LineFold qw( line_fold cut_to_printwidth print_columns );
 
-
-BEGIN { # __get_term_size
-    if ( $^O eq 'MSWin32' ) {
-        require Term::Choose::Win32;
-    }
-    else {
-        require Term::Choose::Linux;
-    }
-}
 
 sub choose_dirs {
     my ( $opt ) = @_;
@@ -77,7 +68,7 @@ sub choose_dirs {
         my $choice = choose(
             [ @pre, sort( @dirs ) ],
             { prompt => $lines, info => $o->{info}, undef => $o->{back}, default => $default_idx, mouse => $o->{mouse},
-              lf => [ 0, length $o->{name} ], justify => $o->{justify}, layout => $o->{layout}, order => $o->{order},
+              lf => [ 0, length $o->{name} ], alignment => $o->{alignment}, layout => $o->{layout}, order => $o->{order},
               clear_screen => $o->{clear_screen}, hide_cursor => $o->{hide_cursor} }
         );
         if ( ! defined $choice ) {
@@ -136,7 +127,7 @@ sub _prepare_opt_choose_path {
         mouse        => 0,
         layout       => 1,
         order        => 1,
-        justify      => 0,
+        alignment    => 0,
         hide_cursor  => 1,
         enchanted    => 1,
         confirm      => ' OK ',
@@ -216,7 +207,7 @@ sub _choose_a_path {
         my $choice = choose(
             [ @pre, sort( @dirs ) ],
             { prompt => $lines, info => $o->{info}, undef => $o->{back}, default => $default_idx,
-              mouse => $o->{mouse}, hide_cursor => $o->{hide_cursor}, justify => $o->{justify},
+              mouse => $o->{mouse}, hide_cursor => $o->{hide_cursor}, alignment => $o->{alignment},
               layout => $o->{layout}, order => $o->{order}, clear_screen => $o->{clear_screen} }
         );
         if ( ! defined $choice ) {
@@ -295,7 +286,7 @@ sub _a_file {
         # Choose
         my $choice = choose(
             [ @pre, sort( @files ) ],
-            { prompt => $lines, info => $o->{info}, undef => $o->{back}, mouse => $o->{mouse}, justify => $o->{justify},
+            { prompt => $lines, info => $o->{info}, undef => $o->{back}, mouse => $o->{mouse}, alignment => $o->{alignment},
               layout => $o->{layout}, order => $o->{order}, clear_screen => $o->{clear_screen}, hide_cursor => $o->{hide_cursor} }
         );
         if ( ! length $choice ) {
@@ -347,7 +338,7 @@ sub choose_a_number {
     }
     my $confirm_tmp = sprintf "%-*s", $longest * 2 + $len_tab, $confirm;
     my $back_tmp    = sprintf "%-*s", $longest * 2 + $len_tab, $back;
-    if ( print_columns( "$choices_range[0]" ) > term_width() ) {
+    if ( print_columns( "$choices_range[0]" ) > get_term_width() ) {
         @choices_range = ();
         for my $di ( 0 .. $digits - 1 ) {
             my $begin = 1 . '0' x $di;
@@ -368,7 +359,7 @@ sub choose_a_number {
 
         my $new_result = length $result ? $result : '';
         my $row = sprintf(  "${name}%*s", $longest, $new_result );
-        if ( print_columns( $row ) > term_width() ) {
+        if ( print_columns( $row ) > get_term_width() ) {
             $row = $new_result;
         }
         my @tmp = ( $row );
@@ -380,7 +371,7 @@ sub choose_a_number {
         # Choose
         my $range = choose(
             $small ? [ @pre, reverse @choices_range ] : [ @pre, @choices_range ],
-            { prompt => $lines, info => $info, layout => 3, justify => 1, mouse => $mouse,
+            { prompt => $lines, info => $info, layout => 3, alignment => 1, mouse => $mouse,
               clear_screen => $clear, undef => $back_tmp, hide_cursor => $hide_cursor }
         );
         if ( ! defined $range ) {
@@ -412,7 +403,7 @@ sub choose_a_number {
         # Choose
         my $number = choose(
             [ undef, @choices, $reset ],
-            { prompt => $lines, layout => 1, justify => 2, order => 0, hide_cursor => $hide_cursor,
+            { prompt => $lines, layout => 1, alignment => 2, order => 0, hide_cursor => $hide_cursor,
               mouse => $mouse, clear_screen => $clear, undef => $back_short }
         );
         next if ! defined $number;
@@ -445,7 +436,7 @@ sub choose_a_subset {
     my $layout      = defined $opt->{layout}          ? $opt->{layout}          : 3;
     my $order       = defined $opt->{order}           ? $opt->{order}           : 1;
     my $prefix      = defined $opt->{prefix}          ? $opt->{prefix}          : ( $layout == 3 ? '  ' : '' );
-    my $justify     = defined $opt->{justify}         ? $opt->{justify}         : 0;
+    my $alignment   = defined $opt->{alignment}       ? $opt->{alignment}       : 0;
     my $confirm     = defined $opt->{confirm}         ? $opt->{confirm}         : ( ' ' x length $prefix ) . '-OK-';
     my $back        = defined $opt->{back}            ? $opt->{back}            : ( ' ' x length $prefix ) . ' << ';
     my $hide_cursor = defined $opt->{hide_cursor}     ? $opt->{hide_cursor}     : 1;
@@ -483,7 +474,7 @@ sub choose_a_subset {
         my @idx = choose(
             [ @pre, map { $prefix . ( defined $_ ? $_ : '' ) } @$curr_avail ],
             { prompt => $lines, info => $info, layout => $layout, mouse => $mouse, clear_screen => $clear,
-              justify => $justify, index => 1, lf => [ 0, 2 ], order => $order, meta_items => [ 0 .. $#pre ],
+              alignment => $alignment, index => 1, lf => [ 0, 2 ], order => $order, meta_items => [ 0 .. $#pre ],
               undef => $back, hide_cursor => $hide_cursor, mark => $mark, include_highlighted => 2 }
         );
         $mark = undef;
@@ -558,7 +549,7 @@ sub settings_menu {
         # Choose
         my $idx = choose(
             [ @pre, @print_keys ],
-            { prompt => $prompt, info => $info, index => 1, default => $default, layout => 3, justify => 0,
+            { prompt => $prompt, info => $info, index => 1, default => $default, layout => 3, alignment => 0,
               mouse => $mouse, clear_screen => $clear, undef => $back, hide_cursor => $hide_cursor }
         );
         if ( ! $idx ) {
@@ -618,17 +609,16 @@ sub insert_sep {
 }
 
 
-sub term_size {
-    #my ( $handle_out ) = defined $_[0] ? $_[0] : \*STDOUT;
-    if ( $^O eq 'MSWin32' ) {
-        return Term::Choose::Win32->__get_term_size();
-    }
-    return Term::Choose::Linux->__get_term_size();
+sub get_term_size {
+    require Term::Choose::Screen;
+    return Term::Choose::Screen::get_term_size();
 }
 
 
-sub term_width {
-    return( ( term_size( $_[0] ) )[0] );
+sub get_term_width {
+    require Term::Choose::Screen;
+    my $term_width = ( Term::Choose::Screen::get_term_size() )[0];
+    return $term_width;
 }
 
 
@@ -669,7 +659,7 @@ Term::Choose::Util - CLI related functions.
 
 =head1 VERSION
 
-Version 0.075
+Version 0.076
 
 =cut
 
@@ -766,6 +756,14 @@ As an argument it can be passed a reference to a hash. With this hash the user c
 
 =item
 
+alignment
+
+Elements in columns are left justified if set to 0, right justified if set to 1 and centered if set to 2.
+
+Values: [0],1,2.
+
+=item
+
 decoded
 
 If enabled, the directory name is returned decoded with C<locale_fs> form L<Encode::Locale>.
@@ -794,9 +792,7 @@ Values: 0,[1].
 
 justify
 
-Elements in columns are left justified if set to 0, right justified if set to 1 and centered if set to 2.
-
-Values: [0],1,2.
+Deprecated. Use I<alignment> instead.
 
 =item
 
@@ -914,6 +910,14 @@ The optional second argument is a hash reference. The following options are avai
 
 =item
 
+alignment
+
+Elements in columns are left justified if set to 0, right justified if set to 1 and centered if set to 2.
+
+Values: [0],1,2.
+
+=item
+
 index
 
 If true, the index positions in the available list of the made choices is returned.
@@ -922,9 +926,7 @@ If true, the index positions in the available list of the made choices is return
 
 justify
 
-Elements in columns are left justified if set to 0, right justified if set to 1 and centered if set to 2.
-
-Values: [0],1,2.
+Deprecated. Use I<alignment> instead.
 
 =item
 

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.155';
+our $VERSION = '1.156';
 
 # -----------------------------------------------------------------------------
 
@@ -29,10 +29,10 @@ L<Quiq::Hash>
     # Namen der bekannten Datensysteme
     my @names = Quiq::Dbms->dbmsNames;
     
-    # Boolsche Werte für Tests
+    # Boolsche Variable für Tests
     ($oracle,$postgresql,$sqlite,$mysql,$access,$mssql) = $d->dbmsVector;
     
-    # Testmethoden
+    # Test-Methoden
     
     $bool = $d->isOracle;
     $bool = $d->isPostgreSQL;
@@ -105,15 +105,9 @@ DBMSe siehe $class->L<dbmsNames|"dbmsNames() - Liste der Namen der unterstützte
 sub new {
     my ($class,$dbms,$version) = @_;
 
-    # DBMS-Name case-insensitiv suchen
+    # DBMS-Namen case insensitive suchen
 
-    my $dbmsName;
-    for ($class->dbmsNames) {
-        if (lc($dbms) eq lc($_)) {
-            $dbmsName = $_;
-            last;
-        }
-    }
+    my ($dbmsName) = grep {lc($dbms) eq lc($_)} $class->dbmsNames;
     if (!$dbmsName) {
         $class->throw(
             '-00001: Unknown DBMS',
@@ -155,7 +149,6 @@ Liefere folgende Liste von DBMS-Namen (in dieser Reihenfolge):
 my @DbmsNames = qw/Oracle PostgreSQL SQLite MySQL Access MSSQL/;
 
 sub dbmsNames {
-    my $this = shift;
     return wantarray? @DbmsNames: \@DbmsNames;
 }
 
@@ -171,9 +164,9 @@ sub dbmsNames {
 
 =head4 Description
 
-Liefere einen Vektor von boolschen Werten, von denen genau einer den
-Wert "wahr" besitzt, und zwar der, der dem DBMS entspricht,
-auf den das Objekt instantiiert ist.
+Liefere einen Vektor von boolschen Werten, von denen genau einer
+wahr ist, und zwar derjenige, der dem DBMS entspricht, auf den das
+Objekt instantiiert ist.
 
 Die Methode ist für Programmcode nützlich, der DBMS-spezifische
 Unterscheidungen macht. Der Code braucht dann lediglich auf den
@@ -192,7 +185,7 @@ durchzuführen
 
 sub dbmsTestVector {
     my $self = shift;
-    return map { $_ eq $self->{'dbms'}? 1: 0 } $self->dbmsNames;
+    return map {$_ eq $self->{'dbms'}? 1: 0} $self->dbmsNames;
 }
 
 # -----------------------------------------------------------------------------
@@ -203,13 +196,17 @@ sub dbmsTestVector {
 
     $bool = $d->isOracle;
 
+=head4 Description
+
+Prüfe, ob das Datenbanksystem Oracle ist. Wenn ja, liefere wahr,
+sonst falsch.
+
 =cut
 
 # -----------------------------------------------------------------------------
 
 sub isOracle {
-    my $self = shift;
-    return $self->{'dbms'} eq 'Oracle'? 1: 0;
+    return shift->{'dbms'} eq 'Oracle'? 1: 0;
 }
 
 # -----------------------------------------------------------------------------
@@ -220,13 +217,17 @@ sub isOracle {
 
     $bool = $d->isPostgreSQL;
 
+=head4 Description
+
+Prüfe, ob das Datenbanksystem PostgreSQL ist. Wenn ja, liefere wahr,
+sonst falsch.
+
 =cut
 
 # -----------------------------------------------------------------------------
 
 sub isPostgreSQL {
-    my $self = shift;
-    return $self->{'dbms'} eq 'PostgreSQL'? 1: 0;
+    return shift->{'dbms'} eq 'PostgreSQL'? 1: 0;
 }
 
 # -----------------------------------------------------------------------------
@@ -237,13 +238,17 @@ sub isPostgreSQL {
 
     $bool = $d->isSQLite;
 
+=head4 Description
+
+Prüfe, ob das Datenbanksystem SQLite ist. Wenn ja, liefere wahr,
+sonst falsch.
+
 =cut
 
 # -----------------------------------------------------------------------------
 
 sub isSQLite {
-    my $self = shift;
-    return $self->{'dbms'} eq 'SQLite'? 1: 0;
+    return shift->{'dbms'} eq 'SQLite'? 1: 0;
 }
 
 # -----------------------------------------------------------------------------
@@ -254,13 +259,17 @@ sub isSQLite {
 
     $bool = $d->isMySQL;
 
+=head4 Description
+
+Prüfe, ob das Datenbanksystem MySQL ist. Wenn ja, liefere wahr,
+sonst falsch.
+
 =cut
 
 # -----------------------------------------------------------------------------
 
 sub isMySQL {
-    my $self = shift;
-    return $self->{'dbms'} eq 'MySQL'? 1: 0;
+    return shift->{'dbms'} eq 'MySQL'? 1: 0;
 }
 
 # -----------------------------------------------------------------------------
@@ -271,13 +280,17 @@ sub isMySQL {
 
     $bool = $d->isAccess;
 
+=head4 Description
+
+Prüfe, ob das Datenbanksystem Access ist. Wenn ja, liefere wahr,
+sonst falsch.
+
 =cut
 
 # -----------------------------------------------------------------------------
 
 sub isAccess {
-    my $self = shift;
-    return $self->{'dbms'} eq 'Access'? 1: 0;
+    return shift->{'dbms'} eq 'Access'? 1: 0;
 }
 
 # -----------------------------------------------------------------------------
@@ -288,20 +301,24 @@ sub isAccess {
 
     $bool = $d->isMSSQL;
 
+=head4 Description
+
+Prüfe, ob das Datenbanksystem MSSQL ist. Wenn ja, liefere wahr,
+sonst falsch.
+
 =cut
 
 # -----------------------------------------------------------------------------
 
 sub isMSSQL {
-    my $self = shift;
-    return $self->{'dbms'} eq 'MSSQL'? 1: 0;
+    return shift->{'dbms'} eq 'MSSQL'? 1: 0;
 }
 
 # -----------------------------------------------------------------------------
 
 =head1 VERSION
 
-1.155
+1.156
 
 =head1 AUTHOR
 

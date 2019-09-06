@@ -27,6 +27,10 @@ Data-Object Exception Class
 
   "$exception" # renders exception message
 
+=libraries
+
+Data::Object::Library
+
 =description
 
 This package provides functionality for creating, throwing, and introspecting

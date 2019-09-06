@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.155';
+our $VERSION = '1.156';
 
 use Quiq::Time::RFC822;
 
@@ -26,6 +26,12 @@ L<Quiq::Hash>
 Ein Objekt der Klasse repräsentiert einen HTTP-Cookie gemäß der klassischen
 L<Netscape-Spezifikation|http://de.wikipedia.org/wiki/HTTP-Cookie#Cookie_nach_Netscape>. Die Klasse wird typischerweise verwendet,
 um Set-Cookie Header zu generieren.
+
+=head1 CAVEATS
+
+Der Name und der Wert des Cookie werden aktuell nicht kodiert.
+Name und Wert sollten daher nur aus druckbaren ASCII-Zeichen
+ohne Semikolon, Komma, Gleichheitszeichen und Leerzeichen bestehen.
 
 =head1 ATTRIBUTES
 
@@ -191,15 +197,9 @@ sub asString {
 
 # -----------------------------------------------------------------------------
 
-=head1 CAVEATS
-
-Der Name und der Wert des Cookie werden aktuell nicht kodiert.
-Name und Wert sollten daher nur aus druckbaren ASCII-Zeichen
-ohne Semikolon, Komma, Gleichheitszeichen und Leerzeichen bestehen.
-
 =head1 VERSION
 
-1.155
+1.156
 
 =head1 AUTHOR
 

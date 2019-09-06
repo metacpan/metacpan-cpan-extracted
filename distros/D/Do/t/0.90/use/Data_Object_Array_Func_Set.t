@@ -27,6 +27,16 @@ Data-Object Array Function (Set) Class
 
 Data::Object::Array::Func
 
+=attributes
+
+arg1(Object, req, ro)
+arg2(Str, req, ro)
+arg3(Any, req, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Array::Func::Set is a function object for Data::Object::Array.

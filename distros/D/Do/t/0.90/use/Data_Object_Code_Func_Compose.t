@@ -27,6 +27,16 @@ Data-Object Code Function (Compose) Class
 
 Data::Object::Code::Func
 
+=attributes
+
+arg1(Object, req, ro)
+arg2(CodeLike, req, ro)
+args(ArrayRef[Any], req, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Code::Func::Compose is a function object for Data::Object::Code.

@@ -12,7 +12,7 @@ use Type::Utils ();
 use Type::Coercion ();
 use Types::TypeTiny ();
 
-our $VERSION = '1.50'; # VERSION
+our $VERSION = '1.60'; # VERSION
 
 Type::Utils::extends('Types::Standard');
 Type::Utils::extends('Types::TypeTiny');
@@ -585,7 +585,7 @@ This package provides a core type library for the L<Do> framework.
 
 =cut
 
-=head1 INHERITS
+=head1 INHERITANCE
 
 This package inherits behaviors from:
 
@@ -1954,6 +1954,14 @@ used to throw an exception if the argument can not be validated. The C<is_Value>
 function can be used to return true or false if the argument can not be
 validated.
 
+=head1 CREDITS
+
+Al Newkirk, C<awncorp@cpan.org>, C<+284>
+
+Anthony Brummett, C<abrummet@genome.wustl.edu>, C<+10>
+
+=cut
+
 =head1 AUTHOR
 
 Al Newkirk, C<awncorp@cpan.org>
@@ -1967,26 +1975,32 @@ terms as the Perl 5 programming language system itself.
 
 =head1 PROJECT
 
-L<On GitHub|https://github.com/iamalnewkirk/do>
+L<GitHub|https://github.com/iamalnewkirk/do>
 
-L<Initiatives|https://github.com/iamalnewkirk/do/projects>
+L<Projects|https://github.com/iamalnewkirk/do/projects>
+
+L<Milestones|https://github.com/iamalnewkirk/do/milestones>
 
 L<Contributing|https://github.com/iamalnewkirk/do/blob/master/CONTRIBUTE.mkdn>
 
-L<Reporting|https://github.com/iamalnewkirk/do/issues>
+L<Issues|https://github.com/iamalnewkirk/do/issues>
 
 =head1 SEE ALSO
 
 To get the most out of this distribution, consider reading the following:
 
+L<Do>
+
+L<Data::Object>
+
 L<Data::Object::Class>
+
+L<Data::Object::ClassHas>
 
 L<Data::Object::Role>
 
-L<Data::Object::Rule>
+L<Data::Object::RoleHas>
 
 L<Data::Object::Library>
-
-L<Data::Object::Signatures>
 
 =cut

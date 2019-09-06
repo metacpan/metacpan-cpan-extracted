@@ -12,14 +12,14 @@ use List::MoreUtils        qw( none );
 use Term::ANSIScreen       qw( :cursor :screen );
 use Term::Choose::LineFold qw( line_fold );
 use Term::Choose           qw( choose );
-use Term::Choose::Util     qw( term_size );
+use Term::Choose::Util     qw( get_term_size );
 
 use App::YTDL::GetData qw( get_download_info );
 
 
 sub gather_video_infos {
     my ( $opt, $info ) = @_;
-    my ( $cols, $rows ) = term_size();
+    my ( $cols, $rows ) = get_term_size();
     print "\n\n\n", '=' x $cols, "\n\n", "\n" x $rows;
     print locate( 1, 1 ), cldown;
     say 'Quality: ', $opt->{quality};
@@ -103,7 +103,7 @@ sub linefolded_print_info {
     my ( $opt, $info, $ex, $video_id, $key_len ) = @_;
     my @keys = _prepare_print_info( $opt, $info, $ex, $video_id );
     my $s_tab = $key_len + length( ' : ' );
-    my ( $maxcols, $maxrows ) = term_size();
+    my ( $maxcols, $maxrows ) = get_term_size();
     $maxcols -= $opt->{right_margin};
     my $col_max = $maxcols > $opt->{max_info_width} ? $opt->{max_info_width} : $maxcols;
     my $print_array = [];

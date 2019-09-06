@@ -396,7 +396,7 @@ __DATA__
   "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
 [% stylesheet = 'included' %]
 
-% IF config.style_sheet && config.style_sheet != '' && config.style_sheet.substr(0,7) != 'inline:' %]
+[% IF config.style_sheet && config.style_sheet != '' && config.style_sheet.substr(0,7) != 'inline:' %]
   <?xml-stylesheet href="[% config.style_sheet %]" type="text/css"?>
 [% ELSIF config.style_sheet && config.style_sheet.substr(0,7) == 'inline:'%]
   [% stylesheet = 'inline'

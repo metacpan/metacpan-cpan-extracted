@@ -27,6 +27,15 @@ Data-Object Hash Function (Get) Class
 
 Data::Object::Hash::Func
 
+=attributes
+
+arg1(Object, req, ro)
+arg2(Str, req, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Hash::Func::Get is a function object for Data::Object::Hash.

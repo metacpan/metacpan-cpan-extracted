@@ -17,7 +17,7 @@ use constant _F_ELEMENTS  => 5;     # elements arrayref
 use constant _F_ROTATORS  => 6;     # rotators arrayref, initially empty
 use constant _NFIELDS     => 7;
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 our $_MAX_ENUM_COUNT = 32768;
 our $_LOG_MAX_ORDER = 21 * log(2);
@@ -379,7 +379,7 @@ Math::DifferenceSet::Planar - object class for planar difference sets
 
 =head1 VERSION
 
-This documentation refers to version 0.006 of Math::DifferenceSet::Planar.
+This documentation refers to version 0.007 of Math::DifferenceSet::Planar.
 
 =head1 SYNOPSIS
 
@@ -705,7 +705,7 @@ value.  In scalar context, the number of multipliers is returned.
 
 =item I<iterate_rotators>
 
-If C<$ds> is a planar difference set object, C<$ds->iterate_rotators>
+If C<$ds> is a planar difference set object, C<$ds-E<gt>iterate_rotators>
 returns a code reference that, repeatedly called, returns the elements
 of a rotator base of the set.  The iterator returns a zero value when
 it is exhausted.
@@ -806,6 +806,9 @@ about it and address the issue.
 Bug reports and suggestions are welcome.
 Please submit them through the CPAN RT,
 L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Math-DifferenceSet-Planar>.
+
+More information for potential contributors can be found in the file
+named F<CONTRIBUTING> in this distribution.
 
 =head1 SEE ALSO
 

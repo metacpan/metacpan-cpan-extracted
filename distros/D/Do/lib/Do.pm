@@ -7,7 +7,7 @@ use warnings;
 
 use parent 'Data::Object';
 
-our $VERSION = '1.50'; # VERSION
+our $VERSION = '1.60'; # VERSION
 
 1;
 
@@ -57,6 +57,8 @@ This package aims to provide a modern Perl development framework and
 foundational set of types, functions, classes, patterns, and interfaces for
 jump-starting application development. This package inherits all behavior from
 L<Data::Object>.
+
+=cut
 
 =head1 SLOGAN
 
@@ -110,7 +112,7 @@ Read more at L<Data::Object::Library>.
 
   1;
 
-The framework's class configuration configures the calling package as a Moo
+The framework's class configuration configures the calling package as a L<Moo>
 class, having the "has", "with", and "extends" keywords available. Read more at
 L<Data::Object::Class>.
 
@@ -132,7 +134,7 @@ L<Data::Object::Class>.
 
   1;
 
-The framework's role configuration configures the calling package as a Moo
+The framework's role configuration configures the calling package as a L<Moo>
 role, having the "has", "with", and "extends" keywords available. Read more at
 L<Data::Object::Role>.
 
@@ -147,7 +149,7 @@ L<Data::Object::Role>.
 
   1;
 
-The framework's rule configuration configures the calling package as a Moo
+The framework's rule configuration configures the calling package as a L<Moo>
 role, intended to be used to classify interfaces. Read more at
 L<Data::Object::Rule>.
 
@@ -357,6 +359,12 @@ L<Plenv|https://github.com/tokuhirom/plenv> environment. These tools will help
 you manage multiple Perl installations in your C<$HOME> directory. They are
 completely isolated Perl installations.
 
+=head1 CREDITS
+
+Al Newkirk, C<awncorp@cpan.org>, C<+284>
+
+Anthony Brummett, C<abrummet@genome.wustl.edu>, C<+10>
+
 =cut
 
 =head1 AUTHOR
@@ -372,26 +380,32 @@ terms as the Perl 5 programming language system itself.
 
 =head1 PROJECT
 
-L<On GitHub|https://github.com/iamalnewkirk/do>
+L<GitHub|https://github.com/iamalnewkirk/do>
 
-L<Initiatives|https://github.com/iamalnewkirk/do/projects>
+L<Projects|https://github.com/iamalnewkirk/do/projects>
+
+L<Milestones|https://github.com/iamalnewkirk/do/milestones>
 
 L<Contributing|https://github.com/iamalnewkirk/do/blob/master/CONTRIBUTE.mkdn>
 
-L<Reporting|https://github.com/iamalnewkirk/do/issues>
+L<Issues|https://github.com/iamalnewkirk/do/issues>
 
 =head1 SEE ALSO
 
 To get the most out of this distribution, consider reading the following:
 
+L<Do>
+
+L<Data::Object>
+
 L<Data::Object::Class>
+
+L<Data::Object::ClassHas>
 
 L<Data::Object::Role>
 
-L<Data::Object::Rule>
+L<Data::Object::RoleHas>
 
 L<Data::Object::Library>
-
-L<Data::Object::Signatures>
 
 =cut

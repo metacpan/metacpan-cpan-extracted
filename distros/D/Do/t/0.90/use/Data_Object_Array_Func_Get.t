@@ -27,6 +27,15 @@ Data-Object Array Function (Get) Class
 
 Data::Object::Array::Func
 
+=attributes
+
+arg1(Object, req, ro)
+arg2(Int, req, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Array::Func::Get is a function object for Data::Object::Array.

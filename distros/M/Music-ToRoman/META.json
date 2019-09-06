@@ -64,7 +64,7 @@
          "web" : "https://github.com/ology/Music-ToRoman"
       }
    },
-   "version" : "0.1200",
+   "version" : "0.1600",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.027007"
@@ -294,6 +294,7 @@
                   ],
                   "spell_cmd" : "aspell list",
                   "stopwords" : [
+                     "DBOOK",
                      "chordless"
                   ],
                   "wordlist" : "Pod::Wordlist"

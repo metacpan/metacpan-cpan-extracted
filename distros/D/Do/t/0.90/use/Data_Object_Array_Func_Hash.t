@@ -27,6 +27,14 @@ Data-Object Array Function (Hash) Class
 
 Data::Object::Array::Func
 
+=attributes
+
+arg1(Object, req, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Array::Func::Hash is a function object for Data::Object::Array.

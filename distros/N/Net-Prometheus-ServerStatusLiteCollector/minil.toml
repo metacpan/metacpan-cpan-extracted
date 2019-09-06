@@ -1,0 +1,3 @@
+name = "Net-Prometheus-ServerStatusLiteCollector"
+module_maker="ModuleBuildTiny"
+static_install = "auto"

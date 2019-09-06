@@ -17,6 +17,10 @@ Data-Object Hash Class Autoboxing
 
   use Data::Object::Hash::Autobox;
 
+=libraries
+
+Data::Object::Library
+
 =description
 
 This package implements autoboxing via L<Data::Object::Autobox> for

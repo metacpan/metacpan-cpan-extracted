@@ -4,7 +4,7 @@ use strict;
 use 5.010000;
 use utf8;
 
-our $VERSION = '0.305';
+our $VERSION = '0.306';
 
 use Encode                qw( encode decode );
 use File::Path            qw( make_path );
@@ -200,7 +200,7 @@ getvideo - Download YouTube and other videos.
 
 =head1 VERSION
 
-Version 0.305
+Version 0.306
 
 =cut
 

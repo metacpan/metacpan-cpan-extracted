@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.655';
+our $VERSION = '1.700';
 
 
 use Encode qw( decode );
@@ -15,7 +15,8 @@ use Win32::Console qw( STD_INPUT_HANDLE ENABLE_MOUSE_INPUT ENABLE_PROCESSED_INPU
                        FOREGROUND_INTENSITY BACKGROUND_INTENSITY );
 
 use Win32::Console::PatchForRT33513 qw();
-use Term::Choose::Constants         qw( :win32 );
+use Term::Choose::Constants         qw( :win32 :keys );
+use Term::Choose::Screen            qw( hide_cursor show_cursor normal );
 
 
 sub SHIFTED_MASK () {
@@ -88,7 +89,7 @@ sub __get_key_OS {
         else {
             return NEXT_get_key;
         }
-        return [ $self->{abs_cursor_y}, $button, $x, $y ];
+        return [ $button, $x, $y ];
     }
     else {
         return NEXT_get_key;
@@ -107,14 +108,8 @@ sub __set_mode {
     else {
         $self->{input}->Mode( !ENABLE_PROCESSED_INPUT );
     }
-    $self->{output} = Win32::Console->new( STD_OUTPUT_HANDLE );
-    $self->{curr_attr} = $self->{output}->Attr();
-    $self->{fg_color}  = $self->{curr_attr} & 0x7;
-    $self->{bg_color}  = $self->{curr_attr} & 0x70;
-    $self->{fill_attr} = $self->{bg_color} | $self->{bg_color};
-    $self->{inverse}   = ( $self->{bg_color} >> 4 ) | ( $self->{fg_color} << 4 );
     if ( $self->{hide_cursor} ) {
-        $self->__hide_cursor();
+        print hide_cursor();
     }
     return $config->{mouse};
 }
@@ -129,64 +124,34 @@ sub __reset_mode {
         }
         $self->{input}->Flush;
     }
-    if ( defined $self->{output} ) {
-        $self->__reset;
-        #$self->{output}->Free();
-    }
+    print normal();
     if ( delete $self->{hide_cursor} ) {
-        $self->__show_cursor();
+        print show_cursor();
     }
 }
 
 
-sub __get_term_size {
-    my ( $self ) = @_;
-    my ( $term_width, $term_height ) = Win32::Console->new()->Size();
-    return $term_width - 1, $term_height;
+sub __get_cursor_row {
+    #my ( $self ) = @_;
+    my $abs_cursor_y = ( Win32::Console->new( STD_OUTPUT_HANDLE )->Cursor() )[1];
+    return $abs_cursor_y || 1;
 }
 
 
-sub __get_cursor_position {
-    my ( $self ) = @_;
-    ( $self->{abs_cursor_x}, $self->{abs_cursor_y} ) = $self->{output}->Cursor();
-}
 
 
-sub __set_cursor_position {
-    my ( $self, $col, $row ) = @_;
-    $self->{output}->Cursor( $col, $row );
-}
+
+# 1.642: Last version which uses Win::Console to create all methods.
+#        Since 1.643 Win32::Console::ANSI and ANSI escapes are used.
 
 
-sub __hide_cursor {
-    my ( $self ) = @_;
-    if ( ! exists $self->{output}{handle} || ! defined $self->{output}{handle} ) {
-        $self->{output} = Win32::Console->new( STD_OUTPUT_HANDLE );
-    }
-    $self->{output}->Cursor( -1, -1, -1, 0 );
-}
 
 
-sub __show_cursor {
-    my ( $self ) = @_;
-    if ( ! exists $self->{output}{handle} || ! defined $self->{output}{handle} ) {
-        $self->{output} = Win32::Console->new( STD_OUTPUT_HANDLE );
-    }
-    $self->{output}->Cursor( -1, -1, -1, 1 );
-}
 
 
-sub __reset {
-    my ( $self ) = @_;
-    $self->{output}->Attr( $self->{curr_attr} );
-}
 
 
-sub __beep {
-    my ( $self, $beep ) = @_;
-    if ( $beep ) {
-    }
-}
+
 
 
 

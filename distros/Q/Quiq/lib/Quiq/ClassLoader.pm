@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.155';
+our $VERSION = '1.156';
 
 # -----------------------------------------------------------------------------
 
@@ -173,6 +173,40 @@ werden über die Klasse selbst aufgelöst. Wenn die Klasse eine
 AUTOLOAD-Methode besitzt, funktioniert diese genau so wie ohne
 I<< Quiq::ClassLoader >>.
 
+=head1 CAVEATS
+
+=over 2
+
+=item *
+
+Der Mechanismus funktioniert nicht, wenn der Modulpfad anders
+lautet als die Klasse heißt. Solche Module müssen explizit
+per use geladen werden.
+
+=item *
+
+Sind mehrere Klassen in einer Moduldatei definiert, kann das
+automatische Laden logischerweise nur über eine dieser Klassen
+erfolgen. Am besten lädt man solche Module auch explizit.
+
+=item *
+
+Über Aufruf der Methode C<import()> ist es nicht möglich, ein
+Modul automatisch zu laden, da Perl bei Nichtexistenz von
+C<import()> C<AUTOLOAD()> nicht aufruft, sondern den Aufruf
+ignoriert. Man kann durch C<< $class->import() >> also nicht
+das Laden eines Klassen-Moduls auslösen.
+
+=item *
+
+Module, die nicht objektorientiert, sondern Funktionssammlungen
+sind, werden von I<< Quiq::ClassLoader >> nicht behandelt. Diese sollten
+per C<use> geladen werden. Es gibt im Perl-Core ein Pragma C<autouse>,
+das alternativ zum automatischen Laden von Funktionen verwendet
+werden kann.
+
+=back
+
 =cut
 
 # -----------------------------------------------------------------------------
@@ -274,43 +308,9 @@ sub AUTOLOAD {
 
 # -----------------------------------------------------------------------------
 
-=head1 CAVEATS
-
-=over 2
-
-=item *
-
-Der Mechanismus funktioniert nicht, wenn der Modulpfad anders
-lautet als die Klasse heißt. Solche Module müssen explizit
-per use geladen werden.
-
-=item *
-
-Sind mehrere Klassen in einer Moduldatei definiert, kann das
-automatische Laden logischerweise nur über eine dieser Klassen
-erfolgen. Am besten lädt man solche Module auch explizit.
-
-=item *
-
-Über Aufruf der Methode C<import()> ist es nicht möglich, ein
-Modul automatisch zu laden, da Perl bei Nichtexistenz von
-C<import()> C<AUTOLOAD()> nicht aufruft, sondern den Aufruf
-ignoriert. Man kann durch C<< $class->import() >> also nicht
-das Laden eines Klassen-Moduls auslösen.
-
-=item *
-
-Module, die nicht objektorientiert, sondern Funktionssammlungen
-sind, werden von I<< Quiq::ClassLoader >> nicht behandelt. Diese sollten
-per C<use> geladen werden. Es gibt im Perl-Core ein Pragma C<autouse>,
-das alternativ zum automatischen Laden von Funktionen verwendet
-werden kann.
-
-=back
-
 =head1 VERSION
 
-1.155
+1.156
 
 =head1 AUTHOR
 

@@ -21,6 +21,12 @@ has template => (
   def => "bin/pod.txt"
 );
 
+has credits => (
+  is => 'ro',
+  isa => 'Str',
+  def => ".credits"
+);
+
 method BUILD($args) {
   $self->construct;
 
@@ -36,11 +42,15 @@ method construct() {
   push @$content, $self->construct_description;
   push @$content, $self->construct_inherits;
   push @$content, $self->construct_integrates;
+  push @$content, $self->construct_typelibrary;
+  push @$content, $self->construct_attributes_list;
+  push @$content, $self->construct_headers;
   push @$content, $self->construct_exports_list;
   push @$content, $self->construct_functions_list;
   push @$content, $self->construct_methods_list;
   push @$content, $self->construct_routines_list;
   push @$content, $self->construct_footers;
+  push @$content, $self->construct_credits;
 
   return $self;
 }
@@ -73,6 +83,15 @@ method construct_description() {
   return $self->markup_head1('description', $description); ;
 }
 
+method construct_headers() {
+  my $pdoc = $self->document;
+  my $headers = $pdoc->headers;
+
+  return () if !$headers;
+
+  return join("\n", "", @$headers);
+}
+
 method construct_footers() {
   my $pdoc = $self->document;
   my $footers = $pdoc->footers;
@@ -82,6 +101,26 @@ method construct_footers() {
   return join("\n", "", @$footers);
 }
 
+method construct_credits() {
+  my $credits = $self->credits;
+
+  open my $ch, "<", $credits or return ();
+
+  my $records = [map { chomp; [split /, /] } (<$ch>)];
+
+  close $ch;
+
+  return () if !@$records;
+
+  my @content;
+
+  push @content, $self->markup_head1('credits', [
+    join "\n\n", map qq($$_[1], C<$$_[2]>, C<+$$_[0]>), @$records
+  ]);
+
+  return join("\n", @content);
+}
+
 method construct_inherits() {
   my $inherits = $self->document->inherits;
 
@@ -89,7 +128,7 @@ method construct_inherits() {
 
   my @content;
 
-  push @content, $self->markup_head1('inherits', [
+  push @content, $self->markup_head1('inheritance', [
     "This package inherits behaviors from:",
     "", join "\n\n", map "L<$_>", @$inherits
   ]);
@@ -104,12 +143,66 @@ method construct_integrates() {
 
   my @content;
 
-  push @content, $self->markup_head1('integrates', [
+  push @content, $self->markup_head1('integrations', [
     "This package integrates behaviors from:",
     "", join "\n\n", map "L<$_>", @$integrates
   ]);
 
   return join("\n", @content);
+}
+
+method construct_typelibrary() {
+  my $libraries = $self->document->libraries;
+
+  return () if !$libraries || !@$libraries;
+
+  my @content;
+
+  push @content, $self->markup_head1('libraries', [
+    "This package uses type constraints defined by:",
+    "", join "\n\n", map "L<$_>", @$libraries
+  ]);
+
+  return join("\n", @content);
+}
+
+method construct_attributes_list() {
+  my $attributes = $self->document->attributes;
+
+  return () if !$attributes || !@$attributes;
+
+  my @content;
+
+  push @content, $self->markup_head1('attributes', [
+    "This package has the following attributes."
+  ]);
+
+  push @content, $self->construct_attributes_item($_) for @$attributes;
+
+  return join("\n", @content);
+}
+
+method construct_attributes_item($item) {
+  my $name = qr/(\w+)/;
+  my $part = qr/([^,]+)/;
+
+  my @vars = $item =~ /$name\($part, $part, $part\)/;
+
+  my $id = $vars[0];
+  my $constraint = $vars[1] || 'Any';
+  my $presence = $vars[3] || 'req';
+  my $ability = $vars[4] || 'ro';
+
+  $ability = $ability eq 'ro' ? 'read-only' : 'read-write';
+  $presence = $presence eq 'req' ? 'required' : 'optional';
+
+  my $identity = "The attribute is $ability";
+  my $accepts = "accepts C<($constraint)> values";
+  my $required = "and is $presence";
+  my $description = "$identity, $accepts, $required.";
+  my $signature = "$id($constraint)";
+
+  return $self->markup_head2($id, ["  $signature", "", $description]);
 }
 
 method construct_exports_list() {
@@ -252,11 +345,11 @@ method render() {
   my $content = $self->content;
   my $template = $self->template;
 
-  open my $fh, "<", $template or confess "Can't open $template: $!";
+  open my $th, "<", $template or confess "Can't open $template: $!";
 
-  my $output = join "", <$fh>;
+  my $output = join "", <$th>;
 
-  close $fh;
+  close $th;
 
   $content = join "\n", @$content;
   $content =~ s/^\n+|\n+$//g;

@@ -27,6 +27,14 @@ Data-Object String Function (Ucfirst) Class
 
 Data::Object::String::Func
 
+=attributes
+
+arg1(Object, req, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::String::Func::Ucfirst is a function object for

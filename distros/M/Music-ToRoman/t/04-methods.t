@@ -24,11 +24,8 @@ is $mtr->parse('D#5'), 'I5', 'I5';
 is $mtr->parse('D#64'), 'I64', 'I64';
 is $mtr->parse('Em'), 'bii', 'bii';
 is $mtr->parse('E#m'), 'ii', 'ii';
-SKIP: {
-    skip 'Gbm|F#m = biii not working', 2;
-    is $mtr->parse('Gbm'), 'biii', 'biii';
-    is $mtr->parse('F#m'), 'biii', 'biii';
-};
+is $mtr->parse('Gbm'), 'biii', 'biii';
+is $mtr->parse('F#m'), 'biii', 'biii';
 is $mtr->parse('F##m'), 'iii', 'iii';
 is $mtr->parse('G#'), 'IV', 'IV';
 is $mtr->parse('A'), 'bV', 'bV';
@@ -49,11 +46,8 @@ diag 'D#/X chords';
 
 is $mtr->parse('D#/E'), 'I/bii', 'I/bii';
 is $mtr->parse('D#/E#'), 'I/ii', 'I/ii';
-SKIP: {
-    skip 'D#/Gb|F# = I/biii not working', 2;
-    is $mtr->parse('D#/Gb'), 'I/biii', 'I/biii';
-    is $mtr->parse('D#/F#'), 'I/biii', 'I/biii';
-};
+is $mtr->parse('D#/Gb'), 'I/biii', 'I/biii';
+is $mtr->parse('D#/F#'), 'I/biii', 'I/biii';
 is $mtr->parse('D#/F##'), 'I/iii', 'I/iii';
 is $mtr->parse('D#/G#'), 'I/IV', 'I/IV';
 is $mtr->parse('D#/A'), 'I/bV', 'I/bV';

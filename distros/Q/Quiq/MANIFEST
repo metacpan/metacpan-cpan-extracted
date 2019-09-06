@@ -133,6 +133,7 @@ lib/Quiq/Process.pm
 lib/Quiq/Program.pm
 lib/Quiq/Progress.pm
 lib/Quiq/Properties.pm
+lib/Quiq/Range.pm
 lib/Quiq/Record.pm
 lib/Quiq/Reference.pm
 lib/Quiq/Rsync.pm
@@ -312,6 +313,7 @@ t/bin/Quiq/Process.t
 t/bin/Quiq/Program.t
 t/bin/Quiq/Progress.t
 t/bin/Quiq/Properties.t
+t/bin/Quiq/Range.t
 t/bin/Quiq/Record.t
 t/bin/Quiq/Reference.t
 t/bin/Quiq/Rsync.t

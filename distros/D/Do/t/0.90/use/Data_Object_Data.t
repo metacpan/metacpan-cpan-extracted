@@ -55,6 +55,10 @@ Data-Object Data Extraction Class
 
 Data::Object::Base
 
+=libraries
+
+Data::Object::Library
+
 =description
 
 This package provides methods for parsing and extracting pod-like data sections

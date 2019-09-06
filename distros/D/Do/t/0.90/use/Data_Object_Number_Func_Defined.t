@@ -27,6 +27,14 @@ Data-Object Number Function (Defined) Class
 
 Data::Object::Number::Func
 
+=attributes
+
+arg1(Object, req, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Number::Func::Defined is a function object for

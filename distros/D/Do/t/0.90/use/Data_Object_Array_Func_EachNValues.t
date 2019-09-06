@@ -27,6 +27,17 @@ Data-Object Array Function (EachNValues) Class
 
 Data::Object::Array::Func
 
+=attributes
+
+arg1(Object, req, ro)
+arg2(Num, req, ro)
+arg3(CodeRef, req, ro)
+args(ArrayRef[Any], opt, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Array::Func::EachNValues is a function object for

@@ -31,6 +31,10 @@ Data-Object Replace Class
 
 Data::Object::Array
 
+=libraries
+
+Data::Object::Library
+
 =description
 
 This package provides routines for introspecting the results of a regexp

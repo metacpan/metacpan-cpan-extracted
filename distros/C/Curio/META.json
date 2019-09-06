@@ -74,26 +74,26 @@
    "provides" : {
       "Curio" : {
          "file" : "lib/Curio.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       },
       "Curio::Declare" : {
          "file" : "lib/Curio/Declare.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       },
       "Curio::Factory" : {
          "file" : "lib/Curio/Factory.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       },
       "Curio::Guard" : {
          "file" : "lib/Curio/Guard.pm"
       },
       "Curio::Role" : {
          "file" : "lib/Curio/Role.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       },
       "Curio::Util" : {
          "file" : "lib/Curio/Util.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
@@ -107,8 +107,11 @@
          "web" : "https://github.com/bluefeet/Curio"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_authority" : "cpan:BLUEFEET",
+   "x_contributors" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+   ],
    "x_serialization_backend" : "JSON::PP version 4.04",
    "x_static_install" : 1
 }

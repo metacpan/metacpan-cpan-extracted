@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.155';
+our $VERSION = '1.156';
 
 use POSIX ();
 use Time::Local ();
@@ -578,6 +578,14 @@ Die Schlüssel/Wert-Paare haben die Form:
 
     $key="$val"
 
+oder
+
+    $key='$val'
+
+oder
+
+    $key={$val}
+
 Wenn $val kein Whitespace enthält, können die Anführungsstriche
 weggelassen werden:
 
@@ -605,7 +613,7 @@ sub stringToKeyVal {
     while ($str =~ s/^\s*(\w+)=//) {
         push @arr,$1;
         $str =~ s/^"([^"]*)"// || $str =~ s/^\{([^}]*)\}// ||
-            $str =~ s/^(\S*)//;
+            $str =~ s/^'([^']*)'// || $str =~ s/^(\S*)//;
         push @arr,$1;
     }
 
@@ -616,7 +624,7 @@ sub stringToKeyVal {
 
 =head1 VERSION
 
-1.155
+1.156
 
 =head1 AUTHOR
 

@@ -27,6 +27,15 @@ Data-Object Hash Function (Exists) Class
 
 Data::Object::Hash::Func
 
+=attributes
+
+arg1(Object, req, ro)
+arg2(Num, req, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Hash::Func::Exists is a function object for Data::Object::Hash.

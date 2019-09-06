@@ -24,35 +24,23 @@ is $mtr->parse('A#5'), 'I5', 'I5';
 is $mtr->parse('A#64'), 'I64', 'I64';
 is $mtr->parse('Bm'), 'bii', 'bii';
 is $mtr->parse('B#m'), 'ii', 'ii';
-SKIP: {
-    skip 'Dbm|C#m = biii not working', 2;
-    is $mtr->parse('Dbm'), 'biii', 'biii';
-    is $mtr->parse('C#m'), 'biii', 'biii';
-};
+is $mtr->parse('Dbm'), 'biii', 'biii';
+is $mtr->parse('C#m'), 'biii', 'biii';
 is $mtr->parse('C##m'), 'iii', 'iii';
 is $mtr->parse('D#'), 'IV', 'IV';
 is $mtr->parse('E'), 'bV', 'bV';
 is $mtr->parse('E#'), 'V', 'V';
 is $mtr->parse('E#7'), 'V7', 'V7';
-SKIP: {
-    skip 'Gbm|F#m = bvi not working', 2;
-    is $mtr->parse('Gbm'), 'bvi', 'bvi';
-    is $mtr->parse('F#m'), 'bvi', 'bvi';
-};
+is $mtr->parse('Gbm'), 'bvi', 'bvi';
+is $mtr->parse('F#m'), 'bvi', 'bvi';
 is $mtr->parse('F##m'), 'vi', 'vi';
 is $mtr->parse('F##m7'), 'vi7', 'vi7';
 is $mtr->parse('F##m7b5'), 'vi7b5', 'vi7b5';
 is $mtr->parse('F##min7'), 'vimin7', 'vimin7';
 is $mtr->parse('Abm'), 'bvii', 'bvii';
-SKIP: {
-    skip 'G#m = bvii not working', 1;
-    is $mtr->parse('G#m'), 'bvii', 'bvii';
-};
+is $mtr->parse('G#m'), 'bvii', 'bvii';
 is $mtr->parse('Abo'), 'bviio', 'bviio';
-SKIP: {
-    skip 'G#o = bviio not working', 1;
-    is $mtr->parse('G#o'), 'bviio', 'bviio';
-};
+is $mtr->parse('G#o'), 'bviio', 'bviio';
 is $mtr->parse('G##o'), 'viio', 'viio';
 is $mtr->parse('G##dim'), 'viio', 'viio';
 is $mtr->parse('G## dim'), 'vii o', 'vii o';
@@ -61,20 +49,14 @@ diag 'A#/X chords';
 
 is $mtr->parse('A#/B'), 'I/bii', 'I/bii';
 is $mtr->parse('A#/B#'), 'I/ii', 'I/ii';
-SKIP: {
-    skip 'A#/C#|Db = biii not working', 2;
-    is $mtr->parse('A#/C#'), 'I/biii', 'I/biii';
-    is $mtr->parse('A#/Db'), 'I/biii', 'I/biii';
-};
+is $mtr->parse('A#/C#'), 'I/biii', 'I/biii';
+is $mtr->parse('A#/Db'), 'I/biii', 'I/biii';
 is $mtr->parse('A#/C##'), 'I/iii', 'I/iii';
 is $mtr->parse('A#/D#'), 'I/IV', 'I/IV';
 is $mtr->parse('A#/E'), 'I/bV', 'I/bV';
 is $mtr->parse('A#/E#'), 'I/V', 'I/V';
-SKIP: {
-    skip 'A#/Gb|F# = bvi not working', 2;
-    is $mtr->parse('A#/Gb'), 'I/bvi', 'I/bvi';
-    is $mtr->parse('A#/F#'), 'I/bvi', 'I/bvi';
-};
+is $mtr->parse('A#/Gb'), 'I/bvi', 'I/bvi';
+is $mtr->parse('A#/F#'), 'I/bvi', 'I/bvi';
 is $mtr->parse('A#/F##'), 'I/vi', 'I/vi';
 is $mtr->parse('A#/Ab'), 'I/bvii', 'I/bvii';
 is $mtr->parse('A#/G##'), 'I/vii', 'I/vii';

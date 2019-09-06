@@ -1,5 +1,5 @@
 package Sim::OPT::Sim;
-# Copyright (C) 2008-2015 by Gian Luca Brunetti and Politecnico di Milano.
+# Copyright (C) 2008-2019 by Gian Luca Brunetti and Politecnico di Milano.
 # This is the module Sim::OPT::Sim of Sim::OPT, a program for detailed metadesign managing parametric explorations through the ESP-r building performance simulation platform and performing optimization by block coordinate descent.
 # This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
@@ -43,7 +43,7 @@ use warnings::unused;
 
 our @EXPORT = qw( sim ); # our @EXPORT = qw( );
 
-$VERSION = '0.067'; # our $VERSION = '';
+$VERSION = '0.069'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Sim is the module used by Sim::OPT to launch simulations once the models have been built.';
 
 #########################################################################################
@@ -99,8 +99,9 @@ sub sim    # This function launch the simulations in ESP-r
 
   my %dat = %{ $_[0] };
   my @instances = @{ $dat{instances} }; #say $tee "IN SIM \@instances " . dump( @instances );
-  say "SCALAR INSTANCES " . scalar( @instances );
+  #say "SCALAR INSTANCES " . scalar( @instances );
   my %dirfiles = %{ $dat{dirfiles} };
+  my %vehicles = %{ $dat{vehicles} };
 
   my @simcases = @{ $dirfiles{simcases} };
   my @simstruct = @{ $dirfiles{simstruct} };
@@ -196,7 +197,7 @@ sub sim    # This function launch the simulations in ESP-r
     my $countdir = 0;
 
     my $numberof_simtools = scalar ( keys %{ $dowhat{simtools} } );
-    my $simelt = $to{crypto}; say $tee "IN SIM \$simelt $simelt";
+    my $simelt = $to{crypto}; #say $tee "IN SIM \$simelt $simelt";
 
 
     if ( $dowhat{simulate} eq "y")
@@ -226,7 +227,7 @@ sub sim    # This function launch the simulations in ESP-r
 
               if ( ( $simelt ne "") and ( $date_to_sim ne "" ) )
               {
-                $resfile = "$simelt-$date_to_sim-$tooltype.res"; say $tee "IN SIM \$resfile $resfile";
+                $resfile = "$simelt-$date_to_sim-$tooltype.res"; #say $tee "IN SIM \$resfile $resfile";
                 $flfile = "$simelt-$date_to_sim-$tooltype.fl"; #say $tee "IN SIM \$flfile $flfile";
               }
 
@@ -531,7 +532,7 @@ $printthis
       my @resultretrieve = Sim::OPT::Report::newretrieve(
       {
         instance => $instance, dirfiles => \%dirfiles,
-        resfile => $resfile, flfile => $flfile
+        resfile => $resfile, flfile => $flfile, vehicles => \%vehicles
       } );
       $dirfiles{retcases} = $resultretrieve[0];
       $dirfiles{retstruct} = $resultretrieve[1];
@@ -544,7 +545,7 @@ $printthis
       my @resultreport = Sim::OPT::Report::newreport(
       {
         instance => $instance, dirfiles => \%dirfiles,
-        resfile => $resfile, flfile => $flfile
+        resfile => $resfile, flfile => $flfile, vehicles => \%vehicles
       } );
       $dirfiles{repcases} = $resultreport[0];
       $dirfiles{repstruct} = $resultreport[1];

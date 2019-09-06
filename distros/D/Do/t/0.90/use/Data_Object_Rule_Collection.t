@@ -19,6 +19,10 @@ Data-Object Collection Rules
 
   with 'Data::Object::Rule::Collection';
 
+=libraries
+
+Data::Object::Library
+
 =description
 
 This rule enforces the criteria for being a collection.

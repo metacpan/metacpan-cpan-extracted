@@ -1,0 +1,23 @@
+Revision history for VMware-vCloudDirector2
+
+0.102     2019-09-06 16:47:38+01:00 Europe/London
+	- Links may have a null or missing type (ie delete links)
+
+0.101     2019-09-06 15:48:38+01:00 Europe/London
+	- Move links up to Object level and return lists rather than references
+	- Add Object attribute to the Error object
+	- Fixed bug in link fetching
+	- Added a find_link method that returns one matching link or throws error
+	- Mechanism to get admin object for a standard object
+	- Junked the ObjectContent class and do everything within Object
+	- Fixed some fetch bugs which were covered over in ObjectContent
+
+0.100     2019-09-05 16:12:29+01:00 Europe/London
+    - Converted to JSON API - quite a lot of internal hash structure
+      changes due to this.
+    - Partially converted test suite (incomplete)
+    - Fixed the fact that all of the write methods (PUT, POST, DELETE)
+      could never have worked.  At all.  Really!
+    - Initial release so can go on with this as work-in-progress
+
+VMware-vCloudDirector version 0.008 cloned and reworked.

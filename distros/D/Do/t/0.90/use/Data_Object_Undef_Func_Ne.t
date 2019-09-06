@@ -27,6 +27,15 @@ Data-Object Undef Function (Ne) Class
 
 Data::Object::Undef::Func
 
+=attributes
+
+arg1(Object, req, ro)
+arg2(Any, req, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Undef::Func::Ne is a function object for Data::Object::Undef.

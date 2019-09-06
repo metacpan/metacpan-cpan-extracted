@@ -8,6 +8,14 @@ use File::Spec;
 use IPC::Run3;
 use Test::More;
 
+# Skip rather than falsely fail - see https://github.com/rjbs/IPC-Run3/pull/9
+# and RT#95308.  Example at
+# http://www.cpantesters.org/cpan/report/277b2ad8-6bf8-1014-b7dc-c8197f9146ad
+plan skip_all => 'MSWin32 gives a false failure on this test'
+    if $^O eq 'MSWin32';
+
+plan tests => 2;
+
 #use Sub::Multi::Tiny::Util '*VERBOSE';
 #BEGIN { $VERBOSE = 2; }
 
@@ -35,14 +43,12 @@ sub get_perl_filename {
 # errors at INIT time
 my $perl = get_perl_filename or die "Could not find perl interpreter";
 
-# Find the .pl file
-
 # Find the dist's root
 my $here = abs_path(__FILE__);
 die "Could not find my file location: $!" unless defined $here;
 my ($volume,$directories,undef) = File::Spec->splitpath( $here );
 
-# Find t/32_same_arity.t
+# Find t/32_same_arity.pl
 my $pl_file = File::Spec->catpath(
     $volume,
     $directories,
@@ -60,7 +66,5 @@ diag "Error message was '$err'" if $err;
 cmp_ok $exitstatus>>8, '!=', 0, "returned a failure indication";
 like $err, qr/distinguish.*arity/,
     "detected two same-arity candidates";
-
-done_testing;
 
 # vi: set fdm=marker: #

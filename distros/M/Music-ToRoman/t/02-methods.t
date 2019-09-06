@@ -11,6 +11,8 @@ diag 'C# chords';
 my $mtr = Music::ToRoman->new( scale_note => 'C#' );
 isa_ok $mtr, 'Music::ToRoman';
 
+is $mtr->parse('Ebbm'), 'bii', 'bii';
+
 is $mtr->parse('C#'), 'I', 'I';
 is $mtr->parse('C#sus4'), 'Isus4', 'Isus4';
 is $mtr->parse('C# sus4'), 'I sus4', 'I sus4';

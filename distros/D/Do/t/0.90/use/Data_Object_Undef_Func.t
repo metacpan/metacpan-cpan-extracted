@@ -21,6 +21,10 @@ Functions for Undef Data
 
 Data::Object::Func
 
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Undef::Func is an abstract base class for function classes in the

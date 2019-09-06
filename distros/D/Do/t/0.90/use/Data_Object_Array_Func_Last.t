@@ -27,6 +27,14 @@ Data-Object Array Function (Last) Class
 
 Data::Object::Array::Func
 
+=attributes
+
+arg1(Object, req, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Array::Func::Last is a function object for Data::Object::Array.

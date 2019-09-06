@@ -9,7 +9,7 @@ use warnings;
 use Guard;
 use Sub::Multi::Tiny::Util qw(_hlog _line_mark_string);
 
-our $VERSION = '0.000004'; # TRIAL
+our $VERSION = '0.000005'; # TRIAL
 
 # Documentation {{{1
 

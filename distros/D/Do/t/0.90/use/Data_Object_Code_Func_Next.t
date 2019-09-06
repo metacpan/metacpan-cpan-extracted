@@ -27,6 +27,15 @@ Data-Object Code Function (Next) Class
 
 Data::Object::Code::Func
 
+=attributes
+
+arg1(Object, req, ro)
+args(ArrayRef[Any], opt, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Code::Func::Next is a function object for Data::Object::Code.

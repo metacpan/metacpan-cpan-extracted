@@ -15,7 +15,8 @@ foreach my $file (@files) {
 }
 
 sub wanted {
-    push @files, $File::Find::name if /\.p(l|m|od)$/;
+    push @files, $File::Find::name if /\.p(l|m|od)$/
+        and $_ !~ /\bDSL\.pm$/; # we skip that one as it initializes immediately
 }
 
 sub synopsis_file_ok {
@@ -46,5 +47,5 @@ sub synopsis_file_ok {
             skip "$file has no SYNOPSIS section", 1;
         };
     };
-    
+
 }

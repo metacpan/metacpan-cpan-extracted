@@ -27,6 +27,10 @@ Data-Object Immutability Role
     return $args;
   }
 
+=libraries
+
+Data::Object::Library
+
 =description
 
 This package provides a mechanism for making any derived object immutable.

@@ -27,6 +27,17 @@ Data-Object Regexp Function (Replace) Class
 
 Data::Object::Regexp::Func
 
+=attributes
+
+arg1(Object, req, ro)
+arg2(Str, req, ro)
+arg3(Str, opt, ro)
+arg4(Str, opt, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Regexp::Func::Replace is a function object for

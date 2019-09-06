@@ -10,9 +10,9 @@ use Scalar::Util qw( looks_like_number );
 use JSON qw( decode_json );
 
 use Term::Choose            qw();
-use Term::Choose::Constants qw( :screen );
 use Term::Choose::LineFold  qw( line_fold print_columns );
-use Term::Choose::Util      qw( term_width insert_sep );
+use Term::Choose::Screen    qw( clear_screen );
+use Term::Choose::Util      qw( insert_sep get_term_width );
 use Term::Form              qw();
 
 
@@ -182,11 +182,11 @@ sub print_sql {
         $str = $filled
     }
     $str .= "\n";
-    $str = line_fold( $str, term_width() - 2, { init_tab => '', subseq => ' ' x 4 } );
+    $str = line_fold( $str, get_term_width() - 2, { init_tab => '', subseq => ' ' x 4 } );
     if ( defined wantarray ) {
         return $str;
     }
-    print CLEAR_SCREEN;
+    print clear_screen();
     print $str;
     if ( defined $waiting ) {
         print $waiting;
@@ -219,7 +219,7 @@ sub stmt_placeholder_to_value {
 
 sub alias {
     my ( $sf, $type, $identifier, $default ) = @_;
-    my $term_w = term_width();
+    my $term_w = get_term_width();
     my $info;
     if ( $identifier eq '' ) { # Union
         $identifier .= 'UNION Alias: ';

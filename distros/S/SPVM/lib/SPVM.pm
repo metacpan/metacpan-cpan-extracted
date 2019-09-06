@@ -7,9 +7,9 @@ use warnings;
 use DynaLoader;
 use File::Basename 'basename', 'dirname';
 
-use SPVM::Data;
-use SPVM::Data::Array;
-use SPVM::Data::Package;
+use SPVM::BlessedObject;
+use SPVM::BlessedObject::Array;
+use SPVM::BlessedObject::Package;
 use FindBin;
 
 use SPVM::Builder;
@@ -19,7 +19,7 @@ use Encode 'encode', 'decode';
 
 use Carp 'confess';
 
-our $VERSION = '0.0439';
+our $VERSION = '0.0440';
 
 my $SPVM_ENV;
 my $BUILDER;

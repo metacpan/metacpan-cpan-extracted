@@ -27,6 +27,10 @@ Data-Object Proxyable Role
     return sub { time }; # process method call
   }
 
+=libraries
+
+Data::Object::Library
+
 =description
 
 This role provides a wrapper around the AUTOLOAD routine which processes calls

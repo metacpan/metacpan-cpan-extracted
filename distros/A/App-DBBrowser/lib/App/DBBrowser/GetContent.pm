@@ -13,10 +13,10 @@ use File::Spec::Functions qw( catfile );
 use List::MoreUtils qw( all uniq );
 use Encode::Locale  qw();
 
-use Term::Choose            qw();
-use Term::Choose::Constants qw( :screen );
-use Term::Choose::Util      qw( choose_a_dir choose_a_number );
-use Term::Form              qw();
+use Term::Choose         qw();
+use Term::Choose::Screen qw( clear_screen );
+use Term::Choose::Util   qw( choose_a_dir choose_a_number );
+use Term::Form           qw();
 
 use App::DBBrowser::Auxil;
 use App::DBBrowser::GetContent::Filter;
@@ -50,7 +50,7 @@ sub __print_args {
         my $arg_rows = $ax->insert_into_args_info_format( $sql, '' );
         push @tmp, @$arg_rows;
         my $str = join( "\n", @tmp ) . "\n\n";
-        print CLEAR_SCREEN;
+        print clear_screen();
         print $str;
     }
 }

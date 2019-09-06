@@ -21,6 +21,10 @@ Functions for CodeRefs
 
 Data::Object::Func
 
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Code::Func is an abstract base class for function classes in the

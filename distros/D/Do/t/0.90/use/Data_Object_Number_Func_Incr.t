@@ -27,6 +27,15 @@ Data-Object Number Function (Incr) Class
 
 Data::Object::Number::Func
 
+=attributes
+
+arg1(Object, req, ro)
+arg2(StringLike, opt, ro)
+
+=libraries
+
+Data::Object::Library
+
 =description
 
 Data::Object::Number::Func::Incr is a function object for Data::Object::Number.
