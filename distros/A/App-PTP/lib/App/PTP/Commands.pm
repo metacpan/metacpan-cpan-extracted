@@ -10,7 +10,7 @@ use warnings;
 no warnings 'experimental::smartmatch';
 use feature 'switch';
 
-use App::PTP::Files qw(write_side_output read_side_input);
+use App::PTP::Files qw(write_side_output read_side_input write_handle);
 use App::PTP::PerlEnv;
 use App::PTP::Util;
 use Cwd qw(abs_path);
@@ -25,7 +25,7 @@ my @all_cmd =
     qw(prepare_perl_env do_grep do_substitute do_perl
     do_execute do_load do_sort do_list_op do_tail do_head do_delete_marked
     do_insert_marked do_set_markers do_number_lines do_file_name do_line_count
-    do_cut do_paste do_pivot do_tee);
+    do_cut do_paste do_pivot do_tee do_shell do_eat);
 our @EXPORT_OK = (@all_cmd, 'warn_or_die_if_needed');
 our %EXPORT_TAGS = (CMD => \@all_cmd);
 
@@ -213,6 +213,17 @@ sub prepare_re2 {
   return ($use_statement, "{${re}}");
 }
 
+# This interpolate str in the Perl env (unless -Q is in effect).
+sub maybe_interpolate {
+  my ($str, $modes, $options, $command) = @_;
+  if (not $modes->{quote_regex}) {
+    $str = eval_in_safe_env("<<\"PTP_EOF_WORD\"\n${str}\nPTP_EOF_WORD\n", $options);
+    die "FATAL: Cannot eval string for --${command}: ${@}\n" if $@;
+    chomp($str);
+  }
+  return $str;
+}
+
 sub do_grep {
   my ($content, $markers, $modes, $options, $re) = @_;
   my ($use_stmt, $quoted_re) = prepare_re2($re, $modes);
@@ -344,11 +355,13 @@ sub do_perl {
 }
 
 sub do_execute {
-  my ($content, $markers, $modes, $options, $code) = @_;
+  my ($content, $markers, $modes, $options, $cmd, $code) = @_;
+  $code = "use $code;" if $cmd eq 'M';
   eval_in_safe_env($code, $options);
   if ($@) {
     chomp($@);
-    die "FATAL: Perl code failed in --execute: ${@}\n";
+    my $scmd = '-'.($cmd =~ s/^(..)/-$1/r); # --execute or -M.
+    die "FATAL: Perl code failed in ${scmd}: ${@}\n";
   }
 }
 
@@ -383,11 +396,11 @@ sub do_sort {
       use locale;
       @$content = sort { $a cmp $b } @$content;
     } else {
-      die sprintf "INTERNAL ERROR: Invalid comparator (%s)\n.", 
+      die sprintf "INTERNAL ERROR: Invalid comparator (%s)\n", 
                   ${$modes->{comparator}};
     }
   } else {
-    die sprintf "INTERNAL ERROR: Invalid comparator type (%s)\n.",
+    die sprintf "INTERNAL ERROR: Invalid comparator type (%s)\n",
                 Dumper($modes->{comparator}) if ref $modes->{comparator};
     my $cmp = $modes->{comparator};
     my $sort = get_code_in_safe_env("sort { $cmp } \@_", $options,
@@ -500,8 +513,11 @@ sub do_file_name {
         ."\n";
   }
   if ($replace_all) {
-    @$content = ($name);
-    @$markers = (0);
+    # Does nothing to empty file.
+    if (@$content) {
+      @$content = ($name);
+      @$markers = (0);
+    }
   } else {
     unshift @$content, $name;
     unshift @$markers, 0;
@@ -573,14 +589,31 @@ sub do_pivot {
 
 sub do_tee {
   my ($content, $markers, $modes, $options, $file_name) = @_;
-  if (not $modes->{quote_regex}) {
-    $file_name = eval_in_safe_env("\"${file_name}\"", $options);
-    die "FATAL: Cannot eval string for --tee: ${@}" if $@;
-  }
+  $file_name = maybe_interpolate($file_name, $modes, $options, 'tee');
   # This missing_final_separator is not really an option, it is added in the
   # modes struct by the 'process' method, specifically for this function.
   write_side_output($file_name, $content, $modes->{missing_final_separator},
                     $options);
+}
+
+sub do_shell {
+  my ($content, $markers, $modes, $options, $command, $arg) = @_;
+  die "INTERNAL ERROR: Unexpected command in do_tee: ${command}\n" unless $command eq 'shell';
+  $arg = maybe_interpolate($arg, $modes, $options, $command);
+  {
+    local $SIG{PIPE} = "IGNORE";
+    open(my $pipe, '|-', $arg) or die "FATAL: Cannot execute command given to --${command}: $!\n";
+    write_handle($pipe, $content, $modes->{missing_final_separator}, $options);
+    # When run by CPAN testers, this fails sometime for unknown reason. So this
+    # is only a warning and not a fatal error.
+    close $pipe or print "WARNING: Cannot close pipe for command given to --${command}: $!\n";
+  }  
+}
+
+sub do_eat {
+  my ($content, $markers, $modes, $options) = @_;
+  @$content = ();
+  @$markers = ();
 }
 
 1;

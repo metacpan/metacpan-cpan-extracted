@@ -136,9 +136,9 @@ our %EXPORT_TAGS = (
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
-our $VERSION = '0.14';
+our $VERSION = '2';
 our $DEBUG   = 0;
-my $vc;
+our $vc;
 
 use XSLoader;
 XSLoader::load( 'Image::Sane', $VERSION );
@@ -200,7 +200,7 @@ Project
 
 =head1 VERSION
 
-0.14
+2
 
 =head1 SYNOPSIS
 

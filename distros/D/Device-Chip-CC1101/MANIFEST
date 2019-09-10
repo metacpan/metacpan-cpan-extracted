@@ -1,0 +1,16 @@
+Build.PL
+Changes
+examples/cc1101.pl
+lib/Device/Chip/CC1101.pm
+MANIFEST			This list of files
+t/00use.t
+t/01registers.t
+t/02config.t
+t/03commands.t
+t/10receive.t
+t/11transmit.t
+t/99pod.t
+README
+LICENSE
+META.yml
+META.json

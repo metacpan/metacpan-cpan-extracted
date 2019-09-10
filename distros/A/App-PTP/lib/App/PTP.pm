@@ -11,7 +11,7 @@ use Data::Dumper;
 use File::Find;
 use Safe;
 
-our $VERSION = '1.04';
+our $VERSION = '1.08';
 
 $Data::Dumper::Terse = 1;  # Don't output variable names.
 $Data::Dumper::Sortkeys = 1;  # Sort the content of the hash variables.
@@ -81,7 +81,7 @@ sub process_all {
     my @content;
     for my $input (@$inputs) {
       my ($content, $missing_separator) =
-          read_input($input, $options);
+          read_input($input, $options, $stdin);
       push @content, @$content;
       $missing_final_separator = $missing_separator;
     }

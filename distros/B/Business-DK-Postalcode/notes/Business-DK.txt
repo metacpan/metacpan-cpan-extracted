@@ -1,0 +1,6 @@
+
+http://search.cpan.org/~mamawe/Algorithm-CheckDigits-0.38/
+
+http://search.cpan.org/~tmtm/Business-Barcode-EAN13-1.01/lib/Business/Barcode/EAN13.pm
+
+http://search.cpan.org/~mamawe/Algorithm-CheckDigits-0.38/CheckDigits/M11_008.pm

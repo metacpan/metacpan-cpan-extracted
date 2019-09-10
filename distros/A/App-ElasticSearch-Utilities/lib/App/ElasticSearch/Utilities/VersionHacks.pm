@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION = '7.2'; # VERSION
+our $VERSION = '7.3'; # VERSION
 
 use Const::Fast;
 use CLI::Helpers qw(:all);
@@ -157,13 +157,14 @@ sub _cluster_state_1_0 {
 sub _search_params {
     my ($url,$options,$data,$version) = @_;
 
-    # Handle the API Changes in version 7.0.0
-    if( qv($version) < qv("7.0.0") ) {
-        if( exists $options->{uri_param} ) {
-            foreach my $invalid ( qw(track_total_hits rest_total_hits_as_int) ) {
-                delete $options->{uri_param}{$invalid}
-                    if exists $options->{uri_param}{$invalid};
-            }
+    my @invalid = ();
+    push @invalid, "track_total_hits"       if qv($version) < qv("6.0.0");
+    push @invalid, "rest_total_hits_as_int" if qv($version) < qv("7.0.0");
+
+    if( @invalid && exists $options->{uri_param} ) {
+        foreach my $invalid ( @invalid ) {
+            delete $options->{uri_param}{$invalid}
+                if exists $options->{uri_param}{$invalid};
         }
     }
 
@@ -182,7 +183,7 @@ App::ElasticSearch::Utilities::VersionHacks - Fix version issues to support all 
 
 =head1 VERSION
 
-version 7.2
+version 7.3
 
 =head1 AUTHOR
 

@@ -10,7 +10,7 @@ Protocol::ACME::Challenge - Empty base class for ACME Challenges
 
 =cut
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 
 1;

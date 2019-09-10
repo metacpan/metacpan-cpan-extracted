@@ -48,8 +48,13 @@ isa_ok $data, 'Data::Object::Hash';
 $data = Data::Object::Hash->new($data);
 isa_ok $data, 'Data::Object::Hash';
 
+# instantiate without arg
+$data = Data::Object::Hash->new;
+isa_ok $data, 'Data::Object::Hash';
+is_deeply $data, {};
+
 # instantiation error
-ok !eval{Data::Object::Hash->new};
+ok !eval{Data::Object::Hash->new([])};
 like $@, qr(Instantiation Error);
 
 ok 1 and done_testing;

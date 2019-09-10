@@ -157,7 +157,7 @@ Coverage of the test suite is at 57.6%
 
 =over
 
-=item * Get the untaint functionality tested thoroughly, that would bring the coverage to 100%, the L</match_valid_postalcode> does not seem to be run.
+=item * Get the untaint functionality tested thoroughly, that would bring the coverage to 100%, the L</match_postalcode> does not seem to be run.
 
 =item * Comply with Data::FormValidator, especially for untainting
 

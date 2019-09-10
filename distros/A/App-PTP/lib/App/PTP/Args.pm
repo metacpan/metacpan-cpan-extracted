@@ -111,6 +111,7 @@ sub options_flags {(
   'fix-final-separator!' => \$options{fix_final_separator},
   '0' => sub { $options{input_separator} = '\000';
                $options{output_separator} = '' },
+  '00' => sub { $options{output_separator} = "\000" },
   'preserve-input-separator|eol' =>
       sub { $options{preserve_eol} = 1; $options{output_separator} = '' },
   'preserve-perl-env!' => \$options{preserve_perl_env},
@@ -183,7 +184,10 @@ sub action_flags {(
       sub { push @pipeline, ['mark-line', \&do_perl, {%modes}, 'mark-line',
                              $_[1]] },
   'execute|e=s' =>
-      sub { push @pipeline, ['execute', \&do_execute, {%modes}, $_[1]] },    
+      sub { push @pipeline, ['execute', \&do_execute, {%modes}, 'execute',
+                             $_[1]] },    
+  'M=s' =>
+      sub { push @pipeline, ['M', \&do_execute, {%modes}, 'M', $_[1]] },
   'load|l=s' =>
       sub { push @pipeline, ['load', \&do_load, {%modes}, $_[1]] },
   'sort' => sub { push @pipeline, ['sort', \&do_sort, {%modes}] },
@@ -207,6 +211,7 @@ sub action_flags {(
   'shuffle' =>
       sub { push @pipeline, ['shuffle', \&do_list_op, {%modes},
                              \&List::Util::shuffle, 0] },
+  'eat' => sub { push @pipeline, ['eat', \&do_eat, {%modes}] },
   'delete-marked' =>
       sub { push @pipeline, ['delete-marked', \&do_delete_marked, {%modes}, 
                              0] },
@@ -249,7 +254,9 @@ sub action_flags {(
       sub { push @pipeline, ['prefix-file-name', \&do_file_name, {%modes}, 0] },
   'line-count|lc' =>
       sub { push @pipeline, ['line-count', \&do_line_count, {%modes}] },
-  'tee=s' => sub { push @pipeline, ['tee', \&do_tee, {%modes}, $_[1]] }
+  'tee=s' => sub { push @pipeline, ['tee', \&do_tee, {%modes}, $_[1]] },
+  'shell=s' => sub { push @pipeline, ['shell', \&do_shell, {%modes}, 'shell',
+                                      $_[1]] }
 )}
 
 sub all_args {

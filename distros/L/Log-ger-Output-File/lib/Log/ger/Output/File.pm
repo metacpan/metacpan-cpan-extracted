@@ -1,12 +1,15 @@
 package Log::ger::Output::File;
 
-our $DATE = '2019-04-23'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $DATE = '2019-09-10'; # DATE
+our $VERSION = '0.008'; # VERSION
 
 ## no critic (InputOutput::RequireBriefOpen)
 
 use strict;
 use warnings;
+
+# supply object methods for filehandles, required for older perls e.g. 5.10
+use FileHandle;
 
 our %lock_handles;
 
@@ -65,7 +68,7 @@ sub get_hooks {
                     $lock_handle = $code_lock->() if $lock_mode eq 'write';
                     print $fh $_[1];
                     print $fh "\n" unless $_[1] =~ /\R\z/;
-                    $fh->flush if $fh->can("flush") && $autoflush || $lock_handle;
+                    $fh->flush if $autoflush || $lock_handle;
                     undef $lock_handle;
                 };
                 [$logger];
@@ -88,7 +91,7 @@ Log::ger::Output::File - Send logs to file
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 

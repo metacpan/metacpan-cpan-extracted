@@ -2,7 +2,7 @@ NAME
     App::CompleteCLIs - CLI wrappers for complete_*() functions
 
 VERSION
-    This document describes version 0.140 of App::CompleteCLIs (from Perl
+    This document describes version 0.142 of App::CompleteCLIs (from Perl
     distribution App-CompleteCLIs), released on 2019-07-18.
 
 SYNOPSIS
@@ -11,9 +11,19 @@ DESCRIPTION
     "Complete::*" modules. They are meant for convenient testing of the
     various "complete_*" functions on the command-line.
 
+    *   complete-acme-metasyntactic-meta-category
+
+    *   complete-acme-metasyntactic-meta-theme
+
+    *   complete-acme-metasyntactic-meta-theme-and-category
+
     *   complete-array-elem
 
     *   complete-country-code
+
+    *   complete-currency-code
+
+    *   complete-cwalitee-indicator
 
     *   complete-dist
 
@@ -45,6 +55,8 @@ DESCRIPTION
 
     *   complete-known-mac
 
+    *   complete-language-code
+
     *   complete-locale
 
     *   complete-manpage
@@ -62,6 +74,8 @@ DESCRIPTION
     *   complete-perl-version
 
     *   complete-pid
+
+    *   complete-pod
 
     *   complete-ppr-subpattern
 

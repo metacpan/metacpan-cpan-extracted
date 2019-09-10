@@ -4,7 +4,7 @@
       "Stephen Ludin <sludin@ludin.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380",
    "license" : [
       "artistic_2"
    ],
@@ -19,41 +19,6 @@
          "inc"
       ]
    },
-   "prereqs" : {
-      "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
-      "configure" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
-      "runtime" : {
-         "requires" : {
-            "Crypt::Format" : "0.04",
-            "Crypt::OpenSSL::Bignum" : "0.04",
-            "Crypt::OpenSSL::RSA" : "0.28",
-            "Crypt::RSA::Parse" : "0.02",
-            "Digest::SHA" : "5.88",
-            "HTTP::Tiny" : "0.050",
-            "IO::Socket::SSL" : "1.56",
-            "JSON" : "2.61",
-            "Log::Any" : "0.15",
-            "Log::Any::Adapter" : "0.11",
-            "Net::SSLeay" : "1.49",
-            "Test::Exception" : "0.35",
-            "perl" : "5.007003"
-         }
-      },
-      "test" : {
-         "requires" : {
-            "Test::Exception" : "0",
-            "Test::More" : "0"
-         }
-      }
-   },
    "release_status" : "stable",
    "resources" : {
       "repository" : {
@@ -62,5 +27,6 @@
          "web" : "https://github.com/sludin/Protocol-ACME"
       }
    },
-   "version" : "1.01"
+   "version" : "1.02",
+   "x_deprecated" : 1
 }

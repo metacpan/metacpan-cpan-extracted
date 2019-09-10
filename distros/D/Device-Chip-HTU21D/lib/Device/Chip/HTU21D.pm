@@ -11,7 +11,7 @@ use base qw( Device::Chip );
 
 use Carp;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use Data::Bitfield 0.02 qw( bitfield boolfield );
 use List::Util qw( first );
@@ -75,7 +75,7 @@ use constant {
    CMD_SOFT_RESET           => 0xFE,
 };
 
-bitfield { format => "bytes-BE" }, REG_USER =>
+bitfield { format => "bytes-LE" }, REG_USER =>
    RES0       => boolfield( 0 ),
    OTPDISABLE => boolfield( 1 ),
    HEATER     => boolfield( 2 ),

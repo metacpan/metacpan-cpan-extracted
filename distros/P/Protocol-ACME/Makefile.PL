@@ -20,6 +20,7 @@ WriteMakefile(
     },
     META_MERGE => {
         'meta-spec' => { version => 2 },
+         x_deprecated => 1,
          resources => {
              repository => {
                  type => 'git',

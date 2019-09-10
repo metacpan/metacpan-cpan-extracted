@@ -103,7 +103,16 @@ FIELD TYPES
        intfield( $bitnum, $width )
 
     Declares a field of $width bits wide, starting at the given bit index,
-    whose value is an integer. It will be shifted appropriately.
+    whose value is an unsigned integer. It will be shifted appropriately.
+
+ signed_intfield
+
+       signed_intfield( $bitnum, $width )
+
+    Since version 0.04.
+
+    Declares a field of $width bits wide, starting at the given bit index,
+    whose value is a signed integer. It will be shifted appropriately.
 
  enumfield
 

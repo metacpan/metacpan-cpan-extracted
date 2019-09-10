@@ -7,7 +7,7 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 
 use AppPtpTest;
-use Test::More tests => 36;
+use Test::More tests => 37;
 
 
 for my $use_safe (0..2) {
@@ -65,4 +65,6 @@ for my $use_safe (0..2) {
               'use Tie::Scalar; my $a; tie $a, "Tie::StdScalar";']) };
   ok($@ =~ /Perl code failed.*trapped by operation mask/,
      'tie disallowed with --safe 2');
+}{
+  is(ptp(['-M', 'File::Basename', '--pivot', '-n', 'dirname($f)', 'src/fake.h']), "src\n", 'load module');
 }

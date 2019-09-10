@@ -1,7 +1,7 @@
 package JobCenter::Client::Mojo;
 use Mojo::Base 'Mojo::EventEmitter';
 
-our $VERSION = '0.38'; # VERSION
+our $VERSION = '0.39'; # VERSION
 
 #
 # Mojo's default reactor uses EV, and EV does not play nice with signals
@@ -258,12 +258,17 @@ sub call_nb {
 	my $rescb = $args{cb2} // die 'no result callback?';
 	my $timeout = $args{timeout} // $self->timeout * 5; # a bit hackish..
 	my $reqauth = $args{reqauth};
+	my $clenv = $args{clenv};
 	my $inargsj;
 
 	if ($self->{json}) {
 		$inargsj = $inargs;
 		$inargs = decode_json($inargs);
 		croak 'inargs is not a json object' unless ref $inargs eq 'HASH';
+		if ($clenv) {
+			$clenv = decode_json($clenv);
+			croak 'clenv is not a json object' unless ref $clenv eq 'HASH';
+		}
 		if ($reqauth) {
 			$reqauth = decode_json($reqauth);
 			croak 'reqauth is not a json object' unless ref $reqauth eq 'HASH';
@@ -272,6 +277,9 @@ sub call_nb {
 		croak 'inargs should be a hashref' unless ref $inargs eq 'HASH';
 		# test encoding
 		$inargsj = encode_json($inargs);
+		if ($clenv) {
+			croak 'clenv should be a hashref' unless ref $clenv eq 'HASH';
+		}
 		if ($reqauth) {
 			croak 'reqauth should be a hashref' unless ref $reqauth eq 'HASH';
 		}
@@ -288,6 +296,7 @@ sub call_nb {
 				vtag => $vtag,
 				inargs => $inargs,
 				timeout => $timeout,
+				($clenv ? (clenv => $clenv) : ()),
 				($reqauth ? (reqauth => $reqauth) : ()),
 			}, $d->begin(0));
 		},
@@ -455,7 +464,7 @@ sub ping {
 }
 
 sub work {
-	my ($self) = @_;
+	my ($self, $prepare) = @_;
 
 	my $pt = $self->ping_timeout;
 	my $tmr;
@@ -475,6 +484,7 @@ sub work {
 		$self->ioloop->{__exit__} = $code;
 		$self->ioloop->stop;
 	});
+	return 0 if $prepare;
 
 	$self->ioloop->{__exit__} = WORK_OK;
 	$self->log->debug('JobCenter::Client::Mojo starting work');
@@ -873,6 +883,9 @@ Valid arguments are:
 
 =item - reqauth: authentication token to be passed on to the authentication
 module of the API for per job/request authentication.
+
+=item - clenv: client environment, made available as part of the job
+environment and inherited to child jobs.
 
 =back
 

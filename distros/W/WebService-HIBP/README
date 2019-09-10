@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 0.11
+    Version 0.15
 
 SYNOPSIS
 
@@ -40,6 +40,10 @@ SUBROUTINES/METHODS
       * user_agent - A pre-configured instance of LWP::UserAgent that will
       be used instead of the automatically created one. This allows full
       control of the user agent properties if desired
+
+      * api_key - User provided API key to access HaveIBeenPwned API, see
+      https://haveibeenpwned.com/API/v3#Authorisation and
+      https://haveibeenpwned.com/API/Key for details.
 
  password
 
@@ -204,11 +208,19 @@ DEPENDENCIES
 
     WebService::HIBP requires the following non-core modules
 
-      JSON
-      LWP::UserAgent
-      LWP::Protocol::https
-      URI::Escape
-      Digest::SHA
+    Encode
+
+    Unicode::Normalize
+
+    JSON
+
+    LWP::UserAgent
+
+    LWP::Protocol::https
+
+    URI::Escape
+
+    Digest::SHA
 
 INCOMPATIBILITIES
 

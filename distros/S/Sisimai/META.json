@@ -60,7 +60,7 @@
    "provides" : {
       "Sisimai" : {
          "file" : "lib/Sisimai.pm",
-         "version" : "v4.25.2"
+         "version" : "v4.25.3"
       },
       "Sisimai::ARF" : {
          "file" : "lib/Sisimai/ARF.pm"
@@ -443,7 +443,7 @@
          "web" : "https://github.com/sisimai/p5-Sisimai"
       }
    },
-   "version" : "v4.25.2",
+   "version" : "v4.25.3",
    "x_contributors" : [
       "jcbf <underspell@gmail.com>",
       "Jonathan Leroy <jonathan@inikup.com>",

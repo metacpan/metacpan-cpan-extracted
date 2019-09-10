@@ -1,7 +1,7 @@
 package Complete::Getopt::Long;
 
-our $DATE = '2019-06-26'; # DATE
-our $VERSION = '0.471'; # VERSION
+our $DATE = '2019-09-10'; # DATE
+our $VERSION = '0.472'; # VERSION
 
 use 5.010001;
 use strict;
@@ -737,7 +737,7 @@ Complete::Getopt::Long - Complete command-line argument using Getopt::Long speci
 
 =head1 VERSION
 
-This document describes version 0.471 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2019-06-26.
+This document describes version 0.472 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2019-09-10.
 
 =head1 SYNOPSIS
 

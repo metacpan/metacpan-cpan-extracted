@@ -2,7 +2,7 @@ package Test2::Harness::Watcher;
 use strict;
 use warnings;
 
-our $VERSION = '0.001095';
+our $VERSION = '0.001099';
 
 use Carp qw/croak/;
 use Scalar::Util qw/blessed/;
@@ -352,7 +352,10 @@ sub kill {
 
     my $pid = $self->{+JOB}->pid;
 
-    return kill('TERM', $pid) if $pid;
+    if ($pid ) {
+        my $sig = 'TERM';
+        return kill("-$sig", $pid) || kill($sig, $pid);
+    }
     return 0;
 }
 

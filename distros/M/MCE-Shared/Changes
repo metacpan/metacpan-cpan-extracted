@@ -1,6 +1,24 @@
 
 Revision history for Perl module MCE::Shared.
 
+1.850 Mon Sep 09 12:30:00 EST 2019
+
+  * More safety around cleanup code in MCE::Shared::Server.
+
+  * Bumped MCE dependency to 1.850.
+
+1.849 Sun Sep 08 23:30:00 EST 2019
+
+  * Fixed edge case in MCE::Hobo when reaping inside a signal handler.
+  * Guard cleanup code in MCE::Shared::Server during global destruction.
+  * Configured extra data channel used for reaping Hobos and exporting.
+  * Optimized reaping in MCE::Hobo when void_context is set.
+
+  * Added list_pids class method to MCE::Hobo.
+  * Added pid class method to MCE::Shared.
+
+  * Bumped MCE dependency to 1.849.
+
 1.848 Tue Sep 03 23:30:00 EST 2019
 
   * Fixed broken examples in the MCE::Shared documentation.

@@ -25,7 +25,7 @@ subtest basics => sub {
         args        => {getopt_spec=>\%gospec, completion=>sub{[]}},
         comp_line0  => 'CMD ^',
         result      => [qw/--bool --flag1 --flag2 --flag3 --flag4 --float --int
-                           --no-bool --nobool --str -1 -2 -3 -F -S -f/],
+                           --no-bool --nobool --str -1 -2 -3 -F -f -S/],
     );
     test_complete(
         name        => 'option name (2)',
@@ -209,7 +209,7 @@ subtest basics => sub {
                         completion=>sub { [qw/-x/] }},
         comp_line0  => 'CMD ^',
         result      => [qw/--bool --flag1 --flag2 --flag3 --flag4 --float --int --no-bool
-                           --nobool --str -1 -2 -3 -F -S -f -x/],
+                           --nobool --str -1 -2 -3 -F -f -S -x/],
     );
     # if the user types '-', she indicates that she wants option names only
     test_complete(

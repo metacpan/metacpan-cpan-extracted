@@ -1,0 +1,211 @@
+NAME
+
+    Device::Chip::CC1101 - chip driver for a CC1101
+
+DESCRIPTION
+
+    This Device::Chip subclass provides specific communication to a Texas
+    Instruments CC1101 radio transceiver chip attached to a computer via an
+    SPI adapter.
+
+    The reader is presumed to be familiar with the general operation of
+    this chip; the documentation here will not attempt to explain or define
+    chip-specific concepts or features, only the use of this module to
+    access them.
+
+CONSTRUCTOR
+
+ new
+
+       $chip = Device::Chip::CC1101->new( %ops )
+
+    Constructs a new Device::Chip::CC1101 instance. Takes the following
+    optional named arguments:
+
+      * fosc
+
+      Gives the XTAL oscillator frequency in Hz. This is used by the
+      carrier_frequency to calculate the actual frequency from the chip
+      config. A default of 26MHz applies if not supplied.
+
+      * poll_interval
+
+      Interval in seconds to poll the chip status after transmitting. A
+      default of 20msec applies if not supplied.
+
+METHODS
+
+    The following methods documented with a trailing call to ->get return
+    Future instances.
+
+ read_register
+
+       $value = $chip->read_register( $addr )->get
+
+    Reads a single byte register and returns its numerical value.
+
+    $addr should be between 0 and 0x3D, giving the register address.
+
+ read_config
+
+       $config = $chip->read_config->get
+
+    Reads and returns the current chip configuration as a HASH reference.
+
+    The returned hash will contain keys with capitalized names representing
+    all of the config register fields in the datasheet, from registers
+    IOCFG2 to RCCTRL0. Values are returned either as integers, or converted
+    enumeration names. Where documented by the datasheet, the enumeration
+    values are capitalised. Where invented by this module from the
+    description they are given in lowercase.
+
+    The value of PATABLE is also returned, rendered as a human-readable hex
+    string in the form
+
+       PATABLE => "01.23.45.67.89.AB.CD.EF",
+
+ change_config
+
+       $chip->change_config( %changes )->get
+
+    Writes the configuration registers to apply the given changes. Any
+    fields not specified will retain their current values. The value of
+    PATABLE can also be set here. Values should be given using the same
+    converted forms as the read_config returns.
+
+    The following additional lowercase-named keys are also provided as
+    shortcuts.
+
+      * mode => STRING
+
+      A convenient shortcut to setting the configuration state to one of
+      the presets supplied with the module. The names of these presets are
+
+         GFSK-1.2kb
+         GFSK-38.4kb
+         GFSK-100kb
+         MSK-250kb
+         MSG-500kb
+
+ carrier_frequency
+
+       $freq = $chip->carrier_frequency->get
+
+    Returns the calculated carrier frequency in Hz, from the FREQ config
+    register, presuming the default main XTAL frequency of 26MHz.
+
+ read_marcstate
+
+       $state = $chip->read_marcstate->get
+
+    Reads the MARCSTATE register and returns the state name.
+
+ read_chipstatus_rx
+
+ read_chipstatus_tx
+
+       $status = $chip->read_chipstatus_rx->get
+    
+       $status = $chip->read_chipstatus_tx->get
+
+    Reads the chip status word and returns a reference to a hash containing
+    the following:
+
+       STATE                => string
+       FIFO_BYTES_AVAILABLE => integer
+
+ read_pktstatus
+
+       $status = $chip->read_pktstatus->get
+
+    Reads the PKTSTATUS register and returns a reference to a hash
+    containing boolean fields of the following names:
+
+       CRC_OK CS PQT_REACHED CCA SFD GDO0 GDO2
+
+ reset
+
+       $chip->reset->get
+
+    Command the chip to perform a software reset.
+
+ flush_fifos
+
+       $chip->flush_fifos->get
+
+    Command the chip to flush the RX and TX FIFOs.
+
+ start_rx
+
+       $chip->start_rx->get
+
+    Command the chip to enter RX mode.
+
+ start_tx
+
+       $chip->start_tx->get
+
+    Command the chip to enter TX mode.
+
+ idle
+
+       $chip->idle->get
+
+    Command the chip to enter IDLE mode.
+
+ read_rxfifo
+
+       $bytes = $chip->read_rxfifo( $len )->get
+
+    Reads the given number of bytes from the RX FIFO.
+
+ write_txfifo
+
+       $chip->write_txfifo( $bytes )->get
+
+    Writes the given bytes into the TX FIFO.
+
+ receive
+
+       $packet = $chip->receive->get
+
+    Retrieves a packet from the RX FIFO, returning a HASH reference.
+
+       data => STRING
+
+    This method automatically strips the RSSI, LQI and CRC_OK fields from
+    the data and adds them to the returned hash if the chip is configured
+    with APPEND_STATUS.
+
+       RSSI   => NUM (in units of dBm)
+       LQI    => INT
+       CRC_OK => BOOL
+
+    This method automatically handles prepending the packet length if the
+    chip is configured in variable-length packet mode.
+
+    TODO: Note that, despite its name, this method does not currently wait
+    for a packet to be available - the caller is responsible for calling
+    "start_rx" and waiting for a packet to be received. This may be
+    provided in a later version by polling chip status or using interrupts
+    if Device::Chip makes them available.
+
+ transmit
+
+       $chip->transmit( $bytes )->get
+
+    Enters TX mode and sends a packet containing the given bytes.
+
+    This method automatically handles prepending the packet length if the
+    chip is configured in variable-length packet mode.
+
+TODO
+
+      * Polling/interrupts to wait for RX packet
+
+      * Support addressing modes in "transmit" and "receive"
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

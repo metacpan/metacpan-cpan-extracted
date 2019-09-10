@@ -1,5 +1,8 @@
 Revision history for WebService-HIBP
 
+0.15   Tue Sep 10 22:05:00 2019
+        Moving to v3 of HIBP API.  Thanks to Matthew Meldrum in RT #130475.
+
 0.14   Wed May 02 20:47:00 2019
         Resubmit after index failure
 

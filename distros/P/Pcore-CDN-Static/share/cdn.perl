@@ -2,7 +2,7 @@
 
     # amCharts4
     amcharts4 => sub ( $cdn, $native, $args ) {
-        my $ver = version->parse( $args->{ver} // v4.5.10 );
+        my $ver = version->parse( $args->{ver} // v4.5.16 );
 
         state $native_prefix = 'https://www.amcharts.com/lib/4';
 
@@ -22,7 +22,7 @@
 
     # amCharts4 geodata
     amcharts4_geodata => sub ( $cdn, $native, $args ) {
-        my $ver = version->parse( $args->{ver} // v4.1.6 );
+        my $ver = version->parse( $args->{ver} // v4.1.7 );
 
         state $native_prefix = 'https://www.amcharts.com/lib/4/geodata';
 
@@ -60,9 +60,34 @@
         }
     },
 
+    extjs7 => sub ( $cdn, $native, $args ) {
+        my $ver = version->parse( $args->{ver} // v7.0.0 );
+
+        if (wantarray) {
+            my @res;
+
+            my $debug = $args->{devel} ? '-debug' : $EMPTY;
+
+            # framework
+            push @res, $cdn->get_script_tag( $cdn->("/static/ext/$ver/ext$debug.js") );
+
+            # theme
+            push @res, $cdn->get_css_tag( $cdn->("/static/ext/$ver/theme-$args->{theme}/resources/theme-$args->{theme}-all$debug.css") );
+            push @res, $cdn->get_script_tag( $cdn->("/static/ext/$ver/theme-$args->{theme}/theme-$args->{theme}$debug.js") );
+
+            # fashion, only for modern material theme
+            push @res, $cdn->get_script_tag( $cdn->("/static/ext/$ver/css-vars.js") );
+
+            return @res;
+        }
+        else {
+            return $cdn->("/static/extjs/$ver");
+        }
+    },
+
     # FontAwesome
     fa5 => sub ( $cdn, $native, $args ) {
-        my $ver = version->parse( $args->{ver} // v5.9.0 );
+        my $ver = version->parse( $args->{ver} // v5.10.2 );
 
         state $native_prefix = 'https://use.fontawesome.com/releases';
 
@@ -76,7 +101,7 @@
 
     # froala, https://www.froala.com/wysiwyg-editor
     froala3 => sub ( $cdn, $native, $args ) {
-        my $ver = version->parse( $args->{ver} // v3.0.3 );
+        my $ver = version->parse( $args->{ver} // v3.0.5 );
 
         if (wantarray) {
             my @res;
@@ -156,7 +181,7 @@
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 1                    | Modules::ProhibitExcessMainComplexity - Main code has high complexity score (33)                               |
+## |    3 | 1                    | Modules::ProhibitExcessMainComplexity - Main code has high complexity score (36)                               |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

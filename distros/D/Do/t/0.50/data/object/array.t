@@ -153,8 +153,8 @@ ok Data::Object::Array->does('Data::Object::Role::Throwable');
 # can_ok 'Data::Object::Array', 'values';
 
 subtest 'test instantiation' => sub {
-  eval { Data::Object::Array->new };
-  like $@, qr/Instantiation Error/;
+  my $a0 = Data::Object::Array->new;
+  is_deeply $a0, [];
 
   eval { Data::Object::Array->new(1) };
   like $@, qr/Instantiation Error/;

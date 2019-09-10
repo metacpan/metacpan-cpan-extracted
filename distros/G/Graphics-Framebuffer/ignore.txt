@@ -18,3 +18,5 @@ test*
 *.yml
 src/Framebuffer.pm
 subs.pl
+examples/many*
+examples/mce*

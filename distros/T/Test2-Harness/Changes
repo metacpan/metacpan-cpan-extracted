@@ -1,3 +1,23 @@
+0.001099  2019-09-09 21:12:15-07:00 America/Los_Angeles
+
+    - Add --durations and --maybe_durations options
+
+0.001098  2019-09-09 13:35:22-07:00 America/Los_Angeles
+
+    - Add current dir to run data
+    - Add rel/abs paths to harness_job_start/end
+
+0.001097  2019-09-08 19:22:56-07:00 America/Los_Angeles
+
+    - Add speedtag command
+
+0.001096  2019-09-08 15:24:00-07:00 America/Los_Angeles
+
+    - Cleanup help options a bit
+    - Split category into category and duration
+    - Clean up the ProcMan module
+    - Tests start as their own process groups
+
 0.001095  2019-09-04 15:38:07-07:00 America/Los_Angeles
 
     - Fix logging of plugin when it is blessed

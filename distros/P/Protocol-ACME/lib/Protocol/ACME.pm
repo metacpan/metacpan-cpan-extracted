@@ -4,8 +4,9 @@ use 5.007003;
 use strict;
 use warnings;
 
+use Data::Dumper;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 =head1 NAME
 
@@ -13,7 +14,7 @@ Protocol::ACME - Interface to the Let's Encrypt ACME API
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =head1 SYNOPSIS
 
@@ -312,6 +313,17 @@ use Carp;
 
 my $USERAGENT = "Protocol::ACME v$VERSION";
 my $NONCE_HEADER = "replay-nonce";
+#my $DEFAULT_VERSION = 2;
+my $VERSION_MAX = 2;
+my $VERSION_MIN = 1;
+
+my $endpoints =
+{
+  1 => { primary => [],
+         meta    => [] },
+  2 => { primary => [ qw( newNonce newAccount newOrder newAuthz revokeCert keyChange ) ] ,
+         meta    => [ qw( website caaIdentities caaIdentities termsOfService ) ] }
+};
 
 sub new
 {
@@ -339,6 +351,7 @@ sub _init
 
   # TODO: There are more elegant and well baked ways to take care of the
   #       parameter handling that I am doing here
+  $self->{version}  = $args->{host}    if exists $args->{version};
   $self->{host}     = $args->{host}    if exists $args->{host};
   $self->{ua}       = $args->{ua}      if exists $args->{ua};
   $self->{openssl}  = $args->{openssl} if exists $args->{openssl};
@@ -374,6 +387,14 @@ sub _init
   }
 
   $self->{links}->{directory} = "https://" . $self->{host} . '/directory';
+
+  if ( exists $self->{version} )
+  {
+    if ( $self->{version} < $VERSION_MIN || $self->{version} > $VERSION_MAX )
+    {
+      _throw( detail => "ACME version number must an integer between $VERSION_MIN and VERSION_MAX" );
+    }
+  }
 
   $self->{nonce} = undef;
 
@@ -522,16 +543,131 @@ sub directory
 
   my $data = _decode_json( $resp->{content} );
 
-  @{$self->{links}}{keys %$data} = values %$data;
+  if ( ! $self->{version} )
+  {
+    if ( exists $data->{'new-reg'} )
+    {
+      $self->{version} = 1;
+    }
+    elsif ( exists $data->{newNonce} )
+    {
+      $self->{version} = 2;
+    }
+    else
+    {
+      _throw( detail => "Unable to determine the ACME endpoint version" );
+    }
+  }
 
+  if ( $self->{version} == 1 )
+  {
+    if ( ! exists $data->{'new-reg'} )
+    {
+      _throw( detail => "Requested ACME v1 but the endpoint does not seem to support v1" );
+    }
+    @{$self->{links}}{keys %$data} = values %$data;
+  }
+  else
+  {
+    if ( ! exists $data->{'newNonce'} )
+    {
+      _throw( detail => "Requested ACME v2 but the endpoint does not seem to support v2" );
+    }
+
+    for my $endpoint ( @{$endpoints->{2}->{primary}} )
+    {
+      $self->{links}->{$endpoint} = $data->{$endpoint};
+    }
+
+    for my $endpoint ( @{$endpoints->{2}->{meta}} )
+    {
+      $self->{links}->{meta}->{$endpoint} = $data->{meta}->{$endpoint};
+    }
+
+  }
+
+  if ( $self->{version} > 1 )
+  {
+    $self->fetch_nonce();
+  }
 
   $self->{log}->debug( "Let's Encrypt Directories loaded." );
+}
+
+
+sub fetch_nonce
+{
+  my $self = shift;
+
+  if ( $self->{version} < 2 )
+  {
+    _throw( detail => "fetchNonce only supporeted in version 2 and above" );
+  }
+
+  if ( ! $self->{nonce} )
+  {
+    $self->{log}->debug( "Fetchign nonce" );
+
+    my $resp = $self->_request_head( $self->{links}->{newNonce} );
+
+    $self->{nonce} = $resp->{headers}->{$NONCE_HEADER};
+  }
+
+  return $self->{nonce};
 }
 
 #
 # Register the account or load the reg url for an existing account ( new-reg or reg )
 #
 sub register
+{
+  my $self = shift;
+
+  if ( $self->{version} == 1 )
+  {
+    $self->register_v1( @_ );
+  }
+  elsif ( $self->{version} == 2 )
+  {
+    $self->register_v2( @_ );
+  }
+  else
+  {
+    _throw( details => "Unknown version: $self-{version}" );
+  }
+
+}
+
+sub register_v2
+{
+  my $self = shift;
+  my %args = @_;
+
+  my $obj = {};
+
+  if ( exists $args{mailto} )
+  {
+    push @{$obj->{contact}}, "mailto:$args{mailto}";
+  }
+  elsif ( exists $self->{contact}->{mailto} )
+  {
+    push @{$obj->{contact}}, "mailto:$self->{contact}->{mailto}";
+  }
+
+  $obj->{termsOfServiceAgreed} = "true";
+
+  my $msg = _encode_json( $obj );
+
+  my $json = $self->_create_jws( $msg );
+
+  $self->{log}->debug( "Sending registration message" );
+
+  my $resp = $self->_request_post( $self->{links}->{'newAccount'}, $json );
+
+  print Dumper( $resp );
+}
+
+sub register_v1
 {
   my $self = shift;
   my %args = @_;
@@ -926,6 +1062,20 @@ sub _request_get
   return $resp;
 }
 
+sub _request_head
+{
+  my $self = shift;
+  my $url  = shift;
+
+  my $resp = $self->{ua}->head( $url );
+
+  $self->{nonce}    = $resp->{headers}->{$NONCE_HEADER};
+  $self->{json}     = undef;
+  $self->{response} = $resp;
+
+  return $resp;
+}
+
 sub _request_post
 {
   my $self     = shift;
@@ -954,7 +1104,20 @@ sub _create_jws
   my $self = shift;
 
   my $msg = shift;
-  return _create_jws_internal( $self->{key}, $msg, $self->{nonce} );
+
+  if ( $self->{version} == 1 )
+  {
+    return _create_jws_internal_v1( $self->{key}, $msg, $self->{nonce} );
+  }
+  elsif ( $self->{version} == 2 )
+  {
+    return _create_jws_internal_v2( $self->{key}, $msg, $self->{nonce} );
+  }
+  else
+  {
+    _throw( "Unknown ACME version: $self->{version}" );
+  }
+
 }
 
 
@@ -1026,7 +1189,30 @@ sub _bigint_to_binary {
 
 }
 
-sub _create_jws_internal
+sub _create_jws_internal_v2
+{
+  my $key   = shift;
+  my $msg   = shift;
+  my $nonce = shift;
+  my $url   = shift;
+
+  my $protected_header = _encode_json( { nonce => $nonce, alg => "RS256", url => $url }, jwk => { "e" => $key->{e}, "kty" => "RSA", "n" => $key->{n} } );
+
+  my $sig = encode_base64url( $key->{key}->sign( encode_base64url($protected_header) . "." . encode_base64url($msg) ) );
+
+  my $jws = { protected => encode_base64url( $protected_header ),
+              payload   => encode_base64url( $msg ),
+              signature => $sig };
+
+  print Dumper( $jws );
+  
+  my $json = _encode_json( $jws );
+
+  return $json;
+
+}
+
+sub _create_jws_internal_v1
 {
   my $key = shift;
   my $msg = shift;
@@ -1135,7 +1321,7 @@ copy of the full license at:
 L<http://www.perlfoundation.org/artistic_license_2_0>
 
 Any use, modification, and distribution of the Standard or Modified
-Version 1.01
+Version 1.02
 distributing the Package, you accept this license. Do not use, modify,
 or distribute the Package, if you do not accept this license.
 

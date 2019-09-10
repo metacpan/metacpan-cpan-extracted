@@ -1,5 +1,5 @@
 package Curio::Util;
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use Carp qw();
 

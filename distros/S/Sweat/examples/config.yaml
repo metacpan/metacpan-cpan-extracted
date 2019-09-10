@@ -1,0 +1,122 @@
+# Sweat: Example configuration file
+#
+# Make a copy of this file and then update that copy to taste.
+#
+# If you name the file ".sweat" and put it in your home directory, then
+# Sweat will load it automatically. Otherwise you can specify it with Sweat's
+# "-c" command-line flag.
+#
+# (Note that a config file isn't *technically* required; you can try running
+# Sweat using only its defaults, but it's likely to complain about something.)
+#
+#################
+# PREFERENCES
+#################
+#
+# shuffle_mode:
+# 0 to have Sweat always run through its drills in the same order.
+# 1 to shuffle up the drills within each group (but still run through all
+#   groups in the same order.
+# default: 0
+shuffle_mode: 1
+
+# no_chair:
+# 0 to have Sweat deal out chair-requiring drills as usual.
+# 1 to have Sweat skip them. (Maybe you're in a hotel room with no stable
+#   chair.)
+# default: 0
+no_chair: 0
+
+# no_jumping:
+# 0 to have Sweat deal out jumpy or stompy drills as usual.
+# 1 to have Sweat skip them. (Maybe you have downstairs neighbors, and it's
+#   late. Or early. And you just aren't that light on your feet...) 
+# default: 0
+no_jumping: 0
+
+# entertainment_mode:
+# 0 to have Sweat just call out drills, and not say much else.
+# 1 to have it instead punch things up a bit with news, weather, and weird
+#   old internet jokes. See also ENTERTAINMENT OPTIONS, below.
+# default: 0
+entertainment_mode: 1
+
+#################
+# SPEECH SETUP
+#################
+#
+# Text-to-speech program location
+# The location of a text-to-speech program on your computer, plus any command-
+# line flags you wish to set.
+# It needs to accept some arbitrary text as a command-line argument.
+# You gotta have this for Sweat to work as intended!
+# Default: say (macOS) or espeak (everything else)
+speech_program: say
+
+##################
+# DRILL DEFINITION
+##################
+#
+# If you don't define any drills here, Sweat will set you up with the twelve
+# "seven-minute workout" drills. This may very well be what you want.
+# If you define any drills here, then Sweat will use *only* these drills.
+# Drills are arranged into groups, and have attributes about their requirements.
+# Let's go ahead and just define the 12 7-minute drills anyway. Yay redundancy!
+# (Actually, I suppose you could hand-localize these drill names into a language
+# besides English if you wanted to, huh.)
+groups:
+  - name: aerobic
+    drills:
+      - name: jumping jacks
+        requires_jumping: 1
+      - name: high knees
+        requires_jumping: 1
+      - name: step-ups
+        requires_a_chair: 1
+  - name: lower-body
+    drills:
+      - name: wall sit
+      - name: squats
+      - name: knee lunges
+  - name: upper-body
+    drills:
+      - name: push-ups
+      - name: tricep dips
+        requires_a_chair: 1
+      - name: rotational push-ups
+  - name: core
+    drills:
+      - name: abdominal crunches
+      - name: plank
+      - name: side plank
+        requires_side_switching: 1
+
+######################
+# ENTERTAINMENT OPTIONS
+######################
+#
+# Fortune program location
+# Path to the 'fortune' program, including any additional command-line
+# arguments you wish to add. If set, then at the end of your workout
+# Sweat will read you a dad-joke or an aphorism or a misattributed quote
+# that some system administrator somewhere enjoyed circa 1986.
+# Default: fortune
+fortune_program: fortune
+
+# NewsAPI key: If you define this, then Sweat will use NewsAPI to read you
+# some current news headlines.
+# You can get a free API key for yourself at http://newsapi.org.
+# Default: None.
+newsapi_key: YouForgotToReplaceThisInTheConfigFile
+
+# NewsAPI country: The two-letter code for the country that NewsAPI will
+# load headlines for. It must be on the list specified under "Request
+# parameters" at https://newsapi.org/docs/endpoints/top-headlines.
+# Default: us
+newsapi_country: us
+
+# url_program: URL-opening program location
+# Path to a program that, given a URL, opens it in your default web browser.
+# Set it to nothing 
+# Default: open (macOS) or xdg-open (everything else)
+url_program: open

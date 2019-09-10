@@ -1,3 +1,12 @@
+0.000020  2019-09-09 21:13:09-07:00 America/Los_Angeles
+
+    - fix durations controller when json is requested
+    - fix 'ui' yath command to include images
+
+0.000019  2019-09-09 14:39:56-07:00 America/Los_Angeles
+
+    - Add durations controller
+
 0.000018  2019-09-04 09:06:51-07:00 America/Los_Angeles
 
     - Switch from tablesort to datatables

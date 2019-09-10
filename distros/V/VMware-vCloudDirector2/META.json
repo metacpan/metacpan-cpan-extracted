@@ -84,23 +84,23 @@
    "provides" : {
       "VMware::vCloudDirector2" : {
          "file" : "lib/VMware/vCloudDirector2.pm",
-         "version" : "0.102"
+         "version" : "0.103"
       },
       "VMware::vCloudDirector2::API" : {
          "file" : "lib/VMware/vCloudDirector2/API.pm",
-         "version" : "0.102"
+         "version" : "0.103"
       },
       "VMware::vCloudDirector2::Error" : {
          "file" : "lib/VMware/vCloudDirector2/Error.pm",
-         "version" : "0.102"
+         "version" : "0.103"
       },
       "VMware::vCloudDirector2::Link" : {
          "file" : "lib/VMware/vCloudDirector2/Link.pm",
-         "version" : "0.102"
+         "version" : "0.103"
       },
       "VMware::vCloudDirector2::Object" : {
          "file" : "lib/VMware/vCloudDirector2/Object.pm",
-         "version" : "0.102"
+         "version" : "0.103"
       }
    },
    "release_status" : "stable",
@@ -112,7 +112,7 @@
          "web" : "https://github.com/Perl-VMware/VMware-vCloudDirector2"
       }
    },
-   "version" : "0.102",
+   "version" : "0.103",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -196,7 +196,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.102",
+                  "tag" : "0.103",
                   "tag_format" : "%v",
                   "tag_message" : "%v"
                },

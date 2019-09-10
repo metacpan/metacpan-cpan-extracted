@@ -1,4 +1,5 @@
 use Test2::V0 -target => 'Test2::Harness::Util::TestFile';
+# HARNESS-DURATION-SHORT
 
 use ok $CLASS;
 
@@ -92,6 +93,7 @@ subtest taint => sub {
         $taint->queue_item(42),
         {
             category    => 'general',
+            duration    => 'medium',
             stage       => 'default',
             file        => $taint->file,
             job_name    => 42,
@@ -126,6 +128,7 @@ subtest warn => sub {
         $warn->queue_item(42),
         {
             category    => 'general',
+            duration    => 'medium',
             stage       => 'default',
             file        => $warn->file,
             job_name    => 42,
@@ -155,7 +158,8 @@ subtest notime => sub {
     is($notime->check_feature('timeout'), 0, "Timeouts turned off");
     is($notime->check_feature('timeout', 1), 0, "Timeouts turned off with default 1");
 
-    is($notime->check_category, 'long', "Category is long");
+    is($notime->check_category, 'general', "Category is general");
+    is($notime->check_duration, 'long', "Duration is long");
 
     is($notime->switches, [], "No SHBANG switches");
     is($notime->shbang, {}, "No shbang");
@@ -163,7 +167,8 @@ subtest notime => sub {
     is(
         $notime->queue_item(42),
         {
-            category    => 'long',
+            category    => 'general',
+            duration    => 'long',
             stage       => 'default',
             file        => $notime->file,
             job_name    => 42,
@@ -214,6 +219,7 @@ subtest all => sub {
         $all->queue_item(42),
         {
             category    => 'isolation',
+            duration    => 'long',
             stage       => 'default',
             file        => $all->file,
             job_name    => 42,
@@ -263,7 +269,8 @@ subtest med2 => sub {
     is($med2->check_feature('stream'), 1, "Use stream");
     is($med2->check_feature('stream', 0), 0, "no stream with a default of false");
 
-    is($med2->check_category, 'medium', "Category is medium");
+    is($med2->check_category, 'general', "Category is general");
+    is($med2->check_duration, 'medium', "duration is medium");
 
     is($med2->switches, [], "No SHBANG switches");
     is($med2->shbang, {}, "No shbang");
@@ -271,7 +278,8 @@ subtest med2 => sub {
     is(
         $med2->queue_item(42),
         {
-            category    => 'medium',
+            category    => 'general',
+            duration    => 'medium',
             stage       => 'default',
             file        => $med2->file,
             job_name    => 42,
@@ -313,7 +321,8 @@ subtest med1 => sub {
     is($med1->check_feature('stream'), 1, "Use stream");
     is($med1->check_feature('stream', 0), 0, "no stream with a default of false");
 
-    is($med1->check_category, 'medium', "Category is medium");
+    is($med1->check_category, 'general', "Category is general");
+    is($med1->check_duration, 'medium', "duration is medium");
 
     is($med1->switches, [], "No SHBANG switches");
     is($med1->shbang, {}, "No shbang");
@@ -321,7 +330,8 @@ subtest med1 => sub {
     is(
         $med1->queue_item(42),
         {
-            category    => 'medium',
+            category    => 'general',
+            duration    => 'medium',
             stage       => 'default',
             file        => $med1->file,
             job_name    => 42,
@@ -363,7 +373,8 @@ subtest long => sub {
     is($long->check_feature('stream'), 1, "Use stream");
     is($long->check_feature('stream', 0), 0, "no stream with a default of false");
 
-    is($long->check_category, 'long', "Category is long");
+    is($long->check_category, 'isolation', "Category is isolation");
+    is($long->check_duration, 'long',    "duration is long");
 
     ok(!exists $long->headers->{SEE}, "Did not see directive after code line");
 
@@ -373,7 +384,8 @@ subtest long => sub {
     is(
         $long->queue_item(42),
         {
-            category    => 'long',
+            category    => 'isolation',
+            duration    => 'long',
             stage       => 'default',
             file        => $long->file,
             job_name    => 42,
@@ -389,7 +401,7 @@ subtest long => sub {
             conflicts   => [],
             shbang      => {line => "#!/usr/bin/perl", switches => []},
             headers     => {
-                category => 'long',
+                duration => 'long',
                 features => {
                     isolation => 1,
                     timeout   => 0,
@@ -421,7 +433,8 @@ subtest extra_comments => sub {
     is($long->check_feature('stream'), 1, "Use stream");
     is($long->check_feature('stream', 0), 0, "no stream with a default of false");
 
-    is($long->check_category, 'long', "Category is long");
+    is($long->check_category, 'isolation', "Category is isolation");
+    is($long->check_duration, 'long', "Duration is long");
 
     is($long->switches, [], "No SHBANG switches");
     is($long->shbang, {switches => [], line => "#!/usr/bin/perl"}, "got shbang");
@@ -429,7 +442,8 @@ subtest extra_comments => sub {
     is(
         $long->queue_item(42),
         {
-            category    => 'long',
+            category    => 'isolation',
+            duration    => 'long',
             stage       => 'default',
             file        => $long->file,
             job_name    => 42,
@@ -445,7 +459,7 @@ subtest extra_comments => sub {
             conflicts   => [],
             shbang      => {line => "#!/usr/bin/perl", switches => []},
             headers     => {
-                category => 'long',
+                duration => 'long',
                 features => {
                     isolation => 1,
                     timeout   => 0,
@@ -498,6 +512,7 @@ subtest binary => sub {
         $binary->queue_item(42),
         {
             category    => 'general',
+            duration    => 'medium',
             stage       => 'default',
             file        => $path,
             job_name    => 42,
@@ -545,6 +560,7 @@ subtest not_perl => sub {
         $not_perl->queue_item(42),
         {
             category    => 'general',
+            duration    => 'medium',
             stage       => 'default',
             file        => $not_perl->file,
             job_name    => 42,
@@ -596,6 +612,7 @@ subtest not_env_perl => sub {
         $not_env_perl->queue_item(42),
         {
             category    => 'general',
+            duration    => 'medium',
             stage       => 'default',
             file        => $not_env_perl->file,
             job_name    => 42,

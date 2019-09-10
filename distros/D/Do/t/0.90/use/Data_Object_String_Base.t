@@ -31,7 +31,9 @@ Data::Object::Library
 
 =description
 
-This package provides routines for operating on Perl 5 string data.
+This package provides routines for operating on Perl 5 string data. If no
+argument is provided, this package is instantiated with a default value of
+C<''>.
 
 =cut
 

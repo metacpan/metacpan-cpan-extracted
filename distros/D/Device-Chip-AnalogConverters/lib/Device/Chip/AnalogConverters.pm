@@ -1,5 +1,10 @@
+#  You may distribute under the terms of either the GNU General Public License
+#  or the Artistic License (the same terms as Perl itself)
+#
+#  (C) Paul Evans, 2018-2019 -- leonerd@leonerd.org.uk
+
 package Device::Chip::AnalogConverters;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 NAME
 

@@ -1,4 +1,4 @@
-6.32 Aug 25, 2019
+6.35 Sept 9, 2019
 package Graphics::Framebuffer;
 
 =head1 NAME
@@ -388,7 +388,7 @@ use Math::Trig ':pi';                                            # Usually only 
 use Math::Bezier;                                                # Bezier curve calculations done here.
 use Math::Gradient qw( gradient array_gradient multi_gradient ); # Awesome gradient calculation module
 use List::Util qw(min max);                                      # min and max are very handy!
-use File::Map 'map_handle';                                      # Absolutely necessary to map the screen to a string.
+use File::Map ':map';                                            # Absolutely necessary to map the screen to a string.
 use Imager;                                                      # This is used for TrueType font printing, image loading.
 use Imager::Matrix2d;
 use Imager::Fill;                                                # For hatch fills
@@ -476,7 +476,7 @@ BEGIN {
     );
 }
 
-DESTROY { # Always clean up after yourself before exiting
+sub DESTROY { # Always clean up after yourself before exiting
     my $self = shift;
     $self->text_mode();
     $self->_screen_close();
@@ -1340,7 +1340,7 @@ sub _reset {
 # Fixes the mapping if Perl garbage collects (naughty Perl)
 sub _fix_mapping { # File::Map SHOULD make this obsolete
     my $self = shift;
-    unmap($self->{'SCREEN'});
+    unmap($self->{'SCREEN'}); # Unmap missing on some File::Maps
     unless (defined($self->{'FB'})) {
         eval { close($self->{'FB'}); };
         open($self->{'FB'}, '+<', $self->{'FB_DEVICE'});
@@ -1381,7 +1381,7 @@ sub _color_order {
 sub _screen_close {
     my $self = shift;
     unless (defined($self->{'ERROR'})) {    # Only do it if not in emulation mode
-        unmap($self->{'SCREEN'}) if (defined($self->{'SCREEN'}));
+        unmap($self->{'SCREEN'}) if (defined($self->{'SCREEN'})); # unmap had issues with File::Map.
         close($self->{'FB'})     if (defined($self->{'FB'}));
         delete($self->{'FB'});              # We leave no remnants
     }
@@ -1565,14 +1565,6 @@ Sets or returns the drawing mode, depending on how it is called.
  $fb->draw_mode(OR_MODE);          # Does a bitwise OR with
                                    # the new pixel and screen
                                    # pixel.
-
- $fb->draw_mode(ALPHA_MODE);       # Does an alpha blend with
-                                   # the screen pixel and the new
-                                   # pixel using the alpha value
-                                   # as the degree which to apply
-                                   # the blending.  Alpha 1 is most
-                                   # transparent, and alpha 255 is
-                                   # completely opague.
 
  $fb->draw_mode(AND_MODE);         # Does a bitwise AND with
                                    # the new pixel and screen
@@ -2865,7 +2857,7 @@ Draws an arc of a circle at point x,y.  This is an alias to draw_arc above, but 
     'radius'        => 100,
     'start_degrees' => -40,
     'end_degrees'   => 80,
-    'granularity   => .05,
+    'granularity    => .05,
  });
 
 =back
@@ -3900,7 +3892,7 @@ Draws a box from point x,y to point xx,yy, either as an outline, if 'filled' is 
     'y'          => 50,
     'xx'         => 70,
     'yy'         => 100,
-    'rounded'    => 0, # optional
+    'radius'     => 0, # if rounded, optional
     'pixel_size' => 1, # optional
     'filled'     => 1, # optional
 
@@ -4025,7 +4017,7 @@ Draws a box at point x,y with the width 'width' and height 'height'.  It draws a
     'y'          => 100,
     'width'      => 200,
     'height'     => 150,
-    'rounded'    => 0, # optional
+    'radius'     => 0, # if rounded, optional
     'pixel_size' => 2, # optional
     'filled'     => 0, # optional
 
@@ -4639,7 +4631,7 @@ sub perl {
     $self->acceleration(PERL);
 }
 
-=head2 perl
+=head2 software
 
 This is an alias to "acceleration(SOFTWARE)"
 
@@ -4650,7 +4642,7 @@ sub software {
     $self->acceleration(SOFTWARE);
 }
 
-=head2 perl
+=head2 hardware
 
 This is an alias to "acceleration(HARDWARE)"
 
@@ -5454,6 +5446,10 @@ sub clip_rset {
 
 Removes all color information from an image, and leaves everything in greyscale.
 
+It applies the following formula to calculate greyscale:
+
+ grey_color = (red * 0.2126) + (green * 0.7155) + (blue * 0.0722)
+
 =over 4
 
  Expects two parameters, 'image' and 'bits'.  The parameter 'image' is a string containing the image data.  The parameter 'bits' is how many bits per pixel make up the image.  Valid values are 16, 24, and 32 only.
@@ -5470,6 +5466,8 @@ Removes all color information from an image, and leaves everything in greyscale.
  }
 
 =back
+
+* You should normally use "blit_transform", but this is a more raw way of affecting the data
 
 =cut
 
@@ -5545,7 +5543,7 @@ This is best called twice, first in bounding box mode, and then in normal mode.
 
 Bounding box mode gets the actual values needed to display the text.
 
-If you are trying to print on top of other graphics, then normal drawing mode would not be the best choice, even though it is the fastest.  Mask mode would visually be the best choice.  However, it's also the slowest.  Experiment with AND, OR, and XOR modes instead.
+If draw mode is "normal", then mask mode is automatically used for best output.
 
 =over 4
 
@@ -5769,7 +5767,7 @@ It's "box" is simply the clipping rectangle.  All text will be fit and wrapped w
 
 Text is started at "x" and wrapped to "x".
 
-* This does NOT scroll text.  It merely truncates what doesn't fit.  It returns where in the text string it last printed before truncation.
+* This does NOT scroll text.  It merely truncates what doesn't fit.  It returns where in the text string it last printed before truncation.  It's also slow.
 
 =over 4
 
@@ -6047,15 +6045,10 @@ If a single image is loaded, it returns a reference to an anonymous hash, of the
 
  {
       'x'           => horizontal position calculated (or passed through),
-
       'y'           => vertical position calculated (or passed through),
-
       'width'       => Width of the image,
-
       'height'      => Height of the image,
-
       'tags'        => The tags of the image (hashref)
-
       'image'       => [raw image data]
  }
 
@@ -6069,33 +6062,23 @@ If the image has multiple frames, then a reference to an array of hashes is retu
  #        Also, X and Y are based upon what was originally passed through, else they
  #        reference 0,0 (but only if you didn't give an X,Y value initially).
 
- # ALSO:  The tags may also specify offsets, and they will be taken into 
+ # ALSO:  The tags may also specify offsets, and they will be taken into account.
 
  [
      { # Frame 1
          'x'           => horizontal position calculated (or passed through),
-
          'y'           => vertical position calculated (or passed through),
-
          'width'       => Width of the image,
-
          'height'      => Height of the image,
-
          'tags'        => The tags of the image (hashref)
-
          'image'       => [raw image data]
      },
      { # Frame 2 (and so on)
          'x'           => horizontal position calculated (or passed through),
-
          'y'           => vertical position calculated (or passed through),
-
          'width'       => Width of the image,
-
          'height'      => Height of the image,
-
          'tags'        => The tags of the image (hashref)
-
          'image'       => [raw image data]
      }
  ]
@@ -6754,6 +6737,8 @@ Convert 24 bit color value to a 16 bit color value.  This requires a three byte 
      }
  );
 
+This simply does a bitshift, nothing more.
+
 =cut
 
 sub RGB888_to_RGB565 {
@@ -6802,6 +6787,8 @@ Convert 32 bit color value to a 16 bit color value.  This requires a four byte p
          'color' => $color32,
      }
  );
+
+This simply does a bitshift, nothing more
 
 =cut
 
@@ -6857,6 +6844,8 @@ Convert 24 bit color value to a 32 bit color value.  This requires a three byte 
      }
  );
 
+This just simply adds an alpha value.  No actual color conversion is done.
+
 =cut
 
 sub RGB888_to_RGBA8888 {
@@ -6883,6 +6872,8 @@ Convert 32 bit color value to a 24 bit color value.  This requires a four byte p
          'color' => $color32
      }
  );
+
+This just removes the alpha value.  No color conversion is actually done.
 
 =cut
 
@@ -7003,15 +6994,17 @@ Return as an array:
 Return as a hash reference:
 
  my $mouse = $fb->get_mouse();
- # Returns
- #  {
- #      'button' => button value, # Button state according to bits
- #                                #  Bit 0 = Left
- #                                #  Bit 1 = Right
- #                                # Other bits according to driver
- #      'x'      => Mouse X coordinate,
- #      'y'      => Mouse Y coordinate,
- #  }
+
+Returns
+
+  {
+      'button' => button value, # Button state according to bits
+                                #  Bit 0 = Left
+                                #  Bit 1 = Right
+                                # Other bits according to driver
+      'x'      => Mouse X coordinate,
+      'y'      => Mouse Y coordinate,
+  }
 
 =head2 set_mouse
 
@@ -7143,6 +7136,10 @@ See the "examples" directory for "threadstest.pl" as an example of a threading s
 
 I have never tested with forks.  Do at your own risk, but follow the same rules as in threads, and it should work.  Instantiate an object per fork AFTER forking.
 
+=head2 MCE
+
+Mario Roy has tested Graphics::Framebuffer with various methods to use the MCE modules for multiprocessing, and creating a single shared library.  See the "README" file for more.
+
 =head2 BLITTING
 
 Use "blit_read" and "blit_write" to save portions of the screen instead of redrawing everything.  It will speed up response tremendously.
@@ -7151,11 +7148,11 @@ Use "blit_read" and "blit_write" to save portions of the screen instead of redra
 
 Someone asked me about sprites.  Well, that's what blitting is for.  You'll have to do your own collision detection.  Using the "XOR" drawing mode, you can "erase" a sprite by rewriting it to the screen via xor.
 
-Listen folks, this library does everything in software, so your results will vary depending on CPU speed and screen resolution.
+Listen folks, this library does everything in software, so your results will vary depending on CPU speed and screen resolution, as well as blit resolution.
 
 =head2 HORIZONTAL "MAGIC"
 
-Horizontal lines and filled boxes draw very fast.  Learn to exploit them.
+Horizontal lines and filled boxes draw very fast, even in Perl mode, seriously.  Learn to exploit them.
 
 =head2 PIXEL SIZE
 
@@ -7211,7 +7208,7 @@ If it does exist, but is not "/dev/fb0", then you can define it in the 'new' met
 
 Ok, segfaults suck.  Believe me, I had plenty in the early days of writing this module.  There is hope for you.
 
-This is almost always caused by the module incorrectly calculating the framebuffer memory size, and it's guessing too small.
+This is almost always caused by the module incorrectly calculating the framebuffer memory size, and it's guessing too large or small a memory footprint, and the system doesn't like it.
 
 Try running the "primitives.pl" in the "examples" directory in the following way (assuming your screen is larger than 640x480):
 
@@ -7235,7 +7232,7 @@ Well, either your system doesn't have a framebuffer driver, or perhaps the modul
 
 First, make sure your system has a framebuffer by seeing if F</dev/fb0> (actually "fb" then any number) exists.  If you don't see any "fb0" - "fb31" files inside "/dev" (or "/dev/fb/"), then you don't have a framebuffer driver running.  You need to fix that first.  Sometimes you have to manually load the driver with "modprobe -a drivername" (replacing "drivername" with the actual driver name).
 
-Second, you did the above, but still nothing.  You need to check permissions.  The account you are running this under needs to have permission to use the screen.  This typically means being a member of the "B<video>" group.  Let's say the account is called "sparky", and you want to give it permission.  In a Linux (Debian/Ubuntu/Mint/RedHat/Fedora) environment you would use this to add "username" (your account name) to the "video" group:
+Second, you did the above, but still nothing.  You need to check permissions.  The account you are running this under needs to have permission to use the screen.  This typically means being a member of the "B<video>" group.  Let's say the account is called "username", and you want to give it permission.  In a Linux (Debian/Ubuntu/Mint/RedHat/Fedora) environment you would use this to add "username" (your account name) to the "video" group:
 
    sudo usermod -a -G video username
 
@@ -7316,6 +7313,8 @@ Version ## VERSION ## (## VERSION DATE ##)
 =head1 THANKS
 
 My thanks go out to those using this module and submitting helpful patches and suggestions for improvement, as well as those who asked for help.  Your requests for help actually gave me ideas.
+
+Thank you Mario Roy for showing how to use MCE to multiprocess instead of threads.  Very handy.  Look for the "get_mce_demos" in the "examples" directory.
 
 =head1 TELL ME ABOUT YOUR PROJECT
 

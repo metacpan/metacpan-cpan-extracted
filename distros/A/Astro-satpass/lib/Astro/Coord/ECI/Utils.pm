@@ -23,9 +23,9 @@ L<Astro::Coord::ECI|Astro::Coord::ECI> coordinate-transformation code.
 
 As of version 0.104 these warn on the first use, as will the first
 attempt to call C<equation_of_time()> and C<obliquity()> as a subroutine
-(i.e. with a first argument that looks like a number). At the first
-release after September 1 2019 all calls will result in a warning, and
-six months after that all calls will be fatal.
+(i.e. with a first argument that looks like a number). As of version
+0.109 release after September 1 2019 all calls will result in a warning.
+As of the first release after December 1 2019 all calls will be fatal.
 
 =head1 DESCRIPTION
 
@@ -136,7 +136,7 @@ package Astro::Coord::ECI::Utils;
 use strict;
 use warnings;
 
-our $VERSION = '0.108';
+our $VERSION = '0.109';
 our @ISA = qw{Exporter};
 
 use Carp;
@@ -1573,18 +1573,18 @@ EOD
 {
     my %deprecate = (
 	equation_of_time	=> {
-	    level	=> 1,
+	    level	=> 2,
 	},
 	nutation_in_longitude	=> {
-	    level	=> 1,
+	    level	=> 2,
 	    method	=> 'nutation',
 	},
 	nutation_in_obliquity	=> {
-	    level	=> 1,
+	    level	=> 2,
 	    method	=> 'nutation',
 	},
 	obliquity	=> {
-	    level	=> 1,
+	    level	=> 2,
 	},
     );
 

@@ -1,6 +1,6 @@
 =head1 NAME
 
-Protocol::ACME - Interface to the Let's Encrypt ACME API
+Protocol::ACME - Interface to the Let's Encrypt ACME API [Deprecated]
 
 =head1 VERSION
 
@@ -55,6 +55,9 @@ Version 1.01
  }
 
 =head1 DESCRIPTION
+
+[Deprecated] This module is no longer maintained. My efforts have gone 
+towards using and supporting L<Net::ACME2>.
 
 The C<Protocol::ACME> is a class implementing an interface for the
 Let's Encrypt ACME API.

@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.848';
+our $VERSION = '1.850';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (InputOutput::ProhibitTwoArgOpen)
@@ -512,7 +512,7 @@ sub _init_handle {
 }
 
 sub CLOSE {
-   _req1('O~CLO', $_[0]->[0].$LF);
+   _req0('O~CLO', $_[0]->[0].$LF);
 }
 
 sub OPEN {
@@ -686,7 +686,7 @@ MCE::Shared::Handle - Handle helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Handle version 1.848
+This document describes MCE::Shared::Handle version 1.850
 
 =head1 DESCRIPTION
 

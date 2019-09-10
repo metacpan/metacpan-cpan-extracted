@@ -15,17 +15,43 @@ Data-Object Data Extraction Class
 
 =synopsis
 
+  use Data::Object::Data;
+
+  my $data = Data::Object::Data->new;
+
+This example is extracting from the main package.
+
+  use Data::Object::Data;
+
+  my $data = Data::Object::Data->new(from => 'Example::Package');
+
+This example is extracting from a class.
+
+  use Data::Object::Data;
+
+  my $data = Data::Object::Data->new(file => 'lib/Example/Package.pm');
+
+This example is extracting from a file.
+
+  use Data::Object::Data;
+
+  my $data = Data::Object::Data->new(data => [,"..."]);
+
+This example is extracting from existing data.
+
   package Command;
 
   use Data::Object::Data;
 
-  =help
+  =pod help
 
   fetches results from the api
 
   =cut
 
-  my $data = Data::Object::Data->new;
+  my $data = Data::Object::Data->new(
+    from => 'Command'
+  );
 
   my $help = $data->content('help');
   # fetches results ...
@@ -36,7 +62,7 @@ Data-Object Data Extraction Class
   my $secret = $data->content('secret');
   # secret: the secret for ...
 
-  my $flag = $data->contents('flag');
+  my $flags = $data->contents('flag');
   # [,...]
 
   __DATA__

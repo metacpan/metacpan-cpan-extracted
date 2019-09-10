@@ -1,5 +1,15 @@
 Revision history for Syntax-Keyword-Try
 
+0.11    2019-09-07
+        [CHANGES]
+         * Use wrap_keyword_plugin() instead of direct access to
+           PL_keyword_plugin
+        [BUGFIXES]
+         * Build OP_ENTER/OP_LEAVE structure the correct way so perl 5.31.3
+           doesn't crash
+         * Fix OP_NEXT/OP_LAST/OP_REDO mangling for perl 5.31.3 to avoid
+           CPU spin (RT129975)
+
 0.10    2019-06-13
         [CHANGES]
          * Added experimental value-semantic expression form (RT121267)

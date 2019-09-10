@@ -1,5 +1,5 @@
 
-Text::Template v1.46
+Text::Template
 
 This is a library for generating form letters, building HTML pages, or
 filling in templates generally.  A `template' is a piece of text that

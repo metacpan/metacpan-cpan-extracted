@@ -7,7 +7,7 @@ use warnings;
 
 use Moo::Role;
 
-our $VERSION = '1.60'; # VERSION
+our $VERSION = '1.70'; # VERSION
 
 # BUILD
 # METHODS
@@ -86,9 +86,9 @@ The throw method throws an exception with the object and message.
 
 =head1 CREDITS
 
-Al Newkirk, C<awncorp@cpan.org>, C<+284>
+Al Newkirk, C<+287>
 
-Anthony Brummett, C<abrummet@genome.wustl.edu>, C<+10>
+Anthony Brummett, C<+10>
 
 =cut
 

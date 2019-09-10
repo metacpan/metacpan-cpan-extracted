@@ -7,7 +7,7 @@ use warnings;
 
 use Moo::Role;
 
-our $VERSION = '1.60'; # VERSION
+our $VERSION = '1.70'; # VERSION
 
 # BUILD
 # METHODS
@@ -98,9 +98,9 @@ The dump method returns a string representation of the underlying data.
 
 =head1 CREDITS
 
-Al Newkirk, C<awncorp@cpan.org>, C<+284>
+Al Newkirk, C<+287>
 
-Anthony Brummett, C<abrummet@genome.wustl.edu>, C<+10>
+Anthony Brummett, C<+10>
 
 =cut
 

@@ -94,19 +94,31 @@ and the separate program:  youtube-dl.
 
 =over 4
 
-=item B<new>(I<url> [, "debug" [ => 0|1|2 ]])
+=item B<new>(I<url> [, "debug" [ => 0|(1)|2 ]] [, "notitle" [ => 0|(1) ]])
 
 Accepts a youtube.com URL and creates and returns a new station object, or 
 I<undef> if the URL is not a valid youtube video or no streams are found.
+
+If "notitle" or "-notitle" is specified (or set to 1), a second call to 
+youtube-dl to fetch the video's title is skipped, useful when called by 
+StreamFinder::Tunein, which already has the title and youtube-dl will not 
+fetch it.
 
 =item $station->B<get>()
 
 Returns an array of strings representing all stream urls found.
 
-=item $station->B<getURL>()
+=item $station->B<getURL>([I<options>])
 
 Similar to B<get>() except it only returns a single stream representing 
 the first valid stream found.  
+
+Current options are:  I<-random> and I<-noplaylists>.  By default, the 
+first ("best"?) stream is returned.  If I<-random> is specified, then 
+a random one is selected from the list of streams found.  
+If I<-noplaylists> is specified, and the stream to be returned is a 
+"playlist" (.pls or .m3u8 extension), it is first fetched and the first entry 
+in the playlist is returned.  This is needed by Fauxdacious Mediaplayer.
 
 =item $station->B<count>()
 
@@ -143,6 +155,41 @@ Returns a two-element array consisting of the extension (ie. "png",
 Returns the stream's type ("Youtube").
 
 =back
+
+=head1 CONFIGURATION FILES
+
+=over 4
+
+=item ~/.config/StreamFinder/Youtube/config
+
+Optional text file for specifying various configuration options 
+for a specific site (submodule).  Each option is specified on a 
+separate line in the format below:
+
+'option' => 'value' [,]
+
+and the options are loaded into a hash used only by the specific 
+(submodule) specified.  Valid options include 
+I<-debug> => [0|1|2], and most of the L<LWP::UserAgent> options.  
+Blank lines and lines starting with a "#" sign are ignored.
+
+Options specified here override any specified in I<~/.config/StreamFinder/config>.
+
+=item ~/.config/StreamFinder/config
+
+Optional text file for specifying various configuration options.  
+Each option is specified on a separate line in the format below:
+
+'option' => 'value' [,]
+
+and the options are loaded into a hash used by all sites 
+(submodules) that support them.  Valid options include 
+I<-debug> => [0|1|2], and most of the L<LWP::UserAgent> options.
+
+=back
+
+NOTE:  Options specified in the options parameter list will override 
+those corresponding options specified in these files.
 
 =head1 KEYWORDS
 
@@ -243,7 +290,10 @@ use LWP::UserAgent ();
 use WWW::YouTube::Download;
 use vars qw(@ISA @EXPORT);
 
-our $DEBUG = 0;
+my $DEBUG = 0;
+my $NOTITLE = 0;
+my %uops = ();
+my @userAgentOps = ();
 
 require Exporter;
 
@@ -254,20 +304,49 @@ sub new
 {
 	my $class = shift;
 	my $url = shift;
+
+	my $self = {};
+	return undef  unless ($url);
+
+	foreach my $p ("$ENV{HOME}/.config/StreamFinder/config", "$ENV{HOME}/.config/StreamFinder/Youtube/config") {
+		if (open IN, $p) {
+			my ($atr, $val);
+			while (<IN>) {
+				chomp;
+				next  if (/^\s*\#/o);
+				($atr, $val) = split(/\s*\=\>\s*/o, $_, 2);
+				eval "\$uops{$atr} = $val";
+			}
+			close IN;
+		}
+	}
+	foreach my $i (qw(agent from conn_cache default_headers local_address ssl_opts max_size
+			max_redirect parse_head protocols_allowed protocols_forbidden requests_redirectable
+			proxy no_proxy)) {
+		push @userAgentOps, $i, $uops{$i}  if (defined $uops{$i});
+	}
+	push (@userAgentOps, 'agent', 'Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101 Firefox/68.0')
+			unless (defined $uops{'agent'});
+	$uops{'timeout'} = 10  unless (defined $uops{'timeout'});
+	$DEBUG = $uops{'debug'}  if (defined $uops{'debug'});
+	$NOTITLE = $uops{'notitle'}  if (defined $uops{'notitle'});
+
 	while (@_) {
 		if ($_[0] =~ /^\-?debug$/o) {
 			shift;
 			$DEBUG = (defined($_[0]) && $_[0] =~/^[0-9]$/) ? shift : 1;
+		} elsif ($_[0] =~ /^\-?notitle$/o) {
+			shift;
+			$NOTITLE = (defined($_[0]) && $_[0] =~/^[0-9]$/) ? shift : 1;
 		}
 	}
 
-	my $self = {};
-	return undef  unless ($url);
 	$url =~ s/\?autoplay\=true$//;  #STRIP THIS OFF SO WE DON'T HAVE TO.
 	print STDERR "-0(Youtube): URL=$url=\n"  if ($DEBUG);
 
     $self->{'client'} = WWW::YouTube::Download->new;
 	return undef  unless ($self->{'client'});
+
 	$self->{'cnt'} = 0;
 	my $meta_data = '';
 	eval "\$meta_data = \$self->{'client'}->prepare_download(\$url);";
@@ -289,9 +368,9 @@ sub new
 			}
 		}
 	}
-	$self->{'id'} = $metadata{'video_id'};
-	$self->{'title'} = $metadata{'title'};
-	$self->{'artist'} = $metadata{'user'};
+	$self->{'id'} = $metadata{'video_id'} || '';
+	$self->{'title'} = $metadata{'title'} || '';
+	$self->{'artist'} = $metadata{'user'} || '';
 	print STDERR "-2: title=".$self->{'title'}."= id=".$self->{'id'}."=\n"  if ($DEBUG);
 
 #	if ($url =~ /www\.brighteon\.com/) {  #NO AUDIO+VIDEO STREAMS AVAILABLE FOR INFOWARZ (SO GET AUDIO ONLY!):
@@ -300,9 +379,14 @@ sub new
 #		#$_ = `youtube-dl --get-url --get-thumbnail -f 'bestaudio[ext=mp4]' "$url"`;
 #		$_ = `youtube-dl --get-url --get-thumbnail -f 'bestaudio' "$url"`;
 #	} else {
+	if (defined($uops{'userid'}) && defined($uops{'userpw'})) {  #USER HAS A LOGIN CONFIGURED:
+		my $uid = $uops{'userid'};
+		my $upw = $uops{'userpw'};
+		$_ = `youtube-dl --username "$uid" --password "$upw" --get-url --get-thumbnail -f mp4 "$url"`;
+	} else {
 		$_ = `youtube-dl --get-url --get-thumbnail -f mp4 "$url"`;
-#	}
-	print STDERR "--cmd=$_=\n"  if ($DEBUG);
+	}
+	print STDERR "--youtube-dl returned=$_=\n"  if ($DEBUG);
 	my @urls = split(/\r?\n/);
 	while (@urls && $urls[0] !~ m#\:\/\/#o) {
 		shift @urls;
@@ -310,33 +394,21 @@ sub new
 	return undef  unless ($urls[0]);
 			
 	$self->{'Url'} = $urls[0];
-	if ($urls[0] =~ /\.m3u8/) {   #HACK TO HANDLE CHUNKY (brighteon.com) .m3u8 STREAMS:
-		$_ = `curl $urls[0]`;
-		(my $urlpath = $urls[0]) =~ s#[^\/]+$##;
-		if (/\.ts/s) {
-			my @lines = split(/\r?\n/);
-			my @tsurls;
-			for (my $i=0;$i<=$#lines;$i++) {
-				next  if ($lines[$i] =~ /^\#/o);
-				next  if ($lines[$i] !~ /\.ts$/o);
-				push @tsurls, $lines[$i];
-			}
-			if (!$#tsurls || $tsurls[0] eq $tsurls[1]) {
-				$self->{'Url'} = ($tsurls[0] =~ m#\/#) ? $tsurls[0] : ($urlpath . $tsurls[0]);
-				print STDERR "w:CHGD. m3u8 STREAM TO ts (".$self->{'Url'}.")\n";
-			}
-		}
-	}
-			
 	chomp $self->{'Url'};
-	$self->{'streams'} = [$self->{'Url'}];
-	$self->{'cnt'} = 1;
+	$self->{'streams'} = [$self->{'Url'}];  #ADD FIRST (BEST) URL.
+	for (my $i=0;$i<$#urls;$i++) {  #ADD ALL OTHER STREAM URLS (EXCEPT LAST ONE, WHICH IS THE ICON URL):
+		chomp $urls[$i];
+		push @{$self->{'streams'}}, $urls[$i]  unless ($self->{'Url'} eq $urls[$i]);
+	}
+	$self->{'cnt'} = scalar @{$self->{'streams'}};
 	$self->{'total'} = $self->{'cnt'};
 	$self->{'iconurl'} = ($#urls >= 1) ? $urls[$#urls] : '';
-	unless ($self->{'title'} =~ /\w/) {   #TRY AGAIN TO GET TITLE, IF WE DON'T HAVE IT:
+	$self->{'imageurl'} = $self->{'iconurl'};
+	unless ($NOTITLE || $self->{'title'} =~ /\w/) {  #TRY AGAIN TO GET TITLE, IF NOT FOUND IN METADATA:
 		$self->{'title'} = `youtube-dl --get-title "$url"`;
 		chomp $self->{'title'};
-		$self->{'title'} = $self->{'Url'} || $url  unless ($self->{'title'} =~ /\w/); #STILL NO TITLE, USE URL.
+		$self->{'title'} = $self->{'Url'} || $url  unless ($self->{'title'} =~ /\w/);  #STILL NO TITLE, USE URL.
+		print STDERR "i:Title not in metadata, set to (".$self->{'title'}.").\n"  if ($DEBUG);
 	}
 	print STDERR "-count=".$self->{'cnt'}."= iconurl=".$self->{'iconurl'}."=\n"  if ($DEBUG);
 	print STDERR "--SUCCESS: stream url=".$self->{'Url'}."=\n"  if ($DEBUG);
@@ -356,7 +428,58 @@ sub get
 sub getURL   #LIKE GET, BUT ONLY RETURN THE SINGLE ONE W/BEST BANDWIDTH AND RELIABILITY:
 {
 	my $self = shift;
-	return $self->{'Url'};
+#	return $self->{'Url'};
+	my $arglist = (defined $_[0]) ? join('|',@_) : '';
+	my $idx = ($arglist =~ /\b\-?random\b/) ? int rand scalar @{$self->{'streams'}} : 0;
+	if ($arglist =~ /\b\-?noplaylists\b/ && ${$self->{'streams'}}[$idx] =~ /\.(pls|m3u8)$/i) {
+		my $plType = $1;
+		my $firstStream = ${$self->{'streams'}}[$idx];
+		print STDERR "-YT:getURL($idx): NOPLAYLISTS and (".${$self->{'streams'}}[$idx].")\n"  if ($DEBUG);
+		my $ua = LWP::UserAgent->new(@userAgentOps);		
+		$ua->timeout($uops{'timeout'});
+		$ua->cookie_jar({});
+		$ua->env_proxy;
+		my $html = '';
+		my $response = $ua->get($firstStream);
+		if ($response->is_success) {
+			$html = $response->decoded_content;
+		} else {
+			print STDERR $response->status_line  if ($DEBUG);
+			my $no_wget = system('wget','-V');
+			unless ($no_wget) {
+				print STDERR "\n..trying wget...\n"  if ($DEBUG);
+				$html = `wget -t 2 -T 20 -O- -o /dev/null \"$firstStream\" 2>/dev/null `;
+			}
+		}
+		my @lines = split(/\r?\n/, $html);
+		$firstStream = '';
+		if ($plType =~ /pls/) {  #PLS:
+			my $firstTitle = '';
+			foreach my $line (@lines) {
+				if ($line =~ m#^\s*File\d+\=(.+)$#) {
+					$firstStream ||= $1;
+				} elsif ($line =~ m#^\s*Title\d+\=(.+)$#) {
+					$firstTitle ||= $1;
+				}
+			}
+			$self->{'title'} ||= $firstTitle;
+			print STDERR "-YT:getURL(PLS): first=$firstStream= title=$firstTitle=\n"  if ($DEBUG);
+		} else {  #m3u8:
+			(my $urlpath = ${$self->{'streams'}}[$idx]) =~ s#[^\/]+$##;
+			foreach my $line (@lines) {
+				if ($line =~ m#^\s*([^\#].+)$#) {
+					my $urlpart = $1;
+					$urlpart =~ s#^\s+##;
+					$urlpart =~ s#^\/##;
+					$firstStream = ($urlpart =~ m#https?\:#) ? $urlpart : ($urlpath .  $urlpart);
+					last;
+				}
+			}
+			print STDERR "-YT:getURL(m3u8): first=$firstStream=\n"  if ($DEBUG);
+		}
+		return $firstStream || ${$self->{'streams'}}[$idx];
+	}
+	return ${$self->{'streams'}}[$idx];
 }
 
 sub count
@@ -393,8 +516,8 @@ sub getIconData
 {
 	my $self = shift;
 	return ()  unless ($self->{'iconurl'});
-	my $ua = LWP::UserAgent->new;		
-	$ua->timeout(10);
+	my $ua = LWP::UserAgent->new(@userAgentOps);		
+	$ua->timeout($uops{'timeout'});
 	$ua->cookie_jar({});
 	$ua->env_proxy;
 	my $art_image = '';
@@ -403,6 +526,12 @@ sub getIconData
 		$art_image = $response->decoded_content;
 	} else {
 		print STDERR $response->status_line  if ($DEBUG);
+		my $no_wget = system('wget','-V');
+		unless ($no_wget) {
+			print STDERR "\n..trying wget...\n"  if ($DEBUG);
+			my $iconUrl = $self->{'iconurl'};
+			$art_image = `wget -t 2 -T 20 -O- -o /dev/null \"$iconUrl\" 2>/dev/null `;
+		}
 	}
 	return ()  unless ($art_image);
 	(my $image_ext = $self->{'iconurl'}) =~ s/^.+\.//;

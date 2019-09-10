@@ -1,7 +1,7 @@
 package App::CompleteCLIs;
 
 our $DATE = '2019-07-18'; # DATE
-our $VERSION = '0.140'; # VERSION
+our $VERSION = '0.142'; # VERSION
 
 use 5.010001;
 use strict;
@@ -22,7 +22,7 @@ App::CompleteCLIs - CLI wrappers for complete_*() functions
 
 =head1 VERSION
 
-This document describes version 0.140 of App::CompleteCLIs (from Perl distribution App-CompleteCLIs), released on 2019-07-18.
+This document describes version 0.142 of App::CompleteCLIs (from Perl distribution App-CompleteCLIs), released on 2019-07-18.
 
 =head1 SYNOPSIS
 
@@ -34,9 +34,19 @@ functions on the command-line.
 
 =over
 
+=item * L<complete-acme-metasyntactic-meta-category>
+
+=item * L<complete-acme-metasyntactic-meta-theme>
+
+=item * L<complete-acme-metasyntactic-meta-theme-and-category>
+
 =item * L<complete-array-elem>
 
 =item * L<complete-country-code>
+
+=item * L<complete-currency-code>
+
+=item * L<complete-cwalitee-indicator>
 
 =item * L<complete-dist>
 
@@ -68,6 +78,8 @@ functions on the command-line.
 
 =item * L<complete-known-mac>
 
+=item * L<complete-language-code>
+
 =item * L<complete-locale>
 
 =item * L<complete-manpage>
@@ -85,6 +97,8 @@ functions on the command-line.
 =item * L<complete-perl-version>
 
 =item * L<complete-pid>
+
+=item * L<complete-pod>
 
 =item * L<complete-ppr-subpattern>
 

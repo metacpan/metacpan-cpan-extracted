@@ -1,4 +1,4 @@
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
@@ -11,44 +11,108 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: afb/ui/AutoForm.js:73
-msgid "dd.MM.yyyy"
+#: callbackery/ui/Footer.js:23
+msgid "Support"
 msgstr ""
 
-#: afb/ui/Footer.js:19
-msgid "Created by OETIKER+PARTNER AG, #VERSION#, #DATE#"
+#: callbackery/ui/Footer.js:34
+msgid "Implemented by %1"
 msgstr ""
 
-#: afb/ui/Login.js:25 afb/ui/Login.js:72
+#: callbackery/ui/Footer.js:39
+msgid "Version %1, %2%3"
+msgstr ""
+
+#: callbackery/ui/Login.js:23 callbackery/ui/Login.js:109
 msgid "Login"
 msgstr ""
 
-#: afb/ui/Login.js:84
+#: callbackery/ui/Login.js:80
+msgid "User"
+msgstr ""
+
+#: callbackery/ui/Login.js:96
 msgid "Password"
 msgstr ""
 
-#: afb/ui/Login.js:110
-msgid ""
-"release %1, %2<br/>created by <a href=\"http://www.oetiker.ch/\" "
-"style=\"color: #444;\" target=\"o+p\">OETIKER+PARTNER AG</a>"
-msgstr ""
-
-#: afb/ui/MsgBox.js:67
-msgid "Cancel"
-msgstr ""
-
-#: afb/ui/MsgBox.js:80
-msgid "Apply"
-msgstr ""
-
-#: afb/ui/MsgBox.js:89
+#: callbackery/ui/MsgBox.js:68 callbackery/ui/Login.js:112
 msgid "OK"
 msgstr ""
 
-#: afb/ui/MsgBox.js:182
-msgid "%1 (Error Code %2)%3"
+#: callbackery/ui/Login.js:137
+msgid "release %1, %2 by %3"
 msgstr ""
 
-#: afb/ui/MsgBox.js:182
+#: callbackery/ui/MsgBox.js:66
+msgid "Cancel"
+msgstr ""
+
+#: callbackery/ui/MsgBox.js:67
+msgid "Apply"
+msgstr ""
+
+#: callbackery/ui/MsgBox.js:69
+msgid "Yes"
+msgstr ""
+
+#: callbackery/ui/MsgBox.js:70
+msgid "No"
+msgstr ""
+
+#: callbackery/ui/MsgBox.js:177
 msgid "RPC Error %1"
 msgstr ""
+
+#: callbackery/ui/TabView.js:45
+msgid "Unsaved Data"
+msgstr ""
+
+#: callbackery/ui/TabView.js:46
+msgid "This form contains unsaved data. Do you still want to switch?"
+msgstr ""
+
+#: callbackery/ui/form/Auto.js:72 callbackery/ui/form/Auto.js:80
+msgid "dd.MM.yyyy"
+msgstr ""
+
+#: callbackery/ui/plugin/Action.js:102 callbackery/ui/plugin/Action.js:133
+#: callbackery/ui/plugin/Action.js:235
+msgid "Validation Error"
+msgstr ""
+
+#: callbackery/ui/plugin/Action.js:103 callbackery/ui/plugin/Action.js:134
+#: callbackery/ui/plugin/Action.js:236
+msgid ""
+"The form can only be submitted when all data fields have valid content."
+msgstr ""
+
+#: callbackery/ui/plugin/Action.js:148
+msgid "No Data"
+msgstr ""
+
+#: callbackery/ui/plugin/Action.js:157
+msgid "Download Exception"
+msgstr ""
+
+#: callbackery/ui/plugin/Action.js:268
+msgid "Upload Exception"
+msgstr ""
+
+#: callbackery/ui/plugin/Form.js:213
+msgid "Loading Form Data"
+msgstr ""
+
+#: callbackery/ui/plugin/Html.js:54
+msgid "Loading HTML Data"
+msgstr ""
+
+#~ msgid "%1 (Error Code %2)%3"
+#~ msgstr ""
+
+#~ msgid "Created by OETIKER+PARTNER AG, #VERSION#, #DATE#"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "release %1, %2<br/>created by <a href=\"http://www.oetiker.ch/\" "
+#~ "style=\"color: #444;\" target=\"o+p\">OETIKER+PARTNER AG</a>"
+#~ msgstr ""

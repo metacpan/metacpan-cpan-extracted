@@ -35,16 +35,6 @@ L<Data::Object::Config>.
 
 =headers
 
-+=head1 PURPOSE
-
-This package provides a framework for modern Perl development, embracing
-Perl's multi-paradigm programming nature, flexibility and vast ecosystem that
-many of engineers already know and love. The power of this framework comes from
-the extendable (yet fully optional) type library which is integrated into the
-object system and type-constrainable subroutine signatures (supporting
-functions, methods and method modifiers). We also provide classes which wrap
-Perl 5 native data types and provides methods for operating on the data.
-
 +=head1 CONVENTION
 
 Contrary to the opinion of some, modern Perl programming can be extremely
@@ -145,21 +135,339 @@ user-defined type library to use in the creation of a single function
 C<greetings> which takes two arguments which must both be instances of the
 class we just created.
 
-+=head1 CONFIGURATION
++=head1 FRAMEWORK
 
-It's important to note that while the example showcases much of what's possible
-with this framework, all of the sophistication is totally optional.  For
-example, method and function signatures are optionally typed, so the
-declarations would work just as well without the types specified. In fact, you
-could then remove the C<App> type library declarations and even resort
-rewriting the method and function as plain-old Perl subroutines.  This
-flexibility to be able to enable more advanced capabilities is common in the
-Perl ecosystem and is one of the things we love most. The wiring-up of things!
-If you're familiar with Perl, this framework is in-part the wiring up of L<Moo>
-(with L<Moose> support), L<Type::Tiny>, L<Function::Parameters>, L<Try::Tiny>
-  and data objects in a cooperative and cohesive way that feels like it's
-native to the language. Please feel free to use as much or as little of the
-framework as you need and are comfortable with.
+Do (aka Data-Object) is a robust modern Perl development framework, embracing
+Perl's multi-paradigm programming nature, flexibility and vast ecosystem that
+many engineers already know and love.
+
++=head2 core
+
+  package main;
+
+  use Do;
+
+  fun main() {
+    # ...
+  }
+
+  1;
+
+The framework's core configuration enables strict, warnings, Perl's 5.14
+features, and configures the core type library, method signatures, and
+autoboxing.
+
++=head2 library
+
+  package App::Library;
+
+  use Do 'Library';
+
+  our $User = declare 'User',
+    as InstanceOf["App::User"];
+
+  1;
+
+The framework's library configuration established a L<Type::Library> compliant
+type library, as well as configuring L<Type::Utils> in the calling package.
+Read more at L<Data::Object::Library>.
+
++=head2 class
+
+  package App::User;
+
+  use Do 'Class';
+
+  has 'fname';
+  has 'lname';
+
+  1;
+
+The framework's class configuration configures the calling package as a L<Moo>
+class, having the "has", "with", and "extends" keywords available. Read more at
+L<Data::Object::Class>.
+
++=head2 role
+
+  package App::Queuer;
+
+  use Do 'Role';
+
+  has 'queue';
+
+  method dequeue() {
+    # ...
+  }
+
+  method enqueue($job) {
+    # ...
+  }
+
+  1;
+
+The framework's role configuration configures the calling package as a L<Moo>
+role, having the "has", "with", and "extends" keywords available. Read more at
+L<Data::Object::Role>.
+
++=head2 rule
+
+  package App::Queueable;
+
+  use Do 'Rule';
+
+  requires 'dequeue';
+  requires 'enqueue';
+
+  1;
+
+The framework's rule configuration configures the calling package as a L<Moo>
+role, intended to be used to classify interfaces. Read more at
+L<Data::Object::Rule>.
+
++=head2 state
+
+  package App::Env;
+
+  use Do 'State';
+
+  has 'vars';
+  has 'args';
+  has 'opts';
+
+  1;
+
+The framework's state configuration configures the calling package as a
+singleton class with global state. Read more at L<Data::Object::State>.
+
++=head2 struct
+
+  package App::Data;
+
+  use Do 'Struct';
+
+  has 'auth';
+  has 'user';
+  has 'args';
+
+  1;
+
+The framework's struct configuration configures the calling package as a class
+whose state becomes immutable after instantiation. Read more at
+L<Data::Object::Struct>.
+
++=head2 args
+
+  package App::Args;
+
+  use Do 'Args';
+
+  method validate() {
+    # ...
+  }
+
+  1;
+
+The framework's args configuration configures the calling package as a class
+representation of the C<@ARGV> variable. Read more at L<Data::Object::Args>.
+
++=head2 array
+
+  package App::Args;
+
+  use Do 'Array';
+
+  method command() {
+    return $self->get(0);
+  }
+
+  1;
+
+The framework's array configuration configures the calling package as a class
+which extends the Array class. Read more at L<Data::Object::Array>.
+
++=head2 code
+
+  package App::Func;
+
+  use Do 'Code';
+
+  around BUILD($args) {
+    $self->$orig($args);
+
+    # ...
+  }
+
+  1;
+
+The framework's code configuration configures the calling package as a class
+which extends the Code class. Read more at L<Data::Object::Code>.
+
++=head2 cli
+
+  package App::Cli;
+
+  use Do 'Cli';
+
+  method main(%args) {
+    # ...
+  }
+
+  1;
+
+The framework's cli configuration configures the calling package as a class
+capable of acting as a command-line interface. Read more at
+L<Data::Object::Cli>.
+
++=head2 data
+
+  package App::Data;
+
+  use Do 'Data';
+
+  method generate() {
+    # ...
+  }
+
+  1;
+
+The framework's data configuration configures the calling package as a class
+capable of parsing POD. Read more at L<Data::Object::Data>.
+
++=head2 float
+
+  package App::Amount;
+
+  use Do 'Float';
+
+  method currency(Str $code) {
+    # ...
+  }
+
+  1;
+
+The framework's float configuration configures the calling package as a class
+which extends the Float class. Read more at L<Data::Object::Float>.
+
++=head2 hash
+
+  package App::Data;
+
+  use Do 'Hash';
+
+  method logline() {
+    # ...
+  }
+
+  1;
+
+The framework's hash configuration configures the calling package as a class
+which extends the Hash class. Read more at L<Data::Object::Hash>.
+
++=head2 number
+
+  package App::ID;
+
+  use Do 'Number';
+
+  method find() {
+    # ...
+  }
+
+  1;
+
+The framework's number configuration configures the calling package as a class
+which extends the Number class. Read more at L<Data::Object::Number>.
+
++=head2 opts
+
+  package App::Opts;
+
+  use Do 'Opts';
+
+  method validate() {
+    # ...
+  }
+
+  1;
+
+The framework's opts configuration configures the calling package as a class
+representation of the command-line arguments. Read more at
+L<Data::Object::Opts>.
+
++=head2 regexp
+
+  package App::Path;
+
+  use Do 'Regexp';
+
+  method match() {
+    # ...
+  }
+
+  1;
+
+The framework's regexp configuration configures the calling package as a class
+which extends the Regexp class. Read more at L<Data::Object::Regexp>.
+
++=head2 scalar
+
+  package App::OID;
+
+  use Do 'Scalar';
+
+  method find() {
+    # ...
+  }
+
+  1;
+
+The framework's scalar configuration configures the calling package as a class
+which extends the Scalar class. Read more at L<Data::Object::Scalar>.
+
++=head2 string
+
+  package App::Title;
+
+  use Do 'String';
+
+  method generate() {
+    # ...
+  }
+
+  1;
+
+The framework's string configuration configures the calling package as a class
+which extends the String class. Read more at L<Data::Object::String>.
+
++=head2 undef
+
+  package App::Fail;
+
+  use Do 'Undef';
+
+  method explain() {
+    # ...
+  }
+
+  1;
+
+The framework's undef configuration configures the calling package as a class
+which extends the Undef class. Read more at L<Data::Object::Undef>.
+
++=head2 vars
+
+  package App::Vars;
+
+  use Do 'Vars';
+
+  method config() {
+    # ...
+  }
+
+  1;
+
+The framework's vars configuration configures the calling package as a class
+representation of the C<%ENV> variable. Read more at L<Data::Object::Vars>.
 
 =cut
 

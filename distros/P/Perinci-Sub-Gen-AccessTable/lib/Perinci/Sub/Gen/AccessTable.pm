@@ -1,7 +1,7 @@
 package Perinci::Sub::Gen::AccessTable;
 
-our $DATE = '2018-09-07'; # DATE
-our $VERSION = '0.580'; # VERSION
+our $DATE = '2019-09-10'; # DATE
+our $VERSION = '0.581'; # VERSION
 
 use 5.010001;
 use strict;
@@ -459,6 +459,10 @@ _
     # extra arguments
     my $ea = $opts->{extra_args} // {};
     $func_args->{$_} = $ea->{$_} for keys %$ea;
+
+    # extra metadata properties
+    my $extra_props = $opts->{extra_props} // {};
+    $func_meta->{$_} = $extra_props->{$_} for keys %$extra_props;
 
     [200, "OK", $func_meta];
 }
@@ -1287,6 +1291,10 @@ _
             schema => ['hash*'],
             summary => 'Extra arguments for the generated function',
         },
+        extra_props => {
+            schema => ['hash*'],
+            summary => 'Extra metadata properties for the generated function metadata',
+        },
         custom_filters => {
             schema => [hash => {of=>['hash*' => {keys=>{
                 'code'=>'code*', 'meta'=>'hash*'}}]}],
@@ -1449,6 +1457,7 @@ sub gen_read_table_func {
         (map { ("default_$_" => $dav->{$_}) } keys %$dav),
         custom_filters             => $cff,
         extra_args                 => $args{extra_args},
+        extra_props                => $args{extra_props},
         hooks                      => $args{hooks} // {},
     };
 
@@ -1487,7 +1496,7 @@ Perinci::Sub::Gen::AccessTable - Generate function (and its metadata) to read ta
 
 =head1 VERSION
 
-This document describes version 0.580 of Perinci::Sub::Gen::AccessTable (from Perl distribution Perinci-Sub-Gen-AccessTable), released on 2018-09-07.
+This document describes version 0.581 of Perinci::Sub::Gen::AccessTable (from Perl distribution Perinci-Sub-Gen-AccessTable), released on 2019-09-10.
 
 =head1 SYNOPSIS
 
@@ -1602,7 +1611,7 @@ It is often not a good idea to expose your database schema directly as API.
 
 Usage:
 
- gen_read_table_func(%args) -> [status, msg, result, meta]
+ gen_read_table_func(%args) -> [status, msg, payload, meta]
 
 Generate function (and its metadata) to read table data.
 
@@ -1800,6 +1809,10 @@ Filtering must also be enabled (C<enable_filtering>).
 
 Extra arguments for the generated function.
 
+=item * B<extra_props> => I<hash>
+
+Extra metadata properties for the generated function metadata.
+
 =item * B<fields_aliases> => I<hash>
 
 =item * B<hooks> => I<hash>
@@ -1938,7 +1951,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -1991,7 +2004,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -17,7 +17,7 @@ ok(@args == @uniq_args, "All arguments are unique.");
 
 ok((none { /^-/ } @args), "No arguments start with a dash.");
 
-ok((none { /[^-a-zA-Z]/ } grep { not /^(<>|0)$/ } @args),
+ok((none { /[^-a-zA-Z]/ } grep { not /^(<>|0|00)$/ } @args),
    "Arguments contains only letters and dashes.");
 
 ok((all { (not /[A-Z]/) or length == 1 } @args),

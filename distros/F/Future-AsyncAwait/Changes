@@ -1,5 +1,10 @@
 Revision history for Future-AsyncAwait
 
+0.33    2019-09-08 05:16:05
+        [BUGFIXES]
+         * Remember to SPAGAIN after future_done_from_stack() in case the
+           stack array was moved (RT130464)
+
 0.32    2019-09-03 17:00:35
         [CHANGES]
          * Define a super-experimental C-level API for other modules to hook

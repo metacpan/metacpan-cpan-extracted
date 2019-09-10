@@ -10,7 +10,7 @@ use Moo::Role;
 
 with 'Data::Object::Role::Proxyable';
 
-our $VERSION = '1.60'; # VERSION
+our $VERSION = '1.70'; # VERSION
 
 # BUILD
 
@@ -47,7 +47,7 @@ sub functor {
 
   return if !$name;
 
-  return eval { $self->space(join('::', ref($self), 'Func', $name))->load };
+  return eval { $self->space->child(join('::', 'Func', $name))->load };
 }
 
 1;
@@ -124,9 +124,9 @@ return empty.
 
 =head1 CREDITS
 
-Al Newkirk, C<awncorp@cpan.org>, C<+284>
+Al Newkirk, C<+287>
 
-Anthony Brummett, C<abrummet@genome.wustl.edu>, C<+10>
+Anthony Brummett, C<+10>
 
 =cut
 

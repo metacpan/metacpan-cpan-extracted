@@ -7,9 +7,11 @@ META.yml
 Makefile.PL
 README
 README.md
+TODO
 appveyor.yml
 cpanfile
 dist.ini
+durations.jsonl
 lib/App/Yath.pm
 lib/App/Yath/Command.pm
 lib/App/Yath/Command/failed.pm
@@ -20,6 +22,7 @@ lib/App/Yath/Command/reload.pm
 lib/App/Yath/Command/replay.pm
 lib/App/Yath/Command/run.pm
 lib/App/Yath/Command/spawn.pm
+lib/App/Yath/Command/speedtag.pm
 lib/App/Yath/Command/start.pm
 lib/App/Yath/Command/stop.pm
 lib/App/Yath/Command/test.pm
@@ -79,7 +82,6 @@ lib/Test2/Harness/Watcher.pm
 lib/Test2/Harness/Watcher/TimeTracker.pm
 lib/Test2/Tools/HarnessTester.pm
 log.jsonl
-out.jsonl
 scripts/yath
 t/App/Yath.t
 t/App/Yath/Command.t

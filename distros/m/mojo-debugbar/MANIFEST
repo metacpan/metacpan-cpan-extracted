@@ -1,0 +1,16 @@
+Changes
+lib/Mojo/Debugbar.pm
+lib/Mojo/Debugbar/Monitor/DBIx.pm
+lib/Mojo/Debugbar/Monitor/Request.pm
+lib/Mojo/Debugbar/Monitor/Template.pm
+lib/Mojo/Debugbar/Monitor/ValidationTiny.pm
+lib/Mojo/Debugbar/Storage/DBIx.pm
+lib/Mojo/Debugbar/Monitor.pm
+lib/Mojo/Debugbar/Monitors.pm
+Makefile.PL
+MANIFEST            This list of files
+README.md
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t

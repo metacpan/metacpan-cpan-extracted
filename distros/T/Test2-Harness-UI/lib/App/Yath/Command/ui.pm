@@ -2,7 +2,7 @@ package App::Yath::Command::ui;
 use strict;
 use warnings;
 
-our $VERSION = '0.000018';
+our $VERSION = '0.000020';
 
 use Test2::Util qw/pkg_to_file/;
 
@@ -103,6 +103,7 @@ sub run_command {
         mount '/js'  => Plack::App::Directory->new({root => share_dir('js')})->to_app;
         mount '/css' => Plack::App::Directory->new({root => share_dir('css')})->to_app;
         mount '/favicon.ico' => Plack::App::File->new({file => share_dir('img') . '/favicon.ico'})->to_app;
+        mount '/img' => Plack::App::Directory->new({root => share_dir('img')})->to_app;
 
         mount '/' => sub {
             Test2::Harness::UI->new(config => $config)->to_app->(@_);

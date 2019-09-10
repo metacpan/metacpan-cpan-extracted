@@ -1,5 +1,5 @@
 package Test::BDD::Cucumber::Model::Feature;
-$Test::BDD::Cucumber::Model::Feature::VERSION = '0.60';
+$Test::BDD::Cucumber::Model::Feature::VERSION = '0.62';
 use Moo;
 use Types::Standard qw( Str ArrayRef InstanceOf );
 
@@ -9,7 +9,7 @@ Test::BDD::Cucumber::Model::Feature - Model to represent a feature file, parsed
 
 =head1 VERSION
 
-version 0.60
+version 0.62
 
 =head1 DESCRIPTION
 

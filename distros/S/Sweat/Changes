@@ -1,0 +1,12 @@
+Revision history for Perl extension Sweat
+
+201909090 2019-09-09T21:32:31Z
+
+    - Replacing the LICENSE file with an MIT license, as originally intended
+
+    - Small organizational improvements for CPAN's sake; thanks to Dan Book for the suggestions.
+
+201909080 2019-09-09T20:26:49Z
+
+    - original version
+

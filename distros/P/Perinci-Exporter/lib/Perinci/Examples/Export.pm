@@ -2,8 +2,8 @@
 
 package Perinci::Examples::Export;
 
-our $DATE = '2019-08-15'; # DATE
-our $VERSION = '0.080'; # VERSION
+our $DATE = '2019-09-10'; # DATE
+our $VERSION = '0.083'; # VERSION
 
 # be lean
 #use strict;
@@ -58,7 +58,7 @@ Perinci::Examples::Export - Examples for exporting
 
 =head1 VERSION
 
-This document describes version 0.080 of Perinci::Examples::Export (from Perl distribution Perinci-Exporter), released on 2019-08-15.
+This document describes version 0.083 of Perinci::Examples::Export (from Perl distribution Perinci-Exporter), released on 2019-09-10.
 
 =head1 DESCRIPTION
 

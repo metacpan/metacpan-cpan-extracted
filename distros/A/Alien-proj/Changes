@@ -1,8 +1,12 @@
 Revision history for Alien::proj
 
+1.04 2019-09-08
+    - pkgconfig workaround to find sqlite3 on
+      windows share builds, gh#2
+
 1.03 2019-09-04
     - Add dependency on Alien::sqlite as it is needed
-      to compile proj 6.1
+      to compile proj 6.1, gh#2
 
 1.02 2018-12-09
     - Update POD and other links

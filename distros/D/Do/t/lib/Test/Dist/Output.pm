@@ -115,7 +115,7 @@ method construct_credits() {
   my @content;
 
   push @content, $self->markup_head1('credits', [
-    join "\n\n", map qq($$_[1], C<$$_[2]>, C<+$$_[0]>), @$records
+    join "\n\n", map qq($$_[1], C<+$$_[0]>), @$records
   ]);
 
   return join("\n", @content);

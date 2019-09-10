@@ -2,11 +2,11 @@ package Sim::OPT;
 # Copyright (C) 2008-2019 by Gian Luca Brunetti and Politecnico di Milano.
 # This is Sim::OPT, a program managing building performance simulation programs for performing optimization by overlapping block coordinate descent.
 # This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
-$VERSION = '0.449';
+$VERSION = '0.451';
 use v5.14;
 # use v5.20;
 use Exporter;
-use parent 'Exporter'; # imports and subclasses Exporter
+use parent 'Exporter';
 
 use vars qw( $VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS );
 use Math::Trig;
@@ -22,17 +22,11 @@ use Set::Intersection;
 use List::Compare;
 use Data::Dumper;
 use POSIX;
-#use Parallel::ForkManager;
-#$Data::Dumper::Indent = 0;
-#$Data::Dumper::Useqq  = 1;
-#$Data::Dumper::Terse  = 1;d
 use Data::Dump qw(dump);
 use feature 'say';
-#use feature qw(postderef);
-#no warnings qw(experimental::postderef);
+
 #use Sub::Signatures;
 #no warnings qw(Sub::Signatures);
-#no strict 'refs';
 no strict;
 no warnings;
 use warnings::unused;
@@ -44,7 +38,7 @@ use Sim::OPT::Takechance;
 use Sim::OPT::Parcoord3d;
 use Sim::OPT::Interlinear;
 
-our @ISA = qw( Exporter ); # our @adamkISA = qw(Exporter);
+our @ISA = qw( Exporter );
 #%EXPORT_TAGS = ( DEFAULT => [qw( &opt &prepare )]); # our %EXPORT_TAGS = ( 'all' => [ qw( ) ] );
 #@EXPORT   = qw(); # our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
@@ -116,25 +110,25 @@ sub odd__
 sub _mean_ { return @_ ? sum(@_) / @_ : 0 }
 
 sub rotate2d
-{ # SELF-EXPLAINING. IT IS HERE TO BE CALLABLE READILY FROM THE OUTSIDE
-    my ( $x, $y, $angle ) = @_;
+{
+  my ( $x, $y, $angle ) = @_;
 
-    sub deg2rad
-    {
-	my $degrees = shift;
-	return ( ( $degrees / 180 ) * 3.14159265358979 );
-    }
+  sub deg2rad
+  {
+		my $degrees = shift;
+		return ( ( $degrees / 180 ) * 3.14159265358979 );
+  }
 
-    sub rad2deg
-    {
-	my $radians = shift;
-	return ( ( $radians / 3.14159265358979 ) * 180 ) ;
-    }
+  sub rad2deg
+  {
+		my $radians = shift;
+		return ( ( $radians / 3.14159265358979 ) * 180 ) ;
+  }
 
-    $angle = deg2rad( $angle );
-    my $x_new = cos($angle)*$x - sin($angle)*$y;
-    my $y_new = sin($angle)*$x + cos($angle)*$y;
-  return ( $x_new, $y_new);
+  $angle = deg2rad( $angle );
+  my $x_new = cos($angle)*$x - sin($angle)*$y;
+  my $y_new = sin($angle)*$x + cos($angle)*$y;
+	return ( $x_new, $y_new);
 }
 
 sub countarray
@@ -147,7 +141,7 @@ sub countarray
 			$c++;
 		}
 	}
-	return ($c); # TO BE CALLED WITH: countarray(@array)
+	return ($c);
 }
 
 sub countnetarray
@@ -161,7 +155,7 @@ sub countnetarray
 		}
 	}
 	@bag = uniq( @bag );
-	return scalar( @bag ); # TO BE CALLED WITH: countnetarray(@array)
+	return scalar( @bag );
 }
 
 
@@ -194,14 +188,13 @@ sub addnear
 		{
 			$newlev = ( $lev - 1 );
 		}
-
 		my $bit = $par . "-" . $newlev;
 		unless( ( $newlev == $lev ) or ( $newlev == 0 ) or ( $newlev > $maxlev ) )
 		{
-			my $firstbit = $par . "-"; #say "\$firstbit $firstbit";
+			my $firstbit = $par . "-";
 			$that = $this;
-			$that =~ s/$firstbit(\d)/$bit/ ; #say "\$that $that";
-			$done = "yes"; #say "\$done $done";
+			$that =~ s/$firstbit(\d)/$bit/ ;
+			$done = "yes";
 		}
 	}
 	$pass->[0][0] = $that;
@@ -209,7 +202,7 @@ sub addnear
 }
 
 
-sub sorttable # TO SORT A TABLE ON THE BASIS OF A COLUMN
+sub sorttable
 {
 	my $num = $_[0];
 	my @table = @{ $_[1] };
@@ -223,7 +216,6 @@ sub sorttable # TO SORT A TABLE ON THE BASIS OF A COLUMN
 	    unshift (@row, $line);
 	    push @rows, \@row;
 	}
-
 	@rows = sort { $a->[$num] cmp $b->[$num] } @rows;
 
 	foreach my $row (@rows) {
@@ -231,7 +223,7 @@ sub sorttable # TO SORT A TABLE ON THE BASIS OF A COLUMN
 		print "$_";
 	    }
 	    print "\n";
-	} #TO BE CALLED WITH: sorttable( $number_of column, \@table);
+	}
 	return (@table);
 }
 
@@ -248,7 +240,7 @@ sub _clean_
 			push(@storeinfo, $_)
 		}
 	}
-	return  @storeinfo; # HOW TO CALL THIS FUNCTION: clean(\@arraytoclean). IT IS DESTRUCTIVE.
+	return  @storeinfo; # IT IS DESTRUCTIVE.
 }
 
 sub present
@@ -290,11 +282,8 @@ sub count_variables # IT COUNTS THE FLATTENED VARIABLES
 	}
 }
 
-# flatten_variables ( [ [1, 2, 3] , [2, 3, 4] , [3, 4, 5] ], [ [1, 2], [2, 3] ] );
-#count_variables ([1, 2, 3, 4, 5], [1, 2, 3]);
 
-
-sub fromopt_tosweep # IT CONVERTS A TREE BLOCK SEARCH FORMAT IN THE ORIGINAL OPT'S BLOCKS SEARCH FORMAT.
+sub fromopt_tosweep
 {
 	my %thishash = %{ $_[0] };
 	my @casegroup = @{ $thishash{casegroup} } ;
@@ -324,7 +313,7 @@ sub fromopt_tosweep # IT CONVERTS A TREE BLOCK SEARCH FORMAT IN THE ORIGINAL OPT
 	return (@sweeps);
 }
 
-sub fromopt_tosweep_simple # IT CONVERTS A TREE BLOCK SEARCH FORMAT IN THE ORIGINAL OPT'S BLOCKS SEARCH FORMAT.
+sub fromopt_tosweep_simple
 {
 	my %thishash = @_;
 	my $casegroupref = $thishash{casegroup};
@@ -366,7 +355,7 @@ sub checkduplicates
 }
 
 
-sub fromsweep_toopt # IT CONVERTS THE ORIGINAL OPT BLOCKS SEARCH FORMAT IN A TREE BLOCK SEARCH FORMAT.
+sub fromsweep_toopt
 {
 	my ( @bucket, @secondbucket );
 	my $countcase = 0;
@@ -404,7 +393,6 @@ sub fromsweep_toopt # IT CONVERTS THE ORIGINAL OPT BLOCKS SEARCH FORMAT IN A TRE
 	@chanceseed = @bucket; # THE ORIGINAL OPT BLOCKS SEARCH FORMAT IN A TREE BLOCK SEARCH FORMAT.
 	@caseseed = @secondbucket;
 	return (\@caseseed, \@chanceseed);
-	# IT HAS TO BE CALLED THIS WAY: fromsweep_toopt(@sweep);
 }
 
 
@@ -429,7 +417,7 @@ sub convcaseseed # IT ADEQUATES THE POINT OF ATTACHMENT OF EACH BLOCK TO THE FAC
 			$countblock++;
 		}
 		$countcase++;
-	} # TO BE CALLED WITH: convcaseseed(\@caseseed, \@chanceseed). @caseseed IS globsAL. TO BE CALLED WITH: convcaseseed(@caseseed);
+	} # TO BE CALLED WITH: convcaseseed(\@caseseed, \@chanceseed). @caseseed IS global.
 	return(@caseseed);
 }
 
@@ -442,7 +430,7 @@ sub convchanceseed # IT COUNTS HOW MANY PARAMETERS THERE ARE IN A SEARCH STRUCTU
 		{
 			push (@$_, @$_, @$_);
 		}
-	} # IT HAS TO BE CALLED WITH convchanceseed(@chanceseed). IT ACTS ON @chanceseed, WHICH IS globsAL.
+	} # IT HAS TO BE CALLED WITH convchanceseed(@chanceseed). IT ACTS ON @chanceseed
 	return(@_);
 }
 
@@ -451,7 +439,7 @@ sub tellnum
 {
 	@arr = @_;
 	my $response = (scalar(@_)/2);
-	return($response); # TO BE CALLED WITH tellnum(%varnums);
+	return($response);
 }
 
 
@@ -495,7 +483,7 @@ sub calcmiditers
 			}
 		}
 		$countcase++;
-	} # TO BE CALLED WITH: calcmiditers(@varnumbers)
+	}
 	return ( @mediters );
 }
 
@@ -506,21 +494,19 @@ sub getitersnum
 	my $varnumber = shift;
 	my @varnumbers = @_;
 	my $itersnum = $varnumbers[$countcase]{$varnumber};
-
 	return $itersnum;
-	# IT HAS TO BE CALLED WITH getitersnum($countcase, $varnumber, @varnumbers);
 }
 
 
 sub clean
 {
   my ( $line, $mypath, $file ) = @_;
-	$line =~ s/^$mypath// ; #say $tee "IN CLEAN \$line $line";
-	$line =~ s/^\/// ; #say $tee "IN CLEAN \$line $line";
-	$line =~ s/^$file// ; #say $tee "IN CLEpAN \$line $line";
-	$line =~ s/^_// ; #say $tee "IN CLEAN \$line $line";
-  $line =~ /_(\D+)$/ ; #say $tee "IN CLEAN \$line $line";
-  $line =~ s/_$1$// ; #say $tee "IN CLEAN \$line $line";
+	$line =~ s/^$mypath// ;
+	$line =~ s/^\/// ;
+	$line =~ s/^$file// ;
+	$line =~ s/^_// ;
+  $line =~ /_(\D+)$/ ;
+  $line =~ s/_$1$// ;
   #$line =~ s/^-// ;
   return( $line );
 }
@@ -529,7 +515,7 @@ sub clean
 sub makefilename # IT DEFINES A FILE NAME GIVEN A %carrier.
 {
 	my ( $tempc_r, $mypath, $file, $instn, $inst_ref, $dowhat_ref ) = @_;
-	my %tempc = %{ $tempc_r }; #say $tee "IN MAKEFILENAME \$tempc $tempc";
+	my %tempc = %{ $tempc_r };
 	my %inst = %{ $inst_ref };
 	my %dowhat = %{ $dowhat_ref };
 	my $cleanto;
@@ -537,13 +523,12 @@ sub makefilename # IT DEFINES A FILE NAME GIVEN A %carrier.
 	{
 		$cleanto = $cleanto . $key . "-" . $tempc{$key} . "_";
 	}
-	$cleanto =~ s/_$// ; #say $tee "IN MAKEFILENAME \$cleanto $cleanto";
+	$cleanto =~ s/_$// ;
 
-	my $to = "$mypath/$file" . "_" . "$cleanto"; #say $tee "IN MAKEFILENAME \$to $to";
-	my $cleancrypto = $instn . "__"; #say $tee "IN MAKEFILENAME \$cleancrypto $cleancrypto";
-	#my $cleancrypto = $instn . "-";
-	my $crypto = "$mypath/$file" . "_" . "$cleancrypto"; #say $tee "IN MAKEFILENAME \$crypto $crypto";
-	my $it; #say "DOWHATNAMES: " . $dowhat{names}; #say "DOWHAT: " . dump ( \%dowhat ) ;
+	my $to = "$mypath/$file" . "_" . "$cleanto";
+	my $cleancrypto = $instn . "__";
+	my $crypto = "$mypath/$file" . "_" . "$cleancrypto";
+	my $it;
 	if ( $dowhat{names} eq "short" )
 	{
 		$it{to} = $to;
@@ -571,14 +556,12 @@ sub getblocks
 	return (@blocks);
 }
 
-#@blocks = getblocks(\@sweeps, 0);  say "dumpA( \@blocks) " . dump(@blocks);
 
 sub getblockelts
 { # IT GETS @blockelts. TO BE CALLED WITH getblockelts(\@sweeps, $countcase, $countblock)
-	my ( $sweeps_ref, $countcase, $countblock ) = @_; #say $tee "In getblockelts; \$countblock: " . dump( $countblock) ;
-	my @sweeps = @{ $sweeps_ref }; #say $tee "In getblockelts; \@sweeps: " . dump( @sweeps) ;
-	#my @blockelts = sort { $a <=> $b } @{ $sweeps[$countcase][$countblock] };
-	my @blockelts = @{ $sweeps[$countcase][$countblock] }; #say $tee "In getblockelts; \@blockelts: " . dump( @blockelts) ;
+	my ( $sweeps_ref, $countcase, $countblock ) = @_;
+	my @sweeps = @{ $sweeps_ref };
+	my @blockelts = @{ $sweeps[$countcase][$countblock] };
 	return ( \@blockelts );
 }
 
@@ -592,23 +575,17 @@ sub getrootname
 }
 
 
-
 sub extractcase #  UPDATES THE FILE NAME ON THE BASIS OF A %carrier
 {
 	my ( $dowhat_ref, $transfile, $carrier_r, $file, $blockelts_r, $mypath, $instn ) = @_;
-	#say $tee "In extractcase; \$transfile: " . dump( $transfile) ;
-	#say $tee "In extractcase; \$file: " . dump( $file) ;
-	my %carrier = %{ $carrier_r }; #say $tee "In extractcase; \%carrier: " . dump( \%carrier) ;
-	my @blockelts = @{ $blockelts_r }; #say $tee "In extractcase; \@blockelts: " . dump( @blockelts ) ;
-	my $num = scalar( @blockelts ); #say $tee "In extractcase; \$num: " . dump( $num ) ;
+	my %carrier = %{ $carrier_r };
+	my @blockelts = @{ $blockelts_r };
+	my $num = scalar( @blockelts );
 	my %dowhat = %{ $dowhat_ref };
-	#say $tee "In extractcase; \$mypath: " . dump( $mypath ) ;
-	#say $tee "In extractcase; \$instn: " . dump( $instn ) ;
-
 	my %provhash;
-	$transfile =~ s/^mypath\///; #say $tee "In extractcase1; \$transfile: " . dump( $transfile) ;
-	$transfile =~ s/^$file//; #say $tee "In extractcase1; \$transfile: " . dump( $transfile) ;
-	$transfile =~ s/^_//; #say $tee "In extractcase2; \$transfile: " . dump( $transfile) ;
+	$transfile =~ s/^mypath\///;
+	$transfile =~ s/^$file//;
+	$transfile =~ s/^_//;
 	foreach my $parnum ( keys %carrier )
 	{
 		$transfile =~ /^(\d+)-(\d+)/;
@@ -617,15 +594,13 @@ sub extractcase #  UPDATES THE FILE NAME ON THE BASIS OF A %carrier
 		{
 			if ( $1 ~~ @blockelts )
 			{
-				$provhash{$1} = $2; #say $tee "In extractcase3; \$transfile: " . dump( $transfile) ;
+				$provhash{$1} = $2;
 			}
 		}
 
-		$transfile =~ s/^$1-$2//; #say $tee "In extractcase4; \$transfile: " . dump( $transfile) ;
-		$transfile =~ s/^_//; #say $tee "In extractcase5; \$transfile: " . dump( $transfile) ;
+		$transfile =~ s/^$1-$2//;
+		$transfile =~ s/^_//;
 	}
-	#say $tee "In extractcase; \%provhash: " . dump( \%provhash ) ;
-
 	my %tempc = %{ dclone( \%carrier )};
 	foreach my $key ( keys %provhash )
 	{
@@ -641,17 +616,15 @@ sub extractcase #  UPDATES THE FILE NAME ON THE BASIS OF A %carrier
 			$tempc{$key} = $provhash{$key};
 		}
 	}
-
-	#say $tee "In extractcase, OBTAINED \%carrier: " . dump( \%carrier ) ;
-	my %to = %{ makefilename( \%tempc, $mypath, $file, $instn, \%inst, \%dowhat ) }; #say $tee "In extractcase!, RESULT1:; \%to: " . dump( \%to ) ;
+	my %to = %{ makefilename( \%tempc, $mypath, $file, $instn, \%inst, \%dowhat ) };
 	return( \%to );
 }
 
 
 sub definerootcases #### DEFINES THE ROOT-CASE'S NAME.
 {
-	my @sweeps = @{ $_[0] }; #say $tee "\@sweeps IN DEFINEROOTCASES " . dump( @sweeps );
-	my @miditers = @{ $_[1] }; #say $tee "\@miditers IN DEFINEROOTCASES " . dump( @miditers );
+	my @sweeps = @{ $_[0] };
+	my @miditers = @{ $_[1] };
 	my @rootnames;
 	my $countcase = 0;
 	foreach my $sweep (@sweeps)
@@ -673,7 +646,7 @@ sub definerootcases #### DEFINES THE ROOT-CASE'S NAME.
 		push ( @rootnames, $rootname);
 		$countcase++;
 	}
-	return (@rootnames); # IT HAS TO BE CALLED WITH: definerootcase(@miditers).
+	return (@rootnames);
 }
 
 
@@ -693,20 +666,7 @@ sub populatewinners
 
 
 sub getitem
-{ # IT GETS THE WINNER OR LOSER LINE. To be called with getitems(\@winner_or_loser_lines, $countcase, $countblock)
-	my $swap = shift;
-	my @items = @$swap;
-	my $countcase = shift;
-	my $countblock = shift;
-	my $item = $items[$countcase][$countblock];
-	my @arr = @$item;
-	my $elt = $arr[-1];
-	return ($elt);
-}
-
-
-sub getitem
-{ # IT GETS THE WINNER OR LOSER LINE. To be called with getitems(\@winner_or_loser_lines, $countcase, $countblock)
+{ # IT GETS THE WINNER OR LOSER LINE.
 	my $swap = shift;
 	my @items = @$swap;
 	my $countcase = shift;
@@ -716,9 +676,6 @@ sub getitem
 	my $elt = $arr[0];
 	return ($elt);
 }
-
-
-
 
 
 sub getline
@@ -752,7 +709,7 @@ sub washn
 	my ( @arr ) = @_;
 	if ( ref( @arr[0] ) eq "ARRAY" )
 	{
-		@arr = @{ $arr[0] }; #say $tee "335 getcase \$itemref " . dump( $itemref );
+		@arr = @{ $arr[0] };
 	}
 	return( @arr );
 }
@@ -760,33 +717,32 @@ sub washn
 
 sub getcase
 {
-	my ( $varn_r, $countcase ) = @_; #say $tee "333 getcase \$countcase " . dump( $countcase );
-	my @varnumbers = @{ $varn_r }; #say $tee "333 getcase \@varnumbers " . dump( @varnumbers );
+	my ( $varn_r, $countcase ) = @_;
+	my @varnumbers = @{ $varn_r };
 	my ( $itemref, %item);
 	if ( ref( @varnumbers[0] ) eq "HASH" )
 	{
-		$itemref = $varnumbers[$countcase]; #say $tee "333 getcase \$itemref " . dump( $itemref );
-		%item = %{ $itemref }; #say $tee "333 getcase \%item " . dump( %item );
+		$itemref = $varnumbers[$countcase];
+		%item = %{ $itemref };
 	}
 	else
 	{
-		@varnumbers = @{ $varnumbers[$countcase] }; #say $tee "335 getcase \$itemref " . dump( $itemref );
-	  $itemref = $varnumbers[$countcase]; #say $tee "335 getcase \$itemref " . dump( $itemref );
-	  my %item = %{ $itemref }; #say $tee "335 getcase \%item " . dump( %item );
-	} #say $tee "333 getcase leaving \@varnumbers " . dump( @varnumbers );
+		@varnumbers = @{ $varnumbers[$countcase] };
+	  $itemref = $varnumbers[$countcase];
+	  my %item = %{ $itemref };
+	}
 	return ( %item );
 }
 
 
 sub getstepsvar
-{ 	# IT EXTRACTS $stepsvar
-	my ( $countvar, $countcase, $varnumbers_r ) = @_; #say $tee "555 getstepsvar \$countvar " . dump( $countvar );
-	my @varnumbers = @{ $varnumbers_r }; #say $tee "555 getstepsvar \@varnumbers" . dump( @varnumbers );
-	#say $tee "555 getstepsvar \$varnumbers[ \$countcase ]" . dump( $varnumbers[ $countcase ] );
-	my %varnums = getcase( \@varnumbers, $countcase ); #say $tee "555 getstepsvar \%varnums" . dump( %varnums );
-	my $stepsvar = $varnums{$countvar}; #say $tee "555 getstepsvar \$stepsvar" . dump( $stepsvar );
+{
+	my ( $countvar, $countcase, $varnumbers_r ) = @_;
+	my @varnumbers = @{ $varnumbers_r };
+	my %varnums = getcase( \@varnumbers, $countcase );
+	my $stepsvar = $varnums{$countvar};
 	return ( $stepsvar )
-} #getstepsvar($countvar, $countcase, \@varnumbers);
+}
 
 
 sub givesize
@@ -845,28 +801,26 @@ sub flattenbox
 
 sub integratebox
 {
-	my @arrelts = @{ $_[0] }; #say $tee "IN INTEGRATEBOX \@arrelts " . dump( @arrelts ) ;
-	my %carrier = %{ $_[1] }; #say $tee "IN INTEGRATEBOX \%carrier " . dump( \%carrier ) ;
-	my $file = $_[2]; #say $tee "IN INTEGRATEBOX \$file $file" ;
-	my @blockelts = @{ $_[3] }; #say $tee "IN INTEGRATEBOX \@blockelts @blockelts" ;
-	my $mypath = $_[4]; #say $tee "IN INTEGRATEBOX \$mypath $mypath" ;
+	my @arrelts = @{ $_[0] };
+	my %carrier = %{ $_[1] };
+	my $file = $_[2];
+	my @blockelts = @{ $_[3] };
+	my $mypath = $_[4];
 	my %dowhat = %{ $_[5] };
 	my @newbox;
 	if ( ref( $arrelts[0] ) )
 	{
 		foreach my $eltref ( @arrelts )
 		{
-			my @elts = @{ $eltref }; #say $tee "IN INTEGRATEBOX \@elts @elts" ;
-			my $target = $elts[0]; #say $tee "IN INTEGRATEBOX Target $target" ;
-			#say $tee "PRE EXTRACTCASE IN INTEGRATEBOX \$target $target" ;
-			my %righttarg = %{ extractcase( \%dowhat, $target, \%carrier, $file, \@blockelts, $mypath ) }; #say $tee "IN INTEGRATEBOX \%righttarg " . dump(  \%righttarg ) ;
-			my $righttarget = $righttarg{cleanto}; #say $tee "IN INTEGRATEBOX \$righttarget $righttarget" ;
-			my $origin = $elts[3]; #say $tee "IN INTEGRATEBOX \$origin $origin" ;
-			#say $tee "PRE EXTRACTCASE IN INTEGRATEBOX \$origin $origin";
-			my %rightorig = %{ extractcase( \%dowhat, $origin, \%carrier, $file, \@blockelts, $mypath ) }; #say $tee "IN INTEGRATEBOX \%rightorig " . dump(  \%rightorig ) ;
-			my $rightorigin = $rightorig{cleanto}; #say $tee "IN INTEGRATEBOX \$rightorigin " . dump(  \$rightorigin ) ;
+			my @elts = @{ $eltref };
+			my $target = $elts[0];
+			my %righttarg = %{ extractcase( \%dowhat, $target, \%carrier, $file, \@blockelts, $mypath ) };
+			my $righttarget = $righttarg{cleanto};
+			my $origin = $elts[3];
+			my %rightorig = %{ extractcase( \%dowhat, $origin, \%carrier, $file, \@blockelts, $mypath ) };
+			my $rightorigin = $rightorig{cleanto};
 			push ( @newbox, [ $righttarget, $elts[1], $elts[2], $rightorigin, $elts[4] ] );
-		} #say $tee "IN INTEGRATEBOX \@newbox " . dump( @newbox ) ;
+		}
 		return ( \@newbox );
 	}
 }
@@ -896,17 +850,12 @@ sub filterbox
 			push ( @basket, $parent );
 			foreach ( @basket )
 			{
-				#my %varnums = %{ $varnumsref };
 				push ( @box, $_->[0], $case->[4] );
 			}
 		}
 	}
-	#say $tee "IN FILTER BOX: " . dump( @box );
-	#say $tee "IN FILTER BASKET: " . dump( @basket );
-	#return( @box );
 	return( @basket );
 }
-
 
 
 sub filterbox_delete
@@ -1053,16 +1002,16 @@ sub gencentres
     my $inv;
     foreach my $key ( sort { $a <=> $b } ( keys %hsmax ) )
     {
-      my $newval = ( int( ( $hsmax{$key} - $hsmin{$key} ) / 2 ) + $hsmin{$key} ) ; #say "\$newval: " . dump ( $newval );
+      my $newval = ( int( ( $hsmax{$key} - $hsmin{$key} ) / 2 ) + $hsmin{$key} ) ;
       if ( ( $newval == $hsmax{$key} ) or ( $newval == $hsmin{$key} ) )
       {
         my @newpair;
-        my $answer = odd__( $signal ); #say "\$answer: " . dump ( $answer );
+        my $answer = odd__( $signal );
         if ( $answer eq "even" )
         {
           $value = $array[ int(rand( @array + 1 )) ];
           my @ar = ( $hsmax{$key}, $hsmin{$key} );
-          $newval = $ar[ int( rand( @ar + 1 ) ) ]; #say "newpair1: " . dump ( @newpair );
+          $newval = $ar[ int( rand( @ar + 1 ) ) ];
           if ( $hsmax{$key} == $newval )
           {
             $inv = "no";
@@ -1098,16 +1047,16 @@ sub gencentres
 sub starsweep
 {
   my ( $varns_r, $sweeps_r ) = @_;
-  my %firstvarn = %{ $varns_r->[0] }; #say $tee "IN STARSWEEP \%firstvarn: " . dump( \%firstvarn );
-  my @firstsweep = @{ shift( @{ $sweeps_r } ) }; #say $tee "IN STARSWEEP \@firstsweep: " . dump( \@firstsweep );
-	my @restsweeps = @{ $sweeps_r }; #say $tee "IN STARSWEEP \@restsweeps: " . dump( \@restsweeps );
+  my %firstvarn = %{ $varns_r->[0] };
+  my @firstsweep = @{ shift( @{ $sweeps_r } ) };
+	my @restsweeps = @{ $sweeps_r };
 	my ( @box );
   foreach $par ( sort { $a <=> $b } ( keys %firstvarn ) )
   {
-		push( @box, [ $par ] ); #say "\$par: " . dump( \$par );
-  } #say "\@box: " . dump( \@box );
-  unshift( @restsweeps, ( [ @box ] ) ); #say "\@sweeps: " . dump( \@sweeps );
-  return( \@restsweeps );  #say $tee "IN STARSWEEP \@restdirs: " . dump( \@restdirs );  say $tee "IN STARSWEEP \@restords: " . dump( \@restords );
+		push( @box, [ $par ] );
+  }
+  unshift( @restsweeps, ( [ @box ] ) );
+  return( \@restsweeps );
 }
 
 
@@ -1118,8 +1067,7 @@ sub readsweeps
 	foreach ( @struct )
 	{
 		foreach ( @$_ )
-		{
-			#prunethis( $_ );
+		{	#prunethis( $_ );
 			;
 		}
 	}
@@ -1132,10 +1080,10 @@ sub stararrange
 	my ( $sweeps_ref, $blockelts_ref, $varnumbers_ref, $countcase, $countblock, $file ) = @_;
 	my @sweeps = @{ $sweeps_ref };
 	my @blockelts = @{ $blockelts_ref };
-	my @varnumbers = @{ $varnumbers_ref }; #say $tee "IN STARARRANGE \@varnumbers " . dump( @varnumbers );
+	my @varnumbers = @{ $varnumbers_ref };
 	my %varnums = getcase( \@varnumbers, $countcase );
 	my @vars = ( keys %varnums );
-	my @diffs = Sim::OPT::Interlinear::diff( \@vars, \@blockelts ); #say $tee "IN STARARRANGE @diffs " . dump( @diffs );
+	my @diffs = Sim::OPT::Interlinear::diff( \@vars, \@blockelts );
 
 	my @newhash;
 	foreach my $var ( @blockelts )
@@ -1148,9 +1096,9 @@ sub stararrange
 	{
 		push( @newhash, $diff );
 		push( @newhash, 1 );
-	} #say $tee "IN STARARRANGE \@newhash " . dump( @newhash );
-	my %temp = @newhash; #say $tee "IN STARARRANGE \%temp " . dump( \%temp );
-	$varnumbers[$countcase] = \%temp; #say $tee "IN STARARRANGE \$varnumbers[\$countcase] " . dump( $varnumbers[$countcase] );
+	}
+	my %temp = @newhash;
+	$varnumbers[$countcase] = \%temp;
 	return( \@varnumbers );
 }
 
@@ -1159,14 +1107,14 @@ sub stararrange
 sub star_act
 {
 	my ( $sweeps_r, $blockelts_r, $countcase, $countblock ) = @_;
-	my @sweeps = @{ $sweeps_r }; #say $tee "IN star_act \@sweeps: " . dump( @sweeps );
-	my @blockelts = @{ $blockelts_r }; #say $tee "IN star_act \@blockelts: " . dump( @blockelts );
+	my @sweeps = @{ $sweeps_r };
+	my @blockelts = @{ $blockelts_r };
 
 	my @bag;
 	foreach my $elt ( @blockelts )
 	{
 		push( @bag, [ $elt ] );
-	} #say $tee "IN star_act \@bag: " . dump( @bag );
+	}
 
 	my @basket;
 	foreach my $sweepcase ( @sweeps )
@@ -1184,10 +1132,9 @@ sub star_act
 			}
 			push( @basket, [ @box ] );
 		}
-	} #say $tee "IN star_act \@basket: " . dump( @basket );
+	}
 	return( \@basket, \@bag );
-} ### END SUB star_act
-
+}
 
 
 sub solvestar
@@ -1211,11 +1158,10 @@ sub solvestar
 		$dirfiles{starpositions} = genstar( \%dirfiles, \@varnumbers, \%carrier, \@blockelts );
 
 		( $dirfiles{dummysweeps}, $dirfiles{dummyelt} ) = @{ star_act( \@sweeps, \@blockelts, $countcase, $countblock ) };
-	} ### if ( not( scalar( @{ $dirfiles{starpositions} } ) == 0 ) )YOU CAN CUT THIS. THE OBTAINED VARIABLES ARE UNUSED
-	#say $tee "IN SOLVESTAR!! \$dirfiles{starpositions}: " . dump( $dirfiles{starpositions} );
-	#say $tee "IN SOLVESTAR \$dirfiles{dummysweeps}: " . dump( $dirfiles{dummysweeps} );
+	}
 
-	$dirfiles{starnumber} = scalar( @{ $dirfiles{starpositions} } ); #say $tee "AFTER \$dirfiles{starnumber}: " . dump( $dirfiles{starnumber} );
+
+	$dirfiles{starnumber} = scalar( @{ $dirfiles{starpositions} } );
 
 	if ( not( scalar( @{ $dirfiles{starpositions} } ) == 0 ) )
 	{
@@ -1225,28 +1171,22 @@ sub solvestar
 		$dirfiles{randomdirs} => "no", # to randomize the directions of descent.
 	}
 	return( \%dirfiles )
-} ### END SUB solvestar
+}
 
 
 sub takewinning
 {
 	my ( $toitem ) = @_;
 
-	my %carrier = split( "_|-", $toitem ); #say $tee "IN takewinning ( \%carrier) " . dump( \%carrier );
+	my %carrier = split( "_|-", $toitem );
 	return( \%carrier );
 }
 
 
 sub sense
 {
-	#say $tee "WORKING.";
 	my ( $addr, $mypath, $objcolumn, $stopcondition ) = @_;
-	#say $tee "IN SENSE \$addr: " . dump( $addr );
-	#say $tee "IN SENSE \$mypath: " . dump( $mypath );
-	#say $tee "IN SENSE \$objcolumn: " . dump( $objcolumn );
-	#say $tee "IN SENSE \$stopcondition: " . dump( $stopcondition );
-
-	my $newaddr = "$mypath/$addr" . "_variances.csv"; #say $tee "IN SENSE \$newaddr: " . dump( $newaddr );
+	my $newaddr = "$mypath/$addr" . "_variances.csv";
 
 	open( ADDR, "$addr" ) or die;
 	my @lines = <ADDR>;
@@ -1259,19 +1199,17 @@ sub sense
 		push( @purelines, $line );
 	}
 
-	#say $tee "IN SENSE \@lines: " . dump( @lines );
+	my @values = map { ( split( ',', $_ ))[ $objcolumn ] } @purelines;
+	my $totvariance = variance( @values );
 
-	my @values = map { ( split( ',', $_ ))[ $objcolumn ] } @purelines; #say $tee "IN SENSE \@values: " . dump( @values );
-	my $totvariance = variance( @values ); #say $tee "IN SENSE \$totvariance: $totvariance" ;
-
-	my @cases = map { ( split( ',', $_ ))[0] } @purelines; #say $tee "IN SENSE \@cases: " . dump( @cases );
+	my @cases = map { ( split( ',', $_ ))[0] } @purelines;
 
 	my @sack;
 	foreach my $case ( @cases )
 	{
 		my @row = split( "_", $case );
 		push( @sack, [ @row ] );
-	} #say $tee "IN SENSE \@sack: " . dump( @sack );
+	}
 
 	my %whole;
 	my $count = 0;
@@ -1284,25 +1222,22 @@ sub sense
 			push( @{ $whole{$key}{$value} }, $values[$count] );
 		}
 		$count++;
-	} #say $tee "IN SENSE \%whole: " . dump( \%whole );
+	}
 
 	my ( %sensfs, %avgsensfs );
-	#say $tee "IN SENSE keys \%whole: " . dump( keys %whole );
 	foreach my $factor ( keys %whole )
 	{
-		#say $tee "IN SENSE \$factor: " . dump( $factor );
-		my @avgvar; #say $tee "IN SENSE keys %{ \$whole{\$factor} }: " . dump( keys %{ $whole{$factor} } );
+		my @avgvar;
 		foreach my $level ( keys %{ $whole{$factor} } )
 		{
-			#say $tee "IN SENSE \$level: " . dump( $level );
-			my $variance = variance( @{ $whole{$factor}{$level} } ); #say $tee "IN SENSE \$variance: $variance" ;
-			my $variancerat = ( $variance / $totvariance ); #say $tee "IN SENSE \$variancerat: $variancerat" ;
+			my $variance = variance( @{ $whole{$factor}{$level} } );
+			my $variancerat = ( $variance / $totvariance );
 			$sensfs{$factor}{$level} = $variancerat;
 			push( @avgsensf, $variancerat );
 		}
 		my $mean = mean( @avgsensf );
-		$avgsensfs{$factor} = $mean; #say $tee "IN SENSE \$mean: " . dump( $mean );
-	} #say $tee "IN SENSE \%sensfs: " . dump( \%sensfs ); say $tee "IN SENSE \%avgsensfs: " . dump( \%avgsensfs );
+		$avgsensfs{$factor} = $mean;
+	}
 
 	open( NEWADDR, ">$newaddr" ) or die;
 	foreach my $fact ( sort{ $a <=> $b }( keys %avgsensfs ) )
@@ -1319,22 +1254,20 @@ sub sense
 
 sub prepfactl
 {
-  my @arr = @{ $_[0] }; #say $tee "IN prepfactl \@arr:" . dump( @arr ) ;
+  my @arr = @{ $_[0] };
   my ( %hash, %hs );
 
   foreach my $el ( @arr )
   {
-		my %hash = split( "-|_", $el ); #say $tee "IN prepfactl \%hash:" . dump( \%hash ) ;
+		my %hash = split( "-|_", $el );
 		foreach my $key ( keys %hash )
 		{
 			$hs{$key}{$hash{$key}} = "";
 		}
   }
-	#say $tee "IN prepfactl \%hs:" . dump( \%hs ) ;
 
 	my %ohs;
 	my $num = 0;
-	#say $tee "IN prepfactl keys \%hs:" . dump( keys %hs ) ;
 	foreach my $key ( keys %hs )
 	{
 		foreach my $item ( sort { $a <=> $b }( keys %{ $hs{$key} } ) )
@@ -1343,7 +1276,7 @@ sub prepfactl
 			$num++;
 		}
 		$ohs{$key} = [ uniq( @{ $ohs{$key} } ) ];
-	} #say $tee "IN prepfactl \$num:" . dump( $num ) ; say $tee "IN prepfactl \%ohs:" . dump( \%ohs ) ;
+	}
   return( $num, \%ohs );
 }
 
@@ -1351,21 +1284,21 @@ sub prepfactl
 sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 {
 	my %d = %{ $_[0] };
-	my $countcase = $d{countcase}; #say $tee "IN callblock ( \$countcase) " . dump($countcase);
-	my $countblock = $d{countblock}; #say $tee "IN callblock ( \$countblock) " . dump($countblock);
-	my @sweeps = @{ $d{sweeps} }; #say $tee "IN callblock \@sweeps " . dump(@sweeps);
-	my @sourcesweeps = @{ $d{sourcesweeps} }; #say $tee"IN callblock \@sourcesweeps " . dump(@sourcesweeps);
+	my $countcase = $d{countcase};
+	my $countblock = $d{countblock};
+	my @sweeps = @{ $d{sweeps} };
+	my @sourcesweeps = @{ $d{sourcesweeps} };
 	my @miditers = @{ $d{miditers} };
-	@miditers = Sim::OPT::washn( @miditers ); #say $tee "IN callblock \@miditers " . dump( @miditers );
-	my @winneritems = @{ $d{winneritems} }; #say $tee "IN callblock \@winneritems " . dump( @winneritems );
-	my %dirfiles = %{ $d{dirfiles} }; #say $tee "IN callblock \%dirfiles " . dump( %dirfiles );
+	@miditers = Sim::OPT::washn( @miditers );
+	my @winneritems = @{ $d{winneritems} };
+	my %dirfiles = %{ $d{dirfiles} };
 	my %datastruc = %{ $d{datastruc} };
-	my %dowhat = %{ $d{dowhat} }; #say $tee "IN callblock \%dowhat" . dump( %dowhat );
+	my %dowhat = %{ $d{dowhat} };
 	my @varnumbers = @{ $d{varnumbers} };
-	my $instn = $d{instn}; #say $tee "IN callblock \$instn" . dump( $instn );
-	my %inst = %{ $d{inst} }; #say $tee "IN callblock \%inst " . dump( \%inst );
+	my $instn = $d{instn};
+	my %inst = %{ $d{inst} };
 	my %vehicles = %{ $d{vehicles} };
-	@varnumbers = Sim::OPT::washn( @varnumbers ); #say $tee"IN callblock ( \@varnumbers) " . dump( @varnumbers );
+	@varnumbers = Sim::OPT::washn( @varnumbers );
 
 	if ( $countcase > $#sweeps )# NUMBER OF CASES OF THE CURRENT PROBLEM
   {
@@ -1378,9 +1311,9 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 
 	say $tee "#Beginning a search on case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
 
-	my @blockelts = @{ getblockelts( \@sweeps, $countcase, $countblock ) }; #say $tee "IN callblock \@blockelts " . dump( @blockelts );
+	my @blockelts = @{ getblockelts( \@sweeps, $countcase, $countblock ) };
 
-	my @sourceblockelts = @{ getblockelts( \@sourcesweeps, $countcase, $countblock ) }; #say $tee "IN callblock \@sourceblockelts " . dump( @sourceblockelts );
+	my @sourceblockelts = @{ getblockelts( \@sourcesweeps, $countcase, $countblock ) };
 
 
 	my $entryname;
@@ -1395,14 +1328,12 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 			$dirfiles{pushsupercycle} = "yes";
 			$dirfiles{nestclock} = $dirfiles{nestclock} + 1;
 			push( @{ $vehicles{nesting}{$dirfiles{nestclock}} }, $countblock );
-
 		}
 	}
 	else
 	{
 		$dirfiles{entryname} = "";
-	} #say $tee "IN callblock 2 \$entryname " . dump( $entryname );
-
+	}
 
 	my $exitname;
 	if ( $sourceblockelts[-1] =~ /([A-Za-z]+)$/ )
@@ -1423,13 +1354,11 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 	else
 	{
 		$dirfiles{exitname} = "";
-	} #say $tee "IN callblock 3 \$exitname " . dump( $exitname );
+	}
 
-
-	#say $tee "IN callblock6: \$sourceblockelts[0] " . dump( $sourceblockelts[0] );
 	if ( $sourceblockelts[0] =~ />/ )
-	{ #say $tee "IN callblock IN: \$sourceblockelts[0] " . dump( $sourceblockelts[0] );
-		$dirfiles{starsign} = "yes"; #say $tee "SETTING IN callblock: \$dirfiles{starsign} " . dump( $dirfiles{starsign} );
+	{
+		$dirfiles{starsign} = "yes";
 		$sourceblockelts[0] =~ /^(\d+)>/ ;
 		$dirfiles{stardivisions} = $1;
 
@@ -1441,16 +1370,12 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 			$dirfiles{nestclock} = $dirfiles{nestclock} + 1;
 			push( @{ $vehicles{nesting}{$dirfiles{nestclock}} }, $countblock );
 		}
-
 	}
 	else
 	{
 		$dirfiles{starsign} = "no";
 		$dirfiles{stardivisions} = "";
 	}
-	#say $tee "IN callblock 3 \$dirfiles{starsign} " . dump( $dirfiles{starsign} );
-	#say $tee "IN callblock 3 \$dirfiles{stardivisions} " . dump( $dirfiles{stardivisions} );
-
 
 	if ( $sourceblockelts[0] =~ /\|/ )
 	{
@@ -1466,7 +1391,6 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 			$dirfiles{nestclock} = $dirfiles{nestclock} + 1;
 			push( @{ $vehicles{nesting}{$dirfiles{nestclock}} }, $countblock );
 		}
-
 	}
 	else
 	{
@@ -1488,7 +1412,6 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 			$dirfiles{nestclock} = $dirfiles{nestclock} + 1;
 			push( @{ $vehicles{nesting}{$dirfiles{nestclock}} }, $countblock );
 		}
-
 	}
 	else
 	{
@@ -1497,7 +1420,7 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 	}
 
 	if ( $sourceblockelts[0] =~ /°/ )
-	{ #say $tee "IN callblock IN: \$sourceblockelts[0] " . dump( $sourceblockelts[0] );
+	{
 		$dirfiles{randompick} = "yes";
 		$sourceblockelts[0] =~ /^(\d+)°/ ;
 		$dirfiles{randompicknum} = $1;
@@ -1510,7 +1433,6 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 			$dirfiles{nestclock} = $dirfiles{nestclock} + 1;
 			push( @{ $vehicles{nesting}{$dirfiles{nestclock}} }, $countblock );
 		}
-
 	}
 	else
 	{
@@ -1530,20 +1452,18 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 			$dirfiles{nestclock} = $dirfiles{nestclock} + 1;
 			push( @{ $vehicles{nesting}{$dirfiles{nestclock}} }, $countblock );
 		}
-
 	}
 	else
 	{
 		$dirfiles{factorial} = "no";
 	}
 
-
 	if ( $sourceblockelts[0] =~ /£/ )
 	{
 		$dirfiles{facecentered} = "yes";
 		$dirfiles{factorial} = "yes";
 		$dirfiles{random} = "yes";
-		$dirfiles{starsign} = "yes"; #say $tee "SETTING IN callblock: \$dirfiles{starsign} " . dump( $dirfiles{starsign} );
+		$dirfiles{starsign} = "yes";
 		$sourceblockelts[0] =~ /^(\d+)£/ ;
 		$dirfiles{facecenterednum} = $1;
 		$dowhat{starpositions} = "";
@@ -1559,13 +1479,11 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 			$dirfiles{nestclock} = $dirfiles{nestclock} + 1;
 			push( @{ $vehicles{nesting}{$dirfiles{nestclock}} }, $countblock );
 		}
-
 	}
 	else
 	{
 		$dirfiles{facecentered} = "no";
 	}
-
 
 	if ( $sourceblockelts[0] =~ /ç/ )
 	{
@@ -1583,7 +1501,6 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 		push( @{ $vehicles{nesting}{$dirfiles{nestclock}} }, $countblock );
 	}
 
-
 	if ( $sourceblockelts[0] =~ /é/ )
 	{
 		$sourceblockelts[0] =~ /^(\d+)(>|<|£|§|°|§)(\d+)é/ ;
@@ -1596,77 +1513,37 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 		$dirfiles{popsupercycle} = "";
 	}
 
-
-  #say "\%dirfiles: " . dump( \%dirfiles );
-	#say "\@sourceblockelts " . dump( @sourceblockelts );
-  #say "\@{ \$vehicles{nesting} } " . dump( @{ $vehicles{nesting} } );
-
 	my @blocks = getblocks( \@sweeps, $countcase );
 
-	my $toitem = getitem( \@winneritems, $countcase, $countblock ); #say $tee "IN12 callblock \$toitem" . dump( $toitem ); #say $tee "IN12 callblock \$mypath" . dump( $mypath ); say $tee "IN12 callblock \$file" . dump( $file ); ###
-	$toitem = clean( $toitem, $mypath, $file ); #say $tee "IN12 callblock \$toitem " . dump( $toitem );
-	#say $tee "IN12 callblock \@winneritems " . dump( @winneritems );
-	#say $tee "IN12 callblock \$countcase " . dump( $countcase );
-	#say $tee "IN12 callblock \$countblock " . dump( $countblock );
+	my $toitem = getitem( \@winneritems, $countcase, $countblock );
+	$toitem = clean( $toitem, $mypath, $file );
 
 	my $from = getline($toitem);
-	$from = clean( $from, $mypath, $file ); #say $tee "IN12 callblock \$from " . dump( $from );
+	$from = clean( $from, $mypath, $file );
 
 	my $file = $dowhat{file};
 
-	#my %intermids = getcase( \@miditers, $countcase ); say $tee "IN callblock \%intermids" . dump( \%intermids ); # UNUSED. CUT,
-	#say $tee "IN callblock \$toitem" . dump( \$toitem ); ###
-	my %carrier = %{ takewinning( $toitem ) }; #say $tee "FROM TAKEWINNING IN callblock \%carrier " . dump( \%carrier ); ###
+	my %carrier = %{ takewinning( $toitem ) };
 
-
-	#say $tee "IN callblock  \$dirfiles{starsign} " . dump( $dirfiles{starsign} );
 	my @tempvarnumbers;
 	if ( $dirfiles{starsign} eq "yes" )
 	{
-		my @newvarnumbers = @{ stararrange( \@sweeps, \@blockelts, \@varnumbers, $countcase, $countblock, $file ) }; #say $tee "IN2 callblock \@newvarnumbers " . dump( @newvarnumbers );
-		$dirfiles{varnumbershold} = dclone( \@varnumbers ); #say $tee "IN2 BEFORE callblock  \$dirfiles{varnumbershold} " . dump( $dirfiles{varnumbershold} );
+		my @newvarnumbers = @{ stararrange( \@sweeps, \@blockelts, \@varnumbers, $countcase, $countblock, $file ) };
+		$dirfiles{varnumbershold} = dclone( \@varnumbers );
 		@varnumbers = @{ dclone( \@newvarnumbers ) };
-		@varnumbers = Sim::OPT::washn( @varnumbers ); #say $tee "IN2 AFTER callblock dcloned \@varnumbers " . dump( @varnumbers );
+		@varnumbers = Sim::OPT::washn( @varnumbers );
 
 		%dirfiles = %{ solvestar( { dirfiles => \%dirfiles, dowhat => \%dowhat, varnumbers => \@varnumbers, blockelts => \@blockelts, carrier => \%carrier } ) };
 
-		my @newmiditers = @{ $dirfiles{starpositions} }; #say $tee "IN2 callblock \@newmiditers " . dump( @newmiditers );
-		# IT CORRECTS THE PART OF @miditers OUTSIDE THE BLOCKS
+		my @newmiditers = @{ $dirfiles{starpositions} }; # IT CORRECTS THE PART OF @miditers OUTSIDE THE BLOCKS
 
-		$dirfiles{miditershold} = dclone( \@miditers ); #say $tee "IN2 BEFORE callblock  \$dirfiles{miditershold} " . dump( $dirfiles{miditershold} );
+		$dirfiles{miditershold} = dclone( \@miditers );
 
-		#sub checkmids
-		#{
-		#	my ( $newmiditers_r, $miditershold ) = @_;
-		#	my @newmiditers = @{ $newmiditers_r };
-		#	my @oldmiditers = @{ $miditershold };
-		#	my $oldmids_r = $oldmiditers[0];
-		#	my %oldmids = %{ $oldmids_r };
-		#	my @news;
-		#	foreach my $mids_r ( @newmiditers )
-		#	{
-		#		my %mids = %{ $mids_r };
-		#		foreach my $key ( keys %mids )
-		#		{
-		#			if ( not ( $key ~~ @blockelts ) )
-		#			{
-		#				$mids{$key} = $oldmids{$key};
-		#			}
-		#		}
-		#		push( @news, \%mids );
-		#	}
-		#	return( \@news );
-		#}
-		#
-		#@newmiditers = @{ checkmids( \@newmiditers, $dirfiles{miditershold} ) }; #say $tee "IN2 callblock POST-PROCESSED \@newmiditers " . dump( @newmiditers );
-
-		@miditers = @{ dclone( \@newmiditers ) }; #say $tee "IN2 AFTER callblock dcloned \@miditers " . dump( @miditers );
-	  #@miditers = Sim::OPT::washn( @miditers ); say $tee "IN2 AFTER callblock dcloned \@miditers " . dump( @miditers );
-		#say $tee "IN2 callblock  \$dirfiles{starpositions} " . dump( $dirfiles{starpositions} );
+		@miditers = @{ dclone( \@newmiditers ) };
 	}
 
-	my %mids = getcase( \@miditers, $countcase ); #say $tee "IN callblock \%mids " . dump( \%mids );
-	my %varnums = getcase( \@varnumbers, $countcase ); #say $tee "IN callblock \%varnums " . dump( \%varnums );
+	my %mids = getcase( \@miditers, $countcase );
+	my %varnums = getcase( \@varnumbers, $countcase );
 
   ###########################################################
 
@@ -1679,15 +1556,10 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 	$dirfiles{morphblock} = "$mypath/$file-morphblock--$countcase-$countblock";
 	$dirfiles{retblock} = "$mypath/$file-retblock--$countcase-$countblock";
 	$dirfiles{repblock} = "$mypath/$file-repblock--$countcase-$countblock"; # # FOR RETRIEVAL
-	$dirfiles{repfile} = "$mypath/$file-report-$countcase-$countblock.csv"; #say "IN CALLBLOCK REPFILE:" . ( $dirfiles{repfile} ) . " .";
-	$dirfiles{sortmixed} = "$dirfiles{repfile}" . "_sortm.csv"; #say "IN CALLBLOCK sortmixed:" . ( $dirfiles{sortmixed} ) . " .";
-	$dirfiles{totres} = "$mypath/$file-$countcase" . "_totres.csv"; #say "IN CALLBLOCK totres:" . ( $dirfiles{totres} ) . " .";
-	$dirfiles{ordres} = "$mypath/$file-$countcase" . "_ordres.csv"; #say "IN CALLBLOCK ordres:" . ( $dirfiles{ordres} ) . " .";
-	#$dirfiles{metafile} = "$dirfiles{repfile}" . "_meta.csv"; say "IN CALLBLOCK \$dirfiles{metafile}:" . ( $dirfiles{metafile} ) . " .";
-	#$dirfiles{ordmeta} = "$dirfiles{repfile}" . "_ordmeta.csv"; say "IN CALLBLOCK \$dirfiles{ordmeta}:" . ( $dirfiles{ordmeta} ) . " .";say "IN CALLBLOCK sortmixed:" . ( $dirfiles{sortmixed} ) . " .";
-
-
-	#say $tee "IN CALLBLOditersCK \@{ \$dirfiles{starpositions} } " . dump( @{ $dirfiles{starpositions} } ); ##VOID!
+	$dirfiles{repfile} = "$mypath/$file-report-$countcase-$countblock.csv";
+	$dirfiles{sortmixed} = "$dirfiles{repfile}" . "_sortm.csv";
+	$dirfiles{totres} = "$mypath/$file-$countcase" . "_totres.csv";
+	$dirfiles{ordres} = "$mypath/$file-$countcase" . "_ordres.csv";
 
 	deffiles( {	countcase => $countcase, countblock => $countblock,
 		miditers => \@miditers,  winneritems => \@winneritems,
@@ -1703,53 +1575,49 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 {
 	my %d = %{ $_[0] };
-	#say $tee "IN DEFFILES \$dummyelt " . dump( $dummyelt );
-	#say $tee "SO, \$c : " . dump( $c );
 
-	my $countcase = $d{countcase}; #say $tee "IN DEFFILES \$countcase : " . dump( $countcase );
-  my $countblock = $d{countblock}; #say $tee "IN DEFFILES \$countblock : " . dump( $countblock );
-	my @sweeps = @{ $d{sweeps} }; #say $tee "IN DEFFILES \@sweeps : " . dump( @sweeps );
-	my @sourcesweeps = @{ $d{sourcesweeps} }; #say $tee "IN DEFFILES \@sourcesweeps : " . dump( @sourcesweeps );
-	my @miditers = @{ $d{miditers} }; #say $tee "IN DEFFILES \@miditers : " . dump( @miditers );
-	my @winneritems = @{ $d{winneritems} }; #say $tee "\@winneritems : " . dump( @winneritems );
-	my %dirfiles = %{ $d{dirfiles} }; #say $tee "IN deffiles \%dirfiles " . dump( %dirfiles );
-	#say $tee "IN DEFFILES \$dirfiles{starsign} " . dump( $dirfiles{starsign} );
-	my %datastruc = %{ $d{datastruc} }; #say $tee "\%datastruc : " . dump( %datastruc );
-	my @varnumbers = @{ $d{varnumbers} }; #say $tee "IN DEFFILES \@varnumbers" . dump( @varnumbers );
-	my %dowhat = %{ $d{dowhat} }; #say $tee "IN DEFFILES \%dowhat" . dump( %dowhat );
+	my $countcase = $d{countcase};
+  my $countblock = $d{countblock};
+	my @sweeps = @{ $d{sweeps} };
+	my @sourcesweeps = @{ $d{sourcesweeps} };
+	my @miditers = @{ $d{miditers} };
+	my @winneritems = @{ $d{winneritems} };
+	my %dirfiles = %{ $d{dirfiles} };
+	my %datastruc = %{ $d{datastruc} };
+	my @varnumbers = @{ $d{varnumbers} };
+	my %dowhat = %{ $d{dowhat} };
 
-	my @blockelts = @{ $d{blockelts} }; #say $tee "IN DEFFILES \@blockelts : " . dump( @blockelts );
-	my @sourceblockelts = @{ $d{blockelts} }; #say $tee "IN DEFFILES \@sourceblockelts : " . dump( @blockelts );
-	my @blocks = @{ $d{blocks} }; #say $tee "IN DEFFILES \@blocks : " . dump( @blocks );
-	my $toitem = $d{toitem}; #say $tee "IN12 DEFFILES12 \$toitem : " . dump( $toitem );
-	my $from = $d{from}; #say $tee "IN DEFFILES \$from " . dump( $from );
-	my %varnums = %{ $d{varnums} }; #say $tee "IN DEFFILES \%varnums " . dump( \%varnums );
-	my %mids = %{ $d{mids} }; #say $tee "IN DEFFILES \%mids " . dump( \%mids );
-	my %carrier = %{ $d{carrier} }; #say $tee "IN DEFFILES \%carrier " . dump( \%carrier );
+	my @blockelts = @{ $d{blockelts} };
+	my @sourceblockelts = @{ $d{blockelts} };
+	my @blocks = @{ $d{blocks} };
+	my $toitem = $d{toitem};
+	my $from = $d{from};
+	my %varnums = %{ $d{varnums} };
+	my %mids = %{ $d{mids} };
+	my %carrier = %{ $d{carrier} };
 	my $instn = $d{instn};
 	my %inst = %{ $d{inst} };
 	my %vehicles = %{ $d{vehicles} };
 
-	#say $tee "IN IN DEFFILES  \$dirfiles{starsign} " . dump( $dirfiles{starsign} );
-	my $file = $dowhat{file}; #say $tee "IN DEFFILES \$file " . dump( $file );
+	my $file = $dowhat{file};
 	my $mypath = $dowhat{mypath};
 
-	my $starstring = tellstring( \%mids, $file ); #say $tee "IN2 DEFFILES1 \$starstring " . dump( $starstring );
+	my $starstring = tellstring( \%mids, $file );
 	$dirfiles{starstring} = $starstring; # FOR THE OUTTER STAR SEARCH
 
-	my $rootitem = "$file" . "_"; #say $tee "IN DEFFILES \$rootitem : " . dump( $rootitem );
+	my $rootitem = "$file" . "_";
 	my (@basket, @box);
-	push (@basket, [ $rootitem ] ); #say $tee "IN DEFFILES \@basket : " . dump( @basket );
+	push (@basket, [ $rootitem ] );
 
 
 
 	sub toil
 	{
 		my ( $blockelts_r, $varnums_r, $basket_r, $c, $mypath, $file ) = @_;
-		my @blockelts = @{ $blockelts_r }; #say $tee "IN TOIL \@blockelts : " . dump( @blockelts );
-		my %varnums = %{ $varnums_r }; #say $tee "IN TOIL \%varnums : " . dump( %varnums );
+		my @blockelts = @{ $blockelts_r };
+		my %varnums = %{ $varnums_r };
 
-		my @basket = @{ $basket_r }; #say $tee "IN TOIL \@basket : " . dump( @basket );
+		my @basket = @{ $basket_r };
 		if ( ( $c eq "" ) or ( $c == 0 ) )
 		{
 			@box = ();
@@ -1758,23 +1626,22 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 		foreach my $var ( @blockelts )
 		{
 			my ( @bucket );
-			my $maxvalue	= $varnums{$var}; #say $tee "IN TOIL \$maxvalue : " . dump( $maxvalue );
+			my $maxvalue	= $varnums{$var};
 
 			foreach my $elt ( @basket )
 			{
-				my $root = $elt->[0]; #say $tee "IN TOIL \$root : " . dump( $root );
+				my $root = $elt->[0];
 				my @bag;
 				my $item;
 				my $cnstep = 1;
 				while ( $cnstep <= $maxvalue)
-				{	#say $tee "IN TOIL \$countblock : " . duvernummp( $countblock );
-					my $olditem = $root; #say $tee "IN TOIL \$olditem : " . dump( $olditem );
-					$item = "$root" . "$var" . "-" . "$cnstep" . "_" ;  #say $tee "IN TOIL \$item : " . dump( $item );
-					push ( @bag, [ $item, $var, $cnstep, $olditem, $c ] ); #say $tee "IN TOIL \@bucket: " . dump( @bucket );
-					$cnstep++; #say $tee "IN TOIL \$cnstep : " . dump( $cnstep );
+				{
+					my $olditem = $root;
+					$item = "$root" . "$var" . "-" . "$cnstep" . "_" ;
+					push ( @bag, [ $item, $var, $cnstep, $olditem, $c ] );
+					$cnstep++;
 				}
 				push ( @bucket, @bag );
-				#push ( @bucket, [ $item, $var, $cnstep, $olditem, $c ] ); #say $tee "IN TOIL \@bucket: " . dump( @bucket );
 			}
 			@basket = ();
 			@basket = @bucket;
@@ -1787,7 +1654,7 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 			{
 				@box = [ @bucket ];
 			}
-		} #say $tee "IN TOIL \@box : " . dump( @box );
+		}
 		return( \@box );
 	}
 
@@ -1807,15 +1674,12 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 			foreach my $elt ( @blockelts )
 			{
 				my @dummys = ( $elt );
-				my @bix = @{ toil( \@dummys, \%varnums, \@basket, $c, $mypath, $file ) }; #say $tee "IN DEFFILES2 \@bix BEFORE: " . dump( @bix );
+				my @bix = @{ toil( \@dummys, \%varnums, \@basket, $c, $mypath, $file ) };
 				@bix = @{ $bix[0] };
-				#say $tee "IN DEFFILES2 \@bix AFTER: " . dump( @bix );
-				#my @bark = @{ flattenbox( @bix ) };
 				push( @bux, @bix );
 				$c++;
 			}
 		}
-
 
 		my ( $tmpblankfile, $bit );
 		my ( @bag, @fills, @fulls );
@@ -1824,23 +1688,21 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 			or ( ( $dirfiles{factorial} eq "yes" ) and ( $dowhat{metamodel} eq "yes" ) )
 			or ( ( $dirfiles{facecentered} eq "yes" ) and ( $dowhat{metamodel} eq "yes" ) )	)
 		{
-			$tmpblankfile = "$mypath/$file" . "_tmp_gen_blank.csv"; #say $tee "IN LATINHYPERCUBE \$tmpblankfile: " . dump( $tmpblankfile );
+			$tmpblankfile = "$mypath/$file" . "_tmp_gen_blank.csv";
 			$bit = $file . "_";
 			@bag =( $bit );
 			@fills = @{ Sim::OPT::Descend::prepareblank( \%varnums, $tmpblankfile, \@blockelts, \@bag, $file, \%carrier ) };
-			@fulls = uniq( map { $_->[0] } @fills ); #say $tee "IN RANDOM \@fulls: " . dump( @fulls );
+			@fulls = uniq( map { $_->[0] } @fills );
 		}
 
 
 		if ( $dirfiles{random} eq "yes" )
 		{
-			my ( $standard ) = prepfactl( \@fulls ); #say $tee "IN RANDOM \$standard: " . dump( $standard );
-			#say $tee "IN RANDOM \$dowhat{randomfraction}: " . dump( $dowhat{randomfraction} );
+			my ( $standard ) = prepfactl( \@fulls );
 
-			#my $numitems = int( $standard * $dowhat{randomfraction} ); #say $tee "IN RANDOM \$numitems: " . dump( $numitems );
 			my $numitems = $dirfiles{randomnum};
 			my @newfulls = shuffle( @fulls );
-			my @forebunch = @newfulls[ 0 .. $numitems ]; #say $tee "IN RANDOM \@forebunch: " . dump( @forebunch );
+			my @forebunch = @newfulls[ 0 .. $numitems ];
 
 			foreach $el ( @forebunch )
 			{
@@ -1850,11 +1712,7 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 
 		if ( $dirfiles{latinhypercube} eq "yes" )
 		{
-			my ( $standard ) = prepfactl( \@fulls ); #say $tee "IN LATINHYPERCUBE \$standard: " . dump( $standard );
-			#say $tee "IN LATINHYPERCUBE \$dowhat{randomfraction}: " . dump( $dowhat{randomfraction} );
-
-			#my $numitems = int( $standard * $dowhat{hypercubefraction} ); #say $tee "IN LATINHYPERCUBE \$numitems: " . dump( $numitems );
-
+			my ( $standard ) = prepfactl( \@fulls );
 			my $numitems = $dirfiles{latinhypercubenum};
 
 			my $totnum = scalar( @fulls );
@@ -1879,7 +1737,7 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 			{
 				my @temp = shuffle( @{ $ref } );
 				push( @forebunch, $temp[0] );
-			} #say $tee "IN LATINHYPERCUBE \@forebunch: " . dump( @forebunch );
+			}
 
 			foreach $el ( @forebunch )
 			{
@@ -1889,8 +1747,8 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 
 		if ( $dirfiles{factorial} eq "yes" )
 		{
-			my ( $standard, $ohs_r ) = prepfactl( \@fulls ); #say $tee "IN FACTORIAL \$ohs_r: " . dump( $ohs_r );
-			my %ohs = %{ $ohs_r }; #say $tee "IN FACTORIAL \%ohs: " . dump( \%ohs );
+			my ( $standard, $ohs_r ) = prepfactl( \@fulls );
+			my %ohs = %{ $ohs_r };
 
 			my %nhs;
 			foreach my $key ( keys %ohs )
@@ -1903,7 +1761,7 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 				{
 					$nhs{$key} = [ @prov ];
 				}
-			} #say $tee "IN FACTORIAL \%nhs: " . dump( \%nhs );
+			}
 
 			my @sack;
 			foreach my $key ( sort{ $a <=> $b }( keys %nhs ) )
@@ -1915,7 +1773,7 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 					$el = join( "-", ( $key, $single ) );
 					push( @sack, $el );
 				}
-			} #say $tee "IN FACTORIAL \@sack: " . dump( @sack );
+			}
 
 			my $numelts = scalar( keys %nhs );
 			foreach my $series ( @fulls )
@@ -1934,33 +1792,19 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 					}
 				}
 			}
-			#say $tee "IN FACTORIAL \@bux: " . dump( @bux );
 		}
-		#say $tee "RESULTING: \@bux: " . dump( @bux );
-		#say $tee "RESULTING: \@buux: " . dump( @buux );
 	}
 	else
 	{
-		#say $tee "IN DEFFFILES RIGHT \$dirfiles{starsign} : " . dump( $dirfiles{starsign} );
 		@bux = @{ toil( \@blockelts, \%varnums, \@basket, "", $mypath, $file ) };
-	} #say $tee "IN DEFFILES2 \@bux: " . dump( @bux );
-	#say $tee "IN DEFFILES2 \$countblock : " . dump( $countblock );
-	#say $tee "IN DEFFILES \@blockelts : " . dump( @blockelts );
+	}
 
-	#############my $flattened_r = flattenbox( \@bux ); 	say $tee "IN DEFFILES2 \$flattened_r: " . dump( $flattened_r );
-	#say $tee "In DEFFILES5 \%mids!: " . dump ( %mids );
 
 	sub cleanduplicates
 	{
-		my ( $elts_ref, $dowhat_ref ) = @_; #say $tee "In cleanduplicates \@elts!: " . dump ( @elts );
+		my ( $elts_ref, $dowhat_ref ) = @_;
 		my @elts = @{ $elts_ref };
 		my %dowhat = %{ $dowhat_ref };
-
-		#my @sack;
-		#foreach my $el ( @elts )
-		#{
-		#	push( @sack, $el->[0] );
-		#}
 
 		my @sack = map { $_[0] } @elts ;
 
@@ -1975,7 +1819,7 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 					last;
 				}
 			}
-		} #say $tee "In cleanduplicates \@finals!: " . dump ( @finals );
+		}
 		return( @finals );
 	}
 
@@ -2004,22 +1848,19 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 		my @bag;
 		foreach my $midsurrs_r ( @miditers )
 		{
-			#say $tee "MIDITERS FOR MIDSURRS!: " . dump ( @miditers );
-			my %midsurrs = %{ $midsurrs_r }; #say $tee "IN DEFFILES \%midsurrs" . dump( \%midsurrs );
+			my %midsurrs = %{ $midsurrs_r };
 	 		@bag = uniq( @{ integratebox( \@bux, \%midsurrs, $file, \@blockelts, $mypath, \%inst, \%dowhat ) } );
 			push( @finalbox, @bag );
-		} #say $tee "IN DEFFILES BEFORE WASH \@finalbox" . dump( @finalbox );
-		my @finalbox = cleanduplicates( \@finalbox, \%dowhat ); #say $tee "IN DEFFILES AFTER WASH \@finalbox" . dump( @finalbox );
+		}
+		my @finalbox = cleanduplicates( \@finalbox, \%dowhat );
 	}
 	else
 	{
-		#say $tee "IN DEFFILES RIGHT AFTER " ;
-		my @bark = @{ flattenbox( \@bux ) }; #say $tee "In DEFFILES5-DESCENT \@bark!: " . dump ( @bark );
+		my @bark = @{ flattenbox( \@bux ) };
 		@finalbox = uniq( @{ integratebox( \@bark, \%carrier, $file, \@blockelts, $mypath, \%inst, \%dowhat ) } );
-		#say $tee "In DEFFILES5-DESCENT \@finalbox!: " . dump ( @finalbox );
 	}
 
-	@finalbox = sort { $a->[0] <=> $b->[0] } @finalbox; #say $tee "In DEFFILES5 \@finalbox!: " . dump ( @finalbox );
+	@finalbox = sort { $a->[0] <=> $b->[0] } @finalbox;
 
 
 	setlaunch( {
@@ -2038,82 +1879,44 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 sub setlaunch # IT SETS THE DATA FOR THE SEARCH ON THE ACTIVE BLOCK.
 {
 	my %d = %{ $_[0] };
-	my $countcase = $d{countcase}; #say $tee "IN SETLAUNCH \$countcase " . dump( $countcase );
-	my $countblock = $d{countblock}; #say $tee "IN SETLAUNCH \$countblock " . dump( $countblock );
+	my $countcase = $d{countcase};
+	my $countblock = $d{countblock};
 	my @sweeps = @{ $d{sweeps} };
-	my @sourcesweeps = @{ $d{sourcesweeps} }; #say $tee "IN SETLAUNCH \@sourcesweeps " . dump( @sourcesweeps );
-	my @miditers = @{ $d{miditers} }; #say $tee "IN SETLAUNCH \@miditers " . dump( @miditers );
+	my @sourcesweeps = @{ $d{sourcesweeps} };
+	my @miditers = @{ $d{miditers} };
 	my @winneritems = @{ $d{winneritems} };
-	my %dirfiles = %{ $d{dirfiles} }; #say $tee "IN SETLAUNCH \%dirfiles " . dump( %dirfiles );
-	my @basket = @{ $d{basket} }; #say $tee "IN SETLAUNCH \@basket " . dump( @basket );
+	my %dirfiles = %{ $d{dirfiles} };
+	my @basket = @{ $d{basket} };
 	my %datastruc = %{ $d{datastruc} };
-	my @varnumbers = @{ $d{varnumbers} }; #say $tee "IN SETLAUNCH \@varnumbers " . dump( @varnumbers );
-	my %dowhat = %{ $d{dowhat} }; #say $tee "IN SETLAUNCH \%dowhat" . dump( %dowhat );
-	my $toitem = $d{toitem} ; #say $tee "IN12 SETLAUNCH \$toitem : " . dump( $toitem );
-	my $from = $d{from}; #say $tee "IN12 SETLAUNCH \$from : " . dump( $from );
-	my $instn = $d{instn}; #say $tee "IN12 SETLAUNCH \$instn : " . dump( $instn );
-	my %inst = %{ $d{inst} }; #say $tee "IN12 SETLAUNCH \%inst : " . dump( \%inst );
+	my @varnumbers = @{ $d{varnumbers} };
+	my %dowhat = %{ $d{dowhat} };
+	my $toitem = $d{toitem};
+	my $from = $d{from};
+	my $instn = $d{instn};
+	my %inst = %{ $d{inst} };
 	my %vehicles = %{ $d{vehicles} };
 
-	#sub cleaninst
-	#{
-	#	my %inst = %{ $_[0] };
-	#	my %newinst;
-	#	my @cleans;
-	#	foreach my $in ( keys %inst )
-	#	{
-	#		push( @cleans, $in{cleanto} );
-	#	}
-	#	uniq( @cleans );
-	#
-	#	foreach my $el (  @cleans )
-	#	{
-	#		foreach my $in ( keys %inst )
-	#		{
-	#			if( $in{cleanto} eq $el )
-	#			{
-	#				$newinst{$in}{cleanto} = $in{cleanto};
-	#				$newinst{$in}{to} = $in{to};
-	#				$newinst{$in}{crypto} = $in{crypto};
-	#				$newinst{$in}{cleancrypto} = $in{cleancrypto};
-	#				next;
-	#			}
-	#		}
-	#	}
-	#	return( \%newinst )
-	#}
-	#
-	#%inst = %{ cleaninst( \%inst ) }; say $tee "AFTER CLEANINST IN SETLAUNCH \%inst : " . dump( \%inst );
-
 	my @blockelts = @{ getblockelts( \@sweeps, $countcase, $countblock ) };
-	my @blocks = getblocks( \@sweeps, $countcase ); #say $tee "IN SETcountstep => $countstep,LAUNCH \@blocks " . dump( @blocks );
+	my @blocks = getblocks( \@sweeps, $countcase );
 
-	my %varnums = %{ $d{varnums} }; #say $tee "IN SETLAUNCH \%varnums " . dump( %varnums );
-	my %mids = %{ $d{mids} }; #say $tee "IN SETLAUNCH \%mids" . dump( \%mids ); ### DDD
-	my %carrier = %{ $d{carrier} }; #say $tee "IN SETLAUNCH \%carrier" . dump( \%carrier ); ### DDD
-	#say $tee "IN IN SETLAUNCH  \$dirfiles{starsign} " . dump( $dirfiles{starsign} );
+	my %varnums = %{ $d{varnums} };
+	my %mids = %{ $d{mids} };
+	my %carrier = %{ $d{carrier} };
 
 	my ( @instances );
-	#say $tee "PRE EXTRACTCASE IN SETLAUNCH - NOTHING" . dump(  );
 	my %starters = %{ extractcase( \%dowhat, "", \%carrier, $file, \@blockelts, $mypath, "" ) };
 
-	$dirfiles{starter} = $starters{cleanto}; #say $tee "IN SETLAUNCH \$dirfiles{starter}" . dump( $dirfiles{starter} );
+	$dirfiles{starter} = $starters{cleanto};
 
 	my $count = 0;
 	foreach my $elt ( @basket )
 	{
 
-		my $newpars = $$elt[0]; #say $tee "IN SETLAUNCH \$newpars! " . dump( $newpars );
-		my $countvar = $$elt[1]; #say $tee "IN SETLAUNCH \$countvar! " . dump( $countvar );
-		my $countstep = $$elt[2]; #say $tee "IN SETLAUNCH \$countstep! " . dump( $countstep );
-		my $oldpars = $$elt[3]; #say $tee "IN SETLAUNCH \$oldpars " . dump( $oldpars );
-		#say $tee "PRE EXTRACTCASE IN SETLAUNCH \$newpars" . dump( \$newpars );
+		my $newpars = $$elt[0];
+		my $countvar = $$elt[1];
+		my $countstep = $$elt[2];
+		my $oldpars = $$elt[3];
 		my %to = %{ extractcase( \%dowhat, $newpars, \%carrier, $file, \@blockelts, $mypath, $instn ) };
-		#say $tee "IN SETLAUNCH FROM EXTRATCASE \%to" . dump( \%to );
-		#say $tee "IN SETLAUNCH FROM EXTRATCASE \$to{cleanto}" . dump( $to{cleanto} );
-		#say $tee "IN SETLAUNCH \$inst{\$to{cleanto}}" . dump( $inst{$to{cleanto}} );
-		#say $tee "IN SETLAUNCH \%inst" . dump( \%inst );
-
 
 		unless( ( $to{cleanto} ~~ @{ $dirfiles{dones} } ) and ( $dirfiles{precomputed} eq "" ) )
 		{
@@ -2122,12 +1925,9 @@ sub setlaunch # IT SETS THE DATA FOR THE SEARCH ON THE ACTIVE BLOCK.
 			$inst{$to{crypto}} = $to{cleanto};
 			$inst{$to{to}} = $to{cleanto};
 
-			#say $tee "PRE EXTRACTCASE IN SETLAUNCH \$oldpars" . dump( \$oldpars );
 			my %orig = %{ extractcase( \%dowhat, $oldpars, \%carrier, $file, \@blockelts, $mypath ) };
 			my $origin = $orig{cleanto};
-			#say $tee "IN SETLAUNCH! \$origin" . dump( \$origin ) . "\n\n";
 			my $c = $$elt[4];
-			#say $tee "IN SETLAUNCH INSTANCE!: $instn";
 			push ( @instances,
 			{
 				countcase => $countcase, countblock => $countblock,
@@ -2144,46 +1944,45 @@ sub setlaunch # IT SETS THE DATA FOR THE SEARCH ON THE ACTIVE BLOCK.
 			$instn++;
 		}
 		$count++;
-	} #say $tee "IN SETLAUNCH \@instances " . dump( @instances );
+	}
 	exe( { instances => \@instances, dirfiles => \%dirfiles } );
 }
 
 sub exe
 {
 	my %dat = %{ $_[0] };
-	my @instances = @{ $dat{instances} }; #say $tee "IN EXE \@instances " . dump( @instances );
-	my %dirfiles = %{ $dat{dirfiles} }; #say $tee "IN EXE \%dirfiles " . dump( %dfromirfiles );
+	my @instances = @{ $dat{instances} };
+	my %dirfiles = %{ $dat{dirfiles} };
 
-	my %d = %{ $instances[0] }; #say $tee "IN EXE \%d!!! " . dump( \%d );
-	my $countcase = $d{countcase}; #say $tee "IN EXE \$countcase " . dump( $countcase );
-	my $countblock = $d{countblock}; #say $tee "IN EXE \$countblock " . dump( $countblock );
-	my @varnumbers = @{ $d{varnumbers} }; #say $tee "IN EXE \@varnumbers " . dump( @varnumbers );
-	my @miditers = $d{miditers}; #say $tee "IN EXE \@miditers " . dump( @miditers );
-	my @sweeps = @{ $d{sweeps} }; #say $tee "IN EXE \@sweeps " . dump( @sweeps );
-	my @sourcesweeps = @{ $d{sourcesweeps} }; #say $tee "IN EXE \@sourcesweeps " . dump( @sourcesweeps );
-	my @winneritems =  @{ $d{winneritems} }; #say $tee "IN EXE \@winneritems " . dump( @winneritems );
+	my %d = %{ $instances[0] };
+	my $countcase = $d{countcase};
+	my $countblock = $d{countblock};
+	my @varnumbers = @{ $d{varnumbers} };
+	my @miditers = $d{miditers};
+	my @sweeps = @{ $d{sweeps} };
+	my @sourcesweeps = @{ $d{sourcesweeps} };
+	my @winneritems =  @{ $d{winneritems} };
 
-	my %datastruc = %{ $d{datastruc} }; #say $tee "IN EXE \%datastruc " . dump( %datastruc );
-	my %dowhat = %{ $d{dowhat} }; #say $tee "IN EXE \%dowhat " . dump( %dowhat );
-	my $toitem = $d{toitem}; #say $tee "IN12 EXE \%toitem : " . dump( \%toitem );
-	my $from = $d{from}; #say $tee "IN12 EXE \%from : " . dump( %from );
-	my %to = %{ $d{to} }; #say $tee "IN12 EXE \%to : " . dump( %to );
-	my $countvar = $d{countvar}; #say $tee "IN12 EXE \$countvar : " . dump( $countvar );
-	my $countstep = $d{countstep}; #say $tee "IN12 EXE \$countstep : " . dump( $countstep );
-	my %carrier = %{ $d{carrier} }; #say $tee "IN exe \%carrier " . dump( \%carrier );
-	my %varnums = %{ $d{varnums} }; #say $tee "IN exe \%varnums " . dump( \%varnums );
-	my $file = $dowhat{file}; #say $tee "IN exe \$file " . dump( $file );
-	my $mypath = $dowhat{mypath}; #say $tee "IN exe \$mypath " . dump( $mypath );
-	my @blockelts = @{ $d{blockelts} }; #say $tee "IN DEFFILES \@blockelts : " . dump( @blockelts );
-	my @sourceblockelts = @{ $d{blockelts} }; #say $tee "IN DEFFILES \@sourceblockelts : " . dump( @blockelts );
-	my @blocks = @{ $d{blocks} }; #say $tee "IN DEFFILES \@blocks : " . dump( @blocks );
+	my %datastruc = %{ $d{datastruc} };
+	my %dowhat = %{ $d{dowhat} };
+	my $toitem = $d{toitem};
+	my $from = $d{from};
+	my %to = %{ $d{to} };
+	my $countvar = $d{countvar};
+	my $countstep = $d{countstep};
+	my %carrier = %{ $d{carrier} };
+	my %varnums = %{ $d{varnums} };
+	my $file = $dowhat{file};
+	my $mypath = $dowhat{mypath};
+	my @blockelts = @{ $d{blockelts} };
+	my @sourceblockelts = @{ $d{blockelts} };
+	my @blocks = @{ $d{blocks} };
 	my $instn = $d{instn};
-	#say $tee "IN EXE  \$dirfiles{starsign} " . dump( $dirfiles{starsign} );
 	my %inst = %{ $d{inst} };
 	my %vehicles = %{ $d{vehicles} };
 
-	my $precomputed = $dowhat{precomputed}; #say $tee "IN EXE \$precomputed " . dump( $precomputed ); #NEW
-  my @takecolumns = @{ $dowhat{takecolumns} }; #say $tee "IN EXE \@takecolumns " . dump( @takecolumns ); #NEW
+	my $precomputed = $dowhat{precomputed};
+  my @takecolumns = @{ $dowhat{takecolumns} };
 	my ( @simcases, @simstruct );
 	say $tee "#Performing a search on case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
 
@@ -2197,11 +1996,13 @@ sub exe
 	{
 		push( @{ $vehicles{cumulateall} }, @instances );
 	}
-	#say "\@{ \$vehicles{cumulateall} } 0 " . dump( @{ $vehicles{cumulateall} } );
 
-	if ( $dowhat{ga} ne "" )
+	if ( $dowhat{ga} eq "yes" )
 	{
-		;
+		say $tee "#Calling GAs on morphing operations for case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
+		`python EpsNSGAII.py`;
+		# store \%table, 'file'; # use Storable;
+    # $hashref = retrieve('file'); # use Storable;
 	}
   elsif ( $dirfiles{randompick} eq "yes" ) #DDD
 	{
@@ -2213,20 +2014,16 @@ sub exe
 		#say "REDS1: " . dump( @reds );
 		@reds = @reds[0..($dirfiles{randompicknum}-1)];
 		#say "REDS2: " . dump( @reds );
-
 		foreach my $instance ( @instances )
 		{ #say "INSTANCE IS: $instance->{is}";
 			if ( $instance->{is} ~~ @reds )
-			{
-				#say "FOUND!";
+			{ #say "FOUND!";
 				my @instancees;
 				push( @instancees, $instance );
 				if ( $dowhat{morph} eq "y" )
 				{
 					say $tee "#Calling morphing operations for instance $instance{is} in case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
 					my @result = Sim::OPT::Morph::morph( $configfile, \@instancees, \%dirfiles, \%dowhat, \%vehicles );
-					#say "\$result[0]" . dump( $result[0] );
-					#say "\$result[1]" . dump( $result[1] );
 				}
 
 				if ( ( $dowhat{simulate} eq "y" ) or ( $dowhat{newreport} eq "y" ) )
@@ -2252,21 +2049,17 @@ sub exe
 			$bit = $file . "_";
 			@bag =( $bit );
 			@fills = @{ Sim::OPT::Descend::prepareblank( \%varnums, $tmpblankfile, \@blockelts, \@bag, $file, \%carrier ) };
-			@fulls = uniq( map { $_->[0] } @fills ); #say $tee "IN RANDOM \@fulls: " . dump( @fulls );
+			@fulls = uniq( map { $_->[0] } @fills );
 		}
-
 	}
 	else
 	{
 		if ( $dowhat{morph} eq "y" )
 		{
 			say $tee "#Calling morphing operations for case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
-
 			my @result = Sim::OPT::Morph::morph( $configfile, \@instances, \%dirfiles, \%dowhat, \%vehicles );
 			$dirfiles{morphcases} = $result[0];
 			$dirfiles{morphstruct} = $result[1];
-			#say "\$result[0]" . dump( $result[0] );
-			#say "\$result[1]" . dump( $result[1] );
 		}
 
 		if ( ( $dowhat{simulate} eq "y" ) or ( $dowhat{newreport} eq "y" ) )
@@ -2288,7 +2081,6 @@ sub exe
 	if ( $dowhat{descend} eq "y" )
 	{
 		say $tee "#Calling descent for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ".";
-		#say $tee "\@sourcesweeps: " . dump( @sourcesweeps );
 		Sim::OPT::Descend::descend(	{ instances => \@instances, dirfiles => \%dirfiles, vehicles => \%vehicles } );
 	}
 
@@ -2317,16 +2109,15 @@ sub genstar
 {
 	my ( $dowhat_ref, $varnumbers_ref, $carrier_ref, $blockelts_ref ) = @_;
 	my %dowhat = %{ $dowhat_ref };
-	my %carrier = %{ $carrier_ref }; #say $tee "IN GENSTAR1 \%carrier: " . dump( %carrier );
-	my @blockelts = @{ $blockelts_ref }; #say $tee "IN GENSTAR1 \@blockelts: " . dump( @blockelts );
-	#say $tee "IN GENSTAR1 \$dowhat{starpositions}: " . dump( $dowhat{starpositions} );
+	my %carrier = %{ $carrier_ref };
+	my @blockelts = @{ $blockelts_ref };
 
 	my @varnumbers = @{ $varnumbers_ref };
 
 	my (  @genextremes, @gencentres, @starpositions );
 	if ( $dowhat{stardivisions} == 1 )
 	{
-		$gencentres_ref = gencen( \@varnumbers); #say $tee "\$dowhat{starpositions}: " . dump( $dowhat{starpositions} );
+		$gencentres_ref = gencen( \@varnumbers);
 		@gencentres = @{ $gencentres_ref };
 		push( @starpositions, @gencentres );
 	}
@@ -2337,12 +2128,11 @@ sub genstar
 		while ( $i < $dowhat{stardivisions} )
 		{
 			$genextremes_ref = gencentres( $genextremes_ref );
-			@genpoints = @{ $genextremes_ref }; #say $tee "GENCENTRES \@gencentres: " . dump( @gencentres );
+			@genpoints = @{ $genextremes_ref };
 			$i++;
 		}
 		push( @starpositions, @genpoints );
 	}
-	#say $tee "IN genstar STARPOSITIONS BEFORE: " . dump( @starpositions );
 
 	my @bag;
 	if ( scalar( @blockelts > 0) )
@@ -2361,8 +2151,6 @@ sub genstar
 		}
 		@starpositions = @bag;
 	}
-	#say $tee "IN genstar STARPOSITIONS AFTER: " . dump( @starpositions );
-
 	return( \@starpositions );
 }
 
@@ -2411,8 +2199,6 @@ sub opt
 		@varnumbers = @varinumbers;
 	}
 
-
-	#if ( not ( $outfile ) ) { $outfile = "$mypath/$file-$fileconfig-feedback.txt"; }
 	if ( not ( $tofile ) )
 	{
 		$tofile = "$mypath/$file-tofile.txt";
@@ -2435,12 +2221,8 @@ sub opt
 
 	$tee = new IO::Tee(\*STDOUT, ">>$tofile"); # GLOBAL ZZZ
 
-#	if ($casefile) { eval `cat $casefile` or die( "$!" ); }
-#	if ($chancefile) { eval `cat $chancefile` or die( "$!" ); }
-
 	say $tee "\nNow in Sim::OPT. \n";
 	$dowhat{file} = $file;
-	#say $tee "IN OPT \%vals " . dump( %vals );
 
 	if ( $dowhat{justchecksensitivity} ne "" )
 	{
@@ -2465,7 +2247,6 @@ sub opt
         push ( @newsweeps, [ @newarr ] );
       }
       @sweeps = @newsweeps;
-      #print "NEW SWEEPS: " . dump( @sweeps ) . "\n";
   }
 
   my $i = 0;
@@ -2502,26 +2283,22 @@ sub opt
     foreach my $dirref ( @{ $dowhat{direction} } )
     {
 			#say "112 \$dirref: " . dump( $dirref );
-      my @thesesweeps = @{ $sweeps[$i] }; #say "112 \@thesesweeps: " . dump( @thesesweeps );
-      my $numcases =  scalar( @thesesweeps )  ; #say "112 \$numcases: " . dump( $numcases );
+      my @thesesweeps = @{ $sweeps[$i] };
+      my $numcases =  scalar( @thesesweeps );
 
       my @directions;
-      my $itemsnum = scalar( @{ $dirref } ); #say "112 \$itemsnum: " . dump( $itemsnum );
+      my $itemsnum = scalar( @{ $dirref } );
       my $c = 0;
       while ( ( $itemsnum + $c ) <= $numcases )
       {
         push ( @directions, ${ $dirref }[0] );
         $c++;
       }
-			#say "112-0 \@directions: " . dump( @directions );
       push ( @newarr, [ @directions ] );
       $i++;
     }
-		#say "112-0 \@newarr: " . dump( @newarr );
     $dowhat{direction} = [ @newarr ];
-    #say "NEW FILLED DIRECTIONS: " . dump( $dowhat{direction} );
   }
-	#say "112-0 \$dowhat{direction}: " . dump( $dowhat{direction} );
 
 	{ #IT FILLS THE MISSING $dowhat{starorder} UNDER APPROPRIATE SETTINGS.
     my $i = 0;
@@ -2529,26 +2306,21 @@ sub opt
     foreach my $dirref ( @{ $dowhat{starorder} } )
     {
 			#say "112 \$dirref: " . dump( $dirref );
-      my @thesesweeps = @{ $sweeps[$i] }; #say "112 \@thesesweeps: " . dump( @thesesweeps );
-      my $numcases =  scalar( @thesesweeps )  ; #say "112 \$numcases: " . dump( $numcases );
+      my $numcases =  scalar( @thesesweeps );
 
       my @directions;
-      my $itemsnum = scalar( @{ $dirref } ); #say "112 \$itemsnum: " . dump( $itemsnum );
+      my $itemsnum = scalar( @{ $dirref } );
       my $c = 0;
       while ( ( $itemsnum + $c ) <= $numcases )
       {
         push ( @directions, ${ $dirref }[0] );
         $c++;
       }
-			#say "112-0 \@directions: " . dump( @directions );
       push ( @newarr, [ @directions ] );
       $i++;
     }
-		#say "112-0 \@newarr: " . dump( @newarr );
     $dowhat{starorder} = [ @newarr ];
-    #say "NEW FILLED STAR ORDERING: " . dump( $dowhat{starorder} );
   }
-	#say "112-0 \$dowhat{starorder}: " . dump( $dowhat{starorder} );
 
   if ( $dowhat{randominit} eq "yes" )
   {
@@ -2567,21 +2339,6 @@ sub opt
     #say "NEW INIT LEVELS: " . dump( @miditers );
   }
 
-	#open( OUTFILE, ">>$outfile" ) or die "Can't open $outfile: $!";
-#	open( TOFILE, ">>$tofile" ) or die "Can't ING: " . dump( $starstring );open $tofile: $!";
-
-	#unless (-e "$mypath")
-	#{
-	#	if ($exeonfiles eq "y")
-	#	{
-	#		`mkdir $mypath`;
-	#	}
-	#}
-	#unless (-e "$mypath")
-	#{
-	#	print TOFILE "mkdir $mypath\n\n";
-	#}
-
 	if ( not ( $target ) ) { $target = "opt"; }
 
 	#####################################################################################
@@ -2589,7 +2346,7 @@ sub opt
 
 	if ( not ( ( @chanceseed ) and ( @caseseed ) and ( @chancedata ) ) )
 	{
-		if ( ( @sweepseed ) and ( @chancedata ) ) # IF THIS VALUE IS DEFINED. TO BE FIXED. ZZZ
+		if ( ( @sweepseed ) and ( @chancedata ) ) # IF THIS VALUE IS DEFINED. TO BE FIXED.
 		{
 			my $yield = fromsweep_toopt( @sweeps );
 			@caseseed = @{ $yield[0] };
@@ -2604,7 +2361,7 @@ sub opt
 
 	if ( ( $target eq "takechance" ) and (@chancedata) and ( $dimchance ) )
 	{
-		my @obt = Sim::OPT::Takechance::takechance( \@caseseed, \@chanceseed, \@chancedata, $dimchance );              #say $tee "PASSED: \@sweeps: " . dump(@sweeps);
+		my @obt = Sim::OPT::Takechance::takechance( \@caseseed, \@chanceseed, \@chancedata, $dimchance );
 		@sweeps_ = @{ $obt[0] };
 		@caseseed_ = @{ $obt[1] };
 		@chanceseed_ = @{ $obt[2] };
@@ -2615,7 +2372,7 @@ sub opt
 		say MESSAGE "\n\@chanceseed_ " . Dumper(@chanceseed_);
 		close MESSAGE;
 
-		if ( not (@sweeps) ) # CONSERVATIVE CONDITION. IT MAY BE CHANCED. ZZZ
+		if ( not (@sweeps) ) # CONSERVATIVE CONDITION. IT MAY BE CHANCED.
 		{
 			@sweeps = @sweeps_ ;
 		}
@@ -2624,17 +2381,14 @@ sub opt
 	{
 
 		if ( scalar( @miditers ) == 0 ) { calcmiditers( @varnumbers ); }
-		#$itersnum = getitersnum($countcase, $varnumber, @varnumbers);
 
 		@rootnames = definerootcases( \@sweeps, \@miditers );
-		#say $tee "PRE CALLCASE \@rootnames: " . dump( @rootnames );
 
 		my $countcase = 0;
 		my $countblock = 0;
 		my %datastruc;
 
 		my @winneritems = populatewinners( \@rootnames, $countcase, $countblock );
-		#say $tee "PRE CALLCASE \@winneritems: " . dump( @winneritems );
 
 		my $count = 0;
 		my @arr;
@@ -2646,7 +2400,6 @@ sub opt
 		}
 		$datastruc{pinwinneritem} = [ @arr ];
 
-		#say $tee "\$dowhat{stardivisions}_: " . dump( $dowhat{stardivisions} );
 		my ( @gencetres, @genextremes, @genpoints, $genextremes_ref, $gencentres_ref );
 
 		if ( $dowhat{outstarmode} eq "yes" )
@@ -2655,9 +2408,8 @@ sub opt
 			{
 				$dowhat{starpositions} = genstar( \%dowhat, \@varnumbers, $miditers[$countcase] );
 			}
-			#say $tee "OUTSTARMODE AFTER \$dowhat{starpositions}: " . dump( \@{ $dowhat{starpositions} } );
 
-			$dowhat{starnumber} = scalar( @{ $dowhat{starpositions} } ); #say $tee "AFTER \$dowhat{starnumber}: " . dump( $dowhat{starnumber} );
+			$dowhat{starnumber} = scalar( @{ $dowhat{starpositions} } );
 
 			if ( not( scalar( @{ $dowhat{starpositions} } ) == 0 ) )
 			{
@@ -2666,9 +2418,9 @@ sub opt
 				$dowhat{randominit} => "no"; # to randomize the init levels specified in @miditers.
 				$dowhat{randomdirs} => "no"; # to randomize the directions of descent.
 
-				my @sweeps = @{ starsweep( \@varnumbers, \@sweeps ) }; #say $tee "AFTER0 \@sweeps: " . dump( @sweeps );
+				my @sweeps = @{ starsweep( \@varnumbers, \@sweeps ) };
 
-				my $number = scalar( @varnumbers ); #say $tee "AFTER0 \$number: " . dump( $number );
+				my $number = scalar( @varnumbers );
 
 				my ( @addition, @addition2, @addition3, @sweepaddition );
 				my $cn = 0;
@@ -2679,17 +2431,17 @@ sub opt
 					push( @addition3, $dowhat{starorder}[0] );
 					push( @sweepaddition, $sweeps[0] );
 					$cn++;
-				} #say $tee "AFTER0 \@addition: " . dump( @addition );
+				}
 
 				@varnumbers = @addition;
 				$dowhat{direction} = \@addition2;
 				$dowhat{starorder} = \@addition3;
 				my @sweeps = @sweepaddition;
 
-				my @bag; #say $tee "AFTER0 \@miditers: " . dump( @miditers );
-				my @miditers = @miditers[1 ... $#miditers]; #say $tee "AFTER1 \@miditers: " . dump( @miditers );
+				my @bag;
+				my @miditers = @miditers[1 ... $#miditers];
 				push( @bag, @{ $dowhat{starpositions} }, @miditers );
-				my @miditers = @bag; #say $tee "AFTER3 \@miditers: " . dump( @miditers );
+				my @miditers = @bag;
 
 				$countstring = 1;
 
@@ -2703,23 +2455,11 @@ sub opt
 
 				@calcoverlaps = calcoverlaps( @sweeps );
 
-		    #@miditers = @pinmiditers;
-				#my %mids = getcase( \@miditers, $countcase ); #say $tee "IN CALLCASE \%mids" . dump( %mids );
 				$dirfiles{countstring} = $countstring;
 				$dirfiles{nestclock} = 0;
-				#my $totres_read = "$mypath/$file-totres-$countcase-$countblock.csv";
-				#$dirfiles{totres_read} = $totres_read;
-				#my $totres_write = "$mypath/$file-totres-$countcase-$countblock.csv";
-				#$dirfiles{totres_write} = $totres_write;
 
-				#say $tee "PRE CALLCASE \@sweeps: " . dump( @sweeps );
-				#say $tee "PRE CALLCASE \@varnumbers: " . dump( @varnumbers );
-				#say $tee "PRE CALLCASE \@miditers: " . dump ( @miditers );
-				#say $tee "PRE CALLCASE \$dowhat{direction}" . dump( $dowhat{direction} );
-				#say $tee "PRE CALLCASE \$dowhat{starorder}" . dump( $dowhat{starorder} );
-
-				$dirfiles{tottot} = "$mypath/$file-$countcase" . "-tottot.csv"; #say "IN CALLBLOCK tottot:" . ( $dirfiles{tottot} ) . " .";
-				$dirfiles{ordtot} = "$mypath/$file-$countcase" . "-ordtot.csv"; #say "IN CALLBLOCK ordtot:" . ( $dirfiles{ordtot} ) . " .";
+				$dirfiles{tottot} = "$mypath/$file-$countcase" . "-tottot.csv";
+				$dirfiles{ordtot} = "$mypath/$file-$countcase" . "-ordtot.csv";
 
 
 				callblock( { countcase => $countcase, countblock => $countblock,
@@ -2733,29 +2473,28 @@ sub opt
 		else
 		{
 			my ( $sweepz_ref, $sourcesweeps_ref ) = cleansweeps( \@sweeps );
-			my @sweepz = @{ $sweepz_ref }; #say $tee "AFTER CLEANSWEEPS \@sweepz: " . dump ( @sweepz );
-			my @sourcesweeps = @{ $sourcesweeps_ref }; #say $tee "AFTER CLEANSWEEPS \@sourcesweeps: " . dump ( @sourcesweeps );
+			my @sweepz = @{ $sweepz_ref };
+			my @sourcesweeps = @{ $sourcesweeps_ref };
 			if ( @sweepz )
 			{
 				@sweeps = @sweepz;
 			}
 
 			#@calcoverlaps = calcoverlaps( @sweeps );
-			$dirfiles{tottot} = "$mypath/$file-$countcase" . "-tottot.csv"; #say "IN CALLBLOCK tottot:" . ( $dirfiles{tottot} ) . " .";
-			$dirfiles{ordtot} = "$mypath/$file-$countcase" . "-ordtot.csv"; #say "IN CALLBLOCK ordtot:" . ( $dirfiles{ordtot} ) . " .";
+			$dirfiles{tottot} = "$mypath/$file-$countcase" . "-tottot.csv";
+			$dirfiles{ordtot} = "$mypath/$file-$countcase" . "-ordtot.csv";
 			#@miditers = @pinmiditers;
 			#say $tee "miditers: " . dump ( @miditers );
 
 			if ( scalar( @miditers ) == 0 ) { calcmiditers( @varnumbers ); }
-			#$itersnum = getitersnum( $countcase, $varnumber, @varnumbers );
 
-			@rootnames = definerootcases( \@sweeps, \@miditers ); #say $tee "\@rootnames: " . dump ( @rootnames );
+			@rootnames = definerootcases( \@sweeps, \@miditers );
 
 			my $countcase = 0;
 			my $countblock = 0;
 			my %datastruc;
 
-			my @winneritems = populatewinners( \@rootnames, $countcase, $countblock ); #say $tee "\@winneritems: " . dump ( @winneritems );
+			my @winneritems = populatewinners( \@rootnames, $countcase, $countblock );
 
 			my $count = 0;
 			my @arr;
@@ -2768,7 +2507,6 @@ sub opt
 			$datastruc = [ @arr ];
 
 			$dirfiles{nestclock} = 0;
-			#say $tee "PRE CALLCASE \%dowhat" . dump( %dowhat );
 			callblock
 			(	{ countcase => $countcase, countblock => $countblock,
 					miditers => \@miditers, varnumbers => \@varnumbers, winneritems => \@winneritems,
@@ -2804,7 +2542,7 @@ Sim::OPT.
 
 =head1 DESCRIPTION
 
-Sim::OPT is an optimization and parametric exploration program favouring problem decomposition. It can be used with simulation programs receiving text files as input and emitting text files as output. Sim::OPT's optimization modules (Sim::OPT, Sim::OPT::Descent) pursue optimization through block search, allowing blocks (subspaces) to overlap, and allowing a free intermix of sequential searches (inexact Gauss-Seidel method) and parallell ones (inexact Jacobi method). The Sim::OPT::Takechange module can seek for the least explored search paths when exploring new search spaces sequentially (following rules presented in: http://dx.doi.org/10.1016/j.autcon.2016.08.014). Sim::OPT::Morph, the morphing module, can manipulate parameters of simulation models.
+OPT is an optimization and parametric exploration program favouring problem decomposition. It can be used with simulation programs receiving text files as input and emitting text files as output. Sim::OPT's optimization modules (Sim::OPT, Sim::OPT::Descent) pursue optimization through block search, allowing blocks (subspaces) to overlap, and allowing a free intermix of sequential searches (inexact Gauss-Seidel method) and parallell ones (inexact Jacobi method). The Sim::OPT::Takechange module can seek for the least explored search paths when exploring new search spaces sequentially (following rules presented in: http://dx.doi.org/10.1016/j.autcon.2016.08.014). Sim::OPT::Morph, the morphing module, can manipulate parameters of simulation models.
 Other modules under the Sim::OPT namespace are Sim::OPT::Parcoord3d, a module which can convert 2D parallel coordinates plots into Autolisp instructions for obtaining 3D plots as Autocad drawings; and Sim::OPT::Interlinear, which can build metamodels from sparse multidimensional data, and the module Sim::OPT::Modish, capable of altering the shading values calculated with the ESP-r buildjng performance simulation platform (http://www.esru.strath.ac.uk/Programs/ESP-r.htm).
 The Sim::OPT's morphing and reporting modules contain several additional functions specifically targeting the ESP-r building performance simulation platform.
 
@@ -2830,7 +2568,7 @@ OPT can perform star searches (Jacoby method of course, but also Gauss-Seidel) w
 
 For specifying in a Sim::OPT configuration file that a certain block has to be searched by the means of a metamodel derived from star searches or other "positions" instead of a multilevel full-factorial search, it is necessary to assign the value "yes" to the variable $dowhat{metamodel}.
 
-OPT can perform both variance-based sensitivity analyses on the basis of simulated dataseries and variance-based preliminary sensitivity analyses on the basis of metamodels.
+OPT can perform variance-based preliminary sensitivity analyses on the basis of metamodels.
 
 OPT works under Linux.
 

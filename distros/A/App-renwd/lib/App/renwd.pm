@@ -1,7 +1,7 @@
 package App::renwd;
 
-our $DATE = '2019-07-23'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-09-09'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: REName current (Working Directory)
@@ -18,7 +18,7 @@ App::renwd - REName current (Working Directory)
 
 =head1 VERSION
 
-This document describes version 0.002 of App::renwd (from Perl distribution App-renwd), released on 2019-07-23.
+This document describes version 0.003 of App::renwd (from Perl distribution App-renwd), released on 2019-09-09.
 
 =head1 SYNOPSIS
 

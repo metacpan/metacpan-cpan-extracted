@@ -34,8 +34,8 @@ http://www.activestate.com/
 
 ** Install with ExtUtils::MakeMaker
 
-    arclog uses standard Perl installation with ExtUtils::MakeMaker.
-Follow these steps:
+    Locale-Maketext-Gettext uses standard Perl installation with
+ExtUtils::MakeMaker.  Follow these steps:
 
     % perl Makefile.PL
     % make
@@ -141,6 +141,6 @@ commands (by running perldoc cpanp).
 
 
 imacat
-2008-11-11
+2008/11/11, updated 2019/9/9
 imacat@mail.imacat.idv.tw
 http://www.imacat.idv.tw/

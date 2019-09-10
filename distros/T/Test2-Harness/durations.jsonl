@@ -1,0 +1,10 @@
+--2019-09-09 20:49:24--  http://127.0.0.1:5000/durations/default/2/5
+Connecting to 127.0.0.1:5000... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: unspecified [application/json]
+Saving to: ‘5’
+
+     0K ..                                                      390M=0s
+
+2019-09-09 20:49:24 (390 MB/s) - ‘5’ saved [2921]
+

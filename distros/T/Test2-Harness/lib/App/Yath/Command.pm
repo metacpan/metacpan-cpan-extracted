@@ -2,7 +2,7 @@ package App::Yath::Command;
 use strict;
 use warnings;
 
-our $VERSION = '0.001095';
+our $VERSION = '0.001099';
 
 use Carp qw/croak confess/;
 use File::Temp qw/tempdir/;
@@ -258,11 +258,15 @@ sub make_run_from_settings {
         show_times  => $settings->{show_times},
         verbose     => $settings->{verbose},
         no_long     => $settings->{no_long},
+        only_long   => $settings->{only_long},
         dummy       => $settings->{dummy},
         cover       => $settings->{cover},
         event_uuids => $settings->{event_uuids},
         mem_usage   => $settings->{mem_usage},
-        default_search => $settings->{default_search},
+        durations   => $settings->{durations},
+
+        maybe_durations => $settings->{maybe_durations},
+        default_search  => $settings->{default_search},
 
         harness_run_fields => $settings->{fields},
 
@@ -334,7 +338,7 @@ sub options {
             field => 'fields',
             used_by => {runner => 1},
             section => "Harness Options",
-            usage => ['-f name:details', qq|--field '{"name": "NAME", "details": "DETAILS", "link": "LINK", "data":{...}}'| ],
+            usage => ['-f name:details', qq|--field 'JSON_STRING'| ],
             summary => ['Add custom harness_run_fields'],
             action => sub {
                 my $self = shift;
@@ -602,7 +606,34 @@ sub options {
             used_by => {runner => 1, jobs => 1},
             section => 'Harness Options',
             usage   => ['--no-long'],
-            summary => ["Do not run tests with the HARNESS-CAT-LONG header"],
+            summary => ["Do not run tests with the HARNESS-DURATION-LONG header"],
+        },
+
+        {
+            spec    => 'only-long',
+            field   => 'only_long',
+            used_by => {runner => 1, jobs => 1},
+            section => 'Harness Options',
+            usage   => ['--only-long'],
+            summary => ["only run tests with the HARNESS-DURATION-LONG header"],
+        },
+
+        {
+            spec => 'durations=s',
+            field => 'durations',
+            used_by => {runner => 1, jobs => 1},
+            section => 'Harness Options',
+            usage => ['--durations path', '--durations url'],
+            long_desc => "Point at a json file or url which has a hash of relative test filenames as keys, and 'SHORT', 'MEDIUM', or 'LONG' as values. This will override durations listed in the file headers. An exception will be thrown if the durations file or url does not work.",
+        },
+
+        {
+            spec => 'maybe-durations=s@',
+            field => 'maybe_durations',
+            used_by => {runner => 1, jobs => 1},
+            section => 'Harness Options',
+            usage => ['--maybe-durations path', '--maybe-durations url'],
+            long_desc => "Same as 'durations' except not fatal if not found. If this and 'durations' are both specified then 'durations' is used as a fallback when this fails. You may specify this option multiple times and the first one that works will be used"
         },
 
         {
@@ -755,7 +786,7 @@ sub options {
             field   => 'log_file_format',
             used_by => {logger => 1},
             section => 'Logging Options',
-            usage   => ['--lff format-string', '--log-file-format format-string'],
+            usage   => ['--lff format-string', '--log-file-format ...'],
             summary => ['Specify the format for automatically-generated log files.', 'Overridden by --log-file, if given',
                         'This option implies -L', "(Default: \$YATH_LOG_FILE_FORMAT, if that is set, or else '%Y-%m-%d~%H:%M:%S~%!U~%!p.jsonl')"],
             long_desc => "This is a string in which percent-escape sequences will be replaced as per POSIX::strftime.  The following special escape sequences are also replaced: (%!U : the unique test run ID)  (%!p : the process ID) (%!S : the number of seconds since local midnight UTC ",

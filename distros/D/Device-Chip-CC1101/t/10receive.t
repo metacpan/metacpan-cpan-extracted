@@ -1,0 +1,93 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Test::More;
+use Test::Device::Chip::Adapter;
+
+use Device::Chip::CC1101;
+
+my $chip = Device::Chip::CC1101->new;
+
+$chip->mount(
+   my $adapter = Test::Device::Chip::Adapter->new,
+)->get;
+
+# initialise config
+{
+   # CONFIG
+   $adapter->expect_write_then_read( "\xC0", 41 )
+      ->returns( "\x29\x2E\x3F\x07\xD3\x91\xFF\x04\x45\x00\x00\x0F\x00\x1E\xC4\xEC" .
+                 "\x8C\x22\x02\x22\xF8\x47\x07\x30\x04\x36\x6C\x03\x40\x91\x87\x6B" .
+                 "\xF8\x56\x10\xA9\x0A\x20\x0D\x41\x00" );
+   # PATABLE
+   $adapter->expect_write_then_read( "\xFE", 8 )
+      ->returns( "\xC6\x00\x00\x00\x00\x00\x00\x00" );
+
+   $chip->read_config->get;
+}
+
+# ->receive in fixed length configuration
+{
+   # Update CONFIG
+   $adapter->expect_write( "\x46" . "\x04\x04\x44" );
+
+   $chip->change_config(
+      LENGTH_CONFIG => "fixed",
+      PACKET_LENGTH => 4,
+   )->get;
+
+   # read RXFIFO, returns packet
+   $adapter->expect_write_then_read( "\xFB", 1 )
+      ->returns( "\x06" );
+   $adapter->expect_write_then_read( "\xFF", 6 )
+      ->returns( "ABCD\x30\xA0" );
+
+   is_deeply( $chip->receive->get,
+      {
+         data   => "ABCD",
+         CRC_OK => 1,
+         LQI    => 32,
+         RSSI   => -50,
+      },
+      '->receive yields packet'
+   );
+
+   $adapter->check_and_clear( '->receive fixed-length' );
+}
+
+# ->receive in variable-length configuration
+{
+   # Update CONFIG
+   $adapter->expect_write( "\x48" . "\x45" );
+
+   $chip->change_config(
+      LENGTH_CONFIG => "variable",
+   )->get;
+
+   # read RXFIFO, returns length
+   $adapter->expect_write_then_read( "\xFB", 1 )
+      ->returns( "\x01" );
+   $adapter->expect_write_then_read( "\xFF", 1 )
+      ->returns( "\x04" );
+   # read RXFIFO, returns packet
+   $adapter->expect_write_then_read( "\xFB", 1 )
+      ->returns( "\x06" );
+   $adapter->expect_write_then_read( "\xFF", 6 )
+      ->returns( "EFGH\x32\xA1" );
+
+   is_deeply( $chip->receive->get,
+      {
+         data   => "EFGH",
+         CRC_OK => 1,
+         LQI    => 33,
+         RSSI   => -49,
+      },
+      '->receive yields packet'
+   );
+
+   $adapter->check_and_clear( '->receive variable-length' );
+}
+
+done_testing;

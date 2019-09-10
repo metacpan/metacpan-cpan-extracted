@@ -22,7 +22,7 @@ from_data
 =description
 
 The from_data method returns content for the given class to be passed to the
-constructor.
+constructor. This method isn't meant to be called directly.
 
 =signature
 

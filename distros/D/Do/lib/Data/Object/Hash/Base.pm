@@ -10,12 +10,14 @@ use Scalar::Util ();
 
 use parent 'Data::Object::Base';
 
-our $VERSION = '1.60'; # VERSION
+our $VERSION = '1.70'; # VERSION
 
 # BUILD
 
 sub new {
   my ($class, $data) = @_;
+
+  $data //= {};
 
   if (Scalar::Util::blessed($data) && $data->can('detract')) {
     $data = $data->detract;
@@ -56,7 +58,9 @@ Data-Object Abstract Hash Class
 
 =head1 DESCRIPTION
 
-This package provides routines for operating on Perl 5 hash references.
+This package provides routines for operating on Perl 5 hash references. If no
+argument is provided, this package is instantiated with a default value of
+C<{}>.
 
 =cut
 
@@ -107,9 +111,9 @@ instance.
 
 =head1 CREDITS
 
-Al Newkirk, C<awncorp@cpan.org>, C<+284>
+Al Newkirk, C<+287>
 
-Anthony Brummett, C<abrummet@genome.wustl.edu>, C<+10>
+Anthony Brummett, C<+10>
 
 =cut
 

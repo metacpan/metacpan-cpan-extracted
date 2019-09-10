@@ -1,3 +1,24 @@
+libtest-module-runnable-perl (0.4.2) stable; urgency=medium
+
+  * Debian packaging warning fixes only
+
+ -- Duncan Ross Palmer <palmer@overchat.org>  Sun, 08 Sep 2019 13:00:36 +0000
+
+libtest-module-runnable-perl (0.4.1) stable; urgency=medium
+
+  * PoD and documentation improvements
+
+ -- Duncan Ross Palmer <palmer@overchat.org>  Sun, 08 Sep 2019 10:30:52 +0000
+
+libtest-module-runnable-perl (0.4.0) stable; urgency=medium
+
+  * Removed Bitbucket pipeline support (YAML)
+  * Added Sourcehut pipeline support (YAML) -- https://builds.sr.ht
+  * Added modeSwitch() and modeName() user hooks
+  * Update links because of project migration from bitbucket
+
+ -- Duncan Ross Palmer <palmer@overchat.org>  Sat, 07 Sep 2019 00:29:43 +0000
+
 libtest-module-runnable-perl (0.3.0) stable; urgency=low
 
   * Added clearMocks()

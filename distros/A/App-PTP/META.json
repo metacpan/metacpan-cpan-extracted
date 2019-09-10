@@ -73,6 +73,6 @@
          "web" : "https://github.com/mkende/ptp"
       }
    },
-   "version" : "1.04",
+   "version" : "1.08",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

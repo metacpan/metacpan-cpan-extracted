@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2017-2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2017-2019 -- leonerd@leonerd.org.uk
 
 package Device::Chip::ADS1115;
 
@@ -12,7 +12,7 @@ Device::Chip::Base::RegisteredI2C->VERSION( '0.10' );
 
 use Future::AsyncAwait 0.13; # list-context bugfix
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use Data::Bitfield 0.02 qw( bitfield boolfield enumfield );
 
@@ -88,7 +88,7 @@ Returns a C<HASH> reference containing the chip's current configuration.
 
 =cut
 
-bitfield { format => "bytes-BE" }, CONFIG =>
+bitfield { format => "integer" }, CONFIG =>
    OS   => boolfield(15),
    MUX  => enumfield(12, qw( 0-1 0-3 1-3 2-3 0 1 2 3 )),
    PGA  => enumfield( 9, qw( 6.144V 4.096V 2.048V 1.024V 0.512V 0.256V )),
@@ -105,7 +105,7 @@ async sub read_config
 
    my $bytes = await $self->cached_read_reg( REG_CONFIG, 1 );
 
-   return $self->{config} = { unpack_CONFIG( $bytes ) };
+   return $self->{config} = { unpack_CONFIG( unpack "S>", $bytes ) };
 }
 
 =head2 change_config
@@ -128,7 +128,7 @@ async sub change_config
 
    delete $self->{fullscale_f} if exists $changes{PGA};
 
-   await $self->cached_write_reg( REG_CONFIG, pack_CONFIG( %$config ) );
+   await $self->cached_write_reg( REG_CONFIG, pack "S>", pack_CONFIG( %$config ) );
 }
 
 =head2 trigger
@@ -147,7 +147,7 @@ async sub trigger
    my $config = await $self->read_config;
 
    # Not "cached" as OS is a volatile bit
-   await $self->write_reg( REG_CONFIG, pack_CONFIG( %$config, OS => 1 ) );
+   await $self->write_reg( REG_CONFIG, pack "S>", pack_CONFIG( %$config, OS => 1 ) );
 }
 
 =head2 read_adc

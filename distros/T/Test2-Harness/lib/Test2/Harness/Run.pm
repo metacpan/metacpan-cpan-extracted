@@ -2,13 +2,16 @@ package Test2::Harness::Run;
 use strict;
 use warnings;
 
-our $VERSION = '0.001095';
+our $VERSION = '0.001099';
 
 use Carp qw/croak/;
+use Cwd qw/getcwd/;
 
 use List::Util qw/first/;
 
 use Test2::Util qw/IS_WIN32/;
+
+use Test2::Harness::Util::JSON qw/decode_json/;
 
 use File::Spec;
 
@@ -33,6 +36,8 @@ use Test2::Harness::Util::HashBase qw{
 
     -meta
     -harness_run_fields
+    -durations
+    -maybe_durations
 
     -default_search
     -projects
@@ -48,8 +53,11 @@ use Test2::Harness::Util::HashBase qw{
     -exclude_files
     -exclude_patterns
     -no_long
+    -only_long
 
     -plugins
+
+    -cwd
 };
 
 sub init {
@@ -78,6 +86,8 @@ sub init {
     $self->{+USE_STREAM} = 1 unless defined $self->{+USE_STREAM};
     $self->{+USE_FORK}   = (IS_WIN32 ? 0 : 1) unless defined $self->{+USE_FORK};
 
+    $self->{+CWD} ||= getcwd();
+
     croak "Preload requires forking"
         if $self->{+PRELOAD} && !$self->{+USE_FORK};
 
@@ -94,6 +104,54 @@ sub init {
     $env->{HARNESS_JOBS}    = $self->{+JOB_COUNT};
 
     $env->{T2_HARNESS_RUN_ID} = $self->{+RUN_ID};
+
+
+    $self->pull_durations();
+}
+
+sub pull_durations {
+    my $self = shift;
+
+    my $primary  = delete $self->{+MAYBE_DURATIONS} || [];
+    my $fallback = delete $self->{+DURATIONS};
+
+    for my $path (@$primary) {
+        local $@;
+        my $durations = eval { $self->_pull_durations($path) } or print "Could not fetch optional durations '$path', ignoring...\n";
+        next unless $durations;
+
+        print "Found durations: $path\n";
+        return $self->{+DURATIONS} = $durations;
+    }
+
+    return $self->{+DURATIONS} = $self->_pull_durations($fallback)
+        if $fallback;
+}
+
+sub _pull_durations {
+    my $self = shift;
+    my ($in) = @_;
+
+    if (my $type = ref($in)) {
+        return $self->{+DURATIONS} = $in if $type eq 'HASH';
+    }
+    elsif ($in =~ m{^https?://}) {
+        require HTTP::Tiny;
+        my $ht = HTTP::Tiny->new();
+        my $res = $ht->get($in, {headers => {'Content-Type' => 'application/json'}});
+
+        die "Could not query durations from '$in'\n$res->{status}: $res->{reason}\n$res->{content}"
+            unless $res->{success};
+
+        return $self->{+DURATIONS} = decode_json($res->{content});
+    }
+    elsif(-f $in) {
+        require Test2::Harness::Util::File::JSON;
+        my $file = Test2::Harness::Util::File::JSON->new(name => $in);
+        return $self->{+DURATIONS} = $file->read();
+    }
+
+    die "Invalid duration specification: $in";
 }
 
 sub all_libs {
@@ -198,6 +256,14 @@ sub _find_files {
 
     push @files => $_->find_files($self, $search) for @$plugins;
 
+    if (my $durations = $self->{+DURATIONS}) {
+        for my $file (@files) {
+            my $rel = File::Spec->abs2rel($file->file);
+            my $dur = $durations->{$rel} or next;
+            $file->set_duration($dur);
+        }
+    }
+
     $_->munge_files(\@files) for @$plugins;
 
     # With -jN > 1 we want to sort jobs based on their category, otherwise
@@ -215,7 +281,8 @@ sub _find_files {
     @files = grep { my $f = $_->file; !first { $f =~ m/$_/ } @{$self->{+EXCLUDE_PATTERNS}} } @files if @{$self->{+EXCLUDE_PATTERNS}};
     #>>>
 
-    @files = grep { $_->check_category ne 'long' } @files if $self->{+NO_LONG};
+    @files = grep { $_->check_duration ne 'long' } @files if $self->{+NO_LONG};
+    @files = grep { $_->check_duration eq 'long' } @files if $self->{+ONLY_LONG};
 
     return @files;
 }

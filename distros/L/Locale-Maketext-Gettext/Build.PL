@@ -4,7 +4,7 @@ use Module::Build;
 
 my $build = Module::Build->new(
     dist_name       => "Locale-Maketext-Gettext",
-    dist_version    => "1.28",
+    dist_version    => "1.29",
     dist_abstract   => "Joins gettext and Maketext frameworks",
     dist_author     => "imacat <imacat\@mail.imacat.idv.tw>",
     license         => "perl",

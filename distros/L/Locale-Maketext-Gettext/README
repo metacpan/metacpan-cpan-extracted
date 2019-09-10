@@ -38,17 +38,23 @@ like the command-line program gettext.
 
 * Installation
 
-    Read INSTALL for instructions on how to install
+Read INSTALL for instructions on how to install
 Locale::Maketext::Gettext.
+
+
+* Source
+
+Source is now on Github.  See
+https://github.com/imacat/Locale-Maketext-Gettext
 
 
 * News, Changes and Updates
 
-    Refer to the Changes for changes, bug fixes, updates, new functions, etc.
+Refer to the Changes for changes, bug fixes, updates, new functions, etc.
 
 
 * Copyright
 
-Copyright (c) 2003-2007 imacat. All rights reserved. This program is free
+Copyright (c) 2003-2019 imacat. All rights reserved. This program is free
 software; you can redistribute it and/or modify it under the same terms
 as Perl itself.

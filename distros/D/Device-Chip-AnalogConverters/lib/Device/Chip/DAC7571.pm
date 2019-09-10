@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2018-2019 -- leonerd@leonerd.org.uk
 
 package Device::Chip::DAC7571;
 
@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Device::Chip );
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use Carp;
 use Future::AsyncAwait;

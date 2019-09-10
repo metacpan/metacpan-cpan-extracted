@@ -11,10 +11,13 @@ BEGIN {
 }
 
 {
-   my ( $cnt, @list, %ret ); local $_;
+   my ( $cnt, @list, %pids, %ret ); local $_;
    ok( 1, "spawning asynchronously" );
 
    MCE::Hobo->create( sub { sleep 2; $_ } ) for ( 1 .. 3 );
+
+   %pids = map { $_ => undef } MCE::Hobo->list_pids;
+   is ( scalar( keys %pids ), 3, 'check for unique pids' );
 
    @list = MCE::Hobo->list_running;
    is ( scalar @list, 3, 'check list_running' );
@@ -41,7 +44,7 @@ BEGIN {
       is ( $_->error, undef, 'check error hobo'.$cnt );
    }
 
-   is ( scalar keys %ret, 3, 'check unique pid value' );
+   is ( scalar keys %ret, 3, 'check for unique values' );
 }
 
 {

@@ -1,0 +1,30 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+no warnings 'qw';
+
+use Music::ToRoman;
+
+#my @notes = qw/ C /;
+#my @notes = qw/ C D E F G A B /;
+my @notes = qw/ C C# Db D D# Eb E Fb E# F F# Gb G G# Ab A A# Bb B B# Cb /;
+
+#for my $scale_note ( @notes ) {
+for my $scale_note ( 'C' ) {
+    print "scale_note: $scale_note\n";
+
+    for my $scale_name (qw/ ionian /){#dorian phrygian lydian mixolydian aeolian locrian /) {
+        my $mtr = Music::ToRoman->new( #verbose=>1,
+            scale_note  => $scale_note,
+            scale_name  => $scale_name,
+            chords      => 0,
+        );
+
+        print "\tscale_name: $scale_name\n";
+
+        for my $note ( @notes ) {
+            my $roman = $mtr->parse($note);
+            print "\t\t$note => $roman\n";
+        }
+    }
+}

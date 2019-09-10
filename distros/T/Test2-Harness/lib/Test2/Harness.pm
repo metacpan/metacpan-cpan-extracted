@@ -2,7 +2,7 @@ package Test2::Harness;
 use strict;
 use warnings;
 
-our $VERSION = '0.001095';
+our $VERSION = '0.001099';
 
 use Carp qw/croak/;
 use List::Util qw/sum/;
@@ -10,6 +10,8 @@ use Time::HiRes qw/sleep time/;
 use Sys::Hostname qw/hostname/;
 use Test2::Harness::Util::JSON qw/encode_canon_json encode_json/;
 use Test2::Harness::Util::UUID qw/gen_uuid/;
+
+use File::Spec;
 
 use Test2::Harness::Util::Term qw/USE_ANSI_COLOR/;
 
@@ -168,6 +170,8 @@ sub iteration {
                 my $f = $event->{facet_data};
                 if ($f && $f->{harness_job_end}) {
                     $f->{harness_job_end}->{file} = $watcher->file;
+                    $f->{harness_job_end}->{rel_file} = File::Spec->abs2rel($watcher->file);
+                    $f->{harness_job_end}->{abs_file} = File::Spec->rel2abs($watcher->file);
                     $f->{harness_job_end}->{fail} = $watcher->fail ? 1 : 0;
 
                     my $plan = $watcher->plan;

@@ -1,0 +1,97 @@
+{
+   "abstract" : "Library for the `sweat` command-line program",
+   "author" : [
+      "Jason McIntosh <jmac@jmac.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.4",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Sweat",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::HomeDir" : "0",
+            "File::Slurper" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "FindBin" : "0",
+            "HTML::Strip" : "0",
+            "LWP" : "0",
+            "List::Util" : "0",
+            "MediaWiki::API" : "0",
+            "Moo" : "0",
+            "POSIX" : "0",
+            "Scalar::Util" : "0",
+            "Term::ReadKey" : "0",
+            "Try::Tiny" : "0",
+            "Types::Standard" : "0",
+            "Web::NewsAPI" : "0",
+            "YAML" : "0",
+            "perl" : "v5.10.0",
+            "utf8::all" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Sweat" : {
+         "file" : "lib/Sweat.pm",
+         "version" : "201909090"
+      },
+      "Sweat::Article" : {
+         "file" : "lib/Sweat/Article.pm"
+      },
+      "Sweat::Drill" : {
+         "file" : "lib/Sweat/Drill.pm"
+      },
+      "Sweat::Group" : {
+         "file" : "lib/Sweat/Group.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jmacdotorg/sweat/issues"
+      },
+      "homepage" : "https://github.com/jmacdotorg/sweat",
+      "repository" : {
+         "url" : "git://github.com/jmacdotorg/sweat.git",
+         "web" : "https://github.com/jmacdotorg/sweat"
+      }
+   },
+   "version" : "201909090",
+   "x_authority" : "cpan:JMAC",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01",
+   "x_static_install" : 1
+}

@@ -1,5 +1,8 @@
 Revision history for Task-Latemp:
 
+0.0103  2016-11-11
+    - Convert to Dist-Zilla.
+
 0.0102  2015-05-30
     - META.yml: add repository, homepage and keywords.
 

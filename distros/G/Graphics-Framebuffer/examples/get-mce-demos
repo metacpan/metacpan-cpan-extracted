@@ -1,0 +1,8 @@
+#!/bin/bash
+
+git clone https://github.com/marioroy/mce-examples.git
+echo "Moving framebuffer demos into examples"
+mv -f mce-examples/framebuffer/*pl .
+echo "Cleaning up"
+rm -Rf mce-examples
+echo "Done"

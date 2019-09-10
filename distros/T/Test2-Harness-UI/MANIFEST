@@ -18,6 +18,7 @@ lib/Test2/Harness/UI/CPANImporter.pm
 lib/Test2/Harness/UI/Config.pm
 lib/Test2/Harness/UI/Controller.pm
 lib/Test2/Harness/UI/Controller/Dashboard.pm
+lib/Test2/Harness/UI/Controller/Durations.pm
 lib/Test2/Harness/UI/Controller/Events.pm
 lib/Test2/Harness/UI/Controller/Job.pm
 lib/Test2/Harness/UI/Controller/Jobs.pm
@@ -33,6 +34,7 @@ lib/Test2/Harness/UI/Request.pm
 lib/Test2/Harness/UI/Response.pm
 lib/Test2/Harness/UI/Schema.pm
 lib/Test2/Harness/UI/Schema/Result/ApiKey.pm
+lib/Test2/Harness/UI/Schema/Result/Duration.pm
 lib/Test2/Harness/UI/Schema/Result/Email.pm
 lib/Test2/Harness/UI/Schema/Result/EmailVerificationCode.pm
 lib/Test2/Harness/UI/Schema/Result/Event.pm

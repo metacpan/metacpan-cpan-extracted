@@ -84,9 +84,12 @@ custom all-purpose media player called "fauxdacious" (his custom hacked
 version of the open-source "audacious" audio player).  "fauxdacious" can 
 incorporate this module to decode and play Facebook.com videos.
 
-NOTE:  You must create the hidden file: ~/.config/.fbdata consisting of two 
-lines:  the first containing your Facebook login id, ie. 
-youremail\@emailservice.com; and the second line, your Facebook password!
+NOTE:  You must create the config file: ~/.config/StreamFinder/Facebook/config 
+containing the two lines:  
+
+userid => 'yourFBlogin'
+
+userpw => 'yourpassword'
 
 =head1 SUBROUTINES/METHODS
 
@@ -101,10 +104,14 @@ I<undef> if the URL is not a valid facebook station or no streams are found.
 
 Returns an array of strings representing all stream urls found.
 
-=item $station->B<getURL>()
+=item $station->B<getURL>([I<options>])
 
 Similar to B<get>() except it only returns a single stream representing 
 the first valid stream found.  
+
+There are currently no I<options> supported for Facebook streams, anything 
+specified here is currently ignored as there is currently only a single 
+playable stream returned.
 
 =item $station->B<count>()
 
@@ -141,6 +148,50 @@ Returns a two-element array consisting of the extension (ie. "png",
 Returns the stream's type ("Facebook").
 
 =back
+
+=head1 CONFIGURATION FILES
+
+NOTE:  If you are still using the old hidden text file: ~/.config/.fbdata, 
+it will still work for now, but will eventually be REMOVED in a future 
+release.  If you have both this file and the above specified in the new 
+config file, the latter will overwrite the .fbdata values.
+
+=over 4
+
+=item ~/.config/StreamFinder/Facebook/config
+
+Optional text file for specifying various configuration options 
+for a specific site (submodule).  Each option is specified on a 
+separate line in the format below:
+
+'option' => 'value' [,]
+
+and the options are loaded into a hash used only by the specific 
+(submodule) specified.  Valid options include 
+I<-debug> => [0|1|2], and most of the L<LWP::UserAgent> options.  
+Blank lines and lines starting with a "#" sign are ignored.
+
+Options specified here override any specified in I<~/.config/StreamFinder/config>.
+
+Among options valid for Facebook streams are the I<-userid> and 
+I<-userpw> options specifying the required Facebook login 
+cradentials (formally stored in ~/.config/.fbdata).
+
+=item ~/.config/StreamFinder/config
+
+Optional text file for specifying various configuration options.  
+Each option is specified on a separate line in the format below:
+
+'option' => 'value' [,]
+
+and the options are loaded into a hash used by all sites 
+(submodules) that support them.  Valid options include 
+I<-debug> => [0|1|2], and most of the L<LWP::UserAgent> options.
+
+=back
+
+NOTE:  Options specified in the options parameter list will override 
+those corresponding options specified in these files.
 
 =head1 KEYWORDS
 
@@ -234,7 +285,9 @@ use warnings;
 use LWP::UserAgent ();
 use vars qw(@ISA @EXPORT);
 
-our $DEBUG = 0;
+my $DEBUG = 0;
+my %uops = ();
+my @userAgentOps = ();
 
 require Exporter;
 
@@ -245,6 +298,32 @@ sub new
 {
 	my $class = shift;
 	my $url = shift;
+
+	my $self = {};
+	return undef  unless ($url);
+
+	foreach my $p ("$ENV{HOME}/.config/StreamFinder/config", "$ENV{HOME}/.config/StreamFinder/Facebook/config") {
+		if (open IN, $p) {
+			my ($atr, $val);
+			while (<IN>) {
+				chomp;
+				next  if (/^\s*\#/o);
+				($atr, $val) = split(/\s*\=\>\s*/o, $_, 2);
+				eval "\$uops{$atr} = $val";
+			}
+			close IN;
+		}
+	}
+	foreach my $i (qw(agent from conn_cache default_headers local_address ssl_opts max_size
+			max_redirect parse_head protocols_allowed protocols_forbidden requests_redirectable
+			proxy no_proxy)) {
+		push @userAgentOps, $i, $uops{$i}  if (defined $uops{$i});
+	}
+	push (@userAgentOps, 'agent', 'Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101 Firefox/68.0')
+			unless (defined $uops{'agent'});
+	$uops{'timeout'} = 10  unless (defined $uops{'timeout'});
+	$DEBUG = $uops{'debug'}  if (defined $uops{'debug'});
+
 	while (@_) {
 		if ($_[0] =~ /^\-?debug$/o) {
 			shift;
@@ -252,11 +331,9 @@ sub new
 		}
 	}	
 
-	my $self = {};
-	return undef  unless ($url);
-
 	my $fbid = '';
 	my $fbpw = '';
+	#DEPRECIATED:  USE $ENV{HOME}/.config/StreamFinder/Facebook/config!:
 	if (open (IN, "<$ENV{HOME}/.config/.fbdata")) {  #FACEBOOK REQUIRES YOUR LOGIN CRADENTIALS!
 		$fbid = <IN>;
 		chomp $fbid;
@@ -264,6 +341,10 @@ sub new
 		chomp $fbpw;
 		close IN;
 	}
+	#END DEPRECIATED
+
+	$fbid = $uops{'userid'}  if (defined $uops{'userid'});
+	$fbpw = $uops{'userpw'}  if (defined $uops{'userpw'});
 	return undef  unless ($fbid && $fbpw);
 	print STDERR "-0(Facebook): URL=$url=\n"  if ($DEBUG);
 
@@ -340,8 +421,8 @@ sub getIconData
 {
 	my $self = shift;
 	return ()  unless ($self->{'iconurl'});
-	my $ua = LWP::UserAgent->new;		
-	$ua->timeout(10);
+	my $ua = LWP::UserAgent->new(@userAgentOps);
+	$ua->timeout($uops{'timeout'});
 	$ua->cookie_jar({});
 	$ua->env_proxy;
 	my $art_image = '';
@@ -350,6 +431,12 @@ sub getIconData
 		$art_image = $response->decoded_content;
 	} else {
 		print STDERR $response->status_line  if ($DEBUG);
+		my $no_wget = system('wget','-V');
+		unless ($no_wget) {
+			print STDERR "\n..trying wget...\n"  if ($DEBUG);
+			my $iconUrl = $self->{'iconurl'};
+			$art_image = `wget -t 2 -T 20 -O- -o /dev/null \"$iconUrl\" 2>/dev/null `;
+		}
 	}
 	return ()  unless ($art_image);
 	(my $image_ext = $self->{'iconurl'}) =~ s/^.+\.//;

@@ -1,7 +1,7 @@
 package Perinci::Exporter;
 
-our $DATE = '2019-08-15'; # DATE
-our $VERSION = '0.080'; # VERSION
+our $DATE = '2019-09-10'; # DATE
+our $VERSION = '0.083'; # VERSION
 
 # IFUNBUILT
 # use strict 'subs', 'vars';
@@ -336,9 +336,11 @@ Perinci::Exporter - An exporter that groks Rinci metadata
 
 =head1 VERSION
 
-This document describes version 0.080 of Perinci::Exporter (from Perl distribution Perinci-Exporter), released on 2019-08-15.
+This document describes version 0.083 of Perinci::Exporter (from Perl distribution Perinci-Exporter), released on 2019-09-10.
 
 =head1 SYNOPSIS
+
+Exporting:
 
  package YourModule;
 
@@ -353,13 +355,67 @@ This document describes version 0.080 of Perinci::Exporter (from Perl distributi
  sub f1 { ... }
 
  # f2 will be exported by default because it has the export:default tag
- $SPEC{f2} = { v=>1.1, tags=>[qw/a export:default/] };
- sub f2 { ... }
+ $SPEC{f2} = {
+     v=>1.1,
+     args=>{a1=>{schema=>"float*",req=>1, pos=>0}, a2=>{schema=>'float*', req=>1, pos=>1}},
+     tags=>[qw/a export:default/],
+ };
+ sub f2 {
+     my %args = @_;
+ }
 
  # f3 will never be exported, and user cannot import them via 'use YourModule
- # qw(f1)' nor via 'use YourModule qw(:a)'
+ # qw(f3)' nor via 'use YourModule qw(:a)'
  $SPEC{f3} = { v=>1.1, tags=>[qw/a export:never/] };
  sub f3 { ... }
+
+ 1;
+
+Importing:
+
+ # does not import anything
+ use YourModule ();
+
+ # imports all functions tagged with 'export:default' (f2)
+ use YourModule;
+
+ # explicitly import functions by name (f1, f2)
+ use YourModule qw(f1 f2);
+
+ # explicitly import functions by tag (f2)
+ use YourModule qw(:a);
+
+ # add per-import options: rename/add prefix/add suffix. both statements below
+ # will cause f2 to be exported as foo_f2_bar. while f1 is simply exported as
+ # f1.
+ use YourModule f2   => { as => 'foo_f2_bar' }, f1 => {};
+ use YourModule ':a' => { prefix => 'foo_', suffix => '_bar' }, f1=>{};
+
+ # per-import option: timeout to limit execution of each invocation to 3
+ # seconds. requires Perinci::Sub::Wrapper and Perinci::Sub::Property::timeout.
+ use YourModule f2 => { timeout=>3 };
+
+ # per-import option: change calling convention from named argument to
+ # positional. requires wrapping (Perinci::Sub::Wrapper).
+ use YourModule f2 => { args_as=>'array' };
+ # now instead of calling f2 with f2(a1=>3, a2=>4), you do f2(3, 4)
+
+ # per-import option: retry on failure. requires wrapping
+ # (Perinci::Sub::Wrapper) and Perinci::Sub::Property::retry. See
+ # Perinci::Sub::Property::retry for more details.
+ use YourModule f2 => { retry=>3 };
+
+ # XXX other per-import options
+
+ # import option: set prefix/suffix for all imports. the statement below will
+ # import foo_f1_bar and foo_f2_bar.
+ use YourModule 'f1', 'f2', -prefix=>'foo', -suffix=>'bar';
+
+ # import option: define behavior when an import clashes with existing symbol.
+ # the default is 'force' which, like Exporter, will force importing anyway
+ # without warning, overriding existing symbol. another option is to 'bail'
+ # (die).
+ use YourModule 'f1', 'f2', -on_clash=>'die';
 
 =head1 DESCRIPTION
 

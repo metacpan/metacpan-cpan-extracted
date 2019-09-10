@@ -3,7 +3,10 @@ abstract: 'Feature-complete Cucumber-style testing in Perl'
 author:
   - 'Peter Sergeant <pete@clueball.com>'
   - 'Erik Huelsmann <ehuels@gmail.com>'
-build_requires: {}
+build_requires:
+  IO::Scalar: '0'
+  Test::Differences: '0'
+  Test::Exception: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -15,11 +18,9 @@ meta-spec:
 name: Test-BDD-Cucumber
 requires:
   Clone: '0'
-  Devel::Refcount: '0'
   Digest::SHA: '0'
   File::Find::Rule: '0'
   Getopt::Long: '0'
-  IO::Scalar: '0'
   JSON::MaybeXS: '1.001000'
   List::MoreUtils: '0'
   List::Util: '0'
@@ -31,9 +32,7 @@ requires:
   TAP::Parser::Iterator::Stream: '0'
   TAP::Parser::SourceHandler: '0'
   Term::ANSIColor: '3.00'
-  Test::Builder: '0'
-  Test::Differences: '0'
-  Test::Exception: '0'
+  Test2::API: '1.302084'
   Test::More: '0'
   Type::Tiny: '0'
   YAML::Syck: '0'
@@ -41,7 +40,7 @@ requires:
 resources:
   bugtracker: https://github.com/pherkin/test-bdd-cucumber-perl/issues
   repository: https://github.com/pherkin/test-bdd-cucumber-perl.git
-version: '0.60'
+version: '0.62'
 x_contributors:
   - 'Aliaksei Palkanau <lifusexitus@gmail.com>'
   - 'Ben Rogers <ben@bdr.org>'

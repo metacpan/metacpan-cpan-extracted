@@ -26,22 +26,11 @@ use Sim::OPT::Report;
 use Sim::OPT::Descend;
 use Sim::OPT::Takechance;
 
-#Devel::Trace::trace('on');  # Enable
-#use Parallel::ForkManager;
-#use Scalar::Utils qw( looks_like_number );
-#$Data::Dumper::Indent = 0;
-#$Data::Dumper::Useqq  = 1;
-#$Data::Dumper::Terse  = 1;
 use Data::Dump qw(dump);
 use feature 'say';
 
 no strict;
 no warnings;
-#use diagnostics;
-#use diagnostics -verbose;
-#enable  diagnostics;
-#disable diagnostics;
-use warnings::unused;
 @ISA = qw( Exporter );
 
 
@@ -91,7 +80,6 @@ sub morph
 	my @varthemes_report = @main::varthemes_report;
 	my @varthemes_variations = @main::varthemes_variations;
 	my @varthemes_steps = @main::varthemes_steps;
-	my @rankdata = @main::rankdata; # CUT ZZZ
 	my @rankcolumn = @main::rankcolumn;
 	my %reportdata = %main::reportdata;
 	my @files_to_filter = @main::files_to_filter;
@@ -262,7 +250,7 @@ sub morph
 	################ $countinstance = 1;
 	foreach my $instance ( @instances )
 	{
-		my %d = %{ $instance }; #say $tee "IN MORPH dump(\%d): " . dump(%d);
+		my %d = %{ $instance };
 		my $instance_after = $instances[ $countinstance + 1];
 		my %d_after = %{ $instance_after };
 
@@ -270,7 +258,7 @@ sub morph
 		my $countblock = $d{countblock};
 		my %datastruc = %{ $d{datastruc} }; ######
 		my @rescontainer = @{ $d{rescontainer} }; ######
-		my @miditers = @{ $d{miditers} }; #say "\@miditers: " . dump( @miditers );
+		my @miditers = @{ $d{miditers} };
 		my @winneritems = @{ $d{winneritems} };
 		my $countvar = $d{countvar};
 		my @countvars;
@@ -278,7 +266,6 @@ sub morph
 		my $countvar_after = $d_after{countvar};
 		my $countstep = $d{countstep};
 		my $countinstance = ( $d{instn} );
-		#say $tee "IN MORPH! \$countinstance: " . dump( $countinstance );
 
 		my @uplift = @{ $d{uplift} };
 		my @backvalues = @{ $d{backvalues} };
@@ -287,20 +274,19 @@ sub morph
 		my @blockelts = @{ $d{blockelts} };
 		my @blocks = @{ $d{blocks} };
 
-		my $origin = $d{origin}; #say $tee "IN MORPH, \$origin: " . dump( $origin );
-		my %to = %{ $d{to} }; #say $tee "IN MORPH, \%to: " . dump( \%to );
-		my %inst = %{ $d{inst} }; #say $tee "IN MORPH, \%inst: " . dump( \%inst );
+		my $origin = $d{origin};
+		my %to = %{ $d{to} };
+		my %inst = %{ $d{inst} };
 
-		my $from = $d{from}; #say $tee " IN MORPH \$from $from ";
-		my $toitem = $d{toitem}; #say $tee " IN MORPH \$toitem $toitem ";
+		my $from = $d{from};
+		my $toitem = $d{toitem};
 
 		my %varnums = %{ $d{varnums} };
-		my %mids = %{ $d{mids} }; #say "\%mids: " . dump( \%mids );
-		my $rootname = Sim::OPT::getrootname( \@rootnames, $countcase ); #say $tee " IN MORPH \$rootname $rootname ";
+		my %mids = %{ $d{mids} };
+		my $rootname = Sim::OPT::getrootname( \@rootnames, $countcase );
 
-		my $varnumber = $countvar; #say $tee "IN MORPH! \$countvar and \$varnumber : " . dump( $countvar );
-		my $stepsvar = $varnums{$countvar}; #say $tee "IN MORPH! \$stepsvar : " . dump( $stepsvar ); say $tee "IN MORPH! \$countvar : " . dump( $countvar );
-
+		my $varnumber = $countvar;
+		my $stepsvar = $varnums{$countvar};
 		my $countcaseplus1 = ( $countcase + 1 );
 		my $countblockplus1 = ( $countblock + 1 );
 
@@ -311,7 +297,7 @@ sub morph
 		my ( %these );
 		if ( ( $dirfiles{randompick} eq "yes" ) or ( $dirfiles{ga} eq "yes" ) )
 		{
-			my $string = $instance->{is}; #say "STRING: $string";
+			my $string = $instance->{is};
 			my @els = split( "_", $string );
 
 			foreach my $el ( @els )
@@ -345,10 +331,7 @@ sub morph
 					$dowhat{actonmodels} = "y";
 				}
 
-				#say $tee "IN MORPH! \$countmorphing : " . dump( $countmorphing );
-				#say $tee "IN MORPH! \$countvar : " . dump( $countvar );
-				#say $tee "IN MORPH! \%vals : " . dump( \%vals );
-				my @applytype = @{ $vals{$countmorphing}{$countvar}{applytype} }; #say $tee "IN MORPH! \@applytype : " . dump( @applytype );
+				my @applytype = @{ $vals{$countmorphing}{$countvar}{applytype} };
 				my $general_variables = $vals{$countmorphing}{$countvar}{general_variables};
 				my @generic_change = @{$vals{$countmorphing}{$countvar}{generic_change} };
 				my $rotate = $vals{$countmorphing}{$countvar}{rotate};
@@ -388,7 +371,7 @@ sub morph
 				my $todos = $vals{$countmorphing}{$countvar}{todos};
 				# genchange
 				my ( @cases_to_sim, @files_to_convert );
-				my ( @obs, @node, @component, @loopcontrol, @flowcontrol, @new_loopcontrol, @new_flowcontrol ); # THINGS globsAL AS REGARDS TO COUNTER ZONE CYCLES
+				my ( @obs, @node, @component, @loopcontrol, @flowcontrol, @new_loopcontrol, @new_flowcontrol ); # THINGS GLOBAL AS REGARDS TO COUNTER ZONE CYCLES
 				my ( @myobs, @mynode, @mycomponent, @myloopcontrol, @myflowcontrol); # THINGS LOCAL AS REGARDS TO COUNTER ZONE CYCLES
 				my ( @tempv, @tempobs, @tempnode, @tempcomponent, @temploopcontrol, @tempflowcontrol); # THINGS LOCAL AS REGARDS TO COUNTER ZONE CYCLES
 				my ( @v, @v_, @obs_, @donode, @docomponent, @doloopcontrol, @doflowcontrol); # THINGS LOCAL AS REGARDS TO COUNTER ZONE CYCLES
@@ -410,14 +393,13 @@ sub morph
 							my $target;
 							unless ($exeonfiles eq "n")
 							{
-								$target = $inst{$dirfiles{starter}}; #say $tee "FIRSTTARGET IN MORPH1: \$target " .dump( $target );
+								$target = $inst{$dirfiles{starter}};
 								if ( ( $dirfiles{randompick} eq "yes" ) or ( $dirfiles{ga} eq "yes" ) )
 								{
 									$target = "$mypath/$file" . "_" . $instance->{is};
 								}
 								`cp -R $mypath/$file $target`;
 								say $tee "LEVEL 0: cp -R $mypath/$file $target\n";
-								#my $cleartarget = $dirfiles{starter}; #say $tee "FIRST CLEAR TARGET IN MORPH1: \$cleartarget " .dump( $cleartarget );
 								say $tee "THAT IS TO SAY, LEVEL 0: cp -R $mypath/$file $cleartarget\n";
 							}
 						}
@@ -442,7 +424,7 @@ sub morph
 						{
 							unless ($exeonfiles eq "n")
 							{
-								my $target = $to{crypto}; #say $tee "TARGET IN MORPH: \$target " .dump( $target );
+								my $target = $to{crypto};
 
 								my $orig;
 
@@ -458,26 +440,25 @@ sub morph
 								}
 								else
 								{
-									$orig = $inst{$origin}; #say $tee "ORIGIN IN MORPH: \$orig " .dump( $orig );
+									$orig = $inst{$origin};
 									`cp -R $orig $target\n`;
 									print $tee "LEVEL 1: cp -R $orig $target\n\n";
 								}
 
-								my $cleartarget = $to{to}; #say $tee "CLEAR TARGET IN MORPH: \$cleartarget " .dump( $cleartarget );
+								my $cleartarget = $to{to};
 								print $tee "THAT IS TO SAY, LEVEL 1: cp -R $origin $cleartarget\n\n";
 							}
 						}
 
-						#say $tee "IN MORPH NEAR REASSIGNMNENT: \$dowhat{actonmodels} " .dump( $dowhat{actonmodels} );
 						if ( $dowhat{actonmodels} eq "y" )
 						{
 							my $countop = 0; # "$countop" IS THE COUNTER OF THE OPERATIONS
-							foreach my $op ( @applytype ) # "$op" MEANS OPERATION
+							foreach my $op ( @applytype )
 							{
-								my $to = $to{crypto}; #say $tee "IN MORPH: REASSIGNIMENT!!! \$to " .dump( $to ); ### TAKE CARE!!! REASSIGNIMENT!!!
-								my $origin = $inst{$origin}; #say $tee "IN MORPH: REASSIGNIMENT!!! \$origin " .dump( $origin ); ### TAKE CARE!!! REASSIGNIMENT!!!
+								my $to = $to{crypto}; ### TAKE CARE!!! REASSIGNIMENT!!!
+								my $origin = $inst{$origin}; ### TAKE CARE!!! REASSIGNIMENT!!!
 								my $skip = $skipop->[ $countop ]	;
-								my $modification_type = $applytype[$countop][0]; #say $tee "\$modification_type: $modification_type"; #
+								my $modification_type = $applytype[$countop][0];
 								if ( ( $applytype[$countop][1] ne $applytype[$countop][2] ) and ( $modification_type ne "changeconfig" ) )
 								{
 
@@ -505,7 +486,6 @@ sub morph
 								say $tee "cd $to\n";
 
 								my $launchline = " -file $to/cfg/$fileconfig -mode script"; say $tee "SO, LAUNCHLINE! " . dump( $launchline );
-								#say $tee "NOW MODIFICATION TYPE! $modification_type ";
 
 								if ( ( $stepsvar > 0 ) and ( not ( eval ( $skip ) ) ) )
 								{
@@ -530,7 +510,7 @@ sub morph
 											( $to, $stepsvar, $countop, $countstep,
 												\@applytype, $change_groundreflectance, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
 										}
-										elsif ( $modtype eq "genchange" )#
+										elsif ( $modtype eq "genchange" )
 										{
 											( $names_ref, $nums_ref, $newcontents_ref, $filecontents_ref, $newfilecontents_ref ) = genchange
 											( $to, $stepsvar, $countop, $countstep,
@@ -540,7 +520,6 @@ sub morph
 											%names = %$names_ref;
 											%nums = %$nums_ref;
 											%newcontents = %$newcontents_ref;
-											#@filecontents = @$filecontents_ref;
 											@newfilecontents = @$newfilecontents_ref;
 										} #
 										elsif ( $modtype eq "generic_change" )#
@@ -787,8 +766,6 @@ sub morph
 									}
 
 
-
-
 									if ( ( $countvar_after > $countvar )
 										or ( defined( $countvar ) and ( not ( defined( $countvar_after ) ) ) and ( not( scalar( @todolist ) == 0 ) ) ) )
 									{
@@ -818,8 +795,6 @@ sub morph
 											}
 
 
-
-
 											my ( @nondone_tos, @nondone_instances );
 											my $countinst = 0;
 											foreach ( @expected_tos )
@@ -837,18 +812,12 @@ sub morph
 											}
 											@nondone_tos = uniq( @nondone_tos );
 											@nondone_instances = uniq( @nondone_instances );
-											#say $tee "COMPLETED THE FOLLOWING CASES : " . dump( @{ $done_tos[ $countvar ] } ) . " ";
-											#say $tee "SO ABOUT TO FIX EX-POST THE REMAINING CASES : " . dump( @nondone_tos ) . " ";
-
 
 											my $numberof = scalar( @nondone_instances );
 											my $cou = 0;
 											my $countt = 1;
 											foreach my $inst ( @nondone_instances )
 											{
-												#say $tee "FINALLY ACTING ON \@nondone_instances : " . dump( @nondone_instances ) .  "BY LOOPING THROUGH \@todolist : " . dump( @todolist );;
-												#say $tee "FINALLY ACTING ON \@nondone_instances BY LOOPING THROUGH \@todolist : " . dump( @todolist );
-
 
 												$countt++;
 												my $numberdone = ( $cou + 1 );
@@ -1009,7 +978,6 @@ sub morph
 
 		close MORPHLIST;
 		close MORPHBLOCK;
-		#$countinstance++;
 	}
 	close TOFILE;
 	close OUTFILE;
@@ -1198,7 +1166,7 @@ sub fixlength
 		if ( not ( $el =~ /\./ ) )
 		{
 			my $thisel = "$el" . ".000";
-			$adjustedlength = length( $thisel ); #ay "\$length !: " . dump( $length );
+			$adjustedlength = length( $thisel );
 			$truenewel = substr( $newel, 0, $adjustedlength);
 		}
 		$truenewel = " " . "$truenewel";
@@ -1208,7 +1176,7 @@ sub fixlength
 		if ( $el =~ /\./ )
 		{
 			my $thisel = "$el" . "000";
-			$adjustedlength = length( $thisel ); #say "\$length !: " . dump( $length );
+			$adjustedlength = length( $thisel );
 			$truenewel = substr( $newel, 0, $adjustedlength);
 		}
 	}
@@ -1393,12 +1361,12 @@ YYY
 			print `$printthis`;
 		}
 
-		my $pinobs =  $$translate[$countop][3];  #say $tee "PINOBS " . dump( $pinobs );
+		my $pinobs =  $$translate[$countop][3];
 		if ( defined( $pinobs ) and ref( $pinobs ) )
 		{
 			my @infos = @{ $pinobs };
-			my $sourcefile = shift( @infos ); #say $tee "@infos " . dump( @infos );
-		  my $sourcepath = "$mypath/$file/zones/$sourcefile"; #say $tee "\$sourcepath $sourcepath";
+			my $sourcefile = shift( @infos );
+		  my $sourcepath = "$mypath/$file/zones/$sourcefile";
 			my %keeplines ;
 			my @newlines;
 			open ( SOURCEFILE, $sourcepath ) or die( "$!" );
@@ -1414,9 +1382,9 @@ YYY
 						$keeplines{$obs} = $line ;
 					}
 				}
-			} #say $tee "\%keeplines " . dump( \%keeplines );
-			my $targetpath = "$to/zones/$sourcefile"; #say $tee "\$targetpath $targetpath";
-			my $oldfile = $targetpath . ".old"; #say $tee "\$oldfile $oldfile";
+			}
+			my $targetpath = "$to/zones/$sourcefile";
+			my $oldfile = $targetpath . ".old";
 
 
 			`mv -f $targetpath $oldfile`;
@@ -1435,7 +1403,7 @@ YYY
 					{
 						if  ( $line =~ / $obs$/ )
 						{
-							$line = $keeplines{$obs}; #say $tee "FOUND: LINE $line";
+							$line = $keeplines{$obs};
 						}
 					}
 				}
@@ -1444,15 +1412,12 @@ YYY
 			close NEWFILE;
 		}
 
-
-
-
 		print $tee
 		"#Translating zones for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.\"
 $printthis
 ";
 	}
-}    # end sub translate
+} # end sub translate
 
 
 sub translate_surfaces
@@ -1728,7 +1693,7 @@ $printthis";
 		}
 		$countrotate++;
 	}
-}    # END SUB rotate_surface
+} # END SUB rotate_surface
 
 
 sub translate_vertices
@@ -1737,7 +1702,7 @@ sub translate_vertices
 		$countvar, $fileconfig , $mypath, $file, $countmorphing, $launchline, $menus_ref, $countinstance ) = @_;
 
 	my @applytype = @$applytype_ref;
-	my @translate_vertices = @$translate_vertices_ref; #say $tee "IN MORPH \@translate_vertices: " . dump( @translate_vertices );
+	my @translate_vertices = @$translate_vertices_ref;
 
 	my @menus = @$menus_ref;
 	my %numvertmenu = %{ $menus[0] };
@@ -1781,15 +1746,12 @@ sub translate_vertices
 		}
 	}
 
-	#say $tee "IN MORPH RECEIVED VERTS: " . dump( @v );
-	#say $tee "SOURCEADDRESS: " . dump( $sourceaddress );
-
 	my $countvertex = 0;
 	foreach my $base_coordinates_ref ( @transform_coordinates )
 	{
 		( $x_swing, $y_swing, $z_swing, $x_base, $y_base, $z_base );
 		my $vertex_letter = $verts{ $verts_to_transl[ $countvertex ] };
-		my @basevs = @{ $v[ $countvertex ] }; #say $tee "\@basevs: " . dump( @basevs );
+		my @basevs = @{ $v[ $countvertex ] };
 		my ( $x_base, $y_base, $z_base, $vertexletter ) = ( $basevs[0], $basevs[1], $basevs[2], $basevs[3] );
 
 		my @base_coordinates = @{ $base_coordinates_ref };
@@ -2105,12 +2067,12 @@ YYY
 		}
 
 
-		my $pinobs =  $$rotate[$countop][4];  #say $tee "PINOBS " . dump( $pinobs );
+		my $pinobs =  $$rotate[$countop][4];
 		if ( defined( $pinobs ) and ref( $pinobs ) )
 		{
 			my @infos = @{ $pinobs };
-			my $sourcefile = shift( @infos ); #say $tee "@infos " . dump( @infos );
-			my $sourcepath = "$mypath/$file/zones/$sourcefile"; #say $tee "\$sourcepath $sourcepath";
+			my $sourcefile = shift( @infos );
+			my $sourcepath = "$mypath/$file/zones/$sourcefile";
 			my %keeplines ;
 			my @newlines;
 			open ( SOURCEFILE, $sourcepath ) or die( "$!" );
@@ -2126,9 +2088,9 @@ YYY
 						$keeplines{$obs} = $line ;
 					}
 				}
-			} #say $tee "\%keeplines " . dump( \%keeplines );
-			my $targetpath = "$to/zones/$sourcefile"; #say $tee "\$targetpath $targetpath";
-			my $oldfile = $targetpath . ".old"; #say $tee "\$oldfile $oldfile";
+			}
+			my $targetpath = "$to/zones/$sourcefile";
+			my $oldfile = $targetpath . ".old";
 
 
 			`mv -f $targetpath $oldfile`;
@@ -2147,7 +2109,7 @@ YYY
 					{
 						if  ( $line =~ / $obs$/ )
 						{
-							$line = $keeplines{$obs}; #say $tee "FOUND: LINE $line";
+							$line = $keeplines{$obs};
 						}
 					}
 				}
@@ -2165,7 +2127,7 @@ YYY
 $printthis
 ";
 	}
-}    # END SUB rotate
+} # END SUB rotate
 
 
 sub rotatez # PUT THE ROTATION POINT AT POINT 0, 0, 0. I HAVE NOT YET MADE THE FUNCTION GENERIC ENOUGH.
@@ -2399,8 +2361,7 @@ YYY
 $printthis";
 		$count++;
 	}
-
-}    # END SUB reassign_construction
+} # END SUB reassign_construction
 
 
 sub change_thickness
@@ -2414,9 +2375,9 @@ sub change_thickness
 
 	say "Changing thicknesses in construction layer for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
-	my @entries_to_change = @{ $$thickness_change[$countop][0] }; #say $tee "\@entries_to_change: " . dump( @entries_to_change ) ;
-	my @groups_of_strata_to_change = @{ $$thickness_change[$countop][1] }; #say $tee "\@groups_of_strata_to_change: " . dump( @groups_of_strata_to_change ) ;
-	my @groups_of_couples_of_min_max_values = @{ $$thickness_change[$countop][2] }; #say $tee "\@groups_of_couples_of_min_max_values: " . dump( @groups_of_couples_of_min_max_values ) ;
+	my @entries_to_change = @{ $$thickness_change[$countop][0] };
+	my @groups_of_strata_to_change = @{ $$thickness_change[$countop][1] };
+	my @groups_of_couples_of_min_max_values = @{ $$thickness_change[$countop][2] };
 
 	my $thiscount = 0;
 	my ( $entry_to_change, $countstrata, $stratum_to_change, $min, $max, $change_stratum, $enter_change_entry, $swing, $pace, $thickness );
@@ -2424,7 +2385,7 @@ sub change_thickness
 	if ( $stepsvar > 1 )
 	{
 		foreach my $entrypair_to_change ( @entries_to_change )
-		{   #say $tee "\$entry_to_change: " . dump( $entry_to_change ) ; say $tee "\$countstep: " . dump( $countstep ) ; say $tee "\$stepsvar: " . dump( $stepsvar ) ;
+		{
 
 			if ( not( ref( $entrypair_to_change ) ) )
 			{
@@ -2436,16 +2397,16 @@ sub change_thickness
 				my $entry_to_change = $entrypair_to_change->[1];
 			}
 
-			@strata_to_change = @{ $groups_of_strata_to_change[$thiscount] }; #say $tee "\@strata_to_change: " . dump( @strata_to_change ) ;
+			@strata_to_change = @{ $groups_of_strata_to_change[$thiscount] };
 			$countstrata = 0;
 			foreach $stratum_to_change ( @strata_to_change )
-			{   #say $tee "\$stratum_to_change: " . dump( $stratum_to_change ) ;
-				my @min_max_values = @{ $groups_of_couples_of_min_max_values[$thiscount][$countstrata] }; #say $tee "\@min_max_values: " . dump( @min_max_values ) ;
-				my $min   = $min_max_values[0]; #say $tee "\$min: " . dump( $min ) ;
-				my $max   = $min_max_values[1]; #say $tee "\$max: " . dump( $max ) ;
-				my $swing = $max - $min; #say $tee "\$swing: " . dump( $swing ) ;
-				my $pace  = ( $swing / ( $stepsvar - 1 ) ); #say $tee "\$pace: " . dump( $pace ) ;
-				my $thickness = $min + ( $pace * ( $countstep - 1 ) ); #say $tee "\$thickness: " . dump( $thickness ) ;
+			{
+				my @min_max_values = @{ $groups_of_couples_of_min_max_values[$thiscount][$countstrata] };
+				my $min   = $min_max_values[0];
+				my $max   = $min_max_values[1];
+				my $swing = $max - $min;
+				my $pace  = ( $swing / ( $stepsvar - 1 ) );
+				my $thickness = $min + ( $pace * ( $countstep - 1 ) );
 				my $layers = ( i => 1, j => 2, k => 3, l => 4, m => 5, n => 6, o => 7, p => 8, q => 9, r => 10, s => 11, t => 12, u => 13, v => 14, w => 15 );
 
 
@@ -2557,35 +2518,31 @@ sub readobsfile
 sub obs_modify
 {
 	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $obs_modify_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref, $countinstance ) = @_;
-	my @applytype = @$applytype_ref; #say $tee "\@applytype : " . dump( @applytype );
-	my $geofile = $applytype[$countop][2]; #say $tee "\$geofile : " . dump( $geofile );
-	my $zone_letter = $applytype[$countop][3]; #say $tee "\$zone_letter : " . dump( $zone_letter );
+	my @applytype = @$applytype_ref;
+	my $geofile = $applytype[$countop][2];
+	my $zone_letter = $applytype[$countop][3];
 
 	my @menus = @$menus_ref;
 	my %numvertmenu = %{ $menus[0] };
 	my %vertnummenu = %{ $menus[1] };
 
 	say $tee "Modifying obstructions for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
-	my $case_cycle_ref = $obs_modify_ref->[$countop]; #say $tee "\$case_cycle_ref : " . dump( $case_cycle_ref );
-	#my @case_cycle = @$case_cycle_ref; say $tee "\@case_cycle : " . dump( @case_cycle );
-	my $configfile = $geofile; #say $tee "\$configfile : $configfile" ;
-	my $fullgeopath = "$to/zones/$geofile"; #say $tee "\$fullgeopath : $fullgeopath" ;
-	my @obsrefs = @{ $case_cycle_ref }; #say $tee "\@obsrefs : " . dump( @obsrefs );
+	my $case_cycle_ref = $obs_modify_ref->[$countop];
+	my $configfile = $geofile;
+	my $fullgeopath = "$to/zones/$geofile";
+	my @obsrefs = @{ $case_cycle_ref };
 
-	#say $tee "\$fullgeopath : " . dump( $fullgeopath );
-	my %obsts = readobsfile( $fullgeopath ); #say $tee "\%obsts : " . dump( %obsts );
-
+	my %obsts = readobsfile( $fullgeopath );
 
 	foreach my $obs ( @obsrefs )
 	{
-		my @obsletters = @{ $obs->[0] }; #say $tee "\@obsletters : " . dump( @obsletters );
-		my $modification_type = $obs->[1]; #say $tee "\$modification_type $modification_type ";
-		my $values_ref = $obs->[2]; #say $tee "\$values_ref : " . dump( $values_ref );
+		my @obsletters = @{ $obs->[0] };
+		my $modification_type = $obs->[1];
+		my $values_ref = $obs->[2];
 
 		my $countobs = 0;
 		foreach my $obsletter ( @obsletters )
 		{
-			#my $xz_resolution = $obs->[3]; say $tee "\$xz_resolution $xz_resolution ";
 			my ( $value, $basevalue, $swing, $low, $high );
 			my ( $x_end, $y_end, $z_end, $zory_end, $x_base, $base, $y_base, $z_base, $end_value, $base_value, $swing, $x_swing,
 			$y_swing, $z_swing, $pace, $value, $x_pace, $x_value, $y_pace, $y_value, $z_pace, $z_value,
@@ -2596,84 +2553,84 @@ sub obs_modify
 
 			if ( $modification_type eq "a" )
 			{
-				@base = @{ $obsts{$obsletter}{origin} }; #say $tee "MOD TYPE A \@base : " . dump( @base );
+				@base = @{ $obsts{$obsletter}{origin} };
 			}
 			elsif ( $modification_type eq "b" )
 			{
-				@base = @{ $obsts{$obsletter}{dimensions} }; #say $tee "MOD TYPE B \@base : " . dump( @base );
+				@base = @{ $obsts{$obsletter}{dimensions} };
 			}
 			elsif ( $modification_type eq "c" )
 			{
-				@base = ( $obsts{$obsletter}{z_rotation} ); #say $tee "\@base : " . dump( @base );
+				@base = ( $obsts{$obsletter}{z_rotation} );
 			}
 			elsif ( $modification_type eq "d" )
 			{
-				@base = ( $obsts{$obsletter}{y_rotation} ); #say $tee "\@base : " . dump( @base );
+				@base = ( $obsts{$obsletter}{y_rotation} );
 			}
 			elsif ( $modification_type eq "f" )
 			{
-				@base = ( $obsts{$obsletter}{name} ); #say $tee "\@base : " . dump( @base );
+				@base = ( $obsts{$obsletter}{name} );
 			}
 			elsif ( $modification_type eq "g" )
 			{
-				@base = ( $obsts{$obsletter}{construction} ); #say $tee "\@base : " . dump( @base );
+				@base = ( $obsts{$obsletter}{construction} );
 			}
 
 			if ( ( $modification_type eq "a" ) or ( $modification_type eq "b" ) )
 			{
-				my ( $x_base, $y_base, $z_base ) = @base; #say $tee "\$x_base : $x_base" ; say $tee "\$y_base : $y_base" ; say $tee "\$z_base : $z_base" ;
+				my ( $x_base, $y_base, $z_base ) = @base;
 
 				if ( ref( $values_ref->[0] ) )
 				{
 
-					@coord1 = @{ $values_ref->[0] }; #say $tee "\@coord1 : " . dump( @coord1 );
-					@coord2 = @{ $values_ref->[1] }; #say $tee "\@coord2 : " . dump( @coord2 );
+					@coord1 = @{ $values_ref->[0] };
+					@coord2 = @{ $values_ref->[1] };
 					( $x_begin, $y_begin, $z_begin ) = @coord1;
 					( $x_end, $y_end, $z_end ) = @coord2;
 
-					$x_swing = ( $x_end - $x_begin ); #say $tee "\$x_swing $x_swing ";
-					$y_swing = ( $y_end - $y_begin ); #say $tee "\$y_swing $y_swing ";
-					$z_swing = ( $z_end - $z_begin ); #say $tee "\$z_swing $z_swing ";
+					$x_swing = ( $x_end - $x_begin );
+					$y_swing = ( $y_end - $y_begin );
+					$z_swing = ( $z_end - $z_begin );
 
-					$x_newbase = ( $x_base + $x_begin ); #say $tee "\$x_newbase $x_newbase ";
-					$y_newbase = ( $y_base + $y_begin ); #say $tee "\$y_newbase $y_newbase ";
-					$z_newbase = ( $z_base + $z_begin ); #say $tee "\$z_newbase $z_newbase ";
+					$x_newbase = ( $x_base + $x_begin );
+					$y_newbase = ( $y_base + $y_begin );
+					$z_newbase = ( $z_base + $z_begin );
 
-					$x_pace = ( $x_swing / $nofspaces ); #say $tee "\$x_pace $x_pace ";
-					$y_pace = ( $y_swing / $nofspaces ); #say $tee "\$y_pace $y_pace ";
-					$z_pace = ( $z_swing / $nofspaces ); #say $tee "\$z_pace $z_pace ";
+					$x_pace = ( $x_swing / $nofspaces );
+					$y_pace = ( $y_swing / $nofspaces );
+					$z_pace = ( $z_swing / $nofspaces );
 
-					$x_value = ( $x_newbase + ( $x_pace * ( $countstep - 1) ) ); #say $tee "\$x_value $x_value ";
-					$y_value = ( $y_newbase + ( $y_pace * ( $countstep - 1) ) ); #say $tee "\$y_value $y_value ";
-					$z_value = ( $z_newbase + ( $z_pace * ( $countstep - 1) ) ); #say $tee "\$z_value $z_value ";
+					$x_value = ( $x_newbase + ( $x_pace * ( $countstep - 1) ) );
+					$y_value = ( $y_newbase + ( $y_pace * ( $countstep - 1) ) );
+					$z_value = ( $z_newbase + ( $z_pace * ( $countstep - 1) ) );
 
 				}
 				else
 				{
-					$values = $values_ref; #say $tee "\$values : " . dump( $values );
-					$x_end = $values->[0]; #say $tee "\$x_end $x_end ";
-					$x_swing = ( 2 * $x_end ); #say $tee "\$x_swing $x_swing ";
-					$x_base = $base[0]; #say $tee "\$x_base $x_base ";
+					$values = $values_ref;
+					$x_end = $values->[0];
+					$x_swing = ( 2 * $x_end );
+					$x_base = $base[0];
 
-					$y_end = $values->[1]; #say $tee "\$y_end $y_end ";
-					$y_swing = ( 2 * $y_end ); #say $tee "\$y_swing $y_swing ";
-					$y_base = $base[1]; #say $tee "\$y_base $y_base ";
+					$y_end = $values->[1];
+					$y_swing = ( 2 * $y_end );
+					$y_base = $base[1];
 
-					$z_end = $values->[2]; #say $tee "\$z_end $z_end ";
-					$z_swing = ( 2 * $z_end ); #say $tee "\$z_swing $z_swing ";
-					$z_base = $base[2]; #say $tee "\$z_base $z_base ";
+					$z_end = $values->[2];
+					$z_swing = ( 2 * $z_end );
+					$z_base = $base[2];
 
-					$x_pace = ( $x_swing / $nofspaces ); #say $tee "\$x_pace $x_pace ";
-					$x_value = ($x_base + ( $x_end - ( $x_pace * ( $countstep - 1 ) ) )); #say $tee "\$x_value $x_value ";
-					$y_pace = ( $y_swing / $nofspaces ); #say $tee "\$y_pace $y_pace ";
-					$y_value = ($y_base + ( $y_end - ( $y_pace * ( $countstep - 1 ) ) )); #say $tee "\$y_value $y_value ";
-					$z_pace = ( $z_swing / $nofspaces ); #say $tee "\$z_pace $z_pace ";
-					$z_value = ($z_base + ( $z_end - ( $z_pace * ( $countstep - 1 ) ) )); #say $tee "\$z_value $z_value ";
+					$x_pace = ( $x_swing / $nofspaces );
+					$x_value = ($x_base + ( $x_end - ( $x_pace * ( $countstep - 1 ) ) ));
+					$y_pace = ( $y_swing / $nofspaces );
+					$y_value = ($y_base + ( $y_end - ( $y_pace * ( $countstep - 1 ) ) ));
+					$z_pace = ( $z_swing / $nofspaces );
+					$z_value = ($z_base + ( $z_end - ( $z_pace * ( $countstep - 1 ) ) ));
 				}
 
-				$x_value = sprintf( "%.3f", $x_value ); #say $tee "\$x_value $x_value ";
-				$y_value = sprintf( "%.3f", $y_value ); #say $tee "\$y_value $y_value ";
-				$z_value = sprintf( "%.3f", $z_value ); #say $tee "\$z_value $z_value ";
+				$x_value = sprintf( "%.3f", $x_value );
+				$y_value = sprintf( "%.3f", $y_value );
+				$z_value = sprintf( "%.3f", $z_value );
 
 				my $printthis =
 "prj $launchline<<YYY
@@ -2722,18 +2679,18 @@ $printthis"; say  "\$printthis : " . dump( $printthis );
 
 				if ( ref ( $zory_end ) )
 				{
-					my $min = $zory_end->[0]; #say $tee "\$min $min ";
-					my $max = $zory_end->[1]; #say $tee "\$max $max ";
-					$swingtranslate = ( $max - $min ); #say $tee "\$swingtranslate $swingtranslate ";
+					my $min = $zory_end->[0];
+					my $max = $zory_end->[1];
+					$swingtranslate = ( $max - $min );
 				}
 				else
 				{
-					$swingtranslate = ( 2 * $zory_end ); #say $tee "\$swingtranslate $swingtranslate ";
+					$swingtranslate = ( 2 * $zory_end );
 				}
 
-				my $zory_base = $base; #say $tee "\$zory_base $zory_base ";
-				my $zory_pace = ( $swingtranslate / ( $stepsvar - 1 ) ); #say $tee "\$zory_pace $zory_pace ";
-				my $zory_value = ($zory_base + ( $zory_end - ( $zory_pace * ( $countstep - 1 ) ) )); #say $tee "\$zory_value $zory_value ";
+				my $zory_base = $base;
+				my $zory_pace = ( $swingtranslate / ( $stepsvar - 1 ) );
+				my $zory_value = ($zory_base + ( $zory_end - ( $zory_pace * ( $countstep - 1 ) ) ));
 
 				my $printthis =
 "prj $launchline<<YYY
@@ -2774,8 +2731,8 @@ YYY
 			if ($modification_type eq "f")
 			{
 				my $base = $base[0];
-				my @alternatives = @{ $values_ref };  #say $tee "\@alternatives : " . dump( @alternatives );
-				my $alternative = $alternatives[ $countstep - 1 ]; #say $tee "\$alternative $alternative ";
+				my @alternatives = @{ $values_ref };
+				my $alternative = $alternatives[ $countstep - 1 ];
 				my $printthis =
 "prj $launchline<<YYY
 b
@@ -2816,8 +2773,8 @@ YYY
 			if ($modification_type eq "g")
 			{
 				my $base = $base[0];
-				my @constrs = @{ $values_ref }; #say $tee "HERE. \@constrs : " . dump( @constrs );
-				my $constr = $constrs[ $countstep - 1 ]; #say $tee "\$constr : $constr" ;
+				my @constrs = @{ $values_ref };
+				my $constr = $constrs[ $countstep - 1 ];
 
 				my $printthis =
 "prj $launchline<<YYY
@@ -2976,7 +2933,7 @@ YYY
 		}
 		$countobs++;
 	}
-}    # END SUB obs_modify.
+} # END SUB obs_modify.
 
 
 sub recalculateish
@@ -4084,14 +4041,9 @@ sub apply_constraints
 			}
 		}
 
-		#say $tee "SOURCEADDRESS: " . dump( $sourceaddress );
 		$countfile++;
 	}
 
-	#say $tee "\%ver BEFORE: " . dump( %ver );
-	#say $tee "\%obs BEFORE: " . dump( %obs );
-	#say $tee "\%nod BEFORE: " . dump( %nod );
-	#say $tee "\%comp BEFORE: " . dump( %comp );
 
  	my ( $swing, $base, $pace, $val );
  	my $count = 0;
@@ -4108,21 +4060,17 @@ sub apply_constraints
 		{
 			$swing->[$count] = ( 2 * $incr );
 			$base->[$count] = ( 0 - $incr );
-		} #say $tee "\$swing->[$count]: " . dump( $swing->[$count] );
+		}
 
-		$pace->[$count] = ( $swing->[$count] / ( $stepsvar - 1 ) ); #say $tee "\$pace->[$count]: " . dump( $pace->[$count] );
-		$val->[$count] = ( $base->[$count] + ( $pace->[$count] * ( $countstep - 1 ) ) ); #say $tee "\$val->[$count]: " . dump( $val->[$count] ); # THIS IS WHAT YOU WANT TO USE IN THE INSTRUCTIONS FOR PROPAGATING CONSTRAINTS
+		$pace->[$count] = ( $swing->[$count] / ( $stepsvar - 1 ) );
+		$val->[$count] = ( $base->[$count] + ( $pace->[$count] * ( $countstep - 1 ) ) ); # THIS IS WHAT YOU WANT TO USE IN THE INSTRUCTIONS FOR PROPAGATING CONSTRAINTS
 		$count++;
 	}
-    #say $tee "\$swing : " . dump( $swing ); say $tee "\$base : " . dump( $base ); say $tee "\$pace : " . dump( $pace ); say $tee "\$val : " . dump( $val );
-
 
     my @tooutputs;
-    #my $tooutput = "( " ;
-    #$tooutput =~ s/\\// ; say $tee "\$tooutput: " . dump( $tooutput );
     foreach my $configfile ( @configfiles )
     {
-    	my $configaddress = "$to$configfile"; #say $tee "\$configaddress: " . dump( $configaddress );
+    	my $configaddress = "$to$configfile";
 	    if ( defined ( $configaddress ) )
 		{
 			if ( -e $configaddress )
@@ -4149,25 +4097,15 @@ sub apply_constraints
 		}
 	}
 
-	#say $tee "\%ver AFTER: " . dump( %ver );
-	#say $tee "\%obs AFTER: " . dump( %obs );
-	#say $tee "\%nod AFTER: " . dump( %nod );
-	#say $tee "\%comp AFTER: " . dump( %comp );
-    #$tooutput =~ s/\\//g ;
-    #$tooutput =~ s/\@{ //g ;
-    #$tooutput =~ s/} }/}/g ; say $tee "\$tooutput: " . dump( $tooutput );
-    #$tooutput =~ s/\$//g ; say $tee "\$tooutput: " . dump( $tooutput );
-    #my @tooutputs = eval( $tooutput ) ; say $tee "\@tooutputs: " . dump( @tooutputs );
-
     foreach my $output ( @tooutputs )
     {
         if ( $output =~ /^ver/ )
         {
-        	$output =~ /^ver\{(\d+)\}\{(\d+)\}/; #say $tee "DING. \$output : " . dump( $output );
-        	my $zone_number = $1; #say $tee "\$zone_number : " . dump( $zone_number );
-        	my $zone_letter = $zones{$zone_number}; #say $tee "\$zone_letter : " . dump( $zone_letter );
-        	my $vnum = $2; #say $tee "\$vnum : " . dump( $vnum );
-        	my $vertex_letter = $verts{$vnum}; #say $tee "\$vertex_letter : " . dump( $vertex_letter );
+        	$output =~ /^ver\{(\d+)\}\{(\d+)\}/;
+        	my $zone_number = $1;
+        	my $zone_letter = $zones{$zone_number};
+        	my $vnum = $2;
+        	my $vertex_letter = $verts{$vnum};
         	my ( $x, $y, $z ) = ( $ver{$zone_number}{$vnum}->[0], $ver{$zone_number}{$vnum}->[1], $ver{$zone_number}{$vnum}->[2] );
 
 			my $printthis =
@@ -4203,24 +4141,24 @@ YYY
 		}
 		elsif ( $output =~ /^obs/ )
         {
-        	$output =~ /\$obs\{(.+)\}\{(.+)\}/; #say $tee "\$output : " . dump( $output );
-        	my $zone_number = $1; #say $tee "\$zone_number : " . dump( $zone_number );
-        	my $obs_letter = $zones{$zone_number}; #say $tee "\$obs_letter : " . dump( $obs_letter );
-        	my $obsnum = $2; #say $tee "\$obsnum : " . dump( $obsnum );
-        	my $obs_letter = $obss{$obsnum}; #say $tee "\$obs_letter : " . dump( $obs_letter );
+        	$output =~ /\$obs\{(.+)\}\{(.+)\}/;
+        	my $zone_number = $1;
+        	my $obs_letter = $zones{$zone_number};
+        	my $obsnum = $2;
+        	my $obs_letter = $obss{$obsnum};
 
-    		my @ob = @{ $obs{$zone_number}{$obsnum} }; #say $tee "\@ob : " . dump( @ob );
-    		my $x = $ob_->[1]; #say $tee "\$x : " . dump( $x );
-			my $y = $ob_->[2]; #say $tee "\$y : " . dump( $y );
-			my $z = $ob_->[3]; #say $tee "\$z : " . dump( $z );
-			my $width = $ob_->[4]; #say $tee "\$width : " . dump( $width );
-			my $depth = $ob_->[5]; #say $tee "\$depth : " . dump( $depth );
-			my $height = $ob_->[6]; #say $tee "\$height : " . dump( $height );
-			my $y_rotation = $ob_->[7]; #say $tee "\$y_rotation : " . dump( $y_rotation );
-			my $tilt = $ob_->[8]; #say $tee "\$tilt : " . dump( $tilt );
-			my $opacity = $ob_->[9]; #say $tee "\$opacity : " . dump( $opacity );
-			my $name = $ob_->[10]; #say $tee "\$name : " . dump( $name );
-			my $material = $ob_->[11]; #say $tee "\$material : " . dump( $material );
+    		my @ob = @{ $obs{$zone_number}{$obsnum} };
+    		my $x = $ob_->[1];
+			my $y = $ob_->[2];
+			my $z = $ob_->[3];
+			my $width = $ob_->[4];
+			my $depth = $ob_->[5];
+			my $height = $ob_->[6];
+			my $y_rotation = $ob_->[7];
+			my $tilt = $ob_->[8];
+			my $opacity = $ob_->[9];
+			my $name = $ob_->[10];
+			my $material = $ob_->[11];
 
 			my $printthis =
 "prj $launchline<<YYY
@@ -4286,10 +4224,10 @@ YYY
 		}
 		elsif ( $output =~ /^nod/ )
         {
-        	$output =~ /nod\{(.+)\}/; #say $tee "DING. \$output : " . dump( $output );
-        	my $nodnum = $2; #say $tee "\$nodnum : " . dump( $nodnum );
-        	my $node_letter = $nodes{$nodnum}; #say $tee "\$node_letter : " . dump( $node_letter );
-            my @nods = @{ $nod{$nodnum} }; #say $tee "\@nods : " . dump( @nods );
+        	$output =~ /nod\{(.+)\}/;
+        	my $nodnum = $2;
+        	my $node_letter = $nodes{$nodnum};
+            my @nods = @{ $nod{$nodnum} };
 
             my $new_node_letter = $nods[0];
 			my $new_fluid = $nods[1];
@@ -4378,10 +4316,10 @@ YYY
 
         elsif ( $output =~ /^comp/ )
         {
-        	$output =~ /comp\{(.+)\}/; #say $tee "DING. \$output : " . dump( $output );
-        	my $compnum = $2; #say $tee "\$compnum : " . dump( $compnum );
-        	my $comp_letter = $components{$compnum}; #say $tee "\$comp_letter : " . dump( $comp_letter );
-            my @comps = @{ $comp{$compnum} }; #say $tee "\@comps : " . dump( @comps );
+        	$output =~ /comp\{(.+)\}/;
+        	my $compnum = $2;
+        	my $comp_letter = $components{$compnum};
+            my @comps = @{ $comp{$compnum} };
 
             my $new_component_letter = $comps[0];
 			my $new_fluid = $comps[1];
@@ -4967,7 +4905,7 @@ $printthis
 			{
 				`runeplus $file_eplus $epwfile`;
 			}
-			print $tee "runeplus $file_eplus $epwfile\n"; # EPW FILE, FOR INSTANCE: /usr/local/EnergyPlus-7-2-0/WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw
+			print $tee "runeplus $file_eplus $epwfile\n"; # EPW FILE
 		}
 	}
 
@@ -5012,16 +4950,16 @@ sub use_modish
 					}
 					my $modishdefpath = "$to" . "$shortmodishdefpath_ref->[0]" ;
 
-			my $zonenumber = $cycle[0]; #say $tee "\$zonenumber " . dump( $zonenumber );
-			my $shdname = $to . $cycle[1]; #say $tee "\$shdname " . dump( $shdname );
-			my $shdaname = $shdname . "a"; #say $tee "\$shdaname " . dump( $shdaname );
-			my @surfaces = @cycle[ 2..$#cycle ]; #say $tee "\@surfaces " . dump( @surfaces );
-			my $oldshdname = $shdname . ".old"; #say $tee "\$oldshdname " . dump( $oldshdname );
-			my $oldshdaname = $shdaname . ".old"; #say $tee "\$oldshdaname " . dump( $oldshdaname );
+			my $zonenumber = $cycle[0];
+			my $shdname = $to . $cycle[1];
+			my $shdaname = $shdname . "a";
+			my @surfaces = @cycle[ 2..$#cycle ];
+			my $oldshdname = $shdname . ".old";
+			my $oldshdaname = $shdaname . ".old";
 			my $tempname = $shdname;
 			my $tempname2 = $tempname;
 			$tempname =~ s/.shd//;
-			my $modshdaname = $tempname . ".mod.shda"; #say $tee "\$modshdaname " . dump( $modshdaname );
+			my $modshdaname = $tempname . ".mod.shda";
 			my $testshdaname = $tempname2 . "test.shda";
 			$" = " ";
 			#$" = ",";
@@ -5029,10 +4967,7 @@ sub use_modish
 			print $tee "rm -f $to/rad/*\n";
 			`rm -f $to/rad/*`;
 			print $tee "perl ./Modish.pm $to/cfg/$fileconfig $zonenumber @surfaces \r\n";
-			#`perl ./Modish.pm $modishdefpath $to/cfg/$fileconfig $zonenumber  @surfaces `;
 			`perl ./Modish.pm $to/cfg/$fileconfig $zonenumber @surfaces `;
-			#print $tee "modish(\"$to/cfg/$fileconfig\", $zonenumber, @surfaces);\r\n";
-			#modish("$to/cfg/$fileconfig", $zonenumber, @surfaces);
 
 			`cp -f $shdname $oldshdname`;
 			print $tee "cp -f $shdname $oldshdname\n";
@@ -5090,9 +5025,6 @@ sub genchange
 
 
 	my @applytype = @$applytype_ref;
-	#my %names = %$names_ref; #
-	#my %nums = %$nums_ref;
-	#my %newcontents = %$newcontents_ref;
 
 	my @menus = @$menus_ref;
 	my %numvertmenu = %{ $menus[0] };
@@ -5204,12 +5136,8 @@ sub genchange
 
 								foreach my $rowelt ( @rowelts )
 								{
-									#if ( $elt_position == $countelt )
-									#{
-
-									#}
 									my ( $truerange, $low, $high, $pace, $value, $base, $newvalue, $newangle );
-									#if ( ( $rowelt ne "" ) and  ( $rowelt ne " " ) )
+
 									{
 
 										my @coords;
@@ -5274,12 +5202,9 @@ sub genchange
 													if ( $countcoord == 1 )
 													{
 
-
-
-														#my @obtained = rotate2d( $rowelt, $filecontents[ $countfile ][ $row_number ][ $next_elt_position ]  , $newangle, $centrex, $centrey );  say $tee "DERIVED \@obtained " . dump( @obtained );
 														my @obtained = rotate2d( $rowelt, $rowelts[ $next_elt_position ] , $newangle, $centrex, $centrey );
 														$newvalue = $obtained[0];
-														#if ( ( $newvalue < 0.00001 ) and ( $newvalue > - 0.00001 ) ){ $newvalue = 0; } ; say $tee "DERIVED1 \$newvalue " . dump( $newvalue );
+														#if ( ( $newvalue < 0.00001 ) and ( $newvalue > - 0.00001 ) ){ $newvalue = 0; } ;
 
 													}
 													elsif ( $countcoord == 2 )
@@ -5287,7 +5212,7 @@ sub genchange
 
 
 
-														#my @obtained = rotate2d ( $filecontents[ $countfile ][ $row_number ][ $prev_elt_position ] , $rowelt, $newangle, $centrex, $centrey ); say $tee "DERIVED \@obtained " . dump( @obtained );
+														#my @obtained = rotate2d ( $filecontents[ $countfile ][ $row_number ][ $prev_elt_position ] , $rowelt, $newangle, $centrex, $centrey );
 														my @obtained = rotate2d ( $rowelts[ $prev_elt_position ], $rowelt, $newangle, $centrex, $centrey );
 														$newvalue = $obtained[1];
 														#if ( ( $newvalue < 0.00001 ) and ( $newvalue > - 0.00001 ) ) { $newvalue = 0; } ;
@@ -5439,7 +5364,7 @@ sub genchange
 		{
 			if ( defined( $nickname ) )
 			{
-				$newcontents{$names{$nickname}{countfile}}{$names{$nickname}{countrow}}{$names{$nickname}{countquest}}{$names{$nickname}{countelt}} = $names{$nickname}{newvalue} ; #say $tee "IT HAPPENDED 1!";
+				$newcontents{$names{$nickname}{countfile}}{$names{$nickname}{countrow}}{$names{$nickname}{countquest}}{$names{$nickname}{countelt}} = $names{$nickname}{newvalue} ;
 			}
 		}
 		return ( \%names, \%newcontents );
@@ -5554,10 +5479,7 @@ sub genchange
 							else
 							{
 								#$newel = sprintf( "%.3f", $newel ); say $tee "\$newel " . dump( $newel );
-
 								#$newrow = replace_nth( "$newrow", $countscore, "$thiselt,", "$newel," );
-
-
 								my $smallpiece;
 								if ( not ( $operation_type eq "wordchange" ) )
 								{
@@ -5576,10 +5498,6 @@ sub genchange
 								}
 								else
 								{
-
-
-
-
 									$newrow = replace_nth( "$newrow", $countscore, $el, $newel );
 								}
 							}
@@ -5668,9 +5586,6 @@ sub genchange
 
 sub genprop
 {  # TO DO: POSSIBILITY TO SPECIFY TEXT STRING IN PLACE OF ELEMENT
-	#use strict;
-	#use warnings;
-
 	my ($to, $stepsvar, $countop, $countstep, $applytype_ref, $genchange, $countvar, $fileconfig, $mypath, $file, $countmorphing, $todo,
 		$names_ref, $nums_ref, $newcontents_ref, $filecontents_ref, $newfilecontents_ref, $launchline, $menus_ref, $countinstance ) = @_;
 
@@ -5766,8 +5681,8 @@ sub vary_controls
 	my ( $semaphore_zone, $semaphore_dataloop, $semaphore_massflow, $semaphore_setpoint, $doline );
 	my $count_controlmass = -1;
 	my $countline = 0;
-	my @letters = ("e", "f", "g", "h", "i", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "z"); # CHECK IF THE LAST LETTERS ARE CORRECT, ZZZ
-	my @period_letters = ("a", "b", "c", "d", "e", "f", "g", "h", "i", "l", "m", "n", "o", "p", "q", "r", "s"); # CHECK IF THE LAST LETTERS ARE CORRECT, ZZZ
+	my @letters = ("e", "f", "g", "h", "i", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "z"); # CHECK IF THE LAST LETTERS ARE CORRECT
+	my @period_letters = ("a", "b", "c", "d", "e", "f", "g", "h", "i", "l", "m", "n", "o", "p", "q", "r", "s"); # CHECK IF THE LAST LETTERS ARE CORRECT
 	my $loop_hour = 2; # NOTE: THE FOLLOWING VARIABLE NAMES ARE SHADOWED IN THE FOREACH LOOP BELOW,
 	# BUT ARE THE ONES USED IN THE OPT CONSTRAINTS FILES.
 	my $max_heating_power = 3;
@@ -5798,10 +5713,6 @@ sub vary_controls
 	my $targetaddress = "$to$targetfile";
 	my $configaddress = "$to$configfile";
 
-	#@loopcontrol; # DON'T PUT "my" HERE.
-	#@flowcontrol; # DON'T PUT "my" HERE.
-	#@new_loopcontrols; # DON'T PUT "my" HERE.
-	#@new_flowcontrols; # DON'T PUT "my" HERE.
 	my ( @groupzone_letters, @zone_period_letters, @flow_letters, @fileloopbulk, @fileflowbulk );
 
 	checkfile($sourceaddress, $targetaddress);
@@ -5813,7 +5724,7 @@ sub vary_controls
 
 
 	sub calc_newctl
-	{  # TO BE CALLED WITH: calc_newcontrols($to, $fileconfig, $stepsvar, $countop, $countstep, \@buildbulk, \@flowbulk, \@loopcontrol, \@flowcontrol);
+	{
 		# THIS COMPUTES CHANGES TO BE MADE TO CONTROLS BEFORE PROPAGATION OF CONSTRAINTS
 		my ( $to, $stepsvar, $countop, $countstep, $swap, $swap2, $swap3, $swap4, $countvar, $fileconfig, $countmorphing ) = @_;
 
@@ -5847,11 +5758,9 @@ sub vary_controls
 				{
 					my $countcontrol = 0;
 					@thisloop = @{$each_loop};
-					# my $letterfile = $letters[$countloop];
 					foreach $lp (@thisloop)
 					{
 						my @control = @{$lp};
-						# my $letterfilecontrol = $period_letters[$countcontrol];
 						$loop_letter = $loopcontrol[$countloop][$countcontrol][0];
 						$loopcontrol_letter = $loopcontrol[$countloop][$countcontrol][1];
 						if ( ( $new_loop_letter eq $loop_letter ) and ($new_loopcontrol_letter eq $loopcontrol_letter ) )
@@ -5931,7 +5840,6 @@ sub vary_controls
 				{
 					my $countcontrol = 0;
 					@thisflow = @{$each_flow};
-					# my $letterfile = $letters[$countflow];
 					foreach $elm (@thisflow)
 					{
 						my @control = @{$elm};

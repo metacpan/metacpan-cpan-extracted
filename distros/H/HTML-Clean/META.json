@@ -1,0 +1,43 @@
+{
+   "abstract" : "HTML::Clean - Cleans up HTML code for web browsers, not humans",
+   "author" : [
+      "Paul Lindner <plindner@inuus.com>"
+   ],
+   "x_contributors" : [
+     "Paul Lindner <plindner@inuus.com>",
+     "Pavel Kuptsov <pkuptsov@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4216",
+   "keywords" : [
+      "html",
+      "html clean",
+      "html strip"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTML-Clean",
+   "provides" : {
+      "HTML::Cleang" : {
+         "file" : "lib/HTML/Clean.pm",
+         "version" : "1.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/poizon/HTML-Clean.git",
+         "web" : "https://github.com/poizon/HTML-Clean"
+      }
+   },
+   "version" : "2.1"
+}

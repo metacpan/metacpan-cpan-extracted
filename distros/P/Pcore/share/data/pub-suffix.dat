@@ -919,7 +919,6 @@ bms;bms
 bmw;bmw
 bn;bn
 bn.it;bn.it
-bnl;bnl
 bnpparibas;bnpparibas
 bnr.la;bnr.la
 bo;bo
@@ -1140,6 +1139,7 @@ catanzaro.it;catanzaro.it
 catering;catering
 catering.aero;catering.aero
 catholic;catholic
+catholic.edu.au;catholic.edu.au
 caxias.br;caxias.br
 cb.it;cb.it
 cba;cba
@@ -1851,6 +1851,7 @@ diet;diet
 digital;digital
 dinosaur.museum;dinosaur.museum
 direct;direct
+direct.quickconnect.to;direct.quickconnect.to
 directory;directory
 discount;discount
 discourse.group;discourse.group
@@ -1950,7 +1951,6 @@ dubai;dubai
 duck;duck
 duckdns.org;duckdns.org
 dunlop;dunlop
-duns;duns
 dupont;dupont
 durban;durban
 durham.museum;durham.museum
@@ -2160,6 +2160,7 @@ edu.za;edu.za
 edu.zm;edu.zm
 education;education
 education.museum;education.museum
+education.tas.edu.au;education.tas.edu.au
 educational.museum;educational.museum
 educator.aero;educator.aero
 edugit.org;edugit.org
@@ -2227,6 +2228,7 @@ environment.museum;environment.museum
 environmentalconservation.museum;environmentalconservation.museum
 epilepsy.museum;epilepsy.museum
 epson;epson
+eq.edu.au;eq.edu.au
 equipment;equipment
 equipment.aero;equipment.aero
 er;er
@@ -3342,7 +3344,6 @@ honai.ehime.jp;honai.ehime.jp
 honbetsu.hokkaido.jp;honbetsu.hokkaido.jp
 honda;honda
 honefoss.no;honefoss.no
-honeywell;honeywell
 hongo.hiroshima.jp;hongo.hiroshima.jp
 honjo.akita.jp;honjo.akita.jp
 honjo.saitama.jp;honjo.saitama.jp
@@ -3721,7 +3722,6 @@ isa.us;isa.us
 isahaya.nagasaki.jp;isahaya.nagasaki.jp
 ise.mie.jp;ise.mie.jp
 isehara.kanagawa.jp;isehara.kanagawa.jp
-iselect;iselect
 isen.kagoshima.jp;isen.kagoshima.jp
 isernia.it;isernia.it
 iserv.dev;iserv.dev
@@ -4434,6 +4434,7 @@ leitungsen.de;leitungsen.de
 leka.no;leka.no
 leksvik.no;leksvik.no
 lel.br;lel.br
+lelux.site;lelux.site
 lenug.su;lenug.su
 lenvik.no;lenvik.no
 lerdal.no;lerdal.no
@@ -4547,6 +4548,7 @@ livorno.it;livorno.it
 lixil;lixil
 lk;lk
 llc;llc
+llp;llp
 lmpm.com;lmpm.com
 ln.cn;ln.cn
 lo.it;lo.it
@@ -5572,6 +5574,7 @@ nhs.uk;nhs.uk
 ni;ni
 nic.in;nic.in
 nic.tj;nic.tj
+nic.za;nic.za
 nichinan.miyazaki.jp;nichinan.miyazaki.jp
 nichinan.tottori.jp;nichinan.tottori.jp
 nico;nico
@@ -5760,12 +5763,10 @@ ntt;ntt
 nu;nu
 nu.ca;nu.ca
 nu.it;nu.it
-nuernberg.museum;nuernberg.museum
 numata.gunma.jp;numata.gunma.jp
 numata.hokkaido.jp;numata.hokkaido.jp
 numazu.shizuoka.jp;numazu.shizuoka.jp
 nuoro.it;nuoro.it
-nuremberg.museum;nuremberg.museum
 nv.us;nv.us
 nx.cn;nx.cn
 ny.us;ny.us
@@ -6532,6 +6533,7 @@ qualifioapp.com;qualifioapp.com
 quebec;quebec
 quebec.museum;quebec.museum
 quest;quest
+quickconnect.to;quickconnect.to
 quicksytes.com;quicksytes.com
 quipelements.com;quipelements.com
 qvc;qvc
@@ -6977,6 +6979,7 @@ school.museum;school.museum
 school.na;school.na
 school.nz;school.nz
 school.za;school.za
+schools.nsw.edu.au;schools.nsw.edu.au
 schule;schule
 schwarz;schwarz
 schweiz.museum;schweiz.museum
@@ -7393,7 +7396,6 @@ staples;staples
 star;star
 starachowice.pl;starachowice.pl
 stargard.pl;stargard.pl
-starhub;starhub
 starnberg.museum;starnberg.museum
 starostwo.gov.pl;starostwo.gov.pl
 stat.no;stat.no

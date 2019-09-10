@@ -26,7 +26,7 @@ open my $fh, '<:encoding(UTF8)', $file
 my $text = <$fh>;
 close $fh or die "Error: cannot close $file\n";
 
-if ( $text =~ /=head1\s+VERSION\s+([0-9][.][0-9]+)/xsm ) {
+if ( $text =~ /=head1\s+VERSION\s+([0-9]+([.][0-9]+)?)/xsm ) {
     my $version = $1;
     is( $version, $Image::Sane::VERSION,
         'version number correctly documented' );

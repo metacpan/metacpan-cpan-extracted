@@ -1,0 +1,9 @@
+Revision history for App-CommentToPod
+
+
+0.002     2019-09-08 11:50:10+02:00 Europe/Oslo
+	- error after upload. Change package dist name from comman2pod
+          to App-CommentToPod
+
+0.001     2019-09-08 11:31:23+02:00 Europe/Oslo
+	- Initial version

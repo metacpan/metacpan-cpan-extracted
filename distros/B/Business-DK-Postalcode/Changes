@@ -1,22 +1,25 @@
 Changes file for Business::DK::Postalcode
 
-Project site changelog:
+0.12 2019-09-08T09:25:34Z Maintenance release, update not required
 
-http://logiclab.jira.com/browse/BDKPST#selectedTab=com.atlassian.jira.plugin.system.project%3Achangelog-panel
+- Minor POD fixes from Mohammad S Anwar
 
-0.11 2015-08-16 Maintenance release, update not necessary
+- Cleaning up in repository and changing to contemporary versions of different configurations
+
+
+0.11 2015-08-16 Maintenance release, update not required
 
 - Re-release of 0.10, problem with dist build
 
 
-0.10 2015-08-16 Maintenance release, update not necessary
+0.10 2015-08-16 Maintenance release, update not required
 
 - Migrated from Module::Build to Dist::Zilla
 
 
 0.09 2014-08-15
 
-- Maintenance release, update not necessary
+- Maintenance release, update not required
 
 - Addressing Kwalitee, aligning version for version consistency in
   modules in distribution
@@ -24,7 +27,7 @@ http://logiclab.jira.com/browse/BDKPST#selectedTab=com.atlassian.jira.plugin.sys
 
 0.08 2014-08-02
 
-- Maintenance release, update not necessary
+- Maintenance release, update not required
 
 - Added example application in examples/
 
@@ -57,7 +60,7 @@ http://logiclab.jira.com/browse/BDKPST#selectedTab=com.atlassian.jira.plugin.sys
 
 0.06 2013-07-27
 
-- Maintenance release, update not necessary
+- Maintenance release, update not required
 
 - Fixed up Changes file as part of my Questhub quest adhering to the standard
   described in: CPAN::Changes::Spec [BDKPST-21]
@@ -70,7 +73,7 @@ http://logiclab.jira.com/browse/BDKPST#selectedTab=com.atlassian.jira.plugin.sys
 
 0.05 2013-07-03
 
-- Bug fix release, update not necessary
+- Bug fix release, update not required
 
 - Adressing test assertions, based on a reports on test failure from CPAN testers
 	- MSWin32-x86-multi-thread / 5.16.0:
@@ -95,7 +98,7 @@ http://logiclab.jira.com/browse/BDKPST#selectedTab=com.atlassian.jira.plugin.sys
 
 0.02 2013-02-24
 
-- Bug fix release, update not necessary
+- Bug fix release, update not required
 
 - Brushing up the requirements, based on a report on test failure from
       CPAN testers:

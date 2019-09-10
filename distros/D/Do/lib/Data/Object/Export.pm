@@ -11,7 +11,7 @@ use Memoize;
 
 use parent 'Exporter';
 
-our $VERSION = '1.60'; # VERSION
+our $VERSION = '1.70'; # VERSION
 
 # BUILD
 
@@ -1527,9 +1527,9 @@ function takes all arguments accepted by the L<Data::Object::Exception> class.
 
 =head1 CREDITS
 
-Al Newkirk, C<awncorp@cpan.org>, C<+284>
+Al Newkirk, C<+287>
 
-Anthony Brummett, C<abrummet@genome.wustl.edu>, C<+10>
+Anthony Brummett, C<+10>
 
 =cut
 

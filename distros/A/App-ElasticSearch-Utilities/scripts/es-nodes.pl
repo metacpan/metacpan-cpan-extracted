@@ -61,7 +61,7 @@ es-nodes.pl - Listing the nodes in a cluster with some details
 
 =head1 VERSION
 
-version 7.2
+version 7.3
 
 =head1 SYNOPSIS
 

@@ -9,6 +9,7 @@ lib/Image/Sane.pm
 lib/Image/Sane/Device.pm
 saneperl.h
 t/1_init.t
+t/2_exit.t
 t/81_scanimage-perl.t
 t/90_MANIFEST.t
 t/91_critic.t

@@ -1,0 +1,57 @@
+NAME
+    Complete::Currency - Complete from list of ISO-4217 currency codes
+
+VERSION
+    This document describes version 0.001 of Complete::Currency (from Perl
+    distribution Complete-Currency), released on 2019-07-18.
+
+SYNOPSIS
+     use Complete::Currency qw(complete_currency_code);
+     my $res = complete_currency_code(word => 'V');
+     # -> [qw/VEF VND VUV/]
+
+FUNCTIONS
+  complete_currency_code
+    Usage:
+
+     complete_currency_code(%args) -> any
+
+    Complete from list of ISO-4217 currency codes.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   word* => *str*
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Complete-Currency>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Complete-Currency>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-Currency>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Complete::Country
+
+    Complete::Language
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -23,17 +23,12 @@ use Data::Dumper;
 #$Data::Dumper::Terse  = 1;
 use Data::Dump qw(dump);
 use feature 'say';
-#use feature qw(postderef);
-#no warnings qw(experimental::postderef);
-#use Sub::Signatures;
-#no warnings qw(Sub::Signatures);
-#no strict 'refs';
+
 use Sim::OPT;
 use Sim::OPT::Morph;
 use Sim::OPT::Report;
 use Sim::OPT::Descend;
 use Sim::OPT::Takechance;
-#use Parallel::ForkManager;
 no strict;
 no warnings;
 use warnings::unused;
@@ -59,7 +54,7 @@ $ABSTRACT = 'Sim::OPT::Sim is the module used by Sim::OPT to launch simulations 
 # Activate or deactivate the following function calls depending from your needs
 
 
-sub sim    # This function launch the simulations in ESP-r
+sub sim
 {
   my %vals = %main::vals;
   my $mypath = $main::mypath;
@@ -74,10 +69,8 @@ sub sim    # This function launch the simulations in ESP-r
   my $simnetwork = $main::simnetwork;
   my $max_processes = $main::max_processes;
 
-  $tee = new IO::Tee(\*STDOUT, ">>$tofile" ); # GLOBAL ZZZ
+  $tee = new IO::Tee(\*STDOUT, ">>$tofile" ); # GLOBAL
 
-  #open( OUTFILE, ">>$outfile" ) or die "Can't open $outfile: $!";
-  #open( TOFILE, ">>$tofile" ) or die "Can't open $tofile: $!";
   say $tee "\nNow in Sim::OPT::Sim.\n";
 
   my %simtitles = %main::simtitles;
@@ -88,7 +81,7 @@ sub sim    # This function launch the simulations in ESP-r
   my @varthemes_report = @main::varthemes_report;
   my @varthemes_variations = @vmain::arthemes_variations;
   my @varthemes_steps = @main::varthemes_steps;
-  my @rankdata = @main::rankdata; # CUT ZZZ
+  my @rankdata = @main::rankdata; # CUT
   my @rankcolumn = @main::rankcolumn;
   my %reportdata = %main::reportdata;
   my @files_to_filter = @main::files_to_filter;
@@ -98,8 +91,7 @@ sub sim    # This function launch the simulations in ESP-r
   my @filter_columns = @main::filter_columns;
 
   my %dat = %{ $_[0] };
-  my @instances = @{ $dat{instances} }; #say $tee "IN SIM \@instances " . dump( @instances );
-  #say "SCALAR INSTANCES " . scalar( @instances );
+  my @instances = @{ $dat{instances} };
   my %dirfiles = %{ $dat{dirfiles} };
   my %vehicles = %{ $dat{vehicles} };
 
@@ -121,20 +113,20 @@ sub sim    # This function launch the simulations in ESP-r
   my $simlist = $dirfiles{simlist};
   my $simblock = $dirfiles{simblock};
   my $retlist = $dirfiles{retlist};
-  my $repfile = $dirfiles{repfile}; #say $tee "IN SIM \$repfile: " . dump($repfile);
+  my $repfile = $dirfiles{repfile};
   my $retblock = $dirfiles{retblock};
   my $replist = $dirfiles{replist};
   my $repblock = $dirfiles{repblock};
   my $descendlist = $dirfiles{descendlist};
   my $descendblock = $dirfiles{descendblock};
 
-  my %d = %{ $instances[0] }; #say $tee "IN SIM \%d!!! : " . dump( %d );
+  my %d = %{ $instances[0] };
 
-  my $countcase = $d{countcase}; #say $tee "IN SIM \$countcase : " . dump( $countcase );
-  my $countblock = $d{countblock}; #say $tee "IN SIM \$countblock : " . dump( $countblock );
+  my $countcase = $d{countcase};
+  my $countblock = $d{countblock};
   my %datastruc = %{ $d{datastruc} }; ######
-  my @varnumbers = @{ $d{varnumbers} }; #say $tee "IN ENTRY SIM \@varnumbers : " . dump( @varnumbers );
-  my @miditers = @{ $d{miditers} }; #say $tee "IN ENTRY SIM \@miditers : " . dump( @miditers );
+  my @varnumbers = @{ $d{varnumbers} };
+  my @miditers = @{ $d{miditers} };
   my @sweeps = @{ $d{sweeps} };
 
 
@@ -147,42 +139,35 @@ sub sim    # This function launch the simulations in ESP-r
   #  exit(say $tee "0 #END RUN.");
   #}
 
-  my %dowhat = %{ $d{dowhat} }; #say $tee "DOWHAT IN SIM " . dump( \%dowhat );
+  my %dowhat = %{ $d{dowhat} };
   my $skipfile = $vals{skipfile};
 	my $skipsim = $vals{skipsim};
 	my $skipreport = $vals{skipreport};
 
   my %notecases;
 
-  #my $getpars = shift;
-  #eval( $getpars );
-
-  #if ( fileno (MORPHLIST)
-
   my ( $resfile, $flfile );
   my @container;
-  #my $pm = new Parallel::ForkManager( $max_processes ); #Sets up the possibility of opening child processes
   foreach my $instance (@instances)
-  { #say $tee "IN SIM \$instance : " . dump( $instance );
-    #my $pid = $pm->start and next; # Begins the child process
+  {
     my %dt = %{$instance};
-    my @winneritems = @{ $dt{winneritems} }; #say $tee "IN SIM \@winneritems : " . dump( @winneritems );
-    my $countvar = $dt{countvar}; #say $tee "IN SIM \$countvar : " . dump( $countvar );
-    my $countstep = $dt{countstep}; #say $tee "IN SIM \$countstep : " . dump( $countstep );
-    my $c = $dt{c}; #say $tee "IN SIM1 \$c : " . dump( $c );
+    my @winneritems = @{ $dt{winneritems} };
+    my $countvar = $dt{countvar};
+    my $countstep = $dt{countstep};
+    my $c = $dt{c};
 
-		my %to = %{ $dt{to} }; #say $tee " IN SIM \%to " . dump( \%to );
+		my %to = %{ $dt{to} };
 		my %inst = %{ $dt{inst} };
-    my $instn = $dt{instn}; #say $tee " IN SIM \$instn " . dump( $instn );
+    my $instn = $dt{instn};
 
-		my $from = $dt{from}; #say $tee " IN SIM \$from $from ";
-		my $toitem = $dt{toitem}; #say $tee " IN SIM \$toitem $toitem ";
+		my $from = $dt{from};
+		my $toitem = $dt{toitem};
 
     my @blockelts =$dt{blockelts};
     my @blocks = $dt{blocks};
     my %varnums = $dt{varnums};
     my %mids = $dt{mids};
-    my $countinstance = $dt{instn}; #say $tee "IN SIM1 \$countinstance : " . dump( $countinstance );
+    my $countinstance = $dt{instn};
 
 
     my $skip = $dowhat{$countvar}{skip}; #########################################
@@ -197,7 +182,7 @@ sub sim    # This function launch the simulations in ESP-r
     my $countdir = 0;
 
     my $numberof_simtools = scalar ( keys %{ $dowhat{simtools} } );
-    my $simelt = $to{crypto}; #say $tee "IN SIM \$simelt $simelt";
+    my $simelt = $to{crypto};
 
 
     if ( $dowhat{simulate} eq "y")
@@ -227,24 +212,12 @@ sub sim    # This function launch the simulations in ESP-r
 
               if ( ( $simelt ne "") and ( $date_to_sim ne "" ) )
               {
-                $resfile = "$simelt-$date_to_sim-$tooltype.res"; #say $tee "IN SIM \$resfile $resfile";
-                $flfile = "$simelt-$date_to_sim-$tooltype.fl"; #say $tee "IN SIM \$flfile $flfile";
+                $resfile = "$simelt-$date_to_sim-$tooltype.res";
+                $flfile = "$simelt-$date_to_sim-$tooltype.fl";
               }
 
-              #if ( fileno (SIMLIST) )
-              #if (not (-e $simlist ) )
-              #{
-              #  if ( $countblock == 0 )
-              #  {
-                  open( SIMLIST, ">$simlist") or die( "$!" );
-              #  }
-              #  else
-              #  {
-              #    open( SIMLIST, ">>$simlist") or die;
-              #  }
-              #}
+              open( SIMLIST, ">$simlist") or die( "$!" );
 
-              #if ( fileno (SIMBLOCK) )
               if (not (-e $simblock ) )
               {
                 if ( $countblock == 0 )
@@ -359,20 +332,20 @@ $printthis
               my $before = $simtitle_ref->[3];
               my $step = $simtitle_ref->[4];
 
-              my $epw = $simtitle_ref->[5]; #say "\$epw $epw ";
-              my $epwfile = $mypath . "/" . $epw; #say "\$epwfile $epwfile ";
-              my $epdir = $simtitle_ref->[6]; #say "\$epdir $epdir ";
-              my $epoldfile = $simtitle_ref->[7]; #say "\$epoldfile $epoldfile ";
-              my $epnewfragment = $simtitle_ref->[8]; #say "\$epnewfragment $epnewfragment ";
-              my $outputdir = $simtitle_ref->[9]; #say "\$outputdir $outputdir ";
-              my $modfiletype = $simtitle_ref->[10]; #say "\$modfiletype $modfiletype ";
-              my $resfiletype = $simtitle_ref->[11]; #say "\$resfiletype $resfiletype ";
+              my $epw = $simtitle_ref->[5];
+              my $epwfile = $mypath . "/" . $epw;
+              my $epdir = $simtitle_ref->[6];
+              my $epoldfile = $simtitle_ref->[7];
+              my $epnewfragment = $simtitle_ref->[8];
+              my $outputdir = $simtitle_ref->[9];
+              my $modfiletype = $simtitle_ref->[10];
+              my $resfiletype = $simtitle_ref->[11];
               my $to = $to{crypto}; ### TAKE CARE!!!
-              my $epoldpath = $to . $epdir . "/" . $epoldfile; #say "\$epoldpath $epoldpath ";
-              my $tempname = $to; #say "\$tempname $tempname ";
-              $tempname =~ s/$mypath\/// ; #say "\$epw $epw "; say "\$tempname $tempname ";
-              my $epnewfile = $tempname . $epnewfragment . "$epnewfile"; #say "\$epw $epnewfile ";
-              my $epresroot = $tempname . $epnewfragment ; #say "\$epw $epresroot ";
+              my $epoldpath = $to . $epdir . "/" . $epoldfile;
+              my $tempname = $to;
+              $tempname =~ s/$mypath\///;
+              my $epnewfile = $tempname . $epnewfragment . "$epnewfile";
+              my $epresroot = $tempname . $epnewfragment ;
 
               my $epnewpath;
               $resfile;
@@ -516,19 +489,11 @@ $printthis
         }
         $counttool++;
       }
-      #$pm->finish; # Terminates the child process
-
     }
 
 
-
-    #say $tee "DUE resfile: $resfile!";
-
     if ( $dowhat{newretrieve} eq "y" )
     {
-      #say $tee "INSIM1: countinstance: $countinstance";
-      #say $tee "INSIM1: \$resfile: $resfile";
-      #say $tee "INSIM1: \$flfile: $flfile";
       my @resultretrieve = Sim::OPT::Report::newretrieve(
       {
         instance => $instance, dirfiles => \%dirfiles,
@@ -541,7 +506,6 @@ $printthis
 
     if ( $dowhat{newreport} eq "y" )
     {
-      #say $tee "INSIM2: countinstance: $countinstance";
       my @resultreport = Sim::OPT::Report::newreport(
       {
         instance => $instance, dirfiles => \%dirfiles,
@@ -563,7 +527,6 @@ $printthis
 
 }    # END SUB sim;
 
-# END OF THE CONTENT OF Sim::OPT::Sim
 ##############################################################################
 ##############################################################################
 

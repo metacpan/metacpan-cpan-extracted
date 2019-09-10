@@ -166,7 +166,7 @@ es-storage-overview.pl - Index Storage Overview by Index Name without Dates
 
 =head1 VERSION
 
-version 7.2
+version 7.3
 
 =head1 SYNOPSIS
 

@@ -85,6 +85,10 @@ method routines() {
 
   my %ignore = map +($_, 1), qw(
     BUILD
+    BUILD_ARGS
+    BUILD_DATA
+    BUILD_OPTS
+    BUILD_VARS
     BUILDARGS
     BUILDPROXY
     import

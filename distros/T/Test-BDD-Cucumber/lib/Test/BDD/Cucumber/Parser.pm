@@ -1,12 +1,12 @@
 package Test::BDD::Cucumber::Parser;
-$Test::BDD::Cucumber::Parser::VERSION = '0.60';
+$Test::BDD::Cucumber::Parser::VERSION = '0.62';
 =head1 NAME
 
 Test::BDD::Cucumber::Parser - Parse Feature files
 
 =head1 VERSION
 
-version 0.60
+version 0.62
 
 =head1 DESCRIPTION
 

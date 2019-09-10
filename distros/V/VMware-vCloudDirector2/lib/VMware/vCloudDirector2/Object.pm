@@ -5,7 +5,7 @@ package VMware::vCloudDirector2::Object;
 use strict;
 use warnings;
 
-our $VERSION = '0.102'; # VERSION
+our $VERSION = '0.103'; # VERSION
 our $AUTHORITY = 'cpan:NIGELM'; # AUTHORITY
 
 use Moose;
@@ -287,7 +287,7 @@ method PUT ($hash) { return $self->api->PUT( $self->href, $hash, $self->mime_typ
 
 
 method fetch_admin_object ($subpath?) {
-    if ( $self->is_admin_object ) {
+    if ( $self->is_admin_object and not( defined($subpath) ) ) {
         return $self;
     }
     else {
@@ -318,7 +318,7 @@ VMware::vCloudDirector2::Object - Module to contain an object!
 
 =head1 VERSION
 
-version 0.102
+version 0.103
 
 =head2 Attributes
 

@@ -93,6 +93,7 @@ share {
   }
   
   build [
+    \&update_pkg_conf_path,
     "%{configure} $with_local $with_cpp11 $build_static",
     \&pause,
     $make_cmd,
@@ -105,6 +106,13 @@ share {
 gather [
     \&rename_la_files,
 ];
+
+sub update_pkg_conf_path {
+    return if !$on_windows;
+    use Env qw /@PKG_CONFIG_PATH/;
+    @PKG_CONFIG_PATH = map {s{^([a-z]):}{/$1}ri} @PKG_CONFIG_PATH;
+    return;
+}
 
 sub rename_la_files {
     #  need to return if not share

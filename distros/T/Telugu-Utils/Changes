@@ -1,0 +1,6 @@
+Revision history for Perl extension Telugu::Utils.
+
+0.01  Thu Aug 29 22:46:22 2019
+	- original version; created by h2xs 1.23 with options
+		-Xn Telugu::Utils
+

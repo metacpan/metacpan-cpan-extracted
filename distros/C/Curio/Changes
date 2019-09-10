@@ -1,5 +1,10 @@
 Revision history for Perl extension Curio.
 
+0.10 2019-09-06T20:58:57Z
+
+ - Fix key aliases so they do not throw exceptions when
+   allow_undeclared_keys is not enabled.
+
 0.09 2019-09-05T20:24:55Z
 
  - Fix inject_with_guard() to work, and add tests for it.

@@ -20,7 +20,7 @@ no strict 'refs';
 
 my $regex;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 our @EXPORT_OK
     = qw(get_all_postalcodes get_all_cities get_all_data create_regex validate_postalcode validate get_city_from_postalcode get_postalcode_from_city);
 
@@ -295,15 +295,15 @@ sub _build_tree {
 
 =begin markdown
 
-[![CPAN version](https://badge.fury.io/pl/Business-DK-Postalcode.svg)](http://badge.fury.io/pl/Business-DK-Postalcode) 
-[![Build Status](https://travis-ci.org/jonasbn/bdkpst.svg?branch=master)](https://travis-ci.org/jonasbn/bdkpst) 
+[![CPAN version](https://badge.fury.io/pl/Business-DK-Postalcode.svg)](http://badge.fury.io/pl/Business-DK-Postalcode)
+[![Build Status](https://travis-ci.org/jonasbn/bdkpst.svg?branch=master)](https://travis-ci.org/jonasbn/bdkpst)
 [![Coverage Status](https://coveralls.io/repos/jonasbn/bdkpst/badge.png?branch=master)](https://coveralls.io/r/jonasbn/bdkpst?branch=master)
 
 =end markdown
 
 =head1 NAME
 
-Business::DK::Postalcode - Danish postal code validator and container 
+Business::DK::Postalcode - Danish postal code validator and container
 
 =head1 VERSION
 
@@ -446,7 +446,7 @@ Since the original source contains data on 3 different countries:
 Only the data representing Denmark has been included in this distribtion, so this
 field is always containing a one.
 
-For access to the data on Greenland or Faroe Islands please refer to: L<Business::GL::Postalcode> 
+For access to the data on Greenland or Faroe Islands please refer to: L<Business::GL::Postalcode>
 and L<Business::FO::Postalcode> respectfully.
 
 =head2 Encoding
@@ -525,7 +525,7 @@ Returns a reference to an array containing all Danish city names having a postal
 
     foreach my $city (@{$cities}) { ... }
 
-Please note that this data source used in this distribution by no means is authorative 
+Please note that this data source used in this distribution by no means is authorative
 when it comes to cities located in Denmark, it might have all cities listed, but
 unfortunately also other post distribution data.
 
@@ -795,7 +795,19 @@ Please see the project F<TODO> file, or the bugtracker (RT), website or issues r
 
 =head1 AUTHOR
 
-Jonas B. Nielsen, (jonasbn) - C<< <jonasbn@cpan.org> >>
+=over
+
+=item * Jonas B. Nielsen, (jonasbn) - C<< <jonasbn@cpan.org> >>
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+=over
+
+=item * Mohammad S Anwar, POD corrections PR #6
+
+=back
 
 =head1 MOTIVATION
 
@@ -838,7 +850,7 @@ which could generate the pattern for me based on a finite data set.
 
 =head1 COPYRIGHT
 
-Business-DK-Postalcode is (C) by Jonas B. Nielsen, (jonasbn) 2006-2015
+Business-DK-Postalcode is (C) by Jonas B. Nielsen, (jonasbn) 2006-2019
 
 =head1 LICENSE
 

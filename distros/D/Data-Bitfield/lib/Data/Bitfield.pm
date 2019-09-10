@@ -8,10 +8,10 @@ package Data::Bitfield;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use Exporter 'import';
-our @EXPORT_OK = qw( bitfield boolfield intfield enumfield constfield );
+our @EXPORT_OK = qw( bitfield boolfield intfield signed_intfield enumfield constfield );
 
 use Carp;
 
@@ -163,12 +163,20 @@ sub bitfield_into_caller
       croak "Field $name collides with other defined fields"
          if ( $used_bits & $mask ) !~ m/^\0*$/;
 
+      if( $format eq "bytes-BE" ) {
+         $shift += 8 if $width <= 8;
+         $shift += 8 if $width <= 16;
+         $shift += 8 if $width <= 24;
+      }
+
       $fields{$name} = [ $mask, $offs, $shift, $encoder, $decoder ];
       $used_bits |= $mask;
    }
 
    $used_bits =~ s/\0+$//;
    my $datalen = length $used_bits;
+
+   my $fmt = $format eq "bytes-BE" ? "L>" : "L<";
 
    my $packsub = sub {
       my %args = @_;
@@ -190,7 +198,7 @@ sub bitfield_into_caller
                croak "Expected an integer value for '$_'";
          }
 
-         my $bits = ( "\x00" x $offs ) . ( pack "L<", $v << $shift );
+         my $bits = ( "\x00" x $offs ) . ( pack $fmt, $v << $shift );
          $v >= 0 and ( $bits & ~$mask ) =~ m/^\0+$/ or
             croak "Value out of range for '$_'";
 
@@ -209,7 +217,7 @@ sub bitfield_into_caller
          my $f = $fields{$_};
          my ( $mask, $offs, $shift, undef, $decoder ) = @$f;
 
-         my $v = unpack( "L<", substr( $val & $mask, $offs, 4 ) ) >> $shift;
+         my $v = unpack( $fmt, substr( $val & $mask, $offs, 4 ) ) >> $shift;
 
          $v = $decoder->($v) if $decoder;
          push @ret, $_ => $v;
@@ -217,18 +225,7 @@ sub bitfield_into_caller
       return @ret;
    };
 
-   if( $format eq "bytes-BE" ) {
-      my $orig_packsub   = $packsub;
-      my $orig_unpacksub = $unpacksub;
-
-      $packsub = sub {
-         return scalar reverse $orig_packsub->(@_);
-      };
-      $unpacksub = sub {
-         return $orig_unpacksub->(scalar reverse $_[0]);
-      };
-   }
-   elsif( $format eq "integer" ) {
+   if( $format eq "integer" ) {
       my $orig_packsub   = $packsub;
       my $orig_unpacksub = $unpacksub;
 
@@ -288,7 +285,7 @@ sub boolfield
    intfield( $bitnum, $width )
 
 Declares a field of C<$width> bits wide, starting at the given bit index,
-whose value is an integer. It will be shifted appropriately.
+whose value is an unsigned integer. It will be shifted appropriately.
 
 =cut
 
@@ -296,6 +293,40 @@ sub intfield
 {
    my ( $bitnum, $width ) = @_;
    return [ $bitnum, $width ];
+}
+
+=head2 signed_intfield
+
+   signed_intfield( $bitnum, $width )
+
+I<Since version 0.04.>
+
+Declares a field of C<$width> bits wide, starting at the given bit index,
+whose value is a signed integer. It will be shifted appropriately.
+
+=cut
+
+sub signed_intfield
+{
+   my ( $bitnum, $width ) = @_;
+
+   my $def = intfield( $bitnum, $width );
+
+   my $excess = 2 ** $width;
+   my $sign = ( 1 << ($width-1) );
+
+   $def->[2] = sub {
+      my $v = shift;
+      $v += $excess if $v < 0;
+      return $v;
+   };
+   $def->[3] = sub {
+      my $v = shift;
+      $v -= $excess if $v & $sign;
+      return $v;
+   };
+
+   return $def;
 }
 
 =head2 enumfield

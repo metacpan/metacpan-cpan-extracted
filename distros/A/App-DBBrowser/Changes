@@ -1,6 +1,9 @@
 Revision history for App-DBBrowser
 
 
+2.209    2019-09-09
+        - Bugfix in 'subqueries': term_width -> get_term_width.
+
 2.208    2019-09-05
         - Adapt the code to the updated Term::Choose.
         - Hide cursor fixes.

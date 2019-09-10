@@ -1,3 +1,8 @@
+0.003   2019-09-09  Released-By: PERLANCAR; Urgency: medium
+
+	- Add share/renwd-cd.bash.
+
+
 0.002   2019-07-23  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Don't allow renaming to an existing dir.

@@ -50,277 +50,132 @@ L<Data::Object>.
 
 If you're doing something modern with Perl, start here!
 
-+=head1 FRAMEWORK
++=head1 PURPOSE
 
-Do (aka Data-Object) is a robust modern Perl development framework, embracing
+This package provides a framework for modern Perl development, embracing
 Perl's multi-paradigm programming nature, flexibility and vast ecosystem that
-many engineers already know and love.
+many of engineers already know and love. The power of this framework comes from
+the extendable (yet fully optional) type library which is integrated into the
+object system and type-constrainable subroutine signatures (supporting
+functions, methods and method modifiers). We also provide classes which wrap
+Perl 5 native data types and provides methods for operating on the data.
 
-+=head1 FRAMEWORK CORE
++=head1 CONVENTION
 
-  package main;
+Contrary to the opinion of some, modern Perl programming can be extremely
+well-structured and beautiful, leveraging many advanced concepts found in other
+languages, and some which aren't. Abilities like method modification also
+referred to as augmentation, reflection, advanced object-orientation,
+type-constrainable object attributes, type-constrainable subroutine signatures
+(with named and positional arguments), as well roles (similar to mixins or
+interfaces in other languages). This framework aims to serve as an entrypoint
+to leveraging those abilities.
 
   use Do;
 
-  fun main() {
-    # ...
-  }
+The "Do" package is an alias and subclass of this package. It encapsulates all
+of the framework's features, is minimalist, and is meant to be the first import
+in a new class or module.
 
-  1;
+  use Data::Object;
 
-The framework's core configuration enables strict, warnings, Perl's 5.14
-features, and configures the core type library, method signatures, and
-autoboxing.
+Both import statements are funcationally equivalent, enable the same
+functionality, and can be configured equally. This is what's enabled whenever
+you import the "Do" or "Data::Object" package into your namespace.
 
-+=head1 FRAMEWORK LIBRARY
+  # basics
+  use strict;
+  use warnings;
 
-  package App::Library;
+  # loads say, state, switch, etc
+  use feature ':5.14';
+
+  # loads type constraints
+  use Data::Object::Library;
+
+  # loads function/method signatures
+  use Data::Object::Signatures;
+
+  # imports keywords and super "do" function, etc
+  use Data::Object::Export;
+
+  # enables method calls on native data types
+  use Data::Object::Autobox;
+
+To explain by way of example: The following established a user-defined type
+library where user-defined classes, roles, etc, will be automatically
+registered.
+
+  package App;
 
   use Do 'Library';
 
-  our $User = declare 'User',
-    as InstanceOf["App::User"];
-
   1;
 
-The framework's library configuration established a L<Type::Library> compliant
-type library, as well as configuring L<Type::Utils> in the calling package.
-Read more at L<Data::Object::Library>.
-
-+=head1 FRAMEWORK CLASS
+The following creates a class representing a user which has the ability to
+greet another person. This class is type-library aware and will register itself
+as a type constraint.
 
   package App::User;
 
-  use Do 'Class';
+  use Do 'Class', 'App';
 
-  has 'fname';
-  has 'lname';
+  has name => (
+    is  => 'ro',
+    isa => 'Str',
+    req => 1
+  );
 
-  1;
-
-The framework's class configuration configures the calling package as a L<Moo>
-class, having the "has", "with", and "extends" keywords available. Read more at
-L<Data::Object::Class>.
-
-+=head1 FRAMEWORK ROLE
-
-  package App::Queuer;
-
-  use Do 'Role';
-
-  has 'queue';
-
-  method dequeue() {
-    # ...
-  }
-
-  method enqueue($job) {
-    # ...
+  method hello(AppUser $user) {
+    return 'Hello '. $user->name .'. How are you?';
   }
 
   1;
 
-The framework's role configuration configures the calling package as a L<Moo>
-role, having the "has", "with", and "extends" keywords available. Read more at
-L<Data::Object::Role>.
+The following is a script which is type-library aware that creates a function
+that returns how one user greets another user.
 
-+=head1 FRAMEWORK RULE
+  package main;
 
-  package App::Queueable;
+  use App::User;
 
-  use Do 'Rule';
+  use Do 'Core', 'App';
 
-  requires 'dequeue';
-  requires 'enqueue';
-
-  1;
-
-The framework's rule configuration configures the calling package as a L<Moo>
-role, intended to be used to classify interfaces. Read more at
-L<Data::Object::Rule>.
-
-+=head1 FRAMEWORK STATE
-
-  package App::Env;
-
-  use Do 'State';
-
-  has 'vars';
-  has 'args';
-  has 'opts';
-
-  1;
-
-The framework's state configuration configures the calling package as a
-singleton class with global state. Read more at L<Data::Object::State>.
-
-+=head1 FRAMEWORK STRUCT
-
-  package App::Data;
-
-  use Do 'Struct';
-
-  has 'auth';
-  has 'user';
-  has 'args';
-
-  1;
-
-The framework's struct configuration configures the calling package as a class
-whose state becomes immutable after instantiation. Read more at
-L<Data::Object::Struct>.
-
-+=head1 FRAMEWORK ARRAY
-
-  package App::Args;
-
-  use Do 'Array';
-
-  method command() {
-    return $self->get(0);
+  fun greetings(AppUser $u1, AppUser $u2) {
+    return $u1->hello($u2);
   }
 
-  1;
+  my $u1 = User->new(name => 'Jane');
+  my $u2 = User->new(name => 'June');
 
-The framework's array configuration configures the calling package as a class
-which extends the Array class. Read more at L<Data::Object::Array>.
+  say(greetings($u1, $u2)); # Hello June ...
 
-+=head1 FRAMEWORK CODE
+This demonstrates much of the power of this framework in one simple example. If
+you're new to Perl, the code above creates a class with a single (read-only
+string) attribute called C<name> and a single method called C<hello>, then
+registers the class in a user-defined type-library called C<App> where all
+user-defined type constraints will be stored and retrieved (and reified). The
+C<main> program (namespace) initializes the framework and specifies the
+user-defined type library to use in the creation of a single function
+C<greetings> which takes two arguments which must both be instances of the
+class we just created. Please see L<Data::Object> for more information and
+usages.
 
-  package App::Func;
++=head1 CONFIGURATION
 
-  use Do 'Code';
-
-  around BUILD($args) {
-    $self->$orig($args);
-
-    # ...
-  }
-
-  1;
-
-The framework's code configuration configures the calling package as a class
-which extends the Code class. Read more at L<Data::Object::Code>.
-
-+=head1 FRAMEWORK FLOAT
-
-  package App::Amount;
-
-  use Do 'Float';
-
-  method currency(Str $code) {
-    # ...
-  }
-
-  1;
-
-The framework's float configuration configures the calling package as a class
-which extends the Float class. Read more at L<Data::Object::Float>.
-
-+=head1 FRAMEWORK HASH
-
-  package App::Data;
-
-  use Do 'Hash';
-
-  method logline() {
-    # ...
-  }
-
-  1;
-
-The framework's hash configuration configures the calling package as a class
-which extends the Hash class. Read more at L<Data::Object::Hash>.
-
-+=head1 FRAMEWORK INTEGER
-
-  package App::Phone;
-
-  use Do 'Integer';
-
-  method format(Str $code) {
-    # ...
-  }
-
-  1;
-
-The framework's integer configuration configures the calling package as a class
-which extends the Integer class. Read more at L<Data::Object::Integer>.
-
-+=head1 FRAMEWORK NUMBER
-
-  package App::ID;
-
-  use Do 'Number';
-
-  method find() {
-    # ...
-  }
-
-  1;
-
-The framework's number configuration configures the calling package as a class
-which extends the Number class. Read more at L<Data::Object::Number>.
-
-+=head1 FRAMEWORK REGEXP
-
-  package App::Path;
-
-  use Do 'Regexp';
-
-  method match() {
-    # ...
-  }
-
-  1;
-
-The framework's regexp configuration configures the calling package as a class
-which extends the Regexp class. Read more at L<Data::Object::Regexp>.
-
-+=head1 FRAMEWORK SCALAR
-
-  package App::OID;
-
-  use Do 'Scalar';
-
-  method find() {
-    # ...
-  }
-
-  1;
-
-The framework's scalar configuration configures the calling package as a class
-which extends the Scalar class. Read more at L<Data::Object::Scalar>.
-
-+=head1 FRAMEWORK STRING
-
-  package App::Title;
-
-  use Do 'String';
-
-  method generate() {
-    # ...
-  }
-
-  1;
-
-The framework's string configuration configures the calling package as a class
-which extends the String class. Read more at L<Data::Object::String>.
-
-+=head1 FRAMEWORK UNDEF
-
-  package App::Fail;
-
-  use Do 'Undef';
-
-  method explain() {
-    # ...
-  }
-
-  1;
-
-The framework's undef configuration configures the calling package as a class
-which extends the Undef class. Read more at L<Data::Object::Undef>.
+It's important to note that while the example showcases much of what's possible
+with this framework, all of the sophistication is totally optional.  For
+example, method and function signatures are optionally typed, so the
+declarations would work just as well without the types specified. In fact, you
+could then remove the C<App> type library declarations and even resort
+rewriting the method and function as plain-old Perl subroutines.  This
+flexibility to be able to enable more advanced capabilities is common in the
+Perl ecosystem and is one of the things we love most. The wiring-up of things!
+If you're familiar with Perl, this framework is in-part the wiring up of L<Moo>
+(with L<Moose> support), L<Type::Tiny>, L<Function::Parameters>, L<Try::Tiny>
+  and data objects in a cooperative and cohesive way that feels like it's
+native to the language. Please feel free to use as much or as little of the
+framework as you need and are comfortable with.
 
 +=head1 INSTALLATION
 
@@ -334,7 +189,7 @@ If you don't have cpanm, get it! It takes less than a minute, otherwise:
 
 Add C<Do> to the list of dependencies in C<cpanfile>:
 
-  requires "Do" => "1.09"; # 1.09 or newer
+  requires "Do" => "1.60"; # 1.60 or newer
 
 If cpanm doesn't have permission to install modules in the current Perl
 installation, it will automatically set up and install to a local::lib in your

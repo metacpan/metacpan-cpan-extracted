@@ -1,3 +1,44 @@
+0.4.2
+-----
+  * fa031cbe4851: Create branch for Lintian (stable)
+  * 2672d3d4bc45: Bump Standards-Version: from 3.7.3 to 4.3.0
+  * 16dbe9f790ea: W: wrong-section-according-to-package-name libtest-module-runnable-perl => perl
+  * c3f589d87560: define debian/source/format as native
+  * f876ae97cdcc: Merged stable into f/201909-lintian (refresh branch)
+  * c95fd7910f64: Try to sack off warning about copyright file being a templte
+  * 33092748bd83: Short description warning
+  * d427645c6547: Extended description line too long
+  * 54d4092fc27e: priority-extra-is-replaced-by-priority-optional
+
+0.4.1
+-----
+  * abb5be3570be: Problems since the introduction of Test::Module::Runnable::Base mean we must re-unify all user-facing documentation
+  * 90b870521edd: Move license from ::Base into main module
+  * be9fad4e136a: More clearly show that not calling run() is now very deprecated
+  * ff3222418be1: Move bulk of PoD out from Test::Module::Runnable::Base and back into Test::Module::Runnable
+  * 5832eda3e32a: Fix up moving remaining relevant, user-facing PoD
+  * c67701ff7273: Merge duplicate 'PRIVATE METHODS's in Base class
+  * a4b7545a78db: Some attributes misclassified as methods in Base
+  * 2edeaae90529: Write PoD for __wrapFail
+  * da867ad78a10: setUpBeforeClass and tearDownAfterClass should be in USER DEFINED METHODS
+  * 9ac690a899cf: Quote ^test
+  * 79cec9d2a1d1: Added additional links
+  * 7dade0a09589: Mark TODO empty
+  * 9e2c80077109: Switch to markdown for README (renamed to README.md)
+  * 98e61e4b61e3: Basic placeholder README markdown
+  * 4db3f5bd1dd1: More README.md changes, to allow people to download the project easily
+
+0.4.0
+-----
+  * Removed Bitbucket pipeline support (YAML)
+  * Added Sourcehut pipeline support (YAML) -- https://builds.sr.ht
+  * Added modeSwitch() and modeName() user hooks
+  * Update links because of project migration from bitbucket
+
+0.3.0
+-----
+  * FIXME: Details missing
+
 0.2.0
 -----
   * 'rand' domain in unique() call.

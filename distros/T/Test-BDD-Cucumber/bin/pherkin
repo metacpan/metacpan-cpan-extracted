@@ -6,7 +6,7 @@ pherkin - Execute tests written using Test::BDD::Cucumber
 
 =head1 VERSION
 
-version 0.60
+version 0.62
 
 =head1 SYNOPSIS
 
@@ -82,11 +82,10 @@ Help
 =head1 OUTPUTS
 
 C<pherkin> can output using any of the C<Test::BDD::Cucumber::Harness> output
-modules. L<Test::BDD::Cucumber::TermColor> is the default, but
-L<Test::BDD::Cucumber::TestBuilder> is also a reasonable option:
+modules. L<TermColor> is the default, but L<TAP> is also a reasonable option:
 
   pherkin -o TermColor some/path/feature   # The default
-  pherkin -o TestBuilder some/path/feature # Test::Builder-type text output
+  pherkin -o TAP some/path/feature         # TAP text output (for e.g. prove)
 
 =head1 CONFIGURATION PROFILES
 

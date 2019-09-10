@@ -10,7 +10,7 @@ use Moo;
 use Carp 'confess';
 
 
-our $VERSION = '1.60'; # VERSION
+our $VERSION = '1.70'; # VERSION
 
 # BUILD
 
@@ -167,7 +167,9 @@ sub load {
     $@;
   } if !$failed;
 
-  confess "Error attempting to load $class: $error"
+  my $unknown = "Cause unknown";
+
+  confess "Error attempting to load $class: " . ($error || $unknown)
     if $error
     or $failed
     or not $loaded;
@@ -1325,9 +1327,9 @@ their names.
 
 =head1 CREDITS
 
-Al Newkirk, C<awncorp@cpan.org>, C<+284>
+Al Newkirk, C<+287>
 
-Anthony Brummett, C<abrummet@genome.wustl.edu>, C<+10>
+Anthony Brummett, C<+10>
 
 =cut
 

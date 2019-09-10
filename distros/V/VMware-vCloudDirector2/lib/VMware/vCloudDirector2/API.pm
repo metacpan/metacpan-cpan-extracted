@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use v5.10;    # needed for state variable
 
-our $VERSION = '0.102'; # VERSION
+our $VERSION = '0.103'; # VERSION
 our $AUTHORITY = 'cpan:NIGELM'; # AUTHORITY
 
 use Moose;
@@ -486,7 +486,7 @@ VMware::vCloudDirector2::API - Module to do stuff!
 
 =head1 VERSION
 
-version 0.102
+version 0.103
 
 =head2 Attributes
 

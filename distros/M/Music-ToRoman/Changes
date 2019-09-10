@@ -1,8 +1,19 @@
 Revision history for Music-ToRoman
 
+0.1702 2019-09-09 18:09:25
+    - Convert bI to vii and bIV to iii.
+
+0.1701 2019-09-09 14:57:50
+    - Adjusted certain enharmonic sensing logic.
+    - Add tests!
+
+0.1700 2019-09-08 00:46:29
+    - Look for enharmonic notes who's counterpart is not found in the scale.
+    - Add an iterative test of the whole note modes.
+
 0.1600 2019-09-06 10:29:40
     - Improve documentation.
-    - Make double-flatted chord parsing work for cetain cases.
+    - Make double-flatted chord parsing work for certain cases.
 
 0.1500 2019-09-05 19:46:15
     - Improve documentation.

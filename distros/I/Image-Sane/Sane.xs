@@ -162,7 +162,7 @@ sane__set_auto (h, n)
 		SANE_Int	n
 	INIT:
 		SANE_Status	status;
-		SANE_Int	info;
+		SANE_Int	info = 0;
         PPCODE:
        		SV* sv = get_sv("Image::Sane::DEBUG", FALSE);
                	if (SvTRUE(sv)) printf("Setting option %d to automatic on SANE_Handle %p\n", n, (void *) h);
@@ -179,8 +179,8 @@ sane__set_option (h, n, value)
                 SV*		value
 	INIT:
 		SANE_Status	status;
-		SANE_Int	info;
-		void *		valuep;
+		SANE_Int	info = 0;
+		void *		valuep = &info; /* dummy assignment to avoid warning */
 		const SANE_Option_Descriptor *	opt;
 		SANE_Bool	b;
 		SANE_Fixed      fixed;
@@ -252,8 +252,6 @@ sane__set_option (h, n, value)
 SANE_Status
 sane__start (handle)
 		SANE_Handle	handle
-	INIT:
-        	SANE_Status	status;
 	CODE:
        		SV* sv = get_sv("Image::Sane::DEBUG", FALSE);
                	if (SvTRUE(sv)) printf("Running sane_start for SANE_Handle %p\n", (void *) handle);
@@ -299,7 +297,7 @@ sane__read (handle, max_length)
                 PUSHMARK(sp);
 	        XPUSHs(sv_2mortal(newSViv(status)));
                 if (!status) {
-                	XPUSHs(sv_2mortal(newSVpvn(data, length)));
+                        XPUSHs(sv_2mortal(newSVpvn((const char *) data, length)));
 			XPUSHs(sv_2mortal(newSViv(length)));
                 }
                 PUTBACK;
@@ -542,10 +540,8 @@ sane__get_devices (local=SANE_FALSE)
 		SANE_Bool	local
 	INIT:
 		SANE_Status	status;
-		AV * array;
                 int i;
                 const SANE_Device **	device_list;
-		array = (AV *)sv_2mortal((SV *)newAV());
         PPCODE:
        		SV* sv = get_sv("Image::Sane::DEBUG", FALSE);
                	if (SvTRUE(sv)) printf("Running sane_get_devices\n");
@@ -571,9 +567,9 @@ sane_strstatus (status)
 void
 sane__exit ()
 	CODE:
-       		SV* sv = get_sv("Image::Sane::_vc", FALSE);
+       		SV* sv = get_sv("Image::Sane::vc", FALSE);
                	if (SvTRUE(sv)) {
         		sv = get_sv("Image::Sane::DEBUG", FALSE);
                 	if (SvTRUE(sv)) printf("Exiting via sane_exit\n");
-			sane_exit;
+			sane_exit();
 		}

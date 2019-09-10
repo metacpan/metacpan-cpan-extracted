@@ -48,8 +48,13 @@ isa_ok $data, 'Data::Object::Regexp';
 $data = Data::Object::Regexp->new($data);
 isa_ok $data, 'Data::Object::Regexp';
 
+# instantiate without arg
+$data = Data::Object::Regexp->new;
+isa_ok $data, 'Data::Object::Regexp';
+is "$data", qr/.*/;
+
 # instantiation error
-ok !eval{Data::Object::Regexp->new};
+ok !eval{Data::Object::Regexp->new(0)};
 like $@, qr(Instantiation Error);
 
 ok 1 and done_testing;

@@ -8,6 +8,7 @@ Makefile.PL
 README
 README.md
 dist.ini
+eg/all-possible
 lib/Music/ToRoman.pm
 t/00-compile.t
 t/00-methods.t
@@ -23,7 +24,10 @@ t/09-methods.t
 t/10-methods.t
 t/11-methods.t
 t/12-methods.t
-t/author-eol.t
+t/13-methods.t
+t/14-methods.t
+t/15-methods.t
+t/16-methods.t
 t/author-no-tabs.t
 t/author-pod-coverage.t
 t/author-pod-spell.t

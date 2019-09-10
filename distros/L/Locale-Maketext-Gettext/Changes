@@ -1,5 +1,14 @@
 Locale-Maketext-Gettext change log
 
+2019-09-09	version 1.29
+	 Fix after 10 years.
+	 1. Gettext.pm: Added support to purge the lexicon cache and
+	    reread the MO file on calling textdomain() when MO file is
+	    updated automatically.  This enables MO file live update with
+	    persistant applications like Mojolicious or mod_perl.
+	 2. Source is now on Github.  See:
+	    https://github.com/imacat/Locale-Maketext-Gettext
+
 2009-06-27	version 1.28
 	 Build script fix.  No code changes.
 	 1. Build.PL: Removed the build_requires, as they are not

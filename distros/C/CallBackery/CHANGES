@@ -1,3 +1,11 @@
+0.18.2 2019-09-10 15:14:45 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - added french translation
+
+0.18.1 2019-09-10 12:13:24 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - updated fr and it translations
+
 0.18.0 2019-08-16 11:34:38 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - add support for per-call log cleaners to prevent login call from spilling the password while loging

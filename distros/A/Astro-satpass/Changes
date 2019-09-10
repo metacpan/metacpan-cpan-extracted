@@ -1,3 +1,8 @@
+0.109		2019-09-08	T. R. Wyant
+    Further deprecate nutation and obliquity subroutines in favor of the
+    same-named methods. Subroutine calls now always result in a warning.
+    In six months they will be fatal.
+
 0.108		2019-08-29	T. R. Wyant
     Validate 'twilight' attribute. It must be between -PI/2 and PI/2
     inclusive. Thanks to Kay Kilpatrick for bringing this to my

@@ -3,10 +3,11 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Convert notes and chords to Roman numeral notation
 
-our $VERSION = '0.1600';
+our $VERSION = '0.1702';
 
 use List::MoreUtils qw/ any first_index /;
 use Moo;
+use Music::Note;
 use Music::Scales;
 
 use strictures 2;
@@ -83,6 +84,20 @@ sub parse {
     }
     print "NOTES: @notes\n" if $self->verbose;
 
+# XXX Not working?
+#    my %ss_enharmonics = (
+#        'C##' => 'D',
+#        'D##' => 'E',
+#        'F##' => 'G',
+#        'G##' => 'A',
+#        'A##' => 'B',
+#    );
+#    for ( @notes ) {
+#        $_ = $ss_enharmonics{$_}
+#            if $ss_enharmonics{$_};
+#    }
+#use Data::Dumper;warn(__PACKAGE__,' ',__LINE__," MARK: ",Dumper\@notes);
+
     # Convert a diminished chord
     $chord =~ s/dim/o/;
 
@@ -105,12 +120,32 @@ sub parse {
     # Get the roman representation based on the scale position
     my $position = first_index { $_ eq $note } @notes;
 
-    # If the note is not in the scale find a new position and accidental
-    my $accidental;
-    if ( $position == -1 ) {
+    if ( $position < 0 && ( $note eq 'Cb' || $note eq 'Fb' ) ) {
+        $note = 'B'
+            if $note eq 'Cb';
+        $note = 'E'
+            if $note eq 'Fb';
+        $position = first_index { $_ eq $note } @notes;
+    }
+    elsif ( $note eq 'E#' ) {
+        $note = 'F';
+    }
+
+    my $accidental = '';
+    # If the note is not in the scale find the new position and accidental
+    if ( $position < 0 ) {
         ( $position, $accidental ) = _pos_acc( $note, $position, \@notes );
     }
-    $accidental ||= '';
+
+    if ( $position < 0 && $note =~ /[#b]+$/ ) {
+        my $n = Music::Note->new( $note, 'isobase' );
+        my $name = $n->format('isobase');
+        ( $accidental = $name ) =~ s/^[A-G]([#b]+)$/$1/;
+        $n->en_eq( $accidental =~ /^#/ ? 'b' : '#' );
+        $note = $n->format('isobase');
+        $position = first_index { $_ eq $note } @notes;
+        $accidental = '';
+    }
 
     my $roman = $scale[$position];
     print "ROMAN 1: $roman\n" if $self->verbose;
@@ -120,7 +155,7 @@ sub parse {
 
     # Are we minor or diminished?
     my $minor = $decorator =~ /[-moø]/ ? 1 : 0;
-    print "CHORD: $chord, NOTE: $note, ACCI: $accidental, DECO: $decorator, MINOR: $minor, POSN: $position\n" if $self->verbose;
+    print "CHORD: $chord, NOTE: $note, NEW ACCI: $accidental, DECO: $decorator, MINOR: $minor, POSN: $position\n" if $self->verbose;
 
     # Convert the case of the roman representation based on minor or major
     if ( $self->chords ) {
@@ -176,6 +211,10 @@ sub parse {
 
     # Append the remaining decorator to the roman representation
     $roman .= $decorator;
+
+    $roman =~ s/bI\b/vii/g;
+    $roman =~ s/bIV\b/iii/g;
+
     print "ROMAN 4: $roman\n" if $self->verbose;
 
     return $roman;
@@ -226,9 +265,11 @@ sub _pos_acc {
     if ( length($note) == 1 ) {
         # Find the scale position of the closest similar note
         $position = first_index { $_ =~ /^$note/ } @$notes;
+
         # Get the accidental of the scale note
         ( $accidental = $notes->[$position] ) =~ s/^[A-G](.)$/$1/;
-        # TODO: Why?
+
+        # TODO: Explain why.
         $accidental = $accidental eq '#' ? 'b' : '#';
     }
     else {
@@ -246,6 +287,7 @@ sub _pos_acc {
 
         # Get the accidental of the given note
         ( my $letter, $accidental ) = $note =~ /^([A-G])(.+)$/;
+
         # Get the scale position of the closest similar note
         $position = first_index { $_ =~ /^$letter/ } @$notes;
 
@@ -302,7 +344,7 @@ Music::ToRoman - Convert notes and chords to Roman numeral notation
 
 =head1 VERSION
 
-version 0.1600
+version 0.1702
 
 =head1 SYNOPSIS
 
@@ -454,6 +496,8 @@ Parsing a double flatted chord will only work in select cases.
 L<List::MoreUtils>
 
 L<Moo>
+
+L<Music::Note>
 
 L<Music::Scales>
 

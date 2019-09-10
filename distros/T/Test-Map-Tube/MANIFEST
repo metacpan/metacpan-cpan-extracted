@@ -9,13 +9,13 @@ t/Sample.pm
 t/sample.xml
 t/bad-sample.xml
 t/00-load.t
-t/pod.t
 t/ok_map.t
 t/not_ok_map.t
 t/ok_map_functions.t
 t/ok_map_routes.t
-t/manifest.t
-t/meta-json.t
-t/meta-yml.t
+xt/pod.t
+xt/manifest.t
+xt/meta-json.t
+xt/meta-yml.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

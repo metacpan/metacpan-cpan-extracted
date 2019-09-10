@@ -7,7 +7,7 @@ use Test::More 0.98;
 
 use Cwd;
 use File::Temp qw(tempfile tempdir);
-use IPC::System::Options qw(system readpipe run);
+use IPC::System::Options qw(system readpipe run start);
 
 subtest system => sub {
 
@@ -88,6 +88,16 @@ subtest run => sub {
     subtest "opt:stdin" => sub {
         my $stdout;
         run({stdin=>"123", capture_stdout=>\$stdout}, $^X, "-e", "print <>");
+        is_deeply($stdout, "123");
+    };
+    ok 1;
+};
+
+subtest start => sub {
+    subtest "opt:stdin" => sub {
+        my $stdout;
+        my $h = start({stdin=>"123", capture_stdout=>\$stdout}, $^X, "-e", "print <>");
+        $h->finish;
         is_deeply($stdout, "123");
     };
     ok 1;

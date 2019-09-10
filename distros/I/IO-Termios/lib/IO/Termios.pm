@@ -12,9 +12,9 @@ use base qw( IO::Handle );
 
 use Carp;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
-use Exporter 'import';
+use Exporter ();
 
 use Fcntl qw( O_RDWR );
 use POSIX qw( TCSANOW );
@@ -66,6 +66,16 @@ can be used to access the hardware handshaking lines.
    $ttyS0->set_mode( "19200,8,n,1" );
    $ttyS0->set_modem({ dsr => 1, cts => 1 });
 
+=head2 Upgrading STDIN/STDOUT/STDERR
+
+If you pass the C<-upgrade> option at C<import> time, any of STDIN, STDOUT or
+STDERR that are found to be TTY wrappers are automatically upgraded into
+C<IO::Termios> instances.
+
+   use IO::Termios -upgrade;
+
+   STDIN->setflag_echo(0);
+
 =head2 Arbitrary Baud Rates on Linux
 
 F<Linux> supports a non-POSIX extension to the usual C<termios> interface,
@@ -76,6 +86,24 @@ methods to set any rate allowed by the kernel/driver. If not, then only the
 POSIX-compatible rates may be used.
 
 =cut
+
+sub import
+{
+   my $pkg = shift;
+   my @symbols = @_;
+   my $caller = caller;
+
+   my $upgrade;
+   @symbols = grep { $_ eq "-upgrade" ? ( $upgrade++, 0 ) : 1 } @symbols;
+
+   if( $upgrade ) {
+      foreach my $fh ( *STDIN{IO}, *STDOUT{IO}, *STDERR{IO} ) {
+         IO::Termios::Attrs->new->getattr( $fh->fileno ) or next;
+
+         bless $fh, __PACKAGE__;
+      }
+   }
+}
 
 =head1 CONSTRUCTORS
 
@@ -809,14 +837,6 @@ sub cfmakeraw
 =item *
 
 Adding more getflag_*/setflag_* convenience wrappers
-
-=item *
-
-Automatically upgrading STDIN/STDOUT/STDERR if appropriate, given a flag.
-
-   use IO::Termios -upgrade;
-
-   STDIN->setflag_echo( 0 );
 
 =back
 

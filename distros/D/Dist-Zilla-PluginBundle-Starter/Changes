@@ -1,3 +1,10 @@
+v3.0.5    2019-09-09 20:34:12 EDT
+  - Fix Dist::Zilla::Starter overview to not link to itself.
+
+v3.0.4    2019-09-09 19:17:20 EDT
+  - Add overview section to Dist::Zilla::Starter guide.
+  - Add example dist.ini configurations to Dist::Zilla::PluginBundle::Starter documentation.
+
 v3.0.3    2019-05-19 12:12:06 EDT
   - Updates and fixes to Dist::Zilla::Starter guide.
 

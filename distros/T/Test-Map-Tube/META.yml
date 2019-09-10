@@ -20,7 +20,7 @@ no_index:
 provides:
   Test::Map::Tube:
     file: lib/Test/Map/Tube.pm
-    version: '0.56'
+    version: '0.57'
 requires:
   Data::Compare: '1.25'
   Map::Tube: '3.64'
@@ -28,5 +28,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Test-Map-Tube.git
-version: '0.56'
+version: '0.57'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

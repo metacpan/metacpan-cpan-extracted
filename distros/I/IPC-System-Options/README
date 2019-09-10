@@ -3,11 +3,11 @@ NAME
     options
 
 VERSION
-    This document describes version 0.331 of IPC::System::Options (from Perl
-    distribution IPC-System-Options), released on 2019-01-07.
+    This document describes version 0.332 of IPC::System::Options (from Perl
+    distribution IPC-System-Options), released on 2019-09-03.
 
 SYNOPSIS
-     use IPC::System::Options qw(system readpipe run);
+     use IPC::System::Options qw(system readpipe run start);
 
      # use exactly like system()
      system(...);
@@ -53,6 +53,14 @@ SYNOPSIS
      # also accepts an optional hash first argument. some additional options that
      # run() accepts: stdin.
      run({capture_stdout => \$stdout, capture_stderr => \$stderr}, 'ls', '-l');
+
+    "start()" is like "run()" but uses IPC::Run's "start()" instead of
+    "run()" to run program in the background. The result is a handle (see
+    IPC::Run for more details) which you can then call "finish()", etc on.
+
+     my $h = start('ls', '-l');
+     ...
+     $h->finish;
 
 DESCRIPTION
 FUNCTIONS
@@ -288,6 +296,10 @@ FUNCTIONS
     *   dry_run => bool
 
         See option documentation in "system()".
+
+  start([ \%opts ], @args)
+    Like "run()", but uses IPC::Run's "start()". For known options, see
+    "run()".
 
 HOMEPAGE
     Please visit the project's homepage at

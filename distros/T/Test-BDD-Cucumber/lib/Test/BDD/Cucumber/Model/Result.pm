@@ -1,12 +1,12 @@
 package Test::BDD::Cucumber::Model::Result;
-$Test::BDD::Cucumber::Model::Result::VERSION = '0.60';
+$Test::BDD::Cucumber::Model::Result::VERSION = '0.62';
 =head1 NAME
 
 Test::BDD::Cucumber::Model::Result - Encapsulates a result state
 
 =head1 VERSION
 
-version 0.60
+version 0.62
 
 =head1 DESCRIPTION
 

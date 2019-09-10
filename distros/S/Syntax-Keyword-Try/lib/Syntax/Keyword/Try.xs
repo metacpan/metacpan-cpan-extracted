@@ -7,11 +7,6 @@
 #include "perl.h"
 #include "XSUB.h"
 
-#ifndef OP_CHECK_MUTEX_LOCK /* < 5.15.8 */
-#define OP_CHECK_MUTEX_LOCK ((void)0)
-#define OP_CHECK_MUTEX_UNLOCK ((void)0)
-#endif
-
 /* Before perl 5.22 these were not visible */
 
 #ifndef cv_clone
@@ -41,11 +36,43 @@
 #define PERL_VERSION_GE(r,v,s) \
         (PERL_DECIMAL_VERSION >= PERL_VERSION_DECIMAL(r,v,s))
 
+#if PERL_VERSION_GE(5,26,0)
+#  define HAVE_OP_SIBPARENT
+#endif
+
 #if PERL_VERSION_GE(5,19,4)
 typedef SSize_t array_ix_t;
 #else /* <5.19.4 */
 typedef I32 array_ix_t;
 #endif /* <5.19.4 */
+
+#ifndef wrap_keyword_plugin
+#  ifndef OP_CHECK_MUTEX_LOCK /* < 5.15.8 */
+#    define OP_CHECK_MUTEX_LOCK ((void)0)
+#    define OP_CHECK_MUTEX_UNLOCK ((void)0)
+#  endif
+
+#  define wrap_keyword_plugin(func, var)  S_wrap_keyword_plugin(aTHX_ func, var)
+static void S_wrap_keyword_plugin(pTHX_ Perl_keyword_plugin_t func, Perl_keyword_plugin_t *var)
+{
+  /* BOOT can potentially race with other threads (RT123547) */
+
+  /* Perl doesn't really provide us a nice mutex for doing this so this is the
+   * best we can find. See also
+   *   https://rt.perl.org/Public/Bug/Display.html?id=132413
+   */
+  if(*var)
+    return;
+
+  OP_CHECK_MUTEX_LOCK;
+  if(!*var) {
+    *var = PL_keyword_plugin;
+    PL_keyword_plugin = func;
+  }
+
+  OP_CHECK_MUTEX_UNLOCK;
+}
+#endif
 
 static OP *pp_entertrycatch(pTHX);
 static OP *pp_catch(pTHX);
@@ -295,18 +322,28 @@ static void MY_walk_optree_try_in_eval(pTHX_ OP **op_ptr, OP *root)
     case OP_LAST:
     case OP_REDO:
       {
-        OP *stateop, *afterop = OpSIBLING(op);
+#ifdef HAVE_OP_SIBPARENT
+        OP *parent = OpHAS_SIBLING(op) ? NULL : op->op_sibparent;
+#endif
 
-        *op_ptr = newLISTOP(OP_SCOPE, 0,
-          stateop = newSTATEOP_nowarnings(),
-          op);
+        OP *stateop = newSTATEOP_nowarnings();
 
-        (*op_ptr)->op_next = stateop;
+        OP *scope = newLISTOP(OP_SCOPE, 0,
+          stateop, op);
+#ifdef HAVE_OP_SIBPARENT
+        if(parent)
+          OpLASTSIB_set(scope, parent);
+        else
+          OpLASTSIB_set(scope, NULL);
+#else
+        op->op_sibling = NULL;
+#endif
+
+        /* Rethread */
+        scope->op_next = stateop;
         stateop->op_next = op;
-        if(afterop) {
-          OpMORESIB_set(op, NULL);
-          OpMORESIB_set(*op_ptr, afterop);
-        }
+
+        *op_ptr = scope;
       }
       break;
 
@@ -332,7 +369,8 @@ static void MY_walk_optree_try_in_eval(pTHX_ OP **op_ptr, OP *root)
         else
           cUNOPx(op)->op_first = newkid;
 
-        OpMORESIB_set(newkid, next);
+        if(next)
+          OpMORESIB_set(newkid, next);
       }
 
       prev = kid;
@@ -472,9 +510,10 @@ static int try_keyword(pTHX_ OP **op)
      ret = op_prepend_elem(OP_LINESEQ, newPUSHFINALLYOP(finally), ret);
   }
 
-  ret = newLISTOP(OP_LEAVE, 0,
-    op_prepend_elem(OP_LINESEQ, newOP(OP_ENTER, 0), ret),
-    NULL);
+  ret = op_append_list(OP_LEAVE,
+    newOP(OP_ENTER, 0),
+    ret);
+
   if(is_value)
     ret->op_ppaddr = &pp_leave_keeping_stack;
 
@@ -503,27 +542,16 @@ static int my_keyword_plugin(pTHX_ char *kw, STRLEN kwlen, OP **op)
 MODULE = Syntax::Keyword::Try    PACKAGE = Syntax::Keyword::Try
 
 BOOT:
-  /* BOOT can potentially race with other threads (RT123547) */
+  XopENTRY_set(&xop_catch, xop_name, "catch");
+  XopENTRY_set(&xop_catch, xop_desc,
+    "optionally invoke the catch block if required");
+  XopENTRY_set(&xop_catch, xop_class, OA_LOGOP);
+  Perl_custom_op_register(aTHX_ &pp_catch, &xop_catch);
 
-  /* Perl doesn't really provide us a nice mutex for doing this so this is the
-   * best we can find. See also
-   *   https://rt.perl.org/Public/Bug/Display.html?id=132413
-   */
-  OP_CHECK_MUTEX_LOCK;
-  if(!next_keyword_plugin) {
-    next_keyword_plugin = PL_keyword_plugin;
-    PL_keyword_plugin = &my_keyword_plugin;
+  XopENTRY_set(&xop_pushfinally, xop_name, "pushfinally");
+  XopENTRY_set(&xop_pushfinally, xop_desc,
+    "arrange for a CV to be invoked at scope exit");
+  XopENTRY_set(&xop_pushfinally, xop_class, OA_SVOP);
+  Perl_custom_op_register(aTHX_ &pp_pushfinally, &xop_pushfinally);
 
-    XopENTRY_set(&xop_catch, xop_name, "catch");
-    XopENTRY_set(&xop_catch, xop_desc,
-      "optionally invoke the catch block if required");
-    XopENTRY_set(&xop_catch, xop_class, OA_LOGOP);
-    Perl_custom_op_register(aTHX_ &pp_catch, &xop_catch);
-
-    XopENTRY_set(&xop_pushfinally, xop_name, "pushfinally");
-    XopENTRY_set(&xop_pushfinally, xop_desc,
-      "arrange for a CV to be invoked at scope exit");
-    XopENTRY_set(&xop_pushfinally, xop_class, OA_SVOP);
-    Perl_custom_op_register(aTHX_ &pp_pushfinally, &xop_pushfinally);
-  }
-  OP_CHECK_MUTEX_UNLOCK;
+  wrap_keyword_plugin(&my_keyword_plugin, &next_keyword_plugin);

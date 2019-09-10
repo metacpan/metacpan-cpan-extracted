@@ -12,7 +12,7 @@ use Unicode::Normalize();
 use WebService::HIBP::Breach();
 use WebService::HIBP::Paste();
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 sub _LENGTH_OF_PASSWORD_PREFIX { return 5; }
 
@@ -20,7 +20,7 @@ sub new {
     my ( $class, %params ) = @_;
     my $self = {};
     bless $self, $class;
-    $self->{url}          = 'https://haveibeenpwned.com/api/v2/';
+    $self->{url}          = 'https://haveibeenpwned.com/api/v3/';
     $self->{password_url} = 'https://api.pwnedpasswords.com/range/';
     if ( $params{user_agent} ) {
         $self->{ua} = $params{user_agent};
@@ -29,6 +29,9 @@ sub new {
         $self->{ua} =
           LWP::UserAgent->new( agent => "WebService-HIBP/$VERSION " );
         $self->{ua}->env_proxy();
+    }
+    if ( $params{api_key} ) {
+        $self->{ua}->default_header('hibp-api-key' => $params{api_key});
     }
     return $self;
 }
@@ -137,9 +140,13 @@ sub account {
     my @filters;
     if ( $parameters{unverified} ) {
         push @filters, 'includeUnverified=true';
+    } else {
+        push @filters, 'includeUnverified=false';
     }
     if ( $parameters{truncate} ) {
         push @filters, 'truncateResponse=true';
+    } else {
+        push @filters, 'truncateResponse=false';
     }
     if ( $parameters{domain} ) {
         push @filters,
@@ -198,7 +205,7 @@ WebService::HIBP - An interface to the Have I Been Pwned webservice at haveibeen
 
 =head1 VERSION
 
-Version 0.14
+Version 0.15
 
 =head1 SYNOPSIS
 
@@ -230,6 +237,8 @@ a new C<WebService::HIBP> object, ready to check how bad the pwnage is.  It acce
 =over 4
 
 =item * user_agent - A pre-configured instance of L<LWP::UserAgent|LWP::UserAgent> that will be used instead of the automatically created one.  This allows full control of the user agent properties if desired
+
+=item * api_key - User provided API key to access HaveIBeenPwned API, see https://haveibeenpwned.com/API/v3#Authorisation and https://haveibeenpwned.com/API/Key for details.
 
 =back
 

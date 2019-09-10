@@ -2,7 +2,7 @@ NAME
     Task::Tmp::spanel - Perl modules for Spanel
 
 VERSION
-    version 0.007
+    version 0.009
 
 TASK CONTENTS
   Included modules
@@ -26,10 +26,13 @@ TASK CONTENTS
    Data::Dumper
    Data::ModeMerge
    Data::Sah
+   Data::Transmute
+   Data::Transmute::Rules::DNS::Zone::Struct::FromSpanel
    Date::Manip
    DateTime
    Digest::MD5
    Digest::SHA1
+   DNS::Zone::Struct::Common::BIND
    Error
    Exporter
    Fcntl
@@ -96,6 +99,8 @@ TASK CONTENTS
    String::ShellQuote
    Sub::Curry
    Sys::RunAlone
+   Sys::RunAlone::Flexible
+   Sys::RunAlone::Flexible2
    Tie::Handle::FileWriteRotate
    Time::Local
    URI

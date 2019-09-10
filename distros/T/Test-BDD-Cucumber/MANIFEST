@@ -5,7 +5,6 @@ MANIFEST
 META.json
 META.yml
 Makefile.PL
-README
 README.pod
 bin/pherkin
 dist.ini
@@ -32,6 +31,7 @@ lib/Test/BDD/Cucumber/Extension.pm
 lib/Test/BDD/Cucumber/Harness.pm
 lib/Test/BDD/Cucumber/Harness/Data.pm
 lib/Test/BDD/Cucumber/Harness/JSON.pm
+lib/Test/BDD/Cucumber/Harness/TAP.pm
 lib/Test/BDD/Cucumber/Harness/TermColor.pm
 lib/Test/BDD/Cucumber/Harness/TestBuilder.pm
 lib/Test/BDD/Cucumber/I18N/Data.pm
@@ -51,7 +51,6 @@ lib/Test/BDD/Cucumber/Model/TagSpec.pm
 lib/Test/BDD/Cucumber/Parser.pm
 lib/Test/BDD/Cucumber/StepContext.pm
 lib/Test/BDD/Cucumber/StepFile.pm
-lib/Test/BDD/Cucumber/TestBuilderDelegator.pm
 lib/Test/BDD/Cucumber/Util.pm
 script/make_corpus.pl
 t/210_background_sections.t

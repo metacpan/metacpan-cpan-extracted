@@ -1,3 +1,25 @@
+0.083   2019-09-10  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Skip tests that need Perinci::Sub::Wrapper as it's now an
+	  optional prereq [RT#130351].
+
+
+0.082   2019-08-18  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Add examples for import options in Synopsis.
+
+
+0.081   2019-08-15  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc][ux] Add importing examples in Synopsis.
+
+
 0.080   2019-08-15  Released-By: PERLANCAR; Urgency: medium
 
 	[INCOMPATIBLE CHANGES]

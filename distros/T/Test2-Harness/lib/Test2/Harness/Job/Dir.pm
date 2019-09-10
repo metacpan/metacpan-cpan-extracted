@@ -2,7 +2,7 @@ package Test2::Harness::Job::Dir;
 use strict;
 use warnings;
 
-our $VERSION = '0.001095';
+our $VERSION = '0.001099';
 
 use File::Spec();
 
@@ -556,6 +556,8 @@ sub _process_start_line {
                 job_id  => $self->{+JOB_ID},
                 stamp   => $value,
                 file    => $self->file,
+                rel_file => File::Spec->abs2rel($self->file),
+                abs_file => File::Spec->rel2abs($self->file),
             },
         }
     };

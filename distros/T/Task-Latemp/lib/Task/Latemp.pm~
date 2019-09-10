@@ -22,21 +22,21 @@ use YAML;
 
 =head1 NAME
 
-Task::Latemp - Specifications for modules needed by the Latemp CMS.
+Task::Latemp - Specifications for modules needed by the Latemp static site generator.
 
 =cut
 
-our $VERSION = '0.0102';
+our $VERSION = '0.0103';
 
 =head1 DESCRIPTION
 
-Latemp ( L<http://web-cpan.berlios.de/latemp/> ) is a Content Management
-System based on Web Meta Language. This module install all of its
+Latemp ( L<https://web-cpan.shlomifish.org/latemp/> ) is a static site
+generator based on Website Meta Language. This task installs all of its
 required dependencies.
 
 =head1 AUTHOR
 
-Shlomi Fish, C<< <shlomif at iglu.org.il> >>
+Shlomi Fish, L<https://www.shlomifish.org/> .
 
 =head1 BUGS
 
@@ -68,9 +68,9 @@ L<http://cpanratings.perl.org/d/Task-Latemp>
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Task-Latemp>
 
-=item * Search CPAN
+=item * MetaCPAN
 
-L<http://search.cpan.org/dist/Task-Latemp>
+L<https://metacpan.org/release/Task-Latemp>
 
 =back
 
@@ -84,7 +84,7 @@ L<Task> .
 
 Copyright 2006 Shlomi Fish, all rights reserved.
 
-This program is released under the following license: bsd
+This program is released under the following license: MIT / Expat .
 
 =cut
 

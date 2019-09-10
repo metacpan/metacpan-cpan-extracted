@@ -1,3 +1,9 @@
+v0.98.3 2019-09-08T06:37:58Z
+ - app api noauthh fix
+
+v0.98.2 2019-09-08T01:32:49Z
+ - resources updated
+
 v0.98.1 2019-07-27T22:31:44Z
  - api schema moved to files
  - dist docker support for multistage build

@@ -59,6 +59,6 @@
       "x_IRC" : "irc://chat.freenode.net/#labmeasurement",
       "x_MailingList" : "https://www-mailman.uni-regensburg.de/mailman/listinfo/lab-measurement-users"
    },
-   "version" : "0.07",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

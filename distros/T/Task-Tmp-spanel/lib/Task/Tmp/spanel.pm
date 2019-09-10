@@ -1,7 +1,7 @@
 package Task::Tmp::spanel;
 
-our $DATE = '2019-08-30'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $DATE = '2019-09-10'; # DATE
+our $VERSION = '0.009'; # VERSION
 
 1;
 # ABSTRACT: Perl modules for Spanel
@@ -18,7 +18,7 @@ Task::Tmp::spanel - Perl modules for Spanel
 
 =head1 VERSION
 
-version 0.007
+version 0.009
 
 =head1 TASK CONTENTS
 
@@ -64,6 +64,10 @@ version 0.007
 
 =head3 L<Data::Sah>
 
+=head3 L<Data::Transmute>
+
+=head3 L<Data::Transmute::Rules::DNS::Zone::Struct::FromSpanel>
+
 =head3 L<Date::Manip>
 
 =head3 L<DateTime>
@@ -71,6 +75,8 @@ version 0.007
 =head3 L<Digest::MD5>
 
 =head3 L<Digest::SHA1>
+
+=head3 L<DNS::Zone::Struct::Common::BIND>
 
 =head3 L<Error>
 
@@ -203,6 +209,10 @@ version 0.007
 =head3 L<Sub::Curry>
 
 =head3 L<Sys::RunAlone>
+
+=head3 L<Sys::RunAlone::Flexible>
+
+=head3 L<Sys::RunAlone::Flexible2>
 
 =head3 L<Tie::Handle::FileWriteRotate>
 

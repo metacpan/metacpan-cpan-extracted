@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized once );
 
-our $VERSION = '1.848';
+our $VERSION = '1.850';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitSubroutinePrototypes)
@@ -145,6 +145,7 @@ sub AUTOLOAD {
    return MCE::Shared::Object::_init(@_) if $_fcn eq 'init';
    return MCE::Shared::Server::_start() if $_fcn eq 'start';
    return MCE::Shared::Server::_stop() if $_fcn eq 'stop';
+   return MCE::Shared::Server::_pid() if $_fcn eq 'pid';
 
    if ( $_fcn eq 'array' || $_fcn eq 'hash' ) {
       _use( 'MCE::Shared::'.ucfirst($_fcn) );
@@ -448,7 +449,7 @@ MCE::Shared - MCE extension for sharing data supporting threads and processes
 
 =head1 VERSION
 
-This document describes MCE::Shared version 1.848
+This document describes MCE::Shared version 1.850
 
 =head1 SYNOPSIS
 
@@ -1874,6 +1875,22 @@ modded internally in a round-robin fashion.
 
  MCE::Shared->init();
  MCE::Shared->init( ID );
+
+=item pid
+
+Returns the process ID of the shared-manager process. This class method
+was added in 1.849 for stopping all workers immediately when exiting a
+L<Graphics::Framebuffer> application. It returns an undefined value
+if the shared-manager is not running. Not useful otherwise if running
+threads (i.e. same PID).
+
+ MCE::Shared->pid();
+
+ $SIG{QUIT} = $SIG{INT} = $SIG{HUP} = $SIG{TERM} = sub {
+    # Signal workers and the shared manager all at once
+    CORE::kill('KILL', MCE::Hobo->list_pids(), MCE::Shared->pid());
+    exec('reset');
+ };
 
 =item start
 

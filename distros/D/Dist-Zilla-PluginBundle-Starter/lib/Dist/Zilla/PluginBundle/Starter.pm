@@ -6,7 +6,7 @@ with 'Dist::Zilla::Role::PluginBundle::Easy',
   'Dist::Zilla::Role::PluginBundle::PluginRemover';
 use namespace::clean;
 
-our $VERSION = 'v3.0.3';
+our $VERSION = 'v3.0.5';
 
 # Revisions can include entries with the standard plugin name, array ref of plugin/name/config,
 # or coderefs which are passed the pluginbundle object and return a list of plugins in one of these formats.
@@ -227,9 +227,10 @@ Dist::Zilla::PluginBundle::Starter - A minimal Dist::Zilla plugin bundle
   -remove = GatherDir  ; to use [Git::GatherDir] instead, for example
   ExecDir.dir = script ; change the directory used by [ExecDir]
   managed_versions = 1 ; uses the main module version, and bumps module versions after release
-  regenerate = LICENSE ; copy LICENSE to root after release or dzil regenerate
+  regenerate = LICENSE ; copy LICENSE to root after release and dzil regenerate
 
-  [@Starter::Git]      ; variant bundle for git workflows
+  [@Starter::Git]      ; drop-in variant bundle for git workflows
+  revision = 3         ; requires/defaults to revision 3
 
 =head1 DESCRIPTION
 
@@ -240,14 +241,16 @@ additional features to stay up to date and allow greater customization. The
 selection of included plugins is intended to be unopinionated and unobtrusive,
 so that it is usable for any well-formed CPAN distribution.
 
-If you're just getting started with L<Dist::Zilla> or CPAN distribution
-building, check out the L<Dist::Zilla::Starter> guide.
+The L<Dist::Zilla::Starter> guide is a starting point if you are new to
+L<Dist::Zilla> or CPAN distribution building. See L</"EXAMPLES"> for example
+configurations of this bundle.
 
 For a variant of this bundle with built-in support for a git-based workflow,
 see L<[@Starter::Git]|Dist::Zilla::PluginBundle::Starter::Git>.
 
 For one-line initialization of a new C<[@Starter]>-based distribution, try
-L<Dist::Zilla::MintingProfile::Starter>.
+L<Dist::Zilla::MintingProfile::Starter> (or
+L<Dist::Zilla::MintingProfile::Starter::Git>).
 
 Migrating from C<[@Basic]> is easy for most cases. Most of the bundle is the
 same, so just make sure to remove any extra plugins that C<[@Starter]> already
@@ -272,7 +275,82 @@ uploading to CPAN.
 
 Another simple way to use L<Dist::Zilla> is with L<Dist::Milla>, an opinionated
 bundle that requires no configuration and performs all of the tasks in
-L</"EXTENDING"> by default.
+L</"EXTENDING"> by default. This bundle can also be configured to operate much
+like L<Dist::Milla>, as in the L</"Dist::Milla equivalent"> example.
+
+=head1 EXAMPLES
+
+Some example F<dist.ini> configurations to get started with.
+
+=head2 Just the basics
+
+  name    = Acme-Foo
+  author  = Jane Doe <example@example.com>
+  license = Artistic_2_0
+  copyright_holder = Jane Doe
+  copyright_year   = 2019
+  version = 1.00
+
+  [@Starter]
+  revision = 3
+
+  [Prereqs / RuntimeRequires]
+  perl = 5.010001
+  Exporter = 5.57
+  Path::Tiny = 0
+
+  [Prereqs / TestRequires]
+  Test::More = 0.88
+
+=head2 Managed boilerplate
+
+  name    = Acme-Foo
+  author  = Jane Doe <example@example.com>
+  license = Artistic_2_0
+  copyright_holder = Jane Doe
+  copyright_year   = 2019
+
+  [@Starter::Git]
+  revision = 3
+  managed_versions = 1
+  regenerate = Makefile.PL
+  regenerate = META.json
+  regenerate = LICENSE
+
+  [AutoPrereqs]
+
+=head2 Dist::Milla equivalent
+
+  [CheckChangesHasContent]
+
+  [ReadmeAnyFromPod]
+  type = markdown
+  filename = README.md
+  location = root
+  phase = release
+  [Regenerate::AfterReleasers]
+  plugin = ReadmeAnyFromPod
+
+  [@Starter::Git]
+  revision = 3
+  installer = ModuleBuildTiny
+  managed_versions = 1
+  regenerate = Build.PL
+  regenerate = META.json
+  regenerate = LICENSE
+  ExecDir.dir = script
+  Release_Commit.allow_dirty[] = README.md
+  BumpVersionAfterRelease.munge_build_pl = 0
+
+  [NameFromDirectory]
+  [LicenseFromModule]
+  override_author = 1
+  [Prereqs::FromCPANfile]
+  [StaticInstall]
+  mode = auto
+  [GithubMeta]
+  issues = 1
+  [Git::Contributors]
 
 =head1 OPTIONS
 

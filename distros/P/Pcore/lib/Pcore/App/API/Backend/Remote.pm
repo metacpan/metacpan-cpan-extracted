@@ -1,8 +1,12 @@
 package Pcore::App::API::Backend::Remote;
 
-use Pcore -role;
+use Pcore -class, -res;
 
 with qw[Pcore::App::API];
+
+sub init ($self) {
+    return res 200;
+}
 
 1;
 __END__

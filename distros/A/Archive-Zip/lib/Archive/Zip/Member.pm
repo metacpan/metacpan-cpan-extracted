@@ -6,7 +6,7 @@ use strict;
 use vars qw( $VERSION @ISA );
 
 BEGIN {
-    $VERSION = '1.64';
+    $VERSION = '1.65';
     @ISA     = qw( Archive::Zip );
 
     if ($^O eq 'MSWin32') {
@@ -654,7 +654,7 @@ sub _dosToUnixTime {
 
 # Note, this is not exactly UTC 1980, it's 1980 + 12 hours and 1
 # minute so that nothing timezoney can muck us up.
-my $safe_epoch = 31.646060;
+my $safe_epoch = 31.656060;
 
 # convert a unix time to DOS date/time
 # NOT AN OBJECT METHOD!
@@ -692,7 +692,7 @@ sub head {
         ? (0,0,0) # crc, compr & uncompr all zero if data descriptor present
         : (
             $self->crc32(), 
-            $mode
+            $mode 
               ? $self->_writeOffset()       # compressed size
               : $self->compressedSize(),    # may need to be re-written later
             $self->uncompressedSize(),
@@ -713,7 +713,10 @@ sub _writeLocalFileHeader {
     $self->_print($fh, $signatureData)
       or return _ioError("writing local header signature");
 
-    my $header = $self->head(1);
+    # Are we dealing with a compression method supported by the module?
+    my $supported_method = $self->desiredCompressionMethod() == COMPRESSION_DEFLATED || $self->desiredCompressionMethod() == COMPRESSION_STORED ;
+    
+    my $header = $self->head($supported_method) ; 
 
     $self->_print($fh, $header) or return _ioError("writing local header");
 

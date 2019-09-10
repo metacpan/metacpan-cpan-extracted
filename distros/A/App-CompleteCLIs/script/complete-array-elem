@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Complete/Util/complete_array_elem
-# and generated automatically using Perinci::CmdLine::Gen version 0.488
+# and generated automatically using Perinci::CmdLine::Gen version 0.491
 
 our $DATE = '2019-07-18'; # DATE
 our $DIST = 'App-CompleteCLIs'; # DIST
-our $VERSION = '0.140'; # VERSION
+our $VERSION = '0.142'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,13 +40,13 @@ complete-array-elem - Complete from array
 
 =head1 VERSION
 
-This document describes version 0.140 of complete-array-elem (from Perl distribution App-CompleteCLIs), released on 2019-07-18.
+This document describes version 0.142 of complete-array-elem (from Perl distribution App-CompleteCLIs), released on 2019-07-18.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % complete-array-elem [options] <word> <array>
+ % complete-array-elem [options] <word> <array> ...
 
 =head1 DESCRIPTION
 

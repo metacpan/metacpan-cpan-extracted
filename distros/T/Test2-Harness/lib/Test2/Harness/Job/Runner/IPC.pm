@@ -2,7 +2,7 @@ package Test2::Harness::Job::Runner::IPC;
 use strict;
 use warnings;
 
-our $VERSION = '0.001095';
+our $VERSION = '0.001099';
 
 use Test2::Harness::Util qw/open_file write_file local_env/;
 use Test2::Harness::Util::IPC qw/run_cmd/;
@@ -76,6 +76,7 @@ sub run {
     my $pid;
     local_env $env => sub {
         $pid = run_cmd(
+            setpgrp => 1,
             chdir   => $job->ch_dir,
             command => sub { $class->command($test, $event_dir, \@inc) },
             stdin   => $in_fh,

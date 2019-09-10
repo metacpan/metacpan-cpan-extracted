@@ -9,7 +9,7 @@ use Carp ();
 
 use Import::Into;
 
-our $VERSION = '1.60'; # VERSION
+our $VERSION = '1.70'; # VERSION
 
 # BUILD
 
@@ -301,6 +301,13 @@ sub config {
   ]
 }
 
+sub config_args {
+  [
+    @{config_class()},
+    prepare_call('extends', 'Data::Object::Args')
+  ]
+}
+
 sub config_array {
   [
     prepare_use('Role::Tiny::With'),
@@ -326,6 +333,13 @@ sub config_code {
   [
     prepare_use('Role::Tiny::With'),
     prepare_use('parent', 'Data::Object::Code')
+  ]
+}
+
+sub config_data {
+  [
+    @{config_class()},
+    prepare_call('extends', 'Data::Object::Data')
   ]
 }
 
@@ -357,13 +371,6 @@ sub config_hash {
   ]
 }
 
-sub config_integer {
-  [
-    prepare_use('Role::Tiny::With'),
-    prepare_use('parent', 'Data::Object::Integer')
-  ]
-}
-
 sub config_base {
   [
     prepare_use('Role::Tiny::With'),
@@ -375,6 +382,13 @@ sub config_number {
   [
     prepare_use('Role::Tiny::With'),
     prepare_use('parent', 'Data::Object::Number')
+  ]
+}
+
+sub config_opts {
+  [
+    @{config_class()},
+    prepare_call('extends', 'Data::Object::Opts')
   ]
 }
 
@@ -420,6 +434,13 @@ sub config_search {
   ]
 }
 
+sub config_space {
+  [
+    @{config_class()},
+    prepare_call('extends', 'Data::Object::Space')
+  ]
+}
+
 sub config_state {
   [
     prepare_use('Data::Object::State'),
@@ -431,6 +452,13 @@ sub config_string {
   [
     prepare_use('Role::Tiny::With'),
     prepare_use('parent', 'Data::Object::String')
+  ]
+}
+
+sub config_struct {
+  [
+    @{config_class()},
+    prepare_call('extends', 'Data::Object::Struct')
   ]
 }
 
@@ -453,6 +481,13 @@ sub config_undef {
   [
     prepare_use('Role::Tiny::With'),
     prepare_use('parent', 'Data::Object::Undef')
+  ]
+}
+
+sub config_vars {
+  [
+    @{config_class()},
+    prepare_call('extends', 'Data::Object::Vars')
   ]
 }
 
@@ -671,6 +706,21 @@ with global state. Read more at L<Data::Object::State>.
 The struct configuration configures the calling package as a class whose state
 becomes immutable after instantiation. Read more at L<Data::Object::Struct>.
 
+=head2 args
+
+  package App::Args;
+
+  use Data::Object::Config 'Args';
+
+  method validate() {
+    # ...
+  }
+
+  1;
+
+The args configuration configures the calling package as a class representation
+of the C<@ARGV> variable. Read more at L<Data::Object::Args>.
+
 =head2 array
 
   package App::Args;
@@ -703,6 +753,36 @@ the Array class. Read more at L<Data::Object::Array>.
 The code configuration configures the calling package as a class which extends
 the Code class. Read more at L<Data::Object::Code>.
 
+=head2 cli
+
+  package App::Cli;
+
+  use Data::Object::Config 'Cli';
+
+  method main(%args) {
+    # ...
+  }
+
+  1;
+
+The cli configuration configures the calling package as a class capable of
+acting as a command-line interface. Read more at L<Data::Object::Cli>.
+
+=head2 data
+
+  package App::Data;
+
+  use Data::Object::Config 'Data';
+
+  method generate() {
+    # ...
+  }
+
+  1;
+
+The data configuration configures the calling package as a class capable of
+parsing POD. Read more at L<Data::Object::Data>.
+
 =head2 float
 
   package App::Amount;
@@ -733,21 +813,6 @@ the Float class. Read more at L<Data::Object::Float>.
 The hash configuration configures the calling package as a class which extends
 the Hash class. Read more at L<Data::Object::Hash>.
 
-=head2 integer
-
-  package App::Phone;
-
-  use Data::Object::Config 'Integer';
-
-  method format(Str $code) {
-    # ...
-  }
-
-  1;
-
-The integer configuration configures the calling package as a class which
-extends the Integer class. Read more at L<Data::Object::Integer>.
-
 =head2 number
 
   package App::ID;
@@ -762,6 +827,21 @@ extends the Integer class. Read more at L<Data::Object::Integer>.
 
 The number configuration configures the calling package as a class which
 extends the Number class. Read more at L<Data::Object::Number>.
+
+=head2 opts
+
+  package App::Opts;
+
+  use Data::Object::Config 'Opts';
+
+  method validate() {
+    # ...
+  }
+
+  1;
+
+The opts configuration configures the calling package as a class representation
+of the command-line arguments. Read more at L<Data::Object::Opts>.
 
 =head2 regexp
 
@@ -822,6 +902,21 @@ extends the String class. Read more at L<Data::Object::String>.
 
 The undef configuration configures the calling package as a class which extends
 the Undef class. Read more at L<Data::Object::Undef>.
+
+=head2 vars
+
+  package App::Vars;
+
+  use Data::Object::Config 'Vars';
+
+  method config() {
+    # ...
+  }
+
+  1;
+
+The vars configuration configures the calling package as a class representation
+of the C<%ENV> variable. Read more at L<Data::Object::Vars>.
 
 =cut
 
@@ -1020,23 +1115,6 @@ L<Data::Object::Class> which extends L<Data::Object::Hash>.
 =item config_hash example
 
   my $plans = config_hash;
-
-=back
-
-=cut
-
-=head2 config_integer
-
-  config_integer() : ArrayRef
-
-The config_integer function returns plans for configuring the package to be a
-L<Data::Object::Class> which extends L<Data::Object::Integer>.
-
-=over 4
-
-=item config_integer example
-
-  my $plans = config_integer;
 
 =back
 
@@ -1424,11 +1502,119 @@ The subject function returns truthy if both arguments match alphanumerically
 
 =cut
 
+=head1 METHODS
+
+This package implements the following methods.
+
+=cut
+
+=head2 config_args
+
+  config_args() : ArrayRef
+
+The config_args function returns plans for configuring the package to be a
+L<Data::Object::Class> which extends L<Data::Object::Args>.
+
+=over 4
+
+=item config_args example
+
+  my $plans = config_args;
+
+=back
+
+=cut
+
+=head2 config_data
+
+  config_data() : ArrayRef
+
+The config_data function returns plans for configuring the package to be a
+L<Data::Object::Class> which extends L<Data::Object::Data>.
+
+=over 4
+
+=item config_data example
+
+  my $plans = config_data;
+
+=back
+
+=cut
+
+=head2 config_opts
+
+  config_opts() : ArrayRef
+
+The config_opts function returns plans for configuring the package to be a
+L<Data::Object::Class> which extends L<Data::Object::Opts>.
+
+=over 4
+
+=item config_opts example
+
+  my $plans = config_opts;
+
+=back
+
+=cut
+
+=head2 config_space
+
+  config_space() : ArrayRef
+
+The config_space function returns plans for configuring the package to be a
+L<Data::Object::Class> which extends L<Data::Object::Space>.
+
+=over 4
+
+=item config_space example
+
+  my $plans = config_space;
+
+=back
+
+=cut
+
+=head2 config_struct
+
+  config_struct() : ArrayRef
+
+The config_struct function returns plans for configuring the package to be a
+L<Data::Object::Class> which extends L<Data::Object::Struct>.
+
+=over 4
+
+=item config_struct example
+
+  my $plans = config_struct;
+
+=back
+
+=cut
+
+=head2 config_vars
+
+  config_vars() : ArrayRef
+
+The config_vars function returns plans for configuring the package to be a
+L<Data::Object::Class> which extends L<Data::Object::Vars>.
+
+=over 4
+
+=item config_vars example
+
+  my $plans = config_vars;
+
+=back
+
+=cut
+
 =head1 CREDITS
 
-Al Newkirk, C<awncorp@cpan.org>, C<+284>
+Al Newkirk, C<+287>
 
-Anthony Brummett, C<abrummet@genome.wustl.edu>, C<+10>
+Anthony Brummett, C<+10>
 
 =cut
 

@@ -1,4 +1,12 @@
-0.471   2019-06-26 (PERLANCAR)
+0.472   2019-09-10  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	- [test] Adjust tests against Complete::Util 0.603 which no longer
+	  re-sorts entries [RT#130349].
+
+
+0.471   2019-06-26  Released-By: PERLANCAR
 
 	- Remove argument 'summaries' to complete_cli_arg(). For now, use
 	  Perinci::CmdLine-related information only.
@@ -13,19 +21,19 @@
 	  so on.
 
 
-0.470   2019-06-25 (PERLANCAR)
+0.470   2019-06-25  Released-By: PERLANCAR
 
 	- Add argument 'summaries' to complete_cli_arg().
 
 
-0.46    2017-01-13 (PERLANCAR)
+0.46    2017-01-13  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Remove dependency on Log::Any::IfLOG.
 
 
-0.45    2016-11-04 (PERLANCAR)
+0.45    2016-11-04  Released-By: PERLANCAR
 
         - [Bugfix] More bug fixes for completing short option bundle: -S^ (where
           -S requires value) was completed directly with the values, it should
@@ -33,41 +41,41 @@
           completes to [-S].
 
 
-0.44    2016-11-04 (PERLANCAR)
+0.44    2016-11-04  Released-By: PERLANCAR
 
         - [Bugfix] Fix bugs completing short option bundles: -abcd^ was regarded
           as completing -a^ (bcd was removed), -sVAL^ was not completable,
           -abcs^ was not completed as [-abcs] to give automatic space.
 
 
-0.43    2016-10-28 (PERLANCAR)
+0.43    2016-10-28  Released-By: PERLANCAR
 
         - [Bugfix] Properly fill 'parsed_opts' with all the option values, not
           just the first one.
 
 
-0.42    2016-09-27 (PERLANCAR)
+0.42    2016-09-27  Released-By: PERLANCAR
 
         - [Bugfix] Avoid perl error "Can't use an undefined value as a
           subroutine reference" when there is no 'completion' argument passed to
           complete_cli_arg() (thanks Mary Ehlers).
 
 
-0.41    2016-02-03 (PERLANCAR)
+0.41    2016-02-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Adjust to Complete::Bash 0.27.
 
 
-0.40    2016-01-23 (PERLANCAR)
+0.40    2016-01-23  Released-By: PERLANCAR
 
 	- Adjust to Complete::Bash 0.25.
 
 	- Handle (ignore) special option spec '<>' [RT#110991].
 
 
-0.39    2016-01-07 (PERLANCAR)
+0.39    2016-01-07  Released-By: PERLANCAR
 
 	- Don't bother providing completion of option names if word doesn't
 	  start with -, this starts causing problem after
@@ -76,25 +84,25 @@
 	  can still get option names.
 
 
-0.38    2015-12-30 (PERLANCAR)
+0.38    2015-12-30  Released-By: PERLANCAR
 
 	- Adjust to Complete::Bash 0.23.
 
 	- Bump prereq version Log::Any::IfLOG to 0.07.
 
 
-0.37    2015-09-22 (PERLANCAR)
+0.37    2015-09-22  Released-By: PERLANCAR
 
 	- [Bugfix] Forgot to update one function call.
 
 
-0.36    2015-09-17 (PERLANCAR)
+0.36    2015-09-17  Released-By: PERLANCAR
 
 	- Adjust to Complete::Util 0.36 (complete_file() & complete_env()
 	  split to Complete-File & Complete-Env).
 
 
-0.35    2015-09-17 (PERLANCAR)
+0.35    2015-09-17  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -102,7 +110,7 @@
 	  complete_array_elem()).
 
 
-0.34    2015-09-09 (PERLANCAR)
+0.34    2015-09-09  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -111,7 +119,7 @@
 	  requirement.
 
 
-0.33    2015-09-03 (PERLANCAR)
+0.33    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -120,61 +128,61 @@
 	  requirement.
 
 
-0.32    2015-04-25 (PERLANCAR)
+0.32    2015-04-25  Released-By: PERLANCAR
 
 	- Use combine_answers() from Complete::Util 0.28+ to allow custom
           completion routine to provide final answer without additional
           completion answers. An application of this is in Games::CompHangman.
 
 
-0.31    2015-04-09 (PERLANCAR)
+0.31    2015-04-09  Released-By: PERLANCAR
 
 	- Replace Log::Any with Log::Any::IfLOG.
 
 
-0.30    2015-03-04 (PERLANCAR)
+0.30    2015-03-04  Released-By: PERLANCAR
 
 	- Follow Complete 0.12 (escmode renamed to esc_mode).
 
 
-0.29    2015-02-15 (PERLANCAR)
+0.29    2015-02-15  Released-By: PERLANCAR
 
 	- Add option 'bundling' and support completing single-dash
 	  multiletter options '-foo'.
 
 
-0.28    2015-01-03 (PERLANCAR)
+0.28    2015-01-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Rebuild (Generate TODO.md).
 
 
-0.27    2014-12-29 (PERLANCAR)
+0.27    2014-12-29  Released-By: PERLANCAR
 
 	- [Bugfixes] A couple more fixes for providing arguments for
 	  completion routine (correct 'words', 'cword').
 
 
-0.26    2014-12-29 (PERLANCAR)
+0.26    2014-12-29  Released-By: PERLANCAR
 
 	- Split --foo=val, some fixes in producing 'parsed_opts' for
 	  completion routine.
 
 
-0.25    2014-12-28 (PERLANCAR)
+0.25    2014-12-28  Released-By: PERLANCAR
 
 	- Provide 'parsed_opts' for completion routine.
 
 
-0.24    2014-12-27 (PERLANCAR)
+0.24    2014-12-27  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- More tweaking of log messages.
 
 
-0.23    2014-12-26 (PERLANCAR)
+0.23    2014-12-26  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -182,7 +190,7 @@
 	  Perinci::CmdLine it contains 'cmdline' object).
 
 
-0.22    2014-12-26 (PERLANCAR)
+0.22    2014-12-26  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -190,14 +198,14 @@
 	  peri-test-comp).
 
 
-0.21    2014-12-25 (PERLANCAR)
+0.21    2014-12-25  Released-By: PERLANCAR
 
         - No functional changes.
 
         - Fix sorting in tests [CT].
 
 
-0.20    2014-12-24 (PERLANCAR)
+0.20    2014-12-24  Released-By: PERLANCAR
 
 	- Add note that we deliberately do not provide 'ci' option in this
 	  module.
@@ -205,7 +213,7 @@
 	- Follow convention of Complete 0.06.
 
 
-0.19    2014-12-20 (PERLANCAR)
+0.19    2014-12-20  Released-By: PERLANCAR
 
         [REMOVED FEATURES]
 
@@ -221,7 +229,7 @@
           routine. Before it was put into a single key 'extras' in the %args.
 
 
-0.18    2014-12-05 (PERLANCAR)
+0.18    2014-12-05  Released-By: PERLANCAR
 
         - Delegate '~user/' completion handling to Complete::Util 0.14's
           complete_file().
@@ -229,25 +237,25 @@
         - Do case-insensitive complete_file(), for convenience.
 
 
-0.17    2014-11-28 (PERLANCAR)
+0.17    2014-11-28  Released-By: PERLANCAR
 
 	- Adjust to Complete::Bash 0.12 (words are now put in 'words' key
 	  instead of 'completion' key).
 
 
-0.16    2014-11-18 (PERLANCAR)
+0.16    2014-11-18  Released-By: PERLANCAR
 
         - Make file completion work more like bash: ~foo/blah<tab> works,
           fallback to file if ~user or $var doesn't match anything, [AB]<tab>
           works like [AB]*.
 
 
-0.15    2014-11-10 (PERLANCAR)
+0.15    2014-11-10  Released-By: PERLANCAR
 
         - Don't produce --nox and --no-x for single letter spec 'x!'.
 
 
-0.14    2014-09-04 (PERLANCAR)
+0.14    2014-09-04  Released-By: PERLANCAR
 
         - No functional changes.
 
@@ -255,18 +263,18 @@
           prerequisite list.
 
 
-0.13    2014-08-06 (SHARYANTO)
+0.13    2014-08-06  Released-By: SHARYANTO
 
         - Provide 'words' and 'cword' to completion routine.
 
 
-0.12    2014-07-29 (SHARYANTO)
+0.12    2014-07-29  Released-By: SHARYANTO
 
         - [ux] When only completing option names, give proper option name
           escaping.
 
 
-0.11    2014-07-28 (SHARYANTO)
+0.11    2014-07-28  Released-By: SHARYANTO
 
         [ENHANCEMENTS]
 
@@ -277,7 +285,7 @@
           has nth=0, the second nth=1).
 
 
-0.10    2014-07-27 (SHARYANTO)
+0.10    2014-07-27  Released-By: SHARYANTO
 
         - Some fixes.
 
@@ -288,25 +296,25 @@
           to pass to completion routine here.
 
 
-0.09    2014-07-27 (SHARYANTO)
+0.09    2014-07-27  Released-By: SHARYANTO
 
         - Support the deprecated 'completion' argument as hash. Undocumented and
           will be removed in the future though.
 
 
-0.08    2014-07-27 (SHARYANTO)
+0.08    2014-07-27  Released-By: SHARYANTO
 
         - [ux] Proper escaping mode when completing environment variables.
 
 
-0.07    2014-07-27 (SHARYANTO)
+0.07    2014-07-27  Released-By: SHARYANTO
 
         - [ux] Completion routine can now return undef so that
           complete_cli_arg() calls default/fallback completion routine that
           complets from environment vars ('$foo'), usernames ('~foo'), or files.
 
 
-0.06    2014-07-27 (SHARYANTO)
+0.06    2014-07-27  Released-By: SHARYANTO
 
         - Completion routine now gets extra information/arguments. In addition
           to 'word', it now also gets: type, opt, ospec, argpos, parent_args,
@@ -319,7 +327,7 @@
           force the user to specify for every opt spec if she doesn't need to.
 
 
-0.05    2014-07-26 (SHARYANTO)
+0.05    2014-07-26  Released-By: SHARYANTO
 
         - Add option: fallback_completion.
 
@@ -330,7 +338,7 @@
         - Other fixes.
 
 
-0.04    2014-07-26 (SHARYANTO)
+0.04    2014-07-26  Released-By: SHARYANTO
 
         - Change algorithm so things become simpler.
 
@@ -343,16 +351,16 @@
           to ['--foo', '--help', '--hour'].
 
 
-0.03    2014-07-24 (SHARYANTO)
+0.03    2014-07-24  Released-By: SHARYANTO
 
         - Handle equal sign (--foo=<tab>).
 
 
-0.02    2014-07-22 (SHARYANTO)
+0.02    2014-07-22  Released-By: SHARYANTO
 
         - [Bugfix] Fix endless loop after flag option.
 
 
-0.01    2014-07-22 (SHARYANTO)
+0.01    2014-07-22  Released-By: SHARYANTO
 
         - First release.

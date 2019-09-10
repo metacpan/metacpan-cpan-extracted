@@ -1,12 +1,12 @@
 package Test::BDD::Cucumber::StepFile;
-$Test::BDD::Cucumber::StepFile::VERSION = '0.60';
+$Test::BDD::Cucumber::StepFile::VERSION = '0.62';
 =head1 NAME
 
 Test::BDD::Cucumber::StepFile - Functions for creating and loading Step Definitions
 
 =head1 VERSION
 
-version 0.60
+version 0.62
 
 =cut
 
@@ -37,6 +37,7 @@ Defining steps:
  #!perl
 
  use strict; use warnings; use Test::More;
+ # or: use strict; use warnings; use Test2::V0;
 
  use Test::BDD::Cucumber::StepFile;
 

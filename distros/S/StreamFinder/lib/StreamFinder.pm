@@ -87,31 +87,18 @@ file.
 =head1 DESCRIPTION
 
 StreamFinder accepts a valid radio station URL on supported websites and
-returns the actual streamurl, title, and cover art icon for that station.  
+returns the actual stream URL(s), title, and cover art icon for that station.  
 The purpose is that one needs one of these URLs 
-in order to have the option to stream the station in one's own choice of 
+in order to have the option to stream the station/video in one's own choice of 
 audio player software rather than using their web browser and accepting any / 
 all flash, ads, javascript, cookies, trackers, web-bugs, and other crapware 
 that can come with that method of playing.  The author uses his own custom 
 all-purpose media player called "fauxdacious" (his custom hacked version of 
 the open-source "audacious" audio player).  "fauxdacious" incorporates this 
 module to decode and play streams.  The currently-supported websites are:
-radionomy.com, iheartradio.com, reciva.com, facebook, banned.video, 
-and youtube / vimeo / brighteon, et. al.  We used to support tunein.com, but 
-they have since apparently wasted a ton of money on web-developers and 
-script kiddies to so fsck up their stations' pages to make it impossible to 
-obtain their hidden streams programatically.
-
-It amazes me the effort to which marketing-run operations will go to and 
-web-development money they'll spend to prevent people from accessing their 
-radio streams in alternate ways, even though the content is already paid for 
-by the advertisements already played in the streams.  Guess they are that 
-desparate to track your web-activity, store crap in cookies on your browser, 
-and pummel you to death with evem more useless add garbage.  Our mission is 
-to restore your freedom to access commercial and other streaming radio 
-stations that already paid for and freely available over the air in the ways 
-most convenient to YOU, the listener!  We are NOT in the business to 
-provide a means of circumventing copyright laws, however!
+radionomy.com, iheartradio.com, reciva.com, radio.net, facebook, banned.video, 
+and youtube / vimeo / brighteon, et. al.  We are again supporting tunein.com, 
+but it may not work for all stations!
 
 Each site is supported by a separate subpackage (StreamFinder::I<Package>), 
 which is determined and selected based on the url when the StreamFinder object 
@@ -123,19 +110,32 @@ One or more playable streams can be returned for each station.
 
 =over 4
 
-=item B<new>(I<url>)
+=item B<new>(I<url> [, I<options> ])
 
 Accepts a URL and creates and returns a new station object, or 
 I<undef> if the URL is not a valid station or no streams are found.
+
+I<options> can vary depending on the type of stream (site) that is 
+being queried.  One option common to all sites is I<-debug>, which 
+turns on debugging output.  A numeric option can follow specifying 
+the level (0, 1, or 2).  0 is none, 1 is basic, 2 is detailed.  
+Default:  B<1> (if I<-debug> is specified).
 
 =item $station->B<get>()
 
 Returns an array of strings representing all stream urls found.
 
-=item $station->B<getURL>()
+=item $station->B<getURL>([I<options>])
 
 Similar to B<get>() except it only returns a single stream representing 
 the first valid stream found.  
+
+Current options are:  I<-random> and I<-noplaylists>.  By default, the 
+first ("best"?) stream is returned.  If I<-random> is specified, then 
+a random one is selected from the list of streams found.  
+If I<-noplaylists> is specified, and the stream to be returned is a 
+"playlist" (.pls extension), it is first fetched and the first entry 
+in the playlist is returned.  This is needed by Fauxdacious Mediaplayer.
 
 =item $station->B<count>()
 
@@ -169,6 +169,41 @@ Returns a two-element array consisting of the extension (ie. "png",
 
 =back
 
+=head1 CONFIGURATION FILES
+
+=over 4
+
+=item ~/.config/StreamFinder/config
+
+Optional text file for specifying various configuration options.  
+Each option is specified on a separate line in the format below:
+
+'option' => 'value' [,]
+
+and the options are loaded into a hash used by all sites 
+(submodules) that support them.  Valid options include 
+I<-debug> => [0|1|2], and most of the L<LWP::UserAgent> options.  
+Blank lines and lines starting with a "#" sign are ignored.
+
+=item ~/.config/StreamFinder/B<submodule>/config
+
+Optional text file for specifying various configuration options 
+for a specific site (submodule).  Each option is specified on a 
+separate line in the format below:
+
+'option' => 'value' [,]
+
+and the options are loaded into a hash used only by the specific 
+(submodule) specified.  Valid options include 
+I<-debug> => [0|1|2], and most of the L<LWP::UserAgent> options.
+
+Options specified here override any specified in I<~/.config/StreamFinder/config>.
+
+=back
+
+NOTE:  Options specified in the options parameter list will override 
+those corresponding options specified in these files.
+
 =head1 DEPENDENCIES
 
 LWP::UserAgent
@@ -179,7 +214,7 @@ URI::Escape;  (Youtube)
 
 WWW::YouTube::Download;  (Youtube)
 
-youtube-dl  (Youtube, Facebook)
+youtube-dl  (Youtube, Facebook, Tunein)
 
 wget  (Reciva, Youtube, BannedVideo)
 
@@ -199,7 +234,7 @@ You can also look for information at:
 
 =head1 SEE ALSO
 
-Fauxdacious media player (https://wildstar84.wordpress.com/fauxdacious)
+Fauxdacious media player - (L<https://wildstar84.wordpress.com/fauxdacious>)
 
 =over 4
 
@@ -271,14 +306,14 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '1.05';
-our $DEBUG = 0;
+our $VERSION = '1.11';
+our $DEBUG = 1;
 
 require Exporter;
 
 @ISA = qw(Exporter);
 @EXPORT = qw();
-my @supported_mods = (qw(Radionomy IHeartRadio Youtube Reciva Facebook BannedVideo));
+my @supported_mods = (qw(Radionomy IHeartRadio Youtube Reciva Facebook RadioNet BannedVideo Tunein));
 my %haveit;
 
 foreach my $module (@supported_mods)
@@ -300,13 +335,18 @@ sub new
 	if ($haveit{'Facebook'} && ($url =~ m#^http[s]?\:\/\/\w*\.facebook\.#)) {
 		return new StreamFinder::Facebook($url, @args);
 	} elsif ($haveit{'IHeartRadio'} && $url =~ m#\biheart\.com\/#) {
-		return new StreamFinder::IHeartRadio($url, 'secure_shoutcast', 'secure', 'any', '!rtmp', @args);
+#		return new StreamFinder::IHeartRadio($url, 'secure_shoutcast', 'secure', 'any', '!rtmp', @args); #DEPRECIATED, USE CONFIG FILE!
+		return new StreamFinder::IHeartRadio($url, @args);
 	} elsif ($haveit{'Reciva'} && $url =~ m#\breciva\.com\/#) {
 		return new StreamFinder::Reciva($url, @args);
+	} elsif ($haveit{'RadioNet'} && $url =~ m#\bradio\.net\/#) {
+		return new StreamFinder::RadioNet($url, @args);
 	} elsif ($haveit{'Radionomy'} && $url =~ m#\bradionomy\.com\/#) {
 		return new StreamFinder::Radionomy($url, @args);
 	} elsif ($haveit{'BannedVideo'} && $url =~ m#\bbanned\.video\/#) {
 		return new StreamFinder::BannedVideo($url, @args);
+	} elsif ($haveit{'Tunein'} && $url =~ m#\btunein\.com\/#) {  #NOTE:ALSO USES StreamFinder::Youtube!
+		return new StreamFinder::Tunein($url, @args);
 	} else {  #DEFAULT TO youtube-dl SINCE SO MANY URLS ARE HANDLED THERE NOW.
 		return new StreamFinder::Youtube($url, @args);
 	}

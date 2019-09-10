@@ -29,7 +29,11 @@ my @files = (
     't/09-methods.t',
     't/10-methods.t',
     't/11-methods.t',
-    't/12-methods.t'
+    't/12-methods.t',
+    't/13-methods.t',
+    't/14-methods.t',
+    't/15-methods.t',
+    't/16-methods.t'
 );
 
 notabs_ok($_) foreach @files;

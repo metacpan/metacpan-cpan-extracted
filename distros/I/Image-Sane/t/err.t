@@ -1,12 +1,12 @@
 use Image::Sane ':all';
 use Try::Tiny;
-use Test::More tests => 39;
+use Test::More tests => 40;
 BEGIN { use_ok('Image::Sane') }
 
 #########################
 
 SKIP: {
-    skip "libsane 1.0.19 or better required", 39
+    skip "libsane 1.0.19 or better required", 40
       unless Image::Sane->get_version_scalar > 1.000018;
 
     try {
@@ -78,4 +78,7 @@ SKIP: {
         };
         $test->cancel;
     }
+
+    is( Image::Sane::strstatus(SANE_STATUS_INVAL),
+        'Invalid argument', 'strstatus' );
 }

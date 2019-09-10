@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2017-2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2017-2019 -- leonerd@leonerd.org.uk
 
 package Device::Chip::AD5691R;
 
@@ -12,7 +12,7 @@ use base qw( Device::Chip );
 use Carp;
 use Future::AsyncAwait;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use Data::Bitfield qw( bitfield boolfield enumfield );
 

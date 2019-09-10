@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2017-2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2017-2019 -- leonerd@leonerd.org.uk
 
 package Device::Chip::MAX11200;
 
@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Device::Chip );
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use Carp;
 use Future::AsyncAwait;
@@ -319,34 +319,30 @@ taking into account the current mode setting of the chip.
 
 =cut
 
-sub read_adc_ratio
+async sub read_adc_ratio
 {
    my $self = shift;
 
-   Future->needs_all(
+   my ( $value, $config ) = await Future->needs_all(
       $self->read_adc,
       ( $self->{config} ? Future->done( $self->{config} ) : $self->read_config )
-   )->then( sub {
-      my ( $value, $config ) = @_;
+   );
 
-      if( $config->{UB} eq "UNIPOLAR" ) {
-         # Raw 24bit integer
-         $value /= 2**24;
+   if( $config->{UB} eq "UNIPOLAR" ) {
+      # Raw 24bit integer
+      return $value / 2**24;
+   }
+   else {
+      if( $config->{FORMAT} eq "TWOS_COMP" ) {
+         # Signed integer in twos-complement form
+         $value -= 2**24 if $value >= 2**23;
       }
       else {
-         if( $config->{FORMAT} eq "TWOS_COMP" ) {
-            # Signed integer in twos-complement form
-            $value -= 2**24 if $value >= 2**23;
-         }
-         else {
-            # Signed-integer in offset form
-            $value -= 2**23;
-         }
-         $value /= 2**23;
+         # Signed-integer in offset form
+         $value -= 2**23;
       }
-
-      return Future->done( $value );
-   });
+      return $value / 2**23;
+   }
 }
 
 =head2 write_gpios

@@ -1,0 +1,48 @@
+---
+abstract: 'Base class for custom File::Collector classes for classifying files and calling File::Collector::Processor methods for processing files'
+author:
+  - 'Steve Dondley <s@dondley.com>'
+build_requires:
+  Benchmark: '0'
+  Cwd: '0'
+  Role::Tiny: '0'
+  Test::More: '0'
+  Test::Most: '0'
+  Test::Output: '0'
+  lib: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-Collector
+provides:
+  File::Collector:
+    file: lib/File/Collector.pm
+    version: '0.037'
+  File::Collector::Processor:
+    file: lib/File/Collector/Processor.pm
+    version: '0.037'
+  File::Collector::Processor::Do:
+    file: lib/File/Collector/Processor.pm
+    version: '0.037'
+requires:
+  Carp: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  Role::Tiny::With: '0'
+  parent: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/sdondley/File-Collector/issues
+  repository: git://github.com/sdondley/File-Collector.git
+version: '0.037'
+x_generated_by_perl: v5.24.4
+x_serialization_backend: 'YAML::Tiny version 1.73'

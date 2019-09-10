@@ -325,5 +325,19 @@ test_gen(
     );
 }
 
+test_gen(
+    name => 'option: extra_props',
+    table_data => $table_data,
+    table_spec => $table_spec,
+    other_args => {extra_props => {'x.foo'=>1, 'x.bar'=>[]}},
+    post_test => sub {
+        my ($res) = @_;
+        my $meta = $res->[2]{meta};
+        is_deeply($meta->{'x.foo'}, 1, "x.foo");
+        is_deeply($meta->{'x.bar'}, [], "x.bar");
+    },
+);
+
+
 DONE_TESTING:
 done_testing();

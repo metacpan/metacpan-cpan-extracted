@@ -3,7 +3,7 @@ package Protocol::ACME::Exception;
 use strict;
 use warnings;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 # very simple stringification ... make this
 # more elaborate according to taste

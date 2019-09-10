@@ -31,7 +31,9 @@ Data::Object::Library
 
 =description
 
-This package provides routines for operating on Perl 5 regular expressions.
+This package provides routines for operating on Perl 5 regular expressions. If no
+argument is provided, this package is instantiated with a default value of
+C<qr/.*/>.
 
 =cut
 

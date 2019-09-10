@@ -1,12 +1,12 @@
 package Test::BDD::Cucumber::Harness;
-$Test::BDD::Cucumber::Harness::VERSION = '0.60';
+$Test::BDD::Cucumber::Harness::VERSION = '0.62';
 =head1 NAME
 
 Test::BDD::Cucumber::Harness - Base class for creating harnesses
 
 =head1 VERSION
 
-version 0.60
+version 0.62
 
 =head1 DESCRIPTION
 
@@ -14,7 +14,7 @@ Harnesses allow your feature files to be executed while telling the outside
 world about how the testing is going, and what's being tested. This is a base
 class for creating new harnesses. You can see
 L<Test::BDD::Cucumber::Harness::TermColor> and
-L<Test::BDD::Cucumber::Harness::TestBuilder> for examples, although if you need
+L<Test::BDD::Cucumber::Harness::TAP> for examples, although if you need
 to interact with the results in a more exciting way, you'd be best off
 interacting with L<Test::BDD::Cucumber::Harness::Data>.
 

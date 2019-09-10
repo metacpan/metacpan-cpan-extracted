@@ -2,8 +2,8 @@ NAME
     App::renwd - REName current (Working Directory)
 
 VERSION
-    This document describes version 0.002 of App::renwd (from Perl
-    distribution App-renwd), released on 2019-07-23.
+    This document describes version 0.003 of App::renwd (from Perl
+    distribution App-renwd), released on 2019-09-09.
 
 SYNOPSIS
     See the command-line script renwd.

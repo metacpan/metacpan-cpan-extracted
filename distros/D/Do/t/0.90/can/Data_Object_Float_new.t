@@ -47,8 +47,13 @@ isa_ok $data, 'Data::Object::Float';
 $data = Data::Object::Float->new($data);
 isa_ok $data, 'Data::Object::Float';
 
+# instantiate without arg
+$data = Data::Object::Float->new;
+isa_ok $data, 'Data::Object::Float';
+is $data, '0.0';
+
 # instantiation error
-ok !eval{Data::Object::Float->new};
+ok !eval{Data::Object::Float->new('y')};
 like $@, qr(Instantiation Error);
 
 ok 1 and done_testing;

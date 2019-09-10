@@ -13,7 +13,7 @@ use Exporter 'import';
 # Every public function used by the main code is exported by default.
 our @EXPORT = 
     qw(init_global_output close_global_output read_input write_output);
-our @EXPORT_OK = qw(write_side_output read_side_input);
+our @EXPORT_OK = qw(write_side_output read_side_input write_handle);
 
 # The reference to this variable is used in the input list to specify that the
 # standard input should be read.

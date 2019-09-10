@@ -12,7 +12,7 @@ use Type::Utils ();
 use Type::Coercion ();
 use Types::TypeTiny ();
 
-our $VERSION = '1.60'; # VERSION
+our $VERSION = '1.70'; # VERSION
 
 Type::Utils::extends('Types::Standard');
 Type::Utils::extends('Types::TypeTiny');
@@ -21,23 +21,44 @@ Type::Utils::extends('Types::Common::String');
 
 # TYPES
 
+RegisterAll(DoArgs());
+RegisterAll(DoData());
 RegisterAll(DoArray());
+RegisterAll(DoCli());
 RegisterAll(DoCode());
 RegisterAll(DoException());
 RegisterAll(DoFloat());
 RegisterAll(DoFunc());
 RegisterAll(DoHash());
 RegisterAll(DoNumber());
+RegisterAll(DoOpts());
 RegisterAll(DoRegexp());
 RegisterAll(DoReplace());
 RegisterAll(DoScalar());
 RegisterAll(DoSearch());
 RegisterAll(DoSpace());
+RegisterAll(DoState());
 RegisterAll(DoString());
+RegisterAll(DoStruct());
 RegisterAll(DoUndef());
-
+RegisterAll(DoVars());
 
 # FUNCTIONS
+
+sub DoArgs {
+  {
+    name => 'DoArgs',
+    aliases => [
+      'ArgsObj',
+      'ArgsObject'
+    ],
+    validation => sub {
+      return 0 if !$_[0]->isa('Data::Object::Args');
+      return 1;
+    },
+    parent => 'Object'
+  }
+}
 
 sub DoArray {
   {
@@ -103,6 +124,21 @@ sub DoArray {
   }
 }
 
+sub DoCli {
+  {
+    name => 'DoCli',
+    aliases => [
+      'CliObj',
+      'CliObject'
+    ],
+    validation => sub {
+      return 0 if !$_[0]->isa('Data::Object::Cli');
+      return 1;
+    },
+    parent => 'Object'
+  }
+}
+
 sub DoCode {
   {
     name => 'DoCode',
@@ -118,6 +154,21 @@ sub DoCode {
     ],
     validation => sub {
       return 0 if !$_[0]->isa('Data::Object::Code');
+      return 1;
+    },
+    parent => 'Object'
+  }
+}
+
+sub DoData {
+  {
+    name => 'DoData',
+    aliases => [
+      'DataObj',
+      'DataObject'
+    ],
+    validation => sub {
+      return 0 if !$_[0]->isa('Data::Object::Data');
       return 1;
     },
     parent => 'Object'
@@ -286,6 +337,21 @@ sub DoNumber {
   }
 }
 
+sub DoOpts {
+  {
+    name => 'DoOpts',
+    aliases => [
+      'OptsObj',
+      'OptsObject'
+    ],
+    validation => sub {
+      return 0 if !$_[0]->isa('Data::Object::Opts');
+      return 1;
+    },
+    parent => 'Object'
+  }
+}
+
 sub DoRegexp {
   {
     name => 'DoRegexp',
@@ -379,6 +445,21 @@ sub DoSpace {
   }
 }
 
+sub DoState {
+  {
+    name => 'DoState',
+    aliases => [
+      'StateObj',
+      'StateObject'
+    ],
+    validation => sub {
+      return 0 if !$_[0]->isa('Data::Object::State');
+      return 1;
+    },
+    parent => 'Object'
+  }
+}
+
 sub DoString {
   {
     name => 'DoStr',
@@ -402,6 +483,21 @@ sub DoString {
   }
 }
 
+sub DoStruct {
+  {
+    name => 'DoStruct',
+    aliases => [
+      'StructObj',
+      'StructObject'
+    ],
+    validation => sub {
+      return 0 if !$_[0]->isa('Data::Object::Struct');
+      return 1;
+    },
+    parent => 'Object'
+  }
+}
+
 sub DoUndef {
   {
     name => 'DoUndef',
@@ -417,6 +513,21 @@ sub DoUndef {
     ],
     validation => sub {
       return 0 if !$_[0]->isa('Data::Object::Undef');
+      return 1;
+    },
+    parent => 'Object'
+  }
+}
+
+sub DoVars {
+  {
+    name => 'DoVars',
+    aliases => [
+      'VarsObj',
+      'VarsObject'
+    ],
+    validation => sub {
+      return 0 if !$_[0]->isa('Data::Object::Vars');
       return 1;
     },
     parent => 'Object'
@@ -605,6 +716,25 @@ This package implements the following functions.
 
 =cut
 
+=head2 doargs
+
+  DoArgs() : HashRef
+
+This function returns the type configuration for a L<Data::Object::Args>
+object.
+
+=over 4
+
+=item DoArgs example
+
+  # given xyz
+
+  my $self = Data::Object::Library->DoArgs(...);
+
+=back
+
+=cut
+
 =head2 doarray
 
   DoArray() : HashRef
@@ -622,6 +752,23 @@ object.
 
 =cut
 
+=head2 docli
+
+  DoCli() : HashRef
+
+This function returns the type configuration for a L<Data::Object::Cli>
+object.
+
+=over 4
+
+=item DoCli example
+
+  Data::Object::Library::DoCli();
+
+=back
+
+=cut
+
 =head2 docode
 
   DoCode() : HashRef
@@ -634,6 +781,23 @@ object.
 =item DoCode example
 
   Data::Object::Library::DoCode();
+
+=back
+
+=cut
+
+=head2 dodata
+
+  DoData() : HashRef
+
+This function returns the type configuration for a L<Data::Object::Data>
+object.
+
+=over 4
+
+=item DoData example
+
+  Data::Object::Library::DoData();
 
 =back
 
@@ -724,6 +888,23 @@ object.
 
 =cut
 
+=head2 doopts
+
+  DoOpts() : HashRef
+
+This function returns the type configuration for a L<Data::Object::Opts>
+object.
+
+=over 4
+
+=item DoOpts example
+
+  Data::Object::Library::DoOpts();
+
+=back
+
+=cut
+
 =head2 doregexp
 
   DoRegexp() : HashRef
@@ -809,6 +990,23 @@ object.
 
 =cut
 
+=head2 dostate
+
+  DoState() : HashRef
+
+This function returns the type configuration for a L<Data::Object::State>
+object.
+
+=over 4
+
+=item DoState example
+
+  Data::Object::Library::DoState();
+
+=back
+
+=cut
+
 =head2 dostring
 
   DoString() : HashRef
@@ -826,6 +1024,23 @@ object.
 
 =cut
 
+=head2 dostruct
+
+  DoStruct() : HashRef
+
+This function returns the type configuration for a L<Data::Object::Struct>
+object.
+
+=over 4
+
+=item DoStruct example
+
+  Data::Object::Library::DoStruct();
+
+=back
+
+=cut
+
 =head2 doundef
 
   DoUndef() : HashRef
@@ -838,6 +1053,23 @@ object.
 =item DoUndef example
 
   Data::Object::Library::DoUndef();
+
+=back
+
+=cut
+
+=head2 dovars
+
+  DoVars() : HashRef
+
+This function returns the type configuration for a L<Data::Object::Vars>
+object.
+
+=over 4
+
+=item DoVars example
+
+  Data::Object::Library::DoVars();
 
 =back
 
@@ -987,6 +1219,26 @@ function can be used to throw an exception if the argument can not be
 validated. The C<is_ArrayLike> function can be used to return true or false if
 the argument can not be validated.
 
+=head2 argsobj
+
+  # ArgsObj
+
+The C<ArgsObj> type constraint is provided by this library and accepts any
+object that is, or is derived from, a L<Data::Object::Args> object. The
+C<assert_ArgsObj> function can be used to throw an exception if the argument
+can not be validated. The C<is_ArgsObj> function can be used to return true or
+false if the argument can not be validated.
+
+=head2 argsobject
+
+  # ArgsObject
+
+The C<ArgsObject> type constraint is provided by this library and accepts any
+object that is, or is derived from, a L<Data::Object::Args> object. The
+C<assert_ArgsObject> function can be used to throw an exception if the argument
+can not be validated. The C<is_ArgsObject> function can be used to return true
+or false if the argument can not be validated.
+
 =head2 arrayobj
 
   # ArrayObj
@@ -1046,6 +1298,26 @@ see that documentation for more information. The C<assert_CodeLike> function can
 used to throw an exception if the argument can not be validated. The C<is_CodeLike>
 function can be used to return true or false if the argument can not be
 validated.
+
+=head2 cliobj
+
+  # CliObj
+
+The C<CliObj> type constraint is provided by this library and accepts any object
+that is, or is derived from, a L<Data::Object::Cli> object. The C<assert_CliObj>
+function can be used to throw an exception if the argument can not be
+validated. The C<is_CliObj> function can be used to return true or false if the
+argument can not be validated.
+
+=head2 cliobject
+
+  # CliObject
+
+The C<CliObject> type constraint is provided by this library and accepts any
+object that is, or is derived from, a L<Data::Object::Cli> object. The
+C<assert_CliObject> function can be used to throw an exception if the argument
+can not be validated. The C<is_CliObject> function can be used to return true or
+false if the argument can not be validated.
 
 =head2 codeobj
 
@@ -1531,6 +1803,26 @@ can be used to throw an exception if the argument can not be validated. The
 C<is_Object> function can be used to return true or false if the argument can not
 be validated.
 
+=head2 optsobj
+
+  # OptsObj
+
+The C<OptsObj> type constraint is provided by this library and accepts any
+object that is, or is derived from, a L<Data::Object::Opts> object. The
+C<assert_OptsObj> function can be used to throw an exception if the argument
+can not be validated. The C<is_OptsObj> function can be used to return true or
+false if the argument can not be validated.
+
+=head2 optsobject
+
+  # OptsObject
+
+The C<OptsObject> type constraint is provided by this library and accepts any
+object that is, or is derived from, a L<Data::Object::Opts> object. The
+C<assert_OptsObject> function can be used to throw an exception if the argument
+can not be validated. The C<is_OptsObject> function can be used to return true
+  or false if the argument can not be validated.
+
 =head2 optlist
 
   # OptList
@@ -1773,6 +2065,26 @@ C<assert_SpaceObject> function can be used to throw an exception if the
 argument can not be validated. The C<is_SpaceObject> function can be used to
 return true or false if the argument can not be validated.
 
+=head2 stateobj
+
+  # StateObj
+
+The C<StateObj> type constraint is provided by this library and accepts any
+object that is, or is derived from, a L<Data::Object::State> object. The
+C<assert_StateObj> function can be used to throw an exception if the argument
+can not be validated. The C<is_StateObj> function can be used to return true or
+false if the argument can not be validated.
+
+=head2 stateobject
+
+  # StateObject
+
+The C<StateObject> type constraint is provided by this library and accepts any
+object that is, or is derived from, a L<Data::Object::State> object. The
+C<assert_StateObject> function can be used to throw an exception if the
+argument can not be validated. The C<is_StateObject> function can be used to
+return true or false if the argument can not be validated.
+
 =head2 str
 
   # Str
@@ -1861,6 +2173,26 @@ The C<StrongPassword> type constraint is provided by the L<Types::Common::String
 library. Please see that documentation for more information. The
 C<assert_StrongPassword> function can be used to throw an exception if the
 argument can not be validated. The C<is_StrongPassword> function can be used to
+return true or false if the argument can not be validated.
+
+=head2 structobj
+
+  # StructObj
+
+The C<StructObj> type constraint is provided by this library and accepts any
+object that is, or is derived from, a L<Data::Object::Struct> object. The
+C<assert_StructObj> function can be used to throw an exception if the argument
+can not be validated. The C<is_StructObj> function can be used to return true
+  or false if the argument can not be validated.
+
+=head2 structobject
+
+  # StructObject
+
+The C<StructObject> type constraint is provided by this library and accepts any
+object that is, or is derived from, a L<Data::Object::Struct> object. The
+C<assert_StructObject> function can be used to throw an exception if the
+argument can not be validated. The C<is_StructObject> function can be used to
 return true or false if the argument can not be validated.
 
 =head2 tied
@@ -1954,11 +2286,31 @@ used to throw an exception if the argument can not be validated. The C<is_Value>
 function can be used to return true or false if the argument can not be
 validated.
 
+=head2 varsobj
+
+  # VarsObj
+
+The C<VarsObj> type constraint is provided by this library and accepts any
+object that is, or is derived from, a L<Data::Object::Vars> object. The
+C<assert_VarsObj> function can be used to throw an exception if the argument
+can not be validated. The C<is_VarsObj> function can be used to return true or
+false if the argument can not be validated.
+
+=head2 varsobject
+
+  # VarsObject
+
+The C<VarsObject> type constraint is provided by this library and accepts any
+object that is, or is derived from, a L<Data::Object::Vars> object. The
+C<assert_VarsObject> function can be used to throw an exception if the argument
+can not be validated. The C<is_VarsObject> function can be used to return true
+  or false if the argument can not be validated.
+
 =head1 CREDITS
 
-Al Newkirk, C<awncorp@cpan.org>, C<+284>
+Al Newkirk, C<+287>
 
-Anthony Brummett, C<abrummet@genome.wustl.edu>, C<+10>
+Anthony Brummett, C<+10>
 
 =cut
 

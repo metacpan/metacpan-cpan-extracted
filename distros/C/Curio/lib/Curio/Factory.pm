@@ -1,5 +1,5 @@
 package Curio::Factory;
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 =encoding utf8
 
@@ -112,14 +112,14 @@ sub _process_key_arg {
         croak "No key was passed to $caller_sub_name()";
     }
 
+    $key = $self->_aliases->{$key}
+        if defined( $key )
+        and defined( $self->_aliases->{$key} );
+
     if (!$self->allow_undeclared_keys()) {
         croak "Undeclared key passed to $caller_sub_name()"
             if !$self->_keys->{$key};
     }
-
-    $key = $self->_aliases->{$key}
-        if defined( $key )
-        and defined( $self->_aliases->{$key} );
 
     return $key;
 }

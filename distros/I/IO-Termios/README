@@ -38,6 +38,16 @@ DESCRIPTION
        $ttyS0->set_mode( "19200,8,n,1" );
        $ttyS0->set_modem({ dsr => 1, cts => 1 });
 
+ Upgrading STDIN/STDOUT/STDERR
+
+    If you pass the -upgrade option at import time, any of STDIN, STDOUT or
+    STDERR that are found to be TTY wrappers are automatically upgraded
+    into IO::Termios instances.
+
+       use IO::Termios -upgrade;
+    
+       STDIN->setflag_echo(0);
+
  Arbitrary Baud Rates on Linux
 
     Linux supports a non-POSIX extension to the usual termios interface,
@@ -349,13 +359,6 @@ FLAG-ACCESSOR METHODS
 TODO
 
       * Adding more getflag_*/setflag_* convenience wrappers
-
-      * Automatically upgrading STDIN/STDOUT/STDERR if appropriate, given a
-      flag.
-
-         use IO::Termios -upgrade;
-      
-         STDIN->setflag_echo( 0 );
 
 SEE ALSO
 

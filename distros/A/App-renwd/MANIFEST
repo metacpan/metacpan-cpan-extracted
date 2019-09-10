@@ -9,6 +9,7 @@ README
 dist.ini
 lib/App/renwd.pm
 script/renwd
+share/renwd-cd.bash
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t

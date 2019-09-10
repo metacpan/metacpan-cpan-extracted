@@ -1,6 +1,14 @@
 Revision history for Perl extension Image::Sane.
 
-0.14  Thu, 08 Jul 2017 19:30 +0200
+2     Sat, 17 Aug 2019 19:30 +0200
+        - correctly set version number.
+        - correct MANIFEST.
+
+1     Sat, 17 Aug 2019 19:30 +0200
+        - initialise info flags as some backends, e.g. imagescan
+          (utsushi) don't.
+
+0.14  Sat, 08 Jul 2017 19:30 +0200
         - correct escaping in 81_scanimage-perl.t to fix RT 122380.
         - add Try::Tiny to TEST_REQUIRES fix RT 122382.
 

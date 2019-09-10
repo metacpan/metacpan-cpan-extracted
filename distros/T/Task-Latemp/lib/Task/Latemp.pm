@@ -21,7 +21,7 @@ use Template;
 use YAML;
 
 
-our $VERSION = '0.0103';
+our $VERSION = '0.0104';
 
 
 1; # End of Task::Latemp
@@ -32,23 +32,23 @@ __END__
 
 =encoding UTF-8
 
-=head1 NAME
-
-Task::Latemp - Specifications for modules needed by the Latemp CMS.
-
 =head1 VERSION
 
-version 0.0103
+version 0.0104
 
 =head1 DESCRIPTION
 
-Latemp ( L<http://web-cpan.berlios.de/latemp/> ) is a Content Management
-System based on Web Meta Language. This module install all of its
+Latemp ( L<https://web-cpan.shlomifish.org/latemp/> ) is a static site
+generator based on Website Meta Language. This task installs all of its
 required dependencies.
+
+=head1 NAME
+
+Task::Latemp - Specifications for modules needed by the Latemp static site generator.
 
 =head1 AUTHOR
 
-Shlomi Fish, C<< <shlomif at iglu.org.il> >>
+Shlomi Fish, L<https://www.shlomifish.org/> .
 
 =head1 BUGS
 
@@ -80,9 +80,9 @@ L<http://cpanratings.perl.org/d/Task-Latemp>
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Task-Latemp>
 
-=item * Search CPAN
+=item * MetaCPAN
 
-L<http://search.cpan.org/dist/Task-Latemp>
+L<https://metacpan.org/release/Task-Latemp>
 
 =back
 
@@ -96,39 +96,11 @@ L<Task> .
 
 Copyright 2006 Shlomi Fish, all rights reserved.
 
-This program is released under the following license: bsd
-
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2006 by Shlomi Fish.
-
-This is free software, licensed under:
-
-  The MIT (X11) License
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-http://rt.cpan.org/NoAuth/Bugs.html?Dist=Task-Latemp or by email to
-bug-task-latemp@rt.cpan.org.
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
+This program is released under the following license: MIT / Expat .
 
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc Task::Latemp
 
 =head2 Websites
 
@@ -143,7 +115,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/Task-Latemp>
+L<https://metacpan.org/release/Task-Latemp>
 
 =item *
 
@@ -179,14 +151,6 @@ L<http://cpanratings.perl.org/d/Task-Latemp>
 
 =item *
 
-CPAN Forum
-
-The CPAN Forum is a web forum for discussing Perl modules.
-
-L<http://cpanforum.com/dist/Task-Latemp>
-
-=item *
-
 CPANTS
 
 The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
@@ -197,7 +161,7 @@ L<http://cpants.cpanauthors.org/dist/Task-Latemp>
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/T/Task-Latemp>
 
@@ -234,5 +198,27 @@ from your repository :)
 L<https://github.com/thewml/latemp>
 
   git clone ssh://git@github.com:thewml/latemp.git
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Task-Latemp> or by email to
+L<bug-task-latemp@rt.cpan.org|mailto:bug-task-latemp@rt.cpan.org>.
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2006 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

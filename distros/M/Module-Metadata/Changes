@@ -1,5 +1,8 @@
 Revision history for Module-Metadata
 
+1.000037  2019-09-07 18:32:44Z
+  - add decode_pod option for automatic =encoding handling
+
 1.000036  2019-04-18 18:25:15Z
   - properly clean up temp dirs after testing
 

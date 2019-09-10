@@ -1,3 +1,15 @@
+0.142   2019-07-18  Released-By: PERLANCAR; Urgency: medium
+
+	- Add CLIs: complete-language-code, complete-currency-code.
+
+
+0.141   2019-07-18  Released-By: PERLANCAR; Urgency: medium
+
+	- Add CLIs:
+	  complete-acme-metasyntactic-meta-{category,theme,theme-and-category},
+	  complete-cwalitee-indicator, complete-pod.
+
+
 0.140   2019-07-18  Released-By: PERLANCAR; Urgency: medium
 
 	- Add CLI: complete-country-code.

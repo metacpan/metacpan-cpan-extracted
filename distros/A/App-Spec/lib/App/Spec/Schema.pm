@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package App::Spec::Schema;
 
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 use base 'Exporter';
 our @EXPORT_OK = qw/ $SCHEMA /;
@@ -157,7 +157,11 @@ $SCHEMA = {
         'flag',
         'string',
         'integer',
-        'file'
+        'float',
+        'file',
+        'filename',
+        'dir',
+        'dirname'
       ]
     },
     'options' => {

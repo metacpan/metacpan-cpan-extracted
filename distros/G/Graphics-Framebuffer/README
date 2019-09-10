@@ -1,66 +1,71 @@
-Graphics-Framebuffer
 
-*********************************************************************
-** Note, this module does NOT work (natively) in Microsoft Windows **
-*********************************************************************
+
+GRAPHICS-FRAMEBUFFER
+
+
+Note, this module does NOT work (natively) in Microsoft Windows
+
 
 PREREQUISITES
 
-This module REQUIRES access to the video framebuffer, usually "/dev/fb0".
-You must be using a video device and driver that exposes this device to
-software.  Video cards with their proprietary drivers are not likely to work.
-However, most open-sourced drivers, seem to work fine.  VirtualBox drivers
-work too.  You must also have the appropriate permissions to write to this
-device (usually membership with group "video").
+This module REQUIRES access to the video framebuffer, usually
+"/dev/fb0". You must be using a video device and driver that exposes
+this device to software. Video cards with their proprietary drivers are
+not likely to work. However, most open-sourced drivers, seem to work
+fine. VirtualBox drivers work too. You must also have the appropriate
+permissions to write to this device (usually membership with group
+"video").
 
-NOTE:  Sometimes if you force grub to set a vga mode, a VESA console
-       framebuffer driver will load, and then you can have a framebuffer with
-       proprietary drivers.
+Sometimes you can force a VESA framebuffer console driver to be loaded
+by adding a video mode to the grub command line. You can do this with
+some proprietary video drivers that don't have their own framebuffer
+drivers.
 
-**** ATTENTION CPAN TESTERS!  Please make sure the above is noted before ****
-**** testing (and marking a fail)                                        ****
+ATTENTION CPAN TESTERS! Please make sure the above is noted before testing (and marking a fail)
 
-I highly recommend you install the system (or package) version of the "Imager"
-library, as it is already pre-compiled with all the needed C libraries for it
-to work with this module.  In Yum (RedHat) and Aptitude (Debian/Ubuntu) this
-module is called "libimager-perl" (or "perl-libImager").  However, if you
-desire to install it yourself, please do it manually, and not via CPAN.  When
-you do it manually, you can see the missing C libraries it is looking for in
-the "Makefile.PL" process and stop it there.  You can then install these
-libraries until it no longer says something is missing.  You see, it just
-turns off functionality if it can't find a library (when installing from CPAN),
-instead of stopping.  Libraries usually missing are those for GIF, JPEG, PNG,
-TrueType and FreeType fonts.  These are necessary not optional, if you wish to
-be able to work with fonts and images.
+I highly recommend you install the system (or package) version of the
+"Imager" library, as it is already pre-compiled with all the needed C
+libraries for it to work with this module. In Yum (RedHat) and Aptitude
+(Debian/Ubuntu) this module is called "libimager-perl" (or
+"perl-libImager"). However, if you desire to install it yourself, please
+do it manually, and not via CPAN. When you do it manually, you can see
+the missing C libraries it is looking for in the "Makefile.PL" process
+and stop it there. You can then install these libraries until it no
+longer says something is missing. You see, it just turns off
+functionality if it can't find a library (when installing from CPAN),
+instead of stopping. Libraries usually missing are those for GIF, JPEG,
+PNG, TrueType and FreeType fonts. These are necessary not optional, if
+you wish to be able to work with fonts and images.
 
 The "build-essential" tools need to be installed. This is generally a C
-compiler, linker, and standard C libraries (usually gcc variety).  The module
-"Inline::C", which this module uses, requires it.  Also, the package
-"kernel-headers".
+compiler, linker, and standard C libraries (usually gcc variety). The
+module "Inline::C", which this module uses, requires it. Also, the
+package "kernel-headers".
 
-You should also install typical TTF fonts as well.  I suggest the Windows
-fonts (fonts-wine), Ubuntu fonts (fonts-ubuntu) and anything else you wish to
-use.
+You should also install typical TTF fonts as well. I suggest the Windows
+fonts (fonts-wine), Ubuntu fonts (fonts-ubuntu) and anything else you
+wish to use.
+
 
 INSTALLATION
 
 You SHOULD install this module from the console, not X-Windows.
 
-To make your system ready for this module, then please install the following:
+To make your system ready for this module, then please install the
+following:
 
 DEBIAN BASED SYSTEMS (Ubuntu, Mint, Raspian, etc):
 
-  sudo apt update
-  sudo apt install build-essential linux-headers libimager-perl \
-   libinline-c-perl libmath-gradient-perl libmath-bezier-perl \
-   libfile-map-perl libtest-more-perl libsys-cpu-perl fonts-wine
+    sudo apt update`
+    sudo apt install build-essential linux-headers libimager-perl libinline-c-perl libmath-gradient-perl libmath-bezier-perl libfile-map-perl libtest-more-perl libsys-cpu-perl fonts-wine
 
 REDHAT BASED SYSTEMS (Fedora, CentOS, etc):
 
-  sudo yum update
-  sudo yum upgrade kernel-headers build-essential perl-math-gradient \
-    perl-test-more perl-math-bezier perl-file-map perl-imager \
-    perl-inline-c perl-sys-cpu
+    sudo yum update
+    sudo yum upgrade kernel-headers build-essential perl-math-gradient perl-math-bezier perl-file-map perl-imager perl-inline-c perl-sys-cpu perl-test-more
+
+
+Continuing...
 
 With that out of the way, you can now install this module.
 
@@ -71,134 +76,124 @@ To install this module, run the following commands:
     make test
     make install
 
-NOTE:  The install step may require sudo (root access).
+NOTE: _The install step may require sudo (root access)._
 
-       Build.PL is not supported due to lack of support by Inline::C
+_Build.PL is not supported by Inline::C, and thus not by this module as
+well._
+
 
 FURTHER TEST SCRIPTS
 
-To test the installation properly.  Log into the text console (not X).
-Go to the 'examples' directory and run 'primitives.pl'.  It basically calls
+To test the installation properly. Log into the text console (not X). Go
+to the 'examples' directory and run 'primitives.pl'. It basically calls
 most of the features of the module.
 
-The script 'threadstest.pl' requires 'Sys::CPU'.  It is not listed as a
-prerequisite for this module (as it isn't), but if you want to run this
-one script, then this is a required module.  It demonstrates how to use this
-module in a threaded environment.
+The scripts beginning with 'thread' requires 'Sys::CPU'. It is not
+listed as a prerequisite for this module (as it isn't), but if you want
+to run the threaded scripts, then this is a required module. It
+demonstrates how to use this module in a threaded environment.
+
+Mario Roy's MCE test scripts have been added (well, a script to go get
+them) to demonstrate alternate multiprocessing methods of using
+Graphics::Framebuffer, even with Perls built without threads support.
+
 
 GETTING STARTED
 
-There is a script template in the "examples" directory in this package.  You
-can use it as a starting point for your script.  It is conveniently called
-"template.pl".  I recommend copying it, renaming it,  and leaving the
-original template intact for use on another project.
+There is a script template in the 'examples' directory in this package.
+You can use it as a starting point for your script. It is conveniently
+called 'template.pl' or "threaded_template.pl". I recommend copying it,
+renaming it, and leaving the original template intact for use on another
+project.
+
 
 COMPATIBILITY vs. SPEED
 
 This module, suprisingly, runs on a variety of hardware with accessible
-framebuffer devices.  The only limitation is CPU power.  Why CPU power?  The
-module uses the CPU for its graphics calculations and drawing, not the GPU.
-There are very little framebuffer drivers that use the GPU for anything, and
-thus no reliable libraries for calling the GPU at the framebuffer level.
+framebuffer devices. The only limitation is CPU power. Why CPU power?
+The module uses the CPU for its graphics calculations and drawing, not
+the GPU. There are very little framebuffer drivers that use the GPU for
+anything, and thus no reliable libraries for calling the GPU at the
+framebuffer level.
 
-Some lower clocked ARM devices may be too slow for practical use of all of the
-methods in this module, but the best way to find out is to run
+Some lower clocked ARM devices may be too slow for practical use of all
+of the methods in this module, but the best way to find out is to run
 'examples/primitives.pl' to see which are fast enough to use.
 
-Here's what I have tested this module on (all 1920x1080x32, unless otherwise
-noted):
+Here's what I have tested this module on (all 1920x1080x32):
 
-Raspberry PI2/3 - Tollerable, I did 16 bit mode testing and coding on this
-                - machine.  Using a Perlbrew custom compiled Perl helps a bit.
-                - The Raspberry PI are configured, by default, to be in 16 bit
-                - graphics mode.  This is not the best mode if you are going
-                - to be loading images or rendering TrueType text, as color
-                - space conversions can take a long time (with acceleration
-                - off).  Overall, 32 bit mode works best on this machine,
-                - especially for image loading and text rendering.  This
-                - performance limitation can, however, be minimized using the
-                - C acceleration features, if you still wish to use the 16
-                - bit display mode.
+-   RASPBERRY PI2/3 - Tollerable, I did 16 bit mode testing and coding
+    on this machine. Using a Perlbrew custom compiled Perl helps a bit.
+    The Raspberry PI are configured, by default, to be in 16 bit
+    graphics mode. This is not the best mode if you are going to be
+    loading images or rendering TrueType text, as color space
+    conversions can take a long time (with acceleration off). Overall,
+    32 bit mode works best on this machine, especially for image loading
+    and text rendering. This performance limitation can, however, be
+    minimized using the C acceleration features, if you still wish to
+    use the 16 bit display mode.
 
-Odroid XU3/XU4  - Surprisingly fast.  All methods plenty fast enough for heavy
-                - use.  Works great with threads too, 8 of them (when done
-                - properly).  Most coding for this module is done on this
-                - machine at 1920x1080x32.  This is fast enough for full
-                - screen (1920 x 1080 or less) animations at 30 fps.  If your
-                - resolution is lower, then your FPS rating will be higher.
+-   ODROID XU3/XU4 - Surprisingly fast. All methods plenty fast enough
+    for heavy use. Works great with threads too, 8 of them (when done
+    properly). Most coding for this module is done on this machine at
+    1920x1080x32. This is fast enough for full screen (1920 x 1080 or
+    less) animations at 30 fps. If your resolution is lower, then your
+    FPS rating will be higher.
 
-Atom 1.60 GHz   - Decent, not nearly as fast as the Odroid XU3/4.  Works good
-with NVidia     - with threads too (when done properly).  Great for normal
-Nouveau driver  - graphical apps and static displayed output.  Recent versions
-                - of the Nouveau framebuffer driver have become noticably
-                - slower now days though.  Oh my goodness, it's slow.
+-   ATOM 1.60 GHZ WITH NVIDIA NOUVEAU DRIVER - Decent, not nearly as
+    fast as the Odroid XU3/4. Works good with threads too (when done
+    properly). Great for normal graphical apps and static displayed
+    output. Recent versions of the Nouveau framebuffer driver have
+    become noticably slower now days though.
 
-2.6 GHz MacBook - Blazingly fast. Most primitives draw nearly instantly.
-with VirtualBox -
+-   2.6 GHZ MACBOOK WITH VIRTUALBOX - Blazingly fast. Most primitives
+    draw nearly instantly.
 
-Windows 10 PC   - Holy cow!  No, seriously, this sucker is fast!  I wonder how
-with VirtualBox - much faster if it were running Linux natively?
-4GHz 6 core CPU -
-NVidia 970 Ti   - In addition, 3840x2160x32 (4K) is surprisingly fast.  Who'd
-                - have thought?  Full screen animations were choppy, but
-                - everything else was plenty fast enough.
+-   WINDOWS 10 PC WITH VIRTUALBOX, 4 GHZ 6 CORE I7 CPU AND 2 NVIDIA 970
+    TI'S - Holy cow! No, seriously, this sucker is fast! I wonder how
+    much faster if it were running Linux natively? In addition,
+    3840x2160x32 (4K) is surprisingly fast. Who'd have thought? Full
+    screen animations were choppy, but everything else was plenty fast
+    enough.
 
-Windows 10 PC   - This is how I found out that the Nouveau driver is very poor
-Native with     - when handling a framebuffer.  It's actually disgraceful at
-4GHz 6 core i7  - how bad and how slow it really is.  It doesn't appear to be
-CPU and two     - using any DMA for the memory copy of the framebuffer, but
-Nvidia 1080Ti's - CPU itself for transfers.  Running Virtual Box on Windows
-                = is much faster than running Linux natively with the 
-                - Nouveau framebuffer drivers!  Sad, really sad.
+-   NATIVE LINUX MINT WITH 4.2 GHZ 6 CORE I7 CPU AND 2 NVIDIA 1080
+    TI'S - This is how I found out that the Nouveau driver is very poor
+    when handling a framebuffer. It's actually disgraceful at how bad
+    and how slow it really is. It doesn't appear to be using any DMA for
+    the memory copy of the framebuffer, but CPU itself for transfers.
+    Running Virtual Box on Windows is much faster than running Linux
+    natively with the Nouveau framebuffer drivers. Sad, really sad.
 
-If you want specific screen formats supported that are not 16/24/32 bit color,
-then it may be advantageous to consider loaning me the display module you want
-to display on.  I have the following platforms to test it on (whichever is
-compatible with your display):
+-   NVIDIA JETSON NANO WITH 4GB OF RAM - Plenty zippy. I am quite
+    pleased with this offering by NVidia.
 
-  *  Raspberry Pi2 & Pi3 (compatible with the first Pi)
-  *  Odroid XU3 and XU4
-  *  NVidia Jetson-Nano (Tegra CPU/GPU)
-  *  Intel i7 CPU Linux PC
-
-I won't need to borrow it long, as I will just need to write a conversion
-routine in C to map output to the display.  That way, once that is working, I
-can get a good idea of how to display it, if that routine works.
-
-If you want vintage computer compatibility, like Atari or something similar,
-then all I can do is emulate it.  YOU will have to supply me with the OS image
-with Perl on it to boot it with.  I do not think MultiTOS has a framebuffer
-device, but if it does, it may work.  Otherwise 68K linux is your only option.
 
 SUPPORT AND DOCUMENTATION
 
 After installing, you can find documentation for this module with the
-perldoc command.
+'perldoc' command.
 
-    perldoc Graphics::Framebuffer (You may have to install 
-      "perldoc", but this usually works.)
+perldoc Graphics::Framebuffer _(You may have to install 'perldoc', but
+this usually works.)_
 
-    or
+or
 
-    man Graphics::Framebuffer (Installing "perldoc" usually enables Perl
-      module man pages)
+man Graphics::Framebuffer _(Installing 'perldoc' usually enables Perl
+module man pages)_
 
 You can also look for information at:
 
-    RT, CPAN's request tracker (report bugs here)
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Graphics-Framebuffer
+-   RT - CPAN's request tracker (report bugs here) -
+    http://rt.cpan.org/NoAuth/Bugs.html?Dist=Graphics-Framebuffer
 
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Graphics-Framebuffer
+-   ANNOCPAN - Annotated CPAN documentation -
+    http://annocpan.org/dist/Graphics-Framebuffer
 
-    CPAN Ratings
-        http://cpanratings.perl.org/d/Graphics-Framebuffer
+-   CPAN RATINGS - http://cpanratings.perl.org/d/Graphics-Framebuffer
 
-    Search CPAN
-        http://search.cpan.org/dist/Graphics-Framebuffer/
+-   SEARCH CPAN - http://search.cpan.org/dist/Graphics-Framebuffer/
 
-    YouTube
-        https://youtu.be/4Yzs55Wpr7E
+-   YOUTUBE - https://youtu.be/4Yzs55Wpr7E
 
 
 LICENSE AND COPYRIGHT
@@ -206,7 +201,7 @@ LICENSE AND COPYRIGHT
 Copyright (C) 2013-2019 Richard Kelsch
 
 This program is free software; you can redistribute it and/or modify it
-under the terms of either: the GNU General Public License version 3, as
-published by the Free Software Foundation; or the Artistic License.
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
 
 See http://dev.perl.org/licenses/ for more information.

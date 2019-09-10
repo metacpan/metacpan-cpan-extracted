@@ -1,0 +1,118 @@
+#!/usr/bin/perl
+package main;
+$main::VERSION = '0.002';
+# ABSTRACT: Commandline util for App::CommentToPod
+
+
+use strict;
+use warnings;
+
+use FindBin;
+use Getopt::Long;
+use lib "$FindBin::Bin/../lib";
+use App::CommentToPod;
+use open ':std', ':encoding(UTF-8)';
+
+my $pod2usage = sub {    # Load Pod::Usage only if needed
+	require Pod::Usage; import Pod::Usage;
+	&pod2usage;
+};
+
+my $emptyStubs = 0;
+GetOptions(
+	'help|h' => sub { $pod2usage->(0) },
+	'man' => sub { $pod2usage->(-verbose => 2) },
+	'empty-stubs' => \$emptyStubs,
+) or $pod2usage->(1);
+
+my $pm = App::CommentToPod->new(mock_empty => $emptyStubs);
+
+my @lines = <>;
+$pm->addPod(join('', @lines));
+print $pm->podfile;
+exit;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+main - Commandline util for App::CommentToPod
+
+=head1 VERSION
+
+version 0.002
+
+=head1 SYNOPSIS
+
+comment2pod [options]
+
+Options:
+
+ --help  - Brief usage help
+ --man   - Full ducumentation
+ --empty-stubs - generate general pod section of subroutines without comment.
+
+=head1 DESCRIPTION
+
+Example:
+
+    cat foo.pm | comment2pod
+
+change the source file
+
+    cat foo.pm | comment2pod | sponge foo.pm
+
+see L<App::CommentToPod>
+
+=head1 USAGE
+
+=over 8
+
+=item B<--help>
+
+Print a brief usage message and exit
+
+=item B<--man>
+
+Print this manual and exit
+
+=item B<--empty-stubs>
+
+Add a pod document over functions which is undocumented (does not
+contain a comment
+
+    sub foo{
+        my $self = shift:
+
+becomes:
+
+   =item C<foo>
+   foo(...) // not documented
+      sub foo{
+         my $self =shift;
+      ...
+   =back
+   sub foo{
+
+=back
+
+=head2 EXAMPLE
+
+    cat foo.pm | comment2pod
+
+=head1 AUTHOR
+
+Kjell Kvinge <kjell@kvinge.biz>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by Kjell Kvinge.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

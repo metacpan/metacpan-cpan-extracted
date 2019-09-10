@@ -1,38 +1,44 @@
-0.007   2019-04-23 (PERLANCAR)
+0.008   2019-09-10  Released-By: PERLANCAR; Urgency: medium
+
+	- Add workaround for flushing in older perls, e.g. 5.10.1 which causes
+	  tests to fail. See commit log for more details.
+
+
+0.007   2019-04-23  Released-By: PERLANCAR
 
 	- Avoid the "Can't locate object method flush via package
 	  IO::Handle" error seen in older perl (e.g. 5.10.1).
 
 
-0.006   2017-08-02 (PERLANCAR)
+0.006   2017-08-02  Released-By: PERLANCAR
 
 	- Remove debug print, d'oh.
 
 
-0.005   2017-08-02 (PERLANCAR)
+0.005   2017-08-02  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Tweak description.
 
 
-0.004   2017-08-02 (PERLANCAR)
+0.004   2017-08-02  Released-By: PERLANCAR
 
         - Add configuration parameters: lock_mode, lazy, autoflush.
 
 
-0.003   2017-08-02 (PERLANCAR)
+0.003   2017-08-02  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Mention LGO:FileWriteRotate.
 
 
-0.002   2017-06-23 (PERLANCAR)
+0.002   2017-06-23  Released-By: PERLANCAR
 
 	- Adjust to Log::ger 0.005.
 
 
-0.001    2017-06-19 (PERLANCAR)
+0.001    2017-06-19  Released-By: PERLANCAR
 
          - First release.

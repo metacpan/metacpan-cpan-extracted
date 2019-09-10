@@ -1,3 +1,18 @@
+[0.4.2]
+  * Debian packaging warning fixes only
+
+[0.4.1]
+  * PoD and documentation improvements
+
+[0.4.0]
+  * Removed Bitbucket pipeline support (YAML)
+  * Added Sourcehut pipeline support (YAML) -- https://builds.sr.ht
+  * Added modeSwitch() and modeName() user hooks
+  * Update links because of project migration from bitbucket
+
+[0.3.0]
+  * FIXME (details missing)
+
 [0.2.3]
   * Fix issue where not was directly tested against a blank string. (Unit tests only).
 

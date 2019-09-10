@@ -52,6 +52,8 @@ SKIP: {
         map { "'$_'" } @classes
     );
 	my @breaches;
+    my $count = 0;
+	if ($ENV{HIBP_API_KEY}) {
 	ACCOUNT: {
 			eval {
 				sleep 2;
@@ -71,7 +73,6 @@ SKIP: {
 				}
 			};
 	}
-    my $count = 0;
     foreach my $breach ( @breaches ) {
         ok( $breach->name(),  "Name of breach is '" . $breach->name() . "'" );
         ok( $breach->title(), "Title of breach is '" . $breach->title() . "'" );
@@ -138,8 +139,10 @@ SKIP: {
         );
         $count += 1;
     }
+	}
     my $previous_count = $count;
     $count = 0;
+	if ($ENV{HIBP_API_KEY}) {
 	@breaches = ();
 	ACCOUNT: {
 			eval {
@@ -196,8 +199,10 @@ SKIP: {
         $count == $previous_count,
 "When truncate is applied, all the breaches were returned with only the name defined:$count:$previous_count"
     );
+	}
     $count = 0;
 	@breaches = ();
+	if ($ENV{HIBP_API_KEY}) {
 	ACCOUNT: {
 			eval {
 				sleep 2;
@@ -218,8 +223,10 @@ SKIP: {
 				}
 			};
 	}
+	}
     $count = 0;
 	@breaches = ();
+	if ($ENV{HIBP_API_KEY}) {
 	ok((scalar @breaches == 0) && ($hibp->last_response()->code() == 404), "Correctly returned a 404 response code and an empty list of breaches for a missing email address for an account"); 
 	ACCOUNT: {
 			eval {
@@ -240,6 +247,7 @@ SKIP: {
 				}
 			};
 	}
+	}
     foreach my $breach ( @breaches )
     {
         if ( $breach->name() ) {
@@ -248,6 +256,7 @@ SKIP: {
     }
     $count = 0;
 	@breaches = ();
+	if ($ENV{HIBP_API_KEY}) {
 	ACCOUNT: {
 			eval {
 				sleep 2;
@@ -274,6 +283,7 @@ SKIP: {
     }
     ok( $count < $previous_count && $count > 0,
         "When domain adobe.com is applied, less breaches were reported" );
+	}
     my $breach;
 	ACCOUNT: {
 			eval {
@@ -392,6 +402,7 @@ SKIP: {
     ok( $count > 0 && $count < $previous_count,
         "Found $count breaches for adobe.com (filtering appears to work)" );
 	my @pastes;
+	if ($ENV{HIBP_API_KEY}) {
 	PASTE: {
 			eval {
 				sleep 2;
@@ -435,6 +446,7 @@ SKIP: {
 					}
 				}
 			};
+	}
 	}
     foreach my $paste ( @pastes ) {
         ok( $paste->source(), "Source of paste is '" . $paste->source() . "'" );

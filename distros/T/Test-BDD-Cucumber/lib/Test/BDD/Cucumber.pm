@@ -1,5 +1,5 @@
 package Test::BDD::Cucumber;
-$Test::BDD::Cucumber::VERSION = '0.60';
+$Test::BDD::Cucumber::VERSION = '0.62';
 use strict;
 use warnings;
 1;
@@ -12,7 +12,7 @@ Test::BDD::Cucumber - Feature-complete Cucumber-style testing in Perl
 
 =head1 VERSION
 
-version 0.60
+version 0.62
 
 =head1 SYNOPSIS
 
@@ -36,7 +36,7 @@ version 0.60
 
 =head1 DESCRIPTION
 
-A complete Cucumber implementation in Perl
+Cucumber for Perl, integrated with L<Test2>, L<Test::More> and L<prove>.
 
 The implementation supports the following Gherkin keywords in feature files:
 C<Feature>, C<Scenario>, C<Scenario Outline>, C<Examples>, C<Given>, C<When>,
@@ -91,14 +91,9 @@ href="https://gitter.im/pjlsergeant/test-bdd-cucumber-perl"><img
 For current bugs, check the issue tracer at GitHub:
 L<https://github.com/pherkin/test-bdd-cucumber-perl/issues>
 
-Two things need specific mentioning:
+One thing need specific mentioning:
 
 =over 4
-
-=item * No support for Test2 in Step files at the moment
-
-While this support is planned, currently, there's only support for Test::Builder
-based test modules (e.g. Test::Exception, Test::Differences, Test::More, etc)
 
 =item * Due to the use of its own parser, differences probably exist
 in the intepretation of feature files when comparing to Cucumber.
@@ -108,9 +103,23 @@ tracking this topic.
 
 =back
 
-=head1 SOURCE
+=head1 PROJECT RESOURCES
 
-On Github, of course: L<https://github.com/pherkin/test-bdd-cucumber-perl>.
+=over 4
+
+=item * Source code repository at L<https://github.com/pherkin/test-bdd-cucumber-perl>
+
+=item * Bug tracker at L<https://github.com/pherkin/test-bdd-cucumber-perl/issues>
+
+=item * Mailing list at L<mailto:perl-pherkin@googlegroups.com>
+
+=item * Chat (Gitter) at L<https://gitter.im/pjlsergeant/test-bdd-cucumber-perl>
+
+=item * Chat (IRC) at L<irc://irc.freenode.net/#perl>
+
+=item * Website at L<https://pherkin.pm>
+
+=back
 
 =head1 SEE ALSO
 

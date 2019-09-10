@@ -6,15 +6,20 @@ use warnings;
 
 use Test::More;
 
-plan tests => 43 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 50 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/CompleteCLIs.pm'
 );
 
 my @scripts = (
+    'script/complete-acme-metasyntactic-meta-category',
+    'script/complete-acme-metasyntactic-meta-theme',
+    'script/complete-acme-metasyntactic-meta-theme-and-category',
     'script/complete-array-elem',
     'script/complete-country-code',
+    'script/complete-currency-code',
+    'script/complete-cwalitee-indicator',
     'script/complete-dist',
     'script/complete-dzil-bundle',
     'script/complete-dzil-plugin',
@@ -30,6 +35,7 @@ my @scripts = (
     'script/complete-kernel',
     'script/complete-known-host',
     'script/complete-known-mac',
+    'script/complete-language-code',
     'script/complete-locale',
     'script/complete-manpage',
     'script/complete-manpage-section',
@@ -39,6 +45,7 @@ my @scripts = (
     'script/complete-perl-builtin-symbol',
     'script/complete-perl-version',
     'script/complete-pid',
+    'script/complete-pod',
     'script/complete-ppr-subpattern',
     'script/complete-proc-name',
     'script/complete-program',

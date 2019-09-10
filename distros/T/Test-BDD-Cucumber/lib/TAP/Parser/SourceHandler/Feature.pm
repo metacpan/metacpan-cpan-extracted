@@ -1,9 +1,10 @@
 package TAP::Parser::SourceHandler::Feature;
-$TAP::Parser::SourceHandler::Feature::VERSION = '0.60';
+$TAP::Parser::SourceHandler::Feature::VERSION = '0.62';
 use strict;
 use warnings;
 
 use Path::Class qw/file/;
+use Test2::API qw/context/;
 
 use base 'TAP::Parser::SourceHandler';
 
@@ -12,7 +13,7 @@ use TAP::Parser::Iterator::PherkinStream;
 use App::pherkin;
 
 use Test::BDD::Cucumber::Loader;
-use Test::BDD::Cucumber::Harness::TestBuilder;
+use Test::BDD::Cucumber::Harness::TAP;
 
 use Path::Class qw/file/;
 
@@ -73,9 +74,6 @@ sub make_iterator {
     #  (pipes are stdio buffered by default)
     $output_fh->autoflush(1);
 
-    my $tb = Test::Builder->create();
-    $tb->output($output_fh);
-
     my $dir     = $source->meta->{'file'}->{'dir'};
     my $runtime = $source->{'pherkins'}->{$dir}
         || die "No pherkin instantiation for [$dir]";
@@ -90,12 +88,11 @@ sub make_iterator {
     }
 
     close $input_fh;
-    my $harness = Test::BDD::Cucumber::Harness::TestBuilder->new(
-        {   fail_skip    => 1,
-            _tb_instance => $tb,
-        }
-    );
+    my $harness = Test::BDD::Cucumber::Harness::TAP->new({ fail_skip => 1 });
 
+    my $context = context();
+    # Without the step to set the handles TAP will end up on STDOUT/STDERR
+    $context->hub->format->set_handles([$output_fh, $output_fh]);
     $pherkin->harness($harness);
     my $filename = file( $dir . $source->meta->{'file'}->{'basename'} ) . '';
 
@@ -104,6 +101,7 @@ sub make_iterator {
         . ( join '; ', keys %{ $runtime->{'features'} } );
 
     $pherkin->_run_tests( $executor, $feature );
+    $context->release;
 
     close $output_fh;
     exit;

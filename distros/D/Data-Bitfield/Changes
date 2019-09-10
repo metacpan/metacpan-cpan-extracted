@@ -1,5 +1,11 @@
 Revision history for Device-Chip-AnalogConverters
 
+0.04    2019-09-08 02:35:05
+        [CHANGES]
+         * A better model for how `bytes-BE` works that is easier to
+           understand and use
+         * Added `signed_intfield`
+
 0.03    2019-05-04 10:45:49
         [CHANGES]
          * Support arbitrarily-wide structures when using "bytes" formats

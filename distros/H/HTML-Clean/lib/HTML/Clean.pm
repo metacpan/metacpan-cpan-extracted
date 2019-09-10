@@ -14,7 +14,9 @@ require AutoLoader;
 # Items to export to callers namespace
 @EXPORT = qw();
 
-$VERSION = '0.9';
+$VERSION = '1.2';
+
+=pod
 
 =head1 NAME
 
@@ -23,8 +25,8 @@ HTML::Clean - Cleans up HTML code for web browsers, not humans
 =head1 SYNOPSIS
 
   use HTML::Clean;
-  $h = new HTML::Clean($filename); # or..
-  $h = new HTML::Clean($htmlcode);
+  $h = HTML::Clean->new($filename); # or..
+  $h = HTML::Clean->new($htmlcode);
 
   $h->compat();
   $h->strip();
@@ -55,16 +57,11 @@ It provides the following features:
 The entire proces is configurable, so you can pick and choose what you want
 to clean.
 
-=head1 THE HTML::Clean CLASS
-
-=over 4
-
 =cut
 
+=head1 THE HTML::Clean CLASS
 
-######################################################################
-
-=head2 $h = new HTML::Clean($dataorfile, [$level]);
+=head2 $h = HTML::Clean->new($dataorfile, [$level]);
 
 This creates a new HTML::Clean object.  A Prerequisite for all other
 functions in this module.
@@ -72,9 +69,9 @@ functions in this module.
 The $dataorfile parameter supplies the input HTML, either a filename,
 or a reference to a scalar value holding the HTML, for example:
 
-  $h = new HTML::Clean("/htdocs/index.html");
+  $h = HTML::Clean->new("/htdocs/index.html");
   $html = "<strong>Hello!</strong>";
-  $h = new HTML::Clean(\$html);
+  $h = HTML::Clean->new(\$html);
 
 An optional 'level' parameter controls the level of optimization
 performed.  Levels range from 1 to 9.  Level 1 includes only simple
@@ -656,7 +653,7 @@ sub defrontpage {
   }
   $$h =~ s,<!--(mstheme|msthemeseparator|msnavigation)-->,,sgx;
 }
-=back
+
 
 =head1 SEE ALSO
 
@@ -672,9 +669,11 @@ FrontPage::Web, FrontPage::File
 
 =back
 
-=head1 AUTHORS
+=head1 AUTHORS and CO-AUTHORS
 
 Paul Lindner for the International Telecommunication Union (ITU)
+
+Pavel Kuptsov <admin@modernperl.ru>
 
 =head1 COPYRIGHT
 

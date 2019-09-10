@@ -83,9 +83,9 @@ SYNOPSIS
 
 DESCRIPTION
     StreamFinder accepts a valid radio station URL on supported websites and
-    returns the actual streamurl, title, and cover art icon for that
+    returns the actual stream URL(s), title, and cover art icon for that
     station. The purpose is that one needs one of these URLs in order to
-    have the option to stream the station in one's own choice of audio
+    have the option to stream the station/video in one's own choice of audio
     player software rather than using their web browser and accepting any /
     all flash, ads, javascript, cookies, trackers, web-bugs, and other
     crapware that can come with that method of playing. The author uses his
@@ -93,23 +93,9 @@ DESCRIPTION
     hacked version of the open-source "audacious" audio player).
     "fauxdacious" incorporates this module to decode and play streams. The
     currently-supported websites are: radionomy.com, iheartradio.com,
-    reciva.com, facebook, banned.video, and youtube / vimeo / brighteon, et.
-    al. We used to support tunein.com, but they have since apparently wasted
-    a ton of money on web-developers and script kiddies to so fsck up their
-    stations' pages to make it impossible to obtain their hidden streams
-    programatically.
-
-    It amazes me the effort to which marketing-run operations will go to and
-    web-development money they'll spend to prevent people from accessing
-    their radio streams in alternate ways, even though the content is
-    already paid for by the advertisements already played in the streams.
-    Guess they are that desparate to track your web-activity, store crap in
-    cookies on your browser, and pummel you to death with evem more useless
-    add garbage. Our mission is to restore your freedom to access commercial
-    and other streaming radio stations that already paid for and freely
-    available over the air in the ways most convenient to YOU, the listener!
-    We are NOT in the business to provide a means of circumventing copyright
-    laws, however!
+    reciva.com, radio.net, facebook, banned.video, and youtube / vimeo /
+    brighteon, et. al. We are again supporting tunein.com, but it may not
+    work for all stations!
 
     Each site is supported by a separate subpackage
     (StreamFinder::*Package*), which is determined and selected based on the
@@ -119,16 +105,30 @@ DESCRIPTION
     One or more playable streams can be returned for each station.
 
 SUBROUTINES/METHODS
-    new(*url*)
+    new(*url* [, *options* ])
         Accepts a URL and creates and returns a new station object, or
         *undef* if the URL is not a valid station or no streams are found.
+
+        *options* can vary depending on the type of stream (site) that is
+        being queried. One option common to all sites is *-debug*, which
+        turns on debugging output. A numeric option can follow specifying
+        the level (0, 1, or 2). 0 is none, 1 is basic, 2 is detailed.
+        Default: 1 (if *-debug* is specified).
 
     $station->get()
         Returns an array of strings representing all stream urls found.
 
-    $station->getURL()
+    $station->getURL([*options*])
         Similar to get() except it only returns a single stream representing
         the first valid stream found.
+
+        Current options are: *-random* and *-noplaylists*. By default, the
+        first ("best"?) stream is returned. If *-random* is specified, then
+        a random one is selected from the list of streams found. If
+        *-noplaylists* is specified, and the stream to be returned is a
+        "playlist" (.pls extension), it is first fetched and the first entry
+        in the playlist is returned. This is needed by Fauxdacious
+        Mediaplayer.
 
     $station->count()
         Returns the number of streams found for the station.
@@ -154,6 +154,35 @@ SUBROUTINES/METHODS
         "gif", "jpeg", etc. and the actual station's banner image (binary
         data).
 
+CONFIGURATION FILES
+    ~/.config/StreamFinder/config
+        Optional text file for specifying various configuration options.
+        Each option is specified on a separate line in the format below:
+
+        'option' => 'value' [,]
+
+        and the options are loaded into a hash used by all sites
+        (submodules) that support them. Valid options include *-debug* =>
+        [0|1|2], and most of the LWP::UserAgent options. Blank lines and
+        lines starting with a "#" sign are ignored.
+
+    ~/.config/StreamFinder/submodule/config
+        Optional text file for specifying various configuration options for
+        a specific site (submodule). Each option is specified on a separate
+        line in the format below:
+
+        'option' => 'value' [,]
+
+        and the options are loaded into a hash used only by the specific
+        (submodule) specified. Valid options include *-debug* => [0|1|2],
+        and most of the LWP::UserAgent options.
+
+        Options specified here override any specified in
+        *~/.config/StreamFinder/config*.
+
+    NOTE: Options specified in the options parameter list will override
+    those corresponding options specified in these files.
+
 DEPENDENCIES
     LWP::UserAgent
 
@@ -162,7 +191,7 @@ RECCOMENDS
 
     WWW::YouTube::Download; (Youtube)
 
-    youtube-dl (Youtube, Facebook)
+    youtube-dl (Youtube, Facebook, Tunein)
 
     wget (Reciva, Youtube, BannedVideo)
 
@@ -181,7 +210,8 @@ SUPPORT
     You can also look for information at:
 
 SEE ALSO
-    Fauxdacious media player (https://wildstar84.wordpress.com/fauxdacious)
+    Fauxdacious media player -
+    (<https://wildstar84.wordpress.com/fauxdacious>)
 
     *   RT: CPAN's request tracker (report bugs here)
 

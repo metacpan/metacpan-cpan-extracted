@@ -1,0 +1,26 @@
+---
+abstract: HTML::Clean - Cleans up HTML code for web browsers, not humans
+author:
+  - Paul Lindner <plindner@inuus.com>
+x_contributors:
+  - Paul Lindner <plindner@inuus.com>
+  - Pavel Kuptsov <pkuptsov@gmail.com>
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4216, CPAN::Meta::Converter version 2.150001'
+keywords:
+  - html
+  - html clean
+  - html strip
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTML-Clean
+provides:
+  HTML::Clean:
+    file: lib/HTML/Clean.pm
+    version: 1.2
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/poizon/HTML-Clean.git
+version: 1.2

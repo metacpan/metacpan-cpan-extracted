@@ -13,7 +13,7 @@ no warnings qw( threads recursion uninitialized once redefine );
 
 package MCE::Hobo;
 
-our $VERSION = '1.848';
+our $VERSION = '1.850';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
@@ -382,7 +382,7 @@ sub join {
    }
    elsif ( $self->{MGR_ID} eq "$$.$_tid" ) {
       local $!; waitpid($wrk_id, 0);
-      _reap_hobo($_LIST->{$pkg}->del($wrk_id));
+      _reap_hobo($_LIST->{$pkg}->del($wrk_id) // return);
    }
    else {
       sleep 0.3 until ( $_DATA->{$pkg}->exists('R'.$wrk_id) );
@@ -421,6 +421,13 @@ sub list {
    my $pkg = "$$.$_tid.".caller();
 
    ( exists $_LIST->{$pkg} ) ? $_LIST->{$pkg}->vals() : ();
+}
+
+sub list_pids {
+   _croak('Usage: MCE::Hobo->list_pids()') if ref($_[0]);
+   my $pkg = "$$.$_tid.".caller(); local $_;
+
+   ( exists $_LIST->{$pkg} ) ? map { $_->pid } $_LIST->{$pkg}->vals() : ();
 }
 
 sub list_joinable {
@@ -559,11 +566,16 @@ sub _croak {
 
 sub _dispatch {
    my ( $mngd, $func, $args ) = @_;
-   $mngd->{WRK_ID} = $_SELF->{WRK_ID} = $$;
 
+   $mngd->{WRK_ID} = $_SELF->{WRK_ID} = $$;
    $ENV{PERL_MCE_IPC} = 'win32' if $_is_MSWin32;
-   $SIG{TERM} = $SIG{SEGV} = $SIG{INT} = $SIG{HUP} = \&_trap;
-   $SIG{QUIT} = \&_quit;
+
+   $SIG{TERM} = $SIG{SEGV} = $SIG{INT} = $SIG{HUP} = sub {
+      $_DATA->{ $_SELF->{PKG} }->set('R'.$$, ''); _trap();
+   };
+   $SIG{QUIT} = sub {
+      $_DATA->{ $_SELF->{PKG} }->set('R'.$$, ''); _quit();
+   };
 
    {
       local $!;
@@ -679,11 +691,18 @@ sub _quit {
 
 sub _reap_hobo {
    my ( $hobo ) = @_;
-   local @_ = $_DATA->{ $hobo->{PKG} }->_get_hobo_data( $hobo->{WRK_ID}.'1' );
+   return unless $hobo;
+
+   my $void_context = ( exists $hobo->{void_context} )
+      ? $hobo->{void_context} : $_MNGD->{ $hobo->{PKG} }{void_context};
+
+   local @_ = ( $void_context )
+      ? $_DATA->{ $hobo->{PKG} }->_get_hobo_data( $hobo->{WRK_ID}, 0 )
+      : $_DATA->{ $hobo->{PKG} }->_get_hobo_data( $hobo->{WRK_ID}, 1 );
 
    if ( $_[1] eq '-1' ) {
       sleep 0.015; # retry
-      @_ = $_DATA->{ $hobo->{PKG} }->_get_hobo_data( $hobo->{WRK_ID}.'2' );
+      @_ = $_DATA->{ $hobo->{PKG} }->_get_hobo_data( $hobo->{WRK_ID}, 2 );
    }
 
    ( $hobo->{ERROR}, $hobo->{RESULT}, $hobo->{JOINED} ) =
@@ -856,7 +875,7 @@ MCE::Hobo - A threads-like parallelization module
 
 =head1 VERSION
 
-This document describes MCE::Hobo version 1.848
+This document describes MCE::Hobo version 1.850
 
 =head1 SYNOPSIS
 
@@ -888,6 +907,7 @@ This document describes MCE::Hobo version 1.848
  MCE::Hobo->create( \&parallel, $_ ) for 1 .. 3;
 
  my @hobos    = MCE::Hobo->list();
+ my @pids     = MCE::Hobo->list_pids();
  my @running  = MCE::Hobo->list_running();
  my @joinable = MCE::Hobo->list_joinable();
  my @count    = MCE::Hobo->pending();
@@ -1286,6 +1306,18 @@ workers have been notified to quit.
 Returns a list of all hobo objects not yet joined.
 
  @hobos = MCE::Hobo->list();
+
+=item MCE::Hobo->list_pids()
+
+Returns a list of all hobo pids not yet joined (available since 1.849).
+
+ @pids = MCE::Hobo->list_pids();
+
+ $SIG{QUIT} = $SIG{INT} = $SIG{HUP} = $SIG{TERM} = sub {
+     # Signal workers and the shared manager all at once
+     CORE::kill('KILL', MCE::Hobo->list_pids(), MCE::Shared->pid());
+     exec('reset');
+ };
 
 =item MCE::Hobo->list_running()
 

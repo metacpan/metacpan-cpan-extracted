@@ -1,6 +1,6 @@
 # Locale::Maketext::Gettext - Joins the gettext and Maketext frameworks
 
-# Copyright (c) 2003-2009 imacat. All rights reserved. This program is free
+# Copyright (c) 2003-2019 imacat. All rights reserved. This program is free
 # software; you can redistribute it and/or modify it under the same terms
 # as Perl itself.
 # First written: 2003-04-23
@@ -11,7 +11,7 @@ use strict;
 use warnings;
 use base qw(Locale::Maketext Exporter);
 use vars qw($VERSION @ISA %Lexicon @EXPORT @EXPORT_OK);
-$VERSION = 1.28;
+$VERSION = 1.29;
 @EXPORT = qw(read_mo);
 @EXPORT_OK = @EXPORT;
 # Prototype declaration
@@ -21,9 +21,10 @@ use Encode qw(encode decode FB_DEFAULT);
 use File::Spec::Functions qw(catfile);
 no strict qw(refs);
 
-use vars qw(%Lexicons %ENCODINGS $REREAD_MO $MOFILE);
+use vars qw(%CACHE $REREAD_MO $MO_FILE);
+%CACHE = qw();
 $REREAD_MO = 0;
-$MOFILE = "";
+$MO_FILE = "";
 use vars qw(@SYSTEM_LOCALEDIRS);
 @SYSTEM_LOCALEDIRS = qw(/usr/share/locale /usr/lib/locale
     /usr/local/share/locale /usr/local/lib/locale);
@@ -102,9 +103,9 @@ sub subclass_init : method {
     $self->SUPER::fail_with($self->can("failure_handler_auto"));
     # Initialize the ENCODE_FAILURE setting
     $self->{"ENCODE_FAILURE"} = FB_DEFAULT;
-    # Initialize the MOFILE value of this instance
-    $self->{"MOFILE"} = "";
-    ${"$class\::MOFILE"} = "" if !defined ${"$class\::MOFILE"};
+    # Initialize the MO_FILE value of this instance
+    $self->{"MO_FILE"} = "";
+    ${"$class\::MO_FILE"} = "" if !defined ${"$class\::MO_FILE"};
     # Find the locale name, for this subclass
     $self->{"LOCALE"} = $class;
     $self->{"LOCALE"} =~ s/^.*:://;
@@ -141,7 +142,7 @@ sub bindtextdomain : method {
 # textdomain: Set the current text domain
 sub textdomain : method {
     local ($_, %_);
-    my ($self, $class, $DOMAIN, $LOCALEDIR, $MOfile);
+    my ($self, $class, $DOMAIN, $LOCALEDIR, $mo_file);
     ($self, $DOMAIN) = @_;
     
     # This is not a static method
@@ -160,41 +161,41 @@ sub textdomain : method {
     # Clear it
     $self->{"Lexicon"} = {};
     %{"$class\::Lexicon"} = qw();
-    $self->{"MOFILE"} = "";
-    ${"$class\::MOFILE"} = "";
+    $self->{"MO_FILE"} = "";
+    ${"$class\::MO_FILE"} = "";
     
     # The format is "{LOCALEDIR}/{LOCALE}/{CATEGORY}/{DOMAIN}.mo"
     # Search the system locale directories if the domain was not
     # registered yet
     if (!exists ${$self->{"LOCALEDIRS"}}{$DOMAIN}) {
-        undef $MOfile;
+        undef $mo_file;
         foreach $LOCALEDIR (@SYSTEM_LOCALEDIRS) {
             $_ = catfile($LOCALEDIR, $self->{"LOCALE"},
                 $self->{"CATEGORY"}, "$DOMAIN.mo");
             if (-f $_ && -r $_) {
-                $MOfile = $_;
+                $mo_file = $_;
                 last;
             }
         }
         # Not found at last
-        return $DOMAIN if !defined $MOfile;
+        return $DOMAIN if !defined $mo_file;
     
     # This domain was registered
     } else {
-        $MOfile = catfile(${$self->{"LOCALEDIRS"}}{$DOMAIN},
+        $mo_file = catfile(${$self->{"LOCALEDIRS"}}{$DOMAIN},
             $self->{"LOCALE"}, $self->{"CATEGORY"}, "$DOMAIN.mo");
     }
     
     # Record it
-    ${"$class\::MOFILE"} = $MOfile;
-    $self->{"MOFILE"} = $MOfile;
+    ${"$class\::MO_FILE"} = $mo_file;
+    $self->{"MO_FILE"} = $mo_file;
     
     # Read the MO file
     # Cached
-    if (!exists $ENCODINGS{$MOfile} || !exists $Lexicons{$MOfile}) {
-        my $enc;
+    if (!$self->_is_using_cache($mo_file)) {
+        my ($enc, @stats, $mtime, $size);
         # Read it
-        %_ = read_mo($MOfile);
+        %_ = read_mo($mo_file);
         
         # Successfully read
         if (scalar(keys %_) > 0) {
@@ -211,13 +212,23 @@ sub textdomain : method {
         }
         
         # Cache them
-        $Lexicons{$MOfile} = \%_;
-        $ENCODINGS{$MOfile} = $enc;
+        @stats = stat $mo_file;
+        if (@stats > 0) {
+            ($mtime, $size) = @stats[9,7];
+        } else {
+            ($mtime, $size) = (undef, undef);
+        }
+        $CACHE{$mo_file} = {
+                "Lexicon"   => {%_},
+                "encoding"  => $enc,
+                "mtime"     => $mtime,
+                "size"      => $size,
+            };
     }
     
     # Respect the existing output encoding
-    if (defined $ENCODINGS{$MOfile}) {
-        $self->{"MO_ENCODING"} = $ENCODINGS{$MOfile};
+    if (defined $CACHE{$mo_file}->{"encoding"}) {
+        $self->{"MO_ENCODING"} = $CACHE{$mo_file}->{"encoding"};
     } else {
         delete $self->{"MO_ENCODING"};
     }
@@ -229,11 +240,36 @@ sub textdomain : method {
             delete $self->{"ENCODING"};
         }
     }
-    $self->{"Lexicon"} = $Lexicons{$MOfile};
-    %{"$class\::Lexicon"} = %{$Lexicons{$MOfile}};
+    $self->{"Lexicon"} = $CACHE{$mo_file}->{"Lexicon"};
+    %{"$class\::Lexicon"} = %{$CACHE{$mo_file}->{"Lexicon"}};
     $self->clear_isa_scan;
     
     return $DOMAIN;
+}
+
+# _is_using_cache: Return whether we are using our cache.
+sub _is_using_cache : method {
+    local ($_, %_);
+    my ($self, $mo_file, @stats, $mtime, $size);
+    ($self, $mo_file) = @_;
+    
+    # NO if we do not have such a cache.
+    return undef unless exists $CACHE{$mo_file};
+    
+    @stats = stat $mo_file;
+    # The MO file does not exist previously.
+    if (!defined $CACHE{$mo_file}->{"mtime"}
+        || !defined $CACHE{$mo_file}->{"size"}) {
+        # Use the cache if the MO file still does not exist.
+        return (@stats == 0);
+    
+    # The MO file exists previously.
+    } else {
+        # Use the cache if the MO file did not change.
+        ($mtime, $size) = @stats[9,7];
+        return $mtime == $CACHE{$mo_file}->{"mtime"}
+                && $size == $CACHE{$mo_file}->{"size"};
+    }
 }
 
 # maketext: Encode after maketext
@@ -260,8 +296,8 @@ sub maketext : method {
     #   single localization subclass whenever possible.
     # Maketext uses class lexicon in order to track the inheritance.
     #   It is hard to change it.
-    if (${"$class\::MOFILE"} ne $self->{"MOFILE"}) {
-        ${"$class\::MOFILE"} = $self->{"MOFILE"};
+    if (${"$class\::MO_FILE"} ne $self->{"MO_FILE"}) {
+        ${"$class\::MO_FILE"} = $self->{"MO_FILE"};
         %{"$class\::Lexicon"} = %{$self->{"Lexicon"}};
     }
     
@@ -299,14 +335,14 @@ sub pmaketext : method {
 #          Refer to gettext documentation section 8.3
 sub read_mo($) {
     local ($_, %_);
-    my ($MOfile, $len, $FH, $content, $tmpl);
-    $MOfile = $_[0];
+    my ($mo_file, $len, $FH, $content, $tmpl);
+    $mo_file = $_[0];
     
     # Avild being stupid
-    return unless -f $MOfile && -r $MOfile;
+    return unless -f $mo_file && -r $mo_file;
     # Read the MO file
-    $len = (stat $MOfile)[7];
-    open $FH, $MOfile   or return;  # GNU gettext never fails!
+    $len = (stat $mo_file)[7];
+    open $FH, $mo_file   or return;  # GNU gettext never fails!
     binmode $FH;
     defined($_ = read $FH, $content, $len)
                         or return;
@@ -366,8 +402,7 @@ sub reload_text : method {
     local ($_, %_);
     
     # Purge the text cache
-    %Lexicons = qw();
-    %ENCODINGS = qw();
+    %CACHE = qw();
     $REREAD_MO = time;
     
     return;
@@ -535,7 +570,7 @@ If you want to have more control to the detail:
 Use Locale::Maketext::Gettext to read and parse the MO file:
 
   use Locale::Maketext::Gettext;
-  %Lexicon = read_mo($MOfile);
+  %Lexicon = read_mo($mo_file);
 
 =head1 DESCRIPTION
 
@@ -653,7 +688,7 @@ are running a vital daemon, such as an X display server.
 
 =over
 
-=item %Lexicon = read_mo($MOfile);
+=item %Lexicon = read_mo($mo_file);
 
 Read and parse the MO file.  Returns the read %Lexicon.  The returned
 lexicon is in its original encoding.
@@ -807,7 +842,7 @@ imacat <imacat@mail.imacat.idv.tw>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2003-2008 imacat. All rights reserved. This program is free
+Copyright (c) 2003-2019 imacat. All rights reserved. This program is free
 software; you can redistribute it and/or modify it under the same terms
 as Perl itself.
 

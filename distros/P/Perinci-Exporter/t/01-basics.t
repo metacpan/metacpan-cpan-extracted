@@ -4,6 +4,7 @@ use strict 'subs', 'vars';
 use warnings;
 use Test::Exception;
 use Test::More 0.98;
+use Test::Needs;
 
 use Perinci::Exporter qw();
 
@@ -55,28 +56,97 @@ our @_import_args;
 
 package main;
 
-test_export(
-    name        => 'default export/import, default_wrap=1',
-    export_args => [default_wrap=>1],
-    import_args => [],
-    imported    => [qw(f1 f2 f4 f91)],
-    wrapped     => [qw(f1 f2 f4)],
-);
-
-{
-    # we also test that wrapping is not redone for functions which use default
-    # wrapping args
-    require Perinci::Sub::Wrapper;
-    no warnings 'redefine';
-    local *Perinci::Sub::Wrapper::wrap_sub = sub { die };
+subtest "tests that need wrapping" => sub {
+    test_needs 'Perinci::Sub::Wrapper';
 
     test_export(
-        name        => 'import individual symbol, default_wrap=1',
+        name        => 'default export/import, default_wrap=1',
         export_args => [default_wrap=>1],
-        import_args => [qw(f1)],
-        imported    => [qw(f1)],
+        import_args => [],
+        imported    => [qw(f1 f2 f4 f91)],
+        wrapped     => [qw(f1 f2 f4)],
     );
-}
+
+    test_export(
+        name        => 'per-symbol import option: wrap=custom',
+        export_args => [],
+        import_args => [fargs => {wrap => {convert=>{result_naked=>0}}}],
+        imported    => [qw(fargs)],
+        wrapped     => [qw(fargs)],
+        posttest    => sub {
+            is_deeply(&{"TestTarget::fargs"}, [200, "OK", "a1= a2= a3="], "result");
+        },
+    );
+
+    test_export(
+        name        => 'just to test that fargs\'s default wrapper not overriden',
+        export_args => [default_wrap=>1],
+        import_args => [qw(fargs)],
+        imported    => [qw(fargs)],
+        wrapped     => [qw(fargs)],
+        posttest    => sub {
+            is_deeply(&{"TestTarget::fargs"}, "a1= a2= a3=", "result");
+        },
+    );
+
+    test_export(
+        name        => 'per-symbol import option: convert',
+        export_args => [],
+        import_args => [fargs => {convert=>{result_naked=>0}}],
+        imported    => [qw(fargs)],
+        wrapped     => [qw(fargs)],
+        posttest    => sub {
+            is_deeply(&{"TestTarget::fargs"}, [200, "OK", "a1= a2= a3="], "result");
+        },
+    );
+
+    test_export(
+        name        => 'per-symbol import option: args_as=array',
+        export_args => [],
+        import_args => [fargs => {args_as=>'array'}],
+        imported    => [qw(fargs)],
+        wrapped     => [qw(fargs)],
+        posttest    => sub {
+            is_deeply(&{"TestTarget::fargs"}(1, 2, 3), "a1=1 a2=2 a3=3", "result");
+        },
+    );
+
+    test_export(
+        name        => 'per-symbol import option: result_naked=0',
+        export_args => [],
+        import_args => [fargs => {result_naked=>0}],
+        imported    => [qw(fargs)],
+        wrapped     => [qw(fargs)],
+        posttest    => sub {
+            is_deeply(&{"TestTarget::fargs"}, [200, "OK", "a1= a2= a3="], "result");
+        },
+    );
+
+    test_export(
+        name        => 'per-symbol import option: curry',
+        export_args => [],
+        import_args => [fargs => {curry=>{a1=>10}}],
+        imported    => [qw(fargs)],
+        wrapped     => [qw(fargs)],
+        posttest    => sub {
+            is_deeply(&{"TestTarget::fargs"}(a2=>2), "a1=10 a2=2 a3=", "result");
+        },
+    );
+
+    {
+        require Perinci::Sub::Wrapper;
+        no warnings 'redefine';
+        local *Perinci::Sub::Wrapper::wrap_sub = sub { die };
+
+        test_export(
+            name        => 'wrapping is not redone for functions which use default wrapping',
+            export_args => [wrap=>1, default_wrap=>1],
+            import_args => [qw(f1)],
+            imported    => [qw(f1)],
+        );
+    }
+
+};
 
 test_export(
     name        => 'sanity: importing unknown exports -> dies',
@@ -205,72 +275,6 @@ test_export(
     import_args => [fargs => {wrap => 0}],
     imported    => [qw(fargs)],
     wrapped     => [qw()],
-);
-
-test_export(
-    name        => 'per-symbol import option: wrap=custom',
-    export_args => [],
-    import_args => [fargs => {wrap => {convert=>{result_naked=>0}}}],
-    imported    => [qw(fargs)],
-    wrapped     => [qw(fargs)],
-    posttest    => sub {
-        is_deeply(&{"TestTarget::fargs"}, [200, "OK", "a1= a2= a3="], "result");
-    },
-);
-
-test_export(
-    name        => 'just to test that fargs\'s default wrapper not overriden',
-    export_args => [default_wrap=>1],
-    import_args => [qw(fargs)],
-    imported    => [qw(fargs)],
-    wrapped     => [qw(fargs)],
-    posttest    => sub {
-        is_deeply(&{"TestTarget::fargs"}, "a1= a2= a3=", "result");
-    },
-);
-
-test_export(
-    name        => 'per-symbol import option: convert',
-    export_args => [],
-    import_args => [fargs => {convert=>{result_naked=>0}}],
-    imported    => [qw(fargs)],
-    wrapped     => [qw(fargs)],
-    posttest    => sub {
-        is_deeply(&{"TestTarget::fargs"}, [200, "OK", "a1= a2= a3="], "result");
-    },
-);
-
-test_export(
-    name        => 'per-symbol import option: args_as=array',
-    export_args => [],
-    import_args => [fargs => {args_as=>'array'}],
-    imported    => [qw(fargs)],
-    wrapped     => [qw(fargs)],
-    posttest    => sub {
-        is_deeply(&{"TestTarget::fargs"}(1, 2, 3), "a1=1 a2=2 a3=3", "result");
-    },
-);
-
-test_export(
-    name        => 'per-symbol import option: result_naked=0',
-    export_args => [],
-    import_args => [fargs => {result_naked=>0}],
-    imported    => [qw(fargs)],
-    wrapped     => [qw(fargs)],
-    posttest    => sub {
-        is_deeply(&{"TestTarget::fargs"}, [200, "OK", "a1= a2= a3="], "result");
-    },
-);
-
-test_export(
-    name        => 'per-symbol import option: curry',
-    export_args => [],
-    import_args => [fargs => {curry=>{a1=>10}}],
-    imported    => [qw(fargs)],
-    wrapped     => [qw(fargs)],
-    posttest    => sub {
-        is_deeply(&{"TestTarget::fargs"}(a2=>2), "a1=10 a2=2 a3=", "result");
-    },
 );
 
 test_export(

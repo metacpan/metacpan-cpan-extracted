@@ -3,10 +3,10 @@ HTML::Clean - Cleans up HTML code for web browsers, not humans
 
 1. INTRODUCTION
 
-  --    ``The HTML Compiler!'' 
+  --    ``The HTML Compiler!''
 
-The majority of the web pages of the internet today are 
-much larger than they need to be.  The reason for this is 
+The majority of the web pages of the internet today are
+much larger than they need to be.  The reason for this is
 that HTML tends to be stored in a human readable format, with
 indenting, newlines and comments.
 
@@ -31,7 +31,7 @@ You can use the library in your perl-cgi scripts to optimize data.  Or
 use the included htmlclean script to preprocess HTML files or templates
 on your server.
 
-The results should be pages that load faster, less load on your web 
+The results should be pages that load faster, less load on your web
 server and better cross-platform HTML.
 
 To read about the latest features, see the Changes file.  To find
@@ -41,7 +41,7 @@ see the TODO file.
 
 2. AVAILABILITY
 
-You can get the latest version of the HTML::Clean module from the 
+You can get the latest version of the HTML::Clean module from the
 Comprehensive Perl Archive Network (CPAN) or from the author's homepage:
 
     http://www.perl.org/CPAN/modules/by-module/HTML/
@@ -77,9 +77,13 @@ is free software; you can redistribute it and/or modify it under the
 same terms as Perl itself.
 
 
-6. AUTHOR INFORMATION
+6. AUTHOR & CO-AUTHOR INFORMATION
 
 Paul Lindner
 paul.lindner@itu.int
 http://people.itu.int/~lindner/
+
+Pavel Kuptsov
+pavel@modernperl.ru
+https://modernperl.ru
 

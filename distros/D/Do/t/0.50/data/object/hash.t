@@ -115,8 +115,8 @@ ok Data::Object::Hash->does('Data::Object::Role::Throwable');
 # can_ok 'Data::Object::Hash', 'values';
 
 subtest 'test instantiation' => sub {
-  eval { Data::Object::Hash->new };
-  like $@, qr/Instantiation Error/;
+  my $h0 = Data::Object::Hash->new;
+  is_deeply $h0, {};
 
   eval { Data::Object::Hash->new(1) };
   like $@, qr/Instantiation Error/;

@@ -52,8 +52,13 @@ isa_ok $data, 'Data::Object::Number::Base';
 $data = Data::Object::Number::Base->new($data);
 isa_ok $data, 'Data::Object::Number::Base';
 
+# instantiate without arg
+$data = Data::Object::Number::Base->new;
+isa_ok $data, 'Data::Object::Number::Base';
+is $$data, 0;
+
 # instantiation error
-ok !eval{Data::Object::Number::Base->new};
+ok !eval{Data::Object::Number::Base->new('y')};
 like $@, qr(Instantiation Error);
 
 ok 1 and done_testing;

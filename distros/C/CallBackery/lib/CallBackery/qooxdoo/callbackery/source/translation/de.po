@@ -1,4 +1,4 @@
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
@@ -11,29 +11,37 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: callbackery/ui/Footer.js:24
+#: callbackery/ui/Footer.js:23
 msgid "Support"
 msgstr ""
 
-#: callbackery/ui/Footer.js:35 callbackery/ui/Login.js:129
+#: callbackery/ui/Footer.js:34
 msgid "Implemented by %1"
 msgstr "Implementiert von %1"
 
-#: callbackery/ui/Footer.js:40 callbackery/ui/Login.js:131
+#: callbackery/ui/Footer.js:39
 msgid "Version %1, %2%3"
 msgstr ""
 
-#: callbackery/ui/Login.js:23 callbackery/ui/Login.js:107
+#: callbackery/ui/Login.js:23 callbackery/ui/Login.js:109
 msgid "Login"
 msgstr "Anmelden"
 
-#: callbackery/ui/Login.js:79
-msgid "Username"
-msgstr "Benutzer"
+#: callbackery/ui/Login.js:80
+msgid "User"
+msgstr ""
 
-#: callbackery/ui/Login.js:93
+#: callbackery/ui/Login.js:96
 msgid "Password"
 msgstr "Passwort"
+
+#: callbackery/ui/MsgBox.js:68 callbackery/ui/Login.js:112
+msgid "OK"
+msgstr ""
+
+#: callbackery/ui/Login.js:137
+msgid "release %1, %2 by %3"
+msgstr ""
 
 #: callbackery/ui/MsgBox.js:66
 msgid "Cancel"
@@ -42,10 +50,6 @@ msgstr "Abbrechen"
 #: callbackery/ui/MsgBox.js:67
 msgid "Apply"
 msgstr "Anwenden"
-
-#: callbackery/ui/MsgBox.js:68
-msgid "OK"
-msgstr ""
 
 #: callbackery/ui/MsgBox.js:69
 msgid "Yes"
@@ -59,45 +63,52 @@ msgstr "Nein"
 msgid "RPC Error %1"
 msgstr "Kommunikations-Fehler %1"
 
-#: callbackery/ui/TabView.js:41
+#: callbackery/ui/TabView.js:45
 msgid "Unsaved Data"
 msgstr "Nicht gespeicherte Daten"
 
-#: callbackery/ui/TabView.js:42
+#: callbackery/ui/TabView.js:46
 msgid "This form contains unsaved data. Do you still want to switch?"
 msgstr ""
 "Dieses Formular enthält nicht gespeicherte Daten. Wollen Sie trotzdem "
 "umschalten?"
 
-#: callbackery/ui/form/Auto.js:72
+#: callbackery/ui/form/Auto.js:72 callbackery/ui/form/Auto.js:80
 msgid "dd.MM.yyyy"
 msgstr ""
 
-#: callbackery/ui/plugin/Action.js:97 callbackery/ui/plugin/Action.js:129
-#: callbackery/ui/plugin/Action.js:218
+#: callbackery/ui/plugin/Action.js:102 callbackery/ui/plugin/Action.js:133
+#: callbackery/ui/plugin/Action.js:235
 msgid "Validation Error"
 msgstr "Validierungsfehler"
 
-#: callbackery/ui/plugin/Action.js:98 callbackery/ui/plugin/Action.js:130
-#: callbackery/ui/plugin/Action.js:219
+#: callbackery/ui/plugin/Action.js:103 callbackery/ui/plugin/Action.js:134
+#: callbackery/ui/plugin/Action.js:236
 msgid ""
 "The form can only be submitted when all data fields have valid content."
 msgstr ""
 "Dieses Formular kann nur abgeschickt werden, wenn alle Felder einen gültigen"
 " Inhalt haben."
 
-#: callbackery/ui/plugin/Action.js:144
+#: callbackery/ui/plugin/Action.js:148
 msgid "No Data"
 msgstr "Keine Daten."
 
-#: callbackery/ui/plugin/Action.js:153
+#: callbackery/ui/plugin/Action.js:157
 msgid "Download Exception"
 msgstr "Download Fehler."
 
-#: callbackery/ui/plugin/Action.js:240
+#: callbackery/ui/plugin/Action.js:268
 msgid "Upload Exception"
 msgstr "Upload Fehler"
 
-#: callbackery/ui/plugin/Html.js:50 callbackery/ui/plugin/Form.js:178
+#: callbackery/ui/plugin/Form.js:213
 msgid "Loading Form Data"
 msgstr "Daten werden geladen"
+
+#: callbackery/ui/plugin/Html.js:54
+msgid "Loading HTML Data"
+msgstr ""
+
+#~ msgid "Username"
+#~ msgstr "Benutzer"

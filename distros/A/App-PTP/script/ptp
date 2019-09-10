@@ -204,6 +204,11 @@ functions used in B<--perl> or B<-n> commands.
 
 Any error in the Perl code will terminate the execution of the program.
 
+=item B<-M> I<module>
+
+Load the given Perl module in the Perl environment. This option cannot be used
+when B<--safe> is specified with level strictly greater than 0.
+
 =item B<-l> I<path>, B<--load>
 
 Same as B<--execute> except that it takes the code to execute from the given
@@ -267,6 +272,13 @@ preserved (they are reversed with the input).
 
 Shuffle all the lines of the input in random order. The markers of the input
 lines are reset (no line is marked after this command).
+
+=item B<--eat>
+
+Delete the entire content of the file (eat it). This is useful if you don't need
+the content any-more (maybe you have sent it to another command with B<--shell>)
+but you cannot redirect the output (typically to get the output of that shell
+command).
 
 =item B<--delete-marked>
 
@@ -363,7 +375,8 @@ unset.
 Splits all the line according to the B<-F> flag (see B<--cut> for more details)
 into multiple lines (this is not the same as adding new-lines in the middle of
 lines as with this command the multiple lines will be treated as distinct lines
-by subsequent commands).
+by subsequent commands). Lines with no fields according to the B<-F> flag are
+entirely dropped.
 
 After this command, the marker of every line is unset.
 
@@ -387,7 +400,9 @@ a look at the  L</EXAMPLES> section.
 
 =item B<--fn>, B<--file-name>
 
-Replace the entire content of the input with a single line containing the name of the file currently being processed.
+Replace the entire content of the input with a single line containing the name
+of the file currently being processed. Does nothing if a file is entirely empty
+at that point in the processing.
 
 The resulting line has its marker unset.
 
@@ -416,6 +431,17 @@ can contain variables from the Perl environment. This behavior can be
 deactivated by the B<-Q> flag, to have the B<filename> be used as-is (in 
 particular, you probably want to use this flag on platform where file-names use
 back-slash characters '\').
+
+=item B<--shell> I<command>
+
+Execute the given command and pass it the content of the current file as
+standard input. The output of the command goes on the standard output, it is not
+read by the program. The current content and markers are not modified.
+
+Not that the given command is first interpreted as a Perl string, so it can
+contain variables from the Perl environment. This behavior can be deactivated by
+the B<-Q> flag. Then, the command is passed to a shell which will do another
+pass of interpretation. That pass cannot be deactivated.
 
 =back
 
@@ -516,6 +542,11 @@ did not have one in the input.
 Set the B<--input-separator> to the null character (B<\000>) and the
 B<--output-separator> to the empty string. This result in having each file read
 entirely in a single logical line.
+
+=item B<--00>
+
+Set the B<--output-separator> to the null character (B<\000>). This produces
+output compatible with B<-0> option of C<xargs>.
 
 =item B<-h>, B<--help>
 
@@ -855,6 +886,12 @@ the first line of each file, and B<--pivot> joins the two lines of each file
 (the file name and the number of lines):
 
   ptp dir -R --input-filter '/\.(c|h|cc)$/' -g '^\s*//' --lc --pfn --pivot
+
+Find all the occurences of a given regex in a file and print them, one per line.
+The regex can contain capture groups (using parenthesis). In that case only the
+content of the capture group is kept:
+
+  ptp file -n 'join(",", /regex/g)' --anti-pivot --fix-final-separator
 
 =head1 ENVIRONMENT
 

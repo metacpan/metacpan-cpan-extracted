@@ -49,8 +49,13 @@ isa_ok $data, 'Data::Object::Array';
 $data = Data::Object::Array->new($data);
 isa_ok $data, 'Data::Object::Array';
 
+# instantiate without arg
+$data = Data::Object::Array->new;
+isa_ok $data, 'Data::Object::Array';
+is_deeply $data, [];
+
 # instantiation error
-ok !eval{Data::Object::Array->new};
+ok !eval{Data::Object::Array->new({})};
 like $@, qr(Instantiation Error);
 
 ok 1 and done_testing;

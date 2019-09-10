@@ -1,0 +1,64 @@
+Revision history for File-Collector
+
+0.037     2019-09-10 02:32:02-04:00 America/New_York
+  - kill Windows test bugs for good (hopefully)
+
+0.036     2019-09-09 09:58:38-04:00 America/New_York
+  - Fix broken tests on Windows
+
+0.035     2019-09-08 15:18:35-04:00 America/New_York
+  - get failed tests working in windows
+
+0.034     2019-09-08 12:48:35-04:00 America/New_York
+  - document that Collector classes need "use Role::Tiny;"
+
+0.033     2019-09-08 12:27:04-04:00 America/New_York
+  - fix regex bug with interpolated variable
+
+0.032     2019-09-08 02:57:31-04:00 America/New_York
+  - minor doc improvements
+
+0.031     2019-09-08 02:25:27-04:00 America/New_York
+  - try to get tests passed on more platforms
+
+0.030     2019-09-07 22:48:17-04:00 America/New_York
+
+0.029     2019-09-07 20:47:35-04:00 America/New_York
+  - improve test coverage
+
+0.028     2019-09-07 20:14:10-04:00 America/New_York
+  - Get min. perl version working for real this time
+
+0.027     2019-09-07 19:45:17-04:00 America/New_York
+  - remove crufty files from distro
+
+0.026     2019-09-07 19:35:38-04:00 America/New_York
+  - remove share directory from release
+
+0.025     2019-09-07 19:23:05-04:00 America/New_York
+  - remove Log4perl module
+
+0.024     2019-09-07 16:20:02-04:00 America/New_York
+  - improve abstracts for base modules
+  - make modules compatible with older versions of perl
+  - add min. perl version to dist.ini
+
+0.023     2019-09-07 16:15:19-04:00 America/New_York
+  - fix spelling error in docs
+
+0.022     2019-09-07 15:50:19-04:00 America/New_York
+  - remove files in attic/ dir from distro
+
+0.021     2019-09-07 15:06:28-04:00 America/New_York
+  - Fix install issue with path to test module
+
+0.020     2019-09-07 01:23:39-04:00 America/New_York
+  - Fix major bug
+  - update docs
+  - switch to use File::Spec
+
+0.019     2019-09-07 00:48:00-04:00 America/New_York
+  - Remove Log4perl::Shortcuts
+
+0.018     2019-09-06 20:18:48-04:00 America/New_York
+  - Test init release

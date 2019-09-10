@@ -9,7 +9,7 @@ use Moo;
 
 use parent 'Data::Object::Base';
 
-our $VERSION = '1.60'; # VERSION
+our $VERSION = '1.70'; # VERSION
 
 # BUILD
 
@@ -76,7 +76,10 @@ sub data {
 
   my $handle = do { no strict 'refs'; \*{"${class}::DATA"} };
 
-  fileno $handle or die "Error with $class: DATA not accessible";
+  fileno $handle or return [];
+
+  # (no longer errors if DATA is missing)
+  # fileno $handle or die "Error with $class: DATA not accessible";
 
   seek $handle, 0, 0;
 
@@ -195,17 +198,43 @@ Data-Object Data Extraction Class
 
 =head1 SYNOPSIS
 
+  use Data::Object::Data;
+
+  my $data = Data::Object::Data->new;
+
+This example is extracting from the main package.
+
+  use Data::Object::Data;
+
+  my $data = Data::Object::Data->new(from => 'Example::Package');
+
+This example is extracting from a class.
+
+  use Data::Object::Data;
+
+  my $data = Data::Object::Data->new(file => 'lib/Example/Package.pm');
+
+This example is extracting from a file.
+
+  use Data::Object::Data;
+
+  my $data = Data::Object::Data->new(data => [,"..."]);
+
+This example is extracting from existing data.
+
   package Command;
 
   use Data::Object::Data;
 
-  =help
+  =pod help
 
   fetches results from the api
 
   =cut
 
-  my $data = Data::Object::Data->new;
+  my $data = Data::Object::Data->new(
+    from => 'Command'
+  );
 
   my $help = $data->content('help');
   # fetches results ...
@@ -216,7 +245,7 @@ Data-Object Data Extraction Class
   my $secret = $data->content('secret');
   # secret: the secret for ...
 
-  my $flag = $data->contents('flag');
+  my $flags = $data->contents('flag');
   # [,...]
 
   __DATA__
@@ -365,7 +394,7 @@ for a given filename.
   from_data(Str $arg1) : Str
 
 The from_data method returns content for the given class to be passed to the
-constructor.
+constructor. This method isn't meant to be called directly.
 
 =over 4
 
@@ -386,7 +415,7 @@ constructor.
   from_file(Str $arg1) : Str
 
 The from_data method returns content for the given file to be passed to the
-constructor.
+constructor. This method isn't meant to be called directly.
 
 =over 4
 
@@ -506,9 +535,9 @@ matches the given list or item by name.
 
 =head1 CREDITS
 
-Al Newkirk, C<awncorp@cpan.org>, C<+284>
+Al Newkirk, C<+287>
 
-Anthony Brummett, C<abrummet@genome.wustl.edu>, C<+10>
+Anthony Brummett, C<+10>
 
 =cut
 

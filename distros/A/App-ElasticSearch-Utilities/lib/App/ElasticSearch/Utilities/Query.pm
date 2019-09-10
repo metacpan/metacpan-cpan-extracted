@@ -4,18 +4,18 @@ package App::ElasticSearch::Utilities::Query;
 use strict;
 use warnings;
 
-our $VERSION = '7.2'; # VERSION
+our $VERSION = '7.3'; # VERSION
 
 use CLI::Helpers qw(:output);
 use Clone qw(clone);
 use Moo;
 use Ref::Util qw(is_arrayref is_hashref);
-use Types::Standard qw(ArrayRef HashRef Int Maybe Str);
+use Types::Standard qw(ArrayRef Enum HashRef Int Maybe Str);
 use Types::ElasticSearch qw(TimeConstant is_TimeConstant);
 use namespace::autoclean;
 
 my %TO = (
-    array_ref => sub { defined $_[0] && ref($_[0]) eq 'ARRAY' ? $_[0] : defined $_[0] ? [ $_[0] ] : $_[0] },
+    array_ref => sub { defined $_[0] && is_arrayref($_[0]) ? $_[0] : defined $_[0] ? [ $_[0] ] : $_[0] },
 );
 
 
@@ -29,30 +29,33 @@ has query_stash => (
 
 
 my %QUERY = (
-    must        => { default => sub {undef}, isa => Maybe[ArrayRef], coerce => $TO{array_ref}, init_arg => 'must'     },
-    must_not    => { default => sub {undef}, isa => Maybe[ArrayRef], coerce => $TO{array_ref}, init_arg => 'must_not' },
-    should      => { default => sub {undef}, isa => Maybe[ArrayRef], coerce => $TO{array_ref}, init_arg => 'should'   },
-    filter      => { default => sub {undef}, isa => Maybe[ArrayRef], coerce => $TO{array_ref}, init_arg => 'filter'   },
-    nested      => { default => sub {undef}, isa => Maybe[HashRef], init_arg => 'nested' },
-    nested_path => { default => sub {undef}, isa => Maybe[Str],     init_arg => 'nested_path' },
+    must        => { isa => ArrayRef, coerce => $TO{array_ref} },
+    must_not    => { isa => ArrayRef, coerce => $TO{array_ref} },
+    should      => { isa => ArrayRef, coerce => $TO{array_ref} },
+    filter      => { isa => ArrayRef, coerce => $TO{array_ref} },
+    nested      => { isa => HashRef },
+    nested_path => { isa => Str },
+    minimum_should_match => { isa => Str },
 );
 
 
 my %REQUEST_BODY = (
-    from         => { isa => Maybe[Int] },
+    from         => { isa => Int },
     size         => { default => sub {50},    isa => Int },
-    fields       => { isa => Maybe[ArrayRef], coerce => $TO{array_ref} },
-    sort         => { isa => Maybe[ArrayRef], coerce => $TO{array_ref} },
-    aggregations => { isa => Maybe[HashRef] },
+    fields       => { isa => ArrayRef, coerce => $TO{array_ref} },
+    sort         => { isa => ArrayRef, coerce => $TO{array_ref} },
+    aggregations => { isa => HashRef },
 );
 
 
 my %PARAMS = (
-    scroll          => { isa => Maybe[TimeConstant] },
-    timeout         => { isa => TimeConstant },
-    terminate_after => { isa => Int },
-    rest_total_hits_as_int => { isa => Str, default => sub { 'false' } },
-    track_total_hits  => { isa => Str, default => sub { 'false' } }
+    scroll           => { isa => Maybe[TimeConstant] },
+    timeout          => { isa => TimeConstant },
+    terminate_after  => { isa => Int },
+    track_total_hits => { isa => Enum[qw( true false )], default => sub { 'true' } },
+    track_scores     => { isa => Enum[qw( true false )] },
+    search_type      => { isa => Enum[qw( dfs_query_then_fetch query_then_fetch )] },
+    rest_total_hits_as_int => { isa => Enum[qw( true false )], default => sub { 'true' } },
 );
 
 # Dynamically build our attributes
@@ -61,7 +64,6 @@ foreach my $attr (keys %QUERY) {
         is       => 'rw',
         lazy     => 1,
         writer   => "set_$attr",
-        init_arg => undef,
         %{ $QUERY{$attr} },
     );
 }
@@ -79,7 +81,6 @@ foreach my $attr (keys %PARAMS) {
         is       => 'rw',
         lazy     => 1,
         writer   => "set_$attr",
-        init_arg => undef,
         %{ $PARAMS{$attr} },
     );
 }
@@ -90,13 +91,17 @@ sub uri_params {
 
     my %params=();
     foreach my $field (keys %PARAMS) {
-        my $v = eval {
-            debug({color=>'magenta'}, "uri_params() - retrieving param '$field'");
+        my $v;
+        eval {
             ## no critic
             no strict 'refs';
-            $self->$field();
+            $v = $self->$field();
             ## user critic
         };
+        debug({color=>'magenta'}, sprintf "uri_params() - retrieving param '%s' got '%s'",
+                $field, ( defined $v ? $v : '' ),
+        );
+
         next unless defined $v;
         $params{$field} = $v;
     }
@@ -160,7 +165,7 @@ sub query {
             if($self->stash($k)) {
                 push @{ $bool{$k} }, $self->stash($k);
             }
-            delete $bool{$k} if exists $bool{$k} and not @{ $bool{$k} };
+            delete $bool{$k} if exists $bool{$k} and is_arrayref($bool{$k}) and not @{ $bool{$k} };
         }
         $qref = { bool => \%bool };
     }
@@ -229,15 +234,14 @@ sub set_match_all {
 
 
 sub add_bool {
-    my $self      = shift;
-    my $section   = shift;
-    my $condition = shift;
-
-    if( exists $QUERY{$section} ) {
+    my $self  = shift;
+    my %bools = @_;
+    foreach my $section ( sort keys %bools ) {
+        next unless exists $QUERY{$section};
         ## no critic
         no strict 'refs';
         my $set = $self->$section;
-        push @{ $set }, $condition;
+        push @{ $set }, $bools{$section};
         my $setter = "set_$section";
         $self->$setter($set);
         ## use critic
@@ -272,7 +276,7 @@ App::ElasticSearch::Utilities::Query - Object representing ES Queries
 
 =head1 VERSION
 
-version 7.2
+version 7.3
 
 =head1 ATTRIBUTES
 
@@ -294,6 +298,11 @@ Can be set using set_must_not and is a valid init_arg.
 
 The should section of a bool query as an array reference.  See: L<add_bool>
 Can be set using set_should and is a valid init_arg.
+
+=head2 minimum_should_match
+
+A string defining the minimum number of should conditions to qualify a match.
+See L<https://www.elastic.co/guide/en/elasticsearch/reference/7.3/query-dsl-minimum-should-match.html>
 
 =head2 filter
 
@@ -358,6 +367,28 @@ large queries where you are protecting against OOM Errors. The B<size> attribute
 truncation occurs after the reduce operation, where B<terminate_after> occurs during the map phase of the query.
 Can be set with B<set_terminateafter>.  Cannot be an init_arg.
 
+=head2 track_total_hits
+
+Should the query attempt to calculate the number of hits the query would match.
+Defaults to C<true>.
+
+=head2 track_scores
+
+Set to true to score every hit in the search results, set to false to not
+report scores.  Defaults to unset, i.e., use the ElasticSearch default.
+
+=head2 rest_total_hits_as_int
+
+In ElasticSearch 7.0, the total hits element became a hash reference with more
+details.  Since most of the tooling relies on the old behavior, this defaults
+to C<true>.
+
+=head2 search_type
+
+Choose an execution path for the query.  This is null by default, but you can
+set it to a valid `search_type` setting, see:
+L<https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html#request-body-search-search-type>
+
 =head1 METHODS
 
 =head2 uri_params()
@@ -384,7 +415,7 @@ The value being the hash reference representation of the aggregation itself.
 It will silently replace a previously named aggregation with the most recent
 call.
 
-Calling this function overrides the L<size> element to B<0> and L<scroll> to undef.
+Calling this function overrides the L<size> element to B<0> and disables L<scroll>.
 
 Aliased as B<add_aggs>.
 
@@ -444,10 +475,22 @@ but defaults to '1m'.  It is the same as calling:
 This method clears all filters and query elements to and sets the must to match_all.
 It will not reset other parameters like size, sort, and aggregations.
 
-=head2 add_bool( section => condition )
+=head2 add_bool( section => conditions .. )
 
 Appends a search condition to a section in the query body.  Valid query body
 points are: must, must_not, should, and filter.
+
+    $q->add_bool( must => { term => { http_status => 200 } } );
+
+    # or
+
+    $q->add_bool(
+        must => [
+            { term => { http_method => 'GET' } }
+            { term => { client_ip   => '10.10.10.1' } }
+        ]
+        must_not => { term => { http_status => 400 } },
+    );
 
 =head2 stash( section => condition )
 

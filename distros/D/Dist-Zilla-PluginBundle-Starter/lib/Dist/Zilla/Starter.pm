@@ -3,7 +3,7 @@ package Dist::Zilla::Starter;
 use strict;
 use warnings;
 
-our $VERSION = 'v3.0.3';
+our $VERSION = 'v3.0.5';
 
 1;
 
@@ -18,10 +18,61 @@ Dist::Zilla::Starter - Guide to getting started with Dist::Zilla
 This is a guide to the inner workings of L<Dist::Zilla> for managing and
 releasing CPAN distributions effectively, in particular with the
 L<[@Starter]|Dist::Zilla::PluginBundle::Starter> and
-L<[@Starter::Git]|Dist::Zilla::PluginBundle::Starter::Git> bundles.
+L<[@Starter::Git]|Dist::Zilla::PluginBundle::Starter::Git> bundles. See their
+documentation for specific usage.
 
-If you are already familiar with general CPAN distribution authoring, skip
-ahead to L</"DZIL AND BUNDLES">.
+=head1 OVERVIEW
+
+L<Dist::Zilla> is a CPAN distribution management tool, which itself just
+defines a set of phases relevant to the distribution building, testing, and
+releasing process, and relies on plugins and commands for specific behavior.
+
+The sections below will walk through all of the essentials for using
+Dist::Zilla effectively. If you are already familiar with general CPAN
+distribution authoring, skip ahead to L</"DZIL AND BUNDLES">.
+
+=over
+
+=item * L</"CPAN DISTRIBUTIONS">
+
+A modern CPAN distribution should have a basic well-defined structure so its
+contents and attributes can be recognized by CPAN infrastructure and tooling.
+
+=item * L</"A BRIEF HISTORY OF AUTHORING">
+
+The historical progression of CPAN distribution authoring tools that led to the
+development of Dist::Zilla.
+
+=item * L</"DZIL AND BUNDLES">
+
+Dist::Zilla plugin bundles that can provide a starting point or a ready-made
+complete distribution management tool.
+
+=item * L</"THE DZIL CORE">
+
+The infrastructure of Dist::Zilla provides the framework for plugins and
+commands to define specific behavior in a configurable and extensible way.
+
+=item * L</"CONFIGURATION">
+
+Configuring a Dist::Zilla project and the plugins for it to use in F<dist.ini>.
+
+=item * L</"COMMANDS">
+
+Taking action with a configured Dist::Zilla project via built-in and
+installable commands.
+
+=item * L</"MINTING">
+
+Dist::Zilla provides the ability to generate new distribution skeletons using
+the same core infrastructure and a minting profile.
+
+=item * L</"PHASES">
+
+Commands execute a series of phases, which each execute any actions registered
+by plugins for that phase. The known phases and their usage are listed here.
+
+=back
 
 =head1 CPAN DISTRIBUTIONS
 

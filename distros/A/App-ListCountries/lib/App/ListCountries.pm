@@ -1,7 +1,7 @@
 package App::ListCountries;
 
-our $DATE = '2016-02-13'; # DATE
-our $VERSION = '0.01'; # VERSION
+our $DATE = '2019-07-18'; # DATE
+our $VERSION = '0.020'; # VERSION
 
 use 5.010001;
 use strict;
@@ -19,9 +19,12 @@ our $data;
     $data = [];
     my $id2names  = $Locale::Codes::Data{'country'}{'id2names'};
     my $id2alpha2 = $Locale::Codes::Data{'country'}{'id2code'}{'alpha-2'};
+    my $id2alpha3 = $Locale::Codes::Data{'country'}{'id2code'}{'alpha-3'};
 
     for my $id (keys %$id2names) {
-        push @$data, [$id2alpha2->{$id}, $id2names->{$id}[0]];
+        # skip countries that no longer has alpha3 codes
+        next unless $id2alpha3->{$id};
+        push @$data, [$id2alpha3->{$id}, $id2alpha2->{$id}, $id2names->{$id}[0]];
     }
 
     $data = [sort {$a->[0] cmp $b->[0]} @$data];
@@ -34,20 +37,26 @@ my $res = gen_read_table_func(
     table_spec => {
         summary => 'List of countries',
         fields => {
-            alpha2 => {
-                summary => 'ISO 2-letter code',
+            alpha3 => {
+                summary => 'ISO 3166 3-letter code',
                 schema => 'str*',
                 pos => 0,
+                sortable => 1,
+            },
+            alpha2 => {
+                summary => 'ISO 3166 2-letter code',
+                schema => 'str*',
+                pos => 1,
                 sortable => 1,
             },
             en_name => {
                 summary => 'English name',
                 schema => 'str*',
-                pos => 1,
+                pos => 2,
                 sortable => 1,
             },
         },
-        pk => 'alpha2',
+        pk => 'alpha3',
     },
     description => <<'_',
 
@@ -73,7 +82,7 @@ App::ListCountries - List countries
 
 =head1 VERSION
 
-This document describes version 0.01 of App::ListCountries (from Perl distribution App-ListCountries), released on 2016-02-13.
+This document describes version 0.020 of App::ListCountries (from Perl distribution App-ListCountries), released on 2019-07-18.
 
 =head1 SYNOPSIS
 
@@ -82,7 +91,11 @@ This document describes version 0.01 of App::ListCountries (from Perl distributi
 =head1 FUNCTIONS
 
 
-=head2 list_countries(%args) -> [status, msg, result, meta]
+=head2 list_countries
+
+Usage:
+
+ list_countries(%args) -> [status, msg, payload, meta]
 
 List countries.
 
@@ -138,6 +151,50 @@ Only return records where the 'alpha2' field is less than specified value.
 =item * B<alpha2.xmin> => I<str>
 
 Only return records where the 'alpha2' field is greater than specified value.
+
+=item * B<alpha3> => I<str>
+
+Only return records where the 'alpha3' field equals specified value.
+
+=item * B<alpha3.contains> => I<str>
+
+Only return records where the 'alpha3' field contains specified text.
+
+=item * B<alpha3.in> => I<array[str]>
+
+Only return records where the 'alpha3' field is in the specified values.
+
+=item * B<alpha3.is> => I<str>
+
+Only return records where the 'alpha3' field equals specified value.
+
+=item * B<alpha3.isnt> => I<str>
+
+Only return records where the 'alpha3' field does not equal specified value.
+
+=item * B<alpha3.max> => I<str>
+
+Only return records where the 'alpha3' field is less than or equal to specified value.
+
+=item * B<alpha3.min> => I<str>
+
+Only return records where the 'alpha3' field is greater than or equal to specified value.
+
+=item * B<alpha3.not_contains> => I<str>
+
+Only return records where the 'alpha3' field does not contain specified text.
+
+=item * B<alpha3.not_in> => I<array[str]>
+
+Only return records where the 'alpha3' field is not in the specified values.
+
+=item * B<alpha3.xmax> => I<str>
+
+Only return records where the 'alpha3' field is less than specified value.
+
+=item * B<alpha3.xmin> => I<str>
+
+Only return records where the 'alpha3' field is greater than specified value.
 
 =item * B<detail> => I<bool> (default: 0)
 
@@ -209,7 +266,7 @@ Only return a certain number of records.
 
 Only return starting from the n'th record.
 
-=item * B<sort> => I<str>
+=item * B<sort> => I<array[str]>
 
 Order records according to certain field(s).
 
@@ -231,7 +288,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -257,13 +314,17 @@ feature.
 
 L<Locale::Codes>
 
+L<list-languages> from L<App::ListLanguages>
+
+L<list-currencies> from L<App::ListCurrencies>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

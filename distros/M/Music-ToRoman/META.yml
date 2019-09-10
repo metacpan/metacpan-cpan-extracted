@@ -24,6 +24,7 @@ name: Music-ToRoman
 requires:
   List::MoreUtils: '0'
   Moo: '2'
+  Music::Note: '0'
   Music::Scales: '0'
   namespace::clean: '0'
   perl: '5.006'
@@ -31,7 +32,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Music-ToRoman
   repository: https://github.com/ology/Music-ToRoman.git
-version: '0.1600'
+version: '0.1702'
 x_Dist_Zilla:
   perl:
     version: '5.027007'
@@ -157,18 +158,6 @@ x_Dist_Zilla:
             - ':TestFiles'
       name: Test::NoTabs
       version: '0.15'
-    -
-      class: Dist::Zilla::Plugin::Test::EOL
-      config:
-        Dist::Zilla::Plugin::Test::EOL:
-          filename: xt/author/eol.t
-          finder:
-            - ':ExecFiles'
-            - ':InstallModules'
-            - ':TestFiles'
-          trailing_whitespace: 1
-      name: Test::EOL
-      version: '0.19'
     -
       class: Dist::Zilla::Plugin::Test::Compile
       config:

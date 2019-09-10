@@ -1,8 +1,16 @@
 Revision history for Perl module HTML::Clean
 --------------------------------------------
+1.2 Tue Sep 9 13:56 MSK 2019
+
+    - Fix pod
+
+1.1 Tue Sep 9 12:30 MSK 2019
+
+    - Fix pod. Add github repository
+
 0.9 Tue Aug 20 09:24 PDT 2019
 
-  - Fix warnings - use IO::File instead deprecated module IO.
+    - Fix warnings - use IO::File instead deprecated module IO.
 
 0.8  Tue Sep  5 08:02:05 PDT 2000
 

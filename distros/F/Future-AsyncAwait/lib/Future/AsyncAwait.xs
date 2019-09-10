@@ -1732,7 +1732,6 @@ static OP *pp_leaveasync(pTHX)
   PERL_CONTEXT *cx = CX_CUR();
   SV *f = NULL;
   SV *ret;
-  SV **oldsp = PL_stack_base + cx->blk_oldsp;
 
   SuspendedState *state = suspendedstate_get(find_runcv(0));
   if(state && state->returning_future) {
@@ -1746,6 +1745,9 @@ static OP *pp_leaveasync(pTHX)
   else {
     ret = future_done_from_stack(f, mark);
   }
+
+  SPAGAIN;
+  SV **oldsp = PL_stack_base + cx->blk_oldsp;
 
   /* Pop extraneous stack items */
   while(SP > oldsp)

@@ -1,0 +1,13 @@
+0.003   2019-09-09  Released-By: PERLANCAR; Urgency: high
+
+	- Derp, previous commit has typo.
+
+
+0.002   2019-09-09  Released-By: PERLANCAR; Urgency: medium
+
+	- Sort SOA before NS.
+
+
+0.001   2019-09-09  Released-By: PERLANCAR
+
+        - First release, extracted from DNS::Zone::PowerDNS::To::BIND.

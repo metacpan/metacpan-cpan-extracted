@@ -10,7 +10,7 @@
 #
 
 package Text::Template;
-$Text::Template::VERSION = '1.56';
+$Text::Template::VERSION = '1.57';
 # ABSTRACT: Expand template text with embedded Perl
 
 use strict;
@@ -611,7 +611,7 @@ Text::Template - Expand template text with embedded Perl
 
 =head1 VERSION
 
-version 1.56
+version 1.57
 
 =head1 SYNOPSIS
 

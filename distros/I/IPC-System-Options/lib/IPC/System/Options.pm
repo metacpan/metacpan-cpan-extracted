@@ -1,9 +1,9 @@
 package IPC::System::Options;
 
-our $DATE = '2019-01-07'; # DATE
-our $VERSION = '0.331'; # VERSION
+our $DATE = '2019-09-03'; # DATE
+our $VERSION = '0.332'; # VERSION
 
-use strict;
+use strict 'subs', 'vars';
 use warnings;
 
 use Proc::ChildError qw(explain_child_error);
@@ -19,7 +19,7 @@ sub import {
     my $i = 0;
     while ($i < @_) {
         # backtick is the older, deprecated name for readpipe
-        if ($_[$i] =~ /\A(system|readpipe|backtick|run|import)\z/) {
+        if ($_[$i] =~ /\A(system|readpipe|backtick|run|start|import)\z/) {
             no strict 'refs';
             *{"$caller\::$_[$i]"} = \&{"$self\::" . $_[$i]};
         } elsif ($_[$i] =~ /\A-(.+)/) {
@@ -50,7 +50,7 @@ sub _quote {
     }
 }
 
-sub _system_or_readpipe_or_run {
+sub _system_or_readpipe_or_run_or_start {
     my $which = shift;
     my $opts = ref($_[0]) eq 'HASH' ? shift : {};
     for (keys %Global_Opts) {
@@ -64,7 +64,7 @@ sub _system_or_readpipe_or_run {
             unless /\A(
                         capture_stdout|capture_stderr|capture_merged|
                         tee_stdout|tee_stderr|tee_merged|
-                        chdir|dies?|dry_run|env|lang|log||max_log_output|shell|
+                        chdir|dies?|dry_run|env|lang|log|max_log_output|shell|
                         stdin # XXX: only for run()
                     )\z/x;
     }
@@ -269,7 +269,7 @@ sub _system_or_readpipe_or_run {
                 unless $exit_code;
         }
 
-    } else {
+    } elsif ($which eq 'run' || $which eq 'start') {
 
         if ($opts->{log} || $opts->{dry_run}) {
             if ($opts->{log}) {
@@ -285,7 +285,7 @@ sub _system_or_readpipe_or_run {
                 $routine->("%srun(%s), env=%s", $label,
                            join(", ", @args), \%set_env);
             } else {
-                warn "[DRY RUN] run(".join(", ", @args).")\n";
+                warn "[DRY RUN] $which(".join(", ", @args).")\n";
             }
             if ($opts->{dry_run}) {
                 $exit_code = 0;
@@ -295,7 +295,8 @@ sub _system_or_readpipe_or_run {
         }
 
         require IPC::Run;
-        $res = IPC::Run::run(
+        my $func = $which eq 'run' ? "IPC::Run::run" : "IPC::Run::start";
+        $res = &{$func}(
             \@args,
             defined($opts->{stdin}) ? \$opts->{stdin} : \*STDIN,
             sub {
@@ -313,8 +314,13 @@ sub _system_or_readpipe_or_run {
                 }
             }, # err
         );
-        $exit_code = $?;
-        $os_error = $!;
+        if ($which eq 'run') {
+            $exit_code = $?;
+            $os_error = $!;
+        } else {
+            $exit_code = 0;
+            $os_error = "";
+        }
 
     } # which
 
@@ -364,26 +370,32 @@ sub _system_or_readpipe_or_run {
         }
     }
 
-    $? = $exit_code;
+    if ($which ne 'start') {
+        $? = $exit_code;
+    }
 
-    return $wa && $which ne 'run' ? @$res : $res;
+    return $wa && $which ne 'run' && $which ne 'start' ? @$res : $res;
 }
 
 sub system {
-    _system_or_readpipe_or_run('system', @_);
+    _system_or_readpipe_or_run_or_start('system', @_);
 }
 
 # backtick is the older, deprecated name for readpipe
 sub backtick {
-    _system_or_readpipe_or_run('readpipe', @_);
+    _system_or_readpipe_or_run_or_start('readpipe', @_);
 }
 
 sub readpipe {
-    _system_or_readpipe_or_run('readpipe', @_);
+    _system_or_readpipe_or_run_or_start('readpipe', @_);
 }
 
 sub run {
-    _system_or_readpipe_or_run('run', @_);
+    _system_or_readpipe_or_run_or_start('run', @_);
+}
+
+sub start {
+    _system_or_readpipe_or_run_or_start('start', @_);
 }
 
 1;
@@ -401,11 +413,11 @@ IPC::System::Options - Perl's system() and readpipe/qx replacement, with options
 
 =head1 VERSION
 
-This document describes version 0.331 of IPC::System::Options (from Perl distribution IPC-System-Options), released on 2019-01-07.
+This document describes version 0.332 of IPC::System::Options (from Perl distribution IPC-System-Options), released on 2019-09-03.
 
 =head1 SYNOPSIS
 
- use IPC::System::Options qw(system readpipe run);
+ use IPC::System::Options qw(system readpipe run start);
 
  # use exactly like system()
  system(...);
@@ -451,6 +463,14 @@ C<system()>:
  # also accepts an optional hash first argument. some additional options that
  # run() accepts: stdin.
  run({capture_stdout => \$stdout, capture_stderr => \$stderr}, 'ls', '-l');
+
+C<start()> is like C<run()> but uses L<IPC::Run>'s C<start()> instead of
+C<run()> to run program in the background. The result is a handle (see
+L<IPC::Run> for more details) which you can then call C<finish()>, etc on.
+
+ my $h = start('ls', '-l');
+ ...
+ $h->finish;
 
 =head1 DESCRIPTION
 
@@ -699,6 +719,11 @@ See option documentation in C<system()>.
 See option documentation in C<system()>.
 
 =back
+
+=head2 start([ \%opts ], @args)
+
+Like C<run()>, but uses L<IPC::Run>'s C<start()>. For known options, see
+C<run()>.
 
 =head1 HOMEPAGE
 

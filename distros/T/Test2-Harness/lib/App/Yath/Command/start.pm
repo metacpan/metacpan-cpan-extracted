@@ -9,7 +9,7 @@ BEGIN {
     $DTRACE = Test2::Harness::Util::DepTracer->new;
 }
 
-our $VERSION = '0.001095';
+our $VERSION = '0.001099';
 
 use File::Spec();
 
@@ -193,7 +193,11 @@ Set a specific run-id
 
 =item --no-long
 
-Do not run tests with the HARNESS-CAT-LONG header
+Do not run tests with the HARNESS-DURATION-LONG header
+
+=item --only-long
+
+only run tests with the HARNESS-DURATION-LONG header
 
 =item --shm
 
@@ -227,7 +231,7 @@ Set the work directory
 
 =item -f name:details
 
-=item --field '{"name": "NAME", "details": "DETAILS", "link": "LINK", "data":{...}}'
+=item --field 'JSON_STRING'
 
 Add custom harness_run_fields
 
@@ -295,6 +299,12 @@ Exclude a file from testing
 
 May be specified multiple times
 
+=item --durations path
+
+=item --durations url
+
+Point at a json file or url which has a hash of relative test filenames as keys, and 'SHORT', 'MEDIUM', or 'LONG' as values. This will override durations listed in the file headers. An exception will be thrown if the durations file or url does not work.
+
 =item --et SECONDS
 
 =item --event_timeout #
@@ -304,6 +314,12 @@ Kill test if no events received in timeout period
 (Default: 60 seconds)
 
 This is used to prevent the harness for waiting forever for a hung test. Add the "# HARNESS-NO-TIMEOUT" comment to the top of a test file to disable timeouts on a per-test basis.
+
+=item --maybe-durations path
+
+=item --maybe-durations url
+
+Same as 'durations' except not fatal if not found. If this and 'durations' are both specified then 'durations' is used as a fallback when this fails. You may specify this option multiple times and the first one that works will be used
 
 =item --no-preload
 

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package App::Spec::Completion::Bash;
 
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 use Moo;
 extends 'App::Spec::Completion';
@@ -329,7 +329,17 @@ ${indent}    _${appname}_compreply @list
 ${indent}    return
 EOM
         }
-        elsif ($type eq "file" or $type eq "dir") {
+        elsif ($type =~ m/^file(name)?\z/) {
+            $comp_value .= <<"EOM";
+${indent}    compopt -o filenames
+${indent}    return
+EOM
+        }
+        elsif ($type =~ m/^dir(name)?\z/) {
+            $comp_value .= <<"EOM";
+${indent}    compopt -o dirnames
+${indent}    return
+EOM
         }
         elsif ($opt->completion) {
             my $function_name = $self->dynamic_completion(
@@ -502,7 +512,15 @@ sub completion_parameter {
 ${indent}    _${appname}_compreply @list
 EOM
     }
-    elsif ($type eq "file" or $type eq "dir") {
+    elsif ($type =~ m/^file(name)?\z/) {
+        $comp = <<"EOM";
+${indent}    compopt -o filenames
+EOM
+    }
+    elsif ($type =~ m/^dir(name)?\z/) {
+        $comp = <<"EOM";
+${indent}    compopt -o dirnames
+EOM
     }
     elsif ($param->completion) {
         my $function_name = $self->dynamic_completion(

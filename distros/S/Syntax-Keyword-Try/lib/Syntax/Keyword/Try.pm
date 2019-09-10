@@ -8,7 +8,7 @@ package Syntax::Keyword::Try;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use Carp;
 
@@ -153,7 +153,7 @@ The syntax provided by this module may be used as a value-yielding expression.
 Because this syntax is new, experimental, and somewhat surprising, it must be
 specifically requested by name C<try_value>:
 
-   use Syntax::Feature::Try qw( try try_value );
+   use Syntax::Keyword::Try qw( try try_value );
 
    my $result = try do { ... } catch { ... };
 
