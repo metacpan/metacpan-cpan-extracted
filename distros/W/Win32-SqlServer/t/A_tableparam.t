@@ -1,10 +1,20 @@
 #---------------------------------------------------------------------
-# $Header: /Perl/OlleDB/t/A_tableparam.t 11    18-04-13 17:23 Sommar $
+# $Header: /Perl/OlleDB/t/A_tableparam.t 13    19-07-08 22:12 Sommar $
 #
 # This test script tests table parameters with sql_sp and sql in with
 # all data types.
 #
 # $History: A_tableparam.t $
+# 
+# *****************  Version 13  *****************
+# User: Sommar       Date: 19-07-08   Time: 22:12
+# Updated in $/Perl/OlleDB/t
+# For older providers, UTF-8 data comes back as nvarchar.
+# 
+# *****************  Version 12  *****************
+# User: Sommar       Date: 19-05-05   Time: 17:49
+# Updated in $/Perl/OlleDB/t
+# First wave of updating test cases for SQL 2019 and UTF-8.
 # 
 # *****************  Version 11  *****************
 # User: Sommar       Date: 18-04-13   Time: 17:23
@@ -75,7 +85,7 @@ use IO::File;
 use English;
 use Config;
 
-use vars qw($sqlver $x86 @tbltypes @tblcols @paramnames @paramtypes $collate
+use vars qw($sqlver $x86 @tbltypes @tblcols @paramnames @paramtypes 
             $unnamedparambatch $namedparambatch $no_of_tests @testres %inparam
             %expectpar %expectcol %expectfile %test %filetest %comment);
 
@@ -179,19 +189,17 @@ sub create_character {
 
    sql(<<SQLEND);
       CREATE TYPE character_type AS TABLE
-             (charcol     char(20)      $collate  NULL,
-              varcharcol  varchar(20)   $collate  NULL,
-              varmaxcol   varchar(MAX)  $collate  NULL,
-              textcol     text          $collate  NULL,
-              ncharcol    nchar(20)     $collate  NULL,
-              ident       int                     IDENTITY,
-              nvarcharcol nvarchar(20)  $collate  NULL,
-              nvarmaxcol  nvarchar(MAX) $collate  NULL,
-              ntextcol    ntext         $collate  NULL)
+             (charcol     char(20)       NULL,
+              varcharcol  varchar(20)    NULL,
+              varmaxcol   varchar(MAX)   NULL,
+              ncharcol    nchar(20)      NULL,
+              ident       int            IDENTITY,
+              nvarcharcol nvarchar(20)   NULL,
+              nvarmaxcol  nvarchar(MAX)  NULL)
 SQLEND
 
-   @tblcols = qw(charcol varcharcol varmaxcol textcol ncharcol nvarcharcol
-                 nvarmaxcol ntextcol);
+   @tblcols = qw(charcol varcharcol varmaxcol 
+                 ncharcol nvarcharcol nvarmaxcol );
 
    my $base = <<'SQLEND';
    ## = CAST((SELECT '~' + isnull(##, 'NULL') + '~'
@@ -201,9 +209,6 @@ SQLEND
    my @arr;
    foreach my $col (@tblcols) {
       my $tmp = $base;
-      if ($col =~ /text/) {
-          $tmp =~ s/'~'|\+//g;
-      }
       $tmp =~ s/##/$col/g;
       push(@arr, $tmp);
    }
@@ -233,32 +238,65 @@ sub create_binary {
                                          tstamp      timestamp     NOT NULL)
 
       CREATE TYPE binary_type2 AS TABLE (binmaxcol varbinary(MAX) NULL,
-                                         imagecol  image          NULL,
                                          rowvercol rowversion    NOT NULL)
 SQLEND
 
-  $namedparambatch = <<'SQLEND';
-  SELECT bincol = convert(binary(20), reverse(a.bincol)),
-         varbincol = convert(varbinary(20), reverse(a.varbincol)),
-         binmaxcol = convert(varbinary(MAX), reverse(b.binmaxcol)),
-         a.tstamp, b.imagecol, b.rowvercol
-  FROM   @firsttable a
-  CROSS  JOIN @secondtable b
+   $namedparambatch = <<'SQLEND';
+   SELECT bincol = convert(binary(20), 
+                           reverse(convert(nchar(10), a.bincol))),
+          varbincol = convert(varbinary(20), 
+                              reverse(convert(nvarchar(20), a.varbincol))),
+          binmaxcol = convert(varbinary(MAX), 
+                              reverse(convert(nvarchar(MAX), b.binmaxcol))),
+          a.tstamp, b.rowvercol
+   FROM   @firsttable a
+   CROSS  JOIN @secondtable b
 SQLEND
 
-  sql(<<SQLEND);
-  CREATE PROCEDURE binary_sp \@firsttable  binary_type1 READONLY,
-                             \@secondtable binary_type2 READONLY AS
-  $namedparambatch
+   sql(<<SQLEND);
+   CREATE PROCEDURE binary_sp \@firsttable  binary_type1 READONLY,
+                              \@secondtable binary_type2 READONLY AS
+   $namedparambatch
 SQLEND
 
-  $unnamedparambatch = $namedparambatch;
-  $unnamedparambatch =~ s/\@\w+/?/g;
+   $unnamedparambatch = $namedparambatch;
+   $unnamedparambatch =~ s/\@\w+/?/g;
+   
+   @tblcols    = qw(bincol varbincol tstamp binmaxcol rowvercol);
+   @tbltypes   = qw(binary_type1 binary_type2);
+   @paramnames = qw(firsttable secondtable);
+   @paramtypes = qw(table(binary_type1) table(binary_type2));
+}
 
-  @tblcols    = qw(bincol varbincol tstamp binmaxcol imagecol rowvercol);
-  @tbltypes   = qw(binary_type1 binary_type2);
-  @paramnames = qw(firsttable secondtable);
-  @paramtypes = qw(table(binary_type1) table(binary_type2));
+#...........................
+sub create_oldlobs {
+   drop_test_objects ('oldlobs');
+   
+   sql(<<SQLEND);
+      CREATE TYPE oldlobs_type AS TABLE (textcol  text  NULL,
+                                         ntextcol ntext NULL,
+                                         imagecol image NULL)
+SQLEND
+   
+   $namedparambatch = <<'SQLEND';
+   SELECT substring(textcol, 1, 100) AS textcol,
+          substring(ntextcol, 1, 100) AS ntextcol,
+          substring(imagecol, 1, 100) AS imagecol
+   FROM   @oldlobs_table
+SQLEND
+   
+   sql(<<SQLEND);
+   CREATE PROCEDURE oldlobs_sp \@oldlobs_table oldlobs_type READONLY AS
+   $namedparambatch
+SQLEND
+
+   $unnamedparambatch = $namedparambatch;
+   $unnamedparambatch =~ s/\@\w+/?/g;
+   
+   @tblcols    = qw(textcol ntextcol imagecol);
+   @tbltypes   = qw(oldlobs_type);
+   @paramnames = qw(oldlobs_table);
+   @paramtypes = qw(table(oldlobs_type));
 }
 
 #...........................
@@ -862,7 +900,9 @@ $no_of_tests = 0;
 
 my $X = testsqllogin();
 
-my $is_latin1 = is_latin1($X);
+my $codepage = codepage($X);
+my $collation = $X->sql_one("SELECT serverproperty('Collation')", SCALAR);
+my $do_oldlobs = ($codepage != 65001 and $collation !~ /_SC$/);
 
 $X->{'ErrInfo'}{RetStatOK}{4711}++;
 $X->{'ErrInfo'}{NoWhine}++;
@@ -876,7 +916,7 @@ if ($sqlver < 10 or $X->{Provider} < Win32::SqlServer::PROVIDER_SQLNCLI10) {
    exit;
 }
 
-$collate = 'COLLATE Latin1_General_CS_AS';
+
 
 
 # Make sure that we have standard settings, except for ANSI_WARNINGS
@@ -1123,19 +1163,16 @@ create_character;
 my @chartable;
 
 @chartable = (["12345678901234'67890", "abc\x{010D}\x{00F6}",
-               'Bridgeblandning 2000' x 2000, 'Hello Dolly ' x 2000,
+               'Bridgeblandning 2000' x 2000, 
                "\x{01E6}\x{10E5}\x{00F6}\x{FFFD}", undef,
                "abc\x{0157}",
-               "21 pa\x{017A}dziernika 2004 " x 2000,
-               "\x{00E6}\x{00E5}\x{00F6}\x{FFFD}" x 8000],
+               "21 pa\x{017A}dziernika 2004 " x 2000],
               {charcol       => 'avlat',
                varcharcol    => '12345678901234567890123',
                varmaxcol     => 'Kortare och kortare',
-               textcol       => 'Dello Holly!',
                ncharcol      => 'Gurkodling',
                nvarcharcol   => '12345678901234567890123',
-               nvarmaxcol    => 'Znamenskoe Akaga ' x 1000,
-               ntextcol      => 'ntext'});
+               nvarmaxcol    => 'Znamenskoe Akaga ' x 1000});
 
 %inparam   = (chartable    => \@chartable);
 %expectcol = (charcol      => "~12345678901234'67890~~avlat" . ' ' x 15 . '~',
@@ -1143,29 +1180,24 @@ my @chartable;
                               "~12345678901234567890~",
               varmaxcol    => '~' . 'Bridgeblandning 2000' x 2000 . '~' .
                               '~Kortare och kortare~',
-              textcol      => 'Hello Dolly ' x 2000 . 'Dello Holly!',
               ncharcol     => "~\x{01E6}\x{10E5}\x{00F6}\x{FFFD}" . ' ' x 16 .
                               "~~Gurkodling" . ' ' x 10 . '~',
               nvarcharcol  => "~abc\x{0157}~~12345678901234567890~",
               nvarmaxcol   => "~" . "21 pa\x{017A}dziernika 2004 " x 2000 . '~' .
-                              "~" . 'Znamenskoe Akaga ' x 1000 . '~',
-              ntextcol     => "\x{00E6}\x{00E5}\x{00F6}\x{FFFD}" x 8000 .
-                              'ntext');
+                              "~" . 'Znamenskoe Akaga ' x 1000 . '~');
 %expectpar = ();
 %test      = (charcol      => '%s =~ /^%s$/',
               varcharcol   => '%s =~ /^%s$/',
               varmaxcol    => '%s =~ /^%s$/',
-              textcol      => '%s =~ /^%s$/',
               ncharcol     => '%s =~ /^%s$/',
               nvarcharcol  => '%s =~ /^%s$/',
-              nvarmaxcol   => '%s =~ /^%s$/',
-              ntextcol     => '%s =~ /^%s$/');
+              nvarmaxcol   => '%s =~ /^%s$/');
 do_tests($X, 1, 'character');
 
 
-@chartable = (["",  "",  "", "", "", undef, "", "", ""],
-              [" ",  " ",  " ", " ", " ", undef, " ", " ", " "],
-              ["   ",  "   ",  "   ", "   ", "   ",undef, "   ", "   ", "   "]);
+@chartable = (["",  "",  "", "", undef, "", ""],
+              [" ",  " ",  " ", " ", undef, " ", " "],
+              ["   ",  "   ",  "   ", "   ",undef, "   ", "   "]);
 
 %inparam   = (chartable    => \@chartable);
 %expectcol = (charcol      => "~" . ' ' x 20 . "~" .
@@ -1173,22 +1205,18 @@ do_tests($X, 1, 'character');
                               "~" . ' ' x 20 . "~",
               varcharcol   => "~~~ ~~   ~",
               varmaxcol    => "~~~ ~~   ~",
-              textcol      => '&#x20;  &#x20;',
               ncharcol     => "~" . ' ' x 20 . "~" .
                               "~" . ' ' x 20 . "~" .
                               "~" . ' ' x 20 . "~",
               nvarcharcol  => "~~~ ~~   ~",
-              nvarmaxcol   => "~~~ ~~   ~",
-              ntextcol     => '&#x20;  &#x20;');
+              nvarmaxcol   => "~~~ ~~   ~");
 %expectpar = ();
 %test      = (charcol      => '%s =~ /^%s$/',
               varcharcol   => '%s =~ /^%s$/',
               varmaxcol    => '%s =~ /^%s$/',
-              textcol      => '%s =~ /^%s$/',
               ncharcol     => '%s =~ /^%s$/',
               nvarcharcol  => '%s =~ /^%s$/',
-              nvarmaxcol   => '%s =~ /^%s$/',
-              ntextcol     => '%s =~ /^%s$/');
+              nvarmaxcol   => '%s =~ /^%s$/');
 do_tests($X, 1, 'character', 'blanks');
 
 @chartable = ({});
@@ -1197,20 +1225,16 @@ do_tests($X, 1, 'character', 'blanks');
 %expectcol = (charcol      => "~NULL" . ' ' x 16 . '~',
               varcharcol   => "~NULL~",
               varmaxcol    => "~NULL~",
-              textcol      => "NULL",
               ncharcol     => "~NULL" . ' ' x 16 . '~',
               nvarcharcol  => "~NULL~",
-              nvarmaxcol   => "~NULL~",
-              ntextcol     => "NULL");
+              nvarmaxcol   => "~NULL~");
 %expectpar = ();
 %test      = (charcol      => '%s =~ /^%s$/',
               varcharcol   => '%s =~ /^%s$/',
               varmaxcol    => '%s =~ /^%s$/',
-              textcol      => '%s =~ /^%s$/',
               ncharcol     => '%s =~ /^%s$/',
               nvarcharcol  => '%s =~ /^%s$/',
-              nvarmaxcol   => '%s =~ /^%s$/',
-              ntextcol     => '%s =~ /^%s$/');
+              nvarmaxcol   => '%s =~ /^%s$/');
 do_tests($X, 1, 'character', 'all null');
 
 drop_test_objects('character');
@@ -1224,52 +1248,44 @@ create_binary;
 
 my (@firsttable, @secondtable);
 
-# Known issue: on 6.5 it appears that OUTPUT binary parameters loses
-# trailing zero bytes.
-
-@firsttable  = ({bincol    => '4711ABCD',
-                 varbincol => '4711ABCD'});
-@secondtable = ({imagecol  => '47119660AB002' x 10000,
-                 binmaxcol => '47119660AB0028' x 10000});
+@firsttable  = ({bincol    => 'CEB1CEB2CEB3',
+                 varbincol => 'CEB1CEB2CEB3'});
+@secondtable = ({binmaxcol => 'CEB1CEB27E73' x 10000});
 
 #$X->{BinaryAsStr} = 1;    Default.
 %inparam   = (firsttable   => \@firsttable,
               secondtable  => \@secondtable);
-%expectcol = (bincol       => '00' x 16 . 'CDAB1147',
-              varbincol    => 'CDAB1147',
+%expectcol = (bincol       => '00' x 14 . 'CEB3CEB2CEB1',
+              varbincol    => 'CEB3CEB2CEB1',
               tstamp       => '^[0-9A-F]{16}$',
               rowvercol    => '^[0-9A-F]{16}$',
-              imagecol     => '47119660AB002' x 10000,
-              binmaxcol    => '2800AB60961147' x 10000);
+              binmaxcol    => '7E73CEB2CEB1' x 10000);
 %expectpar = ();
 %test      = (bincol       => '%s eq %s',
               varbincol    => '%s eq %s',
               binmaxcol    => '%s eq %s',
               tstamp       => '%s =~ /%s/',
-              rowvercol    => '%s =~ /%s/',
-              imagecol     => '%s eq %s');
+              rowvercol    => '%s =~ /%s/');
 do_tests($X, 1, 'binary', 'BinaryAsStr = 1');
 
 $X->{BinaryAsStr} = 0;
 %inparam   = (firsttable   => \@firsttable,
               secondtable  => \@secondtable);
-%expectcol = (bincol       => "\x00" x 12 . 'DCBA1174',
-              varbincol    => 'DCBA1174',
+%expectcol = (bincol       => "\x00" x 8 . 'B3CEB2CEB1CE',
+              varbincol    => 'B3CEB2CEB1CE',
               tstamp       => "^(.|\\n){8}\$",
               rowvercol    => "^(.|\\n){8}\$",
-              imagecol     => '47119660AB002' x 10000,
-              binmaxcol    => '8200BA06691174' x 10000);
+              binmaxcol    => '737EB2CEB1CE' x 10000);
 %expectpar = ();
 %test      = (bincol       => '%s eq %s',
               varbincol    => '%s eq %s',
               binmaxcol    => '%s eq %s',
               tstamp       => '%s =~ /%s/',
-              rowvercol    => '%s =~ /%s/',
-              imagecol     => '%s eq %s');
+              rowvercol    => '%s =~ /%s/');
 do_tests($X, 1, 'binary', 'BinaryAsStr = 0');
 
 @firsttable  = (['', '']);
-@secondtable = (['0x', '0x']);
+@secondtable = (['0x']);
 
 $X->{BinaryAsStr} = 'x';
 %inparam   = (firsttable   => \@firsttable,
@@ -1278,19 +1294,17 @@ $X->{BinaryAsStr} = 'x';
               varbincol    => '0x',
               tstamp       => '^0x[0-9A-F]{16}$',
               rowvercol    => '^0x[0-9A-F]{16}$',
-              imagecol     => '0x',
               binmaxcol    => '0x');
 %expectpar = ();
 %test      = (bincol       => '%s eq %s',
               varbincol    => '%s eq %s',
               binmaxcol    => '%s eq %s',
               tstamp       => '%s =~ /%s/',
-              rowvercol    => '%s =~ /%s/',
-              imagecol     => '%s eq %s');
+              rowvercol    => '%s =~ /%s/');
 do_tests($X, 1, 'binary', 'Empty, x');
 
 @firsttable  = (['', '']);
-@secondtable = (["\x00", "\x00"]);
+@secondtable = (["\x00"]);
 
 $X->{BinaryAsStr} = '0';
 %inparam   = (firsttable   => \@firsttable,
@@ -1299,19 +1313,17 @@ $X->{BinaryAsStr} = '0';
               varbincol    => '',
               tstamp       => "^(.|\\n){8}\$",
               rowvercol    => "^(.|\\n){8}\$",
-              imagecol     => "\x00",
-              binmaxcol    => "\x00");
+              binmaxcol    => "\x00\x00");
 %expectpar = ();
 %test      = (bincol       => '%s eq %s',
               varbincol    => '%s eq %s',
               binmaxcol    => '%s eq %s',
               tstamp       => '%s =~ /%s/',
-              rowvercol    => '%s =~ /%s/',
-              imagecol     => '%s eq %s');
+              rowvercol    => '%s =~ /%s/');
 do_tests($X, 1, 'binary', 'Empty, 0');
 
 @firsttable  = ([undef, undef]);
-@secondtable = ([undef, undef]);
+@secondtable = ([undef]);
 
 
 $X->{BinaryAsStr} = '0';
@@ -1321,21 +1333,66 @@ $X->{BinaryAsStr} = '0';
               varbincol    => undef,
               tstamp       => "^(.|\\n){8}\$",
               rowvercol    => "^(.|\\n){8}\$",
-              imagecol     => undef,
               binmaxcol    => undef);
 %expectpar = ();
 %test      = (bincol       => 'not defined %s',
               varbincol    => 'not defined %s',
               binmaxcol    => 'not defined %s',
               tstamp       => '%s =~ /%s/',
-              rowvercol    => '%s =~ /%s/',
-              imagecol     => 'not defined %s');
+              rowvercol    => '%s =~ /%s/');
 do_tests($X, 1, 'binary', 'All NULL');
 
 
 drop_test_objects('binary');
 
 }
+#------------------------- OLDLOBS -------------------------------
+if ($do_oldlobs) {
+clear_test_data;
+create_oldlobs;
+
+my (@firstable);
+
+$X->{BinaryAsStr} = 1;
+my @oldlobs_table = (['Motoranalfabet' x 3500, 
+                      "21 pa\x{017A}dziernika 2004" x 2000, 
+                      '4711ABCDCEB1CEB2CEB3' x 8000]);
+%inparam = (oldlobs_table => \@oldlobs_table);
+%expectcol = (textcol  => 'Motoranalfabet' x 7 . 'Mo',
+              ntextcol => "21 pa\x{017A}dziernika 2004" x 5,
+              imagecol => '4711ABCDCEB1CEB2CEB3' x 10);
+%expectpar = ();
+%test      = (textcol   => '%s eq %s',
+              ntextcol  => '%s eq %s',
+              imagecol  => '%s eq %s');
+do_tests($X, 1, 'oldlobs', 'regular');
+
+@oldlobs_table = (['', '', '']);
+%inparam = (oldlobs_table => \@oldlobs_table);
+%expectcol = (textcol  => '',
+              ntextcol => '',
+              imagecol => '');
+%expectpar = ();
+%test      = (textcol  => '%s eq %s',
+              ntextcol => '%s eq %s',
+              imagecol => '%s eq %s');
+do_tests($X, 1, 'oldlobs', 'empty');
+
+@oldlobs_table = ([undef, undef, undef]);
+%inparam = (oldlobs_table => \@oldlobs_table);
+%expectcol = (textcol  => undef,
+              ntextcol => undef,
+              imagecol => undef);
+%expectpar = ();
+%test      = (textcol  => 'not defined %s',
+              ntextcol => 'not defined %s',
+              imagecol => 'not defined %s');
+do_tests($X, 1, 'oldlobs', 'undef');
+
+
+}
+
+
 #------------------------- DECIMAL --------------------------------
 {
 
@@ -1716,6 +1773,7 @@ clear_test_data;
 create_sql_variant;
 
 my @vartable;
+my $nvarchar = ($codepage == 65001 ? "varchar" : 'nvarchar');
 
 @vartable = ([1, {Year => 2008, Month => 3, Day => 22}],
              [2, {Year => 2008, Month => 3, Day => 22,
@@ -1727,11 +1785,11 @@ my @vartable;
              [6, 1e202],
              [7, "abc\x{010B}\x{FFFD}"],
              [8, "Lycksele"],
-        [9, '']);
+             [9, '']);
 
 %inparam   = (vartable => \@vartable);
 %expectcol = (basetype => "date;datetimeoffset;datetime2;time;int;" .
-                          "float;nvarchar;varchar;varchar;",
+                          "float;$nvarchar;varchar;varchar;",
               varcol   => "2008-03-22;2008-03-22 18:30:00.0000000 +01:00;" .
                           "2008-03-22 18:30:00.0311000;00:00:00.0000001;" .
                           "12345678;1e+202;abc\x{010B}\x{FFFD};Lycksele;;");
@@ -1783,7 +1841,7 @@ my @xmltable;
 @xmltable = ({xmlcol    => "<R\x{00C4}KSM\x{00D6}RG\x{00C5}S>" .
                            "21 pa\x{017A}dziernika 2004 " x 2000 .
                            "</R\x{00C4}KSM\x{00D6}RG\x{00C5}S>",
-              xmlsccol  => ($is_latin1
+              xmlsccol  => ($codepage == 1252
                                ? '<?xml version="1.0" encoding="iso-8859-1"?>' . "\n" 
                                : '') .
                             "<TÄST>" .

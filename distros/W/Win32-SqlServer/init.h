@@ -1,5 +1,5 @@
 /*---------------------------------------------------------------------
- $Header: /Perl/OlleDB/init.h 5     18-04-09 22:49 Sommar $
+ $Header: /Perl/OlleDB/init.h 7     19-07-19 22:00 Sommar $
 
   This file holds code associated with module and object initialitaion.
   This file also declares global variables that exist through the lifetime
@@ -11,6 +11,19 @@
   Copyright (c) 2004-2018   Erland Sommarskog
 
   $History: init.h $
+ * 
+ * *****************  Version 7  *****************
+ * User: Sommar       Date: 19-07-19   Time: 22:00
+ * Updated in $/Perl/OlleDB
+ * Removed the olddbtranslate option from internaldata, and entirely
+ * deprecated setting the AutoTranslate option to make sure that it always
+ * is false. When clearing options when ProviderString is set, we don't
+ * clear AutoTranslate.
+ * 
+ * *****************  Version 6  *****************
+ * User: Sommar       Date: 19-07-08   Time: 22:30
+ * Updated in $/Perl/OlleDB
+ * Made default for AutoTranslate macro. Updated copyright year.
  * 
  * *****************  Version 5  *****************
  * User: Sommar       Date: 18-04-09   Time: 22:49
@@ -110,6 +123,5 @@ extern void initialize();
 // This routine returns the default provider, which is highest version of
 // SQL Native Client/SQLOLEDB that is installed.
 extern provider_enum default_provider(void);
-
 
 

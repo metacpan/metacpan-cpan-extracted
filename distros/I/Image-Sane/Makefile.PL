@@ -33,6 +33,7 @@ WriteMakefile(
     VERSION_FROM => 'lib/Image/Sane.pm',                        # finds $VERSION
     PREREQ_PM    => { Readonly => 0, Exception::Class => 0 },
     CONFIGURE_REQUIRES => {
+        Config              => 0,
         ExtUtils::Depends   => 0,
         ExtUtils::PkgConfig => 0
     },
@@ -56,7 +57,7 @@ WriteMakefile(
         : ()
     ),
     LIBS    => [$lib],  # e.g., '-lm'
-    CCFLAGS => '-Wall',
+    CCFLAGS => "$Config{ccflags} -Wall",
     DEFINE  => '',      # e.g., '-DHAVE_SOMETHING'
     INC     => $inc,    # e.g., '-I. -I/usr/include/other'
                         # Un-comment this if you add C files to link with later:

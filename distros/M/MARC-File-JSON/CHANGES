@@ -1,2 +1,5 @@
+v0.005:
+  - Revert UTF8 handling change made in 0.004.
+
 v0.004:
   - Use encode/decode_json by default for UTF8 handling

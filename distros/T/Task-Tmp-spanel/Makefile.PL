@@ -20,6 +20,7 @@ my %WriteMakefileArgs = (
     "Algorithm::Dependency::Source::HoA" => 0,
     "Any::Moose" => 0,
     "App::CreateSelfSignedSSLCert" => 0,
+    "App::ProcUtils" => 0,
     "App::rimetadb" => "0.221",
     "CDB_File" => 0,
     "CHI" => 0,
@@ -138,7 +139,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.009",
+  "VERSION" => "0.010",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -150,6 +151,7 @@ my %FallbackPrereqs = (
   "Algorithm::Dependency::Source::HoA" => 0,
   "Any::Moose" => 0,
   "App::CreateSelfSignedSSLCert" => 0,
+  "App::ProcUtils" => 0,
   "App::rimetadb" => "0.221",
   "CDB_File" => 0,
   "CHI" => 0,

@@ -1,9 +1,10 @@
 NAME
-    Data::Clean::JSON - Clean data so it is safe to output to JSON
+    Data::Clean::JSON - (DEPRECATED) Clean data so it is safe to output to
+    JSON
 
 VERSION
-    This document describes version 0.391 of Data::Clean::JSON (from Perl
-    distribution Data-Clean-JSON), released on 2018-10-09.
+    This document describes version 0.392 of Data::Clean::JSON (from Perl
+    distribution Data-Clean-JSON), released on 2019-09-11.
 
 SYNOPSIS
      use Data::Clean::JSON;
@@ -33,6 +34,10 @@ SYNOPSIS
      $cleaned = clone_and_clean_json($data);
 
 DESCRIPTION
+    DEPRECATION NOTICE: This module has been renamed to Data::Clean::ForJSON
+    for more clarity. This old name is retained because there are
+    distributions still depending on it.
+
     This class cleans data from anything that might be problematic when
     encoding to JSON. This includes coderefs, globs, and so on. Here's what
     it will do by default:
@@ -194,8 +199,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012
-    by perlancar@cpan.org.
+    This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013,
+    2012 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

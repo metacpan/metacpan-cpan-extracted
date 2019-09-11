@@ -1,6 +1,6 @@
 package Bio::Palantir::Roles::Fillable;
 # ABSTRACT: Fillable Moose role for the construction of DomainPlus object arrays and Exploratory methods
-$Bio::Palantir::Roles::Fillable::VERSION = '0.192240';
+$Bio::Palantir::Roles::Fillable::VERSION = '0.192540';
 use Moose::Role;
 
 use autodie;
@@ -98,7 +98,7 @@ my %ADJUSTMENT_FOR = (      # length column useless: this information can be obt
 sub detect_domains {                        ## no critic (RequireArgUnpacking)
     my $self = shift;
 
-    my ($seq, $gene_pos, $gap_coords) = @_; #TODO switch to hash
+    my ($seq, $gene_pos, $gap_coords, $from_seq) = @_; #TODO switch to hash
     
     my %hit_for = %{ $self->_parse_generic_domains($seq) };
     
@@ -115,7 +115,7 @@ sub detect_domains {                        ## no critic (RequireArgUnpacking)
     $self->_use_hit_information($_, $gene_pos) for @domains;
     
     $self->_elongate_coordinates(\@domains, $gap_coords);
-    @domains = $self->_handle_overlaps(@domains);
+    @domains = $self->_handle_overlaps($from_seq, @domains);
     $self->_refine_coordinates(@domains);
 
     # subtype the domains
@@ -166,7 +166,6 @@ sub _elongate_coordinates {
 
         # gap filling elongation check
         else {
-
             $start = $gap_coords->[0] if $start < $gap_coords->[0];
             $end   = ($gap_coords->[1] - 1) if $end >= $gap_coords->[1];
         }
@@ -185,6 +184,7 @@ sub _elongate_coordinates {
 sub _handle_overlaps {                      ## no critic (RequireArgUnpacking)
     my $self = shift; 
 
+    my $from_seq = shift // 0;
     my @domains = @_;
     my @sorted_domains 
         = sort { $b->score <=> $a->{score} || $a->begin <=> $b->begin }
@@ -215,7 +215,7 @@ sub _handle_overlaps {                      ## no critic (RequireArgUnpacking)
 
                 push @overlaps, $cmp_hit;
 
-                if ($self->from_seq == 1) {
+                if ($from_seq == 1) {
                     $deja_vu{$cmp_hit} = 1
                         if $sorted_domains[$cmp_hit]->class 
                         eq $sorted_domains[$ref_hit]->class
@@ -541,7 +541,7 @@ Bio::Palantir::Roles::Fillable - Fillable Moose role for the construction of Dom
 
 =head1 VERSION
 
-version 0.192240
+version 0.192540
 
 =head1 SYNOPSIS
 

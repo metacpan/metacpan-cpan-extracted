@@ -1,7 +1,7 @@
 package Perinci::Sub::Complete;
 
-our $DATE = '2019-07-19'; # DATE
-our $VERSION = '0.939'; # VERSION
+our $DATE = '2019-09-11'; # DATE
+our $VERSION = '0.940'; # VERSION
 
 use 5.010001;
 use strict;
@@ -1353,7 +1353,7 @@ Perinci::Sub::Complete - Complete command-line argument using Rinci metadata
 
 =head1 VERSION
 
-This document describes version 0.939 of Perinci::Sub::Complete (from Perl distribution Perinci-Sub-Complete), released on 2019-07-19.
+This document describes version 0.940 of Perinci::Sub::Complete (from Perl distribution Perinci-Sub-Complete), released on 2019-09-11.
 
 =head1 SYNOPSIS
 

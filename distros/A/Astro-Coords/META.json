@@ -39,43 +39,43 @@
    "provides" : {
       "Astro::Coords" : {
          "file" : "lib/Astro/Coords.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "Astro::Coords::Angle" : {
          "file" : "lib/Astro/Coords/Angle.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "Astro::Coords::Angle::Hour" : {
          "file" : "lib/Astro/Coords/Angle/Hour.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "Astro::Coords::Calibration" : {
          "file" : "lib/Astro/Coords/Calibration.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "Astro::Coords::Elements" : {
          "file" : "lib/Astro/Coords/Elements.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "Astro::Coords::Equatorial" : {
          "file" : "lib/Astro/Coords/Equatorial.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "Astro::Coords::Fixed" : {
          "file" : "lib/Astro/Coords/Fixed.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "Astro::Coords::Interpolated" : {
          "file" : "lib/Astro/Coords/Interpolated.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "Astro::Coords::Offset" : {
          "file" : "lib/Astro/Coords/Offset.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "Astro::Coords::Planet" : {
          "file" : "lib/Astro/Coords/Planet.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       }
    },
    "release_status" : "stable",
@@ -88,5 +88,5 @@
          "url" : "git://github.com/timj/perl-Astro-Coords.git"
       }
    },
-   "version" : "0.19"
+   "version" : "0.20"
 }

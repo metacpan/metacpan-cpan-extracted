@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use v5.10;    # needed for state variable
 
-our $VERSION = '0.103'; # VERSION
+our $VERSION = '0.104'; # VERSION
 our $AUTHORITY = 'cpan:NIGELM'; # AUTHORITY
 
 use Moose;
@@ -117,13 +117,15 @@ method _build_json () { return Cpanel::JSON::XS->new->utf8; }
 
 # ------------------------------------------------------------------------
 method _decode_xml_response ($response) {
+        my $content = $response->decoded_content;
+          return  if ( length($content) == 0 );
+
     VMware::vCloudDirector2::Error->throw(
-        { message => "Not a XML response as expected", response => $response } )
+        { message => "Not a XML response as expected - $content", response => $response } )
         unless ( $response->content_type() =~ m|\bxml\b| );
     try {
-        my $xml = $response->decoded_content;
-        return unless ( defined($xml) and length($xml) );
-        return XML::Fast::xml2hash($xml);
+        return unless ( defined($content) and length($content) );
+        return XML::Fast::xml2hash($content);
     }
     catch {
         VMware::vCloudDirector::Error->throw(
@@ -136,14 +138,18 @@ method _decode_xml_response ($response) {
 
 # ------------------------------------------------------------------------
 method _decode_json_response ($response) {
+    my $content = $response->decoded_content;
+          return  if ( length($content) == 0 );
+
     VMware::vCloudDirector2::Error->throw(
-        { message => "Not a JSON response as expected", response => $response } )
-        unless ( $response->content_type() =~ m|\bjson\b| );
+        {   message  => "Not a JSON response as expected - $content",
+            response => $response
+        }
+    ) unless ( $response->content_type() =~ m|\bjson\b| );
 
     try {
-        my $json = $response->decoded_content;
-        return unless ( defined($json) and length($json) );
-        return $self->_json->decode($json);
+        return unless ( defined($content) and length($content) );
+        return $self->_json->decode($content);
     }
     catch {
         VMware::vCloudDirector2::Error->throw(
@@ -222,9 +228,9 @@ method _request ($method, $url, $content?, $headers?) {
         try {
             my $decoded_response = $self->_decode_json_response($response);
             $message .=
-                ( exists( $decoded_response->{Error}{'-message'} ) )
-                ? $decoded_response->{Error}{'-message'}
-                : 'Unknown after decode';
+                ( exists( $decoded_response->{message} ) )
+                ? $decoded_response->{message}
+                : ( 'Unknown after decode: ' . $response->decoded_content );
         }
         catch { $message .= 'Unknown'; }
         VMware::vCloudDirector2::Error->throw(
@@ -486,7 +492,7 @@ VMware::vCloudDirector2::API - Module to do stuff!
 
 =head1 VERSION
 
-version 0.103
+version 0.104
 
 =head2 Attributes
 

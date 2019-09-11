@@ -1,7 +1,7 @@
 package Test2::MojoX;
 use Mojo::Base -base;
 
-our $VERSION = 0.02;
+our $VERSION = 0.04;
 
 ## "Amy: He knows when you are sleeping.
 ##  Professor: He knows when you're on the can.
@@ -565,7 +565,7 @@ sub _wait {
 
 =head1 NAME
 
-Test2::Mojo - Testing Mojo
+Test2::MojoX - Testing Mojo
 
 =head1 SYNOPSIS
 
@@ -963,6 +963,12 @@ L<Mojo::JSON::Pointer>, which defaults to the root value if it is omitted.
 
   $t = $t->json_like('/foo/1' => qr/^\d+$/);
   $t = $t->json_like('/foo/1' => qr/^\d+$/, 'right value');
+  $t = $t->json_like(hash {
+    field foo => hash {
+      field 1 => D;
+    };
+    etc;
+  });
 
 Check the value extracted from JSON response using the given JSON Pointer with
 L<Mojo::JSON::Pointer> for similar match.
@@ -987,7 +993,7 @@ Opposite of L</"json_message_has">.
   $t = $t->json_message_is({foo => [1, 2, 3]});
   $t = $t->json_message_is('/foo' => [1, 2, 3]);
   $t = $t->json_message_is('/foo/1' => 2, 'right value');
-  $t = $t->json_is(hash {
+  $t = $t->json_message_is(hash {
     field foo => array {
       item 1;
       item 2;
@@ -1007,7 +1013,7 @@ omitted.
   $t = $t->json_message_like('/foo/1' => qr/^\d+$/, 'right value');
   $t = $t->json_message_like(hash {
     field foo => bag {
-      item 1;
+      item 2;
       etc;
     };
   });

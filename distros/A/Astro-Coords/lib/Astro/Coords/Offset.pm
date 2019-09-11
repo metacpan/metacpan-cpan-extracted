@@ -40,7 +40,7 @@ use constant PAZERO => new Astro::Coords::Angle( 0.0, units => 'radians' );
 
 use vars qw/ @PROJ  @SYSTEMS /;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 # Allowed projections
 @PROJ = qw| SIN TAN ARC DIRECT |;

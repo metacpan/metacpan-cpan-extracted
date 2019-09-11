@@ -5,7 +5,7 @@ package VMware::vCloudDirector2::Object;
 use strict;
 use warnings;
 
-our $VERSION = '0.103'; # VERSION
+our $VERSION = '0.104'; # VERSION
 our $AUTHORITY = 'cpan:NIGELM'; # AUTHORITY
 
 use Moose;
@@ -125,6 +125,7 @@ has _links => (
     isa     => 'ArrayRef[VMware::vCloudDirector2::Link]',
     lazy    => 1,
     builder => '_build_links',
+    clearer => '_clear_links',
     handles => { links => 'elements', },
 );
 has _all_links => (
@@ -133,6 +134,7 @@ has _all_links => (
     isa     => 'ArrayRef[VMware::vCloudDirector2::Link]',
     lazy    => 1,
     builder => '_build_all_links',
+    clearer => '_clear_all_links',
     handles => { all_links => 'elements', },
 );
 
@@ -176,6 +178,8 @@ method refetch () {
     # simplest way to force the object to be refetched is to clear the hash
     # and then request it which forces a lazy eval
     $self->_clear_hash;
+    $self->_clear_links;
+    $self->_clear_all_links;
     $self->hash;
 
     return $self;
@@ -291,7 +295,9 @@ method fetch_admin_object ($subpath?) {
         return $self;
     }
     else {
-        my $path = join( '/', '/api/admin', $self->type, $self->uuid );
+        my $uri  = $self->href;
+        my $path = $uri->path;
+        $path =~ s|^/api/|api/admin/|;
         $path .= '/' . $subpath if ( defined($subpath) );
         return $self->api->GET($path);
     }
@@ -318,7 +324,7 @@ VMware::vCloudDirector2::Object - Module to contain an object!
 
 =head1 VERSION
 
-version 0.103
+version 0.104
 
 =head2 Attributes
 

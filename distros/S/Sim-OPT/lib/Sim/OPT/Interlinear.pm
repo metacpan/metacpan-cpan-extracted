@@ -1779,6 +1779,9 @@ sub interlinear
   $fulldo = "no"; # TO SEARCH FOR MAXIMUM PRECISION AT THE EXPENSES OF SPEED. "yes" MAKES THE GRADIENTS BE RECALCULATED AT EACH COMPUTATION CYCLE.
   $lvconversion = "";
   $limitgrads = "";
+  #@weldsprepared = ( "/home/luca/ffexpexps_full/minmissionsprep.csv" );
+  #@parswelds = ( [ 1, 4 ] );
+  #@recedes = ( 1, 4 );
   ############# END OF THE EXAMPLE SETTINGS TO BE PUT IN A CONFIGURATION FILE.
 
   print "CONFIG FILE: " . $confile;
@@ -2148,6 +2151,11 @@ After some computations, Interlinear will output a new dataseries with the missi
 This dataseries can be used by OPT for the optimization of one or more blocks. This can be useful, for example, to save computations in searches involving simulations, especially when the time required by each simulations is long, like it may happen with CFD simulations in building design.
 
 The number of computations required for the creation of a metamodel in OPT increases exponentially with the number of instances in the metamodel. To reduce the exponential, a limit has to be set for the size of the net of instances taken into account in the computations for gradients and for points. The variables in the configuration files controlling those limits are "$nfiltergrads", a limit with adaptive effects, and "$limit_checkdistgrads". By default they are unspecified. If they are unspecified (i.e. a null value ("") is specified for them), no limit is assumed. "$nfiltergrads" may be set to the double of the square root of the number of instances of a problem space. "$limit_checkdistgrads" may be set to a part of the total number of instances, for example that number divided by 1/5, or 1/10. An example of configuration file with more information in the comments is embedded in this source code, where it sets the defaults.
+
+By utilizing the metamodelling procedure at point (a), Interlinear can also weld two related problem space models together, provided that they share the same parametric structure. This welding is not a mere merge. It is a neighbour-by-neighbour action, much wholler and, yes, cooler. This action is controlled by the following settings in the configuration file:
+1) @weldsprepared = ( "/home/luca/ffexpexps_full/minmissionsprep.csv" ); #The path to the second dataseries.
+2) @parswelds = ( [ 1, 4 ] ); #The parameter numbers of which the welding action has to take place.
+3) @recedes = ( 1, 4 ); #This signals with respect to which parameters the first dataseries gives way to the second. (Otherwise, the obtained points would be averaged one-to-one with those of first dataseries. Usually you do not want that.)
 
 To call Interlinear as a Perl function (best strategy):
 re.pl # open Perl shell

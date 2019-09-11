@@ -1,3 +1,10 @@
+2.02 2019-09-11
+	- Fix the "apache" source
+
+2.01 2019-09-11
+	- Fix the "file" source (inverted logic was assumed)
+	- Implement the --version option.
+
 2.00 2019-08-26
 
 	- Released on CPAN

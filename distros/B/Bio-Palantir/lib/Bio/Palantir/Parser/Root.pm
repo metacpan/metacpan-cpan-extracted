@@ -1,6 +1,6 @@
 package Bio::Palantir::Parser::Root;
 # ABSTRACT: BiosynML DTD-derived internal class
-$Bio::Palantir::Parser::Root::VERSION = '0.192240';
+$Bio::Palantir::Parser::Root::VERSION = '0.192540';
 use Moose;
 use namespace::autoclean;
 
@@ -20,6 +20,11 @@ has '_root' => (
     is       => 'ro',
     isa      => 'HashRef',
     required => 1,
+);
+
+has 'module_delineation' => (
+    is      => 'ro',
+    isa     => 'Str',
 );
 
 
@@ -255,6 +260,7 @@ sub BUILD {
         }
 
         push @clusters, Cluster->new( 
+            module_delineation => $self->module_delineation,
                           rank => $cluster_rank,
                          _root => $cluster->{'genecluster'},
                          genes => \@cluster_genes,
@@ -266,6 +272,9 @@ sub BUILD {
 
         $cluster_rank++;
     }
+
+    # enables module cutting mode
+    $_->_set_cutting_mode( $self->module_delineation ) for @clusters;
 
     $self->_set_clusters( \@clusters );
 
@@ -286,7 +295,7 @@ Bio::Palantir::Parser::Root - BiosynML DTD-derived internal class
 
 =head1 VERSION
 
-version 0.192240
+version 0.192540
 
 =head1 SYNOPSIS
 

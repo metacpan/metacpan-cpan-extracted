@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Convert notes and chords to Roman numeral notation
 
-our $VERSION = '0.1702';
+our $VERSION = '0.1703';
 
 use List::MoreUtils qw/ any first_index /;
 use Moo;
@@ -132,11 +132,6 @@ sub parse {
     }
 
     my $accidental = '';
-    # If the note is not in the scale find the new position and accidental
-    if ( $position < 0 ) {
-        ( $position, $accidental ) = _pos_acc( $note, $position, \@notes );
-    }
-
     if ( $position < 0 && $note =~ /[#b]+$/ ) {
         my $n = Music::Note->new( $note, 'isobase' );
         my $name = $n->format('isobase');
@@ -145,6 +140,11 @@ sub parse {
         $note = $n->format('isobase');
         $position = first_index { $_ eq $note } @notes;
         $accidental = '';
+    }
+
+    # If the note is not in the scale find the new position and accidental
+    if ( $position < 0 ) {
+        ( $position, $accidental ) = _pos_acc( $note, $position, \@notes );
     }
 
     my $roman = $scale[$position];
@@ -344,7 +344,7 @@ Music::ToRoman - Convert notes and chords to Roman numeral notation
 
 =head1 VERSION
 
-version 0.1702
+version 0.1703
 
 =head1 SYNOPSIS
 

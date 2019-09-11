@@ -19,6 +19,8 @@ using namespace upb::json;
 #    define THX_DECLARE_AND_GET
 #endif
 
+#define HAS_FULL_NOMG (PERL_VERSION >= 14)
+
 namespace {
     void unref_on_scope_leave(void *ref) {
         ((Refcounted *) ref)->unref();
@@ -534,6 +536,9 @@ Mapper::Mapper(pTHX_ Dynamic *_registry, const MessageDef *_message_def, HV *_st
         options.encode_defaults;
     check_enum_values = options.check_enum_values;
     decode_blessed = options.decode_blessed;
+    // on older Perls it is not fully reliable because the check is performed before
+    // the SetMAGIC() call, so it is better to disable it entirely
+    fail_ref_coercion = HAS_FULL_NOMG ? options.fail_ref_coercion : false;
     warn_context = WarnContext::get(aTHX);
 
     if (!decoder_handlers->SetEndMessageHandler(UpbMakeHandler(DecoderHandlers::on_end_message)))
@@ -836,7 +841,12 @@ SV *Mapper::encode(SV *ref) {
     warn_context->clear();
     warn_context->localize_warning_handler(aTHX);
     SV *result = NULL;
-    if (encode(pb_encoder->input(), &status, ref))
+
+#if HAS_FULL_NOMG
+    SvGETMAGIC(ref);
+#endif
+
+    if (encode_value(pb_encoder->input(), &status, ref))
         result = newSVpvn(output_buffer.data(), output_buffer.size());
     output_buffer.clear();
 
@@ -853,7 +863,12 @@ SV *Mapper::encode_json(SV *ref) {
     warn_context->clear();
     warn_context->localize_warning_handler(aTHX);
     SV *result = NULL;
-    if (encode(json_encoder->input(), &status, ref))
+
+#if HAS_FULL_NOMG
+    SvGETMAGIC(ref);
+#endif
+
+    if (encode_value(json_encoder->input(), &status, ref))
         result = newSVpvn(output_buffer.data(), output_buffer.size());
     output_buffer.clear();
 
@@ -943,7 +958,48 @@ namespace {
         return integer;
     }
 
-    uint64_t get_uint64(pTHX_ SV *src) {
+    bool is_coerced_ref(pTHX_ Status *status, const Mapper::Field &fd, SV *sv) {
+        // for overloaded values, we have no easy way to check if a specific
+        // overload method has been defined, so just pass the values through
+        //
+        // the call to Gv_AMG is necessary because SVf_AMAGIC is set on all stashes
+        // on modify, and only reset by Gv_AMG() if the stash does not have overload
+        // magic
+        if (!SvROK(sv) || (SvAMAGIC(sv) && Gv_AMG(SvSTASH(SvRV(sv)))))
+            return false;
+
+        status->SetFormattedErrorMessage(
+            "Reference used when a scalar value is expected for field '%s'",
+            fd.full_name().c_str()
+        );
+
+        return true;
+    }
+
+    inline bool SvPOK_utf8(SV *sv) {
+        return ((SvFLAGS(sv) & (SVf_POK|SVf_UTF8)) == (SVf_POK|SVf_UTF8));
+    }
+
+    // this is a copied-and-modified version of SvPVutf8 and sv_2pvutf8
+    inline char *SvPVutf8_nomg_impl(pTHX_ SV *sv, STRLEN *lp) {
+        // condition and branch are from SvPVutf8
+        if (SvPOK_utf8(sv)) {
+            *lp = SvCUR(sv);
+
+            return SvPVX(sv);
+        } else {
+            // from the body of sv_2pvutf8
+            if (((SvREADONLY(sv) || SvFAKE(sv)) && !SvIsCOW(sv))
+                || isGV_with_GP(sv) || SvROK(sv))
+                sv = sv_mortalcopy(sv);
+            sv_utf8_upgrade_nomg(sv);
+            return SvPV_nomg(sv, *lp);
+        }
+    }
+
+    #define SvPVutf8_nomg(sv, len) SvPVutf8_nomg_impl(aTHX_ sv, &len)
+
+    uint64_t get_uint64_nomg(pTHX_ SV *src) {
         if (SvROK(src) && sv_derived_from(src, "Math::BigInt")) {
             bool negative = false;
             uint64_t value = extract_bits(aTHX_ src, &negative);
@@ -953,7 +1009,13 @@ namespace {
             return SvUV(src);
     }
 
-    int64_t get_int64(pTHX_ SV *src) {
+    uint64_t get_uint64(pTHX_ SV *src) {
+        SvGETMAGIC(src);
+
+        return get_uint64_nomg(aTHX_ src);
+    }
+
+    int64_t get_int64_nomg(pTHX_ SV *src) {
         if (SvROK(src) && sv_derived_from(src, "Math::BigInt")) {
             bool negative = false;
             uint64_t value = extract_bits(aTHX_ src, &negative);
@@ -962,6 +1024,17 @@ namespace {
         } else
             return SvIV(src);
     }
+
+    int64_t get_int64(pTHX_ SV *src) {
+        SvGETMAGIC(src);
+
+        return get_int64_nomg(aTHX_ src);
+    }
+
+    #define SvIV64(sv) get_int64(aTHX_ sv)
+    #define SvUV64(sv) get_uint64(aTHX_ sv)
+    #define SvIV64_nomg(sv) get_int64_nomg(aTHX_ sv)
+    #define SvUV64_nomg(sv) get_uint64_nomg(aTHX_ sv)
 
     IV key_iv(pTHX_ const char *key, I32 keylen) {
         UV value;
@@ -979,6 +1052,26 @@ namespace {
         // XXX warn
         return 0;
     }
+
+#if HAS_FULL_NOMG
+    #define SvIV_enc SvIV_nomg
+    #define SvIV64_enc SvIV64_nomg
+    #define SvUV_enc SvUV_nomg
+    #define SvUV64_enc SvUV64_nomg
+    #define SvNV_enc SvNV_nomg
+    #define SvPV_enc SvPV_nomg
+    #define SvPVutf8_enc SvPVutf8_nomg
+    #define SvTRUE_enc SvTRUE_nomg
+#else
+    #define SvIV_enc SvIV
+    #define SvIV64_enc SvIV64
+    #define SvUV_enc SvUV
+    #define SvUV64_enc SvUV64
+    #define SvNV_enc SvNV
+    #define SvPV_enc SvPV
+    #define SvPVutf8_enc SvPVutf8
+    #define SvTRUE_enc SvTRUE
+#endif
 
     UV key_uv(pTHX_ const char *key, I32 keylen) {
         UV value;
@@ -998,34 +1091,34 @@ namespace {
 
     class NVGetter {
     public:
-        NV operator()(pTHX_ SV *src) const { return SvNV(src); }
+        NV operator()(pTHX_ SV *src) const { return SvNV_enc(src); }
     };
 
     class IVGetter {
     public:
-        IV operator()(pTHX_ SV *src) const { return SvIV(src); }
+        IV operator()(pTHX_ SV *src) const { return SvIV_enc(src); }
     };
 
     class UVGetter {
     public:
-        UV operator()(pTHX_ SV *src) const { return SvUV(src); }
+        UV operator()(pTHX_ SV *src) const { return SvUV_enc(src); }
     };
 
     class I64Getter {
     public:
-        int64_t operator()(pTHX_ SV *src) const { return get_int64(aTHX_ src); }
+        int64_t operator()(pTHX_ SV *src) const { return SvIV64_enc(src); }
     };
 
     class U64Getter {
     public:
-        uint64_t operator()(pTHX_ SV *src) const { return get_uint64(aTHX_ src); }
+        uint64_t operator()(pTHX_ SV *src) const { return SvUV64_enc(src); }
     };
 
     class StringGetter {
     public:
         void operator()(pTHX_ SV *src, string *dest) const {
             STRLEN len;
-            const char *buf = SvPVutf8(src, len);
+            const char *buf = SvPVutf8_enc(src, len);
 
             dest->assign(buf, len);
         }
@@ -1035,7 +1128,7 @@ namespace {
     public:
         void operator()(pTHX_ SV *src, string *dest) const {
             STRLEN len;
-            const char *buf = SvPV(src, len);
+            const char *buf = SvPV_enc(src, len);
 
             dest->assign(buf, len);
         }
@@ -1043,7 +1136,7 @@ namespace {
 
     class BoolGetter {
     public:
-        bool operator()(pTHX_ SV *src) const { return SvTRUE(src); }
+        bool operator()(pTHX_ SV *src) const { return SvTRUE_enc(src); }
     };
 
 #define DEF_SIMPLE_SETTER(NAME, METHOD, TYPE)   \
@@ -1115,6 +1208,12 @@ bool Mapper::encode_from_array(Sink *sink, Status *status, const Mapper::Field &
         if (!item)
             return false;
 
+#if HAS_FULL_NOMG
+        SvGETMAGIC(*item);
+#endif
+
+        if (fail_ref_coercion && is_coerced_ref(aTHX_ status, fd, *item))
+            return false;
         if (!setter(aTHX_ &sub, fd, getter(aTHX_ *item)))
             return false;
     }
@@ -1138,10 +1237,13 @@ bool Mapper::encode_from_message_array(Sink *sink, Status *status, const Mapper:
             return false;
         Sink submsg;
 
+#if HAS_FULL_NOMG
         SvGETMAGIC(*item);
+#endif
+
         if (!sub.StartSubMessage(fd.selector.msg_start, &submsg))
             return false;
-        if (!encode(&submsg, status, *item))
+        if (!encode_value(&submsg, status, *item))
             return false;
         if (!sub.EndSubMessage(fd.selector.msg_end))
             return false;
@@ -1160,8 +1262,11 @@ namespace {
     }
 }
 
-bool Mapper::encode(Sink *sink, Status *status, SV *ref) const {
+bool Mapper::encode_value(Sink *sink, Status *status, SV *ref) const {
+#if !HAS_FULL_NOMG
     SvGETMAGIC(ref);
+#endif
+
     if (!SvROK(ref) || SvTYPE(SvRV(ref)) != SVt_PVHV)
         croak("Not an hash reference when encoding a %s value", message_def->full_name());
     HV *hv = (HV *) SvRV(ref);
@@ -1193,14 +1298,19 @@ bool Mapper::encode(Sink *sink, Status *status, SV *ref) const {
             seen_oneof[it->oneof_index] = true;
         }
 
+        SV *value = HeVAL(he);
+#if HAS_FULL_NOMG
+        SvGETMAGIC(value);
+#endif
+
         if (it->is_map)
-            ok = ok && encode_from_perl_hash(sink, status, *it, HeVAL(he));
+            ok = ok && encode_from_perl_hash(sink, status, *it, value);
         else if (it->field_def->label() == UPB_LABEL_REPEATED)
-            ok = ok && encode_from_perl_array(sink, status, *it, HeVAL(he));
+            ok = ok && encode_from_perl_array(sink, status, *it, value);
         else if (encode_defaults || !it->has_default)
-            ok = ok && encode(sink, status, *it, HeVAL(he));
+            ok = ok && encode_field(sink, status, *it, value);
         else
-            ok = ok && encode_nodefaults(sink, status, *it, HeVAL(he));
+            ok = ok && encode_field_nodefaults(sink, status, *it, value);
     }
     warn_context->pop_level();
 
@@ -1210,18 +1320,23 @@ bool Mapper::encode(Sink *sink, Status *status, SV *ref) const {
     return ok;
 }
 
-bool Mapper::encode(Sink *sink, Status *status, const Field &fd, SV *ref) const {
-    switch (fd.field_def->type()) {
+bool Mapper::encode_field(Sink *sink, Status *status, const Field &fd, SV *ref) const {
+    int field_type = fd.field_def->type();
+
+    if (fail_ref_coercion && field_type != UPB_TYPE_MESSAGE && is_coerced_ref(aTHX_ status, fd, ref))
+        return false;
+
+    switch (field_type) {
     case UPB_TYPE_FLOAT:
-        return sink->PutFloat(fd.selector.primitive, SvNV(ref));
+        return sink->PutFloat(fd.selector.primitive, SvNV_enc(ref));
     case UPB_TYPE_DOUBLE:
-        return sink->PutDouble(fd.selector.primitive, SvNV(ref));
+        return sink->PutDouble(fd.selector.primitive, SvNV_enc(ref));
     case UPB_TYPE_BOOL:
-        return sink->PutBool(fd.selector.primitive, SvTRUE(ref));
+        return sink->PutBool(fd.selector.primitive, SvTRUE_enc(ref));
     case UPB_TYPE_STRING:
     case UPB_TYPE_BYTES: {
         STRLEN len;
-        const char *str = fd.field_def->type() == UPB_TYPE_STRING ? SvPVutf8(ref, len) : SvPV(ref, len);
+        const char *str = fd.field_def->type() == UPB_TYPE_STRING ? SvPVutf8_enc(ref, len) : SvPV_enc(ref, len);
         Sink sub;
         if (!sink->StartString(fd.selector.str_start, len, &sub))
             return false;
@@ -1232,12 +1347,12 @@ bool Mapper::encode(Sink *sink, Status *status, const Field &fd, SV *ref) const 
         Sink sub;
         if (!sink->StartSubMessage(fd.selector.msg_start, &sub))
             return false;
-        if (!fd.mapper->encode(&sub, status, ref))
+        if (!fd.mapper->encode_value(&sub, status, ref))
             return false;
         return sink->EndSubMessage(fd.selector.msg_end);
     }
     case UPB_TYPE_ENUM: {
-        IV value = SvIV(ref);
+        IV value = SvIV_enc(ref);
         if (check_enum_values &&
                 fd.enum_values.find(value) == fd.enum_values.end()) {
             status->SetFormattedErrorMessage(
@@ -1251,40 +1366,43 @@ bool Mapper::encode(Sink *sink, Status *status, const Field &fd, SV *ref) const 
         return sink->PutInt32(fd.selector.primitive, value);
     }
     case UPB_TYPE_INT32:
-        return sink->PutInt32(fd.selector.primitive, SvIV(ref));
+        return sink->PutInt32(fd.selector.primitive, SvIV_enc(ref));
     case UPB_TYPE_UINT32:
-        return sink->PutUInt32(fd.selector.primitive, SvUV(ref));
+        return sink->PutUInt32(fd.selector.primitive, SvUV_enc(ref));
     case UPB_TYPE_INT64:
         if (sizeof(IV) >= sizeof(int64_t))
-            return sink->PutInt64(fd.selector.primitive, SvIV(ref));
+            return sink->PutInt64(fd.selector.primitive, SvIV_enc(ref));
         else
-            return sink->PutInt64(fd.selector.primitive, get_int64(aTHX_ ref));
+            return sink->PutInt64(fd.selector.primitive, SvIV64_enc(ref));
     case UPB_TYPE_UINT64:
         if (sizeof(UV) >= sizeof(int64_t))
-            return sink->PutInt64(fd.selector.primitive, SvUV(ref));
+            return sink->PutInt64(fd.selector.primitive, SvUV_enc(ref));
         else
-            return sink->PutUInt64(fd.selector.primitive, get_uint64(aTHX_ ref));
+            return sink->PutUInt64(fd.selector.primitive, SvUV64_enc(ref));
     default:
         return false; // just in case
     }
 }
 
-bool Mapper::encode_nodefaults(Sink *sink, Status *status, const Field &fd, SV *ref) const {
+bool Mapper::encode_field_nodefaults(Sink *sink, Status *status, const Field &fd, SV *ref) const {
+    if (fail_ref_coercion && is_coerced_ref(aTHX_ status, fd, ref))
+        return false;
+
     switch (fd.field_def->type()) {
     case UPB_TYPE_FLOAT: {
-        NV value = SvNV(ref);
+        NV value = SvNV_enc(ref);
         if (value == fd.default_nv)
             return true;
         return sink->PutFloat(fd.selector.primitive, value);
     }
     case UPB_TYPE_DOUBLE: {
-        NV value = SvNV(ref);
+        NV value = SvNV_enc(ref);
         if (value == fd.default_nv)
             return true;
         return sink->PutDouble(fd.selector.primitive, value);
     }
     case UPB_TYPE_BOOL: {
-        bool value = SvTRUE(ref);
+        bool value = SvTRUE_enc(ref);
         if (value == fd.default_bool)
             return true;
         return sink->PutBool(fd.selector.primitive, value);
@@ -1292,7 +1410,7 @@ bool Mapper::encode_nodefaults(Sink *sink, Status *status, const Field &fd, SV *
     case UPB_TYPE_STRING:
     case UPB_TYPE_BYTES: {
         STRLEN len;
-        const char *str = fd.field_def->type() == UPB_TYPE_STRING ? SvPVutf8(ref, len) : SvPV(ref, len);
+        const char *str = fd.field_def->type() == UPB_TYPE_STRING ? SvPVutf8_enc(ref, len) : SvPV_enc(ref, len);
         if (len == fd.default_str_len &&
                 (len == 0 || memcmp(str, fd.default_str, len) == 0))
             return true;
@@ -1303,7 +1421,7 @@ bool Mapper::encode_nodefaults(Sink *sink, Status *status, const Field &fd, SV *
         return sink->EndString(fd.selector.str_end);
     }
     case UPB_TYPE_ENUM: {
-        IV value = SvIV(ref);
+        IV value = SvIV_enc(ref);
         if (value == fd.default_iv)
             return true;
         if (check_enum_values &&
@@ -1319,25 +1437,25 @@ bool Mapper::encode_nodefaults(Sink *sink, Status *status, const Field &fd, SV *
         return sink->PutInt32(fd.selector.primitive, value);
     }
     case UPB_TYPE_INT32: {
-        IV value = SvIV(ref);
+        IV value = SvIV_enc(ref);
         if (value == fd.default_iv)
             return true;
         return sink->PutInt32(fd.selector.primitive, value);
     }
     case UPB_TYPE_UINT32: {
-        UV value = SvUV(ref);
+        UV value = SvUV_enc(ref);
         if (value == fd.default_uv)
             return true;
         return sink->PutUInt32(fd.selector.primitive, value);
     }
     case UPB_TYPE_INT64: {
-        int64_t value = sizeof(IV) >= sizeof(int64_t) ? SvIV(ref) : get_int64(aTHX_ ref);
+        int64_t value = sizeof(IV) >= sizeof(int64_t) ? SvIV_enc(ref) : SvIV64_enc(ref);
         if (value == fd.default_i64)
             return true;
         return sink->PutInt64(fd.selector.primitive, value);
     }
     case UPB_TYPE_UINT64: {
-        uint64_t value = sizeof(UV) >= sizeof(int64_t) ? SvUV(ref) : get_uint64(aTHX_ ref);
+        uint64_t value = sizeof(UV) >= sizeof(int64_t) ? SvUV_enc(ref) : SvUV64_enc(ref);
         if (value == fd.default_u64)
             return true;
         return sink->PutUInt64(fd.selector.primitive, value);
@@ -1380,12 +1498,12 @@ bool Mapper::encode_hash_kv(Sink *sink, Status *status, const char *key, STRLEN 
     if (fields[0].is_key) {
         if (!encode_key(sink, status, fields[0], key, keylen))
             return false;
-        if (!encode(sink, status, fields[1], value))
+        if (!encode_field(sink, status, fields[1], value))
             return false;
     } else {
         if (!encode_key(sink, status, fields[1], key, keylen))
             return false;
-        if (!encode(sink, status, fields[0], value))
+        if (!encode_field(sink, status, fields[0], value))
             return false;
     }
     if (!sink->EndMessage(status))
@@ -1394,7 +1512,10 @@ bool Mapper::encode_hash_kv(Sink *sink, Status *status, const char *key, STRLEN 
 }
 
 bool Mapper::encode_from_perl_hash(Sink *sink, Status *status, const Field &fd, SV *ref) const {
+#if !HAS_FULL_NOMG
     SvGETMAGIC(ref);
+#endif
+
     if (!SvROK(ref) || SvTYPE(SvRV(ref)) != SVt_PVHV)
         croak("Not an hash reference when encoding field '%s'", fd.full_name().c_str());
     HV *hash = (HV *) SvRV(ref);
@@ -1427,6 +1548,11 @@ bool Mapper::encode_from_perl_hash(Sink *sink, Status *status, const Field &fd, 
 
         warn_cxt.key = key;
         warn_cxt.keylen = keylen;
+
+#if HAS_FULL_NOMG
+        SvGETMAGIC(value);
+#endif
+
         if (!repeated.StartSubMessage(fd.selector.msg_start, &key_value))
             return false;
         if (!fd.mapper->encode_hash_kv(&key_value, status, key, keylen, value))
@@ -1440,43 +1566,45 @@ bool Mapper::encode_from_perl_hash(Sink *sink, Status *status, const Field &fd, 
 }
 
 bool Mapper::encode_from_perl_array(Sink *sink, Status *status, const Field &fd, SV *ref) const {
+#if !HAS_FULL_NOMG
     SvGETMAGIC(ref);
+#endif
     if (!SvROK(ref) || SvTYPE(SvRV(ref)) != SVt_PVAV)
         croak("Not an array reference when encoding field '%s'", fd.full_name().c_str());
     AV *array = (AV *) SvRV(ref);
 
     switch (fd.field_def->type()) {
     case UPB_TYPE_FLOAT:
-        return encode_from_array<NVGetter, FloatEmitter>(sink, fd, array);
+        return encode_from_array<NVGetter, FloatEmitter>(sink, status, fd, array);
     case UPB_TYPE_DOUBLE:
-        return encode_from_array<NVGetter, DoubleEmitter>(sink, fd, array);
+        return encode_from_array<NVGetter, DoubleEmitter>(sink, status, fd, array);
     case UPB_TYPE_BOOL:
-        return encode_from_array<BoolGetter, BoolEmitter>(sink, fd, array);
+        return encode_from_array<BoolGetter, BoolEmitter>(sink, status, fd, array);
     case UPB_TYPE_STRING:
-        return encode_from_array<SVGetter, StringEmitter>(sink, fd, array);
+        return encode_from_array<SVGetter, StringEmitter>(sink, status, fd, array);
     case UPB_TYPE_BYTES:
-        return encode_from_array<SVGetter, StringEmitter>(sink, fd, array);
+        return encode_from_array<SVGetter, StringEmitter>(sink, status, fd, array);
     case UPB_TYPE_MESSAGE:
         return fd.mapper->encode_from_message_array(sink, status, fd, array);
     case UPB_TYPE_ENUM:
         if (check_enum_values)
             return encode_from_array<IVGetter, EnumEmitter>(sink, status, fd, array);
         else
-            return encode_from_array<IVGetter, Int32Emitter>(sink, fd, array);
+            return encode_from_array<IVGetter, Int32Emitter>(sink, status, fd, array);
     case UPB_TYPE_INT32:
-        return encode_from_array<IVGetter, Int32Emitter>(sink, fd, array);
+        return encode_from_array<IVGetter, Int32Emitter>(sink, status, fd, array);
     case UPB_TYPE_UINT32:
-        return encode_from_array<UVGetter, UInt32Emitter>(sink, fd, array);
+        return encode_from_array<UVGetter, UInt32Emitter>(sink, status, fd, array);
     case UPB_TYPE_INT64:
         if (sizeof(IV) >= sizeof(int64_t))
-            return encode_from_array<IVGetter, Int64Emitter>(sink, fd, array);
+            return encode_from_array<IVGetter, Int64Emitter>(sink, status, fd, array);
         else
-            return encode_from_array<I64Getter, Int64Emitter>(sink, fd, array);
+            return encode_from_array<I64Getter, Int64Emitter>(sink, status, fd, array);
     case UPB_TYPE_UINT64:
         if (sizeof(IV) >= sizeof(int64_t))
-            return encode_from_array<UVGetter, UInt64Emitter>(sink, fd, array);
+            return encode_from_array<UVGetter, UInt64Emitter>(sink, status, fd, array);
         else
-            return encode_from_array<U64Getter, UInt64Emitter>(sink, fd, array);
+            return encode_from_array<U64Getter, UInt64Emitter>(sink, status, fd, array);
     default:
         return false; // just in case
     }
@@ -1491,6 +1619,7 @@ bool Mapper::check_from_message_array(Status *status, const Mapper::Field &fd, A
             return false;
 
         SvGETMAGIC(*item);
+
         if (!check(status, *item))
             return false;
     }
@@ -1916,7 +2045,7 @@ void MapperField::copy_value(SV *target, SV *value) {
         if (sizeof(IV) >= sizeof(int64_t))
             sv_setiv(target, SvIV(value));
         else {
-            int64_t i64 = get_int64(aTHX_ value);
+            int64_t i64 = SvIV64(value);
 
             set_bigint(aTHX_ target, (uint64_t) i64, i64 < 0);
         }
@@ -1926,7 +2055,7 @@ void MapperField::copy_value(SV *target, SV *value) {
         if (sizeof(IV) >= sizeof(uint64_t))
             sv_setuv(target, SvUV(value));
         else {
-            int64_t u64 = get_uint64(aTHX_ value);
+            int64_t u64 = SvUV64(value);
 
             set_bigint(aTHX_ target, u64, false);
         }

@@ -4,6 +4,8 @@ use Module::Build::Pluggable 'CPANfile';
 use rlib '..', '../..';
 use FindBin;
 
+my $gitrepo = 'https://github.com/hkoba/perl-mop4import-declare';
+
 my %pm_files = map {
   (my $path = $_) =~ s{^\./}{};
   if ($path !~ m{^(t|_\w+)/}) {
@@ -20,6 +22,7 @@ my $builder = Module::Build::Pluggable->new
    , dist_version_from => 'Declare.pm'
    , dist_abstract     => 'Thin Meta-Object Protocol to build extensible exporters'
    , license           => 'perl'
+   , meta_merge => {resources => {repository  => $gitrepo}}
    , pm_files          => \%pm_files
  );
 

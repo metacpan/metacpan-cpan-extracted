@@ -47,7 +47,7 @@ subtest 'good'  => sub {
                 },
                 'args',
             );
-    
+
             return (
                 1,
                 200,
@@ -67,12 +67,13 @@ subtest 'good'  => sub {
 };
 
 subtest 'bad app id' => sub {
-        
+
     my $target = 'https://developers.facebook.com/tools/debug/examples/bad_app_id';
 
     my $error_code    = 1611016;
     my $error_type    = 'Exception';
     my $error_message = "Object at URL 'https://developers.facebook.com/tools/debug/examples/bad_app_id' of type 'website' is invalid because the given value 'Paul is Awesome' for property 'fb:app_id' could not be parsed as type 'fbid'.";
+    my $trace_id      = 'EJplcsCHuLu';
 
     $Mock_furl_http->mock(
         request => sub {
@@ -90,7 +91,7 @@ subtest 'bad app id' => sub {
                 },
                 'args'
             );
-            
+
             return (
                 1,
                 500,
@@ -98,9 +99,10 @@ subtest 'bad app id' => sub {
                 ['Content-Type' => 'text/javascript; charset=UTF-8'],
                 encode_json(+{
                     error => +{
-                        type    => $error_type,
-                        message => $error_message,
-                        code    => $error_code,
+                        type       => $error_type,
+                        message    => $error_message,
+                        code       => $error_code,
+                        fbtrace_id => $trace_id,
                     },
                 }),
             );
@@ -108,7 +110,7 @@ subtest 'bad app id' => sub {
     );
 
     my $fb = Facebook::OpenGraph->new;
-    throws_ok sub { $fb->check_object($target) }, qr/$error_code:- $error_type:$error_message/, 'exception';
+    throws_ok sub { $fb->check_object($target) }, qr/$error_code:-\t$error_type:$error_message\t$trace_id\t-:-/, 'exception';
 
 };
 
@@ -133,7 +135,7 @@ subtest 'bad domain' => sub {
     $Mock_furl_http->mock(
         request => sub {
             my ($self, %args) = @_;
-        
+
             is_deeply(
                 \%args,
                 +{
@@ -147,7 +149,7 @@ subtest 'bad domain' => sub {
                 },
                 'args'
             );
-    
+
             return (
                 1,
                 200, # Isn't it weird that they give 500 for bad app_id and now give us 200?
@@ -173,6 +175,7 @@ subtest 'bad type' => sub {
     my $error_code    = 1611007;
     my $error_type    = 'Exception';
     my $error_message = "Object at URL 'https://developers.facebook.com/tools/debug/examples/bad_type' is invalid because the configured 'og:type' of 'paul isn't a type' is invalid.";
+    my $trace_id      = 'EJplcsCHuLu';
 
     $Mock_furl_http->mock(
         request => sub {
@@ -191,7 +194,7 @@ subtest 'bad type' => sub {
                 },
                 'args'
             );
-    
+
             return (
                 1,
                 500,
@@ -199,23 +202,24 @@ subtest 'bad type' => sub {
                 ['Content-Type' => 'text/javascript; charset=UTF-8'],
                 encode_json(+{
                     error => +{
-                        code    => $error_code,
-                        type    => $error_type,
-                        message => $error_message,
+                        code       => $error_code,
+                        type       => $error_type,
+                        message    => $error_message,
+                        fbtrace_id => $trace_id,
                     },
                 }),
             );
-            
+
         },
     );
 
     my $fb = Facebook::OpenGraph->new;
-    throws_ok sub { $fb->check_object($target) }, qr/$error_code:- $error_type:$error_message/, 'exception';
+    throws_ok sub { $fb->check_object($target) }, qr/$error_code:-\t$error_type:$error_message\t$trace_id\t-:-/, 'exception';
 
 };
 
 subtest 'missing property' => sub {
-        
+
     my $target = 'https://developers.facebook.com/tools/debug/examples/missing_property';
 
     my $val = +{
@@ -243,7 +247,7 @@ subtest 'missing property' => sub {
                 },
                 'args'
             );
-    
+
             return (
                 1,
                 200,
@@ -263,7 +267,7 @@ subtest 'missing property' => sub {
 };
 
 subtest 'invalid property' => sub {
-        
+
     my $target = 'https://developers.facebook.com/tools/debug/examples/invalid_property';
 
     my $val = +{

@@ -55,7 +55,9 @@ sub CheckSuccess {
 
         # Test
         is($ty, $test->[0],  "Token $test->[0] (line $line test $testnum)");
-        is($val, $test->[1], "Value $test->[1] (line $line test $testnum)");
+        is_deeply($val, $test->[1],
+                "Value $test->[1] (line $line test $testnum)");
+
         ++$testnum;
     }
 } #CheckSuccess()
@@ -67,6 +69,11 @@ sub FirstToken {
     my $parser = FakeYappParser->new($text);
     return Sub::Multi::Tiny::SigParse::_next_token($parser);
 } #FirstToken()
+
+# Make a hashref representing a parameter
+sub _p($$$) {
+    +{ name=>$_[0], named=>!!$_[1], reqd=>!!$_[2] }
+}
 
 # --- Success tests ---------------------------------------------------
 
@@ -89,14 +96,23 @@ CheckSuccess("\t,    ", [[SEPAR => 0]]);
 CheckSuccess("  ,\t", [[SEPAR => 0]]);
 CheckSuccess(" \n  , \n\t", [[SEPAR => 0]]);
 
-# Names
-CheckSuccess('$foo',[[NAME=>'$foo']]);
-CheckSuccess('   $foo',[[NAME=>'$foo']]);
-CheckSuccess('$foo   ',[[NAME=>'$foo']]);
-CheckSuccess('@foo',[[NAME=>'@foo']]);
-CheckSuccess('%foo',[[NAME=>'%foo']]);
-CheckSuccess('&foo',[[NAME=>'&foo']]);
-CheckSuccess('*foo',[[NAME=>'*foo']]);
+# Positional parameters
+CheckSuccess('$foo',[[PARAM=>_p('$foo', 0, 1)]]);
+CheckSuccess('   $foo',[[PARAM=>_p('$foo', 0, 1)]]);
+CheckSuccess('$foo   ',[[PARAM=>_p('$foo', 0, 1)]]);
+CheckSuccess('@foo',[[PARAM=>_p('@foo', 0, 1)]]);
+CheckSuccess('%foo',[[PARAM=>_p('%foo', 0, 1)]]);
+CheckSuccess('&foo',[[PARAM=>_p('&foo', 0, 1)]]);
+CheckSuccess('*foo',[[PARAM=>_p('*foo', 0, 1)]]);
+
+# Named parameters
+CheckSuccess(':$foo',[[PARAM=>_p('$foo', 1, 0)]]);
+CheckSuccess('   :$foo',[[PARAM=>_p('$foo', 1, 0)]]);
+CheckSuccess(':$foo   ',[[PARAM=>_p('$foo', 1, 0)]]);
+CheckSuccess(':@foo',[[PARAM=>_p('@foo', 1, 0)]]);
+CheckSuccess(':%foo',[[PARAM=>_p('%foo', 1, 0)]]);
+CheckSuccess(':&foo',[[PARAM=>_p('&foo', 1, 0)]]);
+CheckSuccess(':*foo',[[PARAM=>_p('*foo', 1, 0)]]);
 
 # where {} clauses
 CheckSuccess('where {1}', [[WHERE=>'{1}']]);
@@ -132,7 +148,7 @@ CheckSuccess('Int Array[Foo]  ',[[TYPE=>'Int'], [TYPE=>'Array[Foo]']]);
 # A random big test
 CheckSuccess('   {x} $foo,    where { $foo > 1 }, 42[bar] {long one},', [
     [ TYPE => '{x}' ],
-    [ NAME => '$foo' ],
+    [ PARAM => _p('$foo', 0, 1) ],
     [ SEPAR => 0 ],
     [ WHERE => '{ $foo > 1 }' ],
     [ SEPAR => 0 ],

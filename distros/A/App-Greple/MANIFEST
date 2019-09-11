@@ -34,6 +34,7 @@ t/03_ja.t
 t/05_reverse_regions.t
 t/06_matchcount.t
 t/08_region.t
+t/09_filter.t
 t/JA.txt
 t/SAMPLE.txt
 t/Util.pm

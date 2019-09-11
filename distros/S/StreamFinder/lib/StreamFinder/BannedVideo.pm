@@ -22,34 +22,37 @@ file.
 
 	use StreamFinder::BannedVideo;
 
-	my $station = new StreamFinder::BannedVideo(<url>,
-			'secure_shoutcast', 'secure', 'any', '!rtmp');
+	my $video = new StreamFinder::BannedVideo(<url>);
 
-	die "Invalid URL or no streams found!\n"  unless ($station);
+	die "Invalid URL or no streams found!\n"  unless ($video);
 
-	my $firstStream = $station->get();
+	my $firstStream = $video->get();
 
 	print "First Stream URL=$firstStream\n";
 
-	my $url = $station->getURL();
+	my $url = $video->getURL();
 
 	print "Stream URL=$url\n";
 
-	my $stationTitle = $station->getTitle();
+	my $videoTitle = $video->getTitle();
 	
-	print "Title=$stationTitle\n";
+	print "Title=$videoTitle\n";
 	
-	my $stationID = $station->getID();
+	my $videoDescription = $video->getTitle('desc');
+	
+	print "Description=$videoDescription\n";
+	
+	my $videoID = $video->getID();
 
-	print "Station ID=$stationID\n";
+	print "Video ID=$videoID\n";
 	
-	my $icon_url = $station->getIconURL();
+	my $icon_url = $video->getIconURL();
 
 	if ($icon_url) {   #SAVE THE ICON TO A TEMP. FILE:
 
-		my ($image_ext, $icon_image) = $station->getIconData();
+		my ($image_ext, $icon_image) = $video->getIconData();
 
-		if ($icon_image && open IMGOUT, ">/tmp/${stationID}.$image_ext") {
+		if ($icon_image && open IMGOUT, ">/tmp/${videoID}.$image_ext") {
 
 			binmode IMGOUT;
 
@@ -61,11 +64,11 @@ file.
 
 	}
 
-	my $stream_count = $station->count();
+	my $stream_count = $video->count();
 
 	print "--Stream count=$stream_count=\n";
 
-	my @streams = $station->get();
+	my @streams = $video->get();
 
 	foreach my $s (@streams) {
 
@@ -75,12 +78,12 @@ file.
 
 =head1 DESCRIPTION
 
-StreamFinder::BannedVideo accepts a valid video URL on Banned.Video 
+StreamFinder::BannedVideo accepts a valid video ID or URL on Banned.Video 
 (Alex Jone's infowars new video site after communist YouTube BANNED his videos) 
 and, at the moment, youtube-dl doesn't convert them (yet?);
-and returns the actual stream URL(s) and cover art icon for that video.  
+and returns the actual title, stream URL(s) and cover art icon for that video.  
 The purpose is that one needs one of these URLs in order to have the option to 
-stream the station in one's own choice of audio player software rather than 
+stream the video in one's own choice of media player software rather than 
 using their web browser and accepting any / all flash, ads, javascript, 
 cookies, trackers, web-bugs, censorship, and other crapware that can come with 
 that method of playing.  The author uses his own custom all-purpose media 
@@ -94,68 +97,70 @@ One or more stream URLs can be returned for each video.
 
 =over 4
 
-=item B<new>(I<url> [, I<-keep> => "type1[,type2...]"|I<[> type1[,type2...] I<]> | , I<-debug> [ => 0|1|2 ] ])
+=item B<new>(I<url> [, I<-keep> => "type1,type2?..." | [type1,type2?...] ] | [, I<-debug> [ => 0|1|2 ] ])
 
-Accepts an Banned.Video URL and creates and returns a new station object, or 
-I<undef> if the URL is not a valid Banned.Video station or no streams are found.
+Accepts a Banned.Video ID or URL and creates and returns a new video object, or 
+I<undef> if the URL is not a valid Banned.Video video or no streams are found.
 
 The optional I<keep> can be either a comma-separated string or an array reference 
 ([...]) of stream types to keep (include) and returned in order specified 
 (type1, type2...).  Each "type" can be one of:  extension (ie. m4a, mp4, etc.), 
-"direct", "stream", or ("any" or "all").  The default list is:  'm4a,direct,stream',
-meaning that all m4a streams followed by all "direct" streams ("directUrl" in page, 
-followed by all remaining (non-direct "streamUrl") streams.  More 
-than one value can be specified to control order of search.   
+"direct", "stream", or ("any" or "all").
 
-=item $station->B<get>()
+DEFAULT keep list is:  'm4a,direct,stream', meaning that all m4a streams followed 
+by all "direct" streams ("directUrl" in page, followed by all remaining 
+(non-direct "streamUrl") streams.  More than one value can be specified to 
+control order of search.
+
+=item $video->B<get>()
 
 Returns an array of strings representing all stream urls found.
 
-=item $station->B<getURL>([I<options>])
+=item $video->B<getURL>([I<options>])
 
 Similar to B<get>() except it only returns a single stream representing 
 the first valid stream found.  
 
-Current options are:  I<-random> and I<-noplaylists>.  By default, the 
-first ("best"?) stream is returned.  If I<-random> is specified, then 
+Current options are:  I<"random"> and I<"noplaylists">.  By default, the 
+first ("best"?) stream is returned.  If I<"random"> is specified, then 
 a random one is selected from the list of streams found.  
-If I<-noplaylists> is specified, and the stream to be returned is a 
-"playlist" (.pls or .m3u8 extension), it is first fetched and the first entry 
+If I<"noplaylists"> is specified, and the stream to be returned is a 
+"playlist" (.pls or .m3u? extension), it is first fetched and the first entry 
 in the playlist is returned.  This is needed by Fauxdacious Mediaplayer.
 
-=item $station->B<count>()
+=item $video->B<count>()
 
-Returns the number of streams found for the station.
+Returns the number of streams found for the video.
 
-=item $station->B<getID>([ 'iheart' | 'fccid' ])
+=item $video->B<getID>(['fccid'])
 
-Returns the video's Banned.Video ID.
+Returns the video's Banned.Video ID, or FCC call-letters.
 
-=item $station->B<getTitle>()
+=item $video->B<getTitle>(['desc'])
 
-Returns the station's title (description).  
+Returns the video's title, or (long description).  
 
-=item $station->B<getIconURL>()
+=item $video->B<getIconURL>()
 
-Returns the url for the station's "cover art" icon image, if any.
+Returns the url for the video's "cover art" icon image, if any.
 
-=item $station->B<getIconData>()
+=item $video->B<getIconData>()
 
 Returns a two-element array consisting of the extension (ie. "png", 
 "gif", "jpeg", etc. and the actual icon image (binary data), if any.
 
-=item $station->B<getImageURL>()
+=item $video->B<getImageURL>()
 
-Returns the url for the station's "cover art" banner image.
+Returns the url for the video's "cover art" banner image.
 
-=item $station->B<getImageData>()
+=item $video->B<getImageData>()
 
 Returns a two-element array consisting of the extension (ie. "png", 
-"gif", "jpeg", etc. and the actual station's banner image (binary data).
+"gif", "jpeg", etc. and the actual video's banner image (binary data).
 
-=item $station->B<getType>()
+=item $video->B<getType>()
 
-Returns the stream's type ("BannedVideo").
+Returns the video's type ("BannedVideo").
 
 =back
 
@@ -203,7 +208,7 @@ BannedVideo
 
 =head1 DEPENDENCIES
 
-LWP::UserAgent
+L<URI::Escape>, L<HTML::Entities>, L<LWP::UserAgent>
 
 =head1 RECCOMENDS
 
@@ -289,6 +294,8 @@ package StreamFinder::BannedVideo;
 
 use strict;
 use warnings;
+use URI::Escape;
+use HTML::Entities ();
 use LWP::UserAgent ();
 use vars qw(@ISA @EXPORT);
 
@@ -337,7 +344,6 @@ sub new
 		if ($_[0] =~ /^\-?debug$/o) {
 			shift;
 			$DEBUG = (defined($_[0]) && $_[0] =~/^[0-9]$/) ? shift : 1;
-print STDERR "-???- DEBUG=$DEBUG=\n";
 		} elsif ($_[0] =~ /^\-?keep$/o) {
 			shift;
 			if (defined $_[0]) {
@@ -356,9 +362,13 @@ print STDERR "-???- DEBUG=$DEBUG=\n";
 	print STDERR "-0(BannedVideo): URL=$url=\n"  if ($DEBUG);
 
 	(my $url2fetch = $url);
-	$url2fetch = 'https://banned.video/watch?id=' . $url  unless ($url =~ /^http/);
+	if ($url =~ /^https?\:/) {
+		$self->{'id'} = $1  if ($url2fetch =~ m#\/([^\/]+)\/?$#);
+	} else {
+		$self->{'id'} = $url;
+		$url2fetch = 'https://banned.video/watch?id=' . $url;
+	}
 	$self->{'cnt'} = 0;
-	$self->{'id'} = $1  if ($url2fetch =~ m#id\=([^\/\?\&]+)$#);
 	my $html = '';
 	print STDERR "-0(BannedVideo): ID=".$self->{'id'}."= URL=$url2fetch=\n"  if ($DEBUG);
 	my $ua = LWP::UserAgent->new(@userAgentOps);		
@@ -377,7 +387,7 @@ print STDERR "-???- DEBUG=$DEBUG=\n";
 		}
 	}
 	print STDERR "-1: html=$html=\n"  if ($DEBUG > 1);
-	return undef  unless ($html);  #STEP 1 FAILED, INVALID STATION URL, PUNT!
+	return undef  unless ($html);  #STEP 1 FAILED, INVALID VIDEO URL, PUNT!
 
 	my $stindex = 0;
 	my @streams = ();
@@ -401,9 +411,21 @@ print STDERR "-???- DEBUG=$DEBUG=\n";
 
 	$self->{'cnt'} = scalar @streams;
 	$self->{'title'} = ($html =~ /\"title\"\s*\:\s*\"([^\"]+)\"/i) ? $1 : '';
+	$self->{'description'} = ($html =~ m#\bname\=\"description\"\s+content\=\"([^\"]+)\"#) ? $1 : $self->{'title'};
+	$self->{'title'} = HTML::Entities::decode_entities($self->{'title'});
+	$self->{'title'} = uri_unescape($self->{'title'});
+	$self->{'description'} = HTML::Entities::decode_entities($self->{'description'});
+	$self->{'description'} = uri_unescape($self->{'description'});
 	$self->{'iconurl'} = ($html =~ /\"(?:poster)?ThumbnailUrl\"\s*\:\s*\"([^\"]+)\"/i) ? $1 : '';
 	$self->{'imageurl'} = ($html =~ /\"posterLargeUrl\"\s*\:\s*\"([^\"]+)\"/i) ? $1 : '';
 	$self->{'imageurl'} ||= $self->{'iconurl'};
+	$self->{'created'} = $1  if ($html =~ /\"createdAt\"\s*\:\s*\"([^\"]+)\"/i);
+	$self->{'updated'} = $1  if ($html =~ /\"updatedAt\"\s*\:\s*\"([^\"]+)\"/i);
+	if (defined $self->{'updated'} && $self->{'updated'} =~ /(\d\d\d\d)/) {
+		$self->{'year'} = $1;
+	} else {
+		$self->{'year'} = $1  if (defined($self->{'created'}) && $self->{'created'} =~ /(\d\d\d\d)/);
+	}
 
 	$self->{'streams'} = \@streams;  #WE'LL HAVE A LIST OF 'EM TO RANDOMLY CHOOSE ONE FROM:
 	$self->{'total'} = $self->{'cnt'};
@@ -427,7 +449,7 @@ sub getURL   #LIKE GET, BUT ONLY RETURN THE SINGLE ONE W/BEST BANDWIDTH AND RELI
 	my $self = shift;
 	my $arglist = (defined $_[0]) ? join('|',@_) : '';
 	my $idx = ($arglist =~ /\b\-?random\b/) ? int rand scalar @{$self->{'streams'}} : 0;
-	if ($arglist =~ /\b\-?noplaylists\b/ && ${$self->{'streams'}}[$idx] =~ /\.(pls|m3u8)$/i) {
+	if ($arglist =~ /\b\-?noplaylists\b/ && ${$self->{'streams'}}[$idx] =~ /\.(pls|m3u8?)$/i) {
 		my $plType = $1;
 		my $firstStream = ${$self->{'streams'}}[$idx];
 		print STDERR "-getURL($idx): NOPLAYLISTS and (".${$self->{'streams'}}[$idx].")\n"  if ($DEBUG);
@@ -471,7 +493,7 @@ sub getURL   #LIKE GET, BUT ONLY RETURN THE SINGLE ONE W/BEST BANDWIDTH AND RELI
 					last;
 				}
 			}
-			print STDERR "-getURL(m3u8): first=$firstStream=\n"  if ($DEBUG);
+			print STDERR "-getURL(m3u?): first=$firstStream=\n"  if ($DEBUG);
 		}
 		return $firstStream || ${$self->{'streams'}}[$idx];
 	}
@@ -487,7 +509,7 @@ sub count
 sub getType
 {
 	my $self = shift;
-	return 'BannedVideo';  #URL TO THE STATION'S THUMBNAIL ICON, IF ANY.
+	return 'BannedVideo';  #STATION TYPE (FOR PARENT StreamFinder MODULE).
 }
 
 sub getID
@@ -499,13 +521,14 @@ sub getID
 sub getTitle
 {
 	my $self = shift;
-	return $self->{'title'};  #URL TO THE STATION'S TITLE(DESCRIPTION), IF ANY.
+	return $self->{'description'}  if (defined($_[0]) && $_[0] =~ /^\-?(?:long|desc)/i);
+	return $self->{'title'};  #VIDEO'S TITLE(DESCRIPTION), IF ANY.
 }
 
 sub getIconURL
 {
 	my $self = shift;
-	return $self->{'iconurl'};  #URL TO THE STATION'S THUMBNAIL ICON, IF ANY.
+	return $self->{'iconurl'};  #URL TO THE VIDEO'S THUMBNAIL ICON, IF ANY.
 }
 
 sub getIconData
@@ -541,7 +564,7 @@ sub getIconData
 sub getImageURL
 {
 	my $self = shift;
-	return $self->{'imageurl'};  #URL TO THE STATION'S BANNER IMAGE, IF ANY.
+	return $self->{'imageurl'};  #URL TO THE VIDEO'S BANNER IMAGE, IF ANY.
 }
 
 sub getImageData

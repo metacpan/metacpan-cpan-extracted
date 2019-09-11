@@ -76,9 +76,27 @@ my $class = 'Bio::Palantir::Refiner::ClusterPlus';
     for my $module ($ClusterPlus1->all_modules) {
         push @modules, join '-', map { $_->function } $module->all_domains;
     }
+
+    my @expected_modules2 = [
+        'A-PCP-C', 'A-PCP-C',
+    ];
+    my $report2 = Bio::Palantir::Refiner->new( 
+        file => $infile , 
+        module_delineation => 'selection',
+    );
+
+    my @nrps_clusters2 = grep { $_->type eq 'nrps' } $report2->all_clusters;
+    
+    my @modules2;
+    for my $module ($nrps_clusters2[2]->all_modules) {
+        push @modules2, join '-', map { $_->function } $module->all_domains;
+    }
     
     cmp_deeply \@modules, @expected_modules,
-        'got expected domain architecture for NRPS Module objects - Modulable build method test';
+        'got expected domain architecture for NRPS Module objects - \'condensation\' module delineation (Modulable build method) test';
+    
+    cmp_deeply \@modules2, @expected_modules2,
+        'got expected domain architecture for NRPS Module objects - \'selection\' module delineation (Modulable build method) test';
 
     # TODO find a better example: here additional detection of a 900aa domain in the gene following the cluster...
     # Test additional domain detection
@@ -216,13 +234,14 @@ my $class = 'Bio::Palantir::Refiner::ClusterPlus';
     my $ClusterPlus = $class->new( _cluster => $root->all_clusters ); 
 
     my @expected_exploratory_domain_symbols = [
-        'CAL_domain', 'ACP', 'KS', 'AT',
-        'KR', 'KR', 'ACP', 'Te'
+        'CAL_domain', 'ACP', 'KS', 'PCP', 'AT', 'DHt',
+        'Te', 'DHt', 'Te', 'KR', 'ACP', 'AT', 'Te', 'PCP',
     ];
 
     my @expected_exploratory_domain_coordinates = [
-        '38-485', '605-677', '704-1120', '1130-1570',
-        '1629-1813', '1866-2045', '2143-2216', '2585-2842'
+        '38-485', '605-677', '704-1120', '825-911', '1130-1548',
+        '1168-1405', '1261-1490', '1491-1730', '1799-2027', '1866-2045',
+        '2143-2216', '2454-2821', '2585-2842', '2629-2699'
     ];
    
     my (@exploratory_domain_symbols, @exploratory_domain_coordinates);

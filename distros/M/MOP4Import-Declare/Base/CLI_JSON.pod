@@ -1,0 +1,215 @@
+=encoding utf-8
+
+=head1 NAME
+
+MOP4Import::Base::CLI_JSON - Runnable-Module with JSON args/outputs
+
+=head1 SYNOPSIS
+
+In F<MyScript.pm>
+
+=for code perl
+
+  #!/usr/bin/env perl
+  package MyScript;
+  use MOP4Import::Base::CLI_JSON -as_base,
+      [fields => qw/verbose structs/];
+  
+  sub cmd_foo : Doc("This prints FOO") {
+    print "FOO\n"
+  }
+  
+  sub bar {
+    (my MY $self) = @_;
+    ([arguments => @ARGV], [structs => $self->{structs}])
+  }
+  
+  MY->run(\@ARGV, {h => "help", v => 'verbose', d => 'debug'}) unless caller;
+  1;
+
+From shell:
+
+=for code sh
+
+  % chmod a+x MyScript.pm
+  % ./MyScript.pm -h
+  Usage: MyScript.pm [--opt=value].. <Command> ARGS...
+  
+  Commands:
+    foo        This prints FOO
+    help
+  
+  Options from MyScript:
+    --verbose
+    --structs
+  
+  Options from MOP4Import::Base::CLI_JSON:
+    --help          show this help message
+    --quiet         to be (somewhat) quiet
+    --scalar        evaluate methods in scalar context
+    --output        choose output serializer (json/tsv/dump)
+    --flatten       output each result separately (instead of single json array)
+    --undef-as      serialize undef as this value. used in tsv output
+    --no-exit-code  exit with 0(EXIT_SUCCESS) even when result was falsy/empty
+    --binary        keep STDIN/OUT/ERR binary friendly
+  %
+  % ./MyScript.pm foo
+  FOO
+  %
+  % ./MyScript.pm --structs='[1,2,{"x":"y"}]' bar '["baz",{"qux":"quux"}]' '{"other":"arg"}'
+  [["arguments",["baz",{"qux":"quux"}],{"other":"arg"}],["structs",[1,2,{"x":"y"}]]]
+
+=head1 DESCRIPTION
+
+MOP4Import::Base::CLI_JSON is my latest boilerplate base class to write
+L<Runnable-Module|MOP4Import::intro_runnable_module>.
+Using this module as a base class, you can run most methods
+directly from shell. It treats subcommand names and options basically
+like following:
+
+=over 4
+
+=item * (Sub)comands are (basically) mapped to methods.
+
+=item * (Posix style long) options before given command are used to create instance(via C<< __PACKAGE__->new(%opts) >>).
+
+=back
+
+You can pass complex structures like arrays and hashes as option
+values and arguments to methods in JSON array/object literal syntax.
+Results of method invocation are printed with JSON serializer by default.
+You can override this behavior by implementing official command
+methods C<cmd_$COMMAND>.
+
+As noted in the above doc, design goal of this module is B<*NOT*>
+to provide complete feature-rich human-friendly CLI base class.
+Instead, it aims to make most methods in developping modules
+testable/useable via CLI (and L<perl -d|perldebug>)
+from very beginning of its development
+so that we can develop perl modules more rapidly via CLI-tested pieces of codes.
+
+
+=head1 CLASS METHODS
+
+=head2 run (\@ARGV, \%option_shortcuts)
+
+  __PACKAGE__->run(\@ARGV) unless caller;
+
+This method parses arguments, invokes appropriate command
+and usually emits its result to STDOUT.
+
+Accepted options are a subset of posix style options (C<--name> and C<--name=value> only). C<--name value> is not allowed,
+L<intentionally|MOP4Import::name_space_value_options_considered_harmful>.
+If I<value> part of options are recognized as JSON arrays/objects, they are automatically deserialized as perl's arrays/hashes.
+
+If run() gets optional second argument hash, it is used to
+accept short name for options like following:
+
+  __PACKAGE__->run(\@ARGV, {h => 'help', v => 'verbose'}) unless caller;
+
+In above, C<-h> is recognized samely as C<--help> and C<-v> as C<--verbose>.
+
+
+=head3 Command name interpretation rule
+X<command-rule>
+
+Then first word in C<@ARGV> is taken and treated as command name.
+Command name is resolved to a module method in following ways:
+
+=over 4
+
+=item C<cmd_$COMMAND>
+
+If there is a method named C<cmd_$COMMAND>, it is assumed that
+this method is officially designed for CLI invocation.
+For official command, C<run()> just invokes it and do nothing else.
+Callee method is responsible to handle its output and possibly exit code.
+
+=item C<$COMMAND>
+
+If there is a method exactly matches to specified command,
+it is invoked via L<cli_invoke($method, @args)|cli_invoke>.
+It invokes the method in array context (unless C<--scalar> option is given).
+Results are printed by C<cli_output()> with JSON serializer.
+If option C<--flatten> is given, cli_output is called for each element of the results instead.
+
+If results are empty list, program exit with code 1
+(unless C<--no-exit-code> option is given).
+
+=item ??UNKNOWN??
+
+If the command name does not meet all above,
+C<cli_unknown_subcommand> hook is called instead.
+
+=back
+
+=head1 OPTIONS
+
+These options control L<run> method.
+
+=over 4
+
+=item quiet
+
+suppress output of method invocation.
+
+=item scalar
+
+evaluate methods in scalar context
+
+=item output
+
+default 'json'
+
+=item flatten
+
+output each result separately (instead of single json array)
+
+=item undef-as
+
+default => 'null'
+
+=item no-exit-code
+
+suppress setting exit-code.
+
+=item binary
+
+keep STDIN/OUT/ERR binary friendly. (default 0)
+
+=back
+
+=head1 METHODS
+
+All public APIs are named starting with C<cli_...> prefix.
+
+=head2 cli_output
+
+=head2 cli_invoke
+
+=head2 cli_precmd
+
+=head2 cli_unknown_subcommand
+
+=head1 COMMANDS
+
+=head3 help
+
+This provides default implementation of usage output.
+
+=head1 SEE ALSO
+
+L<App::Cmd> - if your main goal is writing full-fleged CLI.
+
+=head1 LICENSE
+
+Copyright (C) Kobayasi, Hiroaki.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Kobayasi, Hiroaki E<lt>buribullet@gmail.comE<gt>
+
+=cut

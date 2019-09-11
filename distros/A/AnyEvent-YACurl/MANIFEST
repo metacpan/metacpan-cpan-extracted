@@ -114,6 +114,7 @@ curl-src/tests/data/test1084
 curl-src/tests/data/test1422
 curl-src/tests/data/test1254
 curl-src/tests/data/test314
+curl-src/tests/data/test954
 curl-src/tests/data/test1386
 curl-src/tests/data/test1153
 curl-src/tests/data/test617
@@ -311,6 +312,7 @@ curl-src/tests/data/test1171
 curl-src/tests/data/test836
 curl-src/tests/data/test77
 curl-src/tests/data/test215
+curl-src/tests/data/test953
 curl-src/tests/data/test858
 curl-src/tests/data/test538
 curl-src/tests/data/test827
@@ -328,6 +330,7 @@ curl-src/tests/data/test590
 curl-src/tests/data/test2019
 curl-src/tests/data/test1118
 curl-src/tests/data/test1114
+curl-src/tests/data/test2078
 curl-src/tests/data/test24
 curl-src/tests/data/test266
 curl-src/tests/data/test1147
@@ -454,6 +457,7 @@ curl-src/tests/data/test1266
 curl-src/tests/data/test2043
 curl-src/tests/data/test1124
 curl-src/tests/data/test355
+curl-src/tests/data/test892
 curl-src/tests/data/test1335
 curl-src/tests/data/test1504
 curl-src/tests/data/test1113
@@ -474,6 +478,7 @@ curl-src/tests/data/test35
 curl-src/tests/data/test393
 curl-src/tests/data/test806
 curl-src/tests/data/test838
+curl-src/tests/data/test893
 curl-src/tests/data/test932
 curl-src/tests/data/test108
 curl-src/tests/data/test876
@@ -600,6 +605,7 @@ curl-src/tests/data/test1388
 curl-src/tests/data/test111
 curl-src/tests/data/test170
 curl-src/tests/data/test14
+curl-src/tests/data/test1594
 curl-src/tests/data/test2035
 curl-src/tests/data/test301
 curl-src/tests/data/test1343
@@ -608,6 +614,7 @@ curl-src/tests/data/test2025
 curl-src/tests/data/test207
 curl-src/tests/data/test133
 curl-src/tests/data/test1653
+curl-src/tests/data/test1269
 curl-src/tests/data/test851
 curl-src/tests/data/test545
 curl-src/tests/data/test1120
@@ -712,6 +719,7 @@ curl-src/tests/data/test930
 curl-src/tests/data/test1235
 curl-src/tests/data/test1507
 curl-src/tests/data/test589
+curl-src/tests/data/test849
 curl-src/tests/data/test2067
 curl-src/tests/data/test2040
 curl-src/tests/data/test1367
@@ -779,6 +787,7 @@ curl-src/tests/data/test803
 curl-src/tests/data/test1331
 curl-src/tests/data/test194
 curl-src/tests/data/test1370
+curl-src/tests/data/test848
 curl-src/tests/data/test243
 curl-src/tests/data/test78
 curl-src/tests/data/test10
@@ -903,6 +912,7 @@ curl-src/tests/data/test1228
 curl-src/tests/data/test1345
 curl-src/tests/data/test115
 curl-src/tests/data/test627
+curl-src/tests/data/test2077
 curl-src/tests/data/test1116
 curl-src/tests/data/test1380
 curl-src/tests/data/test206
@@ -1000,6 +1010,7 @@ curl-src/tests/data/test1441
 curl-src/tests/data/test112
 curl-src/tests/data/test56
 curl-src/tests/data/test1214
+curl-src/tests/data/test335
 curl-src/tests/data/test2016
 curl-src/tests/data/test1264
 curl-src/tests/data/test1123
@@ -1284,6 +1295,7 @@ curl-src/tests/data/test573
 curl-src/tests/data/test918
 curl-src/tests/data/test59
 curl-src/tests/data/test1076
+curl-src/tests/data/test1174
 curl-src/tests/data/test518
 curl-src/tests/data/test840
 curl-src/tests/data/test1230
@@ -1566,6 +1578,7 @@ curl-src/tests/libtest/lib569.c
 curl-src/tests/libtest/lib1511.c
 curl-src/tests/libtest/lib574.c
 curl-src/tests/libtest/lib510.c
+curl-src/tests/libtest/lib1594.c
 curl-src/tests/rtspserver.pl
 curl-src/tests/http2-server.pl
 curl-src/tests/stunnel.pem
@@ -1620,8 +1633,10 @@ curl-src/docs/examples/rtsp.c
 curl-src/docs/examples/evhiperfifo.c
 curl-src/docs/examples/htmltitle.cpp
 curl-src/docs/examples/multi-post.c
+curl-src/docs/examples/http3.c
 curl-src/docs/examples/pop3-list.c
 curl-src/docs/examples/multi-app.c
+curl-src/docs/examples/altsvc.c
 curl-src/docs/examples/getinfo.c
 curl-src/docs/examples/smtp-mail.c
 curl-src/docs/examples/imap-ssl.c
@@ -1633,7 +1648,9 @@ curl-src/docs/examples/multithread.c
 curl-src/docs/examples/cacertinmem.c
 curl-src/docs/examples/10-at-a-time.c
 curl-src/docs/examples/ftp-wildcard.c
+curl-src/docs/examples/pop3-authzid.c
 curl-src/docs/examples/ephiperfifo.c
+curl-src/docs/examples/smtp-authzid.c
 curl-src/docs/examples/pop3-stat.c
 curl-src/docs/examples/imap-fetch.c
 curl-src/docs/examples/smooth-gtk-thread.c
@@ -1657,6 +1674,7 @@ curl-src/docs/examples/http2-serverpush.c
 curl-src/docs/examples/post-callback.c
 curl-src/docs/examples/Makefile.am
 curl-src/docs/examples/persistent.c
+curl-src/docs/examples/http3-present.c
 curl-src/docs/examples/ftpget.c
 curl-src/docs/examples/imap-examine.c
 curl-src/docs/examples/pop3-dele.c
@@ -1664,6 +1682,7 @@ curl-src/docs/examples/sendrecv.c
 curl-src/docs/examples/sepheaders.c
 curl-src/docs/examples/ghiper.c
 curl-src/docs/examples/anyauthput.c
+curl-src/docs/examples/imap-authzid.c
 curl-src/docs/examples/curlgtk.c
 curl-src/docs/examples/asiohiper.cpp
 curl-src/docs/examples/postinmemory.c
@@ -1786,6 +1805,7 @@ curl-src/docs/cmdline-opts/socks4.d
 curl-src/docs/cmdline-opts/dns-ipv6-addr.d
 curl-src/docs/cmdline-opts/data.d
 curl-src/docs/cmdline-opts/head.d
+curl-src/docs/cmdline-opts/http3.d
 curl-src/docs/cmdline-opts/proxy-key.d
 curl-src/docs/cmdline-opts/fail.d
 curl-src/docs/cmdline-opts/false-start.d
@@ -1841,6 +1861,7 @@ curl-src/docs/cmdline-opts/ntlm-wb.d
 curl-src/docs/cmdline-opts/url.d
 curl-src/docs/cmdline-opts/list-only.d
 curl-src/docs/cmdline-opts/retry.d
+curl-src/docs/cmdline-opts/sasl-authzid.d
 curl-src/docs/cmdline-opts/proxy-ciphers.d
 curl-src/docs/cmdline-opts/data-raw.d
 curl-src/docs/cmdline-opts/remote-name-all.d
@@ -1858,6 +1879,7 @@ curl-src/docs/cmdline-opts/netrc.d
 curl-src/docs/cmdline-opts/anyauth.d
 curl-src/docs/cmdline-opts/proxy-tls13-ciphers.d
 curl-src/docs/cmdline-opts/help.d
+curl-src/docs/cmdline-opts/parallel-max.d
 curl-src/docs/cmdline-opts/tlsv1.2.d
 curl-src/docs/cmdline-opts/ftp-account.d
 curl-src/docs/cmdline-opts/proxy-tlsv1.d
@@ -1876,6 +1898,7 @@ curl-src/docs/cmdline-opts/user.d
 curl-src/docs/cmdline-opts/socks5-hostname.d
 curl-src/docs/cmdline-opts/xattr.d
 curl-src/docs/cmdline-opts/disable-epsv.d
+curl-src/docs/cmdline-opts/parallel.d
 curl-src/docs/cmdline-opts/proto-default.d
 curl-src/docs/cmdline-opts/proxy-header.d
 curl-src/docs/cmdline-opts/tlspassword.d
@@ -1971,6 +1994,7 @@ curl-src/docs/cmdline-opts/disallow-username-in-url.d
 curl-src/docs/cmdline-opts/proxy-pass.d
 curl-src/docs/cmdline-opts/proxy-user.d
 curl-src/docs/INSTALL.cmake
+curl-src/docs/HTTP3.md
 curl-src/docs/ROADMAP.md
 curl-src/docs/curl-config.1
 curl-src/docs/INTERNALS.md
@@ -1991,6 +2015,7 @@ curl-src/docs/TODO
 curl-src/docs/README.netware
 curl-src/docs/THANKS
 curl-src/docs/BUG-BOUNTY.md
+curl-src/docs/EXPERIMENTAL.md
 curl-src/docs/Makefile.in
 curl-src/docs/libcurl/libcurl-easy.3
 curl-src/docs/libcurl/curl_easy_upkeep.3
@@ -2062,6 +2087,7 @@ curl-src/docs/libcurl/Makefile.in
 curl-src/docs/libcurl/curl_multi_timeout.3
 curl-src/docs/libcurl/libcurl.3
 curl-src/docs/libcurl/curl_mime_encoder.3
+curl-src/docs/libcurl/curl_multi_poll.3
 curl-src/docs/libcurl/curl_getdate.3
 curl-src/docs/libcurl/curl_slist_append.3
 curl-src/docs/libcurl/curl_unescape.3
@@ -2320,6 +2346,7 @@ curl-src/docs/libcurl/opts/CURLOPT_SSL_OPTIONS.3
 curl-src/docs/libcurl/opts/CURLOPT_INFILESIZE_LARGE.3
 curl-src/docs/libcurl/opts/CURLOPT_CAINFO.3
 curl-src/docs/libcurl/opts/CURLOPT_SSLENGINE.3
+curl-src/docs/libcurl/opts/CURLOPT_SASL_AUTHZID.3
 curl-src/docs/libcurl/opts/CURLINFO_PRIMARY_PORT.3
 curl-src/docs/libcurl/opts/CURLOPT_PROXY_SSL_VERIFYPEER.3
 curl-src/docs/libcurl/opts/CURLOPT_CONNECTTIMEOUT_MS.3
@@ -2364,6 +2391,7 @@ curl-src/docs/libcurl/opts/CURLOPT_DISALLOW_USERNAME_IN_URL.3
 curl-src/docs/libcurl/opts/CURLINFO_SPEED_DOWNLOAD.3
 curl-src/docs/libcurl/opts/CURLOPT_NETRC_FILE.3
 curl-src/docs/libcurl/opts/CURLOPT_SEEKFUNCTION.3
+curl-src/docs/libcurl/opts/CURLINFO_RETRY_AFTER.3
 curl-src/docs/libcurl/opts/CURLOPT_SSL_VERIFYPEER.3
 curl-src/docs/libcurl/opts/CURLOPT_HAPPY_EYEBALLS_TIMEOUT_MS.3
 curl-src/docs/libcurl/opts/CURLMOPT_MAX_HOST_CONNECTIONS.3
@@ -2442,6 +2470,7 @@ curl-src/docs/CODE_OF_CONDUCT.md
 curl-src/docs/VERSIONS
 curl-src/docs/MAIL-ETIQUETTE
 curl-src/docs/FAQ
+curl-src/docs/PARALLEL-TRANSFERS.md
 curl-src/docs/RELEASE-PROCEDURE.md
 curl-src/docs/ALTSVC.md
 curl-src/projects/wolfssl_override.props
@@ -2652,6 +2681,7 @@ curl-src/src/tool_cb_prg.c
 curl-src/src/mkhelp.pl
 curl-src/src/tool_filetime.c
 curl-src/src/tool_cb_wrt.c
+curl-src/src/tool_progress.c
 curl-src/src/makefile.amiga
 curl-src/src/Makefile.inc
 curl-src/src/tool_helpers.h
@@ -2699,6 +2729,7 @@ curl-src/src/Makefile.in
 curl-src/src/tool_xattr.c
 curl-src/src/tool_cb_dbg.c
 curl-src/src/tool_version.h
+curl-src/src/tool_progress.h
 curl-src/src/tool_formparse.h
 curl-src/src/tool_urlglob.h
 curl-src/src/tool_bname.c
@@ -2725,6 +2756,14 @@ curl-src/maketgz
 curl-src/configure
 curl-src/buildconf.bat
 curl-src/buildconf
+curl-src/plan9/BUILD.PLAN9.txt
+curl-src/plan9/mkfile.proto
+curl-src/plan9/include/mkfile
+curl-src/plan9/src/mkfile.inc
+curl-src/plan9/src/mkfile
+curl-src/plan9/mkfile
+curl-src/plan9/lib/mkfile.inc
+curl-src/plan9/lib/mkfile
 curl-src/Makefile
 curl-src/lib/nonblock.h
 curl-src/lib/warnless.h
@@ -2808,6 +2847,9 @@ curl-src/lib/curl_memory.h
 curl-src/lib/setopt.h
 curl-src/lib/speedcheck.c
 curl-src/lib/md4.c
+curl-src/lib/vssh/libssh.c
+curl-src/lib/vssh/libssh2.c
+curl-src/lib/quic.h
 curl-src/lib/connect.h
 curl-src/lib/smb.h
 curl-src/lib/curl_threads.c
@@ -2881,11 +2923,16 @@ curl-src/lib/psl.c
 curl-src/lib/strtok.h
 curl-src/lib/base64.c
 curl-src/lib/parsedate.h
+curl-src/lib/vquic/ngtcp2.c
+curl-src/lib/vquic/quiche.h
+curl-src/lib/vquic/ngtcp2.h
+curl-src/lib/vquic/quiche.c
 curl-src/lib/curl_multibyte.h
 curl-src/lib/mime.h
 curl-src/lib/config-vxworks.h
 curl-src/lib/strcase.c
 curl-src/lib/gopher.c
+curl-src/lib/config-plan9.h
 curl-src/lib/inet_pton.c
 curl-src/lib/smtp.h
 curl-src/lib/url.h
@@ -2952,7 +2999,6 @@ curl-src/lib/vauth/krb5_sspi.c
 curl-src/lib/vauth/ntlm.c
 curl-src/lib/vauth/cram.c
 curl-src/lib/vauth/spnego_gssapi.c
-curl-src/lib/ssh.c
 curl-src/lib/Makefile.in
 curl-src/lib/config-dos.h
 curl-src/lib/config-win32.h
@@ -3010,7 +3056,6 @@ curl-src/lib/curl_path.h
 curl-src/lib/libcurl.vers.in
 curl-src/lib/fileinfo.c
 curl-src/lib/Makefile.m32
-curl-src/lib/ssh-libssh.c
 curl-src/lib/curl_addrinfo.c
 curl-src/lib/curl_fnmatch.h
 curl-src/lib/curl_config.h.cmake

@@ -11,7 +11,7 @@ use Path::Tiny qw/ path /;
     my $temp_d = Path::Tiny->tempdir;
 
     my @queue = map { [$_] } 1 .. $NUM;
-    my $proc = sub {
+    my $proc  = sub {
         my $fn = shift(@_)->[0];
         $temp_d->child($fn)->spew_utf8("Wrote $fn .\n");
         return;

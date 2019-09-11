@@ -17,10 +17,24 @@ meta-spec:
   version: '1.4'
 name: App-ProcUtils
 requires:
+  Data::Sah::Coerce::perl::int::int_check_uid_exists: '0'
+  Data::Sah::Coerce::perl::int::str_convert_unix_user_to_uid: '0'
+  Data::Sah::Compiler::perl::TH::array: '0'
+  Data::Sah::Compiler::perl::TH::bool: '0'
+  Data::Sah::Compiler::perl::TH::code: '0'
+  Data::Sah::Compiler::perl::TH::int: '0'
+  Data::Sah::Compiler::perl::TH::re: '0'
+  Data::Sah::Compiler::perl::TH::str: '0'
+  Log::ger: '0.027'
   Perinci::CmdLine::Any: '0'
   Perinci::CmdLine::Lite: '1.820'
   Proc::Find::Parents: '0.631'
   Proc::ProcessTable: '0'
+  Sah::Schema::true: '0'
+  Sah::Schema::unix::local_uid: '0'
+  Sah::Schema::unix::pid: '0'
+  Sah::Schema::unix::signal: '0'
+  String::Truncate: '0'
   perl: '5.010001'
   strict: '0'
   warnings: '0'
@@ -28,11 +42,23 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-ProcUtils
   homepage: https://metacpan.org/release/App-ProcUtils
   repository: git://github.com/perlancar/perl-App-ProcUtils.git
-version: '0.032'
+version: '0.037'
 x_Dist_Zilla:
   perl:
     version: '5.028002'
   plugins:
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript proc-exists'
+      version: '0.421'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript proc-kill'
+      version: '0.421'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript proc-list'
+      version: '0.421'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript proc-list-parents'
@@ -116,7 +142,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.596'
+      version: '0.597'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -313,11 +339,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::AddToDb
       name: '@Author::PERLANCAR/Rinci::AddToDb'
-      version: '0.01'
+      version: '0.020'
     -
-      class: Dist::Zilla::Plugin::Rinci::Validate
-      name: '@Author::PERLANCAR/Rinci::Validate'
-      version: '0.24'
+      class: Dist::Zilla::Plugin::Rinci::EmbedValidator
+      name: '@Author::PERLANCAR/Rinci::EmbedValidator'
+      version: '0.250'
     -
       class: Dist::Zilla::Plugin::SetScriptShebang
       name: '@Author::PERLANCAR/SetScriptShebang'

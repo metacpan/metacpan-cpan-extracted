@@ -24,7 +24,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use base qw/ Astro::Coords::Fixed /;
 

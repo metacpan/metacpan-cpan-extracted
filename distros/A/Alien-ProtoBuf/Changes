@@ -1,5 +1,9 @@
 Revision history for Alien-ProtoBuf
 
+0.09      2019-09-11 20:46:38 CEST
+
+    - Compilation fix for Perl 5.8
+
 0.08      2018-11-10 22:37:30 CET
 
     - Add cxxflags method, to support protobuf 3.6

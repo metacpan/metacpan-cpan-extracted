@@ -35,7 +35,7 @@ requires:
   POSIX: '0'
   Plack: '0'
   Plack::Util: '0'
-  Proc::Daemon::Prefork: '0'
+  Proc::Daemon::Prefork: '0.711'
   Time::HiRes: '0'
   URI::Escape: '0'
   perl: '5.010001'
@@ -45,7 +45,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Gepok
   homepage: https://metacpan.org/release/Gepok
   repository: git://github.com/perlancar/perl-Gepok.git
-version: '0.291'
+version: '0.292'
 x_Dist_Zilla:
   perl:
     version: '5.028002'

@@ -3,11 +3,17 @@ use strict;
 use warnings qw(FATAL all NONFATAL misc);
 use Carp;
 use Exporter qw/import/;
+use overload '""' => 'as_string';
+
+use MOP4Import::Util qw/globref/;
 
 use fields
   (
+   # caller() of import in usual case.
+    'callpack'
+
    # Where to export. Always defined.
-   'destpkg'
+   , 'destpkg'
 
    # What to define. Optional.
    , 'objpkg'
@@ -17,6 +23,9 @@ use fields
 
    # Used in MOP4Import::Types::Extend and MOP4Import::Declare::Type
    , 'extending'
+
+   # original caller info. This may be empty for faked m4i_opts()
+   , 'caller'
 
    , qw/filename line/
  );
@@ -28,14 +37,20 @@ use MOP4Import::Util;
 sub Opts () {__PACKAGE__}
 
 sub new {
-  my ($pack, $caller, @toomany) = @_;
-  if (@toomany) {
-    croak "Too many arguments! You may need to write Opts->new(scalar caller)";
-  }
+  my ($pack, %opts) = @_;
+
   my Opts $opts = fields::new($pack);
-  ($opts->{destpkg}, $opts->{filename}, $opts->{line})
-    = ref $caller ? @$caller : $caller;
-  $opts->{objpkg} = $opts->{destpkg};
+
+  if (my $caller = delete $opts{caller}) {
+    $opts->{caller} = $caller;
+    ($opts->{callpack}, $opts->{filename}, $opts->{line})
+      = ref $caller ? @$caller : ($caller, '', '');
+  }
+
+  $opts->{$_} = $opts{$_} for keys %opts;
+
+  $opts->{objpkg} = $opts->{destpkg} = $opts->{callpack};
+
   $opts;
 }
 
@@ -63,8 +78,147 @@ sub with_destpkg { my Opts $new = clone($_[0]); $new->{destpkg} = $_[1]; $new }
 sub with_objpkg  { my Opts $new = clone($_[0]); $new->{objpkg}  = $_[1]; $new }
 sub with_basepkg { my Opts $new = clone($_[0]); $new->{basepkg} = $_[1]; $new }
 
-our @EXPORT = qw/Opts/;
+# XXX: Not extensible. but how?
+sub m4i_opts {
+  my ($arg) = @_;
+  if (not ref $arg) {
+    # Fake Opts from string.
+    Opts->new(caller => $arg);
+
+  } elsif (UNIVERSAL::isa($arg, Opts)) {
+    # Pass through.
+    $arg
+
+  } elsif (ref $arg eq 'ARRAY') {
+    # Shorthand of MOP4Import::Opts->new(caller => [caller]).
+    Opts->new(caller => $arg);
+
+  } else {
+    Carp::croak("Unknown argument!");
+  }
+}
+
+sub m4i_args {
+  ($_[0], m4i_opts($_[1]), @_[2..$#_]);
+}
+
+sub m4i_fake {
+  my ($fakedCallpack) = @_;
+  (undef, my (@callerTail)) = caller;
+  Opts->new(caller => [$fakedCallpack, @callerTail]);
+}
+
+sub as_string {
+  (my Opts $opts) = @_;
+  $opts->{callpack};
+}
+
+# Provide field getters.
+foreach my $field (keys our %FIELDS) {
+  *{globref(Opts, $field)} = sub {shift->$field()};
+}
+
+our @EXPORT = qw/
+                  Opts
+                  m4i_args
+                /;
 our @EXPORT_OK = (@EXPORT, MOP4Import::Util::function_names
-		  (matching => qr/^with_/));
+		  (matching => qr/^(with_|m4i_)/));
 
 1;
+
+=head1 NAME
+
+MOP4Import::Opts - Object to encapsulate caller() record
+
+=head1 SYNOPSIS
+
+  # To import the type 'Opts' and m4i api functions.
+  use MOP4Import::Opts;
+
+  # To create an instance of MOP4Import::Opts.
+  sub import {
+    ...
+    my Opts $opts = m4i_opts([caller]);
+    ...
+  }
+
+  # To extract MOP4Import::Opts safely from pragma args.
+  sub declare_foo {
+    (my $myPack, my Opts $opts, my (@args)) = m4i_args(@_);
+    ...
+  }
+
+=head1 DESCRIPTION
+
+This hash object encapsulates L<caller()|perlfunc/caller> info
+and other parameters for L<MOP4Import::Declare> family.
+
+=head1 ATTRIBUTES
+
+=over 4
+
+=item callpack
+
+L<scalar caller()|perlfunc/caller> of import in usual case.
+
+=item destpkg
+
+Where to export. Always defined.
+
+=item objpkg
+
+What to define. Optional.
+
+=item basepkg
+
+What to inherit. Optional.
+
+=item extending
+
+Used in MOP4Import::Types::Extend and MOP4Import::Declare::Type
+
+=item caller
+
+Original L<caller()|perlfunc/caller> info.
+This may be empty for faked m4i_opts().
+
+=item filename
+
+=item line
+
+=back
+
+=head1 FUNCTIONS
+
+=head2 m4i_args
+
+This function converts C<$_[1]> by L<m4i_opts> and returns whole C<@_>.
+
+  (my $myPack, my Opts $opts, my (@args)) = m4i_args(@_);
+
+=head2 m4i_opts
+
+  my Opts $opts = m4i_opts([caller]);
+
+  my Opts $opts = m4i_opts(scalar caller); # string is ok too.
+
+=head1 METHODS
+
+=head2 as_string
+
+  $opts->as_string;
+
+  "$opts"; # Same as above.
+
+=head1 AUTHOR
+
+Kobayashi, Hiroaki E<lt>hkoba@cpan.orgE<gt>
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+

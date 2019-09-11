@@ -21,7 +21,7 @@ use Template;
 use YAML;
 
 
-our $VERSION = '0.0104';
+our $VERSION = '0.0105';
 
 
 1; # End of Task::Latemp
@@ -34,7 +34,7 @@ __END__
 
 =head1 VERSION
 
-version 0.0104
+version 0.0105
 
 =head1 DESCRIPTION
 

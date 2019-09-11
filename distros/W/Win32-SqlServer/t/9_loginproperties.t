@@ -1,9 +1,20 @@
 #---------------------------------------------------------------------
-# $Header: /Perl/OlleDB/t/9_loginproperties.t 27    15-05-24 22:26 Sommar $
+# $Header: /Perl/OlleDB/t/9_loginproperties.t 29    19-07-19 22:42 Sommar $
 #
 # This test suite tests that setloginproperty, Autoclose and CommandTimeout.
 #
 # $History: 9_loginproperties.t $
+# 
+# *****************  Version 29  *****************
+# User: Sommar       Date: 19-07-19   Time: 22:42
+# Updated in $/Perl/OlleDB/t
+# Added test to make sure that AutoTranslate is still off when a
+# connection string is used.
+# 
+# *****************  Version 28  *****************
+# User: Sommar       Date: 19-07-17   Time: 21:42
+# Updated in $/Perl/OlleDB/t
+# Adapted the test to changes in SQL_version.
 # 
 # *****************  Version 27  *****************
 # User: Sommar       Date: 15-05-24   Time: 22:26
@@ -184,7 +195,7 @@ $| = 1;
 
 chdir dirname($0);
 
-print "1..44\n";
+print "1..45\n";
 
 # Set up a monitor connection and get login configuration.
 my $monitor = sql_init($mainserver, $mainuser, $mainpw, undef, $provider);
@@ -278,10 +289,15 @@ if ($secondserver and $secondserver ne $mainserver) {
       $testc->setloginproperty('IntegratedSecurity', "SSPI");
    }
 
-   # Get SQL version first thing we do.
+   # Get SQL version first thing we do.  xp_msver returns one more
+   # componenet in version string that we don't have.
    my $newsqlver = $testc->{SQL_version};
+   my @sqlver = split('\.', $newsqlver);
    my %thissqlver = $testc->sql_one("EXEC master..xp_msver 'Productversion'");
-   if ($thissqlver{'Character_Value'} eq $newsqlver) {
+   my @thissqlver = split('\.', $thissqlver{'Character_Value'});
+   if ($thissqlver[0] == $sqlver[0] and 
+       $thissqlver[1] == $sqlver[1] and
+       $thissqlver[2] == $sqlver[2]) {
       print "ok 6\n";
    }
    else {
@@ -308,8 +324,12 @@ if ($secondserver and $secondserver ne $mainserver) {
    else {
       $testc->setloginproperty('IntegratedSecurity', "SSPI");
    }
+   @sqlver = split('\.', $testc->{SQL_version});
    %thissqlver = $testc->sql_one("EXEC master..xp_msver 'Productversion'");
-   if ($thissqlver{'Character_Value'} eq $testc->{SQL_version}) {
+   @thissqlver = split('\.', $thissqlver{'Character_Value'});
+   if ($thissqlver[0] == $sqlver[0] and 
+       $thissqlver[1] == $sqlver[1] and
+       $thissqlver[2] == $sqlver[2]) {
       print "ok 8\n";
    }
    else {
@@ -420,12 +440,13 @@ else {
 }
 
 
-# AttachFilename. Only for SQL 2000 and later.
-if ($monitorsqlver >= 8) {
+# AttachFilename. 
+{
    $monitor->{ErrInfo}{PrintText} = 1;  # Suppress output from CREATE/DROP Database
-   $monitor->sql('CREATE DATABASE OlleDB$test');
+   $monitor->sql('CREATE DATABASE OlleDB$test COLLATE Greek_CI_AS');
    my @helpdb = $monitor->sql_sp('sp_helpdb', ['OlleDB$test']);
    $monitor->sql_sp('sp_detach_db', ['OlleDB$test']);
+   $monitor->{ErrInfo}{PrintText} = 0;
    my $filename = $helpdb[1]{'filename'};
    $filename =~ s!\\\\!\\!g;
    $filename =~ s!\s+$!!g;
@@ -442,12 +463,8 @@ if ($monitorsqlver >= 8) {
       print "not ok 15 # $db\n";
    }
    $testc->disconnect;
-   $monitor->sql('DROP DATABASE [OlleDB test]');
-   $monitor->{ErrInfo}{PrintText} = 0;
 }
-else {
-   print "ok 15 # skip\n";
-}
+
 
 # Network address. This works like server - maybe.
 $testc = new Win32::SqlServer;
@@ -534,10 +551,10 @@ else {
    print "not ok 19 # $name\n";
 }
 
-# Test connection string. If this attribut changeses, all other defaults 
+# Test connection string. If this attribute changeses, all other defaults 
 # should be lost.
 $testc = setup_testc;
-my $connectstring = "Database=tempdb;";
+my $connectstring = 'Database=OlleDB test;';
 $connectstring .= "Server=$mainserver;" if $mainserver;
 if ($mainuser) {
     $connectstring .= "UID=$mainuser;";
@@ -567,7 +584,28 @@ if ($name !~ /^9_login/) {
 else {
    print "not ok 21 # $name\n";
 }
+# Check that AutoTranslate is still off.
+$testc->{BinaryAsStr} = 'x';
+my $binary = $testc->sql_one('SELECT convert(varbinary, ?)', 
+                             [['varchar(3)', "\x{03B1}\x{03B2}\x{03B3}"]], 
+                             SCALAR);
+if ($binary eq '0xE1E2E3') {
+   print "ok 22\n";
+}
+else {
+   print "not ok 22 # $binary\n";
+}
 $testc->disconnect;
+
+# We can drop the database now.
+$monitor->{ErrInfo}{PrintText} = 1;
+$monitor->sql(<<SQLEND);
+ALTER DATABASE [OlleDB test] SET SINGLE_USER WITH ROLLBACK IMMEDIATE
+DROP DATABASE [OlleDB test]
+SQLEND
+$monitor->{ErrInfo}{PrintText} = 0;
+
+
 
 # Test old password. This requires SQL 2005, SQL Native Client and SQL
 # authentication.
@@ -588,10 +626,10 @@ if ($monitor->{Provider} >= PROVIDER_SQLNCLI and $monitorsqlver >= 9 and
    $testc->setloginproperty('Pooling', 0);
    $testc->connect;
    if (not $testc->{ErrInfo}{Messages}) {
-       print "ok 22\n";
+       print "ok 23\n";
    }
    else {
-       print "not ok 22 # " . $testc->{ErrInfo}{Messages}[0]{'text'} . "\n";
+       print "not ok 23 # " . $testc->{ErrInfo}{Messages}[0]{'text'} . "\n";
    }
    $testc->disconnect();
 
@@ -602,10 +640,10 @@ if ($monitor->{Provider} >= PROVIDER_SQLNCLI and $monitorsqlver >= 9 and
    $testc->setloginproperty('Pooling', 0);
    $testc->connect;
    if (not $testc->{ErrInfo}{Messages}) {
-       print "ok 23\n";
+       print "ok 24\n";
    }
    else {
-       print "not ok 23 # " . $testc->{ErrInfo}{Messages}[0]{'text'} . "\n";
+       print "not ok 24 # " . $testc->{ErrInfo}{Messages}[0]{'text'} . "\n";
    }
    $testc->disconnect();
 
@@ -613,28 +651,20 @@ if ($monitor->{Provider} >= PROVIDER_SQLNCLI and $monitorsqlver >= 9 and
    $monitor->sql("DROP LOGIN [$testuser]");
 }
 else {
-   print "ok 22 # skip\n";
    print "ok 23 # skip\n";
+   print "ok 24 # skip\n";
 }
 
 # Test is_connected
 $testc = setup_testc;
 if (not $testc->isconnected()) {
-   print "ok 24\n";
-}
-else {
-   print "not ok 24\n";
-}
-
-$testc->connect();
-if ($testc->isconnected()) {
    print "ok 25\n";
 }
 else {
    print "not ok 25\n";
 }
 
-$testc->cancelbatch();
+$testc->connect();
 if ($testc->isconnected()) {
    print "ok 26\n";
 }
@@ -642,12 +672,20 @@ else {
    print "not ok 26\n";
 }
 
-$testc->disconnect();
-if (not $testc->isconnected()) {
+$testc->cancelbatch();
+if ($testc->isconnected()) {
    print "ok 27\n";
 }
 else {
    print "not ok 27\n";
+}
+
+$testc->disconnect();
+if (not $testc->isconnected()) {
+   print "ok 28\n";
+}
+else {
+   print "not ok 28\n";
 }
 
 # Don't pool this command, SQL 7 has problem with reusing connection
@@ -660,10 +698,10 @@ $testc->{ErrInfo}{PrintText} = 25;
 $testc->{ErrInfo}{CarpLevel} = 25;
 $testc->sql("RAISERROR('Testing Win32::SqlServer', 20, 1) WITH LOG");
 if (not $testc->isconnected()) {
-   print "ok 28\n";
+   print "ok 29\n";
 }
 else {
-   print "not ok 28\n";
+   print "not ok 29\n";
 }
 
 # Test DisconnectOn in ErrInfo.
@@ -671,29 +709,29 @@ $testc->setloginproperty('Pooling', 1);
 $testc->connect();
 $testc->sql("SELECT * FROM #nosuchtable");
 if ($testc->isconnected()) {
-   print "ok 29\n";
-}
-else {
-   print "not ok 29\n";
-}
-
-$testc->{CommandTimeout} = 1;
-$testc->sql("WAITFOR DELAY '00:00:05'");
-if ($testc->isconnected()) {
    print "ok 30\n";
 }
 else {
    print "not ok 30\n";
 }
 
-
-$testc->{ErrInfo}{DisconnectOn}{'208'}++;
-$testc->sql("SELECT * FROM #nosuchtable");
-if (not $testc->isconnected()) {
+$testc->{CommandTimeout} = 1;
+$testc->sql("WAITFOR DELAY '00:00:05'");
+if ($testc->isconnected()) {
    print "ok 31\n";
 }
 else {
    print "not ok 31\n";
+}
+
+
+$testc->{ErrInfo}{DisconnectOn}{'208'}++;
+$testc->sql("SELECT * FROM #nosuchtable");
+if (not $testc->isconnected()) {
+   print "ok 32\n";
+}
+else {
+   print "not ok 32\n";
 }
 
 $testc->connect();
@@ -701,10 +739,10 @@ $testc->{CommandTimeout} = 1;
 $testc->{ErrInfo}{DisconnectOn}{'HYT00'}++;
 $testc->sql("WAITFOR DELAY '00:00:05'");
 if (not $testc->isconnected()) {
-   print "ok 32\n";
+   print "ok 33\n";
 }
 else {
-   print "not ok 32\n";
+   print "not ok 33\n";
 }
 
 # This test may seem out of place, but the code will try to access the
@@ -714,10 +752,10 @@ $testc = setup_testc;
 $testc->{AutoConnect} = 1;
 $testc->sql('SELECT getdate()', COLINFO_FULL);
 if (not $testc->{ErrInfo}{Messages}) {
-    print "ok 33\n";
+    print "ok 34\n";
 }
 else {
-    print "not ok 33 # " . $testc->{ErrInfo}{Messages}[0]{'text'} . "\n";
+    print "not ok 34 # " . $testc->{ErrInfo}{Messages}[0]{'text'} . "\n";
 }
 
 undef $testc;
@@ -725,10 +763,10 @@ $testc = setup_testc;
 $testc->connect();
 $testc->sql('SELECT getdate()', COLINFO_FULL);
 if (not $testc->{ErrInfo}{Messages}) {
-    print "ok 34\n";
+    print "ok 35\n";
 }
 else {
-    print "not ok 34 # " . $testc->{ErrInfo}{Messages}[0]{'text'} . "\n";
+    print "not ok 35 # " . $testc->{ErrInfo}{Messages}[0]{'text'} . "\n";
 }
 
 # Testing sql_init in its various forms.
@@ -736,10 +774,10 @@ undef $testc;
 $testc = Win32::SqlServer::sql_init($mainserver, $mainuser, $mainpw, undef, $provider);
 my $sqluser = $testc->sql_one('SELECT SYSTEM_USER', Win32::SqlServer::SCALAR);
 if (defined $mainuser and $sqluser eq $mainuser or $sqluser =~ /\\/) {
-   print "ok 35\n";
+   print "ok 36\n";
 }
 else {
-   print "not ok 35\n";
+   print "not ok 36\n";
 }
 $testc->disconnect();
 
@@ -748,10 +786,10 @@ undef $testc;
 $testc = Win32::SqlServer->sql_init($mainserver, $mainuser, $mainpw, undef, $provider);
 $sqluser = $testc->sql_one('SELECT SYSTEM_USER', Win32::SqlServer::SCALAR);
 if (defined $mainuser and $sqluser eq $mainuser or $sqluser =~ /\\/) {
-   print "ok 36\n";
+   print "ok 37\n";
 }
 else {
-   print "not ok 36\n";
+   print "not ok 37\n";
 }
 $testc->disconnect();
 
@@ -763,16 +801,6 @@ $testc = setup_testc;
 $testc->setloginproperty('ApplicationIntent', 'READWRITE');
 $testc->connect();
 if ($testc->isconnected()) {
-   print "ok 37\n";
-}
-else {
-   print "not ok 37\n";
-}
-
-$testc = setup_testc;
-$testc->setloginproperty('ApplicationIntent', 'readOnly');
-$testc->connect();
-if ($testc->isconnected()) {
    print "ok 38\n";
 }
 else {
@@ -780,13 +808,23 @@ else {
 }
 
 $testc = setup_testc;
-my $crap = Win32::NodeName();
-eval(q!$testc->setloginproperty('ApplicationIntent', $crap)!);
-if ($@ =~ /Illegal.*\'\Q$crap\E\'/) { 
+$testc->setloginproperty('ApplicationIntent', 'readOnly');
+$testc->connect();
+if ($testc->isconnected()) {
    print "ok 39\n";
 }
 else {
    print "not ok 39\n";
+}
+
+$testc = setup_testc;
+my $crap = Win32::NodeName();
+eval(q!$testc->setloginproperty('ApplicationIntent', $crap)!);
+if ($@ =~ /Illegal.*\'\Q$crap\E\'/) { 
+   print "ok 40\n";
+}
+else {
+   print "not ok 40\n";
 }
 
 # Now we will test changing providers. We cannot do this if the 
@@ -805,10 +843,10 @@ if ($monitor->{Provider} != PROVIDER_SQLOLEDB and
 SQLEND
    my ($app, $host, $oledbver_save) = $testc->sql_one($query, LIST);
    if ($app eq 'Lantluft' and $host eq 'Nettocourtage') {
-      print "ok 40\n";
+      print "ok 41\n";
    }
    else {
-      print "not ok 40  # <$app> <$host>\n";
+      print "not ok 41  # <$app> <$host>\n";
    }
 
    $testc->disconnect();
@@ -817,17 +855,17 @@ SQLEND
    my $this_oledbver;
    ($app, $host, $this_oledbver) = $testc->sql_one($query, LIST);
    if ($app eq 'Lantluft' and $host eq 'Nettocourtage') {
-      print "ok 41\n";
-   }
-   else {
-      print "not ok 41  # <$app> <$host>\n";
-   }
-   
-   if ($this_oledbver == 4) {
       print "ok 42\n";
    }
    else {
-      print "not ok 42  # OLEDB ver = $this_oledbver\n";
+      print "not ok 42  # <$app> <$host>\n";
+   }
+   
+   if ($this_oledbver == 4) {
+      print "ok 43\n";
+   }
+   else {
+      print "not ok 43  # OLEDB ver = $this_oledbver\n";
    }
 
    $testc->disconnect();
@@ -835,23 +873,23 @@ SQLEND
    $testc->connect();
    ($app, $host, $this_oledbver) = $testc->sql_one($query, LIST);
    if ($app eq 'Lantluft' and $host eq 'Nettocourtage') {
-      print "ok 43\n";
-   }
-   else {
-      print "not ok 43  # <$app> <$host>\n";
-   }
-   
-   if ($this_oledbver == $oledbver_save) {
       print "ok 44\n";
    }
    else {
-      print "not ok 44 # OLEDB ver = $this_oledbver\n";
+      print "not ok 44  # <$app> <$host>\n";
+   }
+   
+   if ($this_oledbver == $oledbver_save) {
+      print "ok 45\n";
+   }
+   else {
+      print "not ok 45 # OLEDB ver = $this_oledbver\n";
    }
 }
 else {
-   print "ok 40 # skip\n";
    print "ok 41 # skip\n";
    print "ok 42 # skip\n";
    print "ok 43 # skip\n";
    print "ok 44 # skip\n";
+   print "ok 45 # skip\n";
 }

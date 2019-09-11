@@ -1,3 +1,10 @@
+0.940   2019-09-11  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [test] Adjust tests to Complete::Util 0.603 [RT#130485].
+
+
 0.939   2019-07-19  Released-By: PERLANCAR; Urgency: medium
 
 	- Replace adding completion from Sah attribute

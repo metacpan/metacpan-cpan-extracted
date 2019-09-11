@@ -1,13 +1,19 @@
 /*---------------------------------------------------------------------
- $Header: /Perl/OlleDB/handleattributes.cpp 4     11-08-07 23:25 Sommar $
+ $Header: /Perl/OlleDB/handleattributes.cpp 5     19-07-08 22:34 Sommar $
 
   This file holds routines for getting and (in one case) retrieving
   handle attributes from the Win32::SqlServer hash. Many of them are
   format options.
 
-  Copyright (c) 2004-2011   Erland Sommarskog
+  Copyright (c) 2004-2019   Erland Sommarskog
 
   $History: handleattributes.cpp $
+ * 
+ * *****************  Version 5  *****************
+ * User: Sommar       Date: 19-07-08   Time: 22:34
+ * Updated in $/Perl/OlleDB
+ * Move SQL_version to be in internaldata intstead. Added support for the
+ * codepages hash.
  * 
  * *****************  Version 4  *****************
  * User: Sommar       Date: 11-08-07   Time: 23:25
@@ -44,7 +50,7 @@ static char *hash_keys[] =
    { "internaldata", "PropsDebug",     "AutoConnect",    "RowsAtATime",
      "DecimalAsStr", "DatetimeOption", "TZOffset",       "BinaryAsStr",
      "DateFormat",   "MsecFormat",     "CommandTimeout", "MsgHandler",
-     "QueryNotification", "SQL_version"};
+     "QueryNotification", "SQL_version", "CurrentDB",    "codepages"};
 
 // This enum is used to address option_hash_keys array.
 typedef enum hash_key_enum
@@ -52,7 +58,7 @@ typedef enum hash_key_enum
     HV_internaldata, HV_propsdebug,     HV_autoconnect, HV_rowsatatime,
     HV_decimalasstr, HV_datetimeoption, HV_tzoffset,    HV_binaryasstr,
     HV_dateformat,   HV_msecformat,     HV_cmdtimeout,  HV_msgcallback,
-    HV_querynotification, HV_SQLversion
+    HV_querynotification, HV_SQLversion, HV_CurrentDB,  HV_codepages
 } hash_key_enum;
 
 
@@ -63,12 +69,7 @@ static SV **fetch_from_hash (SV* olle_ptr, hash_key_enum id) {
    hv = (HV *) SvRV(olle_ptr);
    return hv_fetch(hv, hash_keys[id], (I32) strlen(hash_keys[id]), FALSE);
 }
-
-static void delete_from_hash(SV *olle_ptr, hash_key_enum id) {
-   HV * hv;
-   hv = (HV *) SvRV(olle_ptr);
-   hv_delete(hv, hash_keys[id], (I32) strlen(hash_keys[id]), G_DISCARD);
-}
+     
 
 static SV * fetch_option(SV * olle_ptr, hash_key_enum id) {
 // Fetches an option from the hash, and only returns an SV, if there is a
@@ -82,22 +83,6 @@ static SV * fetch_option(SV * olle_ptr, hash_key_enum id) {
    return retsv;
 }
 
-double OptSqlVersion(SV * olle_ptr) {
-   SV * sv;
-   float retval = 6.5;
-   if (sv = fetch_option(olle_ptr, HV_SQLversion)) {
-      char * versionstr = SvPV_nolen(sv);
-      sscanf_s(versionstr, "%f", &retval);
-   }
-   return retval;
-}
-
-// The purpose is to make sure that SQLversion does not have a defined value.
-// We cannot set it to undef, because Perl thinks it's readonly. But we can
-// delete it!
-void drop_SQLversion(SV * olle_ptr) {
-   delete_from_hash(olle_ptr, HV_SQLversion);
-}
 
 BOOL OptAutoConnect (SV * olle_ptr) {
    SV *sv;
@@ -249,6 +234,33 @@ HV* OptQueryNotification(SV * olle_ptr) {
    return retval;
 }
 
+HV * OptCodepagesHash(SV * olle_ptr) {
+   SV * sv;
+   HV * retval = NULL;
+   if (sv = fetch_option(olle_ptr, HV_codepages)) {
+      retval = (HV *) SvRV(sv);
+   }
+   return retval;
+}
+
+// Get the code page for the database in CurrentDB.
+UINT OptCurrentCodepage (SV * olle_ptr) {
+   SV * current_db   = fetch_option(olle_ptr, HV_CurrentDB);
+   HV * codepages_hv = OptCodepagesHash(olle_ptr);
+   UINT retval = 0;
+
+   if (current_db != NULL && codepages_hv != NULL) {
+      HE * he = hv_fetch_ent(codepages_hv, current_db, 0, 0);
+      if (he != NULL) {
+         SV * codepage_sv = HeVAL(he);
+         if (codepage_sv != NULL && SvOK(codepage_sv)) {
+            retval = SvUVx(codepage_sv);
+         }
+      }
+   }
+
+   return retval;
+}
 
 // This one returns all format options in one struct.
 formatoptions getformatoptions(SV   * olle_ptr) {
@@ -272,7 +284,7 @@ formatoptions getformatoptions(SV   * olle_ptr) {
 
 // And this returns most important attribute of them all: the pointer to
 // the internal data area for the XS code. Here we return it a void pointer,
-// and the internaldata module will have to reinterpret the pointed.
+// and the internaldata module will have to reinterpret the pointer.
 void * OptInternalData(SV *olle_ptr)
 {
     HV *hv;
@@ -287,3 +299,12 @@ void * OptInternalData(SV *olle_ptr)
     internaldata = (void *) SvIV(*svp);
     return internaldata;
 }
+
+// Clears the codepages hash. Called when server changes.
+void ClearCodepages(SV * olle_ptr) {
+   HV * codepages_hv = OptCodepagesHash(olle_ptr);
+   if (codepages_hv != NULL) {
+      hv_clear(codepages_hv);
+   }
+}
+

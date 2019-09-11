@@ -26,6 +26,8 @@ $chip->mount(
    $adapter->expect_write_then_read( "\xFE", 8 )
       ->returns( "\xC6\x00\x00\x00\x00\x00\x00\x00" );
 
+   my %config = $chip->read_config->get;
+
    is_deeply(
       { $chip->read_config->get },
       {
@@ -146,6 +148,12 @@ $chip->mount(
          RCCTRL                => 0x4100,
          # PATABLE
          PATABLE               => "C6.00.00.00.00.00.00.00",
+
+         # Derived fields
+         carrier_frequency     => "800.000MHz",
+         channel_spacing       => "199.951kHz",
+         deviation             => "47.607kHz",
+         data_rate             => "115.1kbps",
       },
       '->read_config yields config'
    );
@@ -176,13 +184,6 @@ $chip->mount(
    $adapter->check_and_clear( '->change_config on PATABLE' );
 }
 
-# ->carrier_frequency
-{
-   # Account for "close enough" rounding
-   is( sprintf( "%.3f", $chip->carrier_frequency->get / 1E6 ), "800.000",
-      '->carrier_frequency yields frequency' );
-}
-
 # presets
 {
    $adapter->expect_write( "\x4B" .
@@ -194,6 +195,20 @@ $chip->mount(
    )->get;
 
    $adapter->check_and_clear( '->change_config preset mode' );
+}
+
+# bands
+{
+   # CONFIG
+   $adapter->expect_write( "\x4D" . "\x10\xA7\x62" );
+   # PATABLE
+   $adapter->expect_write( "\x7E" . "\x12\x0E\x1D\x34\x60\x84\xC8\xC0" );
+
+   $chip->change_config(
+      band => "433MHz",
+   )->get;
+
+   $adapter->check_and_clear( '->change_config band' );
 }
 
 done_testing;

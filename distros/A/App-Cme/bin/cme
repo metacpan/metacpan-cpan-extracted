@@ -35,7 +35,7 @@ cme - Check or edit configuration data with Config::Model
 
 =head1 VERSION
 
-version 1.029
+version 1.030
 
 =head1 SYNOPSIS
 
@@ -401,21 +401,19 @@ You can see this
 L<example from OpenSsh|https://github.com/dod38fr/config-model/wiki/New-parameter-for-openssh-example>
 to learn how to fix a model.
 
-=head1 SUPPORT
+=head1 FOR MORE INFORMATION
 
-For support, please check the following resources:
+For more informations, please check:
 
 =over
 
 =item *
 
-The config-model users mailing list:
-
- config-model-users at lists.sourceforge.net
+config-model wiki: L<http://github.com/dod38fr/config-model/wiki>
 
 =item *
 
-The config-model wiki: L<http://github.com/dod38fr/config-model/wiki>
+Blogs about this project: L<https://ddumont.wordpress.com/category/perl/configmodel/>
 
 =back
 

@@ -1,4 +1,9 @@
 Revision history for Device-Chip-CC1101
 
+0.02    2019-09-11 01:33:45
+        [CHANGES]
+         * Support both 433MHz and 868MHz bands
+         * Yield some derived settings from `->read_config` for convenience
+
 0.01    2019-09-10 13:02:30
         First version, released on an unsuspecting world.

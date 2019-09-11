@@ -2,17 +2,17 @@
 
 =head1 NAME
 
-whyfields -- or Modern use of fields.pm and C<%FIELDS>.
+whyfields - or Modern use of fields.pm and C<%FIELDS>.
 
 =head1 DESCRIPTION
 
-Here I try to explain why B<%FIELDS> is useful B<still>
-and alternative to L<fields>.
+Here I try to explain why L<fields> is useful B<still>
+and also propose alternative way of use C<%FIELDS>.
 
-=head1 fields.pm -- old story.
+=head1 fields.pm - old story.
 
 L<fields> allows you to extend C<use strict> style typo-check
-to B<fields> (or slots, instance variables, member variables.. as you like).
+to B<fields> (or slots, properties, attributes, instance variables, member variables.. as you like).
 
     use strict;
     package Cat {
@@ -20,9 +20,9 @@ to B<fields> (or slots, instance variables, member variables.. as you like).
        use fields qw/name birth_year/; # field declaration
 
        sub new {
-          my Cat $self = fields::new(shift); #  my TYPE $sport.
-          $self->{name}       = shift; # Checked!
-          $self->{birth_year} = shift  # Checked!
+          my Cat $self = fields::new(shift); #  my TYPE $var.
+          $self->{name}       = shift; # Checked statically!
+          $self->{birth_year} = shift  # Checked statically!
              // $self->_this_year;
           $self;
        }
@@ -30,7 +30,7 @@ to B<fields> (or slots, instance variables, member variables.. as you like).
        sub age {
           my Cat $self = shift;
           return $self->_this_year
-                    - $self->{birth_year}; # Checked!
+                    - $self->{birth_year}; # Checked statically!
        }
 
        sub _this_year {
@@ -44,7 +44,7 @@ to B<fields> (or slots, instance variables, member variables.. as you like).
 
        print $cat->{name}, ": ", $cat->age, "\n";
 
-       # print $cat->{namae}, "\n"; # Compilation error!
+       # print $cat->{namae}, "\n"; # Compile-time error!
     }
 
 Above program defines a class C<Cat>,
@@ -117,7 +117,7 @@ perl5 over other LL like ruby, python and php.
 I hope more perl mongers cares about this.
 
 Anyway, I want to introduce some facts about C<fields>
-so that you could C<XXX:>
+so that you could stop worrying and start using C<%FIELDS>.
 
 =head2 C<fields> works even for unblessed HASH!
 
@@ -156,40 +156,54 @@ like following (this is a shorthand version of L<MOP4Import::PSGIEnv>):
       ["Content-type", "text/plain"]
    }
 
-=head2 constant sub can be used for C<my TYPE> slot.
+=head2 constant sub can be used as shorthand(type-alias) for C<my TYPE> slot.
 X<TYPENAME-alias>
 
-In fact, you can use shorten type annotation using
-type alias (constant sub which returns class name).
+In fact, you can shorten type annotation using
+B<constant sub> which returns actual long class name.
 So, you can rewrite following:
 
-
+   # OLD:
    my MyProject::SomeModule::Purchase $obj = ...;
 
-into:
-
+   # NEW:
    sub Purchase () {'MyProject::SomeModule::Purchase'}
-
    ...
-
    my Purchase $obj = ...;
 
 
 Some of you may feel above acceptable to write.
 
-And as a positive side-effect, such type alias can be used
-for object instantiation. It also allows overriding of actual class
-in subclasses.
+And bonus point of having classname sub is that you can use it
+to abstract-out classname for future overriding in subclass.
 
-     ...
-     # Subclass can override ->Purchase().
-     my Purchase $obj = $self->Purchase->new(...);
-     ...
+  # OLD: Class name is hardcoded.
+  sub create_purchase {
+    my $self = shift;
+    ...
+    my Purchase $obj = MyProject::SomeModule::Purchase->new(...);
+    ...
+    return $obj
+  }
 
-=head2 values of C<%FIELDS> can be anything now.
+  # NEW: Class name becomes overridable.
+  sub create_purchase {
+    my $self = shift;
+    ...
+    my Purchase $obj = $self->Purchase->new(...);
+    ...
+    return $obj
+  }
+
+Note: Unlike C<< my Purchase $obj >>,
+C<< $self->Purchase >> is method invocation.
+So later doesn't become constant and subclass can override it.
+
+
+=head2 values of C<%FIELDS> can be anything (at least for now).
 
 Actually L<fields> is an abstraction interface of perl's core interface
-C<%FIELDS>.
+C<%FIELDS>. For example:
 
   package Cat;
   use fields qw/name birth_year/;
@@ -198,66 +212,104 @@ Above code briefly does following:
 
   package Cat;
   BEGIN {
+    our %FIELDS;
     $FIELDS{name} = 1;
     $FIELDS{birth_year} = 2;
   }
 
-Then perl's compiler can check typos for variables
-which have type annotation like C<my Cat $cat>.
-When compiler find field access like C<< $cat->{name} >>,
-it looks up C<%CAT::FIELDS> and checks if C<$CAT::FIELDS{name}> exists.
-If it exists, field access is valid. If you wrote wrong field name
-like C<< $cat->{namae} >>, you will get compilation error
-like B<No such class field "namae" in variable $cat of type main::Cat>.
+After the C<BEGIN {...}> block is successfully executed,
+perl continues compiling rest of the code
+with knowledge of package C<Cat> and its C<%FIELDS> relation.
 
-Interestingly, above story does not mention value of C<%FIELDS>.
+When C<my> variable declaration has type alias like C<my Cat $cat>,
+it is marked with the type.
+And then compiler find field access like C<< $cat->{name} >>,
+it looks up C<%CAT::FIELDS> and checks if C<$CAT::FIELDS{name}> exists.
+If it exists, field access is valid. If it doesn't,
+you will get compilation error like following:
+
+  No such class field "namae" in variable $cat of type main::Cat
+
+
+Interestingly, above story tells nothing about the value of C<$CAT::FIELDS{name}>.
 Actually, the values are only used in fields.pm to achieve
 single inheritance restriction. Perl's core itself
 does not care its content.
 
 I think this means we are able to write our own alternative to C<fields.pm>
-using C<%FIELDS>, at our risks. So, let start experiment!
+using C<%FIELDS>, B<at our own risks>.
+So, let's start experimenting!
 
 =head1 (Proposed) Modern use of fields and strict.
 
 Based on the above discussion, here I propose alternative style use
 of fields (actually C<%FIELDS>) to obtain more typo checking at compile time
-like use strict. I hope this is can be incorporated into your coding
-effortlessly.
+like use strict. In short:
 
-=head2 Divide and conquer.
+=over 4
+
+=item * Limited use of direct field access for method implementations.
+
+=item * my MY $obj is enough short.
+
+=item * generate accessors from C<%FIELDS> and have generic constructor.
+
+=back
+
+=head2 Private use of direct field access.
+X<direct-field-access>
 
 First, we should divide and conquer our problem.
-In this case, I want to divide it between "border of encapsulation".
+In this case, I want to divide it over the boundary of encapsulation.
+That is B<"public interfaces"> and B<"private implementations">.
 
-In outside of class definition (which means user side of the class),
-direct access to field is non-sence. But in class definition,
-it doesn't matter. So, use fields for internal codes.
+To isolate the private implementations from the public interfaces,
+we must use some kind of accessor (and constructor) subs anyway.
 
-   my $foo = new Foo(width => 8, height => 3);
-   $foo->{width} * $foo->{height};  # Evil!
+Having such public interfaces,
+use of direct HASH member access in each method implementations
+no more harms public interface. It is totally internal matter.
 
+
+   # Direct HASH access from user code is evil.
+   package main;
+   my $foo = Foo->new(...);
+   print $foo->{width} * $foo->{height}; # The evils.
+
+   # In implementation code, direct HASH access has no problem.
    package Foo {
      use fields qw/width height/;
      sub area {
        my Foo $self = shift;
-       $self->{width} * $self->{height};  # No problem.
+       $self->{width} * $self->{height};
      }
    };
+   # Users of `Foo->area` doesn't care
+   # whether it is direct access or accessor call.
+   print $foo->area;
+
+For example, suppose you once provided an accessor method C<width()>
+and later want to add a read-logging for it,
+you can rename the field C<width> to C<_width>
+and change accessor C<width()> to provide the logging.
+This change is totally invisible to class users.
+
+Also note when you change the field C<width> to C<_width>,
+perl will tell you which line should be changed compile-time!
 
 =head2 C<my MY $obj>
 X<MY> X<MY-alias>
 
-Secondly, I propose shorthand name C<MY> as
+Second, I propose shorthand name C<MY> as
 default L<type alias|/TYPENAME-alias>. Then every method argument declaration
-starts like C<(my MY $self, ...) = @_>. This will be short enough
-to adapt, especially if you are already familiar with C<use strict>
-(its only 3 chars addition!).
-To define this alias, just write C<sub MY () {__PACKAGE__}> at beginning of
-your packages.
+starts like C<(my MY $self, ...) = @_>. I hope this will be short enough
+style change to adapt, especially if you are already familiar with C<my>
+(it's only 3 chars increase!).
+To define this alias, just write C<sub MY () {__PACKAGE__}> at the beginning of
+your package.
 
   package MyApp::Model::Company::LongLongProductName {
-    sub MY () {__PACKAGE__};
+    sub MY () {__PACKAGE__}; # This!
     use fields qw/price/;
 
     sub add_price {
@@ -267,28 +319,44 @@ your packages.
     }
   };
 
-I propose this is because good naming is not so easy.
-And having compile-time checking should be achieved
-earlier than you finally have an good naming (I think!).
-Of course if you have an good naming and it is stable
-(will not be changed for enough long time), use it instead.
+I propose this because IMHO spending time for a shorthand type name of
+merely C<$self> doesn't make sense and
+having compile-time checking for C<$self> is far more important than it.
+(Do you really want to change variable name of the C<$self>
+for every classes? Life is short, isn't it?)
 
-=head2 C<configure> + accessor generator
-X<configure> X<Tk-style-configure>
+Of course if you already reached a good type-alias naming for your current code,
+just use it. This tip is about time-saving.
 
-For about accessors, let's generate it from fields specifications.
-And to have better support for accessor generation, we also need base class
-to hold consistent constructor.
+=head2 accessor generator + generic constructor
+X<accessor-generator> X<configure> X<Tk-style-configure>
 
-Describing such implementation is out of scope of this document.
-Instead I will sketch about one design outline which I frequently used
-for over a decade. It is rooted in L<"PerlE<sol>Tk"|Tk::options>
-and tcl/tk widet API.
+Third, let's generate accessors from C<%FIELDS>. As noted before,
+compile-time field checking doesn't rely on the value of
+C<$FIELDS{$field_name}>. So we can put our nice field specifications
+(like I<readonly>, I<default value>, I<type> ...) there, at own risks;-).
 
-   # User code. (no fields check)
+Also, to make our accessors really useful, we should also provide
+a base constructor which is designed to work well with the accessors.
+Because accessors are about object states(fields/properties/attributes...)
+and constructor defines initial state of the object.
+
+In this document, I will show you a tiny getter generator,
+a base updater method (named C<configure>) and a base constructor.
+It is rooted in L<"PerlE<sol>Tk"|Tk::options> and tcl/tk widget API.
+Such object is used like followings:
+
+   # key => value list
    my $obj = Foo->new(width => 8, height => 3);
 
+   # HASH is ok too.
+   $obj = Foo->new({width => 8, height => 3});
+
+Once object is created, its properties(fields) are fetched by name.
+
    print $obj->width * $obj->height; # => 24
+
+To update its properties, invoke C<configure> with key-value pair list.
 
    $obj->configure(height => 3, width => 3);
 
@@ -296,12 +364,13 @@ and tcl/tk widet API.
 
 =over 4
 
-=item * public members start with C<[A-Za-z]>. Others are private.
+=item * Getters are generated only for fields which have name starting
+with C<[A-Za-z]>. Other fields are private.
 
 =item * In this style, I generate only getters from fields declaration.
 
-=item * If you want to write complex getter, name your private field
-starting with '_'.
+=item * If you want to have complex getter, change the field name
+starting with '_' and write down your getter by hand.
 
    sub dbh {
      (my Foo $foo) = @_;
@@ -310,7 +379,7 @@ starting with '_'.
      };
    }
 
-=item * For setters, I define general purpose setter C<configure> in base class.
+=item * For updating, I define general purpose updater C<configure> in base class.
 And it eventually calls C<onconfigure_...> hooks if it exists.
 
    sub onconfigure_file {
@@ -318,11 +387,13 @@ And it eventually calls C<onconfigure_...> hooks if it exists.
      $foo->{string} = read_file($fn);
    }
 
-=item * To set default values, define and call hook like C<after_new>
-(there would be better name though).
+=item * To set default values,
+define C<after_new> in your class.
+(There would be better name though :-<).
 
    sub after_new {
      (my Foo $foo) = @_;
+     $foo->SUPER::after_new();
      $foo->{name}       //= "(A cat not yet named)";
      $foo->{birth_year} //= $foo->default_birth_year;
    }
@@ -332,12 +403,13 @@ And it eventually calls C<onconfigure_...> hooks if it exists.
 
 =back
 
-Here is a sample implementation of above.
+Here is a sample implementation of above behavior.
 
-Note: below doesn't care about subclassing. For real work,
-please consult internal of L<MOP4Import::Declare>
-and L<MOP4Import::Base::Configure>.
-
+Note: below doesn't care about subclassing.
+To achieve it, you must merge C<%FIELDS> from base class.
+Easiest way to do it is using L<base>. 
+Alternatively, you may implement some kind of equiv of
+L<MOP4Import::Declare/declare_as_base>.
 
     use strict;
     use 5.009;

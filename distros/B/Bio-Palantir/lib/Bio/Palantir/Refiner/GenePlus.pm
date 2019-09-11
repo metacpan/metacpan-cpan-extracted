@@ -1,6 +1,6 @@
 package Bio::Palantir::Refiner::GenePlus;
 # ABSTRACT: Refiner internal class for handling GenePlus objects
-$Bio::Palantir::Refiner::GenePlus::VERSION = '0.192240';
+$Bio::Palantir::Refiner::GenePlus::VERSION = '0.192540';
 use Moose;
 use namespace::autoclean;
 
@@ -119,7 +119,7 @@ sub _build_exp_domains {
     my ($seq) = $self->protein_sequence; 
     my $gene_pos = 0;
 
-    my @domains = $self->detect_domains($seq, $gene_pos);
+    my @domains = $self->detect_domains($seq, $gene_pos, undef, 1);
       
     unless (@domains) {
         return [];
@@ -140,7 +140,7 @@ sub BUILD {
         my ($seq) = $self->protein_sequence; 
         my $gene_pos = 0;
 
-        my @domains = $self->detect_domains($seq, $gene_pos);
+        my @domains = $self->detect_domains($seq, $gene_pos, undef, 1);
 
         unless (@domains) {
             return;
@@ -274,7 +274,7 @@ Bio::Palantir::Refiner::GenePlus - Refiner internal class for handling GenePlus 
 
 =head1 VERSION
 
-version 0.192240
+version 0.192540
 
 =head1 SYNOPSIS
 

@@ -103,7 +103,7 @@ already include the necessary logic (i.e., [Net::SSLeay](https://metacpan.org/po
 
 # ERROR HANDLING
 
-All thrown exceptions are instances of [Net::ACME2::X::Base](https://metacpan.org/pod/Net::ACME2::X::Base).
+All thrown exceptions are instances of [Net::ACME2::X::Generic](https://metacpan.org/pod/Net::ACME2::X::Generic).
 Specific error classes aren’t yet defined.
 
 # CRYPTOGRAPHY & SPEED

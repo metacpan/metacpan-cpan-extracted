@@ -1,9 +1,21 @@
 #---------------------------------------------------------------------
-# $Header: /Perl/OlleDB/t/6_paramsql.t 22    18-04-13 17:23 Sommar $
+# $Header: /Perl/OlleDB/t/6_paramsql.t 24    19-07-08 22:13 Sommar $
 #
 # This test suite concerns sql with parameterised SQL statements.
 #
 # $History: 6_paramsql.t $
+# 
+# *****************  Version 24  *****************
+# User: Sommar       Date: 19-07-08   Time: 22:13
+# Updated in $/Perl/OlleDB/t
+# Need to skip tests with varchar(MAX) or without length for UTF-8 and
+# SQLOLEDB, since this causes a crash/hang.
+# 
+# *****************  Version 23  *****************
+# User: Sommar       Date: 19-07-05   Time: 22:09
+# Updated in $/Perl/OlleDB/t
+# Test XML with ISO-8859-1 only if code pages is 1252, since else test is
+# not valid.
 # 
 # *****************  Version 22  *****************
 # User: Sommar       Date: 18-04-13   Time: 17:23
@@ -154,6 +166,7 @@ my $X = testsqllogin();
 #$X->{LogHandle} = \*F;
 
 my ($sqlver) = split(/\./, $X->{SQL_version});
+my $codepage = $X->{codepages}{$X->{CurrentDB}};
 
 # Create alias types. First set up a stored procedure for the task.
 if ($sqlver >= 9) {
@@ -1162,7 +1175,9 @@ if (1) {
 
 #----------------------------- char/varchar --------------------------
 blurb("char/varchar");
-if (1) {
+unless ($codepage == 65001 and $X->{Provider} == PROVIDER_SQLOLEDB) {
+# Must skip tests with varchar(8000) with UTF-8 and SQLOLEDB due to bug 
+# in SQL Server/SQLOLEDB.
    my $expect = {'a' => "x'zx''z ", 'b' => "0xABCDEF  0xABCDEF",
                  'c' => "0xAB0xAB"};
    my $result = $X->sql_one('SELECT a = ? + ?, b = ? + ?, c = ? + ?',
@@ -1174,9 +1189,13 @@ if (1) {
                             ['char(4 )', '0xABCDEF']], HASH);
    push (@testres, compare($expect, $result));
 }
+else  {
+   push (@testres, 'skip, UTF8 (var)char > 4000 does not work with SQLOLEDB');
+}
+
 
 blurb("named char/varchar");
-if (1) {
+unless ($codepage == 65001 and $X->{Provider} == PROVIDER_SQLOLEDB) {
    my $expect = {'a' => "x''z 0xABCDEF", 'b' => "0xABCDEF  x''z ",
                  'c' => "0xABCDEF0xABCDEF  "};
    my $result = $X->sql_one(
@@ -1186,9 +1205,12 @@ if (1) {
                   '@v3' => ['varchar( 10)', '0xABCDEF']}, HASH);
    push (@testres, compare($expect, $result));
 }
+else {
+   push (@testres, 'skip, UTF8 (var)char > 4000 does not work with SQLOLEDB');
+}
 
 blurb("char/varchar OUTPUT");
-if (1) {
+unless ($codepage == 65001 and $X->{Provider} == PROVIDER_SQLOLEDB) {
    my $expect = ["x'zx''z ", "0xABCDEF  0xABCDEF", "0xAB0xAB  "];
    my ($a, $b, $c);
    $c = '1234567890';
@@ -1204,9 +1226,13 @@ if (1) {
             '@c'  => ['char',         \$c]});
    push (@testres, compare($expect, [$a, $b, $c]));
 }
+else {
+   push (@testres, 'skip, UTF8 (var)char > 4000 does not work with SQLOLEDB');
+}
+
 
 blurb("too long varchar");
-if (1) {
+unless ($codepage == 65001 and $X->{Provider} == PROVIDER_SQLOLEDB) {
    my $expect;
    if ($sqlver <= 8) {
       $expect = {'a' => 'HELLO DOLLY! ' x 615 . 'HELLO'};
@@ -1218,9 +1244,13 @@ if (1) {
                             [['varchar',  'Hello Dolly! ' x 1854]], HASH);
    push (@testres, compare($expect, $result));
 }
+else {
+   push (@testres, 'skip, UTF8 (var)char > 4000 does not work with SQLOLEDB');
+}
+
 
 blurb("too long varchar OUTPUT");
-if (1) {
+unless ($codepage == 65001 and $X->{Provider} == PROVIDER_SQLOLEDB) {
    my $expect;
    if ($sqlver <= 8 or $X->{Provider} == PROVIDER_SQLOLEDB) {
       $expect = 'HELLO DOLLY! ' x 615 . 'HELLO';
@@ -1232,9 +1262,12 @@ if (1) {
    $X->sql('SELECT @a = upper(@a)', {a=> ['varchar',  \$a]});
    push (@testres, compare($expect, $a));
 }
+else {
+   push (@testres, 'skip, UTF8 (var)char > 4000 does not work with SQLOLEDB');
+}
 
 blurb("too long char");
-if (1) {
+unless ($codepage == 65001 and $X->{Provider} == PROVIDER_SQLOLEDB) {
    my $expect = {'a' => 'HELLO DOLLY! ' x 615 . 'HELLO'};
    my $result = $X->sql_one('SELECT a = upper(?)',
                  [['char',  'Hello Dolly! ' x 1854]], HASH);
@@ -1242,23 +1275,31 @@ if (1) {
 }
 
 blurb("too long char OUTPUT");
-if (1) {
+unless ($codepage == 65001 and $X->{Provider} == PROVIDER_SQLOLEDB) {
    my $expect = 'HELLO DOLLY! ' x 615 . 'HELLO';
    my $a = 'Hello Dolly! ' x 1854;
    $X->sql('SELECT @a = upper(@a)', {a => ['char', \$a]});
    push (@testres, compare($expect, $a));
 }
+else {
+   push (@testres, 'skip, UTF8 (var)char > 4000 does not work with SQLOLEDB');
+}
 
 
 blurb("varchar(MAX)");
 if ($sqlver >= 9) {
-   my $expect = {'a' => 'HELLO DOLLY! ' x 1854,
-                 'b' => "21 PA\x{0179}DZIERNIKA 2004 " x 1711};
-   my $result = $X->sql_one('SELECT a = upper(?), b = upper(?)',
-                  [['varchar(MAX)',  'Hello Dolly! ' x 1854],
-                  ['nvarchar(max)', "21 pa\x{017A}dziernika 2004 " x 1711]],
-                 HASH);
-   push (@testres, compare($expect, $result));
+   unless ($codepage == 65001 and $X->{Provider} == PROVIDER_SQLOLEDB) {
+      my $expect = {'a' => 'HELLO DOLLY! ' x 1854,
+                    'b' => "21 PA\x{0179}DZIERNIKA 2004 " x 1711};
+      my $result = $X->sql_one('SELECT a = upper(?), b = upper(?)',
+                     [['varchar(MAX)',  'Hello Dolly! ' x 1854],
+                     ['nvarchar(max)', "21 pa\x{017A}dziernika 2004 " x 1711]],
+                    HASH);
+      push (@testres, compare($expect, $result));
+   }
+   else {
+      push (@testres, 'skip, UTF8 (var)char > 4000 does not work with SQLOLEDB');
+   }
 }
 else {
    push(@testres, 'skip, MAX types not supported on SQL 2000 and earlier.');
@@ -1266,18 +1307,23 @@ else {
 
 blurb("varchar(MAX) OUTPUT");
 if ($sqlver >= 9) {
-   my $expect = ['HELLO DOLLY! ' x 1854,
-                 "21 PA\x{0179}DZIERNIKA 2004 " x 1711];
-   if ($X->{Provider} == PROVIDER_SQLOLEDB) {
-      $$expect[0] = substr($$expect[0], 0, 8000);
-      $$expect[1] = substr($$expect[1], 0, 4000);
+   unless ($codepage == 65001 and $X->{Provider} == PROVIDER_SQLOLEDB) {
+      my $expect = ['HELLO DOLLY! ' x 1854,
+                    "21 PA\x{0179}DZIERNIKA 2004 " x 1711];
+      if ($X->{Provider} == PROVIDER_SQLOLEDB) {
+         $$expect[0] = substr($$expect[0], 0, 8000);
+         $$expect[1] = substr($$expect[1], 0, 4000);
+      }
+      my $a = 'Hello Dolly! ' x 1854;
+      my $b = "21 pa\x{017A}dziernika 2004 " x 1711;
+      $X->sql('SELECT @a = upper(@a), @b = upper(@b)',
+             { a => ['varchar(MAX)',  \$a],
+               b => ['nvarchar(max)', \$b]});
+      push (@testres, compare($expect, [$a, $b]));
    }
-   my $a = 'Hello Dolly! ' x 1854;
-   my $b = "21 pa\x{017A}dziernika 2004 " x 1711;
-   $X->sql('SELECT @a = upper(@a), @b = upper(@b)',
-          { a => ['varchar(MAX)',  \$a],
-            b => ['nvarchar(max)', \$b]});
-   push (@testres, compare($expect, [$a, $b]));
+   else {
+      push (@testres, 'skip, UTF8 (var)char > 4000 does not work with SQLOLEDB');
+   }
 }
 else {
    push(@testres, 'skip, MAX types not supported on SQL 2000 and earlier.');
@@ -1484,15 +1530,20 @@ else {
 
 blurb("XML with charset decl iso-8859-1 OUTPUT");
 if ($sqlver >= 9 and $X->{Provider} >= PROVIDER_SQLNCLI) {
-   my $xml = '<?xml version="1.0" encoding="iso-8859-1"?>' . "\n" .
-             '<ñandú>' . "Räksmörgås" . '</ñandú>';
-   my $expect = '<ñandú>' . "RäksmörgåsRäksmörgås". '</ñandú>';
-   my $sqltext = <<'SQLEND';
-   SET @a.modify(N'replace value of (/ñandú/text())[1]
-                  with concat((/ñandú/text())[1], "Räksmörgås")');
+   if ($codepage == 1252) {
+      my $xml = '<?xml version="1.0" encoding="iso-8859-1"?>' . "\n" .
+                '<ñandú>' . "Räksmörgås" . '</ñandú>';
+      my $expect = '<ñandú>' . "RäksmörgåsRäksmörgås". '</ñandú>';
+      my $sqltext = <<'SQLEND';
+      SET @a.modify(N'replace value of (/ñandú/text())[1]
+                     with concat((/ñandú/text())[1], "Räksmörgås")');
 SQLEND
-   $X->sql($sqltext, {'@a' => ['xml', \$xml]});
-   push (@testres, compare($expect, $xml));
+      $X->sql($sqltext, {'@a' => ['xml', \$xml]});
+      push (@testres, compare($expect, $xml));
+   }
+   else {
+      push(@testres, 'skip, test does only work with codepage 1252.');
+   }
 }
 else {
    push(@testres, 'skip, XML data type not supported on this platform.');
@@ -1501,16 +1552,21 @@ else {
 
 blurb("XML with charset decl iso-8859-1");
 if ($sqlver >= 9) {
-   my $xml = '<?xml version="1.0" encoding="iso-8859-1"?>' . "\n" .
-             '<ñandú>' . "Räksmörgås" . '</ñandú>';
-   my $expect = '<ñandú>' . "RäksmörgåsRäksmörgås". '</ñandú>';
-   my $sqltext = <<'SQLEND';
-   SET @a.modify(N'replace value of (/ñandú/text())[1]
-                  with concat((/ñandú/text())[1], "Räksmörgås")');
-   SELECT a = @a
+   if ($codepage == 1252) {
+      my $xml = '<?xml version="1.0" encoding="iso-8859-1"?>' . "\n" .
+                '<ñandú>' . "Räksmörgås" . '</ñandú>';
+      my $expect = '<ñandú>' . "RäksmörgåsRäksmörgås". '</ñandú>';
+      my $sqltext = <<'SQLEND';
+      SET @a.modify(N'replace value of (/ñandú/text())[1]
+                     with concat((/ñandú/text())[1], "Räksmörgås")');
+      SELECT a = @a
 SQLEND
-   my $result = $X->sql_one($sqltext, {'@a' => ['xml', $xml]}, SCALAR);
-   push (@testres, compare($expect, $result));
+      my $result = $X->sql_one($sqltext, {'@a' => ['xml', $xml]}, SCALAR);
+      push (@testres, compare($expect, $result));
+   }
+   else {
+      push(@testres, 'skip, test does only work with codepage 1252.');
+   }
 }
 else {
    push(@testres, 'skip, XML data type not supported on this platform.');

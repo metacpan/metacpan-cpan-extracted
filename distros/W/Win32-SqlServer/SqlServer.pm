@@ -1,10 +1,34 @@
 #---------------------------------------------------------------------
-# $Header: /Perl/OlleDB/SqlServer.pm 84    18-04-10 22:22 Sommar $
+# $Header: /Perl/OlleDB/SqlServer.pm 87    19-07-22 10:47 Sommar $
 #
-# Copyright (c) 2004-2018 Erland Sommarskog
+# Copyright (c) 2004-2019 Erland Sommarskog
 #
 #
 # $History: SqlServer.pm $
+# 
+# *****************  Version 87  *****************
+# User: Sommar       Date: 19-07-22   Time: 10:47
+# Updated in $/Perl/OlleDB
+# Only apply the fall back for varchar parameters to UTF-8 collations for
+# output parameters.
+# 
+# *****************  Version 86  *****************
+# User: Sommar       Date: 19-07-16   Time: 11:06
+# Updated in $/Perl/OlleDB
+# Changed the condition when we pass nvarchar to varchar in table
+# variables.
+# 
+# *****************  Version 85  *****************
+# User: Sommar       Date: 19-07-08   Time: 22:51
+# Updated in $/Perl/OlleDB
+# 1) PROVIDER_MSSQLOLEDB is now exported.
+# 2) SQL_version is no longer read with a query, but the XS code get it
+# from internaldata. The FETCH uses XS method to get it.
+# 3) New attribute CurrentDB handled sa SQL_version, and codepages which
+# is a hash with the database codepage. This is one read from the
+# database like SQL_version used to be.
+# 4) Various changes to handle UTF-8 support, not the least with
+# downlevel providers.
 # 
 # *****************  Version 84  *****************
 # User: Sommar       Date: 18-04-10   Time: 22:22
@@ -272,12 +296,12 @@ use Carp;
 use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS
             $def_handle $SQLSEP
             %ALLSYSTEMTYPES
-            %TYPESWITHLENGTH %TYPESWITHFIXLEN %STRINGTYPES %QUOTEDTYPES
+            %TYPESWITHLENGTH %TYPESWITHFIXLEN %PLAINCHARTYPES %QUOTEDTYPES
             %UNICODETYPES %LARGETYPES %CLRTYPES %BINARYTYPES %DECIMALTYPES
             %NEWDATETIMETYPES %MAXTYPES %TYPEINFOTYPES $VERSION);
 
 
-$VERSION = '2.011';
+$VERSION = '2.012';
 
 @ISA = qw(Exporter DynaLoader Tie::StdHash);
 
@@ -296,7 +320,7 @@ bootstrap Win32::SqlServer;
                 RETURN_NEXTROW RETURN_NEXTQUERY RETURN_CANCEL RETURN_ERROR
                 RETURN_ABORT
                 PROVIDER_DEFAULT PROVIDER_SQLOLEDB PROVIDER_SQLNCLI
-                PROVIDER_SQLNCLI10 PROVIDER_SQLNCLI11
+                PROVIDER_SQLNCLI10 PROVIDER_SQLNCLI11 PROVIDER_MSOLEDBSQL
                 DATETIME_HASH DATETIME_ISO DATETIME_REGIONAL DATETIME_FLOAT
                 DATETIME_STRFMT
                 CMDSTATE_INIT CMDSTATE_ENTEREXEC CMDSTATE_NEXTRES
@@ -324,7 +348,7 @@ bootstrap Win32::SqlServer;
                                     RETURN_ERROR RETURN_ABORT)],
                 providers    => [qw(PROVIDER_DEFAULT PROVIDER_SQLOLEDB
                                     PROVIDER_SQLNCLI PROVIDER_SQLNCLI10
-                                    PROVIDER_SQLNCLI11)],
+                                    PROVIDER_SQLNCLI11 PROVIDER_MSOLEDBSQL)],
                 datetime     => [qw(DATETIME_HASH DATETIME_ISO DATETIME_REGIONAL
                                     DATETIME_FLOAT DATETIME_STRFMT)],
                 cmdstates    => [qw(CMDSTATE_INIT CMDSTATE_ENTEREXEC CMDSTATE_NEXTRES
@@ -439,8 +463,7 @@ use constant PACKAGENAME => 'Win32::SqlServer';
 %TYPESWITHLENGTH = ('char' => 1, 'nchar' => 1, 'varchar' => 1, 'nvarchar' => 1,
                     'binary' => 1, 'varbinary' => 1);
 %TYPESWITHFIXLEN = ('char' => 1, 'nchar' => 1, 'binary' => 1);
-%STRINGTYPES     = ('char' => 1, 'varchar' => 1, 'nchar' => 1, 'nvarchar' => 1,
-                    'xml' => 1, 'text'=> 1, 'ntext' => 1);
+%PLAINCHARTYPES  = ('char' => 1, 'varchar' => 1, 'text'=> 1);
 %LARGETYPES      = ('text' => 1, 'ntext' => 1, 'image' => 1, 'xml' => 1);
 %QUOTEDTYPES     = ('char' => 1, 'varchar' => 1, 'nchar' => 1, 'nvarchar' => 1,
                     'text' => 1, 'ntext' => 1, 'uniqueidentifier' => 1,
@@ -467,7 +490,8 @@ my %myattrs;
 use constant XS_ATTRIBUTES =>   # Used by the XS code.
              qw(internaldata Provider PropsDebug AutoConnect RowsAtATime
                 DecimalAsStr DatetimeOption TZOffset BinaryAsStr DateFormat
-                MsecFormat CommandTimeout MsgHandler QueryNotification);
+                MsecFormat CommandTimeout MsgHandler QueryNotification
+                CurrentDB codepages);
 use constant PERL_ATTRIBUTES => # Attributes used by the Perl code.
              qw(ErrInfo SQL_version to_server to_client NoExec procs tables
                 tabletypes usertypes LogHandle UserData);
@@ -488,17 +512,19 @@ sub FETCH {
            $self->olle_croak("Attempt to fetch a non-existing Win32::SqlServer property '$key'");
        }
    }
-   if ($key eq "SQL_version" and not defined $self->{$key}) {
-       # If don't have it, we must retrieve it, and save it. There is a
-       # special routine for this.
-       $self->{SQL_version} = $self->get_sqlserver_version;
-   }
 
-   unless ($key eq 'Provider') {
-      return $self->{$key};
+   # Some attributes come from internaldata.
+   if ($key eq 'SQL_version') {
+      return $self->get_sqlversion;
+   }
+   elsif ($key eq 'CurrentDB') {
+      return $self->get_currentdb;
+   }
+   if ($key eq 'Provider') {
+      return $self->get_provider_enum;
    }
    else {
-      return $self->get_provider_enum;
+      return $self->{$key};
    }
 }
 
@@ -523,6 +549,9 @@ sub STORE {
       else {
          $value = undef;
       }
+   }
+   elsif ($key eq "SQl_version" or $key eq "CurentDB") {
+      $self->olle_croak("The object property '$key' is read-only.\n");
    }
    elsif ($key eq "internaldata" or $key eq "ErrInfo") {
       if ($old_value) {
@@ -563,12 +592,11 @@ sub STORE {
 }
 
 sub DELETE {
-   # Generally it is not permitted to delete keys from the hash, but there
-   # is an exception for SQL_version, since the XS version needs to clear it,
-   # but for some reason is not permitted to write to the hash... Also,
-   # to_server and to_client are deleted by sql_unset_conversion.
+   # Generally it is not permitted to delete keys from the hash, but 
+   # to_client/to_server are exceptions as they are created and deleted
+   # by sql_(un)set_conversion.
    my ($self, $key) = @_;
-   if (not grep($_ eq $key, qw(SQL_version to_server to_client))) {
+   if (not grep($_ eq $key, qw(to_server to_client))) {
       $self->olle_croak ("Attempt to delete the object property '$key'");
    }
    $self->{$key} = undef;
@@ -668,8 +696,8 @@ sub sql_init {
        croak("Login into SQL Server failed");
     }
 
-    # Get SQL version.
-    $X->{SQL_version} = $X->get_sqlserver_version();
+    # Get the code page for the current database.
+    $X->get_db_codepage();
 
     # If the global default handle is undefined, give the recently created
     # connection.
@@ -1325,8 +1353,19 @@ SQLEND
        # is a special path. We cannot convert the typeinfo until now, because
        # we must pass the unconverted value to do_table_param.
        unless ($istbltype) {
-          $X->enterparameter($type, $maxlen, $name, $is_input, $is_output,
-                             $value, $precision, $scale, $typeinfo);
+          unless ($PLAINCHARTYPES{$type} and $is_output and
+                  $X->{Provider} < PROVIDER_MSOLEDBSQL and
+                  $X->{codepages}{$X->{CurrentDB}} == 65001) {
+             $X->enterparameter($type, $maxlen, $name, $is_input, $is_output,
+                                $value, $precision, $scale, $typeinfo);
+          }
+          else {
+             # For UTF_8 databases, enter char/varchar as Unicode types when we
+             # have a legacy provider.
+             my $nlen = ($maxlen <= 4000 ? $maxlen : -1);
+             $X->enterparameter("n$type", $nlen, $name, $is_input, $is_output,
+                                $value, $precision, $scale, $typeinfo);
+          }
        }
        else {
           my $ret = $X->do_table_parameter($name, $typeinfo, $tabledef, $value);
@@ -2225,7 +2264,7 @@ sub setup_sqlcmd {
 
                # Handle overlong strings.
                if ($length > $maxlen) {
-                  if ($X->{SQL_version} =~ /^[678]\./) {
+                  if ($X->{SQL_version} =~ /^8\./) {
                      $length = $maxlen;
                   }
                   else {
@@ -2242,7 +2281,7 @@ sub setup_sqlcmd {
                # But on SQL 2005 and later, we should use the MAX types
                # where applicable.
                if (defined $value and $valuelen > $maxlen and
-                   $MAXTYPES{$typename} and $X->{SQL_version} !~ /^[678]\./) {
+                   $MAXTYPES{$typename} and $X->{SQL_version} !~ /^8\./) {
                   $length = -1;
                }
             }
@@ -2337,9 +2376,20 @@ sub setup_sqlcmd {
       $X->do_conversion('to_server', $typestring);
       $X->do_conversion('to_server', $typeinfo);
 
-      # And save the parameter.
-      push(@parameters, [$typename, $length, $parname, 1, $isoutput, 
-                         $value, $precision, $scale, $typeinfo]);
+      # And save the parameter. There is a special case for UTF-8 data
+      # databases and older providers. Here we specify (var)char as Unicode
+      # types.
+      unless ($PLAINCHARTYPES{$typename} and
+              $X->{Provider} < PROVIDER_MSOLEDBSQL and
+              $X->{codepages}{$X->{CurrentDB}} == 65001) {
+         push(@parameters, [$typename, $length, $parname, 1, $isoutput, 
+                            $value, $precision, $scale, $typeinfo]);
+      }
+      else {
+         my $nlength = ($length <= 4000 ? $length : -1);
+         push(@parameters, ["n$typename", $nlength, $parname, 1, $isoutput, 
+                            $value, $precision, $scale, $typeinfo]);
+      }
 
       # Add to the parameter declaration.
       $paramdecls .= (defined $paramdecls ? ", " : '') .
@@ -2377,8 +2427,8 @@ sub setup_sqlcmd {
    $X->initbatch($executesql);
 
    # Enter parameter for the statement. On SQL 2005, we can use
-   # nvarchar(max), but not SQL7/2000 we have to resort to ntext.
-   my $stmtdtype = ($X->{SQL_version} =~ /^[78]\./ ? 'ntext' : 'nvarchar');
+   # nvarchar(max), but not SQL 2000 we have to resort to ntext.
+   my $stmtdtype = ($X->{SQL_version} =~ /^[8]\./ ? 'ntext' : 'nvarchar');
    $X->enterparameter($stmtdtype, -1, '@stmt', 1, 0, $sql);
 
    # Enter the parameter for parameter list.
@@ -2576,7 +2626,8 @@ sub get_table_type_info {
                    THEN  coalesce(nullif(@typedb, ''),
                                   quotename(db_name())) + '.' +
                          quotename(s2.name) + '.' + quotename(x.name)
-              END
+              END,
+              codepage = collationproperty(c.collation_name, 'Codepage')
        FROM   sys.table_types tt
        JOIN   sys.schemas s0 ON tt.schema_id = s0.schema_id
        JOIN   sys.all_columns c ON tt.type_table_object_id = c.object_id
@@ -2656,6 +2707,7 @@ sub do_table_parameter {
        my $scale        = $coldef->{'scale'};
        my $needsdefault = $coldef->{'needsdefault'};
        my $typeinfo     = $coldef->{'typeinfo'};
+       my $codepage     = $coldef->{'codepage'};
 
        # Set max length for some types where the query does not give the best
        # fit.
@@ -2665,6 +2717,23 @@ sub do_table_parameter {
        elsif ($UNICODETYPES{$coltype} and $maxlen > 0) {
           $maxlen = $maxlen / 2;
        }
+
+       # In many cases we want to send (var)char is n(var)chardata
+       # to avoid unwanted character conversion which happens on 
+       # two levels. 1) AutoTranslate is always on for TVPs, it seems
+       # 2) Conversion to the DB collation. So only if column collation
+       # and the DB collation is the ANSI code page, we can send things 
+       # the regular way.
+       if ($coltype =~ /^(var)?char$/ and 
+           ($codepage != GetACP() or 
+            $codepage != $X->{codepages}{$X->{CurrentDB}})) {
+          $coltype = "n$coltype";
+          if ($maxlen > 4000) {
+             $coltype = 'nvarchar';
+             $maxlen = -1;
+          }
+       }   
+
 
        # Precision and scale should be set only for some types
        undef $precision unless $DECIMALTYPES{$coltype};
@@ -2732,45 +2801,50 @@ sub do_table_parameter {
 }
 
 
-#---------------------- get_sqlserver_version -------------------------
-# Retieves the SQL Server version. Since this routine may be called from
-# FETCH, we have to tread carefully, and not call code were may happen to
-# look at SQL_version!
-sub get_sqlserver_version {
+#---------------------- get_db_codepage -------------------------
+# Retrieves the code page for the current database if needed. This 
+# procedure is called from the C++ code, which is why we use the 
+# mid-level interface directly.
+sub get_db_codepage {
     my($self) = @_;
 
-    my ($exec_ok, $sqlver);
+    my ($exec_ok, $currentdb, $codepage);
 
-    # Use xp_msver if possible, but it is not present in Azure SQL Database.
-    # Note that we denote it with master.dbo so that it works on SQL 7.
-    # We need to embed calls in EXEC to avoid compilation errors.
-    $self->initbatch(<<'SQLEND');
-       IF object_id('master.dbo.xp_msver') IS NOT NULL
-          EXEC('EXEC master.dbo.xp_msver ''ProductVersion''')
-       ELSE
-          EXEC('SELECT serverproperty(''ProductVersion'') AS Character_Value')
+    $currentdb = $self->{CurrentDB};
+    if (not defined $currentdb) {
+       $self->olle_croak("Internal error: when entering get_db_codepage, CurrentDB is not defined.");
+    }
+
+    # If we already know the code page for this database, we can quit.
+    return if exists $self->{codepages}{$currentdb};
+
+    # Else, we run this query to get the codepage for the current database. 
+    $self->initbatch(<<'SQLEND', 1);
+        SELECT collationproperty(convert(nvarchar(128), 
+                                     databasepropertyex(db_name(), 'Collation')), 
+                                 'Codepage') AS Codepage
 SQLEND
     $exec_ok = $self->executebatch();
-    $self->olle_croak("Could not retrieve SQL Server version.\n")
-        if not $exec_ok;
+    if (not $exec_ok) {
+        $self->olle_croak("Failed to retrieve the code page.\n");
+    }
+
     while ($self->nextresultset()) {
        my $hashref;
        if ($self->nextrow($hashref, undef)) {
-          $sqlver = $$hashref{'Character_Value'};
+           $codepage  = $$hashref{'Codepage'};
        }
-       last if $sqlver;
+       last if defined $codepage;
     }
-    if (not $sqlver) {
-       $self->olle_croak("Could not retrieve SQL Server version.\n");
+    if (not defined $codepage) {
+       $self->olle_croak("Could not retrieve the code page for the current database\n");
     }
     $self->cancelbatch();
 
-    if ($sqlver =~ /^[46]\./) {
-       $self->olle_croak("Win32::SqlServer does not support connections to version $sqlver of SQL Server.\n");
-    }
-
-    return $sqlver;
+    # Save the value.
+    $self->{codepages}{$currentdb} = $codepage;
 }
+
 
 #------------------- get_object_id, internal ---------------------------
 sub get_object_id {
@@ -2982,7 +3056,7 @@ sub do_result_sets {
        }
 
        # If multiset requested advance index
-       $ix++ if $ismultiset
+       $ix++ if $ismultiset;
     }
 
     if ($is_callback) {

@@ -10,7 +10,7 @@
 # ABSTRACT: Search the configuration of an application
 
 package App::Cme::Command::search ;
-$App::Cme::Command::search::VERSION = '1.029';
+$App::Cme::Command::search::VERSION = '1.030';
 use strict;
 use warnings;
 use 5.10.1;
@@ -85,7 +85,7 @@ App::Cme::Command::search - Search the configuration of an application
 
 =head1 VERSION
 
-version 1.029
+version 1.030
 
 =head1 SYNOPSIS
 

@@ -1,12 +1,17 @@
 /*---------------------------------------------------------------------
- $Header: /Perl/OlleDB/datetime.cpp 8     16-07-15 22:00 Sommar $
+ $Header: /Perl/OlleDB/datetime.cpp 9     19-07-08 22:36 Sommar $
 
   All routines converting between Perl values and the datetime data types
   in SQL Server.
 
-  Copyright (c) 2004-2016   Erland Sommarskog
+  Copyright (c) 2004-2019   Erland Sommarskog
 
   $History: datetime.cpp $
+ * 
+ * *****************  Version 9  *****************
+ * User: Sommar       Date: 19-07-08   Time: 22:36
+ * Updated in $/Perl/OlleDB
+ * The SQL version is now in internaldata.
  * 
  * *****************  Version 8  *****************
  * User: Sommar       Date: 16-07-15   Time: 22:00
@@ -738,13 +743,16 @@ BOOL SV_to_ssvariant_datetime(SV          * sv,
                               SV          * olle_ptr,
                               provider_enum provider)
 {
+   internaldata * mydata = get_internaldata(olle_ptr);
+
    // Get the value as a DBTIMESTAMPOFFSET, and which fields that actually was there.
    DBTIMESTAMPOFFSET dtoffset = default_dtoffset();
    BOOL              ispresent[no_of_datetime_keys];
 
    if (HV_to_datetimetypes(sv, DBTYPE_SQLVARIANT, dtoffset, ispresent,
                            olle_ptr)) {
-      if (provider >= provider_sqlncli10 && OptSqlVersion(olle_ptr) >= 10) {
+      if (provider >= provider_sqlncli10 && 
+          mydata->majorsqlversion >= 10) {
       // If we have SQL 2008 and SQL Native Client 10, then we have the
       // full range of data types available.
          if (! validate_dtoffset(dtoffset, olle_ptr, 1, 9999, 7)) {

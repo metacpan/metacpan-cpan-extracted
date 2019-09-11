@@ -45,6 +45,7 @@ t/8_columninfo.t                Testing data-type information from getcolumninfo
 t/9_loginproperties.t           Test of login properties.
 t/A_tableparam.t                Test of table-valued parameters.
 t/B_filestream.t                Test for OpenSqlFileStream.
+t/C_character.t                 Extra tests for varchar data.
 t/Y_rowsetprops.t               Test of CommandTimeout and Query Notification.
 t/Z_threads.t                   Test with Perl threads.
 t/testsqllogin.pl               Common login module for the test scripts.
@@ -59,7 +60,8 @@ t/Helpers/spatial.data.10       Test data for spatial queries for SQL 2008.
 t/Helpers/spatial.data.11       Test data for spatial queries for SQL 2012.
 t/Helpers/spatial.data.12       Test data for spatial queries for SQL 2014.
 t/Helpers/spatial.data.13       Test data for spatial queries for SQL 2016.
-t/Helpers/spatial.data.14       Test data for spatial queries for SQL 2017
+t/Helpers/spatial.data.14       Test data for spatial queries for SQL 2017.
+t/Helpers/spatial.data.15       Test data for spatial queries for SQL 2019.
 t/Helpers/spatial.queries       Queries to genereate spatial.data
 t/Helpers/udt_create.sql        SQL script to create the assemblies from DLLs.
 t/Helpers/Utf8String.cs         Source code for CLR UDT.

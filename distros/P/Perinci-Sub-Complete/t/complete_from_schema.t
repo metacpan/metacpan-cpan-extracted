@@ -173,7 +173,7 @@ subtest any => sub {
     $sch = [any => {of => [ [str => in=>["1a"]], [int => min=>-2, max=>7] ]}];
     is_deeply(complete_from_schema(schema=>$sch, word=>''),
               {words=>[map { +{word=>$_, summary=>undef} }
-                           qw/-1 -2 0 1 1a 2 3 4 5 6 7/], static=>1});
+                           qw/1a -1 -2 0 1 2 3 4 5 6 7/], static=>1});
 
     $sch = [any => {of => [ [str => in=>["1a"]], ["code"] ]}];
     is_deeply(complete_from_schema(schema=>$sch, word=>''),

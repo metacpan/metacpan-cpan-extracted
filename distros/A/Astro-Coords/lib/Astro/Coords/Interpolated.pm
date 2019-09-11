@@ -25,7 +25,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use base qw/ Astro::Coords /;
 
@@ -67,13 +67,15 @@ sub new {
     return undef unless exists $args{$_};
   }
 
+  my ($unit_c1, $unit_c2) = (ref $args{'units'}) ? @{$args{'units'}} : ($args{'units'}) x 2;
+
   # Convert input args to objects
-  $args{ra1} = new Astro::Coords::Angle::Hour($args{ra1}, units => $args{units},
+  $args{ra1} = new Astro::Coords::Angle::Hour($args{ra1}, units => $unit_c1,
 					      range => '2PI' );
-  $args{dec1} = new Astro::Coords::Angle($args{dec1}, units => $args{units} );
-  $args{ra2} = new Astro::Coords::Angle::Hour($args{ra2}, units => $args{units},
+  $args{dec1} = new Astro::Coords::Angle($args{dec1}, units => $unit_c2 );
+  $args{ra2} = new Astro::Coords::Angle::Hour($args{ra2}, units => $unit_c1,
 					      range => '2PI' );
-  $args{dec2} = new Astro::Coords::Angle($args{dec2}, units => $args{units} );
+  $args{dec2} = new Astro::Coords::Angle($args{dec2}, units => $unit_c2 );
 
   return bless \%args, $class;
 

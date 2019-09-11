@@ -8,7 +8,7 @@ use_ok 'Music::ToRoman';
 
 diag 'D# chords';
 
-my $mtr = Music::ToRoman->new( scale_note => 'D#' ,verbose=>1);
+my $mtr = Music::ToRoman->new( scale_note => 'D#' );
 isa_ok $mtr, 'Music::ToRoman';
 
 is $mtr->parse('D#'), 'I', 'I';

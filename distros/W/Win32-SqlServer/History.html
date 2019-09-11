@@ -13,6 +13,41 @@
 <CENTER>
 <H1>History Win32::SqlServer</H1>
 </CENTER>
+<H3>2019-07-22 &#8211; 2.012</H3>
+<P><B>Beware</B>: the name of the install script has changed. It is now called Win32-SqlServer-install.pl (and not activeperl-copy.pl). Apart from the name change, you run it as in earlier versions.</P>
+<UL>
+  <LI><B>Changes in platform support:</B>
+<UL>
+      <LI>SQL 7 no longer supported (as announced previously).</LI>
+      <LI>Perl 5.18 no longer supported.</LI>
+      <LI>Binaries are available for Perl 5.20, 5.22, 5.24, 5.26, 5.28 and 5.30. With the release of Win32::SqlServer 2.011, I committed myself to support five Perl versions, but I saw on <A HREF="https://www.cpan.org/src/README.html" TARGET="_blank">https://www.cpan.org/src/README.htm</A>l that they have 5.20 as the oldest supported version, so I decided to align with that for this time. My commitment is still only five versions.</LI>
+      <LI>Since ActiveState now requires a regisration for ActivePerl, I am no longer testing with their builds, but I only test with Strawberry Perl. I still expect the binaries to work with ActivePerl. Please let me know if you run into problems.</LI>
+      <LI>If you are using the new MSOLEDBSQL provider, you are adviced to make sure that you have at least version 18.2.1 of the provider. I have only tested with this version, and Microsoft have made some enhancements for UTF-8 collations which I assume are missing from earlier versions of this provider.</LI>
+    </UL>
+  </LI>
+  <LI><B>Feature enhancements</B>:
+<UL>
+      <LI>I have changed how I send and receive <B><CODE>char</CODE></B> and <CODE><B>varchar</B></CODE> data. Previously, I would always coerce data into the ANSI code page of the client. This meant if you wanted to insert the value <I>αβγ</I> into a <B><CODE>varchar</CODE></B> column in a database with a Greek collation, you had to pass the value as <B><CODE>nvarchar</CODE></B>, or else the value would be converted to <I>aß?</I> and the same would happen if you retrieved the value αβγ from a <B><CODE>varchar</CODE></B> column with a Greek collation.  The introduction of UTF-8 collations in SQL 2019 made this arrangement untenable, and when sending <B><CODE>(var)char</CODE></B> data to SQL Server, I convert the data to the code page of the collation of the current database. When receiving data, I receive the data as <B><CODE>nvarchar</CODE></B> to ensure that there is no undesired code conversion. See further the section <I><A HREF="Win32-SqlServer.html#char">char, varchar and text</A></I> in the manual.<BR>
+  &nbsp;&nbsp;&nbsp;Beware that these enchancements has lead to a few breaking changes, as detailed below.</LI>
+      <LI>New object property <A HREF="Win32-SqlServer.html#CurrentDB">CurrentDB</A> which holds the value of the current database. This is a read-only property which is updated automatically if you change the current database with the USE statement.</LI>
+      <LI>New object property <A HREF="Win32-SqlServer.html#codepages">codepages</A>. This is a hashed keyed by database name and holds the code page for databases visited by your Perl script. This is a cache that Win32::SqlServer maintains.</LI>
+      <LI>For some reason, the constant PROVIDER_MSOLEDBSQL was not exported from Win32::SqlServer. This has been corrected.</LI>
+    </UL>
+  </LI>
+  <LI><B>Breaking changes:</B>
+<UL>
+      <LI>The login property <A HREF="Win32-SqlServer.html#Autotranslate">Autotranslate</A> is now deprecated and any attempt to set it is not honoured but results in a warning. This property is ON by default with the OLE DB provider, but Win32::SqlServer forces this setting to OFF, and performs all character conversion itself in order to implement the improvements for <B><CODE>(var)char</CODE></B> data. Likewise, if you supply the keyword <I>AutoTranslate</I> (or <I>Auto Translate</I>) with the <A HREF="Win32-SqlServer.html#ConnectionString">ConnectionString</A> property, Win32::SqlServer trumps your setting. <BR>
+      &nbsp;&nbsp;&nbsp;I plan to remove Autotranslate as a login property iu a later version of Win32::SqlServer.</LI>
+      <LI>The format of the property <A HREF="Win32-SqlServer.html#SQL_version">SQL_version</A> has changed. Previously, I got the value from <CODE>serverproperty('ProductVersion')</CODE>, but I now get it from the OLE DB provider which only returns three parts, and always has two digits for the second part. That is, what previously was returned as <CODE>14.0.3192.2</CODE> is now returned as <CODE>14.00.3192</CODE>.</LI>
+      <LI>You must now be connected when you call <A HREF="Win32-SqlServer.html#initbatch" CLASS="nowrap">initbatch()</A> and if you use <A HREF="Win32-SqlServer.html#AutoConnect">AutoConnect</A>, connection happens in <A HREF="Win32-SqlServer.html#initbatch" CLASS="nowrap">initbatch()</A>. (This is because it is at this point Win32::SqlServer may have to call SQL Server to get the code page of the current database.)</LI>
+      <LI>There is an issue with embedded NUL characters in <B><CODE>(var)char</CODE></B> columns, so that the string &quot;abcd\0efghij&quot; incorrectly comes back to Perl as &quot;abcd&quot;. This is because of the new way I use to retrieve <B><CODE>(var)data</CODE></B> from SQL Server exposes a bug in the OLE DB provider. I have reported the bug to Microsoft, but whether they will address it, I don't know. As a consequence of this issue, five tests in <B>2_datatypes.t</B> fails. Curiously, the issue does not occur when the data comes from a column with a UTF-8 collation.</LI>
+      <LI>  You cannot pass data to an <B><CODE>sql_variant</CODE></B> column table-valued  parameter when you 
+        are running with AutoConnect. This is presumably not a new issue, but something I found when testing Win32::SqlServer 2.012. I was not able to find the cause, but I suspect
+      a bug in the OLE DB provider.  </LI>
+      <LI>Support for <A HREF="Win32-SqlServer.html#OpenSqlFilestream">OpenSqlFilestream</A> on SQL 2008 seems to be generally broken. In earlier versions, I thought it applied only Windows 10 clients, but I find that my test scripts seems to fail on all operating systems. With SQL 2008 R2, the test passes sometimes, sometimes not. From SQL 2012, I see no issues.</LI>
+</UL>
+  </LI>
+</UL>
 <H3>2018-04-22 &#8211; 2.011</H3>
 <P>This is a platform-support release:</P>
 <UL>
@@ -274,7 +309,7 @@ source distribution for further details.
 
 <HR>
 <I>
-Last updated <!--$$Modtime:--> 18-04-22 23:35 <!-- $-->
+Last updated <!--$$Modtime:--> 19-07-22 22:54 <!-- $-->
 </I>
 </BODY>
 </HTML>

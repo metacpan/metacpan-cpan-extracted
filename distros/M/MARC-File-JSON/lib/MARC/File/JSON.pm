@@ -5,27 +5,20 @@ package MARC::File::JSON;
 use strict;
 use warnings;
 use 5.010;
-use JSON qw(to_json from_json encode_json decode_json);
+use JSON qw(to_json from_json);
 use JSON::Streaming::Reader;
 use MARC::Record::Generic;
 use MARC::Record;
 use MARC::File;
 
 use vars qw( @ISA $VERSION );
-$VERSION = '0.004';
+$VERSION = '0.005';
 push @ISA, 'MARC::File';
 
 # MARC::Record -> JSON
 sub encode {
     my ($record, $args) = @_;
-    my $json;
-    if ( defined $args ) {
-        $json = to_json( $record->as_generic, $args );
-    } else {
-        $json = encode_json( $record->as_generic);
-        utf8::upgrade($json);
-    }
-    return $json;
+    return to_json( $record->as_generic, $args );
 }
 
 # JSON -> MARC::Record
@@ -33,9 +26,7 @@ sub decode {
     my ($self, $data, $args) = @_;
 
     if ( !ref($data) ) {
-        $data = defined $args
-            ? from_json( $data, $args )
-            : decode_json( $data );
+        $data = from_json( $data, $args );
     }
     return MARC::Record->new_from_generic( $data );
 }

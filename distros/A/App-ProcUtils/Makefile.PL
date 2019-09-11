@@ -14,6 +14,9 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "App-ProcUtils",
   "EXE_FILES" => [
+    "script/proc-exists",
+    "script/proc-kill",
+    "script/proc-list",
     "script/proc-list-parents",
     "script/proc-table"
   ],
@@ -21,10 +24,24 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::ProcUtils",
   "PREREQ_PM" => {
+    "Data::Sah::Coerce::perl::int::int_check_uid_exists" => 0,
+    "Data::Sah::Coerce::perl::int::str_convert_unix_user_to_uid" => 0,
+    "Data::Sah::Compiler::perl::TH::array" => 0,
+    "Data::Sah::Compiler::perl::TH::bool" => 0,
+    "Data::Sah::Compiler::perl::TH::code" => 0,
+    "Data::Sah::Compiler::perl::TH::int" => 0,
+    "Data::Sah::Compiler::perl::TH::re" => 0,
+    "Data::Sah::Compiler::perl::TH::str" => 0,
+    "Log::ger" => "0.027",
     "Perinci::CmdLine::Any" => 0,
     "Perinci::CmdLine::Lite" => "1.820",
     "Proc::Find::Parents" => "0.631",
     "Proc::ProcessTable" => 0,
+    "Sah::Schema::true" => 0,
+    "Sah::Schema::unix::local_uid" => 0,
+    "Sah::Schema::unix::pid" => 0,
+    "Sah::Schema::unix::signal" => 0,
+    "String::Truncate" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -34,7 +51,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.032",
+  "VERSION" => "0.037",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,13 +59,27 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Data::Sah::Coerce::perl::int::int_check_uid_exists" => 0,
+  "Data::Sah::Coerce::perl::int::str_convert_unix_user_to_uid" => 0,
+  "Data::Sah::Compiler::perl::TH::array" => 0,
+  "Data::Sah::Compiler::perl::TH::bool" => 0,
+  "Data::Sah::Compiler::perl::TH::code" => 0,
+  "Data::Sah::Compiler::perl::TH::int" => 0,
+  "Data::Sah::Compiler::perl::TH::re" => 0,
+  "Data::Sah::Compiler::perl::TH::str" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "Log::ger" => "0.027",
   "Perinci::CmdLine::Any" => 0,
   "Perinci::CmdLine::Lite" => "1.820",
   "Proc::Find::Parents" => "0.631",
   "Proc::ProcessTable" => 0,
+  "Sah::Schema::true" => 0,
+  "Sah::Schema::unix::local_uid" => 0,
+  "Sah::Schema::unix::pid" => 0,
+  "Sah::Schema::unix::signal" => 0,
+  "String::Truncate" => 0,
   "Test::More" => 0,
   "strict" => 0,
   "warnings" => 0

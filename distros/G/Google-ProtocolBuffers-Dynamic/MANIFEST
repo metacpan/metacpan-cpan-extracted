@@ -70,6 +70,7 @@ t/210_encode_defaults.t
 t/215_check_enum_values.t
 t/220_accessor_style.t
 t/225_decode_unblessed.t
+t/235_fail_ref_coercion.t
 t/300_scalar_accessors.t
 t/305_oneof_accessors.t
 t/310_list_accessors.t

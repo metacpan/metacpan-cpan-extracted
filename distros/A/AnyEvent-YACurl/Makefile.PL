@@ -11,6 +11,7 @@ if (! -f "libbrotli-lib/lib/libbrotlidec.a") {
         "--disable-shared",
         "--enable-static",
         "--with-pic",
+        split(/\s/, $ENV{YACURL_BROTLI_OPTS}||'')
     ) and exit $?;
     system("make") and exit $?;
     system("make", "check") and exit $?;
@@ -26,6 +27,7 @@ if (! -f "nghttp2-lib/lib/libnghttp2.a") {
         "--enable-static",
         "--with-pic",
         "--enable-lib-only",
+        split(/\s/, $ENV{YACURL_NGHTTP2_OPTS}||'')
     ) and exit $?;
     system("make") and exit $?;
     system("make", "check") and exit $?;
@@ -41,6 +43,7 @@ if (! -f "c-ares-lib/lib/libcares.a") {
         "--enable-static",
         "--with-pic",
         "--enable-nonblocking",
+        split(/\s/, $ENV{YACURL_CARES_OPTS}||'')
     ) and exit $?;
     system("make") and exit $?;
     system("make", "check") and exit $?;
@@ -61,6 +64,7 @@ if (! -f "curl-lib/lib/libcurl.a") {
         "--with-pic",
         "--disable-threaded-resolver",
         "--disable-pthreads",
+        split(/\s/, $ENV{YACURL_CURL_OPTS}||'')
     ) and exit $?;
     system("make") and exit $?;
     #system("make", "test") and exit $?;

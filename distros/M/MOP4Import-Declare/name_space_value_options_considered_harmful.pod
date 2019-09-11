@@ -1,0 +1,214 @@
+=encoding utf-8
+
+=head1 NAME
+
+C<< "--name <SPC> value" >> style options considered harmful for end-user scripting.
+
+=head1 INTRODUCTION
+
+This document describes my opinion about design of CLI option handling
+for end-user scripting area. My opinion is:
+let's advertise C<< "--name=value" >> over C<< "--name <SPC> value" >>
+and make later unofficial, especially when you are at field of end-user scripting.
+
+Original version of this document (in Japanese) can be found at
+L<here|https://hkoba.hatenablog.com/entry/2017/09/13/125924>. 日本語版もあるよ！
+
+=head1 A STORY
+
+=head2 Imagine your job is to support a team of other specialists by your programs
+
+=over 4
+
+=item *
+
+Some months ago, you wrote a CLI program, called B<A>. It has 5 CLI
+options for now, and is likely to have more options next few
+months. To describe its typical usage, you wrote its manual and put a
+synopsis like following:
+
+=for code sh
+
+  % A --debug --port 5050 --dbname master.db --log var/log/foo.log --type XYZ
+
+Your colleagues use this program B<A> almost everyday. Although they
+are employed as specialists other than about programming, some of them can
+program too (not so good at it than you;-).  And importantly, they too
+love automating boring tasks like you does.
+
+=item *
+
+Eventually, one of your colleague wrote another program B<B> (which might be
+a daily batch or a wrapper just to give typical options by default)
+start calling your program B<A>.
+
+  % B
+  # => calls: A --port 5050 --dbname master.db --log var/log/foo.log --type ABC
+
+B<B> delegates most of options to B<A> as-is.
+
+  % B --dbname devel.db --port 8080
+  # => calls: A --port 8080 --dbname devel.db --log var/log/foo.log --type ABC
+
+But of course as usual, B<B> itself has own options too.
+
+  % B --company ZZZ
+  # => calls: A --port 5050 --dbname master_ZZZ.db --log var/log/foo.log --type ABC-ZZZ
+
+=item *
+
+In the synopsis of B<B> in its manual, the author of B<B> wrote its
+additional option as C<--company ZZZ> than C<--company=ZZZ> like above.
+This is because you implicitly taught him/her to do so through your manual of B<A>.
+
+Since your colleagues respect your programming experiences, they have
+strong motive to copy your coding styles/CLI designs. As you wrote
+options of B<A> as C<< --name value >> (space separated form) than C<<
+--name=value >> (equal concatenated form) in the manual, your
+colleagues are very likely to start thinking former C<< --name value
+>> is better than later and mimic it in their programs and manuals.
+
+=back
+
+=head2 Parsing of C<< "--name <SPC> value" >> requires options dictionary
+
+=over 4
+
+=item *
+
+If your program B<A> takes space separated form options C<--name value>
+(which means value is given as another argument),
+it must have complete dictionary of option names anyway to parse CLI
+arguments correctly. Because there is no way than the dictionary to determine
+next coming arguments are the value of preceding option.
+
+Note: This dictionary usually appears implicitly as arguments of
+L<Getopt::Long::GetOptions()|Getopt::Long> like following:
+
+=for code perl
+
+   use Getopt::Long;
+   ...
+   GetOptions(
+     "debug"    => \ my $o_debug,
+     "port=i"   => \ my $o_port,
+     "dbname=s" => \ my $o_dbname,
+     "log=s"    => \ my $o_logfile,
+     "type=s"   => \ my $o_type,
+   ) or die("Error in command line arguments\n");
+
+
+=item *
+
+Same applies to program B<B> by your colleague. It must have same entries in
+the dictionary and may have own options too.
+
+   use Getopt::Long;
+   ...
+   GetOptions(
+     "debug"    => \ my $o_debug,
+     "port=i"   => \ my $o_port,
+     "dbname=s" => \ my $o_dbname,
+     "log=s"    => \ my $o_logfile,
+     "type=s"   => \ my $o_type,
+     "company=s"=> \ my $o_company, # New option
+   ) or die("Error in command line arguments\n");
+
+
+=back
+
+=head2 Chain of dictionaries introduces endless maintainances
+
+=over 4
+
+=item *
+
+Now it is very easy to imagine another colleague starts writing yet another
+program B<C>, which calls B<B>, which calls B<A>.
+
+=for code sh
+
+  % C --port 18000
+  # => calls: B --company ZZZ --port 18000
+  # => calls: A --port 18000 --dbname master_ZZZ.db --log var/log/foo.log --type ABC-ZZZ
+
+To achieve option delegation of C<--port> like above B<C> must know the options
+dictionary of B<B>. And then another program B<D> arrives, followed by
+B<E>... you can't prohibit others to write a wrapper for your program,
+can you?
+
+=item *
+
+Biggest annoyance comes when you add new option to B<A>, the starting
+point of the chain. The authors of B<B>, B<C>, B<D>... must update the
+option dictionaries too, usually by-hand. Otherwise, they can't get benefit
+from your new feature in B<A>.
+
+This is very similar to L<fire fighting with bucket relay|https://www.google.com/search?q=fire+fighting+bucket+relay&source=lnms&tbm=isch&sa=X>
+which IMHO is very inefficient and only acceptable when there is no better ways.
+
+=back
+
+How can we end this I<chain of maintainances by-hand>? Probably, there
+could be a systematic approach to maintain these chains of option
+specifications. But I don't know such implementation widely accepted in Perl
+and even if there is such thing, IMHO, it is too much for casual automation by
+end-users. Especially if you want to encourage them to write more scripts.
+
+So instead, I want a Poorman's approach
+
+(Or some kind of Zen)
+
+To remove chains of maintainances completely
+
+Which should be written easily and correctly even by novice end-users.
+
+Could we have such a way?
+
+=head1 PROPOSAL
+
+Forget about existing inferior programs written by others. They are
+uncontrollable.  Instead focus on programs you and your collegues are
+going to write for your team. Establish some kind of
+descipline/standard about option specification to enable
+dictionary-less option delegation.  For example, officially recommend
+only following 3 styles of options:
+
+=over 4
+
+=item C<--name=value>
+
+I<Equal-concatenated> pair of option name and its value.
+
+=item C<--name>
+
+Option name without a value.
+
+=item C<-c>
+
+Single letter option(without a value).
+
+=back
+
+And treat C<--> as an end of option parsing as usual.
+
+This way, all options are regularized to start with C<-> regardless of
+having a value or not.  So any arguments starting with C<-> can be
+gathered and passed through another program without predefined
+dictionary. Unlike dictionary based approach, this option processing
+is I<write once and use forever>. If programs like B<B>, B<C>..., written
+by your colleagues, follow this descipline too, they can delegate all
+forthcoming options to program B<A>. Of course other problems like
+option name collision can still remain, but it is smaller than
+original one.
+
+=head2 Standardization/Regualization is your friend for automation
+
+Folks, I strongly fond of automation. Yes, I actually love it.
+If traditional style of option handling can curse future programs
+written by my colleagues, I can't advocate it anymore.
+This is why I don't implement C<< "--name <SPC> value" >> style options
+in my important products.
+
+Thank you for reading!
+

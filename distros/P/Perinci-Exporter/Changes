@@ -1,9 +1,17 @@
+0.084   2019-09-11  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [test] Make curry test optional because Perinci::Sub::Property::curry
+	  is an optional dep [RT#130484].
+
+
 0.083   2019-09-10  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.
 
-	- Skip tests that need Perinci::Sub::Wrapper as it's now an
-	  optional prereq [RT#130351].
+	- [test] Make tests that need Perinci::Sub::Wrapper optional, as the
+	  prereq is now optional [RT#130351].
 
 
 0.082   2019-08-18  Released-By: PERLANCAR; Urgency: low

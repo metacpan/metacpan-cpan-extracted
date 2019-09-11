@@ -1,5 +1,5 @@
 /*---------------------------------------------------------------------
- $Header: /Perl/OlleDB/init.cpp 10    18-04-09 22:49 Sommar $
+ $Header: /Perl/OlleDB/init.cpp 12    19-07-19 22:00 Sommar $
 
   This file holds code that is run when the module initialiases, and
   when a new OlleDB object is created. This file also declares global
@@ -7,9 +7,22 @@
   constants that are set up once and then never changed.
 
 
-  Copyright (c) 2004-2018   Erland Sommarskog
+  Copyright (c) 2004-2019   Erland Sommarskog
 
   $History: init.cpp $
+ * 
+ * *****************  Version 12  *****************
+ * User: Sommar       Date: 19-07-19   Time: 22:00
+ * Updated in $/Perl/OlleDB
+ * Removed the olddbtranslate option from internaldata, and entirely
+ * deprecated setting the AutoTranslate option to make sure that it always
+ * is false. When clearing options when ProviderString is set, we don't
+ * clear AutoTranslate.
+ * 
+ * *****************  Version 11  *****************
+ * User: Sommar       Date: 19-07-08   Time: 22:30
+ * Updated in $/Perl/OlleDB
+ * Made default for AutoTranslate macro. Updated copyright year.
  * 
  * *****************  Version 10  *****************
  * User: Sommar       Date: 18-04-09   Time: 22:49
@@ -275,7 +288,7 @@ static void setup_init_properties ()
    add_init_property("Appname", ssinit_props, SSPROP_INIT_APPNAME,
                      TRUE, VT_BSTR, FALSE, scriptname, NULL, ix);
    add_init_property("Autotranslate", ssinit_props, SSPROP_INIT_AUTOTRANSLATE,
-                     TRUE, VT_BOOL, TRUE, NULL, NULL, ix);
+                     TRUE, VT_BOOL, FALSE, NULL, NULL, ix);
    add_init_property("Language", ssinit_props, SSPROP_INIT_CURRENTLANGUAGE,
                      TRUE, VT_BSTR, TRUE, NULL, NULL, ix);
    add_init_property("AttachFilename", ssinit_props, SSPROP_INIT_FILENAME,
@@ -459,7 +472,7 @@ void initialize ()
    {
         char buff[256];
         sprintf_s(buff, 256,
-                  "This is Win32::SqlServer, version %s\n\nCopyright (c) 2005-2018 Erland Sommarskog\n",
+                  "This is Win32::SqlServer, version %s\n\nCopyright (c) 2005-2019 Erland Sommarskog\n",
                   XS_VERSION);
         sv_setnv(sv, atof(XS_VERSION));
         sv_setpv(sv, buff);

@@ -1,12 +1,26 @@
 /*---------------------------------------------------------------------
- $Header: /Perl/OlleDB/internaldata.cpp 12    16-07-11 22:24 Sommar $
+ $Header: /Perl/OlleDB/internaldata.cpp 14    19-07-19 22:00 Sommar $
 
   This file holds routines setting up the internaldata struct, and
   also release memory allocated in it.
 
-  Copyright (c) 2004-2016   Erland Sommarskog
+  Copyright (c) 2004-2019   Erland Sommarskog
 
   $History: internaldata.cpp $
+ * 
+ * *****************  Version 14  *****************
+ * User: Sommar       Date: 19-07-19   Time: 22:00
+ * Updated in $/Perl/OlleDB
+ * Removed the olddbtranslate option from internaldata, and entirely
+ * deprecated setting the AutoTranslate option to make sure that it always
+ * is false. When clearing options when ProviderString is set, we don't
+ * clear AutoTranslate.
+ * 
+ * *****************  Version 13  *****************
+ * User: Sommar       Date: 19-07-08   Time: 22:31
+ * Updated in $/Perl/OlleDB
+ * New elements in internaldata for SQL version,  currentDB and more for
+ * UTF-8 support.
  * 
  * *****************  Version 12  *****************
  * User: Sommar       Date: 16-07-11   Time: 22:24
@@ -177,6 +191,10 @@ void dump_internaldata(internaldata * mydata)
    warn("init_ptr = %x.\n", mydata->init_ptr);
    warn("datasrc_ptr = %x.\n", mydata->datasrc_ptr);
    warn("isautoconnected = %d.\n", mydata->isautoconnected);
+   warn("isnestedquery = %d.\n", mydata->isnestedquery);
+   warn("SQL_version = %d.\"n", mydata->SQL_version);
+   warn("majorsqlversion = %d.\n", mydata->majorsqlversion);
+   warn("CurrentDB = %d.\n", mydata->CurrentDB);
    warn("provider = %d.\n", mydata->provider);
    warn("pending_cmd = %d.\n", mydata->pending_cmd);
    warn("paramfirst = %x.\n", mydata->paramfirst);
@@ -225,6 +243,10 @@ void * setupinternaldata()
     // all pointers to NULL.
     New(902, mydata, 1, internaldata);
     mydata->isautoconnected   = FALSE;
+    mydata->isnestedquery     = FALSE;
+    mydata->SQL_version       = &PL_sv_undef;
+    mydata->majorsqlversion   = 0;
+    mydata->CurrentDB         = &PL_sv_undef;
     mydata->provider          = default_provider();
     mydata->init_ptr          = NULL;
     mydata->pending_cmd       = NULL;
@@ -554,8 +576,9 @@ void free_batch_data(internaldata *mydata) {
    free_ole_ptr(mydata->cmdtext_ptr);
    free_ole_ptr(mydata->session_ptr);
 
-   // Release the data-source pointer only if auto-connected.
-   if (mydata->isautoconnected) {
+   // Release the data-source pointer only if auto-connected. And
+   // not if it is an internal query
+   if (mydata->isautoconnected && ! mydata->isnestedquery) {
       free_ole_ptr(mydata->datasrc_ptr);
       free_ole_ptr(mydata->init_ptr);
    }
@@ -564,7 +587,24 @@ void free_batch_data(internaldata *mydata) {
 // Frees it all - called on disconncetion.
 void free_connection_data(internaldata  * mydata) {
     free_batch_data(mydata);
+
     free_ole_ptr(mydata->datasrc_ptr);  // This disconnects - or returns to pool.
     free_ole_ptr(mydata->init_ptr);
+}
+
+// Free strings for SQL version and current DB. Called on destroy or
+// when the server changes.
+void free_sqlver_currentdb(internaldata * mydata) {
+    if (my_sv_is_defined(mydata->SQL_version)) {
+       SvREFCNT_dec(mydata->SQL_version);
+       mydata->SQL_version = &PL_sv_undef;
+
+    }
+    mydata->majorsqlversion = 0;
+
+    if (my_sv_is_defined(mydata->CurrentDB)) {
+       SvREFCNT_dec(mydata->CurrentDB);
+       mydata->CurrentDB = &PL_sv_undef;
+    }
 }
 

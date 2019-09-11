@@ -1,7 +1,7 @@
 package Data::Clean::JSON;
 
-our $DATE = '2018-10-09'; # DATE
-our $VERSION = '0.391'; # VERSION
+our $DATE = '2019-09-11'; # DATE
+our $VERSION = '0.392'; # VERSION
 
 use 5.010001;
 use strict;
@@ -53,7 +53,7 @@ sub clone_and_clean_json {
 }
 
 1;
-# ABSTRACT: Clean data so it is safe to output to JSON
+# ABSTRACT: (DEPRECATED) Clean data so it is safe to output to JSON
 
 __END__
 
@@ -63,11 +63,11 @@ __END__
 
 =head1 NAME
 
-Data::Clean::JSON - Clean data so it is safe to output to JSON
+Data::Clean::JSON - (DEPRECATED) Clean data so it is safe to output to JSON
 
 =head1 VERSION
 
-This document describes version 0.391 of Data::Clean::JSON (from Perl distribution Data-Clean-JSON), released on 2018-10-09.
+This document describes version 0.392 of Data::Clean::JSON (from Perl distribution Data-Clean-JSON), released on 2019-09-11.
 
 =head1 SYNOPSIS
 
@@ -98,6 +98,10 @@ Functional shortcuts:
  $cleaned = clone_and_clean_json($data);
 
 =head1 DESCRIPTION
+
+B<DEPRECATION NOTICE:> This module has been renamed to L<Data::Clean::ForJSON>
+for more clarity. This old name is retained because there are distributions
+still depending on it.
 
 This class cleans data from anything that might be problematic when encoding to
 JSON. This includes coderefs, globs, and so on. Here's what it will do by
@@ -276,7 +280,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

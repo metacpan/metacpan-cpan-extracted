@@ -1,1 +1,10 @@
 ^MYMETA.yml$
+^MYMETA\.json$
+^\.git
+^_build\/
+^blib\/
+^Build$
+^MANIFEST.bak$
+\..*\.swp$
+~$
+^Astro-Coords-

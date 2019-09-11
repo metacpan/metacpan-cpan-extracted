@@ -1,0 +1,27 @@
+// 既定値を上書きするには、このファイル内にキー バインドを挿入します
+[
+    {"key": "ctrl+b", "command": "cursorLeft",    "when": "editorTextFocus" }
+    , {"key": "ctrl+f", "command": "cursorRight", "when": "editorTextFocus" }
+    , {"key": "ctrl+n", "command": "cursorDown", "when": "editorTextFocus" }
+    , {"key": "ctrl+p", "command": "cursorUp"
+    ,   "when": "editorTextFocus && !inQuickOpen" }
+    , {"key": "ctrl+a", "command": "cursorHome", "when": "editorTextFocus" }
+    , {"key": "ctrl+e", "command": "cursorEnd",  "when": "editorTextFocus" }
+    , {"key": "ctrl+h", "command": "deleteLeft"
+       // ,  "when": "editorTextFocus"
+      }
+    , {"key": "ctrl+d", "command": "deleteRight",  "when": "editorTextFocus" }
+
+
+    , {"key": "ctrl+q", "command": "cursorWordLeft", "when": "editorTextFocus" }
+    , {
+        "key": "ctrl+t",
+        "command": "cursorWordRight",
+        "when": "editorTextFocus"
+    },
+    {
+        "key": "ctrl+alt+enter",
+        "command": "fsi.SendFile",
+        "when": "editorFocus && !findWidgetVisible && editorLangId == 'fsharp'"
+    }
+]

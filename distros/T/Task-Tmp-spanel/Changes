@@ -1,3 +1,8 @@
+0.010   2019-09-11  Released-By: PERLANCAR; Urgency: medium
+
+	- Add App::ProcUtils.
+
+
 0.009   2019-09-10  Released-By: PERLANCAR; Urgency: medium
 
 	- Add DNS::Zone::Struct::Common::BIND.

@@ -1,5 +1,5 @@
 package Test::Selenium::Remote::Role::DoesTesting;
-$Test::Selenium::Remote::Role::DoesTesting::VERSION = '1.33';
+$Test::Selenium::Remote::Role::DoesTesting::VERSION = '1.34';
 # ABSTRACT: Role to cope with everything that is related to testing (could
 # be reused in both testing classes)
 

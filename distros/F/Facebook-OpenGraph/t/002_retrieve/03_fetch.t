@@ -32,7 +32,7 @@ subtest 'user' => sub {
                 },
                 'args'
             );
-            
+
             return (
                 1,
                 200,
@@ -51,7 +51,7 @@ subtest 'user' => sub {
 };
 
 subtest 'with fields' => sub {
-                
+
     my $datum_ref = +{
         id      => 4, # id is always returned even if it's not specified in fields parameter
         picture => +{ # returns is_silhouette and url after October 2012 Breaking Changes
@@ -61,7 +61,7 @@ subtest 'with fields' => sub {
             },
         },
     };
-    
+
     $Mock_furl_http->mock(
         request => sub {
             my ($mock, %args) = @_;
@@ -76,7 +76,7 @@ subtest 'with fields' => sub {
                 },
                 'args'
             );
-    
+
             return (
                 1,
                 200,
@@ -86,7 +86,7 @@ subtest 'with fields' => sub {
             );
         },
     );
-        
+
     my $fb   = Facebook::OpenGraph->new;
     my $user = $fb->fetch('zuck', +{fields => 'picture'});
 
@@ -106,23 +106,24 @@ subtest 'not found' => sub {
                 ['Content-Type' => 'text/javascript; charset=UTF-8'],
                 encode_json(+{
                     error => +{
-                        code    => 803,
-                        type    => 'OAuthException',
-                        message => '(#803) Some of the aliases you requested do not exist: hhhhhhhhhhsssssssss',
+                        code          => 803,
+                        type          => 'OAuthException',
+                        message       => '(#803) Some of the aliases you requested do not exist: hhhhhhhhhhsssssssss',
                         error_subcode => '',
+                        fbtrace_id    => 'EJplcsCHuLu',
                     },
                 }),
             );
 
         },
     );
-        
+
     my $fb = Facebook::OpenGraph->new;
     throws_ok(
         sub {
             my $user = $fb->fetch('hhhhhhhhhhsssssssss');
         },
-        qr/803:- OAuthException:\(#803\) Some of the aliases you requested do not exist: hhhhhhhhhhsssssssss/,
+        qr/803:-\tOAuthException:\(#803\) Some of the aliases you requested do not exist: hhhhhhhhhhsssssssss\tEJplcsCHuLu\t-:-/,
         'user not found',
     );
 

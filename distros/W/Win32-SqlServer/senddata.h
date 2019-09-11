@@ -1,14 +1,20 @@
 /*---------------------------------------------------------------------
- $Header: /Perl/OlleDB/senddata.h 4     11-08-07 23:29 Sommar $
+ $Header: /Perl/OlleDB/senddata.h 5     19-07-08 22:43 Sommar $
 
   Implements the routines for sending data and command to SQL Server:
   initbatch, enterparameter and executebatch, including routines to
   convert from Perl variables to SQL Server data types, save datetime
   data; those are in datetime.cpp.
 
-  Copyright (c) 2004-2011   Erland Sommarskog
+  Copyright (c) 2004-2019   Erland Sommarskog
 
   $History: senddata.h $
+ * 
+ * *****************  Version 5  *****************
+ * User: Sommar       Date: 19-07-08   Time: 22:43
+ * Updated in $/Perl/OlleDB
+ * Removed some functions that are only used internally. initbatch can no
+ * return TRUE/FALSE.
  * 
  * *****************  Version 4  *****************
  * User: Sommar       Date: 11-08-07   Time: 23:29
@@ -32,37 +38,11 @@
   ---------------------------------------------------------------------*/
 
 
-extern BOOL SV_to_bigint (SV      * sv,
-                          LONG64  &bigintval);
-
-
 extern BOOL SV_to_binary (SV        * sv,
                           bin_options optBinaryAsStr,
                           BOOL        istimestamp,
                           BYTE      * &binaryval,
                           DBLENGTH    &value_len);
-
-extern BOOL SV_to_char (SV       * sv,
-                        char     * &charval,
-                        DBLENGTH   &value_len);
-
-
-extern BOOL SV_to_XML (SV        * sv,
-                       BOOL        &is_8bit,
-                       char      * &xmlchar,
-                       BSTR        &xmlbstr,
-                       DBLENGTH    &value_len);
-
-extern BOOL SV_to_decimal(SV        * sv,
-                          BYTE        precision,
-                          BYTE        scale,
-                          DB_NUMERIC &decimalval);
-
-extern BOOL SV_to_GUID (SV       * sv,
-                        GUID       &guidval);
-
-extern BOOL SV_to_money(SV * sv,
-                        CY  &moneyval);
 
 extern BOOL SV_to_ssvariant (SV          * sv,
                              SSVARIANT     &variant,
@@ -100,8 +80,9 @@ void write_to_databuffer(SV           * olle_ptr,
                          valueunion     value);
 
 
-extern void initbatch(SV * olle_ptr,
-                      SV * sv_cmdtext);
+extern int initbatch(SV   *  olle_ptr,
+                     SV   *  sv_cmdtext,
+                     BOOL isnestedquery);
 
 extern int enterparameter(SV   * olle_ptr,
                           SV   * sv_nameoftype,

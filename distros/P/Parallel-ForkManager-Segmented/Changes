@@ -1,5 +1,8 @@
 Revision history for Parallel-ForkManager-Segmented
 
+0.2.0       2019-09-10
+    - Add process_batch .
+
 0.0.2       2018-08-23
     - Fix a bug with calling the callback with undef() once on empty
     input.

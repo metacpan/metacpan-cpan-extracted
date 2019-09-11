@@ -1,5 +1,9 @@
 Revision history for Net::SecurityCenter
 
+0.202 2019/09/10
+    - Added "download" method for Analysis API
+
+
 0.201 2019/07/12
     - Fixed documentation issue
     - Added missing file in MANIFEST

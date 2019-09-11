@@ -2,7 +2,7 @@ NAME
     Task::Tmp::spanel - Perl modules for Spanel
 
 VERSION
-    version 0.009
+    version 0.010
 
 TASK CONTENTS
   Included modules
@@ -10,6 +10,7 @@ TASK CONTENTS
    Algorithm::Dependency::Source::HoA
    Any::Moose
    App::CreateSelfSignedSSLCert
+   App::ProcUtils
    App::rimetadb
    CDB_File
    CHI

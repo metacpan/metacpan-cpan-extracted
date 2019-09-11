@@ -11,8 +11,6 @@ package Sub::Multi::Tiny;
 
 use 5.006;
 use strict;
-use subs ();
-use vars ();
 use warnings;
 
 require Attribute::Handlers;    # Listed here so automated tools see it
@@ -20,8 +18,12 @@ require Attribute::Handlers;    # Listed here so automated tools see it
 use Import::Into;
 use Sub::Multi::Tiny::SigParse;
 use Sub::Multi::Tiny::Util ':all';
+use subs ();
+use vars ();
 
-our $VERSION = '0.000005'; # TRIAL
+our $VERSION = '0.000006'; # TRIAL
+
+use constant { true => !!1, false => !!0 };
 
 # Documentation {{{1
 
@@ -121,6 +123,10 @@ are all the parameter variables that the multisubs will use.  C<import>
 creates these as package variables so that they can be used unqualified
 in the multisub implementations.
 
+A parameter C<D:Dispatcher> can also be given to specify the dispatcher to
+use.  If C<Dispatcher> includes a double-colon, it will be used as a full
+package name.  Otherwise, C<Sub::Multi::Tiny::Dispatcher::> will be prepended.
+
 =cut
 
 sub import {
@@ -143,10 +149,35 @@ sub import {
     _croak "Can't redefine multi sub $multi_package\()"
         if exists $_multisubs{$multi_package};
 
-    # Create the vars - they will be accessed as package variables
-    my @possible_params = @_;
+    # Create the vars - they will be accessed as package variables.
+    # TODO: parameters of the form D:<foo> import dispatcher <foo>.
+    my @possible_params;
+    my $dispatcher = 'Default';
+    foreach (@_) {
+        if(/^D:(.*)$/) {
+            die '"D:" must be followed by a dispatcher class' unless $1;
+            $dispatcher=$1;
+        } elsif(/^.:/) {
+            die '".:..." forms reserved - did you mean "D:DispatcherClass"?';
+        } else {
+            push @possible_params, $_;
+        }
+    }
+
+    # Load the parameter variables as package variables
     _croak "Please list the sub parameters" unless @possible_params;
     vars->import::into($multi_package, @possible_params);
+
+    # Load the dispatcher
+    $dispatcher = __PACKAGE__ . "::Dispatcher::$dispatcher"
+        unless index($dispatcher, '::') != -1;
+
+    eval "require $dispatcher";
+    die "Could not load dispatcher $dispatcher, requested by $multi_package: $@"
+        if $@;
+
+    _hlog { $multi_package, 'using dispatcher', $dispatcher };
+    ${dispatcher}->import::into($multi_package);
 
     # Make a stub that we will redefine later
     _hlog { "Making $multi_package\()" } ;
@@ -194,6 +225,7 @@ sub _parse_arglist {
 # Create the source for the M attribute handler for a given package
 sub _make_M {
     my $multi_package = shift;
+    my $P = __PACKAGE__;
     my $code = _line_mark_string
         "package $multi_package;\n";
 
@@ -209,17 +241,19 @@ sub M :ATTR(CODE,RAWDATA) {
     _hlog { require Data::Dumper;
             'In ', __PACKAGE__, "::M: \n",
             Data::Dumper->Dump([\@_], ['attr_args']) } 2;
+
     my ($package, $symbol, $referent, $attr, $data, $phase,
         $filename, $linenum) = @_;
     my $funcname = "$package\::" . *{$symbol}{NAME};
+
     _hlog {     # Code from Attribute::Handlers, license perl_5
-        ref($referent), " ",
-        $funcname, " ",
-        "($referent) ", "was just declared ",
-        "and ascribed the ${attr} attribute ",
-        "with data ($data)\n",
-        "in phase $phase\n",
-        "in file $filename at line $linenum\n"
+        ref($referent),
+        $funcname,
+        "($referent)", "was just declared",
+        "and ascribed the ${attr} attribute",
+        "with data ($data)",
+        "in phase $phase",
+        "in file $filename at line $linenum"
     } 2;
 EOT
 
@@ -227,30 +261,27 @@ EOT
     # via eval at runtime.  TODO use UNITCHECK instead to permit doing so?
     $code .= _line_mark_string <<EOT;
     die 'Dispatchers already created - please file a bug report'
-        if @{[__PACKAGE__]}\::_dispatchers_created();
+        if $P\::_dispatchers_created();
 
     my \$multi_def = \$_multisubs{'$multi_package'};
 EOT
 
     # Parse and validate the args
     $code .= _line_mark_string <<EOT;
-    my \$args = @{[__PACKAGE__]}\::_parse_arglist(\$data, \$funcname);
+    my \$hrSig = $P\::_parse_arglist(\$data, \$funcname);
+    $P\::_check_and_inflate_sig(\$hrSig, \$multi_def,
+        \$funcname, \$package, \$filename, \$linenum);
 EOT
 
     $code .= _line_mark_string <<'EOT';
-    foreach (@$args) {
-        my $name = $_->{name};
-        unless($multi_def->{possible_params}->{$name}) {
-            die "Argument $name is not listed on the 'use Sub::Multi::Tiny' line";
-        }
-    }
 EOT
 
     # Save the implementation's info for use when making the dispatcher.
     $code .= _line_mark_string <<'EOT';
     my $info = {
         code => $referent,
-        args => $args,
+        args => $hrSig->{parms},    # TODO remove eventually
+        sig => $hrSig,
 
         # For error messages
         filename => $filename,
@@ -266,6 +297,58 @@ EOT
     return $code;
 } #_make_M
 
+# Validate a signature and convert text to usable objects
+sub _check_and_inflate_sig {
+    my ($signature, $multi_def, $funcname, $package, $filename, $linenum) = @_;
+    my ($saw_positional, $saw_named);
+
+    my $args = $signature->{parms};
+    my $temp;
+    foreach (@$args) {
+
+        # Is the argument valid in this package?
+        my $name = $_->{name};
+        unless($multi_def->{possible_params}->{$name}) {
+            die "Argument $name is not listed on the 'use Sub::Multi::Tiny' line (used by $funcname at $filename\:$linenum";
+        }
+
+        # Is the argument out of order?
+        die "Positional arguments must precede named arguments"
+            if $saw_named && !$_->{named};
+
+        # Inflate type constraint, if any
+        if($_->{type}) {
+            _hlog { In => $package, "evaluating type '$_->{type}'" };
+            $temp = eval _line_mark_string <<EOT;
+do {
+    package $package;
+    $_->{type}  # Anything meaningful in the calling package is OK
+}
+EOT
+            die "In $package: Could not understand type '$_->{type}': $@" if $@;
+            $_->{type} = $temp;
+        }
+
+        # Inflate where clause, if any, into a closure
+        if($_->{where}) {
+            _hlog { In => $package, "evaluating 'where' clause '$_->{where}'" };
+            $temp = eval _line_mark_string <<EOT;
+do {
+    package $package;
+    sub $_->{where}     # Anything meaningful in the calling package is OK
+}
+EOT
+            die "In $package: Could not understand 'where' clause '$_->{where}': $@" if $@;
+            $_->{where} = $temp;
+        }
+
+        # Remember data for later
+        $saw_named ||= $_->{named};
+        $saw_positional ||= !$_->{named};
+
+    }
+} # _check_and_inflate_sig
+
 # Create a dispatcher
 sub _make_dispatcher {
     my $hr = shift;
@@ -280,8 +363,8 @@ sub _make_dispatcher {
     return $custom_dispatcher->($hr) if defined $custom_dispatcher;
 
     # Default dispatcher
-    require Sub::Multi::Tiny::DefaultDispatcher;
-    return Sub::Multi::Tiny::DefaultDispatcher::MakeDispatcher($hr);
+    require Sub::Multi::Tiny::Dispatcher::Default;
+    return Sub::Multi::Tiny::Dispatcher::Default::MakeDispatcher($hr);
 } #_make_dispatcher
 
 1;

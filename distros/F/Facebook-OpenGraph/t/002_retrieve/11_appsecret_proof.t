@@ -12,7 +12,7 @@ subtest 'w/o appsecret_proof' => sub {
         request => sub {
             my ($mock, %args) = @_;
             is $args{appsecret_proof}, undef, 'appsecret_proof not given';
-    
+
             return (
                 1,
                 400,
@@ -24,6 +24,7 @@ subtest 'w/o appsecret_proof' => sub {
                         type          => 'GraphMethodException',
                         message       => 'API calls from the server require an appsecret_proof argument',
                         error_subcode => '',
+                        fbtrace_id    => 'EJplcsCHuLu',
                     },
                 }),
             );
@@ -40,14 +41,14 @@ subtest 'w/o appsecret_proof' => sub {
         sub {
             my $user = $fb->get('/me');
         },
-        qr/100:- GraphMethodException:API calls from the server require an appsecret_proof argument/,
+        qr/100:-\tGraphMethodException:API calls from the server require an appsecret_proof argument\tEJplcsCHuLu\t-:-/,
         'appsecret_proof is required',
     );
 
 };
 
 subtest 'w/ appsecret_proof' => sub {
-    
+
     my $datum_ref = +{
         name       => 'Mark Zuckerberg', # full name
         id         => 4, # id 1-3 were test users
@@ -81,7 +82,7 @@ subtest 'w/ appsecret_proof' => sub {
         secret              => 'TheKingHasEarsShapedLikeADonkey',
     });
     my $user = $fb->get('/me');
-    
+
     is_deeply $datum_ref, $user, 'datum';
 };
 

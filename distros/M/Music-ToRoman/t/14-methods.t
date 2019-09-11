@@ -11,7 +11,7 @@ use Test::More;
 
 use_ok 'Music::ToRoman';
 
-my @notes = qw/ C C# Db D D# Eb E Fb E# F F# Gb G G# Ab A A# Bb B B# Cb /;
+my @notes = qw/ C C# Db D D# Eb E Fb E# Fb F F# Gb G G# Ab A A# Bb B B# Cb /;
 
 my @romans = qw/ I bii ii biii iii IV bV V bvi vi bvii vii /;
 
@@ -120,7 +120,7 @@ for my $roman ( @romans ) {
 %expected = (
     'C'  => 'bvi',
     'C#' => 'vi',
-    'Db' => '', # vi
+    'Db' => 'vi',
     'D'  => 'bvii',
     'D#' => 'vii',
     'Eb' => 'vii',
@@ -129,7 +129,7 @@ for my $roman ( @romans ) {
     'E#' => 'bii',
     'F'  => 'bii',
     'F#' => 'ii',
-    'Gb' => '', # ii
+    'Gb' => 'ii',
     'G'  => 'biii',
     'G#' => 'iii',
     'Ab' => 'iii',
@@ -186,7 +186,7 @@ for my $roman ( @romans ) {
     'G#' => 'biii',
     'Ab' => 'biii',
     'A'  => 'iii',
-    'A#' => '', # IV
+    'A#' => 'IV',
     'Bb' => 'IV',
     'B'  => 'bV',
     'B#' => '', # V
@@ -285,7 +285,7 @@ for my $roman ( @romans ) {
     'E#' => 'bvi',
     'F'  => 'bvi',
     'F#' => 'vi',
-    'Gb' => '', # vi
+    'Gb' => 'vi',
     'G'  => 'bvii',
     'G#' => 'vii',
     'Ab' => 'vii',
@@ -328,7 +328,7 @@ for my $roman ( @romans ) {
 %expected = (
     'C'  => 'bii',
     'C#' => 'ii',
-    'Db' => '', # ii
+    'Db' => 'ii',
     'D'  => 'biii',
     'D#' => 'iii',
     'Eb' => 'iii',
@@ -337,10 +337,10 @@ for my $roman ( @romans ) {
     'E#' => 'bV',
     'F'  => 'bV',
     'F#' => 'V',
-    'Gb' => '', # V
+    'Gb' => 'V',
     'G'  => 'bvi',
     'G#' => 'vi',
-    'Ab' => '', # vi
+    'Ab' => 'vi',
     'A'  => 'bvii',
     'A#' => 'vii',
     'Bb' => 'vii',

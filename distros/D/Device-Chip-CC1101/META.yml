@@ -14,7 +14,7 @@ name: Device-Chip-CC1101
 provides:
   Device::Chip::CC1101:
     file: lib/Device/Chip/CC1101.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   Data::Bitfield: '0.04'
   Device::Chip: '0'
@@ -23,5 +23,5 @@ requires:
   perl: '5.024'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

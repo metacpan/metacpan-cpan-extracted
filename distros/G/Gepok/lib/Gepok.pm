@@ -1,7 +1,7 @@
 package Gepok;
 
-our $DATE = '2019-07-08'; # DATE
-our $VERSION = '0.291'; # VERSION
+our $DATE = '2019-09-11'; # DATE
+our $VERSION = '0.292'; # VERSION
 
 use 5.010001;
 use strict;
@@ -87,6 +87,7 @@ sub BUILD {
         die "ssl_verify_callback needs to be a coderef, or constant '1' or '0'" unless ref $vc eq 'CODE';
     }
     unless ($self->_daemon) {
+        my $already_init;
         my $daemon = Proc::Daemon::Prefork->new(
             name                    => $self->name,
             error_log_path          => $self->error_log_path,
@@ -96,7 +97,8 @@ sub BUILD {
             daemonize               => $self->daemonize,
             prefork                 => $self->start_servers,
             max_children            => $self->max_clients,
-            after_init              => sub { $self->_after_init },
+            before_daemonize        => sub { $self->_after_init; $already_init++; 1 },
+            after_init              => sub { $self->_after_init unless $already_init },
             main_loop               => sub { $self->_main_loop },
             require_root            => $self->require_root,
             # currently auto reloading is turned off
@@ -219,6 +221,8 @@ sub _after_init {
     $self->_server_socks(\@server_socks);
     warn "Will be binding to ".join(", ", @server_sock_infos)."\n";
     $self->before_prefork();
+
+    1;
 }
 
 sub before_prefork {}
@@ -603,7 +607,7 @@ Gepok - PSGI server with built-in HTTPS support, Unix sockets, preforking
 
 =head1 VERSION
 
-This document describes version 0.291 of Gepok (from Perl distribution Gepok), released on 2019-07-08.
+This document describes version 0.292 of Gepok (from Perl distribution Gepok), released on 2019-09-11.
 
 =head1 SYNOPSIS
 

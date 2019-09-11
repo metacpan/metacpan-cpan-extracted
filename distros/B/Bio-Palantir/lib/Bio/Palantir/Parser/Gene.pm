@@ -1,6 +1,6 @@
 package Bio::Palantir::Parser::Gene;
 # ABSTRACT: BiosynML DTD-derived internal class
-$Bio::Palantir::Parser::Gene::VERSION = '0.192240';
+$Bio::Palantir::Parser::Gene::VERSION = '0.192540';
 use Moose;
 use namespace::autoclean;
 
@@ -21,6 +21,7 @@ has '_root' => (
     isa      => 'HashRef',
     required => 1,
 );
+
 
 has 'uui' => (
     is       => 'ro',
@@ -402,7 +403,7 @@ Bio::Palantir::Parser::Gene - BiosynML DTD-derived internal class
 
 =head1 VERSION
 
-version 0.192240
+version 0.192540
 
 =head1 SYNOPSIS
 

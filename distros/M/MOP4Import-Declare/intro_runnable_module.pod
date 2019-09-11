@@ -1,0 +1,266 @@
+=encoding utf-8
+
+=head1 NAME
+
+intro_runnable_module - A brief introduction to Runnable-Module design pattern
+
+=head1 INTRO
+
+This document briefly describes a programming idiom (or design
+pattern, maybe) which I call it as I<Runnable-Module>.
+It seems to me that it is not so well known in perl community
+but I can find L<some|https://www.perlmonks.org/?node_id=621378> L<articles|https://www.perlmonks.org/?node_id=396759> for it. Same pattern can also be found in other dynamic scripting language like L<python|https://stackoverflow.com/questions/419163/what-does-if-name-main-do>. I'm not
+sure it already has better name. If you know about it, please tell me.
+
+Note: original version of this document (written in Japanese) can be found at
+my blog post: L<https://hkoba.hatenablog.com/entry/2017/09/06/185029>
+日本語版もあるよ！.
+
+=head1 Runnable module - What, Why and How
+
+I<Runnable-module> is a programming idiom which allows you to write
+a script to be used both as a standalone program and as a library file
+(can be used via C<use>, C<require>). In perl, it is usually implemented using
+C<unless caller> block.
+
+=head2 What is C<unless caller>?
+
+Have you ever read perl code which ends with something like following?:
+
+    unless (caller) {
+      ...Some interesting code...
+    }
+
+This C<unless (caller) {...}> guards C<...> portion of code to run
+only when this program file is directly executed.
+When the same script is C<eval()>ed as a string or C<require()>d as a module, the C<...> portion is not executed. I knew this idiom in context of L<Tk>
+on comp.lang.perl.tk IIRC and used it
+like L<this post|https://groups.google.com/d/msg/comp.lang.perl.tk/qFyt08fZhGo/uzI1QmL9ZKkJ>. At that time, it was used like:
+
+
+    MainLoop unless caller;
+
+and achieved following tricks:
+
+=over 4
+
+=item * When this script is executed directly, run C<Tk::MainLoop()>
+so that correctly start GUI drawing and event loop.
+
+=item * Otherwise (i.e. C<eval()>ed from clipboard and/or C<do "script">) do nothing.
+
+=back
+
+=head2 Let's write F<MyScript.pm> instead of F<myscript.pl>
+
+This C<unless caller> idiom is useful not only in Tk scripts,
+but also in normal perl scriptings because it enables you
+to write dual purpose script: your script can be used as a module
+and also as a standalone script.
+
+To achieve it, what you need is
+
+=over 4
+
+=item 1
+Name your script like F<MyScript.pm> instead of F<myscript.pl>.
+
+=item 2
+Do C<chmod a+x MyScript.pm> from shell.
+
+=item 3
+Add shbang C<#!/usr/bin/env perl> at first line of it.
+
+=item 4
+Add C<package MyScript;> declaration and also C<1;> at the end of this script.
+
+=back
+
+And finally, you can write some codes guarded in C<unless (caller) {...}> block
+for standalone mode. Here is typical skeleton of such script.
+
+    #!/usr/bin/env perl
+    package MyScript;
+    
+    ...
+    
+    unless (caller) {
+       my @opts; 
+       push @opts, split /=/, $_, 2 while @ARGV and $ARGV[0] =~ /=/; # XXX:minimum!
+       my $app = MyScript->new(@opts);
+       $app->main(@ARGV);
+    }
+    
+    1;
+
+Now, your script became a I<Runnable-Module>. You can use this F<MyScript.pm>
+not only as a CLI tool (don't forget C<chmod a+x>;-), but also as a module
+and call some internal functions/methods freely.
+
+
+    # Invoke as a command and execute MyScript->new(x=>100,y=>100)->main('foo','bar')
+    % ./MyScript.pm x=100 y=100 foo bar
+    
+    # Use as a module, instantiate and call method foo
+    % perl -I. -MMyScript -le 'print MyScript->new->foo'
+
+
+=head2 Dispatching subcommands to methods turns your script into multi-role editor
+
+In above example, C<unless (caller) {...}> block is hard-wired to call
+C<< MyScript->new->main >>. But you can write here more useful behavior
+which could be similar to typical CLI programs with subcommands (i.e. git),
+like following:
+
+=over 4
+
+=item *
+Take a series of posix style long options C<--name=value> and use them as
+arguments of C<new()>.
+
+=over 4
+
+=item *
+If the option is name only (C<--name>), treat it as C<--name=1>.
+C<--debug> is treated as C<--debug=1>.
+
+=back
+
+=item *
+After that, treat next remaining argument as a subcommand name
+and dispatch it to specific method.
+
+=back
+
+Typical CLI usage can be imagined like following:
+
+    # Parse some textfiles and load it into SQLite DB
+    % ./MyScript.pm  --dbname=foo.db  import journal.tsv
+    
+    # Search and list something from above DB
+    % ./MyScript.pm  --dbname=foo.db  list_accounts
+
+
+To achieve above behavior, we can write C<unless (caller) {...}> block like following (assume C<parse_opts()> is given somewhere else):
+
+  unless (caller) {
+     my @opts = parse_opts(\@ARGV);
+  
+     my $self = __PACKAGE__->new(@opts);
+     
+     my $cmd = shift @ARGV || "help";
+  
+     my $method = "cmd_$cmd"; # Map $cmd to a method cmd_$cmd
+  
+     $self->can($method) or die "No such subcommand: $cmd";
+  
+     $self->$method(@ARGV);
+  }
+
+Then we can define subcommands in previous example just as C<sub cmd_import>
+and C<sub cmd_list_accounts>. No special efforts are required.
+
+
+Note: Above code dispatches given subcommand argument C<$cmd> to a method named
+C<cmd_$cmd>. This is because C<import()> is special name for perl itself.
+See L<perlfunc/use>.
+
+=head2 Subcommand dispatcher can be extended to aid Exploratory programming
+
+In previous example, the subcommand dispatcher was intentionally restricted
+only to invoke specifically named methods like C<cmd_...>. Such restriction
+is useful to hide specific methods (like C<import>) and also can be useful
+to provide I<official> list of subcommands.
+
+But this subcommand dispatcher can be extended to do more important jobs in
+programming, especially for bottom-up style
+L<Exploratory programming|https://en.wikipedia.org/wiki/Exploratory_programming>
+for unknown/uncertain problem domains.
+
+In bottom-up style programming, programmer starts writing small pieces of code,
+test them from L<REPL(Read-Eval-Print Loop)|https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop> one-by-one. Those pieces are composed, tested, renamed,
+rewritten and/or discarded and tested again-and-again, endlessly until he/she gets something practically useful.
+
+Unfortunately, perl doesn't have good REPL in its core. And even if you
+use some REPL library, dynamic code redefinition from REPL works against
+C<use strict> and C<use warnings>, which is the MUST in modern perl programming.
+
+Fortunately, IMHO, most important property of REPL based development can be
+incorporated to other languages without REPL. Because it is shortness of
+turn-around time to test every single piece of bottom-up constructions.
+
+In other words, if we can test almost every interesting methods just
+in seconds from shell's CLI and compose them without creating a new file
+with editor, your shell becomes REPL for your Exploratory programming.
+
+To achieve this, we can extend subcommand dispatcher to handle methods
+other than C<cmd_...>. It must emit return values to STDOUT.
+Since return values may contain C<undef>, C<[..]>, C<{..}>...
+we must use some kind of serializer such as L<Data::Dumper> or L<JSON>.
+Following is a minimum starting point of such subcommand dispatcher:
+
+
+    use Data::Dumper;
+    
+    unless (caller) {
+       my @opts = parse_opts(\@ARGV);
+    
+       my $self = __PACKAGE__->new(@opts);
+       
+       my $cmd = shift @ARGV || "help";
+    
+       # If there is a method matches with "cmd_$cmd", invoke it.
+       if (my $sub = $self->can("cmd_$cmd")) {
+    
+         $sub->($self, @ARGV);
+       }
+       # If there is a method matches with $cmd, invoke it and dump the result
+       # for development aid.
+       elsif ($sub = $self->can($cmd)) {
+    
+         my @res = $sub->($self, @ARGV);
+    
+         print Data::Dumper->new(\@res)->Dump;
+       } 
+       else {
+         die "No such subcommand: $cmd";
+       }
+    }
+
+You may want to extend above code for more useful one to handle following points:
+
+=over 4
+
+=item *
+Change exit code when C<@res> is falsy.
+
+=item *
+Change output serializer to L<JSON>.
+
+=item *
+Change argument parser to convert C<[..]>, C<{...}> automatically
+by L<JSON/decode_json> too.
+This enables you to compose your favorite methods each other
+which takes/returns structured objects/arrays.
+
+=back
+
+This is a backstory of L<MOP4Import::Base::CLI_JSON>. Thank you for reading!
+
+=head1 APPENDIX
+
+=head2 Sample implementation of parse_opts()
+
+
+    sub parse_opts {
+      my ($list, $result) = @_;
+      $result //= [];
+      while (@$list and my ($n, $v) = $list->[0]
+             =~ m{^--$ | ^(?:--? ([\w:\-\.]+) (?: =(.*))?)$}xs) {
+        shift @$list;
+        last unless defined $n;
+        push @$result, $n, $v // 1;
+      }
+      wantarray ? @$result : $result;
+    }
+

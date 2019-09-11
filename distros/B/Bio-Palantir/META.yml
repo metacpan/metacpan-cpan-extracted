@@ -51,6 +51,6 @@ requires:
   perl: '5.013002'
   strict: '0'
   warnings: '0'
-version: '0.192240'
+version: '0.192540'
 x_generated_by_perl: v5.22.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

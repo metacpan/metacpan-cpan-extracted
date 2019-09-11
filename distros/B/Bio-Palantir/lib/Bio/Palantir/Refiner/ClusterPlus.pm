@@ -1,6 +1,6 @@
 package Bio::Palantir::Refiner::ClusterPlus;
 # ABSTRACT: Refiner internal class for handling ClusterPlus objects
-$Bio::Palantir::Refiner::ClusterPlus::VERSION = '0.192240';
+$Bio::Palantir::Refiner::ClusterPlus::VERSION = '0.192540';
 use Moose;
 use namespace::autoclean;
 
@@ -40,6 +40,11 @@ has 'from_seq' => (
     default => 0,
 );
 
+has 'module_delineation' => (
+    is      => 'ro',
+    isa     => 'Str',
+);
+
 has 'uui' => (
     is       => 'ro',
     isa      => 'Str',
@@ -76,6 +81,11 @@ with 'Bio::Palantir::Roles::Clusterable';   ## no critic (ProhibitMultipleWiths)
 
 sub BUILD {
     my $self = shift;
+    
+    # determine how delineate modules
+    $self->_set_cutting_mode( 
+        $self->module_delineation // $self->_cluster->module_delineation
+    );
 
     my @genes_plus;
     push @genes_plus, GenePlus->new( 
@@ -103,7 +113,7 @@ sub _update_domain_ranks {
     for my $gene ($self->all_genes) {
 
         next
-            unless $gene->all_domains;
+            unless $gene->all_domains || $gene->all_exp_domains;
        
         my @sorted_domains 
             = sort { $a->begin <=> $b->begin } $gene->all_domains;
@@ -136,7 +146,7 @@ Bio::Palantir::Refiner::ClusterPlus - Refiner internal class for handling Cluste
 
 =head1 VERSION
 
-version 0.192240
+version 0.192540
 
 =head1 SYNOPSIS
 

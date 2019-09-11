@@ -36,7 +36,9 @@ sub scan {
     }
     foreach my $file (glob $self->{pattern}) {
 	next if $file =~ m{$self->{ignore}};
-	$err |= $self->load($file);
+	unless ($self->load($file)) {
+	    ++$err;
+	}
     }
     return $err == 0;
 }

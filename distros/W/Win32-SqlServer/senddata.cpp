@@ -1,14 +1,28 @@
 /*---------------------------------------------------------------------
- $Header: /Perl/OlleDB/senddata.cpp 19    16-07-17 22:58 Sommar $
+ $Header: /Perl/OlleDB/senddata.cpp 21    19-07-09 16:53 Sommar $
 
   Implements the routines for sending data and command to SQL Server:
   initbatch, enterparameter and executebatch, including routines to
   convert from Perl variables to SQL Server data types, save datetime
   data; those are in datetime.cpp.
 
-  Copyright (c) 2004-2016   Erland Sommarskog
+  Copyright (c) 2004-2019   Erland Sommarskog
 
   $History: senddata.cpp $
+ * 
+ * *****************  Version 21  *****************
+ * User: Sommar       Date: 19-07-09   Time: 16:53
+ * Updated in $/Perl/OlleDB
+ * Fixed type errors in 32-bit compile.
+ * 
+ * *****************  Version 20  *****************
+ * User: Sommar       Date: 19-07-08   Time: 22:42
+ * Updated in $/Perl/OlleDB
+ * To support UTF-8 collations (and other collations not in the ANSI code
+ * page), we always convert to the database collation and assume that
+ * AutoTranslate is off. initbatch now makes an explicit callback to the
+ * Perl code to get the codepage, whereas SQL Version (and current
+ * database) are retrieved from the init object.
  * 
  * *****************  Version 19  *****************
  * User: Sommar       Date: 16-07-17   Time: 22:58
@@ -257,35 +271,33 @@ BOOL SV_to_binary (SV        * sv,
 }
 
 BOOL SV_to_char (SV       * sv,
+                 UINT       DB_codepage,
                  char     * &charval,
                  DBLENGTH   &value_len)
 {
-  if (! SvUTF8(sv)) {
-      // This is quite trivial. We should however copy the string to our own
-      // buffer.
+   // We have to convert the data from one code page to another, but
+   // only do this if needed.
+   if (SvUTF8(sv) && DB_codepage == CP_UTF8 ||
+       ! SvUTF8(sv) && DB_codepage == GetACP()) {
+      // Just copy the string to our own buffer
       STRLEN strlen;
       char * perl_str = SvPV(sv, strlen);
       value_len = strlen;
       New(902, charval, strlen + 1, char);
       memcpy(charval, perl_str, strlen);
-      return TRUE;
    }
    else {
-      // Use IDataConvert to get a string in ANSI CP.
-      DBLENGTH bytelen;
-      BSTR     bstr = SV_to_BSTR(sv, &bytelen);
-      HRESULT  ret;
-
-      New(902, charval, bytelen / 2 + 1, char);
-      value_len = bytelen / 2;
-
-      ret = data_convert_ptr->DataConvert(
-            DBTYPE_WSTR, DBTYPE_STR, bytelen, NULL,
-            bstr, charval, (bytelen / 2 + 1), DBSTATUS_S_OK, NULL,
-            NULL, NULL, 0);
+      // First convert it to UTF-16 (because that is what Windows offers).
+      // and then to the target code page.
+      BSTR bstr = SV_to_BSTR(sv);
+      STRLEN charlen;
+      charval = BSTR_to_char(bstr, SysStringLen(bstr), DB_codepage, 
+                             &charlen);
+      value_len = charlen;
       SysFreeString(bstr);
-      return SUCCEEDED(ret);
    }
+
+   return TRUE;
 }
 
 // This is a helper routine to SV_to_XML, also called from enterparameter.
@@ -345,6 +357,7 @@ static void get_xmlencoding (SV              * sv,
 
 
 BOOL SV_to_XML (SV        * sv,
+                UINT        DB_codepage,
                 BOOL        &is_8bit,
                 char      * &xmlchar,
                 BSTR        &xmlbstr,
@@ -360,7 +373,7 @@ BOOL SV_to_XML (SV        * sv,
    // And then handle the string accordingly.
    switch (charsettype) {
       case eightbit :
-         retval = SV_to_char(sv, xmlchar, value_len);
+         retval = SV_to_char(sv, DB_codepage, xmlchar, value_len);
          //value_len *= 2;
          is_8bit = TRUE;
          xmlbstr = NULL;
@@ -469,6 +482,8 @@ BOOL SV_to_ssvariant (SV          * sv,
                       void        * &save_str,
                       BSTR          &save_bstr)
 {
+    UINT DB_codepage = OptCurrentCodepage(olle_ptr);
+
     save_str = NULL;
     save_bstr = NULL;
     memset(&variant, 0, sizeof(SSVARIANT));
@@ -477,11 +492,12 @@ BOOL SV_to_ssvariant (SV          * sv,
     // If the SV is a reference to a hash, it may be a datetime value, so
     // we try this first. SS_to_ssvariant_datetime will return true if the
     // reference is something completely different, so we can fall through
-    // and interpret the reference as a string. Only if it looks as a datetime
-    // hash with illegal value, we get FALSE back.
+    // and interpret the reference as a string. Only if it looks as a 
+    // datetime hash with illegal value, we get FALSE back.
     if (SvROK(sv)) {
        BOOL ret = SV_to_ssvariant_datetime(sv, variant, olle_ptr, provider);
        if (! ret) return FALSE;
+       if (variant.vt != VT_SS_NULL) return TRUE;
     }
 
     if (SvIOK(sv)) {
@@ -506,7 +522,12 @@ BOOL SV_to_ssvariant (SV          * sv,
        variant.vt = VT_SS_R8;
        variant.dblFloatVal = SvNV(sv);
     }
-    else if (SvUTF8(sv)) {
+    else if (DB_codepage != CP_UTF8 &&
+            (SvUTF8(sv) || DB_codepage != GetACP())) {
+       // We probably have a string (but it would be a references or
+       // whatever). If database collation is UTF8. we always pass
+       // the value as varchar. Else we send nvarchar, if the UTF8
+       // bit is set, of the codeages are different.
        DBLENGTH bytelen;
        BSTR     bstr = SV_to_BSTR(sv, &bytelen);
 
@@ -517,20 +538,18 @@ BOOL SV_to_ssvariant (SV          * sv,
        variant.NCharVal.pwchNCharVal = bstr;
        save_bstr = bstr;
     }
-    else if (variant.vt == VT_SS_NULL) {
-    // That is, we end up here, even if the value is a reference or whatever.
-       STRLEN strlen;
-       char * perl_ptr = SvPV(sv, strlen);
+    else {
+       // Send as varchar.
+       DBLENGTH strlen;
        char * str;
-
+       SV_to_char(sv, DB_codepage, str, strlen);
        if (strlen > 8000) strlen = 8000;
-       New(902, str, strlen + 1, char);
-       memcpy(str, perl_ptr, strlen);
        str[strlen] = '\0';
+
        variant.vt = VT_SS_VARSTRING;
+       variant.CharVal.pchCharVal =  str;
        variant.CharVal.sActualLength = (SHORT) strlen;
        variant.CharVal.sMaxLength = (SHORT) strlen;
-       variant.CharVal.pchCharVal = str;
        save_str = str;
     }
 
@@ -908,7 +927,8 @@ BOOL perl_to_sqlvalue(SV         * olle_ptr,
 
       case DBTYPE_STR :
          {  char * value_ptr;
-            value_OK = SV_to_char(sv_value, value_ptr, value_len);
+            value_OK = SV_to_char(sv_value, OptCurrentCodepage(olle_ptr),
+                                  value_ptr, value_len);
             if (value_OK) {
                // If the value is overlong, just silently truncate it.
                if (value_len > maxlen) {
@@ -923,8 +943,8 @@ BOOL perl_to_sqlvalue(SV         * olle_ptr,
          {  char * value8_ptr = NULL;
             BSTR   value_bstr = NULL;
             BOOL   is_8bit;
-            value_OK = SV_to_XML(sv_value, is_8bit, value8_ptr, value_bstr,
-                                 value_len);
+            value_OK = SV_to_XML(sv_value, OptCurrentCodepage(olle_ptr),
+                               is_8bit, value8_ptr, value_bstr, value_len);
             if (value_OK) {
                if (is_8bit) {
                   sqlvalue.byrefptr = save_ptr = (void *) value8_ptr;
@@ -1003,8 +1023,9 @@ BOOL perl_to_sqlvalue(SV         * olle_ptr,
 //--------------------------------------------------------------------
 // $X->initbatch.
 //--------------------------------------------------------------------
-void initbatch(SV * olle_ptr,
-               SV * sv_cmdtext)
+int initbatch(SV   * olle_ptr,
+              SV   * sv_cmdtext,
+              BOOL isnestedquery)
 {
     internaldata  * mydata = get_internaldata(olle_ptr);
 
@@ -1017,10 +1038,35 @@ void initbatch(SV * olle_ptr,
         olle_croak(olle_ptr, "Cannot init a new batch, when previous batch has not been processed");
     }
 
-    // We must make sure that SqlVersion is loaded. We do this here, before
-    // we get a batch pending. We can't do it on connection, since the user
-    // may have selected AutoConnect.
-    OptSqlVersion(olle_ptr);
+    // This is the point where we set SQL Server version and get codepage
+    // for the current database. We go to the Perl code, which may call 
+    // as again. 
+    if (! isnestedquery) {
+       // Make sure that we have the datasrc pointers set up.
+       if (! setup_datasrc(olle_ptr)) {
+          return FALSE;
+       }
+
+       // When we call the Perl code, this may lead to a nested
+       // query. Set this flag now.
+       mydata->isnestedquery = TRUE;
+
+       // Set up for the Perl callback.
+       dSP;
+       ENTER;
+       SAVETMPS;
+       PUSHMARK(SP);
+       EXTEND(SP, 2);
+       PUSHs(olle_ptr);
+       PUTBACK;
+       call_method("get_db_codepage", G_DISCARD);
+
+       FREETMPS;
+       LEAVE;
+
+       // And clear the nested-query flag.
+       mydata->isnestedquery = FALSE;
+    }
 
     // Save the command. If the command text is blank or the empty string,
     // we set the command text to one blank, to avoid error emssages.
@@ -1030,6 +1076,7 @@ void initbatch(SV * olle_ptr,
     else {
        mydata->pending_cmd = SysAllocString(L" ");
     }
+    return TRUE;
 }
 
 //------------------------------------------------------------------------
@@ -1401,14 +1448,11 @@ void write_to_databuffer(SV        * olle_ptr,
    }
 }
 
-//-------------------------------------------------------------------
-// set_rowset_properties, this is a subroutine to executebatch.
-//-------------------------------------------------------------------
+// Retrieves a key value from the QH hash. The value must be defined, and
+// a string value must not be the empty string.
 static SV  * get_QN_hash(HV * hv,
                          const char * key)
 {
-   // Retrieves a key value from the QH hash. The value must be defined, and
-   // a string value must not be the empty string.
    SV  ** svp;
    SV   * sv = NULL;
    SV   * ret = NULL;
@@ -1429,6 +1473,9 @@ static SV  * get_QN_hash(HV * hv,
    return ret;
 }
 
+//-------------------------------------------------------------------
+// set_rowset_properties, this is a subroutine to executebatch.
+//-------------------------------------------------------------------
 static void set_rowset_properties (SV           * olle_ptr,
                                    internaldata * mydata)
 {
@@ -1458,7 +1505,9 @@ static void set_rowset_properties (SV           * olle_ptr,
        no_of_propsets++;
     }
 
-    if (optQN) {
+    // Check for query notification - but not if we run the nested
+    // query to get the codepage.
+    if (optQN && ! mydata->isnestedquery) {
        SV   * sv_service;
        SV   * sv_message;
        SV   * sv_timeout;
@@ -1548,6 +1597,7 @@ static void set_rowset_properties (SV           * olle_ptr,
        }
     }
 }
+
 
 //-------------------------------------------------------------------
 // $X->executebatch.

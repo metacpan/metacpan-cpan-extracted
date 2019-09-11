@@ -58,11 +58,14 @@ my %module = (
                         'Cwd' => 0,
                         'File::Basename' => 0,
                         'HTTP::Response' => 0,
-                        'HTTP::Daemon' => 0,
+                        'HTTP::Daemon' => 6.05,
                         'IO::Socket::INET' => 0, # For port probing
                         'CGI' => 0,
                         'HTTP::Request::AsCGI' => 0,
                         'LWP::Simple' => 0, # just for testing
+                        'LWP' => '6.36', # somewhere before that, there is a test failure otherwise
+                        'Socket' => 0, # for detecting 127.0.0.1 vs [::1]
+                        'URI'      => 0,
                         'URI::URL' => 0,
     },
     TEST_REQUIRES => {

@@ -4,6 +4,7 @@ use warnings;
 use lib 't/lib';
 use T::RequireDateTime;
 
+use DateTime::Duration;
 use Test::More;
 use Test::Fatal;
 

@@ -47,19 +47,20 @@ decreasearray deg2rad_ rad2deg_ purifyarray replace_nth rotate2dabs rotate2d rot
 gatherseparators supercleanarray modish $max_processes
 ); # our @EXPORT = qw( );
 
-$VERSION = '0.113'; # our $VERSION = '';
+$VERSION = '0.115'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Morph is a morphing program for performing parametric variations on model for simulation programs.';
 
 ################################################# MORPH
 
 sub morph
 {
-	my ( $configfile, $instances_r, $dirfiles_r, $dowhat_r, $vehicles_r ) = @_;
+	my ( $configfile, $instances_r, $dirfiles_r, $dowhat_r, $vehicles_r, $inst_r ) = @_;
 
 	my @instances = @{ $instances_r };
 	my %dirfiles = %{ $dirfiles_r };
 	my %dowhat = %{ $dowhat_r };
 	my %vehicles = %{ $vehicles_r };
+	my %inst = %{ $inst_r };
 
 	my $mypath = $main::mypath;
 	my $exeonfiles = $main::exeonfiles;
@@ -70,7 +71,7 @@ sub morph
 	my $outfile = $main::outfile;
 	my $tofile = $main::tofile;
 	my $simnetwork = $main::simnetwork;
-	my $max_processes = $main::max_processes;
+  my $max_processes = $main::max_processes;
 
 	my %simtitles = %main::simtitles;
 	my %retrievedata = %main::retrievedata;
@@ -89,13 +90,19 @@ sub morph
 	my @filter_columns = @main::filter_columns;
 	my %vals = %main::vals;
 
+	if ( $tofile eq "" )
+	{
+		$tofile = "./report.txt";
+	}
+	else
+	{
+		$tofile = "$mypath/$file-tofile.txt";
+	}
+
 	$tee = new IO::Tee( \*STDOUT, ">>$tofile" ); # GLOBAL ZZZ
 
 	say $tee "\n# Now in Sim::OPT::Morph.\n";
-
-	#say $tee "IN MORPH! \$configfile " . dump( $configfile );
-
-	#say $tee "BEGINNING IN MORPH! \%vals " .dump( %vals );
+	say "\n# Now in Sim::OPT::Morph.\n";
 
 	if ( not ( $exeonfiles ) ) { $exeonfiles = "y"; }
 	if ( not ( $preventsim ) ) { $preventsim = "n"; }
@@ -276,7 +283,7 @@ sub morph
 
 		my $origin = $d{origin};
 		my %to = %{ $d{to} };
-		my %inst = %{ $d{inst} };
+		#my %inst = %{ $d{inst} };
 
 		my $from = $d{from};
 		my $toitem = $d{toitem};
@@ -3285,22 +3292,10 @@ sub change_config
 	{
 		unless ($exeonfiles eq "n")
 		{
-			unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
-			{
-				`cp -f $to/$new_configfile $to/$original_configfile\n`;
-			}
-			else
-			{
-				`xcopy  /e /c /r /y $to\\$new_configfile $to\\$original_configfile\n`;
-			}
-		}
-		unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
-		{
+
+			`cp -f $to/$new_configfile $to/$original_configfile\n`;
 			print $tee "cp -f $to/$new_configfile $to/$original_configfile\n";
-		}
-		else
-		{
-			print $tee "xcopy  /e /c /r /y $to\\$new_configfile $to\\$original_configfile\n";
+
 		}
 	}
 $countconfig++;
@@ -3318,22 +3313,8 @@ sub checkfile # THIS CHECKS IF A SOURCE FILE MUST BE SUBSTITUTED BY ANOTHER ONE.
 		{
 			unless ($exeonfiles eq "n")
 			{
-				unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
-				{
-					`cp -f $sourceaddress $targetaddress\n`;
-				}
-				else
-				{
-					`xcopy  /e /c /r /y $sourceaddress $targetaddress\n`;
-				}
-			}
-			unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
-			{
+				`cp -f $sourceaddress $targetaddress\n`;
 				print $tee "cp -f $sourceaddress $targetaddress\n";
-			}
-			else
-			{
-				print $tee "xcopy  /e /c /r /y $sourceaddress $targetaddress\n";
 			}
 		}
 	}
@@ -3397,22 +3378,8 @@ sub change_climate ### THIS SIMPLE SCRIPT HAS TO BE DEBUGGED. WHY DOES IT BLOCK 
 	close TEMPFILECONFIG;
 	unless ( $exeonfiles eq "n" )
 	{
-		unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
-		{
-			`cp -R -f $tempfileconfig $myfile` ;
-		}
-		else
-		{
-			`xcopy  /e /c /r /y $tempfileconfig $myfile` ;
-		}
-	}
-	unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
-	{
+		`cp -R -f $tempfileconfig $myfile` ;
 		print $tee "cp -R -f $tempfileconfig $myfile" ;
-	}
-	else
-	{
-		print $tee "xcopy  /e /c /r /y $tempfileconfig $myfile" ;
 	}
 
 	print $tee "

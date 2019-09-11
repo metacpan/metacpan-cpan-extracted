@@ -1,6 +1,6 @@
 NAME
     StreamFinder - Fetch actual raw streamable URLs from various
-    radio-station websites.
+    radio-station and video websites.
 
 INSTALLATION
             To install this module, run the following commands:
@@ -51,6 +51,10 @@ SYNOPSIS
 
             print "Station ID=$stationID\n";
         
+            my $stationDescription = $station->getTitle('desc');
+        
+            print "Description=$stationDescription\n"  if (defined $stationDescription);
+        
             my $icon_url = $station->getIconURL();
 
             if ($icon_url) {   #SAVE THE ICON TO A TEMP. FILE:
@@ -85,29 +89,43 @@ DESCRIPTION
     StreamFinder accepts a valid radio station URL on supported websites and
     returns the actual stream URL(s), title, and cover art icon for that
     station. The purpose is that one needs one of these URLs in order to
-    have the option to stream the station/video in one's own choice of audio
+    have the option to stream the station/video in one's own choice of media
     player software rather than using their web browser and accepting any /
     all flash, ads, javascript, cookies, trackers, web-bugs, and other
-    crapware that can come with that method of playing. The author uses his
-    own custom all-purpose media player called "fauxdacious" (his custom
-    hacked version of the open-source "audacious" audio player).
-    "fauxdacious" incorporates this module to decode and play streams. The
+    crapware associated with that method of playing. The author uses his own
+    custom all-purpose media player called "fauxdacious" (his custom hacked
+    version of the open-source "audacious" audio player). "fauxdacious"
+    incorporates this module to decode and play streams. The
     currently-supported websites are: radionomy.com, iheartradio.com,
     reciva.com, radio.net, facebook, banned.video, and youtube / vimeo /
     brighteon, et. al. We are again supporting tunein.com, but it may not
-    work for all stations!
+    work for all stations / podcasts!
+
+    NOTE: For some sites, ie. Youtube, Facebook, and BannedVideo, the
+    "station" object actually refers to a specific video, but functions the
+    same way!
 
     Each site is supported by a separate subpackage
     (StreamFinder::*Package*), which is determined and selected based on the
     url when the StreamFinder object is created. The methods are overloaded
     by the selected subpackage's methods.
 
-    One or more playable streams can be returned for each station.
+    Please see the POD. documentation for each subpackage for important
+    additional information on options and features specific to each site /
+    subpackage!
+
+    One or more playable streams can be returned for each station / video.
 
 SUBROUTINES/METHODS
     new(*url* [, *options* ])
         Accepts a URL and creates and returns a new station object, or
         *undef* if the URL is not a valid station or no streams are found.
+
+        NOTE: A full URL must be specified here, but if using any of the
+        subpackage modules directly instead, then either a full URL OR just
+        the station / video's site ID may be used! Reason being that this
+        function parses the full URL to determine which subpackage (site)
+        module to use.
 
         *options* can vary depending on the type of stream (site) that is
         being queried. One option common to all sites is *-debug*, which
@@ -122,22 +140,26 @@ SUBROUTINES/METHODS
         Similar to get() except it only returns a single stream representing
         the first valid stream found.
 
-        Current options are: *-random* and *-noplaylists*. By default, the
-        first ("best"?) stream is returned. If *-random* is specified, then
+        Current options are: *"random"* and *"noplaylists"*. By default, the
+        first ("best"?) stream is returned. If *"random"* is specified, then
         a random one is selected from the list of streams found. If
-        *-noplaylists* is specified, and the stream to be returned is a
-        "playlist" (.pls extension), it is first fetched and the first entry
-        in the playlist is returned. This is needed by Fauxdacious
-        Mediaplayer.
+        *"noplaylists"* is specified, and the stream to be returned is a
+        "playlist" (.pls or .m3u? extension), it is first fetched and the
+        first entry in the playlist is returned. This is needed by
+        Fauxdacious Mediaplayer.
 
     $station->count()
         Returns the number of streams found for the station.
 
-    $station->getStationID()
-        Returns the station's ID.
+    $station->getStationID(['fccid'])
+        Returns the station's site ID (default), or station's FCC
+        call-letters ("fccid") for applicable sites and stations.
 
-    $station->getTitle()
-        Returns the station's title (description).
+    $station->getTitle(['desc'])
+        Returns the station's title, or (long description).
+
+        NOTE: Some sights do not support a separate long description field,
+        so if none found, the standard title field will always be returned.
 
     $station->getIconURL()
         Returns the url for the station's "cover art" icon image, if any.
@@ -149,10 +171,22 @@ SUBROUTINES/METHODS
     $station->getImageURL()
         Returns the url for the station's "cover art" banner image, if any.
 
+        NOTE: If no "banner image" (usually a larger image) is found, the
+        "icon image" url will be returned.
+
     $station->getImageData()
         Returns a two-element array consisting of the extension (ie. "png",
         "gif", "jpeg", etc. and the actual station's banner image (binary
         data).
+
+        NOTE: If no "banner image" (usually a larger image) is found, the
+        "icon image" data will be returned.
+
+    $video->getType()
+        Returns the station's type (*submodule-name*). (one of:
+        "BannedVideo", "Facebook", "IHeartRadio", "RadioNet", "Radionomy",
+        "Reciva", "Tunein", or "Youtube" - depending on the sight that
+        matched the URL.
 
 CONFIGURATION FILES
     ~/.config/StreamFinder/config
@@ -184,16 +218,14 @@ CONFIGURATION FILES
     those corresponding options specified in these files.
 
 DEPENDENCIES
-    LWP::UserAgent
+    URI::Escape, HTML::Entities, LWP::UserAgent
 
 RECCOMENDS
-    URI::Escape; (Youtube)
+    WWW::YouTube::Download (for Youtube)
 
-    WWW::YouTube::Download; (Youtube)
+    youtube-dl (for Youtube, Facebook, Tunein)
 
-    youtube-dl (Youtube, Facebook, Tunein)
-
-    wget (Reciva, Youtube, BannedVideo)
+    wget
 
 BUGS
     Please report any bugs or feature requests to "bug-streamFinder at

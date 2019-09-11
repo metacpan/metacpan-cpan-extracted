@@ -38,7 +38,7 @@ no warnings;
 #@EXPORT   = qw(); # our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw( descend prepareblank ); # our @EXPORT = qw( );
 
-$VERSION = '0.143'; # our $VERSION = '';
+$VERSION = '0.147'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Descent is an module collaborating with the Sim::OPT module for performing block coordinate descent.';
 
 #########################################################################################
@@ -84,9 +84,13 @@ sub descend
   %vals = %main::vals;
 
   my %dt = %{ $_[0] };
+
   my @instances = @{ $dt{instances} };
   my %dirfiles = %{ $dt{dirfiles} };
   my %vehicles = %{ $dt{vehicles} };
+  my %winhash = %{ $dt{winhash} };
+  #my $winning = $winhash{winning};
+  my %inst = %{ $dt{inst} };
 
   my @simcases = @{ $dirfiles{simcases} };
   my @simstruct = @{ $dirfiles{simstruct} };
@@ -129,7 +133,7 @@ sub descend
   my @rootnames = @{ $d{rootnames} }; ######
   my @winneritems = @{ $d{winneritems} };
   my $instn = $d{instn};
-  my %inst = %{ $d{inst} };
+  #my %inst = %{ $d{inst} };
   my %dowhat = %{ $d{dowhat} }; ######
 
   my $skipfile = $vals{skipfile};
@@ -244,6 +248,15 @@ sub descend
   {
     $orderedfile = "";
   }
+
+  #if ( $winning ne "" )
+  #{
+  #  Sim::OPT::callblock( { countcase => $countcase, countblock => $countblock,
+  #  miditers => \@miditers,  winneritems => \@winneritems,
+  #  dirfiles => \%dirfiles, varnumbers => \@varnumbers,
+  #  sweeps => \@sweeps, datastruc => \%datastruc, dowhat => \%dowhat ,
+  #  sourcesweeps => \@sourcesweeps, instn => $instn, inst => \%inst, vehicles => \%vehicles } );
+  #}
 
   sub plus1
   {
@@ -1392,7 +1405,7 @@ sub descend
               if ( $dowhat{morph} eq "y" )
               {
                 say $tee "#Calling morphing operations for instance $instance{is} in case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
-                my @result = Sim::OPT::Morph::morph( $configfile, \@instancees, \%dirfiles, \%dowhat, \%vehicles );
+                my @result = Sim::OPT::Morph::morph( $configfile, \@instancees, \%dirfiles, \%dowhat, \%vehicles, \%inst );
               }
 
               if ( ( $dowhat{simulate} eq "y" ) or ( $dowhat{newreport} eq "y" ) )
@@ -1401,7 +1414,7 @@ sub descend
                 say $tee "#Calling simulations, reporting and retrieving for instance $instance{is} in case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
                 my ( $simcases_ref, $simstruct_ref, $repcases_ref, $repstruct_ref,
                   $mergestruct_ref, $mergecases_ref, $c ) = Sim::OPT::Sim::sim(
-                    { instances => \@instancees, dirfiles => \%dirfiles, vehicles => \%vehicles } );
+                    { instances => \@instancees, dirfiles => \%dirfiles, vehicles => \%vehicles, inst => \%inst } );
                     $dirfiles{simcases} = $simcases_ref;
                     $dirfiles{simstruct} = $simstruct_ref;
                     $dirfiles{repcases} = $repcases_ref;
@@ -1549,7 +1562,7 @@ sub descend
               if ( $dowhat{morph} eq "y" )
               {
                 say $tee "#Calling morphing operations for instance $instance{is} in case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
-                my @result = Sim::OPT::Morph::morph( $configfile, \@instancees, \%dirfiles, \%dowhat, \%vehicles );
+                my @result = Sim::OPT::Morph::morph( $configfile, \@instancees, \%dirfiles, \%dowhat, \%vehicles, \%inst );
               }
 
               if ( ( $dowhat{simulate} eq "y" ) or ( $dowhat{newreport} eq "y" ) )
@@ -1558,7 +1571,7 @@ sub descend
                 say $tee "#Calling simulations, reporting and retrieving for instance $instance{is} in case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
                 my ( $simcases_ref, $simstruct_ref, $repcases_ref, $repstruct_ref,
                   $mergestruct_ref, $mergecases_ref, $c ) = Sim::OPT::Sim::sim(
-                    { instances => \@instancees, dirfiles => \%dirfiles, vehicles => \%vehicles } );
+                    { instances => \@instancees, dirfiles => \%dirfiles, vehicles => \%vehicles, inst => \%inst } );
                     $dirfiles{simcases} = $simcases_ref;
                     $dirfiles{simstruct} = $simstruct_ref;
                     $dirfiles{repcases} = $repcases_ref;

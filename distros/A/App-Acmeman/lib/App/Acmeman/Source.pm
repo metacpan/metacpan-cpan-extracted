@@ -25,6 +25,13 @@ sub get {
     return $self->{_cfg}->get(@_);
 }
 
+sub is_set {
+    my $self = shift;
+    croak "improper use of the get method"
+	unless exists $self->{_cfg};
+    return $self->{_cfg}->is_set(@_);
+}
+
 sub define_domain {
     my $self = shift;
     my $cn = shift || croak "domain name must be given";

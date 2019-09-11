@@ -30,6 +30,7 @@
             "Algorithm::Dependency::Source::HoA" : "0",
             "Any::Moose" : "0",
             "App::CreateSelfSignedSSLCert" : "0",
+            "App::ProcUtils" : "0",
             "App::rimetadb" : "0.221",
             "CDB_File" : "0",
             "CHI" : "0",
@@ -164,7 +165,7 @@
          "web" : "https://github.com/perlancar/perl-Task-Tmp-spanel"
       }
    },
-   "version" : "0.009",
+   "version" : "0.010",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028002"

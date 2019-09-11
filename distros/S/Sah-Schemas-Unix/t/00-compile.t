@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 33 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 35 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Data/Sah/Coerce/perl/int/int_check_gid_exists.pm',
@@ -27,6 +27,7 @@ my @module_files = (
     'Sah/Schema/unix/local_username.pm',
     'Sah/Schema/unix/pathname.pm',
     'Sah/Schema/unix/pid.pm',
+    'Sah/Schema/unix/signal.pm',
     'Sah/Schema/unix/uid.pm',
     'Sah/Schema/unix/username.pm',
     'Sah/SchemaR/unix/dirname.pm',
@@ -39,6 +40,7 @@ my @module_files = (
     'Sah/SchemaR/unix/local_username.pm',
     'Sah/SchemaR/unix/pathname.pm',
     'Sah/SchemaR/unix/pid.pm',
+    'Sah/SchemaR/unix/signal.pm',
     'Sah/SchemaR/unix/uid.pm',
     'Sah/SchemaR/unix/username.pm',
     'Sah/Schemas/Unix.pm'

@@ -21,6 +21,7 @@ requires:
   Algorithm::Dependency::Source::HoA: '0'
   Any::Moose: '0'
   App::CreateSelfSignedSSLCert: '0'
+  App::ProcUtils: '0'
   App::rimetadb: '0.221'
   CDB_File: '0'
   CHI: '0'
@@ -136,7 +137,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Task-Tmp-spanel
   homepage: https://metacpan.org/release/Task-Tmp-spanel
   repository: git://github.com/perlancar/perl-Task-Tmp-spanel.git
-version: '0.009'
+version: '0.010'
 x_Dist_Zilla:
   perl:
     version: '5.028002'

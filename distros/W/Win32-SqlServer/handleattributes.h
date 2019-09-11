@@ -1,12 +1,18 @@
 /*---------------------------------------------------------------------
- $Header: /Perl/OlleDB/handleattributes.h 2     11-08-07 23:25 Sommar $
+ $Header: /Perl/OlleDB/handleattributes.h 3     19-07-08 22:34 Sommar $
 
   Routines for getting and (in one case) deleting handle attributes from
   the Win32::SqlServer hash. Many of them are format options.
 
-  Copyright (c) 2004-2011   Erland Sommarskog
+  Copyright (c) 2004-2019   Erland Sommarskog
 
   $History: handleattributes.h $
+ * 
+ * *****************  Version 3  *****************
+ * User: Sommar       Date: 19-07-08   Time: 22:34
+ * Updated in $/Perl/OlleDB
+ * Move SQL_version to be in internaldata intstead. Added support for the
+ * codepages hash.
  * 
  * *****************  Version 2  *****************
  * User: Sommar       Date: 11-08-07   Time: 23:25
@@ -49,12 +55,7 @@ typedef struct {
 } formatoptions;
 
 
-// The SQL_version property.
-extern double OptSqlVersion(SV * olle_ptr);
-
-// Drop this property, to force re-reading from SQL Server later.
-extern void drop_SQLversion(SV * olle_ptr);
-
+// Routines to retrieve various properties.
 extern BOOL OptAutoConnect (SV * olle_ptr);
 
 extern BOOL OptPropsDebug(SV * olle_ptr);
@@ -81,4 +82,9 @@ extern HV* OptQueryNotification(SV * olle_ptr);
 
 extern formatoptions getformatoptions(SV * olle_ptr);
 
+extern UINT OptCurrentCodepage(SV * olle_ptr);
+
 extern void * OptInternalData(SV *olle_ptr);
+
+extern void ClearCodepages (SV * olle_ptr);
+

@@ -31,7 +31,8 @@ sub layout { shift->{_layout} }
 sub scan {
     my ($self) = @_;
     debug(2, 'assuming Apache layout "'.$self->layout->name.'"');
-    $self->set(qw(core postrenew), $self->layout->restart_command);
+    $self->set(qw(core postrenew), $self->layout->restart_command)
+        unless $self->is_set(qw(core postrenew));
     return $self->examine_http_config($self->layout->config_file);
 }
 

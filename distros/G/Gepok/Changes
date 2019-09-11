@@ -1,3 +1,9 @@
+0.292   2019-09-11  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Listen to sockets before daemonize, so failure is more
+	  obvious.
+
+
 0.291   2019-07-08  Released-By: PERLANCAR; Urgency: low
 
 	- [ux] Show M/N in process label.

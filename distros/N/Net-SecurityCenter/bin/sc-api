@@ -15,7 +15,7 @@ use English qw( -no_match_vars );
 
 use Data::Dumper;
 
-our $VERSION = '0.201';
+our $VERSION = '0.202';
 
 sub slurp {
 

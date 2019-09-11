@@ -10,6 +10,7 @@ my @files = (
     'lib/Parallel/ForkManager/Segmented.pm',
     't/00-compile.t',
     't/avoid-callback-on-empty-input.t',
+    't/system-test--process-batch.t',
     't/system-test-1.t'
 );
 

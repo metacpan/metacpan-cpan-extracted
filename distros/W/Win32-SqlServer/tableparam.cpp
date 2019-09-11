@@ -1,11 +1,16 @@
 /*---------------------------------------------------------------------
- $Header: /Perl/OlleDB/tableparam.cpp 16    16-07-11 22:24 Sommar $
+ $Header: /Perl/OlleDB/tableparam.cpp 17    19-07-08 22:28 Sommar $
 
   Implements all support for table parameters.
 
-  Copyright (c) 2004-2016   Erland Sommarskog
+  Copyright (c) 2004-2019   Erland Sommarskog
 
   $History: tableparam.cpp $
+ * 
+ * *****************  Version 17  *****************
+ * User: Sommar       Date: 19-07-08   Time: 22:28
+ * Updated in $/Perl/OlleDB
+ * The SQL version is now in mydata.
  * 
  * *****************  Version 16  *****************
  * User: Sommar       Date: 16-07-11   Time: 22:24
@@ -129,7 +134,7 @@ BOOL setup_tableparam(SV        * olle_ptr,
 
    // Check that table parameter are supported at all.
    if (mydata->provider < provider_sqlncli10 ||
-       OptSqlVersion(olle_ptr) < 10) {
+       mydata->majorsqlversion < 10) {
        olledb_message(olle_ptr, -1, 1, 16,
            L"To use table parameters, you need SQL 2008 and SQL Server Native Client 10 or later.");
        return FALSE;
@@ -301,6 +306,7 @@ static void add_column_props (SV           * olle_ptr,
     SvREFCNT_dec(object);
 }
 
+
 //------------------------------------------------------------------------
 // definetablecolumn, exposed in the mid-level interface.
 int definetablecolumn(SV * olle_ptr,
@@ -367,7 +373,8 @@ int definetablecolumn(SV * olle_ptr,
    }
    nameoftype = SvPV_nolen(sv_nameoftype);
 
-   // Translate the type name to a type indicator.
+   // Translate the type name to a type indicator. However, we will
+   // pass (var)char as WSTR to support UTF-8.
    typeind = lookup_type_map(nameoftype);
 
    // It must be a legal type.

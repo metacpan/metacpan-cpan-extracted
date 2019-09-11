@@ -17,8 +17,8 @@ WriteMakefile(
         'Test2::Suite' => '0.000126',
     },
     PREREQ_PM => {
-        #'ABC'              => '1.6',
-        #'Foo::Bar::Module' => '5.0401',
+        'Mojolicious' => '8.0',
+        'Test2::Suite' => '0.000126',
     },
     META_MERGE   => {
         dynamic_config => 0,

@@ -1,14 +1,26 @@
 /*---------------------------------------------------------------------
- $Header: /Perl/OlleDB/getdata.cpp 7     16-07-11 22:21 Sommar $
+ $Header: /Perl/OlleDB/getdata.cpp 9     19-07-09 16:53 Sommar $
 
   Implements the routines for getting data and metadata from SQL Server:
   nextresultset, getcolumninfo, nextrow, getoutputparams. Includes routines
   to Server data types to Perl values, save datetime data; those are in
   datetime.cpp.
 
-  Copyright (c) 2004-2016   Erland Sommarskog
+  Copyright (c) 2004-2019   Erland Sommarskog
 
   $History: getdata.cpp $
+ * 
+ * *****************  Version 9  *****************
+ * User: Sommar       Date: 19-07-09   Time: 16:53
+ * Updated in $/Perl/OlleDB
+ * Reduce the number of warnings in 32-bit compiles a little.
+ * 
+ * *****************  Version 8  *****************
+ * User: Sommar       Date: 19-07-08   Time: 22:39
+ * Updated in $/Perl/OlleDB
+ * Added support  for UTF-8 (or more precisely any mix or collation).
+ * (var)char columns are now bound as DBTYPE_WSTR so that we can always
+ * retrieve without data loss. 
  * 
  * *****************  Version 7  *****************
  * User: Sommar       Date: 16-07-11   Time: 22:21
@@ -117,22 +129,30 @@ int nextresultset (SV * olle_ptr,
                                                 (void **) &columns_info_ptr);
        check_for_errors(olle_ptr,
                         "rowset_ptr->QueryInterface for column info", ret);
-
        // Get columninfo buffer.
        ret = columns_info_ptr->GetColumnInfo(&no_of_cols,
                                              &(mydata->column_info),
                                              &(mydata->colname_buffer));
        check_for_errors(olle_ptr, "columns_info_ptr->GetColumnInfo", ret);
        mydata->no_of_cols = (ULONG) no_of_cols;
-
        // Don't need this interface any more.
        columns_info_ptr->Release();
 
        // We need the col_binding array.
        New(902, mydata->col_bindings, no_of_cols, DBBINDING);
-
        // Iterate over the columns to set up the bindings.
        for (DBORDINAL j = 0; j < no_of_cols; j++) {
+          // TGhere is an issue with UTF8 and SQLOLEDB and varchar > 4000. SQL Server
+          // reports this as MAX, i.e. -1(?), but it comes back as 32767. Later this
+          // causes GetNextRow to hang. To avoid this, we commit explicit suicide.
+          if (mydata->column_info[j].ulColumnSize == 32767 &&
+              mydata->provider == provider_sqloledb) {
+             // And it has to be croak, and not olle_croak, as sometimes it 
+             // hangs when releasing allocated objects.
+             croak("For column %d, SQL Server reported a size of %d. This is known to happen with UTF-8 for (var)char > 4000 and SQLOLEDB.\n",
+                   j + 1, mydata->column_info[j].ulColumnSize);
+          }
+
           // These fields are the same for all data types.
           mydata->col_bindings[j].iOrdinal  = j+1;
           mydata->col_bindings[j].dwMemOwner = DBMEMOWNER_CLIENTOWNED;
@@ -142,13 +162,14 @@ int nextresultset (SV * olle_ptr,
           mydata->col_bindings[j].dwFlags   = 0;
           mydata->col_bindings[j].eParamIO  = DBPARAMIO_NOTPARAM;
           mydata->col_bindings[j].cbMaxLen  = 0;   // For those where it ignoreed.
-          mydata->col_bindings[j].wType     = mydata->column_info[j].wType;  // BYREF may be added later.
+          mydata->col_bindings[j].wType     = mydata->column_info[j].wType; // BYREF may be added later.
 
           // We always bind status and value.
           mydata->col_bindings[j].dwPart    = DBPART_VALUE | DBPART_STATUS;
           mydata->col_bindings[j].obStatus  = bind_offset;
           bind_offset += sizeof(DBSTATUS);
           mydata->col_bindings[j].obValue   = bind_offset;
+
           // The rest depends on the data type.
           switch (mydata->column_info[j].wType) {
              case DBTYPE_BOOL :
@@ -233,8 +254,9 @@ int nextresultset (SV * olle_ptr,
                 break;
 
              case DBTYPE_STR :
-                mydata->col_bindings[j].wType    |= DBTYPE_BYREF;
-                bind_offset += sizeof(char *);
+             // We actually receive as WSTR to be handle all collations.
+                mydata->col_bindings[j].wType    = DBTYPE_WSTR | DBTYPE_BYREF;
+                bind_offset += sizeof(WCHAR *);
                 mydata->col_bindings[j].dwPart   |= DBPART_LENGTH;
                 mydata->col_bindings[j].obLength  = bind_offset;
                 bind_offset += sizeof(DBLENGTH);
@@ -281,7 +303,6 @@ int nextresultset (SV * olle_ptr,
 
        // Must allocate space for DBBINDSTATUS.
        New(902, mydata->col_bind_status, no_of_cols, DBBINDSTATUS);
-
        ret = mydata->rowaccess_ptr->CreateAccessor(DBACCESSOR_ROWDATA,
                                                    no_of_cols,
                                                    mydata->col_bindings, 0,
@@ -518,7 +539,7 @@ void getcolumninfo (SV   * olle_ptr,
               if (colinfo->bPrecision == 16) {
                   datatypestr = "smalldatetime";
               }
-              else if (OptSqlVersion(olle_ptr) >= 10 &&
+              else if (mydata->majorsqlversion >= 10 &&
                        mydata->provider >= provider_sqlncli10) {
                   datatypestr = "datetime2";
               }
@@ -805,12 +826,21 @@ static SV * ssvariant_to_SV(SV          * olle_ptr,
           break;
 
        case VT_SS_STRING    :
-       case VT_SS_VARSTRING :
-          perl_value = newSVpvn(ssvar.CharVal.pchCharVal,
-                                ssvar.CharVal.sActualLength);
-          OLE_malloc_ptr->Free(ssvar.CharVal.pchCharVal);
-          if (ssvar.NCharVal.pwchReserved != NULL) {
-             OLE_malloc_ptr->Free(ssvar.NCharVal.pwchReserved);
+       case VT_SS_VARSTRING : {
+             UINT codepage = OptCurrentCodepage(olle_ptr);
+             if (codepage == GetACP() && codepage != CP_UTF8) {
+                perl_value = newSVpvn(ssvar.CharVal.pchCharVal,
+                                      ssvar.CharVal.sActualLength);
+             }
+             else {
+                perl_value = char_to_UTF8_SV(ssvar.CharVal.pchCharVal,
+                                             ssvar.CharVal.sActualLength,
+                                             codepage);
+             }
+             OLE_malloc_ptr->Free(ssvar.CharVal.pchCharVal);
+             if (ssvar.NCharVal.pwchReserved != NULL) {
+                OLE_malloc_ptr->Free(ssvar.NCharVal.pwchReserved);
+             }
           }
           break;
 
@@ -913,9 +943,9 @@ static void extract_data(SV           * olle_ptr,
        value_len = * ((DBBYTEOFFSET *) &data_buffer[binding.obLength]);
     }
 
-   /* {
+    /* {
                     char * str =  * ((char **) &data_buffer[value_offset]);
-                    warn("datastr_ptr = %x '%s'\n", str, valuename);
+                    wprintf(L"datatype = %d, datastr_ptr = %x '%s'\n", datatype, str, valuename);
     } */
 
     switch (value_status) {
@@ -1036,10 +1066,36 @@ static void extract_data(SV           * olle_ptr,
              }
 
              case DBTYPE_STR   : {
-                char ** strptr =  ((char **) &data_buffer[value_offset]);
-                perl_value = newSVpvn(* strptr, value_len);
-                OLE_malloc_ptr->Free(* strptr);
-                * strptr = NULL;
+                 // (var)char is handled different depending on it is a column or
+                 // or parameter. This permits to handle any column collaton.
+                 if (! is_param) {
+                    // Columns were boud as DBTYPE_WSTR, so we convert the Unicode
+                    // string to an SV.
+                    WCHAR ** strptr =  ((WCHAR **) &data_buffer[value_offset]);
+                    perl_value = BSTR_to_SV(* strptr, (I32) (value_len / 2));
+                    OLE_malloc_ptr->Free(* strptr);
+                    * strptr = NULL;
+                 }
+                 else {
+                    // Parameters on the other hand are bound as DBTYPE_STE.
+                    // It depends on the codepage how we handle them. Since they
+                    // are variables, they always have the database collation.
+                    char ** strptr =  ((char **) &data_buffer[value_offset]);
+                    UINT codepage = OptCurrentCodepage(olle_ptr);
+
+                    // If the codepage agrees with the ANSI code page of the 
+                    // client (and it is not UTF-8), we can use the bytes as-is.
+                    if (codepage == GetACP() && codepage != CP_UTF8) {
+                       perl_value = newSVpvn(* strptr, value_len);
+                    }
+                    else { 
+                       // Convert the string to UTF8.
+                       perl_value = char_to_UTF8_SV(*strptr, value_len, codepage);
+                   }
+
+                   OLE_malloc_ptr->Free(* strptr);
+                   * strptr = NULL;
+                }
                 break;
              }
 
@@ -1096,7 +1152,7 @@ int nextrow (SV   * olle_ptr,
 {
     internaldata * mydata = get_internaldata(olle_ptr);
     formatoptions  formatopts = getformatoptions(olle_ptr);
-    IV             optRowsAtATime = OptRowsAtATime(olle_ptr);
+    int            optRowsAtATime = OptRowsAtATime(olle_ptr);
     HRESULT        ret;
     HROW         * row_handle_ptr;
     BOOL           have_hash;
@@ -1135,7 +1191,6 @@ int nextrow (SV   * olle_ptr,
        // next one.
        if (mydata->rowbuffer == NULL) {
           New(902, mydata->rowbuffer, optRowsAtATime, HROW);
-
           // Get rows to the buffer.
           ret = mydata->rowset_ptr->GetNextRows(NULL, 0, optRowsAtATime,
                                                 &(mydata->rows_in_buffer),

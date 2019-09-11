@@ -56,6 +56,7 @@ foreach my $found_module (@found_prereqs) {
     $found_module =~ s/~[^~]+$//;
     next unless $found_module;
     next if $found_module =~ /^Sub::Multi::Tiny/;   # Don't check dist itself
+    next if $found_module eq 'Kit';     # Our test kit
     next if $found_module eq 'perl';
 
     ok( (grep { $_ eq $found_module } @listed_prereqs),

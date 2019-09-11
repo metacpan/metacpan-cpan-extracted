@@ -7,7 +7,7 @@ use parent 'Net::SecurityCenter::API';
 
 use Net::SecurityCenter::Utils qw(:all);
 
-our $VERSION = '0.201';
+our $VERSION = '0.202';
 
 #-------------------------------------------------------------------------------
 # METHODS

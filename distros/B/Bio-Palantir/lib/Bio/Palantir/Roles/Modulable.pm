@@ -1,6 +1,6 @@
 package Bio::Palantir::Roles::Modulable;
 # ABSTRACT: Modulable Moose role for Module object construction
-$Bio::Palantir::Roles::Modulable::VERSION = '0.192240';
+$Bio::Palantir::Roles::Modulable::VERSION = '0.192540';
 use Moose::Role;
 
 use autodie;
@@ -26,6 +26,13 @@ has 'modules' => (
     },
 );
 
+has 'cutting_mode' => (
+    is       => 'ro',
+    isa      => 'Str',
+    writer   => '_set_cutting_mode',
+);
+
+
 ## no critic (ProhibitUnusedPrivateSubroutines)
 
 sub _build_modules {
@@ -36,6 +43,10 @@ sub _build_modules {
         return [];
     }
 
+    my %cutting_regex_for = (
+        condensation => qr{^C$ | ^KS$}xmsi,
+        selection    => qr{^A$ | ^AT$}xmsi,
+    );
 
     my @genes;
     for my $gene ($self->all_genes) {
@@ -66,7 +77,8 @@ sub _build_modules {
             # define elongation modules
             elsif ( 
                 # define modules anchors on C domains (biological sense with communication domains and condensation steps)
-                ($domains[$i]->function =~ m/^C$ | ^KS$/xmsi)
+                ($domains[$i]->function 
+                    =~ $cutting_regex_for{ $self->cutting_mode })
                 # do not allow modules to be separated by an intermediate gene
                 || ( ($genes[$gene_n]->rank
                       - $genes[ $module_for{$module_n}{start} ]->rank) > 1)                
@@ -165,7 +177,7 @@ Bio::Palantir::Roles::Modulable - Modulable Moose role for Module object constru
 
 =head1 VERSION
 
-version 0.192240
+version 0.192540
 
 =head1 SYNOPSIS
 

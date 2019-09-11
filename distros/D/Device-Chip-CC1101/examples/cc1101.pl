@@ -22,6 +22,7 @@ GetOptions(
    'role|R=s' => \( my $ROLE ),
 
    # Radio setup
+   'band|B=s'    => \( my $BAND = "868MHz" ),
    'channel|C=i' => \( my $CHANNEL = 1 ),
    'config=s'    => sub { $_[1] =~ m/(^.*?)=(.*)/ and $MORECONFIG{$1} = $2 },
    'pkt-length|L=i' => \( my $PKTLEN ),
@@ -44,6 +45,7 @@ sleep 0.05;
 $chip->reset->get;
 
 $chip->change_config(
+   band => $BAND,
    mode => "GFSK-38.4kb",
 
    CHAN => $CHANNEL,
@@ -59,8 +61,6 @@ $chip->change_config(
 if( $PRINT_CONFIG ) {
    my %config = $chip->read_config->get;
    printf "%-20s: %s\n", $_, $config{$_} for sort keys %config;
-
-   printf "Carrier frequency: %.3fMHz\n", $chip->carrier_frequency->get / 1E6;
 }
 
 $chip->flush_fifos()->get;
@@ -94,8 +94,8 @@ elsif( $ROLE eq "rx" ) {
 
       # attempt a silly little coloured bar indicator showing RSSI and LQI
       if( -t STDOUT ) {
-         # Cope with -102dBm=0 
-         my $rssi = 102 + $packet->{RSSI};
+         # Cope with -102dBm=0  .. -25dBm=31
+         my $rssi = 41 + int( $packet->{RSSI} / 2.5 );
          my $lqi  = ( 127 - $packet->{LQI} ) / 4;
 
          print " [";

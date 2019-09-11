@@ -9,7 +9,7 @@ use parent 'Net::SecurityCenter::API';
 
 use Net::SecurityCenter::Utils qw(:all);
 
-our $VERSION = '0.201';
+our $VERSION = '0.202';
 
 my $common_template = {
     tool => {
@@ -82,6 +82,8 @@ sub get {
         date       => $common_template->{'date'},
         limit      => $common_template->{'limit'},
         page       => $common_template->{'page'},
+        download   => {},
+        columns    => {},
     };
 
     my $params = sc_check_params( $tmpl, \%args );
@@ -98,11 +100,20 @@ sub get {
     my $sort_field = delete( $params->{'sort_field'} );
     my $view       = delete( $params->{'view'} );
 
+    # Fallback sourceType param
+    if ( defined( $params->{'source_type'} ) ) {
+        $type = $params->{'source_type'};
+    }
+
     # Pagination
     my $count = 0;
     my $page  = delete( $params->{'page'} );
     my $limit = delete( $params->{'limit'} );
     my $total = $limit;
+
+    # For download API
+    my $download = delete( $params->{'download'} );
+    my $columns  = delete( $params->{'columns'} );
 
     my $analysis_params = {
         type  => $type,
@@ -180,6 +191,22 @@ sub get {
         $analysis_params->{'date'} = $date;
     }
 
+    # Download API
+    if ($download) {
+
+        my @columns_params = ();
+
+        foreach my $column ( split( /,/, $columns ) ) {
+            push( @columns_params, { 'name' => $column } );
+        }
+
+        $analysis_params->{'columns'} = \@columns_params;
+
+        # TODO check offset
+        my $result = $self->client->post( '/analysis/download', $analysis_params );
+        return $result;
+    }
+
     while ( $total > $count ) {
 
         my $result = $self->client->post( '/analysis', $analysis_params );
@@ -201,6 +228,18 @@ sub get {
     }
 
     return \@results;
+
+}
+
+#-------------------------------------------------------------------------------
+
+sub download {
+
+    my ( $self, %args ) = @_;
+
+    $args{'download'} = 1;
+
+    return $self->get(%args);
 
 }
 
@@ -598,8 +637,35 @@ Allowed values:
 
 =item * C<limit> : Number of items (default is C<1000>)
 
+=back
+
+
+=head2 download
+
+Downloads an analysis of a query in CSV format.
+
+B<NOTE>: This is a facility for C<$sc-E<gt>get( download =E<gt> 1, ... )> method
+
+Params:
+
+=over 4
+
+=item * C<type> : Type of analysis (I<required>)
+
+=item * C<query_id> : ID of query
+
+=item * C<sort_dir> : Sort direction C<ASC> or C<DESC>
+
+=item * C<sort_field> : Sort field
+
+=item * C<scan_id> : Scan ID (only for C<individual> source type and C<vuln> type values)
+
+=item * C<view> : View type (only for C<individual> source type and C<vuln> type values and C<archive> source type and C<event> type values)
+
+=item * C<columns> : Report columns (comma-separated value, eg. C<pluginID,name>)
 
 =back
+
 
 =head2 get_log
 
@@ -626,6 +692,7 @@ Params:
 =item * C<limit> : Number of items (default is C<1000>)
 
 =back
+
 
 =head2 get_vulnerabilities
 

@@ -1,14 +1,28 @@
 /*---------------------------------------------------------------------
- $Header: /Perl/OlleDB/internaldata.h 8     16-07-11 22:24 Sommar $
+ $Header: /Perl/OlleDB/internaldata.h 10    19-07-19 22:00 Sommar $
 
   This headerfile defines the internaldata struct and structs it uses.
   The internaldata is private to the C++/XS code and not exposed to Perl.
 
   There are also routines to set it up and tear it down.
 
-  Copyright (c) 2004-2016   Erland Sommarskog
+  Copyright (c) 2004-2019   Erland Sommarskog
 
   $History: internaldata.h $
+ * 
+ * *****************  Version 10  *****************
+ * User: Sommar       Date: 19-07-19   Time: 22:00
+ * Updated in $/Perl/OlleDB
+ * Removed the olddbtranslate option from internaldata, and entirely
+ * deprecated setting the AutoTranslate option to make sure that it always
+ * is false. When clearing options when ProviderString is set, we don't
+ * clear AutoTranslate.
+ * 
+ * *****************  Version 9  *****************
+ * User: Sommar       Date: 19-07-08   Time: 22:31
+ * Updated in $/Perl/OlleDB
+ * New elements in internaldata for SQL version,  currentDB and more for
+ * UTF-8 support.
  * 
  * *****************  Version 8  *****************
  * User: Sommar       Date: 16-07-11   Time: 22:24
@@ -133,7 +147,13 @@ typedef struct {
     // Data source, if non-NULL we are connected.
     IDBInitialize          * init_ptr;
     IDBCreateSession       * datasrc_ptr;
+
+    // Various properties about the connection.
     BOOL                     isautoconnected;  // If connection was through connect() or not.
+    BOOL                     isnestedquery;    // If current query was from inside the module.
+    SV                     * SQL_version;      // The handle attribute SQL_version.
+    int                      majorsqlversion;   
+    SV                     * CurrentDB;
     provider_enum            provider;         // SQLOLEDB or SQLNCLI
 
     // Property sets and properties with initialization properties.
@@ -208,3 +228,6 @@ extern void free_batch_data(internaldata *mydata);
 
 extern void free_connection_data(internaldata *mydata);
 
+// Free strings for SQL version and current DB. Called on destroy or
+// when the server changes.
+extern void free_sqlver_currentdb(internaldata * mydata);

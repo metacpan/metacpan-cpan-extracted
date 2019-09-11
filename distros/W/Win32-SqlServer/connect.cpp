@@ -1,11 +1,33 @@
 /*---------------------------------------------------------------------
- $Header: /Perl/OlleDB/connect.cpp 9     18-04-09 22:46 Sommar $
+ $Header: /Perl/OlleDB/connect.cpp 12    19-07-19 22:00 Sommar $
 
   Implements the connection routines on Win32::SqlServer.
 
-  Copyright (c) 2004-2018   Erland Sommarskog
+  Copyright (c) 2004-2019   Erland Sommarskog
 
   $History: connect.cpp $
+ * 
+ * *****************  Version 12  *****************
+ * User: Sommar       Date: 19-07-19   Time: 22:00
+ * Updated in $/Perl/OlleDB
+ * Removed the olddbtranslate option from internaldata, and entirely
+ * deprecated setting the AutoTranslate option to make sure that it always
+ * is false. When clearing options when ProviderString is set, we don't
+ * clear AutoTranslate.
+ * 
+ * *****************  Version 11  *****************
+ * User: Sommar       Date: 19-07-17   Time: 13:14
+ * Updated in $/Perl/OlleDB
+ * Fixed memory leak.
+ * 
+ * *****************  Version 10  *****************
+ * User: Sommar       Date: 19-07-08   Time: 22:36
+ * Updated in $/Perl/OlleDB
+ * Added function to get SQL version and current database from the Init
+ * object and call this on connect. When server is changed, we need to
+ * forget SQL Server version, current database and the coepages has. Split
+ * setup_sesion into setup_datasrc and setup_session. as the data source
+ * is now set up in initbatch.
  * 
  * *****************  Version 9  *****************
  * User: Sommar       Date: 18-04-09   Time: 22:46
@@ -68,6 +90,76 @@
 #include "internaldata.h"
 #include "errcheck.h"
 #include "connect.h"
+
+
+// This routine returns the current database SQL Version as returned by 
+// the initializion object. It is called from do_connect but also 
+// initbatch, since the the database could have changed.
+void get_sqlversion_and_dbname (SV * olle_ptr) {
+    internaldata       * mydata = get_internaldata(olle_ptr);
+    IDBProperties      * property_ptr;
+    HRESULT              ret;
+    ULONG                no_of_prop_sets;
+    DBPROPSET          * property_sets;
+    DBPROPIDSET          propertysetids[2];
+    DBPROPID             datasrcpropid[1];
+    DBPROPID             datasrcinfopropid[1];
+    BSTR                 bstr;
+
+
+    ret = mydata->init_ptr->QueryInterface(IID_IDBProperties,
+                                           (void **) &property_ptr);
+    if (FAILED(ret)) {
+       croak("Internal error: init_ptr->QueryInterface to create Property object failed with hresult %x", ret);
+    }
+
+    propertysetids[0].guidPropertySet = DBPROPSET_DATASOURCEINFO;
+    propertysetids[0].cPropertyIDs = 1;
+    propertysetids[0].rgPropertyIDs = datasrcinfopropid;
+    datasrcinfopropid[0] = DBPROP_DBMSVER;
+
+    propertysetids[1].guidPropertySet = DBPROPSET_DATASOURCE;
+    propertysetids[1].cPropertyIDs = 1;
+    propertysetids[1].rgPropertyIDs = datasrcpropid;
+    datasrcpropid[0] = DBPROP_CURRENTCATALOG;
+
+    ret = property_ptr->GetProperties(2, propertysetids, &no_of_prop_sets, 
+                                      &property_sets);
+    if (FAILED(ret)) {
+       croak("Internal error: property_ptr->GetProperties failed with hresult %x", ret);
+    }
+
+    // Get the SQL version. First the numeric version as a number.
+    bstr = property_sets[0].rgProperties->vValue.bstrVal;
+    swscanf_s(bstr, L"%d", &(mydata->majorsqlversion)); 
+    if (mydata->majorsqlversion < 8) {
+       olle_croak(olle_ptr, "Win32::SqlServer does not support connections version older than SQL 2000.\n");
+    }
+
+    // Decrease the refcnt for this SV, since we will create a new one.
+    SvREFCNT_dec(mydata->SQL_version);
+
+    // For the string value, we don't want any leading zero.
+    if (bstr[0] == L'0') {
+       mydata->SQL_version = BSTR_to_SV(bstr + 1);
+    }
+    else {
+       mydata->SQL_version = BSTR_to_SV(bstr);
+    }
+    SysFreeString(bstr);
+
+    // Get the current database.
+    SvREFCNT_dec(mydata->CurrentDB);
+    bstr = property_sets[1].rgProperties->vValue.bstrVal;
+    mydata->CurrentDB = BSTR_to_SV(bstr);
+    SysFreeString(bstr);
+
+    
+    OLE_malloc_ptr->Free(property_sets[0].rgProperties);
+    OLE_malloc_ptr->Free(property_sets[1].rgProperties);
+    OLE_malloc_ptr->Free(property_sets);
+    property_ptr->Release();
+}
 
 
 // Connect, called from $X->Connect() and $X->executebatch for autoconnect.
@@ -179,6 +271,11 @@ BOOL do_connect (SV    * olle_ptr,
     // And release the property pointers.
     property_ptr->Release();
 
+    // Make sure that SQL_version and current db is set.
+    if (SUCCEEDED(ret)) {
+       get_sqlversion_and_dbname (olle_ptr);
+    }
+
     return SUCCEEDED(ret);
 }
 
@@ -219,18 +316,29 @@ void setloginproperty(SV   * olle_ptr,
    }
    else if (gbl_init_props[ix].propset_enum == oleinit_props &&
             gbl_init_props[ix].property_id == DBPROP_INIT_PROVIDERSTRING) {
-      // In this case, all other properties should be flushed.
+      // In this case, all other properties should be flushed, except for
+      // AUTOTRANSLATE, since we over rule its default.
       for (int j = 0; gbl_init_props[j].propset_enum != datasrc_props; j++) {
-         VariantClear(&mydata->init_properties[j].vValue);
+         if (mydata->init_properties[j].dwPropertyID != SSPROP_INIT_AUTOTRANSLATE) {
+            VariantClear(&mydata->init_properties[j].vValue);
+         }
       }
    }
 
-   // If the server changes, the SQL_version attribute is no longer valid.
+   // If the server changes, there are some attributes that are no
+   // longer valid.
    if (gbl_init_props[ix].propset_enum == oleinit_props &&
        (gbl_init_props[ix].property_id == DBPROP_INIT_PROVIDERSTRING ||
         gbl_init_props[ix].property_id == DBPROP_INIT_DATASOURCE ||
         gbl_init_props[ix].property_id == SSPROP_INIT_NETWORKADDRESS)) {
-      drop_SQLversion(olle_ptr);
+      free_sqlver_currentdb(mydata);
+      ClearCodepages(olle_ptr);
+   }
+
+   // AutoTranslate is deprecated and ingnored.
+   if (gbl_init_props[ix].propset_enum == ssinit_props &&
+       gbl_init_props[ix].property_id == SSPROP_INIT_AUTOTRANSLATE) {
+      olledb_message(olle_ptr, -1, 10, 1, "Warning: The AutoTranslate property is no longer settable and will be removed in a future release or Win32::SqlServer.\n");
    }
 
    // The property ApplicationIntent requires validation.
@@ -307,21 +415,33 @@ void setloginproperty(SV   * olle_ptr,
 }
 
 // Creates the datastc and session objects if needed.
+BOOL setup_datasrc(SV * olle_ptr)
+{
+   internaldata * mydata = get_internaldata(olle_ptr);
+
+   if (mydata->datasrc_ptr == NULL) {
+      if (OptAutoConnect(olle_ptr)) {
+         if (! do_connect(olle_ptr, TRUE)) {
+            return FALSE;
+         }
+      }
+      else {
+         olle_croak(olle_ptr, "Not connected to SQL Server, nor is AutoConnect set. Cannot execute batch");
+      }
+   }
+   else {
+      // Refresh SQL version and database (the latter can have changed).
+      get_sqlversion_and_dbname (olle_ptr);
+   }   
+
+   return TRUE;
+}
+
+// Creates the session object if needed.
 BOOL setup_session(SV * olle_ptr)
 {
-    internaldata * mydata = get_internaldata(olle_ptr);
-    HRESULT        ret;
-
-    if (mydata->datasrc_ptr == NULL) {
-       if (OptAutoConnect(olle_ptr)) {
-          if (! do_connect(olle_ptr, TRUE)) {
-             return FALSE;
-          }
-       }
-       else {
-          olle_croak(olle_ptr, "Not connected to SQL Server, nor is AutoConnect set. Cannot execute batch");
-       }
-    }
+   internaldata * mydata = get_internaldata(olle_ptr);
+   HRESULT        ret;
 
    if (mydata->session_ptr == NULL) {
       ret = mydata->datasrc_ptr->CreateSession(NULL, IID_IDBCreateCommand,
@@ -331,6 +451,7 @@ BOOL setup_session(SV * olle_ptr)
 
    return TRUE;
 }
+
 
 void disconnect(SV * olle_ptr)
 {

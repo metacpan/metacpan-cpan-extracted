@@ -17,6 +17,12 @@ https://developers.facebook.com/bugs/597779113651383/
 
 ###############################################################################
 
+1.30 2019-09-10T14:36:32Z
+    - Support Perl 5.30
+    - Handle newly added error message fields as of v2.1
+      - Now those fields are tab separaged when represented with $res->error_string()
+    - Support resumable video upload
+
 1.25 2019-04-30T00:20:02Z
     - Fix version comparison. Thanks to ksmadsen.
       https://github.com/oklahomer/p5-Facebook-OpenGraph/pull/21

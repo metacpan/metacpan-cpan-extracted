@@ -3,6 +3,7 @@ lib/StreamFinder.pm
 lib/StreamFinder/BannedVideo.pm
 lib/StreamFinder/Facebook.pm
 lib/StreamFinder/IHeartRadio.pm
+lib/StreamFinder/RadioNet.pm
 lib/StreamFinder/Radionomy.pm
 lib/StreamFinder/Reciva.pm
 lib/StreamFinder/Tunein.pm

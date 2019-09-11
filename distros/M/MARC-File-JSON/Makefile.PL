@@ -21,7 +21,7 @@ my %WriteMakefileArgs = (
     "MARC::Record" => 2,
     "MARC::Record::Generic" => "0.001"
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }

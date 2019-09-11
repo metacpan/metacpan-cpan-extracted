@@ -38,6 +38,10 @@ file.
 	
 	print "Title=$stationTitle\n";
 	
+	my $stationDescription = $station->getTitle('desc');
+	
+	print "Description=$stationDescription\n";
+	
 	my $stationID = $station->getID();
 
 	print "Station ID=$stationID\n";
@@ -74,10 +78,10 @@ file.
 
 =head1 DESCRIPTION
 
-StreamFinder::Radionomy accepts a valid radio station URL on Radionomy.com and
-returns the actual stream URL(s) and cover art icon for that station.  
+StreamFinder::Radionomy accepts a valid radio station ID or URL on Radionomy.com 
+and returns the actual stream URL(s), title, and cover art icon for that station.  
 The purpose is that one needs one of these URLs in order to have the option to 
-stream the station in one's own choice of audio player software rather than 
+stream the station in one's own choice of media player software rather than 
 using their web browser and accepting any / all flash, ads, javascript, 
 cookies, trackers, web-bugs, and other crapware that can come with that method 
 of playing.  The author uses his own custom all-purpose media player called 
@@ -93,8 +97,8 @@ One or more streams can be returned for each station.
 
 =item B<new>(I<url> [, "debug" [ => 0|1|2 ]])
 
-Accepts a Radionomy.com URL and creates and returns a new station object, or 
-I<undef> if the URL is not a valid Radionomy station or no streams are found.
+Accepts a Radionomy.com ID or URL and creates and returns a new station object, 
+or I<undef> if the URL is not a valid Radionomy station or no streams are found.
 The url can be the full URL, 
 ie. http://www.radionomy.com/en/radio/jamendolounge/index, 
 or http://www.radionomy.com/en/radio/jamendolounge, 
@@ -109,24 +113,25 @@ Returns an array of strings representing all stream urls found.
 Similar to B<get>() except it only returns a single stream representing 
 the first valid stream found.  
 
-Current options are:  I<-random> and I<-noplaylists>.  By default, the 
-first ("best"?) stream is returned.  If I<-random> is specified, then 
+Current options are:  I<"random"> and I<"noplaylists">.  By default, the 
+first ("best"?) stream is returned.  If I<"random"> is specified, then 
 a random one is selected from the list of streams found.  
-If I<-noplaylists> is specified, and the stream to be returned is a 
-"playlist" (.pls extension), it is first fetched and the first entry 
+If I<"noplaylists"> is specified, and the stream to be returned is a 
+"playlist" (.pls or .m3u? extension), it is first fetched and the first entry 
 in the playlist is returned.  This is needed by Fauxdacious Mediaplayer.
 
 =item $station->B<count>()
 
 Returns the number of streams found for the station.
 
-=item $station->B<getID>()
+=item $station->B<getID>(['fccid'])
 
-Returns the station's Radionomy ID (alphanumeric).
+Returns the station's Radionomy ID (default) or 
+station's FCC call-letters ("fccid").
 
-=item $station->B<getTitle>()
+=item $station->B<getTitle>(['desc'])
 
-Returns the station's title (description).  
+Returns the station's title, or (long description).  
 
 =item $station->B<getIconURL>()
 
@@ -148,7 +153,7 @@ Returns a two-element array consisting of the extension (ie. "png",
 
 =item $station->B<getType>()
 
-Returns the stream's type ("Radionomy").
+Returns the station's type ("Radionomy").
 
 =back
 
@@ -193,7 +198,11 @@ Radionomy
 
 =head1 DEPENDENCIES
 
-LWP::UserAgent
+L<URI::Escape>, L<HTML::Entities>, L<LWP::UserAgent>
+
+=head1 RECCOMENDS
+
+wget
 
 =head1 BUGS
 
@@ -275,6 +284,8 @@ package StreamFinder::Radionomy;
 
 use strict;
 use warnings;
+use URI::Escape;
+use HTML::Entities ();
 use LWP::UserAgent ();
 use vars qw(@ISA @EXPORT);
 
@@ -325,7 +336,7 @@ sub new
 	}	
 
 	(my $url2fetch = $url);
-	$url2fetch = 'https://www.radionomy.com/en/radio/' . $url . '/index'  unless ($url =~ /^http/);
+	$url2fetch = 'https://www.radionomy.com/en/radio/' . $url . '/index'  unless ($url =~ /^https?\:/);
 	unless ($url2fetch =~ m#\/index#) {
 		$url2fetch .= '/'  unless ($url2fetch =~ m#\/$#);
 		$url2fetch .= 'index';
@@ -345,9 +356,18 @@ sub new
 	}
 	print STDERR "-1: html=$html=\n"  if ($DEBUG > 1);
 	return undef  unless ($html);  #STEP 1 FAILED, INVALID STATION URL, PUNT!
+	$self->{'cnt'} = 0;
 	$self->{'iconurl'} = ($html =~ m#\"og\:image\"\s+content\=\"([^\"]+)\"#) ? $1 : '';
 	$self->{'imageurl'} = $self->{'iconurl'};
 	$self->{'title'} = ($html =~ m#\"og\:title\"\s+content\=\"([^\"]+)\"#) ? $1 : '';
+	$self->{'description'} = ($html =~ m#\b(?:name\=\"|property\=\"og\:)description\"\s+content\=\"([^\"]+)\"#) ? $1 : $self->{'title'};
+	$self->{'title'} = HTML::Entities::decode_entities($self->{'title'});
+	$self->{'title'} = uri_unescape($self->{'title'});
+	$self->{'description'} = HTML::Entities::decode_entities($self->{'description'});
+	$self->{'description'} = uri_unescape($self->{'description'});
+	$self->{'fccid'} = ($html =~ m#\<p class\=\"radioDesc\"\>([^\<]+)#) ? $1 : '';
+	$self->{'fccid'} = $1  if (defined($self->{'fccid'}) && $self->{'fccid'} =~ /\b([KW]\w{2,3})\b/);
+	$self->{'fccid'} = $1  if (!$self->{'fccid'} && $self->{'title'} =~ /\b([KW]\w{2,3})\b/);
 	print STDERR "-2: icon=".$self->{'iconurl'}."= title=".$self->{'title'}."=\n"  if ($DEBUG);
 	$url2fetch = ($html =~ m#\<a\s+class\=\"download\"\s+href\=\"([^\"]+)#) ? $1 : '';
 	print STDERR "-3: url2=$url2fetch=\n"  if ($DEBUG);
@@ -398,7 +418,8 @@ sub getURL   #LIKE GET, BUT ONLY RANDOMLY SELECT ONE TO RETURN:
 	my $self = shift;
 	my $arglist = (defined $_[0]) ? join('|',@_) : '';
 	my $idx = ($arglist =~ /\b\-?random\b/) ? int rand scalar @{$self->{'streams'}} : 0;
-	if ($arglist =~ /\b\-?noplaylists\b/ && ${$self->{'streams'}}[$idx] =~ /\.pls$/i) {
+	if ($arglist =~ /\b\-?noplaylists\b/ && ${$self->{'streams'}}[$idx] =~ /\.(pls|m3u8?)$/i) {
+		my $plType = $1;
 		my $firstStream = ${$self->{'streams'}}[$idx];
 		print STDERR "-getURL($idx): NOPLAYLISTS and (".${$self->{'streams'}}[$idx].")\n"  if ($DEBUG);
 		my $ua = LWP::UserAgent->new(@userAgentOps);		
@@ -419,16 +440,30 @@ sub getURL   #LIKE GET, BUT ONLY RANDOMLY SELECT ONE TO RETURN:
 		}
 		my @lines = split(/\r?\n/, $html);
 		$firstStream = '';
-		my $firstTitle = '';
-		foreach my $line (@lines) {
-			if ($line =~ m#^\s*File\d+\=(.+)$#) {
-				$firstStream ||= $1;
-			} elsif ($line =~ m#^\s*Title\d+\=(.+)$#) {
-				$firstTitle ||= $1;
+		if ($plType =~ /pls/) {  #PLS:
+			my $firstTitle = '';
+			foreach my $line (@lines) {
+				if ($line =~ m#^\s*File\d+\=(.+)$#) {
+					$firstStream ||= $1;
+				} elsif ($line =~ m#^\s*Title\d+\=(.+)$#) {
+					$firstTitle ||= $1;
+				}
 			}
+			$self->{'title'} ||= $firstTitle;
+			print STDERR "-getURL(PLS): first=$firstStream= title=$firstTitle=\n"  if ($DEBUG);
+		} else {  #m3u8:
+			(my $urlpath = ${$self->{'streams'}}[$idx]) =~ s#[^\/]+$##;
+			foreach my $line (@lines) {
+				if ($line =~ m#^\s*([^\#].+)$#) {
+					my $urlpart = $1;
+					$urlpart =~ s#^\s+##;
+					$urlpart =~ s#^\/##;
+					$firstStream = ($urlpart =~ m#https?\:#) ? $urlpart : ($urlpath . '/' . $urlpart);
+					last;
+				}
+			}
+			print STDERR "-getURL(m3u?): first=$firstStream=\n"  if ($DEBUG);
 		}
-		$self->{'title'} ||= $firstTitle;
-		print STDERR "-getURL: first=$firstStream= title=$firstTitle=\n"  if ($DEBUG);
 		return $firstStream || ${$self->{'streams'}}[$idx];
 	}
 	return ${$self->{'streams'}}[$idx];
@@ -443,19 +478,21 @@ sub count
 sub getType
 {
 	my $self = shift;
-	return 'Radionomy';  #URL TO THE STATION'S THUMBNAIL ICON, IF ANY.
+	return 'Radionomy';  #STATION TYPE (FOR PARENT StreamFinder MODULE).
 }
 
 sub getID
 {
 	my $self = shift;
-	return $self->{'id'};  #URL TO THE STATION'S THUMBNAIL ICON, IF ANY.
+	return $self->{'fccid'}  if (defined($_[0]) && $_[0] =~ /fcc/i);  #STATION'S CALL LETTERS OR RADIONOMY-ID.
+	return $self->{'id'};
 }
 
 sub getTitle
 {
 	my $self = shift;
-	return $self->{'title'};  #URL TO THE STATION'S TITLE(DESCRIPTION), IF ANY.
+	return $self->{'description'}  if (defined($_[0]) && $_[0] =~ /^\-?(?:long|desc)/i);
+	return $self->{'title'};  #STATION'S TITLE(DESCRIPTION), IF ANY.
 }
 
 sub getIconURL

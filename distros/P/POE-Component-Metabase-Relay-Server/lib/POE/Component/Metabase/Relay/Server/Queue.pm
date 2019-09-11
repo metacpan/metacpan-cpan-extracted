@@ -1,5 +1,5 @@
 package POE::Component::Metabase::Relay::Server::Queue;
-$POE::Component::Metabase::Relay::Server::Queue::VERSION = '0.36';
+$POE::Component::Metabase::Relay::Server::Queue::VERSION = '0.38';
 # ABSTRACT: Submission queue for the metabase relay
 
 use strict;
@@ -270,6 +270,7 @@ event 'shutdown' => sub {
 
 event '_generic_db_result' => sub {
   my ($kernel,$self,$result) = @_[KERNEL,OBJECT,ARG0];
+  $result->{dsn} = $self->dsn;
   if ( $result->{error} ) {
     warn "DB error (" . ( $self->_time - $result->{_ts} ) . "s): " . JSON->new->pretty(1)->encode( $result ) . "\n" if $self->debug;
   }
@@ -437,7 +438,7 @@ POE::Component::Metabase::Relay::Server::Queue - Submission queue for the metaba
 
 =head1 VERSION
 
-version 0.36
+version 0.38
 
 =head1 DESCRIPTION
 
@@ -512,7 +513,7 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Chris Williams.
+This software is copyright (c) 2019 by Chris Williams.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

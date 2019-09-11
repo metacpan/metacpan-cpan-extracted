@@ -1,4 +1,7 @@
-0.192240  2019-08-12 23:48:09+02:00 Europe/Brussels
+0.192540  2019-09-11 10:56:03+02:00 Europe/Brussels
+	- Fixes
+	  - Roles::Fillable/Refiner::GenePlus: activated 'from seq' mode for generating exploratory Domains objects		
+	  - bin::export_bgc_sql_tables: fixed Domains_explus table export
 
 0.192240  2019-08-12 23:38:59+02:00 Europe/Brussels
 	- Fixes

@@ -57,6 +57,10 @@ are all the parameter variables that the multisubs will use.  `import`
 creates these as package variables so that they can be used unqualified
 in the multisub implementations.
 
+A parameter `D:Dispatcher` can also be given to specify the dispatcher to
+use.  If `Dispatcher` includes a double-colon, it will be used as a full
+package name.  Otherwise, `Sub::Multi::Tiny::Dispatcher::` will be prepended.
+
 # CUSTOM DISPATCH
 
 This module includes a default dispatcher (implemented in

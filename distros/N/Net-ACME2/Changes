@@ -1,5 +1,8 @@
 Revision history for Perl module Net::ACME2
 
+0.33 10 September 2019
+- Fix documentation of base class for exception objects. (No code changes.)
+
 0.32 26 August 2019
 - Fix creation of subproblem objects.
 - Add subproblem “identifier” to those objects’ to_string() output.

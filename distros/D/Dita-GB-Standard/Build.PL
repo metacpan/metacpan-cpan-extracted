@@ -9,7 +9,7 @@ my $b = Module::Build->new
   requires      =>
    {'Carp'                  => 0,
     'Data::Dump'            => 0,
-    'Data::Table::Text'     => 20190721,
+    'Data::Table::Text'              => 20190906,
     'Test2::API'            => 0,
     'Test::More'            => 0,
    },

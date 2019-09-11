@@ -36,6 +36,10 @@ file.
 	
 	print "Title=$stationTitle\n";
 	
+	my $stationDescription = $station->getTitle('desc');
+	
+	print "Description=$stationDescription\n";
+	
 	my $stationID = $station->getID();
 
 	print "Station ID=$stationID\n";
@@ -72,10 +76,10 @@ file.
 
 =head1 DESCRIPTION
 
-StreamFinder::Tunein accepts a valid radio station URL on Tunein.com and
-returns the actual stream URL(s) and cover art icon for that station.  
+StreamFinder::Tunein accepts a valid radio station or podcast ID or URL on 
+Tunein.com and returns the actual stream URL(s), title, and cover art icon.  
 The purpose is that one needs one of these URLs in order to have the option to 
-stream the station in one's own choice of audio player software rather than 
+stream the station in one's own choice of media player software rather than 
 using their web browser and accepting any / all flash, ads, javascript, 
 cookies, trackers, web-bugs, and other crapware that can come with that method 
 of playing.  The author uses his own custom all-purpose media player called 
@@ -107,24 +111,25 @@ Returns an array of strings representing all stream urls found.
 Similar to B<get>() except it only returns a single stream representing 
 the first valid stream found.  
 
-Current options are:  I<-random> and I<-noplaylists>.  By default, the 
-first ("best"?) stream is returned.  If I<-random> is specified, then 
+Current options are:  I<"random"> and I<"noplaylists">.  By default, the 
+first ("best"?) stream is returned.  If I<"random"> is specified, then 
 a random one is selected from the list of streams found.  
-If I<-noplaylists> is specified, and the stream to be returned is a 
-"playlist" (.pls extension), it is first fetched and the first entry 
+If I<"noplaylists"> is specified, and the stream to be returned is a 
+"playlist" (.pls or .m3u? extension), it is first fetched and the first entry 
 in the playlist is returned.  This is needed by Fauxdacious Mediaplayer.
 
 =item $station->B<count>()
 
 Returns the number of streams found for the station.
 
-=item $station->B<getID>()
+=item $station->B<getID>(['fccid'])
 
-Returns the station's Tunein ID (alphanumeric).
+Returns the station's Tunein ID (default) or 
+station's FCC call-letters ("fccid").
 
-=item $station->B<getTitle>()
+=item $station->B<getTitle>(['desc'])
 
-Returns the station's title (description).  
+Returns the station's title, or (long description).  
 
 =item $station->B<getIconURL>()
 
@@ -146,7 +151,7 @@ Returns a two-element array consisting of the extension (ie. "png",
 
 =item $station->B<getType>()
 
-Returns the stream's type ("Tunein").
+Returns the station's type ("Tunein").
 
 =back
 
@@ -192,7 +197,11 @@ tunein
 
 =head1 DEPENDENCIES
 
-LWP::UserAgent
+L<URI::Escape>, L<HTML::Entities>, L<LWP::UserAgent>
+
+=head1 RECCOMENDS
+
+wget
 
 =head1 BUGS
 
@@ -270,12 +279,18 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
+my $haveYoutube = 0;
+eval "use StreamFinder::Youtube; \$haveYoutube = 1; 1";
+
 package StreamFinder::Tunein;
 
 use strict;
 use warnings;
+use URI::Escape;
+use HTML::Entities ();
 use LWP::UserAgent ();
 use vars qw(@ISA @EXPORT);
+
 
 my $DEBUG = 0;
 my %uops = ();
@@ -330,8 +345,20 @@ sub new
 	$ua->cookie_jar({});
 	$ua->env_proxy;
 	$self->{'id'} = '';
-	($self->{'id'} = $url) =~ s#^.*\-([a-z]\d\d\d\d+).*$#$1#;
-	my $response = $ua->get($url);
+	$self->{'fccid'} = '';
+
+	(my $url2fetch = $url);
+	#DEPRECIATED (STATION-IDS NOW INCLUDE STUFF BEFORE THE DASH: ($self->{'id'} = $url) =~ s#^.*\-([a-z]\d+)\/?$#$1#;
+	if ($url2fetch =~ m#^https?\:#) {
+		($self->{'id'} = $url) =~ s#^.*?\/([a-zA-Z0-9\-\_]+)(?:\/?|\/\?[^\/]+\/?)$#$1#;
+	} else {
+		my ($id, $podcastid) = split(m#\/#, $url2fetch);
+		$url2fetch = 'https://tunein.com/radio/' . $id;
+		$url2fetch .= '/?topicId=' . $podcastid  if ($podcastid);
+		$self->{'id'} = $id;
+	}
+	print STDERR "-1 FETCHING URL=$url2fetch=\n"  if ($DEBUG);
+	my $response = $ua->get($url2fetch);
 	if ($response->is_success) {
 		$html = $response->decoded_content;
 	} else {
@@ -339,36 +366,81 @@ sub new
 		my $no_wget = system('wget','-V');
 		unless ($no_wget) {
 			print STDERR "\n..trying wget...\n"  if ($DEBUG);
-			$html = `wget -t 2 -T 20 -O- -o /dev/null \"$url\" 2>/dev/null `;
+			$html = `wget -t 2 -T 20 -O- -o /dev/null \"$url2fetch\" 2>/dev/null `;
 		}
 	}
 	print STDERR "-1: html=$html=\n"  if ($DEBUG > 1);
 	if ($html) {  #EXTRACT METADATA, IF WE CAN:
-		$self->{'id'} ||= $1  if ($html =~ m#\"guideId\"\:\"([^\"]+)\"#);
-		$self->{'title'} = ($html =~ m#\"title\"\:\"([^\"]+)\"#) ? $1 : '';
-		$self->{'title'} ||= ($html =~ m# title\=\"([^\"]+)\" #) ? $1 : '';
-		$self->{'iconurl'} = ($html =~ m#\"image\"\:\"([^\"]+)\"#) ? $1 : '';
+		my $artist;
+		$self->{'id'} = $1  if ($html =~ m#\"guideId\"\:\"([^\"]+)\"#);
+		$self->{'fccid'} = ($html =~ m#\"callSign\"\:\"([^\"]+)\"#i) ? $1 : '';
+		$self->{'title'} = ($html =~ m#\"twitter\:title\"\s+content\=\"([^\"]+)\"#) ? $1 : '';
+		$self->{'description'} = $self->{'title'};
+		$artist = ($html =~ m#\"title\"\:\"([^\"]+)\"#) ? $1 : '';
+		$artist ||= ($html =~ m# title\=\"([^\"]+)\" #) ? $1 : '';
+		if ($artist && $self->{'title'} !~ /\w/) {
+			$self->{'title'} = $artist;
+			$artist = '';
+		}
+		$self->{'artist'} = ($html =~ m#\"subtitle\"\:\"([^\"]+)\"#i) ? $1 : '';
+		$self->{'description'} = ($html =~ m#name\=\"twitter\:description\"\s+content\=\"([^\"]+)\"#i) ? $1 : $self->{'title'};
+		$self->{'description'} = HTML::Entities::decode_entities($self->{'description'});
+		$self->{'description'} = uri_unescape($self->{'description'});
+		$self->{'iconurl'} = ($html =~ m#\"twitter\:image\:src\"\s+content\=\"([^\"]+)\"#) ? $1 : '';
+		$self->{'iconurl'} ||= ($html =~ m#\"image\"\:\"([^\"]+)\"#) ? $1 : '';
 		$self->{'iconurl'} =~ s#\\u002F#\/#g;
 		$self->{'iconurl'} =~ s#\?.+$##;
 		$self->{'imageurl'} = ($html =~ m#\"bannerImage\"\:\"([^\"]+)\"#) ? $1 : $self->{'iconurl'};
 		$self->{'imageurl'} =~ s#\\u002F#\/#g;
 		$self->{'imageurl'} =~ s#\?.+$##;
+		if ($self->{'artist'} =~ /\S/) {
+			$self->{'artist'} =~ s/\s*\\?u?003E\s*$//;
+			$artist .= ' - '  if ($artist);
+			$artist .= $self->{'artist'}
+		}
+		if ($artist) {
+			$artist = HTML::Entities::decode_entities($artist);
+			$artist = uri_unescape($artist);
+			$self->{'artist'} = $artist;
+		}
 	}
 	return undef  unless ($self->{'id'});
 
 	my $stationID = $self->{'id'};
-	my $tryStream = "http://opml.radiotime.com/Tune.ashx?id=$stationID";
-	$self->{'streams'} = [$tryStream];
-	$self->{'cnt'} = 1;
-	my $tryYoutubeDL = new StreamFinder::Youtube($tryStream, -debug => $DEBUG, -notitle => 1);
-	if ($tryYoutubeDL) {
-		my $firstStream = $tryYoutubeDL->getURL();
-		$self->{'title'} ||= $tryYoutubeDL->getTitle();
-		$self->{'iconurl'} ||= $tryYoutubeDL->getIconUrl();
-		unshift @{$self->{'streams'}}, $firstStream;
+	$self->{'streams'} = [];
+	$self->{'cnt'} = 0;
+	while ($html =~ s#\"playUrl\"\:\"([^\"]+)\"#STREAMFINDER_MARK#i) {  #PROBABLY A PODCAST?:
+		(my $one = $1) =~ s#\\u002F#\/#g;
+		$one =~ s#\.mp3\?.*$#\.mp3#;   #STRIP OFF EXTRA GARBAGE PARMS, COMMENT OUT IF STARTS FAILING!
+		push @{$self->{'streams'}}, $one;
 		$self->{'cnt'}++;
+		print STDERR "i:Found stream ($one) in page.\n"  if ($DEBUG);
+	}
+	if ($self->{'cnt'}) {   #STREAM(S) FOUND, PBLY A PODCAST:
+		$self->{'id'} .= '/' . $1  if ($html =~ s#\"guideId\"\:\"([^\"]+)\"\,STREAMFINDER_MARK#STREAMFINDER_MARK#i);
+		$self->{'created'} = $1  if ($html =~ s#\"publishTime\"\:\"([^\"]*)\"\,STREAMFINDER_MARK##i);
+		$self->{'year'} = (defined($self->{'created'}) && $self->{'created'} =~ /(\d\d\d\d)/) ? $1 : '';
+		print STDERR "i:Podcast found, ID changed to (".$self->{'id'}."), year (".$self->{'year'}.").\n"  if ($DEBUG);
+	} else {  #(USUALLY) NO STREAMS FOUND, TRY youtube-dl!:
+		my $tryStream = "http://opml.radiotime.com/Tune.ashx?id=$stationID";
+		$self->{'streams'} = [$tryStream];
+		$self->{'cnt'} = 1;
+		if ($haveYoutube) {
+			my $tryYoutubeDL = new StreamFinder::Youtube($tryStream, -debug => $DEBUG, -notitle => 1);
+			if ($tryYoutubeDL) {
+				my $firstStream = $tryYoutubeDL->getURL();
+				print STDERR "i:Found stream ($firstStream) via youtube-dl.\n"  if ($DEBUG);
+				$self->{'title'} ||= $tryYoutubeDL->getTitle();
+				$self->{'iconurl'} ||= $tryYoutubeDL->getIconUrl();
+				unshift @{$self->{'streams'}}, $firstStream;
+				$self->{'cnt'}++;
+			}
+		}
 	}
 	$self->{'total'} = $self->{'cnt'};
+	$self->{'title'} = HTML::Entities::decode_entities($self->{'title'});
+	$self->{'title'} = uri_unescape($self->{'title'});
+	print STDERR "\n--ID=".$self->{'id'}."=\n--TITLE=".$self->{'title'}."\n--ARTIST=".$self->{'artist'}."=\n--STREAMS=".join('|',@{$self->{'streams'}})."=\n"  if ($DEBUG);
 
 	bless $self, $class;   #BLESS IT!
 
@@ -387,7 +459,8 @@ sub getURL   #LIKE GET, BUT ONLY RETURN THE SINGLE ONE W/BEST BANDWIDTH AND RELI
 	my $self = shift;
 	my $arglist = (defined $_[0]) ? join('|',@_) : '';
 	my $idx = ($arglist =~ /\b\-?random\b/) ? int rand scalar @{$self->{'streams'}} : 0;
-	if ($arglist =~ /\b\-?noplaylists\b/ && ${$self->{'streams'}}[$idx] =~ /\.pls$/i) {
+	if ($arglist =~ /\b\-?noplaylists\b/ && ${$self->{'streams'}}[$idx] =~ /\.(pls|m3u8?)$/i) {
+		my $plType = $1;
 		my $firstStream = ${$self->{'streams'}}[$idx];
 		print STDERR "-getURL($idx): NOPLAYLISTS and (".${$self->{'streams'}}[$idx].")\n"  if ($DEBUG);
 		my $ua = LWP::UserAgent->new(@userAgentOps);		
@@ -408,16 +481,30 @@ sub getURL   #LIKE GET, BUT ONLY RETURN THE SINGLE ONE W/BEST BANDWIDTH AND RELI
 		}
 		my @lines = split(/\r?\n/, $html);
 		$firstStream = '';
-		my $firstTitle = '';
-		foreach my $line (@lines) {
-			if ($line =~ m#^\s*File\d+\=(.+)$#) {
-				$firstStream ||= $1;
-			} elsif ($line =~ m#^\s*Title\d+\=(.+)$#) {
-				$firstTitle ||= $1;
+		if ($plType =~ /pls/) {  #PLS:
+			my $firstTitle = '';
+			foreach my $line (@lines) {
+				if ($line =~ m#^\s*File\d+\=(.+)$#) {
+					$firstStream ||= $1;
+				} elsif ($line =~ m#^\s*Title\d+\=(.+)$#) {
+					$firstTitle ||= $1;
+				}
 			}
+			$self->{'title'} ||= $firstTitle;
+			print STDERR "-getURL(PLS): first=$firstStream= title=$firstTitle=\n"  if ($DEBUG);
+		} else {  #m3u8:
+			(my $urlpath = ${$self->{'streams'}}[$idx]) =~ s#[^\/]+$##;
+			foreach my $line (@lines) {
+				if ($line =~ m#^\s*([^\#].+)$#) {
+					my $urlpart = $1;
+					$urlpart =~ s#^\s+##;
+					$urlpart =~ s#^\/##;
+					$firstStream = ($urlpart =~ m#https?\:#) ? $urlpart : ($urlpath . '/' . $urlpart);
+					last;
+				}
+			}
+			print STDERR "-getURL(m3u?): first=$firstStream=\n"  if ($DEBUG);
 		}
-		$self->{'title'} ||= $firstTitle;
-		print STDERR "-getURL: first=$firstStream= title=$firstTitle=\n"  if ($DEBUG);
 		return $firstStream || ${$self->{'streams'}}[$idx];
 	}
 	return ${$self->{'streams'}}[$idx];
@@ -438,13 +525,15 @@ sub getType
 sub getID
 {
 	my $self = shift;
-	return $self->{'id'};  #URL TO THE STATION'S THUMBNAIL ICON, IF ANY.
+	return $self->{'fccid'}  if (defined($_[0]) && $_[0] =~ /fcc/i);  #STATION'S CALL LETTERS OR TUNEIN-ID.
+	return $self->{'id'};
 }
 
 sub getTitle
 {
 	my $self = shift;
-	return $self->{'title'};  #URL TO THE STATION'S TITLE(DESCRIPTION), IF ANY.
+	return $self->{'description'}  if (defined($_[0]) && $_[0] =~ /^\-?(?:long|desc)/i);
+	return $self->{'title'};  #STATION'S TITLE(DESCRIPTION), IF ANY.
 }
 
 sub getIconURL

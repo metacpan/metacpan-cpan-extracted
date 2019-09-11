@@ -33,7 +33,8 @@ my %makefile_args = (
 	'Socket' => 0,
         'Sys::Hostname' => 1.16,
 	'Apache::Defaults' => 1.02,
-	'Apache::Config::Preproc' => 1.03
+	'Apache::Config::Preproc' => 1.03,
+        'Config::Parser' => 1.03
     },
     MIN_PERL_VERSION => 5.016001,
     META_MERGE => {

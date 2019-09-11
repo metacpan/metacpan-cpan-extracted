@@ -1,7 +1,7 @@
 package Sah::Schema::unix::local_groupname;
 
-our $DATE = '2019-07-12'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-09-11'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 our $schema = ['unix::groupname' => {
     summary => 'Unix group name that must exist on the system',
@@ -28,7 +28,7 @@ Sah::Schema::unix::local_groupname - Unix group name that must exist on the syst
 
 =head1 VERSION
 
-This document describes version 0.004 of Sah::Schema::unix::local_groupname (from Perl distribution Sah-Schemas-Unix), released on 2019-07-12.
+This document describes version 0.005 of Sah::Schema::unix::local_groupname (from Perl distribution Sah-Schemas-Unix), released on 2019-09-11.
 
 =head1 DESCRIPTION
 

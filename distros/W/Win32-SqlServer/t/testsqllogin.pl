@@ -1,5 +1,5 @@
 #---------------------------------------------------------------------
-# $Header: /Perl/OlleDB/t/testsqllogin.pl 9     18-04-13 21:49 Sommar $
+# $Header: /Perl/OlleDB/t/testsqllogin.pl 14    19-07-15 23:05 Sommar $
 #
 # This file is C<required> by all test scripts. It defines a sub that
 # connects to SQL Server, and changes current directory to the test
@@ -7,6 +7,32 @@
 # are written there.
 #
 # $History: testsqllogin.pl $
+# 
+# *****************  Version 14  *****************
+# User: Sommar       Date: 19-07-15   Time: 23:05
+# Updated in $/Perl/OlleDB/t
+# Need a return in the codepage function.
+# 
+# *****************  Version 13  *****************
+# User: Sommar       Date: 19-07-15   Time: 14:55
+# Updated in $/Perl/OlleDB/t
+# New parameter $autoconnect.
+# 
+# *****************  Version 12  *****************
+# User: Sommar       Date: 19-07-09   Time: 21:04
+# Updated in $/Perl/OlleDB/t
+# Read codepage from the database, since codepages may not have a value
+# at this point.
+# 
+# *****************  Version 11  *****************
+# User: Sommar       Date: 19-07-08   Time: 22:11
+# Updated in $/Perl/OlleDB/t
+# Now retrieving code pages from Win32::SqlServer itself.
+# 
+# *****************  Version 10  *****************
+# User: Sommar       Date: 19-05-05   Time: 17:48
+# Updated in $/Perl/OlleDB/t
+# Replaced is_latin1 with a function that returns the codepage.
 # 
 # *****************  Version 9  *****************
 # User: Sommar       Date: 18-04-13   Time: 21:49
@@ -60,11 +86,14 @@
 
 sub testsqllogin
 {
-   my ($use_sql_init) = @_;
+   my ($use_sql_init, $autoconnect) = @_;
 
    if (not defined $use_sql_init) {
       $use_sql_init = 1;
    }
+
+   die '$use_sql_init must be 0 when $autoconnect = 1.'
+      if $autoconnect and $use_sql_init;
 
    # Crack the envioronment vairable.
    my ($login) = $ENV{'OLLEDBTEST'};
@@ -79,43 +108,29 @@ sub testsqllogin
    else {
       my $X = new Win32::SqlServer;
       $X->{Provider} = $provider if defined $provider;
+      $X->{AutoConnect} = 1 if $autoconnect;
       $X->setloginproperty('Server', $server);
       if ($user) {
          $X->setloginproperty('Username', $user);
          $X->setloginproperty('Password', $pw);
       }
       $X->setloginproperty('Database', 'tempdb');
-      $X->connect();
+      $X->connect() unless $autoconnect;
       return $X;
   }
 }
 
-sub is_latin1 {
-   # Retrieves whether the server has Latin1 as the code page.
+sub codepage {
    my($X) = @_;
 
-   my ($sqlver) = split(/\./, $X->{SQL_version});
-
-   if ($sqlver >= 8) {
-      my ($codepage) = $X->sql_one(<<SQLEND, Win32::SqlServer::SCALAR);
-       SELECT collationproperty(
-                   convert(nvarchar(1000), serverproperty('Collation')), 
-              'CodePage')
+   # We don't just the codepages property, because it may not have
+   # a value direct after connection.
+   my ($codepage) = $X->sql_one(<<SQLEND, Win32::SqlServer::SCALAR);
+    SELECT collationproperty(
+                convert(nvarchar(1000), serverproperty('Collation')), 
+           'CodePage')
 SQLEND
-       return ($codepage == 1252);
-    }
-   else {
-      # On SQL7 and earlier we get the value from syscurconfigs and syscharsets. The
-      # latter is a crazy table, but csid = 1 means Latin-1, and that is what we care
-      # about.
-      my ($csid) = $X->sql_one(<<SQLEND, Win32::SqlServer::SCALAR);
-      SELECT ch.csid
-      FROM   master.dbo.syscurconfigs cf
-      JOIN   master.dbo.syscharsets ch ON cf.value = ch.id
-      WHERE  cf.config = 1123
-SQLEND
-      return ($csid == 1);
-   }
+   return $codepage;
 }
 
 

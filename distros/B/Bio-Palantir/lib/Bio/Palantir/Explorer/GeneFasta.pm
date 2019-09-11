@@ -1,6 +1,6 @@
 package Bio::Palantir::Explorer::GeneFasta;
 # ABSTRACT: Explorer internal class for handling GeneFasta objects
-$Bio::Palantir::Explorer::GeneFasta::VERSION = '0.192240';
+$Bio::Palantir::Explorer::GeneFasta::VERSION = '0.192540';
 use Moose;
 use namespace::autoclean;
 
@@ -81,7 +81,7 @@ sub BUILD {
     my ($seq) = $self->protein_sequence; 
     my $gene_pos = 0;
 
-    my @domains = $self->detect_domains($seq, $gene_pos);
+    my @domains = $self->detect_domains($seq, $gene_pos, undef, 1);
       
     unless (@domains) {
         return;
@@ -111,7 +111,7 @@ Bio::Palantir::Explorer::GeneFasta - Explorer internal class for handling GeneFa
 
 =head1 VERSION
 
-version 0.192240
+version 0.192540
 
 =head1 SYNOPSIS
 

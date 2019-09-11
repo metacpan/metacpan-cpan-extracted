@@ -29,7 +29,7 @@ no_index:
 provides:
   Facebook::OpenGraph:
     file: lib/Facebook/OpenGraph.pm
-    version: '1.25'
+    version: '1.30'
   Facebook::OpenGraph::Response:
     file: lib/Facebook/OpenGraph/Response.pm
 requires:
@@ -52,7 +52,7 @@ resources:
   bugtracker: https://github.com/oklahomer/p5-Facebook-OpenGraph/issues
   homepage: https://github.com/oklahomer/p5-Facebook-OpenGraph
   repository: git://github.com/oklahomer/p5-Facebook-OpenGraph.git
-version: '1.25'
+version: '1.30'
 x_contributors:
   - 'Go Hagiwara <hagiwara.go@gmail.com>'
   - 'Klaus S. Madsen <ksm@jobindex.dk>'

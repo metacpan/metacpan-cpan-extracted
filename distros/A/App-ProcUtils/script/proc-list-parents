@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/ProcUtils/list_parents
 # and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-07-04'; # DATE
+our $DATE = '2019-09-11'; # DATE
 our $DIST = 'App-ProcUtils'; # DIST
-our $VERSION = '0.032'; # VERSION
+our $VERSION = '0.037'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ proc-list-parents - List all the parents of the current process
 
 =head1 VERSION
 
-This document describes version 0.032 of proc-list-parents (from Perl distribution App-ProcUtils), released on 2019-07-04.
+This document describes version 0.037 of proc-list-parents (from Perl distribution App-ProcUtils), released on 2019-09-11.
 
 =head1 SYNOPSIS
 

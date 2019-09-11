@@ -52,7 +52,7 @@ use warnings;
 use warnings::register;
 use Carp;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use Astro::PAL ();
 use base qw/ Astro::Coords /;
@@ -87,8 +87,10 @@ Lat are used for degdeg systems (eg where type=galactic). C<type> can
 be "galactic", "j2000", "b1950", and "supergalactic".  The C<units>
 can be specified as "sexagesimal" (when using colon or space-separated
 strings), "degrees" or "radians". The default is determined from
-context. The name is just a string you can associate with the sky
-position.
+context.  A reference to a 2-element array can be given to specify
+different units for the two coordinates, e.g. C<['hours', 'degrees']>.
+
+The name is just a string you can associate with the sky position.
 
 All coordinates are converted to FK5 J2000 [epoch 2000.0] internally.
 
@@ -140,14 +142,16 @@ sub new {
   # make sure we are upper cased.
   $args{type} = uc($args{type});
 
+  my ($unit_c1, $unit_c2) = (ref $args{'units'}) ? @{$args{'units'}} : ($args{'units'}) x 2;
+
   # Convert input args to radians
-  $args{ra} = Astro::Coords::Angle::Hour->to_radians($args{ra}, $args{units} )
+  $args{ra} = Astro::Coords::Angle::Hour->to_radians($args{ra}, $unit_c1 )
     if exists $args{ra};
-  $args{dec} = Astro::Coords::Angle->to_radians($args{dec}, $args{units} )
+  $args{dec} = Astro::Coords::Angle->to_radians($args{dec}, $unit_c2 )
     if exists $args{dec};
-  $args{long} = Astro::Coords::Angle->to_radians($args{long}, $args{units} )
+  $args{long} = Astro::Coords::Angle->to_radians($args{long}, $unit_c1 )
     if exists $args{long};
-  $args{lat} = Astro::Coords::Angle->to_radians($args{lat}, $args{units} )
+  $args{lat} = Astro::Coords::Angle->to_radians($args{lat}, $unit_c2 )
     if exists $args{lat};
 
   # Default values for parallax and proper motions

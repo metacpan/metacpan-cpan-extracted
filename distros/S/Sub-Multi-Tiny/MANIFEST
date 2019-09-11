@@ -6,7 +6,8 @@ README.md
 cpanfile
 lib/BuildSigParse.PL
 lib/Sub/Multi/Tiny.pm
-lib/Sub/Multi/Tiny/DefaultDispatcher.pm
+lib/Sub/Multi/Tiny/Dispatcher/Default.pm
+lib/Sub/Multi/Tiny/Dispatcher/TypeParams.pm
 lib/Sub/Multi/Tiny/Util.pm
 minil.toml
 support/SigParse.yp
@@ -18,6 +19,12 @@ t/31_ambiguous_dispatch.t
 t/32_same_arity.pl
 t/32_same_arity.t
 t/33_recursion.t
+t/34_invalid_param.pl
+t/34_invalid_param.t
+t/40_type_tiny.t
+t/41_type_tiny_verbose.t
+t/42_pos_and_named.t
+t/Kit.pm
 xt/check-prereqs.t
 META.yml
 MANIFEST

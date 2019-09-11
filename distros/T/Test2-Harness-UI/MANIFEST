@@ -35,6 +35,7 @@ lib/Test2/Harness/UI/Response.pm
 lib/Test2/Harness/UI/Schema.pm
 lib/Test2/Harness/UI/Schema/Result/ApiKey.pm
 lib/Test2/Harness/UI/Schema/Result/Duration.pm
+lib/Test2/Harness/UI/Schema/Result/DurationsState.pm
 lib/Test2/Harness/UI/Schema/Result/Email.pm
 lib/Test2/Harness/UI/Schema/Result/EmailVerificationCode.pm
 lib/Test2/Harness/UI/Schema/Result/Event.pm

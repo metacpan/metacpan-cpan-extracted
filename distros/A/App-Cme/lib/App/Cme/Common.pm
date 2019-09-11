@@ -10,7 +10,7 @@
 #ABSTRACT: Common methods for App::Cme
 
 package App::Cme::Common;
-$App::Cme::Common::VERSION = '1.029';
+$App::Cme::Common::VERSION = '1.030';
 use strict;
 use warnings;
 use 5.10.1;
@@ -240,7 +240,7 @@ sub get_documentation {
     my $sections = $pom->head1();
     my @ret ;
     foreach my $s (@$sections) {
-        push (@ret ,$s) if $s->title() =~ /DESCRIPTION|EXIT/;
+        push (@ret ,$s) if $s->title() =~ /DESCRIPTION|USAGE|OPTIONS|EXIT/;
     }
     return join ("", map { Pod::POM::View::Text->print($_)} @ret) . "Options:\n";;
 }
@@ -259,7 +259,7 @@ App::Cme::Common - Common methods for App::Cme
 
 =head1 VERSION
 
-version 1.029
+version 1.030
 
 =head1 SYNOPSIS
 

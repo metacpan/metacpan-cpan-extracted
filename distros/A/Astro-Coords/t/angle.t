@@ -11,6 +11,7 @@ my $ang = new Astro::Coords::Angle( '-00:30:2.0456', units => 'sex',
  );
 isa_ok($ang,"Astro::Coords::Angle");
 
+$ang->str_ndp(2);
 is("$ang", "359:29:57.95", "default stringification 0 to 2PI");
 
 $ang->str_delim("dms");
@@ -30,11 +31,11 @@ is( "$ang", "45d00m00.00000s", "dms stringification");
 delta_ok( $ang->arcsec, (45 * 60 * 60 ), 'arcsec');
 
 $ang = new Astro::Coords::Angle(45, units => 'deg');
-delta_ok($ang->negate()->degrees(), -45);
+delta_ok($ang->negate()->degrees(), -45, 'negation');
 
 # use string form to recreate to test parser
 my $ang2 = new Astro::Coords::Angle( $ang->string, units=>'sex',range=>'PI');
-is($ang2->degrees, $ang->degrees, "compare deg to string to deg");
+delta_ok($ang2->degrees, $ang->degrees, "compare deg to string to deg");
 
 # Test Hour constructor
 $ang = new Astro::Coords::Angle::Hour( "12:00:00");

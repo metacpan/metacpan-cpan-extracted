@@ -25,29 +25,52 @@ Revision history for StreamFinder
         - Add StreamFinder::BannedVideo (https://banned.video/) to handle 
         their video streams (which youtube-dl doesn't currently handle).
 1.10    2019/09/07
-        - StreamFinder::RadioNet: (https://www.radion.net/) ADDED
-        - StreamFinder::Tunein: RESTORED (now uses StreamFinder::Youtube for 
-        stream fetching), but adds metadata loading (which youtube-dl does 
-        not currently fetch for these streams.
-        - StreamFinder::IHeartRadio: Add podcast-playing capability.
         - Add user-configuration files (~/.config/StreamFinder/config, 
         ~/.config/StreamFinder/<submodule>/config (see docs).
         User can now specify / override most LWP::UserAgent options, ie. 
         "agent", "timeout", etc. in the new configuration files.
+        User must create these files, if needed with a text editor.
         - Greatly reduce falling back to wget by adding default user-agent 
-        and checking for wget availability.
+        and checking for wget availability.  Specify an "agent" => "your agent" 
+        line in the user-configuration file to change.
         - Add "-random" and "-noplaylists" options to $station->getURL() 
         (see docs)
+        - StreamFinder::BannedVideo:  Add "-keep" option to better control 
+        type and order of streams returned (see docs).
         - StreamFinder::Facebook: Depreciated ~/.config/.fbdata for new 
         user-configuration files.
+        - StreamFinder::IHeartRadio: Add podcast-playing capability.
         - StreamFinder::IHeartRadio: Depreciated old stream order options, 
         replacing them with new -keep and -skip arguments and configuration 
         file entries.
+        - StreamFinder::RadioNet: (https://www.radion.net/) ADDED
+        - StreamFinder::Tunein: RESTORED (now uses StreamFinder::Youtube for 
+        stream fetching), but adds metadata loading (which youtube-dl does 
+        not currently fetch for these streams.
         - StreamFinder::Youtube: Better handle "chunky" brighteon.com 
         .m3u8 video streams.  Also add "-notitle" option, streamlining 
         use by StreamFinder::Tunein (see docs).
-        - StreamFinder::BannedVideo:  Add "-keep" option to better control 
-        type and order of streams returned (see docs).
 1.11    2019/09/07
         - StreamFinder::Youtube: bugfix for brighteon.com m3u8 video URLs.
         - Docs: fix a cpl. typos, actually include the updated README file.
+1.12    2019/09/10
+        - StreamFinder::Tunein: Add podcast-playing capability.  
+        (Will look for "playUrl" before falling back to youtube-dl for stream).
+        - StreamFinder::Reciva: Fix to make LWP::Useragent fetch reciva URLs 
+        using the ANCIENT TLSv1 to allow to work without falling back to wget.
+        See the StreamFinder::Reciva docs for creating a one-line custom 
+        config file to do this - I didn't make it the default since they could 
+        FIX this at ANY time, which would break things!
+        - Add URI::Escape and HTML::Entities as DEPENDENCIES - in order to 
+        ensure that the returned stream titles are un-escaped.
+        - Fix $station->getID('fcc') to work properly (return the station's 
+        FCC call-letters for sights and stations that support it.
+        - Set $station->{artist} and $station->{year} where applicable.
+        - Minor doc updates.
+        - Fix some sight-specific submodules to properly accept just a station 
+        / video ID rather than a full URL (see docs).
+        - Add "desc" option go getTitle() to fetch station's (long) description 
+        (for sites that provide that field), otherwise, the title is returned.
+1.13    2019/09/11
+        - Fix missing (recently-added) file (RadioNet.pm) in MANIFEST file.
+        - More doc. fixes, mostly to the individual submodules.

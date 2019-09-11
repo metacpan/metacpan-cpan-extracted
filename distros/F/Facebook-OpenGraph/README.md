@@ -5,7 +5,7 @@ Facebook::OpenGraph - Simple way to handle Facebook's Graph API.
 
 # VERSION
 
-This is Facebook::OpenGraph version 1.25
+This is Facebook::OpenGraph version 1.30
 
 # SYNOPSIS
 

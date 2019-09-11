@@ -27,6 +27,7 @@
       },
       "configure" : {
          "requires" : {
+            "Config" : "0",
             "ExtUtils::Depends" : "0",
             "ExtUtils::PkgConfig" : "0"
          }
@@ -46,6 +47,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "2",
+   "version" : "3",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

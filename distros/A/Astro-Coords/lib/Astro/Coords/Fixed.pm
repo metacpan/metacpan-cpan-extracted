@@ -36,7 +36,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use Astro::PAL ();
 use Astro::Coords::Angle;
@@ -71,6 +71,9 @@ is changed.
 A telescope is required (in the form of an C<Astro::Telescope> object)
 if the position is specified as HA/Dec.
 
+A reference to a 2-element array can be given to specify different units
+for the two coordinates, e.g. C<['hours', 'degrees']>.
+
 A name can be associated with this position.
 
 =cut
@@ -90,13 +93,15 @@ sub new {
   # Store the telescope if we have one
   $c->telescope( $args{tel} ) if exists $args{tel};
 
+  my ($unit_c1, $unit_c2) = (ref $args{'units'}) ? @{$args{'units'}} : ($args{'units'}) x 2;
+
   if (exists $args{ha} && exists $args{dec} and exists $args{tel}
      and UNIVERSAL::isa($args{tel}, "Astro::Telescope")) {
     # HA and Dec
 
     # Convert input args to radians
-    my $ha = Astro::Coords::Angle::Hour->to_radians($args{ha},$args{units});
-    my $dec = Astro::Coords::Angle->to_radians($args{dec}, $args{units});
+    my $ha = Astro::Coords::Angle::Hour->to_radians($args{ha}, $unit_c1);
+    my $dec = Astro::Coords::Angle->to_radians($args{dec}, $unit_c2);
 
     # Convert to "native" format
     my $lat = $args{tel}->lat;
@@ -112,9 +117,9 @@ sub new {
     # Az and El
 
     # Convert input args to radians
-    $az = new Astro::Coords::Angle( $args{az}, units => $args{units},
+    $az = new Astro::Coords::Angle( $args{az}, units => $unit_c1,
 				    range => '2PI' );
-    $el = new Astro::Coords::Angle( $args{el}, units => $args{units});
+    $el = new Astro::Coords::Angle( $args{el}, units => $unit_c2);
 
     # native form
     $c->native( 'azel' );

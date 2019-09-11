@@ -140,3 +140,5 @@ v0.19   + Astro::Coords::Fixed::array now returns the azimuth and elevation
         + Added warnings about the use of proper motion without parallax.
           (With Astro::PAL, significant proper motions are not applied
           unless the parallax is also given.)
+
+v0.20   + Units can now be given as a 2-element array such as ['hours', 'degrees'].

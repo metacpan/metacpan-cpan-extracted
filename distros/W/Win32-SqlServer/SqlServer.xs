@@ -1,12 +1,24 @@
 /*---------------------------------------------------------------------
- $Header: /Perl/OlleDB/SqlServer.xs 97    16-07-15 13:46 Sommar $
+ $Header: /Perl/OlleDB/SqlServer.xs 99    19-07-09 16:05 Sommar $
 
   The main flie for Win32::SqlServer. This file only includes the XS
   parts these days. All other code is in other files.
 
-  Copyright (c) 2004-2012   Erland Sommarskog
+  Copyright (c) 2004-2019   Erland Sommarskog
 
   $History: SqlServer.xs $
+ * 
+ * *****************  Version 99  *****************
+ * User: Sommar       Date: 19-07-09   Time: 16:05
+ * Updated in $/Perl/OlleDB
+ * Added GetOEMCP for the benefit of 4_conversion.t.
+ * 
+ * *****************  Version 98  *****************
+ * User: Sommar       Date: 19-07-08   Time: 22:45
+ * Updated in $/Perl/OlleDB
+ * initbatch now hs a return value and a new (internal) parameter. Added
+ * three more internal routines to get SQL Server version, Current
+ * database and ANSI Code page.
  * 
  * *****************  Version 97  *****************
  * User: Sommar       Date: 16-07-15   Time: 13:46
@@ -257,6 +269,10 @@ xs_DESTROY(olle_ptr)
           VariantClear(&mydata->init_properties[i].vValue);
        }
 
+       // Make sure strings for SQL version and current database are
+       // cleared.
+       free_sqlver_currentdb(mydata);
+
        // And dispense of mydata itself. The Perl DESTROY will set mydata
        // to 0, to avoid a second cleanup when Perl calls DESTROY a second
        // time. (Which it does for some reason.)
@@ -284,10 +300,12 @@ CODE:
     }
 }
 
-void
-initbatch(sqlsrv, sv_cmdtext)
-    SV  *sqlsrv
-    SV  *sv_cmdtext
+
+int
+initbatch(sqlsrv, sv_cmdtext, isnestedquery = FALSE)
+    SV   *sqlsrv
+    SV   *sv_cmdtext
+    int  isnestedquery
 
 int
 enterparameter(sqlsrv, nameoftype, sv_maxlen, paramname, isinput, isoutput, sv_value = NULL, sv_precision = NULL, sv_scale = NULL, typeinfo = NULL)
@@ -425,6 +443,57 @@ CODE:
 OUTPUT:
    RETVAL
 
+
+SV *
+get_sqlversion (olle_ptr) 
+   SV * olle_ptr;
+CODE:
+{   
+    // Implements FETCH for Olle->{SQL_version];
+    internaldata * mydata = get_internaldata(olle_ptr);
+    if (! my_sv_is_defined(mydata->SQL_version) && 
+        OptAutoConnect(olle_ptr)) {
+       // If value is not set, but AutoConnect is on, connect 
+       // and disconnect to have it set.
+       do_connect(olle_ptr, TRUE);
+       disconnect(olle_ptr);
+    }
+
+    // Need to increment refcnt before return.
+    if (my_sv_is_defined(mydata->SQL_version)) {
+       SvREFCNT_inc(mydata->SQL_version);
+    }
+    RETVAL = mydata->SQL_version;
+}
+OUTPUT:
+   RETVAL
+
+SV *
+get_currentdb (olle_ptr) 
+   SV * olle_ptr;
+CODE:
+{   
+    // Implements FETCH for Olle->{CurrentDB];
+    internaldata * mydata = get_internaldata(olle_ptr);
+    if (! my_sv_is_defined(mydata->CurrentDB) && 
+        OptAutoConnect(olle_ptr)) {
+       // If value is not set, but AutoConnect is on, connect 
+       // and disconnect to have it set.
+       do_connect(olle_ptr, TRUE);
+       disconnect(olle_ptr);
+    }
+
+    if (my_sv_is_defined(mydata->CurrentDB)) {
+       SvREFCNT_inc(mydata->CurrentDB);
+    }
+    RETVAL = mydata->CurrentDB;
+}
+OUTPUT:
+   RETVAL
+
+
+
+
 int
 get_provider_enum(olle_ptr)
     SV * olle_ptr
@@ -529,6 +598,22 @@ CODE:
 { RETVAL = SQL_FILESTREAM_OPEN_FLAG_RANDOM_ACCESS; }
 OUTPUT:
    RETVAL
+
+int
+GetACP()
+CODE:
+{ RETVAL = GetACP(); }
+OUTPUT:
+   RETVAL
+
+
+int
+GetOEMCP()
+CODE:
+{ RETVAL = GetOEMCP(); }
+OUTPUT:
+   RETVAL
+
 
 size_t
 GetProcessWorkingSetSize()

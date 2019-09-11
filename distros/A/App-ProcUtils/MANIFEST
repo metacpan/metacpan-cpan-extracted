@@ -8,6 +8,9 @@ Makefile.PL
 README
 dist.ini
 lib/App/ProcUtils.pm
+script/proc-exists
+script/proc-kill
+script/proc-list
 script/proc-list-parents
 script/proc-table
 t/00-compile.t

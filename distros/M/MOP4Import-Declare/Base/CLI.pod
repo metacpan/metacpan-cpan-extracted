@@ -1,0 +1,47 @@
+
+=head1 NAME
+
+MOP4Import::Base::CLI - Boilerplate base class for Runnable Module
+
+=head1 SYNOPSIS
+
+
+=for code perl
+
+  #!/usr/bin/env perl
+  package MyScript;
+  use MOP4Import::Base::CLI -as_base;
+  ...
+  __PACKAGE__->run(\@ARGV) unless caller;
+  1;
+
+
+=head1 DESCRIPTION
+
+Now superceded by L<MOP4Import::Base::CLI_JSON>.
+
+MOP4Import::Base::CLI is a general purpose base class to make
+L<your module also runnable from CLI easily|MOP4Import::intro_runnable_module>.
+It helps you writing modules with small testable pieces codes.
+
+It provides enough useful default implementation of C<run()> method
+for CLI invocation.
+
+Also, this module is implemented using L<MOP4Import|MOP4Import::Declare>
+so that you can implement your own C<import()> pragmas.
+
+
+=head1 SEE ALSO
+
+L<App::Cmd> - if your main goal is writing full-fleged CLI.
+
+=head1 AUTHOR
+
+Kobayashi, Hiroaki E<lt>hkoba@cpan.orgE<gt>
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

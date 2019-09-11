@@ -1,5 +1,5 @@
 ---
-abstract: unknown
+abstract: 'Testing Mojo'
 author:
   - "Ilya 'elcamlost' Rassadin <elcamlost@protonmail.com>"
 build_requires:
@@ -21,11 +21,13 @@ no_index:
     - examples
     - t
 requires:
+  Mojolicious: '8.0'
+  Test2::Suite: '0.000126'
   perl: '5.016000'
 resources:
   bugtracker: https://github.com/elcamlost/Test2-MojoX/issues
   homepage: https://mojolicious.org
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/elcamlost/Test2-MojoX
-version: 0.02
+version: 0.04
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

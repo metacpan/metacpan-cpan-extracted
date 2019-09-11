@@ -98,6 +98,7 @@ id              TEXT       NOT NULL    PRIMARY KEY,
 base_id         TEXT       NULL,
 rank            INTEGER    NOT NULL,
 activity        TEXT       NULL,
+symbol          TEXT       NULL,
 chemistry       TEXT       NULL,
 monomer         TEXT       NULL,
 size            INTEGER    NOT NULL,
@@ -126,6 +127,7 @@ CREATE TABLE IF NOT EXISTS Domains_plus (
 id              TEXT       NOT NULL    PRIMARY KEY,
 rank            INTEGER    NOT NULL,
 activity        TEXT       NULL,
+symbol          TEXT       NULL,
 chemistry       TEXT       NULL,
 monomer         TEXT       NULL,
 subtype         TEXT       NULL,
@@ -178,6 +180,7 @@ CREATE TABLE IF NOT EXISTS Domains_explus (
 id              TEXT       NOT NULL    PRIMARY KEY,
 rank            INTEGER    NULL,
 activity        TEXT       NULL,
+symbol          TEXT       NULL,
 chemistry       TEXT       NULL,
 monomer         TEXT       NULL,
 subtype         TEXT       NULL,
@@ -226,7 +229,29 @@ br_N75                 INTEGER  NULL,
 br_L50                 INTEGER  NULL,
 br_L75                 INTEGER  NULL,
 br_Ns_per_100kbp       INTEGER  NULL,
-FOREIGN KEY (id) REFERENCES clusters(lineage)
+FOREIGN KEY(id) REFERENCES lineages(id)
+);
+EOT
+}
+
+if ($ARGV_contam_file) {
+    push @stmts, <<'EOT', 
+CREATE TABLE IF NOT EXISTS Assembly_contamination (
+id                      TEXT     NOT NULL    PRIMARY KEY,
+marker_lineage          TEXT     NULL,
+genomes_n               INTEGER  NULL,
+markers_n               INTEGER  NULL,
+maker_sets_n            INTEGER  NULL,
+zero                    INTEGER  NULL,
+one                     INTEGER  NULL,
+two                     INTEGER  NULL,
+three                   INTEGER  NULL,
+four                    INTEGER  NULL,
+five_plus               INTEGER  NULL,
+completeness            REAL     NULL,
+contamination           REAL     NULL,
+strain_heterogeneity    REAL     NULL,
+FOREIGN KEY(id) REFERENCES lineages(id)
 );
 EOT
 }
@@ -272,6 +297,17 @@ if ($ARGV_file_table) {
         if $ARGV_quast;
 }
 
+if ($ARGV_contam_file) {
+
+    my $infile = $ARGV_contam_file;
+
+    open my $in, '<', $infile;
+    chomp(my @lines = <$in>);
+
+    my @contam_elmts = map { [ split "\t", $_ ] } @lines;
+    push @{ $table_for{Assembly_contamination} }, join "\t", @$_ 
+        for @contam_elmts;
+}
 
 # integrate each file report into the SQL tables
 my $i = 0; 
@@ -326,7 +362,6 @@ for my $infile ($ARGV_file_table ? @infiles : @ARGV_infiles) {
         }
         push @{ $table_for{'Assemblies'} }, join "\t", @quast_elmts;
     }
-
 } 
 
 # ### %table_for
@@ -384,7 +419,7 @@ sub get_lineageid_and_fill_lineage_table {
                 (map { $lineages[$_] } (1, 2, 3)),
                 (map { $tax->get_term_at_level($gca, $_) }
                     qw(order family genus species)),
-                    $lineage_elmts[-1],
+                    $lineages[-1],
             ;
 
             $lineage_id = $gca;
@@ -403,7 +438,7 @@ sub get_lineageid_and_fill_lineage_table {
                     (map { $lineages[$_] } (1, 2, 3)),
                     (map { $tax->get_term_at_level($taxid, $_) } 
                         qw(order family genus species)),
-                        $lineage_elmts[-1],
+                        $lineages[-1],
                 ;
             }
 
@@ -546,7 +581,7 @@ sub fill_bgc_tables {
 
                 my $function = $domain->function;
                
-               my (@domain_elmts, @domain_explus_elmts);
+               my @domain_elmts;
                if ($annotation eq 'antismash') {
                  
                     unless ($function && $ARGV_undef_recov == 0) {
@@ -555,32 +590,52 @@ sub fill_bgc_tables {
 
                     @domain_elmts = (
                         $domain_uui, $domain->uui, $domain->rank, $function,
-                        $domain->chemistry, $domain->monomer, $domain->size,
-                        (join '-', @{ $domain->coordinates }), $domain->begin,
-                        $domain->end, $module_uui_for{$domain->uui} // 'null',
-                        $gene_uui,
+                        $domain->symbol, $domain->chemistry, $domain->monomer, 
+                        $domain->size, (join '-', @{ $domain->coordinates }),
+                        $domain->begin, $domain->end, 
+                        $module_uui_for{$domain->uui} // 'null', $gene_uui,
                     );
                 }
 
                 else {
                 
                     @domain_elmts = (
-                        $domain->uui, $domain->rank, $domain->symbol,
-                        $domain->chemistry, $domain->monomer, $domain->subtype,
-                        $domain->size, (join '-', @{ $domain->coordinates }),
+                        $domain->uui, $domain->rank, $domain->function,
+                        $domain->symbol, $domain->chemistry, $domain->monomer, 
+                        $domain->subtype, $domain->size, 
+                        (join '-', @{ $domain->coordinates }),
                         $domain->begin, $domain->end, $domain->evalue,
                         $domain->score, $domain->subtype_evalue,
                         $domain->subtype_score, $domain->base_uui,
                         $module_uui_for{$domain->uui} // 'null', $gene->uui,
                     );
+                }
 
-                    @domain_explus_elmts = (
-                        $domain->uui, $domain->rank, $domain->symbol, 
-                        $domain->chemistry, $domain->monomer, $domain->subtype,
-                        $domain->size, (join '-', @{ $domain->coordinates }),
+                @domain_elmts = map { $_ // 'na' } @domain_elmts;
+
+                push @{ $table_ref->{'Domains' . $suffix} }, 
+                    join "\t", @domain_elmts;
+
+                push @{ $table_ref->{'Sequences'} }, join "\t", 
+                    ($domain_uui, $domain->protein_sequence, $domain->size);
+
+            }
+
+            if ($annotation eq 'palantir') {
+
+                DOMAIN_EXPLUS:
+                for my $domain (sort { $a->rank <=> $b->rank }
+                    $gene->all_exp_domains) {
+
+                    my @domain_explus_elmts = (
+                        $domain->uui, $domain->rank, $domain->function,
+                        $domain->symbol, $domain->chemistry,
+                        $domain->monomer, $domain->subtype, $domain->size, 
+                        (join '-', @{ $domain->coordinates }),
                         $domain->begin, $domain->end, $domain->evalue,
                         $domain->score, $domain->subtype_evalue, 
-                        $domain->subtype_score, $domain->base_uui, $gene->uui,
+                        $domain->subtype_score, $domain->base_uui,
+                        $gene->uui,
                     );
 
                     @domain_explus_elmts
@@ -594,19 +649,10 @@ sub fill_bgc_tables {
                         $domain->size)
                     ;
                 }
-
-                @domain_elmts = map { $_ // 'na' } @domain_elmts;
-
-                push @{ $table_ref->{'Domains' . $suffix} }, 
-                    join "\t", @domain_elmts;
-
-                push @{ $table_ref->{'Sequences'} }, join "\t", 
-                    ($domain_uui, $domain->protein_sequence, $domain->size);
             }
 
             push @done_uuis, $gene_uui; 
         }
-
     }
 
     return;
@@ -688,7 +734,7 @@ export_bgc_sql_tables.pl - Exports SQL tables of BGC data (Palantir and antiSMAS
 
 =head1 VERSION
 
-version 0.192240
+version 0.192540
 
 =head1 NAME
 
@@ -755,6 +801,13 @@ Create an additionnal table "Assemblies" with Quast statistics. For this
 option, you need to use the transposed_report.tsv output of quast and name it
 with the basename of your report file. For example, if you use my_org.xml, name
 your Quast file my_org.tsv.
+
+=item --contam-file [=] <file>
+
+Add an SQL table for CheckM contamination results (tabular file). This option was
+devised for the interface database.
+
+=for Euclid: file.type: readable
 
 =item --new-db
 

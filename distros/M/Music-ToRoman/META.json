@@ -23,6 +23,7 @@
       "develop" : {
          "requires" : {
             "Pod::Coverage::TrustPod" : "0",
+            "Test::EOL" : "0",
             "Test::More" : "0.88",
             "Test::NoTabs" : "0",
             "Test::Pod" : "1.41",
@@ -64,7 +65,7 @@
          "web" : "https://github.com/ology/Music-ToRoman"
       }
    },
-   "version" : "0.1702",
+   "version" : "0.1703",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.027007"
@@ -224,6 +225,22 @@
             },
             "name" : "Test::NoTabs",
             "version" : "0.15"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::EOL",
+            "config" : {
+               "Dist::Zilla::Plugin::Test::EOL" : {
+                  "filename" : "xt/author/eol.t",
+                  "finder" : [
+                     ":ExecFiles",
+                     ":InstallModules",
+                     ":TestFiles"
+                  ],
+                  "trailing_whitespace" : 1
+               }
+            },
+            "name" : "Test::EOL",
+            "version" : "0.19"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Compile",

@@ -1,6 +1,6 @@
 package Bio::Palantir::Refiner;
 # ABSTRACT: front-end class for Bio::Palantir::Refiner module, wich handles the refinement of NRPS/PKS BGC annotations
-$Bio::Palantir::Refiner::VERSION = '0.192240';
+$Bio::Palantir::Refiner::VERSION = '0.192540';
 use Moose;
 use namespace::autoclean;
 
@@ -13,6 +13,13 @@ extends 'Bio::FastParsers::Base';
 
 # ATTRIBUTES
 
+
+
+has 'module_delineation' => (
+    is      => 'ro',
+    isa     => 'Str',
+    default => 'condensation',
+);
 
 
 has 'clusters' => (
@@ -38,8 +45,14 @@ sub _build_clusters {
     my $report = Parser->new( file => $self->file );
     my $root = $report->root;
 
+### TEST0: $self->module_delineation
+
     my @cluster_plus;
-    push @cluster_plus, ClusterPlus->new( _cluster => $_ ) for $root->all_clusters;
+    push @cluster_plus, ClusterPlus->new(
+        _cluster => $_,
+        module_delineation => $self->module_delineation
+        ) for $root->all_clusters
+    ;
 
     return \@cluster_plus;
 
@@ -61,7 +74,7 @@ Bio::Palantir::Refiner - front-end class for Bio::Palantir::Refiner module, wich
 
 =head1 VERSION
 
-version 0.192240
+version 0.192540
 
 =head1 DESCRIPTION
 
@@ -92,6 +105,10 @@ Path to biosynML.xml or regions.js antiSMASH report file to be parsed.
 =head2 file
 
 Path to a biosynML.xml or regions.js file
+
+=head2 module_delineation
+
+Module delineation method: generates modules from condensation or selection domains.
 
 =head2 clusters
 

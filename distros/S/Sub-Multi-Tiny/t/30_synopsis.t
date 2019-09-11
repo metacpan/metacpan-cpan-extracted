@@ -3,8 +3,10 @@ use strict;
 use warnings;
 use Test::More;
 
-#use Sub::Multi::Tiny::Util '*VERBOSE';
-#BEGIN { $VERBOSE = 2; }
+# Leave verbose turned on for the sake of coverage, even though it makes
+# the results quite lengthy.
+use Sub::Multi::Tiny::Util '*VERBOSE';
+BEGIN { $VERBOSE = 99; }
 
 {
     package main::my_multi;     # We're making main::my_multi()

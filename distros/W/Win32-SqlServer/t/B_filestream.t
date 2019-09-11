@@ -1,9 +1,14 @@
 #---------------------------------------------------------------------
-# $Header: /Perl/OlleDB/t/B_filestream.t 9     18-04-11 21:08 Sommar $
+# $Header: /Perl/OlleDB/t/B_filestream.t 10    19-07-05 21:48 Sommar $
 #
 # Tests for OpenSqlFilestream.
 #
 # $History: B_filestream.t $
+# 
+# *****************  Version 10  *****************
+# User: Sommar       Date: 19-07-05   Time: 21:48
+# Updated in $/Perl/OlleDB/t
+# Changed test texts in Swedish to texts in English to avoid åäö-issues.
 # 
 # *****************  Version 9  *****************
 # User: Sommar       Date: 18-04-11   Time: 21:08
@@ -123,10 +128,10 @@ ALTER DATABASE Olle\$DB ADD FILE
 SQLEND
 
 # This is our test strings.
-my $yksi  = "Somliga säger att somliga somrar somnar somliga.\n" x 2000;
-my $kaksi = "Nelly Nilsson nöjer sig numera näppeligen med nio nötter till natten.\n" x 2000;
-my $kolme = "Handlar Hansons halta höna har haft hosta hela halva hösten.\n" x 1000;
-my $negy  = "Elva elaka elefanter erövrade Enköping\n";
+my $yksi  = "The critics are falling over to tell themselves he's boring.\n" x 2000;
+my $kaksi = "Who the hell can he be who's never had VD and does not even sit on toilet seats.\n" x 2000;
+my $kolme = "His lame-brained antics and jumping in the air.\n" x 1000;
+my $negy  = "And so it must be all a game of chess he's playing\n";
 
 # Move to the database and create a table with three rows in it.
 $X->sql('USE Olle$DB');

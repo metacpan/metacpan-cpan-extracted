@@ -1,11 +1,20 @@
-0.391   2018-10-09 (PERLANCAR)
+0.392   2019-09-11  Released-By: PERLANCAR; Urgency: low
+
+        - Deprecate this distribution, as it has now been renamed to
+          Data-Clean-ForJSON.
+
+        - Release a new version that removes Data::Clean::FromJSON to resolve
+          conflict because it now lives in Data-Clean-ForJSON [RT#130441].
+
+
+0.391   2018-10-09  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Explain more about cloning circular references.
 
 
-0.390   2018-10-09 (PERLANCAR)
+0.390   2018-10-09  Released-By: PERLANCAR
 
         - Bump prereq version Data::Clean to 0.500, which replaces cloning
           module of choice from Data::Clone to Sereal::Dclone because the former
@@ -17,23 +26,23 @@
         - [test] Add tests with various clone modules.
 
 
-0.38    2017-01-15 (PERLANCAR)
+0.38    2017-01-15  Released-By: PERLANCAR
 
 	- [dist] Force update Data::Clean to 0.48.
 
 
-0.37    2016-09-28 (PERLANCAR)
+0.37    2016-09-28  Released-By: PERLANCAR
 
 	- Convert bigints (Math::BigInt objects) into strings.
 
 
-0.36    2016-05-27 (PERLANCAR)
+0.36    2016-05-27  Released-By: PERLANCAR
 
         - Introduce shortcut non-OO functions: clean_json_in_place,
           clone_and_clean_json.
 
 
-0.35    2016-05-21 (PERLANCAR)
+0.35    2016-05-21  Released-By: PERLANCAR
 
         - [Bugfix] Previous release did not correctly set recurse object option,
           the correct option is !recurse_obj (wrong Data::Clean documentation).
@@ -41,37 +50,37 @@
         - [dist] Bump prereq version Data::Clean to 0.35.
 
 
-0.34    2016-05-21 (PERLANCAR)
+0.34    2016-05-21  Released-By: PERLANCAR
 
 	- [Incompatible change] By default now recurses into object (see
 	  !recurse_object option in Data::Clean documentation).
 
 
-0.33    2016-04-14 (PERLANCAR)
+0.33    2016-04-14  Released-By: PERLANCAR
 
 	- Split Data::Clean::Base to its own dist as Data::Clean, rebase on
 	  Data::Clean.
 
 
-0.32    2016-03-30 (PERLANCAR)
+0.32    2016-03-30  Released-By: PERLANCAR
 
 	- Avoid perl undef warning because Scalar::Util::reftype() might
 	  return undef.
 
 
-0.31    2016-03-30 (PERLANCAR)
+0.31    2016-03-30  Released-By: PERLANCAR
 
 	- Introduce option "!recurse_obj" to recurse into hash-/array-based
 	  objects.
 
 
-0.30    2016-03-09 (PERLANCAR)
+0.30    2016-03-09  Released-By: PERLANCAR
 
 	- Remove usage of JSON module in test, handle
 	  Cpanel::JSON::XS::Boolean.
 
 
-0.29    2016-01-20 (PERLANCAR)
+0.29    2016-01-20  Released-By: PERLANCAR
 
 	- Stringify version objects.
 
@@ -82,41 +91,41 @@
 	- Bump prereq version Log::Any::IfLOG to 0.07.
 
 
-0.28    2015-06-10 (PERLANCAR)
+0.28    2015-06-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Mention Data::Abridge.
 
 
-0.27    2015-06-08 (PERLANCAR)
+0.27    2015-06-08  Released-By: PERLANCAR
 
         - No functional changes.
 
         - Re-release to show up in MetaCPAN index.
 
 
-0.26    2015-05-23 (PERLANCAR)
+0.26    2015-05-23  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [Bugfix] Don't assume Scalar::Util's blessed has been imported.
 
 
-0.25    2015-05-23 (PERLANCAR)
+0.25    2015-05-23  Released-By: PERLANCAR
 
         - Put generated cleanser code in 'src', for other tools that might need
           it (e.g. Perinci::CmdLine::Inline).
 
 
-0.24    2015-03-26 (PERLANCAR)
+0.24    2015-03-26  Released-By: PERLANCAR
 
         - Change the default clone limit from 50 to 1, as this is now the more
           sensible default now that the previous release has fixed clone limit
           counting for converted objects.
 
 
-0.23    2015-03-26 (PERLANCAR)
+0.23    2015-03-26  Released-By: PERLANCAR
 
         - Don't count object converted into non-ref into clone limit. This
           solves the problem of only a few DateTime/Time::Moment/other objects
@@ -128,7 +137,7 @@
           circular check.
 
 
-0.22    2015-03-26 (PERLANCAR)
+0.22    2015-03-26  Released-By: PERLANCAR
 
 	- Convert Time::Moment objects like DateTime objects (convert them
 	  to epoch value), BTW the fallback unbless routine in
@@ -137,14 +146,14 @@
 	  unblessing other blessed scalar refs.
 
 
-0.21    2015-03-26 (PERLANCAR)
+0.21    2015-03-26  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace Log::Any with Log::Any::IfLOG.
 
 
-0.20    2014-12-10 (PERLANCAR)
+0.20    2014-12-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -152,31 +161,31 @@
 	  String::LineNumber & String::PerlQuote.
 
 
-0.19    2014-11-13 (PERLANCAR)
+0.19    2014-11-13  Released-By: PERLANCAR
 
 	- Avoid perl undef warning & syntax error in generated code [CT].
 
 
-0.18    2014-11-12 (PERLANCAR)
+0.18    2014-11-12  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Make Acme::Damn and Data::Clone optional prereqs [#98887].
 
 
-0.17    2014-11-07 (PERLANCAR)
+0.17    2014-11-07  Released-By: PERLANCAR
 
 	- Remove unneeded dep.
 
 
-0.16     2014-04-10 (SHARYANTO)
+0.16     2014-04-10  Released-By: SHARYANTO
 
          - No functional changes.
 
          - Replace Acme::Damn and Data::Clone with Function::Fallback::CoreOrPP.
 
 
-0.15     2014-02-13 (SHARYANTO)
+0.15     2014-02-13  Released-By: SHARYANTO
 
          [INCOMPATIBLE CHANGES]
 
@@ -187,14 +196,14 @@
            b=>'CIRCULAR'}.
 
 
-0.14     2014-02-13 (SHARYANTO)
+0.14     2014-02-13  Released-By: SHARYANTO
 
          [ENHANCEMENTS]
 
          - Add command: clone (for -circular).
 
 
-0.13     2013-10-31 (SHARYANTO)
+0.13     2013-10-31  Released-By: SHARYANTO
 
          [ENHANCEMENTS]
 
@@ -202,7 +211,7 @@
            simple scalars).
 
 
-0.12     2013-10-31 (SHARYANTO)
+0.12     2013-10-31  Released-By: SHARYANTO
 
          - No functional changes.
 
@@ -218,18 +227,18 @@
            'call_method'.
 
 
-0.11     2013-10-15 (SHARYANTO)
+0.11     2013-10-15  Released-By: SHARYANTO
 
          - Introduce get_cleanser() to get singleton instance.
 
 
-0.10     2013-10-14 (SHARYANTO)
+0.10     2013-10-14  Released-By: SHARYANTO
 
          - Split functionality of JSON::{PP,XS}::Boolean handling to
            Data::Clean::FromJSON.
 
 
-0.09     2013-10-14 (SHARYANTO)
+0.09     2013-10-14  Released-By: SHARYANTO
 
          - No functional changes. Revert back some code.
 
@@ -239,7 +248,7 @@
          - Handle JSON::{XS,PP}::Boolean objects (convert to 1/0).
 
 
-0.07     2013-09-11 (SHARYANTO)
+0.07     2013-09-11  Released-By: SHARYANTO
 
          - No functional changes. Replace Data::Structure::Util's unbless() with
            Acme::Damn's damn() because the former currently fails to build on
@@ -247,7 +256,7 @@
            Windows).
 
 
-0.06     2013-08-07 (SHARYANTO)
+0.06     2013-08-07  Released-By: SHARYANTO
 
          [INCOMPATIBLE CHANGES]
 
@@ -262,30 +271,30 @@
          - Add command: unbless.
 
 
-0.05     2012-08-05 (SHARYANTO)
+0.05     2012-08-05  Released-By: SHARYANTO
 
          - Fix circular handling.
 
 
-0.04     2012-08-04 (SHARYANTO)
+0.04     2012-08-04  Released-By: SHARYANTO
 
          - More documentation.
 
          - Handle circular references.
 
 
-0.03     2012-08-03 (SHARYANTO)
+0.03     2012-08-03  Released-By: SHARYANTO
 
          - No functional changes. Fix English (cleaner -> cleanser).
 
 
-0.02     2012-08-03 (SHARYANTO)
+0.02     2012-08-03  Released-By: SHARYANTO
 
          - Tweak default settings.
 
          - Add basic tests.
 
 
-0.01     2012-08-03 (SHARYANTO)
+0.01     2012-08-03  Released-By: SHARYANTO
 
          - First release. Incomplete and no tests yet.

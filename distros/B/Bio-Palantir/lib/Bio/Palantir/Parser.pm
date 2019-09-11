@@ -1,6 +1,6 @@
 package Bio::Palantir::Parser;
 # ABSTRACT: front-end class for Bio::Palantir::Parser module, wich handles the parsing of biosynML.xml and regions.js antiSMASH reports
-$Bio::Palantir::Parser::VERSION = '0.192240';
+$Bio::Palantir::Parser::VERSION = '0.192540';
 use Moose;
 use namespace::autoclean;
 
@@ -27,6 +27,13 @@ has 'root' => (
     init_arg => undef,
     lazy     => 1,
     builder  => '_build_root',
+);
+
+
+has 'module_delineation' => (
+    is      => 'ro',
+    isa     => 'Str',
+    default => 'condensation',
 );
 
 ## no critic (ProhibitUnusedPrivateSubroutines)
@@ -56,7 +63,8 @@ sub _build_root {
         return;
     }
 
-    return Root->new( _root => $root );
+    return Root->new( _root => $root,
+        module_delineation => $self->module_delineation );
 }
 
 ## use critic
@@ -301,7 +309,7 @@ Bio::Palantir::Parser - front-end class for Bio::Palantir::Parser module, wich h
 
 =head1 VERSION
 
-version 0.192240
+version 0.192540
 
 =head1 SYNOPSIS
 
@@ -351,6 +359,10 @@ Path to a biosynML.xml or regions.js file
 =head2 root
 
 L<Bio::Palantir::Parser::Root> composed object
+
+=head2 module_delineation
+
+Module delineation method: generates modules from condensation or selection domains.
 
 =head1 AUTHOR
 

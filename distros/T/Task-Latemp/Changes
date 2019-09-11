@@ -1,5 +1,10 @@
 Revision history for Task-Latemp:
 
+0.0105  2019-09-10
+    - Add META.json
+        - https://github.com/thewml/latemp/pull/2
+        - Thanks to MANWAR.
+
 0.0104  2019-09-10
     - Correct typos and links.
 

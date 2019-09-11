@@ -92,13 +92,16 @@ sub is_success {
 sub error_string {
     my $self = shift;
 
-    # When error occurs, response should be given in a form of below:
+    # When an error occurs, the response should be given in a form below:
     #{
     #  "error": {
     #    "message": "Message describing the error",
     #    "type": "OAuthException",
-    #    "code": 190 ,
-    #    "error_subcode": 460
+    #    "code": 190,
+    #    "error_subcode": 460,
+    #    "error_user_title": "A title",
+    #    "error_user_msg": "A message",
+    #    "fbtrace_id": "EJplcsCHuLu"
     #  }
     #}
     my $error = eval { $self->as_hashref->{error}; };
@@ -110,11 +113,14 @@ sub error_string {
     else {
         # sometimes error_subcode is not given
         $err_str = sprintf(
-                        '%s:%s %s:%s',
+                        qq{%s:%s\t%s:%s\t%s\t%s:%s},
                         $error->{code},
                         $error->{error_subcode} || '-',
                         $error->{type},
                         $error->{message},
+                        $error->{fbtrace_id},
+                        $error->{error_user_title} || '-',
+                        $error->{error_user_msg} || '-',
                    );
     }
 

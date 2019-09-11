@@ -32,7 +32,7 @@ my %WriteMakefileArgs = (
     "POSIX" => 0,
     "Plack" => 0,
     "Plack::Util" => 0,
-    "Proc::Daemon::Prefork" => 0,
+    "Proc::Daemon::Prefork" => "0.711",
     "Time::HiRes" => 0,
     "URI::Escape" => 0,
     "strict" => 0,
@@ -47,7 +47,7 @@ my %WriteMakefileArgs = (
     "Plack::Test::Suite" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.291",
+  "VERSION" => "0.292",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -76,7 +76,7 @@ my %FallbackPrereqs = (
   "Plack" => 0,
   "Plack::Test::Suite" => 0,
   "Plack::Util" => 0,
-  "Proc::Daemon::Prefork" => 0,
+  "Proc::Daemon::Prefork" => "0.711",
   "Test::More" => "0.98",
   "Time::HiRes" => 0,
   "URI::Escape" => 0,

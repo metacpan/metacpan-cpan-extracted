@@ -40,7 +40,7 @@ use base qw/ Astro::Coords::Angle /;
 # Package Global variables
 use vars qw/ $VERSION /;
 
-$VERSION = '0.19';
+$VERSION = '0.20';
 
 =head1 METHODS
 
@@ -217,6 +217,8 @@ of numbers in order of sign, hour, min, sec, frac.
   @retval = $ang->_r2f( $ndp );
 
 Note that the number of decimal places is an argument.
+
+=back
 
 =cut
 

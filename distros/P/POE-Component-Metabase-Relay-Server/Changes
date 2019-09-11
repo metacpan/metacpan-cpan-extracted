@@ -1,6 +1,22 @@
 ==================================================
-Changes from 2011-07-09 00:00:00 +0000 to present.
+Changes from 2014-09-11 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 0.38 at 2019-09-10 15:09:32 +0000
+-----------------------------------------
+
+  Change: 03bee8487fdb1e7c6544bc980ad30a8fd0fb6b03
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2019-09-10 16:09:32 +0000
+
+    Bump to 0.38 
+
+  Change: 19c63f0ba716f8f1226fe1e7aa274f219e6b7081
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2019-09-10 14:37:43 +0000
+
+    Added dsn to the generic db error output 
 
 -----------------------------------------
 version 0.36 at 2016-07-07 12:10:13 +0000
@@ -28,70 +44,6 @@ version 0.36 at 2016-07-07 12:10:13 +0000
     Avoiding name resolution if debug is off Replace sockaddr_in with
     unpack_sockaddr_in as recommended in Socket documentation 
 
------------------------------------------
-version 0.34 at 2014-03-12 20:18:33 +0000
------------------------------------------
-
-  Change: 0826f3ff6bada096d840c39d3ba4d7b04fe7bdd4
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2014-03-12 20:18:33 +0000
-
-    Fix no_curl option and require 0.08 of PoCo-Curl-Multi 
-
------------------------------------------
-version 0.32 at 2014-03-11 14:04:35 +0000
------------------------------------------
-
-  Change: 3aa21b8f60218ae5e0417674430263bee8083bfd
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2014-03-11 14:04:35 +0000
-
-    Enable automatic usage of POE::Component::Curl::Multi if it is found.
-
-    Add an option to disable this (no_curl) if required 
-
------------------------------------------
-version 0.30 at 2014-02-13 14:22:54 +0000
------------------------------------------
-
-  Change: 366fa9dc333999a85f6d03ec65c7e2c44857ccf6
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2014-02-13 14:22:54 +0000
-
-    Resolve (huh) problems when multiple is set 
-
------------------------------------------
-version 0.28 at 2014-02-12 11:36:40 +0000
------------------------------------------
-
-  Change: 3e27cb4bd5f5b1de109ea8183a2e65bfbdcbdeef
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2014-02-12 11:36:40 +0000
-
-    Remove requirement for MooseX::AttributeHelpers 
-
------------------------------------------
-version 0.26 at 2014-01-21 19:10:05 +0000
------------------------------------------
-
-  Change: 9a9bbd9864a57aa0da1146fc486f4c82b2016753
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2014-01-21 19:10:05 +0000
-
-    Resolve issue with constraints and _set_resolver
-
-    Tidy up stringification of id_file warnings 
-
------------------------------------------
-version 0.24 at 2011-11-17 22:00:44 +0000
------------------------------------------
-
-  Change: b189f0e317e83ecad803bb5fe8013a7ddb89243d
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2011-11-17 22:00:44 +0000
-
-    Update required version of MooseX::Types::URI 
-
 =================================================
-Plus 11 releases after 2011-07-09 00:00:00 +0000.
+Plus 16 releases after 2014-09-11 00:00:00 +0000.
 =================================================

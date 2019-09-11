@@ -122,16 +122,20 @@ subtest "tests that need wrapping" => sub {
         },
     );
 
-    test_export(
-        name        => 'per-symbol import option: curry',
-        export_args => [],
-        import_args => [fargs => {curry=>{a1=>10}}],
-        imported    => [qw(fargs)],
-        wrapped     => [qw(fargs)],
-        posttest    => sub {
-            is_deeply(&{"TestTarget::fargs"}(a2=>2), "a1=10 a2=2 a3=", "result");
-        },
-    );
+    subtest curry => sub {
+        test_needs 'Perinci::Sub::Property::curry';
+
+        test_export(
+            name        => 'per-symbol import option: curry',
+            export_args => [],
+            import_args => [fargs => {curry=>{a1=>10}}],
+            imported    => [qw(fargs)],
+            wrapped     => [qw(fargs)],
+            posttest    => sub {
+                is_deeply(&{"TestTarget::fargs"}(a2=>2), "a1=10 a2=2 a3=", "result");
+            },
+        );
+    };
 
     {
         require Perinci::Sub::Wrapper;

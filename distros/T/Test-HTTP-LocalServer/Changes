@@ -1,3 +1,9 @@
+0.66 2019-09-10
+    * Make detection of IPv4 localhost vs. IPv6 localhost
+      much more resilient. Backported from WWW::Mechanize, implemented by
+      Shoichi Kaji.
+    * We now need HTTP::Daemon 6.05.
+
 0.65 2019-09-05
     * Fix order of module usage in test scripts, spotted by Jorol
       This only was a problem when you had $ENV{HTTP_PROXY} set.

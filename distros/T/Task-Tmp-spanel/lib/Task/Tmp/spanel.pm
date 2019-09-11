@@ -1,7 +1,7 @@
 package Task::Tmp::spanel;
 
-our $DATE = '2019-09-10'; # DATE
-our $VERSION = '0.009'; # VERSION
+our $DATE = '2019-09-11'; # DATE
+our $VERSION = '0.010'; # VERSION
 
 1;
 # ABSTRACT: Perl modules for Spanel
@@ -18,7 +18,7 @@ Task::Tmp::spanel - Perl modules for Spanel
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 TASK CONTENTS
 
@@ -31,6 +31,8 @@ version 0.009
 =head3 L<Any::Moose>
 
 =head3 L<App::CreateSelfSignedSSLCert>
+
+=head3 L<App::ProcUtils>
 
 =head3 L<App::rimetadb>
 

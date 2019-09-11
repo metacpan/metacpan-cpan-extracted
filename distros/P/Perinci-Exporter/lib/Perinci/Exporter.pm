@@ -1,7 +1,7 @@
 package Perinci::Exporter;
 
-our $DATE = '2019-09-10'; # DATE
-our $VERSION = '0.083'; # VERSION
+our $DATE = '2019-09-11'; # DATE
+our $VERSION = '0.084'; # VERSION
 
 # IFUNBUILT
 # use strict 'subs', 'vars';
@@ -336,7 +336,7 @@ Perinci::Exporter - An exporter that groks Rinci metadata
 
 =head1 VERSION
 
-This document describes version 0.083 of Perinci::Exporter (from Perl distribution Perinci-Exporter), released on 2019-09-10.
+This document describes version 0.084 of Perinci::Exporter (from Perl distribution Perinci-Exporter), released on 2019-09-11.
 
 =head1 SYNOPSIS
 

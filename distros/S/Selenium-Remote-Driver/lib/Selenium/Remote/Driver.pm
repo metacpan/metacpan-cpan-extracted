@@ -1,5 +1,5 @@
 package Selenium::Remote::Driver;
-$Selenium::Remote::Driver::VERSION = '1.33';
+$Selenium::Remote::Driver::VERSION = '1.34';
 use strict;
 use warnings;
 
@@ -1887,7 +1887,7 @@ Selenium::Remote::Driver - Perl Client for Selenium Remote Driver
 
 =head1 VERSION
 
-version 1.33
+version 1.34
 
 =head1 SYNOPSIS
 
@@ -2378,7 +2378,7 @@ Print whether the server (or browser) thinks it's implemented webdriver 3.
 If this returns true, webdriver 3 methods will be used in the case an action exists in L<Selenium::Remote::Spec> for the method you are trying to call.
 If a method you are calling has no webdriver 3 equivalent (or browser extension), the legacy commands implemented in L<Selenium::Remote::Commands> will be used.
 
-Note how I said *thinks* above.  In the case you want to force usage of legacy methods, call set_webdriver_3() to work around various browser issues.
+Note how I said *thinks* above.  In the case you want to force usage of legacy methods, set $driver->{is_wd3} to work around various browser issues.
 
 =head2 debug_on
 

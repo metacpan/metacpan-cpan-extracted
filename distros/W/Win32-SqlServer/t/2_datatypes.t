@@ -1,10 +1,24 @@
 #---------------------------------------------------------------------
-# $Header: /Perl/OlleDB/t/2_datatypes.t 36    18-04-13 17:23 Sommar $
+# $Header: /Perl/OlleDB/t/2_datatypes.t 38    19-07-08 22:15 Sommar $
 #
 # This test script tests using sql_sp and sql_insert in all possible
 # ways and with testing use of all datatypes.
 #
 # $History: 2_datatypes.t $
+# 
+# *****************  Version 38  *****************
+# User: Sommar       Date: 19-07-08   Time: 22:15
+# Updated in $/Perl/OlleDB/t
+# 1) Need to skip tests with varchar(MAX) or without length for UTF-8 and
+# SQLOLEDB, since this causes a crash/hang.
+# 2) UTF-8 adaptions and extra test for sql_variant.
+# 3) Modify expected UTF-8 results for downlevel providers, where it is
+# handled as nvarchar.
+# 
+# *****************  Version 37  *****************
+# User: Sommar       Date: 19-05-05   Time: 17:49
+# Updated in $/Perl/OlleDB/t
+# First wave of updating test cases for SQL 2019 and UTF-8.
 # 
 # *****************  Version 36  *****************
 # User: Sommar       Date: 18-04-13   Time: 17:23
@@ -292,11 +306,10 @@ sub create_character {
    sql(<<SQLEND);
       CREATE TABLE character(charcol      char(20)     NULL,
                              varcharcol   varchar(20)  NULL,
-                             varcharcol2  varchar(20)  NOT NULL,
-                             textcol      text         NULL);
+                             varcharcol2  varchar(20)  NOT NULL);
 SQLEND
 
-   @tblcols = qw(charcol varcharcol varcharcol2 textcol);
+   @tblcols = qw(charcol varcharcol varcharcol2);
 
    sql(<<SQLEND);
       CREATE TRIGGER character_tri ON character FOR INSERT AS
@@ -310,19 +323,18 @@ SQLEND
    CREATE PROCEDURE character_sp
                     @charcol     char(20)    OUTPUT,
                     @varcharcol  varchar(20) OUTPUT,
-                    @varcharcol2 varchar(20) OUTPUT,
-                    @textcol     text  AS
+                    @varcharcol2 varchar(20) OUTPUT AS
 
    DELETE character
 
-   INSERT character(charcol, varcharcol, varcharcol2, textcol)
-      VALUES (@charcol, @varcharcol, @varcharcol2, @textcol)
+   INSERT character(charcol, varcharcol, varcharcol2)
+      VALUES (@charcol, @varcharcol, @varcharcol2)
 
    SELECT @charcol     = upper(@charcol),
           @varcharcol  = upper(@varcharcol),
           @varcharcol2 = upper(@varcharcol2)
 
-   SELECT charcol, varcharcol, varcharcol2, textcol
+   SELECT charcol, varcharcol, varcharcol2
    FROM   character
 SQLEND
 }
@@ -333,36 +345,36 @@ sub create_binary {
    sql(<<SQLEND);
       CREATE TABLE binary(bincol      binary(20)    NULL,
                           varbincol   varbinary(20) NULL,
-                          tstamp      timestamp     NOT NULL,
-                          imagecol    image         NULL);
+                          tstamp      timestamp     NOT NULL);
 SQLEND
 
-   @tblcols = qw(bincol varbincol tstamp imagecol);
+   @tblcols = qw(bincol varbincol tstamp);
 
    sql(<<SQLEND);
       CREATE TRIGGER binary_tri ON binary FOR INSERT AS
       UPDATE binary
-      SET    bincol     = convert(binary(20), reverse(bincol)),
-             varbincol  = convert(varbinary(20), reverse(varbincol))
+      SET    bincol    = convert(binary(20), 
+                                 reverse(convert(nchar(10), bincol))),
+             varbincol = convert(varbinary(20), 
+                                 reverse(convert(nvarchar(10), varbincol)))
 SQLEND
 
    sql(<<'SQLEND');
    CREATE PROCEDURE binary_sp
                     @bincol     binary(20)    OUTPUT,
                     @varbincol  varbinary(20) OUTPUT,
-                    @tstamp     timestamp     OUTPUT,
-                    @imagecol   image  AS
+                    @tstamp     timestamp     OUTPUT AS
 
    DELETE binary
 
-   INSERT binary(bincol, varbincol, imagecol)
-      VALUES (@bincol, @varbincol, @imagecol)
+   INSERT binary(bincol, varbincol)
+      VALUES (@bincol, @varbincol)
 
-   SELECT @bincol     = substring(@bincol, 1, 4) + @bincol,
-          @varbincol  = @varbincol + @varbincol,
-          @tstamp     = substring(@tstamp, 5, 4) + substring(@tstamp, 1, 4)
+   SELECT @bincol    = substring(@bincol, 1, 4) + @bincol,
+          @varbincol = @varbincol + @varbincol,
+          @tstamp    = substring(@tstamp, 5, 4) + substring(@tstamp, 1, 4)
 
-   SELECT bincol, varbincol, tstamp = @tstamp, imagecol
+   SELECT bincol, varbincol, tstamp = @tstamp
    FROM   binary
 SQLEND
 }
@@ -578,11 +590,10 @@ sub create_unicode {
    sql(<<SQLEND);
       CREATE TABLE unicode(ncharcol             nchar(20)     NULL,
                            \x{0144}varcharcol   nvarchar(20)  NULL,
-                           nchärcöl2            nchar(20)     NOT NULL,
-                           ntextcol             ntext         NULL);
+                           nchärcöl2            nchar(20)     NOT NULL);
 SQLEND
 
-   @tblcols = ("ncharcol", "\x{0144}varcharcol", "nchärcöl2", "ntextcol");
+   @tblcols = ("ncharcol", "\x{0144}varcharcol", "nchärcöl2");
 
    sql(<<SQLEND);
       CREATE TRIGGER unicode_tri ON unicode FOR INSERT AS
@@ -596,20 +607,87 @@ SQLEND
    CREATE PROCEDURE unicode_sp
                     \@ncharcol     nchar(20)    OUTPUT,
                     \@\x{0144}varcharcol  nvarchar(20) OUTPUT,
-                    \@nchärcöl2    nchar(20)    OUTPUT,
-                    \@ntextcol     ntext  AS
+                    \@nchärcöl2    nchar(20)    OUTPUT AS
 
    DELETE unicode
 
-   INSERT unicode(ncharcol, \x{0144}varcharcol, nchärcöl2, ntextcol)
-      VALUES (\@ncharcol, \@\x{0144}varcharcol, \@nchärcöl2, \@ntextcol)
+   INSERT unicode(ncharcol, \x{0144}varcharcol, nchärcöl2)
+      VALUES (\@ncharcol, \@\x{0144}varcharcol, \@nchärcöl2)
 
    SELECT \@ncharcol     = upper(\@ncharcol),
           \@\x{0144}varcharcol  = upper(\@\x{0144}varcharcol),
           \@nchärcöl2    = upper(\@nchärcöl2)
 
-   SELECT ncharcol, \x{0144}varcharcol, nchärcöl2, ntextcol
+   SELECT ncharcol, \x{0144}varcharcol, nchärcöl2
    FROM   unicode
+SQLEND
+}
+
+sub create_utf8 {
+   drop_test_objects('utf8');
+
+   sql(<<SQLEND);
+      CREATE TABLE utf8(charcol            char(40)     NULL,
+                        \x{0144}varcharcol varchar(40)  NULL,
+                        chärcöl2           char(40)     NOT NULL);
+SQLEND
+
+   @tblcols = ("charcol", "\x{0144}varcharcol", "chärcöl2");
+
+   sql(<<SQLEND);
+      CREATE TRIGGER utf8_tri ON utf8 FOR INSERT AS
+      UPDATE utf8
+      SET    charcol     = reverse(charcol),
+             \x{0144}varcharcol  = reverse(\x{0144}varcharcol),
+             chärcöl2    = reverse(chärcöl2)
+SQLEND
+
+   sql(<<SQLEND);
+   CREATE PROCEDURE utf8_sp
+                    \@charcol     char(40)    OUTPUT,
+                    \@\x{0144}varcharcol  varchar(40) OUTPUT,
+                    \@chärcöl2    char(40)    OUTPUT AS
+
+   DELETE utf8
+
+   INSERT utf8(charcol, \x{0144}varcharcol, chärcöl2)
+      VALUES (\@charcol, \@\x{0144}varcharcol, \@chärcöl2)
+
+   SELECT \@charcol     = upper(\@charcol),
+          \@\x{0144}varcharcol  = upper(\@\x{0144}varcharcol),
+          \@chärcöl2    = upper(\@chärcöl2)
+
+   SELECT charcol, \x{0144}varcharcol, chärcöl2
+   FROM   utf8
+SQLEND
+}
+
+
+sub create_oldlobs {
+   drop_test_objects('oldlobs');
+
+   sql(<<SQLEND);
+      CREATE TABLE oldlobs(textcol  text  NULL,
+                           ntextcol ntext NULL,
+                           imagecol image NULL)
+SQLEND
+
+   @tblcols = qw(textcol ntextcol imagecol);
+
+   # No trigger, since you cannot do much with these data types.
+
+   sql(<<'SQLEND');
+   CREATE PROCEDURE oldlobs_sp @textcol  text,
+                               @ntextcol ntext,
+                               @imagecol image AS
+
+     DELETE oldlobs
+
+     INSERT oldlobs(textcol, ntextcol, imagecol)
+        VALUES(@textcol, @ntextcol, @imagecol)
+
+      SELECT textcol, ntextcol, imagecol
+      FROM   oldlobs
 SQLEND
 }
 
@@ -706,11 +784,11 @@ SQLEND
       ELSE IF @outtype = 'char'
          UPDATE sql_variant SET varcol = reverse(convert(char(20), @var))
       ELSE IF @outtype = 'varchar'
-         UPDATE sql_variant SET varcol = reverse(convert(varchar(20), @var))
+         UPDATE sql_variant SET varcol = reverse(convert(varchar(8000), @var))
       ELSE IF @outtype = 'nchar'
          UPDATE sql_variant SET varcol = reverse(convert(nchar(20), @var))
       ELSE IF @outtype = 'nvarchar'
-         UPDATE sql_variant SET varcol = reverse(convert(nvarchar(20), @var))
+         UPDATE sql_variant SET varcol = reverse(convert(nvarchar(4000), @var))
       ELSE IF @outtype = 'binary'
          UPDATE sql_variant SET varcol = convert(binary(20), @var)
       ELSE IF @outtype = 'varbinary'
@@ -781,11 +859,11 @@ SQLEND
    ELSE IF @outtype = 'char'
       SELECT @varcol = upper(convert(char(20), @varcol))
    ELSE IF @outtype = 'varchar'
-      SELECT @varcol = upper(convert(varchar(20), @varcol))
+      SELECT @varcol = upper(convert(varchar(8000), @varcol))
    ELSE IF @outtype = 'nchar'
       SELECT @varcol = upper(convert(nchar(20), @varcol))
    ELSE IF @outtype = 'nvarchar'
-      SELECT @varcol = upper(convert(nvarchar(20), @varcol))
+      SELECT @varcol = upper(convert(nvarchar(4000), @varcol))
    ELSE IF @outtype = 'binary'
       SELECT @varcol = convert(binary(20), @varcol)
    ELSE IF @outtype = 'varbinary'
@@ -1374,7 +1452,7 @@ sub check_data {
          $valref = undef;
       }
 
-      # This is to avoid warning about "redudant" arguments in sprinf:
+      # This is to avoid warning about "redundant" arguments in sprinf:
       my ($resulttest, $paramtest);
       if ($test{$col} =~ /%s.*%s/) {
           $resulttest = sprintf($test{$col}, '$$result{$col}', '$expectcol{$col}');
@@ -1481,7 +1559,7 @@ sub do_tests {
    $result = sql("SELECT * FROM ${typeclass}", HASH, SINGLEROW);
    check_data(($runlogfile ? undef : $logfilename), $result, 0);
 
-   if ($runlogfile and $sqlver >= 7) {
+   if ($runlogfile) {
       sql("TRUNCATE TABLE ${typeclass}");
       blurb("Log file from sql_insert $testcase");
       sql(get_testfile($logfilename), NORESULT);
@@ -1509,16 +1587,9 @@ $X->{'ErrInfo'}{NeverPrint}{1708}++;  # Suppresses message for sql_variant table
 
 $sqlver = (split(/\./, $X->{SQL_version}))[0];
 $x86 = not $Config{'use64bitint'};
-my $havedb;
-if ($sqlver >= 11) {
-   my $collation = $X->sql_one("SELECT serverproperty('Collation')", SCALAR);
-   if ($collation =~ /_SC$/) {
-      $X->sql('CREATE DATABASE Olle$DB COLLATE Latin1_General_CS_AS');
-      $X->sql('USE Olle$DB');
-      $havedb = 1;
-   }
-}
-my $is_latin1 = is_latin1($X);
+my $collation = $X->sql_one("SELECT serverproperty('Collation')", SCALAR);
+my $codepage = codepage($X);
+my $is_utf8 = ($codepage == 65001);
 
 
 # Make sure that we have standard settings, except for ANSI_WARNINGS
@@ -1595,64 +1666,63 @@ create_character;
 
 %tbl       = (charcol      => "abc\x{00F6}",
               varcharcol   => "abc\x{010D}",
-              varcharcol2  => "123456'8901234567890",
-              textcol      => 'Hello Dolly! ' x 2000);
-%expectcol = (charcol      => ' ' x 16 . "(\x{00F6}|o)" . 'cba',
-              varcharcol   => "(\x{010D}|c)cba",
-              varcharcol2  => "0987654321098'654321",
-              textcol      => $tbl{textcol});
-%expectpar = (charcol      => 'ABC' . "(\x{00D6}|O)" . ' ' x 16,
-              varcharcol   => "ABC(\x{010C}|C)",
-              varcharcol2  => $tbl{varcharcol2});
+              varcharcol2  => "123456'8901234567890");
+unless ($is_utf8) {
+   %expectcol = (charcol      => ' ' x 16 . "(\x{00F6}|o)" . 'cba',
+                 varcharcol   => "(\x{010D}|c)cba",
+                 varcharcol2  => "0987654321098'654321");
+   %expectpar = (charcol      => 'ABC' . "(\x{00D6}|O)" . ' ' x 16,
+                 varcharcol   => "ABC(\x{010C}|C)",
+                 varcharcol2  => $tbl{varcharcol2});
+}
+else {
+   %expectcol = (charcol      => ' ' x 15 . "\x{00F6}cba",
+                 varcharcol   => "\x{010D}cba",
+                 varcharcol2  => "0987654321098'654321");
+   %expectpar = (charcol      => "ABC\x{00D6}" . 
+                                 ' ' x ($X->{Provider} >= PROVIDER_MSOLEDBSQL ? 15 : 16),
+                 varcharcol   => "ABC\x{010C}",
+                 varcharcol2  => $tbl{varcharcol2});
+}
 %test      = (charcol      => '%s =~ /^%s$/',
               varcharcol   => '%s =~ /^%s$/',
-              varcharcol2  => '%s eq %s',
-              textcol      => '%s eq %s');
+              varcharcol2  => '%s eq %s');
 do_tests($X, 1, 'character');
 
 # Known issue: NUL character in SQL command terminates command and because 
 # of this the log file cannot be run.
 %tbl       = (charcol      => '',
               varcharcol   => '',
-              varcharcol2  => "123456789\x00123456789022",
-              textcol      => '');
+              varcharcol2  => "123456789\x00123456789022");
 %expectcol = (charcol      => ' ' x 20,
               varcharcol   => '',
-              varcharcol2  => "0987654321\x00987654321",
-              textcol      => '');
+              varcharcol2  => "0987654321\x00987654321");
 %expectpar = (charcol      => ' ' x 20,
               varcharcol   => '',
               varcharcol2  => substr($tbl{varcharcol2}, 0, 20));
 %expectfile= (charcol      => "''",
               varcharcol   => "''",
-              varcharcol2  => "'$tbl{varcharcol2}'",
-              textcol      => "''");
+              varcharcol2  => "'$tbl{varcharcol2}'");
 %test      = (charcol      => '%s eq %s',
               varcharcol   => '%s eq %s',
-              varcharcol2  => '%s eq %s',
-              textcol      => '%s eq %s');
+              varcharcol2  => '%s eq %s');
 %filetest  = (charcol      => '%s eq %s',
               varcharcol   => '%s eq %s',
-              varcharcol2  => '%s eq %s',
-              textcol      => '%s eq %s');
+              varcharcol2  => '%s eq %s');
 do_tests($X, 0, 'character', 'empty string');
 
-# Known issue SQL7 (only) strips trailing blanks from varchar parameter.
 %tbl       = (charcol      => undef,
               varcharcol   => undef,
-              varcharcol2  => '  ',
-              textcol      => undef);
+              varcharcol2  => '  ');
 %expectcol = (charcol      => undef,
               varcharcol   => undef,
-              varcharcol2  => '  ',
-              textcol      => undef);
+              varcharcol2  => '  ');
 %expectpar = (charcol      => undef,
               varcharcol   => undef,
-              varcharcol2  => ($sqlver != 7 ? '  ' : '  ?'));
+              varcharcol2  => '  ');
 %test      = (charcol      => 'not defined %s',
               varcharcol   => 'not defined %s',
-              varcharcol2  => ($sqlver != 7 ? '%s eq %s' : '%s =~ /^%s$/'),
-              textcol      => 'not defined %s');
+              varcharcol2  => '%s eq %s');
 undef %filetest;
 do_tests($X, 1, 'character', 'null');
 
@@ -1663,131 +1733,109 @@ clear_test_data;
 create_binary;
 
 #$X->{BinaryAsStr} = 1;    Default.
-%tbl       = (bincol       => '4711ABCD',
-              varbincol    => '4711ABCD',
-              tstamp       => '0x00004711ABCD0009',
-              imagecol     => '47119660AB002' x 10000);
-%expectcol = (bincol       => '00' x 16 . 'CDAB1147',
-              varbincol    => 'CDAB1147',
-              tstamp       => '^[0-9A-F]{16}$',
-              imagecol     => $tbl{'imagecol'});
-%expectpar = (bincol       => '4711ABCD4711ABCD' . '00' x 12,
-              varbincol    => '4711ABCD4711ABCD',
+%tbl       = (bincol       => 'CEB1CEB2CEB3',
+              varbincol    => 'CEB1CEB2CEB3',
+              tstamp       => '0x00004711ABCD0009');
+%expectcol = (bincol       => '00' x 14 . 'CEB3CEB2CEB1',
+              varbincol    => 'CEB3CEB2CEB1',
+              tstamp       => '^[0-9A-F]{16}$');
+%expectpar = (bincol       => 'CEB1CEB2CEB1CEB2CEB3' . '00' x 10,
+              varbincol    => 'CEB1CEB2CEB3CEB1CEB2CEB3',
               tstamp       => 'ABCD000900004711');
 %test      = (bincol       => '%s eq %s',
               varbincol    => '%s eq %s',
-              tstamp       => '%s =~ /%s/',
-              imagecol     => '%s eq %s');
+              tstamp       => '%s =~ /%s/');
 do_tests($X, 1, 'binary', 'BinaryAsStr = 1');
 
 $X->{BinaryAsStr} = 1;
 %tbl       = (bincol       => '0x',
               varbincol    => '0x',
-              tstamp       => '0x',
-              imagecol     => '0x');
+              tstamp       => '0x');
 %expectcol = (bincol       => '00' x 20,
               varbincol    => '',
-              tstamp       => '^[0-9A-F]{16}$',
-              imagecol     => '');
+              tstamp       => '^[0-9A-F]{16}$');
 %expectpar = (bincol       => '00' x 20,
               varbincol    => '',
               tstamp       => '^' . '00' x 8 . '$');
 %test      = (bincol       => '%s eq %s',
               varbincol    => '%s eq %s',
-              tstamp       => '%s =~ /%s/',
-              imagecol     => '%s eq %s');
+              tstamp       => '%s =~ /%s/');
 do_tests($X, 1, 'binary', 'BinaryAsStr = 1 empty');
 
 
 $X->{BinaryAsStr} = 'x';
-# Known issue: SQL 7 appears to give wrong value back on 0x0000 for varbinpar.
-%tbl       = (bincol       => '4711ABCD',
+%tbl       = (bincol       => 'CEB1CEB2CEB3',
               varbincol    => '0x0000',
-              tstamp       => '00004711ABCD0009',
-              imagecol     => '47119660AB002' x 100);
-%expectcol = (bincol       => '0x' . '00' x 16 . 'CDAB1147',
+              tstamp       => '00004711ABCD0009');
+%expectcol = (bincol       => '0x' . '00' x 14 . 'CEB3CEB2CEB1',
               varbincol    => '0x0000',
-              tstamp       => '^0x[0-9A-F]{16}$',
-              imagecol     => '0x' . $tbl{'imagecol'});
-%expectpar = (bincol       => '0x4711ABCD4711ABCD' . '00' x 12,
-              varbincol    => ($sqlver != 7 ? '0x' . '00' x 4 : '0x00(000000)?'),
+              tstamp       => '^0x[0-9A-F]{16}$');
+%expectpar = (bincol       => '0xCEB1CEB2CEB1CEB2CEB3' . '00' x 10,
+              varbincol    => '0x' . '00' x 4,
               tstamp       => '0xABCD000900004711');
 %test      = (bincol       => '%s eq %s',
-              varbincol    => ($sqlver != 7 ? '%s eq %s' : '%s =~ /^%s$/'),
-              tstamp       => '%s =~ /%s/',
-              imagecol     => '%s eq %s');
+              varbincol    => '%s eq %s',
+              tstamp       => '%s =~ /%s/');
 do_tests($X, 1, 'binary', 'BinaryAsStr = x');
 
 $X->{BinaryAsStr} = 'x';
 %tbl       = (bincol       => '',
               varbincol    => '',
-              tstamp       => '0x',
-              imagecol     => '');
+              tstamp       => '0x');
 %expectcol = (bincol       => '0x' . '00' x 20,
               varbincol    => '0x',
-              tstamp       => '^0x[0-9A-F]{16}$',
-              imagecol     => '0x');
+              tstamp       => '^0x[0-9A-F]{16}$');
 %expectpar = (bincol       => '0x' . '00' x 20,
               varbincol    => '0x',
               tstamp       => '^0x' . '00' x 8 . '$');
 %test      = (bincol       => '%s eq %s',
               varbincol    => '%s eq %s',
-              tstamp       => '%s =~ /%s/',
-              imagecol     => '%s eq %s');
+              tstamp       => '%s =~ /%s/');
 do_tests($X, 1, 'binary', 'BinaryAsStr = x. empty');
 
 
 $X->{BinaryAsStr} = 0;
 %tbl       = (bincol       => '4711ABCD',
               varbincol    => 'Typewriter',
-              tstamp       => "\x00\x00/!#¤§=",
-              imagecol     => 'Hello Dolly! ' x 10000);
-%expectcol = (bincol       => "\x00" x 12 . 'DCBA1174',
-              varbincol    => 'retirwepyT',
-              tstamp       => "^(.|\\n){8}\$",
-              imagecol     => $tbl{'imagecol'});
+              tstamp       => "\x00\x00/!#¤§=");
+%expectcol = (bincol       => "\x00" x 12 . 'CDAB1147',
+              varbincol    => 'eritwrpeTy',
+              tstamp       => "^(.|\\n){8}\$");
 %expectpar = (bincol       => '47114711ABCD' . "\x00" x 8,
               varbincol    => 'TypewriterTypewriter',
               tstamp       => "#¤§=\x00\x00/!");
 %test      = (bincol       => '%s eq %s',
               varbincol    => '%s eq %s',
-              tstamp       => '%s =~ /%s/',
-              imagecol     => '%s eq %s');
+              tstamp       => '%s =~ /%s/');
 do_tests($X, 1, 'binary', 'BinaryAsBinary');
 
 
 %tbl       = (bincol       => '',
               varbincol    => '',
-              tstamp       => '',
-              imagecol     => '');
+              tstamp       => '');
 %expectcol = (bincol       => "\x00" x 20,
               varbincol    => '',
-              tstamp       => "^(.|\\n){8}\$",
-              imagecol     => '');
+              tstamp       => "^(.|\\n){8}\$");
 %expectpar = (bincol       => "\x00" x 20,
               varbincol    => '',
               tstamp       => '^' . "\x00" x 8 . '$');
 %test      = (bincol       => '%s eq %s',
               varbincol    => '%s eq %s',
-              tstamp       => '%s =~ /%s/',
-              imagecol     => '%s eq %s');
+              tstamp       => '%s =~ /%s/');
 do_tests($X, 1, 'binary', 'BinaryAsBinary, empty');
 
 %tbl       = (bincol       => undef,
               varbincol    => undef,
-              tstamp       => '00004711ABCD0009',
-              imagecol     => undef);
+              tstamp       => '00004711ABCD0009');
 %expectcol = (bincol       => undef,
               varbincol    => undef,
-              tstamp       => "^(.|\\n){8}\$",
-              imagecol     => undef);
+              tstamp       => "^(.|\\n){8}\$");
 %expectpar = (bincol       => undef,
               varbincol    => undef,
               tstamp       => '^47110000$');
 %test      = (bincol       => 'not defined %s',
               varbincol    => 'not defined %s',
-              tstamp       => '%s =~ /%s/',
-              imagecol     => 'not defined %s');
+              tstamp       => '%s =~ /%s/');
 do_tests($X, 1, 'binary', 'null');
 
 drop_test_objects('binary');
@@ -2155,67 +2203,126 @@ binmode(STDOUT, ':utf8:');
 
 %tbl       = (ncharcol      => "\x{00E6}\x{00E5}\x{00F6}\x{FFFD}",
               $nvarcharcol  => "abc\x{0157}",
-              $ncharcol2    => "123456'890123456789\x{010B}",
-              ntextcol      => '21 pa\x{017A}dziernika 2004 ' x 2000);
+              $ncharcol2    => "123456'890123456789\x{010B}");
 %expectcol = (ncharcol      => ' ' x 16 . "\x{FFFD}\x{00F6}\x{00E5}\x{00E6}",
               $nvarcharcol  => "\x{0157}cba",
-              $ncharcol2    => "\x{010B}987654321098'654321",
-              ntextcol      => $tbl{ntextcol});
+              $ncharcol2    => "\x{010B}987654321098'654321");
 %expectpar = (ncharcol      => "\x{00C6}\x{00C5}\x{00D6}\x{FFFD}" . ' ' x 16,
               $nvarcharcol  => "ABC\x{0156}",
               $ncharcol2    => "123456'890123456789\x{010A}");
 %test      = (ncharcol      => '%s eq %s',
               $nvarcharcol  => '%s eq %s',
-              $ncharcol2    => '%s eq %s',
-              ntextcol      => '%s eq %s');
+              $ncharcol2    => '%s eq %s');
 do_tests($X, 1, 'unicode');
 
 # Known issue: NULL terminates strings in literal SQL commands, so log
 # file cannot be used. Unknown if this is an SQL Server bug.
 %tbl       = (ncharcol      => '',
               $nvarcharcol  => '',
-              $ncharcol2    => "\x001234567890'23456789022",
-              ntextcol      => '');
+              $ncharcol2    => "\x001234567890'23456789022");
 %expectcol = (ncharcol      => ' ' x 20,
               $nvarcharcol  => '',
-              $ncharcol2    => "98765432'0987654321\x00",
-              ntextcol      => '');
+              $ncharcol2    => "98765432'0987654321\x00");
 %expectpar = (ncharcol      => ' ' x 20,
               $nvarcharcol  => '',
               $ncharcol2    => "\x001234567890'23456789");
 %expectfile= (ncharcol      => "N''",
               $nvarcharcol  => "N''",
-              $ncharcol2    => "N'\x001234567890''23456789022'",
-              ntextcol      => "N''");
+              $ncharcol2    => "N'\x001234567890''23456789022'");
 %test      = (ncharcol      => '%s eq %s',
               $nvarcharcol  => '%s eq %s',
-              $ncharcol2    => '%s eq %s',
-              ntextcol      => '%s eq %s');
+              $ncharcol2    => '%s eq %s');
 do_tests($X, 0, 'unicode', 'empty string');
 
 # Known issue SQL7 (only) strips trailing blanks from nvarchar parameter.
 %tbl       = (ncharcol      => undef,
               $nvarcharcol  => undef,
-              $ncharcol2    => '  ',
-              ntextcol      => undef);
+              $ncharcol2    => '  ');
 %expectcol = (ncharcol      => undef,
               $nvarcharcol  => undef,
-              $ncharcol2    => ' ' x 20,
-              ntextcol      => undef);
+              $ncharcol2    => ' ' x 20);
 %expectpar = (ncharcol      => undef,
               $nvarcharcol  => undef,
               $ncharcol2    => ' ' x 20);
 %test      = (ncharcol      => 'not defined %s',
               $nvarcharcol  => 'not defined %s',
-              $ncharcol2    => '%s eq %s',
-              ntextcol      => 'not defined %s');
+              $ncharcol2    => '%s eq %s');
 do_tests($X, 1, 'unicode', 'null');
 
 drop_test_objects('unicode');
 
-#------------------------- BIGINT -------------------------------
-# From here we're SQL 2000 and up only.
-goto finally if $sqlver == 7;
+#------------------------- UTF8 --------------------------------
+# Only executed if we have an UTF8 collation.
+if ($is_utf8) {
+   clear_test_data;
+   create_utf8;
+
+   my $varcharcol = "\x{0144}varcharcol";
+   my $charcol2 = 'chärcöl2';
+   binmode(STDOUT, ':utf8:');
+
+   %tbl       = (charcol      => "\x{00E6}\x{00E5}\x{00F6}\x{FFFD}",
+                 $varcharcol  => "abc\x{0157}",
+                 $charcol2    => "123456'890123456789\x{010B}");
+   %expectcol = (charcol      => ' ' x 31 . "\x{FFFD}\x{00F6}\x{00E5}\x{00E6}",
+                 $varcharcol  => "\x{0157}cba",
+                 $charcol2    => ' ' x 19  . "\x{010B}987654321098'654321");
+   %expectpar = (charcol      => "\x{00C6}\x{00C5}\x{00D6}\x{FFFD}" . 
+                                 ' ' x ($X->{Provider} >= PROVIDER_MSOLEDBSQL ? 31 : 36),
+                 $varcharcol  => "ABC\x{0156}",
+                 $charcol2    => "123456'890123456789\x{010A}" . 
+                                  ' ' x ($X->{Provider} >= PROVIDER_MSOLEDBSQL ? 19 : 20));
+   %test      = (charcol      => '%s eq %s',
+                 $varcharcol  => '%s eq %s',
+                 $charcol2    => '%s eq %s');
+   do_tests($X, 1, 'utf8');
+}
+
+#------------------------- OLDLOBS ------------------------------
+# That is, text, next and image. Not if we have an SC or UTF8 collation.
+# Since these types are deprecated, we only make a simple test to make
+# sure that type name works.
+unless ($collation =~ /_SC$/ or $is_utf8) {
+   clear_test_data;
+   create_oldlobs;
+
+   $X->{BinaryAsStr} = 1;    
+   %tbl       = (textcol      => 'Hello Dolly! ' x 2000,
+                 ntextcol     => '21 pa\x{017A}dziernika 2004 ' x 2000,
+                 imagecol     => '47119660AB002' x 10000);
+   %expectcol = (textcol      => $tbl{textcol},
+                 ntextcol     => $tbl{ntextcol},
+                 imagecol     => $tbl{imagecol});
+   %expectpar = ();
+   %test      = (textcol      => '%s eq %s',
+                 ntextcol     => '%s eq %s',
+                 imagecol     => '%s eq %s');
+   do_tests($X, 1, 'oldlobs');
+
+   %tbl       = (textcol      => '',
+                 ntextcol     => '',
+                 imagecol     => '');
+   %expectcol = (textcol      => $tbl{textcol},
+                 ntextcol     => $tbl{ntextcol},
+                 imagecol     => $tbl{imagecol});
+   %expectpar = ();
+   %test      = (textcol      => '%s eq %s',
+                 ntextcol     => '%s eq %s',
+                 imagecol     => '%s eq %s');
+   do_tests($X, 1, 'oldlobs', 'empty');
+
+   %tbl       = (textcol      => undef,
+                 ntextcol     => undef,
+                 imagecol     => undef);
+   %expectcol = (textcol      => undef,
+                 ntextcol     => undef,
+                 imagecol     => undef);
+   %expectpar = ();
+   %test      = (textcol      => 'not defined %s',
+                 ntextcol     => 'not defined %s',
+                 imagecol     => 'not defined %s');
+   do_tests($X, 1, 'oldlobs', 'null');
+}
 
 #------------------------- BIGINT --------------------------------
 clear_test_data;
@@ -2696,13 +2803,13 @@ do_tests($X, 0, 'sql_variant', 'smalldatetime iso/hash');
               outtype => '%s eq %s');
 do_tests($X, 0, 'sql_variant', 'char');
 
-%tbl       = (varcol  => "123456789\x00123456789nn",
+%tbl       = (varcol  => "ä23456789\x00123456789nn",
               intype  => undef,
               outtype => 'varchar');
-%expectcol = (varcol  => "n987654321\x00987654321",
+%expectcol = (varcol  => "nn987654321\x0098765432ä",
               intype  => 'varchar',
               outtype => $tbl{'outtype'});
-%expectpar = (varcol  => "123456789\x00123456789N",
+%expectpar = (varcol  => "Ä23456789\x00123456789NN",
               intype  => $expectcol{'intype'},
               outtype => $tbl{'outtype'});
 %expectfile= (varcol  => "N'$tbl{'varcol'}'",
@@ -2712,6 +2819,24 @@ do_tests($X, 0, 'sql_variant', 'char');
               intype  => '%s eq %s',
               outtype => '%s eq %s');
 do_tests($X, 0, 'sql_variant', 'varchar');
+
+%tbl       = (varcol  => "abcdefghij" x 900,
+              intype  => undef,
+              outtype => 'varchar');
+%expectcol = (varcol  => "jihgfedcba" x 800,
+              intype  => 'varchar',
+              outtype => $tbl{'outtype'});
+%expectpar = (varcol  => "ABCDEFGHIJ" x 800,
+              intype  => $expectcol{'intype'},
+              outtype => $tbl{'outtype'});
+%expectfile= (varcol  => "N'$tbl{'varcol'}'",
+              intype  => 'NULL',
+              outtype => "N'$tbl{'outtype'}'");
+%test      = (varcol  => '%s eq %s',
+              intype  => '%s eq %s',
+              outtype => '%s eq %s');
+do_tests($X, 0, 'sql_variant', 'too long varchar');
+
 
 %tbl       = (varcol  => "",
               intype  => undef,
@@ -2735,7 +2860,7 @@ do_tests($X, 0, 'sql_variant', 'varchar empty str');
               intype  => undef,
               outtype => 'nchar');
 %expectcol = (varcol  => ' ' x 15 . "\x{FFFD}\x{010B}cba",
-              intype  => 'nvarchar',
+              intype  => ($is_utf8 ? 'varchar' : 'nvarchar'),
               outtype => $tbl{'outtype'});
 %expectpar = (varcol  => "ABC\x{010A}\x{FFFD}" . ' ' x 15,
               intype  => $expectcol{'intype'},
@@ -2752,7 +2877,7 @@ do_tests($X, 0, 'sql_variant', 'nchar');
               intype  => undef,
               outtype => 'nvarchar');
 %expectcol = (varcol  => "\x{FFFD}987654321\x{010B}",
-              intype  => 'nvarchar',
+              intype  => ($is_utf8 ? 'varchar' : 'nvarchar'),
               outtype => $tbl{'outtype'});
 %expectpar = (varcol  => "\x{010A}123456789\x{FFFD}",
               intype  => $expectcol{'intype'},
@@ -2765,14 +2890,33 @@ do_tests($X, 0, 'sql_variant', 'nchar');
               outtype => '%s eq %s');
 do_tests($X, 0, 'sql_variant', 'nvarchar');
 
+%tbl       = (varcol  => "\x{010B}12345678\x{FFFD}" x 900,
+              intype  => undef,
+              outtype => 'nvarchar');
+%expectcol = (varcol  => "\x{FFFD}87654321\x{010B}" x 400,
+              intype  => ($is_utf8 ? 'varchar' : 'nvarchar'),
+              outtype => $tbl{'outtype'});
+%expectpar = (varcol  => "\x{010A}12345678\x{FFFD}" x 400,
+              intype  => $expectcol{'intype'},
+              outtype => $tbl{'outtype'});
+%expectfile= (varcol  => "N'$tbl{'varcol'}'",
+              intype  => 'NULL',
+              outtype => "N'$tbl{'outtype'}'");
+%test      = (varcol  => '%s eq %s',
+              intype  => '%s eq %s',
+              outtype => '%s eq %s');
+do_tests($X, 0, 'sql_variant', 'nvarchar, too long');
+
+
 $X->{BinaryAsStr} = 0;
 %tbl       = (varcol  => "123456789\x{FFFD}",
               intype  => undef,
               outtype => 'binary');
-%expectcol = (varcol  => "1\x002\x003\x004\x005\x006\x007\x008\x009\x00\xFD\xFF",
-              intype  => 'nvarchar',
+%expectcol = (varcol  => ($is_utf8 ? "123456789\xEF\xBF\xBD" . "\x00" x 8
+                                   : "1\x002\x003\x004\x005\x006\x007\x008\x009\x00\xFD\xFF"),
+              intype  => ($is_utf8 ? 'varchar' : 'nvarchar'),
               outtype => $tbl{'outtype'});
-%expectpar = (varcol  => "1\x002\x003\x004\x005\x006\x007\x008\x009\x00\xFD\xFF",
+%expectpar = (varcol  => $expectcol{'varcol'},
               intype  => $expectcol{'intype'},
               outtype => $tbl{'outtype'});
 %expectfile= (varcol  => "N'$tbl{'varcol'}'",
@@ -3197,57 +3341,62 @@ drop_test_objects('sql_variant');
 # From here we're SQL 2005 and up only.
 goto finally if $sqlver == 8;
 
-clear_test_data;
-create_varcharmax;
+# Need to skip this test if UTF-8 and SQLOLEDB, because of issues in
+# SQL Server/SQLOLEDB.
+unless ($codepage == 65001 and $X->{Provider} == PROVIDER_SQLOLEDB) {
 
-# When we run with SQLOLEDB, the (MAX) will be passed forth and back
-# as (8000) or (4000).
-%tbl       = (varcharcol   => 'Hello Dolly! ' x 2000,
-              nvarcharcol  => "21 pa\x{017A}dziernika 2004 " x 2000);
-if ($X->{Provider} >= PROVIDER_SQLNCLI) {
-   %expectcol = (varcharcol  => ' !ylloD olleH' x 2000,
-                 nvarcharcol => " 4002 akinreizd\x{017A}ap 12" x 2000);
-   %expectpar = (varcharcol  => 'HELLO DOLLY! ' x 2000 . 'UPPER',
-                 nvarcharcol => "21 PA\x{0179}DZIERNIKA 2004 " x 2000 . 'UPPER');
-   %test      = (varcharcol  => '%s eq %s',
-                 nvarcharcol => '%s eq %s');
+   clear_test_data;
+   create_varcharmax;
+
+   # When we run with SQLOLEDB, the (MAX) will be passed forth and back
+   # as (8000) or (4000).
+   %tbl       = (varcharcol   => 'Hello Dolly! ' x 2000,
+                 nvarcharcol  => "21 pa\x{017A}dziernika 2004 " x 2000);
+   if ($X->{Provider} >= PROVIDER_SQLNCLI) {
+      %expectcol = (varcharcol  => ' !ylloD olleH' x 2000,
+                    nvarcharcol => " 4002 akinreizd\x{017A}ap 12" x 2000);
+      %expectpar = (varcharcol  => 'HELLO DOLLY! ' x 2000 . 'UPPER',
+                    nvarcharcol => "21 PA\x{0179}DZIERNIKA 2004 " x 2000 . 'UPPER');
+      %test      = (varcharcol  => '%s eq %s',
+                    nvarcharcol => '%s eq %s');
+   }
+   else {
+      %expectcol = (varcharcol   => '('   . 'olleH' . ' !ylloD olleH' x 615 .
+                                    ')|(' . ' !ylloD olleH' x 2000 . ')',
+                    nvarcharcol  => '(' . "eizd\x{017A}ap 12" .
+                                          " 4002 akinreizd\x{017A}ap 12" x 190 .
+                                    ')|(' . " 4002 akinreizd\x{017A}ap 12" x 2000 . ')');
+      %expectpar = (varcharcol   => 'HELLO DOLLY! ' x 615 . 'HELLO',
+                    nvarcharcol  => "21 PA\x{0179}DZIERNIKA 2004 " x 190 .
+                                    "21 PA\x{0179}DZIE");
+      %test      = (varcharcol   => '%s =~ /^%s$/',
+                    nvarcharcol  => '%s =~ /^%s$/');
+   }
+   do_tests($X, 1, 'varcharmax');
+
+
+   %tbl       = (varcharcol   => '',
+                 nvarcharcol  => '');
+   %expectcol = (varcharcol   => '',
+                 nvarcharcol  => '');
+   %expectpar = (varcharcol   => 'UPPER',
+                 nvarcharcol  => 'UPPER');
+   %test      = (varcharcol   => '%s eq %s',
+                 nvarcharcol  => '%s eq %s');
+   do_tests($X, 1, 'varcharmax', 'empty string');
+
+   %tbl       = (varcharcol   => undef,
+                 nvarcharcol  => '   ');
+   %expectcol = (varcharcol   => undef,
+                 nvarcharcol  => '   ');
+   %expectpar = (varcharcol   => undef,
+                 nvarcharcol  => '   ' . 'UPPER');
+   %test      = (varcharcol   => 'not defined %s',
+                 nvarcharcol  => '%s eq %s');
+   do_tests($X, 1, 'varcharmax', 'null');
+
+   drop_test_objects('varcharmax');
 }
-else {
-   %expectcol = (varcharcol   => '('   . 'olleH' . ' !ylloD olleH' x 615 .
-                                 ')|(' . ' !ylloD olleH' x 2000 . ')',
-                 nvarcharcol  => '(' . "eizd\x{017A}ap 12" .
-                                       " 4002 akinreizd\x{017A}ap 12" x 190 .
-                                 ')|(' . " 4002 akinreizd\x{017A}ap 12" x 2000 . ')');
-   %expectpar = (varcharcol   => 'HELLO DOLLY! ' x 615 . 'HELLO',
-                 nvarcharcol  => "21 PA\x{0179}DZIERNIKA 2004 " x 190 .
-                                 "21 PA\x{0179}DZIE");
-   %test      = (varcharcol   => '%s =~ /^%s$/',
-                 nvarcharcol  => '%s =~ /^%s$/');
-}
-do_tests($X, 1, 'varcharmax');
-
-
-%tbl       = (varcharcol   => '',
-              nvarcharcol  => '');
-%expectcol = (varcharcol   => '',
-              nvarcharcol  => '');
-%expectpar = (varcharcol   => 'UPPER',
-              nvarcharcol  => 'UPPER');
-%test      = (varcharcol   => '%s eq %s',
-              nvarcharcol  => '%s eq %s');
-do_tests($X, 1, 'varcharmax', 'empty string');
-
-%tbl       = (varcharcol   => undef,
-              nvarcharcol  => '   ');
-%expectcol = (varcharcol   => undef,
-              nvarcharcol  => '   ');
-%expectpar = (varcharcol   => undef,
-              nvarcharcol  => '   ' . 'UPPER');
-%test      = (varcharcol   => 'not defined %s',
-              nvarcharcol  => '%s eq %s');
-do_tests($X, 1, 'varcharmax', 'null');
-
-drop_test_objects('varcharmax');
 
 #-------------------------- (N)VARBINARY MAX -----------------------------
 
@@ -3558,7 +3707,7 @@ create_xmltest($X, $X->{Provider} >= PROVIDER_SQLNCLI);
 %tbl       = (xmlcol    => "<R\x{00C4}KSM\x{00D6}RG\x{00C5}S>" .
                            "21 pa\x{017A}dziernika 2004 " x 2000 .
                            "</R\x{00C4}KSM\x{00D6}RG\x{00C5}S>",
-              xmlsccol  => ($is_latin1 
+              xmlsccol  => ($codepage == 1252 
                               ? '<?xml version="1.0" encoding="iso-8859-1"?>' . "\n"
                               : '') . 
                             "<TÄST>" .
@@ -4338,11 +4487,6 @@ finally:
    $result = sql_sp('#pelle_sp', SCALAR, SINGLEROW);
    push(@testres, ($result == 4711 ? "ok %d" : "not ok %d"));
    $no_of_tests++;
-}
-
-if ($havedb) {
-   $X->sql('USE tempdb');
-   $X->sql('DROP DATABASE Olle$DB');
 }
 
 print "1..$no_of_tests\n";

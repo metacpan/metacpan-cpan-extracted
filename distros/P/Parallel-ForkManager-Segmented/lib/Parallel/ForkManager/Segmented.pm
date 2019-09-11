@@ -1,5 +1,5 @@
 package Parallel::ForkManager::Segmented;
-$Parallel::ForkManager::Segmented::VERSION = '0.0.2';
+$Parallel::ForkManager::Segmented::VERSION = '0.2.0';
 use strict;
 use warnings;
 use 5.014;
@@ -29,9 +29,22 @@ sub run
 {
     my ( $self, $args ) = @_;
 
-    my $WITH_PM    = !$args->{disable_fork};
-    my $items      = $args->{items};
-    my $cb         = $args->{process_item};
+    my $WITH_PM  = !$args->{disable_fork};
+    my $items    = $args->{items};
+    my $cb       = $args->{process_item};
+    my $batch_cb = $args->{process_batch};
+
+    if ( $batch_cb && $cb )
+    {
+        die "Do not specify both process_item and process_batch!";
+    }
+    $batch_cb //= sub {
+        foreach my $item ( @{ shift() } )
+        {
+            $cb->($item);
+        }
+        return;
+    };
     my $nproc      = $args->{nproc};
     my $batch_size = $args->{batch_size};
 
@@ -48,7 +61,7 @@ sub run
     {
         $pm = Parallel::ForkManager->new($nproc);
     }
-    $cb->( shift @$items );
+    $batch_cb->( [ shift @$items ] );
     my $it = natatime $batch_size, @$items;
 ITEMS:
     while ( my @batch = $it->() )
@@ -62,10 +75,7 @@ ITEMS:
                 next ITEMS;
             }
         }
-        foreach my $item (@batch)
-        {
-            $cb->($item);
-        }
+        $batch_cb->( \@batch );
         if ($WITH_PM)
         {
             $pm->finish;    # Terminates the child process
@@ -91,7 +101,7 @@ segments of items.
 
 =head1 VERSION
 
-version 0.0.2
+version 0.2.0
 
 =head1 SYNOPSIS
 
@@ -174,10 +184,6 @@ version 0.0.2
     );
     system("cd $PWD && $CMD @{$to_proc}") and die "$!";
 
-=head1 VERSION
-
-version 0.0.2
-
 =head1 METHODS
 
 =head2 my $obj = Parallel::ForkManager::Segmented->new;
@@ -210,6 +216,49 @@ The number of items in each batch.
 
 Disable forking and use of L<Parallel::ForkManager> and process the items
 serially.
+
+=item * process_batch
+
+[Added in v0.2.0.]
+
+A reference to a subroutine that accepts a reference to an array of a whole batch
+that is processed as a whole. If specified, C<process_item> is not used.
+
+Example:
+
+    use strict;
+    use warnings;
+    use Test::More tests => 30;
+    use Parallel::ForkManager::Segmented ();
+    use Path::Tiny qw/ path /;
+
+    {
+        my $NUM    = 30;
+        my $temp_d = Path::Tiny->tempdir;
+
+        my @queue = ( 1 .. $NUM );
+        my $proc  = sub {
+            foreach my $fn ( @{ shift(@_) } )
+            {
+                $temp_d->child($fn)->spew_utf8("Wrote $fn .\n");
+            }
+            return;
+        };
+        Parallel::ForkManager::Segmented->new->run(
+            {
+                WITH_PM       => 1,
+                items         => \@queue,
+                nproc         => 3,
+                batch_size    => 8,
+                process_batch => $proc,
+            }
+        );
+        foreach my $i ( 1 .. $NUM )
+        {
+            # TEST*30
+            is( $temp_d->child($i)->slurp_utf8, "Wrote $i .\n", "file $i", );
+        }
+    }
 
 =back
 

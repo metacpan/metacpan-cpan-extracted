@@ -1,5 +1,11 @@
 Revision history for Perl extension Sub-Multi-Tiny
 
+0.000006 2019-09-11T00:46:14Z
+
+    - Added a Type::Params-based dispatcher
+    - Added pluggable dispatcher loader
+    - Fixed cpantesters failures on mswin32 and 5.8.6/5.8.7
+
 0.000005 2019-09-06T02:03:22Z
 
     - Changes to cpanfile, xt to try to fix cpantesters failures (#5)

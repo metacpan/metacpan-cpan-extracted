@@ -8,6 +8,7 @@ build_requires:
   Test::Requires: '0'
   Try::Tiny: '0'
 configure_requires:
+  Config: '0'
   ExtUtils::Depends: '0'
   ExtUtils::PkgConfig: '0'
 dynamic_config: 1
@@ -24,5 +25,5 @@ no_index:
 requires:
   Exception::Class: '0'
   Readonly: '0'
-version: '2'
+version: '3'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

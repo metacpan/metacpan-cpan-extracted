@@ -1,7 +1,13 @@
 #---------------------------------------------------------------------
-# $Header: /Perl/OlleDB/t/1_resultsets.t 15    11-08-08 21:51 Sommar $
+# $Header: /Perl/OlleDB/t/1_resultsets.t 16    19-07-08 22:16 Sommar $
 #
 # $History: 1_resultsets.t $
+# 
+# *****************  Version 16  *****************
+# User: Sommar       Date: 19-07-08   Time: 22:16
+# Updated in $/Perl/OlleDB/t
+# For UTF-8 databases, char/varchar come back as nvarchar with legacy
+# providers.
 # 
 # *****************  Version 15  *****************
 # User: Sommar       Date: 11-08-08   Time: 21:51
@@ -102,6 +108,10 @@ my($X, $sql, $sql1, $sql_empty, $sql_error, $sql_null, $sql_key1,
    $no_of_tests);
 
 $X = testsqllogin();
+
+# With legacy providers, UTF8 comes back as nvarchar.
+my $charname = ((codepage($X) == 65001 and $X->{Provider} < PROVIDER_MSOLEDBSQL)  ? 'nvarchar' : 'char');
+my $varcharname = ((codepage($X) == 65001 and $X->{Provider} < PROVIDER_MSOLEDBSQL) ? 'nvarchar' : 'varchar');
 
 # Accept all errors, and be silent about them.
 $X->{errInfo}{maxSeverity}= 25;
@@ -285,8 +295,8 @@ SQLEND
 
 
    &blurb("HASH, MULTISET, COLINFO_FULL, wantarray");
-   my $abc = {a => {Name => 'a', Colno => 1, Type => 'char'},
-              b => {Name => 'b', Colno => 2, Type => 'char'},
+   my $abc = {a => {Name => 'a', Colno => 1, Type => $charname},
+              b => {Name => 'b', Colno => 2, Type => $charname},
               i => {Name => 'i', Colno => 3, Type => 'int'}};
    my $suminfo = {sum => {Name => 'sum', Colno => 1, Type => 'int'}};
    @expect = ([$abc,
@@ -299,7 +309,7 @@ SQLEND
                {sum => 12},
                {sum => 49}],
               [], [],
-              [{x => {Name => 'x', Colno => 1, Type => 'char'}},
+              [{x => {Name => 'x', Colno => 1, Type => $charname}},
                {x => 'xyz'},
                {x => undef}],
               [],
@@ -390,8 +400,8 @@ SQLEND
 
 
    &blurb("LIST, MULTISET, COLINFO_FULL, wantarray");
-   $abc = [{Name => 'a', Colno => 1, Type => 'char'},
-           {Name => 'b', Colno => 2, Type => 'char'},
+   $abc = [{Name => 'a', Colno => 1, Type => $charname},
+           {Name => 'b', Colno => 2, Type => $charname},
            {Name => 'i', Colno => 3, Type => 'int'}];
    $suminfo = [{Name => 'sum', Colno => 1, Type => 'int'}];
    @expect = ([$abc,
@@ -404,7 +414,7 @@ SQLEND
                [12],
                [49]],
               [], [],
-              [[{Name => 'x', Colno => 1, Type => 'char'}],
+              [[{Name => 'x', Colno => 1, Type => $charname}],
                ['xyz'],
                [undef]],
               [],
@@ -595,11 +605,11 @@ SQLEND
 
    #---------------------- COLINFO_FULL -----------------------
    &blurb("HASH, MULTISET, COLINFO_FULL empty, wantarray");
-   @expect = ([{a => {Name => 'a', Colno => 1, Type => 'char'},
-                b => {Name => 'b', Colno => 2, Type => 'char'},
+   @expect = ([{a => {Name => 'a', Colno => 1, Type => $charname},
+                b => {Name => 'b', Colno => 2, Type => $charname},
                 i => {Name => 'i', Colno => 3, Type => 'int'}}],
-              [{a => {Name => 'a', Colno => 1, Type => 'char'},
-                b => {Name => 'b', Colno => 2, Type => 'char'},
+              [{a => {Name => 'a', Colno => 1, Type => $charname},
+                b => {Name => 'b', Colno => 2, Type => $charname},
                 i => {Name => 'i', Colno => 3, Type => 'int'}}]);
    @result = sql($sql_empty, HASH, MULTISET, COLINFO_FULL);
    push(@testres, compare(\@expect, \@result));
@@ -609,11 +619,11 @@ SQLEND
    push(@testres, compare(\@expect, $result));
 
    &blurb("LIST, MULTISET, COLINFO_FULL empty, wantarray");
-   @expect = ([[{Name => 'a', Colno => 1, Type => 'char'},
-                {Name => 'b', Colno => 2, Type => 'char'},
+   @expect = ([[{Name => 'a', Colno => 1, Type => $charname},
+                {Name => 'b', Colno => 2, Type => $charname},
                 {Name => 'i', Colno => 3, Type => 'int'}]],
-              [[{Name => 'a', Colno => 1, Type => 'char'},
-                {Name => 'b', Colno => 2, Type => 'char'},
+              [[{Name => 'a', Colno => 1, Type => $charname},
+                {Name => 'b', Colno => 2, Type => $charname},
                 {Name => 'i', Colno => 3, Type => 'int'}]]);
    @result = sql($sql_empty, LIST, MULTISET, COLINFO_FULL);
    push(@testres, compare(\@expect, \@result));
@@ -867,8 +877,8 @@ SQLEND
 
 
    &blurb("HASH, MULTISET_RC, COLINFO_FULL, wantarray");
-   my $abc = {a => {Name => 'a', Colno => 1, Type => 'char'},
-              b => {Name => 'b', Colno => 2, Type => 'char'},
+   my $abc = {a => {Name => 'a', Colno => 1, Type => $charname},
+              b => {Name => 'b', Colno => 2, Type => $charname},
               i => {Name => 'i', Colno => 3, Type => 'int'}};
    my $suminfo = {sum => {Name => 'sum', Colno => 1, Type => 'int'}};
    @expect = ([$abc,
@@ -881,7 +891,7 @@ SQLEND
                {sum => 12},
                {sum => 49}],
               1, 1,
-              [{x => {Name => 'x', Colno => 1, Type => 'char'}},
+              [{x => {Name => 'x', Colno => 1, Type => $charname}},
                {x => 'xyz'},
                {x => undef}],
               2,
@@ -972,8 +982,8 @@ SQLEND
 
 
    &blurb("LIST, MULTISET_RC, COLINFO_FULL, wantarray");
-   $abc = [{Name => 'a', Colno => 1, Type => 'char'},
-           {Name => 'b', Colno => 2, Type => 'char'},
+   $abc = [{Name => 'a', Colno => 1, Type => $charname},
+           {Name => 'b', Colno => 2, Type => $charname},
            {Name => 'i', Colno => 3, Type => 'int'}];
    $suminfo = [{Name => 'sum', Colno => 1, Type => 'int'}];
    @expect = ([$abc,
@@ -986,7 +996,7 @@ SQLEND
                [12],
                [49]],
               1, 1,
-              [[{Name => 'x', Colno => 1, Type => 'char'}],
+              [[{Name => 'x', Colno => 1, Type => $charname}],
                ['xyz'],
                [undef]],
               2,
@@ -1179,11 +1189,11 @@ SQLEND
 
    #---------------------- COLINFO_FULL -----------------------
    &blurb("HASH, MULTISET_RC, COLINFO_FULL empty, wantarray");
-   @expect = ([{a => {Name => 'a', Colno => 1, Type => 'char'},
-                b => {Name => 'b', Colno => 2, Type => 'char'},
+   @expect = ([{a => {Name => 'a', Colno => 1, Type => $charname},
+                b => {Name => 'b', Colno => 2, Type => $charname},
                 i => {Name => 'i', Colno => 3, Type => 'int'}}],
-              [{a => {Name => 'a', Colno => 1, Type => 'char'},
-                b => {Name => 'b', Colno => 2, Type => 'char'},
+              [{a => {Name => 'a', Colno => 1, Type => $charname},
+                b => {Name => 'b', Colno => 2, Type => $charname},
                 i => {Name => 'i', Colno => 3, Type => 'int'}}]);
    @result = sql($sql_empty, HASH, MULTISET_RC, COLINFO_FULL);
    push(@testres, compare(\@expect, \@result));
@@ -1193,11 +1203,11 @@ SQLEND
    push(@testres, compare(\@expect, $result));
 
    &blurb("LIST, MULTISET_RC, COLINFO_FULL empty, wantarray");
-   @expect = ([[{Name => 'a', Colno => 1, Type => 'char'},
-                {Name => 'b', Colno => 2, Type => 'char'},
+   @expect = ([[{Name => 'a', Colno => 1, Type => $charname},
+                {Name => 'b', Colno => 2, Type => $charname},
                 {Name => 'i', Colno => 3, Type => 'int'}]],
-              [[{Name => 'a', Colno => 1, Type => 'char'},
-                {Name => 'b', Colno => 2, Type => 'char'},
+              [[{Name => 'a', Colno => 1, Type => $charname},
+                {Name => 'b', Colno => 2, Type => $charname},
                 {Name => 'i', Colno => 3, Type => 'int'}]]);
    @result = sql($sql_empty, LIST, MULTISET_RC, COLINFO_FULL);
    push(@testres, compare(\@expect, \@result));
@@ -1436,8 +1446,8 @@ SQLEND
    push(@testres, compare(\@expect, $result));
 
    &blurb("HASH, SINGLESET, COLINFO_FULL, wantarray");
-   @expect = ({a => {Name => 'a', Colno => 1, Type => 'char'},
-               b => {Name => 'b', Colno => 2, Type => 'char'},
+   @expect = ({a => {Name => 'a', Colno => 1, Type => $charname},
+               b => {Name => 'b', Colno => 2, Type => $charname},
                i => {Name => 'i', Colno => 3, Type => 'int'}},
               {a => 'A', b => 'A', i => 12},
               {a => 'A', b => 'D', i => 24},
@@ -1516,8 +1526,8 @@ SQLEND
    push(@testres, compare(\@expect, $result));
 
    &blurb("LIST, SINGLESET, COLINFO_FULL, wantarray");
-   @expect = ([{Name => 'a', Colno => 1, Type => 'char'},
-               {Name => 'b', Colno => 2, Type => 'char'},
+   @expect = ([{Name => 'a', Colno => 1, Type => $charname},
+               {Name => 'b', Colno => 2, Type => $charname},
                {Name => 'i', Colno => 3, Type => 'int'}],
               ['A', 'A', 12],
               ['A', 'D', 24],
@@ -1698,8 +1708,8 @@ SQLEND
    $no_of_tests += 6;
 
    #--------------------- COLINFO_FULL -------------------------
-   @expect = ({a => {Name => 'a', Colno => 1, Type => 'char'},
-               b => {Name => 'b', Colno => 2, Type => 'char'},
+   @expect = ({a => {Name => 'a', Colno => 1, Type => $charname},
+               b => {Name => 'b', Colno => 2, Type => $charname},
                i => {Name => 'i', Colno => 3, Type => 'int'}});
    &blurb("HASH, SINGLESET, COLINFO_FULL empty, wantarray");
    @result = sql($sql_empty, HASH, COLINFO_FULL, SINGLESET);
@@ -1709,8 +1719,8 @@ SQLEND
    $result = sql($sql_empty, COLINFO_FULL, HASH, SINGLESET);
    push(@testres, compare(\@expect, $result));
 
-   @expect = ([{Name => 'a', Colno => 1, Type => 'char'},
-               {Name => 'b', Colno => 2, Type => 'char'},
+   @expect = ([{Name => 'a', Colno => 1, Type => $charname},
+               {Name => 'b', Colno => 2, Type => $charname},
                {Name => 'i', Colno => 3, Type => 'int'}]);
    &blurb("LIST, SINGLESET, COLINFO_FULL empty, wantarray");
    @result = sql($sql_empty, COLINFO_FULL, LIST, SINGLESET);
@@ -3034,8 +3044,8 @@ EVALEND
 
    #------------------------- COLINFO_FULL ------------------------------
    &blurb("HASH, COLINFO_FULL, &callback");
-   @expect = ([1, {a => {Name => 'a', Colno => 1, Type => 'char'},
-                   b => {Name => 'b', Colno => 2, Type => 'char'},
+   @expect = ([1, {a => {Name => 'a', Colno => 1, Type => $charname},
+                   b => {Name => 'b', Colno => 2, Type => $charname},
                    i => {Name => 'i', Colno => 3, Type => 'int'}}],
               [1, {a => 'A', b => 'A', i => 12}],
               [1, {a => 'A', b => 'D', i => 24}],
@@ -3045,11 +3055,11 @@ EVALEND
               [2, {sum => 37}],
               [2, {sum => 12}],
               [2, {sum => 49}],
-              [5, {x => {Name => 'x', Colno => 1, Type => 'char'}}],
+              [5, {x => {Name => 'x', Colno => 1, Type => $charname}}],
               [5, {'x' => 'xyz'}],
               [5, {'x' => undef}],
-              [7, {a => {Name => 'a', Colno => 1, Type => 'char'},
-                   b => {Name => 'b', Colno => 2, Type => 'char'},
+              [7, {a => {Name => 'a', Colno => 1, Type => $charname},
+                   b => {Name => 'b', Colno => 2, Type => $charname},
                    i => {Name => 'i', Colno => 3, Type => 'int'}}],
               [8, {'Col 1' => {Name => '', Colno => 1, Type => 'int'}}],
               [8, {'Col 1' => 4711}]);
@@ -3066,8 +3076,8 @@ EVALEND
    }
 
    &blurb("LIST, COLINFO_FULL, &callback");
-   @expect = ([1, [{Name => 'a', Colno => 1, Type => 'char'},
-                   {Name => 'b', Colno => 2, Type => 'char'},
+   @expect = ([1, [{Name => 'a', Colno => 1, Type => $charname},
+                   {Name => 'b', Colno => 2, Type => $charname},
                    {Name => 'i', Colno => 3, Type => 'int'}]],
               [1, ['A', 'A', 12]],
               [1, ['A', 'D', 24]],
@@ -3075,12 +3085,12 @@ EVALEND
               [2, [37]],
               [2, [12]],
               [2, [49]],
-              [5, [{Name => 'x', Colno => 1, Type => 'char'}]],
+              [5, [{Name => 'x', Colno => 1, Type => $charname}]],
               [5, ['xyz']],
               [5, [undef]],
-              [7, [{Name => 'a', Colno => 1, Type => 'char'},
-                    {Name => 'b', Colno => 2, Type => 'char'},
-                    {Name => 'i', Colno => 3, Type => 'int'}]],
+              [7, [{Name => 'a', Colno => 1, Type => $charname},
+                   {Name => 'b', Colno => 2, Type => $charname},
+                   {Name => 'i', Colno => 3, Type => 'int'}]],
               [8, [{Name => '', Colno => 1, Type => 'int'}]],
               [8, [4711]]);
    $ix = 0;
@@ -3108,12 +3118,12 @@ EVALEND
    $error_ix = 3;
    $ok = 1;
    blurb("sql_sp, COLINFO_FULL, callback");
-   @expect = ([1, [{Name => 'key1', Colno => 1, Type => 'char'},
-                   {Name => 'key2', Colno => 2, Type => 'char'},
+   @expect = ([1, [{Name => 'key1', Colno => 1, Type => $charname},
+                   {Name => 'key2', Colno => 2, Type => $charname},
                    {Name => 'key3', Colno => 3, Type => 'int'},
                    {Name => 'data1', Colno => 4, Type => 'smallint'},
-                   {Name => 'data2', Colno => 5, Type => 'varchar'},
-                   {Name => 'data3', Colno => 6, Type => 'char'}]],
+                   {Name => 'data2', Colno => 5, Type => $varcharname},
+                   {Name => 'data3', Colno => 6, Type => $charname}]],
               [1, ['apple', 'X', '1', undef, undef, 'T']],
               [1, ['apple', 'X', '2', '-15', undef, 'T']]);
    $retstat = sql_sp('#sql_key_many', LIST, \&callback, COLINFO_FULL);

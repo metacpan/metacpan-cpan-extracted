@@ -35,12 +35,8 @@ lib/Selenium/Edge.pm
 lib/Selenium/Firefox.pm
 lib/Selenium/Firefox/Binary.pm
 lib/Selenium/Firefox/Profile.pm
-lib/Selenium/Firefox/amd64/libibushandler.so
-lib/Selenium/Firefox/amd64/x_ignore_nofocus.so
 lib/Selenium/Firefox/webdriver.xpi
 lib/Selenium/Firefox/webdriver_prefs.json
-lib/Selenium/Firefox/x86/libibushandler.so
-lib/Selenium/Firefox/x86/x_ignore_nofocus.so
 lib/Selenium/InternetExplorer.pm
 lib/Selenium/PhantomJS.pm
 lib/Selenium/Remote/Commands.pm

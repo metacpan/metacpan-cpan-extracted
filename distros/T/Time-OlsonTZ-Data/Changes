@@ -1,3 +1,7 @@
+version 0.201903; 2019-09-11
+
+  * Olson database version 2019c: 388 canonical zones, 205 links
+
 version 0.201902; 2019-07-01
 
   * Olson database version 2019b: 388 canonical zones, 205 links

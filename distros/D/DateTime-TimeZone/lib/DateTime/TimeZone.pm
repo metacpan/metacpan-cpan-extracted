@@ -6,8 +6,11 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.36';
+our $VERSION = '2.37';
 
+# Note that while we make use of DateTime::Duration in this module if we
+# actually try to load it here all hell breaks loose with circular
+# dependencies.
 use DateTime::TimeZone::Catalog;
 use DateTime::TimeZone::Floating;
 use DateTime::TimeZone::Local;
@@ -602,7 +605,7 @@ DateTime::TimeZone - Time zone object base class and factory
 
 =head1 VERSION
 
-version 2.36
+version 2.37
 
 =head1 SYNOPSIS
 

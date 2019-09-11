@@ -242,9 +242,10 @@ command 'MY_HOSTID=~s/(a{4})/$1x4/': Applying regexp 's/(a{4})/$1x4/' to leaf 'M
 
 
 # test cme run real script with arguments
+my $i=0;
 foreach my $test ( @script_tests) {
     subtest $test->{label} => sub {
-        my $script = $wr_dir->child('my-script.cme');
+        my $script = $wr_dir->child('my-script'.$i++.'.cme');
         $script->spew_utf8( map { "$_\n"} @{$test->{script}});
 
         my $cmd = [

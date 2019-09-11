@@ -1,4 +1,12 @@
+0.005   2019-09-11  Released-By: PERLANCAR; Urgency: medium
+
+	- Add schema: unix::signal.
+
+
 0.004   2019-07-12  Released-By: PERLANCAR; Urgency: medium
+
+        - UPDATE: This release is broken due to non-existing coerce rule
+          dependencies added by [Sah::Schemas].
 
 	- [ux] Add aliases for {file,dir,path}name::unix ->
 	  unix::{file,dir,path}name.

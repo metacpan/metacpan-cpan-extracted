@@ -5,7 +5,7 @@
 #-------------------------------------------------------------------------------
 # podDocumentation
 package Dita::GB::Standard;
-our $VERSION = 20190901;
+our $VERSION = 20190911;
 require v5.16;
 use warnings FATAL => qw(all);
 use strict;
@@ -58,7 +58,7 @@ sub hexAsWords($)                                                               
 #D1 Make and manage utf8 files                                                  # Make and manage files that conform to the L<GBStandard> and are coded in utf8.
 
 sub gbStandardFileName($$%)                                                     #E Return the L<GBStandard> file name given the content and extension of a proposed file.
- {my ($content, $extension, %options) = @_;                                     # Content, extension, various ingenious options designed by Micaela
+ {my ($content, $extension, %options) = @_;                                     # Content, extension, options
   defined($content) or confess "Content must be defined";
   $content     =~ s(\s*xtr[cf]="[^"]*") ()gs;                                   # Suppress xtrc|f attributes as we use them to hold file names and line numbers during a conversion but they are not germane to the final result and thus prevent files from being collapsed.
 

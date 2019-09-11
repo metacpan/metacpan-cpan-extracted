@@ -97,6 +97,7 @@ my %boolean_options = map +($_ => [$_, 1], "no_$_" => [$_, 0]), qw(
     explicit_defaults
     encode_defaults
     check_enum_values
+    fail_ref_coercion
     generic_extension_methods
 );
 
@@ -207,7 +208,7 @@ Google::ProtocolBuffers::Dynamic::MakeModule
 
 =head1 VERSION
 
-version 0.25
+version 0.26
 
 =head1 AUTHOR
 

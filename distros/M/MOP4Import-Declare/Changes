@@ -1,5 +1,34 @@
 Revision history for Perl extension MOP4Import::Declare
 
+0.050    2019-09-11
+    * MOP4Import::Base::CLI_JSON is introduced with many cli_xxx APIs.
+    * Other important changes follows:
+    * [GH #70] - Add json_type field property support via Cpanel::JSON::XS::Type
+    * [GH #66] Fix - configure should accept options like `api.token`
+    * [GH #64] - `[constant => $name, $value]` pragma is exported by default.
+    * [GH #63] - import by regexp
+    * [GH #62] - M4I::Pairs - Add special fallback to dispatch_declare protocol.
+    * [GH #61] - New named code attribute API.
+    * [GH #58] - MOP4Import::Types now set `@EXPORT`.
+    * [GH #52] - Add cli_create_from_file and cli_read_file
+    * [GH #50] - Move --quiet option to CLI_JSON
+    * [GH #49][GH #61] - rewrite cli_info_command_doc with `cli_CODE_ATTR_get(Doc => $sub)`
+    * [GH #48] - Add `[defaults => fieldName => defaultValue,...] pragma
+    * [GH #47] - add `cli_unknown_subcommand`
+    * [GH #46] - drop CLI_JSON::run (to inherit CLI::run)
+      - rewrite CLI::run (as a template method)
+      - Change parse_json_opts to use parse_opts as function
+    * [GH #45] - Add `[import => @import_specs]` pragma
+    * [GH #44] - Rename impl of pragma `base` to `fileless_base`
+    * [GH #41] - Use mro::get_linear_isa to reorder options
+    * [GH #40] - Decode json arguments as utf8
+      [GH #39] - Change STDIN/OUT/ERR utf8 by default.
+    * [GH #14] - Add new hooks before_configure_default, after_configure_default
+
+0.049_002  2017-10-21
+    * [GH #23] - API change. `declare_PRAGMA` arguments are simplified.
+    * And many changes...
+
 0.004    2015-12-16
     * [GH #19] - Add rlib to configure_requires.
     * [GH #18] - Fix Base::CLI->run exit code handling.

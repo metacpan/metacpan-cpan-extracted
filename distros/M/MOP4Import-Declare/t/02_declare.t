@@ -90,7 +90,15 @@ END
 
     it "should detect unknown pragma", expect_script_error
       q{package SpecError4; use MOP4Import::Declare '-foo';}
-      , to_match => qr/^Unknown pragma 'foo' in SpecError4/;
+      , to_match => qr/^No such pragma: \`use MOP4Import::Declare \['foo'\]\`/;
+
+    it "should detect duplicate fields", expect_script_error
+      q{package SpecError5; use MOP4Import::Declare [fields => qw/foo foo/];}
+      , to_match => qr/^Duplicate field decl! foo/;
+
+    it "should detect accessor redefinition", expect_script_error
+      q{package SpecError6; sub foo {'FOO'}; use MOP4Import::Declare [fields => qw/foo/];}
+      , to_match => qr/^Accessor SpecError6::foo is redefined!/;
   };
 
   my @cards = qw(Ace Chariot Cup Death Devil Emperor Empress Fool Hanged_Man
@@ -156,6 +164,17 @@ END
 
   };
 
+  describe "use YOUR_CLASS [as => 'MyAlias']", sub {
+    it "should anve no error", no_error q{
+package TarotImport2;
+use Tarot1 [as => 'MyTarot'];
+};
+
+    it "should create alias for YOUR_CLASS", sub {
+      expect(TarotImport2->MyTarot)->to_be('Tarot1');
+    };
+  };
+
   describe "Exporter like sigil based import for \$, \@, \% and &", sub {
     it "should have no error", no_error q{
 package TarotImport1;
@@ -173,6 +192,14 @@ use Tarot2 qw/$CARDS @CARDS %CARDS &CARDS/;
     it 'should import &CARDS', sub {
       expect(eval q{package TarotImport1; CARDS()})->to_be([reverse @cards]);
     };
+
+    it "should raise error for typos", sub {
+      expect(do {eval q{package Ng1; use Tarot2 qw/$CAR/;}; $@})->to_match(qr/No such symbol 'CAR' in package Tarot2/);
+      expect(do {eval q{package Ng1; use Tarot2 qw/@CAR/;}; $@})->to_match(qr/No such symbol 'CAR' in package Tarot2/);
+      expect(do {eval q{package Ng1; use Tarot2 qw/%CAR/;}; $@})->to_match(qr/No such symbol 'CAR' in package Tarot2/);
+      expect(do {eval q{package Ng1; use Tarot2 qw/&CAR/;}; $@})->to_match(qr/No such symbol 'CAR' in package Tarot2/);
+    };
+
   };
 
   describe "Exporter like sigil based import for *", sub {
@@ -192,6 +219,10 @@ use Tarot2 qw/*CARDS/;
     it 'should import &CARDS', sub {
       expect(eval q{package TarotImportGLOB; CARDS()})->to_be([reverse @cards]);
     };
+
+    it "should raise error for typos", sub {
+      expect(do {eval q{package Ng1; use Tarot2 qw/*CAR/;}; $@})->to_match(qr/No such symbol 'CAR' in package Tarot2/);
+    };
   };
 
   describe "Exporter like word import for *", sub {
@@ -210,6 +241,21 @@ use Tarot2 qw/CARDS/;
     };
     it 'should import &CARDS', sub {
       expect(eval q{package TarotImportWORD; CARDS()})->to_be([reverse @cards]);
+    };
+
+    it "should raise error for typos", sub {
+      expect(do {eval q{package Ng1; use Tarot2 qw/CAR/;}; $@})->to_match(qr/No such symbol 'CAR' in package Tarot2/);
+    };
+  };
+
+  describe "[import => IMPORT_SPECS...]", sub {
+    it "should have no error", no_error q{
+package TarotImportViaPragma;
+use Tarot2 [import => qw/CARDS/];
+};
+
+    it 'should import @CARDS', sub {
+      expect(eval q{package TarotImportViaPragma; \@CARDS})->to_be(\@cards);
     };
   };
 

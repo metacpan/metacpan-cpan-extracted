@@ -1,7 +1,7 @@
 package Sah::Schema::unix::filename;
 
-our $DATE = '2019-07-12'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-09-11'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 our $schema = ["filename::unix" => {
     summary => 'File name (with optional path) on a Unix system',
@@ -27,7 +27,7 @@ Sah::Schema::unix::filename - File name (with optional path) on a Unix system
 
 =head1 VERSION
 
-This document describes version 0.004 of Sah::Schema::unix::filename (from Perl distribution Sah-Schemas-Unix), released on 2019-07-12.
+This document describes version 0.005 of Sah::Schema::unix::filename (from Perl distribution Sah-Schemas-Unix), released on 2019-09-11.
 
 =head1 DESCRIPTION
 

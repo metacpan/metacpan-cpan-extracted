@@ -1,11 +1,21 @@
 #---------------------------------------------------------------------
-# $Header: /Perl/OlleDB/t/4_conversion.t 14    18-04-13 17:23 Sommar $
+# $Header: /Perl/OlleDB/t/4_conversion.t 16    19-07-09 16:05 Sommar $
 #
 # Tests that it's possible to set up a conversion based on the local
 # OEM character set and the server charset. Mainly is this is test that
 # we can access Win32::Registry properly.
 #
 # $History: 4_conversion.t $
+# 
+# *****************  Version 16  *****************
+# User: Sommar       Date: 19-07-09   Time: 16:05
+# Updated in $/Perl/OlleDB/t
+# Use GetOEMCP to code page for OEM and no need for Win32:Registty.
+# 
+# *****************  Version 15  *****************
+# User: Sommar       Date: 19-05-05   Time: 17:49
+# Updated in $/Perl/OlleDB/t
+# is_latin1 has been replaced by codepage.
 # 
 # *****************  Version 14  *****************
 # User: Sommar       Date: 18-04-13   Time: 17:23
@@ -107,7 +117,7 @@ sub set_shrimp_437 {
 }
 
 # Get the OEM char-set.
-my $client_cs = get_codepage_from_reg('OEMCP');
+my $client_cs = Win32::SqlServer::GetOEMCP();
 my $unknown_oem;
 
 # These are the constants we use to test. It's all about shrimp sandwiches.
@@ -131,9 +141,9 @@ my $provider = $X->{Provider};
 my $clr_enabled = clr_enabled($X);
 
 # Investigate the code page for the server collation. The test only runs 
-# if this is 1252, since we don't what distortions that happens with other
-# charsets.
-if (not is_latin1($X)) {
+# if this is 1252, since we don't know what distortions that happens 
+# with other charsets.
+if (codepage($X) != 1252) {
    print "1..0 # Skipped: Code page for server collation is not 1252.\n";
    exit;
 }
@@ -805,34 +815,3 @@ sub compare {
    }
 }
 
-#--------------------------------- Copied from Sqllib.pm
-sub get_codepage_from_reg {
-    my($cp_value) = shift @_;
-    # Reads the code page for OEM or ANSI. This is one specific key in
-    # in the registry.
-
-    my($REGKEY) = 'SYSTEM\CurrentControlSet\Control\Nls\CodePage';
-    my($regref, $dummy, $result);
-
-    # We need this module to read the registry, but as this is the only
-    # place we need it in, we don't C<use> it.
-    require 'Win32\Registry.pm';
-
-    $dummy = $main::HKEY_LOCAL_MACHINE;  # Resolve "possible typo" with AS Perl.
-    $main::HKEY_LOCAL_MACHINE->Open($REGKEY, $regref) or
-         die "Could not open registry key: '$REGKEY'\n";
-
-    # This is where stuff is getting really ugly, as I have found no code
-    # that works both with the ActiveState Perl and the native port.
-    if ($] < 5.004) {
-       Win32::RegQueryValueEx($regref->{'handle'}, $cp_value, 0,
-                              $dummy, $result) or
-             die "Could not read '$REGKEY\\$cp_value' from registry\n";
-    }
-    else {
-       $regref->QueryValueEx($cp_value, $dummy, $result);
-    }
-    $regref->Close or warn "Could not close registry key.\n";
-
-    $result;
-}

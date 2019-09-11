@@ -7,6 +7,7 @@ our @EXPORT = qw(FindMethods);
 
 use MOP4Import::Util qw(symtab);
 
+# XXX: rewrite this with mro::get_linear_isa;
 sub FindMethods {
   # depth first, pre-order search of 'sub'.
   # In the real sense, this should be called 'Findsubs'.

@@ -118,7 +118,7 @@ I<almost> everywhere that Perl runs.
 
 =head1 ERROR HANDLING
 
-All thrown exceptions are instances of L<Net::ACME2::X::Base>.
+All thrown exceptions are instances of L<Net::ACME2::X::Generic>.
 Specific error classes aren’t yet defined.
 
 =head1 CRYPTOGRAPHY & SPEED
@@ -156,7 +156,7 @@ use Net::ACME2::HTTP;
 use Net::ACME2::Order;
 use Net::ACME2::Authorization;
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 use constant {
     _HTTP_OK => 200,

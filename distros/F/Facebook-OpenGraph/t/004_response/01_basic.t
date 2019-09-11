@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 use Facebook::OpenGraph::Response;
+use JSON 2 qw(encode_json);
 
 subtest 'initialize' => sub {
     my $res = Facebook::OpenGraph::Response->new;
@@ -126,6 +127,48 @@ subtest 'is_api_version_eq_or_later_than' => sub {
     ok(!$res->is_api_version_eq_or_later_than('v2.10'));
     ok(!$res->is_api_version_eq_or_later_than('v3.2'));
     ok(!$res->is_api_version_eq_or_later_than('v3.3'));
+};
+
+subtest 'error_string' => sub {
+    # Sample value is taken from https://developers.facebook.com/docs/graph-api/using-graph-api/error-handling
+    my $message    = 'Message describing the error';
+    my $type       = 'OAuthException';
+    my $code       = 190;
+    my $subcode    = 460;
+    my $user_title = 'A title';
+    my $user_msg   = 'A message';
+    my $trace_id   = 'EJplcsCHuLu';
+
+    my $error = +{
+        message          => $message,
+        type             => $type,
+        code             => $code,
+        error_subcode    => $subcode,
+        error_user_title => $user_title,
+        error_user_msg   => $user_msg,
+        fbtrace_id       => $trace_id,
+    };
+    my $res = Facebook::OpenGraph::Response->new(+{
+        code => 500,
+        message => 'Internal Server Error',
+        headers => [],
+        req_headers => [],
+        req_content => '',
+        content => encode_json(+{ error => $error }),
+    });
+
+    my $expected_str = sprintf(
+                        qq{%s:%s\t%s:%s\t%s\t%s:%s},
+                        $code,
+                        $subcode,
+                        $type,
+                        $message,
+                        $trace_id,
+                        $user_title,
+                        $user_msg,
+                      );
+
+    is($res->error_string, $expected_str);
 };
 
 done_testing;

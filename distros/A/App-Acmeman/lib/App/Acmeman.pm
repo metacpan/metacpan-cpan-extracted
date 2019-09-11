@@ -16,7 +16,7 @@ use Socket qw(inet_ntoa);
 use Sys::Hostname;
 use Pod::Usage;
 use Pod::Man;
-use Getopt::Long qw(:config gnu_getopt no_ignore_case auto_version);
+use Getopt::Long qw(:config gnu_getopt no_ignore_case);
 use POSIX qw(strftime time floor);
 use App::Acmeman::Config;
 use App::Acmeman::Domain qw(:files);
@@ -25,7 +25,7 @@ use Text::ParseWords;
 use App::Acmeman::Log qw(:all :sysexits);
 use feature 'state';
 
-our $VERSION = '2.00';
+our $VERSION = '2.02';
 
 my $progdescr = "manages ACME certificates";
 
@@ -46,24 +46,28 @@ sub new {
 	_domains => []
     }, $class;
     GetOptions(
-	   "h" => sub {
-                    pod2usage(-message => "$self->{_progname}: $progdescr",
-                              -exitstatus => EX_OK);
-           },
-           "help" => sub {
-                    pod2usage(-exitstatus => EX_OK, -verbose => 2);
-           },
-           "usage" => sub {
-                    pod2usage(-exitstatus => EX_OK, -verbose => 0);
-           },
-           "debug|d+" => \$self->{_option}{debug},
-           "dry-run|n" => \$self->{_option}{dry_run},
-	   "stage|s" => sub { $self->{_acme_host} = 'staging' },
-           "force|F" => \$self->{_option}{force},
-           "time-delta|D=n" => \$self->{_option}{time_delta},
-	   "setup|S" => sub { $self->{_command} = 'setup' },
-	   "alt-names|a" => \$self->{_option}{check_alt_names},
-	   "config-file|f=s" => \$self->{_option}{config_file},
+	'h' => sub {
+	          pod2usage(-message => "$self->{_progname}: $progdescr",
+                            -exitstatus => EX_OK);
+        },
+        'help' => sub {
+                  pod2usage(-exitstatus => EX_OK, -verbose => 2);
+        },
+        'usage' => sub {
+                  pod2usage(-exitstatus => EX_OK, -verbose => 0);
+        },
+        'debug|d+' => \$self->{_option}{debug},
+        'dry-run|n' => \$self->{_option}{dry_run},
+	'stage|s' => sub { $self->{_acme_host} = 'staging' },
+        'force|F' => \$self->{_option}{force},
+        'time-delta|D=n' => \$self->{_option}{time_delta},
+	'setup|S' => sub { $self->{_command} = 'setup' },
+	'alt-names|a' => \$self->{_option}{check_alt_names},
+	'config-file|f=s' => \$self->{_option}{config_file},
+	'version' => sub {
+	    print "$0 version $VERSION\n";
+	    exit(EX_OK)
+	}
     ) or exit(EX_USAGE);
     ++$self->{_option}{debug} if $self->dry_run_option;
     debug_level($self->{_option}{debug});

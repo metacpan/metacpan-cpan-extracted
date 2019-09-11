@@ -1,6 +1,6 @@
 =head1 NAME
 
-StreamFinder - Fetch actual raw streamable URLs from various radio-station websites.
+StreamFinder - Fetch actual raw streamable URLs from various radio-station and video websites.
 
 =head1 INSTALLATION
 
@@ -54,6 +54,10 @@ file.
 
 	print "Station ID=$stationID\n";
 	
+	my $stationDescription = $station->getTitle('desc');
+	
+	print "Description=$stationDescription\n"  if (defined $stationDescription);
+	
 	my $icon_url = $station->getIconURL();
 
 	if ($icon_url) {   #SAVE THE ICON TO A TEMP. FILE:
@@ -90,21 +94,27 @@ StreamFinder accepts a valid radio station URL on supported websites and
 returns the actual stream URL(s), title, and cover art icon for that station.  
 The purpose is that one needs one of these URLs 
 in order to have the option to stream the station/video in one's own choice of 
-audio player software rather than using their web browser and accepting any / 
+media player software rather than using their web browser and accepting any / 
 all flash, ads, javascript, cookies, trackers, web-bugs, and other crapware 
-that can come with that method of playing.  The author uses his own custom 
+associated with that method of playing.  The author uses his own custom 
 all-purpose media player called "fauxdacious" (his custom hacked version of 
 the open-source "audacious" audio player).  "fauxdacious" incorporates this 
 module to decode and play streams.  The currently-supported websites are:
 radionomy.com, iheartradio.com, reciva.com, radio.net, facebook, banned.video, 
 and youtube / vimeo / brighteon, et. al.  We are again supporting tunein.com, 
-but it may not work for all stations!
+but it may not work for all stations / podcasts!
+
+NOTE:  For some sites, ie. Youtube, Facebook, and BannedVideo, the "station" 
+object actually refers to a specific video, but functions the same way!
 
 Each site is supported by a separate subpackage (StreamFinder::I<Package>), 
 which is determined and selected based on the url when the StreamFinder object 
-is created.  The methods are overloaded by the selected subpackage's methods.
+is created.  The methods are overloaded by the selected subpackage's methods.  
 
-One or more playable streams can be returned for each station.  
+Please see the POD. documentation for each subpackage for important additional 
+information on options and features specific to each site / subpackage!
+
+One or more playable streams can be returned for each station / video.  
 
 =head1 SUBROUTINES/METHODS
 
@@ -114,6 +124,12 @@ One or more playable streams can be returned for each station.
 
 Accepts a URL and creates and returns a new station object, or 
 I<undef> if the URL is not a valid station or no streams are found.
+
+NOTE:  A full URL must be specified here, but if using any of the 
+subpackage modules directly instead, then either a full URL OR just 
+the station / video's site ID may be used!  Reason being that this 
+function parses the full URL to determine which subpackage (site) 
+module to use.
 
 I<options> can vary depending on the type of stream (site) that is 
 being queried.  One option common to all sites is I<-debug>, which 
@@ -130,24 +146,28 @@ Returns an array of strings representing all stream urls found.
 Similar to B<get>() except it only returns a single stream representing 
 the first valid stream found.  
 
-Current options are:  I<-random> and I<-noplaylists>.  By default, the 
-first ("best"?) stream is returned.  If I<-random> is specified, then 
+Current options are:  I<"random"> and I<"noplaylists">.  By default, the 
+first ("best"?) stream is returned.  If I<"random"> is specified, then 
 a random one is selected from the list of streams found.  
-If I<-noplaylists> is specified, and the stream to be returned is a 
-"playlist" (.pls extension), it is first fetched and the first entry 
+If I<"noplaylists"> is specified, and the stream to be returned is a 
+"playlist" (.pls or .m3u? extension), it is first fetched and the first entry 
 in the playlist is returned.  This is needed by Fauxdacious Mediaplayer.
 
 =item $station->B<count>()
 
 Returns the number of streams found for the station.
 
-=item $station->B<getStationID>()
+=item $station->B<getStationID>(['fccid'])
 
-Returns the station's ID.
+Returns the station's site ID (default), or station's FCC 
+call-letters ("fccid") for applicable sites and stations.
 
-=item $station->B<getTitle>()
+=item $station->B<getTitle>(['desc'])
 
-Returns the station's title (description).  
+Returns the station's title, or (long description).  
+
+NOTE:  Some sights do not support a separate long description field, 
+so if none found, the standard title field will always be returned.
 
 =item $station->B<getIconURL>()
 
@@ -162,10 +182,23 @@ Returns a two-element array consisting of the extension (ie. "png",
 
 Returns the url for the station's "cover art" banner image, if any.
 
+NOTE:  If no "banner image" (usually a larger image) is found, 
+the "icon image" url will be returned.
+
 =item $station->B<getImageData>()
 
 Returns a two-element array consisting of the extension (ie. "png", 
 "gif", "jpeg", etc. and the actual station's banner image (binary data).
+
+NOTE:  If no "banner image" (usually a larger image) is found, 
+the "icon image" data will be returned.
+
+=item $video->B<getType>()
+
+Returns the station's type (I<submodule-name>).  
+(one of:  "BannedVideo", "Facebook", "IHeartRadio", "RadioNet", 
+"Radionomy", "Reciva", "Tunein", or "Youtube" - depending on 
+the sight that matched the URL.
 
 =back
 
@@ -206,17 +239,15 @@ those corresponding options specified in these files.
 
 =head1 DEPENDENCIES
 
-LWP::UserAgent
+L<URI::Escape>, L<HTML::Entities>, L<LWP::UserAgent>
 
 =head1 RECCOMENDS
 
-URI::Escape;  (Youtube)
+L<WWW::YouTube::Download> (for Youtube)
 
-WWW::YouTube::Download;  (Youtube)
+youtube-dl (for Youtube, Facebook, Tunein)
 
-youtube-dl  (Youtube, Facebook, Tunein)
-
-wget  (Reciva, Youtube, BannedVideo)
+wget
 
 =head1 BUGS
 
@@ -306,7 +337,7 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '1.11';
+our $VERSION = '1.13';
 our $DEBUG = 1;
 
 require Exporter;

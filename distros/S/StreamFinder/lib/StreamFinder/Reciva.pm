@@ -74,29 +74,43 @@ file.
 
 =head1 DESCRIPTION
 
-StreamFinder::Reciva accepts a valid radio station URL on radios.reciva.com and
-returns the actual streamurl and cover art icon for that station.  
-The purpose is that one needs one of these URLs 
+StreamFinder::Reciva accepts a valid radio station ID or URL on 
+radios.reciva.com and returns the actual stream URL(s), title, and cover 
+art icon for that station.  The purpose is that one needs one of these URLs 
 in order to have the option to stream the station in one's own choice of 
-audio player software rather than using their web browser and accepting any / 
+media player software rather than using their web browser and accepting any / 
 all flash, ads, javascript, cookies, trackers, web-bugs, and other crapware 
 that can come with that method of playing.  The author uses his own custom 
 all-purpose media player called "fauxdacious" (his custom hacked version of 
 the open-source "audacious" audio player.  "fauxdacious" incorporates this 
 module to decode and play reciva.com streams.
 
-StreamFinder::Reciva accepts a valid radio station URL on radios.reciva.com and 
-returns the actual stream URL(s) and cover art icon for that station.  
-The purpose is that one needs one of these URLs in order to have the option to 
-stream the station in one's own choice of audio player software rather than 
-using their web browser and accepting any / all flash, ads, javascript, 
-cookies, trackers, web-bugs, and other crapware that can come with that method 
-of playing.  The author uses his own custom all-purpose audio player called 
-"fauxdacious" (his custom hacked version of the open-source "audacious" 
-media player).  "fauxdacious" can incorporate this module to decode and play 
-reciva.com streams.
+StreamFinder::Reciva accepts a valid radio station IDF / URL on 
+radios.reciva.com and returns the actual stream URL(s) and cover art icon 
+for that station.  The purpose is that one needs one of these URLs in order 
+to have the option to stream the station in one's own choice of audio player 
+software rather than using their web browser and accepting any / all flash, 
+ads, javascript, cookies, trackers, web-bugs, and other crapware that can 
+come with that method of playing.  The author uses his own custom 
+all-purpose audio player called "fauxdacious" (his custom hacked version of 
+the open-source "audacious" media player).  "fauxdacious" can incorporate 
+this module to decode and play reciva.com streams.
 
-One or more streams can be returned for each station.  
+One or more streams can be returned for each station.
+
+NOTE:  reciva.com STILL uses the ancient SSL TLSv1, which LWP::UserAgent 
+no longer plays nice with without coaxing!  Therefore, if you don't have 
+the fallback B<wget> installed, ie. M$-Windows users, etc. you will need to 
+create a simple text config file named "~/.config/StreamFinder/Reciva/config 
+and add the following line:
+
+'reciva_ssl_opts' => {verify_hostname => 0, SSL_version => 'TLSv1'}
+
+I'm NOT making that the default, since, they could FIX this at ANY TIME, 
+breaking StreamFinder::Reciva!  These options will ONLY be applied to reciva.com 
+URLs, NOT the streams, etc. that are on other sites.  To specify opts for 
+all URLs accessed by StreamFinder::Reciva, use 'ssl_opts' instead of 
+'reciva_ssl_opts'.
 
 =head1 SUBROUTINES/METHODS
 
@@ -118,11 +132,11 @@ Returns an array of strings representing all stream urls found.
 Similar to B<get>() except it only returns a single stream representing 
 the first valid stream found.  
 
-Current options are:  I<-random> and I<-noplaylists>.  By default, the 
-first ("best"?) stream is returned.  If I<-random> is specified, then 
+Current options are:  I<"random"> and I<"noplaylists">.  By default, the 
+first ("best"?) stream is returned.  If I<"random"> is specified, then 
 a random one is selected from the list of streams found.  
-If I<-noplaylists> is specified, and the stream to be returned is a 
-"playlist" (.pls extension), it is first fetched and the first entry 
+If I<"noplaylists"> is specified, and the stream to be returned is a 
+"playlist" (.pls or .m3u? extension), it is first fetched and the first entry 
 in the playlist is returned.  This is needed by Fauxdacious Mediaplayer.
 
 =item $station->B<count>()
@@ -157,7 +171,7 @@ Returns a two-element array consisting of the extension (ie. "png",
 
 =item $station->B<getType>()
 
-Returns the stream's type ("Reciva").
+Returns the station's type ("Reciva").
 
 =back
 
@@ -177,6 +191,12 @@ and the options are loaded into a hash used only by the specific
 (submodule) specified.  Valid options include 
 I<-debug> => [0|1|2], and most of the L<LWP::UserAgent> options.  
 Blank lines and lines starting with a "#" sign are ignored.
+
+Among options valid for Reciva streams is the *.reciva.com - specific 
+SSL options currently needed to access their servers described in 
+the B<new()> function:
+
+'reciva_ssl_opts' => {verify_hostname => 0, SSL_version => 'TLSv1'}
 
 Options specified here override any specified in I<~/.config/StreamFinder/config>.
 
@@ -202,7 +222,7 @@ reciva
 
 =head1 DEPENDENCIES
 
-LWP::UserAgent
+L<URI::Escape>, L<HTML::Entities>, L<LWP::UserAgent>
 
 =head1 RECCOMENDS
 
@@ -288,6 +308,8 @@ package StreamFinder::Reciva;
 
 use strict;
 use warnings;
+use URI::Escape;
+use HTML::Entities ();
 use LWP::UserAgent ();
 use vars qw(@ISA @EXPORT);
 
@@ -327,6 +349,8 @@ sub new
 	}
 	push (@userAgentOps, 'agent', 'Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101 Firefox/68.0')
 			unless (defined $uops{'agent'});
+#	push (@userAgentOps, 'ssl_opts', {verify_hostname => 0, SSL_version => 'TLSv1'})
+#			unless (defined $uops{'ssl_opts'});  #THIS STUPID SIGHT FORCES USE OF ANCIENT TLSv1?!
 	$uops{'timeout'} = 10  unless (defined $uops{'timeout'});
 	$DEBUG = $uops{'debug'}  if (defined $uops{'debug'});
 
@@ -337,15 +361,35 @@ sub new
 		}
 	}	
 
-	$url = 'https://radios.reciva.com/station/' . $url  unless ($url =~ /^http/);
-	(my $url2fetch = $url) =~ s#station\/(\d+).*$#streamer\?stationid\=$1\&streamnumber=0#;
-	$self->{'id'} = $1;
+	unless ($url =~ /^https?\:/) {
+		$self->{'id'} = $url;
+		$url = 'https://radios.reciva.com/station/' . $url;  #UNALTERED URL FOR ICON
+	}
+	(my $url2 = $url) =~ s#station\/(\d+).*$#streamer\?stationid\=$1\&streamnumber=0#;  #ALTERED URL (FOR STEP 2)
+
+	#NOTE:  THIS IS A 2-STEP FETCH:  1) FETCH THE UNALTERED URL TO GET THE ICON, 2) FETCH ALTERED ONE FOR STREAMS!:
+	$self->{'id'} ||= $1  if ($1);
+	return undef  unless ($self->{'id'});
+
 	my $html = '';
-	print STDERR "-0(Reciva): URL=$url2fetch=\n"  if ($DEBUG);
-	my $ua = LWP::UserAgent->new(@userAgentOps);		
+	print STDERR "-0(Reciva): ID=".$self->{'id'}."= AGENT=".join('|',@userAgentOps)."=\n"  if ($DEBUG);
+	my $ua = LWP::UserAgent->new(@userAgentOps);
+	if (defined $uops{'reciva_ssl_opts'}) {
+		my @sslkeys = $ua->ssl_opts();
+		for (my $i=0;$i<=$#sslkeys;$i++) {
+			$self->{'_default_ssl_opts'}->{$sslkeys[$i]} = $ua->ssl_opts($sslkeys[$i]);
+		}
+		my %reciva_ssl_ops = %{$uops{'reciva_ssl_opts'}};
+		foreach my $i (keys %reciva_ssl_ops) {
+			$i =~ s/^reciva_//o;
+			$self->{'_reciva_ssl_opts'}->{$i} = $reciva_ssl_ops{$i};
+			$ua->ssl_opts($i, $reciva_ssl_ops{$i});
+		}
+	}
 	$ua->timeout($uops{'timeout'});
 	$ua->cookie_jar({});
 	$ua->env_proxy;
+	print STDERR "i:STEP 1: FETCHING URL ($url)...\n"  if ($DEBUG);
 	my $response = $ua->get($url);
 	if ($response->is_success) {
 		$html = $response->decoded_content;
@@ -358,46 +402,73 @@ sub new
 		}
 	}
 	print STDERR "-1: html=$html=\n"  if ($DEBUG > 1);
-	return undef  unless ($html);  #STEP 1 FAILED, INVALID STATION URL, PUNT!
-	$self->{'iconurl'} = ($html =~ m#stationid\=\"\d+\"\s+href\=\"\/station\/\d+\"\>\s*\<img\s+src\=\"([^\"]*)#) ? $1 : '';
+	$self->{'title'} = '';
+	$self->{'iconurl'} = '';
+	if ($html) {  #STEP 1 SUCCEEDED, FETCH ICON URL:
+		my $stationID = $self->{'id'};
+		$self->{'iconurl'} = ($html =~ m#stationid\=\"\d+\"\s+href\=\"\/station\/${stationID}\"\>\s*\<img\s+src\=\"([^\"]*)#s) ? $1 : '';
+		$self->{'imageurl'} = $self->{'iconurl'};
+		$self->{'title'} = ($html =~ m#\<th\s+class\=\"stationName\s+spec\"\s+>\s*([^\<]+)#) ? $1 : '';
+		print STDERR "i:ICONURL FOUND=".$self->{'iconurl'}."= TITLE=".$self->{'title'}."=\n";
+		$html = '';
+	}
 	$self->{'imageurl'} = $self->{'iconurl'};
 
-	$html = '';
-	print STDERR "-3: url2=$url2fetch=\n"  if ($DEBUG);
-	return undef  unless ($url2fetch);
-	$response = $ua->get($url2fetch);
+	print STDERR "i:STEP 2: FETCHING URL ($url2)...\n"  if ($DEBUG);
+	$response = $ua->get($url2);
 	if ($response->is_success) {
 		$html = $response->decoded_content;
 	} else {
 		print STDERR $response->status_line  if ($DEBUG);
-		print STDERR "\n..trying wget...\n"  if ($DEBUG);
-		$html = `wget -t 2 -T 20 -O- -o /dev/null \"$url2fetch\" 2>/dev/null `;
+		my $no_wget = system('wget','-V');
+		unless ($no_wget) {
+			print STDERR "\n..trying wget...\n"  if ($DEBUG);
+			$html = `wget -t 2 -T 20 -O- -o /dev/null \"$url2\" 2>/dev/null `;
+		}
 	}
-	print STDERR "-4: html2=$html=\n"  if ($DEBUG > 1);
+	print STDERR "-2: html=$html=\n"  if ($DEBUG > 1);
 	return undef  unless ($html);  #STEP 1 FAILED, INVALID STATION URL, PUNT!
 
 	my @streams;
 	$self->{'cnt'} = 0;
-	$self->{'title'} = ($html =~ m#Playing:\s*([^\<]+)#) ? $1 : '';
+	$self->{'title'} = $1  if (!$self->{'title'} && $html =~ m#Playing:\s*([^\<]+)#);
+	$self->{'title'} = HTML::Entities::decode_entities($self->{'title'});
+	$self->{'title'} = uri_unescape($self->{'title'});
 	my $stream = '';
 	my $plshtml = '';
+	if (defined $self->{'_reciva_ssl_opts'}) {
+		foreach my $i (keys %{$self->{'_reciva_ssl_opts'}}) {
+			$ua->ssl_opts($i, $self->{'_default_ssl_opts'}->{$i});
+			print STDERR "--SSL OPTS SET ($i) BACK TO (".$self->{'_default_ssl_opts'}->{$i}.")!\n"  if ($DEBUG);
+		}
+	}
 	while ($html =~ s/\<iframe\s+src\=\"(\w+\:\/[^\"]+)//io) {  #FIND ONE (OR MORE) STREAM URLS:
 		$stream = $1;
 		if ($stream =~ /\.pls/io) {
+			print STDERR "---fetching pls stream ($stream) for unrolling...\n";
 			$response = $ua->get($stream);
 			if ($response->is_success) {
 				$plshtml = $response->decoded_content;
 			} else {
 				$plshtml = '';
 				print STDERR $response->status_line  if ($DEBUG);
-				print STDERR "\n..trying wget...\n"  if ($DEBUG);
-				$plshtml = `wget -t 2 -T 20 -O- -o /dev/null \"$stream\" 2>/dev/null `;
+				my $no_wget = system('wget','-V');
+				unless ($no_wget) {
+					print STDERR "\n..trying wget...\n"  if ($DEBUG);
+					$plshtml = `wget -t 2 -T 20 -O- -o /dev/null \"$stream\" 2>/dev/null `;
+				}
 			}
-			while ($plshtml =~ s#File\d+\=(\S+)##) {
-				print STDERR "-----5: Adding PLS stream ($1)!\n"  if ($DEBUG);
-				push @streams, $1;
-				++$self->{'cnt'};
-			}
+			if ($plshtml)	{
+				while ($plshtml =~ s#File\d+\=(\S+)##) {
+					print STDERR "-----5: Adding PLS stream ($1)!\n"  if ($DEBUG);
+					push @streams, $1;
+					++$self->{'cnt'};
+				}
+			} else {
+				print STDERR "-----5a: Adding stream ($stream) !\n"  if ($DEBUG);
+				push @streams, $stream;  #COUNDN'T FETCH, LET "-noplaylists" SORT IT OUT!
+				++$self->{'cnt'};   #NUMBER OF Streams FOUND
+			}			
 		} else {
 			print STDERR "-----5: Adding stream ($stream) !\n"  if ($DEBUG);
 			push @streams, $1;
@@ -407,14 +478,18 @@ sub new
 	while ($html =~ s/\<a\s+id\=\"livestreams\"\s+class\=\"live\"\s+onclick\="iframe\(\'(\w+\:\/[^\']+)//o) {  #FIND ONE (OR MORE) STREAM URLS:
 		$stream = $1;
 		if ($stream =~ /\.pls/io) {
+			print STDERR "---fetching livestream ($stream)...\n";
 			$response = $ua->get($stream);
 			if ($response->is_success) {
 				$plshtml = $response->decoded_content;
 			} else {
 				$plshtml = '';
 				print STDERR $response->status_line  if ($DEBUG);
-				print STDERR "\n..trying wget...\n"  if ($DEBUG);
-				$plshtml = `wget -t 2 -T 20 -O- -o /dev/null \"$stream\" 2>/dev/null `;
+				my $no_wget = system('wget','-V');
+				unless ($no_wget) {
+					print STDERR "\n..trying wget...\n"  if ($DEBUG);
+					$plshtml = `wget -t 2 -T 20 -O- -o /dev/null \"$stream\" 2>/dev/null `;
+				}
 			}
 			while ($plshtml =~ s#File\d+\=(\S+)##) {
 				print STDERR "-----6: Adding PLS stream ($1)!\n"  if ($DEBUG);
@@ -450,10 +525,17 @@ sub getURL   #LIKE GET, BUT ONLY RANDOMLY SELECT ONE TO RETURN:
 	my $self = shift;
 	my $arglist = (defined $_[0]) ? join('|',@_) : '';
 	my $idx = ($arglist =~ /\b\-?random\b/) ? int rand scalar @{$self->{'streams'}} : 0;
-	if ($arglist =~ /\b\-?noplaylists\b/ && ${$self->{'streams'}}[$idx] =~ /\.pls$/i) {
+	if ($arglist =~ /\b\-?noplaylists\b/ && ${$self->{'streams'}}[$idx] =~ /\.(pls|m3u8?)$/i) {
+		my $plType = $1;
 		my $firstStream = ${$self->{'streams'}}[$idx];
 		print STDERR "-getURL($idx): NOPLAYLISTS and (".${$self->{'streams'}}[$idx].")\n"  if ($DEBUG);
-		my $ua = LWP::UserAgent->new(@userAgentOps);		
+		my $ua = LWP::UserAgent->new(@userAgentOps);	
+		if ($firstStream =~ /\breciva\b/ && defined $self->{'_reciva_ssl_opts'}) {
+			foreach my $i (keys %{$self->{'_reciva_ssl_opts'}}) {
+				$ua->ssl_opts($i, $self->{'_default_ssl_opts'}->{$i});
+				print STDERR "--SSL OPTS SET2 ($i) BACK TO (".$self->{'_default_ssl_opts'}->{$i}.")!\n"  if ($DEBUG);
+			}
+		}
 		$ua->timeout($uops{'timeout'});
 		$ua->cookie_jar({});
 		$ua->env_proxy;
@@ -471,16 +553,30 @@ sub getURL   #LIKE GET, BUT ONLY RANDOMLY SELECT ONE TO RETURN:
 		}
 		my @lines = split(/\r?\n/, $html);
 		$firstStream = '';
-		my $firstTitle = '';
-		foreach my $line (@lines) {
-			if ($line =~ m#^\s*File\d+\=(.+)$#) {
-				$firstStream ||= $1;
-			} elsif ($line =~ m#^\s*Title\d+\=(.+)$#) {
-				$firstTitle ||= $1;
+		if ($plType =~ /pls/) {  #PLS:
+			my $firstTitle = '';
+			foreach my $line (@lines) {
+				if ($line =~ m#^\s*File\d+\=(.+)$#) {
+					$firstStream ||= $1;
+				} elsif ($line =~ m#^\s*Title\d+\=(.+)$#) {
+					$firstTitle ||= $1;
+				}
 			}
+			$self->{'title'} ||= $firstTitle;
+			print STDERR "-getURL(PLS): first=$firstStream= title=$firstTitle=\n"  if ($DEBUG);
+		} else {  #m3u8:
+			(my $urlpath = ${$self->{'streams'}}[$idx]) =~ s#[^\/]+$##;
+			foreach my $line (@lines) {
+				if ($line =~ m#^\s*([^\#].+)$#) {
+					my $urlpart = $1;
+					$urlpart =~ s#^\s+##;
+					$urlpart =~ s#^\/##;
+					$firstStream = ($urlpart =~ m#https?\:#) ? $urlpart : ($urlpath . '/' . $urlpart);
+					last;
+				}
+			}
+			print STDERR "-getURL(m3u?): first=$firstStream=\n"  if ($DEBUG);
 		}
-		$self->{'title'} ||= $firstTitle;
-		print STDERR "-getURL: first=$firstStream= title=$firstTitle=\n"  if ($DEBUG);
 		return $firstStream || ${$self->{'streams'}}[$idx];
 	}
 	return ${$self->{'streams'}}[$idx];
@@ -495,19 +591,19 @@ sub count
 sub getType
 {
 	my $self = shift;
-	return 'Reciva';  #URL TO THE STATION'S THUMBNAIL ICON, IF ANY.
+	return 'Reciva';  #STATION TYPE (FOR PARENT StreamFinder MODULE).
 }
 
 sub getID
 {
 	my $self = shift;
-	return $self->{'id'};  #URL TO THE STATION'S THUMBNAIL ICON, IF ANY.
+	return $self->{'id'};  #STATION'S RECIVA-ID.
 }
 
 sub getTitle
 {
 	my $self = shift;
-	return $self->{'title'};  #URL TO THE STATION'S TITLE(DESCRIPTION), IF ANY.
+	return $self->{'title'};  #STATION'S TITLE(DESCRIPTION), IF ANY.
 }
 
 sub getIconURL
@@ -524,6 +620,12 @@ sub getIconData
 	$ua->timeout($uops{'timeout'});
 	$ua->cookie_jar({});
 	$ua->env_proxy;
+	if ($self->{'iconurl'} =~ /\breciva\b/ && defined $self->{'_reciva_ssl_opts'}) {
+		foreach my $i (keys %{$self->{'_reciva_ssl_opts'}}) {
+			$ua->ssl_opts($i, $self->{'_default_ssl_opts'}->{$i});
+			print STDERR "--SSL OPTS SET3 ($i) BACK TO (".$self->{'_default_ssl_opts'}->{$i}.")!\n"  if ($DEBUG);
+		}
+	}
 	my $art_image = '';
 	my $response = $ua->get($self->{'iconurl'});
 	if ($response->is_success) {
@@ -557,6 +659,12 @@ sub getImageData
 	$ua->timeout($uops{'timeout'});
 	$ua->cookie_jar({});
 	$ua->env_proxy;
+	if ($self->{'imageurl'} =~ /\breciva\b/ && defined $self->{'_reciva_ssl_opts'}) {
+		foreach my $i (keys %{$self->{'_reciva_ssl_opts'}}) {
+			$ua->ssl_opts($i, $self->{'_default_ssl_opts'}->{$i});
+			print STDERR "--SSL OPTS SET4 ($i) BACK TO (".$self->{'_default_ssl_opts'}->{$i}.")!\n"  if ($DEBUG);
+		}
+	}
 	my $art_image = '';
 	my $response = $ua->get($self->{'imageurl'});
 	if ($response->is_success) {

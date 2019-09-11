@@ -35,9 +35,9 @@ use warnings::unused;
 #%EXPORT_TAGS = ( DEFAULT => [qw( &opt &prepare )]); # our %EXPORT_TAGS = ( 'all' => [ qw( ) ] );
 #@EXPORT   = qw(); # our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
-our @EXPORT = qw( retrieve report newretrieve newreport get_files );
+our @EXPORT = qw( newretrieve newreport get_files );
 
-$VERSION = '0.077';
+$VERSION = '0.081';
 $ABSTRACT = 'Sim::OPT::Report is the module used by Sim::OPT to retrieve simulation results.';
 
 #########################################################################################
@@ -59,6 +59,15 @@ sub newretrieve
   my $report = $main::report;
   my $simnetwork = $main::simnetwork;
   my $max_processes = $main::max_processes;
+
+	if ( $tofile eq "" )
+	{
+		$tofile = "./report.txt";
+	}
+	else
+	{
+		$tofile = "$mypath/$file-tofile.txt";
+	}
 
   $tee = new IO::Tee(\*STDOUT, ">>$tofile"); # GLOBAL
 
@@ -88,6 +97,8 @@ sub newretrieve
   my $resfile = $dt{resfile};
   my $flfile = $dt{flfile};
   my %vehicles = %{ $dt{vehicles} };
+  my $precious = $dt{precious};
+  my %inst = %{ $dt{inst} };
 
   my @simcases = @{ $dirfiles{simcases} }; ######
   my @simstruct = @{ $dirfiles{simstruct} }; ######
@@ -141,7 +152,7 @@ sub newretrieve
 
   my %to = %{ $d{to} };
   my $thisto = $to{to};
-  my %inst = %{ $d{inst} };
+  #my %inst = %{ $d{inst} };
   my $cleanto = $inst{$thisto};
 
 
@@ -846,6 +857,17 @@ sub newreport # This function retrieves the results of interest from the texts f
   my @maketabledata = @main::maketabledata;
   my @filter_columns = @main::filter_columns;
   my %notecases = %main::notecases;
+  my $winline;
+  my @winbag;
+
+	if ( $tofile eq "" )
+	{
+		$tofile = "./report.txt";
+	}
+	else
+	{
+		$tofile = "$mypath/$file-tofile.txt";
+	}
 
   $tee = new IO::Tee(\*STDOUT, ">>$tofile"); # GLOBAL
 
@@ -857,6 +879,8 @@ sub newreport # This function retrieves the results of interest from the texts f
   my $resfile = %{ $dt{resfile} };
   my $flfile = %{ $dt{flfile} };
   my %vehicles = %{ $dt{vehicles} };
+  my $precious = $dt{precious};
+  my %inst = %{ $dt{inst} };
 
   my @simcases = @{ $dirfiles{simcases} };
   my @simstruct = @{ $dirfiles{simstruct} };
@@ -907,8 +931,9 @@ sub newreport # This function retrieves the results of interest from the texts f
 
   my %to = %{ $d{to} };
   my $thisto = $to{to};
-  my %inst = %{ $d{inst} };
+  #my %inst = %{ $d{inst} };
   my $cleanto = $inst{$thisto};
+  my $is = $d{is};
 
   my $from = $d{from};
   my $toitem = $d{toitem};
@@ -927,18 +952,14 @@ sub newreport # This function retrieves the results of interest from the texts f
   my %dowhat = %{ $d{dowhat} };
   my $resfile = $d{resfile};
 
-
   my $direction = ${$dowhat{direction}}[$countcase][$countblock]; #NEW
   my $precomputed = $dowhat{precomputed};
   my @takecolumns = @{ $dowhat{takecolumns} }; #NEW
 
-
   my ( @repfilemem, @linecontent, @convey );
   $" = " ";
 
-
   say $tee "#Processing reports for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", instance " . ($countinstance + 1);
-
 
   open( REPLIST, ">>$replist" ) or die( "$!" );
   open( REPBLOCK, ">>$repblock" ) or die( "$!" );
@@ -1208,6 +1229,7 @@ sub newreport # This function retrieves the results of interest from the texts f
             $thing =~ s/^$oldhead/$newhead/ ;
           }
         }
+        push ( @winbag, $thing );
         print REPFILE $thing;
         print REPFILE ",";
         if ( $dirfiles{launching} eq "yes" )
@@ -1227,16 +1249,14 @@ sub newreport # This function retrieves the results of interest from the texts f
   } #END NEW. TAKE CARE.
   elsif ( $precomputed ne "" ) ############################NEW. END. TAKE CARE.
   {
-
   	my @precomputeds;
-	  if (not ( $precomputed eq "" ) ) ############################NEW. END. TAKE CARE.
-	  {
-	    open ( PRECOMPUTED, "$precomputed" ) or die;
-	    @precomputeds = <PRECOMPUTED>;
-	    close PRECOMPUTED;
-	  }
+	  open ( PRECOMPUTED, "$precomputed" ) or die;
+	  @precomputeds = <PRECOMPUTED>;
+	  close PRECOMPUTED;
 
-    my $touse = $cleanto; ### TAKE CARE!
+    my $touse = $is; ### TAKE CARE!
+
+    say $tee "TOUSE! $touse";
 
     my @box;
     foreach my $line ( @precomputeds )
@@ -1250,6 +1270,8 @@ sub newreport # This function retrieves the results of interest from the texts f
         $line = join( ",", @row );
         push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, $line );
         push( @box, $line );
+        $winline = $line;
+        last;
       }
     }
     @box = uniq( sort( @box ) );
@@ -1264,6 +1286,7 @@ sub newreport # This function retrieves the results of interest from the texts f
     say "#Reporting results for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance: writing $repfile. ";
   }
   close REPFILE;
+
   if ( $dirfiles{launching} eq "yes" )
   {
     close DIVERT;
@@ -1283,7 +1306,28 @@ sub newreport # This function retrieves the results of interest from the texts f
     say "JUMPING";
     next;
   }
-  return ( \@repcases, \@repstruct, $repfile, \@mergestruct, \@mergecases );
+
+  if ( $precious eq "" )
+  {
+    return ( \@repcases, \@repstruct, $repfile, \@mergestruct, \@mergecases );
+  }
+  else
+  {
+    if ( $precomputed eq "" )
+    {
+      say "RETURNING $winbag[-1]";
+      return ( $winbag[-1] );
+    }
+    else
+    {
+      chomp $winline;
+      $winline =~ s/(\s+)$// ;
+      $winline =~ s/(,+)$// ;
+      my @elts = split( ",", $winline );
+      say "RETURNING $elts[-1]";
+      return ( $elts[-1] );
+    }
+  }
 } # END SUB NEWREPORT;
 
 

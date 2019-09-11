@@ -64,6 +64,15 @@ METHODS
 
        PATABLE => "01.23.45.67.89.AB.CD.EF",
 
+    The following values are also returned, derived from the actual
+    register values as a convenience.
+
+       carrier_frequency => "800.000MHz",
+       channel_spacing   => "191.951.kHz",
+       deviation         => "47.607kHz",
+    
+       data_rate         => "115.1kbps",
+
  change_config
 
        $chip->change_config( %changes )->get
@@ -76,6 +85,14 @@ METHODS
     The following additional lowercase-named keys are also provided as
     shortcuts.
 
+      * band => STRING
+
+      A convenient shortcut to setting the FREQ and PATABLE configuration
+      to one of the standard ISM bands. The names of these bands are
+
+         433MHz
+         868MHz
+
       * mode => STRING
 
       A convenient shortcut to setting the configuration state to one of
@@ -86,13 +103,6 @@ METHODS
          GFSK-100kb
          MSK-250kb
          MSG-500kb
-
- carrier_frequency
-
-       $freq = $chip->carrier_frequency->get
-
-    Returns the calculated carrier frequency in Hz, from the FREQ config
-    register, presuming the default main XTAL frequency of 26MHz.
 
  read_marcstate
 

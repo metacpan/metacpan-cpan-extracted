@@ -2,17 +2,165 @@ NAME
     App::ProcUtils - Command line utilities related to processes
 
 VERSION
-    This document describes version 0.032 of App::ProcUtils (from Perl
-    distribution App-ProcUtils), released on 2019-07-04.
+    This document describes version 0.037 of App::ProcUtils (from Perl
+    distribution App-ProcUtils), released on 2019-09-11.
 
 SYNOPSIS
     This distribution provides the following command-line utilities:
+
+    *   proc-exists
+
+    *   proc-kill
+
+    *   proc-list
 
     *   proc-list-parents
 
     *   proc-table
 
 FUNCTIONS
+  exists
+    Usage:
+
+     exists(%args) -> [status, msg, payload, meta]
+
+    Check if processes that match criteria exists.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   cmdline_match => *re*
+
+    *   cmdline_not_match => *re*
+
+    *   code => *code*
+
+        Code is given Proc::ProcessTable::Process object, which is a hashref
+        containing items like "pid", "uid", etc. It should return true to
+        mean that a process matches.
+
+    *   exec_match => *re*
+
+    *   exec_not_match => *re*
+
+    *   logic => *str* (default: "AND")
+
+    *   pids => *array[unix::pid]*
+
+    *   quiet => *true*
+
+    *   uids => *array[unix::local_uid]*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  kill
+    Usage:
+
+     kill(%args) -> [status, msg, payload, meta]
+
+    Kill processes that match criteria.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   cmdline_match => *re*
+
+    *   cmdline_not_match => *re*
+
+    *   code => *code*
+
+        Code is given Proc::ProcessTable::Process object, which is a hashref
+        containing items like "pid", "uid", etc. It should return true to
+        mean that a process matches.
+
+    *   exec_match => *re*
+
+    *   exec_not_match => *re*
+
+    *   logic => *str* (default: "AND")
+
+    *   pids => *array[unix::pid]*
+
+    *   signal => *unix::signal* (default: "TERM")
+
+    *   uids => *array[unix::local_uid]*
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list
+    Usage:
+
+     list(%args) -> [status, msg, payload, meta]
+
+    List processes that match criteria.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   cmdline_match => *re*
+
+    *   cmdline_not_match => *re*
+
+    *   code => *code*
+
+        Code is given Proc::ProcessTable::Process object, which is a hashref
+        containing items like "pid", "uid", etc. It should return true to
+        mean that a process matches.
+
+    *   detail => *true*
+
+        Return detailed records instead of just PIDs.
+
+    *   exec_match => *re*
+
+    *   exec_not_match => *re*
+
+    *   logic => *str* (default: "AND")
+
+    *   pids => *array[unix::pid]*
+
+    *   uids => *array[unix::local_uid]*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
   list_parents
     Usage:
 
@@ -71,6 +219,10 @@ BUGS
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Proc::Find is a similar module; App::ProcUtils provides the CLI scripts
+    as well as function interface.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

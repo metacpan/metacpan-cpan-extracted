@@ -29,19 +29,19 @@ no_index:
 provides:
   VMware::vCloudDirector2:
     file: lib/VMware/vCloudDirector2.pm
-    version: '0.103'
+    version: '0.104'
   VMware::vCloudDirector2::API:
     file: lib/VMware/vCloudDirector2/API.pm
-    version: '0.103'
+    version: '0.104'
   VMware::vCloudDirector2::Error:
     file: lib/VMware/vCloudDirector2/Error.pm
-    version: '0.103'
+    version: '0.104'
   VMware::vCloudDirector2::Link:
     file: lib/VMware/vCloudDirector2/Link.pm
-    version: '0.103'
+    version: '0.104'
   VMware::vCloudDirector2::Object:
     file: lib/VMware/vCloudDirector2/Object.pm
-    version: '0.103'
+    version: '0.104'
 requires:
   Const::Fast: '0'
   Cpanel::JSON::XS: '0'
@@ -65,7 +65,7 @@ requires:
 resources:
   homepage: https://github.com/Perl-VMware/VMware-vCloudDirector2
   repository: https://github.com/Perl-VMware/VMware-vCloudDirector2.git
-version: '0.103'
+version: '0.104'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -130,7 +130,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.103'
+          tag: '0.104'
           tag_format: '%v'
           tag_message: '%v'
         Dist::Zilla::Role::Git::Repo:

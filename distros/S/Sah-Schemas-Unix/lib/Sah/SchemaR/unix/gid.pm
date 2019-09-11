@@ -1,7 +1,7 @@
 package Sah::SchemaR::unix::gid;
 
-our $DATE = '2019-07-12'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-09-11'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 our $rschema = ["int",[{description=>"\nSee also `posint` for integers that start from 1.\n\n",min=>0,summary=>"Non-negative integer (0, 1, 2, ...)"},{description=>"\n",summary=>"Group identifier (GID)"}],["uint","int"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::unix::gid - Group identifier (GID)
 
 =head1 VERSION
 
-This document describes version 0.004 of Sah::SchemaR::unix::gid (from Perl distribution Sah-Schemas-Unix), released on 2019-07-12.
+This document describes version 0.005 of Sah::SchemaR::unix::gid (from Perl distribution Sah-Schemas-Unix), released on 2019-09-11.
 
 =head1 DESCRIPTION
 

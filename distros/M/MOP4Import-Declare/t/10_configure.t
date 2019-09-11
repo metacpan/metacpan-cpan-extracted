@@ -91,12 +91,15 @@ END
        ok {$obj->gemini   eq "baz"};
     };
 
-    it "should wrong argument for configure", sub {
+    it "should raise error for wrong argument", sub {
       expect(do {eval q{Zodiac1->new(undef, 'foo')}; $@})
 	->to_match(qr/^Undefined option name for class Zodiac1/);
 
       expect(do {eval q{Zodiac1->new(foo => 'bar')}; $@})
 	->to_match(qr/^Unknown option for class Zodiac1: foo/);
+
+      expect(do {eval q{Zodiac1->new(_gemini_cnt => 100)}; $@})
+	->to_match(qr/^Private option is prohibited for class Zodiac1: _gemini_cnt/);
     };
 
     it "should call onconfigure_zzz hook ", sub {
@@ -123,11 +126,49 @@ package MyZodiac; use Zodiac1 -as_base;
   describe "use .. [fields [f => \@spec],...]", sub {
     describe "spec: default => 'value'", sub {
       it "should be accepted"
-	, no_error q{package F_def; use Zodiac1 -as_base, [fields => [f => default => 'defval']]};
+        , no_error q{package F_def; use Zodiac1 -as_base, -inc, [fields => [fmt => default => 'tsv']]};
 
       it "should be set as default value", sub {
-	ok {F_def->new->f eq 'defval'};
+	ok {F_def->new->fmt eq 'tsv'};
+      };
+
+      it "should be changed in regular manner", sub {
+	ok {F_def->new(fmt => 'xlsx')->fmt eq 'xlsx'};
       }
+    };
+
+    describe "before/after hook for configure_default", sub {
+      it "should be defined", no_error q{
+package F_def_with_hooks;
+use F_def -as_base
+  , [fields =>
+       [x => default => 'X'],
+       [y => default => 'Y'],
+       [z => default => 'Z'],
+       'value', 'x_is_explicitly_defined',
+    ]
+  ;
+
+sub before_configure_default {
+  (my MY $self) = @_;
+  $self->{x_is_explicitly_defined} = defined $self->{x};
+}
+
+sub after_configure_default {
+  (my MY $self) = @_;
+  $self->{value} //= "$self->{x}$self->{y}$self->{z}";
+}
+
+};
+
+      it "should allow defining derived value in after_configure_hook", sub {
+        expect(F_def_with_hooks->new->value)->to_be("XYZ");
+      };
+
+      it "should allow use of definedness of options in before_configure_hook", sub {
+        expect(F_def_with_hooks->new(x => 8)->x_is_explicitly_defined)->to_be(1);
+      };
+
     };
 
     describe "spec: weakref => 1", sub {
@@ -139,7 +180,82 @@ package MyZodiac; use Zodiac1 -as_base;
 	ok {$obj->[0] = F_weak->new(f => $obj); isweak($obj->[0]->{f})};
       }
     };
-    
+  };
+
+  describe 'copy constructor and such', sub {
+
+    describe 'cf_configs()', sub {
+
+      it "should list configured value only", sub {
+        my $obj = F_def->new(aquarius => 1, scorpio => 2);
+
+        expect([$obj->cf_configs])->to_be([aquarius => 1, scorpio => 2]);
+      };
+    };
+
+    describe 'cf_public_fields()', sub {
+      my $obj = F_def->new(aquarius => 1, scorpio => 2);
+
+      it "should list all public fields", sub {
+        expect([$obj->cf_public_fields])->to_be([qw/aquarius fmt gemini scorpio/]);
+      };
+
+      it "should be applicable to class too", sub {
+        expect([ref($obj)->cf_public_fields])->to_be([qw/aquarius fmt gemini scorpio/]);
+      };
+    };
+
+    describe 'my $clone = $original->new($original)', sub {
+      my $original = Zodiac1->new
+        (aquarius => ["foo"], scorpio => {bar => 1}, gemini => "baz");
+
+      my $clone = $original->new($original);
+
+      describe 'modification to clone', sub {
+
+        push @{$clone->{aquarius}}, 'FOO';
+
+        expect($clone->{aquarius})->to_be(['foo', 'FOO']);
+
+        it "should not affect to original", sub {
+          expect($original->{aquarius})->to_be(['foo']);
+        };
+      };
+
+      describe 'modification to original', sub {
+        $original->{scorpio}{BAR} = 2;
+
+        expect($original->{scorpio})->to_be({bar => 1, BAR => 2});
+
+        it "should not affect to clone", sub {
+          expect($clone->{scorpio})->to_be({bar => 1});
+        };
+      }
+    };
+  };
+
+  describe "fields with dot: [fields => qw/api.token/]", sub {
+    it "should have no error", no_error q{
+package MyConnector;
+use MOP4Import::Base::Configure -as_base, -inc
+    , [fields => qw/api.token/];
+
+sub common_header {
+  (my MY $self) = @_;
+('Content-Type' => 'application/json'
+, Authorization => "Bearer $self->{'api.token'}");
+}
+
+};
+
+    it "should be configured successfully", sub {
+
+      my $obj = MyConnector->new('api.token' => 'XXXXYYYY');
+
+      expect([$obj->common_header])->to_be([qw(Content-Type application/json Authorization) => "Bearer XXXXYYYY"]);
+
+    };
+
   };
 };
 

@@ -3,8 +3,6 @@ package Net::SecurityCenter;
 use warnings;
 use strict;
 
-use Carp;
-
 use Net::SecurityCenter::REST;
 use Net::SecurityCenter::Error;
 
@@ -24,7 +22,7 @@ require Net::SecurityCenter::API::System;
 require Net::SecurityCenter::API::User;
 require Net::SecurityCenter::API::Zone;
 
-our $VERSION = '0.201';
+our $VERSION = '0.202';
 
 #-------------------------------------------------------------------------------
 # CONSTRUCTOR

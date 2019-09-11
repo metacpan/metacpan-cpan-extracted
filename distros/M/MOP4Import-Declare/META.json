@@ -4,13 +4,13 @@
       "KOBAYASHI, Hiroaki <hkoba@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4214",
+   "generated_by" : "Module::Build version 0.4229",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "MOP4Import-Declare",
    "prereqs" : {
@@ -22,7 +22,7 @@
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.42",
+            "Module::Build" : "0",
             "Module::Build::Pluggable" : "0",
             "Module::Build::Pluggable::CPANfile" : "0.05",
             "Module::CPANfile" : "0",
@@ -30,14 +30,27 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Cpanel::JSON::XS" : "4.05",
+            "File::AddInc" : "0",
+            "Module::Runtime" : "0",
+            "YAML::Syck" : "0"
+         },
          "requires" : {
+            "JSON::MaybeXS" : "0",
             "perl" : "5.010",
             "rlib" : "0"
          }
       },
       "test" : {
          "requires" : {
-            "Test::Kantan" : "0"
+            "Capture::Tiny" : "0",
+            "Cpanel::JSON::XS" : "4.05",
+            "Test::Exit" : "0",
+            "Test::Kantan" : "0",
+            "Test::More" : "1.3021",
+            "Test::Output" : "0",
+            "YAML::Syck" : "0"
          }
       }
    },
@@ -45,18 +58,27 @@
       "MOP4Import::Base::CLI" : {
          "file" : "Base/CLI.pm"
       },
+      "MOP4Import::Base::CLI_JSON" : {
+         "file" : "Base/CLI_JSON.pm"
+      },
+      "MOP4Import::Base::CLI_Opts" : {
+         "file" : "Base/CLI_Opts.pm"
+      },
       "MOP4Import::Base::Configure" : {
          "file" : "Base/Configure.pm"
       },
       "MOP4Import::Declare" : {
          "file" : "Declare.pm",
-         "version" : "0.004"
+         "version" : "0.050"
       },
       "MOP4Import::Declare::Type" : {
          "file" : "Declare/Type.pm"
       },
       "MOP4Import::FieldSpec" : {
          "file" : "FieldSpec.pm"
+      },
+      "MOP4Import::NamedCodeAttributes" : {
+         "file" : "NamedCodeAttributes.pm"
       },
       "MOP4Import::Opts" : {
          "file" : "Opts.pm"
@@ -76,15 +98,34 @@
       "MOP4Import::Util" : {
          "file" : "Util.pm"
       },
+      "MOP4Import::Util::CallTester" : {
+         "file" : "Util/CallTester.pm"
+      },
+      "MOP4Import::Util::CommentedJson" : {
+         "file" : "Util/CommentedJson.pm"
+      },
       "MOP4Import::Util::FindMethods" : {
          "file" : "Util/FindMethods.pm"
+      },
+      "MOP4Import::Util::JSON_TYPE" : {
+         "file" : "Util/JSON_TYPE.pm"
+      },
+      "MOP4Import::Util::compat_double_diamond" : {
+         "file" : "Util/compat_double_diamond.pm"
+      },
+      "MOP4Import::Util::compat_double_diamond_5_20" : {
+         "file" : "Util/compat_double_diamond_5_20.pm"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "license" : [
          "http://dev.perl.org/licenses/"
-      ]
+      ],
+      "repository" : {
+         "url" : "https://github.com/hkoba/perl-mop4import-declare"
+      }
    },
-   "version" : "0.004"
+   "version" : "0.050",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

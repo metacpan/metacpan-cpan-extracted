@@ -2,8 +2,8 @@ NAME
     Perinci::Exporter - An exporter that groks Rinci metadata
 
 VERSION
-    This document describes version 0.083 of Perinci::Exporter (from Perl
-    distribution Perinci-Exporter), released on 2019-09-10.
+    This document describes version 0.084 of Perinci::Exporter (from Perl
+    distribution Perinci-Exporter), released on 2019-09-11.
 
 SYNOPSIS
     Exporting:

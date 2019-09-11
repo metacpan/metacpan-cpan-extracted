@@ -58,7 +58,7 @@ BEGIN {
        /;
 }
 
-use MOP4Import::Declare -as_base, qw/Opts/
+use MOP4Import::Declare -as_base, qw/Opts m4i_opts/
   , [fields => @PSGI_FIELDS]
   , [alias => Env => __PACKAGE__] # XXX: Not [as => 'Env'].
   ;
@@ -66,7 +66,7 @@ use MOP4Import::Declare -as_base, qw/Opts/
 sub import {
   (my $myPack, my (@more_fields)) = @_;
 
-  my Opts $opts = Opts->new([caller]);
+  my Opts $opts = m4i_opts([caller]);
 
   my $name = 'Env';
 
@@ -74,10 +74,9 @@ sub import {
 
   my $innerClass = join("::", $opts->{destpkg}, $name);
 
-  $myPack->declare_alias($opts, $opts->{destpkg}, $name, $innerClass);
+  $myPack->declare_alias($opts, $name, $innerClass);
 
   $myPack->dispatch_declare($opts->with_objpkg($innerClass)
-			    , $opts->{destpkg}
 			    , [base => $opts->{basepkg}]
 			    , [fields => @more_fields]
 			  );
@@ -105,7 +104,7 @@ MOP4Import::PSGIEnv - define Env class for PSGI, with extensions.
 =head1 DESCRIPTION
 
 MOP4Import::PSGIEnv is yet another protocol implementation
-of L<MOP4Import|MOP4Import::Intro> family.
+of L<MOP4Import|MOP4Import::Declare> family.
 
 This module simply defines C<Env> class.
 Standard L<PSGI $env|PSGI/The Environment> is already defined.

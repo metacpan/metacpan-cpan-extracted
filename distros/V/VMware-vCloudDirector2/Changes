@@ -1,5 +1,10 @@
 Revision history for VMware-vCloudDirector2
 
+0.104     2019-09-10 17:17:11+01:00 Europe/London
+	- Give more clues when there is an error returned
+	- Improve path generation for admin objects
+	- Refetch object now forces links to be regenerated
+
 0.103     2019-09-09 14:33:32+01:00 Europe/London
 	- Ensured that fetch_admin_object works correctly
 

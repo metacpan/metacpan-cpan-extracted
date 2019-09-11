@@ -15,5 +15,5 @@ t/dist/dist.ini
 t/dist/lib/Sample/Map.pm
 t/dist/t/routes.txt
 t/exp-map-test.txt
-t/manifest.t
-t/pod.t
+xt/manifest.t
+xt/pod.t

@@ -4,13 +4,13 @@
       "Sergey Poznyakoff <gray@gnu.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
    "license" : [
       "gpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "App-Acmeman",
    "no_index" : {
@@ -19,52 +19,42 @@
          "inc"
       ]
    },
-   "prereqs" : {
-      "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
-      "configure" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
-      "runtime" : {
-         "requires" : {
-            "perl" : "5.016001"
-         }
-      }
-   },
    "provides" : {
       "App::Acmeman" : {
          "file" : "lib/App/Acmeman.pm",
-         "version" : "2.00"
+         "version" : "2.02"
       },
       "App::Acmeman::Apache::Layout" : {
-         "file" : "lib/App/Acmeman/Apache/Layout.pm"
+         "file" : "lib/App/Acmeman/Apache/Layout.pm",
+         "version" : 0
       },
       "App::Acmeman::Config" : {
-         "file" : "lib/App/Acmeman/Config.pm"
+         "file" : "lib/App/Acmeman/Config.pm",
+         "version" : 0
       },
       "App::Acmeman::Domain" : {
          "file" : "lib/App/Acmeman/Domain.pm",
          "version" : "1.00"
       },
       "App::Acmeman::Log" : {
-         "file" : "lib/App/Acmeman/Log.pm"
+         "file" : "lib/App/Acmeman/Log.pm",
+         "version" : 0
       },
       "App::Acmeman::Source" : {
-         "file" : "lib/App/Acmeman/Source.pm"
+         "file" : "lib/App/Acmeman/Source.pm",
+         "version" : 0
       },
       "App::Acmeman::Source::Apache" : {
-         "file" : "lib/App/Acmeman/Source/Apache.pm"
+         "file" : "lib/App/Acmeman/Source/Apache.pm",
+         "version" : 0
       },
       "App::Acmeman::Source::File" : {
-         "file" : "lib/App/Acmeman/Source/File.pm"
+         "file" : "lib/App/Acmeman/Source/File.pm",
+         "version" : 0
       },
       "App::Acmeman::Source::Null" : {
-         "file" : "lib/App/Acmeman/Source/Null.pm"
+         "file" : "lib/App/Acmeman/Source/Null.pm",
+         "version" : 0
       }
    },
    "release_status" : "stable",
@@ -75,6 +65,5 @@
          "web" : "http://git.gnu.org.ua/cgit/acmeman.git/"
       }
    },
-   "version" : "2.00",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "2.02"
 }

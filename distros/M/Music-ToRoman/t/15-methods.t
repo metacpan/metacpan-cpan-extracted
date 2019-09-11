@@ -11,28 +11,28 @@ use Test::More;
 
 use_ok 'Music::ToRoman';
 
-my @notes = qw/ C C# Db D D# Eb E Fb E# F F# Gb G G# Ab A A# Bb B B# Cb /;
+my @notes = qw/ C C# Db D D# Eb E Fb E# Fb F F# Gb G G# Ab A A# Bb B B# Cb /;
 
 my @romans = qw/ I bii ii biii iii IV bV V bvi vi bvii vii /;
 
 my %expected = (
     'C'  => 'bii',
-    'C#' => '', # ii
+    'C#' => 'ii',
     'Db' => 'ii',
     'D'  => 'biii',
-    'D#' => '', # iii
+    'D#' => 'iii',
     'Eb' => 'iii',
     'E'  => '', # IV
     'Fb' => 'IV',
     'E#' => 'bV',
     'F'  => 'bV',
-    'F#' => '', # V
+    'F#' => 'V',
     'Gb' => 'V',
     'G'  => 'bvi',
-    'G#' => '', # vi
+    'G#' => 'vi',
     'Ab' => 'vi',
     'A'  => 'bvii',
-    'A#' => '', # vii
+    'A#' => 'vii',
     'Bb' => 'vii',
     'B'  => '', # I
     'B#' => '', # bii
@@ -69,22 +69,22 @@ for my $roman ( @romans ) {
 
 %expected = (
     'C'  => 'vii',
-    'C#' => '', # I
+    'C#' => 'I',
     'Db' => 'I',
     'D'  => 'bii',
-    'D#' => '', # ii
+    'D#' => 'ii',
     'Eb' => 'ii',
     'E'  => 'biii',
     'Fb' => 'biii',
-    'E#' => '', # iii
+    'E#' => 'iii',
     'F'  => 'iii',
-    'F#' => '', # IV
+    'F#' => 'IV',
     'Gb' => 'IV',
     'G'  => 'bV',
-    'G#' => '', # V
+    'G#' => 'V',
     'Ab' => 'V',
     'A'  => 'bvi',
-    'A#' => '', # vi
+    'A#' => 'vi',
     'Bb' => 'vi',
     'B'  => 'bvii',
     'B#' => '', # vii
@@ -120,27 +120,27 @@ for my $roman ( @romans ) {
 }
 
 %expected = (
-    'C'  => 'vi', # 
-    'C#' => 'bvii', # 
-    'Db' => 'bvii', # 
-    'D'  => 'vii', # 
-    'D#' => '', # I
-    'Eb' => 'I', # 
-    'E'  => 'bii', # 
-    'Fb' => 'bii', # 
+    'C'  => 'vi',
+    'C#' => 'bvii',
+    'Db' => 'bvii',
+    'D'  => 'vii',
+    'D#' => 'I',
+    'Eb' => 'I',
+    'E'  => 'bii',
+    'Fb' => 'bii',
     'E#' => '', # ii
-    'F'  => 'ii', # 
-    'F#' => 'biii', # 
-    'Gb' => 'biii', # 
-    'G'  => 'iii', # 
-    'G#' => '', # IV
-    'Ab' => 'IV', # 
-    'A'  => 'bV', # 
-    'A#' => '', # V
-    'Bb' => 'V', # 
-    'B'  => 'bvi', # 
+    'F'  => 'ii',
+    'F#' => 'biii',
+    'Gb' => 'biii',
+    'G'  => 'iii',
+    'G#' => 'IV',
+    'Ab' => 'IV',
+    'A'  => 'bV',
+    'A#' => 'V',
+    'Bb' => 'V',
+    'B'  => 'bvi',
     'B#' => '', # vi
-    'Cb' => 'bvi', # 
+    'Cb' => 'bvi',
 );
 
 %values = ();
@@ -172,27 +172,27 @@ for my $roman ( @romans ) {
 }
 
 %expected = (
-    'C'  => 'bvi', # 
-    'C#' => '', # vi
-    'Db' => 'vi', # 
-    'D'  => 'bvii', # 
-    'D#' => '', # vii
-    'Eb' => 'vii', # 
+    'C'  => 'bvi',
+    'C#' => 'vi',
+    'Db' => 'vi',
+    'D'  => 'bvii',
+    'D#' => 'vii',
+    'Eb' => 'vii',
     'E'  => '', # I
-    'Fb' => 'I', # 
-    'E#' => 'bii', # 
-    'F'  => 'bii', # 
-    'F#' => '', # ii
-    'Gb' => 'ii', # 
-    'G'  => 'biii', # 
-    'G#' => '', # iii
-    'Ab' => 'iii', # 
+    'Fb' => 'I',
+    'E#' => 'bii',
+    'F'  => 'bii',
+    'F#' => 'ii',
+    'Gb' => 'ii',
+    'G'  => 'biii',
+    'G#' => 'iii',
+    'Ab' => 'iii',
     'A'  => '', # IV
     'A#' => '', # bV
     'Bb' => '', # bV
     'B'  => '', # V
     'B#' => '', # bvi
-    'Cb' => 'V', # 
+    'Cb' => 'V',
 );
 
 %values = ();
@@ -227,27 +227,27 @@ SKIP: {
 };
 
 %expected = (
-    'C'  => 'bV', # 
-    'C#' => '', # V
-    'Db' => 'V', # 
-    'D'  => 'bvi', # 
-    'D#' => '', # vi
-    'Eb' => 'vi', # 
-    'E'  => 'bvii', # 
-    'Fb' => 'bvii', # 
-    'E#' => 'vii', # *
-    'F'  => 'vii', # 
-    'F#' => '', # I
-    'Gb' => 'I', # 
-    'G'  => 'bii', # 
-    'G#' => '', # ii
-    'Ab' => 'ii', # 
-    'A'  => 'biii', # 
-    'A#' => '', # iii
-    'Bb' => 'iii', # 
+    'C'  => 'bV',
+    'C#' => 'V',
+    'Db' => 'V',
+    'D'  => 'bvi',
+    'D#' => 'vi',
+    'Eb' => 'vi',
+    'E'  => 'bvii',
+    'Fb' => 'bvii',
+    'E#' => 'vii',
+    'F'  => 'vii',
+    'F#' => 'I',
+    'Gb' => 'I',
+    'G'  => 'bii',
+    'G#' => 'ii',
+    'Ab' => 'ii',
+    'A'  => 'biii',
+    'A#' => 'iii',
+    'Bb' => 'iii',
     'B'  => '', # IV
     'B#' => '', # bV
-    'Cb' => 'IV', # 
+    'Cb' => 'IV',
 );
 
 %values = ();
@@ -279,27 +279,27 @@ for my $roman ( @romans ) {
 }
 
 %expected = (
-    'C'  => 'iii', # 
-    'C#' => '', # IV
-    'Db' => 'IV', # 
-    'D'  => 'bV', # 
-    'D#' => '', # V
-    'Eb' => 'V', # 
-    'E'  => 'bvi', # 
-    'Fb' => 'bvi', # 
+    'C'  => 'iii',
+    'C#' => 'IV',
+    'Db' => 'IV',
+    'D'  => 'bV',
+    'D#' => 'V',
+    'Eb' => 'V',
+    'E'  => 'bvi',
+    'Fb' => 'bvi',
     'E#' => '', # vi
-    'F'  => 'vi', # 
-    'F#' => 'bvii', # 
-    'Gb' => 'bvii', # 
-    'G'  => 'vii', # 
-    'G#' => '', # I
-    'Ab' => 'I', # 
-    'A'  => 'bii', # 
-    'A#' => '', # ii
-    'Bb' => 'ii', # 
-    'B'  => 'biii', # 
+    'F'  => 'vi',
+    'F#' => 'bvii',
+    'Gb' => 'bvii',
+    'G'  => 'vii',
+    'G#' => 'I',
+    'Ab' => 'I',
+    'A'  => 'bii',
+    'A#' => 'ii',
+    'Bb' => 'ii',
+    'B'  => 'biii',
     'B#' => '', # iii
-    'Cb' => 'biii', # 
+    'Cb' => 'biii',
 );
 
 %values = ();
@@ -331,27 +331,27 @@ for my $roman ( @romans ) {
 }
 
 %expected = (
-    'C'  => 'ii', # 
-    'C#' => 'biii', # 
-    'Db' => 'biii', # 
-    'D'  => 'iii', # 
-    'D#' => '', # IV
-    'Eb' => 'IV', # 
-    'E'  => 'bV', # 
-    'Fb' => 'bV', # 
+    'C'  => 'ii',
+    'C#' => 'biii',
+    'Db' => 'biii',
+    'D'  => 'iii',
+    'D#' => 'IV',
+    'Eb' => 'IV',
+    'E'  => 'bV',
+    'Fb' => 'bV',
     'E#' => '', # V
-    'F'  => 'V', # 
-    'F#' => 'bvi', # 
-    'Gb' => 'bvi', # 
-    'G'  => 'vi', # 
-    'G#' => 'bvii', # 
-    'Ab' => 'bvii', # 
-    'A'  => 'vii', # 
-    'A#' => '', # I
-    'Bb' => 'I', # 
-    'B'  => 'bii', # 
+    'F'  => 'V',
+    'F#' => 'bvi',
+    'Gb' => 'bvi',
+    'G'  => 'vi',
+    'G#' => 'bvii',
+    'Ab' => 'bvii',
+    'A'  => 'vii',
+    'A#' => 'I',
+    'Bb' => 'I',
+    'B'  => 'bii',
     'B#' => '', # ii
-    'Cb' => 'bii', # 
+    'Cb' => 'bii',
 );
 
 %values = ();

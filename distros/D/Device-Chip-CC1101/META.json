@@ -32,7 +32,7 @@
    "provides" : {
       "Device::Chip::CC1101" : {
          "file" : "lib/Device/Chip/CC1101.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -41,6 +41,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -1,11 +1,20 @@
 /*---------------------------------------------------------------------
- $Header: /Perl/OlleDB/connect.h 2     08-01-05 21:26 Sommar $
+ $Header: /Perl/OlleDB/connect.h 3     19-07-08 22:36 Sommar $
 
   Implements the connection routines on Win32::SqlServer.
 
-  Copyright (c) 2004-2008   Erland Sommarskog
+  Copyright (c) 2004-2019   Erland Sommarskog
 
   $History: connect.h $
+ * 
+ * *****************  Version 3  *****************
+ * User: Sommar       Date: 19-07-08   Time: 22:36
+ * Updated in $/Perl/OlleDB
+ * Added function to get SQL version and current database from the Init
+ * object and call this on connect. When server is changed, we need to
+ * forget SQL Server version, current database and the coepages has. Split
+ * setup_sesion into setup_datasrc and setup_session. as the data source
+ * is now set up in initbatch.
  * 
  * *****************  Version 2  *****************
  * User: Sommar       Date: 08-01-05   Time: 21:26
@@ -29,8 +38,12 @@ extern void setloginproperty(SV   * olle_ptr,
                              char * prop_name,
                              SV   * prop_value);
 
-// Sets up the datasrc and session pointers and implements Auto-Connect.
+// Sets up the datasrc pointer and implements Auto-Connect.
+extern BOOL setup_datasrc(SV * olle_ptr);
+
+// Sets up the session pointer..
 extern BOOL setup_session(SV * olle_ptr);
+
 
 // $X->disconncet
 extern void disconnect(SV * olle_ptr);

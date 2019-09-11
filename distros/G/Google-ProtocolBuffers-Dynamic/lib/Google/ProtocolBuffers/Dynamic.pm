@@ -9,7 +9,7 @@ use Exporter ();
 # @EXPORT_OK/%EXPORT_TAGS are set up in XS
 *import = \&Exporter::import;
 
-our $VERSION = '0.25'; # VERSION
+our $VERSION = '0.26'; # VERSION
 
 XSLoader::load(__PACKAGE__);
 
@@ -87,7 +87,7 @@ Google::ProtocolBuffers::Dynamic - fast and complete protocol buffer implementat
 
 =head1 VERSION
 
-version 0.25
+version 0.26
 
 =head1 SYNOPSIS
 
@@ -631,6 +631,13 @@ Enabled by default.
 
 Return blessed objects when decoding. When disabled, plain hashes are
 returned.
+
+=head2 fail_ref_coercion
+
+Throws an error when a non-overloaded reference is passsed as the value
+of a non-message field.
+
+Not available for Perl 5.12 or older.
 
 =head1 KNOWN BUGS
 

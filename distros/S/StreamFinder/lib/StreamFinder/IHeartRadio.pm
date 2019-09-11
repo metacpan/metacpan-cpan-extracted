@@ -22,8 +22,8 @@ file.
 
 	use StreamFinder::IHeartRadio;
 
-	my $station = new StreamFinder::IHeartRadio(<url>,
-			'secure_shoutcast', 'secure', 'any', '!rtmp');
+	my $station = new StreamFinder::IHeartRadio(<url>, -keep => 
+			{'secure_shoutcast', 'secure', 'any'}, -skip => 'rtmp');
 
 	die "Invalid URL or no streams found!\n"  unless ($station);
 
@@ -38,6 +38,10 @@ file.
 	my $stationTitle = $station->getTitle();
 	
 	print "Title=$stationTitle\n";
+	
+	my $stationDescription = $station->getTitle('desc');
+	
+	print "Description=$stationDescription\n";
 	
 	my $stationID = $station->getID();
 
@@ -75,10 +79,10 @@ file.
 
 =head1 DESCRIPTION
 
-StreamFinder::IHeartRadio accepts a valid radio station URL on IHeartRadio.com 
-and returns the actual stream URL(s) and cover art icon for that station.  
+StreamFinder::IHeartRadio accepts a valid radio station or podcast ID or URL on 
+IHeartRadio.com and returns the actual stream URL(s), title, and cover art icon.  
 The purpose is that one needs one of these URLs in order to have the option to 
-stream the station in one's own choice of audio player software rather than 
+stream the station in one's own choice of media player software rather than 
 using their web browser and accepting any / all flash, ads, javascript, 
 cookies, trackers, web-bugs, and other crapware that can come with that method 
 of playing.  The author uses his own custom all-purpose media player called 
@@ -101,7 +105,9 @@ I<-keep> and I<-skip> specify a list of one or more I<streamtypes> to either
 include or skip respectively.  The list for each can be either a comma-separated 
 string or an array reference ([...]) of stream types, in the order they should be 
 returned.  Each stream type in the list can be one of:  any, secure, secure_pls, 
-pls, secure_hls, hls, secure_shortcast, shortcast, secure_rtmp, rtmp, etc.  
+pls, secure_hls, hls, secure_shortcast, shortcast, secure_rtmp, rtmp, (I<ext>, 
+ie. mp4) etc.  
+
 NOTE:  This is now the preferred method over the DEPRECIATED one below.  If using 
 this method, do NOT include the inverter ("!") in front of the stream types, as 
 this is not used - these should be put in the I<-skip> list now.  The method 
@@ -109,17 +115,15 @@ below will be REMOVED in a later version soon!
 
 DEPRECIATED:  use The optional I<streamtype> can be one of:  any, secure, 
 secure_pls, pls, secure_hls, hls, secure_shortcast, shortcast, secure_rtmp, 
-rtmp, etc.  More than one value can be specified to control order of search.  
-A I<streamtype> can be preceeded by an exclamantion point ("!") to reject that 
-type of stream.  If "any" appears in the list, it should be the last specifier 
-without a "!" preceeding it, and itself should not be preceeded with a "!" 
-(inverter)!  
-
-For example, the list:  'secure_shoutcast', 'secure', 'any', '!rtmp' 
-would try to find a "secure_shoutcast" (https) shortcast stream, if none found, 
-would then look for any secure (https) stream, failing that, would look for 
-any valid stream.  All the while skipping any that are "rtmp" 
-streams.
+rtmp etc.  More than one value can be specified to control 
+order of search.  A I<streamtype> can be preceeded by an exclamantion point 
+("!") to reject that type of stream.  If "any" appears in the list, it should 
+be the last specifier without a "!" preceeding it, and itself should not be 
+preceeded with a "!" (inverter)!  For example, the list:  'secure_shoutcast', 
+'secure', 'any', '!rtmp' would try to find a "secure_shoutcast" (https) 
+shortcast stream, if none found, would then look for any secure (https) 
+stream, failing that, would look for any valid stream.  All the while 
+skipping any that are "rtmp" streams.
 
 =item $station->B<get>()
 
@@ -130,25 +134,25 @@ Returns an array of strings representing all stream urls found.
 Similar to B<get>() except it only returns a single stream representing 
 the first valid stream found.  
 
-Current options are:  I<-random> and I<-noplaylists>.  By default, the 
-first ("best"?) stream is returned.  If I<-random> is specified, then 
+Current options are:  I<"random"> and I<"noplaylists">.  By default, the 
+first ("best"?) stream is returned.  If I<"random"> is specified, then 
 a random one is selected from the list of streams found.  
-If I<-noplaylists> is specified, and the stream to be returned is a 
-"playlist" (.pls extension), it is first fetched and the first entry 
+If I<"noplaylists"> is specified, and the stream to be returned is a 
+"playlist" (.pls or .m3u? extension), it is first fetched and the first entry 
 in the playlist is returned.  This is needed by Fauxdacious Mediaplayer.
 
 =item $station->B<count>()
 
 Returns the number of streams found for the station.
 
-=item $station->B<getID>([ 'iheart' | 'fccid' ])
+=item $station->B<getID>(['fccid'])
 
-Returns the station's FCC call-letters (default) or 
-station's IHeartRadio ID.
+Returns the station's IHeartRadio ID (default) or 
+station's FCC call-letters ("fccid").
 
-=item $station->B<getTitle>()
+=item $station->B<getTitle>(['desc'])
 
-Returns the station's title (description).  
+Returns the station's title, or (long description).  
 
 =item $station->B<getIconURL>()
 
@@ -170,7 +174,7 @@ Returns a two-element array consisting of the extension (ie. "png",
 
 =item $station->B<getType>()
 
-Returns the stream's type ("IHeartRadio").
+Returns the station's type ("IHeartRadio").
 
 =back
 
@@ -218,7 +222,11 @@ iheartradio
 
 =head1 DEPENDENCIES
 
-LWP::UserAgent
+L<URI::Escape>, L<HTML::Entities>, L<LWP::UserAgent>
+
+=head1 RECCOMENDS
+
+wget
 
 =head1 BUGS
 
@@ -300,6 +308,8 @@ package StreamFinder::IHeartRadio;
 
 use strict;
 use warnings;
+use URI::Escape;
+use HTML::Entities ();
 use LWP::UserAgent ();
 use vars qw(@ISA @EXPORT);
 
@@ -379,10 +389,16 @@ sub new
 	print STDERR "-0(IHeartRadio): URL=$url= KEEP=(",join('|',@okStreams).") SKIP=(",join('|',@skipStreams).")\n"  if ($DEBUG);
 
 	(my $url2fetch = $url);
-	$url2fetch = 'https://www.iheart.com/live/' . $url . '/'  unless ($url =~ /^http/);
-	$self->{'id'} = $1  if ($url2fetch =~ m#\/([^\/]+)\/$#);
+	if ($url =~ /^https?\:/) {
+		$self->{'id'} = $1  if ($url2fetch =~ m#\/([^\/]+)\/?$#);
+	} else {
+		my ($id, $podcastid) = split(m#\/#, $url2fetch);
+		$self->{'id'} = $id;
+		$url2fetch = ($podcastid ? 'https://www.iheart.com/podcast/' : 'https://www.iheart.com/live/') . $id;
+		$url2fetch .= '/episode/' . $podcastid  if ($podcastid);
+	}
 	my $html = '';
-	print STDERR "-0(IHeartRadio): URL=$url2fetch=\n"  if ($DEBUG);
+	print STDERR "-1 FETCHING URL=$url2fetch=\n"  if ($DEBUG);
 	my $ua = LWP::UserAgent->new(@userAgentOps);		
 	$ua->timeout($uops{'timeout'});
 	$ua->cookie_jar({});
@@ -394,7 +410,7 @@ sub new
 		print STDERR $response->status_line  if ($DEBUG);
 	}
 	print STDERR "-1: html=$html=\n"  if ($DEBUG > 1);
-	return undef  unless ($html);  #STEP 1 FAILED, INVALID STATION URL, PUNT!
+	return undef  unless ($html && $self->{'id'});  #STEP 1 FAILED, INVALID STATION URL, PUNT!
 
 	my $html2 = '';
 	my $streamhtml0 = ($html =~ /\"streams\"\s*\:\s*\{([^\}]+)\}/) ? $1 : '';
@@ -409,12 +425,29 @@ sub new
 		my $id = $url;
 		$id =~ s#\/$##;
 		$id = $1  if ($id =~ m#([^\/]+)$#);
-		$self->{'id'} = $id;
+		$self->{'id'} .= '/' . $id  if ($id);
 		$self->{'title'} = ($html =~ s#\<title[^\>]+\>([^\<]+)\<\/title\>##s) ? $1 : '';
+		$self->{'description'} = ($html =~ m#\"podcastDescription\"\>(?:\<[^\>]+\>)?([^\<]+)#s) ? $1 : $self->{'title'};
+		$self->{'description'} = HTML::Entities::decode_entities($self->{'description'});
+		$self->{'description'} = uri_unescape($self->{'description'});
+		if ($html =~ m#\<span class\=\"css\-\w+ \w+\"\>\<span\>([^\<]+)\<\/span\>\<\/span\>\<\/a\>\</div\>\<span\>\<div class\=\"css\-\w+ \w+\"\>([^\<]+)\<\!\-\- \-\-\>#) {
+			$self->{'title'} = $1;
+			$self->{'created'} = $2;
+			$self->{'year'} = ($self->{'created'} =~ /(\d\d\d\d)/) ? $1 : '';
+			print STDERR "i:Found better title (".$self->{'title'}."), year (".$self->{'year'}.").\n"  if ($DEBUG);
+		}
+		$self->{'title'} = HTML::Entities::decode_entities($self->{'title'});
+		$self->{'title'} = uri_unescape($self->{'title'});
+		if ($html =~ m#\<h1[^\>]*\>([^\<]+)#s) {
+			$self->{'artist'} = $1;
+			$self->{'artist'} = HTML::Entities::decode_entities($self->{'artist'});
+			$self->{'artist'} = uri_unescape($self->{'artist'});
+			print STDERR "i:Found artist name (".$self->{'artist'}.").\n"  if ($DEBUG);
+		}
 		$self->{'imageurl'} = ($html =~ s#\"imageUrl\"\:\"([^\"]+)\"##s) ? $1 : '';
 		$self->{'iconurl'} = $self->{'imageurl'};
 		$self->{'total'} = $self->{'cnt'};
-		print STDERR "-SUCCESS2: --id=".$self->{'id'}."=\n--tit=".$self->{'title'}."=\n--icon=".$self->{'iconurl'}."=\n--streams=(".join('|',@{$self->{'streams'}}).")\n"  if ($DEBUG);
+		print STDERR "\n--SUCCESS2: ID=".$self->{'id'}."=\n--TITLE=".$self->{'title'}."\n--STREAMS=".join('|',@{$self->{'streams'}})."=\n"  if ($DEBUG);
 
 		bless $self, $class;   #BLESS IT!
 
@@ -443,6 +476,9 @@ sub new
 		$self->{'fccid'} = ($html =~ m#\"callLetters\"\s*\:\s*\"([^\"]+)\"#i) ? $1 : '';
 		$self->{'title'} = ($html =~ m#\"description\"\s*\:\s*\"([^\"]+)\"#) ? $1 : $url;
 		$self->{'title'} =~ s#http[s]?\:\/\/www\.iheart\.com\/live\/##;
+		$self->{'title'} = HTML::Entities::decode_entities($self->{'title'});
+		$self->{'title'} = uri_unescape($self->{'title'});
+		$self->{'description'} = $self->{'title'};
 		$self->{'imageurl'} = ($html =~ m#\"image_src\"\s+href=\"([^\"]+)\"#) ? $1 : '';
 #		$self->{'iconurl'} = $self->{'imageurl'} ? $self->{'imageurl'} . '?ops=fit(100%2C100)' : '';
 		$self->{'iconurl'} = ($html =~ m#\,\"logo\"\:\"([^\"]+)\"\,\"freq\"\:#) ? $1 : '';
@@ -522,7 +558,8 @@ sub getURL   #LIKE GET, BUT ONLY RETURN THE SINGLE ONE W/BEST BANDWIDTH AND RELI
 	my $self = shift;
 	my $arglist = (defined $_[0]) ? join('|',@_) : '';
 	my $idx = ($arglist =~ /\b\-?random\b/) ? int rand scalar @{$self->{'streams'}} : 0;
-	if ($arglist =~ /\b\-?noplaylists\b/ && ${$self->{'streams'}}[$idx] =~ /\.pls$/i) {
+	if ($arglist =~ /\b\-?noplaylists\b/ && ${$self->{'streams'}}[$idx] =~ /\.(pls|m3u8?)$/i) {
+		my $plType = $1;
 		my $firstStream = ${$self->{'streams'}}[$idx];
 		print STDERR "-getURL($idx): NOPLAYLISTS and (".${$self->{'streams'}}[$idx].")\n"  if ($DEBUG);
 		my $ua = LWP::UserAgent->new(@userAgentOps);		
@@ -543,16 +580,30 @@ sub getURL   #LIKE GET, BUT ONLY RETURN THE SINGLE ONE W/BEST BANDWIDTH AND RELI
 		}
 		my @lines = split(/\r?\n/, $html);
 		$firstStream = '';
-		my $firstTitle = '';
-		foreach my $line (@lines) {
-			if ($line =~ m#^\s*File\d+\=(.+)$#) {
-				$firstStream ||= $1;
-			} elsif ($line =~ m#^\s*Title\d+\=(.+)$#) {
-				$firstTitle ||= $1;
+		if ($plType =~ /pls/) {  #PLS:
+			my $firstTitle = '';
+			foreach my $line (@lines) {
+				if ($line =~ m#^\s*File\d+\=(.+)$#) {
+					$firstStream ||= $1;
+				} elsif ($line =~ m#^\s*Title\d+\=(.+)$#) {
+					$firstTitle ||= $1;
+				}
 			}
+			$self->{'title'} ||= $firstTitle;
+			print STDERR "-getURL(PLS): first=$firstStream= title=$firstTitle=\n"  if ($DEBUG);
+		} else {  #m3u8:
+			(my $urlpath = ${$self->{'streams'}}[$idx]) =~ s#[^\/]+$##;
+			foreach my $line (@lines) {
+				if ($line =~ m#^\s*([^\#].+)$#) {
+					my $urlpart = $1;
+					$urlpart =~ s#^\s+##;
+					$urlpart =~ s#^\/##;
+					$firstStream = ($urlpart =~ m#https?\:#) ? $urlpart : ($urlpath . '/' . $urlpart);
+					last;
+				}
+			}
+			print STDERR "-getURL(m3u?): first=$firstStream=\n"  if ($DEBUG);
 		}
-		$self->{'title'} ||= $firstTitle;
-		print STDERR "-getURL: first=$firstStream= title=$firstTitle=\n"  if ($DEBUG);
 		return $firstStream || ${$self->{'streams'}}[$idx];
 	}
 	return ${$self->{'streams'}}[$idx];
@@ -567,20 +618,21 @@ sub count
 sub getType
 {
 	my $self = shift;
-	return 'IHeartRadio';  #URL TO THE STATION'S THUMBNAIL ICON, IF ANY.
+	return 'IHeartRadio';  #STATION TYPE (FOR PARENT StreamFinder MODULE).
 }
 
 sub getID
 {
 	my $self = shift;
-	return $self->{'id'} || $self->{'fccid'}  if (defined($_[0]) && $_[0] !~ /fcc/i);
-	return $self->{'fccid'} || $self->{'id'};  #URL TO THE STATION'S CALL LETTERS OR IHEART-ID.
+	return $self->{'fccid'}  if (defined($_[0]) && $_[0] =~ /fcc/i);  #STATION'S CALL LETTERS OR IHEARTRADIO-ID.
+	return $self->{'id'};
 }
 
 sub getTitle
 {
 	my $self = shift;
-	return $self->{'title'};  #URL TO THE STATION'S TITLE(DESCRIPTION), IF ANY.
+	return $self->{'description'}  if (defined($_[0]) && $_[0] =~ /^\-?(?:long|desc)/i);
+	return $self->{'title'};  #STATION'S TITLE(DESCRIPTION), IF ANY.
 }
 
 sub getIconURL
@@ -594,7 +646,6 @@ sub getIconData
 	my $self = shift;
 	return ()  unless ($self->{'iconurl'});
 
-print STDERR "--getIconData: iconurl=".$self->{'iconurl'}."=\n";
 	my $ua = LWP::UserAgent->new(@userAgentOps);		
 	$ua->timeout($uops{'timeout'});
 	$ua->cookie_jar({});
@@ -609,9 +660,7 @@ print STDERR "--getIconData: iconurl=".$self->{'iconurl'}."=\n";
 	return ()  unless ($art_image);
 
 	(my $image_ext = $self->{'iconurl'}) =~ s/^.+\.//;
-print STDERR "--getIconData: ext0=$image_ext=\n";
 	$image_ext =~ s/[^A-Za-z].*$//;
-print STDERR "--getIconData: ext final=$image_ext=\n";
 
 	return ($image_ext, $art_image);
 }

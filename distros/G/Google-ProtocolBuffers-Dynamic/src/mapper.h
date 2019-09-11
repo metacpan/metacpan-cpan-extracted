@@ -15,6 +15,7 @@
 
 #include "EXTERN.h"
 #include "perl.h"
+#include "ppport.h"
 
 #include "thx_member.h"
 
@@ -151,9 +152,9 @@ public:
     bool get_decode_blessed() const;
 
 private:
-    bool encode(upb::Sink *sink, upb::Status *status, SV *ref) const;
-    bool encode(upb::Sink *sink, upb::Status *status, const Field &fd, SV *ref) const;
-    bool encode_nodefaults(upb::Sink *sink, upb::Status *status, const Field &fd, SV *ref) const;
+    bool encode_value(upb::Sink *sink, upb::Status *status, SV *ref) const;
+    bool encode_field(upb::Sink *sink, upb::Status *status, const Field &fd, SV *ref) const;
+    bool encode_field_nodefaults(upb::Sink *sink, upb::Status *status, const Field &fd, SV *ref) const;
     bool encode_key(upb::Sink *sink, upb::Status *status, const Field &fd, const char *key, I32 keylen) const;
     bool encode_hash_kv(upb::Sink *sink, upb::Status *status, const char *key, STRLEN keylen, SV *value) const;
     bool encode_from_perl_array(upb::Sink *sink, upb::Status *status, const Field &fd, SV *ref) const;
@@ -162,11 +163,6 @@ private:
 
     template<class G, class S>
     bool encode_from_array(upb::Sink *sink, upb::Status *status, const Mapper::Field &fd, AV *source) const;
-
-    template<class G, class S>
-    bool encode_from_array(upb::Sink *sink, const Mapper::Field &fd, AV *source) const {
-        return encode_from_array<G, S>(sink, NULL, fd, source);
-    }
 
     bool check(upb::Status *status, SV *ref) const;
     bool check(upb::Status *status, const Field &fd, SV *ref) const;
@@ -190,7 +186,7 @@ private:
     upb::Sink encoder_sink, decoder_sink;
     std::string output_buffer;
     upb::StringSink string_sink;
-    bool check_required_fields, decode_explicit_defaults, encode_defaults, check_enum_values, decode_blessed;
+    bool check_required_fields, decode_explicit_defaults, encode_defaults, check_enum_values, decode_blessed, fail_ref_coercion;
     WarnContext *warn_context;
 };
 

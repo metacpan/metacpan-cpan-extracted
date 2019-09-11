@@ -38,7 +38,7 @@ use warnings::unused;
 
 our @EXPORT = qw( sim ); # our @EXPORT = qw( );
 
-$VERSION = '0.069'; # our $VERSION = '';
+$VERSION = '0.073'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Sim is the module used by Sim::OPT to launch simulations once the models have been built.';
 
 #########################################################################################
@@ -69,10 +69,6 @@ sub sim
   my $simnetwork = $main::simnetwork;
   my $max_processes = $main::max_processes;
 
-  $tee = new IO::Tee(\*STDOUT, ">>$tofile" ); # GLOBAL
-
-  say $tee "\nNow in Sim::OPT::Sim.\n";
-
   my %simtitles = %main::simtitles;
   my %retrievedata = %main::retrievedata;
   my @keepcolumns = @main::keepcolumns;
@@ -94,6 +90,21 @@ sub sim
   my @instances = @{ $dat{instances} };
   my %dirfiles = %{ $dat{dirfiles} };
   my %vehicles = %{ $dat{vehicles} };
+  my $precious = $dat{precious};
+  my %inst = %{ $dat{inst} };
+  my $winningvalue;
+
+	if ( $tofile eq "" )
+	{
+		$tofile = "./report.txt";
+	}
+	else
+	{
+		$tofile = "$mypath/$file-tofile.txt";
+	}
+
+  $tee = new IO::Tee(\*STDOUT, ">>$tofile" ); # GLOBAL
+  say $tee "\nNow in Sim::OPT::Sim.\n";
 
   my @simcases = @{ $dirfiles{simcases} };
   my @simstruct = @{ $dirfiles{simstruct} };
@@ -157,7 +168,7 @@ sub sim
     my $c = $dt{c};
 
 		my %to = %{ $dt{to} };
-		my %inst = %{ $dt{inst} };
+		#my %inst = %{ $dt{inst} };
     my $instn = $dt{instn};
 
 		my $from = $dt{from};
@@ -497,31 +508,51 @@ $printthis
       my @resultretrieve = Sim::OPT::Report::newretrieve(
       {
         instance => $instance, dirfiles => \%dirfiles,
-        resfile => $resfile, flfile => $flfile, vehicles => \%vehicles
+        resfile => $resfile, flfile => $flfile,
+        vehicles => \%vehicles, precious => $precious, inst => \%inst
       } );
       $dirfiles{retcases} = $resultretrieve[0];
       $dirfiles{retstruct} = $resultretrieve[1];
       $dirfiles{notecases} = $resultretrieve[2];
     }
 
-    if ( $dowhat{newreport} eq "y" )
+    if ( ( $dowhat{newreport} eq "y" ) and ( $precious  eq "" ) )
     {
       my @resultreport = Sim::OPT::Report::newreport(
       {
         instance => $instance, dirfiles => \%dirfiles,
-        resfile => $resfile, flfile => $flfile, vehicles => \%vehicles
+        resfile => $resfile, flfile => $flfile,
+        vehicles => \%vehicles, precious => $precious, inst => \%inst
       } );
       $dirfiles{repcases} = $resultreport[0];
       $dirfiles{repstruct} = $resultreport[1];
       $dirfiles{mergestruct} = $resultreport[3];
       $dirfiles{mergecases} = $resultreport[4];
     }
+    if ( ( $dowhat{newreport} eq "y" ) and ( $precious  ne "" ) )
+    {
+      $winningvalue = Sim::OPT::Report::newreport(
+      {
+        instance => $instance, dirfiles => \%dirfiles,
+        resfile => $resfile, flfile => $flfile,
+        vehicles => \%vehicles, precious => $precious, inst => \%inst
+      } );
+    }
   }
   close SIMLIST;
   close SIMBLOCK;
 
-  return( \@simcases, \@simstruct, $dirfiles{repcases}, $dirfiles{repstruct},
-    $dirfiles{mergestruct}, $dirfiles{mergecases} );
+  if ( $precious eq "" )
+  {
+    return( \@simcases, \@simstruct, $dirfiles{repcases}, $dirfiles{repstruct},
+      $dirfiles{mergestruct}, $dirfiles{mergecases} );
+  }
+  elsif ( $precious ne "" )
+  {
+    say "DISPATCHING $winningvalue";
+    return( $winningvalue );
+  }
+
   close TOFILE;
   close OUTFILE;
 

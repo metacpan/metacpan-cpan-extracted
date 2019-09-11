@@ -1,5 +1,8 @@
 Revision history for Music-ToRoman
 
+0.1703 2019-09-10 10:14:06
+    - Fix a number of notes to romans by reordering enharmonic computation.
+
 0.1702 2019-09-09 18:09:25
     - Convert bI to vii and bIV to iii.
 

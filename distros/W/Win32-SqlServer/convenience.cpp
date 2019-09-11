@@ -1,13 +1,19 @@
 /*---------------------------------------------------------------------
- $Header: /Perl/OlleDB/convenience.cpp 4     11-08-07 23:19 Sommar $
+ $Header: /Perl/OlleDB/convenience.cpp 5     19-07-08 22:33 Sommar $
 
   This file holds general-purpose routines, mainly for converting
   between SV and BSTR and the like. All these are low-level, and do
   not have access to error handling. Such code should be in utils.cpp.
 
-  Copyright (c) 2004-2011   Erland Sommarskog
+  Copyright (c) 2004-2019   Erland Sommarskog
 
   $History: convenience.cpp $
+ * 
+ * *****************  Version 5  *****************
+ * User: Sommar       Date: 19-07-08   Time: 22:33
+ * Updated in $/Perl/OlleDB
+ * BSTR_to_char has been enchanced to support bstrlen and codepage. Added
+ * char_tu_UTF8_SV.
  * 
  * *****************  Version 4  *****************
  * User: Sommar       Date: 11-08-07   Time: 23:19
@@ -53,7 +59,8 @@ BSTR char_to_BSTR(char     * str,
    if (inlen > 0) {
       // First find out how long the wide string will be, by calling
       // MultiByteToWideChar without a buffer.
-      widelen = MultiByteToWideChar(decoding, flags, str, (int) inlen, NULL, 0);
+      widelen = MultiByteToWideChar(decoding, flags, str, (int) inlen, 
+                                    NULL, 0);
 
       // Any BOM requires space.
       if (add_BOM) {
@@ -74,7 +81,8 @@ BSTR char_to_BSTR(char     * str,
       }
 
       // And now for the real thing.
-      ret = MultiByteToWideChar(decoding, flags, str, (int) inlen, tmp, widelen);
+      ret = MultiByteToWideChar(decoding, flags, str, (int) inlen, 
+                                tmp, widelen);
 
       if (! ret) {
          err = GetLastError();
@@ -107,36 +115,50 @@ BSTR SV_to_BSTR (SV       * sv,
 }
 
 
-// Converts a BSTR to plain char* in UTF-8.
-char * BSTR_to_char (BSTR bstr) {
-   int    buflen;
-   char * retvalue;
+// Converts a BSTR to plain char* in some codepage, default UTF-8.
+char * BSTR_to_char (BSTR     bstr,
+                     int      bstrlen,
+                     UINT     codepage,
+                     STRLEN * retlen) {
+   int    buflen = 0;
+   char * retvalue = NULL;
    int    ret;
 
    if (bstr != NULL) {
-      // First find out the length we need for the return value.
-      buflen = WideCharToMultiByte(CP_UTF8, 0, bstr, -1, NULL, 0, NULL, NULL);
+      if (bstrlen != 0) {
+         // First find out the length we need for the return value.
+         buflen = WideCharToMultiByte(codepage, 0, bstr, bstrlen, NULL, 
+                                      0, NULL, NULL);
 
-      // Allocate buffer.
-      New(902, retvalue, buflen + 1, char);
+         // Allocate buffer.
+         New(902, retvalue, buflen + 1, char);
 
-      // Get the goods
-      ret = WideCharToMultiByte(CP_UTF8, 0, bstr, -1, retvalue, buflen, NULL, NULL);
+         // Get the goods
+         ret = WideCharToMultiByte(codepage, 0, bstr, bstrlen, retvalue, 
+                                   buflen, NULL, NULL);
 
-      if (! ret) {
-         int err = GetLastError();
-         croak("Internal error: WideCharToMultiByte failed with %ld. Buflen was %d", err, buflen);
+         if (! ret) {
+            int err = GetLastError();
+            croak("Internal error: WideCharToMultiByte failed with %ld. Buflen was %d. bstrlen was %d. Codepage was %d.", 
+                  err, buflen, bstrlen, codepage);
+         }
       }
+      else {
+         buflen = 0;
+         New(902, retvalue, buflen + 1, char);
+         memcpy(retvalue, "", buflen);
+      }
+   }
 
-      return retvalue;
+   if (retlen != NULL) {
+      (* retlen) = buflen - (bstrlen == -1 ? -1 : 0);
    }
-   else {
-      return NULL;
-   }
+
+   return retvalue;
 }
 
-// And this one takes the BSTR all the way to an SV. If not submitted, the
-// string is assumed to be NULL-terminated.
+// And this one takes the BSTR all the way to an SV. If bstrlen 
+// is not passed, the string is assumed to be NULL-terminated.
 SV * BSTR_to_SV (BSTR  bstr,
                  int   bstrlen) {
    int    buflen;
@@ -177,6 +199,58 @@ SV * BSTR_to_SV (BSTR  bstr,
    else {
       sv = NULL;
    }
+
+   return sv;
+}
+
+// Converts a character string in any code page to a perl SV with
+// the UTF8 bit set. If codepage is UTF8, but string is not a UTF8
+// string, the ANSI code page is assumed.
+SV * char_to_UTF8_SV (char    * str,
+                      STRLEN    inlen,
+                      UINT      codepage) {
+
+   SV   * sv = NULL;
+   BSTR bstr;
+   int  widelen;
+   int  ret;
+
+   if (str == NULL) {
+      return NULL;
+   }
+
+   if (inlen == 0) {
+      return newSVpvn("", 0);
+   }
+
+   if (codepage == CP_UTF8) {
+      if (is_utf8_string( (U8 *) str, inlen)) {
+         sv = newSVpvn(str, inlen);
+         SvUTF8_on(sv);
+         return sv;
+      }
+      else {
+         codepage = GetACP();
+      }
+   }
+
+
+   // First convert to UTF-16
+   widelen = MultiByteToWideChar(codepage, MB_PRECOMPOSED, str, 
+                                 (int) inlen, NULL, 0);
+   bstr = SysAllocStringLen(NULL, widelen);
+   ret = MultiByteToWideChar(codepage, MB_PRECOMPOSED, str, (int) inlen, 
+                             bstr, widelen);
+
+   if (! ret) {
+      int err = GetLastError();
+      croak("MultiByteToWideChar failed with %ld when converting string '%s' to Unicode",
+             err, str);
+   }
+
+   // Then convert it to UTF-8
+   sv = BSTR_to_SV(bstr);
+   SysFreeString(bstr);
 
    return sv;
 }
