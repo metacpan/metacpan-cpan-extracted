@@ -1,7 +1,10 @@
 Revision history for Perl module Promise::ES6
 
-0.05
-- Prevent warn() when creating a pre-rejected promise.
+0.06 Thu 12 Sep 2019
+- Issue #2: Make all() resolve when given an empty array reference.
+
+0.05 Wed 31 Jul 2019
+- Issue #1: Prevent warn() when creating a pre-rejected promise.
 
 0.04 Mon 4 Mar 2019
 - Fix missing test dependency. (doh!)

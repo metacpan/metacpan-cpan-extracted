@@ -22,31 +22,30 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222640;
+our $VERSION = 1.20190912215427;
 
 my $formatters = [
                 {
                   'format' => '$1 $2 $3',
+                  'leading_digits' => '2',
                   'national_rule' => '0$1',
-                  'pattern' => '(\\d)(\\d{3})(\\d{4})',
-                  'leading_digits' => '2'
+                  'pattern' => '(\\d)(\\d{3})(\\d{4})'
                 },
                 {
-                  'national_rule' => '0$1',
                   'format' => '$1 $2 $3',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{3})',
-                  'leading_digits' => '[347]'
+                  'leading_digits' => '[347]',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{3})'
                 },
                 {
+                  'format' => '$1 $2 $3 $4',
                   'leading_digits' => '[58]',
                   'national_rule' => '0$1',
-                  'format' => '$1 $2 $3 $4',
                   'pattern' => '(\\d{3})(\\d)(\\d{2})(\\d{2})'
                 }
               ];
 
 my $validators = {
-                'voip' => '',
                 'fixed_line' => '
           (?:
             2(?:
@@ -93,14 +92,6 @@ my $validators = {
             )
           )\\d{5}
         ',
-                'specialrate' => '(
-          8(?:
-            0[1-9]|
-            [1-9]\\d
-          )\\d{5}
-        )|(5[02-9]\\d{6})',
-                'personal_number' => '',
-                'toll_free' => '800\\d{5}',
                 'mobile' => '
           7(?:
             (?:
@@ -108,25 +99,37 @@ my $validators = {
               3[2-4]|
               9[23]
             )\\d|
-            421
+            4(?:
+              21|
+              60
+            )
           )\\d{4}
         ',
-                'pager' => ''
+                'pager' => '',
+                'personal_number' => '',
+                'specialrate' => '(
+          8(?:
+            0[1-9]|
+            [1-9]\\d
+          )\\d{5}
+        )|(5[02-9]\\d{6})',
+                'toll_free' => '800\\d{5}',
+                'voip' => ''
               };
-my %areanames = (
-  3892 => "Skopje",
-  38931 => "Kumanovo\/Kriva\ Palanka\/Kratovo",
-  38932 => "Stip\/Probistip\/Sveti\ Nikole\/Radovis",
-  38933 => "Kocani\/Berovo\/Delcevo\/Vinica",
-  38934 => "Gevgelija\/Valandovo\/Strumica\/Dojran",
-  38942 => "Gostivar",
-  38943 => "Veles\/Kavadarci\/Negotino",
-  38944 => "Tetovo",
-  38945 => "Kicevo\/Makedonski\ Brod",
-  38946 => "Ohrid\/Struga\/Debar",
-  38947 => "Bitola\/Demir\ Hisar\/Resen",
-  38948 => "Prilep\/Krusevo",
-);
+my %areanames = ();
+$areanames{en}->{3892} = "Skopje";
+$areanames{en}->{38931} = "Kumanovo\/Kriva\ Palanka\/Kratovo";
+$areanames{en}->{38932} = "Stip\/Probistip\/Sveti\ Nikole\/Radovis";
+$areanames{en}->{38933} = "Kocani\/Berovo\/Delcevo\/Vinica";
+$areanames{en}->{38934} = "Gevgelija\/Valandovo\/Strumica\/Dojran";
+$areanames{en}->{38942} = "Gostivar";
+$areanames{en}->{38943} = "Veles\/Kavadarci\/Negotino";
+$areanames{en}->{38944} = "Tetovo";
+$areanames{en}->{38945} = "Kicevo\/Makedonski\ Brod";
+$areanames{en}->{38946} = "Ohrid\/Struga\/Debar";
+$areanames{en}->{38947} = "Bitola\/Demir\ Hisar\/Resen";
+$areanames{en}->{38948} = "Prilep\/Krusevo";
+
     sub new {
       my $class = shift;
       my $number = shift;

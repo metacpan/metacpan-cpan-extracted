@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::mod2author;
 
-our $DATE = '2019-07-23'; # DATE
-our $VERSION = '1.037'; # VERSION
+our $DATE = '2019-08-01'; # DATE
+our $VERSION = '1.038'; # VERSION
 
 use 5.010;
 use strict;
@@ -71,7 +71,7 @@ App::lcpan::Cmd::mod2author - Get author of module(s)
 
 =head1 VERSION
 
-This document describes version 1.037 of App::lcpan::Cmd::mod2author (from Perl distribution App-lcpan), released on 2019-07-23.
+This document describes version 1.038 of App::lcpan::Cmd::mod2author (from Perl distribution App-lcpan), released on 2019-08-01.
 
 =head1 FUNCTIONS
 

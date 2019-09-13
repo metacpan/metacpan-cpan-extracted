@@ -22,40 +22,25 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222639;
+our $VERSION = 1.20190912215425;
 
 my $formatters = [
                 {
+                  'format' => '$1 $2',
                   'leading_digits' => '
             [24-7]|
             8[3-9]
           ',
-                  'pattern' => '(\\d{4})(\\d{4})',
-                  'format' => '$1 $2'
+                  'pattern' => '(\\d{4})(\\d{4})'
                 },
                 {
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{4})',
                   'format' => '$1-$2-$3',
-                  'leading_digits' => '[89]'
+                  'leading_digits' => '[89]',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{4})'
                 }
               ];
 
 my $validators = {
-                'specialrate' => '(90[059]\\d{7})',
-                'geographic' => '
-          210[7-9]\\d{4}|
-          2(?:
-            [024-7]\\d|
-            1[1-9]
-          )\\d{5}
-        ',
-                'voip' => '
-          (?:
-            210[0-6]|
-            4\\d{3}|
-            5100
-          )\\d{4}
-        ',
                 'fixed_line' => '
           210[7-9]\\d{4}|
           2(?:
@@ -63,8 +48,13 @@ my $validators = {
             1[1-9]
           )\\d{5}
         ',
-                'pager' => '',
-                'toll_free' => '800\\d{7}',
+                'geographic' => '
+          210[7-9]\\d{4}|
+          2(?:
+            [024-7]\\d|
+            1[1-9]
+          )\\d{5}
+        ',
                 'mobile' => '
           6500[01]\\d{3}|
           5(?:
@@ -77,7 +67,17 @@ my $validators = {
             8[3-9]
           )\\d{6}
         ',
-                'personal_number' => ''
+                'pager' => '',
+                'personal_number' => '',
+                'specialrate' => '(90[059]\\d{7})',
+                'toll_free' => '800\\d{7}',
+                'voip' => '
+          (?:
+            210[0-6]|
+            4\\d{3}|
+            5100
+          )\\d{4}
+        '
               };
 
     sub new {

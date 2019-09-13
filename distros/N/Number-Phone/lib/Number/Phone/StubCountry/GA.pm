@@ -22,14 +22,14 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222640;
+our $VERSION = 1.20190912215426;
 
 my $formatters = [
                 {
                   'format' => '$1 $2 $3 $4',
+                  'leading_digits' => '[2-7]',
                   'national_rule' => '0$1',
-                  'pattern' => '(\\d)(\\d{2})(\\d{2})(\\d{2})',
-                  'leading_digits' => '[2-7]'
+                  'pattern' => '(\\d)(\\d{2})(\\d{2})(\\d{2})'
                 },
                 {
                   'format' => '$1 $2 $3 $4',
@@ -38,52 +38,52 @@ my $formatters = [
               ];
 
 my $validators = {
-                'voip' => '',
                 'fixed_line' => '01\\d{6}',
                 'geographic' => '01\\d{6}',
-                'specialrate' => '',
-                'personal_number' => '',
-                'toll_free' => '',
                 'mobile' => '
           (?:
             0[2-7]|
             [2-7]
           )\\d{6}
         ',
-                'pager' => ''
+                'pager' => '',
+                'personal_number' => '',
+                'specialrate' => '',
+                'toll_free' => '',
+                'voip' => ''
               };
-my %areanames = (
-  2410140 => "Kango",
-  24101420 => "Ntoum",
-  24101424 => "Cocobeach",
-  2410144 => "Libreville",
-  2410145 => "Libreville",
-  2410146 => "Libreville",
-  2410147 => "Libreville",
-  2410148 => "Libreville",
-  2410150 => "Gamba",
-  2410154 => "Omboué",
-  2410155 => "Port\-Gentil",
-  2410156 => "Port\-Gentil",
-  2410158 => "Lambaréné",
-  2410159 => "Ndjolé",
-  2410160 => "Ngouoni",
-  2410162 => "Mounana",
-  2410164 => "Lastoursville",
-  2410165 => "Koulamoutou",
-  2410166 => "Moanda",
-  2410167 => "Franceville",
-  2410169 => "Léconi\/Akiéni\/Okondja",
-  241017 => "Libreville",
-  2410182 => "Tchibanga",
-  2410183 => "Mayumba",
-  2410186 => "Mouila",
-  2410190 => "Makokou",
-  2410192 => "Mékambo",
-  2410193 => "Booué",
-  2410196 => "Bitam",
-  2410198 => "Oyem",
-);
+my %areanames = ();
+$areanames{en}->{2410140} = "Kango";
+$areanames{en}->{24101420} = "Ntoum";
+$areanames{en}->{24101424} = "Cocobeach";
+$areanames{en}->{2410144} = "Libreville";
+$areanames{en}->{2410145} = "Libreville";
+$areanames{en}->{2410146} = "Libreville";
+$areanames{en}->{2410147} = "Libreville";
+$areanames{en}->{2410148} = "Libreville";
+$areanames{en}->{2410150} = "Gamba";
+$areanames{en}->{2410154} = "Omboué";
+$areanames{en}->{2410155} = "Port\-Gentil";
+$areanames{en}->{2410156} = "Port\-Gentil";
+$areanames{en}->{2410158} = "Lambaréné";
+$areanames{en}->{2410159} = "Ndjolé";
+$areanames{en}->{2410160} = "Ngouoni";
+$areanames{en}->{2410162} = "Mounana";
+$areanames{en}->{2410164} = "Lastoursville";
+$areanames{en}->{2410165} = "Koulamoutou";
+$areanames{en}->{2410166} = "Moanda";
+$areanames{en}->{2410167} = "Franceville";
+$areanames{en}->{2410169} = "Léconi\/Akiéni\/Okondja";
+$areanames{en}->{241017} = "Libreville";
+$areanames{en}->{2410182} = "Tchibanga";
+$areanames{en}->{2410183} = "Mayumba";
+$areanames{en}->{2410186} = "Mouila";
+$areanames{en}->{2410190} = "Makokou";
+$areanames{en}->{2410192} = "Mékambo";
+$areanames{en}->{2410193} = "Booué";
+$areanames{en}->{2410196} = "Bitam";
+$areanames{en}->{2410198} = "Oyem";
+
     sub new {
       my $class = shift;
       my $number = shift;

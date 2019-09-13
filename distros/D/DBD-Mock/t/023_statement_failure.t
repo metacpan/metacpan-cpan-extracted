@@ -1,6 +1,9 @@
-use strict;
+use 5.008;
 
-use Test::More tests => 28;
+use strict;
+use warnings;
+
+use Test::More;
 
 BEGIN {
     use_ok('DBD::Mock');  
@@ -176,3 +179,5 @@ BEGIN {
         ok($dbh->{mock_can_fetch}==-95, "$dbh->{mock_can_fetch} should be -95");
     }    
 }
+
+done_testing();

@@ -1,0 +1,63 @@
+{
+   "abstract" : "French countries",
+   "author" : [
+      "Nigel Horne <njh@bandsman.co.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Locale-Codes-Country-FR",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Section::Simple" : "0",
+            "Locale::Codes" : "3.59",
+            "Locale::Codes::Country" : "0",
+            "perl" : "5.006002"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Most" : "0",
+            "Test::NoWarnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/nigelhorne/Locale-Codes/Country-FR/issues",
+         "x_url" : "https://github.com/nigelhorne/Locale-Codes/Country-FR/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/nigelhorne/Locale-Codes/Country-FR.git",
+         "web" : "https://github.com/nigelhorne/Locale-Codes/Country-FR",
+         "x_repository" : "https://github.com/nigelhorne/Locale-Codes/Country-FR"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

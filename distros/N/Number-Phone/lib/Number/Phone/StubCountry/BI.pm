@@ -22,17 +22,19 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222638;
+our $VERSION = 1.20190912215423;
 
 my $formatters = [
                 {
                   'format' => '$1 $2 $3 $4',
-                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})',
-                  'leading_digits' => '[2367]'
+                  'leading_digits' => '[2367]',
+                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})'
                 }
               ];
 
 my $validators = {
+                'fixed_line' => '22\\d{6}',
+                'geographic' => '22\\d{6}',
                 'mobile' => '
           (?:
             29|
@@ -41,27 +43,25 @@ my $validators = {
             7[125-9]
           )\\d{6}
         ',
-                'toll_free' => '',
-                'personal_number' => '',
                 'pager' => '',
-                'voip' => '',
-                'fixed_line' => '22\\d{6}',
+                'personal_number' => '',
                 'specialrate' => '',
-                'geographic' => '22\\d{6}'
+                'toll_free' => '',
+                'voip' => ''
               };
-my %areanames = (
-  2572220 => "Bujumbura",
-  2572221 => "Bujumbura",
-  2572222 => "Bujumbura",
-  2572223 => "Bujumbura",
-  2572224 => "Bujumbura",
-  2572225 => "Bujumbura",
-  2572226 => "West\ zone",
-  2572227 => "Rural\ areas",
-  2572230 => "North\ zone",
-  2572240 => "Central\ east\ zone",
-  2572250 => "South\ zone",
-);
+my %areanames = ();
+$areanames{en}->{2572220} = "Bujumbura";
+$areanames{en}->{2572221} = "Bujumbura";
+$areanames{en}->{2572222} = "Bujumbura";
+$areanames{en}->{2572223} = "Bujumbura";
+$areanames{en}->{2572224} = "Bujumbura";
+$areanames{en}->{2572225} = "Bujumbura";
+$areanames{en}->{2572226} = "West\ zone";
+$areanames{en}->{2572227} = "Rural\ areas";
+$areanames{en}->{2572230} = "North\ zone";
+$areanames{en}->{2572240} = "Central\ east\ zone";
+$areanames{en}->{2572250} = "South\ zone";
+
     sub new {
       my $class = shift;
       my $number = shift;

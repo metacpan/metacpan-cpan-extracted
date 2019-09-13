@@ -22,68 +22,35 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222640;
+our $VERSION = 1.20190912215426;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
-                  'national_rule' => '0$1',
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '70'
+                  'leading_digits' => '70',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
                 },
                 {
+                  'format' => '$1 $2 $3 $4',
                   'leading_digits' => '32',
                   'national_rule' => '0$1',
-                  'format' => '$1 $2 $3 $4',
                   'pattern' => '(\\d{2})(\\d{3})(\\d{2})(\\d{2})'
                 },
                 {
+                  'format' => '$1 $2 $3 $4',
                   'leading_digits' => '[57]',
-                  'pattern' => '(\\d{3})(\\d{2})(\\d{2})(\\d{2})',
-                  'format' => '$1 $2 $3 $4'
+                  'pattern' => '(\\d{3})(\\d{2})(\\d{2})(\\d{2})'
                 },
                 {
-                  'leading_digits' => '[348]',
-                  'pattern' => '(\\d{3})(\\d{2})(\\d{2})(\\d{2})',
                   'format' => '$1 $2 $3 $4',
-                  'national_rule' => '0$1'
+                  'leading_digits' => '[348]',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{3})(\\d{2})(\\d{2})(\\d{2})'
                 }
               ];
 
 my $validators = {
-                'pager' => '',
-                'personal_number' => '',
-                'toll_free' => '800\\d{6}',
-                'mobile' => '
-          (?:
-            5(?:
-              [14]4|
-              5[0157-9]|
-              68|
-              7[0147-9]|
-              9[1-35-9]
-            )|
-            790
-          )\\d{6}
-        ',
-                'specialrate' => '',
-                'geographic' => '
-          (?:
-            3(?:
-              [256]\\d|
-              4[124-9]|
-              7[0-4]
-            )|
-            4(?:
-              1\\d|
-              2[2-7]|
-              3[1-79]|
-              4[2-8]|
-              7[239]|
-              9[1-7]
-            )
-          )\\d{6}
-        ',
                 'fixed_line' => '
           (?:
             3(?:
@@ -101,6 +68,39 @@ my $validators = {
             )
           )\\d{6}
         ',
+                'geographic' => '
+          (?:
+            3(?:
+              [256]\\d|
+              4[124-9]|
+              7[0-4]
+            )|
+            4(?:
+              1\\d|
+              2[2-7]|
+              3[1-79]|
+              4[2-8]|
+              7[239]|
+              9[1-7]
+            )
+          )\\d{6}
+        ',
+                'mobile' => '
+          (?:
+            5(?:
+              [14]4|
+              5[0157-9]|
+              68|
+              7[0147-9]|
+              9[1-35-9]
+            )|
+            790
+          )\\d{6}
+        ',
+                'pager' => '',
+                'personal_number' => '',
+                'specialrate' => '',
+                'toll_free' => '800\\d{6}',
                 'voip' => '706\\d{6}'
               };
 

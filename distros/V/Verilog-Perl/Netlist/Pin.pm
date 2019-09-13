@@ -17,7 +17,7 @@ use strict;
 @ISA = qw(Verilog::Netlist::Pin::Struct
 	Verilog::Netlist::Subclass);
 
-$VERSION = '3.466';
+$VERSION = '3.468';
 
 structs('_new_base',
 	'Verilog::Netlist::Pin::Struct'
@@ -53,7 +53,10 @@ sub new {
     } elsif (defined $params{pinselects}) {
 	# remap pinselects to _pinselects
 	foreach my $pinselect (@{$params{pinselects}}) {
-	    push(@{$params{_pinselects}}, new Verilog::Netlist::PinSelection($pinselect->{netname}, $pinselect->{msb}, $pinselect->{lsb}));
+	    push @{$params{_pinselects}},
+		new Verilog::Netlist::PinSelection($pinselect->{netname},
+						   $pinselect->{msb},
+						   $pinselect->{lsb});
 	}
 	delete $params{pinselects};
     }
@@ -328,13 +331,13 @@ instead.
 
 =item $self->nets
 
-Array of references to the Verilog::Netlist::Net the pin connects to.  Only
-valid after a link.
+Array of hashes the pin connects to.  Each hash contains a msb, lsb, and
+net (a Verilog::Netlist::Net).  Only valid after a link.
 
 =item $self->nets_sorted
 
-Array of sorted references to the Verilog::Netlist::Net the pin connects
-to.  Only valid after a link.
+Array of sorted hashes the pin connects to.  Each hash contains a msb, lsb,
+and net (a Verilog::Netlist::Net).  Only valid after a link.
 
 =item $self->netlist
 
@@ -392,7 +395,8 @@ Wilson Snyder <wsnyder@wsnyder.org>
 =head1 SEE ALSO
 
 L<Verilog-Perl>,
-L<Verilog::Netlist::Subclass>
-L<Verilog::Netlist>
+L<Verilog::Netlist::Subclass>,
+L<Verilog::Netlist>,
+L<Verilog::Netlist::PinSelection>
 
 =cut

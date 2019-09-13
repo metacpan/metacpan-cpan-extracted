@@ -1,4 +1,4 @@
-Math-Polynomial version 1.014
+Math-Polynomial version 1.015
 =============================
 
 Math::Polynomial is a Perl class representing polynomials in one
@@ -32,7 +32,7 @@ PROVIDED MODULES AND SCRIPTS
 The distribution provides these modules:
 
   - Math::Polynomial          - main module
-  - Math::Polynomial::Generic - interface extension (deprecated)
+  - Math::Polynomial::Generic - interface extension (discontinued)
 
 There are no scripts included as a part of the user interface.
 
@@ -56,14 +56,14 @@ Recommended modules for increased functionality:
 
 AUTHOR
 
-Written and maintained by Martin Becker "becker-cpan-mp@cozap.com".
+Written and maintained by Martin Becker <becker-cpan-mp (at) cozap.com>.
 
 Inspired by the module of the same name written by Mats Kindahl
 "mats@kindahl.net" 1997-2001, maintained by Martin Becker since 2007.
 
 COPYRIGHT AND LICENCE
 
-Copyright (c) 2007-2017 by Martin Becker.  All rights reserved.
+Copyright (c) 2007-2019 by Martin Becker.  All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.6.0 or,

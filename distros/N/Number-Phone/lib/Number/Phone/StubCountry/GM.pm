@@ -22,26 +22,17 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222640;
+our $VERSION = 1.20190912215426;
 
 my $formatters = [
                 {
+                  'format' => '$1 $2',
                   'leading_digits' => '[2-9]',
-                  'pattern' => '(\\d{3})(\\d{4})',
-                  'format' => '$1 $2'
+                  'pattern' => '(\\d{3})(\\d{4})'
                 }
               ];
 
 my $validators = {
-                'personal_number' => '',
-                'mobile' => '
-          (?:
-            [23679]\\d|
-            5[01]
-          )\\d{5}
-        ',
-                'toll_free' => '',
-                'pager' => '',
                 'fixed_line' => '
           (?:
             4(?:
@@ -64,8 +55,6 @@ my $validators = {
             8\\d{3}
           )\\d{3}
         ',
-                'voip' => '',
-                'specialrate' => '',
                 'geographic' => '
           (?:
             4(?:
@@ -87,55 +76,66 @@ my $validators = {
             )|
             8\\d{3}
           )\\d{3}
-        '
+        ',
+                'mobile' => '
+          (?:
+            [23679]\\d|
+            5[01]
+          )\\d{5}
+        ',
+                'pager' => '',
+                'personal_number' => '',
+                'specialrate' => '',
+                'toll_free' => '',
+                'voip' => ''
               };
-my %areanames = (
-  22042 => "Banjul",
-  22043 => "Bundung\/Serekunda",
-  2204410 => "Brufut",
-  2204412 => "Tanji",
-  2204414 => "Sanyang",
-  2204416 => "Tujereng",
-  2204417 => "Sanyang",
-  2204419 => "Kartong",
-  22044195 => "Berending",
-  220446 => "Kotu\/Senegambia",
-  220447 => "Yundum",
-  2204480 => "Bondali",
-  2204481 => "Brikama\/Kanilia",
-  2204482 => "Brikama\/Kanilia",
-  2204483 => "Brikama\/Kanilia",
-  2204484 => "Brikama\/Kanilia",
-  2204485 => "Kafuta",
-  2204486 => "Gunjur",
-  2204487 => "Faraba",
-  2204488 => "Sibanor",
-  2204489 => "Bwiam",
-  220449 => "Bakau",
-  2205540 => "Kaiaf",
-  2205541 => "Kwenella",
-  2205542 => "Nyorojattaba",
-  2205543 => "Japeneh\/Soma",
-  2205544 => "Bureng",
-  2205545 => "Pakaliba",
-  2205546 => "Kudang",
-  2205547 => "Jareng",
-  220566 => "Baja\ Kunda\/Basse\/Fatoto\/Gambisara\/Garawol\/Misera\/Sambakunda\/Sudowol",
-  2205665 => "Kuntaur",
-  2205666 => "Numeyel",
-  220567 => "Sotuma",
-  2205674 => "Bansang",
-  2205676 => "Georgetown",
-  2205678 => "Brikama\-Ba",
-  2205710 => "Barra",
-  2205714 => "Ndugukebbe",
-  2205720 => "Kerewan",
-  2205723 => "Njabakunda",
-  2205725 => "Iliasa",
-  2205735 => "Farafenni",
-  2205738 => "Ngensanjal",
-  220574 => "Kaur",
-);
+my %areanames = ();
+$areanames{en}->{22042} = "Banjul";
+$areanames{en}->{22043} = "Bundung\/Serekunda";
+$areanames{en}->{2204410} = "Brufut";
+$areanames{en}->{2204412} = "Tanji";
+$areanames{en}->{2204414} = "Sanyang";
+$areanames{en}->{2204416} = "Tujereng";
+$areanames{en}->{2204417} = "Sanyang";
+$areanames{en}->{2204419} = "Kartong";
+$areanames{en}->{22044195} = "Berending";
+$areanames{en}->{220446} = "Kotu\/Senegambia";
+$areanames{en}->{220447} = "Yundum";
+$areanames{en}->{2204480} = "Bondali";
+$areanames{en}->{2204481} = "Brikama\/Kanilia";
+$areanames{en}->{2204482} = "Brikama\/Kanilia";
+$areanames{en}->{2204483} = "Brikama\/Kanilia";
+$areanames{en}->{2204484} = "Brikama\/Kanilia";
+$areanames{en}->{2204485} = "Kafuta";
+$areanames{en}->{2204486} = "Gunjur";
+$areanames{en}->{2204487} = "Faraba";
+$areanames{en}->{2204488} = "Sibanor";
+$areanames{en}->{2204489} = "Bwiam";
+$areanames{en}->{220449} = "Bakau";
+$areanames{en}->{2205540} = "Kaiaf";
+$areanames{en}->{2205541} = "Kwenella";
+$areanames{en}->{2205542} = "Nyorojattaba";
+$areanames{en}->{2205543} = "Japeneh\/Soma";
+$areanames{en}->{2205544} = "Bureng";
+$areanames{en}->{2205545} = "Pakaliba";
+$areanames{en}->{2205546} = "Kudang";
+$areanames{en}->{2205547} = "Jareng";
+$areanames{en}->{220566} = "Baja\ Kunda\/Basse\/Fatoto\/Gambisara\/Garawol\/Misera\/Sambakunda\/Sudowol";
+$areanames{en}->{2205665} = "Kuntaur";
+$areanames{en}->{2205666} = "Numeyel";
+$areanames{en}->{220567} = "Sotuma";
+$areanames{en}->{2205674} = "Bansang";
+$areanames{en}->{2205676} = "Georgetown";
+$areanames{en}->{2205678} = "Brikama\-Ba";
+$areanames{en}->{2205710} = "Barra";
+$areanames{en}->{2205714} = "Ndugukebbe";
+$areanames{en}->{2205720} = "Kerewan";
+$areanames{en}->{2205723} = "Njabakunda";
+$areanames{en}->{2205725} = "Iliasa";
+$areanames{en}->{2205735} = "Farafenni";
+$areanames{en}->{2205738} = "Ngensanjal";
+$areanames{en}->{220574} = "Kaur";
+
     sub new {
       my $class = shift;
       my $number = shift;

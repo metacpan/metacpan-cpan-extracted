@@ -1,5 +1,7 @@
 Revision history for File-Collector
 
+0.038     2019-09-12 07:55:14-04:00 America/New_York
+
 0.037     2019-09-10 02:32:02-04:00 America/New_York
   - kill Windows test bugs for good (hopefully)
 

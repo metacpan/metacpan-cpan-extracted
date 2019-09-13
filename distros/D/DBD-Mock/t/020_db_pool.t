@@ -1,6 +1,9 @@
-use strict;
+use 5.008;
 
-use Test::More tests => 16;
+use strict;
+use warnings;
+
+use Test::More;
 
 BEGIN {
     use_ok( 'DBD::Mock' => qw(Pool) );
@@ -68,3 +71,5 @@ BEGIN {
     
     ok($dbh->disconnect(), '... not really disconnecting, just returning true');
 }
+
+done_testing();

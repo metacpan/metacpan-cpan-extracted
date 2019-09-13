@@ -22,46 +22,49 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222640;
+our $VERSION = 1.20190912215426;
 
 my $formatters = [
                 {
-                  'national_rule' => '(8-$1)',
                   'format' => '$1 $2 $3',
-                  'pattern' => '(\\d)(\\d{3})(\\d{4})',
-                  'leading_digits' => '52[0-79]'
+                  'leading_digits' => '52[0-79]',
+                  'national_rule' => '(8-$1)',
+                  'pattern' => '(\\d)(\\d{3})(\\d{4})'
                 },
                 {
-                  'pattern' => '(\\d{3})(\\d{2})(\\d{3})',
                   'format' => '$1 $2 $3',
+                  'leading_digits' => '[7-9]',
                   'national_rule' => '8 $1',
-                  'leading_digits' => '[7-9]'
+                  'pattern' => '(\\d{3})(\\d{2})(\\d{3})'
                 },
                 {
-                  'national_rule' => '(8-$1)',
                   'format' => '$1 $2',
-                  'pattern' => '(\\d{2})(\\d{6})',
                   'leading_digits' => '
             37|
             4(?:
               [15]|
               6[1-8]
             )
-          '
+          ',
+                  'national_rule' => '(8-$1)',
+                  'pattern' => '(\\d{2})(\\d{6})'
                 },
                 {
-                  'pattern' => '(\\d{3})(\\d{5})',
                   'format' => '$1 $2',
+                  'leading_digits' => '[3-6]',
                   'national_rule' => '(8-$1)',
-                  'leading_digits' => '[3-6]'
+                  'pattern' => '(\\d{3})(\\d{5})'
                 }
               ];
 
 my $validators = {
-                'pager' => '',
-                'mobile' => '6\\d{7}',
-                'toll_free' => '800\\d{5}',
-                'personal_number' => '700\\d{5}',
+                'fixed_line' => '
+          (?:
+            3[1478]|
+            4[124-6]|
+            52
+          )\\d{6}
+        ',
                 'geographic' => '
           (?:
             3[1478]|
@@ -69,70 +72,67 @@ my $validators = {
             52
           )\\d{6}
         ',
+                'mobile' => '6\\d{7}',
+                'pager' => '',
+                'personal_number' => '700\\d{5}',
                 'specialrate' => '(808\\d{5})|(
           9(?:
             0[0239]|
             10
           )\\d{5}
         )|(70[67]\\d{5})',
-                'voip' => '',
-                'fixed_line' => '
-          (?:
-            3[1478]|
-            4[124-6]|
-            52
-          )\\d{6}
-        '
+                'toll_free' => '800\\d{5}',
+                'voip' => ''
               };
-my %areanames = (
-  370310 => "Varėna",
-  370313 => "Druskininkai",
-  370315 => "Alytus",
-  370318 => "Lazdijai",
-  370319 => "Birštonas\/Prienai",
-  370340 => "Ukmergė",
-  370342 => "Vilkaviškis",
-  370343 => "Marijampolė",
-  370345 => "Šakiai",
-  370346 => "Kaišiadorys",
-  370347 => "Kėdainiai",
-  370349 => "Jonava",
-  37037 => "Kaunas",
-  370380 => "Šalčininkai",
-  370381 => "Anykščiai",
-  370382 => "Širvintos",
-  370383 => "Molėtai",
-  370385 => "Zarasai",
-  370386 => "Ignalina\/Visaginas",
-  370387 => "Švenčionys",
-  370389 => "Utena",
-  37041 => "Šiauliai",
-  370421 => "Pakruojis",
-  370422 => "Radviliškis",
-  370425 => "Akmenė",
-  370426 => "Joniškis",
-  370427 => "Kelmė",
-  370428 => "Raseiniai",
-  370440 => "Skuodas",
-  370441 => "Šilutė",
-  370443 => "Mažeikiai",
-  370444 => "Telšiai",
-  370445 => "Kretinga",
-  370446 => "Tauragė",
-  370447 => "Jurbarkas",
-  370448 => "Plungė",
-  370449 => "Šilalė",
-  37045 => "Panevėžys",
-  370450 => "Biržai",
-  370451 => "Pasvalys",
-  370458 => "Rokiškis",
-  370459 => "Kupiškis",
-  37046 => "Klaipėda",
-  370460 => "Palanga",
-  370469 => "Neringa",
-  37052 => "Vilnius",
-  370528 => "Elektrėnai\/Trakai",
-);
+my %areanames = ();
+$areanames{en}->{370310} = "Varėna";
+$areanames{en}->{370313} = "Druskininkai";
+$areanames{en}->{370315} = "Alytus";
+$areanames{en}->{370318} = "Lazdijai";
+$areanames{en}->{370319} = "Birštonas\/Prienai";
+$areanames{en}->{370340} = "Ukmergė";
+$areanames{en}->{370342} = "Vilkaviškis";
+$areanames{en}->{370343} = "Marijampolė";
+$areanames{en}->{370345} = "Šakiai";
+$areanames{en}->{370346} = "Kaišiadorys";
+$areanames{en}->{370347} = "Kėdainiai";
+$areanames{en}->{370349} = "Jonava";
+$areanames{en}->{37037} = "Kaunas";
+$areanames{en}->{370380} = "Šalčininkai";
+$areanames{en}->{370381} = "Anykščiai";
+$areanames{en}->{370382} = "Širvintos";
+$areanames{en}->{370383} = "Molėtai";
+$areanames{en}->{370385} = "Zarasai";
+$areanames{en}->{370386} = "Ignalina\/Visaginas";
+$areanames{en}->{370387} = "Švenčionys";
+$areanames{en}->{370389} = "Utena";
+$areanames{en}->{37041} = "Šiauliai";
+$areanames{en}->{370421} = "Pakruojis";
+$areanames{en}->{370422} = "Radviliškis";
+$areanames{en}->{370425} = "Akmenė";
+$areanames{en}->{370426} = "Joniškis";
+$areanames{en}->{370427} = "Kelmė";
+$areanames{en}->{370428} = "Raseiniai";
+$areanames{en}->{370440} = "Skuodas";
+$areanames{en}->{370441} = "Šilutė";
+$areanames{en}->{370443} = "Mažeikiai";
+$areanames{en}->{370444} = "Telšiai";
+$areanames{en}->{370445} = "Kretinga";
+$areanames{en}->{370446} = "Tauragė";
+$areanames{en}->{370447} = "Jurbarkas";
+$areanames{en}->{370448} = "Plungė";
+$areanames{en}->{370449} = "Šilalė";
+$areanames{en}->{37045} = "Panevėžys";
+$areanames{en}->{370450} = "Biržai";
+$areanames{en}->{370451} = "Pasvalys";
+$areanames{en}->{370458} = "Rokiškis";
+$areanames{en}->{370459} = "Kupiškis";
+$areanames{en}->{37046} = "Klaipėda";
+$areanames{en}->{370460} = "Palanga";
+$areanames{en}->{370469} = "Neringa";
+$areanames{en}->{37052} = "Vilnius";
+$areanames{en}->{370528} = "Elektrėnai\/Trakai";
+
     sub new {
       my $class = shift;
       my $number = shift;

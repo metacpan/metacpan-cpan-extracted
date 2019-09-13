@@ -1,5 +1,8 @@
 Revision history for Map::Tube::Plugin::Formatter
 
+0.17  Thu Sep 12 12:55:00 2019
+      - Moved author test scripts to xt/ subfolder.
+
 0.16  Fri May 10 16:30:00 2019
       - Streamlined to be pluggable to object directly.
       - Removed dependency on Map::Tube::Exception.

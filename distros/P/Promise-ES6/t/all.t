@@ -79,4 +79,12 @@ sub all_exception : Tests {
     );
 }
 
+sub all_empty : Tests {
+    my $foo;
+
+    Promise::ES6->all([])->then( sub { $foo = 42 } );
+
+    is( $foo, 42, 'all() resolves immediately when given an empty list' );
+}
+
 __PACKAGE__->new()->runtests;

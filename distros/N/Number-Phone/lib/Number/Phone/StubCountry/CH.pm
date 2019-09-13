@@ -22,41 +22,36 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222639;
+our $VERSION = 1.20190912215424;
 
 my $formatters = [
                 {
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '
             8[047]|
             90
           ',
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
                   'national_rule' => '0$1',
-                  'format' => '$1 $2 $3'
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
                 },
                 {
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{2})(\\d{2})',
                   'format' => '$1 $2 $3 $4',
-                  'national_rule' => '0$1',
                   'leading_digits' => '
             [2-79]|
             81
-          '
+          ',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{2})(\\d{2})'
                 },
                 {
                   'format' => '$1 $2 $3 $4 $5',
+                  'leading_digits' => '8',
                   'national_rule' => '0$1',
-                  'pattern' => '(\\d{3})(\\d{2})(\\d{3})(\\d{2})(\\d{2})',
-                  'leading_digits' => '8'
+                  'pattern' => '(\\d{3})(\\d{2})(\\d{3})(\\d{2})(\\d{2})'
                 }
               ];
 
 my $validators = {
-                'toll_free' => '800\\d{6}',
-                'mobile' => '7[35-9]\\d{7}',
-                'personal_number' => '878\\d{6}',
-                'pager' => '74[0248]\\d{6}',
-                'voip' => '',
                 'fixed_line' => '
           (?:
             2[12467]|
@@ -67,7 +62,6 @@ my $validators = {
             [7-9]1
           )\\d{7}
         ',
-                'specialrate' => '(84[0248]\\d{6})|(90[016]\\d{6})|(5[18]\\d{7})',
                 'geographic' => '
           (?:
             2[12467]|
@@ -77,30 +71,96 @@ my $validators = {
             6[12]|
             [7-9]1
           )\\d{7}
-        '
+        ',
+                'mobile' => '7[35-9]\\d{7}',
+                'pager' => '74[0248]\\d{6}',
+                'personal_number' => '878\\d{6}',
+                'specialrate' => '(84[0248]\\d{6})|(90[016]\\d{6})|(5[18]\\d{7})',
+                'toll_free' => '800\\d{6}',
+                'voip' => ''
               };
-my %areanames = (
-  4121 => "Lausanne",
-  4122 => "Geneva",
-  4124 => "Yverdon\/Aigle",
-  4126 => "Fribourg",
-  4127 => "Sion",
-  4131 => "Berne",
-  4132 => "Bienne\/Neuchâtel\/Soleure\/Jura",
-  4133 => "Thun",
-  4134 => "Burgdorf\/Langnau\ i\.E\.",
-  4141 => "Lucerne",
-  4143 => "Zurich",
-  4144 => "Zurich",
-  4152 => "Winterthur",
-  4155 => "Rapperswil",
-  4156 => "Baden",
-  4161 => "Basel",
-  4162 => "Olten",
-  4171 => "St\.\ Gallen",
-  4181 => "Chur",
-  4191 => "Bellinzona",
-);
+my %areanames = ();
+$areanames{it}->{4121} = "Losanna";
+$areanames{it}->{4122} = "Ginevra";
+$areanames{it}->{4124} = "Yverdon\/Aigle";
+$areanames{it}->{4126} = "Friburgo";
+$areanames{it}->{4127} = "Sion";
+$areanames{it}->{4131} = "Berna";
+$areanames{it}->{4132} = "Bienne\/Neuchâtel\/Soletta\/Giura";
+$areanames{it}->{4133} = "Thun";
+$areanames{it}->{4134} = "Burgdorf\/Langnau\ i\.E\.";
+$areanames{it}->{4141} = "Lucerna";
+$areanames{it}->{4143} = "Zurigo";
+$areanames{it}->{4144} = "Zurigo";
+$areanames{it}->{4152} = "Winterthur";
+$areanames{it}->{4155} = "Rapperswil";
+$areanames{it}->{4156} = "Baden";
+$areanames{it}->{4161} = "Basilea";
+$areanames{it}->{4162} = "Olten";
+$areanames{it}->{4171} = "San\ Gallo";
+$areanames{it}->{4181} = "Coira";
+$areanames{it}->{4191} = "Bellinzona";
+$areanames{de}->{4121} = "Lausanne";
+$areanames{de}->{4122} = "Genf";
+$areanames{de}->{4124} = "Yverdon\/Aigle";
+$areanames{de}->{4126} = "Freiburg";
+$areanames{de}->{4127} = "Sitten";
+$areanames{de}->{4131} = "Bern";
+$areanames{de}->{4132} = "Biel\/Neuenburg\/Solothurn\/Jura";
+$areanames{de}->{4133} = "Thun";
+$areanames{de}->{4134} = "Burgdorf\/Langnau\ i\.E\.";
+$areanames{de}->{4141} = "Luzern";
+$areanames{de}->{4143} = "Zürich";
+$areanames{de}->{4144} = "Zürich";
+$areanames{de}->{4152} = "Winterthur";
+$areanames{de}->{4155} = "Rapperswil";
+$areanames{de}->{4156} = "Baden";
+$areanames{de}->{4161} = "Basel";
+$areanames{de}->{4162} = "Olten";
+$areanames{de}->{4171} = "St\.\ Gallen";
+$areanames{de}->{4181} = "Chur";
+$areanames{de}->{4191} = "Bellinzona";
+$areanames{fr}->{4121} = "Lausanne";
+$areanames{fr}->{4122} = "Genève";
+$areanames{fr}->{4124} = "Yverdon\/Aigle";
+$areanames{fr}->{4126} = "Fribourg";
+$areanames{fr}->{4127} = "Sion";
+$areanames{fr}->{4131} = "Berne";
+$areanames{fr}->{4132} = "Bienne\/Neuchâtel\/Soleure\/Jura";
+$areanames{fr}->{4133} = "Thoune";
+$areanames{fr}->{4134} = "Burgdorf\/Langnau\ i\.E\.";
+$areanames{fr}->{4141} = "Lucerne";
+$areanames{fr}->{4143} = "Zurich";
+$areanames{fr}->{4144} = "Zurich";
+$areanames{fr}->{4152} = "Winterthour";
+$areanames{fr}->{4155} = "Rapperswil";
+$areanames{fr}->{4156} = "Baden";
+$areanames{fr}->{4161} = "Bâle";
+$areanames{fr}->{4162} = "Olten";
+$areanames{fr}->{4171} = "St\.\ Gall";
+$areanames{fr}->{4181} = "Coire";
+$areanames{fr}->{4191} = "Bellinzona";
+$areanames{en}->{4121} = "Lausanne";
+$areanames{en}->{4122} = "Geneva";
+$areanames{en}->{4124} = "Yverdon\/Aigle";
+$areanames{en}->{4126} = "Fribourg";
+$areanames{en}->{4127} = "Sion";
+$areanames{en}->{4131} = "Berne";
+$areanames{en}->{4132} = "Bienne\/Neuchâtel\/Soleure\/Jura";
+$areanames{en}->{4133} = "Thun";
+$areanames{en}->{4134} = "Burgdorf\/Langnau\ i\.E\.";
+$areanames{en}->{4141} = "Lucerne";
+$areanames{en}->{4143} = "Zurich";
+$areanames{en}->{4144} = "Zurich";
+$areanames{en}->{4152} = "Winterthur";
+$areanames{en}->{4155} = "Rapperswil";
+$areanames{en}->{4156} = "Baden";
+$areanames{en}->{4161} = "Basel";
+$areanames{en}->{4162} = "Olten";
+$areanames{en}->{4171} = "St\.\ Gallen";
+$areanames{en}->{4181} = "Chur";
+$areanames{en}->{4191} = "Bellinzona";
+
     sub new {
       my $class = shift;
       my $number = shift;

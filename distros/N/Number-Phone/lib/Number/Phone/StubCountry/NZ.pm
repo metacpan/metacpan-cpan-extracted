@@ -22,27 +22,28 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222641;
+our $VERSION = 1.20190912215427;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d{3})(\\d{2})(\\d{3})',
-                  'national_rule' => '0$1',
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '[89]0'
+                  'leading_digits' => '[89]0',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{3})(\\d{2})(\\d{3})'
                 },
                 {
-                  'pattern' => '(\\d)(\\d{3})(\\d{4})',
                   'format' => '$1-$2 $3',
-                  'national_rule' => '0$1',
                   'leading_digits' => '
             24|
             [346]|
             7[2-57-9]|
             9[2-9]
-          '
+          ',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d)(\\d{3})(\\d{4})'
                 },
                 {
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '
             2(?:
               10|
@@ -51,17 +52,17 @@ my $formatters = [
             [59]|
             80
           ',
-                  'format' => '$1 $2 $3',
                   'national_rule' => '0$1',
                   'pattern' => '(\\d{3})(\\d{3})(\\d{3,4})'
                 },
                 {
-                  'leading_digits' => '2[028]',
-                  'pattern' => '(\\d{2})(\\d{3,4})(\\d{4})',
                   'format' => '$1 $2 $3',
-                  'national_rule' => '0$1'
+                  'leading_digits' => '2[028]',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{2})(\\d{3,4})(\\d{4})'
                 },
                 {
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '
             2(?:
               [169]|
@@ -70,24 +71,12 @@ my $formatters = [
             7|
             86
           ',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{3,5})',
                   'national_rule' => '0$1',
-                  'format' => '$1 $2 $3'
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{3,5})'
                 }
               ];
 
 my $validators = {
-                'personal_number' => '70\\d{7}',
-                'toll_free' => '
-          508\\d{6,7}|
-          80\\d{6,8}
-        ',
-                'mobile' => '
-          2[0-28]\\d{8}|
-          2[0-27-9]\\d{7}|
-          21\\d{6}
-        ',
-                'pager' => '[28]6\\d{6,7}',
                 'fixed_line' => '
           24099\\d{3}|
           (?:
@@ -97,8 +86,6 @@ my $validators = {
             7[2-57-9]
           )\\d{6}
         ',
-                'voip' => '',
-                'specialrate' => '(90\\d{6,7})',
                 'geographic' => '
           24099\\d{3}|
           (?:
@@ -107,133 +94,146 @@ my $validators = {
             6[235-9]|
             7[2-57-9]
           )\\d{6}
-        '
+        ',
+                'mobile' => '
+          2[0-28]\\d{8}|
+          2[0-27-9]\\d{7}|
+          21\\d{6}
+        ',
+                'pager' => '[28]6\\d{6,7}',
+                'personal_number' => '70\\d{7}',
+                'specialrate' => '(90\\d{6,7})',
+                'toll_free' => '
+          508\\d{6,7}|
+          80\\d{6,8}
+        ',
+                'voip' => ''
               };
-my %areanames = (
-  6424 => "Scott\ Base",
-  64320 => "Gore\/Edendale",
-  64321 => "Invercargill\/Stewart\ Island\/Rakiura",
-  64322 => "Otautau",
-  64323 => "Riverton\/Winton",
-  64324 => "Tokanui\/Lumsden\/Te\ Anau",
-  64325 => "South\ Island",
-  64326 => "South\ Island",
-  64327 => "South\ Island",
-  64328 => "South\ Island",
-  64329 => "South\ Island",
-  64330 => "Ashburton\/Akaroa\/Chatham\ Islands",
-  64331 => "Rangiora\/Amberley\/Culverden\/Darfield\/Cheviot\/Kaikoura",
-  64332 => "Christchurch",
-  64333 => "Christchurch",
-  64334 => "Christchurch\/Rolleston",
-  64335 => "Christchurch",
-  64336 => "South\ Island",
-  64337 => "Christchurch",
-  64338 => "Christchurch",
-  64339 => "South\ Island",
-  64340 => "South\ Island",
-  643409 => "Queenstown",
-  64341 => "Balclutha\/Milton",
-  64342 => "South\ Island",
-  64343 => "Oamaru\/Mount\ Cook\/Twizel\/Kurow",
-  64344 => "Queenstown\/Cromwell\/Alexandra\/Wanaka\/Ranfurly\/Roxburgh",
-  64345 => "Dunedin\/Queenstown",
-  64346 => "Dunedin\/Palmerston",
-  64347 => "Dunedin",
-  64348 => "Dunedin\/Lawrence\/Mosgiel",
-  64349 => "South\ Island",
-  6435 => "South\ Island",
-  64352 => "Murchison\/Takaka\/Motueka",
-  64354 => "Nelson",
-  64357 => "Blenheim",
-  6436 => "South\ Island",
-  64361 => "Timaru",
-  64368 => "Timaru\/Waimate\/Fairlie",
-  64369 => "Geraldine",
-  6437 => "South\ Island",
-  64373 => "Greymouth",
-  64375 => "Hokitika\/Franz\ Josef\ Glacier\/Fox\ Glacier\/Haast",
-  64376 => "Greymouth",
-  64378 => "Westport",
-  64390 => "Ashburton",
-  64391 => "South\ Island",
-  64392 => "South\ Island",
-  64393 => "South\ Island",
-  64394 => "Christchurch\/Invercargill",
-  64395 => "Dunedin\/Timaru",
-  64396 => "Christchurch",
-  64397 => "Christchurch",
-  64398 => "Christchurch\/Blenheim\/Nelson",
-  64399 => "South\ Island",
-  64423 => "Wellington\/Porirua\/Tawa",
-  64429 => "Paraparaumu",
-  6443 => "Wellington",
-  6444 => "Wellington",
-  6445 => "Wellington\/Hutt\ Valley",
-  64480 => "Wellington",
-  6449 => "Wellington",
-  64490 => "Paraparaumu",
-  64627 => "Hawera",
-  64630 => "Featherston",
-  64632 => "Palmerston\ North\/Marton",
-  64634 => "Wanganui",
-  64635 => "Palmerston\ North\ City",
-  64636 => "Levin",
-  64637 => "Masterton\/Dannevirke\/Pahiatua",
-  64638 => "Taihape\/Ohakune\/Waiouru",
-  64675 => "New\ Plymouth\/Mokau",
-  64676 => "New\ Plymouth\/Opunake\/Stratford",
-  64683 => "Napier\/Wairoa",
-  64684 => "Napier\ City",
-  64685 => "Waipukurau",
-  64686 => "Gisborne\/Ruatoria",
-  64687 => "Napier\/Hastings",
-  64694 => "Masterton\/Levin",
-  64695 => "Palmerston\ North\/New\ Plymouth",
-  64696 => "Wanganui\/New\ Plymouth",
-  64697 => "Napier",
-  64698 => "Gisborne",
-  64730 => "Whakatane",
-  64731 => "Whakatane\/Opotiki",
-  64732 => "Whakatane",
-  64733 => "Rotorua\/Taupo",
-  64734 => "Rotorua",
-  64735 => "Rotorua",
-  64736 => "Rotorua",
-  64737 => "Taupo",
-  64738 => "Taupo",
-  64754 => "Tauranga",
-  64757 => "Tauranga",
-  64782 => "Hamilton\/Huntly",
-  64783 => "Hamilton",
-  64784 => "Hamilton",
-  64785 => "Hamilton",
-  64786 => "Paeroa\/Waihi\/Thames\/Whangamata",
-  64787 => "Te\ Awamutu\/Otorohanga\/Te\ Kuiti",
-  64788 => "Matamata\/Putaruru\/Morrinsville",
-  64789 => "Taumarunui",
-  64790 => "Taupo",
-  64792 => "Rotorua\/Whakatane\/Tauranga",
-  64793 => "Tauranga",
-  64795 => "Hamilton",
-  64796 => "Hamilton",
-  6492 => "Auckland",
-  64923 => "Pukekohe",
-  6493 => "Auckland\/Waiheke\ Island",
-  64940 => "Kaikohe\/Kaitaia\/Kawakawa",
-  64941 => "Auckland",
-  64942 => "Helensville\/Warkworth\/Hibiscus\ Coast\/Great\ Barrier\ Island",
-  64943 => "Whangarei\/Maungaturoto",
-  64944 => "Auckland",
-  64947 => "Auckland",
-  64948 => "Auckland",
-  6495 => "Auckland",
-  6496 => "Auckland",
-  6498 => "Auckland",
-  6499 => "Auckland",
-  64990 => "Warkworth",
-  64998 => "Whangarei",
-);
+my %areanames = ();
+$areanames{en}->{6424} = "Scott\ Base";
+$areanames{en}->{64320} = "Gore\/Edendale";
+$areanames{en}->{64321} = "Invercargill\/Stewart\ Island\/Rakiura";
+$areanames{en}->{64322} = "Otautau";
+$areanames{en}->{64323} = "Riverton\/Winton";
+$areanames{en}->{64324} = "Tokanui\/Lumsden\/Te\ Anau";
+$areanames{en}->{64325} = "South\ Island";
+$areanames{en}->{64326} = "South\ Island";
+$areanames{en}->{64327} = "South\ Island";
+$areanames{en}->{64328} = "South\ Island";
+$areanames{en}->{64329} = "South\ Island";
+$areanames{en}->{64330} = "Ashburton\/Akaroa\/Chatham\ Islands";
+$areanames{en}->{64331} = "Rangiora\/Amberley\/Culverden\/Darfield\/Cheviot\/Kaikoura";
+$areanames{en}->{64332} = "Christchurch";
+$areanames{en}->{64333} = "Christchurch";
+$areanames{en}->{64334} = "Christchurch\/Rolleston";
+$areanames{en}->{64335} = "Christchurch";
+$areanames{en}->{64336} = "South\ Island";
+$areanames{en}->{64337} = "Christchurch";
+$areanames{en}->{64338} = "Christchurch";
+$areanames{en}->{64339} = "South\ Island";
+$areanames{en}->{64340} = "South\ Island";
+$areanames{en}->{643409} = "Queenstown";
+$areanames{en}->{64341} = "Balclutha\/Milton";
+$areanames{en}->{64342} = "South\ Island";
+$areanames{en}->{64343} = "Oamaru\/Mount\ Cook\/Twizel\/Kurow";
+$areanames{en}->{64344} = "Queenstown\/Cromwell\/Alexandra\/Wanaka\/Ranfurly\/Roxburgh";
+$areanames{en}->{64345} = "Dunedin\/Queenstown";
+$areanames{en}->{64346} = "Dunedin\/Palmerston";
+$areanames{en}->{64347} = "Dunedin";
+$areanames{en}->{64348} = "Dunedin\/Lawrence\/Mosgiel";
+$areanames{en}->{64349} = "South\ Island";
+$areanames{en}->{6435} = "South\ Island";
+$areanames{en}->{64352} = "Murchison\/Takaka\/Motueka";
+$areanames{en}->{64354} = "Nelson";
+$areanames{en}->{64357} = "Blenheim";
+$areanames{en}->{6436} = "South\ Island";
+$areanames{en}->{64361} = "Timaru";
+$areanames{en}->{64368} = "Timaru\/Waimate\/Fairlie";
+$areanames{en}->{64369} = "Geraldine";
+$areanames{en}->{6437} = "South\ Island";
+$areanames{en}->{64373} = "Greymouth";
+$areanames{en}->{64375} = "Hokitika\/Franz\ Josef\ Glacier\/Fox\ Glacier\/Haast";
+$areanames{en}->{64376} = "Greymouth";
+$areanames{en}->{64378} = "Westport";
+$areanames{en}->{64390} = "Ashburton";
+$areanames{en}->{64391} = "South\ Island";
+$areanames{en}->{64392} = "South\ Island";
+$areanames{en}->{64393} = "South\ Island";
+$areanames{en}->{64394} = "Christchurch\/Invercargill";
+$areanames{en}->{64395} = "Dunedin\/Timaru";
+$areanames{en}->{64396} = "Christchurch";
+$areanames{en}->{64397} = "Christchurch";
+$areanames{en}->{64398} = "Christchurch\/Blenheim\/Nelson";
+$areanames{en}->{64399} = "South\ Island";
+$areanames{en}->{64423} = "Wellington\/Porirua\/Tawa";
+$areanames{en}->{64429} = "Paraparaumu";
+$areanames{en}->{6443} = "Wellington";
+$areanames{en}->{6444} = "Wellington";
+$areanames{en}->{6445} = "Wellington\/Hutt\ Valley";
+$areanames{en}->{64480} = "Wellington";
+$areanames{en}->{6449} = "Wellington";
+$areanames{en}->{64490} = "Paraparaumu";
+$areanames{en}->{64627} = "Hawera";
+$areanames{en}->{64630} = "Featherston";
+$areanames{en}->{64632} = "Palmerston\ North\/Marton";
+$areanames{en}->{64634} = "Wanganui";
+$areanames{en}->{64635} = "Palmerston\ North\ City";
+$areanames{en}->{64636} = "Levin";
+$areanames{en}->{64637} = "Masterton\/Dannevirke\/Pahiatua";
+$areanames{en}->{64638} = "Taihape\/Ohakune\/Waiouru";
+$areanames{en}->{64675} = "New\ Plymouth\/Mokau";
+$areanames{en}->{64676} = "New\ Plymouth\/Opunake\/Stratford";
+$areanames{en}->{64683} = "Napier\/Wairoa";
+$areanames{en}->{64684} = "Napier\ City";
+$areanames{en}->{64685} = "Waipukurau";
+$areanames{en}->{64686} = "Gisborne\/Ruatoria";
+$areanames{en}->{64687} = "Napier\/Hastings";
+$areanames{en}->{64694} = "Masterton\/Levin";
+$areanames{en}->{64695} = "Palmerston\ North\/New\ Plymouth";
+$areanames{en}->{64696} = "Wanganui\/New\ Plymouth";
+$areanames{en}->{64697} = "Napier";
+$areanames{en}->{64698} = "Gisborne";
+$areanames{en}->{64730} = "Whakatane";
+$areanames{en}->{64731} = "Whakatane\/Opotiki";
+$areanames{en}->{64732} = "Whakatane";
+$areanames{en}->{64733} = "Rotorua\/Taupo";
+$areanames{en}->{64734} = "Rotorua";
+$areanames{en}->{64735} = "Rotorua";
+$areanames{en}->{64736} = "Rotorua";
+$areanames{en}->{64737} = "Taupo";
+$areanames{en}->{64738} = "Taupo";
+$areanames{en}->{64754} = "Tauranga";
+$areanames{en}->{64757} = "Tauranga";
+$areanames{en}->{64782} = "Hamilton\/Huntly";
+$areanames{en}->{64783} = "Hamilton";
+$areanames{en}->{64784} = "Hamilton";
+$areanames{en}->{64785} = "Hamilton";
+$areanames{en}->{64786} = "Paeroa\/Waihi\/Thames\/Whangamata";
+$areanames{en}->{64787} = "Te\ Awamutu\/Otorohanga\/Te\ Kuiti";
+$areanames{en}->{64788} = "Matamata\/Putaruru\/Morrinsville";
+$areanames{en}->{64789} = "Taumarunui";
+$areanames{en}->{64790} = "Taupo";
+$areanames{en}->{64792} = "Rotorua\/Whakatane\/Tauranga";
+$areanames{en}->{64793} = "Tauranga";
+$areanames{en}->{64795} = "Hamilton";
+$areanames{en}->{64796} = "Hamilton";
+$areanames{en}->{6492} = "Auckland";
+$areanames{en}->{64923} = "Pukekohe";
+$areanames{en}->{6493} = "Auckland\/Waiheke\ Island";
+$areanames{en}->{64940} = "Kaikohe\/Kaitaia\/Kawakawa";
+$areanames{en}->{64941} = "Auckland";
+$areanames{en}->{64942} = "Helensville\/Warkworth\/Hibiscus\ Coast\/Great\ Barrier\ Island";
+$areanames{en}->{64943} = "Whangarei\/Maungaturoto";
+$areanames{en}->{64944} = "Auckland";
+$areanames{en}->{64947} = "Auckland";
+$areanames{en}->{64948} = "Auckland";
+$areanames{en}->{6495} = "Auckland";
+$areanames{en}->{6496} = "Auckland";
+$areanames{en}->{6498} = "Auckland";
+$areanames{en}->{6499} = "Auckland";
+$areanames{en}->{64990} = "Warkworth";
+$areanames{en}->{64998} = "Whangarei";
+
     sub new {
       my $class = shift;
       my $number = shift;

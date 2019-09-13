@@ -133,8 +133,12 @@ sub test_new : Tests() {
                 skip 'Your OpenSSL can’t load this key!', 1 if !OpenSSL_Control::can_load_private_pem($key->to_pem_with_curve_name());
             }
 
+            if ( $key->isa('Crypt::Perl::Ed25519::PrivateKey') ) {
+                skip 'Your OpenSSL can’t load ed25519 keys!', 1 if !OpenSSL_Control::can_ed25519();
+            }
+
             unlike( $text, qr<Unable to load>, "$print_type: key parsed correctly" ) or do {
-                print $key->to_pem_with_curve_name() . $/;
+                print $key->to_pem() . $/;
             };
         }
 

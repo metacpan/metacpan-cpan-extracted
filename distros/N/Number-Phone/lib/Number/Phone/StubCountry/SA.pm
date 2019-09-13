@@ -22,49 +22,40 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222641;
+our $VERSION = 1.20190912215427;
 
 my $formatters = [
                 {
-                  'leading_digits' => '9',
                   'format' => '$1 $2',
+                  'leading_digits' => '9',
                   'pattern' => '(\\d{4})(\\d{5})'
                 },
                 {
                   'format' => '$1 $2 $3',
+                  'leading_digits' => '1',
                   'national_rule' => '0$1',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})',
-                  'leading_digits' => '1'
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
                 },
                 {
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})',
-                  'national_rule' => '0$1',
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '5'
+                  'leading_digits' => '5',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
                 },
                 {
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '81',
                   'national_rule' => '0$1',
-                  'format' => '$1 $2 $3',
                   'pattern' => '(\\d{3})(\\d{3})(\\d{3,4})'
                 },
                 {
-                  'leading_digits' => '8',
                   'format' => '$1 $2 $3',
+                  'leading_digits' => '8',
                   'pattern' => '(\\d{3})(\\d{3})(\\d{4})'
                 }
               ];
 
 my $validators = {
-                'personal_number' => '',
-                'mobile' => '
-          5(?:
-            [013-689]\\d|
-            7[0-36-8]
-          )\\d{6}
-        ',
-                'toll_free' => '800\\d{7}',
-                'pager' => '',
                 'fixed_line' => '
           1(?:
             1\\d|
@@ -75,8 +66,6 @@ my $validators = {
             7[235-7]
           )\\d{6}
         ',
-                'voip' => '',
-                'specialrate' => '(920\\d{6})|(925\\d{6})|(811\\d{7})',
                 'geographic' => '
           1(?:
             1\\d|
@@ -86,16 +75,33 @@ my $validators = {
             6[2-5]|
             7[235-7]
           )\\d{6}
-        '
+        ',
+                'mobile' => '
+          5(?:
+            [013-689]\\d|
+            7[0-36-8]
+          )\\d{6}
+        ',
+                'pager' => '',
+                'personal_number' => '',
+                'specialrate' => '(920\\d{6})|(925\\d{6})|(811\\d{7})',
+                'toll_free' => '800\\d{7}',
+                'voip' => ''
               };
-my %areanames = (
-  96611 => "Riyadh\/Kharj",
-  96612 => "Makkah\/Jeddah",
-  96613 => "Dammam\/Khobar\/Dahran",
-  96614 => "Madenah\/Arar\/Tabuk\/Yanbu",
-  96616 => "Hail\/Qasim",
-  96617 => "Abha\/Najran\/Jezan",
-);
+my %areanames = ();
+$areanames{ar}->{96611} = "الرياض\/الخرج";
+$areanames{ar}->{96612} = "مكة\/جدة";
+$areanames{ar}->{96613} = "الدمام\/الخبر\/الظهران";
+$areanames{ar}->{96614} = "المدينة\ المنورة\/عرعر\/تبوك\/ينبع\ البحر";
+$areanames{ar}->{96616} = "حائل\/القصيم";
+$areanames{ar}->{96617} = "أبها\/نجران\/جازان";
+$areanames{en}->{96611} = "Riyadh\/Kharj";
+$areanames{en}->{96612} = "Makkah\/Jeddah";
+$areanames{en}->{96613} = "Dammam\/Khobar\/Dahran";
+$areanames{en}->{96614} = "Madenah\/Arar\/Tabuk\/Yanbu";
+$areanames{en}->{96616} = "Hail\/Qasim";
+$areanames{en}->{96617} = "Abha\/Najran\/Jezan";
+
     sub new {
       my $class = shift;
       my $number = shift;

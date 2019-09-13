@@ -1,7 +1,3 @@
-# Copyright (c) 2007-2017 by Martin Becker.  All rights reserved.
-# This package is free software; you can redistribute it and/or modify it
-# under the same terms as Perl itself.
-
 package Math::Polynomial;
 
 use 5.006;
@@ -34,15 +30,15 @@ overload->import(
 # Math::Polynomial=ARRAY(...)
 
 # .......... index ..........   # .......... value ..........
-use constant F_COEFF  => 0;     # coefficients arrayref, ascending degree
-use constant F_ZERO   => 1;     # zero element of coefficient space
-use constant F_ONE    => 2;     # unit element of coefficient space
-use constant F_CONFIG => 3;     # default stringification configuration
-use constant NFIELDS  => 4;
+use constant _F_COEFF  => 0;    # coefficients arrayref, ascending degree
+use constant _F_ZERO   => 1;    # zero element of coefficient space
+use constant _F_ONE    => 2;    # unit element of coefficient space
+use constant _F_CONFIG => 3;    # default stringification configuration
+use constant _NFIELDS  => 4;
 
 # ----- static data -----
 
-our $VERSION      = '1.014';
+our $VERSION      = '1.015';
 our $max_degree   = 10_000;    # limit for power operator
 
 # default values for as_string options
@@ -197,10 +193,10 @@ sub string_config {
     my $have_arg = 2 <= @_;
     if (ref $this) {
         if ($have_arg) {
-            $this->[F_CONFIG] = $config;
+            $this->[_F_CONFIG] = $config;
         }
         else {
-            $config = $this->[F_CONFIG];
+            $config = $this->[_F_CONFIG];
         }
     }
     else {
@@ -243,12 +239,12 @@ sub coeff {
     my ($this, $degree) = @_;
     if (defined $degree) {
         return
-            0 <= $degree && $degree < @{$this->[F_COEFF]}?
-                $this->[F_COEFF]->[$degree]:
-                $this->[F_ZERO];
+            0 <= $degree && $degree < @{$this->[_F_COEFF]}?
+                $this->[_F_COEFF]->[$degree]:
+                $this->[_F_ZERO];
     }
     croak 'array context required if called without argument' if !wantarray;
-    return @{$this->[F_COEFF]};
+    return @{$this->[_F_COEFF]};
 }
 
 sub coefficients {
@@ -257,9 +253,9 @@ sub coefficients {
     return $this->is_zero? ($this->coeff_zero): $this->coeff;
 }
 
-sub degree     { return $#{ $_[0]->[F_COEFF] }; }
-sub coeff_zero { return $_[0]->[F_ZERO]; }
-sub coeff_one  { return $_[0]->[F_ONE]; }
+sub degree     { return $#{ $_[0]->[_F_COEFF] }; }
+sub coeff_zero { return $_[0]->[_F_ZERO]; }
+sub coeff_one  { return $_[0]->[_F_ONE]; }
 
 sub proper_degree {
     my ($this) = @_;
@@ -909,7 +905,7 @@ Math::Polynomial - Perl class for polynomials in one variable
 
 =head1 VERSION
 
-This documentation refers to version 1.014 of Math::Polynomial.
+This documentation refers to version 1.015 of Math::Polynomial.
 
 =head1 SYNOPSIS
 
@@ -1917,6 +1913,22 @@ ordered space, i.e. lacking operators like C<E<lt>> (less than).
 
 =back
 
+=head1 PROTECTED METHODS
+
+=head2 Protected class method
+
+=over 4
+
+=item I<_NFIELDS>
+
+C<Math::Polynomial::_NFIELDS> is the constant number of object attributes
+in the Math::Polynomial base class.  Child classes may use it as an
+offset into the underlying array from where attributes of extensions can
+be stored.  Application code must not use it, nor rely on the internal
+type of object instances.
+
+=back
+
 =head1 EXAMPLES
 
   use Math::Polynomial 1.000;
@@ -2484,12 +2496,12 @@ Seminumerical Algorithms", 3rd ed., 1998, Addison-Wesley Professional.
 
 =head1 AUTHOR
 
-Martin Becker, E<lt>becker-cpan-mp@cozap.comE<gt>
+Martin Becker, E<lt>becker-cpan-mp (at) cozap.comE<gt>
 
 =head1 ACKNOWLEDGEMENTS
 
 Math::Polynomial was inspired by a module of the same name written and
-maintained by Mats Kindahl, E<lt>mats@kindahl.netE<gt>, 1997-2007,
+maintained by Mats Kindahl, E<lt>mats (at) kindahl.netE<gt>, 1997-2007,
 who kindly passed it on to the author for maintenance and improvement.
 
 Additional suggestions and bug reports came from Thorsten Dahlheimer
@@ -2497,7 +2509,7 @@ and Kevin Ryde.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2007-2017 by Martin Becker.  All rights reserved.
+Copyright (c) 2007-2019 by Martin Becker.  All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.6.0 or,

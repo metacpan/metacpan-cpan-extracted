@@ -1,10 +1,10 @@
 # this is bug RT #71438
-
-use Test::More tests => 6;
+use 5.008;
 
 use strict;
 use warnings;
 
+use Test::More;
 use DBI;
 
 my $dbh = DBI->connect('dbi:Mock:', '',  '', { PrintError => 0, RaiseError => 1});
@@ -69,3 +69,5 @@ is_deeply(
     $sth->fetchrow_hashref(),
     undef
 );
+
+done_testing();

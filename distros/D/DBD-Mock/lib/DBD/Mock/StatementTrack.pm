@@ -8,11 +8,12 @@ sub new {
 
     # these params have default values
     # but can be overridden
-    $params{return_data}  ||= [];
-    $params{fields}       ||= [];
-    $params{bound_params} ||= [];
-    $params{statement}    ||= "";
-    $params{failure}      ||= undef;
+    $params{return_data}       ||= [];
+    $params{fields}            ||= [];
+    $params{bound_params}      ||= [];
+    $params{bound_param_attrs} ||= [];
+    $params{statement}         ||= "";
+    $params{failure}           ||= undef;
 
     # these params should never be overridden
     # and should always start out in a default
@@ -61,7 +62,7 @@ sub bind_col {
 }
 
 sub bound_param {
-    my ( $self, $param_num, $value ) = @_;
+    my ( $self, $param_num, $value, $attr ) = @_;
 
     # Basic support for named parameters
     if ( $param_num !~ /^\d+/ ) {
@@ -69,6 +70,8 @@ sub bound_param {
     }
 
     $self->{bound_params}->[ $param_num - 1 ] = $value;
+    $self->{bound_param_attrs}->[ $param_num - 1 ] = ref $attr eq "HASH" ? { %$attr } : $attr;
+
     return $self->bound_params;
 }
 
@@ -85,6 +88,7 @@ sub bind_cols {
 sub bind_params {
     my ( $self, @values ) = @_;
     @{ $self->{bound_params} } = @values;
+    @{ $self->{bound_param_attrs} } = map { undef } @values;
 }
 
 # Rely on the DBI's notion of Active: a statement is active if it's
@@ -116,6 +120,12 @@ sub is_finished {
 
 sub mark_executed {
     my ($self) = @_;
+
+    push @{$self->{execution_history} }, {
+        params => [ @{ $self->{bound_params} } ],
+        attrs  => [ @{ $self->{bound_param_attrs} } ],
+    };
+
     $self->is_executed('yes');
     $self->current_record_num(0);
 }
@@ -189,6 +199,18 @@ sub bound_params {
     my ( $self, @values ) = @_;
     push @{ $self->{bound_params} }, @values if scalar @values;
     return $self->{bound_params};
+}
+
+sub bound_param_attrs {
+    my ( $self, @values ) = @_;
+    push @{ $self->{bound_param_attrs} }, @values if scalar @values;
+    return $self->{bound_param_attrs};
+}
+
+sub execution_history {
+    my ( $self, @values ) = @_;
+    push @{ $self->{execution_history} }, @values if scalar @values;
+    return $self->{execution_history};
 }
 
 1;

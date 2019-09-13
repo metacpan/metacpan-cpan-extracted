@@ -22,16 +22,17 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222640;
+our $VERSION = 1.20190912215426;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d{4,5})',
                   'format' => '$1',
+                  'leading_digits' => '96',
                   'national_rule' => '0$1',
-                  'leading_digits' => '96'
+                  'pattern' => '(\\d{4,5})'
                 },
                 {
+                  'format' => '$1 $2',
                   'leading_digits' => '
             (?:
               1[137]|
@@ -45,37 +46,24 @@ my $formatters = [
             )[12689]
           ',
                   'national_rule' => '0$1',
-                  'format' => '$1 $2',
                   'pattern' => '(\\d{2})(\\d{4,5})'
                 },
                 {
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '9',
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{3,4})',
                   'national_rule' => '0$1',
-                  'format' => '$1 $2 $3'
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3,4})'
                 },
                 {
-                  'leading_digits' => '[1-8]',
-                  'pattern' => '(\\d{2})(\\d{4})(\\d{4})',
                   'format' => '$1 $2 $3',
-                  'national_rule' => '0$1'
+                  'leading_digits' => '[1-8]',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{2})(\\d{4})(\\d{4})'
                 }
               ];
 
 my $validators = {
-                'geographic' => '
-          944111\\d{4}|
-          94(?:
-            (?:
-              00|
-              44
-            )0|
-            (?:
-              11|
-              2\\d
-            )\\d|
-            30[01]
-          )\\d{5}|
+                'fixed_line' => '
           (?:
             1[137]|
             2[13-68]|
@@ -95,8 +83,88 @@ my $validators = {
                 \\d{3}
               )?
             )?
-          )
+          )|
+          94(?:
+            000[09]|
+            2(?:
+              121|
+              [2689]0\\d
+            )|
+            30[0-2]\\d|
+            4(?:
+              111|
+              40\\d
+            )
+          )\\d{4}
         ',
+                'geographic' => '
+          (?:
+            1[137]|
+            2[13-68]|
+            3[1458]|
+            4[145]|
+            5[1468]|
+            6[16]|
+            7[1467]|
+            8[13467]
+          )(?:
+            [03-57]\\d{7}|
+            [16]\\d{3}(?:
+              \\d{4}
+            )?|
+            [289]\\d{3}(?:
+              \\d(?:
+                \\d{3}
+              )?
+            )?
+          )|
+          94(?:
+            000[09]|
+            2(?:
+              121|
+              [2689]0\\d
+            )|
+            30[0-2]\\d|
+            4(?:
+              111|
+              40\\d
+            )
+          )\\d{4}
+        ',
+                'mobile' => '
+          9(?:
+            (?:
+              0(?:
+                [1-35]\\d|
+                44
+              )|
+              (?:
+                [13]\\d|
+                2[0-2]
+              )\\d
+            )\\d|
+            9(?:
+              (?:
+                [0-2]\\d|
+                44
+              )\\d|
+              5[15]0|
+              8(?:
+                1[0-2]|
+                88
+              )|
+              9(?:
+                0[013]|
+                1[0134]|
+                21|
+                77|
+                9[6-9]
+              )
+            )
+          )\\d{5}
+        ',
+                'pager' => '',
+                'personal_number' => '',
                 'specialrate' => '(
           96(?:
             0[12]|
@@ -117,110 +185,73 @@ my $validators = {
             9[19]
           )
         )',
-                'voip' => '993\\d{7}',
-                'fixed_line' => '
-          944111\\d{4}|
-          94(?:
-            (?:
-              00|
-              44
-            )0|
-            (?:
-              11|
-              2\\d
-            )\\d|
-            30[01]
-          )\\d{5}|
-          (?:
-            1[137]|
-            2[13-68]|
-            3[1458]|
-            4[145]|
-            5[1468]|
-            6[16]|
-            7[1467]|
-            8[13467]
-          )(?:
-            [03-57]\\d{7}|
-            [16]\\d{3}(?:
-              \\d{4}
-            )?|
-            [289]\\d{3}(?:
-              \\d(?:
-                \\d{3}
-              )?
-            )?
-          )
-        ',
-                'pager' => '',
-                'personal_number' => '',
                 'toll_free' => '',
-                'mobile' => '
-          9(?:
-            (?:
-              0(?:
-                [1-35]\\d|
-                44
-              )|
-              (?:
-                [13]\\d|
-                2[0-2]
-              )\\d
-            )\\d|
-            9(?:
-              (?:
-                [0-2]\\d|
-                44
-              )\\d|
-              510|
-              8(?:
-                1\\d|
-                88
-              )|
-              9(?:
-                0[013]|
-                1[0134]|
-                21|
-                77|
-                9[6-9]
-              )
-            )
-          )\\d{5}
-        '
+                'voip' => '993\\d{7}'
               };
-my %areanames = (
-  9811 => "Mazandaran",
-  9813 => "Gilan",
-  9817 => "Golestan",
-  9821 => "Tehran\ province",
-  9823 => "Semnan\ province",
-  9824 => "Zanjan\ province",
-  9825 => "Qom\ province",
-  9826 => "Alborz",
-  9828 => "Qazvin\ province",
-  9831 => "Isfahan\ province",
-  9834 => "Kerman\ province",
-  9835 => "Yazd\ province",
-  9838 => "Chahar\-mahal\ and\ Bakhtiari",
-  9841 => "East\ Azarbaijan",
-  9844 => "West\ Azarbaijan",
-  9845 => "Ardabil\ province",
-  9851 => "Razavi\ Khorasan",
-  9854 => "Sistan\ and\ Baluchestan",
-  9856 => "South\ Khorasan",
-  9858 => "North\ Khorasan",
-  9861 => "Khuzestan",
-  9866 => "Lorestan",
-  9871 => "Fars",
-  9874 => "Kohgiluyeh\ and\ Boyer\-Ahmad",
-  9876 => "Hormozgan",
-  9877 => "Bushehr\ province",
-  9881 => "Hamadan\ province",
-  9883 => "Kermanshah\ province",
-  9884 => "Ilam\ province",
-  9886 => "Markazi",
-  9887 => "Kurdistan",
-);
+my %areanames = ();
+$areanames{en}->{9811} = "Mazandaran";
+$areanames{en}->{9813} = "Gilan";
+$areanames{en}->{9817} = "Golestan";
+$areanames{en}->{9821} = "Tehran\ province";
+$areanames{en}->{9823} = "Semnan\ province";
+$areanames{en}->{9824} = "Zanjan\ province";
+$areanames{en}->{9825} = "Qom\ province";
+$areanames{en}->{9826} = "Alborz";
+$areanames{en}->{9828} = "Qazvin\ province";
+$areanames{en}->{9831} = "Isfahan\ province";
+$areanames{en}->{9834} = "Kerman\ province";
+$areanames{en}->{9835} = "Yazd\ province";
+$areanames{en}->{9838} = "Chahar\-mahal\ and\ Bakhtiari";
+$areanames{en}->{9841} = "East\ Azarbaijan";
+$areanames{en}->{9844} = "West\ Azarbaijan";
+$areanames{en}->{9845} = "Ardabil\ province";
+$areanames{en}->{9851} = "Razavi\ Khorasan";
+$areanames{en}->{9854} = "Sistan\ and\ Baluchestan";
+$areanames{en}->{9856} = "South\ Khorasan";
+$areanames{en}->{9858} = "North\ Khorasan";
+$areanames{en}->{9861} = "Khuzestan";
+$areanames{en}->{9866} = "Lorestan";
+$areanames{en}->{9871} = "Fars";
+$areanames{en}->{9874} = "Kohgiluyeh\ and\ Boyer\-Ahmad";
+$areanames{en}->{9876} = "Hormozgan";
+$areanames{en}->{9877} = "Bushehr\ province";
+$areanames{en}->{9881} = "Hamadan\ province";
+$areanames{en}->{9883} = "Kermanshah\ province";
+$areanames{en}->{9884} = "Ilam\ province";
+$areanames{en}->{9886} = "Markazi";
+$areanames{en}->{9887} = "Kurdistan";
+$areanames{fa}->{9811} = "مازندران";
+$areanames{fa}->{9813} = "گیلان";
+$areanames{fa}->{9817} = "گلستان";
+$areanames{fa}->{9821} = "استان\ تهران";
+$areanames{fa}->{9823} = "استان\ سمنان";
+$areanames{fa}->{9824} = "استان\ زنجان";
+$areanames{fa}->{9825} = "استان\ قم";
+$areanames{fa}->{9826} = "البرز";
+$areanames{fa}->{9828} = "استان\ قزوین";
+$areanames{fa}->{9831} = "استان\ اصفهان";
+$areanames{fa}->{9834} = "استان\ کرمان";
+$areanames{fa}->{9835} = "استان\ یزد";
+$areanames{fa}->{9838} = "چهارمحال\ و\ بختیاری";
+$areanames{fa}->{9841} = "آذربایجان\ شرقی";
+$areanames{fa}->{9844} = "آذربایجان\ غربی";
+$areanames{fa}->{9845} = "استان\ اردبیل";
+$areanames{fa}->{9851} = "خراسان\ رضوی";
+$areanames{fa}->{9854} = "سیستان\ و\ بلوچستان";
+$areanames{fa}->{9856} = "خراسان\ جنوبی";
+$areanames{fa}->{9858} = "خراسان\ شمالی";
+$areanames{fa}->{9861} = "خوزستان";
+$areanames{fa}->{9866} = "لرستان";
+$areanames{fa}->{9871} = "فارس";
+$areanames{fa}->{9874} = "کهگیلویه\ و\ بویراحمد";
+$areanames{fa}->{9876} = "هرمزگان";
+$areanames{fa}->{9877} = "استان\ بوشهر";
+$areanames{fa}->{9881} = "استان\ همدان";
+$areanames{fa}->{9883} = "استان\ کرمانشاه";
+$areanames{fa}->{9884} = "استان\ ایلام";
+$areanames{fa}->{9886} = "مرکزی";
+$areanames{fa}->{9887} = "کردستان";
+
     sub new {
       my $class = shift;
       my $number = shift;

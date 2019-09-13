@@ -22,16 +22,17 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222641;
+our $VERSION = 1.20190912215428;
 
 my $formatters = [
                 {
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '202',
                   'national_rule' => '0$1',
-                  'format' => '$1 $2 $3',
                   'pattern' => '(\\d{2})(\\d)(\\d{4})'
                 },
                 {
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '
             [25][2-8]|
             [346]|
@@ -39,42 +40,40 @@ my $formatters = [
             8[237-9]
           ',
                   'national_rule' => '0$1',
-                  'format' => '$1 $2 $3',
                   'pattern' => '(\\d)(\\d{3,4})(\\d{4})'
                 },
                 {
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '[258]',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})',
                   'national_rule' => '0$1',
-                  'format' => '$1 $2 $3'
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
                 },
                 {
-                  'national_rule' => '0$1',
                   'format' => '$1 $2 $3',
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
-                  'leading_digits' => '9'
+                  'leading_digits' => '9',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
                 },
                 {
-                  'national_rule' => '0$1',
                   'format' => '$1 $2 $3',
-                  'pattern' => '(\\d{2})(\\d{4})(\\d{4})',
-                  'leading_digits' => '7'
+                  'leading_digits' => '7',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{2})(\\d{4})(\\d{4})'
                 }
               ];
 
 my $validators = {
-                'personal_number' => '99\\d{7}',
-                'toll_free' => '80[0-79]\\d{6}',
-                'mobile' => '9[0-8]\\d{7}',
-                'pager' => '',
                 'fixed_line' => '
           24\\d{6,7}|
-          8(?:
-            2(?:
-              3\\d|
-              66
-            )|
-            36[24-9]
+          (?:
+            6412|
+            8(?:
+              2(?:
+                3\\d|
+                66
+              )|
+              36[24-9]
+            )
           )\\d{4}|
           (?:
             2[235-8]\\d|
@@ -89,15 +88,17 @@ my $validators = {
             8[7-9]
           )\\d{6}
         ',
-                'voip' => '70\\d{8}',
                 'geographic' => '
           24\\d{6,7}|
-          8(?:
-            2(?:
-              3\\d|
-              66
-            )|
-            36[24-9]
+          (?:
+            6412|
+            8(?:
+              2(?:
+                3\\d|
+                66
+              )|
+              36[24-9]
+            )
           )\\d{4}|
           (?:
             2[235-8]\\d|
@@ -112,33 +113,56 @@ my $validators = {
             8[7-9]
           )\\d{6}
         ',
+                'mobile' => '9[0-8]\\d{7}',
+                'pager' => '',
+                'personal_number' => '99\\d{7}',
                 'specialrate' => '(
           20(?:
             [013-9]\\d\\d|
             2
           )\\d{4}
-        )|(50[0-46-9]\\d{6})'
+        )|(50[0-46-9]\\d{6})',
+                'toll_free' => '80[0-79]\\d{6}',
+                'voip' => '70\\d{8}'
               };
-my %areanames = (
-  8862 => "Taipei",
-  8863 => "Taoyuan\/Hsinchu\/Yilan\/Hualien",
-  88637 => "Miaoli",
-  88642 => "Taichung\/Changhua",
-  88643 => "Taichung\/Changhua",
-  88647 => "Taichung\/Changhua",
-  88648 => "Taichung\/Changhua",
-  88649 => "Nantou",
-  8865 => "Chiayi\/Yunlin",
-  8866 => "Tainan\/Penghu",
-  8867 => "Kaohsiung",
-  88680 => "Pingtung",
-  886823 => "Kinmen",
-  886826 => "Wuqiu",
-  88683 => "Matsu",
-  88687 => "Pingtung",
-  88688 => "Pingtung",
-  88689 => "Taitung",
-);
+my %areanames = ();
+$areanames{zh}->{8862} = "台北";
+$areanames{zh}->{8863} = "桃园\、新竹\、花莲\、宜兰";
+$areanames{zh}->{88637} = "苗栗";
+$areanames{zh}->{88642} = "台中\、彰化";
+$areanames{zh}->{88643} = "台中\、彰化";
+$areanames{zh}->{88647} = "台中\、彰化";
+$areanames{zh}->{88648} = "台中\、彰化";
+$areanames{zh}->{88649} = "南投";
+$areanames{zh}->{8865} = "嘉义\、云林";
+$areanames{zh}->{8866} = "台南\、澎湖";
+$areanames{zh}->{8867} = "高雄";
+$areanames{zh}->{88680} = "屏东";
+$areanames{zh}->{886823} = "金门";
+$areanames{zh}->{886826} = "乌丘";
+$areanames{zh}->{88683} = "马祖";
+$areanames{zh}->{88687} = "屏东";
+$areanames{zh}->{88688} = "屏东";
+$areanames{zh}->{88689} = "台东";
+$areanames{en}->{8862} = "Taipei";
+$areanames{en}->{8863} = "Taoyuan\/Hsinchu\/Yilan\/Hualien";
+$areanames{en}->{88637} = "Miaoli";
+$areanames{en}->{88642} = "Taichung\/Changhua";
+$areanames{en}->{88643} = "Taichung\/Changhua";
+$areanames{en}->{88647} = "Taichung\/Changhua";
+$areanames{en}->{88648} = "Taichung\/Changhua";
+$areanames{en}->{88649} = "Nantou";
+$areanames{en}->{8865} = "Chiayi\/Yunlin";
+$areanames{en}->{8866} = "Tainan\/Penghu";
+$areanames{en}->{8867} = "Kaohsiung";
+$areanames{en}->{88680} = "Pingtung";
+$areanames{en}->{886823} = "Kinmen";
+$areanames{en}->{886826} = "Wuqiu";
+$areanames{en}->{88683} = "Matsu";
+$areanames{en}->{88687} = "Pingtung";
+$areanames{en}->{88688} = "Pingtung";
+$areanames{en}->{88689} = "Taitung";
+
     sub new {
       my $class = shift;
       my $number = shift;

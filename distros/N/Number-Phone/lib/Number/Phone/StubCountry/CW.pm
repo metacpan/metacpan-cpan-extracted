@@ -22,57 +22,22 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222639;
+our $VERSION = 1.20190912215425;
 
 my $formatters = [
                 {
-                  'leading_digits' => '[3467]',
                   'format' => '$1 $2',
+                  'leading_digits' => '[3467]',
                   'pattern' => '(\\d{3})(\\d{4})'
                 },
                 {
-                  'leading_digits' => '9[4-8]',
                   'format' => '$1 $2 $3',
+                  'leading_digits' => '9[4-8]',
                   'pattern' => '(\\d)(\\d{3})(\\d{4})'
                 }
               ];
 
 my $validators = {
-                'pager' => '955\\d{5}',
-                'personal_number' => '',
-                'toll_free' => '',
-                'mobile' => '
-          953[01]\\d{4}|
-          9(?:
-            5[12467]|
-            6[5-9]
-          )\\d{5}
-        ',
-                'specialrate' => '(60[0-2]\\d{4})',
-                'geographic' => '
-          9(?:
-            4(?:
-              3[0-5]|
-              4[14]|
-              6\\d
-            )|
-            50\\d|
-            7(?:
-              2[014]|
-              3[02-9]|
-              4[4-9]|
-              6[357]|
-              77|
-              8[7-9]
-            )|
-            8(?:
-              3[39]|
-              [46]\\d|
-              7[01]|
-              8[57-9]
-            )
-          )\\d{4}
-        ',
                 'fixed_line' => '
           9(?:
             4(?:
@@ -97,14 +62,49 @@ my $validators = {
             )
           )\\d{4}
         ',
+                'geographic' => '
+          9(?:
+            4(?:
+              3[0-5]|
+              4[14]|
+              6\\d
+            )|
+            50\\d|
+            7(?:
+              2[014]|
+              3[02-9]|
+              4[4-9]|
+              6[357]|
+              77|
+              8[7-9]
+            )|
+            8(?:
+              3[39]|
+              [46]\\d|
+              7[01]|
+              8[57-9]
+            )
+          )\\d{4}
+        ',
+                'mobile' => '
+          953[01]\\d{4}|
+          9(?:
+            5[12467]|
+            6[5-9]
+          )\\d{5}
+        ',
+                'pager' => '955\\d{5}',
+                'personal_number' => '',
+                'specialrate' => '(60[0-2]\\d{4})',
+                'toll_free' => '',
                 'voip' => ''
               };
-my %areanames = (
-  599318 => "St\.\ Eustatius",
-  599416 => "Saba",
-  59971 => "Bonaire",
-  59975 => "Bonaire",
-);
+my %areanames = ();
+$areanames{en}->{599318} = "St\.\ Eustatius";
+$areanames{en}->{599416} = "Saba";
+$areanames{en}->{59971} = "Bonaire";
+$areanames{en}->{59975} = "Bonaire";
+
     sub new {
       my $class = shift;
       my $number = shift;

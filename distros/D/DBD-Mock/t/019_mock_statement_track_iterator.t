@@ -1,6 +1,9 @@
-use strict;
+use 5.008;
 
-use Test::More tests => 22;
+use strict;
+use warnings;
+
+use Test::More;
 
 BEGIN {
     use_ok('DBD::Mock');
@@ -50,3 +53,5 @@ isa_ok($next, 'DBD::Mock::StatementTrack');
 is($next->statement, "INSERT INTO nothing (nothing) VALUES('nada')", '... its our old insert statement too');
 
 ok(!defined($i->next()), '... now nothing in the iterator');
+
+done_testing();

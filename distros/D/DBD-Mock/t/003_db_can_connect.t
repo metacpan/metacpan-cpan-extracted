@@ -1,6 +1,9 @@
-use strict;
+use 5.008;
 
-use Test::More tests => 22;
+use strict;
+use warnings;
+
+use Test::More;
 
 BEGIN {
     use_ok('DBD::Mock');  
@@ -77,3 +80,5 @@ BEGIN {
 
     $dbh->disconnect();
 }
+
+done_testing();

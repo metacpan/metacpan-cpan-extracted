@@ -1,5 +1,5 @@
 This archive contains the distribution File-Collector,
-version 0.037:
+version 0.038:
 
   Base class for custom File::Collector classes for classifying files and calling File::Collector::Processor methods for processing files
 

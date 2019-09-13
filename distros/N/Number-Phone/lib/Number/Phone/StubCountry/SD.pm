@@ -22,52 +22,52 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222641;
+our $VERSION = 1.20190912215428;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})',
-                  'national_rule' => '0$1',
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '[19]'
+                  'leading_digits' => '[19]',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
                 }
               ];
 
 my $validators = {
-                'geographic' => '
-          1(?:
-            5[3-7]|
-            8[35-7]
-          )\\d{6}
-        ',
-                'specialrate' => '',
                 'fixed_line' => '
           1(?:
             5[3-7]|
             8[35-7]
           )\\d{6}
         ',
-                'voip' => '',
-                'pager' => '',
-                'toll_free' => '',
+                'geographic' => '
+          1(?:
+            5[3-7]|
+            8[35-7]
+          )\\d{6}
+        ',
                 'mobile' => '
           (?:
             1[0-2]|
             9[0-3569]
           )\\d{7}
         ',
-                'personal_number' => ''
+                'pager' => '',
+                'personal_number' => '',
+                'specialrate' => '',
+                'toll_free' => '',
+                'voip' => ''
               };
-my %areanames = (
-  249153 => "Khartoum",
-  249155 => "Khartoum\ North",
-  249156 => "Khartoum\ Rural",
-  249157 => "Omdurman",
-  249183 => "Khartoum",
-  249185 => "Khartoum\ North",
-  249186 => "Khartoum\ Rural",
-  249187 => "Omdurman",
-);
+my %areanames = ();
+$areanames{en}->{249153} = "Khartoum";
+$areanames{en}->{249155} = "Khartoum\ North";
+$areanames{en}->{249156} = "Khartoum\ Rural";
+$areanames{en}->{249157} = "Omdurman";
+$areanames{en}->{249183} = "Khartoum";
+$areanames{en}->{249185} = "Khartoum\ North";
+$areanames{en}->{249186} = "Khartoum\ Rural";
+$areanames{en}->{249187} = "Omdurman";
+
     sub new {
       my $class = shift;
       my $number = shift;

@@ -22,36 +22,24 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222640;
+our $VERSION = 1.20190912215426;
 
 my $formatters = [
                 {
                   'format' => '$1 $2 $3',
+                  'leading_digits' => '7',
                   'national_rule' => '0$1',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})',
-                  'leading_digits' => '7'
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
                 },
                 {
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '[1-689]',
                   'national_rule' => '0$1',
-                  'format' => '$1 $2 $3',
                   'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
                 }
               ];
 
 my $validators = {
-                'specialrate' => '(1973\\d{5})',
-                'geographic' => '
-          (?:
-            [189]1|
-            2[13-7]|
-            3[1-8]|
-            4[157]|
-            5[12457]|
-            6[35-7]
-          )[2-57]\\d{6}
-        ',
-                'voip' => '',
                 'fixed_line' => '
           (?:
             [189]1|
@@ -62,42 +50,54 @@ my $validators = {
             6[35-7]
           )[2-57]\\d{6}
         ',
+                'geographic' => '
+          (?:
+            [189]1|
+            2[13-7]|
+            3[1-8]|
+            4[157]|
+            5[12457]|
+            6[35-7]
+          )[2-57]\\d{6}
+        ',
+                'mobile' => '7[0-25-8]\\d{7}',
                 'pager' => '',
                 'personal_number' => '',
+                'specialrate' => '(1973\\d{5})',
                 'toll_free' => '',
-                'mobile' => '7[0-25-8]\\d{7}'
+                'voip' => ''
               };
-my %areanames = (
-  9411 => "Colombo",
-  9421 => "Jaffna",
-  9423 => "Mannar",
-  9424 => "Vavuniya",
-  9425 => "Anuradhapura",
-  9426 => "Trincomalee",
-  9427 => "Polonnaruwa",
-  9431 => "Negombo\,\ Gampaha",
-  9432 => "Chilaw\,\ Puttalam",
-  9433 => "Gampaha",
-  9434 => "Kalutara",
-  9435 => "Kegalle",
-  9436 => "Avissawella\,\ Colombo",
-  9437 => "Kurunegala",
-  9438 => "Panadura\,\ Kalutara",
-  9441 => "Matara",
-  9445 => "Ratnapura",
-  9447 => "Hambantota",
-  9451 => "Hatton\,\ Nuwara\ Eliya",
-  9452 => "Nuwara\ Eliya",
-  9454 => "Nawalapitiya\,\ Kandy",
-  9455 => "Badulla",
-  9457 => "Bandarawela\,\ Badulla",
-  9463 => "Ampara",
-  9465 => "Batticaloa",
-  9466 => "Matale",
-  9467 => "Kalmunai\,\ Ampara",
-  948 => "Kandy",
-  949 => "Galle",
-);
+my %areanames = ();
+$areanames{en}->{9411} = "Colombo";
+$areanames{en}->{9421} = "Jaffna";
+$areanames{en}->{9423} = "Mannar";
+$areanames{en}->{9424} = "Vavuniya";
+$areanames{en}->{9425} = "Anuradhapura";
+$areanames{en}->{9426} = "Trincomalee";
+$areanames{en}->{9427} = "Polonnaruwa";
+$areanames{en}->{9431} = "Negombo\,\ Gampaha";
+$areanames{en}->{9432} = "Chilaw\,\ Puttalam";
+$areanames{en}->{9433} = "Gampaha";
+$areanames{en}->{9434} = "Kalutara";
+$areanames{en}->{9435} = "Kegalle";
+$areanames{en}->{9436} = "Avissawella\,\ Colombo";
+$areanames{en}->{9437} = "Kurunegala";
+$areanames{en}->{9438} = "Panadura\,\ Kalutara";
+$areanames{en}->{9441} = "Matara";
+$areanames{en}->{9445} = "Ratnapura";
+$areanames{en}->{9447} = "Hambantota";
+$areanames{en}->{9451} = "Hatton\,\ Nuwara\ Eliya";
+$areanames{en}->{9452} = "Nuwara\ Eliya";
+$areanames{en}->{9454} = "Nawalapitiya\,\ Kandy";
+$areanames{en}->{9455} = "Badulla";
+$areanames{en}->{9457} = "Bandarawela\,\ Badulla";
+$areanames{en}->{9463} = "Ampara";
+$areanames{en}->{9465} = "Batticaloa";
+$areanames{en}->{9466} = "Matale";
+$areanames{en}->{9467} = "Kalmunai\,\ Ampara";
+$areanames{en}->{948} = "Kandy";
+$areanames{en}->{949} = "Galle";
+
     sub new {
       my $class = shift;
       my $number = shift;

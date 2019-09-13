@@ -1,6 +1,9 @@
-use strict;
+use 5.008;
 
-use Test::More tests => 27;
+use strict;
+use warnings;
+
+use Test::More;
 
 BEGIN {
     use_ok('DBD::Mock');  
@@ -93,3 +96,5 @@ $sth->finish();
 
 # mock_is_finished
 is($sth->{mock_is_finished}, 'yes', '... and we are now finished');
+
+done_testing();

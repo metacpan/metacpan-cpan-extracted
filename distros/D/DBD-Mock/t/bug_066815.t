@@ -1,7 +1,9 @@
-#!/usr/bin/perl
-use Test::More tests => 15; 
+use 5.008;
+
 use strict;
 use warnings;
+
+use Test::More;
 use Test::Exception;
 use DBI;
 use DBD::Mock;
@@ -125,3 +127,5 @@ while(@cases) {
     } qr/\QSession states exhausted, only '$num_states' in DBD::Mock::Session\E/;
 
 }
+
+done_testing();

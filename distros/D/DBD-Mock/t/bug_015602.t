@@ -2,9 +2,12 @@
 # The bug that was reported did not appear, but it did expose
 # another bug with consecutive executes()
 
-use strict;
+use 5.008;
 
-use Test::More tests => 4;
+use strict;
+use warnings;
+
+use Test::More;
 
 use_ok('DBI');
 
@@ -36,3 +39,5 @@ eval {
 
 # Shuts up warning when object is destroyed
 undef $dbh->{mock_session};
+
+done_testing();

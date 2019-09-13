@@ -24,6 +24,7 @@ WriteMakefile(
         'CSS::Minifier::XS'	=> '0.09',
         'CSS::Sass'     =>  '3.0',
         'JavaScript::Minifier::XS'     => '0.1',
+        'JavaScript::Packer'     => '2.0',
     },
       META_MERGE => {
         'meta-spec' => { version => 2 },

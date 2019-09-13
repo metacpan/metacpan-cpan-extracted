@@ -16,7 +16,7 @@ sub bind_col {
 sub bind_param {
     my ( $sth, $param_num, $val, $attr ) = @_;
     my $tracker = $sth->FETCH('mock_my_history');
-    $tracker->bound_param( $param_num, $val );
+    $tracker->bound_param( $param_num, $val, $attr );
     return 1;
 }
 
@@ -127,7 +127,7 @@ sub execute {
     # -RobK, 2007-10-12
     #use Data::Dumper;warn Dumper $dbh->{mock_last_insert_ids};
 
-    if ( $dbh->{Statement} =~ /^\s*?insert\s+into\s+(\S+)/i ) {
+    if ( $dbh->{Statement} =~ /^\s*?insert(?:\s+ignore)?\s+into\s+(\S+)/i ) {
         if ( $dbh->{mock_last_insert_ids}
             && exists $dbh->{mock_last_insert_ids}{$1} )
         {
@@ -374,11 +374,17 @@ sub FETCH {
     if ( $attrib eq 'mock_my_history' ) {
         return $tracker;
     }
-    if ( $attrib eq 'mock_statement' ) {
+    elsif ( $attrib eq 'mock_execution_history' ) {
+        return $tracker->execution_history();
+    }
+    elsif ( $attrib eq 'mock_statement' ) {
         return $tracker->statement;
     }
     elsif ( $attrib eq 'mock_params' ) {
         return $tracker->bound_params;
+    }
+    elsif ( $attrib eq 'mock_param_attrs' ) {
+        return $tracker->bound_param_attrs;
     }
     elsif ( $attrib eq 'mock_records' ) {
         return $tracker->return_data;

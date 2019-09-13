@@ -1,6 +1,14 @@
 Revision history for Term::Choose
 
 
+
+1.701   2019-09-12
+    - Issued around `tput`. [GH #6 gregoa]
+    - Bugfix: enable colored output for the 'undef' and 'empty' string.
+    - Set 'col_width_plus' only once.
+    - Bugix in line_fold: make colored output work with a single prompt line.
+
+
 1.700   2019-09-05
     - Option 'mouse': changed from 5 to 2 allowed values.
     - Renamed option 'justify' to 'alignment'.

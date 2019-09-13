@@ -22,24 +22,70 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222640;
+our $VERSION = 1.20190912215426;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d{3})(\\d{4})',
                   'format' => '$1 $2',
-                  'leading_digits' => '[4-9]'
+                  'leading_digits' => '[4-9]',
+                  'pattern' => '(\\d{3})(\\d{4})'
                 },
                 {
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '3',
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
-                  'format' => '$1 $2 $3'
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
                 }
               ];
 
 my $validators = {
-                'pager' => '',
-                'toll_free' => '800\\d{4}',
+                'fixed_line' => '
+          (?:
+            4(?:
+              1[0-24-69]|
+              2[0-7]|
+              [37][0-8]|
+              4[0-245]|
+              5[0-68]|
+              6\\d|
+              8[0-36-8]
+            )|
+            5(?:
+              05|
+              [156]\\d|
+              2[02578]|
+              3[0-579]|
+              4[03-7]|
+              7[0-2578]|
+              8[0-35-9]|
+              9[013-689]
+            )|
+            87[23]
+          )\\d{4}
+        ',
+                'geographic' => '
+          (?:
+            4(?:
+              1[0-24-69]|
+              2[0-7]|
+              [37][0-8]|
+              4[0-245]|
+              5[0-68]|
+              6\\d|
+              8[0-36-8]
+            )|
+            5(?:
+              05|
+              [156]\\d|
+              2[02578]|
+              3[0-579]|
+              4[03-7]|
+              7[0-2578]|
+              8[0-35-9]|
+              9[013-689]
+            )|
+            87[23]
+          )\\d{4}
+        ',
                 'mobile' => '
           (?:
             38[589]\\d\\d|
@@ -67,66 +113,20 @@ my $validators = {
             )
           )\\d{4}
         ',
+                'pager' => '',
                 'personal_number' => '',
-                'geographic' => '
-          (?:
-            4(?:
-              1[0-24-69]|
-              2[0-7]|
-              [37][0-8]|
-              4[0-245]|
-              5[0-68]|
-              6\\d|
-              8[0-36-8]
-            )|
-            5(?:
-              05|
-              [156]\\d|
-              2[02578]|
-              3[0-579]|
-              4[03-7]|
-              7[0-2578]|
-              8[0-35-9]|
-              9[013-689]
-            )|
-            87[23]
-          )\\d{4}
-        ',
                 'specialrate' => '(90\\d{5})|(809\\d{4})',
-                'voip' => '49\\d{5}',
-                'fixed_line' => '
-          (?:
-            4(?:
-              1[0-24-69]|
-              2[0-7]|
-              [37][0-8]|
-              4[0-245]|
-              5[0-68]|
-              6\\d|
-              8[0-36-8]
-            )|
-            5(?:
-              05|
-              [156]\\d|
-              2[02578]|
-              3[0-579]|
-              4[03-7]|
-              7[0-2578]|
-              8[0-35-9]|
-              9[013-689]
-            )|
-            87[23]
-          )\\d{4}
-        '
+                'toll_free' => '800\\d{4}',
+                'voip' => '49\\d{5}'
               };
-my %areanames = (
-  354421 => "Keflavík",
-  354462 => "Akureyri",
-  354551 => "Reykjavík\/Vesturbær\/Miðbærinn",
-  354552 => "Reykjavík\/Vesturbær\/Miðbærinn",
-  354561 => "Reykjavík\/Vesturbær\/Miðbærinn",
-  354562 => "Reykjavík\/Vesturbær\/Miðbærinn",
-);
+my %areanames = ();
+$areanames{en}->{354421} = "Keflavík";
+$areanames{en}->{354462} = "Akureyri";
+$areanames{en}->{354551} = "Reykjavík\/Vesturbær\/Miðbærinn";
+$areanames{en}->{354552} = "Reykjavík\/Vesturbær\/Miðbærinn";
+$areanames{en}->{354561} = "Reykjavík\/Vesturbær\/Miðbærinn";
+$areanames{en}->{354562} = "Reykjavík\/Vesturbær\/Miðbærinn";
+
     sub new {
       my $class = shift;
       my $number = shift;

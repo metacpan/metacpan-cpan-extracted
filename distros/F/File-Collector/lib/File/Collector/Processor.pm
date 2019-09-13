@@ -1,5 +1,5 @@
 package File::Collector::Processor ;
-$File::Collector::Processor::VERSION = '0.037';
+$File::Collector::Processor::VERSION = '0.038';
 use strict;
 use warnings;
 
@@ -42,7 +42,7 @@ sub do {
 
 {
   package File::Collector::Processor::Do;
-$File::Collector::Processor::Do::VERSION = '0.037';
+$File::Collector::Processor::Do::VERSION = '0.038';
 sub AUTOLOAD {
     my $self = shift;
     our $AUTOLOAD;
@@ -65,7 +65,7 @@ File::Collector::Processor - Base class for custom File::Collector::Processor cl
 
 =head1 VERSION
 
-version 0.037
+version 0.038
 
 =head1 OVERVIEW
 

@@ -136,7 +136,7 @@ our %EXPORT_TAGS = (
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
-our $VERSION = '3';
+our $VERSION = '4';
 our $DEBUG   = 0;
 our $vc;
 
@@ -200,7 +200,7 @@ Project
 
 =head1 VERSION
 
-3
+4
 
 =head1 SYNOPSIS
 
@@ -532,7 +532,7 @@ Jeffrey Ratcliffe, E<lt>jffry@posteo.netE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2008--2017 by Jeffrey Ratcliffe
+Copyright (C) 2008--2019 by Jeffrey Ratcliffe
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.5 or,

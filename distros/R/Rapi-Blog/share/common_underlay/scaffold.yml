@@ -1,0 +1,11 @@
+## scaffold.yml - Rapi::Blog scaffold config file
+#
+# Common underlay scaffold
+#
+
+private_paths : [ private/, scaffold.yml ]
+not_found     : private/404-page-not-found.html
+login         : private/login.html
+error         : private/error.html
+#static_paths  : [/]
+default_ext   : html

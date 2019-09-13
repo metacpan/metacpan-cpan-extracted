@@ -22,43 +22,34 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222638;
+our $VERSION = 1.20190912215423;
 
 my $formatters = [
                 {
                   'format' => '$1 $2',
-                  'pattern' => '(\\d{3})(\\d{3})',
                   'intl_format' => 'NA',
-                  'leading_digits' => '[2-7]'
+                  'leading_digits' => '[2-7]',
+                  'pattern' => '(\\d{3})(\\d{3})'
                 },
                 {
                   'format' => '$1 $2 $3',
-                  'pattern' => '(\\d)(\\d{3})(\\d{3})',
                   'leading_digits' => '
             [2-68]|
             7[246]
-          '
+          ',
+                  'pattern' => '(\\d)(\\d{3})(\\d{3})'
                 },
                 {
+                  'format' => '$1 $2 $3 $4',
                   'leading_digits' => '
             1[67]|
             7
           ',
-                  'format' => '$1 $2 $3 $4',
                   'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})'
                 }
               ];
 
 my $validators = {
-                'personal_number' => '',
-                'toll_free' => '',
-                'mobile' => '
-          (?:
-            1[67]|
-            77
-          )\\d{6}
-        ',
-                'pager' => '',
                 'fixed_line' => '
           (?:
             2[3-6]|
@@ -69,8 +60,6 @@ my $validators = {
             8[2-4]
           )\\d{5}
         ',
-                'voip' => '',
-                'specialrate' => '',
                 'geographic' => '
           (?:
             2[3-6]|
@@ -80,17 +69,28 @@ my $validators = {
             7[246]|
             8[2-4]
           )\\d{5}
-        '
+        ',
+                'mobile' => '
+          (?:
+            1[67]|
+            77
+          )\\d{6}
+        ',
+                'pager' => '',
+                'personal_number' => '',
+                'specialrate' => '',
+                'toll_free' => '',
+                'voip' => ''
               };
-my %areanames = (
-  9752 => "Thimphu",
-  9753 => "Trongsa",
-  9754 => "Trashigang",
-  9755 => "Phuentsholing",
-  9756 => "Gelephu",
-  9757 => "Samdrup\ Jongkhar",
-  9758 => "Paro",
-);
+my %areanames = ();
+$areanames{en}->{9752} = "Thimphu";
+$areanames{en}->{9753} = "Trongsa";
+$areanames{en}->{9754} = "Trashigang";
+$areanames{en}->{9755} = "Phuentsholing";
+$areanames{en}->{9756} = "Gelephu";
+$areanames{en}->{9757} = "Samdrup\ Jongkhar";
+$areanames{en}->{9758} = "Paro";
+
     sub new {
       my $class = shift;
       my $number = shift;

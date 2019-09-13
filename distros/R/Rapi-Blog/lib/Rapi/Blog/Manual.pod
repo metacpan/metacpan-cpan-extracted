@@ -234,9 +234,17 @@ to use the taxonomies they want, and not use the ones the don't want.
 Files within the scaffold (which are not defined as C<static_paths>) are processed as L<Template::Toolkit>
 templates with the following methods/parameters exposed in the template variables (i.e. the L<Template::Stash>):
 
+=head2 BlogCfg
+
+A HashRef of key/value pairs matching the params of the Rapi::Blog builder object. This is the same as
+the priviledged template variable C<c.ra_builder> except instead of being the actual object instance, it
+is just a copy of public attribute values. This allows templates access to the Rapi::Blog constructor 
+params and computed settings without having to expose the actual live object which is super-user access.
+
 =head2 scaffold
 
-The active scaffold config/data structure.
+The active scaffold config/data structure. Note: since the addition of multiple layered scaffolds, this object
+represents the effective, merged config of all active scaffolds.
 
 =head2 list_posts
 
@@ -398,6 +406,20 @@ empty string C<''>.
 This is provided as a top-level variable so non-privileged templates can access it (since they do 
 not have access to the actual context object in C<[% c %]>.
 
+=head2 local_info
+
+Access to arbitrary data that is specific to both the current session as well as the current URL/path of
+the active request.
+
+This is used in certain Remote controller calls, such as password_reset, which involve a UI lifecycle that 
+needs to span several requests and allow the template to display messages to the user. This is being set
+according to the API of the various features which use this, but can also be passed a value from the template
+call to be set as well.
+
+This also supports the special value 'clear' which can be supplied which will clear/delete the value after
+returning it.
+
+
 =head2 Post
 
 When the target template of the request is a Post, including requests dispatched via a C<view_wrapper>,
@@ -418,6 +440,11 @@ the entire application which can be used to perform actions based on the query s
 (e.g. C<[% c.req.params.foo %]>, direct access to the database 
 (e.g. C<[% c.model('DB::Post').search_rs(...) %]>) or anything else which can be reached via the context.
 
+=head2 ensure_logged_out
+
+Whenever called, if a user is already logged in, they are logged out in the background. This can be
+placed on any pages or in any templates where ensuring a user is not logged in is desired, such as
+on sign up pages, or other screens where it doesn't make sense for a user to be logged in.
 
 =head1 AUTOMATIC DATABASE UPGRADES
 

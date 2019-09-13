@@ -22,36 +22,36 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222641;
+our $VERSION = 1.20190912215428;
 
 my $formatters = [];
 
 my $validators = {
-                'geographic' => '2[02-9]\\d{3}',
-                'specialrate' => '',
                 'fixed_line' => '2[02-9]\\d{3}',
-                'voip' => '',
-                'pager' => '',
-                'toll_free' => '',
+                'geographic' => '2[02-9]\\d{3}',
                 'mobile' => '
           (?:
             7[01]\\d|
             90
           )\\d{4}
         ',
-                'personal_number' => ''
+                'pager' => '',
+                'personal_number' => '',
+                'specialrate' => '',
+                'toll_free' => '',
+                'voip' => ''
               };
-my %areanames = (
-  68820 => "Funafuti",
-  68822 => "Niulakita",
-  68823 => "Nui",
-  68824 => "Nukufetau",
-  68825 => "Nukulaelae",
-  68826 => "Nanumea",
-  68827 => "Nanumaga",
-  68828 => "Niutao",
-  68829 => "Vaitupu",
-);
+my %areanames = ();
+$areanames{en}->{68820} = "Funafuti";
+$areanames{en}->{68822} = "Niulakita";
+$areanames{en}->{68823} = "Nui";
+$areanames{en}->{68824} = "Nukufetau";
+$areanames{en}->{68825} = "Nukulaelae";
+$areanames{en}->{68826} = "Nanumea";
+$areanames{en}->{68827} = "Nanumaga";
+$areanames{en}->{68828} = "Niutao";
+$areanames{en}->{68829} = "Vaitupu";
+
     sub new {
       my $class = shift;
       my $number = shift;

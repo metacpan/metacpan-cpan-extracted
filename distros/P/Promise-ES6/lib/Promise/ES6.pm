@@ -3,7 +3,7 @@ package Promise::ES6;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =encoding utf-8
 
@@ -215,17 +215,23 @@ sub all {
     return $class->new(sub {
         my ($resolve, $reject) = @_;
         my $unresolved_size = scalar(@promises);
-        for my $promise (@promises) {
-            $promise->then(sub {
-                my ($value) = @_;
-                $unresolved_size--;
-                if ($unresolved_size <= 0) {
-                    $resolve->([ map { $_->{_value} } @promises ]);
-                }
-            }, sub {
-                my ($reason) = @_;
-                $reject->($reason);
-            });
+
+        if ($unresolved_size) {
+            for my $promise (@promises) {
+                $promise->then(sub {
+                    my ($value) = @_;
+                    $unresolved_size--;
+                    if ($unresolved_size <= 0) {
+                        $resolve->([ map { $_->{_value} } @promises ]);
+                    }
+                }, sub {
+                    my ($reason) = @_;
+                    $reject->($reason);
+                });
+            }
+        }
+        else {
+            $resolve->([]);
         }
     });
 }

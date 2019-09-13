@@ -1,5 +1,15 @@
 Revision history for Perl extension DBD::Mock.
 
+1.49 2019-09-12T12:59:51Z
+    - Fixing tests that fail on some old versions of Perl
+
+1.48 2019-09-12T06:34:47Z
+    - Added execution_history feature to enable tracking of multiple
+      executes for prepared statements.
+    - Added support for $dbh->table_info calls
+    - Fixed bug rt91055 "insert IGNORE" doesn't raise last_insert_id
+    - Fixed bug rt82243 Bug with Regex in DBD::Mock::Session
+
 1.47 2019-09-06T10:03:39Z
     - Applied Max Carey's patch from rt86294 adding support for
       nested keys to fetchall_hashref

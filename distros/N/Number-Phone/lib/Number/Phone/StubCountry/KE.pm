@@ -22,52 +22,30 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222640;
+our $VERSION = 1.20190912215426;
 
 my $formatters = [
                 {
-                  'leading_digits' => '[24-6]',
                   'format' => '$1 $2',
+                  'leading_digits' => '[24-6]',
                   'national_rule' => '0$1',
                   'pattern' => '(\\d{2})(\\d{5,7})'
                 },
                 {
-                  'leading_digits' => '[17]',
-                  'pattern' => '(\\d{3})(\\d{6})',
                   'format' => '$1 $2',
-                  'national_rule' => '0$1'
+                  'leading_digits' => '[17]',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{3})(\\d{6})'
                 },
                 {
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '[89]',
                   'national_rule' => '0$1',
-                  'format' => '$1 $2 $3',
                   'pattern' => '(\\d{3})(\\d{3})(\\d{3,4})'
                 }
               ];
 
 my $validators = {
-                'pager' => '',
-                'toll_free' => '800[24-8]\\d{5,6}',
-                'mobile' => '[17]\\d{8}',
-                'personal_number' => '',
-                'geographic' => '
-          (?:
-            4[245]|
-            5[2-79]|
-            6[01457-9]
-          )\\d{5,7}|
-          (?:
-            4[136]|
-            5[08]|
-            62
-          )\\d{7}|
-          (?:
-            [24]0|
-            51|
-            66
-          )\\d{6,7}
-        ',
-                'specialrate' => '(900[02-9]\\d{5})',
                 'fixed_line' => '
           (?:
             4[245]|
@@ -85,37 +63,67 @@ my $validators = {
             66
           )\\d{6,7}
         ',
+                'geographic' => '
+          (?:
+            4[245]|
+            5[2-79]|
+            6[01457-9]
+          )\\d{5,7}|
+          (?:
+            4[136]|
+            5[08]|
+            62
+          )\\d{7}|
+          (?:
+            [24]0|
+            51|
+            66
+          )\\d{6,7}
+        ',
+                'mobile' => '
+          (?:
+            1(?:
+              0[0-2]|
+              1[01]
+            )|
+            7\\d\\d
+          )\\d{6}
+        ',
+                'pager' => '',
+                'personal_number' => '',
+                'specialrate' => '(900[02-9]\\d{5})',
+                'toll_free' => '800[24-8]\\d{5,6}',
                 'voip' => ''
               };
-my %areanames = (
-  2542 => "Nairobi",
-  25440 => "Kwale\/Ukunda\/Msambweni\/Lungalunga",
-  25441 => "Mombasa\/Mariakani\/Kilifi",
-  25442 => "Malindi\/Lamu\/Garsen",
-  25443 => "Voi\/Wundanyi\/Mwatate\/Taveta",
-  25444 => "Machakos\/Makueni\/Mwingi\/Kitui",
-  25445 => "Kajiado\/Ngong\/Loitokitok\/Athi\ River",
-  25446 => "Garissa\/Hola\/Wajir\/Mandera",
-  25450 => "Naivasha\/Narok\/Gilgil",
-  25451 => "Nakuru\/Njoro\/Molo",
-  25452 => "Kericho\/Bomet",
-  25453 => "Eldoret\/Turbo\/Kapsabet\/Iten\/Kabarnet",
-  25454 => "Kitale\/Moi\'s\ Bridge\/Kapenguria\/Lodwar",
-  25455 => "Bungoma\/Busia",
-  25456 => "Kakamega\/Mbale\/Butere\/Mumias\/Vihiga",
-  25457 => "Kisumu\/Siaya\/Maseno",
-  25458 => "Kisii\/Kilgoris\/Oyugis\/Nyamira",
-  25459 => "Homabay\/Migori",
-  25460 => "Muranga\/Kerugoya",
-  25461 => "Nyeri\/Karatina",
-  25462 => "Nanyuki",
-  25464 => "Meru\/Maua\/Chuka",
-  25465 => "Nyahururu\/Maralal",
-  25466 => "Thika\/Ruiru",
-  25467 => "Kiambu\/Kikuyu",
-  25468 => "Embu",
-  25469 => "Marsabit\/Moyale",
-);
+my %areanames = ();
+$areanames{en}->{2542} = "Nairobi";
+$areanames{en}->{25440} = "Kwale\/Ukunda\/Msambweni\/Lungalunga";
+$areanames{en}->{25441} = "Mombasa\/Mariakani\/Kilifi";
+$areanames{en}->{25442} = "Malindi\/Lamu\/Garsen";
+$areanames{en}->{25443} = "Voi\/Wundanyi\/Mwatate\/Taveta";
+$areanames{en}->{25444} = "Machakos\/Makueni\/Mwingi\/Kitui";
+$areanames{en}->{25445} = "Kajiado\/Ngong\/Loitokitok\/Athi\ River";
+$areanames{en}->{25446} = "Garissa\/Hola\/Wajir\/Mandera";
+$areanames{en}->{25450} = "Naivasha\/Narok\/Gilgil";
+$areanames{en}->{25451} = "Nakuru\/Njoro\/Molo";
+$areanames{en}->{25452} = "Kericho\/Bomet";
+$areanames{en}->{25453} = "Eldoret\/Turbo\/Kapsabet\/Iten\/Kabarnet";
+$areanames{en}->{25454} = "Kitale\/Moi\'s\ Bridge\/Kapenguria\/Lodwar";
+$areanames{en}->{25455} = "Bungoma\/Busia";
+$areanames{en}->{25456} = "Kakamega\/Mbale\/Butere\/Mumias\/Vihiga";
+$areanames{en}->{25457} = "Kisumu\/Siaya\/Maseno";
+$areanames{en}->{25458} = "Kisii\/Kilgoris\/Oyugis\/Nyamira";
+$areanames{en}->{25459} = "Homabay\/Migori";
+$areanames{en}->{25460} = "Muranga\/Kerugoya";
+$areanames{en}->{25461} = "Nyeri\/Karatina";
+$areanames{en}->{25462} = "Nanyuki";
+$areanames{en}->{25464} = "Meru\/Maua\/Chuka";
+$areanames{en}->{25465} = "Nyahururu\/Maralal";
+$areanames{en}->{25466} = "Thika\/Ruiru";
+$areanames{en}->{25467} = "Kiambu\/Kikuyu";
+$areanames{en}->{25468} = "Embu";
+$areanames{en}->{25469} = "Marsabit\/Moyale";
+
     sub new {
       my $class = shift;
       my $number = shift;

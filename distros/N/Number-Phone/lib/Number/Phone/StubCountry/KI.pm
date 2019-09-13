@@ -22,22 +22,11 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222640;
+our $VERSION = 1.20190912215426;
 
 my $formatters = [];
 
 my $validators = {
-                'personal_number' => '',
-                'toll_free' => '',
-                'mobile' => '
-          73140\\d{3}|
-          (?:
-            630[01]|
-            730[0-5]
-          )\\d{4}|
-          [67]200[01]\\d{3}
-        ',
-                'pager' => '',
                 'fixed_line' => '
           (?:
             [24]\\d|
@@ -66,16 +55,6 @@ my $validators = {
             8[0-5]
           )\\d{3}
         ',
-                'voip' => '
-          30(?:
-            0[01]\\d\\d|
-            12(?:
-              11|
-              20
-            )
-          )\\d\\d
-        ',
-                'specialrate' => '',
                 'geographic' => '
           (?:
             [24]\\d|
@@ -103,59 +82,80 @@ my $validators = {
             )|
             8[0-5]
           )\\d{3}
+        ',
+                'mobile' => '
+          73140\\d{3}|
+          (?:
+            630[01]|
+            730[0-5]
+          )\\d{4}|
+          [67]200[01]\\d{3}
+        ',
+                'pager' => '',
+                'personal_number' => '',
+                'specialrate' => '',
+                'toll_free' => '',
+                'voip' => '
+          30(?:
+            0[01]\\d\\d|
+            12(?:
+              11|
+              20
+            )
+          )\\d\\d
         '
               };
-my %areanames = (
-  68621 => "Bairiki",
-  68622 => "Bairiki",
-  68623 => "Bairiki",
-  68624 => "Bairiki",
-  68625 => "Betio",
-  68626 => "Betio",
-  68627 => "Tarawa",
-  68628 => "Bikenibeu",
-  68629 => "Bikenibeu",
-  68630 => "Tarawa",
-  68631 => "North\ Tarawa",
-  68632 => "North\ Tarawa",
-  68633 => "Abaiang",
-  68634 => "Marakei",
-  68635 => "Butaritari",
-  68636 => "Makin",
-  68637 => "Banaba",
-  68638 => "Maiana",
-  68639 => "Kuria",
-  68640 => "Aranuka",
-  68641 => "Abemama",
-  68642 => "Nonouti",
-  68643 => "Tabiteuea\ North",
-  68644 => "Tabiteuea\ South",
-  68645 => "Onotoa",
-  68646 => "Beru",
-  68647 => "Nikunau",
-  68648 => "Tamana",
-  68649 => "Arorae",
-  686650 => "Bairiki",
-  686651 => "Betio",
-  686652 => "Bikenibeu",
-  686653 => "Gilbert\ Islands",
-  686654 => "Gilbert\ Islands",
-  686655 => "Phoenix\ Islands",
-  68672700 => "Gilbert\ Islands",
-  686750 => "Bairiki",
-  686751 => "Betio",
-  686752 => "Bikenibeu",
-  6867530 => "Gilbert\ Islands",
-  6867538 => "Line\ Islands",
-  6867540 => "Phoenix\ Islands",
-  6867548 => "Line\ Islands",
-  686755 => "Phoenix\ Islands",
-  68681 => "Kiritimati",
-  68682 => "Kiritimati",
-  68683 => "Fanning",
-  68684 => "Washington",
-  68685 => "Kanton",
-);
+my %areanames = ();
+$areanames{en}->{68621} = "Bairiki";
+$areanames{en}->{68622} = "Bairiki";
+$areanames{en}->{68623} = "Bairiki";
+$areanames{en}->{68624} = "Bairiki";
+$areanames{en}->{68625} = "Betio";
+$areanames{en}->{68626} = "Betio";
+$areanames{en}->{68627} = "Tarawa";
+$areanames{en}->{68628} = "Bikenibeu";
+$areanames{en}->{68629} = "Bikenibeu";
+$areanames{en}->{68630} = "Tarawa";
+$areanames{en}->{68631} = "North\ Tarawa";
+$areanames{en}->{68632} = "North\ Tarawa";
+$areanames{en}->{68633} = "Abaiang";
+$areanames{en}->{68634} = "Marakei";
+$areanames{en}->{68635} = "Butaritari";
+$areanames{en}->{68636} = "Makin";
+$areanames{en}->{68637} = "Banaba";
+$areanames{en}->{68638} = "Maiana";
+$areanames{en}->{68639} = "Kuria";
+$areanames{en}->{68640} = "Aranuka";
+$areanames{en}->{68641} = "Abemama";
+$areanames{en}->{68642} = "Nonouti";
+$areanames{en}->{68643} = "Tabiteuea\ North";
+$areanames{en}->{68644} = "Tabiteuea\ South";
+$areanames{en}->{68645} = "Onotoa";
+$areanames{en}->{68646} = "Beru";
+$areanames{en}->{68647} = "Nikunau";
+$areanames{en}->{68648} = "Tamana";
+$areanames{en}->{68649} = "Arorae";
+$areanames{en}->{686650} = "Bairiki";
+$areanames{en}->{686651} = "Betio";
+$areanames{en}->{686652} = "Bikenibeu";
+$areanames{en}->{686653} = "Gilbert\ Islands";
+$areanames{en}->{686654} = "Gilbert\ Islands";
+$areanames{en}->{686655} = "Phoenix\ Islands";
+$areanames{en}->{68672700} = "Gilbert\ Islands";
+$areanames{en}->{686750} = "Bairiki";
+$areanames{en}->{686751} = "Betio";
+$areanames{en}->{686752} = "Bikenibeu";
+$areanames{en}->{6867530} = "Gilbert\ Islands";
+$areanames{en}->{6867538} = "Line\ Islands";
+$areanames{en}->{6867540} = "Phoenix\ Islands";
+$areanames{en}->{6867548} = "Line\ Islands";
+$areanames{en}->{686755} = "Phoenix\ Islands";
+$areanames{en}->{68681} = "Kiritimati";
+$areanames{en}->{68682} = "Kiritimati";
+$areanames{en}->{68683} = "Fanning";
+$areanames{en}->{68684} = "Washington";
+$areanames{en}->{68685} = "Kanton";
+
     sub new {
       my $class = shift;
       my $number = shift;

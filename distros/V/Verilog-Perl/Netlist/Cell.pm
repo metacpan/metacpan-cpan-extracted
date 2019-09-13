@@ -11,7 +11,7 @@ use strict;
 @ISA = qw(Verilog::Netlist::Cell::Struct
 	Verilog::Netlist::Subclass);
 
-$VERSION = '3.466';
+$VERSION = '3.468';
 
 structs('new',
 	'Verilog::Netlist::Cell::Struct'
@@ -259,7 +259,8 @@ List of name sorted Verilog::Netlist::Pin connections for the cell.
 
 =item $self->range
 
-The range for the cell (e.g. "[1:0]") or undef if not ranged.
+The range for the cell (e.g. "[1:0]") or false (i.e. undef or "") if not
+ranged.
 
 =item $self->submod
 

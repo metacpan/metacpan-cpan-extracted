@@ -1,4 +1,4 @@
-# Copyright (c) 2008-2017 Martin Becker.  All rights reserved.
+# Copyright (c) 2008-2019 Martin Becker.  All rights reserved.
 # This package is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -148,9 +148,12 @@ my %pattern = (
         }mx,
     'changes_version_std' =>
         qr{^(\d+\.\d\S*)\s+(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b},
+    'changes_version_short_dates' =>
+        qr{^(\d+\.\d\S*)\s+\d{4}-\d{2}-\d{2}\b},
     'changes_version_headlines' =>
         qr{^\s*\Q$modname\E\s+(?:[Vv]ersion\s+)?(\d\S*)\s*$},
-    'authormail_code' => qr[\QE<lt>$ambox\E(?:\@|E<64>)\Q${amhost}E<gt>\E],
+    'authormail_code' =>
+        qr[\QE<lt>$ambox\E(?:\@|E<64>|\s*\(at\)\s*)\Q${amhost}E<gt>\E],
     'package_line' => qr/^\s*package\s+(\w+(?:\:\:\w+)*)\s*;/,
     'version_line' => qr/^\s*(?:our\s*)\$VERSION\s*=\s*(.*?)\s*\z/,
     'version' => qr/^'([\d._]+)';\z/,
@@ -268,6 +271,7 @@ if (open FILE, '<', $CHANGES) {
     while (<FILE>) {
         if (
             /$pattern{'changes_version_std'}/o ||
+            /$pattern{'changes_version_short_dates'}/o ||
             /$pattern{'changes_version_headlines'}/o
         ) {
             $changes_version = $1;
@@ -674,7 +678,11 @@ sub info_from_makefile_pl {
             ([^\s<>]+ (?:\s+ [^\s<>]+)* )   # civilian name in $3
             \s* \<                          # left angular bracket
             ([\w.-]+)                       # mailbox in $4
+            (?:
             \\? \@                          # optional backslash, at-sign
+            |
+            \s*\(at\)\s*                    # optionally replaced by (at)
+            )
             ([\w.-]+)                       # host in $5
             \>                              # right angular bracket
             \2                              # quote from $2

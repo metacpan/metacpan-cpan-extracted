@@ -22,29 +22,29 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222640;
+our $VERSION = 1.20190912215426;
 
 my $formatters = [
                 {
+                  'format' => '$1 $2',
                   'leading_digits' => '[2568]',
-                  'pattern' => '(\\d{4})(\\d{4})',
-                  'format' => '$1 $2'
+                  'pattern' => '(\\d{4})(\\d{4})'
                 }
               ];
 
 my $validators = {
                 'fixed_line' => '2\\d{7}',
-                'voip' => '',
                 'geographic' => '2\\d{7}',
-                'specialrate' => '',
-                'personal_number' => '',
-                'toll_free' => '800[256]\\d{4}',
                 'mobile' => '[56]\\d{7}',
-                'pager' => ''
+                'pager' => '',
+                'personal_number' => '',
+                'specialrate' => '',
+                'toll_free' => '800[256]\\d{4}',
+                'voip' => ''
               };
-my %areanames = (
-  26622 => "Maseru",
-);
+my %areanames = ();
+$areanames{en}->{26622} = "Maseru";
+
     sub new {
       my $class = shift;
       my $number = shift;

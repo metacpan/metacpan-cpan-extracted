@@ -22,70 +22,70 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222640;
+our $VERSION = 1.20190912215427;
 
 my $formatters = [
                 {
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '
             [269]|
             8[01]
           ',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{3})',
-                  'format' => '$1 $2 $3'
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{3})'
                 }
               ];
 
 my $validators = {
-                'voip' => '',
                 'fixed_line' => '6\\d{7}',
                 'geographic' => '6\\d{7}',
-                'specialrate' => '(81\\d{6})|(90\\d{6})',
-                'personal_number' => '',
-                'toll_free' => '80\\d{6}',
                 'mobile' => '2\\d{7}',
-                'pager' => ''
+                'pager' => '',
+                'personal_number' => '',
+                'specialrate' => '(81\\d{6})|(90\\d{6})',
+                'toll_free' => '80\\d{6}',
+                'voip' => ''
               };
-my %areanames = (
-  37161 => "Jūrmala",
-  37162 => "Valmiera",
-  371630 => "Jelgava",
-  371631 => "Tukums",
-  371632 => "Talsi",
-  371633 => "Kuldiga",
-  371634 => "Liepaja",
-  371635 => "Ventspils",
-  371636 => "Ventspils",
-  371637 => "Dobele",
-  371638 => "Saldus",
-  371639 => "Bauska",
-  371640 => "Limbaži",
-  371641 => "Cēsis",
-  371642 => "Valmiera",
-  371643 => "Alūksne",
-  371644 => "Gulbene",
-  371645 => "Balvi",
-  371646 => "Rēzekne",
-  371647 => "Valka",
-  371648 => "Madona",
-  371649 => "Aizkraukle",
-  371650 => "Ogre",
-  371651 => "Aizkraukle",
-  371652 => "Jēkabpils",
-  371653 => "Preiļi",
-  371654 => "Daugavpils",
-  371655 => "Ogre",
-  371656 => "Krāslava",
-  371657 => "Ludza",
-  371658 => "Daugavpils",
-  371659 => "Cēsis",
-  37166 => "Riga",
-  37167 => "Riga",
-  371682 => "Valmiera",
-  371683 => "Jēkabpils",
-  371684 => "Liepāja",
-  371686 => "Jelgava",
-  37169 => "Riga",
-);
+my %areanames = ();
+$areanames{en}->{37161} = "Jūrmala";
+$areanames{en}->{37162} = "Valmiera";
+$areanames{en}->{371630} = "Jelgava";
+$areanames{en}->{371631} = "Tukums";
+$areanames{en}->{371632} = "Talsi";
+$areanames{en}->{371633} = "Kuldiga";
+$areanames{en}->{371634} = "Liepaja";
+$areanames{en}->{371635} = "Ventspils";
+$areanames{en}->{371636} = "Ventspils";
+$areanames{en}->{371637} = "Dobele";
+$areanames{en}->{371638} = "Saldus";
+$areanames{en}->{371639} = "Bauska";
+$areanames{en}->{371640} = "Limbaži";
+$areanames{en}->{371641} = "Cēsis";
+$areanames{en}->{371642} = "Valmiera";
+$areanames{en}->{371643} = "Alūksne";
+$areanames{en}->{371644} = "Gulbene";
+$areanames{en}->{371645} = "Balvi";
+$areanames{en}->{371646} = "Rēzekne";
+$areanames{en}->{371647} = "Valka";
+$areanames{en}->{371648} = "Madona";
+$areanames{en}->{371649} = "Aizkraukle";
+$areanames{en}->{371650} = "Ogre";
+$areanames{en}->{371651} = "Aizkraukle";
+$areanames{en}->{371652} = "Jēkabpils";
+$areanames{en}->{371653} = "Preiļi";
+$areanames{en}->{371654} = "Daugavpils";
+$areanames{en}->{371655} = "Ogre";
+$areanames{en}->{371656} = "Krāslava";
+$areanames{en}->{371657} = "Ludza";
+$areanames{en}->{371658} = "Daugavpils";
+$areanames{en}->{371659} = "Cēsis";
+$areanames{en}->{37166} = "Riga";
+$areanames{en}->{37167} = "Riga";
+$areanames{en}->{371682} = "Valmiera";
+$areanames{en}->{371683} = "Jēkabpils";
+$areanames{en}->{371684} = "Liepāja";
+$areanames{en}->{371686} = "Jelgava";
+$areanames{en}->{37169} = "Riga";
+
     sub new {
       my $class = shift;
       my $number = shift;

@@ -22,29 +22,21 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222638;
+our $VERSION = 1.20190912215423;
 
 my $formatters = [
                 {
+                  'format' => '$1-$2',
                   'leading_digits' => '[2-8]',
-                  'pattern' => '(\\d{3})(\\d{4})',
-                  'format' => '$1-$2'
+                  'pattern' => '(\\d{3})(\\d{4})'
                 },
                 {
-                  'pattern' => '(\\d)(\\d{3})(\\d{4})(\\d{3})',
-                  'format' => '$1-$2-$3-$4'
+                  'format' => '$1-$2-$3-$4',
+                  'pattern' => '(\\d)(\\d{3})(\\d{4})(\\d{3})'
                 }
               ];
 
 my $validators = {
-                'geographic' => '
-          (?:
-            236|
-            732
-          )\\d{4}|
-          [2-578][02]\\d{5}
-        ',
-                'specialrate' => '',
                 'fixed_line' => '
           (?:
             236|
@@ -52,20 +44,28 @@ my $validators = {
           )\\d{4}|
           [2-578][02]\\d{5}
         ',
-                'voip' => '',
+                'geographic' => '
+          (?:
+            236|
+            732
+          )\\d{4}|
+          [2-578][02]\\d{5}
+        ',
+                'mobile' => '6[0-35-7]\\d{5}',
                 'pager' => '',
                 'personal_number' => '',
-                'mobile' => '6[0-35-7]\\d{5}',
-                'toll_free' => '0800\\d{7}'
+                'specialrate' => '',
+                'toll_free' => '0800\\d{7}',
+                'voip' => ''
               };
-my %areanames = (
-  5012 => "Belize\ District",
-  5013 => "Orange\ Walk\ District",
-  5014 => "Corozal\ District",
-  5015 => "Stann\ Creek\ District",
-  5017 => "Toledo\ District",
-  5018 => "Cayo\ District",
-);
+my %areanames = ();
+$areanames{en}->{5012} = "Belize\ District";
+$areanames{en}->{5013} = "Orange\ Walk\ District";
+$areanames{en}->{5014} = "Corozal\ District";
+$areanames{en}->{5015} = "Stann\ Creek\ District";
+$areanames{en}->{5017} = "Toledo\ District";
+$areanames{en}->{5018} = "Cayo\ District";
+
     sub new {
       my $class = shift;
       my $number = shift;

@@ -22,73 +22,73 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222641;
+our $VERSION = 1.20190912215428;
 
 my $formatters = [
                 {
                   'format' => '$1 $2',
-                  'pattern' => '(\\d{4})(\\d{4})',
-                  'leading_digits' => '[0237]'
+                  'leading_digits' => '[0237]',
+                  'pattern' => '(\\d{4})(\\d{4})'
                 },
                 {
-                  'pattern' => '(\\d{5})(\\d{4})',
                   'format' => '$1 $2',
-                  'leading_digits' => '9'
+                  'leading_digits' => '9',
+                  'pattern' => '(\\d{5})(\\d{4})'
                 }
               ];
 
 my $validators = {
-                'pager' => '',
-                'toll_free' => '0800\\d{4}',
+                'fixed_line' => '[23][2-5]\\d{6}',
+                'geographic' => '[23][2-5]\\d{6}',
                 'mobile' => '7[6-9]\\d{6}',
+                'pager' => '',
                 'personal_number' => '',
                 'specialrate' => '(900\\d{6})',
-                'geographic' => '[23][2-5]\\d{6}',
-                'voip' => '70\\d{6}',
-                'fixed_line' => '[23][2-5]\\d{6}'
+                'toll_free' => '0800\\d{4}',
+                'voip' => '70\\d{6}'
               };
-my %areanames = (
-  2682207 => "Nhlangano\,\ Shiselweni\ district",
-  2682217 => "Hlathikulu\,\ Shiselweni\ district",
-  2682227 => "Hluthi\,\ Shiselweni\ district",
-  2682237 => "Mahamba\,\ Shiselweni\ district",
-  2682303 => "Nsoko\,\ Lubombo\ district",
-  2682312 => "Mhlume\,\ Lubombo\ district",
-  2682313 => "Mhlume\,\ Lubombo\ district",
-  2682322 => "Tshaneni\,\ Lubombo\ district",
-  2682323 => "Tshaneni\,\ Lubombo\ district",
-  2682333 => "Mpaka\,\ Lubombo\ district",
-  2682343 => "Siteki\,\ Lubombo\ district",
-  2682344 => "Siphofaneni\,\ Lubombo\ district",
-  2682363 => "Big\ Bend\,\ Lubombo\ district",
-  2682364 => "Big\ Bend\,\ Lubombo\ district",
-  2682373 => "Maphiveni\,\ Lubombo\ district",
-  2682382 => "Simunye\,\ Lubombo\ district",
-  2682383 => "Simunye\,\ Lubombo\ district",
-  2682404 => "Mbabane\,\ Hhohho\ district",
-  2682405 => "Mbabane\,\ Hhohho\ district",
-  2682406 => "Mbabane\,\ Hhohho\ district",
-  2682416 => "Lobamba\,\ Hhohho\ district",
-  2682422 => "Sidwashini\,\ Hhohho\ district",
-  2682437 => "Pigg\'s\ Peak\,\ Hhohho\ district",
-  2682442 => "Ngwenya\,\ Hhohho\ district",
-  2682452 => "Bhunya\,\ Hhohho\ district",
-  2682453 => "Bhunya\,\ Hhohho\ district",
-  2682467 => "Mhlambanyatsi\,\ Hhohho\ district",
-  2682472 => "Mahwalala\,\ Hhohho\ district",
-  2682482 => "Siphocosini\,\ Hhohho\ district",
-  2682505 => "Manzini",
-  2682506 => "Manzini",
-  2682517 => "Matsapha\,\ Manzini\ district",
-  2682518 => "Matsapha\,\ Manzini\ district",
-  2682528 => "Malkerns\,\ Manzini\ district",
-  2682538 => "Mankayane\,\ Manzini\ district",
-  2682548 => "Ludzeludze\,\ Manzini\ district",
-  26832 => "Shiselweni",
-  26833 => "Lubombo",
-  26834 => "Hhohho",
-  26835 => "Manzini",
-);
+my %areanames = ();
+$areanames{en}->{2682207} = "Nhlangano\,\ Shiselweni\ district";
+$areanames{en}->{2682217} = "Hlathikulu\,\ Shiselweni\ district";
+$areanames{en}->{2682227} = "Hluthi\,\ Shiselweni\ district";
+$areanames{en}->{2682237} = "Mahamba\,\ Shiselweni\ district";
+$areanames{en}->{2682303} = "Nsoko\,\ Lubombo\ district";
+$areanames{en}->{2682312} = "Mhlume\,\ Lubombo\ district";
+$areanames{en}->{2682313} = "Mhlume\,\ Lubombo\ district";
+$areanames{en}->{2682322} = "Tshaneni\,\ Lubombo\ district";
+$areanames{en}->{2682323} = "Tshaneni\,\ Lubombo\ district";
+$areanames{en}->{2682333} = "Mpaka\,\ Lubombo\ district";
+$areanames{en}->{2682343} = "Siteki\,\ Lubombo\ district";
+$areanames{en}->{2682344} = "Siphofaneni\,\ Lubombo\ district";
+$areanames{en}->{2682363} = "Big\ Bend\,\ Lubombo\ district";
+$areanames{en}->{2682364} = "Big\ Bend\,\ Lubombo\ district";
+$areanames{en}->{2682373} = "Maphiveni\,\ Lubombo\ district";
+$areanames{en}->{2682382} = "Simunye\,\ Lubombo\ district";
+$areanames{en}->{2682383} = "Simunye\,\ Lubombo\ district";
+$areanames{en}->{2682404} = "Mbabane\,\ Hhohho\ district";
+$areanames{en}->{2682405} = "Mbabane\,\ Hhohho\ district";
+$areanames{en}->{2682406} = "Mbabane\,\ Hhohho\ district";
+$areanames{en}->{2682416} = "Lobamba\,\ Hhohho\ district";
+$areanames{en}->{2682422} = "Sidwashini\,\ Hhohho\ district";
+$areanames{en}->{2682437} = "Pigg\'s\ Peak\,\ Hhohho\ district";
+$areanames{en}->{2682442} = "Ngwenya\,\ Hhohho\ district";
+$areanames{en}->{2682452} = "Bhunya\,\ Hhohho\ district";
+$areanames{en}->{2682453} = "Bhunya\,\ Hhohho\ district";
+$areanames{en}->{2682467} = "Mhlambanyatsi\,\ Hhohho\ district";
+$areanames{en}->{2682472} = "Mahwalala\,\ Hhohho\ district";
+$areanames{en}->{2682482} = "Siphocosini\,\ Hhohho\ district";
+$areanames{en}->{2682505} = "Manzini";
+$areanames{en}->{2682506} = "Manzini";
+$areanames{en}->{2682517} = "Matsapha\,\ Manzini\ district";
+$areanames{en}->{2682518} = "Matsapha\,\ Manzini\ district";
+$areanames{en}->{2682528} = "Malkerns\,\ Manzini\ district";
+$areanames{en}->{2682538} = "Mankayane\,\ Manzini\ district";
+$areanames{en}->{2682548} = "Ludzeludze\,\ Manzini\ district";
+$areanames{en}->{26832} = "Shiselweni";
+$areanames{en}->{26833} = "Lubombo";
+$areanames{en}->{26834} = "Hhohho";
+$areanames{en}->{26835} = "Manzini";
+
     sub new {
       my $class = shift;
       my $number = shift;

@@ -8,6 +8,11 @@ extends 'DBIx::Class::ResultSet';
 
 use RapidApp::Util ':all';
 
+sub enabled {
+  (shift)
+    ->search_rs({ 'me.disabled' => 0 })
+}
+
 sub authors {
   (shift)
     ->search_rs({ -or => [{ 'me.author' => 1 },{ 'me.admin' => 1 }]})

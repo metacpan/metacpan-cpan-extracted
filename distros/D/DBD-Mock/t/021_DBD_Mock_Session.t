@@ -1,6 +1,9 @@
-use strict;
+use 5.008;
 
-use Test::More tests => 55;
+use strict;
+use warnings;
+
+use Test::More;
 
 BEGIN {
     use_ok('DBD::Mock');
@@ -353,3 +356,5 @@ use DBI;
     # Shuts up warning when object is destroyed
     undef $dbh->{mock_session};
 }
+
+done_testing();

@@ -1,17 +1,45 @@
 #!/usr/bin/env perl
+=head1 Abstract
+
+p5find-sub is a program to find subroutine definitions in your perl5 code.
+When invoked, it simply prints the location all subroutines, including the
+name-less ones.
+
+=head1 Usage Example
+
+Here is a partial result for perlbrew repository:
+
+    > p5find-sub lib | head
+    lib/App/Perlbrew/Path/Installation.pm:11:sub name {
+    lib/App/Perlbrew/Path/Installation.pm:15:sub bin {
+    lib/App/Perlbrew/Path/Installation.pm:19:sub man {
+    lib/App/Perlbrew/Path/Installation.pm:23:sub perl {
+    lib/App/Perlbrew/Path/Installation.pm:27:sub version_file {
+    lib/App/Perlbrew/Path/Installations.pm:12:sub child {
+    lib/App/Perlbrew/Path/Installations.pm:22:sub children {
+    lib/App/Perlbrew/Path/Installations.pm:26:sub list {
+    lib/App/Perlbrew/Path/Root.pm:12:sub bin {
+    lib/App/Perlbrew/Path/Root.pm:16:sub build {
+
+To find a subroutine by its name, pass the name with C<--name> parameter:
+
+    > p5find-sub --name do_install_this lib
+    lib/App/perlbrew.pm:1706:sub do_install_this {
+
+=cut
+
 use v5.18;
-
-use App::p5find qw<p5_doc_iterator>;
-
+use warnings;
 use Getopt::Long 'GetOptions';
-
-my ($wanted_sub_name, @paths) = @ARGV;
+use App::p5find qw<p5_doc_iterator print_file_linenum_line>;
 
 sub print_usage {
     print <<USAGE;
-p5find-sub [switches] name [path1] [path2]...
+p5find-sub [switches] [path1] [path2]...
+  -h        show help message
+  --name    specify the name of subroutine.
 
-  -h    show help message
+For more documentation, see: perldoc p5find-sub
 USAGE
 }
 
@@ -19,6 +47,7 @@ my %opts;
 GetOptions(
     \%opts,
     "h",
+    "name=s",
 );
 
 if ($opts{h}) {
@@ -26,10 +55,19 @@ if ($opts{h}) {
     exit(0);
 }
 
+my ($wanted_sub_name, @paths);
+
+if ($opts{name}) {
+    $wanted_sub_name = $opts{name};
+}
+
+@paths = @ARGV;
 @paths = ('.') unless @paths;
 
 my $iter = p5_doc_iterator(@paths);
 while (my $doc = $iter->()) {
+    my $file = $doc->filename;
+
     my $o = $doc->find(
         sub {
             my $el = $_[1];
@@ -42,13 +80,19 @@ while (my $doc = $iter->()) {
         }
     ) or next;
 
-    my $file = $doc->filename;
+    my %hits;
     for my $token (@$o) {
         # $token is the word "sub"
         my $el = $token->parent;
         my $sub_name = $el->isa("PPI::Statement::Sub") ? $el->name : "(anonymous)";
-        if ($wanted_sub_name eq $sub_name) {
-            say join ":", $file, $token->line_number, $sub_name;
+
+        if ( !defined($wanted_sub_name) || $wanted_sub_name eq $sub_name ) {
+            my $ln = $token->line_number;
+            $hits{$ln} = 1;
         }
+    }
+
+    if (%hits) {
+        print_file_linenum_line( $file, \%hits );
     }
 }

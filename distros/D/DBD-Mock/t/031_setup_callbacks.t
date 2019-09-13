@@ -1,12 +1,13 @@
+use 5.008;
+
 use strict;
+use warnings;
 
 use Test::More;
 
-BEGIN {
-    use_ok('DBD::Mock');
-    use_ok('DBD::Mock::dr');
-    use_ok('DBI');
-}
+use DBD::Mock;
+use DBD::Mock::dr;
+use DBI;
 
 my ( $dsn, $user, $password, $attributes );
 
@@ -67,10 +68,10 @@ DBD::Mock::dr::set_connect_callbacks( sub {
     $sth = $dbh->prepare('SELECT foo FROM bar');
     isa_ok($sth, 'DBI::st');
 
-    my $rows = $sth->execute();
+    $rows = $sth->execute();
     is($rows, '0E0', '... got back 0E0 for rows with a SELECT statement');
 
-    my ($result) = $sth->fetchrow_array();
+    ($result) = $sth->fetchrow_array();
 
     is($result, undef, "... as we have reset the callbacks this SELECT shouldn't match a result set ");
 
@@ -106,10 +107,10 @@ DBD::Mock::dr::add_connect_callbacks( sub {
     $sth = $dbh->prepare('SELECT foo FROM bar');
     isa_ok($sth, 'DBI::st');
 
-    my $rows = $sth->execute();
+    $rows = $sth->execute();
     is($rows, '0E0', '... got back 0E0 for rows with a SELECT statement');
 
-    my ($result) = $sth->fetchrow_array();
+    ($result) = $sth->fetchrow_array();
 
     is($result, 10, "... this should return a value as we've added its connect callback in");
 

@@ -22,20 +22,21 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222641;
+our $VERSION = 1.20190912215428;
 
 my $formatters = [
                 {
                   'format' => '$1 $2',
-                  'pattern' => '(\\d{2})(\\d{4})',
-                  'leading_digits' => '8[125]'
+                  'leading_digits' => '8[125]',
+                  'pattern' => '(\\d{2})(\\d{4})'
                 },
                 {
-                  'leading_digits' => '[134]',
                   'format' => '$1',
+                  'leading_digits' => '[134]',
                   'pattern' => '(\\d{6})'
                 },
                 {
+                  'format' => '$1 $2',
                   'leading_digits' => '
             1|
             2[0-79]|
@@ -43,28 +44,28 @@ my $formatters = [
             4[0-7]|
             59
           ',
-                  'format' => '$1 $2',
                   'pattern' => '(\\d)(\\d{6})'
                 },
                 {
+                  'format' => '$1 $2',
                   'leading_digits' => '
             24|
             [67]
           ',
-                  'pattern' => '(\\d)(\\d{7})',
-                  'format' => '$1 $2'
+                  'pattern' => '(\\d)(\\d{7})'
                 },
                 {
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '
             [348]|
             64|
             79[0-8]|
             90
           ',
-                  'format' => '$1 $2 $3',
                   'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
                 },
                 {
+                  'format' => '$1 $2',
                   'leading_digits' => '
             1|
             28|
@@ -72,27 +73,11 @@ my $formatters = [
             799|
             9[2-9]
           ',
-                  'pattern' => '(\\d{2})(\\d{5,7})',
-                  'format' => '$1 $2'
+                  'pattern' => '(\\d{2})(\\d{5,7})'
                 }
               ];
 
 my $validators = {
-                'specialrate' => '',
-                'geographic' => '
-          (?:
-            1\\d|
-            2[0-79]|
-            3[0-46-8]|
-            4[0-7]|
-            59
-          )\\d{5}|
-          (?:
-            [134]\\d|
-            8[125]
-          )\\d{4}
-        ',
-                'voip' => '',
                 'fixed_line' => '
           (?:
             1\\d|
@@ -106,9 +91,19 @@ my $validators = {
             8[125]
           )\\d{4}
         ',
-                'pager' => '',
-                'personal_number' => '',
-                'toll_free' => '',
+                'geographic' => '
+          (?:
+            1\\d|
+            2[0-79]|
+            3[0-46-8]|
+            4[0-7]|
+            59
+          )\\d{5}|
+          (?:
+            [134]\\d|
+            8[125]
+          )\\d{4}
+        ',
                 'mobile' => '
           28\\d{5}|
           (?:
@@ -130,14 +125,19 @@ my $validators = {
               [2-9]
             )
           )\\d{6}
-        '
+        ',
+                'pager' => '',
+                'personal_number' => '',
+                'specialrate' => '',
+                'toll_free' => '',
+                'voip' => ''
               };
-my %areanames = (
-  2521 => "Mogadishu",
-  2523 => "Hargeisa",
-  2524 => "Garowe",
-  25261 => "Mogadishu",
-);
+my %areanames = ();
+$areanames{en}->{2521} = "Mogadishu";
+$areanames{en}->{2523} = "Hargeisa";
+$areanames{en}->{2524} = "Garowe";
+$areanames{en}->{25261} = "Mogadishu";
+
     sub new {
       my $class = shift;
       my $number = shift;

@@ -36,6 +36,20 @@ subtest "algoritm md5" => sub {
     );
 };
 
+subtest "algoritm Digest (MD5)" => sub {
+    my $res = digest_files(
+        algorithm=>"Digest", digest_args=>['MD5'], files=>["$dir/1", "$dir/2", "$dir/3"],
+    );
+    is($res->[0], 207) or diag explain $res;
+    is_deeply(
+        $res->[2],
+        [
+            {file=>"$dir/1", digest=>"f97c5d29941bfb1b2fdab0874906ab82"},
+            {file=>"$dir/2", digest=>"b8a9f715dbb64fd5c56e7783c6820a61"},
+        ],
+    );
+};
+
 subtest "algoritm sha1" => sub {
     my $res = digest_files(
         algorithm=>"sha1", files=>["$dir/1", "$dir/2", "$dir/3"],

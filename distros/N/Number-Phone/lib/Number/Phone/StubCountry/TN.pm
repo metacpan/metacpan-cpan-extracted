@@ -22,25 +22,17 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222641;
+our $VERSION = 1.20190912215428;
 
 my $formatters = [
                 {
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '[2-57-9]',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{3})',
-                  'format' => '$1 $2 $3'
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{3})'
                 }
               ];
 
 my $validators = {
-                'geographic' => '
-          81200\\d{3}|
-          (?:
-            3[0-2]|
-            7\\d
-          )\\d{6}
-        ',
-                'specialrate' => '(8[12]10\\d{4})|(88\\d{6})',
                 'fixed_line' => '
           81200\\d{3}|
           (?:
@@ -48,9 +40,13 @@ my $validators = {
             7\\d
           )\\d{6}
         ',
-                'voip' => '',
-                'pager' => '',
-                'personal_number' => '',
+                'geographic' => '
+          81200\\d{3}|
+          (?:
+            3[0-2]|
+            7\\d
+          )\\d{6}
+        ',
                 'mobile' => '
           3(?:
             001|
@@ -68,19 +64,23 @@ my $validators = {
             )
           )\\d{5}
         ',
-                'toll_free' => '8010\\d{4}'
+                'pager' => '',
+                'personal_number' => '',
+                'specialrate' => '(8[12]10\\d{4})|(88\\d{6})',
+                'toll_free' => '8010\\d{4}',
+                'voip' => ''
               };
-my %areanames = (
-  21670 => "Ben\ Arous",
-  21671 => "Ariana\/Ben\ Arous\/Carthage\/Tunis",
-  21672 => "Bizerte\/Nabeul\/Zaghouan",
-  21673 => "Chebba\/Hamman\-Sousse\/Khenis\/Mahdia\/Monastir\/Sousse",
-  21674 => "Agareb\/Sfax",
-  21675 => "Gabes\/Kebili\/Medenine\/Tataouine",
-  21676 => "Gafsa\/Sidi\ Bouzid\/Tozeur",
-  21677 => "Haffouz\/Kairouan\/Kasserine",
-  21678 => "Beja\/Jendouba\/Kef\/La\ Kef\/Siliana\/Tabarka",
-);
+my %areanames = ();
+$areanames{en}->{21670} = "Ben\ Arous";
+$areanames{en}->{21671} = "Ariana\/Ben\ Arous\/Carthage\/Tunis";
+$areanames{en}->{21672} = "Bizerte\/Nabeul\/Zaghouan";
+$areanames{en}->{21673} = "Chebba\/Hamman\-Sousse\/Khenis\/Mahdia\/Monastir\/Sousse";
+$areanames{en}->{21674} = "Agareb\/Sfax";
+$areanames{en}->{21675} = "Gabes\/Kebili\/Medenine\/Tataouine";
+$areanames{en}->{21676} = "Gafsa\/Sidi\ Bouzid\/Tozeur";
+$areanames{en}->{21677} = "Haffouz\/Kairouan\/Kasserine";
+$areanames{en}->{21678} = "Beja\/Jendouba\/Kef\/La\ Kef\/Siliana\/Tabarka";
+
     sub new {
       my $class = shift;
       my $number = shift;

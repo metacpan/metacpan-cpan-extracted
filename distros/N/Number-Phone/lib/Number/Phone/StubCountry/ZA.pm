@@ -22,48 +22,36 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222641;
+our $VERSION = 1.20190912215428;
 
 my $formatters = [
                 {
+                  'format' => '$1 $2',
                   'leading_digits' => '8[1-4]',
-                  'pattern' => '(\\d{2})(\\d{3,4})',
                   'national_rule' => '0$1',
-                  'format' => '$1 $2'
+                  'pattern' => '(\\d{2})(\\d{3,4})'
                 },
                 {
                   'format' => '$1 $2 $3',
+                  'leading_digits' => '8[1-4]',
                   'national_rule' => '0$1',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{2,3})',
-                  'leading_digits' => '8[1-4]'
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{2,3})'
                 },
                 {
-                  'national_rule' => '0$1',
                   'format' => '$1 $2 $3',
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
-                  'leading_digits' => '860'
+                  'leading_digits' => '860',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
                 },
                 {
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})',
-                  'national_rule' => '0$1',
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '[1-9]'
+                  'leading_digits' => '[1-9]',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
                 }
               ];
 
 my $validators = {
-                'toll_free' => '80\\d{7}',
-                'mobile' => '
-          8[1-4]\\d{3,7}|
-          (?:
-            6\\d|
-            7[0-46-9]|
-            85
-          )\\d{7}
-        ',
-                'personal_number' => '',
-                'pager' => '',
-                'voip' => '87\\d{7}',
                 'fixed_line' => '
           (?:
             1[0-8]|
@@ -82,52 +70,64 @@ my $validators = {
             5[1346-8]
           )\\d{7}
         ',
+                'mobile' => '
+          8[1-4]\\d{3,7}|
+          (?:
+            6\\d|
+            7[0-46-9]|
+            85
+          )\\d{7}
+        ',
+                'pager' => '',
+                'personal_number' => '',
                 'specialrate' => '(860\\d{6})|(
           (?:
             86[2-9]|
             9[0-2]\\d
           )\\d{6}
-        )|(861\\d{6})'
+        )|(861\\d{6})',
+                'toll_free' => '80\\d{7}',
+                'voip' => '87\\d{7}'
               };
-my %areanames = (
-  2710 => "Johannesburg",
-  2711 => "Johannesburg",
-  2712 => "Brits\/Tshwane",
-  2713 => "Bronkhorstspruit\/Eastern\ Gauteng\/Middelburg\/Nelspruit\/Northern\ and\ Western\ Mpumalanga\/Witbank",
-  2714 => "Modimolle\/Northern\ North\ West\ and\ Southwestern\ Limpopo\/Rustenburg",
-  2715 => "Northern\ and\ Eastern\ Limpopo\/Polokwane",
-  2716 => "Vaal\ Triangle",
-  2717 => "Ermelo\/Secunda\/Southern\ Mpumalanga",
-  2718 => "Klerksdorp\/Lichtenburg\/Potchefstroom",
-  2721 => "Cape\ Town\/Gordons\ Bay\/Somerset\ West\/Stellenbosch",
-  2722 => "Boland\/Malmesbury\/Vredenburg\/Western\ coast\ of\ Western\ Cape",
-  2723 => "Beaufort\ West\/Karoo\/Robertson\/Worcester",
-  2727 => "Alexander\ Bay\/Calvinia\/Clanwilliam\/Namaqualand\/Port\ Nolloth\/Springbok\/Vredendal",
-  2728 => "Caledon\/Hermanus\/Southern\ coast\ of\ Western\ Cape\/Swellendam",
-  2731 => "Durban",
-  2732 => "Ballito\/KwaZulu\ Natal\ coast\/Stanger\/Tongaat\/Verulam",
-  2733 => "KwaZulu\ Natal\ Midlands\/Pietermaritzburg",
-  2734 => "Newcastle\/Northern\ KwaZulu\ Natal\/Vryheid",
-  2735 => "Richards\ Bay\/St\.\ Lucia\/Ulundi\/Zululand",
-  2736 => "Drakensberg\/Ladysmith",
-  2739 => "Eastern\ Pondoland\/Port\ Shepstone\/Southern\ coast\ of\ KwaZulu\ Natal",
-  2740 => "Alice\/Bhisho",
-  2741 => "Port\ Elizabeth\/Uitenhage",
-  2742 => "Jeffreys\ Bay\/Humansdorp\/Southern\ and\ central\ Eastern\ Cape",
-  2743 => "East\ London",
-  2744 => "Garden\ Route\/George\/Knysna\/Mossel\ Bay\/Oudtshoorn\/Plettenberg\ Bay",
-  2745 => "Northern\ and\ eastern\ parts\ of\ Eastern\ Cape\/Queenstown",
-  2746 => "Bathurst\/Southern\ and\ eastern\ parts\ of\ Eastern\ Cape\/Grahamstown\/Kenton\-on\-Sea\/Port\ Alfred",
-  2747 => "Butterworth\/Eastern\ part\ of\ Eastern\ Cape\/Mthatha",
-  2748 => "Cradock\/Northern\ part\ of\ Eastern\ Cape\/Steynsburg",
-  2749 => "Graaff\-Reinet\/Western\ part\ of\ Eastern\ Cape",
-  2751 => "Aliwal\ North\/Bloemfontein\/Far\ eastern\ part\ of\ Eastern\ Cape\/Southern\ and\ Central\ Free\ State",
-  2753 => "Eastern\ part\ of\ Northern\ Cape\/Far\ western\ part\ of\ North\ West\/Kimberley\/Kuruman",
-  2754 => "Upington\/Gordonia",
-  2756 => "Kroonstad\/Parys\/Northern\ Free\ State",
-  2757 => "Northern\ Free\ State\ Goldfields\/Welkom",
-  2758 => "Bethlehem\/Eastern\ Free\ State",
-);
+my %areanames = ();
+$areanames{en}->{2710} = "Johannesburg";
+$areanames{en}->{2711} = "Johannesburg";
+$areanames{en}->{2712} = "Brits\/Tshwane";
+$areanames{en}->{2713} = "Bronkhorstspruit\/Eastern\ Gauteng\/Middelburg\/Nelspruit\/Northern\ and\ Western\ Mpumalanga\/Witbank";
+$areanames{en}->{2714} = "Modimolle\/Northern\ North\ West\ and\ Southwestern\ Limpopo\/Rustenburg";
+$areanames{en}->{2715} = "Northern\ and\ Eastern\ Limpopo\/Polokwane";
+$areanames{en}->{2716} = "Vaal\ Triangle";
+$areanames{en}->{2717} = "Ermelo\/Secunda\/Southern\ Mpumalanga";
+$areanames{en}->{2718} = "Klerksdorp\/Lichtenburg\/Potchefstroom";
+$areanames{en}->{2721} = "Cape\ Town\/Gordons\ Bay\/Somerset\ West\/Stellenbosch";
+$areanames{en}->{2722} = "Boland\/Malmesbury\/Vredenburg\/Western\ coast\ of\ Western\ Cape";
+$areanames{en}->{2723} = "Beaufort\ West\/Karoo\/Robertson\/Worcester";
+$areanames{en}->{2727} = "Alexander\ Bay\/Calvinia\/Clanwilliam\/Namaqualand\/Port\ Nolloth\/Springbok\/Vredendal";
+$areanames{en}->{2728} = "Caledon\/Hermanus\/Southern\ coast\ of\ Western\ Cape\/Swellendam";
+$areanames{en}->{2731} = "Durban";
+$areanames{en}->{2732} = "Ballito\/KwaZulu\ Natal\ coast\/Stanger\/Tongaat\/Verulam";
+$areanames{en}->{2733} = "KwaZulu\ Natal\ Midlands\/Pietermaritzburg";
+$areanames{en}->{2734} = "Newcastle\/Northern\ KwaZulu\ Natal\/Vryheid";
+$areanames{en}->{2735} = "Richards\ Bay\/St\.\ Lucia\/Ulundi\/Zululand";
+$areanames{en}->{2736} = "Drakensberg\/Ladysmith";
+$areanames{en}->{2739} = "Eastern\ Pondoland\/Port\ Shepstone\/Southern\ coast\ of\ KwaZulu\ Natal";
+$areanames{en}->{2740} = "Alice\/Bhisho";
+$areanames{en}->{2741} = "Port\ Elizabeth\/Uitenhage";
+$areanames{en}->{2742} = "Jeffreys\ Bay\/Humansdorp\/Southern\ and\ central\ Eastern\ Cape";
+$areanames{en}->{2743} = "East\ London";
+$areanames{en}->{2744} = "Garden\ Route\/George\/Knysna\/Mossel\ Bay\/Oudtshoorn\/Plettenberg\ Bay";
+$areanames{en}->{2745} = "Northern\ and\ eastern\ parts\ of\ Eastern\ Cape\/Queenstown";
+$areanames{en}->{2746} = "Bathurst\/Southern\ and\ eastern\ parts\ of\ Eastern\ Cape\/Grahamstown\/Kenton\-on\-Sea\/Port\ Alfred";
+$areanames{en}->{2747} = "Butterworth\/Eastern\ part\ of\ Eastern\ Cape\/Mthatha";
+$areanames{en}->{2748} = "Cradock\/Northern\ part\ of\ Eastern\ Cape\/Steynsburg";
+$areanames{en}->{2749} = "Graaff\-Reinet\/Western\ part\ of\ Eastern\ Cape";
+$areanames{en}->{2751} = "Aliwal\ North\/Bloemfontein\/Far\ eastern\ part\ of\ Eastern\ Cape\/Southern\ and\ Central\ Free\ State";
+$areanames{en}->{2753} = "Eastern\ part\ of\ Northern\ Cape\/Far\ western\ part\ of\ North\ West\/Kimberley\/Kuruman";
+$areanames{en}->{2754} = "Upington\/Gordonia";
+$areanames{en}->{2756} = "Kroonstad\/Parys\/Northern\ Free\ State";
+$areanames{en}->{2757} = "Northern\ Free\ State\ Goldfields\/Welkom";
+$areanames{en}->{2758} = "Bethlehem\/Eastern\ Free\ State";
+
     sub new {
       my $class = shift;
       my $number = shift;

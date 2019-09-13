@@ -1,7 +1,7 @@
 package File::Digest;
 
-our $DATE = '2019-08-21'; # DATE
-our $VERSION = '0.008'; # VERSION
+our $DATE = '2019-09-12'; # DATE
+our $VERSION = '0.010'; # VERSION
 
 use 5.010001;
 use strict;
@@ -14,11 +14,6 @@ our @EXPORT_OK = qw(digest_files);
 use Perinci::Object;
 
 our %SPEC;
-
-$SPEC{':package'} = {
-    v => 1.1,
-    summary => 'Calculate file checksum/digest (using various algorithms)',
-};
 
 my %arg_file = (
     file => {
@@ -43,17 +38,21 @@ my %arg_files = (
     },
 );
 
-my %arg_algorithm = (
+my %args_algorithm = (
     algorithm => {
-        schema => ['str*', in=>[qw/crc32 md5 sha1 sha224 sha256 sha384 sha512 sha512224 sha512256/]],
+        schema => ['str*', in=>[qw/crc32 md5 sha1 sha224 sha256 sha384 sha512 sha512224 sha512256 Digest/]],
         default => 'md5',
         cmdline_aliases => {a=>{}},
+    },
+    digest_args => {
+        schema => ['array*', of=>'str*', 'x.perl.coerce_rules'=>['str_comma_sep']],
+        cmdline_aliases => {A=>{}},
     },
 );
 
 $SPEC{digest_file} = {
     v => 1.1,
-    summary => 'Calculate file checksum/digest (using various algorithms)',
+    summary => 'Calculate digest of file',
     description => <<'_',
 
 Return 400 status when algorithm is unknown/unsupported.
@@ -61,7 +60,7 @@ Return 400 status when algorithm is unknown/unsupported.
 _
     args => {
         %arg_file,
-        %arg_algorithm,
+        %args_algorithm,
     },
 };
 sub digest_file {
@@ -99,6 +98,11 @@ sub digest_file {
         my $ctx = Digest::CRC->new(type=>'crc32');
         $ctx->addfile($fh);
         return [200, "OK", $ctx->hexdigest];
+    } elsif ($algo eq 'Digest') {
+        require Digest;
+        my $ctx = Digest->new(@{ $args{digest_args} // [] });
+        $ctx->addfile($fh);
+        return [200, "OK", $ctx->hexdigest];
     } else {
         return [400, "Invalid/unsupported algorithm '$algo'"];
     }
@@ -106,7 +110,7 @@ sub digest_file {
 
 $SPEC{digest_files} = {
     v => 1.1,
-    summary => 'Calculate file checksum/digest (using various algorithms)',
+    summary => 'Calculate digests of files',
     description => <<'_',
 
 Dies when algorithm is unsupported/unknown.
@@ -114,7 +118,7 @@ Dies when algorithm is unsupported/unknown.
 _
     args => {
         %arg_files,
-        %arg_algorithm,
+        %args_algorithm,
     },
 };
 sub digest_files {
@@ -127,7 +131,7 @@ sub digest_files {
     my @res;
 
     for my $file (@$files) {
-        my $itemres = digest_file(file => $file, algorithm=>$algo);
+        my $itemres = digest_file(file => $file, algorithm=>$algo, digest_args=>$args{digest_args});
         die $itemres->[1] if $itemres->[0] == 400;
         $envres->add_result($itemres->[0], $itemres->[1], {item_id=>$file});
         push @res, {file=>$file, digest=>$itemres->[2]} if $itemres->[0] == 200;
@@ -140,7 +144,7 @@ sub digest_files {
 }
 
 1;
-# ABSTRACT: Calculate file checksum/digest (using various algorithms)
+# ABSTRACT: Calculate digests of files
 
 __END__
 
@@ -150,11 +154,11 @@ __END__
 
 =head1 NAME
 
-File::Digest - Calculate file checksum/digest (using various algorithms)
+File::Digest - Calculate digests of files
 
 =head1 VERSION
 
-This document describes version 0.008 of File::Digest (from Perl distribution File-Digest), released on 2019-08-21.
+This document describes version 0.010 of File::Digest (from Perl distribution File-Digest), released on 2019-09-12.
 
 =head1 SYNOPSIS
 
@@ -167,6 +171,9 @@ This document describes version 0.008 of File::Digest (from Perl distribution Fi
 
 =head1 DESCRIPTION
 
+This module provides some convenience when you want to use L<Digest> against
+files.
+
 =head1 FUNCTIONS
 
 
@@ -176,7 +183,7 @@ Usage:
 
  digest_file(%args) -> [status, msg, payload, meta]
 
-Calculate file checksum/digest (using various algorithms).
+Calculate digest of file.
 
 Return 400 status when algorithm is unknown/unsupported.
 
@@ -187,6 +194,8 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<algorithm> => I<str> (default: "md5")
+
+=item * B<digest_args> => I<array[str]>
 
 =item * B<file>* => I<filename>
 
@@ -213,7 +222,7 @@ Usage:
 
  digest_files(%args) -> [status, msg, payload, meta]
 
-Calculate file checksum/digest (using various algorithms).
+Calculate digests of files.
 
 Dies when algorithm is unsupported/unknown.
 
@@ -224,6 +233,8 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<algorithm> => I<str> (default: "md5")
+
+=item * B<digest_args> => I<array[str]>
 
 =item * B<files>* => I<array[filename]>
 
@@ -260,12 +271,11 @@ feature.
 
 =head1 SEE ALSO
 
-L<sum> from L<PerlPowerTools> (which only supports older algorithms like CRC32).
+L<Digest>
 
-Backend modules: L<Digest::CRC>, L<Digest::MD5>, L<Digest::SHA>.
-
-L<xsum> from L<App::xsum> which can also check checksums/digests from checksum
-file e.g. F<MD5SUMS>.
+L<xsum> from L<App::xsum> is a CLI for File::Digest. It can also check digests
+stored in checksum files against the actual digests computed from the original
+files.
 
 =head1 AUTHOR
 

@@ -5,7 +5,7 @@ use warnings;
 
 # ABSTRACT: RapidApp-powered blog
 
-use RapidApp 1.3101;
+use RapidApp 1.3105;
 
 use Moose;
 extends 'RapidApp::Builder';
@@ -19,7 +19,10 @@ require Module::Locate;
 use Path::Class qw/file dir/;
 use YAML::XS 0.64 'LoadFile';
 
-our $VERSION = '1.0200';
+use Rapi::Blog::Scaffold;
+use Rapi::Blog::Scaffold::Set;
+
+our $VERSION = '1.1001';
 our $TITLE = "Rapi::Blog v" . $VERSION;
 
 has 'site_path',        is => 'ro', required => 1;
@@ -27,6 +30,15 @@ has 'scaffold_path',    is => 'ro', isa => Maybe[Str], default => sub { undef };
 has 'builtin_scaffold', is => 'ro', isa => Maybe[Str], default => sub { undef };
 has 'scaffold_config',  is => 'ro', isa => HashRef, default => sub {{}};
 has 'fallback_builtin_scaffold', is => 'ro', isa => Bool, default => sub {0};
+
+has 'enable_password_reset', is => 'ro', isa => Bool, default => sub {1};
+has 'enable_user_sign_up',   is => 'ro', isa => Bool, default => sub {1};
+has 'enable_email_login',    is => 'ro', isa => Bool, default => sub {1};
+
+has 'underlay_scaffolds', is => 'ro', isa => ArrayRef[Str], default => sub {[]};
+
+has 'smtp_config', is => 'ro', isa => Maybe[HashRef], default => sub { undef };
+has 'override_email_recipient', is => 'ro', isa => Maybe[Str], default => sub { undef };
 
 has '+base_appname', default => sub { 'Rapi::Blog::App' };
 has '+debug',        default => sub {1};
@@ -69,9 +81,13 @@ has '+inject_components', default => sub {
 
   return [
     [ $model => 'Model::DB' ],
-    [ 'Rapi::Blog::Controller::Remote' => 'Controller::Remote' ]
+    [ 'Rapi::Blog::Model::Mailer' => 'Model::Mailer' ],
+    [ 'Rapi::Blog::Controller::Remote' => 'Controller::Remote' ],
+    [ 'Rapi::Blog::Controller::Remote::PreauthAction' => 'Controller::Remote::PreauthAction' ]
   ]
 };
+
+
 
 has 'site_dir', is => 'ro', init_arg => undef, lazy => 1, default => sub {
   my $self = shift;
@@ -81,6 +97,70 @@ has 'site_dir', is => 'ro', init_arg => undef, lazy => 1, default => sub {
   
   return $Dir
 }, isa => InstanceOf['Path::Class::Dir'];
+
+
+has 'scaffolds', is => 'ro', lazy => 1, default => sub { undef };
+
+has 'ScaffoldSet', is => 'ro', init_arg => undef, lazy => 1, default => sub {
+  my $self = shift;
+  
+  my $scafs = $self->scaffolds || [];
+  $scafs = [ $scafs ] unless (ref($scafs)||'' eq 'ARRAY');
+  $scafs = [ $self->scaffold_dir ] unless (scalar(@$scafs) > 0);
+  
+  my @list = map { 
+    Rapi::Blog::Scaffold->factory( $_ ) 
+  } @$scafs, @{ $self->_get_underlay_scaffold_dirs };
+  
+  my $Set = Rapi::Blog::Scaffold::Set->new( Scaffolds => \@list );
+    
+  # Apply any custom configs to the *first* scaffold:
+  $self->scaffold_config and $Set->first->config->_apply_params( $self->scaffold_config );
+  
+  $Set
+
+}, isa => InstanceOf['Rapi::Blog::Scaffold::Set'];
+
+
+# This exists to be able to provide access to the running Blog config, including within
+# templates, without the risk associated with providing direct access to the Rapi::Blog 
+# instance outright:
+has 'BlogCfg', is => 'ro', init_arg => undef, lazy => 1, default => sub {
+  my $self = shift;
+  
+  my @keys = grep {
+    my $Attr = $self->meta->get_attribute($_);
+    
+    !($_ =~ /^_/) # ignore attrs with private names (i.e. start with "_")
+    && ($Attr->reader||'') eq $_ # only consider attributes with normal accessor names
+    && $Attr->has_value($self) # and already have a value
+
+  } $self->meta->get_attribute_list;
+
+  # If any normal methods are desired in the future, add them to keys here
+  
+  my $cfg = { map { $_ => $self->$_ } @keys };
+
+  $cfg
+}, isa => HashRef;
+
+
+
+# Single merged config object which considers, prioritizes and flattens the configs of all scaffolds
+has 'scaffold_cfg', is => 'ro', init_arg => undef, lazy => 1, default => sub {
+  my $self = shift;
+  
+  my %merged = (
+    map {
+      %{ $_->config->_all_as_hash }
+    } reverse ($self->ScaffoldSet->all)
+  );
+  
+  Rapi::Blog::Scaffold::Config->new( %merged )
+
+}, isa => InstanceOf['Rapi::Blog::Scaffold::Config'];
+
+
 
 has 'scaffold_dir', is => 'ro', init_arg => undef, lazy => 1, default => sub {
   my $self = shift;
@@ -134,58 +214,31 @@ sub _get_builtin_scaffold_dir {
 	$Scaffolds->subdir($scaffold_name)
 }
 
-has 'scaffold_cnf', is => 'ro', init_arg => undef, lazy => 1, default => sub {
+
+after 'bootstrap' => sub { 
   my $self = shift;
   
-  my $defaults = {
-    favicon            => 'favicon.ico',
-    landing_page       => 'index.html',
-    internal_post_path => 'private/post/',
-    not_found          => 'rapidapp/public/http-404.html',
-    view_wrappers      => [],
-    static_paths       => ['/'],
-    private_paths      => [],
-    default_ext        => 'html',
+  my $c = $self->appname;
+  $c->setup_plugins(['+Rapi::Blog::CatalystApp']);
   
-  };
-  
-  my $cnf = clone( $self->scaffold_config );
-  
-  my $yaml_file = $self->scaffold_dir->file('scaffold.yml');
-  if (-f $yaml_file) {
-    my $data = LoadFile( $yaml_file );
-    %$cnf = ( %$data, %$cnf );
-  }
-  
-  %$cnf = ( %$defaults, %$cnf );
-
-  return $cnf
-
-}, isa => HashRef;
-
-has 'default_view_path', is => 'ro', lazy => 1, default => sub {
-  my $self = shift;
-  
-  return $self->scaffold_cnf->{default_view_path} if ($self->scaffold_cnf->{default_view_path});
-  
-  # first marked 'default' or first type 'include' or first anything
-  my @wrappers = grep { $_->{path} } @{$self->scaffold_cnf->{view_wrappers} || []};
-  my $def = List::Util::first { $_->{default} } @wrappers;
-  $def ||= List::Util::first { $_->{type} eq 'include' } @wrappers;
-  $def ||= $self->scaffold_cnf->{view_wrappers}[0];
-  
-  unless($def) {
-    warn "\n ** Waring: scaffold has no suitable view_wrappers to use as 'default_view_path'\n\n";
-    return undef;
-  }
-
-  return $def->{path}
 };
 
-has 'preview_path', is => 'ro', lazy => 1, default => sub {
+
+sub _get_underlay_scaffold_dirs {
   my $self = shift;
-  return $self->scaffold_cnf->{preview_path} || $self->default_view_path
-};
+
+  my $CommonUnderlay = dir( $self->share_dir )->subdir('common_underlay')->absolute;
+  -d $CommonUnderlay or die join('',
+    " Fatal error: Unable to locate common underlay scaffold dir (this could ",
+    "indicate a problem with your Rapi::Blog installation)\n\n"
+  );
+  
+  return [ 
+    @{$self->underlay_scaffolds}, 
+    $CommonUnderlay 
+  ]
+}
+
 
 
 sub _build_version { $VERSION }
@@ -365,32 +418,56 @@ sub _build_base_config {
     
     'Controller::RapidApp::Template' => {
       root_template_prefix  => '/',
-      root_template         => $self->scaffold_cnf->{landing_page},
+      root_template         => $self->scaffold_cfg->landing_page,
       read_alias_path => '/tpl',  #<-- already the default
       edit_alias_path => '/tple', #<-- already the default
       default_template_extension => undef,
       include_paths => [ $tpl_dir ],
       access_class => 'Rapi::Blog::Template::AccessStore',
       access_params => {
-        scaffold_dir  => $self->scaffold_dir,
-        scaffold_cnf  => $self->scaffold_cnf,
-        static_paths  => $self->scaffold_cnf->{static_paths},
-        private_paths => $self->scaffold_cnf->{private_paths},
-        default_ext   => $self->scaffold_cnf->{default_ext},
+      
+        BlogCfg            => $self->BlogCfg,
+        ScaffoldSet        => $self->ScaffoldSet,
+        scaffold_cfg       => $self->scaffold_cfg,
         
-        internal_post_path => $self->scaffold_cnf->{internal_post_path},
-        view_wrappers      => $self->scaffold_cnf->{view_wrappers},
-        default_view_path  => $self->default_view_path,
-        preview_path       => $self->preview_path,
+        #internal_post_path => $self->scaffold_cfg->internal_post_path,
+        #default_view_path  => $self->scaffold_cfg->default_view_path,
+        
+      
+        #scaffold_dir  => $self->scaffold_dir,
+        #scaffold_cnf  => $self->scaffold_cnf,
+        #static_paths  => $self->scaffold_cnf->{static_paths},
+        #private_paths => $self->scaffold_cnf->{private_paths},
+        #default_ext   => $self->scaffold_cnf->{default_ext},
+        #
+        #internal_post_path => $self->scaffold_cnf->{internal_post_path},
+        #view_wrappers      => $self->scaffold_cnf->{view_wrappers},
+        #default_view_path  => $self->default_view_path,
+        #preview_path       => $self->preview_path,
+        #
+        #underlay_scaffold_dirs => $self->_get_underlay_scaffold_dirs,
 
         get_Model => sub { $self->base_appname->model('DB') } 
       } 
+    },
+    
+    'Model::Mailer' => {
+      smtp_config => $self->smtp_config,
+      ( $self->override_email_recipient ? (envelope_to => $self->override_email_recipient) : () )
     }
+    
   };
   
-  if(my $favname = $self->scaffold_cnf->{favicon}) {
-    my $Fav = $self->scaffold_dir->file($favname);
-    $config->{RapidApp}{default_favicon_url} = $Fav->stringify if (-f $Fav);
+  if(my $faviconPath = $self->ScaffoldSet->first_config_value_filepath('favicon')) {
+    $config->{RapidApp}{default_favicon_url} = $faviconPath;
+  }
+  
+  if(my $loginTpl = $self->ScaffoldSet->first_config_value_file('login')) {
+    $config->{'Plugin::RapidApp::AuthCore'}{login_template} = $loginTpl;
+  }
+  
+  if(my $errorTpl = $self->ScaffoldSet->first_config_value_file('error')) {
+    $config->{'RapidApp'}{error_template} = $errorTpl;
   }
   
   return $config
@@ -481,6 +558,23 @@ If set to true and the local scaffold directory doesn't exist, the default built
 'bootstrap-blog' will be used instead. Useful for testing and content-only scenarios.
 
 Defaults to false.
+
+=head2 smtp_config
+
+Optional HashRef of L<Email::Sender::Transport::SMTP> params which will be used by the app for
+sending E-Mails, such as password resets and other notifications. The options are passed directly
+to C<Email::Sender::Transport::SMTP->new()>. If the special param C<transport_class> is included,
+it will be used as the transport class instead of C<Email::Sender::Transport::SMTP>. If this is
+supplied, it should still be a valid L<Email::Sender::Transport> class.
+
+If this option is not supplied, E-Mails will be sent via the localhost using C<sendmail> via 
+the default L<Email::Sender::Transport::Sendmail> options.
+
+=head2 override_email_recipient
+
+If set, all e-mails generated by the system will be sent to the specified address instead of normal 
+recipients.
+
 
 =head1 METHODS
 

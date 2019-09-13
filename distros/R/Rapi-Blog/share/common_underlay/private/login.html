@@ -1,0 +1,57 @@
+[%- WRAPPER private/auth_wrapper.html 
+  title = 'Rapi::Blog login'
+  rapidapp_footer_stamp = 1
+-%]
+
+<div class="cf" style="height:80px;">
+  <h2 class="lb_ribbon lb_blue">
+    <div style="padding-top:3px;">
+      <img 
+        src="[% mount_url %]/assets/rapidapp/misc/static/images/iconLoggedOut.png" 
+        style="vertical-align:middle;padding-bottom:5px;padding-right:9px;"
+      />
+      <span style="padding-right:11px;font-weight:bold;font-size:1.1em;">Sign in</span>
+    </div>
+  </h2>
+
+  [% IF BlogCfg.enable_email_login %]
+    <a href="[%- mount_url -%]/email_login" class="right small sl_link">
+      <span>E-Mail Login</span>
+    </a>
+  [% END %]
+
+  [% IF BlogCfg.enable_password_reset %]
+    <a href="[%- mount_url -%]/email_login" class="right small sl_link">
+      <span>Forgot Password</span>
+    </a>
+  [% END %]
+  
+  [% IF BlogCfg.enable_user_sign_up %]
+    <a href="[%- mount_url -%]/sign_up" class="right small sl_link">
+      <span>Sign Up</span>
+    </a>
+  [% END %]
+  
+  <a href="[%- mount_url -%]/" class="right small sl_link">
+    <span>Home</span>
+  </a>
+  
+
+</div>
+
+
+[% IF error_status %]
+  <div style="font-size:1.1em;font-weight:bold;color:red;padding:10px;">
+    <center>&nbsp;[% error_status %]&nbsp;</center>
+  </div>
+[% END %]
+
+<div class="row m_cont" style="padding-top:10px;">
+  <div class="seven columns centered">
+    <div class="l_pane">
+      [% INCLUDE rapidapp/public/login_form.tt %]
+    </div>
+  </div>
+</div>
+       
+[% END %]

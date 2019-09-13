@@ -1,6 +1,9 @@
-use strict;
+use 5.008;
 
-use Test::More tests => 38;
+use strict;
+use warnings;
+
+use Test::More;
 
 BEGIN {
     use_ok('DBI');
@@ -84,3 +87,4 @@ ok( @{$history->[2]->bound_params} == 0, 'No parameters' );
 is( $history->[3]->statement, 'COMMIT' );
 ok( @{$history->[3]->bound_params} == 0, 'No parameters' );
 
+done_testing();

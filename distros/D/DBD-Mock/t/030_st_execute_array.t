@@ -1,3 +1,5 @@
+use 5.008;
+
 use strict;
 use warnings;
 
@@ -31,4 +33,4 @@ my $sql = 'INSERT INTO staff (first_name, last_name, dept) VALUES(?, ?, ?)';
         or diag $@;
 }
 
-done_testing;
+done_testing();

@@ -243,7 +243,7 @@ Since this is a normal DBI statement handle we need to expose our tracking infor
 
 - **mock\_add\_resultset( \\@resultset | \\%sql\_and\_resultset )**
 
-    This stocks the database handle with a record set, allowing you to seed data for your application to see if it works properly.. Each recordset is a simple arrayref of arrays with the first arrayref being the fieldnames used. Every time a statement handle is created it asks the database handle if it has any resultsets available and if so uses it.
+    This stocks the database handle with a record set, allowing you to seed data for your application to see if it works properly.. Each recordset is a simple arrayref of arrays with the first arrayref being the field names used. Every time a statement handle is created it asks the database handle if it has any resultsets available and if so uses it.
 
     Here is a sample usage, partially from the test suite:
 
@@ -311,7 +311,7 @@ Since this is a normal DBI statement handle we need to expose our tracking infor
           ],
         };
 
-    If an SQL statement matches both a specified SQL statement result set and a regular expresion result set then the specified SQL statement takes precedence.  If two regular expression result sets match then the first one added takes precedence:
+    If an SQL statement matches both a specified SQL statement result set and a regular expression result set then the specified SQL statement takes precedence.  If two regular expression result sets match then the first one added takes precedence:
 
         # Set up our first regex matching result set
         $dbh->{mock_add_resultset} = {
@@ -513,6 +513,49 @@ In order to capture begin\_work(), commit(), and rollback(), DBD::Mock will crea
         $sth->bind_param( ':id' => 7783 );
         $sth->bind_param( ':active' => 'yes' );
 
+- **mock\_param\_attrs**
+
+    Returns an arrayref of any attributes (parameter type) defined for bound parameters (note: you rarely to define attributes for bound parameters). Where an attribute/type hasn't been that slot in the returned arrayref will be `undef`. e.g. for:
+
+        my $sth = $dbh->prepare( 'SELECT * FROM foo WHERE id = ? AND is_active = ?' );
+        $sth->bind_param( 2, 'yes' );
+        $sth->bind_param( 1 7783, SQL_INTEGER );
+
+    This would return:
+
+        [ SQL_INTEGER, undef ]
+
+    Passing parameters via `execute()` will always populate the array with `undef`, so for:
+
+        $sth->execute( 7783, 'yes' );
+
+    This would return:
+
+        [ undef, undef ]
+
+- **mock\_execution\_history**
+
+    Returns an arrayref where each entry contains the details for an execution of the prepared statement. e.g. after:
+
+        my $sth = $dbh->prepare( 'SELECT * FROM foo WHERE id = ? AND is_active = ?' );
+        $sth->bind_param( 2, 'yes' );
+        $sth->bind_param( 1 7783, SQL_INTEGER );
+        $sth->execute();
+
+        $sth->execute( 1023, 'no' );
+
+    Then `<$sth-`{mock\_execution\_history}>> would be:
+
+        [
+            {
+                params => [ 7783, 'yes' ],
+                attrs  => [ SQL_INTEGER, undef ],
+            }, {
+                params => [ 1023, 'no' ],
+                attrs  => [ undef, undef ],
+            }
+        ]
+
 - **mock\_records**
 
     An arrayref of arrayrefs representing the records the mock statement was stocked with.
@@ -566,6 +609,7 @@ Under the hood this module does most of the work with a `DBD::Mock::StatementTra
     - **return\_data**: Arrayref of return data records
     - **fields**: Arrayref of field names
     - **bound\_params**: Arrayref of bound parameters
+    - **bound\_param\_attrs**: Arrayref of bound parameter attributes
 
 - **statement** (Statement attribute 'mock\_statement')
 
@@ -629,7 +673,7 @@ Under the hood this module does most of the work with a `DBD::Mock::StatementTra
 
 - **next\_record()**
 
-    If the statement has been depleted (all records returned) returns undef; otherwise it gets the current recordfor returning, increments the current record number and returns the current record.
+    If the statement has been depleted (all records returned) returns undef; otherwise it gets the current record for returning, increments the current record number and returns the current record.
 
 - **to\_string()**
 
@@ -637,7 +681,7 @@ Under the hood this module does most of the work with a `DBD::Mock::StatementTra
 
 # DBD::Mock::StatementTrack::Iterator
 
-This object can be used to iterate through the current set of `DBD::Mock::StatementTrack` objects in the history by fetching the 'mock\_all\_history\_iterator' attribute from a database handle. This object is very simple and is meant to be a convience to make writing long test script easier. Aside from the constructor (`new`) this object has only one method.
+This object can be used to iterate through the current set of `DBD::Mock::StatementTrack` objects in the history by fetching the 'mock\_all\_history\_iterator' attribute from a database handle. This object is very simple and is meant to be a convenience to make writing long test script easier. Aside from the constructor (`new`) this object has only one method.
 
 > **next**
 >
@@ -679,7 +723,7 @@ The DBD::Mock::Session object is an alternate means of specifying the SQL statem
 
 As you can see, a session is essentially made up a list of HASH references we call 'states'. Each state has a 'statement' and a set of 'results'. If DBD::Mock finds a session in the 'mock\_session' attribute, then it will pass the current `$dbh` and SQL statement to that DBD::Mock::Session. The SQL statement will be checked against the 'statement'  field in the current state. If it passes, then the 'results' of the current state will get feed to DBD::Mock through the 'mock\_add\_resultset' attribute. We then advance to the next state in the session, and wait for the next call through DBD::Mock. If at any time the SQL statement does not match the current state's 'statement', or the session runs out of available states, an error will be raised (and propagated through the normal DBI error handling based on your values for RaiseError and PrintError).
 
-Also, as can be seen in the the session element, bound parameters can also be supplied and tested. In this statement, the SQL is compared, then when the statement is executed, the bound parameters are also checked. The bound parameters much match in both number of parameters and the parameters themselves, or an error will be raised.
+As can be seen in the session element, bound parameters can also be supplied and tested. In this statement, the SQL is compared, then when the statement is executed, the bound parameters are also checked. The bound parameters much match in both number of parameters and the parameters themselves, or an error will be raised.
 
 As can also be seen in the example above, 'statement' fields can come in many forms. The simplest is a string, which will be compared using `eq` against the currently running statement. The next is a reg-exp reference, this too will get compared against the currently running statement. The last option is a CODE ref, this is sort of a catch-all to allow for a wide range of SQL comparison approaches (including using modules like SQL::Statement or SQL::Parser for detailed functional comparisons). The first argument to the CODE ref will be the currently active SQL statement to compare against, the second argument is a reference to the current state HASH (in case you need to alter the results, or store extra information). The CODE is evaluated in boolean context and throws and exception if it is false.
 
@@ -705,7 +749,7 @@ All functionality listed here is highly experimental and should be used with gre
 
 - Error handling in _mock\_add\_resultset_
 
-    We have added experimental erro handling in _mock\_add\_resultset_ the best example is the test file `t/023_statement_failure.t`, but it looks something like this:
+    We have added experimental error handling in _mock\_add\_resultset_ the best example is the test file `t/023_statement_failure.t`, but it looks something like this:
 
         $dbh->{mock_add_resultset} = {
             sql => 'SELECT foo FROM bar',
@@ -785,6 +829,41 @@ All functionality listed here is highly experimental and should be used with gre
             };
         } );
 
+- table\_info
+
+    This feature adds support for DBI's `table_info` method. To mock the table info for a search of the `testSchema` database schema you would use the following:
+
+        $dbh->{mock_add_table_info} = {
+            cataloge   => undef,
+            schema     => 'testSchema',
+            table      => undef,
+            type       => undef,
+            table_info => [
+                [ 'TABLE_CAT', 'TABLE_SCHEM', 'TABLE_NAME', 'TABLE_TYPE', 'REMARKS' ],
+                [ undef,       'testSchema',  'foo',        'TABLE',      undef     ],
+                [ undef,       'testSchema',  'bar',        'VIEW',       undef     ],
+            ],
+        };
+
+    The `cataloge`, `schema`, `table` and `type` parameters need to explicitly match what you expect table\_info to be called with (note: table\_info treats `undef` and `''` the same).
+
+    Similar to the mock\_results\_sets, the `table_info` parameter's first entry is an arrayref of column names, and the rest are the values of the rows returned (one arrayref per row).
+
+    If you need to cover listing schemas then you'd use:
+
+        $dbh->{mock_add_table_info} = {
+            schema     => '%',
+            table_info => [
+                [ 'TABLE_CAT', 'TABLE_SCHEM',  'TABLE_NAME', 'TABLE_TYPE', 'REMARKS' ],
+                [ undef,       'testSchema',   undef,        undef,        undef     ],
+                [ undef,       'testSchema_2', undef,        undef,        undef     ],
+            ],
+        }
+
+    To clear the current mocked table info set the database handle's `mock_clear_table_info` attribute to 1
+
+        $dbh->{mock_clear_table_info} = 1;
+
 # BUGS
 
 - Odd $dbh attribute behavior
@@ -814,12 +893,6 @@ All functionality listed here is highly experimental and should be used with gre
 Test::MockObject article - [http://www.perl.com/pub/a/2002/07/10/tmo.html](http://www.perl.com/pub/a/2002/07/10/tmo.html)
 
 Perl Code Kata: Testing Databases - [http://www.perl.com/pub/a/2005/02/10/database\_kata.html](http://www.perl.com/pub/a/2005/02/10/database_kata.html)
-
-# DISCUSSION GROUP
-
-We have created a **DBD::Mock** google group for discussion/questions about this module.
-
-[http://groups.google.com/group/DBDMock](http://groups.google.com/group/DBDMock)
 
 # ACKNOWLEDGEMENTS
 

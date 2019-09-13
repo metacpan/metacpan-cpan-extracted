@@ -1,7 +1,9 @@
+use 5.008;
+
 use strict;
 use warnings;
 
-use Test::More tests => 5;
+use Test::More;
 
 BEGIN {
     use_ok('DBD::Mock');
@@ -54,3 +56,5 @@ ok( $sth->execute, 'Execute using named parameters' );
 
 $sth = $dbh->prepare('SELECT * FROM foo WHERE id = :id and active = :active');
 ok( $sth->execute( '101', 'no' ), 'Execute using named parameters #2' );
+
+done_testing();

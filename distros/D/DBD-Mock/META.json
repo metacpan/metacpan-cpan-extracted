@@ -61,7 +61,7 @@
    "provides" : {
       "DBD::Mock" : {
          "file" : "lib/DBD/Mock.pm",
-         "version" : "1.47"
+         "version" : "1.49"
       },
       "DBD::Mock::Pool" : {
          "file" : "lib/DBD/Mock/Pool.pm"
@@ -96,11 +96,12 @@
          "web" : "https://gitlab.com/scrapheap/DBD-Mock"
       }
    },
-   "version" : "1.47",
+   "version" : "1.49",
    "x_authority" : "cpan:JLCOOPER",
    "x_contributors" : [
       "Chisel <CHISEL@cpan.org>",
       "Dave Rolsky <DROLSKY@cpan.org>",
+      "Frédéric Brière <FBRIERE@cpan.org>",
       "Gines R <ginesr@gmail.com>",
       "Max Carey <MHC@cpan.org>",
       "gregor herrmann <gregoa@debian.org>",

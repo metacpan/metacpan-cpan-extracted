@@ -2210,7 +2210,7 @@ mpInstnameParen:		// Similar to instnameParen, but for modport instantiations wh
 
 mpInstname:			// Similar to instname, but for modport instantiations which have no parenthesis
 	//			// id is-a: interface_port_identifier   (interface.modport)
-		id instRangeE	 			{ PARSEP->instantCb($<fl>1, GRAMMARP->m_cellMod, $1, $2); }
+		id instRangeListE			{ PARSEP->instantCb($<fl>1, GRAMMARP->m_cellMod, $1, $2); }
 	;
 
 instnameList:
@@ -2227,13 +2227,22 @@ instname:
 	//			// 	 or instance_identifier   (module)
 	//			// 	 or instance_identifier   (program)
 	//			// 	 or udp_instance	  (udp)
-		id instRangeE '(' 			{ PARSEP->instantCb($<fl>1, GRAMMARP->m_cellMod, $1, $2); PINPARAMS(); }
-	|	instRangeE '(' 				{ PARSEP->instantCb($<fl>2, GRAMMARP->m_cellMod, "", $1); PINPARAMS(); } // UDP
+		id instRangeListE '(' 			{ PARSEP->instantCb($<fl>1, GRAMMARP->m_cellMod, $1, $2); PINPARAMS(); }
+	|	instRangeListE '(' 			{ PARSEP->instantCb($<fl>2, GRAMMARP->m_cellMod, "", $1); PINPARAMS(); } // UDP
 	;
 
-instRangeE<str>:
+instRangeListE<str>:
 		/* empty */				{ $$ = ""; }
-	|	'[' constExpr ']'			{ $<fl>$=$<fl>1; $$ = "["+$2+"]"; }
+	|	instRangeList				{ $<fl>$=$<fl>1; $$ = $1; }
+	;
+
+instRangeList<str>:
+		instRange				{ $<fl>$=$<fl>1; $$ = $1; }
+	|	instRangeList instRange			{ $<fl>$=$<fl>1; $$ = $1+$2; }
+	;
+
+instRange<str>:
+		'[' constExpr ']'			{ $<fl>$=$<fl>1; $$ = "["+$2+"]"; }
 	|	'[' constExpr ':' constExpr ']'		{ $<fl>$=$<fl>1; $$ = "["+$2+":"+$4+"]"; }
 	;
 
@@ -2357,7 +2366,8 @@ stmtList:
 
 stmt:				// IEEE: statement_or_null == function_statement_or_null
 		statement_item				{ }
-	|	id/*block_identifier*/ ':' statement_item	{ }  /*S05 block creation rule*/
+	//			// S05 block creation rule
+	|	id/*block_identifier*/ ':' statement_item	{ }
 	//			// from _or_null
 	|	';'					{ }
 	;
@@ -3849,19 +3859,19 @@ simple_immediate_assertion_statement:	// ==IEEE: simple_immediate_assertion_stat
 	|	yCOVER '(' expr ')' stmt 		{ }
 	;
 
-deferred_immediate_assertion_statement:	// ==IEEE: deferred_immediate_assertion_statement
+final_zero:			// IEEE: part of deferred_immediate_assertion_statement
+		'#' yaINTNUM				{ }  // yaINTNUM is always a '0'
+	//			// 1800-2012:
+	|	yFINAL					{ }
+	;
+
+deferred_immediate_assertion_statement<nodep>:	// ==IEEE: deferred_immediate_assertion_statement
 	//			// IEEE: deferred_immediate_assert_statement
-		yASSERT '#' yaINTNUM '(' expr ')' action_block	{ }	// yaINTNUM is always a '0'
-	//			// 1800-2012:
-	|	yASSERT yFINAL '(' expr ')' action_block	{ }
+		yASSERT final_zero '(' expr ')' action_block	{ }
 	//			// IEEE: deferred_immediate_assume_statement
-	|	yASSUME '#' yaINTNUM '(' expr ')' action_block	{ }	// yaINTNUM is always a '0'
-	//			// 1800-2012:
-	|	yASSUME yFINAL '(' expr ')' action_block	{ }
+	|	yASSUME final_zero '(' expr ')' action_block	{ }
 	//			// IEEE: deferred_immediate_cover_statement
-	|	yCOVER '#' yaINTNUM '(' expr ')' stmt		{ }	// yaINTNUM is always a '0'
-	//			// 1800-2012:
-	|	yCOVER yFINAL '(' expr ')' action_block		{ }
+	|	yCOVER  final_zero '(' expr ')' stmt		{ }
 	;
 
 expect_property_statement:	// ==IEEE: expect_property_statement

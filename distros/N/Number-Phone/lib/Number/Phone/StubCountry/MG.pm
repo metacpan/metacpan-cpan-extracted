@@ -22,23 +22,30 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222640;
+our $VERSION = 1.20190912215427;
 
 my $formatters = [
                 {
+                  'format' => '$1 $2 $3 $4',
                   'leading_digits' => '[23]',
                   'national_rule' => '0$1',
-                  'format' => '$1 $2 $3 $4',
                   'pattern' => '(\\d{2})(\\d{2})(\\d{3})(\\d{2})'
                 }
               ];
 
 my $validators = {
-                'pager' => '',
-                'mobile' => '3[2-49]\\d{7}',
-                'toll_free' => '',
-                'personal_number' => '',
-                'specialrate' => '',
+                'fixed_line' => '
+          2072[29]\\d{4}|
+          20(?:
+            2\\d|
+            4[47]|
+            5[3467]|
+            6[279]|
+            7[35]|
+            8[268]|
+            9[245]
+          )\\d{5}
+        ',
                 'geographic' => '
           2072[29]\\d{4}|
           20(?:
@@ -51,42 +58,35 @@ my $validators = {
             9[245]
           )\\d{5}
         ',
-                'voip' => '22\\d{7}',
-                'fixed_line' => '
-          2072[29]\\d{4}|
-          20(?:
-            2\\d|
-            4[47]|
-            5[3467]|
-            6[279]|
-            7[35]|
-            8[268]|
-            9[245]
-          )\\d{5}
-        '
+                'mobile' => '3[2-49]\\d{7}',
+                'pager' => '',
+                'personal_number' => '',
+                'specialrate' => '',
+                'toll_free' => '',
+                'voip' => '22\\d{7}'
               };
-my %areanames = (
-  2612022 => "Antananarivo",
-  2612044 => "Antsirabe",
-  2612047 => "Ambositra",
-  2612053 => "Toamasina",
-  2612054 => "Ambatondrazaka",
-  2612056 => "Moramanga",
-  2612057 => "Maroantsetra\/Sainte\ Marie",
-  2612062 => "Mahajanga",
-  2612067 => "Antsohihy",
-  2612069 => "Maintirano",
-  26120722 => "Manakara",
-  26120729 => "Mananjary",
-  2612073 => "Farafangana",
-  2612075 => "Fianarantsoa",
-  2612082 => "Antsiranana",
-  2612086 => "Nosy\ Be",
-  2612088 => "Sambava",
-  2612092 => "Taolañaro",
-  2612094 => "Toliary",
-  2612095 => "Morondava",
-);
+my %areanames = ();
+$areanames{en}->{2612022} = "Antananarivo";
+$areanames{en}->{2612044} = "Antsirabe";
+$areanames{en}->{2612047} = "Ambositra";
+$areanames{en}->{2612053} = "Toamasina";
+$areanames{en}->{2612054} = "Ambatondrazaka";
+$areanames{en}->{2612056} = "Moramanga";
+$areanames{en}->{2612057} = "Maroantsetra\/Sainte\ Marie";
+$areanames{en}->{2612062} = "Mahajanga";
+$areanames{en}->{2612067} = "Antsohihy";
+$areanames{en}->{2612069} = "Maintirano";
+$areanames{en}->{26120722} = "Manakara";
+$areanames{en}->{26120729} = "Mananjary";
+$areanames{en}->{2612073} = "Farafangana";
+$areanames{en}->{2612075} = "Fianarantsoa";
+$areanames{en}->{2612082} = "Antsiranana";
+$areanames{en}->{2612086} = "Nosy\ Be";
+$areanames{en}->{2612088} = "Sambava";
+$areanames{en}->{2612092} = "Taolañaro";
+$areanames{en}->{2612094} = "Toliary";
+$areanames{en}->{2612095} = "Morondava";
+
     sub new {
       my $class = shift;
       my $number = shift;

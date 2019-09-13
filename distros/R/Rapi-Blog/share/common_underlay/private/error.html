@@ -1,0 +1,48 @@
+[%- WRAPPER private/auth_wrapper.html 
+  title = error.title || 'Error'
+  foundation_columns_class = 'ten'
+  no_login_logo_header = 1
+-%]
+          
+<div class="cf" style="height:80px;">
+  <h2 class="lb_ribbon lb_blue">
+    <div style="padding-top:3px;">
+      <img 
+        src="[% mount_url %]/assets/local/misc/static/img/error-icon-48.png" 
+        style="vertical-align:middle;padding-bottom:5px;padding-right:30px;"
+      />
+      <span style="padding-right:50px;font-weight:bold;font-size:1.9em;">
+        [% IF error.title %]
+          [% error.title %]
+        [% ELSE %]
+          ([% error_status_code || '5xx' %])&nbsp;Error
+        [% END %]
+      </span>
+    </div>
+  </h2>
+  
+  <a href="[%- mount_url -%]/" class="right small sl_link">
+    <span>Home</span>
+  </a>
+
+
+</div>
+
+
+<div class="row m_cont">
+  <div class="ten columns centered">
+  
+  <h3>[% error.subtitle || 'An error occurred:' %]</h3>
+  
+  <br>
+  <pre>
+  [% error.info || error || 'unknown error - no error message available' %]
+  </pre>
+  <br>
+  
+
+
+  </div>
+</div>
+            
+[% END %]

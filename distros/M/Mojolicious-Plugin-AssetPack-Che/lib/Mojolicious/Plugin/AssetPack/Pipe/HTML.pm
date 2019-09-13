@@ -3,6 +3,8 @@ use Mojo::Base 'Mojolicious::Plugin::AssetPack::Pipe';
 use Mojolicious::Plugin::AssetPack::Util qw(diag load_module DEBUG);
 use HTML::Packer;
 
+my $packer = HTML::Packer->init();
+
 has config => sub { my $self = shift; my $config = $self->assetpack->config || $self->assetpack->config({}); $config->{HTML} ||= {} };
 has minify_opts => sub { {remove_comments => 1, remove_newlines => 0, no_compress_comment => 1, html5 => 1, %{shift->config->{minify_opts} ||= {}}, } };# do_javascript => 'clean', do_stylesheet => 'minify' ,
 
@@ -31,7 +33,7 @@ sub process {
       #~ load_module 'HTML::Packer'
         #~ || die qq(Could not load "HTML::Packer": $@);
       DEBUG && diag "Minify asset=[%s] with checksum=[%s] and minify_opts=[@{[ %{$self->minify_opts} ]}]", $asset->url, $asset->checksum, ;
-      HTML::Packer::minify(\$content, $self->minify_opts);
+      $packer->minify(\$content, $self->minify_opts);
       $asset->content($store->save(\$content, $attrs))->minified(1);
     }
   );

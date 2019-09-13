@@ -22,27 +22,27 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222640;
+our $VERSION = 1.20190912215426;
 
 my $formatters = [
                 {
-                  'intl_format' => 'NA',
-                  'pattern' => '(\\d{3})(\\d{4})',
                   'format' => '$1 $2',
+                  'intl_format' => 'NA',
                   'leading_digits' => '
             [237]|
             80
-          '
+          ',
+                  'pattern' => '(\\d{3})(\\d{4})'
                 },
                 {
-                  'leading_digits' => '8',
                   'format' => '$1 $2',
+                  'leading_digits' => '8',
                   'national_rule' => '0$1',
                   'pattern' => '(\\d{3})(\\d{5})'
                 },
                 {
-                  'leading_digits' => '[235]',
                   'format' => '$1 $2 $3',
+                  'leading_digits' => '[235]',
                   'national_rule' => '0$1',
                   'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
                 }
@@ -70,7 +70,6 @@ my $validators = {
             [1-9]7
           )\\d{6}
         ',
-                'voip' => '',
                 'geographic' => '
           3(?:
             [167]2[0-6]|
@@ -92,9 +91,6 @@ my $validators = {
             [1-9]7
           )\\d{6}
         ',
-                'specialrate' => '',
-                'personal_number' => '',
-                'toll_free' => '800\\d{5}',
                 'mobile' => '
           56[01]\\d{6}|
           (?:
@@ -102,86 +98,90 @@ my $validators = {
             5[0457]
           )\\d{7}
         ',
-                'pager' => ''
+                'pager' => '',
+                'personal_number' => '',
+                'specialrate' => '',
+                'toll_free' => '800\\d{5}',
+                'voip' => ''
               };
-my %areanames = (
-  233302 => "Accra",
-  233303 => "Tema",
-  2333035 => "Ada",
-  233307 => "Greater\ Accra\ Region",
-  233308 => "Greater\ Accra\ Region",
-  2333120 => "Takoradi",
-  2333121 => "Axim",
-  2333122 => "Elubo",
-  2333123 => "Tarkwa",
-  2333124 => "Asankragwa",
-  2333125 => "Samreboi",
-  2333126 => "Enchi",
-  233317 => "Western\ Region",
-  233318 => "Western\ Region",
-  2333220 => "Kumasi",
-  2333221 => "Konongo",
-  2333222 => "Ashanti\ Mampong",
-  2333223 => "Ejura",
-  2333224 => "Bekwai",
-  2333225 => "Obuasi",
-  233327 => "Ashanti\ Region",
-  233328 => "Ashanti\ Region",
-  2333320 => "Swedru",
-  2333321 => "Cape\ Coast",
-  2333322 => "Dunkwa",
-  2333323 => "Winneba",
-  233337 => "Central\ Region",
-  233338 => "Central\ Region",
-  2333420 => "Koforidua",
-  2333421 => "Nsawam",
-  2333423 => "Mpraeso",
-  2333424 => "Donkorkrom",
-  2333425 => "Suhum",
-  2333426 => "Asamankese",
-  2333427 => "Akuapim\ Mampong",
-  2333428 => "Aburi",
-  23334292 => "Akim\ Oda",
-  2333430 => "Akosombo",
-  2333431 => "Nkawkaw",
-  233347 => "Eastern\ Region",
-  233348 => "Eastern\ Region",
-  2333520 => "Sunyani",
-  2333521 => "Bechem",
-  2333522 => "Berekum",
-  2333523 => "Dormaa\ Ahenkro",
-  2333524 => "Wenchi",
-  2333525 => "Techiman",
-  2333526 => "Atebubu",
-  2333527 => "Yeji",
-  233357 => "Brong\-Ahafo\ Region",
-  233358 => "Brong\-Ahafo\ Region",
-  2333620 => "Ho",
-  2333621 => "Amedzofe",
-  2333623 => "Kpandu",
-  2333624 => "Kete\-Krachi",
-  2333625 => "Denu\/Aflao",
-  2333626 => "Keta\/Akatsi",
-  233367 => "Volta\ Region",
-  233368 => "Volta\ Region",
-  2333720 => "Tamale",
-  2333721 => "Walewale",
-  2333722 => "Buipe",
-  2333723 => "Damongo",
-  2333724 => "Yendi",
-  2333725 => "Bole",
-  2333726 => "Salaga",
-  233377 => "Northern\ Region",
-  233378 => "Northern\ Region",
-  2333820 => "Bolgatanga",
-  2333821 => "Navrongo",
-  2333822 => "Bawku",
-  233387 => "Upper\ East\ Region",
-  233388 => "Upper\ East\ Region",
-  233392 => "Wa",
-  233397 => "Upper\ West\ Region",
-  233398 => "Upper\ West\ Region",
-);
+my %areanames = ();
+$areanames{en}->{233302} = "Accra";
+$areanames{en}->{233303} = "Tema";
+$areanames{en}->{2333035} = "Ada";
+$areanames{en}->{233307} = "Greater\ Accra\ Region";
+$areanames{en}->{233308} = "Greater\ Accra\ Region";
+$areanames{en}->{2333120} = "Takoradi";
+$areanames{en}->{2333121} = "Axim";
+$areanames{en}->{2333122} = "Elubo";
+$areanames{en}->{2333123} = "Tarkwa";
+$areanames{en}->{2333124} = "Asankragwa";
+$areanames{en}->{2333125} = "Samreboi";
+$areanames{en}->{2333126} = "Enchi";
+$areanames{en}->{233317} = "Western\ Region";
+$areanames{en}->{233318} = "Western\ Region";
+$areanames{en}->{2333220} = "Kumasi";
+$areanames{en}->{2333221} = "Konongo";
+$areanames{en}->{2333222} = "Ashanti\ Mampong";
+$areanames{en}->{2333223} = "Ejura";
+$areanames{en}->{2333224} = "Bekwai";
+$areanames{en}->{2333225} = "Obuasi";
+$areanames{en}->{233327} = "Ashanti\ Region";
+$areanames{en}->{233328} = "Ashanti\ Region";
+$areanames{en}->{2333320} = "Swedru";
+$areanames{en}->{2333321} = "Cape\ Coast";
+$areanames{en}->{2333322} = "Dunkwa";
+$areanames{en}->{2333323} = "Winneba";
+$areanames{en}->{233337} = "Central\ Region";
+$areanames{en}->{233338} = "Central\ Region";
+$areanames{en}->{2333420} = "Koforidua";
+$areanames{en}->{2333421} = "Nsawam";
+$areanames{en}->{2333423} = "Mpraeso";
+$areanames{en}->{2333424} = "Donkorkrom";
+$areanames{en}->{2333425} = "Suhum";
+$areanames{en}->{2333426} = "Asamankese";
+$areanames{en}->{2333427} = "Akuapim\ Mampong";
+$areanames{en}->{2333428} = "Aburi";
+$areanames{en}->{23334292} = "Akim\ Oda";
+$areanames{en}->{2333430} = "Akosombo";
+$areanames{en}->{2333431} = "Nkawkaw";
+$areanames{en}->{233347} = "Eastern\ Region";
+$areanames{en}->{233348} = "Eastern\ Region";
+$areanames{en}->{2333520} = "Sunyani";
+$areanames{en}->{2333521} = "Bechem";
+$areanames{en}->{2333522} = "Berekum";
+$areanames{en}->{2333523} = "Dormaa\ Ahenkro";
+$areanames{en}->{2333524} = "Wenchi";
+$areanames{en}->{2333525} = "Techiman";
+$areanames{en}->{2333526} = "Atebubu";
+$areanames{en}->{2333527} = "Yeji";
+$areanames{en}->{233357} = "Brong\-Ahafo\ Region";
+$areanames{en}->{233358} = "Brong\-Ahafo\ Region";
+$areanames{en}->{2333620} = "Ho";
+$areanames{en}->{2333621} = "Amedzofe";
+$areanames{en}->{2333623} = "Kpandu";
+$areanames{en}->{2333624} = "Kete\-Krachi";
+$areanames{en}->{2333625} = "Denu\/Aflao";
+$areanames{en}->{2333626} = "Keta\/Akatsi";
+$areanames{en}->{233367} = "Volta\ Region";
+$areanames{en}->{233368} = "Volta\ Region";
+$areanames{en}->{2333720} = "Tamale";
+$areanames{en}->{2333721} = "Walewale";
+$areanames{en}->{2333722} = "Buipe";
+$areanames{en}->{2333723} = "Damongo";
+$areanames{en}->{2333724} = "Yendi";
+$areanames{en}->{2333725} = "Bole";
+$areanames{en}->{2333726} = "Salaga";
+$areanames{en}->{233377} = "Northern\ Region";
+$areanames{en}->{233378} = "Northern\ Region";
+$areanames{en}->{2333820} = "Bolgatanga";
+$areanames{en}->{2333821} = "Navrongo";
+$areanames{en}->{2333822} = "Bawku";
+$areanames{en}->{233387} = "Upper\ East\ Region";
+$areanames{en}->{233388} = "Upper\ East\ Region";
+$areanames{en}->{233392} = "Wa";
+$areanames{en}->{233397} = "Upper\ West\ Region";
+$areanames{en}->{233398} = "Upper\ West\ Region";
+
     sub new {
       my $class = shift;
       my $number = shift;

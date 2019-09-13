@@ -3,6 +3,7 @@ use ExtUtils::MakeMaker;
 use ExtUtils::Depends;
 use ExtUtils::PkgConfig;
 use English;
+use Config;
 
 # minimum required version of dependancies we need to build
 our %build_reqs = ( 'libsane' => '1.0.19', );

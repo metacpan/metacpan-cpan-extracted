@@ -1,6 +1,9 @@
-use strict;
+use 5.008;
 
-use Test::More tests => 25;
+use strict;
+use warnings;
+
+use Test::More;
 
 BEGIN {
     use_ok('DBD::Mock');  
@@ -86,3 +89,5 @@ like($@, qr/Attribute aliases not available for \'Fail\'/, '... got the error we
     is($dbh->{mysql_insertid}, 1, '... our alias works');
        
 }
+
+done_testing();

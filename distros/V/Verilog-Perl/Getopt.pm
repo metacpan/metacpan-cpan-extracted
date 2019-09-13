@@ -16,7 +16,7 @@ use Cwd;
 ######################################################################
 #### Configuration Section
 
-$VERSION = '3.466';
+$VERSION = '3.468';
 
 # Basenames we should ignore when recursing directories,
 # Because they contain large files of no relevance
@@ -375,7 +375,8 @@ sub file_substitute {
     my $self = shift;
     my $filename = shift;
     my $out = $filename;
-    while ($filename =~ /\$([A-Za-z_0-9]+)\b/g) {
+    while ($filename =~ /\$([A-Za-z_0-9]+)\b/g
+           || $filename =~ /\$\{[A-Za-z_0-9]+\}\b/g) {
 	my $var = $1;
 	if (defined $ENV{$var}) {
 	    $out =~ s/\$$var\b/$ENV{$var}/g;

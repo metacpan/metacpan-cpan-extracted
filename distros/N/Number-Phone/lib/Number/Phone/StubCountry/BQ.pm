@@ -22,26 +22,11 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222638;
+our $VERSION = 1.20190912215423;
 
 my $formatters = [];
 
 my $validators = {
-                'specialrate' => '',
-                'geographic' => '
-          (?:
-            318[023]|
-            41(?:
-              6[023]|
-              70
-            )|
-            7(?:
-              1[578]|
-              50
-            )\\d
-          )\\d{3}
-        ',
-                'voip' => '',
                 'fixed_line' => '
           (?:
             318[023]|
@@ -55,7 +40,19 @@ my $validators = {
             )\\d
           )\\d{3}
         ',
-                'pager' => '',
+                'geographic' => '
+          (?:
+            318[023]|
+            41(?:
+              6[023]|
+              70
+            )|
+            7(?:
+              1[578]|
+              50
+            )\\d
+          )\\d{3}
+        ',
                 'mobile' => '
           (?:
             31(?:
@@ -71,15 +68,18 @@ my $validators = {
             )\\d
           )\\d{3}
         ',
+                'pager' => '',
+                'personal_number' => '',
+                'specialrate' => '',
                 'toll_free' => '',
-                'personal_number' => ''
+                'voip' => ''
               };
-my %areanames = (
-  599318 => "St\.\ Eustatius",
-  599416 => "Saba",
-  59971 => "Bonaire",
-  59975 => "Bonaire",
-);
+my %areanames = ();
+$areanames{en}->{599318} = "St\.\ Eustatius";
+$areanames{en}->{599416} = "Saba";
+$areanames{en}->{59971} = "Bonaire";
+$areanames{en}->{59975} = "Bonaire";
+
     sub new {
       my $class = shift;
       my $number = shift;

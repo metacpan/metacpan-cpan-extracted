@@ -21,9 +21,11 @@ CREATE TABLE [user] (
   [email] varchar(255) DEFAULT NULL,
   [admin] BOOLEAN NOT NULL DEFAULT 0,
   [author] BOOLEAN NOT NULL DEFAULT 0,
-  [comment] BOOLEAN NOT NULL DEFAULT 1
+  [comment] BOOLEAN NOT NULL DEFAULT 1,
+  [disabled] BOOLEAN NOT NULL DEFAULT 0
 );
-INSERT INTO [user] VALUES(0,'(system)','System User',null,null,1,1,1);
+INSERT INTO [user] VALUES(0,'(system)','System User',null,null,1,1,1,0);
+
 
 DROP TABLE IF EXISTS [section];
 CREATE TABLE [section] (
@@ -118,7 +120,7 @@ CREATE TABLE [comment] (
 DROP TABLE IF EXISTS [hit];
 CREATE TABLE [hit] (
   [id] INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-  [post_id] INTEGER NOT NULL,
+  [post_id] INTEGER,
   [ts] datetime NOT NULL,
   [client_ip] varchar(16),
   [client_hostname] varchar(255),
@@ -154,3 +156,57 @@ CREATE TABLE         [trk_section_sections] (
   FOREIGN KEY ([subsection_id]) REFERENCES [section] ([id]) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+
+
+DROP TABLE IF EXISTS [preauth_action_type];
+CREATE TABLE [preauth_action_type] (
+  [name] varchar(16) PRIMARY KEY NOT NULL,
+  [description] varchar(1024) DEFAULT NULL
+);
+INSERT INTO [preauth_action_type] VALUES('enable_account','Enable a disabled user account');
+INSERT INTO [preauth_action_type] VALUES('password_reset','Change a user password');
+INSERT INTO [preauth_action_type] VALUES('login','Single-use login');
+
+
+DROP TABLE IF EXISTS [preauth_action];
+CREATE TABLE [preauth_action] (
+  [id] INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  [type] varchar(16) NOT NULL,
+  [active] BOOLEAN NOT NULL DEFAULT 1,
+  [sealed] BOOLEAN NOT NULL DEFAULT 0,
+  [create_ts] datetime NOT NULL,
+  [expire_ts] datetime NOT NULL,
+  [user_id] INTEGER,
+  [auth_key] varchar(128) UNIQUE NOT NULL,
+  [json_data] text,
+  
+  FOREIGN KEY ([type]) REFERENCES [preauth_action_type] ([name]) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY ([user_id]) REFERENCES [user] ([id]) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+DROP TABLE IF EXISTS [preauth_event_type];
+CREATE TABLE [preauth_event_type] (
+  [id]          INTEGER PRIMARY KEY NOT NULL,
+  [name]        varchar(16) UNIQUE NOT NULL,
+  [description] varchar(1024) DEFAULT NULL
+);
+INSERT INTO [preauth_event_type] VALUES(1,'Valid',     'Pre-Authorization Action accessed and is valid');
+INSERT INTO [preauth_event_type] VALUES(2,'Invalid',   'Pre-Authorization Action exists but is invalid');
+INSERT INTO [preauth_event_type] VALUES(3,'Deactivate','Pre-Authorization Action deactivated');
+INSERT INTO [preauth_event_type] VALUES(4,'Executed',  'Pre-Authorization Action executed');
+INSERT INTO [preauth_event_type] VALUES(5,'Sealed',    'Action sealed - can no longer be accessed with key, except by admins');
+
+
+DROP TABLE IF EXISTS [preauth_action_event];
+CREATE TABLE [preauth_action_event] (
+  [id]        INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  [ts]        datetime NOT NULL,
+  [type_id]   INTEGER NOT NULL,
+  [action_id] INTEGER NOT NULL,
+  [hit_id]    INTEGER,
+  [info]      text,
+  
+  FOREIGN KEY ([type_id])   REFERENCES [preauth_event_type] ([id]) ON DELETE RESTRICT ON UPDATE CASCADE,
+  FOREIGN KEY ([action_id]) REFERENCES [preauth_action]     ([id]) ON DELETE RESTRICT ON UPDATE CASCADE,
+  FOREIGN KEY ([hit_id])    REFERENCES [hit]                ([id]) ON DELETE RESTRICT ON UPDATE CASCADE
+);

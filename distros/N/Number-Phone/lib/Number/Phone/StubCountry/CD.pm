@@ -22,47 +22,36 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222639;
+our $VERSION = 1.20190912215424;
 
 my $formatters = [
                 {
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '88',
                   'national_rule' => '0$1',
-                  'format' => '$1 $2 $3',
                   'pattern' => '(\\d{2})(\\d{2})(\\d{3})'
                 },
                 {
                   'format' => '$1 $2',
+                  'leading_digits' => '[1-6]',
                   'national_rule' => '0$1',
-                  'pattern' => '(\\d{2})(\\d{5})',
-                  'leading_digits' => '[1-6]'
+                  'pattern' => '(\\d{2})(\\d{5})'
                 },
                 {
-                  'national_rule' => '0$1',
                   'format' => '$1 $2 $3',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})',
-                  'leading_digits' => '1'
+                  'leading_digits' => '1',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
                 },
                 {
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '[89]',
-                  'format' => '$1 $2 $3',
                   'national_rule' => '0$1',
                   'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
                 }
               ];
 
 my $validators = {
-                'mobile' => '
-          88\\d{5}|
-          (?:
-            8[0-2459]|
-            9[017-9]
-          )\\d{7}
-        ',
-                'toll_free' => '',
-                'personal_number' => '',
-                'pager' => '',
-                'voip' => '',
                 'fixed_line' => '
           12\\d{7}|
           [1-6]\\d{6}
@@ -71,16 +60,33 @@ my $validators = {
           12\\d{7}|
           [1-6]\\d{6}
         ',
-                'specialrate' => ''
+                'mobile' => '
+          88\\d{5}|
+          (?:
+            8[0-2459]|
+            9[017-9]
+          )\\d{7}
+        ',
+                'pager' => '',
+                'personal_number' => '',
+                'specialrate' => '',
+                'toll_free' => '',
+                'voip' => ''
               };
-my %areanames = (
-  2431 => "Kinshasa",
-  2432 => "Katanga",
-  2433 => "Bas\-Congo\/Bandundu",
-  2434 => "Kasai\-Oriental\/Kasai\-Occidental",
-  2435 => "Oriental\ Province\ \(Kisanga\/Mbandaka\)",
-  2436 => "North\ Kivu\/South\ Kivu\/Maniema",
-);
+my %areanames = ();
+$areanames{fr}->{2431} = "Kinshasa";
+$areanames{fr}->{2432} = "Katanga";
+$areanames{fr}->{2433} = "Bas\-Congo\/Bandundu";
+$areanames{fr}->{2434} = "Kasai\-Oriental\/Kasai\-Occidental";
+$areanames{fr}->{2435} = "Province\ Orientale\ \(Kisanga\/Mbandaka\)";
+$areanames{fr}->{2436} = "Nord\-Kivu\/Sud\-Kivu\/Maniema";
+$areanames{en}->{2431} = "Kinshasa";
+$areanames{en}->{2432} = "Katanga";
+$areanames{en}->{2433} = "Bas\-Congo\/Bandundu";
+$areanames{en}->{2434} = "Kasai\-Oriental\/Kasai\-Occidental";
+$areanames{en}->{2435} = "Oriental\ Province\ \(Kisanga\/Mbandaka\)";
+$areanames{en}->{2436} = "North\ Kivu\/South\ Kivu\/Maniema";
+
     sub new {
       my $class = shift;
       my $number = shift;

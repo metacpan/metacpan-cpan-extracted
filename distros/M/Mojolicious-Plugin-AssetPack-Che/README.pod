@@ -18,6 +18,8 @@ sub register {
   $app->routes->find('assetpack')->pattern->defaults->{cb} = $self->serve_cb();
   
   $self->store->_types->type(html => ['text/html;charset=UTF-8']);# Restore deleted Jan
+  $self->store->default_headers($config->{default_headers})
+    if $config->{default_headers};
   
   my $process = $config->{process};
   $self->process(ref eq 'ARRAY' ? @$_ : $_) #($_->[0], map Mojo::URL->new($_), @$_[1..$#$_])
@@ -26,7 +28,8 @@ sub register {
   return $self;
 }
 
-sub process {# redefine for nested topics
+# redefine for nested topics
+sub process {
   my ($self, $topic, @input) = @_;
   utf8::encode($topic);
  
@@ -96,11 +99,11 @@ Since version 1.28.
 
 =head1 VERSION
 
-Version 2.031 (test on base Mojolicious::Plugin::AssetPack v2.02+)
+Version 2.081 (test on base Mojolicious::Plugin::AssetPack v2.08)
 
 =cut
 
-our $VERSION = '2.031';
+our $VERSION = '2.081';
 
 
 =head1 SYNOPSIS
@@ -110,9 +113,10 @@ See parent module L<Mojolicious::Plugin::AssetPack> for full documentation.
 On register the plugin  C<config> can contain additional optional argument B<process>:
 
   $app->plugin('AssetPack::Che',
-    pipes => [qw(Sass Css JavaScript HTML CombineFile)],
+    pipes => [qw(Sass Css JavaScriptPacker HTML CombineFile)],
     CombineFile => { gzip => {min_size => 1000},}, # pipe options
     HTML => {minify_opts=>{remove_newlines => 1,}},# pipe based on HTML::Packer
+    JavaScriptPacker => {minify_opts=>{}},# pipe based on JavaScript::Packer
     process => [
       ['foo.js'=>qw(path/to/foo1.js path/to/foo2.js)],
       ['foo.html'=>qw(path/to/foo1.html path/to/foo2.html)],
@@ -135,7 +139,7 @@ Please report any bugs or feature requests at L<https://github.com/mche/Mojolici
 
 =head1 COPYRIGHT
 
-Copyright 2016-2018 Mikhail Che.
+Copyright 2016+ Mikhail Che.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

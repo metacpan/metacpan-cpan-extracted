@@ -22,33 +22,29 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222641;
+our $VERSION = 1.20190912215427;
 
 my $formatters = [
                 {
                   'format' => '$1 $2',
-                  'pattern' => '(\\d{3})(\\d{4,6})',
-                  'leading_digits' => '[58]'
+                  'leading_digits' => '[58]',
+                  'pattern' => '(\\d{3})(\\d{4,6})'
                 },
                 {
-                  'pattern' => '(\\d{2})(\\d{6})',
                   'format' => '$1 $2',
-                  'leading_digits' => '2'
+                  'leading_digits' => '2',
+                  'pattern' => '(\\d{2})(\\d{6})'
                 },
                 {
-                  'pattern' => '(\\d{4})(\\d{4})',
                   'format' => '$1 $2',
-                  'leading_digits' => '[79]'
+                  'leading_digits' => '[79]',
+                  'pattern' => '(\\d{4})(\\d{4})'
                 }
               ];
 
 my $validators = {
-                'geographic' => '2[2-6]\\d{6}',
-                'specialrate' => '(900\\d{5})',
                 'fixed_line' => '2[2-6]\\d{6}',
-                'voip' => '',
-                'pager' => '',
-                'personal_number' => '',
+                'geographic' => '2[2-6]\\d{6}',
                 'mobile' => '
           90[1-9]\\d{5}|
           (?:
@@ -56,17 +52,21 @@ my $validators = {
             9[1-9]
           )\\d{6}
         ',
+                'pager' => '',
+                'personal_number' => '',
+                'specialrate' => '(900\\d{5})',
                 'toll_free' => '
           500\\d{4}|
           8007\\d{4,5}
-        '
+        ',
+                'voip' => ''
               };
-my %areanames = (
-  96823 => "Dhofar\ \&\ Al\ Wusta",
-  96824 => "Muscat",
-  96825 => "A\’Dakhliyah\,\ Al\ Sharqiya\ \&\ A\’Dhahira",
-  96826 => "Al\ Batinah\ \&\ Musandam",
-);
+my %areanames = ();
+$areanames{en}->{96823} = "Dhofar\ \&\ Al\ Wusta";
+$areanames{en}->{96824} = "Muscat";
+$areanames{en}->{96825} = "A\’Dakhliyah\,\ Al\ Sharqiya\ \&\ A\’Dhahira";
+$areanames{en}->{96826} = "Al\ Batinah\ \&\ Musandam";
+
     sub new {
       my $class = shift;
       my $number = shift;

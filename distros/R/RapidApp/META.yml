@@ -65,8 +65,8 @@ requires:
   DBIx::Class::Core: 0
   DBIx::Class::Helper::ResultSet::Util: 0
   DBIx::Class::Helpers: 2.033003
+  DBIx::Class::InflateColumn::Authen::Passphrase: 0.01
   DBIx::Class::Optional::Dependencies: 0
-  DBIx::Class::PassphraseColumn: 0.02
   DBIx::Class::ResultSet: 0
   DBIx::Class::Schema: 0
   DBIx::Class::Schema::Diff: 1.07
@@ -167,7 +167,7 @@ resources:
   bugtracker: https://github.com/vanstyn/RapidApp/issues
   homepage: http://www.rapidapp.info
   repository: https://github.com/vanstyn/RapidApp.git
-version: 1.3103
+version: 1.3105
 x_contributors:
   - 'Michael Conrad <mconrad@intellitree.com>'
   - 'Torsten Raudssus <torsten@raudss.us>'

@@ -22,71 +22,108 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222641;
+our $VERSION = 1.20190912215428;
 
 my $formatters = [
                 {
+                  'format' => '$1-$2',
                   'leading_digits' => '
-            [2-6]|
-            7[014]|
+            [2-4]|
+            50|
+            6[09]|
+            7[0-24-69]|
             8[05]
           ',
-                  'pattern' => '(\\d{2})(\\d{3})',
-                  'format' => '$1-$2'
+                  'pattern' => '(\\d{2})(\\d{3})'
                 },
                 {
-                  'pattern' => '(\\d{4})(\\d{3})',
-                  'format' => '$1 $2'
-                },
-                {
-                  'leading_digits' => '
-            7[578]|
-            8
-          ',
                   'format' => '$1 $2',
+                  'pattern' => '(\\d{4})(\\d{3})'
+                },
+                {
+                  'format' => '$1 $2',
+                  'leading_digits' => '[5-8]',
                   'pattern' => '(\\d{3})(\\d{4})'
                 }
               ];
 
 my $validators = {
-                'personal_number' => '',
-                'mobile' => '
-          (?:
-            7[578]|
-            8[46-9]
-          )\\d{5}
-        ',
-                'toll_free' => '0800\\d{3}',
-                'pager' => '',
-                'voip' => '',
                 'fixed_line' => '
           (?:
             2\\d|
-            3[1-8]|
-            4[1-4]|
-            [56]0|
-            7[0149]|
+            3[0-8]|
+            4[0-4]|
+            50|
+            6[09]|
+            7[0-24-69]|
             8[05]
           )\\d{3}
         ',
-                'specialrate' => '',
                 'geographic' => '
           (?:
             2\\d|
-            3[1-8]|
-            4[1-4]|
-            [56]0|
-            7[0149]|
+            3[0-8]|
+            4[0-4]|
+            50|
+            6[09]|
+            7[0-24-69]|
             8[05]
           )\\d{3}
-        '
+        ',
+                'mobile' => '
+          (?:
+            6(?:
+              3[02]|
+              85|
+              90
+            )|
+            7(?:
+              [2-46]0|
+              [578]\\d
+            )|
+            8[46-9]\\d
+          )\\d{4}
+        ',
+                'pager' => '',
+                'personal_number' => '',
+                'specialrate' => '(55[04]\\d{4})',
+                'toll_free' => '0800\\d{3}',
+                'voip' => ''
               };
+my %areanames = ();
+$areanames{en}->{6762} = "Nuku\'alofa";
+$areanames{en}->{67629} = "Pea";
+$areanames{en}->{67630} = "Pea";
+$areanames{en}->{67631} = "Muʻa";
+$areanames{en}->{67632} = "Muʻa";
+$areanames{en}->{67633} = "Kolonga";
+$areanames{en}->{67634} = "Kolonga";
+$areanames{en}->{67635} = "Nakolo";
+$areanames{en}->{67636} = "Nakolo";
+$areanames{en}->{67637} = "Vaini";
+$areanames{en}->{67638} = "Vaini";
+$areanames{en}->{67640} = "Kolovai";
+$areanames{en}->{67641} = "Masilamea";
+$areanames{en}->{67642} = "Masilamea";
+$areanames{en}->{67643} = "Matangiake";
+$areanames{en}->{67650} = "\‘Eua";
+$areanames{en}->{67660} = "Ha\’apai";
+$areanames{en}->{67669} = "Ha\’apai";
+$areanames{en}->{67670} = "Vava\’u";
+$areanames{en}->{67671} = "Vava\’u";
+$areanames{en}->{67672} = "Vava\’u";
+$areanames{en}->{67674} = "Vava\’u";
+$areanames{en}->{67675} = "Vava\’u";
+$areanames{en}->{67676} = "Vava\’u";
+$areanames{en}->{67679} = "Vava\’u";
+$areanames{en}->{67680} = "Niuas";
+$areanames{en}->{67685} = "Niuas";
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+676|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
+      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
         return $self->is_valid() ? $self : undef;
     }
 1;

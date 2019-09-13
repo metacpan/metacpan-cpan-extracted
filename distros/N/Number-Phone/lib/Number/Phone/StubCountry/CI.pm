@@ -22,13 +22,13 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222639;
+our $VERSION = 1.20190912215424;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})',
                   'format' => '$1 $2 $3 $4',
-                  'leading_digits' => '[02-8]'
+                  'leading_digits' => '[02-8]',
+                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})'
                 }
               ];
 
@@ -50,8 +50,6 @@ my $validators = {
             )
           )\\d{5}
         ',
-                'voip' => '',
-                'specialrate' => '',
                 'geographic' => '
           (?:
             2(?:
@@ -69,7 +67,6 @@ my $validators = {
             )
           )\\d{5}
         ',
-                'personal_number' => '',
                 'mobile' => '
           (?:
             0[1-9]|
@@ -78,23 +75,38 @@ my $validators = {
             8[4-9]
           )\\d{6}
         ',
+                'pager' => '',
+                'personal_number' => '',
+                'specialrate' => '',
                 'toll_free' => '',
-                'pager' => ''
+                'voip' => ''
               };
-my %areanames = (
-  22520 => "Plateau\,\ Abidjan",
-  22521 => "Abidjan\ \(southeast\)",
-  22522 => "Cocody\,\ Abidjan",
-  22523 => "Banco\,\ Abidjan",
-  22524 => "Abobo\,\ Abidjan",
-  22530 => "Yamoussoukro",
-  22531 => "Bouaké",
-  22532 => "Daloa",
-  22533 => "Man",
-  22534 => "San\-Pédro",
-  22535 => "Abengourou",
-  22536 => "Korhogo",
-);
+my %areanames = ();
+$areanames{fr}->{22520} = "Plateau\,\ Abidjan";
+$areanames{fr}->{22521} = "Abidjan\ \(southeast\)";
+$areanames{fr}->{22522} = "Cocody\,\ Abidjan";
+$areanames{fr}->{22523} = "Banco\,\ Abidjan";
+$areanames{fr}->{22524} = "Abobo\,\ Abidjan";
+$areanames{fr}->{22530} = "Yamoussoukro";
+$areanames{fr}->{22531} = "Bouaké";
+$areanames{fr}->{22532} = "Daloa";
+$areanames{fr}->{22533} = "Man";
+$areanames{fr}->{22534} = "San\-Pédro";
+$areanames{fr}->{22535} = "Abengourou";
+$areanames{fr}->{22536} = "Korhogo";
+$areanames{en}->{22520} = "Plateau\,\ Abidjan";
+$areanames{en}->{22521} = "Abidjan\ \(southeast\)";
+$areanames{en}->{22522} = "Cocody\,\ Abidjan";
+$areanames{en}->{22523} = "Banco\,\ Abidjan";
+$areanames{en}->{22524} = "Abobo\,\ Abidjan";
+$areanames{en}->{22530} = "Yamoussoukro";
+$areanames{en}->{22531} = "Bouaké";
+$areanames{en}->{22532} = "Daloa";
+$areanames{en}->{22533} = "Man";
+$areanames{en}->{22534} = "San\-Pédro";
+$areanames{en}->{22535} = "Abengourou";
+$areanames{en}->{22536} = "Korhogo";
+
     sub new {
       my $class = shift;
       my $number = shift;

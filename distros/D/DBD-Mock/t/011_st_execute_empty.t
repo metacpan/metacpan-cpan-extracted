@@ -1,6 +1,9 @@
-use strict;
+use 5.008;
 
-use Test::More tests => 15;
+use strict;
+use warnings;
+
+use Test::More;
 
 BEGIN {
     use_ok('DBD::Mock');  
@@ -39,3 +42,5 @@ my $sql = 'SELECT * FROM foo WHERE bar = ? AND baz = ?';
     is( $sth->{mock_is_finished}, 'yes',
         'Finished flag set after finish()' );
 }
+
+done_testing();

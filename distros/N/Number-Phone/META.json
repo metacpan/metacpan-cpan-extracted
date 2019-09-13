@@ -45,6 +45,8 @@
             "File::Basename" : "0",
             "File::ShareDir" : "1.104",
             "File::Spec" : "0",
+            "I18N::LangTags" : "0",
+            "I18N::LangTags::Detect" : "0",
             "Scalar::Util" : "1.48",
             "Test::More" : "0.96",
             "Test::utf8" : "0"
@@ -60,6 +62,6 @@
          "url" : "https://github.com/DrHyde/perl-modules-Number-Phone"
       }
    },
-   "version" : "3.5001",
+   "version" : "3.6000",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -1,6 +1,9 @@
-use strict;
+use 5.008;
 
-use Test::More tests => 3;
+use strict;
+use warnings;
+
+use Test::More;
 
 BEGIN {
     use_ok('DBI');
@@ -11,3 +14,5 @@ isa_ok($dbh, 'DBI::db');
 
 $dbh->{mock_get_info} = { foo => 4 };
 is( $dbh->get_info( 'foo' ), '4', "Retrieved info successfully" );
+
+done_testing();

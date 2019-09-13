@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/xsum/xsum
 # and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-08-21'; # DATE
+our $DATE = '2019-09-12'; # DATE
 our $DIST = 'App-xsum'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ xsum - Compute and check file checksums/digests (using various algorithms)
 
 =head1 VERSION
 
-This document describes version 0.002 of xsum (from Perl distribution App-xsum), released on 2019-08-21.
+This document describes version 0.007 of xsum (from Perl distribution App-xsum), released on 2019-09-12.
 
 =head1 SYNOPSIS
 
@@ -51,17 +51,41 @@ Compute MD5 digests for some files:
 
  % xsum -a md5 *.dat
 
+Compute MD5 digests for some files (same as previous example, -a defaults to "md5"):
+
+ % xsum *.dat
+
+Compute MD5 digests for some files (also same as previous example):
+
+ % xsum -a Digest -A MD5 *.dat
+
+Compute MD5 digests for some files (also same as previous example, -a defaults to "Digest" when -A is specified):
+
+ % xsum -A MD5 *.dat
+
+Compute BLAKE2b digests for some files (requirest Digest::BLAKE2 Perl module):
+
+ % xsum -A BLAKE2,blake2b *.dat
+
 Compute SHA1 digest for data in stdin:
 
  % somecmd | xsum -a sha1 -
 
 Check MD5 digests of files listed in MD5SUMS:
 
- % xsum --check -a md5 MD5SUMS
+ % xsum --check MD5SUMS
+
+Check MD5 digest of one file:
+
+ % xsum download.exe -C 9f4b2277f50a412e56de6e0306f4afb8
+
+Check MD5 digest of two files:
+
+ % xsum download1.exe -C 9f4b2277f50a412e56de6e0306f4afb8 download2.zip -C 62b3bf86abdfdd87e9f6a3ea7b51aa7b
 
 =head1 DESCRIPTION
 
-C<xsum> is a small handy utility that can be used as an alternative/replacement
+C<xsum> is a handy small utility that can be used as an alternative/replacement
 for the individual per-algorithm Unix utilities like C<md5sum>, C<sha1sum>,
 C<sha224sum>, and so on. It's basically the same as said Unix utilities but you
 can use a single command instead.
@@ -81,17 +105,32 @@ C<*> marks required options.
 
 =item B<--algorithm>=I<s>, B<-a>
 
-Default value:
-
- "md5"
-
 Valid values:
 
- ["crc32","md5","sha1","sha224","sha256","sha384","sha512","sha512224","sha512256"]
+ ["crc32","md5","sha1","sha224","sha256","sha384","sha512","sha512224","sha512256","Digest"]
+
+In addition to `md5`, `sha1` or the other algorithms, you can also specify
+`Digest` to use Perl's <pm:Digest> module. This gives you access to tens of
+other digest modules, for example <pm:Digest::BLAKE2> (see examples).
+
+When `--digest-args` (`-A`) is not specified, algorithm defaults to `md5`. But
+if `--digest-args` (`-A`) is specified, algorithm defaults to `Digest`, for
+convenience.
+
 
 =item B<--check>, B<-c>
 
 Read checksum from files and check them.
+
+=item B<--checksums-json>=I<s>, B<-C>
+
+Supply checksum(s) (JSON-encoded).
+
+=item B<--digest-args>=I<s>, B<-A>
+
+If you use `Digest` as the algorithm, you can pass arguments for the <pm:Digest>
+module here.
+
 
 =item B<--file>=I<s@>*
 
@@ -179,7 +218,13 @@ L<md5sum>. Unix utility.
 
 L<sha1sum>. Unix utility.
 
+L<sha224sum>. Unix utility.
+
 L<sha256sum>. Unix utility.
+
+L<sha384sum>. Unix utility.
+
+L<sha512sum>. Unix utility.
 
 =head1 AUTHOR
 

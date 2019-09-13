@@ -1,6 +1,9 @@
-use strict;
+use 5.008;
 
-use Test::More tests => 24;
+use strict;
+use warnings;
+
+use Test::More;
 
 BEGIN {
     use_ok('DBD::Mock');
@@ -93,3 +96,5 @@ is_deeply(
     $drh->{nothing} = 100;
     ok(!defined($drh->{nothing}), '... we only support our attributes');
 }
+
+done_testing();

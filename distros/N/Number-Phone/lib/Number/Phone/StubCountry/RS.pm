@@ -22,10 +22,11 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222641;
+our $VERSION = 1.20190912215427;
 
 my $formatters = [
                 {
+                  'format' => '$1 $2',
                   'leading_digits' => '
             (?:
               2[389]|
@@ -34,28 +35,17 @@ my $formatters = [
             [7-9]
           ',
                   'national_rule' => '0$1',
-                  'format' => '$1 $2',
                   'pattern' => '(\\d{3})(\\d{3,9})'
                 },
                 {
-                  'leading_digits' => '[1-36]',
                   'format' => '$1 $2',
+                  'leading_digits' => '[1-36]',
                   'national_rule' => '0$1',
                   'pattern' => '(\\d{2})(\\d{5,10})'
                 }
               ];
 
 my $validators = {
-                'toll_free' => '800\\d{3,9}',
-                'mobile' => '
-          6(?:
-            [0-689]|
-            7\\d
-          )\\d{6,7}
-        ',
-                'personal_number' => '',
-                'pager' => '',
-                'voip' => '',
                 'fixed_line' => '
           (?:
             11[1-9]\\d|
@@ -73,12 +63,6 @@ my $validators = {
             3[0-8]
           )[2-9]\\d{4,9}
         ',
-                'specialrate' => '(
-          (?:
-            78\\d|
-            90[0169]
-          )\\d{3,7}
-        )|(7[06]\\d{4,10})',
                 'geographic' => '
           (?:
             11[1-9]\\d|
@@ -95,44 +79,94 @@ my $validators = {
             2[0-24-7]|
             3[0-8]
           )[2-9]\\d{4,9}
-        '
+        ',
+                'mobile' => '
+          6(?:
+            [0-689]|
+            7\\d
+          )\\d{6,7}
+        ',
+                'pager' => '',
+                'personal_number' => '',
+                'specialrate' => '(
+          (?:
+            78\\d|
+            90[0169]
+          )\\d{3,7}
+        )|(7[06]\\d{4,10})',
+                'toll_free' => '800\\d{3,9}',
+                'voip' => ''
               };
-my %areanames = (
-  38110 => "Pirot",
-  38111 => "Belgrade",
-  38112 => "Pozarevac",
-  38113 => "Pancevo",
-  38114 => "Valjevo",
-  38115 => "Sabac",
-  38116 => "Leskovac",
-  38117 => "Vranje",
-  38118 => "Nis",
-  38119 => "Zajecar",
-  38120 => "Novi\ Pazar",
-  38121 => "Novi\ Sad",
-  38122 => "Sremska\ Mitrovica",
-  38123 => "Zrenjanin",
-  381230 => "Kikinda",
-  38124 => "Subotica",
-  38125 => "Sombor",
-  38126 => "Smederevo",
-  38127 => "Prokuplje",
-  38128 => "Kosovska\ Mitrovica",
-  381280 => "Gnjilane",
-  38129 => "Prizren",
-  381290 => "Urosevac",
-  38130 => "Bor",
-  38131 => "Uzice",
-  38132 => "Cacak",
-  38133 => "Prijepolje",
-  38134 => "Kragujevac",
-  38135 => "Jagodina",
-  38136 => "Kraljevo",
-  38137 => "Krusevac",
-  38138 => "Pristina",
-  38139 => "Pec",
-  381390 => "Dakovica",
-);
+my %areanames = ();
+$areanames{sr}->{38110} = "Пирот";
+$areanames{sr}->{38111} = "Београд";
+$areanames{sr}->{38112} = "Пожаревац";
+$areanames{sr}->{38113} = "Панчево";
+$areanames{sr}->{38114} = "Ваљево";
+$areanames{sr}->{38115} = "Шабац";
+$areanames{sr}->{38116} = "Лесковац";
+$areanames{sr}->{38117} = "Врање";
+$areanames{sr}->{38118} = "Ниш";
+$areanames{sr}->{38119} = "Зајечар";
+$areanames{sr}->{38120} = "Нови\ Пазар";
+$areanames{sr}->{38121} = "Нови\ Сад";
+$areanames{sr}->{38122} = "Сремска\ Митровица";
+$areanames{sr}->{38123} = "Зрењанин";
+$areanames{sr}->{381230} = "Кикинда";
+$areanames{sr}->{38124} = "Суботица";
+$areanames{sr}->{38125} = "Сомбор";
+$areanames{sr}->{38126} = "Смедерево";
+$areanames{sr}->{38127} = "Прокупље";
+$areanames{sr}->{38128} = "Косовска\ Митровица";
+$areanames{sr}->{381280} = "Гњилане";
+$areanames{sr}->{38129} = "Призрен";
+$areanames{sr}->{381290} = "Урошевац";
+$areanames{sr}->{38130} = "Бор";
+$areanames{sr}->{38131} = "Ужице";
+$areanames{sr}->{38132} = "Чачак";
+$areanames{sr}->{38133} = "Пријепоље";
+$areanames{sr}->{38134} = "Крагујевац";
+$areanames{sr}->{38135} = "Јагодина";
+$areanames{sr}->{38136} = "Краљево";
+$areanames{sr}->{38137} = "Крушевац";
+$areanames{sr}->{38138} = "Приштина";
+$areanames{sr}->{38139} = "Пећ";
+$areanames{sr}->{381390} = "Ђаковица";
+$areanames{en}->{38110} = "Pirot";
+$areanames{en}->{38111} = "Belgrade";
+$areanames{en}->{38112} = "Pozarevac";
+$areanames{en}->{38113} = "Pancevo";
+$areanames{en}->{38114} = "Valjevo";
+$areanames{en}->{38115} = "Sabac";
+$areanames{en}->{38116} = "Leskovac";
+$areanames{en}->{38117} = "Vranje";
+$areanames{en}->{38118} = "Nis";
+$areanames{en}->{38119} = "Zajecar";
+$areanames{en}->{38120} = "Novi\ Pazar";
+$areanames{en}->{38121} = "Novi\ Sad";
+$areanames{en}->{38122} = "Sremska\ Mitrovica";
+$areanames{en}->{38123} = "Zrenjanin";
+$areanames{en}->{381230} = "Kikinda";
+$areanames{en}->{38124} = "Subotica";
+$areanames{en}->{38125} = "Sombor";
+$areanames{en}->{38126} = "Smederevo";
+$areanames{en}->{38127} = "Prokuplje";
+$areanames{en}->{38128} = "Kosovska\ Mitrovica";
+$areanames{en}->{381280} = "Gnjilane";
+$areanames{en}->{38129} = "Prizren";
+$areanames{en}->{381290} = "Urosevac";
+$areanames{en}->{38130} = "Bor";
+$areanames{en}->{38131} = "Uzice";
+$areanames{en}->{38132} = "Cacak";
+$areanames{en}->{38133} = "Prijepolje";
+$areanames{en}->{38134} = "Kragujevac";
+$areanames{en}->{38135} = "Jagodina";
+$areanames{en}->{38136} = "Kraljevo";
+$areanames{en}->{38137} = "Krusevac";
+$areanames{en}->{38138} = "Pristina";
+$areanames{en}->{38139} = "Pec";
+$areanames{en}->{381390} = "Dakovica";
+
     sub new {
       my $class = shift;
       my $number = shift;

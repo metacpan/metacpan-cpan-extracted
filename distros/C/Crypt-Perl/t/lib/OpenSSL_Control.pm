@@ -113,7 +113,7 @@ sub has_ecdsa_verify_private_bug {
 
         my $key_pem = File::Slurp::read_file("$t_dir/assets/prime256v1.key");
         my $msg = "hello";
-        my $sig = pack 'H*', '3045022100965e84d06031b2bb0c52fdc0d1ca148e4bdf0f91ae24ecf23dd76b294c68bda102207e35cc7334964151fcddd5b3dec51fad123c3fbab5ba40021003472222297f3e';
+        my $sig = pack 'H*', '30460221009aae8b7ae764d93fb97ddbab4f5ea0169175e4690e3cfd6297ccbfa3555b3c420221008519ce1ca5f944b7e42d3dd1c3ef2323dbb2404dc8ab36340077642439f3ac1c';
 
         $_has_ecdsa_verify_private_bug = !verify_private($key_pem, $msg, 'sha1', $sig);
     }

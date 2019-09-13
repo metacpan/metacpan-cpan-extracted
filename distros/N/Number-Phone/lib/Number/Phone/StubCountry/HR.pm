@@ -22,55 +22,72 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222640;
+our $VERSION = 1.20190912215426;
 
 my $formatters = [
                 {
-                  'leading_digits' => '6[01]',
-                  'pattern' => '(\\d{2})(\\d{2})(\\d{2,3})',
                   'format' => '$1 $2 $3',
-                  'national_rule' => '0$1'
+                  'leading_digits' => '6[01]',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{2})(\\d{2})(\\d{2,3})'
                 },
                 {
-                  'leading_digits' => '8',
                   'format' => '$1 $2 $3',
+                  'leading_digits' => '8',
                   'national_rule' => '0$1',
                   'pattern' => '(\\d{3})(\\d{2})(\\d{2,3})'
                 },
                 {
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '1',
-                  'pattern' => '(\\d)(\\d{4})(\\d{3})',
                   'national_rule' => '0$1',
-                  'format' => '$1 $2 $3'
+                  'pattern' => '(\\d)(\\d{4})(\\d{3})'
                 },
                 {
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '[67]',
                   'national_rule' => '0$1',
-                  'format' => '$1 $2 $3',
                   'pattern' => '(\\d{2})(\\d{3})(\\d{3,4})'
                 },
                 {
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '9',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{3,4})',
-                  'format' => '$1 $2 $3',
-                  'national_rule' => '0$1'
-                },
-                {
                   'national_rule' => '0$1',
-                  'format' => '$1 $2 $3',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{3,4})',
-                  'leading_digits' => '[2-5]'
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{3,4})'
                 },
                 {
-                  'leading_digits' => '8',
                   'format' => '$1 $2 $3',
+                  'leading_digits' => '[2-5]',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{3,4})'
+                },
+                {
+                  'format' => '$1 $2 $3',
+                  'leading_digits' => '8',
                   'national_rule' => '0$1',
                   'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
                 }
               ];
 
 my $validators = {
-                'toll_free' => '80[01]\\d{4,6}',
+                'fixed_line' => '
+          1\\d{7}|
+          (?:
+            2[0-3]|
+            3[1-5]|
+            4[02-47-9]|
+            5[1-3]
+          )\\d{6,7}
+        ',
+                'geographic' => '
+          1\\d{7}|
+          (?:
+            2[0-3]|
+            3[1-5]|
+            4[02-47-9]|
+            5[1-3]
+          )\\d{6,7}
+        ',
                 'mobile' => '
           9(?:
             751\\d{5}|
@@ -82,18 +99,8 @@ my $validators = {
             7[0679]
           )\\d{6}
         ',
-                'personal_number' => '7[45]\\d{6}',
                 'pager' => '',
-                'fixed_line' => '
-          1\\d{7}|
-          (?:
-            2[0-3]|
-            3[1-5]|
-            4[02-47-9]|
-            5[1-3]
-          )\\d{6,7}
-        ',
-                'voip' => '',
+                'personal_number' => '7[45]\\d{6}',
                 'specialrate' => '(
           6[01459]\\d{6}|
           6[01]\\d{4,5}
@@ -101,38 +108,31 @@ my $validators = {
           62\\d{6,7}|
           72\\d{6}
         )',
-                'geographic' => '
-          1\\d{7}|
-          (?:
-            2[0-3]|
-            3[1-5]|
-            4[02-47-9]|
-            5[1-3]
-          )\\d{6,7}
-        '
+                'toll_free' => '80[01]\\d{4,6}',
+                'voip' => ''
               };
-my %areanames = (
-  3851 => "Zagreb",
-  38520 => "Dubrovnik\-Neretva",
-  38521 => "Split\-Dalmatia",
-  38522 => "Šibenik\-Knin",
-  38523 => "Zadar",
-  38531 => "Osijek\-Baranja",
-  38532 => "Vukovar\-Srijem",
-  38533 => "Virovitica\-Podravina",
-  38534 => "Požega\-Slavonia",
-  38535 => "Brod\-Posavina",
-  38540 => "Međimurje",
-  38542 => "Varaždin",
-  38543 => "Bjelovar\-Bilogora",
-  38544 => "Sisak\-Moslavina",
-  38547 => "Karlovac",
-  38548 => "Koprivnica\-Križevci",
-  38549 => "Krapina\-Zagorje",
-  38551 => "Primorsko\-goranska",
-  38552 => "Istra",
-  38553 => "Lika\-Senj",
-);
+my %areanames = ();
+$areanames{en}->{3851} = "Zagreb";
+$areanames{en}->{38520} = "Dubrovnik\-Neretva";
+$areanames{en}->{38521} = "Split\-Dalmatia";
+$areanames{en}->{38522} = "Šibenik\-Knin";
+$areanames{en}->{38523} = "Zadar";
+$areanames{en}->{38531} = "Osijek\-Baranja";
+$areanames{en}->{38532} = "Vukovar\-Srijem";
+$areanames{en}->{38533} = "Virovitica\-Podravina";
+$areanames{en}->{38534} = "Požega\-Slavonia";
+$areanames{en}->{38535} = "Brod\-Posavina";
+$areanames{en}->{38540} = "Međimurje";
+$areanames{en}->{38542} = "Varaždin";
+$areanames{en}->{38543} = "Bjelovar\-Bilogora";
+$areanames{en}->{38544} = "Sisak\-Moslavina";
+$areanames{en}->{38547} = "Karlovac";
+$areanames{en}->{38548} = "Koprivnica\-Križevci";
+$areanames{en}->{38549} = "Krapina\-Zagorje";
+$areanames{en}->{38551} = "Primorsko\-goranska";
+$areanames{en}->{38552} = "Istra";
+$areanames{en}->{38553} = "Lika\-Senj";
+
     sub new {
       my $class = shift;
       my $number = shift;

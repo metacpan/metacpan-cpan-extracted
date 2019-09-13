@@ -1,7 +1,9 @@
-#!/usr/bin/perl
-use Test::More tests => 3; 
+use 5.008;
+
 use strict;
 use warnings;
+
+use Test::More;
 use Test::Exception;
 use DBI;
 use DBD::Mock;
@@ -43,3 +45,5 @@ throws_ok {
     ok $sth->execute(@$params),
 } qr/\QSession states exhausted, only '1' in DBD::Mock::Session\E/,
     "fails on executing one too many times";
+
+done_testing();

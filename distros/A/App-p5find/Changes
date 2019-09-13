@@ -1,3 +1,8 @@
+0.03    2019-09-13T09:57:01+0900
+    More documentation, define a consistent default behaviour of
+    recalling everything (that is being looked for), and
+    output in the format of: "${file}:${line_number}:${line}"
+
 0.02    2019-07-24T07:49:06+0900
     Let all programs accept "-h" switch for showing usage.
 

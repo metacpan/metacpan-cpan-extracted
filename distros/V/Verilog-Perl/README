@@ -176,7 +176,7 @@ WHICH PARSER PACKAGE?
         Ast tree would allow any arbitrary transformation of Verilog syntax
         (everything is known excluding whitespace). Long term the authors
         would be interested in collaborating on a general parser, but for
-        now, applications can leverate the C++ code or use Verilator's XML
+        now, applications can leverage the C++ code or use Verilator's XML
         output (below).
 
     Verilog::SigParser

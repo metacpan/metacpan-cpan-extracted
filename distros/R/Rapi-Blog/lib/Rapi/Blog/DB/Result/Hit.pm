@@ -17,7 +17,7 @@ __PACKAGE__->add_columns(
   "id",
   { data_type => "integer", is_auto_increment => 1, is_nullable => 0 },
   "post_id",
-  { data_type => "integer", is_foreign_key => 1, is_nullable => 0 },
+  { data_type => "integer", is_foreign_key => 1, is_nullable => 1 },
   "ts",
   { data_type => "datetime", is_nullable => 0 },
   "client_ip",
@@ -40,12 +40,23 @@ __PACKAGE__->belongs_to(
   "post",
   "Rapi::Blog::DB::Result::Post",
   { id => "post_id" },
-  { is_deferrable => 0, on_delete => "CASCADE", on_update => "CASCADE" },
+  {
+    is_deferrable => 0,
+    join_type     => "LEFT",
+    on_delete     => "CASCADE",
+    on_update     => "CASCADE",
+  },
+);
+__PACKAGE__->has_many(
+  "preauth_action_events",
+  "Rapi::Blog::DB::Result::PreauthActionEvent",
+  { "foreign.hit_id" => "self.id" },
+  { cascade_copy => 0, cascade_delete => 0 },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07045 @ 2017-05-28 12:05:29
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:QE/NEebm+u3rIfwKLaxOog
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2018-10-28 02:04:56
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:c1TGt5mrSyCobHmzHF8/Yg
 
 __PACKAGE__->load_components('+Rapi::Blog::DB::Component::SafeResult');
 

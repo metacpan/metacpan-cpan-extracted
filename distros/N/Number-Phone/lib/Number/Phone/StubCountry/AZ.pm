@@ -22,24 +22,22 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222638;
+our $VERSION = 1.20190912215423;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d{3})(\\d{2})(\\d{2})',
                   'format' => '$1 $2 $3',
                   'intl_format' => 'NA',
-                  'leading_digits' => '[1-9]'
+                  'leading_digits' => '[1-9]',
+                  'pattern' => '(\\d{3})(\\d{2})(\\d{2})'
                 },
                 {
-                  'pattern' => '(\\d{3})(\\d{2})(\\d{2})(\\d{2})',
-                  'national_rule' => '0$1',
                   'format' => '$1 $2 $3 $4',
-                  'leading_digits' => '9'
+                  'leading_digits' => '9',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{3})(\\d{2})(\\d{2})(\\d{2})'
                 },
                 {
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{2})(\\d{2})',
-                  'national_rule' => '(0$1)',
                   'format' => '$1 $2 $3 $4',
                   'leading_digits' => '
             [12]|
@@ -47,18 +45,19 @@ my $formatters = [
               [0-46-9]|
               5[0-35-9]
             )
-          '
+          ',
+                  'national_rule' => '(0$1)',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{2})(\\d{2})'
                 },
                 {
-                  'leading_digits' => '[3-8]',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{2})(\\d{2})',
                   'format' => '$1 $2 $3 $4',
-                  'national_rule' => '0$1'
+                  'leading_digits' => '[3-8]',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{2})(\\d{2})'
                 }
               ];
 
 my $validators = {
-                'voip' => '',
                 'fixed_line' => '
           365(?:
             [0-46-9]\\d|
@@ -75,7 +74,6 @@ my $validators = {
             )
           )\\d{6}
         ',
-                'specialrate' => '(900200\\d{3})',
                 'geographic' => '
           365(?:
             [0-46-9]\\d|
@@ -92,8 +90,6 @@ my $validators = {
             )
           )\\d{6}
         ',
-                'personal_number' => '',
-                'toll_free' => '88\\d{7}',
                 'mobile' => '
           36554\\d{4}|
           (?:
@@ -103,91 +99,95 @@ my $validators = {
             7[07]
           )\\d{7}
         ',
-                'pager' => ''
+                'pager' => '',
+                'personal_number' => '',
+                'specialrate' => '(900200\\d{3})',
+                'toll_free' => '88\\d{7}',
+                'voip' => ''
               };
-my %areanames = (
-  99412 => "Baku",
-  99418 => "Sumgayit",
-  9942020 => "Barda",
-  9942021 => "Ujar",
-  9942022 => "Agsu",
-  9942023 => "Agdash",
-  9942024 => "Gobustan",
-  9942025 => "Kurdamir",
-  9942026 => "Shamakhi",
-  9942027 => "Goychay",
-  9942028 => "Ismayilli",
-  9942029 => "Zardab",
-  9942120 => "Hajigabul",
-  9942121 => "Shirvan",
-  9942122 => "Beylagan",
-  9942123 => "Sabirabad",
-  9942124 => "Imishli",
-  9942125 => "Salyan",
-  9942126 => "Neftchala",
-  9942127 => "Agjabadi",
-  9942128 => "Saatli",
-  99421428 => "Hajigabul",
-  9942220 => "Goygol",
-  9942221 => "Dashkasan",
-  9942222 => "Agstafa",
-  9942223 => "Tartar",
-  9942224 => "Goranboy",
-  9942225 => "Ganja",
-  9942226 => "Ganja",
-  9942227 => "Samukh",
-  9942229 => "Gazakh",
-  9942230 => "Shamkir",
-  9942231 => "Tovuz",
-  9942232 => "Gadabay",
-  9942233 => "Yevlakh",
-  9942235 => "Naftalan",
-  99422428 => "Agstafa\/Ganja\/Yevlakh",
-  9942330 => "Siyazan",
-  9942331 => "Khizi",
-  9942332 => "Khachmaz",
-  9942333 => "Guba",
-  9942335 => "Shabran",
-  9942338 => "Gusar",
-  9942420 => "Gabala",
-  9942421 => "Oguz",
-  9942422 => "Zagatala",
-  9942424 => "Shaki",
-  9942425 => "Gakh",
-  9942427 => "Mingachevir",
-  9942429 => "Balakan",
-  9942520 => "Yardimli",
-  9942521 => "Masalli",
-  9942522 => "Astara",
-  9942524 => "Jalilabad",
-  9942525 => "Lankaran",
-  9942527 => "Lerik",
-  9942529 => "Bilasuvar",
-  9942620 => "Khojali",
-  9942621 => "Lachin",
-  9942622 => "Khankandi",
-  9942623 => "Qubadli",
-  9942624 => "Askaran",
-  9942625 => "Zangilan",
-  9942626 => "Shusha",
-  9942627 => "Kalbajar",
-  9942628 => "Agdara",
-  9942629 => "Khojavand",
-  9942630 => "Hadrut",
-  9942631 => "Fuzuli",
-  9942632 => "Agdam",
-  9942638 => "Jabrayil",
-  99436541 => "Babek",
-  99436542 => "Sharur",
-  99436543 => "Shahbuz",
-  99436544 => "Nakhchivan\ city",
-  99436546 => "Julfa",
-  99436547 => "Ordubad",
-  99436548 => "Kangarli",
-  99436549 => "Sadarak",
-  99436550 => "Nakhchivan\ city",
-  99436552 => "Sharur",
-);
+my %areanames = ();
+$areanames{en}->{99412} = "Baku";
+$areanames{en}->{99418} = "Sumgayit";
+$areanames{en}->{9942020} = "Barda";
+$areanames{en}->{9942021} = "Ujar";
+$areanames{en}->{9942022} = "Agsu";
+$areanames{en}->{9942023} = "Agdash";
+$areanames{en}->{9942024} = "Gobustan";
+$areanames{en}->{9942025} = "Kurdamir";
+$areanames{en}->{9942026} = "Shamakhi";
+$areanames{en}->{9942027} = "Goychay";
+$areanames{en}->{9942028} = "Ismayilli";
+$areanames{en}->{9942029} = "Zardab";
+$areanames{en}->{9942120} = "Hajigabul";
+$areanames{en}->{9942121} = "Shirvan";
+$areanames{en}->{9942122} = "Beylagan";
+$areanames{en}->{9942123} = "Sabirabad";
+$areanames{en}->{9942124} = "Imishli";
+$areanames{en}->{9942125} = "Salyan";
+$areanames{en}->{9942126} = "Neftchala";
+$areanames{en}->{9942127} = "Agjabadi";
+$areanames{en}->{9942128} = "Saatli";
+$areanames{en}->{99421428} = "Hajigabul";
+$areanames{en}->{9942220} = "Goygol";
+$areanames{en}->{9942221} = "Dashkasan";
+$areanames{en}->{9942222} = "Agstafa";
+$areanames{en}->{9942223} = "Tartar";
+$areanames{en}->{9942224} = "Goranboy";
+$areanames{en}->{9942225} = "Ganja";
+$areanames{en}->{9942226} = "Ganja";
+$areanames{en}->{9942227} = "Samukh";
+$areanames{en}->{9942229} = "Gazakh";
+$areanames{en}->{9942230} = "Shamkir";
+$areanames{en}->{9942231} = "Tovuz";
+$areanames{en}->{9942232} = "Gadabay";
+$areanames{en}->{9942233} = "Yevlakh";
+$areanames{en}->{9942235} = "Naftalan";
+$areanames{en}->{99422428} = "Agstafa\/Ganja\/Yevlakh";
+$areanames{en}->{9942330} = "Siyazan";
+$areanames{en}->{9942331} = "Khizi";
+$areanames{en}->{9942332} = "Khachmaz";
+$areanames{en}->{9942333} = "Guba";
+$areanames{en}->{9942335} = "Shabran";
+$areanames{en}->{9942338} = "Gusar";
+$areanames{en}->{9942420} = "Gabala";
+$areanames{en}->{9942421} = "Oguz";
+$areanames{en}->{9942422} = "Zagatala";
+$areanames{en}->{9942424} = "Shaki";
+$areanames{en}->{9942425} = "Gakh";
+$areanames{en}->{9942427} = "Mingachevir";
+$areanames{en}->{9942429} = "Balakan";
+$areanames{en}->{9942520} = "Yardimli";
+$areanames{en}->{9942521} = "Masalli";
+$areanames{en}->{9942522} = "Astara";
+$areanames{en}->{9942524} = "Jalilabad";
+$areanames{en}->{9942525} = "Lankaran";
+$areanames{en}->{9942527} = "Lerik";
+$areanames{en}->{9942529} = "Bilasuvar";
+$areanames{en}->{9942620} = "Khojali";
+$areanames{en}->{9942621} = "Lachin";
+$areanames{en}->{9942622} = "Khankandi";
+$areanames{en}->{9942623} = "Qubadli";
+$areanames{en}->{9942624} = "Askaran";
+$areanames{en}->{9942625} = "Zangilan";
+$areanames{en}->{9942626} = "Shusha";
+$areanames{en}->{9942627} = "Kalbajar";
+$areanames{en}->{9942628} = "Agdara";
+$areanames{en}->{9942629} = "Khojavand";
+$areanames{en}->{9942630} = "Hadrut";
+$areanames{en}->{9942631} = "Fuzuli";
+$areanames{en}->{9942632} = "Agdam";
+$areanames{en}->{9942638} = "Jabrayil";
+$areanames{en}->{99436541} = "Babek";
+$areanames{en}->{99436542} = "Sharur";
+$areanames{en}->{99436543} = "Shahbuz";
+$areanames{en}->{99436544} = "Nakhchivan\ city";
+$areanames{en}->{99436546} = "Julfa";
+$areanames{en}->{99436547} = "Ordubad";
+$areanames{en}->{99436548} = "Kangarli";
+$areanames{en}->{99436549} = "Sadarak";
+$areanames{en}->{99436550} = "Nakhchivan\ city";
+$areanames{en}->{99436552} = "Sharur";
+
     sub new {
       my $class = shift;
       my $number = shift;

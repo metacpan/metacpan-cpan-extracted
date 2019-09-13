@@ -4,13 +4,13 @@
       "ÐÐ¸ÑÐ°Ð¸Ð» Ð§Ðµ (Mikhail Che) <mche<-on->cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Mojolicious-Plugin-AssetPack-Che",
    "no_index" : {
@@ -36,6 +36,7 @@
             "CSS::Sass" : "3.0",
             "HTML::Packer" : "2.03",
             "JavaScript::Minifier::XS" : "0.1",
+            "JavaScript::Packer" : "2.0",
             "Mojolicious::Plugin::AssetPack" : "2.02",
             "perl" : "5.006"
          }
@@ -49,6 +50,6 @@
          "web" : "https://github.com/mche/Mojolicious-Plugin-AssetPack-Che"
       }
    },
-   "version" : "2.031",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "2.081",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -1,6 +1,7 @@
 package Test::Classifier ;
 
 use strict; use warnings;
+use lib '.';
 use t::TestMods::Test::Processor;
 use t::TestMods::Test::TestObj;
 use Role::Tiny;

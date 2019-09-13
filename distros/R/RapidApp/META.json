@@ -74,8 +74,8 @@
             "DBIx::Class::Core" : "0",
             "DBIx::Class::Helper::ResultSet::Util" : "0",
             "DBIx::Class::Helpers" : "2.033003",
+            "DBIx::Class::InflateColumn::Authen::Passphrase" : "0.01",
             "DBIx::Class::Optional::Dependencies" : "0",
-            "DBIx::Class::PassphraseColumn" : "0.02",
             "DBIx::Class::ResultSet" : "0",
             "DBIx::Class::Schema" : "0",
             "DBIx::Class::Schema::Diff" : "1.07",
@@ -202,7 +202,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#rapidapp"
    },
-   "version" : "1.3103",
+   "version" : "1.3105",
    "x_contributors" : [
       "Michael Conrad <mconrad@intellitree.com>",
       "Torsten Raudssus <torsten@raudss.us>",

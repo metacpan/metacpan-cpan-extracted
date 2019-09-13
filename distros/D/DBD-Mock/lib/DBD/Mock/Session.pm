@@ -171,14 +171,16 @@ sub _verify_bound_param {
 
     my $ref = ref $expected;
 
-    if ( $ref eq 'Regexp' and $got !~ /$expected/ ) {
-        die "Bound param $index do not match (using regexp) "
-          . "in current state in DBD::Mock::Session ($self->{name})"
-          . "      got: $got\n"
-          . " expected: $expected";
-    }
+    if ( $ref eq 'Regexp' ) {
 
-    if ( $got ne $expected ) {
+        if ( $got !~ /$expected/ ) {
+            die "Bound param $index do not match (using regexp) "
+              . "in current state in DBD::Mock::Session ($self->{name})"
+              . "      got: $got\n"
+              . " expected: $expected";
+        }
+
+    } elsif ( $got ne $expected ) {
         die "Bound param $index do not match "
           . "in current state in DBD::Mock::Session ($self->{name})\n"
           . "     got: $got\n"

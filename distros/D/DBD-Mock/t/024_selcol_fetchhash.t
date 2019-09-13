@@ -1,9 +1,9 @@
-use 5.006;
+use 5.008;
 
 use strict;
 use warnings;
 
-use Test::More tests => 11;
+use Test::More;
 
 BEGIN {
     use_ok('DBD::Mock');  
@@ -112,3 +112,5 @@ is_deeply(
     $dbh->selectall_hashref($items_sql, [], "Checking selectall_hashref with empty array of keys."), 
     { %{$not_coco_hash} },
     '... selectall_hashref with empty array of keys');
+
+done_testing();

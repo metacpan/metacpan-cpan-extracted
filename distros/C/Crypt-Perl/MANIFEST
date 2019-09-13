@@ -4,7 +4,7 @@ Changes
 LICENSE
 MANIFEST
 Makefile.PL
-README.pod
+README.md
 lib/Crypt/Perl.pm
 lib/Crypt/Perl/ASN1.pm
 lib/Crypt/Perl/ASN1/BitString.pm

@@ -1,9 +1,10 @@
-use 5.006;
+use 5.008;
 
 use strict;
 use warnings;
+
+use Test::More;
 use Test::Exception;
-use Test::More tests => 7;
 
 BEGIN {
     use_ok('DBD::Mock');
@@ -52,3 +53,4 @@ lives_ok(
     'Prepare two statements'
 );
 
+done_testing();

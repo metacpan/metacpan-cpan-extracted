@@ -1,6 +1,9 @@
-use strict;
+use 5.008;
 
-use Test::More tests => 11;
+use strict;
+use warnings;
+
+use Test::More;
 
 BEGIN {
     use_ok('DBD::Mock');  
@@ -35,3 +38,5 @@ is($st_track->statement, 'SELECT foo FROM bar WHERE x = ?', '... our statements 
 
 my $params = $st_track->bound_params;
 is(scalar(@{$params}), 1, '... got the expected amount of params');
+
+done_testing();

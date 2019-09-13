@@ -1,6 +1,9 @@
-use strict;
+use 5.008;
 
-use Test::More tests => 43;
+use strict;
+use warnings;
+
+use Test::More;
 
 BEGIN {
     use_ok('DBD::Mock');  
@@ -104,3 +107,5 @@ sub check_resultset {
     }
 
 }
+
+done_testing();

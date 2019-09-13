@@ -22,35 +22,37 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222641;
+our $VERSION = 1.20190912215428;
 
 my $formatters = [
                 {
                   'format' => '$1 $2',
+                  'leading_digits' => '[89]',
                   'national_rule' => '0$1',
-                  'pattern' => '(\\d{3})(\\d{5})',
-                  'leading_digits' => '[89]'
+                  'pattern' => '(\\d{3})(\\d{5})'
                 },
                 {
-                  'leading_digits' => '[2-4]',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{3})',
-                  'national_rule' => '0$1',
-                  'format' => '$1 $2 $3'
-                },
-                {
-                  'leading_digits' => '[23]',
                   'format' => '$1 $2 $3',
+                  'leading_digits' => '[2-4]',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{3})'
+                },
+                {
+                  'format' => '$1 $2 $3',
+                  'leading_digits' => '[23]',
                   'national_rule' => '0$1',
                   'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
                 }
               ];
 
 my $validators = {
-                'pager' => '',
-                'personal_number' => '',
-                'toll_free' => '800\\d{5}',
-                'mobile' => '4[3-79]\\d{6}',
-                'specialrate' => '(900\\d{5})',
+                'fixed_line' => '
+          (?:
+            2[89]|
+            39
+          )0\\d{6}|
+          [23][89]\\d{6}
+        ',
                 'geographic' => '
           (?:
             2[89]|
@@ -58,24 +60,36 @@ my $validators = {
           )0\\d{6}|
           [23][89]\\d{6}
         ',
-                'voip' => '',
-                'fixed_line' => '
-          (?:
-            2[89]|
-            39
-          )0\\d{6}|
-          [23][89]\\d{6}
-        '
+                'mobile' => '4[3-79]\\d{6}',
+                'pager' => '',
+                'personal_number' => '',
+                'specialrate' => '(900\\d{5})',
+                'toll_free' => '800\\d{5}',
+                'voip' => ''
               };
-my %areanames = (
-  38328 => "Mitrovica",
-  383280 => "Gjilan",
-  38329 => "Prizren",
-  383290 => "Ferizaj",
-  38338 => "Prishtina",
-  38339 => "Peja",
-  383390 => "Gjakova",
-);
+my %areanames = ();
+$areanames{sq}->{38328} = "Mitrovicë";
+$areanames{sq}->{383280} = "Gjilan";
+$areanames{sq}->{38329} = "Prizren";
+$areanames{sq}->{383290} = "Ferizaj";
+$areanames{sq}->{38338} = "Prishtinë";
+$areanames{sq}->{38339} = "Pejë";
+$areanames{sq}->{383390} = "Gjakovë";
+$areanames{sr}->{38328} = "Косовска\ Митровица";
+$areanames{sr}->{383280} = "Гњилане";
+$areanames{sr}->{38329} = "Призрен";
+$areanames{sr}->{383290} = "Урошевац";
+$areanames{sr}->{38338} = "Приштина";
+$areanames{sr}->{38339} = "Пећ";
+$areanames{sr}->{383390} = "Ђаковица";
+$areanames{en}->{38328} = "Mitrovica";
+$areanames{en}->{383280} = "Gjilan";
+$areanames{en}->{38329} = "Prizren";
+$areanames{en}->{383290} = "Ferizaj";
+$areanames{en}->{38338} = "Prishtina";
+$areanames{en}->{38339} = "Peja";
+$areanames{en}->{383390} = "Gjakova";
+
     sub new {
       my $class = shift;
       my $number = shift;

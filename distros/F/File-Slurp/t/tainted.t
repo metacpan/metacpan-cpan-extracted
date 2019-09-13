@@ -9,6 +9,8 @@ use Scalar::Util qw(tainted);
 use Test::More;
 
 BEGIN {
+    plan skip_all => 'Taint was always terrible. Just stop it already.';
+    exit;
     # Taint mode is the devil. THE DEVIL I SAY
     unshift @INC, File::Spec->catdir(File::Spec->rel2abs(File::Basename::dirname(__FILE__)), 'lib') =~ /^(.*)$/;
     # Why on earth do we keep on with Taint mode?!? I hate all the things

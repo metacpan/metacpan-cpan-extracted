@@ -1,6 +1,9 @@
-use strict;
+use 5.008;
 
-use Test::More tests => 68;
+use strict;
+use warnings;
+
+use Test::More;
 
 BEGIN {
     use_ok('DBD::Mock');
@@ -145,4 +148,6 @@ BEGIN {
     $st_track->is_finished('nothing');
     is($st_track->is_finished(), 'no', '... our statement is no longer finished');                                
 
-}    
+}
+
+done_testing();

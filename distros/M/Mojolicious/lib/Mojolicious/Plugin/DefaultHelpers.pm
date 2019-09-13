@@ -42,6 +42,8 @@ sub register {
   $app->helper(dumper  => sub { shift; dumper @_ });
   $app->helper(include => sub { shift->render_to_string(@_) });
 
+  $app->helper(log => \&_log);
+
   $app->helper('proxy.get_p'  => sub { _proxy_method_p('GET',  @_) });
   $app->helper('proxy.post_p' => sub { _proxy_method_p('POST', @_) });
   $app->helper('proxy.start_p' => \&_proxy_start_p);
@@ -95,8 +97,8 @@ sub _current_route {
 sub _development {
   my ($page, $c, $e) = @_;
 
-  my $app = $c->app;
-  $app->log->error(($e = _is_e($e) ? $e : Mojo::Exception->new($e))->inspect)
+  $c->helpers->log->error(
+    ($e = _is_e($e) ? $e : Mojo::Exception->new($e))->inspect)
     if $page eq 'exception';
 
   # Filtered stash snapshot
@@ -106,6 +108,7 @@ sub _development {
   $stash->{exception} = $page eq 'exception' ? $e : undef;
 
   # Render with fallbacks
+  my $app     = $c->app;
   my $mode    = $app->mode;
   my $options = {
     format   => $stash->{format} || $app->renderer->default_format,
@@ -165,6 +168,12 @@ sub _is_e { blessed $_[0] && $_[0]->isa('Mojo::Exception') }
 sub _is_fresh {
   my ($c, %options) = @_;
   return $c->app->static->is_fresh($c, \%options);
+}
+
+sub _log {
+  my $c = shift;
+  return $c->stash->{'mojo.log'}
+    ||= $c->app->log->context('[' . $c->req->request_id . ']');
 }
 
 sub _proxy_method_p {
@@ -254,7 +263,7 @@ sub _respond_to {
 sub _static {
   my ($c, $file) = @_;
   return !!$c->rendered if $c->app->static->serve($c, $file);
-  $c->app->log->debug(qq{Static file "$file" not found});
+  $c->helpers->log->debug(qq{Static file "$file" not found});
   return !$c->helpers->reply->not_found;
 }
 
@@ -517,6 +526,20 @@ response headers with L<Mojolicious::Static/"is_fresh">.
 
 Set C<layout> stash value, all additional key/value pairs get merged into the
 L</"stash">.
+
+=head2 log
+
+  my $log = $c->log;
+
+Alternative to L<Mojolicious/"log"> that includes
+L<Mojo::Message::Request/"request_id"> with every log message.
+
+  # Log message with context
+  $c->log->debug('This is a log message with request id');
+
+  # Pass logger with context to model
+  my $log = $c->log;
+  $c->some_model->create({foo => $foo}, $log);
 
 =head2 param
 

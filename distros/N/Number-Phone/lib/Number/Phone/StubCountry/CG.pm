@@ -22,50 +22,57 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222639;
+our $VERSION = 1.20190912215424;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d{3})(\\d{2})(\\d{2})(\\d{2})',
                   'format' => '$1 $2 $3 $4',
-                  'leading_digits' => '801'
-                },
-                {
-                  'pattern' => '(\\d)(\\d{4})(\\d{4})',
-                  'format' => '$1 $2 $3',
-                  'leading_digits' => '8'
+                  'leading_digits' => '801',
+                  'pattern' => '(\\d{3})(\\d{2})(\\d{2})(\\d{2})'
                 },
                 {
                   'format' => '$1 $2 $3',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})',
-                  'leading_digits' => '[02]'
+                  'leading_digits' => '8',
+                  'pattern' => '(\\d)(\\d{4})(\\d{4})'
+                },
+                {
+                  'format' => '$1 $2 $3',
+                  'leading_digits' => '[02]',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
                 }
               ];
 
 my $validators = {
+                'fixed_line' => '222[1-589]\\d{5}',
+                'geographic' => '222[1-589]\\d{5}',
+                'mobile' => '0[14-6]\\d{7}',
                 'pager' => '',
                 'personal_number' => '',
-                'toll_free' => '',
-                'mobile' => '0[14-6]\\d{7}',
                 'specialrate' => '(
           80(?:
             0\\d\\d|
             11[0-4]
           )\\d{4}
         )',
-                'geographic' => '222[1-589]\\d{5}',
-                'fixed_line' => '222[1-589]\\d{5}',
+                'toll_free' => '',
                 'voip' => ''
               };
-my %areanames = (
-  2422221 => "Cuvette",
-  2422222 => "Likouala\/Sangha",
-  2422223 => "Pool",
-  2422224 => "Plateaux",
-  2422225 => "Bouenza\/Lekoumou\/Niari",
-  2422228 => "Brazzaville",
-  2422229 => "Pointe\-Noire",
-);
+my %areanames = ();
+$areanames{fr}->{2422221} = "Cuvette";
+$areanames{fr}->{2422222} = "Likouala\/Sangha";
+$areanames{fr}->{2422223} = "Pool";
+$areanames{fr}->{2422224} = "Plateaux";
+$areanames{fr}->{2422225} = "Bouenza\/Lekoumou\/Niari";
+$areanames{fr}->{2422228} = "Brazzaville";
+$areanames{fr}->{2422229} = "Pointe\-Noire";
+$areanames{en}->{2422221} = "Cuvette";
+$areanames{en}->{2422222} = "Likouala\/Sangha";
+$areanames{en}->{2422223} = "Pool";
+$areanames{en}->{2422224} = "Plateaux";
+$areanames{en}->{2422225} = "Bouenza\/Lekoumou\/Niari";
+$areanames{en}->{2422228} = "Brazzaville";
+$areanames{en}->{2422229} = "Pointe\-Noire";
+
     sub new {
       my $class = shift;
       my $number = shift;

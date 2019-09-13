@@ -24,13 +24,13 @@ name: File-Collector
 provides:
   File::Collector:
     file: lib/File/Collector.pm
-    version: '0.037'
+    version: '0.038'
   File::Collector::Processor:
     file: lib/File/Collector/Processor.pm
-    version: '0.037'
+    version: '0.038'
   File::Collector::Processor::Do:
     file: lib/File/Collector/Processor.pm
-    version: '0.037'
+    version: '0.038'
 requires:
   Carp: '0'
   File::Basename: '0'
@@ -43,6 +43,6 @@ requires:
 resources:
   bugtracker: https://github.com/sdondley/File-Collector/issues
   repository: git://github.com/sdondley/File-Collector.git
-version: '0.037'
+version: '0.038'
 x_generated_by_perl: v5.24.4
 x_serialization_backend: 'YAML::Tiny version 1.73'

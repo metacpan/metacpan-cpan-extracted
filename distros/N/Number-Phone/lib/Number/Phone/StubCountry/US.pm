@@ -22,26 +22,24 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222641;
+our $VERSION = 1.20190912215428;
 
 my $formatters = [
                 {
-                  'intl_format' => 'NA',
                   'format' => '$1-$2',
-                  'pattern' => '(\\d{3})(\\d{4})',
-                  'leading_digits' => '[2-9]'
+                  'intl_format' => 'NA',
+                  'leading_digits' => '[2-9]',
+                  'pattern' => '(\\d{3})(\\d{4})'
                 },
                 {
-                  'intl_format' => '$1-$2-$3',
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{4})',
                   'format' => '($1) $2-$3',
-                  'leading_digits' => '[2-9]'
+                  'intl_format' => '$1-$2-$3',
+                  'leading_digits' => '[2-9]',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{4})'
                 }
               ];
 
 my $validators = {
-                'voip' => '',
-                'specialrate' => '(900[2-9]\\d{6})|(710[2-9]\\d{6})',
                 'geographic' => '(
           (?:
             2(?:
@@ -217,17 +215,7 @@ my $validators = {
             )
           )[2-9]\\d{6}
         )',
-                'toll_free' => '
-          8(?:
-            00|
-            33|
-            44|
-            55|
-            66|
-            77|
-            88
-          )[2-9]\\d{6}
-        ',
+                'pager' => '',
                 'personal_number' => '
           5(?:
             00|
@@ -239,7 +227,19 @@ my $validators = {
             88
           )[2-9]\\d{6}
         ',
-                'pager' => ''
+                'specialrate' => '(900[2-9]\\d{6})|(710[2-9]\\d{6})',
+                'toll_free' => '
+          8(?:
+            00|
+            33|
+            44|
+            55|
+            66|
+            77|
+            88
+          )[2-9]\\d{6}
+        ',
+                'voip' => ''
               };
 use Number::Phone::NANP::Data;
 sub areaname {

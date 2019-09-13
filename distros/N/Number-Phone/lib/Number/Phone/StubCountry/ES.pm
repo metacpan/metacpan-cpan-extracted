@@ -22,50 +22,34 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222640;
+our $VERSION = 1.20190912215425;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d{4})',
                   'format' => '$1',
                   'intl_format' => 'NA',
-                  'leading_digits' => '905'
+                  'leading_digits' => '905',
+                  'pattern' => '(\\d{4})'
                 },
                 {
-                  'intl_format' => 'NA',
-                  'pattern' => '(\\d{6})',
                   'format' => '$1',
-                  'leading_digits' => '[79]9'
+                  'intl_format' => 'NA',
+                  'leading_digits' => '[79]9',
+                  'pattern' => '(\\d{6})'
                 },
                 {
                   'format' => '$1 $2 $3',
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
-                  'leading_digits' => '[89]00'
+                  'leading_digits' => '[89]00',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
                 },
                 {
-                  'leading_digits' => '[5-9]',
                   'format' => '$1 $2 $3 $4',
+                  'leading_digits' => '[5-9]',
                   'pattern' => '(\\d{3})(\\d{2})(\\d{2})(\\d{2})'
                 }
               ];
 
 my $validators = {
-                'personal_number' => '70\\d{7}',
-                'toll_free' => '[89]00\\d{6}',
-                'mobile' => '
-          9(?:
-            6906(?:
-              09|
-              10
-            )|
-            7390\\d\\d
-          )\\d\\d|
-          (?:
-            6\\d|
-            7[1-48]
-          )\\d{7}
-        ',
-                'pager' => '',
                 'fixed_line' => '
           96906(?:
             0[0-8]|
@@ -96,8 +80,6 @@ my $validators = {
             )
           )\\d{6}
         ',
-                'voip' => '',
-                'specialrate' => '(90[12]\\d{6})|(80[367]\\d{6})|(51\\d{7})',
                 'geographic' => '
           96906(?:
             0[0-8]|
@@ -127,126 +109,260 @@ my $validators = {
               7[124-9]
             )
           )\\d{6}
-        '
+        ',
+                'mobile' => '
+          9(?:
+            6906(?:
+              09|
+              10
+            )|
+            7390\\d\\d
+          )\\d\\d|
+          (?:
+            6\\d|
+            7[1-48]
+          )\\d{7}
+        ',
+                'pager' => '',
+                'personal_number' => '70\\d{7}',
+                'specialrate' => '(90[12]\\d{6})|(80[367]\\d{6})|(51\\d{7})',
+                'toll_free' => '[89]00\\d{6}',
+                'voip' => ''
               };
-my %areanames = (
-  3481 => "Madrid",
-  34820 => "Ávila",
-  34821 => "Segovia",
-  34822 => "Tenerife",
-  34823 => "Salamanca",
-  34824 => "Badajoz",
-  34825 => "Toledo",
-  34826 => "Ciudad\ Real",
-  34827 => "Cáceres",
-  34828 => "Las\ Palmas",
-  3483 => "Barcelona",
-  34841 => "La\ Rioja",
-  34842 => "Cantabria",
-  34843 => "Guipúzcoa",
-  34844 => "Bizkaia",
-  34845 => "Araba",
-  34846 => "Bizkaia",
-  34847 => "Burgos",
-  34848 => "Navarre",
-  34849 => "Guadalajara",
-  34850 => "Almería",
-  34851 => "Málaga",
-  34852 => "Málaga",
-  34853 => "Jaén",
-  34854 => "Seville",
-  34855 => "Seville",
-  34856 => "Cádiz",
-  34857 => "Cordova",
-  34858 => "Granada",
-  34859 => "Huelva",
-  34860 => "Valencia",
-  34861 => "Valencia",
-  34862 => "Valencia",
-  34863 => "Valencia",
-  34864 => "Castellón",
-  34865 => "Alicante",
-  34866 => "Alicante",
-  34867 => "Albacete",
-  34868 => "Murcia",
-  34869 => "Cuenca",
-  34871 => "Balearic\ Islands",
-  34872 => "Gerona",
-  34873 => "Lleida",
-  34874 => "Huesca",
-  34875 => "Soria",
-  34876 => "Zaragoza",
-  34877 => "Tarragona",
-  34878 => "Teruel",
-  34879 => "Palencia",
-  34880 => "Zamora",
-  34881 => "La\ Coruña",
-  34882 => "Lugo",
-  34883 => "Valladolid",
-  34884 => "Asturias",
-  34885 => "Asturias",
-  34886 => "Pontevedra",
-  34887 => "León",
-  34888 => "Ourense",
-  3491 => "Madrid",
-  34920 => "Ávila",
-  34921 => "Segovia",
-  34922 => "Tenerife",
-  34923 => "Salamanca",
-  34924 => "Badajoz",
-  34925 => "Toledo",
-  34926 => "Ciudad\ Real",
-  34927 => "Cáceres",
-  34928 => "Las\ Palmas",
-  3493 => "Barcelona",
-  34941 => "La\ Rioja",
-  34942 => "Cantabria",
-  34943 => "Guipúzcoa",
-  34944 => "Bizkaia",
-  34945 => "Araba",
-  34946 => "Bizkaia",
-  34947 => "Burgos",
-  34948 => "Navarre",
-  34949 => "Guadalajara",
-  34950 => "Almería",
-  34951 => "Málaga",
-  34952 => "Málaga",
-  34953 => "Jaén",
-  34954 => "Seville",
-  34955 => "Seville",
-  34956 => "Cádiz",
-  34957 => "Cordova",
-  34958 => "Granada",
-  34959 => "Huelva",
-  34960 => "Valencia",
-  34961 => "Valencia",
-  34962 => "Valencia",
-  34963 => "Valencia",
-  34964 => "Castellón",
-  34965 => "Alicante",
-  34966 => "Alicante",
-  34967 => "Albacete",
-  34968 => "Murcia",
-  34969 => "Cuenca",
-  34971 => "Balearic\ Islands",
-  34972 => "Gerona",
-  34973 => "Lleida",
-  34974 => "Huesca",
-  34975 => "Soria",
-  34976 => "Zaragoza",
-  34977 => "Tarragona",
-  34978 => "Teruel",
-  34979 => "Palencia",
-  34980 => "Zamora",
-  34981 => "La\ Coruña",
-  34982 => "Lugo",
-  34983 => "Valladolid",
-  34984 => "Asturias",
-  34985 => "Asturias",
-  34986 => "Pontevedra",
-  34987 => "León",
-  34988 => "Ourense",
-);
+my %areanames = ();
+$areanames{es}->{3481} = "Madrid";
+$areanames{es}->{34820} = "Ávila";
+$areanames{es}->{34821} = "Segovia";
+$areanames{es}->{34822} = "Tenerife";
+$areanames{es}->{34823} = "Salamanca";
+$areanames{es}->{34824} = "Badajoz";
+$areanames{es}->{34825} = "Toledo";
+$areanames{es}->{34826} = "Ciudad\ Real";
+$areanames{es}->{34827} = "Cáceres";
+$areanames{es}->{34828} = "Las\ Palmas";
+$areanames{es}->{3483} = "Barcelona";
+$areanames{es}->{34841} = "La\ Rioja";
+$areanames{es}->{34842} = "Cantabria";
+$areanames{es}->{34843} = "Guipúzcoa";
+$areanames{es}->{34844} = "Vizcaya";
+$areanames{es}->{34845} = "Álava";
+$areanames{es}->{34846} = "Vizcaya";
+$areanames{es}->{34847} = "Burgos";
+$areanames{es}->{34848} = "Navarra";
+$areanames{es}->{34849} = "Guadalajara";
+$areanames{es}->{34850} = "Álmería";
+$areanames{es}->{34851} = "Málaga";
+$areanames{es}->{34852} = "Málaga";
+$areanames{es}->{34853} = "Jaén";
+$areanames{es}->{34854} = "Sevilla";
+$areanames{es}->{34855} = "Seville";
+$areanames{es}->{34856} = "Cádiz";
+$areanames{es}->{34857} = "Córdoba";
+$areanames{es}->{34858} = "Granada";
+$areanames{es}->{34859} = "Huelva";
+$areanames{es}->{34860} = "Valencia";
+$areanames{es}->{34861} = "Valencia";
+$areanames{es}->{34862} = "Valencia";
+$areanames{es}->{34863} = "Valencia";
+$areanames{es}->{34864} = "Castellón";
+$areanames{es}->{34865} = "Alicante";
+$areanames{es}->{34866} = "Alicante";
+$areanames{es}->{34867} = "Albacete";
+$areanames{es}->{34868} = "Murcia";
+$areanames{es}->{34869} = "Cuenca";
+$areanames{es}->{34871} = "Baleares";
+$areanames{es}->{34872} = "Gerona";
+$areanames{es}->{34873} = "Lérida";
+$areanames{es}->{34874} = "Huesca";
+$areanames{es}->{34875} = "Soria";
+$areanames{es}->{34876} = "Zaragoza";
+$areanames{es}->{34877} = "Tarragona";
+$areanames{es}->{34878} = "Teruel";
+$areanames{es}->{34879} = "Palencia";
+$areanames{es}->{34880} = "Zamora";
+$areanames{es}->{34881} = "La\ Coruña";
+$areanames{es}->{34882} = "Lugo";
+$areanames{es}->{34883} = "Valladolid";
+$areanames{es}->{34884} = "Asturias";
+$areanames{es}->{34885} = "Asturias";
+$areanames{es}->{34886} = "Pontevedra";
+$areanames{es}->{34887} = "León";
+$areanames{es}->{34888} = "Orense";
+$areanames{es}->{3491} = "Madrid";
+$areanames{es}->{34920} = "Ávila";
+$areanames{es}->{34921} = "Segovia";
+$areanames{es}->{34922} = "Tenerife";
+$areanames{es}->{34923} = "Salamanca";
+$areanames{es}->{34924} = "Badajoz";
+$areanames{es}->{34925} = "Toledo";
+$areanames{es}->{34926} = "Ciudad\ Real";
+$areanames{es}->{34927} = "Cáceres";
+$areanames{es}->{34928} = "Las\ Palmas";
+$areanames{es}->{3493} = "Barcelona";
+$areanames{es}->{34941} = "La\ Rioja";
+$areanames{es}->{34942} = "Cantabria";
+$areanames{es}->{34943} = "Guipúzcoa";
+$areanames{es}->{34944} = "Vizcaya";
+$areanames{es}->{34945} = "Álava";
+$areanames{es}->{34946} = "Vizcaya";
+$areanames{es}->{34947} = "Burgos";
+$areanames{es}->{34948} = "Navarra";
+$areanames{es}->{34949} = "Guadalajara";
+$areanames{es}->{34950} = "Almería";
+$areanames{es}->{34951} = "Málaga";
+$areanames{es}->{34952} = "Málaga";
+$areanames{es}->{34953} = "Jaén";
+$areanames{es}->{34954} = "Sevilla";
+$areanames{es}->{34955} = "Sevilla";
+$areanames{es}->{34956} = "Cádiz";
+$areanames{es}->{34957} = "Córdoba";
+$areanames{es}->{34958} = "Granada";
+$areanames{es}->{34959} = "Huelva";
+$areanames{es}->{34960} = "Valencia";
+$areanames{es}->{34961} = "Valencia";
+$areanames{es}->{34962} = "Valencia";
+$areanames{es}->{34963} = "Valencia";
+$areanames{es}->{34964} = "Castellón";
+$areanames{es}->{34965} = "Alicante";
+$areanames{es}->{34966} = "Alicante";
+$areanames{es}->{34967} = "Albacete";
+$areanames{es}->{34968} = "Murcia";
+$areanames{es}->{34969} = "Cuenca";
+$areanames{es}->{34971} = "Baleares";
+$areanames{es}->{34972} = "Gerona";
+$areanames{es}->{34973} = "Lérida";
+$areanames{es}->{34974} = "Huesca";
+$areanames{es}->{34975} = "Soria";
+$areanames{es}->{34976} = "Zaragoza";
+$areanames{es}->{34977} = "Tarragona";
+$areanames{es}->{34978} = "Teruel";
+$areanames{es}->{34979} = "Palencia";
+$areanames{es}->{34980} = "Zamora";
+$areanames{es}->{34981} = "A\ Coruña";
+$areanames{es}->{34982} = "Lugo";
+$areanames{es}->{34983} = "Valladolid";
+$areanames{es}->{34984} = "Asturias";
+$areanames{es}->{34985} = "Asturias";
+$areanames{es}->{34986} = "Pontevedra";
+$areanames{es}->{34987} = "León";
+$areanames{es}->{34988} = "Orense";
+$areanames{en}->{3481} = "Madrid";
+$areanames{en}->{34820} = "Ávila";
+$areanames{en}->{34821} = "Segovia";
+$areanames{en}->{34822} = "Tenerife";
+$areanames{en}->{34823} = "Salamanca";
+$areanames{en}->{34824} = "Badajoz";
+$areanames{en}->{34825} = "Toledo";
+$areanames{en}->{34826} = "Ciudad\ Real";
+$areanames{en}->{34827} = "Cáceres";
+$areanames{en}->{34828} = "Las\ Palmas";
+$areanames{en}->{3483} = "Barcelona";
+$areanames{en}->{34841} = "La\ Rioja";
+$areanames{en}->{34842} = "Cantabria";
+$areanames{en}->{34843} = "Guipúzcoa";
+$areanames{en}->{34844} = "Bizkaia";
+$areanames{en}->{34845} = "Araba";
+$areanames{en}->{34846} = "Bizkaia";
+$areanames{en}->{34847} = "Burgos";
+$areanames{en}->{34848} = "Navarre";
+$areanames{en}->{34849} = "Guadalajara";
+$areanames{en}->{34850} = "Almería";
+$areanames{en}->{34851} = "Málaga";
+$areanames{en}->{34852} = "Málaga";
+$areanames{en}->{34853} = "Jaén";
+$areanames{en}->{34854} = "Seville";
+$areanames{en}->{34855} = "Seville";
+$areanames{en}->{34856} = "Cádiz";
+$areanames{en}->{34857} = "Cordova";
+$areanames{en}->{34858} = "Granada";
+$areanames{en}->{34859} = "Huelva";
+$areanames{en}->{34860} = "Valencia";
+$areanames{en}->{34861} = "Valencia";
+$areanames{en}->{34862} = "Valencia";
+$areanames{en}->{34863} = "Valencia";
+$areanames{en}->{34864} = "Castellón";
+$areanames{en}->{34865} = "Alicante";
+$areanames{en}->{34866} = "Alicante";
+$areanames{en}->{34867} = "Albacete";
+$areanames{en}->{34868} = "Murcia";
+$areanames{en}->{34869} = "Cuenca";
+$areanames{en}->{34871} = "Balearic\ Islands";
+$areanames{en}->{34872} = "Gerona";
+$areanames{en}->{34873} = "Lleida";
+$areanames{en}->{34874} = "Huesca";
+$areanames{en}->{34875} = "Soria";
+$areanames{en}->{34876} = "Zaragoza";
+$areanames{en}->{34877} = "Tarragona";
+$areanames{en}->{34878} = "Teruel";
+$areanames{en}->{34879} = "Palencia";
+$areanames{en}->{34880} = "Zamora";
+$areanames{en}->{34881} = "La\ Coruña";
+$areanames{en}->{34882} = "Lugo";
+$areanames{en}->{34883} = "Valladolid";
+$areanames{en}->{34884} = "Asturias";
+$areanames{en}->{34885} = "Asturias";
+$areanames{en}->{34886} = "Pontevedra";
+$areanames{en}->{34887} = "León";
+$areanames{en}->{34888} = "Ourense";
+$areanames{en}->{3491} = "Madrid";
+$areanames{en}->{34920} = "Ávila";
+$areanames{en}->{34921} = "Segovia";
+$areanames{en}->{34922} = "Tenerife";
+$areanames{en}->{34923} = "Salamanca";
+$areanames{en}->{34924} = "Badajoz";
+$areanames{en}->{34925} = "Toledo";
+$areanames{en}->{34926} = "Ciudad\ Real";
+$areanames{en}->{34927} = "Cáceres";
+$areanames{en}->{34928} = "Las\ Palmas";
+$areanames{en}->{3493} = "Barcelona";
+$areanames{en}->{34941} = "La\ Rioja";
+$areanames{en}->{34942} = "Cantabria";
+$areanames{en}->{34943} = "Guipúzcoa";
+$areanames{en}->{34944} = "Bizkaia";
+$areanames{en}->{34945} = "Araba";
+$areanames{en}->{34946} = "Bizkaia";
+$areanames{en}->{34947} = "Burgos";
+$areanames{en}->{34948} = "Navarre";
+$areanames{en}->{34949} = "Guadalajara";
+$areanames{en}->{34950} = "Almería";
+$areanames{en}->{34951} = "Málaga";
+$areanames{en}->{34952} = "Málaga";
+$areanames{en}->{34953} = "Jaén";
+$areanames{en}->{34954} = "Seville";
+$areanames{en}->{34955} = "Seville";
+$areanames{en}->{34956} = "Cádiz";
+$areanames{en}->{34957} = "Cordova";
+$areanames{en}->{34958} = "Granada";
+$areanames{en}->{34959} = "Huelva";
+$areanames{en}->{34960} = "Valencia";
+$areanames{en}->{34961} = "Valencia";
+$areanames{en}->{34962} = "Valencia";
+$areanames{en}->{34963} = "Valencia";
+$areanames{en}->{34964} = "Castellón";
+$areanames{en}->{34965} = "Alicante";
+$areanames{en}->{34966} = "Alicante";
+$areanames{en}->{34967} = "Albacete";
+$areanames{en}->{34968} = "Murcia";
+$areanames{en}->{34969} = "Cuenca";
+$areanames{en}->{34971} = "Balearic\ Islands";
+$areanames{en}->{34972} = "Gerona";
+$areanames{en}->{34973} = "Lleida";
+$areanames{en}->{34974} = "Huesca";
+$areanames{en}->{34975} = "Soria";
+$areanames{en}->{34976} = "Zaragoza";
+$areanames{en}->{34977} = "Tarragona";
+$areanames{en}->{34978} = "Teruel";
+$areanames{en}->{34979} = "Palencia";
+$areanames{en}->{34980} = "Zamora";
+$areanames{en}->{34981} = "La\ Coruña";
+$areanames{en}->{34982} = "Lugo";
+$areanames{en}->{34983} = "Valladolid";
+$areanames{en}->{34984} = "Asturias";
+$areanames{en}->{34985} = "Asturias";
+$areanames{en}->{34986} = "Pontevedra";
+$areanames{en}->{34987} = "León";
+$areanames{en}->{34988} = "Ourense";
+
     sub new {
       my $class = shift;
       my $number = shift;

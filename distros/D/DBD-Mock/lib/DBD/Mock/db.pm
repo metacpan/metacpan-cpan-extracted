@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use List::Util qw( first );
+use DBI;
 
 our $imp_data_size = 0;
 
@@ -21,6 +22,31 @@ sub get_info {
     my ( $dbh, $attr ) = @_;
     $dbh->{mock_get_info} ||= {};
     return $dbh->{mock_get_info}{$attr};
+}
+
+sub table_info {
+    my ( $dbh, @params ) = @_;
+
+    my ($cataloge, $schema, $table, $type) = map { $_ || '' } @params[0..4];
+
+    $dbh->{mock_table_info} ||= {};
+
+    my @tables = @{ $dbh->{mock_table_info}->{ $cataloge }->{ $schema }->{ $table }->{ $type } || [] };
+
+    my ($fieldNames, @rows) = map { [ @$_ ] } @tables;
+
+    $fieldNames ||= [];
+
+    my $sponge = DBI->connect('dbi:Sponge:', '', '' )
+        or return $dbh->DBI::set_err($DBI::err, "DBI::Sponge: $DBI::errstr");
+
+    my $sth = $sponge->prepare("table_info", {
+        rows          => \@rows,
+        NUM_OF_FIELDS => scalar @$fieldNames,
+        NAME          => $fieldNames
+    }) or return $dbh->DBI::set_err( $sponge->err(), $sponge->errstr() );
+
+    return $sth;
 }
 
 sub prepare {
@@ -373,6 +399,24 @@ sub STORE {
     }
     elsif ( $attrib =~ /^mock_(add_)?data_sources/ ) {
         $dbh->{Driver}->STORE( $attrib, $value );
+    }
+    elsif ( $attrib =~ /^mock_add_table_info$/ ) {
+        $dbh->{mock_table_info} ||= {};
+
+        if ( ref $value ne "HASH" ) {
+            die "mock_add_table_info needs a hash reference"
+        }
+
+        my ( $cataloge, $schema, $table, $type ) = map { defined $_ ? $_ : '' } @$value{qw( cataloge schema table type )};
+
+        $dbh->{mock_table_info}->{ $cataloge }->{ $schema }->{ $table }->{ $type } = $value->{table_info}; 
+    }
+    elsif ( $attrib =~ /^mock_clear_table_info$/ ) {
+        if ( $value ) {
+            $dbh->{mock_table_info} = {};
+        }
+
+        return {};
     }
     elsif ( $attrib =~ /^mock/ ) {
         return $dbh->{$attrib} = $value;

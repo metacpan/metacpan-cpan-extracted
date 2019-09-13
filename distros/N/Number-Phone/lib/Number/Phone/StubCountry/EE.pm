@@ -22,12 +22,11 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222640;
+our $VERSION = 1.20190912215425;
 
 my $formatters = [
                 {
                   'format' => '$1 $2',
-                  'pattern' => '(\\d{3})(\\d{4})',
                   'leading_digits' => '
             [369]|
             4[3-8]|
@@ -44,9 +43,11 @@ my $formatters = [
               )
             )|
             7[1-9]
-          '
+          ',
+                  'pattern' => '(\\d{3})(\\d{4})'
                 },
                 {
+                  'format' => '$1 $2',
                   'leading_digits' => '
             [45]|
             8(?:
@@ -54,24 +55,39 @@ my $formatters = [
               [1-4]
             )
           ',
-                  'format' => '$1 $2',
                   'pattern' => '(\\d{4})(\\d{3,4})'
                 },
                 {
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '7',
-                  'pattern' => '(\\d{2})(\\d{2})(\\d{4})',
-                  'format' => '$1 $2 $3'
+                  'pattern' => '(\\d{2})(\\d{2})(\\d{4})'
                 },
                 {
-                  'leading_digits' => '80',
                   'format' => '$1 $2 $3',
+                  'leading_digits' => '80',
                   'pattern' => '(\\d{4})(\\d{3})(\\d{3})'
                 }
               ];
 
 my $validators = {
-                'pager' => '',
-                'personal_number' => '70[0-2]\\d{5}',
+                'fixed_line' => '
+          (?:
+            3[23589]|
+            4[3-8]|
+            6\\d|
+            7[1-9]|
+            88
+          )\\d{5}
+        ',
+                'geographic' => '
+          (?:
+            3[23589]|
+            4[3-8]|
+            6\\d|
+            7[1-9]|
+            88
+          )\\d{5}
+        ',
                 'mobile' => '
           (?:
             5\\d|
@@ -92,6 +108,14 @@ my $validators = {
             )
           )\\d{3}
         ',
+                'pager' => '',
+                'personal_number' => '70[0-2]\\d{5}',
+                'specialrate' => '(
+          (?:
+            40\\d\\d|
+            900
+          )\\d{4}
+        )',
                 'toll_free' => '
           800(?:
             (?:
@@ -101,52 +125,28 @@ my $validators = {
             [2-9]
           )\\d{3}
         ',
-                'specialrate' => '(
-          (?:
-            40\\d\\d|
-            900
-          )\\d{4}
-        )',
-                'geographic' => '
-          (?:
-            3[23589]|
-            4[3-8]|
-            6\\d|
-            7[1-9]|
-            88
-          )\\d{5}
-        ',
-                'fixed_line' => '
-          (?:
-            3[23589]|
-            4[3-8]|
-            6\\d|
-            7[1-9]|
-            88
-          )\\d{5}
-        ',
                 'voip' => ''
               };
-my %areanames = (
-  37232 => "Rakvere",
-  37233 => "Kohtla\-Järve",
-  37235 => "Narva\/Sillamäe",
-  37238 => "Paide",
-  37243 => "Viljandi",
-  37244 => "Pärnu",
-  37245 => "Kuressaare",
-  37246 => "Kärdla",
-  37247 => "Haapsalu",
-  37248 => "Rapla",
-  3726 => "Tallinn\/Harju\ County",
-  37273 => "Tartu",
-  37274 => "Tartu",
-  37275 => "Tartu",
-  37276 => "Valga",
-  37277 => "Jõgeva",
-  37278 => "Võru",
-  37279 => "Põlva",
-);
+my %areanames = ();
+$areanames{en}->{37232} = "Rakvere";
+$areanames{en}->{37233} = "Kohtla\-Järve";
+$areanames{en}->{37235} = "Narva\/Sillamäe";
+$areanames{en}->{37238} = "Paide";
+$areanames{en}->{37243} = "Viljandi";
+$areanames{en}->{37244} = "Pärnu";
+$areanames{en}->{37245} = "Kuressaare";
+$areanames{en}->{37246} = "Kärdla";
+$areanames{en}->{37247} = "Haapsalu";
+$areanames{en}->{37248} = "Rapla";
+$areanames{en}->{3726} = "Tallinn\/Harju\ County";
+$areanames{en}->{37273} = "Tartu";
+$areanames{en}->{37274} = "Tartu";
+$areanames{en}->{37275} = "Tartu";
+$areanames{en}->{37276} = "Valga";
+$areanames{en}->{37277} = "Jõgeva";
+$areanames{en}->{37278} = "Võru";
+$areanames{en}->{37279} = "Põlva";
+
     sub new {
       my $class = shift;
       my $number = shift;

@@ -296,6 +296,7 @@ t/mojolicious/lib/PluginWithEmbeddedApp.pm
 t/mojolicious/lib/PluginWithTemplate.pm
 t/mojolicious/lib/SingleFileTestApp.pm
 t/mojolicious/lite_app.t
+t/mojolicious/log_lite_app.t
 t/mojolicious/longpolling_lite_app.t
 t/mojolicious/mojolicious_config_test.whatever.conf
 t/mojolicious/multipath_lite_app.t

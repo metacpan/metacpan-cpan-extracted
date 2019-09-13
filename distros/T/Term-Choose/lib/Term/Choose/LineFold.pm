@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.700';
+our $VERSION = '1.701';
 
 use Exporter qw( import );
 
@@ -120,7 +120,7 @@ sub line_fold {
     $string =~ s/[^\x{0a}\x{0b}\x{0c}\x{0d}\x{85}\P{Cc}]//g; # remove control chars but keep vertical spaces
     $string =~ s/[\p{Noncharacter_Code_Point}\p{Cs}]//g;
     my $regex = qr/\x{0d}\x{0a}|[\x{000a}-\x{000d}\x{0085}\x{2028}\x{2029}]/; # \R 5.10
-    if ( $string !~ /$regex/ && print_columns( $opt->{init_tab} . $string ) <= $avail_width ) {
+    if ( $string !~ /$regex/ && print_columns( $opt->{init_tab} . $string ) <= $avail_width && ! @color ) {
         return $opt->{init_tab} . $string;
     }
     my @paragraphs;

@@ -1,14 +1,10 @@
-# Copyright (c) 2009-2017 by Martin Becker.  All rights reserved.
-# This package is free software; you can redistribute it and/or modify it
-# under the same terms as Perl itself.
-
 package Math::Polynomial::Generic;
 
 use strict;
 use warnings;
 use Carp qw(carp croak);
 
-our $VERSION = '1.014';
+our $VERSION = '1.015';
 
 sub import {
     croak(__PACKAGE__ . " is no longer available");
@@ -58,11 +54,11 @@ or it can be defined locally as a small wrapper for the same.
 
 =head1 AUTHOR
 
-Martin Becker, E<lt>becker-cpan-mp@cozap.comE<gt>
+Martin Becker, E<lt>becker-cpan-mp (at) cozap.comE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2009-2017 by Martin Becker.  All rights reserved.
+Copyright (c) 2009-2019 by Martin Becker.  All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.6 or,

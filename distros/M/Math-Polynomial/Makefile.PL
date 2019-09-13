@@ -1,9 +1,24 @@
-# Copyright (c) 2008-2017 Martin Becker.  All rights reserved.
+# Copyright (c) 2008-2019 Martin Becker.  All rights reserved.
 # This package is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
 use strict;
 use ExtUtils::MakeMaker;
+use File::Spec;
+
+my %versions = map {
+    my $module = $_;
+    my @path   = ('lib', split /::/, "$module.pm");
+    my $file   = join '/', @path;
+    my $osfile = File::Spec->catfile(@path);
+    $module => {
+        file    => $file,
+        version => MM->parse_version($osfile),
+    }
+} qw(
+    Math::Polynomial
+    Math::Polynomial::Generic
+);
 
 WriteMakefile(
     NAME           => 'Math::Polynomial',
@@ -13,7 +28,7 @@ WriteMakefile(
         Carp       => 0,
     },
     ABSTRACT_FROM  => 'lib/Math/Polynomial.pm',
-    AUTHOR         => 'Martin Becker <becker-cpan-mp@cozap.com>',
+    AUTHOR         => 'Martin Becker <becker-cpan-mp (at) cozap.com>',
     $ExtUtils::MakeMaker::VERSION >= 6.18? (
         SIGN       => 1,
     ): (),
@@ -23,6 +38,7 @@ WriteMakefile(
     $ExtUtils::MakeMaker::VERSION >= 6.46? (
         META_MERGE => {
             'meta-spec' => { version => 2 },
+            dynamic_config => 0,
             prereqs => {
                 runtime => {
                     recommends => {
@@ -32,25 +48,21 @@ WriteMakefile(
                     },
                 },
             },
-            provides => {
-                'Math::Polynomial' => {
-                    file    => 'lib/Math/Polynomial.pm',
-                    version => '1.014',
-                },
-                'Math::Polynomial::Generic' => {
-                    file    => 'lib/Math/Polynomial/Generic.pm',
-                    version => '1.014',
-                },
-            },
+            provides => \%versions,
         },
     ): (),
     $ExtUtils::MakeMaker::VERSION >= 6.47? (
         MIN_PERL_VERSION => '5.006',
     ): (),
-    $ExtUtils::MakeMaker::VERSION >= 6.56? (
-        BUILD_REQUIRES => {
-            'Test'                => 0,
+    $ExtUtils::MakeMaker::VERSION >= 6.52? (
+        CONFIGURE_REQUIRES => {
             'ExtUtils::MakeMaker' => 0,
+            'File::Spec'          => 0,
+        },
+    ): (),
+    $ExtUtils::MakeMaker::VERSION >= 6.64? (
+        TEST_REQUIRES => {
+            'Test'                => 0,
         },
     ): (),
 );

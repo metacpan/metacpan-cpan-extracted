@@ -45,6 +45,8 @@ __PACKAGE__->add_columns(
   { data_type => "boolean", default_value => 0, is_nullable => 0 },
   "comment",
   { data_type => "boolean", default_value => 1, is_nullable => 0 },
+  "disabled",
+  { data_type => "boolean", default_value => 0, is_nullable => 0 },
 );
 __PACKAGE__->set_primary_key("id");
 __PACKAGE__->add_unique_constraint("full_name_unique", ["full_name"]);
@@ -73,10 +75,16 @@ __PACKAGE__->has_many(
   { "foreign.updater_id" => "self.id" },
   { cascade_copy => 0, cascade_delete => 0 },
 );
+__PACKAGE__->has_many(
+  "preauth_actions",
+  "Rapi::Blog::DB::Result::PreauthAction",
+  { "foreign.user_id" => "self.id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
 
 
-# Created by DBIx::Class::Schema::Loader v0.07045 @ 2017-06-16 23:59:58
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:CsDZyGJU9o2NZP7vE2Wz9Q
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2018-10-27 23:38:05
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:2klRAJnak1zgM9iKuGRQCQ
 
 use RapidApp::Util ':all';
 

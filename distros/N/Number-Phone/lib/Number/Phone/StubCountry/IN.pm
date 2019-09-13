@@ -22,16 +22,17 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222640;
+our $VERSION = 1.20190912215426;
 
 my $formatters = [
                 {
-                  'leading_digits' => '575',
-                  'intl_format' => 'NA',
                   'format' => '$1',
+                  'intl_format' => 'NA',
+                  'leading_digits' => '575',
                   'pattern' => '(\\d{7})'
                 },
                 {
+                  'format' => '$1',
                   'leading_digits' => '
             5(?:
               0|
@@ -48,20 +49,20 @@ my $formatters = [
               8888
             )
           ',
-                  'pattern' => '(\\d{8})',
-                  'format' => '$1'
+                  'pattern' => '(\\d{8})'
                 },
                 {
-                  'leading_digits' => '1800',
                   'format' => '$1 $2',
+                  'leading_digits' => '1800',
                   'pattern' => '(\\d{4})(\\d{4,5})'
                 },
                 {
-                  'leading_digits' => '140',
                   'format' => '$1 $2 $3',
+                  'leading_digits' => '140',
                   'pattern' => '(\\d{3})(\\d{3})(\\d{4})'
                 },
                 {
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '
             11|
             2[02]|
@@ -83,11 +84,11 @@ my $formatters = [
               6[0-589]
             )
           ',
-                  'format' => '$1 $2 $3',
                   'national_rule' => '0$1',
                   'pattern' => '(\\d{2})(\\d{4})(\\d{4})'
                 },
                 {
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '
             1(?:
               2[0-24]|
@@ -196,10 +197,10 @@ my $formatters = [
             )
           ',
                   'national_rule' => '0$1',
-                  'format' => '$1 $2 $3',
                   'pattern' => '(\\d{3})(\\d{3})(\\d{4})'
                 },
                 {
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '
             1(?:
               [2-479]|
@@ -263,41 +264,409 @@ my $formatters = [
               )
             )[2-7]
           ',
-                  'format' => '$1 $2 $3',
                   'national_rule' => '0$1',
                   'pattern' => '(\\d{4})(\\d{3})(\\d{3})'
                 },
                 {
-                  'pattern' => '(\\d{5})(\\d{5})',
-                  'national_rule' => '0$1',
                   'format' => '$1 $2',
-                  'leading_digits' => '[6-9]'
+                  'leading_digits' => '[6-9]',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{5})(\\d{5})'
                 },
                 {
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '
             1(?:
               6|
               8[06]0
             )
           ',
-                  'pattern' => '(\\d{4})(\\d{2,4})(\\d{4})',
-                  'format' => '$1 $2 $3'
+                  'pattern' => '(\\d{4})(\\d{2,4})(\\d{4})'
                 },
                 {
+                  'format' => '$1 $2 $3 $4',
                   'intl_format' => 'NA',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})(\\d{3})',
-                  'format' => '$1 $2 $3 $4',
-                  'national_rule' => '0$1'
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})(\\d{3})'
                 },
                 {
                   'format' => '$1 $2 $3 $4',
-                  'pattern' => '(\\d{4})(\\d{3})(\\d{3})(\\d{3})',
-                  'leading_digits' => '18'
+                  'leading_digits' => '18',
+                  'pattern' => '(\\d{4})(\\d{3})(\\d{3})(\\d{3})'
                 }
               ];
 
 my $validators = {
-                'pager' => '',
+                'fixed_line' => '
+          782[0-6][2-7]\\d{5}|
+          (?:
+            170[24]|
+            2(?:
+              80[13468]|
+              90\\d
+            )|
+            380\\d|
+            4(?:
+              20[24]|
+              72[2-8]
+            )|
+            552[1-7]
+          )\\d{6}|
+          (?:
+            342|
+            674|
+            788
+          )(?:
+            [0189][2-7]|
+            [2-7]\\d
+          )\\d{5}|
+          (?:
+            11|
+            2[02]|
+            33|
+            4[04]|
+            79|
+            80
+          )[2-7]\\d{7}|
+          (?:
+            1(?:
+              2[0-249]|
+              3[0-25]|
+              4[145]|
+              [59][14]|
+              6[014]|
+              7[1257]|
+              8[01346]
+            )|
+            2(?:
+              1[257]|
+              3[013]|
+              4[01]|
+              5[0137]|
+              6[0158]|
+              78|
+              8[1568]|
+              9[14]
+            )|
+            3(?:
+              26|
+              4[13]|
+              5[34]|
+              6[01489]|
+              7[02-46]|
+              8[159]
+            )|
+            4(?:
+              1[36]|
+              2[1-47]|
+              3[15]|
+              5[12]|
+              6[0-26-9]|
+              7[014-9]|
+              8[013-57]|
+              9[014-7]
+            )|
+            5(?:
+              1[025]|
+              22|
+              [36][25]|
+              4[28]|
+              [578]1|
+              9[15]
+            )|
+            6(?:
+              12|
+              [2-47]1|
+              5[17]|
+              6[13]|
+              80
+            )|
+            7(?:
+              12|
+              2[14]|
+              3[134]|
+              4[47]|
+              5[15]|
+              [67]1
+            )|
+            8(?:
+              16|
+              2[014]|
+              3[126]|
+              6[136]|
+              7[078]|
+              8[34]|
+              91
+            )
+          )[2-7]\\d{6}|
+          (?:
+            1(?:
+              2[35-8]|
+              3[346-9]|
+              4[236-9]|
+              [59][0235-9]|
+              6[235-9]|
+              7[34689]|
+              8[257-9]
+            )|
+            2(?:
+              1[134689]|
+              3[24-8]|
+              4[2-8]|
+              5[25689]|
+              6[2-4679]|
+              7[13-79]|
+              8[2-479]|
+              9[235-9]
+            )|
+            3(?:
+              01|
+              1[79]|
+              2[1-5]|
+              4[5-8]|
+              5[125689]|
+              6[235-7]|
+              7[157-9]|
+              8[2-46-8]
+            )|
+            4(?:
+              1[14578]|
+              2[5689]|
+              3[2-467]|
+              5[4-7]|
+              6[35]|
+              73|
+              8[2689]|
+              9[2389]
+            )|
+            5(?:
+              [16][146-9]|
+              2[14-8]|
+              3[1346]|
+              4[14-69]|
+              5[46]|
+              7[2-4]|
+              8[2-8]|
+              9[246]
+            )|
+            6(?:
+              1[1358]|
+              2[2457]|
+              3[2-4]|
+              4[235-7]|
+              5[2-689]|
+              6[24578]|
+              7[235689]|
+              8[1-6]
+            )|
+            7(?:
+              1[013-9]|
+              2[0235-9]|
+              3[2679]|
+              4[1-35689]|
+              5[2-46-9]|
+              [67][02-9]|
+              8[013-7]|
+              9[0189]
+            )|
+            8(?:
+              1[1357-9]|
+              2[235-8]|
+              3[03-57-9]|
+              4[0-24-9]|
+              5\\d|
+              6[2457-9]|
+              7[1-6]|
+              8[1256]|
+              9[2-4]
+            )
+          )\\d[2-7]\\d{5}
+        ',
+                'geographic' => '
+          782[0-6][2-7]\\d{5}|
+          (?:
+            170[24]|
+            2(?:
+              80[13468]|
+              90\\d
+            )|
+            380\\d|
+            4(?:
+              20[24]|
+              72[2-8]
+            )|
+            552[1-7]
+          )\\d{6}|
+          (?:
+            342|
+            674|
+            788
+          )(?:
+            [0189][2-7]|
+            [2-7]\\d
+          )\\d{5}|
+          (?:
+            11|
+            2[02]|
+            33|
+            4[04]|
+            79|
+            80
+          )[2-7]\\d{7}|
+          (?:
+            1(?:
+              2[0-249]|
+              3[0-25]|
+              4[145]|
+              [59][14]|
+              6[014]|
+              7[1257]|
+              8[01346]
+            )|
+            2(?:
+              1[257]|
+              3[013]|
+              4[01]|
+              5[0137]|
+              6[0158]|
+              78|
+              8[1568]|
+              9[14]
+            )|
+            3(?:
+              26|
+              4[13]|
+              5[34]|
+              6[01489]|
+              7[02-46]|
+              8[159]
+            )|
+            4(?:
+              1[36]|
+              2[1-47]|
+              3[15]|
+              5[12]|
+              6[0-26-9]|
+              7[014-9]|
+              8[013-57]|
+              9[014-7]
+            )|
+            5(?:
+              1[025]|
+              22|
+              [36][25]|
+              4[28]|
+              [578]1|
+              9[15]
+            )|
+            6(?:
+              12|
+              [2-47]1|
+              5[17]|
+              6[13]|
+              80
+            )|
+            7(?:
+              12|
+              2[14]|
+              3[134]|
+              4[47]|
+              5[15]|
+              [67]1
+            )|
+            8(?:
+              16|
+              2[014]|
+              3[126]|
+              6[136]|
+              7[078]|
+              8[34]|
+              91
+            )
+          )[2-7]\\d{6}|
+          (?:
+            1(?:
+              2[35-8]|
+              3[346-9]|
+              4[236-9]|
+              [59][0235-9]|
+              6[235-9]|
+              7[34689]|
+              8[257-9]
+            )|
+            2(?:
+              1[134689]|
+              3[24-8]|
+              4[2-8]|
+              5[25689]|
+              6[2-4679]|
+              7[13-79]|
+              8[2-479]|
+              9[235-9]
+            )|
+            3(?:
+              01|
+              1[79]|
+              2[1-5]|
+              4[5-8]|
+              5[125689]|
+              6[235-7]|
+              7[157-9]|
+              8[2-46-8]
+            )|
+            4(?:
+              1[14578]|
+              2[5689]|
+              3[2-467]|
+              5[4-7]|
+              6[35]|
+              73|
+              8[2689]|
+              9[2389]
+            )|
+            5(?:
+              [16][146-9]|
+              2[14-8]|
+              3[1346]|
+              4[14-69]|
+              5[46]|
+              7[2-4]|
+              8[2-8]|
+              9[246]
+            )|
+            6(?:
+              1[1358]|
+              2[2457]|
+              3[2-4]|
+              4[235-7]|
+              5[2-689]|
+              6[24578]|
+              7[235689]|
+              8[1-6]
+            )|
+            7(?:
+              1[013-9]|
+              2[0235-9]|
+              3[2679]|
+              4[1-35689]|
+              5[2-46-9]|
+              [67][02-9]|
+              8[013-7]|
+              9[0189]
+            )|
+            8(?:
+              1[1357-9]|
+              2[235-8]|
+              3[03-57-9]|
+              4[0-24-9]|
+              5\\d|
+              6[2457-9]|
+              7[1-6]|
+              8[1256]|
+              9[2-4]
+            )
+          )\\d[2-7]\\d{5}
+        ',
                 'mobile' => '
           (?:
             6(?:
@@ -484,6 +853,9 @@ my $validators = {
             9\\d{3}
           )\\d{6}
         ',
+                'pager' => '',
+                'personal_number' => '',
+                'specialrate' => '(1860\\d{7})|(186[12]\\d{9})|(140\\d{7})',
                 'toll_free' => '
           00800\\d{7}|
           1(?:
@@ -494,3035 +866,2663 @@ my $validators = {
             )
           )
         ',
-                'personal_number' => '',
-                'geographic' => '
-          782[0-6][2-7]\\d{5}|
-          (?:
-            170[24]|
-            2(?:
-              80[13468]|
-              90\\d
-            )|
-            380\\d|
-            4(?:
-              20[24]|
-              72[2-8]
-            )|
-            552[1-7]
-          )\\d{6}|
-          (?:
-            342|
-            674|
-            788
-          )(?:
-            [0189][2-7]|
-            [2-7]\\d
-          )\\d{5}|
-          (?:
-            11|
-            2[02]|
-            33|
-            4[04]|
-            79|
-            80
-          )[2-7]\\d{7}|
-          (?:
-            1(?:
-              2[0-249]|
-              3[0-25]|
-              4[145]|
-              [59][14]|
-              6[014]|
-              7[1257]|
-              8[01346]
-            )|
-            2(?:
-              1[257]|
-              3[013]|
-              4[01]|
-              5[0137]|
-              6[0158]|
-              78|
-              8[1568]|
-              9[14]
-            )|
-            3(?:
-              26|
-              4[13]|
-              5[34]|
-              6[01489]|
-              7[02-46]|
-              8[159]
-            )|
-            4(?:
-              1[36]|
-              2[1-47]|
-              3[15]|
-              5[12]|
-              6[0-26-9]|
-              7[014-9]|
-              8[013-57]|
-              9[014-7]
-            )|
-            5(?:
-              1[025]|
-              22|
-              [36][25]|
-              4[28]|
-              [578]1|
-              9[15]
-            )|
-            6(?:
-              12|
-              [2-47]1|
-              5[17]|
-              6[13]|
-              80
-            )|
-            7(?:
-              12|
-              2[14]|
-              3[134]|
-              4[47]|
-              5[15]|
-              [67]1
-            )|
-            8(?:
-              16|
-              2[014]|
-              3[126]|
-              6[136]|
-              7[078]|
-              8[34]|
-              91
-            )
-          )[2-7]\\d{6}|
-          (?:
-            1(?:
-              2[35-8]|
-              3[346-9]|
-              4[236-9]|
-              [59][0235-9]|
-              6[235-9]|
-              7[34689]|
-              8[257-9]
-            )|
-            2(?:
-              1[134689]|
-              3[24-8]|
-              4[2-8]|
-              5[25689]|
-              6[2-4679]|
-              7[13-79]|
-              8[2-479]|
-              9[235-9]
-            )|
-            3(?:
-              01|
-              1[79]|
-              2[1-5]|
-              4[5-8]|
-              5[125689]|
-              6[235-7]|
-              7[157-9]|
-              8[2-46-8]
-            )|
-            4(?:
-              1[14578]|
-              2[5689]|
-              3[2-467]|
-              5[4-7]|
-              6[35]|
-              73|
-              8[2689]|
-              9[2389]
-            )|
-            5(?:
-              [16][146-9]|
-              2[14-8]|
-              3[1346]|
-              4[14-69]|
-              5[46]|
-              7[2-4]|
-              8[2-8]|
-              9[246]
-            )|
-            6(?:
-              1[1358]|
-              2[2457]|
-              3[2-4]|
-              4[235-7]|
-              5[2-689]|
-              6[24578]|
-              7[235689]|
-              8[1-6]
-            )|
-            7(?:
-              1[013-9]|
-              2[0235-9]|
-              3[2679]|
-              4[1-35689]|
-              5[2-46-9]|
-              [67][02-9]|
-              8[013-7]|
-              9[0189]
-            )|
-            8(?:
-              1[1357-9]|
-              2[235-8]|
-              3[03-57-9]|
-              4[0-24-9]|
-              5\\d|
-              6[2457-9]|
-              7[1-6]|
-              8[1256]|
-              9[2-4]
-            )
-          )\\d[2-7]\\d{5}
-        ',
-                'specialrate' => '(1860\\d{7})|(186[12]\\d{9})|(140\\d{7})',
-                'fixed_line' => '
-          782[0-6][2-7]\\d{5}|
-          (?:
-            170[24]|
-            2(?:
-              80[13468]|
-              90\\d
-            )|
-            380\\d|
-            4(?:
-              20[24]|
-              72[2-8]
-            )|
-            552[1-7]
-          )\\d{6}|
-          (?:
-            342|
-            674|
-            788
-          )(?:
-            [0189][2-7]|
-            [2-7]\\d
-          )\\d{5}|
-          (?:
-            11|
-            2[02]|
-            33|
-            4[04]|
-            79|
-            80
-          )[2-7]\\d{7}|
-          (?:
-            1(?:
-              2[0-249]|
-              3[0-25]|
-              4[145]|
-              [59][14]|
-              6[014]|
-              7[1257]|
-              8[01346]
-            )|
-            2(?:
-              1[257]|
-              3[013]|
-              4[01]|
-              5[0137]|
-              6[0158]|
-              78|
-              8[1568]|
-              9[14]
-            )|
-            3(?:
-              26|
-              4[13]|
-              5[34]|
-              6[01489]|
-              7[02-46]|
-              8[159]
-            )|
-            4(?:
-              1[36]|
-              2[1-47]|
-              3[15]|
-              5[12]|
-              6[0-26-9]|
-              7[014-9]|
-              8[013-57]|
-              9[014-7]
-            )|
-            5(?:
-              1[025]|
-              22|
-              [36][25]|
-              4[28]|
-              [578]1|
-              9[15]
-            )|
-            6(?:
-              12|
-              [2-47]1|
-              5[17]|
-              6[13]|
-              80
-            )|
-            7(?:
-              12|
-              2[14]|
-              3[134]|
-              4[47]|
-              5[15]|
-              [67]1
-            )|
-            8(?:
-              16|
-              2[014]|
-              3[126]|
-              6[136]|
-              7[078]|
-              8[34]|
-              91
-            )
-          )[2-7]\\d{6}|
-          (?:
-            1(?:
-              2[35-8]|
-              3[346-9]|
-              4[236-9]|
-              [59][0235-9]|
-              6[235-9]|
-              7[34689]|
-              8[257-9]
-            )|
-            2(?:
-              1[134689]|
-              3[24-8]|
-              4[2-8]|
-              5[25689]|
-              6[2-4679]|
-              7[13-79]|
-              8[2-479]|
-              9[235-9]
-            )|
-            3(?:
-              01|
-              1[79]|
-              2[1-5]|
-              4[5-8]|
-              5[125689]|
-              6[235-7]|
-              7[157-9]|
-              8[2-46-8]
-            )|
-            4(?:
-              1[14578]|
-              2[5689]|
-              3[2-467]|
-              5[4-7]|
-              6[35]|
-              73|
-              8[2689]|
-              9[2389]
-            )|
-            5(?:
-              [16][146-9]|
-              2[14-8]|
-              3[1346]|
-              4[14-69]|
-              5[46]|
-              7[2-4]|
-              8[2-8]|
-              9[246]
-            )|
-            6(?:
-              1[1358]|
-              2[2457]|
-              3[2-4]|
-              4[235-7]|
-              5[2-689]|
-              6[24578]|
-              7[235689]|
-              8[1-6]
-            )|
-            7(?:
-              1[013-9]|
-              2[0235-9]|
-              3[2679]|
-              4[1-35689]|
-              5[2-46-9]|
-              [67][02-9]|
-              8[013-7]|
-              9[0189]
-            )|
-            8(?:
-              1[1357-9]|
-              2[235-8]|
-              3[03-57-9]|
-              4[0-24-9]|
-              5\\d|
-              6[2457-9]|
-              7[1-6]|
-              8[1256]|
-              9[2-4]
-            )
-          )\\d[2-7]\\d{5}
-        ',
                 'voip' => ''
               };
-my %areanames = (
-  9111 => "New\ Delhi",
-  91120 => "Ghaziabad\/Dadri\,\ Uttar\ Pradesh",
-  91121 => "Meerut\,\ Uttar\ Pradesh",
-  91122 => "Hapur\,\ Uttar\ Pradesh",
-  911232 => "Modinagar\,\ Uttar\ Pradesh",
-  911233 => "Mawana\,\ Uttar\ Pradesh",
-  911234 => "Baghpat\/Baraut\,\ Uttar\ Pradesh",
-  911237 => "Sardhana\,\ Uttar\ Pradesh",
-  91124 => "Gurgaon\,\ Haryana",
-  911250 => "Charkhidadri\,\ Haryana",
-  911251 => "Jhajjar\,\ Haryana",
-  911252 => "Loharu\,\ Haryana",
-  911253 => "Tohsham\,\ Haryana",
-  911254 => "Bawanikhera\,\ Haryana",
-  911255 => "Siwani\,\ Haryana",
-  911257 => "Meham\,\ Haryana",
-  911258 => "Kalanaur\,\ Haryana",
-  911259 => "Kosli\,\ Haryana",
-  911262 => "Rohtak\,\ Haryana",
-  911263 => "Gohana\,\ Haryana",
-  911267 => "Nuh\,\ Haryana",
-  911268 => "Ferojpur\,\ Haryana",
-  911274 => "Rewari\,\ Haryana",
-  911275 => "Palwal\,\ Haryana",
-  911276 => "Bahadurgarh\,\ Haryana",
-  911281 => "Jatusana\,\ Haryana",
-  911282 => "Narnaul\,\ Haryana",
-  911284 => "Bawal\,\ Haryana",
-  911285 => "Mohindergarh\,\ Haryana",
-  91129 => "Faridabad\,\ Haryana",
-  91130 => "Sonipat\,\ Haryana",
-  91131 => "Muzaffarnagar\,\ Uttar\ Pradesh",
-  91132 => "Saharanpur\,\ Uttar\ Pradesh",
-  911331 => "Nakur\/Gangoh\,\ Uttar\ Pradesh",
-  911332 => "Roorkee\,\ Uttarakhand",
-  911334 => "Roorkee\/Haridwar\,\ Uttarakhand",
-  911336 => "Deoband\,\ Uttar\ Pradesh",
-  911341 => "Najibabad\,\ Uttar\ Pradesh",
-  911342 => "Bijnor\,\ Uttar\ Pradesh",
-  911343 => "Nagina\,\ Uttar\ Pradesh",
-  911344 => "Dhampur\,\ Uttar\ Pradesh",
-  911345 => "Bijnor\/Chandpur\,\ Uttar\ Pradesh",
-  911346 => "Pauri\/Bubakhal\,\ Uttarakhand",
-  911348 => "Lansdowne\/Syunsi\,\ Uttarakhand",
-  91135 => "Dehradun\,\ Uttarakhand",
-  911360 => "Dehradun\ Chakrata\/Dakpattar\,\ Uttarakhand",
-  911363 => "Karnaprayag\,\ Uttarakhand",
-  911364 => "Ukhimath\/Guptkashi\,\ Uttarakhand",
-  911368 => "Pauri\,\ Uttarakhand",
-  911370 => "Devprayag\/Jakholi\,\ Uttarakhand",
-  911371 => "Dunda\,\ Uttarakhand",
-  911372 => "Chamoli\,\ Uttarakhand",
-  911373 => "Purola\,\ Uttarakhand",
-  911374 => "Bhatwari\/Uttarkashi\,\ Uttarakhand",
-  911375 => "Rajgarhi\,\ Uttarakhand",
-  911376 => "Tehri\,\ Uttarakhand",
-  911377 => "Bhatwari\/Gangotri\,\ Uttarakhand",
-  911378 => "Devprayag\,\ Uttarakhand",
-  911379 => "Pratapnagar\,\ Uttarakhand",
-  911381 => "Joshimath\/Badrinath\,\ Uttarakhand",
-  911382 => "Lansdowne\/Kotdwara\,\ Uttarakhand",
-  911386 => "Lansdowne\,\ Uttarakhand",
-  911389 => "Joshimath\,\ Uttarakhand",
-  911392 => "Budhana\,\ Uttar\ Pradesh",
-  911396 => "Jansath\/Khatauli\,\ Uttar\ Pradesh",
-  911398 => "Kairana\/Shamli\,\ Uttar\ Pradesh",
-  91141 => "Jaipur\,\ Rajasthan",
-  911420 => "Baswa\/Bandikui\,\ Rajasthan",
-  911421 => "Kotputli\,\ Rajasthan",
-  911422 => "Viratnagar\/Shahpura\,\ Rajasthan",
-  911423 => "Amber\/Chomu\,\ Rajasthan",
-  911424 => "Phulera\/Renwal\,\ Rajasthan",
-  911425 => "Phulera\/Sambhar\,\ Rajasthan",
-  911426 => "Jamwa\ Ramgarh\/Achrol\,\ Rajasthan",
-  911427 => "Dausa\,\ Rajasthan",
-  911428 => "Dudu\,\ Rajasthan",
-  911429 => "Bassi\,\ Rajasthan",
-  911430 => "Phagi\,\ Rajasthan",
-  911431 => "Lalsot\,\ Rajasthan",
-  911432 => "Tonk\,\ Rajasthan",
-  911433 => "Todaraisingh\,\ Rajasthan",
-  911434 => "Deoli\,\ Rajasthan",
-  911435 => "Tonk\/Piploo\,\ Rajasthan",
-  911436 => "Uniayara\,\ Rajasthan",
-  911437 => "Malpura\,\ Rajasthan",
-  911438 => "Newai\,\ Rajasthan",
-  91144 => "Alwar\,\ Rajasthan",
-  91145 => "Ajmer\,\ Rajasthan",
-  911460 => "Kishangarhbas\/Khairthal\,\ Rajasthan",
-  911461 => "Bansur\,\ Rajasthan",
-  911462 => "Beawar\,\ Rajasthan",
-  911463 => "Kishangarh\,\ Rajasthan",
-  911464 => "Rajgarh\,\ Rajasthan",
-  911465 => "Thanaghazi\,\ Rajasthan",
-  911466 => "Kekri\,\ Rajasthan",
-  911467 => "Kekri\,\ Rajasthan",
-  911468 => "Ramgarh\,\ Rajasthan",
-  911469 => "Tijara\,\ Rajasthan",
-  911470 => "Dungla\,\ Rajasthan",
-  911471 => "Rashmi\,\ Rajasthan",
-  911472 => "Chittorgarh\,\ Rajasthan",
-  911473 => "Barisadri\,\ Rajasthan",
-  911474 => "Begun\,\ Rajasthan",
-  911475 => "Begun\/Rawatbhata\,\ Rajasthan",
-  911476 => "Kapasan\,\ Rajasthan",
-  911477 => "Nimbahera\,\ Rajasthan",
-  911478 => "Pratapgarh\,\ Rajasthan",
-  911479 => "Pratapgarh\/Arnod\,\ Rajasthan",
-  911480 => "Asind\,\ Rajasthan",
-  911481 => "Raipur\,\ Rajasthan",
-  911482 => "Bhilwara\,\ Rajasthan",
-  911483 => "Hurda\/Gulabpura\,\ Rajasthan",
-  911484 => "Shahapura\,\ Rajasthan",
-  911485 => "Jahazpur\,\ Rajasthan",
-  911486 => "Mandal\,\ Rajasthan",
-  911487 => "Banera\,\ Rajasthan",
-  911488 => "Kotri\,\ Rajasthan",
-  911489 => "Mandalgarh\,\ Rajasthan",
-  911491 => "Nasirabad\,\ Rajasthan",
-  911492 => "Laxmangarh\/Kherli\,\ Rajasthan",
-  911493 => "Tijara\,\ Rajasthan",
-  911494 => "Behror\,\ Rajasthan",
-  911495 => "Mandawar\,\ Rajasthan",
-  911496 => "Sarwar\,\ Rajasthan",
-  911497 => "Kishangarh\,\ Rajasthan",
-  911498 => "Anupgarh\,\ Rajasthan",
-  911499 => "Sangaria\,\ Rajasthan",
-  911501 => "Srikaranpur\,\ Rajasthan",
-  911502 => "Nohar\/Jedasar\,\ Rajasthan",
-  911503 => "Sadulshahar\,\ Rajasthan",
-  911504 => "Bhadra\,\ Rajasthan",
-  911505 => "Padampur\,\ Rajasthan",
-  911506 => "Anupgarh\/Gharsana\,\ Rajasthan",
-  911507 => "Raisinghnagar\,\ Rajasthan",
-  911508 => "Suratgarh\/Goluwala\,\ Rajasthan",
-  911509 => "Suratgarh\,\ Rajasthan",
-  91151 => "Bikaner\,\ Rajasthan",
-  911520 => "Bikaner\/Chhatargarh\,\ Rajasthan",
-  911521 => "Bikaner\/Jaimalsar\,\ Rajasthan",
-  911522 => "Bikaner\/Jamsar\,\ Rajasthan",
-  911523 => "Bikaner\/Poogal\,\ Rajasthan",
-  911526 => "Lunkaransar\/Mahajan\,\ Rajasthan",
-  911527 => "Lunkaransar\/Rajasarb\,\ Rajasthan",
-  911528 => "Lunkaransar\,\ Rajasthan",
-  911529 => "Lunkaransar\/Kanholi\,\ Rajasthan",
-  911531 => "Nokha\,\ Rajasthan",
-  911532 => "Nokha\/Nathusar\,\ Rajasthan",
-  911533 => "Kolayat\/Goddo\,\ Rajasthan",
-  911534 => "Kolayat\,\ Rajasthan",
-  911535 => "Kolayat\/Bajju\,\ Rajasthan",
-  911536 => "Kolayat\/Daitra\,\ Rajasthan",
-  911537 => "Nohar\/Rawatsar\,\ Rajasthan",
-  911539 => "Tibbi\,\ Rajasthan",
-  91154 => "Sriganganagar\,\ Rajasthan",
-  911552 => "Hanumangarh\,\ Rajasthan",
-  911555 => "Nohar\,\ Rajasthan",
-  911559 => "Rajgarh\,\ Rajasthan",
-  911560 => "Sujangarh\/Bidasar\,\ Rajasthan",
-  911561 => "Taranagar\,\ Rajasthan",
-  911562 => "Churu\,\ Rajasthan",
-  911563 => "Sardarshahar\/Jaitsisar\,\ Rajasthan",
-  911564 => "Sardarshahar\,\ Rajasthan",
-  911565 => "Sri\ Dungargarh\,\ Rajasthan",
-  911566 => "Sri\ Dungargarh\/Sudsar\,\ Rajasthan",
-  911567 => "Ratangarh\,\ Rajasthan",
-  911568 => "Sujangarh\,\ Rajasthan",
-  911569 => "Sujangarh\/Lalgarh\,\ Rajasthan",
-  911570 => "Laxmangarh\/Nechwa\,\ Rajasthan",
-  911571 => "Fatehpur\,\ Rajasthan",
-  911572 => "Sikar\,\ Rajasthan",
-  911573 => "Laxmangarh\,\ Rajasthan",
-  911574 => "Neem\ Ka\ Thana\,\ Rajasthan",
-  911575 => "Srimadhopur\,\ Rajasthan",
-  911576 => "Dantaramgarh\/Shyamji\,\ Rajasthan",
-  911577 => "Dantaramgarh\,\ Rajasthan",
-  911580 => "Deedwana\,\ Rajasthan",
-  911581 => "Ladnun\,\ Rajasthan",
-  911582 => "Nagaur\,\ Rajasthan",
-  911583 => "Jayal\,\ Rajasthan",
-  911584 => "Nagaur\/Mundwa\ Marwar\,\ Rajasthan",
-  911585 => "Nagaur\/Khinwsar\,\ Rajasthan",
-  911586 => "Nawa\/Kuchamancity\,\ Rajasthan",
-  911587 => "Degana\,\ Rajasthan",
-  911588 => "Parbatsar\/Makrana\,\ Rajasthan",
-  911589 => "Parbatsar\,\ Rajasthan",
-  911590 => "Merta\,\ Rajasthan",
-  911591 => "Merta\/Gotan\,\ Rajasthan",
-  911592 => "Jhunjhunu\,\ Rajasthan",
-  911593 => "Khetri\,\ Rajasthan",
-  911594 => "Udaipurwati\,\ Rajasthan",
-  911595 => "Jhunjhunu\/Bissau\,\ Rajasthan",
-  911596 => "Chirawa\,\ Rajasthan",
-  911602 => "Kharar\,\ Punjab",
-  911603 => "Kharar\,\ Punjab",
-  911604 => "Kharar\,\ Punjab",
-  911605 => "Kharar\,\ Punjab",
-  911606 => "Kharar\,\ Punjab",
-  911607 => "Kharar\,\ Punjab",
-  91161 => "Ludhiana\,\ Punjab",
-  911624 => "Jagraon\,\ Punjab",
-  911628 => "Samrala\,\ Punjab",
-  911632 => "Ferozepur\,\ Punjab",
-  911633 => "Muktasar\,\ Punjab",
-  911634 => "Abohar\,\ Punjab",
-  911635 => "Kotkapura\,\ Punjab",
-  911636 => "Moga\,\ Punjab",
-  911637 => "Malaut\,\ Punjab",
-  911638 => "Fazilka\,\ Punjab",
-  911639 => "Faridakot\,\ Punjab",
-  91164 => "Bhatinda\,\ Punjab",
-  911651 => "Phulmandi\,\ Punjab",
-  911652 => "Mansa\,\ Punjab",
-  911655 => "Raman\,\ Punjab",
-  911659 => "Sardulgarh\,\ Punjab",
-  911662 => "Hissar\,\ Haryana",
-  911663 => "Hansi\,\ Haryana",
-  911664 => "Bhiwani\,\ Haryana",
-  911666 => "Sirsa\,\ Haryana",
-  911667 => "Fatehabad\,\ Haryana",
-  911668 => "Dabwali\,\ Haryana",
-  911669 => "Adampur\ Mandi\,\ Haryana",
-  911672 => "Sangrur\,\ Punjab",
-  911675 => "Malerkotla\,\ Punjab",
-  911676 => "Sunam\,\ Punjab",
-  911679 => "Barnala\,\ Punjab",
-  911681 => "Jind\,\ Haryana",
-  911682 => "Zira\,\ Punjab",
-  911683 => "Julana\,\ Haryana",
-  911684 => "Narwana\,\ Haryana",
-  911685 => "Guruharsahai\,\ Punjab",
-  911686 => "Safidon\,\ Haryana",
-  911692 => "Tohana\,\ Haryana",
-  911693 => "Barwala\,\ Haryana",
-  911696 => "Kalanwali\,\ Haryana",
-  911697 => "Ratia\,\ Haryana",
-  911698 => "Ellenabad\,\ Haryana",
-  911702 => "Nahan\,\ Himachal\ Pradesh",
-  911704 => "Paonta\,\ Himachal\ Pradesh",
-  91171 => "Ambala\,\ Haryana",
-  91172 => "Chandigarh\,\ Punjab",
-  911731 => "Barara\,\ Haryana",
-  911732 => "Jagadhari\,\ Haryana",
-  911733 => "Kalka\,\ Haryana",
-  911734 => "Naraingarh\,\ Haryana",
-  911735 => "Chaaharauli\,\ Haryana",
-  911741 => "Pehowa\,\ Haryana",
-  911743 => "Cheeka\,\ Haryana",
-  911744 => "Kurukshetra\,\ Haryana",
-  911745 => "Nilokheri\,\ Haryana",
-  911746 => "Kaithal\,\ Haryana",
-  911748 => "Gharaunda\,\ Haryana",
-  911749 => "Assandh\,\ Haryana",
-  91175 => "Patiala\,\ Punjab",
-  911762 => "Rajpura\,\ Punjab",
-  911763 => "Sarhind\,\ Punjab",
-  911764 => "Samana\,\ Punjab",
-  911765 => "Nabha\,\ Punjab",
-  91177 => "Shimla\,\ Himachal\ Pradesh",
-  911781 => "Rohru\,\ Himachal\ Pradesh",
-  911782 => "Rampur\ Bushahar\,\ Himachal\ Pradesh",
-  911783 => "Theog\,\ Himachal\ Pradesh",
-  911785 => "Pooh\,\ Himachal\ Pradesh",
-  911786 => "Kalpa\,\ Himachal\ Pradesh",
-  911792 => "Solan\,\ Himachal\ Pradesh",
-  911795 => "Nalagarh\,\ Himachal\ Pradesh",
-  911796 => "Arki\,\ Himachal\ Pradesh",
-  911799 => "Rajgarh\,\ Himachal\ Pradesh",
-  911802 => "Panipat\,\ Haryana",
-  911803 => "Panipat\,\ Haryana",
-  911804 => "Panipat\,\ Haryana",
-  911805 => "Panipat\,\ Haryana",
-  911806 => "Panipat\,\ Haryana",
-  911807 => "Panipat\,\ Haryana",
-  91181 => "Jallandhar\,\ Punjab",
-  911821 => "Nakodar\,\ Punjab",
-  911822 => "Kapurthala\,\ Punjab",
-  911823 => "Nawanshahar\,\ Punjab",
-  911824 => "Phagwara\,\ Punjab",
-  911826 => "Phillaur\,\ Punjab",
-  911828 => "Sultanpur\ Lodhi\,\ Punjab",
-  91183 => "Amritsar\,\ Punjab",
-  91184 => "Karnal\,\ Haryana",
-  911851 => "Patti\,\ Punjab",
-  911852 => "Taran\,\ Punjab",
-  911853 => "Rayya\,\ Punjab",
-  911858 => "Ajnala\,\ Punjab",
-  911859 => "Goindwal\,\ Punjab",
-  91186 => "Pathankot\,\ Punjab",
-  911870 => "Jugial\,\ Punjab",
-  911871 => "Batala\,\ Punjab",
-  911872 => "Quadian\,\ Punjab",
-  911874 => "Gurdaspur\,\ Punjab",
-  911875 => "Dinanagar\,\ Punjab",
-  911881 => "Ropar\,\ Punjab",
-  911882 => "Hoshiarpur\,\ Punjab",
-  911883 => "Dasua\,\ Punjab",
-  911884 => "Garhashanker\,\ Punjab",
-  911885 => "Balachaur\,\ Punjab",
-  911886 => "Tanda\ Urmar\,\ Punjab",
-  911887 => "Nangal\,\ Punjab",
-  911892 => "Kangra\/Dharamsala\,\ Himachal\ Pradesh",
-  911893 => "Nurpur\,\ Himachal\ Pradesh",
-  911894 => "Palampur\,\ Himachal\ Pradesh",
-  911895 => "Bharmour\,\ Himachal\ Pradesh",
-  911896 => "Churah\/Tissa\,\ Himachal\ Pradesh",
-  911897 => "Pangi\/Killar\,\ Himachal\ Pradesh",
-  911899 => "Chamba\,\ Himachal\ Pradesh",
-  911900 => "Lahul\/Keylong\,\ Himachal\ Pradesh",
-  911902 => "Kullu\,\ Himachal\ Pradesh",
-  911903 => "Banjar\,\ Himachal\ Pradesh",
-  911904 => "Nirmand\,\ Himachal\ Pradesh",
-  911905 => "Mandi\,\ Himachal\ Pradesh",
-  911906 => "Spiti\/Kaza\,\ Himachal\ Pradesh",
-  911907 => "Sundernagar\,\ Himachal\ Pradesh",
-  911908 => "Jogindernagar\,\ Himachal\ Pradesh",
-  911909 => "Udaipur\,\ Himachal\ Pradesh",
-  91191 => "Jammu\,\ Jammu\ And\ Kashmir",
-  911921 => "Basholi\,\ Jammu\ And\ Kashmir",
-  911922 => "Kathua\,\ Jammu\ And\ Kashmir",
-  911923 => "Samba\,\ Jammu\ And\ Kashmir",
-  911924 => "Akhnoor\,\ Jammu\ And\ Kashmir",
-  911931 => "Kulgam\,\ Jammu\ And\ Kashmir",
-  911932 => "Anantnag\,\ Jammu\ And\ Kashmir",
-  911933 => "Pulwama\,\ Jammu\ And\ Kashmir",
-  911936 => "Pahalgam\,\ Jammu\ And\ Kashmir",
-  91194 => "Srinagar\,\ Jammu\ And\ Kashmir",
-  911951 => "Badgam\,\ Jammu\ And\ Kashmir",
-  911952 => "Baramulla\,\ Jammu\ And\ Kashmir",
-  911954 => "Sopore\,\ Jammu\ And\ Kashmir",
-  911955 => "Kupwara\,\ Jammu\ And\ Kashmir",
-  911956 => "Uri\,\ Jammu\ And\ Kashmir",
-  911957 => "Bandipur\,\ Jammu\ And\ Kashmir",
-  911958 => "Karnah\,\ Jammu\ And\ Kashmir",
-  911960 => "Nowshera\,\ Jammu\ And\ Kashmir",
-  911962 => "Rajouri\,\ Jammu\ And\ Kashmir",
-  911964 => "Kalakot\,\ Jammu\ And\ Kashmir",
-  911965 => "Poonch\,\ Jammu\ And\ Kashmir",
-  911970 => "Dehra\ Gopipur\,\ Himachal\ Pradesh",
-  911972 => "Hamirpur\,\ Himachal\ Pradesh",
-  911975 => "Una\,\ Himachal\ Pradesh",
-  911976 => "Amb\,\ Himachal\ Pradesh",
-  911978 => "Bilaspur\,\ Himachal\ Pradesh",
-  911980 => "Nobra\,\ Jammu\ And\ Kashmir",
-  911981 => "Nyoma\,\ Jammu\ And\ Kashmir",
-  911982 => "Leh\,\ Jammu\ And\ Kashmir",
-  911983 => "Zanaskar\,\ Jammu\ And\ Kashmir",
-  911985 => "Kargil\,\ Jammu\ And\ Kashmir",
-  911990 => "Ramnagar\,\ Jammu\ And\ Kashmir",
-  911991 => "Reasi\,\ Jammu\ And\ Kashmir",
-  911992 => "Udhampur\,\ Jammu\ And\ Kashmir",
-  911995 => "Kishtwar\,\ Jammu\ And\ Kashmir",
-  911996 => "Doda\,\ Jammu\ And\ Kashmir",
-  911997 => "Bedarwah\,\ Jammu\ And\ Kashmir",
-  911998 => "Ramban\,\ Jammu\ And\ Kashmir",
-  911999 => "Mahore\,\ Jammu\ And\ Kashmir",
-  9120 => "Pune\,\ Maharashtra",
-  912111 => "Indapur\,\ Maharashtra",
-  912112 => "Baramati\,\ Maharashtra",
-  912113 => "Bhor\,\ Maharashtra",
-  912114 => "Lonavala\,\ Maharashtra",
-  912115 => "Saswad\,\ Maharashtra",
-  912117 => "Daund\,\ Maharashtra",
-  912118 => "Walchandnagar\,\ Maharashtra",
-  912119 => "Kedgaon\,\ Maharashtra",
-  91212 => "Chinchwad\,\ Maharashtra",
-  912130 => "Velhe\,\ Maharashtra",
-  912132 => "Junnar\,\ Maharashtra",
-  912133 => "Manchar\,\ Maharashtra",
-  912135 => "Rajgurunagar\,\ Maharashtra",
-  912136 => "Urlikanchan\,\ Maharashtra",
-  912137 => "Nahavara\,\ Maharashtra",
-  912138 => "Shirur\,\ Maharashtra",
-  912139 => "Pirangut\,\ Maharashtra",
-  912140 => "Mangaon\,\ Maharashtra",
-  912141 => "Alibagh\,\ Maharashtra",
-  912142 => "Pali\,\ Maharashtra",
-  912143 => "Pen\,\ Maharashtra",
-  912144 => "Murud\,\ Maharashtra",
-  912145 => "Mahad\,\ Maharashtra",
-  912147 => "Shrivardhan\,\ Maharashtra",
-  912148 => "Karjat\,\ Maharashtra",
-  912149 => "Mahasala\,\ Maharashtra",
-  91215 => "Navi\ Mumbai\/Turbhe\,\ Maharashtra",
-  912160 => "Sakarwadi\,\ Maharashtra",
-  912161 => "Vaduj\,\ Maharashtra",
-  912162 => "Satara\,\ Maharashtra",
-  912163 => "Koregaon\,\ Maharashtra",
-  912164 => "Karad\,\ Maharashtra",
-  912165 => "Dhiwadi\,\ Maharashtra",
-  912166 => "Phaltan\,\ Maharashtra",
-  912167 => "Wai\,\ Maharashtra",
-  912168 => "Mahabaleswar\,\ Maharashtra",
-  912169 => "Shirwal\,\ Maharashtra",
-  91217 => "Sholapur\,\ Maharashtra",
-  912181 => "Akkalkot\,\ Maharashtra",
-  912182 => "Karmala\,\ Maharashtra",
-  912183 => "Madha\,\ Maharashtra",
-  912184 => "Barsi\,\ Maharashtra",
-  912185 => "Malsuras\,\ Maharashtra",
-  912186 => "Pandharpur\,\ Maharashtra",
-  912187 => "Sangola\,\ Maharashtra",
-  912188 => "Mangalwedha\,\ Maharashtra",
-  912189 => "Mohol\,\ Maharashtra",
-  912191 => "Poladpur\,\ Maharashtra",
-  912192 => "Khopoli\,\ Maharashtra",
-  912194 => "Roha\,\ Maharashtra",
-  9122 => "Mumbai",
-  91230 => "Khadakwasala\,\ Maharashtra",
-  91231 => "Kolhapur\,\ Maharashtra",
-  912320 => "Chandgad\,\ Maharashtra",
-  912321 => "Radhanagar\,\ Maharashtra",
-  912322 => "Shirol\/Jalsingpur\,\ Maharashtra",
-  912323 => "Ajara\,\ Maharashtra",
-  912324 => "Hatkangale\/Ichalkaranji\,\ Maharashtra",
-  912325 => "Kagal\/Murgud\,\ Maharashtra",
-  912326 => "Gaganbavada\,\ Maharashtra",
-  912327 => "Gadhinglaj\,\ Maharashtra",
-  912328 => "Panhala\,\ Maharashtra",
-  912329 => "Shahuwadi\/Malakapur\,\ Maharashtra",
-  91233 => "Sangli\,\ Maharashtra",
-  912341 => "Kavathemankal\,\ Maharashtra",
-  912342 => "Islampur\,\ Maharashtra",
-  912343 => "Atpadi\,\ Maharashtra",
-  912344 => "Jath\,\ Maharashtra",
-  912345 => "Shirala\,\ Maharashtra",
-  912346 => "Tasgaon\,\ Maharashtra",
-  912347 => "Vita\,\ Maharashtra",
-  912350 => "Madangad\,\ Maharashtra",
-  912351 => "Langa\,\ Maharashtra",
-  912352 => "Ratnagiri\,\ Maharashtra",
-  912353 => "Rajapur\,\ Maharashtra",
-  912354 => "Sanganeshwar\/Deorukh\,\ Maharashtra",
-  912355 => "Chiplun\,\ Maharashtra",
-  912356 => "Khed\,\ Maharashtra",
-  912357 => "Malgund\,\ Maharashtra",
-  912358 => "Dapoli\,\ Maharashtra",
-  912359 => "Guhagar\,\ Maharashtra",
-  912362 => "Kudal\,\ Maharashtra",
-  912363 => "Sawantwadi\,\ Maharashtra",
-  912364 => "Deogad\,\ Maharashtra",
-  912365 => "Malwan\,\ Maharashtra",
-  912366 => "Vengurla\,\ Maharashtra",
-  912367 => "Kankavali\,\ Maharashtra",
-  912371 => "Wathar\,\ Maharashtra",
-  912372 => "Patan\,\ Maharashtra",
-  912373 => "Mahaswad\,\ Maharashtra",
-  912375 => "Pusegaon\,\ Maharashtra",
-  912378 => "Medha\,\ Maharashtra",
-  912381 => "Ahmedpur\,\ Maharashtra",
-  912382 => "Latur\,\ Maharashtra",
-  912383 => "Ausa\,\ Maharashtra",
-  912384 => "Nilanga\,\ Maharashtra",
-  912385 => "Udgir\,\ Maharashtra",
-  91241 => "Ahmednagar\,\ Maharashtra",
-  912421 => "Jamkhed\,\ Maharashtra",
-  912422 => "Shri\ Rampur\,\ Maharashtra",
-  912423 => "Koparagon\,\ Maharashtra",
-  912424 => "Akole\,\ Maharashtra",
-  912425 => "Sangamner\,\ Maharashtra",
-  912426 => "Rahuri\,\ Maharashtra",
-  912427 => "Newasa\,\ Maharashtra",
-  912428 => "Pathardi\,\ Maharashtra",
-  912429 => "Shevgaon\,\ Maharashtra",
-  912430 => "Sillod\,\ Maharashtra",
-  912431 => "Paithan\,\ Maharashtra",
-  912432 => "Aurangabad\,\ Maharashtra",
-  912433 => "Gangapur\,\ Maharashtra",
-  912435 => "Kannad\,\ Maharashtra",
-  912436 => "Vijapur\,\ Maharashtra",
-  912437 => "Khultabad\,\ Maharashtra",
-  912438 => "Soyegaon\,\ Maharashtra",
-  912439 => "Golegaon\,\ Maharashtra",
-  912441 => "Ashti\,\ Maharashtra",
-  912442 => "Bhir\,\ Maharashtra",
-  912443 => "Manjalegaon\,\ Maharashtra",
-  912444 => "Patoda\,\ Maharashtra",
-  912445 => "Kaij\,\ Maharashtra",
-  912446 => "Ambejogai\,\ Maharashtra",
-  912447 => "Gevrai\,\ Maharashtra",
-  912451 => "Pathari\,\ Maharashtra",
-  912452 => "Parbhani\,\ Maharashtra",
-  912453 => "Gangakhed\,\ Maharashtra",
-  912454 => "Basmatnagar\,\ Maharashtra",
-  912455 => "Kalamnuri\,\ Maharashtra",
-  912456 => "Hingoli\,\ Maharashtra",
-  912457 => "Jintdor\,\ Maharashtra",
-  912460 => "Delhi\ Tanda\,\ Maharashtra",
-  912461 => "Mukhed\,\ Maharashtra",
-  912462 => "Nanded\,\ Maharashtra",
-  912463 => "Degloor\,\ Maharashtra",
-  912465 => "Billoli\,\ Maharashtra",
-  912466 => "Kandhar\,\ Maharashtra",
-  912467 => "Bhokar\,\ Maharashtra",
-  912468 => "Hadgaon\,\ Maharashtra",
-  912469 => "Kinwat\,\ Maharashtra",
-  912471 => "Tuljapur\,\ Maharashtra",
-  912472 => "Osmanabad\,\ Maharashtra",
-  912473 => "Kallam\,\ Maharashtra",
-  912475 => "Omerga\,\ Maharashtra",
-  912477 => "Paranda\,\ Maharashtra",
-  912478 => "Bhoom\,\ Maharashtra",
-  912481 => "Ner\,\ Maharashtra",
-  912482 => "Jalna\,\ Maharashtra",
-  912483 => "Ambad\,\ Maharashtra",
-  912484 => "Partur\,\ Maharashtra",
-  912485 => "Bhokardan\,\ Maharashtra",
-  912487 => "Shrigonda\,\ Maharashtra",
-  912488 => "Parner\,\ Maharashtra",
-  912489 => "Karjat\,\ Maharashtra",
-  91250 => "Bassein\,\ Maharashtra",
-  91251 => "Kalyan\,\ Maharashtra",
-  912520 => "Jawahar\,\ Maharashtra",
-  912521 => "Talasari\,\ Maharashtra",
-  912522 => "Bhiwandi\,\ Maharashtra",
-  912524 => "Murbad\,\ Maharashtra",
-  912525 => "Palghar\,\ Maharashtra",
-  912526 => "Wada\,\ Maharashtra",
-  912527 => "Shahapur\,\ Maharashtra",
-  912528 => "Dahanu\,\ Maharashtra",
-  912529 => "Mokhada\,\ Maharashtra",
-  91253 => "Nasik\ City\,\ Maharashtra",
-  912550 => "Niphad\,\ Maharashtra",
-  912551 => "Sinnar\,\ Maharashtra",
-  912552 => "Nandgaon\,\ Maharashtra",
-  912553 => "Igatpuri\,\ Maharashtra",
-  912554 => "Malegaon\,\ Maharashtra",
-  912555 => "Satana\,\ Maharashtra",
-  912556 => "Chanwad\,\ Maharashtra",
-  912557 => "Dindori\,\ Maharashtra",
-  912558 => "Peint\,\ Maharashtra",
-  912559 => "Yeola\,\ Maharashtra",
-  912560 => "Kusumba\,\ Maharashtra",
-  912561 => "Pimpalner\,\ Maharashtra",
-  912562 => "Dhule\,\ Maharashtra",
-  912563 => "Shirpur\,\ Maharashtra",
-  912564 => "Nandurbar\,\ Maharashtra",
-  912565 => "Shahada\,\ Maharashtra",
-  912566 => "Sindkheda\,\ Maharashtra",
-  912567 => "Taloda\,\ Maharashtra",
-  912568 => "Sakri\,\ Maharashtra",
-  912569 => "Navapur\,\ Maharashtra",
-  91257 => "Jalgaon\,\ Maharashtra",
-  912580 => "Jamner\,\ Maharashtra",
-  912582 => "Bhusawal\,\ Maharashtra",
-  912583 => "Edalabad\,\ Maharashtra",
-  912584 => "Raver\,\ Maharashtra",
-  912585 => "Yawal\,\ Maharashtra",
-  912586 => "Chopda\,\ Maharashtra",
-  912587 => "Amalner\,\ Maharashtra",
-  912588 => "Erandul\,\ Maharashtra",
-  912589 => "Chalisgaon\,\ Maharashtra",
-  912591 => "Manmad\,\ Maharashtra",
-  912592 => "Kalwan\,\ Maharashtra",
-  912593 => "Surgena\,\ Maharashtra",
-  912594 => "Trimbak\,\ Maharashtra",
-  912595 => "Dhadgaon\,\ Maharashtra",
-  912596 => "Pachora\,\ Maharashtra",
-  912597 => "Parola\,\ Maharashtra",
-  912598 => "Umrane\,\ Maharashtra",
-  912599 => "Bhudargad\/Gargoti\,\ Maharashtra",
-  91260 => "Vapi\,\ Gujarat",
-  91261 => "Surat\,\ Gujarat",
-  912621 => "Sayan\,\ Gujarat",
-  912622 => "Bardoli\,\ Gujarat",
-  912623 => "Mandvi\,\ Gujarat",
-  912624 => "Fortsongadh\,\ Gujarat",
-  912625 => "Valod\,\ Gujarat",
-  912626 => "Vyara\,\ Gujarat",
-  912628 => "Nizar\,\ Gujarat",
-  912629 => "M\.M\.Mangrol\,\ Gujarat",
-  912630 => "Bansada\,\ Gujarat",
-  912631 => "Ahwa\,\ Gujarat",
-  912632 => "Valsad\,\ Gujarat",
-  912633 => "Dharampur\,\ Gujarat",
-  912634 => "Billimora\,\ Gujarat",
-  912637 => "Navsari\,\ Gujarat",
-  912640 => "Rajpipla\,\ Gujarat",
-  912641 => "Amod\,\ Gujarat",
-  912642 => "Bharuch\,\ Gujarat",
-  912643 => "Valia\,\ Gujarat",
-  912644 => "Jambusar\,\ Gujarat",
-  912645 => "Jhagadia\,\ Gujarat",
-  912646 => "Ankleshwar\,\ Gujarat",
-  912649 => "Dediapada\,\ Gujarat",
-  91265 => "Vadodara\,\ Gujarat",
-  912661 => "Naswadi\,\ Gujarat",
-  912662 => "Padra\,\ Gujarat",
-  912663 => "Dabhoi\,\ Gujarat",
-  912664 => "Pavijetpur\,\ Gujarat",
-  912665 => "Sankheda\,\ Gujarat",
-  912666 => "Miyagam\,\ Gujarat",
-  912667 => "Savli\,\ Gujarat",
-  912668 => "Waghodia\,\ Gujarat",
-  912669 => "Chhota\ Udaipur\,\ Gujarat",
-  912670 => "Shehra\,\ Gujarat",
-  912672 => "Godhra\,\ Gujarat",
-  912673 => "Dahod\,\ Gujarat",
-  912674 => "Lunavada\,\ Gujarat",
-  912675 => "Santrampur\,\ Gujarat",
-  912676 => "Halol\,\ Gujarat",
-  912677 => "Limkheda\,\ Gujarat",
-  912678 => "Devgadhbaria\,\ Gujarat",
-  912679 => "Jhalod\,\ Gujarat",
-  91268 => "Nadiad\,\ Gujarat",
-  912690 => "Balasinor\,\ Gujarat",
-  912691 => "Kapad\ Wanj\,\ Gujarat",
-  912692 => "Anand\,\ Gujarat",
-  912694 => "Kheda\,\ Gujarat",
-  912696 => "Borsad\,\ Gujarat",
-  912697 => "Retlad\,\ Gujarat",
-  912698 => "Khambat\,\ Gujarat",
-  912699 => "Thasra\,\ Gujarat",
-  912711 => "Barwala\,\ Gujarat",
-  912712 => "Gandhi\ Nagar\,\ Gujarat",
-  912713 => "Dhandhuka\,\ Gujarat",
-  912714 => "Dholka\,\ Gujarat",
-  912715 => "Viramgam\,\ Gujarat",
-  912716 => "Dehgam\,\ Gujarat",
-  912717 => "Sanand\,\ Gujarat",
-  912718 => "Bareja\,\ Gujarat",
-  912733 => "Harij\,\ Gujarat",
-  912734 => "Chanasma\,\ Gujarat",
-  912735 => "Deodar\,\ Gujarat",
-  912737 => "Tharad\,\ Gujarat",
-  912738 => "Santalpur\,\ Gujarat",
-  912739 => "Vadgam\,\ Gujarat",
-  912740 => "Vav\,\ Gujarat",
-  912742 => "Palanpur\,\ Gujarat",
-  912744 => "Deesa\,\ Gujarat",
-  912746 => "Radhanpur\,\ Gujarat",
-  912747 => "Thara\,\ Gujarat",
-  912748 => "Dhanera\,\ Gujarat",
-  912749 => "Danta\,\ Gujarat",
-  912751 => "Chotila\,\ Gujarat",
-  912752 => "Surendranagar\,\ Gujarat",
-  912753 => "Limbdi\,\ Gujarat",
-  912754 => "Dhrangadhra\,\ Gujarat",
-  912755 => "Sayla\,\ Gujarat",
-  912756 => "Muli\,\ Gujarat",
-  912757 => "Dasada\,\ Gujarat",
-  912758 => "Halvad\,\ Gujarat",
-  912759 => "Lakhtar\,\ Gujarat",
-  912761 => "Kheralu\,\ Gujarat",
-  912762 => "Mehsana\,\ Gujarat",
-  912763 => "Vijapur\,\ Gujarat",
-  912764 => "Kalol\,\ Gujarat",
-  912765 => "Visnagar\,\ Gujarat",
-  912766 => "Patan\,\ Gujarat",
-  912767 => "Sidhpur\,\ Gujarat",
-  912770 => "Prantij\,\ Gujarat",
-  912771 => "Bhiloda\,\ Gujarat",
-  912772 => "Himatnagar\,\ Gujarat",
-  912773 => "Malpur\,\ Gujarat",
-  912774 => "Modasa\,\ Gujarat",
-  912775 => "Khedbrahma\,\ Gujarat",
-  912778 => "Idar\,\ Gujarat",
-  912779 => "Bayad\,\ Gujarat",
-  91278 => "Bhavnagar\,\ Gujarat",
-  912791 => "Babra\,\ Gujarat",
-  912792 => "Amreli\,\ Gujarat",
-  912793 => "Damnagar\,\ Gujarat",
-  912794 => "Rajula\,\ Gujarat",
-  912795 => "Kodinar\,\ Gujarat",
-  912796 => "Kunkawav\,\ Gujarat",
-  912797 => "Dhari\,\ Gujarat",
-  912801 => "Ranavav\,\ Gujarat",
-  912803 => "Khavda\,\ Gujarat",
-  912804 => "Kutiyana\,\ Gujarat",
-  912806 => "Gogodar\,\ Gujarat",
-  912808 => "Sumrasar\,\ Gujarat",
-  91281 => "Rajkot\,\ Gujarat",
-  912820 => "Paddhari\,\ Gujarat",
-  912821 => "Jasdan\,\ Gujarat",
-  912822 => "Morvi\,\ Gujarat",
-  912823 => "Jetpur\,\ Gujarat",
-  912824 => "Dhoraji\,\ Gujarat",
-  912825 => "Gondal\,\ Gujarat",
-  912826 => "Upleta\,\ Gujarat",
-  912827 => "Kotdasanghani\,\ Gujarat",
-  912828 => "Wankaner\,\ Gujarat",
-  912829 => "Maliya\ Miyana\,\ Gujarat",
-  912830 => "Rahpar\,\ Gujarat",
-  912831 => "Nalia\,\ Gujarat",
-  912832 => "Bhuj\,\ Gujarat",
-  912833 => "Khambhalia\,\ Gujarat",
-  912834 => "Kutchmandvi\,\ Gujarat",
-  912835 => "Nakhatrana\,\ Gujarat",
-  912836 => "Anjar\/Gandhidham\,\ Gujarat",
-  912837 => "Bhachav\,\ Gujarat",
-  912838 => "Mundra\,\ Gujarat",
-  912839 => "Lakhpat\,\ Gujarat",
-  912841 => "Vallabhipur\,\ Gujarat",
-  912842 => "Talaja\,\ Gujarat",
-  912843 => "Gariadhar\,\ Gujarat",
-  912844 => "Mahuva\,\ Gujarat",
-  912845 => "Savarkundla\,\ Gujarat",
-  912846 => "Sihor\,\ Gujarat",
-  912847 => "Gadhada\,\ Gujarat",
-  912848 => "Palitana\,\ Gujarat",
-  912849 => "Botad\,\ Gujarat",
-  91285 => "Junagarh\,\ Gujarat",
-  91286 => "Porbander\,\ Gujarat",
-  912870 => "Malia\ Hatina\,\ Gujarat",
-  912871 => "Keshod\,\ Gujarat",
-  912872 => "Vanthali\,\ Gujarat",
-  912873 => "Visavadar\,\ Gujarat",
-  912874 => "Manavadar\,\ Gujarat",
-  912875 => "Una\/Diu\,\ Gujarat",
-  912876 => "Veraval\,\ Gujarat",
-  912877 => "Talala\,\ Gujarat",
-  912878 => "Mangrol\,\ Gujarat",
-  91288 => "Jamnagar\,\ Gujarat",
-  912891 => "Jamkalyanpur\,\ Gujarat",
-  912892 => "Okha\,\ Gujarat",
-  912893 => "Jodia\,\ Gujarat",
-  912894 => "Kalawad\,\ Gujarat",
-  912895 => "Lalpur\,\ Gujarat",
-  912896 => "Bhanvad\,\ Gujarat",
-  912897 => "Dhrol\,\ Gujarat",
-  912898 => "Jamjodhpur\,\ Gujarat",
-  912900 => "Siwana\/Samdari\,\ Rajasthan",
-  912901 => "Siwana\,\ Rajasthan",
-  912902 => "Barmer\/Kanot\,\ Rajasthan",
-  912903 => "Chohtan\/Gangasar\,\ Rajasthan",
-  912904 => "Deogarh\,\ Rajasthan",
-  912905 => "Sarada\/Chawand\,\ Rajasthan",
-  912906 => "Salumber\,\ Rajasthan",
-  912907 => "Kherwara\,\ Rajasthan",
-  912908 => "Amet\,\ Rajasthan",
-  912909 => "Bhim\/Dawer\,\ Rajasthan",
-  91291 => "Jodhpur\,\ Rajasthan",
-  912920 => "Bilara\/Bhopalgarh\,\ Rajasthan",
-  912921 => "Phalodi\/Bap\,\ Rajasthan",
-  912922 => "Osian\,\ Rajasthan",
-  912923 => "Phalodi\/Lohawat\,\ Rajasthan",
-  912924 => "Phalodi\/Baroo\,\ Rajasthan",
-  912925 => "Phalodi\,\ Rajasthan",
-  912926 => "Osian\/Mathania\,\ Rajasthan",
-  912927 => "Osian\/Dhanwara\,\ Rajasthan",
-  912928 => "Shergarh\/Deechu\,\ Rajasthan",
-  912929 => "Shergarh\/Balesar\,\ Rajasthan",
-  912930 => "Bilara\/Piparcity\,\ Rajasthan",
-  912931 => "Jodhpur\/Jhanwar\,\ Rajasthan",
-  912932 => "Pali\,\ Rajasthan",
-  912933 => "Bali\/Sumerpur\,\ Rajasthan",
-  912934 => "Desuri\/Rani\,\ Rajasthan",
-  912935 => "Marwar\ Junction\,\ Rajasthan",
-  912936 => "Pali\/Rohat\,\ Rajasthan",
-  912937 => "Raipur\,\ Rajasthan",
-  912938 => "Bali\,\ Rajasthan",
-  912939 => "Jaitaran\,\ Rajasthan",
-  91294 => "Udaipur\ Girwa\/Udaipur\,\ Rajasthan",
-  912950 => "Dhariawad\,\ Rajasthan",
-  912951 => "Bhim\,\ Rajasthan",
-  912952 => "Rajsamand\/Kankorli\,\ Rajasthan",
-  912953 => "Nathdwara\,\ Rajasthan",
-  912954 => "Kumbalgarh\/Charbhujaji\,\ Rajasthan",
-  912955 => "Malvi\/Fatehnagar\,\ Rajasthan",
-  912956 => "Gogunda\,\ Rajasthan",
-  912957 => "Vallabhnagar\,\ Rajasthan",
-  912958 => "Kotra\,\ Rajasthan",
-  912959 => "Jhadol\,\ Rajasthan",
-  912960 => "Sojat\,\ Rajasthan",
-  912961 => "Ghatol\,\ Rajasthan",
-  912962 => "Banswara\,\ Rajasthan",
-  912963 => "Gerhi\/Partapur\,\ Rajasthan",
-  912964 => "Dungarpur\,\ Rajasthan",
-  912965 => "Kushalgarh\,\ Rajasthan",
-  912966 => "Sagwara\,\ Rajasthan",
-  912967 => "Aspur\,\ Rajasthan",
-  912968 => "Bagidora\,\ Rajasthan",
-  912969 => "Bhinmal\,\ Rajasthan",
-  912970 => "Sanchore\/Hadecha\,\ Rajasthan",
-  912971 => "Pindwara\,\ Rajasthan",
-  912972 => "Sirohi\,\ Rajasthan",
-  912973 => "Jalore\,\ Rajasthan",
-  912974 => "Abu\ Road\,\ Rajasthan",
-  912975 => "Reodar\,\ Rajasthan",
-  912976 => "Sheoganj\/Posaliyan\,\ Rajasthan",
-  912977 => "Jalore\/Sayla\,\ Rajasthan",
-  912978 => "Ahore\,\ Rajasthan",
-  912979 => "Sanchore\,\ Rajasthan",
-  912980 => "Pachpadra\/Korna\,\ Rajasthan",
-  912981 => "Sheo\/Harsani\,\ Rajasthan",
-  912982 => "Barmer\,\ Rajasthan",
-  912983 => "Barmer\/Gudda\,\ Rajasthan",
-  912984 => "Barmer\/Sindari\,\ Rajasthan",
-  912985 => "Barmer\/Ramsar\,\ Rajasthan",
-  912986 => "Barmer\/Dhorimanna\,\ Rajasthan",
-  912987 => "Sheo\,\ Rajasthan",
-  912988 => "Pachpadra\/Balotra\,\ Rajasthan",
-  912989 => "Chohtan\,\ Rajasthan",
-  912990 => "Bhinmal\/Jasawantpura\,\ Rajasthan",
-  912991 => "Jaisalmer\/Ramgarh\,\ Rajasthan",
-  912992 => "Jaisalmer\,\ Rajasthan",
-  912993 => "Jaisalmer\/Devikot\,\ Rajasthan",
-  912994 => "Pokhran\,\ Rajasthan",
-  912995 => "Pokhran\/Nachna\,\ Rajasthan",
-  912996 => "Pokhran\/Loharki\,\ Rajasthan",
-  912997 => "Jaisalmer\/Mohargarh\,\ Rajasthan",
-  912998 => "Jaisalmer\/Khuiyals\,\ Rajasthan",
-  912999 => "Jaisalmer\/Nehdai\,\ Rajasthan",
-  913010 => "Jaisalmer\/Shahgarh\,\ Rajasthan",
-  913011 => "Jaisalmer\/Pasewar\,\ Rajasthan",
-  913012 => "Jaisalmer\/Mehsana\,\ Rajasthan",
-  913013 => "Jaisalmer\/Dhanaua\,\ Rajasthan",
-  913014 => "Jaisalmer\/Khuri\,\ Rajasthan",
-  913015 => "Jaisalmer\/Myajlar\,\ Rajasthan",
-  913016 => "Jaisalmer\/Jheenjaniyali\,\ Rajasthan",
-  913017 => "Pokhran\/Madasar\,\ Rajasthan",
-  913018 => "Jaisalmer\/Sadhna\,\ Rajasthan",
-  913019 => "Pokhran\/Phalsoond\,\ Rajasthan",
-  913174 => "Diamond\ Harbour\,\ West\ Bengal",
-  913192 => "Andaman\ \&\ Nicobar\,\ Andaman\ Islands",
-  913193 => "Andaman\ \&\ Nicobar\,\ Nicobar\ Islands",
-  913210 => "Kakdwip\,\ West\ Bengal",
-  913211 => "Arambag\,\ West\ Bengal",
-  913212 => "Champadanga\,\ West\ Bengal",
-  913213 => "Dhaniakhali\,\ West\ Bengal",
-  913214 => "Jagatballavpur\,\ West\ Bengal",
-  913215 => "Bongoan\,\ West\ Bengal",
-  913216 => "Habra\,\ West\ Bengal",
-  913217 => "Basirhat\,\ West\ Bengal",
-  913218 => "Canning\,\ West\ Bengal",
-  913220 => "Contai\,\ West\ Bengal",
-  913221 => "Jhargram\,\ West\ Bengal",
-  913222 => "Kharagpur\,\ West\ Bengal",
-  913223 => "Nayagarh\/Kultikri\,\ West\ Bengal",
-  913224 => "Haldia\,\ West\ Bengal",
-  913225 => "Ghatal\,\ West\ Bengal",
-  913227 => "Amlagora\,\ West\ Bengal",
-  913228 => "Tamluk\,\ West\ Bengal",
-  913229 => "Dantan\,\ West\ Bengal",
-  913241 => "Gangajalghati\,\ West\ Bengal",
-  913242 => "Bankura\,\ West\ Bengal",
-  913243 => "Khatra\,\ West\ Bengal",
-  913244 => "Bishnupur\,\ West\ Bengal",
-  913251 => "Adra\,\ West\ Bengal",
-  913252 => "Purulia\,\ West\ Bengal",
-  913253 => "Manbazar\,\ West\ Bengal",
-  913254 => "Jhalda\,\ West\ Bengal",
-  91326 => "Dhanbad\,\ Bihar",
-  9133 => "Kolkata\,\ West\ Bengal",
-  91341 => "Asansol\,\ West\ Bengal",
-  91342 => "Burdwan\,\ West\ Bengal",
-  91343 => "Durgapur\,\ West\ Bengal",
-  913451 => "Seharabazar\,\ West\ Bengal",
-  913452 => "Guskara\,\ West\ Bengal",
-  913453 => "Katwa\,\ West\ Bengal",
-  913454 => "Kalna\,\ West\ Bengal",
-  913461 => "Rampur\ Hat\,\ West\ Bengal",
-  913462 => "Suri\,\ West\ Bengal",
-  913463 => "Bolpur\,\ West\ Bengal",
-  913465 => "Nalhati\,\ West\ Bengal",
-  913471 => "Karimpur\,\ West\ Bengal",
-  913472 => "Krishna\ Nagar\,\ West\ Bengal",
-  913473 => "Ranaghat\,\ West\ Bengal",
-  913474 => "Bethuadahari\,\ West\ Bengal",
-  913481 => "Islampur\,\ West\ Bengal",
-  913482 => "Berhampur\,\ West\ Bengal",
-  913483 => "Murshidabad\/Jiaganj\,\ West\ Bengal",
-  913484 => "Kandi\,\ West\ Bengal",
-  913485 => "Dhuliyan\,\ West\ Bengal",
-  913511 => "Bubulchandi\,\ West\ Bengal",
-  913512 => "Malda\,\ West\ Bengal",
-  913513 => "Harishchandrapur\,\ West\ Bengal",
-  913521 => "Gangarampur\,\ West\ Bengal",
-  913522 => "Balurghat\,\ West\ Bengal",
-  913523 => "Raiganj\,\ West\ Bengal",
-  913524 => "Harirampur\,\ West\ Bengal",
-  913525 => "Dalkhola\,\ West\ Bengal",
-  913526 => "Islampur\,\ West\ Bengal",
-  91353 => "Siliguri\,\ West\ Bengal",
-  91354 => "Darjeeling\,\ West\ Bengal",
-  913552 => "Kalimpong\,\ West\ Bengal",
-  913561 => "Jalpaiguri\,\ West\ Bengal",
-  913562 => "Mal\ Bazar\,\ West\ Bengal",
-  913563 => "Birpara\,\ West\ Bengal",
-  913564 => "Alipurduar\,\ West\ Bengal",
-  913565 => "Nagarakata\,\ West\ Bengal",
-  913566 => "Kalchini\,\ West\ Bengal",
-  913581 => "Dinhata\,\ West\ Bengal",
-  913582 => "Coochbehar\,\ West\ Bengal",
-  913583 => "Mathabhanga\,\ West\ Bengal",
-  913584 => "Mekhliganj\,\ West\ Bengal",
-  913592 => "Gangtok\,\ West\ Bengal",
-  913595 => "Gauzing\/Nayabazar\,\ West\ Bengal",
-  91360 => "Itanagar\/Ziro\,\ Arunachal\ Pradesh",
-  91361 => "Guwahati\,\ Assam",
-  913621 => "Boko\,\ Assam",
-  913623 => "Barama\,\ Assam",
-  913624 => "Nalbari\,\ Assam",
-  913637 => "Cherrapunjee\,\ Meghalaya",
-  913638 => "Nongpoh\,\ Meghalaya",
-  913639 => "Baghmara\,\ Meghalaya",
-  91364 => "Shillong\,\ Meghalaya",
-  913650 => "Dadengiri\/Phulbari\,\ Meghalaya",
-  913651 => "Tura\,\ Meghalaya",
-  913652 => "Jowai\,\ Meghalaya",
-  913653 => "Amlarem\/Dawki\,\ Meghalaya",
-  913654 => "Nongstoin\,\ Meghalaya",
-  913655 => "Khliehriat\,\ Meghalaya",
-  913656 => "Mawkyrwat\,\ Meghalaya",
-  913657 => "Mairang\,\ Meghalaya",
-  913658 => "Williamnagar\,\ Meghalaya",
-  913659 => "Resubelpara\/Mendipathar\,\ Meghalaya",
-  913661 => "Kokrajhar\,\ Assam",
-  913662 => "Dhubri\,\ Assam",
-  913663 => "Goalpara\,\ Assam",
-  913664 => "Hajo\,\ Assam",
-  913665 => "Tarabarihat\,\ Assam",
-  913666 => "Barpeta\ Road\,\ Assam",
-  913667 => "Bilasipara\,\ Assam",
-  913668 => "Bijni\,\ Assam",
-  913669 => "Abhayapuri\,\ Assam",
-  913670 => "Maibong\,\ Assam",
-  913671 => "Diphu\,\ Assam",
-  913672 => "Nagaon\,\ Assam",
-  913673 => "Haflong\,\ Assam",
-  913674 => "Hojai\,\ Assam",
-  913675 => "Bokajan\,\ Assam",
-  913676 => "Howraghat\,\ Assam",
-  913677 => "Baithalangshu\,\ Assam",
-  913678 => "Morigaon\,\ Assam",
-  91368 => "Passighat\,\ Arunachal\ Pradesh",
-  91369 => "Mokokchung\,\ Nagaland",
-  91370 => "Kohima\,\ Nagaland",
-  913711 => "Udalguri\,\ Assam",
-  913712 => "Tezpur\,\ Assam",
-  913713 => "Mangaldoi\,\ Assam",
-  913714 => "Rangapara\,\ Assam",
-  913715 => "Gohpur\,\ Assam",
-  91372 => "Lungleh\,\ Mizoram",
-  91373 => "Dibrugarh\,\ Assam",
-  91374 => "Tinsukhia\,\ Assam",
-  913751 => "Digboi\,\ Assam",
-  913752 => "Lakhimpur\,\ Assam",
-  913753 => "Dhemaji\,\ Assam",
-  913754 => "Moranhat\,\ Assam",
-  913756 => "Sadiya\,\ Assam",
-  913758 => "Dhakuakhana\,\ Assam",
-  913759 => "Bihupuria\,\ Assam",
-  91376 => "Jorhat\,\ Assam",
-  913771 => "Mariani\,\ Assam",
-  913772 => "Sibsagar\,\ Assam",
-  913774 => "Golaghat\,\ Assam",
-  913775 => "Majuli\,\ Assam",
-  913776 => "Bokakhat\,\ Assam",
-  913777 => "Yangkiyang\,\ Arunachal\ Pradesh",
-  913778 => "Pakkekesang\,\ Arunachal\ Pradesh",
-  913779 => "Roing\/Mariso\,\ Arunachal\ Pradesh",
-  913780 => "Dirang\,\ Arunachal\ Pradesh",
-  913782 => "Kalaktung\/Bomdila\,\ Arunachal\ Pradesh",
-  913783 => "Along\,\ Arunachal\ Pradesh",
-  913784 => "Nefra\,\ Arunachal\ Pradesh",
-  913785 => "Bameng\,\ Arunachal\ Pradesh",
-  913786 => "Khonsa\,\ Arunachal\ Pradesh",
-  913787 => "Seppa\,\ Arunachal\ Pradesh",
-  913788 => "Kolaring\,\ Arunachal\ Pradesh",
-  913789 => "Huri\,\ Arunachal\ Pradesh",
-  913790 => "Tali\,\ Arunachal\ Pradesh",
-  913791 => "Taliha\,\ Arunachal\ Pradesh",
-  913792 => "Daporizo\,\ Arunachal\ Pradesh",
-  913793 => "Mechuka\,\ Arunachal\ Pradesh",
-  913794 => "Tawang\,\ Arunachal\ Pradesh",
-  913795 => "Basar\,\ Arunachal\ Pradesh",
-  913797 => "Pangin\,\ Arunachal\ Pradesh",
-  913798 => "Mariyang\,\ Arunachal\ Pradesh",
-  913799 => "Tuting\,\ Arunachal\ Pradesh",
-  913800 => "Jairampur\,\ Arunachal\ Pradesh",
-  913801 => "Anini\,\ Arunachal\ Pradesh",
-  913802 => "Roing\/Arda\,\ Arunachal\ Pradesh",
-  913803 => "Roing\,\ Arunachal\ Pradesh",
-  913804 => "Tezu\,\ Arunachal\ Pradesh",
-  913805 => "Hayuliang\,\ Arunachal\ Pradesh",
-  913806 => "Chowkhem\,\ Arunachal\ Pradesh",
-  913807 => "Miao\,\ Arunachal\ Pradesh",
-  913808 => "Changlang\,\ Arunachal\ Pradesh",
-  913809 => "Sagalee\,\ Arunachal\ Pradesh",
-  91381 => "Agartala\,\ Tripura",
-  913821 => "R\.K\.Pur\,\ Tripura",
-  913822 => "Dharam\ Nagar\,\ Tripura",
-  913823 => "Belonia\,\ Tripura",
-  913824 => "Kailsahar\,\ Tripura",
-  913825 => "Khowai\,\ Tripura",
-  913826 => "Ambasa\,\ Tripura",
-  913830 => "Champai\/Chiapui\,\ Mizoram",
-  913831 => "Champa\,\ Mizoram",
-  913834 => "Demagiri\,\ Mizoram",
-  913835 => "Saiha\,\ Mizoram",
-  913836 => "Saiha\/Tuipang\,\ Mizoram",
-  913837 => "Kolasib\,\ Mizoram",
-  913838 => "Aizwal\/Serchip\,\ Mizoram",
-  913839 => "Jalukie\,\ Nagaland",
-  913841 => "Vdarbondh\,\ Assam",
-  913842 => "Silchar\,\ Assam",
-  913843 => "Karimganj\,\ Assam",
-  913844 => "Hailakandi\,\ Assam",
-  913845 => "Ukhrul\ Central\,\ Manipur",
-  913848 => "Thonbal\,\ Manipur",
-  91385 => "Imphal\,\ Manipur",
-  913860 => "Wokha\,\ Nagaland",
-  913861 => "Tuengsang\,\ Nagaland",
-  913862 => "Dimapur\,\ Nagaland",
-  913863 => "Kiphire\,\ Nagaland",
-  913865 => "Phek\,\ Nagaland",
-  913867 => "Zuenheboto\,\ Nagaland",
-  913869 => "Mon\,\ Nagaland",
-  913870 => "Ukhrursouth\/Kassemkhulen\,\ Manipur",
-  913871 => "Mao\/Korang\,\ Manipur",
-  913872 => "Chandel\,\ Manipur",
-  913873 => "Thinghat\,\ Manipur",
-  913874 => "Churchandpur\,\ Manipur",
-  913876 => "Jiribam\,\ Manipur",
-  913877 => "Tamenglong\,\ Manipur",
-  913878 => "Chakpikarong\,\ Manipur",
-  913879 => "Bishenpur\,\ Manipur",
-  913880 => "Sadarhills\/Kangpokai\,\ Manipur",
-  91389 => "Aizawal\,\ Mizoram",
-  9140 => "Hyderabad\ Local\,\ Andhra\ Pradesh",
-  914111 => "Sriperumbudur\,\ Tamil\ Nadu",
-  914112 => "Kancheepuram\,\ Tamil\ Nadu",
-  914114 => "Chengalpattu\,\ Tamil\ Nadu",
-  914115 => "Madurantakam\,\ Tamil\ Nadu",
-  914116 => "Tiruvallur\,\ Tamil\ Nadu",
-  914118 => "Tiruttani\,\ Tamil\ Nadu",
-  914119 => "Ponneri\,\ Tamil\ Nadu",
-  91413 => "Pondicherry\,\ Tamil\ Nadu",
-  914142 => "Cuddalore\,\ Tamil\ Nadu",
-  914143 => "Virudhachalam\,\ Tamil\ Nadu",
-  914144 => "Chidambaram\,\ Tamil\ Nadu",
-  914145 => "Gingee\,\ Tamil\ Nadu",
-  914146 => "Villupuram\,\ Tamil\ Nadu",
-  914147 => "Tindivanam\,\ Tamil\ Nadu",
-  914149 => "Ulundurpet\,\ Tamil\ Nadu",
-  914151 => "Kallakurichi\,\ Tamil\ Nadu",
-  914153 => "Arakandanallur\,\ Tamil\ Nadu",
-  91416 => "Vellore\,\ Tamil\ Nadu",
-  914171 => "Gudiyatham\,\ Tamil\ Nadu",
-  914172 => "Ranipet\,\ Tamil\ Nadu",
-  914173 => "Arni\,\ Tamil\ Nadu",
-  914174 => "Vaniyambadi\,\ Tamil\ Nadu",
-  914175 => "Tiruvannamalai\,\ Tamil\ Nadu",
-  914177 => "Arkonam\,\ Tamil\ Nadu",
-  914179 => "Tirupattur\,\ Tamil\ Nadu",
-  914181 => "Polur\,\ Tamil\ Nadu",
-  914182 => "Tiruvettipuram\,\ Tamil\ Nadu",
-  914183 => "Vandavasi\,\ Tamil\ Nadu",
-  914188 => "Chengam\,\ Tamil\ Nadu",
-  914202 => "Mulanur\,\ Tamil\ Nadu",
-  914204 => "Kodumudi\,\ Tamil\ Nadu",
-  91421 => "Tirupur\,\ Tamil\ Nadu",
-  91422 => "Coimbatore\,\ Tamil\ Nadu",
-  91423 => "Udhagamandalam\,\ Tamil\ Nadu",
-  91424 => "Erode\,\ Tamil\ Nadu",
-  914252 => "Udumalpet\,\ Tamil\ Nadu",
-  914253 => "Anamalai\,\ Tamil\ Nadu",
-  914254 => "Mettupalayam\,\ Tamil\ Nadu",
-  914255 => "Palladam\,\ Tamil\ Nadu",
-  914256 => "Bhavani\,\ Tamil\ Nadu",
-  914257 => "Kangeyam\,\ Tamil\ Nadu",
-  914258 => "Dharampuram\,\ Tamil\ Nadu",
-  914259 => "Pollachi\,\ Tamil\ Nadu",
-  914262 => "Gudalur\,\ Tamil\ Nadu",
-  914266 => "Kotagiri\,\ Tamil\ Nadu",
-  914268 => "Velur\,\ Tamil\ Nadu",
-  91427 => "Salem\,\ Tamil\ Nadu",
-  914281 => "Yercaud\,\ Tamil\ Nadu",
-  914282 => "Attur\,\ Tamil\ Nadu",
-  914283 => "Sankagiri\,\ Tamil\ Nadu",
-  914285 => "Gobichettipalayam\,\ Tamil\ Nadu",
-  914286 => "Namakkal\,\ Tamil\ Nadu",
-  914287 => "Rasipuram\,\ Tamil\ Nadu",
-  914288 => "Tiruchengode\,\ Tamil\ Nadu",
-  914290 => "Omalur\,\ Tamil\ Nadu",
-  914292 => "Valapady\,\ Tamil\ Nadu",
-  914294 => "Perundurai\,\ Tamil\ Nadu",
-  914295 => "Sathiyamangalam\,\ Tamil\ Nadu",
-  914296 => "Avanashi\,\ Tamil\ Nadu",
-  914298 => "Metturdam\,\ Tamil\ Nadu",
-  91431 => "Tiruchchirappalli\,\ Tamil\ Nadu",
-  914320 => "Aravakurichi\,\ Tamil\ Nadu",
-  914322 => "Pudukkottai\,\ Tamil\ Nadu",
-  914323 => "Kulithalai\,\ Tamil\ Nadu",
-  914324 => "Karur\,\ Tamil\ Nadu",
-  914326 => "Musiri\,\ Tamil\ Nadu",
-  914327 => "Thuraiyur\,\ Tamil\ Nadu",
-  914328 => "Perambalur\,\ Tamil\ Nadu",
-  914329 => "Ariyalur\,\ Tamil\ Nadu",
-  914331 => "Jayamkondan\,\ Tamil\ Nadu",
-  914332 => "Manaparai\,\ Tamil\ Nadu",
-  914333 => "Ponnamaravathi\,\ Tamil\ Nadu",
-  914339 => "Keeranur\,\ Tamil\ Nadu",
-  914341 => "Uthangarai\,\ Tamil\ Nadu",
-  914342 => "Dharmapuri\,\ Tamil\ Nadu",
-  914343 => "Krishnagiri\,\ Tamil\ Nadu",
-  914344 => "Hosur\,\ Tamil\ Nadu",
-  914346 => "Harur\,\ Tamil\ Nadu",
-  914347 => "Denkanikota\,\ Tamil\ Nadu",
-  914348 => "Palakkodu\,\ Tamil\ Nadu",
-  91435 => "Kumbakonam\,\ Tamil\ Nadu",
-  914362 => "Thanjavur\,\ Tamil\ Nadu",
-  914364 => "Mayiladuthurai\,\ Tamil\ Nadu",
-  914365 => "Nagapattinam\,\ Tamil\ Nadu",
-  914366 => "Tiruvarur\,\ Tamil\ Nadu",
-  914367 => "Mannargudi\,\ Tamil\ Nadu",
-  914368 => "Karaikal\,\ Tamil\ Nadu",
-  914369 => "Thiruthuraipoondi\,\ Tamil\ Nadu",
-  914371 => "Arantangi\,\ Tamil\ Nadu",
-  914372 => "Orathanad\,\ Tamil\ Nadu",
-  914373 => "Pattukottai\,\ Tamil\ Nadu",
-  914374 => "Papanasam\,\ Tamil\ Nadu",
-  9144 => "Chennai\,\ Tamil\ Nadu",
-  91451 => "Dindigul\,\ Tamil\ Nadu",
-  91452 => "Madurai\,\ Tamil\ Nadu",
-  914542 => "Kodaikanal\,\ Tamil\ Nadu",
-  914543 => "Batlagundu\,\ Tamil\ Nadu",
-  914544 => "Natham\,\ Tamil\ Nadu",
-  914545 => "Palani\,\ Tamil\ Nadu",
-  914546 => "Theni\,\ Tamil\ Nadu",
-  914549 => "Thirumanglam\,\ Tamil\ Nadu",
-  914551 => "Vedasandur\,\ Tamil\ Nadu",
-  914552 => "Usilampatti\,\ Tamil\ Nadu",
-  914553 => "Oddanchatram\,\ Tamil\ Nadu",
-  914554 => "Cumbum\,\ Tamil\ Nadu",
-  914561 => "Devakottai\,\ Tamil\ Nadu",
-  914562 => "Virudhunagar\,\ Tamil\ Nadu",
-  914563 => "Rajapalayam\,\ Tamil\ Nadu",
-  914564 => "Paramakudi\,\ Tamil\ Nadu",
-  914565 => "Karaikudi\,\ Tamil\ Nadu",
-  914566 => "Aruppukottai\,\ Tamil\ Nadu",
-  914567 => "Ramanathpuram\,\ Tamil\ Nadu",
-  914573 => "Rameshwaram\,\ Tamil\ Nadu",
-  914574 => "Manamadurai\,\ Tamil\ Nadu",
-  914575 => "Sivaganga\,\ Tamil\ Nadu",
-  914576 => "Mudukulathur\,\ Tamil\ Nadu",
-  914577 => "Tirupathur\,\ Tamil\ Nadu",
-  91460 => "Taliparamba\,\ Kerala",
-  91461 => "Thoothukudi\,\ Tamil\ Nadu",
-  91462 => "Tirunelvelli\,\ Tamil\ Nadu",
-  914630 => "Srivaikundam\,\ Tamil\ Nadu",
-  914632 => "Kovilpatti\,\ Tamil\ Nadu",
-  914633 => "Tenkasi\,\ Tamil\ Nadu",
-  914634 => "Ambasamudram\,\ Tamil\ Nadu",
-  914635 => "Nanguneri\,\ Tamil\ Nadu",
-  914636 => "Sankarankovil\,\ Tamil\ Nadu",
-  914637 => "Valliyoor\,\ Tamil\ Nadu",
-  914638 => "Vilathikulam\,\ Tamil\ Nadu",
-  914639 => "Tiruchendur\,\ Tamil\ Nadu",
-  914651 => "Kuzhithurai\,\ Tamil\ Nadu",
-  914652 => "Nagercoil\,\ Tamil\ Nadu",
-  91469 => "Tiruvalla\,\ Kerala",
-  91470 => "Attingal\,\ Kerala",
-  91471 => "Thiruvananthapuram\,\ Kerala",
-  914728 => "Nedumangad\,\ Kerala",
-  914733 => "Pathanamthitta\,\ Kerala",
-  914734 => "Adoor\,\ Kerala",
-  914735 => "Ranni\,\ Kerala",
-  91474 => "Kollam\,\ Kerala",
-  91475 => "Punalur\,\ Kerala",
-  91476 => "Karunagapally\,\ Kerala",
-  91477 => "Alappuzha\,\ Kerala",
-  91478 => "Cherthala\,\ Kerala",
-  91479 => "Mavelikkara\,\ Kerala",
-  91480 => "Irinjalakuda\,\ Kerala",
-  91481 => "Kottayam\,\ Kerala",
-  914822 => "Palai\,\ Kerala",
-  914828 => "Kanjirapally\,\ Kerala",
-  914829 => "Vaikom\,\ Kerala",
-  91483 => "Manjeri\,\ Kerala",
-  91484 => "Ernakulam\,\ Kerala",
-  91485 => "Muvattupuzha\,\ Kerala",
-  914862 => "Thodupuzha\,\ Kerala",
-  914864 => "Adimaly\,\ Kerala",
-  914865 => "Munnar\,\ Kerala",
-  914868 => "Nedumkandam\,\ Kerala",
-  914869 => "Peermedu\,\ Kerala",
-  91487 => "Thrissur\,\ Kerala",
-  914884 => "Vadakkanchery\,\ Kerala",
-  914885 => "Kunnamkulam\,\ Kerala",
-  914890 => "Bitra\,\ Lakshadweep",
-  914891 => "Amini\,\ Lakshadweep",
-  914892 => "Minicoy\,\ Lakshadweep",
-  914893 => "Androth\,\ Lakshadweep",
-  914894 => "Agathy\,\ Lakshadweep",
-  914895 => "Kalpeni\,\ Lakshadweep",
-  914896 => "Kavaratti\,\ Lakshadweep",
-  914897 => "Kadamath\,\ Lakshadweep",
-  914898 => "Kiltan\,\ Lakshadweep",
-  914899 => "Chetlat\,\ Lakshadweep",
-  91490 => "Tellicherry\,\ Kerala",
-  91491 => "Palakkad\,\ Kerala",
-  914922 => "Alathur\,\ Kerala",
-  914923 => "Koduvayur\,\ Kerala",
-  914924 => "Mannarkad\,\ Kerala",
-  914926 => "Shoranur\,\ Kerala",
-  914931 => "Nilambur\,\ Kerala",
-  914933 => "Perinthalmanna\,\ Kerala",
-  914935 => "Mananthavady\,\ Kerala",
-  914936 => "Kalpetta\,\ Kerala",
-  91494 => "Tirur\,\ Kerala",
-  91495 => "Kozhikode\,\ Kerala",
-  91496 => "Vatakara\,\ Kerala",
-  91497 => "Kannur\,\ Kerala",
-  914982 => "Taliparamba\,\ Kerala",
-  914985 => "Payyanur\,\ Kerala",
-  914994 => "Kasaragod\,\ Kerala",
-  914997 => "Kanhangad\,\ Kerala",
-  914998 => "Uppala\,\ Kerala",
-  915111 => "Akbarpur\,\ Uttar\ Pradesh",
-  915112 => "Bilhaur\,\ Uttar\ Pradesh",
-  915113 => "Bhognipur\/Pakhrayan\,\ Uttar\ Pradesh",
-  915114 => "Derapur\/Jhinjak\,\ Uttar\ Pradesh",
-  915115 => "Ghatampur\,\ Uttar\ Pradesh",
-  91512 => "Kanpur\,\ Uttar\ Pradesh",
-  915142 => "Purwa\/Bighapur\,\ Uttar\ Pradesh",
-  915143 => "Hasanganj\,\ Uttar\ Pradesh",
-  915144 => "Safipur\,\ Uttar\ Pradesh",
-  91515 => "Unnao\,\ Uttar\ Pradesh",
-  915162 => "Orai\,\ Uttar\ Pradesh",
-  915164 => "Kalpi\,\ Uttar\ Pradesh",
-  915165 => "Konch\,\ Uttar\ Pradesh",
-  915168 => "Jalaun\,\ Uttar\ Pradesh",
-  915170 => "Chirgaon\/Moth\,\ Uttar\ Pradesh",
-  915171 => "Garauth\,\ Uttar\ Pradesh",
-  915172 => "Mehraun\,\ Uttar\ Pradesh",
-  915174 => "Jhansi\,\ Uttar\ Pradesh",
-  915175 => "Lalitpur\/Talbehat\,\ Uttar\ Pradesh",
-  915176 => "Lalitpur\,\ Uttar\ Pradesh",
-  915178 => "Mauranipur\,\ Uttar\ Pradesh",
-  915180 => "Fatehpur\,\ Uttar\ Pradesh",
-  915181 => "Bindki\,\ Uttar\ Pradesh",
-  915182 => "Khaga\,\ Uttar\ Pradesh",
-  915183 => "Fatehpur\/Gazipur\,\ Uttar\ Pradesh",
-  915190 => "Baberu\,\ Uttar\ Pradesh",
-  915191 => "Naraini\/Attarra\,\ Uttar\ Pradesh",
-  915192 => "Banda\,\ Uttar\ Pradesh",
-  915194 => "Karvi\/Manikpur\,\ Uttar\ Pradesh",
-  915195 => "Mau\/Rajapur\,\ Uttar\ Pradesh",
-  915198 => "Karvi\,\ Uttar\ Pradesh",
-  915212 => "Malihabad\,\ Uttar\ Pradesh",
-  91522 => "Lucknow\,\ Uttar\ Pradesh",
-  915240 => "Fatehpur\,\ Uttar\ Pradesh",
-  915241 => "Ramsanehi\ Ghat\,\ Uttar\ Pradesh",
-  915244 => "Haidergarh\,\ Uttar\ Pradesh",
-  915248 => "Barabanki\,\ Uttar\ Pradesh",
-  915250 => "Bahraich\/Bhinga\,\ Uttar\ Pradesh",
-  915251 => "Kaisarganj\/Kaiserganj\,\ Uttar\ Pradesh",
-  915252 => "Bahraich\/Bahrailh\,\ Uttar\ Pradesh",
-  915253 => "Nanpara\,\ Uttar\ Pradesh",
-  915254 => "Nanparah\/Mihinpurwa\,\ Uttar\ Pradesh",
-  915255 => "Kaisarganh\/Mahasi\,\ Uttar\ Pradesh",
-  915260 => "Tarabganj\,\ Uttar\ Pradesh",
-  915261 => "Tarabganj\/Colonelganj\,\ Uttar\ Pradesh",
-  915262 => "Gonda\,\ Uttar\ Pradesh",
-  915263 => "Balarampur\/Balrampur\,\ Uttar\ Pradesh",
-  915264 => "Balarampur\/Tulsipur\,\ Uttar\ Pradesh",
-  915265 => "Utraula\,\ Uttar\ Pradesh",
-  915270 => "Bikapur\,\ Uttar\ Pradesh",
-  915271 => "Akbarpur\,\ Uttar\ Pradesh",
-  915273 => "Tandai\/Tanda\,\ Uttar\ Pradesh",
-  915274 => "Tanda\/Baskhari\,\ Uttar\ Pradesh",
-  915275 => "Akbarpur\/Jalalpur\,\ Uttar\ Pradesh",
-  915278 => "Faizabad\,\ Uttar\ Pradesh",
-  915280 => "Rath\,\ Uttar\ Pradesh",
-  915281 => "Mahoba\,\ Uttar\ Pradesh",
-  915282 => "Hamirpur\,\ Uttar\ Pradesh",
-  915283 => "Charkhari\,\ Uttar\ Pradesh",
-  915284 => "Maudaha\,\ Uttar\ Pradesh",
-  915311 => "Salon\,\ Uttar\ Pradesh",
-  915313 => "Salon\/Jais\,\ Uttar\ Pradesh",
-  915315 => "Dalmau\/Lalganj\,\ Uttar\ Pradesh",
-  915317 => "Dalmau\,\ Uttar\ Pradesh",
-  91532 => "Allahabad\,\ Uttar\ Pradesh",
-  915331 => "Bharwari\,\ Uttar\ Pradesh",
-  915332 => "Phoolpur\,\ Uttar\ Pradesh",
-  915333 => "Karchhana\/Shankergarh\,\ Uttar\ Pradesh",
-  915334 => "Meja\/Sirsa\,\ Uttar\ Pradesh",
-  915335 => "Soraon\,\ Uttar\ Pradesh",
-  915341 => "Kunda\,\ Uttar\ Pradesh",
-  915342 => "Pratapgarh\,\ Uttar\ Pradesh",
-  915343 => "Patti\,\ Uttar\ Pradesh",
-  91535 => "Raibareli\,\ Uttar\ Pradesh",
-  915361 => "Musafirkhana\,\ Uttar\ Pradesh",
-  915362 => "Sultanpur\,\ Uttar\ Pradesh",
-  915364 => "Kadipur\,\ Uttar\ Pradesh",
-  915368 => "Amethi\,\ Uttar\ Pradesh",
-  915412 => "Chandauli\/Mugalsarai\,\ Uttar\ Pradesh",
-  915413 => "Chakia\,\ Uttar\ Pradesh",
-  915414 => "Bhadohi\,\ Uttar\ Pradesh",
-  91542 => "Varansi\,\ Uttar\ Pradesh",
-  915440 => "Mirzapur\/Hallia\,\ Uttar\ Pradesh",
-  915442 => "Mirzapur\,\ Uttar\ Pradesh",
-  915443 => "Chunur\,\ Uttar\ Pradesh",
-  915444 => "Robertsganj\,\ Uttar\ Pradesh",
-  915445 => "Robertsganj\/Obra\,\ Uttar\ Pradesh",
-  915446 => "Dudhi\/Pipri\,\ Uttar\ Pradesh",
-  915447 => "Dudhi\,\ Uttar\ Pradesh",
-  915450 => "Kerakat\,\ Uttar\ Pradesh",
-  915451 => "Mariyahu\,\ Uttar\ Pradesh",
-  915452 => "Jaunpur\,\ Uttar\ Pradesh",
-  915453 => "Shahganj\,\ Uttar\ Pradesh",
-  915454 => "Machlishahar\,\ Uttar\ Pradesh",
-  915460 => "Phulpur\,\ Uttar\ Pradesh",
-  915461 => "Ghosi\,\ Uttar\ Pradesh",
-  915462 => "Azamgarh\,\ Uttar\ Pradesh",
-  915463 => "Lalganj\,\ Uttar\ Pradesh",
-  915464 => "Maunathbhanjan\,\ Uttar\ Pradesh",
-  915465 => "Phulpur\/Atrawlia\,\ Uttar\ Pradesh",
-  915466 => "Sagri\,\ Uttar\ Pradesh",
-  91548 => "Ghazipur\,\ Uttar\ Pradesh",
-  915491 => "Rasara\,\ Uttar\ Pradesh",
-  915493 => "Mohamdabad\,\ Uttar\ Pradesh",
-  915494 => "Bansdeeh\,\ Uttar\ Pradesh",
-  915495 => "Saidpur\,\ Uttar\ Pradesh",
-  915496 => "Ballia\/Raniganj\,\ Uttar\ Pradesh",
-  915497 => "Zamania\,\ Uttar\ Pradesh",
-  915498 => "Ballia\,\ Uttar\ Pradesh",
-  91551 => "Gorakhpur\,\ Uttar\ Pradesh",
-  915521 => "Bansgaon\/Barhal\ Ganj\,\ Uttar\ Pradesh",
-  915522 => "Pharenda\/Compierganj\,\ Uttar\ Pradesh",
-  915523 => "Maharajganj\,\ Uttar\ Pradesh",
-  915524 => "Pharenda\/Anand\ Nagar\,\ Uttar\ Pradesh",
-  915525 => "Bansgaon\,\ Uttar\ Pradesh",
-  915541 => "Domariyaganj\,\ Uttar\ Pradesh",
-  915542 => "Basti\,\ Uttar\ Pradesh",
-  915543 => "Naugarh\/Barhani\,\ Uttar\ Pradesh",
-  915544 => "Naugarh\/Tetribazar\,\ Uttar\ Pradesh",
-  915545 => "Bansi\,\ Uttar\ Pradesh",
-  915546 => "Harraiya\,\ Uttar\ Pradesh",
-  915547 => "Khalilabad\,\ Uttar\ Pradesh",
-  915548 => "Khalilabad\/Mehdawal\,\ Uttar\ Pradesh",
-  915561 => "Salempur\/Barhaj\,\ Uttar\ Pradesh",
-  915563 => "Captanganj\/Khadda\,\ Uttar\ Pradesh",
-  915564 => "Padrauna\,\ Uttar\ Pradesh",
-  915566 => "Salempur\,\ Uttar\ Pradesh",
-  915567 => "Captanganj\,\ Uttar\ Pradesh",
-  915568 => "Deoria\,\ Uttar\ Pradesh",
-  915612 => "Ferozabad\,\ Uttar\ Pradesh",
-  915613 => "Achhnera\,\ Uttar\ Pradesh",
-  915614 => "Jarar\,\ Uttar\ Pradesh",
-  91562 => "Agra\,\ Uttar\ Pradesh",
-  915640 => "Kaman\,\ Rajasthan",
-  915641 => "Deeg\,\ Rajasthan",
-  915642 => "Dholpur\,\ Rajasthan",
-  915643 => "Nadbai\,\ Rajasthan",
-  915644 => "Bharatpur\,\ Rajasthan",
-  915645 => "Rupbas\,\ Rajasthan",
-  915646 => "Baseri\,\ Rajasthan",
-  915647 => "Bari\,\ Rajasthan",
-  915648 => "Bayana\,\ Rajasthan",
-  91565 => "Mathura\,\ Uttar\ Pradesh",
-  915661 => "Sadabad\,\ Uttar\ Pradesh",
-  915662 => "Chhata\/Kosikalan\,\ Uttar\ Pradesh",
-  915664 => "Mant\/Vrindavan\,\ Uttar\ Pradesh",
-  915671 => "Jasrana\,\ Uttar\ Pradesh",
-  915672 => "Mainpuri\,\ Uttar\ Pradesh",
-  915673 => "Bhogaon\,\ Uttar\ Pradesh",
-  915676 => "Shikohabad\,\ Uttar\ Pradesh",
-  915677 => "Karhal\,\ Uttar\ Pradesh",
-  915680 => "Bharthana\,\ Uttar\ Pradesh",
-  915681 => "Bidhuna\,\ Uttar\ Pradesh",
-  915683 => "Auraiya\,\ Uttar\ Pradesh",
-  915688 => "Etawah\,\ Uttar\ Pradesh",
-  915690 => "Kaimganj\,\ Uttar\ Pradesh",
-  915691 => "Chhibramau\,\ Uttar\ Pradesh",
-  915692 => "Farrukhabad\/Fategarh\,\ Uttar\ Pradesh",
-  915694 => "Kannauj\,\ Uttar\ Pradesh",
-  91571 => "Aligarh\,\ Uttar\ Pradesh",
-  915721 => "Sikandra\ Rao\,\ Uttar\ Pradesh",
-  915722 => "Hathras\,\ Uttar\ Pradesh",
-  915723 => "Atrauli\,\ Uttar\ Pradesh",
-  915724 => "Khair\,\ Uttar\ Pradesh",
-  915731 => "Garhmukteshwar\,\ Uttar\ Pradesh",
-  915732 => "Bulandshahr\,\ Uttar\ Pradesh",
-  915733 => "Pahasu\,\ Uttar\ Pradesh",
-  915734 => "Debai\,\ Uttar\ Pradesh",
-  915735 => "Sikandrabad\,\ Uttar\ Pradesh",
-  915736 => "Siyana\,\ Uttar\ Pradesh",
-  915738 => "Khurja\,\ Uttar\ Pradesh",
-  915740 => "Aliganj\/Ganjdundwara\,\ Uttar\ Pradesh",
-  915742 => "Etah\,\ Uttar\ Pradesh",
-  915744 => "Kasganj\,\ Uttar\ Pradesh",
-  915745 => "Jalesar\,\ Uttar\ Pradesh",
-  91581 => "Bareilly\,\ Uttar\ Pradesh",
-  915821 => "Pitamberpur\,\ Uttar\ Pradesh",
-  915822 => "Baheri\,\ Uttar\ Pradesh",
-  915823 => "Aonla\,\ Uttar\ Pradesh",
-  915824 => "Aonla\/Ramnagar\,\ Uttar\ Pradesh",
-  915825 => "Nawabganj\,\ Uttar\ Pradesh",
-  915831 => "Dataganj\,\ Uttar\ Pradesh",
-  915832 => "Badaun\,\ Uttar\ Pradesh",
-  915833 => "Sahaswan\,\ Uttar\ Pradesh",
-  915834 => "Bisauli\,\ Uttar\ Pradesh",
-  915836 => "Gunnaur\,\ Uttar\ Pradesh",
-  915841 => "Tilhar\,\ Uttar\ Pradesh",
-  915842 => "Shahjahanpur\,\ Uttar\ Pradesh",
-  915843 => "Jalalabad\,\ Uttar\ Pradesh",
-  915844 => "Powayan\,\ Uttar\ Pradesh",
-  915850 => "Hardoi\/Baghavli\,\ Uttar\ Pradesh",
-  915851 => "Bilgam\/Madhoganj\,\ Uttar\ Pradesh",
-  915852 => "Hardoi\,\ Uttar\ Pradesh",
-  915853 => "Shahabad\,\ Uttar\ Pradesh",
-  915854 => "Sandila\,\ Uttar\ Pradesh",
-  915855 => "Bilgram\/Sandi\,\ Uttar\ Pradesh",
-  915861 => "Misrikh\/Aurangabad\,\ Uttar\ Pradesh",
-  915862 => "Sitapur\,\ Uttar\ Pradesh",
-  915863 => "Biswan\,\ Uttar\ Pradesh",
-  915864 => "Sidhauli\/Mahmodabad\,\ Uttar\ Pradesh",
-  915865 => "Misrikh\,\ Uttar\ Pradesh",
-  915870 => "Bhira\,\ Uttar\ Pradesh",
-  915871 => "Nighasan\/Palia\ Kalan\,\ Uttar\ Pradesh",
-  915872 => "Kheri\,\ Uttar\ Pradesh",
-  915873 => "Nighasan\/Tikunia\,\ Uttar\ Pradesh",
-  915874 => "Nighasan\/Dhaurehra\,\ Uttar\ Pradesh",
-  915875 => "Mohammadi\/Maigalganj\,\ Uttar\ Pradesh",
-  915876 => "Mohammadi\,\ Uttar\ Pradesh",
-  915880 => "Puranpur\,\ Uttar\ Pradesh",
-  915881 => "Bisalpur\,\ Uttar\ Pradesh",
-  915882 => "Pilibhit\,\ Uttar\ Pradesh",
-  91591 => "Moradabad\,\ Uttar\ Pradesh",
-  915921 => "Bilari\,\ Uttar\ Pradesh",
-  915922 => "Amroha\,\ Uttar\ Pradesh",
-  915923 => "Sambhal\,\ Uttar\ Pradesh",
-  915924 => "Hasanpur\,\ Uttar\ Pradesh",
-  915942 => "Nainital\,\ Uttar\ Pradesh",
-  915943 => "Khatima\,\ Uttar\ Pradesh",
-  915944 => "Kichha\/Rudrapur\,\ Uttar\ Pradesh",
-  915945 => "Haldwani\/Chorgalian\,\ Uttar\ Pradesh",
-  915946 => "Haldwani\,\ Uttar\ Pradesh",
-  915947 => "Kashipur\,\ Uttar\ Pradesh",
-  915948 => "Khatima\/Sitarganj\,\ Uttar\ Pradesh",
-  915949 => "Kichha\/Bazpur\,\ Uttar\ Pradesh",
-  91595 => "Rampur\,\ Uttar\ Pradesh",
-  915960 => "Shahabad\,\ Uttar\ Pradesh",
-  915961 => "Munsiari\,\ Uttar\ Pradesh",
-  915962 => "Almora\,\ Uttar\ Pradesh",
-  915963 => "Bageshwar\,\ Uttar\ Pradesh",
-  915964 => "Pithoragarh\,\ Uttar\ Pradesh",
-  915965 => "Champawat\,\ Uttar\ Pradesh",
-  915966 => "Ranikhet\,\ Uttar\ Pradesh",
-  915967 => "Dharchula\,\ Uttar\ Pradesh",
-  916111 => "Hilsa\,\ Bihar",
-  916112 => "Biharsharif\,\ Bihar",
-  916114 => "Jahanabad\,\ Bihar",
-  916115 => "Danapur\,\ Bihar",
-  91612 => "Patna\,\ Bihar",
-  916132 => "Barh\,\ Bihar",
-  916135 => "Bikram\,\ Bihar",
-  916150 => "Hathua\,\ Bihar",
-  916151 => "Sidhawalia\,\ Bihar",
-  916152 => "Chapra\,\ Bihar",
-  916153 => "Maharajganj\,\ Bihar",
-  916154 => "Siwan\,\ Bihar",
-  916155 => "Ekma\,\ Bihar",
-  916156 => "Gopalganj\,\ Bihar",
-  916157 => "Mairwa\,\ Bihar",
-  916158 => "Sonepur\,\ Bihar",
-  916159 => "Masrakh\,\ Bihar",
-  916180 => "Adhaura\,\ Bihar",
-  916181 => "Piro\,\ Bihar",
-  916182 => "Arrah\,\ Bihar",
-  916183 => "Buxar\,\ Bihar",
-  916184 => "Sasaram\,\ Bihar",
-  916185 => "Bikramganj\,\ Bihar",
-  916186 => "Aurangabad\,\ Bihar",
-  916187 => "Mohania\,\ Bihar",
-  916188 => "Rohtas\,\ Bihar",
-  916189 => "Bhabhua\,\ Bihar",
-  91621 => "Muzaffarpur\,\ Bihar",
-  916222 => "Sheohar\,\ Bihar",
-  916223 => "Motipur\,\ Bihar",
-  916224 => "Hajipur\,\ Bihar",
-  916226 => "Sitamarhi\,\ Bihar",
-  916227 => "Mahua\,\ Bihar",
-  916228 => "Pupri\,\ Bihar",
-  916229 => "Bidupur\,\ Bihar",
-  916242 => "Benipur\,\ Bihar",
-  916243 => "Begusarai\,\ Bihar",
-  916244 => "Khagaria\,\ Bihar",
-  916245 => "Gogri\,\ Bihar",
-  916246 => "Jainagar\,\ Bihar",
-  916247 => "Singhwara\,\ Bihar",
-  916250 => "Dhaka\,\ Bihar",
-  916251 => "Bagaha\,\ Bihar",
-  916252 => "Motihari\,\ Bihar",
-  916253 => "Narkatiaganj\,\ Bihar",
-  916254 => "Bettiah\,\ Bihar",
-  916255 => "Raxaul\,\ Bihar",
-  916256 => "Ramnagar\,\ Bihar",
-  916257 => "Barachakia\,\ Bihar",
-  916258 => "Areraj\,\ Bihar",
-  916259 => "Pakridayal\,\ Bihar",
-  916271 => "Benipatti\,\ Bihar",
-  916272 => "Darbhanga\,\ Bihar",
-  916273 => "Jhajharpur\,\ Bihar",
-  916274 => "Samastipur\,\ Bihar",
-  916275 => "Rosera\,\ Bihar",
-  916276 => "Madhubani\,\ Bihar",
-  916277 => "Phulparas\,\ Bihar",
-  916278 => "Dalsinghsarai\,\ Bihar",
-  916279 => "Barauni\,\ Bihar",
-  91631 => "Gaya\,\ Bihar",
-  916322 => "Wazirganj\,\ Bihar",
-  916323 => "Dumraon\,\ Bihar",
-  916324 => "Nawada\,\ Bihar",
-  916325 => "Pakribarwan\,\ Bihar",
-  916326 => "Sherghati\,\ Bihar",
-  916327 => "Rafiganj\,\ Bihar",
-  916328 => "Daudnagar\,\ Bihar",
-  916331 => "Imamganj\,\ Bihar",
-  916332 => "Nabinagar\,\ Bihar",
-  916336 => "Rajauli\,\ Bihar",
-  916337 => "Arwal\,\ Bihar",
-  916341 => "Seikhpura\,\ Bihar",
-  916342 => "H\.Kharagpur\,\ Bihar",
-  916344 => "Monghyr\,\ Bihar",
-  916345 => "Jamui\,\ Bihar",
-  916346 => "Lakhisarai\,\ Bihar",
-  916347 => "Chakai\,\ Bihar",
-  916348 => "Mallehpur\,\ Bihar",
-  916349 => "Jhajha\,\ Bihar",
-  91641 => "Bhagalpur\,\ Bihar",
-  916420 => "Amarpur\,\ Bihar",
-  916421 => "Naugachia\,\ Bihar",
-  916422 => "Godda\,\ Bihar",
-  916423 => "Maheshpur\ Raj\,\ Bihar",
-  916424 => "Banka\,\ Bihar",
-  916425 => "Katoria\,\ Bihar",
-  916426 => "Rajmahal\,\ Bihar",
-  916427 => "Kathikund\,\ Bihar",
-  916428 => "Nala\,\ Bihar",
-  916429 => "Kahalgaon\,\ Bihar",
-  916431 => "Jharmundi\,\ Bihar",
-  916432 => "Deoghar\,\ Bihar",
-  916433 => "Jamtara\,\ Bihar",
-  916434 => "Dumka\,\ Bihar",
-  916435 => "Pakur\,\ Bihar",
-  916436 => "Sahibganj\,\ Bihar",
-  916437 => "Mahagama\,\ Bihar",
-  916438 => "Madhupur\,\ Bihar",
-  916451 => "Barsoi\,\ Bihar",
-  916452 => "Katihar\,\ Bihar",
-  916453 => "Araria\,\ Bihar",
-  916454 => "Purnea\,\ Bihar",
-  916455 => "Forbesganj\,\ Bihar",
-  916457 => "Korha\,\ Bihar",
-  916459 => "Thakurganj\,\ Bihar",
-  916461 => "Raniganj\,\ Bihar",
-  916462 => "Dhamdaha\,\ Bihar",
-  916466 => "Kishanganj\,\ Bihar",
-  916467 => "Banmankhi\,\ Bihar",
-  916471 => "Birpur\,\ Bihar",
-  916473 => "Supaul\,\ Bihar",
-  916475 => "S\.Bakhtiarpur\,\ Bihar",
-  916476 => "Madhepura\,\ Bihar",
-  916477 => "Triveniganj\,\ Bihar",
-  916478 => "Saharsa\,\ Bihar",
-  916479 => "Udakishanganj\,\ Bihar",
-  91651 => "Ranchi\,\ Bihar",
-  916522 => "Muri\,\ Bihar",
-  916523 => "Ghaghra\,\ Bihar",
-  916524 => "Gumla\,\ Bihar",
-  916525 => "Simdega\,\ Bihar",
-  916526 => "Lohardaga\,\ Bihar",
-  916527 => "Kolebira\,\ Bihar",
-  916528 => "Khunti\,\ Bihar",
-  916529 => "Itki\,\ Bihar",
-  916530 => "Bundu\,\ Bihar",
-  916531 => "Mandar\,\ Bihar",
-  916532 => "Giridih\,\ Bihar",
-  916533 => "Basia\,\ Bihar",
-  916534 => "Jhumaritalaiya\,\ Bihar",
-  916535 => "Chainpur\,\ Bihar",
-  916536 => "Palkot\,\ Bihar",
-  916538 => "Torpa\,\ Bihar",
-  916539 => "Bolwa\,\ Bihar",
-  916540 => "Govindpur\,\ Bihar",
-  916541 => "Chatra\,\ Bihar",
-  916542 => "Bokaro\,\ Bihar",
-  916543 => "Barhi\,\ Bihar",
-  916544 => "Gomia\,\ Bihar",
-  916545 => "Mandu\,\ Bihar",
-  916546 => "Hazaribagh\,\ Bihar",
-  916547 => "Chavparan\,\ Bihar",
-  916548 => "Ichak\,\ Bihar",
-  916549 => "Bermo\,\ Bihar",
-  916550 => "Hunterganj\,\ Bihar",
-  916551 => "Barkagaon\,\ Bihar",
-  916553 => "Ramgarh\,\ Bihar",
-  916554 => "Rajdhanwar\,\ Bihar",
-  916556 => "Tisri\,\ Bihar",
-  916557 => "Bagodar\,\ Bihar",
-  916558 => "Dumri\(Isribazar\)\,\ Bihar",
-  916559 => "Simaria\,\ Bihar",
-  916560 => "Patan\,\ Bihar",
-  916561 => "Garhwa\,\ Bihar",
-  916562 => "Daltonganj\,\ Bihar",
-  916563 => "Bhawanathpur\,\ Bihar",
-  916564 => "Nagarutari\,\ Bihar",
-  916565 => "Latehar\,\ Bihar",
-  916566 => "Japla\,\ Bihar",
-  916567 => "Barwadih\,\ Bihar",
-  916568 => "Balumath\,\ Bihar",
-  916569 => "Garu\,\ Bihar",
-  91657 => "Jamshedpur\,\ Bihar",
-  916581 => "Bhandaria\,\ Bihar",
-  916582 => "Chaibasa\,\ Bihar",
-  916583 => "Kharsawa\,\ Bihar",
-  916584 => "Bishrampur\,\ Bihar",
-  916585 => "Ghatsila\,\ Bihar",
-  916586 => "Chainpur\,\ Bihar",
-  916587 => "Chakardharpur\,\ Bihar",
-  916588 => "Jagarnathpur\,\ Bihar",
-  916589 => "Jhinkpani\,\ Bihar",
-  916591 => "Chandil\,\ Bihar",
-  916593 => "Manoharpur\,\ Bihar",
-  916594 => "Baharagora\,\ Bihar",
-  916596 => "Noamundi\,\ Bihar",
-  916597 => "Saraikela\/Adstyapur\,\ Bihar",
-  91661 => "Rourkela\,\ Odisha",
-  916621 => "Hemgiri\,\ Odisha",
-  916622 => "Sundargarh\,\ Odisha",
-  916624 => "Rajgangpur\,\ Odisha",
-  916625 => "Lahunipara\,\ Odisha",
-  916626 => "Banaigarh\,\ Odisha",
-  91663 => "Sambalpur\,\ Odisha",
-  916640 => "Bagdihi\,\ Odisha",
-  916641 => "Deodgarh\,\ Odisha",
-  916642 => "Kuchinda\,\ Odisha",
-  916643 => "Barkot\,\ Odisha",
-  916644 => "Rairakhol\,\ Odisha",
-  916645 => "Jharsuguda\,\ Odisha",
-  916646 => "Bargarh\,\ Odisha",
-  916647 => "Naktideul\,\ Odisha",
-  916648 => "Patnagarh\,\ Odisha",
-  916649 => "Jamankira\,\ Odisha",
-  916651 => "Birmaharajpur\,\ Odisha",
-  916652 => "Balangir\,\ Odisha",
-  916653 => "Dunguripali\,\ Odisha",
-  916654 => "Sonapur\,\ Odisha",
-  916655 => "Titlagarh\,\ Odisha",
-  916657 => "Kantabhanji\,\ Odisha",
-  916670 => "Bhawanipatna\,\ Odisha",
-  916671 => "Rajkhariar\,\ Odisha",
-  916672 => "Dharamgarh\,\ Odisha",
-  916673 => "Jayapatna\,\ Odisha",
-  916675 => "T\.Rampur\,\ Odisha",
-  916676 => "M\.Rampur\,\ Odisha",
-  916677 => "Narlaroad\,\ Odisha",
-  916678 => "Nowparatan\,\ Odisha",
-  916679 => "Komana\,\ Odisha",
-  916681 => "Jujumura\,\ Odisha",
-  916682 => "Attabira\,\ Odisha",
-  916683 => "Padmapur\,\ Odisha",
-  916684 => "Paikamal\,\ Odisha",
-  916685 => "Sohela\,\ Odisha",
-  91671 => "Cuttack\,\ Odisha",
-  916721 => "Narsinghpur\,\ Odisha",
-  916722 => "Pardip\,\ Odisha",
-  916723 => "Athgarh\,\ Odisha",
-  916724 => "Jagatsinghpur\,\ Odisha",
-  916725 => "Dhanmandal\,\ Odisha",
-  916726 => "Jajapur\ Road\,\ Odisha",
-  916727 => "Kendrapara\,\ Odisha",
-  916728 => "Jajapur\ Town\,\ Odisha",
-  916729 => "Pattamundai\,\ Odisha",
-  916731 => "Anandapur\,\ Odisha",
-  916732 => "Hindol\,\ Odisha",
-  916733 => "Ghatgaon\,\ Odisha",
-  916735 => "Telkoi\,\ Odisha",
-  91674 => "Bhubaneshwar\,\ Odisha",
-  916752 => "Puri\,\ Odisha",
-  916753 => "Nayagarh\,\ Odisha",
-  916755 => "Khurda\,\ Odisha",
-  916756 => "Balugaon\,\ Odisha",
-  916757 => "Daspalla\,\ Odisha",
-  916758 => "Nimapara\,\ Odisha",
-  916760 => "Talcher\,\ Odisha",
-  916761 => "Chhendipada\,\ Odisha",
-  916762 => "Dhenkanal\,\ Odisha",
-  916763 => "Athmallik\,\ Odisha",
-  916764 => "Anugul\,\ Odisha",
-  916765 => "Palla\ Hara\,\ Odisha",
-  916766 => "Keonjhar\,\ Odisha",
-  916767 => "Barbil\,\ Odisha",
-  916768 => "Parajang\,\ Odisha",
-  916769 => "Kamakhyanagar\,\ Odisha",
-  916781 => "Basta\,\ Odisha",
-  916782 => "Balasore\,\ Odisha",
-  916784 => "Bhadrak\,\ Odisha",
-  916786 => "Chandbali\,\ Odisha",
-  916788 => "Soro\,\ Odisha",
-  916791 => "Bangiriposi\,\ Odisha",
-  916792 => "Baripada\,\ Odisha",
-  916793 => "Betanati\,\ Odisha",
-  916794 => "Rairangpur\,\ Odisha",
-  916795 => "Udala\,\ Odisha",
-  916796 => "Karanjia\,\ Odisha",
-  916797 => "Jashipur\,\ Odisha",
-  91680 => "Berhampur\,\ Odisha",
-  916810 => "Khalikote\,\ Odisha",
-  916811 => "Chhatrapur\,\ Odisha",
-  916814 => "Digapahandi\,\ Odisha",
-  916815 => "Parlakhemundi\,\ Odisha",
-  916816 => "Mohana\,\ Odisha",
-  916817 => "R\.Udayigiri\,\ Odisha",
-  916818 => "Buguda\,\ Odisha",
-  916819 => "Surada\,\ Odisha",
-  916821 => "Bhanjanagar\,\ Odisha",
-  916822 => "Aska\,\ Odisha",
-  916840 => "Tumudibandha\,\ Odisha",
-  916841 => "Boudh\,\ Odisha",
-  916842 => "Phulbani\,\ Odisha",
-  916843 => "Puruna\ Katak\,\ Odisha",
-  916844 => "Kantamal\,\ Odisha",
-  916845 => "Phiringia\,\ Odisha",
-  916846 => "Baliguda\,\ Odisha",
-  916847 => "G\.Udayagiri\,\ Odisha",
-  916848 => "Kotagarh\,\ Odisha",
-  916849 => "Daringbadi\,\ Odisha",
-  916850 => "Kalimela\,\ Odisha",
-  916852 => "Koraput\,\ Odisha",
-  916853 => "Sunabeda\,\ Odisha",
-  916854 => "Jeypore\,\ Odisha",
-  916855 => "Laxmipur\,\ Odisha",
-  916856 => "Rayagada\,\ Odisha",
-  916857 => "Gunupur\,\ Odisha",
-  916858 => "Nowrangapur\,\ Odisha",
-  916859 => "Motu\,\ Odisha",
-  916860 => "Boriguma\,\ Odisha",
-  916861 => "Malkangiri\,\ Odisha",
-  916862 => "Gudari\,\ Odisha",
-  916863 => "Bisam\ Cuttack\,\ Odisha",
-  916864 => "Mathili\,\ Odisha",
-  916865 => "Kashipur\,\ Odisha",
-  916866 => "Umerkote\,\ Odisha",
-  916867 => "Jharigan\,\ Odisha",
-  916868 => "Nandapur\,\ Odisha",
-  916869 => "Papadhandi\,\ Odisha",
-  917100 => "Kuhi\,\ Maharashtra",
-  917102 => "Parseoni\,\ Maharashtra",
-  917103 => "Butibori\,\ Maharashtra",
-  917104 => "Hingua\,\ Maharashtra",
-  917105 => "Narkhed\,\ Maharashtra",
-  917106 => "Bhiwapur\,\ Maharashtra",
-  917109 => "Kamptee\,\ Maharashtra",
-  917112 => "Katol\,\ Maharashtra",
-  917113 => "Saoner\,\ Maharashtra",
-  917114 => "Ramtek\,\ Maharashtra",
-  917115 => "Mouda\,\ Maharashtra",
-  917116 => "Umrer\,\ Maharashtra",
-  917118 => "Kalmeshwar\,\ Maharashtra",
-  91712 => "Nagpur\,\ Maharashtra",
-  917131 => "Sironcha\,\ Maharashtra",
-  917132 => "Gadchiroli\,\ Maharashtra",
-  917133 => "Aheri\,\ Maharashtra",
-  917134 => "Bhamregadh\,\ Maharashtra",
-  917135 => "Chamorshi\,\ Maharashtra",
-  917136 => "Etapalli\,\ Maharashtra",
-  917137 => "Desaiganj\,\ Maharashtra",
-  917138 => "Dhanora\,\ Maharashtra",
-  917139 => "Kurkheda\,\ Maharashtra",
-  917141 => "Betul\,\ Madhya\ Pradesh",
-  917142 => "Bhimpur\,\ Madhya\ Pradesh",
-  917143 => "Bhainsdehi\,\ Madhya\ Pradesh",
-  917144 => "Atner\,\ Madhya\ Pradesh",
-  917145 => "Chicholi\,\ Madhya\ Pradesh",
-  917146 => "Ghorandogri\,\ Madhya\ Pradesh",
-  917147 => "Multai\,\ Madhya\ Pradesh",
-  917148 => "Prabha\ Pattan\,\ Madhya\ Pradesh",
-  917149 => "Tamia\,\ Madhya\ Pradesh",
-  917151 => "Samudrapur\,\ Maharashtra",
-  917152 => "Wardha\,\ Maharashtra",
-  917153 => "Hinganghat\,\ Maharashtra",
-  917155 => "Seloo\,\ Maharashtra",
-  917156 => "Talegaokarangal\,\ Maharashtra",
-  917157 => "Arvi\,\ Maharashtra",
-  917158 => "Deoli\,\ Maharashtra",
-  917160 => "Jamai\,\ Madhya\ Pradesh",
-  917161 => "Parasia\,\ Madhya\ Pradesh",
-  917162 => "Chhindwara\,\ Madhya\ Pradesh",
-  917164 => "Pandhurna\,\ Madhya\ Pradesh",
-  917165 => "Saunsar\,\ Madhya\ Pradesh",
-  917166 => "Chaurai\,\ Madhya\ Pradesh",
-  917167 => "Amarwada\,\ Madhya\ Pradesh",
-  917168 => "Harrai\,\ Madhya\ Pradesh",
-  917169 => "Batkakhapa\,\ Madhya\ Pradesh",
-  917170 => "Chumur\,\ Maharashtra",
-  917171 => "Gond\ Pipri\,\ Maharashtra",
-  917172 => "Chandrapur\,\ Maharashtra",
-  917173 => "Rajura\,\ Maharashtra",
-  917174 => "Mul\,\ Maharashtra",
-  917175 => "Bhadrawati\,\ Maharashtra",
-  917176 => "Warora\,\ Maharashtra",
-  917177 => "Brahmapuri\,\ Maharashtra",
-  917178 => "Sinderwahi\,\ Maharashtra",
-  917179 => "Nagbhir\,\ Maharashtra",
-  917180 => "Salekasa\,\ Maharashtra",
-  917181 => "Lakhandur\,\ Maharashtra",
-  917182 => "Gondia\,\ Maharashtra",
-  917183 => "Tumsar\,\ Maharashtra",
-  917184 => "Bhandara\,\ Maharashtra",
-  917185 => "Pauni\,\ Maharashtra",
-  917186 => "Sakoli\,\ Maharashtra",
-  917187 => "Goregaon\,\ Maharashtra",
-  917189 => "Amagaon\,\ Maharashtra",
-  917196 => "Arjuni\ Morgaon\,\ Maharashtra",
-  917197 => "Mohadi\,\ Maharashtra",
-  917198 => "Tirora\,\ Maharashtra",
-  917199 => "Deori\,\ Maharashtra",
-  917201 => "Kalamb\,\ Maharashtra",
-  917202 => "Ralegaon\,\ Maharashtra",
-  917203 => "Babhulgaon\,\ Maharashtra",
-  91721 => "Amravati\,\ Maharashtra",
-  917220 => "Chhikaldara\,\ Maharashtra",
-  917221 => "Nandgaon\,\ Maharashtra",
-  917222 => "Chandurrly\,\ Maharashtra",
-  917223 => "Achalpur\,\ Maharashtra",
-  917224 => "Daryapur\,\ Maharashtra",
-  917225 => "Tiwasa\,\ Maharashtra",
-  917226 => "Dharani\,\ Maharashtra",
-  917227 => "Chandurbazar\,\ Maharashtra",
-  917228 => "Morshi\,\ Maharashtra",
-  917229 => "Warlydwarud\,\ Maharashtra",
-  917230 => "Ghatanji\,\ Maharashtra",
-  917231 => "Umarkhed\,\ Maharashtra",
-  917232 => "Yeotmal\,\ Maharashtra",
-  917233 => "Pusad\,\ Maharashtra",
-  917234 => "Digras\,\ Maharashtra",
-  917235 => "Pandharkawada\,\ Maharashtra",
-  917236 => "Maregaon\,\ Maharashtra",
-  917237 => "Marigaon\,\ Maharashtra",
-  917238 => "Darwaha\,\ Maharashtra",
-  917239 => "Wani\,\ Maharashtra",
-  91724 => "Akola\,\ Maharashtra",
-  917251 => "Risod\,\ Maharashtra",
-  917252 => "Washim\,\ Maharashtra",
-  917253 => "Mangrulpur\,\ Maharashtra",
-  917254 => "Malgaon\,\ Maharashtra",
-  917255 => "Barshi\ Takli\,\ Maharashtra",
-  917256 => "Murtizapur\,\ Maharashtra",
-  917257 => "Balapur\,\ Maharashtra",
-  917258 => "Akot\,\ Maharashtra",
-  917260 => "Lonar\,\ Maharashtra",
-  917261 => "Deolgaonraja\,\ Maharashtra",
-  917262 => "Buldhana\,\ Maharashtra",
-  917263 => "Khamgaon\,\ Maharashtra",
-  917264 => "Chikhali\,\ Maharashtra",
-  917265 => "Nandura\,\ Maharashtra",
-  917266 => "Jalgaonjamod\,\ Maharashtra",
-  917267 => "Malkapur\,\ Maharashtra",
-  917268 => "Mekhar\,\ Maharashtra",
-  917269 => "Sindkhedaraja\,\ Maharashtra",
-  917270 => "Sonkatch\,\ Madhya\ Pradesh",
-  917271 => "Bagli\,\ Madhya\ Pradesh",
-  917272 => "Dewas\,\ Madhya\ Pradesh",
-  917273 => "Kannod\,\ Madhya\ Pradesh",
-  917274 => "Khategaon\,\ Madhya\ Pradesh",
-  917279 => "Nandnva\,\ Maharashtra",
-  917280 => "Barwaha\,\ Madhya\ Pradesh",
-  917281 => "Sendhwa\,\ Madhya\ Pradesh",
-  917282 => "Khargone\,\ Madhya\ Pradesh",
-  917283 => "Maheshwar\,\ Madhya\ Pradesh",
-  917284 => "Rajpur\,\ Madhya\ Pradesh",
-  917285 => "Kasrawad\,\ Madhya\ Pradesh",
-  917286 => "Khetia\,\ Madhya\ Pradesh",
-  917287 => "Gogaon\,\ Madhya\ Pradesh",
-  917288 => "Bhikangaon\,\ Madhya\ Pradesh",
-  917289 => "Zhirnia\,\ Madhya\ Pradesh",
-  917290 => "Badwani\,\ Madhya\ Pradesh",
-  917291 => "Manawar\,\ Madhya\ Pradesh",
-  917292 => "Dhar\,\ Madhya\ Pradesh",
-  917294 => "Dharampuri\,\ Madhya\ Pradesh",
-  917295 => "Badnawar\,\ Madhya\ Pradesh",
-  917296 => "Sardarpur\,\ Madhya\ Pradesh",
-  917297 => "Kukshi\,\ Madhya\ Pradesh",
-  91731 => "Indore\,\ Madhya\ Pradesh",
-  917320 => "Pandhana\,\ Madhya\ Pradesh",
-  917321 => "Sanwer\,\ Madhya\ Pradesh",
-  917322 => "Depalpur\,\ Madhya\ Pradesh",
-  917323 => "Punasa\,\ Madhya\ Pradesh",
-  917324 => "Mhow\,\ Madhya\ Pradesh",
-  917325 => "Burhanpur\,\ Madhya\ Pradesh",
-  917326 => "Baldi\,\ Madhya\ Pradesh",
-  917327 => "Harsud\,\ Madhya\ Pradesh",
-  917328 => "Khalwa\,\ Madhya\ Pradesh",
-  917329 => "Khakner\,\ Madhya\ Pradesh",
-  91733 => "Khandwa\,\ Madhya\ Pradesh",
-  91734 => "Ujjain\,\ Madhya\ Pradesh",
-  917360 => "Shujalpur\,\ Madhya\ Pradesh",
-  917361 => "Susner\,\ Madhya\ Pradesh",
-  917362 => "Agar\,\ Madhya\ Pradesh",
-  917363 => "Berchha\,\ Madhya\ Pradesh",
-  917364 => "Shajapur\,\ Madhya\ Pradesh",
-  917365 => "Mahidpurcity\,\ Madhya\ Pradesh",
-  917366 => "Khachrod\,\ Madhya\ Pradesh",
-  917367 => "Badnagar\,\ Madhya\ Pradesh",
-  917368 => "Ghatia\,\ Madhya\ Pradesh",
-  917369 => "Tarana\,\ Madhya\ Pradesh",
-  917370 => "Khilchipur\,\ Madhya\ Pradesh",
-  917371 => "Sarangpur\,\ Madhya\ Pradesh",
-  917372 => "Rajgarh\,\ Madhya\ Pradesh",
-  917374 => "Biaora\,\ Madhya\ Pradesh",
-  917375 => "Narsingharh\,\ Madhya\ Pradesh",
-  917390 => "Thandla\,\ Madhya\ Pradesh",
-  917391 => "Petlawad\,\ Madhya\ Pradesh",
-  917392 => "Jhabua\,\ Madhya\ Pradesh",
-  917393 => "Jobat\,\ Madhya\ Pradesh",
-  917394 => "Alirajpur\,\ Madhya\ Pradesh",
-  917395 => "Sondhwa\,\ Madhya\ Pradesh",
-  917410 => "Alot\,\ Madhya\ Pradesh",
-  917412 => "Ratlam\,\ Madhya\ Pradesh",
-  917413 => "Sailana\,\ Madhya\ Pradesh",
-  917414 => "Jaora\,\ Madhya\ Pradesh",
-  917420 => "Jawad\,\ Madhya\ Pradesh",
-  917421 => "Manasa\,\ Madhya\ Pradesh",
-  917422 => "Mandsaur\,\ Madhya\ Pradesh",
-  917423 => "Neemuch\,\ Madhya\ Pradesh",
-  917424 => "Malhargarh\,\ Madhya\ Pradesh",
-  917425 => "Garoth\,\ Madhya\ Pradesh",
-  917426 => "Sitamau\,\ Madhya\ Pradesh",
-  917427 => "Bhanpura\,\ Madhya\ Pradesh",
-  917430 => "Khanpur\,\ Rajasthan",
-  917431 => "Aklera\,\ Rajasthan",
-  917432 => "Jhalawar\,\ Rajasthan",
-  917433 => "Pachpahar\/Bhawanimandi\,\ Rajasthan",
-  917434 => "Pirawa\/Raipur\,\ Rajasthan",
-  917435 => "Gangdhar\,\ Rajasthan",
-  917436 => "Hindoli\,\ Rajasthan",
-  917437 => "Nainwa\,\ Rajasthan",
-  917438 => "Keshoraipatan\/Patan\,\ Rajasthan",
-  91744 => "Ladpura\/Kota\,\ Rajasthan",
-  917450 => "Sangod\,\ Rajasthan",
-  917451 => "Atru\,\ Rajasthan",
-  917452 => "Chhabra\,\ Rajasthan",
-  917453 => "Baran\,\ Rajasthan",
-  917454 => "Chhipaborad\,\ Rajasthan",
-  917455 => "Digod\/Sultanpur\,\ Rajasthan",
-  917456 => "Kishanganj\/Bhanwargarh\,\ Rajasthan",
-  917457 => "Mangrol\,\ Rajasthan",
-  917458 => "Pipalda\/Sumerganj\ Mandi\,\ Rajasthan",
-  917459 => "Ramganj\ Mandi\,\ Rajasthan",
-  917460 => "Sahabad\,\ Rajasthan",
-  917461 => "Mahuwa\,\ Rajasthan",
-  917462 => "Sawaimadhopur\,\ Rajasthan",
-  917463 => "Gangapur\,\ Rajasthan",
-  917464 => "Karauli\,\ Rajasthan",
-  917465 => "Sapotra\,\ Rajasthan",
-  917466 => "Bonli\,\ Rajasthan",
-  917467 => "Bamanwas\,\ Rajasthan",
-  917468 => "Khandar\,\ Rajasthan",
-  917469 => "Hindaun\,\ Rajasthan",
-  91747 => "Bundi\,\ Rajasthan",
-  917480 => "Goharganj\,\ Madhya\ Pradesh",
-  917481 => "Gairatganj\,\ Madhya\ Pradesh",
-  917482 => "Raisen\,\ Madhya\ Pradesh",
-  917484 => "Silwani\,\ Madhya\ Pradesh",
-  917485 => "Udaipura\,\ Madhya\ Pradesh",
-  917486 => "Bareli\,\ Madhya\ Pradesh",
-  917487 => "Begamganj\,\ Madhya\ Pradesh",
-  917490 => "Pohari\,\ Madhya\ Pradesh",
-  917491 => "Narwar\,\ Madhya\ Pradesh",
-  917492 => "Shivpuri\,\ Madhya\ Pradesh",
-  917493 => "Karera\,\ Madhya\ Pradesh",
-  917494 => "Kolaras\,\ Madhya\ Pradesh",
-  917495 => "Badarwas\,\ Madhya\ Pradesh",
-  917496 => "Pichhore\,\ Madhya\ Pradesh",
-  917497 => "Khaniadhana\,\ Madhya\ Pradesh",
-  91751 => "Gwalior\,\ Madhya\ Pradesh",
-  917521 => "Seondha\,\ Madhya\ Pradesh",
-  917522 => "Datia\,\ Madhya\ Pradesh",
-  917523 => "Bhander\,\ Madhya\ Pradesh",
-  917524 => "Dabra\,\ Madhya\ Pradesh",
-  917525 => "Bhitarwar\,\ Madhya\ Pradesh",
-  917526 => "Ghatigaon\,\ Madhya\ Pradesh",
-  917527 => "Mehgaon\,\ Madhya\ Pradesh",
-  917528 => "Bijaypur\,\ Madhya\ Pradesh",
-  917529 => "Laher\,\ Madhya\ Pradesh",
-  917530 => "Sheopurkalan\,\ Madhya\ Pradesh",
-  917531 => "Baroda\,\ Madhya\ Pradesh",
-  917532 => "Morena\,\ Madhya\ Pradesh",
-  917533 => "Karhal\,\ Madhya\ Pradesh",
-  917534 => "Bhind\,\ Madhya\ Pradesh",
-  917535 => "Raghunathpur\,\ Madhya\ Pradesh",
-  917536 => "Sabalgarh\,\ Madhya\ Pradesh",
-  917537 => "Jora\,\ Madhya\ Pradesh",
-  917538 => "Ambah\,\ Madhya\ Pradesh",
-  917539 => "Gohad\,\ Madhya\ Pradesh",
-  917540 => "Bamori\,\ Madhya\ Pradesh",
-  917541 => "Isagarh\,\ Madhya\ Pradesh",
-  917542 => "Guna\,\ Madhya\ Pradesh",
-  917543 => "Ashoknagar\,\ Madhya\ Pradesh",
-  917544 => "Raghogarh\,\ Madhya\ Pradesh",
-  917545 => "Arone\,\ Madhya\ Pradesh",
-  917546 => "Chachaura\,\ Madhya\ Pradesh",
-  917547 => "Chanderi\,\ Madhya\ Pradesh",
-  917548 => "Mungaoli\,\ Madhya\ Pradesh",
-  91755 => "Bhopal\,\ Madhya\ Pradesh",
-  917560 => "Ashta\,\ Madhya\ Pradesh",
-  917561 => "Ichhawar\,\ Madhya\ Pradesh",
-  917562 => "Sehore\,\ Madhya\ Pradesh",
-  917563 => "Nasrullaganj\,\ Madhya\ Pradesh",
-  917564 => "Budhni\,\ Madhya\ Pradesh",
-  917565 => "Berasia\,\ Madhya\ Pradesh",
-  917570 => "Seonimalwa\,\ Madhya\ Pradesh",
-  917571 => "Khirkiya\,\ Madhya\ Pradesh",
-  917572 => "Itarsi\,\ Madhya\ Pradesh",
-  917573 => "Timarani\,\ Madhya\ Pradesh",
-  917574 => "Hoshangabad\,\ Madhya\ Pradesh",
-  917575 => "Sohagpur\,\ Madhya\ Pradesh",
-  917576 => "Piparia\,\ Madhya\ Pradesh",
-  917577 => "Harda\,\ Madhya\ Pradesh",
-  917578 => "Pachmarhi\,\ Madhya\ Pradesh",
-  917580 => "Bina\,\ Madhya\ Pradesh",
-  917581 => "Khurai\,\ Madhya\ Pradesh",
-  917582 => "Sagar\,\ Madhya\ Pradesh",
-  917583 => "Banda\,\ Madhya\ Pradesh",
-  917584 => "Rahatgarh\,\ Madhya\ Pradesh",
-  917585 => "Rehli\,\ Madhya\ Pradesh",
-  917586 => "Deori\,\ Madhya\ Pradesh",
-  917590 => "Lateri\,\ Madhya\ Pradesh",
-  917591 => "Sironj\,\ Madhya\ Pradesh",
-  917592 => "Vidisha\,\ Madhya\ Pradesh",
-  917593 => "Kurwai\,\ Madhya\ Pradesh",
-  917594 => "Ganjbasoda\,\ Madhya\ Pradesh",
-  917595 => "Nateran\,\ Madhya\ Pradesh",
-  917596 => "Gyraspur\,\ Madhya\ Pradesh",
-  917601 => "Patharia\,\ Madhya\ Pradesh",
-  917603 => "Tendukheda\,\ Madhya\ Pradesh",
-  917604 => "Hatta\,\ Madhya\ Pradesh",
-  917605 => "Patera\,\ Madhya\ Pradesh",
-  917606 => "Jabera\,\ Madhya\ Pradesh",
-  917608 => "Bijawar\,\ Madhya\ Pradesh",
-  917609 => "Buxwaha\,\ Madhya\ Pradesh",
-  91761 => "Jabalpur\,\ Madhya\ Pradesh",
-  917621 => "Patan\,\ Madhya\ Pradesh",
-  917622 => "Katni\,\ Madhya\ Pradesh",
-  917623 => "Kundam\,\ Madhya\ Pradesh",
-  917624 => "Sihora\,\ Madhya\ Pradesh",
-  917625 => "Umariapan\,\ Madhya\ Pradesh",
-  917626 => "Vijayraghogarh\,\ Madhya\ Pradesh",
-  917627 => "Manpur\,\ Madhya\ Pradesh",
-  917628 => "Karpa\,\ Madhya\ Pradesh",
-  917629 => "Pushprajgarh\,\ Madhya\ Pradesh",
-  917630 => "Katangi\,\ Madhya\ Pradesh",
-  917632 => "Balaghat\,\ Madhya\ Pradesh",
-  917633 => "Waraseoni\,\ Madhya\ Pradesh",
-  917634 => "Lamta\,\ Madhya\ Pradesh",
-  917635 => "Lanji\,\ Madhya\ Pradesh",
-  917636 => "Baihar\,\ Madhya\ Pradesh",
-  917637 => "Birsa\,\ Madhya\ Pradesh",
-  917638 => "Damoh\,\ Madhya\ Pradesh",
-  917640 => "Shahpur\,\ Madhya\ Pradesh",
-  917641 => "Niwas\,\ Madhya\ Pradesh",
-  917642 => "Mandla\,\ Madhya\ Pradesh",
-  917643 => "Bijadandi\,\ Madhya\ Pradesh",
-  917644 => "Dindori\,\ Madhya\ Pradesh",
-  917645 => "Karanjia\,\ Madhya\ Pradesh",
-  917646 => "Nainpur\,\ Madhya\ Pradesh",
-  917647 => "Ghughari\,\ Madhya\ Pradesh",
-  917648 => "Mawai\,\ Madhya\ Pradesh",
-  917649 => "Kakaiya\,\ Madhya\ Pradesh",
-  917650 => "Beohari\,\ Madhya\ Pradesh",
-  917651 => "Jaisinghnagar\,\ Madhya\ Pradesh",
-  917652 => "Shahdol\,\ Madhya\ Pradesh",
-  917653 => "Bandhavgarh\,\ Madhya\ Pradesh",
-  917655 => "Birsinghpur\,\ Madhya\ Pradesh",
-  917656 => "Kannodi\,\ Madhya\ Pradesh",
-  917657 => "Jaitpur\,\ Madhya\ Pradesh",
-  917658 => "Kotma\,\ Madhya\ Pradesh",
-  917659 => "Jaithari\,\ Madhya\ Pradesh",
-  917660 => "Sirmour\,\ Madhya\ Pradesh",
-  917661 => "Teonthar\,\ Madhya\ Pradesh",
-  917662 => "Rewa\,\ Madhya\ Pradesh",
-  917663 => "Mauganj\,\ Madhya\ Pradesh",
-  917664 => "Hanumana\,\ Madhya\ Pradesh",
-  917670 => "Majhagwan\,\ Madhya\ Pradesh",
-  917671 => "Jaitwara\,\ Madhya\ Pradesh",
-  917672 => "Satna\,\ Madhya\ Pradesh",
-  917673 => "Nagod\,\ Madhya\ Pradesh",
-  917674 => "Maihar\,\ Madhya\ Pradesh",
-  917675 => "Amarpatan\,\ Madhya\ Pradesh",
-  917680 => "Niwari\,\ Madhya\ Pradesh",
-  917681 => "Jatara\,\ Madhya\ Pradesh",
-  917682 => "Chhatarpur\,\ Madhya\ Pradesh",
-  917683 => "Tikamgarh\,\ Madhya\ Pradesh",
-  917684 => "Baldeogarh\,\ Madhya\ Pradesh",
-  917685 => "Nowgaon\,\ Madhya\ Pradesh",
-  917686 => "Khajuraho\,\ Madhya\ Pradesh",
-  917687 => "Laundi\,\ Madhya\ Pradesh",
-  917688 => "Gourihar\,\ Madhya\ Pradesh",
-  917689 => "Badamalhera\,\ Madhya\ Pradesh",
-  917690 => "Lakhnadon\,\ Madhya\ Pradesh",
-  917691 => "Chhapara\,\ Madhya\ Pradesh",
-  917692 => "Seoni\,\ Madhya\ Pradesh",
-  917693 => "Ghansour\,\ Madhya\ Pradesh",
-  917694 => "Keolari\,\ Madhya\ Pradesh",
-  917695 => "Gopalganj\,\ Madhya\ Pradesh",
-  917700 => "Nagri\,\ Madhya\ Pradesh",
-  917701 => "Pingeshwar\,\ Madhya\ Pradesh",
-  917703 => "Manpur\,\ Madhya\ Pradesh",
-  917704 => "Deobhog\,\ Madhya\ Pradesh",
-  917705 => "Kurud\,\ Madhya\ Pradesh",
-  917706 => "Gariaband\,\ Madhya\ Pradesh",
-  917707 => "Bagbahera\,\ Madhya\ Pradesh",
-  91771 => "Raipur\,\ Madhya\ Pradesh",
-  917720 => "Arang\,\ Madhya\ Pradesh",
-  917721 => "Neora\,\ Madhya\ Pradesh",
-  917722 => "Dhamtari\,\ Madhya\ Pradesh",
-  917723 => "Mahasamund\,\ Madhya\ Pradesh",
-  917724 => "Basana\,\ Madhya\ Pradesh",
-  917725 => "Saraipali\,\ Madhya\ Pradesh",
-  917726 => "Bhatapara\,\ Madhya\ Pradesh",
-  917727 => "Balodabazar\,\ Madhya\ Pradesh",
-  917728 => "Kasdol\,\ Madhya\ Pradesh",
-  917729 => "Bhilaigarh\,\ Madhya\ Pradesh",
-  917730 => "Ajaigarh\,\ Madhya\ Pradesh",
-  917731 => "Gunnore\,\ Madhya\ Pradesh",
-  917732 => "Panna\,\ Madhya\ Pradesh",
-  917733 => "Pawai\,\ Madhya\ Pradesh",
-  917734 => "Shahnagar\,\ Madhya\ Pradesh",
-  917740 => "Bodla\,\ Madhya\ Pradesh",
-  917741 => "Kawardha\,\ Madhya\ Pradesh",
-  917743 => "Chuikhadan\,\ Madhya\ Pradesh",
-  917744 => "Rajandgaon\,\ Madhya\ Pradesh",
-  917745 => "Chhuriakala\,\ Madhya\ Pradesh",
-  917746 => "Manpur\,\ Madhya\ Pradesh",
-  917747 => "Mohla\,\ Madhya\ Pradesh",
-  917748 => "Dallirajhara\,\ Madhya\ Pradesh",
-  917749 => "Balod\,\ Madhya\ Pradesh",
-  917750 => "Marwahi\,\ Madhya\ Pradesh",
-  917751 => "Pendra\,\ Madhya\ Pradesh",
-  917752 => "Bilaspur\,\ Madhya\ Pradesh",
-  917753 => "Kota\,\ Madhya\ Pradesh",
-  917754 => "Pandaria\,\ Madhya\ Pradesh",
-  917755 => "Mungeli\,\ Madhya\ Pradesh",
-  917756 => "Lormi\,\ Madhya\ Pradesh",
-  917757 => "Shakti\,\ Madhya\ Pradesh",
-  917758 => "Dabhara\,\ Madhya\ Pradesh",
-  917759 => "Korba\,\ Madhya\ Pradesh",
-  917761 => "Tapkara\,\ Madhya\ Pradesh",
-  917762 => "Raigarh\,\ Madhya\ Pradesh",
-  917763 => "Jashpurnagar\,\ Madhya\ Pradesh",
-  917764 => "Kunkuri\,\ Madhya\ Pradesh",
-  917765 => "Pathalgaon\,\ Madhya\ Pradesh",
-  917766 => "Dharamjaigarh\,\ Madhya\ Pradesh",
-  917767 => "Gharghoda\,\ Madhya\ Pradesh",
-  917768 => "Saranggarh\,\ Madhya\ Pradesh",
-  917769 => "Bagicha\,\ Madhya\ Pradesh",
-  917770 => "Kathdol\,\ Madhya\ Pradesh",
-  917771 => "Manendragarh\,\ Madhya\ Pradesh",
-  917772 => "Wadrainagar\,\ Madhya\ Pradesh",
-  917773 => "Odgi\,\ Madhya\ Pradesh",
-  917774 => "Ambikapur\,\ Madhya\ Pradesh",
-  917775 => "Surajpur\,\ Madhya\ Pradesh",
-  917776 => "Premnagar\,\ Madhya\ Pradesh",
-  917777 => "Pratappur\,\ Madhya\ Pradesh",
-  917778 => "Semaria\,\ Madhya\ Pradesh",
-  917779 => "Ramchandrapur\,\ Madhya\ Pradesh",
-  917781 => "Narainpur\,\ Madhya\ Pradesh",
-  917782 => "Jagdalpur\,\ Madhya\ Pradesh",
-  917783 => "Padamkot\,\ Madhya\ Pradesh",
-  917784 => "Parasgaon\,\ Madhya\ Pradesh",
-  917785 => "Makodi\,\ Madhya\ Pradesh",
-  917786 => "Kondagaon\,\ Madhya\ Pradesh",
-  917787 => "Jarwa\,\ Madhya\ Pradesh",
-  917788 => "Luckwada\,\ Madhya\ Pradesh",
-  917789 => "Bhairongarh\,\ Madhya\ Pradesh",
-  917790 => "Babaichichli\,\ Madhya\ Pradesh",
-  917791 => "Gadarwara\,\ Madhya\ Pradesh",
-  917792 => "Narsinghpur\,\ Madhya\ Pradesh",
-  917793 => "Kareli\,\ Madhya\ Pradesh",
-  917794 => "Gotegaon\,\ Madhya\ Pradesh",
-  917801 => "Deosar\,\ Madhya\ Pradesh",
-  917802 => "Churhat\,\ Madhya\ Pradesh",
-  917803 => "Majholi\,\ Madhya\ Pradesh",
-  917804 => "Kusmi\,\ Madhya\ Pradesh",
-  917805 => "Singrauli\,\ Madhya\ Pradesh",
-  917806 => "Chitrangi\,\ Madhya\ Pradesh",
-  917810 => "Uproda\,\ Madhya\ Pradesh",
-  917811 => "Pasan\,\ Madhya\ Pradesh",
-  917812 => "Damoh\,\ Madhya\ Pradesh",
-  917813 => "Barpalli\,\ Madhya\ Pradesh",
-  917815 => "Kathghora\,\ Madhya\ Pradesh",
-  917816 => "Pali\,\ Madhya\ Pradesh",
-  917817 => "Janjgir\,\ Madhya\ Pradesh",
-  917818 => "Chandipara\,\ Madhya\ Pradesh",
-  917819 => "Pandishankar\,\ Madhya\ Pradesh",
-  917820 => "Khairagarh\,\ Madhya\ Pradesh",
-  917821 => "Dhamda\,\ Madhya\ Pradesh",
-  917822 => "Sidhi\,\ Madhya\ Pradesh",
-  917823 => "Dongargarh\,\ Madhya\ Pradesh",
-  917824 => "Bemetara\,\ Madhya\ Pradesh",
-  917825 => "Berla\,\ Madhya\ Pradesh",
-  917826 => "Patan\,\ Madhya\ Pradesh",
-  917831 => "Balrampur\,\ Madhya\ Pradesh",
-  917832 => "Rajpur\,\ Madhya\ Pradesh",
-  917833 => "Udaipur\,\ Madhya\ Pradesh",
-  917834 => "Sitapur\,\ Madhya\ Pradesh",
-  917835 => "Bharathpur\,\ Madhya\ Pradesh",
-  917836 => "Baikunthpur\,\ Madhya\ Pradesh",
-  917840 => "Koyelibeda\,\ Madhya\ Pradesh",
-  917841 => "Sarona\,\ Madhya\ Pradesh",
-  917843 => "Durgakondal\,\ Madhya\ Pradesh",
-  917844 => "Pakhanjur\,\ Madhya\ Pradesh",
-  917846 => "Garpa\,\ Madhya\ Pradesh",
-  917847 => "Antagarh\,\ Madhya\ Pradesh",
-  917848 => "Keskal\,\ Madhya\ Pradesh",
-  917849 => "Baderajpur\,\ Madhya\ Pradesh",
-  917850 => "Bhanupratappur\,\ Madhya\ Pradesh",
-  917851 => "Bhopalpatnam\,\ Madhya\ Pradesh",
-  917852 => "Toynar\,\ Madhya\ Pradesh",
-  917853 => "Bijapur\,\ Madhya\ Pradesh",
-  917854 => "Ilamidi\,\ Madhya\ Pradesh",
-  917855 => "Chingmut\,\ Madhya\ Pradesh",
-  917856 => "Dantewada\,\ Madhya\ Pradesh",
-  917857 => "Bacheli\,\ Madhya\ Pradesh",
-  917858 => "Kuakunda\,\ Madhya\ Pradesh",
-  917859 => "Lohadigundah\,\ Madhya\ Pradesh",
-  917861 => "Netanar\,\ Madhya\ Pradesh",
-  917862 => "Bastanar\,\ Madhya\ Pradesh",
-  917863 => "Chingamut\,\ Madhya\ Pradesh",
-  917864 => "Sukma\,\ Madhya\ Pradesh",
-  917865 => "Gogunda\,\ Madhya\ Pradesh",
-  917866 => "Konta\,\ Madhya\ Pradesh",
-  917867 => "Bokaband\,\ Madhya\ Pradesh",
-  917868 => "Kanker\,\ Madhya\ Pradesh",
-  91788 => "Durg\,\ Madhya\ Pradesh",
-  9179 => "Ahmedabad\ Local\,\ Gujarat",
-  9180 => "Bangalore\,\ Karnataka",
-  918110 => "Anekal\,\ Karnataka",
-  918111 => "Hosakote\,\ Karnataka",
-  918113 => "Channapatna\,\ Karnataka",
-  918117 => "Kanakapura\,\ Karnataka",
-  918118 => "Nelamangala\,\ Karnataka",
-  918119 => "Doddaballapur\,\ Karnataka",
-  918131 => "Gubbi\,\ Karnataka",
-  918132 => "Kunigal\,\ Karnataka",
-  918133 => "Chikkanayakanahalli\,\ Karnataka",
-  918134 => "Tiptur\,\ Karnataka",
-  918135 => "Sira\,\ Karnataka",
-  918136 => "Pavagada\,\ Karnataka",
-  918137 => "Madugiri\,\ Karnataka",
-  918138 => "Koratageri\,\ Karnataka",
-  918139 => "Turuvekere\,\ Karnataka",
-  918150 => "Bagepalli\,\ Karnataka",
-  918151 => "Malur\,\ Karnataka",
-  918152 => "Kolar\,\ Karnataka",
-  918153 => "Bangarpet\,\ Karnataka",
-  918154 => "Chintamani\,\ Karnataka",
-  918155 => "Gowribidanur\,\ Karnataka",
-  918156 => "Chikkaballapur\,\ Karnataka",
-  918157 => "Srinivasapur\,\ Karnataka",
-  918158 => "Sidlaghatta\,\ Karnataka",
-  918159 => "Mulbagal\,\ Karnataka",
-  91816 => "Tumkur\,\ Karnataka",
-  918170 => "Alur\,\ Karnataka",
-  918172 => "Hassan\,\ Karnataka",
-  918173 => "Sakleshpur\,\ Karnataka",
-  918174 => "Arsikere\,\ Karnataka",
-  918175 => "Holenarasipur\,\ Karnataka",
-  918176 => "Cannarayapatna\,\ Karnataka",
-  918177 => "Belur\,\ Karnataka",
-  918180 => "Basavapatna\,\ Karnataka",
-  918181 => "Thirthahalli\,\ Karnataka",
-  918182 => "Shimoga\,\ Karnataka",
-  918183 => "Sagar\,\ Karnataka",
-  918184 => "Sorab\,\ Karnataka",
-  918185 => "Hosanagara\,\ Karnataka",
-  918186 => "Kargal\,\ Karnataka",
-  918187 => "Shikaripura\,\ Karnataka",
-  918188 => "Honnali\,\ Karnataka",
-  918189 => "Channagiri\,\ Karnataka",
-  918190 => "Tallak\,\ Karnataka",
-  918191 => "Holalkere\,\ Karnataka",
-  918192 => "Davangere\,\ Karnataka",
-  918193 => "Hiriyur\,\ Karnataka",
-  918194 => "Chitradurga\,\ Karnataka",
-  918195 => "Challakere\,\ Karnataka",
-  918196 => "Jagalur\,\ Karnataka",
-  918198 => "Molkalmuru\,\ Karnataka",
-  918199 => "Hosadurga\,\ Karnataka",
-  91820 => "Udupi\,\ Karnataka",
-  91821 => "Mysore\,\ Karnataka",
-  918221 => "Nanjangud\,\ Karnataka",
-  918222 => "Hunsur\,\ Karnataka",
-  918223 => "K\.R\.Nagar\,\ Karnataka",
-  918224 => "Kollegal\,\ Karnataka",
-  918225 => "Cowdahalli\,\ Karnataka",
-  918226 => "Chamrajnagar\,\ Karnataka",
-  918227 => "T\.Narsipur\,\ Karnataka",
-  918228 => "H\.D\.Kote\,\ Karnataka",
-  918229 => "Gundlupet\,\ Karnataka",
-  918230 => "Krishnarajapet\,\ Karnataka",
-  918231 => "Malavalli\,\ Karnataka",
-  918232 => "Mandya\,\ Karnataka",
-  918234 => "Nagamangala\,\ Karnataka",
-  918236 => "Pandavpura\,\ Karnataka",
-  91824 => "Mangalore\,\ Karnataka",
-  918251 => "Puttur\,\ Karnataka",
-  918253 => "Hebri\,\ Karnataka",
-  918254 => "Kundapur\,\ Karnataka",
-  918255 => "Bantwal\,\ Karnataka",
-  918256 => "Belthangady\,\ Karnataka",
-  918257 => "Sullia\,\ Karnataka",
-  918258 => "Karkala\,\ Karnataka",
-  918259 => "Shankarnarayana\,\ Karnataka",
-  918261 => "Tarikere\,\ Karnataka",
-  918262 => "Chikmagalur\,\ Karnataka",
-  918263 => "Mudigere\,\ Karnataka",
-  918265 => "Koppa\,\ Karnataka",
-  918266 => "Narsimharajapur\,\ Karnataka",
-  918267 => "Kadur\,\ Karnataka",
-  918272 => "Madikeri\,\ Karnataka",
-  918274 => "Virajpet\,\ Karnataka",
-  918276 => "Somwarpet\,\ Karnataka",
-  918282 => "Bhadravati\,\ Karnataka",
-  918283 => "Salkani\,\ Karnataka",
-  918284 => "Haliyal\,\ Karnataka",
-  918288 => "Bailhongal\,\ Karnataka",
-  918289 => "Athani\,\ Karnataka",
-  918301 => "Mundagod\,\ Karnataka",
-  918304 => "Kundgol\,\ Karnataka",
-  91831 => "Belgaum\,\ Karnataka",
-  91832 => "Goa",
-  918330 => "Saundatti\,\ Karnataka",
-  918331 => "Raibag\/Kudchi\,\ Karnataka",
-  918332 => "Gokak\,\ Karnataka",
-  918333 => "Hukkeri\/Sankeshwar\,\ Karnataka",
-  918334 => "Mudalgi\,\ Karnataka",
-  918335 => "Ramdurg\,\ Karnataka",
-  918336 => "Khanapur\,\ Karnataka",
-  918337 => "Murugod\,\ Karnataka",
-  918338 => "Chikkodi\,\ Karnataka",
-  918339 => "Ainapur\,\ Karnataka",
-  918350 => "Mudhol\,\ Karnataka",
-  918351 => "Hungund\,\ Karnataka",
-  918352 => "Bijapur\,\ Karnataka",
-  918353 => "Jamkhandi\,\ Karnataka",
-  918354 => "Bagalkot\,\ Karnataka",
-  918355 => "Bableshwar\,\ Karnataka",
-  918356 => "Muddebihal\,\ Karnataka",
-  918357 => "Badami\,\ Karnataka",
-  918358 => "Basavanabagewadi\,\ Karnataka",
-  918359 => "Indi\,\ Karnataka",
-  91836 => "Hubli\,\ Karnataka",
-  918370 => "Kalghatagi\,\ Karnataka",
-  918371 => "Mundargi\,\ Karnataka",
-  918372 => "Gadag\,\ Karnataka",
-  918373 => "Ranebennur\,\ Karnataka",
-  918375 => "Haveri\,\ Karnataka",
-  918376 => "Hirekerur\,\ Karnataka",
-  918377 => "Nargund\,\ Karnataka",
-  918378 => "Savanur\,\ Karnataka",
-  918379 => "Hangal\,\ Karnataka",
-  918380 => "Navalgund\,\ Karnataka",
-  918381 => "Ron\,\ Karnataka",
-  918382 => "Karwar\,\ Karnataka",
-  918383 => "Joida\,\ Karnataka",
-  918384 => "Sirsi\,\ Karnataka",
-  918385 => "Bhatkal\,\ Karnataka",
-  918386 => "Kumta\,\ Karnataka",
-  918387 => "Honnavar\,\ Karnataka",
-  918388 => "Ankola\,\ Karnataka",
-  918389 => "Siddapur\,\ Karnataka",
-  918391 => "Kudligi\,\ Karnataka",
-  918392 => "Bellary\,\ Karnataka",
-  918393 => "Kurugodu\,\ Karnataka",
-  918394 => "Hospet\,\ Karnataka",
-  918395 => "Sandur\,\ Karnataka",
-  918396 => "Siruguppa\,\ Karnataka",
-  918397 => "H\.B\.Halli\,\ Karnataka",
-  918398 => "Harapanahalli\,\ Karnataka",
-  918399 => "Huvinahadagali\,\ Karnataka",
-  918402 => "Kanigiri\,\ Andhra\ Pradesh",
-  918403 => "Yerragondapalem\,\ Andhra\ Pradesh",
-  918404 => "Marturu\,\ Andhra\ Pradesh",
-  918405 => "Giddalur\,\ Andhra\ Pradesh",
-  918406 => "Cumbum\,\ Andhra\ Pradesh",
-  918407 => "Darsi\,\ Andhra\ Pradesh",
-  918408 => "Donakonda\,\ Andhra\ Pradesh",
-  918411 => "Tanduru\,\ Andhra\ Pradesh",
-  918412 => "Pargi\,\ Andhra\ Pradesh",
-  918413 => "Hyderabad\ West\/Shamshabad\,\ Andhra\ Pradesh",
-  918414 => "Ibrahimpatnam\,\ Andhra\ Pradesh",
-  918415 => "Hyderabad\ East\/Ghatkeswar\,\ Andhra\ Pradesh",
-  918416 => "Vikrabad\,\ Andhra\ Pradesh",
-  918417 => "Chevella\,\ Andhra\ Pradesh",
-  918418 => "Medchal\,\ Andhra\ Pradesh",
-  918419 => "Yellapur\,\ Karnataka",
-  918422 => "Chadchan\,\ Karnataka",
-  918424 => "Devarahippargi\,\ Karnataka",
-  918425 => "Biligi\,\ Karnataka",
-  918426 => "Telgi\,\ Karnataka",
-  918440 => "Nimburga\,\ Karnataka",
-  918441 => "Sedam\,\ Karnataka",
-  918442 => "Jewargi\,\ Karnataka",
-  918443 => "Shorapur\,\ Karnataka",
-  918444 => "Hunsagi\,\ Karnataka",
-  918450 => "Andole\/Jogipet\,\ Andhra\ Pradesh",
-  918451 => "Zahirabad\,\ Andhra\ Pradesh",
-  918452 => "Medak\,\ Andhra\ Pradesh",
-  918454 => "Gajwel\,\ Andhra\ Pradesh",
-  918455 => "Sangareddy\,\ Andhra\ Pradesh",
-  918456 => "Narayankhed\,\ Andhra\ Pradesh",
-  918457 => "Siddipet\,\ Andhra\ Pradesh",
-  918458 => "Narsapur\,\ Andhra\ Pradesh",
-  918461 => "Dichpalli\,\ Andhra\ Pradesh",
-  918462 => "Nizamabad\,\ Andhra\ Pradesh",
-  918463 => "Armoor\,\ Andhra\ Pradesh",
-  918464 => "Madnur\,\ Andhra\ Pradesh",
-  918465 => "Yellareddy\,\ Andhra\ Pradesh",
-  918466 => "Banswada\,\ Andhra\ Pradesh",
-  918467 => "Bodhan\,\ Andhra\ Pradesh",
-  918468 => "Kamareddy\,\ Andhra\ Pradesh",
-  918470 => "Afzalpur\,\ Karnataka",
-  918471 => "Mashal\,\ Karnataka",
-  918472 => "Gulbarga\,\ Karnataka",
-  918473 => "Yadgiri\,\ Karnataka",
-  918474 => "Chittapur\,\ Karnataka",
-  918475 => "Chincholi\,\ Karnataka",
-  918476 => "Wadi\,\ Karnataka",
-  918477 => "Aland\,\ Karnataka",
-  918478 => "Kamalapur\,\ Karnataka",
-  918479 => "Shahapur\,\ Karnataka",
-  918481 => "Basavakalyan\,\ Karnataka",
-  918482 => "Bidar\,\ Karnataka",
-  918483 => "Humnabad\,\ Karnataka",
-  918484 => "Bhalki\,\ Karnataka",
-  918485 => "Aurad\,\ Karnataka",
-  918487 => "Shirahatti\,\ Karnataka",
-  918488 => "Sindagi\,\ Karnataka",
-  918490 => "Pamuru\,\ Andhra\ Pradesh",
-  918491 => "Kanaganapalle\,\ Andhra\ Pradesh",
-  918492 => "Kambadur\,\ Andhra\ Pradesh",
-  918493 => "Madakasira\,\ Andhra\ Pradesh",
-  918494 => "Kadiri\,\ Andhra\ Pradesh",
-  918495 => "Rayadurg\,\ Andhra\ Pradesh",
-  918496 => "Uravakonda\,\ Andhra\ Pradesh",
-  918497 => "Kalyandurg\,\ Andhra\ Pradesh",
-  918498 => "Nallacheruvu\/Tanakallu\,\ Andhra\ Pradesh",
-  918499 => "Podili\,\ Andhra\ Pradesh",
-  918501 => "Kollapur\,\ Andhra\ Pradesh",
-  918502 => "Alampur\,\ Andhra\ Pradesh",
-  918503 => "Makthal\,\ Andhra\ Pradesh",
-  918504 => "Atmakur\,\ Andhra\ Pradesh",
-  918505 => "Kodangal\,\ Andhra\ Pradesh",
-  918506 => "Narayanpet\,\ Andhra\ Pradesh",
-  918510 => "Koilkuntla\,\ Andhra\ Pradesh",
-  918512 => "Adoni\,\ Andhra\ Pradesh",
-  918513 => "Nandikotkur\,\ Andhra\ Pradesh",
-  918514 => "Nandyal\,\ Andhra\ Pradesh",
-  918515 => "Banaganapalle\,\ Andhra\ Pradesh",
-  918516 => "Dronachalam\,\ Andhra\ Pradesh",
-  918517 => "Atmakur\,\ Andhra\ Pradesh",
-  918518 => "Kurnool\,\ Andhra\ Pradesh",
-  918519 => "Allagadda\,\ Andhra\ Pradesh",
-  918520 => "Pattikonda\,\ Andhra\ Pradesh",
-  918522 => "Peapalle\,\ Andhra\ Pradesh",
-  918523 => "Alur\,\ Andhra\ Pradesh",
-  918524 => "Srisailam\,\ Andhra\ Pradesh",
-  918525 => "Gudur\/Kodumur\,\ Andhra\ Pradesh",
-  918531 => "Deodurga\,\ Karnataka",
-  918532 => "Raichur\,\ Karnataka",
-  918533 => "Gangavathi\,\ Karnataka",
-  918534 => "Yelburga\,\ Karnataka",
-  918535 => "Sindhanur\,\ Karnataka",
-  918536 => "Kustagi\,\ Karnataka",
-  918537 => "Lingsugur\,\ Karnataka",
-  918538 => "Manvi\,\ Karnataka",
-  918539 => "Koppal\,\ Karnataka",
-  918540 => "Nagarkurnool\,\ Andhra\ Pradesh",
-  918541 => "Achampet\,\ Andhra\ Pradesh",
-  918542 => "Mahabubnagar\,\ Andhra\ Pradesh",
-  918543 => "Wanaparthy\,\ Andhra\ Pradesh",
-  918545 => "Amangallu\,\ Andhra\ Pradesh",
-  918546 => "Gadwal\,\ Andhra\ Pradesh",
-  918548 => "Shadnagar\,\ Andhra\ Pradesh",
-  918549 => "Kalwakurthy\,\ Andhra\ Pradesh",
-  918550 => "Yellanuru\,\ Andhra\ Pradesh",
-  918551 => "Garladinne\,\ Andhra\ Pradesh",
-  918552 => "Gooty\/Guntakal\,\ Andhra\ Pradesh",
-  918554 => "Anantapur\,\ Andhra\ Pradesh",
-  918556 => "Hindupur\,\ Andhra\ Pradesh",
-  918557 => "Penukonda\,\ Andhra\ Pradesh",
-  918558 => "Tadipatri\,\ Andhra\ Pradesh",
-  918559 => "Dharmavaram\,\ Andhra\ Pradesh",
-  918560 => "Jammalamadugu\,\ Andhra\ Pradesh",
-  918561 => "Rayachoti\,\ Andhra\ Pradesh",
-  918562 => "Kadapa\,\ Andhra\ Pradesh",
-  918563 => "Kamalapuram\/Yerraguntala\,\ Andhra\ Pradesh",
-  918564 => "Proddatur\,\ Andhra\ Pradesh",
-  918565 => "Rajampeta\,\ Andhra\ Pradesh",
-  918566 => "Koduru\,\ Andhra\ Pradesh",
-  918567 => "Lakkireddipalli\,\ Andhra\ Pradesh",
-  918568 => "Pulivendla\,\ Andhra\ Pradesh",
-  918569 => "Badvel\,\ Andhra\ Pradesh",
-  918570 => "Kuppam\,\ Andhra\ Pradesh",
-  918571 => "Madanapalli\,\ Andhra\ Pradesh",
-  918572 => "Chittoor\,\ Andhra\ Pradesh",
-  918573 => "Bangarupalem\,\ Andhra\ Pradesh",
-  918576 => "Satyavedu\,\ Andhra\ Pradesh",
-  918577 => "Putturu\,\ Andhra\ Pradesh",
-  918578 => "Srikalahasthi\,\ Andhra\ Pradesh",
-  918579 => "Palmaneru\,\ Andhra\ Pradesh",
-  918581 => "Punganur\,\ Andhra\ Pradesh",
-  918582 => "B\.Kothakota\,\ Andhra\ Pradesh",
-  918583 => "Sodam\,\ Andhra\ Pradesh",
-  918584 => "Piler\,\ Andhra\ Pradesh",
-  918585 => "Pakala\,\ Andhra\ Pradesh",
-  918586 => "Vayalpad\,\ Andhra\ Pradesh",
-  918587 => "Venkatgirikota\,\ Andhra\ Pradesh",
-  918588 => "Vaimpalli\,\ Andhra\ Pradesh",
-  918589 => "Siddavattam\,\ Andhra\ Pradesh",
-  918592 => "Ongole\,\ Andhra\ Pradesh",
-  918593 => "Medarmetla\,\ Andhra\ Pradesh",
-  918594 => "Chirala\,\ Andhra\ Pradesh",
-  918596 => "Markapur\,\ Andhra\ Pradesh",
-  918598 => "Kandukuru\,\ Andhra\ Pradesh",
-  918599 => "Ulvapadu\,\ Andhra\ Pradesh",
-  91861 => "Nellore\,\ Andhra\ Pradesh",
-  918620 => "Udaygiri\,\ Andhra\ Pradesh",
-  918621 => "Rapur\/Podalakur\,\ Andhra\ Pradesh",
-  918622 => "Kovvur\,\ Andhra\ Pradesh",
-  918623 => "Sullurpet\,\ Andhra\ Pradesh",
-  918624 => "Gudur\,\ Andhra\ Pradesh",
-  918625 => "Venkatgiri\,\ Andhra\ Pradesh",
-  918626 => "Kavali\,\ Andhra\ Pradesh",
-  918627 => "Atmakur\,\ Andhra\ Pradesh",
-  918628 => "Chejerla\,\ Andhra\ Pradesh",
-  918629 => "Vinjamuru\,\ Andhra\ Pradesh",
-  91863 => "Guntur\,\ Andhra\ Pradesh",
-  918640 => "Krosuru\,\ Andhra\ Pradesh",
-  918641 => "Sattenapalli\,\ Andhra\ Pradesh",
-  918642 => "Guntur\ Palnad\/Macherala\,\ Andhra\ Pradesh",
-  918643 => "Bapatla\,\ Andhra\ Pradesh",
-  918644 => "Tenali\,\ Andhra\ Pradesh",
-  918645 => "Mangalagiri\,\ Andhra\ Pradesh",
-  918646 => "Vinukonda\,\ Andhra\ Pradesh",
-  918647 => "Narsaraopet\,\ Andhra\ Pradesh",
-  918648 => "Repalle\,\ Andhra\ Pradesh",
-  918649 => "Piduguralla\,\ Andhra\ Pradesh",
-  918654 => "Jaggayyapet\,\ Andhra\ Pradesh",
-  918656 => "Nuzvidu\,\ Andhra\ Pradesh",
-  918659 => "Mylavaram\,\ Andhra\ Pradesh",
-  91866 => "Vijayawada\,\ Andhra\ Pradesh",
-  918671 => "Divi\/Challapalli\,\ Andhra\ Pradesh",
-  918672 => "Bandar\/Machilipatnam\,\ Andhra\ Pradesh",
-  918673 => "Tirivuru\,\ Andhra\ Pradesh",
-  918674 => "Gudivada\,\ Andhra\ Pradesh",
-  918676 => "Vuyyuru\,\ Andhra\ Pradesh",
-  918677 => "Kaikaluru\,\ Andhra\ Pradesh",
-  918678 => "Nandigama\,\ Andhra\ Pradesh",
-  918680 => "Nidamanur\/Hillcolony\,\ Andhra\ Pradesh",
-  918681 => "Chandoor\,\ Andhra\ Pradesh",
-  918682 => "Nalgonda\,\ Andhra\ Pradesh",
-  918683 => "Hazurnagar\,\ Andhra\ Pradesh",
-  918684 => "Suryapet\,\ Andhra\ Pradesh",
-  918685 => "Bhongir\,\ Andhra\ Pradesh",
-  918689 => "Miryalguda\,\ Andhra\ Pradesh",
-  918691 => "Devarakonda\,\ Andhra\ Pradesh",
-  918692 => "Nampalle\,\ Andhra\ Pradesh",
-  918693 => "Thungaturthy\,\ Andhra\ Pradesh",
-  918694 => "Ramannapet\,\ Andhra\ Pradesh",
-  91870 => "Warangal\,\ Andhra\ Pradesh",
-  918710 => "Cherial\,\ Andhra\ Pradesh",
-  918711 => "Wardhannapet\/Ghanapur\,\ Andhra\ Pradesh",
-  918713 => "Parkal\,\ Andhra\ Pradesh",
-  918715 => "Mulug\,\ Andhra\ Pradesh",
-  918716 => "Jangaon\,\ Andhra\ Pradesh",
-  918717 => "Eturnagaram\,\ Andhra\ Pradesh",
-  918718 => "Narasampet\,\ Andhra\ Pradesh",
-  918719 => "Mahabubbad\,\ Andhra\ Pradesh",
-  918720 => "Mahadevapur\,\ Andhra\ Pradesh",
-  918721 => "Husnabad\,\ Andhra\ Pradesh",
-  918723 => "Sircilla\,\ Andhra\ Pradesh",
-  918724 => "Jagtial\,\ Andhra\ Pradesh",
-  918725 => "Metpalli\,\ Andhra\ Pradesh",
-  918727 => "Huzurabad\,\ Andhra\ Pradesh",
-  918728 => "Peddapalli\,\ Andhra\ Pradesh",
-  918729 => "Manthani\,\ Andhra\ Pradesh",
-  918730 => "Khanapur\,\ Andhra\ Pradesh",
-  918731 => "Utnor\,\ Andhra\ Pradesh",
-  918732 => "Adilabad\,\ Andhra\ Pradesh",
-  918733 => "Asifabad\,\ Andhra\ Pradesh",
-  918734 => "Nirmal\,\ Andhra\ Pradesh",
-  918735 => "Bellampalli\,\ Andhra\ Pradesh",
-  918736 => "Mancherial\,\ Andhra\ Pradesh",
-  918737 => "Chinnor\,\ Andhra\ Pradesh",
-  918738 => "Sirpurkagaznagar\,\ Andhra\ Pradesh",
-  918739 => "Jannaram\/Luxittipet\,\ Andhra\ Pradesh",
-  918740 => "Aswaraopet\,\ Andhra\ Pradesh",
-  918741 => "Sudhimalla\/Tekulapalli\,\ Andhra\ Pradesh",
-  918742 => "Khammam\,\ Andhra\ Pradesh",
-  918743 => "Bhadrachalam\,\ Andhra\ Pradesh",
-  918744 => "Kothagudem\,\ Andhra\ Pradesh",
-  918745 => "Yellandu\,\ Andhra\ Pradesh",
-  918746 => "Bhooragamphad\/Manuguru\,\ Andhra\ Pradesh",
-  918747 => "Nuguru\/Cherla\,\ Andhra\ Pradesh",
-  918748 => "V\.R\.Puram\,\ Andhra\ Pradesh",
-  918749 => "Madhira\,\ Andhra\ Pradesh",
-  918751 => "Boath\/Echoda\,\ Andhra\ Pradesh",
-  918752 => "Bhainsa\,\ Andhra\ Pradesh",
-  918753 => "Outsarangapalle\,\ Andhra\ Pradesh",
-  918761 => "Sathupalli\,\ Andhra\ Pradesh",
-  91877 => "Tirupathi\,\ Andhra\ Pradesh",
-  91878 => "Karimnagar\,\ Andhra\ Pradesh",
-  918811 => "Polavaram\,\ Andhra\ Pradesh",
-  918812 => "Eluru\,\ Andhra\ Pradesh",
-  918813 => "Eluru\ Kovvur\/Nidadavolu\,\ Andhra\ Pradesh",
-  918814 => "Eluru\ Narsapur\/Palakole\,\ Andhra\ Pradesh",
-  918816 => "Bhimavaram\,\ Andhra\ Pradesh",
-  918818 => "Tadepalligudem\,\ Andhra\ Pradesh",
-  918819 => "Tanuku\,\ Andhra\ Pradesh",
-  918821 => "Jangareddygudem\,\ Andhra\ Pradesh",
-  918823 => "Chintalapudi\,\ Andhra\ Pradesh",
-  918829 => "Bhimadole\,\ Andhra\ Pradesh",
-  91883 => "Rajahmundri\,\ Andhra\ Pradesh",
-  91884 => "Kakinada\,\ Andhra\ Pradesh",
-  918852 => "Peddapuram\,\ Andhra\ Pradesh",
-  918854 => "Tuni\,\ Andhra\ Pradesh",
-  918855 => "Mandapeta\/Ravulapalem\,\ Andhra\ Pradesh",
-  918856 => "Amalapuram\,\ Andhra\ Pradesh",
-  918857 => "Ramachandrapuram\,\ Andhra\ Pradesh",
-  918862 => "Razole\,\ Andhra\ Pradesh",
-  918863 => "Chavitidibbalu\,\ Andhra\ Pradesh",
-  918864 => "Rampachodavaram\,\ Andhra\ Pradesh",
-  918865 => "Yelavaram\,\ Andhra\ Pradesh",
-  918868 => "Yeleswaram\,\ Andhra\ Pradesh",
-  918869 => "Pithapuram\,\ Andhra\ Pradesh",
-  91891 => "Visakhapatnam\,\ Andhra\ Pradesh",
-  918922 => "Vizayanagaram\,\ Andhra\ Pradesh",
-  918924 => "Anakapalle\,\ Andhra\ Pradesh",
-  918931 => "Yelamanchili\,\ Andhra\ Pradesh",
-  918932 => "Narsipatnam\,\ Andhra\ Pradesh",
-  918933 => "Bheemunipatnam\,\ Andhra\ Pradesh",
-  918934 => "Chodavaram\,\ Andhra\ Pradesh",
-  918935 => "Paderu\,\ Andhra\ Pradesh",
-  918936 => "Araku\,\ Andhra\ Pradesh",
-  918937 => "Chintapalle\,\ Andhra\ Pradesh",
-  918938 => "Sileru\,\ Andhra\ Pradesh",
-  918941 => "Palakonda\/Rajam\,\ Andhra\ Pradesh",
-  918942 => "Srikakulam\,\ Andhra\ Pradesh",
-  918944 => "Bobbili\,\ Andhra\ Pradesh",
-  918945 => "Tekkali\/Palasa\,\ Andhra\ Pradesh",
-  918946 => "Pathapatnam\/Hiramandalam\,\ Andhra\ Pradesh",
-  918947 => "Sompeta\,\ Andhra\ Pradesh",
-  918952 => "Chepurupalli\/Garividi\,\ Andhra\ Pradesh",
-  918963 => "Parvathipuram\,\ Andhra\ Pradesh",
-  918964 => "Saluru\,\ Andhra\ Pradesh",
-  918965 => "Gajapathinagaram\,\ Andhra\ Pradesh",
-  918966 => "Srungavarapukota\/Kothavalasa\,\ Andhra\ Pradesh",
-);
+my %areanames = ();
+$areanames{en}->{9111} = "New\ Delhi";
+$areanames{en}->{91120} = "Ghaziabad\/Dadri\,\ Uttar\ Pradesh";
+$areanames{en}->{91121} = "Meerut\,\ Uttar\ Pradesh";
+$areanames{en}->{91122} = "Hapur\,\ Uttar\ Pradesh";
+$areanames{en}->{911232} = "Modinagar\,\ Uttar\ Pradesh";
+$areanames{en}->{911233} = "Mawana\,\ Uttar\ Pradesh";
+$areanames{en}->{911234} = "Baghpat\/Baraut\,\ Uttar\ Pradesh";
+$areanames{en}->{911237} = "Sardhana\,\ Uttar\ Pradesh";
+$areanames{en}->{91124} = "Gurgaon\,\ Haryana";
+$areanames{en}->{911250} = "Charkhidadri\,\ Haryana";
+$areanames{en}->{911251} = "Jhajjar\,\ Haryana";
+$areanames{en}->{911252} = "Loharu\,\ Haryana";
+$areanames{en}->{911253} = "Tohsham\,\ Haryana";
+$areanames{en}->{911254} = "Bawanikhera\,\ Haryana";
+$areanames{en}->{911255} = "Siwani\,\ Haryana";
+$areanames{en}->{911257} = "Meham\,\ Haryana";
+$areanames{en}->{911258} = "Kalanaur\,\ Haryana";
+$areanames{en}->{911259} = "Kosli\,\ Haryana";
+$areanames{en}->{911262} = "Rohtak\,\ Haryana";
+$areanames{en}->{911263} = "Gohana\,\ Haryana";
+$areanames{en}->{911267} = "Nuh\,\ Haryana";
+$areanames{en}->{911268} = "Ferojpur\,\ Haryana";
+$areanames{en}->{911274} = "Rewari\,\ Haryana";
+$areanames{en}->{911275} = "Palwal\,\ Haryana";
+$areanames{en}->{911276} = "Bahadurgarh\,\ Haryana";
+$areanames{en}->{911281} = "Jatusana\,\ Haryana";
+$areanames{en}->{911282} = "Narnaul\,\ Haryana";
+$areanames{en}->{911284} = "Bawal\,\ Haryana";
+$areanames{en}->{911285} = "Mohindergarh\,\ Haryana";
+$areanames{en}->{91129} = "Faridabad\,\ Haryana";
+$areanames{en}->{91130} = "Sonipat\,\ Haryana";
+$areanames{en}->{91131} = "Muzaffarnagar\,\ Uttar\ Pradesh";
+$areanames{en}->{91132} = "Saharanpur\,\ Uttar\ Pradesh";
+$areanames{en}->{911331} = "Nakur\/Gangoh\,\ Uttar\ Pradesh";
+$areanames{en}->{911332} = "Roorkee\,\ Uttarakhand";
+$areanames{en}->{911334} = "Roorkee\/Haridwar\,\ Uttarakhand";
+$areanames{en}->{911336} = "Deoband\,\ Uttar\ Pradesh";
+$areanames{en}->{911341} = "Najibabad\,\ Uttar\ Pradesh";
+$areanames{en}->{911342} = "Bijnor\,\ Uttar\ Pradesh";
+$areanames{en}->{911343} = "Nagina\,\ Uttar\ Pradesh";
+$areanames{en}->{911344} = "Dhampur\,\ Uttar\ Pradesh";
+$areanames{en}->{911345} = "Bijnor\/Chandpur\,\ Uttar\ Pradesh";
+$areanames{en}->{911346} = "Pauri\/Bubakhal\,\ Uttarakhand";
+$areanames{en}->{911348} = "Lansdowne\/Syunsi\,\ Uttarakhand";
+$areanames{en}->{91135} = "Dehradun\,\ Uttarakhand";
+$areanames{en}->{911360} = "Dehradun\ Chakrata\/Dakpattar\,\ Uttarakhand";
+$areanames{en}->{911363} = "Karnaprayag\,\ Uttarakhand";
+$areanames{en}->{911364} = "Ukhimath\/Guptkashi\,\ Uttarakhand";
+$areanames{en}->{911368} = "Pauri\,\ Uttarakhand";
+$areanames{en}->{911370} = "Devprayag\/Jakholi\,\ Uttarakhand";
+$areanames{en}->{911371} = "Dunda\,\ Uttarakhand";
+$areanames{en}->{911372} = "Chamoli\,\ Uttarakhand";
+$areanames{en}->{911373} = "Purola\,\ Uttarakhand";
+$areanames{en}->{911374} = "Bhatwari\/Uttarkashi\,\ Uttarakhand";
+$areanames{en}->{911375} = "Rajgarhi\,\ Uttarakhand";
+$areanames{en}->{911376} = "Tehri\,\ Uttarakhand";
+$areanames{en}->{911377} = "Bhatwari\/Gangotri\,\ Uttarakhand";
+$areanames{en}->{911378} = "Devprayag\,\ Uttarakhand";
+$areanames{en}->{911379} = "Pratapnagar\,\ Uttarakhand";
+$areanames{en}->{911381} = "Joshimath\/Badrinath\,\ Uttarakhand";
+$areanames{en}->{911382} = "Lansdowne\/Kotdwara\,\ Uttarakhand";
+$areanames{en}->{911386} = "Lansdowne\,\ Uttarakhand";
+$areanames{en}->{911389} = "Joshimath\,\ Uttarakhand";
+$areanames{en}->{911392} = "Budhana\,\ Uttar\ Pradesh";
+$areanames{en}->{911396} = "Jansath\/Khatauli\,\ Uttar\ Pradesh";
+$areanames{en}->{911398} = "Kairana\/Shamli\,\ Uttar\ Pradesh";
+$areanames{en}->{91141} = "Jaipur\,\ Rajasthan";
+$areanames{en}->{911420} = "Baswa\/Bandikui\,\ Rajasthan";
+$areanames{en}->{911421} = "Kotputli\,\ Rajasthan";
+$areanames{en}->{911422} = "Viratnagar\/Shahpura\,\ Rajasthan";
+$areanames{en}->{911423} = "Amber\/Chomu\,\ Rajasthan";
+$areanames{en}->{911424} = "Phulera\/Renwal\,\ Rajasthan";
+$areanames{en}->{911425} = "Phulera\/Sambhar\,\ Rajasthan";
+$areanames{en}->{911426} = "Jamwa\ Ramgarh\/Achrol\,\ Rajasthan";
+$areanames{en}->{911427} = "Dausa\,\ Rajasthan";
+$areanames{en}->{911428} = "Dudu\,\ Rajasthan";
+$areanames{en}->{911429} = "Bassi\,\ Rajasthan";
+$areanames{en}->{911430} = "Phagi\,\ Rajasthan";
+$areanames{en}->{911431} = "Lalsot\,\ Rajasthan";
+$areanames{en}->{911432} = "Tonk\,\ Rajasthan";
+$areanames{en}->{911433} = "Todaraisingh\,\ Rajasthan";
+$areanames{en}->{911434} = "Deoli\,\ Rajasthan";
+$areanames{en}->{911435} = "Tonk\/Piploo\,\ Rajasthan";
+$areanames{en}->{911436} = "Uniayara\,\ Rajasthan";
+$areanames{en}->{911437} = "Malpura\,\ Rajasthan";
+$areanames{en}->{911438} = "Newai\,\ Rajasthan";
+$areanames{en}->{91144} = "Alwar\,\ Rajasthan";
+$areanames{en}->{91145} = "Ajmer\,\ Rajasthan";
+$areanames{en}->{911460} = "Kishangarhbas\/Khairthal\,\ Rajasthan";
+$areanames{en}->{911461} = "Bansur\,\ Rajasthan";
+$areanames{en}->{911462} = "Beawar\,\ Rajasthan";
+$areanames{en}->{911463} = "Kishangarh\,\ Rajasthan";
+$areanames{en}->{911464} = "Rajgarh\,\ Rajasthan";
+$areanames{en}->{911465} = "Thanaghazi\,\ Rajasthan";
+$areanames{en}->{911466} = "Kekri\,\ Rajasthan";
+$areanames{en}->{911467} = "Kekri\,\ Rajasthan";
+$areanames{en}->{911468} = "Ramgarh\,\ Rajasthan";
+$areanames{en}->{911469} = "Tijara\,\ Rajasthan";
+$areanames{en}->{911470} = "Dungla\,\ Rajasthan";
+$areanames{en}->{911471} = "Rashmi\,\ Rajasthan";
+$areanames{en}->{911472} = "Chittorgarh\,\ Rajasthan";
+$areanames{en}->{911473} = "Barisadri\,\ Rajasthan";
+$areanames{en}->{911474} = "Begun\,\ Rajasthan";
+$areanames{en}->{911475} = "Begun\/Rawatbhata\,\ Rajasthan";
+$areanames{en}->{911476} = "Kapasan\,\ Rajasthan";
+$areanames{en}->{911477} = "Nimbahera\,\ Rajasthan";
+$areanames{en}->{911478} = "Pratapgarh\,\ Rajasthan";
+$areanames{en}->{911479} = "Pratapgarh\/Arnod\,\ Rajasthan";
+$areanames{en}->{911480} = "Asind\,\ Rajasthan";
+$areanames{en}->{911481} = "Raipur\,\ Rajasthan";
+$areanames{en}->{911482} = "Bhilwara\,\ Rajasthan";
+$areanames{en}->{911483} = "Hurda\/Gulabpura\,\ Rajasthan";
+$areanames{en}->{911484} = "Shahapura\,\ Rajasthan";
+$areanames{en}->{911485} = "Jahazpur\,\ Rajasthan";
+$areanames{en}->{911486} = "Mandal\,\ Rajasthan";
+$areanames{en}->{911487} = "Banera\,\ Rajasthan";
+$areanames{en}->{911488} = "Kotri\,\ Rajasthan";
+$areanames{en}->{911489} = "Mandalgarh\,\ Rajasthan";
+$areanames{en}->{911491} = "Nasirabad\,\ Rajasthan";
+$areanames{en}->{911492} = "Laxmangarh\/Kherli\,\ Rajasthan";
+$areanames{en}->{911493} = "Tijara\,\ Rajasthan";
+$areanames{en}->{911494} = "Behror\,\ Rajasthan";
+$areanames{en}->{911495} = "Mandawar\,\ Rajasthan";
+$areanames{en}->{911496} = "Sarwar\,\ Rajasthan";
+$areanames{en}->{911497} = "Kishangarh\,\ Rajasthan";
+$areanames{en}->{911498} = "Anupgarh\,\ Rajasthan";
+$areanames{en}->{911499} = "Sangaria\,\ Rajasthan";
+$areanames{en}->{911501} = "Srikaranpur\,\ Rajasthan";
+$areanames{en}->{911502} = "Nohar\/Jedasar\,\ Rajasthan";
+$areanames{en}->{911503} = "Sadulshahar\,\ Rajasthan";
+$areanames{en}->{911504} = "Bhadra\,\ Rajasthan";
+$areanames{en}->{911505} = "Padampur\,\ Rajasthan";
+$areanames{en}->{911506} = "Anupgarh\/Gharsana\,\ Rajasthan";
+$areanames{en}->{911507} = "Raisinghnagar\,\ Rajasthan";
+$areanames{en}->{911508} = "Suratgarh\/Goluwala\,\ Rajasthan";
+$areanames{en}->{911509} = "Suratgarh\,\ Rajasthan";
+$areanames{en}->{91151} = "Bikaner\,\ Rajasthan";
+$areanames{en}->{911520} = "Bikaner\/Chhatargarh\,\ Rajasthan";
+$areanames{en}->{911521} = "Bikaner\/Jaimalsar\,\ Rajasthan";
+$areanames{en}->{911522} = "Bikaner\/Jamsar\,\ Rajasthan";
+$areanames{en}->{911523} = "Bikaner\/Poogal\,\ Rajasthan";
+$areanames{en}->{911526} = "Lunkaransar\/Mahajan\,\ Rajasthan";
+$areanames{en}->{911527} = "Lunkaransar\/Rajasarb\,\ Rajasthan";
+$areanames{en}->{911528} = "Lunkaransar\,\ Rajasthan";
+$areanames{en}->{911529} = "Lunkaransar\/Kanholi\,\ Rajasthan";
+$areanames{en}->{911531} = "Nokha\,\ Rajasthan";
+$areanames{en}->{911532} = "Nokha\/Nathusar\,\ Rajasthan";
+$areanames{en}->{911533} = "Kolayat\/Goddo\,\ Rajasthan";
+$areanames{en}->{911534} = "Kolayat\,\ Rajasthan";
+$areanames{en}->{911535} = "Kolayat\/Bajju\,\ Rajasthan";
+$areanames{en}->{911536} = "Kolayat\/Daitra\,\ Rajasthan";
+$areanames{en}->{911537} = "Nohar\/Rawatsar\,\ Rajasthan";
+$areanames{en}->{911539} = "Tibbi\,\ Rajasthan";
+$areanames{en}->{91154} = "Sriganganagar\,\ Rajasthan";
+$areanames{en}->{911552} = "Hanumangarh\,\ Rajasthan";
+$areanames{en}->{911555} = "Nohar\,\ Rajasthan";
+$areanames{en}->{911559} = "Rajgarh\,\ Rajasthan";
+$areanames{en}->{911560} = "Sujangarh\/Bidasar\,\ Rajasthan";
+$areanames{en}->{911561} = "Taranagar\,\ Rajasthan";
+$areanames{en}->{911562} = "Churu\,\ Rajasthan";
+$areanames{en}->{911563} = "Sardarshahar\/Jaitsisar\,\ Rajasthan";
+$areanames{en}->{911564} = "Sardarshahar\,\ Rajasthan";
+$areanames{en}->{911565} = "Sri\ Dungargarh\,\ Rajasthan";
+$areanames{en}->{911566} = "Sri\ Dungargarh\/Sudsar\,\ Rajasthan";
+$areanames{en}->{911567} = "Ratangarh\,\ Rajasthan";
+$areanames{en}->{911568} = "Sujangarh\,\ Rajasthan";
+$areanames{en}->{911569} = "Sujangarh\/Lalgarh\,\ Rajasthan";
+$areanames{en}->{911570} = "Laxmangarh\/Nechwa\,\ Rajasthan";
+$areanames{en}->{911571} = "Fatehpur\,\ Rajasthan";
+$areanames{en}->{911572} = "Sikar\,\ Rajasthan";
+$areanames{en}->{911573} = "Laxmangarh\,\ Rajasthan";
+$areanames{en}->{911574} = "Neem\ Ka\ Thana\,\ Rajasthan";
+$areanames{en}->{911575} = "Srimadhopur\,\ Rajasthan";
+$areanames{en}->{911576} = "Dantaramgarh\/Shyamji\,\ Rajasthan";
+$areanames{en}->{911577} = "Dantaramgarh\,\ Rajasthan";
+$areanames{en}->{911580} = "Deedwana\,\ Rajasthan";
+$areanames{en}->{911581} = "Ladnun\,\ Rajasthan";
+$areanames{en}->{911582} = "Nagaur\,\ Rajasthan";
+$areanames{en}->{911583} = "Jayal\,\ Rajasthan";
+$areanames{en}->{911584} = "Nagaur\/Mundwa\ Marwar\,\ Rajasthan";
+$areanames{en}->{911585} = "Nagaur\/Khinwsar\,\ Rajasthan";
+$areanames{en}->{911586} = "Nawa\/Kuchamancity\,\ Rajasthan";
+$areanames{en}->{911587} = "Degana\,\ Rajasthan";
+$areanames{en}->{911588} = "Parbatsar\/Makrana\,\ Rajasthan";
+$areanames{en}->{911589} = "Parbatsar\,\ Rajasthan";
+$areanames{en}->{911590} = "Merta\,\ Rajasthan";
+$areanames{en}->{911591} = "Merta\/Gotan\,\ Rajasthan";
+$areanames{en}->{911592} = "Jhunjhunu\,\ Rajasthan";
+$areanames{en}->{911593} = "Khetri\,\ Rajasthan";
+$areanames{en}->{911594} = "Udaipurwati\,\ Rajasthan";
+$areanames{en}->{911595} = "Jhunjhunu\/Bissau\,\ Rajasthan";
+$areanames{en}->{911596} = "Chirawa\,\ Rajasthan";
+$areanames{en}->{911602} = "Kharar\,\ Punjab";
+$areanames{en}->{911603} = "Kharar\,\ Punjab";
+$areanames{en}->{911604} = "Kharar\,\ Punjab";
+$areanames{en}->{911605} = "Kharar\,\ Punjab";
+$areanames{en}->{911606} = "Kharar\,\ Punjab";
+$areanames{en}->{911607} = "Kharar\,\ Punjab";
+$areanames{en}->{91161} = "Ludhiana\,\ Punjab";
+$areanames{en}->{911624} = "Jagraon\,\ Punjab";
+$areanames{en}->{911628} = "Samrala\,\ Punjab";
+$areanames{en}->{911632} = "Ferozepur\,\ Punjab";
+$areanames{en}->{911633} = "Muktasar\,\ Punjab";
+$areanames{en}->{911634} = "Abohar\,\ Punjab";
+$areanames{en}->{911635} = "Kotkapura\,\ Punjab";
+$areanames{en}->{911636} = "Moga\,\ Punjab";
+$areanames{en}->{911637} = "Malaut\,\ Punjab";
+$areanames{en}->{911638} = "Fazilka\,\ Punjab";
+$areanames{en}->{911639} = "Faridakot\,\ Punjab";
+$areanames{en}->{91164} = "Bhatinda\,\ Punjab";
+$areanames{en}->{911651} = "Phulmandi\,\ Punjab";
+$areanames{en}->{911652} = "Mansa\,\ Punjab";
+$areanames{en}->{911655} = "Raman\,\ Punjab";
+$areanames{en}->{911659} = "Sardulgarh\,\ Punjab";
+$areanames{en}->{911662} = "Hissar\,\ Haryana";
+$areanames{en}->{911663} = "Hansi\,\ Haryana";
+$areanames{en}->{911664} = "Bhiwani\,\ Haryana";
+$areanames{en}->{911666} = "Sirsa\,\ Haryana";
+$areanames{en}->{911667} = "Fatehabad\,\ Haryana";
+$areanames{en}->{911668} = "Dabwali\,\ Haryana";
+$areanames{en}->{911669} = "Adampur\ Mandi\,\ Haryana";
+$areanames{en}->{911672} = "Sangrur\,\ Punjab";
+$areanames{en}->{911675} = "Malerkotla\,\ Punjab";
+$areanames{en}->{911676} = "Sunam\,\ Punjab";
+$areanames{en}->{911679} = "Barnala\,\ Punjab";
+$areanames{en}->{911681} = "Jind\,\ Haryana";
+$areanames{en}->{911682} = "Zira\,\ Punjab";
+$areanames{en}->{911683} = "Julana\,\ Haryana";
+$areanames{en}->{911684} = "Narwana\,\ Haryana";
+$areanames{en}->{911685} = "Guruharsahai\,\ Punjab";
+$areanames{en}->{911686} = "Safidon\,\ Haryana";
+$areanames{en}->{911692} = "Tohana\,\ Haryana";
+$areanames{en}->{911693} = "Barwala\,\ Haryana";
+$areanames{en}->{911696} = "Kalanwali\,\ Haryana";
+$areanames{en}->{911697} = "Ratia\,\ Haryana";
+$areanames{en}->{911698} = "Ellenabad\,\ Haryana";
+$areanames{en}->{911702} = "Nahan\,\ Himachal\ Pradesh";
+$areanames{en}->{911704} = "Paonta\,\ Himachal\ Pradesh";
+$areanames{en}->{91171} = "Ambala\,\ Haryana";
+$areanames{en}->{91172} = "Chandigarh\,\ Punjab";
+$areanames{en}->{911731} = "Barara\,\ Haryana";
+$areanames{en}->{911732} = "Jagadhari\,\ Haryana";
+$areanames{en}->{911733} = "Kalka\,\ Haryana";
+$areanames{en}->{911734} = "Naraingarh\,\ Haryana";
+$areanames{en}->{911735} = "Chaaharauli\,\ Haryana";
+$areanames{en}->{911741} = "Pehowa\,\ Haryana";
+$areanames{en}->{911743} = "Cheeka\,\ Haryana";
+$areanames{en}->{911744} = "Kurukshetra\,\ Haryana";
+$areanames{en}->{911745} = "Nilokheri\,\ Haryana";
+$areanames{en}->{911746} = "Kaithal\,\ Haryana";
+$areanames{en}->{911748} = "Gharaunda\,\ Haryana";
+$areanames{en}->{911749} = "Assandh\,\ Haryana";
+$areanames{en}->{91175} = "Patiala\,\ Punjab";
+$areanames{en}->{911762} = "Rajpura\,\ Punjab";
+$areanames{en}->{911763} = "Sarhind\,\ Punjab";
+$areanames{en}->{911764} = "Samana\,\ Punjab";
+$areanames{en}->{911765} = "Nabha\,\ Punjab";
+$areanames{en}->{91177} = "Shimla\,\ Himachal\ Pradesh";
+$areanames{en}->{911781} = "Rohru\,\ Himachal\ Pradesh";
+$areanames{en}->{911782} = "Rampur\ Bushahar\,\ Himachal\ Pradesh";
+$areanames{en}->{911783} = "Theog\,\ Himachal\ Pradesh";
+$areanames{en}->{911785} = "Pooh\,\ Himachal\ Pradesh";
+$areanames{en}->{911786} = "Kalpa\,\ Himachal\ Pradesh";
+$areanames{en}->{911792} = "Solan\,\ Himachal\ Pradesh";
+$areanames{en}->{911795} = "Nalagarh\,\ Himachal\ Pradesh";
+$areanames{en}->{911796} = "Arki\,\ Himachal\ Pradesh";
+$areanames{en}->{911799} = "Rajgarh\,\ Himachal\ Pradesh";
+$areanames{en}->{911802} = "Panipat\,\ Haryana";
+$areanames{en}->{911803} = "Panipat\,\ Haryana";
+$areanames{en}->{911804} = "Panipat\,\ Haryana";
+$areanames{en}->{911805} = "Panipat\,\ Haryana";
+$areanames{en}->{911806} = "Panipat\,\ Haryana";
+$areanames{en}->{911807} = "Panipat\,\ Haryana";
+$areanames{en}->{91181} = "Jallandhar\,\ Punjab";
+$areanames{en}->{911821} = "Nakodar\,\ Punjab";
+$areanames{en}->{911822} = "Kapurthala\,\ Punjab";
+$areanames{en}->{911823} = "Nawanshahar\,\ Punjab";
+$areanames{en}->{911824} = "Phagwara\,\ Punjab";
+$areanames{en}->{911826} = "Phillaur\,\ Punjab";
+$areanames{en}->{911828} = "Sultanpur\ Lodhi\,\ Punjab";
+$areanames{en}->{91183} = "Amritsar\,\ Punjab";
+$areanames{en}->{91184} = "Karnal\,\ Haryana";
+$areanames{en}->{911851} = "Patti\,\ Punjab";
+$areanames{en}->{911852} = "Taran\,\ Punjab";
+$areanames{en}->{911853} = "Rayya\,\ Punjab";
+$areanames{en}->{911858} = "Ajnala\,\ Punjab";
+$areanames{en}->{911859} = "Goindwal\,\ Punjab";
+$areanames{en}->{91186} = "Pathankot\,\ Punjab";
+$areanames{en}->{911870} = "Jugial\,\ Punjab";
+$areanames{en}->{911871} = "Batala\,\ Punjab";
+$areanames{en}->{911872} = "Quadian\,\ Punjab";
+$areanames{en}->{911874} = "Gurdaspur\,\ Punjab";
+$areanames{en}->{911875} = "Dinanagar\,\ Punjab";
+$areanames{en}->{911881} = "Ropar\,\ Punjab";
+$areanames{en}->{911882} = "Hoshiarpur\,\ Punjab";
+$areanames{en}->{911883} = "Dasua\,\ Punjab";
+$areanames{en}->{911884} = "Garhashanker\,\ Punjab";
+$areanames{en}->{911885} = "Balachaur\,\ Punjab";
+$areanames{en}->{911886} = "Tanda\ Urmar\,\ Punjab";
+$areanames{en}->{911887} = "Nangal\,\ Punjab";
+$areanames{en}->{911892} = "Kangra\/Dharamsala\,\ Himachal\ Pradesh";
+$areanames{en}->{911893} = "Nurpur\,\ Himachal\ Pradesh";
+$areanames{en}->{911894} = "Palampur\,\ Himachal\ Pradesh";
+$areanames{en}->{911895} = "Bharmour\,\ Himachal\ Pradesh";
+$areanames{en}->{911896} = "Churah\/Tissa\,\ Himachal\ Pradesh";
+$areanames{en}->{911897} = "Pangi\/Killar\,\ Himachal\ Pradesh";
+$areanames{en}->{911899} = "Chamba\,\ Himachal\ Pradesh";
+$areanames{en}->{911900} = "Lahul\/Keylong\,\ Himachal\ Pradesh";
+$areanames{en}->{911902} = "Kullu\,\ Himachal\ Pradesh";
+$areanames{en}->{911903} = "Banjar\,\ Himachal\ Pradesh";
+$areanames{en}->{911904} = "Nirmand\,\ Himachal\ Pradesh";
+$areanames{en}->{911905} = "Mandi\,\ Himachal\ Pradesh";
+$areanames{en}->{911906} = "Spiti\/Kaza\,\ Himachal\ Pradesh";
+$areanames{en}->{911907} = "Sundernagar\,\ Himachal\ Pradesh";
+$areanames{en}->{911908} = "Jogindernagar\,\ Himachal\ Pradesh";
+$areanames{en}->{911909} = "Udaipur\,\ Himachal\ Pradesh";
+$areanames{en}->{91191} = "Jammu\,\ Jammu\ And\ Kashmir";
+$areanames{en}->{911921} = "Basholi\,\ Jammu\ And\ Kashmir";
+$areanames{en}->{911922} = "Kathua\,\ Jammu\ And\ Kashmir";
+$areanames{en}->{911923} = "Samba\,\ Jammu\ And\ Kashmir";
+$areanames{en}->{911924} = "Akhnoor\,\ Jammu\ And\ Kashmir";
+$areanames{en}->{911931} = "Kulgam\,\ Jammu\ And\ Kashmir";
+$areanames{en}->{911932} = "Anantnag\,\ Jammu\ And\ Kashmir";
+$areanames{en}->{911933} = "Pulwama\,\ Jammu\ And\ Kashmir";
+$areanames{en}->{911936} = "Pahalgam\,\ Jammu\ And\ Kashmir";
+$areanames{en}->{91194} = "Srinagar\,\ Jammu\ And\ Kashmir";
+$areanames{en}->{911951} = "Badgam\,\ Jammu\ And\ Kashmir";
+$areanames{en}->{911952} = "Baramulla\,\ Jammu\ And\ Kashmir";
+$areanames{en}->{911954} = "Sopore\,\ Jammu\ And\ Kashmir";
+$areanames{en}->{911955} = "Kupwara\,\ Jammu\ And\ Kashmir";
+$areanames{en}->{911956} = "Uri\,\ Jammu\ And\ Kashmir";
+$areanames{en}->{911957} = "Bandipur\,\ Jammu\ And\ Kashmir";
+$areanames{en}->{911958} = "Karnah\,\ Jammu\ And\ Kashmir";
+$areanames{en}->{911960} = "Nowshera\,\ Jammu\ And\ Kashmir";
+$areanames{en}->{911962} = "Rajouri\,\ Jammu\ And\ Kashmir";
+$areanames{en}->{911964} = "Kalakot\,\ Jammu\ And\ Kashmir";
+$areanames{en}->{911965} = "Poonch\,\ Jammu\ And\ Kashmir";
+$areanames{en}->{911970} = "Dehra\ Gopipur\,\ Himachal\ Pradesh";
+$areanames{en}->{911972} = "Hamirpur\,\ Himachal\ Pradesh";
+$areanames{en}->{911975} = "Una\,\ Himachal\ Pradesh";
+$areanames{en}->{911976} = "Amb\,\ Himachal\ Pradesh";
+$areanames{en}->{911978} = "Bilaspur\,\ Himachal\ Pradesh";
+$areanames{en}->{911980} = "Nobra\,\ Jammu\ And\ Kashmir";
+$areanames{en}->{911981} = "Nyoma\,\ Jammu\ And\ Kashmir";
+$areanames{en}->{911982} = "Leh\,\ Jammu\ And\ Kashmir";
+$areanames{en}->{911983} = "Zanaskar\,\ Jammu\ And\ Kashmir";
+$areanames{en}->{911985} = "Kargil\,\ Jammu\ And\ Kashmir";
+$areanames{en}->{911990} = "Ramnagar\,\ Jammu\ And\ Kashmir";
+$areanames{en}->{911991} = "Reasi\,\ Jammu\ And\ Kashmir";
+$areanames{en}->{911992} = "Udhampur\,\ Jammu\ And\ Kashmir";
+$areanames{en}->{911995} = "Kishtwar\,\ Jammu\ And\ Kashmir";
+$areanames{en}->{911996} = "Doda\,\ Jammu\ And\ Kashmir";
+$areanames{en}->{911997} = "Bedarwah\,\ Jammu\ And\ Kashmir";
+$areanames{en}->{911998} = "Ramban\,\ Jammu\ And\ Kashmir";
+$areanames{en}->{911999} = "Mahore\,\ Jammu\ And\ Kashmir";
+$areanames{en}->{9120} = "Pune\,\ Maharashtra";
+$areanames{en}->{912111} = "Indapur\,\ Maharashtra";
+$areanames{en}->{912112} = "Baramati\,\ Maharashtra";
+$areanames{en}->{912113} = "Bhor\,\ Maharashtra";
+$areanames{en}->{912114} = "Lonavala\,\ Maharashtra";
+$areanames{en}->{912115} = "Saswad\,\ Maharashtra";
+$areanames{en}->{912117} = "Daund\,\ Maharashtra";
+$areanames{en}->{912118} = "Walchandnagar\,\ Maharashtra";
+$areanames{en}->{912119} = "Kedgaon\,\ Maharashtra";
+$areanames{en}->{91212} = "Chinchwad\,\ Maharashtra";
+$areanames{en}->{912130} = "Velhe\,\ Maharashtra";
+$areanames{en}->{912132} = "Junnar\,\ Maharashtra";
+$areanames{en}->{912133} = "Manchar\,\ Maharashtra";
+$areanames{en}->{912135} = "Rajgurunagar\,\ Maharashtra";
+$areanames{en}->{912136} = "Urlikanchan\,\ Maharashtra";
+$areanames{en}->{912137} = "Nahavara\,\ Maharashtra";
+$areanames{en}->{912138} = "Shirur\,\ Maharashtra";
+$areanames{en}->{912139} = "Pirangut\,\ Maharashtra";
+$areanames{en}->{912140} = "Mangaon\,\ Maharashtra";
+$areanames{en}->{912141} = "Alibagh\,\ Maharashtra";
+$areanames{en}->{912142} = "Pali\,\ Maharashtra";
+$areanames{en}->{912143} = "Pen\,\ Maharashtra";
+$areanames{en}->{912144} = "Murud\,\ Maharashtra";
+$areanames{en}->{912145} = "Mahad\,\ Maharashtra";
+$areanames{en}->{912147} = "Shrivardhan\,\ Maharashtra";
+$areanames{en}->{912148} = "Karjat\,\ Maharashtra";
+$areanames{en}->{912149} = "Mahasala\,\ Maharashtra";
+$areanames{en}->{91215} = "Navi\ Mumbai\/Turbhe\,\ Maharashtra";
+$areanames{en}->{912160} = "Sakarwadi\,\ Maharashtra";
+$areanames{en}->{912161} = "Vaduj\,\ Maharashtra";
+$areanames{en}->{912162} = "Satara\,\ Maharashtra";
+$areanames{en}->{912163} = "Koregaon\,\ Maharashtra";
+$areanames{en}->{912164} = "Karad\,\ Maharashtra";
+$areanames{en}->{912165} = "Dhiwadi\,\ Maharashtra";
+$areanames{en}->{912166} = "Phaltan\,\ Maharashtra";
+$areanames{en}->{912167} = "Wai\,\ Maharashtra";
+$areanames{en}->{912168} = "Mahabaleswar\,\ Maharashtra";
+$areanames{en}->{912169} = "Shirwal\,\ Maharashtra";
+$areanames{en}->{91217} = "Sholapur\,\ Maharashtra";
+$areanames{en}->{912181} = "Akkalkot\,\ Maharashtra";
+$areanames{en}->{912182} = "Karmala\,\ Maharashtra";
+$areanames{en}->{912183} = "Madha\,\ Maharashtra";
+$areanames{en}->{912184} = "Barsi\,\ Maharashtra";
+$areanames{en}->{912185} = "Malsuras\,\ Maharashtra";
+$areanames{en}->{912186} = "Pandharpur\,\ Maharashtra";
+$areanames{en}->{912187} = "Sangola\,\ Maharashtra";
+$areanames{en}->{912188} = "Mangalwedha\,\ Maharashtra";
+$areanames{en}->{912189} = "Mohol\,\ Maharashtra";
+$areanames{en}->{912191} = "Poladpur\,\ Maharashtra";
+$areanames{en}->{912192} = "Khopoli\,\ Maharashtra";
+$areanames{en}->{912194} = "Roha\,\ Maharashtra";
+$areanames{en}->{9122} = "Mumbai";
+$areanames{en}->{91230} = "Khadakwasala\,\ Maharashtra";
+$areanames{en}->{91231} = "Kolhapur\,\ Maharashtra";
+$areanames{en}->{912320} = "Chandgad\,\ Maharashtra";
+$areanames{en}->{912321} = "Radhanagar\,\ Maharashtra";
+$areanames{en}->{912322} = "Shirol\/Jalsingpur\,\ Maharashtra";
+$areanames{en}->{912323} = "Ajara\,\ Maharashtra";
+$areanames{en}->{912324} = "Hatkangale\/Ichalkaranji\,\ Maharashtra";
+$areanames{en}->{912325} = "Kagal\/Murgud\,\ Maharashtra";
+$areanames{en}->{912326} = "Gaganbavada\,\ Maharashtra";
+$areanames{en}->{912327} = "Gadhinglaj\,\ Maharashtra";
+$areanames{en}->{912328} = "Panhala\,\ Maharashtra";
+$areanames{en}->{912329} = "Shahuwadi\/Malakapur\,\ Maharashtra";
+$areanames{en}->{91233} = "Sangli\,\ Maharashtra";
+$areanames{en}->{912341} = "Kavathemankal\,\ Maharashtra";
+$areanames{en}->{912342} = "Islampur\,\ Maharashtra";
+$areanames{en}->{912343} = "Atpadi\,\ Maharashtra";
+$areanames{en}->{912344} = "Jath\,\ Maharashtra";
+$areanames{en}->{912345} = "Shirala\,\ Maharashtra";
+$areanames{en}->{912346} = "Tasgaon\,\ Maharashtra";
+$areanames{en}->{912347} = "Vita\,\ Maharashtra";
+$areanames{en}->{912350} = "Madangad\,\ Maharashtra";
+$areanames{en}->{912351} = "Langa\,\ Maharashtra";
+$areanames{en}->{912352} = "Ratnagiri\,\ Maharashtra";
+$areanames{en}->{912353} = "Rajapur\,\ Maharashtra";
+$areanames{en}->{912354} = "Sanganeshwar\/Deorukh\,\ Maharashtra";
+$areanames{en}->{912355} = "Chiplun\,\ Maharashtra";
+$areanames{en}->{912356} = "Khed\,\ Maharashtra";
+$areanames{en}->{912357} = "Malgund\,\ Maharashtra";
+$areanames{en}->{912358} = "Dapoli\,\ Maharashtra";
+$areanames{en}->{912359} = "Guhagar\,\ Maharashtra";
+$areanames{en}->{912362} = "Kudal\,\ Maharashtra";
+$areanames{en}->{912363} = "Sawantwadi\,\ Maharashtra";
+$areanames{en}->{912364} = "Deogad\,\ Maharashtra";
+$areanames{en}->{912365} = "Malwan\,\ Maharashtra";
+$areanames{en}->{912366} = "Vengurla\,\ Maharashtra";
+$areanames{en}->{912367} = "Kankavali\,\ Maharashtra";
+$areanames{en}->{912371} = "Wathar\,\ Maharashtra";
+$areanames{en}->{912372} = "Patan\,\ Maharashtra";
+$areanames{en}->{912373} = "Mahaswad\,\ Maharashtra";
+$areanames{en}->{912375} = "Pusegaon\,\ Maharashtra";
+$areanames{en}->{912378} = "Medha\,\ Maharashtra";
+$areanames{en}->{912381} = "Ahmedpur\,\ Maharashtra";
+$areanames{en}->{912382} = "Latur\,\ Maharashtra";
+$areanames{en}->{912383} = "Ausa\,\ Maharashtra";
+$areanames{en}->{912384} = "Nilanga\,\ Maharashtra";
+$areanames{en}->{912385} = "Udgir\,\ Maharashtra";
+$areanames{en}->{91241} = "Ahmednagar\,\ Maharashtra";
+$areanames{en}->{912421} = "Jamkhed\,\ Maharashtra";
+$areanames{en}->{912422} = "Shri\ Rampur\,\ Maharashtra";
+$areanames{en}->{912423} = "Koparagon\,\ Maharashtra";
+$areanames{en}->{912424} = "Akole\,\ Maharashtra";
+$areanames{en}->{912425} = "Sangamner\,\ Maharashtra";
+$areanames{en}->{912426} = "Rahuri\,\ Maharashtra";
+$areanames{en}->{912427} = "Newasa\,\ Maharashtra";
+$areanames{en}->{912428} = "Pathardi\,\ Maharashtra";
+$areanames{en}->{912429} = "Shevgaon\,\ Maharashtra";
+$areanames{en}->{912430} = "Sillod\,\ Maharashtra";
+$areanames{en}->{912431} = "Paithan\,\ Maharashtra";
+$areanames{en}->{912432} = "Aurangabad\,\ Maharashtra";
+$areanames{en}->{912433} = "Gangapur\,\ Maharashtra";
+$areanames{en}->{912435} = "Kannad\,\ Maharashtra";
+$areanames{en}->{912436} = "Vijapur\,\ Maharashtra";
+$areanames{en}->{912437} = "Khultabad\,\ Maharashtra";
+$areanames{en}->{912438} = "Soyegaon\,\ Maharashtra";
+$areanames{en}->{912439} = "Golegaon\,\ Maharashtra";
+$areanames{en}->{912441} = "Ashti\,\ Maharashtra";
+$areanames{en}->{912442} = "Bhir\,\ Maharashtra";
+$areanames{en}->{912443} = "Manjalegaon\,\ Maharashtra";
+$areanames{en}->{912444} = "Patoda\,\ Maharashtra";
+$areanames{en}->{912445} = "Kaij\,\ Maharashtra";
+$areanames{en}->{912446} = "Ambejogai\,\ Maharashtra";
+$areanames{en}->{912447} = "Gevrai\,\ Maharashtra";
+$areanames{en}->{912451} = "Pathari\,\ Maharashtra";
+$areanames{en}->{912452} = "Parbhani\,\ Maharashtra";
+$areanames{en}->{912453} = "Gangakhed\,\ Maharashtra";
+$areanames{en}->{912454} = "Basmatnagar\,\ Maharashtra";
+$areanames{en}->{912455} = "Kalamnuri\,\ Maharashtra";
+$areanames{en}->{912456} = "Hingoli\,\ Maharashtra";
+$areanames{en}->{912457} = "Jintdor\,\ Maharashtra";
+$areanames{en}->{912460} = "Delhi\ Tanda\,\ Maharashtra";
+$areanames{en}->{912461} = "Mukhed\,\ Maharashtra";
+$areanames{en}->{912462} = "Nanded\,\ Maharashtra";
+$areanames{en}->{912463} = "Degloor\,\ Maharashtra";
+$areanames{en}->{912465} = "Billoli\,\ Maharashtra";
+$areanames{en}->{912466} = "Kandhar\,\ Maharashtra";
+$areanames{en}->{912467} = "Bhokar\,\ Maharashtra";
+$areanames{en}->{912468} = "Hadgaon\,\ Maharashtra";
+$areanames{en}->{912469} = "Kinwat\,\ Maharashtra";
+$areanames{en}->{912471} = "Tuljapur\,\ Maharashtra";
+$areanames{en}->{912472} = "Osmanabad\,\ Maharashtra";
+$areanames{en}->{912473} = "Kallam\,\ Maharashtra";
+$areanames{en}->{912475} = "Omerga\,\ Maharashtra";
+$areanames{en}->{912477} = "Paranda\,\ Maharashtra";
+$areanames{en}->{912478} = "Bhoom\,\ Maharashtra";
+$areanames{en}->{912481} = "Ner\,\ Maharashtra";
+$areanames{en}->{912482} = "Jalna\,\ Maharashtra";
+$areanames{en}->{912483} = "Ambad\,\ Maharashtra";
+$areanames{en}->{912484} = "Partur\,\ Maharashtra";
+$areanames{en}->{912485} = "Bhokardan\,\ Maharashtra";
+$areanames{en}->{912487} = "Shrigonda\,\ Maharashtra";
+$areanames{en}->{912488} = "Parner\,\ Maharashtra";
+$areanames{en}->{912489} = "Karjat\,\ Maharashtra";
+$areanames{en}->{91250} = "Bassein\,\ Maharashtra";
+$areanames{en}->{91251} = "Kalyan\,\ Maharashtra";
+$areanames{en}->{912520} = "Jawahar\,\ Maharashtra";
+$areanames{en}->{912521} = "Talasari\,\ Maharashtra";
+$areanames{en}->{912522} = "Bhiwandi\,\ Maharashtra";
+$areanames{en}->{912524} = "Murbad\,\ Maharashtra";
+$areanames{en}->{912525} = "Palghar\,\ Maharashtra";
+$areanames{en}->{912526} = "Wada\,\ Maharashtra";
+$areanames{en}->{912527} = "Shahapur\,\ Maharashtra";
+$areanames{en}->{912528} = "Dahanu\,\ Maharashtra";
+$areanames{en}->{912529} = "Mokhada\,\ Maharashtra";
+$areanames{en}->{91253} = "Nasik\ City\,\ Maharashtra";
+$areanames{en}->{912550} = "Niphad\,\ Maharashtra";
+$areanames{en}->{912551} = "Sinnar\,\ Maharashtra";
+$areanames{en}->{912552} = "Nandgaon\,\ Maharashtra";
+$areanames{en}->{912553} = "Igatpuri\,\ Maharashtra";
+$areanames{en}->{912554} = "Malegaon\,\ Maharashtra";
+$areanames{en}->{912555} = "Satana\,\ Maharashtra";
+$areanames{en}->{912556} = "Chanwad\,\ Maharashtra";
+$areanames{en}->{912557} = "Dindori\,\ Maharashtra";
+$areanames{en}->{912558} = "Peint\,\ Maharashtra";
+$areanames{en}->{912559} = "Yeola\,\ Maharashtra";
+$areanames{en}->{912560} = "Kusumba\,\ Maharashtra";
+$areanames{en}->{912561} = "Pimpalner\,\ Maharashtra";
+$areanames{en}->{912562} = "Dhule\,\ Maharashtra";
+$areanames{en}->{912563} = "Shirpur\,\ Maharashtra";
+$areanames{en}->{912564} = "Nandurbar\,\ Maharashtra";
+$areanames{en}->{912565} = "Shahada\,\ Maharashtra";
+$areanames{en}->{912566} = "Sindkheda\,\ Maharashtra";
+$areanames{en}->{912567} = "Taloda\,\ Maharashtra";
+$areanames{en}->{912568} = "Sakri\,\ Maharashtra";
+$areanames{en}->{912569} = "Navapur\,\ Maharashtra";
+$areanames{en}->{91257} = "Jalgaon\,\ Maharashtra";
+$areanames{en}->{912580} = "Jamner\,\ Maharashtra";
+$areanames{en}->{912582} = "Bhusawal\,\ Maharashtra";
+$areanames{en}->{912583} = "Edalabad\,\ Maharashtra";
+$areanames{en}->{912584} = "Raver\,\ Maharashtra";
+$areanames{en}->{912585} = "Yawal\,\ Maharashtra";
+$areanames{en}->{912586} = "Chopda\,\ Maharashtra";
+$areanames{en}->{912587} = "Amalner\,\ Maharashtra";
+$areanames{en}->{912588} = "Erandul\,\ Maharashtra";
+$areanames{en}->{912589} = "Chalisgaon\,\ Maharashtra";
+$areanames{en}->{912591} = "Manmad\,\ Maharashtra";
+$areanames{en}->{912592} = "Kalwan\,\ Maharashtra";
+$areanames{en}->{912593} = "Surgena\,\ Maharashtra";
+$areanames{en}->{912594} = "Trimbak\,\ Maharashtra";
+$areanames{en}->{912595} = "Dhadgaon\,\ Maharashtra";
+$areanames{en}->{912596} = "Pachora\,\ Maharashtra";
+$areanames{en}->{912597} = "Parola\,\ Maharashtra";
+$areanames{en}->{912598} = "Umrane\,\ Maharashtra";
+$areanames{en}->{912599} = "Bhudargad\/Gargoti\,\ Maharashtra";
+$areanames{en}->{91260} = "Vapi\,\ Gujarat";
+$areanames{en}->{91261} = "Surat\,\ Gujarat";
+$areanames{en}->{912621} = "Sayan\,\ Gujarat";
+$areanames{en}->{912622} = "Bardoli\,\ Gujarat";
+$areanames{en}->{912623} = "Mandvi\,\ Gujarat";
+$areanames{en}->{912624} = "Fortsongadh\,\ Gujarat";
+$areanames{en}->{912625} = "Valod\,\ Gujarat";
+$areanames{en}->{912626} = "Vyara\,\ Gujarat";
+$areanames{en}->{912628} = "Nizar\,\ Gujarat";
+$areanames{en}->{912629} = "M\.M\.Mangrol\,\ Gujarat";
+$areanames{en}->{912630} = "Bansada\,\ Gujarat";
+$areanames{en}->{912631} = "Ahwa\,\ Gujarat";
+$areanames{en}->{912632} = "Valsad\,\ Gujarat";
+$areanames{en}->{912633} = "Dharampur\,\ Gujarat";
+$areanames{en}->{912634} = "Billimora\,\ Gujarat";
+$areanames{en}->{912637} = "Navsari\,\ Gujarat";
+$areanames{en}->{912640} = "Rajpipla\,\ Gujarat";
+$areanames{en}->{912641} = "Amod\,\ Gujarat";
+$areanames{en}->{912642} = "Bharuch\,\ Gujarat";
+$areanames{en}->{912643} = "Valia\,\ Gujarat";
+$areanames{en}->{912644} = "Jambusar\,\ Gujarat";
+$areanames{en}->{912645} = "Jhagadia\,\ Gujarat";
+$areanames{en}->{912646} = "Ankleshwar\,\ Gujarat";
+$areanames{en}->{912649} = "Dediapada\,\ Gujarat";
+$areanames{en}->{91265} = "Vadodara\,\ Gujarat";
+$areanames{en}->{912661} = "Naswadi\,\ Gujarat";
+$areanames{en}->{912662} = "Padra\,\ Gujarat";
+$areanames{en}->{912663} = "Dabhoi\,\ Gujarat";
+$areanames{en}->{912664} = "Pavijetpur\,\ Gujarat";
+$areanames{en}->{912665} = "Sankheda\,\ Gujarat";
+$areanames{en}->{912666} = "Miyagam\,\ Gujarat";
+$areanames{en}->{912667} = "Savli\,\ Gujarat";
+$areanames{en}->{912668} = "Waghodia\,\ Gujarat";
+$areanames{en}->{912669} = "Chhota\ Udaipur\,\ Gujarat";
+$areanames{en}->{912670} = "Shehra\,\ Gujarat";
+$areanames{en}->{912672} = "Godhra\,\ Gujarat";
+$areanames{en}->{912673} = "Dahod\,\ Gujarat";
+$areanames{en}->{912674} = "Lunavada\,\ Gujarat";
+$areanames{en}->{912675} = "Santrampur\,\ Gujarat";
+$areanames{en}->{912676} = "Halol\,\ Gujarat";
+$areanames{en}->{912677} = "Limkheda\,\ Gujarat";
+$areanames{en}->{912678} = "Devgadhbaria\,\ Gujarat";
+$areanames{en}->{912679} = "Jhalod\,\ Gujarat";
+$areanames{en}->{91268} = "Nadiad\,\ Gujarat";
+$areanames{en}->{912690} = "Balasinor\,\ Gujarat";
+$areanames{en}->{912691} = "Kapad\ Wanj\,\ Gujarat";
+$areanames{en}->{912692} = "Anand\,\ Gujarat";
+$areanames{en}->{912694} = "Kheda\,\ Gujarat";
+$areanames{en}->{912696} = "Borsad\,\ Gujarat";
+$areanames{en}->{912697} = "Retlad\,\ Gujarat";
+$areanames{en}->{912698} = "Khambat\,\ Gujarat";
+$areanames{en}->{912699} = "Thasra\,\ Gujarat";
+$areanames{en}->{912711} = "Barwala\,\ Gujarat";
+$areanames{en}->{912712} = "Gandhi\ Nagar\,\ Gujarat";
+$areanames{en}->{912713} = "Dhandhuka\,\ Gujarat";
+$areanames{en}->{912714} = "Dholka\,\ Gujarat";
+$areanames{en}->{912715} = "Viramgam\,\ Gujarat";
+$areanames{en}->{912716} = "Dehgam\,\ Gujarat";
+$areanames{en}->{912717} = "Sanand\,\ Gujarat";
+$areanames{en}->{912718} = "Bareja\,\ Gujarat";
+$areanames{en}->{912733} = "Harij\,\ Gujarat";
+$areanames{en}->{912734} = "Chanasma\,\ Gujarat";
+$areanames{en}->{912735} = "Deodar\,\ Gujarat";
+$areanames{en}->{912737} = "Tharad\,\ Gujarat";
+$areanames{en}->{912738} = "Santalpur\,\ Gujarat";
+$areanames{en}->{912739} = "Vadgam\,\ Gujarat";
+$areanames{en}->{912740} = "Vav\,\ Gujarat";
+$areanames{en}->{912742} = "Palanpur\,\ Gujarat";
+$areanames{en}->{912744} = "Deesa\,\ Gujarat";
+$areanames{en}->{912746} = "Radhanpur\,\ Gujarat";
+$areanames{en}->{912747} = "Thara\,\ Gujarat";
+$areanames{en}->{912748} = "Dhanera\,\ Gujarat";
+$areanames{en}->{912749} = "Danta\,\ Gujarat";
+$areanames{en}->{912751} = "Chotila\,\ Gujarat";
+$areanames{en}->{912752} = "Surendranagar\,\ Gujarat";
+$areanames{en}->{912753} = "Limbdi\,\ Gujarat";
+$areanames{en}->{912754} = "Dhrangadhra\,\ Gujarat";
+$areanames{en}->{912755} = "Sayla\,\ Gujarat";
+$areanames{en}->{912756} = "Muli\,\ Gujarat";
+$areanames{en}->{912757} = "Dasada\,\ Gujarat";
+$areanames{en}->{912758} = "Halvad\,\ Gujarat";
+$areanames{en}->{912759} = "Lakhtar\,\ Gujarat";
+$areanames{en}->{912761} = "Kheralu\,\ Gujarat";
+$areanames{en}->{912762} = "Mehsana\,\ Gujarat";
+$areanames{en}->{912763} = "Vijapur\,\ Gujarat";
+$areanames{en}->{912764} = "Kalol\,\ Gujarat";
+$areanames{en}->{912765} = "Visnagar\,\ Gujarat";
+$areanames{en}->{912766} = "Patan\,\ Gujarat";
+$areanames{en}->{912767} = "Sidhpur\,\ Gujarat";
+$areanames{en}->{912770} = "Prantij\,\ Gujarat";
+$areanames{en}->{912771} = "Bhiloda\,\ Gujarat";
+$areanames{en}->{912772} = "Himatnagar\,\ Gujarat";
+$areanames{en}->{912773} = "Malpur\,\ Gujarat";
+$areanames{en}->{912774} = "Modasa\,\ Gujarat";
+$areanames{en}->{912775} = "Khedbrahma\,\ Gujarat";
+$areanames{en}->{912778} = "Idar\,\ Gujarat";
+$areanames{en}->{912779} = "Bayad\,\ Gujarat";
+$areanames{en}->{91278} = "Bhavnagar\,\ Gujarat";
+$areanames{en}->{912791} = "Babra\,\ Gujarat";
+$areanames{en}->{912792} = "Amreli\,\ Gujarat";
+$areanames{en}->{912793} = "Damnagar\,\ Gujarat";
+$areanames{en}->{912794} = "Rajula\,\ Gujarat";
+$areanames{en}->{912795} = "Kodinar\,\ Gujarat";
+$areanames{en}->{912796} = "Kunkawav\,\ Gujarat";
+$areanames{en}->{912797} = "Dhari\,\ Gujarat";
+$areanames{en}->{912801} = "Ranavav\,\ Gujarat";
+$areanames{en}->{912803} = "Khavda\,\ Gujarat";
+$areanames{en}->{912804} = "Kutiyana\,\ Gujarat";
+$areanames{en}->{912806} = "Gogodar\,\ Gujarat";
+$areanames{en}->{912808} = "Sumrasar\,\ Gujarat";
+$areanames{en}->{91281} = "Rajkot\,\ Gujarat";
+$areanames{en}->{912820} = "Paddhari\,\ Gujarat";
+$areanames{en}->{912821} = "Jasdan\,\ Gujarat";
+$areanames{en}->{912822} = "Morvi\,\ Gujarat";
+$areanames{en}->{912823} = "Jetpur\,\ Gujarat";
+$areanames{en}->{912824} = "Dhoraji\,\ Gujarat";
+$areanames{en}->{912825} = "Gondal\,\ Gujarat";
+$areanames{en}->{912826} = "Upleta\,\ Gujarat";
+$areanames{en}->{912827} = "Kotdasanghani\,\ Gujarat";
+$areanames{en}->{912828} = "Wankaner\,\ Gujarat";
+$areanames{en}->{912829} = "Maliya\ Miyana\,\ Gujarat";
+$areanames{en}->{912830} = "Rahpar\,\ Gujarat";
+$areanames{en}->{912831} = "Nalia\,\ Gujarat";
+$areanames{en}->{912832} = "Bhuj\,\ Gujarat";
+$areanames{en}->{912833} = "Khambhalia\,\ Gujarat";
+$areanames{en}->{912834} = "Kutchmandvi\,\ Gujarat";
+$areanames{en}->{912835} = "Nakhatrana\,\ Gujarat";
+$areanames{en}->{912836} = "Anjar\/Gandhidham\,\ Gujarat";
+$areanames{en}->{912837} = "Bhachav\,\ Gujarat";
+$areanames{en}->{912838} = "Mundra\,\ Gujarat";
+$areanames{en}->{912839} = "Lakhpat\,\ Gujarat";
+$areanames{en}->{912841} = "Vallabhipur\,\ Gujarat";
+$areanames{en}->{912842} = "Talaja\,\ Gujarat";
+$areanames{en}->{912843} = "Gariadhar\,\ Gujarat";
+$areanames{en}->{912844} = "Mahuva\,\ Gujarat";
+$areanames{en}->{912845} = "Savarkundla\,\ Gujarat";
+$areanames{en}->{912846} = "Sihor\,\ Gujarat";
+$areanames{en}->{912847} = "Gadhada\,\ Gujarat";
+$areanames{en}->{912848} = "Palitana\,\ Gujarat";
+$areanames{en}->{912849} = "Botad\,\ Gujarat";
+$areanames{en}->{91285} = "Junagarh\,\ Gujarat";
+$areanames{en}->{91286} = "Porbander\,\ Gujarat";
+$areanames{en}->{912870} = "Malia\ Hatina\,\ Gujarat";
+$areanames{en}->{912871} = "Keshod\,\ Gujarat";
+$areanames{en}->{912872} = "Vanthali\,\ Gujarat";
+$areanames{en}->{912873} = "Visavadar\,\ Gujarat";
+$areanames{en}->{912874} = "Manavadar\,\ Gujarat";
+$areanames{en}->{912875} = "Una\/Diu\,\ Gujarat";
+$areanames{en}->{912876} = "Veraval\,\ Gujarat";
+$areanames{en}->{912877} = "Talala\,\ Gujarat";
+$areanames{en}->{912878} = "Mangrol\,\ Gujarat";
+$areanames{en}->{91288} = "Jamnagar\,\ Gujarat";
+$areanames{en}->{912891} = "Jamkalyanpur\,\ Gujarat";
+$areanames{en}->{912892} = "Okha\,\ Gujarat";
+$areanames{en}->{912893} = "Jodia\,\ Gujarat";
+$areanames{en}->{912894} = "Kalawad\,\ Gujarat";
+$areanames{en}->{912895} = "Lalpur\,\ Gujarat";
+$areanames{en}->{912896} = "Bhanvad\,\ Gujarat";
+$areanames{en}->{912897} = "Dhrol\,\ Gujarat";
+$areanames{en}->{912898} = "Jamjodhpur\,\ Gujarat";
+$areanames{en}->{912900} = "Siwana\/Samdari\,\ Rajasthan";
+$areanames{en}->{912901} = "Siwana\,\ Rajasthan";
+$areanames{en}->{912902} = "Barmer\/Kanot\,\ Rajasthan";
+$areanames{en}->{912903} = "Chohtan\/Gangasar\,\ Rajasthan";
+$areanames{en}->{912904} = "Deogarh\,\ Rajasthan";
+$areanames{en}->{912905} = "Sarada\/Chawand\,\ Rajasthan";
+$areanames{en}->{912906} = "Salumber\,\ Rajasthan";
+$areanames{en}->{912907} = "Kherwara\,\ Rajasthan";
+$areanames{en}->{912908} = "Amet\,\ Rajasthan";
+$areanames{en}->{912909} = "Bhim\/Dawer\,\ Rajasthan";
+$areanames{en}->{91291} = "Jodhpur\,\ Rajasthan";
+$areanames{en}->{912920} = "Bilara\/Bhopalgarh\,\ Rajasthan";
+$areanames{en}->{912921} = "Phalodi\/Bap\,\ Rajasthan";
+$areanames{en}->{912922} = "Osian\,\ Rajasthan";
+$areanames{en}->{912923} = "Phalodi\/Lohawat\,\ Rajasthan";
+$areanames{en}->{912924} = "Phalodi\/Baroo\,\ Rajasthan";
+$areanames{en}->{912925} = "Phalodi\,\ Rajasthan";
+$areanames{en}->{912926} = "Osian\/Mathania\,\ Rajasthan";
+$areanames{en}->{912927} = "Osian\/Dhanwara\,\ Rajasthan";
+$areanames{en}->{912928} = "Shergarh\/Deechu\,\ Rajasthan";
+$areanames{en}->{912929} = "Shergarh\/Balesar\,\ Rajasthan";
+$areanames{en}->{912930} = "Bilara\/Piparcity\,\ Rajasthan";
+$areanames{en}->{912931} = "Jodhpur\/Jhanwar\,\ Rajasthan";
+$areanames{en}->{912932} = "Pali\,\ Rajasthan";
+$areanames{en}->{912933} = "Bali\/Sumerpur\,\ Rajasthan";
+$areanames{en}->{912934} = "Desuri\/Rani\,\ Rajasthan";
+$areanames{en}->{912935} = "Marwar\ Junction\,\ Rajasthan";
+$areanames{en}->{912936} = "Pali\/Rohat\,\ Rajasthan";
+$areanames{en}->{912937} = "Raipur\,\ Rajasthan";
+$areanames{en}->{912938} = "Bali\,\ Rajasthan";
+$areanames{en}->{912939} = "Jaitaran\,\ Rajasthan";
+$areanames{en}->{91294} = "Udaipur\ Girwa\/Udaipur\,\ Rajasthan";
+$areanames{en}->{912950} = "Dhariawad\,\ Rajasthan";
+$areanames{en}->{912951} = "Bhim\,\ Rajasthan";
+$areanames{en}->{912952} = "Rajsamand\/Kankorli\,\ Rajasthan";
+$areanames{en}->{912953} = "Nathdwara\,\ Rajasthan";
+$areanames{en}->{912954} = "Kumbalgarh\/Charbhujaji\,\ Rajasthan";
+$areanames{en}->{912955} = "Malvi\/Fatehnagar\,\ Rajasthan";
+$areanames{en}->{912956} = "Gogunda\,\ Rajasthan";
+$areanames{en}->{912957} = "Vallabhnagar\,\ Rajasthan";
+$areanames{en}->{912958} = "Kotra\,\ Rajasthan";
+$areanames{en}->{912959} = "Jhadol\,\ Rajasthan";
+$areanames{en}->{912960} = "Sojat\,\ Rajasthan";
+$areanames{en}->{912961} = "Ghatol\,\ Rajasthan";
+$areanames{en}->{912962} = "Banswara\,\ Rajasthan";
+$areanames{en}->{912963} = "Gerhi\/Partapur\,\ Rajasthan";
+$areanames{en}->{912964} = "Dungarpur\,\ Rajasthan";
+$areanames{en}->{912965} = "Kushalgarh\,\ Rajasthan";
+$areanames{en}->{912966} = "Sagwara\,\ Rajasthan";
+$areanames{en}->{912967} = "Aspur\,\ Rajasthan";
+$areanames{en}->{912968} = "Bagidora\,\ Rajasthan";
+$areanames{en}->{912969} = "Bhinmal\,\ Rajasthan";
+$areanames{en}->{912970} = "Sanchore\/Hadecha\,\ Rajasthan";
+$areanames{en}->{912971} = "Pindwara\,\ Rajasthan";
+$areanames{en}->{912972} = "Sirohi\,\ Rajasthan";
+$areanames{en}->{912973} = "Jalore\,\ Rajasthan";
+$areanames{en}->{912974} = "Abu\ Road\,\ Rajasthan";
+$areanames{en}->{912975} = "Reodar\,\ Rajasthan";
+$areanames{en}->{912976} = "Sheoganj\/Posaliyan\,\ Rajasthan";
+$areanames{en}->{912977} = "Jalore\/Sayla\,\ Rajasthan";
+$areanames{en}->{912978} = "Ahore\,\ Rajasthan";
+$areanames{en}->{912979} = "Sanchore\,\ Rajasthan";
+$areanames{en}->{912980} = "Pachpadra\/Korna\,\ Rajasthan";
+$areanames{en}->{912981} = "Sheo\/Harsani\,\ Rajasthan";
+$areanames{en}->{912982} = "Barmer\,\ Rajasthan";
+$areanames{en}->{912983} = "Barmer\/Gudda\,\ Rajasthan";
+$areanames{en}->{912984} = "Barmer\/Sindari\,\ Rajasthan";
+$areanames{en}->{912985} = "Barmer\/Ramsar\,\ Rajasthan";
+$areanames{en}->{912986} = "Barmer\/Dhorimanna\,\ Rajasthan";
+$areanames{en}->{912987} = "Sheo\,\ Rajasthan";
+$areanames{en}->{912988} = "Pachpadra\/Balotra\,\ Rajasthan";
+$areanames{en}->{912989} = "Chohtan\,\ Rajasthan";
+$areanames{en}->{912990} = "Bhinmal\/Jasawantpura\,\ Rajasthan";
+$areanames{en}->{912991} = "Jaisalmer\/Ramgarh\,\ Rajasthan";
+$areanames{en}->{912992} = "Jaisalmer\,\ Rajasthan";
+$areanames{en}->{912993} = "Jaisalmer\/Devikot\,\ Rajasthan";
+$areanames{en}->{912994} = "Pokhran\,\ Rajasthan";
+$areanames{en}->{912995} = "Pokhran\/Nachna\,\ Rajasthan";
+$areanames{en}->{912996} = "Pokhran\/Loharki\,\ Rajasthan";
+$areanames{en}->{912997} = "Jaisalmer\/Mohargarh\,\ Rajasthan";
+$areanames{en}->{912998} = "Jaisalmer\/Khuiyals\,\ Rajasthan";
+$areanames{en}->{912999} = "Jaisalmer\/Nehdai\,\ Rajasthan";
+$areanames{en}->{913010} = "Jaisalmer\/Shahgarh\,\ Rajasthan";
+$areanames{en}->{913011} = "Jaisalmer\/Pasewar\,\ Rajasthan";
+$areanames{en}->{913012} = "Jaisalmer\/Mehsana\,\ Rajasthan";
+$areanames{en}->{913013} = "Jaisalmer\/Dhanaua\,\ Rajasthan";
+$areanames{en}->{913014} = "Jaisalmer\/Khuri\,\ Rajasthan";
+$areanames{en}->{913015} = "Jaisalmer\/Myajlar\,\ Rajasthan";
+$areanames{en}->{913016} = "Jaisalmer\/Jheenjaniyali\,\ Rajasthan";
+$areanames{en}->{913017} = "Pokhran\/Madasar\,\ Rajasthan";
+$areanames{en}->{913018} = "Jaisalmer\/Sadhna\,\ Rajasthan";
+$areanames{en}->{913019} = "Pokhran\/Phalsoond\,\ Rajasthan";
+$areanames{en}->{913174} = "Diamond\ Harbour\,\ West\ Bengal";
+$areanames{en}->{913192} = "Andaman\ \&\ Nicobar\,\ Andaman\ Islands";
+$areanames{en}->{913193} = "Andaman\ \&\ Nicobar\,\ Nicobar\ Islands";
+$areanames{en}->{913210} = "Kakdwip\,\ West\ Bengal";
+$areanames{en}->{913211} = "Arambag\,\ West\ Bengal";
+$areanames{en}->{913212} = "Champadanga\,\ West\ Bengal";
+$areanames{en}->{913213} = "Dhaniakhali\,\ West\ Bengal";
+$areanames{en}->{913214} = "Jagatballavpur\,\ West\ Bengal";
+$areanames{en}->{913215} = "Bongoan\,\ West\ Bengal";
+$areanames{en}->{913216} = "Habra\,\ West\ Bengal";
+$areanames{en}->{913217} = "Basirhat\,\ West\ Bengal";
+$areanames{en}->{913218} = "Canning\,\ West\ Bengal";
+$areanames{en}->{913220} = "Contai\,\ West\ Bengal";
+$areanames{en}->{913221} = "Jhargram\,\ West\ Bengal";
+$areanames{en}->{913222} = "Kharagpur\,\ West\ Bengal";
+$areanames{en}->{913223} = "Nayagarh\/Kultikri\,\ West\ Bengal";
+$areanames{en}->{913224} = "Haldia\,\ West\ Bengal";
+$areanames{en}->{913225} = "Ghatal\,\ West\ Bengal";
+$areanames{en}->{913227} = "Amlagora\,\ West\ Bengal";
+$areanames{en}->{913228} = "Tamluk\,\ West\ Bengal";
+$areanames{en}->{913229} = "Dantan\,\ West\ Bengal";
+$areanames{en}->{913241} = "Gangajalghati\,\ West\ Bengal";
+$areanames{en}->{913242} = "Bankura\,\ West\ Bengal";
+$areanames{en}->{913243} = "Khatra\,\ West\ Bengal";
+$areanames{en}->{913244} = "Bishnupur\,\ West\ Bengal";
+$areanames{en}->{913251} = "Adra\,\ West\ Bengal";
+$areanames{en}->{913252} = "Purulia\,\ West\ Bengal";
+$areanames{en}->{913253} = "Manbazar\,\ West\ Bengal";
+$areanames{en}->{913254} = "Jhalda\,\ West\ Bengal";
+$areanames{en}->{91326} = "Dhanbad\,\ Bihar";
+$areanames{en}->{9133} = "Kolkata\,\ West\ Bengal";
+$areanames{en}->{91341} = "Asansol\,\ West\ Bengal";
+$areanames{en}->{91342} = "Burdwan\,\ West\ Bengal";
+$areanames{en}->{91343} = "Durgapur\,\ West\ Bengal";
+$areanames{en}->{913451} = "Seharabazar\,\ West\ Bengal";
+$areanames{en}->{913452} = "Guskara\,\ West\ Bengal";
+$areanames{en}->{913453} = "Katwa\,\ West\ Bengal";
+$areanames{en}->{913454} = "Kalna\,\ West\ Bengal";
+$areanames{en}->{913461} = "Rampur\ Hat\,\ West\ Bengal";
+$areanames{en}->{913462} = "Suri\,\ West\ Bengal";
+$areanames{en}->{913463} = "Bolpur\,\ West\ Bengal";
+$areanames{en}->{913465} = "Nalhati\,\ West\ Bengal";
+$areanames{en}->{913471} = "Karimpur\,\ West\ Bengal";
+$areanames{en}->{913472} = "Krishna\ Nagar\,\ West\ Bengal";
+$areanames{en}->{913473} = "Ranaghat\,\ West\ Bengal";
+$areanames{en}->{913474} = "Bethuadahari\,\ West\ Bengal";
+$areanames{en}->{913481} = "Islampur\,\ West\ Bengal";
+$areanames{en}->{913482} = "Berhampur\,\ West\ Bengal";
+$areanames{en}->{913483} = "Murshidabad\/Jiaganj\,\ West\ Bengal";
+$areanames{en}->{913484} = "Kandi\,\ West\ Bengal";
+$areanames{en}->{913485} = "Dhuliyan\,\ West\ Bengal";
+$areanames{en}->{913511} = "Bubulchandi\,\ West\ Bengal";
+$areanames{en}->{913512} = "Malda\,\ West\ Bengal";
+$areanames{en}->{913513} = "Harishchandrapur\,\ West\ Bengal";
+$areanames{en}->{913521} = "Gangarampur\,\ West\ Bengal";
+$areanames{en}->{913522} = "Balurghat\,\ West\ Bengal";
+$areanames{en}->{913523} = "Raiganj\,\ West\ Bengal";
+$areanames{en}->{913524} = "Harirampur\,\ West\ Bengal";
+$areanames{en}->{913525} = "Dalkhola\,\ West\ Bengal";
+$areanames{en}->{913526} = "Islampur\,\ West\ Bengal";
+$areanames{en}->{91353} = "Siliguri\,\ West\ Bengal";
+$areanames{en}->{91354} = "Darjeeling\,\ West\ Bengal";
+$areanames{en}->{913552} = "Kalimpong\,\ West\ Bengal";
+$areanames{en}->{913561} = "Jalpaiguri\,\ West\ Bengal";
+$areanames{en}->{913562} = "Mal\ Bazar\,\ West\ Bengal";
+$areanames{en}->{913563} = "Birpara\,\ West\ Bengal";
+$areanames{en}->{913564} = "Alipurduar\,\ West\ Bengal";
+$areanames{en}->{913565} = "Nagarakata\,\ West\ Bengal";
+$areanames{en}->{913566} = "Kalchini\,\ West\ Bengal";
+$areanames{en}->{913581} = "Dinhata\,\ West\ Bengal";
+$areanames{en}->{913582} = "Coochbehar\,\ West\ Bengal";
+$areanames{en}->{913583} = "Mathabhanga\,\ West\ Bengal";
+$areanames{en}->{913584} = "Mekhliganj\,\ West\ Bengal";
+$areanames{en}->{913592} = "Gangtok\,\ West\ Bengal";
+$areanames{en}->{913595} = "Gauzing\/Nayabazar\,\ West\ Bengal";
+$areanames{en}->{91360} = "Itanagar\/Ziro\,\ Arunachal\ Pradesh";
+$areanames{en}->{91361} = "Guwahati\,\ Assam";
+$areanames{en}->{913621} = "Boko\,\ Assam";
+$areanames{en}->{913623} = "Barama\,\ Assam";
+$areanames{en}->{913624} = "Nalbari\,\ Assam";
+$areanames{en}->{913637} = "Cherrapunjee\,\ Meghalaya";
+$areanames{en}->{913638} = "Nongpoh\,\ Meghalaya";
+$areanames{en}->{913639} = "Baghmara\,\ Meghalaya";
+$areanames{en}->{91364} = "Shillong\,\ Meghalaya";
+$areanames{en}->{913650} = "Dadengiri\/Phulbari\,\ Meghalaya";
+$areanames{en}->{913651} = "Tura\,\ Meghalaya";
+$areanames{en}->{913652} = "Jowai\,\ Meghalaya";
+$areanames{en}->{913653} = "Amlarem\/Dawki\,\ Meghalaya";
+$areanames{en}->{913654} = "Nongstoin\,\ Meghalaya";
+$areanames{en}->{913655} = "Khliehriat\,\ Meghalaya";
+$areanames{en}->{913656} = "Mawkyrwat\,\ Meghalaya";
+$areanames{en}->{913657} = "Mairang\,\ Meghalaya";
+$areanames{en}->{913658} = "Williamnagar\,\ Meghalaya";
+$areanames{en}->{913659} = "Resubelpara\/Mendipathar\,\ Meghalaya";
+$areanames{en}->{913661} = "Kokrajhar\,\ Assam";
+$areanames{en}->{913662} = "Dhubri\,\ Assam";
+$areanames{en}->{913663} = "Goalpara\,\ Assam";
+$areanames{en}->{913664} = "Hajo\,\ Assam";
+$areanames{en}->{913665} = "Tarabarihat\,\ Assam";
+$areanames{en}->{913666} = "Barpeta\ Road\,\ Assam";
+$areanames{en}->{913667} = "Bilasipara\,\ Assam";
+$areanames{en}->{913668} = "Bijni\,\ Assam";
+$areanames{en}->{913669} = "Abhayapuri\,\ Assam";
+$areanames{en}->{913670} = "Maibong\,\ Assam";
+$areanames{en}->{913671} = "Diphu\,\ Assam";
+$areanames{en}->{913672} = "Nagaon\,\ Assam";
+$areanames{en}->{913673} = "Haflong\,\ Assam";
+$areanames{en}->{913674} = "Hojai\,\ Assam";
+$areanames{en}->{913675} = "Bokajan\,\ Assam";
+$areanames{en}->{913676} = "Howraghat\,\ Assam";
+$areanames{en}->{913677} = "Baithalangshu\,\ Assam";
+$areanames{en}->{913678} = "Morigaon\,\ Assam";
+$areanames{en}->{91368} = "Passighat\,\ Arunachal\ Pradesh";
+$areanames{en}->{91369} = "Mokokchung\,\ Nagaland";
+$areanames{en}->{91370} = "Kohima\,\ Nagaland";
+$areanames{en}->{913711} = "Udalguri\,\ Assam";
+$areanames{en}->{913712} = "Tezpur\,\ Assam";
+$areanames{en}->{913713} = "Mangaldoi\,\ Assam";
+$areanames{en}->{913714} = "Rangapara\,\ Assam";
+$areanames{en}->{913715} = "Gohpur\,\ Assam";
+$areanames{en}->{91372} = "Lungleh\,\ Mizoram";
+$areanames{en}->{91373} = "Dibrugarh\,\ Assam";
+$areanames{en}->{91374} = "Tinsukhia\,\ Assam";
+$areanames{en}->{913751} = "Digboi\,\ Assam";
+$areanames{en}->{913752} = "Lakhimpur\,\ Assam";
+$areanames{en}->{913753} = "Dhemaji\,\ Assam";
+$areanames{en}->{913754} = "Moranhat\,\ Assam";
+$areanames{en}->{913756} = "Sadiya\,\ Assam";
+$areanames{en}->{913758} = "Dhakuakhana\,\ Assam";
+$areanames{en}->{913759} = "Bihupuria\,\ Assam";
+$areanames{en}->{91376} = "Jorhat\,\ Assam";
+$areanames{en}->{913771} = "Mariani\,\ Assam";
+$areanames{en}->{913772} = "Sibsagar\,\ Assam";
+$areanames{en}->{913774} = "Golaghat\,\ Assam";
+$areanames{en}->{913775} = "Majuli\,\ Assam";
+$areanames{en}->{913776} = "Bokakhat\,\ Assam";
+$areanames{en}->{913777} = "Yangkiyang\,\ Arunachal\ Pradesh";
+$areanames{en}->{913778} = "Pakkekesang\,\ Arunachal\ Pradesh";
+$areanames{en}->{913779} = "Roing\/Mariso\,\ Arunachal\ Pradesh";
+$areanames{en}->{913780} = "Dirang\,\ Arunachal\ Pradesh";
+$areanames{en}->{913782} = "Kalaktung\/Bomdila\,\ Arunachal\ Pradesh";
+$areanames{en}->{913783} = "Along\,\ Arunachal\ Pradesh";
+$areanames{en}->{913784} = "Nefra\,\ Arunachal\ Pradesh";
+$areanames{en}->{913785} = "Bameng\,\ Arunachal\ Pradesh";
+$areanames{en}->{913786} = "Khonsa\,\ Arunachal\ Pradesh";
+$areanames{en}->{913787} = "Seppa\,\ Arunachal\ Pradesh";
+$areanames{en}->{913788} = "Kolaring\,\ Arunachal\ Pradesh";
+$areanames{en}->{913789} = "Huri\,\ Arunachal\ Pradesh";
+$areanames{en}->{913790} = "Tali\,\ Arunachal\ Pradesh";
+$areanames{en}->{913791} = "Taliha\,\ Arunachal\ Pradesh";
+$areanames{en}->{913792} = "Daporizo\,\ Arunachal\ Pradesh";
+$areanames{en}->{913793} = "Mechuka\,\ Arunachal\ Pradesh";
+$areanames{en}->{913794} = "Tawang\,\ Arunachal\ Pradesh";
+$areanames{en}->{913795} = "Basar\,\ Arunachal\ Pradesh";
+$areanames{en}->{913797} = "Pangin\,\ Arunachal\ Pradesh";
+$areanames{en}->{913798} = "Mariyang\,\ Arunachal\ Pradesh";
+$areanames{en}->{913799} = "Tuting\,\ Arunachal\ Pradesh";
+$areanames{en}->{913800} = "Jairampur\,\ Arunachal\ Pradesh";
+$areanames{en}->{913801} = "Anini\,\ Arunachal\ Pradesh";
+$areanames{en}->{913802} = "Roing\/Arda\,\ Arunachal\ Pradesh";
+$areanames{en}->{913803} = "Roing\,\ Arunachal\ Pradesh";
+$areanames{en}->{913804} = "Tezu\,\ Arunachal\ Pradesh";
+$areanames{en}->{913805} = "Hayuliang\,\ Arunachal\ Pradesh";
+$areanames{en}->{913806} = "Chowkhem\,\ Arunachal\ Pradesh";
+$areanames{en}->{913807} = "Miao\,\ Arunachal\ Pradesh";
+$areanames{en}->{913808} = "Changlang\,\ Arunachal\ Pradesh";
+$areanames{en}->{913809} = "Sagalee\,\ Arunachal\ Pradesh";
+$areanames{en}->{91381} = "Agartala\,\ Tripura";
+$areanames{en}->{913821} = "R\.K\.Pur\,\ Tripura";
+$areanames{en}->{913822} = "Dharam\ Nagar\,\ Tripura";
+$areanames{en}->{913823} = "Belonia\,\ Tripura";
+$areanames{en}->{913824} = "Kailsahar\,\ Tripura";
+$areanames{en}->{913825} = "Khowai\,\ Tripura";
+$areanames{en}->{913826} = "Ambasa\,\ Tripura";
+$areanames{en}->{913830} = "Champai\/Chiapui\,\ Mizoram";
+$areanames{en}->{913831} = "Champa\,\ Mizoram";
+$areanames{en}->{913834} = "Demagiri\,\ Mizoram";
+$areanames{en}->{913835} = "Saiha\,\ Mizoram";
+$areanames{en}->{913836} = "Saiha\/Tuipang\,\ Mizoram";
+$areanames{en}->{913837} = "Kolasib\,\ Mizoram";
+$areanames{en}->{913838} = "Aizwal\/Serchip\,\ Mizoram";
+$areanames{en}->{913839} = "Jalukie\,\ Nagaland";
+$areanames{en}->{913841} = "Vdarbondh\,\ Assam";
+$areanames{en}->{913842} = "Silchar\,\ Assam";
+$areanames{en}->{913843} = "Karimganj\,\ Assam";
+$areanames{en}->{913844} = "Hailakandi\,\ Assam";
+$areanames{en}->{913845} = "Ukhrul\ Central\,\ Manipur";
+$areanames{en}->{913848} = "Thonbal\,\ Manipur";
+$areanames{en}->{91385} = "Imphal\,\ Manipur";
+$areanames{en}->{913860} = "Wokha\,\ Nagaland";
+$areanames{en}->{913861} = "Tuengsang\,\ Nagaland";
+$areanames{en}->{913862} = "Dimapur\,\ Nagaland";
+$areanames{en}->{913863} = "Kiphire\,\ Nagaland";
+$areanames{en}->{913865} = "Phek\,\ Nagaland";
+$areanames{en}->{913867} = "Zuenheboto\,\ Nagaland";
+$areanames{en}->{913869} = "Mon\,\ Nagaland";
+$areanames{en}->{913870} = "Ukhrursouth\/Kassemkhulen\,\ Manipur";
+$areanames{en}->{913871} = "Mao\/Korang\,\ Manipur";
+$areanames{en}->{913872} = "Chandel\,\ Manipur";
+$areanames{en}->{913873} = "Thinghat\,\ Manipur";
+$areanames{en}->{913874} = "Churchandpur\,\ Manipur";
+$areanames{en}->{913876} = "Jiribam\,\ Manipur";
+$areanames{en}->{913877} = "Tamenglong\,\ Manipur";
+$areanames{en}->{913878} = "Chakpikarong\,\ Manipur";
+$areanames{en}->{913879} = "Bishenpur\,\ Manipur";
+$areanames{en}->{913880} = "Sadarhills\/Kangpokai\,\ Manipur";
+$areanames{en}->{91389} = "Aizawal\,\ Mizoram";
+$areanames{en}->{9140} = "Hyderabad\ Local\,\ Andhra\ Pradesh";
+$areanames{en}->{914111} = "Sriperumbudur\,\ Tamil\ Nadu";
+$areanames{en}->{914112} = "Kancheepuram\,\ Tamil\ Nadu";
+$areanames{en}->{914114} = "Chengalpattu\,\ Tamil\ Nadu";
+$areanames{en}->{914115} = "Madurantakam\,\ Tamil\ Nadu";
+$areanames{en}->{914116} = "Tiruvallur\,\ Tamil\ Nadu";
+$areanames{en}->{914118} = "Tiruttani\,\ Tamil\ Nadu";
+$areanames{en}->{914119} = "Ponneri\,\ Tamil\ Nadu";
+$areanames{en}->{91413} = "Pondicherry\,\ Tamil\ Nadu";
+$areanames{en}->{914142} = "Cuddalore\,\ Tamil\ Nadu";
+$areanames{en}->{914143} = "Virudhachalam\,\ Tamil\ Nadu";
+$areanames{en}->{914144} = "Chidambaram\,\ Tamil\ Nadu";
+$areanames{en}->{914145} = "Gingee\,\ Tamil\ Nadu";
+$areanames{en}->{914146} = "Villupuram\,\ Tamil\ Nadu";
+$areanames{en}->{914147} = "Tindivanam\,\ Tamil\ Nadu";
+$areanames{en}->{914149} = "Ulundurpet\,\ Tamil\ Nadu";
+$areanames{en}->{914151} = "Kallakurichi\,\ Tamil\ Nadu";
+$areanames{en}->{914153} = "Arakandanallur\,\ Tamil\ Nadu";
+$areanames{en}->{91416} = "Vellore\,\ Tamil\ Nadu";
+$areanames{en}->{914171} = "Gudiyatham\,\ Tamil\ Nadu";
+$areanames{en}->{914172} = "Ranipet\,\ Tamil\ Nadu";
+$areanames{en}->{914173} = "Arni\,\ Tamil\ Nadu";
+$areanames{en}->{914174} = "Vaniyambadi\,\ Tamil\ Nadu";
+$areanames{en}->{914175} = "Tiruvannamalai\,\ Tamil\ Nadu";
+$areanames{en}->{914177} = "Arkonam\,\ Tamil\ Nadu";
+$areanames{en}->{914179} = "Tirupattur\,\ Tamil\ Nadu";
+$areanames{en}->{914181} = "Polur\,\ Tamil\ Nadu";
+$areanames{en}->{914182} = "Tiruvettipuram\,\ Tamil\ Nadu";
+$areanames{en}->{914183} = "Vandavasi\,\ Tamil\ Nadu";
+$areanames{en}->{914188} = "Chengam\,\ Tamil\ Nadu";
+$areanames{en}->{914202} = "Mulanur\,\ Tamil\ Nadu";
+$areanames{en}->{914204} = "Kodumudi\,\ Tamil\ Nadu";
+$areanames{en}->{91421} = "Tirupur\,\ Tamil\ Nadu";
+$areanames{en}->{91422} = "Coimbatore\,\ Tamil\ Nadu";
+$areanames{en}->{91423} = "Udhagamandalam\,\ Tamil\ Nadu";
+$areanames{en}->{91424} = "Erode\,\ Tamil\ Nadu";
+$areanames{en}->{914252} = "Udumalpet\,\ Tamil\ Nadu";
+$areanames{en}->{914253} = "Anamalai\,\ Tamil\ Nadu";
+$areanames{en}->{914254} = "Mettupalayam\,\ Tamil\ Nadu";
+$areanames{en}->{914255} = "Palladam\,\ Tamil\ Nadu";
+$areanames{en}->{914256} = "Bhavani\,\ Tamil\ Nadu";
+$areanames{en}->{914257} = "Kangeyam\,\ Tamil\ Nadu";
+$areanames{en}->{914258} = "Dharampuram\,\ Tamil\ Nadu";
+$areanames{en}->{914259} = "Pollachi\,\ Tamil\ Nadu";
+$areanames{en}->{914262} = "Gudalur\,\ Tamil\ Nadu";
+$areanames{en}->{914266} = "Kotagiri\,\ Tamil\ Nadu";
+$areanames{en}->{914268} = "Velur\,\ Tamil\ Nadu";
+$areanames{en}->{91427} = "Salem\,\ Tamil\ Nadu";
+$areanames{en}->{914281} = "Yercaud\,\ Tamil\ Nadu";
+$areanames{en}->{914282} = "Attur\,\ Tamil\ Nadu";
+$areanames{en}->{914283} = "Sankagiri\,\ Tamil\ Nadu";
+$areanames{en}->{914285} = "Gobichettipalayam\,\ Tamil\ Nadu";
+$areanames{en}->{914286} = "Namakkal\,\ Tamil\ Nadu";
+$areanames{en}->{914287} = "Rasipuram\,\ Tamil\ Nadu";
+$areanames{en}->{914288} = "Tiruchengode\,\ Tamil\ Nadu";
+$areanames{en}->{914290} = "Omalur\,\ Tamil\ Nadu";
+$areanames{en}->{914292} = "Valapady\,\ Tamil\ Nadu";
+$areanames{en}->{914294} = "Perundurai\,\ Tamil\ Nadu";
+$areanames{en}->{914295} = "Sathiyamangalam\,\ Tamil\ Nadu";
+$areanames{en}->{914296} = "Avanashi\,\ Tamil\ Nadu";
+$areanames{en}->{914298} = "Metturdam\,\ Tamil\ Nadu";
+$areanames{en}->{91431} = "Tiruchchirappalli\,\ Tamil\ Nadu";
+$areanames{en}->{914320} = "Aravakurichi\,\ Tamil\ Nadu";
+$areanames{en}->{914322} = "Pudukkottai\,\ Tamil\ Nadu";
+$areanames{en}->{914323} = "Kulithalai\,\ Tamil\ Nadu";
+$areanames{en}->{914324} = "Karur\,\ Tamil\ Nadu";
+$areanames{en}->{914326} = "Musiri\,\ Tamil\ Nadu";
+$areanames{en}->{914327} = "Thuraiyur\,\ Tamil\ Nadu";
+$areanames{en}->{914328} = "Perambalur\,\ Tamil\ Nadu";
+$areanames{en}->{914329} = "Ariyalur\,\ Tamil\ Nadu";
+$areanames{en}->{914331} = "Jayamkondan\,\ Tamil\ Nadu";
+$areanames{en}->{914332} = "Manaparai\,\ Tamil\ Nadu";
+$areanames{en}->{914333} = "Ponnamaravathi\,\ Tamil\ Nadu";
+$areanames{en}->{914339} = "Keeranur\,\ Tamil\ Nadu";
+$areanames{en}->{914341} = "Uthangarai\,\ Tamil\ Nadu";
+$areanames{en}->{914342} = "Dharmapuri\,\ Tamil\ Nadu";
+$areanames{en}->{914343} = "Krishnagiri\,\ Tamil\ Nadu";
+$areanames{en}->{914344} = "Hosur\,\ Tamil\ Nadu";
+$areanames{en}->{914346} = "Harur\,\ Tamil\ Nadu";
+$areanames{en}->{914347} = "Denkanikota\,\ Tamil\ Nadu";
+$areanames{en}->{914348} = "Palakkodu\,\ Tamil\ Nadu";
+$areanames{en}->{91435} = "Kumbakonam\,\ Tamil\ Nadu";
+$areanames{en}->{914362} = "Thanjavur\,\ Tamil\ Nadu";
+$areanames{en}->{914364} = "Mayiladuthurai\,\ Tamil\ Nadu";
+$areanames{en}->{914365} = "Nagapattinam\,\ Tamil\ Nadu";
+$areanames{en}->{914366} = "Tiruvarur\,\ Tamil\ Nadu";
+$areanames{en}->{914367} = "Mannargudi\,\ Tamil\ Nadu";
+$areanames{en}->{914368} = "Karaikal\,\ Tamil\ Nadu";
+$areanames{en}->{914369} = "Thiruthuraipoondi\,\ Tamil\ Nadu";
+$areanames{en}->{914371} = "Arantangi\,\ Tamil\ Nadu";
+$areanames{en}->{914372} = "Orathanad\,\ Tamil\ Nadu";
+$areanames{en}->{914373} = "Pattukottai\,\ Tamil\ Nadu";
+$areanames{en}->{914374} = "Papanasam\,\ Tamil\ Nadu";
+$areanames{en}->{9144} = "Chennai\,\ Tamil\ Nadu";
+$areanames{en}->{91451} = "Dindigul\,\ Tamil\ Nadu";
+$areanames{en}->{91452} = "Madurai\,\ Tamil\ Nadu";
+$areanames{en}->{914542} = "Kodaikanal\,\ Tamil\ Nadu";
+$areanames{en}->{914543} = "Batlagundu\,\ Tamil\ Nadu";
+$areanames{en}->{914544} = "Natham\,\ Tamil\ Nadu";
+$areanames{en}->{914545} = "Palani\,\ Tamil\ Nadu";
+$areanames{en}->{914546} = "Theni\,\ Tamil\ Nadu";
+$areanames{en}->{914549} = "Thirumanglam\,\ Tamil\ Nadu";
+$areanames{en}->{914551} = "Vedasandur\,\ Tamil\ Nadu";
+$areanames{en}->{914552} = "Usilampatti\,\ Tamil\ Nadu";
+$areanames{en}->{914553} = "Oddanchatram\,\ Tamil\ Nadu";
+$areanames{en}->{914554} = "Cumbum\,\ Tamil\ Nadu";
+$areanames{en}->{914561} = "Devakottai\,\ Tamil\ Nadu";
+$areanames{en}->{914562} = "Virudhunagar\,\ Tamil\ Nadu";
+$areanames{en}->{914563} = "Rajapalayam\,\ Tamil\ Nadu";
+$areanames{en}->{914564} = "Paramakudi\,\ Tamil\ Nadu";
+$areanames{en}->{914565} = "Karaikudi\,\ Tamil\ Nadu";
+$areanames{en}->{914566} = "Aruppukottai\,\ Tamil\ Nadu";
+$areanames{en}->{914567} = "Ramanathpuram\,\ Tamil\ Nadu";
+$areanames{en}->{914573} = "Rameshwaram\,\ Tamil\ Nadu";
+$areanames{en}->{914574} = "Manamadurai\,\ Tamil\ Nadu";
+$areanames{en}->{914575} = "Sivaganga\,\ Tamil\ Nadu";
+$areanames{en}->{914576} = "Mudukulathur\,\ Tamil\ Nadu";
+$areanames{en}->{914577} = "Tirupathur\,\ Tamil\ Nadu";
+$areanames{en}->{91460} = "Taliparamba\,\ Kerala";
+$areanames{en}->{91461} = "Thoothukudi\,\ Tamil\ Nadu";
+$areanames{en}->{91462} = "Tirunelvelli\,\ Tamil\ Nadu";
+$areanames{en}->{914630} = "Srivaikundam\,\ Tamil\ Nadu";
+$areanames{en}->{914632} = "Kovilpatti\,\ Tamil\ Nadu";
+$areanames{en}->{914633} = "Tenkasi\,\ Tamil\ Nadu";
+$areanames{en}->{914634} = "Ambasamudram\,\ Tamil\ Nadu";
+$areanames{en}->{914635} = "Nanguneri\,\ Tamil\ Nadu";
+$areanames{en}->{914636} = "Sankarankovil\,\ Tamil\ Nadu";
+$areanames{en}->{914637} = "Valliyoor\,\ Tamil\ Nadu";
+$areanames{en}->{914638} = "Vilathikulam\,\ Tamil\ Nadu";
+$areanames{en}->{914639} = "Tiruchendur\,\ Tamil\ Nadu";
+$areanames{en}->{914651} = "Kuzhithurai\,\ Tamil\ Nadu";
+$areanames{en}->{914652} = "Nagercoil\,\ Tamil\ Nadu";
+$areanames{en}->{91469} = "Tiruvalla\,\ Kerala";
+$areanames{en}->{91470} = "Attingal\,\ Kerala";
+$areanames{en}->{91471} = "Thiruvananthapuram\,\ Kerala";
+$areanames{en}->{914728} = "Nedumangad\,\ Kerala";
+$areanames{en}->{914733} = "Pathanamthitta\,\ Kerala";
+$areanames{en}->{914734} = "Adoor\,\ Kerala";
+$areanames{en}->{914735} = "Ranni\,\ Kerala";
+$areanames{en}->{91474} = "Kollam\,\ Kerala";
+$areanames{en}->{91475} = "Punalur\,\ Kerala";
+$areanames{en}->{91476} = "Karunagapally\,\ Kerala";
+$areanames{en}->{91477} = "Alappuzha\,\ Kerala";
+$areanames{en}->{91478} = "Cherthala\,\ Kerala";
+$areanames{en}->{91479} = "Mavelikkara\,\ Kerala";
+$areanames{en}->{91480} = "Irinjalakuda\,\ Kerala";
+$areanames{en}->{91481} = "Kottayam\,\ Kerala";
+$areanames{en}->{914822} = "Palai\,\ Kerala";
+$areanames{en}->{914828} = "Kanjirapally\,\ Kerala";
+$areanames{en}->{914829} = "Vaikom\,\ Kerala";
+$areanames{en}->{91483} = "Manjeri\,\ Kerala";
+$areanames{en}->{91484} = "Ernakulam\,\ Kerala";
+$areanames{en}->{91485} = "Muvattupuzha\,\ Kerala";
+$areanames{en}->{914862} = "Thodupuzha\,\ Kerala";
+$areanames{en}->{914864} = "Adimaly\,\ Kerala";
+$areanames{en}->{914865} = "Munnar\,\ Kerala";
+$areanames{en}->{914868} = "Nedumkandam\,\ Kerala";
+$areanames{en}->{914869} = "Peermedu\,\ Kerala";
+$areanames{en}->{91487} = "Thrissur\,\ Kerala";
+$areanames{en}->{914884} = "Vadakkanchery\,\ Kerala";
+$areanames{en}->{914885} = "Kunnamkulam\,\ Kerala";
+$areanames{en}->{914890} = "Bitra\,\ Lakshadweep";
+$areanames{en}->{914891} = "Amini\,\ Lakshadweep";
+$areanames{en}->{914892} = "Minicoy\,\ Lakshadweep";
+$areanames{en}->{914893} = "Androth\,\ Lakshadweep";
+$areanames{en}->{914894} = "Agathy\,\ Lakshadweep";
+$areanames{en}->{914895} = "Kalpeni\,\ Lakshadweep";
+$areanames{en}->{914896} = "Kavaratti\,\ Lakshadweep";
+$areanames{en}->{914897} = "Kadamath\,\ Lakshadweep";
+$areanames{en}->{914898} = "Kiltan\,\ Lakshadweep";
+$areanames{en}->{914899} = "Chetlat\,\ Lakshadweep";
+$areanames{en}->{91490} = "Tellicherry\,\ Kerala";
+$areanames{en}->{91491} = "Palakkad\,\ Kerala";
+$areanames{en}->{914922} = "Alathur\,\ Kerala";
+$areanames{en}->{914923} = "Koduvayur\,\ Kerala";
+$areanames{en}->{914924} = "Mannarkad\,\ Kerala";
+$areanames{en}->{914926} = "Shoranur\,\ Kerala";
+$areanames{en}->{914931} = "Nilambur\,\ Kerala";
+$areanames{en}->{914933} = "Perinthalmanna\,\ Kerala";
+$areanames{en}->{914935} = "Mananthavady\,\ Kerala";
+$areanames{en}->{914936} = "Kalpetta\,\ Kerala";
+$areanames{en}->{91494} = "Tirur\,\ Kerala";
+$areanames{en}->{91495} = "Kozhikode\,\ Kerala";
+$areanames{en}->{91496} = "Vatakara\,\ Kerala";
+$areanames{en}->{91497} = "Kannur\,\ Kerala";
+$areanames{en}->{914982} = "Taliparamba\,\ Kerala";
+$areanames{en}->{914985} = "Payyanur\,\ Kerala";
+$areanames{en}->{914994} = "Kasaragod\,\ Kerala";
+$areanames{en}->{914997} = "Kanhangad\,\ Kerala";
+$areanames{en}->{914998} = "Uppala\,\ Kerala";
+$areanames{en}->{915111} = "Akbarpur\,\ Uttar\ Pradesh";
+$areanames{en}->{915112} = "Bilhaur\,\ Uttar\ Pradesh";
+$areanames{en}->{915113} = "Bhognipur\/Pakhrayan\,\ Uttar\ Pradesh";
+$areanames{en}->{915114} = "Derapur\/Jhinjak\,\ Uttar\ Pradesh";
+$areanames{en}->{915115} = "Ghatampur\,\ Uttar\ Pradesh";
+$areanames{en}->{91512} = "Kanpur\,\ Uttar\ Pradesh";
+$areanames{en}->{915142} = "Purwa\/Bighapur\,\ Uttar\ Pradesh";
+$areanames{en}->{915143} = "Hasanganj\,\ Uttar\ Pradesh";
+$areanames{en}->{915144} = "Safipur\,\ Uttar\ Pradesh";
+$areanames{en}->{91515} = "Unnao\,\ Uttar\ Pradesh";
+$areanames{en}->{915162} = "Orai\,\ Uttar\ Pradesh";
+$areanames{en}->{915164} = "Kalpi\,\ Uttar\ Pradesh";
+$areanames{en}->{915165} = "Konch\,\ Uttar\ Pradesh";
+$areanames{en}->{915168} = "Jalaun\,\ Uttar\ Pradesh";
+$areanames{en}->{915170} = "Chirgaon\/Moth\,\ Uttar\ Pradesh";
+$areanames{en}->{915171} = "Garauth\,\ Uttar\ Pradesh";
+$areanames{en}->{915172} = "Mehraun\,\ Uttar\ Pradesh";
+$areanames{en}->{915174} = "Jhansi\,\ Uttar\ Pradesh";
+$areanames{en}->{915175} = "Lalitpur\/Talbehat\,\ Uttar\ Pradesh";
+$areanames{en}->{915176} = "Lalitpur\,\ Uttar\ Pradesh";
+$areanames{en}->{915178} = "Mauranipur\,\ Uttar\ Pradesh";
+$areanames{en}->{915180} = "Fatehpur\,\ Uttar\ Pradesh";
+$areanames{en}->{915181} = "Bindki\,\ Uttar\ Pradesh";
+$areanames{en}->{915182} = "Khaga\,\ Uttar\ Pradesh";
+$areanames{en}->{915183} = "Fatehpur\/Gazipur\,\ Uttar\ Pradesh";
+$areanames{en}->{915190} = "Baberu\,\ Uttar\ Pradesh";
+$areanames{en}->{915191} = "Naraini\/Attarra\,\ Uttar\ Pradesh";
+$areanames{en}->{915192} = "Banda\,\ Uttar\ Pradesh";
+$areanames{en}->{915194} = "Karvi\/Manikpur\,\ Uttar\ Pradesh";
+$areanames{en}->{915195} = "Mau\/Rajapur\,\ Uttar\ Pradesh";
+$areanames{en}->{915198} = "Karvi\,\ Uttar\ Pradesh";
+$areanames{en}->{915212} = "Malihabad\,\ Uttar\ Pradesh";
+$areanames{en}->{91522} = "Lucknow\,\ Uttar\ Pradesh";
+$areanames{en}->{915240} = "Fatehpur\,\ Uttar\ Pradesh";
+$areanames{en}->{915241} = "Ramsanehi\ Ghat\,\ Uttar\ Pradesh";
+$areanames{en}->{915244} = "Haidergarh\,\ Uttar\ Pradesh";
+$areanames{en}->{915248} = "Barabanki\,\ Uttar\ Pradesh";
+$areanames{en}->{915250} = "Bahraich\/Bhinga\,\ Uttar\ Pradesh";
+$areanames{en}->{915251} = "Kaisarganj\/Kaiserganj\,\ Uttar\ Pradesh";
+$areanames{en}->{915252} = "Bahraich\/Bahrailh\,\ Uttar\ Pradesh";
+$areanames{en}->{915253} = "Nanpara\,\ Uttar\ Pradesh";
+$areanames{en}->{915254} = "Nanparah\/Mihinpurwa\,\ Uttar\ Pradesh";
+$areanames{en}->{915255} = "Kaisarganh\/Mahasi\,\ Uttar\ Pradesh";
+$areanames{en}->{915260} = "Tarabganj\,\ Uttar\ Pradesh";
+$areanames{en}->{915261} = "Tarabganj\/Colonelganj\,\ Uttar\ Pradesh";
+$areanames{en}->{915262} = "Gonda\,\ Uttar\ Pradesh";
+$areanames{en}->{915263} = "Balarampur\/Balrampur\,\ Uttar\ Pradesh";
+$areanames{en}->{915264} = "Balarampur\/Tulsipur\,\ Uttar\ Pradesh";
+$areanames{en}->{915265} = "Utraula\,\ Uttar\ Pradesh";
+$areanames{en}->{915270} = "Bikapur\,\ Uttar\ Pradesh";
+$areanames{en}->{915271} = "Akbarpur\,\ Uttar\ Pradesh";
+$areanames{en}->{915273} = "Tandai\/Tanda\,\ Uttar\ Pradesh";
+$areanames{en}->{915274} = "Tanda\/Baskhari\,\ Uttar\ Pradesh";
+$areanames{en}->{915275} = "Akbarpur\/Jalalpur\,\ Uttar\ Pradesh";
+$areanames{en}->{915278} = "Faizabad\,\ Uttar\ Pradesh";
+$areanames{en}->{915280} = "Rath\,\ Uttar\ Pradesh";
+$areanames{en}->{915281} = "Mahoba\,\ Uttar\ Pradesh";
+$areanames{en}->{915282} = "Hamirpur\,\ Uttar\ Pradesh";
+$areanames{en}->{915283} = "Charkhari\,\ Uttar\ Pradesh";
+$areanames{en}->{915284} = "Maudaha\,\ Uttar\ Pradesh";
+$areanames{en}->{915311} = "Salon\,\ Uttar\ Pradesh";
+$areanames{en}->{915313} = "Salon\/Jais\,\ Uttar\ Pradesh";
+$areanames{en}->{915315} = "Dalmau\/Lalganj\,\ Uttar\ Pradesh";
+$areanames{en}->{915317} = "Dalmau\,\ Uttar\ Pradesh";
+$areanames{en}->{91532} = "Allahabad\,\ Uttar\ Pradesh";
+$areanames{en}->{915331} = "Bharwari\,\ Uttar\ Pradesh";
+$areanames{en}->{915332} = "Phoolpur\,\ Uttar\ Pradesh";
+$areanames{en}->{915333} = "Karchhana\/Shankergarh\,\ Uttar\ Pradesh";
+$areanames{en}->{915334} = "Meja\/Sirsa\,\ Uttar\ Pradesh";
+$areanames{en}->{915335} = "Soraon\,\ Uttar\ Pradesh";
+$areanames{en}->{915341} = "Kunda\,\ Uttar\ Pradesh";
+$areanames{en}->{915342} = "Pratapgarh\,\ Uttar\ Pradesh";
+$areanames{en}->{915343} = "Patti\,\ Uttar\ Pradesh";
+$areanames{en}->{91535} = "Raibareli\,\ Uttar\ Pradesh";
+$areanames{en}->{915361} = "Musafirkhana\,\ Uttar\ Pradesh";
+$areanames{en}->{915362} = "Sultanpur\,\ Uttar\ Pradesh";
+$areanames{en}->{915364} = "Kadipur\,\ Uttar\ Pradesh";
+$areanames{en}->{915368} = "Amethi\,\ Uttar\ Pradesh";
+$areanames{en}->{915412} = "Chandauli\/Mugalsarai\,\ Uttar\ Pradesh";
+$areanames{en}->{915413} = "Chakia\,\ Uttar\ Pradesh";
+$areanames{en}->{915414} = "Bhadohi\,\ Uttar\ Pradesh";
+$areanames{en}->{91542} = "Varansi\,\ Uttar\ Pradesh";
+$areanames{en}->{915440} = "Mirzapur\/Hallia\,\ Uttar\ Pradesh";
+$areanames{en}->{915442} = "Mirzapur\,\ Uttar\ Pradesh";
+$areanames{en}->{915443} = "Chunur\,\ Uttar\ Pradesh";
+$areanames{en}->{915444} = "Robertsganj\,\ Uttar\ Pradesh";
+$areanames{en}->{915445} = "Robertsganj\/Obra\,\ Uttar\ Pradesh";
+$areanames{en}->{915446} = "Dudhi\/Pipri\,\ Uttar\ Pradesh";
+$areanames{en}->{915447} = "Dudhi\,\ Uttar\ Pradesh";
+$areanames{en}->{915450} = "Kerakat\,\ Uttar\ Pradesh";
+$areanames{en}->{915451} = "Mariyahu\,\ Uttar\ Pradesh";
+$areanames{en}->{915452} = "Jaunpur\,\ Uttar\ Pradesh";
+$areanames{en}->{915453} = "Shahganj\,\ Uttar\ Pradesh";
+$areanames{en}->{915454} = "Machlishahar\,\ Uttar\ Pradesh";
+$areanames{en}->{915460} = "Phulpur\,\ Uttar\ Pradesh";
+$areanames{en}->{915461} = "Ghosi\,\ Uttar\ Pradesh";
+$areanames{en}->{915462} = "Azamgarh\,\ Uttar\ Pradesh";
+$areanames{en}->{915463} = "Lalganj\,\ Uttar\ Pradesh";
+$areanames{en}->{915464} = "Maunathbhanjan\,\ Uttar\ Pradesh";
+$areanames{en}->{915465} = "Phulpur\/Atrawlia\,\ Uttar\ Pradesh";
+$areanames{en}->{915466} = "Sagri\,\ Uttar\ Pradesh";
+$areanames{en}->{91548} = "Ghazipur\,\ Uttar\ Pradesh";
+$areanames{en}->{915491} = "Rasara\,\ Uttar\ Pradesh";
+$areanames{en}->{915493} = "Mohamdabad\,\ Uttar\ Pradesh";
+$areanames{en}->{915494} = "Bansdeeh\,\ Uttar\ Pradesh";
+$areanames{en}->{915495} = "Saidpur\,\ Uttar\ Pradesh";
+$areanames{en}->{915496} = "Ballia\/Raniganj\,\ Uttar\ Pradesh";
+$areanames{en}->{915497} = "Zamania\,\ Uttar\ Pradesh";
+$areanames{en}->{915498} = "Ballia\,\ Uttar\ Pradesh";
+$areanames{en}->{91551} = "Gorakhpur\,\ Uttar\ Pradesh";
+$areanames{en}->{915521} = "Bansgaon\/Barhal\ Ganj\,\ Uttar\ Pradesh";
+$areanames{en}->{915522} = "Pharenda\/Compierganj\,\ Uttar\ Pradesh";
+$areanames{en}->{915523} = "Maharajganj\,\ Uttar\ Pradesh";
+$areanames{en}->{915524} = "Pharenda\/Anand\ Nagar\,\ Uttar\ Pradesh";
+$areanames{en}->{915525} = "Bansgaon\,\ Uttar\ Pradesh";
+$areanames{en}->{915541} = "Domariyaganj\,\ Uttar\ Pradesh";
+$areanames{en}->{915542} = "Basti\,\ Uttar\ Pradesh";
+$areanames{en}->{915543} = "Naugarh\/Barhani\,\ Uttar\ Pradesh";
+$areanames{en}->{915544} = "Naugarh\/Tetribazar\,\ Uttar\ Pradesh";
+$areanames{en}->{915545} = "Bansi\,\ Uttar\ Pradesh";
+$areanames{en}->{915546} = "Harraiya\,\ Uttar\ Pradesh";
+$areanames{en}->{915547} = "Khalilabad\,\ Uttar\ Pradesh";
+$areanames{en}->{915548} = "Khalilabad\/Mehdawal\,\ Uttar\ Pradesh";
+$areanames{en}->{915561} = "Salempur\/Barhaj\,\ Uttar\ Pradesh";
+$areanames{en}->{915563} = "Captanganj\/Khadda\,\ Uttar\ Pradesh";
+$areanames{en}->{915564} = "Padrauna\,\ Uttar\ Pradesh";
+$areanames{en}->{915566} = "Salempur\,\ Uttar\ Pradesh";
+$areanames{en}->{915567} = "Captanganj\,\ Uttar\ Pradesh";
+$areanames{en}->{915568} = "Deoria\,\ Uttar\ Pradesh";
+$areanames{en}->{915612} = "Ferozabad\,\ Uttar\ Pradesh";
+$areanames{en}->{915613} = "Achhnera\,\ Uttar\ Pradesh";
+$areanames{en}->{915614} = "Jarar\,\ Uttar\ Pradesh";
+$areanames{en}->{91562} = "Agra\,\ Uttar\ Pradesh";
+$areanames{en}->{915640} = "Kaman\,\ Rajasthan";
+$areanames{en}->{915641} = "Deeg\,\ Rajasthan";
+$areanames{en}->{915642} = "Dholpur\,\ Rajasthan";
+$areanames{en}->{915643} = "Nadbai\,\ Rajasthan";
+$areanames{en}->{915644} = "Bharatpur\,\ Rajasthan";
+$areanames{en}->{915645} = "Rupbas\,\ Rajasthan";
+$areanames{en}->{915646} = "Baseri\,\ Rajasthan";
+$areanames{en}->{915647} = "Bari\,\ Rajasthan";
+$areanames{en}->{915648} = "Bayana\,\ Rajasthan";
+$areanames{en}->{91565} = "Mathura\,\ Uttar\ Pradesh";
+$areanames{en}->{915661} = "Sadabad\,\ Uttar\ Pradesh";
+$areanames{en}->{915662} = "Chhata\/Kosikalan\,\ Uttar\ Pradesh";
+$areanames{en}->{915664} = "Mant\/Vrindavan\,\ Uttar\ Pradesh";
+$areanames{en}->{915671} = "Jasrana\,\ Uttar\ Pradesh";
+$areanames{en}->{915672} = "Mainpuri\,\ Uttar\ Pradesh";
+$areanames{en}->{915673} = "Bhogaon\,\ Uttar\ Pradesh";
+$areanames{en}->{915676} = "Shikohabad\,\ Uttar\ Pradesh";
+$areanames{en}->{915677} = "Karhal\,\ Uttar\ Pradesh";
+$areanames{en}->{915680} = "Bharthana\,\ Uttar\ Pradesh";
+$areanames{en}->{915681} = "Bidhuna\,\ Uttar\ Pradesh";
+$areanames{en}->{915683} = "Auraiya\,\ Uttar\ Pradesh";
+$areanames{en}->{915688} = "Etawah\,\ Uttar\ Pradesh";
+$areanames{en}->{915690} = "Kaimganj\,\ Uttar\ Pradesh";
+$areanames{en}->{915691} = "Chhibramau\,\ Uttar\ Pradesh";
+$areanames{en}->{915692} = "Farrukhabad\/Fategarh\,\ Uttar\ Pradesh";
+$areanames{en}->{915694} = "Kannauj\,\ Uttar\ Pradesh";
+$areanames{en}->{91571} = "Aligarh\,\ Uttar\ Pradesh";
+$areanames{en}->{915721} = "Sikandra\ Rao\,\ Uttar\ Pradesh";
+$areanames{en}->{915722} = "Hathras\,\ Uttar\ Pradesh";
+$areanames{en}->{915723} = "Atrauli\,\ Uttar\ Pradesh";
+$areanames{en}->{915724} = "Khair\,\ Uttar\ Pradesh";
+$areanames{en}->{915731} = "Garhmukteshwar\,\ Uttar\ Pradesh";
+$areanames{en}->{915732} = "Bulandshahr\,\ Uttar\ Pradesh";
+$areanames{en}->{915733} = "Pahasu\,\ Uttar\ Pradesh";
+$areanames{en}->{915734} = "Debai\,\ Uttar\ Pradesh";
+$areanames{en}->{915735} = "Sikandrabad\,\ Uttar\ Pradesh";
+$areanames{en}->{915736} = "Siyana\,\ Uttar\ Pradesh";
+$areanames{en}->{915738} = "Khurja\,\ Uttar\ Pradesh";
+$areanames{en}->{915740} = "Aliganj\/Ganjdundwara\,\ Uttar\ Pradesh";
+$areanames{en}->{915742} = "Etah\,\ Uttar\ Pradesh";
+$areanames{en}->{915744} = "Kasganj\,\ Uttar\ Pradesh";
+$areanames{en}->{915745} = "Jalesar\,\ Uttar\ Pradesh";
+$areanames{en}->{91581} = "Bareilly\,\ Uttar\ Pradesh";
+$areanames{en}->{915821} = "Pitamberpur\,\ Uttar\ Pradesh";
+$areanames{en}->{915822} = "Baheri\,\ Uttar\ Pradesh";
+$areanames{en}->{915823} = "Aonla\,\ Uttar\ Pradesh";
+$areanames{en}->{915824} = "Aonla\/Ramnagar\,\ Uttar\ Pradesh";
+$areanames{en}->{915825} = "Nawabganj\,\ Uttar\ Pradesh";
+$areanames{en}->{915831} = "Dataganj\,\ Uttar\ Pradesh";
+$areanames{en}->{915832} = "Badaun\,\ Uttar\ Pradesh";
+$areanames{en}->{915833} = "Sahaswan\,\ Uttar\ Pradesh";
+$areanames{en}->{915834} = "Bisauli\,\ Uttar\ Pradesh";
+$areanames{en}->{915836} = "Gunnaur\,\ Uttar\ Pradesh";
+$areanames{en}->{915841} = "Tilhar\,\ Uttar\ Pradesh";
+$areanames{en}->{915842} = "Shahjahanpur\,\ Uttar\ Pradesh";
+$areanames{en}->{915843} = "Jalalabad\,\ Uttar\ Pradesh";
+$areanames{en}->{915844} = "Powayan\,\ Uttar\ Pradesh";
+$areanames{en}->{915850} = "Hardoi\/Baghavli\,\ Uttar\ Pradesh";
+$areanames{en}->{915851} = "Bilgam\/Madhoganj\,\ Uttar\ Pradesh";
+$areanames{en}->{915852} = "Hardoi\,\ Uttar\ Pradesh";
+$areanames{en}->{915853} = "Shahabad\,\ Uttar\ Pradesh";
+$areanames{en}->{915854} = "Sandila\,\ Uttar\ Pradesh";
+$areanames{en}->{915855} = "Bilgram\/Sandi\,\ Uttar\ Pradesh";
+$areanames{en}->{915861} = "Misrikh\/Aurangabad\,\ Uttar\ Pradesh";
+$areanames{en}->{915862} = "Sitapur\,\ Uttar\ Pradesh";
+$areanames{en}->{915863} = "Biswan\,\ Uttar\ Pradesh";
+$areanames{en}->{915864} = "Sidhauli\/Mahmodabad\,\ Uttar\ Pradesh";
+$areanames{en}->{915865} = "Misrikh\,\ Uttar\ Pradesh";
+$areanames{en}->{915870} = "Bhira\,\ Uttar\ Pradesh";
+$areanames{en}->{915871} = "Nighasan\/Palia\ Kalan\,\ Uttar\ Pradesh";
+$areanames{en}->{915872} = "Kheri\,\ Uttar\ Pradesh";
+$areanames{en}->{915873} = "Nighasan\/Tikunia\,\ Uttar\ Pradesh";
+$areanames{en}->{915874} = "Nighasan\/Dhaurehra\,\ Uttar\ Pradesh";
+$areanames{en}->{915875} = "Mohammadi\/Maigalganj\,\ Uttar\ Pradesh";
+$areanames{en}->{915876} = "Mohammadi\,\ Uttar\ Pradesh";
+$areanames{en}->{915880} = "Puranpur\,\ Uttar\ Pradesh";
+$areanames{en}->{915881} = "Bisalpur\,\ Uttar\ Pradesh";
+$areanames{en}->{915882} = "Pilibhit\,\ Uttar\ Pradesh";
+$areanames{en}->{91591} = "Moradabad\,\ Uttar\ Pradesh";
+$areanames{en}->{915921} = "Bilari\,\ Uttar\ Pradesh";
+$areanames{en}->{915922} = "Amroha\,\ Uttar\ Pradesh";
+$areanames{en}->{915923} = "Sambhal\,\ Uttar\ Pradesh";
+$areanames{en}->{915924} = "Hasanpur\,\ Uttar\ Pradesh";
+$areanames{en}->{915942} = "Nainital\,\ Uttar\ Pradesh";
+$areanames{en}->{915943} = "Khatima\,\ Uttar\ Pradesh";
+$areanames{en}->{915944} = "Kichha\/Rudrapur\,\ Uttar\ Pradesh";
+$areanames{en}->{915945} = "Haldwani\/Chorgalian\,\ Uttar\ Pradesh";
+$areanames{en}->{915946} = "Haldwani\,\ Uttar\ Pradesh";
+$areanames{en}->{915947} = "Kashipur\,\ Uttar\ Pradesh";
+$areanames{en}->{915948} = "Khatima\/Sitarganj\,\ Uttar\ Pradesh";
+$areanames{en}->{915949} = "Kichha\/Bazpur\,\ Uttar\ Pradesh";
+$areanames{en}->{91595} = "Rampur\,\ Uttar\ Pradesh";
+$areanames{en}->{915960} = "Shahabad\,\ Uttar\ Pradesh";
+$areanames{en}->{915961} = "Munsiari\,\ Uttar\ Pradesh";
+$areanames{en}->{915962} = "Almora\,\ Uttar\ Pradesh";
+$areanames{en}->{915963} = "Bageshwar\,\ Uttar\ Pradesh";
+$areanames{en}->{915964} = "Pithoragarh\,\ Uttar\ Pradesh";
+$areanames{en}->{915965} = "Champawat\,\ Uttar\ Pradesh";
+$areanames{en}->{915966} = "Ranikhet\,\ Uttar\ Pradesh";
+$areanames{en}->{915967} = "Dharchula\,\ Uttar\ Pradesh";
+$areanames{en}->{916111} = "Hilsa\,\ Bihar";
+$areanames{en}->{916112} = "Biharsharif\,\ Bihar";
+$areanames{en}->{916114} = "Jahanabad\,\ Bihar";
+$areanames{en}->{916115} = "Danapur\,\ Bihar";
+$areanames{en}->{91612} = "Patna\,\ Bihar";
+$areanames{en}->{916132} = "Barh\,\ Bihar";
+$areanames{en}->{916135} = "Bikram\,\ Bihar";
+$areanames{en}->{916150} = "Hathua\,\ Bihar";
+$areanames{en}->{916151} = "Sidhawalia\,\ Bihar";
+$areanames{en}->{916152} = "Chapra\,\ Bihar";
+$areanames{en}->{916153} = "Maharajganj\,\ Bihar";
+$areanames{en}->{916154} = "Siwan\,\ Bihar";
+$areanames{en}->{916155} = "Ekma\,\ Bihar";
+$areanames{en}->{916156} = "Gopalganj\,\ Bihar";
+$areanames{en}->{916157} = "Mairwa\,\ Bihar";
+$areanames{en}->{916158} = "Sonepur\,\ Bihar";
+$areanames{en}->{916159} = "Masrakh\,\ Bihar";
+$areanames{en}->{916180} = "Adhaura\,\ Bihar";
+$areanames{en}->{916181} = "Piro\,\ Bihar";
+$areanames{en}->{916182} = "Arrah\,\ Bihar";
+$areanames{en}->{916183} = "Buxar\,\ Bihar";
+$areanames{en}->{916184} = "Sasaram\,\ Bihar";
+$areanames{en}->{916185} = "Bikramganj\,\ Bihar";
+$areanames{en}->{916186} = "Aurangabad\,\ Bihar";
+$areanames{en}->{916187} = "Mohania\,\ Bihar";
+$areanames{en}->{916188} = "Rohtas\,\ Bihar";
+$areanames{en}->{916189} = "Bhabhua\,\ Bihar";
+$areanames{en}->{91621} = "Muzaffarpur\,\ Bihar";
+$areanames{en}->{916222} = "Sheohar\,\ Bihar";
+$areanames{en}->{916223} = "Motipur\,\ Bihar";
+$areanames{en}->{916224} = "Hajipur\,\ Bihar";
+$areanames{en}->{916226} = "Sitamarhi\,\ Bihar";
+$areanames{en}->{916227} = "Mahua\,\ Bihar";
+$areanames{en}->{916228} = "Pupri\,\ Bihar";
+$areanames{en}->{916229} = "Bidupur\,\ Bihar";
+$areanames{en}->{916242} = "Benipur\,\ Bihar";
+$areanames{en}->{916243} = "Begusarai\,\ Bihar";
+$areanames{en}->{916244} = "Khagaria\,\ Bihar";
+$areanames{en}->{916245} = "Gogri\,\ Bihar";
+$areanames{en}->{916246} = "Jainagar\,\ Bihar";
+$areanames{en}->{916247} = "Singhwara\,\ Bihar";
+$areanames{en}->{916250} = "Dhaka\,\ Bihar";
+$areanames{en}->{916251} = "Bagaha\,\ Bihar";
+$areanames{en}->{916252} = "Motihari\,\ Bihar";
+$areanames{en}->{916253} = "Narkatiaganj\,\ Bihar";
+$areanames{en}->{916254} = "Bettiah\,\ Bihar";
+$areanames{en}->{916255} = "Raxaul\,\ Bihar";
+$areanames{en}->{916256} = "Ramnagar\,\ Bihar";
+$areanames{en}->{916257} = "Barachakia\,\ Bihar";
+$areanames{en}->{916258} = "Areraj\,\ Bihar";
+$areanames{en}->{916259} = "Pakridayal\,\ Bihar";
+$areanames{en}->{916271} = "Benipatti\,\ Bihar";
+$areanames{en}->{916272} = "Darbhanga\,\ Bihar";
+$areanames{en}->{916273} = "Jhajharpur\,\ Bihar";
+$areanames{en}->{916274} = "Samastipur\,\ Bihar";
+$areanames{en}->{916275} = "Rosera\,\ Bihar";
+$areanames{en}->{916276} = "Madhubani\,\ Bihar";
+$areanames{en}->{916277} = "Phulparas\,\ Bihar";
+$areanames{en}->{916278} = "Dalsinghsarai\,\ Bihar";
+$areanames{en}->{916279} = "Barauni\,\ Bihar";
+$areanames{en}->{91631} = "Gaya\,\ Bihar";
+$areanames{en}->{916322} = "Wazirganj\,\ Bihar";
+$areanames{en}->{916323} = "Dumraon\,\ Bihar";
+$areanames{en}->{916324} = "Nawada\,\ Bihar";
+$areanames{en}->{916325} = "Pakribarwan\,\ Bihar";
+$areanames{en}->{916326} = "Sherghati\,\ Bihar";
+$areanames{en}->{916327} = "Rafiganj\,\ Bihar";
+$areanames{en}->{916328} = "Daudnagar\,\ Bihar";
+$areanames{en}->{916331} = "Imamganj\,\ Bihar";
+$areanames{en}->{916332} = "Nabinagar\,\ Bihar";
+$areanames{en}->{916336} = "Rajauli\,\ Bihar";
+$areanames{en}->{916337} = "Arwal\,\ Bihar";
+$areanames{en}->{916341} = "Seikhpura\,\ Bihar";
+$areanames{en}->{916342} = "H\.Kharagpur\,\ Bihar";
+$areanames{en}->{916344} = "Monghyr\,\ Bihar";
+$areanames{en}->{916345} = "Jamui\,\ Bihar";
+$areanames{en}->{916346} = "Lakhisarai\,\ Bihar";
+$areanames{en}->{916347} = "Chakai\,\ Bihar";
+$areanames{en}->{916348} = "Mallehpur\,\ Bihar";
+$areanames{en}->{916349} = "Jhajha\,\ Bihar";
+$areanames{en}->{91641} = "Bhagalpur\,\ Bihar";
+$areanames{en}->{916420} = "Amarpur\,\ Bihar";
+$areanames{en}->{916421} = "Naugachia\,\ Bihar";
+$areanames{en}->{916422} = "Godda\,\ Bihar";
+$areanames{en}->{916423} = "Maheshpur\ Raj\,\ Bihar";
+$areanames{en}->{916424} = "Banka\,\ Bihar";
+$areanames{en}->{916425} = "Katoria\,\ Bihar";
+$areanames{en}->{916426} = "Rajmahal\,\ Bihar";
+$areanames{en}->{916427} = "Kathikund\,\ Bihar";
+$areanames{en}->{916428} = "Nala\,\ Bihar";
+$areanames{en}->{916429} = "Kahalgaon\,\ Bihar";
+$areanames{en}->{916431} = "Jharmundi\,\ Bihar";
+$areanames{en}->{916432} = "Deoghar\,\ Bihar";
+$areanames{en}->{916433} = "Jamtara\,\ Bihar";
+$areanames{en}->{916434} = "Dumka\,\ Bihar";
+$areanames{en}->{916435} = "Pakur\,\ Bihar";
+$areanames{en}->{916436} = "Sahibganj\,\ Bihar";
+$areanames{en}->{916437} = "Mahagama\,\ Bihar";
+$areanames{en}->{916438} = "Madhupur\,\ Bihar";
+$areanames{en}->{916451} = "Barsoi\,\ Bihar";
+$areanames{en}->{916452} = "Katihar\,\ Bihar";
+$areanames{en}->{916453} = "Araria\,\ Bihar";
+$areanames{en}->{916454} = "Purnea\,\ Bihar";
+$areanames{en}->{916455} = "Forbesganj\,\ Bihar";
+$areanames{en}->{916457} = "Korha\,\ Bihar";
+$areanames{en}->{916459} = "Thakurganj\,\ Bihar";
+$areanames{en}->{916461} = "Raniganj\,\ Bihar";
+$areanames{en}->{916462} = "Dhamdaha\,\ Bihar";
+$areanames{en}->{916466} = "Kishanganj\,\ Bihar";
+$areanames{en}->{916467} = "Banmankhi\,\ Bihar";
+$areanames{en}->{916471} = "Birpur\,\ Bihar";
+$areanames{en}->{916473} = "Supaul\,\ Bihar";
+$areanames{en}->{916475} = "S\.Bakhtiarpur\,\ Bihar";
+$areanames{en}->{916476} = "Madhepura\,\ Bihar";
+$areanames{en}->{916477} = "Triveniganj\,\ Bihar";
+$areanames{en}->{916478} = "Saharsa\,\ Bihar";
+$areanames{en}->{916479} = "Udakishanganj\,\ Bihar";
+$areanames{en}->{91651} = "Ranchi\,\ Bihar";
+$areanames{en}->{916522} = "Muri\,\ Bihar";
+$areanames{en}->{916523} = "Ghaghra\,\ Bihar";
+$areanames{en}->{916524} = "Gumla\,\ Bihar";
+$areanames{en}->{916525} = "Simdega\,\ Bihar";
+$areanames{en}->{916526} = "Lohardaga\,\ Bihar";
+$areanames{en}->{916527} = "Kolebira\,\ Bihar";
+$areanames{en}->{916528} = "Khunti\,\ Bihar";
+$areanames{en}->{916529} = "Itki\,\ Bihar";
+$areanames{en}->{916530} = "Bundu\,\ Bihar";
+$areanames{en}->{916531} = "Mandar\,\ Bihar";
+$areanames{en}->{916532} = "Giridih\,\ Bihar";
+$areanames{en}->{916533} = "Basia\,\ Bihar";
+$areanames{en}->{916534} = "Jhumaritalaiya\,\ Bihar";
+$areanames{en}->{916535} = "Chainpur\,\ Bihar";
+$areanames{en}->{916536} = "Palkot\,\ Bihar";
+$areanames{en}->{916538} = "Torpa\,\ Bihar";
+$areanames{en}->{916539} = "Bolwa\,\ Bihar";
+$areanames{en}->{916540} = "Govindpur\,\ Bihar";
+$areanames{en}->{916541} = "Chatra\,\ Bihar";
+$areanames{en}->{916542} = "Bokaro\,\ Bihar";
+$areanames{en}->{916543} = "Barhi\,\ Bihar";
+$areanames{en}->{916544} = "Gomia\,\ Bihar";
+$areanames{en}->{916545} = "Mandu\,\ Bihar";
+$areanames{en}->{916546} = "Hazaribagh\,\ Bihar";
+$areanames{en}->{916547} = "Chavparan\,\ Bihar";
+$areanames{en}->{916548} = "Ichak\,\ Bihar";
+$areanames{en}->{916549} = "Bermo\,\ Bihar";
+$areanames{en}->{916550} = "Hunterganj\,\ Bihar";
+$areanames{en}->{916551} = "Barkagaon\,\ Bihar";
+$areanames{en}->{916553} = "Ramgarh\,\ Bihar";
+$areanames{en}->{916554} = "Rajdhanwar\,\ Bihar";
+$areanames{en}->{916556} = "Tisri\,\ Bihar";
+$areanames{en}->{916557} = "Bagodar\,\ Bihar";
+$areanames{en}->{916558} = "Dumri\(Isribazar\)\,\ Bihar";
+$areanames{en}->{916559} = "Simaria\,\ Bihar";
+$areanames{en}->{916560} = "Patan\,\ Bihar";
+$areanames{en}->{916561} = "Garhwa\,\ Bihar";
+$areanames{en}->{916562} = "Daltonganj\,\ Bihar";
+$areanames{en}->{916563} = "Bhawanathpur\,\ Bihar";
+$areanames{en}->{916564} = "Nagarutari\,\ Bihar";
+$areanames{en}->{916565} = "Latehar\,\ Bihar";
+$areanames{en}->{916566} = "Japla\,\ Bihar";
+$areanames{en}->{916567} = "Barwadih\,\ Bihar";
+$areanames{en}->{916568} = "Balumath\,\ Bihar";
+$areanames{en}->{916569} = "Garu\,\ Bihar";
+$areanames{en}->{91657} = "Jamshedpur\,\ Bihar";
+$areanames{en}->{916581} = "Bhandaria\,\ Bihar";
+$areanames{en}->{916582} = "Chaibasa\,\ Bihar";
+$areanames{en}->{916583} = "Kharsawa\,\ Bihar";
+$areanames{en}->{916584} = "Bishrampur\,\ Bihar";
+$areanames{en}->{916585} = "Ghatsila\,\ Bihar";
+$areanames{en}->{916586} = "Chainpur\,\ Bihar";
+$areanames{en}->{916587} = "Chakardharpur\,\ Bihar";
+$areanames{en}->{916588} = "Jagarnathpur\,\ Bihar";
+$areanames{en}->{916589} = "Jhinkpani\,\ Bihar";
+$areanames{en}->{916591} = "Chandil\,\ Bihar";
+$areanames{en}->{916593} = "Manoharpur\,\ Bihar";
+$areanames{en}->{916594} = "Baharagora\,\ Bihar";
+$areanames{en}->{916596} = "Noamundi\,\ Bihar";
+$areanames{en}->{916597} = "Saraikela\/Adstyapur\,\ Bihar";
+$areanames{en}->{91661} = "Rourkela\,\ Odisha";
+$areanames{en}->{916621} = "Hemgiri\,\ Odisha";
+$areanames{en}->{916622} = "Sundargarh\,\ Odisha";
+$areanames{en}->{916624} = "Rajgangpur\,\ Odisha";
+$areanames{en}->{916625} = "Lahunipara\,\ Odisha";
+$areanames{en}->{916626} = "Banaigarh\,\ Odisha";
+$areanames{en}->{91663} = "Sambalpur\,\ Odisha";
+$areanames{en}->{916640} = "Bagdihi\,\ Odisha";
+$areanames{en}->{916641} = "Deodgarh\,\ Odisha";
+$areanames{en}->{916642} = "Kuchinda\,\ Odisha";
+$areanames{en}->{916643} = "Barkot\,\ Odisha";
+$areanames{en}->{916644} = "Rairakhol\,\ Odisha";
+$areanames{en}->{916645} = "Jharsuguda\,\ Odisha";
+$areanames{en}->{916646} = "Bargarh\,\ Odisha";
+$areanames{en}->{916647} = "Naktideul\,\ Odisha";
+$areanames{en}->{916648} = "Patnagarh\,\ Odisha";
+$areanames{en}->{916649} = "Jamankira\,\ Odisha";
+$areanames{en}->{916651} = "Birmaharajpur\,\ Odisha";
+$areanames{en}->{916652} = "Balangir\,\ Odisha";
+$areanames{en}->{916653} = "Dunguripali\,\ Odisha";
+$areanames{en}->{916654} = "Sonapur\,\ Odisha";
+$areanames{en}->{916655} = "Titlagarh\,\ Odisha";
+$areanames{en}->{916657} = "Kantabhanji\,\ Odisha";
+$areanames{en}->{916670} = "Bhawanipatna\,\ Odisha";
+$areanames{en}->{916671} = "Rajkhariar\,\ Odisha";
+$areanames{en}->{916672} = "Dharamgarh\,\ Odisha";
+$areanames{en}->{916673} = "Jayapatna\,\ Odisha";
+$areanames{en}->{916675} = "T\.Rampur\,\ Odisha";
+$areanames{en}->{916676} = "M\.Rampur\,\ Odisha";
+$areanames{en}->{916677} = "Narlaroad\,\ Odisha";
+$areanames{en}->{916678} = "Nowparatan\,\ Odisha";
+$areanames{en}->{916679} = "Komana\,\ Odisha";
+$areanames{en}->{916681} = "Jujumura\,\ Odisha";
+$areanames{en}->{916682} = "Attabira\,\ Odisha";
+$areanames{en}->{916683} = "Padmapur\,\ Odisha";
+$areanames{en}->{916684} = "Paikamal\,\ Odisha";
+$areanames{en}->{916685} = "Sohela\,\ Odisha";
+$areanames{en}->{91671} = "Cuttack\,\ Odisha";
+$areanames{en}->{916721} = "Narsinghpur\,\ Odisha";
+$areanames{en}->{916722} = "Pardip\,\ Odisha";
+$areanames{en}->{916723} = "Athgarh\,\ Odisha";
+$areanames{en}->{916724} = "Jagatsinghpur\,\ Odisha";
+$areanames{en}->{916725} = "Dhanmandal\,\ Odisha";
+$areanames{en}->{916726} = "Jajapur\ Road\,\ Odisha";
+$areanames{en}->{916727} = "Kendrapara\,\ Odisha";
+$areanames{en}->{916728} = "Jajapur\ Town\,\ Odisha";
+$areanames{en}->{916729} = "Pattamundai\,\ Odisha";
+$areanames{en}->{916731} = "Anandapur\,\ Odisha";
+$areanames{en}->{916732} = "Hindol\,\ Odisha";
+$areanames{en}->{916733} = "Ghatgaon\,\ Odisha";
+$areanames{en}->{916735} = "Telkoi\,\ Odisha";
+$areanames{en}->{91674} = "Bhubaneshwar\,\ Odisha";
+$areanames{en}->{916752} = "Puri\,\ Odisha";
+$areanames{en}->{916753} = "Nayagarh\,\ Odisha";
+$areanames{en}->{916755} = "Khurda\,\ Odisha";
+$areanames{en}->{916756} = "Balugaon\,\ Odisha";
+$areanames{en}->{916757} = "Daspalla\,\ Odisha";
+$areanames{en}->{916758} = "Nimapara\,\ Odisha";
+$areanames{en}->{916760} = "Talcher\,\ Odisha";
+$areanames{en}->{916761} = "Chhendipada\,\ Odisha";
+$areanames{en}->{916762} = "Dhenkanal\,\ Odisha";
+$areanames{en}->{916763} = "Athmallik\,\ Odisha";
+$areanames{en}->{916764} = "Anugul\,\ Odisha";
+$areanames{en}->{916765} = "Palla\ Hara\,\ Odisha";
+$areanames{en}->{916766} = "Keonjhar\,\ Odisha";
+$areanames{en}->{916767} = "Barbil\,\ Odisha";
+$areanames{en}->{916768} = "Parajang\,\ Odisha";
+$areanames{en}->{916769} = "Kamakhyanagar\,\ Odisha";
+$areanames{en}->{916781} = "Basta\,\ Odisha";
+$areanames{en}->{916782} = "Balasore\,\ Odisha";
+$areanames{en}->{916784} = "Bhadrak\,\ Odisha";
+$areanames{en}->{916786} = "Chandbali\,\ Odisha";
+$areanames{en}->{916788} = "Soro\,\ Odisha";
+$areanames{en}->{916791} = "Bangiriposi\,\ Odisha";
+$areanames{en}->{916792} = "Baripada\,\ Odisha";
+$areanames{en}->{916793} = "Betanati\,\ Odisha";
+$areanames{en}->{916794} = "Rairangpur\,\ Odisha";
+$areanames{en}->{916795} = "Udala\,\ Odisha";
+$areanames{en}->{916796} = "Karanjia\,\ Odisha";
+$areanames{en}->{916797} = "Jashipur\,\ Odisha";
+$areanames{en}->{91680} = "Berhampur\,\ Odisha";
+$areanames{en}->{916810} = "Khalikote\,\ Odisha";
+$areanames{en}->{916811} = "Chhatrapur\,\ Odisha";
+$areanames{en}->{916814} = "Digapahandi\,\ Odisha";
+$areanames{en}->{916815} = "Parlakhemundi\,\ Odisha";
+$areanames{en}->{916816} = "Mohana\,\ Odisha";
+$areanames{en}->{916817} = "R\.Udayigiri\,\ Odisha";
+$areanames{en}->{916818} = "Buguda\,\ Odisha";
+$areanames{en}->{916819} = "Surada\,\ Odisha";
+$areanames{en}->{916821} = "Bhanjanagar\,\ Odisha";
+$areanames{en}->{916822} = "Aska\,\ Odisha";
+$areanames{en}->{916840} = "Tumudibandha\,\ Odisha";
+$areanames{en}->{916841} = "Boudh\,\ Odisha";
+$areanames{en}->{916842} = "Phulbani\,\ Odisha";
+$areanames{en}->{916843} = "Puruna\ Katak\,\ Odisha";
+$areanames{en}->{916844} = "Kantamal\,\ Odisha";
+$areanames{en}->{916845} = "Phiringia\,\ Odisha";
+$areanames{en}->{916846} = "Baliguda\,\ Odisha";
+$areanames{en}->{916847} = "G\.Udayagiri\,\ Odisha";
+$areanames{en}->{916848} = "Kotagarh\,\ Odisha";
+$areanames{en}->{916849} = "Daringbadi\,\ Odisha";
+$areanames{en}->{916850} = "Kalimela\,\ Odisha";
+$areanames{en}->{916852} = "Koraput\,\ Odisha";
+$areanames{en}->{916853} = "Sunabeda\,\ Odisha";
+$areanames{en}->{916854} = "Jeypore\,\ Odisha";
+$areanames{en}->{916855} = "Laxmipur\,\ Odisha";
+$areanames{en}->{916856} = "Rayagada\,\ Odisha";
+$areanames{en}->{916857} = "Gunupur\,\ Odisha";
+$areanames{en}->{916858} = "Nowrangapur\,\ Odisha";
+$areanames{en}->{916859} = "Motu\,\ Odisha";
+$areanames{en}->{916860} = "Boriguma\,\ Odisha";
+$areanames{en}->{916861} = "Malkangiri\,\ Odisha";
+$areanames{en}->{916862} = "Gudari\,\ Odisha";
+$areanames{en}->{916863} = "Bisam\ Cuttack\,\ Odisha";
+$areanames{en}->{916864} = "Mathili\,\ Odisha";
+$areanames{en}->{916865} = "Kashipur\,\ Odisha";
+$areanames{en}->{916866} = "Umerkote\,\ Odisha";
+$areanames{en}->{916867} = "Jharigan\,\ Odisha";
+$areanames{en}->{916868} = "Nandapur\,\ Odisha";
+$areanames{en}->{916869} = "Papadhandi\,\ Odisha";
+$areanames{en}->{917100} = "Kuhi\,\ Maharashtra";
+$areanames{en}->{917102} = "Parseoni\,\ Maharashtra";
+$areanames{en}->{917103} = "Butibori\,\ Maharashtra";
+$areanames{en}->{917104} = "Hingua\,\ Maharashtra";
+$areanames{en}->{917105} = "Narkhed\,\ Maharashtra";
+$areanames{en}->{917106} = "Bhiwapur\,\ Maharashtra";
+$areanames{en}->{917109} = "Kamptee\,\ Maharashtra";
+$areanames{en}->{917112} = "Katol\,\ Maharashtra";
+$areanames{en}->{917113} = "Saoner\,\ Maharashtra";
+$areanames{en}->{917114} = "Ramtek\,\ Maharashtra";
+$areanames{en}->{917115} = "Mouda\,\ Maharashtra";
+$areanames{en}->{917116} = "Umrer\,\ Maharashtra";
+$areanames{en}->{917118} = "Kalmeshwar\,\ Maharashtra";
+$areanames{en}->{91712} = "Nagpur\,\ Maharashtra";
+$areanames{en}->{917131} = "Sironcha\,\ Maharashtra";
+$areanames{en}->{917132} = "Gadchiroli\,\ Maharashtra";
+$areanames{en}->{917133} = "Aheri\,\ Maharashtra";
+$areanames{en}->{917134} = "Bhamregadh\,\ Maharashtra";
+$areanames{en}->{917135} = "Chamorshi\,\ Maharashtra";
+$areanames{en}->{917136} = "Etapalli\,\ Maharashtra";
+$areanames{en}->{917137} = "Desaiganj\,\ Maharashtra";
+$areanames{en}->{917138} = "Dhanora\,\ Maharashtra";
+$areanames{en}->{917139} = "Kurkheda\,\ Maharashtra";
+$areanames{en}->{917141} = "Betul\,\ Madhya\ Pradesh";
+$areanames{en}->{917142} = "Bhimpur\,\ Madhya\ Pradesh";
+$areanames{en}->{917143} = "Bhainsdehi\,\ Madhya\ Pradesh";
+$areanames{en}->{917144} = "Atner\,\ Madhya\ Pradesh";
+$areanames{en}->{917145} = "Chicholi\,\ Madhya\ Pradesh";
+$areanames{en}->{917146} = "Ghorandogri\,\ Madhya\ Pradesh";
+$areanames{en}->{917147} = "Multai\,\ Madhya\ Pradesh";
+$areanames{en}->{917148} = "Prabha\ Pattan\,\ Madhya\ Pradesh";
+$areanames{en}->{917149} = "Tamia\,\ Madhya\ Pradesh";
+$areanames{en}->{917151} = "Samudrapur\,\ Maharashtra";
+$areanames{en}->{917152} = "Wardha\,\ Maharashtra";
+$areanames{en}->{917153} = "Hinganghat\,\ Maharashtra";
+$areanames{en}->{917155} = "Seloo\,\ Maharashtra";
+$areanames{en}->{917156} = "Talegaokarangal\,\ Maharashtra";
+$areanames{en}->{917157} = "Arvi\,\ Maharashtra";
+$areanames{en}->{917158} = "Deoli\,\ Maharashtra";
+$areanames{en}->{917160} = "Jamai\,\ Madhya\ Pradesh";
+$areanames{en}->{917161} = "Parasia\,\ Madhya\ Pradesh";
+$areanames{en}->{917162} = "Chhindwara\,\ Madhya\ Pradesh";
+$areanames{en}->{917164} = "Pandhurna\,\ Madhya\ Pradesh";
+$areanames{en}->{917165} = "Saunsar\,\ Madhya\ Pradesh";
+$areanames{en}->{917166} = "Chaurai\,\ Madhya\ Pradesh";
+$areanames{en}->{917167} = "Amarwada\,\ Madhya\ Pradesh";
+$areanames{en}->{917168} = "Harrai\,\ Madhya\ Pradesh";
+$areanames{en}->{917169} = "Batkakhapa\,\ Madhya\ Pradesh";
+$areanames{en}->{917170} = "Chumur\,\ Maharashtra";
+$areanames{en}->{917171} = "Gond\ Pipri\,\ Maharashtra";
+$areanames{en}->{917172} = "Chandrapur\,\ Maharashtra";
+$areanames{en}->{917173} = "Rajura\,\ Maharashtra";
+$areanames{en}->{917174} = "Mul\,\ Maharashtra";
+$areanames{en}->{917175} = "Bhadrawati\,\ Maharashtra";
+$areanames{en}->{917176} = "Warora\,\ Maharashtra";
+$areanames{en}->{917177} = "Brahmapuri\,\ Maharashtra";
+$areanames{en}->{917178} = "Sinderwahi\,\ Maharashtra";
+$areanames{en}->{917179} = "Nagbhir\,\ Maharashtra";
+$areanames{en}->{917180} = "Salekasa\,\ Maharashtra";
+$areanames{en}->{917181} = "Lakhandur\,\ Maharashtra";
+$areanames{en}->{917182} = "Gondia\,\ Maharashtra";
+$areanames{en}->{917183} = "Tumsar\,\ Maharashtra";
+$areanames{en}->{917184} = "Bhandara\,\ Maharashtra";
+$areanames{en}->{917185} = "Pauni\,\ Maharashtra";
+$areanames{en}->{917186} = "Sakoli\,\ Maharashtra";
+$areanames{en}->{917187} = "Goregaon\,\ Maharashtra";
+$areanames{en}->{917189} = "Amagaon\,\ Maharashtra";
+$areanames{en}->{917196} = "Arjuni\ Morgaon\,\ Maharashtra";
+$areanames{en}->{917197} = "Mohadi\,\ Maharashtra";
+$areanames{en}->{917198} = "Tirora\,\ Maharashtra";
+$areanames{en}->{917199} = "Deori\,\ Maharashtra";
+$areanames{en}->{917201} = "Kalamb\,\ Maharashtra";
+$areanames{en}->{917202} = "Ralegaon\,\ Maharashtra";
+$areanames{en}->{917203} = "Babhulgaon\,\ Maharashtra";
+$areanames{en}->{91721} = "Amravati\,\ Maharashtra";
+$areanames{en}->{917220} = "Chhikaldara\,\ Maharashtra";
+$areanames{en}->{917221} = "Nandgaon\,\ Maharashtra";
+$areanames{en}->{917222} = "Chandurrly\,\ Maharashtra";
+$areanames{en}->{917223} = "Achalpur\,\ Maharashtra";
+$areanames{en}->{917224} = "Daryapur\,\ Maharashtra";
+$areanames{en}->{917225} = "Tiwasa\,\ Maharashtra";
+$areanames{en}->{917226} = "Dharani\,\ Maharashtra";
+$areanames{en}->{917227} = "Chandurbazar\,\ Maharashtra";
+$areanames{en}->{917228} = "Morshi\,\ Maharashtra";
+$areanames{en}->{917229} = "Warlydwarud\,\ Maharashtra";
+$areanames{en}->{917230} = "Ghatanji\,\ Maharashtra";
+$areanames{en}->{917231} = "Umarkhed\,\ Maharashtra";
+$areanames{en}->{917232} = "Yeotmal\,\ Maharashtra";
+$areanames{en}->{917233} = "Pusad\,\ Maharashtra";
+$areanames{en}->{917234} = "Digras\,\ Maharashtra";
+$areanames{en}->{917235} = "Pandharkawada\,\ Maharashtra";
+$areanames{en}->{917236} = "Maregaon\,\ Maharashtra";
+$areanames{en}->{917237} = "Marigaon\,\ Maharashtra";
+$areanames{en}->{917238} = "Darwaha\,\ Maharashtra";
+$areanames{en}->{917239} = "Wani\,\ Maharashtra";
+$areanames{en}->{91724} = "Akola\,\ Maharashtra";
+$areanames{en}->{917251} = "Risod\,\ Maharashtra";
+$areanames{en}->{917252} = "Washim\,\ Maharashtra";
+$areanames{en}->{917253} = "Mangrulpur\,\ Maharashtra";
+$areanames{en}->{917254} = "Malgaon\,\ Maharashtra";
+$areanames{en}->{917255} = "Barshi\ Takli\,\ Maharashtra";
+$areanames{en}->{917256} = "Murtizapur\,\ Maharashtra";
+$areanames{en}->{917257} = "Balapur\,\ Maharashtra";
+$areanames{en}->{917258} = "Akot\,\ Maharashtra";
+$areanames{en}->{917260} = "Lonar\,\ Maharashtra";
+$areanames{en}->{917261} = "Deolgaonraja\,\ Maharashtra";
+$areanames{en}->{917262} = "Buldhana\,\ Maharashtra";
+$areanames{en}->{917263} = "Khamgaon\,\ Maharashtra";
+$areanames{en}->{917264} = "Chikhali\,\ Maharashtra";
+$areanames{en}->{917265} = "Nandura\,\ Maharashtra";
+$areanames{en}->{917266} = "Jalgaonjamod\,\ Maharashtra";
+$areanames{en}->{917267} = "Malkapur\,\ Maharashtra";
+$areanames{en}->{917268} = "Mekhar\,\ Maharashtra";
+$areanames{en}->{917269} = "Sindkhedaraja\,\ Maharashtra";
+$areanames{en}->{917270} = "Sonkatch\,\ Madhya\ Pradesh";
+$areanames{en}->{917271} = "Bagli\,\ Madhya\ Pradesh";
+$areanames{en}->{917272} = "Dewas\,\ Madhya\ Pradesh";
+$areanames{en}->{917273} = "Kannod\,\ Madhya\ Pradesh";
+$areanames{en}->{917274} = "Khategaon\,\ Madhya\ Pradesh";
+$areanames{en}->{917279} = "Nandnva\,\ Maharashtra";
+$areanames{en}->{917280} = "Barwaha\,\ Madhya\ Pradesh";
+$areanames{en}->{917281} = "Sendhwa\,\ Madhya\ Pradesh";
+$areanames{en}->{917282} = "Khargone\,\ Madhya\ Pradesh";
+$areanames{en}->{917283} = "Maheshwar\,\ Madhya\ Pradesh";
+$areanames{en}->{917284} = "Rajpur\,\ Madhya\ Pradesh";
+$areanames{en}->{917285} = "Kasrawad\,\ Madhya\ Pradesh";
+$areanames{en}->{917286} = "Khetia\,\ Madhya\ Pradesh";
+$areanames{en}->{917287} = "Gogaon\,\ Madhya\ Pradesh";
+$areanames{en}->{917288} = "Bhikangaon\,\ Madhya\ Pradesh";
+$areanames{en}->{917289} = "Zhirnia\,\ Madhya\ Pradesh";
+$areanames{en}->{917290} = "Badwani\,\ Madhya\ Pradesh";
+$areanames{en}->{917291} = "Manawar\,\ Madhya\ Pradesh";
+$areanames{en}->{917292} = "Dhar\,\ Madhya\ Pradesh";
+$areanames{en}->{917294} = "Dharampuri\,\ Madhya\ Pradesh";
+$areanames{en}->{917295} = "Badnawar\,\ Madhya\ Pradesh";
+$areanames{en}->{917296} = "Sardarpur\,\ Madhya\ Pradesh";
+$areanames{en}->{917297} = "Kukshi\,\ Madhya\ Pradesh";
+$areanames{en}->{91731} = "Indore\,\ Madhya\ Pradesh";
+$areanames{en}->{917320} = "Pandhana\,\ Madhya\ Pradesh";
+$areanames{en}->{917321} = "Sanwer\,\ Madhya\ Pradesh";
+$areanames{en}->{917322} = "Depalpur\,\ Madhya\ Pradesh";
+$areanames{en}->{917323} = "Punasa\,\ Madhya\ Pradesh";
+$areanames{en}->{917324} = "Mhow\,\ Madhya\ Pradesh";
+$areanames{en}->{917325} = "Burhanpur\,\ Madhya\ Pradesh";
+$areanames{en}->{917326} = "Baldi\,\ Madhya\ Pradesh";
+$areanames{en}->{917327} = "Harsud\,\ Madhya\ Pradesh";
+$areanames{en}->{917328} = "Khalwa\,\ Madhya\ Pradesh";
+$areanames{en}->{917329} = "Khakner\,\ Madhya\ Pradesh";
+$areanames{en}->{91733} = "Khandwa\,\ Madhya\ Pradesh";
+$areanames{en}->{91734} = "Ujjain\,\ Madhya\ Pradesh";
+$areanames{en}->{917360} = "Shujalpur\,\ Madhya\ Pradesh";
+$areanames{en}->{917361} = "Susner\,\ Madhya\ Pradesh";
+$areanames{en}->{917362} = "Agar\,\ Madhya\ Pradesh";
+$areanames{en}->{917363} = "Berchha\,\ Madhya\ Pradesh";
+$areanames{en}->{917364} = "Shajapur\,\ Madhya\ Pradesh";
+$areanames{en}->{917365} = "Mahidpurcity\,\ Madhya\ Pradesh";
+$areanames{en}->{917366} = "Khachrod\,\ Madhya\ Pradesh";
+$areanames{en}->{917367} = "Badnagar\,\ Madhya\ Pradesh";
+$areanames{en}->{917368} = "Ghatia\,\ Madhya\ Pradesh";
+$areanames{en}->{917369} = "Tarana\,\ Madhya\ Pradesh";
+$areanames{en}->{917370} = "Khilchipur\,\ Madhya\ Pradesh";
+$areanames{en}->{917371} = "Sarangpur\,\ Madhya\ Pradesh";
+$areanames{en}->{917372} = "Rajgarh\,\ Madhya\ Pradesh";
+$areanames{en}->{917374} = "Biaora\,\ Madhya\ Pradesh";
+$areanames{en}->{917375} = "Narsingharh\,\ Madhya\ Pradesh";
+$areanames{en}->{917390} = "Thandla\,\ Madhya\ Pradesh";
+$areanames{en}->{917391} = "Petlawad\,\ Madhya\ Pradesh";
+$areanames{en}->{917392} = "Jhabua\,\ Madhya\ Pradesh";
+$areanames{en}->{917393} = "Jobat\,\ Madhya\ Pradesh";
+$areanames{en}->{917394} = "Alirajpur\,\ Madhya\ Pradesh";
+$areanames{en}->{917395} = "Sondhwa\,\ Madhya\ Pradesh";
+$areanames{en}->{917410} = "Alot\,\ Madhya\ Pradesh";
+$areanames{en}->{917412} = "Ratlam\,\ Madhya\ Pradesh";
+$areanames{en}->{917413} = "Sailana\,\ Madhya\ Pradesh";
+$areanames{en}->{917414} = "Jaora\,\ Madhya\ Pradesh";
+$areanames{en}->{917420} = "Jawad\,\ Madhya\ Pradesh";
+$areanames{en}->{917421} = "Manasa\,\ Madhya\ Pradesh";
+$areanames{en}->{917422} = "Mandsaur\,\ Madhya\ Pradesh";
+$areanames{en}->{917423} = "Neemuch\,\ Madhya\ Pradesh";
+$areanames{en}->{917424} = "Malhargarh\,\ Madhya\ Pradesh";
+$areanames{en}->{917425} = "Garoth\,\ Madhya\ Pradesh";
+$areanames{en}->{917426} = "Sitamau\,\ Madhya\ Pradesh";
+$areanames{en}->{917427} = "Bhanpura\,\ Madhya\ Pradesh";
+$areanames{en}->{917430} = "Khanpur\,\ Rajasthan";
+$areanames{en}->{917431} = "Aklera\,\ Rajasthan";
+$areanames{en}->{917432} = "Jhalawar\,\ Rajasthan";
+$areanames{en}->{917433} = "Pachpahar\/Bhawanimandi\,\ Rajasthan";
+$areanames{en}->{917434} = "Pirawa\/Raipur\,\ Rajasthan";
+$areanames{en}->{917435} = "Gangdhar\,\ Rajasthan";
+$areanames{en}->{917436} = "Hindoli\,\ Rajasthan";
+$areanames{en}->{917437} = "Nainwa\,\ Rajasthan";
+$areanames{en}->{917438} = "Keshoraipatan\/Patan\,\ Rajasthan";
+$areanames{en}->{91744} = "Ladpura\/Kota\,\ Rajasthan";
+$areanames{en}->{917450} = "Sangod\,\ Rajasthan";
+$areanames{en}->{917451} = "Atru\,\ Rajasthan";
+$areanames{en}->{917452} = "Chhabra\,\ Rajasthan";
+$areanames{en}->{917453} = "Baran\,\ Rajasthan";
+$areanames{en}->{917454} = "Chhipaborad\,\ Rajasthan";
+$areanames{en}->{917455} = "Digod\/Sultanpur\,\ Rajasthan";
+$areanames{en}->{917456} = "Kishanganj\/Bhanwargarh\,\ Rajasthan";
+$areanames{en}->{917457} = "Mangrol\,\ Rajasthan";
+$areanames{en}->{917458} = "Pipalda\/Sumerganj\ Mandi\,\ Rajasthan";
+$areanames{en}->{917459} = "Ramganj\ Mandi\,\ Rajasthan";
+$areanames{en}->{917460} = "Sahabad\,\ Rajasthan";
+$areanames{en}->{917461} = "Mahuwa\,\ Rajasthan";
+$areanames{en}->{917462} = "Sawaimadhopur\,\ Rajasthan";
+$areanames{en}->{917463} = "Gangapur\,\ Rajasthan";
+$areanames{en}->{917464} = "Karauli\,\ Rajasthan";
+$areanames{en}->{917465} = "Sapotra\,\ Rajasthan";
+$areanames{en}->{917466} = "Bonli\,\ Rajasthan";
+$areanames{en}->{917467} = "Bamanwas\,\ Rajasthan";
+$areanames{en}->{917468} = "Khandar\,\ Rajasthan";
+$areanames{en}->{917469} = "Hindaun\,\ Rajasthan";
+$areanames{en}->{91747} = "Bundi\,\ Rajasthan";
+$areanames{en}->{917480} = "Goharganj\,\ Madhya\ Pradesh";
+$areanames{en}->{917481} = "Gairatganj\,\ Madhya\ Pradesh";
+$areanames{en}->{917482} = "Raisen\,\ Madhya\ Pradesh";
+$areanames{en}->{917484} = "Silwani\,\ Madhya\ Pradesh";
+$areanames{en}->{917485} = "Udaipura\,\ Madhya\ Pradesh";
+$areanames{en}->{917486} = "Bareli\,\ Madhya\ Pradesh";
+$areanames{en}->{917487} = "Begamganj\,\ Madhya\ Pradesh";
+$areanames{en}->{917490} = "Pohari\,\ Madhya\ Pradesh";
+$areanames{en}->{917491} = "Narwar\,\ Madhya\ Pradesh";
+$areanames{en}->{917492} = "Shivpuri\,\ Madhya\ Pradesh";
+$areanames{en}->{917493} = "Karera\,\ Madhya\ Pradesh";
+$areanames{en}->{917494} = "Kolaras\,\ Madhya\ Pradesh";
+$areanames{en}->{917495} = "Badarwas\,\ Madhya\ Pradesh";
+$areanames{en}->{917496} = "Pichhore\,\ Madhya\ Pradesh";
+$areanames{en}->{917497} = "Khaniadhana\,\ Madhya\ Pradesh";
+$areanames{en}->{91751} = "Gwalior\,\ Madhya\ Pradesh";
+$areanames{en}->{917521} = "Seondha\,\ Madhya\ Pradesh";
+$areanames{en}->{917522} = "Datia\,\ Madhya\ Pradesh";
+$areanames{en}->{917523} = "Bhander\,\ Madhya\ Pradesh";
+$areanames{en}->{917524} = "Dabra\,\ Madhya\ Pradesh";
+$areanames{en}->{917525} = "Bhitarwar\,\ Madhya\ Pradesh";
+$areanames{en}->{917526} = "Ghatigaon\,\ Madhya\ Pradesh";
+$areanames{en}->{917527} = "Mehgaon\,\ Madhya\ Pradesh";
+$areanames{en}->{917528} = "Bijaypur\,\ Madhya\ Pradesh";
+$areanames{en}->{917529} = "Laher\,\ Madhya\ Pradesh";
+$areanames{en}->{917530} = "Sheopurkalan\,\ Madhya\ Pradesh";
+$areanames{en}->{917531} = "Baroda\,\ Madhya\ Pradesh";
+$areanames{en}->{917532} = "Morena\,\ Madhya\ Pradesh";
+$areanames{en}->{917533} = "Karhal\,\ Madhya\ Pradesh";
+$areanames{en}->{917534} = "Bhind\,\ Madhya\ Pradesh";
+$areanames{en}->{917535} = "Raghunathpur\,\ Madhya\ Pradesh";
+$areanames{en}->{917536} = "Sabalgarh\,\ Madhya\ Pradesh";
+$areanames{en}->{917537} = "Jora\,\ Madhya\ Pradesh";
+$areanames{en}->{917538} = "Ambah\,\ Madhya\ Pradesh";
+$areanames{en}->{917539} = "Gohad\,\ Madhya\ Pradesh";
+$areanames{en}->{917540} = "Bamori\,\ Madhya\ Pradesh";
+$areanames{en}->{917541} = "Isagarh\,\ Madhya\ Pradesh";
+$areanames{en}->{917542} = "Guna\,\ Madhya\ Pradesh";
+$areanames{en}->{917543} = "Ashoknagar\,\ Madhya\ Pradesh";
+$areanames{en}->{917544} = "Raghogarh\,\ Madhya\ Pradesh";
+$areanames{en}->{917545} = "Arone\,\ Madhya\ Pradesh";
+$areanames{en}->{917546} = "Chachaura\,\ Madhya\ Pradesh";
+$areanames{en}->{917547} = "Chanderi\,\ Madhya\ Pradesh";
+$areanames{en}->{917548} = "Mungaoli\,\ Madhya\ Pradesh";
+$areanames{en}->{91755} = "Bhopal\,\ Madhya\ Pradesh";
+$areanames{en}->{917560} = "Ashta\,\ Madhya\ Pradesh";
+$areanames{en}->{917561} = "Ichhawar\,\ Madhya\ Pradesh";
+$areanames{en}->{917562} = "Sehore\,\ Madhya\ Pradesh";
+$areanames{en}->{917563} = "Nasrullaganj\,\ Madhya\ Pradesh";
+$areanames{en}->{917564} = "Budhni\,\ Madhya\ Pradesh";
+$areanames{en}->{917565} = "Berasia\,\ Madhya\ Pradesh";
+$areanames{en}->{917570} = "Seonimalwa\,\ Madhya\ Pradesh";
+$areanames{en}->{917571} = "Khirkiya\,\ Madhya\ Pradesh";
+$areanames{en}->{917572} = "Itarsi\,\ Madhya\ Pradesh";
+$areanames{en}->{917573} = "Timarani\,\ Madhya\ Pradesh";
+$areanames{en}->{917574} = "Hoshangabad\,\ Madhya\ Pradesh";
+$areanames{en}->{917575} = "Sohagpur\,\ Madhya\ Pradesh";
+$areanames{en}->{917576} = "Piparia\,\ Madhya\ Pradesh";
+$areanames{en}->{917577} = "Harda\,\ Madhya\ Pradesh";
+$areanames{en}->{917578} = "Pachmarhi\,\ Madhya\ Pradesh";
+$areanames{en}->{917580} = "Bina\,\ Madhya\ Pradesh";
+$areanames{en}->{917581} = "Khurai\,\ Madhya\ Pradesh";
+$areanames{en}->{917582} = "Sagar\,\ Madhya\ Pradesh";
+$areanames{en}->{917583} = "Banda\,\ Madhya\ Pradesh";
+$areanames{en}->{917584} = "Rahatgarh\,\ Madhya\ Pradesh";
+$areanames{en}->{917585} = "Rehli\,\ Madhya\ Pradesh";
+$areanames{en}->{917586} = "Deori\,\ Madhya\ Pradesh";
+$areanames{en}->{917590} = "Lateri\,\ Madhya\ Pradesh";
+$areanames{en}->{917591} = "Sironj\,\ Madhya\ Pradesh";
+$areanames{en}->{917592} = "Vidisha\,\ Madhya\ Pradesh";
+$areanames{en}->{917593} = "Kurwai\,\ Madhya\ Pradesh";
+$areanames{en}->{917594} = "Ganjbasoda\,\ Madhya\ Pradesh";
+$areanames{en}->{917595} = "Nateran\,\ Madhya\ Pradesh";
+$areanames{en}->{917596} = "Gyraspur\,\ Madhya\ Pradesh";
+$areanames{en}->{917601} = "Patharia\,\ Madhya\ Pradesh";
+$areanames{en}->{917603} = "Tendukheda\,\ Madhya\ Pradesh";
+$areanames{en}->{917604} = "Hatta\,\ Madhya\ Pradesh";
+$areanames{en}->{917605} = "Patera\,\ Madhya\ Pradesh";
+$areanames{en}->{917606} = "Jabera\,\ Madhya\ Pradesh";
+$areanames{en}->{917608} = "Bijawar\,\ Madhya\ Pradesh";
+$areanames{en}->{917609} = "Buxwaha\,\ Madhya\ Pradesh";
+$areanames{en}->{91761} = "Jabalpur\,\ Madhya\ Pradesh";
+$areanames{en}->{917621} = "Patan\,\ Madhya\ Pradesh";
+$areanames{en}->{917622} = "Katni\,\ Madhya\ Pradesh";
+$areanames{en}->{917623} = "Kundam\,\ Madhya\ Pradesh";
+$areanames{en}->{917624} = "Sihora\,\ Madhya\ Pradesh";
+$areanames{en}->{917625} = "Umariapan\,\ Madhya\ Pradesh";
+$areanames{en}->{917626} = "Vijayraghogarh\,\ Madhya\ Pradesh";
+$areanames{en}->{917627} = "Manpur\,\ Madhya\ Pradesh";
+$areanames{en}->{917628} = "Karpa\,\ Madhya\ Pradesh";
+$areanames{en}->{917629} = "Pushprajgarh\,\ Madhya\ Pradesh";
+$areanames{en}->{917630} = "Katangi\,\ Madhya\ Pradesh";
+$areanames{en}->{917632} = "Balaghat\,\ Madhya\ Pradesh";
+$areanames{en}->{917633} = "Waraseoni\,\ Madhya\ Pradesh";
+$areanames{en}->{917634} = "Lamta\,\ Madhya\ Pradesh";
+$areanames{en}->{917635} = "Lanji\,\ Madhya\ Pradesh";
+$areanames{en}->{917636} = "Baihar\,\ Madhya\ Pradesh";
+$areanames{en}->{917637} = "Birsa\,\ Madhya\ Pradesh";
+$areanames{en}->{917638} = "Damoh\,\ Madhya\ Pradesh";
+$areanames{en}->{917640} = "Shahpur\,\ Madhya\ Pradesh";
+$areanames{en}->{917641} = "Niwas\,\ Madhya\ Pradesh";
+$areanames{en}->{917642} = "Mandla\,\ Madhya\ Pradesh";
+$areanames{en}->{917643} = "Bijadandi\,\ Madhya\ Pradesh";
+$areanames{en}->{917644} = "Dindori\,\ Madhya\ Pradesh";
+$areanames{en}->{917645} = "Karanjia\,\ Madhya\ Pradesh";
+$areanames{en}->{917646} = "Nainpur\,\ Madhya\ Pradesh";
+$areanames{en}->{917647} = "Ghughari\,\ Madhya\ Pradesh";
+$areanames{en}->{917648} = "Mawai\,\ Madhya\ Pradesh";
+$areanames{en}->{917649} = "Kakaiya\,\ Madhya\ Pradesh";
+$areanames{en}->{917650} = "Beohari\,\ Madhya\ Pradesh";
+$areanames{en}->{917651} = "Jaisinghnagar\,\ Madhya\ Pradesh";
+$areanames{en}->{917652} = "Shahdol\,\ Madhya\ Pradesh";
+$areanames{en}->{917653} = "Bandhavgarh\,\ Madhya\ Pradesh";
+$areanames{en}->{917655} = "Birsinghpur\,\ Madhya\ Pradesh";
+$areanames{en}->{917656} = "Kannodi\,\ Madhya\ Pradesh";
+$areanames{en}->{917657} = "Jaitpur\,\ Madhya\ Pradesh";
+$areanames{en}->{917658} = "Kotma\,\ Madhya\ Pradesh";
+$areanames{en}->{917659} = "Jaithari\,\ Madhya\ Pradesh";
+$areanames{en}->{917660} = "Sirmour\,\ Madhya\ Pradesh";
+$areanames{en}->{917661} = "Teonthar\,\ Madhya\ Pradesh";
+$areanames{en}->{917662} = "Rewa\,\ Madhya\ Pradesh";
+$areanames{en}->{917663} = "Mauganj\,\ Madhya\ Pradesh";
+$areanames{en}->{917664} = "Hanumana\,\ Madhya\ Pradesh";
+$areanames{en}->{917670} = "Majhagwan\,\ Madhya\ Pradesh";
+$areanames{en}->{917671} = "Jaitwara\,\ Madhya\ Pradesh";
+$areanames{en}->{917672} = "Satna\,\ Madhya\ Pradesh";
+$areanames{en}->{917673} = "Nagod\,\ Madhya\ Pradesh";
+$areanames{en}->{917674} = "Maihar\,\ Madhya\ Pradesh";
+$areanames{en}->{917675} = "Amarpatan\,\ Madhya\ Pradesh";
+$areanames{en}->{917680} = "Niwari\,\ Madhya\ Pradesh";
+$areanames{en}->{917681} = "Jatara\,\ Madhya\ Pradesh";
+$areanames{en}->{917682} = "Chhatarpur\,\ Madhya\ Pradesh";
+$areanames{en}->{917683} = "Tikamgarh\,\ Madhya\ Pradesh";
+$areanames{en}->{917684} = "Baldeogarh\,\ Madhya\ Pradesh";
+$areanames{en}->{917685} = "Nowgaon\,\ Madhya\ Pradesh";
+$areanames{en}->{917686} = "Khajuraho\,\ Madhya\ Pradesh";
+$areanames{en}->{917687} = "Laundi\,\ Madhya\ Pradesh";
+$areanames{en}->{917688} = "Gourihar\,\ Madhya\ Pradesh";
+$areanames{en}->{917689} = "Badamalhera\,\ Madhya\ Pradesh";
+$areanames{en}->{917690} = "Lakhnadon\,\ Madhya\ Pradesh";
+$areanames{en}->{917691} = "Chhapara\,\ Madhya\ Pradesh";
+$areanames{en}->{917692} = "Seoni\,\ Madhya\ Pradesh";
+$areanames{en}->{917693} = "Ghansour\,\ Madhya\ Pradesh";
+$areanames{en}->{917694} = "Keolari\,\ Madhya\ Pradesh";
+$areanames{en}->{917695} = "Gopalganj\,\ Madhya\ Pradesh";
+$areanames{en}->{917700} = "Nagri\,\ Madhya\ Pradesh";
+$areanames{en}->{917701} = "Pingeshwar\,\ Madhya\ Pradesh";
+$areanames{en}->{917703} = "Manpur\,\ Madhya\ Pradesh";
+$areanames{en}->{917704} = "Deobhog\,\ Madhya\ Pradesh";
+$areanames{en}->{917705} = "Kurud\,\ Madhya\ Pradesh";
+$areanames{en}->{917706} = "Gariaband\,\ Madhya\ Pradesh";
+$areanames{en}->{917707} = "Bagbahera\,\ Madhya\ Pradesh";
+$areanames{en}->{91771} = "Raipur\,\ Madhya\ Pradesh";
+$areanames{en}->{917720} = "Arang\,\ Madhya\ Pradesh";
+$areanames{en}->{917721} = "Neora\,\ Madhya\ Pradesh";
+$areanames{en}->{917722} = "Dhamtari\,\ Madhya\ Pradesh";
+$areanames{en}->{917723} = "Mahasamund\,\ Madhya\ Pradesh";
+$areanames{en}->{917724} = "Basana\,\ Madhya\ Pradesh";
+$areanames{en}->{917725} = "Saraipali\,\ Madhya\ Pradesh";
+$areanames{en}->{917726} = "Bhatapara\,\ Madhya\ Pradesh";
+$areanames{en}->{917727} = "Balodabazar\,\ Madhya\ Pradesh";
+$areanames{en}->{917728} = "Kasdol\,\ Madhya\ Pradesh";
+$areanames{en}->{917729} = "Bhilaigarh\,\ Madhya\ Pradesh";
+$areanames{en}->{917730} = "Ajaigarh\,\ Madhya\ Pradesh";
+$areanames{en}->{917731} = "Gunnore\,\ Madhya\ Pradesh";
+$areanames{en}->{917732} = "Panna\,\ Madhya\ Pradesh";
+$areanames{en}->{917733} = "Pawai\,\ Madhya\ Pradesh";
+$areanames{en}->{917734} = "Shahnagar\,\ Madhya\ Pradesh";
+$areanames{en}->{917740} = "Bodla\,\ Madhya\ Pradesh";
+$areanames{en}->{917741} = "Kawardha\,\ Madhya\ Pradesh";
+$areanames{en}->{917743} = "Chuikhadan\,\ Madhya\ Pradesh";
+$areanames{en}->{917744} = "Rajandgaon\,\ Madhya\ Pradesh";
+$areanames{en}->{917745} = "Chhuriakala\,\ Madhya\ Pradesh";
+$areanames{en}->{917746} = "Manpur\,\ Madhya\ Pradesh";
+$areanames{en}->{917747} = "Mohla\,\ Madhya\ Pradesh";
+$areanames{en}->{917748} = "Dallirajhara\,\ Madhya\ Pradesh";
+$areanames{en}->{917749} = "Balod\,\ Madhya\ Pradesh";
+$areanames{en}->{917750} = "Marwahi\,\ Madhya\ Pradesh";
+$areanames{en}->{917751} = "Pendra\,\ Madhya\ Pradesh";
+$areanames{en}->{917752} = "Bilaspur\,\ Madhya\ Pradesh";
+$areanames{en}->{917753} = "Kota\,\ Madhya\ Pradesh";
+$areanames{en}->{917754} = "Pandaria\,\ Madhya\ Pradesh";
+$areanames{en}->{917755} = "Mungeli\,\ Madhya\ Pradesh";
+$areanames{en}->{917756} = "Lormi\,\ Madhya\ Pradesh";
+$areanames{en}->{917757} = "Shakti\,\ Madhya\ Pradesh";
+$areanames{en}->{917758} = "Dabhara\,\ Madhya\ Pradesh";
+$areanames{en}->{917759} = "Korba\,\ Madhya\ Pradesh";
+$areanames{en}->{917761} = "Tapkara\,\ Madhya\ Pradesh";
+$areanames{en}->{917762} = "Raigarh\,\ Madhya\ Pradesh";
+$areanames{en}->{917763} = "Jashpurnagar\,\ Madhya\ Pradesh";
+$areanames{en}->{917764} = "Kunkuri\,\ Madhya\ Pradesh";
+$areanames{en}->{917765} = "Pathalgaon\,\ Madhya\ Pradesh";
+$areanames{en}->{917766} = "Dharamjaigarh\,\ Madhya\ Pradesh";
+$areanames{en}->{917767} = "Gharghoda\,\ Madhya\ Pradesh";
+$areanames{en}->{917768} = "Saranggarh\,\ Madhya\ Pradesh";
+$areanames{en}->{917769} = "Bagicha\,\ Madhya\ Pradesh";
+$areanames{en}->{917770} = "Kathdol\,\ Madhya\ Pradesh";
+$areanames{en}->{917771} = "Manendragarh\,\ Madhya\ Pradesh";
+$areanames{en}->{917772} = "Wadrainagar\,\ Madhya\ Pradesh";
+$areanames{en}->{917773} = "Odgi\,\ Madhya\ Pradesh";
+$areanames{en}->{917774} = "Ambikapur\,\ Madhya\ Pradesh";
+$areanames{en}->{917775} = "Surajpur\,\ Madhya\ Pradesh";
+$areanames{en}->{917776} = "Premnagar\,\ Madhya\ Pradesh";
+$areanames{en}->{917777} = "Pratappur\,\ Madhya\ Pradesh";
+$areanames{en}->{917778} = "Semaria\,\ Madhya\ Pradesh";
+$areanames{en}->{917779} = "Ramchandrapur\,\ Madhya\ Pradesh";
+$areanames{en}->{917781} = "Narainpur\,\ Madhya\ Pradesh";
+$areanames{en}->{917782} = "Jagdalpur\,\ Madhya\ Pradesh";
+$areanames{en}->{917783} = "Padamkot\,\ Madhya\ Pradesh";
+$areanames{en}->{917784} = "Parasgaon\,\ Madhya\ Pradesh";
+$areanames{en}->{917785} = "Makodi\,\ Madhya\ Pradesh";
+$areanames{en}->{917786} = "Kondagaon\,\ Madhya\ Pradesh";
+$areanames{en}->{917787} = "Jarwa\,\ Madhya\ Pradesh";
+$areanames{en}->{917788} = "Luckwada\,\ Madhya\ Pradesh";
+$areanames{en}->{917789} = "Bhairongarh\,\ Madhya\ Pradesh";
+$areanames{en}->{917790} = "Babaichichli\,\ Madhya\ Pradesh";
+$areanames{en}->{917791} = "Gadarwara\,\ Madhya\ Pradesh";
+$areanames{en}->{917792} = "Narsinghpur\,\ Madhya\ Pradesh";
+$areanames{en}->{917793} = "Kareli\,\ Madhya\ Pradesh";
+$areanames{en}->{917794} = "Gotegaon\,\ Madhya\ Pradesh";
+$areanames{en}->{917801} = "Deosar\,\ Madhya\ Pradesh";
+$areanames{en}->{917802} = "Churhat\,\ Madhya\ Pradesh";
+$areanames{en}->{917803} = "Majholi\,\ Madhya\ Pradesh";
+$areanames{en}->{917804} = "Kusmi\,\ Madhya\ Pradesh";
+$areanames{en}->{917805} = "Singrauli\,\ Madhya\ Pradesh";
+$areanames{en}->{917806} = "Chitrangi\,\ Madhya\ Pradesh";
+$areanames{en}->{917810} = "Uproda\,\ Madhya\ Pradesh";
+$areanames{en}->{917811} = "Pasan\,\ Madhya\ Pradesh";
+$areanames{en}->{917812} = "Damoh\,\ Madhya\ Pradesh";
+$areanames{en}->{917813} = "Barpalli\,\ Madhya\ Pradesh";
+$areanames{en}->{917815} = "Kathghora\,\ Madhya\ Pradesh";
+$areanames{en}->{917816} = "Pali\,\ Madhya\ Pradesh";
+$areanames{en}->{917817} = "Janjgir\,\ Madhya\ Pradesh";
+$areanames{en}->{917818} = "Chandipara\,\ Madhya\ Pradesh";
+$areanames{en}->{917819} = "Pandishankar\,\ Madhya\ Pradesh";
+$areanames{en}->{917820} = "Khairagarh\,\ Madhya\ Pradesh";
+$areanames{en}->{917821} = "Dhamda\,\ Madhya\ Pradesh";
+$areanames{en}->{917822} = "Sidhi\,\ Madhya\ Pradesh";
+$areanames{en}->{917823} = "Dongargarh\,\ Madhya\ Pradesh";
+$areanames{en}->{917824} = "Bemetara\,\ Madhya\ Pradesh";
+$areanames{en}->{917825} = "Berla\,\ Madhya\ Pradesh";
+$areanames{en}->{917826} = "Patan\,\ Madhya\ Pradesh";
+$areanames{en}->{917831} = "Balrampur\,\ Madhya\ Pradesh";
+$areanames{en}->{917832} = "Rajpur\,\ Madhya\ Pradesh";
+$areanames{en}->{917833} = "Udaipur\,\ Madhya\ Pradesh";
+$areanames{en}->{917834} = "Sitapur\,\ Madhya\ Pradesh";
+$areanames{en}->{917835} = "Bharathpur\,\ Madhya\ Pradesh";
+$areanames{en}->{917836} = "Baikunthpur\,\ Madhya\ Pradesh";
+$areanames{en}->{917840} = "Koyelibeda\,\ Madhya\ Pradesh";
+$areanames{en}->{917841} = "Sarona\,\ Madhya\ Pradesh";
+$areanames{en}->{917843} = "Durgakondal\,\ Madhya\ Pradesh";
+$areanames{en}->{917844} = "Pakhanjur\,\ Madhya\ Pradesh";
+$areanames{en}->{917846} = "Garpa\,\ Madhya\ Pradesh";
+$areanames{en}->{917847} = "Antagarh\,\ Madhya\ Pradesh";
+$areanames{en}->{917848} = "Keskal\,\ Madhya\ Pradesh";
+$areanames{en}->{917849} = "Baderajpur\,\ Madhya\ Pradesh";
+$areanames{en}->{917850} = "Bhanupratappur\,\ Madhya\ Pradesh";
+$areanames{en}->{917851} = "Bhopalpatnam\,\ Madhya\ Pradesh";
+$areanames{en}->{917852} = "Toynar\,\ Madhya\ Pradesh";
+$areanames{en}->{917853} = "Bijapur\,\ Madhya\ Pradesh";
+$areanames{en}->{917854} = "Ilamidi\,\ Madhya\ Pradesh";
+$areanames{en}->{917855} = "Chingmut\,\ Madhya\ Pradesh";
+$areanames{en}->{917856} = "Dantewada\,\ Madhya\ Pradesh";
+$areanames{en}->{917857} = "Bacheli\,\ Madhya\ Pradesh";
+$areanames{en}->{917858} = "Kuakunda\,\ Madhya\ Pradesh";
+$areanames{en}->{917859} = "Lohadigundah\,\ Madhya\ Pradesh";
+$areanames{en}->{917861} = "Netanar\,\ Madhya\ Pradesh";
+$areanames{en}->{917862} = "Bastanar\,\ Madhya\ Pradesh";
+$areanames{en}->{917863} = "Chingamut\,\ Madhya\ Pradesh";
+$areanames{en}->{917864} = "Sukma\,\ Madhya\ Pradesh";
+$areanames{en}->{917865} = "Gogunda\,\ Madhya\ Pradesh";
+$areanames{en}->{917866} = "Konta\,\ Madhya\ Pradesh";
+$areanames{en}->{917867} = "Bokaband\,\ Madhya\ Pradesh";
+$areanames{en}->{917868} = "Kanker\,\ Madhya\ Pradesh";
+$areanames{en}->{91788} = "Durg\,\ Madhya\ Pradesh";
+$areanames{en}->{9179} = "Ahmedabad\ Local\,\ Gujarat";
+$areanames{en}->{9180} = "Bangalore\,\ Karnataka";
+$areanames{en}->{918110} = "Anekal\,\ Karnataka";
+$areanames{en}->{918111} = "Hosakote\,\ Karnataka";
+$areanames{en}->{918113} = "Channapatna\,\ Karnataka";
+$areanames{en}->{918117} = "Kanakapura\,\ Karnataka";
+$areanames{en}->{918118} = "Nelamangala\,\ Karnataka";
+$areanames{en}->{918119} = "Doddaballapur\,\ Karnataka";
+$areanames{en}->{918131} = "Gubbi\,\ Karnataka";
+$areanames{en}->{918132} = "Kunigal\,\ Karnataka";
+$areanames{en}->{918133} = "Chikkanayakanahalli\,\ Karnataka";
+$areanames{en}->{918134} = "Tiptur\,\ Karnataka";
+$areanames{en}->{918135} = "Sira\,\ Karnataka";
+$areanames{en}->{918136} = "Pavagada\,\ Karnataka";
+$areanames{en}->{918137} = "Madugiri\,\ Karnataka";
+$areanames{en}->{918138} = "Koratageri\,\ Karnataka";
+$areanames{en}->{918139} = "Turuvekere\,\ Karnataka";
+$areanames{en}->{918150} = "Bagepalli\,\ Karnataka";
+$areanames{en}->{918151} = "Malur\,\ Karnataka";
+$areanames{en}->{918152} = "Kolar\,\ Karnataka";
+$areanames{en}->{918153} = "Bangarpet\,\ Karnataka";
+$areanames{en}->{918154} = "Chintamani\,\ Karnataka";
+$areanames{en}->{918155} = "Gowribidanur\,\ Karnataka";
+$areanames{en}->{918156} = "Chikkaballapur\,\ Karnataka";
+$areanames{en}->{918157} = "Srinivasapur\,\ Karnataka";
+$areanames{en}->{918158} = "Sidlaghatta\,\ Karnataka";
+$areanames{en}->{918159} = "Mulbagal\,\ Karnataka";
+$areanames{en}->{91816} = "Tumkur\,\ Karnataka";
+$areanames{en}->{918170} = "Alur\,\ Karnataka";
+$areanames{en}->{918172} = "Hassan\,\ Karnataka";
+$areanames{en}->{918173} = "Sakleshpur\,\ Karnataka";
+$areanames{en}->{918174} = "Arsikere\,\ Karnataka";
+$areanames{en}->{918175} = "Holenarasipur\,\ Karnataka";
+$areanames{en}->{918176} = "Cannarayapatna\,\ Karnataka";
+$areanames{en}->{918177} = "Belur\,\ Karnataka";
+$areanames{en}->{918180} = "Basavapatna\,\ Karnataka";
+$areanames{en}->{918181} = "Thirthahalli\,\ Karnataka";
+$areanames{en}->{918182} = "Shimoga\,\ Karnataka";
+$areanames{en}->{918183} = "Sagar\,\ Karnataka";
+$areanames{en}->{918184} = "Sorab\,\ Karnataka";
+$areanames{en}->{918185} = "Hosanagara\,\ Karnataka";
+$areanames{en}->{918186} = "Kargal\,\ Karnataka";
+$areanames{en}->{918187} = "Shikaripura\,\ Karnataka";
+$areanames{en}->{918188} = "Honnali\,\ Karnataka";
+$areanames{en}->{918189} = "Channagiri\,\ Karnataka";
+$areanames{en}->{918190} = "Tallak\,\ Karnataka";
+$areanames{en}->{918191} = "Holalkere\,\ Karnataka";
+$areanames{en}->{918192} = "Davangere\,\ Karnataka";
+$areanames{en}->{918193} = "Hiriyur\,\ Karnataka";
+$areanames{en}->{918194} = "Chitradurga\,\ Karnataka";
+$areanames{en}->{918195} = "Challakere\,\ Karnataka";
+$areanames{en}->{918196} = "Jagalur\,\ Karnataka";
+$areanames{en}->{918198} = "Molkalmuru\,\ Karnataka";
+$areanames{en}->{918199} = "Hosadurga\,\ Karnataka";
+$areanames{en}->{91820} = "Udupi\,\ Karnataka";
+$areanames{en}->{91821} = "Mysore\,\ Karnataka";
+$areanames{en}->{918221} = "Nanjangud\,\ Karnataka";
+$areanames{en}->{918222} = "Hunsur\,\ Karnataka";
+$areanames{en}->{918223} = "K\.R\.Nagar\,\ Karnataka";
+$areanames{en}->{918224} = "Kollegal\,\ Karnataka";
+$areanames{en}->{918225} = "Cowdahalli\,\ Karnataka";
+$areanames{en}->{918226} = "Chamrajnagar\,\ Karnataka";
+$areanames{en}->{918227} = "T\.Narsipur\,\ Karnataka";
+$areanames{en}->{918228} = "H\.D\.Kote\,\ Karnataka";
+$areanames{en}->{918229} = "Gundlupet\,\ Karnataka";
+$areanames{en}->{918230} = "Krishnarajapet\,\ Karnataka";
+$areanames{en}->{918231} = "Malavalli\,\ Karnataka";
+$areanames{en}->{918232} = "Mandya\,\ Karnataka";
+$areanames{en}->{918234} = "Nagamangala\,\ Karnataka";
+$areanames{en}->{918236} = "Pandavpura\,\ Karnataka";
+$areanames{en}->{91824} = "Mangalore\,\ Karnataka";
+$areanames{en}->{918251} = "Puttur\,\ Karnataka";
+$areanames{en}->{918253} = "Hebri\,\ Karnataka";
+$areanames{en}->{918254} = "Kundapur\,\ Karnataka";
+$areanames{en}->{918255} = "Bantwal\,\ Karnataka";
+$areanames{en}->{918256} = "Belthangady\,\ Karnataka";
+$areanames{en}->{918257} = "Sullia\,\ Karnataka";
+$areanames{en}->{918258} = "Karkala\,\ Karnataka";
+$areanames{en}->{918259} = "Shankarnarayana\,\ Karnataka";
+$areanames{en}->{918261} = "Tarikere\,\ Karnataka";
+$areanames{en}->{918262} = "Chikmagalur\,\ Karnataka";
+$areanames{en}->{918263} = "Mudigere\,\ Karnataka";
+$areanames{en}->{918265} = "Koppa\,\ Karnataka";
+$areanames{en}->{918266} = "Narsimharajapur\,\ Karnataka";
+$areanames{en}->{918267} = "Kadur\,\ Karnataka";
+$areanames{en}->{918272} = "Madikeri\,\ Karnataka";
+$areanames{en}->{918274} = "Virajpet\,\ Karnataka";
+$areanames{en}->{918276} = "Somwarpet\,\ Karnataka";
+$areanames{en}->{918282} = "Bhadravati\,\ Karnataka";
+$areanames{en}->{918283} = "Salkani\,\ Karnataka";
+$areanames{en}->{918284} = "Haliyal\,\ Karnataka";
+$areanames{en}->{918288} = "Bailhongal\,\ Karnataka";
+$areanames{en}->{918289} = "Athani\,\ Karnataka";
+$areanames{en}->{918301} = "Mundagod\,\ Karnataka";
+$areanames{en}->{918304} = "Kundgol\,\ Karnataka";
+$areanames{en}->{91831} = "Belgaum\,\ Karnataka";
+$areanames{en}->{91832} = "Goa";
+$areanames{en}->{918330} = "Saundatti\,\ Karnataka";
+$areanames{en}->{918331} = "Raibag\/Kudchi\,\ Karnataka";
+$areanames{en}->{918332} = "Gokak\,\ Karnataka";
+$areanames{en}->{918333} = "Hukkeri\/Sankeshwar\,\ Karnataka";
+$areanames{en}->{918334} = "Mudalgi\,\ Karnataka";
+$areanames{en}->{918335} = "Ramdurg\,\ Karnataka";
+$areanames{en}->{918336} = "Khanapur\,\ Karnataka";
+$areanames{en}->{918337} = "Murugod\,\ Karnataka";
+$areanames{en}->{918338} = "Chikkodi\,\ Karnataka";
+$areanames{en}->{918339} = "Ainapur\,\ Karnataka";
+$areanames{en}->{918350} = "Mudhol\,\ Karnataka";
+$areanames{en}->{918351} = "Hungund\,\ Karnataka";
+$areanames{en}->{918352} = "Bijapur\,\ Karnataka";
+$areanames{en}->{918353} = "Jamkhandi\,\ Karnataka";
+$areanames{en}->{918354} = "Bagalkot\,\ Karnataka";
+$areanames{en}->{918355} = "Bableshwar\,\ Karnataka";
+$areanames{en}->{918356} = "Muddebihal\,\ Karnataka";
+$areanames{en}->{918357} = "Badami\,\ Karnataka";
+$areanames{en}->{918358} = "Basavanabagewadi\,\ Karnataka";
+$areanames{en}->{918359} = "Indi\,\ Karnataka";
+$areanames{en}->{91836} = "Hubli\,\ Karnataka";
+$areanames{en}->{918370} = "Kalghatagi\,\ Karnataka";
+$areanames{en}->{918371} = "Mundargi\,\ Karnataka";
+$areanames{en}->{918372} = "Gadag\,\ Karnataka";
+$areanames{en}->{918373} = "Ranebennur\,\ Karnataka";
+$areanames{en}->{918375} = "Haveri\,\ Karnataka";
+$areanames{en}->{918376} = "Hirekerur\,\ Karnataka";
+$areanames{en}->{918377} = "Nargund\,\ Karnataka";
+$areanames{en}->{918378} = "Savanur\,\ Karnataka";
+$areanames{en}->{918379} = "Hangal\,\ Karnataka";
+$areanames{en}->{918380} = "Navalgund\,\ Karnataka";
+$areanames{en}->{918381} = "Ron\,\ Karnataka";
+$areanames{en}->{918382} = "Karwar\,\ Karnataka";
+$areanames{en}->{918383} = "Joida\,\ Karnataka";
+$areanames{en}->{918384} = "Sirsi\,\ Karnataka";
+$areanames{en}->{918385} = "Bhatkal\,\ Karnataka";
+$areanames{en}->{918386} = "Kumta\,\ Karnataka";
+$areanames{en}->{918387} = "Honnavar\,\ Karnataka";
+$areanames{en}->{918388} = "Ankola\,\ Karnataka";
+$areanames{en}->{918389} = "Siddapur\,\ Karnataka";
+$areanames{en}->{918391} = "Kudligi\,\ Karnataka";
+$areanames{en}->{918392} = "Bellary\,\ Karnataka";
+$areanames{en}->{918393} = "Kurugodu\,\ Karnataka";
+$areanames{en}->{918394} = "Hospet\,\ Karnataka";
+$areanames{en}->{918395} = "Sandur\,\ Karnataka";
+$areanames{en}->{918396} = "Siruguppa\,\ Karnataka";
+$areanames{en}->{918397} = "H\.B\.Halli\,\ Karnataka";
+$areanames{en}->{918398} = "Harapanahalli\,\ Karnataka";
+$areanames{en}->{918399} = "Huvinahadagali\,\ Karnataka";
+$areanames{en}->{918402} = "Kanigiri\,\ Andhra\ Pradesh";
+$areanames{en}->{918403} = "Yerragondapalem\,\ Andhra\ Pradesh";
+$areanames{en}->{918404} = "Marturu\,\ Andhra\ Pradesh";
+$areanames{en}->{918405} = "Giddalur\,\ Andhra\ Pradesh";
+$areanames{en}->{918406} = "Cumbum\,\ Andhra\ Pradesh";
+$areanames{en}->{918407} = "Darsi\,\ Andhra\ Pradesh";
+$areanames{en}->{918408} = "Donakonda\,\ Andhra\ Pradesh";
+$areanames{en}->{918411} = "Tanduru\,\ Andhra\ Pradesh";
+$areanames{en}->{918412} = "Pargi\,\ Andhra\ Pradesh";
+$areanames{en}->{918413} = "Hyderabad\ West\/Shamshabad\,\ Andhra\ Pradesh";
+$areanames{en}->{918414} = "Ibrahimpatnam\,\ Andhra\ Pradesh";
+$areanames{en}->{918415} = "Hyderabad\ East\/Ghatkeswar\,\ Andhra\ Pradesh";
+$areanames{en}->{918416} = "Vikrabad\,\ Andhra\ Pradesh";
+$areanames{en}->{918417} = "Chevella\,\ Andhra\ Pradesh";
+$areanames{en}->{918418} = "Medchal\,\ Andhra\ Pradesh";
+$areanames{en}->{918419} = "Yellapur\,\ Karnataka";
+$areanames{en}->{918422} = "Chadchan\,\ Karnataka";
+$areanames{en}->{918424} = "Devarahippargi\,\ Karnataka";
+$areanames{en}->{918425} = "Biligi\,\ Karnataka";
+$areanames{en}->{918426} = "Telgi\,\ Karnataka";
+$areanames{en}->{918440} = "Nimburga\,\ Karnataka";
+$areanames{en}->{918441} = "Sedam\,\ Karnataka";
+$areanames{en}->{918442} = "Jewargi\,\ Karnataka";
+$areanames{en}->{918443} = "Shorapur\,\ Karnataka";
+$areanames{en}->{918444} = "Hunsagi\,\ Karnataka";
+$areanames{en}->{918450} = "Andole\/Jogipet\,\ Andhra\ Pradesh";
+$areanames{en}->{918451} = "Zahirabad\,\ Andhra\ Pradesh";
+$areanames{en}->{918452} = "Medak\,\ Andhra\ Pradesh";
+$areanames{en}->{918454} = "Gajwel\,\ Andhra\ Pradesh";
+$areanames{en}->{918455} = "Sangareddy\,\ Andhra\ Pradesh";
+$areanames{en}->{918456} = "Narayankhed\,\ Andhra\ Pradesh";
+$areanames{en}->{918457} = "Siddipet\,\ Andhra\ Pradesh";
+$areanames{en}->{918458} = "Narsapur\,\ Andhra\ Pradesh";
+$areanames{en}->{918461} = "Dichpalli\,\ Andhra\ Pradesh";
+$areanames{en}->{918462} = "Nizamabad\,\ Andhra\ Pradesh";
+$areanames{en}->{918463} = "Armoor\,\ Andhra\ Pradesh";
+$areanames{en}->{918464} = "Madnur\,\ Andhra\ Pradesh";
+$areanames{en}->{918465} = "Yellareddy\,\ Andhra\ Pradesh";
+$areanames{en}->{918466} = "Banswada\,\ Andhra\ Pradesh";
+$areanames{en}->{918467} = "Bodhan\,\ Andhra\ Pradesh";
+$areanames{en}->{918468} = "Kamareddy\,\ Andhra\ Pradesh";
+$areanames{en}->{918470} = "Afzalpur\,\ Karnataka";
+$areanames{en}->{918471} = "Mashal\,\ Karnataka";
+$areanames{en}->{918472} = "Gulbarga\,\ Karnataka";
+$areanames{en}->{918473} = "Yadgiri\,\ Karnataka";
+$areanames{en}->{918474} = "Chittapur\,\ Karnataka";
+$areanames{en}->{918475} = "Chincholi\,\ Karnataka";
+$areanames{en}->{918476} = "Wadi\,\ Karnataka";
+$areanames{en}->{918477} = "Aland\,\ Karnataka";
+$areanames{en}->{918478} = "Kamalapur\,\ Karnataka";
+$areanames{en}->{918479} = "Shahapur\,\ Karnataka";
+$areanames{en}->{918481} = "Basavakalyan\,\ Karnataka";
+$areanames{en}->{918482} = "Bidar\,\ Karnataka";
+$areanames{en}->{918483} = "Humnabad\,\ Karnataka";
+$areanames{en}->{918484} = "Bhalki\,\ Karnataka";
+$areanames{en}->{918485} = "Aurad\,\ Karnataka";
+$areanames{en}->{918487} = "Shirahatti\,\ Karnataka";
+$areanames{en}->{918488} = "Sindagi\,\ Karnataka";
+$areanames{en}->{918490} = "Pamuru\,\ Andhra\ Pradesh";
+$areanames{en}->{918491} = "Kanaganapalle\,\ Andhra\ Pradesh";
+$areanames{en}->{918492} = "Kambadur\,\ Andhra\ Pradesh";
+$areanames{en}->{918493} = "Madakasira\,\ Andhra\ Pradesh";
+$areanames{en}->{918494} = "Kadiri\,\ Andhra\ Pradesh";
+$areanames{en}->{918495} = "Rayadurg\,\ Andhra\ Pradesh";
+$areanames{en}->{918496} = "Uravakonda\,\ Andhra\ Pradesh";
+$areanames{en}->{918497} = "Kalyandurg\,\ Andhra\ Pradesh";
+$areanames{en}->{918498} = "Nallacheruvu\/Tanakallu\,\ Andhra\ Pradesh";
+$areanames{en}->{918499} = "Podili\,\ Andhra\ Pradesh";
+$areanames{en}->{918501} = "Kollapur\,\ Andhra\ Pradesh";
+$areanames{en}->{918502} = "Alampur\,\ Andhra\ Pradesh";
+$areanames{en}->{918503} = "Makthal\,\ Andhra\ Pradesh";
+$areanames{en}->{918504} = "Atmakur\,\ Andhra\ Pradesh";
+$areanames{en}->{918505} = "Kodangal\,\ Andhra\ Pradesh";
+$areanames{en}->{918506} = "Narayanpet\,\ Andhra\ Pradesh";
+$areanames{en}->{918510} = "Koilkuntla\,\ Andhra\ Pradesh";
+$areanames{en}->{918512} = "Adoni\,\ Andhra\ Pradesh";
+$areanames{en}->{918513} = "Nandikotkur\,\ Andhra\ Pradesh";
+$areanames{en}->{918514} = "Nandyal\,\ Andhra\ Pradesh";
+$areanames{en}->{918515} = "Banaganapalle\,\ Andhra\ Pradesh";
+$areanames{en}->{918516} = "Dronachalam\,\ Andhra\ Pradesh";
+$areanames{en}->{918517} = "Atmakur\,\ Andhra\ Pradesh";
+$areanames{en}->{918518} = "Kurnool\,\ Andhra\ Pradesh";
+$areanames{en}->{918519} = "Allagadda\,\ Andhra\ Pradesh";
+$areanames{en}->{918520} = "Pattikonda\,\ Andhra\ Pradesh";
+$areanames{en}->{918522} = "Peapalle\,\ Andhra\ Pradesh";
+$areanames{en}->{918523} = "Alur\,\ Andhra\ Pradesh";
+$areanames{en}->{918524} = "Srisailam\,\ Andhra\ Pradesh";
+$areanames{en}->{918525} = "Gudur\/Kodumur\,\ Andhra\ Pradesh";
+$areanames{en}->{918531} = "Deodurga\,\ Karnataka";
+$areanames{en}->{918532} = "Raichur\,\ Karnataka";
+$areanames{en}->{918533} = "Gangavathi\,\ Karnataka";
+$areanames{en}->{918534} = "Yelburga\,\ Karnataka";
+$areanames{en}->{918535} = "Sindhanur\,\ Karnataka";
+$areanames{en}->{918536} = "Kustagi\,\ Karnataka";
+$areanames{en}->{918537} = "Lingsugur\,\ Karnataka";
+$areanames{en}->{918538} = "Manvi\,\ Karnataka";
+$areanames{en}->{918539} = "Koppal\,\ Karnataka";
+$areanames{en}->{918540} = "Nagarkurnool\,\ Andhra\ Pradesh";
+$areanames{en}->{918541} = "Achampet\,\ Andhra\ Pradesh";
+$areanames{en}->{918542} = "Mahabubnagar\,\ Andhra\ Pradesh";
+$areanames{en}->{918543} = "Wanaparthy\,\ Andhra\ Pradesh";
+$areanames{en}->{918545} = "Amangallu\,\ Andhra\ Pradesh";
+$areanames{en}->{918546} = "Gadwal\,\ Andhra\ Pradesh";
+$areanames{en}->{918548} = "Shadnagar\,\ Andhra\ Pradesh";
+$areanames{en}->{918549} = "Kalwakurthy\,\ Andhra\ Pradesh";
+$areanames{en}->{918550} = "Yellanuru\,\ Andhra\ Pradesh";
+$areanames{en}->{918551} = "Garladinne\,\ Andhra\ Pradesh";
+$areanames{en}->{918552} = "Gooty\/Guntakal\,\ Andhra\ Pradesh";
+$areanames{en}->{918554} = "Anantapur\,\ Andhra\ Pradesh";
+$areanames{en}->{918556} = "Hindupur\,\ Andhra\ Pradesh";
+$areanames{en}->{918557} = "Penukonda\,\ Andhra\ Pradesh";
+$areanames{en}->{918558} = "Tadipatri\,\ Andhra\ Pradesh";
+$areanames{en}->{918559} = "Dharmavaram\,\ Andhra\ Pradesh";
+$areanames{en}->{918560} = "Jammalamadugu\,\ Andhra\ Pradesh";
+$areanames{en}->{918561} = "Rayachoti\,\ Andhra\ Pradesh";
+$areanames{en}->{918562} = "Kadapa\,\ Andhra\ Pradesh";
+$areanames{en}->{918563} = "Kamalapuram\/Yerraguntala\,\ Andhra\ Pradesh";
+$areanames{en}->{918564} = "Proddatur\,\ Andhra\ Pradesh";
+$areanames{en}->{918565} = "Rajampeta\,\ Andhra\ Pradesh";
+$areanames{en}->{918566} = "Koduru\,\ Andhra\ Pradesh";
+$areanames{en}->{918567} = "Lakkireddipalli\,\ Andhra\ Pradesh";
+$areanames{en}->{918568} = "Pulivendla\,\ Andhra\ Pradesh";
+$areanames{en}->{918569} = "Badvel\,\ Andhra\ Pradesh";
+$areanames{en}->{918570} = "Kuppam\,\ Andhra\ Pradesh";
+$areanames{en}->{918571} = "Madanapalli\,\ Andhra\ Pradesh";
+$areanames{en}->{918572} = "Chittoor\,\ Andhra\ Pradesh";
+$areanames{en}->{918573} = "Bangarupalem\,\ Andhra\ Pradesh";
+$areanames{en}->{918576} = "Satyavedu\,\ Andhra\ Pradesh";
+$areanames{en}->{918577} = "Putturu\,\ Andhra\ Pradesh";
+$areanames{en}->{918578} = "Srikalahasthi\,\ Andhra\ Pradesh";
+$areanames{en}->{918579} = "Palmaneru\,\ Andhra\ Pradesh";
+$areanames{en}->{918581} = "Punganur\,\ Andhra\ Pradesh";
+$areanames{en}->{918582} = "B\.Kothakota\,\ Andhra\ Pradesh";
+$areanames{en}->{918583} = "Sodam\,\ Andhra\ Pradesh";
+$areanames{en}->{918584} = "Piler\,\ Andhra\ Pradesh";
+$areanames{en}->{918585} = "Pakala\,\ Andhra\ Pradesh";
+$areanames{en}->{918586} = "Vayalpad\,\ Andhra\ Pradesh";
+$areanames{en}->{918587} = "Venkatgirikota\,\ Andhra\ Pradesh";
+$areanames{en}->{918588} = "Vaimpalli\,\ Andhra\ Pradesh";
+$areanames{en}->{918589} = "Siddavattam\,\ Andhra\ Pradesh";
+$areanames{en}->{918592} = "Ongole\,\ Andhra\ Pradesh";
+$areanames{en}->{918593} = "Medarmetla\,\ Andhra\ Pradesh";
+$areanames{en}->{918594} = "Chirala\,\ Andhra\ Pradesh";
+$areanames{en}->{918596} = "Markapur\,\ Andhra\ Pradesh";
+$areanames{en}->{918598} = "Kandukuru\,\ Andhra\ Pradesh";
+$areanames{en}->{918599} = "Ulvapadu\,\ Andhra\ Pradesh";
+$areanames{en}->{91861} = "Nellore\,\ Andhra\ Pradesh";
+$areanames{en}->{918620} = "Udaygiri\,\ Andhra\ Pradesh";
+$areanames{en}->{918621} = "Rapur\/Podalakur\,\ Andhra\ Pradesh";
+$areanames{en}->{918622} = "Kovvur\,\ Andhra\ Pradesh";
+$areanames{en}->{918623} = "Sullurpet\,\ Andhra\ Pradesh";
+$areanames{en}->{918624} = "Gudur\,\ Andhra\ Pradesh";
+$areanames{en}->{918625} = "Venkatgiri\,\ Andhra\ Pradesh";
+$areanames{en}->{918626} = "Kavali\,\ Andhra\ Pradesh";
+$areanames{en}->{918627} = "Atmakur\,\ Andhra\ Pradesh";
+$areanames{en}->{918628} = "Chejerla\,\ Andhra\ Pradesh";
+$areanames{en}->{918629} = "Vinjamuru\,\ Andhra\ Pradesh";
+$areanames{en}->{91863} = "Guntur\,\ Andhra\ Pradesh";
+$areanames{en}->{918640} = "Krosuru\,\ Andhra\ Pradesh";
+$areanames{en}->{918641} = "Sattenapalli\,\ Andhra\ Pradesh";
+$areanames{en}->{918642} = "Guntur\ Palnad\/Macherala\,\ Andhra\ Pradesh";
+$areanames{en}->{918643} = "Bapatla\,\ Andhra\ Pradesh";
+$areanames{en}->{918644} = "Tenali\,\ Andhra\ Pradesh";
+$areanames{en}->{918645} = "Mangalagiri\,\ Andhra\ Pradesh";
+$areanames{en}->{918646} = "Vinukonda\,\ Andhra\ Pradesh";
+$areanames{en}->{918647} = "Narsaraopet\,\ Andhra\ Pradesh";
+$areanames{en}->{918648} = "Repalle\,\ Andhra\ Pradesh";
+$areanames{en}->{918649} = "Piduguralla\,\ Andhra\ Pradesh";
+$areanames{en}->{918654} = "Jaggayyapet\,\ Andhra\ Pradesh";
+$areanames{en}->{918656} = "Nuzvidu\,\ Andhra\ Pradesh";
+$areanames{en}->{918659} = "Mylavaram\,\ Andhra\ Pradesh";
+$areanames{en}->{91866} = "Vijayawada\,\ Andhra\ Pradesh";
+$areanames{en}->{918671} = "Divi\/Challapalli\,\ Andhra\ Pradesh";
+$areanames{en}->{918672} = "Bandar\/Machilipatnam\,\ Andhra\ Pradesh";
+$areanames{en}->{918673} = "Tirivuru\,\ Andhra\ Pradesh";
+$areanames{en}->{918674} = "Gudivada\,\ Andhra\ Pradesh";
+$areanames{en}->{918676} = "Vuyyuru\,\ Andhra\ Pradesh";
+$areanames{en}->{918677} = "Kaikaluru\,\ Andhra\ Pradesh";
+$areanames{en}->{918678} = "Nandigama\,\ Andhra\ Pradesh";
+$areanames{en}->{918680} = "Nidamanur\/Hillcolony\,\ Andhra\ Pradesh";
+$areanames{en}->{918681} = "Chandoor\,\ Andhra\ Pradesh";
+$areanames{en}->{918682} = "Nalgonda\,\ Andhra\ Pradesh";
+$areanames{en}->{918683} = "Hazurnagar\,\ Andhra\ Pradesh";
+$areanames{en}->{918684} = "Suryapet\,\ Andhra\ Pradesh";
+$areanames{en}->{918685} = "Bhongir\,\ Andhra\ Pradesh";
+$areanames{en}->{918689} = "Miryalguda\,\ Andhra\ Pradesh";
+$areanames{en}->{918691} = "Devarakonda\,\ Andhra\ Pradesh";
+$areanames{en}->{918692} = "Nampalle\,\ Andhra\ Pradesh";
+$areanames{en}->{918693} = "Thungaturthy\,\ Andhra\ Pradesh";
+$areanames{en}->{918694} = "Ramannapet\,\ Andhra\ Pradesh";
+$areanames{en}->{91870} = "Warangal\,\ Andhra\ Pradesh";
+$areanames{en}->{918710} = "Cherial\,\ Andhra\ Pradesh";
+$areanames{en}->{918711} = "Wardhannapet\/Ghanapur\,\ Andhra\ Pradesh";
+$areanames{en}->{918713} = "Parkal\,\ Andhra\ Pradesh";
+$areanames{en}->{918715} = "Mulug\,\ Andhra\ Pradesh";
+$areanames{en}->{918716} = "Jangaon\,\ Andhra\ Pradesh";
+$areanames{en}->{918717} = "Eturnagaram\,\ Andhra\ Pradesh";
+$areanames{en}->{918718} = "Narasampet\,\ Andhra\ Pradesh";
+$areanames{en}->{918719} = "Mahabubbad\,\ Andhra\ Pradesh";
+$areanames{en}->{918720} = "Mahadevapur\,\ Andhra\ Pradesh";
+$areanames{en}->{918721} = "Husnabad\,\ Andhra\ Pradesh";
+$areanames{en}->{918723} = "Sircilla\,\ Andhra\ Pradesh";
+$areanames{en}->{918724} = "Jagtial\,\ Andhra\ Pradesh";
+$areanames{en}->{918725} = "Metpalli\,\ Andhra\ Pradesh";
+$areanames{en}->{918727} = "Huzurabad\,\ Andhra\ Pradesh";
+$areanames{en}->{918728} = "Peddapalli\,\ Andhra\ Pradesh";
+$areanames{en}->{918729} = "Manthani\,\ Andhra\ Pradesh";
+$areanames{en}->{918730} = "Khanapur\,\ Andhra\ Pradesh";
+$areanames{en}->{918731} = "Utnor\,\ Andhra\ Pradesh";
+$areanames{en}->{918732} = "Adilabad\,\ Andhra\ Pradesh";
+$areanames{en}->{918733} = "Asifabad\,\ Andhra\ Pradesh";
+$areanames{en}->{918734} = "Nirmal\,\ Andhra\ Pradesh";
+$areanames{en}->{918735} = "Bellampalli\,\ Andhra\ Pradesh";
+$areanames{en}->{918736} = "Mancherial\,\ Andhra\ Pradesh";
+$areanames{en}->{918737} = "Chinnor\,\ Andhra\ Pradesh";
+$areanames{en}->{918738} = "Sirpurkagaznagar\,\ Andhra\ Pradesh";
+$areanames{en}->{918739} = "Jannaram\/Luxittipet\,\ Andhra\ Pradesh";
+$areanames{en}->{918740} = "Aswaraopet\,\ Andhra\ Pradesh";
+$areanames{en}->{918741} = "Sudhimalla\/Tekulapalli\,\ Andhra\ Pradesh";
+$areanames{en}->{918742} = "Khammam\,\ Andhra\ Pradesh";
+$areanames{en}->{918743} = "Bhadrachalam\,\ Andhra\ Pradesh";
+$areanames{en}->{918744} = "Kothagudem\,\ Andhra\ Pradesh";
+$areanames{en}->{918745} = "Yellandu\,\ Andhra\ Pradesh";
+$areanames{en}->{918746} = "Bhooragamphad\/Manuguru\,\ Andhra\ Pradesh";
+$areanames{en}->{918747} = "Nuguru\/Cherla\,\ Andhra\ Pradesh";
+$areanames{en}->{918748} = "V\.R\.Puram\,\ Andhra\ Pradesh";
+$areanames{en}->{918749} = "Madhira\,\ Andhra\ Pradesh";
+$areanames{en}->{918751} = "Boath\/Echoda\,\ Andhra\ Pradesh";
+$areanames{en}->{918752} = "Bhainsa\,\ Andhra\ Pradesh";
+$areanames{en}->{918753} = "Outsarangapalle\,\ Andhra\ Pradesh";
+$areanames{en}->{918761} = "Sathupalli\,\ Andhra\ Pradesh";
+$areanames{en}->{91877} = "Tirupathi\,\ Andhra\ Pradesh";
+$areanames{en}->{91878} = "Karimnagar\,\ Andhra\ Pradesh";
+$areanames{en}->{918811} = "Polavaram\,\ Andhra\ Pradesh";
+$areanames{en}->{918812} = "Eluru\,\ Andhra\ Pradesh";
+$areanames{en}->{918813} = "Eluru\ Kovvur\/Nidadavolu\,\ Andhra\ Pradesh";
+$areanames{en}->{918814} = "Eluru\ Narsapur\/Palakole\,\ Andhra\ Pradesh";
+$areanames{en}->{918816} = "Bhimavaram\,\ Andhra\ Pradesh";
+$areanames{en}->{918818} = "Tadepalligudem\,\ Andhra\ Pradesh";
+$areanames{en}->{918819} = "Tanuku\,\ Andhra\ Pradesh";
+$areanames{en}->{918821} = "Jangareddygudem\,\ Andhra\ Pradesh";
+$areanames{en}->{918823} = "Chintalapudi\,\ Andhra\ Pradesh";
+$areanames{en}->{918829} = "Bhimadole\,\ Andhra\ Pradesh";
+$areanames{en}->{91883} = "Rajahmundri\,\ Andhra\ Pradesh";
+$areanames{en}->{91884} = "Kakinada\,\ Andhra\ Pradesh";
+$areanames{en}->{918852} = "Peddapuram\,\ Andhra\ Pradesh";
+$areanames{en}->{918854} = "Tuni\,\ Andhra\ Pradesh";
+$areanames{en}->{918855} = "Mandapeta\/Ravulapalem\,\ Andhra\ Pradesh";
+$areanames{en}->{918856} = "Amalapuram\,\ Andhra\ Pradesh";
+$areanames{en}->{918857} = "Ramachandrapuram\,\ Andhra\ Pradesh";
+$areanames{en}->{918862} = "Razole\,\ Andhra\ Pradesh";
+$areanames{en}->{918863} = "Chavitidibbalu\,\ Andhra\ Pradesh";
+$areanames{en}->{918864} = "Rampachodavaram\,\ Andhra\ Pradesh";
+$areanames{en}->{918865} = "Yelavaram\,\ Andhra\ Pradesh";
+$areanames{en}->{918868} = "Yeleswaram\,\ Andhra\ Pradesh";
+$areanames{en}->{918869} = "Pithapuram\,\ Andhra\ Pradesh";
+$areanames{en}->{91891} = "Visakhapatnam\,\ Andhra\ Pradesh";
+$areanames{en}->{918922} = "Vizayanagaram\,\ Andhra\ Pradesh";
+$areanames{en}->{918924} = "Anakapalle\,\ Andhra\ Pradesh";
+$areanames{en}->{918931} = "Yelamanchili\,\ Andhra\ Pradesh";
+$areanames{en}->{918932} = "Narsipatnam\,\ Andhra\ Pradesh";
+$areanames{en}->{918933} = "Bheemunipatnam\,\ Andhra\ Pradesh";
+$areanames{en}->{918934} = "Chodavaram\,\ Andhra\ Pradesh";
+$areanames{en}->{918935} = "Paderu\,\ Andhra\ Pradesh";
+$areanames{en}->{918936} = "Araku\,\ Andhra\ Pradesh";
+$areanames{en}->{918937} = "Chintapalle\,\ Andhra\ Pradesh";
+$areanames{en}->{918938} = "Sileru\,\ Andhra\ Pradesh";
+$areanames{en}->{918941} = "Palakonda\/Rajam\,\ Andhra\ Pradesh";
+$areanames{en}->{918942} = "Srikakulam\,\ Andhra\ Pradesh";
+$areanames{en}->{918944} = "Bobbili\,\ Andhra\ Pradesh";
+$areanames{en}->{918945} = "Tekkali\/Palasa\,\ Andhra\ Pradesh";
+$areanames{en}->{918946} = "Pathapatnam\/Hiramandalam\,\ Andhra\ Pradesh";
+$areanames{en}->{918947} = "Sompeta\,\ Andhra\ Pradesh";
+$areanames{en}->{918952} = "Chepurupalli\/Garividi\,\ Andhra\ Pradesh";
+$areanames{en}->{918963} = "Parvathipuram\,\ Andhra\ Pradesh";
+$areanames{en}->{918964} = "Saluru\,\ Andhra\ Pradesh";
+$areanames{en}->{918965} = "Gajapathinagaram\,\ Andhra\ Pradesh";
+$areanames{en}->{918966} = "Srungavarapukota\/Kothavalasa\,\ Andhra\ Pradesh";
+
     sub new {
       my $class = shift;
       my $number = shift;

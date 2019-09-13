@@ -1,6 +1,9 @@
-use strict;
+use 5.008;
 
-use Test::More tests => 15;
+use strict;
+use warnings;
+
+use Test::More;
 
 BEGIN {
     use_ok('DBD::Mock');  
@@ -55,3 +58,5 @@ BEGIN {
         { FOO => 0, BAR => 1, BAZ => 2 },
         '... got the right NAME_hash_uc attributes');                    
 }
+
+done_testing();

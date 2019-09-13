@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.700';
+our $VERSION = '1.701';
 
 use Exporter qw( import );
 
@@ -34,7 +34,7 @@ my (
 
 
 BEGIN {
-    if ( $^O eq 'MSWin32' || $ENV{TC_ANSI_ESCAPES} || system( "tput -V &> /dev/null" ) ) {
+    if ( $^O eq 'MSWin32' || $ENV{TC_ANSI_ESCAPES} || ! qx(tput cuu 2>/dev/null) ) {
         @up    = ( "\e[", "A" );
         @down  = ( "\e[", "B" );
         @right = ( "\e[", "C" );

@@ -48,15 +48,15 @@
    "provides" : {
       "File::Collector" : {
          "file" : "lib/File/Collector.pm",
-         "version" : "0.037"
+         "version" : "0.038"
       },
       "File::Collector::Processor" : {
          "file" : "lib/File/Collector/Processor.pm",
-         "version" : "0.037"
+         "version" : "0.038"
       },
       "File::Collector::Processor::Do" : {
          "file" : "lib/File/Collector/Processor.pm",
-         "version" : "0.037"
+         "version" : "0.038"
       }
    },
    "release_status" : "stable",
@@ -70,7 +70,7 @@
          "web" : "https://github.com/sdondley/File-Collector"
       }
    },
-   "version" : "0.037",
+   "version" : "0.038",
    "x_generated_by_perl" : "v5.24.4",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
 }

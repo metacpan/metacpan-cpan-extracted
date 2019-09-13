@@ -3,8 +3,8 @@ NAME
     algorithms)
 
 VERSION
-    This document describes version 0.002 of App::xsum (from Perl
-    distribution App-xsum), released on 2019-08-21.
+    This document describes version 0.007 of App::xsum (from Perl
+    distribution App-xsum), released on 2019-09-12.
 
 SYNOPSIS
     See xsum.
@@ -17,7 +17,7 @@ FUNCTIONS
 
     Compute and check file checksums/digests (using various algorithms).
 
-    "xsum" is a small handy utility that can be used as an
+    "xsum" is a handy small utility that can be used as an
     alternative/replacement for the individual per-algorithm Unix utilities
     like "md5sum", "sha1sum", "sha224sum", and so on. It's basically the
     same as said Unix utilities but you can use a single command instead.
@@ -31,11 +31,29 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   algorithm => *str* (default: "md5")
+    *   algorithm => *str*
+
+        In addition to "md5", "sha1" or the other algorithms, you can also
+        specify "Digest" to use Perl's Digest module. This gives you access
+        to tens of other digest modules, for example Digest::BLAKE2 (see
+        examples).
+
+        When "--digest-args" ("-A") is not specified, algorithm defaults to
+        "md5". But if "--digest-args" ("-A") is specified, algorithm
+        defaults to "Digest", for convenience.
 
     *   check => *bool*
 
         Read checksum from files and check them.
+
+    *   checksums => *array[str]*
+
+        Supply checksum(s).
+
+    *   digest_args => *array[str]*
+
+        If you use "Digest" as the algorithm, you can pass arguments for the
+        Digest module here.
 
     *   files* => *array[filename]*
 
@@ -75,10 +93,16 @@ SEE ALSO
 
     sha1sum. Unix utility.
 
+    sha224sum. Unix utility.
+
     sha256sum. Unix utility.
 
-    Backend module: File::Digest, which in turn uses Digest::CRC,
-    Digest::MD5, and Digest::SHA.
+    sha384sum. Unix utility.
+
+    sha512sum. Unix utility.
+
+    sum from PerlPowerTools (which only supports older algorithms like
+    CRC32).
 
 AUTHOR
     perlancar <perlancar@cpan.org>

@@ -22,58 +22,17 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222641;
+our $VERSION = 1.20190912215427;
 
 my $formatters = [
                 {
                   'format' => '$1 $2',
-                  'pattern' => '(\\d{3})(\\d{4})',
-                  'leading_digits' => '[2-9]'
+                  'leading_digits' => '[2-9]',
+                  'pattern' => '(\\d{3})(\\d{4})'
                 }
               ];
 
 my $validators = {
-                'pager' => '',
-                'personal_number' => '',
-                'mobile' => '
-          (?:
-            6[2-4689]0|
-            77\\d|
-            88[0-4]
-          )\\d{4}
-        ',
-                'toll_free' => '',
-                'specialrate' => '',
-                'geographic' => '
-          (?:
-            2(?:
-              55|
-              77
-            )|
-            345|
-            488|
-            5(?:
-              35|
-              44|
-              87
-            )|
-            6(?:
-              22|
-              54|
-              79
-            )|
-            7(?:
-              33|
-              47
-            )|
-            8(?:
-              24|
-              55|
-              76
-            )|
-            900
-          )\\d{4}
-        ',
                 'fixed_line' => '
           (?:
             2(?:
@@ -104,25 +63,66 @@ my $validators = {
             900
           )\\d{4}
         ',
+                'geographic' => '
+          (?:
+            2(?:
+              55|
+              77
+            )|
+            345|
+            488|
+            5(?:
+              35|
+              44|
+              87
+            )|
+            6(?:
+              22|
+              54|
+              79
+            )|
+            7(?:
+              33|
+              47
+            )|
+            8(?:
+              24|
+              55|
+              76
+            )|
+            900
+          )\\d{4}
+        ',
+                'mobile' => '
+          (?:
+            6[2-4689]0|
+            77\\d|
+            88[0-4]
+          )\\d{4}
+        ',
+                'pager' => '',
+                'personal_number' => '',
+                'specialrate' => '',
+                'toll_free' => '',
                 'voip' => ''
               };
-my %areanames = (
-  68025 => "Sonsorol\ State\ and\ Hatohobei\ State",
-  68027 => "Angaur\ State",
-  6803 => "Peleliu\ State",
-  6804 => "Koror\ State",
-  68053 => "Ngatpang\ State",
-  68054 => "Aimeliik\ State",
-  68058 => "Airai\ State",
-  680622 => "Ngchesar\ State",
-  68065 => "Melekeok\ State",
-  68067 => "Ngiwal\ State",
-  68073 => "Ngaremlengui\ State",
-  68074 => "Ngardmau\ State",
-  68082 => "Ngaraard\ State",
-  68085 => "Ngarchelong\ State",
-  68087 => "Kayangel\ State",
-);
+my %areanames = ();
+$areanames{en}->{68025} = "Sonsorol\ State\ and\ Hatohobei\ State";
+$areanames{en}->{68027} = "Angaur\ State";
+$areanames{en}->{6803} = "Peleliu\ State";
+$areanames{en}->{6804} = "Koror\ State";
+$areanames{en}->{68053} = "Ngatpang\ State";
+$areanames{en}->{68054} = "Aimeliik\ State";
+$areanames{en}->{68058} = "Airai\ State";
+$areanames{en}->{680622} = "Ngchesar\ State";
+$areanames{en}->{68065} = "Melekeok\ State";
+$areanames{en}->{68067} = "Ngiwal\ State";
+$areanames{en}->{68073} = "Ngaremlengui\ State";
+$areanames{en}->{68074} = "Ngardmau\ State";
+$areanames{en}->{68082} = "Ngaraard\ State";
+$areanames{en}->{68085} = "Ngarchelong\ State";
+$areanames{en}->{68087} = "Kayangel\ State";
+
     sub new {
       my $class = shift;
       my $number = shift;

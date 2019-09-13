@@ -22,40 +22,35 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222641;
+our $VERSION = 1.20190912215427;
 
 my $formatters = [
                 {
+                  'format' => '$1 $2',
                   'leading_digits' => '80',
                   'national_rule' => '(0$1)',
-                  'format' => '$1 $2',
                   'pattern' => '(\\d{3})(\\d{5})'
                 },
                 {
                   'format' => '$1 $2',
+                  'leading_digits' => '1',
                   'national_rule' => '(0$1)',
-                  'pattern' => '(\\d)(\\d{7})',
-                  'leading_digits' => '1'
+                  'pattern' => '(\\d)(\\d{7})'
                 },
                 {
                   'format' => '$1 $2',
+                  'leading_digits' => '[4-8]',
                   'national_rule' => '(0$1)',
-                  'pattern' => '(\\d{2})(\\d{6})',
-                  'leading_digits' => '[4-8]'
+                  'pattern' => '(\\d{2})(\\d{6})'
                 },
                 {
                   'format' => '$1 $2 $3',
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
-                  'leading_digits' => '9'
+                  'leading_digits' => '9',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
                 }
               ];
 
 my $validators = {
-                'personal_number' => '80[24]\\d{5}',
-                'toll_free' => '800\\d{5}',
-                'mobile' => '9\\d{8}',
-                'pager' => '',
-                'voip' => '',
                 'fixed_line' => '
           19(?:
             [02-68]\\d|
@@ -88,34 +83,39 @@ my $validators = {
             8[2-4]
           )\\d{6}
         ',
-                'specialrate' => '(801\\d{5})|(805\\d{5})'
+                'mobile' => '9\\d{8}',
+                'pager' => '',
+                'personal_number' => '80[24]\\d{5}',
+                'specialrate' => '(801\\d{5})|(805\\d{5})',
+                'toll_free' => '800\\d{5}',
+                'voip' => ''
               };
-my %areanames = (
-  511 => "Lima\/Callao",
-  5141 => "Amazonas",
-  5142 => "San\ Martín",
-  5143 => "Ancash",
-  5144 => "La\ Libertad",
-  5151 => "Puno",
-  5152 => "Tacna",
-  5153 => "Moquegua",
-  5154 => "Arequipa",
-  5156 => "Ica",
-  5161 => "Ucayali",
-  5162 => "Huánuco",
-  5163 => "Pasco",
-  5164 => "Junín",
-  5165 => "Loreto",
-  5166 => "Ayacucho",
-  5167 => "Huancavelica",
-  5172 => "Tumbes",
-  5173 => "Piura",
-  5174 => "Lambayeque",
-  5176 => "Cajamarca",
-  5182 => "Madre\ de\ Dios",
-  5183 => "Apurímac",
-  5184 => "Cusco",
-);
+my %areanames = ();
+$areanames{en}->{511} = "Lima\/Callao";
+$areanames{en}->{5141} = "Amazonas";
+$areanames{en}->{5142} = "San\ Martín";
+$areanames{en}->{5143} = "Ancash";
+$areanames{en}->{5144} = "La\ Libertad";
+$areanames{en}->{5151} = "Puno";
+$areanames{en}->{5152} = "Tacna";
+$areanames{en}->{5153} = "Moquegua";
+$areanames{en}->{5154} = "Arequipa";
+$areanames{en}->{5156} = "Ica";
+$areanames{en}->{5161} = "Ucayali";
+$areanames{en}->{5162} = "Huánuco";
+$areanames{en}->{5163} = "Pasco";
+$areanames{en}->{5164} = "Junín";
+$areanames{en}->{5165} = "Loreto";
+$areanames{en}->{5166} = "Ayacucho";
+$areanames{en}->{5167} = "Huancavelica";
+$areanames{en}->{5172} = "Tumbes";
+$areanames{en}->{5173} = "Piura";
+$areanames{en}->{5174} = "Lambayeque";
+$areanames{en}->{5176} = "Cajamarca";
+$areanames{en}->{5182} = "Madre\ de\ Dios";
+$areanames{en}->{5183} = "Apurímac";
+$areanames{en}->{5184} = "Cusco";
+
     sub new {
       my $class = shift;
       my $number = shift;

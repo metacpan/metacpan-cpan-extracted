@@ -22,35 +22,34 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222640;
+our $VERSION = 1.20190912215426;
 
 my $formatters = [
                 {
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '
             2[13]|
             3[14]|
             [4-8]
           ',
-                  'format' => '$1 $2 $3',
                   'national_rule' => '0$1',
                   'pattern' => '(\\d{2})(\\d{3})(\\d{3})'
                 },
                 {
-                  'national_rule' => '0$1',
                   'format' => '$1 $2 $3 $4',
-                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{3})',
-                  'leading_digits' => '3'
+                  'leading_digits' => '3',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{3})'
                 },
                 {
-                  'leading_digits' => '2',
                   'format' => '$1 $2 $3 $4',
+                  'leading_digits' => '2',
                   'national_rule' => '0$1',
                   'pattern' => '(\\d{2})(\\d{2})(\\d{3})(\\d{3})'
                 }
               ];
 
 my $validators = {
-                'voip' => '',
                 'fixed_line' => '
           (?:
             2[13]|
@@ -59,7 +58,6 @@ my $validators = {
             8[1468]
           )\\d{6}
         ',
-                'specialrate' => '(30\\d{7})',
                 'geographic' => '
           (?:
             2[13]|
@@ -68,7 +66,6 @@ my $validators = {
             8[1468]
           )\\d{6}
         ',
-                'toll_free' => '',
                 'mobile' => '
           20(?:
             [29]\\d|
@@ -76,8 +73,11 @@ my $validators = {
             7[6-8]
           )\\d{6}
         ',
+                'pager' => '',
                 'personal_number' => '',
-                'pager' => ''
+                'specialrate' => '(30\\d{7})',
+                'toll_free' => '',
+                'voip' => ''
               };
 
     sub new {

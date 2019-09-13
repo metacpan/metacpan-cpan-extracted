@@ -1,0 +1,90 @@
+[%- WRAPPER private/auth_wrapper.html 
+  title = 'Login by E-Mail'
+  rapidapp_footer_stamp = 1
+-%]
+
+[% ensure_logged_out %]
+
+<div class="cf" style="height:80px;">
+  <h2 class="lb_ribbon lb_blue">
+    <div style="padding-top:3px;">
+      <img 
+        src="[% mount_url %]/assets/rapidapp/misc/static/images/iconLoggedOut.png" 
+        style="vertical-align:middle;padding-bottom:5px;padding-right:9px;"
+      />
+      <span style="padding-right:11px;font-weight:bold;font-size:1.1em;">Request one-time login link</span>
+    </div>
+  </h2>
+
+  <a href="[%- mount_url -%]/" class="right small sl_link">
+    <span>Home</span>
+  </a>
+  
+  <a href="[%- mount_url -%]/auth/login" class="right small sl_link">
+    <span>Sign in</span>
+  </a>
+  
+
+</div>
+
+
+[% IF local_info.error %]
+  <div style="font-size:1.1em;font-weight:bold;color:red;padding:10px;">
+    <center>&nbsp;[% local_info(clear).message %]&nbsp;</center>
+  </div>
+  <br>
+[% END %]
+
+<div class="row m_cont" style="padding-top:10px;">
+  <div class="seven columns centered">
+    <div class="l_pane">
+      
+      
+  [% IF local_info.success %]
+    [% local_info(clear).message || 'Success - login link sent' %]
+    <div style="padding-top:60px;"></div>
+    
+  [% ELSE %]
+  
+    <p>
+    Request a direct login link sent to the E-Mail on file for your account.
+    </p>
+    
+    <p>
+    For security, the link will only work once and expire within a few minutes.
+    </p>
+    <br>
+
+    <form 
+      action="[% remote_action_path %]/email_login?using=local_info" 
+      method="post" class="nice" id="l_form"
+    >
+
+      <input type="hidden" id="redirect" name="redirect" value="" />
+      
+      <div class="sepH_c">
+        <div class="elVal">
+          <label for="email">Username or E-Mail Address:</label>
+          <input autofocus type="text" id="email"  name="email" class="oversize expand input-text" />
+        </div>
+      </div>
+
+      <div class="cf" style="padding-bottom:30px;">
+        <!--
+        <label for="remember" class="left"><input type="checkbox" id="remember"> Remember me</label>
+        -->
+        <input 
+          type="submit" class="button small radius right black" 
+          value="Send one-time login link"
+          onclick="this.form.submit(); this.disabled = true;"
+        />
+      </div>
+    </form>
+  
+  [% END %]
+  
+    </div>
+  </div>
+</div>
+       
+[% END %]

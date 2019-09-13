@@ -1,10 +1,10 @@
 {
    "abstract" : "Perl class for polynomials in one variable",
    "author" : [
-      "Martin Becker <becker-cpan-mp@cozap.com>"
+      "Martin Becker <becker-cpan-mp (at) cozap.com>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -22,13 +22,13 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "Test" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0"
          }
       },
       "runtime" : {
@@ -42,19 +42,24 @@
             "overload" : "0",
             "perl" : "5.006"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test" : "0"
+         }
       }
    },
    "provides" : {
       "Math::Polynomial" : {
          "file" : "lib/Math/Polynomial.pm",
-         "version" : "1.014"
+         "version" : "1.015"
       },
       "Math::Polynomial::Generic" : {
          "file" : "lib/Math/Polynomial/Generic.pm",
-         "version" : "1.014"
+         "version" : "1.015"
       }
    },
    "release_status" : "stable",
-   "version" : "1.014",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "1.015",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -1,7 +1,7 @@
 package App::xsum;
 
-our $DATE = '2019-08-21'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-09-12'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -14,7 +14,7 @@ $SPEC{xsum} = {
     summary => 'Compute and check file checksums/digests (using various algorithms)',
     description => <<'_',
 
-`xsum` is a small handy utility that can be used as an alternative/replacement
+`xsum` is a handy small utility that can be used as an alternative/replacement
 for the individual per-algorithm Unix utilities like `md5sum`, `sha1sum`,
 `sha224sum`, and so on. It's basically the same as said Unix utilities but you
 can use a single command instead.
@@ -41,12 +41,39 @@ _
             schema => ['array*', of=>'filename*'],
             req => 1,
             pos => 0,
-            greedy => 1,
+            slurpy => 1,
+        },
+        checksums => {
+            'x.name.is_plural' => 1,
+            'x.name.singular' => 'file',
+            summary => 'Supply checksum(s)',
+            schema => ['array*', of=>'str*'],
+            cmdline_aliases => {C=>{}},
         },
         algorithm => {
-            schema => ['str*', in=>[qw/crc32 md5 sha1 sha224 sha256 sha384 sha512 sha512224 sha512256/]],
-            default => 'md5',
+            schema => ['str*', in=>[qw/crc32 md5 sha1 sha224 sha256 sha384 sha512 sha512224 sha512256 Digest/]],
+            description => <<'_',
+
+In addition to `md5`, `sha1` or the other algorithms, you can also specify
+`Digest` to use Perl's <pm:Digest> module. This gives you access to tens of
+other digest modules, for example <pm:Digest::BLAKE2> (see examples).
+
+When `--digest-args` (`-A`) is not specified, algorithm defaults to `md5`. But
+if `--digest-args` (`-A`) is specified, algorithm defaults to `Digest`, for
+convenience.
+
+_
             cmdline_aliases => {a=>{}},
+        },
+        digest_args => {
+            schema => ['array*', of=>'str*', 'x.perl.coerce_rules'=>['str_comma_sep']],
+            description => <<'_',
+
+If you use `Digest` as the algorithm, you can pass arguments for the <pm:Digest>
+module here.
+
+_
+            cmdline_aliases => {A=>{}},
         },
     },
     links => [
@@ -63,7 +90,19 @@ _
             summary => 'Unix utility',
         },
         {
+            url => 'prog:sha224sum',
+            summary => 'Unix utility',
+        },
+        {
             url => 'prog:sha256sum',
+            summary => 'Unix utility',
+        },
+        {
+            url => 'prog:sha384sum',
+            summary => 'Unix utility',
+        },
+        {
+            url => 'prog:sha512sum',
             summary => 'Unix utility',
         },
     ],
@@ -71,6 +110,34 @@ _
         {
             summary => 'Compute MD5 digests for some files',
             src => 'xsum -a md5 *.dat',
+            src_plang => 'bash',
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+        {
+            summary => 'Compute MD5 digests for some files (same as previous example, -a defaults to "md5")',
+            src => 'xsum *.dat',
+            src_plang => 'bash',
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+        {
+            summary => 'Compute MD5 digests for some files (also same as previous example)',
+            src => 'xsum -a Digest -A MD5 *.dat',
+            src_plang => 'bash',
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+        {
+            summary => 'Compute MD5 digests for some files (also same as previous example, -a defaults to "Digest" when -A is specified)',
+            src => 'xsum -A MD5 *.dat',
+            src_plang => 'bash',
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+        {
+            summary => 'Compute BLAKE2b digests for some files (requirest Digest::BLAKE2 Perl module)',
+            src => 'xsum -A BLAKE2,blake2b *.dat',
             src_plang => 'bash',
             test => 0,
             'x.doc.show_result' => 0,
@@ -84,7 +151,21 @@ _
         },
         {
             summary => 'Check MD5 digests of files listed in MD5SUMS',
-            src => 'xsum --check -a md5 MD5SUMS',
+            src => 'xsum --check MD5SUMS',
+            src_plang => 'bash',
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+        {
+            summary => 'Check MD5 digest of one file',
+            src => 'xsum download.exe -C 9f4b2277f50a412e56de6e0306f4afb8',
+            src_plang => 'bash',
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+        {
+            summary => 'Check MD5 digest of two files',
+            src => 'xsum download1.exe -C 9f4b2277f50a412e56de6e0306f4afb8 download2.zip -C 62b3bf86abdfdd87e9f6a3ea7b51aa7b',
             src_plang => 'bash',
             test => 0,
             'x.doc.show_result' => 0,
@@ -98,10 +179,17 @@ sub xsum {
 
     my %args = @_;
 
+    my $algorithm = $args{algorithm} // ($args{digest_args} ? 'Digest' : 'md5');
+
     my $num_success;
     my $envres;
+    my $i = -1;
     for my $file (@{ $args{files} }) {
+        $i++;
         if ($args{check}) {
+
+            # treat file as checksums file. extract filenames and checksums from
+            # the checksums file and check them.
             my $res = Parse::Sums::parse_sums(filename => $file);
             unless ($res->[0] == 200) {
                 $envres //= [
@@ -126,7 +214,7 @@ sub xsum {
                     warn "$entry->{file}: Cannot compute digest: $digest_res->[1]\n";
                     next ENTRY;
                 }
-                if ($digest_res->[2] eq $entry->{digest}) {
+                if (lc($digest_res->[2]) eq lc($entry->{digest})) {
                     print "$entry->{file}: OK\n";
                     $num_success++;
                 } else {
@@ -135,19 +223,48 @@ sub xsum {
                     print "$entry->{file}: FAILED\n";
                 }
             }
+
+        } elsif ($args{checksums} && @{ $args{checksums} }) {
+
+            # check checksum of file against checksum provided in 'checksums'
+            # argument.
+            if ($#{ $args{checksums} } < $i) {
+                warn "No checksum value provided for file '$file', please specify with -C\n";
+                next;
+            }
+            my $digest_res = File::Digest::digest_file(
+                file => $file, algorithm => $algorithm, digest_args=> $args{digest_args});
+            unless ($digest_res) {
+                $envres //= [
+                    500, "Some files' checksums cannot be checked"];
+                warn "$file: Cannot compute digest: $digest_res->[1]\n";
+                next;
+            }
+            if (lc($digest_res->[2]) eq lc($args{checksums}[$i])) {
+                print "$file: OK\n";
+                $num_success++;
+            } else {
+                $envres //= [
+                    500, "Some files did NOT match computed checksums"];
+                print "$file: FAILED\n";
+            }
+
         } else {
+
+            # produce checksum for file
             my $res = File::Digest::digest_file(
-                file => $file, algorithm => $args{algorithm});
+                file => $file, algorithm => $algorithm, digest_args=> $args{digest_args});
             unless ($res->[0] == 200) {
                 warn "Can't checksum $file: $res->[1]\n";
                 next;
             }
             $num_success++;
             if ($args{tag}) {
-                printf "%s (%s) = %s\n", uc($args{algorithm}), $file, $res->[2];
+                printf "%s (%s) = %s\n", uc($algorithm), $file, $res->[2];
             } else {
                 printf "%s  %s\n", $res->[2], $file;
             }
+
         }
     }
 
@@ -170,7 +287,7 @@ App::xsum - Compute and check file checksums/digests (using various algorithms)
 
 =head1 VERSION
 
-This document describes version 0.002 of App::xsum (from Perl distribution App-xsum), released on 2019-08-21.
+This document describes version 0.007 of App::xsum (from Perl distribution App-xsum), released on 2019-09-12.
 
 =head1 SYNOPSIS
 
@@ -187,7 +304,7 @@ Usage:
 
 Compute and check file checksums/digests (using various algorithms).
 
-C<xsum> is a small handy utility that can be used as an alternative/replacement
+C<xsum> is a handy small utility that can be used as an alternative/replacement
 for the individual per-algorithm Unix utilities like C<md5sum>, C<sha1sum>,
 C<sha224sum>, and so on. It's basically the same as said Unix utilities but you
 can use a single command instead.
@@ -203,11 +320,28 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<algorithm> => I<str> (default: "md5")
+=item * B<algorithm> => I<str>
+
+In addition to C<md5>, C<sha1> or the other algorithms, you can also specify
+C<Digest> to use Perl's L<Digest> module. This gives you access to tens of
+other digest modules, for example L<Digest::BLAKE2> (see examples).
+
+When C<--digest-args> (C<-A>) is not specified, algorithm defaults to C<md5>. But
+if C<--digest-args> (C<-A>) is specified, algorithm defaults to C<Digest>, for
+convenience.
 
 =item * B<check> => I<bool>
 
 Read checksum from files and check them.
+
+=item * B<checksums> => I<array[str]>
+
+Supply checksum(s).
+
+=item * B<digest_args> => I<array[str]>
+
+If you use C<Digest> as the algorithm, you can pass arguments for the L<Digest>
+module here.
 
 =item * B<files>* => I<array[filename]>
 
@@ -253,10 +387,15 @@ L<md5sum>. Unix utility.
 
 L<sha1sum>. Unix utility.
 
+L<sha224sum>. Unix utility.
+
 L<sha256sum>. Unix utility.
 
-Backend module: L<File::Digest>, which in turn uses L<Digest::CRC>,
-L<Digest::MD5>, and L<Digest::SHA>.
+L<sha384sum>. Unix utility.
+
+L<sha512sum>. Unix utility.
+
+L<sum> from L<PerlPowerTools> (which only supports older algorithms like CRC32).
 
 =head1 AUTHOR
 

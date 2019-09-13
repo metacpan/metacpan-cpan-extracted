@@ -1,5 +1,52 @@
 Revision history for Rapi::Blog
 
+1.1001 2019-09-11
+    - Require RapidApp 1.3105 -- 1.3104 was a bad release on cpanZZ
+
+1.1000 2019-09-11
+    - Finally rollup extensive unreleased changes into an offcial new release
+      - Note: This is an official release, but due to the drawn out dev cycle,
+        there may be more bugs than a normal maintenance release. This release
+        es expected to be following up with a more stable minor release shortly
+    - Require RapidApp 1.3104
+    - New Rapi::Blog::CatalystApp API hooks (core refactors and improvements)
+    - New schema version and migration. Adds 'user'disabled' column
+    - Preliminary implementation of "user_reset_tokens" subsustem
+    - Refactror and pull out separate dedicated 'Scaffold' class
+    - Further abstract Scaffold::Config class
+    - Major refactor and integration of AccessStore class logic with new 
+      Scaffold object/classes, futher/better separation of concerns
+    - Implementation of "layed scaffolds" -- this is a major additional layer
+      of logic and abstraction
+    - Many, many fixes and refactors to address myriad breakages from these\
+      very significant refactors. Most seem address, but there may be additional 
+      edge cases and bugs
+    - Lots of cleanup and removal of old, no longer active code, post refactoring
+    - Further expand Scaffold design into additional "Dispatcher" module
+    - Refactor and generalize 'preauth_action" tables and design
+    - firther expand and modularaize with new "Actor" superclass
+    - Add preauth_action_event_type table and design/concept
+    - Add 'ScaffoldSet' concept/design
+    - Delegate more power and control to scaffolds, including control of the login
+      teamplte
+    - Expose 'BlogCfg' hash across application for various introspective functions
+    - Implement 'forgot_password' (built on top of the extensive refactors above)
+    - Fixes to URL auth/redirect + autofocus for login pages
+    - Add self-signup functionality
+    - Support new RapidApp 'error' template feature
+    - auth_wrapper template more flexible
+    - Add PRIVILEGED template directive 'ensure_logged_out' 
+    - Implement Mailer componentand related structure - support password reset
+      with sent e-mails
+    - Add new preauth action 'login' which allows direct logic via single use,
+      time limited direct link (typically e-mailed)
+    - Fully wotrking login via e-mail
+    - Support configuration mailer/transport configs. Default is sendmail, can can
+      be set to sasl to a provider such as Sendgrid
+    - Many, many, many fixes and improvements to all the stuff that broke along 
+      the way. There is probably more bugs that will hopefully be found and resolved
+      quickly
+
 1.0200 2018-08-20
     - Added new feature/tamonomy SECTIONS (VANSTYN)
     - Third publically released version of the schema (VANSTYN)

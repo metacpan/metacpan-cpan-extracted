@@ -36,7 +36,7 @@ use vars qw ($VERSION $Debug $Opt %Vpassert_Conversions
 	     %Files %Files_Read
 	     %File_Dest
 	     );
-$VERSION = '3.466';
+$VERSION = '3.468';
 
 ######################################################################
 # configuration
@@ -1616,7 +1616,7 @@ error message will include a binary display of the signal values.
 
 Check for a single cycle request pulse, followed by a single cycle
 acknowledgment pulse.  Do not allow any of the data signals to change
-between the request and acknowledgement.
+between the request and acknowledgment.
 
 =item $ucheck_ilevel(I<level> )
 

@@ -22,23 +22,23 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222640;
+our $VERSION = 1.20190912215426;
 
 my $formatters = [
                 {
-                  'leading_digits' => '[237-9]',
                   'format' => '$1 $2 $3',
+                  'leading_digits' => '[237-9]',
                   'pattern' => '(\\d{3})(\\d{2})(\\d{2})'
                 },
                 {
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})',
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '69'
+                  'leading_digits' => '69',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
                 },
                 {
                   'format' => '$1 $2 $3',
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
-                  'leading_digits' => '6'
+                  'leading_digits' => '6',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
                 }
               ];
 
@@ -62,7 +62,6 @@ my $validators = {
             )
           )\\d{4}
         ',
-                'voip' => '',
                 'geographic' => '
           (?:
             2(?:
@@ -82,28 +81,6 @@ my $validators = {
             )
           )\\d{4}
         ',
-                'specialrate' => '(
-          90(?:
-            02[258]|
-            1(?:
-              23|
-              3[14]
-            )|
-            66[136]
-          )\\d\\d
-        )|(
-          870(?:
-            28|
-            87
-          )\\d\\d
-        )',
-                'personal_number' => '',
-                'toll_free' => '
-          80(?:
-            02[28]|
-            9\\d\\d
-          )\\d\\d
-        ',
                 'mobile' => '
           756\\d{4}|
           (?:
@@ -120,7 +97,30 @@ my $validators = {
             7[37-9]
           )\\d{5}
         ',
-                'pager' => ''
+                'pager' => '',
+                'personal_number' => '',
+                'specialrate' => '(
+          90(?:
+            02[258]|
+            1(?:
+              23|
+              3[14]
+            )|
+            66[136]
+          )\\d\\d
+        )|(
+          870(?:
+            28|
+            87
+          )\\d\\d
+        )',
+                'toll_free' => '
+          80(?:
+            02[28]|
+            9\\d\\d
+          )\\d\\d
+        ',
+                'voip' => ''
               };
 
     sub new {

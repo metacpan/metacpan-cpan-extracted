@@ -44,11 +44,11 @@
    "provides" : {
       "Map::Tube::Plugin::Formatter" : {
          "file" : "lib/Map/Tube/Plugin/Formatter.pm",
-         "version" : "0.16"
+         "version" : "0.17"
       },
       "Map::Tube::Plugin::Formatter::Utils" : {
          "file" : "lib/Map/Tube/Plugin/Formatter/Utils.pm",
-         "version" : "0.16"
+         "version" : "0.17"
       }
    },
    "release_status" : "stable",
@@ -59,6 +59,6 @@
          "web" : "https://github.com/manwar/Map-Tube-Plugin-Formatter"
       }
    },
-   "version" : "0.16",
+   "version" : "0.17",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

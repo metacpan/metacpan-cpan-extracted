@@ -1,6 +1,9 @@
-use strict;
+use 5.008;
 
-use Test::More tests => 23;
+use strict;
+use warnings;
+
+use Test::More;
 
 BEGIN {
     use_ok('DBD::Mock'); 
@@ -71,3 +74,5 @@ ok($@, '... we got the exception');
 like($sth_fetch->errstr, 
      qr/^No connection present/,
      '... fetching row against inactive db throws expected exception' );
+
+done_testing();

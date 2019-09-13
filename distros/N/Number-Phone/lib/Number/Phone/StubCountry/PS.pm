@@ -22,33 +22,37 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222641;
+our $VERSION = 1.20190912215427;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d)(\\d{3})(\\d{4})',
-                  'national_rule' => '0$1',
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '[2489]'
+                  'leading_digits' => '[2489]',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d)(\\d{3})(\\d{4})'
                 },
                 {
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
                   'format' => '$1 $2 $3',
+                  'leading_digits' => '5',
                   'national_rule' => '0$1',
-                  'leading_digits' => '5'
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
                 },
                 {
-                  'pattern' => '(\\d{4})(\\d{3})(\\d{3})',
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '1'
+                  'leading_digits' => '1',
+                  'pattern' => '(\\d{4})(\\d{3})(\\d{3})'
                 }
               ];
 
 my $validators = {
-                'pager' => '',
-                'personal_number' => '',
-                'toll_free' => '1800\\d{6}',
-                'mobile' => '5[69]\\d{7}',
+                'fixed_line' => '
+          (?:
+            22[2-47-9]|
+            42[45]|
+            82[01458]|
+            92[369]
+          )\\d{5}
+        ',
                 'geographic' => '
           (?:
             22[2-47-9]|
@@ -57,16 +61,12 @@ my $validators = {
             92[369]
           )\\d{5}
         ',
+                'mobile' => '5[69]\\d{7}',
+                'pager' => '',
+                'personal_number' => '',
                 'specialrate' => '(1700\\d{6})',
-                'voip' => '',
-                'fixed_line' => '
-          (?:
-            22[2-47-9]|
-            42[45]|
-            82[01458]|
-            92[369]
-          )\\d{5}
-        '
+                'toll_free' => '1800\\d{6}',
+                'voip' => ''
               };
 
     sub new {

@@ -1,6 +1,6 @@
 package App::p5find;
 use v5.18;
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 use File::Next;
 use PPI::Document::File;
@@ -8,7 +8,8 @@ use PPIx::QuoteLike;
 
 use Exporter 'import';
 our @EXPORT_OK = qw( p5_doc_iterator
-                     p5_source_file_iterator);
+                     p5_source_file_iterator
+                     print_file_linenum_line );
 
 my %EXCLUDED = (
     '.git' => 1,
@@ -51,6 +52,20 @@ sub is_perl5_source_file {
         return 1 if $line =~ m{^#!.*perl};
     }
     return 0;
+}
+
+sub print_file_linenum_line {
+    my ($file, $to_print) = @_;
+
+    my $line_number = 0;
+    open my $fh, "<", $file;
+    while (my $line = <$fh>) {
+        $line_number++;
+        if ( $to_print->{$line_number} ) {
+            print "${file}:${line_number}:${line}";
+        }
+    }
+    close($fh);
 }
 
 1;

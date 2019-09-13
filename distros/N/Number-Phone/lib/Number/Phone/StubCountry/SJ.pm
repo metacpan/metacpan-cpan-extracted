@@ -22,13 +22,13 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222641;
+our $VERSION = 1.20190912215428;
 
 my $formatters = [];
 
 my $validators = {
-                'pager' => '',
-                'toll_free' => '80[01]\\d{5}',
+                'fixed_line' => '79\\d{6}',
+                'geographic' => '79\\d{6}',
                 'mobile' => '
           (?:
             4[015-8]|
@@ -36,8 +36,8 @@ my $validators = {
             9\\d
           )\\d{6}
         ',
+                'pager' => '',
                 'personal_number' => '880\\d{5}',
-                'geographic' => '79\\d{6}',
                 'specialrate' => '(
           810(?:
             0[0-6]|
@@ -55,40 +55,40 @@ my $validators = {
             )
           )\\d{3}
         )',
-                'fixed_line' => '79\\d{6}',
+                'toll_free' => '80[01]\\d{5}',
                 'voip' => '85[0-5]\\d{5}'
               };
-my %areanames = (
-  472 => "Oslo",
-  4731 => "Buskerud",
-  4732 => "Buskerud",
-  4733 => "Vestfold",
-  4735 => "Telemark",
-  4737 => "Aust\-Agder",
-  4738 => "Vest\-Agder",
-  4751 => "Rogaland",
-  4752 => "Rogaland",
-  4753 => "Hordaland",
-  4755 => "Hordaland",
-  4756 => "Hordaland",
-  4757 => "Sogn\ og\ Fjordane",
-  4761 => "Oppland",
-  4762 => "Hedmark",
-  4763 => "Akershus",
-  4764 => "Akershus",
-  4766 => "Akershus",
-  4767 => "Akershus",
-  4769 => "Østfold",
-  4770 => "Møre\ og\ Romsdal",
-  4771 => "Møre\ og\ Romsdal",
-  4772 => "Sør\-Trøndelag",
-  4773 => "Sør\-Trøndelag",
-  4774 => "Nord\-Trøndelag",
-  4775 => "Nordland",
-  4776 => "Nordland",
-  4777 => "Troms",
-  4778 => "Finnmark",
-);
+my %areanames = ();
+$areanames{en}->{472} = "Oslo";
+$areanames{en}->{4731} = "Buskerud";
+$areanames{en}->{4732} = "Buskerud";
+$areanames{en}->{4733} = "Vestfold";
+$areanames{en}->{4735} = "Telemark";
+$areanames{en}->{4737} = "Aust\-Agder";
+$areanames{en}->{4738} = "Vest\-Agder";
+$areanames{en}->{4751} = "Rogaland";
+$areanames{en}->{4752} = "Rogaland";
+$areanames{en}->{4753} = "Hordaland";
+$areanames{en}->{4755} = "Hordaland";
+$areanames{en}->{4756} = "Hordaland";
+$areanames{en}->{4757} = "Sogn\ og\ Fjordane";
+$areanames{en}->{4761} = "Oppland";
+$areanames{en}->{4762} = "Hedmark";
+$areanames{en}->{4763} = "Akershus";
+$areanames{en}->{4764} = "Akershus";
+$areanames{en}->{4766} = "Akershus";
+$areanames{en}->{4767} = "Akershus";
+$areanames{en}->{4769} = "Østfold";
+$areanames{en}->{4770} = "Møre\ og\ Romsdal";
+$areanames{en}->{4771} = "Møre\ og\ Romsdal";
+$areanames{en}->{4772} = "Sør\-Trøndelag";
+$areanames{en}->{4773} = "Sør\-Trøndelag";
+$areanames{en}->{4774} = "Nord\-Trøndelag";
+$areanames{en}->{4775} = "Nordland";
+$areanames{en}->{4776} = "Nordland";
+$areanames{en}->{4777} = "Troms";
+$areanames{en}->{4778} = "Finnmark";
+
     sub new {
       my $class = shift;
       my $number = shift;

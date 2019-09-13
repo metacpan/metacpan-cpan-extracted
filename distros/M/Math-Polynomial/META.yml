@@ -1,14 +1,15 @@
 ---
 abstract: 'Perl class for polynomials in one variable'
 author:
-  - 'Martin Becker <becker-cpan-mp@cozap.com>'
+  - 'Martin Becker <becker-cpan-mp (at) cozap.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
   Test: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+  File::Spec: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,10 +22,10 @@ no_index:
 provides:
   Math::Polynomial:
     file: lib/Math/Polynomial.pm
-    version: '1.014'
+    version: '1.015'
   Math::Polynomial::Generic:
     file: lib/Math/Polynomial/Generic.pm
-    version: '1.014'
+    version: '1.015'
 recommends:
   Math::AnyNum: '0'
   Math::Complex: '0'
@@ -33,5 +34,5 @@ requires:
   Carp: '0'
   overload: '0'
   perl: '5.006'
-version: '1.014'
+version: '1.015'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

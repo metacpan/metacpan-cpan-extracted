@@ -22,86 +22,38 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222640;
+our $VERSION = 1.20190912215426;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d{4})(\\d{5})',
-                  'national_rule' => '0$1',
                   'format' => '$1 $2',
                   'leading_digits' => '
             3(?:
               1[346]|
               [24-79]
             )
-          '
-                },
-                {
+          ',
                   'national_rule' => '0$1',
-                  'format' => '$1 $2 $3',
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
-                  'leading_digits' => '[235-79]'
+                  'pattern' => '(\\d{4})(\\d{5})'
                 },
                 {
+                  'format' => '$1 $2 $3',
+                  'leading_digits' => '
+            [235-79]|
+            88
+          ',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
+                },
+                {
+                  'format' => '$1 $2 $3 $4',
                   'leading_digits' => '8',
                   'national_rule' => '0$1',
-                  'format' => '$1 $2 $3 $4',
                   'pattern' => '(\\d{3})(\\d{3})(\\d)(\\d{2,3})'
                 }
               ];
 
 my $validators = {
-                'geographic' => '
-          (?:
-            3(?:
-              1(?:
-                [256]\\d|
-                3[1-9]|
-                47
-              )|
-              2(?:
-                22|
-                3[0-479]|
-                6[0-7]
-              )|
-              4(?:
-                22|
-                5[6-9]|
-                6\\d
-              )|
-              5(?:
-                22|
-                3[4-7]|
-                59|
-                6\\d
-              )|
-              6(?:
-                22|
-                5[35-7]|
-                6\\d
-              )|
-              7(?:
-                22|
-                3[468]|
-                4[1-9]|
-                59|
-                [67]\\d
-              )|
-              9(?:
-                22|
-                4[1-8]|
-                6\\d
-              )
-            )|
-            6(?:
-              09|
-              12|
-              2[2-4]
-            )\\d
-          )\\d{5}
-        ',
-                'specialrate' => '',
-                'voip' => '',
                 'fixed_line' => '
           (?:
             3(?:
@@ -151,10 +103,57 @@ my $validators = {
             )\\d
           )\\d{5}
         ',
-                'pager' => '',
-                'personal_number' => '',
-                'toll_free' => '800\\d{6,7}',
+                'geographic' => '
+          (?:
+            3(?:
+              1(?:
+                [256]\\d|
+                3[1-9]|
+                47
+              )|
+              2(?:
+                22|
+                3[0-479]|
+                6[0-7]
+              )|
+              4(?:
+                22|
+                5[6-9]|
+                6\\d
+              )|
+              5(?:
+                22|
+                3[4-7]|
+                59|
+                6\\d
+              )|
+              6(?:
+                22|
+                5[35-7]|
+                6\\d
+              )|
+              7(?:
+                22|
+                3[468]|
+                4[1-9]|
+                59|
+                [67]\\d
+              )|
+              9(?:
+                22|
+                4[1-8]|
+                6\\d
+              )
+            )|
+            6(?:
+              09|
+              12|
+              2[2-4]
+            )\\d
+          )\\d{5}
+        ',
                 'mobile' => '
+          8801\\d{5}|
           (?:
             2(?:
               0[0-35]|
@@ -168,64 +167,69 @@ my $validators = {
               [07]\\d|
               55
             )|
-            99[69]
+            99[05-9]
           )\\d{6}
-        '
+        ',
+                'pager' => '',
+                'personal_number' => '',
+                'specialrate' => '',
+                'toll_free' => '800\\d{6,7}',
+                'voip' => ''
               };
-my %areanames = (
-  996312 => "Bishkek\,\ Chuy\ region",
-  9963131 => "Belovodskoe\,\ Chuy\ region",
-  9963132 => "Kant\,\ Chuy\ region",
-  9963133 => "Kara\-Balta\,\ Chuy\ region",
-  9963134 => "Sokuluk\,\ Chuy\ region",
-  9963135 => "Kemin\,\ Chuy\ region",
-  9963137 => "Kayndy\,\ Chuy\ region",
-  9963138 => "Tokmok\,\ Chuy\ region",
-  9963139 => "Lebedinovka\,\ Chuy\ region",
-  996322 => "Osh",
-  9963230 => "Eski\-Nookat\,\ Osh\ region",
-  9963231 => "Aravan\,\ Osh\ region",
-  9963232 => "Kara\-Suu\,\ Osh\ region",
-  9963233 => "Uzgen\,\ Osh\ region",
-  9963234 => "Gulcha\,\ Osh\ region",
-  9963237 => "Daroot\-Korgon\,\ Osh\ region",
-  9963239 => "Kara\-Kulja\,\ Osh\ region",
-  996342 => "Talas",
-  9963456 => "Kyzyl\-Adyr\,\ Talas\ region",
-  9963457 => "Bakay\-Ata\,\ Talas\ region",
-  9963458 => "Kokoy\,\ Talas\ region",
-  9963459 => "Pokrovka\,\ Talas\ region",
-  996352 => "Naryn",
-  9963534 => "At\-Bashy\,\ Naryn\ region",
-  9963535 => "Kochkor\,\ Naryn\ region",
-  9963536 => "Chaek\/Minkush\,\ Naryn\ region",
-  9963537 => "Baetov\,\ Naryn\ region",
-  996362 => "Batken\,\ Naryn\ region",
-  9963653 => "Sulukta\,\ Naryn\ region",
-  9963655 => "Pulgon\,\ Naryn\ region",
-  9963656 => "Isfana\,\ Naryn\ region",
-  9963657 => "Kyzylkia\,\ Naryn\ region",
-  996372 => "Jalal\-Abat",
-  9963734 => "Massy\/Kochkor\-Ata\,\ Jalal\-Abat\ region",
-  9963736 => "Bazarkorgon\,\ Jalal\-Abat\ region",
-  9963738 => "Kazarman\,\ Jalal\-Abat\ region",
-  9963741 => "Ala\-Buka\,\ Jalal\-Abat\ region",
-  9963742 => "Kerben\,\ Jalal\-Abat\ region",
-  9963744 => "Mailuu\-Suu\,\ Jalal\-Abat\ region",
-  9963745 => "Tash\-Kumyr\,\ Jalal\-Abat\ region",
-  9963746 => "Kara\-Kul\,\ Jalal\-Abat\ region",
-  9963747 => "Toktogul\,\ Jalal\-Abat\ region",
-  9963748 => "Kok\-Jangak\/Suzak\,\ Jalal\-Abat\ region",
-  9963749 => "Kanysh\-Kya\ \(Chatkal\)\,\ Jalal\-Abat\ region",
-  996392 => "Karakol\,\ Issyk\-Ko\ region",
-  9963942 => "Ananyevo\,\ Issyk\-Ko\ region",
-  9963943 => "Cholpon\-Ata\,\ Issyk\-Ko\ region",
-  9963944 => "Balykchy\,\ Issyk\-Ko\ region",
-  9963945 => "Tup\,\ Issyk\-Ko\ region",
-  9963946 => "Kyzyl\-Suu\,\ Issyk\-Ko\ region",
-  9963947 => "Bokombaevo\/Kadji\-Say\,\ Issyk\-Ko\ region",
-  9963948 => "Ak\-Suu\,\ Issyk\-Ko\ region",
-);
+my %areanames = ();
+$areanames{en}->{996312} = "Bishkek\,\ Chuy\ region";
+$areanames{en}->{9963131} = "Belovodskoe\,\ Chuy\ region";
+$areanames{en}->{9963132} = "Kant\,\ Chuy\ region";
+$areanames{en}->{9963133} = "Kara\-Balta\,\ Chuy\ region";
+$areanames{en}->{9963134} = "Sokuluk\,\ Chuy\ region";
+$areanames{en}->{9963135} = "Kemin\,\ Chuy\ region";
+$areanames{en}->{9963137} = "Kayndy\,\ Chuy\ region";
+$areanames{en}->{9963138} = "Tokmok\,\ Chuy\ region";
+$areanames{en}->{9963139} = "Lebedinovka\,\ Chuy\ region";
+$areanames{en}->{996322} = "Osh";
+$areanames{en}->{9963230} = "Eski\-Nookat\,\ Osh\ region";
+$areanames{en}->{9963231} = "Aravan\,\ Osh\ region";
+$areanames{en}->{9963232} = "Kara\-Suu\,\ Osh\ region";
+$areanames{en}->{9963233} = "Uzgen\,\ Osh\ region";
+$areanames{en}->{9963234} = "Gulcha\,\ Osh\ region";
+$areanames{en}->{9963237} = "Daroot\-Korgon\,\ Osh\ region";
+$areanames{en}->{9963239} = "Kara\-Kulja\,\ Osh\ region";
+$areanames{en}->{996342} = "Talas";
+$areanames{en}->{9963456} = "Kyzyl\-Adyr\,\ Talas\ region";
+$areanames{en}->{9963457} = "Bakay\-Ata\,\ Talas\ region";
+$areanames{en}->{9963458} = "Kokoy\,\ Talas\ region";
+$areanames{en}->{9963459} = "Pokrovka\,\ Talas\ region";
+$areanames{en}->{996352} = "Naryn";
+$areanames{en}->{9963534} = "At\-Bashy\,\ Naryn\ region";
+$areanames{en}->{9963535} = "Kochkor\,\ Naryn\ region";
+$areanames{en}->{9963536} = "Chaek\/Minkush\,\ Naryn\ region";
+$areanames{en}->{9963537} = "Baetov\,\ Naryn\ region";
+$areanames{en}->{996362} = "Batken\,\ Naryn\ region";
+$areanames{en}->{9963653} = "Sulukta\,\ Naryn\ region";
+$areanames{en}->{9963655} = "Pulgon\,\ Naryn\ region";
+$areanames{en}->{9963656} = "Isfana\,\ Naryn\ region";
+$areanames{en}->{9963657} = "Kyzylkia\,\ Naryn\ region";
+$areanames{en}->{996372} = "Jalal\-Abat";
+$areanames{en}->{9963734} = "Massy\/Kochkor\-Ata\,\ Jalal\-Abat\ region";
+$areanames{en}->{9963736} = "Bazarkorgon\,\ Jalal\-Abat\ region";
+$areanames{en}->{9963738} = "Kazarman\,\ Jalal\-Abat\ region";
+$areanames{en}->{9963741} = "Ala\-Buka\,\ Jalal\-Abat\ region";
+$areanames{en}->{9963742} = "Kerben\,\ Jalal\-Abat\ region";
+$areanames{en}->{9963744} = "Mailuu\-Suu\,\ Jalal\-Abat\ region";
+$areanames{en}->{9963745} = "Tash\-Kumyr\,\ Jalal\-Abat\ region";
+$areanames{en}->{9963746} = "Kara\-Kul\,\ Jalal\-Abat\ region";
+$areanames{en}->{9963747} = "Toktogul\,\ Jalal\-Abat\ region";
+$areanames{en}->{9963748} = "Kok\-Jangak\/Suzak\,\ Jalal\-Abat\ region";
+$areanames{en}->{9963749} = "Kanysh\-Kya\ \(Chatkal\)\,\ Jalal\-Abat\ region";
+$areanames{en}->{996392} = "Karakol\,\ Issyk\-Ko\ region";
+$areanames{en}->{9963942} = "Ananyevo\,\ Issyk\-Ko\ region";
+$areanames{en}->{9963943} = "Cholpon\-Ata\,\ Issyk\-Ko\ region";
+$areanames{en}->{9963944} = "Balykchy\,\ Issyk\-Ko\ region";
+$areanames{en}->{9963945} = "Tup\,\ Issyk\-Ko\ region";
+$areanames{en}->{9963946} = "Kyzyl\-Suu\,\ Issyk\-Ko\ region";
+$areanames{en}->{9963947} = "Bokombaevo\/Kadji\-Say\,\ Issyk\-Ko\ region";
+$areanames{en}->{9963948} = "Ak\-Suu\,\ Issyk\-Ko\ region";
+
     sub new {
       my $class = shift;
       my $number = shift;

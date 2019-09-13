@@ -1,6 +1,9 @@
-use strict;
+use 5.008;
 
-use Test::More tests => 5;
+use strict;
+use warnings;
+
+use Test::More;
 
 BEGIN {
     use_ok('DBD::Mock');  
@@ -18,3 +21,5 @@ BEGIN {
     
     is($dbh, $dbh2, '.. these should be the same handles');
 }
+
+done_testing();

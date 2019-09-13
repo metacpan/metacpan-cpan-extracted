@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.700';
+our $VERSION = '1.701';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -831,7 +831,18 @@ sub __wr_cell {
             $str = $self->__pad_str_to_colwidth( $idx );
         }
         if ( $self->{color} ) {
-            my @color = ( $self->{orig_list}[$idx] || '' ) =~ /(\e\[[\d;]*m)/g;
+            my @color;
+            if ( ! $self->{orig_list}[$idx] ) {
+                if ( ! defined $self->{orig_list}[$idx] ) {
+                    @color = $self->{undef} =~ /(\e\[[\d;]*m)/g;
+                }
+                elsif ( ! length $self->{orig_list}[$idx] ) {
+                    @color = $self->{empty} =~ /(\e\[[\d;]*m)/g;
+                }
+            }
+            else {
+                @color = $self->{orig_list}[$idx] =~ /(\e\[[\d;]*m)/g;
+            }
             if ( $emphasised ) {
                 for ( @color ) {
                     # keep cell marked after color escapes
@@ -958,7 +969,6 @@ sub __list_idx_to_rowcol {
         }
     }
     else {
-        $self->{col_width_plus} = $self->{col_width} + $self->{pad};
         my $tmp_avail_width = $self->{avail_width} + $self->{pad};
         # auto_format
         if ( $layout == 1 || $layout == 2 ) {
@@ -1100,7 +1110,7 @@ sub __mouse_info_to_key {
             my $idx = $self->{rc2idx}[$row][$col];
             $begin_next_col = $begin_this_col + $self->{length}[$idx] + $self->{pad};
         }
-        else { #
+        else {
             $begin_next_col = $begin_this_col + $self->{col_width_plus};
         }
         if ( $col == 0 ) {
@@ -1154,7 +1164,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.700
+Version 1.701
 
 =cut
 

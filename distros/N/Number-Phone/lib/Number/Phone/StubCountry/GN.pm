@@ -22,26 +22,22 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222640;
+our $VERSION = 1.20190912215426;
 
 my $formatters = [
                 {
                   'format' => '$1 $2 $3 $4',
-                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})',
-                  'leading_digits' => '3'
+                  'leading_digits' => '3',
+                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})'
                 },
                 {
-                  'leading_digits' => '[67]',
                   'format' => '$1 $2 $3 $4',
+                  'leading_digits' => '[67]',
                   'pattern' => '(\\d{3})(\\d{2})(\\d{2})(\\d{2})'
                 }
               ];
 
 my $validators = {
-                'personal_number' => '',
-                'toll_free' => '',
-                'mobile' => '6[02356]\\d{7}',
-                'pager' => '',
                 'fixed_line' => '
           30(?:
             24|
@@ -53,8 +49,6 @@ my $validators = {
             9[1478]
           )\\d{4}
         ',
-                'voip' => '722\\d{6}',
-                'specialrate' => '',
                 'geographic' => '
           30(?:
             24|
@@ -65,31 +59,37 @@ my $validators = {
             [78]1|
             9[1478]
           )\\d{4}
-        '
+        ',
+                'mobile' => '6[02356]\\d{7}',
+                'pager' => '',
+                'personal_number' => '',
+                'specialrate' => '',
+                'toll_free' => '',
+                'voip' => '722\\d{6}'
               };
-my %areanames = (
-  224302 => "Fria",
-  2243031 => "Boké",
-  2243032 => "Kamsar",
-  2243041 => "Conakry",
-  2243042 => "Conakry",
-  2243043 => "Conakry",
-  2243045 => "Conakry",
-  2243046 => "Boussoura",
-  2243047 => "Conakry",
-  2243051 => "Labé",
-  2243053 => "Pita",
-  2243061 => "Kindia",
-  22430613 => "Télimélé",
-  2243068 => "Mamou",
-  2243069 => "Dalaba",
-  224307 => "Kankan",
-  224308 => "Faranah",
-  2243091 => "N\'Zérékoré",
-  2243094 => "Macenta",
-  2243097 => "Guéckédou",
-  2243098 => "Kissidougou",
-);
+my %areanames = ();
+$areanames{en}->{224302} = "Fria";
+$areanames{en}->{2243031} = "Boké";
+$areanames{en}->{2243032} = "Kamsar";
+$areanames{en}->{2243041} = "Conakry";
+$areanames{en}->{2243042} = "Conakry";
+$areanames{en}->{2243043} = "Conakry";
+$areanames{en}->{2243045} = "Conakry";
+$areanames{en}->{2243046} = "Boussoura";
+$areanames{en}->{2243047} = "Conakry";
+$areanames{en}->{2243051} = "Labé";
+$areanames{en}->{2243053} = "Pita";
+$areanames{en}->{2243061} = "Kindia";
+$areanames{en}->{22430613} = "Télimélé";
+$areanames{en}->{2243068} = "Mamou";
+$areanames{en}->{2243069} = "Dalaba";
+$areanames{en}->{224307} = "Kankan";
+$areanames{en}->{224308} = "Faranah";
+$areanames{en}->{2243091} = "N\'Zérékoré";
+$areanames{en}->{2243094} = "Macenta";
+$areanames{en}->{2243097} = "Guéckédou";
+$areanames{en}->{2243098} = "Kissidougou";
+
     sub new {
       my $class = shift;
       my $number = shift;

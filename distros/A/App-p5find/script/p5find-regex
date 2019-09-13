@@ -1,21 +1,79 @@
 #!/usr/bin/env perl
+
+=head1 Abstract
+
+p5find-regex is a program to find regular expressions in your perl5 code. This
+is not so trivial with a grep/ack command, since it's also non-trivial to have
+a regular expression matching all regular expressions.
+
+=head1 Examples
+
+    p5find-regex -h
+
+    p5find-regex ~/src/mycode
+
+=head1 Description
+
+This program p5find-regexp locates regular expressions in perl source code
+under the given path.
+
+The output format should be compatible to C<grep -Hnr>. Each line consists of
+colon-separated fields of filename, line number, and the content of that line.
+
+Here's a partial result of regexes found in perlbrew source code.
+
+    > p5find-regex ./lib | head
+    
+    lib/App/Perlbrew/Util.pm:24:    my @a = split //, shift;
+    lib/App/Perlbrew/Util.pm:25:    my @b = split //, shift;
+    lib/App/Perlbrew/Path.pm:99:    $path =~ s!\Q$home/\E!~/! if $home;
+    lib/App/perlbrew.pm:77:    my ($name) = $_->{opt} =~ /([^|]+)/;
+    lib/App/perlbrew.pm:168:            $cmd =~ s!{$_}!$params->{$_}!g;
+    lib/App/perlbrew.pm:224:    my @v = split(/[\.\-_]/, $version);
+    lib/App/perlbrew.pm:232:        $v[3] =~ s/[^0-9]//g;
+    lib/App/perlbrew.pm:282:                $value =~ s/^=//;
+    lib/App/perlbrew.pm:419:        $shell_name =~ s/\d+$//;
+    lib/App/perlbrew.pm:465:        $self->{cpan_mirror} =~ s{/+$}{};
+
+Alternatively, a C<-o> flag will make it print only the regex instead of
+entire line.  In this display mode, an extra tab character ("\t") is added
+right in front of the regex so is easier to separate them visually and
+programatically by piping to C<cut -f 2->:
+
+    > ./script/p5find-regex -o ./lib | cut -f 2- | head
+    
+    //
+    //
+    s!\Q$home/\E!~/!
+    /([^|]+)/
+    s!{$_}!$params->{$_}!g
+    /[\.\-_]/
+    s/[^0-9]//g
+    s/^=//
+    s/\d+$//
+    s{/+$}{}
+
+=cut
+
 use v5.18;
 
 use Getopt::Long;
-use App::p5find qw(p5_doc_iterator);
+use App::p5find qw(p5_doc_iterator print_file_linenum_line);
 
 sub print_usage {
     print <<USAGE;
 Usage: p5find-regex [switches] [--] [dir...]
   -h    show this help message.
   -o    Print only the matching regex
+
+See also: `perldoc p5find-regex` for full documentation.
 USAGE
 }
 
 my %opts;
 GetOptions(
     \%opts,
-    "h", # No op
+    "h", # help!
     "o", # Print only the Regexp, not the entire line.
 );
 
@@ -46,15 +104,7 @@ for my $dir (@args) {
                 $matched{$ln} = 1;
             }
 
-            my $line_number = 0;
-            open my $fh, "<", $file;
-            while (my $line = <$fh>) {
-                $line_number++;
-                if ($matched{$line_number}) {
-                    print "${file}:${line_number}:${line}";
-                }
-            }
-            close($fh);
+            print_file_linenum_line( $file, \%matched );
         }
     }
 }

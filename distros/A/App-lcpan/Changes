@@ -1,4 +1,11 @@
-1.037   2019-07-23  Released-By: PERLANCAR; Urgency: medium
+1.038   2019-08-01  Released-By: PERLANCAR; Urgency: low
+
+	- Add %pods_args.
+
+	- Tweak Rinci metadata: rename greedy -> slurpy.
+
+
+1.037   2019-07-23  Released-By: PERLANCAR; Urgency: high
 
 	- Add to builtin skip list: Shipment-3.02.tar.gz (segfaults
           Compiler::Lexer 0.22).

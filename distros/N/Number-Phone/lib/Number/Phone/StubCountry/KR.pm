@@ -22,88 +22,123 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222640;
+our $VERSION = 1.20190912215426;
 
 my $formatters = [
                 {
-                  'leading_digits' => '1[016-9]114',
-                  'intl_format' => 'NA',
                   'format' => '$1',
+                  'intl_format' => 'NA',
+                  'leading_digits' => '1[016-9]114',
                   'national_rule' => '0$1',
                   'pattern' => '(\\d{5})'
                 },
                 {
-                  'national_rule' => '0$1',
                   'format' => '$1-$2',
-                  'pattern' => '(\\d{2})(\\d{3,4})',
                   'leading_digits' => '
             (?:
               3[1-3]|
               [46][1-4]|
               5[1-5]
             )1
-          '
-                },
-                {
-                  'leading_digits' => '1',
-                  'pattern' => '(\\d{4})(\\d{4})',
-                  'format' => '$1-$2'
-                },
-                {
-                  'leading_digits' => '2',
-                  'pattern' => '(\\d)(\\d{3,4})(\\d{4})',
-                  'format' => '$1-$2-$3',
-                  'national_rule' => '0$1'
-                },
-                {
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})',
-                  'format' => '$1-$2-$3',
+          ',
                   'national_rule' => '0$1',
+                  'pattern' => '(\\d{2})(\\d{3,4})'
+                },
+                {
+                  'format' => '$1-$2',
+                  'leading_digits' => '1',
+                  'pattern' => '(\\d{4})(\\d{4})'
+                },
+                {
+                  'format' => '$1-$2-$3',
+                  'leading_digits' => '2',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d)(\\d{3,4})(\\d{4})'
+                },
+                {
+                  'format' => '$1-$2-$3',
                   'leading_digits' => '
             60|
             8
-          '
+          ',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
                 },
                 {
-                  'pattern' => '(\\d{2})(\\d{3,4})(\\d{4})',
                   'format' => '$1-$2-$3',
-                  'national_rule' => '0$1',
                   'leading_digits' => '
             [1346]|
             5[1-5]
-          '
-                },
-                {
-                  'pattern' => '(\\d{2})(\\d{4})(\\d{4})',
+          ',
                   'national_rule' => '0$1',
+                  'pattern' => '(\\d{2})(\\d{3,4})(\\d{4})'
+                },
+                {
                   'format' => '$1-$2-$3',
-                  'leading_digits' => '[57]'
+                  'leading_digits' => '[57]',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{2})(\\d{4})(\\d{4})'
                 },
                 {
-                  'leading_digits' => '0030',
                   'format' => '$1 $2 $3',
-                  'pattern' => '(\\d{5})(\\d{3})(\\d{3})',
-                  'intl_format' => 'NA'
+                  'intl_format' => 'NA',
+                  'leading_digits' => '0030',
+                  'pattern' => '(\\d{5})(\\d{3})(\\d{3})'
                 },
                 {
+                  'format' => '$1-$2-$3',
                   'leading_digits' => '5',
                   'national_rule' => '0$1',
-                  'format' => '$1-$2-$3',
                   'pattern' => '(\\d{2})(\\d{5})(\\d{4})'
                 },
                 {
                   'format' => '$1 $2 $3',
-                  'pattern' => '(\\d{5})(\\d{3,4})(\\d{4})',
-                  'intl_format' => 'NA'
+                  'intl_format' => 'NA',
+                  'pattern' => '(\\d{5})(\\d{3,4})(\\d{4})'
                 },
                 {
-                  'intl_format' => 'NA',
                   'format' => '$1 $2 $3 $4',
+                  'intl_format' => 'NA',
                   'pattern' => '(\\d{5})(\\d{2})(\\d{3})(\\d{4})'
                 }
               ];
 
 my $validators = {
+                'fixed_line' => '
+          (?:
+            2|
+            3[1-3]|
+            [46][1-4]|
+            5[1-5]
+          )[1-9]\\d{6,7}|
+          (?:
+            3[1-3]|
+            [46][1-4]|
+            5[1-5]
+          )1\\d{2,3}
+        ',
+                'geographic' => '
+          (?:
+            2|
+            3[1-3]|
+            [46][1-4]|
+            5[1-5]
+          )[1-9]\\d{6,7}|
+          (?:
+            3[1-3]|
+            [46][1-4]|
+            5[1-5]
+          )1\\d{2,3}
+        ',
+                'mobile' => '
+          10[01]\\d{6}|
+          1(?:
+            0[2-9]|
+            [126-9]\\d
+          )\\d{6,7}
+        ',
+                'pager' => '15\\d{7,8}',
+                'personal_number' => '50\\d{8,9}',
                 'specialrate' => '(60[2-9]\\d{6})|(
           1(?:
             5(?:
@@ -129,35 +164,6 @@ my $validators = {
             )
           )\\d{4}
         )',
-                'geographic' => '
-          (?:
-            2|
-            3[1-3]|
-            [46][1-4]|
-            5[1-5]
-          )[1-9]\\d{6,7}|
-          (?:
-            3[1-3]|
-            [46][1-4]|
-            5[1-5]
-          )1\\d{2,3}
-        ',
-                'voip' => '70\\d{8}',
-                'fixed_line' => '
-          (?:
-            2|
-            3[1-3]|
-            [46][1-4]|
-            5[1-5]
-          )[1-9]\\d{6,7}|
-          (?:
-            3[1-3]|
-            [46][1-4]|
-            5[1-5]
-          )1\\d{2,3}
-        ',
-                'pager' => '15\\d{7,8}',
-                'personal_number' => '50\\d{8,9}',
                 'toll_free' => '
           00(?:
             308\\d{6,7}|
@@ -168,27 +174,44 @@ my $validators = {
             80
           )\\d{7}
         ',
-                'mobile' => '1[0-26-9]\\d{7,8}'
+                'voip' => '70\\d{8}'
               };
-my %areanames = (
-  822 => "Seoul",
-  8231 => "Gyeonggi",
-  8232 => "Incheon",
-  8233 => "Gangwon",
-  8241 => "Chungnam",
-  8242 => "Daejeon",
-  8243 => "Chungbuk",
-  8244 => "Sejong\ City",
-  8251 => "Busan",
-  8252 => "Ulsan",
-  8253 => "Daegu",
-  8254 => "Gyeongbuk",
-  8255 => "Gyeongnam",
-  8261 => "Jeonnam",
-  8262 => "Gwangju",
-  8263 => "Jeonbuk",
-  8264 => "Jeju",
-);
+my %areanames = ();
+$areanames{ko}->{822} = "서울";
+$areanames{ko}->{8231} = "경기";
+$areanames{ko}->{8232} = "인천";
+$areanames{ko}->{8233} = "강원";
+$areanames{ko}->{8241} = "충남";
+$areanames{ko}->{8242} = "대전";
+$areanames{ko}->{8243} = "충북";
+$areanames{ko}->{8244} = "세종";
+$areanames{ko}->{8251} = "부산";
+$areanames{ko}->{8252} = "울산";
+$areanames{ko}->{8253} = "대구";
+$areanames{ko}->{8254} = "경북";
+$areanames{ko}->{8255} = "경남";
+$areanames{ko}->{8261} = "전남";
+$areanames{ko}->{8262} = "광주";
+$areanames{ko}->{8263} = "전북";
+$areanames{ko}->{8264} = "제주";
+$areanames{en}->{822} = "Seoul";
+$areanames{en}->{8231} = "Gyeonggi";
+$areanames{en}->{8232} = "Incheon";
+$areanames{en}->{8233} = "Gangwon";
+$areanames{en}->{8241} = "Chungnam";
+$areanames{en}->{8242} = "Daejeon";
+$areanames{en}->{8243} = "Chungbuk";
+$areanames{en}->{8244} = "Sejong\ City";
+$areanames{en}->{8251} = "Busan";
+$areanames{en}->{8252} = "Ulsan";
+$areanames{en}->{8253} = "Daegu";
+$areanames{en}->{8254} = "Gyeongbuk";
+$areanames{en}->{8255} = "Gyeongnam";
+$areanames{en}->{8261} = "Jeonnam";
+$areanames{en}->{8262} = "Gwangju";
+$areanames{en}->{8263} = "Jeonbuk";
+$areanames{en}->{8264} = "Jeju";
+
     sub new {
       my $class = shift;
       my $number = shift;

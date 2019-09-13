@@ -22,36 +22,27 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222638;
+our $VERSION = 1.20190912215423;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d{2})(\\d{5})',
                   'format' => '$1 $2',
-                  'leading_digits' => '90'
+                  'leading_digits' => '90',
+                  'pattern' => '(\\d{2})(\\d{5})'
                 },
                 {
                   'format' => '$1 $2',
-                  'pattern' => '(\\d{3})(\\d{4})',
-                  'leading_digits' => '[2-6]'
+                  'leading_digits' => '[2-6]',
+                  'pattern' => '(\\d{3})(\\d{4})'
                 },
                 {
-                  'leading_digits' => '7',
                   'format' => '$1 $2 $3',
+                  'leading_digits' => '7',
                   'pattern' => '(\\d{2})(\\d{3})(\\d{3})'
                 }
               ];
 
 my $validators = {
-                'voip' => '
-          79(?:
-            1(?:
-              [01]\\d|
-              20
-            )|
-            2[0-2]\\d
-          )\\d{3}
-        ',
                 'fixed_line' => '
           (?:
             2(?:
@@ -116,8 +107,6 @@ my $validators = {
             )
           )\\d{4}
         ',
-                'specialrate' => '(90\\d{5})',
-                'toll_free' => '',
                 'mobile' => '
           77200\\d{3}|
           7(?:
@@ -125,49 +114,60 @@ my $validators = {
             7[014-8]
           )\\d{5}
         ',
+                'pager' => '',
                 'personal_number' => '',
-                'pager' => ''
+                'specialrate' => '(90\\d{5})',
+                'toll_free' => '',
+                'voip' => '
+          79(?:
+            1(?:
+              [01]\\d|
+              20
+            )|
+            2[0-2]\\d
+          )\\d{3}
+        '
               };
-my %areanames = (
-  26724 => "Francistown",
-  26726 => "Selebi\-Phikwe",
-  26729 => "Letlhakane\/Orapa",
-  267310 => "Gaborone\ \(outer\)",
-  267312 => "Gaborone",
-  267313 => "Gaborone",
-  267315 => "Gaborone",
-  267316 => "Gaborone",
-  267317 => "Gaborone",
-  267318 => "Gaborone",
-  267319 => "Gaborone",
-  26735 => "Gaborone",
-  26736 => "Gaborone",
-  267370 => "Gaborone",
-  267371 => "Gaborone",
-  267390 => "Gaborone",
-  267391 => "Gaborone",
-  267392 => "Gaborone",
-  267393 => "Gaborone",
-  267394 => "Gaborone",
-  267395 => "Gaborone",
-  267397 => "Gaborone",
-  26746 => "Serowe",
-  26747 => "Mahalapye",
-  26749 => "Palapye",
-  267530 => "Lobatse",
-  267533 => "Lobatse",
-  267538 => "Ramotswa",
-  267539 => "Ramotswa",
-  26754 => "Barolong\/Ngwaketse",
-  26757 => "Mochudi",
-  26758 => "Jwaneng",
-  26759 => "Molepolole",
-  26762 => "Kasane",
-  267651 => "Kgalagadi",
-  267654 => "Kgalagadi",
-  267659 => "Gantsi",
-  26768 => "Maun",
-);
+my %areanames = ();
+$areanames{en}->{26724} = "Francistown";
+$areanames{en}->{26726} = "Selebi\-Phikwe";
+$areanames{en}->{26729} = "Letlhakane\/Orapa";
+$areanames{en}->{267310} = "Gaborone\ \(outer\)";
+$areanames{en}->{267312} = "Gaborone";
+$areanames{en}->{267313} = "Gaborone";
+$areanames{en}->{267315} = "Gaborone";
+$areanames{en}->{267316} = "Gaborone";
+$areanames{en}->{267317} = "Gaborone";
+$areanames{en}->{267318} = "Gaborone";
+$areanames{en}->{267319} = "Gaborone";
+$areanames{en}->{26735} = "Gaborone";
+$areanames{en}->{26736} = "Gaborone";
+$areanames{en}->{267370} = "Gaborone";
+$areanames{en}->{267371} = "Gaborone";
+$areanames{en}->{267390} = "Gaborone";
+$areanames{en}->{267391} = "Gaborone";
+$areanames{en}->{267392} = "Gaborone";
+$areanames{en}->{267393} = "Gaborone";
+$areanames{en}->{267394} = "Gaborone";
+$areanames{en}->{267395} = "Gaborone";
+$areanames{en}->{267397} = "Gaborone";
+$areanames{en}->{26746} = "Serowe";
+$areanames{en}->{26747} = "Mahalapye";
+$areanames{en}->{26749} = "Palapye";
+$areanames{en}->{267530} = "Lobatse";
+$areanames{en}->{267533} = "Lobatse";
+$areanames{en}->{267538} = "Ramotswa";
+$areanames{en}->{267539} = "Ramotswa";
+$areanames{en}->{26754} = "Barolong\/Ngwaketse";
+$areanames{en}->{26757} = "Mochudi";
+$areanames{en}->{26758} = "Jwaneng";
+$areanames{en}->{26759} = "Molepolole";
+$areanames{en}->{26762} = "Kasane";
+$areanames{en}->{267651} = "Kgalagadi";
+$areanames{en}->{267654} = "Kgalagadi";
+$areanames{en}->{267659} = "Gantsi";
+$areanames{en}->{26768} = "Maun";
+
     sub new {
       my $class = shift;
       my $number = shift;

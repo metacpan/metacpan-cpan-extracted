@@ -22,19 +22,18 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222640;
+our $VERSION = 1.20190912215427;
 
 my $formatters = [
                 {
-                  'national_rule' => '0$1',
                   'format' => '$1 $2 $3',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{3,4})',
-                  'leading_digits' => '[2-9]'
+                  'leading_digits' => '[2-9]',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{3,4})'
                 }
               ];
 
 my $validators = {
-                'voip' => '78[1-49]\\d{5}',
                 'fixed_line' => '
           (?:
             20[2-8]|
@@ -52,12 +51,6 @@ my $validators = {
             )
           )\\d{5}
         ',
-                'specialrate' => '(
-          9(?:
-            4[1568]|
-            5[178]
-          )\\d{5}
-        )|(77[1-9]\\d{5})',
                 'geographic' => '
           (?:
             20[2-8]|
@@ -75,12 +68,6 @@ my $validators = {
             )
           )\\d{5}
         ',
-                'toll_free' => '
-          80(?:
-            [0-2578]|
-            9\\d
-          )\\d{5}
-        ',
                 'mobile' => '
           6(?:
             00|
@@ -89,21 +76,34 @@ my $validators = {
             [7-9]\\d
           )\\d{5}
         ',
+                'pager' => '',
                 'personal_number' => '',
-                'pager' => ''
+                'specialrate' => '(
+          9(?:
+            4[1568]|
+            5[178]
+          )\\d{5}
+        )|(77[1-9]\\d{5})',
+                'toll_free' => '
+          80(?:
+            [0-2578]|
+            9\\d
+          )\\d{5}
+        ',
+                'voip' => '78[1-49]\\d{5}'
               };
-my %areanames = (
-  3822 => "Danilovgad\/Kolasin\/Podgorica",
-  38230 => "Bar\/Ulcinj",
-  38231 => "Herceg\ Novi",
-  38232 => "Kotor\/Tivat",
-  38233 => "Budva",
-  38240 => "Niksic\/Pluzine\/Savnik",
-  38241 => "Cetinje",
-  38250 => "Bijelo\ Polje\/Mojkovac",
-  38251 => "Andrijevica\/Berane\/Blue\/Gusinje\/Petnitsa\/Rožaje",
-  38252 => "Pljevlja\/Zabljak",
-);
+my %areanames = ();
+$areanames{en}->{3822} = "Danilovgad\/Kolasin\/Podgorica";
+$areanames{en}->{38230} = "Bar\/Ulcinj";
+$areanames{en}->{38231} = "Herceg\ Novi";
+$areanames{en}->{38232} = "Kotor\/Tivat";
+$areanames{en}->{38233} = "Budva";
+$areanames{en}->{38240} = "Niksic\/Pluzine\/Savnik";
+$areanames{en}->{38241} = "Cetinje";
+$areanames{en}->{38250} = "Bijelo\ Polje\/Mojkovac";
+$areanames{en}->{38251} = "Andrijevica\/Berane\/Blue\/Gusinje\/Petnitsa\/Rožaje";
+$areanames{en}->{38252} = "Pljevlja\/Zabljak";
+
     sub new {
       my $class = shift;
       my $number = shift;

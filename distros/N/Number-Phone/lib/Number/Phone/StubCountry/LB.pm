@@ -22,10 +22,11 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222640;
+our $VERSION = 1.20190912215426;
 
 my $formatters = [
                 {
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '
             [13-69]|
             7(?:
@@ -36,20 +37,45 @@ my $formatters = [
             )|
             8[02-9]
           ',
-                  'pattern' => '(\\d)(\\d{3})(\\d{3})',
-                  'format' => '$1 $2 $3',
-                  'national_rule' => '0$1'
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d)(\\d{3})(\\d{3})'
                 },
                 {
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '[7-9]',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{3})',
-                  'format' => '$1 $2 $3'
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{3})'
                 }
               ];
 
 my $validators = {
-                'personal_number' => '',
-                'toll_free' => '',
+                'fixed_line' => '
+          (?:
+            (?:
+              [14-69]\\d|
+              8[02-9]
+            )\\d|
+            7(?:
+              [2-57]\\d|
+              62|
+              8[0-7]|
+              9[04-9]
+            )
+          )\\d{4}
+        ',
+                'geographic' => '
+          (?:
+            (?:
+              [14-69]\\d|
+              8[02-9]
+            )\\d|
+            7(?:
+              [2-57]\\d|
+              62|
+              8[0-7]|
+              9[04-9]
+            )
+          )\\d{4}
+        ',
                 'mobile' => '
           (?:
             (?:
@@ -65,36 +91,10 @@ my $validators = {
           )\\d{5}
         ',
                 'pager' => '',
-                'fixed_line' => '
-          (?:
-            (?:
-              [14-69]\\d|
-              8[02-9]
-            )\\d|
-            7(?:
-              [2-57]\\d|
-              62|
-              8[0-7]|
-              9[04-9]
-            )
-          )\\d{4}
-        ',
-                'voip' => '',
-                'geographic' => '
-          (?:
-            (?:
-              [14-69]\\d|
-              8[02-9]
-            )\\d|
-            7(?:
-              [2-57]\\d|
-              62|
-              8[0-7]|
-              9[04-9]
-            )
-          )\\d{4}
-        ',
-                'specialrate' => '(80\\d{6})|(9[01]\\d{6})'
+                'personal_number' => '',
+                'specialrate' => '(80\\d{6})|(9[01]\\d{6})',
+                'toll_free' => '',
+                'voip' => ''
               };
 
     sub new {

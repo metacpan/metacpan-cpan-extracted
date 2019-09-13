@@ -1,3 +1,33 @@
+0.007   2019-09-12  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Perform checksum checking case-insensitively [GH#3].
+
+
+0.006   2019-09-12  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Tweak examples.
+
+
+0.005   2019-09-12  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Make -a default to 'Digest' (and thus optional) if we already
+          specify A.
+
+
+0.004   2019-09-12  Released-By: PERLANCAR; Urgency: medium
+
+	- Allow using all digest algorithms from Digest::* modules by
+	  setting -a to Digest and then specifying --digest-args (-A).
+
+
+0.003   2019-09-12  Released-By: PERLANCAR; Urgency: medium
+
+	- Add option: --checksum (-C) to specify checksum on the
+	  command-line (suggested by Chris White, GH#2).
+
+
 0.002   2019-08-21  Released-By: PERLANCAR; Urgency: medium
 
 	- Update to File::Digest 0.008 which supports reading from stdin

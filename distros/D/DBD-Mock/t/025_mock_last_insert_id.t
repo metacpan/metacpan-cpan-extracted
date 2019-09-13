@@ -1,9 +1,9 @@
-use 5.006;
+use 5.008;
 
 use strict;
 use warnings;
 
-use Test::More tests => 12;
+use Test::More;
 
 use DBI;
 
@@ -30,7 +30,7 @@ $dbh->{mock_start_insert_id} = ['Baz', 345];
 }
 
 {
-    my $sth = $dbh->prepare('INSERT INTO Baz (foo, bar) values (?, ?)');
+    my $sth = $dbh->prepare('INSERT IGNORE INTO Baz (foo, bar) values (?, ?)');
 
     $sth->execute(90, 41);
     is($dbh->{mock_last_insert_id}, 345, '... got the right insert id');
@@ -44,3 +44,5 @@ $dbh->{mock_start_insert_id} = ['Baz', 345];
     is($dbh->{mock_last_insert_id}, 347, '... got the right insert id');
     is($dbh->last_insert_id((undef)x4), 347, '... got the right insert id from last_insert_id');
 }
+
+done_testing();

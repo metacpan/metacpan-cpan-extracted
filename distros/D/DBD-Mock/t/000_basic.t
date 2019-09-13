@@ -1,11 +1,16 @@
-use strict;
+use 5.008;
 
-use Test::More tests => 1;
+use strict;
+use warnings;
+
+use Test::More;
 
 BEGIN {
     use_ok( 'DBD::Mock' );
 }
 
 if ( $ENV{REPORT_TEST_ENVIRONMENT} ) {
-    warn "\n\nperl $^V ($^O)\n\n";
+    warn "\n\nperl $] ($^O)\n\n";
 }
+
+done_testing();

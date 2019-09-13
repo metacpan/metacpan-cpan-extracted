@@ -1,7 +1,7 @@
 package App::lcpan;
 
-our $DATE = '2019-07-23'; # DATE
-our $VERSION = '1.037'; # VERSION
+our $DATE = '2019-08-01'; # DATE
+our $VERSION = '1.038'; # VERSION
 
 use 5.010001;
 use strict;
@@ -145,7 +145,7 @@ our %query_multi_args = (
         schema => ['array*', of=>'str*'],
         cmdline_aliases => {q=>{}},
         pos => 0,
-        greedy => 1,
+        slurpy => 1,
         tags => ['category:filtering'],
     },
     detail => {
@@ -280,9 +280,22 @@ our %mods_args = (
         'x.name.is_plural' => 1,
         req => 1,
         pos => 0,
-        greedy => 1,
+        slurpy => 1,
         cmdline_src => 'stdin_or_args',
         element_completion => \&_complete_mod,
+    },
+);
+
+our %pods_args = (
+    pods => {
+        schema => ['array*', of=>'perl::modname*', min_len=>1],
+        'x.name.is_plural' => 1,
+        'x.name.singular' => 'pod',
+        req => 1,
+        pos => 0,
+        slurpy => 1,
+        cmdline_src => 'stdin_or_args',
+        #element_completion => \&_complete_pod, # will be too slow with the current schema
     },
 );
 
@@ -305,7 +318,7 @@ our %mods_or_dists_args = (
         schema => ['array*', of => ['str*']], # XXX perl::mod_or_distname
         req => 1,
         pos => 0,
-        greedy => 1,
+        slurpy => 1,
         element_completion => \&App::lcpan::_complete_mod_or_dist,
     },
 );
@@ -325,7 +338,7 @@ our %scripts_args = (
         'x.name.is_plural' => 1,
         req => 1,
         pos => 0,
-        greedy => 1,
+        slurpy => 1,
         cmdline_src => 'stdin_or_args',
         element_completion => \&_complete_script,
     },
@@ -358,7 +371,7 @@ our %authors_args = (
         'x.name.is_plural' => 1,
         req => 1,
         pos => 0,
-        greedy => 1,
+        slurpy => 1,
         cmdline_src => 'stdin_or_args',
         element_completion => \&_complete_cpanid,
     },
@@ -379,7 +392,7 @@ our %dists_args = (
         'x.name.is_plural' => 1,
         req => 1,
         pos => 0,
-        greedy => 1,
+        slurpy => 1,
         cmdline_src => 'stdin_or_args',
         element_completion => \&_complete_dist,
     },
@@ -4124,7 +4137,7 @@ App::lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.037 of App::lcpan (from Perl distribution App-lcpan), released on 2019-07-23.
+This document describes version 1.038 of App::lcpan (from Perl distribution App-lcpan), released on 2019-08-01.
 
 =head1 SYNOPSIS
 
@@ -4303,7 +4316,7 @@ Recurse for a number of levels (-1 means unlimited).
 
 =item * B<modules>* => I<array[perl::modname]>
 
-=item * B<perl_version> => I<str> (default: "v5.28.2")
+=item * B<perl_version> => I<str> (default: "v5.26.1")
 
 Set base Perl version for determining core modules.
 
@@ -4501,7 +4514,7 @@ Select modules belonging to certain namespace(s).
 
 When there are more than one query, perform OR instead of AND logic.
 
-=item * B<perl_version> => I<str> (default: "v5.28.2")
+=item * B<perl_version> => I<str> (default: "v5.26.1")
 
 Set base Perl version for determining core modules.
 
@@ -4669,7 +4682,7 @@ Select modules belonging to certain namespace(s).
 
 When there are more than one query, perform OR instead of AND logic.
 
-=item * B<perl_version> => I<str> (default: "v5.28.2")
+=item * B<perl_version> => I<str> (default: "v5.26.1")
 
 Set base Perl version for determining core modules.
 

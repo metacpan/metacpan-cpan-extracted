@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::inject;
 
-our $DATE = '2019-07-23'; # DATE
-our $VERSION = '1.037'; # VERSION
+our $DATE = '2019-08-01'; # DATE
+our $VERSION = '1.038'; # VERSION
 
 use 5.010;
 use strict;
@@ -28,7 +28,7 @@ $SPEC{'handle_cmd'} = {
             'x.name.is_plural' => 1,
             req => 1,
             pos => 0,
-            greedy => 1,
+            slurpy => 1,
         },
     },
     deps => {
@@ -71,7 +71,7 @@ App::lcpan::Cmd::inject - Inject one or more tarballs to the mirror
 
 =head1 VERSION
 
-This document describes version 1.037 of App::lcpan::Cmd::inject (from Perl distribution App-lcpan), released on 2019-07-23.
+This document describes version 1.038 of App::lcpan::Cmd::inject (from Perl distribution App-lcpan), released on 2019-08-01.
 
 =head1 FUNCTIONS
 

@@ -1,6 +1,9 @@
-use strict;
+use 5.008;
 
-use Test::More tests => 9;
+use strict;
+use warnings;
+
+use Test::More;
 
 BEGIN {
     use_ok('DBD::Mock');  
@@ -29,3 +32,5 @@ my $sql = 'SELECT * FROM foo WHERE bar = ? AND baz = ?';
     is( $a_params->[1], 'bar',
         'Statement handle stored bound inline parameter (attribute)' );
 }
+
+done_testing();

@@ -1,5 +1,5 @@
 package File::Collector ;
-$File::Collector::VERSION = '0.037';
+$File::Collector::VERSION = '0.038';
 use strict; use warnings;
 
 use Carp;
@@ -58,6 +58,7 @@ sub new {
   # eval class code
   foreach my $class ( @$classes ) {
     eval "require $class";
+    die "Could not load class: $class, $@" if $@;
   }
 
   # a bit of trickery to make Processor class code consistent with base class
@@ -388,7 +389,7 @@ sub _classify_all {
   my $s = shift;
   foreach my $c ( @{ $s->{_classes} } ) {
     my $role = Role::Tiny->apply_roles_to_object ($s, $c);
-    $role->_classify_file() if $role->can('_classify_file');;
+    $role->_classify_file() if $role->can('_classify_file');
   }
 }
 
@@ -428,7 +429,7 @@ File::Collector - Base class for custom File::Collector classes for classifying 
 
 =head1 VERSION
 
-version 0.037
+version 0.038
 
 =head1 OVERVIEW
 

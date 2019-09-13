@@ -1,3 +1,15 @@
+0.010   2019-09-12  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Didn't pass digest_args argument from digest_files() to
+          digest_file().
+
+
+0.009   2019-09-12  Released-By: PERLANCAR; Urgency: medium
+
+	- Allow using digest algorithm from all Digest::* modules by specifying
+          'algorithm' to 'Digest' and fill in 'digest_args'.
+
+
 0.008   2019-08-21  Released-By: PERLANCAR; Urgency: medium
 
 	- Support reading from STDIN (requested by Chris White).

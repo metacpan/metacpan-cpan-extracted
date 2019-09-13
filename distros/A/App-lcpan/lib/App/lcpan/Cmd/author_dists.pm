@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::author_dists;
 
-our $DATE = '2019-07-23'; # DATE
-our $VERSION = '1.037'; # VERSION
+our $DATE = '2019-08-01'; # DATE
+our $VERSION = '1.038'; # VERSION
 
 use 5.010;
 use strict;
@@ -42,7 +42,7 @@ App::lcpan::Cmd::author_dists - List distributions of an author
 
 =head1 VERSION
 
-This document describes version 1.037 of App::lcpan::Cmd::author_dists (from Perl distribution App-lcpan), released on 2019-07-23.
+This document describes version 1.038 of App::lcpan::Cmd::author_dists (from Perl distribution App-lcpan), released on 2019-08-01.
 
 =head1 FUNCTIONS
 

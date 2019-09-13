@@ -16,11 +16,11 @@ sub create_from_request {
   $create ||= {};
 
   $create = { %$create,
-    client_ip          => $request->address,
-    uri                => $request->uri,
-    method             => $request->method,
-    user_agent         => $request->header('User-Agent'),
-    referer            => $request->header('Referer'),
+    client_ip          => scalar $request->address,
+    uri                => scalar $request->uri,
+    method             => scalar $request->method,
+    user_agent         => scalar $request->header('User-Agent'),
+    referer            => scalar $request->header('Referer'),
     
     # Not sure if this is worth it or not:
     #serialized_request => do { try{
@@ -29,9 +29,9 @@ sub create_from_request {
     #  YAML::XS::Dump($x)
     #}}
     
-  } if($request);
+  } if ($request);
   
-  $request->{ts} ||= Rapi::Blog::Util->now_ts;
+  $create->{ts} ||= Rapi::Blog::Util->now_ts;
   
   $self->create( $create )
 }

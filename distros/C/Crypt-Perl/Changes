@@ -1,5 +1,9 @@
 Revision history for Perl module Crypt::Perl
 
+0.30 Wed Sep 11 2019
+- Fix ECDSA OpenSSL private key verification in tests.
+- Fix ECDSA & ed25519 private key test skip logic.
+
 0.29 Fri Aug 24 2018
 - Fix LICENSE file
 

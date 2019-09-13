@@ -1,0 +1,75 @@
+[%- DEFAULT 
+  title = 'Rapi::Blog'
+  rapidapp_footer_stamp = 0
+  foundation_columns_class = 'seven'
+  no_login_logo_header = 0
+-%]
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>[% title %]</title>
+
+  <!-- Foundation framework -->
+  <link rel="stylesheet" href="[% mount_url %]/assets/rapidapp/misc/static/login/foundation/stylesheets/foundation.css">
+  <link rel="stylesheet" href="[% mount_url %]/assets/rapidapp/misc/static/login/css/style.css">
+</head>
+
+<body class="ptrn_a grdnt_a">
+
+  [% IF ! no_login_logo_header %]
+  <div style="padding-top:60px;"></div>
+  [% END %]
+  <div class="container">
+    <div class="row">
+      <div class="[% foundation_columns_class %] columns centered" style="position:relative;padding-top:0px;">
+        <div class="login_box" >
+          
+          [% IF ! no_login_logo_header %]
+
+          <div class="login_logo" style="top:-115px;">
+            [% IF login_logo_url %]
+              <img src="[% mount_url %][% login_logo_url %]" alt="" />
+            [% END %]
+          </div>
+          [% END %]
+          
+          <div class="lb_content">
+
+
+
+<!-- BEGIN WRAPPER CONTENT -->
+[% content %]
+<!-- END WRAPPER CONTENT -->
+
+
+
+          </div> 
+        </div>
+
+        [% IF rapidapp_footer_stamp %]
+        <div style="position: absolute; bottom: 0px; width:100%;">
+          <div style="text-align:center;padding-bottom:5px;height:100%;">
+            <a target="_blank" href="http://www.rapidapp.info/">
+              <img 
+                width="165" height="25" border="0" 
+                src="[% mount_url %]/assets/rapidapp/misc/static/images/rapidapp_powered_logo_small.png"
+              >
+            </a>
+          </div> 
+        </div>
+        
+        <div style="position: absolute; bottom: -18px; width:100%;">
+          <div class="right" style="float:right;padding-right:15px;font-size:.7em;color:#666666;">
+            <span>[% ver_string %]</span>
+          </div>
+        </div>
+        [% END %]
+        
+      </div>
+    </div>
+  </div>
+  
+</body>
+</html>

@@ -22,18 +22,17 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222638;
+our $VERSION = 1.20190912215423;
 
 my $formatters = [
                 {
                   'format' => '$1 $2 $3 $4',
-                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})',
-                  'leading_digits' => '[25-7]'
+                  'leading_digits' => '[025-7]',
+                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})'
                 }
               ];
 
 my $validators = {
-                'voip' => '',
                 'fixed_line' => '
           2(?:
             0(?:
@@ -76,43 +75,45 @@ my $validators = {
             )
           )\\d{4}
         ',
-                'specialrate' => '',
-                'personal_number' => '',
-                'toll_free' => '',
                 'mobile' => '
           (?:
+            0[17]|
             5[124-8]|
             [67]\\d
           )\\d{6}
         ',
-                'pager' => ''
+                'pager' => '',
+                'personal_number' => '',
+                'specialrate' => '',
+                'toll_free' => '',
+                'voip' => ''
               };
-my %areanames = (
-  226204 => "Kaya",
-  2262052 => "Dédougou",
-  2262053 => "Boromo\/Djibasso\/Nouna",
-  2262090 => "Gaoua",
-  2262091 => "Banfora",
-  2262096 => "Orodara",
-  2262097 => "Bobo\-Dioulasso",
-  2262098 => "Bobo\-Dioulasso",
-  2262099 => "Béréba\/Fo\/Houndé",
-  2262445 => "Kaya",
-  2262446 => "Falagountou\/Dori",
-  2262449 => "Falagountou\/Dori",
-  2262454 => "Yako",
-  2262455 => "Ouahigouya",
-  2262456 => "Djibo",
-  2262470 => "Pouytenga\/Koupéla",
-  2262471 => "Tenkodogo",
-  2262477 => "Fada\/Diabo",
-  2262479 => "Kantchari",
-  226253 => "Ouagadougou",
-  226254 => "Ouagadougou",
-  2262540 => "Pô\/Kombissiri\/Koubri",
-  2262541 => "Léo\/Sapouy",
-  2262544 => "Koudougou",
-);
+my %areanames = ();
+$areanames{en}->{226204} = "Kaya";
+$areanames{en}->{2262052} = "Dédougou";
+$areanames{en}->{2262053} = "Boromo\/Djibasso\/Nouna";
+$areanames{en}->{2262090} = "Gaoua";
+$areanames{en}->{2262091} = "Banfora";
+$areanames{en}->{2262096} = "Orodara";
+$areanames{en}->{2262097} = "Bobo\-Dioulasso";
+$areanames{en}->{2262098} = "Bobo\-Dioulasso";
+$areanames{en}->{2262099} = "Béréba\/Fo\/Houndé";
+$areanames{en}->{2262445} = "Kaya";
+$areanames{en}->{2262446} = "Falagountou\/Dori";
+$areanames{en}->{2262449} = "Falagountou\/Dori";
+$areanames{en}->{2262454} = "Yako";
+$areanames{en}->{2262455} = "Ouahigouya";
+$areanames{en}->{2262456} = "Djibo";
+$areanames{en}->{2262470} = "Pouytenga\/Koupéla";
+$areanames{en}->{2262471} = "Tenkodogo";
+$areanames{en}->{2262477} = "Fada\/Diabo";
+$areanames{en}->{2262479} = "Kantchari";
+$areanames{en}->{226253} = "Ouagadougou";
+$areanames{en}->{226254} = "Ouagadougou";
+$areanames{en}->{2262540} = "Pô\/Kombissiri\/Koubri";
+$areanames{en}->{2262541} = "Léo\/Sapouy";
+$areanames{en}->{2262544} = "Koudougou";
+
     sub new {
       my $class = shift;
       my $number = shift;

@@ -22,54 +22,54 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222641;
+our $VERSION = 1.20190912215428;
 
 my $formatters = [
                 {
-                  'intl_format' => 'NA',
                   'format' => '$1 $2',
-                  'pattern' => '(\\d{3})(\\d{3})',
-                  'leading_digits' => '[1-9]'
+                  'intl_format' => 'NA',
+                  'leading_digits' => '[1-9]',
+                  'pattern' => '(\\d{3})(\\d{3})'
                 },
                 {
-                  'leading_digits' => '[28]',
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
                   'format' => '$1 $2 $3',
-                  'national_rule' => '0$1'
+                  'leading_digits' => '[28]',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
                 },
                 {
+                  'format' => '$1 $2',
                   'leading_digits' => '[79]',
-                  'pattern' => '(\\d{2})(\\d{7})',
                   'national_rule' => '0$1',
-                  'format' => '$1 $2'
+                  'pattern' => '(\\d{2})(\\d{7})'
                 }
               ];
 
 my $validators = {
-                'toll_free' => '800\\d{6}',
+                'fixed_line' => '21[1-8]\\d{6}',
+                'geographic' => '21[1-8]\\d{6}',
                 'mobile' => '
           (?:
             76|
             9[5-8]
           )\\d{7}
         ',
-                'personal_number' => '',
                 'pager' => '',
-                'voip' => '',
-                'fixed_line' => '21[1-8]\\d{6}',
-                'geographic' => '21[1-8]\\d{6}',
-                'specialrate' => ''
+                'personal_number' => '',
+                'specialrate' => '',
+                'toll_free' => '800\\d{6}',
+                'voip' => ''
               };
-my %areanames = (
-  260211 => "Lusaka\ Province",
-  260212 => "Ndola\/Copperbelt\ and\ Luapula\ Provinces",
-  260213 => "Livingstone\/Southern\ Province",
-  260214 => "Kasama\/Northern\ Province",
-  260215 => "Kabwe\/Central\ Province",
-  260216 => "Chipata\/Eastern\ Province",
-  260217 => "Solwezi\/Western\ Province",
-  260218 => "Mongu\/North\-Western\ Province",
-);
+my %areanames = ();
+$areanames{en}->{260211} = "Lusaka\ Province";
+$areanames{en}->{260212} = "Ndola\/Copperbelt\ and\ Luapula\ Provinces";
+$areanames{en}->{260213} = "Livingstone\/Southern\ Province";
+$areanames{en}->{260214} = "Kasama\/Northern\ Province";
+$areanames{en}->{260215} = "Kabwe\/Central\ Province";
+$areanames{en}->{260216} = "Chipata\/Eastern\ Province";
+$areanames{en}->{260217} = "Solwezi\/Western\ Province";
+$areanames{en}->{260218} = "Mongu\/North\-Western\ Province";
+
     sub new {
       my $class = shift;
       my $number = shift;

@@ -22,13 +22,13 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222641;
+our $VERSION = 1.20190912215428;
 
 my $formatters = [
                 {
+                  'format' => '$1 $2 $3 $4',
                   'leading_digits' => '[279]',
-                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})',
-                  'format' => '$1 $2 $3 $4'
+                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})'
                 }
               ];
 
@@ -43,8 +43,6 @@ my $validators = {
             77
           )\\d{5}
         ',
-                'voip' => '',
-                'specialrate' => '',
                 'geographic' => '
           2(?:
             2[2-7]|
@@ -55,24 +53,38 @@ my $validators = {
             77
           )\\d{5}
         ',
-                'personal_number' => '',
-                'toll_free' => '',
                 'mobile' => '
           (?:
             7[09]|
             9[0-36-9]
           )\\d{6}
         ',
-                'pager' => ''
+                'pager' => '',
+                'personal_number' => '',
+                'specialrate' => '',
+                'toll_free' => '',
+                'voip' => ''
               };
-my %areanames = (
-  22822 => "Lome",
-  22823 => "Maritime\ region",
-  22824 => "Plateaux\ region",
-  22825 => "Central\ region",
-  22826 => "Kara\ region",
-  22827 => "Savannah\ region",
-);
+my %areanames = ();
+$areanames{fr}->{22822} = "Lomé";
+$areanames{fr}->{22823} = "Région\ Maritime";
+$areanames{fr}->{22824} = "Région\ des\ Plateaux";
+$areanames{fr}->{22825} = "Région\ Centrale";
+$areanames{fr}->{22826} = "Région\ de\ la\ Kara";
+$areanames{fr}->{22827} = "Région\ des\ Savanes";
+$areanames{es}->{22822} = "Lomé";
+$areanames{es}->{22823} = "Región\ Marítima";
+$areanames{es}->{22824} = "Región\ Plateaux";
+$areanames{es}->{22825} = "Región\ Central";
+$areanames{es}->{22826} = "Región\ de\ Kara";
+$areanames{es}->{22827} = "Región\ de\ Savannah";
+$areanames{en}->{22822} = "Lome";
+$areanames{en}->{22823} = "Maritime\ region";
+$areanames{en}->{22824} = "Plateaux\ region";
+$areanames{en}->{22825} = "Central\ region";
+$areanames{en}->{22826} = "Kara\ region";
+$areanames{en}->{22827} = "Savannah\ region";
+
     sub new {
       my $class = shift;
       my $number = shift;

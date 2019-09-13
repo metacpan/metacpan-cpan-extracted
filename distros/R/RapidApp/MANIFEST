@@ -46,6 +46,7 @@ lib/RapidApp/CoreSchema/Result/User.pm
 lib/RapidApp/CoreSchema/Result/UserToRole.pm
 lib/RapidApp/CoreSchema/ResultSet/Request.pm
 lib/RapidApp/DBIC/Component/LinkedResult.pm
+lib/RapidApp/DBIC/Component/PassphraseColumn.pm
 lib/RapidApp/DBIC/Component/SchemaTableSpec.pm
 lib/RapidApp/DBIC/Component/TableSpec.pm
 lib/RapidApp/DBIC/Component/VirtualColumns.pm

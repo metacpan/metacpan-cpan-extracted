@@ -22,25 +22,17 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222640;
+our $VERSION = 1.20190912215427;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})',
                   'format' => '$1 $2 $3 $4',
-                  'leading_digits' => '[2-48]'
+                  'leading_digits' => '[2-48]',
+                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})'
                 }
               ];
 
 my $validators = {
-                'geographic' => '
-          (?:
-            25[08]|
-            35\\d|
-            45[1-7]
-          )\\d{5}
-        ',
-                'specialrate' => '',
                 'fixed_line' => '
           (?:
             25[08]|
@@ -48,26 +40,46 @@ my $validators = {
             45[1-7]
           )\\d{5}
         ',
-                'voip' => '',
-                'pager' => '',
-                'toll_free' => '800\\d{5}',
+                'geographic' => '
+          (?:
+            25[08]|
+            35\\d|
+            45[1-7]
+          )\\d{5}
+        ',
                 'mobile' => '[2-4][0-46-9]\\d{6}',
-                'personal_number' => ''
+                'pager' => '',
+                'personal_number' => '',
+                'specialrate' => '',
+                'toll_free' => '800\\d{5}',
+                'voip' => ''
               };
-my %areanames = (
-  22245 => "Nouakchott",
-  2224513 => "Néma",
-  2224515 => "Aioun",
-  2224533 => "Kaédi",
-  2224534 => "Sélibaby",
-  2224537 => "Aleg",
-  2224544 => "Zouérat",
-  2224546 => "Atar",
-  2224550 => "Boghé",
-  2224563 => "Kiffa",
-  2224569 => "Rosso\/Tidjikja",
-  2224574 => "Nouadhibou",
-);
+my %areanames = ();
+$areanames{fr}->{22245} = "Nouakchott";
+$areanames{fr}->{2224513} = "Néma";
+$areanames{fr}->{2224515} = "Aîoun";
+$areanames{fr}->{2224533} = "Kaédi";
+$areanames{fr}->{2224534} = "Sélibaby";
+$areanames{fr}->{2224537} = "Aleg";
+$areanames{fr}->{2224544} = "Zouérat";
+$areanames{fr}->{2224546} = "Atar";
+$areanames{fr}->{2224550} = "Boghé";
+$areanames{fr}->{2224563} = "Kiffa";
+$areanames{fr}->{2224569} = "Rosso\/Tidjikja";
+$areanames{fr}->{2224574} = "Nouadhibou";
+$areanames{en}->{22245} = "Nouakchott";
+$areanames{en}->{2224513} = "Néma";
+$areanames{en}->{2224515} = "Aioun";
+$areanames{en}->{2224533} = "Kaédi";
+$areanames{en}->{2224534} = "Sélibaby";
+$areanames{en}->{2224537} = "Aleg";
+$areanames{en}->{2224544} = "Zouérat";
+$areanames{en}->{2224546} = "Atar";
+$areanames{en}->{2224550} = "Boghé";
+$areanames{en}->{2224563} = "Kiffa";
+$areanames{en}->{2224569} = "Rosso\/Tidjikja";
+$areanames{en}->{2224574} = "Nouadhibou";
+
     sub new {
       my $class = shift;
       my $number = shift;

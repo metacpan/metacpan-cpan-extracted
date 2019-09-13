@@ -1,9 +1,9 @@
-use 5.006;
+use 5.008;
 
 use strict;
 use warnings;
 
-use Test::More tests => 12;
+use Test::More;
 
 BEGIN {
     use_ok('DBD::Mock');
@@ -71,3 +71,4 @@ $sth->execute();
                'bind_col implementation does not break selectall_* methods' );
 }
 
+done_testing();

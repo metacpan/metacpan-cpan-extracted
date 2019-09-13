@@ -1,9 +1,10 @@
-use 5.006;
+use 5.008;
 
 use strict;
 use warnings;
+
+use Test::More;
 use Test::Exception;
-use Test::More tests => 6;
 
 BEGIN {
     use_ok('DBD::Mock');
@@ -44,3 +45,5 @@ lives_ok(
 ok( exists $row{'person.person_name'},    'First column' );
 ok( exists $row{'person.person_country'}, 'Second column' );
 ok( exists $row{'person.person_id'},      'Third column' );
+
+done_testing();

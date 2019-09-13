@@ -22,57 +22,39 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190611222640;
+our $VERSION = 1.20190912215426;
 
 my $formatters = [
                 {
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '
             [2356]|
             87
           ',
-                  'pattern' => '(\\d)(\\d{3})(\\d{4})',
-                  'format' => '$1 $2 $3',
-                  'national_rule' => '(0$1)'
+                  'national_rule' => '(0$1)',
+                  'pattern' => '(\\d)(\\d{3})(\\d{4})'
                 },
                 {
-                  'pattern' => '(\\d{3})(\\d{5,6})',
                   'format' => '$1 $2',
+                  'leading_digits' => '[89]',
                   'national_rule' => '0$1',
-                  'leading_digits' => '[89]'
+                  'pattern' => '(\\d{3})(\\d{5,6})'
                 },
                 {
+                  'format' => '$1 $2',
                   'leading_digits' => '70',
-                  'pattern' => '(\\d{2})(\\d{7})',
                   'national_rule' => '0$1',
-                  'format' => '$1 $2'
+                  'pattern' => '(\\d{2})(\\d{7})'
                 },
                 {
-                  'national_rule' => '0$1',
                   'format' => '$1 $2 $3',
-                  'pattern' => '(\\d)(\\d{4})(\\d{4})',
-                  'leading_digits' => '7'
+                  'leading_digits' => '7',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d)(\\d{4})(\\d{4})'
                 }
               ];
 
 my $validators = {
-                'toll_free' => '80\\d{6}',
-                'mobile' => '
-          7(?:
-            55[0-49]|
-            (?:
-              7[025-9]|
-              [89][0-25-9]
-            )\\d
-          )\\d{5}
-        ',
-                'personal_number' => '70\\d{7}',
-                'pager' => '
-          74(?:
-            66|
-            77
-          )\\d{5}
-        ',
-                'voip' => '',
                 'fixed_line' => '
           (?:
             2(?:
@@ -227,28 +209,46 @@ my $validators = {
             )
           )\\d{4}
         ',
+                'mobile' => '
+          7(?:
+            55[0-49]|
+            (?:
+              7[025-9]|
+              [89][0-25-9]
+            )\\d
+          )\\d{5}
+        ',
+                'pager' => '
+          74(?:
+            66|
+            77
+          )\\d{5}
+        ',
+                'personal_number' => '70\\d{7}',
                 'specialrate' => '(85\\d{6})|(900\\d{5})|(
           8(?:
             10|
             8\\d
           )\\d{5}
-        )'
+        )',
+                'toll_free' => '80\\d{6}',
+                'voip' => ''
               };
-my %areanames = (
-  962266 => "Mafraq",
-  962267 => "Jarash",
-  962268 => "Ajloun",
-  962269 => "Irbid",
-  9623222 => "Tafileh",
-  962324 => "Aqaba",
-  962325 => "Maan",
-  9623260 => "Tafileh",
-  962327 => "Karak",
-  962530 => "Zarqa",
-  962531 => "Madaba",
-  962533 => "Balqa",
-  9626 => "Amman",
-);
+my %areanames = ();
+$areanames{en}->{962266} = "Mafraq";
+$areanames{en}->{962267} = "Jarash";
+$areanames{en}->{962268} = "Ajloun";
+$areanames{en}->{962269} = "Irbid";
+$areanames{en}->{9623222} = "Tafileh";
+$areanames{en}->{962324} = "Aqaba";
+$areanames{en}->{962325} = "Maan";
+$areanames{en}->{9623260} = "Tafileh";
+$areanames{en}->{962327} = "Karak";
+$areanames{en}->{962530} = "Zarqa";
+$areanames{en}->{962531} = "Madaba";
+$areanames{en}->{962533} = "Balqa";
+$areanames{en}->{9626} = "Amman";
+
     sub new {
       my $class = shift;
       my $number = shift;

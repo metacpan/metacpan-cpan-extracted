@@ -1,6 +1,9 @@
-use strict;
+use 5.008;
 
-use Test::More tests => 25;
+use strict;
+use warnings;
+
+use Test::More;
 
 BEGIN {
     use_ok('DBD::Mock');  
@@ -161,3 +164,4 @@ $dbh->{mock_add_resultset} = {
 }
 
 
+done_testing();
