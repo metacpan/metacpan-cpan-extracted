@@ -13,10 +13,14 @@ use constant CONN_TIMEOUT => $ENV{MIKROTIK_CLIENT_CONNTIMEOUT};
 use constant DEBUG        => $ENV{MIKROTIK_CLIENT_DEBUG} || 0;
 use constant PROMISES     => !!(eval { require Promises; 1 });
 
-our $VERSION = "v0.501";
+our $VERSION = "v0.520";
 
+has ca   => sub { $ENV{MIKROTIK_CLIENT_CA} };
+has cert => sub { $ENV{MIKROTIK_CLIENT_CERT} };
 has error     => '';
 has host      => '192.168.88.1';
+has insecure  => 0;
+has key       => sub { $ENV{MIKROTIK_CLIENT_KEY} };
 has new_login => sub { $_[0]->tls || 0 };
 has password  => '';
 has port      => 0;
@@ -86,14 +90,14 @@ sub _cleanup {
 sub _close {
     my ($self, $err) = @_;
     $self->_fail_all($err || 'closed prematurely');
-    delete @{$self}{qw(handle response)};
+    delete @{$self}{qw(handle response requests)};
 }
 
 sub _command {
     my ($self, $cmd, $attr, $query, $cb) = @_;
 
     my $tag = ++$self->{_tag};
-    my $r   = $self->{requests}{$tag} = {tag => $tag, cb => $cb};
+    my $r = $self->{requests}{$tag} = {tag => $tag, cb => $cb};
     $r->{subscription} = delete $attr->{'.subscription'};
 
     warn "-- got request for command '$cmd' (tag: $tag)\n" if DEBUG;
@@ -109,15 +113,19 @@ sub _connect {
 
     my $queue = $self->{queue} = [$r];
 
-    my $tls  = $self->tls;
+    my $tls = $self->tls;
     my $port = $self->port ? $self->{port} : $tls ? 8729 : 8728;
+
+    my $tls_opts = {verify => !$self->insecure, cipher_list => "HIGH"};
+    $self->{$_} && ($tls_opts->{$_ . "_file"} = $self->{$_})
+        for qw(ca cert key);
 
     weaken $self;
     $self->{handle} = AnyEvent::Handle->new(
         connect => [$self->host, $port],
         timeout => 60,
 
-        $tls ? (tls => "connect", tls_ctx => {cipher_list => "HIGH"}) : (),
+        $tls ? (tls => "connect", tls_ctx => $tls_opts) : (),
 
         on_connect => sub {
             warn "-- connection established\n" if DEBUG;
@@ -153,7 +161,8 @@ sub _enqueue {
 }
 
 sub _fail_all {
-    $_[0]->_fail($_, $_[1]) for values %{$_[0]->{requests}};
+    my @requests = values %{$_[0]->{requests}};
+    $_[0]->_fail($_, $_[1]) for @requests;
 }
 
 sub _finish {
@@ -197,7 +206,7 @@ sub _read {
         if DEBUG;
 
     my $response = $self->{response} ||= MikroTik::Client::Response->new();
-    my $data     = $response->parse($buf);
+    my $data = $response->parse($buf);
 
     for (@$data) {
         next unless my $r = $self->{requests}{delete $_->{'.tag'}};
@@ -316,12 +325,29 @@ MikroTik::Client - Non-blocking interface to MikroTik API
 =head1 DESCRIPTION
 
 Both blocking and non-blocking (don't mix them though) interface to a MikroTik
-API service. With queries, command subscriptions and optional Promises. Starting
-from C<v0.5> this module is an L<AnyEvent> user.
+API service. With queries, command subscriptions and optional Promises.
 
 =head1 ATTRIBUTES
 
 L<MikroTik::Client> implements the following attributes.
+
+=head2 ca
+
+    my $ca = $api->ca;
+    $api->ca("/etc/ssl/certs/ca-bundle.crt")
+
+Path to TLS certificate authority file used to verify the peer certificate,
+defaults to the value of the C<MIKROTIK_CLIENT_CA> environment variable.
+
+=head2 cert
+
+    my $cert = $api->cert;
+    $api->cert("./client.crt")
+
+Path to TLS certificate file used to authenticate against the peer. Can be bundled
+with a private key and additional signing certificates. If file contains the private key,
+L<key> attribute is optional. Defaults to the value of the C<MIKROTIK_CLIENT_CERT>
+environment variable.
 
 =head2 error
 
@@ -336,6 +362,22 @@ Keeps an error from last L</command> call. Empty string on successful commands.
 
 Host name or IP address to connect to. Defaults to C<192.168.88.1>.
 
+=head2 insecure
+
+  my $insecure = $api->insecure;
+  $api->insecure(1);
+
+Do not verify TLS certificates I<(highly discouraged)>. Connection will be encrypted,
+but a peer certificate won't be validated. Disabled by default.
+
+=head2 key
+
+    my $key = $api->key;
+    $api->key("./client.crt")
+
+Path to TLS key file. Optional if a private key bundled with a L<cert> file. Defaults to
+the value of the C<MIKROTIK_CLIENT_KEY> environment variable.
+
 =head2 new_login
 
   my $new_login = $api->new_login;
@@ -343,7 +385,7 @@ Host name or IP address to connect to. Defaults to C<192.168.88.1>.
 
 Use new login scheme introduced in RouterOS C<v6.43> and fallback to previous
 one for older systems. Since in this mode a password will be send in clear text,
-for some time, it will be default only for L</tls> connections.
+it will be default only for L</tls> connections.
 
 =head2 password
 

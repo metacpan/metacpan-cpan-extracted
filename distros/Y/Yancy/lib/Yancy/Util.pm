@@ -1,5 +1,5 @@
 package Yancy::Util;
-our $VERSION = '1.039';
+our $VERSION = '1.040';
 # ABSTRACT: Utilities for Yancy
 
 #pod =head1 SYNOPSIS
@@ -282,8 +282,8 @@ sub match {
                 my $expect = $match->{ $key }{ '!=' };
                 $test{ $key } = sub {
                     my ( $got, $key ) = @_;
-                    if ( !defined $expect ) {
-                        return defined $got;
+                    if ( !defined $expect || !defined $got) {
+                        return defined $got != defined $expect;
                     }
                     return $got ne $expect;
                 };
@@ -447,7 +447,7 @@ Yancy::Util - Utilities for Yancy
 
 =head1 VERSION
 
-version 1.039
+version 1.040
 
 =head1 SYNOPSIS
 

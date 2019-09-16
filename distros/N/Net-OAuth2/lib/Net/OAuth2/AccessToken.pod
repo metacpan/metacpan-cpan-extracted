@@ -128,7 +128,7 @@ example:
 
   my $auth    = Net::OAuth2::Profile::WebServer->new(...);
   my $token   = $auth->get_access_token(...);
-  my $session = $token->freeze_session;
+  my $session = $token->session_freeze;
   # now save $session in database or file
   ...
   # restore session
@@ -272,12 +272,12 @@ these method will add the token to the HTTP messages sent.
 
 =head1 SEE ALSO
 
-This module is part of Net-OAuth2 distribution version 0.64,
-built on March 21, 2018. Website: F<http://perl.overmeer.net/CPAN/>.
+This module is part of Net-OAuth2 distribution version 0.65,
+built on September 16, 2019. Website: F<http://perl.overmeer.net/CPAN/>.
 
 =head1 COPYRIGHTS
 
-Copyrights 2013-2018-2018 on the perl code and the related documentation
+Copyrights 2013-2019-2018 on the perl code and the related documentation
  by [Mark Overmeer <markov@cpan.org>] for SURFnet bv, The Netherlands.  For other contributors see ChangeLog.
 
 Copyrights 2011-12 by Keith Grennan.

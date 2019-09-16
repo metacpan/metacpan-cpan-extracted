@@ -1,8 +1,11 @@
 package XS::Loader;
 use strict;
 use warnings;
+use Config();
 use DynaLoader;
 use XS::Install::Payload;
+
+our $UNIQUE_LIBNAME = ($^O eq 'MSWin32');
 
 sub load {
     shift if $_[0] && $_[0] eq __PACKAGE__;
@@ -41,6 +44,8 @@ EOF
         }
     }}
     
+    local *DynaLoader::mod2fname = \&mod2fname_unique if $UNIQUE_LIBNAME;
+    
     my $ok = eval {
         DynaLoader::bootstrap_inherit($module, $version);
         1;        
@@ -57,5 +62,29 @@ EOF
 sub load_noboot { load($_[0], $_[1], $_[2], 1) }
 
 *bootstrap = *load;
+
+############## taken from DynaLoader_pm.PL, needed on Windows #####################
+sub mod2fname_unique {
+    my $parts = shift;
+    my $so_len = length($Config::Config{dlext}) + 1;
+    my $name_max = 255; # No easy way to get this here
+
+    my $libname = "PL_".join("__", @$parts);
+
+    return $libname if (length($libname)+$so_len) <= $name_max;
+
+    # It's too darned big, so we need to go strip. We use the same
+    # algorithm as xsubpp does. First, strip out doubled __
+    $libname =~ s/__/_/g;
+    return $libname if (length($libname)+$so_len) <= $name_max;
+
+    # Strip duplicate letters
+    1 while $libname =~ s/(.)\1/\U$1/i;
+    return $libname if (length($libname)+$so_len) <= $name_max;
+
+    # Still too long. Truncate.
+    $libname = substr($libname, 0, $name_max - $so_len);
+    return $libname;
+}
 
 1;

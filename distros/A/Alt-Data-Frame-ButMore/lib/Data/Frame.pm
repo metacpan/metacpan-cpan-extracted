@@ -18,7 +18,9 @@ use failures qw{
 use Hash::Ordered;
 use PDL::Basic qw(sequence);
 use PDL::Core qw(pdl null);
-use List::AllUtils qw(each_arrayref pairgrep pairkeys pairmap pairwise);
+use List::AllUtils qw(
+  each_arrayref pairgrep pairkeys pairmap pairwise reduce
+);
 use List::MoreUtils 0.423;
 use PDL::Primitive ();
 use PDL::Factor    ();
@@ -30,7 +32,9 @@ use Sereal::Decoder 4.005;
 use Sereal::Encoder 4.005;
 use Text::Table::Tiny;
 use Type::Params;
-use Types::Standard qw(Any ArrayRef CodeRef CycleTuple HashRef Maybe Str);
+use Types::Standard qw(
+  Any ArrayRef CodeRef Enum CycleTuple HashRef Maybe Str
+);
 use Types::PDL qw(Piddle Piddle1D);
 
 use Data::Frame::Column::Helper;
@@ -922,6 +926,27 @@ sub _is_numeric_column {
     return !is_discrete($piddle);
 }
 
+
+method drop_bad (:$how='any') {
+    state $check = Type::Params::compile( Enum [qw(all any)] );
+    ($how) = $check->($how);
+
+    my $f = sub {
+        my ($op) = @_;
+        return reduce {
+            my $col = $self->column($b);
+            $col->badflag ? $op->( $a, $col->isbad ) : $a;
+        } PDL::Core::zeros( $self->nrow ), $self->names->flatten;
+    };
+
+    my $isbad =
+        $how eq 'any'
+      ? $f->( sub { $_[0] | $_[1] } )
+      : $f->( sub { $_[0] & $_[1] } );
+    return $self->select_rows( PDL::Primitive::which( !$isbad ) );
+}
+
+
 method _compare ($other, $mode) {
     my $class = ref($self);
 
@@ -1067,7 +1092,7 @@ Data::Frame - data frame implementation
 
 =head1 VERSION
 
-version 0.0051
+version 0.0053
 
 =head1 STATUS
 
@@ -1623,6 +1648,12 @@ This method is internally used by the C<.=> operation, below are same,
 =head2 is_numeric_column
 
     is_numeric_column($column_name_or_idx)
+
+=head2 drop_bad
+
+    drop_bad(:$how='any')
+
+Returns a new data frame with rows with BAD values dropped.
 
 =head1 MISCELLANEOUS FEATURES
 

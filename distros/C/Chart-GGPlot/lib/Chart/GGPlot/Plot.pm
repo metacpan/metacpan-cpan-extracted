@@ -5,7 +5,7 @@ package Chart::GGPlot::Plot;
 use Chart::GGPlot::Class;
 use namespace::autoclean;
 
-our $VERSION = '0.0005'; # VERSION
+our $VERSION = '0.0007'; # VERSION
 
 use Autoload::AUTOCAN;
 use Data::Frame::Types qw(DataFrame);
@@ -174,7 +174,7 @@ method summary () {
     if ( $self->data ) {
         $s .=
             &$label("data:")
-          . $self->data->names->join(", ")
+          . join(", ", @{$self->data->names})
           . sprintf( " [%sx%s] ", $self->data->nrow, $self->data->ncol ) . "\n";
     }
     if ( $self->mapping->length > 0 ) {
@@ -182,7 +182,7 @@ method summary () {
     }
     if ( $self->scales->length() > 0 ) {
         $s .=
-          &$label("scales:") . $self->scales->input()->join(", ") . "\n";
+          &$label("scales:") . join( ", ", @{ $self->scales->input } ) . "\n";
     }
     $s .= &$label("faceting: ") . $self->facet . "\n";
     $s .= "-----------------------------------";
@@ -277,7 +277,7 @@ Chart::GGPlot::Plot - ggplot class
 
 =head1 VERSION
 
-version 0.0005
+version 0.0007
 
 =head1 DESCRIPTION
 

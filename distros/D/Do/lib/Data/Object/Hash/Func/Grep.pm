@@ -9,19 +9,19 @@ use Data::Object 'Class';
 
 extends 'Data::Object::Hash::Func';
 
-our $VERSION = '1.70'; # VERSION
+our $VERSION = '1.76'; # VERSION
 
 # BUILD
 
 has arg1 => (
   is => 'ro',
-  isa => 'Object',
+  isa => 'HashLike',
   req => 1
 );
 
 has arg2 => (
   is => 'ro',
-  isa => 'CodeRef',
+  isa => 'CodeLike',
   req => 1
 );
 
@@ -118,9 +118,9 @@ The attribute is read-only, accepts C<(Object)> values, and is optional.
 
 =head2 arg2
 
-  arg2(CodeRef)
+  arg2(CodeLike)
 
-The attribute is read-only, accepts C<(CodeRef)> values, and is optional.
+The attribute is read-only, accepts C<(CodeLike)> values, and is optional.
 
 =cut
 
@@ -179,9 +179,11 @@ Returns the ordered list of named function object arguments.
 
 =head1 CREDITS
 
-Al Newkirk, C<+287>
+Al Newkirk, C<+296>
 
 Anthony Brummett, C<+10>
+
+José Joaquín Atria, C<+1>
 
 =cut
 

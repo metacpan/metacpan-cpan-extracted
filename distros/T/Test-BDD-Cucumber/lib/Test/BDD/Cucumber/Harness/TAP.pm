@@ -1,12 +1,12 @@
 package Test::BDD::Cucumber::Harness::TAP;
-$Test::BDD::Cucumber::Harness::TAP::VERSION = '0.62';
+$Test::BDD::Cucumber::Harness::TAP::VERSION = '0.64';
 =head1 NAME
 
 Test::BDD::Cucumber::Harness::TAP - Generate results in TAP format
 
 =head1 VERSION
 
-version 0.62
+version 0.64
 
 =head1 DESCRIPTION
 

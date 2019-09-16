@@ -9,7 +9,7 @@ use Moo::Role;
 
 use Carp ();
 
-our $VERSION = '1.70'; # VERSION
+our $VERSION = '1.76'; # VERSION
 
 # BUILD
 
@@ -94,7 +94,7 @@ This package implements the following methods.
 
 =head2 autoload
 
-  AUTOLOAD(Str $arg1, Str $arg2, Any @args) : Any
+  AUTOLOAD(Str $arg1, Str $arg2, Object $self, Any @args) : Any
 
 The AUTOLOAD method is called when the object doesn't have the method being
 called. This method is called and handled automatically.
@@ -103,7 +103,7 @@ called. This method is called and handled automatically.
 
 =item AUTOLOAD example
 
-  $self->AUTOLOAD($class, $method, @args);
+  AUTOLOAD($class, $method, $self, @args);
 
 =back
 
@@ -128,9 +128,11 @@ called and handled automatically.
 
 =head1 CREDITS
 
-Al Newkirk, C<+287>
+Al Newkirk, C<+296>
 
 Anthony Brummett, C<+10>
+
+José Joaquín Atria, C<+1>
 
 =cut
 

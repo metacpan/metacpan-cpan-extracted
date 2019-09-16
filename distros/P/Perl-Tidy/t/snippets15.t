@@ -10,6 +10,11 @@
 #7 break_old_methods.def
 #8 bom1.bom
 #9 bom1.def
+#10 align28.def
+#11 align29.def
+#12 align30.def
+#13 git09.def
+#14 git09.git09
 
 # To locate test #13 you can search for its name or the string '#13'
 
@@ -30,6 +35,7 @@ BEGIN {
         'bom'               => "-bom -wn",
         'break_old_methods' => "--break-at-old-method-breakpoints",
         'def'               => "",
+        'git09'             => "-ce -cbl=map,sort,grep",
         'gnu'               => "-gnu",
         'olbs0'             => "-olbs=0",
         'olbs2'             => "-olbs=2",
@@ -39,6 +45,40 @@ BEGIN {
     # BEGIN SECTION 2: Sources #
     ############################
     $rsources = {
+
+        'align28' => <<'----------',
+# tests for 'delete_needless_parens'
+# align all '='s; but do not align parens
+my $w = $columns * $cell_w + ( $columns + 1 ) * $border;
+my $h = $rows * $cell_h + ( $rows + 1 ) * $border;
+my $img = new Gimp::Image( $w, $h, RGB );
+
+# keep leading paren after if as alignment for padding
+eval {
+    if   ( $a->{'abc'} eq 'ABC' ) { no_op(23) }
+    else                          { no_op(42) }
+};
+----------
+
+        'align29' => <<'----------',
+# alignment with lots of commas
+is( floor(1.23441242), 1, "Basic floor(1.23441242) test" );
+is( fmod( 3.5, 2.0 ), 1.5, "Basic fmod(3.5, 2.0) test" );
+is( join( " ", frexp(1) ), "0.5 1", "Basic frexp(1) test" );
+is( ldexp( 0, 1 ), 0, "Basic ldexp(0,1) test" );
+is( log10(1),  0, "Basic log10(1) test" );
+----------
+
+        'align30' => <<'----------',
+# commas on lhs align, commas on rhs do not (different subs)
+($x,$y,$z)=spherical_to_cartesian($rho,$theta,$phi);
+($rho_c,$theta,$z)=spherical_to_cylindrical($rho_s,$theta,$phi);
+( $r2, $theta2, $z2 )=cartesian_to_cylindrical( $x1, $y1, $z1 );
+
+# two-line if/elsif gets aligned 
+if($i==$depth){$_++;}
+elsif($i>$depth){$_=0;}
+----------
 
         'bom1' => <<'----------',
 # keep cuddled call chain with -bom
@@ -62,6 +102,17 @@ my $q = $rs
       'track.id' => { -ident => 'none_search.id' },
    })
    ->as_query;
+----------
+
+        'git09' => <<'----------',
+# no one-line block for first map with -ce -cbl=map,sort,grep
+@sorted = map {
+    $_->[0]
+} sort {
+    $a->[1] <=> $b->[1] or $a->[0] cmp $b->[0] 
+} map {
+    [$_, length($_)]
+} @unsorted;
 ----------
 
         'gnu5' => <<'----------',
@@ -248,6 +299,79 @@ return Mojo::Promise->resolve($query_params)->then(&_reveal_event)->then(
     }
 );
 #9...........
+        },
+
+        'align28.def' => {
+            source => "align28",
+            params => "def",
+            expect => <<'#10...........',
+# tests for 'delete_needless_parens'
+# align all '='s; but do not align parens
+my $w   = $columns * $cell_w + ( $columns + 1 ) * $border;
+my $h   = $rows * $cell_h + ( $rows + 1 ) * $border;
+my $img = new Gimp::Image( $w, $h, RGB );
+
+# keep leading paren after if as alignment for padding
+eval {
+    if   ( $a->{'abc'} eq 'ABC' ) { no_op(23) }
+    else                          { no_op(42) }
+};
+#10...........
+        },
+
+        'align29.def' => {
+            source => "align29",
+            params => "def",
+            expect => <<'#11...........',
+# alignment with lots of commas
+is( floor(1.23441242),     1,       "Basic floor(1.23441242) test" );
+is( fmod( 3.5, 2.0 ),      1.5,     "Basic fmod(3.5, 2.0) test" );
+is( join( " ", frexp(1) ), "0.5 1", "Basic frexp(1) test" );
+is( ldexp( 0, 1 ),         0,       "Basic ldexp(0,1) test" );
+is( log10(1),              0,       "Basic log10(1) test" );
+#11...........
+        },
+
+        'align30.def' => {
+            source => "align30",
+            params => "def",
+            expect => <<'#12...........',
+# commas on lhs align, commas on rhs do not (different subs)
+( $x,     $y,      $z )  = spherical_to_cartesian( $rho, $theta, $phi );
+( $rho_c, $theta,  $z )  = spherical_to_cylindrical( $rho_s, $theta, $phi );
+( $r2,    $theta2, $z2 ) = cartesian_to_cylindrical( $x1, $y1, $z1 );
+
+# two-line if/elsif gets aligned
+if    ( $i == $depth ) { $_++; }
+elsif ( $i > $depth )  { $_ = 0; }
+#12...........
+        },
+
+        'git09.def' => {
+            source => "git09",
+            params => "def",
+            expect => <<'#13...........',
+# no one-line block for first map with -ce -cbl=map,sort,grep
+@sorted =
+  map  { $_->[0] }
+  sort { $a->[1] <=> $b->[1] or $a->[0] cmp $b->[0] }
+  map  { [ $_, length($_) ] } @unsorted;
+#13...........
+        },
+
+        'git09.git09' => {
+            source => "git09",
+            params => "git09",
+            expect => <<'#14...........',
+# no one-line block for first map with -ce -cbl=map,sort,grep
+@sorted = map {
+    $_->[0]
+} sort {
+    $a->[1] <=> $b->[1] or $a->[0] cmp $b->[0]
+} map {
+    [ $_, length($_) ]
+} @unsorted;
+#14...........
         },
     };
 

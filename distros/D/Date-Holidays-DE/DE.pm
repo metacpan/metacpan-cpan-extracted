@@ -14,7 +14,7 @@ require Exporter;
 
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(holidays);
-our $VERSION   = '2.02';
+our $VERSION   = '2.03';
 
 sub holidays{
 	my %parameters = (
@@ -49,6 +49,7 @@ sub holidays{
 	# 17ju  = Tag der deutschen Einheit (>= 1954, <= 1990)
 	# frie  = Augsburger Friedensfest
 	# mari  = Mariae Himmelfahrt
+	# kind  = Weltkindertag
 	# 3okt  = Tag der deutschen Einheit (>= 1990)
 	# refo  = Reformationstag
 	# alhe  = Allerheiligen
@@ -167,6 +168,9 @@ sub holidays{
 
 	# Extras for Thueringen
 	@{$holidays{'th'}} = qw(refo);
+	if ($year >= 2019) {
+		push @{$holidays{'th'}}, qw(kind);
+	}
 
 	# Fixed-date holidays
 	#
@@ -193,6 +197,9 @@ sub holidays{
 
 	# Assumption day Aug 15
 	$holiday{'mari'} = _date2timestamp($year,  8, 15);
+
+	# International Childrens Day
+	$holiday{'kind'} = _date2timestamp($year,  9, 20);
 
 	# Reunion day Jun 17 (1954-1990)
 	if (($year <= 1990) and ($year >= 1954)){
@@ -415,6 +422,7 @@ The module knows about the following holidays:
   17ju  Tag der deutschen Einheit   Reunion day (>= 1954, <= 1990)
   frie  Augsburger Friedensfest     Augsburg peace day
   mari  Mariae Himmelfahrt          Assumption day
+  kind  Weltkindertag               International Childrens Day
   3okt  Tag der deutschen Einheit   Reunion day (>= 1990)
   refo  Reformationstag             Reformation day
   alhe  Allerheiligen               All hallows day
@@ -588,8 +596,8 @@ list of holiday dates. This does currently not appear to be the case.
 B<Date::Calc> works with year, month and day numbers exclusively. Even though
 this module uses B<Date::Calc> for all calculations, it represents the calculated
 holidays as UNIX timestamps (seconds since The Epoch) to allow for more
-flexible formatting. This limits the range of years to work on to 
-the years from 1972 to 2037. 
+flexible formatting. On Perl versions earlier than 5.12.0 (released 2010), this 
+limits the range of years to work on to the years from 1972 to 2037. 
 
 Historic regulations for I<Buss- und Bettag> are still not implemented.
 

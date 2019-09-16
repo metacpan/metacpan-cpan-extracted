@@ -1,7 +1,7 @@
 package Bio::Palantir;
 # ABSTRACT: core classes and utilities for Bio::Palantir 
 # CONTRIBUTOR: Denis BAURAIN <denis.baurain@uliege.be>
-$Bio::Palantir::VERSION = '0.192540';
+$Bio::Palantir::VERSION = '0.192560';
 use strict; use warnings;
 
 use Bio::Palantir::Parser; use Bio::Palantir::Refiner; use
@@ -19,7 +19,7 @@ Bio::Palantir - core classes and utilities for Bio::Palantir
 
 =head1 VERSION
 
-version 0.192540
+version 0.192560
 
 =head1 SYNOPSIS
 

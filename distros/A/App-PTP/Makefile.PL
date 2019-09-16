@@ -26,7 +26,7 @@ WriteMakefile(
         'File::Find'            => 0,
         'File::Spec::Functions' => 0,
         'Getopt::Long'          => 0,
-        'List::Util'            => 0,
+        'List::Util'            => 0,  # Note: Perl 5.22 has v1.41
         'Pod::Usage'            => 0,
         'Safe'                  => 0,
         'Scalar::Util'          => 0,

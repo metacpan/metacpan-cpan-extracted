@@ -10,6 +10,7 @@ t/00_load.t
 t/01_sync.t
 t/02_async.t
 t/03_connfail.t
+t/04_flush.t
 
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

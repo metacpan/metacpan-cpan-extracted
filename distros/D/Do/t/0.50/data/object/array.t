@@ -8,11 +8,14 @@ use_ok 'Data::Object::Array';
 # ok Data::Object::Array->does('Data::Object::Rule::Collection');
 # ok Data::Object::Array->does('Data::Object::Rule::Comparison');
 # ok Data::Object::Array->does('Data::Object::Rule::Defined');
-ok Data::Object::Array->does('Data::Object::Role::Detract');
-ok Data::Object::Array->does('Data::Object::Role::Dumper');
+# deprecated
+# ok Data::Object::Array->does('Data::Object::Role::Detract');
+# deprecated
+# ok Data::Object::Array->does('Data::Object::Role::Dumper');
 # deprecated
 # ok Data::Object::Array->does('Data::Object::Rule::List');
-ok Data::Object::Array->does('Data::Object::Role::Output');
+# deprecated
+# ok Data::Object::Array->does('Data::Object::Role::Output');
 ok Data::Object::Array->does('Data::Object::Role::Throwable');
 
 # deprecated

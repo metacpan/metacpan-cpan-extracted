@@ -1,8 +1,8 @@
 
+my $VERSION = 1.22;
+
 use strict;
 use warnings;
-
-my $VERSON = 1.22;
 
 use constant DEBUG_CONTENTS => 0;
 
@@ -105,7 +105,6 @@ ISBN:
 CONTENTS:
 diag("Sending 1-page ebay query to check contents...");
 $iDebug = DEBUG_CONTENTS ? 2 : 0;
-# $iDebug = 2;
 $iDump = 0;
 $WWW::Search::Test::sSaveOnError = q{ebay-1-failed.html}; # }; # Emacs bug
 my $sQuery = 'trinidad tobago flag';
@@ -119,7 +118,7 @@ my $qrBid = qr{\b$sBidPattern};
 my @ara = (
            ['description', 'like', $qrBid, 'description contains bid amount'],
            ['description', 'like', qr{Item #\d+;}, 'description contains item #'],
-           ['url', 'like', qr(\Ahttps?://(cgi|www)\d*\.ebay\.com), # ), # Emacs bug
+           ['url', 'like', qr(\Ahttps?://(cgi|www)\d*\.ebay\.com)i, # ), # Emacs bug
             q'URL is from ebay.com'], # '], # Emacs bug
            ['title', 'ne', 'q{}', 'result Title is not empty'],
            ['change_date', 'date', 'change_date is really a date'],

@@ -1,5 +1,9 @@
 Revision history for Perl extension Task-BeLike-ZAKAME
 
+0.21 2019-09-16T04:13:08Z
+
+    - Add App::FatPacker, IO::Async::SSL, and Ryu::Async to recommends
+
 0.20 2018-10-10T03:07:12Z
 
     - Add App::cpanlistchanges and Software::License to requires

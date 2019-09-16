@@ -26,11 +26,14 @@ $r = eval {
     $mo_file1 = catfile($LOCALEDIR, "en", "LC_MESSAGES", "test-cache.mo");
     ($atime, $mtime0, $size) = (stat $mo_file0)[8,9,7];
     open $FH, $mo_file0                 or die "$mo_file0: $!";
+    binmode $FH                         or die "$mo_file0: $!";
     read $FH, $content, $size           or die "$mo_file0: $!";
     close $FH                           or die "$mo_file0: $!";
     open $FH, ">$mo_file1"              or die "$mo_file1: $!";
+    binmode $FH                         or die "$mo_file1: $!";
     print $FH $content                  or die "$mo_file1: $!";
     close $FH                           or die "$mo_file1: $!";
+    $mtime1 = (stat $mo_file1)[9];
     utime $atime, $mtime0, $mo_file1    or die "$mo_file1: $!";
     
     require T_L10N;
@@ -39,15 +42,16 @@ $r = eval {
     $_->bindtextdomain("test-cache", $LOCALEDIR);
     $_->textdomain("test-cache");
     $_[0] = $_->maketext("Hello, world!");
+    my %Lexicon = %{$_->{"Lexicon"}};
     
     # Update the file but keep the size and mtime
     open $FH, "+<$mo_file1"             or die "$mo_file1: $!";
+    binmode $FH                         or die "$mo_file1: $!";
     read $FH, $content, $size           or die "$mo_file1: $!";
     $content =~ s/Hiya/HiYa/;
     seek $FH, 0, 0                      or die "$mo_file1: $!";
     print $FH $content                  or die "$mo_file1: $!";
     close $FH                           or die "$mo_file1: $!";
-    ($mtime1, $size) = (stat $mo_file1)[9,7];
     utime $atime, $mtime0, $mo_file1    or die "$mo_file1: $!";
     $_->textdomain("test-cache");
     $_[1] = $_->maketext("Hello, world!");

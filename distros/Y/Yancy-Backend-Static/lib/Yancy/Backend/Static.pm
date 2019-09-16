@@ -1,5 +1,5 @@
 package Yancy::Backend::Static;
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 # ABSTRACT: Build a Yancy site from static Markdown files
 
 #pod =head1 SYNOPSIS
@@ -216,6 +216,7 @@ sub _id_to_path {
     else {
         $id .= '.markdown';
     }
+    return $id;
 }
 
 sub _path_to_id {
@@ -314,7 +315,7 @@ Yancy::Backend::Static - Build a Yancy site from static Markdown files
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -376,6 +377,10 @@ Doug Bell <preaction@cpan.org>
 =item *
 
 Mohammad S Anwar <mohammad.anwar@yahoo.com>
+
+=item *
+
+Wojtek Bażant <wojciech.bazant+ebi@gmail.com>
 
 =item *
 

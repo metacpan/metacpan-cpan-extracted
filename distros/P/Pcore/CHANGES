@@ -1,3 +1,9 @@
+v0.98.4 2019-09-14T09:49:55Z
+ - pcore-cdn-static-data to git
+ - script links updated to git
+ - resources updated
+ - hgignore fixed
+
 v0.98.3 2019-09-08T06:37:58Z
  - app api noauthh fix
 

@@ -14,16 +14,14 @@ use overload (
 );
 
 with qw(
-  Data::Object::Role::Detract
-  Data::Object::Role::Dumper
+  Data::Object::Role::Dumpable
   Data::Object::Role::Functable
-  Data::Object::Role::Output
   Data::Object::Role::Throwable
 );
 
 use parent 'Data::Object::Number::Base';
 
-our $VERSION = '1.70'; # VERSION
+our $VERSION = '1.76'; # VERSION
 
 # METHODS
 
@@ -69,13 +67,9 @@ L<Data::Object::Number::Base>
 
 This package integrates behaviors from:
 
-L<Data::Object::Role::Detract>
-
-L<Data::Object::Role::Dumper>
+L<Data::Object::Role::Dumpable>
 
 L<Data::Object::Role::Functable>
-
-L<Data::Object::Role::Output>
 
 L<Data::Object::Role::Throwable>
 
@@ -578,9 +572,11 @@ L<Data::Object::Array> object.
 
 =head1 CREDITS
 
-Al Newkirk, C<+287>
+Al Newkirk, C<+296>
 
 Anthony Brummett, C<+10>
+
+José Joaquín Atria, C<+1>
 
 =cut
 

@@ -547,7 +547,9 @@ sub fill_bgc_tables {
             # TODO need to generate uuid here because some genes are included in different clusters sometimes
             next GENE if grep { $_ eq $gene->uui } @done_uuis;
             
-            my $gene_uui = $ug->create_str; # For duplicated genes (t3pks in t1pks,...) TODO what to do ? duplicated ids because of overlapping clusters otherwise
+            my $gene_uui = $annotation eq 'palantir'
+                ? $gene->uui
+                : $ug->create_str; # For duplicated genes (t3pks in t1pks,...) TODO what to do ? duplicated ids because of overlapping clusters otherwise
 
             my @gene_elmts;
             if ($annotation eq 'antismash') {
@@ -563,7 +565,7 @@ sub fill_bgc_tables {
 
             else {
                 @gene_elmts = (
-                    $gene->uui, $gene->rank, $gene->name, 
+                    $gene_uui, $gene->rank, $gene->name, 
                     $gene->genomic_prot_size, 
                     (join '-', @{ $gene->genomic_prot_coordinates }), 
                     $gene->genomic_prot_begin, $gene->genomic_prot_end, 
@@ -577,12 +579,14 @@ sub fill_bgc_tables {
             DOMAIN:
             for my $domain (sort { $a->rank <=> $b->rank } $gene->all_domains) {
                 
-                my $domain_uui = $ug->create_str;
+                my $domain_uui = 'palantir'
+                    ? $domain->uui
+                    : $ug->create_str;
 
                 my $function = $domain->function;
                
-               my @domain_elmts;
-               if ($annotation eq 'antismash') {
+                my @domain_elmts;
+                if ($annotation eq 'antismash') {
                  
                     unless ($function && $ARGV_undef_recov == 0) {
                        get_function($domain->protein_sequence);
@@ -600,7 +604,7 @@ sub fill_bgc_tables {
                 else {
                 
                     @domain_elmts = (
-                        $domain->uui, $domain->rank, $domain->function,
+                        $domain_uui, $domain->rank, $domain->function,
                         $domain->symbol, $domain->chemistry, $domain->monomer, 
                         $domain->subtype, $domain->size, 
                         (join '-', @{ $domain->coordinates }),
@@ -615,7 +619,7 @@ sub fill_bgc_tables {
 
                 push @{ $table_ref->{'Domains' . $suffix} }, 
                     join "\t", @domain_elmts;
-
+                
                 push @{ $table_ref->{'Sequences'} }, join "\t", 
                     ($domain_uui, $domain->protein_sequence, $domain->size);
 
@@ -734,7 +738,7 @@ export_bgc_sql_tables.pl - Exports SQL tables of BGC data (Palantir and antiSMAS
 
 =head1 VERSION
 
-version 0.192540
+version 0.192560
 
 =head1 NAME
 

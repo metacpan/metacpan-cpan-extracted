@@ -1,8 +1,12 @@
 Revision history for Perl module HTML::Clean
 --------------------------------------------
-1.2 Tue Sep 9 13:56 MSK 2019
+1.3 Tue Sep 13 14:36 MSK 2019
 
-    - Fix pod
+    - Fix meta description
+
+1.3 Tue Sep 9 14:10 MSK 2019
+
+    - Fix pod and typo
 
 1.1 Tue Sep 9 12:30 MSK 2019
 

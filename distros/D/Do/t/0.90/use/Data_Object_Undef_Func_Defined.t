@@ -29,7 +29,7 @@ Data::Object::Undef::Func
 
 =attributes
 
-arg1(Object, req, ro)
+arg1(Any, req, ro)
 
 =libraries
 

@@ -236,6 +236,16 @@ used to throw an exception if the argument can not be validated. The C<is_Dict>
 function can be used to return true or false if the argument can not be
 validated.
 
++=head2 dumpable
+
+  # Dumpable
+
+The C<Dumpable> type constraint is provided by this library and accepts any
+object that is a consumer of the L<Data::Object::Role::Dumpable> role. The
+C<assert_Dumpable> function can be used to throw an exception if the argument
+can not be validated. The C<is_Dumpable> function can be used to return true or
+false if the argument can not be validated.
+
 +=head2 enum
 
   # Enum[qw(A B C)]
@@ -375,6 +385,16 @@ Please see that documentation for more information. The C<assert_HashRef> functi
 can be used to throw an exception if the argument can not be validated. The
 C<is_HashRef> function can be used to return true or false if the argument can not
 be validated.
+
++=head2 immutable
+
+  # Immutable
+
+The C<Immutable> type constraint is provided by this library and accepts any
+object that is a consumer of the L<Data::Object::Role::Immutable> role. The
+C<assert_Immutable> function can be used to throw an exception if the argument
+can not be validated. The C<is_Immutable> function can be used to return true or
+false if the argument can not be validated.
 
 +=head2 instanceof
 
@@ -579,6 +599,17 @@ see that documentation for more information. The C<assert_Num> function can be
 used to throw an exception if the argument can not be validated. The C<is_Num>
 function can be used to return true or false if the argument can not be
 validated.
+
++=head2 numberlike
+
+  # NumberLike
+
+The C<NumberLike> type constraint is provided by the this library and accepts
+any value that looks like a number, or object that overloads stringification
+and looks like a number stringified. Please see that documentation for more
+information. The C<assert_NumberLike> function can be used to throw an
+exception if the argument can not be validated. The C<is_NumberLike> function
+can be used to return true or false if the argument can not be validated.
 
 +=head2 numobj
 
@@ -902,6 +933,16 @@ C<assert_SpaceObject> function can be used to throw an exception if the
 argument can not be validated. The C<is_SpaceObject> function can be used to
 return true or false if the argument can not be validated.
 
++=head2 stashable
+
+  # Stashable
+
+The C<Stashable> type constraint is provided by this library and accepts any
+object that is a consumer of the L<Data::Object::Role::Stashable> role. The
+C<assert_Stashable> function can be used to throw an exception if the argument
+can not be validated. The C<is_Stashable> function can be used to return true or
+false if the argument can not be validated.
+
 +=head2 stateobj
 
   # StateObj
@@ -1031,6 +1072,16 @@ object that is, or is derived from, a L<Data::Object::Struct> object. The
 C<assert_StructObject> function can be used to throw an exception if the
 argument can not be validated. The C<is_StructObject> function can be used to
 return true or false if the argument can not be validated.
+
++=head2 throwable
+
+  # Throwable
+
+The C<Throwable> type constraint is provided by this library and accepts any
+object that is a consumer of the L<Data::Object::Role::Throwable> role. The
+C<assert_Throwable> function can be used to throw an exception if the argument
+can not be validated. The C<is_Throwable> function can be used to return true or
+false if the argument can not be validated.
 
 +=head2 tied
 

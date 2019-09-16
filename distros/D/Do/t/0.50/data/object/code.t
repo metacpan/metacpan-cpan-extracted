@@ -6,8 +6,10 @@ use_ok 'Data::Object::Code';
 
 # deprecated
 # ok Data::Object::Code->does('Data::Object::Rule::Defined');
-ok Data::Object::Code->does('Data::Object::Role::Detract');
-ok Data::Object::Code->does('Data::Object::Role::Dumper');
+# deprecated
+# ok Data::Object::Code->does('Data::Object::Role::Detract');
+# deprecated
+# ok Data::Object::Code->does('Data::Object::Role::Dumper');
 ok Data::Object::Code->does('Data::Object::Role::Throwable');
 
 # deprecated

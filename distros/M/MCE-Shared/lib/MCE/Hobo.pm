@@ -13,7 +13,7 @@ no warnings qw( threads recursion uninitialized once redefine );
 
 package MCE::Hobo;
 
-our $VERSION = '1.850';
+our $VERSION = '1.860';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
@@ -275,7 +275,10 @@ sub exit {
    }
    elsif ( $wrk_id == $$ ) {
       alarm 0; my ( $exit_status, @res ) = @_; $? = $exit_status || 0;
-      $_DATA->{$pkg}->set('R'.$wrk_id, @res ? $_freeze->(\@res) : '');
+      {
+         local $SIG{TERM} = local $SIG{QUIT} = local $SIG{INT} = sub {};
+         $_DATA->{$pkg}->set('R'.$wrk_id, @res ? $_freeze->(\@res) : '');
+      }
       die "Hobo exited ($?)\n";
       _exit($?); # not reached
    }
@@ -291,7 +294,7 @@ sub exit {
    if ($_is_MSWin32) {
       CORE::kill('KILL', $wrk_id) if CORE::kill('ZERO', $wrk_id);
    } else {
-      CORE::kill('QUIT', $wrk_id) if CORE::kill('ZERO', $wrk_id);
+      CORE::kill('INT', $wrk_id) if CORE::kill('ZERO', $wrk_id);
    }
 
    $self;
@@ -571,11 +574,33 @@ sub _dispatch {
    $ENV{PERL_MCE_IPC} = 'win32' if $_is_MSWin32;
 
    $SIG{TERM} = $SIG{SEGV} = $SIG{INT} = $SIG{HUP} = sub {
-      $_DATA->{ $_SELF->{PKG} }->set('R'.$$, ''); _trap();
+      {
+         local $SIG{$_[0]} = local $SIG{INT} = local $SIG{QUIT} = sub {};
+         $_DATA->{ $_SELF->{PKG} }->set('R'.$$, '');
+      }
+      _trap();
    };
+
    $SIG{QUIT} = sub {
-      $_DATA->{ $_SELF->{PKG} }->set('R'.$$, ''); _quit();
+      {
+         local $SIG{$_[0]} = local $SIG{INT} = sub {};
+         $_DATA->{ $_SELF->{PKG} }->set('R'.$$, '');
+      }
+      _quit();
    };
+
+   # Started.
+   my $signame; $? = 0;
+
+   {
+      local $SIG{INT}  = sub { $signame = 'INT'  },
+      local $SIG{QUIT} = sub { $signame = 'QUIT' },
+      local $SIG{TERM} = sub { $signame = 'TERM' };
+
+      $_DATA->{ $_SELF->{PKG} }->set('S'.$$, '');
+   }
+
+   CORE::kill($signame, $$) if $signame;
 
    {
       local $!;
@@ -584,8 +609,6 @@ sub _dispatch {
    }
 
    # Run task.
-   $_DATA->{ $_SELF->{PKG} }->set('S'.$$, ''), $? = 0;
-
    my $hobo_timeout = ( exists $_SELF->{hobo_timeout} )
       ? $_SELF->{hobo_timeout} : $mngd->{hobo_timeout};
 
@@ -612,14 +635,19 @@ sub _dispatch {
    alarm 0; _exit($?) if ( $@ && $@ =~ /^Hobo exited \(\S+\)$/ );
 
    if ( $@ ) {
-      my $err = $@;
-      $? = 1, $_DATA->{ $_SELF->{PKG} }->set('S'.$$, $err);
+      my $err = $@; $? = 1;
+      local $SIG{TERM} = local $SIG{QUIT} = local $SIG{INT} = sub {};
+      $_DATA->{ $_SELF->{PKG} }->set('S'.$$, $err);
+      $_DATA->{ $_SELF->{PKG} }->set('R'.$$, @res ? $_freeze->(\@res) : '');
+
       warn "Hobo $$ terminated abnormally: reason $err\n" if (
          $err ne "Hobo timed out" && !$mngd->{on_finish}
       );
    }
-
-   $_DATA->{ $_SELF->{PKG} }->set('R'.$$, @res ? $_freeze->(\@res) : '');
+   else {
+      local $SIG{TERM} = local $SIG{QUIT} = local $SIG{INT} = sub {};
+      $_DATA->{ $_SELF->{PKG} }->set('R'.$$, @res ? $_freeze->(\@res) : '');
+   }
 
    _exit($?);
 }
@@ -638,14 +666,6 @@ sub _exit {
    $SIG{__WARN__} = sub { };
 
    threads->exit($exit_status) if ( $_has_threads && $_is_MSWin32 );
-
-   if ( ! $_tid ) {
-      $SIG{HUP} = $SIG{INT} = $SIG{QUIT} = $SIG{TERM} = sub {
-         $SIG{$_[0]} = $SIG{INT} = sub { };
-         CORE::kill($_[0], getppid()) if ( $_[0] eq 'INT' && !$_is_MSWin32 );
-         CORE::kill('KILL', $$);
-      };
-   }
 
    my $posix_exit = ( exists $_SELF->{posix_exit} )
       ? $_SELF->{posix_exit} : $_MNGD->{ $_SELF->{PKG} }{posix_exit};
@@ -700,10 +720,9 @@ sub _reap_hobo {
       ? $_DATA->{ $hobo->{PKG} }->_get_hobo_data( $hobo->{WRK_ID}, 0 )
       : $_DATA->{ $hobo->{PKG} }->_get_hobo_data( $hobo->{WRK_ID}, 1 );
 
-   if ( $_[1] eq '-1' ) {
-      sleep 0.015; # retry
-      @_ = $_DATA->{ $hobo->{PKG} }->_get_hobo_data( $hobo->{WRK_ID}, 2 );
-   }
+   # retry
+   @_ = $_DATA->{ $hobo->{PKG} }->_get_hobo_data( $hobo->{WRK_ID}, 2 )
+      if ( $_[1] eq '-1' );
 
    ( $hobo->{ERROR}, $hobo->{RESULT}, $hobo->{JOINED} ) =
       ( pop || '', length $_[0] ? $_thaw->(pop) : [], 1 );
@@ -875,7 +894,7 @@ MCE::Hobo - A threads-like parallelization module
 
 =head1 VERSION
 
-This document describes MCE::Hobo version 1.850
+This document describes MCE::Hobo version 1.860
 
 =head1 SYNOPSIS
 
@@ -1119,7 +1138,7 @@ of C<$@> associated with the hobo's execution status in its C<eval> context.
 
 =item $hobo->exit()
 
-This sends C<'SIGQUIT'> to the hobo process, notifying the hobo to exit.
+This sends C<'SIGINT'> to the hobo process, notifying the hobo to exit.
 It returns the hobo object to allow for method chaining. It is important to
 join later if not immediately to not leave a zombie or defunct process.
 
@@ -1313,7 +1332,7 @@ Returns a list of all hobo pids not yet joined (available since 1.849).
 
  @pids = MCE::Hobo->list_pids();
 
- $SIG{QUIT} = $SIG{INT} = $SIG{HUP} = $SIG{TERM} = sub {
+ $SIG{INT} = $SIG{HUP} = $SIG{TERM} = sub {
      # Signal workers and the shared manager all at once
      CORE::kill('KILL', MCE::Hobo->list_pids(), MCE::Shared->pid());
      exec('reset');

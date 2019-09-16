@@ -84,4 +84,10 @@ describe 'Config::AWS in Config::INI compatibility mode' => sub {
     };
 };
 
+tests 'Undefined string in read_string' => sub {
+    is warnings { Config::AWS::read_string(undef) },
+        [ match qr/Reading config with only one line or less\. Faulty input\?/ ],
+        'Warns about faulty input';
+};
+
 done_testing;

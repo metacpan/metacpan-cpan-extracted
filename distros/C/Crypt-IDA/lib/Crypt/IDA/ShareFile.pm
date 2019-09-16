@@ -3,6 +3,7 @@ package Crypt::IDA::ShareFile;
 use 5.008008;
 use strict;
 use warnings;
+no warnings qw(redefine);
 
 use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION);
 
@@ -1645,7 +1646,7 @@ Declan Malone, E<lt>idablack@sourceforge.netE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009 by Declan Malone
+Copyright (C) 2009-2019 by Declan Malone
 
 This package is free software; you can redistribute it and/or modify
 it under the terms of version 2 (or, at your discretion, any later

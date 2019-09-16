@@ -46,7 +46,7 @@ subcommands:
         appspec new --name myprogram --class App::MyProgram App-MyProgram
 
     parameters:
-      - path=s --Path to the distribution directory (default is 'Dist-Name' in current directory)
+      - path= +dirname --Path to the distribution directory (default is 'Dist-Name' in current directory)
     options:
     - +name|n=s --The (file) name of the app
     - +class|c=s --The main class name for your app implementation

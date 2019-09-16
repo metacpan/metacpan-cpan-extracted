@@ -1,0 +1,12 @@
+.appveyor.yml
+.gitignore
+.travis.yml
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README.md
+lib/Data/FDSet.pm
+t/all.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

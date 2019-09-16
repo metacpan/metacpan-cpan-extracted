@@ -5,7 +5,7 @@ use Mu;
 use strictures 2;
 use namespace::clean;
 
-our $VERSION = '0.004000';
+our $VERSION = '0.004001';
 $VERSION =~ tr/_//d;
 
 extends 'Data::Dumper::Compact';

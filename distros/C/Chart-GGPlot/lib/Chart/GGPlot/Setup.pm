@@ -5,14 +5,15 @@ package Chart::GGPlot::Setup;
 use 5.016;
 use warnings;
 
-our $VERSION = '0.0005'; # VERSION
+our $VERSION = '0.0007'; # VERSION
 
 use utf8;
 use feature ':5.16';
 
 use Import::Into;
 
-use Alt::Data::Frame::ButMore 0.0051;
+use Alt::Data::Frame::ButMore 0.0053;
+use Data::Frame::Autobox ();
 
 use Carp;
 use Data::Dumper ();
@@ -26,22 +27,12 @@ use Syntax::Keyword::Try ();
 use Module::Load;
 use Moose 2.1400;
 use Moose::Role               ();
-use Moose::Autobox            ();
 use MooseX::Aliases           ();
 use MooseX::MungeHas          ();
 use MooseX::StrictConstructor ();
 use boolean                   ();
 
 use List::AllUtils qw(uniq);
-
-# Add additional method to Moose::Autobox roles.
-# In this way we have similar interfaces between,
-# * arrayref and piddle
-# * hashref and aes, dataframe, etc
-for my $type (qw(Hash Array)) {
-    Moose::Autobox->mixin_additional_role(
-        uc($type) => "Data::Frame::Autobox::$type" );
-}
 
 # for debug
 if (my $trace_level = $ENV{CHART_GGPLOT_TRACE} ) {
@@ -103,11 +94,7 @@ sub _import_tag {
         Syntax::Keyword::Try->import::into($target);
         boolean->import::into($target);
 
-        # TODO: See if I can help this issue
-        #  https://rt.cpan.org/Public/Bug/Display.html?id=123935
-        #PerlX::Assert->import::into($target);
-
-        Moose::Autobox->import::into($target);
+        Data::Frame::Autobox->import::into($target);
     }
     elsif ( $tag eq ':class' ) {
         $class->_import_tag( $target, ':base' );
@@ -178,7 +165,7 @@ Chart::GGPlot::Setup - Import stuffs into Chart::GGPlot classes
 
 =head1 VERSION
 
-version 0.0005
+version 0.0007
 
 =head1 SYNOPSIS
 

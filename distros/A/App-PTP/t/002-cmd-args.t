@@ -6,13 +6,21 @@ use warnings;
 use Test::More tests => 4;
 
 use App::PTP::Args;
-use App::PTP::Util;
 use List::Util qw(none all);
+
+sub uniqstr (@) {
+  my (@l) = @_;
+  for my $i (0 .. $#l - 1) {
+    undef $l[$i] if $l[$i] eq $l[$i+1];
+  }
+  return grep { defined } @l;
+}
+
 
 my %cmd_args = App::PTP::Args::all_args();
 my @args = sort map { split /\|/, s/[:=!+].*//r } keys %cmd_args;
 
-my @uniq_args = App::PTP::Util::uniqstr @args;
+my @uniq_args = uniqstr @args;
 ok(@args == @uniq_args, "All arguments are unique.");
 
 ok((none { /^-/ } @args), "No arguments start with a dash.");

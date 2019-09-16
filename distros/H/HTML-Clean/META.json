@@ -23,9 +23,9 @@
    },
    "name" : "HTML-Clean",
    "provides" : {
-      "HTML::Cleang" : {
+      "HTML::Clean" : {
          "file" : "lib/HTML/Clean.pm",
-         "version" : "1.2"
+         "version" : "1.4"
       }
    },
    "release_status" : "stable",
@@ -39,5 +39,5 @@
          "web" : "https://github.com/poizon/HTML-Clean"
       }
    },
-   "version" : "2.1"
+   "version" : "1.4"
 }

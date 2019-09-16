@@ -1,5 +1,5 @@
 package GitLab::API::v4;
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 =encoding utf8
 
@@ -9248,6 +9248,29 @@ sub update_settings {
 
 =back
 
+=head2 Application statistics
+
+See L<https://docs.gitlab.com/ce/api/statistics.html>.
+
+=over
+
+=item statistics
+
+    my $statistics = $api->statistics();
+
+Sends a C<GET> request to C<application/statistics> and returns the decoded response content.
+
+=cut
+
+sub statistics {
+    my $self = shift;
+    croak "The statistics method does not take any arguments" if @_;
+    my $options = {};
+    return $self->_call_rest_client( 'GET', 'application/statistics', [@_], $options );
+}
+
+=back
+
 =head2 Sidekiq Metrics
 
 See L<https://docs.gitlab.com/ce/api/sidekiq_metrics.html>.
@@ -9703,6 +9726,7 @@ sub edit_user {
 
     $api->delete_user(
         $user_id,
+        \%params,
     );
 
 Sends a C<DELETE> request to C<users/:user_id>.
@@ -9711,10 +9735,13 @@ Sends a C<DELETE> request to C<users/:user_id>.
 
 sub delete_user {
     my $self = shift;
-    croak 'delete_user must be called with 1 arguments' if @_ != 1;
+    croak 'delete_user must be called with 1 to 2 arguments' if @_ < 1 or @_ > 2;
     croak 'The #1 argument ($user_id) to delete_user must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The last argument (\%params) to delete_user must be a hash ref' if defined($_[1]) and ref($_[1]) ne 'HASH';
+    my $params = (@_ == 2) ? pop() : undef;
     my $options = {};
     $options->{decode} = 0;
+    $options->{content} = $params if defined $params;
     $self->_call_rest_client( 'DELETE', 'users/:user_id', [@_], $options );
     return;
 }
@@ -10552,7 +10579,7 @@ development this distribution would not exist.
     Simon Ruderich <simon@ruderich.org>
     royce55 <royce@ecs.vuw.ac.nz>
     gregor herrmann <gregoa@debian.org>
-    Luc Didry <luc@framasoft.org>
+    Luc Didry <luc@didry.org>
     Kieren Diment <kieren.diment@staples.com.au>
     Dmitry Frolov <dmitry.frolov@gmail.com>
 

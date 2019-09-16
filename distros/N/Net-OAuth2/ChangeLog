@@ -3,6 +3,12 @@
 
 All changes by Mark Overmeer unless noted otherwise.
 
+version 0.65: Mon 16 Sep 08:42:09 CEST 2019
+
+	Fixes:
+	- #1 set the Host header [Julien Semaan]
+	- #2 session_freeze [prsquee]
+
 version 0.64: Wed 21 Mar 09:48:02 CET 2018
 
 	Improvements:

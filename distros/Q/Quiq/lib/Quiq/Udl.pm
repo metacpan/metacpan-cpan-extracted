@@ -6,9 +6,10 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.156';
+our $VERSION = '1.157';
 
 use Quiq::Hash;
+use Quiq::Database::Config;
 use Quiq::Option;
 
 # -----------------------------------------------------------------------------
@@ -33,6 +34,10 @@ Objekt instantiieren:
 
     my $udlStr = 'dbi#oracle:xyz%xyz_admin:koala3@pluto.gaga.de:1521';
     my $udl = Quiq::Udl->new($udlStr);
+
+UDL aus Konfigurationsdatei:
+
+    my $udl = Quiq::Udl->new('test-db');
 
 UDL-Komponenten:
 
@@ -108,17 +113,40 @@ Referenz auf Hash mit optionalen Angaben.
 
 =head2 Konstruktor
 
-=head3 new() - Konstruktor
+=head3 new() - Instantiiere UDL-Objekt
 
 =head4 Synopsis
 
     $udl = $class->new;
     $udl = $class->new($udlStr);
     $udl = $class->new(@keyVal);
+    $udl = $class->new($name);
+
+=head4 Arguments
+
+=over 4
+
+=item $udlStr
+
+UDL als Zeichenkette.
+
+=item @keyVal
+
+UDL-Komponenten.
+
+=item $name
+
+Name aus Konfigurationsdatei C<~/.db.conf>.
+
+=back
+
+=head4 Returns
+
+UDL-Objekt
 
 =head4 Description
 
-Instantiiere ein Udl-Objekt und liefere eine Referenz auf
+Instantiiere ein UDL-Objekt und liefere eine Referenz auf
 dieses Objekt zurück.
 
 =cut
@@ -127,6 +155,7 @@ dieses Objekt zurück.
 
 sub new {
     my $class = shift;
+    # @_: $udlStr -or- @keyVal -or- $name
 
     my $self = $class->SUPER::new(
         api => '',
@@ -139,7 +168,15 @@ sub new {
         # FIXME: auf Quiq::OrderedHash umstellen
         options => Quiq::Hash->new->unlockKeys,
     );
-    if (@_) {
+    if (@_ == 1 && $_[0] !~ /^[a-z]+#/) {
+        # Argument ist kein UDL. Wir interpretieren das Argument
+        # als Name, suchen diesen in der Konfiguration und
+        # nutzen den UDL des Eintrags.
+
+        my $udlStr = Quiq::Database::Config->new->udl(shift);
+        $self->udl($udlStr);
+    }
+    elsif (@_) {
         $self->udl(@_);
     }
 
@@ -733,7 +770,7 @@ sub udl {
 
 =head1 VERSION
 
-1.156
+1.157
 
 =head1 AUTHOR
 

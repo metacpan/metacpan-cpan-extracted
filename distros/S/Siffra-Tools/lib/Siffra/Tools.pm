@@ -40,7 +40,7 @@ BEGIN
     require Siffra::Base;
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION = '0.14';
+    $VERSION = '0.15';
     @ISA     = qw(Siffra::Base Exporter);
 
     #Give a hoot don't pollute, do not export more than needed by default
@@ -494,9 +494,18 @@ sub parseCSV()
         }
         else
         {
-            my @header = $csv->header( $fh, { munge_column_names => "uc" } );
+            my @header = eval { $csv->header( $fh, { munge_column_names => "uc" } ); };
+            my ( $cde, $str, $pos, $rec, $fld ) = $csv->error_diag();
+            if ( $cde > 0 )
+            {
+                $rec--;
+                undef @rows;
+                $retorno->{ error }   = $cde;
+                $retorno->{ message } = "$str @ rec $rec, pos $pos, field $fld";
+                return $retorno;
+            } ## end if ( $cde > 0 )
             $retorno->{ header } = \@header;
-        }
+        } ## end else [ if ( $encoding =~ /utf-8/i...)]
 
         while ( my $row = $csv->getline( $fh ) )
         {

@@ -6,7 +6,7 @@
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "apache_2_0"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -58,10 +58,11 @@
          "web" : "https://github.com/iamalnewkirk/do"
       }
    },
-   "version" : "1.70",
+   "version" : "1.76",
    "x_authority" : "cpan:AWNCORP",
    "x_contributors" : [
-      "Anthony Brummett <abrummet@genome.wustl.edu>"
+      "Anthony Brummett <abrummet@genome.wustl.edu>",
+      "Jos\u00e9 Joaqu\u00edn Atria <jjatria@gmail.com>"
    ],
    "x_generated_by_perl" : "v5.26.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"

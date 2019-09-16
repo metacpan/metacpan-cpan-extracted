@@ -10,7 +10,6 @@ build_requires:
   Test::More: '0'
   perl: '5.006'
   strict: '0'
-  warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
@@ -24,15 +23,17 @@ meta-spec:
 name: Music-BachChoralHarmony
 requires:
   File::ShareDir: '0'
+  List::Util: '0'
   Moo: '2'
   Text::CSV: '0'
   namespace::clean: '0'
   perl: '5.006'
   strictures: '2'
+  warnings: '0'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Music-BachChoralHarmony
-  repository: https://github.com/ology/Music-BachChoralHarmony
-version: '0.0105'
+  homepage: https://github.com/ology/Music-BachChoralHarmony
+  repository: https://github.com/ology/Music-BachChoralHarmony.git
+version: '0.0402'
 x_Dist_Zilla:
   perl:
     version: '5.027007'
@@ -201,9 +202,9 @@ x_Dist_Zilla:
       name: MetaJSON
       version: '6.012'
     -
-      class: Dist::Zilla::Plugin::MetaResources
-      name: MetaResources
-      version: '6.012'
+      class: Dist::Zilla::Plugin::GithubMeta
+      name: GithubMeta
+      version: '0.58'
     -
       class: Dist::Zilla::Plugin::Test::PodSpelling
       config:
@@ -218,6 +219,7 @@ x_Dist_Zilla:
             - DBOOK
             - ShareDir
             - UCI
+            - enharmonic
           wordlist: Pod::Wordlist
       name: Test::PodSpelling
       version: '2.007005'
@@ -234,7 +236,9 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::GatherDir:
           exclude_filename: []
-          exclude_match: []
+          exclude_match:
+            - \.mid
+            - \.png
           follow_symlinks: 0
           include_dotfiles: 0
           prefix: ''
@@ -344,4 +348,4 @@ x_Dist_Zilla:
     version: '6.012'
 x_authority: cpan:GENE
 x_generated_by_perl: v5.27.7
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_serialization_backend: 'YAML::Tiny version 1.73'

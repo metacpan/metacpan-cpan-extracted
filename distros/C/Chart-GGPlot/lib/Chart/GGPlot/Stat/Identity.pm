@@ -6,7 +6,7 @@ use Chart::GGPlot::Class;
 use namespace::autoclean;
 use MooseX::Singleton;
 
-our $VERSION = '0.0005'; # VERSION
+our $VERSION = '0.0007'; # VERSION
 
 use Chart::GGPlot::Layer;
 use Chart::GGPlot::Util::Pod qw(layer_func_pod);
@@ -80,7 +80,7 @@ Chart::GGPlot::Stat::Identity - Statistic method that does identity
 
 =head1 VERSION
 
-version 0.0005
+version 0.0007
 
 =head1 SEE ALSO
 

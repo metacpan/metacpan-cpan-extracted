@@ -10,7 +10,8 @@ use Data::Dumper;
 use Test::More 'no_plan';
 
 use WWW::Search::Test;
-BEGIN {
+BEGIN
+  {
   use_ok('WWW::Search::Ebay::Category');
   } # end of BEGIN block
 
@@ -50,11 +51,8 @@ diag("Sending 1-page category query to check contents...");
 $iDebug = 0;
 $iDump = 0;
 $WWW::Search::Test::sSaveOnError = q{category-failed.html};
-my $iCategory = 147399;
-# It's impossible to find a category that reliably only
-# has one page of results:
-my $iMax = 999_999;
-tm_run_test('normal', $iCategory, 1, $iMax, $iDebug, $iDump);
+# 175817 is "Credit Services"
+tm_run_test('normal', 175817, 1, 199, $iDebug, $iDump);
 # Now get the results and inspect them:
 my @ao = $WWW::Search::Test::oSearch->results();
 cmp_ok(0, '<', scalar(@ao), 'got some results');

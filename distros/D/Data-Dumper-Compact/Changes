@@ -1,5 +1,8 @@
 Revision history for Data-Dumper-Compact
 
+0.004001 - 2019-09-15
+  - Regexp fixup to avoid a deprecation warning
+
 0.004000 - 2019-05-29
   - Add tweak feature to DwarnT
 

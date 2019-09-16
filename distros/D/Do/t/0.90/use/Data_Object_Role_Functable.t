@@ -19,6 +19,10 @@ Data-Object Functable Role
 
   with 'Data::Object::Role::Functable';
 
+=integrates
+
+Data::Object::Role::Proxyable
+
 =libraries
 
 Data::Object::Library
@@ -27,12 +31,6 @@ Data::Object::Library
 
 This package provides mechanisms for dispatching to functors, i.e. data object
 function classes.
-
-+=head1 ROLES
-
-This package assumes all behavior from the follow roles:
-
-L<Data::Object::Role::Proxyable>
 
 =cut
 

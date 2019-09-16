@@ -9,25 +9,25 @@ use Data::Object 'Class';
 
 extends 'Data::Object::String::Func';
 
-our $VERSION = '1.70'; # VERSION
+our $VERSION = '1.76'; # VERSION
 
 # BUILD
 
 has arg1 => (
   is => 'ro',
-  isa => 'Object',
+  isa => 'StringLike',
   req => 1
 );
 
 has arg2 => (
   is => 'ro',
-  isa => 'Str',
+  isa => 'StringLike',
   req => 1
 );
 
 has arg3 => (
   is => 'ro',
-  isa => 'Num',
+  isa => 'NumberLike',
   def => 0,
   opt => 1
 );
@@ -104,25 +104,25 @@ This package has the following attributes.
 
 =head2 arg1
 
-  arg1(Object)
+  arg1(StringLike)
 
-The attribute is read-only, accepts C<(Object)> values, and is optional.
+The attribute is read-only, accepts C<(StringLike)> values, and is optional.
 
 =cut
 
 =head2 arg2
 
-  arg2(Str)
+  arg2(StringLike)
 
-The attribute is read-only, accepts C<(Str)> values, and is optional.
+The attribute is read-only, accepts C<(StringLike)> values, and is optional.
 
 =cut
 
 =head2 arg3
 
-  arg3(Num)
+  arg3(NumberLike)
 
-The attribute is read-only, accepts C<(Num)> values, and is optional.
+The attribute is read-only, accepts C<(NumberLike)> values, and is optional.
 
 =cut
 
@@ -174,9 +174,11 @@ Returns the ordered list of named function object arguments.
 
 =head1 CREDITS
 
-Al Newkirk, C<+287>
+Al Newkirk, C<+296>
 
 Anthony Brummett, C<+10>
+
+José Joaquín Atria, C<+1>
 
 =cut
 

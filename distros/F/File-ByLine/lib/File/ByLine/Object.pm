@@ -6,7 +6,7 @@
 #
 
 package File::ByLine::Object;
-$File::ByLine::Object::VERSION = '1.183060';
+$File::ByLine::Object::VERSION = '1.192590';
 use v5.10;
 
 # ABSTRACT: Internal object used by File::ByLine
@@ -603,6 +603,11 @@ sub _open_and_seek {
         $parts = $size;
     }
 
+    # We have a zero byte file, special case
+    if ( $parts == 0 ) {
+        return ( $fh, -1 );
+    }
+
     # Figure out start and end size
     my $start = int( $part_number * ( $size / $parts ) );
     my $end = int( $start + ( $size / $parts ) );
@@ -785,7 +790,7 @@ File::ByLine::Object - Internal object used by File::ByLine
 
 =head1 VERSION
 
-version 1.183060
+version 1.192590
 
 =head1 SEE File::ByLine
 

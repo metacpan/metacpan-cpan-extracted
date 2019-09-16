@@ -45,7 +45,7 @@ package AnyEvent::Fork::Remote::Dummy;
 
 sub new { my $a ; bless \$a }
 
-sub require { $_[0] }
+sub eval { $_[0] }
 sub send_arg { $_[0] }
 
 # Report connection error by not returning fh

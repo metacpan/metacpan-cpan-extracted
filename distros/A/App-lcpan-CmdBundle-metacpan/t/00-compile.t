@@ -6,12 +6,13 @@ use warnings;
 
 use Test::More;
 
-plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/lcpan/Cmd/metacpan_author.pm',
     'App/lcpan/Cmd/metacpan_dist.pm',
     'App/lcpan/Cmd/metacpan_mod.pm',
+    'App/lcpan/Cmd/metacpan_pod.pm',
     'App/lcpan/Cmd/metacpan_script.pm',
     'App/lcpan/CmdBundle/metacpan.pm'
 );

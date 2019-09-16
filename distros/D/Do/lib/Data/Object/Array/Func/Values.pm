@@ -9,13 +9,13 @@ use Data::Object 'Class';
 
 extends 'Data::Object::Array::Func';
 
-our $VERSION = '1.70'; # VERSION
+our $VERSION = '1.76'; # VERSION
 
 # BUILD
 
 has arg1 => (
   is => 'ro',
-  isa => 'Object',
+  isa => 'ArrayLike',
   req => 1
 );
 
@@ -95,17 +95,17 @@ This package has the following attributes.
 
 =head2 arg1
 
-  arg1(Object)
+  arg1(ArrayLike)
 
-The attribute is read-only, accepts C<(Object)> values, and is optional.
+The attribute is read-only, accepts C<(ArrayLike)> values, and is optional.
 
 =cut
 
 =head2 args
 
-  args(ArrayRef[Int])
+  args(ArrayRef[NumberLike])
 
-The attribute is read-only, accepts C<(ArrayRef[Int])> values, and is optional.
+The attribute is read-only, accepts C<(ArrayRef[NumberLike])> values, and is optional.
 
 =cut
 
@@ -156,9 +156,11 @@ Returns the ordered list of named function object arguments.
 
 =head1 CREDITS
 
-Al Newkirk, C<+287>
+Al Newkirk, C<+296>
 
 Anthony Brummett, C<+10>
+
+José Joaquín Atria, C<+1>
 
 =cut
 

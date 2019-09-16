@@ -37,10 +37,10 @@ sub test_unitTest_trigger : Test(4) {
     $self->is($udl,'dbi#sqlite:/tmp/test.db;schema=test');
 
     eval {$cfg->udl('db_2')};
-    $self->like($@,qr/not defined/i);
+    $self->like($@,qr/No UDL/i);
 
     eval {$cfg->udl('unknown')};
-    $self->like($@,qr/not defined/i);
+    $self->like($@,qr/Database not defined/i);
 }
 
 # -----------------------------------------------------------------------------

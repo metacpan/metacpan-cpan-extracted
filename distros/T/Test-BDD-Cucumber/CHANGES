@@ -1,4 +1,16 @@
 -----
+0.64  2019-09-15
+    [Fixed]
+      - Corrected List::Util dependency failing to declare 1.33 minimum
+0.63  2019-09-15
+    [Deprecated]
+      - Mixing steps with comments is not allowed in Gherkin;
+        support for mixing steps and comments will be removed in v1.0
+    [Changed]
+      - Gherkin parser refactoring for readability
+    [Added]
+      - Support for scenario descriptions: a block of explanatory text
+        between the `Scenario:` keyword and the step lines
 0.62  2019-09-09
     - Fix regression in 0.61 with `prove` plugin printing TAP on STDOUT
 0.61  2019-09-07

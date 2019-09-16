@@ -2,24 +2,37 @@ package AnyEvent::Fork::RPC::Sync;
 
 use common::sense; # actually required to avoid spurious warnings...
 
+our $VERSION = 2; # protocol version
+
 # declare only
 sub AnyEvent::Fork::RPC::event;
+
+# always successful
+sub AnyEvent::Fork::RPC::flush { 1 }
 
 sub do_exit { exit } # workaround for perl 5.14 and below
 
 # the goal here is to keep this simple, small and efficient
 sub run {
-   my ($function, $init, $serialiser, undef) = splice @_, -4, 4;
+   my %kv = splice @_, pop;
+
    my $rfh = shift;
    my $wfh = fileno $rfh ? $rfh : *STDOUT;
+
+   my $function   = delete $kv{function};
+   my $serialiser = delete $kv{serialiser};
+   my $rlen       = delete $kv{rlen};
 
    $0 =~ s/^(\d+).*$/$1 $function/s;
 
    {
       package main;
+      my $init = delete $kv{init};
       &$init if length $init;
       $function = \&$function; # resolve function early for extra speed
    }
+
+   %kv = (); # save some very small amount of memory
 
    my ($f, $t) = eval $serialiser; die $@ if $@;
 
@@ -40,7 +53,7 @@ sub run {
       $write->(pack "NN/a*", 0, &$f);
    };
 
-   my ($rlen, $rbuf) = 512 - 16;
+   my $rbuf;
 
    while (sysread $rfh, $rbuf, $rlen - length $rbuf, length $rbuf) {
       $rlen = $rlen * 2 + 16 if $rlen - 128 < length $rbuf;

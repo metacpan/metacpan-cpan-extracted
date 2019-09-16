@@ -39,10 +39,11 @@ use DNS::Unbound::AsyncQuery;
 
 {
     my $query = DNS::Unbound::AsyncQuery->new( sub {} );
-    $query->_set_dns( { ctx => 'some_ctx', id => 'some_id' } );
-    $query->_forget_dns();
+    my $faux = { ctx => 'some_ctx', id => 'some_id' };
 
-    is( $query->_get_dns(), undef, '_forget_dns()' );
+    $query->_set_dns( $faux );
+
+    is( $query->_get_dns(), $faux, '_set_dns() and _get_dns()' );
 }
 
 done_testing;

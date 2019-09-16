@@ -8,7 +8,7 @@
 package Perl::Tidy::IndentationItem;
 use strict;
 use warnings;
-our $VERSION = '20190601';
+our $VERSION = '20190915';
 
 sub new {
 
@@ -90,7 +90,7 @@ sub permanently_decrease_available_spaces {
 sub tentatively_decrease_available_spaces {
 
     # We are asked to tentatively delete $spaces_needed of indentation
-    # for a indentation item.  We may want to undo this later.  NOTE: if
+    # for an indentation item.  We may want to undo this later.  NOTE: if
     # there are child nodes, their total SPACES must be reduced by the
     # caller.
     my ( $item, $spaces_needed ) = @_;

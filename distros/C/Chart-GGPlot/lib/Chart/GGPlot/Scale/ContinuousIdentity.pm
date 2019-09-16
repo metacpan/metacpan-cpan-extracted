@@ -5,7 +5,7 @@ package Chart::GGPlot::Scale::ContinuousIdentity;
 use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0005'; # VERSION
+our $VERSION = '0.0007'; # VERSION
 
 use Chart::GGPlot::Util qw(:all);
 
@@ -42,7 +42,7 @@ Chart::GGPlot::Scale::ContinuousIdentity - Continuous identity scale
 
 =head1 VERSION
 
-version 0.0005
+version 0.0007
 
 =head1 AUTHOR
 

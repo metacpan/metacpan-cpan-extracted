@@ -5,7 +5,7 @@ package Chart::GGPlot::Theme::Element;
 use strict;
 use warnings;
 
-our $VERSION = '0.0005'; # VERSION
+our $VERSION = '0.0007'; # VERSION
 
 package Chart::GGPlot::Theme::Element {
     use Chart::GGPlot::Setup;
@@ -89,7 +89,7 @@ package Chart::GGPlot::Theme::Element::Text {
     use Class::Method::Modifiers;
     use namespace::autoclean;
 
-    our $VERSION = '0.0005'; # VERSION
+    our $VERSION = '0.0007'; # VERSION
 
     use parent qw(Chart::GGPlot::Theme::Element);
 
@@ -120,7 +120,7 @@ Chart::GGPlot::Theme::Element - Basic types for theme elements
 
 =head1 VERSION
 
-version 0.0005
+version 0.0007
 
 =head1 SEE ALSO
 

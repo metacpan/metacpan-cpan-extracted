@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/htk291/p5-Acme-PriPara.png?branch=master)](https://travis-ci.org/htk291/p5-Acme-PriPara) [![Coverage Status](https://coveralls.io/repos/htk291/p5-Acme-PriPara/badge.png?branch=master)](https://coveralls.io/r/htk291/p5-Acme-PriPara?branch=master)
+[![Build Status](https://travis-ci.org/htk291/p5-Acme-PriPara.svg?branch=master)](https://travis-ci.org/htk291/p5-Acme-PriPara) [![Coverage Status](https://img.shields.io/coveralls/htk291/p5-Acme-PriPara/master.svg?style=flat)](https://coveralls.io/r/htk291/p5-Acme-PriPara?branch=master)
 # NAME
 
 Acme::PriPara - It's new $module

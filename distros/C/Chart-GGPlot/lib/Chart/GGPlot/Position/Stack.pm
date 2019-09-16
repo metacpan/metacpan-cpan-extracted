@@ -5,7 +5,7 @@ package Chart::GGPlot::Position::Stack;
 use Chart::GGPlot::Class;
 use namespace::autoclean;
 
-our $VERSION = '0.0005'; # VERSION
+our $VERSION = '0.0007'; # VERSION
 
 use PDL::Primitive qw(which);
 
@@ -101,7 +101,7 @@ Chart::GGPlot::Position::Stack - Position for "stack"
 
 =head1 VERSION
 
-version 0.0005
+version 0.0007
 
 =head1 DESCRIPTION
 

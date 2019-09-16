@@ -3,7 +3,6 @@
 use strict;
 print "1..1\n";
 
-$ENV{TEST_SIGNATURE} = 1;
 if (!$ENV{TEST_SIGNATURE}) {
     print "ok 1 # skip Set the environment variable",
                 " TEST_SIGNATURE to enable this test\n";

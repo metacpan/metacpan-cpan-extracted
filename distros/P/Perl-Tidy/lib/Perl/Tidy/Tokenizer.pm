@@ -21,7 +21,7 @@
 package Perl::Tidy::Tokenizer;
 use strict;
 use warnings;
-our $VERSION = '20190601';
+our $VERSION = '20190915';
 
 use Perl::Tidy::LineBuffer;
 
@@ -3221,7 +3221,7 @@ EOM
                 elsif (
                        ( $next_nonblank_token eq ':' )
                     && ( $rtokens->[ $i_next + 1 ] ne ':' )
-                    && ( $i_next <= $max_token_index )      # colon on same line
+                    && ( $i_next <= $max_token_index )    # colon on same line
                     && label_ok()
                   )
                 {
@@ -4225,7 +4225,13 @@ sub operator_expected {
         # could change the interpretation of the statement.
         else {
             if ( $tok =~ /^([x\/\+\-\*\%\&\.\?\<]|\>\>)$/ ) {
-                complain("operator in print statement not recommended\n");
+
+               # Do not complain in 'use' statements, which have special syntax.
+               # For example, from RT#130344:
+               #   use lib $FindBin::Bin . '/lib';
+                if ( $statement_type ne 'use' ) {
+                    complain("operator in print statement not recommended\n");
+                }
                 $op_expected = OPERATOR;
             }
         }
@@ -4718,6 +4724,7 @@ sub report_unexpected {
               write_on_underline( $underline, $pos_prev - $offset, '-' x $num );
             $trailer = " (previous token underlined)";
         }
+        $underline =~ s/\s+$//;
         warning( $numbered_line . "\n" );
         warning( $underline . "\n" );
         warning( $msg . $trailer . "\n" );
@@ -6273,7 +6280,7 @@ sub scan_identifier_do {
             $attrs = $2;
 
             # If we also found the sub name on this call then append PROTO.
-            # This is not necessary but for compatability with previous
+            # This is not necessary but for compatibility with previous
             # versions when the -csc flag is used:
             if ( $match && $proto ) {
                 $tok .= $proto;

@@ -1,5 +1,8 @@
 Revision history for Calendar::Plugin::Renderer
 
+0.16  Sun Sep 15 20:25:00 2019
+      - Moved author test scripts to xt/ subfolder.
+
 0.15  Thu May 02 15:40:00 2019
       - Added test for Hebrew and Julian calendars.
 

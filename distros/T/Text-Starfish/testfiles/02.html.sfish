@@ -10,5 +10,8 @@
 # This is a comment
 2
  # But this is not a comment
+3
+<?sf ## This is also allowed for code in .sf
+   echo ("1+1=".(1+1)); !>
 </BODY>
 </HTML>

@@ -6,9 +6,12 @@ use_ok 'Data::Object::Regexp';
 
 # deprecated
 # ok Data::Object::Regexp->does('Data::Object::Rule::Defined');
-ok Data::Object::Regexp->does('Data::Object::Role::Detract');
-ok Data::Object::Regexp->does('Data::Object::Role::Dumper');
-ok Data::Object::Regexp->does('Data::Object::Role::Output');
+# deprecated
+# ok Data::Object::Regexp->does('Data::Object::Role::Detract');
+# deprecated
+# ok Data::Object::Regexp->does('Data::Object::Role::Dumper');
+# deprecated
+# ok Data::Object::Regexp->does('Data::Object::Role::Output');
 ok Data::Object::Regexp->does('Data::Object::Role::Throwable');
 
 # deprecated

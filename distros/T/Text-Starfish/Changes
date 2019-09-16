@@ -163,3 +163,24 @@ Revision history for Perl extension Text::Starfish.
 
 1.25  Mon Apr 15 11:50:33 ADT 2019
 	- documentation improvements
+
+1.26  Fri Sep 13 16:08:51 ADT 2019
+	- documentation improvements
+	- .sf extension added as equivalent to .html.sfish
+	  with emphasis to be used for cgi/php style
+	- added <?sf ... !> hook to sf style
+	- added $Starf->{Final} routine
+
+1.27  Sat Sep 14 08:37:28 ADT 2019
+	- documentation improvements
+	- changed final routine into an array of routines
+	- intoduce method add_final to add a final routine
+
+1.28  Sat Sep 14 15:33:00 ADT 2019
+	- documentation improvements
+	- replaced `pwd` with getcwd() in testing to avoid errors in
+	  different operating systels (Windows)
+
+1.29  Sat Sep 14 18:26:36 ADT 2019
+	- documentation improvements
+	- fixed test 35 (missing test file)

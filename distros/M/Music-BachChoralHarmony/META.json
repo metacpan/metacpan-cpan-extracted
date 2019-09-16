@@ -36,11 +36,13 @@
       "runtime" : {
          "requires" : {
             "File::ShareDir" : "0",
+            "List::Util" : "0",
             "Moo" : "2",
             "Text::CSV" : "0",
             "namespace::clean" : "0",
             "perl" : "5.006",
-            "strictures" : "2"
+            "strictures" : "2",
+            "warnings" : "0"
          }
       },
       "test" : {
@@ -51,23 +53,20 @@
             "Test::Exception" : "0",
             "Test::More" : "0",
             "perl" : "5.006",
-            "strict" : "0",
-            "warnings" : "0"
+            "strict" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "mailto" : "bug-Music-BachChoralHarmony@rt.cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Music-BachChoralHarmony"
-      },
+      "homepage" : "https://github.com/ology/Music-BachChoralHarmony",
       "repository" : {
          "type" : "git",
+         "url" : "https://github.com/ology/Music-BachChoralHarmony.git",
          "web" : "https://github.com/ology/Music-BachChoralHarmony"
       }
    },
-   "version" : "0.0105",
+   "version" : "0.0402",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.027007"
@@ -283,9 +282,9 @@
             "version" : "6.012"
          },
          {
-            "class" : "Dist::Zilla::Plugin::MetaResources",
-            "name" : "MetaResources",
-            "version" : "6.012"
+            "class" : "Dist::Zilla::Plugin::GithubMeta",
+            "name" : "GithubMeta",
+            "version" : "0.58"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::PodSpelling",
@@ -301,7 +300,8 @@
                      "CSV",
                      "DBOOK",
                      "ShareDir",
-                     "UCI"
+                     "UCI",
+                     "enharmonic"
                   ],
                   "wordlist" : "Pod::Wordlist"
                }
@@ -325,7 +325,10 @@
             "config" : {
                "Dist::Zilla::Plugin::GatherDir" : {
                   "exclude_filename" : [],
-                  "exclude_match" : [],
+                  "exclude_match" : [
+                     "\\.mid",
+                     "\\.png"
+                  ],
                   "follow_symlinks" : 0,
                   "include_dotfiles" : 0,
                   "prefix" : "",
@@ -467,6 +470,6 @@
    },
    "x_authority" : "cpan:GENE",
    "x_generated_by_perl" : "v5.27.7",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
 }
 

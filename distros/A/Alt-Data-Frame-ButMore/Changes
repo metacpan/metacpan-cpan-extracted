@@ -1,5 +1,13 @@
 Revision history of Alt-Data-Frame-ButMore
 
+0.0053      2019-09-15
+    - Breaking change: Dropped Moose::Autobox and instead use a custom
+      Data::Frame::Autobox module for limited autoboxing on array and hash.
+    - Add a Data::Frame::drop_bad() method.
+    - Add a PDL::SV::uniqind() method.
+    - Stringfication of PDL::SV now honors $PDL::toolongtoprint
+    - Add a "faithfuld" example.
+
 0.0051      2019-06-01
     - Adjust some of Data::Frame::from_csv()'s behavior to align with R.
     - Fix PDL::Factor's repeat() method.

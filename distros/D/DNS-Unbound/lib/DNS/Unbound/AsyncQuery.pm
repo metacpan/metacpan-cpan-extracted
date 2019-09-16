@@ -55,6 +55,8 @@ class provides:
 
 Cancels an in-progress DNS query. Returns nothing.
 
+B<NOTE:> This will leave the promise I<unresolved>.
+
 =cut
 
 sub cancel {
@@ -64,6 +66,7 @@ sub cancel {
 
     if (!$dns_hr->{'fulfilled'}) {
         if (my $ctx = delete $dns_hr->{'ctx'}) {
+            delete $dns_hr->{'queries_lookup'}{ $dns_hr->{'id'} };
             $CANCEL_CR->( $ctx, $dns_hr->{'id'} );
         }
     }
@@ -95,11 +98,6 @@ sub _set_dns {
 
 sub _get_dns {
     return $_[0]->{'_dns'};
-}
-
-sub _forget_dns {
-    delete $_[0]->{'_dns'};
-    return $_[0];
 }
 
 1;

@@ -5,11 +5,12 @@ use Config;
 use Cwd qw/getcwd abs_path/;
 use Exporter 'import';
 use ExtUtils::MakeMaker;
+use XS::Loader;
 use XS::Install::Deps;
 use XS::Install::Util;
 use XS::Install::Payload;
 
-our $VERSION = '1.2.10';
+our $VERSION = '1.2.11';
 my $THIS_MODULE = 'XS::Install';
 
 our @EXPORT_OK = qw/write_makefile not_available/;
@@ -115,6 +116,9 @@ sub pre_process {
             CCFLAGS => $params->{CCFLAGS},
         },  
     };
+    
+    $params->{UNIQUE_LIBNAME} //= $win32;
+    *DynaLoader::mod2fname = \&XS::Loader::mod2fname_unique if delete $params->{UNIQUE_LIBNAME};
 }
 
 sub process_FROM {
@@ -131,7 +135,6 @@ sub process_FROM {
     
     $params->{VERSION_FROM}  ||= $pm unless $params->{VERSION};
     $params->{ABSTRACT_FROM} ||= (-f $pod) ? $pod : $pm unless $params->{ABSTRACT};
-    
 }
 
 sub process_REQUIRES {
@@ -207,7 +210,10 @@ sub _apply_BIN_DEPS {
     $params->{PREREQ_PM}{$module}           ||= $installed_version;
     $params->{MODULE_INFO}{BIN_DEPS}{$module} = $installed_version;
     push @{$params->{MODULE_INFO}{VISIBLE_BIN_DEPS} ||= []}, $module unless $stop_sharing;
-    
+
+    my $info = XS::Install::Payload::binary_module_info($module)
+        or die "[XS::Install] this module wants '$module' as a binary dependence, however '$module' doesn't provide any binary interface\n";
+        
     # add so/dll to linker list
     my $shared_list = $params->{MODULE_INFO}{SHARED_LIBS};
     my $module_path = $module;
@@ -215,14 +221,17 @@ sub _apply_BIN_DEPS {
     die "SHOULDN'T EVER HAPPEN" unless $module =~ /([^:]+)$/;
     my $module_last_name = $1;
     foreach my $dir (@INC) {
-        my $lib_path = "$dir/auto/$module_path/$module_last_name.$Config{dlext}";
+        my $lib_path = "$dir/auto/$module_path/";
+        if ($info->{FILE}) {
+            $lib_path .= $info->{FILE};
+        } else { # DEPRECATED
+            $lib_path .= $module_last_name.".".$Config{dlext};
+        }
+        
         next unless -f $lib_path;
         push @$shared_list, abs_path($lib_path);
         last;
     }
-    
-    my $info = XS::Install::Payload::binary_module_info($module)
-        or die "[XS::Install] this module wants '$module' as a binary dependence, however '$module' doesn't provide any binary interface\n";
     
     if ($info->{INCLUDE}) {
         my $incdir = XS::Install::Payload::include_dir($module);
@@ -439,6 +448,7 @@ sub process_BIN_SHARE {
     $bin_share->{LOADABLE} = has_binary($params);
     
     $bin_share->{CPLUS} //= $params->{CPLUS} if $params->{CPLUS};
+    $bin_share->{FILE} = module_so_file($params);
     
     # generate info file
     mkdir 'blib';
@@ -681,7 +691,16 @@ sub _instroot { return has_binary($_[0]) ? '$(INST_ARCHLIB)' : '$(INST_LIB)' }
 sub module_so {
     my $params = shift;
     return undef unless has_binary($params);
-    return _instroot($params).'/auto/'._pkg_slash($params->{NAME}).'/'._pkg_last($params->{NAME}).'.'.$Config{dlext};
+    return _instroot($params).'/auto/'._pkg_slash($params->{NAME}).'/'.module_so_file($params);
+}
+
+sub module_so_file {
+    my $params = shift;
+    return undef unless has_binary($params);
+    my @modparts = split(/::/, $params->{NAME});
+    my $modfname = $modparts[-1];
+    $modfname = DynaLoader::mod2fname(\@modparts) if defined &DynaLoader::mod2fname;
+    return $modfname.'.'.($params->{DLEXT} || $Config{dlext});
 }
 
 sub _sync {

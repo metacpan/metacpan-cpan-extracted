@@ -354,6 +354,20 @@ the Undef class. Read more at L<Data::Object::Undef>.
 The vars configuration configures the calling package as a class representation
 of the C<%ENV> variable. Read more at L<Data::Object::Vars>.
 
++=head2 with
+
+  package App::Error;
+
+  use Data::Object::Config 'Class';
+  use Data::Object::Config 'WithStashable';
+
+  1;
+
+The with configuration configures the calling package to consume the core role
+denoted in the name, e.g. the name C<WithStashable> configures the package to
+consume the core role L<Data::Object::Role::Stashable>. Using roles requires
+that the package have previously been declared a class or role itself.
+
 =cut
 
 use_ok "Data::Object::Config";

@@ -7,7 +7,7 @@ use warnings;
 
 use parent 'Data::Object::Config';
 
-our $VERSION = '1.70'; # VERSION
+our $VERSION = '1.76'; # VERSION
 
 # METHODS
 
@@ -774,9 +774,11 @@ argument.
 
 =head1 CREDITS
 
-Al Newkirk, C<+287>
+Al Newkirk, C<+296>
 
 Anthony Brummett, C<+10>
+
+José Joaquín Atria, C<+1>
 
 =cut
 

@@ -7,7 +7,7 @@ use warnings;
 
 use parent 'Moo';
 
-our $VERSION = '1.70'; # VERSION
+our $VERSION = '1.76'; # VERSION
 
 1;
 
@@ -121,9 +121,11 @@ class. See L<Moo> for more information.
 
 =head1 CREDITS
 
-Al Newkirk, C<+287>
+Al Newkirk, C<+296>
 
 Anthony Brummett, C<+10>
+
+José Joaquín Atria, C<+1>
 
 =cut
 

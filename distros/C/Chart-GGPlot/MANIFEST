@@ -37,6 +37,8 @@ examples/geom_boxplot_01_04.pl
 examples/geom_boxplot_01_04.png
 examples/geom_boxplot_01_05.pl
 examples/geom_boxplot_01_05.png
+examples/geom_col_01_01.pl
+examples/geom_col_01_01.png
 examples/geom_histogram_01_01.pl
 examples/geom_histogram_01_01.png
 examples/geom_histogram_01_02.pl
@@ -330,6 +332,7 @@ lib/Chart/GGPlot/Util/Stats.pm
 lib/Chart/GGPlot/Util/_Base.pm
 lib/Chart/GGPlot/Util/_Labeling.pm
 lib/PDL/Role/HasNames.pm
+nytprof.out
 t/01-setup.t
 t/05-util_base.t
 t/06-util_scales.t

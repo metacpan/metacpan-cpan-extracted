@@ -10,7 +10,7 @@ use Moo::Role;
 
 with 'Data::Object::Role::Proxyable';
 
-our $VERSION = '1.70'; # VERSION
+our $VERSION = '1.76'; # VERSION
 
 # BUILD
 
@@ -79,9 +79,11 @@ Data-Object Functable Role
 This package provides mechanisms for dispatching to functors, i.e. data object
 function classes.
 
-=head1 ROLES
+=cut
 
-This package assumes all behavior from the follow roles:
+=head1 INTEGRATIONS
+
+This package integrates behaviors from:
 
 L<Data::Object::Role::Proxyable>
 
@@ -124,9 +126,11 @@ return empty.
 
 =head1 CREDITS
 
-Al Newkirk, C<+287>
+Al Newkirk, C<+296>
 
 Anthony Brummett, C<+10>
+
+José Joaquín Atria, C<+1>
 
 =cut
 

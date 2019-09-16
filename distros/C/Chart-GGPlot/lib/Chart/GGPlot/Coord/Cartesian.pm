@@ -5,7 +5,7 @@ package Chart::GGPlot::Coord::Cartesian;
 use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0005'; # VERSION
+our $VERSION = '0.0007'; # VERSION
 
 use Types::PDL qw(Piddle1D PiddleFromAny);
 use Types::Standard qw(Maybe);
@@ -138,7 +138,7 @@ Chart::GGPlot::Coord::Cartesian - The Cartesian coordinate system
 
 =head1 VERSION
 
-version 0.0005
+version 0.0007
 
 =head1 ATTRIBUTES
 

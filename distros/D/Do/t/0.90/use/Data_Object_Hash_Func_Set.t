@@ -30,7 +30,7 @@ Data::Object::Hash::Func
 =attributes
 
 arg1(Object, req, ro)
-arg2(Str, req, ro)
+arg2(StringLike, req, ro)
 args(ArrayRef[Any], req, ro)
 
 =libraries

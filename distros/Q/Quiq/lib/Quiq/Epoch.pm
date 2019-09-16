@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.156';
+our $VERSION = '1.157';
 
 use Time::HiRes ();
 use Time::Local ();
@@ -59,9 +59,9 @@ Zeitpunkt ist hochauflösend, umfasst also auch Sekundenbruchteile.
 =head4 Description
 
 Instantiiere ein Zeitpunkt-Objekt für Epoch-Wert $epoch bzw.
-ISO-Zeitangabe $iso, interpretiert in der lokalen Zeitzone, und
-liefere dieses Objekt zurück. Ist kein Argument angegeben, wird
-der aktuelle Zeitpunkt genommen.
+ISO-Zeitangabe $iso, letztere interpretiert in der lokalen
+Zeitzone, und liefere dieses Objekt zurück. Ist kein Argument
+angegeben, wird der aktuelle Zeitpunkt genommen.
 
 =cut
 
@@ -123,7 +123,7 @@ sub epoch {
 Liefere die Zeitkomponenten Sekunden, Minuten, Stunden, Tag, Monat, Jahr
 in lokaler Zeit. Im Unterschied zu localtime() aus dem Perl Core sind
 Monat ($m) und Jahr (y) "richtig" wiedergegeben. d.h die Komponente $m
-muss nicht inkrementiert und die Komponente $y muss nicht um 1900
+muss nicht um 1 erhöht und die Komponente $y muss nicht um 1900
 erhöht werden.
 
 =head4 Example
@@ -150,16 +150,38 @@ sub localtime {
 
 # -----------------------------------------------------------------------------
 
-=head3 as() - Erzeuge String-Darstellung
+=head3 as() - Erzeuge externe Darstellung
 
 =head4 Synopsis
 
     $str = $t->as($fmt);
 
+=head4 Arguments
+
+=over 4
+
+=item $fmt
+
+Formatangabe. Folgende Formate sind definiert:
+
+=over 4
+
+=item YYYY-MM-DD HH:MI:SS
+
+Zeit in ISO-Darstellung.
+
+=back
+
+=back
+
+=head4 Returns
+
+Zeit-Darstellung (String)
+
 =head4 Description
 
-Liefere eine externe Repräsentation gemäß Formatangabe $fmt. Der
-Zeitpunkt wird in der lokalen Zeitzone interpretiert.
+Liefere eine externe Darstellung des Zeitpunkts gemäß Formatangabe $fmt.
+Der Zeitpunkt wird in der lokalen Zeitzone interpretiert.
 
 =head4 Example
 
@@ -179,7 +201,10 @@ sub as {
         $strFmt = '%Y-%m-%d %H:%M:%S';
     }
     else {
-        $self->throw;
+        $self->throw(
+            'EPOCH-00001: Unknown time format',
+            Format => $fmt,
+        );
     }
     
     return POSIX::strftime($strFmt,CORE::localtime $$self);
@@ -189,7 +214,7 @@ sub as {
 
 =head1 VERSION
 
-1.156
+1.157
 
 =head1 AUTHOR
 

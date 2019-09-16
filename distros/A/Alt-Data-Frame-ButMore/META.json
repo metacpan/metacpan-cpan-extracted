@@ -45,8 +45,6 @@
             "Moo" : "2.003004",
             "Moo::Role" : "0",
             "MooX::Traits" : "0",
-            "Moose::Autobox" : "0.16",
-            "Moose::Role" : "0",
             "PDL" : "2.019",
             "PDL::Basic" : "0",
             "PDL::Core" : "0",
@@ -76,6 +74,7 @@
             "Type::Utils" : "0",
             "Types::PDL" : "0",
             "Types::Standard" : "0",
+            "autobox" : "0",
             "boolean" : "0",
             "failures" : "0",
             "feature" : "0",
@@ -109,7 +108,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#pdl"
    },
-   "version" : "0.0051",
+   "version" : "0.0053",
    "x_contributors" : [
       "Mohammad S Anwar <manwar@cpan.org>"
    ],

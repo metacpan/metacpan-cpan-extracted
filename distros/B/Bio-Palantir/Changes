@@ -1,3 +1,7 @@
+0.192560  2019-09-13 16:32:18+02:00 Europe/Brussels
+	- Fixes
+	  - bin::export_bgc_sql_tables: fixed key link between Domains_plus and Sequences tables
+
 0.192540  2019-09-11 10:56:03+02:00 Europe/Brussels
 	- Fixes
 	  - Roles::Fillable/Refiner::GenePlus: activated 'from seq' mode for generating exploratory Domains objects		

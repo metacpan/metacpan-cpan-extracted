@@ -1,0 +1,36 @@
+---
+abstract: 'Perl interface to the Analog Paradigm hybrid controller.'
+author:
+  - 'Bernd Ulmann <vaxman@cpan.org>'
+build_requires:
+  Carp: '0'
+  Device::SerialPort: '0'
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+  Time::HiRes: '0'
+  YAML: '0'
+configure_requires:
+  Carp: '0'
+  Device::SerialPort: '0'
+  ExtUtils::MakeMaker: '0'
+  Time::HiRes: '0'
+  YAML: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IO-HyCon
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Device::SerialPort: '0'
+  Time::HiRes: '0'
+  YAML: '0'
+  perl: '5.006'
+version: '0.2'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

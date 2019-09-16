@@ -29,8 +29,8 @@ Data::Object::String::Func
 
 =attributes
 
-arg1(Object, req, ro)
-arg3(Num, opt, ro)
+arg1(StringLike, req, ro)
+arg3(NumberLike, opt, ro)
 
 =libraries
 

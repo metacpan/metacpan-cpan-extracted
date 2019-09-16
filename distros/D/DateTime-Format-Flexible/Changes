@@ -1,5 +1,14 @@
 Revision history for Perl module DateTime::Format::Flexible
 
+0.32 Sat Sep 14 2019
+  - add support for offset timezones without a space separator and formatted HH:MM '2019-09-03T10:42:00.000-04:00'
+    - thanks Stijn Heymans
+  - allow negative timezone offsets in 2 and 4 digit lengths with and without spaces
+    - now works: 2007-05-06T04:44:44-0800
+    - now works: 2007-05-06T04:44:44-08
+    - now works: 2007-05-06T04:44:44 -08
+  - validate all timezone offsets
+
 0.31 Mon Sep 17 2018
   - add support for Sep 10, 2018 12:58, Sep 10, 18 12:58
     - thanks Ian! D. Allen
@@ -45,7 +54,6 @@ Revision history for Perl module DateTime::Format::Flexible
       - thanks David White rt #105178, tests from Time::ParseDate
   - when we have a leading month that is 0 (zero) and we have a year, assume it is supposed to be october (10)
     - thanks Dave Musakhanyan
-
 
 0.26 Tue Apr 22 2014
   - support "MM/DD/YYYY HH:MM" (missing seconds),

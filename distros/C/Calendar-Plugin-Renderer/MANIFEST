@@ -14,10 +14,6 @@ lib/Calendar/Plugin/Renderer/SVG/Box.pm
 lib/Calendar/Plugin/Renderer/SVG/Label.pm
 t/00-load.t
 t/calendar-plugin-renderer.t
-t/manifest.t
-t/pod.t
-t/meta-json.t
-t/meta-yml.t
 t/bahai.xml
 t/gregorian.xml
 t/hebrew.xml
@@ -32,5 +28,9 @@ t/fake-julian.xml
 t/fake-hebrew.xml
 t/fake-persian.xml
 t/fake-saka.xml
+xt/manifest.t
+xt/pod.t
+xt/meta-json.t
+xt/meta-yml.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

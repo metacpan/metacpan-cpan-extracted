@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.850';
+our $VERSION = '1.860';
 
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
 
@@ -35,10 +35,6 @@ use overload (
    fallback => 1
 );
 
-sub _croak {
-   goto &MCE::Shared::Base::_croak;
-}
-
 ###############################################################################
 ## ----------------------------------------------------------------------------
 ## Attributes used internally.
@@ -50,6 +46,10 @@ sub _croak {
 our ($HIGHEST, $LOWEST, $FIFO, $LIFO, $LILO, $FILO) = (1, 0, 1, 0, 1, 0);
 my  ($PORDER, $TYPE, $FAST, $AWAIT) = ($HIGHEST, $FIFO, 0, 0);
 
+my $_sig;
+my $_sigint  = sub { $_sig = 'INT'  };
+my $_sigterm = sub { $_sig = 'TERM' };
+
 my $LF = "\012"; Internals::SvREADONLY($LF, 1);
 my $_has_threads = $INC{'threads.pm'} ? 1 : 0;
 my $_tid = $_has_threads ? threads->tid() : 0;
@@ -59,6 +59,9 @@ my %_valid_fields_new = map { $_ => 1 } qw(
    await barrier fast porder queue type
 );
 
+sub _croak {
+   goto &MCE::Shared::Base::_croak;
+}
 sub CLONE {
    $_tid = threads->tid() if $_has_threads;
 }
@@ -910,22 +913,28 @@ sub _req_queue {
    local $\ = undef if (defined $\);
    local $/ = $LF if ($/ ne $LF);
 
-   CORE::lock $_DAT_LOCK if $_is_MSWin32;
-   $_dat_ex->() if !$_is_MSWin32;
-   $_[3]->{'_mutex_'.( $_chn % MUTEX_LOCKS )}->unlock() if $_[3];
+   my ($_len, $_buf, $_frozen);
 
-   print({$_DAT_W_SOCK} $_[0].$LF . $_chn.$LF),
-   print({$_DAU_W_SOCK} $_[1]);
+   {
+      $_sig = undef, local $SIG{INT} = $_sigint, local $SIG{TERM} = $_sigterm;
 
-   chomp(my $_len = <$_DAU_W_SOCK>);
-   if ($_len < 0) {
+      CORE::lock $_DAT_LOCK if $_is_MSWin32;
+      $_dat_ex->() if !$_is_MSWin32;
+
+      $_[3]->{'_mutex_'.( $_chn % MUTEX_LOCKS )}->unlock() if $_[3];
+
+      print({$_DAT_W_SOCK} $_[0].$LF . $_chn.$LF),
+      print({$_DAU_W_SOCK} $_[1]);
+      chomp($_len = <$_DAU_W_SOCK>);
+
+      $_frozen = chop($_len), read($_DAU_W_SOCK, $_buf, $_len)
+         if ($_len >= 0);
+
       $_dat_un->() if !$_is_MSWin32;
-      return;
    }
 
-   my $_frozen = chop($_len);
-   read $_DAU_W_SOCK, my($_buf), $_len;
-   $_dat_un->() if !$_is_MSWin32;
+   CORE::kill($_sig, $$) if $_sig;
+   return if ($_len < 0);
 
    ($_[2] == 1)
       ? ($_frozen) ? $_thaw->($_buf)[0] : $_buf
@@ -1022,7 +1031,7 @@ MCE::Shared::Queue - Hybrid-queue helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Queue version 1.850
+This document describes MCE::Shared::Queue version 1.860
 
 =head1 DESCRIPTION
 

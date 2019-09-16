@@ -27,5 +27,6 @@ Gene
 Music
 ShareDir
 UCI
+enharmonic
 gene
 lib

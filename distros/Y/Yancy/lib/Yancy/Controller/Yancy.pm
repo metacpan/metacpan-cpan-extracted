@@ -1,5 +1,5 @@
 package Yancy::Controller::Yancy;
-our $VERSION = '1.039';
+our $VERSION = '1.040';
 # ABSTRACT: Basic controller for displaying content
 
 #pod =head1 SYNOPSIS
@@ -158,6 +158,7 @@ our $VERSION = '1.039';
 #pod =cut
 
 use Mojo::Base 'Mojolicious::Controller';
+use Mojo::JSON qw( to_json );
 use Yancy::Util qw( derp );
 use POSIX qw( ceil );
 
@@ -831,7 +832,7 @@ Yancy::Controller::Yancy - Basic controller for displaying content
 
 =head1 VERSION
 
-version 1.039
+version 1.040
 
 =head1 SYNOPSIS
 

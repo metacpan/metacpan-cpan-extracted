@@ -1,0 +1,53 @@
+IO-HyCon
+
+IO::HyCon is a Perl interface for an Arduino-based hybrid controller as used
+in the Analog Paradigm Model-1 analog computer. This module allows complete
+control of the analog computer including setting digital potentioemters, readout
+of computing elements etc. It assumes an Analog Paradigm hybrid controller 
+with firmware revision of at least 0.5.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+DEPENDENCIES
+
+This module requires the following modules and libraries:
+
+    YAML, Carp, Device::SerialPort, Time::HiRes
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc IO::HyCon
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=IO-HyCon
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/IO-HyCon
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/IO-HyCon
+
+    Search CPAN
+        https://metacpan.org/release/IO-HyCon
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2019 by Bernd Ulmann
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

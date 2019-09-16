@@ -7,12 +7,13 @@ use warnings;
 
 use base 'Type::Library';
 
+use Scalar::Util ();
+use Type::Coercion ();
 use Type::Tiny ();
 use Type::Utils ();
-use Type::Coercion ();
 use Types::TypeTiny ();
 
-our $VERSION = '1.70'; # VERSION
+our $VERSION = '1.76'; # VERSION
 
 Type::Utils::extends('Types::Standard');
 Type::Utils::extends('Types::TypeTiny');
@@ -23,6 +24,7 @@ Type::Utils::extends('Types::Common::String');
 
 RegisterAll(DoArgs());
 RegisterAll(DoData());
+RegisterAll(DoDumpable());
 RegisterAll(DoArray());
 RegisterAll(DoCli());
 RegisterAll(DoCode());
@@ -30,6 +32,7 @@ RegisterAll(DoException());
 RegisterAll(DoFloat());
 RegisterAll(DoFunc());
 RegisterAll(DoHash());
+RegisterAll(DoImmutable());
 RegisterAll(DoNumber());
 RegisterAll(DoOpts());
 RegisterAll(DoRegexp());
@@ -37,9 +40,11 @@ RegisterAll(DoReplace());
 RegisterAll(DoScalar());
 RegisterAll(DoSearch());
 RegisterAll(DoSpace());
+RegisterAll(DoStashable());
 RegisterAll(DoState());
 RegisterAll(DoString());
 RegisterAll(DoStruct());
+RegisterAll(DoThrowable());
 RegisterAll(DoUndef());
 RegisterAll(DoVars());
 
@@ -175,6 +180,20 @@ sub DoData {
   }
 }
 
+sub DoDumpable {
+  {
+    name => 'DoDumpable',
+    aliases => [
+      'Dumpable'
+    ],
+    validation => sub {
+      return 0 if !$_[0]->does('Data::Object::Role::Dumpable');
+      return 1;
+    },
+    parent => 'Object'
+  }
+}
+
 sub DoException {
   {
     name => 'DoException',
@@ -293,6 +312,20 @@ sub DoHash {
       };
 
       return $coercions;
+    },
+    parent => 'Object'
+  }
+}
+
+sub DoImmutable {
+  {
+    name => 'DoImmutable',
+    aliases => [
+      'Immutable'
+    ],
+    validation => sub {
+      return 0 if !$_[0]->does('Data::Object::Role::Immutable');
+      return 1;
     },
     parent => 'Object'
   }
@@ -445,6 +478,20 @@ sub DoSpace {
   }
 }
 
+sub DoStashable {
+  {
+    name => 'DoStashable',
+    aliases => [
+      'Stashable'
+    ],
+    validation => sub {
+      return 0 if !$_[0]->does('Data::Object::Role::Stashable');
+      return 1;
+    },
+    parent => 'Object'
+  }
+}
+
 sub DoState {
   {
     name => 'DoState',
@@ -492,6 +539,20 @@ sub DoStruct {
     ],
     validation => sub {
       return 0 if !$_[0]->isa('Data::Object::Struct');
+      return 1;
+    },
+    parent => 'Object'
+  }
+}
+
+sub DoThrowable {
+  {
+    name => 'DoThrowable',
+    aliases => [
+      'Throwable'
+    ],
+    validation => sub {
+      return 0 if !$_[0]->does('Data::Object::Role::Throwable');
       return 1;
     },
     parent => 'Object'
@@ -668,6 +729,17 @@ sub GenerateExplanation {
   return $type->{explaination}->($_[2], $_[1], $_[3]);
 }
 
+# ONE-OFFS
+
+Type::Utils::declare('RegexpLike', Type::Utils::as(Object(), Type::Utils::where(sub {
+  return !!re::is_regexp($_[0]) || (Scalar::Util::blessed($_[0]) &&
+    ($_[0]->isa('Regexp') || $_[0]->isa('Data::Object::Regexp')));
+})));
+
+Type::Utils::declare('NumberLike', Type::Utils::as(StringLike(), Type::Utils::where(sub {
+  return Scalar::Util::looks_like_number("$_[0]");
+})));
+
 1;
 
 =encoding utf8
@@ -727,9 +799,7 @@ object.
 
 =item DoArgs example
 
-  # given xyz
-
-  my $self = Data::Object::Library->DoArgs(...);
+  Data::Object::Library::DoArgs();
 
 =back
 
@@ -803,6 +873,23 @@ object.
 
 =cut
 
+=head2 dodumpable
+
+  DoDumpable() : HashRef
+
+This function returns the type configuration for an object with the
+L<Data::Object::Role::Dumpable> role.
+
+=over 4
+
+=item DoDumpable example
+
+  Data::Object::Library::DoDumpable();
+
+=back
+
+=cut
+
 =head2 doexception
 
   DoException() : HashRef
@@ -866,6 +953,23 @@ object.
 =item DoHash example
 
   Data::Object::Library::DoHash();
+
+=back
+
+=cut
+
+=head2 doimmutable
+
+  DoImmutable() : HashRef
+
+This function returns the type configuration for an object with the
+L<Data::Object::Role::Immutable> role.
+
+=over 4
+
+=item DoImmutable example
+
+  Data::Object::Library::DoImmutable();
 
 =back
 
@@ -990,6 +1094,23 @@ object.
 
 =cut
 
+=head2 dostashable
+
+  DoStashable() : HashRef
+
+This function returns the type configuration for an object with the
+L<Data::Object::Role::Stashable> role.
+
+=over 4
+
+=item DoStashable example
+
+  Data::Object::Library::DoStashable();
+
+=back
+
+=cut
+
 =head2 dostate
 
   DoState() : HashRef
@@ -1036,6 +1157,23 @@ object.
 =item DoStruct example
 
   Data::Object::Library::DoStruct();
+
+=back
+
+=cut
+
+=head2 dothrowable
+
+  DoThrowable() : HashRef
+
+This function returns the type configuration for an object with the
+L<Data::Object::Role::Throwable> role.
+
+=over 4
+
+=item DoThrowable example
+
+  Data::Object::Library::DoThrowable();
 
 =back
 
@@ -1399,6 +1537,16 @@ used to throw an exception if the argument can not be validated. The C<is_Dict>
 function can be used to return true or false if the argument can not be
 validated.
 
+=head2 dumpable
+
+  # Dumpable
+
+The C<Dumpable> type constraint is provided by this library and accepts any
+object that is a consumer of the L<Data::Object::Role::Dumpable> role. The
+C<assert_Dumpable> function can be used to throw an exception if the argument
+can not be validated. The C<is_Dumpable> function can be used to return true or
+false if the argument can not be validated.
+
 =head2 enum
 
   # Enum[qw(A B C)]
@@ -1538,6 +1686,16 @@ Please see that documentation for more information. The C<assert_HashRef> functi
 can be used to throw an exception if the argument can not be validated. The
 C<is_HashRef> function can be used to return true or false if the argument can not
 be validated.
+
+=head2 immutable
+
+  # Immutable
+
+The C<Immutable> type constraint is provided by this library and accepts any
+object that is a consumer of the L<Data::Object::Role::Immutable> role. The
+C<assert_Immutable> function can be used to throw an exception if the argument
+can not be validated. The C<is_Immutable> function can be used to return true or
+false if the argument can not be validated.
 
 =head2 instanceof
 
@@ -1742,6 +1900,17 @@ see that documentation for more information. The C<assert_Num> function can be
 used to throw an exception if the argument can not be validated. The C<is_Num>
 function can be used to return true or false if the argument can not be
 validated.
+
+=head2 numberlike
+
+  # NumberLike
+
+The C<NumberLike> type constraint is provided by the this library and accepts
+any value that looks like a number, or object that overloads stringification
+and looks like a number stringified. Please see that documentation for more
+information. The C<assert_NumberLike> function can be used to throw an
+exception if the argument can not be validated. The C<is_NumberLike> function
+can be used to return true or false if the argument can not be validated.
 
 =head2 numobj
 
@@ -2065,6 +2234,16 @@ C<assert_SpaceObject> function can be used to throw an exception if the
 argument can not be validated. The C<is_SpaceObject> function can be used to
 return true or false if the argument can not be validated.
 
+=head2 stashable
+
+  # Stashable
+
+The C<Stashable> type constraint is provided by this library and accepts any
+object that is a consumer of the L<Data::Object::Role::Stashable> role. The
+C<assert_Stashable> function can be used to throw an exception if the argument
+can not be validated. The C<is_Stashable> function can be used to return true or
+false if the argument can not be validated.
+
 =head2 stateobj
 
   # StateObj
@@ -2195,6 +2374,16 @@ C<assert_StructObject> function can be used to throw an exception if the
 argument can not be validated. The C<is_StructObject> function can be used to
 return true or false if the argument can not be validated.
 
+=head2 throwable
+
+  # Throwable
+
+The C<Throwable> type constraint is provided by this library and accepts any
+object that is a consumer of the L<Data::Object::Role::Throwable> role. The
+C<assert_Throwable> function can be used to throw an exception if the argument
+can not be validated. The C<is_Throwable> function can be used to return true or
+false if the argument can not be validated.
+
 =head2 tied
 
   # Tied["MyClass"]
@@ -2308,9 +2497,11 @@ can not be validated. The C<is_VarsObject> function can be used to return true
 
 =head1 CREDITS
 
-Al Newkirk, C<+287>
+Al Newkirk, C<+296>
 
 Anthony Brummett, C<+10>
+
+José Joaquín Atria, C<+1>
 
 =cut
 

@@ -4,7 +4,7 @@ package Chart::GGPlot::Backend::Plotly::Util;
 
 use Chart::GGPlot::Setup qw(:base :pdl);
 
-our $VERSION = '0.0005'; # VERSION
+our $VERSION = '0.0007'; # VERSION
 
 use Data::Frame;
 use Data::Munge qw(elem);
@@ -18,6 +18,8 @@ use parent qw(Exporter::Tiny);
 use Chart::GGPlot::Util::Scales qw(
   csshex_to_rgb255 colorname_to_csshex
 );
+
+use constant br => '<br />';
 
 our @EXPORT_OK = qw(
   pt_to_px cex_to_px
@@ -38,34 +40,36 @@ fun pt_to_px ($x) { $x / 72 * $dpi }
 # 0.3 is a magic number from my guess.
 fun cex_to_px ($x) { pt_to_px( 12 * $x * 0.75 * 0.3 ) }
 
-sub br { '<br />' }
+sub _rgb {
+    my ($c) = @_;
+    return 'transparent' if $c eq 'BAD';
+    return $c =~ /^#/ ? $c : colorname_to_csshex($c);
+}
+
+sub _rgba {
+    my ($c, $a) = @_;
+
+    return 'transparent' if $c eq 'BAD';
+    $c = $c =~ /^#/ ? $c : colorname_to_csshex($c);
+    return $c if $a == 1;
+
+    if ($c =~ /^#/) {
+        return sprintf(
+            "rgba(%s,%s,%s,%s)",
+            csshex_to_rgb255($c),
+            0+sprintf("%.2f", $a)   # 0+ for removing trailing zeros
+        );
+    }
+    return $c;
+}
 
 # plotly does not understands some non-rgb colors like "grey35"
 fun to_rgb ($color, $alpha=pdl(1)) {
     state $check = Type::Params::compile((Piddle | Str), Piddle);
     ($color, $alpha) = $check->($color, $alpha);
 
-    my $rgb = sub {
-        my ($c, $a) = @_;
-
-        return 'transparent' if $c eq 'BAD';
-        unless ( $c =~ /^\#/ ) {
-             $c = colorname_to_csshex($c);
-        }
-        return $c if $a == 1;
-
-        if ($c =~ /^#/) {
-            return sprintf(
-                "rgba(%s,%s,%s,%s)",
-                csshex_to_rgb255($c),
-                0+sprintf("%.2f", $a)   # 0+ for removing trailing zeros
-            );
-        }
-        return $c;
-    };
-
     if ( !ref($color) ) {
-        return $rgb->($color, $alpha->at(0));
+        return _rgba($color, $alpha->at(0));
     }
     else {
         if ($alpha->length != $color->length and $alpha->length != 1) {
@@ -78,10 +82,10 @@ fun to_rgb ($color, $alpha=pdl(1)) {
         my @color = $color->flatten;
         my @rgba;
         if ($alpha->uniq->length == 1 and $alpha->at(0) == 1) {
-            @rgba = map { $rgb->($_, 1) } @color;
+            @rgba = map { _rgb($_) } @color;
         } else {
             my @alpha = $alpha->flatten;
-            @rgba = pairwise { $rgb->($a, $b) } @color, @alpha;
+            @rgba = pairwise { _rgba($a, $b) } @color, @alpha;
         }
 
         return PDL::SV->new(\@rgba);
@@ -247,7 +251,7 @@ Chart::GGPlot::Backend::Plotly::Util - Utilities used by Chart::GGPlot::Backend:
 
 =head1 VERSION
 
-version 0.0005
+version 0.0007
 
 =head1 FUNCTIONS
 

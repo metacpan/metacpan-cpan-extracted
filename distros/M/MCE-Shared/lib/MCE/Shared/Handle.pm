@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.850';
+our $VERSION = '1.860';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (InputOutput::ProhibitTwoArgOpen)
@@ -24,6 +24,10 @@ our $VERSION = '1.850';
 use MCE::Shared::Base ();
 use Errno ();
 use bytes;
+
+my $_sig;
+my $_sigint  = sub { $_sig = 'INT'  };
+my $_sigterm = sub { $_sig = 'TERM' };
 
 my $LF = "\012"; Internals::SvREADONLY($LF, 1);
 my $_max_fd = eval 'fileno(\*main::DATA)' // 2;
@@ -546,44 +550,69 @@ sub OPEN {
    local $\ = undef if (defined $\);
    local $/ = $LF if ($/ ne $LF);
 
-   CORE::lock $_DAT_LOCK if $_is_MSWin32;
-   $_dat_ex->() if !$_is_MSWin32;
-   print({$_DAT_W_SOCK} 'O~OPN'.$LF . $_chn.$LF),
-   print({$_DAU_W_SOCK} $_id.$LF . $_fd.$LF . length($_buf).$LF . $_buf);
-   <$_DAU_W_SOCK>;
+   my $_err;
 
-   IO::FDPass::send( fileno $_DAU_W_SOCK, fileno $_fd ) if ($_fd > $_max_fd);
-   chomp(my $_err = <$_DAU_W_SOCK>);
-   $_dat_un->() if !$_is_MSWin32;
+   {
+      $_sig = undef, local $SIG{INT} = $_sigint, local $SIG{TERM} = $_sigterm;
+
+      CORE::lock $_DAT_LOCK if $_is_MSWin32;
+      $_dat_ex->() if !$_is_MSWin32;
+
+      print({$_DAT_W_SOCK} 'O~OPN'.$LF . $_chn.$LF),
+      print({$_DAU_W_SOCK} $_id.$LF . $_fd.$LF . length($_buf).$LF . $_buf);
+      <$_DAU_W_SOCK>;
+
+      IO::FDPass::send( fileno $_DAU_W_SOCK, fileno $_fd ) if ($_fd > $_max_fd);
+      chomp($_err = <$_DAU_W_SOCK>);
+
+      $_dat_un->() if !$_is_MSWin32;
+   }
+
+   CORE::kill($_sig, $$) if $_sig;
 
    if ($_err) {
-      $! = $_err; '';
+      $! = $_err;
+      '';
    } else {
-      $! = 0; 1;
+      $! = 0;
+      1;
    }
 }
 
 sub READ {
    local $\ = undef if (defined $\);
 
-   CORE::lock $_DAT_LOCK if $_is_MSWin32;
-   $_dat_ex->() if !$_is_MSWin32;
-   print({$_DAT_W_SOCK} 'O~REA'.$LF . $_chn.$LF),
-   print({$_DAU_W_SOCK} $_[0]->[0].$LF . $_[2].$LF . length($/).$LF . $/);
+   my ($_len, $_ret);
 
-   local $/ = $LF if ($/ ne $LF);
-   chomp(my $_ret = <$_DAU_W_SOCK>);
-   chomp(my $_len = <$_DAU_W_SOCK>);
+   {
+      $_sig = undef, local $SIG{INT} = $_sigint, local $SIG{TERM} = $_sigterm;
+
+      CORE::lock $_DAT_LOCK if $_is_MSWin32;
+      $_dat_ex->() if !$_is_MSWin32;
+
+      print({$_DAT_W_SOCK} 'O~REA'.$LF . $_chn.$LF),
+      print({$_DAU_W_SOCK} $_[0]->[0].$LF . $_[2].$LF . length($/).$LF . $/);
+
+      local $/ = $LF if ($/ ne $LF);
+      chomp($_ret = <$_DAU_W_SOCK>);
+      chomp($_len = <$_DAU_W_SOCK>);
+
+      if ($_len && $_len > 0) {
+         (defined $_[3])
+            ? read($_DAU_W_SOCK, $_[1], $_len, $_[3])
+            : read($_DAU_W_SOCK, $_[1], $_len);
+      }
+
+      $_dat_un->() if !$_is_MSWin32;
+   }
+
+   CORE::kill($_sig, $$) if $_sig;
 
    if ($_len) {
       if ($_len < 0) {
-         $_dat_un->() if !$_is_MSWin32;
          $. = 0, $! = $_len * -1;
          return undef;
       }
-      (defined $_[3])
-         ? read($_DAU_W_SOCK, $_[1], $_len, $_[3])
-         : read($_DAU_W_SOCK, $_[1], $_len);
    }
    else {
       my $_ref = \$_[1];
@@ -594,7 +623,6 @@ sub READ {
       }
    }
 
-   $_dat_un->() if !$_is_MSWin32;
    $. = $_ret, $! = 0;
    $_len;
 }
@@ -602,25 +630,35 @@ sub READ {
 sub READLINE {
    local $\ = undef if (defined $\);
 
-   CORE::lock $_DAT_LOCK if $_is_MSWin32;
-   $_dat_ex->() if !$_is_MSWin32;
-   print({$_DAT_W_SOCK} 'O~RLN'.$LF . $_chn.$LF),
-   print({$_DAU_W_SOCK} $_[0]->[0].$LF . length($/).$LF . $/);
+   my ($_buf, $_len, $_ret);
 
-   local $/ = $LF if ($/ ne $LF); my $_buf;
-   chomp(my $_ret = <$_DAU_W_SOCK>);
-   chomp(my $_len = <$_DAU_W_SOCK>);
+   {
+      $_sig = undef, local $SIG{INT} = $_sigint, local $SIG{TERM} = $_sigterm;
 
-   if ($_len) {
-      if ($_len < 0) {
-         $_dat_un->() if !$_is_MSWin32;
-         $. = 0, $! = $_len * -1;
-         return undef;
+      CORE::lock $_DAT_LOCK if $_is_MSWin32;
+      $_dat_ex->() if !$_is_MSWin32;
+
+      print({$_DAT_W_SOCK} 'O~RLN'.$LF . $_chn.$LF),
+      print({$_DAU_W_SOCK} $_[0]->[0].$LF . length($/).$LF . $/);
+
+      local $/ = $LF if ($/ ne $LF);
+      chomp($_ret = <$_DAU_W_SOCK>);
+      chomp($_len = <$_DAU_W_SOCK>);
+
+      if ($_len && $_len > 0) {
+         read($_DAU_W_SOCK, $_buf, $_len);
       }
-      read($_DAU_W_SOCK, $_buf, $_len);
+
+      $_dat_un->() if !$_is_MSWin32;
    }
 
-   $_dat_un->() if !$_is_MSWin32;
+   CORE::kill($_sig, $$) if $_sig;
+
+   if ($_len && $_len < 0) {
+      $. = 0, $! = $_len * -1;
+      return undef;
+   }
+
    $. = $_ret, $! = 0;
    $_buf;
 }
@@ -650,22 +688,31 @@ sub WRITE {
    local $\ = undef if (defined $\);
    local $/ = $LF if ($/ ne $LF);
 
-   CORE::lock $_DAT_LOCK if $_is_MSWin32;
+   my $_ret;
 
-   if (@_ == 1 || (@_ == 2 && $_[1] == length($_[0]))) {
-      $_dat_ex->() if !$_is_MSWin32;
-      print({$_DAT_W_SOCK} 'O~WRI'.$LF . $_chn.$LF),
-      print({$_DAU_W_SOCK} $_id.$LF . length($_[0]).$LF, $_[0]);
-   }
-   else {
-      my $_buf = substr($_[0], ($_[2] || 0), $_[1]);
-      $_dat_ex->() if !$_is_MSWin32;
-      print({$_DAT_W_SOCK} 'O~WRI'.$LF . $_chn.$LF),
-      print({$_DAU_W_SOCK} $_id.$LF . length($_buf).$LF, $_buf);
+   {
+      $_sig = undef, local $SIG{INT} = $_sigint, local $SIG{TERM} = $_sigterm;
+
+      CORE::lock $_DAT_LOCK if $_is_MSWin32;
+
+      if (@_ == 1 || (@_ == 2 && $_[1] == length($_[0]))) {
+         $_dat_ex->() if !$_is_MSWin32;
+         print({$_DAT_W_SOCK} 'O~WRI'.$LF . $_chn.$LF),
+         print({$_DAU_W_SOCK} $_id.$LF . length($_[0]).$LF, $_[0]);
+      }
+      else {
+         my $_buf = substr($_[0], ($_[2] || 0), $_[1]);
+         $_dat_ex->() if !$_is_MSWin32;
+         print({$_DAT_W_SOCK} 'O~WRI'.$LF . $_chn.$LF),
+         print({$_DAU_W_SOCK} $_id.$LF . length($_buf).$LF, $_buf);
+      }
+
+      chomp($_ret = <$_DAU_W_SOCK>);
+
+      $_dat_un->() if !$_is_MSWin32;
    }
 
-   chomp(my $_ret = <$_DAU_W_SOCK>);
-   $_dat_un->() if !$_is_MSWin32;
+   CORE::kill($_sig, $$) if $_sig;
 
    (length $_ret) ? $_ret : undef;
 }
@@ -686,7 +733,7 @@ MCE::Shared::Handle - Handle helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Handle version 1.850
+This document describes MCE::Shared::Handle version 1.860
 
 =head1 DESCRIPTION
 

@@ -8,7 +8,7 @@ use MikroTik::Client::Response;
 use MikroTik::Client::Sentence qw(encode_sentence);
 use Scalar::Util 'weaken';
 
-has 'fd';
+has 'error';
 has port   => undef;
 has res    => sub { MikroTik::Client::Response->new() };
 has server => sub {
@@ -18,7 +18,12 @@ has server => sub {
     return tcp_server "127.0.0.1", $self->port, sub {
         my $fh = shift;
         $self->{h} = AnyEvent::Handle->new(
-            fh      => $fh,
+            fh => $fh,
+
+            $self->tls_opts
+            ? (tls => "accept", tls_ctx => $self->{tls_opts})
+            : (),
+
             on_read => sub {
                 my $h    = shift;
                 my $data = $self->res->parse(\$h->{rbuf});
@@ -36,10 +41,19 @@ has server => sub {
                     } or warn "unhandled command \"$cmd\": $@";
                 }
             },
-            on_eof => sub { delete $self->{timers} }
+            on_eof => sub { delete $self->{timers} },
+            on_error => sub { $self->error($_[2]) }
         );
     }, sub { $self->port($_[2]); return 0 };
 };
+has 'tls_opts';
+
+sub close {
+    my $self = shift;
+    $self->{h}->destroy();
+    delete @{$self}{qw(h server res)};
+    return $self;
+}
 
 sub cmd_cancel {
     my ($self, $attr) = @_;

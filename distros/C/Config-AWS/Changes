@@ -1,5 +1,18 @@
 Revision history for Config::AWS
 
+0.07      2019-09-14 13:34:43+01:00 Europe/London
+
+  Changes:
+    * Guard against undefined values in read_string
+  Fixes:
+    * Fix an issue with reporting File::Share as a dependency.
+
+0.06      2019-09-13 22:24:53+01:00 Europe/London
+
+  Changes:
+    * Started using a cpanfile to track dependencies.
+    * Error messages when unable to read files are clearer.
+
 0.05      2019-07-16 20:04:10+01:00 Europe/London
 
   Fixes:

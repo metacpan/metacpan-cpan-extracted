@@ -43,6 +43,7 @@ cmp_deeply($info, {
     BIN_DEPS    => {'XS::Install' => ignore()},
     PASSTHROUGH => ['XS::Install'],
     LOADABLE    => 1,
+    FILE        => ignore(),
 });
 
 done_testing();

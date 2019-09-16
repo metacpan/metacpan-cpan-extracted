@@ -1,6 +1,5 @@
 # Ebay/ByEndDate.pm
 # by Martin Thurn
-# $Id: ByEndDate.pm,v 2.33 2015-06-06 20:22:00 Martin Exp $
 
 =head1 NAME
 
@@ -85,7 +84,7 @@ use Date::Manip;
 use base 'WWW::Search::Ebay';
 
 our
-$VERSION = do { my @r = (q$Revision: 2.33 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
+$VERSION = 2.341;
 our $MAINTAINER = 'Martin Thurn <mthurn@cpan.org>';
 
 my $EBAY_TZ = 'America/Los_Angeles';
@@ -100,7 +99,11 @@ sub _native_setup_search
     carp " --- second argument to _native_setup_search should be hashref, not arrayref";
     return undef;
     } # unless
+  # These will become CGI arguments when the HTTP request is made to
+  # ebay.com:
   $rhOptsArg->{'SortProperty'} = 'MetaEndSort';
+  $rhOptsArg->{'_fosrp'} = 1;
+  $rhOptsArg->{'_sop'} = 1;
   if (0)
     {
     # my @a = sort Date_Init();
@@ -153,7 +156,7 @@ sub _parse_tree
   $self->{cache} = [
                     map { $_->[0] }
                     sort { $a->[1] cmp $b->[1] }
-                    map { [ $_, $_->change_date ] }
+                    map { [ $_, $_->change_date || 0 ] }
                     @{$self->{cache}}
                    ];
   return $hits;

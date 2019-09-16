@@ -1,6 +1,6 @@
 package Bio::Palantir::Refiner::DomainPlus;
 # ABSTRACT: Refiner internal class for handling DomainPlus objects
-$Bio::Palantir::Refiner::DomainPlus::VERSION = '0.192540';
+$Bio::Palantir::Refiner::DomainPlus::VERSION = '0.192560';
 use Moose;
 use namespace::autoclean;
 
@@ -67,7 +67,7 @@ Bio::Palantir::Refiner::DomainPlus - Refiner internal class for handling DomainP
 
 =head1 VERSION
 
-version 0.192540
+version 0.192560
 
 =head1 SYNOPSIS
 

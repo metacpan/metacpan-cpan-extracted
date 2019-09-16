@@ -1,8 +1,15 @@
 Revision history for Perl extension AnyEvent::Fork::RPC
 
-TODO: better exit conditions in Async, see Art Sackett mail
-TODO: allow overtaking existing $fh
+TODO: allow overtaking an existing $fh
 TODO: compatible $0 method, somehow
+
+2.0  Sun Sep 15 22:17:38 CEST 2019
+	- add AnyEvent::RPC::flush function in the child.
+	- introduce protocol versioning to ensure the right backend
+          module version is loaded.
+        - implement a more version-agnostic protocol.
+	- exposed buffer size as C<buflen_req> and C<buflen_res>
+          parameters to allow tweaking.
 
 1.24  Tue Mar 26 05:18:55 CET 2019
 	- check if connection has succeeded, rather than crashing

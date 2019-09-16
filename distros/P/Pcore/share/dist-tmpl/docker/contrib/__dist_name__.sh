@@ -28,4 +28,4 @@ DOCKER_CONTAINER_ARGS="
     --shm-size=1g \
 "
 
-source <( curl -fsSL https://bitbucket.org/softvisio/scripts/raw/tip/docker.sh || echo false ) "$@"
+source <( curl -fsSL https://bitbucket.org/softvisio/scripts/raw/master/docker.sh || echo false ) "$@"

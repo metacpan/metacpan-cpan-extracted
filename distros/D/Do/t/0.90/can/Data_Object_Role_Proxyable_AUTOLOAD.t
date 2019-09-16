@@ -13,7 +13,7 @@ AUTOLOAD
 
 =usage
 
-  $self->AUTOLOAD($class, $method, @args);
+  AUTOLOAD($class, $method, $self, @args);
 
 =description
 
@@ -22,7 +22,7 @@ called. This method is called and handled automatically.
 
 =signature
 
-AUTOLOAD(Str $arg1, Str $arg2, Any @args) : Any
+AUTOLOAD(Str $arg1, Str $arg2, Object $self, Any @args) : Any
 
 =type
 

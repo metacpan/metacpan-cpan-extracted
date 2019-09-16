@@ -1,133 +1,74 @@
-# Changes for version 0.05 of Math::FastGF2
+# Recent changes (v0.05 onwards)
 
-## General Changes
+Recent versions add a little bit more functionality (construct Cauchy
+and Vandermonde matrices), and some bug fixing, but my main focus has
+been on performance improvements. I mostly achieved this by converting
+some expensive method calls with XS code. I avoided tinkering with the
+existing ida_process_streams routine (in Crypt::IDA), even though it
+could use a bit of rewriting.
 
-See the main Changes file for full history.
+Originally, I had written this module with a view to implementing a
+RAID-like storage system, using files instead of block devices. I
+intended to use low-powered computers (Raspberry Pi and ODROID boards)
+and external disks for storing old backups. I wrote a command-line
+tool for managing the archive, but it relied on mounting disks over a
+LAN, or physically connecting them to a single machine. I wanted to
+develop this idea, using something like POE to write a distributed
+cluster, with proper network daemons and such, but I never got around
+to it.
 
-## Performance Changes
+Recently, I came across the Mojolicious framework and realised that it
+could be a good framework to use:
 
-I've decided to revisit this module primarily to see if I can get
-better throughput when doing IDA split/combine operations (see
-Crypt::IDA for details; it uses this module for the maths).
+* can easily write high-level, user-friendly HTTP interfaces (as
+  opposed to trying to write a FUSE driver, for example)
 
-Performance has generally been good enough for me when running it on
-my desktop, but recently I've become more interested in running it on
-less powerful machines (Raspberry Pi and old ODROID boards) to build a
-cheap distributed NAS cluster.
+* has support for low-level, event-driven programming (easier to use
+  than POE)
 
-After doing some tests, I found that the throughput on these boards
-wasn't good enough to saturate a 100Mbit network, meaning that my IDA
-code, rather than network bandwidth, would be the bottleneck in my
-cluster.
+* easy to use secure networking (HTTP/TLS)
 
-There may be a limit to how fast I can get the combined Perl/XS code
-running, but after doing some profiling and general inspection of the
-code, I've come up with some ideas...
+* websockets are more convenient to use than generic sockets (and they
+  support TLS, too)
 
-### Result
+This revived my interest in the idea of using low-powered boards and
+storage devices as a distributed storage cluster.
 
-I've basically done what I can in this module, so I'll move on to
-reworking some stuff in Crypt::IDA next.
+However, the performance of my Math::FastGF2 and Crypt::IDA libraries
+was never very good on Pi or ODROID boards. Rather than rewrite
+everything in C, I decided that I'd stick with Mojolicious and just
+optimise the Perl/XS libraries.
 
-It may be that I won't be able to get good enough performance on a
-Raspberry Pi without a total rewrite. However, as I also have an
-ODROID machine in the cluster, I can do all the split/combine tasks
-there and leave Pi machines to just do disk storage.
+As a result of the optimisations, the code is still too slow to be
+practical on the Pi boards that I have (Model Bs). Splitting a
+256Mbyte file with k=3, n=3 parameters takes just over 2 minutes (down
+from around 3 minutes), reading and writing to the onboard memory
+card. This translates to around 16Mbit/s, which is far too slow to
+saturate the 100Mbit network connection. I didn't actually test
+reading from the network and writing to an external disk (or another
+network connection), but my intuition is that these Pi boards wouldn't
+be very good machines to do splitting/combining on, at least not with
+Math::FastGF2 and Crypt::IDA.
 
-## Move handling of Matrix->{ROWS,COLS,ORG,WIDTH} back to Perl
+I'm sure that I can still use Pi boards purely as storage nodes in
+this new setup. I have some ODROID boards as well, which have much
+better performance, so I can use one of those as the "head" node that
+does the split/combine operations, with shares being sent over the
+network to/from the Pi storage nodes.
 
-Profiling seems to indicate a fair bit of time being taken up by these
-calls. They're not the biggest culprits, but I suspect that there is a
-non-trivial amount of overhead by doing an XS call for these.
+As a result of the optimisations (here and in Crypt::IDA), the same
+test of splitting a 256Mbyte file takes just under 10s on my XU3 Lite
+board. Previously, it took 56s. This is still around three times
+slower than on my proper desktop machine, but it should, theoretically
+mean a bandwidth of around 160Mbit/s, which *would* be able to
+saturate the 100Mbps network interface that it has.
 
-I wasn't able to do this because it's just not possible with
-XS. However, I was able to cut down on the number of calls.
+With these new optimisations, it should now be practical to use the
+Math::FastGF2 and Crypt::IDA libraries on fairly low-powered boards
+like ODROID's XU3/XU3 Lite.
 
-## Remove condition checks from deep in critical C inner loops
-
-I made a design decision early on to have all the gf2_* operations
-take "bytes" as their first parameter, rather than implementing
-different routine names for working on fields of sizes 1, 2 or 4
-bytes. I followed the same convention even down into the C routines,
-with a result that most inner loops will have a check for field size
-on each of the variables they're operating on.
-
-I will keep the Perl/XS interface the same, but move the check on
-field size outside critical loops.
-
-(multiply_submatrix is the biggest bottleneck in the code)
-
-### Result
-
-I implemented a quick fix to change:
-
-    gf2_mul(8, ...
-
-to a new
-
-    gf2_mul8( ...
-
-The code is still overly-generic, though I don't fancy exploding it
-out into 24 (or whatever) different versions depending on:
-
-* field size
-* input matrix organisation
-* output matrix organisation
-* transform matrix organisation
-
-I might optimise for the two most common layouts used for an IDA split
-operation on 8-bit fields and use the existing code as a fallback.
-Some other time, though.
-
-## Keep profiling offset_to_rowcol
-
-This may be simply a victim of XS overheads in calling $self->ORG and
-$self->COLS, so when I transfer handling of those methods back into
-Perl, this function may stop being an issue.
-
-### Result
-
-I made a few tweaks to this routine, but the real issue is that it's
-being called indiscriminately (from Crypt::IDA). I can eliminate most
-(if not all) of the calls by keeping a few extra bookkeeping
-variables there.
-
-## Remove/migrate some error-checking or checking for "variants"
-
-The code allows for a lot of different variables that can all work
-together:
-
-* big-endian vs little-endian of data
-* whether perl's endianness is different from data being processed
-* whether matrices are stored in "rowwise" or "columnwise" (or some combination being multiplied together)
-* GF(2) field size (1, 2 or 4 bytes)
-
-All the checks required for such flexibility is possibly slowing us
-down a lot.
-
-Other places might have a bit too much error checking, too.
-
-One solution for handling this stuff in Perl is to have a set of
-method names that begin with an underscore, which are meant for
-internal use only. Where it's warranted, I can move checking of:
-
-* error conditions
-* handling different "flavours" of routines
-
-into the main public method interface and then call one of the
-underscored methods (which can avoid checking the same things
-repeatedly). Also, it might be possible to just move some checks out
-of main loops.
-
-### Result
-
-I didn't follow up on this.
-
-## Future Direction
-
-I might come back soon and rewrite or clean up some code here, but
-it's not a huge priority. I'll go on to rework Crypt::IDA, which uses
-these libraries. That's much more in need of attention. In the
-process, I might come back and make a few more tweaks, but for now I'm
-happy enough with the code here.
-
+Note that the boards that I'm using are quite old. The Model B
+Raspberry Pi boards have had two major updates (Pi 3 and Pi 4). The
+ODROID boards also have more powerful successors (XU4 and N2). I
+suspect that the newer ODROID boards would be overkill, but perhaps
+the newer Pi boards would be fast enough to use as head nodes.

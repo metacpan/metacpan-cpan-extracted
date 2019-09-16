@@ -7,11 +7,14 @@ use_ok 'Data::Object::Float';
 # deprecated
 # ok Data::Object::Float->does('Data::Object::Rule::Comparison');
 # ok Data::Object::Float->does('Data::Object::Rule::Defined');
-ok Data::Object::Float->does('Data::Object::Role::Detract');
-ok Data::Object::Float->does('Data::Object::Role::Dumper');
+# deprecated
+# ok Data::Object::Float->does('Data::Object::Role::Detract');
+# deprecated
+# ok Data::Object::Float->does('Data::Object::Role::Dumper');
 # no longer supported
 # ok Data::Object::Float->does('Data::Object::Role::Numeric');
-ok Data::Object::Float->does('Data::Object::Role::Output');
+# deprecated
+# ok Data::Object::Float->does('Data::Object::Role::Output');
 ok Data::Object::Float->does('Data::Object::Role::Throwable');
 # no longer supported
 # ok Data::Object::Float->does('Data::Object::Role::Type');

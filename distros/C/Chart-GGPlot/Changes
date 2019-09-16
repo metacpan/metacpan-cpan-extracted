@@ -1,5 +1,11 @@
 Revision history for Chart::GGPlot
 
+0.0007      2019-09-15
+  - Bump Alt::Data::Frame::ButMore requirement, to drop use of
+    Moose::Autobox.
+  - New feature: geom_col().
+  - Add JSON::XS to runtime requires.
+
 0.0005      2019-06-09
   - New feature: experimental support of geom_smooth(). At present loess
     (locally weighted estimated scatterplot smoothing) and simple linear

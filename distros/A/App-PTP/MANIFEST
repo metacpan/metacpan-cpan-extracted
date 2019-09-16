@@ -26,6 +26,7 @@ t/206-command-tee.t
 t/207-command-cut.t
 t/208-command-shell.t
 t/209-command-file-name.t
+t/210-command-uniq.t
 t/300-perlenv.t
 t/999-examples.t
 t/data/default_data.txt

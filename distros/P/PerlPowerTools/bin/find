@@ -18,13 +18,43 @@ License: perl
 
 use strict;
 
+use Config qw(%Config);
+use File::Basename;
+use File::Spec::Functions;
 use File::Temp qw/ tempfile /;
 use FindBin;
 
-my $script = 'find2perl';
+sub find_find2perl {
+	return $ENV{FIND2PERL} if defined $ENV{FIND2PERL};
+	my @candidates =
+		grep { -e }
+		map { catfile( $_, 'find2perl' ) }
+			dirname($Config{perlpath}),
+			split( /$Config{path_sep}/, $ENV{PATH} )
+			;
 
-`perl $FindBin::Bin/which $script`
-    or die "Please install App::find2perl before continuing.\n";
+	push @candidates, catfile( $ENV{PERL_LOCAL_LIB_ROOT}, 'bin', 'find2perl' )
+		if defined $ENV{PERL_LOCAL_LIB_ROOT};
+
+	return defined $candidates[0] ? $candidates[0] : ();
+	}
+
+my $find2perl  = find_find2perl();
+
+die <<"HEREDOC" unless -e $find2perl;
+Did not find the find2perl program. Install App::find2perl or set the
+FIND2PERL environment variable with the path.
+
+This program looked for find2perl in:
+
+	@{[ defined $find2perl ? $find2perl : '<not found>' ]}
+
+find2perl was distributed with perl up to v5.18 and became a separate
+module in v5.20. Older versions of find2perl assumed that the program
+would be next to the perl binary but installed something like
+/usr/bin/find2perl that would dispatch to the Standard Library
+version.
+HEREDOC
 
 # Temp files to capture find2perl output and error.
 my ($out_fh, $out_file) = tempfile();
@@ -51,7 +81,7 @@ $|++, select $_ for select STDERR;
 
 # Run find2perl to convert find command to Perl script.
 
-system $script, @ARGV;
+system $^X, $find2perl, @ARGV;
 
 # Check for errors.
 
@@ -80,14 +110,14 @@ if ($error) {
                 if $ARGV[$i] =~ s/^(-[acm])min$/${1}time/;
         }
 
-        system $script, @ARGV;
+        system $find2perl, @ARGV;
         $child_error = $?;
     } else {
         warn $error;
     }
 }
 
-die "Can't run $script (wait status == $child_error)" if $child_error;
+die "Can't run $find2perl (wait status == $child_error)" if $child_error;
 
 die "Empty program" unless -s $out_fh && -s $out_file;
 
@@ -124,7 +154,7 @@ eval qq{
     $program;
 };
 
-die "Can't compile and execute $script program: $@\n" if $@;
+die "Can't compile and execute $find2perl: $@\n" if $@;
 
 exit 0;
 

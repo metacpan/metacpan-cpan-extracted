@@ -1,5 +1,58 @@
 # Perltidy Change Log
 
+## 2019 09 15
+
+    - fixed issue RT#130344: false warning "operator in print statement" 
+      for "use lib". 
+
+    - fixed issue RT#130304: standard error output should include filename.
+      When perltidy error messages are directed to the standard error output 
+      with -se or --standard-error-output, the message lines now have a prefix 
+      'filename:' for clarification in case multiple files 
+      are processed, where 'filename' is the name of the input file.  If 
+      input is from the standard input the displayed filename is '<stdin>', 
+      and if it is from a data structure then displayed filename 
+      is '<source_stream>'.
+
+    - implement issue RT#130425: check mode.  A new flag '--assert-tidy'
+      will cause an error message if the output script is not identical to
+      the input script. For completeness, the opposite flag '--assert-untidy'
+      has also been added.  The next item, RT#130297, insures that the script
+      will exit with a non-zero exit flag if the assertion fails.
+
+    - fixed issue RT#130297; the perltidy script now exits with a nonzero exit 
+      status if it wrote to the standard error output. Prevously only fatal
+      run errors produced a non-zero exit flag. Now, even non-fatal messages
+      requested with the -w flag will cause a non-zero exit flag.  The exit
+      flag now has these values:
+
+         0 = no errors
+         1 = perltidy could not run to completion due to errors
+         2 = perltidy ran to completion with error messages
+
+    - added warning message for RT#130008, which warns of conflicting input
+      parameters -iob and -bom or -boc.
+
+    - fixed RT#129850; concerning a space between a closing block brace and
+      opening bracket or brace, as occurs before the '[' in this line:
+
+       my @addunix = map { File::Spec::Unix->catfile( @ROOT, @$_ ) } ['b'];
+
+      Formerly, any space was removed. Now it is optional, and the output will
+      follow the input.
+
+    - fixed issue git#13, needless trailing whitespace in error message
+
+    - fixed issue git#9: if the -ce (--cuddled-else) flag is used,
+      do not try to form new one line blocks for a block type 
+      specified with -cbl, particularly map, sort, grep
+
+    - iteration speedup for unchanged code.  Previously, when iterations were
+      requested, at least two formatting passes were made. Now just a single pass
+      is made if the formatted code is identical to the input code.
+
+    - some improved vertical alignments
+
 ## 2019 06 01
 
     - rt #128477: Prevent inconsistent owner/group and setuid/setgid bits. 
@@ -357,7 +410,7 @@
 ## 2017 05 21
 
     - Fixed debian #862667: failure to check for perltidy.ERR deletion can lead 
-      to overwriting abritrary files by symlink attack. Perltidy was continuing 
+      to overwriting arbitrary files by symlink attack. Perltidy was continuing
       to write files after an unlink failure.  Thanks to Don Armstrong 
       for a patch.
 
@@ -380,7 +433,7 @@
       with --backup-and-modify-in-place. Thanks to Heinz Knutzen for this patch.
 
     - Fixed minor formatting issue where one-line blocks for subs with signatures 
-      were unnecesarily broken
+      were unnecessarily broken
 
     - RT #32905, patch to fix utf-8 error when output was STDOUT. 
 
@@ -459,7 +512,7 @@
     
      - Fixed RT #107832 and #106492, lack of vertical alignment of two lines
        when -boc flag (break at old commas) is set.  This bug was 
-       inadvertantly introduced in previous bug fix RT #98902. 
+       inadvertently introduced in previous bug fix RT #98902. 
 
      - Some common extensions to Perl syntax are handled better.
        In particular, the following snippet is now foratted cleanly:
@@ -545,7 +598,7 @@
     - Fixed RT #96101; Closing brace of anonymous sub in a list was being
       indented.  For example, the closing brace of the anonymous sub below 
       will now be lined up with the word 'callback'.  This problem 
-      occured if there was no comma after the closing brace of the anonymous sub.  
+      occurred if there was no comma after the closing brace of the anonymous sub.
       This update may cause minor changes to formatting of code with lists 
       of anonymous subs, especially TK code.
       
@@ -1259,7 +1312,7 @@
          : undef;
 
     -Text following un-parenthesized if/unless/while/until statements get a
-    full level of indentation.  Suggested by Jeff Armstorng and others. 
+    full level of indentation.  Suggested by Jeff Armstrong and others.
     OLD:
        return $ship->chargeWeapons("phaser-canon")
          if $encounter->description eq 'klingon'
@@ -2036,7 +2089,7 @@
      external calls to Tidy.pm module.  Fixed incorrect html title when
      Tidy.pm is called with IO::Scalar or IO::Array source.
 
-    -Output file permissons are now set as follows.  An output script file
+    -Output file permissions are now set as follows.  An output script file
      gets the same permission as the input file, except that owner
      read/write permission is added (otherwise, perltidy could not be
      rerun).  Html output files use system defaults.  Previously chmod 0755
@@ -3000,7 +3053,7 @@
     -I updated the tokenizer to allow $#+ and $#-, which seem to be new to
     Perl 5.6.  Some experimenting with a recent version of Perl indicated
     that it allows these non-alphanumeric '$#' array maximum index
-    varaibles: $#: $#- $#+ so I updated the parser accordingly.  Only $#:
+    variables: $#: $#- $#+ so I updated the parser accordingly.  Only $#:
     seems to be valid in older versions of Perl.
 
     -Fixed a rare formatting problem with -lp (and -gnu) which caused

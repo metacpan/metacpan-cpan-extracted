@@ -129,6 +129,8 @@ lib/Quiq/Parameters.pm
 lib/Quiq/Path.pm
 lib/Quiq/Perl.pm
 lib/Quiq/Pod/Generator.pm
+lib/Quiq/PostgreSql/CopyFormat.pm
+lib/Quiq/PostgreSql/Psql.pm
 lib/Quiq/Process.pm
 lib/Quiq/Program.pm
 lib/Quiq/Progress.pm
@@ -309,6 +311,8 @@ t/bin/Quiq/Parameters.t
 t/bin/Quiq/Path.t
 t/bin/Quiq/Perl.t
 t/bin/Quiq/Pod/Generator.t
+t/bin/Quiq/PostgreSql/CopyFormat.t
+t/bin/Quiq/PostgreSql/Psql.t
 t/bin/Quiq/Process.t
 t/bin/Quiq/Program.t
 t/bin/Quiq/Progress.t

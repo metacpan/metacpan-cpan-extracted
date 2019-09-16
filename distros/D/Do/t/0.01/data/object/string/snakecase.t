@@ -13,7 +13,7 @@ subtest 'test the snakecase method' => sub {
   my $snakecase = $string->snakecase;
 
   isnt refaddr($string), refaddr($snakecase);
-  is "$snakecase", 'helloWorld';    # helloWorld
+  is "$snakecase", 'hello_world';    # hello_world
 
   isa_ok $string,    'Data::Object::String';
   isa_ok $snakecase, 'Data::Object::String';

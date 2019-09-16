@@ -265,7 +265,6 @@ ok($_, "Hiya :)");
 # Search system locale directories
 ($lang, $domain) = find_system_mo;
 $skip = defined $domain? 0: 1;
-print "($lang, $domain)\n";
 $r = eval {
     return if $skip;
     require T_L10N;

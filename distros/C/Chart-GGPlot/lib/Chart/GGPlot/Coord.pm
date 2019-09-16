@@ -5,7 +5,7 @@ package Chart::GGPlot::Coord;
 use Chart::GGPlot::Role qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0005'; # VERSION
+our $VERSION = '0.0007'; # VERSION
 
 use Types::Standard qw(Bool);
 
@@ -73,7 +73,7 @@ Chart::GGPlot::Coord - The role for coordinates
 
 =head1 VERSION
 
-version 0.0005
+version 0.0007
 
 =head1 DESCRIPTION
 

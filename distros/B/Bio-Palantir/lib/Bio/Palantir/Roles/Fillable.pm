@@ -1,6 +1,6 @@
 package Bio::Palantir::Roles::Fillable;
 # ABSTRACT: Fillable Moose role for the construction of DomainPlus object arrays and Exploratory methods
-$Bio::Palantir::Roles::Fillable::VERSION = '0.192540';
+$Bio::Palantir::Roles::Fillable::VERSION = '0.192560';
 use Moose::Role;
 
 use autodie;
@@ -541,7 +541,7 @@ Bio::Palantir::Roles::Fillable - Fillable Moose role for the construction of Dom
 
 =head1 VERSION
 
-version 0.192540
+version 0.192560
 
 =head1 SYNOPSIS
 

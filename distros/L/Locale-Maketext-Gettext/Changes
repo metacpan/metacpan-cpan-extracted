@@ -1,5 +1,13 @@
 Locale-Maketext-Gettext change log
 
+2019-09-17	version 1.30
+	 Fix after 10 years.
+	 1. 12-cache.t: Fixed so that it works on MS-Win32.  I forgot to
+	    issue binmode when copying the MO files.
+	 2. 00-signature.t: Removed TEST_SIGNATURE, as this does not work
+	    on everybody who does not have my GPG public key, but me.
+	 3. 03-errors.t: Removed the debugging output.
+
 2019-09-09	version 1.29
 	 Fix after 10 years.
 	 1. Gettext.pm: Added support to purge the lexicon cache and

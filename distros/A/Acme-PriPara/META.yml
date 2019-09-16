@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.140640'
+generated_by: 'Minilla/v3.1.6, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   Acme::PriPara:
     file: lib/Acme/PriPara.pm
-    version: '0.02'
+    version: '0.04'
   Acme::PriPara::MainMembers:
     file: lib/Acme/PriPara/MainMembers.pm
   Acme::PriPara::MainMembers::DorothyWest:
@@ -51,9 +51,14 @@ resources:
   bugtracker: https://github.com/htk291/p5-Acme-PriPara/issues
   homepage: https://github.com/htk291/p5-Acme-PriPara
   repository: git://github.com/htk291/p5-Acme-PriPara.git
-version: '0.02'
+version: '0.04'
+x_authority: cpan:HTK
 x_contributors:
-  - 'htk291 <htk0129@gmail.com>'
+  - 'AnaTofuZ <anatofuz@gmail.com>'
   - 'OGATA Tetsuji <tetsuji.ogata@gmail.com>'
   - 'SUZUKI Masashi <m15.suzuki.masashi@gmail.com>'
-  - 'H.Takahashi <htk291@gmail.com>'
+  - 'htk291 <htk0129@gmail.com>'
+  - 'htk291 <htk291@gmail.com>'
+  - 'kiryuanzu <anzu.nagato.1005@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -9,13 +9,14 @@ README
 cpanfile
 lib/App/p5find.pm
 metamerge.json
+script/p5find-method-call
 script/p5find-regex
 script/p5find-str
 script/p5find-sub
 script/p5find-token-word
 script/p5find-unused-package
-script/p5find-variable-methods
 script/p5find-words-used-only-once
 t/iter.t
 t/iter2.t
 t/iter3.t
+t/p5-method-call-iterator.t

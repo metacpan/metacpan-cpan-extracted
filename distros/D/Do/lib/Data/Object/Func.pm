@@ -11,7 +11,7 @@ extends 'Data::Object::Base';
 
 with 'Data::Object::Role::Throwable';
 
-our $VERSION = '1.70'; # VERSION
+our $VERSION = '1.76'; # VERSION
 
 # BUILD
 
@@ -233,9 +233,11 @@ Returns a list of positional args from the named args.
 
 =head1 CREDITS
 
-Al Newkirk, C<+287>
+Al Newkirk, C<+296>
 
 Anthony Brummett, C<+10>
+
+José Joaquín Atria, C<+1>
 
 =cut
 

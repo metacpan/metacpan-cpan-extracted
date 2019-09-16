@@ -11,8 +11,10 @@ my $songs = $bach->parse();
 
 my %score;
 for my $id ( keys %$songs ) {
+#warn "MARK: $id\n" if $songs->{$id}{key} eq 'A_m';
     $score{ $songs->{$id}{key} }++;
 }
+#exit;
 
 use Chart::Bars;
 my $chart = Chart::Bars->new( 800, 400 );

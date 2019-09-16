@@ -58,6 +58,6 @@
          "web" : "https://github.com/FGasper/p5-DNS-Unbound"
       }
    },
-   "version" : "0.10",
+   "version" : "0.12",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

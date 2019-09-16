@@ -50,6 +50,7 @@ subtest 'Charactors' => sub {
         ok $mirei->has_pripara_changed;
         is $mirei->costume_brand, 'Candy à la Mode';
         is $mirei->color,         'ライトブルー', 'color returns only if pripara-changed';
+        is $mirei->say,           'ぷり';
     };
 
     subtest 'Sophy' => sub {
@@ -65,6 +66,7 @@ subtest 'Charactors' => sub {
         is $sophy->voiced_by,     '久保田未夢';
         is $sophy->costume_brand,  undef;
         is $sophy->color,          undef, 'color returns only if pripara-changed';
+        is $sophy->say,            'ぷしゅ〜';
 
         $sophy->pripara_change;    # Sophy attempt to enter the PriPara World...
         ok ! $sophy->has_pripara_changed;
@@ -90,6 +92,7 @@ subtest 'Charactors' => sub {
         is $sion->voiced_by,     '山北早紀';
         is $sion->costume_brand,  undef;
         is $sion->color,          undef, 'color returns only if pripara-changed';
+        is $sion->say,            'イゴッ!';
 
         $sion->pripara_change;
         ok $sion->has_pripara_changed;
@@ -109,6 +112,7 @@ subtest 'Charactors' => sub {
         is $dorothy->cv,          '澁谷梓希';
         is $dorothy->voiced_by,   '澁谷梓希';
         is $dorothy->color,        undef, 'color returns only if pripara-changed';
+        is $dorothy->say,         'テンションマーックス!';
 
         $dorothy->pripara_change;
         ok ! $dorothy->has_pripara_changed;
@@ -134,6 +138,7 @@ subtest 'Charactors' => sub {
         is $reona->cv,            '若井友希';
         is $reona->voiced_by,     '若井友希';
         is $reona->color,         undef, 'color returns only if pripara-changed';
+        is $reona->say,           'リラックス〜。';
 
         $reona->pripara_change;
         ok ! $reona->has_pripara_changed;

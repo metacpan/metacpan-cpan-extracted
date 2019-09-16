@@ -7,7 +7,7 @@ package Chart::GGPlot::Util::Scales;
 
 use Chart::GGPlot::Setup qw(:base :pdl);
 
-our $VERSION = '0.0005'; # VERSION
+our $VERSION = '0.0007'; # VERSION
 
 use Color::Brewer;
 use Color::Library;
@@ -945,7 +945,7 @@ Chart::GGPlot::Util::Scales - R 'scales' package functions used by Chart::GGPlot
 
 =head1 VERSION
 
-version 0.0005
+version 0.0007
 
 =head1 FUNCTIONS
 

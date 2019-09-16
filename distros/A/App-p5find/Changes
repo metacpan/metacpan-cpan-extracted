@@ -1,3 +1,7 @@
+0.04    2019-09-14T19:29:06+0900
+   - Add "p5find-method-call" to replace "p5find-variable-methods"
+   - More documentation.
+
 0.03    2019-09-13T09:57:01+0900
     More documentation, define a consistent default behaviour of
     recalling everything (that is being looked for), and

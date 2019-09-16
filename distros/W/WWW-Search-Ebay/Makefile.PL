@@ -1,10 +1,9 @@
 
-use warnings;
-use strict;
+# $rcs = ' $Id: Makefile.PL,v 1.104 2015-06-06 19:55:18 Martin Exp $ ';
 
 use inc::Module::Install;
 
-version(3.052);
+version(3.054);
 all_from('lib/WWW/Search/Ebay.pm');
 
 requires(perl => 5.005);
@@ -34,14 +33,8 @@ coverage :
 PART0
 postamble $ret;
 
-my $iHaveEnv = 1;
-eval 'use Env';
-if ($@)
-  {
-  $iHaveEnv = 0;
-  } # if
-
-if ($iHaveEnv and $ENV{MTHURN_PERL_DEV})
+use Env;
+if ($ENV{MTHURN_PERL_DEV})
   {
   warn "DDD This is author's development environment\n";
   use_ptar();
@@ -49,7 +42,7 @@ if ($iHaveEnv and $ENV{MTHURN_PERL_DEV})
 
 WriteAll;
 
-if (0 and $iHaveEnv and $ENV{MTHURN_PERL_DEV})
+if (0 && $ENV{MTHURN_PERL_DEV})
   {
   my $sFnameMakefile = q{Makefile};
   eval "use File::Slurp";

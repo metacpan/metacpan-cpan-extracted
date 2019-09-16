@@ -366,7 +366,7 @@ EXAMPLES
     is only defined when the child is fully initialised. If you redirect the
     log messages in your "init" function for example, then the "event"
     function might not yet be available. This is why the log callback checks
-    whether the fucntion is there using "defined", and only then uses it to
+    whether the function is there using "defined", and only then uses it to
     log the message.
 
 PARENT PROCESS USAGE
@@ -414,7 +414,7 @@ PARENT PROCESS USAGE
             all requests have been handled, and this can be accomplished by
             waiting for this callback.
 
-        init => $function (default none)
+        init => $function (default: none)
             When specified (by name), this function is called in the child
             as the very first thing when taking over the process, with all
             the arguments normally passed to the "AnyEvent::Fork::run"
@@ -428,10 +428,10 @@ PARENT PROCESS USAGE
             could be used to load any modules that provide the serialiser or
             function. It can not, however, create events.
 
-        done => $function (default "CORE::exit")
+        done => $function (default: "CORE::exit")
             The function to call when the asynchronous backend detects an
             end of file condition when reading from the communications
-            socket *and* there are no outstanding requests. It's ignored by
+            socket *and* there are no outstanding requests. It is ignored by
             the synchronous backend.
 
             By overriding this you can prolong the life of a RPC process
@@ -577,6 +577,29 @@ PARENT PROCESS USAGE
                       sub { @{ Storable::thaw shift } }
                    )
 
+        buflen => $bytes (default: "512 - 16")
+            The starting size of the read buffer for request and response
+            data.
+
+            "AnyEvent::Fork::RPC" ensures that the buffer for reeading
+            request and response data is large enough for at leats aingle
+            request or response, and will dynamically enlarge the buffer if
+            needed.
+
+            While this ensures that memory is not overly wasted, it
+            typically leads to having to do one syscall per request, which
+            can be inefficient in some cases. In such cases, it can be
+            beneficient to increase the buffer size to hold more than one
+            request.
+
+        buflen_req => $bytes (default: same as "buflen")
+            Overrides "buflen" for request data (as read by the forked
+            process).
+
+        buflen_res => $bytes (default: same as "buflen")
+            Overrides "buflen" for response data (replies read by the parent
+            process).
+
         See the examples section earlier in this document for some actual
         examples.
 
@@ -610,7 +633,19 @@ CHILD PROCESS USAGE
     without having to load any extra modules. They are part of the
     child-side API of AnyEvent::Fork::RPC.
 
-    AnyEvent::Fork::RPC::event ...
+    Note that these functions are typically not yet declared when code is
+    compiled into the child, because the backend module is only loaded when
+    you call "run", which is typically the last method you call on the fork
+    object.
+
+    Therefore, you either have to explicitly pre-load the right backend
+    module or mark calls to these functions as function calls, e.g.:
+
+       AnyEvent::Fork::RPC::event (0 => "five");
+       AnyEvent::Fork::RPC::event->(0 => "five");
+       &AnyEvent::Fork::RPC::flush;
+
+    AnyEvent::Fork::RPC::event (...)
         Send an event to the parent. Events are a bit like RPC calls made by
         the child process to the parent, except that there is no notion of
         return values.
@@ -622,7 +657,49 @@ CHILD PROCESS USAGE
         sent immediatelly but queued for later sending, so there is no
         guarantee that the event has been sent to the parent when the call
         returns - when you e.g. exit directly after calling this function,
-        the parent might never receive the event.
+        the parent might never receive the event. See the next function for
+        a remedy.
+
+    $success = AnyEvent::Fork::RPC::flush ()
+        Synchronously wait and flush the reply data to the parent. Returns
+        true on success and false otherwise (i.e. when the reply data cannot
+        be written at all). Ignoring the success status is a common and
+        healthy behaviour.
+
+        Only the "async" backend does something on "flush" - the "sync"
+        backend is not buffering reply data and always returns true from
+        this function.
+
+        Normally, reply data might or might not be written to the parent
+        immediatelly but is buffered. This can greatly improve performance
+        and efficiency, but sometimes can get in your way: for example. when
+        you want to send an error message just before exiting, or when you
+        want to ensure replies timely reach the parent before starting a
+        long blocking operation.
+
+        In these cases, you can call this function to flush any outstanding
+        reply data to the parent. This is done blockingly, so no requests
+        will be handled and no event callbacks will be called.
+
+        For example, you could wrap your request function in a "eval" block
+        and report the exception string back to the caller just before
+        exiting:
+
+           sub req {
+              ...
+
+              eval {
+                 ...
+              };
+
+              if ($@) {
+                 AnyEvent::RPC::event (throw => "$@");
+                 AnyEvent::RPC::flush ();
+                 exit;
+              }
+
+              ...
+           }
 
   PROCESS EXIT
     If and when the child process exits depends on the backend and

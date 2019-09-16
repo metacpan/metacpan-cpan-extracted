@@ -5,7 +5,7 @@ package Chart::GGPlot::Scale;
 use Chart::GGPlot::Role qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0005'; # VERSION
+our $VERSION = '0.0007'; # VERSION
 
 use PDL::Primitive qw(which);
 use Types::PDL qw(Piddle PiddleFromAny);
@@ -137,7 +137,7 @@ Chart::GGPlot::Scale - The role for scale
 
 =head1 VERSION
 
-version 0.0005
+version 0.0007
 
 =head1 DESCRIPTION
 

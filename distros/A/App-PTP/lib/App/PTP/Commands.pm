@@ -347,7 +347,11 @@ sub do_perl {
     if (not defined $content->[$i]) {
       undef $markers->[$i];
     } elsif (not defined $markers->[$i]) {
-      $markers->[$i] = '';  # We don't want undef here, as we will filter on it.
+      # We don't want undef here, as we will filter on it.
+      # Note that the $m and @m variables shared with the environment try to
+      # prevent the user from setting undef in them. But we don't trust that
+      # Too much.
+      $markers->[$i] = '';
     }
   }
   @$content = grep { defined } @$content;
@@ -412,11 +416,16 @@ sub do_sort {
 
 sub do_list_op {
   my ($content, $markers, $modes, $options, $sub, $apply_on_markers) = @_;
-  @$content = &$sub(@$content);
-  if ($apply_on_markers) {
-    @$markers = &$sub(@$markers);
-  } else {
+  if ($apply_on_markers eq 'none') {
+    @$content = &$sub(@$content);
     @$markers = (0) x scalar(@$content);
+  } elsif ($apply_on_markers eq 'same') {
+    @$content = &$sub(@$content);
+    @$markers = &$sub(@$markers);
+  } elsif ($apply_on_markers eq 'together' ) {
+    &$sub($content, $markers);
+  } else {
+    die "INTERNAL ERROR: Invalid value for \$apply_on_markers passed to do_list_op: $apply_on_markers\n";
   }
 }
 

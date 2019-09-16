@@ -12,7 +12,7 @@ use Test::File::ShareDir -share =>
   { -dist => { 'Alt-Data-Frame-ButMore' => 'data-raw' } };
 
 use Data::Frame;
-use Data::Frame::Examples qw(mtcars iris);
+use Data::Frame::Examples qw(mtcars iris airquality);
 
 my $mtcars = mtcars();
 
@@ -383,6 +383,13 @@ subtest id => sub {
     );
     my $id = $df->id();
     pdl_is( $id, pdl( [ 0, 1, 0, 2 ] ), 'id()' );
+};
+
+subtest drop_bad => sub {
+    my $df = airquality();
+    is($df->drop_bad()->nrow, 111, 'drop_bad()');
+    is($df->drop_bad(how => 'any')->nrow, 111, 'drop_bad(how => "any")');
+    is($df->drop_bad(how => 'all')->nrow, 153, 'drop_bad(how => "all")');
 };
 
 done_testing;

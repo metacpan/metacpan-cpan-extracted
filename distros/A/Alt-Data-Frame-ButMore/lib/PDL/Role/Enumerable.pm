@@ -64,7 +64,7 @@ PDL::Role::Enumerable
 
 =head1 VERSION
 
-version 0.0051
+version 0.0053
 
 =head1 AUTHORS
 

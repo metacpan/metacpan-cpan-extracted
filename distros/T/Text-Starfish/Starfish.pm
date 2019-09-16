@@ -30,7 +30,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS); # Exporter vars
 use vars qw($NAME $ABSTRACT $VERSION);
 $NAME     = 'Starfish';
 $ABSTRACT = 'Perl-based System for Text-Embedded Programming and Preprocessing';
-$VERSION  = '1.25';
+$VERSION  = '1.29';
 
 use vars qw($Revision);
 ($Revision = substr(q$Revision: $, 10)) =~ s/\s+$//;
@@ -233,60 +233,68 @@ sub eval_dispatch {
 }
 
 sub digest {
-    my $self = shift;
-    $self->{CurrentLoop} = 1;
-    my $savedcontent = $self->{data};
-
-  START:			# The main scanning loop
-    $self->{Out} = '';
-    $self->scan();
-    while ($self->{ttype} != -1) {
-      if ($self->{ttype} > -1) {
-	my $hook = $self->{hook}->[$self->{ttype}];
-	if ($hook->{ht} eq 'regex') {
-	  $self->{Out} .= $self->eval_dispatch;
-	}
-	# old style regex evaluator, should be removed, but first
-	# fix problems with python style
-	elsif ( @{$self->{args}} ) {
-	  $self->{Out}.= &{$self->{hook}->[$self->{ttype}]->{replace}}
-	    ( $self, @{ $self->{args} } );
-	}
-	else {
-	  $self->{Out}.= &{$self->{hook}->[$self->{ttype}]->{f}}
-	    ( $self, $self->{prefix}, $self->{currenttoken}, $self->{suffix});
-	}
-      } # else $ttype < -1 (outer text)
-      else { $self->_process_outer( $self->{currenttoken} ) }
-      $self->scan();
-    }
-    
-    if ($self->{CurrentLoop} < $self->{Loops}) {
-	++$self->{CurrentLoop};
-	if ($self->{REPLACE}) {             # in replace mode interate with
-	  $self->{data} = $savedcontent;    # original input
-	  goto START;
-	}
-	$self->{data} = $self->{Out};
-	if ($savedcontent ne $self->{Out})
-	{ $self->{LastUpdateTime} = time }
-	putfile 'sfish.debug', $self->{data};
-	goto START;
-    }
-    
-    if (defined $self->{macrosdefined}) {
-      my ($m, $s);
-      for $m (sort keys %{$self->{Macros}}) {
-	$s = $self->{Macros}->{$m};
-	if ($s =~ /\n/) {
-	  my $p1 = "$`$&"; $s = $';
-	  if ($s) { $s = $p1.wrap($s) }
-	  else { $s = $p1 }
-	}
-	$self->{Out}.= $self->{MprefAuxDefine}.$s.$self->{MsufAuxDefine};
+  my $self = shift;
+  $self->{CurrentLoop} = 1;
+  my $savedcontent = $self->{data};
+  
+ START:			# The main scanning loop
+  $self->{Out} = '';
+  $self->scan();
+  while ($self->{ttype} != -1) {
+    if ($self->{ttype} > -1) {
+      my $hook = $self->{hook}->[$self->{ttype}];
+      if ($hook->{ht} eq 'regex') {
+	$self->{Out} .= $self->eval_dispatch;
       }
+      # old style regex evaluator, should be removed, but first
+      # fix problems with python style
+      elsif ( @{$self->{args}} ) {
+	$self->{Out}.= &{$self->{hook}->[$self->{ttype}]->{replace}}
+	  ( $self, @{ $self->{args} } );
+      }
+      else {
+	$self->{Out}.= &{$self->{hook}->[$self->{ttype}]->{f}}
+	  ( $self, $self->{prefix}, $self->{currenttoken}, $self->{suffix});
+      }
+    } # else $ttype < -1 (outer text)
+    else { $self->_process_outer( $self->{currenttoken} ) }
+    $self->scan();
+  }
+    
+  if ($self->{CurrentLoop} < $self->{Loops}) {
+    ++$self->{CurrentLoop};
+    if ($self->{REPLACE}) {             # in replace mode interate with
+      $self->{data} = $savedcontent;    # original input
+      goto START;
     }
-}
+    $self->{data} = $self->{Out};
+    if ($savedcontent ne $self->{Out})
+      { $self->{LastUpdateTime} = time }
+    putfile 'sfish.debug', $self->{data};
+    goto START;
+  }
+
+  # Final routines, if defined
+  if (defined($self->{Final})) {
+    my @a = @{ $self->{Final} };
+    for my $f (@a) {
+      $self->{Out} = &{$f}($self->{Out}); }
+  }
+  
+  # Related to the macro concept (e.g. code folding)
+  if (defined $self->{macrosdefined}) {
+    my ($m, $s);
+    for $m (sort keys %{$self->{Macros}}) {
+      $s = $self->{Macros}->{$m};
+      if ($s =~ /\n/) {
+	my $p1 = "$`$&"; $s = $';
+	if ($s) { $s = $p1.wrap($s) }
+	else { $s = $p1 }
+      }
+      $self->{Out}.= $self->{MprefAuxDefine}.$s.$self->{MsufAuxDefine};
+    }
+  }
+} # end of sub digest
 
 # process outer text; by default, it should be appended to $self->{Out}
 sub _process_outer {
@@ -750,7 +758,8 @@ sub setStyle {
 	else {
 	    my $f = $self->{INFILE};
 
-	    if    ($f =~ /\.html\.sfish$/i) { $self->setStyle('.html.sfish') }
+	    if    ($f =~ /\.(html\.sfish|sf)$/i
+		  ) { $self->setStyle('.html.sfish') }
 	    else {
 		$f =~ s/\.s(tar)?fish$//;
 		if    ($f =~ /\.html?/i)        { $self->setStyle('html') }
@@ -820,6 +829,7 @@ sub setStyle {
 		f=>sub{return''}},
 	       {begin => '<!--<?', end => '!>-->', f => \&evaluate },
 	       {begin=>'<?starfish ', end=>'?>', f=>\&evaluate },
+	       {begin=>qr/<\?sf\s/, end=>qr/!>/, f=>\&evaluate },
         ];
 	$self->addHook(qr/^#.*\n/m, 'comment');
 	$self->{CodePreparation} = '';
@@ -962,6 +972,13 @@ sub rmAllHooks {
 }
 
 sub resetHooks { my $self = shift; $self->rmAllHooks(); $self->setStyle(); }
+
+sub add_final {
+  my $self = shift;
+  my $f = shift; die "$f not a function" unless ref($f) eq 'CODE';
+  if (!defined($self->{Final})) { $self->{Final} = [] }
+  push @{ $self->{Final} }, $f;
+}
 
 sub defineMacros {
     my $self = shift;
@@ -1376,6 +1393,32 @@ Generating text with a variable replacement:
  Document 2
  %End2
 
+=head3 LaTeX Example with Final Routine used for Slides
+
+  % -*- compile-command: "make 01s 01"; -*-
+  %<? ##read_starfish_conf();
+  %  $TexTarget = 'slides';
+  %  sfish_add_tag('sl,l', 'echo');
+  %  sfish_add_tag('slide', 'echo');
+  %  sfish_ignore_outer;
+  %  $Star->add_final( sub {
+  %    my $r = shift;
+  %    $r =~ s/^% -\*- compile-command.*\n//;
+  %    $r.= "\\end{document}\n";
+  %    return $r;
+  %  } );
+  % !>
+
+  \section{Course Introduction}
+
+  Not in slide.
+
+  %slide:In slide.
+
+  %<sl,l>
+  In slides and lectures.
+  %</sl,l>
+
 =head2 Example with Test/Release versions (Java)
 
 Suppose you have a stanalone java file p.java, and you want to have
@@ -1510,6 +1553,14 @@ active at a time, due to executing Starfish from a starfish snippet.
 The name is introduced into the main namespace, which might be a
 questionable decision.
 
+=head2 $Star->{Final}
+
+If defined, it should be an array of CODE references, which are applied as
+functions on the final output before writing it out.  These are used as final
+routines, typically to add or remove some of the first lines or finals lines.
+Each functionj takes input as a parameter and returns it after processing.
+The variable should accessed using the method C<add_final>.
+
 =head2 $Star->{INFILE}
 
 Name of the current input file.
@@ -1570,7 +1621,7 @@ C<-copyhooks> Copies hooks from the Star object (C<$::Star>).  This
 =head2 $o->add_tag($tag, $action)
 
 Normally used by C<sfish_add_tag> by translating the call to
-C<$Star->add_tag($tag, $action)>.  Examples:
+C<$Star-E<gt>add_tag($tag, $action)>.  Examples:
 
   $Star->add_tag('slide', 'ignore');
   $Star->add_tag('slide', 'echo');

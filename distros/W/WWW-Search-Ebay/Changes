@@ -1,11 +1,3 @@
-2018-04-28  Kingpin  <martin@ubuntu>
-
-	* category.t: fixed test
-
-2018-02-03  Kingpin  <martin@ubuntu>
-
-	* lib/WWW/Search/Ebay.pm: parse new HTML format
-
 2016-02-07  Kingpin  <martin@localhost.localdomain>
 
 	* lib/WWW/Search/Ebay.pm (_parse_shipping): allow shipping to be "unknown"

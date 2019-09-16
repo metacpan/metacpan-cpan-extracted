@@ -31,6 +31,10 @@ Data-Object Environment Variables
   $vars->get('user'); # $ENV{USER}
   $vars->get('USER'); # $ENV{USER}
 
+=integrates
+
+Data::Object::Role::Stashable
+
 =libraries
 
 Data::Object::Library

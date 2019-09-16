@@ -373,7 +373,7 @@ There is an important twist - the C<AnyEvent::Fork::RPC::event> function
 is only defined when the child is fully initialised. If you redirect the
 log messages in your C<init> function for example, then the C<event>
 function might not yet be available. This is why the log callback checks
-whether the fucntion is there using C<defined>, and only then uses it to
+whether the function is there using C<defined>, and only then uses it to
 log the message.
 
 =head1 PARENT PROCESS USAGE
@@ -393,7 +393,7 @@ use Guard ();
 
 use AnyEvent;
 
-our $VERSION = 1.24;
+our $VERSION = '2.0';
 
 =item my $rpc = AnyEvent::Fork::RPC::run $fork, $function, [key => value...]
 
@@ -441,7 +441,7 @@ want the child to go away after it has handled them. The problem is that
 the parent must not exit either until all requests have been handled, and
 this can be accomplished by waiting for this callback.
 
-=item init => $function (default none)
+=item init => $function (default: none)
 
 When specified (by name), this function is called in the child as the very
 first thing when taking over the process, with all the arguments normally
@@ -456,11 +456,11 @@ C<$function> name is resolved into a function reference, so it could be
 used to load any modules that provide the serialiser or function. It can
 not, however, create events.
 
-=item done => $function (default C<CORE::exit>)
+=item done => $function (default: C<CORE::exit>)
 
 The function to call when the asynchronous backend detects an end of file
 condition when reading from the communications socket I<and> there are no
-outstanding requests. It's ignored by the synchronous backend.
+outstanding requests. It is ignored by the synchronous backend.
 
 By overriding this you can prolong the life of a RPC process after e.g.
 the parent has exited by running the event loop in the provided function
@@ -470,7 +470,7 @@ could provide L<EV::run> as C<done> function).
 Of course, in that case you are responsible for exiting at the appropriate
 time and not returning from
 
-=item async => $boolean (default: 0)
+=item async => $boolean (default: C<0>)
 
 The default server used in the child does all I/O blockingly, and only
 allows a single RPC call to execute concurrently.
@@ -490,7 +490,7 @@ synchronous, and C<AnyEvent::Fork::RPC::Async> for asynchronous mode.
 If you use a template process and want to fork both sync and async
 children, then it is permissible to load both modules.
 
-=item serialiser => $string (default: $AnyEvent::Fork::RPC::STRING_SERIALISER)
+=item serialiser => $string (default: C<$AnyEvent::Fork::RPC::STRING_SERIALISER>)
 
 All arguments, result data and event data have to be serialised to be
 transferred between the processes. For this, they have to be frozen and
@@ -606,6 +606,27 @@ Implementation:
 
 =back
 
+=item buflen => $bytes (default: C<512 - 16>)
+
+The starting size of the read buffer for request and response data.
+
+C<AnyEvent::Fork::RPC> ensures that the buffer for reeading request and
+response data is large enough for at leats aingle request or response, and
+will dynamically enlarge the buffer if needed.
+
+While this ensures that memory is not overly wasted, it typically leads
+to having to do one syscall per request, which can be inefficient in some
+cases. In such cases, it can be beneficient to increase the buffer size to
+hold more than one request.
+
+=item buflen_req => $bytes (default: same as C<buflen>)
+
+Overrides C<buflen> for request data (as read by the forked process).
+
+=item buflen_res => $bytes (default: same as C<buflen>)
+
+Overrides C<buflen> for response data (replies read by the parent process).
+
 =back
 
 See the examples section earlier in this document for some actual
@@ -638,7 +659,7 @@ sub run {
    my ($f, $t) = eval $serialiser; die $@ if $@;
 
    my (@rcb, %rcb, $fh, $shutdown, $wbuf, $ww);
-   my ($rlen, $rbuf, $rw) = 512 - 16;
+   my ($rlen, $rbuf, $rw) = $arg{buflen_res} || $arg{buflen} || 512 - 16;
 
    my $wcb = sub {
       my $len = syswrite $fh, $wbuf;
@@ -660,8 +681,15 @@ sub run {
 
    my $module = "AnyEvent::Fork::RPC::" . ($arg{async} ? "Async" : "Sync");
 
-   $self->require ($module)
-        ->send_arg ($function, $arg{init}, $serialiser, $arg{done} || "$module\::do_exit")
+   $self->eval ("use $module 2 ()")
+        ->send_arg (
+             function   => $function,
+             init       => $arg{init},
+             serialiser => $serialiser,
+             done       => $arg{done} || "$module\::do_exit",
+             rlen       => $arg{buflen_req} || $arg{buflen} || 512 - 16,
+             -10 # the above are 10 arguments
+          )
         ->run ("$module\::run", sub {
       $fh = shift
          or return $on_error->("connection failed");
@@ -775,9 +803,21 @@ available in the namespace of this module when the child is running,
 without having to load any extra modules. They are part of the child-side
 API of L<AnyEvent::Fork::RPC>.
 
+Note that these functions are typically not yet declared when code is
+compiled into the child, because the backend module is only loaded when
+you call C<run>, which is typically the last method you call on the fork
+object.
+
+Therefore, you either have to explicitly pre-load the right backend module
+or mark calls to these functions as function calls, e.g.:
+
+   AnyEvent::Fork::RPC::event (0 => "five");
+   AnyEvent::Fork::RPC::event->(0 => "five");
+   &AnyEvent::Fork::RPC::flush;
+
 =over 4
 
-=item AnyEvent::Fork::RPC::event ...
+=item AnyEvent::Fork::RPC::event (...)
 
 Send an event to the parent. Events are a bit like RPC calls made by the
 child process to the parent, except that there is no notion of return
@@ -790,7 +830,45 @@ Note: the event data, like any data send to the parent, might not be sent
 immediatelly but queued for later sending, so there is no guarantee that
 the event has been sent to the parent when the call returns - when you
 e.g. exit directly after calling this function, the parent might never
-receive the event.
+receive the event. See the next function for a remedy.
+
+=item $success = AnyEvent::Fork::RPC::flush ()
+
+Synchronously wait and flush the reply data to the parent. Returns true on
+success and false otherwise (i.e. when the reply data cannot be written at
+all). Ignoring the success status is a common and healthy behaviour.
+
+Only the "async" backend does something on C<flush> - the "sync" backend
+is not buffering reply data and always returns true from this function.
+
+Normally, reply data might or might not be written to the parent
+immediatelly but is buffered. This can greatly improve performance and
+efficiency, but sometimes can get in your way: for example. when you want
+to send an error message just before exiting, or when you want to ensure
+replies timely reach the parent before starting a long blocking operation.
+
+In these cases, you can call this function to flush any outstanding reply
+data to the parent. This is done blockingly, so no requests will be
+handled and no event callbacks will be called.
+
+For example, you could wrap your request function in a C<eval> block and
+report the exception string back to the caller just before exiting:
+
+   sub req {
+      ...
+
+      eval {
+         ...
+      };
+
+      if ($@) {
+         AnyEvent::RPC::event (throw => "$@");
+         AnyEvent::RPC::flush ();
+         exit;
+      }
+
+      ...
+   }
 
 =back
 

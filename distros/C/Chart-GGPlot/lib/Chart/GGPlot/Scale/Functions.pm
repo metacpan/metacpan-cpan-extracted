@@ -4,7 +4,7 @@ package Chart::GGPlot::Scale::Functions;
 
 use Chart::GGPlot::Setup qw(:base :pdl);
 
-our $VERSION = '0.0005'; # VERSION
+our $VERSION = '0.0007'; # VERSION
 
 use List::AllUtils qw(pairgrep);
 use Module::Load;
@@ -751,7 +751,7 @@ Chart::GGPlot::Scale::Functions - Scale functions
 
 =head1 VERSION
 
-version 0.0005
+version 0.0007
 
 =head1 FUNCTIONS
 

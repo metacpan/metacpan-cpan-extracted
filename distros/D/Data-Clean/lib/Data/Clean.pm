@@ -1,7 +1,7 @@
 package Data::Clean;
 
-our $DATE = '2018-10-14'; # DATE
-our $VERSION = '0.502'; # VERSION
+our $DATE = '2019-09-01'; # DATE
+our $VERSION = '0.504'; # VERSION
 
 use 5.010001;
 use strict;
@@ -47,6 +47,11 @@ sub command_call_func {
 sub command_one_or_zero {
     my ($self, $cd, $args) = @_;
     return "{{var}} = {{var}} ? 1:0; \$ref = ''";
+}
+
+sub command_deref_scalar_one_or_zero {
+    my ($self, $cd, $args) = @_;
+    return "{{var}} = \${ {{var}} } ? 1:0; \$ref = ''";
 }
 
 sub command_deref_scalar {
@@ -287,7 +292,7 @@ Data::Clean - Clean data structure
 
 =head1 VERSION
 
-This document describes version 0.502 of Data::Clean (from Perl distribution Data-Clean), released on 2018-10-14.
+This document describes version 0.504 of Data::Clean (from Perl distribution Data-Clean), released on 2019-09-01.
 
 =head1 SYNOPSIS
 
@@ -320,7 +325,7 @@ This document describes version 0.502 of Data::Clean (from Perl distribution Dat
 This class can be used to process a data structure by replacing some forms of
 data items with other forms. One of the main uses is to clean "unsafe" data,
 e.g. clean a data structure so it can be encoded to JSON (see
-L<Data::Clean::JSON>, which is a thin wrapper over this class).
+L<Data::Clean::ForJSON>, which is a thin wrapper over this class).
 
 As can be seen from the example, you specify a list of transformations to be
 done, and then this class will generate an appropriate Perl code to do the
@@ -400,6 +405,10 @@ as the replacement.
 =item * ['one_or_zero']
 
 This will perform C<< $val ? 1:0 >>.
+
+=item * ['deref_scalar_one_or_zero']
+
+This will perform C<< ${$val} ? 1:0 >>.
 
 =item * ['deref_scalar']
 
@@ -503,7 +512,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

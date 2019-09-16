@@ -8,11 +8,14 @@ use_ok 'Data::Object::Hash';
 # ok Data::Object::Hash->does('Data::Object::Rule::Collection');
 # ok Data::Object::Hash->does('Data::Object::Rule::Comparison');
 # ok Data::Object::Hash->does('Data::Object::Rule::Defined');
-ok Data::Object::Hash->does('Data::Object::Role::Detract');
-ok Data::Object::Hash->does('Data::Object::Role::Dumper');
+# deprecated
+# ok Data::Object::Hash->does('Data::Object::Role::Detract');
+# deprecated
+# ok Data::Object::Hash->does('Data::Object::Role::Dumper');
 # deprecated
 # ok Data::Object::Hash->does('Data::Object::Rule::List');
-ok Data::Object::Hash->does('Data::Object::Role::Output');
+# deprecated
+# ok Data::Object::Hash->does('Data::Object::Role::Output');
 ok Data::Object::Hash->does('Data::Object::Role::Throwable');
 
 # deprecated

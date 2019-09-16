@@ -1,0 +1,6 @@
+TODO
+^.*~$
+Makefile
+.gitignore
+^MYMETA.*$
+^.*tar(.?gz)?$

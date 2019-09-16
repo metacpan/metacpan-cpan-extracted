@@ -1,3 +1,7 @@
+9.02 Fri Sep 13 21:47:21 CEST 2019
+
+     - adapt to new labanquepostale.fr changes for credit cards
+
 9.01 Wed Mar  6 10:05:13 CET 2019
 
      - get last 400 operations for all accounts (was only done for "cb" accounts)

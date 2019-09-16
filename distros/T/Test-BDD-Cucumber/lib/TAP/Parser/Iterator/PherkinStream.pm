@@ -1,5 +1,5 @@
 package TAP::Parser::Iterator::PherkinStream;
-$TAP::Parser::Iterator::PherkinStream::VERSION = '0.62';
+$TAP::Parser::Iterator::PherkinStream::VERSION = '0.64';
 use strict;
 use warnings;
 

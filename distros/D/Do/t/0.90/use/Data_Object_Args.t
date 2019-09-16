@@ -29,6 +29,10 @@ Data-Object Command-line Arguments
   $args->exists('command'); # exists $ARGV[0]
   $args->get('command'); # $ARGV[0]
 
+=integrates
+
+Data::Object::Role::Stashable
+
 =libraries
 
 Data::Object::Library

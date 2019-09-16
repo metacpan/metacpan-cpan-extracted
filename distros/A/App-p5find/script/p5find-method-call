@@ -1,0 +1,83 @@
+#!/usr/bin/env perl
+=head1 Abstract
+
+p5find-method-call is a program to find method invocations.
+
+=head1 Usage Examples
+
+The output format should be compatible to C<grep -Hnr>. Each line consists of
+colon-separated fields of filename, line number, and the content of that line.
+
+Here's the result of searching for method calls in perlbrew repository:
+
+    > p5find-method-call lib/
+    lib/App/Perlbrew/Path/Installation.pm:12:	$_[0]->basename;
+    lib/App/Perlbrew/Path/Installation.pm:16:	shift->child (bin => @_);
+    lib/App/Perlbrew/Path/Installation.pm:20:	shift->child (man => @_);
+    lib/App/Perlbrew/Path/Installation.pm:24:	shift->bin ('perl');
+    lib/App/Perlbrew/Path/Installation.pm:28:	shift->child ('.version');
+    lib/App/Perlbrew/Path/Installations.pm:16:	$return = $return->_child ('App::Perlbrew::Path::Installation' => shift @params) if @params;
+    lib/App/Perlbrew/Path/Installations.pm:17:	$return = $return->child (@params) if @params;
+    lib/App/Perlbrew/Path/Installations.pm:23:	shift->_children ('App::Perlbrew::Path::Installation' => @_);
+    lib/App/Perlbrew/Path/Installations.pm:27:	shift->children;
+    lib/App/Perlbrew/Path/Root.pm:13:	shift->child (bin => @_);
+=cut
+
+use v5.18;
+use warnings;
+
+use Getopt::Long qw(GetOptions);
+use App::p5find qw(p5_doc_iterator p5_method_call_iterator print_file_linenum_line);
+
+sub print_usage {
+    print <<USAGE;
+p5find-variable-methods [switches] -- [path1] [path2]...
+
+  -h    show help message
+  --var Only the ones with variable names.
+
+For more documentation, see: perldoc p5find-method-call
+USAGE
+}
+
+my %opts;
+GetOptions(
+    \%opts,
+    "h",
+    "var",
+);
+
+if ($opts{h}) {
+    print_usage();
+    exit(0);
+}
+
+my @paths = @ARGV;
+@paths = ('.') unless @paths;
+
+my $iter = p5_doc_iterator(@paths);
+while( my $doc = $iter->() ) {
+    my $file = $doc->filename;
+    my %hits;
+
+    my $method = p5_method_call_iterator($doc);
+    while (my $op = $method->()) {
+        if ($opts{"var"}) {
+            my $op_next = $op->snext_sibling;
+            next if $op_next->isa("PPI::Token::Word");
+
+            # Weird case from PPI. Consider this code:
+            #     $a = $b ? $o->foo : 1;
+            # The "foo :" part is parsed as one token. Which is wrong.
+            # Luckly it does not remove positive responoses if we exclude those here.
+            next if $op_next->isa("PPI::Token::Label");
+        }
+
+        my $ln = $op->line_number;
+        $hits{$ln} = 1;
+    }
+
+    if (%hits) {
+        print_file_linenum_line( $file, \%hits );
+    }
+};

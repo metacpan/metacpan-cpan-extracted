@@ -29,8 +29,8 @@ Data::Object::Code::Func
 
 =attributes
 
-arg1(Object, req, ro)
-arg2(CodeRef, req, ro)
+arg1(CodeLike, req, ro)
+arg2(CodeLike, req, ro)
 
 =libraries
 

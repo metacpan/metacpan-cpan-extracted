@@ -5,11 +5,10 @@ package Chart::GGPlot::Facet;
 use Chart::GGPlot::Role qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0005'; # VERSION
+our $VERSION = '0.0007'; # VERSION
 
 use Data::Frame;
 use Data::Munge qw(elem);
-use Eval::Closure;
 use List::AllUtils qw(firstidx);
 use Types::Standard qw(ArrayRef Bool CodeRef);
 
@@ -103,32 +102,6 @@ classmethod render_strips ($x, $y, $labeller, $theme) {
     };
 }
 
-# Evaluate variables in a facet specification.
-# Returns a hashref with keys be names of the variables.
-classmethod _eval_facet_vars ($vars, $data, $env = {}) {
-    my $names = $vars->names;
-    my $out   = {
-        $names->map(
-            sub { $_ => $class->_eval_facet_var( $vars->at($_), $data, $env ) }
-        )->flatten
-    };
-    return $out;
-}
-
-# Evaluate a single variable in a facet specification.
-classmethod _eval_facet_var ($var, $data, $env = {}) {
-    if ( $data->exists($var) ) {
-        return $data->at($var);
-    }
-    else {
-        my $evaled = eval_closure(
-            source      => $var,
-            environment => $env,
-        );
-        return call_if_coderef($evaled);
-    }
-}
-
 classmethod check_coord_freedom ($coord) {
     if (
         List::AllUtils::any { $coord->$_isa("Chart::GGPlot::$_") }
@@ -180,7 +153,7 @@ Chart::GGPlot::Facet - The facet class
 
 =head1 VERSION
 
-version 0.0005
+version 0.0007
 
 =head1 DESCRIPTION
 

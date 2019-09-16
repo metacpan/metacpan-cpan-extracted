@@ -4,7 +4,7 @@ package Chart::GGPlot::Backend::Plotly::Geom;
 
 use Chart::GGPlot::Role;
 
-our $VERSION = '0.0005'; # VERSION
+our $VERSION = '0.0007'; # VERSION
 
 use List::AllUtils qw(pairmap);
 use Types::Standard qw(ArrayRef);
@@ -95,7 +95,7 @@ Chart::GGPlot::Backend::Plotly::Geom - Role for geom-specific details with the P
 
 =head1 VERSION
 
-version 0.0005
+version 0.0007
 
 =head1 CLASS METHODS
 

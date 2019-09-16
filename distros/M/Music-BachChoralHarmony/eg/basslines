@@ -4,30 +4,45 @@ use warnings;
 
 # Roman numeral analysis of the most common bass lines.
 
+use Data::Dumper;
 use Music::BachChoralHarmony;
+use lib '/Users/gene/sandbox/Music-ToRoman/lib';
 use Music::ToRoman;
 
-my $size = shift || 4;
+my $size   = shift || 3; # Number of notes to consider
+my $in_key = shift || 'major'; # maj, minor, min, m
+my $min    = shift // 1;
+
+$in_key = 'major'
+    if $in_key eq 'maj';
+$in_key = 'minor'
+    if $in_key eq 'm' || $in_key eq 'min';
 
 my $bach = Music::BachChoralHarmony->new;
 my $songs = $bach->parse();
 
 my %score;
 
-# Process each song for key and chord
+# Process each song
 for my $song ( sort keys %$songs ) {
+    next if $song eq '003907bv' || $song eq '014806bv'; # XXX These keys are not found among the chord notes?
+
     my $key = $songs->{$song}{key};
 
     # Get the scale name
     my $name = $key =~ /M/ ? 'major' : 'minor';
     $key =~ s/_?M//i;
 
+    # Skip if not the right key
+    next unless $name eq $in_key;
+
+#    print "SONG: $song in $key $name\n";
+
     my $mtr = Music::ToRoman->new(
         scale_note => $key,
         scale_name => $name,
         chords     => 0,
     );
-#    print "SONG: $song in $key $name\n";
 
     # The last seen roman group
     my $last;
@@ -45,13 +60,13 @@ for my $song ( sort keys %$songs ) {
         push @seen, $roman;
 
         if ( @seen == $size ) {
-            my $group = join ',', @seen;
+            my $group = join ' ', @seen;
             @seen = ();
-            $score{ $last . ' ' . $group }++ if $last;
+            $score{ $last . ' -> ' . $group }++ if $last;
 
-            # Tally the bigram
             $last = $group;
         }
     }
 }
-use Data::Dumper;warn(__PACKAGE__,' ',__LINE__," MARK: ",Dumper[map{"$_: $score{$_}"}sort{$score{$a}<=>$score{$b}}keys%score]);
+
+print Dumper [ map { "$_: $score{$_}" } sort { $score{$a} <=> $score{$b} } grep { $score{$_} >= $min } keys %score ];

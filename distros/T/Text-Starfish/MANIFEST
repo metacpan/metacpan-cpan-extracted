@@ -70,4 +70,6 @@ testfiles/p_t.java
 testfiles/33_tex.in
 testfiles/33-lecture_tex.out
 testfiles/34-slides_tex.out
+testfiles/35_tex.in
+testfiles/35-slides_tex.out
 META.json                                Module JSON meta-data (added by MakeMaker)

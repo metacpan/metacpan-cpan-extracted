@@ -246,10 +246,21 @@ The markers of the input lines are reset (no line is marked after this command).
 Sort the content of the input using the given custom comparator. See the
 B<--comparator> flag for a specification of the argument of this command.
 
+All markers are unset after this operation.
+
 =item B<-u>, B<--unique>
 
 Remove consecutive lines that are identical. You will often want to have a
 B<--sort> step before this one.
+
+The markers of the lines that are kept are not changed.
+
+=item B<--gu>, B<--global-unique>
+
+Remove duplicate lines in the file, even if they are not consecutive. The first
+occurence of each line is kept.
+
+The markers of the lines that are kept are not changed.
 
 =item B<--head> [I<n>]
 

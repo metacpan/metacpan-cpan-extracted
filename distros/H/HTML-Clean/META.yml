@@ -19,8 +19,8 @@ name: HTML-Clean
 provides:
   HTML::Clean:
     file: lib/HTML/Clean.pm
-    version: 1.2
+    version: 1.4
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/poizon/HTML-Clean.git
-version: 1.2
+version: 1.4

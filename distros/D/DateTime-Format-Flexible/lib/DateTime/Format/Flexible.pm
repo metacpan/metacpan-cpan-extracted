@@ -2,7 +2,7 @@ package DateTime::Format::Flexible;
 use strict;
 use warnings;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use base 'DateTime::Format::Builder';
 
@@ -614,27 +614,119 @@ sub _parse_timezone
     }
 
     # set any trailing offset timezones
-    if ( my ( $tz ) = $date =~ m{((?:\s+)?\+\d{2,4}|\s+\-\d{4})\.?\z}mx )
+    if ( my ( $tz ) = $date =~ m{(
+                                   (?:\s+)?\+\d{2,4}         # ' +04', '+04'
+                                   |\s+\-\d{4}               # ' -0400'
+                                   |(?:\s+)?[-+]\d{2}:\d{2}  # '-04:00', '+04:00'
+                                 )\.?\z}mx )
     {
-        $date =~ s{\Q$tz\E}{};
+        printf( "# possible timezone (%s) in (%s)\n", $tz, $date) if $ENV{DFF_DEBUG};
+        my $original_tz = $tz;
+        $tz =~ s{:}{};
         # some timezones are 2 digit hours, add the minutes part
         $tz = _clean_whitespace( $tz );
         $tz .= '00' if ( length( $tz ) == 3 );
-        $p->{time_zone} = $tz;
-        return ( $date , $p );
+        if ( _is_valid_tz_offset( $tz ) )
+        {
+            printf( "#  timezone matched (%s)\n" , $tz ) if $ENV{DFF_DEBUG};
+            $date =~ s{\Q$original_tz\E\.?\z}{};
+            $p->{time_zone} = $tz;
+            return ( $date , $p );
+        }
+    }
+
+    if ( length( $date ) > 15 and ($date =~ m{\dT\d} or $date =~ m{\d\s\d}))
+    {
+      # this pattern conflicts with 5-08, 01-02-03, 08-Jan-99, 2006-Dec-08
+      # so we need to check the length and make sure it is long enough to be
+      # a full iso datetime, and that is has a 'T' or ' ' (space) surrounded by digits
+      if ( my ( $tz ) = $date =~ m{(
+                                     (?:\s+)?[-+]\d{2,4}     # '-0800', '-08', ' -08'
+                                   )\.?\z}mx )
+      {
+          printf( "# possible timezone (%s) in (%s)\n", $tz, $date) if $ENV{DFF_DEBUG};
+          my $original_tz = $tz;
+          $tz =~ s{:}{};
+          # some timezones are 2 digit hours, add the minutes part
+          $tz = _clean_whitespace( $tz );
+          $tz .= '00' if ( length( $tz ) == 3 );
+          if ( _is_valid_tz_offset( $tz ) )
+          {
+              $date =~ s{\Q$original_tz\E\.?\z}{};
+              $p->{time_zone} = $tz;
+              return ( $date , $p );
+          }
+      }
     }
 
     # search for positive/negative 4 digit timezones that are inside the string
     # must be surrounded by spaces
     # Mon Apr 05 17:25:35 +0000 2010
-    if ( my ( $tz ) = $date =~ m{\s([\+\-]\d{4})\s}mx )
+    if ( my ( $tz ) = $date =~ m{\s(
+                                   [-+]\d{4}        # Mon Apr 05 17:25:35 +0000 2010
+                                   |[-+]\d{2}:\d{2} # Mon Apr 05 17:25:35 +00:00 2010
+                                 )\s}mx )
     {
-        $date =~ s{\Q$tz\E}{};
-        $p->{time_zone} = $tz;
-        return ( $date , $p );
+        my $original_tz = $tz;
+        $tz =~ s{:}{};
+        if ( _is_valid_tz_offset( $tz ) )
+        {
+            $date =~ s{\Q$original_tz\E}{};
+            $p->{time_zone} = $tz;
+            return ( $date , $p );
+        }
     }
 
     return ( $date , $p );
+}
+
+sub _is_valid_tz_offset
+{
+  my ($offset) = @_;
+
+  # https://en.wikipedia.org/wiki/List_of_UTC_time_offsets
+  my $valid = {
+    '-1200' => 1,
+    '-1100' => 1,
+    '-1000' => 1,
+    '-0930' => 1,
+    '-0900' => 1,
+    '-0800' => 1,
+    '-0700' => 1,
+    '-0600' => 1,
+    '-0500' => 1,
+    '-0400' => 1,
+    '-0330' => 1,
+    '-0300' => 1,
+    '-0200' => 1,
+    '-0100' => 1,
+    '-0000' => 1,
+    '+0000' => 1,
+    '+0100' => 1,
+    '+0200' => 1,
+    '+0300' => 1,
+    '+0330' => 1,
+    '+0400' => 1,
+    '+0430' => 1,
+    '+0500' => 1,
+    '+0530' => 1,
+    '+0545' => 1,
+    '+0600' => 1,
+    '+0630' => 1,
+    '+0700' => 1,
+    '+0800' => 1,
+    '+0845' => 1,
+    '+0900' => 1,
+    '+0930' => 1,
+    '+1000' => 1,
+    '+1030' => 1,
+    '+1100' => 1,
+    '+1200' => 1,
+    '+1245' => 1,
+    '+1300' => 1,
+    '+1400' => 1,
+  };
+  return exists $valid->{$offset};
 }
 
 sub _do_math

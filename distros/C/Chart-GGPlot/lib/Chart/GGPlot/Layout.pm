@@ -5,7 +5,7 @@ package Chart::GGPlot::Layout;
 use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0005'; # VERSION
+our $VERSION = '0.0007'; # VERSION
 
 use Data::Frame::Types qw(DataFrame);
 use List::AllUtils qw(pairwise reduce);
@@ -274,7 +274,7 @@ Chart::GGPlot::Layout - Layout
 
 =head1 VERSION
 
-version 0.0005
+version 0.0007
 
 =head1 DESCRIPTION
 

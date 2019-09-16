@@ -6,12 +6,12 @@ use strict;
 use warnings;
 
 use overload (
-  '""'     => 'data',
-  '~~'     => 'data',
+  '""'     => 'explain',
+  '~~'     => 'explain',
   fallback => 1
 );
 
-our $VERSION = '1.70'; # VERSION
+our $VERSION = '1.76'; # VERSION
 
 # BUILD
 
@@ -38,7 +38,7 @@ sub new {
 
 # METHODS
 
-sub data {
+sub explain {
   my ($self) = @_;
 
   $self->trace(1, 1) if !$self->{frames};
@@ -148,17 +148,17 @@ This package implements the following methods.
 
 =cut
 
-=head2 data
+=head2 e
 
-  data() : Any
+  e() : Any
 
 Render the exception message with optional context and stack trace.
 
 =over 4
 
-=item data example
+=item e example
 
-  my $data = $exception->data();
+  my $e = $exception->explain();
 
 =back
 
@@ -224,9 +224,11 @@ skips the first frame.
 
 =head1 CREDITS
 
-Al Newkirk, C<+287>
+Al Newkirk, C<+296>
 
 Anthony Brummett, C<+10>
+
+José Joaquín Atria, C<+1>
 
 =cut
 

@@ -1,6 +1,6 @@
 package Bio::Palantir::Parser::Qualifier;
 # ABSTRACT: BiosynML DTD-derived internal class
-$Bio::Palantir::Parser::Qualifier::VERSION = '0.192540';
+$Bio::Palantir::Parser::Qualifier::VERSION = '0.192560';
 use Moose;
 use namespace::autoclean;
 
@@ -69,7 +69,7 @@ Bio::Palantir::Parser::Qualifier - BiosynML DTD-derived internal class
 
 =head1 VERSION
 
-version 0.192540
+version 0.192560
 
 =head1 SYNOPSIS
 

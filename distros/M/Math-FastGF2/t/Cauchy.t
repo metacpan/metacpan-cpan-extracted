@@ -13,7 +13,7 @@ BEGIN {
 	ok(1, "Skipping tests that require Crypt::IDA\n");
 	done_testing;
 	exit;
-    }	
+    }
 };
 
 use Crypt::IDA qw(:all);

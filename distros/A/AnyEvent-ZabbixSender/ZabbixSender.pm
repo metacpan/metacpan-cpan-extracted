@@ -31,7 +31,7 @@ use AnyEvent ();
 use AnyEvent::Socket ();
 use AnyEvent::Handle ();
 
-our $VERSION = '1.0';
+our $VERSION = '1.1';
 
 =item $zbx = new AnyEvent::ZabbixSender [key => value...]
 
@@ -116,7 +116,7 @@ sub new {
       queue_time  => 3600,
       on_response => $NOP,
       on_error    => sub {
-         AE::log 4 => "$_[0]{zhost}:$_[0]{zport}: $_[1]"; # error
+         AE::log 4 => "$_[0]{zhost}:$_[0]{zport}: $_[2]"; # error
       },
       on_loss     => sub {
          my $nitems = @{ $_[1] };

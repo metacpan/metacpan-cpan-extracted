@@ -1,6 +1,19 @@
 Revision history for Perl extension Crypt::IDA.
 
+0.03 16 Sep 2019
+  - Fix error checking for optional dependency in test script
+  - relax version requirements (perl, Class::Tiny)
+
+0.02 15 Sep 2019
+  - 10th Year Anniversary Edition! (following Math-FastGF2)
+  - Generally speaking, no changes to original functionality
+  - Document new features in Math::FastGF2 of interest here
+  - Improved performance of internal ida_process_streams routine
+  - New Crypt::IDA::Algorithm class, an alternative to using Crypt::IDA
+  - New Crypt::IDA::SlidingWindow class (used by ::Algorithm)
+
 0.01  Sat Jul 25 00:55:39 2009
-	- original version; created by h2xs 1.23 with options
-		-X -b 5.8.8 -n Crypt::IDA
+  - original version; created by h2xs 1.23 with options
+    -X -b 5.8.8 -n Crypt::IDA
+
 

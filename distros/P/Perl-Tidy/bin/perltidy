@@ -13,7 +13,11 @@ if ( $^O =~ /Mac/ ) {
     );
 }
 
-Perl::Tidy::perltidy( argv => $arg_string );
+# Exit codes returned by perltidy:
+#    0 = no errors
+#    1 = perltidy could not run to completion due to errors
+#    2 = perltidy ran to completion with error messages
+exit Perl::Tidy::perltidy( argv => $arg_string );
 
 __END__
 
@@ -354,6 +358,24 @@ Force perltidy to process binary files.  To avoid producing excessive
 error messages, perltidy skips files identified by the system as non-text.
 However, valid perl scripts containing binary data may sometimes be identified
 as non-text, and this flag forces perltidy to process them.
+
+=item B<-ast>,   B<--assert-tidy>      
+
+This flag asserts that the input and output code streams are identical, or in
+other words that the input code is already 'tidy' according to the formatting
+parameters.  If this is not the case, an error message noting this is produced.
+This error message will cause the process to return a non-zero exit code.
+The test for this is made by comparing an MD5 hash value for the input and
+output code streams. This flag has no other effect on the functioning of
+perltidy.  This might be useful for certain code maintenance operations.
+
+=item B<-asu>,   B<--assert-untidy>      
+
+This flag asserts that the input and output code streams are different, or in
+other words that the input code is 'untidy' according to the formatting
+parameters.  If this is not the case, an error message noting this is produced.
+This flag has no other effect on the functioning of perltidy.
+
 
 =back
 
@@ -3643,7 +3665,7 @@ where B<ext> is some new extension.  In order to provides the user some
 flexibility, the following convention is used in all cases to decide if
 a leading '.' should be used.  If the extension C<ext> begins with
 C<A-Z>, C<a-z>, or C<0-9>, then it will be appended to the filename with
-an intermediate '.' (or perhaps an '_' on VMS systems).  Otherwise, it
+an intermediate '.' (or perhaps a '_' on VMS systems).  Otherwise, it
 will be appended directly.  
 
 For example, suppose the file is F<somefile.pl>.  For C<-bext=old>, a '.' is
@@ -3729,13 +3751,34 @@ F<somefile.tdy.tdy.tdy>.
 
 =back
 
+=head1 ERROR HANDLING
+
+An exit value of 0, 1, or 2 is returned by perltidy to indicate the status of the result.
+
+A exit value of 0 indicates that perltidy ran to completion with no error messages.
+
+A non-zero exit value indicates some kind of problem was detected. 
+
+An exit value of 1 indicates that perltidy terminated prematurely, usually due
+to some kind of errors in the input parameters.  This can happen for example if
+a parameter is misspelled or given an invalid value.  Error messages in the
+standard error output will indicate the cause of any problem.  If perltidy
+terminates prematurely then no output files will be produced.
+
+An exit value of 2 indicates that perltidy was able to run to completion but
+there there are (1) warning messages in the standard error output related to
+parameter errors or problems and/or (2) warning messages in the perltidy error
+file(s) relating to possible syntax errors in one or more of the source
+script(s) being tidied.  When multiple files are being processed, an error
+detected in any single file will produce this type of exit condition.
+
 =head1 SEE ALSO
 
 perlstyle(1), Perl::Tidy(3)
 
 =head1 VERSION
 
-This man page documents perltidy version 20190601
+This man page documents perltidy version 20190915
 
 =head1 BUG REPORTS
 

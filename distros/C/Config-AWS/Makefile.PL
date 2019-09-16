@@ -24,25 +24,17 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Config::AWS",
   "PREREQ_PM" => {
-    "Carp" => 0,
-    "Exporter::Shiny" => 0,
     "Exporter::Tiny" => 1,
     "File::Glob" => 0,
     "Path::Tiny" => "0.076",
-    "Ref::Util" => 0,
-    "Scalar::Util" => 0,
-    "strict" => 0,
-    "warnings" => 0
+    "Ref::Util" => 0
   },
   "TEST_REQUIRES" => {
-    "File::Share" => 0,
-    "File::ShareDir" => 0,
-    "File::ShareDir::Install" => "0.10",
-    "Path::Tiny" => "0.076",
+    "File::Share" => "0.03",
     "Test2::Tools::Spec" => 0,
     "Test2::V0" => 0
   },
-  "VERSION" => "0.05",
+  "VERSION" => "0.07",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,20 +42,13 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Carp" => 0,
-  "Exporter::Shiny" => 0,
   "Exporter::Tiny" => 1,
   "File::Glob" => 0,
-  "File::Share" => 0,
-  "File::ShareDir" => 0,
-  "File::ShareDir::Install" => "0.10",
+  "File::Share" => "0.03",
   "Path::Tiny" => "0.076",
   "Ref::Util" => 0,
-  "Scalar::Util" => 0,
   "Test2::Tools::Spec" => 0,
-  "Test2::V0" => 0,
-  "strict" => 0,
-  "warnings" => 0
+  "Test2::V0" => 0
 );
 
 

@@ -47,8 +47,11 @@ subtest at => sub {
 };
 
 subtest uniq => sub {
-    my $p1 = PDL::SV->new( [qw(foo bar baz foo bar)] )->setbadat(1);
-    pdl_is( $p1->uniq, PDL::SV->new( [qw(foo baz bar)] ), 'uniq' );
+    my $p1 =
+      PDL::SV->new( [qw(foo bar baz foo bar)] )->setbadat(1)->setbadat(2);
+    pdl_is( $p1->uniq, PDL::SV->new( [qw(foo bar)] ), 'uniq' );
+
+    pdl_is( $p1->uniqind, pdl( [ 0, 4 ] ), 'uniqind' );
 };
 
 subtest sever => sub {
@@ -249,6 +252,15 @@ subtest ge => sub {
     pdl_is( ( $p2 ge 'foo' ),
             pdl( [ [ 1, 0, 0 ], [ 1, 1, 1 ] ] )->setbadif($badmask),
             'ge vs. a plain string' );
+};
+
+subtest string => sub {
+    is( PDL::SV->new( [qw(foo bar baz)] ), '[ foo bar baz ]', 'string' );
+    is(
+        PDL::SV->new( [ ('foo') x 10001 ] ),
+        'TOO LONG TO PRINT',
+        'string toolongtoprint'
+    );
 };
 
 done_testing;

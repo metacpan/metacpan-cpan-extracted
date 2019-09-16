@@ -1,0 +1,16 @@
+Changes
+ignore.txt
+IO-HyCon-0.1_1.tar.gz
+IO-HyCon-0.1_2.tar.gz
+IO-HyCon-0.1_3.tar.gz
+lib/IO/HyCon.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

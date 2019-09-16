@@ -3,8 +3,7 @@
   * My extended documentation: <http://perl.overmeer.net/CPAN/>
   * Development via GitHub: <https://github.com/markov2/perl5-Net-OAuth2>
   * Download from CPAN: <ftp://ftp.cpan.org/pub/CPAN/authors/id/M/MA/MARKOV/>
-  * Indexed from CPAN: <http://search.cpan.org/~markov/Net-OAuth2/>
-    and <https://metacpan.org/release/Net-OAuth2>
+  * Indexed from CPAN: <https://metacpan.org/release/Net-OAuth2>
 
 This distribution implements an OAuth2 client, with knowledge about
 various services.

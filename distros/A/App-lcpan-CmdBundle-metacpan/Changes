@@ -1,32 +1,37 @@
-0.006   2019-06-24 (PERLANCAR)
+0.007   2019-08-02  Released-By: PERLANCAR; Urgency: medium
+
+	- Add subcommand: metacpan-pod.
+
+
+0.006   2019-06-24  Released-By: PERLANCAR
 
 	- Add subcommand: metacpan-script.
 
 
-0.005   2018-09-07 (PERLANCAR)
+0.005   2018-09-07  Released-By: PERLANCAR
 
 	- [build] Rebuild with App::lcpan 1.025 for fixed %authors_args.
 
 
-0.004   2018-09-07 (PERLANCAR)
+0.004   2018-09-07  Released-By: PERLANCAR
 
 	- Allow multiple arguments (modules, dists, authors).
 
 
-0.003   2017-07-10 (PERLANCAR)
+0.003   2017-07-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace Log::Any with Log::ger.
 
 
-0.002   2017-01-20 (PERLANCAR)
+0.002   2017-01-20  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [dist] Use Pod::Weaver plugin PWP:App::lcpan.
 
 
-0.001   2017-01-15 (PERLANCAR)
+0.001   2017-01-15  Released-By: PERLANCAR
 
         - First release.

@@ -1,6 +1,6 @@
 package App::p5find;
 use v5.18;
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 
 use File::Next;
 use PPI::Document::File;
@@ -9,6 +9,7 @@ use PPIx::QuoteLike;
 use Exporter 'import';
 our @EXPORT_OK = qw( p5_doc_iterator
                      p5_source_file_iterator
+                     p5_method_call_iterator
                      print_file_linenum_line );
 
 my %EXCLUDED = (
@@ -66,6 +67,24 @@ sub print_file_linenum_line {
         }
     }
     close($fh);
+}
+
+sub p5_method_call_iterator {
+    my ($doc) = @_;
+
+    my $arrows = $doc->find(
+        sub {
+            my $op = $_[1];
+            return 0 unless $op->isa("PPI::Token::Operator") && $op->content eq '->';
+            my $op_next = $op->snext_sibling or return 0;
+            return 0 if $op_next->isa("PPI::Structure::Subscript") || $op_next->isa("PPI::Structure::List");
+            return 1;
+        }
+    ) || [];
+
+    return sub {
+        return @$arrows ? shift(@$arrows) : undef;
+    };
 }
 
 1;

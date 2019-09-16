@@ -29,6 +29,10 @@ Data-Object Command-line Options
   $opts->help; # $help
   $opts->get('help'); # $help
 
+=integrates
+
+Data::Object::Role::Stashable
+
 =libraries
 
 Data::Object::Library

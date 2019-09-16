@@ -8,7 +8,7 @@ use MooseX::Singleton;
 
 with qw(Chart::GGPlot::Geom);
 
-our $VERSION = '0.0005'; # VERSION
+our $VERSION = '0.0007'; # VERSION
 
 use Chart::GGPlot::Aes;
 use Chart::GGPlot::Layer;
@@ -100,7 +100,7 @@ Chart::GGPlot::Geom::Polygon - Class for polygon geom
 
 =head1 VERSION
 
-version 0.0005
+version 0.0007
 
 =head1 SEE ALSO
 

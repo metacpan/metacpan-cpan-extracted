@@ -29,8 +29,8 @@ Data::Object::Regexp::Func
 
 =attributes
 
-arg1(Object, req, ro)
-arg2(Str, req, ro)
+arg1(RegexpLike, req, ro)
+arg2(StringLike, req, ro)
 
 =libraries
 

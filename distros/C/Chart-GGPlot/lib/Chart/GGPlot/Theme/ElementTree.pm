@@ -6,7 +6,7 @@ use Chart::GGPlot::Setup;
 use Function::Parameters qw(classmethod);
 use namespace::autoclean;
 
-our $VERSION = '0.0005'; # VERSION
+our $VERSION = '0.0007'; # VERSION
 
 use parent qw(Chart::GGPlot::Params);
 
@@ -197,7 +197,7 @@ Chart::GGPlot::Theme::ElementTree - Definitions of theme elements
 
 =head1 VERSION
 
-version 0.0005
+version 0.0007
 
 =head1 DESCRIPTION
 

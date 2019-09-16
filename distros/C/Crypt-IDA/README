@@ -1,16 +1,21 @@
 Crypt-IDA version 0.01
 ======================
 
-The README is used to introduce the module and provide instructions on
-how to install the module, any machine dependencies it may have (for
-example C compilers and installed libraries) and any other information
-that should be provided before the module is installed.
+The Crypt::IDA module implements Rabin's Information Dispersal
+Algorithm. This is what's known as a "threshold system": a secret is
+divided into n shares with the property that any k (the "quorum" or
+"threshold") of those shares (with k <= n) can be combined at a later
+time to reconstruct the secret. The algorithm should be
+cryptographically secure in the sense that if fewer shares than the
+quorum k are presented, no information about the secret is revealed.
 
-A README file is required for CPAN modules since CPAN extracts the
-README file from a module distribution so that people browsing the
-archive can use it get an idea of the modules uses. It is usually a
-good idea to provide version information here so that people can
-decide whether fixes for the module are worth downloading.
+The module uses Math::FastGF2 to efficiently implement the algorithm,
+making it suitable for securely sharing/distributing even large files.
+
+The Crypt::IDA::ShareFile module implements a file format for
+creating, storing and distributing shares created with Crypt::IDA.
+
+This is the initial release.
 
 INSTALLATION
 
@@ -29,7 +34,6 @@ This module requires these other modules and libraries:
   Math::FastGF2::Matrix
 
 COPYRIGHT AND LICENCE
-
 
 Copyright (C) 2009 by Declan Malone
 

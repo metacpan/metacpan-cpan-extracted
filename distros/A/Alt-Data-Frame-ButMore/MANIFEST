@@ -14,6 +14,7 @@ data-raw/airquality.csv
 data-raw/diamonds.csv
 data-raw/economics.csv
 data-raw/economics_long.csv
+data-raw/faithfuld.csv
 data-raw/iris.csv
 data-raw/mpg.csv
 data-raw/mtcars.csv
@@ -21,8 +22,7 @@ data-raw/txhousing.csv
 dist.ini
 lib/Alt/Data/Frame/ButMore.pm
 lib/Data/Frame.pm
-lib/Data/Frame/Autobox/Array.pm
-lib/Data/Frame/Autobox/Hash.pm
+lib/Data/Frame/Autobox.pm
 lib/Data/Frame/Class.pm
 lib/Data/Frame/Column/Helper.pm
 lib/Data/Frame/Examples.pm

@@ -1,0 +1,7 @@
+Revision history for Perl module Data::FDSet
+
+0.02 - 13 Sep 2019
+- Drop superfluous Call::Context dependency.
+
+0.01 - 13 Sep 2019
+- Initial release

@@ -27,3 +27,5 @@
 33 - testing sfish_add_tag in LaTeX
 
 34 - testing sfish_add_tag in LaTeX, and also sfish_ignore_outer
+
+35 - testing add_final, in addition to some features from test 34

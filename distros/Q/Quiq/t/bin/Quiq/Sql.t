@@ -881,7 +881,7 @@ sub test_insert_4 : Test(1) {
 sub test_insertMulti_1 : Test(2) {
     my $self = shift;
 
-    my $expected = sprintf Quiq::Unindent->string(q~
+    my $expected = sprintf Quiq::Unindent->trim(q~
         INSERT INTO person
             (per_id, per_vorname, per_nachname, per_geburtstag)
         VALUES

@@ -1,3 +1,7 @@
+v0.520
+    - Add support for PKI certificates.
+    - Fix failing remaining requests on errors.
+
 v0.501
     - Fix connection tests.
 

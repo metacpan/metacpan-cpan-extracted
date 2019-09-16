@@ -7,7 +7,7 @@ Alt::Data::Frame::ButMore - Alternative implementation of Data::Frame with more 
 
 # VERSION
 
-version 0.0051
+version 0.0053
 
 # STATUS
 
@@ -618,6 +618,14 @@ $df .= $x;
 ```
 is_numeric_column($column_name_or_idx)
 ```
+
+## drop\_bad
+
+```
+drop_bad(:$how='any')
+```
+
+Returns a new data frame with rows with BAD values dropped.
 
 # MISCELLANEOUS FEATURES
 

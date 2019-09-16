@@ -3,7 +3,7 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = '1.156';
+our $VERSION = '1.157';
 
 =encoding utf8
 
@@ -540,6 +540,14 @@ L<Quiq::Pod::Generator> - POD-Generator
 
 =item *
 
+L<Quiq::PostgreSql::CopyFormat> - Erzeuge Daten für PostgreSQL COPY-Kommando
+
+=item *
+
+L<Quiq::PostgreSql::Psql> - Wrapper für psql
+
+=item *
+
 L<Quiq::Process> - Information über den laufenden Prozess
 
 =item *
@@ -734,7 +742,7 @@ L<Quiq::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.156
+1.157
 
 =head1 AUTHOR
 

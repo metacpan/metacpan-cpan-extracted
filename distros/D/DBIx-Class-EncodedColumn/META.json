@@ -1,0 +1,93 @@
+{
+   "abstract" : "Automatically encode columns",
+   "author" : [
+      "Guillermo Roditi (groditi) <groditi@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "DBIx-Class-EncodedColumn",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Crypt::Eksblowfish::Bcrypt" : "0",
+            "DBIx::Class::TimeStamp" : "0",
+            "Dist::Milla" : "v1.0.20",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Crypt::OpenPGP" : "0",
+            "Digest" : "0",
+            "Digest::SHA" : "0",
+            "Math::Pari" : "0"
+         },
+         "requires" : {
+            "DBIx::Class" : "0.06002",
+            "Encode" : "0",
+            "Sub::Name" : "0.04"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBD::SQLite" : "0",
+            "Dir::Self" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/wreis/DBIx-Class-EncodedColumn/issues"
+      },
+      "homepage" : "https://github.com/wreis/DBIx-Class-EncodedColumn",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/wreis/DBIx-Class-EncodedColumn.git",
+         "web" : "https://github.com/wreis/DBIx-Class-EncodedColumn"
+      }
+   },
+   "version" : "0.00018",
+   "x_contributors" : [
+      "Jonathan Scott Duff <duff@localhost.localdomain>",
+      "Jonathan Scott Duff <duff@pobox.com>",
+      "Jonathan Yu <frequency@cpan.org>",
+      "Lisa Hare <lhare@inview.co.uk>",
+      "Peter Mottram <peter@sysnix.com>",
+      "Robert Rothenberg <rrwo@cpan.org>",
+      "Tina Mueller <cpan2@tinita.de>",
+      "Wallace Reis <wallace@reis.me>",
+      "Wallace Reis <wreis@devserver.perceptyx.com>",
+      "wreis <wallace@reis.org.br>"
+   ],
+   "x_generated_by_perl" : "v5.24.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08",
+   "x_static_install" : 1
+}
+

@@ -7,9 +7,12 @@ use_ok 'Data::Object::String';
 # deprecated
 # ok Data::Object::String->does('Data::Object::Rule::Comparison');
 # ok Data::Object::String->does('Data::Object::Rule::Defined');
-ok Data::Object::String->does('Data::Object::Role::Detract');
-ok Data::Object::String->does('Data::Object::Role::Dumper');
-ok Data::Object::String->does('Data::Object::Role::Output');
+# deprecated
+# ok Data::Object::String->does('Data::Object::Role::Detract');
+# deprecated
+# ok Data::Object::String->does('Data::Object::Role::Dumper');
+# deprecated
+# ok Data::Object::String->does('Data::Object::Role::Output');
 ok Data::Object::String->does('Data::Object::Role::Throwable');
 
 # no longer supported

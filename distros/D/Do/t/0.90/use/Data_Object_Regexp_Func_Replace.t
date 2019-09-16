@@ -29,10 +29,10 @@ Data::Object::Regexp::Func
 
 =attributes
 
-arg1(Object, req, ro)
-arg2(Str, req, ro)
-arg3(Str, opt, ro)
-arg4(Str, opt, ro)
+arg1(RegexpLike, req, ro)
+arg2(StringLike, req, ro)
+arg3(StringLike, opt, ro)
+arg4(StringLike, opt, ro)
 
 =libraries
 

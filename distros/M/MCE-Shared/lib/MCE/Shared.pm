@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized once );
 
-our $VERSION = '1.850';
+our $VERSION = '1.860';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitSubroutinePrototypes)
@@ -449,7 +449,7 @@ MCE::Shared - MCE extension for sharing data supporting threads and processes
 
 =head1 VERSION
 
-This document describes MCE::Shared version 1.850
+This document describes MCE::Shared version 1.860
 
 =head1 SYNOPSIS
 
@@ -1886,7 +1886,7 @@ threads (i.e. same PID).
 
  MCE::Shared->pid();
 
- $SIG{QUIT} = $SIG{INT} = $SIG{HUP} = $SIG{TERM} = sub {
+ $SIG{INT} = $SIG{HUP} = $SIG{TERM} = sub {
     # Signal workers and the shared manager all at once
     CORE::kill('KILL', MCE::Hobo->list_pids(), MCE::Shared->pid());
     exec('reset');

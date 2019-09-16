@@ -1,11 +1,5 @@
-#!perl -w
-
-#BEGIN
-#{
-#    if ($] < 5.006) { print "1..0 # skip current Perl version $] < 5.006000\n"; exit 0; }
-#}
-
 use strict;
+use warnings;
 
 my $USE_OBJECT_DEADLY = eval {
     require Object::Deadly;

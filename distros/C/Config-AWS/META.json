@@ -28,24 +28,16 @@
       },
       "runtime" : {
          "requires" : {
-            "Carp" : "0",
-            "Exporter::Shiny" : "0",
             "Exporter::Tiny" : "1",
             "File::Glob" : "0",
             "Path::Tiny" : "0.076",
             "Ref::Util" : "0",
-            "Scalar::Util" : "0",
-            "perl" : "5.010",
-            "strict" : "0",
-            "warnings" : "0"
+            "perl" : "5.010"
          }
       },
       "test" : {
          "requires" : {
-            "File::Share" : "0",
-            "File::ShareDir" : "0",
-            "File::ShareDir::Install" : "0.10",
-            "Path::Tiny" : "0.076",
+            "File::Share" : "0.03",
             "Test2::Tools::Spec" : "0",
             "Test2::V0" : "0",
             "perl" : "5.010"
@@ -55,7 +47,7 @@
    "provides" : {
       "Config::AWS" : {
          "file" : "lib/Config/AWS.pm",
-         "version" : "0.05"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -70,7 +62,7 @@
          "web" : "https://gitlab.com/jjatria/Config-AWS"
       }
    },
-   "version" : "0.05",
+   "version" : "0.07",
    "x_generated_by_perl" : "v5.30.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
 }

@@ -1,59 +1,71 @@
 Revision history for Perl extension Math::FastGF2.
 
-0.06  Sun 18 Aug 2019
+0.07  Fri 13 Sep 2019
+      - Fix problem with C routine not returning a value in all
+        cases (stops compilation with error in C99)
+      - Slightly improve(?) multiply_submatrix_c for most common
+        calling case (w=1, input/output matrices in ROWWISE/COLWISE or
+        COLWISE/ROWWISE organisation)
+      - Turn offset_to_rowcol into an xsub (profiling showed it was
+        very expensive; a better solution would be to eliminate the
+        need to call it altogether...)
+      - new getvals_str and setvals_str XS subs that do same kind of
+        sanity checking as getvals/setvals, but only works with
+        strings (gives a big performance improvement)
 
-        - Fix Cauchy.t to pass tests if Crypt::IDA is not available
-          (problem discovered via CPAN testers)
+0.06  Sun 18 Aug 2019
+      - Fix Cauchy.t to pass tests if Crypt::IDA is not available
+        (problem discovered via CPAN testers)
 
 0.05  Sat 17 Aug 2019
-        - 10th anniversary special release!!!
-        - New constructor for Cauchy Matrix generated from a list
-	  of x1,x2,...xn,y1,..yk values (moved from Crypt::IDA)
-	- New, slightly more efficient Matrix inversion method for
-	  Cauchy matrices (called as constructor given above x1..yk)
-	- New constructor for Vandermonde matrix (x1..xn)
-	- New $matrix->print method (pretty!)
-	- Don't warn if modules "use"d twice
-	- Profiling-driven speed improvements and some code cleanup
-	  * One of my main reasons to revisit the code.
-	  * See Changes-0.5 for more details.
+      - 10th anniversary special release!!!
+      - New constructor for Cauchy Matrix generated from a list
+	of x1,x2,...xn,y1,..yk values (moved from Crypt::IDA)
+      - New, slightly more efficient Matrix inversion method for
+	Cauchy matrices (called as constructor given above x1..yk)
+      - New constructor for Vandermonde matrix (x1..xn)
+      - New $matrix->print method (pretty!)
+      - Don't warn if modules "use"d twice
+      - Profiling-driven speed improvements and some code cleanup
+	* One of my main reasons to revisit the code.
+	* See Changes-0.5 for more details.
 
 0.04  Mon Aug 17 21:00:00 2009
-	- Add copy/flip-related Matrix code
-        - More tests on getvals/setvals
- 	- Remove some unused code that was causing compilation errors
- 	  on some platforms.
-        - Documentation updates
-	- Downgrade version of perl required to version 5.6. I have
-          not personally tested this version, but I've no reason to
-          suspect any problems. I will keep an eye out for test
-          reports on this, though.
+      - Add copy/flip-related Matrix code
+      - More tests on getvals/setvals
+      - Remove some unused code that was causing compilation errors
+	on some platforms.
+      - Documentation updates
+      - Downgrade version of perl required to version 5.6. I have
+	not personally tested this version, but I've no reason to
+	suspect any problems. I will keep an eye out for test
+	reports on this, though.
 
 0.03  Fri Aug 14 22:50:00 2009
-        - New release. Attempt to automatically determine the correct
-          C data types for 16 and 32-bit values. This should simplify
-          the task of setting up the software on different platforms.
-          If the determination of types doesn't succeed the
-          Makefile.PL script exits with a useful error message and
-          error code 0 before writing a Makefile, so this should at
-          least handle the problem gracefully and not raise a FAIL
-          test result.
+      - New release. Attempt to automatically determine the correct
+	C data types for 16 and 32-bit values. This should simplify
+	the task of setting up the software on different platforms.
+	If the determination of types doesn't succeed the
+	Makefile.PL script exits with a useful error message and
+	error code 0 before writing a Makefile, so this should at
+	least handle the problem gracefully and not raise a FAIL
+	test result.
 
 0.02  Fri Aug 14 18:00:00 2009
-        - New release. Add Matrix code.
-        - All installable perl scripts now go in bin/ where they
-          belong.
-        - Make building of XS code depend on perlsubs.c
-        - Automated tests by CPAN testers are failing because of
-          different sizes for "unsigned long". A future release will
-          try to determine the correct word size at compile time.
-          Until then, if the system tests fail with code 11 (segfault)
-          on systems with 64-bit native ints, please manually change
-          the type of gf2_u32 to something appropriate and also update
-          the Perl XS functions (and prototypes) to use the same
-          value. Thank you.
+      - New release. Add Matrix code.
+      - All installable perl scripts now go in bin/ where they
+	belong.
+      - Make building of XS code depend on perlsubs.c
+      - Automated tests by CPAN testers are failing because of
+	different sizes for "unsigned long". A future release will
+	try to determine the correct word size at compile time.
+	Until then, if the system tests fail with code 11 (segfault)
+	on systems with 64-bit native ints, please manually change
+	the type of gf2_u32 to something appropriate and also update
+	the Perl XS functions (and prototypes) to use the same
+	value. Thank you.
 
 0.01  Mon Jul 13 20:19:47 2009
-	- original version; created by h2xs 1.23 with options
-		-A -n Math::FastGF2
+      - original version; created by h2xs 1.23 with options
+	      -A -n Math::FastGF2
 

@@ -1,6 +1,8 @@
 Revision history for Term::Choose
 
 
+1.702   2019-09-13
+    - Option 'lf': fixed documentation.
 
 1.701   2019-09-12
     - Issued around `tput`. [GH #6 gregoa]

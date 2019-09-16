@@ -21,7 +21,7 @@ use Exporter::Shiny qw(
     default_profile
 );
 
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 our %EXPORT_TAGS = (
     ini  => [qw( read_file read_string read_handle )],
     aws  => [qw( config_file default_profile credentials_file )],
@@ -72,14 +72,13 @@ sub config_file {
 sub read_file {
     croak 'Filename is missing' unless @_ >= 1;
     croak 'Argument was not a string' if is_ref $_[0];
-    require Path::Tiny;
-    _read( [ Path::Tiny::path(shift)->lines({ chomp => 1 }) ], @_ );
+    _read( _prepare(shift), @_ );
 }
 
 sub read_string {
     croak 'String is missing' unless @_ >= 1;
     croak 'Argument was not a string' if is_ref $_[0];
-    _read( [ split /\n/, shift ], @_ );
+    _read( [ split /\n/, shift // '' ], @_ );
 }
 
 sub read_handle {
@@ -104,7 +103,13 @@ sub _prepare {
 
     unless (is_ref $input) {
         require Path::Tiny;
-        return [ Path::Tiny::path( $input )->lines({ chomp => 1 }) ];
+        my @lines = eval { Path::Tiny::path( $input )->lines({ chomp => 1 }) };
+        if ($@) {
+            croak "Cannot read from $input: $@->{err}"
+                if ref $@ && $@->isa('Path::Tiny::Error');
+            croak $@;
+        }
+        return \@lines;
     }
 
     return [ map { chomp } $input->getlines ]

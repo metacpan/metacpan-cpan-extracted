@@ -13,9 +13,7 @@ DoArgs
 
 =usage
 
-  # given xyz
-
-  my $self = Data::Object::Library->DoArgs(...);
+  Data::Object::Library::DoArgs();
 
 =description
 

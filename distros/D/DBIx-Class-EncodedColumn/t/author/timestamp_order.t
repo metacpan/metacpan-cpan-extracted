@@ -5,7 +5,7 @@ use utf8;
 use Dir::Self;
 use File::Spec;
 use File::Temp 'tempdir';
-use lib File::Spec->catdir(__DIR__, 'lib');
+use lib File::Spec->catdir(__DIR__, '..', 'lib');
 use DigestTest::Schema;
 
 DigestTest::Schema->load_classes(qw/WithTimeStampChild WithTimeStampChildWrongOrder/);
@@ -13,7 +13,7 @@ DigestTest::Schema->load_classes(qw/WithTimeStampChild WithTimeStampChildWrongOr
 my $tmp = tempdir( CLEANUP => 1 );
 my $db_file = File::Spec->catfile($tmp, 'testdb.sqlite');
 my $schema = DigestTest::Schema->connect("dbi:SQLite:dbname=${db_file}");
-$schema->deploy({}, File::Spec->catdir(__DIR__, 'var'));
+$schema->deploy({}, File::Spec->catdir(__DIR__, '..', 'var'));
 
 my %create_values = (username => 'testuser', password => 'password1');
 my $row = $schema->resultset('WithTimeStampChild')->create( \%create_values );

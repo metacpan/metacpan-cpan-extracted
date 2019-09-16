@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.156';
+our $VERSION = '1.157';
 
 use Quiq::Hash;
 use Quiq::Option;
@@ -4327,7 +4327,6 @@ sub insertMulti {
         }
         $sql .= sprintf $fmt,map {$self->valExpr($_)} @$rec;
     }
-    $sql .= "\n";    
 
     return $sql;
 }
@@ -5386,7 +5385,7 @@ sub diff {
 
 =head1 VERSION
 
-1.156
+1.157
 
 =head1 AUTHOR
 

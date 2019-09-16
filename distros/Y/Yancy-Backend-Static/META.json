@@ -57,7 +57,7 @@
    "provides" : {
       "Yancy::Backend::Static" : {
          "file" : "lib/Yancy/Backend/Static.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
@@ -73,10 +73,11 @@
       },
       "x_IRC" : "irc://irc.freenode.org/#yancy"
    },
-   "version" : "0.006",
+   "version" : "0.007",
    "x_authority" : "cpan:PREACTION",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "Wojtek Ba\u017cant <wojciech.bazant+ebi@gmail.com>",
       "Wojtek Ba\u017cant <wojtek.bazant@sanger.ac.uk>"
    ],
    "x_generated_by_perl" : "v5.28.0",

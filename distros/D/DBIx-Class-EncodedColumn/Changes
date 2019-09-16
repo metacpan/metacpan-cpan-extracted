@@ -1,3 +1,8 @@
+Revision history for Message-Passing-Fluentd
+
+0.00018 2019-09-16 08:00:00
+        - Bugfix author tests (#130447, by jplesnik)
+        - Previous release was broken
 0.00017 2019-09-03
         - Add '.' to @inc (perlpunk)
         - Update prereqs (perlpunk)

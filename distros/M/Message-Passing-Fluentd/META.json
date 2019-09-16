@@ -4,7 +4,7 @@
       "Wallace Reis <wallace@reis.me>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -39,7 +39,10 @@
          "requires" : {
             "AnyEvent" : "0",
             "Fluent::Logger" : "0",
+            "JSON::MaybeXS" : "0",
+            "Message::Passing" : "0",
             "Moo" : "0",
+            "Try::Tiny" : "0",
             "namespace::autoclean" : "0",
             "perl" : "5.008005"
          }
@@ -62,8 +65,11 @@
          "web" : "https://github.com/wreis/Message-Passing-Fluentd"
       }
    },
-   "version" : "0.01",
-   "x_generated_by_perl" : "v5.20.2",
+   "version" : "0.02",
+   "x_contributors" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+   ],
+   "x_generated_by_perl" : "v5.24.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.08",
    "x_static_install" : 1
 }

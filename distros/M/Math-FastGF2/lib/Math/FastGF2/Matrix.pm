@@ -19,7 +19,7 @@ require Exporter;
 	       );
 @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 @EXPORT = (  );
-$VERSION = '0.06';
+$VERSION = '0.07';
 
 require XSLoader;
 XSLoader::load('Math::FastGF2', $VERSION);
@@ -210,7 +210,8 @@ sub ne {
   return !values_eq_c($self,$other);
 }
 
-sub offset_to_rowcol {
+
+sub _offset_to_rowcol_disabled {
   my $self=shift;
   my $offset=shift;
 
@@ -1360,13 +1361,23 @@ If the specified byte order is different from the native byte order on
 the machine, then bytes within each word will be swapped. Otherwise,
 the values are passed through unchanged.
 
-All these routines have the choice of operating on strings (close to
-the internal representation of the matrix in memory) or lists of
+All the above routines have the choice of operating on strings (close
+to the internal representation of the matrix in memory) or lists of
 values (regular numeric scalars, as used by getval/setval). Byte order
 translation (where specified) is performed regardless of whether
 strings or lists are used. Operating with strings is slightly more
 efficient than using lists of values, since data can be copied with
 fewer operations without needing to pack/unpack a list of values.
+
+Starting in version 0.07, there are also new XS versions of setvals
+and getvals. They take the same arguments as the Perl versions, but
+only work with strings:
+
+ $str = $m->getvals_str($row, $col, $words, $byteorder);
+ $m->setvals_str($row, $col, $str, $byteorder);
+
+Profiling has shown that these routines are much quicker than the Perl
+versions.
 
 =head2 Examples
 
@@ -1428,6 +1439,7 @@ or:
   $m->setvals(0,0,"\0" x ($self->ROWS * $self->COLS * $self->WIDTH));
 
 (which is exactly what the C<zero> method does.)
+
 
 =head1 MATRIX OPERATIONS
 

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.156';
+our $VERSION = '1.157';
 
 use POSIX qw/:locale_h/;
 
@@ -146,7 +146,7 @@ sub get {
 
 =head1 VERSION
 
-1.156
+1.157
 
 =head1 AUTHOR
 

@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.156';
+our $VERSION = '1.157';
 
 use Quiq::Sql;
 use Quiq::Object;
@@ -163,11 +163,11 @@ sub new {
     my $udl = @_? shift: $ENV{'UDL'};
 
     if (!defined $udl || $udl eq '') {
-        $class->throw('DB-00002: Kein UDL');
+        $class->throw('DB-00002: No UDL');
     }
     elsif (@_) {
         $class->throw(
-            'DB-00002: Zu viele Parameter',
+            'DB-00002: Too many parameters',
             Parameters => join(',',@_),
         );
     }
@@ -4903,7 +4903,7 @@ Von Perl aus auf die Access-Datenbank zugreifen:
 
 =head1 VERSION
 
-1.156
+1.157
 
 =head1 AUTHOR
 

@@ -2,6 +2,8 @@ use strict;
 use warnings;
 use Test::More;
 
+plan skip_all => 'Deprecated';
+
 use_ok 'Data::Object::Number';
 can_ok 'Data::Object::Number', 'data';
 

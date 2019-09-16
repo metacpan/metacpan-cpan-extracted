@@ -1,6 +1,4 @@
 
-# $Id: Category.pm,v 2.5 2015-09-13 14:27:26 Martin Exp $
-
 =head1 NAME
 
 WWW::Search::Ebay::Category - backend for returning entire categories on www.ebay.com
@@ -48,7 +46,7 @@ use Date::Manip;
 use base 'WWW::Search::Ebay';
 
 our
-$VERSION = do { my @r = (q$Revision: 2.5 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
+$VERSION = 2.611;
 
 our $MAINTAINER = 'Martin Thurn <mthurn@cpan.org>';
 
@@ -70,6 +68,31 @@ sub _native_setup_search
   return $self->SUPER::_native_setup_search($native_query, $rhOptsArg);
   } # _native_setup_search
 
+
+sub _get_result_count_elements
+  {
+  my $self = shift;
+  my $tree = shift;
+  my @ao;
+  push @ao, $tree->look_down(
+                             _tag => 'h2',
+                             class => 'srp-controls__count-heading',
+                            );
+  return @ao;
+  }
+
+sub _get_itemtitle_tds
+  {
+  my $self = shift;
+  my $tree = shift;
+  printf STDERR (" TTT this is Category::_get_itemtitle_tds") if (1 < $self->{_debug});
+  my @ao;
+  push @ao, $tree->look_down(_tag => 'div',
+                             class => 's-item__image-section',
+                            );
+  printf STDERR (" DDD found %d itemtitle tags", scalar(@ao)) if (1 < $self->{_debug});
+  return @ao;
+  } # _get_itemtitle_tds
 
 sub _preprocess_results_page_OFF
   {

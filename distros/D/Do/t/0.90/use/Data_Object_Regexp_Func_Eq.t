@@ -29,7 +29,7 @@ Data::Object::Regexp::Func
 
 =attributes
 
-arg1(Object, req, ro)
+arg1(RegexpLike, req, ro)
 arg2(Any, req, ro)
 
 =libraries

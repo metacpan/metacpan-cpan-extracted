@@ -65,6 +65,7 @@ author/sections/services.yml
 author/sections/settings.yml
 author/sections/sidekiq_metrics.yml
 author/sections/snippets.yml
+author/sections/statistics.yml
 author/sections/system_hooks.yml
 author/sections/tags.yml
 author/sections/todos.yml

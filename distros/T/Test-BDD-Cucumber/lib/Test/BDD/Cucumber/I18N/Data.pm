@@ -1,5 +1,5 @@
 package Test::BDD::Cucumber::I18N::Data;
-$Test::BDD::Cucumber::I18N::Data::VERSION = '0.62';
+$Test::BDD::Cucumber::I18N::Data::VERSION = '0.64';
 use strict;
 use warnings;
 use utf8;
@@ -14,7 +14,7 @@ Test::BDD::Cucumber::I18N::Data - Cucumber language definitions
 
 =head1 VERSION
 
-version 0.62
+version 0.64
 
 =head1 DESCRIPTION
 

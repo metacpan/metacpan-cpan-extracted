@@ -10,7 +10,7 @@ use Moo;
 with 'Data::Object::Role::Proxyable';
 with 'Data::Object::Role::Stashable';
 
-our $VERSION = '1.70'; # VERSION
+our $VERSION = '1.76'; # VERSION
 
 has named => (
   is => 'ro'
@@ -151,6 +151,14 @@ variables.
 
 =cut
 
+=head1 INTEGRATIONS
+
+This package integrates behaviors from:
+
+L<Data::Object::Role::Stashable>
+
+=cut
+
 =head1 LIBRARIES
 
 This package uses type constraints defined by:
@@ -269,9 +277,11 @@ The stashed method returns the stashed data associated with the object.
 
 =head1 CREDITS
 
-Al Newkirk, C<+287>
+Al Newkirk, C<+296>
 
 Anthony Brummett, C<+10>
+
+José Joaquín Atria, C<+1>
 
 =cut
 

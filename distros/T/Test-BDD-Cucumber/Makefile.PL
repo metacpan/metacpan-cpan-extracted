@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
     "Getopt::Long" => 0,
     "JSON::MaybeXS" => "1.001000",
     "List::MoreUtils" => 0,
-    "List::Util" => 0,
+    "List::Util" => "1.33",
     "Module::Runtime" => 0,
     "Moo" => "2.002002",
     "MooX::HandlesVia" => 0,
@@ -45,7 +45,7 @@ my %WriteMakefileArgs = (
     "Test::Differences" => 0,
     "Test::Exception" => 0
   },
-  "VERSION" => "0.62",
+  "VERSION" => "0.64",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -60,7 +60,7 @@ my %FallbackPrereqs = (
   "IO::Scalar" => 0,
   "JSON::MaybeXS" => "1.001000",
   "List::MoreUtils" => 0,
-  "List::Util" => 0,
+  "List::Util" => "1.33",
   "Module::Runtime" => 0,
   "Moo" => "2.002002",
   "MooX::HandlesVia" => 0,

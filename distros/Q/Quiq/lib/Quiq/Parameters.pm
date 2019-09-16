@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.156';
+our $VERSION = '1.157';
 
 use Quiq::Converter;
 use Quiq::Hash;
@@ -597,7 +597,7 @@ sub extractToObject {
 
 =head1 VERSION
 
-1.156
+1.157
 
 =head1 AUTHOR
 

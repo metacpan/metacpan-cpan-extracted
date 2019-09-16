@@ -6,9 +6,17 @@ use warnings;
 
 use GraphViz2;
 use Music::BachChoralHarmony;
+use lib $ENV{HOME} . '/sandbox/Music-ToRoman/lib';
 use Music::ToRoman;
 
-my $in_key = shift || 'G_M';
+my $in_note = shift // ''; # Show all connections if not given
+my $in_key  = shift || 'major'; # maj, minor, min, m
+my $min     = shift // 0;
+
+$in_key = 'major'
+    if $in_key eq 'maj';
+$in_key = 'minor'
+    if $in_key eq 'm' || $in_key eq 'min';
 
 my $bach = Music::BachChoralHarmony->new;
 my $songs = $bach->parse();
@@ -19,14 +27,18 @@ my %score;
 
 # Process each song for key and chord
 for my $song ( sort keys %$songs ) {
-    my $key = $songs->{$song}{key};
+    next if $song eq '003907bv' || $song eq '014806bv'; # XXX These keys are not found among the chord notes?
 
-    # Skip unless we are in the right key
-    next unless $key eq $in_key;
+    my $key = $songs->{$song}{key};
 
     # Get the scale name
     my $name = $key =~ /M/ ? 'major' : 'minor';
     $key =~ s/_?M//i;
+
+    next if $in_note && $key ne $in_note;
+
+    # Skip unless we are in the right key
+    next unless $name eq $in_key;
 
     my $mtr = Music::ToRoman->new(
         scale_note => $key,
@@ -63,6 +75,8 @@ my %nodes;
 my %edges;
 
 for my $bigram ( keys %score ) {
+    next if $min && $score{$bigram} <= $min;
+
     my ( $i, $j ) = split ' ', $bigram;
 
     $g->add_node( name => $i )

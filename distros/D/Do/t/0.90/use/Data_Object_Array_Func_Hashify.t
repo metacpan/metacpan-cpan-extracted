@@ -29,8 +29,8 @@ Data::Object::Array::Func
 
 =attributes
 
-arg1(Object, req, ro)
-arg2(Undef | CodeRef, opt, ro)
+arg1(ArrayLike, req, ro)
+arg2(Undef | UndefObject | CodeLike, opt, ro)
 args(ArrayRef[Any], opt, ro)
 
 =libraries

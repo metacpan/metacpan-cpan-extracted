@@ -147,4 +147,19 @@ describe 'Config::AWS read tests' => sub {
     };
 };
 
+tests 'Unreadable file' => sub {
+    like dies {
+            local $ENV{AWS_CONFIG_FILE} = '' . {};
+            Config::AWS::read;
+        },
+        qr/Cannot read from .*: .*/,
+        'read() dies when reading missing file';
+
+    like dies {
+            Config::AWS::read_file( '' . {} );
+        },
+        qr/Cannot read from .*: .*/,
+        'read_file() dies when reading missing file';
+};
+
 done_testing;

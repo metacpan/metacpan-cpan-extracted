@@ -7,6 +7,7 @@ BEGIN { plan tests => 5 };
 use Text::Starfish;
 use File::Copy;
 use Carp;
+use Cwd;
 ok(1);				# made this far
 
 # Slash hack was added because the Windows terminal evaluates does not
@@ -168,6 +169,7 @@ okfiles('../testfiles/26-out.html', '26-out.html');
 # 33
 &testcase(33, 'in:33_tex.in->33.tex -replace -o=33-lecture.tex');
 &testcase(34, 'in:33_tex.in->34.tex -replace -o=34-slides.tex');
+&testcase(35, 'in:35_tex.in->35.tex -replace -o=35-slides.tex');
 
 sub okfiles {
     my $f1 = shift;
@@ -176,7 +178,7 @@ sub okfiles {
 	if (!-f $f1)
 	{ die "file $f1 does not exist (to be compared to tmp/$f2)"	}
 	if (! ok(getfile($f2), getfile($f1)) )
-	{ print STDERR "pwd=".`pwd`."Files: $f1 and $f2\n" }
+	{ print STDERR "cwd=".getcwd()."Files: $f1 and $f2\n" }
 
     }
 }
@@ -284,7 +286,7 @@ sub testcase {
       $outNew = $out;
     }
 
-    putfile('test-description', '# CWD: '.`pwd`.
+    putfile('test-description', '# CWD: '.getcwd().
 	    "# cp $testfilesdir/$outfile $outfile-expected\n".
 	    "# perl -I. -- starfish @sfishArgs\n".
 	    "# starfish_cmd( @sfishArgs );\n".
@@ -306,7 +308,7 @@ sub comparefiles {
     { print STDERR "Error: file $f2 does not exist\n"; ok(0); return; }
     my $fc2 = getfile($f2);
     if ($fc1 eq $fc2) { next; }
-    print STDERR "CWD: ".`pwd`."Difference between $f1 and $f2:\n";
+    print STDERR "CWD: ".getcwd()."Difference between $f1 and $f2:\n";
     while ($fc1 ne '' or $fc2 ne '') {
       $fc1=~/^.*\n/; my $l1=$&; my $fc1r=$';
       $fc2=~/^.*\n/; my $l2=$&; my $fc2r=$';

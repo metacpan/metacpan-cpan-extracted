@@ -1,6 +1,18 @@
 
 Revision history for Perl module MCE::Shared.
 
+1.860 Sun Sep 15 20:00:00 EST 2019
+
+  * Signal-handling update release.
+
+  * SIGINT and SIGTERM safety for shared objects during IPC.
+  * IPC safety in MCE::Hobo during SIGINT and SIGTERM.
+
+  * Method $hobo->exit in MCE::Hobo now sends the SIGINT signal
+    for extra reliability with MCE::Shared (previously SIGQUIT).
+
+  * Bumped MCE dependency to 1.860.
+
 1.850 Mon Sep 09 12:30:00 EST 2019
 
   * More safety around cleanup code in MCE::Shared::Server.

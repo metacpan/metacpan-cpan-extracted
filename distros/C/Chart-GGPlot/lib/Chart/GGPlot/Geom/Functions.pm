@@ -4,7 +4,7 @@ package Chart::GGPlot::Geom::Functions;
 
 use Chart::GGPlot::Setup;
 
-our $VERSION = '0.0005'; # VERSION
+our $VERSION = '0.0007'; # VERSION
 
 use Chart::GGPlot::Util qw(collect_functions_from_package);
 
@@ -51,7 +51,7 @@ Chart::GGPlot::Geom::Functions - Function interface for Chart::GGPlot::Geom
 
 =head1 VERSION
 
-version 0.0005
+version 0.0007
 
 =head1 DESCRIPTION
 
@@ -217,6 +217,73 @@ multiple widths to find the best to illustrate the stories in your data.
 =back
 
 See also L<Chart::GGPlot::Stat::Functions/stat_bin>.
+
+=head2 geom_col
+
+    geom_col(:$mapping=undef, :$data=undef, :$position="stack",
+             :$width=undef, :$na_rm=false, :$show_legend=undef,
+             :$inherit_aes=true,
+             %rest)
+
+Bar plot. Different from geom_bar(), geom_col() uses stat_identity():
+it leaves the data as is.
+
+=over 4
+
+=item * $mapping
+
+Set of aesthetic mappings created by C<aes()>. If specified and
+C<$inherit_aes> is true (the default), it is combined with the default
+mapping at the top level of the plot.
+You must supply mapping if there is no plot mapping.
+
+=item * $data
+
+The data to be displayed in this layer.
+If C<undef>, the default, the data is inherited from the plot data as
+specified in the call to C<ggplot()>.
+
+=item * $stat
+
+The statistical transformation to use on the data for this layer, as a
+string.
+
+=item * $position
+
+Position adjustment, either as a string, or the result of a call to a
+position adjustment function.
+
+=item * $na_rm
+
+If false, the default, missing values are removed with a warning.
+If true, missing values are silently removed.
+
+=item * $show_legend
+
+Should this layer be included in the legends?
+C<undef>, the default, includes if any aesthetics are mapped.
+A true scalar for never includes, and a defined false scalar for always
+includes.
+
+=item * $inherit_aes
+
+If false, overrides the default aesthetics, rather than combining with them.
+This is most useful for helper functions that define both data and
+aesthetics and shouldn't inherit behaviour from the default plot
+specification.
+
+=item * %rest
+
+Other arguments passed to C<Chart::GGPlot::Layer-E<gt>new()>.
+These are often aesthetics, used to set an aesthetic to a fixed value,
+like C<color =E<gt> "red", size =E<gt> 3>.
+They may also be parameters to the paired geom/stat.
+
+=item * $width
+
+Bar width. By default, set to 90% of the resolution of the data.
+
+=back
 
 =head2 geom_boxplot
 

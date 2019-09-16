@@ -30,9 +30,9 @@ Data::Object::Hash::Func
 =attributes
 
 arg1(Object, req, ro)
-arg2(Str, opt, ro)
-arg3(HashRef, opt, ro)
-arg4(HashRef, opt, ro)
+arg2(StringLike, opt, ro)
+arg3(HashLike, opt, ro)
+arg4(HashLike, opt, ro)
 
 =libraries
 

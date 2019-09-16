@@ -86,6 +86,7 @@ use vars qw{
   $missing_file_spec
   $fh_stderr
   $rOpts_character_encoding
+  $Warn_count
 };
 
 @ISA    = qw( Exporter );
@@ -105,11 +106,11 @@ BEGIN {
 
     # To make the number continually increasing, the Development Number is a 2
     # digit number starting at 01 after a release is continually bumped along
-    # at significant points during developement. If it ever reaches 99 then the
+    # at significant points during development. If it ever reaches 99 then the
     # Release version must be bumped, and it is probably past time for a
     # release anyway.
 
-    $VERSION = '20190601';
+    $VERSION = '20190915';
 }
 
 sub streamhandle {
@@ -403,7 +404,7 @@ EOM
         $fh_stderr = *STDERR;
     }
 
-    sub Warn { my $msg = shift; $fh_stderr->print($msg); return }
+    sub Warn { my $msg = shift; $fh_stderr->print($msg); $Warn_count++; return }
 
     sub Exit {
         my $flag = shift;
@@ -418,6 +419,25 @@ EOM
         Exit(1);
         croak "unexpected return to Die";
     }
+
+    my $md5_hex = sub {
+        my ($buf) = @_;
+
+        # Evaluate the MD5 sum for a string
+        # Patch for [rt.cpan.org #88020]
+        # Use utf8::encode since md5_hex() only operates on bytes.
+        # my $digest = md5_hex( utf8::encode($sink_buffer) );
+
+        # Note added 20180114: the above patch did not work correctly.  I'm not
+        # sure why.  But switching to the method recommended in the Perl 5
+        # documentation for Encode worked.  According to this we can either use
+        #    $octets = encode_utf8($string)  or equivalently
+        #    $octets = encode("utf8",$string)
+        # and then calculate the checksum.  So:
+        my $octets = Encode::encode( "utf8", $buf );
+        my $digest = md5_hex($octets);
+        return $digest;
+    };
 
     # extract various dump parameters
     my $dump_options_type     = $input_hash{'dump_options_type'};
@@ -728,12 +748,14 @@ EOM
     while ( my $input_file = shift @ARGV ) {
         my $fileroot;
         my @input_file_stat;
+        my $display_name;
 
         #---------------------------------------------------------------
         # prepare this input stream
         #---------------------------------------------------------------
         if ($source_stream) {
-            $fileroot = "perltidy";
+            $fileroot     = "perltidy";
+            $display_name = "<source_stream>";
 
             # If the source is from an array or string, then .LOG output
             # is only possible if a logfile stream is specified.  This prevents
@@ -743,11 +765,13 @@ EOM
             }
         }
         elsif ( $input_file eq '-' ) {    # '-' indicates input from STDIN
-            $fileroot = "perltidy";       # root name to use for .ERR, .LOG, etc
+            $fileroot     = "perltidy";   # root name to use for .ERR, .LOG, etc
+            $display_name = "<stdin>";
             $in_place_modify = 0;
         }
         else {
-            $fileroot = $input_file;
+            $fileroot     = $input_file;
+            $display_name = $input_file;
             unless ( -e $input_file ) {
 
                 # file doesn't exist - check for a file glob
@@ -844,6 +868,12 @@ EOM
             $rpending_logfile_message );
         next unless ($source_object);
 
+        my $max_iterations      = $rOpts->{'iterations'};
+        my $do_convergence_test = $max_iterations > 1;
+        my $convergence_log_message;
+        my %saw_md5;
+        my $digest_input = 0;
+
         # Prefilters and postfilters: The prefilter is a code reference
         # that will be applied to the source before tidying, and the
         # postfilter is a code reference to the result before outputting.
@@ -851,14 +881,15 @@ EOM
             $prefilter
             || (   $rOpts_character_encoding
                 && $rOpts_character_encoding eq 'utf8' )
+            || $rOpts->{'assert-tidy'}
+            || $rOpts->{'assert-untidy'}
+            || $do_convergence_test
           )
         {
             my $buf = '';
             while ( my $line = $source_object->get_line() ) {
                 $buf .= $line;
             }
-
-            $buf = $prefilter->($buf) if $prefilter;
 
             if (   $rOpts_character_encoding
                 && $rOpts_character_encoding eq 'utf8'
@@ -874,6 +905,19 @@ EOM
                     );
                     next;
                 }
+            }
+
+            # MD5 sum of input file is evaluated before any prefilter
+            if ( $rOpts->{'assert-tidy'} || $rOpts->{'assert-untidy'} ) {
+                $digest_input = $md5_hex->($buf);
+            }
+
+            $buf = $prefilter->($buf) if $prefilter;
+
+        # starting MD5 sum for convergence test is evaluated after any prefilter
+            if ($do_convergence_test) {
+                my $digest = $md5_hex->($buf);
+                $saw_md5{$digest} = 1;
             }
 
             $source_object = Perl::Tidy::LineSource->new( \$buf, $rOpts,
@@ -977,7 +1021,10 @@ EOM
         $line_separator = "\n" unless defined($line_separator);
 
         my ( $sink_object, $postfilter_buffer );
-        if ($postfilter) {
+        if (   $postfilter
+            || $rOpts->{'assert-tidy'}
+            || $rOpts->{'assert-untidy'} )
+        {
             $sink_object =
               Perl::Tidy::LineSink->new( \$postfilter_buffer, $tee_file,
                 $line_separator, $rOpts, $rpending_logfile_message, $binmode );
@@ -998,7 +1045,7 @@ EOM
 
         my $logger_object =
           Perl::Tidy::Logger->new( $rOpts, $log_file, $warning_file,
-            $fh_stderr, $saw_extrude );
+            $fh_stderr, $saw_extrude, $display_name );
         write_logfile_header(
             $rOpts,        $logger_object, $config_file,
             $rraw_options, $Windows_type,  $readable_options,
@@ -1022,26 +1069,6 @@ EOM
         #---------------------------------------------------------------
         # loop over iterations for one source stream
         #---------------------------------------------------------------
-
-        # We will do a convergence test if 3 or more iterations are allowed.
-        # It would be pointless for fewer because we have to make at least
-        # two passes before we can see if we are converged, and the test
-        # would just slow things down.
-        my $max_iterations = $rOpts->{'iterations'};
-        my $convergence_log_message;
-        my %saw_md5;
-        my $do_convergence_test = $max_iterations > 2;
-
-        # Since Digest::MD5 qw(md5_hex) has been in the earliest version of Perl
-        # we are requiring (5.8), I have commented out this check
-##?        if ($do_convergence_test) {
-##?            eval "use Digest::MD5 qw(md5_hex)";
-##?            $do_convergence_test = !$@;
-##?
-##?            ### Trying to avoid problems with ancient versions of perl
-##?            ##eval { my $string = "perltidy"; utf8::encode($string) };
-##?            ##$do_convergence_test = $do_convergence_test && !$@;
-##?        }
 
         # save objects to allow redirecting output during iterations
         my $sink_object_final     = $sink_object;
@@ -1158,19 +1185,7 @@ EOM
                 }
                 elsif ($do_convergence_test) {
 
-                    # Patch for [rt.cpan.org #88020]
-                    # Use utf8::encode since md5_hex() only operates on bytes.
-                    # my $digest = md5_hex( utf8::encode($sink_buffer) );
-
-                    # Note added 20180114: this patch did not work correctly.
-                    # I'm not sure why.  But switching to the method
-                    # recommended in the Perl 5 documentation for Encode
-                    # worked.  According to this we can either use
-                    #    $octets = encode_utf8($string)  or equivalently
-                    #    $octets = encode("utf8",$string)
-                    # and then calculate the checksum.  So:
-                    my $octets = Encode::encode( "utf8", $sink_buffer );
-                    my $digest = md5_hex($octets);
+                    my $digest = $md5_hex->($sink_buffer);
                     if ( !$saw_md5{$digest} ) {
                         $saw_md5{$digest} = $iter;
                     }
@@ -1227,12 +1242,38 @@ EOM
         #---------------------------------------------------------------
         # Perform any postfilter operation
         #---------------------------------------------------------------
-        if ($postfilter) {
+        if (   $postfilter
+            || $rOpts->{'assert-tidy'}
+            || $rOpts->{'assert-untidy'} )
+        {
             $sink_object->close_output_file();
             $sink_object =
               Perl::Tidy::LineSink->new( $output_file, $tee_file,
                 $line_separator, $rOpts, $rpending_logfile_message, $binmode );
-            my $buf = $postfilter->($postfilter_buffer);
+
+            my $buf =
+                $postfilter
+              ? $postfilter->($postfilter_buffer)
+              : $postfilter_buffer;
+
+            # Check if file changed if requested, but only after any postfilter
+            if ( $rOpts->{'assert-tidy'} ) {
+                my $digest_output = $md5_hex->($buf);
+                if ( $digest_output ne $digest_input ) {
+                    $logger_object->warning(
+"assertion failure: '--assert-tidy' is set but output differs from input\n"
+                    );
+                }
+            }
+            if ( $rOpts->{'assert-untidy'} ) {
+                my $digest_output = $md5_hex->($buf);
+                if ( $digest_output eq $digest_input ) {
+                    $logger_object->warning(
+"assertion failure: '--assert-untidy' is set but output equals input\n"
+                    );
+                }
+            }
+
             $source_object =
               Perl::Tidy::LineSource->new( \$buf, $rOpts,
                 $rpending_logfile_message );
@@ -1430,8 +1471,24 @@ EOM
           if $logger_object;
     }    # end of main loop to process all files
 
+    # Fix for RT #130297: return a true value if anything was written to the
+    # standard error output, even non-fatal warning messages, otherwise return
+    # false.
+
+    # These exit codes are returned:
+    #  0 = perltidy ran to completion with no errors
+    #  1 = perltidy could not run to completion due to errors
+    #  2 = perltidy ran to completion with error messages
+
+    # Note that if perltidy is run with multiple files, any single file with
+    # errors or warnings will write a line like
+    #        '## Please see file testing.t.ERR'
+    # to standard output for each file with errors, so the flag will be true,
+    # even only some of the multiple files may have had errors.
+
   NORMAL_EXIT:
-    return 0;
+    my $ret = $Warn_count ? 2 : 0;
+    return $ret;
 
   ERROR_EXIT:
     return 1;
@@ -1707,6 +1764,8 @@ sub generate_options {
     $add_option->( 'tabs',                         't',    '!' );
     $add_option->( 'default-tabsize',              'dt',   '=i' );
     $add_option->( 'extended-syntax',              'xs',   '!' );
+    $add_option->( 'assert-tidy',                  'ast',  '!' );
+    $add_option->( 'assert-untidy',                'asu',  '!' );
 
     ########################################
     $category = 2;    # Code indentation control
@@ -3625,7 +3684,7 @@ I/O control
 
 Basic Options:
  -i=n    use n columns per indentation level (default n=4)
- -t      tabs: use one tab character per indentation level, not recommeded
+ -t      tabs: use one tab character per indentation level, not recommended
  -nt     no tabs: use n spaces per indentation level (default)
  -et=n   entab leading whitespace n spaces per tab; not recommended
  -io     "indent only": just do indentation, no other formatting.

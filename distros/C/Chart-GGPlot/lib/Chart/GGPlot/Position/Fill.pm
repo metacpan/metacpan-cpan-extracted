@@ -5,7 +5,7 @@ package Chart::GGPlot::Position::Fill;
 use Chart::GGPlot::Class;
 use namespace::autoclean;
 
-our $VERSION = '0.0005'; # VERSION
+our $VERSION = '0.0007'; # VERSION
 
 extends qw(Chart::GGPlot::Position::Stack);
 
@@ -27,7 +27,7 @@ Chart::GGPlot::Position::Fill - Position for "fill"
 
 =head1 VERSION
 
-version 0.0005
+version 0.0007
 
 =head1 DESCRIPTION
 

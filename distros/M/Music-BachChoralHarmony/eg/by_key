@@ -18,7 +18,7 @@ for my $song ( keys %$progression ) {
     next unless $progression->{$song}{key} && $progression->{$song}{key} eq $key;
     push @events, $progression->{$song}{events};
 }
-#warn(__PACKAGE__,' ',__LINE__," MARK: ",scalar(@events),"\n");
+#warn scalar(@events),"\n";
 
 # Get a hash of all bigrams and their scores
 my %score;

@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.850';
+our $VERSION = '1.860';
 
 use MCE::Shared::Base ();
 use base 'MCE::Shared::Base::Common';
@@ -1115,7 +1115,7 @@ MCE::Shared::Minidb - A pure-Perl in-memory data store
 
 =head1 VERSION
 
-This document describes MCE::Shared::Minidb version 1.850
+This document describes MCE::Shared::Minidb version 1.860
 
 =head1 DESCRIPTION
 

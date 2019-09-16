@@ -2,6 +2,8 @@ use strict;
 use warnings;
 use Test::More;
 
+plan skip_all => 'Deprecated';
+
 use_ok 'Data::Object::Array';
 can_ok 'Data::Object::Array', 'data';
 

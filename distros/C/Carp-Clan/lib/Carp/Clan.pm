@@ -12,7 +12,7 @@
 
 @DB::args = ();    # Avoid warning "used only once" in Perl 5.003
 
-package Carp::Clan; # git description: v6.06-8-g0cfdd10
+package Carp::Clan; # git description: v6.07-8-g8b5dba6
 
 use strict;
 use overload ();
@@ -28,7 +28,7 @@ our $MaxArgNums = 8;     # How many arguments to print.        0 = all.
 
 our $Verbose = 0;        # If true then make _shortmsg call _longmsg instead.
 
-our $VERSION = '6.07';
+our $VERSION = '6.08';
 
 # _longmsg() crawls all the way up the stack reporting on all the function
 # calls made. The error string, $error, is originally constructed from the
@@ -207,19 +207,14 @@ sub import {
         else                            { $pattern = $item; }
     }
 
-   # Speed up pattern matching in Perl versions >= 5.005:
-   # (Uses "eval ''" because qr// is a syntax error in previous Perl versions)
-    if ( $] >= 5.005 ) {
-        eval '$pattern = qr/$pattern/;';
-    }
-    else {
-        eval { $pkg =~ /$pattern/; };
-    }
+    eval { $pattern = qr/$pattern/ };
+
     if ($@) {
         $@ =~ s/\s+$//;
         $@ =~ s/\s+at\s.+$//;
         die _shortmsg( '^:::', 0, $@ );
     }
+
     {
         local ($^W) = 0;
         no strict "refs";
@@ -244,7 +239,7 @@ Carp::Clan - Report errors from perspective of caller of a "clan" of modules
 
 =head1 VERSION
 
-version 6.07
+version 6.08
 
 =head1 SYNOPSIS
 
@@ -345,17 +340,17 @@ Steffen Beyer <STBEY@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Joshua ben Jore Karen Etheridge Kent Fredric
+=for stopwords Karen Etheridge Joshua ben Jore Kent Fredric
 
 =over 4
 
 =item *
 
-Joshua ben Jore <jjore@cpan.org>
+Karen Etheridge <ether@cpan.org>
 
 =item *
 
-Karen Etheridge <ether@cpan.org>
+Joshua ben Jore <jjore@cpan.org>
 
 =item *
 

@@ -15,10 +15,16 @@ sub element_stringify {
 sub string {
 	# TODO
 	my ($self) = @_;
-	if( $self->ndims == 0 ) {
+
+    if ($self->nelem > $PDL::toolongtoprint) {
+        return "TOO LONG TO PRINT";
+    }
+
+    my $ndims = $self->ndims;
+	if( $ndims == 0 ) {
 		return $self->element_stringify( $self->at() );
 	}
-	if( $self->ndims == 1 ) {
+	elsif( $ndims == 1 ) {
 		return $self->string1d;
 	}
 	# TODO string2d, stringNd
@@ -57,7 +63,7 @@ PDL::Role::Stringifiable
 
 =head1 VERSION
 
-version 0.0051
+version 0.0053
 
 =head1 AUTHORS
 

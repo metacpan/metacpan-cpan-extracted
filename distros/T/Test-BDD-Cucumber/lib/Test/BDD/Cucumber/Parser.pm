@@ -1,12 +1,12 @@
 package Test::BDD::Cucumber::Parser;
-$Test::BDD::Cucumber::Parser::VERSION = '0.62';
+$Test::BDD::Cucumber::Parser::VERSION = '0.64';
 =head1 NAME
 
 Test::BDD::Cucumber::Parser - Parse Feature files
 
 =head1 VERSION
 
-version 0.62
+version 0.64
 
 =head1 DESCRIPTION
 
@@ -81,8 +81,11 @@ sub _construct {
 
     $feature->language( $class->_extract_language( \@lines ) );
 
-    my $self = { langdef => langdef( $feature->language ) };
-    bless $self, $class;
+    my $langdef = langdef( $feature->language );
+    my $self = bless {
+        langdef => $langdef,
+        _construct_matchers( $langdef )
+    }, $class;
 
     $self->_extract_scenarios(
         $self->_extract_conditions_of_satisfaction(
@@ -91,6 +94,60 @@ sub _construct {
     );
 
     return $feature;
+}
+
+sub _construct_matchers {
+    my ($l) = @_;
+    my $step_line_kw_cont =
+        join('|', map { $l->{$_} } qw/given and when then but/);
+    my $step_line_kw_first =
+        join('|', map { $l->{$_} } qw/given when then/);
+    my $scenario_line_kw =
+        join('|', map { $l->{$_} } qw/background scenario scenarioOutline/);
+
+    return (
+        _step_line_first => qr/^($step_line_kw_first)(.+)/,
+        _step_line_cont  => qr/^($step_line_kw_cont)(.+)/,
+        _feature_line    => qr/^(?:$l->{feature}): (.+)/,
+        _scenario_line   => qr/^($scenario_line_kw): ?(.*)?/,
+        _examples_line   => qr/^($l->{examples}): ?(.+)?$/,
+        _tags_line       => qr/\@([^\s]+)/,
+        );
+}
+
+sub _is_step_line {
+    my ($self, $continuation, $line) = @_;
+
+    if ($continuation) {
+        return $line =~ $self->{_step_line_cont};
+    }
+    else {
+        return $line =~ $self->{_step_line_first};
+    }
+}
+
+sub _is_feature_line {
+    my ($self, $line) = @_;
+
+    return $line =~ $self->{_feature_line};
+}
+
+sub _is_scenario_line {
+    my ($self, $line) = @_;
+
+    return $line =~ $self->{_scenario_line};
+}
+
+sub _is_tags_line {
+    my ($self, $line) = @_;
+
+    return $line =~ $self->{_tags_line};
+}
+
+sub _is_examples_line {
+    my ($self, $line) = @_;
+
+    return $line =~ $self->{_examples_line};
 }
 
 sub _extract_language {
@@ -153,10 +210,8 @@ sub _extract_conditions_of_satisfaction {
     while ( my $line = shift(@lines) ) {
         next if $line->is_comment || $line->is_blank;
 
-        my $langdef = $self->{langdef};
-        if ( $line->content =~
-            m/^((?:$langdef->{background}):|(?:$langdef->{scenario}):|@)/ )
-        {
+        if ( $self->_is_scenario_line( $line->content )
+             or $self->_is_tags_line( $line->content ) ) {
             unshift( @lines, $line );
             last;
         } else {
@@ -176,12 +231,8 @@ sub _extract_scenarios {
         next if $line->is_comment || $line->is_blank;
 
         my $langdef = $self->{langdef};
-        if ( $line->content =~
-m/^((?:$langdef->{background})|(?:$langdef->{scenario})|(?:$langdef->{scenarioOutline})): ?(.+)?/
-          )
-        {
-            my ( $type, $name ) = ( $1, $2 );
-
+        if ( my ( $type, $name ) =
+             $self->_is_scenario_line( $line->content ) ) {
             # Only one background section, and it must be the first
             if ( $scenarios++ && $type =~ m/^($langdef->{background})/ ) {
                 die parse_error_from_line(
@@ -200,7 +251,14 @@ m/^((?:$langdef->{background})|(?:$langdef->{scenario})|(?:$langdef->{scenarioOu
             @scenario_tags = ();
 
             # Attempt to populate it
+            @lines = $self->_extract_scenario_description($scenario, @lines);
             @lines = $self->_extract_steps( $feature, $scenario, @lines );
+            if (@lines && $lines[0]->content =~ m/^($langdef->{examples}):$/ ) {
+                # Outline data block...
+                shift @lines;
+                @lines = $self->_extract_table( 6, $scenario,
+                                                $self->_remove_next_blanks(@lines) );
+            }
 
             # Catch Scenario outlines without examples
             if ( $type =~ m/^($langdef->{scenarioOutline})/
@@ -229,64 +287,79 @@ m/^((?:$langdef->{background})|(?:$langdef->{scenario})|(?:$langdef->{scenarioOu
     return $feature, $self->_remove_next_blanks(@lines);
 }
 
+my $warned_mixed_comments = 0;
+
 sub _extract_steps {
     my ( $self, $feature, $scenario, @lines ) = @_;
 
     my $langdef   = $self->{langdef};
     my @givens    = split( /\|/, $langdef->{given} );
     my $last_verb = $givens[-1];
+    my $last_line_was_comment = 0;
 
-    while ( my $line = shift(@lines) ) {
-        next if $line->is_comment;
-        last if $line->is_blank;
 
-        # Conventional step?
-        if ( $line->content =~
-m/^((?:$langdef->{given})|(?:$langdef->{and})|(?:$langdef->{when})|(?:$langdef->{then})|(?:$langdef->{but}))(.+)/
-          )
-        {
-            my ( $verb, $text ) = ( $1, $2 );
-            my $original_verb = $verb;
-            $verb = 'Given' if $verb =~ m/^($langdef->{given})$/;
-            $verb = 'When'  if $verb =~ m/^($langdef->{when})$/;
-            $verb = 'Then'  if $verb =~ m/^($langdef->{then})$/;
-            $verb = $last_verb
-              if $verb =~ m/^($langdef->{and})$/
-              or $verb =~ m/^($langdef->{but}$)/;
-            $last_verb = $verb;
+    my ( $verb, $text );
+    while ( @lines and
+            ($lines[0]->is_comment
+             or ($verb, $text) = $self->_is_step_line( 1, $lines[0]->content ) ) ) {
+        my $line = shift @lines;
+        if ($line->is_comment) {
+            $last_line_was_comment = 1;
+            next;
+        }
 
-            # Remove the ending space for languages that
-            # have it, for backward compatibility
-            $original_verb =~ s/ $//;
-            my $step = Test::BDD::Cucumber::Model::Step->new(
-                {
-                    text          => $text,
-                    verb          => $verb,
-                    line          => $line,
-                    verb_original => $original_verb,
-                }
+        if ($last_line_was_comment) {
+            # don't issue this warning if the comment is after
+            warn 'Mixing comments and steps is deprecated: not allowed in Gherkin'
+                unless $warned_mixed_comments;
+            $warned_mixed_comments = 1;
+        }
+
+        my $original_verb = $verb;
+        $verb = 'Given' if $verb =~ m/^($langdef->{given})$/;
+        $verb = 'When'  if $verb =~ m/^($langdef->{when})$/;
+        $verb = 'Then'  if $verb =~ m/^($langdef->{then})$/;
+        $verb = $last_verb
+            if $verb =~ m/^($langdef->{and})$/
+            or $verb =~ m/^($langdef->{but}$)/;
+        $last_verb = $verb;
+
+        # Remove the ending space for languages that
+        # have it, for backward compatibility
+        $original_verb =~ s/ $//;
+        my $step = Test::BDD::Cucumber::Model::Step->new(
+            {
+                text          => $text,
+                verb          => $verb,
+                line          => $line,
+                verb_original => $original_verb,
+            }
             );
 
-            @lines =
-              $self->_extract_step_data( $feature, $scenario, $step, @lines );
+        @lines =
+            $self->_extract_step_data( $feature, $scenario, $step, @lines );
 
-            push( @{ $scenario->steps }, $step );
-
-            # Outline data block...
-        } elsif ( $line->content =~ m/^($langdef->{examples}):$/ ) {
-            return $self->_extract_table( 6, $scenario,
-                $self->_remove_next_blanks(@lines) );
-        } elsif ( $line->content =~
-            m/^(?:(?:$langdef->{scenario})|(?:$langdef->{scenarioOutline})):/ )
-        {
-            # next scenario begins here
-            return ($line, @lines);
-        } else {
-            die parse_error_from_line( "Malformed step line", $line );
-        }
+        push( @{ $scenario->steps }, $step );
     }
 
     return $self->_remove_next_blanks(@lines);
+}
+
+
+sub _extract_scenario_description {
+    my ( $self, $scenario, @lines ) = @_;
+
+    while ( @lines
+            and ($lines[0]->is_comment
+                 or (not $self->_is_step_line(0, $lines[0]->content)
+                     and not $self->_is_examples_line($lines[0]->content)
+                     and not $self->_is_tags_line($lines[0]->content)
+                     and not $self->_is_scenario_line($lines[0]->content) ) )
+        ) {
+        push @{$scenario->description}, shift(@lines);
+    }
+
+    return @lines;
 }
 
 sub _extract_step_data {

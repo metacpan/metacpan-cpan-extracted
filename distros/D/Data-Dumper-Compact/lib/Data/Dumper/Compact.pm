@@ -7,7 +7,7 @@ use Mu;
 use strictures 2;
 use namespace::clean;
 
-our $VERSION = '0.004000';
+our $VERSION = '0.004001';
 $VERSION =~ tr/_//d;
 
 sub import {
@@ -284,7 +284,7 @@ sub _format_arraylike {
 
     # if we can fit the first line in the available remaining space in the
     # current line, do that
-    if ($f =~ s/^(.{0,${spare}})\n//sm) {
+    if ($spare > 0 and $f =~ s/^(.{0,${spare}})\n//sm) {
       push @bits, $1;
     }
     push(@lines, join(' ', @bits)) if @bits;

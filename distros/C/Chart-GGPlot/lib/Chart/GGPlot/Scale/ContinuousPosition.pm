@@ -5,7 +5,7 @@ package Chart::GGPlot::Scale::ContinuousPosition;
 use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0005'; # VERSION
+our $VERSION = '0.0007'; # VERSION
 
 use Types::PDL qw(Piddle PiddleFromAny);
 use Types::Standard qw(InstanceOf Maybe);
@@ -62,7 +62,7 @@ Chart::GGPlot::Scale::ContinuousPosition - Continuous position scale
 
 =head1 VERSION
 
-version 0.0005
+version 0.0007
 
 =head1 AUTHOR
 

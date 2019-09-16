@@ -1,3 +1,39 @@
+1.157 2019-09-15
+================
+[Quiq::Database::Config]
+* Default-Konfigurationsdatei von ~/.database.conf in db.conf umbenannt
+* Option -sloppy zum Konstruktor hinzugefügt
+* Attribut configFile korrigiert und Exceptions angepasst
+
+[Quiq::Database::Connection]
+* Exceptions auf Englisch
+
+[Quiq::PostgreSql::CopyFormat]
+* Klasse hinzugefügt
+
+[Quiq::PostgreSql::Psql]
+* Klasse hinzugefügt
+
+[Quiq::Concat]
+* Doku bearbeitet
+
+[Quiq::Epoch]
+* Doku bearbeitet
+* Aussagekräftiger Exception-Text
+
+[Quiq::Perl]
+* perlDoFile() - Execptions auf Englisch
+
+[Quiq::Sql]
+* insertMulti() - Newline am Ende entfernt
+
+[Quiq::Stopwatch]
+* Mehrere Timer in einem Objekt eingeführt
+* Abschnittszeiten eingeführt
+
+[Quiq::Udl]
+* Erweiterung um UDL-Namen durch Konsultation von Konfigurationsdatei
+
 1.156 2019-09-05
 ================
 [Quiq::Database::Connection]

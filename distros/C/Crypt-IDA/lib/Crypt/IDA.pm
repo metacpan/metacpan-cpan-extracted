@@ -3,9 +3,11 @@ package Crypt::IDA;
 use 5.008008;
 use strict;
 use warnings;
+no warnings qw(redefine);
 
 use Carp;
 use Fcntl qw(:DEFAULT :seek);
+
 use Math::FastGF2 qw(:ops);
 use Math::FastGF2::Matrix;
 
@@ -29,7 +31,13 @@ our %EXPORT_TAGS = ( 'default' => [ @export_default ],
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw( );
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
+
+# not exported from Matrix class
+use constant {
+    ROWWISE => 1,
+    COLWISE => 2,
+};
 
 # hard-coding module names is supposedly not good style, but at least
 # I'm up-front about breaking that "rule":
@@ -208,6 +216,19 @@ sub empty_to_file {
 # own input/output matrices, there's so little error-checking of
 # parameters here that it's probably best not to mention its
 # existence/availability.
+
+# the routine uses various tracking variables for each filler/emptier
+# handle
+use constant {
+    CALLBACK => 0,
+    IW       => 1,
+    ENDING   => 2,
+    BF       => 3,
+    PART     => 4,
+    OR       => 6,
+    SKIP     => 7,
+};
+
 sub ida_process_streams {
   my ($self, $class);
   if ($_[0] eq $classname or ref($_[0]) eq $classname) {
@@ -225,6 +246,14 @@ sub ida_process_streams {
   $outorder=0        unless defined($outorder);
   $bytes_to_read = 0 unless defined($bytes_to_read);
 
+  # XS calls are expensive, so do them only once
+  my ($IWIDTH, $IROWS, $ICOLS, $IORGNUM) = 
+      map { $in->$_ } qw{WIDTH ROWS COLS ORGNUM};
+  my ($OWIDTH, $OROWS, $OCOLS, $OORGNUM) = 
+      map { $out->$_ } qw{WIDTH ROWS COLS ORGNUM};
+  my ($XWIDTH, $XROWS, $XCOLS, $XORGNUM) = 
+      map { $xform->$_ } qw{WIDTH ROWS COLS ORGNUM};
+  
   my $bytes_read=0;
   my ($IR, $OW);		# input read, output write pointers
   my ($ILEN, $OLEN);
@@ -232,9 +261,9 @@ sub ida_process_streams {
   my ($want_in_size, $want_out_size);
 
   my ($eof, $rc, $str, $max_fill, $max_empty);
-  my $width=$in->WIDTH;
+  my $width=$IWIDTH;
   my $bits=$width << 3;
-  my $rows=$in->ROWS;
+  my $rows=$IROWS;
 
   my $nfillers  = scalar(@$fillers);
   my $nemptiers = scalar(@$emptiers);
@@ -244,42 +273,56 @@ sub ida_process_streams {
   my ($i, $k);
   my ($start_in_col,$start_out_col);
 
+
+  
   #warn "-------------------------------------\n";
   #warn "Asked to process $bytes_to_read bytes\n";
   #warn "Input cols is " .$in->COLS. ", Output cols is " . $out->COLS . "\n";
   #warn "Inorder is $inorder, Outorder is $outorder\n";
   #warn "There are $nfillers fillers, $nemptiers emptiers\n";
 
-  if ($bytes_to_read % ($width * $xform->COLS)) {
+  if ($bytes_to_read % ($width * $XCOLS)) {
     carp "process_streams: bytes to read not a multiple of COLS * WIDTH";
     return undef;
   }
-  unless ($nfillers == 1 or $nfillers==$in->ROWS) {
+  unless ($nfillers == 1 or $nfillers==$IROWS) {
     carp "Fillers must be 1 or number of input rows";
     return undef;
   }
-  unless ($nemptiers == 1 or $nemptiers == $out->ROWS) {
+  unless ($nemptiers == 1 or $nemptiers == $OROWS) {
     carp "Emptiers must be 1 or number of output rows";
     return undef;
   }
 
-
+  # Previously, I stashed vars inside the supplied fill/empty
+  # callbacks, assuming that we might need them again if we were to be
+  # called a second time. However, since the only way that this
+  # routine can end is with an error or eof, neither is a condition
+  # that we can continue on from.
+  #
+  # As a result, I'm changing to:
+  # * only storing these vars locally
+  # * storing them in an list of lists (rather than list of hashes)
+  # (see constant definitions above)
+  #
+  my (@fillvars,@emptyvars);
+  
   ($IFmin, $OFmax, $IR, $OW) = (0,0,0,0);
   if ($nfillers == 1) {
-    if ($in->ORG ne "colwise" and $in->ROWS != 1) {
+    if ($IORGNUM != COLWISE and $IROWS != 1) {
       carp "Need a 'colwise' input matrix with a single filler";
       return undef;
     }
-    $ILEN=$rows * $in->COLS * $width;
+    $ILEN=$rows * $ICOLS * $width;
     $idown=$width;
-    $iright=$in->ROWS * $width;
+    $iright=$IROWS * $width;
     $want_in_size = $width * $rows;
   } else {
-    if ($in->ORG ne "rowwise" and $in->ROWS != 1) {
+    if ($IORGNUM != ROWWISE and $IROWS != 1) {
       carp "Need a 'rowwise' input matrix with multiple fillers";
       return undef;
     }
-    $ILEN=$in->COLS * $width;
+    $ILEN=$ICOLS * $width;
     $idown=$ILEN;
     $iright=$width;
     $want_in_size = $width;
@@ -289,31 +332,39 @@ sub ida_process_streams {
     $fillers->[$i]->{"END"}  = $i * $idown + $ILEN - 1;
     $fillers->[$i]->{"BF"}   = 0;
     $fillers->[$i]->{"PART"} = ""; # partial word
+    # Set up per-filler variables
+    my @varlist = ();
+    my $cb = $fillers->[$i]->{SUB};
+    @varlist[CALLBACK,IW,ENDING,BF,PART] = (
+	$cb, $i * $idown, $i * $idown + $ILEN - 1, 0, "" );
+    push @fillvars, \@varlist;
   }
   if ($nemptiers == 1) {
-    if ($out->ORG ne "colwise" and $out->ROWS != 1) {
+    if ($OORGNUM != COLWISE and $OROWS != 1) {
       carp "Need a 'colwise' output matrix with a single emptier";
       return undef;
     }
-    $OLEN=$out->ROWS * $out->COLS * $width;
+    $OLEN=$OROWS * $OCOLS * $width;
     $odown=$width;
-    $oright=$out->ROWS * $width;
-    $want_out_size = $width * $out->ROWS;
+    $oright=$OROWS * $width;
+    $want_out_size = $width * $OROWS;
   } else {
-    if ($out->ORG ne "rowwise" and $out->ROWS != 1) {
+    if ($OORGNUM != ROWWISE and $OROWS != 1) {
       carp "Need a 'rowwise' output matrix with multiple emptiers";
       return undef;
     }
-    $OLEN   = $out->COLS * $width;
+    $OLEN   = $OCOLS * $width;
     $odown  = $OLEN;
     $oright = $width;
     $want_out_size = $width;
   }
   for my $i (0 .. $nemptiers - 1) {
-    $emptiers->[$i]->{"OR"}   = $i * $odown;
-    $emptiers->[$i]->{"END"}  = $i * $odown + $OLEN - 1;
-    $emptiers->[$i]->{"BF"}   = 0;
-    $emptiers->[$i]->{"SKIP"} = 0;
+    # Set up per-emptier variables
+    my @varlist = ();
+    my $cb = $emptiers->[$i]->{SUB};
+    @varlist[CALLBACK,OR,ENDING,BF,SKIP] = (
+	$cb, $i * $odown, $i * $odown + $OLEN - 1, 0, 0);
+    push @emptyvars, \@varlist;
   }
 
   do {
@@ -322,23 +373,23 @@ sub ida_process_streams {
     while (!$eof and ($IFmin < $want_in_size)) {
       #warn "Seems like we need input\n";
       for ($i = 0, $IFmin=$ILEN; $i < $nfillers ; ++$i) {
-	#warn "IR is $IR, filler ${i}'s IW is " . $fillers->[$i]->{"IW"}. "\n";
-	$max_fill = $ILEN - $fillers->[$i]->{"BF"};
-	if ($fillers->[$i]->{"IW"} >= $IR + $i * $idown) {
-	  if ($fillers->[$i]->{"IW"} + $max_fill >
-	      $fillers->[$i]->{"END"}) {
-	    $max_fill = $fillers->[$i]->{"END"} -
-	      $fillers->[$i]->{"IW"} + 1;
+	#warn "IR is $IR, filler ${i}'s IW is " . $fillvars[$i]->[IW]. "\n";
+	$max_fill = $ILEN - $fillvars[$i]->[BF];
+	if ($fillvars[$i]->[IW] >= $IR + $i * $idown) {
+	  if ($fillvars[$i]->[IW] + $max_fill >
+	      $fillvars[$i]->[ENDING]) {
+	    $max_fill = $fillvars[$i]->[ENDING] -
+	      $fillvars[$i]->[IW] + 1;
 	  }
 	} else {
-	  if ($fillers->[$i]->{"IW"} + $max_fill >=
+	  if ($fillvars[$i]->[IW] + $max_fill >=
 	      $IR + $i * $idown) {
-	    $max_fill = $IR  + $i * $idown - $fillers->[$i]->{"IW"};
+	    $max_fill = $IR  + $i * $idown - $fillvars[$i]->[IW];
 	  }
 	}
 
 	#warn "Before adjusting maxfill: $max_fill (bytes read $bytes_read)\n";
-	#warn "BF on filler $i is ". $fillers->[$i]->{"BF"} . "\n";
+	#warn "BF on filler $i is ". $fillvars[$i]->[BF] . "\n";
 	if ($bytes_to_read and
 	    ($bytes_read  + $max_fill > $bytes_to_read)) {
 	  $max_fill = $bytes_to_read - $bytes_read;
@@ -350,10 +401,10 @@ sub ida_process_streams {
 
 	# Subtract the length of any bytes from partial word read in
 	# the last time around.
-	$max_fill-=length $fillers->[$i]->{"PART"};
+	$max_fill-=length $fillvars[$i]->[PART];
 	die "max fill: $max_fill < 0\n" unless $max_fill >= 0;
 
-	$str=$fillers->[$i]->{"SUB"}->($max_fill);
+	$str=$fillvars[$i]->[CALLBACK]->($max_fill);
 
 	#warn "Got input '$str' on row $i, length ". length($str). "\n";
 
@@ -374,8 +425,8 @@ sub ida_process_streams {
 	  #warn "Got string '$str' from filler $i\n";
 	  #warn "length of str is " . (length($str)) . "\n";
 
-	  my $aligned=$fillers->[$i]->{"PART"} . $str;
-	  $fillers->[$i]->{"PART"}=
+	  my $aligned=$fillvars[$i]->[PART] . $str;
+	  $fillvars[$i]->[PART]=
 	    substr $aligned,
 	      (length($aligned) - (length($aligned) % $width)),
 		(length($aligned) % $width),
@@ -383,15 +434,15 @@ sub ida_process_streams {
 	  die "Alignment problem with filler $i\n"
 	    if length($aligned) % $width;
 	  die "Alignment problem with fill pointer $i\n"
-	    if $fillers->[$i]->{"IW"} % $width;
+	    if $fillvars[$i]->[IW] % $width;
 
 	  #next unless length $aligned;
 
 	  #warn "Adding string '$aligned' to input buffer\n";
 
 	  $in->
-	    setvals($in->
-		    offset_to_rowcol($fillers->[$i]->{"IW"}),
+	    setvals_str($in->
+		    offset_to_rowcol($fillvars[$i]->[IW]),
 		    $aligned,
 		    $inorder);
 
@@ -399,18 +450,18 @@ sub ida_process_streams {
 	  # pretend we didn't see any bytes from partial words
 	  my $saw_bytes=(length $aligned) - (length($aligned) % $width) ;
 	  $bytes_read += $saw_bytes;
-	  $fillers->[$i]->{"BF"}  += $saw_bytes;
-	  $fillers->[$i]->{"IW"}  += $saw_bytes;
-	  if ($fillers->[$i]->{"IW"} > $fillers->[$i]->{"END"}) {
-	    $fillers->[$i]->{"IW"}  -= $ILEN;
+	  $fillvars[$i]->[BF]  += $saw_bytes;
+	  $fillvars[$i]->[IW]  += $saw_bytes;
+	  if ($fillvars[$i]->[IW] > $fillvars[$i]->[ENDING]) {
+	    $fillvars[$i]->[IW]  -= $ILEN;
 	  }
 	}
-	if ($fillers->[$i]->{"BF"} < $IFmin) {
-	  $IFmin = $fillers->[$i]->{"BF"};
+	if ($fillvars[$i]->[BF] < $IFmin) {
+	  $IFmin = $fillvars[$i]->[BF];
 	}
       }
       if ($eof) {
-	print "EOF detected in $eof stream(s)\n";
+	#print "EOF detected in $eof stream(s)\n";
 	if ($eof % $nfillers) {
 	  carp "Not all input streams of same length";
 	  return undef;
@@ -430,19 +481,19 @@ sub ida_process_streams {
 
 	for ($i=0, $OFmax=0; $i < $nemptiers; ++$i) {
 
-	  $max_empty = $emptiers->[$i]->{"BF"};
-	  if ($emptiers->[$i]->{"OR"} >= $OW + $i * $odown)  {
-	    if ($emptiers->[$i]->{"BF"} + $want_out_size > $OLEN) {
-	      $max_empty = $emptiers->[$i]->{"END"} -
-		$emptiers->[$i]->{"OR"} + 1;
+	  $max_empty = $emptyvars[$i]->[BF];
+	  if ($emptyvars[$i]->[OR] >= $OW + $i * $odown)  {
+	    if ($emptyvars[$i]->[BF] + $want_out_size > $OLEN) {
+	      $max_empty = $emptyvars[$i]->[ENDING] -
+		$emptyvars[$i]->[OR] + 1;
 	      #warn "Stopping overflow, max_empty is now $max_empty\n";
 	    }
 	  } else {
-	    if ($emptiers->[$i]->{"OR"} + $want_out_size >
+	    if ($emptyvars[$i]->[OR] + $want_out_size >
 		$OW + $i * $odown) {
 	      #warn "Stopping tail overwrite, max_empty is now $max_empty\n";
 	      $max_empty =
-		$OW + $i * $odown - $emptiers->[$i]->{"OR"};
+		$OW + $i * $odown - $emptyvars[$i]->[OR];
 		# printf ("Stopping tail overwrite, max_empty is now %Ld\n", 
 		#   (long long) max_fill_or_empty);  */
 	    }
@@ -454,16 +505,16 @@ sub ida_process_streams {
 
 	  # call handler to empty some data
 	  #warn "Emptying row $i, col ".
-	  #  ($emptiers->[$i]->{"OR"} % ( $out->COLS * $width)) .
+	  #  ($emptyvars[$i]->[OR] % ( $out->COLS * $width)) .
 	  #    " with $max_empty bytes\n";
 
 	  die "Alignment problem with OR emptier $i" if
-	    $emptiers->[$i]->{"OR"} % $width;
+	    $emptyvars[$i]->[OR] % $width;
 	  ($rr,$cc)=$out->
-	    offset_to_rowcol($emptiers->[$i]->{"OR"});
+	    offset_to_rowcol($emptyvars[$i]->[OR]);
 
 	  #warn "got (row,col) ($rr,$cc) from OR#$i offset ".
-	  #  $emptiers->[$i]->{"OR"}. "\n";
+	  #  $emptyvars[$i]->[OR]. "\n";
 
 	  # When emptying, we have to check whether the emptier
 	  # emptied full words. If it emptied part of a word, we have
@@ -473,25 +524,25 @@ sub ida_process_streams {
 	  # at the start of the output string.
 
 	  $str=$out->
-	    getvals($rr,$cc,
+	    getvals_str($rr,$cc,
 		    $max_empty / $width,
 		    $outorder);
-	  #substr $str, 0, $emptiers->[$i]->{"SKIP"}, "";
-	  $rc=$emptiers->[$i]->{"SUB"}->($str);
+	  #substr $str, 0, $emptyvars[$i]->[SKIP], "";
+	  $rc=$emptyvars[$i]->[CALLBACK]->($str);
 
 	  unless (defined($rc)) {
 	    carp "ERROR: write error $!\n";
 	    return undef;
 	  }
-	  #$emptiers->[$i]->{"SKIP"} = $rc % $width;
+	  #$emptyvars[$i]->[SKIP] = $rc % $width;
 	  #$rc -= $rc % $width;
-	  $emptiers->[$i]->{"BF"}   -= $rc;
-	  $emptiers->[$i]->{"OR"}   += $rc;
-	  if ($emptiers->[$i]->{"OR"} > $emptiers->[$i]->{"END"}) {
-	    $emptiers->[$i]->{"OR"} -= $OLEN;
+	  $emptyvars[$i]->[BF]   -= $rc;
+	  $emptyvars[$i]->[OR]   += $rc;
+	  if ($emptyvars[$i]->[OR] > $emptyvars[$i]->[ENDING]) {
+	    $emptyvars[$i]->[OR] -= $OLEN;
 	  }
-	  if ($emptiers->[$i]->{"BF"} > $OFmax) {
-	    $OFmax = $emptiers->[$i]->{"BF"};
+	  if ($emptyvars[$i]->[BF] > $OFmax) {
+	    $OFmax = $emptyvars[$i]->[BF];
 	  }
 	}
       }
@@ -504,25 +555,25 @@ sub ida_process_streams {
       $start_out_col = $cc;
       $k=int ($IFmin  / $want_in_size);
       #warn "k=$k, start_in_col=$start_in_col, start_out_col=$start_out_col\n";
-      if ($k + $start_in_col > $in->COLS) {
-	$k = $in->COLS - $start_in_col;
+      if ($k + $start_in_col > $ICOLS) {
+	$k = $ICOLS - $start_in_col;
       }
-      if ($k + $start_out_col > $out->COLS) {
-	$k = $out->COLS - $start_out_col;
+      if ($k + $start_out_col > $OCOLS) {
+	$k = $OCOLS - $start_out_col;
       }
       #warn "k is now $k\n";
       Math::FastGF2::Matrix::multiply_submatrix_c
 	  ($xform, $in, $out,
-	   0, 0, $xform->ROWS,
+	   0, 0, $XROWS,
 	   $start_in_col, $start_out_col, $k);
       $IFmin -= $want_in_size * $k;
       $OFmax += $want_out_size * $k;
       $IR+=$iright * $k;
-      if ($IR > $fillers->[0]->{"END"}) {
+      if ($IR > $fillvars[0]->[ENDING]) {
 	$IR=0;
       }
       $OW+=$oright * $k;
-      if ($OW > $emptiers->[0]->{"END"}) {
+      if ($OW > $emptyvars[0]->[ENDING]) {
 	$OW=0;
       }
       # printf ("Moving to next column: IFmin, OFmax are (%lld, %lld)\n",
@@ -536,10 +587,10 @@ sub ida_process_streams {
 
       if ($k) {
 	for ($i=0;  $i < $nfillers; ++$i) {
-	  $fillers->[$i]->{"BF"}  -= $k * $want_in_size;
+	  $fillvars[$i]->[BF]  -= $k * $want_in_size;
 	}
 	for ($i=0; $i < $nemptiers; ++$i) {
-	  $emptiers->[$i]->{"BF"} += $k * $want_out_size;
+	  $emptyvars[$i]->[BF] += $k * $want_out_size;
 	}
       }
 
@@ -624,7 +675,7 @@ sub ida_fisher_yates_shuffle {	# based on recipe 4.15 from the
     defined($picks) and $picks >=0 and $picks<scalar(@$array);
 
   my $i=scalar(@$array);
-  while (--$i > $picks - scalar(@$array)) {
+  while (--$i >= scalar(@$array) - $picks) {
     my $j=int rand ($i + 1);	# random int from [0,$i]
     next if $i==$j;		# don't swap element with itself
     @$array[$i,$j]=@$array[$j,$i]
@@ -683,7 +734,7 @@ sub ida_check_key {
   foreach my $v (@$key) {
     return 1 if $v >= 256 ** $w;
     return 1 if exists($values{$v}); # failure; duplicate value
-    $values{$v}=1;
+    $values{$v}=undef;
   }
   return 0;			# success; all values distinct
 };
@@ -1612,6 +1663,13 @@ reference to a list of $k + $n distinct elements.
 Takes a reference to a list of $k + $n elements and checks that the
 list is a valid key. Returns 0 to indicate that the key is valid.
 
+Note that version 0.05 of Math::FastGF2 added two new constructors,
+C<new_cauchy> and C<new_inverse_cauchy>, to create Cauchy form
+transform matrices and their inverse from a given "key". These
+routines can be used as an alternative to using C<ida_generate_key> to
+randomly generate a key as above, or in conjunction with it. More on
+keys follows in the next section.
+
 =head1 KEY MANAGEMENT
 
 The C<ida_split> routine takes a secret and creates several "shares"
@@ -1761,6 +1819,10 @@ Erasure Codes. As with Rabin's scheme, any k of the shares may be
 presented to C<ida_combine> (along with the appropriate inverse matrix
 calculated from k rows of the split transform matrix) to reconstruct
 the original file.
+
+Note that version 0.05 of Math::FastGF2 added a new C<new_vandermonde>
+constructor methods to help with performing Reed-Solomon encoding.
+
 
 =head2 Writing Custom Callbacks
 
@@ -1912,9 +1974,6 @@ future versions:
 
 =over
 
-=item * Add support for producing Reed-Solomon Erasure Codes using the
-method described earlier.
-
 =item * Update the matrix processing code so that it can detect when
 padding of input is required and handle it by itself. The changes
 required to implement this can be made in such a way as to preserve
@@ -1941,7 +2000,7 @@ Declan Malone, E<lt>idablack@sourceforge.netE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009 by Declan Malone
+Copyright (C) 2009-2019 by Declan Malone
 
 This package is free software; you can redistribute it and/or modify
 it under the terms of version 2 (or, at your discretion, any later

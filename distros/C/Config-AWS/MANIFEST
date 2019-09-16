@@ -6,6 +6,7 @@ META.json
 META.yml
 Makefile.PL
 README.md
+cpanfile
 dist.ini
 lib/Config/AWS.pm
 share/config/.aws/config

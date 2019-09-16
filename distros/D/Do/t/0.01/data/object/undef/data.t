@@ -2,6 +2,8 @@ use strict;
 use warnings;
 use Test::More;
 
+plan skip_all => 'Deprecated';
+
 use_ok 'Data::Object::Undef';
 can_ok 'Data::Object::Undef', 'data';
 

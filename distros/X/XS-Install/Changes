@@ -1,3 +1,5 @@
+1.2.11   13.09.2019
+           - use unique shared library names on windows
 1.2.10   14.08.2019
            - fix double CCFLAGS in Makefile.test (binary tests)
 1.2.9    30.07.2019

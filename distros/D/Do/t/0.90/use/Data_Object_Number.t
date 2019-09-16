@@ -25,10 +25,8 @@ Data::Object::Number::Base
 
 =integrates
 
-Data::Object::Role::Detract
-Data::Object::Role::Dumper
+Data::Object::Role::Dumpable
 Data::Object::Role::Functable
-Data::Object::Role::Output
 Data::Object::Role::Throwable
 
 =libraries

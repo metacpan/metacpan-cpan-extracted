@@ -1,4 +1,4 @@
-# Copyrights 2013-2018 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2013-2019 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package Net::OAuth2::Profile;
 use vars '$VERSION';
-$VERSION = '0.64';
+$VERSION = '0.65';
 
 
 use warnings;
@@ -203,9 +203,9 @@ sub build_request($$$)
     $request->protocol('HTTP/1.1');
 
     # 2016-01-15 Instagram does not like the portnumber to appear
-    # $head->header(Host => $uri->host_port);
-    my ($host, $port) = ($uri->host, $uri->port);
-    $host .= ':'.$port if $port != $uri->default_port;
+    # my ($host, $port) = ($uri->host, $uri->port);
+    # $host .= ':'.$port if $port != $uri->default_port;
+    $head->header(Host => $uri->host);
 
     $head->header(Connection => 'Keep-Alive');
     $request;

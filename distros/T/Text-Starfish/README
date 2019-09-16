@@ -1,6 +1,6 @@
 <? read_starfish_conf(); echo &readme_line(); !>
 #+
-Text::Starfish version 1.25
+Text::Starfish version 1.29
 ===========================
 #-
 

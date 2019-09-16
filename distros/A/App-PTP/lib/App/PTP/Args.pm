@@ -200,17 +200,20 @@ sub action_flags {(
   'custom-sort|cs=s' =>
       sub { my $opt = {%modes, comparator => $_[1] };
             push @pipeline, [ 'custom-sort', \&do_sort, $opt] },
-  'unique|u' =>
+  'unique|uniq|u' =>
       sub { push @pipeline, ['unique', \&do_list_op, {%modes},
-                             \&App::PTP::Util::uniqstr, 0] },
+                             \&App::PTP::Util::uniqstr, 'together'] },
+  'global-unique|guniq|gu' =>
+      sub { push @pipeline, ['global-unique', \&do_list_op, {%modes},
+                             \&App::PTP::Util::globaluniqstr, 'together'] },
   'head:i' => sub { push @pipeline, ['head', \&do_head, {%modes}, $_[1]] },
   'tail:i' => sub { push @pipeline, ['tail', \&do_tail, {%modes}, $_[1]] },
   'reverse|tac' =>
       sub { push @pipeline,
-                 ['reverse', \&do_list_op, {%modes}, sub {reverse @_ }, 1] },
+                 ['reverse', \&do_list_op, {%modes}, sub {reverse @_ }, 'same'] },
   'shuffle' =>
       sub { push @pipeline, ['shuffle', \&do_list_op, {%modes},
-                             \&List::Util::shuffle, 0] },
+                             \&List::Util::shuffle, 'none'] },
   'eat' => sub { push @pipeline, ['eat', \&do_eat, {%modes}] },
   'delete-marked' =>
       sub { push @pipeline, ['delete-marked', \&do_delete_marked, {%modes}, 

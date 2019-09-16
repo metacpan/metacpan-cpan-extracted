@@ -7,9 +7,12 @@ use_ok 'Data::Object::Scalar';
 # deprecated
 # ok Data::Object::Scalar->does('Data::Object::Rule::Comparison');
 # ok Data::Object::Scalar->does('Data::Object::Rule::Defined');
-ok Data::Object::Scalar->does('Data::Object::Role::Detract');
-ok Data::Object::Scalar->does('Data::Object::Role::Dumper');
-ok Data::Object::Scalar->does('Data::Object::Role::Output');
+# deprecated
+# ok Data::Object::Scalar->does('Data::Object::Role::Detract');
+# deprecated
+# ok Data::Object::Scalar->does('Data::Object::Role::Dumper');
+# deprecated
+# ok Data::Object::Scalar->does('Data::Object::Role::Output');
 ok Data::Object::Scalar->does('Data::Object::Role::Throwable');
 
 # no longer supported

@@ -1,0 +1,266 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/durseq/durseq
+# and generated automatically using Perinci::CmdLine::Gen version 0.491
+
+our $DATE = '2019-07-23'; # DATE
+our $DIST = 'App-durseq'; # DIST
+our $VERSION = '0.002'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/durseq/durseq",
+    program_name => "durseq",
+    read_config => 0,
+    read_env => 0,
+);
+
+$cmdline->run;
+
+# ABSTRACT: Generate a sequence of durations
+# PODNAME: durseq
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+durseq - Generate a sequence of durations
+
+=head1 VERSION
+
+This document describes version 0.002 of durseq (from Perl distribution App-durseq), released on 2019-07-23.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % durseq [options] [from] [to] [increment]
+
+Examples:
+
+Generate "infinite" durations from zero (then P1D, P2D, ...):
+
+ % durseq
+
+Generate durations from P0D to P10D:
+
+ % durseq P0D P10D
+ PT0H0M0S
+ P1D
+ ... 7 more lines ...
+ P9D
+ P10D
+
+Generate durations from P0D to P10D, with 12 hours increment:
+
+ % durseq P0D P10D -i PT12H
+ PT0H0M0S
+ PT12H
+ ... 17 more lines ...
+ PT228H
+ PT240H
+
+Generate durations from P10D to P0D (reverse):
+
+ % durseq P10D P0D -r
+ P10D
+ P9D
+ ... 7 more lines ...
+ P1D
+ PT0H0M0S
+
+Generate 10 durations from P1M (increment 1 week):
+
+ % durseq P1M -i P1W -n 10
+ P1M
+ P1M7D
+ ... 6 more lines ...
+ P1M56D
+ P1M63D
+
+=head1 DESCRIPTION
+
+This utility is similar to Unix L<seq> command or Perl script
+L<dateseq>, except that it generates a sequence of dates.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--from>=I<s>
+
+Starting duration.
+
+=item B<--increment>=I<s>, B<-i>
+
+Increment, default is one day (P1D).
+
+=item B<--limit>=I<s>, B<-n>
+
+Only generate a certain amount of items.
+
+=item B<--reverse>, B<-r>
+
+Decrement instead of increment.
+
+=item B<--to>=I<s>
+
+Ending duration, if not specified will generate an infinite* stream of durations.
+
+=back
+
+=head2 Formatting options
+
+=over
+
+=item B<--format-class-attrs-json>=I<s>
+
+Arguments to pass to constructor of DateTime::Format::* class (JSON-encoded).
+
+See C<--format-class-attrs>.
+
+=item B<--format-class-attrs>=I<s>
+
+Arguments to pass to constructor of DateTime::Format::* class.
+
+=item B<--format-class>=I<s>
+
+Use a DateTime::Format::Duration::* class for formatting.
+
+Default value:
+
+ "ISO8601"
+
+By default, "ISO8601" (<pm:DateTime::Format::Duration::ISO8601>) is used.
+
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C durseq durseq
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete durseq 'p/*/`durseq`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-durseq>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-durseq>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-durseq>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

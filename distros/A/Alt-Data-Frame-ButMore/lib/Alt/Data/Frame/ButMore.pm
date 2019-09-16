@@ -5,7 +5,7 @@ package Alt::Data::Frame::ButMore;
 use strict;
 use warnings;
 
-our $VERSION = '0.0051'; # VERSION
+our $VERSION = '0.0053'; # VERSION
 
 1;
 
@@ -21,7 +21,7 @@ Alt::Data::Frame::ButMore - Alternative implementation of Data::Frame with more 
 
 =head1 VERSION
 
-version 0.0051
+version 0.0053
 
 =head1 STATUS
 
@@ -577,6 +577,12 @@ This method is internally used by the C<.=> operation, below are same,
 =head2 is_numeric_column
 
     is_numeric_column($column_name_or_idx)
+
+=head2 drop_bad
+
+    drop_bad(:$how='any')
+
+Returns a new data frame with rows with BAD values dropped.
 
 =head1 MISCELLANEOUS FEATURES
 

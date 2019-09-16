@@ -4,7 +4,7 @@ package Chart::GGPlot::Util::Pod;
 
 use Chart::GGPlot::Setup;
 
-our $VERSION = '0.0005'; # VERSION
+our $VERSION = '0.0007'; # VERSION
 
 use List::AllUtils qw(min);
 
@@ -113,7 +113,7 @@ Chart::GGPlot::Util::Pod - Dev utilities for pod-related tasks of Chart::GGPlot
 
 =head1 VERSION
 
-version 0.0005
+version 0.0007
 
 =head1 DESCRIPTION
 

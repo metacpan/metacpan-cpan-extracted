@@ -25,7 +25,7 @@ WriteMakefile(
         'MooX::Options'              => '4.023',
         'Moo'                        => '2.000000',
         'namespace::autoclean'       => '0.28',
-        'BankAccount::Validator::UK' => '0.48',
+        'BankAccount::Validator::UK' => '0.50',
         'Encode::Locale'             => '1.05',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
@@ -33,8 +33,8 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'App::ValidateBankAccount'         => { file => 'lib/App/ValidateBankAccount.pm'       , version => '0.08' },
-            'App::ValidateBankAccount::Option' => { file => 'lib/App/ValidateBankAccount/Option.pm', version => '0.08' },
+            'App::ValidateBankAccount'         => { file => 'lib/App/ValidateBankAccount.pm'       , version => '0.09' },
+            'App::ValidateBankAccount::Option' => { file => 'lib/App/ValidateBankAccount/Option.pm', version => '0.09' },
         },
         resources => {
             repository => {

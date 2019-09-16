@@ -220,7 +220,7 @@ Data::Frame::IO::CSV - Partial class for data frame's conversion from/to CSV
 
 =head1 VERSION
 
-version 0.0051
+version 0.0053
 
 =head1 METHODS
 

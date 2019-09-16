@@ -24,11 +24,7 @@ use Moo::Role ();
 
 use List::AllUtils qw(uniq);
 
-use Moose::Autobox 0.16;
-for my $type (qw(Hash Array)) {
-    Moose::Autobox->mixin_additional_role(
-        uc($type) => "Data::Frame::Autobox::$type" );
-}
+use Data::Frame::Autobox ();
 
 use Role::Tiny ();
 Role::Tiny->apply_roles_to_package( 'PDL', 'Data::Frame::PDL' );
@@ -67,7 +63,7 @@ sub _import_tag {
         Syntax::Keyword::Try->import::into($target);
         boolean->import::into($target);
 
-        Moose::Autobox->import::into($target);
+        Data::Frame::Autobox->import::into($target);
     }
     elsif ( $tag eq ':class' ) {
         $class->_import_tag( $target, ':base' );
@@ -104,7 +100,7 @@ Data::Frame::Setup - Import stuffs into Data::Frame classes
 
 =head1 VERSION
 
-version 0.0051
+version 0.0053
 
 =head1 SYNOPSIS
 

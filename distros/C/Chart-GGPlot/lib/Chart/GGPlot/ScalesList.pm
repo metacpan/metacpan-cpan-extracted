@@ -5,7 +5,7 @@ package Chart::GGPlot::ScalesList;
 use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0005'; # VERSION
+our $VERSION = '0.0007'; # VERSION
 
 use List::AllUtils qw(pairmap pairkeys);
 use Types::Standard qw(Any ArrayRef Object);
@@ -55,7 +55,8 @@ method add ($scale) {
         # Remove old scale for this aesthetic (if it exists)
         $self->scales = $self->scales->slice( !$prev_aes );
     }
-    $self->scales->push($scale);
+    push @{$self->scales}, $scale;
+    return;
 }
 
 
@@ -191,7 +192,7 @@ Chart::GGPlot::ScalesList - Encapsulation multiple scale objects
 
 =head1 VERSION
 
-version 0.0005
+version 0.0007
 
 =head1 ATTRIBUTES
 

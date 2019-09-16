@@ -1,13 +1,13 @@
 package Map::Tube::Exception::MissingPluginFuzzyFind;
 $Map::Tube::Exception::MissingPluginFuzzyFind::AUTHORITY = 'cpan:MANWAR';
-$Map::Tube::Exception::MissingPluginFuzzyFind::VERSION = '3.19';
+$Map::Tube::Exception::MissingPluginFuzzyFind::VERSION = '3.20';
 =head1 NAME
 
 Map::Tube::Exception::MissingPluginFuzzyFind - Represent 'missing plugin fuzzy find' exception.
 
 =head1 VERSION
 
-version 3.19
+version 3.20
 
 =cut
 

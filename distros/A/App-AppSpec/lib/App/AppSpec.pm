@@ -8,7 +8,7 @@ use Term::ANSIColor;
 use YAML::PP;
 use File::Basename qw/ dirname /;
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use base 'App::Spec::Run::Cmd';
 

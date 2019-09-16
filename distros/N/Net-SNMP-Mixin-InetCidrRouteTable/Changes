@@ -1,0 +1,8 @@
+Revision history for Net-SNMP-Mixin-InetCidrRouteTable
+
+0.03	Fri, 13 Sep 2019 09:35:29 +0200
+	* some bugs fixed
+	* added routing zone as hash key
+
+0.02	Thu, 12 Sep 2019 16:09:13 +0200
+	* first CPAN version -- don't use it!

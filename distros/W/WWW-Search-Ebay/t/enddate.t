@@ -1,8 +1,8 @@
 
+my $VERSION = 1.15;
+
 use strict;
 use warnings;
-
-my $VERSION = 1.16;
 
 use blib;
 use Data::Dumper;
@@ -10,7 +10,7 @@ use Date::Manip;
 $ENV{TZ} = 'EST5EDT';
 # Date_Init('TZ=EST5EDT');
 use ExtUtils::testlib;
-use Test::More 'no_plan';
+use Test::More;
 use WWW::Search;
 use WWW::Search::Test;
 
@@ -25,16 +25,16 @@ tm_new_engine('Ebay::ByEndDate');
 pass('no-op');
 TEST_NOW:
 pass('no-op');
+diag("Sending end-date query...");
 $iDebug = 0;
 $iDump = 0;
+$WWW::Search::Test::sSaveOnError = q{enddate-failed.html};
 # We need a query that returns "Featured Items" _and_ items that end
 # in a few minutes.  This one attracts Rock'n'Roll fans and
 # philatelists:
 TODO:
   {
   $TODO = 'We only need one page of results in order to test the end-date sort';
-  diag("Sending end-date query...");
-  $WWW::Search::Test::sSaveOnError = q{byenddate-failed.html};
   tm_run_test('normal', 'zeppelin', 45, 49, $iDebug, $iDump);
   }
 $TODO = '';
@@ -48,25 +48,26 @@ foreach my $oResult (@ao)
   {
   like($oResult->url, qr{\Ahttps?://(cgi|www)\d*\.ebay\.com},
        'result URL really is from ebay.com');
-  cmp_ok($oResult->title, 'ne', '',
-         'result Title is not empty');
+  my $sTitle = $oResult->title;
+  cmp_ok($sTitle, 'ne', '',
+         qq'result Title ($sTitle) is not empty');
   like($oResult->description, qr{([0-9]+|no)\s+bids?},
        'result bidcount is ok');
   my $sDate = $oResult->change_date || '';
   DEBUG_DATE && diag(qq{raw result date is '$sDate'});
-  if ($sDate eq q//)
-    {
-    diag(Dumper($oResult));
-    diag " ^^^ result has no end date";
-    } # if
+  diag(Dumper($oResult)) unless isnt($sDate, '', "change_date ($sDate) is not empty");
+  # It is not possible to test the order of results in this way,
+  # because eBay sometimes sticks paid (advertised) auctions at the
+  # top of the page (and those are not in order).
   my $iCmp = Date_Cmp($sDatePrev, $sDate);
-  cmp_ok($iCmp, '<=', 0, 'result is in order by end date');
+  # cmp_ok($iCmp, '<=', 0, 'result is in order by end date');
   $sDatePrev = $sDate;
   } # foreach
 pass('no-op');
 ALL_DONE:
 pass('no-op');
-exit 0;
+
+done_testing();
 
 __END__
 

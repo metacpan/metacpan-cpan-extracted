@@ -2,27 +2,39 @@ package AnyEvent::Fork::RPC::Async;
 
 use common::sense; # actually required to avoid spurious warnings...
 
+our $VERSION = 2; # protocol version
+
 use Errno ();
 
 use AnyEvent;
 
 # declare only
 sub AnyEvent::Fork::RPC::event;
+sub AnyEvent::Fork::RPC::flush;
 
 sub do_exit { exit } # workaround for perl 5.14 and below
 
 sub run {
-   my ($function, $init, $serialiser, $done) = splice @_, -4, 4;
+   my %kv = splice @_, pop;
+
    my $rfh = shift;
    my $wfh = fileno $rfh ? $rfh : *STDOUT;
+
+   my $function   = delete $kv{function};
+   my $serialiser = delete $kv{serialiser};
+   my $rlen       = delete $kv{rlen};
+   my $done       = delete $kv{done};
 
    $0 =~ s/^(\d+).*$/$1 $function/s;
 
    {
       package main;
+      my $init = delete $kv{init};
       &$init if length $init;
       $function = \&$function; # resolve function early for extra speed
    }
+
+   %kv = (); # save some very small amount of memory
 
    my $busy = 1; # exit when == 0
 
@@ -55,11 +67,30 @@ sub run {
       $ww ||= AE::io $wfh, 1, $wcb;
    };
 
+   *AnyEvent::Fork::RPC::flush = sub {
+      while (length $wbuf) {
+         my $len = syswrite $wfh, $wbuf;
+
+         if (defined $len) {
+            substr $wbuf, 0, $len, "";
+         } elsif ($! == Errno::EAGAIN || $! == Errno::EWOULDBLOCK) {
+            my $fdset;
+            (vec $fdset, fileno $wfh, 1) = 1;
+            # buggy windows often sets exceptfds instead of wfds
+            select undef, my $wset = $fdset, my $eset = $fdset, undef;
+         } else {
+            return 0;
+         }
+      }
+
+      1
+   };
+
    *AnyEvent::Fork::RPC::event = sub {
       $write->(pack "NN/a*", 0, &$f);
    };
 
-   my ($rlen, $rbuf, $rw) = 512 - 16;
+   my ($rbuf, $rw);
 
    my $len;
 

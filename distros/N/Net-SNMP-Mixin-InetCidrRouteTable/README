@@ -1,0 +1,107 @@
+NAME
+    Net::SNMP::Mixin::InetCidrRouteTable - mixin class for the
+    inetCidrRouteTable
+
+VERSION
+    Version 0.03
+
+SYNOPSIS
+      use Net::SNMP;
+      use Net::SNMP::Mixin;
+
+      #...
+
+      my $session = Net::SNMP->session( -hostname => 'foo.bar.com' );
+
+      $session->mixer('Net::SNMP::Mixin::InetCidrRouteTable');
+      $session->init_mixins;
+      snmp_dispatcher();
+      $session->init_ok();
+      die $session->errors if $session->errors;
+
+      my @routes = $session->get_inet_cidr_route_table();
+
+      foreach my $route (@routes) {
+        my $prefix   = $route->{inetCidrRoutePrefix};
+        my $next_hop = $route->{inetCidrRouteNextHop};
+        my $if_index = $route->{inetCidrRouteIfIndex};
+        # ...
+
+        print "$prefix => $if_index/$next_hop\n";
+      }
+
+DESCRIPTION
+    A Net::SNMP mixin class for inetCidrRouteTable.
+
+    The inetCidrRouteTable provides the ability to display IP
+    version-independent multipath CIDR routes.
+
+MIXIN METHODS
+  OBJ->get_inet_cidr_route_table()
+    Returns a sorted list of inetCidrRouteTable and cooked entries. Every
+    list element (route entry) is a hashref with the following fields and
+    values:
+
+        {
+            inetCidrRoutePrefix       => CIDR String,
+            inetCidrRouteZone         => InetAddress,
+            inetCidrRouteNextHop      => InetAddress,
+            inetCidrRoutePolicy       => OBJECT IDENTIFIER,
+            inetCidrRouteIfIndex      => InterfaceIndexOrZero,
+            inetCidrRouteType         => INTEGER,
+            inetCidrRouteTypeString   => String,                    # resolved enum
+            inetCidrRouteProto        => IANAipRouteProtocol,
+            inetCidrRouteProtoString  => String,                    # resolved enum
+            inetCidrRouteAge          => Gauge32,
+            inetCidrRouteNextHopAS    => InetAutonomousSystemNumber,
+            inetCidrRouteMetric1      => Integer32,
+            inetCidrRouteMetric2      => Integer32,
+            inetCidrRouteMetric3      => Integer32,
+            inetCidrRouteMetric4      => Integer32,
+            inetCidrRouteMetric5      => Integer32,
+            inetCidrRouteStatus       => RowStatus
+            inetCidrRouteStatusString => String,                    # resolved enum
+        }
+
+INITIALIZATION
+  OBJ->_init($reload)
+    Fetch the inetCidrRouteTable from the host. Don't call this method
+    direct!
+
+PRIVATE METHODS
+    Only for developers or maintainers.
+
+  _fetch_inet_cidr_route_tbl($session)
+    Fetch the inetCidrRouteTable once during object initialization.
+
+  _inet_cidr_route_tbl_cb($session)
+    The callback for _fetch_inet_cidr_route_tbl().
+
+SEE ALSO
+    Net::SNMP::Mixin
+
+REQUIREMENTS
+    Net::SNMP, Net::SNMP::Mixin
+
+BUGS, PATCHES & FIXES
+    There are no known bugs at the time of this release. However, if you
+    spot a bug or are experiencing difficulties that are not explained
+    within the POD documentation, please submit a bug to the RT system (see
+    link below). However, it would help greatly if you are able to pinpoint
+    problems or even supply a patch.
+
+    Fixes are dependant upon their severity and my availablity. Should a fix
+    not be forthcoming, please feel free to (politely) remind me by sending
+    an email to gaissmai@cpan.org .
+
+      RT: http://rt.cpan.org/Public/Dist/Display.html?Name=Net-SNMP-Mixin-InetCidrRouteTable
+
+AUTHOR
+    Karl Gaissmaier <karl.gaissmaier at uni-ulm.de>
+
+COPYRIGHT & LICENSE
+    Copyright 2019 Karl Gaissmaier, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

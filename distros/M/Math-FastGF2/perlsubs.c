@@ -106,12 +106,12 @@ gf2_u32 mat_setval(SV *Self, int row, int col, gf2_u32 val) {
 
   if ((row < 0) || (row >= m->rows)) {
     fprintf (stderr, "Math::FastGF2::Matrix - row out of range in setval\n");
-    return;
+    return 0;
   }
 
   if ((col < 0) || (col >= m->cols)) {
     fprintf (stderr, "Math::FastGF2::Matrix - col out of range in setval\n");
-    return;
+    return 0;
   }
 
   switch (m->width) {
@@ -138,6 +138,10 @@ static int mat_local_byte_order (void) {
   return (int) *first;
 }
 
+/* log and exponent tables for fast 8-bit multiplies */
+/* extern const gf2_s16 *fast_gf2_log; */
+/* extern const gf2_u8  *fast_gf2_exp; */
+
 /*
   This should only be called from the Perl module code, so no checking
   on args is done. Self, Transform and Result are expected to have
@@ -145,12 +149,12 @@ static int mat_local_byte_order (void) {
 */
 void
 mat_multiply_submatrix_c (SV *Self, SV *Transform, SV *Result,
-			  int self_row,  int result_row, int nrows,
-			  int xform_col, int result_col, int ncols) {
+			    int self_row,  int result_row, int nrows,
+			    int xform_col, int result_col, int ncols) {
   gf2_matrix_t *self   = (gf2_matrix_t*) SvIV(SvRV(Self));
   gf2_matrix_t *xform  = (gf2_matrix_t*) SvIV(SvRV(Transform));
   gf2_matrix_t *result = (gf2_matrix_t*) SvIV(SvRV(Result));
-  
+
   /* i == input == self, t == transform, o == output == result; r <- i * t */
   /* all offsets are measured in bytes */
   int idown  = gf2_matrix_offset_down(self);
@@ -160,6 +164,73 @@ mat_multiply_submatrix_c (SV *Self, SV *Transform, SV *Result,
   int odown  = gf2_matrix_offset_down(result); 
   int oright = gf2_matrix_offset_right(result); 
 
+  /* 
+     Treat the most common case of width = 1 and ROWWISE/COLWISE pair
+     of matrices separately to avoid pointer arithmetic overheads
+  */
+  if ((self->width == 1) && (iright == 1) &&
+      (
+           ((tright == 1) && (odown == 1))  /* combine */
+	|| ((tdown == 1) && (oright == 1))  /* split   */
+       )) {
+    int r,c,v;
+    gf2_u8  u8, *u8_irp, *u8_orp, *u8_tcp, *u8_ocp, *u8_vip, *u8_vtp;
+      
+    
+    if ((tright == 1) && (odown == 1)) {
+      // fprintf(stderr, "FAST: combine\n");
+      /* (iright == tright == odown == 1) */
+      gf2_u8 *u8_tcp_start = xform->values  + xform_col;
+      gf2_u8 *u8_ocp_start = result->values + oright * result_col;
+      for (r=0,
+	     u8_irp=self->values   + idown * self_row,
+	     u8_orp=result->values + result_row;
+	   r < nrows;
+	   ++r,  u8_irp += idown) {
+	for (c=0,
+	       u8_tcp=u8_tcp_start,
+	       u8_ocp=u8_ocp_start;
+	     c < ncols;
+	     ++c, u8_tcp ++, u8_ocp += oright) {
+	  for (v=0,
+		 u8_vip=u8_irp, u8_vtp=u8_tcp,
+		 u8=gf2_mul8(*u8_vip,*u8_vtp);
+	       u8_vip ++, u8_vtp += tdown,
+		 ++v < self->cols; ) {
+	      u8^=gf2_mul8(*u8_vip,*u8_vtp);
+	  }
+	  *(u8_ocp + r) = u8;
+	}
+      }
+    } else {
+      //fprintf(stderr, "FAST: split\n");
+      /* (iright == tdown == oright == 1) */
+      gf2_u8 *u8_tcp_start = xform->values  + tright * xform_col;
+      gf2_u8 *u8_ocp_start = result->values + result_col;
+      for (r=0,
+	     u8_irp=self->values   + idown * self_row,
+	     u8_orp=result->values + odown * result_row;
+	   r < nrows;
+	   ++r,  u8_irp += idown) {
+	for (c=0,
+	       u8_tcp=u8_tcp_start,
+	       u8_ocp=u8_ocp_start;
+	     c < ncols;
+	     ++c, u8_tcp += tright, u8_ocp++) {
+	  for (v=0,
+		 u8_vip=u8_irp, u8_vtp=u8_tcp,
+		 u8=gf2_mul8(*u8_vip,*u8_vtp);
+	       u8_vip ++, u8_vtp++,
+		 ++v < self->cols; ) {
+	    u8^=gf2_mul8(*u8_vip,*u8_vtp);
+	  }
+	  *(u8_ocp + r * odown) = u8;
+	}
+      }
+    }
+    return;
+  }
+
   gf2_u8   u8,  *u8_irp,  *u8_orp,  *u8_tcp,  *u8_ocp,  *u8_vip,  *u8_vtp;
   gf2_u16 u16, *u16_irp, *u16_orp, *u16_tcp, *u16_ocp, *u16_vip, *u16_vtp;
   gf2_u32 u32, *u32_irp, *u32_orp, *u32_tcp, *u32_ocp, *u32_vip, *u32_vtp;
@@ -168,17 +239,17 @@ mat_multiply_submatrix_c (SV *Self, SV *Transform, SV *Result,
 
   switch (self->width) {
   case 1:
-    for (r=0, 
-	   u8_irp=self->values   + idown * self_row, 
+    for (r=0,
+	   u8_irp=self->values   + idown * self_row,
 	   u8_orp=result->values + odown * result_row;
 	 r < nrows;
-	 ++r,  u8_irp += idown, u8_orp + odown) {
+	 ++r,  u8_irp += idown) {
       for (c=0,
 	     u8_tcp=xform->values  + tright * xform_col,
 	     u8_ocp=result->values + oright * result_col;
 	   c < ncols;
 	   ++c, u8_tcp += tright, u8_ocp += oright) {
-	for (v=0, 
+	for (v=0,
 	       u8_vip=u8_irp, u8_vtp=u8_tcp,
 	       u8=gf2_mul8(*u8_vip,*u8_vtp);
 	     u8_vip += iright, u8_vtp += tdown,
@@ -332,6 +403,47 @@ SV* mat_get_raw_values_c (SV *Self, int row, int col,
   return Str;
 }
 
+// Profiling showed that getvals had a fairly high overhead for
+// calling ROWS, COLS and WIDTH, so I'm moving some of the code into
+// an XS routine here. This only returns a string, but unlike
+// get_raw_values_c, it does bounds checking.
+SV* mat_getvals_str (SV *Self, int row, int col, 
+		       int words, int byteorder) {
+  gf2_matrix_t *self  = (gf2_matrix_t*) SvIV(SvRV(Self));
+
+  int errors = 0;
+  if ((byteorder < 0) || (byteorder > 2)) ++errors;
+  if ((row < 0) || (row >= self->rows)) ++errors;
+  if ((col < 0) || (col >= self->cols)) ++errors;
+  if (errors) return &PL_sv_undef;
+  
+  char *from_start = self->values + 
+    gf2_matrix_offset_down(self) * row +
+    gf2_matrix_offset_right(self) * col;
+  char *to_start;
+  int len=self->width * words;
+  SV *Str=newSVpv(from_start, len);
+  int native_byteorder=mat_local_byte_order();
+  char *from, *to;
+  int i,j;
+  int width=self->width;
+
+  if ( (width > 1) && byteorder && 
+       (native_byteorder != byteorder) ) {
+
+    to_start=SvPV(Str,len) + width - 1;
+    for (i=width ; i-- ; --to_start, ++from_start) {
+      from=from_start; to=to_start;
+      for (j=words; j--;  to += width, from += width) {
+	*to=*from;
+      }
+;
+    }
+  }
+  /*  sv_2mortal(Str); */ /* apparently newSVpv takes care of this */
+  return Str;
+}
+
 void mat_set_raw_values_c (SV *Self, int row, int col, 
 			   int words, int byteorder,
 			   SV *Str) {
@@ -363,4 +475,68 @@ void mat_set_raw_values_c (SV *Self, int row, int col,
   return;
 }
 
+void mat_setvals_str (SV *Self, int row, int col, 
+		      SV *Str, int byteorder ) {
+
+  gf2_matrix_t *self  = (gf2_matrix_t*) SvIV(SvRV(Self));
+
+  int errors = 0;
+  if ((byteorder < 0) || (byteorder > 2)) ++errors;
+  if ((row < 0) || (row >= self->rows)) ++errors;
+  if ((col < 0) || (col >= self->cols)) ++errors;
+  if (errors) return;
+
+  int width=self->width;
+  int len;
+  char *from_start;
+  char *to_start= self->values + 
+    gf2_matrix_offset_down(self) * row +
+    gf2_matrix_offset_right(self) * col;
+  int native_byteorder=mat_local_byte_order();
+  char *from, *to;
+  int i,j;
+
+  if ( (width > 1) && byteorder &&
+       (native_byteorder != byteorder) ) {
+    int words;
+    from_start=SvPV(Str,len) + width - 1;
+    words = len / self->width;
+    for (i=width ; i-- ; --from_start, ++to_start) {
+      from=from_start; to=to_start;
+      for (j=words; j--; to += width, from += width) {
+	*to=*from;
+      }
+    }
+  } else {
+    from_start=SvPV(Str,len);
+    memcpy(to_start, from_start, len);
+  } 
+  return;
+}
+
+
 /* new code to implement previous offset_to_rowcol */
+void mat_offset_to_rowcol (SV *Self, int offset, int *row, int *col) {
+
+  gf2_matrix_t *self  = (gf2_matrix_t*) SvIV(SvRV(Self));
+  int width = self->width;
+  int cols  = self->cols;
+  int rows  = self->rows;
+
+  int errors = 0;
+  if (offset % width) errors++; else offset /= width;;
+  if ((offset < 0) || (offset >= rows * cols)) errors++;
+  if (errors) {
+    *row = *col = &PL_sv_undef;
+    return;
+  }
+
+  if (self->organisation == 1) { // ROWWISE
+    *row = offset / cols;
+    *col = offset - *row * cols;
+  } else {
+    *row = offset % rows;
+    *col = offset / rows;
+  }
+  return;
+}

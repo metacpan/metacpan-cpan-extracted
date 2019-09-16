@@ -4,7 +4,7 @@ package Chart::GGPlot::Trans::Functions;
 
 use Chart::GGPlot::Setup qw(:base :pdl);
 
-our $VERSION = '0.0005'; # VERSION
+our $VERSION = '0.0007'; # VERSION
 
 use PDL::Math;
 use PDL::Primitive qw(which);
@@ -215,7 +215,7 @@ Chart::GGPlot::Trans::Functions - Function interface for Chart::GGPlot::Trans
 
 =head1 VERSION
 
-version 0.0005
+version 0.0007
 
 =head1 FUNCTIONS
 

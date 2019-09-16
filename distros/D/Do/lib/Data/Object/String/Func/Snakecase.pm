@@ -9,13 +9,13 @@ use Data::Object 'Class';
 
 extends 'Data::Object::String::Func';
 
-our $VERSION = '1.70'; # VERSION
+our $VERSION = '1.76'; # VERSION
 
 # BUILD
 
 has arg1 => (
   is => 'ro',
-  isa => 'Object',
+  isa => 'StringLike',
   req => 1
 );
 
@@ -26,10 +26,11 @@ sub execute {
 
   my ($data) = $self->unpack;
 
-  my $result = lc("$data");
+  my $result = "$data";
 
-  $result =~ s/[^a-zA-Z0-9]+([a-z])/\U$1/g;
-  $result =~ s/[^a-zA-Z0-9]+//g;
+  my $re = qr/[\W_]+/;
+  $result =~ s/$re/_/g;
+  $result =~ s/^$re|$re$//g;
 
   return $result;
 }
@@ -95,9 +96,9 @@ This package has the following attributes.
 
 =head2 arg1
 
-  arg1(Object)
+  arg1(StringLike)
 
-The attribute is read-only, accepts C<(Object)> values, and is optional.
+The attribute is read-only, accepts C<(StringLike)> values, and is optional.
 
 =cut
 
@@ -147,9 +148,11 @@ Returns the ordered list of named function object arguments.
 
 =head1 CREDITS
 
-Al Newkirk, C<+287>
+Al Newkirk, C<+296>
 
 Anthony Brummett, C<+10>
+
+José Joaquín Atria, C<+1>
 
 =cut
 

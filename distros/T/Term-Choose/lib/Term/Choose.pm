@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.701';
+our $VERSION = '1.702';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -1164,7 +1164,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.701
+Version 1.702
 
 =cut
 
@@ -1539,18 +1539,16 @@ From broad to narrow: 0 > 1 > 2 > 3
 
 =head3 lf
 
-If I<prompt> lines are folded the option I<lf> allows one to insert spaces at beginning of the folded lines.
+If I<prompt> and I<info> lines are folded, the option I<lf> allows one to insert spaces at beginning of the folded lines.
 
 The option I<lf> expects a reference to an array with one or two elements:
 
-- the first element (C<INITIAL_TAB>) sets the number of spaces inserted at beginning of paragraphs
+- the first element (initial tab) sets the number of spaces inserted at beginning of paragraphs
 
-- a second element (C<SUBSEQUENT_TAB>) sets the number of spaces inserted at the beginning of all broken lines apart
+- a second element (subsequent tab) sets the number of spaces inserted at the beginning of all broken lines apart
 from the beginning of paragraphs
 
 Allowed values for the two elements are: 0 or greater.
-
-See C<INITIAL_TAB> and C<SUBSEQUENT_TAB> in L<Text::LineFold>.
 
 (default: undefined)
 

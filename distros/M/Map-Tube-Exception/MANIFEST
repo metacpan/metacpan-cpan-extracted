@@ -42,6 +42,6 @@ lib/Map/Tube/Exception/MissingSupportedMap.pm
 lib/Map/Tube/Exception/MissingSupportedObject.pm
 t/00-load.t
 t/01-map-tube-exception.t
-t/manifest.t
-t/pod.t
 xt/author/pod-syntax.t
+xt/manifest.t
+xt/pod.t

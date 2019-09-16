@@ -10,5 +10,12 @@ bin/rabin-combine.pl
 bin/rabin-split.pl
 bin/SplitCombine.pl
 bin/SplitCombine.xml
-
-META.yml                                 Module meta-data (added by MakeMaker)
+GNU_GPL.txt
+lib/Crypt/IDA/Algorithm.pm
+lib/Crypt/IDA/SlidingWindow.pm
+t/algorithm.t
+t/party.t
+t/slide.t
+MANIFEST.SKIP
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

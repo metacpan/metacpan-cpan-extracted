@@ -14,16 +14,14 @@ use overload (
 );
 
 with qw(
-  Data::Object::Role::Detract
-  Data::Object::Role::Dumper
+  Data::Object::Role::Dumpable
   Data::Object::Role::Functable
-  Data::Object::Role::Output
   Data::Object::Role::Throwable
 );
 
 use parent 'Data::Object::String::Base';
 
-our $VERSION = '1.70'; # VERSION
+our $VERSION = '1.76'; # VERSION
 
 1;
 
@@ -67,13 +65,9 @@ L<Data::Object::String::Base>
 
 This package integrates behaviors from:
 
-L<Data::Object::Role::Detract>
-
-L<Data::Object::Role::Dumper>
+L<Data::Object::Role::Dumpable>
 
 L<Data::Object::Role::Functable>
-
-L<Data::Object::Role::Output>
 
 L<Data::Object::Role::Throwable>
 
@@ -503,6 +497,25 @@ represented by the object. This method returns a number value.
 
 =cut
 
+=head2 render
+
+  render(HashRef $arg1) : StrObject
+
+The render method treats the string as a template and performs a simple token
+replacement using the argument provided.
+
+=over 4
+
+=item render example
+
+  # given "Hi, {name}!"
+
+  $string->render({name => 'Friend'}); # Hi, Friend!
+
+=back
+
+=cut
+
 =head2 replace
 
   replace(Str $arg1, Str $arg2) : StrObject
@@ -584,11 +597,10 @@ be determined after execution.
   snakecase() : StrObject
 
 The snakecase method modifies the string such that it will no longer have any
-non-alphanumeric characters and each word (group of alphanumeric characters
-separated by 1 or more non-alphanumeric characters) is capitalized. The only
-difference between this method and the camelcase method is that this method
-ensures that the first character will always be lowercased. Note, this method
-modifies the string. This method returns a string value.
+non-alphanumeric characters and all words (groups of alphanumeric characters
+separated by 1 or more non-alphanumeric characters) are joined by a single
+underscore. This method returns a string value. Any leading or trailing
+underscores are removed.
 
 =over 4
 
@@ -596,7 +608,7 @@ modifies the string. This method returns a string value.
 
   # given 'hello world'
 
-  $string->snakecase; # helloWorld
+  $string->snakecase; # hello_world
 
 =back
 
@@ -767,9 +779,11 @@ array reference. This method returns an array value.
 
 =head1 CREDITS
 
-Al Newkirk, C<+287>
+Al Newkirk, C<+296>
 
 Anthony Brummett, C<+10>
+
+José Joaquín Atria, C<+1>
 
 =cut
 

@@ -1,5 +1,8 @@
 Revision history for Map::Tube::Plugin::Graph
 
+0.42  2019-09-13T17:25:00+00:00
+      - Moved author test scripts to xt/ subfolder.
+
 0.41  2019-07-17T18:05:00+00:00
       - Upgraded dependency on Map::Tube v3.64.
 

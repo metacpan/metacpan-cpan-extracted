@@ -29,8 +29,8 @@ Data::Object::Array::Func
 
 =attributes
 
-arg1(Object, req, ro)
-arg2(Str, req, ro)
+arg1(ArrayLike, req, ro)
+arg2(StringLike, req, ro)
 arg3(Any, req, ro)
 
 =libraries

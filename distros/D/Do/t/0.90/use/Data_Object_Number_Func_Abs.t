@@ -29,7 +29,7 @@ Data::Object::Number::Func
 
 =attributes
 
-arg1(Object, req, ro)
+arg1(NumberLike, req, ro)
 
 =libraries
 

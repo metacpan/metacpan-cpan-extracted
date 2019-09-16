@@ -2,8 +2,8 @@ NAME
     Data::Clean - Clean data structure
 
 VERSION
-    This document describes version 0.502 of Data::Clean (from Perl
-    distribution Data-Clean), released on 2018-10-14.
+    This document describes version 0.504 of Data::Clean (from Perl
+    distribution Data-Clean), released on 2019-09-01.
 
 SYNOPSIS
      use Data::Clean;
@@ -34,7 +34,7 @@ DESCRIPTION
     This class can be used to process a data structure by replacing some
     forms of data items with other forms. One of the main uses is to clean
     "unsafe" data, e.g. clean a data structure so it can be encoded to JSON
-    (see Data::Clean::JSON, which is a thin wrapper over this class).
+    (see Data::Clean::ForJSON, which is a thin wrapper over this class).
 
     As can be seen from the example, you specify a list of transformations
     to be done, and then this class will generate an appropriate Perl code
@@ -107,6 +107,10 @@ METHODS
     *   ['one_or_zero']
 
         This will perform "$val ? 1:0".
+
+    *   ['deref_scalar_one_or_zero']
+
+        This will perform "${$val} ? 1:0".
 
     *   ['deref_scalar']
 
@@ -197,7 +201,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
+    This software is copyright (c) 2019, 2017, 2016 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

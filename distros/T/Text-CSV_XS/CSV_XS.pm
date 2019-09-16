@@ -26,7 +26,7 @@ use XSLoader;
 use Carp;
 
 use vars   qw( $VERSION @ISA @EXPORT_OK );
-$VERSION   = "1.39";
+$VERSION   = "1.40";
 @ISA       = qw( Exporter );
 @EXPORT_OK = qw( csv );
 XSLoader::load "Text::CSV_XS", $VERSION;
@@ -92,6 +92,7 @@ my %def_attr = (
     _COLUMN_NAMES		=> undef,
     _BOUND_COLUMNS		=> undef,
     _AHEAD			=> undef,
+    _FORMULA_CB			=> undef,
 
     ENCODING			=> undef,
     );
@@ -183,8 +184,8 @@ sub new {
 	}
     exists $attr{formula_handling} and
 	$attr{formula} = delete $attr{formula_handling};
-    exists $attr{formula} and
-	$attr{formula} = _supported_formula (undef, $attr{formula});
+    my $attr_formula = delete $attr{formula};
+
     for (keys %attr) {
 	if (m/^[a-z]/ && exists $def_attr{$_}) {
 	    # uncoverable condition false
@@ -232,6 +233,7 @@ sub new {
     defined $\ && !exists $attr{eol} and $self->{eol} = $\;
     bless $self, $class;
     defined $self->{types} and $self->types ($self->{types});
+    defined $attr_formula  and $self->{formula} = _supported_formula ($self, $attr_formula);
     $self;
     } # new
 
@@ -442,12 +444,17 @@ sub _SetDiagInfo {
 sub _supported_formula {
     my ($self, $f) = @_;
     defined $f or return 5;
+    if ($self && $f && ref $f && ref $f eq "CODE") {
+	$self->{_FORMULA_CB} = $f;
+	return 6;
+	}
     $f =~ m/^(?: 0 | none    )$/xi ? 0 :
     $f =~ m/^(?: 1 | die     )$/xi ? 1 :
     $f =~ m/^(?: 2 | croak   )$/xi ? 2 :
     $f =~ m/^(?: 3 | diag    )$/xi ? 3 :
     $f =~ m/^(?: 4 | empty | )$/xi ? 4 :
-    $f =~ m/^(?: 5 | undef   )$/xi ? 5 : do {
+    $f =~ m/^(?: 5 | undef   )$/xi ? 5 :
+    $f =~ m/^(?: 6 | cb      )$/xi ? 6 : do {
 	$self ||= "Text::CSV_XS";
 	croak ($self->_SetDiagInfo (1500, "formula-handling '$f' is not supported"));
 	};
@@ -456,7 +463,8 @@ sub _supported_formula {
 sub formula {
     my $self = shift;
     @_ and $self->_set_attr_N ("formula", _supported_formula ($self, shift));
-    [qw( none die croak diag empty undef )]->[_supported_formula ($self, $self->{formula})];
+    $self->{formula} == 6 or $self->{_FORMULA_CB} = undef;
+    [qw( none die croak diag empty undef cb )]->[_supported_formula ($self, $self->{formula})];
     } # always_quote
 sub formula_handling {
     my $self = shift;
@@ -894,7 +902,7 @@ sub header {
 		$hdr .= "\0" x $l;
 		read $fh, $x, $l;
 		}
-	    if ($enc ne "utf-8") {
+	    if ($enc && $enc ne "utf-8") {
 		require Encode;
 		$hdr = Encode::decode ($enc, $hdr);
 		}
@@ -916,6 +924,14 @@ sub header {
 
     my $row = $self->getline ($h) or croak;
     close $h;
+
+    if ($args{munge_column_names} eq "db") {
+	for (@$row) {
+	    s/\W+/_/g;
+	    s/^_+//;
+	    $_ = lc;
+	    }
+	}
 
     if ($ahead) { # Must be after getline, which creates the cache
 	$self->_cache_set ($_cache_id{_has_ahead}, 1);
@@ -1107,7 +1123,9 @@ sub _csv_attr {
 
     my $enc = delete $attr{enc} || delete $attr{encoding} || "";
     $enc eq "auto" and ($attr{detect_bom}, $enc) = (1, "");
+    my $stack = $enc =~ s/(:\w.*)// ? $1 : "";
     $enc =~ m/^[-\w.]+$/ and $enc = ":encoding($enc)";
+    $enc .= $stack;
 
     my $fh;
     my $sink = 0;
@@ -1135,7 +1153,10 @@ sub _csv_attr {
 	    $cls = 1;
 	    }
 	if ($fh) {
-	    $enc and binmode $fh, $enc;
+	    if ($enc) {
+		binmode $fh, $enc;
+		my $fn = fileno $fh; # This is a workaround for a bug in PerlIO::via::gzip
+		}
 	    unless (defined $attr{eol}) {
 		my @layers = eval { PerlIO::get_layers ($fh) };
 		$attr{eol} = (grep m/crlf/ => @layers) ? "\n" : "\r\n";
@@ -1210,13 +1231,13 @@ sub _csv_attr {
     ref $fltr eq "CODE" and $fltr = { 0 => $fltr };
     ref $fltr eq "HASH" or  $fltr = undef;
 
-    exists $attr{formula} and
-	$attr{formula} = _supported_formula (undef, $attr{formula});
+    my $form = delete $attr{formula};
 
     defined $attr{auto_diag}   or $attr{auto_diag}   = 1;
     defined $attr{escape_null} or $attr{escape_null} = 0;
     my $csv = delete $attr{csv} || Text::CSV_XS->new (\%attr)
 	or croak $last_new_err;
+    defined $form and $csv->formula ($form);
 
     return {
 	csv  => $csv,
@@ -1249,7 +1270,7 @@ sub csv {
 
     my $c = _csv_attr (@_);
 
-    my ($csv, $in, $fh, $hdrs) = @{$c}{"csv", "in", "fh", "hdrs"};
+    my ($csv, $in, $fh, $hdrs) = @{$c}{qw( csv in fh hdrs )};
     my %hdr;
     if (ref $hdrs eq "HASH") {
 	%hdr  = %$hdrs;
@@ -1898,6 +1919,24 @@ Replace the content of fields that start with a C<=> with C<undef>.
 
  $csv->formula ("undef");
  $csv->formula (undef);
+
+=item a callback
+
+Modify the content of fields that start with a  C<=>  with the return-value
+of the callback.  The original content of the field is available inside the
+callback as C<$_>;
+
+ # Replace all formula's with 42
+ $csv->formula (sub { 42; });
+
+ # same as $csv->formula ("empty") but slower
+ $csv->formula (sub { "" });
+
+ # Allow =4+12
+ $csv->formula (sub { s/^=(\d+\+\d+)$/$1/eer });
+
+ # Allow more complex calculations
+ $csv->formula (sub { eval { s{^=([-+*/0-9()]+)$}{$1}ee }; $_ });
 
 =back
 
@@ -2750,27 +2789,70 @@ The following values are available:
 
   lc     - lower case
   uc     - upper case
+  db     - valid DB field names
   none   - do not change
   \%hash - supply a mapping
   \&cb   - supply a callback
 
-Literal:
+=over 2
+
+=item Lower case
+
+ $csv->header ($fh, { munge_column_names => "lc" });
+
+The header is changed to all lower-case
+
+ $_ = lc;
+
+=item Upper case
+
+ $csv->header ($fh, { munge_column_names => "uc" });
+
+The header is changed to all upper-case
+
+ $_ = uc;
+
+=item Literal
 
  $csv->header ($fh, { munge_column_names => "none" });
 
-Hash:
+=item Hash
 
  $csv->header ($fh, { munge_column_names => { foo => "sombrero" });
 
 if a value does not exist, the original value is used unchanged
 
-Callback:
+=item Database
+
+ $csv->header ($fh, { munge_column_names => "db" });
+
+=over 2
+
+=item -
+
+lower-case
+
+=item -
+
+all sequences of non-word characters are replaced with an underscore
+
+=item -
+
+all leading underscores are removed
+
+=back
+
+ $_ = lc (s/\W+/_/gr =~ s/^_+//r);
+
+=item Callback
 
  $csv->header ($fh, { munge_column_names => sub { fc } });
  $csv->header ($fh, { munge_column_names => sub { "column_".$col++ } });
  $csv->header ($fh, { munge_column_names => sub { lc (s/\W+/_/gr) } });
 
 As this callback is called in a C<map>, you can use C<$_> directly.
+
+=back
 
 =item set_column_names
 X<set_column_names>
@@ -3218,6 +3300,22 @@ If C<encoding> is set to the literal value C<"auto">, the method L</header>
 will be invoked on the opened stream to check if there is a BOM and set the
 encoding accordingly.   This is equal to passing a true value in the option
 L<C<detect_bom>|/detect_bom>.
+
+Encodings can be stacked, as supported by C<binmode>:
+
+ # Using PerlIO::via::gzip
+ csv (in       => \@csv,
+      out      => "test.csv:via.gz",
+      encoding => ":via(gzip):encoding(utf-8)",
+      );
+ $aoa = csv (in => "test.csv:via.gz",  encoding => ":via(gzip)");
+
+ # Using PerlIO::gzip
+ csv (in       => \@csv,
+      out      => "test.csv:via.gz",
+      encoding => ":gzip:encoding(utf-8)",
+      );
+ $aoa = csv (in => "test.csv:gzip.gz", encoding => ":gzip");
 
 =head3 detect_bom
 X<detect_bom>

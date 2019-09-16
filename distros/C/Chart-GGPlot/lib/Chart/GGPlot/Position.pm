@@ -5,7 +5,7 @@ package Chart::GGPlot::Position;
 use Chart::GGPlot::Role;
 use namespace::autoclean;
 
-our $VERSION = '0.0005'; # VERSION
+our $VERSION = '0.0007'; # VERSION
 
 use PDL::Primitive qw(which);
 use Types::Standard qw(CodeRef);
@@ -53,7 +53,7 @@ Chart::GGPlot::Position - The position role
 
 =head1 VERSION
 
-version 0.0005
+version 0.0007
 
 =head1 DESCRIPTION
 

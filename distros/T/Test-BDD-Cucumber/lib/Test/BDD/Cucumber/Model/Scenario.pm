@@ -1,5 +1,5 @@
 package Test::BDD::Cucumber::Model::Scenario;
-$Test::BDD::Cucumber::Model::Scenario::VERSION = '0.62';
+$Test::BDD::Cucumber::Model::Scenario::VERSION = '0.64';
 use Moo;
 use Types::Standard qw( Str ArrayRef HashRef Bool InstanceOf );
 
@@ -9,7 +9,7 @@ Test::BDD::Cucumber::Model::Scenario - Model to represent a scenario
 
 =head1 VERSION
 
-version 0.62
+version 0.64
 
 =head1 DESCRIPTION
 
@@ -24,6 +24,18 @@ The text after the C<Scenario:> keyword
 =cut
 
 has 'name' => ( is => 'rw', isa => Str );
+
+=head2 description
+
+The text between the Scenario line and the first step line
+
+=cut
+
+has 'description' => (
+    is      => 'rw',
+    isa     => ArrayRef[InstanceOf['Test::BDD::Cucumber::Model::Line']],
+    default => sub { [] },
+    );
 
 =head2 steps
 

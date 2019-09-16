@@ -1,13 +1,13 @@
 package Map::Tube::Exception::InvalidColorName;
 $Map::Tube::Exception::InvalidColorName::AUTHORITY = 'cpan:MANWAR';
-$Map::Tube::Exception::InvalidColorName::VERSION = '3.19';
+$Map::Tube::Exception::InvalidColorName::VERSION = '3.20';
 =head1 NAME
 
 Map::Tube::Exception::InvalidColorName - Represent 'invalid color name' exception.
 
 =head1 VERSION
 
-version 3.19
+version 3.20
 
 =cut
 

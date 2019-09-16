@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::metacpan_script;
 
-our $DATE = '2019-06-24'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2019-08-02'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -70,7 +70,7 @@ App::lcpan::Cmd::metacpan_script - Open script POD on MetaCPAN
 
 =head1 VERSION
 
-This document describes version 0.006 of App::lcpan::Cmd::metacpan_script (from Perl distribution App-lcpan-CmdBundle-metacpan), released on 2019-06-24.
+This document describes version 0.007 of App::lcpan::Cmd::metacpan_script (from Perl distribution App-lcpan-CmdBundle-metacpan), released on 2019-08-02.
 
 =head1 DESCRIPTION
 
@@ -111,7 +111,7 @@ be located in the top-level of C<cpan>. If C<index_name> contains a path, e.g.
 C<./index.db> or C</home/ujang/lcpan.db> then the index will be located solely
 using the C<index_name>.
 
-=item * B<scripts>* => I<array[str]>
+=item * B<scripts>* => I<array[filename::unix]>
 
 =item * B<use_bootstrap> => I<bool> (default: 1)
 
@@ -155,7 +155,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

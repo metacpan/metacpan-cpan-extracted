@@ -8,7 +8,7 @@ use MooseX::Singleton;
 
 extends qw(Chart::GGPlot::Geom::Rect);
 
-our $VERSION = '0.0005'; # VERSION
+our $VERSION = '0.0007'; # VERSION
 
 use Chart::GGPlot::Aes;
 use Chart::GGPlot::Layer;
@@ -133,6 +133,50 @@ my $geom_histogram_code = fun (
     );  
 };
 
+my $geom_col_pod = layer_func_pod(<<'EOT');
+
+        geom_col(:$mapping=undef, :$data=undef, :$position="stack",
+                 :$width=undef, :$na_rm=false, :$show_legend=undef,
+                 :$inherit_aes=true,
+                 %rest)
+
+    Bar plot. Different from geom_bar(), geom_col() uses stat_identity():
+    it leaves the data as is.
+
+    =over 4
+
+    %TMPL_COMMON_ARGS%
+
+    =item * $width
+
+    Bar width. By default, set to 90% of the resolution of the data.
+
+    =back
+
+EOT
+
+my $geom_col_code = fun (
+        :$data = undef, :$mapping = undef, :$position = "stack",
+        :$width = undef,
+        :$na_rm = false, :$show_legend = undef, :$inherit_aes = true,
+        %rest )
+{
+    return Chart::GGPlot::Layer->new(
+        data        => $data,
+        mapping     => $mapping,
+        stat        => 'identity',
+        geom        => 'bar',
+        position    => $position,
+        show_legend => $show_legend,
+        inherit_aes => $inherit_aes,
+        params      => {
+            width => $width,
+            na_rm => $na_rm,
+            %rest,
+        },
+    );  
+};
+
 classmethod ggplot_functions() {
     return [
         {
@@ -144,6 +188,11 @@ classmethod ggplot_functions() {
             name => 'geom_histogram',
             code => $geom_histogram_code,
             pod => $geom_histogram_pod,
+        },
+        {
+            name => 'geom_col',
+            code => $geom_col_code,
+            pod => $geom_col_pod,
         },
     ];  
 }
@@ -179,7 +228,7 @@ Chart::GGPlot::Geom::Bar - Class for bar geom
 
 =head1 VERSION
 
-version 0.0005
+version 0.0007
 
 =head1 SEE ALSO
 
