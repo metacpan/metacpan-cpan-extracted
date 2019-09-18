@@ -25,7 +25,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=DNS-Zone-Struct-Common
   homepage: https://metacpan.org/release/DNS-Zone-Struct-Common
   repository: git://github.com/perlancar/perl-DNS-Zone-Struct-Common.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.028002'

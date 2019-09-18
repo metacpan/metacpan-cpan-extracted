@@ -315,6 +315,11 @@ The number of drills to include in the workout.
 If Sweat runs through every available drill before meeting this number, then
 it will start a new set, continuing until it meets this count.
 
+B<Please consider not setting this above 12.> I don't advise you to run through
+lots of drills without any periods of longer resting. Consider, instead, just
+running Sweat multiple times, if you want an extra-long workout, and taking a
+breather that lasts a full minute or two in between runs. Drink some water.
+
 Default: 12
 
 B<Please note> that you should not work through a large number of drills without mixing
@@ -346,7 +351,9 @@ Default: 30
  # In config
  chair: 0
 
-B<Boolean.> Indicates the availability of a chair, for certain drills.
+B<Boolean.> Indicates the availability of a chair, for certain drills. You may
+wish to shut this off if you find yourself without a stable chair (or other weight-
+bearing chair-height surface) at hand.
 
 If false, then drills requiring a chair will
 replace themselves with a random drill of the same style. (For example, a chairsome
@@ -362,10 +369,15 @@ Default: 1
  # In config
  jumping: 0
 
-B<Boolean.> Indicates the tolerability of jumping, for certain drills.
+B<Boolean.> Indicates the tolerability of jumping, for certain drills. You may
+wish to shut this off when working out during a very late or very early
+hour, so as not to disturb your downstairs neighbors.
 
 If false, then drills involving jumping or stomping will replace
-themselves with a random drill of the same style.
+themselves with a random drill of the same style. (For example, a jumpy aerobic
+drill will get replaced with another, less stompy aerobic drill.)
+
+Default: 1
 
 =head3 rest-length
 
@@ -551,7 +563,12 @@ individual drill definitions.
         requires_side_switching: 1
 
 Please note that the C<groups> attribute is not additive; if you define it at all,
-then you must define I<all> the drills and drill-groups that Sweat will use.
+then you must define I<all> the drills and drill-groups that Sweat will use. If you
+do not define it, then Sweat will use the four groups and twelve drills listed above.
+
+Sweat will let you give groups uneven numbers of drills, if you want. If Sweat
+needs to run a drill from a group whose available drills have already all been
+run during the current workout, it will clear them all for running again.
 
 =head1 NOTES AND BUGS
 
@@ -569,7 +586,12 @@ eager to receive reports of how well it works on any system, and welcoming patch
 other suggestions for improving it anywhere.
 
 The default drills specify "knee lunges" and "abdominal crunches" because the words "lunges"
-and "crunches" sound too similar, without further context.
+and "crunches" otherwise sound too similar, when spoken by a speech synthesizer.
+
+If a news story claims a YouTube video as its URL, Sweat will instead create and open a temporary
+HTML file that embeds that video, thus preventing it from noisily auto-playing. (To
+the best of my knowledge, there exists no way to visit a video via youtube.com and
+not have it start playing at full volume.)
 
 =head1 AUTHOR
 

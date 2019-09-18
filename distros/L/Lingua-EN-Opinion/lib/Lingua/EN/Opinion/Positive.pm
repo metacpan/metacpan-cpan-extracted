@@ -1,5 +1,5 @@
 package Lingua::EN::Opinion::Positive;
-$Lingua::EN::Opinion::Positive::VERSION = '0.1301';
+$Lingua::EN::Opinion::Positive::VERSION = '0.1400';
 our $AUTHORITY = 'cpan:GENE';
 
 use Moo;
@@ -2041,7 +2041,7 @@ Lingua::EN::Opinion::Positive
 
 =head1 VERSION
 
-version 0.1301
+version 0.1400
 
 =head1 DESCRIPTION
 
@@ -2089,7 +2089,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Gene Boggs.
+This software is copyright (c) 2019 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

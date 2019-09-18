@@ -1,34 +1,59 @@
-Write your Authorization scripts/programs to any language you are familiar
-Forth, Erlang, Lisp, Fortran, Perl, C, etc
+Write your Authorization script/program to any language you prefer.
+It must accept two arguments, provided from the Dancer2::Plugin::WebService
 
-You must always pass the three arguments
+    username packed as hex string   (to avoid shell attacks)
+    password packed as hex string   (to avoid shell attacks)
 
-    1)  username    (packed as hex strings to avoid shell attacks)
-    2)  password    (packed as hex strings to avoid shell attacks)
-    3)  list of comma delimitted groups where user should be member at least to one of them
+	e.g.
 
-    e.g  foo  726f6f74 70617373776f7264 group1,group2,group3
+    SomeScript 6a6f65 536f6d6550617373776f7264
 
-As result script must print at standard output the three lines
+As a result, the script must print at the standard output the two lines
 
-    1 if the login is succesfull , or 0 if the login failed
-    a message, usually an excuse why the login failed
-    a comma delimitted list the groups user is member of the specified ones
-       
-To generate the hex packed string you could do
+    1st line : 0 if the login is succesfull or a message of the login failure description
+    2rd line : a comma delimitted list of the groups the user is member e.g.
 
-string to hex
+	for successful login
 
-  perl -e "print unpack('H*', \$ARGV[0]),\"\n\""  Joe
-  echo -n Joe | xxd -ps
-  echo -n Joe | od -A n -t x1 |sed 's/ //g'
+		0
+		admins,ftp,ldapadmin
 
-hex to string
+	for failed login
 
-  perl -e "print pack('H*', \$ARGV[0]),\"\n\""  4a6f65
-  echo -n 4a6f65 | xxd -r -ps
-  
-Can it be any simpler ? Wish you happy coding !
+		server is on maintenance
+		""
+
+If the user do not belong to any of the   config.yml  defined groups
+then the login will fail even if the user/pass are correct
+
+	Groups : [ group1 , group2 ... ]
+
+For your tests, you can use any of the commands to convert
+
+     text to hex
+
+		echo -n joe | xxd -ps
+		echo -n joe | od -A n -t x1 | sed 's/ //g'
+		perl -E 'say unpack "H*", shift' joe
+
+	hex to text
+
+		echo -n 6a6f65 | xxd -r -ps
+		perl -E 'say pack "H*", shift' 6a6f65
+
+If root privileges are needed, e.g. for the "native Linux" authentication Command,
+set at the config.yml
+
+	...
+	Use sudo : true
+
+and add the user running the WebService to sudoers e.g.
+
+  vi /etc/sudoers.d/WebService
+
+    dancer ALL=(ALL) NOPASSWD: /usr/local/share/perl5/Dancer2/Plugin/AuthScripts/LinuxNative.pl	
+
+
+Thats all; now you are ready to write some auth scripts.
 
 George Bouras
-george.mpouras@yandex.com

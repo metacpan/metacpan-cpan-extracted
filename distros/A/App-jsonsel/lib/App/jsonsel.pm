@@ -1,7 +1,7 @@
 package App::jsonsel;
 
-our $DATE = '2019-07-29'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-08-08'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -87,7 +87,7 @@ App::jsonsel - Select JSON elements using CSel (CSS-selector-like) syntax
 
 =head1 VERSION
 
-This document describes version 0.004 of App::jsonsel (from Perl distribution App-jsonsel), released on 2019-07-29.
+This document describes version 0.006 of App::jsonsel (from Perl distribution App-jsonsel), released on 2019-08-08.
 
 =head1 SYNOPSIS
 

@@ -11,7 +11,7 @@ use Mojo::Util qw(class_to_path monkey_patch);
 
 use constant DEBUG => $ENV{TOADFARM_DEBUG} ? 1 : 0;
 
-our $VERSION = '0.79';
+our $VERSION = '0.80';
 
 BEGIN {
   $ENV{TOADFARM_ACTION} //= (@ARGV and $ARGV[0] =~ /^(reload|start|stop)$/) ? $1 : 'load';
@@ -33,12 +33,12 @@ sub import {
   monkey_patch $caller, (
     app         => sub {$app},
     change_root => \&_change_root,
-    logging => sub { $tf->{logging}++; $app->_setup_log(@_) },
-    mount  => sub { push @{$app->config->{apps}},    @_ == 2 ? @_ : ($_[0], {}); $app },
-    plugin => sub { push @{$app->config->{plugins}}, @_ == 2 ? @_ : ($_[0], {}); $app },
-    run_as => \&_run_as,
-    secrets => sub { $tf->{secrets}++; $app->secrets([@_]) },
-    start => sub {
+    logging     => sub { $tf->{logging}++; $app->_setup_log(@_) },
+    mount       => sub { push @{$app->config->{apps}}, @_ == 2 ? @_ : ($_[0], {}); $app },
+    plugin      => sub { push @{$app->config->{plugins}}, @_ == 2 ? @_ : ($_[0], {}); $app },
+    run_as      => \&_run_as,
+    secrets     => sub { $tf->{secrets}++; $app->secrets([@_]) },
+    start       => sub {
       if (@_) {
         my $listen = ref $_[0] eq 'ARRAY' ? shift : undef;
         $app->config->{hypnotoad} = @_ > 1 ? {@_} : {%{$_[0]}} if @_;
@@ -308,7 +308,7 @@ Toadfarm - One Mojolicious app to rule them all
 
 =head1 VERSION
 
-0.79
+0.80
 
 =head1 DESCRIPTION
 

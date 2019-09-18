@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-07-29'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-08-08'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -11,6 +11,8 @@ use Perinci::CmdLine::Any;
 
 Perinci::CmdLine::Any->new(
     url => '/App/podsel/podsel',
+    read_config => 0,
+    read_env => 0,
 )->run;
 
 # ABSTRACT: Select Pod::Elemental nodes using CSel syntax
@@ -28,7 +30,7 @@ podsel - Select Pod::Elemental nodes using CSel syntax
 
 =head1 VERSION
 
-This document describes version 0.001 of podsel (from Perl distribution App-podsel), released on 2019-07-29.
+This document describes version 0.003 of podsel (from Perl distribution App-podsel), released on 2019-08-08.
 
 =head1 SYNOPSIS
 
@@ -80,6 +82,14 @@ See C<--node-action>.
 Shortcut for --node-action dump.
 
 See C<--node-action>.
+
+=item B<--eval>=I<s@>
+
+--eval E is shortcut for --action eval:E.
+
+See C<--node-action>.
+
+Can be specified multiple times.
 
 =item B<--expr>=I<s>
 
@@ -171,34 +181,6 @@ CSel expression, refer to <pm:Data::CSel>.
 
 =back
 
-=head2 Configuration options
-
-=over
-
-=item B<--config-path>=I<s>, B<-c>
-
-Set path to configuration file.
-
-=item B<--config-profile>=I<s>, B<-P>
-
-Set configuration profile to use.
-
-=item B<--no-config>, B<-C>
-
-Do not use any configuration file.
-
-=back
-
-=head2 Environment options
-
-=over
-
-=item B<--no-env>
-
-Do not read environment for default options.
-
-=back
-
 =head2 Output options
 
 =over
@@ -285,45 +267,6 @@ It is also recommended to install L<shcompgen> (see above).
 =head2 other shells
 
 For fish and zsh, install L<shcompgen> as described above.
-
-=head1 CONFIGURATION FILE
-
-This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
-
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/podsel.conf>, F<~/podsel.conf>, or F</etc/podsel.conf>.
-
-All found files will be read and merged.
-
-To disable searching for configuration files, pass C<--no-config>.
-
-You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
-
-You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
-
-Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
-
-List of available configuration parameters:
-
- expr (see --expr)
- file (see --file)
- format (see --format)
- naked_res (see --naked-res)
- node_actions (see --node-action)
- select_action (see --select-action)
-
-=head1 ENVIRONMENT
-
-=head2 PODSEL_OPT => str
-
-Specify additional command-line options.
-
-=head1 FILES
-
-F<~/.config/podsel.conf>
-
-F<~/podsel.conf>
-
-F</etc/podsel.conf>
 
 =head1 HOMEPAGE
 

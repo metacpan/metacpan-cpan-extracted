@@ -17,6 +17,8 @@ my %WriteMakefileArgs = (
   "NAME" => "DNS::Zone::PowerDNS::To::BIND",
   "PREREQ_PM" => {
     "DBIx::Connect::Any" => 0,
+    "DNS::Zone::Struct::Common" => "0.004",
+    "DNS::Zone::Struct::Common::BIND" => 0,
     "Exporter" => "5.57",
     "Log::ger" => "0.027",
     "strict" => 0,
@@ -28,7 +30,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.007",
+  "VERSION" => "0.008",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,6 +39,8 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "DBIx::Connect::Any" => 0,
+  "DNS::Zone::Struct::Common" => "0.004",
+  "DNS::Zone::Struct::Common::BIND" => 0,
   "Exporter" => "5.57",
   "File::Spec" => 0,
   "IO::Handle" => 0,

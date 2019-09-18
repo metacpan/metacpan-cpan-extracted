@@ -2,8 +2,13 @@ package t::resolve;
 use strict;
 use warnings;
 
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use MemoryCheck;
+
 use parent qw(Test::Class);
 use Test::More;
+use Test::FailWarnings;
 
 use Promise::ES6;
 

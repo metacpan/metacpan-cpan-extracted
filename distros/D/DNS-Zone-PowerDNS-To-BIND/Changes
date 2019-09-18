@@ -1,3 +1,10 @@
+0.008   2019-09-17  Released-By: PERLANCAR; Urgency: medium
+
+	- Add workaround: convert_underscore_in_host.
+
+        - [refactor] Extract workarounds to DNS::Zone::Struct::Common{,::BIND}.
+
+
 0.007   2019-09-05  Released-By: PERLANCAR; Urgency: medium
 
 	- Fix sort order once again: hosts must be grouped together,

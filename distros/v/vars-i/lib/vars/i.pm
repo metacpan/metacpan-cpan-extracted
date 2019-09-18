@@ -1,45 +1,60 @@
 package vars::i;
-use 5.006;
+use 5.006001;
 
-our $VERSION = '1.10'; # TRIAL
+our $VERSION = '2.000000';  # Prerelease leading to v2.0.0
 
 use strict qw(vars subs);
 use warnings;
 
+# Turn a scalar, arrayref, or hashref into a list
+sub _unpack {
+    if( ref $_[0] eq 'ARRAY' ){
+        return @{$_[0]};
+    }
+    elsif( ref $_[0] eq 'HASH' ){
+        return %{$_[0]};
+    }
+    else {
+        return ($_[0]);
+    }
+} #_unpack
+
 sub import {
     return if @_ < 2;
-    my( $pack, $var, @value ) = @_;
+    my( $pack, $first_var, @value ) = @_;
     my $callpack = caller;
 
     my %definitions;
 
     if( not @value ){
-        if( ref $var ){     # E.g., use vars [ foo=>, bar=>... ];
-            %definitions = @$var;
-        } else {
-            return;     # No value given --- no-op; not an error.
+        if( ref $first_var eq 'ARRAY' ){  # E.g., use vars [ foo=>, bar=>... ];
+            %definitions = @$first_var;
         }
-    } elsif(@value == 1 && ref $value[0]) {     # E.g., use vars foo=>{}
-        %definitions = ( $var => $value[0] );
-    } else {
-        %definitions = ( $var => [@value] );
-    }
-
-    for my $k( keys %definitions ){
-        $var = $k;
-        if( ref $definitions{$k} eq 'ARRAY' ){
-            @value = @{ $definitions{$k} };
-        }
-        elsif( ref $definitions{$k} eq 'HASH' ){
-            @value = %{ $definitions{$k} };
+        elsif( ref $first_var eq 'HASH' ){  # E.g., use vars { foo=>, bar=>... };
+            %definitions = %$first_var;
         }
         else {
-            @value = $definitions{$k};
+            return;     # No value given --- no-op; not an error.
         }
+    }
+    elsif(@value == 1) {        # E.g., use vars foo => <str/hashref/arrayref>
+        %definitions = ( $first_var => $value[0] );
+    }
+    else {
+        %definitions = ( $first_var => [@value] );
+    }
 
+    #require Data::Dumper;   # For debugging
+    #print Data::Dumper->Dump([\%definitions], ['definitions']);
 
-        if( my( $ch, $sym ) = $var =~ /^([\$\@\%\*\&])(.+)$/ ){
-            if( $sym !~ /^(\w+(::|'))+\w+$/ && $sym =~ /\W|(^\d+$)/ ){
+    while( my ($var, $val) = each %definitions ){
+
+        if( my( $ch, $sym ) = $var =~ /^([-\$\@\%\*\&])(.+)$/ ){
+            if( $ch eq '-' ){   # An option
+                require Carp;
+                Carp::croak('vars::i does not yet support any options!');
+            }
+            elsif( $sym !~ /^(\w+(::|'))+\w+$/ && $sym =~ /\W|(^\d+$)/ ){
                 #    ^^ Skip fully-qualified names  ^^ Check special names
 
                 # A variable name we can't or won't handle
@@ -60,32 +75,46 @@ sub import {
 
             if( $ch eq '$' ){
                 *{$sym} = \$$sym;
-                (${$sym}) = @value;
+                ${$sym} = $val;
             }
             elsif( $ch eq '@' ){
                 *{$sym} = \@$sym;
-                (@{$sym}) = @value;
+                @{$sym} = _unpack $val;
             }
             elsif( $ch eq '%' ){
                 *{$sym} = \%$sym;
-                (%{$sym}) = @value;
+                %{$sym} = _unpack $val;
             }
             elsif( $ch eq '*' ){
                 *{$sym} = \*$sym;
-                (*{$sym}) = shift @value;
+                (*{$sym}) = $val;
             }
             else {   # $ch eq '&'; guaranteed by the regex above.
-                *{$sym} = shift @value;
+                my ($param) = $val;
+                if(ref $param) {
+                    # NOTE: for now, permit any ref, since we can't determine
+                    # refs overload &{}.  If necessary, we can later use
+                    # Scalar::Util 1.25+'s blessed(), and allow CODE refs
+                    # or blessed refs.
+                    *{$sym} = $param;
+                }
+                else {
+                    require Carp;
+                    Carp::croak("Can't assign non-reference " .
+                        (defined($param) ? $param : '<undef>') .
+                        " to $sym");
+                }
             }
             # There is no else, because the regex above guarantees
             # that $ch has one of the values we tested.
 
-        } else {    # Name didn't match the regex above
+        }
+        else {    # Name didn't match the regex above
             require Carp;
-            Carp::croak("'$var' is not a valid variable name");
+            Carp::croak("'$var' is not a valid variable or option name");
         }
     }
-};
+} #import()
 
 1;
 __END__
@@ -174,17 +203,40 @@ one-parameter case.
 Trying to create a special variable is fatal.  E.g., C<use vars::i '$@', 1;>
 will die at compile time.
 
+=item *
+
+The sigil is taken into account (context sensitivity!)  So:
+
+    use vars::i '$foo' => [1,2,3];  # now $foo is an arrayref
+    use vars::i '@bar' => [1,2,3];  # now @bar is a three-element list
+
 =back
 
 =head1 SEE ALSO
 
 See L<vars>, L<perldoc/"our">, L<perlmodlib/Pragmatic Modules>.
 
-=head1 MINIMUM PERL VERSION
+=head1 VERSIONING
 
-This version supports Perl 5.6+.  If you are running an earlier Perl,
-use version 1.01 of this module
+Since version 1.900000, this module is numbered using
+L<Semantic Versioning 2.0.0|https://semver.org>,
+packed in the compatibility format of C<< vX.Y.Z -> X.00Y00Z >>.
+
+This version supports Perl 5.6.1+.  If you are running an earlier Perl:
+
+=over
+
+=item Perl 5.6:
+
+Use version 1.10 of this module
+(L<CXW/vars-i-1.10|https://metacpan.org/pod/release/CXW/vars-i-1.10/lib/vars/i.pm>).
+
+=item Pre-5.6:
+
+Use version 1.01 of this module
 (L<PODMASTER/vars-i-1.01|https://metacpan.org/pod/release/PODMASTER/vars-i-1.01/lib/vars/i.pm>).
+
+=back
 
 =head1 DEVELOPMENT
 

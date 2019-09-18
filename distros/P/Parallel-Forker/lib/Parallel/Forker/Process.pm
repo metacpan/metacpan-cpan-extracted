@@ -12,7 +12,7 @@ use Scalar::Util qw(weaken);
 use strict;
 use vars qw($Debug $VERSION $HashId);
 
-$VERSION = '1.246';
+$VERSION = '1.250';
 
 $Debug = $Parallel::Forker::Debug;
 $HashId = 0;

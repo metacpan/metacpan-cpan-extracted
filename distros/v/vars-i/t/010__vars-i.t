@@ -5,7 +5,7 @@
 # Do not `use strict` or else this file won't compile in the event of errors.
 # Leaving off `use strict` permits us to use the more detailed test results.
 
-use Test::More tests => 35;
+use Test::More tests => 45;
 
 use vars::i;     # Fatal if we can't load
 
@@ -29,6 +29,9 @@ use vars::i;     # Fatal if we can't load
         '%HASH2' => { answer => 'forty-two' },
         '@ARR2' => [1337, qw(Mike Oldfield)],
     ];
+
+    use vars::i '$foo' => [1,2,3];
+    use vars::i '@bar' => [1,2,3];
 
 BEGIN {     # so that we are testing compile-time effects
     # Use string eval + `use strict` to trap undefined variables
@@ -82,5 +85,15 @@ BEGIN {     # so that we are testing compile-time effects
     cmp_ok($ARR2[0], '==', 1337, '$ARR2[0]');
     is($ARR2[1], 'Mike', '$ARR2[1]');
     is($ARR2[2], 'Oldfield', '$ARR2[2]');
+
+    ok(eval q[use strict; no warnings 'all'; $foo; 1],
+                q[use vars::i '$foo' => [...]]);
+    is(ref($foo), 'ARRAY', q[$foo arrayref]);
+    cmp_ok($foo->[$_], '==', $_+1, "\$foo->[$_]") foreach 0..2;
+
+    ok(eval q[use strict; no warnings 'all'; @bar; 1],
+                q[use vars::i '@bar' => [...]]);
+    is(ref(@bar), '', q[@bar not a ref]);
+    cmp_ok($bar[$_], '==', $_+1, "\$bar[$_]") foreach 0..2;
 
 }

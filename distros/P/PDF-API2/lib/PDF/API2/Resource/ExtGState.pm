@@ -5,7 +5,7 @@ use base 'PDF::API2::Resource';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '2.035'; # VERSION
+our $VERSION = '2.036'; # VERSION
 
 use PDF::API2::Basic::PDF::Utils;
 use PDF::API2::Util;

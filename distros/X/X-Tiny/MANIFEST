@@ -9,6 +9,7 @@ README.md
 lib/X/Tiny.pm
 lib/X/Tiny/Base.pm
 t/basic.t
+t/call_stack_refs.t
 t/lib/MyDist/X.pm
 t/lib/MyDist/X/BadArg.pm
 t/lib/MyDist/X/Base.pm

@@ -52,6 +52,9 @@
          "web" : "https://github.com/jhthorsen/toadfarm"
       }
    },
-   "version" : "0.79",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.80",
+   "x_contributors" : [
+      "Jan Henning Thorsen <jhthorsen@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -44,6 +44,14 @@ file.
 
 	print "Station ID=$stationID\n";
 	
+	my $artist = $station->{'artist'};
+
+	print "Artist=$artist\n"  if ($artist);
+	
+	my $genre = $station->{'genre'};
+
+	print "Genre=$genre\n"  if ($genre);
+	
 	my $icon_url = $station->getIconURL();
 
 	if ($icon_url) {   #SAVE THE ICON TO A TEMP. FILE:
@@ -345,7 +353,13 @@ sub new
 	$ua->cookie_jar({});
 	$ua->env_proxy;
 	$self->{'id'} = '';
-	$self->{'fccid'} = '';
+	$self->{'title'} = '';
+	$self->{'artist'} = '';
+	$self->{'created'} = '';
+	$self->{'year'} = '';
+	$self->{'streams'} = [];
+	$self->{'cnt'} = 0;
+	
 
 	(my $url2fetch = $url);
 	#DEPRECIATED (STATION-IDS NOW INCLUDE STUFF BEFORE THE DASH: ($self->{'id'} = $url) =~ s#^.*\-([a-z]\d+)\/?$#$1#;
@@ -371,6 +385,7 @@ sub new
 	}
 	print STDERR "-1: html=$html=\n"  if ($DEBUG > 1);
 	if ($html) {  #EXTRACT METADATA, IF WE CAN:
+		print STDERR "-1: EXTRACTING METADATA...\n"  if ($DEBUG);
 		my $artist;
 		$self->{'id'} = $1  if ($html =~ m#\"guideId\"\:\"([^\"]+)\"#);
 		$self->{'fccid'} = ($html =~ m#\"callSign\"\:\"([^\"]+)\"#i) ? $1 : '';
@@ -403,6 +418,15 @@ sub new
 			$artist = uri_unescape($artist);
 			$self->{'artist'} = $artist;
 		}
+		my $genre = ($html =~ m#\"rootGenre\"\:\"([^\"]+)\"#) ? $1 : '';
+		my $subgenre = ($html =~ m#\"primaryGenreName\"\:\"([^\"]+)\"#) ? $1 : '';
+		if ($genre && $subgenre) {
+			$self->{'genre'} = ($genre eq 'music') ? $subgenre : $genre . ' - ' . $subgenre;
+		} elsif ($genre) {
+			$self->{'genre'} = $genre;
+		} elsif ($subgenre) {
+			$self->{'genre'} = $subgenre;
+		}
 	}
 	return undef  unless ($self->{'id'});
 
@@ -423,17 +447,17 @@ sub new
 		print STDERR "i:Podcast found, ID changed to (".$self->{'id'}."), year (".$self->{'year'}.").\n"  if ($DEBUG);
 	} else {  #(USUALLY) NO STREAMS FOUND, TRY youtube-dl!:
 		my $tryStream = "http://opml.radiotime.com/Tune.ashx?id=$stationID";
-		$self->{'streams'} = [$tryStream];
-		$self->{'cnt'} = 1;
 		if ($haveYoutube) {
-			my $tryYoutubeDL = new StreamFinder::Youtube($tryStream, -debug => $DEBUG, -notitle => 1);
-			if ($tryYoutubeDL) {
-				my $firstStream = $tryYoutubeDL->getURL();
-				print STDERR "i:Found stream ($firstStream) via youtube-dl.\n"  if ($DEBUG);
-				$self->{'title'} ||= $tryYoutubeDL->getTitle();
-				$self->{'iconurl'} ||= $tryYoutubeDL->getIconUrl();
-				unshift @{$self->{'streams'}}, $firstStream;
-				$self->{'cnt'}++;
+			$_ = `youtube-dl --get-url  "$tryStream"`;
+			print STDERR "-2 TRYING($tryStream): YT returned ($_)!\n"  if ($DEBUG);
+			my @urls = split(/\r?\n/);
+			while (@urls && $urls[0] !~ m#^https?\:\/\/#o) {
+				shift @urls;
+			}
+			if (scalar(@urls) > 0) {
+				print STDERR "i:Found stream(s) (".join('|',@urls).") via youtube-dl.\n"  if ($DEBUG);
+				@{$self->{'streams'}} = @urls;
+				$self->{'cnt'} = scalar @urls;
 			}
 		}
 	}

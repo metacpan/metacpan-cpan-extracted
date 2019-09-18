@@ -38,9 +38,17 @@ file.
 	
 	print "Title=$videoTitle\n";
 	
+	my $stationDescription = $station->getTitle('desc');
+	
+	print "Description=$stationDescription\n";
+	
 	my $videoID = $video->getID();
 
 	print "Video ID=$videoID\n";
+	
+	my $artist = $station->{'artist'};
+
+	print "Artist=$artist\n"  if ($artist);
 	
 	my $icon_url = $video->getIconURL();
 
@@ -75,7 +83,7 @@ file.
 =head1 DESCRIPTION
 
 StreamFinder::Youtube accepts a valid full Youtube video ID or URL on 
-youtube, brighteon, vimeo, et. al. that the "youtube-dl" program supports, 
+youtube, et. al. that the "youtube-dl" program supports, 
 and returns the actual stream URL, title, and cover art icon for that video.  
 The purpose is that one needs this URL in order to have the option to 
 stream the video in one's own choice of media player software rather 
@@ -89,22 +97,22 @@ general StreamFinder module.
 
 Depends:  
 
-L<WWW::YouTube::Download>, L<I::Escape>, L<HTML::Entities>, L<LWP::UserAgent>, 
+L<I::Escape>, L<HTML::Entities>, L<LWP::UserAgent>, 
 and the separate application program:  youtube-dl.
 
 =head1 SUBROUTINES/METHODS
 
 =over 4
 
-=item B<new>(I<url> [, "debug" [ => 0|(1)|2 ]] [, "notitle" [ => 0|(1) ]])
+=item B<new>(I<url> [, "debug" [ => 0|(1)|2 ]] [, "fast" [ => 0|(1) ]])
 
 Accepts a youtube.com URL and creates and returns a new video object, or 
 I<undef> if the URL is not a valid youtube video or no streams are found.
 
-If "notitle" or "-notitle" is specified (or set to 1), a second call to 
-youtube-dl to fetch the video's title is skipped, useful when called by 
-StreamFinder::Tunein, which already has the title and youtube-dl will not 
-fetch it.
+If "fast" or "-fast" is specified (or set to 1), a separate probe of the 
+page to fetch the video's title and artist is skipped.  This is useful 
+if you know the video is NOT a youtube.com video or you don't care about 
+the artist field.
 
 =item $video->B<get>()
 
@@ -130,9 +138,9 @@ Returns the number of streams found for the video.
 
 Returns the video's Youtube ID (numeric).
 
-=item $video->B<getTitle>()
+=item $station->B<getTitle>(['desc'])
 
-Returns the video's title (description).  
+Returns the station's title, or (long description).  
 
 =item $video->B<getIconURL>()
 
@@ -201,7 +209,7 @@ youtube
 
 youtube-dl
 
-L<URI::Escape>, L<HTML::Entities>, L<LWP::UserAgent>, L<WWW::YouTube::Download>, youtube-dl
+L<URI::Escape>, L<HTML::Entities>, L<LWP::UserAgent>, youtube-dl
 
 =head1 RECCOMENDS
 
@@ -290,11 +298,10 @@ use warnings;
 use URI::Escape;
 use HTML::Entities ();
 use LWP::UserAgent ();
-use WWW::YouTube::Download;
 use vars qw(@ISA @EXPORT);
 
 my $DEBUG = 0;
-my $NOTITLE = 0;
+my $FAST = 0;
 my %uops = ();
 my @userAgentOps = ();
 
@@ -332,91 +339,133 @@ sub new
 			unless (defined $uops{'agent'});
 	$uops{'timeout'} = 10  unless (defined $uops{'timeout'});
 	$DEBUG = $uops{'debug'}  if (defined $uops{'debug'});
-	$NOTITLE = $uops{'notitle'}  if (defined $uops{'notitle'});
+	$FAST = $uops{'fast'}  if (defined $uops{'fast'});
 
 	while (@_) {
 		if ($_[0] =~ /^\-?debug$/o) {
 			shift;
 			$DEBUG = (defined($_[0]) && $_[0] =~/^[0-9]$/) ? shift : 1;
-		} elsif ($_[0] =~ /^\-?notitle$/o) {
+		} elsif ($_[0] =~ /^\-?fast$/o) {
 			shift;
-			$NOTITLE = (defined($_[0]) && $_[0] =~/^[0-9]$/) ? shift : 1;
+			$FAST = (defined($_[0]) && $_[0] =~/^[0-9]$/) ? shift : 1;
 		}
 	}
 
-	$url =~ s/\?autoplay\=true$//;  #STRIP THIS OFF SO WE DON'T HAVE TO.
 	print STDERR "-0(Youtube): URL=$url=\n"  if ($DEBUG);
-
-    $self->{'client'} = WWW::YouTube::Download->new;
-	return undef  unless ($self->{'client'});
-
-	$self->{'cnt'} = 0;
-	my $meta_data = '';
-	eval "\$meta_data = \$self->{'client'}->prepare_download(\$url);";
-	my %metadata;
-	if ($meta_data) {
-		foreach my $name (qw(video_id title user)) {
-			eval "\$metadata{$name} = \$self->{'client'}->get_$name(\$url);";
-		}
+	$url =~ s/\?autoplay\=true$//;  #STRIP THIS OFF SO WE DON'T HAVE TO.
+	(my $url2fetch = $url);
+	#DEPRECIATED (STATION-IDS NOW INCLUDE STUFF BEFORE THE DASH: ($self->{'id'} = $url) =~ s#^.*\-([a-z]\d+)\/?$#$1#;
+	if ($url2fetch =~ m#^https?\:#) {
+		$self->{'id'} = $1  if ($url2fetch =~ m#\/([^\/]+)\/?$#);
+		$self->{'id'} =~ s/^watch\?v\=//;
+		$self->{'id'} =~ s/[\?\&].*$//;
+	} else {
+		$self->{'id'} = $url;
+		$url2fetch = 'https://www.youtube.com/watch?v=' . $url;
 	}
-	else    #SOME FB-SHARED VIDEOS HAVE EXTRA JUNK IN 'EM, WHICH MUST BE STRIPPED OFF HERE FOR SOME REASON:
-	{
-		my $urlsrc = $url;
-		$urlsrc =~ s#attribution\_link.+?watch#watch#;
-		$urlsrc = uri_unescape($urlsrc);
-		eval "\$meta_data = \$self->{'client'}->prepare_download(\$urlsrc);";
-		if ($meta_data) {
-			foreach my $name (qw(video_id title user)) {
-				eval "\$metadata{$name} = \$self->{'client'}->get_$name(\$urlsrc);";
-			}
-		}
-	}
-	$self->{'id'} = $metadata{'video_id'} || '';
-	$self->{'title'} = $metadata{'title'} || '';
-	$self->{'artist'} = $metadata{'user'} || '';
-	print STDERR "-2: title=".$self->{'title'}."= id=".$self->{'id'}."=\n"  if ($DEBUG);
+	print STDERR "-1 FETCHING URL=$url= VIA youtube-dl: ID=".$self->{'id'}."=\n"  if ($DEBUG);
+	$self->{'iconurl'} = '';
+	$self->{'title'} = '';
+	$self->{'artist'} = '';
 
-#	if ($url =~ /www\.brighteon\.com/) {  #NO AUDIO+VIDEO STREAMS AVAILABLE FOR INFOWARZ (SO GET AUDIO ONLY!):
-#		#$url =~ s#embed\/##;
-#		#$_ = `youtube-dl -x --get-url "$url"`;
-#		#$_ = `youtube-dl --get-url --get-thumbnail -f 'bestaudio[ext=mp4]' "$url"`;
-#		$_ = `youtube-dl --get-url --get-thumbnail -f 'bestaudio' "$url"`;
-#	} else {
+	#FIRST:  GET STREAMS, THUMBNAIL, ETC. FROM youtube-dl:
+
+	my $ytdlArgs = '--get-url --get-thumbnail --get-title --get-description -f "'
+			. ((defined $uops{'format'}) ? $uops{'format'} : 'mp4')
+			. '" ' . ((defined $uops{'youtube-dl-args'}) ? $uops{'youtube-dl-args'} : '');
+	my $try = 0;
+	my ($more, @ytdldata);
+RETRYIT:
 	if (defined($uops{'userid'}) && defined($uops{'userpw'})) {  #USER HAS A LOGIN CONFIGURED:
 		my $uid = $uops{'userid'};
 		my $upw = $uops{'userpw'};
-		$_ = `youtube-dl --username "$uid" --password "$upw" --get-url --get-thumbnail -f mp4 "$url"`;
+		$_ = `youtube-dl --username "$uid" --password "$upw" $ytdlArgs "$url"`;
 	} else {
-		$_ = `youtube-dl --get-url --get-thumbnail -f mp4 "$url"`;
+		$_ = `youtube-dl --get-url $ytdlArgs "$url"`;
 	}
-	print STDERR "--youtube-dl returned=$_=\n"  if ($DEBUG);
-	my @urls = split(/\r?\n/);
-	while (@urls && $urls[0] !~ m#\:\/\/#o) {
-		shift @urls;
+	print STDERR "--TRY($try of 1): youtube-dl returned=$_= ARGS=$ytdlArgs=\n"  if ($DEBUG);
+	@ytdldata = split /\r?\n/s;
+	return undef unless (scalar(@ytdldata) > 0);
+
+	unless ($ytdldata[0] =~ m#^https?\:\/\/#) {
+		$_ = shift(@ytdldata);
+		$self->{'title'} ||= $_;
 	}
-	return undef  unless ($urls[0]);
-			
-	$self->{'Url'} = $urls[0];
-	chomp $self->{'Url'};
-	$self->{'streams'} = [$self->{'Url'}];  #ADD FIRST (BEST) URL.
-	for (my $i=0;$i<$#urls;$i++) {  #ADD ALL OTHER STREAM URLS (EXCEPT LAST ONE, WHICH IS THE ICON URL):
-		chomp $urls[$i];
-		push @{$self->{'streams'}}, $urls[$i]  unless ($self->{'Url'} eq $urls[$i]);
+	$self->{'description'} = '';
+	$more = 1;
+	while (@ytdldata) {
+		$_ = shift @ytdldata;
+		$more = 0  unless (m#^https?\:\/\/#o);
+		if ($more) {
+			push @{$self->{'streams'}}, $_;
+		} else {
+			$self->{'description'} .= $_ . ' ';
+		}
 	}
 	$self->{'cnt'} = scalar @{$self->{'streams'}};
-	$self->{'total'} = $self->{'cnt'};
-	$self->{'iconurl'} = ($#urls >= 1) ? $urls[$#urls] : '';
-	$self->{'imageurl'} = $self->{'iconurl'};
-	unless ($NOTITLE || $self->{'title'} =~ /\w/) {  #TRY AGAIN TO GET TITLE, IF NOT FOUND IN METADATA:
-		$self->{'title'} = `youtube-dl --get-title "$url"`;
-		chomp $self->{'title'};
-		$self->{'title'} = $self->{'Url'} || $url  unless ($self->{'title'} =~ /\w/);  #STILL NO TITLE, USE URL.
-		print STDERR "i:Title not in metadata, set to (".$self->{'title'}.").\n"  if ($DEBUG);
+	$self->{'iconurl'} = pop(@{$self->{'streams'}})  if ($self->{'cnt'} > 1);
+	$self->{'cnt'} = scalar @{$self->{'streams'}};
+	unless ($try || $self->{'cnt'} > 0) {  #IF NOTHING FOUND, RETRY WITHOUT THE SPECIFIC FILE-FORMAT:
+		$try++;
+		$ytdlArgs =~ s/\-f\s+\"([^\"]+)\"//;
+		goto RETRYIT  if ($1);
 	}
-	$self->{'title'} = HTML::Entities::decode_entities($self->{'title'});
-	$self->{'title'} = uri_unescape($self->{'title'});
+
+	#NOW MANUALLY SCAN PAGE TO TRY TO GET artist, description, year, ETC. DIRECTLY FROM PAGE:
+
+	unless ($FAST) {
+		print STDERR "-2 FETCHING SCREEN URL=$url2fetch= ID=".$self->{'id'}."=\n"  if ($DEBUG);
+		my $ua = LWP::UserAgent->new(@userAgentOps);		
+		$ua->timeout($uops{'timeout'});
+		$ua->cookie_jar({});
+		$ua->env_proxy;
+		my $html = '';
+		my $response = $ua->get($url2fetch);
+		if ($response->is_success) {
+			$html = $response->decoded_content;
+		} else {
+			print STDERR $response->status_line  if ($DEBUG);
+			my $no_wget = system('wget','-V');
+			unless ($no_wget) {
+				print STDERR "\n..trying wget...\n"  if ($DEBUG);
+				$html = `wget -t 2 -T 20 -O- -o /dev/null \"$url2fetch\" 2>/dev/null `;
+			}
+		}
+		if ($html =~ s#\]\}\,\"title\"\:\{\"runs\"\:\[\{\"text\"\:\"([^\"]+)\"\,\"navigationEndpoint\"\:([^\}]+)##s) {
+			my $two = $2;
+			$self->{'artist'} = $1;
+			$self->{'artist'} .= ' - https://www.youtube.com' . $1  if ($two =~ m#\"url\"\:\"([^\"]+)#);
+		}
+		if ($html =~ s#\"videoDetails\"\:\{\"videoId\"\:\"([^\"]+)\"([^\}]+)##s) {
+			my $two = $2;
+			$self->{'id'} = $1;
+			$two =~ s/\\\"/\\u0022/gs;
+			$self->{'title'} = $1  if ($two =~ m#\"title\"\:\"([^\"]+)#);
+			$self->{'iconurl'} = $1  if ($two =~ m#\"thumbnails\"\:\[\{\"url\"\:\"([^\"]+)#);
+			$self->{'iconurl'} =~ s/\?.*$//;
+		}
+		if ($html =~ m#\"dateText\"\:\{([^\}]+)\}#s) {
+			my $one = $1;
+			$self->{'year'} = $1  if ($one =~ /(\d\d\d\d)/);
+		}
+	}
+	$self->{'total'} = $self->{'cnt'};
+	$self->{'imageurl'} = $self->{'iconurl'};
+	$self->{'Url'} = ($self->{'cnt'} > 0) ? $self->{'streams'}->[0] : '';
 	print STDERR "-count=".$self->{'cnt'}."= iconurl=".$self->{'iconurl'}."=\n"  if ($DEBUG);
 	print STDERR "--SUCCESS: stream url=".$self->{'Url'}."=\n"  if ($DEBUG);
+	if ($self->{'description'} =~ /\w/) {
+		$self->{'description'} =~ s/\s+$//;
+	} else {
+		$self->{'description'} = $self->{'title'};
+	}
+	foreach my $i (qw(title artist description)) {
+		$self->{$i} = HTML::Entities::decode_entities($self->{$i});
+		$self->{$i} = uri_unescape($self->{$i});
+		$self->{$i} =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/egs;
+	}
+	print STDERR "-2: title=".$self->{'title'}."= id=".$self->{'id'}."= artist=".$self->{'artist'}."= year(Published)=".$self->{'year'}."=\n"  if ($DEBUG);
+#print STDERR "\n--ID=".$self->{'id'}."=\n--TITLE=".$self->{'title'}."=\n--CNT=".$self->{'cnt'}."=\n--ICON=".$self->{'iconurl'}."=\n--1ST=".$self->{'Url'}."=\n"  if ($DEBUG);
 
 	bless $self, $class;   #BLESS IT!
 
@@ -433,7 +482,6 @@ sub get
 sub getURL   #LIKE GET, BUT ONLY RETURN THE SINGLE ONE W/BEST BANDWIDTH AND RELIABILITY:
 {
 	my $self = shift;
-#	return $self->{'Url'};
 	my $arglist = (defined $_[0]) ? join('|',@_) : '';
 	my $idx = ($arglist =~ /\b\-?random\b/) ? int rand scalar @{$self->{'streams'}} : 0;
 	if ($arglist =~ /\b\-?noplaylists\b/ && ${$self->{'streams'}}[$idx] =~ /\.(pls|m3u8?)$/i) {
@@ -510,7 +558,8 @@ sub getID
 sub getTitle
 {
 	my $self = shift;
-	return $self->{'title'};  #VIDEO'S TITLE(DESCRIPTION), IF ANY.
+	return $self->{'description'}  if (defined($_[0]) && $_[0] =~ /^\-?(?:long|desc)/i);
+	return $self->{'title'};  #STATION'S TITLE(DESCRIPTION), IF ANY.
 }
 
 sub getIconURL
@@ -543,6 +592,7 @@ sub getIconData
 	return ()  unless ($art_image);
 	(my $image_ext = $self->{'iconurl'}) =~ s/^.+\.//;
 	$image_ext =~ s/[^A-Za-z].*$//;
+
 	return ($image_ext, $art_image);
 }
 

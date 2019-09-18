@@ -1,7 +1,7 @@
 package App::podsel;
 
-our $DATE = '2019-07-29'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-08-08'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -105,7 +105,7 @@ App::podsel - Select Pod::Elemental nodes using CSel syntax
 
 =head1 VERSION
 
-This document describes version 0.001 of App::podsel (from Perl distribution App-podsel), released on 2019-07-29.
+This document describes version 0.003 of App::podsel (from Perl distribution App-podsel), released on 2019-08-08.
 
 =head1 SYNOPSIS
 

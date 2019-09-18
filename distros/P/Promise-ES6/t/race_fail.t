@@ -3,9 +3,11 @@ use warnings;
 
 use Test::More;
 use Test::Fatal;
+use Test::FailWarnings;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
+use MemoryCheck;
 
 use Eventer;
 use PromiseTest;

@@ -7,11 +7,6 @@ my $script = $app->_script;
 
 isa_ok $script->option_parser, 'Getopt::Long::Parser';
 
-{
-  local $TODO = 'need to define config for Getopt::Long';
-  is_deeply($script->option_parser->{settings}, [qw(no_auto_help pass_through)], 'Getopt::Long has correct config');
-}
-
 eval { $script->option(undef) };
 like($@, qr{^Usage:.*type =>}, 'option() require type');
 eval { $script->option(str => undef) };

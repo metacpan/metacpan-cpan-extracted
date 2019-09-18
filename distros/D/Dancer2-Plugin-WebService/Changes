@@ -1,3 +1,13 @@
+4.1.5  2019-09-18
+
+  - Rewritten
+  - In memory operation for login and session data
+  - Less methods and more built in functionality for perfomance
+
+3.101  2018-05-21
+
+  - Code clean up
+
 3.100  2018-05-20
 
   - Re-write many parts of the code for perfomance

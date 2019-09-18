@@ -59,7 +59,7 @@
          "web" : "https://github.com/perlancar/perl-DNS-Zone-Struct-To-BIND"
       }
    },
-   "version" : "0.003",
+   "version" : "0.006",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028002"

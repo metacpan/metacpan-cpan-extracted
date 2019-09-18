@@ -21,6 +21,7 @@ t/extends.t
 t/file-dir.t
 t/help.t
 t/Helper.pm
+t/hook.t
 t/moose.t
 t/n_of.t
 t/options.t

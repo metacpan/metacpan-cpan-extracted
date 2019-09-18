@@ -1,7 +1,7 @@
 package App::orgsel;
 
-our $DATE = '2019-07-29'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $DATE = '2019-08-08'; # DATE
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use strict;
@@ -66,7 +66,7 @@ App::orgsel - Select Org document elements using CSel (CSS-selector-like) syntax
 
 =head1 VERSION
 
-This document describes version 0.007 of App::orgsel (from Perl distribution App-orgsel), released on 2019-07-29.
+This document describes version 0.009 of App::orgsel (from Perl distribution App-orgsel), released on 2019-08-08.
 
 =head1 SYNOPSIS
 

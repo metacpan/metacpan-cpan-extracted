@@ -1,5 +1,10 @@
 Revision history for perl distribution Applify
 
+0.18 2019-09-18T11:24:06+0900
+ - Add support for hooks #19 #20 #21
+ - Fix showing both + and * if required and n_of is set #22
+ - Fix support for option ..., n_of => '1,2' #23
+
 0.17 2019-08-19T15:53:49+0200
  - Fix options with isa and no default #17
    Contributor: Roy Storey

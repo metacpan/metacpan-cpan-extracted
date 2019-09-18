@@ -24,7 +24,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=DNS-Zone-Struct-To-BIND
   homepage: https://metacpan.org/release/DNS-Zone-Struct-To-BIND
   repository: git://github.com/perlancar/perl-DNS-Zone-Struct-To-BIND.git
-version: '0.003'
+version: '0.006'
 x_Dist_Zilla:
   perl:
     version: '5.028002'

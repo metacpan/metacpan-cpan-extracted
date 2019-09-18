@@ -1,7 +1,7 @@
 package App::yamlsel;
 
-our $DATE = '2019-08-01'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2019-08-08'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -80,7 +80,7 @@ App::yamlsel - Select YAML elements using CSel (CSS-selector-like) syntax
 
 =head1 VERSION
 
-This document describes version 0.006 of App::yamlsel (from Perl distribution App-yamlsel), released on 2019-08-01.
+This document describes version 0.007 of App::yamlsel (from Perl distribution App-yamlsel), released on 2019-08-08.
 
 =head1 SYNOPSIS
 

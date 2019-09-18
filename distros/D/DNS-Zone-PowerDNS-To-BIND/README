@@ -3,9 +3,9 @@ NAME
     information in PowerDNS database
 
 VERSION
-    This document describes version 0.007 of DNS::Zone::PowerDNS::To::BIND
+    This document describes version 0.008 of DNS::Zone::PowerDNS::To::BIND
     (from Perl distribution DNS-Zone-PowerDNS-To-BIND), released on
-    2019-09-05.
+    2019-09-17.
 
 SYNOPSIS
      use DNS::Zone::PowerDNS::To::BIND qw(gen_bind_zone_from_powerdns_db);
@@ -61,19 +61,10 @@ FUNCTIONS
         Whether to avoid having CNAME record for a name as well as other
         record types.
 
-        This is a workaround for a common misconfiguration in PowerDNS DB.
-        Bind will reject the whole zone if there is CNAME record for a name
-        (e.g. 'www') as well as other record types (e.g. 'A' or 'TXT'). The
-        workaround is to skip those A/TXT records and only keep the CNAME
-        record.
-
-    *   workaround_no_ns => *bool* (default: 1)
-
-        Whether to add some NS records for '' when there are no NS records
-        for it.
-
-        This is a workaround for a common misconfiguration in PowerDNS DB.
-        This will add some NS records specified in "default_ns".
+        This is a workaround for a common misconfiguration. Bind will reject
+        the whole zone if there is CNAME record for a name (e.g. 'www') as
+        well as other record types (e.g. 'A' or 'TXT'). The workaround is to
+        skip those A/TXT records and only keep the CNAME record.
 
     *   workaround_root_cname => *bool* (default: 1)
 
@@ -82,6 +73,15 @@ FUNCTIONS
 
         CNAME on a root node (host='') does not make sense, so the
         workaround is to ignore the root CNAME.
+
+    *   workaround_underscore_in_host => *bool* (default: 1)
+
+        Whether to convert underscores in hostname to dashes.
+
+        Underscore is not a valid character in hostname. This workaround can
+        help a bit by automatically converting underscores to dashes. Note
+        that it does not ensure hostnames like "foo_.example.com" to become
+        valid as "foo-.example.com" is also not a valid hostname.
 
     Return value: (any)
 

@@ -10,10 +10,10 @@ Simple uses:
 
    AE::log fatal => "No config found, cannot continue!"; # never returns
    AE::log alert => "The battery died!";
-   AE::log crit  => "The battery temperature is too hot!";
+   AE::log crit  => "The battery is too hot!";
    AE::log error => "Division by zero attempted.";
    AE::log warn  => "Couldn't delete the file.";
-   AE::log note  => "Wanted to create config, but config already exists.";
+   AE::log note  => "Attempted to create config, but config already exists.";
    AE::log info  => "File soandso successfully deleted.";
    AE::log debug => "the function returned 3";
    AE::log trace => "going to call function abc";

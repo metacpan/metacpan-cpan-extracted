@@ -1,29 +1,40 @@
 ---
 abstract: 'abstract class for Date::Holidays::* packages'
 author:
-  - 'Jonas B. Nielsen <jonasbn@cpan.org>'
+  - 'Jonas B. <jonasbn@cpan.org>'
 build_requires:
-  File::Spec: 0
-  IO::Handle: 0
-  IPC::Open3: 0
-  Module::Build: 0.30
-  Test::More: 0
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.30'
+  Pod::Coverage::TrustPod: '0'
+  Test::Fatal: '0'
+  Test::Kwalitee: '1.21'
+  Test::More: '0'
+  Test::Pod: '1.41'
+  Test::Pod::Coverage: '1.08'
+  Test::Tester: '1.302111'
 configure_requires:
-  ExtUtils::MakeMaker: 0
-  Module::Build: 0.30
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.30'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Date-Holidays-Abstract
+provides:
+  Date::Holidays::Abstract:
+    file: lib/Date/Holidays/Abstract.pm
+    version: '0.08'
 requires:
-  Class::Virtually::Abstract: 0
-  Test::Harness: 0
-  Test::More: 0
-  perl: 5.006
+  Class::Virtually::Abstract: '0'
+  perl: '5.006'
 resources:
-  homepage: http://search.cpan.org/dist/Date-Holidays-Abstract/
-  repository: git://github.com/gitpan/Date-Holidays-Abstract.git
-version: 0.07
+  bugtracker: https://github.com/jonasbn/perl-date-holidays-abstract/issues
+  homepage: https://github.com/jonasbn/perl-date-holidays-abstract
+  repository: https://github.com/jonasbn/perl-date-holidays-abstract.git
+version: '0.08'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

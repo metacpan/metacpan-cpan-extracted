@@ -17,7 +17,7 @@ use constant _F_ELEMENTS  => 5;     # elements arrayref
 use constant _F_ROTATORS  => 6;     # rotators arrayref, initially empty
 use constant _NFIELDS     => 7;
 
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 
 our $_MAX_ENUM_COUNT = 32768;
 our $_LOG_MAX_ORDER = 21 * log(2);
@@ -122,12 +122,6 @@ sub _sort_elements {
     return \@elements;
 }
 
-sub _elements_from_deltas {
-    my $sum = 0;
-    my @elements = map { $sum += $_ } 0, 1, split / /, $_[0];
-    return \@elements;
-}
-
 sub _data {
     if (!defined $DATA) {
         $DATA = Math::DifferenceSet::Planar::Data->new;
@@ -168,14 +162,13 @@ sub new {
         my $key = defined($exponent)? "$base, $exponent": $order;
         croak "PDS($key) not available";
     }
-    my $elements = _elements_from_deltas($pds->deltas);
     return bless [
         $pds->order,
         $pds->base,
         $pds->exponent,
         $pds->modulus,
         $pds->n_planes,
-        $elements,
+        $pds->elements,
         [],
     ], $class;
 }
@@ -241,14 +234,13 @@ sub iterate_available_sets {
     return sub {
         my $pds = $dit->();
         return undef if !$pds;
-        my $elements = _elements_from_deltas($pds->deltas);
         return bless [
             $pds->order,
             $pds->base,
             $pds->exponent,
             $pds->modulus,
             $pds->n_planes,
-            $elements,
+            $pds->elements,
             [],
         ], $class;
     };
@@ -379,7 +371,7 @@ Math::DifferenceSet::Planar - object class for planar difference sets
 
 =head1 VERSION
 
-This documentation refers to version 0.007 of Math::DifferenceSet::Planar.
+This documentation refers to version 0.008 of Math::DifferenceSet::Planar.
 
 =head1 SYNOPSIS
 

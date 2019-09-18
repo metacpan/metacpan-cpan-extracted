@@ -14,12 +14,12 @@ use base 'DBIx::Class::Core';
 
 =head1 VERSION
 
-This documentation refers to version 0.007 of
+This documentation refers to version 0.008 of
 Math::DifferenceSet::Planar::Schema::Result::DifferenceSet.
 
 =cut
 
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 
 =head1 TABLE: C<difference_set>
 
@@ -56,7 +56,7 @@ __PACKAGE__->table("difference_set");
 
 =head2 deltas
 
-  data_type: 'text'
+  data_type: 'blob'
   is_nullable: 0
 
 =cut
@@ -73,8 +73,28 @@ __PACKAGE__->add_columns(
   "n_planes",
   { data_type => "integer", is_nullable => 0 },
   "deltas",
-  { data_type => "text", is_nullable => 0 },
+  { data_type => "blob", is_nullable => 0 },
 );
+
+=head2 elements
+
+I<elements> is a wrapper for I<deltas> generating an array of elements
+values from the deltas raw data.  It returns an array reference if
+deltas is defined, otherwise undef.
+
+Unpacking deltas raw data into elements is part of the resultset API,
+as different implementations may employ different packing mechanisms.
+
+=cut
+
+sub elements {
+    my ($this) = @_;
+    my $deltas = $this->deltas;
+    return undef if !defined $deltas;
+    my $sum = 0;
+    my @elements = map { $sum += $_ } 0, 1, unpack 'w*', $deltas;
+    return \@elements;
+}
 
 =head1 PRIMARY KEY
 

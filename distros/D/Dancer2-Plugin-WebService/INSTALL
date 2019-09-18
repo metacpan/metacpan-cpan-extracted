@@ -1,49 +1,35 @@
 Make sure you have the prerequisite modules installed.
-e.g for Redhat/Centos 7.x
+
+Packages for Redhat/Centos
 
 	yum install perl-devel perl-ExtUtils-ParseXS perl-ExtUtils-Install perl-ExtUtils-MakeMaker perl-ExtUtils-Manifest perl-Test-Harness
 	yum install perl-CPAN perl-CPAN-Meta perl-CPAN-Meta-Requirements perl-CPAN-Meta-YAML perl-CPANPLUS-Dist-Build perl-Parse-CPAN-Meta perl-Test-CPAN-Meta perl-CPAN-Changes perl-CPANPLUS perl-Module-Signature perl-Version-Requirements perl-YAML
 	yum install perl-Data-Dumper
 	yum install perl-App-cpanminus 
 
+Packages for Archlinux
+
+	pacman -S perl-data-dump
+	pacman -S cpanminus
+
+Modules to install from cpan
+
 	cpanm XML::Hash::XS
 	cpanm JSON::XS
 	cpanm YAML::XS
 	cpanm Moo
+	cpanm ExtUtils::Config
+	cpanm IO::HTML
+	cpanm HTTP::Headers
+	cpanm HTTP::Entity::Parser
+	cpanm HTTP::Request::Common
+	cpanm Net::Server
 	cpanm Plack
 	cpanm Plack::Middleware::Deflater
 	cpanm Starman
 	cpanm Template::Toolkit
 	cpanm Dancer2
 	cpanm Dancer2::Plugin::WebService
-
-After install Dancer2::Plugin::WebService you should run it as a non privileged user e.g. dancer
-Be careful, non root users can not bind ports up to 1024
-Create the user and ownership
-
-	getent group  dancer >/dev/null || groupadd dancer
-	getent passwd dancer >/dev/null || useradd -g dancer -l -M -c "Dancer2 WebService" -s $(which nologin) dancer
-
-	mkdir /var/lib/WebService ; chown -R dancer:dancer /var/lib/WebService
-	mkdir /var/log/WebService ; chown -R dancer:dancer /var/log/WebService
-
-If there is a firewall open the listening port e.g. at Redhat
-
-	firewall-cmd --zone=public --permanent --add-port=3000/tcp
-	firewall-cmd --reload
-	firewall-cmd --list-all
-
-	# Redhat
-	find /usr/local/share/perl5/Dancer2/Plugin/scripts      -regex ".*\.\(sh\|pl\)\$" -type f -exec chmod 755 {} \;	
-	# Archlinux
-	find /usr/share/perl5/site_perl/Dancer2/Plugin/scripts  -regex ".*\.\(sh\|pl\)\$" -type f -exec chmod 755 {} \;
-	
-If you want to use an authentication method that needs sudo, you must add the user running
-the WebService ( dancer ) on a sudoers file e.g.
-
-	vi /etc/sudoers.d/WebService
-
-		dancer ALL=NOPASSWD: /usr/local/share/perl5/Dancer2/Plugin/scripts/LinuxOS/AuthUser.pl
 
 Use logrotate for housekeeping the log files
 vi /etc/logrotate.d/WebService
@@ -57,8 +43,45 @@ vi /etc/logrotate.d/WebService
 	rotate 7
 	}
 
+You should your run your service as a non privileged user e.g. dancer.
+Be careful, non root users can not bind ports up to 1024
+Create the user if not exist
 
-Create a skeleton for your service e.g. at  /opt/TestService/
+	getent group  dancer >/dev/null || groupadd dancer
+	getent passwd dancer >/dev/null || useradd -g dancer -l -M -c "Dancer2 WebService" -s $(which nologin) dancer
+
+Create the Persistent data and log directories. You can change them if you want
+
+	mkdir /var/lib/WebService
+	mkdir /var/log/WebService
+
+	chown -R dancer:dancer /var/lib/WebService
+	chown -R dancer:dancer /var/log/WebService
+
+If you have a firewall you should create a rule for the listening port e.g. at Redhat
+
+	firewall-cmd --zone=public --permanent --add-port=3000/tcp
+	firewall-cmd --reload
+	firewall-cmd --list-all
+
+If you are running the service as user dancer, and want to want to use an authentication method that needs root, add dancer user to sudoers e.g.
+
+	vi /etc/sudoers
+
+		#includedir /etc/sudoers.d
+
+	vi /etc/sudoers.d/WebService
+
+		dancer ALL=NOPASSWD: /usr/local/share/perl5/Dancer2/Plugin/scripts/LinuxOS/AuthUser.pl
+
+Make sure the authorization scripts are executable
+
+	# Redhat
+	find /usr/local/share/perl5/Dancer2/Plugin      -regex ".*\.\(sh\|pl\)\$" -type f -exec chmod 755 {} \;	
+	# Archlinux
+	find /usr/share/perl5/site_perl/Dancer2/Plugin  -regex ".*\.\(sh\|pl\)\$" -type f -exec chmod 755 {} \;
+
+Create your application ( TestService ) e.g. at /opt/TestService/
 
 	dancer2 gen --application TestService --directory TestService --path /opt --overwrite
 	chown -R dancer:dancer /opt/TestService
@@ -77,32 +100,24 @@ vi /opt/TestService/bin/app.psgi
 Configure the production enviroment
 vi /opt/TestService/environments/production.yml
 
+    # logger    : file, console
+    # log level : core, debug, info, warning, error
 
+    startup_info     : 1
+    show_errors      : 1
+    warnings         : 1
+    no_server_tokens : 0
 
-
-# logger    : file, console
-# log level : core, debug, info, warning, error
-
-startup_info     : 1
-show_errors      : 1
-warnings         : 1
-no_server_tokens : 0
-
-logger           : 'console'
-log              : 'file'
-engines:
-  logger:
-    file:
-      log_format : '{"ts":"%{%Y-%m-%d %H:%M:%S}t","host":"%h","level":"%L","message":"%m"}'
-      log_dir    : '/var/log/WebService'
-      file_name  : 'TestService.log'
-    console:
-      log_format : '{"ts":"%{%Y-%m-%d %H:%M:%S}t","host":"%h","level":"%L","message":"%m"}'
-
-
-
-
-
+    logger           : 'console'
+    log              : 'file'
+    engines:
+      logger:
+        file:
+          log_format : '{"ts":"%{%Y-%m-%d %H:%M:%S}t","host":"%h","level":"%L","message":"%m"}'
+          log_dir    : '/var/log/WebService'
+          file_name  : 'TestService.log'
+        console:
+          log_format : '{"ts":"%{%Y-%m-%d %H:%M:%S}t","host":"%h","level":"%L","message":"%m"}'
 
 
 
@@ -112,10 +127,9 @@ Configure your application settings, changing the values to your needs
 vi /opt/TestService/config.yml
 
 
-
 # enviroment related settings should go to /environments yml files
 
-
+version                 : 4.1.3
 environment             : production
 charset                 : UTF-8
 plugins                 :
@@ -125,58 +139,44 @@ plugins                 :
     Session idle timout : 3600
     Default format      : json
     Routes              :
-      secure            : private
-      mirror            : public
-      route1            : public
-      route2            : public
-      route3            : public
-      error             : public
-      get1              : public
-      get2              : public
+      INeedLogin        : private
+      summer            : public
+      winter            : public
 
     Allowed hosts:
-
-      - 127.*
-      - 10.*
-      - 172.??.?.*
-      - 192.168.1.23
-      - 4.?.?.??
-      - ????:????:????:6d00:20c:29ff:*:ffa3
-      - "*"
-
-    User must belong to one or more of the groups:
-
-      - powerusers
-      - postfix
-      - tape
+    - 127.*
+    - 10.*
+    - 172.??.?.*
+    - 192.168.1.23
+    - 4.?.?.??
+    - ????:????:????:6d00:20c:29ff:*:ffa3
+    - "*"
 
     Authentication methods:
+    - Name     : simple
+      Active   : yes
+      Command  : INTERNAL
+      Accounts :
+        <any>  : secret4all
+        user1  : <any>		
+        user2  : pass2
 
-      - Name     : simple
-        Active   : yes
-        Command  : INTERNAL
-        Users    :
-          <any>  : secret4all
-          user1  : <any>		
-          user2  : pass2
+    - Name      : Linux native users
+      Active    : false
+      Command   : MODULE_INSTALL_DIR/AuthScripts/LinuxNative.pl
+      Arguments : [ ]
+      Groups    : [root, ldap , gluster , ceph]
+      Use sudo  : true
 
-      - Name     : Linux native users
-        Active   : yes
-        Command  : MODULE_INSTALL_DIR/scripts/LinuxOS/AuthUser.pl
-        Use sudo : yes
-
-      - Name     : Basic Apache auth for simple users
-        Active   : no
-        Command  : MODULE_INSTALL_DIR/scripts/HttpBasic/users.pl
-        Use sudo : no
-
-      - Name     : Basic Apache auth for admins
-        Active   : no
-        Command  : MODULE_INSTALL_DIR/scripts/HttpBasic/admins.pl
-        Use sudo : no
+    - Name      : Basic Apache auth for simple users
+      Active    : true
+      Command   : MODULE_INSTALL_DIR/AuthScripts/HttpBasic.sh
+      Arguments : [ "/etc/htpasswd" ]
+      Groups    : [ ]
+      Use sudo  : no
 
 
-Write your real code at   /opt/TestService/lib/TestService.pm   e.g.
+Write your rest service code at   /opt/TestService/lib/TestService.pm   e.g.
 vi /opt/TestService/lib/TestService.pm
 
 
@@ -244,6 +244,10 @@ Add at your nginx.conf something similar to
 
 
 
+plackup executable is usually at the following locations
+
+    /usr/local/bin/plackup        # RedHat
+    /usr/bin/site_perl/plackup    # Archlinux
 
 
 It is a good idea tou start your application as Linux service
@@ -251,8 +255,6 @@ We bind at port 127.0.0.1 because we usually publish such services
 using the the nginx as reverse proxy
 
 vi /usr/lib/systemd/system/testservice.service
-
-
 
 
 [Unit]
@@ -284,9 +286,6 @@ RestartSec=60s
 WantedBy=multi-user.target
 
 
-
-
-
 start the service
 
 	systemctl enable    testservice.service
@@ -294,7 +293,7 @@ start the service
 	systemctl start     testservice
 	systemctl is-active testservice
 	systemctl status    testservice
-	journalctl -xeu     testservice | less
+	journalctl -xelu    testservice | less
 
 delete the service
 
@@ -304,17 +303,18 @@ delete the service
 
 start the application manual
 
-	cd /opt/TestService; sudo -u dancer plackup --host 127.0.0.1 --port 3000 --server Starman --workers=10 --env production -a /opt/TestService/bin/app.psgi
+	cd /opt/TestService
 
-or during development (Redhat)
-
-	sudo -u dancer /usr/local/bin/plackup --port 3000 -a /opt/TestService/bin/app.psgi --Reload /opt/TestService/lib,/opt/TestService/config.yml,/usr/local/share/perl5/Dancer2/Plugin
+	# production
+	sudo -u dancer plackup --host 0.0.0.0 --port 3000 --server Starman --workers=5 --env production -a /opt/TestService/bin/app.psgi
 	
-	or without Plack
+	# development
+	sudo -u dancer plackup --host 0.0.0.0 --port 3000 --server HTTP::Server::PSGI --env development --Reload /opt/TestService/lib/TestService.pm,/opt/TestService/config.yml -a /opt/TestService/bin/app.psgi
 
+	# without Plack
 	sudo -u dancer perl /opt/TestService/bin/app.psgi
 
 quick test
 
 	ss -tln 'sport = :3000'
-	curl -X GET http://localhost:3000/info?to=human
+	curl -X GET http://localhost:3000/WebService?to=human

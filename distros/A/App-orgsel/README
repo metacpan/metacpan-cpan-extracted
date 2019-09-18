@@ -3,8 +3,8 @@ NAME
     (CSS-selector-like) syntax
 
 VERSION
-    This document describes version 0.007 of App::orgsel (from Perl
-    distribution App-orgsel), released on 2019-07-29.
+    This document describes version 0.009 of App::orgsel (from Perl
+    distribution App-orgsel), released on 2019-08-08.
 
 SYNOPSIS
 FUNCTIONS

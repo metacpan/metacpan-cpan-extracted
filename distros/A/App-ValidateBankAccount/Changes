@@ -1,5 +1,8 @@
 Revision history for App::ValidateBankAccount
 
+0.10  Tue Sep 17 17:50:00 2019
+      - Moved author test scripts to xt/ subfolder.
+
 0.09  Mon Sep 16 17:40:00 2019
       - Updated dependency on BankAccount::Validator::UK v0.50.
 

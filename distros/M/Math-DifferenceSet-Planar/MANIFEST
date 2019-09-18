@@ -28,8 +28,8 @@ t/db/extra.db
 t/db/extra.pod
 t/db/pds.db
 t/db/pds.pod
-t/db/pds_40.db
-t/db/pds_40.pod
+t/db/pds_48.db
+t/db/pds_48.pod
 t/lib/Test/MyUtils.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

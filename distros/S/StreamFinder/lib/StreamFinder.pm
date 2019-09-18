@@ -56,7 +56,15 @@ file.
 	
 	my $stationDescription = $station->getTitle('desc');
 	
-	print "Description=$stationDescription\n"  if (defined $stationDescription);
+	print "Description=$stationDescription\n";
+	
+	my $artist = $station->{'artist'};
+
+	print "Artist=$artist\n"  if ($artist);
+	
+	my $genre = $station->{'genre'};
+
+	print "Genre=$genre\n"  if ($genre);
 	
 	my $icon_url = $station->getIconURL();
 
@@ -90,22 +98,24 @@ file.
 
 =head1 DESCRIPTION
 
-StreamFinder accepts a valid radio station URL on supported websites and
-returns the actual stream URL(s), title, and cover art icon for that station.  
-The purpose is that one needs one of these URLs 
+StreamFinder accepts a valid radio station  or video URL on supported websites 
+and returns the actual stream URL(s), title, and cover art icon for that 
+station.  The purpose is that one needs one of these URLs 
 in order to have the option to stream the station/video in one's own choice of 
 media player software rather than using their web browser and accepting any / 
 all flash, ads, javascript, cookies, trackers, web-bugs, and other crapware 
 associated with that method of playing.  The author uses his own custom 
 all-purpose media player called "fauxdacious" (his custom hacked version of 
 the open-source "audacious" audio player).  "fauxdacious" incorporates this 
-module to decode and play streams.  The currently-supported websites are:
-radionomy.com, iheartradio.com, reciva.com, radio.net, facebook, banned.video, 
-and youtube / vimeo / brighteon, et. al.  We are again supporting tunein.com, 
-but it may not work for all stations / podcasts!
+module to decode and play streams.  The currently-supported websites are:  
+radionomy.com, iheartradio.com, reciva.com, radio.net, banned.video, 
+podcasts.apple.com, vimeo.com, brighteon.com, and (youtube.com, et. al).  
+We are again supporting tunein.com, but it may not work for all stations 
+/ podcasts!
 
-NOTE:  For some sites, ie. Youtube, Facebook, and BannedVideo, the "station" 
-object actually refers to a specific video, but functions the same way!
+NOTE:  For some sites, ie. Youtube, Vimeo, Brighteon, and BannedVideo, the 
+"station" object actually refers to a specific video, but functions the 
+same way!
 
 Each site is supported by a separate subpackage (StreamFinder::I<Package>), 
 which is determined and selected based on the url when the StreamFinder object 
@@ -114,7 +124,12 @@ is created.  The methods are overloaded by the selected subpackage's methods.
 Please see the POD. documentation for each subpackage for important additional 
 information on options and features specific to each site / subpackage!
 
-One or more playable streams can be returned for each station / video.  
+One or more playable streams can be returned for each station / video.
+
+If you have another streaming site that is not supported, please file a 
+feature request via email or the CPAN bug system, or for faster service, 
+a Perl patch module / program source that can extract some or all of the 
+necessary information for streams on that site and I'll consider it!
 
 =head1 SUBROUTINES/METHODS
 
@@ -196,9 +211,9 @@ the "icon image" data will be returned.
 =item $video->B<getType>()
 
 Returns the station's type (I<submodule-name>).  
-(one of:  "BannedVideo", "Facebook", "IHeartRadio", "RadioNet", 
-"Radionomy", "Reciva", "Tunein", or "Youtube" - depending on 
-the sight that matched the URL.
+(one of:  "Apple", "BannedVideo", "IHeartRadio", "RadioNet", 
+"Radionomy", "Reciva", "Tunein", "Youtube" or "Vimeo" - 
+depending on the sight that matched the URL.
 
 =back
 
@@ -243,9 +258,7 @@ L<URI::Escape>, L<HTML::Entities>, L<LWP::UserAgent>
 
 =head1 RECCOMENDS
 
-L<WWW::YouTube::Download> (for Youtube)
-
-youtube-dl (for Youtube, Facebook, Tunein)
+youtube-dl (for Brighteon, Tunein, Vimeo)
 
 wget
 
@@ -337,14 +350,16 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '1.13';
-our $DEBUG = 1;
+our $VERSION = '1.20';
+our $DEBUG = 0;
 
 require Exporter;
 
 @ISA = qw(Exporter);
 @EXPORT = qw();
-my @supported_mods = (qw(Radionomy IHeartRadio Youtube Reciva Facebook RadioNet BannedVideo Tunein));
+my @supported_mods = (qw(Radionomy IHeartRadio Youtube Reciva RadioNet 
+		BannedVideo Tunein Brighteon Vimeo Apple));
+
 my %haveit;
 
 foreach my $module (@supported_mods)
@@ -363,23 +378,33 @@ sub new
 
 	my @args = @_;
 	push @args, ('-debug', $DEBUG)  if ($DEBUG);
-	if ($haveit{'Facebook'} && ($url =~ m#^http[s]?\:\/\/\w*\.facebook\.#)) {
-		return new StreamFinder::Facebook($url, @args);
+	if ($haveit{'BannedVideo'} && $url =~ m#\bbanned\.video\/#) {
+		return new StreamFinder::BannedVideo($url, @args);
 	} elsif ($haveit{'IHeartRadio'} && $url =~ m#\biheart\.com\/#) {
 #		return new StreamFinder::IHeartRadio($url, 'secure_shoutcast', 'secure', 'any', '!rtmp', @args); #DEPRECIATED, USE CONFIG FILE!
 		return new StreamFinder::IHeartRadio($url, @args);
-	} elsif ($haveit{'Reciva'} && $url =~ m#\breciva\.com\/#) {
-		return new StreamFinder::Reciva($url, @args);
+	} elsif ($haveit{'Tunein'} && $url =~ m#\btunein\.com\/#) {  #NOTE:ALSO USES youtube-dl!
+		return new StreamFinder::Tunein($url, @args);
 	} elsif ($haveit{'RadioNet'} && $url =~ m#\bradio\.net\/#) {
 		return new StreamFinder::RadioNet($url, @args);
 	} elsif ($haveit{'Radionomy'} && $url =~ m#\bradionomy\.com\/#) {
 		return new StreamFinder::Radionomy($url, @args);
-	} elsif ($haveit{'BannedVideo'} && $url =~ m#\bbanned\.video\/#) {
-		return new StreamFinder::BannedVideo($url, @args);
-	} elsif ($haveit{'Tunein'} && $url =~ m#\btunein\.com\/#) {  #NOTE:ALSO USES StreamFinder::Youtube!
-		return new StreamFinder::Tunein($url, @args);
-	} else {  #DEFAULT TO youtube-dl SINCE SO MANY URLS ARE HANDLED THERE NOW.
+	} elsif ($haveit{'Reciva'} && $url =~ m#\breciva\.com\/#) {
+		return new StreamFinder::Reciva($url, @args);
+	} elsif ($haveit{'Brighteon'} && $url =~ m#\bbrighteon\.com\/#) {  #NOTE:ALSO USES youtube-dl!
+		return new StreamFinder::Brighteon($url, @args);
+	} elsif ($haveit{'Vimeo'} && $url =~ m#\bvimeo\.com\/#) {  #NOTE:ALSO USES youtube-dl!
+		return new StreamFinder::Vimeo($url, @args);
+	} elsif ($haveit{'Apple'} && $url =~ m#\b(?:podcasts?|music)\.apple\.com\/#) {  #NOTE:ALSO USES youtube-dl!
+		return new StreamFinder::Apple($url, @args);
+#	} elsif ($haveit{'Facebook'} && ($url =~ m#^http[s]?\:\/\/\w*\.facebook\.#)) {  #REMOVED SUPPORT AS FB NOW LOCKS YOUR ACCOUNT & FORCES PASSWORD CHANGE!
+#		return new StreamFinder::Facebook($url, @args);
+#	} elsif ($haveit{'Youtube'} && $url =~ m#\b(?:youtube|youtu|yt)\.\/#) {
+#		return new StreamFinder::Youtube($url, @args);
+	} elsif ($haveit{'Youtube'}) {  #DEFAULT TO youtube-dl SINCE SO MANY URLS ARE HANDLED THERE NOW.
 		return new StreamFinder::Youtube($url, @args);
+	} else {
+		return undef;
 	}
 }
 

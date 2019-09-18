@@ -15,7 +15,7 @@ use constant _F_DATA     => 0;  # result set object
 use constant _F_PATH     => 1;  # result set object
 use constant _NFIELDS    => 2;
 
-our $VERSION  = '0.007';
+our $VERSION  = '0.008';
 our @CARP_NOT = qw(Math::DifferenceSet::Planar);
 
 our $DATABASE_DIR = dist_dir('Math-DifferenceSet-Planar');
@@ -124,7 +124,7 @@ Math::DifferenceSet::Planar::Data - storage of sample planar difference sets
 
 =head1 VERSION
 
-This documentation refers to version 0.007 of
+This documentation refers to version 0.008 of
 Math::DifferenceSet::Planar::Data.
 
 =head1 SYNOPSIS
@@ -210,7 +210,8 @@ Math::DifferenceSet::Planar::Schema::Result::DifferenceSet.
 
 C<$data-E<gt>get($order, @columns)> does the same, but returns a partial
 record with only the columns that are specified.  This is particularly
-efficient if the I<deltas> column is not needed.
+efficient if the I<deltas> column and thus the I<elements> accessor are
+not needed.
 
 =item I<iterate>
 
@@ -231,8 +232,9 @@ descending size.
 If C<$data> is a Math::DifferenceSet::Planar::Data object,
 C<$data-E<gt>iterate_properties(@args)> behaves exactly like
 C<$data-E<gt>iterate(@args)>, except that the result records have no
-deltas component.  Using this method to browse difference set properties
-is more efficient than fetching complete records.
+deltas component and thus no access to elements.  Using this method
+to browse difference set properties is more efficient than fetching
+complete records.
 
 =item I<max_order>
 

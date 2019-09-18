@@ -25,7 +25,7 @@ no_index:
 provides:
   Sweat:
     file: lib/Sweat.pm
-    version: '201909090'
+    version: '201909171'
   Sweat::Article:
     file: lib/Sweat/Article.pm
   Sweat::Drill:
@@ -37,9 +37,11 @@ requires:
   File::Slurper: '0'
   File::Spec: '0'
   File::Temp: '0'
+  File::Which: '0'
   FindBin: '0'
   HTML::Strip: '0'
   LWP: '0'
+  LWP::Protocol::https: '0'
   List::Util: '0'
   MediaWiki::API: '0'
   Moo: '0'
@@ -50,13 +52,16 @@ requires:
   Types::Standard: '0'
   Web::NewsAPI: '0'
   YAML: '0'
+  namespace::clean: '0'
   perl: v5.10.0
   utf8::all: '0'
 resources:
   bugtracker: https://github.com/jmacdotorg/sweat/issues
   homepage: https://github.com/jmacdotorg/sweat
   repository: git://github.com/jmacdotorg/sweat.git
-version: '201909090'
+version: '201909171'
 x_authority: cpan:JMAC
+x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

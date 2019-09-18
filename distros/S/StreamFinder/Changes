@@ -74,3 +74,26 @@ Revision history for StreamFinder
 1.13    2019/09/11
         - Fix missing (recently-added) file (RadioNet.pm) in MANIFEST file.
         - More doc. fixes, mostly to the individual submodules.
+1.20    
+        - Removed usage and all references to WWW::Youtube::Download - 
+        This module no longer fetches the "author" (Youtube user) or do 
+        anything else we can't more easily do manually.
+        - StreamFinder::Apple: (podcasts.apple.com) ADDED!
+        - StreamFinder::Brighteon: (brighteon.com) ADDED (split off from 
+        StreamFinder::Youtube).
+        - StreamFinder::Vimeo: (vimeo.com) ADDED (split off from 
+        StreamFinder::Youtube.
+        We separated these for better support - ie. ability to get the "author" 
+        fields and access some additional streams.  We also can often avoid 
+        having to call youtube-dl.
+        - StreamFinder::Youtube: Removed "notitle" option, added "fast" option, 
+        and add "description" field fetch to youtube-dl.  Fixed url-fetching 
+        order to call youtube-dl FIRST to prevent infinite stall if called 
+        with a valid stream-url.
+        StreamFinder::IHeartRadio - Fix sometimes-corrupted ID field.
+        StreamFinder::Reciva - Fix failure to always capture ID field if 
+        given wrongly-formatted full url.
+        - Add $station->{'genre'} field to IHeartRadio, RadioNet, Reciva, and 
+        Tunein (the sites that support it).
+        - Various small code and doc. tweaks / cleanups.
+        - DEBUG was accidently left set to ON, turnedit OFF by default!

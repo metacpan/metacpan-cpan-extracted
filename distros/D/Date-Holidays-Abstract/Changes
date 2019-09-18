@@ -1,5 +1,9 @@
 Changes file for Date-Holidays-Abstract
 
+0.08 2018.09-17 maintenance release, update not necessary
+
+- Corrected wrong homepage URL
+
 0.07 2014.09.01, maintenance release, update not necessary
 
 - Updated requirement to Class::Virtually::Abstract instead of Class::Virtual,

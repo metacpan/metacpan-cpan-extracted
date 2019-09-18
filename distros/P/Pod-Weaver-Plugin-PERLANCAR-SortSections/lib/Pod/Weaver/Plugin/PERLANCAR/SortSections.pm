@@ -1,7 +1,7 @@
 package Pod::Weaver::Plugin::PERLANCAR::SortSections;
 
-our $DATE = '2017-02-14'; # DATE
-our $VERSION = '0.06'; # VERSION
+our $DATE = '2019-09-17'; # DATE
+our $VERSION = '0.07'; # VERSION
 
 use 5.010001;
 use Moose;
@@ -49,10 +49,13 @@ sub finalize_document {
 
             # FAQ (after all content & references)
             'FAQ',
+            'FAQS',
 
             # links/pointers (CLI)
             'CONFIGURATION FILE',
+            'CONFIGURATION FILES',
             'ENVIRONMENT',
+            'ENVIRONMENT VARIABLES',
             'FILES',
 
             # todos
@@ -93,7 +96,7 @@ Pod::Weaver::Plugin::PERLANCAR::SortSections - Sort POD sections like PERLANCAR
 
 =head1 VERSION
 
-This document describes version 0.06 of Pod::Weaver::Plugin::PERLANCAR::SortSections (from Perl distribution Pod-Weaver-Plugin-PERLANCAR-SortSections), released on 2017-02-14.
+This document describes version 0.07 of Pod::Weaver::Plugin::PERLANCAR::SortSections (from Perl distribution Pod-Weaver-Plugin-PERLANCAR-SortSections), released on 2019-09-17.
 
 =head1 SYNOPSIS
 
@@ -131,7 +134,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

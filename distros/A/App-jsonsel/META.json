@@ -33,8 +33,8 @@
       },
       "runtime" : {
          "requires" : {
-            "App::CSelUtils" : "0.082",
-            "Data::CSel::WrapStruct" : "0",
+            "App::CSelUtils" : "0.084",
+            "Data::CSel::WrapStruct" : "0.004",
             "Data::Sah::Compiler::perl::TH::array" : "0",
             "Data::Sah::Compiler::perl::TH::str" : "0",
             "File::Slurper" : "0",
@@ -67,7 +67,7 @@
          "web" : "https://github.com/perlancar/perl-App-jsonsel"
       }
    },
-   "version" : "0.004",
+   "version" : "0.006",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028002"

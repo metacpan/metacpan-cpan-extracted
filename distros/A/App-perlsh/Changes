@@ -1,5 +1,9 @@
 Revision history for App-perlsh
 
+0.02    2019-09-17 23:20:05
+        [BUGFIXES]
+         * Append a linefeed to input in case the code ends with a comment
+
 0.01    2015/07/17 14:56:35
         First version, released on an unsuspecting world.
 

@@ -1,5 +1,9 @@
 Revision history for Perl extension Math::DifferenceSet::Planar.
 
+0.008   Tue, 17 Sep 2019 23:44:16 +0200
+        - made raw data format more space-efficient
+        - moved elements unpacking into database API
+
 0.007   Thu, 05 Sep 2019 16:56:07 +0200
         - test coverage
         - documentation typos

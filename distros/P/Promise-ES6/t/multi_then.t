@@ -4,7 +4,12 @@ use strict;
 use warnings;
 
 use Test::More;
+use Test::FailWarnings;
 use parent qw(Test::Class);
+
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use MemoryCheck;
 
 use Promise::ES6;
 

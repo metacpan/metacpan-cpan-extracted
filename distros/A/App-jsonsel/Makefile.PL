@@ -20,8 +20,8 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::jsonsel",
   "PREREQ_PM" => {
-    "App::CSelUtils" => "0.082",
-    "Data::CSel::WrapStruct" => 0,
+    "App::CSelUtils" => "0.084",
+    "Data::CSel::WrapStruct" => "0.004",
     "Data::Sah::Compiler::perl::TH::array" => 0,
     "Data::Sah::Compiler::perl::TH::str" => 0,
     "File::Slurper" => 0,
@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,8 +45,8 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "App::CSelUtils" => "0.082",
-  "Data::CSel::WrapStruct" => 0,
+  "App::CSelUtils" => "0.084",
+  "Data::CSel::WrapStruct" => "0.004",
   "Data::Sah::Compiler::perl::TH::array" => 0,
   "Data::Sah::Compiler::perl::TH::str" => 0,
   "File::Slurper" => 0,

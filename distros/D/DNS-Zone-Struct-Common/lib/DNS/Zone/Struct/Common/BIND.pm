@@ -1,7 +1,7 @@
 package DNS::Zone::Struct::Common::BIND;
 
-our $DATE = '2019-09-09'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-09-17'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -167,7 +167,7 @@ DNS::Zone::Struct::Common::BIND - BIND-related DNS zone routines
 
 =head1 VERSION
 
-This document describes version 0.003 of DNS::Zone::Struct::Common::BIND (from Perl distribution DNS-Zone-Struct-Common), released on 2019-09-09.
+This document describes version 0.004 of DNS::Zone::Struct::Common::BIND (from Perl distribution DNS-Zone-Struct-Common), released on 2019-09-17.
 
 =head1 SYNOPSIS
 

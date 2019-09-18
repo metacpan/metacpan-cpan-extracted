@@ -1,5 +1,25 @@
 Revision history for Perl extension AnyEvent.
 
+TODO: document TCP_*** constants
+TODO: add debug/trace logging to some modules
+TODO: use the eval-with-cb-call trick also to speed up JSON?
+TODO: FAQ: common pitfalls? invoke-before-return
+TODO: FAQ: scope-ids? hosts file order?
+TODO: AnyEvent::Handle with AnyEvent::IO?
+TODO: invalid. and localhost. specialcasing inside AEDNS and not AESocket (rfc6761)
+TODO: maybe implement env variable to give hosts precedence
+TODO: more formats for parse_ipv6 (single ipv6 address without port, ...p80, ...#80)
+TODO: inet_aton maybe pack C4? no, add a comment why not
+TODO: socket prepare callbacks, can they easily signal failure as well?
+TODO: Олег Г <verdrehung@gmail.com>, empty A record response causes
+AnyEvent::resolve_sockaddr to eventually call pack_sockaddr with undef -
+broken dns server, but maybe improve the response.
+
+7.17 Wed Sep 18 03:04:49 CEST 2019
+	- work around antique openssl version in RHEL 7  by formatting
+          dh parameters differently (reported by several people).
+	- add t/13_weaken.t.
+
 7.16 Fri Jul 19 18:00:21 CEST 2019
 	- add ffdhe group dh parameters from RFC 7919, and use ffdhe3072
           as new default, instead of schmorp1539.

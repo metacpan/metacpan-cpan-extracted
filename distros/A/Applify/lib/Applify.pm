@@ -13,7 +13,7 @@ use constant SUB_NAME_IS_AVAILABLE => $INC{'App/FatPacker/Trace.pm'}
 our $INSTANTIATING = 0;
 our $PERLDOC       = 'perldoc';
 our $SUBCMD_PREFIX = 'command';
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 my $ANON = 0;
 
 sub app {
@@ -24,13 +24,21 @@ sub app {
   local @ARGV = @ARGV;
   shift @ARGV if $self->_subcommand_activate($ARGV[0]);
 
-  # Parse command line options
-  my $parsed_options
-    = $self->option_parser->getoptions(\my %argv, (map { $self->_calculate_option_spec($_) } @{$self->options}),
-    $self->_default_options);
+  my (%argv, @spec);
+  $self->_run_hook(before_options_parsing => \@ARGV);
+
+  for my $option (@{$self->options}, @{$self->_default_options}) {
+    push @spec, $self->_calculate_option_spec($option);
+    $argv{$option->{name}} = $option->{n_of} ? [] : undef;
+  }
+
+  my $got_valid_options = $self->option_parser->getoptions(\%argv, @spec);
+
+  # Remove default $argv{foo} = [] and $argv{bar} = undef
+  delete $argv{$_} for grep { !defined $argv{$_} || ref $argv{$_} eq 'ARRAY' && !@{$argv{$_}} } keys %argv;
 
   # Check if we should abort running the app based on user argv
-  if (!$parsed_options) {
+  if (!$got_valid_options) {
     $self->_exit(1);
   }
   elsif ($argv{help}) {
@@ -75,6 +83,12 @@ sub extends {
   return $self;
 }
 
+sub hook {
+  my ($self, $name, $cb) = @_;
+  push @{$self->{hook}{$name}}, $cb;
+  return $self;
+}
+
 sub import {
   my ($class, %args) = @_;
   my @caller = caller;
@@ -85,14 +99,11 @@ sub import {
   strict->import;
   warnings->import;
 
-  $self->{skip_subs} = {app => 1, option => 1, version => 1, documentation => 1, extends => 1, subcommand => 1};
-
   no strict 'refs';
-  for my $name (keys %$ns) {
-    $self->{'skip_subs'}{$name} = 1;
-  }
+  $self->{skip_subs}{$_} = 1 for keys %$ns;
 
-  for my $k (qw(app extends option version documentation subcommand)) {
+  for my $k (qw(app extends hook option version documentation subcommand)) {
+    $self->{skip_subs}{$k} = 1;
     my $name = $args{$k} // $k;
     next unless $name;
     $export{$k} = $name =~ /::/ ? $name : "$caller[0]\::$name";
@@ -100,6 +111,7 @@ sub import {
 
   no warnings 'redefine';    # need to allow redefine when loading a new app
   *{$export{app}}           = sub (&) { $self->app(@_) };
+  *{$export{hook}}          = sub     { $self->hook(@_) };
   *{$export{option}}        = sub     { $self->option(@_) };
   *{$export{version}}       = sub     { $self->version(@_) };
   *{$export{documentation}} = sub     { $self->documentation(@_) };
@@ -126,6 +138,8 @@ sub option {
   my %option = @_ % 2 ? (default => @_) : @_;
   $option{alias} = [$option{alias}] if $option{alias} and !ref $option{alias};
   $option{arg}   = do { local $_ = $name; s!_!-!g; $_ } unless $option{arg};
+  $option{default} //= !!0 if $type eq 'bool';
+
   push @{$self->options}, {%option, type => $type, name => $name, documentation => $documentation};
 
   return $self;
@@ -134,9 +148,12 @@ sub option {
 sub option_parser {
   my $self = shift;
   return do { $self->{option_parser} = shift; $self } if @_;
+
+  my @config = qw(no_auto_help no_auto_version pass_through);
+  push @config, 'debug' if $ENV{APPLIFY_DEBUG};
   return $self->{option_parser} ||= do {
     require Getopt::Long;
-    Getopt::Long::Parser->new(config => [qw(no_auto_help no_auto_version pass_through)]);
+    Getopt::Long::Parser->new(config => \@config);
   };
 }
 
@@ -144,14 +161,9 @@ sub options { $_[0]->{options} }
 
 sub print_help {
   my $self    = shift;
-  my @options = @{$self->options};
+  my @options = (@{$self->options}, {}, @{$self->_default_options}, {});
   my $width   = 0;
-
-  push @options, {name => ''};
-  push @options, {name => 'help', documentation => 'Print this help text'};
-  push @options, {name => 'man', documentation => 'Display manual for this application'} if $self->documentation;
-  push @options, {name => 'version', documentation => 'Print application name and version'} if $self->version;
-  push @options, {name => ''};
+  my %notes;
 
   $self->_print_synopsis;
 
@@ -167,28 +179,26 @@ OPTION:
     my $subcmds = [sort { $a->{name} cmp $b->{name} } values %{$self->{subcommands}}];
     my ($width) = sort { $b <=> $a } map { length($_->{name}) } @$subcmds;
     print "\n    ", File::Basename::basename($0), " [command] [options]\n";
-    print "\ncommands:\n";
+    print "\nCommands:\n";
     printf("    %-${width}s  %s\n", @{$_}{'name', 'desc'}) for @$subcmds;
-    print "\noptions:\n";
+    print "\nOptions:\n";
   }
 
   $width += 2;
 
 OPTION:
   for my $option (@options) {
-    my $arg = $option->{arg} || $option->{name} or do { print "\n"; next OPTION };
-
-    printf(
-      " %s %-${width}s  %s\n",
-      $option->{required} ? '*' : $option->{n_of} ? '+' : ' ',
-      _option_with_dashes($arg),
-      $option->{documentation},
-    );
+    my $arg = $option->{arg} or do { print "\n"; next OPTION };
+    my $prefix
+      = ($option->{required} and $option->{n_of}) ? '++' : $option->{required} ? '*' : $option->{n_of} ? '+' : '';
+    $notes{$prefix}++ if $prefix;
+    printf " %-2s %-${width}s  %s\n", $prefix, _option_with_dashes($arg), $option->{documentation};
   }
 
-  print "Notes:\n";
-  print " * denotes a required option\n";
-  print " + denotes an option that accepts multiple values\n";
+  print "Notes:\n"                                                             if %notes;
+  print " *  denotes a required option\n"                                      if $notes{'*'};
+  print " +  denotes an option that accepts multiple values\n"                 if $notes{'+'};
+  print " ++ denotes an option that accepts multiple values and is required\n" if $notes{'++'};
   return $self;
 }
 
@@ -243,11 +253,10 @@ sub _app_run {
 
 sub _calculate_option_spec {
   my ($self, $option) = @_;
-  my $spec = join '|', $option->{name}, $option->{arg};
 
-  if (ref $option->{alias} eq 'ARRAY') {
-    $spec .= join '|', '', @{$option->{alias}};
-  }
+  my $spec = $option->{name};
+  $spec .= "|$option->{arg}" if $option->{name} ne $option->{arg};
+  $spec .= join '|', '', @{$option->{alias}} if ref $option->{alias} eq 'ARRAY';
 
   if    ($option->{type} =~ /^(?:bool|flag)/i) { $spec .= '!' }
   elsif ($option->{type} =~ /^inc/)            { $spec .= '+' }
@@ -275,11 +284,11 @@ sub _default_options {
   my $self = shift;
   my @default;
 
-  push @default, 'help';
-  push @default, 'man' if $self->documentation;
-  push @default, 'version' if $self->version;
+  push @default, {name => 'help',    documentation => 'Print this help text'};
+  push @default, {name => 'man',     documentation => 'Display manual for this application'} if $self->documentation;
+  push @default, {name => 'version', documentation => 'Print application name and version'} if $self->version;
 
-  return @default;
+  return [map { $_->{type} = 'bool'; $_->{arg} = $_->{name}; $_ } @default];
 }
 
 sub _documentation_class_handle {
@@ -296,8 +305,9 @@ sub _documentation_class_handle {
 
 sub _exit {
   my ($self, $reason) = @_;
-  exit 0 unless ($reason =~ /^\d+$/);    # may change without warning...
-  exit $reason;
+  my $exit_value = $reason =~ /^\d+$/ ? $reason : 0;
+  $self->_run_hook(before_exit => $exit_value);
+  exit $exit_value;
 }
 
 sub _generate_attribute_accessor {
@@ -410,6 +420,12 @@ sub _print_synopsis {
   }
 }
 
+sub _run_hook {
+  my ($self, $name, @args) = @_;
+  return unless my $cbs = $self->{hook}{$name};
+  for my $cb (@$cbs) { $self->$cb(@args) }
+}
+
 sub _sub {
   my ($fqn, $code) = @_;
   no strict 'refs';
@@ -448,7 +464,7 @@ Applify - Write object oriented scripts with ease
 
 =head1 VERSION
 
-0.17
+0.18
 
 =head1 DESCRIPTION
 
@@ -654,6 +670,32 @@ C<--version> option to your script.
 
 Specify which classes this application should inherit from. These
 classes can be L<Moose> based.
+
+=head2 hook
+
+  hook before_exit            => sub { my ($script, $exit_value) = @_ };
+  hook before_options_parsing => sub { my ($script, $argv) = @_ };
+
+Defines a hook to run.
+
+=over 2
+
+=item * before_exit
+
+Called right before C<exit($exit_value)> is called by L<Applify>. Note that
+this hook will not be called if an exception is thrown.
+
+=item * before_options_parsing
+
+Called right before C<$argv> is parsed by L</option_parser>. C<$argv> is an
+array-ref of the raw options given to your application. This hook allows you
+to modify L</option_parser>. Example:
+
+  hook before_options_parsing => sub {
+    shift->option_parser->configure(bundling no_pass_through);
+  };
+
+=back
 
 =head2 subcommand
 

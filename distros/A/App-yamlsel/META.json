@@ -33,7 +33,7 @@
       },
       "runtime" : {
          "requires" : {
-            "App::CSelUtils" : "0.082",
+            "App::CSelUtils" : "0.084",
             "Data::CSel::WrapStruct" : "0.004",
             "Data::Sah::Compiler::perl::TH::array" : "0",
             "Data::Sah::Compiler::perl::TH::str" : "0",
@@ -68,7 +68,7 @@
          "web" : "https://github.com/perlancar/perl-App-yamlsel"
       }
    },
-   "version" : "0.006",
+   "version" : "0.007",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028002"

@@ -10,7 +10,7 @@ my @DATA = split(m"<BR/>\s*", join('', <DATA>));
 
 trap {my $sb_file = Data::SeaBASS->new(\$DATA[0]);};
 is($trap->leaveby, 'return', "warning trap");
-like(join('',@{$trap->warn}), qr"^/optical_depth_warning=true", "warning 1");
+like(join('',@{$trap->warn}), qr"optically_shallow", "warning 1");
 
 trap {my $sb_file = Data::SeaBASS->new(\$DATA[1]);};
 is($trap->leaveby, 'return', "no warning trap");
@@ -25,7 +25,7 @@ __DATA__
 /missing=-999
 /below_detection_limit=-888
 /above_detection_limit=-777
-/optical_depth_warning=true
+/data_use_warning=optically_shallow
 /delimiter=space
 /fields=date,time,lat,lon,depth,wt,sal
 /end_header
@@ -37,7 +37,7 @@ __DATA__
 /missing=-999
 /below_detection_limit=-888
 /above_detection_limit=-777
-/optical_depth_warning=false
+/data_use_warning=
 /delimiter=space
 /fields=date,time,lat,lon,depth,wt,sal
 /end_header

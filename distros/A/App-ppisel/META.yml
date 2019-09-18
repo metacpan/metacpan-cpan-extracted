@@ -17,7 +17,7 @@ meta-spec:
   version: '1.4'
 name: App-ppisel
 requires:
-  App::CSelUtils: '0.082'
+  App::CSelUtils: '0.084'
   Data::Sah::Compiler::perl::TH::array: '0'
   Data::Sah::Compiler::perl::TH::str: '0'
   File::Slurper: '0'
@@ -33,7 +33,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-ppisel
   homepage: https://metacpan.org/release/App-ppisel
   repository: git://github.com/perlancar/perl-App-ppisel.git
-version: '0.001'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.028002'

@@ -8,7 +8,7 @@ package App::perlsh;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use List::Util qw( reduce );
 use Term::ReadLine;
@@ -160,7 +160,8 @@ sub run
    my $lp = Lexical::Persistence->new();
 
    while ( defined( my $line = $self->read ) ) {
-      my $sub = $lp->compile( $line );
+      # Append a linefeed in case of trailing comment
+      my $sub = $lp->compile( "$line\n" );
       if( !defined $sub ) {
          $self->print( "Compile error: $@\n" );
          next;

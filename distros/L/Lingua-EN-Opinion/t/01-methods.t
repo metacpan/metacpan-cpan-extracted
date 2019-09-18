@@ -1,4 +1,7 @@
-#!perl
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
 use Test::More;
 use Test::Exception;
 
@@ -6,6 +9,16 @@ use_ok 'Lingua::EN::Opinion';
 
 my $obj = eval { Lingua::EN::Opinion->new };
 isa_ok $obj, 'Lingua::EN::Opinion';
+
+is $obj->file, undef, 'no file';
+is $obj->text, undef, 'no text';
+is $obj->stem, 0, 'no stem';
+is_deeply $obj->sentences, [], 'no sentences';
+is_deeply $obj->scores, [], 'no scores';
+is_deeply $obj->familiarity, { known => 0, unknown => 0 }, 'no familiarity';
+isa_ok $obj->positive, 'Lingua::EN::Opinion::Positive';
+isa_ok $obj->negative, 'Lingua::EN::Opinion::Negative';
+isa_ok $obj->emotion, 'Lingua::EN::Opinion::Emotion';
 
 throws_ok {
     $obj = Lingua::EN::Opinion->new( file => 'foo' );
@@ -34,6 +47,7 @@ is_deeply $x, $sentences, 'sentences';
 $x = $obj->scores;
 my $scores = [ 0, -1, -1, 1, 0, -1, 0, -2, -2, 1, 1 ];
 is_deeply $x, $scores, 'scores';
+is_deeply $obj->familiarity, { known => 10, unknown => 80 }, 'familiarity';
 
 my $text = <<'END';
 I begin this story with a neutral statement.
@@ -57,6 +71,7 @@ is_deeply $x, $sentences, 'sentences';
 $x = $obj->scores;
 my $scores = [ 0, -1, -1, 1, 0, -1, 0, -2, -2, 1, 1 ];
 is_deeply $x, $scores, 'scores';
+is_deeply $obj->familiarity, { known => 10, unknown => 80 }, 'familiarity';
 
 $x = $obj->averaged_score(2);
 $scores = [ -0.5, 0, -0.5, -1, -0.5, 1 ];
@@ -77,6 +92,7 @@ $scores = {
 
 $obj->nrc_sentiment();
 is_deeply $obj->nrc_scores->[6], $scores, 'nrc_scores';
+is_deeply $obj->familiarity, { known => 27, unknown => 63 }, 'familiarity';
 
 $x = $obj->get_word('foo');
 is_deeply $x, undef, 'get_word';

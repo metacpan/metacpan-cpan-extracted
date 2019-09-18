@@ -5,7 +5,7 @@ use base 'PDF::API2::Resource::Font';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '2.035'; # VERSION
+our $VERSION = '2.036'; # VERSION
 
 use File::Basename;
 

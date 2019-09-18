@@ -1,16 +1,24 @@
 package Log::ger::Output::Composite;
 
-our $DATE = '2019-01-31'; # DATE
-our $VERSION = '0.008'; # VERSION
+our $DATE = '2019-09-17'; # DATE
+our $VERSION = '0.009'; # VERSION
 
 use strict;
 use warnings;
+use Log::ger::Util;
+
+# this can be used to override all level settings as it has the highest
+# precedence.
+our $Current_Level;
 
 sub _get_min_max_level {
     my $level = shift;
     my ($min, $max);
     if (defined $level) {
-        if (ref $level eq 'ARRAY') {
+        if (defined $Current_Level) {
+            $min = 0;
+            $max = $Current_Level;
+        } elsif (ref $level eq 'ARRAY') {
             $min = Log::ger::Util::numeric_level($level->[0]);
             $max = Log::ger::Util::numeric_level($level->[1]);
             ($min, $max) = ($max, $min) if $min > $max;
@@ -107,7 +115,7 @@ sub get_hooks {
                                 last;
                             }
                         }
-                        push @hook_args, (level => 6, str_level => 'trace');
+                        push @hook_args, (level => 60, str_level => 'trace');
                         if ($hooks->{create_log_routine}) {
                             $res = $hooks->{create_log_routine}->[2]->(
                                 @hook_args);
@@ -250,6 +258,11 @@ sub get_hooks {
     };
 }
 
+sub set_level {
+    $Current_Level = Log::ger::Util::numeric_level(shift);
+    Log::ger::Util::reinit_all_targets();
+}
+
 1;
 # ABSTRACT: Composite output
 
@@ -265,7 +278,7 @@ Log::ger::Output::Composite - Composite output
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -382,6 +395,24 @@ per-output layout.
 Specify per-category level. Optional. Hash key is category name, value is level
 (which can be a string/numeric level or a two-element array containing minimum
 and maximum level).
+
+=head1 FAQS
+
+=head2 Why does re-setting log level (using Log::ger::Util::set_level) doesn't work?
+
+This output plugin sets its own levels and logs using a multilevel routine
+(which gets called for all levels). Re-setting log level dynamically via
+L<Log::ger::Util>'s C<set_level> will not work as intended, which is fortunate
+or unfortunate depending on your need.
+
+If you want to override all levels settings with a single value, you can use
+C<Log::ger::Output::Composite::set_level>, for example:
+
+ Log::ger::Util::set_level('trace'); # also set this too
+ Log::ger::Output::Composite::set_level('trace');
+
+This sets an internal level setting which is respected and has the highest
+precedence so all levels settings will use this instead.
 
 =head1 ENVIRONMENT
 

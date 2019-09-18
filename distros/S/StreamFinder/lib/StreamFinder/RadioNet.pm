@@ -46,6 +46,10 @@ file.
 
 	print "Station ID=$stationID\n";
 	
+	my $genre = $station->{'genre'};
+
+	print "Genre=$genre\n"  if ($genre);
+	
 	my $icon_url = $station->getIconURL();
 
 	if ($icon_url) {   #SAVE THE ICON TO A TEMP. FILE:
@@ -352,24 +356,25 @@ sub new
 	}
 	print STDERR "-1: html=$html=\n"  if ($DEBUG > 1);
 	return undef  unless ($html);  #STEP 1 FAILED, INVALID STATION URL, PUNT!
-	$self->{'iconurl'} = ($html =~ m#\"og\:image\"\s+content\=\"([^\"]+)\"#) ? $1 : '';
+	$self->{'iconurl'} = ($html =~ m#\"og\:image\"\s+content\=\"([^\"]+)\"#s) ? $1 : '';
 	my $logoSz = 0;
-	while ($html =~ s#\"logo(\d+)x\d+\"\:\"([^\"]+)\"##) {
+	while ($html =~ s#\"logo(\d+)x\d+\"\:\"([^\"]+)\"##s) {
 		if ($1 > $logoSz) {
 			$logoSz = $1;
 			$self->{'imageurl'} = $2;
 		}
 	}
 	$self->{'imageurl'} ||= $self->{'iconurl'};
-	$self->{'title'} = ($html =~ m#\"og\:title\"\s+content\=\"([^\"]+)\"#) ? $1 : '';
-	$self->{'description'} = ($html =~ m#\b(?:name\=\"twitter|property\=\"og)\:description\"\s+content\=\"([^\"]+)\"#) ? $1 : $self->{'title'};
+	$self->{'title'} = ($html =~ m#\"og\:title\"\s+content\=\"([^\"]+)\"#s) ? $1 : '';
+	$self->{'description'} = ($html =~ m#\b(?:name\=\"twitter|property\=\"og)\:description\"\s+content\=\"([^\"]+)\"#s) ? $1 : $self->{'title'};
 	$self->{'title'} = HTML::Entities::decode_entities($self->{'title'});
 	$self->{'title'} = uri_unescape($self->{'title'});
 	$self->{'description'} = HTML::Entities::decode_entities($self->{'description'});
 	$self->{'description'} = uri_unescape($self->{'description'});
+	$self->{'genre'} = $1  if ($html =~ m#\"genres\"\:\s*\[\"([^\"]+)\"#s);
 	print STDERR "-2: icon=".$self->{'iconurl'}."= title=".$self->{'title'}."= image=".$self->{'imageurl'}."=\n"  if ($DEBUG);
 	$self->{'cnt'} = 0;
-	while ($html =~ s#\"streamUrl\"\:\"([^\"]+)\"##) {
+	while ($html =~ s#\"streamUrl\"\:\"([^\"]+)\"##s) {
 		push @{$self->{'streams'}}, $1;
 		$self->{'cnt'}++;
 	}

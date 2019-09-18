@@ -33,7 +33,7 @@
       },
       "runtime" : {
          "requires" : {
-            "App::CSelUtils" : "0.082",
+            "App::CSelUtils" : "0.084",
             "Data::Sah::Compiler::perl::TH::array" : "0",
             "Data::Sah::Compiler::perl::TH::str" : "0",
             "Org::Parser" : "0.53",
@@ -65,7 +65,7 @@
          "web" : "https://github.com/perlancar/perl-App-orgsel"
       }
    },
-   "version" : "0.007",
+   "version" : "0.009",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028002"

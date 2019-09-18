@@ -53,7 +53,15 @@ SYNOPSIS
         
             my $stationDescription = $station->getTitle('desc');
         
-            print "Description=$stationDescription\n"  if (defined $stationDescription);
+            print "Description=$stationDescription\n";
+        
+            my $artist = $station->{'artist'};
+
+            print "Artist=$artist\n"  if ($artist);
+        
+            my $genre = $station->{'genre'};
+
+            print "Genre=$genre\n"  if ($genre);
         
             my $icon_url = $station->getIconURL();
 
@@ -86,24 +94,24 @@ SYNOPSIS
             }
 
 DESCRIPTION
-    StreamFinder accepts a valid radio station URL on supported websites and
-    returns the actual stream URL(s), title, and cover art icon for that
-    station. The purpose is that one needs one of these URLs in order to
-    have the option to stream the station/video in one's own choice of media
-    player software rather than using their web browser and accepting any /
-    all flash, ads, javascript, cookies, trackers, web-bugs, and other
-    crapware associated with that method of playing. The author uses his own
-    custom all-purpose media player called "fauxdacious" (his custom hacked
-    version of the open-source "audacious" audio player). "fauxdacious"
-    incorporates this module to decode and play streams. The
+    StreamFinder accepts a valid radio station or video URL on supported
+    websites and returns the actual stream URL(s), title, and cover art icon
+    for that station. The purpose is that one needs one of these URLs in
+    order to have the option to stream the station/video in one's own choice
+    of media player software rather than using their web browser and
+    accepting any / all flash, ads, javascript, cookies, trackers, web-bugs,
+    and other crapware associated with that method of playing. The author
+    uses his own custom all-purpose media player called "fauxdacious" (his
+    custom hacked version of the open-source "audacious" audio player).
+    "fauxdacious" incorporates this module to decode and play streams. The
     currently-supported websites are: radionomy.com, iheartradio.com,
-    reciva.com, radio.net, facebook, banned.video, and youtube / vimeo /
-    brighteon, et. al. We are again supporting tunein.com, but it may not
-    work for all stations / podcasts!
+    reciva.com, radio.net, banned.video, podcasts.apple.com, vimeo.com,
+    brighteon.com, and (youtube.com, et. al). We are again supporting
+    tunein.com, but it may not work for all stations / podcasts!
 
-    NOTE: For some sites, ie. Youtube, Facebook, and BannedVideo, the
-    "station" object actually refers to a specific video, but functions the
-    same way!
+    NOTE: For some sites, ie. Youtube, Vimeo, Brighteon, and BannedVideo,
+    the "station" object actually refers to a specific video, but functions
+    the same way!
 
     Each site is supported by a separate subpackage
     (StreamFinder::*Package*), which is determined and selected based on the
@@ -115,6 +123,11 @@ DESCRIPTION
     subpackage!
 
     One or more playable streams can be returned for each station / video.
+
+    If you have another streaming site that is not supported, please file a
+    feature request via email or the CPAN bug system, or for faster service,
+    a Perl patch module / program source that can extract some or all of the
+    necessary information for streams on that site and I'll consider it!
 
 SUBROUTINES/METHODS
     new(*url* [, *options* ])
@@ -183,10 +196,10 @@ SUBROUTINES/METHODS
         "icon image" data will be returned.
 
     $video->getType()
-        Returns the station's type (*submodule-name*). (one of:
-        "BannedVideo", "Facebook", "IHeartRadio", "RadioNet", "Radionomy",
-        "Reciva", "Tunein", or "Youtube" - depending on the sight that
-        matched the URL.
+        Returns the station's type (*submodule-name*). (one of: "Apple",
+        "BannedVideo", "IHeartRadio", "RadioNet", "Radionomy", "Reciva",
+        "Tunein", "Youtube" or "Vimeo" - depending on the sight that matched
+        the URL.
 
 CONFIGURATION FILES
     ~/.config/StreamFinder/config
@@ -221,9 +234,7 @@ DEPENDENCIES
     URI::Escape, HTML::Entities, LWP::UserAgent
 
 RECCOMENDS
-    WWW::YouTube::Download (for Youtube)
-
-    youtube-dl (for Youtube, Facebook, Tunein)
+    youtube-dl (for Brighteon, Tunein, Vimeo)
 
     wget
 

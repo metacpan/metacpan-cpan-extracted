@@ -3,8 +3,8 @@ NAME
     syntax
 
 VERSION
-    This document describes version 0.004 of App::jsonsel (from Perl
-    distribution App-jsonsel), released on 2019-07-29.
+    This document describes version 0.006 of App::jsonsel (from Perl
+    distribution App-jsonsel), released on 2019-08-08.
 
 SYNOPSIS
 FUNCTIONS

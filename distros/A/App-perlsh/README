@@ -1,12 +1,15 @@
 NAME
-    `App::perlsh' - a simple perl REPL based on `Lexical::Persistence'
+
+    App::perlsh - a simple perl REPL based on Lexical::Persistence
 
 SYNOPSIS
-     use App::perlsh;
 
+     use App::perlsh;
+    
      App::perlsh->run
 
 DESCRIPTION
+
     This module implements an application that provides a simple perl REPL
     ("read-execute-print loop"); that is, an interactive shell-like program
     that repeatedly reads perl code from input, executes it, and prints the
@@ -18,15 +21,16 @@ DESCRIPTION
       $ perlsh
       eval: my $one = 1;
       '1'
-
+    
       eval: my $two = 2;
       '2'
-
+    
       eval: $one + $two
       '3'
-
+    
       eval:
 
 AUTHOR
+
     Paul Evans <leonerd@leonerd.org.uk>
 

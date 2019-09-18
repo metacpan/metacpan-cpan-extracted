@@ -17,7 +17,7 @@ meta-spec:
   version: '1.4'
 name: App-yamlsel
 requires:
-  App::CSelUtils: '0.082'
+  App::CSelUtils: '0.084'
   Data::CSel::WrapStruct: '0.004'
   Data::Sah::Compiler::perl::TH::array: '0'
   Data::Sah::Compiler::perl::TH::str: '0'
@@ -33,7 +33,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-yamlsel
   homepage: https://metacpan.org/release/App-yamlsel
   repository: git://github.com/perlancar/perl-App-yamlsel.git
-version: '0.006'
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.028002'

@@ -1,5 +1,9 @@
 Revision history for Perl module X::Tiny
 
+0.20 Tue Sep 17 2019
+- Stop storing references in the call stack structure. This makes
+it easier to avoid memory leaks.
+
 0.19 Fri Jul 26 2019
 - Fix typo in POD.
 

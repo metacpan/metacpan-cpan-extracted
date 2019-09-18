@@ -1,10 +1,10 @@
 {
-   "abstract" : "Rapid creation of RESTful Web Services with sessions and persistent data",
+   "abstract" : "RESTful Web Services with login, sessions, persistent data, multiple input/output formats, and IP access",
    "author" : [
       "George Bouras <george.mpouras@yandex.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -43,11 +43,12 @@
    "provides" : {
       "Dancer2::Plugin::WebService" : {
          "file" : "lib/Dancer2/Plugin/WebService.pm",
-         "version" : "3.101"
+         "version" : "v4.1.5"
       }
    },
    "release_status" : "stable",
-   "version" : "3.101",
-   "x_serialization_backend" : "JSON::XS version 3.04"
+   "version" : "4.1.5",
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "JSON::XS version 4.02"
 }
 

@@ -4,7 +4,7 @@
       "Jason Lefler <jason.lefler@nasa.gov>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -49,7 +49,8 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.173030",
+   "version" : "0.192600",
+   "x_generated_by_perl" : "v5.22.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0227"
 }
 

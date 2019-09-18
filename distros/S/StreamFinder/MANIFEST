@@ -1,12 +1,14 @@
 Changes
 lib/StreamFinder.pm
+lib/StreamFinder/Apple.pm
 lib/StreamFinder/BannedVideo.pm
-lib/StreamFinder/Facebook.pm
+lib/StreamFinder/Brighteon.pm
 lib/StreamFinder/IHeartRadio.pm
 lib/StreamFinder/RadioNet.pm
 lib/StreamFinder/Radionomy.pm
 lib/StreamFinder/Reciva.pm
 lib/StreamFinder/Tunein.pm
+lib/StreamFinder/Vimeo.pm
 lib/StreamFinder/Youtube.pm
 Makefile.PL
 MANIFEST			This list of files

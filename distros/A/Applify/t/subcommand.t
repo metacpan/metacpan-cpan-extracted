@@ -94,7 +94,7 @@ HERE
 }
 
 {
-  my $app = eval_script($code, 'log', '--age', '2d', '--save');
+  my $app = eval_script($code, qw(log --age 2d --save));
   isa_ok $app, 'MyLogging', 'correct inheritance';
   is $app->age,  '2d', 'age option set';
   is $app->save, 1,    'global option set';
@@ -113,55 +113,50 @@ HERE
     ),
     'correct subroutine';
 
-  is + (run_method($script, 'print_help'))[0], <<'HERE', 'print_help()';
+  is_help $script, <<'HERE', 'subcommand log';
 Usage:
 
     subcommand.t [command] [options]
 
-commands:
+Commands:
     list  provide a listing
     log   provide a log
 
-options:
-   --input-file  input
-   --save        save work
- * --age         age of log
+Options:
+    --input-file  input
+    --save        save work
+ *  --age         age of log
 
-   --help        Print this help text
+    --help        Print this help text
 
 Notes:
- * denotes a required option
- + denotes an option that accepts multiple values
+ *  denotes a required option
 HERE
 
 }
 
 {
-  my $app = eval_script($code, 'logs', '--long', 'prefix');
+  my $app = eval_script($code, qw(logs --long prefix));
   isa_ok $app, 'HASH', 'object as exit did not happen';
   is $app->save, undef, 'not set';
   my $script = $app->_script;
   is $script->subcommand, undef, 'no matching subcommand';
   my $code = $script->_subcommand_code($app);
   is $code, undef, 'no code reference';
-  is + (run_method($app, 'run'))[0], <<'HERE', 'should print help';
+  is_help $script, <<'HERE', 'subcommand logs';
 Usage:
 
     subcommand.t [command] [options]
 
-commands:
+Commands:
     list  provide a listing
     log   provide a log
 
-options:
-   --input-file  input
-   --save        save work
+Options:
+    --input-file  input
+    --save        save work
 
-   --help        Print this help text
-
-Notes:
- * denotes a required option
- + denotes an option that accepts multiple values
+    --help        Print this help text
 HERE
 
 }
@@ -214,10 +209,7 @@ sub deparse {
 sub eval_script {
   my ($code, @args) = @_;
   local @ARGV = @args;
-
-  my $app = eval "$code" or die $@;
-
-  return $app;
+  return eval "$code" || die $@;
 }
 
-done_testing();
+done_testing;

@@ -3,8 +3,12 @@ abstract: 'Perl pragma to declare and simultaneously initialize global variables
 author:
   - 'D.H. <podmaster@cpan.org>'
 build_requires:
+  Exporter: '0'
   ExtUtils::MakeMaker: '0'
+  Import::Into: '1.002005'
   Test::More: '0'
+  lib::relative: '1.000'
+  parent: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 0
@@ -27,15 +31,18 @@ no_index:
 provides:
   vars::i:
     file: lib/vars/i.pm
-    version: '1.10'
+    version: '2.000000'
 requires:
   Carp: '0'
-  perl: '5.006'
+  Data::Dumper: '0'
+  perl: '5.006001'
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/cxw42/Perl-vars-i/issues
   homepage: https://github.com/cxw42/Perl-vars-i
   repository: git://github.com/cxw42/Perl-vars-i.git
-version: '1.10'
+version: '2.000000'
 x_contributors:
   - 'Christopher White <cxw@cpan.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

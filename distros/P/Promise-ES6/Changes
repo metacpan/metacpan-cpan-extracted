@@ -1,5 +1,13 @@
 Revision history for Perl module Promise::ES6
 
+0.07 Tue 17 Sep 2019
+- Fix a number of memory leaks. (This necessitated some significant
+  changes underneath.)
+- Fix spurious unhandled-rejection warnings. These now happen at DESTROY
+  time rather than right away. (I consider this too subtle of a change to
+  be “breaking”.)
+- Add more tests.
+
 0.06 Thu 12 Sep 2019
 - Issue #2: Make all() resolve when given an empty array reference.
 

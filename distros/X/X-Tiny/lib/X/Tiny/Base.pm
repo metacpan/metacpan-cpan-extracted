@@ -198,7 +198,7 @@ sub new {
 
     my $self = $class->_new(@args);
 
-    $CALL_STACK{$self->_get_strval()} = [ _get_call_stack(2) ];
+    $CALL_STACK{$self->_get_strval()} = [ _get_printable_call_stack(2) ];
 
     return $self;
 }
@@ -245,7 +245,7 @@ sub _get_strval {
     return q<> . $self;
 }
 
-sub _get_call_stack {
+sub _get_printable_call_stack {
     my ($level) = @_;
 
     my @stack;
@@ -259,7 +259,7 @@ sub _get_call_stack {
         my ($pkg) = ($call[0] =~ m<(.+)::>);
 
         if (!$pkg || !$pkg->isa(__PACKAGE__)) {
-            push @call, [ @DB::args ];  #need to copy the array
+            push @call, [ map { X::Tiny::Base::_arg_to_printable() } @DB::args ];  #need to copy the array
             push @stack, \@call;
         }
 
@@ -269,25 +269,26 @@ sub _get_call_stack {
     return @stack;
 }
 
+sub _arg_to_printable {
+
+    # Oof. In order to avoid warn()ing on undefined values
+    # (and to distinguish '' from undef) we now quote scalars.
+    ref() ? "$_" : !defined() ? 'undef' : do {
+        my $copy = $_;
+        $copy =~ s<'><\\'>g;
+        "'$copy'";
+    };
+}
+
 sub __spew {
     my ($self) = @_;
 
     my $spew = $self->to_string();
 
     if ( rindex($spew, $/) != (length($spew) - length($/)) ) {
-        my ($args, @printable);
+        my ($args);
         $spew .= $/ . join( q<>, map {
-
-            #Oof. In order to avoid warn()ing on undefined values
-            #(and to distinguish '' from undef) we now quote scalars.
-            @printable = map {
-                ref() ? $_ : !defined() ? 'undef' : do {
-                    s<'><\\'>g;
-                    "'$_'"
-                }
-            } @{ $_->[3] };
-
-            $args = join(', ', @printable );
+            $args = join(', ', @{ $_->[3] } );
             "\t==> $_->[0]($args) (called in $_->[1] at line $_->[2])$/"
         } @{ $CALL_STACK{$self->_get_strval()} } );
     }

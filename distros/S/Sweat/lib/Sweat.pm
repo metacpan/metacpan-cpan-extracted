@@ -1,6 +1,6 @@
 package Sweat;
 
-our $VERSION = 201909090;
+our $VERSION = 201909171;
 
 use v5.10;
 
@@ -18,6 +18,7 @@ use Try::Tiny;
 use utf8::all;
 use Term::ReadKey;
 use POSIX qw(uname);
+use File::Which;
 
 use Sweat::Group;
 use Sweat::Article;
@@ -222,21 +223,10 @@ sub BUILD {
 sub _check_resources {
     my $self = shift;
 
-    # Based on:
-    # https://stackoverflow.com/questions/592620/how-to-check-if-a-program-exists-from-a-bash-script
-    my $result = system ('command', '-v', 'this-command-doesnt-exist-sweat',);
-
-    if ( $result < 0 ) {
-        say "Uh oh, this system lacks the POSIX 'command' command, and thus I "
-            . "can't tell if it has all the programs installed that I need. "
-            . "Trying anyway, wish me luck...";
-        return;
-    }
-
     my $speech_program = $self->speech_program;
     my $bare_speech_program = (split /\s+/, $speech_program)[0];
 
-    unless ( `command -v '$bare_speech_program'` ) {
+    unless ( which( $bare_speech_program) ) {
         die "ERROR: Sweat's 'speech-program' configuration is set to "
             . "'$speech_program', but there doesn't seem to be a program "
             . "there. I can't run without a speech program... sorry!\n";
@@ -247,11 +237,11 @@ sub _check_resources {
             my $method = "${_}_program";
             my $program = $self->$method;
             my $bare_program = (split /\s+/, $program)[0];
-            unless ( `command -v '$bare_program'` ) {
-            $self->$method( undef );
-            warn "WARNING: Sweat's '$_-program' configuration is set to "
-                 . "'$program', but there doesn't seem to be a program there. "
-                 . "Going ahead without $_-opening.\n";
+            unless ( which( $bare_program ) ) {
+                $self->$method( undef );
+                warn "WARNING: Sweat's '$_-program' configuration is set to "
+                     . "'$program', but there doesn't seem to be a program there. "
+                     . "Going ahead without $_-opening.\n";
             }
         }
     }

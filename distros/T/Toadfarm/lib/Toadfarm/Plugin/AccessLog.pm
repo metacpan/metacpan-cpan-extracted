@@ -30,8 +30,8 @@ sub register {
           unshift @{$url->path->parts}, @{$url->base->path->parts};
 
           $log->info(
-            sprintf '%s %s %s %s %.4fs',
-            $req->env->{identity} || $tx->remote_address,
+            sprintf '[%s] %s %s %s %s %.4fs',
+            $req->request_id, $req->env->{identity} || $tx->remote_address,
             $req->method, $url, $code, tv_interval($req->env->{t0}),
           );
         }

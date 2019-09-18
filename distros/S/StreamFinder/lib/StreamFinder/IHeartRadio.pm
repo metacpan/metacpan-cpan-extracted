@@ -47,6 +47,14 @@ file.
 
 	print "Station ID=$stationID\n";
 	
+	my $artist = $station->{'artist'};
+
+	print "Artist=$artist\n"  if ($artist);
+	
+	print "Genre=$genre\n"  if ($genre);
+	
+	my $icon_url = $station->getIconURL();
+
 	my $icon_url = $station->getIconURL();
 
 	if ($icon_url) {   #SAVE THE ICON TO A TEMP. FILE:
@@ -398,7 +406,7 @@ sub new
 		$url2fetch .= '/episode/' . $podcastid  if ($podcastid);
 	}
 	my $html = '';
-	print STDERR "-1 FETCHING URL=$url2fetch=\n"  if ($DEBUG);
+	print STDERR "-1 FETCHING URL=$url2fetch= ID=".$self->{'id'}."=\n"  if ($DEBUG);
 	my $ua = LWP::UserAgent->new(@userAgentOps);		
 	$ua->timeout($uops{'timeout'});
 	$ua->cookie_jar({});
@@ -416,6 +424,11 @@ sub new
 	my $streamhtml0 = ($html =~ /\"streams\"\s*\:\s*\{([^\}]+)\}/) ? $1 : '';
 	print STDERR "-2: streamhtml=$streamhtml0=\n"  if ($DEBUG);
 	$self->{'cnt'} = 0;
+	$self->{'title'} = '';
+	$self->{'artist'} = '';
+	$self->{'created'} = '';
+	$self->{'year'} = '';
+	$self->{'streams'} = [];
 	unless ($streamhtml0) {  #NO STREAMS (PODCAST?) - LOOK FOR MEDIAURL:
 		while ($html =~ s#\"mediaUrl\"\:\"([^\"]+)\"##gso) {
 			push @{$self->{'streams'}}, $1;
@@ -471,18 +484,17 @@ sub new
 			$streampattern = '\"' . $streamtype;
 		}
 		$self->{'cnt'} = 0;
-		$self->{'id'} = ($html =~ m#\"id\"\s*\:\s*([^\,\s]+)#) ? $1 : '';
-		$self->{'id'} = $1  if (!$self->{'id'} && ($url =~ m#\/([^\/]+)\/?$#));
-		$self->{'fccid'} = ($html =~ m#\"callLetters\"\s*\:\s*\"([^\"]+)\"#i) ? $1 : '';
-		$self->{'title'} = ($html =~ m#\"description\"\s*\:\s*\"([^\"]+)\"#) ? $1 : $url;
+		$self->{'fccid'} = ($html =~ m#\"callLetters\"\s*\:\s*\"([^\"]+)\"#is) ? $1 : '';
+		$self->{'title'} = ($html =~ m#\"description\"\s*\:\s*\"([^\"]+)\"#s) ? $1 : $url;
 		$self->{'title'} =~ s#http[s]?\:\/\/www\.iheart\.com\/live\/##;
 		$self->{'title'} = HTML::Entities::decode_entities($self->{'title'});
 		$self->{'title'} = uri_unescape($self->{'title'});
 		$self->{'description'} = $self->{'title'};
-		$self->{'imageurl'} = ($html =~ m#\"image_src\"\s+href=\"([^\"]+)\"#) ? $1 : '';
+		$self->{'imageurl'} = ($html =~ m#\"image_src\"\s+href=\"([^\"]+)\"#s) ? $1 : '';
 #		$self->{'iconurl'} = $self->{'imageurl'} ? $self->{'imageurl'} . '?ops=fit(100%2C100)' : '';
-		$self->{'iconurl'} = ($html =~ m#\,\"logo\"\:\"([^\"]+)\"\,\"freq\"\:#) ? $1 : '';
+		$self->{'iconurl'} = ($html =~ m#\,\"logo\"\:\"([^\"]+)\"\,\"freq\"\:#s) ? $1 : '';
 		$self->{'imageurl'} ||= $self->{'iconurl'};
+		$self->{'genre'} = $1  if ($html =~ m#\"Genre\"\s+name\=\"twitter\:label1\"\/\>\<meta\s+data\-react\-helmet\=\"[^\"]*\"\s+content\=\"([^\"]+)\"#s);
 		# INNER LOOP: MATCH STREAM URLS BY TYPE PATTEREN REGEX UNTIL WE FIND ONE THAT'S ACCEPTABLE (NOT EXCLUDED TYPE):
 		print STDERR "-3: PATTERN=${streampattern}_stream=\n"  if ($DEBUG);
 INNER:  while ($streamhtml =~ s#(${streampattern}_stream)\"\s*\:\s*\"([^\"]+)\"##)

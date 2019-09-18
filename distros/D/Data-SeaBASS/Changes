@@ -1,4 +1,9 @@
 
+0.192600  2019-09-17 12:37:57-04:00 EST5EDT
+
+	- added fractional seconds
+	- changed optically_shallow warning to data_use_warnings
+
 0.173030  2017-10-30 13:51:26-04:00 EST5EDT
 
 	- treat empty fields as undef

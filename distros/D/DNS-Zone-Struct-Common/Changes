@@ -1,3 +1,8 @@
+0.004   2019-09-17  Released-By: PERLANCAR; Urgency: medium
+
+	- Add workaround: convert_underscore_in_host.
+
+
 0.003   2019-09-09  Released-By: PERLANCAR; Urgency: high
 
 	- Derp, previous commit has typo.

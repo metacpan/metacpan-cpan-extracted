@@ -35,6 +35,7 @@ WriteMakefile(
         'parent'          => 0,
         'Test::More'      => 0,
         'Test::Simple'    => 0,
+        'Test::FailWarnings' => 0,
     },
 );
 

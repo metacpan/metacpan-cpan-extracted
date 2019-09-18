@@ -46,11 +46,11 @@
    "provides" : {
       "App::ValidateBankAccount" : {
          "file" : "lib/App/ValidateBankAccount.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "App::ValidateBankAccount::Option" : {
          "file" : "lib/App/ValidateBankAccount/Option.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -61,6 +61,6 @@
          "web" : "https://github.com/manwar/App-ValidateBankAccount"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

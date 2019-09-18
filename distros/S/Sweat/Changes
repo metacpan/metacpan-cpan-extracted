@@ -1,5 +1,13 @@
 Revision history for Perl extension Sweat
 
+201909171 2019-09-18T03:00:57Z
+
+    - Making use of File::Which, rather than assuming the presence of a `command` command. (Thanks to Kivanc Yazan for pointing this problem out.)
+
+201909170 2019-09-18T01:05:29Z
+
+    - Adding LWP::Protocol::https as a dependency.
+
 201909090 2019-09-09T21:32:31Z
 
     - Replacing the LICENSE file with an MIT license, as originally intended

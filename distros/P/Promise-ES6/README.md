@@ -4,6 +4,8 @@ Promise::ES6 - ES6-style promises in Perl
 
 # SYNOPSIS
 
+    $Promise::ES6::DETECT_MEMORY_LEAKS = 1;
+
     my $promise = Promise::ES6->new( sub {
         my ($resolve_cr, $reject_cr) = @_;
 
@@ -51,8 +53,28 @@ of the following is true:
 - 2) The unhandled rejection happens via an uncaught exception
 (even within the constructor).
 
+# LEAK DETECTION
+
+It’s easy to create inadvertent memory leaks using promises.
+As of version 0.07, any Promise::ES6 instances that are created while
+`$Promise::ES6::DETECT_MEMORY_LEAKS` is set to a truthy value are
+“leak-detect-enabled”, which means that if they survive until their original
+process’s global destruction, a warning is triggered.
+
+**NOTE:** If your application needs recursive promises (e.g., to poll
+iteratively for completion of a task), `use feature 'current_sub'`
+may help you avoid memory leaks.
+
 # SEE ALSO
 
 If you’re not sure of what promises are, there are several good
 introductions to the topic. You might start with
 [this one](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises).
+
+Promise::ES6 serves much the same role as [Future](https://metacpan.org/pod/Future) but exposes
+a standard, cross-language API rather than a proprietary one.
+
+CPAN contains a number of other modules that implement promises.
+Promise::ES6’s distinguishing features are simplicity and lightness.
+By design, it implements **just** the standard Promise API and doesn’t
+assume you use, e.g., [AnyEvent](https://metacpan.org/pod/AnyEvent).

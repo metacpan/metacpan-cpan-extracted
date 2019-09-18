@@ -17,7 +17,7 @@ meta-spec:
   version: '1.4'
 name: App-orgsel
 requires:
-  App::CSelUtils: '0.082'
+  App::CSelUtils: '0.084'
   Data::Sah::Compiler::perl::TH::array: '0'
   Data::Sah::Compiler::perl::TH::str: '0'
   Org::Parser: '0.53'
@@ -30,7 +30,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-orgsel
   homepage: https://metacpan.org/release/App-orgsel
   repository: git://github.com/perlancar/perl-App-orgsel.git
-version: '0.007'
+version: '0.009'
 x_Dist_Zilla:
   perl:
     version: '5.028002'

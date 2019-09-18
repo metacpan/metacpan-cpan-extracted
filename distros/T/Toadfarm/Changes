@@ -1,5 +1,8 @@
 Revision history for perl distribution Toadfarm
 
+0.80 2019-09-18T12:01:02+0900
+ - Include request_id in AccessLog #27
+
 0.79 2018-09-26T01:26:17+0900
  - Compatible with Mojolicious 8.00
 

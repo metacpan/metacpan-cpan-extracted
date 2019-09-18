@@ -4,7 +4,7 @@ use warnings;
 use WWW::Correios::SIGEP::LogisticaReversa;
 use WWW::Correios::SIGEP::Common;
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 sub new {
     my ($class, $params) = @_;
@@ -189,7 +189,10 @@ sub gera_xml_plp {
     . ']]></nome_remetente><logradouro_remetente><![CDATA['
     . ($params->{remetente}{logradouro} || die "remetente.logradouro exigido")
     . ']]></logradouro_remetente><numero_remetente>'
-    . ($params->{remetente}{numero} || die "remetente.numero exigido")
+    . (defined $params->{remetente}{numero}
+       && $params->{remetente}{numero} =~ m{\A(?:s/n|\d+)\z}  # digit or "s/n"
+       ? $params->{remetente}{numero} : die "remetente.numero exigido"
+      )
     . '</numero_remetente>'
     . (defined $params->{remetente}{complemento}
         ? '<complemento_remetente><![CDATA['
@@ -286,7 +289,10 @@ sub gera_xml_plp {
                  : '<complemento_destinatario />'
              )
              . '<numero_end_destinatario>'
-             . ($obj->{destinatario}{numero} || die "objetos[].destinatario.numero")
+             . (defined $obj->{destinatario}{numero}
+                && $obj->{destinatario}{numero} =~ m{\A(?:s/n|\d+)\z}  # digit or "s/n"
+                ? $obj->{destinatario}{numero} : die "objetos[].destinatario.numero"
+               )
              . '</numero_end_destinatario></destinatario><nacional><bairro_destinatario><![CDATA['
              . ($obj->{destinatario}{bairro} || die "objetos[].destinatario.bairro exigido")
              . ']]></bairro_destinatario><cidade_destinatario><![CDATA['
@@ -698,7 +704,7 @@ Método da API SIGEP: I<fechaPlpVariosServicos>
         remetente => {
             nome => 'Minha Empresa LTDA',
             logradouro  => 'Minha Rua',
-            numero      => 100,
+            numero      => 100,   # ou 's/n' para logradouros sem numeracao
             complemento => 302,  # opcional
             bairro      => 'Meu bairro',
             cep         => '111111222', # somente números
@@ -738,7 +744,7 @@ Método da API SIGEP: I<fechaPlpVariosServicos>
                 destinatario => {
                     nome => 'Comprador Feliz da Silva',
                     logradouro => 'Rua da Entrega',
-                    numero     => 1,
+                    numero     => 1,  # ou 's/n' para logradouros sem numeracao
                     complemento => 'casa',  # opcional
                     bairro      => 'Bairro Feliz',
                     cidade      => 'Cidade Feliz',

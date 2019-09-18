@@ -4,7 +4,7 @@ Applify - Write object oriented scripts with ease
 
 # VERSION
 
-0.17
+0.18
 
 # DESCRIPTION
 
@@ -197,6 +197,28 @@ Specifies where to retrieve the version number from when giving the
 
 Specify which classes this application should inherit from. These
 classes can be [Moose](https://metacpan.org/pod/Moose) based.
+
+## hook
+
+    hook before_exit            => sub { my ($script, $exit_value) = @_ };
+    hook before_options_parsing => sub { my ($script, $argv) = @_ };
+
+Defines a hook to run.
+
+- before\_exit
+
+    Called right before `exit($exit_value)` is called by [Applify](https://metacpan.org/pod/Applify). Note that
+    this hook will not be called if an exception is thrown.
+
+- before\_options\_parsing
+
+    Called right before `$argv` is parsed by ["option\_parser"](#option_parser). `$argv` is an
+    array-ref of the raw options given to your application. This hook allows you
+    to modify ["option\_parser"](#option_parser). Example:
+
+        hook before_options_parsing => sub {
+          shift->option_parser->configure(bundling no_pass_through);
+        };
 
 ## subcommand
 

@@ -2,6 +2,10 @@ Revision history for Perl extension Parallel::Forker
 
 The contributors that suggested a given feature are shown in [].
 
+* Parallel::Forker 1.250 2019-09-17
+
+****	Fix CPAN missing tarball, no functional change.
+
 * Parallel::Forker 1.236 2019-03-10
 
 ****	Remove texinfo dependency on building README.

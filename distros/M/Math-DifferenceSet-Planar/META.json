@@ -52,19 +52,19 @@
    "provides" : {
       "Math::DifferenceSet::Planar" : {
          "file" : "lib/Math/DifferenceSet/Planar.pm",
-         "version" : "0.007"
+         "version" : "0.008"
       },
       "Math::DifferenceSet::Planar::Data" : {
          "file" : "lib/Math/DifferenceSet/Planar/Data.pm",
-         "version" : "0.007"
+         "version" : "0.008"
       },
       "Math::DifferenceSet::Planar::Schema" : {
          "file" : "lib/Math/DifferenceSet/Planar/Schema.pm",
-         "version" : "0.007"
+         "version" : "0.008"
       },
       "Math::DifferenceSet::Planar::Schema::Result::DifferenceSet" : {
          "file" : "lib/Math/DifferenceSet/Planar/Schema/Result/DifferenceSet.pm",
-         "version" : "0.007"
+         "version" : "0.008"
       }
    },
    "release_status" : "stable",
@@ -82,6 +82,6 @@
          "web" : "https://github.com/mhasch/perl-Math-DifferenceSet-Planar"
       }
    },
-   "version" : "0.007",
+   "version" : "0.008",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

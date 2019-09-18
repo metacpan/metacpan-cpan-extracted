@@ -10,7 +10,7 @@ when building a L<Toadfarm> script.
 =head1 FUNCTIONS
 
 These functions are exported to the caller namespace by default. See
-L</SYNOPSIS> for example usage.
+L<Toadfarm/"SYNOPSIS"> for example usage.
 
 =head2 app
 

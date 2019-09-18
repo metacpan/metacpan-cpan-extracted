@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
-use Test::More tests => 42;
+use Test::More tests => 46;
 use Test::Trap qw(:default);
 
 use Data::SeaBASS qw(STRICT_READ STRICT_WRITE STRICT_ALL INSERT_BEGINNING INSERT_END);
@@ -114,6 +114,18 @@ trap {
 };
 is($trap->leaveby, 'return', "trap 15");
 
+trap {
+    my $sb_file = Data::SeaBASS->new(\$DATA[10], {'fill_ancillary_data' => 1});
+    is($sb_file->data(0)->{'second'}, '3.456', 'data, fractional second');
+};
+is($trap->leaveby, 'return', "fractional second 1");
+
+trap {
+    my $sb_file = Data::SeaBASS->new(\$DATA[11], {'fill_ancillary_data' => 1});
+    is($sb_file->data(0)->{'second'}, '3.456', 'data from header, fractional second');
+};
+is($trap->leaveby, 'return', "fractional second 2");
+
 done_testing();
 
 __DATA__
@@ -153,3 +165,12 @@ __DATA__
 /measurement_depth=0
 /fields=date,time
 19920102 01:02:03
+<BR/>
+/start_date=19920209
+/fields=lat,wt,sal,hour,minute,Second,day
+31.389 20.7320 -999 1 2 3.456 1
+<BR/>
+/start_date=19920209
+/start_time=1:2:3.456
+/fields=lat,wt,sal
+31.389 20.7320 -999

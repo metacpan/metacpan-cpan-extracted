@@ -1,7 +1,7 @@
 package Log::ger::App;
 
-our $DATE = '2018-12-17'; # DATE
-our $VERSION = '0.009'; # VERSION
+our $DATE = '2019-09-17'; # DATE
+our $VERSION = '0.010'; # VERSION
 
 # IFUNBUILT
 # use strict;
@@ -184,7 +184,7 @@ Log::ger::App - An easy way to use Log::ger in applications
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -387,6 +387,26 @@ Bool.
 
 =head2 SYSLOG_QUIET
 
+=head1 FAQS
+
+=head2 Why does re-setting log level (using Log::ger::Util::set_level) doesn't work?
+
+(This FAQ item is from L<Log::ger::Output::Composite>'s, slightly modified).
+
+The Log::ger::Output::Composite plugin that Log::ger::App uses sets its own
+levels and logs using a multilevel routine (which gets called for all levels).
+Re-setting log level dynamically via L<Log::ger::Util>'s C<set_level> will not
+work as intended, which is fortunate or unfortunate depending on your need.
+
+If you want to override all levels settings with a single value, you can use
+C<Log::ger::Output::Composite::set_level>, for example:
+
+ Log::ger::Util::set_level('trace'); # also set this too
+ Log::ger::Output::Composite::set_level('trace');
+
+This sets an internal level setting which is respected and has the highest
+precedence so all levels settings will use this instead.
+
 =head1 SEE ALSO
 
 L<Log::ger>
@@ -397,7 +417,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

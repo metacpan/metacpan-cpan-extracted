@@ -36,7 +36,7 @@ REPL ("read-execute-print loop").
 
 =head2 -b, --blib
 
-Imports the L<blib> module at startup, which prefers build code in the
+Imports the L<blib> module at startup, which prefers built code in the
 F<blib/> directory if such exists. This is useful for commandline testing or
 experimenting with newly-built perl modules before they are installed.
 

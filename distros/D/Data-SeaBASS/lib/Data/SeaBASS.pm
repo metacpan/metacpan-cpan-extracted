@@ -9,11 +9,11 @@ Data::SeaBASS - Object-oriented interface for reading/writing SeaBASS files
 
 =head1 VERSION
 
-version 0.173030
+version 0.192600
 
 =cut
 
-our $VERSION = '0.173030'; # VERSION
+our $VERSION = '0.192600'; # VERSION
 
 =head1 SYNOPSIS
 
@@ -312,7 +312,7 @@ our @ALL_HEADERS = qw(
 	cloud_percent
 	measurement_depth
 	secchi_depth
-	optical_depth_warning
+	data_use_warning
 	water_depth
 	wave_height
 	wind_speed
@@ -326,11 +326,11 @@ our @ALL_HEADERS = qw(
 );
 
 our %HEADER_DEFAULTS = (
-	optical_depth_warning => 'false',
+	data_use_warning => '',
 );
 
 our %OMIT_EMPTY_HEADERS = (
-	optical_depth_warning => 1,
+	data_use_warning => 1,
 );
 
 # headers that are allowed but are not to be added during add_empty_headers
@@ -358,7 +358,7 @@ my %ANCILLARY = (
 	'time'  => [ '$hour:$minute:$second', ],
 	'hour'    => [ { '$time'   => qr/^(\d+):/ },            { 'start_time' => qr/^(\d+):/ }, ],
 	'minute'  => [ { '$time'   => qr/:(\d+):/ },            { 'start_time' => qr/:(\d+):/ }, ],
-	'second'  => [ { '$time'   => qr/:(\d+)(?:[^:\d]|$)/ }, { 'start_time' => qr/:(\d+)(?:[^:\d]|$)/ }, ],
+	'second'  => [ { '$time'   => qr/:(\d+(?:\.\d*)?)(?:[^:\d]|$)/ }, { 'start_time' => qr/:(\d+(?:\.\d*)?)(?:[^:\d]|$)/ }, ],
 	'station' => [ { 'station' => qr/^(.*?)$/ }, ],
 );
 
@@ -374,7 +374,7 @@ my %FIELD_FORMATTING = (
 	'sdy'    => '%03d',
 	'hour'   => '%02d',
 	'minute' => '%02d',
-	'second' => '%02d',
+	'second' => '%02d', # this is actually overridden in the function checking this for milliseconds, etc
 );
 
 =head1 CONSTRUCTOR
@@ -2165,9 +2165,9 @@ sub read_headers {
 
 		delete( $self->{'fields_lc'} );
 	} ## end if ($self->{'options'}...)
-
-	if ($self->{'options'}{'optional_warnings'} && $headers{"${slash}optical_depth_warning"} && $headers{"${slash}optical_depth_warning"} =~ /true/){
-		carp("/optical_depth_warning=true, indicating optically shallow water. Use caution when using this data.");
+	my $data_use_header = "${slash}data_use_warning";
+	if ($self->{'options'}{'optional_warnings'} && $headers{$data_use_header}){
+		carp("/data_use_warning=$headers{$data_use_header}!\nUse caution when using this data.");
 	}
 
 	return 1;
@@ -2347,7 +2347,15 @@ sub add_and_remove_fields {
 	while ( my ( $variable, $pad ) = each(%FIELD_FORMATTING) ) {
 		my $case_var = $self->{'case_conversion'}{$variable} || $variable;
 		my $v = $hash->{$case_var};
-		if ( defined($v) && length($v) && (!defined($missing) || $v != $missing)) {
+		if ($case_var eq 'second'){
+			if ( defined($v) && length($v) && (!defined($missing) || $v != $missing)) {
+				if ($v =~ /\D/){
+					$hash->{$case_var} = sprintf('%02.3f', $v);
+				} else {
+					$hash->{$case_var} = sprintf('%02d', $v);
+				}
+			}
+		} elsif ( defined($v) && length($v) && (!defined($missing) || $v != $missing)) {
 			$hash->{$case_var} = sprintf($pad, $v);
 		}
 	} ## end while (my ($variable, $pad...))

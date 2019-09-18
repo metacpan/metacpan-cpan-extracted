@@ -97,7 +97,12 @@ Then, choose one of the options below.
 Run this command:
 
     cpanm Sweat
-    
+
+If you run into issues due to failing dependencies, try this instead:
+
+    cpanm --notest Sweat
+
+Alternately, you can run these commands under \`sudo\` to install Sweat at the system level.
 
 ## Installing from source
 

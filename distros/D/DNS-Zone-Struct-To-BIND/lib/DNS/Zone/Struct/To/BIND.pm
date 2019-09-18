@@ -1,7 +1,7 @@
 package DNS::Zone::Struct::To::BIND;
 
-our $DATE = '2019-08-28'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-09-17'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -89,9 +89,11 @@ sub gen_bind_zone_from_struct {
         } elsif ($type eq 'CNAME') {
             push @res, "CNAME ", _abs_host($rec->{canon}), "\n";
         } elsif ($type eq 'MX') {
-            push @res, "MX $rec->{priority} ", _abs_host($rec->{host}), "\n";
+            push @res, "MX $rec->{priority} ", $rec->{host}, "\n";
         } elsif ($type eq 'NS') {
             push @res, "NS ", _abs_host($rec->{host}), "\n";
+        } elsif ($type eq 'SRV') {
+            push @res, "SRV $rec->{priority} $rec->{weight} $rec->{port} $rec->{target}\n";
         } elsif ($type eq 'SSHFP') {
             push @res, "SSHFP $rec->{algo} $rec->{fptype} $rec->{fp}\n";
         } elsif ($type eq 'TXT') {
@@ -119,7 +121,7 @@ DNS::Zone::Struct::To::BIND - Generate BIND zone configuration from structure
 
 =head1 VERSION
 
-This document describes version 0.003 of DNS::Zone::Struct::To::BIND (from Perl distribution DNS-Zone-Struct-To-BIND), released on 2019-08-28.
+This document describes version 0.006 of DNS::Zone::Struct::To::BIND (from Perl distribution DNS-Zone-Struct-To-BIND), released on 2019-09-17.
 
 =head1 SYNOPSIS
 

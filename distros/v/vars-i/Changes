@@ -1,5 +1,23 @@
 Revision history for Perl distribution vars-i
 
+2.000000 2019-09-18T01:21:48Z
+
+    - Added a few more tests
+    - Production release of 1.900000
+    - Switch to Semantic Versioning
+
+1.900000 2019-09-16T02:26:52Z (TRIAL RELEASE)
+
+    - **Versioning change**: Prepare for switch to semantic
+      versioning.  The next production release will be semver 2.0.0.
+    - In `use vars::i '$foo'=>[1..3]`, make `$foo` hold
+      an arrayref rather than the first element of the
+      provided array.  (#4)
+    - Fill in prerequisites and update documentation
+    - Add test kit
+    - Add a placeholder for options (should any be needed
+      in the future).
+
 1.10 2019-07-09T22:03:31Z
     - Production release
 
@@ -39,3 +57,5 @@ Revision history for Perl distribution vars-i
     - injected http://perlmonks.org/index.pl?node_id=264096
     - wrote tests
     - uploaded to cpan (finally)
+
+# vi: set ts=4 sts=4 sw=4 et ai: #

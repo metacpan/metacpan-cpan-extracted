@@ -3,7 +3,7 @@ package PDF::API2::Resource::Font::CoreFont::courierbold;
 use strict;
 use warnings;
 
-our $VERSION = '2.035'; # VERSION
+our $VERSION = '2.036'; # VERSION
 
 sub data { return {
     'fontname' => 'Courier-Bold',

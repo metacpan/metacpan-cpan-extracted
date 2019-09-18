@@ -1,4 +1,4 @@
-[![MetaCPAN Release](https://badge.fury.io/pl/vars-i.svg)](https://metacpan.org/release/vars-i)
+[![MetaCPAN Release](https://badge.fury.io/pl/vars-i.svg)](https://metacpan.org/release/vars-i) [![Build Status](https://travis-ci.org/cxw42/Perl-vars-i.svg?branch=master)](https://travis-ci.org/cxw42/Perl-vars-i)
 # NAME
 
 vars::i - Perl pragma to declare and simultaneously initialize global variables.
@@ -76,16 +76,32 @@ create the variable.  E.g., `use vars::i '$foo';` is a no-op.
 
 - Trying to create a special variable is fatal.  E.g., `use vars::i '$@', 1;`
 will die at compile time.
+- The sigil is taken into account (context sensitivity!)  So:
+
+        use vars::i '$foo' => [1,2,3];  # now $foo is an arrayref
+        use vars::i '@bar' => [1,2,3];  # now @bar is a three-element list
 
 # SEE ALSO
 
 See [vars](https://metacpan.org/pod/vars), ["our" in perldoc](https://metacpan.org/pod/perldoc#our), ["Pragmatic Modules" in perlmodlib](https://metacpan.org/pod/perlmodlib#Pragmatic-Modules).
 
-# MINIMUM PERL VERSION
+# VERSIONING
 
-This version supports Perl 5.6+.  If you are running an earlier Perl,
-use version 1.01 of this module
-([PODMASTER/vars-i-1.01](https://metacpan.org/pod/release/PODMASTER/vars-i-1.01/lib/vars/i.pm)).
+Since version 1.900000, this module is numbered using
+[Semantic Versioning 2.0.0](https://semver.org),
+packed in the compatibility format of `vX.Y.Z -> X.00Y00Z`.
+
+This version supports Perl 5.6.1+.  If you are running an earlier Perl:
+
+- Perl 5.6:
+
+    Use version 1.10 of this module
+    ([CXW/vars-i-1.10](https://metacpan.org/pod/release/CXW/vars-i-1.10/lib/vars/i.pm)).
+
+- Pre-5.6:
+
+    Use version 1.01 of this module
+    ([PODMASTER/vars-i-1.01](https://metacpan.org/pod/release/PODMASTER/vars-i-1.01/lib/vars/i.pm)).
 
 # DEVELOPMENT
 

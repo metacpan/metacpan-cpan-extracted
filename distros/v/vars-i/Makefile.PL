@@ -11,7 +11,7 @@ use ExtUtils::MakeMaker 6.64;
 my %WriteMakefileArgs = (
     NAME     => 'vars::i',
     DISTNAME => 'vars-i',
-    VERSION  => '1.10',
+    VERSION  => '2.000000',
     EXE_FILES => [glob('script/*'), glob('bin/*')],
     CONFIGURE_REQUIRES => {
   "ExtUtils::MakeMaker" => "6.64"
@@ -22,12 +22,19 @@ my %WriteMakefileArgs = (
 }
 ,
     TEST_REQUIRES      => {
-  "Test::More" => 0
+  "Exporter" => 0,
+  "Import::Into" => "1.002005",
+  "Test::More" => 0,
+  "lib::relative" => "1.000",
+  "parent" => 0
 }
 ,
     PREREQ_PM          => {
   "Carp" => 0,
-  "perl" => "5.006"
+  "Data::Dumper" => 0,
+  "perl" => "5.006001",
+  "strict" => 0,
+  "warnings" => 0
 }
 ,
 );

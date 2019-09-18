@@ -42,6 +42,10 @@ file.
 
 	print "Station ID=$stationID\n";
 	
+	my $genre = $station->{'genre'};
+
+	print "Genre=$genre\n"  if ($genre);
+	
 	my $icon_url = $station->getIconURL();
 
 	if ($icon_url) {   #SAVE THE ICON TO A TEMP. FILE:
@@ -84,17 +88,6 @@ that can come with that method of playing.  The author uses his own custom
 all-purpose media player called "fauxdacious" (his custom hacked version of 
 the open-source "audacious" audio player.  "fauxdacious" incorporates this 
 module to decode and play reciva.com streams.
-
-StreamFinder::Reciva accepts a valid radio station IDF / URL on 
-radios.reciva.com and returns the actual stream URL(s) and cover art icon 
-for that station.  The purpose is that one needs one of these URLs in order 
-to have the option to stream the station in one's own choice of audio player 
-software rather than using their web browser and accepting any / all flash, 
-ads, javascript, cookies, trackers, web-bugs, and other crapware that can 
-come with that method of playing.  The author uses his own custom 
-all-purpose audio player called "fauxdacious" (his custom hacked version of 
-the open-source "audacious" media player).  "fauxdacious" can incorporate 
-this module to decode and play reciva.com streams.
 
 One or more streams can be returned for each station.
 
@@ -366,11 +359,12 @@ sub new
 		$url = 'https://radios.reciva.com/station/' . $url;  #UNALTERED URL FOR ICON
 	}
 	(my $url2 = $url) =~ s#station\/(\d+).*$#streamer\?stationid\=$1\&streamnumber=0#;  #ALTERED URL (FOR STEP 2)
-
-	#NOTE:  THIS IS A 2-STEP FETCH:  1) FETCH THE UNALTERED URL TO GET THE ICON, 2) FETCH ALTERED ONE FOR STREAMS!:
 	$self->{'id'} ||= $1  if ($1);
+	$self->{'id'} ||= $1  if ($url2 =~ /(\d\d+)/);
 	return undef  unless ($self->{'id'});
 
+
+	#NOTE:  THIS IS A 2-STEP FETCH:  1) FETCH THE UNALTERED URL TO GET THE ICON, 2) FETCH ALTERED ONE FOR STREAMS!:
 	my $html = '';
 	print STDERR "-0(Reciva): ID=".$self->{'id'}."= AGENT=".join('|',@userAgentOps)."=\n"  if ($DEBUG);
 	my $ua = LWP::UserAgent->new(@userAgentOps);
@@ -397,7 +391,7 @@ sub new
 		print STDERR $response->status_line  if ($DEBUG);
 		my $no_wget = system('wget','-V');
 		unless ($no_wget) {
-			print STDERR "\n..trying wget...\n"  if ($DEBUG);
+			print STDERR "\n..trying wget0...\n"  if ($DEBUG);
 			$html = `wget -t 2 -T 20 -O- -o /dev/null \"$url\" 2>/dev/null `;
 		}
 	}
@@ -409,7 +403,11 @@ sub new
 		$self->{'iconurl'} = ($html =~ m#stationid\=\"\d+\"\s+href\=\"\/station\/${stationID}\"\>\s*\<img\s+src\=\"([^\"]*)#s) ? $1 : '';
 		$self->{'imageurl'} = $self->{'iconurl'};
 		$self->{'title'} = ($html =~ m#\<th\s+class\=\"stationName\s+spec\"\s+>\s*([^\<]+)#) ? $1 : '';
-		print STDERR "i:ICONURL FOUND=".$self->{'iconurl'}."= TITLE=".$self->{'title'}."=\n";
+		my $genreDiv = ($html =~ m#\<div\s+class\=\"genre\"\>(.+?)\<\/#s) ? $1 : '';
+		$genreDiv =~ s#^\s*\<[^\>]*\>?##s;
+		print STDERR "--GENRE:=$genreDiv=\n"  if ($DEBUG);
+		$self->{'genre'} = $genreDiv  if ($genreDiv =~ /\w/);
+		print STDERR "i:ICONURL FOUND=".$self->{'iconurl'}."= TITLE=".$self->{'title'}."=\n"  if ($DEBUG);
 		$html = '';
 	}
 	$self->{'imageurl'} = $self->{'iconurl'};
@@ -422,7 +420,7 @@ sub new
 		print STDERR $response->status_line  if ($DEBUG);
 		my $no_wget = system('wget','-V');
 		unless ($no_wget) {
-			print STDERR "\n..trying wget...\n"  if ($DEBUG);
+			print STDERR "\n..trying wget1...\n"  if ($DEBUG);
 			$html = `wget -t 2 -T 20 -O- -o /dev/null \"$url2\" 2>/dev/null `;
 		}
 	}
@@ -439,13 +437,13 @@ sub new
 	if (defined $self->{'_reciva_ssl_opts'}) {
 		foreach my $i (keys %{$self->{'_reciva_ssl_opts'}}) {
 			$ua->ssl_opts($i, $self->{'_default_ssl_opts'}->{$i});
-			print STDERR "--SSL OPTS SET ($i) BACK TO (".$self->{'_default_ssl_opts'}->{$i}.")!\n"  if ($DEBUG);
+			print STDERR "--SSL OPTS SET2 ($i) BACK TO (".$self->{'_default_ssl_opts'}->{$i}.")!\n"  if ($DEBUG);
 		}
 	}
 	while ($html =~ s/\<iframe\s+src\=\"(\w+\:\/[^\"]+)//io) {  #FIND ONE (OR MORE) STREAM URLS:
 		$stream = $1;
 		if ($stream =~ /\.pls/io) {
-			print STDERR "---fetching pls stream ($stream) for unrolling...\n";
+			print STDERR "---fetching pls stream ($stream) for unrolling...\n"  if ($DEBUG);
 			$response = $ua->get($stream);
 			if ($response->is_success) {
 				$plshtml = $response->decoded_content;
@@ -454,7 +452,7 @@ sub new
 				print STDERR $response->status_line  if ($DEBUG);
 				my $no_wget = system('wget','-V');
 				unless ($no_wget) {
-					print STDERR "\n..trying wget...\n"  if ($DEBUG);
+					print STDERR "\n..trying wget2...\n"  if ($DEBUG);
 					$plshtml = `wget -t 2 -T 20 -O- -o /dev/null \"$stream\" 2>/dev/null `;
 				}
 			}
@@ -478,7 +476,7 @@ sub new
 	while ($html =~ s/\<a\s+id\=\"livestreams\"\s+class\=\"live\"\s+onclick\="iframe\(\'(\w+\:\/[^\']+)//o) {  #FIND ONE (OR MORE) STREAM URLS:
 		$stream = $1;
 		if ($stream =~ /\.pls/io) {
-			print STDERR "---fetching livestream ($stream)...\n";
+			print STDERR "---fetching livestream ($stream)...\n"  if ($DEBUG);
 			$response = $ua->get($stream);
 			if ($response->is_success) {
 				$plshtml = $response->decoded_content;
@@ -487,7 +485,7 @@ sub new
 				print STDERR $response->status_line  if ($DEBUG);
 				my $no_wget = system('wget','-V');
 				unless ($no_wget) {
-					print STDERR "\n..trying wget...\n"  if ($DEBUG);
+					print STDERR "\n..trying wget3...\n"  if ($DEBUG);
 					$plshtml = `wget -t 2 -T 20 -O- -o /dev/null \"$stream\" 2>/dev/null `;
 				}
 			}
@@ -530,15 +528,15 @@ sub getURL   #LIKE GET, BUT ONLY RANDOMLY SELECT ONE TO RETURN:
 		my $firstStream = ${$self->{'streams'}}[$idx];
 		print STDERR "-getURL($idx): NOPLAYLISTS and (".${$self->{'streams'}}[$idx].")\n"  if ($DEBUG);
 		my $ua = LWP::UserAgent->new(@userAgentOps);	
-		if ($firstStream =~ /\breciva\b/ && defined $self->{'_reciva_ssl_opts'}) {
-			foreach my $i (keys %{$self->{'_reciva_ssl_opts'}}) {
-				$ua->ssl_opts($i, $self->{'_default_ssl_opts'}->{$i});
-				print STDERR "--SSL OPTS SET2 ($i) BACK TO (".$self->{'_default_ssl_opts'}->{$i}.")!\n"  if ($DEBUG);
-			}
-		}
 		$ua->timeout($uops{'timeout'});
 		$ua->cookie_jar({});
 		$ua->env_proxy;
+		if ($firstStream =~ /\breciva\b/ && defined $self->{'_reciva_ssl_opts'}) {
+			foreach my $i (keys %{$self->{'_reciva_ssl_opts'}}) {
+				$ua->ssl_opts($i, $self->{'_reciva_ssl_opts'}->{$i});
+				print STDERR "--SSL OPTS SET4 ($i) TO (".$self->{'_reciva_ssl_opts'}->{$i}.")!\n"  if ($DEBUG);
+			}
+		}
 		my $html = '';
 		my $response = $ua->get($firstStream);
 		if ($response->is_success) {
@@ -547,7 +545,7 @@ sub getURL   #LIKE GET, BUT ONLY RANDOMLY SELECT ONE TO RETURN:
 			print STDERR $response->status_line  if ($DEBUG);
 			my $no_wget = system('wget','-V');
 			unless ($no_wget) {
-				print STDERR "\n..trying wget...\n"  if ($DEBUG);
+				print STDERR "\n..trying wget4...\n"  if ($DEBUG);
 				$html = `wget -t 2 -T 20 -O- -o /dev/null \"$firstStream\" 2>/dev/null `;
 			}
 		}
@@ -622,8 +620,8 @@ sub getIconData
 	$ua->env_proxy;
 	if ($self->{'iconurl'} =~ /\breciva\b/ && defined $self->{'_reciva_ssl_opts'}) {
 		foreach my $i (keys %{$self->{'_reciva_ssl_opts'}}) {
-			$ua->ssl_opts($i, $self->{'_default_ssl_opts'}->{$i});
-			print STDERR "--SSL OPTS SET3 ($i) BACK TO (".$self->{'_default_ssl_opts'}->{$i}.")!\n"  if ($DEBUG);
+			$ua->ssl_opts($i, $self->{'_reciva_ssl_opts'}->{$i});
+			print STDERR "--SSL OPTS SET5 ($i) TO (".$self->{'_reciva_ssl_opts'}->{$i}.")!\n"  if ($DEBUG);
 		}
 	}
 	my $art_image = '';
@@ -634,7 +632,7 @@ sub getIconData
 		print STDERR $response->status_line  if ($DEBUG);
 		my $no_wget = system('wget','-V');
 		unless ($no_wget) {
-			print STDERR "\n..trying wget...\n"  if ($DEBUG);
+			print STDERR "\n..trying wget5...\n"  if ($DEBUG);
 			my $iconUrl = $self->{'iconurl'};
 			$art_image = `wget -t 2 -T 20 -O- -o /dev/null \"$iconUrl\" 2>/dev/null `;
 		}
@@ -661,8 +659,8 @@ sub getImageData
 	$ua->env_proxy;
 	if ($self->{'imageurl'} =~ /\breciva\b/ && defined $self->{'_reciva_ssl_opts'}) {
 		foreach my $i (keys %{$self->{'_reciva_ssl_opts'}}) {
-			$ua->ssl_opts($i, $self->{'_default_ssl_opts'}->{$i});
-			print STDERR "--SSL OPTS SET4 ($i) BACK TO (".$self->{'_default_ssl_opts'}->{$i}.")!\n"  if ($DEBUG);
+			$ua->ssl_opts($i, $self->{'_reciva_ssl_opts'}->{$i});
+			print STDERR "--SSL OPTS SET6 ($i) TO (".$self->{'_reciva_ssl_opts'}->{$i}.")!\n"  if ($DEBUG);
 		}
 	}
 	my $art_image = '';
@@ -673,7 +671,7 @@ sub getImageData
 		print STDERR $response->status_line  if ($DEBUG);
 		my $no_wget = system('wget','-V');
 		unless ($no_wget) {
-			print STDERR "\n..trying wget...\n"  if ($DEBUG);
+			print STDERR "\n..trying wget6...\n"  if ($DEBUG);
 			my $iconUrl = $self->{'iconurl'};
 			$art_image = `wget -t 2 -T 20 -O- -o /dev/null \"$iconUrl\" 2>/dev/null `;
 		}

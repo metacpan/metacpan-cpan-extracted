@@ -1,5 +1,10 @@
 Revision history for Lingua-EN-Opinion
 
+0.1400 2019-09-17 18:18:51
+    - Add a known/unknown familiarity attribute.
+    - Add tests.
+    - Update eg/ code with the familiarity metric.
+
 0.1301 2019-05-01 06:31:09
     - Add eg/pos-neg
     - Clean attribute code.

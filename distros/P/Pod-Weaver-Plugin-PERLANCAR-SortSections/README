@@ -1,12 +1,45 @@
-SYNOPSIS
+NAME
+    Pod::Weaver::Plugin::PERLANCAR::SortSections - Sort POD sections like
+    PERLANCAR
 
+VERSION
+    This document describes version 0.07 of
+    Pod::Weaver::Plugin::PERLANCAR::SortSections (from Perl distribution
+    Pod-Weaver-Plugin-PERLANCAR-SortSections), released on 2019-09-17.
+
+SYNOPSIS
     In your weaver.ini:
 
      [-PERLANCAR::SortSections]
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Pod-Weaver-Plugin-PERLANCAR-SortSections>.
 
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Pod-Weaver-Plugin-PERLANCAR-SortSecti
+    ons>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Plugin-PER
+    LANCAR-SortSections>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Pod::Weaver::Plugin::SortSections, the generic/configurable version
 
     Pod::Weaver::Role::SortSections
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2017, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

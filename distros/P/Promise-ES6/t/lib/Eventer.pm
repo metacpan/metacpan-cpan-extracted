@@ -1,5 +1,7 @@
 package Eventer;
 
+use Test::More;
+
 use Fcntl;
 use File::Temp ();
 
@@ -27,6 +29,8 @@ sub has_happened {
 
 sub happen {
     my ($self, $evt) = @_;
+
+    # diag "EVENT HAPPENING: $evt";
 
     sysopen my $fh, "$self->{'_tempdir'}/event_$evt", Fcntl::O_WRONLY | Fcntl::O_CREAT | Fcntl::O_EXCL;
 
