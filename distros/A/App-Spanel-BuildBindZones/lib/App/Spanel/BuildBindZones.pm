@@ -1,7 +1,7 @@
 package App::Spanel::BuildBindZones;
 
-our $DATE = '2019-08-28'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-08-29'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -9,6 +9,7 @@ use warnings;
 use Log::ger;
 
 use File::chdir;
+use List::Util qw(max);
 
 our %SPEC;
 
@@ -130,6 +131,25 @@ sub build_bind_zones {
                 next;
             }
 
+            # insert header
+            $bind_zone = join(
+                "",
+                "; This BIND zone is generated from YAML zone $yaml_file\n",
+                "; on ", scalar(gmtime), " UTC by $0\n",
+                $bind_zone);
+
+            # insert metadata
+            if ($main::SPANEL_CONFIG) {
+                my $server_priority = $main::SPANEL_CONFIG->{dns}{zones_priority} // 0;
+                my $zone_priority   = $struct_zone->{priority} // 0;
+                my $priority = max($server_priority, $zone_priority);
+
+                my $meta = "; meta: server=$main::SPANEL_CONFIG->{local}{id}; priority=$priority";
+                $bind_zone =~ s/(\$TTL)/$meta\n$1/ or do {
+                    log_warn "$yaml_file: Warning: cannot insert meta '$meta'";
+                };
+            }
+
             open my $fh, ">", $output_file or do {
                 log_warn "$yaml_file: Cannot open $output_file: $!, skipped";
                 next;
@@ -160,7 +180,7 @@ App::Spanel::BuildBindZones - Build BIND zones from YAML zones
 
 =head1 VERSION
 
-This document describes version 0.001 of App::Spanel::BuildBindZones (from Perl distribution App-Spanel-BuildBindZones), released on 2019-08-28.
+This document describes version 0.002 of App::Spanel::BuildBindZones (from Perl distribution App-Spanel-BuildBindZones), released on 2019-08-29.
 
 =head1 SYNOPSIS
 

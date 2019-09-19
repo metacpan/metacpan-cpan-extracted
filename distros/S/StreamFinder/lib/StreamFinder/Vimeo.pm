@@ -38,11 +38,15 @@ file.
 	
 	print "Title=$videoTitle\n";
 	
+	my $videoDescription = $video->getTitle('desc');
+	
+	print "Description=$videoDescription\n";
+	
 	my $videoID = $video->getID();
 
 	print "Video ID=$videoID\n";
 	
-	my $artist = $station->{'artist'};
+	my $artist = $video->{'artist'};
 
 	print "Artist=$artist\n"  if ($artist);
 	
@@ -102,8 +106,10 @@ and the separate application program:  youtube-dl.
 
 =item B<new>(I<url> [, "debug" [ => 0|(1)|2 ]] [, "quality" => I<quality>)
 
-Accepts a vimeo.com URL and creates and returns a new video object, or 
-I<undef> if the URL is not a valid vimeo video or no streams are found.
+Accepts a vimeo.com ID or URL and creates and returns a new video object, 
+or I<undef> if the URL is not a valid Vimeo video or no streams are 
+found.  The URL can be the full URL, 
+ie. https://player.vimeo.com/video/I<video-id>, or just I<video-id>.
 
 The I<"quality"> option, which can be set to a "p number" optionally 
 preceeded by a relational operator ("<", ">", "=") - default: "<".  
@@ -114,7 +120,7 @@ that does the same thing.
 
 =item $video->B<get>()
 
-Returns an array of strings representing all stream urls found.
+Returns an array of strings representing all stream URLs found.
 
 =item $video->B<getURL>([I<options>])
 
@@ -136,13 +142,13 @@ Returns the number of streams found for the video.
 
 Returns the video's Vimeo ID (numeric).
 
-=item $video->B<getTitle>()
+=item $video->B<getTitle>(['desc'])
 
-Returns the video's title (description).  
+Returns the video's title, or (long description).  
 
 =item $video->B<getIconURL>()
 
-Returns the url for the video's "cover art" icon image, if any.
+Returns the URL for the video's "cover art" icon image, if any.
 
 =item $video->B<getIconData>()
 
@@ -151,7 +157,8 @@ Returns a two-element array consisting of the extension (ie. "png",
 
 =item $video->B<getImageURL>()
 
-Returns the url for the video's "cover art" banner image.
+Returns the URL for the video's "cover art" (usually larger) 
+banner image.
 
 =item $video->B<getImageData>()
 
@@ -426,7 +433,7 @@ sub new
 	unless ($self->{'cnt'} > 0) {
 		$url =~ s/\?autoplay\=true$//;  #STRIP THIS OFF SO WE DON'T HAVE TO.
 		my $url2fetch = $url;
-		#DEPRECIATED (STATION-IDS NOW INCLUDE STUFF BEFORE THE DASH: ($self->{'id'} = $url) =~ s#^.*\-([a-z]\d+)\/?$#$1#;
+		#DEPRECIATED (VIDEO-IDS NOW INCLUDE STUFF BEFORE THE DASH: ($self->{'id'} = $url) =~ s#^.*\-([a-z]\d+)\/?$#$1#;
 		$url2fetch = 'https://www.vimeo.com/' . $url  unless ($url2fetch =~ m#^https?\:#);
 		print STDERR "\n-2 NO STREAMS FOUND IN PLAYER PAGE, TRYING youtube-dl...\n"  if ($DEBUG);
 		my $ytdlArgs = '--get-url --get-thumbnail --get-title --get-description -f "'

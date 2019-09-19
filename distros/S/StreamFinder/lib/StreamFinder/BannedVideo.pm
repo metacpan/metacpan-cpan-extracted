@@ -99,8 +99,10 @@ One or more stream URLs can be returned for each video.
 
 =item B<new>(I<url> [, I<-keep> => "type1,type2?..." | [type1,type2?...] ] | [, I<-debug> [ => 0|1|2 ] ])
 
-Accepts a Banned.Video ID or URL and creates and returns a new video object, or 
-I<undef> if the URL is not a valid Banned.Video video or no streams are found.
+Accepts a Banned.Video video ID or URL and creates and returns a new video object, 
+or I<undef> if the URL is not a valid Banned.Video video or no streams are found  
+The URL can be the full URL, 
+ie. https://banned.video/watch?id=<video-id>, or just I<video-id>.
 
 The optional I<keep> can be either a comma-separated string or an array reference 
 ([...]) of stream types to keep (include) and returned in order specified 
@@ -114,7 +116,7 @@ control order of search.
 
 =item $video->B<get>()
 
-Returns an array of strings representing all stream urls found.
+Returns an array of strings representing all stream URLs found.
 
 =item $video->B<getURL>([I<options>])
 
@@ -142,7 +144,7 @@ Returns the video's title, or (long description).
 
 =item $video->B<getIconURL>()
 
-Returns the url for the video's "cover art" icon image, if any.
+Returns the URL for the video's "cover art" icon image, if any.
 
 =item $video->B<getIconData>()
 
@@ -151,7 +153,8 @@ Returns a two-element array consisting of the extension (ie. "png",
 
 =item $video->B<getImageURL>()
 
-Returns the url for the video's "cover art" banner image.
+Returns the URL for the video's "cover art" (usually larger) 
+banner image.
 
 =item $video->B<getImageData>()
 
@@ -364,10 +367,13 @@ sub new
 	(my $url2fetch = $url);
 	if ($url =~ /^https?\:/) {
 		$self->{'id'} = $1  if ($url2fetch =~ m#\/([^\/]+)\/?$#);
+		$self->{'id'} =~ s#^(?:watch\?)?id\=##;
 	} else {
 		$self->{'id'} = $url;
 		$url2fetch = 'https://banned.video/watch?id=' . $url;
 	}
+	return undef  unless ($self->{'id'});
+
 	$self->{'cnt'} = 0;
 	my $html = '';
 	print STDERR "-0(BannedVideo): ID=".$self->{'id'}."= URL=$url2fetch=\n"  if ($DEBUG);
@@ -430,7 +436,7 @@ sub new
 	$self->{'streams'} = \@streams;  #WE'LL HAVE A LIST OF 'EM TO RANDOMLY CHOOSE ONE FROM:
 	$self->{'total'} = $self->{'cnt'};
 	print STDERR "-(all)count=".$self->{'cnt'}."= iconurl=".$self->{'iconurl'}."=\n"  if ($DEBUG);
-	print STDERR "-SUCCESS: 1st stream=".${$self->{'streams'}}[0]."=\n"  if ($DEBUG);
+	print STDERR "-SUCCESS: 1st stream=".${$self->{'streams'}}[0]."=\ntitle=".$self->{'title'}."=\n"  if ($DEBUG);
 
 	bless $self, $class;   #BLESS IT!
 

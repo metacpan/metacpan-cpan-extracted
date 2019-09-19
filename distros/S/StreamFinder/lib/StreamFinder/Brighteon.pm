@@ -38,9 +38,17 @@ file.
 	
 	print "Title=$videoTitle\n";
 	
+	my $videoDescription = $video->getTitle('desc');
+	
+	print "Description=$videoDescription\n";
+	
 	my $videoID = $video->getID();
 
 	print "Video ID=$videoID\n";
+	
+	my $artist = $video->{'artist'};
+
+	print "Artist=$artist\n"  if ($artist);
 	
 	my $icon_url = $video->getIconURL();
 
@@ -97,8 +105,10 @@ and the separate application program:  youtube-dl.
 
 =item B<new>(I<url> [, I<-youtube> => (yes)|no|only ] [, I<-keep> => "type1,type2?..." | [type1,type2?...] ] | [, "debug" [ => 0|(1)|2 ]])
 
-Accepts a brighteon.com URL and creates and returns a new video object, or 
-I<undef> if the URL is not a valid brighteon video or no streams are found.
+Accepts a brighteon.com video ID or URL and creates and returns a new video object, 
+or I<undef> if the URL is not a valid Brighteon video or no streams are found.  
+The URL can be the full URL, 
+ie. https://www.brighteon.com/I<video-id>, or just I<video-id>
 
 The optional I<keep> can be either a comma-separated string or an array reference 
 ([...]) of stream types to keep (include) and returned in order specified 
@@ -113,7 +123,7 @@ control order of search.
 NOTE:  I<keep> is ignored if I<youtube> is set to "only".
 
 The optional I<youtube> can be set to "yes" - also include streams youtube-dl finds, 
-"no" - only include streams embedded in the station's brighteon.com page, or 
+"no" - only include streams embedded in the video's brighteon.com page, or 
 "only" - only include streams youtube-dl finds.  Default is "yes".  This is needed 
 because currently the streams on the page: (mpd plays best but is unseekable, and 
 the m3u8 stream doesn't seem to work well).  youtube-dl also returns a "chunky" m3u8 
@@ -121,7 +131,7 @@ stream that is seekable and seems to work ok.
 
 =item $video->B<get>()
 
-Returns an array of strings representing all stream urls found.
+Returns an array of strings representing all stream URLs found.
 
 =item $video->B<getURL>([I<options>])
 
@@ -143,13 +153,13 @@ Returns the number of streams found for the video.
 
 Returns the video's Brighteon ID (alphanumeric).
 
-=item $video->B<getTitle>()
+=item $video->B<getTitle>(['desc'])
 
-Returns the video's title (description).  
+Returns the video's title, or (long description).  
 
 =item $video->B<getIconURL>()
 
-Returns the url for the video's "cover art" icon image, if any.
+Returns the URL for the video's "cover art" icon image, if any.
 
 =item $video->B<getIconData>()
 
@@ -158,7 +168,9 @@ Returns a two-element array consisting of the extension (ie. "png",
 
 =item $video->B<getImageURL>()
 
-Returns the url for the video's "cover art" banner image.
+Returns the URL for the video's "cover art" banner image, which for 
+Brighteon videos is always the icon image, as Brighteon does not 
+support a separate banner image at this time.
 
 =item $video->B<getImageData>()
 
@@ -374,7 +386,7 @@ sub new
 	print STDERR "-0(Brighteon): URL=$url=\n"  if ($DEBUG);
 	$url =~ s/\?autoplay\=true$//;  #STRIP THIS OFF SO WE DON'T HAVE TO.
 	(my $url2fetch = $url);
-	#DEPRECIATED (STATION-IDS NOW INCLUDE STUFF BEFORE THE DASH: ($self->{'id'} = $url) =~ s#^.*\-([a-z]\d+)\/?$#$1#;
+	#DEPRECIATED (VIDEO-IDS NOW INCLUDE STUFF BEFORE THE DASH: ($self->{'id'} = $url) =~ s#^.*\-([a-z]\d+)\/?$#$1#;
 	if ($url2fetch =~ m#^https?\:#) {
 		$self->{'id'} = $1  if ($url2fetch =~ m#\/([^\/]+)\/?$#);
 		$self->{'id'} =~ s/[\?\&].*$//;
@@ -494,9 +506,9 @@ RETRYIT:
 		if (defined($uops{'userid'}) && defined($uops{'userpw'})) {  #USER HAS A LOGIN CONFIGURED:
 			my $uid = $uops{'userid'};
 			my $upw = $uops{'userpw'};
-			$_ = `youtube-dl --username "$uid" --password "$upw" $ytdlArgs "$url"`;
+			$_ = `youtube-dl --username "$uid" --password "$upw" $ytdlArgs "$url2fetch"`;
 		} else {
-			$_ = `youtube-dl --get-url $ytdlArgs "$url"`;
+			$_ = `youtube-dl --get-url $ytdlArgs "$url2fetch"`;
 		}
 		print STDERR "--TRY($try of 1): youtube-dl returned=$_= ARGS=$ytdlArgs=\n"  if ($DEBUG);
 		@ytdldata = split /\r?\n/s;

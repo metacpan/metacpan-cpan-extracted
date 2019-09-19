@@ -1,5 +1,8 @@
 Revision history for Lingua::IND::Numbers
 
+0.11  2019-09-18T18:00:00+01:00
+      - Moved author test scripts to xt/ subfolder.
+
 0.10  2017-04-05T18:40:00+01:00
       - Added test scripts (t/meta-json.t and t/meta-yml.t).
 

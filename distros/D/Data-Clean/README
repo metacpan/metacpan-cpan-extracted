@@ -2,8 +2,8 @@ NAME
     Data::Clean - Clean data structure
 
 VERSION
-    This document describes version 0.504 of Data::Clean (from Perl
-    distribution Data-Clean), released on 2019-09-01.
+    This document describes version 0.505 of Data::Clean (from Perl
+    distribution Data-Clean), released on 2019-09-08.
 
 SYNOPSIS
      use Data::Clean;

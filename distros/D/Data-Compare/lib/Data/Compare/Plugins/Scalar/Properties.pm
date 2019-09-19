@@ -1,10 +1,11 @@
 package Data::Compare::Plugins::Scalar::Properties;
 
+use warnings;
 use strict;
 use vars qw($VERSION);
 use Data::Compare;
 
-$VERSION = 1.0;
+$VERSION = 1.25;
 
 sub register {
     return [

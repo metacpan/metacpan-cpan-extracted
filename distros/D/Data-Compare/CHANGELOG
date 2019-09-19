@@ -1,7 +1,12 @@
+1.26    2019-09-18  DCANTRELL  Minor code quality improvements from Alberto
+                                 Simõe;
+                               Reinstate check for cwd being inaccessible
+                                 (Daniel Collins)
+
 1.25    2013-04-15  DCANTRELL  Add Gianni Ceccarelli's tests and patch
-				 to Use refaddr & reftype to "do the right
-				 thing" when comparing objects that overload
-				 numification and stringification
+                                 to Use refaddr & reftype to "do the right
+                                 thing" when comparing objects that overload
+                                 numification and stringification
 
 1.24    2014-04-05  DCANTRELL  Bump the required JSON.pm version for
                                  tests - something's a bit broken around

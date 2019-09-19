@@ -1,7 +1,7 @@
 package Term::Detect::Software;
 
-our $DATE = '2019-08-18'; # DATE
-our $VERSION = '0.221'; # VERSION
+our $DATE = '2019-08-21'; # DATE
+our $VERSION = '0.222'; # VERSION
 
 use 5.010001;
 use strict;
@@ -192,6 +192,7 @@ sub detect_terminal {
                     if (File::Which::which("tput")) {
                         my $res = `tput colors` + 0;
                         push @dbg, "detect color_depth: $res via tput";
+                        $res = 16 if $res == 8; # 8 is basically 16 (8 low-intensity + 8 high-intensity)
                         $info->{color_depth} = $res;
                     }
                 }
@@ -233,7 +234,7 @@ Term::Detect::Software - Detect terminal (emulator) software and its capabilitie
 
 =head1 VERSION
 
-This document describes version 0.221 of Term::Detect::Software (from Perl distribution Term-Detect-Software), released on 2019-08-18.
+This document describes version 0.222 of Term::Detect::Software (from Perl distribution Term-Detect-Software), released on 2019-08-21.
 
 =head1 SYNOPSIS
 

@@ -51,10 +51,10 @@ file.
 
 	print "Artist=$artist\n"  if ($artist);
 	
+	my $genre = $station->{'genre'};
+
 	print "Genre=$genre\n"  if ($genre);
 	
-	my $icon_url = $station->getIconURL();
-
 	my $icon_url = $station->getIconURL();
 
 	if ($icon_url) {   #SAVE THE ICON TO A TEMP. FILE:
@@ -106,8 +106,14 @@ One or more stream URLs can be returned for each station.
 
 =item B<new>(I<url> [, I<-keep|-skip> => I<streamtypes> | I<-debug> [ => 0|1|2 ] ... ])
 
-Accepts an iheartradio.com URL and creates and returns a new station object, or 
-I<undef> if the URL is not a valid iheartradio station or no streams are found.
+Accepts an iheartradio.com station / podcast ID or URL and creates and returns a 
+new station object, or I<undef> if the URL is not a valid IHeart station or 
+podcast, or no streams are found.  The URL can be the full URL, 
+ie. https://www.iheart.com/live/I<station-id>, 
+https://www.iheart.com/podcast/I<podcast-id>/episode/I<episode-id>, or just 
+I<station-id>, or I<podcast-id>/I<episode-id>.  NOTE:  For podcasts, you must 
+include the I<episode-id> if not specifying a full URL, otherwise, the 
+I<podcast-id> will be interpreted as a I<station-id>!
 
 I<-keep> and I<-skip> specify a list of one or more I<streamtypes> to either 
 include or skip respectively.  The list for each can be either a comma-separated 
@@ -135,7 +141,7 @@ skipping any that are "rtmp" streams.
 
 =item $station->B<get>()
 
-Returns an array of strings representing all stream urls found.
+Returns an array of strings representing all stream URLs found.
 
 =item $station->B<getURL>([I<options>])
 
@@ -155,16 +161,19 @@ Returns the number of streams found for the station.
 
 =item $station->B<getID>(['fccid'])
 
-Returns the station's IHeartRadio ID (default) or 
-station's FCC call-letters ("fccid").
+Returns the station's IHeartRadio ID (default) or station's FCC 
+call-letters ("fccid").  For stations, the IHeartRadio ID is a single value.  
+For individual podcast episodes it's two values separated by a slash ("/").
 
 =item $station->B<getTitle>(['desc'])
 
-Returns the station's title, or (long description).  
+Returns the station's title, or (long description).  Podcasts 
+on IHeartRadio can have separate descriptions, but for stations, 
+it is always the station's title.
 
 =item $station->B<getIconURL>()
 
-Returns the url for the station's "cover art" icon image, if any.
+Returns the URL for the station's "cover art" icon image, if any.
 
 =item $station->B<getIconData>()
 
@@ -173,7 +182,8 @@ Returns a two-element array consisting of the extension (ie. "png",
 
 =item $station->B<getImageURL>()
 
-Returns the url for the station's "cover art" banner image.
+Returns the URL for the station's "cover art" (usually larger) 
+banner image.
 
 =item $station->B<getImageData>()
 

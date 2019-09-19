@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.860';
+our $VERSION = '1.862';
 
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
 
@@ -1031,7 +1031,7 @@ MCE::Shared::Queue - Hybrid-queue helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Queue version 1.860
+This document describes MCE::Shared::Queue version 1.862
 
 =head1 DESCRIPTION
 

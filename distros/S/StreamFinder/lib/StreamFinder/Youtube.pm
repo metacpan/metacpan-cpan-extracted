@@ -38,15 +38,15 @@ file.
 	
 	print "Title=$videoTitle\n";
 	
-	my $stationDescription = $station->getTitle('desc');
+	my $videoDescription = $video->getTitle('desc');
 	
-	print "Description=$stationDescription\n";
+	print "Description=$videoDescription\n";
 	
 	my $videoID = $video->getID();
 
 	print "Video ID=$videoID\n";
 	
-	my $artist = $station->{'artist'};
+	my $artist = $video->{'artist'};
 
 	print "Artist=$artist\n"  if ($artist);
 	
@@ -106,8 +106,11 @@ and the separate application program:  youtube-dl.
 
 =item B<new>(I<url> [, "debug" [ => 0|(1)|2 ]] [, "fast" [ => 0|(1) ]])
 
-Accepts a youtube.com URL and creates and returns a new video object, or 
-I<undef> if the URL is not a valid youtube video or no streams are found.
+Accepts a youtube.com video ID or URL and creates and returns a new video 
+object, or I<undef> if the URL is not a valid Youtube video or no streams 
+are found  The URL can be the full URL, 
+ie. https://www.youtube.com/watch?v=I<video-id>, or just I<video-id> 
+(if the site is www.youtube.com, since Youtube has multiple sites).
 
 If "fast" or "-fast" is specified (or set to 1), a separate probe of the 
 page to fetch the video's title and artist is skipped.  This is useful 
@@ -116,7 +119,7 @@ the artist field.
 
 =item $video->B<get>()
 
-Returns an array of strings representing all stream urls found.
+Returns an array of strings representing all stream URLs found.
 
 =item $video->B<getURL>([I<options>])
 
@@ -138,13 +141,13 @@ Returns the number of streams found for the video.
 
 Returns the video's Youtube ID (numeric).
 
-=item $station->B<getTitle>(['desc'])
+=item $video->B<getTitle>(['desc'])
 
 Returns the station's title, or (long description).  
 
 =item $video->B<getIconURL>()
 
-Returns the url for the video's "cover art" icon image, if any.
+Returns the URL for the video's "cover art" icon image, if any.
 
 =item $video->B<getIconData>()
 
@@ -153,7 +156,9 @@ Returns a two-element array consisting of the extension (ie. "png",
 
 =item $video->B<getImageURL>()
 
-Returns the url for the video's "cover art" banner image.
+Returns the URL for the video's "cover art" banner image, which for 
+Youtube videoss is always the icon image, as Youtube does not support 
+a separate banner image at this time.
 
 =item $video->B<getImageData>()
 

@@ -39,7 +39,7 @@ for my $file ( sort @files ) {
     printf "known: %d, unknown: %d, known/total: %.2f\n",
         $opinion->familiarity->{known},
         $opinion->familiarity->{unknown},
-        $opinion->familiarity->{known} / ( $opinion->familiarity->{known} + $opinion->familiarity->{unknown} );
+        $opinion->ratio;
 
     if ( $prompt ) {
         print "\n";

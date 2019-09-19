@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/Spanel/BuildBindZones/build_bind_zones
 # and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-08-28'; # DATE
+our $DATE = '2019-08-29'; # DATE
 our $DIST = 'App-Spanel-BuildBindZones'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,7 +40,7 @@ spanel-build-bind-zones - Build BIND zones from YAML zones
 
 =head1 VERSION
 
-This document describes version 0.001 of spanel-build-bind-zones (from Perl distribution App-Spanel-BuildBindZones), released on 2019-08-28.
+This document describes version 0.002 of spanel-build-bind-zones (from Perl distribution App-Spanel-BuildBindZones), released on 2019-08-29.
 
 =head1 SYNOPSIS
 

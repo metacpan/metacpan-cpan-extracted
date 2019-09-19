@@ -1,11 +1,10 @@
 # ABSTRACT:RESTful Web Services with login, sessions, persistent data, multiple input/output formats, and IP access
 # Multiple input/output formats : JSON , XML , YAML, PERL , HUMAN
 #
-# George Bouras
-# george.mpouras@yandex.com
+# George Bouras, george.mpouras@yandex.com
 
 package Dancer2::Plugin::WebService;
-our	$VERSION = '4.1.5';
+our	$VERSION = '4.1.6';
 use	strict;
 use	warnings;
 use	Dancer2::Plugin;
@@ -683,7 +682,7 @@ Dancer2::Plugin::WebService - RESTful Web Services with login, sessions, persist
 
 =head1 VERSION
 
-version 4.1.5
+version 4.1.6
 
 =head1 SYNOPSIS
 
@@ -725,14 +724,6 @@ The replies through this module have the extra key B<error> . At success B<error
   any  '/LoginNeeded_read'  => sub { reply session_get('s1', 's2') };
 
   dance;
-
-=head1 NAME
-
-Dancer2::Plugin::WebService - Web Services with login, sessions, persistent data, multiple input/output formats, and IP access
-
-=head1 VERSION
-
-version 4.1.5
 
 =head1 POLYMORPHISM
 
@@ -1064,17 +1055,6 @@ B<RPC::Any> A simple, unified interface to XML-RPC and JSON-RPC
 B<XML::RPC> Pure Perl implementation for an XML-RPC client and server.
 
 B<JSON::RPC> JSON RPC 2.0 Server Implementation 
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2018 by George Bouras
-
-It is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=head1 AUTHOR
-
-George Bouras <george.mpouras@yandex.com>
 
 =head1 AUTHOR
 

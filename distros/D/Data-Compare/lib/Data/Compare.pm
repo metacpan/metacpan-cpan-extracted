@@ -17,7 +17,7 @@ use File::Find::Rule;
 
 @ISA     = qw(Exporter);
 @EXPORT  = qw(Compare);
-$VERSION = 1.25;
+$VERSION = 1.26;
 $DEBUG   = $ENV{PERL_DATA_COMPARE_DEBUG} || 0;
 
 my %handler;
@@ -25,7 +25,8 @@ my %handler;
 use Cwd;
 
 sub import {
-  register_plugins() unless tainted getcwd();
+  my $cwd = getcwd();
+  register_plugins() unless(tainted getcwd() || !chdir $cwd);
   __PACKAGE__->export_to_level(1, @EXPORT);
 }
 
@@ -384,14 +385,16 @@ L<git://github.com/DrHyde/perl-modules-Data-Compare.git>
 
 =head1 BUGS
 
-Plugin support is not quite finished (see the TODO file for details) but
-is usable.  The missing bits are bells and whistles rather than core
-functionality.
+Plugin support is not quite finished (see the the Github
+L<issue #5|http://github.com/DrHyde/perl-modules-Data-Compare/issues/5>
+for details) but is usable. The missing bits are bells and whistles rather than
+core functionality.
 
-Please report any other bugs either by email to David Cantrell (see below
-for address) or using rt.cpan.org:
+Plugins are unavailable if you can't change to the current directory.  This
+might happen if you started your process as a priveleged user and then dropped
+priveleges.  If this affects you, please supply a portable patch with tests.
 
-L<https://rt.cpan.org/Ticket/Create.html?Queue=Data-Compare>
+Bug reports should be made on Github or by email.
 
 =head1 AUTHOR
 

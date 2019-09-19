@@ -2,7 +2,7 @@ NAME
     Complete::Country - Complete from list of ISO-3166 country codes
 
 VERSION
-    This document describes version 0.002 of Complete::Country (from Perl
+    This document describes version 0.003 of Complete::Country (from Perl
     distribution Complete-Country), released on 2019-07-18.
 
 SYNOPSIS
@@ -44,6 +44,8 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+    Complete::Currency
+
     Complete::Language
 
 AUTHOR

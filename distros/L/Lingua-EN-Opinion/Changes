@@ -1,5 +1,16 @@
 Revision history for Lingua-EN-Opinion
 
+0.1502 2019-09-18 11:31:55
+    - Update eg/ code with the ->ratio method.
+    - Fix documentation typo.
+
+0.1501 2019-09-18 11:03:41
+    - Improve documentation.
+
+0.1500 2019-09-18 08:21:37
+    - Add a ->ratio method.
+    - Improve documentation.
+
 0.1400 2019-09-17 18:18:51
     - Add a known/unknown familiarity attribute.
     - Add tests.

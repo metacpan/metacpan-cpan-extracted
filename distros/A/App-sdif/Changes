@@ -1,5 +1,11 @@
 Revision history for Perl application 'sdif-tools'.
 
+4.12.0 2019-09-19T03:44:01Z
+
+    - Rename --graph option to --prefix.
+
+    Now process diff output in git commit message produced by Minilla.
+
 4.11.1 2019-06-22T21:07:23Z
 
     - Fix normal diff to produce colored text.

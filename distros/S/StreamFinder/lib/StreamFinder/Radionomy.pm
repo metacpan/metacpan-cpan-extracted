@@ -99,14 +99,14 @@ One or more streams can be returned for each station.
 
 Accepts a Radionomy.com ID or URL and creates and returns a new station object, 
 or I<undef> if the URL is not a valid Radionomy station or no streams are found.
-The url can be the full URL, 
-ie. http://www.radionomy.com/en/radio/jamendolounge/index, 
-or http://www.radionomy.com/en/radio/jamendolounge, 
-or just the station ID:  jamendolounge.
+The URL can be the full URL, 
+ie. http://www.radionomy.com/en/radio/I<station-id>/index, 
+http://www.radionomy.com/en/radio/I<station-id>, 
+or just I<station-id>.
 
 =item $station->B<get>()
 
-Returns an array of strings representing all stream urls found.
+Returns an array of strings representing all stream URLs found.
 
 =item $station->B<getURL>([I<options>])
 
@@ -135,7 +135,7 @@ Returns the station's title, or (long description).
 
 =item $station->B<getIconURL>()
 
-Returns the url for the station's "cover art" icon image, if any.
+Returns the URL for the station's "cover art" icon image, if any.
 
 =item $station->B<getIconData>()
 
@@ -144,7 +144,9 @@ Returns a two-element array consisting of the extension (ie. "png",
 
 =item $station->B<getImageURL>()
 
-Returns the url for the station's "cover art" banner image.
+Returns the URL for the station's "cover art" banner image, which for 
+Radionomy stations is always the icon image, as Radionomy does not 
+support a separate banner image at this time.
 
 =item $station->B<getImageData>()
 

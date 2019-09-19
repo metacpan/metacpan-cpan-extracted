@@ -22,6 +22,7 @@ requires:
   Data::Transmute: '0.031'
   Data::Transmute::Rules::DNS::Zone::Struct::FromSpanel: '0'
   File::chdir: '0'
+  List::Util: '1.45'
   Log::ger: '0.027'
   Perinci::CmdLine::Any: '0'
   Perinci::CmdLine::Lite: '1.820'
@@ -33,7 +34,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-Spanel-BuildBindZones
   homepage: https://metacpan.org/release/App-Spanel-BuildBindZones
   repository: git://github.com/perlancar/perl-App-Spanel-BuildBindZones.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.028002'

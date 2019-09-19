@@ -2,17 +2,21 @@
 
 package App::WHMCSUtils;
 
-our $DATE = '2018-01-29'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2019-09-19'; # DATE
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
 
+use Digest::MD5 qw(md5_hex);
 use File::chdir;
 use IPC::System::Options qw(system readpipe);
+use LWP::UserAgent::Patch::HTTPSHardTimeout;
+use LWP::UserAgent;
 use Path::Tiny;
+use WWW::Mechanize;
 
 our %SPEC;
 
@@ -38,6 +42,31 @@ our %args_db = (
         schema => 'str*',
     },
     db_pass => {
+        schema => 'str*',
+    },
+);
+
+our %args_whmcs_credential = (
+    url => {
+        schema => 'url*',
+        req => 1,
+        description => <<'_',
+
+It should be without `/admin` part, e.g.:
+
+    https://client.mycompany.com/
+
+_
+    },
+    admin_username => {
+        schema => 'str*',
+        req => 1,
+    },
+    admin_password => {
+        schema => 'str*',
+        req => 1,
+    },
+    mech_user_agent => {
         schema => 'str*',
     },
 );
@@ -116,7 +145,6 @@ _
     },
 };
 sub restore_whmcs_client {
-
     my %args = @_;
 
     local $CWD;
@@ -645,6 +673,208 @@ _
     return [200, "OK", \%totalrow];
 }
 
+# login to whmcs admin area, dies on failure
+my $logged_in = 0;
+our $mech;
+sub _login_admin {
+    my %args = @_;
+
+    return $mech if $logged_in;
+    my $url = $args{url} . "/admin";
+    log_debug("Logging into %s as %s ...", $url, $args{admin_username});
+
+    $mech = WWW::Mechanize->new(
+        (agent => $args{mech_user_agent}) x !!defined($args{mech_user_agent}),
+    );
+    $mech->get("$url/login.php");
+
+    if ( !$mech->success || $mech->content !~ m!<form .*dologin.php!) {
+        die "Failed opening WHMCS admin login page (status=". $mech->status. ")";
+    }
+    $mech->submit_form(
+        form_number => 1,
+        fields      => {
+            username => $args{admin_username},
+            password => $args{admin_password},
+        },
+    );
+
+    my $success = $mech->success;
+    my $content = $mech->content;
+    my @err;
+    if (!$success) {
+        push @err, "Can't submit successfully: ".$mech->res->code." - ".$mech->res->message;
+    }
+    if ($content !~ /Logout/i) {
+        push @err, "Not logged in yet (no Logout string)";
+    }
+    if ($content =~ m!<form .*dologin.php!) {
+        push @err, "Getting form login again";
+    }
+    if (@err) {
+        die "Failed logging into WHMCS admin area: ".join(", ", @err);
+    }
+    $logged_in++;
+    $mech;
+}
+
+sub _send_verification_email {
+    my ($args, $client_rec, $dbh, $orig_sender_email, $sender_email) = @_;
+
+    _login_admin(%$args);
+
+    my $url0 = "$args->{url}/admin/clientssummary.php";
+    my $url1 = "$url0?userid=$client_rec->{id}";
+    $mech->get($url1);
+    die "Can't get $url1: " . $mech->status unless $mech->success;
+
+    my $content = $mech->content;
+    $content =~ /'token':\s*'(\w+)'/ or die "Can't extract submit token";
+    $dbh->do("UPDATE tblconfiguration SET value=? WHERE setting='Email'", {}, $sender_email) if $sender_email ne $orig_sender_email;
+    $mech->post(
+        $url0,
+        [
+            token => $1,
+            action => 'resendVerificationEmail',
+            userid => $client_rec->{id},
+        ],
+    );
+    die "Can't post to $url1 to submit resend action: " .
+        $mech->status unless $mech->success;
+    $dbh->do("UPDATE tblconfiguration SET value=? WHERE setting='Email'", {}, $orig_sender_email) if $sender_email ne $orig_sender_email;
+}
+
+$SPEC{send_verification_emails} = {
+    v => 1.1,
+    summary => 'Send verification emails for clients who have not had their email verified',
+    description => <<'_',
+
+WHMCS does not yet provide an API for this, so we do this via a headless
+browser.
+
+_
+    args => {
+        %args_db,
+        %args_whmcs_credential,
+        action => {
+            schema => ['str*', in=>['list-clients', 'send-verification-emails']],
+            default => 'send-verification-emails',
+            cmdline_aliases => {
+                list_clients => {is_flag=>1, summary=>'Shortcut for --action=list-clients', code=>sub {$_[0]{action} = 'list-clients'}},
+            },
+            description => <<'_',
+
+The default action is to send verification emails. You can also just list the
+clients who haven't got their email verified yet.
+
+_
+        },
+        random => {
+            schema => 'bool*',
+            default => 1,
+        },
+        limit => {
+            summary => 'Only process this many clients then stop',
+            schema => 'uint*',
+        },
+        include_client_ids => {
+            #'x.name.is_plural' => 1,
+            #'x.name.singular' => 'include_client_id',
+            schema => ['array*', of=>'uint*', 'x.perl.coerce_rules'=>['str_comma_sep']],
+            tags => ['category:filtering'],
+        },
+        include_active => {
+            summary => 'Whether to include active clients',
+            schema => ['bool*'],
+            default => 1,
+            tags => ['category:filtering'],
+        },
+        include_inactive => {
+            summary => 'Whether to include inactive clients',
+            schema => ['bool*'],
+            default => 0,
+            tags => ['category:filtering'],
+        },
+        hook_set_sender_email => {
+            summary => 'Hook to set sender email for every email',
+            description => <<'_',
+
+Hook will receive these arguments:
+
+    ($client_rec, $orig_sender_email)
+
+`$client_rec` is a hash containing client record fields, e.g. `id`, `email`,
+`firstname`, `lastname`, etc. `$orig_sender_email` is the original sender email
+setting (`Email` setting in the configuration table).
+
+Hook is expected to return the sender email.
+
+_
+            schema => ['any*', of=>['str*', 'code*']],
+        },
+    },
+    features => {
+        dry_run => 1,
+    },
+};
+sub send_verification_emails {
+    my %args = @_;
+    $args{random} //= 1;
+
+    my $dbh = _connect_db(%args);
+
+    my $sth = $dbh->prepare(
+        join("",
+             "SELECT id,firstname,lastname,companyname,email FROM tblclients ",
+             "WHERE email_verified=0 ",
+             (defined $args{include_active}   && !$args{include_active}   ? "AND status <> 'Active' "   : ""),
+             (defined $args{include_inactive} && !$args{include_inactive} ? "AND status <> 'Inactive' " : ""),
+             ($args{include_client_ids} ? "AND id IN (".join(",",map{$_+0} @{ $args{include_client_ids} }).")" : ""),
+             "ORDER BY ".($args{random} ? "RAND()" : "id"),
+         ),
+    );
+    $sth->execute;
+
+    my @client_recs;
+    my %emails;
+    while (my $row = $sth->fetchrow_hashref) {
+        push @client_recs, $row;
+    }
+    log_info "Found %d client email(s)", scalar(@client_recs);
+
+    if ($args{action} eq 'list-clients') {
+        return [200, "OK", \@client_recs];
+    }
+
+    my $i = 0;
+    my ($orig_sender_email) = $dbh->selectrow_array("SELECT value FROM tblconfiguration WHERE setting='Email'");
+
+    for my $client_rec (@client_recs) {
+        $i++;
+        if ($args{limit} && $i > $args{limit}) {
+            log_info "Terminating because limit is set to %d", $args{limit};
+            last;
+        }
+        my $sender_email = $orig_sender_email;
+        if ($args{hook_set_sender_email}) {
+            unless (ref $args{hook_set_sender_email} eq 'CODE') {
+                $args{hook_set_sender_email} = eval "sub { $args{hook_set_sender_email} }";
+                die "Can't compile code in hook_set_sender_email: $@" if $@;
+            }
+            $sender_email = $args{hook_set_sender_email}->($client_rec, $orig_sender_email);
+        }
+        log_info "[%d/%d]%s Sending verification email (sender email %s) for client #%d (%s %s, email %s) ...",
+            $i, scalar(@client_recs),
+            $args{-dry_run} ? " [DRY-RUN]" : "",
+            $sender_email,
+            $client_rec->{id}, $client_rec->{firstname}, $client_rec->{lastname}, $client_rec->{email};
+        next if $args{-dry_run};
+        _send_verification_email(\%args, $client_rec, $dbh, $orig_sender_email, $sender_email);
+    }
+
+    [200];
+}
+
 1;
 # ABSTRACT: CLI utilities related to WHMCS
 
@@ -660,7 +890,7 @@ App::WHMCSUtils - CLI utilities related to WHMCS
 
 =head1 VERSION
 
-This document describes version 0.005 of App::WHMCSUtils (from Perl distribution App-WHMCSUtils), released on 2018-01-29.
+This document describes version 0.008 of App::WHMCSUtils (from Perl distribution App-WHMCSUtils), released on 2019-09-19.
 
 =head1 FUNCTIONS
 
@@ -669,7 +899,7 @@ This document describes version 0.005 of App::WHMCSUtils (from Perl distribution
 
 Usage:
 
- calc_deferred_revenue(%args) -> [status, msg, result, meta]
+ calc_deferred_revenue(%args) -> [status, msg, payload, meta]
 
 This utility collects invoice items from paid invoices, filters eligible ones,
 then defers the revenue to separate months for items that should be deferred,
@@ -775,18 +1005,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 restore_whmcs_client
 
 Usage:
 
- restore_whmcs_client(%args) -> [status, msg, result, meta]
+ restore_whmcs_client(%args) -> [status, msg, payload, meta]
 
 Restore a missing client from SQL database backup.
 
@@ -837,7 +1068,109 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 send_verification_emails
+
+Usage:
+
+ send_verification_emails(%args) -> [status, msg, payload, meta]
+
+Send verification emails for clients who have not had their email verified.
+
+WHMCS does not yet provide an API for this, so we do this via a headless
+browser.
+
+This function is not exported.
+
+This function supports dry-run operation.
+
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<action> => I<str> (default: "send-verification-emails")
+
+The default action is to send verification emails. You can also just list the
+clients who haven't got their email verified yet.
+
+=item * B<admin_password>* => I<str>
+
+=item * B<admin_username>* => I<str>
+
+=item * B<db_host> => I<str> (default: "localhost")
+
+=item * B<db_name>* => I<str>
+
+=item * B<db_pass> => I<str>
+
+=item * B<db_port> => I<net::port> (default: 3306)
+
+=item * B<db_user> => I<str>
+
+=item * B<hook_set_sender_email> => I<str|code>
+
+Hook to set sender email for every email.
+
+Hook will receive these arguments:
+
+ ($client_rec, $orig_sender_email)
+
+C<$client_rec> is a hash containing client record fields, e.g. C<id>, C<email>,
+C<firstname>, C<lastname>, etc. C<$orig_sender_email> is the original sender email
+setting (C<Email> setting in the configuration table).
+
+Hook is expected to return the sender email.
+
+=item * B<include_active> => I<bool> (default: 1)
+
+Whether to include active clients.
+
+=item * B<include_client_ids> => I<array[uint]>
+
+=item * B<include_inactive> => I<bool> (default: 0)
+
+Whether to include inactive clients.
+
+=item * B<limit> => I<uint>
+
+Only process this many clients then stop.
+
+=item * B<mech_user_agent> => I<str>
+
+=item * B<random> => I<bool> (default: 1)
+
+=item * B<url>* => I<url>
+
+It should be without C</admin> part, e.g.:
+
+ https://client.mycompany.com/
+
+=back
+
+Special arguments:
+
+=over 4
+
+=item * B<-dry_run> => I<bool>
+
+Pass -dry_run=>1 to enable simulation mode.
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -867,7 +1200,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

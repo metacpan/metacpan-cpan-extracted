@@ -2,9 +2,9 @@ NAME
     App::Spanel::BuildBindZones - Build BIND zones from YAML zones
 
 VERSION
-    This document describes version 0.001 of App::Spanel::BuildBindZones
+    This document describes version 0.002 of App::Spanel::BuildBindZones
     (from Perl distribution App-Spanel-BuildBindZones), released on
-    2019-08-28.
+    2019-08-29.
 
 SYNOPSIS
     See the included spanel-build-bind-zones script.

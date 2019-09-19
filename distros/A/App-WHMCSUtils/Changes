@@ -1,4 +1,28 @@
-0.005   2018-01-29 (PERLANCAR)
+0.008   2019-09-19  Released-By: PERLANCAR; Urgency: medium
+
+	- Add option --limit.
+
+	- [bugfix] Reduce the window size of changing sender email in the
+          database.
+
+	- [bugfix] Fix a couple of other logic bugs.
+
+
+0.007   2019-09-19  Released-By: PERLANCAR; Urgency: medium
+
+	[whmcs-send-verification-emails]
+
+        - Add options --(no-)include-active & --(no-)include-inactive.
+
+	- Add option --hook-set-sender-email.
+
+
+0.006   2019-09-19  Released-By: PERLANCAR; Urgency: medium
+
+	- Add utility: whmcs-send-verification-emails.
+
+
+0.005   2018-01-29  Released-By: PERLANCAR
 
 	- Add total row to CSV.
 
@@ -10,19 +34,19 @@
 	  lines.
 
 
-0.004   2018-01-26 (PERLANCAR)
+0.004   2018-01-26  Released-By: PERLANCAR
 
 	- Allow extra rules to set to revenue, some fixes/improvements of
 	  rules.
 
 
-0.003   2018-01-25 (PERLANCAR)
+0.003   2018-01-25  Released-By: PERLANCAR
 
 	- [ux] Order invoice items by date paid instead of invoice ID.
 
 	- [doc] Add usage instruction.
 
 
-0.002   2018-01-25 (PERLANCAR)
+0.002   2018-01-25  Released-By: PERLANCAR
 
         - First public release.

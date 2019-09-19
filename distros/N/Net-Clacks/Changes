@@ -1,5 +1,15 @@
-@  changeset:   63:f8f7ac6344ea
+@  changeset:   65:db93daac2a03
 |  tag:         tip
+|  user:        Rene Schickbauer <cavac@blackmesa>
+|  date:        Wed Sep 18 11:43:46 2019 +0200
+|  summary:     Fix substr bugs
+|
+o  changeset:   64:4487e65aea0e
+|  user:        Rene Schickbauer <cavac@rosetta>
+|  date:        Tue Jun 18 20:36:06 2019 +0200
+|  summary:     Prepare for 6.0 release
+|
+o  changeset:   63:f8f7ac6344ea
 |  user:        Rene Schickbauer <cavac@venera>
 |  date:        Tue Jun 18 20:31:50 2019 +0200
 |  summary:     Update documentation

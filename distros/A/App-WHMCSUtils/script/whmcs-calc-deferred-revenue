@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/WHMCSUtils/calc_deferred_revenue
-# and generated automatically using Perinci::CmdLine::Gen version 0.484
+# and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2018-01-29'; # DATE
+our $DATE = '2019-09-19'; # DATE
 our $DIST = 'App-WHMCSUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,7 +38,7 @@ whmcs-calc-deferred-revenue - whmcs-calc-deferred-revenue
 
 =head1 VERSION
 
-This document describes version 0.005 of whmcs-calc-deferred-revenue (from Perl distribution App-WHMCSUtils), released on 2018-01-29.
+This document describes version 0.008 of whmcs-calc-deferred-revenue (from Perl distribution App-WHMCSUtils), released on 2019-09-19.
 
 =head1 SYNOPSIS
 
@@ -140,17 +140,15 @@ Default value:
 
 =over
 
-=item B<--config-path>=I<filename>
+=item B<--config-path>=I<s>, B<-c>
 
 Set path to configuration file.
 
-Can be specified multiple times.
-
-=item B<--config-profile>=I<s>
+=item B<--config-profile>=I<s>, B<-P>
 
 Set configuration profile to use.
 
-=item B<--no-config>
+=item B<--no-config>, B<-C>
 
 Do not use any configuration file.
 
@@ -387,7 +385,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

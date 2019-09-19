@@ -1,0 +1,184 @@
+{
+   "abstract" : "Namespace for mass spectrometry-related libraries",
+   "author" : [
+      "Jeremy Volkening <jdv@base2bio.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.422",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MS",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "BioX::Seq" : "0",
+            "Module::Build" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Compress::BGZF" : "0",
+            "Data::Lock" : "0",
+            "File::ShareDir" : "1.00",
+            "HTTP::Tiny" : "0",
+            "Module::Pluggable" : "0",
+            "Net::FTP" : "0",
+            "PerlIO::gzip" : "0",
+            "URI" : "0",
+            "XML::Parser" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "MS" : {
+         "file" : "lib/MS.pm",
+         "version" : "0.008"
+      },
+      "MS::CV" : {
+         "file" : "lib/MS/CV.pm"
+      },
+      "MS::Mass" : {
+         "file" : "lib/MS/Mass.pm",
+         "version" : "0.001"
+      },
+      "MS::PepInfo" : {
+         "file" : "lib/MS/PepInfo.pm"
+      },
+      "MS::Peptide" : {
+         "file" : "lib/MS/Peptide.pm"
+      },
+      "MS::Protein" : {
+         "file" : "lib/MS/Protein.pm"
+      },
+      "MS::Reader" : {
+         "file" : "lib/MS/Reader.pm",
+         "version" : "0.203"
+      },
+      "MS::Reader::ImzML" : {
+         "file" : "lib/MS/Reader/ImzML.pm",
+         "version" : "0.001"
+      },
+      "MS::Reader::ImzML::Spectrum" : {
+         "file" : "lib/MS/Reader/ImzML/Spectrum.pm"
+      },
+      "MS::Reader::MGF" : {
+         "file" : "lib/MS/Reader/MGF.pm",
+         "version" : "0.001"
+      },
+      "MS::Reader::MGF::Spectrum" : {
+         "file" : "lib/MS/Reader/MGF/Spectrum.pm"
+      },
+      "MS::Reader::MSn" : {
+         "file" : "lib/MS/Reader/MSn.pm",
+         "version" : "0.001"
+      },
+      "MS::Reader::MSn::Spectrum" : {
+         "file" : "lib/MS/Reader/MSn/Spectrum.pm"
+      },
+      "MS::Reader::MzIdentML" : {
+         "file" : "lib/MS/Reader/MzIdentML.pm",
+         "version" : "0.001"
+      },
+      "MS::Reader::MzIdentML::DBSequence" : {
+         "file" : "lib/MS/Reader/MzIdentML/DBSequence.pm"
+      },
+      "MS::Reader::MzIdentML::Peptide" : {
+         "file" : "lib/MS/Reader/MzIdentML/Peptide.pm"
+      },
+      "MS::Reader::MzIdentML::PeptideEvidence" : {
+         "file" : "lib/MS/Reader/MzIdentML/PeptideEvidence.pm"
+      },
+      "MS::Reader::MzIdentML::ProteinAmbiguityGroup" : {
+         "file" : "lib/MS/Reader/MzIdentML/ProteinAmbiguityGroup.pm"
+      },
+      "MS::Reader::MzIdentML::SequenceItem" : {
+         "file" : "lib/MS/Reader/MzIdentML/SequenceItem.pm"
+      },
+      "MS::Reader::MzIdentML::SpectrumIdentificationResult" : {
+         "file" : "lib/MS/Reader/MzIdentML/SpectrumIdentificationResult.pm"
+      },
+      "MS::Reader::MzML" : {
+         "file" : "lib/MS/Reader/MzML.pm",
+         "version" : "0.006"
+      },
+      "MS::Reader::MzML::Chromatogram" : {
+         "file" : "lib/MS/Reader/MzML/Chromatogram.pm"
+      },
+      "MS::Reader::MzML::Record" : {
+         "file" : "lib/MS/Reader/MzML/Record.pm"
+      },
+      "MS::Reader::MzML::Spectrum" : {
+         "file" : "lib/MS/Reader/MzML/Spectrum.pm"
+      },
+      "MS::Reader::MzQuantML" : {
+         "file" : "lib/MS/Reader/MzQuantML.pm",
+         "version" : "0.001"
+      },
+      "MS::Reader::MzXML" : {
+         "file" : "lib/MS/Reader/MzXML.pm",
+         "version" : "0.005"
+      },
+      "MS::Reader::MzXML::Spectrum" : {
+         "file" : "lib/MS/Reader/MzXML/Spectrum.pm"
+      },
+      "MS::Reader::PepXML" : {
+         "file" : "lib/MS/Reader/PepXML.pm",
+         "version" : "0.006"
+      },
+      "MS::Reader::PepXML::Result" : {
+         "file" : "lib/MS/Reader/PepXML/Result.pm"
+      },
+      "MS::Reader::ProtXML" : {
+         "file" : "lib/MS/Reader/ProtXML.pm",
+         "version" : "0.003"
+      },
+      "MS::Reader::ProtXML::Group" : {
+         "file" : "lib/MS/Reader/ProtXML/Group.pm"
+      },
+      "MS::Reader::XML" : {
+         "file" : "lib/MS/Reader/XML.pm",
+         "version" : "0.001"
+      },
+      "MS::Reader::XML::CV" : {
+         "file" : "lib/MS/Reader/XML/CV.pm"
+      },
+      "MS::Reader::XML::Record" : {
+         "file" : "lib/MS/Reader/XML/Record.pm",
+         "version" : "0.001"
+      },
+      "MS::Reader::XML::Record::CV" : {
+         "file" : "lib/MS/Reader/XML/Record/CV.pm"
+      },
+      "MS::Search::DB" : {
+         "file" : "lib/MS/Search/DB.pm"
+      },
+      "MS::Search::DB::Source::uniprot" : {
+         "file" : "lib/MS/Search/DB/Source/uniprot.pm"
+      },
+      "MS::Spectrum" : {
+         "file" : "lib/MS/Spectrum.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.gnu.org/licenses/gpl-3.0.txt"
+      ],
+      "repository" : {
+         "url" : "https://github.com/jvolkening/p5-MS"
+      }
+   },
+   "version" : "0.008"
+}

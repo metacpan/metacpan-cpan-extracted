@@ -1,5 +1,8 @@
 Revision history for perl distribution Toadfarm
 
+0.81 2019-09-19T10:10:38+0900
+ - Fix t/log.t #27
+
 0.80 2019-09-18T12:01:02+0900
  - Include request_id in AccessLog #27
 

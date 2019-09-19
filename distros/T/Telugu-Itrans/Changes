@@ -1,0 +1,6 @@
+Revision history for Perl extension Telugu::Itrans.
+
+0.01  Wed Sep 18 17:54:50 2019
+	- original version; created by h2xs 1.23 with options
+		-Xn Telugu::Itrans
+

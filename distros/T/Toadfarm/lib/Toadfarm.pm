@@ -11,7 +11,7 @@ use Mojo::Util qw(class_to_path monkey_patch);
 
 use constant DEBUG => $ENV{TOADFARM_DEBUG} ? 1 : 0;
 
-our $VERSION = '0.80';
+our $VERSION = '0.81';
 
 BEGIN {
   $ENV{TOADFARM_ACTION} //= (@ARGV and $ARGV[0] =~ /^(reload|start|stop)$/) ? $1 : 'load';
@@ -57,7 +57,7 @@ sub import {
 }
 
 sub startup {
-  my $self = shift;
+  my $self   = shift;
   my $config = $ENV{MOJO_CONFIG} ? $self->plugin('Config') : {};
 
   # remember the config when hot reloading the app
@@ -92,7 +92,7 @@ sub _change_root {
 
 sub _die_on_insecure {
   my ($class, $app) = @_;
-  my $config = $app->config;
+  my $config  = $app->config;
   my $plugins = $config->{plugins} || [];
 
   die "Cannot change user without TOADFARM_INSECURE=1"  if $config->{hypnotoad}{user};
@@ -144,7 +144,7 @@ sub _mount_apps {
           local $Data::Dumper::Terse    = 1;
           local $Data::Dumper::Deepcopy = 1;
           Data::Dumper::Dumper(\%config);
-          }
+        }
       );
       $ENV{MOJO_CONFIG} = $tmp->filename;
     }
@@ -152,8 +152,8 @@ sub _mount_apps {
     unless (ref $app and UNIVERSAL::isa($app, 'Mojolicious')) {
       my ($class, $path, @error) = ($app, $app);
       $path = File::Which::which($path) || class_to_path($path) unless -r $path;
-      $app = eval { $server->build_app($class) } or push @error, $@ if $class =~ /^[\w:]+$/;
-      $app = eval { $server->load_app($path) } or push @error, $@ unless ref $app;
+      $app  = eval { $server->build_app($class) } or push @error, $@ if $class =~ /^[\w:]+$/;
+      $app  = eval { $server->load_app($path) } or push @error, $@ unless ref $app;
       die join "\n", @error unless $app;
     }
 
@@ -217,7 +217,7 @@ sub _pid_file {
   my $name = basename $0;
   my $dir  = dirname abs_path $0;
 
-  return File::Spec->catfile($dir, "$name.pid") if -w $dir;
+  return File::Spec->catfile($dir,               "$name.pid") if -w $dir;
   return File::Spec->catfile(File::Spec->tmpdir, "toadfarm-$name.pid");
 }
 
@@ -308,7 +308,7 @@ Toadfarm - One Mojolicious app to rule them all
 
 =head1 VERSION
 
-0.80
+0.81
 
 =head1 DESCRIPTION
 

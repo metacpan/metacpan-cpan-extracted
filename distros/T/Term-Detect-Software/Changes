@@ -1,3 +1,9 @@
+0.222   2019-08-21  Released-By: PERLANCAR; Urgency: medium
+
+	- When tput returns 8, set color_depth to 16 because 8 is basically
+	  16 (8 low-intensity + 8 high-intensity).
+
+
 0.221   2019-08-18  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

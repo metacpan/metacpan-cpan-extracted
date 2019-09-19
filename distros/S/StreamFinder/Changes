@@ -74,9 +74,9 @@ Revision history for StreamFinder
 1.13    2019/09/11
         - Fix missing (recently-added) file (RadioNet.pm) in MANIFEST file.
         - More doc. fixes, mostly to the individual submodules.
-1.20    
+1.20    2019/09/16
         - Removed usage and all references to WWW::Youtube::Download - 
-        This module no longer fetches the "author" (Youtube user) or do 
+        This module no longer fetches the "author" (Youtube user) nor does 
         anything else we can't more easily do manually.
         - StreamFinder::Apple: (podcasts.apple.com) ADDED!
         - StreamFinder::Brighteon: (brighteon.com) ADDED (split off from 
@@ -89,11 +89,17 @@ Revision history for StreamFinder
         - StreamFinder::Youtube: Removed "notitle" option, added "fast" option, 
         and add "description" field fetch to youtube-dl.  Fixed url-fetching 
         order to call youtube-dl FIRST to prevent infinite stall if called 
-        with a valid stream-url.
+        with an already-valid stream-url (Fauxdacious mediaplayer).
         StreamFinder::IHeartRadio - Fix sometimes-corrupted ID field.
         StreamFinder::Reciva - Fix failure to always capture ID field if 
         given wrongly-formatted full url.
         - Add $station->{'genre'} field to IHeartRadio, RadioNet, Reciva, and 
         Tunein (the sites that support it).
         - Various small code and doc. tweaks / cleanups.
-        - DEBUG was accidently left set to ON, turnedit OFF by default!
+        - DEBUG was accidently left set to ON, now turned OFF by default!
+1.21    2019/09/18
+        - Significant documentation improvements & polishing.
+        - StreamFinder::BannedVideo: Fix incorrect IDs returned.
+        - StreamFinder::Tunein: (new()) - Fix mishandled URL if only 
+        station-ID specified (non-full URL).
+        - StreamFinder::Apple: (new()) - Handle if only podcast-ID specified.

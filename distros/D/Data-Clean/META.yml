@@ -31,7 +31,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Clean
   homepage: https://metacpan.org/release/Data-Clean
   repository: git://github.com/perlancar/perl-Data-Clean.git
-version: '0.504'
+version: '0.505'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

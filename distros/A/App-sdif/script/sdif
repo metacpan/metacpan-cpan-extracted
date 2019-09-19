@@ -42,7 +42,8 @@ diff ... | sdif
     --column=order	set column order (default ONM)
     --view, -v		viewer mode
     --ambiguous=s       ambiguous character width (detect, wide, narrow)
-    --[no]graph		process git --graph output (default on)
+    --[no]prefix	process git --graph output (default on)
+    --prefix-pattern    prefix pattern
 
     --man		display manual page
     --diff=s		set diff command
@@ -108,7 +109,8 @@ our $screen_width;
 my $opt_color = 'always';
 my $opt_256 = 1;
 my $opt_mark = "center";
-my $opt_graph = 1;
+my $opt_prefix = 1;
+my $opt_prefix_pattern = q/(?:\\| )*(?:  )*/;
 my $opt_W;
 my $opt_colortable;
 
@@ -133,7 +135,8 @@ my @optargs = (
     "truncate|t!" => \$opt_truncate,
     "onword!" => \$opt_onword,
     "mark=s" => \$opt_mark,
-    "graph!" => \$opt_graph,
+    "prefix!" => \$opt_prefix,
+    "prefix-pattern=s" => \$opt_prefix_pattern,
     "l" => \$opt_l,
     "s" => \$opt_s,
     "width|W=i" => \$opt_W,
@@ -244,8 +247,9 @@ if (defined $opt_cdif and $opt_cdif eq '') {
     $opt_cdif = $default_opt_cdif;
 }
 unshift @opt_cdifopts,
-    $opt_256   ? qw(--256)   : qw(--no-256)  ,
-    $opt_graph ? qw(--graph) : qw(--no-graph),
+    $opt_256    ? qw(--256)    : qw(--no-256)   ,
+    $opt_prefix ? qw(--prefix) : qw(--no-prefix),
+    qw(--prefix-pattern) => $opt_prefix_pattern,
     @default_opt_cdifopts;
 
 my($OLD, $NEW, $DIFF);
@@ -314,9 +318,9 @@ my @column = !$opt_column ? () : do {
 ##
 ## Git --graph prefix pattern
 ##
-my $graph_prefix_re = do {
-    if ($opt_graph) {
-	qr/(?:\| )*(?:  )?/;
+my $prefix_re = do {
+    if ($opt_prefix) {
+	qr/$opt_prefix_pattern/;
     } else {
 	"";
     }
@@ -338,7 +342,7 @@ if ($opt_cdif) {
 	if ($DIFF ne '-') {
 	    open(STDIN, $DIFF) || die "cannot open diff: $!\n";
 	}
-	do { exec join ' ', $opt_cdif, @opt_cdifopts } ;
+	do { exec shellwords($opt_cdif), @opt_cdifopts } ;
 	warn "exec failed: $!";
 	print while <>;
 	exit;
@@ -451,7 +455,7 @@ while (<DIFF>) {
     #
     # unified diff
     #
-    elsif (/^($graph_prefix_re)(--- (?s:.*))/) {
+    elsif (/^($prefix_re)(--- (?s:.*))/) {
 	my($prefix, $left) = ($1, $2);
 	my $right = <DIFF>;
 	local $screen_width = $screen_width;
@@ -463,7 +467,7 @@ while (<DIFF>) {
 	print_command_n({ type => 'FILE' }, $left, $right);
     }
     elsif (m{^
-	   (?<prefix>$graph_prefix_re)
+	   (?<prefix>$prefix_re)
 	   (?<command>
 	     \@\@ [ ]
 	     \-(?<oline>\d+) (?:,(?<o>\d+))? [ ]
@@ -484,7 +488,7 @@ while (<DIFF>) {
 	    use App::sdif::Divert;
 	    $divert = new App::sdif::Divert
 		FINAL => sub { s/^/$prefix/mg };
-	};
+	}
 
 	print_command_n({ type => 'COMMAND' }, $command, $command);
 	my @buf = read_unified_2 \%read_opt, *DIFF, $o, $n;
@@ -1098,6 +1102,20 @@ Treat ambiguous characters as wide.
 Treat ambiguous characters as narrow.
 
 =back
+
+=item B<-->[B<no>]B<prefix>
+
+Understand prefix for diff output including B<git> B<--graph> option.
+True by default.
+
+=item B<--prefix-pattern>=I<pattern>
+
+Specify prefix pattern in regex.  Default pattern is:
+
+    (?:\| )*(?:  )*
+
+This pattern matches B<git> graph style and whitespace indented diff
+output.
 
 =item B<--colormap>=I<colormap>, B<--cm>=I<colormap>
 

@@ -4,7 +4,7 @@ Toadfarm - One Mojolicious app to rule them all
 
 # VERSION
 
-0.80
+0.81
 
 # DESCRIPTION
 

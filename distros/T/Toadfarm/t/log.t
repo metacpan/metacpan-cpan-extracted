@@ -73,8 +73,8 @@ while (<$FH>) {
   #[info] 127.0.0.1 GET http://127.0.0.1:35902/yikes 404 0.0145s
   #[info] user1 GET http://127.0.0.1:35902/with/identity 200 0.0012s
 
-  $log{without_identity} = $_ if m!info\W+\S+ GET http://[\w\.]+:\d+/yikes 404 [\d.]+s$!;
-  $log{with_identity}    = $_ if m!info\W+user1 GET http://[\w\.]+:\d+/with/identity 200 [\d.]+s$!;
+  $log{without_identity} = $_ if m!info\W+\w+\W+\S+ GET http://[\w\.]+:\d+/yikes 404 [\d.]+s$!;
+  $log{with_identity}    = $_ if m!info\W+\w+\W+user1 GET http://[\w\.]+:\d+/with/identity 200 [\d.]+s$!;
   $log{with_prefix}      = $_ if m!info.*X-Request-Base!;
   $log{with_close}       = $_ if m!/close\s\d+!;
   $log{with_timeout}     = $_ if m!/timeout.*504!;

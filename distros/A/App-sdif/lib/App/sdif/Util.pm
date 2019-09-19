@@ -18,6 +18,8 @@ our @EXPORT_OK = qw(
 use Data::Dumper;
 use List::Util qw(sum);
 
+our $MINILLA_CHANGES = 1;
+
 sub read_unified_2 {
     map {
 	[ collect $_ qr/[\t ]/ ], # common
@@ -84,6 +86,11 @@ sub read_unified {
     while (<$FH>) {
 	if ($prefix) {
 	    s/^\Q$prefix// or warn "Unexpected: $_";
+	    if ($MINILLA_CHANGES) {
+		# Minilla removes single space mark in git commit message.
+		# This is not perfect but mostly works.
+		s/^(?![-+ ])/ /;
+	    }
 	}
 	# `git diff' produces message like this:
 	# "\ No newline at end of file"

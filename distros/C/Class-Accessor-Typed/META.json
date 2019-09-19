@@ -1,0 +1,78 @@
+{
+   "abstract" : "Class::Accessor::Lite with Type",
+   "author" : [
+      "papix <mail@papix.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.6",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Class-Accessor-Typed",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Mouse::Util::TypeConstraints" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Class::Accessor::Typed" : {
+         "file" : "lib/Class/Accessor/Typed.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/papix/Class-Accessor-Typed/issues"
+      },
+      "homepage" : "https://github.com/papix/Class-Accessor-Typed",
+      "repository" : {
+         "url" : "git://github.com/papix/Class-Accessor-Typed.git",
+         "web" : "https://github.com/papix/Class-Accessor-Typed"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:PAPIX",
+   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_static_install" : 1
+}

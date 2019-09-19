@@ -34,6 +34,17 @@ subtest "security: check call_method argument" => sub {
     };
 };
 
+subtest "command: unbless_ffc_inlined" => sub {
+    my $data = bless({foo=>1}, "Foo");
+
+    my $c = Data::Clean->new(
+        -obj => ['unbless_ffc_inlined'],
+    );
+    my $cdata = $c->clone_and_clean($data);
+    is_deeply($cdata, {foo=>1})
+        or diag explain $cdata;
+};
+
 subtest "command: replace_with_str" => sub {
     my $c = Data::Clean->new(
         -obj => ['replace_with_str', "JINNY'S TAIL"],

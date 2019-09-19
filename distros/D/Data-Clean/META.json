@@ -62,7 +62,7 @@
          "web" : "https://github.com/perlancar/perl-Data-Clean"
       }
    },
-   "version" : "0.504",
+   "version" : "0.505",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

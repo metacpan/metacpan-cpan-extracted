@@ -65,8 +65,10 @@ my $opt_new = 1;
 my $opt_unknown = 1;
 my $opt_command = 1;
 my $opt_mark = 1;
-my $opt_graph = 1;
+my $opt_prefix = 1;
+my $opt_prefix_pattern = q/(?:\\| )*(?:  )*/;
 my $opt_visible_cr = 1;
+my $opt_visible_esc = 1;
 
 my $opt_c;
 my $opt_u;
@@ -118,8 +120,10 @@ my @optargs = (
     "command!" => \$opt_command,
     "unknown!" => \$opt_unknown,
     "mark!" => \$opt_mark,
-    "graph!" => \$opt_graph,
+    "prefix!" => \$opt_prefix,
+    "prefix-pattern=s" => \$opt_prefix_pattern,
     "visible-cr|vcr!" => \$opt_visible_cr,
+    "visible-esc|vesc!" => \$opt_visible_esc,
 
     "i|ignore-case" => \$opt_i,
     "b|ignore-space-change" => \$opt_b,
@@ -208,9 +212,9 @@ sub color {
     $color_handler->color(@_);
 }
 
-my $graph_prefix_re = do {
-    if ($opt_graph) {
-	qr/(?:\| )*(?:  )?/;
+my $prefix_re = do {
+    if ($opt_prefix) {
+	qr/$opt_prefix_pattern/;
     } else {
 	"";
     }
@@ -375,7 +379,7 @@ while (<DIFF>) {
     # diff --combined (generic)
     #
     elsif (m{^
-	   (?<prefix> $graph_prefix_re)
+	   (?<prefix> $prefix_re)
 	   (?<command>
 	     (?<mark> \@{2,} ) [ ]
 	     (?<lines> (?: [-+]\d+(?:,\d+)? [ ] ){2,} )
@@ -388,7 +392,11 @@ while (<DIFF>) {
 	my @lines = map {
 	    $_ eq ' ' ? 1 : int $_
 	} $lines =~ /\d+(?|,(\d+)|( ))/g;
-	@lines == $column or do { print; next };
+
+	if (@lines != $column) {
+	    print;
+	    next;
+	}
 
 	my($divert, %read_opt);
 	if ($prefix) {
@@ -571,7 +579,10 @@ sub compare {
     }
 
     if ($opt_visible_cr) {
-	s/\r/\x{240D}/g for $$old, $$new;
+	s/\r/\N{SYMBOL FOR CARRIAGE RETURN}/g for $$old, $$new;
+    }
+    if ($opt_visible_esc) {
+	s/\e/\N{SYMBOL FOR ESCAPE}/g for $$old, $$new;
     }
 
     ($$old, $$new) = context($$old, $$new);
@@ -852,8 +863,10 @@ Options:
 	--[no]command	    print diff command line (default true)
 	--[no]unknown	    print unknown line      (default true)
 	--[no]mark	    print mark or not       (default true)
-	--[no]graph	    read git --graph output (default true)
+	--[no]prefix	    read git --graph output (default true)
+	--prefix-pattern    prefix pattern
 	--[no]visible-cr    visible carriage return (default true)
+	--[no]visible-esc   visible escape          (default true)
 	--[no]mecab	    use mecab tokenizer     (default false)
 
 
@@ -1078,13 +1091,29 @@ effects.
 
 These options are prepared for watchdiff(1) command.
 
-=item B<-->[B<no>]B<graph>
+=item B<-->[B<no>]B<prefix>
 
-Process B<git> B<--graph> option.
+Understand prefix for diff output including B<git> B<--graph> option.
+True by default.
+
+=item B<--prefix-pattern>=I<pattern>
+
+Specify prefix pattern in regex.  Default pattern is:
+
+    (?:\| )*(?:  )*
+
+This pattern matches B<git> graph style and whitespace indented diff
+output.
 
 =item B<-->[B<no>]B<visible-cr>
 
-Convert carriage-return to visible code.
+Convert CARRIAGE-RETURN to visible code.
+True by default.
+
+=item B<-->[B<no>]B<visible-esc>
+
+Convert ESCAPE to visible code.
+True by default.
 
 =item B<-->[B<no>]B<mecab>
 

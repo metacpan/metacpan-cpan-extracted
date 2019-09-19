@@ -3,8 +3,8 @@ NAME
     capabilities
 
 VERSION
-    This document describes version 0.221 of Term::Detect::Software (from
-    Perl distribution Term-Detect-Software), released on 2019-08-18.
+    This document describes version 0.222 of Term::Detect::Software (from
+    Perl distribution Term-Detect-Software), released on 2019-08-21.
 
 SYNOPSIS
      use Term::Detect::Software qw(detect_terminal detect_terminal_cached);

@@ -2,8 +2,8 @@ NAME
     File::MoreUtil - File-related utilities
 
 VERSION
-    This document describes version 0.620 of File::MoreUtil (from Perl
-    distribution File-MoreUtil), released on 2019-04-05.
+    This document describes version 0.621 of File::MoreUtil (from Perl
+    distribution File-MoreUtil), released on 2019-08-17.
 
 SYNOPSIS
      use File::MoreUtil qw(
@@ -77,28 +77,36 @@ FUNCTIONS
 
     Will return true if $dir exists and is empty.
 
+    This should be trivial but alas it is not. "-s" always returns true (in
+    other words, "-z" always returns false) for a directory.
+
   dir_has_files
     Usage:
 
      dir_has_files($dir) => BOOL
 
-    Will return true if $dir exists and has one or more regular files in it.
+    Will return true if $dir exists and has one or more plain files in it. A
+    plain file is one that passes Perl's "-f" operator. A symlink to a plain
+    file counts as a plain file. Non-plain files include named pipes, Unix
+    sockets, and block/character special files.
 
   dir_has_dot_files
     Usage:
 
      dir_has_dot_files($dir) => BOOL
 
-    Will return true if $dir exists and has one or more regular dot files
-    (i.e. files with names beginning with a dot) in it.
+    Will return true if $dir exists and has one or more plain dot files in
+    it. See "dir_has_files" for the definition of plain files. Dot files
+    a.k.a. hidden files are files with names beginning with a dot.
 
   dir_has_non_dot_files
     Usage:
 
      dir_has_non_dot_files($dir) => BOOL
 
-    Will return true if $dir exists and has one or more regular non-dot
-    files (i.e. files with names not beginning with a dot) in it.
+    Will return true if $dir exists and has one or more plain non-dot files
+    in it. See "dir_has_dot_files" for the definitions. =head2
+    dir_has_subdirs
 
   dir_has_subdirs
     Usage:
@@ -113,23 +121,22 @@ FUNCTIONS
 
      dir_has_dot_subdirs($dir) => BOOL
 
-    Will return true if $dir exists and has one or more regular dot
-    subdirectories (i.e. subdirectories with names beginning with a dot) in
-    it.
+    Will return true if $dir exists and has one or more dot subdirectories
+    (i.e. subdirectories with names beginning with a dot) in it.
 
   dir_has_non_dot_subdirs
     Usage:
 
      dir_has_non_dot_subdirs($dir) => BOOL
 
-    Will return true if $dir exists and has one or more regular non-dot
+    Will return true if $dir exists and has one or more non-dot
     subdirectories (i.e. subdirectories with names not beginning with a dot)
     in it.
 
 FAQ
   Where is file_empty()?
-    For checking if some path exists, is a regular file, and is empty
-    (content is zero-length), you can simply use the "-z" filetest operator.
+    For checking if some path exists, is a plain file, and is empty (content
+    is zero-length), you can simply use the "-z" filetest operator.
 
 HOMEPAGE
     Please visit the project's homepage at

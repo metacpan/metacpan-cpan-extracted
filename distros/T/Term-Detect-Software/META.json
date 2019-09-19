@@ -58,7 +58,7 @@
          "web" : "https://github.com/perlancar/perl-Term-Detect-Software"
       }
    },
-   "version" : "0.221",
+   "version" : "0.222",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

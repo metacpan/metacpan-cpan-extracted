@@ -50,13 +50,13 @@ file.
 	
 	print "Title=$stationTitle\n";
 	
-	my $stationID = $station->getID();
-
-	print "Station ID=$stationID\n";
-	
 	my $stationDescription = $station->getTitle('desc');
 	
 	print "Description=$stationDescription\n";
+	
+	my $stationID = $station->getID();
+
+	print "Station ID=$stationID\n";
 	
 	my $artist = $station->{'artist'};
 
@@ -98,38 +98,56 @@ file.
 
 =head1 DESCRIPTION
 
-StreamFinder accepts a valid radio station  or video URL on supported websites 
+StreamFinder accepts a valid radio station or video URL on supported websites 
 and returns the actual stream URL(s), title, and cover art icon for that 
 station.  The purpose is that one needs one of these URLs 
-in order to have the option to stream the station/video in one's own choice of 
-media player software rather than using their web browser and accepting any / 
-all flash, ads, javascript, cookies, trackers, web-bugs, and other crapware 
-associated with that method of playing.  The author uses his own custom 
-all-purpose media player called "fauxdacious" (his custom hacked version of 
-the open-source "audacious" audio player).  "fauxdacious" incorporates this 
-module to decode and play streams.  The currently-supported websites are:  
-radionomy.com, iheartradio.com, reciva.com, radio.net, banned.video, 
-podcasts.apple.com, vimeo.com, brighteon.com, and (youtube.com, et. al).  
-We are again supporting tunein.com, but it may not work for all stations 
-/ podcasts!
+in order to have the option to stream the station / video in one's own choice 
+of media player software rather than using their web browser and accepting 
+any / all flash, ads, javascript, cookies, trackers, web-bugs, and other 
+crapware associated with that method of playing.  The author uses his own 
+custom all-purpose media player called "fauxdacious" (his custom hacked 
+version of the open-source "audacious" audio player).  "fauxdacious" 
+incorporates this module to decode and play streams.  
 
-NOTE:  For some sites, ie. Youtube, Vimeo, Brighteon, and BannedVideo, the 
-"station" object actually refers to a specific video, but functions the 
-same way!
+The currently-supported websites are:  banned.video, brighteon.com, 
+iheartradio.com, podcasts.apple.com, radio.net, radionomy.com, reciva.com, 
+tunein.com, vimeo.com, and (youtube.com, et. al and other sites that 
+youtube-dl supports).  
+
+NOTE:  Facebook (Streamfinder::Facebook) has been eliminated because 
+logging into Facebook via the call to youtube-dl is now interpreted by 
+Facebook as a "rogue app. login" and will cause them to LOCK your account 
+and FORCE you to change your password the next time you log in 
+to Facebook!
+
+NOTE:  For some sites, ie. Youtube, Vimeo, Brighteon, and BannedVideo, etc. 
+the "station" object actually refers to a specific video or podcast, but 
+functions the same way.
 
 Each site is supported by a separate subpackage (StreamFinder::I<Package>), 
-which is determined and selected based on the url when the StreamFinder object 
+which is determined and selected based on the URL when the StreamFinder object 
 is created.  The methods are overloaded by the selected subpackage's methods.  
 
 Please see the POD. documentation for each subpackage for important additional 
 information on options and features specific to each site / subpackage!
 
-One or more playable streams can be returned for each station / video.
+One or more playable streams can be returned for each station / video / 
+podcast, along with at least a "title" (station name / video or podcast 
+title) and an icon image URL ("iconurl" - if found).  Additional information 
+that MAY be fetched is a (larger?) banner image ("imageurl"), a (longer?) 
+"description", an "artist" / author, a "genre", and a "year" (podcasts, 
+videos, etc.).  Some sites also provide station's FCC call letters 
+("fccid").  For icon and image URLs, functions exist to fetch the actual 
+binary data and mime type for downloading to local storage.  
 
 If you have another streaming site that is not supported, please file a 
-feature request via email or the CPAN bug system, or for faster service, 
-a Perl patch module / program source that can extract some or all of the 
-necessary information for streams on that site and I'll consider it!
+feature request via email or the CPAN bug system, or (for faster service), 
+provide a Perl patch module / program source that can extract some or all 
+of the necessary information for streams on that site and I'll consider it!  
+The easiest way to do this is to take one of the existing submodules, copy 
+it to "StreamFinder::I<YOURSITE>.pm and modify it (and the POD docs) to 
+your specific site's needs, test it on several of their pages (see the 
+"SYNOPSIS" code above), and send it to me (That's what I do)!
 
 =head1 SUBROUTINES/METHODS
 
@@ -154,7 +172,7 @@ Default:  B<1> (if I<-debug> is specified).
 
 =item $station->B<get>()
 
-Returns an array of strings representing all stream urls found.
+Returns an array of strings representing all stream URLs found.
 
 =item $station->B<getURL>([I<options>])
 
@@ -186,7 +204,7 @@ so if none found, the standard title field will always be returned.
 
 =item $station->B<getIconURL>()
 
-Returns the url for the station's "cover art" icon image, if any.
+Returns the URL for the station's "cover art" icon image, if any.
 
 =item $station->B<getIconData>()
 
@@ -195,10 +213,10 @@ Returns a two-element array consisting of the extension (ie. "png",
 
 =item $station->B<getImageURL>()
 
-Returns the url for the station's "cover art" banner image, if any.
+Returns the URL for the station's "cover art" banner image, if any.
 
 NOTE:  If no "banner image" (usually a larger image) is found, 
-the "icon image" url will be returned.
+the "icon image" URL will be returned.
 
 =item $station->B<getImageData>()
 
@@ -208,7 +226,7 @@ Returns a two-element array consisting of the extension (ie. "png",
 NOTE:  If no "banner image" (usually a larger image) is found, 
 the "icon image" data will be returned.
 
-=item $video->B<getType>()
+=item $station->B<getType>()
 
 Returns the station's type (I<submodule-name>).  
 (one of:  "Apple", "BannedVideo", "IHeartRadio", "RadioNet", 
@@ -350,15 +368,15 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '1.20';
+our $VERSION = '1.21';
 our $DEBUG = 0;
 
 require Exporter;
 
 @ISA = qw(Exporter);
 @EXPORT = qw();
-my @supported_mods = (qw(Radionomy IHeartRadio Youtube Reciva RadioNet 
-		BannedVideo Tunein Brighteon Vimeo Apple));
+my @supported_mods = (qw(Apple BannedVideo Brighteon IHeartRadio RadioNet Radionomy Reciva 
+		Tunein Vimeo Youtube));
 
 my %haveit;
 

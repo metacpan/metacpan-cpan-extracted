@@ -21,6 +21,10 @@ isa_ok $obj->negative, 'Lingua::EN::Opinion::Negative';
 isa_ok $obj->emotion, 'Lingua::EN::Opinion::Emotion';
 
 throws_ok {
+    $obj->ratio
+} qr/division by zero/, 'no ratio';
+
+throws_ok {
     $obj = Lingua::EN::Opinion->new( file => 'foo' );
 } qr/File foo does not exist/, 'bogus file';
 
@@ -48,6 +52,8 @@ $x = $obj->scores;
 my $scores = [ 0, -1, -1, 1, 0, -1, 0, -2, -2, 1, 1 ];
 is_deeply $x, $scores, 'scores';
 is_deeply $obj->familiarity, { known => 10, unknown => 80 }, 'familiarity';
+is sprintf( '%.3f', $obj->ratio ), 0.111, 'known ratio';
+is sprintf( '%.3f', $obj->ratio(1) ), 0.889, 'unknown ratio';
 
 my $text = <<'END';
 I begin this story with a neutral statement.
@@ -69,9 +75,11 @@ $obj->analyze;
 $x = $obj->sentences;
 is_deeply $x, $sentences, 'sentences';
 $x = $obj->scores;
-my $scores = [ 0, -1, -1, 1, 0, -1, 0, -2, -2, 1, 1 ];
+$scores = [ 0, -1, -1, 1, 0, -1, 0, -2, -2, 1, 1 ];
 is_deeply $x, $scores, 'scores';
 is_deeply $obj->familiarity, { known => 10, unknown => 80 }, 'familiarity';
+is sprintf( '%.3f', $obj->ratio ), 0.111, 'known ratio';
+is sprintf( '%.3f', $obj->ratio(1) ), 0.889, 'unknown ratio';
 
 $x = $obj->averaged_score(2);
 $scores = [ -0.5, 0, -0.5, -1, -0.5, 1 ];
@@ -93,6 +101,8 @@ $scores = {
 $obj->nrc_sentiment();
 is_deeply $obj->nrc_scores->[6], $scores, 'nrc_scores';
 is_deeply $obj->familiarity, { known => 27, unknown => 63 }, 'familiarity';
+is $obj->ratio, 0.3, 'known ratio';
+is $obj->ratio(1), 0.7, 'unknown ratio';
 
 $x = $obj->get_word('foo');
 is_deeply $x, undef, 'get_word';
@@ -164,7 +174,7 @@ $expected = {
 };
 is_deeply $x, $expected, 'nrc_get_sentence';
 
-=pod
+=for stemming
 
 $text = <<'END';
 And a mighty angel took up a stone like a great millstone, and

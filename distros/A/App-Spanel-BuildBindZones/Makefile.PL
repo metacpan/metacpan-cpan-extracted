@@ -25,6 +25,7 @@ my %WriteMakefileArgs = (
     "Data::Transmute" => "0.031",
     "Data::Transmute::Rules::DNS::Zone::Struct::FromSpanel" => 0,
     "File::chdir" => 0,
+    "List::Util" => "1.45",
     "Log::ger" => "0.027",
     "Perinci::CmdLine::Any" => 0,
     "Perinci::CmdLine::Lite" => "1.820",
@@ -38,7 +39,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,6 +55,7 @@ my %FallbackPrereqs = (
   "File::chdir" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "List::Util" => "1.45",
   "Log::ger" => "0.027",
   "Perinci::CmdLine::Any" => 0,
   "Perinci::CmdLine::Lite" => "1.820",

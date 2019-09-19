@@ -97,7 +97,7 @@ Tunein.com streams.  One or more streams can be returned for each station.
 
 NOTE:  Tunein uses StreamFinder::Youtube (youtube-dl) to extract the actual 
 stream and only returns a SINGLE valid stream URL for a station based on a 
-boilerplate url based on the station's ID.  However, youtube-dl does NOT return 
+boilerplate URL based on the station's ID.  However, youtube-dl does NOT return 
 the metadata, which we're able to extract here.  This may or may NOT work for a 
 given station (particularly non-free / subscription-required stations, ymmv)!
 
@@ -107,12 +107,18 @@ given station (particularly non-free / subscription-required stations, ymmv)!
 
 =item B<new>(I<url> [, "debug" [ => 0|1|2 ]])
 
-Accepts a tunein.com URL and creates and returns a new station object, or 
-I<undef> if the URL is not a valid tunein station or no streams are found.
+Accepts a tunein.com station / podcast ID or URL and creates and returns a new 
+station object, or I<undef> if the URL is not a valid Tunein station or podcast, 
+or no streams are found  The URL can be the full URL, 
+ie. https://tunein.com/radio/I<station-id>, 
+https://tunein.com/podcasts/I<podcast-id>/?topicId=I<episode-id>, 
+or just I<station-id> or I<podcast-id>/I<episode-id>.  NOTE:  For podcasts, 
+you must also include the I<episode-id>, otherwise, the I<podcast-id> will be 
+interpreted as a I<station-id> and you'll likely get no streams!
 
 =item $station->B<get>()
 
-Returns an array of strings representing all stream urls found.
+Returns an array of strings representing all stream URLs found.
 
 =item $station->B<getURL>([I<options>])
 
@@ -141,7 +147,7 @@ Returns the station's title, or (long description).
 
 =item $station->B<getIconURL>()
 
-Returns the url for the station's "cover art" icon image, if any.
+Returns the URL for the station's "cover art" icon image, if any.
 
 =item $station->B<getIconData>()
 
@@ -150,7 +156,8 @@ Returns a two-element array consisting of the extension (ie. "png",
 
 =item $station->B<getImageURL>()
 
-Returns the url for the station's "cover art" banner image, if any.
+Returns the URL for the station's "cover art" (usually larger) 
+banner image, if any.
 
 =item $station->B<getImageData>()
 
@@ -367,9 +374,9 @@ sub new
 		($self->{'id'} = $url) =~ s#^.*?\/([a-zA-Z0-9\-\_]+)(?:\/?|\/\?[^\/]+\/?)$#$1#;
 	} else {
 		my ($id, $podcastid) = split(m#\/#, $url2fetch);
-		$url2fetch = 'https://tunein.com/radio/' . $id;
-		$url2fetch .= '/?topicId=' . $podcastid  if ($podcastid);
 		$self->{'id'} = $id;
+		$url2fetch = ($podcastid ? 'https://tunein.com/podcasts/' : 'https://tunein.com/radio/'). $id;
+		$url2fetch .= '/?topicId=' . $podcastid  if ($podcastid);
 	}
 	print STDERR "-1 FETCHING URL=$url2fetch=\n"  if ($DEBUG);
 	my $response = $ua->get($url2fetch);

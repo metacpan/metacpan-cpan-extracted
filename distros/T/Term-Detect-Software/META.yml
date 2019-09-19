@@ -27,7 +27,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Term-Detect-Software
   homepage: https://metacpan.org/release/Term-Detect-Software
   repository: git://github.com/perlancar/perl-Term-Detect-Software.git
-version: '0.221'
+version: '0.222'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

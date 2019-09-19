@@ -1,0 +1,24 @@
+Revision history for MS
+
+0.008    2019-09-18
+        Fixed incomplete parsing of MzIdentML SequenceCollection children
+        Full POD coverage, added pod-coverage.t
+
+0.007    2019-09-18
+        Numerous minor tweaks and fixes
+        Increased test coverage
+
+0.006    2019-07-09
+        Add 'include_isoforms' option to MS::Search::DB::Source::uniprot
+
+0.005    2019-01-09
+        MS::Protein now a subclass of MS::Peptide
+        Use range() to subset peptides while preserving modifications
+        Additional tests
+
+0.004    2017-05-11
+        Many updates, feature additions, and bug fixes
+
+0.001    2016-04-06
+        Initial import - alpha stage
+

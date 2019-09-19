@@ -111,14 +111,14 @@ all URLs accessed by StreamFinder::Reciva, use 'ssl_opts' instead of
 
 =item B<new>(I<url> [, "debug" [ => 0|1|2 ]])
 
-Accepts a reciva.com URL and creates and returns a new station object, or 
-I<undef> if the URL is not a valid reciva station or no streams are found.
-The url can be the full URL, ie. https://radios.reciva.com/station/55952, 
-or just the station ID:  55952.
+Accepts a reciva.com station ID or URL and creates and returns a new station 
+object, or I<undef> if the URL is not a valid Reciva station or no streams 
+are found.  The URL can be the full URL, 
+ie. https://radios.reciva.com/station/I<station-id>, or just I<station-id>.
 
 =item $station->B<get>()
 
-Returns an array of strings representing all stream urls found.
+Returns an array of strings representing all stream URLs found.
 
 =item $station->B<getURL>([I<options>])
 
@@ -142,11 +142,11 @@ Returns the station's Reciva ID (numeric).
 
 =item $station->B<getTitle>()
 
-Returns the station's title (description).  
+Returns the station's title (description).
 
 =item $station->B<getIconURL>()
 
-Returns the url for the station's "cover art" icon image, if any.
+Returns the URL for the station's "cover art" icon image, if any.
 
 =item $station->B<getIconData>()
 
@@ -155,7 +155,9 @@ Returns a two-element array consisting of the extension (ie. "png",
 
 =item $station->B<getImageURL>()
 
-Returns the url for the station's "cover art" banner image.
+Returns the URL for the station's "cover art" banner image, which for 
+Reciva stations is always the icon image, as Reciva does not support 
+a separate banner image at this time.
 
 =item $station->B<getImageData>()
 
@@ -432,6 +434,7 @@ sub new
 	$self->{'title'} = $1  if (!$self->{'title'} && $html =~ m#Playing:\s*([^\<]+)#);
 	$self->{'title'} = HTML::Entities::decode_entities($self->{'title'});
 	$self->{'title'} = uri_unescape($self->{'title'});
+	$self->{'description'} = $self->{'title'};
 	my $stream = '';
 	my $plshtml = '';
 	if (defined $self->{'_reciva_ssl_opts'}) {

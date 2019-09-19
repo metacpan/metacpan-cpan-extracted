@@ -2,14 +2,14 @@ NAME
     App::WHMCSUtils - CLI utilities related to WHMCS
 
 VERSION
-    This document describes version 0.005 of App::WHMCSUtils (from Perl
-    distribution App-WHMCSUtils), released on 2018-01-29.
+    This document describes version 0.008 of App::WHMCSUtils (from Perl
+    distribution App-WHMCSUtils), released on 2019-09-19.
 
 FUNCTIONS
   calc_deferred_revenue
     Usage:
 
-     calc_deferred_revenue(%args) -> [status, msg, result, meta]
+     calc_deferred_revenue(%args) -> [status, msg, payload, meta]
 
     This utility collects invoice items from paid invoices, filters eligible
     ones, then defers the revenue to separate months for items that should
@@ -111,7 +111,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -120,7 +120,7 @@ FUNCTIONS
   restore_whmcs_client
     Usage:
 
-     restore_whmcs_client(%args) -> [status, msg, result, meta]
+     restore_whmcs_client(%args) -> [status, msg, payload, meta]
 
     Restore a missing client from SQL database backup.
 
@@ -162,7 +162,99 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  send_verification_emails
+    Usage:
+
+     send_verification_emails(%args) -> [status, msg, payload, meta]
+
+    Send verification emails for clients who have not had their email
+    verified.
+
+    WHMCS does not yet provide an API for this, so we do this via a headless
+    browser.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   action => *str* (default: "send-verification-emails")
+
+        The default action is to send verification emails. You can also just
+        list the clients who haven't got their email verified yet.
+
+    *   admin_password* => *str*
+
+    *   admin_username* => *str*
+
+    *   db_host => *str* (default: "localhost")
+
+    *   db_name* => *str*
+
+    *   db_pass => *str*
+
+    *   db_port => *net::port* (default: 3306)
+
+    *   db_user => *str*
+
+    *   hook_set_sender_email => *str|code*
+
+        Hook to set sender email for every email.
+
+        Hook will receive these arguments:
+
+         ($client_rec, $orig_sender_email)
+
+        $client_rec is a hash containing client record fields, e.g. "id",
+        "email", "firstname", "lastname", etc. $orig_sender_email is the
+        original sender email setting ("Email" setting in the configuration
+        table).
+
+        Hook is expected to return the sender email.
+
+    *   include_active => *bool* (default: 1)
+
+        Whether to include active clients.
+
+    *   include_client_ids => *array[uint]*
+
+    *   include_inactive => *bool* (default: 0)
+
+        Whether to include inactive clients.
+
+    *   limit => *uint*
+
+        Only process this many clients then stop.
+
+    *   mech_user_agent => *str*
+
+    *   random => *bool* (default: 1)
+
+    *   url* => *url*
+
+        It should be without "/admin" part, e.g.:
+
+         https://client.mycompany.com/
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -188,7 +280,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+    This software is copyright (c) 2019, 2018, 2017 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

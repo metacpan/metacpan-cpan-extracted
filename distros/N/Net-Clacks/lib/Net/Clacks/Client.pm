@@ -7,7 +7,7 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp;
-our $VERSION = 6.0;
+our $VERSION = 6.1;
 use Fatal qw( close );
 use Array::Contains;
 #---AUTOPRAGMAEND---
@@ -160,7 +160,11 @@ sub doNetwork {
         my $written = syswrite($self->{socket}, $self->{outbuffer});
         if(defined($written) && $written) {
             $workCount += $written;
-            $self->{outbuffer} = substr($self->{outbuffer}, $written);
+            if(length($self->{outbuffer}) == $written) {
+                $self->{outbuffer} = '';
+            } else {
+                $self->{outbuffer} = substr($self->{outbuffer}, $written);
+            }
         }
 
         if($brokenpipe) {

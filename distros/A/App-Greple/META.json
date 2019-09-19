@@ -57,7 +57,7 @@
    "provides" : {
       "App::Greple" : {
          "file" : "lib/App/Greple.pm",
-         "version" : "8.3306"
+         "version" : "8.3401"
       },
       "App::Greple::Common" : {
          "file" : "lib/App/Greple/Common.pm"
@@ -128,7 +128,7 @@
          "web" : "https://github.com/kaz-utashiro/greple"
       }
    },
-   "version" : "8.3306",
+   "version" : "8.3401",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kaz Utashiro <kaz@utashiro.com>",

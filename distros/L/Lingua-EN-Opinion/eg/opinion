@@ -36,4 +36,4 @@ print 'Average sentence score: ', mean( @{ $opinion->scores } ), "\n";
 printf "known: %d, unknown: %d, known/total: %.2f\n",
     $opinion->familiarity->{known},
     $opinion->familiarity->{unknown},
-    $opinion->familiarity->{known} / ( $opinion->familiarity->{known} + $opinion->familiarity->{unknown} );
+    $opinion->ratio;

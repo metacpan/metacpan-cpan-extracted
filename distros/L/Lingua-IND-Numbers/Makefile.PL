@@ -26,7 +26,7 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Lingua::IND::Numbers' => { file => 'lib/Lingua/IND/Numbers.pm', version => '0.10' },
+            'Lingua::IND::Numbers' => { file => 'lib/Lingua/IND/Numbers.pm', version => '0.11' },
         },
         resources => {
             repository => {

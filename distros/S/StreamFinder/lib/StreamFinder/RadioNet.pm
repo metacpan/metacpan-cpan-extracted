@@ -101,13 +101,14 @@ One or more streams can be returned for each station.
 
 =item B<new>(I<url> [, "debug" [ => 0|1|2 ]])
 
-Accepts a Radio.net URL and creates and returns a new station object, or 
-I<undef> if the URL is not a valid Radio.net station or no streams are found.
-The url can be the full URL, ie. https://www.radio.net/s/vibe945.
+Accepts a Radio.net station ID or URL and creates and returns a new station 
+object, or I<undef> if the URL is not a valid Radio.net station or no 
+streams are found.  The URL can be the full URL, 
+ie. https://www.radio.net/s/I<station-id>, or just I<station-id>.
 
 =item $station->B<get>()
 
-Returns an array of strings representing all stream urls found.
+Returns an array of strings representing all stream URLs found.
 
 =item $station->B<getURL>([I<options>])
 
@@ -135,7 +136,7 @@ Returns the station's title, or (long description).
 
 =item $station->B<getIconURL>()
 
-Returns the url for the station's "cover art" icon image, if any.
+Returns the URL for the station's "cover art" icon image, if any.
 
 =item $station->B<getIconData>()
 
@@ -144,7 +145,8 @@ Returns a two-element array consisting of the extension (ie. "png",
 
 =item $station->B<getImageURL>()
 
-Returns the url for the station's "cover art" banner image.
+Returns the URL for the station's "cover art" (usually larger) 
+banner image.
 
 =item $station->B<getImageData>()
 

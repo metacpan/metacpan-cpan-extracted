@@ -1,7 +1,7 @@
 package Data::Clean;
 
-our $DATE = '2019-09-01'; # DATE
-our $VERSION = '0.504'; # VERSION
+our $DATE = '2019-09-08'; # DATE
+our $VERSION = '0.505'; # VERSION
 
 use 5.010001;
 use strict;
@@ -103,6 +103,35 @@ sub command_clone {
     );
 }
 
+sub command_unbless_ffc_inlined {
+    my ($self, $cd, $args) = @_;
+
+    # code taken from Function::Fallback::CoreOrPP 0.07
+    $cd->{subs}{unbless} //= <<'EOC';
+    my $ref = shift;
+
+    my $r = ref($ref);
+    # not a reference
+    return $ref unless $r;
+
+    # return if not a blessed ref
+    my ($r2, $r3) = "$ref" =~ /(.+)=(.+?)\(/
+        or return $ref;
+
+    if ($r3 eq 'HASH') {
+        return { %$ref };
+    } elsif ($r3 eq 'ARRAY') {
+        return [ @$ref ];
+    } elsif ($r3 eq 'SCALAR') {
+        return \( my $copy = ${$ref} );
+    } else {
+        die "Can't handle $ref";
+    }
+EOC
+
+    "{{var}} = \$sub_unbless->({{var}}); \$ref = ref({{var}})";
+}
+
 # test
 sub command_die {
     my ($self, $cd, $args) = @_;
@@ -119,6 +148,7 @@ sub _generate_cleanser_code {
         modules => {}, # key = module name, val = version
         clone_func   => $self->{_opts}{'!clone_func'},
         code => '',
+        subs => {},
     };
 
     $cd->{modules}{'Scalar::Util'} //= 0;
@@ -225,6 +255,11 @@ sub _generate_cleanser_code {
     }
 
     push @code, 'sub {'."\n";
+
+    for (sort keys %{$cd->{subs}}) {
+        push @code, "state \$sub_$_ = sub { ".$cd->{subs}{$_}." };\n";
+    }
+
     push @code, 'my $data = shift;'."\n";
     push @code, 'state %refs;'."\n" if $circ;
     push @code, 'state $ctr_circ;'."\n" if $circ;
@@ -292,7 +327,7 @@ Data::Clean - Clean data structure
 
 =head1 VERSION
 
-This document describes version 0.504 of Data::Clean (from Perl distribution Data-Clean), released on 2019-09-01.
+This document describes version 0.505 of Data::Clean (from Perl distribution Data-Clean), released on 2019-09-08.
 
 =head1 SYNOPSIS
 

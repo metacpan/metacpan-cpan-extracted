@@ -7,7 +7,7 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp;
-our $VERSION = 6.0;
+our $VERSION = 6.1;
 use Fatal qw( close );
 use Array::Contains;
 #---AUTOPRAGMAEND---
@@ -853,9 +853,11 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
             }
 
             if(defined($written) && $written) {
-                #my $whatwaswritten = substr($clients{$cid}->{outbuffer}, 0, $written);
-                #print STDERR "> $whatwaswritten\n--\n";
-                $clients{$cid}->{outbuffer} = substr($clients{$cid}->{outbuffer}, $written);
+                if(length($clients{$cid}->{outbuffer}) == $written) {
+                    $clients{$cid}->{outbuffer} = '';
+                } else {
+                    $clients{$cid}->{outbuffer} = substr($clients{$cid}->{outbuffer}, $written);
+                }   
             }
         }
 

@@ -88,7 +88,8 @@ file.
 =head1 DESCRIPTION
 
 StreamFinder::Apple accepts a valid podcast or episode URL on 
-podcasts.apple.com and returns the actual stream URL(s), title, and cover 
+podcasts.apple.com, or an album or song (free sample clips only) from 
+music.apple.com, and returns the actual stream URL(s), title, and cover 
 art icon for that podcast.  The purpose is that one needs one of these URLs 
 in order to have the option to stream the station in one's own choice of 
 media player software rather than using their web browser and accepting any / 
@@ -99,11 +100,13 @@ the open-source "audacious" audio player.  "fauxdacious" incorporates this
 module to decode and play podcasts.apple.com streams.
 
 NOTE:  The URL must be either a podcast site, format:  
-https://podcasts.apple.com/I<country>/podcast/I<podcaster-description>/id1440412195?i=1000448441439 
+https://podcasts.apple.com/I<country>/podcast/I<podcaster-description>/idI<podcast#>?i=I<episode#> 
 (returns stream(s) for all "episodes" for that site, OR a specific podcast / 
 "episode" page site, format:  
 https://podcasts.apple.com/I<country>/podcast/I<podcaster-description>/idI<podcast#> 
-(returns a single stream for that specific podcast).
+(returns a single stream for that specific podcast).  Music samples also 
+seem to work using the format (with or without the ?i=I<song#> part):  
+https://music.apple.com/I<country>/album/I<album-description>/idI<album#>?i=I<song#>
 
 =head1 SUBROUTINES/METHODS
 
@@ -111,9 +114,13 @@ https://podcasts.apple.com/I<country>/podcast/I<podcaster-description>/idI<podca
 
 =item B<new>(I<url> [, "debug" [ => 0|1|2 ]])
 
-Accepts a podcasts.apple.com URL and creates and returns a new station 
-object, or I<undef> if the URL is not a valid reciva station or no streams 
-are found.  
+Accepts a podcasts.apple.com ID or URL or music.apple.com URL and creates and 
+returns a new podcast object, or I<undef> if the URL is not a valid podcast, 
+album, etc. or no streams are found.  The URL can be the full URL, 
+ie. https://podcasts.apple.com/podcast/idI<podcast-id>, 
+https://podcasts.apple.com/podcast/idI<podcast-id>?i=<episode-id>, or just 
+I<podcast-id>, or I<podcast-id>/I<episode-id>.  NOTE:  If the ID is an album 
+or song clip, then the full URL must be given, ie. http://music.apple.com/...
 
 =item $station->B<get>()
 
@@ -133,19 +140,25 @@ in the playlist is returned.  This is needed by Fauxdacious Mediaplayer.
 
 =item $station->B<count>()
 
-Returns the number of streams found for the station.
+Returns the number of streams found for the podcast / episode / album / song.  
+Episodes and songs usually return 1, whereas podcasts and albums usually 1 
+for each episode / sample song clip in the podcast / album respectively.
 
 =item $station->B<getID>()
 
-Returns the station's Apple ID (numeric).
+Returns the station's Apple ID (numeric).  For podcasts and albums, this 
+is a single numeric value.  For episodes and songs, it's two numbers 
+separated by a slash ("/").
 
 =item $station->B<getTitle>(['desc'])
 
-Returns the station's title, or (long description).  
+Returns the podcast's, album's, episode's or song clip's title, 
+or (long description).  
 
 =item $station->B<getIconURL>()
 
-Returns the url for the station's "cover art" icon image, if any.
+Returns the url for the podcast's / album's "cover art" icon image, 
+if any.
 
 =item $station->B<getIconData>()
 
@@ -154,7 +167,9 @@ Returns a two-element array consisting of the extension (ie. "png",
 
 =item $station->B<getImageURL>()
 
-Returns the url for the station's "cover art" banner image.
+Returns the url for the podcast's / album's "cover art" banner image, 
+which for Apple is always the icon image, as Apple does not support 
+a separate banner image at this time.
 
 =item $station->B<getImageData>()
 
@@ -349,16 +364,22 @@ sub new
 
 	$self->{'id'} = '';
 	(my $url2fetch = $url);
-	$url2fetch = 'https://podcasts.apple.com/us/podcast/' . $url  unless ($url =~ m#^https?\:#);
 	if ($url2fetch =~ m#^https?\:\/\/(?:podcasts|music)\.apple\.#) {
 #EXAMPLE1:my $url = 'https://podcasts.apple.com/us/podcast/wnbc-sec-shorts-josh-snead/id1440412195?i=1000448441439';
 #EXAMPLE2:my $url = 'https://podcasts.apple.com/us/podcast/good-bull-hunting-for-texas-a-m-fans/id1440412195';
 #EXAMPLE3:my $url = 'https://music.apple.com/us/album/big-legged-woman/723550112';
 		$self->{'id'} = ($url =~ m#\/(?:id)?(\d+)(?:\?i\=(\d+))?\/?#) ? $1 : '';
 		$self->{'id'} .= '/'. $2  if (defined $2);
+	} elsif ($url2fetch !~ m#^https?\:\/\/#) {
+		my ($id, $podcastid) = split(m#\/#, $url2fetch);
+		$self->{'id'} = $id;
+		$url2fetch = 'https://podcasts.apple.com/podcast/id' . $id;
+		$url2fetch .= '?i=' . $podcastid  if ($podcastid);
 	}
-	print STDERR "--URL=$url= ID=".$self->{'id'}."=\n"  if ($DEBUG);
+
+	print STDERR "--URL=$url2fetch= ID=".$self->{'id'}."=\n"  if ($DEBUG);
 	return undef  unless ($self->{'id'});
+
 	my $html = '';
 	print STDERR "-0(Apple): ID=".$self->{'id'}."= AGENT=".join('|',@userAgentOps)."=\n"  if ($DEBUG);
 	my $ua = LWP::UserAgent->new(@userAgentOps);

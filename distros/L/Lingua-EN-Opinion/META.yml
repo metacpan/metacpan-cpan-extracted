@@ -34,7 +34,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Lingua-EN-Opinion
   repository: https://github.com/ology/Lingua-EN-Opinion.git
-version: '0.1400'
+version: '0.1502'
 x_Dist_Zilla:
   perl:
     version: '5.027007'
