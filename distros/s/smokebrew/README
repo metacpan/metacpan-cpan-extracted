@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.52
+    version 0.54
 
 SYNOPSIS
 
@@ -91,6 +91,10 @@ COMMAND LINE SWITCHES
 
       This would pass the flags for building a threaded 64bit perl to
       Configure.
+
+      If you specify -Dusequadmath smokebrew will only build perls that
+      actually support quadmath, namely perls greater than or equal to
+      v5.21.4
 
     --mirrors URL
 
@@ -440,7 +444,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2017 by Chris Williams.
+    This software is copyright (c) 2019 by Chris Williams.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

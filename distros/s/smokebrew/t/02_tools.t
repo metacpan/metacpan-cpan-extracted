@@ -14,7 +14,7 @@ use App::SmokeBrew::Tools;
   {
     # Check we can fetch a file from a CPAN mirror
     require IO::Socket::INET;
-    my $sock = IO::Socket::INET->new( PeerAddr => 'cpan.hexten.net', PeerPort => 80, Timeout => 20 )
+    my $sock = IO::Socket::INET->new( PeerAddr => 'www.cpan.org', PeerPort => 80, Timeout => 20 )
        or $fetchtests = 0;
   }
 
@@ -82,6 +82,11 @@ use App::SmokeBrew::Tools;
 {
   ok( App::SmokeBrew::Tools->devel_perl('5.13.0'), 'It is a development perl' );
   ok( !App::SmokeBrew::Tools->devel_perl('5.12.0'), 'It is not a development perl' );
+}
+
+{
+  ok( App::SmokeBrew::Tools->can_quadmath('5.22.0'), 'It can quadmath' );
+  ok( !App::SmokeBrew::Tools->can_quadmath('5.12.0'), 'It cannot quadmath' );
 }
 
 {

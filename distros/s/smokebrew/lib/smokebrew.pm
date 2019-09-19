@@ -1,5 +1,5 @@
 package smokebrew;
-$smokebrew::VERSION = '0.52';
+$smokebrew::VERSION = '0.54';
 #ABSTRACT: Automated Perl building and installation for CPAN Testers
 
 use strict;
@@ -19,7 +19,7 @@ smokebrew - Automated Perl building and installation for CPAN Testers
 
 =head1 VERSION
 
-version 0.52
+version 0.54
 
 =head1 SYNOPSIS
 
@@ -93,6 +93,9 @@ This switch may be specified multiple times with different arguments.
   smokebrew --perlargs "-Dusethreads" --perlargs "-Duse64bitint"
 
 This would pass the flags for building a threaded 64bit perl to L<Configure>.
+
+If you specify C<-Dusequadmath> smokebrew will only build perls that actually support quadmath, namely
+perls greater than or equal to v5.21.4
 
 =item C<--mirrors URL>
 
@@ -418,7 +421,7 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Chris Williams.
+This software is copyright (c) 2019 by Chris Williams.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

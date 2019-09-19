@@ -4,7 +4,7 @@ use warnings;
 use Test::More;
 use Test::TypeTiny;
 
-use Data::Object::Export qw(deduce);
+use Data::Object::Utility;
 use Data::Object::Library qw(
   UndefObj
   UndefObject
@@ -15,7 +15,7 @@ ok_subtype Object, UndefObj;
 ok_subtype Object, UndefObject;
 
 my $data1 = undef;
-my $data2 = deduce undef;
+my $data2 = Data::Object::Utility::Deduce undef;
 
 should_fail($data1, UndefObj);
 should_pass($data2, UndefObj);

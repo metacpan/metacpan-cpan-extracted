@@ -58,9 +58,10 @@
          "web" : "https://github.com/iamalnewkirk/do"
       }
    },
-   "version" : "1.76",
+   "version" : "1.80",
    "x_authority" : "cpan:AWNCORP",
    "x_contributors" : [
+      "Adam Hopkins <violapiratejunky@gmail.com>",
       "Anthony Brummett <abrummet@genome.wustl.edu>",
       "Jos\u00e9 Joaqu\u00edn Atria <jjatria@gmail.com>"
    ],

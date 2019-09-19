@@ -4,7 +4,7 @@ use warnings;
 use Test::More;
 use Test::TypeTiny;
 
-use Data::Object::Export qw(deduce);
+use Data::Object::Utility;
 use Data::Object::Library qw(
   RegexpObj
   RegexpObject
@@ -15,7 +15,7 @@ ok_subtype Object, RegexpObj;
 ok_subtype Object, RegexpObject;
 
 my $data1 = qr//;
-my $data2 = deduce qr//;
+my $data2 = Data::Object::Utility::Deduce qr//;
 
 should_fail($data1, RegexpObj);
 should_pass($data2, RegexpObj);

@@ -1,4 +1,9 @@
 Revision history for Perl extension Lingua::pt_BR::Nums2Words.
 
+0.02  Thu Sep 19 00:00:00 2019
+    - Remove perl 5.20 requirement to install this module
+    - Fix the number 15 (it was written as 'quinte')
+    - Fix the number 17 (it was writter as 'dezesete')
+
 0.01  Thu Apr 2 00:00:00 2015
-	- original version
+    - original version

@@ -22,6 +22,7 @@ WriteMakefile(
     },
     PREREQ_PM => {
         'Mojolicious' => 0,
+        'Mojo::Base' => 0,
         'Test::More' => 0,
         'List::Util' => 0,
         'Term::ANSIColor' => 0,

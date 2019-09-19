@@ -34,3 +34,5 @@ is( $app->prefix, $prefix, 'Prefix dir option is okay' );
 is( $app->plugin, 'App::SmokeBrew::Plugin::CPANPLUS::YACSmoke', 'Plugin option is okay' );
 is( ref $app->perlargs, 'ARRAY', 'Perlargs is an ARRAYref');
 }
+
+unlink('smokebrew.cfg');

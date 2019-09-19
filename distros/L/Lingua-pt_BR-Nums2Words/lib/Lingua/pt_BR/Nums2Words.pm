@@ -6,7 +6,7 @@ use Exporter 'import';
 use Carp;
 use utf8;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 our @EXPORT_OK = qw/num2word/;
 
 =encoding utf8
@@ -44,8 +44,8 @@ my %cardinals;
 $cardinals{units}      = [undef, qw/um dois três quatro cinco seis sete oito
                           nove/];
 
-$cardinals{first_tens} = [undef, qw/onze doze treze quatorze quinte dezesseis
-                          dezesete dezoito dezenove/];
+$cardinals{first_tens} = [undef, qw/onze doze treze quatorze quinze dezesseis
+                          dezessete dezoito dezenove/];
 
 $cardinals{tens}       = [undef, qw/dez vinte trinta quarenta cinquenta sessenta
                           setenta oitenta noventa/];
@@ -198,6 +198,10 @@ Lingua::PT::Nums2Words for pt_PT Portuguese.
 =head1 AUTHOR
 
 Gil Magno E<lt>gils@cpan.orgE<gt>
+
+=head1 THANKS TO
+
+Italo Gonçales (cpan:GONCALES) E<lt>italo.goncales@gmail.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 

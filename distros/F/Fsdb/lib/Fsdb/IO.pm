@@ -2,9 +2,7 @@
 
 #
 # Fsdb::IO.pm
-# $Id: dac8ca3b6f469025184776b4fd18db3ba3c9b4a0 $
-#
-# Copyright (C) 2005-2013 by John Heidemann <johnh@isi.edu>
+# Copyright (C) 2005-2019 by John Heidemann <johnh@isi.edu>
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License,
@@ -242,6 +240,25 @@ sub _reset_cols {
     $self->{_debug} = undef;
 }
 
+=head2 _find_filename_decompressor
+
+returns the name of the decompression program for FILE if it ends in a compression
+extension
+
+=cut
+sub _find_filename_decompressor($;$) {
+    my($file, $as_extension) = @_;
+    return undef if (!defined($file));
+    my($ext) = ($file =~ m/\.(gz|xz|bz2)$/);
+    $ext = $file if ($as_extension && !defined($ext));
+    return undef if (!defined($ext));
+    return "zcat" if ($ext eq "gz");
+    return "xzcat" if ($ext eq "xz");
+    return "bzcat" if ($ext eq  "bz2");
+    return undef;
+}
+
+
 =head2 config_one
 
     $fsdb->config_one($arglist_aref);
@@ -303,9 +320,9 @@ sub config_one {
 	shift @$aaref;
 	$self->{_compression} = shift @$aaref;
 	$self->{_compression} = undef if ($self->{_compression} && $self->{_compression} eq 'none');
-	my(%valid_compressions) = qw(bz2 1 gz 1 xz 1);
+	my $decompressor = _find_filename_decompressor($self->{_compression}, 1);
 	$self->{_error} = "bad compression mode: " . $self->{_compression}
-	    if ($self->{_compression} && !defined($valid_compressions{$self->{_compression}}));
+	    if ($self->{_compression} && !defined($decompressor));
 	$self->update_headerrow;
     } elsif ($aaref->[0] eq '-debug') {
 	shift @$aaref;
@@ -404,6 +421,13 @@ sub close {
     if (defined($self->{_queue})) {
 	$self->{_queue}->enqueue(undef);
 	delete $self->{_queue};
+    };
+    # reap any subprocesses
+    if (defined($self->{_hdfs_reader_pid})) {
+            waitpid $self->{_hdfs_reader_pid}, 0;
+    };
+    if (defined($self->{_compression_pid})) {
+            waitpid $self->{_compression_pid}, 0;
     };
     $self->{_error} = 'closed';
 }

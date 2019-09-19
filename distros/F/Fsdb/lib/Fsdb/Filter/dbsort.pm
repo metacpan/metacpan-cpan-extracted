@@ -410,6 +410,8 @@ sub segment_merge_start($$) {
 	my(@merge_args) = qw(--nolog --noclose --removeinputs --xargs);
 	push(@merge_args, '--parallelism', $self->{_max_parallelism})
 	    if (defined($self->{_max_parallelism}));
+	push(@merge_args, '--header', $self->{_header})
+	    if (defined($self->{_header}));
 	push(@merge_args, '-T', $self->{_tmpdir})
 	    if (defined($self->{_tmpdir}));
 	push(@merge_args, @{$self->{_sort_argv}});

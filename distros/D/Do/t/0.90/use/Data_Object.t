@@ -469,6 +469,35 @@ which extends the Undef class. Read more at L<Data::Object::Undef>.
 The framework's vars configuration configures the calling package as a class
 representation of the C<%ENV> variable. Read more at L<Data::Object::Vars>.
 
+=footers
+
++=head1 SLOGAN
+
+If you're doing something modern with Perl, start here!
+
++=head1 INSTALLATION
+
+If you have cpanm, you only need one line:
+
+  $ cpanm -qn Do
+
+If you don't have cpanm, get it! It takes less than a minute, otherwise:
+
+  $ curl -L https://cpanmin.us | perl - -qn Do
+
+Add C<Do> to the list of dependencies in C<cpanfile>:
+
+  requires "Do" => "1.80"; # 1.80 or newer
+
+If cpanm doesn't have permission to install modules in the current Perl
+installation, it will automatically set up and install to a local::lib in your
+home directory.  See the L<local::lib|local::lib> documentation for details on
+enabling it in your environment. We recommend using a
+L<Perlbrew|https://github.com/gugod/app-perlbrew> or
+L<Plenv|https://github.com/tokuhirom/plenv> environment. These tools will help
+you manage multiple Perl installations in your C<$HOME> directory. They are
+completely isolated Perl installations.
+
 =cut
 
 use_ok 'Data::Object';

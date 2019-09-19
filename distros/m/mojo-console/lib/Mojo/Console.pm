@@ -6,26 +6,34 @@ use List::Util qw(any none);
 use Mojo::Console::Input;
 use Mojo::Console::Output;
 
-our $VERSION = '0.0.3';
+our $VERSION = '0.0.7';
 
 has 'input' => sub { Mojo::Console::Input->new };
 has 'max_attempts' => 10;
 has 'output' => sub { Mojo::Console::Output->new };
+has '_required' => 0;
 
 sub ask {
-    my ($self, $message, $required) = @_;
+    my ($self, $message, $default) = @_;
 
     my $attempts = $self->max_attempts;
     my $answer = '';
 
-    while ((($required || $attempts == 10) && !$answer) && $attempts--) {
+    while ((($self->_required || $attempts == 10) && !$answer) && $attempts--) {
         $self->line($message . ' ');
-        $answer = $self->input->ask;
+        
+        if ($default) {
+            $self->warn(sprintf('[default=%s] ', $default));
+        }
+
+        $answer = $self->input->ask || (!$self->_required && $default);
     }
 
     if ($attempts < 0) {
         $self->error("Please answer the question.\n");
     }
+
+    $self->required(0);
 
     return $answer;
 }
@@ -98,6 +106,14 @@ sub newline {
     return shift->output->newline(@_);
 }
 
+sub required {
+    my $self = shift;
+
+    $self->_required(shift // 1);
+
+    return $self;
+}
+
 sub success {
     return shift->output->success(@_);
 }
@@ -162,7 +178,7 @@ the following new ones.
 =head2 ask
 
     my $answer = $self->ask('What is your name?');
-    my $required_answer = $self->ask('What is your name?', 1); # this will ask for an answer maximum 10 times and will exit in case the answer is empty
+    my $required_answer = $self->required->ask('What is your name?'); # this will ask for an answer maximum 10 times and will exit in case the answer is empty
 
 =head2 confirm
 
@@ -189,6 +205,10 @@ the following new ones.
 =head2 newline
 
     $self->line("This message will have a new line at the end");
+
+=head2 required
+
+    $self->required->ask('What is your name?');
 
 =head2 success
 

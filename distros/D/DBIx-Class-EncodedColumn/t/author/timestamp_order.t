@@ -8,6 +8,11 @@ use File::Temp 'tempdir';
 use lib File::Spec->catdir(__DIR__, '..', 'lib');
 use DigestTest::Schema;
 
+unless( eval 'require DBIx::Class::TimeStamp' ) {
+  plan skip_all => 'DBIx::Class::TimeStamp not available';
+  exit;
+}
+
 DigestTest::Schema->load_classes(qw/WithTimeStampChild WithTimeStampChildWrongOrder/);
 
 my $tmp = tempdir( CLEANUP => 1 );

@@ -39,7 +39,7 @@ resources:
   bugtracker: https://github.com/wreis/DBIx-Class-EncodedColumn/issues
   homepage: https://github.com/wreis/DBIx-Class-EncodedColumn
   repository: https://github.com/wreis/DBIx-Class-EncodedColumn.git
-version: '0.00018'
+version: '0.00019'
 x_contributors:
   - 'Jonathan Scott Duff <duff@localhost.localdomain>'
   - 'Jonathan Scott Duff <duff@pobox.com>'

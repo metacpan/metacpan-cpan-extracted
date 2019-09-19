@@ -2,7 +2,7 @@
 
 #
 # dbmerge.pm
-# Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
+# Copyright (C) 1991-2019 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -26,6 +26,8 @@ or
 or
     dbmerge [-T TemporaryDirectory] [-nNrR] column [column...] --inputs A.fsdb [B.fsdb ...]
 
+or
+    { echo "A.fsdb"; echo "B.fsdb" } | dbmerge --xargs column [column...]
 
 =head1 DESCRIPTION
 
@@ -53,7 +55,7 @@ It therefore buffers output on disk as necessary.
 so disk space is O(number of records).)
 
 L<dbmerge> will merge data in parallel, if possible.
-The <--parallelism> option can control the degree of parallelism,
+The C<--parallelism> option can control the degree of parallelism,
 if desired.
 
 
@@ -66,7 +68,7 @@ General option:
 =item B<--xargs>
 
 Expect that input filenames are given, one-per-line, on standard input.
-(In this case, merging can start incrementally.
+(In this case, merging can start incrementally.)
 
 =item B<--removeinputs>
 
@@ -141,6 +143,11 @@ By default, programs process automatically,
 but Fsdb::Filter objects in Perl do not run until you invoke
 the run() method.
 The C<--(no)autorun> option controls that behavior within Perl.
+
+=item B<--header> H
+
+Use H as the full Fsdb header, rather than reading a header from
+then input.
 
 =item B<--help>
 
@@ -262,6 +269,7 @@ sub set_defaults($) {
     $self->{_xargs} = undef;
     $self->{_endgame} = 1;
     $self->set_default_tmpdir;
+    $self->{_header} = undef;
 }
 
 =head2 parse_options
@@ -285,6 +293,7 @@ sub parse_options($@) {
 	'close!' => \$self->{_close},
 	'd|debug+' => \$self->{_debug},
 	'endgame!' => \$self->{_endgame},
+	'header=s' => \$self->{_header},
 	'i|input=s@' => sub { $self->parse_io_option('inputs', @_); },
 	'inputs!' => \$past_sort_options,
 	'j|parallelism=i' => \$self->{_max_parallelism},
@@ -436,6 +445,8 @@ sub segments_merge2_run($$$$$$) {
     my @merge_options = qw(--autorun --nolog);
     push(@merge_options, '--noclose', '--saveoutput' => \$self->{_out})
 	if ($is_final_output);
+    push(@merge_options, '--header' => $self->{_header})
+	if ($self->{_header});
 
     my $debug_msg = '';
     if ($self->{_debug}) {
@@ -960,7 +971,7 @@ sub run($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2019 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

@@ -1,6 +1,6 @@
 requires 'Mojolicious', '7.15'; # Mojo::File
 requires 'Mojo::SQLite';
-requires 'LinkEmbedder';
+requires 'LinkEmbedder', '== 1.05';
 requires 'File::Share';
 requires 'Passwords';
 

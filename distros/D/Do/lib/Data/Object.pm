@@ -7,7 +7,7 @@ use warnings;
 
 use parent 'Data::Object::Config';
 
-our $VERSION = '1.76'; # VERSION
+our $VERSION = '1.80'; # VERSION
 
 # METHODS
 
@@ -772,11 +772,40 @@ argument.
 
 =cut
 
+=head1 SLOGAN
+
+If you're doing something modern with Perl, start here!
+
+=head1 INSTALLATION
+
+If you have cpanm, you only need one line:
+
+  $ cpanm -qn Do
+
+If you don't have cpanm, get it! It takes less than a minute, otherwise:
+
+  $ curl -L https://cpanmin.us | perl - -qn Do
+
+Add C<Do> to the list of dependencies in C<cpanfile>:
+
+  requires "Do" => "1.80"; # 1.80 or newer
+
+If cpanm doesn't have permission to install modules in the current Perl
+installation, it will automatically set up and install to a local::lib in your
+home directory.  See the L<local::lib|local::lib> documentation for details on
+enabling it in your environment. We recommend using a
+L<Perlbrew|https://github.com/gugod/app-perlbrew> or
+L<Plenv|https://github.com/tokuhirom/plenv> environment. These tools will help
+you manage multiple Perl installations in your C<$HOME> directory. They are
+completely isolated Perl installations.
+
 =head1 CREDITS
 
-Al Newkirk, C<+296>
+Al Newkirk, C<+303>
 
 Anthony Brummett, C<+10>
+
+Adam Hopkins, C<+1>
 
 José Joaquín Atria, C<+1>
 
@@ -795,9 +824,11 @@ terms as the Perl 5 programming language system itself.
 
 =head1 PROJECT
 
-L<GitHub|https://github.com/iamalnewkirk/do>
+L<Wiki|https://github.com/iamalnewkirk/do/wiki>
 
-L<Projects|https://github.com/iamalnewkirk/do/projects>
+L<Project|https://github.com/iamalnewkirk/do>
+
+L<Initiatives|https://github.com/iamalnewkirk/do/projects>
 
 L<Milestones|https://github.com/iamalnewkirk/do/milestones>
 

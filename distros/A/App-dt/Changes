@@ -1,10 +1,15 @@
-0.004   2017-05-22 (PERLANCAR)
+0.005   2019-09-19  Released-By: PERLANCAR; Urgency: medium
+
+	- Add output format 'raw' (passed to print() directly).
+
+
+0.004   2017-05-22  Released-By: PERLANCAR
 
         - [Incompatible change] When there is only a single output, set $DATA[0]
           from last expression of -e code to allow terser code.
 
 
-0.003   2017-05-19 (PERLANCAR)
+0.003   2017-05-19  Released-By: PERLANCAR
 
 	[ENHANCEMENTS]
 
@@ -24,13 +29,13 @@
         - Add more docs and examples.
 
 
-0.002   2017-05-19 (PERLANCAR)
+0.002   2017-05-19  Released-By: PERLANCAR
 
 	- POD fixes/additions.
 
 	- Also set $DATA to the first data structure.
 
 
-0.001   2017-05-18 (PERLANCAR)
+0.001   2017-05-18  Released-By: PERLANCAR
 
         - First early release, no tests.

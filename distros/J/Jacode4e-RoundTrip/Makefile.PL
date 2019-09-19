@@ -1,9 +1,10 @@
 use strict;
+BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; $^W=1;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
     'NAME'      => q{Jacode4e::RoundTrip},
-    'VERSION'   => q{2.13.81.8},
+    'VERSION'   => q{2.13.81.9},
     'ABSTRACT'  => q{Jacode4e for round-trip conversion in JIS X 0213},
     'PREREQ_PM' => {
         'ExtUtils::MakeMaker' => '5.4302',
@@ -16,7 +17,7 @@ WriteMakefile(
         'perl' => '5.005_03',
         'strict' => '1.01',
     },
-    'AUTHOR'    => q{ina <ina@cpan.org> in a CPAN},
+    'AUTHOR'    => q{ina <ina@cpan.org>},
 );
 
 __END__

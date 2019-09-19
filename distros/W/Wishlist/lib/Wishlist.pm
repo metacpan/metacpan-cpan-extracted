@@ -8,7 +8,7 @@ use Mojo::SQLite;
 use LinkEmbedder;
 use Wishlist::Model;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 $VERSION = eval $VERSION;
 
 has dist_dir => sub {
@@ -211,7 +211,7 @@ Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>
 
 =head1 CONTRIBUTORS
 
-[None yet]
+Nakayama Yasuhiro (yasu47b)
 
 =head1 COPYRIGHT AND LICENSE
 

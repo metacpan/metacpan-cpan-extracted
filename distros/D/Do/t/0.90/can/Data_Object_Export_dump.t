@@ -13,17 +13,19 @@ dump
 
 =usage
 
-  # given {1..8}
+  # given $value
 
-  say dump {1..8};
+  my $str = do('dump', $value);
 
 =description
 
-The dump function returns a string representation of the data passed.
+The dump function uses L<Data::Dumper> to return a string representation of the
+argument provided. This function is not exported but can be access via the
+L<super-do|/do> function.
 
 =signature
 
-dump(Any $arg1) : Str
+dump(Any $value) : Str
 
 =type
 
@@ -33,10 +35,8 @@ function
 
 # TESTING
 
-use_ok 'Data::Object::Export';
+use Data::Object::Export;
 
-my $data = 'Data::Object::Export';
-
-can_ok $data, 'dump';
+can_ok "Data::Object::Export", "dump";
 
 ok 1 and done_testing;

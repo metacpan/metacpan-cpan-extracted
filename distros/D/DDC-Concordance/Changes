@@ -2,6 +2,9 @@
 ##
 ## Change log for perl distribution DDC-Concordance
 
+v0.43 Thu, 19 Sep 2019 14:47:12 +0200 moocow
+	+ added DDC::Client support for UNIX-domain sockets (tested with socat wrappers)
+
 v0.42 Fri, 24 Aug 2018 11:15:38 +0200 moocow
 	+ added DDC:PP support for ddc v2.1.16 (~DDC::XS v0.21) lexer-comments "#[...]", "#:...\n" and parsed comments #CMT '...'
 

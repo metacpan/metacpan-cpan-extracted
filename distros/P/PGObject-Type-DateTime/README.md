@@ -39,7 +39,7 @@ You can also look for information at:
 
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2013-2017 Chris Travers
+Copyright (C) 2013-2017 The LedgerSMB Core Team
 
 This program is released under the following license: BSD
 

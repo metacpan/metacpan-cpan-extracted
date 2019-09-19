@@ -10,6 +10,14 @@ use 5.010; ##-- in case old EU::MM doesn't grok MIN_PERL_VERSION
 #    if (!defined($NetServer::Generic::VERSION));
 #}
 
+##-- argh; File::Find woes
+use ExtUtils::Manifest;
+use File::Find;
+sub my_find {
+  File::Find::find({ %{$_[0]}, follow_fast=>0, follow=>0 }, @_[1..$#_]);
+};
+*ExtUtils::Manifest::find = \&my_find;
+
 WriteMakefile
   (
    NAME         => 'DDC::Concordance',

@@ -40,7 +40,7 @@ our $ilen = 4;
 ##  + %args:
 ##    (
 ##     ##-- connection options
-##     connect=>\%connectArgs,  ##-- passed to IO::Socket::INET->new()
+##     connect=>\%connectArgs,  ##-- passed to IO::Socket::(INET|UNIX)->new()
 ##     mode   =>$queryMode,     ##-- one of 'table', 'html', 'text', 'json', or 'raw'; default='json' ('html' is not yet supported)
 ##     linger =>\@linger,       ##-- SO_LINGER socket option; default=[1,0]: immediate termination
 ##     ##
@@ -66,7 +66,8 @@ our $ilen = 4;
 ##     tableHighlight => [$l0,$r0,$l1,$r1], ##-- highlighting strings, table mode (default=[qw(&& && _& &_)])
 ##    )
 ##  + default \%connectArgs:
-##     PeerAddr=>localhost
+##     Domain=>'INET',          ##-- also accepts 'UNIX'
+##     PeerAddr=>'localhost',
 ##     PeerPort=>50000,
 ##     Proto=>'tcp',
 ##     Type=>SOCK_STREAM,
@@ -76,6 +77,7 @@ sub new {
   my ($that,%args) = @_;
   my %connect = (
 		 ##-- connection options
+		 Domain=>'INET',
 		 PeerAddr=>'localhost',
 		 PeerPort=>50000,
 		 Proto=>'tcp',
@@ -422,8 +424,15 @@ sub run_query {
 ## $io_socket = $dc->open()
 sub open {
   my $dc = shift;
-  $dc->{sock} = IO::Socket::INET->new(%{$dc->{'connect'}})
-    or return undef;
+  my $domain = $dc->{connect}{Domain} // 'INET';
+  if (lc($domain) eq 'unix') {
+    ##-- v0.43: use unix-domain socket connection
+    $dc->{sock} = IO::Socket::UNIX->new(%{$dc->{'connect'}});
+  } else {
+    ##-- compatibility hack: use INET-domain sockets (TCP)
+    $dc->{sock} = IO::Socket::INET->new(%{$dc->{'connect'}});
+  }
+  return undef if (!$dc->{sock});
   $dc->{sock}->setsockopt(SOL_SOCKET, SO_LINGER, pack('II',@{$dc->{linger}})) if ($dc->{linger});
   $dc->{sock}->autoflush(1);
   return $dc->{sock};
@@ -898,7 +907,7 @@ e.g. by setting:
 
  (
   ##-- connection options
-  connect  =>\%connectArgs,   ##-- passed to IO::Socket::INET->new()
+  connect  =>\%connectArgs,   ##-- passed to IO::Socket::(INET|UNIX)->new(), depending on $connectArgs{Domain}
   mode     =>$mode,           ##-- query mode; one of qw(json table text html raw); default='json'
   linger   =>\@linger,        ##-- SO_LINGER socket option (default=[1,0]: immediate termination)
  
@@ -924,11 +933,16 @@ e.g. by setting:
 
 =item default \%connectArgs:
 
- PeerAddr=>localhost
+ Domain=>'INET',
+ PeerAddr=>'localhost',
  PeerPort=>50000,
  Proto=>'tcp',
  Type=>SOCK_STREAM,
  Blocking=>1,
+
+=item connect to a UNIX socket at C<$SOCKPATH> on the local host:
+
+  $dc = DDC::Client->new(connect=>{Domain=>'UNIX',Peer=>$SOCKPATH});
 
 =back
 
@@ -1130,7 +1144,7 @@ but not between individual requests.
 
  $io_socket = $dc->open();
 
-Open the underlying socket; returns undef on failure.
+Open the underlying INET- or UNIX-domain socket; returns undef on failure.
 Most users will never need to call this method, since it will be called
 implicitly by higher-level methods such as L<requiest()|/request>, L<query()|/query>, L<status()|/status>
 if required.
@@ -1246,7 +1260,7 @@ Bryan Jurish E<lt>moocow@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2006-2018 by Bryan Jurish
+Copyright (C) 2006-2019 by Bryan Jurish
 
 This package is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.24.1 or,

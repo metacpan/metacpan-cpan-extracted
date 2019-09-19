@@ -1,13 +1,13 @@
 package Map::Tube::Exception::MissingMapData;
 $Map::Tube::Exception::MissingMapData::AUTHORITY = 'cpan:MANWAR';
-$Map::Tube::Exception::MissingMapData::VERSION = '3.20';
+$Map::Tube::Exception::MissingMapData::VERSION = '3.21';
 =head1 NAME
 
 Map::Tube::Exception::MissingMapData - Represent 'missing map data' exception.
 
 =head1 VERSION
 
-version 3.20
+version 3.21
 
 =cut
 

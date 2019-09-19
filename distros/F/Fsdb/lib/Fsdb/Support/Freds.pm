@@ -2,8 +2,7 @@
 
 #
 # Fsdb::Support::Freds.pm
-# Copyright (C) 2013 by John Heidemann <johnh@ficus.cs.ucla.edu>
-# $Id: 30850e6477d5618974cfc18edaca6fd4b70b8a71 $
+# Copyright (C) 2013-2019 by John Heidemann <johnh@ficus.cs.ucla.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING

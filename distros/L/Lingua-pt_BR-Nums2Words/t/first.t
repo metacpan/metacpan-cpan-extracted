@@ -33,6 +33,8 @@ is(num2word(4), 'quatro');
 is(num2word(5), 'cinco');
 is(num2word(6), 'seis');
 is(num2word(7), 'sete');
+is(num2word(15), 'quinze');
+is(num2word(17), 'dezessete');
 
 is(num2word(1100), 'mil e cem');
 is(num2word(1101), 'mil cento e um');

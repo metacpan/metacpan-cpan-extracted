@@ -1,5 +1,8 @@
 Revision history for Catmandu-WoS
 
+0.0302  2019-09-19 17:36:30 CEST
+        - add missing dependencies
+
 0.0301  2018-03-07 06:06:42 CET
         - add missing dependency
 

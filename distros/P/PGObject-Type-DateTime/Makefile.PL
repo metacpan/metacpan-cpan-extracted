@@ -14,7 +14,7 @@ WriteMakefile(
     PL_FILES            => {},
     PREREQ_PM => {
         'PGObject' => '1.3',
-	'DateTime' => 0,
+	'DateTime' => '1.05', # 'local_week' was added in 1.05
 	'DateTime::TimeZone' => 0,
     },
     BUILD_REQUIRES => {

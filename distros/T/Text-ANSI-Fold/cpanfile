@@ -1,4 +1,4 @@
-requires 'perl', '5.008001';
+requires 'perl', '5.014';
 
 requires 'Text::VisualWidth::PP', '0.05';
 

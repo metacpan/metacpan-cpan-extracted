@@ -41,4 +41,19 @@ is_deeply(chops($fold, width => [ 1..10 ]),
 	  [ "1", "22", "333", "4444", "55555", "6" ],
 	  "call with 'width' parameter");
 
+$fold->configure(text => "", width => 10);
+is_deeply(chops($fold),
+	  [ ],
+	  "chops (empty)");
+
+$fold->configure(text => "", width => 10, padding => 1);
+is_deeply(chops($fold),
+	  [ " " x 10 ],
+	  "chops (empty, padding)");
+
+$fold->configure(text => "", width => 10, padding => 1, padchar => 'x');
+is_deeply(chops($fold),
+	  [ 'x' x 10 ],
+	  "chops (empty, padding, padchar)");
+
 done_testing;

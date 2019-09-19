@@ -1,5 +1,10 @@
 Revision history for `ansifold' command.
 
+0.04 2019-09-19T12:25:31Z
+
+    - Require newer Text::ANSI::Fold to make --padding option
+      works for empty line.
+
 0.03 2018-12-21T15:54:32Z
 
     - Discard --truncate option and use Getopt::EX::Numbers module.

@@ -1,6 +1,20 @@
 ==================================================
-Changes from 2012-09-06 00:00:00 +0000 to present.
+Changes from 2014-09-20 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 0.54 at 2019-09-19 10:39:41 +0000
+-----------------------------------------
+
+  Change: 3edaa6a9eb2ac55ed00089a53246ac3f0bea0a0a
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2019-09-19 11:39:41 +0000
+
+    Now identifies if quadmath is requested
+
+    If -Dusequadmath is specified as a build option then it checks if the
+    perl version to be built is capable of being built with quadmath, ie.
+    perls >= 5.21.4 
 
 -----------------------------------------
 version 0.52 at 2017-09-05 17:52:49 +0000
@@ -28,104 +42,6 @@ version 0.50 at 2017-05-31 10:13:27 +0000
 
     Update CPANPLUS::YACSmoke plugin for changes in CPANPLUS 
 
------------------------------------------
-version 0.48 at 2014-02-18 00:37:05 +0000
------------------------------------------
-
-  Change: 62adce1f670e3e15e0f1311fd7b6b81b013cc8b6
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2014-02-18 00:37:05 +0000
-
-    Release engineering for 0.48 
-
-  Change: 6703b92659fabb8d84a8176468ca752f4031a756
-  Author: Chris Williams <chris@bingosnet.co.uk>
-  Date : 2014-02-18 00:26:13 +0000
-
-    Merge pull request #1 from mephinet/set-make-for-configure-too
-
-    set MAKE in environment for Configure 
-
-  Change: aac4ec8a351bf2da4478d2125bd9aac95d8fa28c
-  Author: mephinet <mephinet@gmx.net>
-  Date : 2014-02-17 20:12:41 +0000
-
-    set MAKE in environment for Configure 
-
------------------------------------------
-version 0.46 at 2013-10-03 17:44:42 +0000
------------------------------------------
-
-  Change: 51c1bb9a7f10ce845bac4d245c8eed92732cc9d2
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-10-03 18:44:42 +0000
-
-    Convert dist to Dist::Zilla 
-
-  Change: 88fe82bc5c48bb79d5d8aa546e6edc43dca82d7a
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-10-03 17:48:51 +0000
-
-    Pull the latest CPANPLUS tarball in CPANPLUS::YACSmoke plugin 
-
-  Change: 39d5c30fec03b326926b8bcccca4068ce33a9748
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-04-24 21:06:13 +0000
-
-    Generate the README from lib/smokebrew.pm now 
-
------------------------------------------
-version 0.44 at 2013-04-13 16:12:21 +0000
------------------------------------------
-
-  Change: 30a47479a602e370911f6d12d91d82518279c6f1
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-04-13 17:12:21 +0000
-
-    Added smokebrew.pm 
-
------------------------------------------
-version 0.42 at 2013-01-07 20:55:04 +0000
------------------------------------------
-
-  Change: b2b5063284f5a1cc8b122cc75f1048a6e847995f
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-01-07 20:55:04 +0000
-
-    Fix to add missing Changes file 
-
------------------------------------------
-version 0.40 at 2013-01-05 22:47:58 +0000
------------------------------------------
-
-  Change: 0904e6af7be5faf82f40e9a7206e92ad2111bbb5
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-01-05 22:47:58 +0000
-
-    Bump version to 0.40 
-
-  Change: 590dc8f088c04a75ff361bcd538324860d317a64
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-01-05 22:46:38 +0000
-
-    Added 'latest' option to only install the most latest perls 
-
-  Change: 8416c9ef41d2e918a2b4bc0d19ff146e36813984
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-01-05 22:09:45 +0000
-
-    Add 'modern' option to only install modern perls 
-
------------------------------------------
-version 0.38 at 2012-11-26 10:05:57 +0000
------------------------------------------
-
-  Change: b62bee96d9e6057375d0289253b59456c14f77c5
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2012-11-26 10:05:57 +0000
-
-    Use Config to find a suitable default for 'make' 
-
 =================================================
-Plus 18 releases after 2012-09-06 00:00:00 +0000.
+Plus 24 releases after 2014-09-20 00:00:00 +0000.
 =================================================

@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::mod2dist;
 
-our $DATE = '2019-08-01'; # DATE
-our $VERSION = '1.038'; # VERSION
+our $DATE = '2019-09-19'; # DATE
+our $VERSION = '1.039'; # VERSION
 
 use 5.010;
 use strict;
@@ -67,7 +67,7 @@ App::lcpan::Cmd::mod2dist - Get distribution name of module(s)
 
 =head1 VERSION
 
-This document describes version 1.038 of App::lcpan::Cmd::mod2dist (from Perl distribution App-lcpan), released on 2019-08-01.
+This document describes version 1.039 of App::lcpan::Cmd::mod2dist (from Perl distribution App-lcpan), released on 2019-09-19.
 
 =head1 FUNCTIONS
 

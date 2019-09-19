@@ -14,11 +14,11 @@ PGObject::Type::DateTime - DateTime Wrappers for PGObject
 
 =head1 VERSION
 
-Version 2.0.1
+Version 2.0.2
 
 =cut
 
-our $VERSION = 2.000001;
+our $VERSION = 2.000002;
 our $default_tz = DateTime::TimeZone->new(name => 'UTC');
 
 
@@ -324,7 +324,7 @@ L<http://search.cpan.org/dist/PGObject-Type-DateTime/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013-2017 Chris Travers.
+Copyright 2013-2017 The LedgerSMB Core Team
 
 This program is released under the following license: BSD
 

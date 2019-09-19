@@ -11,7 +11,7 @@ Data::Object::Name
 
 =abstract
 
-Data-Object Package
+Data-Object Name Class
 
 =synopsis
 

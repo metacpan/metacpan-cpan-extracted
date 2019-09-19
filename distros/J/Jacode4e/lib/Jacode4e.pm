@@ -1,5 +1,5 @@
 package Jacode4e;
-$VERSION = '2.13.6.14';
+$VERSION = '2.13.6.15';
 ######################################################################
 #
 # Jacode4e - jacode.pl-like program for enterprise
@@ -1959,6 +1959,12 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
  Kanji shift code
  https://ja.wikipedia.org/wiki/%E6%BC%A2%E5%AD%97%E3%82%B7%E3%83%95%E3%83%88%E3%82%B3%E3%83%BC%E3%83%89
+
+ U+32FF SQUARE ERA NAME REIWA
+ https://unicode.org/versions/Unicode12.1.0/
+ http://en.glyphwiki.org/wiki/u32ff
+ https://www.ibm.com/support/pages/zos%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8B%E6%96%B0%E5%85%83%E5%8F%B7%E5%AF%BE%E5%BF%9C%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6
+ http://www.hitachi-support.com/alert/ss/HWS17-007/list.pdf#page=29
 
  CJKV Information Processing
  https://resources.oreilly.com/examples/9781565922242/tree/master/AppQ/78-vs-83-1.sjs

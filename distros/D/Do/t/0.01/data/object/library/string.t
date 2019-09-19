@@ -4,7 +4,7 @@ use warnings;
 use Test::More;
 use Test::TypeTiny;
 
-use Data::Object::Export qw(deduce);
+use Data::Object::Utility;
 use Data::Object::Library qw(
   StrObj
   StrObject
@@ -19,7 +19,7 @@ ok_subtype Object, StringObj;
 ok_subtype Object, StringObject;
 
 my $data1 = "abcdefg";
-my $data2 = deduce "abcdefg";
+my $data2 = Data::Object::Utility::Deduce "abcdefg";
 
 should_fail($data1, StrObj);
 should_pass($data2, StrObj);

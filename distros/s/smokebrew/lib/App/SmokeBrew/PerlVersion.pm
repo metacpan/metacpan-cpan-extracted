@@ -1,5 +1,5 @@
 package App::SmokeBrew::PerlVersion;
-$App::SmokeBrew::PerlVersion::VERSION = '0.52';
+$App::SmokeBrew::PerlVersion::VERSION = '0.54';
 #ABSTRACT: Moose role for perl versions
 
 use strict;
@@ -31,6 +31,12 @@ sub is_dev_release {
   return $self->version->version % 2;
 }
 
+sub can_quadmath {
+  my $self = shift;
+  return 0 unless $self->version->numify >= 5.021004;
+  return 1;
+}
+
 no Moose::Role;
 
 qq[Smokin'];
@@ -47,7 +53,7 @@ App::SmokeBrew::PerlVersion - Moose role for perl versions
 
 =head1 VERSION
 
-version 0.52
+version 0.54
 
 =head1 SYNOPSIS
 
@@ -90,6 +96,10 @@ Returns the normalised perl version prefixed with C<perl->.
 
 Returns true if the perl version is a C<development> perl release, false otherwise.
 
+=item C<can_quadmath>
+
+Returns true if the perl version is capable of being built with C<quadmath>.
+
 =back
 
 =head1 SEE ALSO
@@ -108,7 +118,7 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Chris Williams.
+This software is copyright (c) 2019 by Chris Williams.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

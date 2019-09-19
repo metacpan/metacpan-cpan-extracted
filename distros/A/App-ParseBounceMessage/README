@@ -1,0 +1,69 @@
+NAME
+    App::ParseBounceMessage - Parse a bounce email message and return a
+    structure
+
+VERSION
+    This document describes version 0.001 of App::ParseBounceMessage (from
+    Perl distribution App-ParseBounceMessage), released on 2019-09-19.
+
+DESCRIPTION
+    This distribution provides a simple CLI for
+    Mail::DeliveryStatus::BounceParser.
+
+FUNCTIONS
+  parse_bounce_message
+    Usage:
+
+     parse_bounce_message(%args) -> [status, msg, payload, meta]
+
+    Parse a bounce email message and return a structure.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   message_file => *filename* (default: "-")
+
+        A file containing a single email message.
+
+        Dash ("-") means to get the message from standard input.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-ParseBounceMessage>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-ParseBounceMessage>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-ParseBounceMessag
+    e>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Mail::DeliveryStatus::BounceParser
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

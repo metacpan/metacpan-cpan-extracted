@@ -1,7 +1,7 @@
 package App::dt;
 
-our $DATE = '2017-05-22'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-09-19'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 1;
 # ABSTRACT: CLI data transformer
@@ -18,7 +18,7 @@ App::dt - CLI data transformer
 
 =head1 VERSION
 
-This document describes version 0.004 of App::dt (from Perl distribution App-dt), released on 2017-05-22.
+This document describes version 0.005 of App::dt (from Perl distribution App-dt), released on 2019-09-19.
 
 =head1 SYNOPSIS
 
@@ -46,7 +46,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

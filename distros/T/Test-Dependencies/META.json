@@ -4,34 +4,23 @@
       "Erik Huelsmann <ehuels@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Test-Dependencies",
    "optional_features" : {
-      "Heavy" : {
-         "description" : "\"Heavy\" dependency search policy",
-         "prereqs" : {
-            "runtime" : {
-               "requires" : {
-                  "B::PerlReq" : "0",
-                  "PerlReq::Utils" : "0"
-               }
-            }
-         },
-         "x_default" : "0"
-      },
       "Legacy" : {
          "description" : "Legacy (no-arguments) ok_dependencies() invocation",
          "prereqs" : {
             "runtime" : {
                "requires" : {
                   "CPAN::Meta" : "0",
+                  "CPAN::Meta::Requirements" : "2.120920",
                   "File::Find::Rule::Perl" : "0"
                }
             }
@@ -49,10 +38,9 @@
       },
       "develop" : {
          "requires" : {
-            "B::PerlReq" : "0",
             "CPAN::Meta" : "0",
-            "File::Find::Rule::Perl" : "0",
-            "PerlReq::Utils" : "0"
+            "CPAN::Meta::Requirements" : "2.120920",
+            "File::Find::Rule::Perl" : "0"
          }
       },
       "runtime" : {
@@ -61,10 +49,9 @@
             "perl" : "v5.10.1"
          },
          "suggests" : {
-            "B::PerlReq" : "0",
             "CPAN::Meta" : "0",
-            "File::Find::Rule::Perl" : "0",
-            "PerlReq::Utils" : "0"
+            "CPAN::Meta::Requirements" : "2.120920",
+            "File::Find::Rule::Perl" : "0"
          }
       },
       "test" : {
@@ -85,6 +72,12 @@
          "web" : "https://github.com/ehuelsmann/perl-Test-Dependencies"
       }
    },
-   "version" : "0.23"
+   "version" : "0.24",
+   "x_contributors" : [
+      "Kent Fredric <kentfredric@gmail.com>",
+      "Nick Morrott <knowledgejunkie@gmail.com>"
+   ],
+   "x_generated_by_perl" : "v5.24.4",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
 }
 

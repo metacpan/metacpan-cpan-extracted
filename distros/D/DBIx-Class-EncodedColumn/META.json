@@ -73,7 +73,7 @@
          "web" : "https://github.com/wreis/DBIx-Class-EncodedColumn"
       }
    },
-   "version" : "0.00018",
+   "version" : "0.00019",
    "x_contributors" : [
       "Jonathan Scott Duff <duff@localhost.localdomain>",
       "Jonathan Scott Duff <duff@pobox.com>",

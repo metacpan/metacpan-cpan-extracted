@@ -39,4 +39,24 @@ use Data::Object::Utility;
 
 can_ok "Data::Object::Utility", "DeduceDeep";
 
+use Scalar::Util 'refaddr';
+
+my $main   = bless {}, 'main';
+my $object = Data::Object::Utility::DeduceDeep {1, 2, 3, {4, 5, 6, [-1, 99, $main]}};
+
+is $object->{1}, 2;
+is $object->{3}{4}, 5;
+is $object->{3}{6}[0], -1;
+is $object->{3}{6}[1], 99;
+is $object->{3}{6}[2], $main;
+
+isa_ok $object, 'Data::Object::Hash';
+isa_ok $object->{1}, 'Data::Object::Number';
+isa_ok $object->{3}, 'Data::Object::Hash';
+isa_ok $object->{3}{4}, 'Data::Object::Number';
+isa_ok $object->{3}{6}, 'Data::Object::Array';
+isa_ok $object->{3}{6}[0], 'Data::Object::Number';
+isa_ok $object->{3}{6}[1], 'Data::Object::Number';
+isa_ok $object->{3}{6}[2], 'main';
+
 ok 1 and done_testing;

@@ -4,13 +4,13 @@
       "Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "App::ModuleBuildTiny version 0.022",
+   "generated_by" : "App::ModuleBuildTiny version 0.024",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Wishlist",
    "prereqs" : {
@@ -28,7 +28,7 @@
       "runtime" : {
          "requires" : {
             "File::Share" : "0",
-            "LinkEmbedder" : "0",
+            "LinkEmbedder" : "== 1.05",
             "Mojo::SQLite" : "0",
             "Mojolicious" : "7.15",
             "Passwords" : "0"
@@ -38,7 +38,7 @@
    "provides" : {
       "Wishlist" : {
          "file" : "lib/Wishlist.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Wishlist::Controller::Access" : {
          "file" : "lib/Wishlist/Controller/Access.pm"
@@ -62,6 +62,6 @@
          "url" : "http://github.com/jberger/Wishlist"
       }
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

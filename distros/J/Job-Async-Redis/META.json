@@ -51,13 +51,19 @@
             "Future" : "0.37",
             "Future::AsyncAwait" : "0",
             "Future::Utils" : "0",
+            "Getopt::Long" : "0",
+            "IO::Async::Loop" : "0",
+            "IO::Async::Timer::Periodic" : "0",
             "JSON::MaybeUTF8" : "0",
             "Job::Async" : "0.004",
             "Job::Async::Client" : "0",
             "Job::Async::Utils" : "0",
             "Job::Async::Worker" : "0",
             "Log::Any" : "1.050",
+            "Log::Any::Adapter" : "0",
             "Net::Async::Redis" : "2.000",
+            "Net::Async::Statsd::Client" : "0",
+            "Pod::Usage" : "0",
             "Ryu::Async" : "0",
             "Syntax::Keyword::Try" : "0",
             "curry" : "0",
@@ -76,11 +82,9 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
-            "IO::Async::Loop" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Job::Async::Test::Compliance" : "0",
-            "Log::Any::Adapter" : "0",
             "Log::Any::Adapter::TAP" : "0",
             "Test::CheckDeps" : "0.010",
             "Test::Deep" : "0",
@@ -94,25 +98,27 @@
    "provides" : {
       "Job::Async::Client::Redis" : {
          "file" : "lib/Job/Async/Client/Redis.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Job::Async::Redis" : {
          "file" : "lib/Job/Async/Redis.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Job::Async::Worker::Redis" : {
          "file" : "lib/Job/Async/Worker/Redis.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
-   "version" : "0.003",
+   "version" : "0.004",
    "x_authority" : "cpan:TEAM",
    "x_contributors" : [
       "Paul \"LeoNerd\" Evans <leonerd@leonerd.org.uk>",
-      "tm604 <tom@perlsite.co.uk>"
+      "Raunak Kathuria <raunakkathuria@gmail.com>",
+      "tm604 <tom@perlsite.co.uk>",
+      "mat-fs <53427463+mat-fs@users.noreply.github.com>"
    ],
-   "x_generated_by_perl" : "v5.28.1",
+   "x_generated_by_perl" : "v5.30.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
 }
 

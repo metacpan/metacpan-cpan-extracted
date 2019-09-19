@@ -1,5 +1,11 @@
 Revision history for Catmandu
 
+1.2006  2019-09-19 17:38:31 CEST
+  - add missing dependencies
+
+1.2005  2019-09-19 11:04:58 CEST
+  - switch to UUID::Tiny
+
 1.2004  2019-08-28 14:00:59 CEST
   - new Flushable role for bags
 

@@ -13,7 +13,7 @@ throw
 
 =usage
 
-  $exception->throw();
+  $exception->throw($context);
 
 =description
 
@@ -21,7 +21,7 @@ Throw error with message and context.
 
 =signature
 
-throw(Str $arg1) : Object
+throw(Str $classname, Any $context, Maybe[Number] $offset) : Object
 
 =type
 

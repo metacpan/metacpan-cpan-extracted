@@ -4,7 +4,7 @@ use warnings;
 use Test::More;
 use Test::TypeTiny;
 
-use Data::Object::Export qw(deduce);
+use Data::Object::Utility;
 use Data::Object::Library qw(
   NumObj
   NumObject
@@ -19,7 +19,7 @@ ok_subtype Object, NumberObj;
 ok_subtype Object, NumberObject;
 
 my $data1 = 10;
-my $data2 = deduce 10;
+my $data2 = Data::Object::Utility::Deduce 10;
 
 should_fail($data1, NumObj);
 should_pass($data2, NumObj);

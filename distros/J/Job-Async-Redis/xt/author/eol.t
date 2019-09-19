@@ -7,6 +7,7 @@ use Test::More 0.88;
 use Test::EOL;
 
 my @files = (
+    'bin/jobmon-redis.pl',
     'lib/Job/Async/Client/Redis.pm',
     'lib/Job/Async/Client/Redis.pod',
     'lib/Job/Async/Redis.pm',

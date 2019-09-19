@@ -1,6 +1,12 @@
 
 Revision history for Job-Async-Redis
 
+0.004     2019-09-19 17:19:09+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - timing metrics are recorded in Redis
+    - basic monitoring script
+
 0.003     2019-07-01 16:28:24+08:00 Asia/Kuala_Lumpur
     New features:
 

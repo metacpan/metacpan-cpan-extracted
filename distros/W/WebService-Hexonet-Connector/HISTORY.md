@@ -1,3 +1,10 @@
+## [2.2.3](https://github.com/hexonet/perl-sdk/compare/v2.2.2...v2.2.3) (2019-09-19)
+
+
+### Bug Fixes
+
+* **release process:** migrate configuration ([26efd60](https://github.com/hexonet/perl-sdk/commit/26efd60))
+
 ## [2.2.2](https://github.com/hexonet/perl-sdk/compare/v2.2.1...v2.2.2) (2019-08-16)
 
 

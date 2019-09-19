@@ -5,6 +5,8 @@ use warnings;
 
 use Test::More;
 
+plan skip_all => 'Refactoring';
+
 # POD
 
 =name
@@ -13,18 +15,19 @@ cast
 
 =usage
 
-  # given [1..4]
+  # given 123
 
-  my $array = cast([1..4]); # Data::Object::Array
+  my $num = cast(123); # Data::Object::Number
+  my $str = cast(123, 'string'); # Data::Object::String
 
 =description
 
-The cast function returns a Data::Object for the data provided. If the data
+The cast function returns a data object for the argument provided. If the data
 passed is blessed then that same object will be returned.
 
 =signature
 
-cast(Any $arg1) : Any
+cast(Any $arg1, Str $type) : Any
 
 =type
 

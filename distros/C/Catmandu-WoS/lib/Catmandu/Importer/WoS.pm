@@ -2,7 +2,7 @@ package Catmandu::Importer::WoS;
 
 use Catmandu::Sane;
 
-our $VERSION = '0.0301';
+our $VERSION = '0.0302';
 
 use Moo;
 use Catmandu::Util qw(xml_escape);
@@ -10,7 +10,7 @@ use namespace::clean;
 
 with 'Catmandu::WoS::SearchRecords';
 
-has query => (is => 'ro', required => 1);
+has query             => (is => 'ro', required => 1);
 has symbolic_timespan => (is => 'ro');
 has timespan_begin    => (is => 'ro');
 has timespan_end      => (is => 'ro');

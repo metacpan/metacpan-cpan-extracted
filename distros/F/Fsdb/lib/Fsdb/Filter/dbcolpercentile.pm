@@ -33,11 +33,12 @@ In all other cases, a full copy of data is buffered on disk.
 
 =over 4
 
-=item B<-p> or B<--percentile>
+=item B<-p> or B<--percentile> or B<--mode percentile>
 
 Show percentile (default).
+Percentile is the percentage of the cumulative values at or lower than the current value, relative to the total count.
 
-=item B<-P> or B<--rank> or B<--nopercentile>
+=item B<-P> or B<--rank> or B<--nopercentile> or B<--mode rank>
 
 Compute ranks instead of percentiles.
 
@@ -270,6 +271,7 @@ sub parse_options ($@) {
 	'log!' => \$self->{_logprog},
 	'o|output=s' => sub { $self->parse_io_option('output', @_); },
 	'fraction' => sub { $self->{_mode} = 'fraction'; },
+	'm|mode=s' => sub { $self->{_mode} = $_[0]; },
 	'p|percentile' => sub { $self->{_mode} = 'percentile'; },
 	'P|nopercentile|rank' => sub { $self->{_mode} = 'rank'; },
 	'S|pre-sorted+' => \$self->{_pre_sorted},
@@ -293,6 +295,10 @@ Internal: setup, parse headers.
 
 sub setup ($) {
     my($self) = @_;
+
+    # check mode
+    croak($self->{_prog} . ": unkown mode " . $self->{_mode} . " (must be rank, fraction, or percentile).\n")
+        unless ($self->{_mode} eq 'percentile' || $self->{_mode} eq 'fraction' || $self->{_mode} eq 'rank');
 
     # assign default sort order, if not specified
     if (!defined($self->{_sort_order})) {
@@ -349,12 +355,12 @@ sub _count_rows() {
     my $orig_in = $self->{_in};
     $self->{_save_in_filename} = Fsdb::Support::NamedTmpfile::alloc($self->{_tmpdir});
     my($save_sink) = new Fsdb::IO::Writer(-file => $self->{_save_in_filename}, -clone => $orig_in);
-    my($n) = 0;
+    my($n_rows, $n_counts) = 0;
     my $read_fastpath_sub = $orig_in->fastpath_sub();
     my $write_fastpath_sub = $save_sink->fastpath_sub();
     my $fref;
     while ($fref = &$read_fastpath_sub()) {
-	$n++;
+	$n_rows++;
 	&$write_fastpath_sub($fref);
     };
     $save_sink->error and croak($self->{_prog} . ": error writing temporary file.\n");
@@ -362,7 +368,7 @@ sub _count_rows() {
 
     # reopen _in with our saved data
     $self->{_in} = new Fsdb::IO::Reader(-file => $self->{_save_in_filename});
-    return $n;
+    return $n_rows;
 }
 
 =head2 run
@@ -380,6 +386,8 @@ sub run ($) {
     if ($self->{_mode} eq 'percentile') {
 	$n = $self->_count_rows;
         $percentile_scaling = 1.0 / $n;
+    } elsif ($self->{_mode} eq 'fraction') {
+        die;
     };
 
     my $read_fastpath_sub = $self->{_in}->fastpath_sub();

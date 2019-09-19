@@ -9,6 +9,8 @@ use Test::More;
 my $pod = Test::This->new;
 
 for my $file (map $pod->file("$_"), @{$pod->paths}) {
+  next unless -f $file->lib_file;
+
   for my $name (@{$file->can_files}) {
     my $exists = !! -f $name;
     ok $exists, "$name exists";

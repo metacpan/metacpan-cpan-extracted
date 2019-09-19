@@ -13,7 +13,7 @@ use Type::Tiny ();
 use Type::Utils ();
 use Types::TypeTiny ();
 
-our $VERSION = '1.76'; # VERSION
+our $VERSION = '1.80'; # VERSION
 
 Type::Utils::extends('Types::Standard');
 Type::Utils::extends('Types::TypeTiny');
@@ -26,6 +26,7 @@ RegisterAll(DoArgs());
 RegisterAll(DoData());
 RegisterAll(DoDumpable());
 RegisterAll(DoArray());
+RegisterAll(DoBoolean());
 RegisterAll(DoCli());
 RegisterAll(DoCode());
 RegisterAll(DoException());
@@ -124,6 +125,23 @@ sub DoArray {
       };
 
       return $coercions;
+    },
+    parent => 'Object'
+  }
+}
+
+sub DoBoolean {
+  {
+    name => 'DoBoolean',
+    aliases => [
+      'BoolObj',
+      'BoolObject',
+      'BooleanObj',
+      'BooleanObject'
+    ],
+    validation => sub {
+      return 0 if !$_[0]->isa('Data::Object::Boolean');
+      return 1;
     },
     parent => 'Object'
   }
@@ -822,6 +840,23 @@ object.
 
 =cut
 
+=head2 doboolean
+
+  DoBoolean() : HashRef
+
+This function returns the type configuration for a L<Data::OBject::Code>
+object.
+
+=over 4
+
+=item DoBoolean example
+
+  Data::Object::Library::DoBoolean();
+
+=back
+
+=cut
+
 =head2 docli
 
   DoCli() : HashRef
@@ -1416,6 +1451,46 @@ see that documentation for more information. The C<assert_Bool> function can be
 used to throw an exception if the argument can not be validated. The C<is_Bool>
 function can be used to return true or false if the argument can not be
 validated.
+
+=head2 boolobj
+
+  # BoolObj
+
+The C<BoolObj> type constraint is provided by this library and accepts any
+object that is, or is derived from, a L<Data::Object::Boolean> object. The
+C<assert_BoolObj> function can be used to throw an exception if the argument
+can not be validated. The C<is_BoolObj> function can be used to return true or
+false if the argument can not be validated.
+
+=head2 boolobject
+
+  # BoolObject
+
+The C<BoolObject> type constraint is provided by this library and accepts any
+object that is, or is derived from, a L<Data::Object::Boolean> object. The
+C<assert_BoolObject> function can be used to throw an exception if the argument
+can not be validated. The C<is_BoolObject> function can be used to return true
+or false if the argument can not be validated.
+
+=head2 booleanobj
+
+  # BooleanObj
+
+The C<BooleanObj> type constraint is provided by this library and accepts any
+object that is, or is derived from, a L<Data::Object::Boolean> object. The
+C<assert_BooleanObj> function can be used to throw an exception if the argument
+can not be validated. The C<is_BooleanObj> function can be used to return true
+or false if the argument can not be validated.
+
+=head2 booleanobject
+
+  # BooleanObject
+
+The C<BooleanObject> type constraint is provided by this library and accepts
+any object that is, or is derived from, a L<Data::Object::Boolean> object. The
+C<assert_BooleanObject> function can be used to throw an exception if the
+argument can not be validated. The C<is_BooleanObject> function can be used to
+return true or false if the argument can not be validated.
 
 =head2 classname
 
@@ -2497,9 +2572,11 @@ can not be validated. The C<is_VarsObject> function can be used to return true
 
 =head1 CREDITS
 
-Al Newkirk, C<+296>
+Al Newkirk, C<+303>
 
 Anthony Brummett, C<+10>
+
+Adam Hopkins, C<+1>
 
 José Joaquín Atria, C<+1>
 
@@ -2518,9 +2595,11 @@ terms as the Perl 5 programming language system itself.
 
 =head1 PROJECT
 
-L<GitHub|https://github.com/iamalnewkirk/do>
+L<Wiki|https://github.com/iamalnewkirk/do/wiki>
 
-L<Projects|https://github.com/iamalnewkirk/do/projects>
+L<Project|https://github.com/iamalnewkirk/do>
+
+L<Initiatives|https://github.com/iamalnewkirk/do/projects>
 
 L<Milestones|https://github.com/iamalnewkirk/do/milestones>
 

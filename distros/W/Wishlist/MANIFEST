@@ -5,6 +5,7 @@ MANIFEST
 MANIFEST.SKIP
 META.json
 META.yml
+README
 cpanfile
 lib/Wishlist.pm
 lib/Wishlist/Controller/Access.pm

@@ -47,6 +47,54 @@ BEGIN {
         ["\x81\x40",'utf8',    'cp932x',{'INPUT_LAYOUT'=>'D','SPACE'=>"\x20\x20",'OVERRIDE_MAPPING'=>{"\x81\x40"=>"\xEF\xBC\x8D"    }},"\xEF\xBC\x8D"    ],
         ["\x81\x40",'utf8.1',  'cp932x',{'INPUT_LAYOUT'=>'D','SPACE'=>"\x20\x20",'OVERRIDE_MAPPING'=>{"\x81\x40"=>"\xEF\xBC\x8D"    }},"\xEF\xBC\x8D"    ],
         ["\x81\x40",'utf8jp',  'cp932x',{'INPUT_LAYOUT'=>'D','SPACE'=>"\x20\x20",'OVERRIDE_MAPPING'=>{"\x81\x40"=>"\xF3\xB0\x84\xBC"}},"\xF3\xB0\x84\xBC"],
+
+# U+32FF SQUARE ERA NAME REIWA
+# https://unicode.org/versions/Unicode12.1.0/
+# http://en.glyphwiki.org/wiki/u32ff
+# https://www.ibm.com/support/pages/zos%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8B%E6%96%B0%E5%85%83%E5%8F%B7%E5%AF%BE%E5%BF%9C%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6
+# http://www.hitachi-support.com/alert/ss/HWS17-007/list.pdf#page=29
+
+        ["\xE8\x60",    'cp00930','cp00930',{'INPUT_LAYOUT'=>'D',                'OVERRIDE_MAPPING'=>{"\xE8\x60"=>"\xE8\x60"        }},"\xE8\x60"        ],
+        ["\xE8\x60",    'keis78', 'cp00930',{'INPUT_LAYOUT'=>'D',                'OVERRIDE_MAPPING'=>{"\xE8\x60"=>"\x73\xFA"        }},"\x73\xFA"        ],
+        ["\xE8\x60",    'keis83', 'cp00930',{'INPUT_LAYOUT'=>'D',                'OVERRIDE_MAPPING'=>{"\xE8\x60"=>"\x73\xFA"        }},"\x73\xFA"        ],
+        ["\xE8\x60",    'keis90', 'cp00930',{'INPUT_LAYOUT'=>'D',                'OVERRIDE_MAPPING'=>{"\xE8\x60"=>"\x73\xFA"        }},"\x73\xFA"        ],
+        ["\xE8\x60",    'utf8',   'cp00930',{'INPUT_LAYOUT'=>'D',                'OVERRIDE_MAPPING'=>{"\xE8\x60"=>"\xE3\x8B\xBF"    }},"\xE3\x8B\xBF"    ],
+        ["\xE8\x60",    'utf8.1', 'cp00930',{'INPUT_LAYOUT'=>'D',                'OVERRIDE_MAPPING'=>{"\xE8\x60"=>"\xE3\x8B\xBF"    }},"\xE3\x8B\xBF"    ],
+
+        ["\x73\xFA",    'cp00930','keis78', {'INPUT_LAYOUT'=>'D',                'OVERRIDE_MAPPING'=>{"\x73\xFA"=>"\xE8\x60"        }},"\xE8\x60"        ],
+        ["\x73\xFA",    'keis78', 'keis78', {'INPUT_LAYOUT'=>'D',                'OVERRIDE_MAPPING'=>{"\x73\xFA"=>"\x73\xFA"        }},"\x73\xFA"        ],
+        ["\x73\xFA",    'keis83', 'keis78', {'INPUT_LAYOUT'=>'D',                'OVERRIDE_MAPPING'=>{"\x73\xFA"=>"\x73\xFA"        }},"\x73\xFA"        ],
+        ["\x73\xFA",    'keis90', 'keis78', {'INPUT_LAYOUT'=>'D',                'OVERRIDE_MAPPING'=>{"\x73\xFA"=>"\x73\xFA"        }},"\x73\xFA"        ],
+        ["\x73\xFA",    'utf8',   'keis78', {'INPUT_LAYOUT'=>'D',                'OVERRIDE_MAPPING'=>{"\x73\xFA"=>"\xE3\x8B\xBF"    }},"\xE3\x8B\xBF"    ],
+        ["\x73\xFA",    'utf8.1', 'keis78', {'INPUT_LAYOUT'=>'D',                'OVERRIDE_MAPPING'=>{"\x73\xFA"=>"\xE3\x8B\xBF"    }},"\xE3\x8B\xBF"    ],
+
+        ["\x73\xFA",    'cp00930','keis83', {'INPUT_LAYOUT'=>'D',                'OVERRIDE_MAPPING'=>{"\x73\xFA"=>"\xE8\x60"        }},"\xE8\x60"        ],
+        ["\x73\xFA",    'keis78', 'keis83', {'INPUT_LAYOUT'=>'D',                'OVERRIDE_MAPPING'=>{"\x73\xFA"=>"\x73\xFA"        }},"\x73\xFA"        ],
+        ["\x73\xFA",    'keis83', 'keis83', {'INPUT_LAYOUT'=>'D',                'OVERRIDE_MAPPING'=>{"\x73\xFA"=>"\x73\xFA"        }},"\x73\xFA"        ],
+        ["\x73\xFA",    'keis90', 'keis83', {'INPUT_LAYOUT'=>'D',                'OVERRIDE_MAPPING'=>{"\x73\xFA"=>"\x73\xFA"        }},"\x73\xFA"        ],
+        ["\x73\xFA",    'utf8',   'keis83', {'INPUT_LAYOUT'=>'D',                'OVERRIDE_MAPPING'=>{"\x73\xFA"=>"\xE3\x8B\xBF"    }},"\xE3\x8B\xBF"    ],
+        ["\x73\xFA",    'utf8.1', 'keis83', {'INPUT_LAYOUT'=>'D',                'OVERRIDE_MAPPING'=>{"\x73\xFA"=>"\xE3\x8B\xBF"    }},"\xE3\x8B\xBF"    ],
+
+        ["\x73\xFA",    'cp00930','keis90', {'INPUT_LAYOUT'=>'D',                'OVERRIDE_MAPPING'=>{"\x73\xFA"=>"\xE8\x60"        }},"\xE8\x60"        ],
+        ["\x73\xFA",    'keis78', 'keis90', {'INPUT_LAYOUT'=>'D',                'OVERRIDE_MAPPING'=>{"\x73\xFA"=>"\x73\xFA"        }},"\x73\xFA"        ],
+        ["\x73\xFA",    'keis83', 'keis90', {'INPUT_LAYOUT'=>'D',                'OVERRIDE_MAPPING'=>{"\x73\xFA"=>"\x73\xFA"        }},"\x73\xFA"        ],
+        ["\x73\xFA",    'keis90', 'keis90', {'INPUT_LAYOUT'=>'D',                'OVERRIDE_MAPPING'=>{"\x73\xFA"=>"\x73\xFA"        }},"\x73\xFA"        ],
+        ["\x73\xFA",    'utf8',   'keis90', {'INPUT_LAYOUT'=>'D',                'OVERRIDE_MAPPING'=>{"\x73\xFA"=>"\xE3\x8B\xBF"    }},"\xE3\x8B\xBF"    ],
+        ["\x73\xFA",    'utf8.1', 'keis90', {'INPUT_LAYOUT'=>'D',                'OVERRIDE_MAPPING'=>{"\x73\xFA"=>"\xE3\x8B\xBF"    }},"\xE3\x8B\xBF"    ],
+
+        ["\xE3\x8B\xBF",'cp00930','utf8',   {'INPUT_LAYOUT'=>'D',                'OVERRIDE_MAPPING'=>{"\xE3\x8B\xBF"=>"\xE8\x60"    }},"\xE8\x60"        ],
+        ["\xE3\x8B\xBF",'keis78', 'utf8',   {'INPUT_LAYOUT'=>'D',                'OVERRIDE_MAPPING'=>{"\xE3\x8B\xBF"=>"\x73\xFA"    }},"\x73\xFA"        ],
+        ["\xE3\x8B\xBF",'keis83', 'utf8',   {'INPUT_LAYOUT'=>'D',                'OVERRIDE_MAPPING'=>{"\xE3\x8B\xBF"=>"\x73\xFA"    }},"\x73\xFA"        ],
+        ["\xE3\x8B\xBF",'keis90', 'utf8',   {'INPUT_LAYOUT'=>'D',                'OVERRIDE_MAPPING'=>{"\xE3\x8B\xBF"=>"\x73\xFA"    }},"\x73\xFA"        ],
+        ["\xE3\x8B\xBF",'utf8',   'utf8',   {'INPUT_LAYOUT'=>'D',                'OVERRIDE_MAPPING'=>{"\xE3\x8B\xBF"=>"\xE3\x8B\xBF"}},"\xE3\x8B\xBF"    ],
+        ["\xE3\x8B\xBF",'utf8.1', 'utf8',   {'INPUT_LAYOUT'=>'D',                'OVERRIDE_MAPPING'=>{"\xE3\x8B\xBF"=>"\xE3\x8B\xBF"}},"\xE3\x8B\xBF"    ],
+
+        ["\xE3\x8B\xBF",'cp00930','utf8.1', {'INPUT_LAYOUT'=>'D',                'OVERRIDE_MAPPING'=>{"\xE3\x8B\xBF"=>"\xE8\x60"    }},"\xE8\x60"        ],
+        ["\xE3\x8B\xBF",'keis78', 'utf8.1', {'INPUT_LAYOUT'=>'D',                'OVERRIDE_MAPPING'=>{"\xE3\x8B\xBF"=>"\x73\xFA"    }},"\x73\xFA"        ],
+        ["\xE3\x8B\xBF",'keis83', 'utf8.1', {'INPUT_LAYOUT'=>'D',                'OVERRIDE_MAPPING'=>{"\xE3\x8B\xBF"=>"\x73\xFA"    }},"\x73\xFA"        ],
+        ["\xE3\x8B\xBF",'keis90', 'utf8.1', {'INPUT_LAYOUT'=>'D',                'OVERRIDE_MAPPING'=>{"\xE3\x8B\xBF"=>"\x73\xFA"    }},"\x73\xFA"        ],
+        ["\xE3\x8B\xBF",'utf8',   'utf8.1', {'INPUT_LAYOUT'=>'D',                'OVERRIDE_MAPPING'=>{"\xE3\x8B\xBF"=>"\xE3\x8B\xBF"}},"\xE3\x8B\xBF"    ],
+        ["\xE3\x8B\xBF",'utf8.1', 'utf8.1', {'INPUT_LAYOUT'=>'D',                'OVERRIDE_MAPPING'=>{"\xE3\x8B\xBF"=>"\xE3\x8B\xBF"}},"\xE3\x8B\xBF"    ],
     );
     $|=1; print "1..",scalar(@test),"\n"; my $testno=1; sub ok { print $_[0]?'ok ':'not ok ',$testno++,$_[1]?" - $_[1]\n":"\n" }
 }

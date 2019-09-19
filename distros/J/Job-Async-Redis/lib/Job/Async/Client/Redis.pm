@@ -7,7 +7,7 @@ use mro;
 
 use parent qw(Job::Async::Client);
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 =head1 NAME
 
@@ -170,6 +170,7 @@ sub submit {
             $tx->hmset(
                 'job::' . $id,
                 _reply_to => $self->id,
+                _queued    => Time::HiRes::time(),
                 %{ $job->flattened_data }
             ),
             $tx->lpush($self->prefixed_queue($self->queue), $id)

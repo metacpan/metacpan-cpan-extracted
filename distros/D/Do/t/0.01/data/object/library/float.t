@@ -4,7 +4,7 @@ use warnings;
 use Test::More;
 use Test::TypeTiny;
 
-use Data::Object::Export qw(deduce);
+use Data::Object::Utility;
 use Data::Object::Library qw(
   FloatObj
   FloatObject
@@ -15,7 +15,7 @@ ok_subtype Object, FloatObj;
 ok_subtype Object, FloatObject;
 
 my $data1 = 99.99;
-my $data2 = deduce 99.99;
+my $data2 = Data::Object::Utility::Deduce 99.99;
 
 should_fail($data1, FloatObj);
 should_pass($data2, FloatObj);

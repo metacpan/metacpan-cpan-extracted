@@ -1,4 +1,7 @@
 Revision history for Perl module Wishlist
 
+0.02 2019-09-19
+  - Bump LinkEmbedder dependency to 1.05 to fix api usage (yasu47b++)
+
 0.01 2017-12-23
   - Initial release

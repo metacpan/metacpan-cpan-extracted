@@ -36,7 +36,7 @@ our %fmt = (
 	   );
 
 our %client = (
-	       connect=>{PeerAddr=>"localhost",PeerPort=>50011},
+	       connect=>{Domain=>'INET',PeerAddr=>"localhost",PeerPort=>50011},
 	       start=>0,
 	       limit=>10,
 	       hint=>'',
@@ -76,6 +76,7 @@ GetOptions(##-- General
 	   ##-- Connection
 	   'server|s=s' => \$client{connect}{PeerAddr},
 	   'port|p=s'   => \$client{connect}{PeerPort},
+	   'unix|u=s'   => sub { %{$client{connect}} = (Domain=>'UNIX',Peer=>$_[1]) },
 	   'corpora|corpus|c=s' => \$corpora,
 	   'opt-file|opt|O=s' => \$client{optFile},
 	   'mode|m=s' => \$client{mode},
@@ -159,15 +160,18 @@ if ($fieldNamesStr ne '') {
 }
 
 ##-- port
-$client{connect}{PeerPort} = $1 if ($client{connect}{PeerAddr} =~ s/\:([0-9]+)$//);
+$client{connect}{PeerPort} = $1 if ($client{connect}{Domain} eq 'INET' && $client{connect}{PeerAddr} =~ s/\:([0-9]+)$//);
 
 ##-- client
 our $dclient = DDC::Client::Distributed->new(%client,
 					     keepRaw=>($fmt_class =~ /Raw/ || $client{mode} =~ /^(?:raw|req)/i ? 1 : 0),
 					     fieldNames=>$fieldNames,
 					    );
+my $srv_addr = ($client{connect}{Domain} eq 'INET'
+		? join(':', map {$_//'?'} @{$client{connect}}{qw(PeerAddr PeerPort)})
+		: join(':', 'UNIX', map {$_//'?'} @{$client{connect}}{qw(Peer)}));
 $dclient->open()
-  or die("$prog: could not connect to DDC server on $client{connect}{PeerAddr}:$client{connect}{PeerPort}: $!");
+  or die("$prog: could not connect to DDC server on $srv_addr: $!");
 
 if ($expandChain) {
   ##-- term expansion mode
@@ -351,8 +355,9 @@ ddc-query.perl - distributed DDC query tool in perl
   -version
 
  Connection Options:
-  -server  SERVER                   ##-- default=localhost
-  -port    PORT                     ##-- default=50011
+  -server  SERVER                   ##-- TCP server host address (default=localhost)
+  -port    PORT                     ##-- TCP server port (default=50011)
+  -unix    PATH                     ##-- UNIX server socket path (overrides TCP settings)
   -timeout DDC_TIMEOUT              ##-- default=60
   -mode    QMODE                    ##-- query mode: 'json', 'table', 'text', 'request' (default='json')
   -qenc    QENCODING                ##-- query encoding (default=raw bytes)

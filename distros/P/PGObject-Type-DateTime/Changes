@@ -1,5 +1,8 @@
 Revision history for PGObject-Type-DateTime
 
+2.0.2   2019-09-19
+        Set minimum DateTime dependency to 1.05 (found by cpantesters)
+
 2.0.1	2017-08-14
 	Fix regex for PGObject 1 vs 2 detection
 

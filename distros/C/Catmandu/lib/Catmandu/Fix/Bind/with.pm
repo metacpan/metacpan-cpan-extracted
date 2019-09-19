@@ -2,7 +2,7 @@ package Catmandu::Fix::Bind::with;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2004';
+our $VERSION = '1.2006';
 
 use Moo;
 use Clone ();

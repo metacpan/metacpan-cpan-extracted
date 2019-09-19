@@ -1,5 +1,5 @@
 package App::SmokeBrew::Tools;
-$App::SmokeBrew::Tools::VERSION = '0.52';
+$App::SmokeBrew::Tools::VERSION = '0.54';
 #ABSTRACT: Various utility functions for smokebrew
 
 use strict;
@@ -15,7 +15,6 @@ use URI;
 my @mirrors = (
   'http://www.cpan.org/',
   'http://cpan.cpantesters.org/',
-  'http://cpan.hexten.net/',
   'ftp://ftp.funet.fi/pub/CPAN/',
 );
 
@@ -116,6 +115,12 @@ sub perls {
   sort keys %Module::CoreList::released;
 }
 
+sub _has_quadmath {
+  my $pv = shift;
+  return 1 if $pv->numify >= 5.021004;
+  return 0;
+}
+
 sub _is_dev {
   my $pv = shift;
   return 0 if _is_ancient($pv);
@@ -178,6 +183,13 @@ sub devel_perl {
   return _is_dev( Perl::Version->new( $perl ) );
 }
 
+sub can_quadmath {
+  my $perl = shift;
+  $perl = shift if eval { $perl->isa(__PACKAGE__) };
+  return unless $perl;
+  return _has_quadmath( Perl::Version->new( $perl ) );
+}
+
 qq[Smoke tools look what's inside of you];
 
 __END__
@@ -192,7 +204,7 @@ App::SmokeBrew::Tools - Various utility functions for smokebrew
 
 =head1 VERSION
 
-version 0.52
+version 0.54
 
 =head1 SYNOPSIS
 
@@ -270,6 +282,12 @@ Takes one parameter a perl version to check.
 
 Returns true if given perl is a development perl.
 
+=item C<can_quadmath>
+
+Takes one parameter a perl version to check.
+
+Returns true if given perl is able to be built with C<quadmath>.
+
 =item C<perl_version>
 
 Takes one parameter a perl version.
@@ -294,7 +312,7 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Chris Williams.
+This software is copyright (c) 2019 by Chris Williams.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

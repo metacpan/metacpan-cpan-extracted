@@ -1,0 +1,43 @@
+{
+    "plugins": [
+        "@semantic-release/commit-analyzer",
+        "@semantic-release/release-notes-generator",
+        [
+            "@semantic-release/changelog",
+            {
+                "changelogFile": "HISTORY.md"
+            }
+        ],
+        [
+            "@semantic-release/exec",
+            {
+                "prepareCmd": "./updateVersion.sh ${nextRelease.version} ${options.branch} && (./scripts/rebuild.sh || ./scripts/rebuild.sh) && ./scripts/buildrelease.sh ${nextRelease.version}",
+                "publishCmd": "./scripts/upload.sh ${nextRelease.version}"
+            }
+        ],
+        [
+            "@semantic-release/git",
+            {
+                "assets": [
+                    "HISTORY.md",
+                    "package.json",
+                    "lib",
+                    "docs",
+                    "cover_db",
+                    "WebService-Hexonet-Connector-latest.tar.gz"
+                ]
+            }
+        ],
+        [
+            "@semantic-release/github",
+            {
+                "assets": [
+                    {
+                        "label": "WebService::Hexonet::Connector (tar.gz)",
+                        "path": "WebService-Hexonet-Connector.tar.gz"
+                    }
+                ]
+            }
+        ]
+    ]
+}

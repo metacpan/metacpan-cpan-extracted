@@ -9,6 +9,7 @@ README
 bench/client.pl
 bench/simple-addition.pl
 bench/worker.pl
+bin/jobmon-redis.pl
 cpanfile
 dist.ini
 lib/Job/Async/Client/Redis.pm

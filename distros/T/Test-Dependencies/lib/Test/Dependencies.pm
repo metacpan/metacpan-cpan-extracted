@@ -14,11 +14,11 @@ Test::Dependencies - Ensure that the dependency listing is complete
 
 =head1 VERSION
 
-Version 0.23
+Version 0.24
 
 =cut
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 =head1 SYNOPSIS
 
@@ -57,6 +57,14 @@ Specifies the list of namespaces for which it is ok not to have
 specified dependencies.
 
 =item style
+
+B<DEPRECATED>
+
+There used to be the option of specifying a style; the heavy style
+depended on B::PerlReq. This module stopped working somewhere around
+Perl 5.20. Specifying a style no longer has any effect.
+
+Old text:
 
 Specifies the style of module usage checking to use.  There are two
 valid values: "light" and "heavy".  The default is heavy.  The
@@ -103,6 +111,9 @@ sub import {
     }
     $exclude_re = join '|', map { "^$_(\$|::)" } @{$args{exclude}};
   }
+  else {
+      $exclude_re = qr/^$/;
+  }
 
   if (defined $ENV{TDSTYLE}) {
     _choose_style($ENV{TDSTYLE});
@@ -110,7 +121,7 @@ sub import {
     if (defined $args{style}) {
       _choose_style($args{style});
     } else {
-      _choose_style('heavy');
+      _choose_style('light');
     }
   }
 
@@ -122,7 +133,7 @@ sub _choose_style {
   if (lc $style eq 'light') {
     eval 'use Test::Dependencies::Light';
   } elsif (lc $style eq 'heavy') {
-    eval 'use Test::Dependencies::Heavy';
+    eval 'use Test::Dependencies::Light';
   } else {
     carp "Unknown style: '", $style, "'";
   }
@@ -328,11 +339,9 @@ sub ok_dependencies {
 
 =back
 
-Please report any bugs or feature requests to
-C<bug-test-dependencies at rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-Dependencies>.
-I will be notified, and then you'll automatically be notified of progress on
-your bug as I make changes.
+Please report your bugs on GitHub:
+
+   L<https://github.com/ehuelsmann/perl-Test-Dependencies/issues>
 
 =head1 SUPPORT
 
@@ -344,17 +353,9 @@ You can also look for information at:
 
 =over 4
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Test-Dependencies>
-
 =item * CPAN Ratings
 
 L<http://cpanratings.perl.org/d/Test-Dependencies>
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-Dependencies>
 
 =item * Search CPAN
 
@@ -364,7 +365,7 @@ L<http://search.cpan.org/dist/Test-Dependencies>
 
 =head1 LICENCE AND COPYRIGHT
 
-    Copyright (c) 2016, Erik Huelsmann. All rights reserved.
+    Copyright (c) 2016-2019, Erik Huelsmann. All rights reserved.
     Copyright (c) 2007, Best Practical Solutions, LLC. All rights reserved.
 
     This module is free software; you can redistribute it and/or modify it

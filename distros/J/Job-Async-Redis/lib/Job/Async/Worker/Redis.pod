@@ -1,5 +1,3 @@
-=encoding utf8
-
 =for comment POD_DERIVED_INDEX_GENERATED
 The following documentation is automatically generated.  Please do not edit
 this file, but rather the original, inline with Job::Async::Worker::Redis
@@ -42,6 +40,16 @@ Requests to stop processing.
 
 Returns a future which will complete when all currently-processing jobs have
 finished.
+
+=head2 max_concurrent_jobs
+
+Number of jobs to process in parallel. Defaults to 1.
+
+=head2 job_poll_interval
+
+Polling interval (e.g. for C<BRPOPLPUSH> in C<reliable> mode), in seconds.
+
+Defaults to 3 seconds.
 
 =head1 INHERITED METHODS
 

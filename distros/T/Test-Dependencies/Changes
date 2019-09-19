@@ -1,5 +1,10 @@
 Revision history for Test-Dependencies
 
+0.24    Thu Sep 19, 2019
+        * Adjust dependency declaration; CPAN::Meta::Requirements is now
+          a separate dist; we are using 'requirements_for_module' which
+          was added after our minimum CPAN::Meta requirement.
+
 0.23    Sun Aug 21, 2016
         * load tests don't fail on Test::More 1.30, but do on many versions
           before it; increase minimum requirement (we'll phase out the old

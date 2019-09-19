@@ -1,4 +1,10 @@
-# Test-Dependencies
+# NAME
+
+Test-Dependencies
+
+[![Build Status](https://travis-ci.org/ehuelsmann/perl-Test-Dependencies.svg?branch=master)](https://travis-ci.org/ehuelsmann/perl-Test-Dependencies)
+
+# DESCRIPTION
 
 Makes sure that all of the modules that are 'use'd are listed in the
 Makefile.PL as dependencies.
@@ -15,12 +21,13 @@ To install this module, run the following commands:
 
 ## RECOMMENDED USE
 
-This module supports the development process of declaring correct dependencies on your
-module. As such, it's best to include it as a `develop` dependency.  Additionally, any
-tests based on this module best be located outside of the 't/' directory which holds
-all tests executed upon installation of your module.  A growing number of authors uses
-'xt/' to store tests aiding the development process itself.  If anything, that's a
-good place to store your `Test::Dependencies` based tests.
+This module supports the development process of declaring correct dependencies
+on your module. As such, it's best to include it as a `develop` dependency.
+Additionally, any tests based on this module best be located outside of the 't/'
+directory which holds all tests executed upon installation of your module.
+A growing number of authors uses 'xt/' to store tests aiding the development
+process itself.  If anything, that's a good place to store your
+`Test::Dependencies` based tests.
 
 ## SUPPORT AND DOCUMENTATION
 
@@ -33,17 +40,11 @@ You can also look for information at:
     Search CPAN
         http://search.cpan.org/dist/Test-Dependencies
 
-    CPAN Request Tracker:
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-Dependencies
-
-    AnnoCPAN, annotated CPAN documentation:
-        http://annocpan.org/dist/Test-Dependencies
-
     CPAN Ratings:
         http://cpanratings.perl.org/d/Test-Dependencies
 
 # LICENCE AND COPYRIGHT
-    Copyright (c) 2016, Erik Huelsmann. All rights reserved.
+    Copyright (c) 2016-2019, Erik Huelsmann. All rights reserved.
     Copyright (c) 2007, Best Practical Solutions, LLC. All rights reserved.
 
     This module is free software; you can redistribute it and/or modify it

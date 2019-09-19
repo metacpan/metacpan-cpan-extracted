@@ -1,5 +1,9 @@
 Revision history for this software.
 
+2.13.81.9 2019-09-20 00:00:00
+  - 0015_option_override_mapping.t supports U+32FF SQUARE ERA NAME REIWA
+  - created by INABA Hitoshi
+
 2.13.81.8 2019-08-20 00:00:00
   - fix Bug #130298 for Jacode4e-RoundTrip: xt directory is too big
   - created by INABA Hitoshi

@@ -2,9 +2,7 @@
 
 #
 # Fsdb::IO::Reader.pm
-# $Id: 2a2f291dc6b6a5e06727ae853281470c6a663aef $
-#
-# Copyright (C) 2005-2015 by John Heidemann <johnh@isi.edu>
+# Copyright (C) 2005-2019 by John Heidemann <johnh@isi.edu>
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License,
@@ -36,6 +34,7 @@ use strict;
 use IO::File;
 use Carp;
 use IO::Uncompress::AnyUncompress;
+use IPC::Open2;
 
 use Fsdb::IO;
 
@@ -157,6 +156,7 @@ sub new {
     return $self;
 }
 
+
 =head2 config_one
 
 documented in new
@@ -170,14 +170,24 @@ sub config_one {
 	my $fh;
 	my $mode = $self->default_binmode();
 	if ($file eq '-') {
-	     $fh = new IO::Handle;
-	     $fh->fdopen(fileno(STDIN),"<");
-	     binmode $fh, $mode;
+	    $fh = new IO::Handle;
+	    $fh->fdopen(fileno(STDIN),"<");
+	    binmode $fh, $mode;
 	} elsif ($file =~ /^hdfs:/) {
-             my $hdfs_reader_pid = open($fh, '-|', "hdfs", "-cat", $file);
-	     binmode $fh, $mode;
+            my($hdfs_fh, $compression_fh);
+            $self->{_hdfs_reader_pid} = open($hdfs_fh, '-|', "hdfs", "-cat", $file);
+            my $decompressor = Fsdb::IO::_find_filename_decompressor($file);
+            if ($decompressor) {
+                $self->{_compression_pid} = open2($compression_fh, $hdfs_fh, $decompressor);
+            };
+            $fh = $compression_fh // $hdfs_fh;
         } else {
-	     $fh = new IO::File $file, "<$mode";
+            my $decompressor = Fsdb::IO::_find_filename_decompressor($file);
+            if ($decompressor) {
+                $self->{_compression_pid} = open($fh, '-|', $decompressor, $file);
+            } else {
+                $fh = new IO::File $file, "<$mode";
+            };
 	};
 	if ($fh) {
 	    $self->{_fh} = $fh;

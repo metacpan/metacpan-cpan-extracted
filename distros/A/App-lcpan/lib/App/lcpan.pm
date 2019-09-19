@@ -1,7 +1,7 @@
 package App::lcpan;
 
-our $DATE = '2019-08-01'; # DATE
-our $VERSION = '1.038'; # VERSION
+our $DATE = '2019-09-19'; # DATE
+our $VERSION = '1.039'; # VERSION
 
 use 5.010001;
 use strict;
@@ -3776,6 +3776,22 @@ our %deps_rel_args = (
 our %rdeps_rel_args = %{clone(\%deps_rel_args)};
 $rdeps_rel_args{rel}{default} = 'ALL';
 
+our %rdeps_level_args = (
+    level => {
+        summary => 'Recurse for a number of levels (-1 means unlimited)',
+        schema  => ['int*', min=>1, max=>10],
+        default => 1,
+        cmdline_aliases => {
+            l => {},
+            R => {
+                summary => 'Recurse (alias for `--level 10`)',
+                is_flag => 1,
+                code => sub { $_[0]{level} = 10 },
+            },
+        },
+    },
+);
+
 our %deps_args = (
     %deps_phase_args,
     %deps_rel_args,
@@ -3924,19 +3940,7 @@ my %rdeps_args = (
     %mods_args,
     %rdeps_rel_args,
     %rdeps_phase_args,
-    level => {
-        summary => 'Recurse for a number of levels (-1 means unlimited)',
-        schema  => ['int*', min=>1, max=>10],
-        default => 1,
-        cmdline_aliases => {
-            l => {},
-            R => {
-                summary => 'Recurse (alias for `--level 10`)',
-                is_flag => 1,
-                code => sub { $_[0]{level} = 10 },
-            },
-        },
-    },
+    %rdeps_level_args,
     authors => {
         'x.name.is_plural' => 1,
         summary => 'Filter certain author',
@@ -4137,7 +4141,7 @@ App::lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.038 of App::lcpan (from Perl distribution App-lcpan), released on 2019-08-01.
+This document describes version 1.039 of App::lcpan (from Perl distribution App-lcpan), released on 2019-09-19.
 
 =head1 SYNOPSIS
 
@@ -4316,7 +4320,7 @@ Recurse for a number of levels (-1 means unlimited).
 
 =item * B<modules>* => I<array[perl::modname]>
 
-=item * B<perl_version> => I<str> (default: "v5.26.1")
+=item * B<perl_version> => I<str> (default: "v5.28.2")
 
 Set base Perl version for determining core modules.
 
@@ -4514,7 +4518,7 @@ Select modules belonging to certain namespace(s).
 
 When there are more than one query, perform OR instead of AND logic.
 
-=item * B<perl_version> => I<str> (default: "v5.26.1")
+=item * B<perl_version> => I<str> (default: "v5.28.2")
 
 Set base Perl version for determining core modules.
 
@@ -4682,7 +4686,7 @@ Select modules belonging to certain namespace(s).
 
 When there are more than one query, perform OR instead of AND logic.
 
-=item * B<perl_version> => I<str> (default: "v5.26.1")
+=item * B<perl_version> => I<str> (default: "v5.28.2")
 
 Set base Perl version for determining core modules.
 

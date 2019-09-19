@@ -7,7 +7,7 @@ use warnings;
 
 use parent 'Moo';
 
-our $VERSION = '1.76'; # VERSION
+our $VERSION = '1.80'; # VERSION
 
 # BUILD
 
@@ -128,9 +128,11 @@ The renew method resets the state and returns a new singleton.
 
 =head1 CREDITS
 
-Al Newkirk, C<+296>
+Al Newkirk, C<+303>
 
 Anthony Brummett, C<+10>
+
+Adam Hopkins, C<+1>
 
 José Joaquín Atria, C<+1>
 
@@ -149,9 +151,11 @@ terms as the Perl 5 programming language system itself.
 
 =head1 PROJECT
 
-L<GitHub|https://github.com/iamalnewkirk/do>
+L<Wiki|https://github.com/iamalnewkirk/do/wiki>
 
-L<Projects|https://github.com/iamalnewkirk/do/projects>
+L<Project|https://github.com/iamalnewkirk/do>
+
+L<Initiatives|https://github.com/iamalnewkirk/do/projects>
 
 L<Milestones|https://github.com/iamalnewkirk/do/milestones>
 

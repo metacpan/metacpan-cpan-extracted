@@ -3,7 +3,7 @@ package Job::Async::Redis;
 use strict;
 use warnings;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 =head1 NAME
 

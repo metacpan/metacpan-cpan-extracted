@@ -1,4 +1,4 @@
-[![MetaCPAN Release](https://badge.fury.io/pl/Mojolicious-Plugin-Text-Caml.svg)](https://metacpan.org/release/Mojolicious-Plugin-Text-Caml)
+
 # NAME
 
 Mojolicious::Plugin::Text::Caml - Mojolicious Plugin

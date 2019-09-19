@@ -5,11 +5,81 @@ use 5.014;
 use strict;
 use warnings;
 
-use Scalar::Util ();
+use Memoize qw(memoize);
+use Scalar::Util qw(blessed looks_like_number reftype);
 
-our $VERSION = '1.76'; # VERSION
+our $VERSION = '1.80'; # VERSION
 
 # FUNCTIONS
+
+sub NameFile {
+  require Data::Object::Name;
+
+  my ($string) = @_;
+
+  my $name = Data::Object::Name->new($string);
+
+  return $name->file;
+}
+
+sub NameLabel {
+  require Data::Object::Name;
+
+  my ($string) = @_;
+
+  my $name = Data::Object::Name->new($string);
+
+  return $name->label;
+}
+
+sub NamePackage {
+  require Data::Object::Name;
+
+  my ($string) = @_;
+
+  my $name = Data::Object::Name->new($string);
+
+  return $name->package;
+}
+
+sub NamePath {
+  require Data::Object::Name;
+
+  my ($string) = @_;
+
+  my $name = Data::Object::Name->new($string);
+
+  return $name->path;
+}
+
+sub Namespace {
+  my ($package, $argument) = @_;
+
+  my $registry = Registry();
+
+  my $namespace = NamePackage($argument);
+
+  $registry->set($package, $namespace);
+
+  return $namespace;
+}
+
+sub Registry {
+  require Data::Object::Registry;
+
+  my $point = Data::Object::Registry->can('new');
+
+  unshift @_, 'Data::Object::Registry' and goto $point;
+}
+
+sub Reify {
+  my ($from, $expr) = @_;
+
+  my $class = Registry()->obj($from);
+  my $point = $class->can('lookup');
+
+  @_ = ($class, $expr) and goto $point;
+}
 
 sub TypeArray {
   require Data::Object::Array;
@@ -134,7 +204,7 @@ sub Deduce {
   my ($data) = @_;
 
   return TypeUndef($data) if not(defined($data));
-  return DeduceBlessed($data) if Scalar::Util::blessed($data);
+  return DeduceBlessed($data) if blessed($data);
   return DeduceDefined($data);
 }
 
@@ -142,7 +212,7 @@ sub DeduceDefined {
   my ($data) = @_;
 
   return DeduceReferences($data) if ref($data);
-  return DeduceNumberlike($data) if Scalar::Util::looks_like_number($data);
+  return DeduceNumberlike($data) if looks_like_number($data);
   return DeduceStringLike($data);
 }
 
@@ -202,6 +272,7 @@ sub TypeName {
   my ($data) = (Deduce($_[0]));
 
   return "ARRAY" if $data->isa("Data::Object::Array");
+  return "BOOLEAN" if $data->isa("Data::Object::Boolean");
   return "HASH" if $data->isa("Data::Object::Hash");
   return "CODE" if $data->isa("Data::Object::Code");
   return "FLOAT" if $data->isa("Data::Object::Float");
@@ -226,20 +297,20 @@ INSPECT:
 
   return [@$data] if $type eq 'ARRAY';
   return {%$data} if $type eq 'HASH';
+  return $$data if $type eq 'BOOLEAN';
   return $$data if $type eq 'REGEXP';
   return $$data if $type eq 'FLOAT';
   return $$data if $type eq 'NUMBER';
-  return $$data if $type eq 'INTEGER';
   return $$data if $type eq 'STRING';
   return undef  if $type eq 'UNDEF';
 
   if ($type eq 'ANY' or $type eq 'SCALAR') {
-    $type = Scalar::Util::reftype($data) // '';
+    $type = reftype($data) // '';
 
     return [@$data] if $type eq 'ARRAY';
     return {%$data} if $type eq 'HASH';
+    return $$data if $type eq 'BOOLEAN';
     return $$data if $type eq 'FLOAT';
-    return $$data if $type eq 'INTEGER';
     return $$data if $type eq 'NUMBER';
     return $$data if $type eq 'REGEXP';
     return $$data if $type eq 'SCALAR';
@@ -278,6 +349,9 @@ sub DetractDeep {
 
   return wantarray ? (@data) : $data[0];
 }
+
+memoize 'Namespace';
+memoize 'Reify';
 
 1;
 
@@ -490,6 +564,137 @@ Note: Blessed objects are not traversed.
   # given ...
 
   Data::Object::Utility::DetractDeep(...);
+
+=back
+
+=cut
+
+=head2 namefile
+
+  NameFile(Str $arg1) : Str
+
+The C<NameFile> function returns the file representation for a given string.
+
+=over 4
+
+=item NameFile example
+
+  # given ...
+
+  Data::Object::Utility::NameFile(...);
+
+=back
+
+=cut
+
+=head2 namelabel
+
+  NameLabel(Str $arg1) : Str
+
+The C<NameLabel> function returns the label representation for a given string.
+
+=over 4
+
+=item NameLabel example
+
+  # given ...
+
+  Data::Object::Utility::NameLabel(...);
+
+=back
+
+=cut
+
+=head2 namepackage
+
+  NamePackage(Str $arg1) : Str
+
+The C<NamePackage> function returns the package representation for a give
+string.
+
+=over 4
+
+=item NamePackage example
+
+  # given ...
+
+  Data::Object::Utility::NamePackage(...);
+
+=back
+
+=cut
+
+=head2 namepath
+
+  NamePath(Str $arg1) : Str
+
+The C<NamePath> function returns the path representation for a given string.
+
+=over 4
+
+=item NamePath example
+
+  # given ...
+
+  Data::Object::Utility::NamePath(...);
+
+=back
+
+=cut
+
+=head2 namespace
+
+  Namespace(Str $arg1) : Str
+
+The C<Namespace> function registers a type library with a namespace in the
+registry so that typed operations know where to look for type context-specific
+constraints.
+
+=over 4
+
+=item Namespace example
+
+  # given ...
+
+  Data::Object::Utility::Namespace(...);
+
+=back
+
+=cut
+
+=head2 registry
+
+  Registry() : Object
+
+The C<Registry> function returns the global L<Data::Object::Registry> object,
+which holds mappings between namespaces and type registries.
+
+=over 4
+
+=item Registry example
+
+  # given ...
+
+  Data::Object::Utility::Registry(...);
+
+=back
+
+=cut
+
+=head2 reify
+
+  Reify(Str $namespace, Str $expression) : Maybe[Object]
+
+The C<Reify> function returns a type constraint for a given namespace and
+expression.
+
+=over 4
+
+=item Reify example
+
+  # given ...
+
+  Data::Object::Utility::Reify(...);
 
 =back
 
@@ -763,9 +968,11 @@ the provided data type and can be used to perform operations on the data.
 
 =head1 CREDITS
 
-Al Newkirk, C<+296>
+Al Newkirk, C<+303>
 
 Anthony Brummett, C<+10>
+
+Adam Hopkins, C<+1>
 
 José Joaquín Atria, C<+1>
 
@@ -784,9 +991,11 @@ terms as the Perl 5 programming language system itself.
 
 =head1 PROJECT
 
-L<GitHub|https://github.com/iamalnewkirk/do>
+L<Wiki|https://github.com/iamalnewkirk/do/wiki>
 
-L<Projects|https://github.com/iamalnewkirk/do/projects>
+L<Project|https://github.com/iamalnewkirk/do>
+
+L<Initiatives|https://github.com/iamalnewkirk/do/projects>
 
 L<Milestones|https://github.com/iamalnewkirk/do/milestones>
 

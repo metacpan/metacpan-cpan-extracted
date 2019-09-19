@@ -2,7 +2,7 @@
 
 #
 # dbmerge2.pm
-# Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
+# Copyright (C) 1991-2019 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -110,6 +110,11 @@ but Fsdb::Filter objects in Perl do not run until you invoke
 the run() method.
 The C<--(no)autorun> option controls that behavior within Perl.
 
+=item B<--header> H
+
+Use H as the full Fsdb header, rather than reading a header from
+then input.
+
 =item B<--help>
 
 Show help.
@@ -212,6 +217,7 @@ sub set_defaults ($) {
     $self->{_info}{input_count} = 2;
     $self->{_sort_argv} = [];
     $self->{_tmpdir} = defined($ENV{'TMPDIR'}) ? $ENV{'TMPDIR'} : "/tmp";
+    $self->{_header} = undef;
 }
 
 =head2 parse_options
@@ -233,6 +239,7 @@ sub parse_options ($@) {
 	'autorun!' => \$self->{_autorun},
 	'close!' => \$self->{_close},
 	'd|debug+' => \$self->{_debug},
+	'header=s' => \$self->{_header},
 	'i|input=s@' => sub { $self->parse_io_option('inputs', @_); },
 	'log!' => \$self->{_logprog},
 	'o|output=s' => sub { $self->parse_io_option('output', @_); },
@@ -266,7 +273,9 @@ sub setup ($) {
     # setup final IO
     #
     $self->setup_exactly_two_inputs;
-    $self->finish_io_option('inputs', -comment_handler => $self->create_pass_comments_sub);
+    my(@in_options) = (-comment_handler => $self->create_pass_comments_sub);
+    push(@in_options, -header => $self->{_header}) if (defined($self->{_header}));
+    $self->finish_io_option('inputs', @in_options);
     $self->finish_io_option('output', -clone => $self->{_ins}[0]);
 
     croak($self->{_prog} . ": input streams have different schemas; cannot merge\n")
@@ -336,7 +345,7 @@ sub run ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2019 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

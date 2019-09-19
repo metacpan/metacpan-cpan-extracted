@@ -4,7 +4,7 @@ use warnings;
 use Test::More;
 use Test::TypeTiny;
 
-use Data::Object::Export qw(deduce);
+use Data::Object::Utility;
 use Data::Object::Library qw(
   ArrayObj
   ArrayObject
@@ -15,7 +15,7 @@ ok_subtype Object, ArrayObj;
 ok_subtype Object, ArrayObject;
 
 my $data1 = [];
-my $data2 = deduce [];
+my $data2 = Data::Object::Utility::Deduce [];
 
 should_fail($data1, ArrayObj);
 should_pass($data2, ArrayObj);
@@ -23,8 +23,8 @@ should_pass($data2, ArrayObj);
 should_fail($data1, ArrayObject);
 should_pass($data2, ArrayObject);
 
-my $data3 = deduce [undef];
-my $data4 = deduce [bless {}, 'main'];
+my $data3 = Data::Object::Utility::Deduce [undef];
+my $data4 = Data::Object::Utility::Deduce [bless {}, 'main'];
 
 should_fail($data3, ArrayObj [Object]);
 should_pass($data4, ArrayObj [Object]);

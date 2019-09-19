@@ -202,7 +202,7 @@ sub setup ($) {
 
     $self->finish_fh_io_option('input');
 
-    my $csv = $self->{_csv} = new Text::CSV_XS;
+    my $csv = $self->{_csv} = new Text::CSV_XS({'binary' => 1});
 
     my($header);
     $header = $self->{_in}->getline;

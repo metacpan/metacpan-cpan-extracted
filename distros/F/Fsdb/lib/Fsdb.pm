@@ -33,7 +33,7 @@ Fsdb - a flat-text database for shell scripting
 
 
 =cut
-our $VERSION = '2.67';
+our $VERSION = '2.68';
 
 =head1 SYNOPSIS
 
@@ -235,29 +235,38 @@ L<http://www.isi.edu/~johnh/SOFTWARE/FSDB/index.html>.
 
 =head1 WHAT'S NEW
 
-=head2 2.67, 2019-07-10
-summary tdb
+=head2 2.68, 2019-09-19
+All programs now support automatic decompression based on file extension.
 
 =over 4
 
 =item IMPROVEMENT
 
-L<dbformmail> now has an "mh" mechanism that writes messages to 
-individual files (an mh-style mailbox).
-
-=item BUG FIX
-
-L<dbrow> failed to include the Carp library, leading to fails on croak.
-
-=item BUG FIX
-
-Fixed L<dbjoin> error message for an unsorted right stream was incorrect
-(it said left).
+The omitted-possible-error test case for L<dbfilepivot>
+now has an altnerative output that I saw on some BSD-running systems
+(thanks to CPAN).
 
 =item IMPROVEMENT
 
-All Fsdb programs can now read from and write to HDFS,
-when files that start with "hdfs:" are given to -i and -o options.
+L<dbmerge> and L<dbmerge2> now support C<--header>.
+L<dbmerge2> now gives better error messages when presented
+the wrong number of inputs.
+
+=item BUG FIX
+
+L<dbsort> now works with C<--header> even when the file is big
+(due to fixes to L<dbmerge>).
+
+=item IMPROVEMENT
+
+L<cvs_to_db> now processes data with the "binary" option, allowing
+it to handle newlines embedded in quoted fields.
+
+=item IMPROVEMENT
+
+All programs now will transparently decompress input files,
+if they are listed as a filename as an input argument
+that extends with a standard extension (.gz, .bz2, and .xz).
 
 =back
 
@@ -3535,6 +3544,32 @@ open TEST/bad_filename").
 Hash joins with three identical rows were failing with the assertion
 failure "internal error: confused about overflow" due to a now-fixed
 bug.
+
+=back
+
+=head2 2.67, 2019-07-10
+add support for reading and writing hdfs
+
+=over 4
+
+=item IMPROVEMENT
+
+L<dbformmail> now has an "mh" mechanism that writes messages to 
+individual files (an mh-style mailbox).
+
+=item BUG FIX
+
+L<dbrow> failed to include the Carp library, leading to fails on croak.
+
+=item BUG FIX
+
+Fixed L<dbjoin> error message for an unsorted right stream was incorrect
+(it said left).
+
+=item IMPROVEMENT
+
+All Fsdb programs can now read from and write to HDFS,
+when files that start with "hdfs:" are given to -i and -o options.
 
 =back
 

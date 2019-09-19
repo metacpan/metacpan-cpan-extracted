@@ -1,0 +1,8 @@
+#fsdb c_id c_name
+#h cid cname
+#h cid cname
+11	numanal
+12	os
+10	pascal
+13	statistics
+#   | dbmerge2 '--header=#fsdb c_id c_name' --input TEST/dbmerge_ex_b.in c_name

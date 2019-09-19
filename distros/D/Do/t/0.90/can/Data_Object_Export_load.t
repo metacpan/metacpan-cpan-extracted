@@ -5,6 +5,8 @@ use warnings;
 
 use Test::More;
 
+plan skip_all => 'Refactoring';
+
 # POD
 
 =name
@@ -15,12 +17,13 @@ load
 
   # given 'List::Util';
 
-  $package = load 'List::Util'; # List::Util if loaded
+  $package = do('load', 'List::Util'); # List::Util
 
 =description
 
-The load function attempts to dynamically load a module and either dies or
-returns the package name of the loaded module.
+The load function attempts to dynamically load a module and either raises an
+exception or returns the package name of the loaded module. This function is
+not exported but can be access via the L<super-do|/do> function.
 
 =signature
 

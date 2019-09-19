@@ -3,8 +3,10 @@ use Mojo::Base 'Mojolicious::Controller';
 
 sub show_add {
   my $c = shift;
-  my $link = $c->link($c->param('url'));
-  $c->render('add', link => $link);
+  $c->link($c->param('url'), sub {
+    my $link = $_[1];
+    $c->render('add', link => $link);
+  });
 }
 
 sub do_add {

@@ -478,6 +478,7 @@ TEST/dbfilepivot_hw_order.in
 TEST/dbfilepivot_hw_order.out
 TEST/dbfilepivot_hw_order_error.cmd
 TEST/dbfilepivot_hw_order_error.out
+TEST/dbfilepivot_omitted_possible_error.altout
 TEST/dbfilepivot_omitted_possible_error.cmd
 TEST/dbfilepivot_omitted_possible_error.out
 TEST/dbfilepivot_pre_sorted.cmd
@@ -657,6 +658,8 @@ TEST/dbmapreduce_unlimited_parallelism.cmd
 TEST/dbmapreduce_unlimited_parallelism.out
 TEST/dbmerge2_ex.cmd
 TEST/dbmerge2_ex.out
+TEST/dbmerge2_ex_header.cmd
+TEST/dbmerge2_ex_header.out
 TEST/dbmerge2_ex_R.cmd
 TEST/dbmerge2_ex_R.out
 TEST/dbmerge2_two_input.cmd
@@ -689,6 +692,8 @@ TEST/dbmerge_ex.in
 TEST/dbmerge_ex.out
 TEST/dbmerge_ex_b.in
 TEST/dbmerge_ex_c.in
+TEST/dbmerge_ex_header.cmd
+TEST/dbmerge_ex_header.out
 TEST/dbmerge_ex_R.cmd
 TEST/dbmerge_ex_R.in
 TEST/dbmerge_ex_R.out

@@ -17,8 +17,9 @@ my $t = Test::Mojo->new(
 # "mock" the link helper
 my ($url, $data);
 $t->app->helper('link' => sub {
-  (undef, $url) = @_;
-  return Local::MockLink->new($data);
+  $url = $_[1];
+  my $cb = $_[2];
+  $cb->(undef, Local::MockLink->new($data));
 });
 
 $data = {

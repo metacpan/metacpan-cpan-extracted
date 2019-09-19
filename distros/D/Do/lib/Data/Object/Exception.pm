@@ -11,7 +11,7 @@ use overload (
   fallback => 1
 );
 
-our $VERSION = '1.76'; # VERSION
+our $VERSION = '1.80'; # VERSION
 
 # BUILD
 
@@ -67,7 +67,7 @@ sub explain {
 }
 
 sub throw {
-  my ($self, $message, $context) = @_;
+  my ($self, $message, $context, $offset) = @_;
 
   if (ref $self) {
     $message ||= $self->{message};
@@ -78,7 +78,7 @@ sub throw {
 
   my $exception = $self->new(message => $message, context => $context);
 
-  die $exception->trace;
+  die $exception->trace($offset);
 }
 
 sub trace {
@@ -187,7 +187,7 @@ instance.
 
 =head2 throw
 
-  throw(Str $arg1) : Object
+  throw(Str $classname, Any $context, Maybe[Number] $offset) : Object
 
 Throw error with message and context.
 
@@ -195,7 +195,7 @@ Throw error with message and context.
 
 =item throw example
 
-  $exception->throw();
+  $exception->throw($context);
 
 =back
 
@@ -224,9 +224,11 @@ skips the first frame.
 
 =head1 CREDITS
 
-Al Newkirk, C<+296>
+Al Newkirk, C<+303>
 
 Anthony Brummett, C<+10>
+
+Adam Hopkins, C<+1>
 
 José Joaquín Atria, C<+1>
 
@@ -245,9 +247,11 @@ terms as the Perl 5 programming language system itself.
 
 =head1 PROJECT
 
-L<GitHub|https://github.com/iamalnewkirk/do>
+L<Wiki|https://github.com/iamalnewkirk/do/wiki>
 
-L<Projects|https://github.com/iamalnewkirk/do/projects>
+L<Project|https://github.com/iamalnewkirk/do>
+
+L<Initiatives|https://github.com/iamalnewkirk/do/projects>
 
 L<Milestones|https://github.com/iamalnewkirk/do/milestones>
 

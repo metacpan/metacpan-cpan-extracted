@@ -4,13 +4,13 @@
       "Gil Magno <gils@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Lingua-pt_BR-Nums2Words",
    "no_index" : {
@@ -35,5 +35,16 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.01"
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://gitlab.com/gilmagno/lingua-pt-br-nums2words.git",
+         "web" : "https://gitlab.com/gilmagno/lingua-pt-br-nums2words"
+      }
+   },
+   "version" : "0.02",
+   "x_contributors" : [
+      "Italo Gonçales <italo.goncales@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

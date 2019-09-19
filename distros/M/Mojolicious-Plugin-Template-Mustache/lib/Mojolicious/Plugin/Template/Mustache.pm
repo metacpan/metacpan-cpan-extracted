@@ -3,38 +3,43 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 use Template::Mustache;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub register {
-    my (undef, $app, $args) = @_;
+    my ( undef, $app, $args ) = @_;
 
-    $args //= {};
+    $app->renderer->add_handler(
+        mustache => sub {
+            my Mojolicious::Renderer $renderer = shift;
+            my Mojolicious::Controller $c      = shift;
+            my ( $output, $options ) = @_;
 
-    $app->renderer->add_handler(mustache => sub {
-        my Mojolicious::Renderer $renderer = shift;
-        my Mojolicious::Controller $c = shift;
-        my ($output, $options) = @_;
-
-        if ($options->{inline} and (my $inline_template = $options->{inline})) {
-            my $mustache = Template::Mustache->new(
-                   template => $inline_template,
-               );
-            $$output = $mustache->render($c->stash);
-        }
-        elsif (my $template_name = $renderer->template_path($options)) {
-            my $mustache = Template::Mustache->new(
-                    template_path => $template_name
+            my $mustache;
+            if ( $options->{inline} ) {
+                my $inline_template = $options->{inline};
+                $mustache = Template::Mustache->new(
+                    template => $inline_template,
+                    %{$args},
                 );
-            $$output = $mustache->render($c->stash);
-        } else {
-            my $data_template = $renderer->get_data_template($options);
-            my $mustache = Template::Mustache->new(
-                    template => $data_template
+            }
+            elsif ( my $template_name = $renderer->template_path($options) ) {
+                $mustache = Template::Mustache->new(
+                    template_path => $template_name,
+                    %{$args},
                 );
-            $$output = $mustache->render($c->stash) if $data_template;
+            }
+            else {
+                my $data_template = $renderer->get_data_template($options);
+                $mustache = Template::Mustache->new(
+                    template => $data_template,
+                    %{$args},
+                );
+            }
+            $$output = $mustache->render( $c->stash );
+
+            return !!$$output;
         }
-        return $$output ? 1 : 0;
-    });
+    );
 
     return 1;
 }

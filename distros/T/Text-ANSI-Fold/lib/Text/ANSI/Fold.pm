@@ -3,7 +3,7 @@ use 5.014;
 use strict;
 use warnings;
 
-our $VERSION = "0.06";
+our $VERSION = "0.07";
 
 use Carp;
 use Text::VisualWidth::PP 'vwidth';
@@ -12,11 +12,9 @@ use Text::VisualWidth::PP 'vwidth';
 use Exporter 'import';
 our @EXPORT_OK = qw(&ansi_fold);
 
-my $myfold = __PACKAGE__->new();
-
 sub ansi_fold {
     my($text, $width, @option) = @_;
-    $myfold->fold($text, width => $width, @option);
+    __PACKAGE__->configure->fold($text, width => $width, @option);
 }
 ######################################################################
 
@@ -70,7 +68,9 @@ sub new {
 }
 
 sub configure {
-    my $obj = ref $_[0] ? $_[0] : $myfold;
+    my $obj = ref $_[0] ? $_[0] : do {
+	state $private = new __PACKAGE__;
+    };
     shift;
     croak "invalid parameter" if @_ % 2;
     while (@_ >= 2) {
@@ -222,8 +222,9 @@ sub text {
 sub retrieve {
     my $obj = shift;
     local *_ = \$obj->{text};
-    return '' if $_ eq '';
+    return '' if not defined $_;
     (my $folded, $_) = $obj->fold($_, @_);
+    $_ = undef if length == 0;
     $folded;
 }
 

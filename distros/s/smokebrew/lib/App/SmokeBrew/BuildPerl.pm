@@ -1,5 +1,5 @@
 package App::SmokeBrew::BuildPerl;
-$App::SmokeBrew::BuildPerl::VERSION = '0.52';
+$App::SmokeBrew::BuildPerl::VERSION = '0.54';
 #ABSTRACT: build and install a particular version of Perl
 
 use strict;
@@ -92,6 +92,14 @@ sub build_perl {
   my $self = shift;
   my $perl_version = $self->perl_version;
   msg(sprintf("Starting build for '%s'",$perl_version), $self->verbose);
+  if ( grep { m!Dusequadmath! } $self->perlargs ) {
+    msg(sprintf("Checking if this perl '%s' can be built with quadmath",$perl_version), $self->verbose);
+    if ( ! $self->can_quadmath ) {
+      error(sprintf("This perl '%s' cannot be built with quadmath",$perl_version), $self->verbose);
+      return;
+    }
+    msg(sprintf("Congratulations, this perl '%s' can be built with quadmath",$perl_version), $self->verbose);
+  }
   $self->builddir->mkpath();
   my $file = $self->_fetch();
   return unless $file;
@@ -166,7 +174,7 @@ App::SmokeBrew::BuildPerl - build and install a particular version of Perl
 
 =head1 VERSION
 
-version 0.52
+version 0.54
 
 =head1 SYNOPSIS
 
@@ -286,7 +294,7 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Chris Williams.
+This software is copyright (c) 2019 by Chris Williams.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -5,6 +5,7 @@
 ^MYMETA\.
 ^misc/
 ^old/
+^sanitize/
 
 ^DDC-Concordance-
 lib/DDC/Query.pm

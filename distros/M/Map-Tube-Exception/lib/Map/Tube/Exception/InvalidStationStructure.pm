@@ -1,13 +1,13 @@
 package Map::Tube::Exception::InvalidStationStructure;
 $Map::Tube::Exception::InvalidStationStructure::AUTHORITY = 'cpan:MANWAR';
-$Map::Tube::Exception::InvalidStationStructure::VERSION = '3.20';
+$Map::Tube::Exception::InvalidStationStructure::VERSION = '3.21';
 =head1 NAME
 
 Map::Tube::Exception::InvalidStationStructure - Represent 'invalid station structure' exception.
 
 =head1 VERSION
 
-version 3.20
+version 3.21
 
 =cut
 

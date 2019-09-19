@@ -4,7 +4,7 @@ use warnings;
 use Test::More;
 use Test::TypeTiny;
 
-use Data::Object::Export qw(deduce);
+use Data::Object::Utility;
 use Data::Object::Library qw(
   CodeObj
   CodeObject
@@ -14,8 +14,8 @@ use Data::Object::Library qw(
 ok_subtype Object, CodeObj;
 ok_subtype Object, CodeObject;
 
-my $data1 = sub        { };
-my $data2 = deduce sub { };
+my $data1 = sub { };
+my $data2 = Data::Object::Utility::Deduce sub { };
 
 should_fail($data1, CodeObj);
 should_pass($data2, CodeObj);

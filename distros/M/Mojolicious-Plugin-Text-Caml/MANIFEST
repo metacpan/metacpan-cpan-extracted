@@ -7,6 +7,7 @@ cpanfile
 lib/Mojolicious/Plugin/Text/Caml.pm
 minil.toml
 t/basic.t
+t/no_data.t
 t/templates/mustache.html.caml
 META.yml
 MANIFEST

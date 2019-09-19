@@ -9,7 +9,7 @@ use Carp ();
 
 use Import::Into;
 
-our $VERSION = '1.76'; # VERSION
+our $VERSION = '1.80'; # VERSION
 
 # BUILD
 
@@ -584,7 +584,7 @@ sub _process_meta {
     unless $namespace->isa('Type::Library');
 
   # build type-tiny constraint for target, then add constraint to typelib
-  _process_typereg($namespace, _process_typetiny(Data::Object::Export::registry(),
+  _process_typereg($namespace, _process_typetiny(Data::Object::Utility::Registry(),
       $target, $parent));
 
   return;
@@ -595,7 +595,7 @@ sub _process_typelib {
   my ($target, $meta) = @_;
 
   # register target <-> typelib so target can use typelib
-  return Data::Object::Export::namespace($target, ref($meta)
+  return Data::Object::Utility::Namespace($target, ref($meta)
     ? join('-', @$meta) : $meta);
 }
 
@@ -1790,9 +1790,11 @@ consume the L<Data::Object::Role::Throwable> role.
 
 =head1 CREDITS
 
-Al Newkirk, C<+296>
+Al Newkirk, C<+303>
 
 Anthony Brummett, C<+10>
+
+Adam Hopkins, C<+1>
 
 José Joaquín Atria, C<+1>
 
@@ -1811,9 +1813,11 @@ terms as the Perl 5 programming language system itself.
 
 =head1 PROJECT
 
-L<GitHub|https://github.com/iamalnewkirk/do>
+L<Wiki|https://github.com/iamalnewkirk/do/wiki>
 
-L<Projects|https://github.com/iamalnewkirk/do/projects>
+L<Project|https://github.com/iamalnewkirk/do>
+
+L<Initiatives|https://github.com/iamalnewkirk/do/projects>
 
 L<Milestones|https://github.com/iamalnewkirk/do/milestones>
 

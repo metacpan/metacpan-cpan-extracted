@@ -9,6 +9,10 @@ use lib File::Spec->catdir(__DIR__, '../', 'lib');
 
 BEGIN {
   if( eval 'require Crypt::Eksblowfish::Bcrypt' ){
+    unless( eval 'require DBIx::Class::TimeStamp' ) {
+      plan skip_all => 'DBIx::Class::TimeStamp not available';
+      exit;
+    }
     plan tests => 8;
     use_ok('DigestTest::Schema');
   } else {

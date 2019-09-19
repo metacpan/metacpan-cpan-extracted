@@ -120,7 +120,7 @@ WriteMakefile(
     VERSION_FROM        => 'lib/Fsdb.pm',
     ABSTRACT_FROM       => 'lib/Fsdb.pm',
     ($] >= 5.010 ?
-      (LICENSE 		=> 'GPL-2',) : ()),
+      (LICENSE 		=> 'gpl_2',) : ()),
     EXE_FILES       => [ map "bin/$_", @programs_to_install ],
     PL_FILES            => {},
     PREREQ_PM => {
