@@ -11,7 +11,6 @@ BEGIN {
 		exit;
 	}
 }
-my $s = $driver->session;
 
 
 # The purpose of these tests is to confirm that Neo4j values are correctly
@@ -24,10 +23,10 @@ my $s = $driver->session;
 # https://metacpan.org/pod/Cpanel::JSON::XS#JSON-%3E-PERL
 # https://metacpan.org/pod/Mojo::JSON::MaybeXS#Upgraded-Numbers
 
-use Test::More 0.96 tests => 3 + 1;
+use Test::More 0.96 tests => 4 + 1;
 use Test::Exception;
 use JSON::PP ();
-my $transaction = $s->begin_transaction;
+my $transaction = $driver->session->begin_transaction;
 
 
 my ($q, $r);
@@ -38,7 +37,7 @@ subtest 'Neo4j property types' => sub {
 	$q = <<END;
 RETURN 42, 0.5, 'Praise be to the dartmakers.', true, false, null
 END
-	lives_ok { $r = $s->run($q)->list->[0]; } 'get property values';
+	lives_ok { $r = $transaction->run($q)->list->[0]; } 'get property values';
 	
 	is $r->get(0), 42, 'integer';
 	is $r->get(1), .5, 'float';
@@ -124,6 +123,22 @@ END
 	is ref $r->get(1)->{second}->[0], 'HASH', 'node in map-list';
 	is scalar (grep !/^_/, keys %{$r->get(1)->{second}->[0]}), 0, 'no-prop node in map-list';
 	is $r->get(1)->{second}->[1], undef, 'null in map-list';
+};
+
+
+subtest 'Underscore properties' => sub {
+	plan tests => 6;
+	$q = <<END;
+CREATE (a:Test {_node: -1, _labels: 'test,special'})-[b:TEST {_relationship: 'yes', _test: true}]->(c:Test)
+RETURN a, b, c
+END
+	lives_ok { $r = $transaction->run($q)->list->[0]; } 'get underscore props';
+	
+	is $r->get('b')->{_test}, JSON::PP::true, 'underscore test';
+	is $r->get('b')->{_relationship}, 'yes', 'underscore relationship';
+	is $r->get('a')->{_labels}, 'test,special', 'underscore labels';
+	is $r->get('a')->{_node}, -1, 'underscore node set';
+	is $r->get('c')->{_node}, undef, 'underscore node unset';
 };
 
 

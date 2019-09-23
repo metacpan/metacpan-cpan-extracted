@@ -1,11 +1,18 @@
 Revision history for Perl extension API::INSEE::Sirene.
 
-3.502  Wed Jul 10 10:28:00 2019
-    - Documentation uniformisation
-    - Minor code improvements
-    - Errors handling improvement
+3.503  Mon Sep  23 10:59:44 2019
+        - Decreased $HARD_MAX_RESULTS value from 10000 to 1000 according to new the specifications applicable from 2019-10-01
+        - Updated documentation
+
+3.502  Wed Jul  10 10:28:00 2019
+        - Documentation uniformisation
+        - Minor code improvements
+        - Errors handling improvement. The module will now display better errors
+        - Added checkResponse() method
+        - Moved getEstablishmentsByCriteria() to @EXPORT_OK
+        - Moved getLegalUnitBySIREN() to @EXPORT
 
 3.501  Mon Jul  8 12:40:26 2019
-	- original version; created by h2xs 1.23 with options
-		-AX -n API::INSEE::Sirene -v 3.501
+        - original version; created by h2xs 1.23 with options
+            -AX -n API::INSEE::Sirene -v 3.501
 

@@ -1,13 +1,15 @@
 package UUID4::Tiny;
 # ABSTRACT: Cryptographically secure v4 UUIDs for Linux x64
 
+use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Carp qw/carp croak/;
-use Exporter qw/import/;
+use Exporter;
+our @ISA = qw/Exporter/;
 
 our @EXPORT_OK = qw/
     create_uuid
@@ -55,7 +57,8 @@ sub string_to_uuid {
         carp 'Input not converted: assumed to be UUID bytes';
         return $string;
     }
-    pack 'H*', $string =~ y/-//dr;
+    (my $hex = $string) =~ y/-//d;
+    pack 'H*', $hex;
 }
 
 sub uuid_to_string {
@@ -83,7 +86,7 @@ UUID4::Tiny - Cryptographically secure v4 UUIDs for Linux x64
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

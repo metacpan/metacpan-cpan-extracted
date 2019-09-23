@@ -5,11 +5,12 @@
 use strict;
 use warnings;
 
+use 5.008;
 use ExtUtils::MakeMaker;
 
 # 64 bit Linux only
 # https://rt.cpan.org/Public/Bug/Display.html?id=113337
-os_unsupported unless $^O eq 'linux' && length(pack 'P') * 8 == 64;
+os_unsupported() unless $^O eq 'linux' && length(pack 'P') * 8 == 64;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Cryptographically secure v4 UUIDs for Linux x64",
@@ -19,6 +20,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "UUID4-Tiny",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.008",
   "NAME" => "UUID4::Tiny",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -33,7 +35,7 @@ my %WriteMakefileArgs = (
     "Test2::Tools::Tiny" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }

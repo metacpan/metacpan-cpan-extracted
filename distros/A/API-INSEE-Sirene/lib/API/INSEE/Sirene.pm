@@ -14,8 +14,8 @@ our @EXPORT_OK = qw(&getEstablishmentsByCriteria &getLegalUnitsByCriteria &getLe
 
 my $API_VERSION = 3;
 my $API_REVISION = 5;
-my $PACKAGE_REVISION = '02';
-our $VERSION = 3.502;
+my $PACKAGE_REVISION = '03';
+our $VERSION = 3.503;
 
 my $EMPTY = q{};
 my $API_BASE_URL = "https://api.insee.fr/entreprises/sirene/V$API_VERSION";
@@ -26,7 +26,7 @@ our $proxy = undef;
 our $timeout = 20;
 
 our $default_max_results = 20; # from documentation
-my $HARD_MAX_RESULTS = 10_000; # from documentation
+my $HARD_MAX_RESULTS = 1_000; # from documentation
 
 my $historized_fields = [
 
@@ -98,7 +98,6 @@ sub initUserAgent {
     $proxy ? $user_agent->proxy(['https', 'http'], $proxy) : $user_agent->env_proxy;
 
     my ($token, $err) = getToken();
-
     croak "Unable to get token.\n$err" if (!$token);
 
     $user_agent->default_header('Authorization' => "Bearer $token");
@@ -125,7 +124,7 @@ sub getToken {
         return $json_obj->{'access_token'};
     }
 
-    return (0, sprintf "Sent Request:\n%s\nReceived response:\n%s\n", $request->as_string, $response->as_string);
+    return (0, sprintf "Sent request:\n%s\nReceived response:\n%s\n", $request->as_string, $response->as_string);
 }
 
 sub checkResponse {
@@ -140,7 +139,7 @@ sub checkResponse {
         return $response->content;
     }
 
-    return (0, sprintf "Sent Request:\n%s\nReceived response:\n%s\n", $request->as_string, $response->as_string);
+    return (0, sprintf "Sent request:\n%s\nReceived response:\n%s\n", $request->as_string, $response->as_string);
 }
 
 sub buildParameters {
@@ -218,7 +217,7 @@ sub getLegalUnitBySIREN {
 
     my ($siren, $fields) = @_;
 
-    return (0, "Invalid SIREN -> Must be a 9 digits number") if ($siren !~ m/\d{9}/);
+    return (0, "Invalid SIREN $siren -> Must be a 9 digits number") if ($siren !~ m/\d{9}/);
 
     my $parameters = buildParameters($usefull_fields_unite_legale, 0, $fields);
     initUserAgent() if (not defined $user_agent);
@@ -230,7 +229,7 @@ sub getEstablishmentBySIRET {
 
     my ($siret, $fields) = @_;
 
-    return (0, "Invalid SIRET -> Must be a 14 digits number") if ($siret !~ m/\d{14}/);
+    return (0, "Invalid SIRET $siret -> Must be a 14 digits number") if ($siret !~ m/\d{14}/);
 
     my $parameters = buildParameters($usefull_fields_etablissement, 0, $fields);
     initUserAgent() if (not defined $user_agent);
@@ -242,7 +241,7 @@ sub getEstablishmentsBySIREN {
 
     my ($siren, $fields) = @_;
 
-    return (0, "Invalid SIREN -> Must be a 9 digits number.") if ($siren !~ m/\d{9}/);
+    return (0, "Invalid SIREN $siren -> Must be a 9 digits number.") if ($siren !~ m/\d{9}/);
 
     my $parameters = buildParameters($usefull_fields_etablissement, 0, $fields, {siren => $siren});
     initUserAgent() if (not defined $user_agent);
@@ -317,11 +316,15 @@ __END__
 
 =pod
 
-=encoding UTF-8
+=encoding utf8
 
 =head1 NAME
 
 API::INSEE::Sirene - An interface for the Sirene API of INSEE
+
+=head1 VERSION
+
+Version 3.504
 
 =head1 SYNOPSIS
 
@@ -350,7 +353,7 @@ API::INSEE::Sirene - An interface for the Sirene API of INSEE
 
 This module allows you to interact with the Sirene API of INSEE (Institut National de la Statistique et des Études Économiques) in France.
 
-It contains a set of functions that can perform searches on INSEE's database to get some information about french entreprises like their SIREN number, company name, company headquarters address, etc.
+It contains a set of functions that can perform searches on INSEE's database to get some information about french companies like their SIREN number, company name, company headquarters address, etc.
 
 The terms "enterprise", "legal unit" and "establishment" used in this documentation are defined at the INSEE website in the following pages:
 
@@ -394,6 +397,10 @@ B<Please note that this API is french so all fields names used in function calls
 
 =item *
 
+L<< Carp|https://perldoc.perl.org/Carp.html >>
+
+=item *
+
 L<< JSON|https://metacpan.org/pod/JSON >>
 
 =item *
@@ -403,10 +410,6 @@ L<< LWP::UserAgent|https://metacpan.org/pod/LWP::UserAgent >>
 =item *
 
 L<< POSIX::strftime|https://metacpan.org/pod/POSIX#strftime >>
-
-=item *
-
-L<< Carp|https://perldoc.perl.org/Carp.html >>
 
 =back
 
@@ -448,7 +451,7 @@ These folowing functions are available by manual import:
 
 =head1 FUNCTIONAL INTERFACE
 
-This section describes all functionalities available in this module.
+This section describes all available features in this module.
 
 =head2 VARIABLES
 
@@ -469,7 +472,7 @@ This variable is set to 20 results by default.
 
 =item B<HARD_MAX_RESULTS>
 
-Constant that specifies the max results number you can get. This value can't be increased. If you try to send a request with a higher value, the number parameter will be forced to HARD_MAX_RESULTS value.
+Constant that specifies the max results number you can get. This value can't be increased. If you try to send a request with a higher value, the C<nombre> parameter will be forced to HARD_MAX_RESULTS value.
 
 =item B<proxy>
 
@@ -489,43 +492,43 @@ This variable is set to 20 seconds by default.
 
 =over 4
 
-=item B<getLegalUnitBySIREN()>
+=item B<getLegalUnitBySIREN>
 
 Search a legal unit by her SIREN number.
 
-=item B<getEstablishmentBySIRET()>
+=item B<getEstablishmentBySIRET>
 
 Search an establishment by his SIRET number.
 
-=item B<getEstablishmentsBySIREN()>
+=item B<getEstablishmentsBySIREN>
 
 Search all establishments that are attached to the legal unit identified by this SIREN number.
 
-=item B<getLegalUnitsByCriteria()>
+=item B<getLegalUnitsByCriteria>
 
 Search all legal units matching the specified criteria.
 
-=item B<getEstablishmentsByCriteria()>
+=item B<getEstablishmentsByCriteria>
 
 Search all establishments matching the specified criteria.
 
-=item B<getLegalUnitsByName()>
+=item B<getLegalUnitsByName>
 
 Search all legal units matching the specified name. (denominationUniteLegale field)
 
-=item B<getEstablishmentsByName()>
+=item B<getEstablishmentsByName>
 
 Search all establishments matching the specified name. (denominationUniteLegale field)
 
-=item B<getLegalUnitsByUsualName()>
+=item B<getLegalUnitsByUsualName>
 
 Search all legal units matching the specified name. (denominationUsuelle1UniteLegale field)
 
-=item B<getEstablishmentsByUsualName()>
+=item B<getEstablishmentsByUsualName>
 
 Search all establishments matching the specified name. (denominationUsuelle1UniteLegale field)
 
-=item B<getUserAgentInitialized()>
+=item B<getUserAgentInitialized>
 
 Return the user agent initialized with the token. Allows advanced users to make their own requests.
 
@@ -539,7 +542,7 @@ B<Note:> All functions search and return values that are in the most recent lega
 
 =item B<siren and siret>
 
-In the B<getEstablishmentBySIRET()>, B<getEstablishmentsBySIREN()> and B<getLegalUnitBySIREN()> functions, you must give a SIREN or a SIRET number:
+In the B<getEstablishmentBySIRET>, B<getEstablishmentsBySIREN> and B<getLegalUnitBySIREN> functions, you must give a SIREN or a SIRET number:
 
   my $response_json = getLegalUnitBySIREN(123456789);
   my $response_json = getEstablishmentBySIRET(12345678987654);
@@ -549,11 +552,10 @@ B<Note:> A SIREN number must be 9 digits long and a SIRET number must be 14 digi
 
 =item B<criteria>
 
-In the B<getLegalUnitsByCriteria()> and B<getEstablishmentsByCriteria()> functions, you must give a hash reference of search criteria:
+In the B<getLegalUnitsByCriteria> and B<getEstablishmentsByCriteria> functions, you must give a hash reference of search criteria:
 
   # search all legal units whose acronym like 'ABC' AND whose category like 'ETI'
   my %criteria = (
-
     sigleUniteLegale => 'ABC',
     categorieEntreprise => 'ETI'
   );
@@ -564,7 +566,7 @@ B<Note:> Criteria are concatened with an AND in query search. A criteria is a co
 
 =item B<name>
 
-In the B<getLegalUnitsByName()>, B<getEstablishmentsByName()>, B<getLegalUnitsByUsualName()> and B<getEstablishmentsByUsualName()> functions, you must give a string:
+In the B<getLegalUnitsByName>, B<getEstablishmentsByName>, B<getLegalUnitsByUsualName> and B<getEstablishmentsByUsualName> functions, you must give a string:
 
     my $response_json = getLegalUnitsByName("EnterpriseName");
 
@@ -575,23 +577,36 @@ B<Note:> You can enter a part or the complete name of an enterprise.
 All functions are taking two parameters including an optional one. The second parameter, if present, can be presented in three forms:
 
   my $fields_that_interest_me = ['dateCreationUniteLegale', 'sigleUniteLegale'];
-  my $result_json = getLegalUnitBySIREN(123456789, $fields_that_interest_me);
+  my $response_json = getLegalUnitBySIREN(123456789, $fields_that_interest_me);
 
   # or
-  my $result_json = getLegalUnitBySIREN(123456789, 'dateCreationUniteLegale');
+  my $response_json = getLegalUnitBySIREN(123456789, 'dateCreationUniteLegale');
 
   # or
-  my $result_json = getLegalUnitBySIREN(123456789, 'all');
+  my $response_json = getLegalUnitBySIREN(123456789, 'all');
 
 You can specify an array of fields that interest you in order that the module returns to you only these fields. If you want to get only one field, you do not have to give it as an array.
 
 When you don't specify fields like this:
 
-  my $result_json = getLegalUnitBySIREN(123456789);
+  my $response_json = getLegalUnitBySIREN(123456789);
 
 The module will not return to you all fields by default because there are too many. Instead, it returns a selection of fields that are most likely of interest to you.
 
 If you want all fields, you have to specify it explicitly by passing the 'all' parameter.
+
+=back
+
+=head2 FUNCTION RETURN 
+
+Each function listed above returns the JSON string of the response content in case of success. Else, they return a list, whose the first element is 0, and the second is the complete sent request and the response received with headers.
+To handling the return of these function, you can do somethink like this:
+
+  my ($response_json, $err) = getLegalUnitBySIREN(123456789, 'dateCreationUniteLegale');
+
+  if (!$response_json) {
+      print $err;
+  }
 
 =back
 
@@ -600,7 +615,6 @@ If you want all fields, you have to specify it explicitly by passing the 'all' p
 Some fields have an alias to be more user-friendly, here is the list of available aliases:
 
   my %usefull_fields_alias = (
-
     'nicSiege'                       => 'nicSiegeUniteLegale',
     'nom'                            => 'denominationUniteLegale',
     'dateCreation'                   => 'dateCreationUniteLegale',
@@ -617,11 +631,11 @@ Some fields have an alias to be more user-friendly, here is the list of availabl
 
 B<Usage:>
 
-  my $result_json = getLegalUnitBySIREN(123456789, 'nom');
+  my $response_json = getLegalUnitBySIREN(123456789, 'nom');
 
 is equivalent to
 
-  my $result_json = getLegalUnitBySIREN(123456789, 'denominationUniteLegale');
+  my $response_json = getLegalUnitBySIREN(123456789, 'denominationUniteLegale');
 
 =head1 AUTHOR
 

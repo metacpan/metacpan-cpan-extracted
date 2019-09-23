@@ -16,13 +16,14 @@ require_ok $pkg;
 {
     my $server
         = Test::HTTP::LocalServer->spawn(file => 't/files/sru_oai_dc.xml');
-    my $search = $pkg->new('key', $server->url)->fix({key => 'value'});
+    my $url    = 'http://localhost:' . $server->port;
+    my $search = $pkg->new('key', $url)->fix({key => 'value'});
     ok defined $search->{key}, 'default parser';
     is scalar @{$search->{key}}, 2, 'got records';
-    $search = $pkg->new('nested.key', $server->url)
-        ->fix({nested => {key => 'value'}});
+    $search
+        = $pkg->new('nested.key', $url)->fix({nested => {key => 'value'}});
     is scalar @{$search->{nested}->{key}}, 2, 'nested path';
-    $search = $pkg->new('key.*', $server->url)->fix({key => ['foo', 'bar']});
+    $search = $pkg->new('key.*', $url)->fix({key => ['foo', 'bar']});
     ok defined $search->{key}->[0]->[0], 'array path';
     $server->stop;
 
@@ -30,11 +31,12 @@ require_ok $pkg;
 
 {
     my $server = Test::HTTP::LocalServer->spawn(file => 't/files/21.xml');
-    my $search = $pkg->new('key', $server->url, parser => 'marcxml')
-        ->fix({key => 'value'});
+    my $url    = 'http://localhost:' . $server->port;
+    my $search
+        = $pkg->new('key', $url, parser => 'marcxml')->fix({key => 'value'});
     ok defined $search->{key}, 'marcxml parser';
     $search = $pkg->new(
-        'key', $server->url,
+        'key', $url,
         parser => 'marcxml',
         fixes  => 'remove_field(record);'
     )->fix({key => 'value'});

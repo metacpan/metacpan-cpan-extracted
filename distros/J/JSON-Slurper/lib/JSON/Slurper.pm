@@ -9,7 +9,7 @@ use Scalar::Util   ();
 
 our @EXPORT_OK = qw(slurp_json spurt_json);
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use constant JSON_XS => $ENV{JSON_SLURPER_NO_JSON_XS} ? do { require JSON::PP; undef }
   : eval { require Cpanel::JSON::XS; Cpanel::JSON::XS->VERSION('4.09'); 1 } ? 1
@@ -109,7 +109,7 @@ sub spurt_json (\[@$%]$;@) {
           : JSON::PP->new->utf8->pretty->canonical->allow_nonref->allow_blessed->convert_blessed->escape_slash;
     }
 
-    if (ref $data eq 'REF') {
+    if (ref $data eq 'REF' or ref $data eq 'SCALAR') {
         $data = $$data;
     }
 

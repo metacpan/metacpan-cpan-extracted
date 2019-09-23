@@ -1,5 +1,8 @@
 Revision history for JSON-Slurper
 
+0.04  2019-09-23 04:41:15 CDT
+        - Allow scalars to be passed to spurt_json.
+
 0.03  2019-09-22 00:58:28 CDT
         - Allow refs to be passed to spurt_json.
 

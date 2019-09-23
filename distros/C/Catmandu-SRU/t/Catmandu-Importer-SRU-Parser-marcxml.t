@@ -41,8 +41,8 @@ my @parsers    = (
 foreach my $parser (@parsers) {
     my $importer = Catmandu::Importer::SRU->new(%attrs, parser => $parser);
     ok(my $obj = $importer->first, 'parse marc');
-    ok(exists $obj->{_id},    'marc has _id');
-    ok(exists $obj->{record}, 'marc as record');
+    ok(exists $obj->{_id},         'marc has _id');
+    ok(exists $obj->{record},      'marc as record');
 }
 
 note("Testing many response");

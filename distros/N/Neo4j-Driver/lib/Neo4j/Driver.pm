@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver;
 # ABSTRACT: Perl implementation of the Neo4j Driver API
-$Neo4j::Driver::VERSION = '0.11';
+$Neo4j::Driver::VERSION = '0.12';
 
 use Carp qw(croak);
 use Module::Load;
@@ -99,7 +99,7 @@ Neo4j::Driver - Perl implementation of the Neo4j Driver API
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -198,9 +198,13 @@ an alternative to HTTP to connect to the Neo4j server.
 The design goal is for this driver to eventually offer equal support
 for Bolt and HTTP. At this time, using Bolt with this driver is not
 recommended, although it sorta-kinda works. The biggest issues
-include: Explicit transactions are not yet implemented, there is
-no proper error handling, and summary information is completely
-unavailable. Additionally, there are certain problems with Unicode,
+include: Unicode is not supported in L<Neo4j::Bolt>,
+C<libneo4j-client> error reporting is unreliable, summary
+information reported by L<Neo4j::Bolt> is incomplete, and graph meta
+data supplied by L<Neo4j::Bolt> is unreliable and has a different
+format than when the HTTP transport is used.
+
+Additionally, there are
 incompatibilities with other "experimental" features of this driver,
 and parts of the documentation still assume that HTTP is the only
 option.
@@ -211,7 +215,7 @@ option.
 
 This driver does not support persistent connections at present. All
 connections are closed automatically. There is no need for explicit
-calls to `close` at this time.
+calls to C<close> at this time.
 
 =head2 HTTP Timeout
 
@@ -286,7 +290,7 @@ discovered. Use C<eval>, L<Try::Tiny> or similar to catch this.
 
 =head1 BUGS
 
-See the L<TODO.pod> document and Github for known issues and planned
+See the F<TODO> document and Github for known issues and planned
 improvements. Please report new issues and other feedback on Github.
 
 Just like the official Neo4j drivers, this driver has been designed to strike

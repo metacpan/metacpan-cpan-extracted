@@ -58928,3 +58928,9 @@ S/SR/SREZIC/Tk-PathEntry-3.08.tar.gz
 J/JH/JHTHORSEN/Toadfarm-0.82.tar.gz
 E/EH/EHUELS/Weasel-Widgets-Dojo-0.05.tar.gz
 H/HE/HEXONET/WebService-Hexonet-Connector-v2.2.4.tar.gz
+C/CP/CPANLNCSA/API-INSEE-Sirene-3.503.tar.gz
+N/NI/NICS/Catmandu-SRU-0.426.tar.gz
+S/SR/SRCHULO/JSON-Slurper-0.04.tar.gz
+A/AJ/AJNN/Neo4j-Driver-0.12.tar.gz
+F/FA/FAYLAND/Net-WHMCS-0.10.tar.gz
+C/CV/CVLIBRARY/UUID4-Tiny-0.002.tar.gz

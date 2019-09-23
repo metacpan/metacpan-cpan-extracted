@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Transport::HTTP;
 # ABSTRACT: Adapter for the Neo4j Transactional HTTP API
-$Neo4j::Driver::Transport::HTTP::VERSION = '0.11';
+$Neo4j::Driver::Transport::HTTP::VERSION = '0.12';
 
 use Carp qw(carp croak);
 our @CARP_NOT = qw(Neo4j::Driver::Transaction);
@@ -231,7 +231,7 @@ Neo4j::Driver::Transport::HTTP - Adapter for the Neo4j Transactional HTTP API
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 DESCRIPTION
 

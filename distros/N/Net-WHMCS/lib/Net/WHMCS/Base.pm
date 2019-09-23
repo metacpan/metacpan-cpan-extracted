@@ -1,5 +1,5 @@
 package Net::WHMCS::Base;
-$Net::WHMCS::Base::VERSION = '0.09';
+$Net::WHMCS::Base::VERSION = '0.10';
 # ABSTRACT: WHMCS API Role
 
 use Moo::Role;
@@ -11,14 +11,12 @@ has 'WHMCS_URL' => (
     is       => 'rw',
     required => 1
 );
-has 'WHMCS_USERNAME' => (
-    is       => 'rw',
-    required => 1
-);
-has 'WHMCS_PASSWORD' => (
-    is       => 'rw',
-    required => 1
-);
+
+has 'api_identifier' => (is => 'ro');
+has 'api_secret'     => (is => 'ro');
+
+has 'WHMCS_USERNAME'      => (is => 'rw');
+has 'WHMCS_PASSWORD'      => (is => 'rw');
 has 'WHMCS_API_ACCESSKEY' => (is => 'rw');
 
 has 'ua' => (is => 'lazy');
@@ -34,9 +32,14 @@ sub build_request {
         croak "No API action set\n";
     }
 
-    $params->{username}  = $self->WHMCS_USERNAME;
-    $params->{password}  = $self->WHMCS_PASSWORD;
-    $params->{accesskey} = $self->WHMCS_API_ACCESSKEY if $self->WHMCS_API_ACCESSKEY;
+    if ($self->api_identifier) {
+        $params->{identifier} = $self->api_identifier;
+        $params->{secret}     = $self->api_secret;
+    } else {
+        $params->{username}  = $self->WHMCS_USERNAME;
+        $params->{password}  = $self->WHMCS_PASSWORD;
+        $params->{accesskey} = $self->WHMCS_API_ACCESSKEY if $self->WHMCS_API_ACCESSKEY;
+    }
 
     $params->{responsetype} = 'json';
 
@@ -65,7 +68,7 @@ Net::WHMCS::Base - WHMCS API Role
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head3 build_request
 
@@ -83,7 +86,7 @@ Fayland Lam <fayland@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Fayland Lam.
+This software is copyright (c) 2019 by Fayland Lam.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

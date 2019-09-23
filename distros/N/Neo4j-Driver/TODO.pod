@@ -5,13 +5,6 @@
 
 This software has pre-release quality. The interface is not yet stable.
 
-=over
-
-=item * Replace old C<{}> parameter style with new C<$> style; see
-L<https://neo4j.com/docs/cypher-manual/current/deprecations-additions-removals-compatibility/>.
-
-=back
-
 =head2 L<Neo4j::Driver>
 
 =over
@@ -113,6 +106,9 @@ feature that is almost never used. Since the server is often run on localhost
 anyway where latency is very close to zero, this item should not have high
 priority.
 
+=item * Replace old C<{}> parameter style with new C<$> style; see
+L<https://neo4j.com/docs/cypher-manual/current/deprecations-additions-removals-compatibility/>.
+
 =back
 
 =head2 L<Neo4j::Driver::StatementResult>
@@ -169,6 +165,9 @@ regards to index/key collisions.
 =item * Profile the server-side performance penalty of requesting stats for
 various kinds of queries. If the penalty turns out to be low, stats should
 probably be requested by default.
+
+=item * Using Bolt seems to always provide stats. Since the API should not be
+different for HTTP and Bolt, requesting stats should probably be the default.
 
 =item * The ResultSummary is currently only available via C<summary> after
 explicitly requesting stats before C<run>, while the C<ResultSummary> object is

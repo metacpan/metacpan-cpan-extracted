@@ -43,6 +43,7 @@
             "Carp" : "0",
             "Exporter" : "0",
             "constant" : "0",
+            "perl" : "5.008",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -62,7 +63,7 @@
    "provides" : {
       "UUID4::Tiny" : {
          "file" : "lib/UUID4/Tiny.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -76,12 +77,39 @@
          "web" : "https://github.com/cv-library/UUID4-Tiny"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
       },
       "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::AutoPrereqsFast",
+            "name" : "AutoPrereqsFast",
+            "version" : "0.003"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::OnlyCorePrereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::OnlyCorePrereqs" : {
+                  "also_disallow" : [],
+                  "check_dual_life_versions" : 1,
+                  "deprecated_ok" : 0,
+                  "phases" : [
+                     "configure",
+                     "build",
+                     "runtime",
+                     "test"
+                  ],
+                  "skips" : [
+                     "Test2::Tools::Tiny"
+                  ],
+                  "starting_version" : "5.008"
+               }
+            },
+            "name" : "OnlyCorePrereqs",
+            "version" : "0.024"
+         },
          {
             "class" : "Dist::Zilla::Plugin::Git::GatherDir",
             "config" : {
@@ -274,7 +302,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.001",
+                  "tag" : "0.002",
                   "tag_format" : "%v",
                   "tag_message" : "%v"
                },
@@ -412,11 +440,6 @@
             "version" : "6.012"
          },
          {
-            "class" : "Dist::Zilla::Plugin::AutoPrereqsFast",
-            "name" : "AutoPrereqsFast",
-            "version" : "0.003"
-         },
-         {
             "class" : "Dist::Zilla::Plugin::EnsureChangesHasContent",
             "name" : "EnsureChangesHasContent",
             "version" : "0.02"
@@ -425,26 +448,6 @@
             "class" : "Dist::Zilla::Plugin::GitHub::Meta",
             "name" : "GitHub::Meta",
             "version" : "0.47"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::OnlyCorePrereqs",
-            "config" : {
-               "Dist::Zilla::Plugin::OnlyCorePrereqs" : {
-                  "also_disallow" : [],
-                  "check_dual_life_versions" : 1,
-                  "deprecated_ok" : 0,
-                  "phases" : [
-                     "configure",
-                     "build",
-                     "runtime",
-                     "test"
-                  ],
-                  "skips" : [],
-                  "starting_version" : "5.025008"
-               }
-            },
-            "name" : "OnlyCorePrereqs",
-            "version" : "0.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodWeaver",

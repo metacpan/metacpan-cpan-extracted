@@ -20,7 +20,7 @@ my $s = $driver->session;
 # those features or moved elsewhere once the features are documented
 # and thus officially supported.
 
-use Test::More 0.96 tests => 7;
+use Test::More 0.96 tests => 8;
 use Test::Exception;
 use Test::Warnings qw(warnings :no_end_test);
 
@@ -43,7 +43,7 @@ END
 	lives_and { is $a[0], 'n'; } 'get record 0 in keys list';
 	
 	# notifications
-	my $t = $s->begin_transaction;
+	my $t = $driver->session->begin_transaction;
 	$t->{return_stats} = 1;
 	lives_ok { @a = $t->run($q)->summary->notifications; } 'no notifications';
 	$q = <<END;
@@ -103,12 +103,12 @@ subtest 'die_on_error = 0' => sub {
 	# it to also affect all croaks this driver issues by itself.
 	# The latter are not yet covered by these tests.
 	plan tests => 4;
-	my $t = $s->begin_transaction;
+	my $t = $driver->session->begin_transaction;
 	$t->{transport}->{die_on_error} = 0;
 	lives_and { is $t->run('RETURN 42')->single->get, 42 } 'no error';
 	lives_and { warnings { is $t->run('iced manifolds.')->size, 0 } } 'cypher syntax error';
-	$t = $s->begin_transaction;
-	$t->{die_on_error} = 0;
+	$t = $driver->session->begin_transaction;
+	$t->{transport}->{die_on_error} = 0;
 	$t->{transaction_endpoint} = '/qwertyasdfghzxcvbn';
 	lives_and { warnings { is $t->run('RETURN 42')->size, 0 } } 'HTTP 404';
 	lives_ok { warnings {
@@ -119,9 +119,19 @@ subtest 'die_on_error = 0' => sub {
 };
 
 
+subtest 'nested transactions: explicit' => sub {
+	plan tests => 1;
+	my $session = $driver->session;
+	lives_ok {
+		$session->begin_transaction;
+		$session->begin_transaction;
+	} 'explicit nested transactions';
+};
+
+
 subtest 'stats' => sub {
 	plan tests => 9;
-	my $t = $s->begin_transaction;
+	my $t = $driver->session->begin_transaction;
 	$t->{return_stats} = 1;
 	lives_ok { $r = $t->run('RETURN 42'); } 'run stats query';
 	# deprecation warnings are expected
@@ -165,7 +175,7 @@ subtest 'support for get_person in LOMS plugin' => sub {
 
 subtest 'graph queries' => sub {
 	plan tests => 7;
-	my $t = $s->begin_transaction;
+	my $t = $driver->session->begin_transaction;
 	$t->{return_graph} = 1;
 	$q = <<END;
 CREATE ({name:'Alice'})-[k:KNOWS{since:1978}]->({name:'Bob'}) RETURN id(k)

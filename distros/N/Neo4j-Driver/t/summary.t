@@ -11,18 +11,17 @@ BEGIN {
 		exit;
 	}
 }
-my $s = $driver->session;
 
 
 # These tests are for the result summary and statistics.
 
 use Test::More 0.96 tests => 7 + 1;
 use Test::Exception;
-my $transaction = $s->begin_transaction;
+my $transaction = $driver->session->begin_transaction;
 $transaction->{return_stats} = 1;
 
 
-my $t = $s->begin_transaction;
+my $t = $driver->session->begin_transaction;
 $t->{return_stats} = 1;
 my ($q, $r, $c);
 
@@ -54,17 +53,21 @@ END
 subtest 'ResultSummary: failure' => sub {
 	plan tests => 4;
 	throws_ok { $t->run()->summary; } qr/missing stats/i, 'missing statement - summary';
-	my $tx = $driver->session->begin_transaction;
-	$tx->{return_stats} = 0;
-	throws_ok {
-		$tx->run('RETURN 42')->summary;
-	} qr/missing stats/i, 'no stats requested - summary';
-	throws_ok {
-		$tx->run('RETURN 42')->single->summary;
-	} qr/missing stats/i, 'no stats requested - single summary';
-	lives_ok {
-		$tx->run('RETURN 42')->single;
-	} 'no stats requested - single';
+	SKIP: {
+		my $is_bolt = URI->new( $ENV{TEST_NEO4J_SERVER} // '' )->scheme // '' eq 'bolt';
+		skip 'Bolt always provides stats', 3 if $is_bolt;
+		my $tx = $driver->session->begin_transaction;
+		$tx->{return_stats} = 0;
+		throws_ok {
+			$tx->run('RETURN 42')->summary;
+		} qr/missing stats/i, 'no stats requested - summary';
+		throws_ok {
+			$tx->run('RETURN 42')->single->summary;
+		} qr/missing stats/i, 'no stats requested - single summary';
+		lives_ok {
+			$tx->run('RETURN 42')->single;
+		} 'no stats requested - single';
+	}
 };
 
 

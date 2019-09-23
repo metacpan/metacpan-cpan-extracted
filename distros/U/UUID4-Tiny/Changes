@@ -1,3 +1,7 @@
+0.002     2019-09-23 09:12:57 BST
+
+    - Tweaks to support Perl v5.8+
+
 0.001     2019-09-19 14:59:09 BST
 
     - Initial release

@@ -1,5 +1,5 @@
 package Net::WHMCS::Support;
-$Net::WHMCS::Support::VERSION = '0.09';
+$Net::WHMCS::Support::VERSION = '0.10';
 # ABSTRACT: WHMCS API Support
 
 use Moo;
@@ -25,7 +25,7 @@ Net::WHMCS::Support - WHMCS API Support
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head2 openticket
 
@@ -44,7 +44,7 @@ Fayland Lam <fayland@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Fayland Lam.
+This software is copyright (c) 2019 by Fayland Lam.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

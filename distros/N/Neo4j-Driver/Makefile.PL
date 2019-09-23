@@ -20,7 +20,6 @@ my %WriteMakefileArgs = (
     "Cpanel::JSON::XS" => "3.0201",
     "JSON::PP" => 0,
     "LWP::UserAgent" => 0,
-    "Module::Load" => 0,
     "REST::Client" => 134,
     "Try::Tiny" => 0,
     "URI" => "1.25"
@@ -30,7 +29,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.96",
     "Test::Warnings" => 0
   },
-  "VERSION" => "0.11",
+  "VERSION" => "0.12",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,7 +40,6 @@ my %FallbackPrereqs = (
   "Cpanel::JSON::XS" => "3.0201",
   "JSON::PP" => 0,
   "LWP::UserAgent" => 0,
-  "Module::Load" => 0,
   "REST::Client" => 134,
   "Test::Exception" => 0,
   "Test::More" => "0.96",

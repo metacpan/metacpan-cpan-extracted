@@ -10,9 +10,8 @@ use Digest::MD5 'md5_hex';
 
 my $whmcs = Net::WHMCS->new(
 	WHMCS_URL => 'http://example.com/whmcs/includes/api.php',
-	WHMCS_USERNAME => 'admin_user',
-	WHMCS_PASSWORD => md5_hex('admin_pass'),
-	# WHMCS_API_ACCESSKEY => 'faylandtest', # optional, to pass the IP, http://docs.whmcs.com/API:Access_Keys
+	api_identifier => 'D4j1dKYE3g40VROOPCGyJ9zRwP0ADJIv',
+    api_secret => 'F1CKGXRIpylMfsrig3mwwdSdYUdLiFlo',
 );
 
 my $user = $whmcs->client->getclientsdetails({

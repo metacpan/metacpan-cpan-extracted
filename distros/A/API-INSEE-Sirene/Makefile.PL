@@ -8,4 +8,6 @@ WriteMakefile(
     ABSTRACT_FROM     => 'lib/API/INSEE/Sirene.pm',
     AUTHOR            => 'FOUQUET Justin <jfouquet at lncsa dot fr>',
     LICENSE           => 'perl',
+
+    clean         => { FILES => "MANIFEST API-INSEE-Sirene-*.tar.gz debian.bak debian/libapi-insee-sirene-perl*" },
 );

@@ -1,5 +1,8 @@
 Revision history for Catmandu-SRU
 
+0.426  2019-09-23 10:04:01 CEST
+  - work around issue with url returned by Test::HTTP::LocalServer 0.66 
+
 0.425  2019-09-20 10:11:50 CEST
   - add missing dependencies
 

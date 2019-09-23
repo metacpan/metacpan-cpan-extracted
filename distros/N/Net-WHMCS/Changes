@@ -1,5 +1,8 @@
 Revision history for Perl extension Net-WHMCS
 
+0.10    2019-09-23
+    - use identifier and secret for auth
+
 0.09    2017-09-12
     - add addclientnote
     - requires WHMCS 7.0+ (old version please use v0.08 instead)

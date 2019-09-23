@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::SummaryCounters;
 # ABSTRACT: Statement statistics
-$Neo4j::Driver::SummaryCounters::VERSION = '0.11';
+$Neo4j::Driver::SummaryCounters::VERSION = '0.12';
 
 sub new {
 	my ($class, $stats) = @_;
@@ -17,7 +17,6 @@ sub new {
 my @counters = qw(
 	constraints_added
 	constraints_removed
-	contains_updates
 	indexes_added
 	indexes_removed
 	labels_added
@@ -33,6 +32,17 @@ for my $c (@counters) { *$c = sub { shift->{$c} } }
 # This name is a typo that drivers are supposed to fix;
 # see <https://github.com/neo4j/neo4j/issues/3421>
 sub relationships_deleted { shift->{relationship_deleted}; }
+
+# contains_updates is only present in the HTTP response;
+# we need to synthesize it from Bolt responses
+sub contains_updates {
+	my $self = shift;
+	unless (defined $self->{contains_updates}) {
+		$self->{contains_updates} = $self->{relationship_deleted} // 0;
+		$self->{contains_updates} += grep {$self->{$_}} @counters;
+	}
+	return !! $self->{contains_updates};
+}
 
 
 
@@ -51,7 +61,7 @@ Neo4j::Driver::SummaryCounters - Statement statistics
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 

@@ -27,21 +27,43 @@ no_index:
 provides:
   UUID4::Tiny:
     file: lib/UUID4/Tiny.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Carp: '0'
   Exporter: '0'
   constant: '0'
+  perl: '5.008'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/cv-library/UUID4-Tiny/issues
   repository: git://github.com/cv-library/UUID4-Tiny.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
   plugins:
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqsFast
+      name: AutoPrereqsFast
+      version: '0.003'
+    -
+      class: Dist::Zilla::Plugin::OnlyCorePrereqs
+      config:
+        Dist::Zilla::Plugin::OnlyCorePrereqs:
+          also_disallow: []
+          check_dual_life_versions: '1'
+          deprecated_ok: '0'
+          phases:
+            - configure
+            - build
+            - runtime
+            - test
+          skips:
+            - Test2::Tools::Tiny
+          starting_version: '5.008'
+      name: OnlyCorePrereqs
+      version: '0.024'
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
       config:
@@ -189,7 +211,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.001'
+          tag: '0.002'
           tag_format: '%v'
           tag_message: '%v'
         Dist::Zilla::Role::Git::Repo:
@@ -291,10 +313,6 @@ x_Dist_Zilla:
       name: '@Starter::Git/ExecDir'
       version: '6.012'
     -
-      class: Dist::Zilla::Plugin::AutoPrereqsFast
-      name: AutoPrereqsFast
-      version: '0.003'
-    -
       class: Dist::Zilla::Plugin::EnsureChangesHasContent
       name: EnsureChangesHasContent
       version: '0.02'
@@ -302,22 +320,6 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::GitHub::Meta
       name: GitHub::Meta
       version: '0.47'
-    -
-      class: Dist::Zilla::Plugin::OnlyCorePrereqs
-      config:
-        Dist::Zilla::Plugin::OnlyCorePrereqs:
-          also_disallow: []
-          check_dual_life_versions: '1'
-          deprecated_ok: '0'
-          phases:
-            - configure
-            - build
-            - runtime
-            - test
-          skips: []
-          starting_version: '5.025008'
-      name: OnlyCorePrereqs
-      version: '0.024'
     -
       class: Dist::Zilla::Plugin::PodWeaver
       config:
